@@ -21,7 +21,7 @@ COMMAND_MODULE = 'openedx.core.djangoapps.programs.management.commands.backpopul
 
 
 @ddt.ddt
-@httpretty.activate
+@mock.patch(COMMAND_MODULE + '.get_programs')
 @mock.patch(COMMAND_MODULE + '.award_program_certificates.delay')
 @skip_unless_lms
 class BackpopulateProgramCredentialsTests(CatalogIntegrationMixin, CredentialsApiConfigMixin, TestCase):
@@ -42,17 +42,8 @@ class BackpopulateProgramCredentialsTests(CatalogIntegrationMixin, CredentialsAp
         self.catalog_integration = self.create_catalog_integration()
         self.service_user = UserFactory(username=self.catalog_integration.service_username)
 
-    def _mock_programs_api(self, data):
-        """Helper for mocking out Catalog API URLs."""
-        self.assertTrue(httpretty.is_enabled(), msg='httpretty must be enabled to mock Catalog API calls.')
-
-        url = self.catalog_integration.internal_api_url.strip('/') + '/programs/'
-        body = json.dumps({'results': data})
-
-        httpretty.register_uri(httpretty.GET, url, body=body, content_type='application/json')
-
     @ddt.data(True, False)
-    def test_handle(self, commit, mock_task):
+    def test_handle(self, commit, mock_task, mock_get_programs):
         """Verify that relevant tasks are only enqueued when the commit option is passed."""
         data = [
             factories.Program(
@@ -64,7 +55,7 @@ class BackpopulateProgramCredentialsTests(CatalogIntegrationMixin, CredentialsAp
                 ]
             ),
         ]
-        self._mock_programs_api(data)
+        mock_get_programs.return_value = data
 
         GeneratedCertificateFactory(
             user=self.alice,
@@ -131,9 +122,9 @@ class BackpopulateProgramCredentialsTests(CatalogIntegrationMixin, CredentialsAp
             ),
         ],
     )
-    def test_handle_flatten(self, data, mock_task):
+    def test_handle_flatten(self, data, mock_task, mock_get_programs):
         """Verify that program structures are flattened correctly."""
-        self._mock_programs_api(data)
+        mock_get_programs.return_value = data
 
         GeneratedCertificateFactory(
             user=self.alice,
@@ -157,7 +148,7 @@ class BackpopulateProgramCredentialsTests(CatalogIntegrationMixin, CredentialsAp
         ]
         mock_task.assert_has_calls(calls, any_order=True)
 
-    def test_handle_username_dedup(self, mock_task):
+    def test_handle_username_dedup(self, mock_task, mock_get_programs):
         """Verify that only one task is enqueued for a user with multiple eligible certs."""
         data = [
             factories.Program(
@@ -170,7 +161,7 @@ class BackpopulateProgramCredentialsTests(CatalogIntegrationMixin, CredentialsAp
                 ]
             ),
         ]
-        self._mock_programs_api(data)
+        mock_get_programs.return_value = data
 
         GeneratedCertificateFactory(
             user=self.alice,
@@ -190,7 +181,7 @@ class BackpopulateProgramCredentialsTests(CatalogIntegrationMixin, CredentialsAp
 
         mock_task.assert_called_once_with(self.alice.username)
 
-    def test_handle_mode_slugs(self, mock_task):
+    def test_handle_mode_slugs(self, mock_task, mock_get_programs):
         """Verify that mode slugs are taken into account."""
         data = [
             factories.Program(
@@ -205,7 +196,7 @@ class BackpopulateProgramCredentialsTests(CatalogIntegrationMixin, CredentialsAp
                 ]
             ),
         ]
-        self._mock_programs_api(data)
+        mock_get_programs.return_value = data
 
         GeneratedCertificateFactory(
             user=self.alice,
@@ -224,7 +215,7 @@ class BackpopulateProgramCredentialsTests(CatalogIntegrationMixin, CredentialsAp
 
         mock_task.assert_called_once_with(self.alice.username)
 
-    def test_handle_passing_status(self, mock_task):
+    def test_handle_passing_status(self, mock_task, mock_get_programs):
         """Verify that only certificates with a passing status are selected."""
         data = [
             factories.Program(
@@ -237,7 +228,7 @@ class BackpopulateProgramCredentialsTests(CatalogIntegrationMixin, CredentialsAp
                 ]
             ),
         ]
-        self._mock_programs_api(data)
+        mock_get_programs.return_value = data
 
         passing_status = CertificateStatuses.downloadable
         failing_status = CertificateStatuses.notpassing
@@ -265,9 +256,8 @@ class BackpopulateProgramCredentialsTests(CatalogIntegrationMixin, CredentialsAp
 
         mock_task.assert_called_once_with(self.alice.username)
 
-    def test_handle_missing_service_user(self, mock_task):
+    def test_handle_missing_service_user(self, mock_task, __):
         """Verify that the command fails when no service user exists."""
-
         self.catalog_integration = self.create_catalog_integration(service_username='test')
         with self.assertRaises(CommandError):
             call_command('backpopulate_program_credentials')
@@ -275,7 +265,7 @@ class BackpopulateProgramCredentialsTests(CatalogIntegrationMixin, CredentialsAp
         mock_task.assert_not_called()
 
     @mock.patch(COMMAND_MODULE + '.logger.exception')
-    def test_handle_enqueue_failure(self, mock_log, mock_task):
+    def test_handle_enqueue_failure(self, mock_log, mock_task, mock_get_programs):
         """Verify that failure to enqueue a task doesn't halt execution."""
         def side_effect(username):
             """Simulate failure to enqueue a task."""
@@ -294,7 +284,7 @@ class BackpopulateProgramCredentialsTests(CatalogIntegrationMixin, CredentialsAp
                 ]
             ),
         ]
-        self._mock_programs_api(data)
+        mock_get_programs.return_value = data
 
         GeneratedCertificateFactory(
             user=self.alice,
