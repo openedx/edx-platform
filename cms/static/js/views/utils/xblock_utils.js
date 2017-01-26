@@ -94,31 +94,29 @@ define(['jquery', 'underscore', 'gettext', 'common/js/components/utils/view_util
 
         /**
          * Moves the specified xblock in a new parent xblock.
-         * @param {String}  source_locator  The xblock element to be moved.
-         * @param {String}  parent_locator  New parent xblock locator of the xblock to be moved,
+         * @param {String}  sourceLocator  The xblock element to be moved.
+         * @param {String}  targetParentLocator  Target parent xblock locator of the xblock to be moved,
          *      new moved xblock would be placed under this xblock.
          * @param {String}  targetIndex  Intended index position of the xblock in parent xblock. If provided,
          *      xblock would be placed at the particular index in the parent xblock.
          * @returns {jQuery promise} A promise representing the moving of the xblock.
          */
-        moveXBlock = function(sourceLocator, parentLocator, targetIndex) {
-            var operationText = targetIndex !== undefined ? gettext('Undo moving') : gettext('Moving');
+        moveXBlock = function(sourceLocator, targetParentLocator, targetIndex) {
+            var moveOperation = $.Deferred(),
+                operationText = targetIndex !== undefined ? gettext('Undo moving') : gettext('Moving');
             return ViewUtils.runOperationShowingMessage(operationText,
                 function() {
-                    var movingOperation = $.Deferred();
-                    $.postJSON(ModuleUtils.getUpdateUrl(), {
+                    $.patchJSON(ModuleUtils.getUpdateUrl(), {
                         move_source_locator: sourceLocator,
-                        parent_locator: parentLocator,
+                        parent_locator: targetParentLocator,
                         target_index: targetIndex
                     }, function(data) {
-                        movingOperation.resolve(data);
-                    },
-                    'PATCH'
-                    )
+                        moveOperation.resolve(data);
+                    })
                     .fail(function() {
-                        movingOperation.reject();
+                        moveOperation.reject();
                     });
-                    return movingOperation.promise();
+                    return moveOperation.promise();
                 });
         };
 

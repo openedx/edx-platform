@@ -15,9 +15,9 @@
     <% } %>
 
     <div class="copy">
-      <h2 class="title title-3" id="<%= type %>-<%= intent %>-title"><%- title %><% if(titleLink) { %> <%= titleLink %> <% } %></h2>
+      <h2 class="title title-3" id="<%= type %>-<%= intent %>-title"><%- title %><% if(titleHtml) { %> <%= titleHtml %> <% } %></h2>
       <% if(obj.message) { %><p class="message" id="<%= type %>-<%= intent %>-description"><%- message %></p><% } %>
-      <% if(messageLink) { %> <%= messageLink %> <% } %>
+      <% if(messageHtml) { %> <%= messageHtml %> <% } %>
     </div>
 
     <% if(obj.actions) { %>

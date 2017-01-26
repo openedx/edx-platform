@@ -1,11 +1,11 @@
 /**
- * The MovedAlertView to show confirmation message when moving XBlocks in course.
+ * The MovedAlertView to show confirmation message when moving XBlocks.
  */
 (function(define) {
     'use strict';
-    define(['jquery', 'underscore', 'underscore.string', 'common/js/components/views/feedback_alert',
-    'js/views/utils/xblock_utils', 'edx-ui-toolkit/js/utils/string-utils'],
-        function($, _, str, AlertView, XBlockViewUtils, StringUtils) {
+    define(['jquery', 'underscore', 'common/js/components/views/feedback_alert', 'js/views/utils/xblock_utils',
+        'js/views/utils/move_xblock_utils', 'edx-ui-toolkit/js/utils/string-utils'],
+        function($, _, AlertView, XBlockViewUtils, MoveXBlockUtils, StringUtils) {
             var MovedAlertView = AlertView.Confirmation.extend({
                 events: _.extend({}, AlertView.Confirmation.prototype.events, {
                     'click .action-undo-move': 'undoMoveXBlock'
@@ -20,35 +20,27 @@
 
                 undoMoveXBlock: function(event) {
                     var self = this,
-                        $moveLink = $(event.target),
-                        sourceLocator = $moveLink.data('source-locator'),
-                        sourceDisplayName = $moveLink.data('source-display-name'),
-                        parentLocator = $moveLink.data('parent-locator'),
-                        targetIndex = $moveLink.data('target-index');
-                    XBlockViewUtils.moveXBlock(sourceLocator, parentLocator, targetIndex)
+                        $moveButton = $(event.target),
+                        sourceLocator = $moveButton.data('source-locator'),
+                        sourceDisplayName = $moveButton.data('source-display-name'),
+                        sourceParentLocator = $moveButton.data('source-parent-locator'),
+                        targetIndex = $moveButton.data('target-index');
+                    XBlockViewUtils.moveXBlock(sourceLocator, sourceParentLocator, targetIndex)
                     .done(function(response) {
                         // show XBlock element
                         $('.studio-xblock-wrapper[data-locator="' + response.move_source_locator + '"]').show();
                         if (self.movedAlertView) {
                             self.movedAlertView.hide();
                         }
-                        self.movedAlertView = new MovedAlertView({
-                            title: StringUtils.interpolate(
-                                gettext(
-                                    'Undo Success! "{sourceDisplayName}" has been moved back to a previous location.'
-                                ), {
+                        self.movedAlertView = MoveXBlockUtils.showMovedNotification(
+                            StringUtils.interpolate(
+                                gettext('Move cancelled. "{sourceDisplayName}" has been moved back to its original ' +
+                                    'location.'),
+                                {
                                     sourceDisplayName: sourceDisplayName
                                 }
-                            ),
-                            maxShown: 10000
-                        });
-                        self.movedAlertView.show();
-                        // scroll to top
-                        $.smoothScroll({
-                            offset: 0,
-                            easing: 'swing',
-                            speed: 1000
-                        });
+                            )
+                        );
                     });
                 }
             });

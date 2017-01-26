@@ -11,8 +11,8 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
             selectTargetParent,
             getConfirmationFeedbackTitle,
             getUndoConfirmationFeedbackTitle,
-            getConfirmationFeedbackTitleLink,
-            getConfirmationFeedbackMessageLink,
+            getConfirmationFeedbackTitleHtml,
+            getConfirmationFeedbackMessageHtml,
             sourceDisplayName = 'HTML 101',
             outlineUrl = '/course/cid?formats=concise',
             sourceLocator = 'source-xblock-locator',
@@ -80,7 +80,7 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
 
         getConfirmationFeedbackTitle = function(displayName) {
             return StringUtils.interpolate(
-                gettext('Success! "{displayName}" has been moved to a new location.'),
+                'Success! "{displayName}" has been moved.',
                 {
                     displayName: displayName
                 }
@@ -89,16 +89,16 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
 
         getUndoConfirmationFeedbackTitle = function(displayName) {
             return StringUtils.interpolate(
-                gettext('Undo Success! "{sourceDisplayName}" has been moved back to a previous location.'),
+                'Move cancelled. "{sourceDisplayName}" has been moved back to its original location.',
                 {
                     sourceDisplayName: displayName
                 }
             );
         };
 
-        getConfirmationFeedbackTitleLink = function(parentLocator) {
+        getConfirmationFeedbackTitleHtml = function(parentLocator) {
             return StringUtils.interpolate(
-                gettext(' {link_start}Take me there{link_end}'),
+                '{link_start}Take me to the new location{link_end}',
                 {
                     link_start: HtmlUtils.HTML('<a href="/container/' + parentLocator + '">'),
                     link_end: HtmlUtils.HTML('</a>')
@@ -106,16 +106,16 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
             );
         };
 
-        getConfirmationFeedbackMessageLink = function(displayName, locator, parentLocator, sourceIndex) {
+        getConfirmationFeedbackMessageHtml = function(displayName, locator, parentLocator, sourceIndex) {
             return HtmlUtils.interpolateHtml(
                 HtmlUtils.HTML(
                     '<a class="action-undo-move" href="#" data-source-display-name="{displayName}" ' +
-                    'data-source-locator="{sourceLocator}" data-parent-locator="{parentLocator}" ' +
+                    'data-source-locator="{sourceLocator}" data-source-parent-locator="{parentSourceLocator}" ' +
                     'data-target-index="{targetIndex}">{undoMove}</a>'),
                 {
                     displayName: displayName,
                     sourceLocator: locator,
-                    parentLocator: parentLocator,
+                    parentSourceLocator: parentLocator,
                     targetIndex: sourceIndex,
                     undoMove: gettext('Undo move')
                 }
@@ -152,7 +152,7 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
 
             sendMoveXBlockRequest = function(requests, xblockLocator, parentLocator, targetIndex, sourceIndex) {
                 var responseData,
-                    expectData,
+                    expectedData,
                     sourceIndex = sourceIndex || 0, // eslint-disable-line no-redeclare
                     moveButton = modal.$el.find('.modal-actions .action-move')[sourceIndex];
 
@@ -160,19 +160,19 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
                 selectTargetParent(parentLocator);
                 moveButton.click();
 
-                responseData = expectData = {
+                responseData = expectedData = {
                     move_source_locator: xblockLocator,
                     parent_locator: parentLocator
                 };
 
                 if (targetIndex !== undefined) {
-                    expectData = _.extend(expectData, {
+                    expectedData = _.extend(expectedData, {
                         targetIndex: targetIndex
                     });
                 }
 
                 // verify content of request
-                AjaxHelpers.expectJsonRequest(requests, 'PATCH', '/xblock/', expectData);
+                AjaxHelpers.expectJsonRequest(requests, 'PATCH', '/xblock/', expectedData);
 
                 // send the response
                 AjaxHelpers.respondWithJson(requests, _.extend(responseData, {
@@ -185,11 +185,11 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
                 sendMoveXBlockRequest(requests, sourceLocator, targetParentLocator);
                 expect(modal.movedAlertView).toBeDefined();
                 expect(modal.movedAlertView.options.title).toEqual(getConfirmationFeedbackTitle(sourceDisplayName));
-                expect(modal.movedAlertView.options.titleLink).toEqual(
-                    getConfirmationFeedbackTitleLink(targetParentLocator)
+                expect(modal.movedAlertView.options.titleHtml).toEqual(
+                    getConfirmationFeedbackTitleHtml(targetParentLocator)
                 );
-                expect(modal.movedAlertView.options.messageLink).toEqual(
-                    getConfirmationFeedbackMessageLink(
+                expect(modal.movedAlertView.options.messageHtml).toEqual(
+                    getConfirmationFeedbackMessageHtml(
                         sourceDisplayName,
                         sourceLocator,
                         sourceParentLocator,
@@ -208,7 +208,7 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
                     requests = AjaxHelpers.requests(this);
                 moveXBlockWithSuccess(requests);
                 modal.movedAlertView.undoMoveXBlock({
-                    target: $(modal.movedAlertView.options.messageLink.text)
+                    target: $(modal.movedAlertView.options.messageHtml.text)
                 });
                 AjaxHelpers.respondWithJson(requests, {
                     move_source_locator: sourceLocator,
@@ -243,7 +243,7 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
                 moveXBlockWithSuccess(requests);
                 notificationSpy = ViewHelpers.createNotificationSpy();
                 modal.movedAlertView.undoMoveXBlock({
-                    target: $(modal.movedAlertView.options.messageLink.text)
+                    target: $(modal.movedAlertView.options.messageHtml.text)
                 });
                 verifyNotificationStatus(requests, notificationSpy, 'Undo moving');
             });

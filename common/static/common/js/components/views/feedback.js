@@ -21,8 +21,8 @@
                 options: {
                     title: '',
                     message: '',
-                    titleLink: '',  // an html link in the title
-                    messageLink: '',    // an html in message
+                    titleHtml: '',  // an optional html that comes after the title.
+                    messageHtml: '',    // an optional html that comes after the message.
                     intent: null,  // "warning", "confirmation", "error", "announcement", "step-required", etc
                     type: null, // "alert", "notification", or "prompt": set by subclass
                     shown: true,  // is this view currently being shown?
