@@ -79,7 +79,6 @@ git+https://github.com/edx/XBlock.git@xblock-0.4.13#egg=XBlock==0.4.13
 git+https://github.com/edx/edx-ora2.git@1.1.13#egg=ora2==1.1.13
 -e git+https://github.com/edx/edx-submissions.git@1.1.4#egg=edx-submissions==1.1.4
 git+https://github.com/edx/ease.git@release-2015-07-14#egg=ease==0.1.3
-git+https://github.com/edx/i18n-tools.git@v0.3.7#egg=edx-i18n-tools==v0.3.7
 git+https://github.com/edx/edx-val.git@0.0.12#egg=edxval==0.0.12
 git+https://github.com/pmitros/RecommenderXBlock.git@v1.1#egg=recommender-xblock==1.1
 git+https://github.com/solashirai/crowdsourcehinter.git@518605f0a95190949fe77bd39158450639e2e1dc#egg=crowdsourcehinter-xblock==0.1
