@@ -139,9 +139,11 @@ class TestUserTaskStopped(APITestCase):
         )
         user_task_stopped.send(sender=UserTaskStatus, status=self.status)
 
-        subject = "Your {studio_name} task status".format(studio_name=settings.STUDIO_NAME)
+        subject = "{platform_name} {studio_name}: Task Status Update".format(
+            platform_name=settings.PLATFORM_NAME, studio_name=settings.STUDIO_NAME
+        )
         body_fragments = [
-            "Your task {task_name} has completed".format(task_name=self.status.name),
+            "Your {task_name} task has completed with the status".format(task_name=self.status.name),
             "https://test.edx.org/",
             reverse('usertaskstatus-detail', args=[self.status.uuid])
         ]
@@ -169,15 +171,19 @@ class TestUserTaskStopped(APITestCase):
         """
         user_task_stopped.send(sender=UserTaskStatus, status=self.status)
 
-        subject = "Your {studio_name} task status".format(studio_name=settings.STUDIO_NAME)
+        subject = "{platform_name} {studio_name}: Task Status Update".format(
+            platform_name=settings.PLATFORM_NAME, studio_name=settings.STUDIO_NAME
+        )
         fragments = [
-            "Your task {task_name} has completed".format(task_name=self.status.name),
-            "Sign in to view the details"
+            "Your {task_name} task has completed with the status".format(task_name=self.status.name),
+            "Sign in to view the details of your task or download any files created."
         ]
 
         self.assertEqual(len(mail.outbox), 1)
 
         msg = mail.outbox[0]
+        print(msg.body)
+        print("==========================")
         self.assertEqual(msg.subject, subject)
 
         for fragment in fragments:

@@ -2,12 +2,10 @@
 
 % if detail_url:
 
-${_("Your task {task_name} has completed with status {task_status}. To view details on your task or download any files created please copy and paste this address into your web browser's address bar:").format(task_name=task_name, task_status=task_status)}
-${detail_url}
+${_("Your {task_name} task has completed with the status {task_status}. Use this URL to view task details or download any files created: {detail_url}").format(task_name=task_name, task_status=task_status, detail_url=detail_url)}
 
 % else:
 
-${_("Your task {task_name} has completed with status {task_status}. Sign in to view the details of your task or download any files created.").format(task_name=task_name, task_status=task_status)}
+${_("Your {task_name} task has completed with the status {task_status}. Sign in to view the details of your task or download any files created.").format(task_name=task_name, task_status=task_status)}
 
 % endif
-
