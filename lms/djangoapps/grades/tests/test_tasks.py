@@ -229,10 +229,10 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
 
     @ddt.data(ScoreDatabaseTableEnum.courseware_student_module, ScoreDatabaseTableEnum.submissions)
     @patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade_v3.retry')
-    def test_retry_when_db_not_updated(self, score_db_table, mock_retry):
+    @patch('lms.djangoapps.grades.tasks.log')
+    def test_retry_when_db_not_updated(self, score_db_table, mock_log, mock_retry):
         self.set_up_course()
         self.recalculate_subsection_grade_kwargs['score_db_table'] = score_db_table
-
         modified_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC) - timedelta(days=1)
         if score_db_table == ScoreDatabaseTableEnum.submissions:
             with patch('lms.djangoapps.grades.tasks.sub_api.get_score') as mock_sub_score:
@@ -248,6 +248,10 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
             )
 
         self._assert_retry_called(mock_retry)
+        self.assertIn(
+            u"Persistent Grades: tasks._has_database_updated_with_new_score is False.",
+            mock_log.info.call_args_list[0][0][0]
+        )
 
     @ddt.data(
         *itertools.product(
@@ -257,7 +261,8 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
     )
     @ddt.unpack
     @patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade_v3.retry')
-    def test_when_no_score_found(self, score_deleted, score_db_table, mock_retry):
+    @patch('lms.djangoapps.grades.tasks.log')
+    def test_when_no_score_found(self, score_deleted, score_db_table, mock_log, mock_retry):
         self.set_up_course()
         self.recalculate_subsection_grade_kwargs['score_deleted'] = score_deleted
         self.recalculate_subsection_grade_kwargs['score_db_table'] = score_db_table
@@ -275,6 +280,10 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
             self._assert_retry_not_called(mock_retry)
         else:
             self._assert_retry_called(mock_retry)
+            self.assertIn(
+                u"Persistent Grades: tasks._has_database_updated_with_new_score is False.",
+                mock_log.info.call_args_list[0][0][0]
+            )
 
     @patch('lms.djangoapps.grades.tasks.log')
     @patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade_v3.retry')
