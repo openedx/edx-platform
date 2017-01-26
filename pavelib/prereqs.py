@@ -160,7 +160,7 @@ def python_prereqs_installation():
 
 def pip_install_req_file(req_file):
     """Pip install the requirements file."""
-    pip_cmd = 'pip install -q --disable-pip-version-check --exists-action w'
+    pip_cmd = 'pip install -vvv --disable-pip-version-check --exists-action w'
     sh("{pip_cmd} -r {req_file}".format(pip_cmd=pip_cmd, req_file=req_file))
 
 
@@ -185,6 +185,7 @@ PACKAGES_TO_UNINSTALL = [
     "django-storages",
     "django-oauth2-provider",       # Because now it's called edx-django-oauth2-provider.
     "edx-oauth2-provider",          # Because it moved from github to pypi
+    "i18n-tools",                   # Because the distirbution name was changed to edx-i18n-tools
 ]
 
 
