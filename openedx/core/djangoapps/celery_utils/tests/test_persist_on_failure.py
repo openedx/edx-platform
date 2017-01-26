@@ -10,7 +10,7 @@ import six
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from ..models import FailedTask
-from ..task import PersistOnFailureTask
+from ..persist_on_failure import PersistOnFailureTask
 
 
 @skip_unless_lms
@@ -47,7 +47,7 @@ class PersistOnFailureTaskTestCase(TestCase):
         # Assert that we get the kind of data we expect
         self.assertEqual(
             failed_task_object.task_name,
-            u'openedx.core.djangoapps.celery_utils.tests.test_task.exampletask'
+            u'openedx.core.djangoapps.celery_utils.tests.test_persist_on_failure.exampletask'
         )
         self.assertEqual(failed_task_object.args, [])
         self.assertEqual(failed_task_object.kwargs, {u'message': u'The example task failed'})

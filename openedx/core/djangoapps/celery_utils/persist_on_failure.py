@@ -7,8 +7,7 @@ from celery import Task
 from .models import FailedTask
 
 
-# pylint: disable=abstract-method
-class PersistOnFailureTask(Task):
+class PersistOnFailureTask(Task):  # pylint: disable=abstract-method
     """
     Custom Celery Task base class that persists task data on failure.
     """
@@ -17,13 +16,14 @@ class PersistOnFailureTask(Task):
         """
         If the task fails, persist a record of the task.
         """
-        FailedTask.objects.create(
-            task_name=_truncate_to_field(FailedTask, 'task_name', self.name),
-            task_id=task_id,  # Fixed length UUID: No need to truncate
-            args=args,
-            kwargs=kwargs,
-            exc=_truncate_to_field(FailedTask, 'exc', repr(exc)),
-        )
+        if not FailedTask.objects.filter(task_id=task_id, datetime_resolved=None).exists():
+            FailedTask.objects.create(
+                task_name=_truncate_to_field(FailedTask, 'task_name', self.name),
+                task_id=task_id,  # Fixed length UUID: No need to truncate
+                args=args,
+                kwargs=kwargs,
+                exc=_truncate_to_field(FailedTask, 'exc', repr(exc)),
+            )
         super(PersistOnFailureTask, self).on_failure(exc, task_id, args, kwargs, einfo)
 
 
