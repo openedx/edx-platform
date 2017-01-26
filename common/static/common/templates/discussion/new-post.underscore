@@ -33,7 +33,7 @@
         <label class="field-label">
             <span class="field-label-text"><%- gettext("Title") %></span>
             <div class="field-help" id="field_help_title">
-                <%- gettext("Add a clear and descriptive title to encourage participation.") %>
+                <%- gettext("Add a clear and descriptive title to encourage participation. (required)") %>
             </div>
             <div>
                 <input aria-describedby="field_help_title" type="text" class="js-post-title field-input" name="title">
@@ -42,7 +42,7 @@
     </div>
 
     <div>
-        <span class="field-label-text field-label-text-full" id="new-post-editor-description"><%- gettext('Your question or idea') %></span>
+        <span class="field-label-text field-label-text-full" id="new-post-editor-description"><%- gettext('Your question or idea (required)') %></span>
         <div class="js-post-body editor" aria-describedby="new-post-editor-description" name="body"></div>
     </div>
     <div class="post-options">
