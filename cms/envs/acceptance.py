@@ -111,7 +111,7 @@ USE_I18N = True
 # django.contrib.staticfiles is not added to lms as there is a ^/static$ route built in to the app
 INSTALLED_APPS += ('lettuce.django',)
 LETTUCE_APPS = ('contentstore',)
-LETTUCE_BROWSER = os.environ.get('LETTUCE_BROWSER', 'firefox')
+LETTUCE_BROWSER = os.environ.get('LETTUCE_BROWSER', 'chrome')
 
 # Where to run: local, saucelabs, or grid
 LETTUCE_SELENIUM_CLIENT = os.environ.get('LETTUCE_SELENIUM_CLIENT', 'local')
