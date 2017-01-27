@@ -105,7 +105,7 @@ class TestGetPrograms(mixins.CatalogIntegrationMixin, TestCase):
         # This should not return programs.
         self.assertEqual(data, [])
 
-    def test_get_programs_data(self, _mock_cache, mock_get_catalog_data):   # pylint: disable=unused-argument
+    def test_get_active_programs_data(self, _mock_cache, mock_get_catalog_data):   # pylint: disable=unused-argument
         programs = []
         program_types = []
         programs_data = []
@@ -130,7 +130,7 @@ class TestGetPrograms(mixins.CatalogIntegrationMixin, TestCase):
                 patched_get_programs.return_value = programs
                 patched_get_program_types.return_value = program_types
 
-                programs_data = utils.get_programs_data()
+                programs_data = utils.get_active_programs_data()
                 self.assertEqual(programs_data, programs)
 
     def test_get_one_program(self, _mock_cache, mock_get_catalog_data):
