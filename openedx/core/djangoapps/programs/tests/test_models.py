@@ -5,8 +5,10 @@ import mock
 from nose.plugins.attrib import attr
 
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
+@skip_unless_lms
 @attr(shard=2)
 @ddt.ddt
 # ConfigurationModels use the cache. Make every cache get a miss.

@@ -47,7 +47,6 @@ COMMON_LOOKUP_PATHS = [
 # A list of NPM installed libraries that should be copied into the common
 # static directory.
 NPM_INSTALLED_LIBRARIES = [
-    'backbone-validation/dist/backbone-validation-min.js',
     'backbone/backbone.js',
     'backbone.paginator/lib/backbone.paginator.js',
     'moment-timezone/builds/moment-timezone-with-data.js',

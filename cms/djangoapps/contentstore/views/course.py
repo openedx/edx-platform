@@ -64,8 +64,6 @@ from openedx.core.djangoapps.content.course_structures.api.v0 import api, errors
 from openedx.core.djangoapps.credit.api import is_credit_course, get_credit_requirements
 from openedx.core.djangoapps.credit.tasks import update_credit_course_requirements
 from openedx.core.djangoapps.models.course_details import CourseDetails
-from openedx.core.djangoapps.programs.models import ProgramsApiConfig
-from openedx.core.djangoapps.programs.utils import get_programs
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.course_tabs import CourseTabPluginManager
@@ -469,13 +467,6 @@ def course_listing(request):
     courses, in_process_course_actions = get_courses_accessible_to_user(request)
     libraries = _accessible_libraries_list(request.user) if LIBRARIES_ENABLED else []
 
-    programs_config = ProgramsApiConfig.current()
-    raw_programs = get_programs(request.user) if programs_config.is_studio_tab_enabled else []
-
-    # Sort programs alphabetically by name.
-    # TODO: Support ordering in the Programs API itself.
-    programs = sorted(raw_programs, key=lambda p: p['name'].lower())
-
     def format_in_process_course_view(uca):
         """
         Return a dict of the data which the view requires for each unsucceeded course
@@ -525,9 +516,6 @@ def course_listing(request):
         'rerun_creator_status': GlobalStaff().has_user(request.user),
         'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False),
         'allow_course_reruns': settings.FEATURES.get('ALLOW_COURSE_RERUNS', True),
-        'is_programs_enabled': programs_config.is_studio_tab_enabled and request.user.is_staff,
-        'programs': programs,
-        'program_authoring_url': reverse('programs'),
     })
 
 
