@@ -19,7 +19,6 @@ from student.tests.factories import UserFactory
 
 UTILITY_MODULE = 'openedx.core.lib.edx_api_utils'
 TEST_API_URL = 'http://www-internal.example.com/api'
-TEST_API_SIGNING_KEY = 'edx'
 
 
 @skip_unless_lms
@@ -200,8 +199,7 @@ class TestGetEdxApiData(ProgramsApiConfigMixin, CacheIsolationTestCase):
         self.assertTrue(mock_exception.called)
         self.assertEqual(actual, [])
 
-    @override_settings(JWT_AUTH={'JWT_ISSUER': 'http://example.com/oauth', 'JWT_EXPIRATION': 30},
-                       ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY, ECOMMERCE_API_URL=TEST_API_URL)
+    @override_settings(ECOMMERCE_API_URL=TEST_API_URL)
     def test_client_passed(self):
         """ Verify that when API client is passed edx_rest_api_client is not
         used.

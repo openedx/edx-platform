@@ -4,13 +4,14 @@ from edx_rest_api_client.client import EdxRestApiClient
 from eventtracking import tracker
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.lib.token_utils import JwtBuilder
 
-ECOMMERCE_DATE_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
+ECOMMERCE_DATE_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
 
 
 def create_tracking_context(user):
     """ Assembles attributes from user and request objects to be sent along
-    in ecommerce api calls for tracking purposes. """
+    in E-Commerce API calls for tracking purposes. """
     context_tracker = tracker.get_tracker().resolve_context()
 
     return {
@@ -22,27 +23,19 @@ def create_tracking_context(user):
 
 def is_commerce_service_configured():
     """
-    Return a Boolean indicating whether or not configuration is present to use
-    the external commerce service.
+    Return a Boolean indicating whether or not configuration is present to use the external commerce service.
     """
-    ecommerce_api_url = configuration_helpers.get_value("ECOMMERCE_API_URL", settings.ECOMMERCE_API_URL)
-    ecommerce_api_signing_key = configuration_helpers.get_value(
-        "ECOMMERCE_API_SIGNING_KEY", settings.ECOMMERCE_API_SIGNING_KEY,
-    )
-    return bool(ecommerce_api_url and ecommerce_api_signing_key)
+    ecommerce_api_url = configuration_helpers.get_value('ECOMMERCE_API_URL', settings.ECOMMERCE_API_URL)
+    return bool(ecommerce_api_url)
 
 
-def ecommerce_api_client(user, session=None):
+def ecommerce_api_client(user, session=None, token_expiration=None):
     """ Returns an E-Commerce API client setup with authentication for the specified user. """
-    jwt_auth = configuration_helpers.get_value("JWT_AUTH", settings.JWT_AUTH)
+    claims = {'tracking_context': create_tracking_context(user)}
+    jwt = JwtBuilder(user).build_token(['email', 'profile'], expires_in=token_expiration, additional_claims=claims)
+
     return EdxRestApiClient(
-        configuration_helpers.get_value("ECOMMERCE_API_URL", settings.ECOMMERCE_API_URL),
-        configuration_helpers.get_value("ECOMMERCE_API_SIGNING_KEY", settings.ECOMMERCE_API_SIGNING_KEY),
-        user.username,
-        user.profile.name if hasattr(user, 'profile') else None,
-        user.email,
-        tracking_context=create_tracking_context(user),
-        issuer=jwt_auth['JWT_ISSUER'],
-        expires_in=jwt_auth['JWT_EXPIRATION'],
+        configuration_helpers.get_value('ECOMMERCE_API_URL', settings.ECOMMERCE_API_URL),
+        jwt=jwt,
         session=session
     )
