@@ -26,7 +26,7 @@ class mock_ecommerce_api_endpoint(object):
 
     host = settings.ECOMMERCE_API_URL.strip('/')
 
-    def __init__(self, response=None, status=200, expect_called=True, exception=None):
+    def __init__(self, response=None, status=200, expect_called=True, exception=None, reset_on_exit=True):
         """
         Keyword Arguments:
             response: a JSON-serializable Python type representing the desired response body.
@@ -34,11 +34,13 @@ class mock_ecommerce_api_endpoint(object):
             expect_called: a boolean indicating whether an API request was expected; set
                 to False if we should ensure that no request arrived.
             exception: raise this exception instead of returning an HTTP response when called.
+            reset_on_exit (bool): Indicates if `httpretty` should be reset after the decorator exits.
         """
         self.response = response or self.default_response
         self.status = status
         self.expect_called = expect_called
         self.exception = exception
+        self.reset_on_exit = reset_on_exit
 
     def get_uri(self):
         """
@@ -74,7 +76,8 @@ class mock_ecommerce_api_endpoint(object):
     def __exit__(self, exc_type, exc_val, exc_tb):
         assert self.expect_called == (httpretty.last_request().headers != {})
         httpretty.disable()
-        httpretty.reset()
+        if self.reset_on_exit:
+            httpretty.reset()
 
 
 class mock_create_basket(mock_ecommerce_api_endpoint):
@@ -117,6 +120,20 @@ class mock_create_refund(mock_ecommerce_api_endpoint):
 
     def get_path(self):
         return '/refunds/'
+
+
+class mock_process_refund(mock_ecommerce_api_endpoint):
+    """ Mocks calls to E-Commerce API client refund process method. """
+
+    default_response = []
+    method = httpretty.PUT
+
+    def __init__(self, refund_id, **kwargs):
+        super(mock_process_refund, self).__init__(**kwargs)
+        self.refund_id = refund_id
+
+    def get_path(self):
+        return '/refunds/{}/process/'.format(self.refund_id)
 
 
 class mock_order_endpoint(mock_ecommerce_api_endpoint):
