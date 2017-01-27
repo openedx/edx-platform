@@ -567,7 +567,7 @@ SUB_SPECIALTY_CHOICES = {
         ('Pulmonary', 'Pulmonary'),
         ('Other', 'Other, please enter:'),
     ],
-    'Obstetrics_Gynecology': [
+    'Obstetrics_&_Gynecology': [
         ('Gynecology', 'Gynecology'),
         ('Obstetrics', 'Obstetrics'),
         ('Maternal_&_Fetal_Medicine', 'Maternal & Fetal Medicine'),

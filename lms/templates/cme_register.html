@@ -65,7 +65,7 @@
       $('select.select-controller').change(function() {
         var controllerClasses = $(this).children("option:selected").attr('class');
         var controllerClass = controllerClasses.split(' ')[0];
-        var controlledFieldContents = '#' + controllerClass;
+        var controlledFieldContents = '#' + controllerClass.replace('_&_', '_'); // JQuery can't handle & in selectors
         var controlledField = '#' + controllerClass.split('-')[0];
         $(controlledField).html('<option value="">--</option>').siblings('.controlled').hide().children('input').val('');
         $(controlledField).parent().hide();
@@ -404,7 +404,7 @@
        
         <div id="sub_specialty-Obstetrics_Gynecology" class="sub_specialty-container" style="display: none;">
           <option value="">--</option>
-          %for code, sub_specialty in sub_specialty_choices['Obstetrics_Gynecology']:
+          %for code, sub_specialty in sub_specialty_choices['Obstetrics_&_Gynecology']:
             <option value="${code}">${sub_specialty}</option>
           %endfor
         </div>
