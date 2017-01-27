@@ -133,7 +133,7 @@ STATICFILES_DIRS += [
     (course_dir, COMMON_TEST_DATA_ROOT / course_dir)
     for course_dir in os.listdir(COMMON_TEST_DATA_ROOT)
     if os.path.isdir(COMMON_TEST_DATA_ROOT / course_dir)
-    ]
+]
 
 # Avoid having to run collectstatic before the unit test suite
 # If we don't add these settings, then Django templates that can't
