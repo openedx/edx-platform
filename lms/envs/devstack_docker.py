@@ -13,7 +13,9 @@ HOST = 'edx.devstack.edxapp:18000'
 SITE_NAME = HOST
 LMS_ROOT_URL = 'http://{}'.format(HOST)
 
-ECOMMERCE_PUBLIC_URL_ROOT = "http://edx.devstack.ecommerce:18130"
+ECOMMERCE_PUBLIC_URL_ROOT = 'http://localhost:18130'
+ECOMMERCE_API_URL = 'http://edx.devstack.ecommerce:18130/api/v2'
+
 
 OAUTH_OIDC_ISSUER = '{}/oauth2'.format(LMS_ROOT_URL)
 
