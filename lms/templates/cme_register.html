@@ -63,10 +63,6 @@
         $(controlledField).html('<option value="">--</option>');
         $(controlledField).parent().hide();
        
-        var controllerClass2 = '#' + controllerClasses.split(' ')[1];
-        $(controllerClass2).html('<option value="">--</option>').siblings('.controlled').hide().children('input').val('');
-        $(controllerClass2).parent().hide();
-       
         if ($(controlledFieldContents).html() != null) {
           $(controlledField).html($(controlledFieldContents).html()).parent().show();
         }
