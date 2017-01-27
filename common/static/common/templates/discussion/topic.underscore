@@ -4,7 +4,7 @@
             <%- gettext("Topic area") %>
         </span>
         <div class="field-help" id="field_help_topic_area">
-            <%- gettext("Add your post to a relevant topic to help others find it. (required)") %>
+            <%- gettext("Add your post to a relevant topic to help others find it. (Required)") %>
         </div>
         <div class="field-input">
             <select class="post-topic field-input" aria-describedby="field_help_topic_area" required>

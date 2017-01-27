@@ -5,7 +5,7 @@
             <%- gettext("Post type") %>
         </span>
         <div class="field-help" id="field_help_post_type">
-            <%- gettext("Questions raise issues that need answers. Discussions share ideas and start conversations. (required)") %>
+            <%- gettext("Questions raise issues that need answers. Discussions share ideas and start conversations. (Required)") %>
         </div>
         <div class="field-label">
             <fieldset class="field-input">

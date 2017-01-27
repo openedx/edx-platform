@@ -33,7 +33,7 @@
         <label class="field-label">
             <span class="field-label-text"><%- gettext("Title") %></span>
             <div class="field-help" id="field_help_title">
-                <%- gettext("Add a clear and descriptive title to encourage participation. (required)") %>
+                <%- gettext("Add a clear and descriptive title to encourage participation. (Required)") %>
             </div>
             <div>
                 <input aria-describedby="field_help_title" type="text" class="js-post-title field-input" name="title">
