@@ -1,0 +1,211 @@
+## mako
+<%page expression_filter="h" args="online_help_token"/>
+<%namespace name='static' file='static_content.html'/>
+<%namespace file='main.html' import="login_query"/>
+<%!
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+
+from context_processors import doc_url
+from lms.djangoapps.ccx.overrides import get_current_ccx
+from openedx.core.djangolib.markup import HTML, Text
+
+# App that handles subdomain specific branding
+from branding import api as branding_api
+# app that handles site status messages
+from status.status import get_site_status_msg
+%>
+
+## Provide a hook for themes to inject branding on top.
+<%block name="navigation_top" />
+
+## Add UI Toolkit components if using the Pattern Library
+% if uses_pattern_library:
+    <%block name="js_extra">
+    <%static:require_module module_name="js/header_factory" class_name="HeaderFactory">
+    HeaderFactory();
+    </%static:require_module>
+    </%block>
+% endif
+
+<%block>
+<%
+try:
+    course_id = course.id
+except:
+    # can't figure out a better way to get at a possibly-defined course var
+    course_id = None
+site_status_msg = get_site_status_msg(course_id)
+%>
+% if site_status_msg:
+<div class="site-status">
+  <div class="inner-wrapper">
+    <span class="white-error-icon"></span>
+    <p>${site_status_msg}</p>
+  </div>
+</div>
+% endif
+</%block>
+  <header id="global-navigation" class="header-global ${"slim" if course else ""}" >
+    <nav class="wrapper-header" aria-label="${_('Global')}">
+    <h1 class="logo">
+      <a href="${marketing_link('ROOT')}">
+        <%block name="navigation_logo">
+            <img src="https://labsterim.s3.amazonaws.com/media/uploads/labster/labster_logo_30.png" height="30" alt="${_("{platform_name} Home Page").format(platform_name=static.get_platform_name())}"/>
+        </%block>
+      </a>
+    </h1>
+
+    % if course:
+      <h2 class="course-header"><span class="provider">${course.display_org_with_default}:</span>
+        <span class="course-number">${course.display_number_with_default}</span>
+        <%
+        display_name = course.display_name_with_default
+        if settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
+          ccx = get_current_ccx(course.id)
+          if ccx:
+            display_name = ccx.display_name
+        %>
+        <span class="course-name">${display_name}</span></h2>
+      % endif
+
+      % if user.is_authenticated():
+        <ol class="left nav-global list-inline authenticated">
+        <%block name="navigation_global_links_authenticated">
+          % if settings.FEATURES.get('COURSES_ARE_BROWSABLE') and not show_program_listing:
+            <li class="item nav-global-01">
+              <a href="${marketing_link('COURSES')}">${_('Browse Labs')}</a>
+            </li>
+          % endif
+          % if settings.LABSTER_FEATURES.get('ENABLE_VOUCHERS') and user.is_active:
+            <li class="nav-global-01">
+              <a href="${reverse('enter_voucher')}">${_('Enter voucher')}</a>
+            </li>
+          % endif
+          %if settings.FEATURES.
+          % if show_program_listing:
+            <li class="tab-nav-item">
+              <a class="${'active ' if reverse('dashboard') == request.path else ''}tab-nav-link" href="${reverse('dashboard')}">
+                ${_("Courses")}
+              </a>
+            </li>
+            <li class="tab-nav-item">
+              <a class="${'active ' if reverse('program_listing_view') in request.path else ''}tab-nav-link" href="${reverse('program_listing_view')}">
+                ${_("Programs")}
+              </a>
+            </li>
+          % endif
+          %if settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD','') and user.is_staff:
+            <li class="item">
+              ## Translators: This is short for "System administration".
+              <a href="${reverse('sysadmin')}">${_("Sysadmin")}</a>
+            </li>
+          %endif
+        </%block>
+      </ol>
+
+      <%include file="user_dropdown.html"/>
+
+      % if should_display_shopping_cart_func() and not (course and static.is_request_in_themed_site()): # see shoppingcart.context_processor.user_has_cart_context_processor
+        <ol class="user">
+          <li class="primary">
+            <a class="shopping-cart" href="${reverse('shoppingcart.views.show_cart')}">
+              <span class="icon fa fa-shopping-cart" aria-hidden="true"></span> ${_("Shopping Cart")}
+            </a>
+          </li>
+        </ol>
+      % endif
+    % else:
+      <ol class="left list-inline nav-global">
+        <%block name="navigation_global_links">
+          % if static.get_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
+            <li class="item nav-global-01">
+              <a href="${marketing_link('HOW_IT_WORKS')}">${_("How it Works")}</a>
+            </li>
+            % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
+              <li class="item nav-global-02">
+                <a href="${marketing_link('COURSES')}">${_("Courses")}</a>
+              </li>
+            % endif
+            <li class="item nav-global-03">
+              <a href="${marketing_link('SCHOOLS')}">${_("Schools")}</a>
+            </li>
+          % endif
+        </%block>
+
+        <%block name="navigation_other_global_links">
+          % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
+            % if settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
+              <li class="item nav-global-05">
+                <a class="btn" href="/courses">${_("Browse Labs")}</a>
+              </li>
+            %endif
+            % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
+              <li class="item nav-global-04">
+                <a class="btn-neutral" href="${reverse('course-specific-register', args=[course.id.to_deprecated_string()])}">${_("Register")}</a>
+              </li>
+            % else:
+              <li class="item nav-global-04">
+                <a class="btn-neutral" href="/register${login_query()}">${_("Register")}</a>
+              </li>
+            % endif
+          % endif
+        </%block>
+      </ol>
+
+      <ol class="right nav-courseware list-inline">
+        <%block name="navigation_sign_in">
+          <li class="item nav-courseware-01">
+            % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
+              % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
+                <a class="btn btn-login" href="${reverse('course-specific-login', args=[course.id.to_deprecated_string()])}${login_query()}">${_("Log in")}</a>
+              % else:
+                <a class="btn btn-login" href="/login${login_query()}">${_("Log in")}</a>
+              % endif
+            % endif
+          </li>
+        </%block>
+      </ol>
+    % endif
+    % if static.show_language_selector():
+     <% languages = static.get_released_languages() %>
+      % if len(languages) > 1:
+      <ol class="user">
+        <li class="primary">
+          <form action="/i18n/setlang/" method="post" class="settings-language-form" id="language-settings-form">
+            <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
+            % if user.is_authenticated():
+            <input title="preference api" type="hidden" class="url-endpoint" value="${reverse('preferences_api', kwargs={'username': user.username})}" data-user-is-authenticated="true">
+            % else:
+            <input title="session update url" type="hidden" class="url-endpoint" value="${reverse('session_language')}" data-user-is-authenticated="false">
+            % endif
+            <label><span class="sr">${_("Choose Language")}</span>
+                <select class="input select language-selector" id="settings-language-value" name="language">
+                  % for language in languages:
+                    % if language[0] == LANGUAGE_CODE:
+                      <option value="${language[0]}" selected="selected">${language[1]}</option>
+                    % else:
+                      <option value="${language[0]}" >${language[1]}</option>
+                    % endif
+                  % endfor
+                </select>
+            </label>
+          </form>
+        </li>
+      </ol>
+      % endif
+      % endif
+    </nav>
+</header>
+% if course:
+<!--[if lte IE 9]>
+<div class="ie-banner" aria-hidden="true">${Text(_('{begin_strong}Warning:{end_strong} Your browser is not fully supported. We strongly recommend using {chrome_link} or {ff_link}.')).format(
+    begin_strong=HTML('<strong>'),
+    end_strong=HTML('</strong>'),
+    chrome_link=HTML('<a href="https://www.google.com/chrome" target="_blank">Chrome</a>'),
+    ff_link=HTML('<a href="http://www.mozilla.org/firefox" target="_blank">Firefox</a>'),
+)}</div>
+<![endif]-->
+% endif
+
+<%include file="help_modal.html"/>
