@@ -1,4 +1,4 @@
-<h6 class="hd-6 breadcrumbs">
+<div class="breadcrumbs">
     <span class="nav-item">
         <button class="btn-link all-topics">
             <span class="icon fa fa-bars" aria-hidden="true"></span><%- gettext('All Topics') %>
@@ -8,4 +8,4 @@
         <span class="fa fa-angle-right"></span>
         <span class="nav-item"><%- content %></span>
     <% }); %>
-</h6>
+</div>
