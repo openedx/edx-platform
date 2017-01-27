@@ -1,83 +1,110 @@
 """Factories for generating fake catalog data."""
-from uuid import uuid4
+# pylint: disable=missing-docstring, invalid-name
+from random import randint
 
 import factory
-from factory.fuzzy import FuzzyText
+from faker import Faker
 
 
-class Organization(factory.Factory):
+fake = Faker()
+
+
+def generate_course_key():
+    return '+'.join(fake.words(2))
+
+
+def generate_course_run_key():
+    return 'course-v1:' + '+'.join(fake.words(3))
+
+
+def generate_zulu_datetime():
     """
-    Factory for stubbing Organization resources from the catalog API.
+    The catalog returns UTC datetimes formatted using Z, the zone designator
+    for the zero UTC offset, not the +00:00 offset. For more, see
+    https://en.wikipedia.org/wiki/ISO_8601#UTC.
     """
+    return fake.date_time().isoformat() + 'Z'
+
+
+class DictFactory(factory.Factory):
     class Meta(object):
         model = dict
 
-    name = FuzzyText(prefix='Organization ')
-    key = FuzzyText(suffix='X')
+
+class ImageFactory(DictFactory):
+    height = factory.Faker('random_int')
+    width = factory.Faker('random_int')
 
 
-class CourseRun(factory.Factory):
+class Image(ImageFactory):
     """
-    Factory for stubbing CourseRun resources from the catalog API.
+    For constructing dicts mirroring the catalog's serialized representation of ImageFields.
+
+    See https://github.com/edx/course-discovery/blob/master/course_discovery/apps/api/fields.py.
     """
-    class Meta(object):
-        model = dict
-
-    key = FuzzyText(prefix='org/', suffix='/run')
-    marketing_url = FuzzyText(prefix='https://www.example.com/marketing/')
+    description = factory.Faker('sentence')
+    src = factory.Faker('image_url')
 
 
-class Course(factory.Factory):
+class StdImage(ImageFactory):
     """
-    Factory for stubbing Course resources from the catalog API.
+    For constructing dicts mirroring the catalog's serialized representation of StdImageFields.
+
+    See https://github.com/edx/course-discovery/blob/master/course_discovery/apps/api/fields.py.
     """
-    class Meta(object):
-        model = dict
-
-    title = FuzzyText(prefix='Course ')
-    key = FuzzyText(prefix='course+')
-    owners = [Organization()]
-    course_runs = [CourseRun() for __ in range(3)]
+    url = factory.Faker('image_url')
 
 
-class BannerImage(factory.Factory):
-    """
-    Factory for stubbing BannerImage resources from the catalog API.
-    """
-    class Meta(object):
-        model = dict
-
-    url = FuzzyText(
-        prefix='https://www.somecdn.com/media/programs/banner_images/',
-        suffix='.jpg'
-    )
-
-
-class Program(factory.Factory):
-    """
-    Factory for stubbing Program resources from the catalog API.
-    """
-    class Meta(object):
-        model = dict
-
-    uuid = str(uuid4())
-    title = FuzzyText(prefix='Program ')
-    subtitle = FuzzyText(prefix='Subtitle ')
-    type = 'FooBar'
-    marketing_slug = FuzzyText(prefix='slug_')
-    authoring_organizations = [Organization()]
-    courses = [Course() for __ in range(3)]
-    banner_image = {
-        size: BannerImage() for size in ['large', 'medium', 'small', 'x-small']
+def generate_sized_stdimage():
+    return {
+        size: StdImage() for size in ['large', 'medium', 'small', 'x-small']
     }
 
 
-class ProgramType(factory.Factory):
-    """
-    Factory for stubbing ProgramType resources from the catalog API.
-    """
-    class Meta(object):
-        model = dict
+class Organization(DictFactory):
+    key = factory.Faker('word')
+    name = factory.Faker('company')
+    uuid = factory.Faker('uuid4')
 
-    name = FuzzyText()
-    logo_image = FuzzyText(prefix='https://example.com/program/logo')
+
+class CourseRun(DictFactory):
+    end = factory.LazyFunction(generate_zulu_datetime)
+    enrollment_end = factory.LazyFunction(generate_zulu_datetime)
+    enrollment_start = factory.LazyFunction(generate_zulu_datetime)
+    image = Image()
+    key = factory.LazyFunction(generate_course_run_key)
+    marketing_url = factory.Faker('url')
+    pacing_type = 'self_paced'
+    short_description = factory.Faker('sentence')
+    start = factory.LazyFunction(generate_zulu_datetime)
+    title = factory.Faker('catch_phrase')
+    type = 'verified'
+    uuid = factory.Faker('uuid4')
+
+
+class Course(DictFactory):
+    course_runs = [CourseRun() for __ in range(randint(3, 5))]
+    image = Image()
+    key = factory.LazyFunction(generate_course_key)
+    owners = [Organization()]
+    title = factory.Faker('catch_phrase')
+    uuid = factory.Faker('uuid4')
+
+
+class Program(DictFactory):
+    authoring_organizations = [Organization()]
+    banner_image = factory.LazyFunction(generate_sized_stdimage)
+    card_image_url = factory.Faker('image_url')
+    courses = [Course() for __ in range(randint(3, 5))]
+    marketing_slug = factory.Faker('slug')
+    marketing_url = factory.Faker('url')
+    status = 'active'
+    subtitle = factory.Faker('sentence')
+    title = factory.Faker('catch_phrase')
+    type = factory.Faker('word')
+    uuid = factory.Faker('uuid4')
+
+
+class ProgramType(DictFactory):
+    name = factory.Faker('word')
+    logo_image = factory.LazyFunction(generate_sized_stdimage)
