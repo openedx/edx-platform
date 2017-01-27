@@ -1,5 +1,6 @@
 """Helper functions for working with the catalog service."""
 from django.conf import settings
+from django.core.cache import cache
 from django.contrib.auth.models import User
 from edx_rest_api_client.client import EdxRestApiClient
 from opaque_keys.edx.keys import CourseKey
@@ -7,6 +8,7 @@ from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from openedx.core.lib.token_utils import JwtBuilder
+from xmodule.modulestore.django import modulestore
 
 
 def create_catalog_api_client(user, catalog_integration):
@@ -76,7 +78,8 @@ def get_programs(user=None, uuid=None, type=None):  # pylint: disable=redefined-
 
 
 def get_program_types(user=None):  # pylint: disable=redefined-builtin
-    """Retrieve all program types from the catalog service.
+    """
+    Retrieve all program types from the catalog service.
 
     Returns:
         list of dict, representing program types.
@@ -101,18 +104,69 @@ def get_program_types(user=None):  # pylint: disable=redefined-builtin
         return []
 
 
-def get_programs_data(user=None):
-    """Return the list of Programs after adding the ProgramType Logo Image"""
+def _get_program_instructors(program):
+    """
+    Returns the list of instructor from cached if cache key exists otherwise
+    iterate over the courses and return all the instructors of each course run
+    """
+    catalog_integration = CatalogIntegration.current()
+    if catalog_integration.enabled:
+        cache_key = 'program.instructors.{program_id}'.format(
+            program_id=program.get('uuid')
+        )
 
-    programs_list = get_programs(user)
-    program_types = get_program_types(user)
+        instructor_lookup_list = []
+        instructors = cache.get(cache_key) or []
+        if instructors:
+            return instructors
 
-    program_types_lookup_dict = {program_type["name"]: program_type for program_type in program_types}
+        module_store = modulestore()
+        for key in _get_all_course_run_keys(program):
+            descriptor = module_store.get_course(key)
+            if descriptor and descriptor.instructor_info:
+                for instructor in descriptor.instructor_info.get("instructors", []):
+                    if instructor.get('name') not in instructor_lookup_list:
+                        instructor_lookup_list.append(instructor.get('name'))
+                        instructors.append(instructor)
 
-    for program in programs_list:
-        program["logo_image"] = program_types_lookup_dict[program["type"]]["logo_image"]
+        cache.set(cache_key, instructors, catalog_integration.cache_ttl)
+        return instructors
+    else:
+        return []
 
-    return programs_list
+
+def _get_all_course_run_keys(program):
+    """
+    Returns the course keys of all the course runs of a program.
+    """
+    keys = []
+    for course in program.get("courses", []):       # pylint: disable=E1101
+        for course_run in course.get("course_runs", []):
+            keys.append(CourseKey.from_string(course_run.get("key")))
+    return keys
+
+
+def get_active_programs_data(user=None, program_id=None):
+    """
+    This will return the program details with its corresponding program_type if program_id
+    is given otherwise returns the list of all the active programs with their program_types.
+    """
+    program_data = []
+    programs = get_programs(user, program_id)
+    if not programs:
+        return None
+
+    program_types = {program_type["name"]: program_type for program_type in get_program_types(user)}
+    # get_programs returns a dict when provided with the program_id parameter.
+    if isinstance(programs, dict):
+        programs = [programs]
+
+    for program in programs:
+        if program["status"] == "active":
+            program["type"] = program_types[program["type"]]
+            program["instructors"] = _get_program_instructors(programs) if program_id else None
+            program_data.append(program)
+    return program_data
 
 
 def munge_catalog_program(catalog_program):

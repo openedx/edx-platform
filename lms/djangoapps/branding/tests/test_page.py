@@ -297,28 +297,28 @@ class IndexPageProgramsTests(ModuleStoreTestCase):
     """
     @patch.dict('django.conf.settings.FEATURES', {'DISPLAY_PROGRAMS_ON_MARKETING_PAGES': False})
     def test_get_programs_not_called(self):
-        with mock.patch("student.views.get_programs_data") as patched_get_programs_data:
+        with mock.patch("student.views.get_active_programs_data") as patched_get_active_programs_data:
             # check the /dashboard
             response = self.client.get('/')
             self.assertEqual(response.status_code, 200)
-            self.assertEqual(patched_get_programs_data.call_count, 0)
+            self.assertEqual(patched_get_active_programs_data.call_count, 0)
 
-        with mock.patch("courseware.views.views.get_programs_data") as patched_get_programs_data:
+        with mock.patch("courseware.views.views.get_active_programs_data") as patched_get_active_programs_data:
             # check the /courses view
             response = self.client.get(reverse('branding.views.courses'))
             self.assertEqual(response.status_code, 200)
-            self.assertEqual(patched_get_programs_data.call_count, 0)
+            self.assertEqual(patched_get_active_programs_data.call_count, 0)
 
     @patch.dict('django.conf.settings.FEATURES', {'DISPLAY_PROGRAMS_ON_MARKETING_PAGES': True})
     def test_get_programs_called(self):
-        with mock.patch("student.views.get_programs_data") as patched_get_programs_data:
+        with mock.patch("student.views.get_active_programs_data") as patched_get_active_programs_data:
             # check the /dashboard
             response = self.client.get('/')
             self.assertEqual(response.status_code, 200)
-            self.assertEqual(patched_get_programs_data.call_count, 1)
+            self.assertEqual(patched_get_active_programs_data.call_count, 1)
 
-        with mock.patch("courseware.views.views.get_programs_data") as patched_get_programs_data:
+        with mock.patch("courseware.views.views.get_active_programs_data") as patched_get_active_programs_data:
             # check the /courses view
             response = self.client.get(reverse('branding.views.courses'))
             self.assertEqual(response.status_code, 200)
-            self.assertEqual(patched_get_programs_data.call_count, 1)
+            self.assertEqual(patched_get_active_programs_data.call_count, 1)
