@@ -235,17 +235,8 @@ def _do_cme_create_account(post_vars):
     cme_user_profile.license_state = post_vars.get('license_state')
     cme_user_profile.physician_status = post_vars.get('physician_status')
     cme_user_profile.patient_population = post_vars.get('patient_population')
-
-    if post_vars.get('specialty') == 'Other':
-        cme_user_profile.specialty = post_vars.get('specialty_free')
-    else:
-        cme_user_profile.specialty = post_vars.get('specialty')
-
-    if post_vars.get('sub_specialty') == 'Other':
-        cme_user_profile.sub_specialty = post_vars.get('sub_specialty_free')
-    else:
-        cme_user_profile.sub_specialty = post_vars.get('sub_specialty')
-
+    cme_user_profile.specialty = post_vars.get('specialty')
+    cme_user_profile.sub_specialty = post_vars.get('sub_specialty')
     cme_user_profile.affiliation = post_vars.get('affiliation')
 
     if post_vars.get('affiliation') == 'Other':
