@@ -49,6 +49,7 @@ from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem
 from lms.djangoapps.verify_student.services import VerificationService, ReverificationService
 from openedx.core.djangoapps.bookmarks.services import BookmarksService
+from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.credit.services import CreditService
 from openedx.core.djangoapps.util.user_utils import SystemUser
 from openedx.core.lib.xblock_utils import (
@@ -917,7 +918,8 @@ def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_inf
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
         course_id,
         user,
-        descriptor
+        descriptor,
+        read_only=CrawlersConfig.is_crawler(request),
     )
     instance = get_module_for_descriptor(
         user,

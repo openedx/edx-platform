@@ -50,6 +50,7 @@ from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=im
 from milestones.tests.utils import MilestonesTestCaseMixin
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.lib.gating import api as gating_api
+from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory, UserFactory, CourseEnrollmentFactory
 from util.tests.test_date_utils import fake_ugettext, fake_pgettext
@@ -58,7 +59,7 @@ from util.views import ensure_valid_course_key
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 from openedx.core.djangoapps.credit.api import set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
@@ -2065,3 +2066,83 @@ class TestRenderXBlockSelfPaced(TestRenderXBlock):
 
     def course_options(self):
         return {'self_paced': True}
+
+
+class TestIndexViewCrawlerStudentStateWrites(SharedModuleStoreTestCase):
+    """
+    Ensure that courseware index requests do not trigger student state writes.
+
+    This is to prevent locking issues that have caused latency spikes in the
+    courseware_studentmodule table when concurrent requests each try to update
+    the same rows for sequence, section, and course positions.
+    """
+    @classmethod
+    def setUpClass(cls):
+        """Set up the simplest course possible."""
+        # setUpClassAndTestData() already calls setUpClass on SharedModuleStoreTestCase
+        # pylint: disable=super-method-not-called
+        with super(TestIndexViewCrawlerStudentStateWrites, cls).setUpClassAndTestData():
+            cls.course = CourseFactory.create()
+            with cls.store.bulk_operations(cls.course.id):
+                cls.chapter = ItemFactory.create(category='chapter', parent_location=cls.course.location)
+                cls.section = ItemFactory.create(category='sequential', parent_location=cls.chapter.location)
+                cls.vertical = ItemFactory.create(category='vertical', parent_location=cls.section.location)
+
+    @classmethod
+    def setUpTestData(cls):
+        """Set up and enroll our fake user in the course."""
+        cls.password = 'test'
+        cls.user = UserFactory(password=cls.password)
+        CourseEnrollment.enroll(cls.user, cls.course.id)
+
+    def setUp(self):
+        """Do the client login."""
+        super(TestIndexViewCrawlerStudentStateWrites, self).setUp()
+        self.client.login(username=self.user.username, password=self.password)
+
+    def test_write_by_default(self):
+        """By default, always write student state, regardless of user agent."""
+        with patch('courseware.model_data.UserStateCache.set_many') as patched_state_client_set_many:
+            # Simulate someone using Chrome
+            self._load_courseware('Mozilla/5.0 AppleWebKit/537.36')
+            self.assertTrue(patched_state_client_set_many.called)
+            patched_state_client_set_many.reset_mock()
+
+            # Common crawler user agent
+            self._load_courseware('edX-downloader/0.1')
+            self.assertTrue(patched_state_client_set_many.called)
+
+    def test_writes_with_config(self):
+        """Test state writes (or lack thereof) based on config values."""
+        CrawlersConfig.objects.create(known_user_agents='edX-downloader,crawler_foo', enabled=True)
+        with patch('courseware.model_data.UserStateCache.set_many') as patched_state_client_set_many:
+            # Exact matching of crawler user agent
+            self._load_courseware('crawler_foo')
+            self.assertFalse(patched_state_client_set_many.called)
+
+            # Partial matching of crawler user agent
+            self._load_courseware('edX-downloader/0.1')
+            self.assertFalse(patched_state_client_set_many.called)
+
+            # Simulate an actual browser hitting it (we should write)
+            self._load_courseware('Mozilla/5.0 AppleWebKit/537.36')
+            self.assertTrue(patched_state_client_set_many.called)
+
+        # Disabling the crawlers config should revert us to default behavior
+        CrawlersConfig.objects.create(enabled=False)
+        self.test_write_by_default()
+
+    def _load_courseware(self, user_agent):
+        """Helper to load the actual courseware page."""
+        url = reverse(
+            'courseware_section',
+            kwargs={
+                'course_id': unicode(self.course.id),
+                'chapter': unicode(self.chapter.location.name),
+                'section': unicode(self.section.location.name),
+            }
+        )
+        response = self.client.get(url, HTTP_USER_AGENT=user_agent)
+        # Make sure we get back an actual 200, and aren't redirected because we
+        # messed up the setup somehow (e.g. didn't enroll properly)
+        self.assertEqual(response.status_code, 200)
