@@ -582,7 +582,7 @@ SUB_SPECIALTY_CHOICES = {
         ('Surgery','Surgery'),
     ],
     'Pediatrics': [
-        ('Adolesent_Medicine','Adolesent Medicine'),
+        ('Adolescent_Medicine','Adolescent Medicine'),
         ('Allergy,_Immunology,_&_Rheumatology','Allergy, Immunology, & Rheumatology'),
         ('Anesthesiology','Anesthesiology'),
         ('Cardiovascular_Health','Cardiovascular Health'),
