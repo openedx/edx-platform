@@ -54,20 +54,13 @@
         }
       });
       
-      $('select.controller').change(function() {
-        if ($(this).children("option:selected").val() === 'Other') {
-          $(this).siblings('.controlled').slideDown('fast');
-        } else {
-          $(this).siblings('.controlled').slideUp('fast');
-        }
-      });
      
       $('select.select-controller').change(function() {
         var controllerClasses = $(this).children("option:selected").attr('class');
         var controllerClass = controllerClasses.split(' ')[0];
         var controlledFieldContents = '#' + controllerClass.replace('_&_', '_'); // JQuery can't handle & in selectors
         var controlledField = '#' + controllerClass.split('-')[0];
-        $(controlledField).html('<option value="">--</option>').siblings('.controlled').hide().children('input').val('');
+        $(controlledField).html('<option value="">--</option>');
         $(controlledField).parent().hide();
        
         var controllerClass2 = '#' + controllerClasses.split(' ')[1];
@@ -358,7 +351,7 @@
          
           <li class="field select" id="specialty-container">
             <label for="specialty">Specialty</label>
-            <select id="specialty" name="specialty" class="controller select-controller">
+            <select id="specialty" name="specialty" class="select-controller">
               <option value="">--</option>
               %for code, specialty in CmeUserProfile.SPECIALTY_CHOICES:
                 <option value="${code}" class="sub_specialty-${code}">${specialty}</option>
@@ -374,7 +367,7 @@
        
         <li class="field" style="display: none;" id="sub-specialty-container">
           <label for="sub_specialty">Sub-Specialty</label>
-          <select id="sub_specialty" name="sub_specialty" class="controller">
+          <select id="sub_specialty" name="sub_specialty">
             <option value="">--</option>
           </select>
          
