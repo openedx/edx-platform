@@ -20,6 +20,13 @@
         vertical-align: middle;
     }
 
+    .has-breadcrumbs .breadcrumbs {
+        margin-bottom: ($baseline / 2);
+        font-size: font-size(base);
+        font-weight: font-weight(semi-bold);
+        line-height: $base-line-height;
+    }
+
     .page-header-main {
         line-height: $searchBoxHeight;
     }
