@@ -7,11 +7,12 @@ from django.core.management import BaseCommand, CommandError
 from django.db.models import Q
 from opaque_keys.edx.keys import CourseKey
 from provider.oauth2.models import Client
+import waffle
 
 from certificates.models import GeneratedCertificate, CertificateStatuses  # pylint: disable=import-error
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.programs.tasks.v1.tasks import award_program_certificates
-from openedx.core.djangoapps.catalog.utils import get_programs
+from openedx.core.djangoapps.programs.utils import get_programs
 
 
 # TODO: Log to console, even with debug mode disabled?
@@ -85,7 +86,8 @@ class Command(BaseCommand):
 
     def _load_run_modes(self, user):
         """Find all run modes which are part of a program."""
-        programs = get_programs(user)
+        use_catalog = waffle.switch_is_active('get_programs_from_catalog')
+        programs = get_programs(user, use_catalog=use_catalog)
         self.run_modes = self._flatten(programs)
 
     def _flatten(self, programs):
