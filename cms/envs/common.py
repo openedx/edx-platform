@@ -908,9 +908,6 @@ INSTALLED_APPS = (
     # Bookmarks
     'openedx.core.djangoapps.bookmarks',
 
-    # programs support
-    'openedx.core.djangoapps.programs',
-
     # Catalog integration
     'openedx.core.djangoapps.catalog',
 

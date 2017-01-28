@@ -12,7 +12,7 @@ from provider.constants import CONFIDENTIAL
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from student.tests.factories import UserFactory
 
@@ -22,6 +22,7 @@ TEST_API_URL = 'http://www-internal.example.com/api'
 TEST_API_SIGNING_KEY = 'edx'
 
 
+@skip_unless_lms
 @attr(shard=2)
 @httpretty.activate
 class TestGetEdxApiData(ProgramsApiConfigMixin, CacheIsolationTestCase):

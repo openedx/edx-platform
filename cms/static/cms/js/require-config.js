@@ -59,7 +59,6 @@
             'underscore.string': 'common/js/vendor/underscore.string',
             'backbone': 'common/js/vendor/backbone',
             'backbone-relational': 'js/vendor/backbone-relational.min',
-            'backbone.validation': 'common/js/vendor/backbone-validation-min',
             'backbone.associations': 'js/vendor/backbone-associations-min',
             'backbone.paginator': 'common/js/vendor/backbone.paginator',
             'tinymce': 'js/vendor/tinymce/js/tinymce/tinymce.full.min',

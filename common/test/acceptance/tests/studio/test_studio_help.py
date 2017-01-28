@@ -7,7 +7,7 @@ from unittest import skip
 
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest, ContainerBase
-from common.test.acceptance.pages.studio.index import DashboardPage, DashboardPageWithPrograms
+from common.test.acceptance.pages.studio.index import DashboardPage
 from common.test.acceptance.pages.studio.utils import click_studio_help, studio_help_links
 from common.test.acceptance.pages.studio.index import IndexPage, HomePage
 from common.test.acceptance.tests.studio.base_studio_test import StudioLibraryTest
@@ -26,7 +26,6 @@ from common.test.acceptance.pages.studio.settings_advanced import AdvancedSettin
 from common.test.acceptance.pages.studio.settings_certificates import CertificatesPage
 from common.test.acceptance.pages.studio.import_export import ExportCoursePage, ImportCoursePage
 from common.test.acceptance.pages.studio.users import CourseTeamPage
-from common.test.acceptance.fixtures.programs import ProgramsConfigMixin
 from common.test.acceptance.tests.helpers import (
     AcceptanceTest,
     assert_nav_help_link,
@@ -524,40 +523,6 @@ class LibraryExportHelpTest(StudioLibraryTest):
             page=self.library_export_page,
             href=href,
             help_text='Learn more about exporting a library'
-        )
-
-
-@attr(shard=10)
-class NewProgramHelpTest(ProgramsConfigMixin, AcceptanceTest):
-    """
-    Test help links on a 'New Program' page
-    """
-    def setUp(self):
-        super(NewProgramHelpTest, self).setUp()
-        self.auth_page = AutoAuthPage(self.browser, staff=True)
-        self.program_page = DashboardPageWithPrograms(self.browser)
-        self.auth_page.visit()
-        self.set_programs_api_configuration(True)
-        self.program_page.visit()
-
-    def test_program_create_nav_help(self):
-        """
-        Scenario: Help link in navigation bar is working on 'New Program' page
-        Given that I am on the 'New Program' page
-        And I want help about the process
-        And I click the 'Help' in the navigation bar
-        Then Help link should open.
-        And help url should end with 'index.html'
-        """
-        self.program_page.click_new_program_button()
-        href = 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course' \
-               '/en/latest/index.html'
-
-        # Assert that help link is correct.
-        assert_nav_help_link(
-            test=self,
-            page=self.program_page,
-            href=href,
         )
 
 

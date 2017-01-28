@@ -38,11 +38,6 @@ from openedx.core.djangolib.markup import HTML, Text
             <a href="#" class="button new-button new-library-button"><span class="icon fa fa-plus icon-inline" aria-hidden="true"></span>
             ${_("New Library")}</a>
           % endif
-
-          % if is_programs_enabled:
-            <a href=${program_authoring_url + 'new'} class="button new-button new-program-button"><span class="icon fa fa-plus icon-inline" aria-hidden="true"></span>
-            ${_("New Program")}</a>
-          % endif
         </li>
       </ul>
     </nav>
@@ -295,17 +290,10 @@ from openedx.core.djangolib.markup import HTML, Text
       </div>
       %endif
 
-      % if libraries_enabled or is_programs_enabled:
+      % if libraries_enabled:
       <ul id="course-index-tabs">
         <li class="courses-tab active"><a>${_("Courses")}</a></li>
-
-        % if libraries_enabled:
-          <li class="libraries-tab"><a>${_("Libraries")}</a></li>
-        % endif
-
-        % if is_programs_enabled:
-          <li class="programs-tab"><a>${_("Programs")}</a></li>
-        % endif
+        <li class="libraries-tab"><a>${_("Libraries")}</a></li>
       </ul>
       % endif
 
@@ -515,52 +503,6 @@ from openedx.core.djangolib.markup import HTML, Text
         % endif
       </div>
       %endif
-
-      % if is_programs_enabled:
-        % if len(programs) > 0:
-          <div class="programs programs-tab">
-            <!-- Classes related to courses are intentionally reused here, to duplicate the styling used for course listing. -->
-            <ul class="list-courses">
-              % for program in programs:
-              <li class="course-item">
-
-                <a class="program-link" href=${program_authoring_url + str(program['id'])}>
-                  <h3 class="course-title">${program['name']}</h3>
-
-                  <div class="course-metadata">
-                    <span class="course-org metadata-item">
-                      <!-- As of this writing, programs can only be owned by one organization. If that constraint is relaxed, this will need to be revisited. -->
-                      <span class="label">${_("Organization:")}</span> <span class="value">${program['organizations'][0]['key']}</span>
-                    </span>
-                  </div>
-                </a>
-
-              </li>
-              % endfor
-            </ul>
-          </div>
-
-        % else:
-          <div class="notice notice-incontext notice-instruction notice-instruction-nocourses list-notices programs-tab">
-            <div class="notice-item has-actions">
-
-              <div class="msg">
-                <h3 class="title">${_("You haven't created any programs yet.")}</h3>
-                <div class="copy">
-                  <p>${_("Programs are groups of courses related to a common subject.")}</p>
-                </div>
-              </div>
-
-              <ul class="list-actions">
-                <li class="action-item">
-                  <a href=${program_authoring_url + 'new'} class="action-primary action-create new-button action-create-program new-program-button"><span class="icon fa fa-plus icon-inline" aria-hidden="true"></span> ${_('Create Your First Program')}</a>
-                </li>
-              </ul>
-
-            </div>
-          </div>
-        % endif
-      % endif
 
     </article>
     <aside class="content-supplementary" role="complementary">

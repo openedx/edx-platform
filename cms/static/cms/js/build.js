@@ -53,8 +53,7 @@
             'js/factories/settings_graders',
             'js/factories/textbooks',
             'js/factories/videos_index',
-            'js/factories/xblock_validation',
-            'js/programs/program_admin_app'
+            'js/factories/xblock_validation'
         ]),
         /**
          * By default all the configuration for optimization happens from the command

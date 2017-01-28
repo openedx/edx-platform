@@ -3,7 +3,6 @@ from django.conf.urls import patterns, include, url
 # There is a course creators admin table.
 from ratelimitbackend import admin
 
-from cms.djangoapps.contentstore.views.program import ProgramAuthoringView, ProgramsIdTokenView
 from cms.djangoapps.contentstore.views.organization import OrganizationListView
 
 admin.autodiscover()
@@ -176,14 +175,6 @@ if settings.FEATURES.get('CERTIFICATES_HTML_VIEW'):
 urlpatterns += patterns(
     '',
     url(r'^maintenance/', include('maintenance.urls', namespace='maintenance')),
-)
-
-urlpatterns += (
-    # These views use a configuration model to determine whether or not to
-    # display the Programs authoring app. If disabled, a 404 is returned.
-    url(r'^programs/id_token/$', ProgramsIdTokenView.as_view(), name='programs_id_token'),
-    # Drops into the Programs authoring app, which handles its own routing.
-    url(r'^program/', ProgramAuthoringView.as_view(), name='programs'),
 )
 
 if settings.DEBUG:
