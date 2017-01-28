@@ -258,12 +258,12 @@ def inherit_metadata(descriptor, inherited_data):
         pass
 
 
-def own_metadata(module):
+def own_metadata(module, include_default=False):
     """
     Return a JSON-friendly dictionary that contains only non-inherited field
     keys, mapped to their serialized values
     """
-    return module.get_explicitly_set_fields_by_scope(Scope.settings)
+    return module.get_explicitly_set_fields_by_scope(Scope.settings, include_default)
 
 
 class InheritingFieldData(KvsFieldData):

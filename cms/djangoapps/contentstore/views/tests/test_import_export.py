@@ -698,7 +698,7 @@ class TestLibraryImportExport(CourseTestCase):
         )
 
         # Compare the two content libraries for equality.
-        self.assertCoursesEqual(source_library1_key, source_library2_key)
+        self.assertCoursesEqual(source_library1_key, source_library2_key, include_default=True)
 
 
 @ddt.ddt

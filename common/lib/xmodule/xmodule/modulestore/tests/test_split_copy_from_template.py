@@ -4,10 +4,14 @@ Currently it is only used for content libraries.
 However for these tests, we make sure it also works when copying from course to course.
 """
 import ddt
+from shutil import rmtree
+from tempfile import mkdtemp
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.factories import CourseFactory, LibraryFactory
-from xmodule.modulestore.tests.utils import MixedSplitTestCase
+from xmodule.modulestore.tests.utils import MongoContentstoreBuilder, MixedSplitTestCase
+from xmodule.modulestore.xml_importer import import_course_from_xml
+from xmodule.modulestore.xml_exporter import export_course_to_xml
 
 
 @ddt.ddt
@@ -15,6 +19,15 @@ class TestSplitCopyTemplate(MixedSplitTestCase):
     """
     Test for split's copy_from_template method.
     """
+
+    def setUp(self):
+        """
+        Prepare environment for testing
+        """
+        super(TestSplitCopyTemplate, self).setUp()
+        self.export_dir = mkdtemp()
+        self.addCleanup(rmtree, self.export_dir, ignore_errors=True)
+
     @ddt.data(
         LibraryFactory,
         CourseFactory,
@@ -173,3 +186,64 @@ class TestSplitCopyTemplate(MixedSplitTestCase):
         self.assertTrue(self.store.has_changes(new_blocks["chapter"]))
         # Verify that our published_version_exists works
         self.assertFalse(published_version_exists(new_blocks["vertical"]))
+
+    def test_copy_from_template_with_import_export(self):
+        """
+        Test that the behavior of import/export works correct after some block was copied with copy_from_template()
+        """
+        chapter_display_name = 'Test Chapter'
+        sequential_display_name = 'Test Sequential'
+        chapter_dst_display_name = 'Some New Chapter'
+
+        # Create original course:
+        course_original = CourseFactory.create(modulestore=self.store)
+        chapter = self.make_block("chapter", course_original, display_name=chapter_display_name)
+        sequential = self.make_block("sequential", chapter, display_name=sequential_display_name)
+
+        # Create course where to copy sequential block
+        course_dst = CourseFactory.create(modulestore=self.store)
+        chapter_dst = self.make_block("chapter", course_dst, display_name=chapter_dst_display_name)
+
+        new_blocks = self.store.copy_from_template([sequential.location], dest_key=chapter_dst.location,
+                                                   user_id=self.user_id)
+        self.store.publish(new_blocks[0], self.user_id)
+
+        course_dst = self.store.get_course(course_dst.location.course_key)  # Reload from modulestore
+
+        chapter_after_copy = self.store.get_item(course_dst.get_children()[0].location)
+        self.assertEqual(chapter_after_copy.display_name, chapter_dst_display_name)
+
+        sequential_after_copy = chapter_after_copy.get_children()[0]
+        self.assertEqual(sequential_after_copy.display_name, sequential_display_name)
+
+        course_dst_after_import_key = self.store.make_course_key('edX', "course_new", "2017_Fall_2")
+
+        with MongoContentstoreBuilder().build() as contentstore:
+            # export course to xml
+            top_level_export_dir = 'exported_source_course'
+
+            export_course_to_xml(
+                self.store,
+                contentstore,
+                course_dst.id,
+                self.export_dir,
+                top_level_export_dir,
+            )
+
+            course_dst_after_import = import_course_from_xml(
+                self.store,
+                self.user_id,
+                self.export_dir,
+                source_dirs=[top_level_export_dir],
+                static_content_store=contentstore,
+                target_id=course_dst_after_import_key,
+                create_if_not_present=True,
+                raise_on_failure=True
+            )
+
+            chapter_after_import_location = course_dst_after_import[0].get_children()[0].location
+            chapter_after_import = self.store.get_item(chapter_after_import_location)
+            self.assertEqual(chapter_after_import.display_name, chapter_dst_display_name)
+
+            sequential_after_import = chapter_after_import.get_children()[0]
+            self.assertEqual(sequential_after_import.display_name, sequential_display_name)
