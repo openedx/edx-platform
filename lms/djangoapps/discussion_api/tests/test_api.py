@@ -1093,17 +1093,6 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
             {"endorsed": ["This field may not be specified for discussion threads."]}
         )
 
-    def test_question_without_endorsed(self):
-        with self.assertRaises(ValidationError) as assertion:
-            self.get_comment_list(
-                self.make_minimal_cs_thread({"thread_type": "question"}),
-                endorsed=None
-            )
-        self.assertEqual(
-            assertion.exception.message_dict,
-            {"endorsed": ["This field is required for question threads."]}
-        )
-
     def test_empty(self):
         discussion_thread = self.make_minimal_cs_thread(
             {"thread_type": "discussion", "children": [], "resp_total": 0}
@@ -1250,6 +1239,10 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
 
         non_endorsed_actual = self.get_comment_list(thread, endorsed=False).data
         self.assertEqual(non_endorsed_actual["results"][0]["id"], "non_endorsed_comment")
+
+        without_endorsed_actual = self.get_comment_list(thread, endorsed=None)
+        self.assertEqual(without_endorsed_actual["results"][0]["id"], "endorsed_comment")
+        self.assertEqual(without_endorsed_actual["results"][1]["id"], "non_endorsed_comment")
 
     def test_endorsed_by_anonymity(self):
         """

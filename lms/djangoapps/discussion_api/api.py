@@ -631,7 +631,10 @@ def get_comment_list(request, thread_id, endorsed, page, page_size, requested_fi
     # existing comments service interface
     if cc_thread["thread_type"] == "question":
         if endorsed is None:
-            raise ValidationError({"endorsed": ["This field is required for question threads."]})
+            endorsed_responses = cc_thread["endorsed_responses"][response_skip:(response_skip + page_size)]
+            non_endorsed_responses = cc_thread["non_endorsed_responses"]
+            responses = endorsed_responses + non_endorsed_responses
+            resp_total = len(endorsed_responses) + len(non_endorsed_responses)
         elif endorsed:
             # CS does not apply resp_skip and resp_limit to endorsed responses
             # of a question post
