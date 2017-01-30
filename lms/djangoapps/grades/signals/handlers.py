@@ -191,7 +191,8 @@ def enqueue_subsection_update(sender, **kwargs):  # pylint: disable=unused-argum
             event_transaction_id=unicode(get_event_transaction_id()),
             event_transaction_type=unicode(get_event_transaction_type()),
             score_db_table=kwargs['score_db_table'],
-        )
+        ),
+        countdown=2,
     )
     log.info(
         u'Grades: Request async calculation of subsection grades with args: {}. Task [{}]'.format(
