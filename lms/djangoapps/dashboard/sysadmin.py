@@ -15,7 +15,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from django.http import HttpResponse, Http404
 from django.utils.decorators import method_decorator
 from django.utils.html import escape
@@ -193,7 +193,8 @@ class Users(SysadminDashboardView):
         user = User(username=uname, email=email, is_active=True)
         user.set_password(new_password)
         try:
-            user.save()
+            with transaction.atomic():
+                user.save()
         except IntegrityError:
             msg += _('Oops, failed to create user {user}, {error}').format(
                 user=user,

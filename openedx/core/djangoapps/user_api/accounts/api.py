@@ -303,7 +303,8 @@ def create_account(username, password, email):
     user.set_password(password)
 
     try:
-        user.save()
+        with transaction.atomic():
+            user.save()
     except IntegrityError:
         raise AccountUserAlreadyExists
 

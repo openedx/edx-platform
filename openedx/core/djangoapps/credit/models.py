@@ -548,11 +548,12 @@ class CreditEligibility(TimeStampedModel):
         # If we're eligible, then mark the user as being eligible for credit.
         if is_eligible:
             try:
-                CreditEligibility.objects.create(
-                    username=username,
-                    course=CreditCourse.objects.get(course_key=course_key),
-                )
-                return is_eligible, True
+                with transaction.atomic():
+                    CreditEligibility.objects.create(
+                        username=username,
+                        course=CreditCourse.objects.get(course_key=course_key),
+                    )
+                    return is_eligible, True
             except IntegrityError:
                 return is_eligible, False
         else:
