@@ -111,7 +111,6 @@ from openedx.core.djangolib.markup import HTML, Text
         return false;
     });
 
-
     // Listen for click events on element tagged with the 'register' class
     // Submit the hidden enrolllment form, and include information about which
     // purchasing workflow is being executed (based on which button is clicked)
@@ -124,8 +123,8 @@ from openedx.core.djangolib.markup import HTML, Text
                .attr("type", "hidden")
                .attr("id", "purchase_workflow")
                .attr("name", "purchase_workflow").val(purchase_workflow);
-      //var enroll_form = $("#class_enroll_form");
-        var enroll_form = $(this).parent().siblings(".enroll-form:eq(0)").find(".class_enroll_form");
+
+      var enroll_form = $("#" + $(this).data('course-id'));
       enroll_form.append($(event_target_input));
       enroll_form.submit();
       event.preventDefault();
@@ -179,7 +178,6 @@ from openedx.core.djangolib.markup import HTML, Text
     });
 
     %endif
-
 
 </script>
 
@@ -454,7 +452,7 @@ from openedx.core.djangolib.markup import HTML, Text
                              ## Since it's no harm to display a hidden form, we display it with the most permissive conditional
                              ## which is when the student is not registered.
                              <div class="enroll-form" style="display: none;">
-                                <form class="class_enroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
+                                <form class="class_enroll_form" id="${course['course_runs'][0]['uuid']}" method="post" data-remote="true" action="${reverse('change_enrollment')}">
                                   <fieldset class="enroll_fieldset">
                                     <legend class="sr">${_("Enroll")}</legend>
                                     <input name="course_id" id="course_id" type="hidden" value="${course['course_runs'][0]['key'] | h}">

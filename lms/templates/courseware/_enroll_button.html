@@ -40,6 +40,6 @@ from django.utils.translation import ugettext as _
   <% btn_class = "" %>
 % endif
 
-<button type="button" class="btn-brand btn-enroll-now ${btn_class}">
+<button type="button" class="btn-brand btn-enroll-now ${btn_class}" data-course-id="${course['uuid']}">
   ${btn_text}
 </button>
