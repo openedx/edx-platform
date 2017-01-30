@@ -341,7 +341,7 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         # The response should have a "Sign In" button with the URL
         # that preserves the querystring params
         with with_comprehensive_theme_context(theme):
-            response = self.client.get(reverse(url_name), params)
+            response = self.client.get(reverse(url_name), params, HTTP_ACCEPT="text/html")
 
         expected_url = '/login?{}'.format(self._finish_auth_url_param(params + [('next', '/dashboard')]))
         self.assertContains(response, expected_url)
@@ -357,7 +357,7 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
 
         # Verify that this parameter is also preserved
         with with_comprehensive_theme_context(theme):
-            response = self.client.get(reverse(url_name), params)
+            response = self.client.get(reverse(url_name), params, HTTP_ACCEPT="text/html")
 
         expected_url = '/login?{}'.format(self._finish_auth_url_param(params))
         self.assertContains(response, expected_url)
@@ -392,11 +392,11 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         if current_backend is not None:
             pipeline_target = "student_account.views.third_party_auth.pipeline"
             with simulate_running_pipeline(pipeline_target, current_backend):
-                response = self.client.get(reverse(url_name), params)
+                response = self.client.get(reverse(url_name), params, HTTP_ACCEPT="text/html")
 
         # Do NOT simulate a running pipeline
         else:
-            response = self.client.get(reverse(url_name), params)
+            response = self.client.get(reverse(url_name), params, HTTP_ACCEPT="text/html")
 
         # This relies on the THIRD_PARTY_AUTH configuration in the test settings
         expected_providers = [
@@ -429,7 +429,7 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
 
     def test_hinted_login(self):
         params = [("next", "/courses/something/?tpa_hint=oa2-google-oauth2")]
-        response = self.client.get(reverse('signin_user'), params)
+        response = self.client.get(reverse('signin_user'), params, HTTP_ACCEPT="text/html")
         self.assertContains(response, '"third_party_auth_hint": "oa2-google-oauth2"')
 
         tpa_hint = self.hidden_enabled_provider.provider_id
