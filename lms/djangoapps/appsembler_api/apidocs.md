@@ -336,7 +336,7 @@ This endpoint provides information about user accounts. Can be called with filte
 
 ### Enrollments
 
-This endpoint provides information about course enrollment. Can be called with filters for course, start date, and end date, or can be called without parameters to get information for all enrollments.
+This endpoint provides information about course enrollment. Can be called with filters for course, start date, and end date, or can be called without parameters to get information for all enrollments. If the student has finished the course and requested a certificate in a certain course, the information will be included.
 
 * URL: `/appsembler_api/v0/analytics/enrollment/batch`
 * Method: `GET`
@@ -362,7 +362,13 @@ This endpoint provides information about course enrollment. Can be called with f
     "course_id": "course-v1:edX+DemoX+Demo_Course",
     "user_id": 3,
     "enrollment_id": 2,
-    "date_enrolled": "2016-05-23T16:17:11.068Z"
+    "date_enrolled": "2016-05-23T16:17:11.068Z",
+    "cerificate": {
+        "grade": "1.0",
+        "url": "",
+        "completion_date": "2017-01-24 14:32:21+00:00"
+
+    }
   },
   ...
   ]
