@@ -43,8 +43,8 @@
       </a>
 
   </div>
-  <section id="previewModal" class="modal" aria-hidden="true">
-    <div class="inner-wrapper" role="dialog" aria-labelledby="preview-title">
+  <div id="previewModal" class="modal" aria-hidden="true">
+    <div class="inner-wrapper" role="dialog" aria-labelledby="preview-title" aria-modal=true>
       <button class="close-modal"><span class="icon fa fa-remove" aria-hidden="true"></span> <span class="sr">{% trans 'Close' %}</span></button>
 
       <header>
@@ -52,21 +52,23 @@
         <hr/>
       </header>
 
-    <div class="modal-body">
-      <iframe name="previewWindow" frameborder="0"></iframe>
-    </div>
-    <div class="modal-footer">
-      <button type="submit" name="save" value="1" class="btn btn-large btn-primary" onclick="this.form.target=''; this.form.action='{% url 'wiki:edit' path=urlpath.path article_id=article.id %}'">
-        <span class="icon fa fa-check-square-o" aria-hidden="true"></span>
-        {% trans "Save changes" %}
-      </button>
 
-      <a id="previewModalBackToEditor" href="#" class="btn btn-large">
-        <span class="icon fa fa-circle-arrow-left" aria-hidden="true"></span>
-        {% trans "Back to editor" %}
-      </a>
+      <div class="modal-body">
+        <iframe name="previewWindow" frameborder="0"></iframe>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" name="save" value="1" class="btn btn-large btn-primary" onclick="this.form.target=''; this.form.action='{% url 'wiki:edit' path=urlpath.path article_id=article.id %}'">
+          <span class="icon fa fa-check-square-o" aria-hidden="true"></span>
+          {% trans "Save changes" %}
+        </button>
+
+        <a id="previewModalBackToEditor" href="#" class="btn btn-large">
+          <span class="icon fa fa-circle-arrow-left" aria-hidden="true"></span>
+          {% trans "Back to editor" %}
+        </a>
+      </div>
     </div>
-  </section>
+  </div>
   {% include "wiki/includes/cheatsheet.html" %}
 </form>
 
