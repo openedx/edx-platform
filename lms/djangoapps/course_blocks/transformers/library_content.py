@@ -7,6 +7,7 @@ from openedx.core.lib.block_structure.transformer import BlockStructureTransform
 from xmodule.library_content_module import LibraryContentModule
 from xmodule.modulestore.django import modulestore
 from eventtracking import tracker
+from track import contexts
 
 
 class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransformer):
@@ -105,7 +106,14 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
                     )
 
                 # publish events for analytics
-                self._publish_events(block_structure, block_key, previous_count, max_count, block_keys)
+                self._publish_events(
+                    block_structure,
+                    block_key,
+                    previous_count,
+                    max_count,
+                    block_keys,
+                    usage_info.user.id,
+                )
                 all_selected_children.update(usage_info.course_key.make_usage_key(s[0], s[1]) for s in selected)
 
         def check_child_removal(block_key):
@@ -145,8 +153,7 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
         except StudentModule.DoesNotExist:
             return None
 
-    @classmethod
-    def _publish_events(cls, block_structure, location, previous_count, max_count, block_keys):
+    def _publish_events(self, block_structure, location, previous_count, max_count, block_keys, user_id):
         """
         Helper method to publish events for analytics purposes
         """
@@ -171,10 +178,15 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
                 "location": unicode(location),
                 "previous_count": previous_count,
                 "result": result,
-                "max_count": max_count
+                "max_count": max_count,
             }
             event_data.update(kwargs)
-            tracker.emit("edx.librarycontentblock.content.{}".format(event_name), event_data)
+            context = contexts.course_context_from_course_id(location.course_key)
+            if user_id:
+                context['user_id'] = user_id
+            full_event_name = "edx.librarycontentblock.content.{}".format(event_name)
+            with tracker.get_tracker().context(full_event_name, context):
+                tracker.emit(full_event_name, event_data)
 
         LibraryContentModule.publish_selected_children_events(
             block_keys,
