@@ -32,7 +32,7 @@ class SubsectionGrade(object):
         self.graded = getattr(subsection, 'graded', False)
 
         self.course_version = getattr(subsection, 'course_version', None)
-        self.subtree_edited_timestamp = subsection.subtree_edited_on
+        self.subtree_edited_timestamp = getattr(subsection, 'subtree_edited_on', None)
 
         self.graded_total = None  # aggregated grade for all graded problems
         self.all_total = None  # aggregated grade for all problems, regardless of whether they are graded
@@ -341,6 +341,6 @@ class SubsectionGradeFactory(object):
             log_statement,
             self.course.id,
             getattr(subsection, 'course_version', None),
-            subsection.subtree_edited_on,
+            getattr(subsection, 'subtree_edited_on', None),
             self.student.id,
         ))

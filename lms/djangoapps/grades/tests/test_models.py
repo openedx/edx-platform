@@ -231,14 +231,14 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
         with self.assertRaises(ValidationError):
             PersistentSubsectionGrade.create_grade(**self.params)
 
-    def test_optional_fields(self):
-        del self.params["course_version"]
+    @ddt.data('course_version', 'subtree_edited_timestamp')
+    def test_optional_fields(self, field):
+        del self.params[field]
         PersistentSubsectionGrade.create_grade(**self.params)
 
     @ddt.data(
         ("user_id", ValidationError),
         ("usage_key", KeyError),
-        ("subtree_edited_timestamp", ValidationError),
         ("earned_all", ValidationError),
         ("possible_all", ValidationError),
         ("earned_graded", ValidationError),
@@ -427,10 +427,11 @@ class PersistentCourseGradesTest(GradesModelTestCase):
         self.assertIsInstance(created_grade.passed_timestamp, datetime)
         self.assertEqual(created_grade, read_grade)
 
-    def test_course_version_optional(self):
-        del self.params["course_version"]
+    @ddt.data('course_version', 'course_edited_timestamp')
+    def test_optional_fields(self, field):
+        del self.params[field]
         grade = PersistentCourseGrade.update_or_create_course_grade(**self.params)
-        self.assertEqual("", grade.course_version)
+        self.assertFalse(getattr(grade, field))
 
     @ddt.data(
         ("percent_grade", "Not a float at all", ValueError),

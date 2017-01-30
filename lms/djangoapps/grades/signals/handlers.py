@@ -27,7 +27,7 @@ from .signals import (
 from ..constants import ScoreDatabaseTableEnum
 from ..new.course_grade import CourseGradeFactory
 from ..scores import weighted_score
-from ..tasks import recalculate_subsection_grade_v3
+from ..tasks import recalculate_subsection_grade_v3, RECALCULATE_GRADE_DELAY
 
 log = getLogger(__name__)
 
@@ -191,7 +191,8 @@ def enqueue_subsection_update(sender, **kwargs):  # pylint: disable=unused-argum
             event_transaction_id=unicode(get_event_transaction_id()),
             event_transaction_type=unicode(get_event_transaction_type()),
             score_db_table=kwargs['score_db_table'],
-        )
+        ),
+        countdown=RECALCULATE_GRADE_DELAY,
     )
     log.info(
         u'Grades: Request async calculation of subsection grades with args: {}. Task [{}]'.format(

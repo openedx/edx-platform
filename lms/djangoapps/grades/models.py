@@ -277,8 +277,8 @@ class PersistentSubsectionGrade(DeleteGradesMixin, TimeStampedModel):
     usage_key = UsageKeyField(blank=False, max_length=255)
 
     # Information relating to the state of content when grade was calculated
-    subtree_edited_timestamp = models.DateTimeField('last content edit timestamp', blank=False)
-    course_version = models.CharField('guid of latest course version', blank=True, max_length=255)
+    subtree_edited_timestamp = models.DateTimeField(u'Last content edit timestamp', blank=True, null=True)
+    course_version = models.CharField(u'Guid of latest course version', blank=True, max_length=255)
 
     # earned/possible refers to the number of points achieved and available to achieve.
     # graded refers to the subset of all problems that are marked as being graded.
@@ -529,7 +529,7 @@ class PersistentCourseGrade(DeleteGradesMixin, TimeStampedModel):
     course_id = CourseKeyField(blank=False, max_length=255)
 
     # Information relating to the state of content when grade was calculated
-    course_edited_timestamp = models.DateTimeField(u'Last content edit timestamp', blank=False)
+    course_edited_timestamp = models.DateTimeField(u'Last content edit timestamp', blank=True, null=True)
     course_version = models.CharField(u'Course content version identifier', blank=True, max_length=255)
     grading_policy_hash = models.CharField(u'Hash of grading policy', blank=False, max_length=255)
 
