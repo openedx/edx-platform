@@ -2309,7 +2309,7 @@ class UpdateCommentTest(
         self.request.user = self.user
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
 
-    def register_comment(self, overrides=None, thread_overrides=None, course=None):
+    def register_comment(self, overrides=None, thread_overrides=None, course=None, has_child=None):
         """
         Make a comment with appropriate data overridden by the overrides
         parameter and register mock responses for both GET and PUT on its
@@ -2322,8 +2322,6 @@ class UpdateCommentTest(
             "id": "test_thread",
             "course_id": unicode(course.id)
         })
-        cs_thread_data.update(thread_overrides or {})
-        self.register_get_thread_response(cs_thread_data)
         cs_comment_data = make_minimal_cs_comment({
             "id": "test_comment",
             "course_id": cs_thread_data["course_id"],
@@ -2334,6 +2332,27 @@ class UpdateCommentTest(
             "updated_at": "2015-06-03T00:00:00Z",
             "body": "Original body",
         })
+        if thread_overrides and "thread_type" in thread_overrides and thread_overrides["thread_type"] == "question":
+            cs_thread_data["endorsed_responses"] = []
+            cs_thread_data["non_endorsed_responses"] = []
+            cs_thread_data.pop("children")
+        if has_child:
+            cs_child_comment_data = make_minimal_cs_comment({
+                "id": "test_child_comment",
+                "parent_id": "test_comment",
+                "course_id": cs_thread_data["course_id"],
+                "thread_id": cs_thread_data["id"],
+                "username": self.user.username,
+                "user_id": str(self.user.id),
+                "created_at": "2015-06-03T00:00:00Z",
+                "updated_at": "2015-06-03T00:00:00Z",
+                "body": "Original body",
+            })
+            cs_comment_data["children"] = cs_child_comment_data
+            cs_thread_data["children"] = [cs_comment_data]
+        cs_thread_data.update(thread_overrides or {})
+        self.register_get_thread_response(cs_thread_data)
+
         cs_comment_data.update(overrides or {})
         self.register_get_comment_response(cs_comment_data)
         self.register_put_comment_response(cs_comment_data)
@@ -2680,6 +2699,52 @@ class UpdateCommentTest(
                 httpretty.last_request().parsed_body,
                 {"user_id": [str(self.user.id)]}
             )
+
+    def test_comment_child(self):
+        self.register_comment(has_child=True)
+        actual = update_comment(self.request, "test_comment", {"raw_body": "Edited body"})
+        expected = {
+            "id": "test_comment",
+            "thread_id": "test_thread",
+            "parent_id": None,
+            "author": self.user.username,
+            "author_label": None,
+            "created_at": "2015-06-03T00:00:00Z",
+            "updated_at": "2015-06-03T00:00:00Z",
+            "raw_body": "Edited body",
+            "rendered_body": "<p>Edited body</p>",
+            "endorsed": False,
+            "endorsed_by": None,
+            "endorsed_by_label": None,
+            "endorsed_at": None,
+            "abuse_flagged": False,
+            "voted": False,
+            "vote_count": 0,
+            "editable_fields": ["abuse_flagged", "raw_body", "voted"],
+            "children": [
+                {
+                    "id": "test_child_comment",
+                    "author": self.user.username,
+                    "author_label": None,
+                    "created_at": "2015-06-03T00:00:00Z",
+                    "updated_at": "2015-06-03T00:00:00Z",
+                    "raw_body": "Original body",
+                    "rendered_body": "<p>Original body</p>",
+                    "abuse_flagged": False,
+                    "voted": False,
+                    "vote_count": 0,
+                    "editable_fields": ["abuse_flagged", "raw_body", "voted"],
+                    "thread_id": "test_thread",
+                    "parent_id": "test_comment",
+                    "endorsed": False,
+                    "endorsed_by": None,
+                    "endorsed_by_label": None,
+                    "endorsed_at": None,
+                    "children": []
+                }
+            ]
+        }
+        self.assertEqual(actual, expected)
 
 
 @attr(shard=2)

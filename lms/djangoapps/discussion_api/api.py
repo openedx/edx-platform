@@ -129,7 +129,16 @@ def _get_comment_and_context(request, comment_id):
     """
     try:
         cc_comment = Comment(id=comment_id).retrieve()
-        _, context = _get_thread_and_context(request, cc_comment["thread_id"])
+        cc_thread, context = _get_thread_and_context(request, cc_comment["thread_id"])
+        if cc_thread["thread_type"] == "question":
+            responses = cc_thread["endorsed_responses"] + cc_thread["non_endorsed_responses"]
+        else:
+            responses = cc_thread["children"]
+        cc_comment.attributes["children"] = [
+            response["children"]
+            for response in responses
+            if response["id"] == comment_id
+        ]
         return cc_comment, context
     except CommentClientRequestError:
         raise CommentNotFoundError("Comment not found.")
