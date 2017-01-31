@@ -2,6 +2,8 @@
 This module is essentially a broker to xmodule/tabs.py -- it was originally introduced to
 perform some LMS-specific tab display gymnastics for the Entrance Exams feature
 """
+import waffle
+
 from django.conf import settings
 from django.utils.translation import ugettext as _, ugettext_noop
 
@@ -9,7 +11,7 @@ from courseware.access import has_access
 from courseware.entrance_exams import user_must_complete_entrance_exam
 from openedx.core.lib.course_tabs import CourseTabPluginManager
 from student.models import CourseEnrollment
-from xmodule.tabs import CourseTab, CourseTabList, key_checker
+from xmodule.tabs import CourseTab, CourseTabList, key_checker, link_reverse_func
 
 
 class EnrolledTab(CourseTab):
@@ -33,6 +35,16 @@ class CoursewareTab(EnrolledTab):
     view_name = 'courseware'
     is_movable = False
     is_default = False
+
+    @property
+    def link_func(self):
+        """
+        Returns a function that computes the URL for this tab.
+        """
+        if waffle.switch_is_active('unified_course_view'):
+            return link_reverse_func('unified_course_view')
+        else:
+            return link_reverse_func('courseware')
 
 
 class CourseInfoTab(CourseTab):
