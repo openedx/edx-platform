@@ -509,7 +509,7 @@
                     ref = element.files;
                     for (loopI = 0, loopLen = ref.length; loopI < loopLen; loopI++) {
                         file = ref[loopI];
-                        if (allowedFiles.length !== 0 && indexOfHelper.call(allowedFiles, file.name < 0)) {
+                        if (allowedFiles.length !== 0 && indexOfHelper.call(allowedFiles, file.name) < 0) {
                             unallowedFileSubmitted = true;
                             errors.push(edx.StringUtils.interpolate(
                                 gettext('You submitted {filename}; only {allowedFiles} are allowed.'), {
