@@ -358,12 +358,12 @@ from openedx.core.djangolib.markup import HTML, Text
                     <blockquote class="program-quote visible-sm">
                         <div class="quote">
                             <span class="pull-right hidden-sm">
-                                <img src="${static.url('images/programs/quote-logo.png')}" width="90" height="90"/>
+                                <img src="${static.url(program['individual_endorsements'][0]['endorser']['profile_image_url'])}" width="90" height="90"/>
                             </span>
                             <span>
                                 ${program['individual_endorsements'][0]['quote']}
                             </span>
-                            <img class="visible-sm pull-left" src="${static.url('images/programs/quote-logo.png')}" width="40" height="40"/>
+                            <img class="visible-sm pull-left" src="${static.url(program['individual_endorsements'][0]['endorser']['profile_image_url'])}" width="40" height="40"/>
                             <span class="writer">
                                 ${program['individual_endorsements'][0]['endorser']['given_name']},
                                 ${program['individual_endorsements'][0]['endorser']['position']['title']}
@@ -401,12 +401,12 @@ from openedx.core.djangolib.markup import HTML, Text
                     <blockquote class="program-quote">
                         <div class="quote">
                             <span class="pull-right hidden-sm">
-                                <img src="${static.url('images/programs/quote-logo.png')}" width="90" height="90"/>
+                                <img src="${static.url(program['individual_endorsements'][0]['endorser']['profile_image_url'])}" width="90" height="90"/>
                             </span>
                             <span>
                                ${program['individual_endorsements'][0]['quote']}
                             </span>
-                            <img class="visible-sm pull-left" src="${static.url('images/programs/quote-logo.png')}" width="40" height="40"/>
+                            <img class="visible-sm pull-left" src="${static.url(program['individual_endorsements'][0]['endorser']['profile_image_url'])}" width="40" height="40"/>
                             <span class="writer">
                                 ${program['individual_endorsements'][0]['endorser']['given_name']},
                                 ${program['individual_endorsements'][0]['endorser']['position']['title']}
