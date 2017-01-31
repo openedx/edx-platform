@@ -20,6 +20,7 @@ from django.db import transaction
 from django.db.models import Q
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, QueryDict
 from django.shortcuts import redirect
+from django.template.loader import render_to_string
 from django.utils.decorators import method_decorator
 from django.utils.timezone import UTC
 from django.utils.translation import ugettext as _
@@ -419,7 +420,7 @@ def static_tab(request, course_id, tab_slug):
         tab
     )
 
-    return render_to_response('courseware/component_tab-v1.html', {
+    return render_to_response('courseware/tab-fragment-v1.html', {
         'course': course,
         'active_page': 'static_tab_{0}'.format(tab['url_slug']),
         'tab': tab,
@@ -431,9 +432,9 @@ def static_tab(request, course_id, tab_slug):
 
 @ensure_csrf_cookie
 @ensure_valid_course_key
-def component_tab(request, course_id, tab_type):
+def tab_fragment(request, course_id, tab_type):
     """
-    Display a component tab based on type name.
+    Display a tab fragment based on type name.
 
     Assumes the course_id is in a valid format.
     """
@@ -441,14 +442,13 @@ def component_tab(request, course_id, tab_type):
     course_key = CourseKey.from_string(course_id)
     course = get_course_with_access(request.user, 'load', course_key)
 
-    component_tab = [tab for tab in course.tabs if tab.type == tab_type][0]
-    fragment = component_tab.render_fragment(request, course)
+    tab = [tab for tab in course.tabs if tab.type == tab_type][0]
+    fragment = tab.render_fragment(request, course)
 
-
-    return render_to_response('courseware/component_tab-v2.html', {
+    return render_to_response('courseware/tab-fragment-v2.html', {
         'course': course,
-        'active_page': component_tab['type'],
-        'tab': component_tab,
+        'active_page': tab['type'],
+        'tab': tab,
         'fragment': fragment,
         'uses_pattern_library': True,
         'disable_courseware_js': True,
@@ -700,65 +700,6 @@ def course_about(request, course_id):
         inject_coursetalk_keys_into_context(context, course_key)
 
         return render_to_response('courseware/course_about.html', context)
-
-
-class ProgressComponentView(FragmentView):
-    """
-    Component implementation of the discussion board.
-    """
-    def render_fragment(self, request, course_id=None):
-        """
-        Render the component
-        """
-        # nr_transaction = newrelic.agent.current_transaction()
-        #
-        course_key = CourseKey.from_string(course_id)
-        context = _create_progress_context(request, course_key)
-        html = render_to_string('discussion/discussion_board_component.html', context)
-        # # inline_js = render_to_string('discussion/discussion_board_js.template', context)
-        #
-        # fragment = Fragment(html)
-        # # fragment.add_javascript(inline_js)
-        fragment = Fragment()
-        fragment.content = "Hello World"
-        return fragment
-
-
-def _create_progress_context(request, course_key):
-    course = get_course_with_access(request.user, 'load', course_key, depth=None, check_if_enrolled=True)
-    prep_course_for_grading(course, request)
-    staff_access = bool(has_access(request.user, 'staff', course))
-    student = request.user
-
-    # NOTE: To make sure impersonation by instructor works, use
-    # student instead of request.user in the rest of the function.
-
-    # The pre-fetching of groups is done to make auth checks not require an
-    # additional DB lookup (this kills the Progress page in particular).
-    student = User.objects.prefetch_related("groups").get(id=student.id)
-
-    course_grade = CourseGradeFactory().create(student, course)
-    courseware_summary = course_grade.chapter_grades
-    grade_summary = course_grade.summary
-
-    studio_url = get_studio_url(course, 'settings/grading')
-
-    # checking certificate generation configuration
-    enrollment_mode, is_active = CourseEnrollment.enrollment_mode_for_user(student, course_key)
-
-    context = {
-        'course': course,
-        'courseware_summary': courseware_summary,
-        'studio_url': studio_url,
-        'grade_summary': grade_summary,
-        'staff_access': staff_access,
-        'student': student,
-        'passed': is_course_passed(course, grade_summary),
-        'credit_course_requirements': _credit_course_requirements(course_key, student),
-        'certificate_data': _get_cert_data(student, course, course_key, is_active, enrollment_mode)
-    }
-
-    return context
 
 
 @transaction.non_atomic_requests
@@ -1590,3 +1531,55 @@ def financial_assistance_form(request):
             }
         ],
     })
+
+
+class UnifiedCourseView(View):
+    """
+    Unified view for a course.
+    """
+    @method_decorator(login_required)
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True))
+    @method_decorator(ensure_valid_course_key)
+    def get(self, request, course_id):
+        """
+        Displays the main view for the specified course.
+
+        Arguments:
+            request: HTTP request
+            course_id (unicode): course id
+        """
+        course_key = CourseKey.from_string(course_id)
+        course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
+
+        # Render the outline as a fragment
+        outline_fragment = CourseOutlineFragmentView().render_fragment(request, course_id=course_id)
+
+        # Render the entire unified course view
+        context = {
+            'csrf': csrf(request)['csrf_token'],
+            'course': course,
+            'outline_fragment': outline_fragment,
+            'disable_courseware_js': True,
+            'uses_pattern_library': True,
+        }
+        return render_to_response('courseware/unified-course-view.html', context)
+
+
+class CourseOutlineFragmentView(FragmentView):
+    """
+    Course outline fragment to be shown in the unified course view.
+    """
+
+    def render_fragment(self, request, course_id=None):
+        """
+        Renders the course outline as a fragment.
+        """
+        course_key = CourseKey.from_string(course_id)
+        course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
+        context = {
+            'csrf': csrf(request)['csrf_token'],
+            'course': course,
+        }
+        html = render_to_string('courseware/course-outline.html', context)
+        return Fragment(html)
