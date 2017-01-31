@@ -26,13 +26,14 @@ class Command(BaseCommand):
         except InvalidKeyError:
             return SlashSeparatedCourseKey.from_deprecated_string(arg)
 
+    def add_arguments(self, parser):
+        parser.add_argument('source_course_key')
+        parser.add_argument('dest_course_key')
+
     def handle(self, *args, **options):
         "Execute the command"
-        if len(args) != 2:
-            raise CommandError("clone requires 2 arguments: <source-course_id> <dest-course_id>")
-
-        source_course_id = self.course_key_from_arg(args[0])
-        dest_course_id = self.course_key_from_arg(args[1])
+        source_course_id = self.course_key_from_arg(options['source_course_key'])
+        dest_course_id = self.course_key_from_arg(options['dest_course_key'])
 
         mstore = modulestore()
 
