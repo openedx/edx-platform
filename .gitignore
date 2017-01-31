@@ -108,3 +108,6 @@ lms/lib/comment_client/python
 autodeploy.properties
 .ws_migrations_complete
 dist
+
+themes/arbisoft-nda/lms/static/css/
+themes/arbisoft-nda/lms/static/css/*

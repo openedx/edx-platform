@@ -375,7 +375,7 @@ def _get_source_address(course_id, course_title, truncate=True):
     # character appears.
     course_name = re.sub(r"[^\w.-]", '_', course_id.course)
 
-    from_addr_format = u'"{course_title}" <{course_name}-{from_email}>'
+    from_addr_format = u"Arbisoft's training platform <{from_email}>"
 
     def format_address(course_title_no_quotes):
         """
@@ -386,8 +386,6 @@ def _get_source_address(course_id, course_title, truncate=True):
         `course_title_no_quotes`.
         """
         return from_addr_format.format(
-            course_title=course_title_no_quotes,
-            course_name=course_name,
             from_email=configuration_helpers.get_value(
                 'email_from_address',
                 settings.BULK_EMAIL_DEFAULT_FROM_EMAIL
