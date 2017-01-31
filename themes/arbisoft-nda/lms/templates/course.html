@@ -6,7 +6,7 @@
     %>
     <%page args="course" expression_filter="h"/>
     <article class="course" id="${course.id}" role="region" aria-label="${course.display_name_with_default}">
-        <a href="${reverse('about_course', args=[course.id.to_deprecated_string()])}">
+        <a href="/login">
             <header class="course-image">
                 <div class="cover-image">
                     <img src="${course.course_image_url}" alt="${course.display_name_with_default} ${course.display_number_with_default}" />
@@ -17,7 +17,7 @@
                 <h2 class="course-name">
                     <span class="course-organization">${course.display_org_with_default} <span class="course-date pull-right" aria-hidden="true">${course.start_datetime_text()} - ${course.end_datetime_text()}</span></span>
                     <span class="course-title">${course.display_name}</span>
-                    <a href="${reverse('about_course', args=[course.id.to_deprecated_string()])}" class="btn btn-brand">Learn More</a>
+                    <a href="/login" class="btn btn-brand">Learn More</a>
                 </h2>
 
             </div>
