@@ -48,7 +48,7 @@ edx-i18n-tools==0.3.7
 edx-lint==0.4.3
 edx-django-oauth2-provider==1.1.4
 edx-django-sites-extensions==2.1.1
-edx-enterprise==0.9.0
+edx-enterprise==0.19.1
 edx-oauth2-provider==1.2.0
 edx-opaque-keys==0.4.0
 edx-organizations==0.4.2
