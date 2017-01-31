@@ -109,11 +109,10 @@ class Target(models.Model):
             courseenrollment__is_active=True
         )
         if self.target_type == SEND_TO_MYSELF:
-            course = courses.get_course_by_id(course_key)
+            course = courses.get_course_by_id(course_id)
             ids = []
             for __, student in enumerate(enrollment_qset):
-                request.user = student
-                grade = grades.grade(student, request, course)
+                grade = grades.grade(student, course)
                 if grade['percent'] and grade['percent'] > 70:
                     ids.append(student.id)
             return use_read_replica_if_available(enrollment_qset.exclude(id__in=ids))
