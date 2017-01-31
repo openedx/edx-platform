@@ -413,17 +413,10 @@ class ProblemPage(PageObject):
         """
         Check if correct answer/choice highlighted for choice group.
         """
-        correct_status_xpath = '//fieldset/div[contains(@class, "field")][{0}]/label[contains(@class, "choicegroup_correct")]/span[contains(@class, "status correct")]'  # pylint: disable=line-too-long
-        any_status_xpath = '//fieldset/div[contains(@class, "field")][{0}]/label/span'
+        xpath = '//fieldset/div[contains(@class, "field")][{0}]/label[contains(@class, "choicegroup_correct")]'
         for choice in correct_choices:
-            if not self.q(xpath=correct_status_xpath.format(choice)).is_present():
+            if not self.q(xpath=xpath.format(choice)).is_present():
                 return False
-
-            # Check that there is only a single status span, as there were some bugs with multiple
-            # spans (with various classes) being appended.
-            if not len(self.q(xpath=any_status_xpath.format(choice)).results) == 1:
-                return False
-
         return True
 
     @property

@@ -681,8 +681,17 @@
                 var answers;
                 answers = response.answers;
                 $.each(answers, function(key, value) {
-                    var answer;
-                    if (!$.isArray(value)) {
+                    var answer, choice, i, len, results;
+                    if ($.isArray(value)) {
+                        results = [];
+                        for (i = 0, len = value.length; i < len; i++) {
+                            choice = value[i];
+                            results.push(that.$('label[for="input_' + key + '_' + choice + '"]').attr({
+                                correct_answer: 'true'
+                            }));
+                        }
+                        return results;
+                    } else {
                         answer = that.$('#answer_' + key + ', #solution_' + key);
                         edx.HtmlUtils.setHtml(answer, edx.HtmlUtils.HTML(value));
                         Collapsible.setCollapsibles(answer);
@@ -713,7 +722,7 @@
                         display = that.inputtypeDisplays[$(inputtype).attr('id')];
                         showMethod = that.inputtypeShowAnswerMethods[cls];
                         if (showMethod != null) {
-                            results.push(showMethod(inputtype, display, answers, response.correct_status_html));
+                            results.push(showMethod(inputtype, display, answers));
                         } else {
                             results.push(void 0);
                         }
@@ -938,10 +947,10 @@
                     var $status;
                     $status = $('#status_' + id);
                     if ($status[0]) {
-                        $status.removeAttr('class').addClass('status unanswered');
+                        $status.removeAttr('class').addClass('unanswered');
                     } else {
                         $('<span>', {
-                            class: 'status unanswered',
+                            class: 'unanswered',
                             style: 'display: inline-block;',
                             id: 'status_' + id
                         });
@@ -1021,30 +1030,16 @@
         };
 
         Problem.prototype.inputtypeShowAnswerMethods = {
-            choicegroup: function(element, display, answers, correctStatusHtml) {
-                var answer, choice, inputId, i, len, results, $element, $inputLabel, $inputStatus;
+            choicegroup: function(element, display, answers) {
+                var answer, choice, inputId, i, len, results, $element;
                 $element = $(element);
                 inputId = $element.attr('id').replace(/inputtype_/, '');
                 answer = answers[inputId];
                 results = [];
                 for (i = 0, len = answer.length; i < len; i++) {
                     choice = answer[i];
-                    $inputLabel = $element.find('#input_' + inputId + '_' + choice).parent('label');
-                    $inputStatus = $inputLabel.find('#status_' + inputId);
-                    // If the correct answer was already Submitted before "Show Answer" was selected,
-                    // the status HTML will already be present. Otherwise, inject the status HTML.
-
-                    // If the learner clicked a different answer after Submit, their submitted answers
-                    // will be marked as "unanswered". In that case, for correct answers update the
-                    // classes accordingly.
-                    if ($inputStatus.hasClass('unanswered')) {
-                        $inputStatus.removeAttr('class').addClass('status correct');
-                        $inputLabel.addClass('choicegroup_correct');
-                    } else if (!$inputLabel.hasClass('choicegroup_correct')) {
-                        // If the status HTML is not already present (due to clicking Submit), append
-                        // the status HTML for correct answers.
-                        results.push($inputLabel.addClass('choicegroup_correct').append(correctStatusHtml));
-                    }
+                    results.push($element.find('#input_' + inputId + '_' + choice).parent('label').
+                        addClass('choicegroup_correct'));
                 }
                 return results;
             },
