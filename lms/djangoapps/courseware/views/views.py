@@ -26,6 +26,7 @@ from django.http import (
     QueryDict,
 )
 from django.shortcuts import redirect
+from django.template.loader import render_to_string
 from django.utils.decorators import method_decorator
 from django.utils.timezone import UTC
 from django.utils.translation import ugettext as _
@@ -1603,3 +1604,55 @@ def financial_assistance_form(request):
             }
         ],
     })
+
+
+class UnifiedCourseView(View):
+    """
+    Unified view for a course.
+    """
+    @method_decorator(login_required)
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True))
+    @method_decorator(ensure_valid_course_key)
+    def get(self, request, course_id):
+        """
+        Displays the main view for the specified course.
+
+        Arguments:
+            request: HTTP request
+            course_id (unicode): course id
+        """
+        course_key = CourseKey.from_string(course_id)
+        course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
+
+        # Render the outline as a fragment
+        outline_fragment = CourseOutlineFragmentView().render_fragment(request, course_id=course_id)
+
+        # Render the entire unified course view
+        context = {
+            'csrf': csrf(request)['csrf_token'],
+            'course': course,
+            'outline_fragment': outline_fragment,
+            'disable_courseware_js': True,
+            'uses_pattern_library': True,
+        }
+        return render_to_response('courseware/unified-course-view.html', context)
+
+
+class CourseOutlineFragmentView(FragmentView):
+    """
+    Course outline fragment to be shown in the unified course view.
+    """
+
+    def render_fragment(self, request, course_id=None):
+        """
+        Renders the course outline as a fragment.
+        """
+        course_key = CourseKey.from_string(course_id)
+        course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
+        context = {
+            'csrf': csrf(request)['csrf_token'],
+            'course': course,
+        }
+        html = render_to_string('courseware/course-outline.html', context)
+        return Fragment(html)
