@@ -109,11 +109,6 @@ def cme_create_account(request, post_override=None):
 #     if error is not None:
 #         return HttpResponse(json.dumps(error))
 
-    # Validate required secondary fields
-    error = validate_required_secondaries(post_vars)
-    if error is not None:
-        return HttpResponse(json.dumps(error))
-
     # Validate email address
     try:
         validate_email(post_vars['email'])
@@ -462,29 +457,6 @@ def validate_required_boxes(post_vars):
         if post_vars.get(k, 'false') != u'true':
             error['success'] = False
             error['value'] = val
-            error['field'] = k
-            return error
-
-
-def validate_required_secondaries(post_vars):
-    """
-    Checks that required "secondary" text fields contain at least 2 chars. A secondary field is one that appears on the form if
-    the user chooses a particular value in the corresponding primary. E.g. if "Other" chosen in sub_specialty then the
-    sub_specialty_free secondary field pops up on the registration form.
-    `post_vars is dict of post parameters (a `dict)
-    Returns a dict indicating failure, field and message on empty field else None
-    """
-
-    #Add additional required secondaries here
-    required_secondaries_dict = {'specialty': ('Other', 'specialty_free', 'Enter your specialty.'),
-                                 'sub_specialty': ('Other', 'sub_specialty_free', 'Enter your sub-specialty.'),
-                                 }
-
-    error = {}
-    for k, val in required_secondaries_dict.items():
-        if post_vars.get(k) == val[0] and len(post_vars.get(val[1])) < 2:
-            error['success'] = False
-            error['value'] = val[2]
             error['field'] = k
             return error
 
