@@ -11,6 +11,7 @@ from django.conf.urls.static import static
 from courseware.views.views import EnrollStaffView
 from config_models.views import ConfigurationModelCurrentAPIView
 from courseware.views.index import CoursewareIndex
+from courseware.views.views import UnifiedCourseView, CourseOutlineFragmentView
 from openedx.core.djangoapps.auth_exchange.views import LoginWithAccessTokenView
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
@@ -380,6 +381,20 @@ urlpatterns += (
     ),
 
     url(
+        r'^courses/{}/course/?$'.format(
+            settings.COURSE_ID_PATTERN,
+        ),
+        UnifiedCourseView.as_view(),
+        name='unified_course_view',
+    ),
+    url(
+        r'^courses/{}/course/outline?$'.format(
+            settings.COURSE_ID_PATTERN,
+        ),
+        CourseOutlineFragmentView.as_view(),
+        name='course_outline_fragment_view',
+    ),
+    url(
         r'^courses/{}/courseware/?$'.format(
             settings.COURSE_ID_PATTERN,
         ),
@@ -691,8 +706,8 @@ urlpatterns += (
         r'^courses/{}/tab/(?P<tab_type>[^/]+)/$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'courseware.views.views.component_tab',
-        name='component_tab',
+        'courseware.views.views.tab_fragment',
+        name='tab_fragment',
     ),
 )
 

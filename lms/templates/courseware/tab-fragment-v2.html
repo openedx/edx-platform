@@ -14,8 +14,8 @@ from openedx.core.djangolib.markup import HTML
 <%block name="headextra">
 ${HTML(fragment.head_html())}
 </%block>
-<%block name="js_extra">
 
+<%block name="js_extra">
 <%include file="/mathjax_include.html" args="disable_fast_preview=True"/>
 ${HTML(fragment.foot_html())}
 </%block>

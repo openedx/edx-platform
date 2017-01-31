@@ -236,7 +236,7 @@ class CourseTab(object):
         return tab_type(tab_dict=tab_dict)
 
 
-class ComponentTabMixin(object):
+class TabFragmentMixin(object):
     """
     A mixin for tabs that meet the component API (and can be rendered via Fragments).
     """
@@ -246,7 +246,7 @@ class ComponentTabMixin(object):
     def link_func(self):
         def link_func(course, reverse_func):
             """ Returns a url for a given course and reverse function. """
-            return reverse_func("component_tab", args=[course.id.to_deprecated_string(), self.type])
+            return reverse_func("tab_fragment", args=[course.id.to_deprecated_string(), self.type])
 
         return link_func
 
