@@ -199,7 +199,7 @@ from openedx.core.djangolib.markup import HTML, Text
                 <div class="row">
                     <div class="col col-12 md-col-8 lg-col-9">
                         <div class="org-logo">
-                            <img src="https://www.edx.org/sites/default/files/school/image/logo/iimb-200x101.png" alt="Indian Institute of Management, Bangalore Logo">
+                            <img src="${program['authoring_organizations'][0]['logo_image_url']}" alt="${program['authoring_organizations'][0]['name']}">
                         </div>
                         <h1 class="banner-title">${program['title']}</h1>
                         <p class="banner-description">${program['subtitle']}</p>
