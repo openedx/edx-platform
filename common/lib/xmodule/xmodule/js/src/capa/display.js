@@ -1043,7 +1043,8 @@
                     } else if (!$inputLabel.hasClass('choicegroup_correct')) {
                         // If the status HTML is not already present (due to clicking Submit), append
                         // the status HTML for correct answers.
-                        results.push($inputLabel.addClass('choicegroup_correct').append(correctStatusHtml));
+                        edx.HtmlUtils.append($inputLabel, edx.HtmlUtils.HTML(correctStatusHtml));
+                        results.push($inputLabel.addClass('choicegroup_correct'));
                     }
                 }
                 return results;
