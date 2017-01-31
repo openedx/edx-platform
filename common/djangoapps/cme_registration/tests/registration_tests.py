@@ -310,26 +310,6 @@ class TestCmeRegistration(UrlResetMixin, TestCase):
         self.assertContains(response, '{"field": "postal_code", "value": "Enter your postal code", "success": false}')
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Run only in LMS')
-    def test_specialty_other(self):
-
-        self.post_vars['specialty'] = 'Other'
-        self.post_vars['specialty_free'] = ''
-        url = reverse('create_account')
-        response = self.client.post(url, self.post_vars)
-
-        self.assertContains(response, '{"field": "specialty", "value": "Enter your specialty.", "success": false}')
-
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Run only in LMS')
-    def test_sub_specialty_other(self):
-
-        self.post_vars['sub_specialty'] = 'Other'
-        self.post_vars['sub_specialty_free'] = ''
-        url = reverse('create_account')
-        response = self.client.post(url, self.post_vars)
-
-        self.assertContains(response, '{"field": "sub_specialty", "value": "Enter your sub-specialty.", "success": false}')
-
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Run only in LMS')
     def test_honor_code_required(self):
 
         del self.post_vars['honor_code']
@@ -401,10 +381,8 @@ class TestCmeRegistration(UrlResetMixin, TestCase):
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Run only in LMS')
     def test_db_records_with_others_created(self):
 
-        self.post_vars['specialty'] = 'Other'
-        self.post_vars['specialty_free'] = 'Patient care'
-        self.post_vars['sub_specialty'] = 'Other'
-        self.post_vars['sub_specialty_free'] = 'Legs and feet'
+        self.post_vars['specialty'] = 'Other/None'
+        self.post_vars['sub_specialty'] = 'Other/None'
         self.post_vars['affiliation'] = 'Other'
         self.post_vars['other_affiliation'] = 'other_affiliation'
         self.post_vars['sub_affiliation'] = ''
@@ -448,8 +426,8 @@ class TestCmeRegistration(UrlResetMixin, TestCase):
                                                          postal_code='postal_code',
                                                          country_cme='country',
                                                          county_province='county_province',
-                                                         specialty='Patient care',
-                                                         sub_specialty='Legs and feet',
+                                                         specialty='Other/None',
+                                                         sub_specialty='Other/None',
                                                          )
         self.assertEqual(1, len(cme_user_profile))
 
