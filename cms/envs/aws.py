@@ -307,6 +307,7 @@ if AWS_SECRET_ACCESS_KEY == "":
 # Disabling querystring auth instructs Boto to exclude the querystring parameters (e.g. signature, access key) it
 # normally appends to every returned URL.
 AWS_QUERYSTRING_AUTH = AUTH_TOKENS.get('AWS_QUERYSTRING_AUTH', True)
+AWS_DEFAULT_ACL = AUTH_TOKENS.get('AWS_DEFAULT_ACL', '')
 
 if AUTH_TOKENS.get('DEFAULT_FILE_STORAGE'):
     DEFAULT_FILE_STORAGE = AUTH_TOKENS.get('DEFAULT_FILE_STORAGE')
