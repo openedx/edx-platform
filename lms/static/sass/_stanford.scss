@@ -13,3 +13,12 @@
         margin: 5% !important;
     }
 }
+
+#course-content {
+    .sequence {
+       .sequence-nav {
+           // Make sure tooltip is above
+           z-index: 100;
+       }
+    }
+}
