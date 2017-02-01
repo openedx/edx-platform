@@ -45,13 +45,11 @@
         
         if ($(this).children("option:selected").val() === 'Stanford University') {
           $(this).siblings('.affiliation-controlled#sunet_id_container, .affiliation-controlled#stanford_department_container').slideDown('fast');
-        } else if ($(this).children("option:selected").val() === "Packard Children's Health Alliance") {
+        } else if ($(this).children("option:selected").val() === "Packard Children's Health Alliance (PCHA)") {
           $(this).siblings('.affiliation-controlled#PCHA_affiliation_container').slideDown('fast');
-        } else if ($(this).children("option:selected").val() === 'University Healthcare Alliance') {
+        } else if ($(this).children("option:selected").val() === 'University Healthcare Alliance (UHA)') {
           $(this).siblings('.affiliation-controlled#UHA_affiliation_container').slideDown('fast');
-        } else if ($(this).children("option:selected").val() === 'Other') {
-          $(this).siblings('.affiliation-controlled#other_affiliation_container').slideDown('fast');
-        }
+        } 
       });
       
      
@@ -480,11 +478,6 @@
                   <option value="${code}">${UHA_affiliation}</option>
                 %endfor
               </select>
-            </div>
-           
-            <div class="field affiliation-controlled" id="other_affiliation_container" style="display: none;">
-              <br />
-              <input id="other_affiliation" type="text" name="other_affiliation" title="Please enter your affiliation here." placeholder="Please enter your affiliation here." />
             </div>
           </li>
           

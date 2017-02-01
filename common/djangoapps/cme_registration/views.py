@@ -234,10 +234,7 @@ def _do_cme_create_account(post_vars):
     cme_user_profile.sub_specialty = post_vars.get('sub_specialty')
     cme_user_profile.affiliation = post_vars.get('affiliation')
 
-    if post_vars.get('affiliation') == 'Other':
-        cme_user_profile.other_affiliation = post_vars.get('other_affiliation')
-    else:
-        cme_user_profile.other_affiliation = None
+    cme_user_profile.other_affiliation = None
 
     cme_user_profile.sub_affiliation = post_vars.get('sub_affiliation')
     cme_user_profile.sunet_id = post_vars.get('sunet_id')
