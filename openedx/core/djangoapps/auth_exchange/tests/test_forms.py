@@ -10,7 +10,7 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 import httpretty
 from provider import scope
-import social.apps.django_app.utils as social_utils
+import social_django.utils as social_utils
 
 from third_party_auth.tests.utils import ThirdPartyOAuthTestMixinFacebook, ThirdPartyOAuthTestMixinGoogle
 

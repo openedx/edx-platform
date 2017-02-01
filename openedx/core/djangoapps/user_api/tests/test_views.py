@@ -16,7 +16,7 @@ from django.test.testcases import TransactionTestCase
 from django.test.utils import override_settings
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from pytz import common_timezones_set, UTC
-from social.apps.django_app.default.models import UserSocialAuth
+from social_django.models import UserSocialAuth
 
 from django_comment_common import models
 from openedx.core.djangoapps.site_configuration.helpers import get_value
@@ -1936,7 +1936,7 @@ class TestFacebookRegistrationView(
 
     def test_social_auth_exception(self):
         """
-        According to the do_auth method in social.backends.facebook.py,
+        According to the do_auth method in social_core.backends.facebook.py,
         the Facebook API sometimes responds back a JSON with just False as value.
         """
         self._setup_provider_response_with_body(200, json.dumps("false"))
