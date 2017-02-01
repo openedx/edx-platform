@@ -1,0 +1,23 @@
+<%namespace name='static' file='../static_content.html'/>
+<script src="${static.url('js/lms-base-vendor.js')}"></script>
+<script src="${static.url('js/certificates/certificates.js')}"></script>
+<div class="badges-overlay" style="display:none;">
+    <div class="badges-modal">
+        <div class="close"><span class="fa fa-close" alt="Close" aria-hidden="true"><input type="button" class="sr-only" value="Close"/></span></div>
+        <h1 class="hd-1 emphasized">Share on Mozilla Backpack</h1>
+        <p class="explanation">
+            To share your certificate on Mozilla Backpack, you must first have a Backpack account.
+            Complete the following steps to add your certificate to Backpack.
+        </p>
+        <hr class="modal-hr"/>
+        <img class="backpack-logo" src="${static.url('certificates/images/backpack-logo.png')}">
+        <ol class="badges-steps">
+            <li class="step">Create a <a href="https://backpack.openbadges.org/" target="_blank">Mozilla Backpack</a> account, or log in to your existing account
+            </li>
+            <li class="step"><a href="${badge.image_url}" target="_blank">Download this image (right-click, save as)</a> and then <a href="https://backpack.openbadges.org/backpack/add" target="_blank">upload</a> it to your backpack.</li>
+        </ol>
+        <div class="image-container">
+            <img class="badges-backpack-example" src="${static.url('certificates/images/backpack-ui.png')}">
+        </div>
+    </div>
+</div>

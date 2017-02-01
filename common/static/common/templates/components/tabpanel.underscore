@@ -1,0 +1,1 @@
+<div role="tabpanel" class="tabpanel is-hidden" id="<%= tabId %>" aria-labelledby="tab-<%= index %>" aria-hidden="true" tabindex="0"></div>

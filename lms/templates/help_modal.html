@@ -1,0 +1,358 @@
+<%page expression_filter="h"/>
+<%namespace name='static' file='static_content.html'/>
+
+<%!
+from datetime import datetime
+import pytz
+from django.conf import settings
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+from openedx.core.djangolib.js_utils import js_escaped_string
+from openedx.core.djangolib.markup import HTML, Text
+from xmodule.tabs import CourseTabList
+%>
+
+% if settings.FEATURES.get('ENABLE_FEEDBACK_SUBMISSION', False):
+
+<div class="help-tab">
+  <a href="#help-modal" rel="leanModal" role="button">${_("Support")}</a>
+</div>
+
+<section id="help-modal" class="modal" aria-hidden="true" role="dialog" tabindex="-1" aria-label="${_("{platform_name} Support").format(platform_name=static.get_platform_name())}">
+  <div class="inner-wrapper">
+    ## TODO: find a way to refactor this
+    <button class="close-modal" tabindex="0">
+      <span class="icon fa fa-remove" aria-hidden="true"></span>
+      <span class="sr">
+        ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
+        ${_('Close')}
+      </span>
+    </button>
+    <div id="help_wrapper">
+
+        <header>
+          <h2>
+        ${Text(_('{platform_name} Support')).format(
+            platform_name=HTML(u'<span class="edx">{}</span>').format(static.get_platform_name())
+        )}
+          </h2>
+          <hr>
+        </header>
+
+    <%
+      discussion_tab = CourseTabList.get_discussion(course) if course else None
+      discussion_link = discussion_tab.link_func(course, reverse) if (discussion_tab and discussion_tab.is_enabled(course, user=user)) else None
+    %>
+
+    % if discussion_link:
+        <p>${Text(_('For {strong_start}questions on course lectures, homework, tools, or materials for this course{strong_end}, post in the {link_start}course discussion forum{link_end}.')).format(
+          strong_start=HTML('<strong>'),
+          strong_end=HTML('</strong>'),
+          link_start=HTML('<a href="{url}" target="_blank">').format(
+            url=discussion_link
+          ),
+          link_end=HTML('</a>'),
+          )}
+        </p>
+    % endif
+
+        <p>${Text(_('Have {strong_start}general questions about {platform_name}{strong_end}? You can find lots of helpful information in the {platform_name} {link_start}FAQ{link_end}.')).format(
+            strong_start=HTML('<strong>'),
+            strong_end=HTML('</strong>'),
+            link_start=HTML('<a href="{url}" id="feedback-faq-link" target="_blank">').format(
+              url=marketing_link('FAQ')
+            ),
+            link_end=HTML('</a>'),
+            platform_name=static.get_platform_name())}
+          </p>
+
+        <p>${Text(_('Have a {strong_start}question about something specific{strong_end}? You can contact the {platform_name} general support team directly:')).format(
+            strong_start=HTML('<strong>'),
+            strong_end=HTML('</strong>'),
+            platform_name=static.get_platform_name()
+          )}</p>
+        <hr>
+
+        <div class="help-buttons">
+            <button type="button" class="" id="feedback_link_problem">${_('Report a problem')}</button><br />
+            <button type="button" class="" id="feedback_link_suggestion">${_('Make a suggestion')}</button><br />
+            <button type="button" class="" id="feedback_link_question">${_('Ask a question')}</button>
+        </div>
+
+        <p class="note">${_('Please note: The {platform_name} support team is English speaking. While we will do our best to address your inquiry in any language, our responses will be in English.').format(
+            platform_name=static.get_platform_name()
+        )}</p>
+
+    </div>
+
+    <div id="feedback_form_wrapper">
+
+        <header></header>
+
+        <form id="feedback_form" class="feedback_form" method="post" data-remote="true" action="/submit_feedback">
+          <div class="feedback-form-error" aria-live="polite">
+              <div id="feedback_error" class="modal-form-error" tabindex="-1"></div>
+          </div>
+    % if not user.is_authenticated():
+          <label data-field="name" for="feedback_form_name">${_('Name')}*</label>
+          <input name="name" type="text" id="feedback_form_name" required>
+          <label data-field="email" for="feedback_form_email">${_('E-mail')}*</label>
+          <input name="email" type="text" id="feedback_form_email" required>
+    % endif
+
+          <div class="js-course-id-anchor">
+              % if course:
+                  <input name="course_id" type="hidden" value="${unicode(course.id)}">
+              % endif
+          </div>
+
+          <label data-field="subject" for="feedback_form_subject">${_('Briefly describe your issue')}*</label>
+          <input name="subject" type="text" id="feedback_form_subject" required>
+
+          <label data-field="details" for="feedback_form_details">${_('Tell us the details')}*</label>
+          <span class="tip" id="feedback_form_details_tip">${_('Describe what you were doing when you encountered the issue. Include any details that will help us to troubleshoot, including error messages that you saw.')}</span>
+          <textarea name="details" id="feedback_form_details" required aria-describedby="feedback_form_details_tip"></textarea>
+
+          <input name="issue_type" type="hidden">
+          <div class="submit">
+            <input name="submit" type="submit" value="${_('Submit')}" id="feedback_submit">
+          </div>
+        </form>
+    </div>
+
+    <div id="feedback_success_wrapper">
+
+        <header>
+          <h2>${_('Thank You!')}</h2>
+          <hr>
+        </header>
+
+        <p>
+        ${Text(_(
+            'Thank you for your inquiry or feedback.  We typically respond to a request '
+            'within one business day, Monday to Friday.  In the meantime, please '
+            'review our {link_start}detailed FAQs{link_end} where most questions have '
+            'already been answered.'
+        )).format(
+            link_start=HTML('<a href="{}" target="_blank" id="success-feedback-faq-link">').format(marketing_link('FAQ')),
+            link_end=HTML('</a>')
+        )}
+        </p>
+    </div>
+  </div>
+</section>
+
+<script type="text/javascript">
+$(document).ready(function() {
+    var currentCourseId,
+        courseOptions = [],
+        userAuthenticated = false,
+        courseOptionsLoadInProgress = false,
+        finishedLoadingCourseOptions = false,
+        $helpModal = $("#help-modal"),
+        $closeButton = $("#help-modal .close-modal"),
+        $leanOverlay = $("#lean_overlay"),
+        $feedbackForm = $("#feedback_form"),
+        onModalClose = function() {
+            $closeButton.off("click");
+            $leanOverlay.off("click");
+            $helpModal.attr("aria-hidden", "true");
+            $('area,input,select,textarea,button').removeAttr('tabindex');
+            $(".help-tab a").focus();
+            $leanOverlay.removeAttr('tabindex');
+        },
+        showFeedback = function(event, issue_type, title, subject_label, details_label) {
+            event.preventDefault();
+            DialogTabControls.initializeTabKeyValues("#feedback_form_wrapper", $closeButton);
+            $("#feedback_form input[name='issue_type']").val(issue_type);
+            $("#feedback_form_wrapper header").html("<h2>" + title + "</h2><hr>");
+            $("#feedback_form_wrapper label[data-field='subject']").html(subject_label);
+            $("#feedback_form_wrapper label[data-field='details']").html(details_label);
+            if (userAuthenticated && finishedLoadingCourseOptions && courseOptions.length > 1) {
+                $('.js-course-id-anchor').html([
+                    '<label for="feedback_form_course">' + '${_("Course") | n, js_escaped_string}' + '</label>',
+                    '<select name="course_id" id="feedback_form_course" class="feedback-form-select">',
+                    courseOptions.join(''),
+                    '</select>'
+                ].join(''));
+            }
+            $("#help_wrapper").css("display", "none");
+            $("#feedback_form_wrapper").css("display", "block");
+            $closeButton.focus();
+        },
+        loadCourseOptions = function() {
+            courseOptionsLoadInProgress = true;
+            $.ajax({
+                url: '/api/enrollment/v1/enrollment',
+                success: function(data) {
+                    var i,
+                        courseDetails,
+                        courseName,
+                        courseId,
+                        option,
+                        defaultOptionText = '${_("- Select -") | n, js_escaped_string}',
+                        markedSelectedOption = false;
+
+                    // Make sure courseOptions is empty before we begin pushing options into it.
+                    courseOptions = [];
+
+                    for (i = 0; i < data.length; i++) {
+                        courseDetails = data[i].course_details;
+                        if (!courseDetails) {
+                            continue;
+                        }
+
+                        courseName = courseDetails.course_name;
+                        courseId = courseDetails.course_id;
+                        if (!(courseName && courseId)) {
+                            continue;
+                        }
+
+                        // Build an option for this course and select it if it's the course we're currently viewing.
+                        if (!markedSelectedOption && courseId === currentCourseId) {
+                            option = buildCourseOption(courseName, courseId, true);
+                            markedSelectedOption = true;
+                        } else {
+                            option = buildCourseOption(courseName, courseId, false);
+                        }
+
+                        courseOptions.push(option);
+                    }
+
+                    // Build the default option and select it if we haven't already selected another option.
+                    option = buildCourseOption(defaultOptionText, '', !markedSelectedOption);
+
+                    // Add the default option to the head of the courseOptions Array.
+                    courseOptions.unshift(option);
+
+                    finishedLoadingCourseOptions = true;
+                },
+                complete: function() {
+                    courseOptionsLoadInProgress = false;
+                }
+            });
+        },
+        buildCourseOption = function(courseName, courseId, selected) {
+            var option = '<option value="' + _.escape(courseId) + '"';
+            if (selected) {
+                option += ' selected';
+            }
+            option += '>' + _.escape(courseName) + '</option>';
+            return option;
+        };
+
+    % if user.is_authenticated():
+        userAuthenticated = true;
+    % endif
+
+    % if course:
+        currentCourseId = "${unicode(course.id) | n, js_escaped_string}";
+    % endif
+
+    DialogTabControls.setKeydownListener($helpModal, $closeButton);
+
+    $(".help-tab").click(function() {
+        if (userAuthenticated && !finishedLoadingCourseOptions && !courseOptionsLoadInProgress) {
+            loadCourseOptions();
+        }
+        $helpModal.css("position", "absolute");
+        DialogTabControls.initializeTabKeyValues("#help_wrapper", $closeButton);
+        $(".field-error").removeClass("field-error");
+        $feedbackForm[0].reset();
+        $("#feedback_form input[type='submit']").removeAttr("disabled");
+        $("#feedback_form_wrapper").css("display", "none");
+        $("#feedback_error").css("display", "none");
+        $("#feedback_form_details_tip").css("display", "none");
+        $("#feedback_success_wrapper").css("display", "none");
+        $("#help_wrapper").css("display", "block");
+        $helpModal.attr("aria-hidden", "false");
+        $closeButton.click(onModalClose);
+        $leanOverlay.click(onModalClose);
+        $("button.close-modal").attr('tabindex', 0);
+        $closeButton.focus();
+    });
+
+    $("#feedback_link_problem").click(function(event) {
+        $("#feedback_form_details_tip").css({"display": "block", "padding-bottom": "5px"});
+        showFeedback(
+            event,
+            "${_('problem') | n, js_escaped_string}",
+            "${_('Report a Problem') | n, js_escaped_string}",
+            "${_('Brief description of the problem') + '*' | n, js_escaped_string}" ,
+            "${Text(_('Details of the problem you are encountering{asterisk}')).format(
+                asterisk='*',
+            ) | n, js_escaped_string}"
+        );
+    });
+    $("#feedback_link_suggestion").click(function(event) {
+        showFeedback(
+            event,
+            "${_('suggestion') | n, js_escaped_string}",
+            "${_('Make a Suggestion') | n, js_escaped_string}",
+            "${_('Brief description of your suggestion') + '*' | n, js_escaped_string}",
+            "${_('Details') + '*' | n, js_escaped_string}"
+        );
+    });
+    $("#feedback_link_question").click(function(event) {
+        showFeedback(
+            event,
+            "${_('question') | n, js_escaped_string}",
+            "${_('Ask a Question') | n, js_escaped_string}",
+            "${_('Brief summary of your question') + '*' | n, js_escaped_string}",
+            "${_('Details') + '*' | n, js_escaped_string}"
+        );
+    });
+    $feedbackForm.submit(function() {
+        $("input[type='submit']", this).attr("disabled", "disabled");
+        $closeButton.focus();
+    });
+    $feedbackForm.on("ajax:complete", function() {
+        $("input[type='submit']", this).removeAttr("disabled");
+    });
+    $feedbackForm.on("ajax:success", function(event, data, status, xhr) {
+        $("#feedback_form_wrapper").css("display", "none");
+        $("#feedback_success_wrapper").css("display", "block");
+        DialogTabControls.initializeTabKeyValues("#feedback_success_wrapper", $closeButton);
+        $closeButton.focus();
+    });
+    $feedbackForm.on("ajax:error", function(event, xhr, status, error) {
+        $(".field-error").removeClass("field-error").removeAttr("aria-invalid");
+        var responseData;
+        try {
+            responseData = jQuery.parseJSON(xhr.responseText);
+        } catch(err) {
+        }
+        if (responseData) {
+            $("[data-field='"+responseData.field+"']").addClass("field-error").attr("aria-invalid", "true");
+            $("#feedback_error").html(responseData.error).stop().css("display", "block");
+        } else {
+            // If no data (or malformed data) is returned, a server error occurred
+            htmlStr = "${_('An error has occurred.') | n, js_escaped_string}";
+% if settings.FEEDBACK_SUBMISSION_EMAIL:
+            htmlStr += " " + "${Text(_('Please {link_start}send us e-mail{link_end}.')).format(
+              link_start=HTML('<button type="button" id="feedback_email">'),
+              link_end=HTML('</button>'),
+            ) | n, js_escaped_string}";
+% else:
+            // If no email is configured, we can't do much other than
+            // ask the user to try again later
+            htmlStr += " " + "${_('Please try again later.') | n, js_escaped_string}";
+% endif
+            $("#feedback_error").html(htmlStr).stop().css("display", "block");
+% if settings.FEEDBACK_SUBMISSION_EMAIL:
+            $("#feedback_email").click(function(e) {
+                mailto = "mailto:" + "${settings.FEEDBACK_SUBMISSION_EMAIL | n, js_escaped_string}" +
+                    "?subject=" + $("#feedback_form input[name='subject']").val() +
+                    "&body=" + $("#feedback_form textarea[name='details']").val();
+                window.open(mailto);
+                e.preventDefault();
+            });
+%endif
+        }
+        // Make change explicit to assistive technology
+        $("#feedback_error").focus();
+    });
+});
+</script>
+
+%endif

@@ -1,0 +1,7 @@
+<section class="empty-programs-message">
+    <h2 class="hd-3"><%- gettext('You are not enrolled in any programs yet.') %></h2>
+    <a class="btn-brand" href="<%- marketingUrl %>">
+        <span class="icon fa fa-search" aria-hidden="true"></span>
+        <span><%- gettext('Explore Programs') %></span>
+    </a>
+</section>

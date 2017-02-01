@@ -1,0 +1,12 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%inherit file="../main.html" />
+
+<%block name="pagetitle">${_("This Course Unavailable In Your Country")}</%block>
+
+<section class="outside-app">
+<p>
+${_("Our system indicates that you are trying to enroll in this {platform_name} "
+    "course from a country or region in which it is not currently available."
+   ).format(platform_name=settings.PLATFORM_NAME)}
+</p>
+</section>

@@ -1,0 +1,160 @@
+// forums - main app styling
+// ====================
+// NOTE: this file is deprecated, and we should not continue to add to this file. Use other partials as appropriate.
+
+.discussion-body {
+  @include clearfix();
+  border: none;
+  background: transparent;
+  box-shadow: none;
+
+  .bottom-post-status {
+    padding: 30px;
+    font-size: $forum-x-large-font-size;
+    font-weight: 700;
+    color: $forum-color-copy-light;
+    text-align: center;
+  }
+
+  .discussion-article {
+    position: relative;
+
+    a,
+    p {
+      word-wrap: break-word;
+    }
+  }
+
+  .main-article.new {
+    display: none;
+    padding: ($baseline*2.5);
+  }
+
+  .discussion-reply-new {
+    @include clearfix();
+    @include transition(opacity .2s linear 0s);
+
+    h4 {
+      font-size: $forum-large-font-size;
+      font-weight: 700;
+    }
+  }
+
+  .reply-post-control {
+    margin-top: $baseline;
+  }
+}
+
+// ====================
+
+// inline discussion module
+.discussion-module {
+  @extend .discussion-body;
+  display: block;
+  position: relative;
+  border-radius: $forum-border-radius;
+
+  header {
+    .anonymous{
+      font-size: $forum-base-font-size;
+    }
+  }
+
+  .inline-discussion-topic {
+    width: flex-grid(12);
+    font-size: $forum-small-font-size;
+
+    .inline-discussion-topic-title {
+      font-weight: bold;
+    }
+  }
+
+  .discussion-module-header {
+    @include float(left);
+    width: flex-grid(7);
+    margin-bottom: ($baseline * 0.75);
+  }
+
+  .add_post_btn_container {
+    @include text-align(right);
+    width: flex-grid(12);
+    height: (2 * $baseline);
+  }
+
+  div.add-response.post-extended-content {
+    margin-top: $baseline;
+    margin-bottom: $baseline;
+  }
+
+  .loading-animation {
+    background-image: url('#{$static-path}/images/spinner.gif');
+  }
+}
+
+.discussion-show {
+  @include float(right);
+  position: relative;
+  top: 3px;
+  font-size: $forum-base-font-size;
+  text-align: center;
+
+  &.shown {
+    background-color: $btn-default-background-color;
+    color: $uxpl-primary-blue;
+  }
+}
+
+section.discussion {
+  @include clearfix();
+}
+
+.new-post-article {
+  .forum-new-post-form {
+    padding: $baseline;
+  }
+
+  .inner-wrapper {
+    max-width: 1180px;
+    min-width: 760px;
+    margin: auto;
+  }
+}
+
+.xblock-student_view-discussion {
+  @extend %ui-print-excluded;
+  // Overrides overspecific courseware CSS from:
+  // https://github.com/edx/edx-platform/blob/master/lms/static/sass/course/courseware/_courseware.scss#L499
+  padding-top: 15px !important;
+}
+
+// ====================
+
+// post pagination
+section.discussion-pagination {
+  margin-top: ($baseline*1.5);
+
+  nav.discussion-paginator {
+    @include float(right);
+
+    ol {
+      li {
+        @include padding-right($baseline/2);
+        list-style: none;
+        display: inline-block;
+
+        &.current-page span {
+          display: inline-block;
+          height: 35px;
+          padding: 0 ($baseline*0.75);
+          border: 1px solid $forum-color-border;
+          border-radius: $forum-border-radius;
+          font-size: $forum-base-font-size;
+          font-weight: 700;
+          line-height: 32px;
+          color: $gray-d3;
+          text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+        }
+      }
+    }
+  }
+}

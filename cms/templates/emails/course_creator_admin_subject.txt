@@ -1,0 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
+${_("{email} has requested {studio_name} course creator privileges on edge").format(
+    email=user_email, studio_name=settings.STUDIO_SHORT_NAME,
+)}

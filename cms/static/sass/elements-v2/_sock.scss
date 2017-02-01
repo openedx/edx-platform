@@ -1,0 +1,135 @@
+// studio - elements - support sock
+// ====================
+
+.wrapper-sock {
+  @include clearfix();
+  position: relative;
+  margin: ($baseline*2) 0 0 0;
+  border-top: 1px solid $gray-l4;
+  width: 100%;
+
+  .wrapper-inner {
+    @include linear-gradient($gray-d3 0%, $gray-d3 98%, $black 100%);
+    display: none;
+    width: 100% !important;
+    border-bottom: 1px solid $white;
+    padding: 0 $baseline !important;
+  }
+
+  // sock - actions
+  .list-cta {
+    @extend %ui-depth1;
+    position: absolute;
+    top: -($baseline*0.75);
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
+
+    .cta-show-sock {
+      @extend %ui-btn-pill;
+      background: $uxpl-grayscale-x-back;
+      font-size: font-size(x-small);
+      padding: ($baseline/2) $baseline;
+      color: $gray-d3;
+
+      .icon {
+        @include margin-right($baseline/4);
+      }
+
+      &:hover {
+        background: $blue;
+        color: $white;
+      }
+    }
+  }
+
+  // sock - additional help
+  .sock {
+    @include clearfix();
+    @include span(12);
+    max-width: $fg-max-width;
+    min-width: $fg-min-width;
+    margin: 0 auto;
+    padding: ($baseline*2) 0;
+    color: $gray-l3;
+
+    // shared elements
+    .support,
+    .feedback {
+      box-sizing: border-box;
+
+      .title {
+        color: $white;
+        margin-bottom: ($baseline/2);
+      }
+
+      .copy {
+        margin: 0 0 $baseline 0;
+      }
+
+      .list-actions {
+        list-style: none;
+
+        .action-item {
+          @include float(left);
+          @include margin-right($baseline/2);
+          margin-bottom: ($baseline/2);
+
+          &:last-child {
+            @include margin-right(0);
+          }
+
+          .action {
+            display: block;
+
+            .icon {
+              vertical-align: middle;
+              @include margin-right($baseline/4);
+            }
+          }
+
+          .tip {
+            @extend .sr-only;
+          }
+        }
+
+        .action-primary {
+          @extend %btn-brand;
+          @extend %btn-small;
+        }
+      }
+    }
+
+    // studio support content
+    .support {
+      @include float(left);
+      @include span(8);
+      margin-right: flex-gutter();
+
+      .action-item {
+        width: flexgrid(4,8);
+      }
+    }
+
+    // studio feedback content
+    .feedback {
+      @include float(left);
+      @include span(4);
+      .action-item {
+        width: flexgrid(4,4);
+      }
+    }
+  }
+
+  // case: sock content is shown
+  &.is-shown {
+    border-color: $gray-d3;
+
+    .list-cta .cta-show-sock {
+      background: $gray-d3;
+      border-color: $gray-d3;
+      color: $white;
+      font-size: font-size(small);
+    }
+  }
+}

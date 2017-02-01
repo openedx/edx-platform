@@ -1,0 +1,40 @@
+[run]
+data_file = reports/pa11ycrawler/.coverage
+
+source =
+    lms
+    cms
+    common/djangoapps
+    common/lib
+    openedx/core/djangoapps
+    **/mako_lms/
+    **/mako_cms/
+
+omit =
+    lms/envs/*
+    cms/envs/*
+    common/djangoapps/terrain/*
+    common/djangoapps/*/migrations/*
+    openedx/core/djangoapps/*/migrations/*
+    */test*
+    */management/*
+    */urls*
+    */wsgi*
+    lms/djangoapps/*/migrations/*
+    cms/djangoapps/*/migrations/*
+
+parallel = True
+
+[report]
+ignore_errors = True
+include =
+    **/views/*.py
+    **/views.py
+
+
+[html]
+title = pa11ycrawler Coverage Report
+directory = reports/pa11ycrawler/cover
+
+[xml]
+output = reports/pa11ycrawler/coverage.xml

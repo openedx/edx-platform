@@ -1,0 +1,42 @@
+## mako
+<%page expression_filter="h"/>
+<%!
+  from django.core.urlresolvers import reverse
+  from django.utils.translation import ugettext as _
+%>
+
+%if urlpath is not Undefined and urlpath:
+<header>
+  <ul class="breadcrumb pull-left" class="">
+    <%
+      # The create button links to the highest ancestor we have edit priveleges to
+      create_article_root = None
+    %>
+    %for ancestor in urlpath.cached_ancestors:
+      <li><a href="${reverse('wiki:get', kwargs={'path' : ancestor.path})}">${ancestor.article.current_revision.title}</a></li>
+      <%
+        if not create_article_root and ancestor.article.can_write(user):
+          create_article_root = ancestor
+      %>
+    %endfor
+    <li class="active"><a href="${reverse('wiki:get', kwargs={'path' : urlpath.path})}">${article.current_revision.title}</a></li>
+    <%
+      if not create_article_root and urlpath.article.can_write(user):
+        create_article_root = urlpath
+    %>
+  </ul>
+
+  <div class="global-functions pull-right">
+    <!-- <form class="search-wiki pull-left">
+      <input type="search" placeholder="search wiki" />
+    </form> -->
+    %if create_article_root:
+    <a class="add-article-btn btn pull-left" href="${reverse('wiki:create', kwargs={'path' : create_article_root.path})}" style="padding: 7px;">
+      <span class="icon fa fa-plus" aria-hidden="true"></span>
+      ${_("Add article")}
+    </a>
+    %endif
+  </div>
+</header>
+
+%endif
