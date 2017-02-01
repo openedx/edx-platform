@@ -60,11 +60,13 @@ from courseware.courses import (
     get_permission_for_course_about,
     get_studio_url,
     get_course_overview_with_access,
-    get_course_upgrade_link,
     get_course_with_access,
     sort_by_announcement,
     sort_by_start_date,
     UserNotEnrolled
+)
+from courseware.date_summary import (
+    VerificationDeadlineDate,
 )
 from courseware.masquerade import setup_masquerade
 from courseware.model_data import FieldDataCache
@@ -339,11 +341,15 @@ def course_info(request, course_id):
             url_to_enroll = marketing_link('COURSES')
 
         # Process requests containing the upgrade parameter
+        upgrade_data = VerificationDeadlineDate(course, user)
+
         upgrade = False
         upgrade_link = ''
-        if request.user.is_authenticated():
-            upgrade = request.GET.get('upgrade', 'false') == 'true'
-            upgrade_link = get_course_upgrade_link(course, user)
+        if (request.user.is_authenticated() and 
+           request.GET.get('upgrade', 'false') == 'true' and
+           upgrade_data.verification_status == 'none' and
+           not upgrade_data.deadline_has_passed()):
+            upgrade = True
 
         context = {
             'request': request,
@@ -357,7 +363,7 @@ def course_info(request, course_id):
             'show_enroll_banner': show_enroll_banner,
             'url_to_enroll': url_to_enroll,
             'upgrade_banner': upgrade,
-            'upgrade_link': upgrade_link
+            'upgrade_link': upgrade_data.link
         }
 
         # Get the URL of the user's last position in order to display the 'where you were last' message
