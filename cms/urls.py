@@ -140,6 +140,11 @@ if settings.SHIB_ONLY_SITE:
         url(r'^backup_signin$', 'contentstore.views.login_page', name='backup_login'),
     )
 
+if settings.SPLIT_STUDIO_HOME:
+    urlpatterns += (
+        url(r'^home_library/?$', 'library_listing', name='home_library'),
+    )
+
 if settings.FEATURES.get('ENABLE_EXPORT_GIT'):
     urlpatterns += (url(
         r'^export_git/{}$'.format(

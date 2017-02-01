@@ -45,34 +45,21 @@
         
         if ($(this).children("option:selected").val() === 'Stanford University') {
           $(this).siblings('.affiliation-controlled#sunet_id_container, .affiliation-controlled#stanford_department_container').slideDown('fast');
-        } else if ($(this).children("option:selected").val() === "Packard Children's Health Alliance") {
+        } else if ($(this).children("option:selected").val() === "Packard Children's Health Alliance (PCHA)") {
           $(this).siblings('.affiliation-controlled#PCHA_affiliation_container').slideDown('fast');
-        } else if ($(this).children("option:selected").val() === 'University Healthcare Alliance') {
+        } else if ($(this).children("option:selected").val() === 'University Healthcare Alliance (UHA)') {
           $(this).siblings('.affiliation-controlled#UHA_affiliation_container').slideDown('fast');
-        } else if ($(this).children("option:selected").val() === 'Other') {
-          $(this).siblings('.affiliation-controlled#other_affiliation_container').slideDown('fast');
-        }
+        } 
       });
       
-      $('select.controller').change(function() {
-        if ($(this).children("option:selected").val() === 'Other') {
-          $(this).siblings('.controlled').slideDown('fast');
-        } else {
-          $(this).siblings('.controlled').slideUp('fast');
-        }
-      });
      
       $('select.select-controller').change(function() {
         var controllerClasses = $(this).children("option:selected").attr('class');
         var controllerClass = controllerClasses.split(' ')[0];
-        var controlledFieldContents = '#' + controllerClass;
+        var controlledFieldContents = '#' + controllerClass.replace('_&_', '_'); // JQuery can't handle & in selectors
         var controlledField = '#' + controllerClass.split('-')[0];
-        $(controlledField).html('<option value="">--</option>').siblings('.controlled').hide().children('input').val('');
+        $(controlledField).html('<option value="">--</option>');
         $(controlledField).parent().hide();
-       
-        var controllerClass2 = '#' + controllerClasses.split(' ')[1];
-        $(controllerClass2).html('<option value="">--</option>').siblings('.controlled').hide().children('input').val('');
-        $(controllerClass2).parent().hide();
        
         if ($(controlledFieldContents).html() != null) {
           $(controlledField).html($(controlledFieldContents).html()).parent().show();
@@ -358,17 +345,13 @@
          
           <li class="field select" id="specialty-container">
             <label for="specialty">Specialty</label>
-            <select id="specialty" name="specialty" class="controller select-controller">
+            <select id="specialty" name="specialty" class="select-controller">
               <option value="">--</option>
               %for code, specialty in CmeUserProfile.SPECIALTY_CHOICES:
                 <option value="${code}" class="sub_specialty-${code}">${specialty}</option>
               %endfor
             </select>
            
-            <div class="field controlled" id="specialty_free_container" style="display: none;">
-              <br />
-              <input id="specialty_free" type="text" name="specialty_free" title="Please enter your Specialty here." placeholder="Please enter your Specialty here." />
-           </div>
           </li>
        
        
@@ -378,75 +361,64 @@
        
         <li class="field" style="display: none;" id="sub-specialty-container">
           <label for="sub_specialty">Sub-Specialty</label>
-          <select id="sub_specialty" name="sub_specialty" class="controller">
+          <select id="sub_specialty" name="sub_specialty">
             <option value="">--</option>
           </select>
          
-          <div class="field controlled" id="sub_specialty_free_container" style="display: none;">
-           <br />
-           <input id="sub_specialty_free" type="text" name="sub_specialty_free" title="Please enter your Sub-Specialty here." placeholder="Please enter your Sub-Specialty here." />
-          </div>
         </li>
        
-        <div id="sub_specialty-Cardiology" class="sub_specialty-container" style="display: none;">
+        <div id="sub_specialty-Cardiovascular_Health" class="sub_specialty-container" style="display: none;">
           <option value="">--</option>
-          %for code, sub_specialty in sub_specialty_choices['Cardiology']:
+          %for code, sub_specialty in sub_specialty_choices['Cardiovascular_Health']:
             <option value="${code}">${sub_specialty}</option>
           %endfor
         </div>
-       
+
         <div id="sub_specialty-Internal_Medicine" class="sub_specialty-container" style="display: none;">
           <option value="">--</option>
           %for code, sub_specialty in sub_specialty_choices['Internal_Medicine']:
             <option value="${code}">${sub_specialty}</option>
           %endfor
         </div>
-       
+
         <div id="sub_specialty-Obstetrics_Gynecology" class="sub_specialty-container" style="display: none;">
           <option value="">--</option>
-          %for code, sub_specialty in sub_specialty_choices['Obstetrics_Gynecology']:
+          %for code, sub_specialty in sub_specialty_choices['Obstetrics_&_Gynecology']:
             <option value="${code}">${sub_specialty}</option>
           %endfor
         </div>
-       
+
         <div id="sub_specialty-Oncology" class="sub_specialty-container" style="display: none;">
           <option value="">--</option>
           %for code, sub_specialty in sub_specialty_choices['Oncology']:
             <option value="${code}">${sub_specialty}</option>
           %endfor
         </div>
-       
-        <div id="sub_specialty-Palliative_Care" class="sub_specialty-container" style="display: none;">
+
+        <div id="sub_specialty-Orthopedics_Sports_Medicine" class="sub_specialty-container" style="display: none;">
           <option value="">--</option>
-          %for code, sub_specialty in sub_specialty_choices['Palliative_Care']:
+          %for code, sub_specialty in sub_specialty_choices['Orthopedics_&_Sports_Medicine']:
             <option value="${code}">${sub_specialty}</option>
           %endfor
         </div>
-       
+
         <div id="sub_specialty-Pediatrics" class="sub_specialty-container" style="display: none;">
           <option value="">--</option>
           %for code, sub_specialty in sub_specialty_choices['Pediatrics']:
             <option value="${code}">${sub_specialty}</option>
           %endfor
         </div>
-       
-        <div id="sub_specialty-Pulmonology" class="sub_specialty-container" style="display: none;">
+
+        <div id="sub_specialty-Radiology" class="sub_specialty-container" style="display: none;">
           <option value="">--</option>
-          %for code, sub_specialty in sub_specialty_choices['Pulmonology']:
+          %for code, sub_specialty in sub_specialty_choices['Radiology']:
             <option value="${code}">${sub_specialty}</option>
           %endfor
         </div>
-       
+
         <div id="sub_specialty-Surgery" class="sub_specialty-container" style="display: none;">
           <option value="">--</option>
           %for code, sub_specialty in sub_specialty_choices['Surgery']:
-            <option value="${code}">${sub_specialty}</option>
-          %endfor
-        </div>
-       
-        <div id="sub_specialty-Transplant" class="sub_specialty-container" style="display: none;">
-          <option value="">--</option>
-          %for code, sub_specialty in sub_specialty_choices['Transplant']:
             <option value="${code}">${sub_specialty}</option>
           %endfor
         </div>
@@ -506,11 +478,6 @@
                   <option value="${code}">${UHA_affiliation}</option>
                 %endfor
               </select>
-            </div>
-           
-            <div class="field affiliation-controlled" id="other_affiliation_container" style="display: none;">
-              <br />
-              <input id="other_affiliation" type="text" name="other_affiliation" title="Please enter your affiliation here." placeholder="Please enter your affiliation here." />
             </div>
           </li>
           
