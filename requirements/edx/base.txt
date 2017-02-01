@@ -46,6 +46,9 @@ edx-ccx-keys==0.2.1
 edx-drf-extensions==1.2.2
 edx-i18n-tools==0.3.7
 edx-lint==0.4.3
+# astroid 1.3.8 is an unmet dependency of the version of pylint used in edx-lint 0.4.3
+# when upgrading edx-lint, we should try to remove this from the platform
+astroid==1.3.8
 edx-django-oauth2-provider==1.1.4
 edx-django-sites-extensions==2.1.1
 edx-enterprise==0.19.1
