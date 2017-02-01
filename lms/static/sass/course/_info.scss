@@ -1,3 +1,8 @@
+
+@import '../edx-pattern-library-shims/base/variables';
+@import '../edx-pattern-library-shims/buttons';
+
+
 .home {
   @include clearfix();
   max-width: 1140px;
@@ -54,6 +59,31 @@ div.info-wrapper {
       @extend %t-title6;
       margin-bottom: $baseline;
       font-style: normal;
+    }
+
+    .upgrade-banner {
+      // This banner uses the Pattern Library's defined variables
+      border-style: solid;
+      border-color: $uxpl-gray-base $uxpl-gray-base $uxpl-gray-base $uxpl-green-base;
+      border-width: 1px 1px 1px 10px;
+
+      .upgrade-msg {
+        display: inline-block;
+        margin: $baseline 0 $baseline 0;
+
+        h4 {
+          font-weight: font-weight(semi-bold);
+        }
+        p {
+          margin-top: $baseline/4;
+          font-weight: font-weight(light);
+        }
+      }
+
+      .upgrade-icon {
+        margin: $baseline;
+      }
+
     }
 
     > p {

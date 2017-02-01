@@ -60,6 +60,7 @@ from courseware.courses import (
     get_permission_for_course_about,
     get_studio_url,
     get_course_overview_with_access,
+    get_course_upgrade_link,
     get_course_with_access,
     sort_by_announcement,
     sort_by_start_date,
@@ -337,6 +338,10 @@ def course_info(request, course_id):
         if settings.FEATURES.get('ENABLE_MKTG_SITE'):
             url_to_enroll = marketing_link('COURSES')
 
+        # Process requests containing the upgrade parameter
+        upgrade = request.GET.get('upgrade', 'false') == 'true'
+        upgrade_link = get_course_upgrade_link(course, user)
+
         context = {
             'request': request,
             'masquerade_user': user,
@@ -348,6 +353,8 @@ def course_info(request, course_id):
             'studio_url': studio_url,
             'show_enroll_banner': show_enroll_banner,
             'url_to_enroll': url_to_enroll,
+            'upgrade_banner': upgrade,
+            'upgrade_link': upgrade_link
         }
 
         # Get the URL of the user's last position in order to display the 'where you were last' message

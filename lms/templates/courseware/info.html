@@ -81,6 +81,21 @@ from openedx.core.djangolib.markup import HTML, Text
             </div>
           % endif
 
+          % if upgrade_banner:
+              <div class="upgrade-banner layout-1q3q layout-reversed">
+                <img class="upgrade-icon" src="${STATIC_URL}images/edx-verified-mini-cert.png">
+                <span class="upgrade-msg">
+                  <h4>${_("Give yourself an additional incentive to complete")}</h4>
+                  <p>${_("Earn a verified certificate.")}
+                    <a href="https://www.edx.org/verified-certificate" target="_blank">${_("Learn More")}</a>
+                  </p>
+                </span>
+                <span class="upgrade-banner-button">
+                  <a href="${upgrade_link}" class="btn-brand-green">${_("Upgrade Now")}</a>
+                </span>
+              </div>
+          % endif
+
           <h4>${_("Course Updates and News")}</h4>
           ${HTML(get_course_info_section(request, masquerade_user, course, 'updates'))}
 
