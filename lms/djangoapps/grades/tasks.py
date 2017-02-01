@@ -16,7 +16,6 @@ from openedx.core.djangoapps.celery_utils.persist_on_failure import PersistOnFai
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import CourseLocator
 from submissions import api as sub_api
-from student.models import anonymous_id_for_user
 from track.event_transaction_utils import (
     set_event_transaction_type,
     set_event_transaction_id,

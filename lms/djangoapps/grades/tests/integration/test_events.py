@@ -30,7 +30,6 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
     @classmethod
     def setUpClass(cls):
         super(GradesEventIntegrationTest, cls).setUpClass()
-        cls.store = modulestore()
         with cls.store.default_store(ModuleStoreEnum.Type.split):
             cls.course = CourseFactory.create()
             cls.chapter = ItemFactory.create(
@@ -141,7 +140,7 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
             }
         )
 
-        course = modulestore().get_course(self.course.id, depth=0)
+        course = self.store.get_course(self.course.id, depth=0)
         models_tracker.emit.assert_called_with(
             u'edx.grades.course.grade_calculated',
             {
@@ -156,9 +155,6 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
                 'course_version': unicode(course.course_version),
             }
         )
-        enrollment_tracker.reset_mock()
-        models_tracker.reset_mock()
-        handlers_tracker.reset_mock()
 
     @patch('lms.djangoapps.instructor_task.tasks_helper.tracker')
     @patch('lms.djangoapps.grades.signals.handlers.tracker')
@@ -174,11 +170,10 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
             choices=[False, False, False, True],
             choice_names=['choice_0', 'choice_1', 'choice_2', 'choice_3']
         )
-        module_store = modulestore()
-        with module_store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.course.id):
+        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.course.id):
             self.problem.data = new_problem_xml
-            module_store.update_item(self.problem, self.instructor.id)
-            module_store.publish(self.problem.location, self.instructor.id)
+            self.store.update_item(self.problem, self.instructor.id)
+        self.store.publish(self.problem.location, self.instructor.id)
 
         submit_rescore_problem_for_student(
             request=get_mock_request(self.instructor),
@@ -221,7 +216,7 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
                 'event_transaction_type': unicode(RESCORE_TYPE),
             }
         )
-        course = modulestore().get_course(self.course.id, depth=0)
+        course = self.store.get_course(self.course.id, depth=0)
         models_tracker.emit.assert_called_with(
             u'edx.grades.course.grade_calculated',
             {
@@ -236,6 +231,3 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
                 'course_edited_timestamp': unicode(course.subtree_edited_on),
             }
         )
-        instructor_task_tracker.reset_mock()
-        models_tracker.reset_mock()
-        handlers_tracker.reset_mock()
