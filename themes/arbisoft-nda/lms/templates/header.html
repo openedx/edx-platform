@@ -43,6 +43,9 @@
                                     </li>
                                     % else:
                                     <li>
+                                        <a class="btn-brand btn-client" href="/register${login_query()}">${_("Create Account")}</a>
+                                    </li>
+                                    <li>
                                         <a href="/login${login_query()}" class="brand-link">${_("Sign in")}</a>
                                     </li>
                                     % endif
