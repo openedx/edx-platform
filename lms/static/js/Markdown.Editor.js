@@ -1408,10 +1408,18 @@
                         }
                     });
                 }
+                // This line does not appear in vanilla WMD. It was added by edX to improve accessibility.
+                // It should become a separate commit applied to WMD's official HEAD if we remove this edited version
+                // of WMD from Git and install it from NPM / a maintained public fork.
+                button.removeAttribute('aria-disabled');
             }
             else {
                 image.style.backgroundPosition = button.XShift + ' ' + disabledYShift;
                 button.onmouseover = button.onmouseout = button.onclick = function() { };
+                // This line does not appear in vanilla WMD. It was added by edX to improve accessibility.
+                // It should become a separate commit applied to WMD's official HEAD if we remove this edited version
+                // of WMD from Git and install it from NPM / a maintained public fork.
+                button.setAttribute('aria-disabled', true);
             }
         }
 
