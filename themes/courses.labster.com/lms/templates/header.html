@@ -82,7 +82,6 @@ site_status_msg = get_site_status_msg(course_id)
               <a href="${reverse('enter_voucher')}">${_('Enter voucher')}</a>
             </li>
           % endif
-          %if settings.FEATURES.
           % if show_program_listing:
             <li class="tab-nav-item">
               <a class="${'active ' if reverse('dashboard') == request.path else ''}tab-nav-link" href="${reverse('dashboard')}">
@@ -137,16 +136,16 @@ site_status_msg = get_site_status_msg(course_id)
           % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
             % if settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
               <li class="item nav-global-05">
-                <a class="btn" href="/courses">${_("Browse Labs")}</a>
+                <a href="/courses">${_("Browse Labs")}</a>
               </li>
             %endif
             % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
               <li class="item nav-global-04">
-                <a class="btn-neutral" href="${reverse('course-specific-register', args=[course.id.to_deprecated_string()])}">${_("Register")}</a>
+                <a href="${reverse('course-specific-register', args=[course.id.to_deprecated_string()])}">${_("Register now")}</a>
               </li>
             % else:
               <li class="item nav-global-04">
-                <a class="btn-neutral" href="/register${login_query()}">${_("Register")}</a>
+                <a href="/register${login_query()}">${_("Register now")}</a>
               </li>
             % endif
           % endif
@@ -209,3 +208,11 @@ site_status_msg = get_site_status_msg(course_id)
 % endif
 
 <%include file="help_modal.html"/>
+
+<%block name="head_extra">
+<link rel="stylesheet" id="options-google-fonts"  href="//fonts.googleapis.com/css?family=Lato:100,300,400,700,900,100italic,300italic,400italic,700italic,900italic&amp;subset=latin&amp;v=1410882627" type="text/css" media="all" />
+</%block>
+
+<%include file="labster_scripts.html" />
+<%include file="labster_notification.html" />
+<%include file="labster_unity_support.html" />

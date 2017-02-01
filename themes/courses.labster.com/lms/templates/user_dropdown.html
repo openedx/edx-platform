@@ -12,12 +12,13 @@ from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_
 % if uses_pattern_library:
     <div class="wrapper-user-menu dropdown-menu-container logged-in js-header-user-menu">
         <a href="${reverse('dashboard')}" class="menu-title">
+            <i class="icon fa fa-home" aria-hidden="true"></i>
             <span>${_("Dashboard for:")} </span>
             <%
             username = user.username
             profile_image_url = get_profile_image_urls_for_user(user)['medium']
             %>
-            <img class="menu-image" src="${profile_image_url}" alt="">
+            <img class="menu-image is-hidden" src="${profile_image_url}" alt="">
             ${username}
         </a>
         <button type="button" class="menu-button button-more has-dropdown js-dropdown-button default-icon" aria-haspopup="true" aria-expanded="false" aria-controls="${_("Usermenu")}">
@@ -39,13 +40,13 @@ from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_
     <ol class="user">
         <li class="primary">
             <a href="${reverse('dashboard')}" class="user-link">
-                <span>${_("Dashboard for:")} </span>
+                <i class="icon fa fa-home" aria-hidden="true"></i>
                 <%
                 username = user.username
                 profile_image_url = get_profile_image_urls_for_user(user)['medium']
                 %>
-                <img class="user-image-frame" src="${profile_image_url}" alt="${_('Profile image for {username}').format(username=username)}">
-                <div class="label-username">${username}</div>
+                <img class="user-image-frame is-hidden" src="${profile_image_url}" alt="${_('Profile image for {username}').format(username=username)}">
+                <div class="label-username"><span>${_("Dashboard for:")} </span>${username}</div>
             </a>
         </li>
         <li class="primary">
