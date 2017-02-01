@@ -16,7 +16,7 @@ from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory, StaffF
 from lms.djangoapps.grades.tests.utils import mock_get_score
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
 
 
@@ -68,35 +68,34 @@ class CurrentGradeViewTest(SharedModuleStoreTestCase, APITestCase):
         super(CurrentGradeViewTest, cls).setUpClass()
 
         cls.course = CourseFactory.create(display_name='test course', run="Testing_course")
-        with cls.store.bulk_operations(cls.course.id):
 
-            chapter = ItemFactory.create(
-                category='chapter',
-                parent_location=cls.course.location,
-                display_name="Chapter 1",
-            )
-            # create a problem for each type and minimum count needed by the grading policy
-            # A section is not considered if the student answers less than "min_count" problems
-            for grading_type, min_count in (("Homework", 12), ("Lab", 12), ("Midterm Exam", 1), ("Final Exam", 1)):
-                for num in xrange(min_count):
-                    section = ItemFactory.create(
-                        category='sequential',
-                        parent_location=chapter.location,
-                        due=datetime(2013, 9, 18, 11, 30, 00, tzinfo=UTC),
-                        display_name='Sequential {} {}'.format(grading_type, num),
-                        format=grading_type,
-                        graded=True,
-                    )
-                    vertical = ItemFactory.create(
-                        category='vertical',
-                        parent_location=section.location,
-                        display_name='Vertical {} {}'.format(grading_type, num),
-                    )
-                    ItemFactory.create(
-                        category='problem',
-                        parent_location=vertical.location,
-                        display_name='Problem {} {}'.format(grading_type, num),
-                    )
+        chapter = ItemFactory.create(
+            category='chapter',
+            parent_location=cls.course.location,
+            display_name="Chapter 1",
+        )
+        # create a problem for each type and minimum count needed by the grading policy
+        # A section is not considered if the student answers less than "min_count" problems
+        for grading_type, min_count in (("Homework", 12), ("Lab", 12), ("Midterm Exam", 1), ("Final Exam", 1)):
+            for num in xrange(min_count):
+                section = ItemFactory.create(
+                    category='sequential',
+                    parent_location=chapter.location,
+                    due=datetime(2013, 9, 18, 11, 30, 00),
+                    display_name='Sequential {} {}'.format(grading_type, num),
+                    format=grading_type,
+                    graded=True,
+                )
+                vertical = ItemFactory.create(
+                    category='vertical',
+                    parent_location=section.location,
+                    display_name='Vertical {} {}'.format(grading_type, num),
+                )
+                ItemFactory.create(
+                    category='problem',
+                    parent_location=vertical.location,
+                    display_name='Problem {} {}'.format(grading_type, num),
+                )
 
         cls.course_key = cls.course.id
 
@@ -142,14 +141,8 @@ class CurrentGradeViewTest(SharedModuleStoreTestCase, APITestCase):
         """
         Test that a user can successfully request her own grade.
         """
-        with check_mongo_calls(6):
-            resp = self.client.get(self.get_url(self.student.username))
-            self.assertEqual(resp.status_code, status.HTTP_200_OK)
-
-        # redo with block structure now in the cache
-        with check_mongo_calls(3):
-            resp = self.client.get(self.get_url(self.student.username))
-            self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        resp = self.client.get(self.get_url(self.student.username))
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
     def test_nonexistent_user(self):
         """
@@ -390,8 +383,8 @@ class GradingPolicyTestMixin(object):
         The view should be addressable by course-keys from both module stores.
         """
         course = CourseFactory.create(
-            start=datetime(2014, 6, 16, 14, 30, tzinfo=UTC),
-            end=datetime(2015, 1, 16, tzinfo=UTC),
+            start=datetime(2014, 6, 16, 14, 30),
+            end=datetime(2015, 1, 16),
             org="MTD",
             default_store=modulestore_type,
         )
