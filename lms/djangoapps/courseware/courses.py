@@ -293,11 +293,13 @@ def get_course_info_section(request, user, course, section_key):
 
     return html
 
+
 def get_course_upgrade_link(course, user):
     """
     Returns the link for the course upgrade
     """
     return VerificationDeadlineDate(course, user).link
+
 
 def get_course_date_blocks(course, user):
     """

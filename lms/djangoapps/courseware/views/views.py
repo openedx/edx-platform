@@ -339,8 +339,11 @@ def course_info(request, course_id):
             url_to_enroll = marketing_link('COURSES')
 
         # Process requests containing the upgrade parameter
-        upgrade = request.GET.get('upgrade', 'false') == 'true'
-        upgrade_link = get_course_upgrade_link(course, user)
+        upgrade = False
+        upgrade_link = ''
+        if request.user.is_authenticated():
+            upgrade = request.GET.get('upgrade', 'false') == 'true'
+            upgrade_link = get_course_upgrade_link(course, user)
 
         context = {
             'request': request,
