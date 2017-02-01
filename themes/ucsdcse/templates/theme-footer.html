@@ -1,0 +1,38 @@
+## mako
+<%!
+  from django.core.urlresolvers import reverse
+  from django.utils.translation import ugettext as _
+%>
+<%namespace name='static' file='/static_content.html'/>
+<%!
+  from datetime import date
+%>
+
+<div class="wrapper-footer">
+  <footer>
+    <div class="colophon">
+      <nav class="nav-colophon">
+        <ol>
+          <li><a href="${reverse('about')}">About</a></li>
+          <li><a href="${reverse('about')}#careers">Careers</a></li>
+          <li><a href="${reverse('about')}#contact">Contact</a></li>
+          <li><a href="${reverse('tos')}">Terms of Service</a></li>
+          <li><a href="${reverse('tos')}#privacy">Privacy Policy</a></li>
+          <li><a href="${reverse('tos')}#honor">Honor Code</a></li>
+          <li><a href="${reverse('tos')}#copyright">Copyright</a></li>
+        </ol>
+      </nav>
+    </div>
+    <div class="references">
+      <span>Built on <a href="http://code.edx.org">OpenEdX</a>.</span>
+    </div>
+
+    <div class="copyright">
+        <p><span>
+            ${_('Copyright {year}. All rights reserved.').format(
+                year=date.today().year
+            )}
+        </span></p>
+    </div>
+  </footer>
+</div>
