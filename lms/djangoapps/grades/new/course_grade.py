@@ -31,8 +31,8 @@ class CourseGrade(object):
     def __init__(self, student, course, course_structure):
         self.student = student
         self.course = course
-        self.course_version = getattr(course_structure, 'course_version', None)
-        self.course_edited_timestamp = getattr(course_structure, 'subtree_edited_on', None)
+        self.course_version = getattr(course, 'course_version', None)
+        self.course_edited_timestamp = getattr(course, 'subtree_edited_on', None)
         self.course_structure = course_structure
         self._percent = None
         self._letter_grade = None
