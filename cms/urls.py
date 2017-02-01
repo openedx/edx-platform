@@ -142,7 +142,7 @@ if settings.SHIB_ONLY_SITE:
 
 if settings.SPLIT_STUDIO_HOME:
     urlpatterns += (
-        url(r'^home_library/?$', 'library_listing', name='home_library'),
+        url(r'^home_library/?$', 'contentstore.views.library_listing', name='home_library'),
     )
 
 if settings.FEATURES.get('ENABLE_EXPORT_GIT'):
