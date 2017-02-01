@@ -84,6 +84,10 @@ from lms.envs.common import (
     # django-debug-toolbar
     DEBUG_TOOLBAR_PATCH_SETTINGS,
     BLOCK_STRUCTURES_SETTINGS,
+
+    # File upload defaults
+    FILE_UPLOAD_STORAGE_BUCKET_NAME,
+    FILE_UPLOAD_STORAGE_PREFIX,
 )
 from path import Path as path
 from warnings import simplefilter
