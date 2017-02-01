@@ -39,6 +39,10 @@ class CommerceConfiguration(ConfigurationModel):
         default=DEFAULT_RECEIPT_PAGE_URL,
         help_text=_('Path to order receipt page.')
     )
+    enable_automatic_refund_approval = models.BooleanField(
+        default=True,
+        help_text=_('Automatically approve valid refund requests, without manual processing')
+    )
 
     def __unicode__(self):
         return "Commerce configuration"
