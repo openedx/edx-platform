@@ -395,20 +395,21 @@
       }
 
       .component {
-        display: block;
+        display: inline-block;
         color: $black;
+        padding: ($baseline/4) ($baseline/2);
+      }
+
+      .xblock-displayname {
+        @include float(left);
       }
 
       .button-forward, .component {
         border: none;
-        padding: ($baseline/2);
       }
 
       .button-forward {
-        .xblock-displayname {
-          @include float(left);
-        }
-
+        padding: ($baseline/2);
         .forward-sr-icon {
           @include float(right);
 
