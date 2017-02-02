@@ -16,8 +16,6 @@ from openedx.core.djangoapps.theming.models import SiteTheme
 from oauth2_provider.generators import generate_client_secret, generate_client_id
 from oauth2_provider.models import get_application_model
 
-Application = get_application_model()
-
 
 def get_initial_sass_variables():
     """
@@ -99,6 +97,7 @@ def json_to_sass(json_input):
 
 def bootstrap_site(site, organization_slug=None, user_email=None, password=None):
     from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
+    Application = get_application_model()
     # don't use create because we need to call save() to set some values automatically
     site_config = SiteConfiguration(site=site, enabled=True)
     site_config.save()
