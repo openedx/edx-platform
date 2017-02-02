@@ -209,7 +209,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                     # Normally, we don't want lots of exception traces in our logs from common
                     # content problems.  But if you're debugging the xml loading code itself,
                     # uncomment the next line.
-                    # exc_info=True
+                    exc_info=True
                 )
 
                 msg = msg % (unicode(err)[:200])
