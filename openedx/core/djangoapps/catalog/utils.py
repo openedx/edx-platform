@@ -164,7 +164,7 @@ def get_active_programs_data(user=None, program_id=None):
     for program in programs:
         if program["status"] == "active":
             program["type"] = program_types[program["type"]]
-            program["instructors"] = _get_program_instructors(programs) if program_id else None
+            program["instructors"] = _get_program_instructors(programs[0]) if program_id else None
             program_data.append(program)
     return program_data
 

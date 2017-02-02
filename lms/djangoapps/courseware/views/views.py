@@ -683,7 +683,7 @@ def program_detail(request, program_id):
 
     if not program:
         raise Http404
-    return render_to_response('courseware/program_detail.html', {'program': program})
+    return render_to_response('courseware/program_detail.html', {'program': program[0]})
 
 
 @transaction.non_atomic_requests
