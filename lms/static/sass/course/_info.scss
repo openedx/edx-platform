@@ -102,6 +102,42 @@ div.info-wrapper {
         display: inline-block;
         margin: $baseline $baseline*2 $baseline $baseline*2;
       }
+
+      .btn-brand-green {
+        @extend %btn-shims;
+
+        border-color: $uxpl-green-base;
+        background: $uxpl-green-base;
+        color: $btn-brand-color;
+
+        // STATE: hover and focus
+        &:hover,
+        &.is-hovered,
+        &:focus,
+        &.is-focused {
+          border-color: $uxpl-green-base;
+          background-color: $uxpl-green-base;
+          color: $btn-brand-color;
+        }
+
+        // STATE: is pressed or active
+        &:active,
+        &:visited,
+        &.is-pressed,
+        &.is-active {
+          border-color: $uxpl-green-base;
+          background: $uxpl-green-base;
+          color: $btn-brand-focus-color;
+        }
+
+        // STATE: is disabled
+        &:disabled,
+        &.is-disabled {
+          border-color: $btn-disabled-border-color;
+          background: $btn-brand-disabled-background;
+          color: $btn-brand-disabled-color;
+        }
+      }
     }
 
     > p {

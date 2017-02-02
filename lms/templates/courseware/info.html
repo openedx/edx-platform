@@ -92,7 +92,9 @@ from openedx.core.djangolib.markup import HTML, Text
                     <a href="https://www.edx.org/verified-certificate" target="_blank">${_("Learn More")}</a>
                   </p>
                 </div>
-                <a href="${upgrade_link}" class="upgrade-banner-button btn-brand-green">${_("Upgrade Now")}</a>
+                <div class="upgrade-banner-button">
+                  <a href="${upgrade_link}" class="btn-brand-green">${_("Upgrade Now")}</a>
+                </div>
               </div>
           % endif
 
