@@ -13,7 +13,7 @@
 # Naaman nov <naaman.nov@gmail.com>, 2015
 # Nadav Stark <nadav@yeda.org.il>, 2015
 # Ned Batchelder <ned@edx.org>, 2016
-# qualityalltext <quality@alltext.co.il>, 2016
+# qualityalltext <quality@alltext.co.il>, 2016-2017
 # Ron Rozen <Ronrozen@gmail.com>, 2016
 # Shay Nativ <shay@yeda.org.il>, 2015
 # yaaqov, 2014
@@ -43,7 +43,7 @@
 # e2f_HE c1 <e2f_HE_c1@outlook.com>, 2016
 # e2f he_r1 <e2f_he_r1@outlook.com>, 2016
 # Nadav Stark <nadav@yeda.org.il>, 2015
-# qualityalltext <quality@alltext.co.il>, 2016
+# qualityalltext <quality@alltext.co.il>, 2016-2017
 # Ron Rozen <Ronrozen@gmail.com>, 2016
 # yuval zana, 2015
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
@@ -56,16 +56,16 @@
 # e2f_HE c1 <e2f_HE_c1@outlook.com>, 2016
 # e2f he_r1 <e2f_he_r1@outlook.com>, 2016
 # Nadav Stark <nadav@yeda.org.il>, 2015
-# qualityalltext <quality@alltext.co.il>, 2016
+# qualityalltext <quality@alltext.co.il>, 2016-2017
 # Ron Rozen <Ronrozen@gmail.com>, 2016
 # yuval zana, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-01-05 17:02+0000\n"
-"PO-Revision-Date: 2017-01-05 17:07+0000\n"
-"Last-Translator: Ned Batchelder <ned@edx.org>\n"
+"POT-Creation-Date: 2017-01-23 17:56+0000\n"
+"PO-Revision-Date: 2017-02-01 14:52+0000\n"
+"Last-Translator: qualityalltext <quality@alltext.co.il>\n"
 "Language-Team: Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1543,9 +1543,14 @@ msgid ""
 msgstr ""
 "נדמה שכתובת ה-URL שהכנסת הוא קישור חיצוני. האם ברצונך להוסיף תחילית //:http?"
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: cms/templates/js/course-instructor-details.underscore
+#: cms/templates/js/signatory-details.underscore
+#: common/static/common/templates/discussion/new-post.underscore
+#: common/static/common/templates/discussion/thread-edit.underscore
 msgid "Title"
 msgstr "כותרת"
 
@@ -3960,7 +3965,7 @@ msgstr "[no tags]"
 
 #: lms/static/js/financial-assistance/views/financial_assistance_form_view.js
 msgid "Unable to submit application"
-msgstr ""
+msgstr "לא ניתן לשלוח אפליקציה"
 
 #: lms/static/js/financial-assistance/views/financial_assistance_form_view.js
 #: lms/static/js/student_account/views/LoginView.js
@@ -4170,6 +4175,10 @@ msgstr "שחזר קוד הרשמה"
 msgid "Mark enrollment code as unused"
 msgstr "סמן את קוד ההרשמה כ'אינו בשימוש'"
 
+#: lms/static/js/instructor_dashboard/send_email.js
+msgid "All learners in the {track_name} track"
+msgstr ""
+
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
 "Error getting student progress url for '<%- student_id %>'. Make sure that "
@@ -4376,17 +4385,18 @@ msgstr "טוען את הקורסים שלך"
 #: lms/static/js/student_account/views/FormView.js
 #: lms/static/js/student_account/views/RegisterView.js
 msgid "An error occurred."
-msgstr ""
+msgstr "אירעה שגיאה."
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid "We couldn't sign you in."
-msgstr ""
+msgstr "לא ניתן לחבר אותך."
 
 #: lms/static/js/student_account/views/LoginView.js
 #, c-format
 msgid "An error occurred when signing you in to %s."
 msgstr ""
 
+#: lms/static/js/student_account/views/LoginView.js
 #: lms/templates/verify_student/intro_step.underscore
 msgid "Check Your Email"
 msgstr "בדוק את הדואר האלקטרוני שלך"
@@ -4398,6 +4408,9 @@ msgid ""
 "message with password reset instructions to this email "
 "address.{paragraphEnd}"
 msgstr ""
+"{paragraphStart} הזנת את הכתובת {boldStart}{email}{boldEnd}. אם כתובת דואר "
+"אלקטרוני זו קשורה לחשבון {platform_name}, תשַלח הודעה עם הוראות איפוס סיסמה "
+"לכתובת זו. {paragraphEnd} "
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
@@ -4413,17 +4426,17 @@ msgstr ""
 
 #: lms/static/js/student_account/views/RegisterView.js
 msgid "We couldn't create your account."
-msgstr ""
+msgstr "לא ניתן ליצור את החשבון שלך. "
 
 #: lms/static/js/student_account/views/RegisterView.js
 msgid "You've successfully signed into %(currentProvider)s."
-msgstr ""
+msgstr "התחברת בהצלחה ל%(currentProvider)s."
 
 #: lms/static/js/student_account/views/RegisterView.js
 msgid ""
 "We just need a little more information before you start learning with "
 "%(platformName)s."
-msgstr ""
+msgstr "אנו זקוקים למידע נוסף לפני שתתחיל ללמוד עם %(platformName)s."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Basic Account Information"
@@ -4945,7 +4958,7 @@ msgstr "מספר לומדים"
 
 #: lms/templates/courseware/progress_graph.js
 msgid "Overall Score"
-msgstr ""
+msgstr "ניקוד כללי"
 
 #: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
 msgid ""
@@ -6308,11 +6321,11 @@ msgstr "שגיאה בזמן פרסום ההודעה שלך"
 
 #: common/static/common/templates/discussion/new-post.underscore
 msgid "Add a Post"
-msgstr ""
+msgstr "הוסף פוסט"
 
 #: common/static/common/templates/discussion/new-post.underscore
 msgid "Visible to"
-msgstr ""
+msgstr "גלוי עבור:"
 
 #: common/static/common/templates/discussion/new-post.underscore
 msgid ""
@@ -6333,7 +6346,7 @@ msgstr "הוסף כותרת ברורה ותיאורית על מנת לעודד �
 
 #: common/static/common/templates/discussion/new-post.underscore
 msgid "Your question or idea"
-msgstr ""
+msgstr "שאלתך או רעיונך"
 
 #: common/static/common/templates/discussion/new-post.underscore
 msgid "follow this post"
@@ -6502,7 +6515,7 @@ msgstr "פוסט זה גלוי לכולם."
 
 #: common/static/common/templates/discussion/thread-type.underscore
 msgid "Post type"
-msgstr ""
+msgstr "סוג הפוסט"
 
 #: common/static/common/templates/discussion/thread-type.underscore
 msgid ""
@@ -6530,7 +6543,7 @@ msgstr "הוסף תגובה:"
 
 #: common/static/common/templates/discussion/topic.underscore
 msgid "Topic area"
-msgstr ""
+msgstr "תחום הנושא"
 
 #: common/static/common/templates/discussion/topic.underscore
 msgid "Add your post to a relevant topic to help others find it."
@@ -6596,7 +6609,7 @@ msgstr ""
 
 #: lms/djangoapps/discussion/static/discussion/templates/user-profile.underscore
 msgid "All Posts"
-msgstr ""
+msgstr "כל הפוסטים"
 
 #: lms/djangoapps/support/static/support/templates/certificates.underscore
 msgid "username or email"
@@ -8115,6 +8128,8 @@ msgid ""
 "you will need to have these by {date} to qualify to earn a Verified "
 "Certificate."
 msgstr ""
+"אתה יכול לשלם עכשיו אפילו אם אין לך את הפריטים הבאים, אבל תצטרך אותם עד "
+"{date} על מנת לעמוד בתנאים לקבלת תעודת סיום מאומתת. "
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid ""
@@ -8201,7 +8216,7 @@ msgstr "תעודה מאומתת עבור {courseName}"
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid ""
 "To receive a certificate, you must also verify your identity before {date}."
-msgstr ""
+msgstr "לפני קבלת התעודה, עליך לאמת את זהותך {date}. "
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "To receive a certificate, you must also verify your identity."
@@ -8410,11 +8425,11 @@ msgstr "העלאות פעילות"
 
 #: cms/templates/js/active-video-upload.underscore
 msgid "Read More"
-msgstr ""
+msgstr "קרא עוד"
 
 #: cms/templates/js/active-video-upload.underscore
 msgid "details about the failure"
-msgstr ""
+msgstr "פרטים אודות חוסר ההצלחה"
 
 #: cms/templates/js/add-xblock-component-button.underscore
 msgid "Add Component:"
@@ -8666,8 +8681,20 @@ msgid "Learners see the published subsection and can access its content."
 msgstr "הלומדים רואים את תת הפרק שפורסם ויכולים לגשת לתוכנו."
 
 #: cms/templates/js/content-visibility-editor.underscore
+msgid "Hide content after course end date"
+msgstr "הסתר תוכן לאחר תאריך סיום הקורס"
+
+#: cms/templates/js/content-visibility-editor.underscore
 msgid "Hide content after due date"
 msgstr "הסתר תוכן לאחר תאריך היעד"
+
+#: cms/templates/js/content-visibility-editor.underscore
+msgid ""
+"After the course\\'s end date has passed, learners can no longer access "
+"subsection content. The subsection remains included in grade calculations."
+msgstr ""
+"לאחר שתאריך היעד של תת הפרק עבר, הלומדים אינם יכולים יותר לגשת לתוכן תת "
+"הפרק. תת הפרק אינו כלול בחישובי הציון."
 
 #: cms/templates/js/content-visibility-editor.underscore
 msgid ""
@@ -8691,13 +8718,12 @@ msgstr ""
 #: cms/templates/js/content-visibility-editor.underscore
 #, python-format
 msgid ""
-"If you select an option other than \"%(hide_label)s\", after the subsection "
-"release date has passed, published units in this subsection will become "
-"available to learners unless units are explicitly hidden."
+"If you select an option other than \"%(hide_label)s\", published units in "
+"this subsection become available to learners unless they are explicitly "
+"hidden."
 msgstr ""
-"אם תבחר אפשרות אחרת שאינה \"%(hide_label)s\", לאחר תפוגת תאריך הפצת תת-הפרק,"
-" יחידות שפורסמו בתת-פרק זה יהפכו לזמינות ללומדים, אלא אם הוסתרו היחידות "
-"במפורש."
+"אם תבחר אפשרות אחרת שאינה \"%(hide_label)s\", יחידות שפורסמו בתת פרק זה יהיו"
+" זמינות ללומדים אלא אם כן הוסתרו ללומדים."
 
 #: cms/templates/js/course-instructor-details.underscore
 msgid "Instructor Name"
@@ -8798,7 +8824,7 @@ msgstr "מבחן תחת פיקוח"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Timed Exam"
-msgstr ""
+msgstr "מבחן מתוזמן"
 
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
@@ -8816,7 +8842,7 @@ msgstr "הגדר"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Duplicate"
-msgstr ""
+msgstr "שכפל"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Drag to reorder"
@@ -8844,6 +8870,10 @@ msgstr "דורג כ:"
 #: cms/templates/js/course-outline.underscore
 msgid "Due:"
 msgstr "תאריך הגשה"
+
+#: cms/templates/js/course-outline.underscore
+msgid "Subsection is hidden after course end date"
+msgstr "תת-הפרק נסתר לאחר תאריך סיום הקורס"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Subsection is hidden after due date"
@@ -9205,11 +9235,11 @@ msgstr "מזהה וידאו"
 
 #: cms/templates/js/previous-video-upload.underscore
 msgid "Remove this video"
-msgstr ""
+msgstr "הסר סרטון וידאו זה "
 
 #: cms/templates/js/previous-video-upload.underscore
 msgid "Remove {video_name} video"
-msgstr ""
+msgstr "הסר את סרטון הוידאו  {video_name}   "
 
 #: cms/templates/js/publish-history.underscore
 msgid "Never published"
