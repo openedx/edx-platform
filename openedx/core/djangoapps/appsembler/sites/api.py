@@ -10,6 +10,11 @@ from rest_framework.response import Response
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from rest_framework.views import APIView
 
+from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
+from openedx.core.lib.api.authentication import (
+    OAuth2AuthenticationAllowInactiveUser,
+)
+
 from .serializers import SiteConfigurationSerializer, SiteConfigurationListSerializer, SiteSerializer,\
     RegistrationSerializer
 from .utils import delete_site
@@ -18,6 +23,8 @@ from .utils import delete_site
 class SiteViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Site.objects.all()
     serializer_class = SiteSerializer
+
+    authentication_classes = (OAuth2AuthenticationAllowInactiveUser,)
 
     def get_queryset(self):
         queryset = Site.objects.exclude(id=settings.SITE_ID)
@@ -39,6 +46,8 @@ class SiteConfigurationViewSet(viewsets.ModelViewSet):
     list_serializer_class = SiteConfigurationListSerializer
     create_serializer_class = SiteSerializer
 
+    authentication_classes = (OAuth2AuthenticationAllowInactiveUser,)
+
     def get_serializer_class(self):
         if self.action == 'list':
             return self.list_serializer_class
@@ -52,6 +61,7 @@ class SiteConfigurationViewSet(viewsets.ModelViewSet):
 
 class FileUploadView(views.APIView):
     parser_classes = (MultiPartParser,)
+    permission_classes = (ApiKeyHeaderPermission,)
 
     def post(self, request, format=None):
         file_obj = request.data['file']
@@ -66,9 +76,12 @@ class FileUploadView(views.APIView):
 
 class SiteCreateView(generics.CreateAPIView):
     serializer_class = RegistrationSerializer
+    permission_classes = (ApiKeyHeaderPermission,)
 
 
 class UsernameAvailabilityView(APIView):
+    permission_classes = (ApiKeyHeaderPermission,)
+
     def get(self, request, username, format=None):
         try:
             User.objects.get(username=username)
