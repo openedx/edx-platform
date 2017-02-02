@@ -10,6 +10,7 @@ from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from openedx.core.lib.token_utils import JwtBuilder
+from openedx.core.djangoapps.cache_toolbox import app_settings
 
 
 def create_catalog_api_client(user, catalog_integration):
@@ -110,29 +111,24 @@ def _get_program_instructors(program):
     Returns the list of instructor from cached if cache key exists otherwise
     iterate over the courses and return all the instructors of each course run
     """
-    catalog_integration = CatalogIntegration.current()
-    if catalog_integration.enabled:
-        cache_key = 'program.instructors.{program_id}'.format(
-            program_id=program.get('uuid')
-        )
+    cache_key = 'program.instructors.{program_id}'.format(
+        program_id=program.get('uuid')
+    )
 
-        lookup_list = []
-        instructors = cache.get(cache_key) or []
-        if instructors:
-            return instructors
-
-        for queryset in CourseOverview.objects.filter(id__in=_get_all_course_run_keys(program)).values_list(
-                'instructor_info', flat=True):
-            queryset = json.loads(queryset)
-            for instructor in queryset.get("instructors", []):
-                if instructor.get('name') not in lookup_list:
-                    lookup_list.append(instructor.get('name'))
-                    instructors.append(instructor)
-
-        cache.set(cache_key, instructors, catalog_integration.cache_ttl)
+    lookup_list = []
+    instructors = cache.get(cache_key) or []
+    if instructors:
         return instructors
-    else:
-        return []
+
+    for queryset in CourseOverview.objects.filter(id__in=_get_all_course_run_keys(program)).values_list(
+            'instructor_info', flat=True):
+        queryset = json.loads(queryset)
+        for instructor in queryset.get("instructors", []):
+            if instructor.get('name') not in lookup_list:
+                lookup_list.append(instructor.get('name'))
+                instructors.append(instructor)
+    cache.set(cache_key, instructors, app_settings.CACHE_TOOLBOX_DEFAULT_TIMEOUT)
+    return instructors
 
 
 def _get_all_course_run_keys(program):
