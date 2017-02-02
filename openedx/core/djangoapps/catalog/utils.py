@@ -1,4 +1,5 @@
 """Helper functions for working with the catalog service."""
+import json
 from django.conf import settings
 from django.core.cache import cache
 from django.contrib.auth.models import User
@@ -6,9 +7,9 @@ from edx_rest_api_client.client import EdxRestApiClient
 from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from openedx.core.lib.token_utils import JwtBuilder
-from xmodule.modulestore.django import modulestore
 
 
 def create_catalog_api_client(user, catalog_integration):
@@ -115,19 +116,18 @@ def _get_program_instructors(program):
             program_id=program.get('uuid')
         )
 
-        instructor_lookup_list = []
+        lookup_list = []
         instructors = cache.get(cache_key) or []
         if instructors:
             return instructors
 
-        module_store = modulestore()
-        for key in _get_all_course_run_keys(program):
-            descriptor = module_store.get_course(key)
-            if descriptor and descriptor.instructor_info:
-                for instructor in descriptor.instructor_info.get("instructors", []):
-                    if instructor.get('name') not in instructor_lookup_list:
-                        instructor_lookup_list.append(instructor.get('name'))
-                        instructors.append(instructor)
+        for queryset in CourseOverview.objects.filter(id__in=_get_all_course_run_keys(program)).values_list(
+                'instructor_info', flat=True):
+            queryset = json.loads(queryset)
+            for instructor in queryset.get("instructors", []):
+                if instructor.get('name') not in lookup_list:
+                    lookup_list.append(instructor.get('name'))
+                    instructors.append(instructor)
 
         cache.set(cache_key, instructors, catalog_integration.cache_ttl)
         return instructors
@@ -156,15 +156,15 @@ def get_active_programs_data(user=None, program_id=None):
     if not programs:
         return None
 
-    program_types = {program_type["name"]: program_type for program_type in get_program_types(user)}
     # get_programs returns a dict when provided with the program_id parameter.
     if isinstance(programs, dict):
         programs = [programs]
 
+    program_types = {program_type["name"]: program_type for program_type in get_program_types(user)}
     for program in programs:
         if program["status"] == "active":
             program["type"] = program_types[program["type"]]
-            program["instructors"] = _get_program_instructors(programs) if program_id else None
+            program["instructors"] = _get_program_instructors(programs[0]) if program_id else None
             program_data.append(program)
     return program_data
 
