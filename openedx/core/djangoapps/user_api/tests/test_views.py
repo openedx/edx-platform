@@ -1967,6 +1967,24 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             "defaultValue": backend.name
         })
 
+    def test_create_account_not_allowed(self):
+        """
+        Test case to check user creation is forbidden when ALLOW_PUBLIC_ACCOUNT_CREATION feature flag is turned off
+        """
+        def _side_effect_for_get_value(value, default=None):
+            """
+            returns a side_effect with given return value for a given value
+            """
+            if value == 'ALLOW_PUBLIC_ACCOUNT_CREATION':
+                return False
+            else:
+                return get_value(value, default)
+
+        with mock.patch('openedx.core.djangoapps.site_configuration.helpers.get_value') as mock_get_value:
+            mock_get_value.side_effect = _side_effect_for_get_value
+            response = self.client.post(self.url, {"email": self.EMAIL, "username": self.USERNAME})
+            self.assertEqual(response.status_code, 403)
+
 
 @httpretty.activate
 @ddt.ddt

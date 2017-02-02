@@ -39,6 +39,7 @@ from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_t
 from openedx.core.djangoapps.user_api.accounts import EMAIL_MAX_LENGTH
 from openedx.core.djangoapps.user_api.accounts.api import activate_account, create_account
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
+from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import UserFactory
 from student_account.views import account_settings_context, get_user_orders
