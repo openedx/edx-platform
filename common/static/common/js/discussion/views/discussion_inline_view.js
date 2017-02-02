@@ -193,6 +193,7 @@
                     });
                 }
             }
+            this.toggleDiscussionBtn.focus();
         },
 
         hideDiscussion: function() {
