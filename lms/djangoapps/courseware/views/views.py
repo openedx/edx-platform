@@ -343,13 +343,12 @@ def course_info(request, course_id):
         # Process requests containing the upgrade parameter
         upgrade_data = VerificationDeadlineDate(course, user)
 
-        upgrade = False
-        upgrade_link = ''
+        upgrade_link = None
         if (request.user.is_authenticated() and 
            request.GET.get('upgrade', 'false') == 'true' and
            upgrade_data.verification_status == 'none' and
            not upgrade_data.deadline_has_passed()):
-            upgrade = True
+            upgrade_link = upgrade_data.link
 
         context = {
             'request': request,
@@ -362,8 +361,7 @@ def course_info(request, course_id):
             'studio_url': studio_url,
             'show_enroll_banner': show_enroll_banner,
             'url_to_enroll': url_to_enroll,
-            'upgrade_banner': upgrade,
-            'upgrade_link': upgrade_data.link
+            'upgrade_link': upgrade_link
         }
 
         # Get the URL of the user's last position in order to display the 'where you were last' message
