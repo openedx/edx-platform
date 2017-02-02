@@ -1,7 +1,7 @@
 """ Tests for rendering functions in the mako pipeline. """
 
 import ddt
-from unittest import skipUnless
+from unittest import skipUnless, skip
 
 from django.conf import settings
 from django.test import TestCase
@@ -39,6 +39,7 @@ class RequireJSPathOverridesTest(TestCase):
         self.assertEqual(map(str.strip, result.splitlines()), self.OVERRIDES_JS)
 
 
+@skip('Temporarily skipping Pipeline Render Tests to reduce memory usage of jenkins workers  JZ 10/12/2016')
 @ddt.ddt
 class PipelineRenderTest(TestCase):
     """Test individual pipeline rendering functions. """
