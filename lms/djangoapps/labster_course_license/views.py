@@ -23,8 +23,12 @@ from django.utils.safestring import mark_safe
 from labster_course_license.utils import LtiPassport, course_tree_info, SimulationValidationError
 from labster_course_license.models import CourseLicense
 from ccx_keys.locator import CCXLocator
-from ccx.views import coach_dashboard, get_ccx_for_coach
-from ccx.overrides import get_override_for_ccx, override_field_for_ccx, clear_override_for_ccx
+from lms.djangoapps.ccx.views import coach_dashboard, get_ccx_for_coach
+from lms.djangoapps.ccx.overrides import get_override_for_ccx, override_field_for_ccx, clear_override_for_ccx
+from lms.djangoapps.ccx.utils import (
+    ccx_course,
+    get_ccx_creation_dict,
+)
 
 
 log = logging.getLogger(__name__)
@@ -71,13 +75,19 @@ def dashboard(request, course, ccx):
         'course': course,
         'ccx': ccx,
     }
+    context.update(get_ccx_creation_dict(course))
 
     if ccx:
-        ccx_locator = CCXLocator.from_course_locator(course.id, ccx.id)
+        ccx_locator = CCXLocator.from_course_locator(course.id, unicode(ccx.id))
         context['license'] = CourseLicense.get_license(ccx_locator)
         context['labster_license_url'] = reverse('labster_license_handler', kwargs={'course_id': ccx_locator})
+
+        with ccx_course(ccx_locator) as course:
+            context['course'] = course
     else:
         context['ccx_coach_dashboard'] = reverse('ccx_coach_dashboard', kwargs={'course_id': course.id})
+
+
     return render_to_response('labster/course_license.html', context)
 
 
