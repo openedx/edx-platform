@@ -90,10 +90,11 @@ django-memcached-hashring==0.1.2
 python-openid==2.2.5
 python-dateutil==2.1
 
-# This module gets monkey-patched in third_party_auth.py to fix a Django 1.8 incompatibility.
-# When this dependency gets upgraded, the monkey patch should be removed, if possible.
-# We can also remove the fix to auth_url in third_party_auth/saml.py when that fix is included upstream.
-python-social-auth==0.2.12
+# we have to install social-auth-app-django from fork to get over missing migration
+# issue https://github.com/python-social-auth/social-app-django/issues/28
+# once migrations are run we can switch back to base package(social-auth-app-django==1.0.1)
+git+https://github.com/ziafazal/social-app-django.git@7121a7acb6544a38e80c435f5f33605d796a6e4d#egg=social-auth-app-django==1.0.1
+social-auth-core==1.1.0
 
 pytz==2016.7
 pysrt==0.4.7

@@ -42,7 +42,7 @@ class AccessTokenExchangeViewTest(AccessTokenExchangeTestMixin):
             json.loads(response.content),
             {u"error": expected_error, u"error_description": expected_error_description}
         )
-        self.assertNotIn("partial_pipeline", self.client.session)
+        self.assertNotIn("partial_pipeline_token", self.client.session)
 
     def _assert_success(self, data, expected_scopes):
         response = self.csrf_client.post(self.url, data)

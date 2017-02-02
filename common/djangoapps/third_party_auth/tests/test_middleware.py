@@ -20,7 +20,7 @@ class TestSessionFlushMiddleware(unittest.TestCase):
         client = Client()
         session = client.session
         session['fancy_variable'] = 13025
-        session['partial_pipeline'] = 'pipeline_running'
+        session['partial_pipeline_token'] = 'pipeline_running'
         session['third_party_auth_quarantined_modules'] = ('fake_quarantined_module',)
         session.save()
         client.get('/')
@@ -45,7 +45,7 @@ class TestSessionFlushMiddleware(unittest.TestCase):
         client = Client()
         session = client.session
         session['fancy_variable'] = 13025
-        session['partial_pipeline'] = 'pipeline_running'
+        session['partial_pipeline_token'] = 'pipeline_running'
         session.save()
         client.get('/')
         self.assertEqual(client.session.get('fancy_variable', None), 13025)

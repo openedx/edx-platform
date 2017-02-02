@@ -13,7 +13,6 @@ from openedx.core.lib.django_startup import autostartup
 import logging
 import analytics
 from openedx.core.djangoapps.monkey_patch import (
-    third_party_auth,
     django_db_models_options
 )
 
@@ -33,7 +32,6 @@ def run():
     """
     Executed during django startup
     """
-    third_party_auth.patch()
     django_db_models_options.patch()
 
     # To override the settings before executing the autostartup() for python-social-auth

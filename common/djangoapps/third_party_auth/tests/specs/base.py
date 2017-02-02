@@ -14,9 +14,9 @@ from django.contrib.sessions.backends import cache
 from django.core.urlresolvers import reverse
 from django.test import utils as django_utils
 from django.conf import settings as django_settings
-from social import actions, exceptions
-from social.apps.django_app import utils as social_utils
-from social.apps.django_app import views as social_views
+from social_core import actions, exceptions
+from social_django import utils as social_utils
+from social_django import views as social_views
 
 from lms.djangoapps.commerce.tests import TEST_API_URL
 from student import models as student_models
@@ -266,7 +266,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         # with is actually present.
         for prepopulated_form_value in self.provider.get_register_form_data(pipeline_kwargs).values():
             if prepopulated_form_value:
-                self.assertIn(prepopulated_form_value, response.content)
+                self.assertIn(prepopulated_form_value.encode('utf-8'), response.content)
 
     # Implementation details and actual tests past this point -- no more
     # configuration needed.
@@ -409,11 +409,14 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         """Makes sure the given request is running an auth pipeline."""
         self.assertTrue(pipeline.running(request))
 
-    def assert_redirect_to_dashboard_looks_correct(self, response):
+    def assert_redirect_to_dashboard_looks_correct(self, backend, response):
         """Asserts a response would redirect to /dashboard."""
         self.assertEqual(302, response.status_code)
         # pylint: disable=protected-access
-        self.assertEqual(auth_settings._SOCIAL_AUTH_LOGIN_REDIRECT_URL, response.get('Location'))
+        self.assertEqual(
+            backend.strategy.absolute_uri(auth_settings._SOCIAL_AUTH_LOGIN_REDIRECT_URL),
+            backend.strategy.absolute_uri(response.get('Location'))
+        )
 
     def assert_redirect_to_login_looks_correct(self, response):
         """Asserts a response would redirect to /login."""
@@ -467,7 +470,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         return user
 
     def fake_auth_complete(self, strategy):
-        """Fake implementation of social.backends.BaseAuth.auth_complete.
+        """Fake implementation of social_core.backends.BaseAuth.auth_complete.
 
         Unlike what the docs say, it does not need to return a user instance.
         Sometimes (like when directing users to the /register form) it instead
@@ -509,7 +512,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         These two objects contain circular references, so we create them
         together. The references themselves are a mixture of normal __init__
         stuff and monkey-patching done by python-social-auth. See, for example,
-        social.apps.django_apps.utils.strategy().
+        social_django.utils.strategy().
         """
         request = self.request_factory.get(
             pipeline.get_complete_url(self.backend_name) +
@@ -607,9 +610,13 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         self.set_logged_in_cookies(request)
 
         # Fire off the auth pipeline to link.
-        self.assert_redirect_to_dashboard_looks_correct(actions.do_complete(
-            request.backend, social_views._do_login, request.user, None,  # pylint: disable=protected-access
-            redirect_field_name=auth.REDIRECT_FIELD_NAME))
+        self.assert_redirect_to_dashboard_looks_correct(
+            request.backend,
+            actions.do_complete(
+                request.backend, social_views._do_login, request.user, None,  # pylint: disable=protected-access
+                redirect_field_name=auth.REDIRECT_FIELD_NAME
+            )
+        )
 
         # Now we expect to be in the linked state, with a backend entry.
         self.assert_social_auth_exists_for_user(request.user, strategy)
@@ -644,8 +651,10 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         self.assert_social_auth_exists_for_user(request.user, strategy)
 
         # Fire off the disconnect pipeline to unlink.
-        self.assert_redirect_to_dashboard_looks_correct(actions.do_disconnect(
-            request.backend, request.user, None, redirect_field_name=auth.REDIRECT_FIELD_NAME))
+        self.assert_redirect_to_dashboard_looks_correct(
+            request.backend,
+            actions.do_disconnect(request.backend, request.user, None, redirect_field_name=auth.REDIRECT_FIELD_NAME)
+        )
 
         # Now we expect to be in the unlinked state, with no backend entry.
         self.assert_account_settings_context_looks_correct(account_settings_context(request), user, linked=False)
@@ -755,7 +764,9 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         self.set_logged_in_cookies(request)
 
         self.assert_redirect_to_dashboard_looks_correct(
-            actions.do_complete(request.backend, social_views._do_login, user=user))
+            request.backend,
+            actions.do_complete(request.backend, social_views._do_login, user=user)
+        )
         self.assert_account_settings_context_looks_correct(account_settings_context(request), user)
 
     def test_signin_fails_if_account_not_active(self):
@@ -856,7 +867,9 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         # Set the cookie and try again
         self.set_logged_in_cookies(request)
         self.assert_redirect_to_dashboard_looks_correct(
-            actions.do_complete(strategy.request.backend, social_views._do_login, user=created_user))
+            strategy.request.backend,
+            actions.do_complete(strategy.request.backend, social_views._do_login, user=created_user)
+        )
         # Now the user has been redirected to the dashboard. Their third party account should now be linked.
         self.assert_social_auth_exists_for_user(created_user, strategy)
         self.assert_account_settings_context_looks_correct(account_settings_context(request), created_user, linked=True)

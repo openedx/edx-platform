@@ -73,11 +73,11 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseBadRequest
 from django.shortcuts import redirect
-from social.apps.django_app.default import models
-from social.apps.django_app.default.models import UserSocialAuth
-from social.exceptions import AuthException
-from social.pipeline import partial
-from social.pipeline.social_auth import associate_by_email
+from social_django import models
+from social_django.models import UserSocialAuth
+from social_core.exceptions import AuthException
+from social_core.pipeline import partial
+from social_core.pipeline.social_auth import associate_by_email
 
 import student
 
@@ -198,7 +198,13 @@ class ProviderUserState(object):
 
 def get(request):
     """Gets the running pipeline from the passed request."""
-    return request.session.get('partial_pipeline')
+    from social_django import utils as social_utils
+    strategy = social_utils.load_strategy(request)
+    partial_object = strategy.partial_load(request.session.get('partial_pipeline_token'))
+    pipeline_data = None
+    if partial_object:
+        pipeline_data = {'kwargs': partial_object.kwargs, 'backend': partial_object.backend}
+    return pipeline_data
 
 
 def get_real_social_auth_object(request):
@@ -445,7 +451,7 @@ def make_random_password(length=None, choice_fn=random.SystemRandom().choice):
 
 def running(request):
     """Returns True iff request is running a third-party auth pipeline."""
-    return request.session.get('partial_pipeline') is not None  # Avoid False for {}.
+    return request.session.get('partial_pipeline_token') is not None  # Avoid False for {}.
 
 
 # Pipeline functions.

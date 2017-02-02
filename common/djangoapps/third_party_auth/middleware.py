@@ -1,6 +1,6 @@
 """Middleware classes for third_party_auth."""
 
-from social.apps.django_app.middleware import SocialAuthExceptionMiddleware
+from social_django.middleware import SocialAuthExceptionMiddleware
 
 from . import pipeline
 
@@ -45,7 +45,7 @@ class PipelineQuarantineMiddleware(object):
         collection of user consent for sharing data with a linked third-party
         authentication provider.
         """
-        running_pipeline = request.session.get('partial_pipeline')
+        running_pipeline = request.session.get('partial_pipeline_token')
 
         if not running_pipeline:
             return

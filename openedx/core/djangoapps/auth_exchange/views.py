@@ -24,7 +24,7 @@ from provider.oauth2.views import AccessTokenView as DOPAccessTokenView
 from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
-import social.apps.django_app.utils as social_utils
+import social_django.utils as social_utils
 
 from openedx.core.djangoapps.auth_exchange.forms import AccessTokenExchangeForm
 from openedx.core.djangoapps.oauth_dispatch import adapters
@@ -37,7 +37,7 @@ class AccessTokenExchangeBase(APIView):
     OAuth access token.
     """
     @method_decorator(csrf_exempt)
-    @method_decorator(social_utils.strategy("social:complete"))
+    @method_decorator(social_utils.psa("social:complete"))
     def dispatch(self, *args, **kwargs):
         return super(AccessTokenExchangeBase, self).dispatch(*args, **kwargs)
 

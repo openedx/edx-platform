@@ -50,7 +50,7 @@ class TestEnterpriseHelpers(unittest.TestCase):
         """
         Test that we correctly check whether data sharing consent is requested.
         """
-        request = mock.MagicMock(session={'partial_pipeline': 'thing'})
+        request = mock.MagicMock(session={'partial_pipeline_token': 'thing'})
         mock_get_ec.return_value = mock.MagicMock(requests_data_sharing_consent=True)
         self.assertTrue(data_sharing_consent_requested(request))
         mock_get_ec.return_value = mock.MagicMock(requests_data_sharing_consent=False)
@@ -66,7 +66,7 @@ class TestEnterpriseHelpers(unittest.TestCase):
         Test that we correctly check whether data sharing consent is required at login.
         """
         check_method = mock.MagicMock(return_value=True)
-        request = mock.MagicMock(session={'partial_pipeline': 'thing'})
+        request = mock.MagicMock(session={'partial_pipeline_token': 'thing'})
         mock_get_ec.return_value = mock.MagicMock(enforces_data_sharing_consent=check_method)
         self.assertTrue(data_sharing_consent_required_at_login(request))
         check_method.return_value = False
@@ -82,7 +82,7 @@ class TestEnterpriseHelpers(unittest.TestCase):
         """
         Test that we get the correct requirement string for the current consent statae.
         """
-        request = mock.MagicMock(session={'partial_pipeline': 'thing'})
+        request = mock.MagicMock(session={'partial_pipeline_token': 'thing'})
         mock_ec = mock.MagicMock(
             enforces_data_sharing_consent=mock.MagicMock(return_value=True),
             requests_data_sharing_consent=True,
@@ -101,7 +101,7 @@ class TestEnterpriseHelpers(unittest.TestCase):
         """
         Test that the insertion of the enterprise fields is processed as expected.
         """
-        request = mock.MagicMock(session={'partial_pipeline': 'thing'})
+        request = mock.MagicMock(session={'partial_pipeline_token': 'thing'})
         mock_ec = mock.MagicMock(
             enforces_data_sharing_consent=mock.MagicMock(return_value=True),
             requests_data_sharing_consent=True,

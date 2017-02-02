@@ -5,11 +5,11 @@ import unittest
 from django.conf import settings
 from django import test
 from django.contrib.auth import models
-import mock
+from mock import MagicMock, patch
 
 from third_party_auth import pipeline, provider
 from third_party_auth.tests import testutil
-from social.apps.django_app.default import models as social_models
+from social_django import models as social_models
 
 
 # Get Django User model by reference from python-social-auth. Not a type
@@ -231,43 +231,43 @@ class TestPipelineUtilityFunctions(TestCase, test.TestCase):
         Test that we can use a dictionary with a UID entry to retrieve a
         database-backed UserSocialAuth object.
         """
-        request = mock.MagicMock(
-            session={
-                'partial_pipeline': {
-                    'kwargs': {
-                        'social': {
-                            'uid': 'fake uid'
-                        }
-                    }
+        request = MagicMock()
+        pipeline_partial = {
+            'kwargs': {
+                'social': {
+                    'uid': 'fake uid'
                 }
             }
-        )
-        real_social = pipeline.get_real_social_auth_object(request)
-        self.assertEqual(real_social, self.social_auth)
+        }
+
+        with patch('third_party_auth.pipeline.get') as get_pipeline:
+            get_pipeline.return_value = pipeline_partial
+            real_social = pipeline.get_real_social_auth_object(request)
+            self.assertEqual(real_social, self.social_auth)
 
     def test_get_real_social_auth(self):
         """
         Test that trying to get a database-backed UserSocialAuth from an existing
         instance returns correctly.
         """
-        request = mock.MagicMock(
-            session={
-                'partial_pipeline': {
-                    'kwargs': {
-                        'social': self.social_auth
-                    }
-                }
+        request = MagicMock()
+        pipeline_partial = {
+            'kwargs': {
+                'social': self.social_auth
             }
-        )
-        real_social = pipeline.get_real_social_auth_object(request)
-        self.assertEqual(real_social, self.social_auth)
+        }
+
+        with patch('third_party_auth.pipeline.get') as get_pipeline:
+            get_pipeline.return_value = pipeline_partial
+            real_social = pipeline.get_real_social_auth_object(request)
+            self.assertEqual(real_social, self.social_auth)
 
     def test_get_real_social_auth_no_pipeline(self):
         """
         Test that if there's no running pipeline, we return None when looking
         for a database-backed UserSocialAuth object.
         """
-        request = mock.MagicMock(session={})
+        request = MagicMock(session={})
         real_social = pipeline.get_real_social_auth_object(request)
         self.assertEqual(real_social, None)
 
@@ -276,7 +276,7 @@ class TestPipelineUtilityFunctions(TestCase, test.TestCase):
         Test that if a UserSocialAuth object hasn't been attached to the pipeline as
         `social`, we return none
         """
-        request = mock.MagicMock(
+        request = MagicMock(
             session={
                 'running_pipeline': {
                     'kwargs': {}
@@ -291,7 +291,7 @@ class TestPipelineUtilityFunctions(TestCase, test.TestCase):
         Test that quarantining a session adds the correct flags, and that
         lifting the quarantine similarly removes those flags.
         """
-        request = mock.MagicMock(
+        request = MagicMock(
             session={}
         )
         pipeline.quarantine_session(request, locations=('my_totally_real_module', 'other_real_module',))

@@ -11,7 +11,6 @@ settings.INSTALLED_APPS  # pylint: disable=pointless-statement
 from openedx.core.lib.django_startup import autostartup
 import django
 from openedx.core.djangoapps.monkey_patch import (
-    third_party_auth,
     django_db_models_options
 )
 from openedx.core.lib.xblock_utils import xblock_local_resource_url
@@ -28,7 +27,6 @@ def run():
     """
     Executed during django startup
     """
-    third_party_auth.patch()
     django_db_models_options.patch()
 
     # Comprehensive theming needs to be set up before django startup,

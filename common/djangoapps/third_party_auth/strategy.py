@@ -4,8 +4,8 @@ ConfigurationModels rather than django.settings
 """
 from .models import OAuth2ProviderConfig
 from .pipeline import AUTH_ENTRY_CUSTOM
-from social.backends.oauth import OAuthAuth
-from social.strategies.django_strategy import DjangoStrategy
+from social_core.backends.oauth import OAuthAuth
+from social_django.strategy import DjangoStrategy
 
 
 class ConfigurationModelStrategy(DjangoStrategy):

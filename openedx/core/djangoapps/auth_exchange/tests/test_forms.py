@@ -10,7 +10,7 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 import httpretty
 from provider import scope
-import social.apps.django_app.utils as social_utils
+import social_django.utils as social_utils
 
 from third_party_auth.tests.utils import ThirdPartyOAuthTestMixinFacebook, ThirdPartyOAuthTestMixinGoogle
 
@@ -38,7 +38,7 @@ class AccessTokenExchangeFormTest(AccessTokenExchangeTestMixin):
             form.errors,
             {"error": expected_error, "error_description": expected_error_description}
         )
-        self.assertNotIn("partial_pipeline", self.request.session)
+        self.assertNotIn("partial_pipeline_token", self.request.session)
 
     def _assert_success(self, data, expected_scopes):
         form = AccessTokenExchangeForm(request=self.request, oauth2_adapter=self.oauth2_adapter, data=data)
