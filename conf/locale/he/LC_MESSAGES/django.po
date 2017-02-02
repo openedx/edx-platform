@@ -41,7 +41,7 @@
 # e2f_HE c1 <e2f_HE_c1@outlook.com>, 2016
 # e2f he_r1 <e2f_he_r1@outlook.com>, 2016
 # Nadav Stark <nadav@yeda.org.il>, 2015
-# qualityalltext <quality@alltext.co.il>, 2016
+# qualityalltext <quality@alltext.co.il>, 2016-2017
 # Ron Rozen <Ronrozen@gmail.com>, 2016
 # Shay Nativ <shay@yeda.org.il>, 2015
 # Yoav Caspin <yoavc@pmo.gov.il>, 2016-2017
@@ -58,7 +58,7 @@
 # e2f he_r1 <e2f_he_r1@outlook.com>, 2016
 # Naaman nov <naaman.nov@gmail.com>, 2015
 # Nadav Stark <nadav@yeda.org.il>, 2015
-# qualityalltext <quality@alltext.co.il>, 2016
+# qualityalltext <quality@alltext.co.il>, 2016-2017
 # Ron Rozen <Ronrozen@gmail.com>, 2016
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
 # edX translation file
@@ -76,8 +76,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-01-05 17:03+0000\n"
-"PO-Revision-Date: 2016-10-30 14:15+0000\n"
+"POT-Creation-Date: 2017-01-23 17:57+0000\n"
+"PO-Revision-Date: 2017-01-31 08:32+0000\n"
 "Last-Translator: qualityalltext <quality@alltext.co.il>\n"
 "Language-Team: Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)\n"
 "MIME-Version: 1.0\n"
@@ -127,8 +127,7 @@ msgid "Subsection"
 msgstr "תת פרק"
 
 #: cms/djangoapps/contentstore/views/helpers.py
-#: lms/djangoapps/instructor/views/tools.py lms/templates/seq_module.html
-#: lms/templates/ccx/schedule.html
+#: lms/djangoapps/instructor/views/tools.py lms/templates/ccx/schedule.html
 msgid "Unit"
 msgstr "יחידה"
 
@@ -230,7 +229,7 @@ msgstr "חינוך מקצועי"
 #: common/djangoapps/course_modes/models.py common/lib/xmodule/xmodule/tabs.py
 #: lms/djangoapps/courseware/tabs.py lms/djangoapps/courseware/views/views.py
 #: lms/djangoapps/shoppingcart/reports.py cms/templates/widgets/header.html
-#: lms/templates/courseware/courseware.html
+#: lms/templates/help_modal.html lms/templates/courseware/courseware.html
 msgid "Course"
 msgstr "קורס"
 
@@ -246,6 +245,7 @@ msgstr "קורס"
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 #: common/lib/xmodule/xmodule/word_cloud_module.py
+#: common/lib/xmodule/xmodule/x_module.py
 #: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
 #: cms/templates/container.html cms/templates/library.html
 msgid "Display Name"
@@ -1832,23 +1832,25 @@ msgid "XML data for the annotation"
 msgstr "מידע XML עבור הסברים"
 
 #: common/lib/xmodule/xmodule/annotatable_module.py
+#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/conditional_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/library_content_module.py
+#: common/lib/xmodule/xmodule/library_root_xblock.py
+#: common/lib/xmodule/xmodule/poll_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
-msgid "Display name for this module"
-msgstr "שם תצוגה עבור מודול זה"
+#: common/lib/xmodule/xmodule/word_cloud_module.py
+#: common/lib/xmodule/xmodule/x_module.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+msgid "The display name for this component."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/annotatable_module.py
 msgid "Annotation"
 msgstr "ביאור"
-
-#: common/lib/xmodule/xmodule/capa_base.py
-#: common/lib/xmodule/xmodule/conditional_module.py
-#: common/lib/xmodule/xmodule/html_module.py
-msgid "This name appears in the horizontal navigation at the top of the page."
-msgstr "שם זה מופיע בתפריט הניווט בחלק העליון של העמוד."
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Blank Advanced Problem"
@@ -3437,10 +3439,6 @@ msgid "No Library Selected"
 msgstr "לא נבחרה ספריה"
 
 #: common/lib/xmodule/xmodule/library_root_xblock.py
-msgid "Enter the name of the library as it should appear in Studio."
-msgstr "הזן את שם הספריה כפי שצריכה להופיע בסטודיו."
-
-#: common/lib/xmodule/xmodule/library_root_xblock.py
 msgid "Library Display Name"
 msgstr "שם תצוגה לספריה"
 
@@ -3450,11 +3448,9 @@ msgstr "הזן את שמות הרכיבים המתקדמים לשימוש בספ
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
-"Enter the name that students see for this component.  Analytics reports may "
-"also use the display name to identify this component."
+"The display name for this component. Analytics reports may also use the "
+"display name to identify this component."
 msgstr ""
-"הזן את השם שרואים הסטודנטים עבור רכיב זה. ניתן להשתמש בשם קמפוס כדי לזהות "
-"מרכיב זה בדוחות אנליטיקס. "
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "LTI ID"
@@ -3866,6 +3862,26 @@ msgstr ""
 "הזן כן או לא. אם כן, תשובות ההגשה עבור מודולי הבעיות יילקחו בחשבון במסגרת "
 "דירוג מבחן הכניסה/אלגוריתם הכניסה. "
 
+#: common/lib/xmodule/xmodule/poll_module.py
+msgid "Whether this student has voted on the poll"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/poll_module.py
+msgid "Student answer"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/poll_module.py
+msgid "Poll answers from all students"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/poll_module.py
+msgid "Poll answers from xml"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/poll_module.py
+msgid "Poll question"
+msgstr ""
+
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid "Enter the date by which problems are due."
 msgstr "הזן את תאריך היעד להגשת הבעיות."
@@ -3954,14 +3970,14 @@ msgid "This exam is hidden from the learner."
 msgstr "מבחן זה חסוי ללומד."
 
 #: common/lib/xmodule/xmodule/seq_module.py
-msgid "subsection"
-msgstr "תת פרק"
+msgid ""
+"Because the course has ended, this assignment is hidden from the learner."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid ""
-"Because the due date has passed, this {subsection_format} is hidden from the"
-" learner."
-msgstr "מאחר שחלף כבר תאריך היעד, {subsection_format} חסוי ללומד."
+"Because the due date has passed, this assignment is hidden from the learner."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid ""
@@ -3978,10 +3994,8 @@ msgid "Not Selected"
 msgstr "לא נבחר "
 
 #: common/lib/xmodule/xmodule/split_test_module.py
-msgid ""
-"This name is used for organizing your course content, but is not shown to "
-"students."
-msgstr "השימוש בשם זה הוא לארגון תוכן הקורס אך אינו גלוי לסטודנט."
+msgid "The display name for this component. (Not shown to learners)"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid "Content Experiment"
@@ -4149,13 +4163,6 @@ msgstr ""
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid "Default Video URL"
 msgstr "כתובת URL כברירת מחדל לסרטון וידאו"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid ""
-"The name students see. This name appears in the course ribbon and as a "
-"header for the video."
-msgstr ""
-"השם שרואים הסטודנטים. שם זה מופיע ברצועת הקורס וככותרת עבור סרטון הווידאו."
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid "Component Display Name"
@@ -4441,10 +4448,6 @@ msgstr "כתובת URL של פוסטר"
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "Poster URL"
 msgstr "כתובת URL של פוסטר"
-
-#: common/lib/xmodule/xmodule/word_cloud_module.py
-msgid "The label for this word cloud on the course page."
-msgstr "התווית לענן מילים זה בעמוד הקורס."
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 #: lms/templates/annotatable.html lms/templates/imageannotation.html
@@ -5902,6 +5905,12 @@ msgid ""
 msgstr ""
 "אפשרות לתרשים כתובת URL ל-LMS  + מארח המשמש לבניית כתובות URL עבור ספריית "
 "תוכן, לדוגמה https://courses.edx.org."
+
+#: lms/djangoapps/email_marketing/models.py
+msgid ""
+"Number of seconds to delay the sending of User Welcome email after user has "
+"been activated"
+msgstr ""
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 msgid "{platform_name} Staff"
@@ -9809,10 +9818,6 @@ msgid "Gating milestone for {usage_key}"
 msgstr "קבלת אבן דרך עבור {usage_key}"
 
 #: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
-msgid "Display name for this component"
-msgstr "שם תצוגה עבור רכיב זה"
-
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
 msgid "Category"
 msgstr "קטגוריה"
 
@@ -10623,7 +10628,7 @@ msgstr "התנתק"
 
 #: common/lib/capa/capa/templates/codeinput.html
 msgid "Code Editor"
-msgstr ""
+msgstr "עורך קוד"
 
 #: common/templates/license.html
 msgid "All Rights Reserved"
@@ -10655,35 +10660,35 @@ msgstr "חלק מהזכויות שמורות"
 
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Feedback Form"
-msgstr ""
+msgstr "טופס משוב"
 
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Email: {email}"
-msgstr ""
+msgstr "דואר אלקטרוני: {email}"
 
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Full Name: {realname}"
-msgstr ""
+msgstr "שם מלא: {realname} "
 
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Inquiry Type: {inquiry_type}"
-msgstr ""
+msgstr "סוג הודעה: {inquiry_type}"
 
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Message: {message}"
-msgstr ""
+msgstr "הודעה: {message} "
 
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Tags: {tags}"
-msgstr ""
+msgstr "תגיות: {tags}"
 
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Additional Info:"
-msgstr ""
+msgstr "מידע נוסף:"
 
 #: common/templates/emails/contact_us_feedback_email_subject.txt
 msgid "Feedback from user"
-msgstr ""
+msgstr "משוב משתמש"
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_board.html
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
@@ -10763,7 +10768,7 @@ msgstr "סמן עמוד זה"
 
 #: lms/templates/conditional_module.html
 msgid "You do not have access to this dependency module."
-msgstr ""
+msgstr "אין לך גישה ליחידת תפקוד תלויה זו."
 
 #: lms/templates/course.html
 msgid "LEARN MORE"
@@ -10775,7 +10780,7 @@ msgstr "מתחיל"
 
 #: lms/templates/course.html
 msgid "Starts: {date}"
-msgstr ""
+msgstr "מתחיל: {date}"
 
 #: lms/templates/courses_list.html
 msgid "View all Courses"
@@ -11047,6 +11052,13 @@ msgid ""
 "our {link_start}detailed FAQs{link_end} where most questions have already "
 "been answered."
 msgstr ""
+"תודה על ההודעה או המשוב שלך. בדרך כלל אנו מגיבים לבקשה תוך יום עסקים אחד, "
+"מיום שני עד יום שישי. בינתיים,  אנא בדוק את  {link_start}detailed "
+"FAQs{link_end} שלנו, שם רוב השאלות כבר נענו."
+
+#: lms/templates/help_modal.html
+msgid "- Select -"
+msgstr "-בחר-"
 
 #: lms/templates/help_modal.html
 msgid "problem"
@@ -11101,18 +11113,30 @@ msgid "Please try again later."
 msgstr "אנא נסה שוב מאוחר יותר"
 
 #: lms/templates/hidden_content.html
-msgid "The due date for this {subsection_format} has passed."
-msgstr "תאריך העיד עבור  {subsection_format} כבר חלף."
+msgid "The course has ended."
+msgstr "הקורס הסתיים"
+
+#: lms/templates/hidden_content.html
+msgid "The due date for this assignment has passed."
+msgstr "תאריך היעד למשימה זו עבר."
 
 #: lms/templates/hidden_content.html
 msgid ""
-"Because the due date has passed, this {subsection_format} is no longer "
-"available.{line_break}If you have completed this {subsection_format}, your "
-"grade is available on the {link_start}progress page{link_end}."
+"Because the course has ended, this assignment is no longer "
+"available.{line_break}If you have completed this assignment, your grade is "
+"available on the {link_start}progress page{link_end}."
 msgstr ""
-"כיוון שחלף תאריך היעד, {subsection_format} זה אינו זמין יותר.{line_break} אם"
-" ברצונך להשלים {subsection_format} זה, ציונך יהיה זמין ב{link_start} העמוד "
-"ההמשך {link_end}."
+"היות והקורס הסתיים, משימה זו אינה זמינה עוד. {line_break} אם השלמת את המשימה"
+" הזו, הציון שלך יהיה זמין ב-{link_start}progress page{link_end}."
+
+#: lms/templates/hidden_content.html
+msgid ""
+"Because the due date has passed, this assignment is no longer "
+"available.{line_break}If you have completed this assignment, your grade is "
+"available on the {link_start}progress page{link_end}."
+msgstr ""
+"היות ותאריך היעד עבר, משימה זו אינה זמינה עוד. {line_break} אם השלמת את "
+"המשימה הזו, הציון שלך יהיה זמין ב-{link_start}progress page{link_end}."
 
 #: lms/templates/imageannotation.html
 msgid "Note: only instructors may annotate."
@@ -11737,6 +11761,10 @@ msgstr ""
 #: lms/templates/seq_module.html
 msgid "Previous"
 msgstr "הקודם"
+
+#: lms/templates/seq_module.html
+msgid "Sequence"
+msgstr "רצף"
 
 #: lms/templates/seq_module.html
 msgid "Next"
@@ -13591,7 +13619,7 @@ msgstr "תאריך הגשה {date}"
 
 #: lms/templates/courseware/accordion.html
 msgid "{section_format} due {{date}}"
-msgstr ""
+msgstr "{section_format} ב- {{date}}"
 
 #: lms/templates/courseware/accordion.html
 msgid "This content is graded"
@@ -13864,7 +13892,7 @@ msgstr "תאריכים חשובים של הקורס"
 
 #: lms/templates/courseware/info.html
 msgid "Today is {date}"
-msgstr ""
+msgstr "היום {date}"
 
 #: lms/templates/courseware/news.html
 msgid "News - MITx 6.002x"
@@ -13915,6 +13943,8 @@ msgid ""
 "{student_name}, you have met the requirements for credit in this course. "
 "{a_start}Go to your dashboard{a_end} to purchase course credit."
 msgstr ""
+"{student_name}, עמדת בדרישות לקבלת נקודות זכות בקורס זה. {a_start} עבור אל "
+"לוח הבקרה שלך {a_end} על מנת לרכוש נקודות זכות לקורס."
 
 #: lms/templates/courseware/progress.html
 msgid "{student_name}, you have not yet met the requirements for credit."
@@ -13942,7 +13972,7 @@ msgstr "האימות נדחה"
 
 #: lms/templates/courseware/progress.html
 msgid "Completed by {date}"
-msgstr ""
+msgstr "הושלם ב- {date} "
 
 #: lms/templates/courseware/progress.html
 msgid "Upcoming"
@@ -14193,15 +14223,15 @@ msgstr "בקרוב"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Ended - {date}"
-msgstr ""
+msgstr "הסתיים -  {date}  "
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Started - {date}"
-msgstr ""
+msgstr "התחיל - {date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Starts - {date}"
-msgstr ""
+msgstr "מתחיל -  {date} "
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "View Archived Course"
@@ -15622,7 +15652,7 @@ msgstr "תאריך סיום הקורס:"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "No end date set"
-msgstr ""
+msgstr "לא הוגדר תאריך סיום"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Has the course started?"
@@ -16793,6 +16823,10 @@ msgstr "קבוצת למידה:"
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "(Learners not explicitly assigned to a cohort)"
 msgstr "(לומדים שלא הוקצו במפורש למחזור לימודים)"
+
+#: lms/templates/instructor/instructor_dashboard_2/send_email.html
+msgid "Learners in the {track_name} Track"
+msgstr "לומדים הנמצאים במסלול {track_name} "
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Subject: "
@@ -18095,6 +18129,7 @@ msgid ""
 "The verification deadline for {course_name} was {{date}}. Verification is no"
 " longer available."
 msgstr ""
+"תאריך היעד לאימות עבור {course_name} היה {{date}}. האימות אינו זמין יותר."
 
 #: lms/templates/verify_student/missed_deadline.html
 msgid ""
@@ -18207,12 +18242,12 @@ msgstr "אודות edX"
 
 #: themes/edx.org/lms/templates/footer.html
 msgid ""
-"© 2016 edX Inc.  All rights reserved except where noted.  EdX, Open edX and "
-"the edX and Open EdX logos are registered trademarks or trademarks of edX "
-"Inc."
+"© 2012-{year} edX Inc.  All rights reserved except where noted.  EdX, Open "
+"edX and the edX and Open EdX logos are registered trademarks or trademarks "
+"of edX Inc."
 msgstr ""
-"© 2016 edX Inc.‎ כל הזכויות שמורות, למעט כשמצוין אחרת‏. EdX‏, Open edX וסמלי"
-" הלוגו edX ו-Open EdX הם סימני מסחר רשומים או סימני מסחר של edX Inc.‎"
+"© -{year}2012 edX Inc.‎ כל הזכויות שמורות, למעט כשמצוין אחרת‏. EdX‏, Open "
+"edX וסמלי הלוגו edX ו-Open EdX הם סימני מסחר רשומים או סימני מסחר של "
 
 #: themes/edx.org/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
@@ -18565,6 +18600,9 @@ msgid ""
 "Staff or Admin role selects {em_start}Activate{em_end}. Only course team "
 "members with these roles can edit or delete an activated certificate."
 msgstr ""
+"על מנת להתחיל בהנפקת תעודות הקורס, בוחר חבר בצוות הקורס המשמש בתפקיד איש סגל"
+" או מנהל ב{em_start}הפעל{em_end}. רק חברי צוות הקורס בעלי תפקידים אלה יכולים"
+" לערוך או למחוק תעודה מופעלת."
 
 #: cms/templates/certificates.html
 msgid ""
@@ -18702,11 +18740,9 @@ msgstr "מזהה מיקום"
 
 #: cms/templates/container.html
 msgid ""
-"Use this ID when you create links to this unit from other course content. "
-"You enter the ID in the URL field."
+"To create a link to this unit from an HTML component in this course, enter "
+"\"/jump_to_id/<location ID>\" as the URL value."
 msgstr ""
-"השתמש במזהה זה כאשר אתה יוצר קישורים ליחידה זו מתוכן קורס אחר. עליך להזין את"
-" המזהה בכתובת ה-URL."
 
 #: cms/templates/container.html
 msgid "Location in Course Outline"
@@ -20973,7 +21009,7 @@ msgstr "סקירת הקורס"
 
 #: cms/templates/settings.html
 msgid "HTML Code Editor"
-msgstr ""
+msgstr "עורך קוד HTML"
 
 #: cms/templates/settings.html
 msgid ""
