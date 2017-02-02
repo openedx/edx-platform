@@ -216,6 +216,12 @@ FEATURES = {
 
     # Show Language selector
     'SHOW_LANGUAGE_SELECTOR': False,
+
+    # Set this to False to facilitate cleaning up invalid xml from your modulestore.
+    'ENABLE_XBLOCK_XML_VALIDATION': True,
+
+    # Allow public account creation
+    'ALLOW_PUBLIC_ACCOUNT_CREATION': True,
 }
 
 ENABLE_JASMINE = False

@@ -23,6 +23,7 @@ from django.contrib.auth.views import password_reset_confirm
 from django.contrib import messages
 from django.core.context_processors import csrf
 from django.core import mail
+from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse, NoReverseMatch, reverse_lazy
 from django.core.validators import validate_email, ValidationError
 from django.db import IntegrityError, transaction
@@ -1475,6 +1476,13 @@ def _do_create_account(form, custom_form=None):
 
     Note: this function is also used for creating test users.
     """
+    # Check if ALLOW_PUBLIC_ACCOUNT_CREATION flag turned off to restrict user account creation
+    if not configuration_helpers.get_value(
+            'ALLOW_PUBLIC_ACCOUNT_CREATION',
+            settings.FEATURES.get('ALLOW_PUBLIC_ACCOUNT_CREATION', True)
+    ):
+        raise PermissionDenied()
+
     errors = {}
     errors.update(form.errors)
     if custom_form:
@@ -1854,6 +1862,13 @@ def create_account(request, post_override=None):
     JSON call to create new edX account.
     Used by form in signup_modal.html, which is included into navigation.html
     """
+    # Check if ALLOW_PUBLIC_ACCOUNT_CREATION flag turned off to restrict user account creation
+    if not configuration_helpers.get_value(
+            'ALLOW_PUBLIC_ACCOUNT_CREATION',
+            settings.FEATURES.get('ALLOW_PUBLIC_ACCOUNT_CREATION', True)
+    ):
+        return HttpResponseForbidden(_("Account creation not allowed."))
+
     warnings.warn("Please use RegistrationView instead.", DeprecationWarning)
 
     try:
@@ -1953,6 +1968,8 @@ def auto_auth(request):
         user.save()
         profile = UserProfile.objects.get(user=user)
         reg = Registration.objects.get(user=user)
+    except PermissionDenied:
+        return HttpResponseForbidden(_("Account creation not allowed."))
 
     # Set the user's global staff bit
     if is_staff is not None:

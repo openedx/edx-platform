@@ -4,9 +4,9 @@ import copy
 from opaque_keys import InvalidKeyError
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden
 from django.core.urlresolvers import reverse
-from django.core.exceptions import ImproperlyConfigured, NON_FIELD_ERRORS, ValidationError
+from django.core.exceptions import ImproperlyConfigured, NON_FIELD_ERRORS, ValidationError, PermissionDenied
 from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect, csrf_exempt
@@ -298,6 +298,7 @@ class RegistrationView(APIView):
             HttpResponse: 400 if the request is not valid.
             HttpResponse: 409 if an account with the given username or email
                 address already exists
+            HttpResponse: 403 operation not allowed
         """
         data = request.POST.copy()
 
@@ -348,6 +349,8 @@ class RegistrationView(APIView):
                 for field, error_list in err.message_dict.items()
             }
             return JsonResponse(errors, status=400)
+        except PermissionDenied:
+            return HttpResponseForbidden(_("Account creation not allowed."))
 
         response = JsonResponse({"success": True})
         set_logged_in_cookies(request, response, user)

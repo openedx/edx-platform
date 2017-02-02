@@ -131,7 +131,7 @@ site_status_msg = get_site_status_msg(course_id)
               <div class="item nav-courseware-02">
                 <a class="btn-neutral btn-register" href="${reverse('course-specific-register', args=[course.id.to_deprecated_string()])}">${_("Register")}</a>
               </div>
-            % else:
+            % elif static.get_value('ALLOW_PUBLIC_ACCOUNT_CREATION', settings.FEATURES.get('ALLOW_PUBLIC_ACCOUNT_CREATION')):
               <div class="item nav-courseware-02">
                 <a class="btn-neutral btn-register" href="/register">${_("Register")}</a>
               </div>

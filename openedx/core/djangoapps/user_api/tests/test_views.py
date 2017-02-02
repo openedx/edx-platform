@@ -19,6 +19,7 @@ from pytz import UTC
 from social.apps.django_app.default.models import UserSocialAuth
 
 from django_comment_common import models
+from openedx.core.djangoapps.site_configuration.helpers import get_value
 from openedx.core.lib.api.test_utils import ApiTestCase, TEST_API_KEY
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import UserFactory
@@ -1724,6 +1725,24 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             self.assertHttpOK(response)
 
         self.assertContains(response, 'Kosovo')
+
+    def test_create_account_not_allowed(self):
+        """
+        Test case to check user creation is forbidden when ALLOW_PUBLIC_ACCOUNT_CREATION feature flag is turned off
+        """
+        def _side_effect_for_get_value(value, default=None):
+            """
+            returns a side_effect with given return value for a given value
+            """
+            if value == 'ALLOW_PUBLIC_ACCOUNT_CREATION':
+                return False
+            else:
+                return get_value(value, default)
+
+        with mock.patch('openedx.core.djangoapps.site_configuration.helpers.get_value') as mock_get_value:
+            mock_get_value.side_effect = _side_effect_for_get_value
+            response = self.client.post(self.url, {"email": self.EMAIL, "username": self.USERNAME})
+            self.assertEqual(response.status_code, 403)
 
 
 @httpretty.activate

@@ -28,6 +28,7 @@ from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from openedx.core.djangoapps.user_api.accounts.api import activate_account, create_account
 from openedx.core.djangoapps.user_api.accounts import EMAIL_MAX_LENGTH
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
+from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import UserFactory
 from student_account.views import account_settings_context, get_user_orders
@@ -701,3 +702,30 @@ class MicrositeLogistrationTests(TestCase):
         self.assertEqual(resp.status_code, 200)
 
         self.assertNotIn('<div id="login-and-registration-container"', resp.content)
+
+
+class AccountCreationTestCaseWithSiteOverrides(SiteMixin, TestCase):
+    """
+    Test cases for Feature flag ALLOW_PUBLIC_ACCOUNT_CREATION which when
+    turned off disables the account creation options in lms
+    """
+
+    def setUp(self):
+        """Set up the tests"""
+        super(AccountCreationTestCaseWithSiteOverrides, self).setUp()
+
+        # Set the feature flag ALLOW_PUBLIC_ACCOUNT_CREATION to False
+        self.site_configuration_values = {
+            'ALLOW_PUBLIC_ACCOUNT_CREATION': False
+        }
+        self.site_domain = 'testserver1.com'
+        self.set_up_site(self.site_domain, self.site_configuration_values)
+
+    def test_register_option_login_page(self):
+        """
+        Navigate to the login page and check the Register option is hidden when
+        ALLOW_PUBLIC_ACCOUNT_CREATION flag is turned off
+        """
+        response = self.client.get(reverse('signin_user'))
+        self.assertNotIn('<a class="btn-neutral" href="/register?next=%2Fdashboard">Register</a>',
+                         response.content)

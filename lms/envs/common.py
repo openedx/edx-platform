@@ -380,6 +380,9 @@ FEATURES = {
 
     # WIP -- will be removed in Ticket #TNL-4750.
     'ENABLE_TIME_ZONE_PREFERENCE': False,
+
+    # Allow public account creation
+    'ALLOW_PUBLIC_ACCOUNT_CREATION': True,
 }
 
 # Ignore static asset files on import which match this pattern
