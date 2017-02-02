@@ -274,6 +274,7 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
             'can_edit': context.get('can_edit', True),
             'can_edit_visibility': context.get('can_edit_visibility', True),
             'can_add': context.get('can_add', True),
+            'can_move': context.get('can_move', True)
         }
         html = render_to_string('studio_xblock_wrapper.html', template_context)
         frag = wrap_fragment(frag, html)

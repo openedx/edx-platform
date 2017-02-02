@@ -338,6 +338,7 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
                     'display_name': self.display_name or self.url_name,
                 }))
                 context['can_edit_visibility'] = False
+                context['can_move'] = False
                 self.render_children(context, fragment, can_reorder=False, can_add=False)
         # else: When shown on a unit page, don't show any sort of preview -
         # just the status of this block in the validation area.

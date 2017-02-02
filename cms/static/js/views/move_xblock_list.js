@@ -33,7 +33,8 @@ function($, Backbone, _, gettext, HtmlUtils, StringUtils, XBlockUtils, MoveXBloc
             section: gettext('Sections'),
             subsection: gettext('Subsections'),
             unit: gettext('Units'),
-            component: gettext('Components')
+            component: gettext('Components'),
+            group: gettext('Groups')
         },
 
         events: {
@@ -43,6 +44,7 @@ function($, Backbone, _, gettext, HtmlUtils, StringUtils, XBlockUtils, MoveXBloc
         initialize: function(options) {
             this.visitedAncestors = [];
             this.template = HtmlUtils.template(MoveXBlockListViewTemplate);
+            this.sourceXBlockInfo = options.sourceXBlockInfo;
             this.ancestorInfo = options.ancestorInfo;
             this.listenTo(Backbone, 'move:breadcrumbButtonPressed', this.handleBreadcrumbButtonPress);
             this.renderXBlockInfo();
@@ -53,6 +55,7 @@ function($, Backbone, _, gettext, HtmlUtils, StringUtils, XBlockUtils, MoveXBloc
                 this.$el,
                 this.template(
                     {
+                        sourceXBlockId: this.sourceXBlockInfo.id,
                         xblocks: this.childrenInfo.children,
                         noChildText: this.getNoChildText(),
                         categoryText: this.getCategoryText(),
@@ -123,10 +126,14 @@ function($, Backbone, _, gettext, HtmlUtils, StringUtils, XBlockUtils, MoveXBloc
          * Set parent and child XBlock categories.
          */
         setDisplayedXBlocksCategories: function() {
-            this.parentInfo.category = XBlockUtils.getXBlockType(
-                this.parentInfo.parent.get('category'),
-                this.visitedAncestors[this.visitedAncestors.length - 2]
-            );
+            var childCategory = 'component';
+            this.parentInfo.category = XBlockUtils.getXBlockType(this.parentInfo.parent.get('category'));
+            if (!_.contains(_.keys(this.categoryRelationMap), this.parentInfo.category)) {
+                if (this.parentInfo.category === 'split_test') {
+                    childCategory = 'group';    // This is just to show groups text on group listing.
+                }
+                this.categoryRelationMap[this.parentInfo.category] = childCategory;
+            }
             this.childrenInfo.category = this.categoryRelationMap[this.parentInfo.category];
         },
 
@@ -136,25 +143,19 @@ function($, Backbone, _, gettext, HtmlUtils, StringUtils, XBlockUtils, MoveXBloc
          * @returns {any} Integer or undefined
          */
         getCurrentLocationIndex: function() {
-            var category, ancestorXBlock, currentLocationIndex;
-
-            if (this.childrenInfo.category === 'component' || this.childrenInfo.children.length === 0) {
-                return currentLocationIndex;
-            }
-
-            category = this.childrenInfo.children[0].get('category');
-            ancestorXBlock = _.find(
-                this.ancestorInfo.ancestors, function(ancestor) { return ancestor.category === category; }
-            );
-
-            if (ancestorXBlock) {
-                _.each(this.childrenInfo.children, function(xblock, index) {
-                    if (ancestorXBlock.display_name === xblock.get('display_name') &&
-                        ancestorXBlock.id === xblock.get('id')) {
-                        currentLocationIndex = index;
-                    }
-                });
-            }
+            var self = this,
+                currentLocationIndex;
+            _.each(self.childrenInfo.children, function(xblock, index) {
+                if (xblock.get('id') === self.sourceXBlockInfo.id) {
+                    currentLocationIndex = index;
+                } else {
+                    _.each(self.ancestorInfo.ancestors, function(ancestor) {
+                        if (ancestor.display_name === xblock.get('display_name') && ancestor.id === xblock.get('id')) {
+                            currentLocationIndex = index;
+                        }
+                    });
+                }
+            });
 
             return currentLocationIndex;
         },
