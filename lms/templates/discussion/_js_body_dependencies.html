@@ -1,0 +1,40 @@
+## mako
+
+<%namespace name='static' file='/static_content.html'/>
+
+<%page args="disable_fast_preview=True" expression_filter="h"/>
+
+<%!
+from openedx.core.djangolib.js_utils import js_escaped_string
+%>
+
+<%include file="/mathjax_include.html" args="disable_fast_preview=disable_fast_preview"/>
+
+<%static:js group='discussion'/>
+
+## Add RequireJS definitions for each discussion class
+<%
+discussion_classes = [
+    ['Discussion', 'common/js/discussion/discussion'],
+    ['Content', 'common/js/discussion/content'],
+    ['DiscussionInlineView', 'common/js/discussion/views/discussion_inline_view'],
+    ['DiscussionThreadView', 'common/js/discussion/views/discussion_thread_view'],
+    ['DiscussionThreadListView', 'common/js/discussion/views/discussion_thread_list_view'],
+    ['DiscussionThreadProfileView', 'common/js/discussion/views/discussion_thread_profile_view'],
+    ['DiscussionUtil', 'common/js/discussion/utils'],
+    ['DiscussionCourseSettings', 'common/js/discussion/models/discussion_course_settings'],
+    ['DiscussionUser', 'common/js/discussion/models/discussion_user'],
+    ['NewPostView', 'common/js/discussion/views/new_post_view'],
+]
+%>
+<script type="text/javascript">
+    % for discussion_class in discussion_classes:
+        RequireJS.define(
+            '${discussion_class[1] | n, js_escaped_string}',
+            [],
+            function() {
+                return window['${discussion_class[0] | n, js_escaped_string}'];
+            }
+        );
+    % endfor
+</script>

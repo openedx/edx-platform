@@ -1,0 +1,57 @@
+<form>
+    <h3 class="modal-section-title"><%= gettext('Set as a Special Exam') %></h3>
+    <div class="modal-section-content has-actions">
+        <ul class="list-fields list-input exam-types" role="group" aria-label="<%- gettext('Exam Types') %>">
+            <li class="field-radio">
+                <label class="label">
+                    <input type="radio" name="exam_type" class="input input-radio no_special_exam" checked="checked"/>
+                    <%- gettext('None') %>
+                </label>
+            </li>
+            <li class="field-radio">
+                <label class="label">
+                    <input type="radio" name="exam_type" class="input input-radio timed_exam"
+                        aria-describedby="timed-exam-description" />
+                    <%- gettext('Timed') %>
+                </label>
+                <p class='field-message' id='timed-exam-description'> <%- gettext('Use a timed exam to limit the time learners can spend on problems in this subsection. Learners must submit answers before the time expires. You can allow additional time for individual learners through the Instructor Dashboard.') %> </p>
+            </li>
+            <% if (enable_proctored_exam) { %>
+                <li class="field-radio">
+                    <label class="label">
+                        <input type="radio" name="exam_type" class="input input-radio proctored_exam"
+                            aria-describedby="proctored-exam-description" />
+                        <%- gettext('Proctored') %>
+                    </label>
+                    <p class='field-message' id='proctored-exam-description'> <%- gettext('Proctored exams are timed and they record video of each learner taking the exam. The videos are then reviewed to ensure that learners follow all examination rules.') %> </p>
+                </li>
+                <li class="field-radio">
+                    <label class="label">
+                        <input type="radio" name="exam_type" class="input input-radio practice_exam"
+                            aria-describedby="practice-exam-description"/>
+                        <%- gettext('Practice Proctored') %>
+                    </label>
+                    <p class='field-message' id='practice-exam-description'> <%- gettext("Use a practice proctored exam to introduce learners to the proctoring tools and processes. Results of a practice exam do not affect a learner's grade.") %> </p>
+                </li>
+            <% } %>
+        </ul>
+        <ul class="list-fields list-input exam-options">
+            <li class="field field-text field-time-limit">
+                <label class="label">
+                    <%- gettext('Time Allotted (HH:MM):') %>
+                    <input type="text" value="" aria-describedby="time-limit-description" placeholder="HH:MM"
+                        class="time_limit release-time time input input-text" autocomplete="off" />
+                </label>
+                <p class='field-message' id='time-limit-description'><%- gettext('Select a time allotment for the exam. If it is over 24 hours, type in the amount of time. You can grant individual learners extra time to complete the exam through the Instructor Dashboard.') %></p>
+            </li>
+            <li class="field field-text field-exam-review-rules">
+                <label class="label">
+                    <%- gettext('Review Rules') %> 
+                    <textarea cols="50" maxlength="255" aria-describedby="review-rules-description"
+                        class="review-rules input input-text" autocomplete="off" />
+                </label>
+                <p class='field-message' id='review-rules-description'><%- gettext('Specify any additional rules or rule exceptions that the proctoring review team should enforce when reviewing the videos. For example, you could specify that calculators are allowed.') %></p>
+            </li>
+        </ul>
+    </div>
+</form>

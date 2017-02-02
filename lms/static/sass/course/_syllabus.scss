@@ -1,0 +1,60 @@
+div.syllabus {
+
+  padding: 2em 2.5em;
+
+  text-align: center;
+
+  h1 {
+    @extend .top-header
+  }
+
+  .notes {
+    margin: 0px auto 20px;
+  }
+
+  table {
+    table-layout: auto;
+    text-align: left;
+
+    margin: ($baseline/2) 0;
+
+    thead {
+      font-weight: bold;
+      border-bottom: 1px solid black;
+    }
+
+    tr.first {
+      td {
+        padding-top: 15px !important;
+      }
+    }
+
+    td {
+      border: none !important;
+      padding: 5px 10px !important;
+      vertical-align: middle;
+      font-size: 1em !important;
+      line-height: auto;
+
+      &.day, &.due, &.slides, &.assignment {
+        white-space: nowrap !important;
+      }
+
+      &.no_class {
+        text-align: center;
+      }
+
+      &.important {
+        color: red;
+      }
+
+      &.week_separator {
+        padding: 0px !important;
+
+        hr {
+          margin: ($baseline/2);
+        }
+      }
+    }
+  }
+}

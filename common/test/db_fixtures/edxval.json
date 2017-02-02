@@ -1,0 +1,113 @@
+[
+  {
+    "pk": 1,
+    "model": "edxval.profile",
+    "fields": {
+      "profile_name": "desktop_mp4"
+    }
+  },
+  {
+    "pk": 2,
+    "model": "edxval.profile",
+    "fields": {
+      "profile_name": "desktop_webm"
+    }
+  },
+  {
+    "pk": 3,
+    "model": "edxval.profile",
+    "fields": {
+      "profile_name": "mobile_high"
+    }
+  },
+  {
+    "pk": 4,
+    "model": "edxval.profile",
+    "fields": {
+      "profile_name": "mobile_low"
+    }
+  },
+  {
+    "pk": 5,
+    "model": "edxval.profile",
+    "fields": {
+      "profile_name": "youtube"
+    }
+  },
+  {
+    "pk": 1,
+    "model": "edxval.video",
+    "fields": {
+      "duration": 20.6,
+      "status": "File Complete",
+      "edx_video_id": "video_001",
+      "client_video_id": "Demo",
+      "created": "2015-07-30T10:14:50Z"
+    }
+  },
+  {
+    "pk": 1,
+    "model": "edxval.encodedvideo",
+    "fields": {
+      "profile": 3,
+      "created": "2015-07-30T10:14:50Z",
+      "url": "http://localhost:8777/intro.mp4",
+      "modified": "2015-07-30T10:14:50Z",
+      "video": 1,
+      "file_size": 15188012,
+      "bitrate": 672
+    }
+  },
+  {
+    "pk": 2,
+    "model": "edxval.encodedvideo",
+    "fields": {
+      "profile": 4,
+      "created": "2015-07-30T10:14:50Z",
+      "url": "http://localhost:8777/intro.mp4",
+      "modified": "2015-07-30T10:14:50Z",
+      "video": 1,
+      "file_size": 6185643,
+      "bitrate": 273
+    }
+  },
+  {
+    "pk": 3,
+    "model": "edxval.encodedvideo",
+    "fields": {
+      "profile": 1,
+      "created": "2015-07-30T10:14:50Z",
+      "url": "http://localhost:8777/intro.mp4",
+      "modified": "2015-07-30T10:14:50Z",
+      "video": 1,
+      "file_size": 56933999,
+      "bitrate": 2521
+    }
+  },
+  {
+    "pk": 4,
+    "model": "edxval.encodedvideo",
+    "fields": {
+      "profile": 2,
+      "created": "2015-07-30T10:14:50Z",
+      "url": "http://localhost:8777/intro.webm",
+      "modified": "2015-07-30T10:14:50Z",
+      "video": 1,
+      "file_size": 24415064,
+      "bitrate": 1081
+    }
+  },
+  {
+    "pk": 5,
+    "model": "edxval.encodedvideo",
+    "fields": {
+      "profile": 5,
+      "created": "2015-07-30T10:14:50Z",
+      "url": "zeYD3qMxKrI",
+      "modified": "2015-07-30T10:14:50Z",
+      "video": 1,
+      "file_size": 0,
+      "bitrate": 0
+    }
+  }
+]

@@ -1,0 +1,18 @@
+{
+  "subs-esLhHcdKGWvKs.srt": {
+    "contentType": "application/octet-stream",
+    "content_son": {
+      "category": "asset",
+      "course": "EdxTest101",
+      "name": "subs-esLhHcdKGWvKs.srt",
+      "org": "Edx",
+      "revision": null,
+      "tag": "c4x"
+    },
+    "displayname": "/invalid\\displayname/subs-esLhHcdKGWvKs.srt",
+    "filename": "/c4x/Edx/EdxTest101/asset/MyPathIsHere.srt",
+    "import_path": "subs-esLhHcdKGWvKs.srt",
+    "locked": false,
+    "thumbnail_location": null
+  }
+}

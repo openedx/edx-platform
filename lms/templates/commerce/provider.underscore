@@ -1,0 +1,27 @@
+<div class="provider-wrapper">
+  <div class="provider-info">
+    <%= interpolate(
+          gettext("You still need to visit the %(display_name)s website to complete the credit process."),
+          { display_name: display_name }, true
+        ) %>
+  </div>
+  <div class="provider-more-info">
+    <%= interpolate(
+          gettext("To finalize course credit, %(display_name)s requires %(platform_name)s learners to submit a credit request."),
+          { display_name: display_name, platform_name: platformName }, true
+        ) %>
+  </div>
+  <div class="provider-instructions">
+    <%= fulfillment_instructions %>
+  </div>
+</div>
+
+<div class="provider-buttons-logos">
+  <div class="provider-logo">
+    <%= interpolate("<img src='%s' alt='%s'></image>", [thumbnail_url, display_name]) %>
+  </div>
+  <div class="complete-order">
+    <%= interpolate('<button data-provider="%s" data-course-key="%s" data-username="%s" class="complete-course" onClick=completeOrder(this)>%s</button>', [id, course_key, username,
+        gettext( "Get Credit")]) %>
+  </div>
+</div>

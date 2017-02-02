@@ -1,0 +1,14 @@
+{
+    "simple_test": {
+        "test_string": "Course display name: %%COURSE_DISPLAY_NAME%%",
+        "expected": "Course display name: test_course"
+    },
+    "Multiple_test": {
+        "test_string": "We display %%COURSE_DISPLAY_NAME%% a lot here: %%COURSE_DISPLAY_NAME%% %%COURSE_DISPLAY_NAME%%",
+        "expected": "We display test_course a lot here: test_course test_course"
+    },
+    "Html_test": {
+        "test_string": "This string has some html: <h1>%%COURSE_DISPLAY_NAME%%</h1>",
+        "expected": "This string has some html: <h1>test_course</h1>"
+    }
+}

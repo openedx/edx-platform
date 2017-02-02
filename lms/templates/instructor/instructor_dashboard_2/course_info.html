@@ -1,0 +1,153 @@
+<%page args="section_data" expression_filter="h"/>
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
+%>
+
+%if settings.FEATURES.get('DISPLAY_ANALYTICS_ENROLLMENTS') or section_data.get('enrollment_message'):
+  <h3 class="hd hd-3">${_("Enrollment Information")}</h3>
+  <div class="enrollment-wrapper">
+    %if settings.FEATURES.get('DISPLAY_ANALYTICS_ENROLLMENTS'):
+      ## Translators: 'track' refers to the enrollment type ('honor', 'verified', or 'audit')
+      <% modes = section_data['enrollment_count'] %>
+        <table>
+            <caption class="tip">${_("Number of enrollees (admins, staff, and students) by track")}</caption>
+            <tr>
+                <th scope="row">${_("Verified")}</th><td>${modes['verified']}</td>
+            </tr>
+            <tr>
+                <th scope="row">${_("Audit")}</th><td>${modes['audit']}</td>
+            </tr>
+            <tr>
+                <th scope="row">${_("Honor")}</th><td>${modes['honor']}</td>
+            </tr>
+            <tr>
+                <th scope="row">${_("Professional")}</th><td>${modes['professional'] + modes['no-id-professional']}</td>
+            </tr>
+            <tr style="color:green;border-top:1px solid #000">
+                <th scope="row" style="padding-top:10px;">
+                    <strong>${_("Total")}</strong>
+                </th>
+                <td style="padding-top:10px;">
+                    <strong>${modes['total']}</strong>
+                </td>
+            </tr>
+        </table>
+      %elif section_data.get('enrollment_message'):
+        <p>${section_data['enrollment_message']}</p>
+      %endif
+  </div>
+  <hr>
+%endif
+
+<div class="basic-wrapper">
+  <h3 class="hd hd-3">${_("Basic Course Information")}</h3>
+
+  <ul class="list-input">
+    <li class="field text is-not-editable" id="field-course-organization">
+      <label for="course-organization">${_("Organization:")}</label>
+      <b>${ section_data['course_id'].org}</b>
+    </li>
+
+    <li class="field text is-not-editable" id="field-course-number">
+      <label for="course-number">${_("Course Number:")}</label>
+      <b>${ section_data['course_id'].course}</b>
+    </li>
+
+    <li class="field text is-not-editable" id="field-course-name">
+      <label for="course-name">${_("Course Name:")}</label>
+      <b>${ section_data['course_id'].run}</b>
+    </li>
+
+    <li class="field text is-not-editable" id="field-course-display-name">
+      <label for="course-display-name">${_("Course Display Name:")}</label>
+      <b>${ section_data['course_display_name']}</b>
+    </li>
+
+    <li class="field text is-not-editable" id="field-course-start-date">
+      <label for="course-start-date">${_("Course Start Date:")}</label>
+      <b class="localized-datetime" data-datetime="${section_data['start_date']}" data-timezone="${user_timezone}" data-language="${user_language}"></b>
+    </li>
+
+    <li class="field text is-not-editable" id="field-course-end-date">
+      <label for="course-end-date">${_("Course End Date:")}</label>
+        % if course.end is None:
+            <b>${_("No end date set")}</b>
+        % else:
+            <b class="localized-datetime" data-datetime="${section_data['end_date']}" data-timezone="${user_timezone}" data-language="${user_language}"></b>
+        % endif
+    </li>
+    <li class="field text is-not-editable" id="field-course-started">
+      <label for="start-date">${_("Has the course started?")}</label>
+
+      <b>${_("Yes") if section_data['has_started'] else _("No")}</b>
+
+    </li>
+
+    <li class="field text is-not-editable" id="field-course-ended">
+      <label for="start-date">${_("Has the course ended?")}</label>
+      %if section_data['has_ended']:
+      <b>${_("Yes")}</b>
+      %else:
+      <b>${_("No")}</b>
+      %endif
+    </li>
+
+    <li class="field text is-not-editable" id="field-course-num-sections">
+      <label for="course-num-sections">${_("Number of sections:")}</label>
+      <b>${ section_data['num_sections'] }</b>
+    </li>
+
+    <li class="field text is-not-editable" id="field-grade-cutoffs">
+      <label for="start-date">${_("Grade Cutoffs:")}</label>
+      <b>${ section_data['grade_cutoffs'] }</b>
+    </li>
+  </ul>
+
+  %if settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD', ''):
+      <p>
+        ## Translators: git is a version-control system; see http://git-scm.com/about
+        ${Text(_("View detailed Git import logs for this course {link_start}by clicking here{link_end}.")).format(
+            link_start=HTML('<a href="{}">').format(section_data['detailed_gitlogs_url']),
+            link_end=HTML('</a>')
+        )}
+      </p>
+  %endif
+
+</div>
+
+%if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
+  <div class="running-tasks-container action-type-container">
+    <hr>
+    <h3 class="hd hd-3"> ${_("Pending Tasks")} </h3>
+    <div class="running-tasks-section">
+      <p>${_("The status for any active tasks appears in a table below.")} </p>
+      <br />
+
+      <div class="running-tasks-table" data-endpoint="${ section_data['list_instructor_tasks_url'] }"></div>
+    </div>
+    <div class="no-pending-tasks-message"></div>
+  </div>
+
+%endif
+
+%if len(section_data['course_errors']):
+  <div class="course-errors-wrapper">
+    <hr>
+    <p>
+    <div class="toggle-wrapper">
+      <h3 class="hd hd-3 title">${_("Course Warnings")}:</h3>
+      <div class="triangle"></div>
+    </div>
+    <div class="course-errors-visibility-wrapper">
+      %for error in section_data['course_errors']:
+        <div class="course-error">
+          <code class=course-error-first>  ${ error[0] } </code><br>
+          <code class=course-error-second> ${ error[1] } </code>
+        </div>
+      %endfor
+    </div>
+    <p>
+  </div>
+<br>
+%endif

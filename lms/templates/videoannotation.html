@@ -1,0 +1,220 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='/static_content.html'/>
+${static.css(group='style-vendor-tinymce-content', raw=True)}
+${static.css(group='style-vendor-tinymce-skin', raw=True)}
+${static.css(group='style-xmodule-annotations', raw=True)}
+
+<div class="annotatable-wrapper">
+	<div class="annotatable-header">
+		% if display_name is not UNDEFINED and display_name is not None:
+			<h3 class="hd hd-2 annotatable-title">${display_name}</h3>
+		% endif
+	</div>
+	% if instructions_html is not UNDEFINED and instructions_html is not None:
+	<div class="annotatable-section shaded">
+		<div class="annotatable-section-title">
+		    ${_('Instructions')}
+		    <a class="annotatable-toggle annotatable-toggle-instructions expanded" href="javascript:void(0)">${_('Collapse Instructions')}</a>
+		</div>
+		<div class="annotatable-section-body annotatable-instructions">
+		    ${instructions_html}
+		</div>
+	</div>
+	% endif
+	<div class="annotatable-section">
+		<div class="annotatable-content">
+		    <div id="videoHolder">
+				<video id="vid1" class="video-js vjs-default-skin" controls preload="none" width="640" height="264" poster="${poster}">
+					<source src="${sourceUrl}" type='${typeSource}' />
+				</video>
+			</div>
+			<div id="catchDIV">
+				<div class="annotationListContainer">${_('You do not have any notes.')}</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+// TODO: Fix indentation in the following block
+(function (require) {
+    var init = function() {
+    function onClickHideInstructions(){
+		//Reset function if there is more than one event handler
+		$(this).off();
+		$(this).on('click',onClickHideInstructions);
+		var hide = $(this).html()=='Collapse Instructions'?true:false,
+			cls, txt,slideMethod;
+		txt = (hide ? 'Expand' : 'Collapse') + ' Instructions';
+		cls = (hide ? ['expanded', 'collapsed'] : ['collapsed', 'expanded']);
+		slideMethod = (hide ? 'slideUp' : 'slideDown');
+		$(this).text(txt).removeClass(cls[0]).addClass(cls[1]);
+		$(this).parents('.annotatable-section:first').find('.annotatable-instructions')[slideMethod]();
+	}
+	$('.annotatable-toggle-instructions').on('click', onClickHideInstructions);
+
+	//Grab uri of the course
+    var parts = window.location.href.split("/"),
+    	uri = '';
+	for (var index = 0; index <= 9; index += 1) uri += parts[index]+"/"; //Get the unit url
+	//Change uri in cms
+	var lms_location = $('.sidebar .preview-button').attr('href');
+	if (typeof lms_location!='undefined'){
+		uri = window.location.protocol;
+		for (var index = 0; index <= 9; index += 1) uri += lms_location.split("/")[index]+"/"; //Get the unit url
+	}
+	var unit_id = $('#sequence-list').find('.active').attr("data-element");
+    uri += unit_id;
+	var pagination = 100,
+	 is_staff = '${is_course_staff}' === 'True',
+        options = {
+        optionsAnnotator: {
+            permissions:{
+                user: {
+                    id:"${user.email}",
+                    name:"${user.username}"
+                },
+                userString: function (user) {
+                    if (user && user.name)
+                        return user.name;
+                    return user;
+                },
+                userId: function (user) {
+                    if (user && user.id)
+                        return user.id;
+                    return user;
+                },
+                permissions: {
+                        'read':   [],
+                        'update': ["${user.email}"],
+                        'delete': ["${user.email}"],
+                        'admin':  ["${user.email}"]
+                },
+                showViewPermissionsCheckbox: false,
+                showEditPermissionsCheckbox: false,
+                userAuthorize: function(action, annotation, user) {
+                    var token, tokens, _i, _len;
+                    if (annotation.permissions) {
+                      tokens = annotation.permissions[action] || [];
+                      if (is_staff){
+                      	return true;
+                      }
+                      if (tokens.length === 0) {
+                        return true;
+                      }
+                      for (_i = 0, _len = tokens.length; _i < _len; _i++) {
+                        token = tokens[_i];
+
+                        if (this.userId(user) === token) {
+
+                          return true;
+                        }
+                      }
+
+                      return false;
+                    } else if (annotation.user) {
+                      if (user) {
+                        return this.userId(user) === this.userId(annotation.user);
+                      } else {
+                        return false;
+                      }
+                    }
+                    return true;
+                  },
+            },
+            auth: {
+                token: "${token}"
+            },
+            store: {
+                // The endpoint of the store on your server.
+                prefix: "${annotation_storage}",
+
+                annotationData: {
+                    uri: uri,
+
+                },
+
+                urls: {
+                    // These are the default URLs.
+                    create:  '/create',
+                    read:    '/read/:id',
+                    update:  '/update/:id',
+                    destroy: '/delete/:id',
+                    search:  '/search'
+                },
+
+                loadFromSearch:{
+                    limit:pagination,
+                    offset:0,
+                    uri:uri,
+                    media:'video',
+		    userid:'${user.email}',
+                }
+            },
+        },
+        optionsVideoJS: {techOrder: ["html5","flash","youtube"]},
+        optionsRS: {},
+        optionsOVA: {posBigNew:'none'},
+        optionsRichText: {
+            tinymce:{
+                selector: "li.annotator-item textarea",
+                plugins: "media image codemirror",
+                menubar: false,
+                toolbar_items_size: 'small',
+                extended_valid_elements : "iframe[src|frameborder|style|scrolling|class|width|height|name|align|id]",
+                toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | image rubric | code ",
+            }
+        },
+    };
+
+	var imgURLRoot = "${settings.STATIC_URL}" + "js/vendor/ova/catch/img/";
+    var ova, Catch, annotator, catchOptions;
+    var startova = function() {
+    	//remove old instances
+        if (Annotator._instances.length !== 0) {
+          $('#videoHolder').annotator("destroy");
+        }
+        delete ova;
+        //Load the plugin Video/Text Annotation
+        ova = new OpenVideoAnnotation.Annotator($('#videoHolder'),options);
+
+        // TODO: Fix to avoid using global scope!
+        window.options = options;
+        window.ova = ova;
+        // END TODO
+
+        ova.annotator.addPlugin('Tags');
+        var userId = ('${default_tab}'.toLowerCase() === 'instructor') ?
+                '${instructor_email}':
+                '${user.email}';
+
+        //Catch
+        annotator = ova.annotator;
+        catchOptions = {
+                media:'video',
+                externalLink:false,
+                imageUrlRoot:imgURLRoot,
+                showMediaSelector: false,
+                showPublicPrivate: true,
+    	        userId:userId,
+                pagination:pagination,//Number of Annotations per load in the pagination,
+                flags:is_staff,
+                default_tab: "${default_tab}",
+                instructor_email: "${instructor_email}",
+                annotation_mode: "${annotation_mode}",
+            };
+        Catch = new CatchAnnotation($('#catchDIV'),catchOptions);
+        // TODO: Fix to avoid using global scope!
+        window.Catch = Catch;
+        // END TODO
+    }
+
+    startova();
+    };
+    try {
+        require(["ova"], init);
+    } catch(error) {
+        console.log("Error: " + error.message + " - Annotator not loaded in LMS.");
+    }
+}).call(this, require || RequireJS.require);
+</script>

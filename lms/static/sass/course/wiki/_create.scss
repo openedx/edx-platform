@@ -1,0 +1,72 @@
+form#wiki_revision {
+  float: left;
+  margin-right: flex-gutter(9);
+  width: flex-grid(6, 9);
+
+  label {
+    display: block;
+    margin-bottom: 7px ;
+  }
+
+  .CodeMirror-scroll {
+    min-height: 550px;
+    width: 100%;
+  }
+
+  .CodeMirror {
+    @extend textarea;
+    @include box-sizing(border-box);
+    font-family: monospace;
+    margin-bottom: $baseline;
+  }
+
+  textarea {
+    @include box-sizing(border-box);
+    margin-bottom: $baseline;
+    min-height: 450px;
+    width: 100%;
+  }
+
+  input[type="text"] {
+    display: block;
+    width: 50%;
+  }
+
+  #submit_delete {
+    background: none;
+    border: none;
+    box-shadow: none;
+    color: #999;
+    float: right;
+    font-weight: normal;
+    text-decoration: underline;
+  }
+
+  input[type="submit"] {
+    margin-top: $baseline;
+  }
+}
+
+#wiki_edit_instructions {
+  color: #666;
+  float: left;
+  margin-top: lh();
+  width: flex-grid(3, 9);
+
+  &:hover, &:focus {
+    color: #333;
+  }
+
+  .markdown-example {
+    background-color: #e3e3e3;
+    line-height: 1.0;
+    margin: 5px 0 7px;
+    padding: {
+      top: 5px;
+      right: 2px;
+      bottom: 5px;
+      left: 5px;
+    }
+    text-shadow: 0 1px 0 #fff;
+  }
+}

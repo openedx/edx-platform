@@ -1,0 +1,62 @@
+<div class="enrollment-search">
+    <form class="enrollment-form">
+        <label class="sr" for="enrollment-query-input"><%- gettext('Search') %></label>
+        <input
+            id="enrollment-query-input"
+            type="text"
+            name="query"
+            value="<%- user %>"
+            placeholder="<%- gettext('Username or email address') %>">
+        </input>
+        <input type="submit" value="<%- gettext('Search') %>" class="btn-disable-on-submit"></input>
+    </form>
+</div>
+
+<% if (enrollments.length > 0) { %>
+<div class="enrollment-results">
+  <table id="enrollment-table" class="enrollment-table display compact nowrap">
+    <thead>
+      <tr>
+        <th><%- gettext('Course ID') %></th>
+        <th><%- gettext('Course Start') %></th>
+        <th><%- gettext('Course End') %></th>
+        <th><%- gettext('Upgrade Deadline') %></th>
+        <th><%- gettext('Verification Deadline') %></th>
+        <th><%- gettext('Enrollment Date') %></th>
+        <th><%- gettext('Enrollment Mode') %></th>
+        <th><%- gettext('Verified mode price') %></th>
+        <th><%- gettext('Reason') %></th>
+        <th><%- gettext('Last modified by') %></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% enrollments.each(function (enrollment) { %>
+      <tr>
+        <td><% print(enrollment.get('course_id')) %></td>
+        <td><% print(formatDate(enrollment.get('course_start'))) %></td>
+        <td><% print(formatDate(enrollment.get('course_end'))) %></td>
+        <td><% print(formatDate(enrollment.get('verified_upgrade_deadline'))) %></td>
+        <td><% print(formatDate(enrollment.get('verification_deadline'))) %></td>
+        <td><% print(formatDate(enrollment.get('created'))) %></td>
+        <td><% print(enrollment.get('mode')) %></td>
+        <td><% print(enrollment.get('verified_price')) %></td>
+        <td><% print(enrollment.get('manual_enrollment').reason || gettext('N/A')) %></td>
+        <td><% print(enrollment.get('manual_enrollment').enrolled_by || gettext('N/A')) %></td>
+        <td>
+          <button
+              class="change-enrollment-btn"
+              data-modes="<%= _.pluck(enrollment.get('course_modes'), 'slug')%>"
+              data-course_id="<%= enrollment.get('course_id') %>"
+          >
+            <%- gettext('Change Enrollment') %>
+          </button>
+        </td>
+      </tr>
+      <% }); %>
+    </tbody>
+  </table>
+</div>
+
+<div class="enrollment-modal-wrapper is-hidden"></div>
+<% } %>

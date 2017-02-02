@@ -1,0 +1,10 @@
+<%!
+  from courseware.courses import get_course_about_section
+%>
+<%namespace name='static' file='static_content.html'/>
+
+<div id="video-modal" class="modal video-modal">
+  <div class="inner-wrapper">
+    ${get_course_about_section(request, course, "video")}
+  </div>
+</div>

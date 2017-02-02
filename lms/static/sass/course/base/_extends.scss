@@ -1,0 +1,205 @@
+// lms - course - extends
+// ====================
+
+// lms inner wrapper
+%inner-wrapper {
+  margin: 0 auto;
+  max-width: 1180px;
+  width: flex-grid(12);
+}
+
+// Older Course Extends - to review/remove with LMS cleanup
+h1.top-header {
+  border-bottom: 1px solid $border-color-2;
+  @include text-align(left);
+  font-size: em(24);
+  font-weight: 100;
+  padding-bottom: lh();
+}
+
+.button-reset {
+  text-transform: none;
+  letter-spacing: 0;
+
+  &:hover, &:focus {
+    text-decoration: none;
+  }
+}
+
+.light-button, a.light-button, // only used in askbot as classes
+.gray-button {
+  @include button(simple, $gray-l5);
+  @extend .button-reset;
+  font-size: em(13);
+}
+
+.blue-button {
+  @include button(simple, $blue);
+  @extend .button-reset;
+  font-size: em(13);
+}
+
+.pink-button {
+  @include button(simple, $pink);
+  @extend .button-reset;
+  font-size: em(13);
+}
+
+.content {
+  @include box-sizing(border-box);
+  display: table-cell;
+  padding: 2em 2.5em;
+  vertical-align: top;
+  width: flex-grid(9) + flex-gutter();
+
+  @media print {
+    box-shadow: none;
+  }
+}
+
+.sidebar {
+  @include box-sizing(border-box);
+  display: table-cell;
+  font-family: $sans-serif;
+  font-size: 14px;
+  position: relative;
+  vertical-align: top;
+  width: flex-grid(3);
+  background: $sidebar-color;
+
+  h1, h2, h3, h4 {
+   font-weight: bold;
+   letter-spacing: 0;
+   text-transform: none;
+   font-family: $sans-serif;
+   text-align: left;
+   font-style: normal;
+  }
+
+  h1 {
+    font-size: 18px;
+    margin-bottom: 15px;
+  }
+
+  h2 {
+    font-size: 16px;
+  }
+
+  h3 {
+    font-size: 14px;
+  }
+
+  h4 {
+    font-size: 12px;
+  }
+
+  a {
+    border: none;
+    font-style: normal;
+  }
+
+  .bottom-border {
+    border-bottom: 1px solid $border-color;
+  }
+
+  @media print {
+    display: none;
+  }
+
+  ul, ol {
+    margin: 0;
+    padding-left: 0;
+
+    li {
+      @include margin-left(20px);
+      background: none;
+      position: relative;
+      padding: 0;
+
+      a {
+        display: block;
+        line-height: lh();
+        font-size: 1em;
+        @include box-sizing(border-box);
+        padding: lh(.25) lh(0.5) lh(.25) 0;
+
+        &:hover, &:focus {
+          color: #666;
+          background: $gray-l6;
+        }
+      }
+    }
+  }
+
+  header#open_close_accordion {
+    position: relative;
+
+    a {
+      background: #f6f6f6 url('#{$static-path}/images/slide-left-icon.png') center center no-repeat;
+      border: 1px solid #D3D3D3;
+      border-radius: 3px 0 0 3px;
+      height: 16px;
+      padding: 6px;
+      position: absolute;
+      right: -1px;
+      text-indent: -9999px;
+      top: 12px;
+      width: 16px;
+      z-index: 99;
+
+      &:hover, &:focus {
+        background-color: white;
+      }
+    }
+  }
+
+  a.button {
+    text-decoration: none;
+  }
+}
+
+.topbar {
+  @extend .clearfix;
+  border-bottom: 1px solid $border-color;
+
+  @media print {
+    display: none;
+  }
+
+  a {
+    &.block-link {
+      border-left: 1px solid lighten($border-color, 10%);
+      display: block;
+
+      &:hover, &:focus {
+        background: none;
+      }
+    }
+  }
+}
+
+.tran {
+  @include transition( all .2s $ease-in-out-quad 0s);
+}
+
+// FontAwesome rtl chevron next
+.fa-chevron-next {
+  &:before {
+    @if $bi-app-direction == ltr {
+        content: "\f054"; // .fa-chevron-right
+    } @else if $bi-app-direction == rtl {
+        content: "\f053"; // .fa-chevron-left
+    }
+  }
+}
+
+// FontAwesome rtl chevron prev
+.fa-chevron-prev {
+  &:before {
+    @if $bi-app-direction == ltr {
+        content: "\f053"; // .fa-chevron-left
+    } @else if $bi-app-direction == rtl {
+        content: "\f054"; // .fa-chevron-right
+    }
+  }
+}

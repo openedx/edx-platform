@@ -1,0 +1,12 @@
+# This requirements file is only for python packages that need to be installed
+# for the edx-platform in testing environments. This includes:
+#   * Jenkins
+#   * devstack
+# Please do not use this file for packages that are needed in production
+#
+# DON'T JUST ADD NEW DEPENDENCIES!!!
+# If you have changes you would like to make, please consult with:
+#   * @edx/testeng - to discuss it's impact on test infrastructure
+#   * @edx/devops - to check system requirements
+
+pysqlite==2.8.3

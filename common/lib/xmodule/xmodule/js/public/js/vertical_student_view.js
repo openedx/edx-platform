@@ -1,0 +1,1 @@
+../../../assets/vertical/public/js/vertical_student_view.js

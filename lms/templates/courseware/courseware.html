@@ -1,0 +1,223 @@
+<%page expression_filter="h"/>
+<%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/>
+<%def name="online_help_token()"><% return "courseware" %></%def>
+<%!
+from django.utils.translation import ugettext as _
+from django.conf import settings
+
+from edxnotes.helpers import is_feature_enabled as is_edxnotes_enabled
+from openedx.core.djangolib.markup import HTML
+from openedx.core.djangolib.js_utils import js_escaped_string
+%>
+<%
+  include_special_exams = settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and (course.enable_proctored_exams or course.enable_timed_exams)
+%>
+<%def name="course_name()">
+ <% return _("{course_number} Courseware").format(course_number=course.display_number_with_default) %>
+</%def>
+
+<%block name="bodyclass">view-in-course view-courseware courseware ${course.css_class or ''}</%block>
+
+<%block name="title">
+<title data-base-title="${static.get_page_title_breadcrumbs(section_title, course_name())}">
+  ${static.get_page_title_breadcrumbs(sequence_title, section_title, course_name())}
+</title>
+</%block>
+
+<%block name="header_extras">
+
+% for template_name in ["image-modal"]:
+<script type="text/template" id="${template_name}-tpl">
+    <%static:include path="common/templates/${template_name}.underscore" />
+</script>
+% endfor
+
+% if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
+    % for template_name in ["course_search_item", "course_search_results", "search_loading", "search_error"]:
+        <script type="text/template" id="${template_name}-tpl">
+            <%static:include path="search/${template_name}.underscore" />
+        </script>
+    % endfor
+% endif
+
+% if include_special_exams:
+  % for template_name in ["proctored-exam-status"]:
+    <script type="text/template" id="${template_name}-tpl">
+        <%static:include path="courseware/${template_name}.underscore" />
+    </script>
+  % endfor
+% endif
+
+</%block>
+
+<%block name="headextra">
+<%static:css group='style-course-vendor'/>
+<%static:css group='style-course'/>
+## Utility: Notes
+% if is_edxnotes_enabled(course):
+<%static:css group='style-student-notes'/>
+% endif
+
+<script type="text/javascript" src="${static.url('js/jquery.autocomplete.js')}"></script>
+<script type="text/javascript" src="${static.url('js/src/tooltip_manager.js')}"></script>
+
+<link href="${static.url('css/vendor/jquery.autocomplete.css')}" rel="stylesheet" type="text/css">
+  ${HTML(fragment.head_html())}
+</%block>
+
+<%block name="js_extra">
+  <script type="text/javascript" src="${static.url('common/js/vendor/jquery.scrollTo.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
+
+  ## codemirror
+  <script type="text/javascript" src="${static.url('js/vendor/codemirror-compressed.js')}"></script>
+
+  <%static:js group='courseware'/>
+  <%include file="/mathjax_include.html" args="disable_fast_preview=True"/>
+
+  % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
+    <%static:require_module module_name="js/search/course/course_search_factory" class_name="CourseSearchFactory">
+        var courseId = $('.courseware-results').data('courseId');
+        CourseSearchFactory(courseId);
+    </%static:require_module>
+  % endif
+
+  <%static:require_module module_name="js/courseware/courseware_factory" class_name="CoursewareFactory">
+    CoursewareFactory();
+  </%static:require_module>
+
+  % if staff_access:
+  	<%include file="xqa_interface.html"/>
+  % endif
+
+  <script type="text/javascript">
+    var $$course_id = "${course.id | n, js_escaped_string}";
+  </script>
+
+${HTML(fragment.foot_html())}
+
+</%block>
+
+<div class="message-banner" aria-live="polite"></div>
+
+% if default_tab:
+  <%include file="/courseware/course_navigation.html" />
+% else:
+  <%include file="/courseware/course_navigation.html" args="active_page='courseware'" />
+% endif
+
+<div class="container">
+  <div class="course-wrapper" role="presentation">
+
+% if disable_accordion is UNDEFINED or not disable_accordion:
+    <div class="course-index">
+
+      <div class="wrapper-course-modes">
+
+          <div class="courseware-bookmarks-button" data-bookmarks-api-url="${bookmarks_api_url}">
+              <button type="button" class="bookmarks-list-button is-inactive" aria-pressed="false">
+                  ${_('Bookmarks')}
+              </button>
+          </div>
+
+          % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
+            <div id="courseware-search-bar" class="search-bar courseware-search-bar" role="search" aria-label="Course">
+              <form>
+                <label for="course-search-input" class="sr">${_('Course Search')}</label>
+                <div class="search-field-wrapper">
+                  <input id="course-search-input" type="text" class="search-field"/>
+                  <button type="submit" class="search-button">${_('Search')}</button>
+                  <button type="button" class="cancel-button" title="${_('Clear search')}">
+                    <span class="icon fa fa-remove" aria-hidden="true"></span>
+                  </button>
+                </div>
+              </form>
+            </div>
+          % endif
+
+      </div>
+
+      <div class="accordion">
+        <nav class="course-navigation" aria-label="${_('Course')}">
+          % if accordion.strip():
+            ${HTML(accordion)}
+          % else:
+            <div class="chapter">${_("No content has been added to this course")}</div>
+          % endif
+        </nav>
+      </div>
+
+    </div>
+% endif
+    <section class="course-content" id="course-content">
+        <div class="path"></div>
+        <main id="main" aria-label="Content" tabindex="-1">
+        % if getattr(course, 'entrance_exam_enabled') and \
+           getattr(course, 'entrance_exam_minimum_score_pct') and \
+           entrance_exam_current_score is not UNDEFINED:
+            % if not entrance_exam_passed:
+            <p class="sequential-status-message">
+                ${_('To access course materials, you must score {required_score}% or higher on this \
+                exam. Your current score is {current_score}%.').format(
+                    required_score=int(round(course.entrance_exam_minimum_score_pct * 100)),
+                    current_score=int(round(entrance_exam_current_score * 100))
+                )}
+            </p>
+            <script type="text/javascript">
+            $(document).ajaxSuccess(function(event, xhr, settings) {
+                if (settings.url.indexOf("xmodule_handler/problem_check") > -1) {
+                    var data = JSON.parse(xhr.responseText);
+                    if (data.entrance_exam_passed){
+                        location.reload();
+                    }
+                }
+            });
+            </script>
+            % else:
+              <p class="sequential-status-message">
+                ${_('Your score is {current_score}%. You have passed the entrance exam.').format(
+                    current_score=int(round(entrance_exam_current_score * 100))
+                )}
+            </p>
+            % endif
+        % endif
+
+          ${HTML(fragment.body_html())}
+        </main>
+    </section>
+
+    <section class="courseware-results-wrapper">
+      <div id="loading-message" aria-live="polite" aria-relevant="all"></div>
+      <div id="error-message" aria-live="polite"></div>
+      <div class="courseware-results search-results" data-course-id="${course.id}" data-lang-code="${language_preference}"></div>
+    </section>
+
+  </div>
+</div>
+<div class="container-footer">
+  % if settings.FEATURES.get("LICENSING", False):
+    <div class="course-license">
+    % if getattr(course, "license", None):
+      <%include file="../license.html" args="license=course.license" />
+    % else:
+      ## Default course license: All Rights Reserved, if none is explicitly set.
+      <%include file="../license.html" args="license='all-rights-reserved'" />
+    % endif
+    </div>
+  % endif
+</div>
+
+<nav class="nav-utilities ${"has-utility-calculator" if course.show_calculator else ""}" aria-label="${_('Course Utilities')}">
+  ## Utility: Notes
+  % if is_edxnotes_enabled(course):
+    <%include file="/edxnotes/toggle_notes.html" args="course=course"/>
+  % endif
+
+  ## Utility: Calc
+  % if course.show_calculator:
+    <%include file="/calculator/toggle_calculator.html" />
+  % endif
+</nav>
+
+<%include file="../modal/accessible_confirm.html" />
