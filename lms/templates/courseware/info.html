@@ -82,7 +82,8 @@ from openedx.core.djangolib.markup import HTML, Text
           % endif
 
           % if upgrade_banner:
-              <div class="upgrade-banner layout-1q3q layout-reversed">
+            <div class="upgrade-banner">
+                <div class="green-border"></div>
                 <div class="upgrade-icon">
                   <img src="${STATIC_URL}images/edx-verified-mini-cert.png">
                 </div>
@@ -95,7 +96,7 @@ from openedx.core.djangolib.markup import HTML, Text
                 <div class="upgrade-banner-button">
                   <a href="${upgrade_link}" class="btn-brand-green">${_("Upgrade Now")}</a>
                 </div>
-              </div>
+            </div>
           % endif
 
           <h4>${_("Course Updates and News")}</h4>

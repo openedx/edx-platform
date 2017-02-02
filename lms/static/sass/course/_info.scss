@@ -1,8 +1,3 @@
-
-@import '../edx-pattern-library-shims/base/variables';
-@import '../edx-pattern-library-shims/buttons';
-
-
 .home {
   @include clearfix();
   max-width: 1140px;
@@ -50,7 +45,7 @@ div.info-wrapper {
     @extend .content;
     @include padding-left($baseline);
     line-height: lh();
-    width: 100%;
+    width: 99%;
     display: block;
 
     h1,h3 {
@@ -61,44 +56,54 @@ div.info-wrapper {
       font-style: normal;
     }
 
-    .upgrade-banner {
+    div.upgrade-banner {
       // This banner uses the Pattern Library's defined variables
-      border-style: solid;
-      border-color: $uxpl-gray-background $uxpl-gray-background $uxpl-gray-background $uxpl-green-base;
-      border-width: 1px 1px 1px 10px;
-      max-height: 100px;
-      display: inline-flex;
+      background-color: $white;
+      border: 1px solid $uxpl-gray-background;
+      @include border-left(0px);
+      width: 100%;
+      display: table;
+
+      .green-border {
+        width: 10px;
+        height: 100%;
+        margin: 0;
+        vertical-align: top;
+        background: $uxpl-green-base;
+        display: table-cell;
+      }
+
+      .upgrade-icon {
+        vertical-align: top;
+        margin: $baseline;
+        display: inline-block;
+        img {
+          max-height: 50px;
+        }
+      }
 
       .upgrade-msg {
-        display: inline-block;
+        vertical-align: top;
         margin: $baseline 0 $baseline 0;
+        display: inline-block;
 
         h4 {
           font-weight: font-weight(semi-bold);
           font-size: font-size(large);
         }
         p {
-          margin-top: $baseline/4;
+          margin-top: $baseline / 4;
           font-weight: font-weight(normal);
           font-size: font-size(base);
         }
 
         a:link, a:hover, a:visited, a:active {
-          text-decoration: underline;
+          text-decoration: underline !important;
         }
-      }
-
-      .upgrade-icon {
-        display: inline-block;
-        margin: $baseline;
-
-        img {
-          max-height: 50px;
-        }
-
       }
 
       .upgrade-banner-button {
+        vertical-align: top;
         display: inline-block;
         margin: $baseline $baseline*2 $baseline $baseline*2;
       }
