@@ -53,11 +53,13 @@
     <% } %>
 </form>
 
-<div class="toggle-form">
-    <div class="section-title">
-        <h2>
-            <span class="text"><%- _.sprintf( gettext("New to %(platformName)s?"), context ) %></span>
-        </h2>
+<% if ( context.createAccountOption !== false ) { %>
+    <div class="toggle-form">
+        <div class="section-title">
+            <h2>
+                <span class="text"><%- _.sprintf( gettext("New to %(platformName)s?"), context ) %></span>
+            </h2>
+        </div>
+        <button class="nav-btn form-toggle" data-type="register"><%- gettext("Create an account") %></button>
     </div>
-    <button class="nav-btn form-toggle" data-type="register"><%- gettext("Create an account") %></button>
-</div>
+<% } %>

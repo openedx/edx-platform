@@ -14,9 +14,9 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
 from contentstore.models import PushNotificationConfig
+from contentstore.tests.test_course_settings import CourseTestCase
 from contentstore.tests.utils import parse_json, user, registration, AjaxEnabledTestClient
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from contentstore.tests.test_course_settings import CourseTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 import datetime
 from pytz import UTC
@@ -301,6 +301,34 @@ class AuthTestCase(ContentStoreTestCase):
 
         # re-request, and we should get a redirect to login page
         self.assertRedirects(resp, settings.LOGIN_REDIRECT_URL + '?next=/home/')
+
+    @mock.patch.dict(settings.FEATURES, {"ALLOW_PUBLIC_ACCOUNT_CREATION": False})
+    def test_signup_button_index_page(self):
+        """
+        Navigate to the home page and check the Sign Up button is hidden when ALLOW_PUBLIC_ACCOUNT_CREATION flag
+        is turned off
+        """
+        response = self.client.get(reverse('homepage'))
+        self.assertNotIn('<a class="action action-signup" href="/signup">Sign Up</a>', response.content)
+
+    @mock.patch.dict(settings.FEATURES, {"ALLOW_PUBLIC_ACCOUNT_CREATION": False})
+    def test_signup_button_login_page(self):
+        """
+        Navigate to the login page and check the Sign Up button is hidden when ALLOW_PUBLIC_ACCOUNT_CREATION flag
+        is turned off
+        """
+        response = self.client.get(reverse('login'))
+        self.assertNotIn('<a class="action action-signup" href="/signup">Sign Up</a>', response.content)
+
+    @mock.patch.dict(settings.FEATURES, {"ALLOW_PUBLIC_ACCOUNT_CREATION": False})
+    def test_signup_link_login_page(self):
+        """
+        Navigate to the login page and check the Sign Up link is hidden when ALLOW_PUBLIC_ACCOUNT_CREATION flag
+        is turned off
+        """
+        response = self.client.get(reverse('login'))
+        self.assertNotIn('<a href="/signup" class="action action-signin">Don&#39;t have a Studio Account? Sign up!</a>',
+                         response.content)
 
 
 class ForumTestCase(CourseTestCase):

@@ -368,6 +368,9 @@ FEATURES = {
 
     # Set this to False to facilitate cleaning up invalid xml from your modulestore.
     'ENABLE_XBLOCK_XML_VALIDATION': True,
+
+    # Allow public account creation
+    'ALLOW_PUBLIC_ACCOUNT_CREATION': True,
 }
 
 # Ignore static asset files on import which match this pattern
