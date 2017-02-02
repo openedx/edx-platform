@@ -27,13 +27,12 @@ class LicenseCourseTab(CourseTab):
         if not user:
             return True
         if not settings.FEATURES.get('CUSTOM_COURSES_EDX', False) or not course.enable_ccx:
+            # If ccx is not enable do not show License tab.
             return False
-        # Start: Added By Labster
-        # Hide the tab in CCX becasue it missleads to master course.
-        # This fix has to be removed after upgrading to Eucalyptus.
-        ccx_id = getattr(course.id, 'ccx', None)
-        if ccx_id is not None:
-            return False
-        # End: Added By Labster
+
+        if has_access(user, 'staff', course) or has_access(user, 'instructor', course):
+            # if user is staff or instructor then he can always see License tab.
+            return True
+
         role = CourseCcxCoachRole(course.id)
         return role.has_user(user)
