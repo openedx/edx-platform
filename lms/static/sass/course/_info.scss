@@ -64,8 +64,10 @@ div.info-wrapper {
     .upgrade-banner {
       // This banner uses the Pattern Library's defined variables
       border-style: solid;
-      border-color: $uxpl-gray-base $uxpl-gray-base $uxpl-gray-base $uxpl-green-base;
+      border-color: $uxpl-gray-background $uxpl-gray-background $uxpl-gray-background $uxpl-green-base;
       border-width: 1px 1px 1px 10px;
+      max-height: 100px;
+      display: inline-flex;
 
       .upgrade-msg {
         display: inline-block;
@@ -73,17 +75,33 @@ div.info-wrapper {
 
         h4 {
           font-weight: font-weight(semi-bold);
+          font-size: font-size(large);
         }
         p {
           margin-top: $baseline/4;
-          font-weight: font-weight(light);
+          font-weight: font-weight(normal);
+          font-size: font-size(base);
+        }
+
+        a:link, a:hover, a:visited, a:active {
+          text-decoration: underline;
         }
       }
 
       .upgrade-icon {
+        display: inline-block;
         margin: $baseline;
+
+        img {
+          max-height: 50px;
+        }
+
       }
 
+      .upgrade-banner-button {
+        display: inline-block;
+        margin: $baseline $baseline*2 $baseline $baseline*2;
+      }
     }
 
     > p {
