@@ -56,29 +56,31 @@
   {% endwith %}
   {% endif %}
 
-<main id="main" aria-label="Content" tabindex="-1">
-  <section class="container wiki {{ selected_tab }}" id="wiki-content">
-    <div class="wiki-wrapper">
-      {% block wiki_body %}
+<div class="container">
+  <div class="wiki-wrapper">
+    <main id="main" aria-label="Content" tabindex="-1">
+      <section class="wiki {{ selected_tab }}" id="wiki-content">
+        {% block wiki_body %}
 
-        {% block wiki_breadcrumbs %}{% endblock %}
+          {% block wiki_breadcrumbs %}{% endblock %}
 
-        {% if messages %}
-          {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">
-              <a class="close" data-dismiss="alert" href="#">&times;</a>
-              {{ message }}
-            </div>
-          {% endfor %}
-        {% endif %}
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-{{ message.tags }}">
+                <a class="close" data-dismiss="alert" href="#">&times;</a>
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
 
-        {% block wiki_contents %}{% endblock %}
+          {% block wiki_contents %}{% endblock %}
 
-      {% endblock %}
-    </div>
+        {% endblock %}
 
-  </section>
-</main>
+      </section>
+    </main>
+  </div>
+</div>
 
 {% endblock %}
 {% endwith %}
