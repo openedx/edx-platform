@@ -113,6 +113,7 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
             'invitation_only',
             'max_student_enrollments_allowed',
             'catalog_visibility',
+            'instructor_info'
         ]
         for attribute_name in fields_to_test:
             course_value = getattr(course, attribute_name)
@@ -203,6 +204,24 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
                 ],
                 "static_asset_path": "/my/abs/path",        # Absolute path
                 "certificates_show_before_end": True,
+                "instructor_info": {                        # Instructor info provided
+                    "instructors": [
+                        {
+                            "bio": "TestInstructor1 Bio.",
+                            "image": "/fake-image-path/image1.jpeg",
+                            "organization": "TestX",
+                            "name": "TestInstructor1",
+                            "title": "Test Title1"
+                        },
+                        {
+                            "bio": "TestInstructor2 Bio.",
+                            "image": "/fake-image-path/image2.jpeg",
+                            "organization": "TestX",
+                            "name": "TestInstructor2",
+                            "title": "Test Title2"
+                        }
+                    ]
+                }
             },
             {
                 "display_name": "",                         # Empty display name
@@ -213,6 +232,7 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
                 "static_asset_path": "my/relative/path",    # Relative asset path
                 "certificates_show_before_end": False,
                 "catalog_visibility": CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
+                "instructor_info": {},                      # Empty Instructor info
             },
             {
                 "display_name": "",                         # Empty display name
@@ -223,6 +243,7 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
                 "static_asset_path": "",                    # Empty asset path
                 "certificates_show_before_end": False,
                 "catalog_visibility": CATALOG_VISIBILITY_ABOUT,
+                "instructor_info": None,
             },
             {
                 #                                           # Don't set display name
