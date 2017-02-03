@@ -109,16 +109,7 @@ function(HTML5Video, Resizer) {
         // starts playing. Just after that configurations can be applied.
         state.videoPlayer.ready = _.once(function() {
             if (!state.isFlashMode() && state.speed != '1.0') {
-                // Work around a bug in the Youtube API that causes videos to
-                // play at normal speed rather than at the configured speed in
-                // Safari.  Setting the playback rate to 1.0 *after* playing
-                // started and then to the actual value tricks the player into
-                // picking up the speed setting.
-                if (state.browserIsSafari && state.isYoutubeType()) {
-                    state.videoPlayer.setPlaybackRate(1.0, false);
-                }
-
-                state.videoPlayer.setPlaybackRate(state.speed, true);
+                state.videoPlayer.setPlaybackRate(state.speed);
             }
         });
 
@@ -381,10 +372,7 @@ function(HTML5Video, Resizer) {
         }
     }
 
-    function setPlaybackRate(newSpeed, useCueVideoById) {
-        var duration = this.videoPlayer.duration(),
-            time = this.videoPlayer.currentTime;
-
+    function setPlaybackRate(newSpeed) {
         this.videoPlayer.player.setPlaybackRate(newSpeed);
     }
 
