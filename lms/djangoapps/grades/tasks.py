@@ -41,8 +41,11 @@ def recalculate_subsection_grade_v3(self, **kwargs):
     Latest version of the recalculate_subsection_grade task.  See docstring
     for _recalculate_subsection_grade for further description.
     """
-    log.error("\n\n\nSTARTING TASK RUN, THIS MESSAGE SHOULD ONLY APPEAR TWICE")
-    _recalculate_subsection_grade(self, **kwargs)
+    try:
+        log.error("\n\n\nSTARTING TASK RUN, THIS MESSAGE SHOULD ONLY APPEAR TWICE")
+        _recalculate_subsection_grade(self, **kwargs)
+    finally:
+        log.error("TASK RUN FINISHED\n\n\n")
 
 
 def _recalculate_subsection_grade(self, **kwargs):
@@ -68,6 +71,7 @@ def _recalculate_subsection_grade(self, **kwargs):
         score_db_table (ScoreDatabaseTableEnum): database table that houses
             the changed score. Used in conjunction with expected_modified_time.
     """
+    erics_awesome_debug_var = True
     try:
         course_key = CourseLocator.from_string(kwargs['course_id'])
         if not PersistentGradesEnabledFlag.feature_enabled(course_key):
@@ -90,7 +94,9 @@ def _recalculate_subsection_grade(self, **kwargs):
         has_database_updated = _has_db_updated_with_new_score(self, scored_block_usage_key, **kwargs)
 
         if not has_database_updated:
-            raise _retry_recalculate_subsection_grade(self, **kwargs)
+            log.error("IM USING THE FIRST RETRY YOU GUYS")
+            erics_awesome_debug_var = False
+            _retry_recalculate_subsection_grade(self, **kwargs)
 
         _update_subsection_grades(
             course_key,
@@ -99,12 +105,14 @@ def _recalculate_subsection_grade(self, **kwargs):
             kwargs['user_id'],
         )
     except Exception as exc:   # pylint: disable=broad-except
-        log.error("tnl-6244 grades unexpected failure: {}. task id: {}. kwargs={}".format(
-            repr(exc),
-            self.request.id,
-            kwargs,
-        ))
-        raise _retry_recalculate_subsection_grade(self, exc=exc, **kwargs)
+        if erics_awesome_debug_var:
+            log.error("IM USING THE SECOND RETRY YOU GUYS")
+            log.error("tnl-6244 grades unexpected failure: {}. task id: {}. kwargs={}".format(
+                repr(exc),
+                self.request.id,
+                kwargs,
+            ))
+            _retry_recalculate_subsection_grade(self, exc=exc, **kwargs)
 
 
 def _has_db_updated_with_new_score(self, scored_block_usage_key, **kwargs):
