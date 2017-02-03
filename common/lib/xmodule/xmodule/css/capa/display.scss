@@ -170,16 +170,10 @@ div.problem {
       width: 100%;
 
       &.choicegroup_correct {
-        @include status-icon($correct, "\f00c");
-        border: 2px solid $correct;
+        border: none;
 
         &:after {
           @include margin-left($baseline*.75);
-        }
-
-        // keep green for correct answers on hover.
-        &:hover {
-          border-color: $correct;
         }
       }
 
@@ -198,16 +192,10 @@ div.problem {
       }
 
       &.choicegroup_incorrect {
-        @include status-icon($incorrect, "\f00d");
-        border: 2px solid $incorrect;
+        border: none;
 
         &:after {
           @include margin-left($baseline*.75);
-        }
-
-        // keep red for incorrect answers on hover.
-        &:hover {
-          border-color: $incorrect;
         }
       }
 
