@@ -436,7 +436,7 @@ function(VideoPlayer) {
                     state.speed = '2.0';
                     state.videoPlayer.onPlay();
                     expect(state.videoPlayer.setPlaybackRate)
-                        .toHaveBeenCalledWith('2.0', true);
+                        .toHaveBeenCalledWith('2.0');
                     state.videoPlayer.onPlay();
                     expect(state.videoPlayer.setPlaybackRate.calls.count())
                         .toEqual(1);
@@ -943,9 +943,8 @@ function(VideoPlayer) {
                 state.isHtml5Mode.and.returnValue(false);
                 state.videoPlayer.isPlaying.and.returnValue(true);
                 VideoPlayer.prototype.setPlaybackRate.call(state, '0.75');
-                expect(state.videoPlayer.updatePlayTime).toHaveBeenCalledWith(60);
-                expect(state.videoPlayer.player.loadVideoById)
-                    .toHaveBeenCalledWith('videoId', 60);
+                expect(state.videoPlayer.player.setPlaybackRate)
+                    .toHaveBeenCalledWith('0.75');
             });
 
             it('in Flash mode and video not started', function() {
@@ -953,15 +952,7 @@ function(VideoPlayer) {
                 state.isHtml5Mode.and.returnValue(false);
                 state.videoPlayer.isPlaying.and.returnValue(false);
                 VideoPlayer.prototype.setPlaybackRate.call(state, '0.75');
-                expect(state.videoPlayer.updatePlayTime).toHaveBeenCalledWith(60);
-                expect(state.videoPlayer.seekTo).toHaveBeenCalledWith(60);
-                expect(state.trigger).toHaveBeenCalledWith(
-                    'videoProgressSlider.updateStartEndTimeRegion',
-                    {
-                        duration: 60
-                    });
-                expect(state.videoPlayer.player.cueVideoById)
-                    .toHaveBeenCalledWith('videoId', 60);
+                expect(state.videoPlayer.player.setPlaybackRate).toHaveBeenCalledWith('0.75');
             });
 
             it('in HTML5 mode', function() {
@@ -975,9 +966,7 @@ function(VideoPlayer) {
 
                 state.videoPlayer.isPlaying.and.returnValue(false);
                 VideoPlayer.prototype.setPlaybackRate.call(state, '1.0');
-                expect(state.videoPlayer.updatePlayTime).toHaveBeenCalledWith(60);
-                expect(state.videoPlayer.player.cueVideoById)
-                    .toHaveBeenCalledWith('videoId', 60);
+                expect(state.videoPlayer.player.setPlaybackRate).toHaveBeenCalledWith('1.0');
             });
         });
     });
