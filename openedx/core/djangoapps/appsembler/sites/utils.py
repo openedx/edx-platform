@@ -13,9 +13,6 @@ from organizations.api import add_organization
 from organizations.models import UserOrganizationMapping, Organization
 from openedx.core.djangoapps.theming.models import SiteTheme
 
-from oauth2_provider.generators import generate_client_secret, generate_client_id
-from oauth2_provider.models import get_application_model
-
 
 def get_initial_sass_variables():
     """
@@ -97,7 +94,6 @@ def json_to_sass(json_input):
 
 def bootstrap_site(site, organization_slug=None, user_email=None, password=None):
     from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
-    Application = get_application_model()
     # don't use create because we need to call save() to set some values automatically
     site_config = SiteConfiguration(site=site, enabled=True)
     site_config.save()
@@ -117,21 +113,10 @@ def bootstrap_site(site, organization_slug=None, user_email=None, password=None)
         organization = {}
     if user_email:
         user = User.objects.get(email=user_email)
-        client_id = generate_client_id()
-        client_secret = generate_client_secret()
-        Application.objects.create(
-                client_id=client_id,
-                client_secret=client_secret,
-                skip_authorization=True,
-                client_type=Application.CLIENT_CONFIDENTIAL,
-                authorization_grant_type=Application.GRANT_IMPLICIT,
-                redirect_uris=u"",
-                name=u"AMC-{0}".format(user_email),
-                user=user)
         UserOrganizationMapping.objects.create(user=user, organization=organization)
     else:
         user = {}
-    return organization, site, user, client_id, client_secret
+    return organization, site, user
 
 
 def delete_site(site_id):
