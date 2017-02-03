@@ -47,6 +47,7 @@ from simple_history.models import HistoricalRecords
 from track import contexts
 from xmodule_django.models import CourseKeyField, NoneToEmptyManager
 
+from .arbisoft import constants as arbi_constants
 from lms.djangoapps.badges.utils import badges_enabled
 from certificates.models import GeneratedCertificate
 from course_modes.models import CourseMode
@@ -421,6 +422,67 @@ class UserProfile(models.Model):
             Unicode cache key
         """
         return cls.PROFILE_COUNTRY_CACHE_KEY.format(user_id=user_id)
+
+
+class CandidateProfile(models.Model):
+    user = models.OneToOneField(User, unique=True, db_index=True, related_name='arbisoft_profile')
+    graduation_date = models.DateTimeField(blank=False, null=False)
+    phone_number = models.CharField(max_length=20, blank=False, null=False)
+    cgpa = models.DecimalField(max_digits=4, decimal_places=2, blank=False, null=False)
+    position_in_class = models.CharField(max_length=25, blank=False, null=False)
+    academic_projects = models.CharField(max_length=255, blank=False, null=False)
+    extra_curricular_activities = models.CharField(max_length=255, blank=False, null=False)
+    freelance_work = models.CharField(max_length=255, blank=False, null=False)
+    accomplishment = models.CharField(max_length=255, blank=False, null=False)
+    individuality_factor = models.CharField(max_length=255, blank=False, null=False)
+    ideal_organization = models.CharField(max_length=255, blank=False, null=False)
+    why_arbisoft = models.CharField(max_length=255, blank=False, null=False)
+    expected_salary = models.IntegerField(blank=False, null=False)
+    career_plan = models.CharField(max_length=255, blank=False, null=False)
+    references = models.CharField(max_length=255, blank=False, null=False)
+
+    other_studied_course = models.CharField(max_length=255, blank=True, null=True)
+    other_technology = models.CharField(max_length=255, blank=True, null=True)
+
+
+class CandidateCourse(models.Model):
+    """
+    Model to store all courses from a list of choices available studied by a candidate user.
+    """
+    candidate = models.ForeignKey(CandidateProfile, on_delete=models.CASCADE, null=True)
+    studied_course = models.CharField(
+        max_length=255,
+        blank=False,
+        choices=arbi_constants.STUDIED_COURSES,
+        default=arbi_constants.INTRO_TO_COMPUTING
+    )
+
+
+class CandidateExpertise(models.Model):
+    """
+    Model to store expertise level of candidate user from list of choices available with a list of rank levels.
+    """
+    candidate = models.ForeignKey(CandidateProfile, on_delete=models.CASCADE, null=True)
+    expertise = models.CharField(
+        max_length=255,
+        blank=False,
+        choices=arbi_constants.EXPERTISE,
+        default=arbi_constants.INTRO_TO_COMPUTING
+    )
+    rank = models.IntegerField(blank=False)
+
+
+class CandidateTechnology(models.Model):
+    """
+    Model to store all technologies from a list of choices available in which a candidate user is interested.
+    """
+    candidate = models.ForeignKey(CandidateProfile, on_delete=models.CASCADE, null=True)
+    technology = models.CharField(
+        max_length=255,
+        blank=False,
+        choices=arbi_constants.TECHNOLOGIES,
+        default=arbi_constants.PYTHON_DJANGO
+    )
 
 
 @receiver(models.signals.post_save, sender=UserProfile)

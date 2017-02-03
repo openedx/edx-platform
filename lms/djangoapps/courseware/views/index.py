@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.context_processors import csrf
 from django.core.urlresolvers import reverse
-from django.http import Http404
+from django.http import Http404, HttpResponseRedirect
 from django.utils.decorators import method_decorator
 from django.utils.timezone import UTC
 from django.views.decorators.cache import cache_control
@@ -32,6 +32,7 @@ from shoppingcart.models import CourseRegistrationCode
 from student.models import CourseEnrollment
 from student.views import is_course_blocked
 from student.roles import GlobalStaff
+from util.arbisoft_utils import is_survey_required
 from util.views import ensure_valid_course_key
 from xmodule.modulestore.django import modulestore
 from xmodule.x_module import STUDENT_VIEW
@@ -86,6 +87,12 @@ class CoursewareIndex(View):
             section (unicode): section url_name
             position (unicode): position in module, eg of <sequential> module
         """
+
+        # check if we need user profile survey before user can access course
+        if is_survey_required(request.user):
+            redirect_uri = reverse('arbisoft_survey')
+            return HttpResponseRedirect(redirect_uri)
+
         self.course_key = CourseKey.from_string(course_id)
         self.request = request
         self.original_chapter_url_name = chapter

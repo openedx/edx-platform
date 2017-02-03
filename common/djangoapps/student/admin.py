@@ -11,7 +11,8 @@ from xmodule.modulestore.django import modulestore
 from config_models.admin import ConfigurationModelAdmin
 from student.models import (
     UserProfile, UserTestGroup, CourseEnrollmentAllowed, DashboardConfiguration, CourseEnrollment, Registration,
-    PendingNameChange, CourseAccessRole, LinkedInAddToProfileConfiguration, UserAttribute, LogoutViewConfiguration
+    PendingNameChange, CourseAccessRole, LinkedInAddToProfileConfiguration, UserAttribute, LogoutViewConfiguration,
+    CandidateProfile, CandidateCourse, CandidateExpertise, CandidateTechnology
 )
 from student.roles import REGISTERED_ACCESS_ROLES
 
@@ -164,6 +165,30 @@ class UserProfileInline(admin.StackedInline):
 class UserAdmin(BaseUserAdmin):
     """ Admin interface for the User model. """
     inlines = (UserProfileInline,)
+
+
+@admin.register(CandidateProfile)
+class CandidateProfileAdmin(admin.ModelAdmin):
+    class Meta(object):
+        model = CandidateProfile
+
+
+@admin.register(CandidateCourse)
+class CandidateCourseAdmin(admin.ModelAdmin):
+    class Meta(object):
+        model = CandidateCourse
+
+
+@admin.register(CandidateExpertise)
+class CandidateExpertiseAdmin(admin.ModelAdmin):
+    class Meta(object):
+        model = CandidateExpertise
+
+
+@admin.register(CandidateTechnology)
+class CandidateTechnologyAdmin(admin.ModelAdmin):
+    class Meta(object):
+        model = CandidateTechnology
 
 
 @admin.register(UserAttribute)

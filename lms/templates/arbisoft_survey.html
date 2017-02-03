@@ -1,0 +1,191 @@
+<%inherit file="arbisoft_main.html" />
+<%def name="online_help_token()"><% return "learnerdashboard" %></%def>
+<%def name="get_label(name)">
+<%
+    labels = {
+        "graduation_date": "Graduating on",
+        "phone_number": "Contact number",
+        "cgpa": "CGPA",
+        "position_in_class": "Position in class",
+        "academic_projects": "Tell us something about your university project(s)",
+        "extra_curricular_activities": "List down any extra curricular activities you're involved in(if any)",
+        "freelance_work": "Mention any freelance work you do/have done?",
+        "accomplishment": "Your biggest accomplishment to-date?",
+        "individuality_factor": "What makes you different from your batch mates?",
+        "ideal_organization": "Describe your ideal organization?",
+        "why_arbisoft": "Why Arbisoft?",
+        "expected_salary": "Your salary expectations?",
+        "career_plan": "Your career plans two years down the line?",
+        "references": "Mention two university references along with their position and contact number",
+        "other_studied_course": "Other Studied Course",
+        "other_technology": "Other Technology",
+        "expertise_ranking": "Mark the courses you are an expert at scale of 1 to 5, where 5 being expert and 1 being the least expert",
+        "studied_course": "Check mark the courses you studied",
+        "technology": "Mark the technology you'd like to work on/learn"
+    }
+    return labels.get(name, "Please enter:")
+%>
+</%def>
+<%namespace name='static' file='static_content.html'/>
+<%block name="headextra">
+  <%static:css group='style-course-vendor'/>
+  <%static:css group='style-vendor-tinymce-content'/>
+  <%static:css group='style-vendor-tinymce-skin'/>
+  <%static:css group='style-course'/>
+</%block>
+<%block name="jsextra">
+  <script src="${static.url('js/vendor/timepicker/jquery.timepicker.js')}"></script>
+  <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
+  <style>
+    .ui-timepicker-list { z-index: 100000; }
+    .ui-datepicker { z-index: 100000 !important; }
+    input.date, input.time { width: auto !important; display: inline !important; }
+  </style>
+</%block>
+
+<style>
+    .login-register .form-field input, .financial-assistance-wrapper .financial-assistance-form .form-field input {
+        height: auto;
+    }
+    .form-field input[type="radio"] {
+        width: 1em;
+    }
+    .multiselect-div {
+        padding: 10px 0;
+        border-top: 1px solid #ccc;
+    }
+    .multiselect-div ul {
+        list-style: outside none none;
+        margin: 5px;
+        padding: 0;
+    }
+    .multiselect-div > ul li {
+        margin-right: 35px;
+        padding: 0;
+    }
+    .ranking-div {
+        clear: both;
+        padding: 10px 0;
+        border-top: 1px solid #ccc;
+    }
+    .course-title {
+        display: inline-block;
+        line-height: 1.4;
+        width: 270px;
+    }
+    .ranking-div ul {
+        clear: both;
+        float: right;
+        list-style: outside none none;
+        margin: 5px;
+        padding: 0;
+    }
+    .ranking-div > ul li {
+        float: left;
+        margin-right: 35px;
+        padding: 0;
+    }
+    .login-register .form-field label, .financial-assistance-wrapper .financial-assistance-form .form-field label {
+        font-weight: 600;
+    }
+    .error-message-title {
+      color: red !important;
+    }
+</style>
+
+<%!
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+from django.template import RequestContext
+import third_party_auth
+from third_party_auth import pipeline
+from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
+from openedx.core.djangolib.markup import HTML, Text
+%>
+
+<main id="main" aria-label="Content" tabindex="-1">
+    <div class="login-register">
+      <div class="form-type">
+          <div class="form-wrapper">
+              <div class="status">This form must be filled before you can attempt the test</div>
+              %if profile.errors:
+                <div class="status submission-error" aria-live="polite">
+                    <h4 class="message-title">We couldn't save your details.</h4>
+                    <div class="message-copy">Please enter correct values for highlighted fields</div>
+                </div>
+              %endif
+            <form method="POST" action="/arbisoft_survey" class="post-form">
+                <div class="section-title lines">
+                    <h2>
+                        <span class="text">Complete Your Registration</span>
+                    </h2>
+                </div>
+                <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+                %for element in profile:
+
+                     %if element.name != 'other_studied_course' and element.name != 'other_technology':
+                         %if element.name == 'studied_course' or element.name == 'technology':
+                             <div class="form-field multiselect-div">
+                         %elif element.name == 'graduation_date':
+                             <div class="form-field datepair">
+                         %else:
+                            <div class="form-field">
+                         %endif
+                            <label for="id_${element.name}">${get_label(element.name)}
+                            %for error in element.errors:
+                                <span class="error-message-title">&nbsp; ${error}</span>
+                            %endfor
+                            </label>
+                            ${element}
+
+                         </div>
+                     %endif
+                     %if element.name == 'studied_course':
+                         <div class="form-field">
+                             <label for="id_${profile['other_studied_course'].name}">
+                                 ${get_label(profile['other_studied_course'].name)}
+                             </label>
+                             ${profile['other_studied_course']}
+                         </div>
+                     %endif
+                     %if element.name == 'technology':
+                         <div class="form-field">
+                             <label for="id_${profile['other_technology'].name}">
+                                ${get_label(profile['other_technology'].name)}
+                             </label>
+                             ${profile['other_technology']}
+                         </div>
+                     %endif
+                    <br/>
+                %endfor
+                <div class="form-field">
+                    <label>${get_label('expertise_ranking')}</label>
+                    ${ ranking_formset.management_form }
+                    %for form in ranking_formset:
+                        <div class="ranking-div">
+                            %for field in form:
+                                %if field.name == 'expertise':
+                                    <span class="course-title">${field.value()}</span>
+                                %endif
+                                ${field}
+                            %endfor
+                        </div>
+                    %endfor
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="action action-primary">Submit Your details</button>
+                </div>
+            </form>
+          </div>
+      </div>
+    </div>
+<script>
+    console.log("date time picker");
+    $('.datepair .date').datepicker({
+        'dateFormat': 'yy-mm-dd',
+        'autoclose': true
+    });
+</script>
+</main>
+
+

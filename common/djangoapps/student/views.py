@@ -26,7 +26,15 @@ from django.core import mail
 from django.core.urlresolvers import reverse, NoReverseMatch, reverse_lazy
 from django.core.validators import validate_email, ValidationError
 from django.db import IntegrityError, transaction
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseServerError, Http404
+from django.http import (
+    HttpResponse,
+    HttpResponseBadRequest,
+    HttpResponseForbidden,
+    HttpResponseServerError,
+    Http404,
+    HttpResponseRedirect
+)
+from django.forms import modelformset_factory
 from django.shortcuts import redirect
 from django.utils.encoding import force_bytes, force_text
 from django.utils.translation import ungettext
@@ -47,6 +55,7 @@ from social.exceptions import AuthException, AuthAlreadyAssociated
 from edxmako.shortcuts import render_to_response, render_to_string
 
 from course_modes.models import CourseMode
+from enrollment.api import add_enrollment, get_enrollment
 from shoppingcart.api import order_history
 from student.models import (
     Registration, UserProfile,
@@ -54,7 +63,13 @@ from student.models import (
     CourseEnrollmentAllowed, UserStanding, LoginFailures,
     create_comments_service_user, PasswordHistory, UserSignupSource,
     DashboardConfiguration, LinkedInAddToProfileConfiguration, ManualEnrollmentAudit, ALLOWEDTOENROLL_TO_ENROLLED,
-    LogoutViewConfiguration)
+    LogoutViewConfiguration,
+    CandidateProfile,
+    CandidateCourse,
+    CandidateExpertise,
+    CandidateTechnology
+)
+from .arbisoft import constants as arbi_constants
 from student.forms import AccountCreationForm, PasswordResetFormNoActive, get_registration_extension_form
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification  # pylint: disable=import-error
@@ -90,6 +105,7 @@ from lang_pref import LANGUAGE_KEY
 import track.views
 
 import dogstats_wrapper as dog_stats_api
+from util.arbisoft_utils import is_survey_required
 
 from util.db import outer_atomic
 from util.json_request import JsonResponse
@@ -544,8 +560,84 @@ def is_course_blocked(request, redeemed_registration_codes, course_key):
 
 @login_required
 @ensure_csrf_cookie
+def arbisoft_survey(request):
+    from .arbisoft.form import (
+        CandidateProfileForm,
+        CandidateExpertiseForm,
+    )
+    profile_form = CandidateProfileForm(request.POST or None)
+
+    CourseRankingFormset = modelformset_factory(
+        CandidateExpertise, form=CandidateExpertiseForm, extra=len(arbi_constants.EXPERTISE)
+    )
+
+    course_ranking_formset = CourseRankingFormset(
+        queryset=CandidateExpertise.objects.none(),
+        initial=[
+            {'expertise': course_id, 'rank': 1}
+            for course_id, course_name in arbi_constants.EXPERTISE
+        ]
+    )
+
+    context = {
+        'profile': profile_form,
+        'ranking_formset': course_ranking_formset,
+    }
+
+    if request.method == "POST":
+        ranking_formset = CourseRankingFormset(data=request.POST)
+
+        details_valid = ranking_formset.is_valid() and profile_form.is_valid()
+
+        if details_valid:
+            with transaction.atomic():
+                user = request.user
+                print "saving ", request.method, request.user.username
+                profile = profile_form.save(commit=False)
+                profile.user = user
+                profile.save()
+
+                for rank_form in ranking_formset:
+                    rank = rank_form.save(commit=False)
+                    rank.candidate = profile
+                    rank.save()
+
+                courses = profile_form.cleaned_data['studied_course']
+                CandidateCourse.objects.bulk_create([
+                    CandidateCourse(candidate=profile, studied_course=course)
+                    for course in courses
+                ])
+
+                technologies = profile_form.cleaned_data['technology']
+                CandidateTechnology.objects.bulk_create([
+                    CandidateTechnology(candidate=profile, technology=technology)
+                    for technology in technologies
+                ])
+
+                # make user active here
+                user.is_active = True
+                user.save()
+
+                # enroll user in course
+                course_id = settings.ARBISOFT_FRESH_GRAD_COURSE_ID
+                if not get_enrollment(user.username, course_id):
+                    add_enrollment(user.username, course_id)
+
+            redirect_uri = reverse('dashboard')
+            return HttpResponseRedirect(redirect_uri)
+
+    return render_to_response('arbisoft_survey.html', context)
+
+
+@login_required
+@ensure_csrf_cookie
 def dashboard(request):
     user = request.user
+
+    # check if we need user profile survey before user can access course
+    if is_survey_required(user):
+        redirect_uri = reverse('arbisoft_survey')
+        return HttpResponseRedirect(redirect_uri)
 
     platform_name = configuration_helpers.get_value("platform_name", settings.PLATFORM_NAME)
 
