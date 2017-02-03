@@ -14,6 +14,7 @@
 .courseware-bookmarks-button {
   width: flex-grid(5);
   vertical-align: top;
+  display: none;
 
   .bookmarks-list-button {
     @extend %ui-clear-button;
