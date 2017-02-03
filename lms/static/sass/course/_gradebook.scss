@@ -1,0 +1,231 @@
+$cell-border-color: #e1e1e1;
+$table-border-color: #c8c8c8;
+
+.no-select {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+div.gradebook-wrapper {
+
+  section.gradebook-content {
+    @extend .content;
+    display: block;
+    width: 100%;
+    @include clearfix();
+
+    .student-search {
+    	padding: 0 $baseline 0 ($baseline*0.75);
+    }
+
+    .student-search-field {
+    	width: 100%;
+    	height: 27px;
+    	padding: 0 ($baseline*0.75) 0 35px;
+    	@include box-sizing(border-box);
+    	border-radius: 13px;
+    	border: 1px solid $table-border-color;
+    	background: url('#{$static-path}/images/search-icon.png') no-repeat 9px center $gray-l6;
+    	font-family: $sans-serif;
+    	font-size: 11px;
+    	box-shadow: 0 1px 4px rgba(0, 0, 0, .12) inset;
+    	@include transition(border-color .15s linear 0s);
+
+    	&::-webkit-input-placeholder,
+    	&::-moz-input-placeholder {
+    		font-style: italic;
+    	}
+
+    	&:focus {
+    		border-color: #1d9dd9;
+    	}
+    }
+
+    .student-table {
+		float: left;
+		width: 24%;
+		border-radius: 3px 0 0 3px;
+		color: #3c3c3c;
+
+		th {
+			height: 50px;
+		}
+
+		tr:first-child td {
+			border-top: 1px solid $table-border-color;
+			border-radius: ($baseline/4) 0 0 0;
+		}
+
+		tr:last-child td {
+			border-bottom: 1px solid $table-border-color;
+			border-radius: 0 0 0 ($baseline/4);
+		}
+
+		td {
+			height: 50px;
+			padding-left: $baseline;
+			border-bottom: 1px solid $cell-border-color;
+			border-left: 1px solid $table-border-color;
+			background: $gray-l5;
+			font-size: 13px;
+			line-height: 50px;
+		}
+
+		tr:nth-child(odd) td {
+			background-color: #fbfbfb;
+		}
+	}
+
+	.grade-book-footer {
+	    position: relative;
+	    top: 15px;
+		width: 100%;
+		border: 0;
+		box-shadow: 0;
+		text-align: center;
+	    display: inline-block;
+	}
+
+	.grades {
+		position: relative;
+		float: left;
+		width: 76%;
+		overflow-x: auto;
+		overflow-y: hidden;
+
+		.left-shadow,
+		.right-shadow {
+			@extend %ui-depth4;
+			position: absolute;
+			top: 0;
+			width: 20px;
+			pointer-events: none;
+		}
+
+		.left-shadow {
+			left: 0;
+			background-image: -webkit-gradient(linear, left, $shadow-l1, $transparent 20%), -webkit-gradient(linear, left, $shadow-l1, $transparent);
+			background-image:  -webkit-linear-gradient(left, $shadow-l1, $transparent 20%), -webkit-linear-gradient(left, $shadow-l1, $transparent);
+			background-image:     -moz-linear-gradient(left, $shadow-l1, $transparent 20%), -moz-linear-gradient(left, $shadow-l1, $transparent);
+			background-image:      -ms-linear-gradient(left, $shadow-l1, $transparent 20%), -ms-linear-gradient(left, $shadow-l1, $transparent);
+			background-image:       -o-linear-gradient(left, $shadow-l1, $transparent 20%), -o-linear-gradient(left, $shadow-l1, $transparent);
+		}
+
+		.right-shadow {
+			right: 0;
+			background-image: -webkit-gradient(linear, right, $shadow-l1, $transparent 20%), -webkit-gradient(linear, right, $shadow-l1, $transparent);
+			background-image:  -webkit-linear-gradient(right, $shadow-l1, $transparent 20%), -webkit-linear-gradient(right, $shadow-l1, $transparent);
+			background-image:     -moz-linear-gradient(right, $shadow-l1, $transparent 20%), -moz-linear-gradient(right, $shadow-l1, $transparent);
+			background-image:      -ms-linear-gradient(right, $shadow-l1, $transparent 20%), -ms-linear-gradient(right, $shadow-l1, $transparent);
+			background-image:       -o-linear-gradient(right, $shadow-l1, $transparent 20%), -o-linear-gradient(right, $shadow-l1, $transparent);
+		}
+	}
+
+	.grade-table {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 1000px;
+		cursor: move;
+		@include transition(none);
+		@include user-select(none);
+
+		td,
+		th {
+			width: 50px;
+			text-align: center;
+		}
+
+		thead th {
+			position: relative;
+			height: 50px;
+			@include linear-gradient(top, $cell-border-color, #ddd);
+			font-size: 10px;
+			line-height: 10px;
+			font-weight: bold;
+			text-align: center;
+			box-shadow: 0 1px 0 $table-border-color inset, 0 2px 0 rgba(255, 255, 255, .7) inset;
+			border-left: 1px solid $gray-l3;
+
+			&:first-child {
+				border-radius: 5px 0 0 0;
+				box-shadow: 1px 1px 0 $table-border-color inset, 1px 2px 0 rgba(255, 255, 255, .7) inset;
+				border-left: none;
+			}
+
+			&:last-child {
+				border-radius: 0 3px 0 0;
+				box-shadow: -1px 1px 0 $table-border-color inset, -1px 2px 0 rgba(255, 255, 255, .7) inset;
+			}
+
+			.assignment {
+				margin: 9px 0;
+			}
+
+			.type,
+			.number,
+			.max {
+				display: block;
+			}
+
+			.max {
+				height: 12px;
+				@include linear-gradient(top, #c6c6c6, #bababa);
+				font-size: 9px;
+				line-height: 12px;
+				color: $white;
+			}
+		}
+
+		tr {
+			border-right: 1px solid $table-border-color;
+		}
+
+		tr:first-child td {
+			border-top: 1px solid $table-border-color;
+		}
+
+		tr:last-child td {
+			border-bottom: 1px solid $table-border-color;
+		}
+
+		td {
+			height: 50px;
+			border-bottom: 1px solid $cell-border-color;
+			background: #f3f3f3;
+			font-size: 13px;
+			line-height: 50px;
+			border-left: 1px solid $cell-border-color;
+		}
+
+		tr:nth-child(odd) td {
+			background-color: #fbfbfb;
+		}
+	}
+
+    h1 {
+      @extend .top-header;
+    }
+  }
+
+	.student-table tr:hover td,
+	.grade-table tr:hover td,
+    .student-table tr:focus td,
+	.grade-table tr:focus td,
+	.student-table tr.highlight td,
+	.grade-table tr.highlight td {
+		border-color: #74b7d6;
+		@include linear-gradient(#8ed6f7, #76cbf4);
+		color: #333;
+
+		a {
+			color: #333;
+		}
+	}
+}
+
+

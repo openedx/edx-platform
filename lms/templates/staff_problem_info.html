@@ -1,0 +1,152 @@
+<%namespace name='static' file='/static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from django.template.defaultfilters import escapejs
+%>
+
+## The JS for this is defined in xqa_interface.html
+${block_content}
+%if 'detached' not in tags:
+%  if edit_link:
+  <div>
+      <a href="${edit_link}">Edit</a>
+      % if xqa_key:
+          / <a href="#${element_id}_xqa-modal" onclick="javascript:getlog('${element_id}', {
+          'location': '${location | h}',
+          'xqa_key': '${xqa_key | h}',
+          'category': '${category | h}',
+          'user': '${user | h}'
+       })" id="${element_id}_xqa_log">QA</a>
+      % endif
+  </div>
+%  endif
+%  if not disable_staff_debug_info:
+<div class="wrap-instructor-info">
+  <a class="instructor-info-action" href="#${element_id}_debug" id="${element_id}_trig">${_("Staff Debug Info")}</a>
+
+  %  if settings.FEATURES.get('ENABLE_STUDENT_HISTORY_VIEW') and \
+    location.category == 'problem':
+    <a class="instructor-info-action" href="#${element_id}_history" id="${element_id}_history_trig">${_("Submission history")}</a>
+  %  endif
+</div>
+%  endif
+
+<div aria-hidden="true" role="dialog" tabindex="-1" id="${element_id}_xqa-modal" class="modal xqa-modal">
+  <div class="inner-wrapper">
+    <header>
+      <h2>${_("{platform_name} Content Quality Assessment").format(platform_name=settings.PLATFORM_NAME)}</h2>
+    </header>
+
+    <form id="${element_id}_xqa_form" class="xqa_form">
+      <label for="${element_id}_xqa_entry">${_("Comment")}</label>
+      <input tabindex="0" id="${element_id}_xqa_entry" type="text" placeholder="${_('comment')}">
+      <label for="${element_id}_xqa_tag">${_("Tag")}</label>
+      <span style="color:black;vertical-align: -10pt">${_('Optional tag (eg "done" or "broken"):') + '&nbsp; '}      </span>
+      <input id="${element_id}_xqa_tag" type="text" placeholder="${_('tag')}" style="width:80px;display:inline">
+      <div class="submit">
+        <button name="submit" type="submit">${_('Add comment')}</button>
+      </div>
+      <hr>
+      <div id="${element_id}_xqa_log_data"></div>
+    </form>
+
+  </div>
+</div>
+
+<div aria-hidden="true" role="dialog" tabindex="-1" class="modal staff-modal" id="${element_id}_debug" >
+  <div class="inner-wrapper">
+    <header>
+      <h2>${_('Staff Debug')}</h2>
+    </header>
+
+    <hr />
+    <div class="staff_actions">
+      <h3>${_('Actions')}</h3>
+      <div>
+        <label for="sd_fu_${location.name | h}">${_('Username')}:</label>
+        <input type="text" tabindex="0" id="sd_fu_${location.name | h}" placeholder="${user.username}"/>
+      </div>
+      <div data-location="${location | h}" data-location-name="${location.name | h}">
+        [
+        % if can_reset_attempts:
+        <button type="button" class="btn-link staff-debug-reset">${_('Reset Learner\'s Attempts to Zero')}</button>
+        |
+        % endif
+        % if has_instructor_access:
+        <button type="button" class="btn-link staff-debug-sdelete">${_('Delete Learner\'s State')}</button>
+        % if can_rescore_problem:
+        |
+        <button type="button" class="btn-link staff-debug-rescore">${_('Rescore Learner\'s Submission')}</button>
+        |
+        <button type="button" class="btn-link staff-debug-rescore-if-higher">${_('Rescore Only If Score Improves')}</button>
+        % endif
+        % endif
+        ]
+      </div>
+      <div id="result_${location.name | h}"></div>
+    </div>
+
+    <div class="staff_info" style="display:block">
+      is_released = ${is_released}
+      location = ${location.to_deprecated_string() | h}
+
+      <table summary="${_('Module Fields')}">
+        <tr><th>${_('Module Fields')}</th></tr>
+        %for name, field in fields:
+        <tr><td style="width:25%">${name}</td><td><pre style="display:inline-block; margin: 0;">${field | h}</pre></td></tr>
+        %endfor
+      </table>
+      <table>
+        <tr><th>${_('XML attributes')}</th></tr>
+        %for name, field in xml_attributes.items():
+        <tr><td style="width:25%">${name}</td><td><pre style="display:inline-block; margin: 0;">${field | h}</pre></td></tr>
+        %endfor
+      </table>
+      category = ${category | h}
+    </div>
+    %if render_histogram:
+    <div id="histogram_${element_id}" class="histogram" data-histogram="${histogram}"></div>
+    %endif
+  </div>
+</div>
+
+<div aria-hidden="true" role="dialog" tabindex="-1" class="modal history-modal" id="${element_id}_history">
+  <div class="inner-wrapper">
+    <header>
+      <h2>${_("Submission History Viewer")}</h2>
+    </header>
+    <form id="${element_id}_history_form">
+      <label for="${element_id}_history_student_username">${_("User:")}</label>
+      <input tabindex="0" id="${element_id}_history_student_username" type="text" placeholder=""/>
+      <input type="hidden" id="${element_id}_history_location" value="${location | h}"/>
+      <div class="submit">
+        <button name="submit" type="submit">${_("View History")}</button>
+      </div>
+    </form>
+
+    <div id="${element_id}_history_text" class="staff_info" style="display:block">
+    </div>
+  </div>
+</div>
+
+<div id="${element_id}_setup"></div>
+
+<script type="text/javascript">
+// assumes courseware.html's loaded this method.
+$(function () {
+    setup_debug('${element_id}',
+        %if edit_link:
+        '${edit_link}',
+        %else:
+        null,
+        %endif
+        {
+            'location': '${location | escapejs}',
+            'xqa_key': '${xqa_key}',
+            'category': '${category}',
+            'user': '${user}'
+        }
+    );
+});
+</script>
+%endif

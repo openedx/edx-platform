@@ -1,0 +1,30 @@
+<%page args="course" expression_filter="h"/>
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
+%>
+<%namespace name='static' file='/static_content.html'/>
+
+<%
+  edxnotes_visibility = course.edxnotes_visibility
+  edxnotes_visibility_url = reverse("edxnotes_visibility", kwargs={"course_id": course.id})
+%>
+<div class="wrapper-utility edx-notes-visibility">
+  <span class="action-toggle-message" aria-live="polite"></span>
+  <button class="utility-control utility-control-button action-toggle-notes is-disabled ${"is-active" if edxnotes_visibility else ""}">
+    <span class="icon fa fa-pencil" aria-hidden="true"></span>
+    % if edxnotes_visibility:
+    <span class="utility-control-label sr">${_("Hide notes")}</span>
+    % else:
+    <span class="utility-control-label sr">${_("Show notes")}</span>
+    % endif
+  </button>
+</div>
+
+<%static:require_module_async module_name="js/edxnotes/views/notes_visibility_factory" class_name="NotesVisibilityFactory">
+    NotesVisibilityFactory.ToggleVisibilityView(
+        ${edxnotes_visibility | n, dump_js_escaped_json},
+        '${edxnotes_visibility_url | n, js_escaped_string}'
+    );
+</%static:require_module_async>

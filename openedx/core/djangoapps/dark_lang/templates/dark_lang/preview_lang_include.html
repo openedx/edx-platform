@@ -1,0 +1,36 @@
+<%!
+from django.utils.translation import ugettext as _
+%>
+<%page expression_filter="h"/>
+
+<h1>
+    ${_("Preview Language Setting")}
+</h1>
+<div >
+    <form class="form" action="/update_lang/" method="post">
+        <fieldset class="form-group">
+            <div class="field">
+                <label class="field-label">${_("Language Code")}
+                    <input class="field-input input-text" type="text" name="preview_lang"
+                           placeholder="${_('For example use en for English')}" />
+                </label>
+            </div>
+        </fieldset>
+        <div class="form-actions">
+            <button class="btn-brand btn-base" type="submit" name="set_language" value="set_language">${_("Submit")}</button>
+            <button class="btn-brand btn-base" type="submit" name="reset" value="reset">${_("Reset")}</button>
+        </div>
+
+        <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }"/>
+    </form>
+
+    <br/>
+    % if not form_submit_message is UNDEFINED:
+        <h3 class="alert-title"> ${form_submit_message}</h3>
+        % if success:
+            <p class="alert-copy-with-title">
+                ${_("Please refresh the page to see the changes applied.")}
+            </p>
+        % endif
+    % endif
+</div>

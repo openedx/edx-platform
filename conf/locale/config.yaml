@@ -1,0 +1,160 @@
+# Configuration for i18n workflow.
+
+locales:
+    - en  # English - Source Language
+    # - am  # Amharic
+    - ar  # Arabic
+    # - az  # Azerbaijani
+    # - bg_BG  # Bulgarian (Bulgaria)
+    # - bn_BD  # Bengali (Bangladesh)
+    # - bn_IN  # Bengali (India)
+    # - bs  # Bosnian
+    # - ca  # Catalan
+    # - ca@valencia  # Catalan (Valencia)
+    # - cs  # Czech
+    # - cy  # Welsh
+    # - da  # Danish
+    # - de_DE  # German (Germany)
+    # - el  # Greek
+    # - en_GB  # English (United Kingdom)
+    # # Don't pull these until we figure out why pages randomly display in these locales,
+    # # when the user's browser is in English and the user is not logged in.
+    # #- en@lolcat  # LOLCAT English
+    # #- en@pirate  # Pirate English
+    - es_419  # Spanish (Latin America)
+    # - es_AR  # Spanish (Argentina)
+    # - es_EC  # Spanish (Ecuador)
+    # - es_ES  # Spanish (Spain)
+    # - es_MX  # Spanish (Mexico)
+    # - es_PE  # Spanish (Peru)
+    # - et_EE  # Estonian (Estonia)
+    # - eu_ES  # Basque (Spain)
+    # - fa  # Persian
+    # - fa_IR  # Persian (Iran)
+    # - fi_FI  # Finnish (Finland)
+    # - fil  # Filipino
+    - fr  # French
+    # - gl  # Galician
+    # - gu  # Gujarati
+    - he  # Hebrew
+    - hi  # Hindi
+    # - hr  # Croatian
+    # - hu  # Hungarian
+    # - hy_AM  # Armenian (Armenia)
+    # - id  # Indonesian
+    # - it_IT  # Italian (Italy)
+    # - ja_JP  # Japanese (Japan)
+    # - kk_KZ  # Kazakh (Kazakhstan)
+    # - km_KH  # Khmer (Cambodia)
+    # - kn  # Kannada
+    - ko_KR  # Korean (Korea)
+    # - lt_LT  # Lithuanian (Lithuania)
+    # - ml  # Malayalam
+    # - mn  # Mongolian
+    # - mr  # Marathi
+    # - ms  # Malay
+    # - nb  # Norwegian Bokmål
+    # - ne  # Nepali
+    # - nl_NL  # Dutch (Netherlands)
+    # - or  # Oriya
+    # - pl  # Polish
+    - pt_BR  # Portuguese (Brazil)
+    # - pt_PT  # Portuguese (Portugal)
+    # - ro  # Romanian
+    - ru  # Russian
+    # - si  # Sinhala
+    # - sk  # Slovak
+    # - sl  # Slovenian
+    # - sq  # Albanian
+    # - sr  # Serbian
+    # - sv  # Swedish
+    # - sw  # Swahili
+    # - ta  # Tamil
+    # - te  # Telugu
+    # - th  # Thai
+    # - tr_TR  # Turkish (Turkey)
+    # - uk  # Ukranian
+    # - ur  # Urdu
+    # - uz  # Uzbek
+    # - vi  # Vietnamese
+    - zh_CN  # Chinese (China)
+    # - zh_HK  # Chinese (Hong Kong)
+    # - zh_TW  # Chinese (Taiwan)
+
+
+# The locales used for fake-accented English, for testing.
+dummy_locales:
+    - eo
+    - fake2
+    - rtl  # Fake testing language for Arabic
+
+# Directories we don't search for strings.
+ignore_dirs:
+    - common/static/xmodule/modules
+    - common/static/xmodule/descriptors
+    # Directories with no user-facing code.
+    - '*/migrations'
+    # Directories that are not our code.
+    - node_modules
+    # Directories containing files that can't have strings in them.
+    - conf
+    - docs
+    - '*/fonts'
+    - '*/img'
+    - '*/images'
+    - '*/sass'
+    - '*/css'
+    # Directories that only contain tests.
+    - common/test
+    - test_root
+    - '*/terrain'
+    - '*/spec'
+    - '*/tests'
+    - '*/features'
+    # Directories full of auto-generated JS
+    - lms/static/js/i18n
+    - cms/static/js/i18n
+
+
+# Third-party installed apps that we also extract strings from.  When adding a
+# file here, also add it to the django.po merge files below, and to the
+# .tx/config file so that it will be pushed to and pulled from transifex.
+third_party:
+    - wiki
+
+
+# How should .po files be segmented?  See i18n/segment.py for details. Strings
+# that are only found in a particular segment are segregated into that .po file
+# so that translators can focus on separate parts of the product.
+#
+# We segregate Studio so we can provide new languages for LMS without having to
+# also translate the Studio strings. LMS needs the strings from lms/* and
+# common/*, so those will stay in the main .po file.
+segment:
+    django-partial.po:          # This .po file..
+        django-studio.po:       #  produces this .po file..
+            - cms/*             #   by segregating strings from these files.
+        # Anything that doesn't match a pattern stays in the original file.
+    djangojs-partial.po:
+        djangojs-studio.po:
+            - cms/*
+    mako.po:
+        mako-studio.po:
+            - cms/*
+    underscore.po:
+        underscore-studio.po:
+            - cms/*
+
+# How should the generate step merge files?
+generate_merge:
+    django.po:
+        - django-partial.po
+        - django-studio.po
+        - mako.po
+        - mako-studio.po
+        - wiki.po
+    djangojs.po:
+        - djangojs-partial.po
+        - djangojs-studio.po
+        - underscore.po
+        - underscore-studio.po
