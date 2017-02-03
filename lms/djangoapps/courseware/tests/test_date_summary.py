@@ -278,7 +278,19 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         )
         self.assertEqual(block.title, 'Course End')
 
-    ## Tests Verified Upgrade Deadline Date Block
+    # Tests Verified Upgrade Deadline Date Block
+
+    def check_upgrade_banner(self, banner_expected=True):
+        """
+        Helper method to check for the presence of the Upgrade Banner
+        """
+        url = reverse('info', args=[self.course.id.to_deprecated_string()]) + '?upgrade=true'
+        resp = self.client.get(url)
+        if banner_expected:
+            self.assertIn("Give yourself an additional incentive to complete", resp.content)
+        else:
+            self.assertNotIn("Give yourself an additional incentive to complete", resp.content)
+
     @freeze_time('2015-01-02')
     def test_verified_upgrade_deadline_date(self):
         self.setup_course_and_user(days_till_upgrade_deadline=1, user_enrollment_mode=CourseMode.AUDIT)
@@ -289,9 +301,11 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
 
     def test_without_upgrade_deadline(self):
         self.setup_course_and_user(enrollment_mode=None)
+        self.client.login(username='mrrobot', password='test')
         block = VerifiedUpgradeDeadlineDate(self.course, self.user)
         self.assertFalse(block.is_enabled)
         self.assertIsNone(block.date)
+        self.check_upgrade_banner(banner_expected=False)
 
     @freeze_time('2015-01-02')
     def test_verified_upgrade_banner_present(self):
@@ -301,9 +315,15 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         self.assertEqual(block.date, datetime.now(utc) + timedelta(days=1))
         self.assertTrue(block.is_enabled)
         self.assertEqual(block.link, reverse('verify_student_upgrade_and_verify', args=(self.course.id,)))
-        url = reverse('info', args=[self.course.id.to_deprecated_string()]) + '?upgrade=true'
-        resp = self.client.get(url)
-        self.assertIn("Give yourself an additional incentive to complete", resp.content)
+        self.check_upgrade_banner()
+
+    @freeze_time('2015-01-02')
+    def test_verified_upgrade_banner_not_present_past_deadline(self):
+        self.setup_course_and_user(days_till_upgrade_deadline=-1, user_enrollment_mode=CourseMode.AUDIT)
+        self.client.login(username='mrrobot', password='test')
+        block = VerifiedUpgradeDeadlineDate(self.course, self.user)
+        self.assertFalse(block.is_enabled)
+        self.check_upgrade_banner(banner_expected=False)
 
     def test_ecommerce_checkout_redirect(self):
         """Verify the block link redirects to ecommerce checkout if it's enabled."""
