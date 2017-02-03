@@ -52,7 +52,7 @@ astroid==1.3.8
 edx-django-oauth2-provider==1.1.4
 edx-django-sites-extensions==2.1.1
 # enterprise app with desired changes
-git+https://github.com/edx/edx-enterprise.git@e12db898e655820ee47926d21eef6683506332aa#egg=edx-enterprise==0.19.1
+git+https://github.com/edx/edx-enterprise.git@656cd2953fec7918a5adfd4c35eab3bcd5958ce1#egg=edx-enterprise==0.19.2
 #edx-enterprise==0.19.1
 edx-oauth2-provider==1.2.0
 edx-opaque-keys==0.4.0
@@ -95,7 +95,7 @@ python-dateutil==2.1
 # we have to install social-auth-app-django from fork to get over missing migration
 # issue https://github.com/python-social-auth/social-app-django/issues/28
 # once migrations are run we can switch back to base package(social-auth-app-django==1.0.1)
-git+https://github.com/ziafazal/social-app-django.git@7121a7acb6544a38e80c435f5f33605d796a6e4d#egg=social-auth-app-django==1.0.1
+git+https://github.com/ziafazal/social-app-django.git@7121a7acb6544a38e80c435f5f33605d796a6e4d#egg=social-auth-app-django==1.0.2
 social-auth-core==1.1.0
 
 pytz==2016.7
