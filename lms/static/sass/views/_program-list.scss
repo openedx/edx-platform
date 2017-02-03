@@ -1,0 +1,81 @@
+.program-list-wrapper {
+  padding: $baseline;
+}
+
+.program-cards-container {
+  @include grid-container();
+  @include span(12);
+
+  @media(min-width: $bp-screen-md) {
+    @include span(9);
+  }
+}
+
+.sidebar {
+  @include span(12);
+  @include float(right);
+  margin-bottom: $baseline;
+
+  @media(min-width: $bp-screen-md) {
+    @include span(3);
+  }
+
+  .aside {
+    padding: $baseline;
+    margin-bottom: $baseline;
+    box-sizing: border-box;
+    border: 1px solid $border-color-l3;
+  }
+
+  .program-advertise {
+    clear: both;
+
+    .new-programs-btn {
+      width: 100%;
+      text-align: center;
+      padding: 10px;
+
+    }
+
+    .advertise-message {
+      font-size: font-size(x-small);
+      color: palette(grayscale, black);
+      margin-bottom: $baseline;
+    }
+  }
+
+  .certificate-container {
+    .hd-6 {
+      color: palette(grayscale, dark);
+      font-weight: font-weight(normal);
+      margin-bottom: $baseline;
+    }
+
+    .certificate-link {
+      padding-top: $baseline;
+      color: palette(primary, base);
+      display: block;
+
+      &:active,
+      &:focus,
+      &:hover {
+        color: $link-hover;
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+.empty-programs-message {
+  @include span(12);
+  border: 3px solid $gray-l4;
+  background: $gray-l6;
+  padding: ($baseline*2) 0;
+  text-align: center;
+  margin-bottom: 20px;
+
+  .hd-3 {
+    color: $black;
+    margin-bottom: $baseline;
+  }
+}

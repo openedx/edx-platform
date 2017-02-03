@@ -1,0 +1,13 @@
+{% load i18n %}
+{% load url from future %}
+<em>
+{% url 'wiki:signup' as signup_url %}
+{% url 'wiki:login' as login_url %}
+{% if login_url and signup_url %}
+  {% blocktrans %}
+  You need to <a href="{{ login_url }}">log in</a> or <a href="{{ signup_url }}">sign up</a> to use this function.
+  {% endblocktrans %}
+{% else %}
+  {% trans "You need to log in or sign up to use this function." %}
+{% endif %}
+</em>

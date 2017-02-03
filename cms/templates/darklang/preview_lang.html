@@ -1,0 +1,15 @@
+## Override the default styles_version to the Pattern Library version (version 2)
+<%! main_css = "style-main-v2" %>
+<%page expression_filter="h"/>
+<%!
+from django.utils.translation import ugettext as _
+%>
+
+<%inherit file="../base.html" />
+<%block name="title">${_("Preview Language Setting")}</%block>
+<%block name="bodyclass">is-signedin pattern-library</%block>
+
+<%block name="content">
+    <%include file="/dark_lang/preview_lang_include.html" />
+</%block>
+

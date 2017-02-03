@@ -1,0 +1,205 @@
+<%inherit file="/main.html" />
+<%!
+    from django.core.urlresolvers import reverse
+    from django.utils.translation import ugettext as _
+    from django.utils.timezone import utc as UTC
+    from util.date_utils import get_time_display, DEFAULT_DATE_TIME_FORMAT
+    from django.conf import settings
+%>
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="headextra">
+  <%static:css group='style-course'/>
+  <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.axislabels.js')}"></script>
+  <script>
+      $(function() {
+          $(".toggle-import-log").click(function(e) {
+              var self = $(this);
+              var id = self.data("import-log");
+              $("#import-log-" + id).toggle({
+                  duration: 200
+              });
+              if (self.html() === "[ + ]") {
+                  self.html("[ &#8722; ]");
+              } else {
+                  self.html("[ + ]");
+              }
+              e.preventDefault();
+          });
+      });
+  </script>
+</%block>
+<%def name="pagination()">
+    <div class="pagination">
+        %if logs.has_previous():
+            <span class="previous-page">
+              <a href="?page=${logs.previous_page_number()}">
+                ${_("previous")}
+              </a>
+            </span>
+        %endif
+        ${_("Page {current_page} of {total_pages}".format(
+            current_page=logs.number,
+            total_pages=logs.paginator.num_pages
+        ))}
+        %if logs.has_next():
+            <span class="next-page">
+              <a href="?page=${logs.next_page_number()}">
+                ${_("next")}
+              </a>
+            </span>
+        %endif
+      </div>
+</%def>
+<style type="text/css">
+a.active-section {
+	color: #551A8B;
+}
+.sysadmin-dashboard-content h2 a {
+	margin-right: 1.2em;
+}
+table.stat_table {
+	font-family: verdana,arial,sans-serif;
+	font-size:11px;
+	color:#333333;
+	border-width: 1px;
+	border-color: #666666;
+	border-collapse: collapse;
+}
+table.stat_table th {
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #666666;
+	background-color: #dedede;
+}
+table.stat_table td {
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #666666;
+	background-color: #ffffff;
+}
+.import-log {
+    display: none;
+}
+
+.pagination, .page-status {
+    text-align: center;
+    padding: 12px 0 12px 0;
+}
+
+.pagination .previous-page {
+    padding-right: 10px;
+}
+
+.pagination .next-page {
+    padding-left: 10px;
+}
+
+a.selectedmode { background-color: yellow; }
+
+textarea {
+  height: 200px;
+}
+</style>
+
+<section class="container">
+  <div class="sysadmin-dashboard-wrapper">
+
+    <section class="sysadmin-dashboard-content" style="margin-left:10pt;margin-top:10pt;margin-right:10pt;margin-bottom:20pt">
+      <h1>${_('Sysadmin Dashboard')}</h1>
+      <hr />
+      <h2 class="instructor-nav">
+        <a href="${reverse('sysadmin')}">${_('Users')}</a>
+        <a href="${reverse('sysadmin_courses')}">${_('Courses')}</a>
+        <a href="${reverse('sysadmin_staffing')}">${_('Staffing and Enrollment')}</a>
+        ## Translators: refers to http://git-scm.com/docs/git-log
+        <a href="${reverse('gitlogs')}" class="active-section">${_('Git Logs')}</a>
+      </h2>
+      <hr />
+
+      <form name="dashform" method="POST" action="${reverse('sysadmin')}">
+        <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+        <input type="hidden" name="dash_mode" value="">
+      </form>
+
+      ## Translators: refers to http://git-scm.com/docs/git-log
+      <h3>${_('Git Logs')}</h3>
+
+      %if course_id is not None:
+          ## Translators: Git is a version-control system; see http://git-scm.com/about
+          <h2>${_('Recent git load activity for {course_id}').format(course_id=course_id) | h}</h2>
+          %if error_msg:
+              <h3>${_('Error')}:</h3>
+              <p>${error_msg}</p>
+          %endif
+      %endif
+
+      %if len(logs):
+          ${pagination()}
+
+          <table class="stat_table" width="100%">
+            <thead>
+              <tr>
+                <th width="15%">${_('Date')}</th>
+                <th width="15%">${_('Course ID')}</th>
+                ## Translators: Git is a version-control system; see http://git-scm.com/about
+                <th>${_('Git Action')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              %for index, cil in enumerate(logs):
+                  <%
+                      # Appropriate datetime string for current locale and timezone
+                      date = get_time_display(cil.created.replace(tzinfo=UTC),
+                                              DEFAULT_DATE_TIME_FORMAT, coerce_tz=settings.TIME_ZONE)
+                  %>
+                  <tr>
+                    <td>${date}</td>
+                    <td>
+                      <a href="${reverse('gitlogs_detail', kwargs={'course_id': unicode(cil.course_id)})}">
+                        ${cil.course_id | h}
+                      </a>
+                    </td>
+                    <td>
+                      %if course_id is not None:
+                          <a class="toggle-import-log" data-import-log="${index}" href="#">[ + ]</a>
+                      %endif
+                      ${cil.git_log}
+                    </td>
+                  </tr>
+
+                  ## Show the full log of the latest import if viewing logs for a specific course
+                  %if course_id is not None:
+                      <tr class="import-log" id="import-log-${index}">
+                        <td colspan="3">
+                          <pre>
+                            ${cil.import_log | h}
+                          </pre>
+                        </td>
+                      </tr>
+                  %endif
+              %endfor
+            </tbody>
+          </table>
+
+          ${pagination()}
+      %else:
+          <div class="page-status">
+            %if not course_id:
+                ## If viewing all logs there are no logs available, let the user know.
+                ## Translators: git is a version-control system; see http://git-scm.com/about
+                ${_('No git import logs have been recorded.')}
+            %else:
+                ## If viewing a single course and there are no logs available, let the user know.
+                ## Translators: git is a version-control system; see http://git-scm.com/about
+                ${_('No git import logs have been recorded for this course.')}
+            %endif
+          </div>
+      %endif
+
+    </section>
+  </div>
+</section>

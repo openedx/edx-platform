@@ -1,0 +1,9 @@
+<% if (title) { %>
+<span class="u-field-title" aria-hidden="true"><%- title %></span>
+<% } %>
+<span class="sr" for="u-field-value-<%- id %>"><%- screenReaderTitle %></span>
+<span class="u-field-value" id="u-field-value-<%- id %>" aria-describedby="u-field-message-<%- id %>"><%- value %></span>
+<span class="u-field-message" id="u-field-message-<%- id %>">
+    <span class="u-field-message-notification" aria-live="polite"></span>
+    <span class="u-field-message-help" id="u-field-help-message-<%- id %>"> <%- message %></span>
+</span>

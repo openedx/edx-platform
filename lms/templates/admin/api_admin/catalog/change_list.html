@@ -1,0 +1,27 @@
+{% extends "admin/base_site.html" %}
+{% block extrahead %}
+    {{ block.super }}
+{% endblock %}
+{% block innercontent %}
+    <ul class="object-tools">
+        <li>
+            <a class="addlink" href="add/">Add Catalog</a>
+        </li>
+    </ul>
+    <table cellspacing="0" style="margin-top: 20px;">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Name</th>
+            </tr>
+        </thead>
+        {% for catalog in catalogs %}
+            <tr class="{% cycle 'row1' 'row2' %}">
+                <td>&nbsp;</td>
+                <td>
+                    <a href="{{catalog.id}}">{{catalog.name}}</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
