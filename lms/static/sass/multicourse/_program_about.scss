@@ -595,8 +595,6 @@ h1, h2, h3, h4, h5, h6{
     }
     @media (min-width: $tablet) {
         height: 333px;
-        //background: #000 url('https://dphy0qlkz2ftb.cloudfront.net/media/programs/banner_images/9549586e-0993-4903-9139-173b012328ea.large.jpg') no-repeat center center;
-        background: #000 url('#{$static-path}/images/programs/banner-bg.jpg') no-repeat center center;
         margin-bottom: 20px;
     }
     @media (min-width: $desktop) {
