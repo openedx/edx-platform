@@ -62,9 +62,7 @@
 
             DiscussionThreadView.prototype.events = {
                 'click .discussion-submit-post': 'submitComment',
-                'click .add-response-btn': 'scrollToAddResponse',
-                'click .forum-thread-expand': 'expand',
-                'click .forum-thread-collapse': 'collapse'
+                'click .add-response-btn': 'scrollToAddResponse'
             };
 
             DiscussionThreadView.prototype.$ = function(selector) {
@@ -164,45 +162,6 @@
                     return this.renderAddResponseButton();
                 }
             });
-
-            DiscussionThreadView.prototype.expand = function(event) {
-                if (event) {
-                    event.preventDefault();
-                }
-                this.$el.addClass('expanded');
-                this.$el.find('.post-body').text(this.model.get('body'));
-                this.showView.convertMath();
-                this.$el.find('.forum-thread-expand').hide();
-                this.$el.find('.forum-thread-collapse').show();
-                this.$el.find('.post-extended-content').show();
-                if (!this.loadedResponses) {
-                    return this.loadInitialResponses();
-                }
-            };
-
-            DiscussionThreadView.prototype.collapse = function(event) {
-                if (event) {
-                    event.preventDefault();
-                }
-                this.$el.removeClass('expanded');
-                this.$el.find('.post-body').text(this.getAbbreviatedBody());
-                this.showView.convertMath();
-                this.$el.find('.forum-thread-expand').show();
-                this.$el.find('.forum-thread-collapse').hide();
-                return this.$el.find('.post-extended-content').hide();
-            };
-
-            DiscussionThreadView.prototype.getAbbreviatedBody = function() {
-                var abbreviated, cached;
-                cached = this.model.get('abbreviatedBody');
-                if (cached) {
-                    return cached;
-                } else {
-                    abbreviated = DiscussionUtil.abbreviateString(this.model.get('body'), 140);
-                    this.model.set('abbreviatedBody', abbreviated);
-                    return abbreviated;
-                }
-            };
 
             DiscussionThreadView.prototype.cleanup = function() {
                 // jQuery.ajax after 1.5 returns a jqXHR which doesn't implement .abort
@@ -346,7 +305,10 @@
                 view.on('comment:endorse', this.endorseThread);
                 view.render();
                 this.$el.find(listSelector).append(view.el);
-                return view.afterInsert();
+                view.afterInsert();
+                if (options.focusAddedResponse) {
+                    this.focusToTheAddedResponse(view.el);
+                }
             };
 
             DiscussionThreadView.prototype.renderAddResponseButton = function() {
@@ -394,7 +356,9 @@
                     user_id: window.user.get('id')
                 });
                 comment.set('thread', this.model.get('thread'));
-                this.renderResponseToList(comment, '.js-response-list');
+                this.renderResponseToList(comment, '.js-response-list', {
+                    focusAddedResponse: true
+                });
                 this.model.addComment();
                 this.renderAddResponseButton();
                 return DiscussionUtil.safeAjax({
@@ -410,6 +374,10 @@
                         return comment.set(data.content);
                     }
                 });
+            };
+
+            DiscussionThreadView.prototype.focusToTheAddedResponse = function(list) {
+                return $(list).attr('tabindex', '-1').focus();
             };
 
             DiscussionThreadView.prototype.edit = function() {

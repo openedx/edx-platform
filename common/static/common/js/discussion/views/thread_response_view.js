@@ -174,6 +174,7 @@
                     return self.showCommentForm();
                 });
                 this.commentViews.push(view);
+                this.focusToTheCommentResponse(view.$el.closest('.forum-response'));
                 return view;
             };
 
@@ -211,6 +212,10 @@
                         return view.render();
                     }
                 });
+            };
+
+            ThreadResponseView.prototype.focusToTheCommentResponse = function(list) {
+                return $(list).attr('tabindex', '-1').focus();
             };
 
             ThreadResponseView.prototype._delete = function(event) {

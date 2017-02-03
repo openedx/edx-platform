@@ -44,16 +44,13 @@
   @include border-radius(0, 0, $forum-border-radius, $forum-border-radius);
   box-sizing: border-box;
   border: 1px solid $forum-color-border;
-  border-top: none;
   width: 100%;
   background: $forum-color-background-light;
-  box-shadow: 0 1px 3px $shadow-l1 inset;
 }
 
 @mixin discussion-new-post-wmd-preview-container {
   @include discussion-wmd-preview-container;
   border-color: $forum-color-border;
-  box-shadow: 0 1px 3px $shadow-d1 inset;
 }
 
 @mixin discussion-wmd-preview-label {
