@@ -13,7 +13,7 @@
         <%- categoryText %>:
     </span>
 </div>
-<ul class="xblock-items-container">
+<ul class="xblock-items-container" data-items-category="<%- XBlocksCategory %>">
     <% for (var i = 0; i < xblocks.length; i++) {
         var xblock = xblocks[i];
     %>

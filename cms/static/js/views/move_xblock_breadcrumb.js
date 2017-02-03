@@ -13,10 +13,6 @@ function($, Backbone, _, gettext, HtmlUtils, StringUtils, MoveXBlockBreadcrumbVi
     var MoveXBlockBreadcrumb = Backbone.View.extend({
         el: '.breadcrumb-container',
 
-        defaultRenderOptions: {
-            breadcrumbs: ['Course Outline']
-        },
-
         events: {
             'click .parent-nav-button': 'handleBreadcrumbButtonPress'
         },
@@ -29,7 +25,7 @@ function($, Backbone, _, gettext, HtmlUtils, StringUtils, MoveXBlockBreadcrumbVi
         render: function(options) {
             HtmlUtils.setHtml(
                 this.$el,
-                this.template(_.extend({}, this.defaultRenderOptions, options))
+                this.template(options)
             );
             Backbone.trigger('move:breadcrumbRendered');
             return this;
