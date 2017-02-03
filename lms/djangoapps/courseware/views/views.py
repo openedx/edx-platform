@@ -66,7 +66,7 @@ from courseware.courses import (
     UserNotEnrolled
 )
 from courseware.date_summary import (
-    VerificationDeadlineDate,
+    VerifiedUpgradeDeadlineDate,
 )
 from courseware.masquerade import setup_masquerade
 from courseware.model_data import FieldDataCache
@@ -341,13 +341,12 @@ def course_info(request, course_id):
             url_to_enroll = marketing_link('COURSES')
 
         # Process requests containing the upgrade parameter
-        upgrade_data = VerificationDeadlineDate(course, user)
+        upgrade_data = VerifiedUpgradeDeadlineDate(course, user)
 
         upgrade_link = None
         if (request.user.is_authenticated() and
                 request.GET.get('upgrade', 'false') == 'true' and
-                upgrade_data.verification_status == 'none' and
-                not upgrade_data.deadline_has_passed()):
+                upgrade_data.is_enabled):
             upgrade_link = upgrade_data.link
 
         context = {

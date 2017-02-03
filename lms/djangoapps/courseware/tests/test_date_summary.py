@@ -45,6 +45,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             days_till_upgrade_deadline=4,
             enroll_user=True,
             enrollment_mode=CourseMode.VERIFIED,
+            user_enrollment_mode=None,
             course_min_price=100,
             days_till_verification_deadline=14,
             verification_status=None,
@@ -73,7 +74,10 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
 
         if enroll_user:
             enrollment_mode = enrollment_mode or CourseMode.DEFAULT_MODE_SLUG
-            CourseEnrollmentFactory.create(course_id=self.course.id, user=self.user, mode=enrollment_mode)
+            if user_enrollment_mode:
+                CourseEnrollmentFactory.create(course_id=self.course.id, user=self.user, mode=user_enrollment_mode)
+            else:
+                CourseEnrollmentFactory.create(course_id=self.course.id, user=self.user, mode=enrollment_mode)
 
         if days_till_verification_deadline is not None:
             VerificationDeadline.objects.create(
@@ -277,15 +281,29 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     ## Tests Verified Upgrade Deadline Date Block
     @freeze_time('2015-01-02')
     def test_verified_upgrade_deadline_date(self):
-        self.setup_course_and_user(days_till_upgrade_deadline=1)
+        self.setup_course_and_user(days_till_upgrade_deadline=1, user_enrollment_mode=CourseMode.AUDIT)
         block = VerifiedUpgradeDeadlineDate(self.course, self.user)
         self.assertEqual(block.date, datetime.now(utc) + timedelta(days=1))
+        self.assertTrue(block.is_enabled)
         self.assertEqual(block.link, reverse('verify_student_upgrade_and_verify', args=(self.course.id,)))
 
     def test_without_upgrade_deadline(self):
         self.setup_course_and_user(enrollment_mode=None)
         block = VerifiedUpgradeDeadlineDate(self.course, self.user)
+        self.assertFalse(block.is_enabled)
         self.assertIsNone(block.date)
+
+    @freeze_time('2015-01-02')
+    def test_verified_upgrade_banner_present(self):
+        self.setup_course_and_user(days_till_upgrade_deadline=1, user_enrollment_mode=CourseMode.AUDIT)
+        self.client.login(username='mrrobot', password='test')
+        block = VerifiedUpgradeDeadlineDate(self.course, self.user)
+        self.assertEqual(block.date, datetime.now(utc) + timedelta(days=1))
+        self.assertTrue(block.is_enabled)
+        self.assertEqual(block.link, reverse('verify_student_upgrade_and_verify', args=(self.course.id,)))
+        url = reverse('info', args=[self.course.id.to_deprecated_string()]) + '?upgrade=true'
+        resp = self.client.get(url)
+        self.assertIn("Give yourself an additional incentive to complete", resp.content)
 
     def test_ecommerce_checkout_redirect(self):
         """Verify the block link redirects to ecommerce checkout if it's enabled."""
