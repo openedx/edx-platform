@@ -683,6 +683,14 @@ def program_detail(request, program_id):
 
     if not program:
         raise Http404
+
+    # TODO: put these keys dynamically
+    for course in program[0]['courses']:
+        course_runs = course['course_runs'][0]
+        course_runs['registered'] = False
+        course_runs['can_enroll'] = True
+        course_runs['is_shib_course'] = False
+
     return render_to_response('courseware/program_detail.html', {'program': program[0]})
 
 
