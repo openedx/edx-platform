@@ -280,11 +280,13 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
 
     # Tests Verified Upgrade Deadline Date Block
 
-    def check_upgrade_banner(self, banner_expected=True):
+    def check_upgrade_banner(self, banner_expected=True, include_url_parameter=True):
         """
         Helper method to check for the presence of the Upgrade Banner
         """
-        url = reverse('info', args=[self.course.id.to_deprecated_string()]) + '?upgrade=true'
+        url = reverse('info', args=[self.course.id.to_deprecated_string()])
+        if include_url_parameter:
+            url += '?upgrade=true'
         resp = self.client.get(url)
         if banner_expected:
             self.assertIn("Give yourself an additional incentive to complete", resp.content)
@@ -324,6 +326,23 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         block = VerifiedUpgradeDeadlineDate(self.course, self.user)
         self.assertFalse(block.is_enabled)
         self.check_upgrade_banner(banner_expected=False)
+
+    @freeze_time('2015-01-02')
+    def test_verified_upgrade_banner_cookie(self):
+        self.setup_course_and_user(days_till_upgrade_deadline=1, user_enrollment_mode=CourseMode.AUDIT)
+        self.client.login(username='mrrobot', password='test')
+
+        # No URL parameter or cookie present, notification should not be shown.
+        self.check_upgrade_banner(include_url_parameter=False, banner_expected=False)
+
+        # Now pass URL parameter-- notification should be shown.
+        self.check_upgrade_banner(include_url_parameter=True)
+
+        # A cookie should be set in the previous call, so it is no longer necessary to pass
+        # the URL parameter in order to see the notification.
+        self.check_upgrade_banner(include_url_parameter=False)
+
+        # Unfortunately (according to django doc), it is not possible to test expiration of the cookie.
 
     def test_ecommerce_checkout_redirect(self):
         """Verify the block link redirects to ecommerce checkout if it's enabled."""

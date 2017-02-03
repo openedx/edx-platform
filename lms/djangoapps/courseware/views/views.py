@@ -340,14 +340,21 @@ def course_info(request, course_id):
         if settings.FEATURES.get('ENABLE_MKTG_SITE'):
             url_to_enroll = marketing_link('COURSES')
 
-        # Process requests containing the upgrade parameter
-        upgrade_data = VerifiedUpgradeDeadlineDate(course, user)
-
+        store_upgrade_cookie = False
+        upgrade_cookie_name = 'show_upgrade_notification'
         upgrade_link = None
-        if (request.user.is_authenticated() and
-                request.GET.get('upgrade', 'false') == 'true' and
-                upgrade_data.is_enabled):
-            upgrade_link = upgrade_data.link
+        if request.user.is_authenticated():
+            show_upgrade_notification = False
+            if request.GET.get('upgrade', 'false') == 'true':
+                store_upgrade_cookie = True
+                show_upgrade_notification = True
+            elif upgrade_cookie_name in request.COOKIES and bool(request.COOKIES[upgrade_cookie_name]):
+                show_upgrade_notification = True
+
+            if show_upgrade_notification:
+                upgrade_data = VerifiedUpgradeDeadlineDate(course, user)
+                if upgrade_data.is_enabled:
+                    upgrade_link = upgrade_data.link
 
         context = {
             'request': request,
@@ -378,7 +385,17 @@ def course_info(request, course_id):
         if CourseEnrollment.is_enrolled(request.user, course.id):
             inject_coursetalk_keys_into_context(context, course_key)
 
-        return render_to_response('courseware/info.html', context)
+        response = render_to_response('courseware/info.html', context)
+        if store_upgrade_cookie:
+            response.set_cookie(
+                upgrade_cookie_name,
+                True,
+                max_age=10 * 24 * 60 * 60,  # set for 10 days
+                domain=settings.SESSION_COOKIE_DOMAIN,
+                httponly=True  # no use case for accessing from JavaScript
+            )
+
+        return response
 
 
 def get_last_accessed_courseware(course, request, user):
