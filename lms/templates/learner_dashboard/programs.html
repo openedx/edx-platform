@@ -1,0 +1,34 @@
+## Override the default styles_version to the Pattern Library version (version 2)
+<%! main_css = "style-learner-dashboard" %>
+
+<%page expression_filter="h"/>
+<%inherit file="../main.html" />
+<%namespace name='static' file='../static_content.html'/>
+<%def name="online_help_token()"><% return "programs" %></%def>
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.js_utils import (
+    dump_js_escaped_json, js_escaped_string
+)
+%>
+
+<%block name="js_extra">
+<%static:require_module module_name="js/learner_dashboard/program_list_factory" class_name="ProgramListFactory">
+ProgramListFactory({
+    certificatesData: ${credentials | n, dump_js_escaped_json},
+    marketingUrl: '${marketing_url | n, js_escaped_string}',
+    programsData: ${programs | n, dump_js_escaped_json},
+    sampleCertImageSrc: '${static.url('images/programs/sample-cert.png') | n, js_escaped_string}',
+    userProgress: ${progress | n, dump_js_escaped_json}
+});
+</%static:require_module>
+</%block>
+
+<%block name="pagetitle">${_("Programs")}</%block>
+
+<main id="main" aria-label="Content" tabindex="-1">
+    <div class="program-list-wrapper grid-container">
+        <div class="program-cards-container col"></div>
+        <div class="sidebar col col-last"></div>
+    </div>
+</main>

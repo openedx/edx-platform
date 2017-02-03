@@ -1,0 +1,90 @@
+<%page expression_filter="h"/>
+<%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from edxnotes.helpers import is_feature_enabled as is_edxnotes_enabled
+
+from openedx.core.djangolib.markup import HTML
+from openedx.core.djangolib.js_utils import js_escaped_string
+%>
+<%def name="course_name()">
+ <% return _("{course_number} Courseware").format(course_number=course.display_number_with_default) %>
+</%def>
+
+<%block name="bodyclass">view-in-course view-courseware courseware ${course.css_class or ''}</%block>
+<%block name="title"><title>
+    % if section_title:
+${static.get_page_title_breadcrumbs(section_title, course_name())}
+    % else:
+${static.get_page_title_breadcrumbs(course_name())}
+    %endif
+</title></%block>
+
+<%block name="header_extras">
+% for template_name in ["image-modal"]:
+<script type="text/template" id="${template_name}-tpl">
+    <%static:include path="common/templates/${template_name}.underscore" />
+</script>
+% endfor
+<%
+  header_file = None
+%>
+</%block>
+
+<%block name="headextra">
+<%static:css group='style-course-vendor'/>
+<%static:css group='style-course'/>
+## Utility: Notes
+% if is_edxnotes_enabled(course):
+<%static:css group='style-student-notes'/>
+% endif
+
+<script type="text/javascript" src="${static.url('js/jquery.autocomplete.js')}"></script>
+<script type="text/javascript" src="${static.url('js/src/tooltip_manager.js')}"></script>
+
+<link href="${static.url('css/vendor/jquery.autocomplete.css')}" rel="stylesheet" type="text/css">
+  ${HTML(fragment.head_html())}
+</%block>
+
+<%block name="js_extra">
+  <script type="text/javascript" src="${static.url('common/js/vendor/jquery.scrollTo.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
+
+  ## codemirror
+  <script type="text/javascript" src="${static.url('js/vendor/codemirror-compressed.js')}"></script>
+
+  <%static:js group='courseware'/>
+
+  <%include file="/mathjax_include.html" args="disable_fast_preview=True"/>
+  % if staff_access:
+  	<%include file="xqa_interface.html"/>
+  % endif
+
+  <script type="text/javascript">
+    var $$course_id = "${course.id | n, js_escaped_string}";
+  </script>
+
+${HTML(fragment.foot_html())}
+
+</%block>
+
+<div class="course-wrapper">
+  <section class="course-content" id="course-content">
+    ${HTML(fragment.body_html())}
+  </section>
+</div>
+
+<nav class="nav-utilities ${"has-utility-calculator" if course.show_calculator else ""}" aria-label="${_('Course Utilities')}">
+  ## Utility: Notes
+  % if is_edxnotes_enabled(course):
+    <%include file="/edxnotes/toggle_notes.html" args="course=course"/>
+  % endif
+
+  ## Utility: Calc
+  % if course.show_calculator:
+    <%include file="/calculator/toggle_calculator.html" />
+  % endif
+</nav>
+
+<%include file="../modal/accessible_confirm.html" />

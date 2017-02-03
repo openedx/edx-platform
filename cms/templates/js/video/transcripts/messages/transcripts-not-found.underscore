@@ -1,0 +1,16 @@
+<div class="transcripts-message-status status-error"><span class="icon fa fa-remove" aria-hidden="true"></span><%= gettext("No Timed Transcript") %></div>
+<p class="transcripts-message">
+<%= gettext("EdX doesn\'t have a timed transcript for this video. Please upload an .srt file.") %>
+</p>
+<div class="transcripts-file-uploader"></div>
+<p class="transcripts-error-message is-invisible">
+<%= gettext("Error.") %>
+</p>
+<div class="wrapper-transcripts-buttons">
+    <button class="action setting-upload" type="button" name="setting-upload" value="<%= gettext("Upload New Transcript") %>" data-tooltip="<%= gettext("Upload New Transcript") %>">
+        <%= gettext("Upload New Transcript") %>
+    </button>
+    <a class="action setting-download is-disabled" aria-disabled="true" href="javascropt: void(0);" data-tooltip="<%= gettext("Download Transcript for Editing") %>">
+        <%= gettext("Download Transcript for Editing") %>
+    </a>
+</div>

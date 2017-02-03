@@ -1,0 +1,24 @@
+<%inherit file="main.html" />
+<%namespace name='static' file='../static_content.html'/>
+<%! from django.utils.translation import ugettext as _ %>
+<%block name="bodyclass">courseware news</%block>
+<%block name="pagetitle">${_("News - MITx 6.002x")}</%block>
+
+<%block name="headextra">
+<%static:css group='style-course-vendor'/>
+<%static:css group='style-course'/>
+</%block>
+
+<%block name="js_extra">
+</%block>
+
+<%include file="course_navigation.html" args="active_page='news'" />
+
+<section class="container">
+  <div class="course-wrapper">
+    <section class="course-content">
+      <h3> ${_("Updates to Discussion Posts You Follow")} </h3>
+      ${content}
+    </section>
+  </div>
+</section>

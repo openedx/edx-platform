@@ -1,0 +1,23 @@
+## mako
+<%!
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+%>
+<%namespace name='static' file='../static_content.html'/>
+
+<%inherit file="../main.html" />
+
+<%block name="pagetitle">
+${_("Student Support")}
+</%block>
+
+<%block name="content">
+<section class="container outside-app">
+  <h1>${_("Student Support")}</h1>
+  <ul>
+    % for url in urls:
+    <li><a href="${url["url"]}">${unicode(url["name"])}</a>: ${unicode(url["description"])}</li>
+    % endfor
+  </ul>
+</section>
+</%block>

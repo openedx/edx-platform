@@ -1,0 +1,14 @@
+<problem display_name="Numerical Input" markdown="A numerical input problem accepts a line of text input from the student, and evaluates the input for correctness based on its numerical value.&#10;&#10;The answer is correct if it is within a specified numerical tolerance of the expected answer.&#10;&#10;&gt;&gt;Enter the number of fingers on a human hand&lt;&lt;&#10;= 5&#10;&#10;[explanation]&#10;If you look at your hand, you can count that you have five fingers.&#10;[explanation]&#10;">
+  <p>A numerical input problem accepts a line of text input from the student, and evaluates the input for correctness based on its numerical value.</p>
+  <p>The answer is correct if it is within a specified numerical tolerance of the expected answer.</p>
+  <p>Enter the number of fingers on a human hand</p>
+  <numericalresponse answer="5">
+    <formulaequationinput label="Enter the number of fingers on a human hand"/>
+  </numericalresponse>
+  <solution>
+    <div class="detailed-solution">
+      <p>Explanation</p>
+      <p>If you look at your hand, you can count that you have five fingers.</p>
+    </div>
+  </solution>
+</problem>

@@ -1,0 +1,92 @@
+<%!
+from django.utils.translation import ugettext as _
+from django.template.defaultfilters import escapejs
+%>
+<%namespace name='static' file='../static_content.html'/>
+<%block name="js_extra">
+  <%static:js group='certificates_wv'/>
+  <script type="text/javascript">
+      $(document).ready(function() {
+          FaceBook.init({"facebook_app_id": '${facebook_app_id}'});
+          $.ajaxSetup({
+              headers: {
+                  'X-CSRFToken': $.cookie('csrftoken')
+              },
+              dataType: 'json'
+          });
+          $(".action-linkedin-profile").click(function() {
+              var data = {
+                  user_id: '${accomplishment_user_id}',
+                  course_id: $(this).data('course-id'),
+                  enrollment_mode: $(this).data('certificate-mode'),
+                  certificate_id: '${certificate_id_number}',
+                  certificate_url: window.location.href,
+                  social_network: 'LinkedIn'
+              };
+              Logger.log('edx.certificate.shared', data);
+              window.open('${linked_in_url}');
+          });
+      });
+
+      function popupWindow(url, title, width, height) {
+          // popup a window at center of the screen.
+          var left = (screen.width/2)-(width/2);
+          var top = (screen.height/2)-(height/2);
+          return window.open(url, title, 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=yes, resizable=yes, width='+width+', height='+height+', top='+top+', left='+left);
+      }
+  </script>
+</%block>
+<div id="fb-root"></div>
+<div class="wrapper-banner wrapper-banner-user">
+    <section class="banner banner-user">
+        <div class="message message-block message-notice">
+            <h2 class="message-title hd-5 emphasized">${accomplishment_banner_opening | h}</h2>
+            <div class="wrapper-copy-and-actions">
+                <p class="message-copy copy copy-base emphasized">${accomplishment_banner_congrats}</p>
+                <div class="message-actions">
+                    <h3 class="sr-only">${_("Print or share your certificate:")}</h3>
+                    % if facebook_share_enabled:
+                      <button class="action action-share-facebook btn-inverse btn-small icon-only" id="action-share-facebook"
+                         onclick="FaceBook.share({
+                          share_text: '${facebook_share_text | escapejs}',
+                          share_link: '${share_url}',
+                          picture_link: '${full_course_image_url}',
+                          description: '${_('Click the link to see my certificate.') | escapejs}'
+                          });">
+                          <span class="icon fa fa-facebook-official" aria-hidden="true"></span>
+                          <span class="action-label">${_("Post on Facebook")}</span>
+                      </button>
+                    %endif
+                    % if twitter_share_enabled:
+                      <button data-tooltip="${_('Share on Twitter')}"
+                        class="action action-share-twitter btn-inverse btn-small icon-only"
+                        title="${_('Share on Twitter')}"
+                        onclick="popupWindow('${twitter_url}', 'tweetWindow', 640, 480); return false;">
+                          <span class="icon fa fa-twitter" aria-hidden="true"></span>
+                          <span class="action-label">${_("Tweet this Accomplishment. Pop up window.")}</span>
+                      </button>
+                    %endif
+
+                    %if linked_in_url:
+                    <button class="action action-linkedin-profile btn-inverse btn-small icon-only" id="action-share-linkedin" title="${_('Add to LinkedIn Profile')}" data-course-id="${course_id}" data-certificate-mode="${course_mode}">
+                        <span class="icon fa fa-linkedin" aria-hidden="true"></span>
+                        <span class="action-label">${_("Add to LinkedIn Profile")}</span>
+                    </button>
+                    %endif
+
+                    %if badge:
+                    <button class="action action-share-mozillaopenbadges btn btn-overlay btn-small">
+                        <img class="icon icon-mozillaopenbadges" src="/static/certificates/images/ico-mozillaopenbadges.png" alt="Mozilla Open Badges Backpack">
+                        ${_("Add to Mozilla Backpack")}
+                    </button>
+                    %endif
+
+                    <button class="action action-print btn-inverse btn-small" id="action-print-view">
+                        <span class="icon fa fa-print" aria-hidden="true"></span>
+                        ${_("Print Certificate")}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
