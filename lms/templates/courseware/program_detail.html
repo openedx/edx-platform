@@ -360,9 +360,6 @@ from openedx.core.djangolib.markup import HTML, Text
                     </div>
                     <blockquote class="program-quote visible-sm">
                         <div class="quote">
-                            <span class="pull-right hidden-sm">
-                                <img src="${program['individual_endorsements'][0]['endorser']['profile_image_url']}" width="90" height="90"/>
-                            </span>
                             <span>
                                 ${program['individual_endorsements'][0]['quote']}
                             </span>
@@ -409,7 +406,6 @@ from openedx.core.djangolib.markup import HTML, Text
                             <span>
                                ${program['individual_endorsements'][0]['quote']}
                             </span>
-                            <img class="visible-sm pull-left" src="${program['individual_endorsements'][0]['endorser']['profile_image_url']}" width="40" height="40"/>
                             <span class="writer">
                                 ${program['individual_endorsements'][0]['endorser']['given_name']},
                                 ${program['individual_endorsements'][0]['endorser']['position']['title']}
