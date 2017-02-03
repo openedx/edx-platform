@@ -122,7 +122,7 @@ iframe[seamless]{
 div.problem-progress {
   @include padding-left($baseline/4);
   @extend %t-ultralight;
-  display: inline-block;
+  display: none;
   color: $gray-d1;
   font-weight: 100;
   font-size: em(16);
@@ -170,10 +170,14 @@ div.problem {
       width: 100%;
 
       &.choicegroup_correct {
-        border: none;
+        border: 2px solid #e4e4e4;
 
         &:after {
           @include margin-left($baseline*.75);
+        }
+
+        &:hover {
+          border: 2px solid $blue;
         }
       }
 
@@ -192,10 +196,14 @@ div.problem {
       }
 
       &.choicegroup_incorrect {
-        border: none;
+        border: 2px solid #e4e4e4;
 
         &:after {
           @include margin-left($baseline*.75);
+        }
+
+        &:hover {
+          border: 2px solid $blue;
         }
       }
 
