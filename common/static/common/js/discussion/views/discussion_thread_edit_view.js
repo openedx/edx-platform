@@ -58,7 +58,7 @@
 
             save: function() {
                 var title = this.$('.edit-post-title').val(),
-                    threadType = this.$('.post-type-input:checked').val(),
+                    threadType = this.$('.input-radio:checked').val(),
                     body = this.$('.edit-post-body textarea').val(),
                     postData = {
                         title: title,
