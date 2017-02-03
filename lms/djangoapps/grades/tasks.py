@@ -35,12 +35,13 @@ KNOWN_RETRY_ERRORS = (DatabaseError, ValidationError)  # Errors we expect occasi
 RECALCULATE_GRADE_DELAY = 2  # in seconds, to prevent excessive _has_db_updated failures. See TNL-6424.
 
 
-@task(bind=True, base=PersistOnFailureTask, default_retry_delay=30, routing_key=settings.RECALCULATE_GRADES_ROUTING_KEY)
+@task(bind=True, base=PersistOnFailureTask, default_retry_delay=10, routing_key=settings.RECALCULATE_GRADES_ROUTING_KEY, max_retries=1)
 def recalculate_subsection_grade_v3(self, **kwargs):
     """
     Latest version of the recalculate_subsection_grade task.  See docstring
     for _recalculate_subsection_grade for further description.
     """
+    log.error("\n\n\nSTARTING TASK RUN, THIS MESSAGE SHOULD ONLY APPEAR TWICE")
     _recalculate_subsection_grade(self, **kwargs)
 
 
@@ -97,15 +98,12 @@ def _recalculate_subsection_grade(self, **kwargs):
             kwargs['only_if_higher'],
             kwargs['user_id'],
         )
-    except Retry:
-        raise
     except Exception as exc:   # pylint: disable=broad-except
-        if not isinstance(exc, KNOWN_RETRY_ERRORS):
-            log.info("tnl-6244 grades unexpected failure: {}. task id: {}. kwargs={}".format(
-                repr(exc),
-                self.request.id,
-                kwargs,
-            ))
+        log.error("tnl-6244 grades unexpected failure: {}. task id: {}. kwargs={}".format(
+            repr(exc),
+            self.request.id,
+            kwargs,
+        ))
         raise _retry_recalculate_subsection_grade(self, exc=exc, **kwargs)
 
 
@@ -137,8 +135,9 @@ def _has_db_updated_with_new_score(self, scored_block_usage_key, **kwargs):
     else:
         db_is_updated = found_modified_time >= from_timestamp(kwargs['expected_modified_time'])
 
+    db_is_updated = False
     if not db_is_updated:
-        log.info(
+        log.error(
             u"Persistent Grades: tasks._has_database_updated_with_new_score is False. Task ID: {}. Kwargs: {}. Found "
             u"modified time: {}".format(
                 self.request.id,
