@@ -109,11 +109,6 @@ def cme_create_account(request, post_override=None):
 #     if error is not None:
 #         return HttpResponse(json.dumps(error))
 
-    # Validate required secondary fields
-    error = validate_required_secondaries(post_vars)
-    if error is not None:
-        return HttpResponse(json.dumps(error))
-
     # Validate email address
     try:
         validate_email(post_vars['email'])
@@ -235,23 +230,11 @@ def _do_cme_create_account(post_vars):
     cme_user_profile.license_state = post_vars.get('license_state')
     cme_user_profile.physician_status = post_vars.get('physician_status')
     cme_user_profile.patient_population = post_vars.get('patient_population')
-
-    if post_vars.get('specialty') == 'Other':
-        cme_user_profile.specialty = post_vars.get('specialty_free')
-    else:
-        cme_user_profile.specialty = post_vars.get('specialty')
-
-    if post_vars.get('sub_specialty') == 'Other':
-        cme_user_profile.sub_specialty = post_vars.get('sub_specialty_free')
-    else:
-        cme_user_profile.sub_specialty = post_vars.get('sub_specialty')
-
+    cme_user_profile.specialty = post_vars.get('specialty')
+    cme_user_profile.sub_specialty = post_vars.get('sub_specialty')
     cme_user_profile.affiliation = post_vars.get('affiliation')
 
-    if post_vars.get('affiliation') == 'Other':
-        cme_user_profile.other_affiliation = post_vars.get('other_affiliation')
-    else:
-        cme_user_profile.other_affiliation = None
+    cme_user_profile.other_affiliation = None
 
     cme_user_profile.sub_affiliation = post_vars.get('sub_affiliation')
     cme_user_profile.sunet_id = post_vars.get('sunet_id')
@@ -474,29 +457,6 @@ def validate_required_boxes(post_vars):
             error['field'] = k
             return error
 
-
-def validate_required_secondaries(post_vars):
-    """
-    Checks that required "secondary" text fields contain at least 2 chars. A secondary field is one that appears on the form if
-    the user chooses a particular value in the corresponding primary. E.g. if "Other" chosen in sub_specialty then the
-    sub_specialty_free secondary field pops up on the registration form.
-    `post_vars is dict of post parameters (a `dict)
-    Returns a dict indicating failure, field and message on empty field else None
-    """
-
-    #Add additional required secondaries here
-    required_secondaries_dict = {'specialty': ('Other', 'specialty_free', 'Enter your specialty.'),
-                                 'sub_specialty': ('Other', 'sub_specialty_free', 'Enter your sub-specialty.'),
-                                 }
-
-    error = {}
-    for k, val in required_secondaries_dict.items():
-        if post_vars.get(k) == val[0] and len(post_vars.get(val[1])) < 2:
-            error['success'] = False
-            error['value'] = val[2]
-            error['field'] = k
-            return error
-
 # Commented out while no radios exist
 # def validate_required_radios(post_vars):
 #     """
@@ -540,109 +500,107 @@ DENIED_COUNTRIES = ['Sudan',
                     ]
 
 #Construct dicts for sub-specialty, sub-affiliation dropdowns
-SUB_SPECIALTY_CHOICES = {}
 SUB_AFFILIATION_CHOICES = {}
 
-SUB_SPECIALTY_CHOICES['Cardiology'] = (('Cardiopulmonary', 'Cardiopulmonary'),
-                                       ('Cardiothoracic', 'Cardiothoracic'),
-                                       ('Cardiovascular_Disease', 'Cardiovascular Disease'),
-                                       ('Cath_Angio_Lab', 'Cath Angio/Lab'),
-                                       ('Electrophysiology', 'Electrophysiology'),
-                                       ('Interventional_Cardiology', 'Interventional Cardiology'),
-                                       ('Surgery', 'Surgery'),
-                                       ('Vascular', 'Vascular'),
-                                       ('Other', 'Other, please enter:'))
-
-SUB_SPECIALTY_CHOICES['Internal_Medicine'] = (('Cardiology', 'Cardiology'),
-                                              ('Dermatology', 'Dermatology'),
-                                              ('Endocrinology_Gerontology_&_Metabolism', 'Endocrinology, Gerontology & Metabolism'),
-                                              ('Gastroenterology_&_Hepatology', 'Gastroenterology & Hepatology'),
-                                              ('Hematology', 'Hematology'),
-                                              ('Immunology_&_Rheumatology', 'Immunology & Rheumatology'),
-                                              ('Infectious_Disease', 'Infectious Disease'),
-                                              ('Nephrology', 'Nephrology'),
-                                              ('Preventative_Medicine', 'Preventative Medicine'),
-                                              ('Pulmonary', 'Pulmonary'),
-                                              ('Other', 'Other, please enter:'))
-
-SUB_SPECIALTY_CHOICES['Obstetrics_Gynecology'] = (('Gynecology', 'Gynecology'),
-                                                  ('Obstetrics', 'Obstetrics'),
-                                                  ('Maternal_&_Fetal_Medicine', 'Maternal & Fetal Medicine'),
-                                                  ('Women_Health', 'Women\'s Health'),
-                                                  ('Other', 'Other, please enter:'))
-
-SUB_SPECIALTY_CHOICES['Oncology'] = (('Breast', 'Breast'),
-                                     ('Gastroenterology', 'Gastroenterology'),
-                                     ('Gynecology', 'Gynecology'),
-                                     ('Hematology', 'Hematology'),
-                                     ('Medical', 'Medical'),
-                                     ('Radiation', 'Radiation'),
-                                     ('Surgical', 'Surgical'),
-                                     ('Urology', 'Urology'),
-                                     ('Other', 'Other, please enter:'))
-
-SUB_SPECIALTY_CHOICES['Palliative_Care'] = (('Hospice', 'Hospice'),
-                                            ('Other', 'Other, please enter:'))
-
-SUB_SPECIALTY_CHOICES['Pediatrics'] = (('Adolescent_Medicine', 'Adolescent Medicine'),
-                                       ('Allergy', 'Allergy'),
-                                       ('Anesthesiology', 'Anesthesiology'),
-                                       ('Cardiac_Surgery', 'Cardiac Surgery'),
-                                       ('Cardiology', 'Cardiology'),
-                                       ('Critical_Care', 'Critical Care'),
-                                       ('Dermatology', 'Dermatology'),
-                                       ('Emergency', 'Emergency'),
-                                       ('Endocrinology', 'Endocrinology'),
-                                       ('Family Practice', 'Family Practice'),
-                                       ('Gastroenterology', 'Gastroenterology'),
-                                       ('Hematology_&_Oncology', 'Hematology & Oncology'),
-                                       ('Immunology_&_Rheumatology', 'Immunology & Rheumatology'),
-                                       ('Internal_Medicine', 'Internal Medicine'),
-                                       ('Infectious_Disease', 'Infectious Disease'),
-                                       ('Neonatology', 'Neonatology'),
-                                       ('Nephrology', 'Nephrology'),
-                                       ('Neurology', 'Neurology'),
-                                       ('Obstetrics_&_Gynecology', 'Obstetrics & Gynecology'),
-                                       ('Otolaryngology_Head_&_Neck', 'Otolaryngology/ Head & Neck'),
-                                       ('Oncology', 'Oncology'),
-                                       ('Ophthalmology', 'Ophthalmology'),
-                                       ('Orthopaedic_Surgery', 'Orthopaedic Surgery'),
-                                       ('Osteopathy', 'Osteopathy'),
-                                       ('Pathology', 'Pathology'),
-                                       ('Pediatric_Intensive_Care', 'Pediatric Intensive Care'),
-                                       ('Psychiatry', 'Psychiatry'),
-                                       ('Psychology', 'Psychology'),
-                                       ('Pulmonary', 'Pulmonary'),
-                                       ('Radiology', 'Radiology'),
-                                       ('Surgery', 'Surgery'),
-                                       ('Urology', 'Urology'),
-                                       ('Other', 'Other, please enter:'))
-
-SUB_SPECIALTY_CHOICES['Pulmonology'] = (('Critical_Care', 'Critical Care'),
-                                        ('Respiratory', 'Respiratory'),
-                                        ('Other', 'Other, please enter:'))
-
-SUB_SPECIALTY_CHOICES['Surgery'] = (('Bariatric_Surgery', 'Bariatric Surgery'),
-                                    ('Cardiac_Surgery', 'Cardiac Surgery'),
-                                    ('Cardiothoracic_Surgery', 'Cardiothoracic Surgery'),
-                                    ('Colon_&_Rectal_Surgery', 'Colon & Rectal Surgery'),
-                                    ('Emergency_Medicine', 'Emergency Medicine'),
-                                    ('Gastrointestinal_Surgery', 'Gastrointestinal Surgery'),
-                                    ('Neurosurgery', 'Neurosurgery'),
-                                    ('Oral_&_Maxillofacial_Surgery', 'Oral & Maxillofacial Surgery'),
-                                    ('Orthopaedic_Surgery', 'Orthopaedic Surgery'),
-                                    ('Plastic_&_Reconstructive_Surgery', 'Plastic & Reconstructive Surgery'),
-                                    ('Surgical_Critical_Care', 'Surgical Critical Care'),
-                                    ('Surgical_Oncology', 'Surgical Oncology'),
-                                    ('Thoracic_Surgery', 'Thoracic Surgery'),
-                                    ('Trauma_Surgery', 'Trauma Surgery'),
-                                    ('Upper_Extremity_Hand_Surgery', 'Upper Extremity/ Hand Surgery'),
-                                    ('Vascular_Surgery', 'Vascular Surgery'),
-                                    ('Other', 'Other, please enter:'))
-
-SUB_SPECIALTY_CHOICES['Transplant'] = (('Solid_Organ', 'Solid Organ'),
-                                       ('Blood_and_Bone_Marrow', 'Blood and Bone Marrow'),
-                                       ('Other', 'Other, please enter:'))
+SUB_SPECIALTY_CHOICES = {
+    'Cardiovascular_Health': [
+        ('Cardiac_Surgery','Cardiac Surgery'),
+        ('Cardiology','Cardiology'),
+        ('Cardiothoracic','Cardiothoracic'),
+        ('Cardiothoracic_Surgery','Cardiothoracic Surgery'),
+        ('Cardiovascular_Disease','Cardiovascular Disease'),
+        ('Cath_Angio/Lab','Cath Angio/Lab'),
+        ('Electrophysiology','Electrophysiology'),
+        ('Interventional_Cardiology','Interventional Cardiology'),
+    ],
+    'Internal_Medicine': [
+        ('Adolescent_Medicine','Adolescent Medicine'),
+        ('Adult_Congenital_Heart_Disease','Adult Congenital Heart Disease'),
+        ('Advanced_Heart_Failure_and_Transplant_Cardiology','Advanced Heart Failure and Transplant Cardiology'),
+        ('Allergy_&_Immunology','Allergy & Immunology'),
+        ('Cardiovascular_Disease','Cardiovascular Disease'),
+        ('Clinical_Cardiac_Electrophysiology','Clinical Cardiac Electrophysiology'),
+        ('Critical_Care_Medicine','Critical Care Medicine'),
+        ('Endocrinology,_Diabetes,_&_Metabolism','Endocrinology, Diabetes, & Metabolism'),
+        ('Gastroenterology','Gastroenterology'),
+        ('Geriatric_Medicine','Geriatric Medicine'),
+        ('Hematology','Hematology'),
+        ('Hospice_&_Palliative_Medicine','Hospice & Palliative Medicine'),
+        ('Hospital_Medicine,_Focused_Practice','Hospital Medicine, Focused Practice'),
+        ('Infectious_Disease','Infectious Disease'),
+        ('Interventional_Cardiology','Interventional Cardiology'),
+        ('Medical_Oncology','Medical Oncology'),
+        ('Nephrology','Nephrology'),
+        ('Pulmonary_Disease','Pulmonary Disease'),
+        ('Rheumatology','Rheumatology'),
+        ('Sleep_Medicine','Sleep Medicine'),
+        ('Sports_Medicine','Sports Medicine'),
+    ],
+    'Obstetrics_&_Gynecology': [
+        ('Female_Pelvic_Medicine_and_Reconstructive_Surgery','Female Pelvic Medicine and Reconstructive Surgery'),
+        ('Gynecologic_Oncology','Gynecologic Oncology'),
+        ('Maternal-Fetal_Medicine','Maternal-Fetal Medicine'),
+        ('Reproductive_Endocrinology_and_Infertility','Reproductive Endocrinology and Infertility'),
+    ],
+    'Oncology': [
+        ('Hematology','Hematology'),
+        ('Medical_Oncology','Medical Oncology'),
+        ('Radiation_Oncology','Radiation Oncology'),
+    ],
+    'Orthopedics_&_Sports_Medicine': [
+        ('Surgery','Surgery'),
+    ],
+    'Pediatrics': [
+        ('Adolescent_Medicine','Adolescent Medicine'),
+        ('Allergy,_Immunology,_&_Rheumatology','Allergy, Immunology, & Rheumatology'),
+        ('Anesthesiology','Anesthesiology'),
+        ('Cardiovascular_Health','Cardiovascular Health'),
+        ('Complimentary_Medicine_&_Pain_Management','Complimentary Medicine & Pain Management'),
+        ('Critical_Care_&_Pulmonology','Critical Care & Pulmonology'),
+        ('Dental_Specialties','Dental Specialties'),
+        ('Dermatology','Dermatology'),
+        ('Emergency_Medicine_&_Trauma','Emergency Medicine & Trauma'),
+        ('Endocrinology_&_Metabolism','Endocrinology & Metabolism'),
+        ('Family_Medicine_&_Community_Health','Family Medicine & Community Health'),
+        ('Gastroenterology_&_Hepatology','Gastroenterology & Hepatology'),
+        ('Genetics_&_Genomics','Genetics & Genomics'),
+        ('Gerontology','Gerontology'),
+        ('Hematology','Hematology'),
+        ('Infectious_Disease_&_Global_Health','Infectious Disease & Global Health'),
+        ('Internal_Medicine','Internal Medicine'),
+        ('Neonatology','Neonatology'),
+        ('Nephrology','Nephrology'),
+        ('Neurology_&_Neurologic_Surgery','Neurology & Neurologic Surgery'),
+        ('Obstetrics_&_Gynecology','Obstetrics & Gynecology'),
+        ('Oncology','Oncology'),
+        ('Ophthalmology','Ophthalmology'),
+        ('Orthopedics_&_Sports_Medicine','Orthopedics & Sports Medicine'),
+        ('Otolaryngology_(ENT)','Otolaryngology (ENT)'),
+        ('Pathology_&_Laboratory_Medicine','Pathology & Laboratory Medicine'),
+        ('Preventative_Medicine_&_Nutrition','Preventative Medicine & Nutrition'),
+        ('Psychiatry_&_Behavioral_Sciences','Psychiatry & Behavioral Sciences'),
+        ('Radiology','Radiology'),
+        ('Surgery','Surgery'),
+        ('Urology','Urology'),
+        ('Other/None','Other/None'),
+    ],
+    'Radiology': [
+        ('Diagnostic_Radiology','Diagnostic Radiology'),
+        ('Interventional_Radiology_and_Diagnostic_Radiology','Interventional Radiology and Diagnostic Radiology'),
+        ('Medical_Physics','Medical Physics'),
+        ('Radiation_Oncology','Radiation Oncology'),
+        ('Therapeutic_Medical_Physics','Therapeutic Medical Physics'),
+    ],
+    'Surgery': [
+        ('Complex_General_Surgical_Oncology','Complex General Surgical Oncology'),
+        ('General_Surgery','General Surgery'),
+        ('Hand_Surgery','Hand Surgery'),
+        ('Hospice_and_Palliative_Medicine','Hospice and Palliative Medicine'),
+        ('Pediatric_Surgery','Pediatric Surgery'),
+        ('Surgical_Critical_Care','Surgical Critical Care'),
+        ('Vascular_Surgery','Vascular Surgery'),
+    ],
+}
 
 SUB_AFFILIATION_CHOICES['Packard_Childrens_Health_Alliance'] = (('Bayside_Medical_Group', 'Bayside Medical Group'),
                                                                 ('Diablo_Valley_Child_Neurology', 'Diablo Valley Child Neurology'),
