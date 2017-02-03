@@ -344,10 +344,10 @@ def course_info(request, course_id):
         upgrade_data = VerificationDeadlineDate(course, user)
 
         upgrade_link = None
-        if (request.user.is_authenticated() and 
-           request.GET.get('upgrade', 'false') == 'true' and
-           upgrade_data.verification_status == 'none' and
-           not upgrade_data.deadline_has_passed()):
+        if (request.user.is_authenticated() and
+                request.GET.get('upgrade', 'false') == 'true' and
+                upgrade_data.verification_status == 'none' and
+                not upgrade_data.deadline_has_passed()):
             upgrade_link = upgrade_data.link
 
         context = {
