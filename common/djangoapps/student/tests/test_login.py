@@ -539,7 +539,6 @@ class LoginOAuthTokenMixin(ThirdPartyOAuthTestMixin):
         """Assert that the given response was a 400 with the given error code"""
         self.assertEqual(response.status_code, status_code)
         self.assertEqual(json.loads(response.content), {"error": error})
-        self.assertNotIn("partial_pipeline_token", self.client.session)
 
     def test_success(self):
         self._setup_provider_response(success=True)

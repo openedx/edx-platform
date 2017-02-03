@@ -1811,7 +1811,6 @@ class ThirdPartyRegistrationTestMixin(ThirdPartyOAuthTestMixin, CacheIsolationTe
         for conflict_attribute in ["username", "email"]:
             self.assertIn(conflict_attribute, errors)
             self.assertIn("belongs to an existing account", errors[conflict_attribute][0]["user_message"])
-        self.assertNotIn("partial_pipeline_token", self.client.session)
 
     def _assert_access_token_error(self, response, expected_error_message):
         """Assert that the given response was an error for the access_token field with the given error message."""
@@ -1821,7 +1820,6 @@ class ThirdPartyRegistrationTestMixin(ThirdPartyOAuthTestMixin, CacheIsolationTe
             response_json,
             {"access_token": [{"user_message": expected_error_message}]}
         )
-        self.assertNotIn("partial_pipeline_token", self.client.session)
 
     def _verify_user_existence(self, user_exists, social_link_exists, user_is_active=None, username=None):
         """Verifies whether the user object exists."""

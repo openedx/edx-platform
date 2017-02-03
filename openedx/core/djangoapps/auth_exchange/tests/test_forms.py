@@ -38,7 +38,6 @@ class AccessTokenExchangeFormTest(AccessTokenExchangeTestMixin):
             form.errors,
             {"error": expected_error, "error_description": expected_error_description}
         )
-        self.assertNotIn("partial_pipeline_token", self.request.session)
 
     def _assert_success(self, data, expected_scopes):
         form = AccessTokenExchangeForm(request=self.request, oauth2_adapter=self.oauth2_adapter, data=data)

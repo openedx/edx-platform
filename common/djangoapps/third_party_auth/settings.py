@@ -90,3 +90,5 @@ def apply_settings(django_settings):
         'social_django.context_processors.backends',
         'social_django.context_processors.login_redirect',
     )
+
+    django_settings.API_VERSION = '2.3'
