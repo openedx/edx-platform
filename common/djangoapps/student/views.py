@@ -283,14 +283,14 @@ def reverification_info(statuses):
     return reverifications
 
 
-def get_course_enrollments(user, org_to_include, orgs_to_exclude):
+def get_course_enrollments(user, orgs_to_include, orgs_to_exclude):
     """
     Given a user, return a filtered set of his or her course enrollments.
 
     Arguments:
         user (User): the user in question.
-        org_to_include (str): If not None, ONLY courses of this org will be returned.
-        orgs_to_exclude (list[str]): If org_to_include is not None, this
+        orgs_to_include (list[str]): If not None, ONLY courses of these orgs will be returned.
+        orgs_to_exclude (list[str]): If orgs_to_include is not None, this
             argument is ignored. Else, courses of this org will be excluded.
 
     Returns:
@@ -309,8 +309,8 @@ def get_course_enrollments(user, org_to_include, orgs_to_exclude):
             )
             continue
 
-        # Filter out anything that is not attributed to the current ORG.
-        if org_to_include and course_overview.location.org != org_to_include:
+        # Filter out anything that is not attributed to the orgs to include.
+        if orgs_to_include and course_overview.location.org not in orgs_to_include:
             continue
 
         # Conversely, filter out any enrollments with courses attributed to current ORG.
@@ -597,17 +597,16 @@ def dashboard(request):
         settings.FEATURES.get('DISPLAY_COURSE_MODES_ON_DASHBOARD', True)
     )
 
-    # we want to filter and only show enrollments for courses within
-    # the 'ORG' defined in configuration.
-    course_org_filter = configuration_helpers.get_value('course_org_filter')
-
     # Let's filter out any courses in an "org" that has been declared to be
     # in a configuration
     org_filter_out_set = configuration_helpers.get_all_orgs()
 
-    # remove our current org from the "filter out" list, if applicable
+    # Remove current site orgs from the "filter out" list, if applicable.
+    # We want to filter and only show enrollments for courses within
+    # the organizations defined in configuration for the current site.
+    course_org_filter = configuration_helpers.get_current_site_orgs()
     if course_org_filter:
-        org_filter_out_set.remove(course_org_filter)
+        org_filter_out_set = org_filter_out_set - set(course_org_filter)
 
     # Build our (course, enrollment) list for the user, but ignore any courses that no
     # longer exist (because the course IDs have changed). Still, we don't delete those
