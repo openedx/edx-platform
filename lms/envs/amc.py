@@ -62,6 +62,9 @@ SEARCH_INITIALIZER = "lms.lib.courseware_search.lms_search_initializer.LmsSearch
 SEARCH_RESULT_PROCESSOR = "lms.lib.courseware_search.lms_result_processor.LmsSearchResultProcessor"
 SEARCH_FILTER_GENERATOR = "lms.lib.courseware_search.lms_filter_generator.LmsSearchFilterGenerator"
 
+#enable course visibility feature flags
+COURSE_CATALOG_VISIBILITY_PERMISSION = 'see_in_catalog'
+COURSE_ABOUT_VISIBILITY_PERMISSION = 'see_about_page'
 SEARCH_SKIP_ENROLLMENT_START_DATE_FILTERING = True
 
 # disable for now
