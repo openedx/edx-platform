@@ -20,7 +20,8 @@ log = logging.getLogger(__name__)
 CLASS_PRIORITY = ['video', 'problem']
 
 
-@XBlock.needs('user', 'bookmarks')
+@XBlock.needs('user')
+@XBlock.needs('bookmarks')
 class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParserMixin, MakoTemplateBlockBase, XBlock):
     """
     Layout XBlock for rendering subblocks vertically.
