@@ -71,8 +71,8 @@ git+https://github.com/edx/rfc6266.git@v0.0.5-edx#egg=rfc6266==0.0.5-edx
 git+https://github.com/edx/lettuce.git@0.2.20.002#egg=lettuce==0.2.20.002
 
 # Our libraries:
-git+https://github.com/andy-armstrong/web-fragments.git@e747c58b9babad4d6d4e027629b2d2316343f395#egg=web-fragments==0.1.0
-git+https://github.com/edx/XBlock.git@97a60f6b722f805efd174d62d1c65ded54d97132#egg=XBlock==0.4.14
+git+https://github.com/andy-armstrong/web-fragments.git@master#egg=web-fragments==0.1.0
+git+https://github.com/edx/XBlock.git@andya/use-web-fragments#egg=XBlock==0.4.14
 -e git+https://github.com/edx/codejail.git@a320d43ce6b9c93b17636b2491f724d9e433be47#egg=codejail==0.0
 -e git+https://github.com/edx/event-tracking.git@0.2.1#egg=event-tracking==0.2.1
 -e git+https://github.com/edx/django-splash.git@v0.2#egg=django-splash==0.2
