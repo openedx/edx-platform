@@ -30,7 +30,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import UsageKey
 from xmodule.modulestore import ModuleStoreEnum
 
-from bulk_email.models import BulkEmailFlag
+from bulk_email.models import BulkEmailFlag, CourseEmail, CourseEmailTemplate
 from course_modes.models import CourseMode
 from courseware.models import StudentModule
 from courseware.tests.factories import (
@@ -70,6 +70,7 @@ from certificates.models import CertificateStatuses
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohort_settings
 from openedx.core.lib.xblock_utils import grade_histogram
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 
 from .test_tools import msk_from_problem_urlname
 
@@ -3558,7 +3559,7 @@ class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginE
 
 @attr(shard=1)
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
-class TestInstructorSendEmail(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
+class TestInstructorSendEmail(SiteMixin, SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Checks that only instructors have access to email endpoints, and that
     these endpoints are only accessible with courses that actually exist,
@@ -3644,6 +3645,43 @@ class TestInstructorSendEmail(SharedModuleStoreTestCase, LoginEnrollmentTestCase
             'subject': 'test subject',
         })
         self.assertEqual(response.status_code, 400)
+
+    def test_send_email_with_site_template_and_from_addr(self):
+        site_email = self.site_configuration.values.get('course_email_from_addr')
+        site_template = self.site_configuration.values.get('course_email_template_name')
+        CourseEmailTemplate.objects.create(name=site_template)
+        url = reverse('send_email', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        response = self.client.post(url, self.full_test_message)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(1, CourseEmail.objects.filter(
+            course_id=self.course.id,
+            sender=self.instructor,
+            subject=self.full_test_message['subject'],
+            html_message=self.full_test_message['message'],
+            template_name=site_template,
+            from_addr=site_email
+        ).count())
+
+    def test_send_email_with_org_template_and_from_addr(self):
+        org_email = 'fake_org@example.com'
+        org_template = 'fake_org_email_template'
+        CourseEmailTemplate.objects.create(name=org_template)
+        self.site_configuration.values.update({
+            'course_email_from_addr': {self.course.id.org: org_email},
+            'course_email_template_name': {self.course.id.org: org_template}
+        })
+        self.site_configuration.save()
+        url = reverse('send_email', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        response = self.client.post(url, self.full_test_message)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(1, CourseEmail.objects.filter(
+            course_id=self.course.id,
+            sender=self.instructor,
+            subject=self.full_test_message['subject'],
+            html_message=self.full_test_message['message'],
+            template_name=org_template,
+            from_addr=org_email
+        ).count())
 
 
 class MockCompletionInfo(object):
