@@ -132,7 +132,7 @@
                 var anonymous, anonymousToPeers, body, follow, group, threadType, title, topicId, url,
                     self = this;
                 event.preventDefault();
-                threadType = this.$('.post-type-input:checked').val();
+                threadType = this.$('.input-radio:checked').val();
                 title = this.$('.js-post-title').val();
                 body = this.$('.js-post-body').find('.wmd-input').val();
                 group = this.$('.js-group-select option:selected').attr('value');
