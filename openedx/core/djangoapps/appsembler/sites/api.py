@@ -80,8 +80,6 @@ class SiteCreateView(generics.CreateAPIView):
 
 
 class UsernameAvailabilityView(APIView):
-    permission_classes = (ApiKeyHeaderPermission,)
-
     def get(self, request, username, format=None):
         try:
             User.objects.get(username=username)
