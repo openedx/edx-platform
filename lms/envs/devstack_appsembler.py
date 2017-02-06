@@ -62,3 +62,5 @@ AUTHENTICATION_BACKENDS = ('organizations.backends.OrganizationMemberBackend',) 
 
 INTERCOM_APP_ID = AUTH_TOKENS.get("INTERCOM_APP_ID")
 INTERCOM_APP_SECRET = AUTH_TOKENS.get("INTERCOM_APP_SECRET")
+
+EDX_API_KEY = "test"
