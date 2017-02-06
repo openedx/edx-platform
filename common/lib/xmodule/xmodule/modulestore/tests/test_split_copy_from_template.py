@@ -173,3 +173,48 @@ class TestSplitCopyTemplate(MixedSplitTestCase):
         self.assertTrue(self.store.has_changes(new_blocks["chapter"]))
         # Verify that our published_version_exists works
         self.assertFalse(published_version_exists(new_blocks["vertical"]))
+
+    def test_copy_from_template_two_times(self):
+        """
+        Test that copy_from_template works correct if the copied version copied anywhere else.
+        """
+        chapter_display_name = 'Test Chapter'
+        sequential_display_name = 'Test Sequential'
+        chapter_dst_display_name = 'Some New Chapter'
+        chapter_dst_display_name2 = 'Some New Chapter 2'
+
+        # Create original course:
+        course_original = CourseFactory.create(modulestore=self.store)
+        chapter = self.make_block("chapter", course_original, display_name=chapter_display_name)
+        sequential = self.make_block("sequential", chapter, display_name=sequential_display_name)
+
+        # Create course where to copy sequential block
+        course_dst = CourseFactory.create(modulestore=self.store)
+        chapter_dst = self.make_block("chapter", course_dst, display_name=chapter_dst_display_name)
+
+        # Create course where to copy sequential block the second time
+        course_dst2 = CourseFactory.create(modulestore=self.store)
+        chapter_dst2 = self.make_block("chapter", course_dst2, display_name=chapter_dst_display_name2)
+
+        new_blocks = self.store.copy_from_template([sequential.location], dest_key=chapter_dst.location,
+                                                   user_id=self.user_id)
+        self.store.publish(new_blocks[0], self.user_id)
+
+        course_dst = self.store.get_course(course_dst.location.course_key)  # Reload from modulestore
+
+        chapter_after_copy = self.store.get_item(course_dst.get_children()[0].location)
+        self.assertEqual(chapter_after_copy.display_name, chapter_dst_display_name)
+
+        sequential_after_copy = chapter_after_copy.get_children()[0]
+        self.assertEqual(sequential_after_copy.display_name, sequential_display_name)
+
+        new_blocks2 = self.store.copy_from_template([sequential_after_copy.location], dest_key=chapter_dst2.location,
+                                                    user_id=self.user_id)
+        self.store.publish(new_blocks2[0], self.user_id)
+        course_dst2 = self.store.get_course(course_dst2.location.course_key)  # Reload from modulestore
+
+        chapter_after_copy = self.store.get_item(course_dst2.get_children()[0].location)
+        self.assertEqual(chapter_after_copy.display_name, chapter_dst_display_name2)
+
+        sequential_after_copy = chapter_after_copy.get_children()[0]
+        self.assertEqual(sequential_after_copy.display_name, sequential_display_name)
