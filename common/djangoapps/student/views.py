@@ -118,6 +118,8 @@ from openedx.core.djangoapps.embargo import api as embargo_api
 import analytics
 from eventtracking import tracker
 
+import newrelic_custom_metrics
+
 # Note that this lives in LMS, so this dependency should be refactored.
 from notification_prefs.views import enable_notifications
 
@@ -614,6 +616,10 @@ def dashboard(request):
     # longer exist (because the course IDs have changed). Still, we don't delete those
     # enrollments, because it could have been a data push snafu.
     course_enrollments = list(get_course_enrollments(user, course_org_filter, org_filter_out_set))
+
+    # Record how many courses there are so that we can get a better
+    # understanding of usage patterns on prod.
+    newrelic_custom_metrics.accumulate('num_courses', len(course_enrollments))
 
     # sort the enrollment pairs by the enrollment date
     course_enrollments.sort(key=lambda x: x.created, reverse=True)
