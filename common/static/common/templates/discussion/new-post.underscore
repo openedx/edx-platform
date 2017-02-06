@@ -46,20 +46,22 @@
         <div class="js-post-body editor" aria-describedby="new-post-editor-description" name="body"></div>
     </div>
     <div class="post-options">
-        <label class="post-option is-enabled">
-            <input type="checkbox" name="follow" class="post-option-input js-follow" checked>
-            <span class="icon fa fa-star" aria-hidden="true"></span><%- gettext("follow this post") %>
+        <label class="field-label label-inline">
+            <input type="checkbox" name="follow" class="field-input input-checkbox" checked>
+            <span class="field-input-label">
+                <span class="icon fa fa-star" aria-hidden="true"></span><%- gettext("follow this post") %>
+            </span>
         </label>
         <% if (allow_anonymous) { %>
-        <label class="post-option">
-            <input type="checkbox" name="anonymous" class="post-option-input js-anon">
-            <%- gettext("post anonymously") %>
+        <label class="field-label label-inline">
+            <input type="checkbox" name="anonymous" class="field-input input-checkbox">
+            <span class="field-input-label"><%- gettext("post anonymously") %></span>
         </label>
         <% } %>
         <% if (allow_anonymous_to_peers) { %>
-        <label class="post-option">
-            <input type="checkbox" name="anonymous_to_peers" class="post-option-input js-anon-peers">
-            <%- gettext("post anonymously to classmates") %>
+        <label class="field-label label-inline">
+            <input type="checkbox" name="anonymous_to_peers" class="field-input input-checkbox">
+            <span class="field-input-label"><%- gettext("post anonymously to classmates") %></span>
         </div>
         <% } %>
     </div>
