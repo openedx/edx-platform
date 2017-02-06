@@ -1,7 +1,8 @@
 define([
-    'jquery', 'backbone', 'js/views/active_video_upload_list',
+    'jquery', 'backbone', 'js/views/active_video_upload_list', 'js/collections/video',
     'js/views/previous_video_upload_list', 'js/views/active_video_upload'
-], function($, Backbone, ActiveVideoUploadListView, PreviousVideoUploadListView, ActiveVideoUpload) {
+], function($, Backbone, ActiveVideoUploadListView, VideoPagingCollection,
+    PreviousVideoUploadListView, ActiveVideoUpload) {
     'use strict';
     var VideosIndexFactory = function(
         $contentWrapper,
@@ -13,7 +14,7 @@ define([
         videoSupportedFileFormats,
         videoUploadMaxFileSizeInGB
     ) {
-        var activeView = new ActiveVideoUploadListView({
+        /*var activeView = new ActiveVideoUploadListView({
                 postUrl: videoHandlerUrl,
                 concurrentUploadLimit: concurrentUploadLimit,
                 uploadButton: uploadButton,
@@ -41,13 +42,15 @@ define([
                         $contentWrapper.find('.wrapper-assets').replaceWith(updatedView.render().$el);
                     });
                 }
-            }),
-            previousView = new PreviousVideoUploadListView({
+            }),*/
+            var previousView = new PreviousVideoUploadListView({
                 videoHandlerUrl: videoHandlerUrl,
-                collection: new Backbone.Collection(previousUploads),
+                collection: new VideoPagingCollection(previousUploads, {
+                    url: videoHandlerUrl
+                }),
                 encodingsDownloadUrl: encodingsDownloadUrl
             });
-        $contentWrapper.append(activeView.render().$el);
+        //$contentWrapper.append(activeView.render().$el);
         $contentWrapper.append(previousView.render().$el);
     };
 
