@@ -95,7 +95,7 @@ python-dateutil==2.1
 # we have to install social-auth-app-django from fork to get over missing migration
 # issue https://github.com/python-social-auth/social-app-django/issues/28
 # once migrations are run we can switch back to base package(social-auth-app-django==1.0.1)
-git+https://github.com/ziafazal/social-app-django.git@f0a4812f93b0eaac5380763e016ba946657c3a96#egg=social-auth-app-django==1.0.1
+git+https://github.com/ziafazal/social-app-django.git@8f4688076eab6d9b6fb71bb045e779b6c627835f#egg=social-auth-app-django==1.0.1
 social-auth-core==1.1.0
 
 pytz==2016.7
