@@ -1,4 +1,6 @@
 """Helper functions for working with the catalog service."""
+import json
+
 from django.conf import settings
 from django.core.cache import cache
 from django.contrib.auth.models import User

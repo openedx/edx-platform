@@ -71,7 +71,7 @@ from openedx.core.djangolib.markup import HTML, Text
 
     var paginate = function(page, size){
         var start = size * page,
-            end = (start + size - 1) > total ? total - 1 : (start + size - 1);
+            end = (start + size - 1) >= total ? total - 1 : (start + size - 1);
         $(".profile-item-desktop").each(function(index, item){
             if (index >= start && index <= end){
                 $(item).css('display', 'block');
