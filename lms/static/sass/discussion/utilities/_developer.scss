@@ -1,0 +1,81 @@
+// discussion: - developer
+// ====================
+
+// NOTES:
+// * use this area for any developer-needed or created styling that needs to be refactored into patterns or visually
+//   polished. Please list any template/view that reference your styles when definining them (example below):
+
+// --------------------
+// Views: Error
+// --------------------
+// .crazy-new-feature {
+// background: transparent;
+// }
+
+// --------------------
+// Views: forum_form_discussion / single_thread
+// provisional styling for "search alerts" (messages boxes that appear in the sidebar below the search
+// input field with notices pertaining to the search result).
+// --------------------
+
+.forum-nav {
+
+  // wrapper for multiple alerts
+  .search-alerts {
+
+  }
+
+  // a single alert, which can be independently displayed / dismissed
+  .search-alert {
+    @include transition(none);
+    padding: ($baseline/2) 11px ($baseline/2) 18px;
+    background-color: $black;
+  }
+
+  .search-alert-content, .search-alert-controls {
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  // alert content
+  .search-alert-content {
+    width: 70%;
+
+    // alert copy
+    .message {
+      font-size: $forum-small-font-size;
+      color: $white;
+
+      em {
+        @extend %t-weight5;
+        font-style: italic;
+      }
+    }
+
+    // links to jump to users/content in alerts
+    .link-jump {
+      @include transition(none);
+      @extend %t-weight5;
+    }
+  }
+
+  // alert controls
+  .search-alert-controls {
+    @include text-align(right);
+    width: 28%;
+
+    .control {
+      @include transition(none);
+      @extend %t-weight5;
+      padding: ($baseline/4) ($baseline/2);
+      color: $white;
+      font-size: $forum-base-font-size;
+
+      // reseting poorly globally scoped hover/focus state for this control
+      &:hover, &:focus {
+        color: $white;
+        text-decoration: none;
+      }
+    }
+  }
+}

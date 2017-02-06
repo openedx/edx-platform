@@ -1,0 +1,19 @@
+<%page expression_filter="h" args="notification_name, notification_type, notification_icon,
+                                   notification_message, should_enable_next_hint, is_hidden=True"/>
+<%! from django.utils.translation import ugettext as _ %>
+
+<div class="notification ${notification_type} ${'notification-'}${notification_name}
+      ${'' if not is_hidden else 'is-hidden' }"
+     tabindex="-1">
+    <span class="icon fa ${notification_icon}" aria-hidden="true"></span>
+    <span class="notification-message" aria-describedby="${ short_id }-problem-title">${notification_message}
+    </span>
+    <div class="notification-btn-wrapper">
+        % if notification_name is 'hint':
+        <button type="button" class="btn btn-default btn-small notification-btn hint-button">
+          ${_('Next Hint')}
+        </button>
+        % endif
+        <button type="button" class="btn btn-default btn-small notification-btn review-btn sr">${_('Review')}</button>
+    </div>
+</div>

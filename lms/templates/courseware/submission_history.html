@@ -1,0 +1,16 @@
+<%page expression_filter="h"/>
+<% import json, pytz  %>
+<h3>${username} > ${course_id} > ${location}</h3>
+
+% for i, (entry, score) in enumerate(zip(history_entries, scores)):
+<hr/>
+<div>
+    <% timedate = entry.updated.astimezone(pytz.timezone(settings.TIME_ZONE))%>
+    <% timedate_str = timedate.strftime('%Y-%m-%d %H:%M:%S %Z') %>
+<b>#${len(history_entries) - i}</b>: ${timedate_str}</br>
+Score: ${score.grade} / ${score.max_grade}
+<pre>
+${json.dumps(entry.state, indent=2, sort_keys=True)}
+</pre>
+</div>
+% endfor

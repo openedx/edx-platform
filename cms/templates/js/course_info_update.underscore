@@ -1,0 +1,35 @@
+<li name="<%- updateModel.cid %>">
+	<!-- FIXME what style should we use for initially hidden? --> <!-- TODO decide whether this should use codemirror -->
+	<form class="new-update-form">
+		<div class="row">
+			<label for="update-date-<%= updateModel.cid %>" class="inline-label"><%= gettext('Date') %>:</label>
+			<!-- TODO replace w/ date widget and actual date (problem is that persisted version is "Month day" not an actual date obj -->
+			<input id="update-date-<%= updateModel.cid %>" type="text" class="date" value="<%= updateModel.get('date') %>">
+		</div>
+		<div class="row">
+			<textarea class="new-update-content text-editor"><%= updateModel.get('content') %></textarea>
+		</div>
+        <%if (push_notification_enabled) { %>
+    		<div class="row new-update-push-notification">
+                <input id="update-notification-checkbox-<%= updateModel.cid %>" type="checkbox" class="toggle-checkbox" data-tooltip="<%= gettext('Send push notification to mobile apps') %>" checked />
+                <label for="update-notification-checkbox-<%= updateModel.cid %>" class="inline-label"><%= gettext('Send notification to mobile apps') %></label>
+            </div>
+        <% } %>
+		<div class="row">
+			<!-- cid rather than id b/c new ones have cid's not id's -->
+            <button class="save-button" name="<%= updateModel.cid %>"><%= gettext('Post') %></button>
+            <button class="cancel-button" name="<%= updateModel.cid %>"><%= gettext('Cancel') %></button>
+		</div>
+	</form>
+	<div class="post-preview">
+		<div class="post-actions">
+            <button class="edit-button" name="<%= updateModel.cid %>"><span class="edit-icon"></span><%= gettext('Edit') %></button>
+            <button class="delete-button" name="<%= updateModel.cid %>"><span class="delete-icon"></span><%= gettext('Delete') %></button>
+		</div>
+		<h2>
+			<span class="calendar-icon"></span><span class="date-display"><%=
+				updateModel.get('date') %></span>
+		</h2>
+		<div class="update-contents"><%= updateModel.get('content') %></div>
+	</div>
+</li>
