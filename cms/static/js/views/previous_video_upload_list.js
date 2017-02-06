@@ -5,7 +5,7 @@ define([
     'js/views/paging',
     'js/views/previous_video_upload',
     'common/js/components/views/paging_footer',
-    'common/js/components/views/paging_header'],
+    'js/views/paging_header'],
 
     function($, _, Backbone, gettext, BaseView, PagingView,
         PreviousVideoUploadView, PagingFooter, PagingHeader) {
@@ -22,6 +22,10 @@ define([
                     videoHandlerUrl: options.videoHandlerUrl,
                     template: this.loadTemplate('previous-video-upload-list')
                 });
+                this.pagingView.registerSortableColumn('js-video-name-col', gettext('Name'), 'asc');
+                this.pagingView.registerSortableColumn('js-video-duration-col', gettext('Duration'), 'asc');
+                this.pagingView.registerSortableColumn('js-video-date-col', gettext('Date Added'), 'asc');
+                this.pagingView.setInitialSortColumn('js-video-name-col')
             },
 
             PreviousVideoUploadPagingView: PagingView.extend({
@@ -48,8 +52,8 @@ define([
                     _.each(this.itemViews, function(view) {
                                    $tabBody.append(view.render().$el);
                     });
-                    this.pagingHeader = new PagingHeader({el: $el.find('#video-paging-header'),
-                        collection: this.collection});
+                    this.pagingHeader = new PagingHeader({view: this,
+                        el: $el.find('#video-paging-header')});
                     this.pagingFooter = new PagingFooter({collection: this.collection,
                         el: $el.find('#video-paging-footer')});
                     this.pagingHeader.render();
