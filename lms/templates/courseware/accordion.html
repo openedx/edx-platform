@@ -22,7 +22,7 @@ else:
         ${chapter['display_name']}
     </span>
 </a>
-<div class="chapter-content-container" id="${chapter['display_id']}-child" tabindex="-1" role="group" aria-label="${chapter['display_name']} submenu">
+<div class="chapter-content-container" id="${chapter['display_id']}-child" tabindex="-1" role="region" aria-label="${chapter['display_name']} submenu">
     <div class="chapter-menu">
         % for section in chapter['sections']:
         <div class="menu-item ${'active' if 'active' in section and section['active'] else ''} ${'graded'  if 'graded' in section and section['graded'] else ''}">
