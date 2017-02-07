@@ -3,7 +3,19 @@
 <%!
     from django.utils.translation import ugettext as _
     from django.core.urlresolvers import reverse
-    %>
+    import datetime
+    import pytz
+
+    def time_left(start):
+        tz = pytz.timezone('Asia/Karachi')
+        now = datetime.datetime.now(tz=tz)
+        td = start - now
+        message = "Test is already end"
+        if td.days > 0:
+             message = "{days} Days Left".format(days=td.days)
+        return message
+
+%>
     <%page args="course" expression_filter="h"/>
     <article class="course" id="${course.id}" role="region" aria-label="${course.display_name_with_default}">
         <a href="/login">
@@ -15,7 +27,11 @@
             </header>
             <div class="course-info" aria-hidden="true">
                 <h2 class="course-name">
-                    <span class="course-organization">${course.display_org_with_default} <span class="course-date pull-right" aria-hidden="true">${course.start_datetime_text()} - ${course.end_datetime_text()}</span></span>
+                    <span class="course-organization">${course.display_org_with_default}
+                        <span class="course-date pull-right" aria-hidden="true">
+                            <i class="fa fa-clock-o" aria-hidden="true"></i> ${time_left(course.start)}
+                        </span>
+                    </span>
                     <span class="course-title">${course.display_name}</span>
                     <a href="/login" class="btn btn-brand">Learn More</a>
                 </h2>

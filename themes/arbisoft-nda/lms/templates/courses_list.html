@@ -2,7 +2,19 @@
 <%page expression_filter="h"/>
 <%namespace name='static' file='static_content.html'/>
 <%! from django.utils.translation import ugettext as _ %>
+<%!
+    import datetime
+    import pytz
 
+    def enrollment_available(enrollment_end):
+        if not enrollment_end:
+            return False
+
+        tz = pytz.timezone('Asia/Karachi')
+        now = datetime.datetime.now(tz=tz)
+        td = enrollment_end - now
+        return td.days > 0
+%>
 <section class="courses-section">
   <div class="courses-container">
     <div class="highlighted-courses">
@@ -13,11 +25,13 @@
           <div class="grid-manual">
             <div class="row course-list">
               %for course in courses[:6]:
-                <div class="col col-12 sm-col-12">
-                  <div class="courses-listing-item">
-                    <%include file="course.html" args="course=course" />
-                  </div>
-                </div>
+                  %if course.enrollment_end and enrollment_available(course.enrollment_end):
+                    <div class="col col-12 sm-col-12">
+                      <div class="courses-listing-item">
+                        <%include file="course.html" args="course=course" />
+                      </div>
+                    </div>
+                  %endif
               %endfor
             </div>
           </div>
