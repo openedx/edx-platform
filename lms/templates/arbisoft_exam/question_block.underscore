@@ -1,0 +1,1 @@
+<iframe src="<%= url %>" onload="resizeIframe(this)"></iframe>

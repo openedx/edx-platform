@@ -1,0 +1,60 @@
+<%!
+    from openedx.core.djangolib.js_utils import dump_js_escaped_json
+%>
+
+<%namespace name='static' file='/static_content.html'/>
+
+<style>
+    #arbi-exam iframe {
+        position: relative;
+        top: 0;
+        left: 0;
+        width: 100%;
+        min-height: 700px;
+        border: none;
+    }
+    #question-nav li{
+        float: left;
+        margin-left: 5px;
+        list-style: none;
+    }
+    .question-link.highlight{
+        font-weight: 600;
+        color: #000000;
+        pointer-events: none;
+    }
+</style>
+
+<div id="arbi-exam"></div>
+<div>
+    <button class="previous" data-value="Previous">Previous</button>
+    <button class="next" data-value="Next">Next</button>
+    <ul id="question-nav">
+        % for index, item in enumerate(items):
+            <li><a class="question-link" href="#" data-index="${index}">${index + 1}</a></li>
+        % endfor
+    </ul>
+</div>
+
+<script type="text/template" id="arbisoft_exam">
+    <%static:include path="arbisoft_exam/question_block.underscore" />
+</script>
+
+<script type="text/javascript">
+    function resizeIframe(iframe) {
+    iframe.height = iframe.contentWindow.document.body.scrollHeight +  "px";
+  }
+</script>
+
+<%block name="js_extra">
+    <%static:require_module module_name="js/arbisoft_exam/exam_loader" class_name="ExamLoader">
+        var items = ${items | n, dump_js_escaped_json};
+        ExamLoader(items);
+    </%static:require_module>
+</%block>
+
+
+
+
+
+
