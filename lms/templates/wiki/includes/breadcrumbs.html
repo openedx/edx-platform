@@ -6,7 +6,8 @@
 %>
 
 %if urlpath is not Undefined and urlpath:
-<header>
+<header class="breadcrumbs-header">
+  <h2 class="sr">${_("Course Wiki")}</h2>
   <ul class="breadcrumb pull-left" class="">
     <%
       # The create button links to the highest ancestor we have edit priveleges to

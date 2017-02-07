@@ -49,7 +49,6 @@ import request_cache
 from certificates.models import GeneratedCertificate
 from course_modes.models import CourseMode
 from enrollment.api import _default_course_mode
-from openedx.core.djangoapps.commerce.utils import ecommerce_api_client, ECOMMERCE_DATE_FORMAT
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, NoneToEmptyManager
@@ -234,6 +233,7 @@ class UserProfile(models.Model):
 
     class Meta(object):
         db_table = "auth_userprofile"
+        permissions = (("can_deactivate_users", "Can deactivate, but NOT delete users"),)
 
     # CRITICAL TODO/SECURITY
     # Sanitize all fields.
@@ -1536,6 +1536,9 @@ class CourseEnrollment(models.Model):
 
     def refund_cutoff_date(self):
         """ Calculate and return the refund window end date. """
+        # NOTE: This is here to avoid circular references
+        from openedx.core.djangoapps.commerce.utils import ecommerce_api_client, ECOMMERCE_DATE_FORMAT
+
         try:
             attribute = self.attributes.get(namespace='order', name='order_number')
         except ObjectDoesNotExist:

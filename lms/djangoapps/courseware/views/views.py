@@ -42,7 +42,7 @@ from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from lms.djangoapps.course_api.blocks.api import get_blocks
 
-from openedx.core.djangoapps.catalog.utils import get_programs_data
+from openedx.core.djangoapps.catalog.utils import get_programs_with_type_logo
 
 import shoppingcart
 import survey.utils
@@ -159,7 +159,7 @@ def courses(request):
     # for edx-pattern-library is added.
     if configuration_helpers.get_value("DISPLAY_PROGRAMS_ON_MARKETING_PAGES",
                                        settings.FEATURES.get("DISPLAY_PROGRAMS_ON_MARKETING_PAGES")):
-        programs_list = get_programs_data(request.user)
+        programs_list = get_programs_with_type_logo()
 
     return render_to_response(
         "courseware/courses.html",

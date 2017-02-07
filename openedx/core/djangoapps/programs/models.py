@@ -19,8 +19,8 @@ class ProgramsApiConfig(ConfigurationModel):
 
     api_version_number = models.IntegerField(verbose_name=_("API Version"))
 
-    internal_service_url = models.URLField(verbose_name=_("Internal Service URL"))
-    public_service_url = models.URLField(verbose_name=_("Public Service URL"))
+    internal_service_url = models.URLField(verbose_name=_("Internal Service URL"), blank=True)
+    public_service_url = models.URLField(verbose_name=_("Public Service URL"), blank=True)
 
     marketing_path = models.CharField(
         max_length=255,

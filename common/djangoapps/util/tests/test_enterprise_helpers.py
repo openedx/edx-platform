@@ -177,12 +177,12 @@ class TestEnterpriseHelpers(unittest.TestCase):
         )
 
         set_enterprise_branding_filter_param(request, provider_id=None)
-        with mock.patch('enterprise.api.get_enterprise_branding_info_by_ec_uuid', return_value=branding_info):
+        with mock.patch('enterprise.utils.get_enterprise_branding_info_by_ec_uuid', return_value=branding_info):
             logo_url = get_enterprise_customer_logo_url(request)
             self.assertEqual(logo_url, '/test/image.png')
 
         set_enterprise_branding_filter_param(request, provider_id)
-        with mock.patch('enterprise.api.get_enterprise_branding_info_by_provider_id', return_value=branding_info):
+        with mock.patch('enterprise.utils.get_enterprise_branding_info_by_provider_id', return_value=branding_info):
             logo_url = get_enterprise_customer_logo_url(request)
             self.assertEqual(logo_url, '/test/image.png')
 
@@ -195,7 +195,7 @@ class TestEnterpriseHelpers(unittest.TestCase):
         branding_info = mock.Mock()
 
         set_enterprise_branding_filter_param(request, 'test-idp')
-        with mock.patch('enterprise.api.get_enterprise_branding_info_by_provider_id', return_value=branding_info):
+        with mock.patch('enterprise.utils.get_enterprise_branding_info_by_provider_id', return_value=branding_info):
             logo_url = get_enterprise_customer_logo_url(request)
             self.assertEqual(logo_url, None)
 
@@ -209,6 +209,6 @@ class TestEnterpriseHelpers(unittest.TestCase):
         branding_info = mock.Mock()
 
         set_enterprise_branding_filter_param(request, provider_id=None)
-        with mock.patch('enterprise.api.get_enterprise_branding_info_by_provider_id', return_value=branding_info):
+        with mock.patch('enterprise.utils.get_enterprise_branding_info_by_provider_id', return_value=branding_info):
             logo_url = get_enterprise_customer_logo_url(request)
             self.assertEqual(logo_url, None)

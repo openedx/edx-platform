@@ -9,7 +9,7 @@ import logging
 
 from contentstore.views.item import create_xblock_info
 from contentstore.utils import reverse_library_url, add_instructor
-from django.http import HttpResponseNotAllowed, Http404
+from django.http import HttpResponseNotAllowed, Http404, HttpResponseForbidden
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.conf import settings
@@ -25,6 +25,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from .user import user_with_role
 
+from course_creators.views import get_course_creator_status
 from .component import get_component_templates, CONTAINER_TEMPLATES
 from student.auth import (
     STUDIO_VIEW_USERS, STUDIO_EDIT_ROLES, get_user_permissions, has_studio_read_access, has_studio_write_access
@@ -39,6 +40,22 @@ log = logging.getLogger(__name__)
 LIBRARIES_ENABLED = settings.FEATURES.get('ENABLE_CONTENT_LIBRARIES', False)
 
 
+def get_library_creator_status(user):
+    """
+    Helper method for returning the library creation status for a particular user,
+    taking into account the value LIBRARIES_ENABLED.
+    """
+
+    if not LIBRARIES_ENABLED:
+        return False
+    elif user.is_staff:
+        return True
+    elif settings.FEATURES.get('ENABLE_CREATOR_GROUP', False):
+        return get_course_creator_status(user) == 'granted'
+    else:
+        return True
+
+
 @login_required
 @ensure_csrf_cookie
 @require_http_methods(('GET', 'POST'))
@@ -49,6 +66,10 @@ def library_handler(request, library_key_string=None):
     if not LIBRARIES_ENABLED:
         log.exception("Attempted to use the content library API when the libraries feature is disabled.")
         raise Http404  # Should never happen because we test the feature in urls.py also
+
+    if not get_library_creator_status(request.user):
+        if not request.user.is_staff:
+            return HttpResponseForbidden()
 
     if library_key_string is not None and request.method == 'POST':
         return HttpResponseNotAllowed(("POST",))

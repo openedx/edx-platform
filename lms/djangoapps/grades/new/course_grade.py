@@ -31,11 +31,15 @@ class CourseGrade(object):
     def __init__(self, student, course, course_structure):
         self.student = student
         self.course = course
-        self.course_version = getattr(course, 'course_version', None)
-        self.course_edited_timestamp = getattr(course, 'subtree_edited_on', None)
-        self.course_structure = course_structure
         self._percent = None
         self._letter_grade = None
+
+        self.course_structure = course_structure
+        if self.course_structure:
+            course_block = course_structure[course.location]
+            self.course_version = getattr(course_block, 'course_version', None)
+            self.course_edited_timestamp = getattr(course_block, 'subtree_edited_on', None)
+
         self._subsection_grade_factory = SubsectionGradeFactory(self.student, self.course, self.course_structure)
 
     @lazy

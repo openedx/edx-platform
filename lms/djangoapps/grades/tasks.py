@@ -16,7 +16,6 @@ from openedx.core.djangoapps.celery_utils.persist_on_failure import PersistOnFai
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import CourseLocator
 from submissions import api as sub_api
-from student.models import anonymous_id_for_user
 from track.event_transaction_utils import (
     set_event_transaction_type,
     set_event_transaction_id,
@@ -33,6 +32,7 @@ from .transformer import GradesTransformer
 log = getLogger(__name__)
 
 KNOWN_RETRY_ERRORS = (DatabaseError, ValidationError)  # Errors we expect occasionally, should be resolved on retry
+RECALCULATE_GRADE_DELAY = 2  # in seconds, to prevent excessive _has_db_updated failures. See TNL-6424.
 
 
 @task(bind=True, base=PersistOnFailureTask, default_retry_delay=30, routing_key=settings.RECALCULATE_GRADES_ROUTING_KEY)

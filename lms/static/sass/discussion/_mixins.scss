@@ -87,16 +87,3 @@
   white-space: nowrap;
   text-overflow: ellipsis;
 }
-
-@mixin forum-user-label($color) {
-  @include margin-left($baseline/4);
-  @extend %t-weight5;
-  font-size: $forum-small-font-size;
-  vertical-align: middle;
-  border-radius: $forum-border-radius;
-  padding: 0 ($baseline/5);
-  background: $color;
-  font-style: normal;
-  color: white;
-  white-space: nowrap;
-}
