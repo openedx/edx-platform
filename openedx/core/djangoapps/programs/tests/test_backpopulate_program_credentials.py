@@ -7,7 +7,12 @@ import mock
 from certificates.models import CertificateStatuses  # pylint: disable=import-error
 from lms.djangoapps.certificates.api import MODES
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
-from openedx.core.djangoapps.catalog.tests import factories
+from openedx.core.djangoapps.catalog.tests.factories import (
+    generate_course_run_key,
+    ProgramFactory,
+    CourseFactory,
+    CourseRunFactory,
+)
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin
 from openedx.core.djangolib.testing.utils import skip_unless_lms
@@ -23,7 +28,7 @@ COMMAND_MODULE = 'openedx.core.djangoapps.programs.management.commands.backpopul
 @skip_unless_lms
 class BackpopulateProgramCredentialsTests(CatalogIntegrationMixin, CredentialsApiConfigMixin, TestCase):
     """Tests for the backpopulate_program_credentials management command."""
-    course_run_key, alternate_course_run_key = (factories.generate_course_run_key() for __ in range(2))
+    course_run_key, alternate_course_run_key = (generate_course_run_key() for __ in range(2))
 
     def setUp(self):
         super(BackpopulateProgramCredentialsTests, self).setUp()
@@ -36,8 +41,8 @@ class BackpopulateProgramCredentialsTests(CatalogIntegrationMixin, CredentialsAp
         # skewing mock call counts.
         self.create_credentials_config(enable_learner_issuance=False)
 
-        self.catalog_integration = self.create_catalog_integration()
-        self.service_user = UserFactory(username=self.catalog_integration.service_username)
+        catalog_integration = self.create_catalog_integration()
+        UserFactory(username=catalog_integration.service_username)
 
     @ddt.data(True, False)
     def test_handle(self, commit, mock_task, mock_get_programs):
@@ -45,10 +50,10 @@ class BackpopulateProgramCredentialsTests(CatalogIntegrationMixin, CredentialsAp
         Verify that relevant tasks are only enqueued when the commit option is passed.
         """
         data = [
-            factories.Program(
+            ProgramFactory(
                 courses=[
-                    factories.Course(course_runs=[
-                        factories.CourseRun(key=self.course_run_key),
+                    CourseFactory(course_runs=[
+                        CourseRunFactory(key=self.course_run_key),
                     ]),
                 ]
             ),
@@ -78,39 +83,39 @@ class BackpopulateProgramCredentialsTests(CatalogIntegrationMixin, CredentialsAp
 
     @ddt.data(
         [
-            factories.Program(
+            ProgramFactory(
                 courses=[
-                    factories.Course(course_runs=[
-                        factories.CourseRun(key=course_run_key),
+                    CourseFactory(course_runs=[
+                        CourseRunFactory(key=course_run_key),
                     ]),
                 ]
             ),
-            factories.Program(
+            ProgramFactory(
                 courses=[
-                    factories.Course(course_runs=[
-                        factories.CourseRun(key=alternate_course_run_key),
-                    ]),
-                ]
-            ),
-        ],
-        [
-            factories.Program(
-                courses=[
-                    factories.Course(course_runs=[
-                        factories.CourseRun(key=course_run_key),
-                    ]),
-                    factories.Course(course_runs=[
-                        factories.CourseRun(key=alternate_course_run_key),
+                    CourseFactory(course_runs=[
+                        CourseRunFactory(key=alternate_course_run_key),
                     ]),
                 ]
             ),
         ],
         [
-            factories.Program(
+            ProgramFactory(
                 courses=[
-                    factories.Course(course_runs=[
-                        factories.CourseRun(key=course_run_key),
-                        factories.CourseRun(key=alternate_course_run_key),
+                    CourseFactory(course_runs=[
+                        CourseRunFactory(key=course_run_key),
+                    ]),
+                    CourseFactory(course_runs=[
+                        CourseRunFactory(key=alternate_course_run_key),
+                    ]),
+                ]
+            ),
+        ],
+        [
+            ProgramFactory(
+                courses=[
+                    CourseFactory(course_runs=[
+                        CourseRunFactory(key=course_run_key),
+                        CourseRunFactory(key=alternate_course_run_key),
                     ]),
                 ]
             ),
@@ -148,11 +153,11 @@ class BackpopulateProgramCredentialsTests(CatalogIntegrationMixin, CredentialsAp
         course run certificates.
         """
         data = [
-            factories.Program(
+            ProgramFactory(
                 courses=[
-                    factories.Course(course_runs=[
-                        factories.CourseRun(key=self.course_run_key),
-                        factories.CourseRun(key=self.alternate_course_run_key),
+                    CourseFactory(course_runs=[
+                        CourseRunFactory(key=self.course_run_key),
+                        CourseRunFactory(key=self.alternate_course_run_key),
                     ]),
                 ]
             ),
@@ -183,10 +188,10 @@ class BackpopulateProgramCredentialsTests(CatalogIntegrationMixin, CredentialsAp
         qualifying course run certificates.
         """
         data = [
-            factories.Program(
+            ProgramFactory(
                 courses=[
-                    factories.Course(course_runs=[
-                        factories.CourseRun(key=self.course_run_key, type='honor'),
+                    CourseFactory(course_runs=[
+                        CourseRunFactory(key=self.course_run_key, type='honor'),
                     ]),
                 ]
             ),
@@ -216,10 +221,10 @@ class BackpopulateProgramCredentialsTests(CatalogIntegrationMixin, CredentialsAp
         Verify that only course run certificates with a passing status are selected.
         """
         data = [
-            factories.Program(
+            ProgramFactory(
                 courses=[
-                    factories.Course(course_runs=[
-                        factories.CourseRun(key=self.course_run_key),
+                    CourseFactory(course_runs=[
+                        CourseRunFactory(key=self.course_run_key),
                     ]),
                 ]
             ),
@@ -261,10 +266,10 @@ class BackpopulateProgramCredentialsTests(CatalogIntegrationMixin, CredentialsAp
         mock_task.side_effect = side_effect
 
         data = [
-            factories.Program(
+            ProgramFactory(
                 courses=[
-                    factories.Course(course_runs=[
-                        factories.CourseRun(key=self.course_run_key),
+                    CourseFactory(course_runs=[
+                        CourseRunFactory(key=self.course_run_key),
                     ]),
                 ]
             ),

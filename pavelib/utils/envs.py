@@ -111,11 +111,6 @@ class Env(object):
             'log': BOK_CHOY_LOG_DIR / "bok_choy_ecommerce.log",
         },
 
-        'programs': {
-            'port': 8090,
-            'log': BOK_CHOY_LOG_DIR / "bok_choy_programs.log",
-        },
-
         'catalog': {
             'port': 8091,
             'log': BOK_CHOY_LOG_DIR / "bok_choy_catalog.log",

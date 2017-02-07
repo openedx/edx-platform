@@ -31,12 +31,11 @@ def get_user_credentials(user):
     return credentials
 
 
-def get_programs_for_credentials(user, programs_credentials):
+def get_programs_for_credentials(programs_credentials):
     """ Given a user and an iterable of credentials, get corresponding programs
     data and return it as a list of dictionaries.
 
     Arguments:
-        user (User): The user to authenticate as for requesting programs.
         programs_credentials (list): List of credentials awarded to the user
             for completion of a program.
 
@@ -44,7 +43,7 @@ def get_programs_for_credentials(user, programs_credentials):
         list, containing programs dictionaries.
     """
     certified_programs = []
-    programs = get_programs(user)
+    programs = get_programs()
     for program in programs:
         for credential in programs_credentials:
             if program['uuid'] == credential['credential']['program_uuid']:
@@ -84,7 +83,7 @@ def get_user_program_credentials(user):
             log.exception('Invalid credential structure: %r', credential)
 
     if programs_credentials:
-        programs_credentials_data = get_programs_for_credentials(user, programs_credentials)
+        programs_credentials_data = get_programs_for_credentials(programs_credentials)
 
     return programs_credentials_data
 

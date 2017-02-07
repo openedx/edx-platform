@@ -12,7 +12,6 @@ from .youtube import StubYouTubeService
 from .lti import StubLtiService
 from .video_source import VideoSourceHttpService
 from .edxnotes import StubEdxNotesService
-from .programs import StubProgramsService
 from .catalog import StubCatalogService
 
 
@@ -25,7 +24,6 @@ SERVICES = {
     'lti': StubLtiService,
     'video': VideoSourceHttpService,
     'edxnotes': StubEdxNotesService,
-    'programs': StubProgramsService,
     'ecommerce': StubEcommerceService,
     'catalog': StubCatalogService,
 }

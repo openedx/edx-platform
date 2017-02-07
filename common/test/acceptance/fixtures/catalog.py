@@ -13,31 +13,31 @@ class CatalogFixture(object):
     """
     Interface to set up mock responses from the Catalog stub server.
     """
-    def install_programs(self, programs):
+    def install_programs(self, data):
         """Set response data for the catalog's course run API."""
         key = 'catalog.programs'
 
-        requests.put(
-            '{}/set_config'.format(CATALOG_STUB_URL),
-            data={key: json.dumps(programs)},
-        )
+        if isinstance(data, dict):
+            key += '.' + data['uuid']
 
-    def install_course_run(self, course_run):
-        """Set response data for the catalog's course run API."""
-        key = 'catalog.{}'.format(course_run['key'])
+            requests.put(
+                '{}/set_config'.format(CATALOG_STUB_URL),
+                data={key: json.dumps(data)},
+            )
+        else:
+            requests.put(
+                '{}/set_config'.format(CATALOG_STUB_URL),
+                data={key: json.dumps({'results': data})},
+            )
 
-        requests.put(
-            '{}/set_config'.format(CATALOG_STUB_URL),
-            data={key: json.dumps(course_run)},
-        )
 
-
-class CatalogConfigMixin(object):
+class CatalogIntegrationMixin(object):
     """Mixin providing a method used to configure the catalog integration."""
-    def set_catalog_configuration(self, is_enabled=False, service_url=CATALOG_STUB_URL):
-        """Dynamically adjusts the catalog config model during tests."""
+    def set_catalog_integration(self, is_enabled=False, service_username=None):
+        """Use this to change the catalog integration config model during tests."""
         ConfigModelFixture('/config/catalog', {
             'enabled': is_enabled,
-            'internal_api_url': '{}/api/v1/'.format(service_url),
+            'internal_api_url': '{}/api/v1/'.format(CATALOG_STUB_URL),
             'cache_ttl': 0,
+            'service_username': service_username,
         }).install()
