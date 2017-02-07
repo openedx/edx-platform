@@ -32,6 +32,7 @@ Longer TODO:
 import imp
 import sys
 import os
+import datetime
 
 from path import Path as path
 from warnings import simplefilter
@@ -49,7 +50,7 @@ from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 PLATFORM_NAME = "Your Platform Name Here"
 CC_MERCHANT_NAME = PLATFORM_NAME
 # Shows up in the platform footer, eg "(c) COPYRIGHT_YEAR"
-COPYRIGHT_YEAR = "2017"
+COPYRIGHT_YEAR = datetime.date.today().year
 
 PLATFORM_FACEBOOK_ACCOUNT = "http://www.facebook.com/YourPlatformFacebookAccount"
 PLATFORM_TWITTER_ACCOUNT = "@YourPlatformTwitterAccount"
