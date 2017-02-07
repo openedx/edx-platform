@@ -1,30 +1,27 @@
 """
 Tests for branding page
 """
-
-import mock
 import datetime
 
+import ddt
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
+from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.test.utils import override_settings
 from django.test.client import RequestFactory
-
-from pytz import UTC
 from mock import patch, Mock
 from nose.plugins.attrib import attr
+from pytz import UTC
 from edxmako.shortcuts import render_to_response
 
 from branding.views import index
+from courseware.tests.helpers import LoginEnrollmentTestCase
+from milestones.tests.utils import MilestonesTestCaseMixin
+from util.milestones_helpers import set_prerequisite_courses
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from django.core.urlresolvers import reverse
-from courseware.tests.helpers import LoginEnrollmentTestCase
-
-from util.milestones_helpers import set_prerequisite_courses
-from milestones.tests.utils import MilestonesTestCaseMixin
 
 FEATURES_WITH_STARTDATE = settings.FEATURES.copy()
 FEATURES_WITH_STARTDATE['DISABLE_START_DATES'] = False
@@ -290,35 +287,31 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         self.assertEqual(context['courses'][2].id, self.course_with_default_start_date.id)
 
 
+@ddt.ddt
 @attr(shard=1)
 class IndexPageProgramsTests(ModuleStoreTestCase):
     """
     Tests for Programs List in Marketing Pages.
     """
-    @patch.dict('django.conf.settings.FEATURES', {'DISPLAY_PROGRAMS_ON_MARKETING_PAGES': False})
-    def test_get_programs_not_called(self):
-        with mock.patch("student.views.get_programs_data") as patched_get_programs_data:
-            # check the /dashboard
-            response = self.client.get('/')
-            self.assertEqual(response.status_code, 200)
-            self.assertEqual(patched_get_programs_data.call_count, 0)
 
-        with mock.patch("courseware.views.views.get_programs_data") as patched_get_programs_data:
-            # check the /courses view
-            response = self.client.get(reverse('branding.views.courses'))
-            self.assertEqual(response.status_code, 200)
-            self.assertEqual(patched_get_programs_data.call_count, 0)
+    def setUp(self):
+        super(IndexPageProgramsTests, self).setUp()
+        self.client.login(username=self.user.username, password=self.user_password)
 
-    @patch.dict('django.conf.settings.FEATURES', {'DISPLAY_PROGRAMS_ON_MARKETING_PAGES': True})
-    def test_get_programs_called(self):
-        with mock.patch("student.views.get_programs_data") as patched_get_programs_data:
-            # check the /dashboard
-            response = self.client.get('/')
-            self.assertEqual(response.status_code, 200)
-            self.assertEqual(patched_get_programs_data.call_count, 1)
+    @ddt.data(True, False)
+    def test_programs_with_type_logo_called(self, display_programs):
+        with patch.dict('django.conf.settings.FEATURES', {'DISPLAY_PROGRAMS_ON_MARKETING_PAGES': display_programs}):
+            views = [
+                (reverse('dashboard'), 'student.views.get_programs_with_type_logo'),
+                (reverse('branding.views.courses'), 'courseware.views.views.get_programs_with_type_logo'),
+            ]
 
-        with mock.patch("courseware.views.views.get_programs_data") as patched_get_programs_data:
-            # check the /courses view
-            response = self.client.get(reverse('branding.views.courses'))
-            self.assertEqual(response.status_code, 200)
-            self.assertEqual(patched_get_programs_data.call_count, 1)
+            for url, dotted_path in views:
+                with patch(dotted_path) as mock_get_programs_with_type_logo:
+                    response = self.client.get(url)
+                    self.assertEqual(response.status_code, 200)
+
+                    if display_programs:
+                        mock_get_programs_with_type_logo.assert_called_once()
+                    else:
+                        mock_get_programs_with_type_logo.assert_not_called_()

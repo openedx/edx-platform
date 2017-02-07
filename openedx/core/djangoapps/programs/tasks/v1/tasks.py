@@ -65,7 +65,7 @@ def get_completed_programs(student):
         list of program UUIDs
 
     """
-    meter = ProgramProgressMeter(student, use_catalog=True)
+    meter = ProgramProgressMeter(student)
     return meter.completed_programs
 
 
