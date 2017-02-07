@@ -1054,6 +1054,15 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
         # Add a Post link is present
         self.assertTrue(self.discussion_page.q(css='.new-post-btn').present)
 
+    def test_add_post_not_present_if_discussion_blackout_period_started(self):
+        """
+        If discussion blackout period has started Add a post button should not appear.
+        """
+        self.start_discussion_blackout_period()
+        self.browser.refresh()
+        self.discussion_page.expand_discussion()
+        self.assertFalse(self.discussion_page.is_new_post_button_visible())
+
     def test_initial_render(self):
         self.assertFalse(self.discussion_page.is_discussion_expanded())
 
@@ -1077,20 +1086,7 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
         self.check_anonymous_to_peers(False)
 
     def test_discussion_blackout_period(self):
-        now = datetime.datetime.now(UTC)
-        self.course_fix.add_advanced_settings(
-            {
-                u"discussion_blackouts": {
-                    "value": [
-                        [
-                            (now - datetime.timedelta(days=14)).isoformat(),
-                            (now + datetime.timedelta(days=2)).isoformat()
-                        ]
-                    ]
-                }
-            }
-        )
-        self.course_fix._add_advanced_settings()
+        self.start_discussion_blackout_period()
         self.browser.refresh()
         thread = Thread(id=uuid4().hex, commentable_id=self.discussion_id)
         thread_fixture = SingleThreadViewFixture(thread)
@@ -1158,6 +1154,25 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
         # Verify that neither discussion's forms are shwon
         self.assertIsNone(self.discussion_page.new_post_form)
         self.assertIsNone(self.additional_discussion_page.new_post_form)
+
+    def start_discussion_blackout_period(self):
+        """
+        Start discussion blackout period, starting 14 days before now to 2 days ago.
+        """
+        now = datetime.datetime.now(UTC)
+        self.course_fix.add_advanced_settings(
+            {
+                u"discussion_blackouts": {
+                    "value": [
+                        [
+                            (now - datetime.timedelta(days=14)).isoformat(),
+                            (now + datetime.timedelta(days=2)).isoformat()
+                        ]
+                    ]
+                }
+            }
+        )
+        self.course_fix._add_advanced_settings()  # pylint: disable=protected-access
 
 
 @attr(shard=2)
