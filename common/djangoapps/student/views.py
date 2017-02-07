@@ -1073,6 +1073,10 @@ def change_enrollment(request, check_access=True):
     if not user.is_authenticated():
         return HttpResponseForbidden()
 
+    #If account is not activated do not let the user to enroll in a course and show the error message
+    if not user.is_active:
+        return HttpResponseBadRequest(_("This account has not been activated yet. Please first activate your account by clicking the link in the sent activation e-mail."))
+
     # Ensure we received a course_id
     action = request.POST.get("enrollment_action")
     if 'course_id' not in request.POST:
