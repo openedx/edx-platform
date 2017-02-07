@@ -10,16 +10,11 @@ from django.utils.translation import ugettext as _
 
 <section class="course-outline" id="course-outline">
     <ul>
-        % for unit in blocks.get('children') or []:
-            <li>${ unit['display_name'] }</li>
+        % for section in blocks.get('children') or []:
+            <li>${ section['display_name'] }</li>
             <ul>
-                % for section in unit.get('children') or []:
-                    <li>${ section['display_name'] }</li>
-                    <ul>
-                        % for subsection in section.get('children') or []:
-                            <li>${ subsection['display_name'] }</li>
-                        % endfor
-                    </ul>
+                % for subsection in section.get('children') or []:
+                    <li>${ subsection['display_name'] }</li>
                 % endfor
             </ul>
         % endfor
