@@ -501,6 +501,14 @@ if AWS_SECRET_ACCESS_KEY == "":
 
 AWS_STORAGE_BUCKET_NAME = AUTH_TOKENS.get('AWS_STORAGE_BUCKET_NAME', 'edxuploads')
 
+#
+# To support Azure Storage via the Django-Storages library
+#
+AZURE_ACCOUNT_NAME = AUTH_TOKENS.get('AZURE_ACCOUNT_NAME', None)
+AZURE_ACCOUNT_KEY = AUTH_TOKENS.get('AZURE_ACCOUNT_KEY', None)
+AZURE_CONTAINER = AUTH_TOKENS.get('AZURE_CONTAINER', None)
+
+
 # Disabling querystring auth instructs Boto to exclude the querystring parameters (e.g. signature, access key) it
 # normally appends to every returned URL.
 AWS_QUERYSTRING_AUTH = AUTH_TOKENS.get('AWS_QUERYSTRING_AUTH', True)
