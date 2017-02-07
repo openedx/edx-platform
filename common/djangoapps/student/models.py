@@ -272,9 +272,9 @@ class UserProfile(models.Model):
         ('m', ugettext_noop("Master's or professional degree")),
         ('b', ugettext_noop("Bachelor's degree")),
         ('a', ugettext_noop("Associate degree")),
-        ('hs', ugettext_noop("Secondary/high school")),
-        ('jhs', ugettext_noop("Junior secondary/junior high/middle school")),
-        ('el', ugettext_noop("Elementary/primary school")),
+        #('hs', ugettext_noop("Secondary/high school")),
+        #('jhs', ugettext_noop("Junior secondary/junior high/middle school")),
+        #('el', ugettext_noop("Elementary/primary school")),
         # Translators: 'None' refers to the student's level of education
         ('none', ugettext_noop("No formal education")),
         # Translators: 'Other' refers to the student's level of education
