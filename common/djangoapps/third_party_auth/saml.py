@@ -44,11 +44,6 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
             log.error('SAML authentication is not enabled')
             raise Http404
 
-        # TODO: remove this check once the fix is merged upstream:
-        # https://github.com/omab/python-social-auth/pull/821
-        if 'idp' not in self.strategy.request_data():
-            raise AuthMissingParameter(self, 'idp')
-
         return super(SAMLAuthBackend, self).auth_url()
 
     def _check_entitlements(self, idp, attributes):

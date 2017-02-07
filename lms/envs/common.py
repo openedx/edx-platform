@@ -2159,11 +2159,6 @@ INSTALLED_APPS = (
     'database_fixups',
 )
 
-# Migrations which are not in the standard module "migrations"
-MIGRATION_MODULES = {
-    'social.apps.django_app.default': 'social.apps.django_app.default.south_migrations'
-}
-
 ######################### CSRF #########################################
 
 # Forwards-compatibility with Django 1.7
