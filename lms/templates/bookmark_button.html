@@ -5,7 +5,6 @@
   <button class="btn btn-link bookmark-button ${"bookmarked" if is_bookmarked else ""}"
     aria-pressed="${"true" if is_bookmarked else "false"}"
     data-bookmark-id="${bookmark_id}">
-     <span class="sr bookmark-sr">${_("Click to remove") if is_bookmarked else _("Click to add")}</span>
      <span class="bookmark-text">${_("Bookmarked") if is_bookmarked else _("Bookmark this page")}</span>
     </button>
 </div>
