@@ -265,8 +265,9 @@ class StubHttpService(HTTPServer, object):
         """
         Stop the server and free up the port
         """
-        # First call superclass shutdown()
-        HTTPServer.shutdown(self)
+        # Don't need to call shutdown because when the main thread (testcase) is torn down, child daemons are killed
+        # as per Thread documentation
+        # HTTPServer.shutdown(self)
 
         # We also need to manually close the socket
         self.socket.close()
