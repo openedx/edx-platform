@@ -17,10 +17,9 @@ describe 'Markdown to xml extended hint dropdown', ->
 
       [[
         dogs		{{ NOPE::Not dogs, not cats, not toads }}
-        (FACES)	{{ With lots of makeup, doncha know?}}
-
+        (FACES)	{{ With lots of makeup, don't you know? }}
         money       {{ Clowns don't have any money, of course }}
-        donkeys     {{don't be an ass.}}
+        donkeys     {{ Clowns make tricks with donkeys }}
         -no hint-
       ]]
 
