@@ -122,15 +122,14 @@ import newrelic_custom_metrics
 # Note that this lives in LMS, so this dependency should be refactored.
 from notification_prefs.views import enable_notifications
 
+from openedx.core.djangoapps.catalog.utils import get_programs_with_type_logo
 from openedx.core.djangoapps.credit.email_utils import get_credit_provider_display_names, make_providers_strings
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
-from openedx.core.djangoapps.catalog.utils import munge_catalog_program
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
-from openedx.core.djangoapps.catalog.utils import get_programs_with_type_logo
 
 
 log = logging.getLogger("edx.student")
@@ -670,9 +669,6 @@ def dashboard(request):
     meter = ProgramProgressMeter(user, enrollments=course_enrollments)
     inverted_programs = meter.invert_programs()
 
-    for program_list in inverted_programs.itervalues():
-        program_list[:] = [munge_catalog_program(program) for program in program_list]
-
     # Construct a dictionary of course mode information
     # used to render the course list.  We re-use the course modes dict
     # we loaded earlier to avoid hitting the database.
@@ -795,7 +791,7 @@ def dashboard(request):
         'order_history_list': order_history_list,
         'courses_requirements_not_met': courses_requirements_not_met,
         'nav_hidden': True,
-        'programs_by_run': inverted_programs,
+        'inverted_programs': inverted_programs,
         'show_program_listing': ProgramsApiConfig.current().show_program_listing,
         'disable_courseware_js': True,
         'display_course_modes_on_dashboard': enable_verified_certificates and display_course_modes_on_dashboard,

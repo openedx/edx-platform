@@ -13,7 +13,6 @@ from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory, Prog
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.catalog.utils import (
     get_programs,
-    munge_catalog_program,
     get_program_types,
     get_programs_with_type_logo,
 )
@@ -129,63 +128,6 @@ class TestGetPrograms(CatalogIntegrationMixin, TestCase):
 
         data = get_programs()
         self.assertEqual(data, [])
-
-
-class TestMungeCatalogProgram(TestCase):
-    def setUp(self):
-        super(TestMungeCatalogProgram, self).setUp()
-
-        self.catalog_program = ProgramFactory()
-
-    def assert_munged(self, program):
-        munged = munge_catalog_program(program)
-        expected = {
-            'id': program['uuid'],
-            'name': program['title'],
-            'subtitle': program['subtitle'],
-            'category': program['type'],
-            'marketing_slug': program['marketing_slug'],
-            'organizations': [
-                {
-                    'display_name': organization['name'],
-                    'key': organization['key']
-                } for organization in program['authoring_organizations']
-            ],
-            'course_codes': [
-                {
-                    'display_name': course['title'],
-                    'key': course['key'],
-                    'organization': {
-                        'display_name': course['owners'][0]['name'],
-                        'key': course['owners'][0]['key']
-                    },
-                    'run_modes': [
-                        {
-                            'course_key': course_run['key'],
-                            'run_key': CourseKey.from_string(course_run['key']).run,
-                            'mode_slug': course_run['type'],
-                            'marketing_url': course_run['marketing_url'],
-                        } for course_run in course['course_runs']
-                    ],
-                } for course in program['courses']
-            ],
-            'banner_image_urls': {
-                'w1440h480': program['banner_image']['large']['url'],
-                'w726h242': program['banner_image']['medium']['url'],
-                'w435h145': program['banner_image']['small']['url'],
-                'w348h116': program['banner_image']['x-small']['url'],
-            },
-            'detail_url': program.get('detail_url'),
-        }
-
-        self.assertEqual(munged, expected)
-
-    def test_munge_catalog_program(self):
-        self.assert_munged(self.catalog_program)
-
-    def test_munge_with_detail_url(self):
-        self.catalog_program['detail_url'] = 'foo'
-        self.assert_munged(self.catalog_program)
 
 
 @skip_unless_lms

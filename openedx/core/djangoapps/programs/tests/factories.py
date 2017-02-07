@@ -4,14 +4,11 @@ import factory
 from faker import Faker
 
 
-fake = Faker()
-
-
 class ProgressFactory(factory.Factory):
     class Meta(object):
         model = dict
 
     uuid = factory.Faker('uuid4')
-    completed = []
-    in_progress = []
-    not_started = []
+    completed = 0
+    in_progress = 0
+    not_started = 0
