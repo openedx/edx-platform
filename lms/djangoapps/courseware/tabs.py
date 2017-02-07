@@ -49,7 +49,7 @@ class CourseInfoTab(CourseTab):
 
     @classmethod
     def is_enabled(cls, course, user=None):
-        return True
+        return False
 
 
 class SyllabusTab(EnrolledTab):

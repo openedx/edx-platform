@@ -5,7 +5,8 @@
 
   > div {
     @include box-sizing(border-box);
-    display: inline-block;
+    display: block;
+    width: 100% !important;
   }
 }
 
@@ -18,6 +19,7 @@
 
   .bookmarks-list-button {
     @extend %ui-clear-button;
+    display: none;
 
     // set styles
     @extend %btn-pl-default-base;

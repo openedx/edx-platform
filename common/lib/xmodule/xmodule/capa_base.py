@@ -413,8 +413,8 @@ class CapaMixin(CapaFields):
         # The logic flow is a little odd so that _('xxx') strings can be found for
         # translation while also running _() just once for each string.
         _ = self.runtime.service(self, "i18n").ugettext
-        check = _('Check')
-        final_check = _('Final Check')
+        check = _('Submit')
+        final_check = _('Submit')
 
         # Apply customizations if present
         if 'custom_check' in self.text_customization:
@@ -519,7 +519,7 @@ class CapaMixin(CapaFields):
             elif (self.closed() and not is_survey_question) or needs_reset:
                 return False
             else:
-                return True
+                return False
 
     def handle_problem_html_error(self, err):
         """
