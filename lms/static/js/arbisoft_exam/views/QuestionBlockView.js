@@ -70,7 +70,8 @@
               _render: function (block) {
                   var url = "/xblock/" + block.attributes.id;
                   $(this.container).html(this.template({
-                      url: url
+                      url: url,
+                      index: this.currentBlockIndex + 1
                   }));
               },
               _disableNext: function () {
