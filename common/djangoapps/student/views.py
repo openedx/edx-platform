@@ -565,6 +565,11 @@ def arbisoft_survey(request):
         CandidateProfileForm,
         CandidateExpertiseForm,
     )
+
+    # if user has already given profile details then skip survey.
+    if not is_survey_required(request.user):
+        return HttpResponseRedirect(reverse('dashboard'))
+
     profile_form = CandidateProfileForm(request.POST or None)
 
     CourseRankingFormset = modelformset_factory(
@@ -623,8 +628,7 @@ def arbisoft_survey(request):
                 if not get_enrollment(user.username, course_id):
                     add_enrollment(user.username, course_id)
 
-            redirect_uri = reverse('dashboard')
-            return HttpResponseRedirect(redirect_uri)
+            return HttpResponseRedirect(reverse('dashboard'))
 
     return render_to_response('arbisoft_survey.html', context)
 
