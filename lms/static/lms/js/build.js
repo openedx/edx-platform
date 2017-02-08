@@ -31,6 +31,7 @@
             'js/search/course/course_search_factory',
             'js/search/dashboard/dashboard_search_factory',
             'js/student_account/logistration_factory',
+            'js/arbisoft_exam/exam_loader',
             'js/student_account/views/account_settings_factory',
             'js/student_account/views/finish_auth_factory',
             'js/student_profile/views/learner_profile_factory',
