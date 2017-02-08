@@ -1,0 +1,9 @@
+# pylintrc tweaks for use with edx_lint.
+[MASTER]
+ignore+ = ,.git,migrations,node_modules,.pycharm_helpers
+
+[BASIC]
+attr-rgx = [a-z_][a-z0-9_]{2,40}$
+argument-rgx = [a-z_][a-z0-9_]{2,40}$
+variable-rgx = [a-z_][a-z0-9_]{2,40}$
+class-attribute-rgx = ([A-Za-z_][A-Za-z0-9_]{2,40}|(__.*__))$

@@ -1,0 +1,30 @@
+<div class="focusguard focusguard-start" tabindex="0"></div>
+<div class="badges-modal" tabindex="0">
+        <button class="close"><span class="fa fa-close" aria-hidden="true"></span><span class="sr"><%- gettext("Close") %></span></button>
+    <h1 class="modal-header"><%- gettext("Share on Mozilla Backpack") %></h1>
+    <p class="explanation"><%- gettext("To share your certificate on Mozilla Backpack, you must first have a Backpack account. Complete the following steps to add your certificate to Backpack.") %>
+    </p>
+    <hr class="modal-hr"/>
+    <img class="backpack-logo" src="<%- badgeMeta.badges_logo %>" alt="">
+    <ol class="badges-steps">
+        <li class="step"><%=
+        interpolate(
+          gettext("Create a %(link_start)sMozilla Backpack%(link_end)s account, or log in to your existing account"),
+          {link_start: '<a href="https://backpack.openbadges.org/" target="_blank">', link_end: '</a>'},
+          true
+        )%>
+        </li>
+        <li class="step"><%=
+        interpolate(
+          gettext("%(download_link_start)sDownload this image (right-click or option-click, save as)%(link_end)s and then %(upload_link_start)supload%(link_end)s it to your backpack.</li>"), {
+            download_link_start: '<a class="badge-link" href="' + image_url + '" target="_blank">',
+            link_end: '</a>', upload_link_start: '<a href="https://backpack.openbadges.org/backpack/add" target="_blank">'
+          },
+          true
+        )%>
+    </ol>
+    <div class="image-container">
+        <img class="badges-backpack-example" src="<%- badgeMeta.backpack_ui_img %>" alt="">
+    </div>
+</div>
+<div class="focusguard focusguard-end" tabindex="0"></div>

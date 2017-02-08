@@ -1,0 +1,63 @@
+<div class="cohorts-state-section">
+    <label> <input type="checkbox" class="cohorts-state" value="Cohorts-State" <%- cohortsEnabled ? 'checked="checked"' : '' %> /> <%- gettext('Enable Cohorts') %></label>
+</div>
+
+<% if (cohortsEnabled) { %>
+    <div class="cohort-management-nav">
+        <hr class="divider divider-lv1" />
+        <form action="" method="post" name="" id="cohort-management-nav-form" class="cohort-management-nav-form">
+
+            <div class="cohort-management-nav-form-select field field-select">
+                <label for="cohort-select" class="label sr"><%- gettext("Select a cohort to manage") %></label>
+                <select class="input cohort-select" name="cohort-select" id="cohort-select"></select>
+            </div>
+
+            <div class="form-actions">
+                <button class="form-submit button action-primary action-view sr"><%- gettext('View Cohort') %></button>
+            </div>
+        </form>
+
+        <button class="button action-primary action-create">
+            <span class="icon fa fa-plus" aria-hidden="true"></span>
+            <%- gettext('Add Cohort') %>
+        </button>
+    </div>
+
+    <!-- Add modal -->
+    <div class="cohort-management-add-form"></div>
+
+    <!-- individual group -->
+    <div class="cohort-management-group"></div>
+
+    <div class="wrapper-cohort-supplemental">
+
+        <hr class="divider divider-lv1" />
+
+        <!-- Uploading a CSV file of cohort assignments. -->
+        <button class="toggle-cohort-management-secondary" data-href="#cohort-management-file-upload"><%- gettext('Assign students to cohorts by uploading a CSV file') %></button>
+        <div class="cohort-management-file-upload csv-upload is-hidden" id="cohort-management-file-upload" tabindex="-1"></div>
+
+        <div class="cohort-management-supplemental">
+            <p class="">
+                <span class="icon fa fa-info-circle" aria-hidden="true"></span>
+                <%= HtmlUtils.interpolateHtml(
+                    gettext('To review student cohort assignments or see the results of uploading a CSV file, download course profile information or cohort results on the {link_start}Data Download{link_end} page.'),
+                    {
+                        link_start: HtmlUtils.HTML('<button type="button" class="btn-link link-cross-reference" data-section="data_download">'),
+                        link_end: HtmlUtils.HTML('</button>')
+                    })
+                %>
+            </p>
+        </div>
+
+        <hr class="divider divider-lv1" />
+
+        <!-- Discussion Topics. -->
+        <button class="toggle-cohort-management-discussions" data-href="#cohort-discussions-management"><%- gettext('Specify whether discussion topics are divided by cohort') %></button>
+        <div class="cohort-discussions-nav is-hidden" id="cohort-discussions-management" tabindex="-1">
+            <div class="cohort-course-wide-discussions-nav"></div>
+            <div class="cohort-inline-discussions-nav"></div>
+        </div>
+
+    </div>
+<% } %>

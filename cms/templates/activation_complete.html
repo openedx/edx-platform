@@ -1,0 +1,48 @@
+<%!
+from openedx.core.djangolib.markup import Text
+from django.utils.translation import ugettext as _
+%>
+<%page expression_filter="h"/>
+<%inherit file="base.html" />
+
+<%block name="content">
+<div class="wrapper-mast wrapper sr">
+  <header class="mast">
+    <h1 class="page-header">
+      ${Text(_("{studio_name} Account Activation")).format(
+        studio_name=Text(settings.STUDIO_SHORT_NAME),
+      )}
+    </h1>
+  </header>
+</div>
+
+<div class="wrapper-content wrapper">
+  <section class="content activation is-complete">
+    <article class="content-primary" role="main">
+    </article>
+
+    <div class="notice notice-incontext notice-instruction has-actions">
+      <div class="msg">
+        <h1 class="title">${_("Your account activation is complete!")}</h1>
+        <div class="copy">
+          <p>
+            ${Text(_("Thank you for activating your account. You may now sign in and start using {studio_name} to author courses.")).format(
+              studio_name=Text(settings.STUDIO_NAME)
+            )}
+          </p>
+        </div>
+      </div>
+
+      <ul class="list-actions">
+        <li class="action-item">
+          <a href="/signin" class="action-primary action-signin">
+            ${Text(_("Sign into {studio_name}")).format(
+              studio_name=Text(settings.STUDIO_SHORT_NAME)
+            )}
+          </a>
+        </li>
+      </ul>
+    </div>
+  </section>
+</div>
+</%block>

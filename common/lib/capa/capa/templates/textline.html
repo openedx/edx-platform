@@ -1,0 +1,56 @@
+<%page expression_filter="h"/>
+<%! from openedx.core.djangolib.markup import HTML %>
+<% doinline = "inline" if inline else "" %>
+
+<div id="inputtype_${id}" class="${'text-input-dynamath' if do_math else ''} capa_inputtype ${doinline} textline">
+% if preprocessor is not None:
+    <div class="text-input-dynamath_data ${doinline}" data-preprocessor="${preprocessor['class_name']}"/>
+    <div class="script_placeholder" data-src="${preprocessor['script_src']}"/>
+% endif
+
+% if status in ('unsubmitted', 'correct', 'incorrect', 'partially-correct', 'incomplete'):
+    <div class="${status.classname} ${doinline}">
+% endif
+
+% if hidden:
+    <div style="display:none;" name="${hidden}" inputid="input_${id}" />
+% endif
+
+% if response_data['label']:
+    <label class="problem-group-label" for="input_${id}" id="label_${id}">${response_data['label']}</label>
+% endif
+
+% for description_id, description_text in response_data['descriptions'].items():
+    <p class="question-description" id="${description_id}">${description_text}</p>
+% endfor
+<input type="text" name="input_${id}" id="input_${id}" ${describedby_html} value="${value}"
+    % if do_math:
+        class="math"
+    % endif
+    % if size:
+        size="${size}"
+    % endif
+    % if hidden:
+        style="display:none;"
+    % endif
+/>
+<span class="trailing_text" id="trailing_text_${id}">${trailing_text}</span>
+
+<%include file="status_span.html" args="status=status, status_id=id"/>
+
+<p id="answer_${id}" class="answer"></p>
+
+% if do_math:
+    <div id="display_${id}" class="equation">`{::}`</div>
+    <textarea style="display:none" id="input_${id}_dynamath" name="input_${id}_dynamath"></textarea>
+% endif
+
+% if status in ('unsubmitted', 'correct', 'incorrect', 'partially-correct', 'incomplete'):
+    </div>
+% endif
+
+  % if msg:
+      <span class="message" aria-describedby="label_${id}" tabindex="-1">${HTML(msg)}</span>
+  % endif
+
+</div>
