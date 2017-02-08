@@ -36,7 +36,7 @@ class SiteViewSet(viewsets.ReadOnlyModelViewSet):
         except User.DoesNotExist:
             return Response(status=400)
         if not user.is_superuser:
-            queryset = queryset.filter(organizations=user.organizations.first())
+            queryset = queryset.filter(organizations=user.organizations.all())
         return queryset
 
 
