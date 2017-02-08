@@ -12,6 +12,7 @@ from logging import getLogger
 
 from courseware.model_data import get_score
 from lms.djangoapps.course_blocks.api import get_course_blocks
+import newrelic.agent
 from openedx.core.djangoapps.celery_utils.persist_on_failure import PersistOnFailureTask
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import CourseLocator
@@ -73,6 +74,9 @@ def _recalculate_subsection_grade(self, **kwargs):
             return
 
         scored_block_usage_key = UsageKey.from_string(kwargs['usage_id']).replace(course_key=course_key)
+
+        newrelic.agent.add_custom_parameter('course_id', unicode(course_key))
+        newrelic.agent.add_custom_parameter('usage_id', unicode(scored_block_usage_key))
 
         # The request cache is not maintained on celery workers,
         # where this code runs. So we take the values from the
