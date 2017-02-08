@@ -14,6 +14,7 @@ class Migration(migrations.Migration):
         migrations.RunSQL(
             "create unique index email on auth_user (email);",
             "drop index email on auth_user;",
+            hints={'target_db': 'default'}
         )
     ]
 
