@@ -359,6 +359,7 @@ def click_grade(_step, version):
     location = world.scenario_dict['LTI'].location.html_id()
     iframe_name = 'ltiFrame-' + location
     with world.browser.get_iframe(iframe_name) as iframe:
+        world.wait_for_visible('#' + version_map[version]['selector'])
         iframe.find_by_name(version_map[version]['selector']).first.click()
         assert iframe.is_text_present(version_map[version]['expected_text'])
 
