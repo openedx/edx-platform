@@ -6,7 +6,8 @@ from student.models import (User, UserProfile, Registration,
                             PendingEmailChange, UserStanding,
                             CourseAccessRole)
 from course_modes.models import CourseMode
-from django.contrib.auth.models import Group, AnonymousUser
+from django.contrib.auth.models import AnonymousUser, Group, Permission
+from django.contrib.contenttypes.models import ContentType
 from datetime import datetime
 import factory
 from factory import lazy_attribute
@@ -17,6 +18,8 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 # Factories are self documenting
 # pylint: disable=missing-docstring
+
+TEST_PASSWORD = 'test'
 
 
 class GroupFactory(DjangoModelFactory):
@@ -123,6 +126,10 @@ class AdminFactory(UserFactory):
     is_staff = True
 
 
+class SuperuserFactory(UserFactory):
+    is_superuser = True
+
+
 class CourseEnrollmentFactory(DjangoModelFactory):
     class Meta(object):
         model = CourseEnrollment
@@ -161,3 +168,18 @@ class PendingEmailChangeFactory(DjangoModelFactory):
     user = factory.SubFactory(UserFactory)
     new_email = factory.Sequence(u'new+email+{0}@edx.org'.format)
     activation_key = factory.Sequence(u'{:0<30d}'.format)
+
+
+class ContentTypeFactory(DjangoModelFactory):
+    class Meta(object):
+        model = ContentType
+
+    app_label = factory.Faker('app_name')
+
+
+class PermissionFactory(DjangoModelFactory):
+    class Meta(object):
+        model = Permission
+
+    codename = factory.Faker('codename')
+    content_type = factory.SubFactory(ContentTypeFactory)

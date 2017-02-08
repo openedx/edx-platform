@@ -27,7 +27,7 @@ from courseware.tests.factories import (
     StaffFactory,
     UserFactory,
 )
-from courseware.tests.helpers import LoginEnrollmentTestCase
+from courseware.tests.helpers import LoginEnrollmentTestCase, masquerade_as_group_member
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import CourseEnrollment
 from student.roles import CourseCcxCoachRole, CourseStaffRole
@@ -44,6 +44,9 @@ from xmodule.course_module import (
     CATALOG_VISIBILITY_NONE,
 )
 from xmodule.error_module import ErrorDescriptor
+from xmodule.partitions.partitions import Group, UserPartition
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase,
@@ -292,6 +295,57 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
             self.assertFalse(
                 bool(access.has_access(self.student, 'staff', self.course, course_key=self.course.id))
             )
+
+    @patch('courseware.access.in_preview_mode', Mock(return_value=True))
+    def test_has_access_in_preview_mode_with_group(self):
+        """
+        Test that a user masquerading as a member of a group sees appropriate content in preview mode.
+        """
+        partition_id = 0
+        group_0_id = 0
+        group_1_id = 1
+        user_partition = UserPartition(
+            partition_id, 'Test User Partition', '',
+            [Group(group_0_id, 'Group 1'), Group(group_1_id, 'Group 2')],
+            scheme_id='cohort'
+        )
+        self.course.user_partitions.append(user_partition)
+        self.course.cohort_config = {'cohorted': True}
+
+        chapter = ItemFactory.create(category="chapter", parent_location=self.course.location)
+        chapter.group_access = {partition_id: [group_0_id]}
+        chapter.user_partitions = self.course.user_partitions
+
+        modulestore().update_item(self.course, ModuleStoreEnum.UserID.test)
+
+        # User should not be able to preview when masquerading as student (and not in the group above).
+        with patch('courseware.access.get_user_role') as mock_user_role:
+            mock_user_role.return_value = 'student'
+            self.assertFalse(
+                bool(access.has_access(self.global_staff, 'load', chapter, course_key=self.course.id))
+            )
+
+        # Should be able to preview when in staff or instructor role.
+        for mocked_role in ['staff', 'instructor']:
+            with patch('courseware.access.get_user_role') as mock_user_role:
+                mock_user_role.return_value = mocked_role
+                self.assertTrue(
+                    bool(access.has_access(self.global_staff, 'load', chapter, course_key=self.course.id))
+                )
+
+        # Now install masquerade group and set staff as a member of that.
+        self.assertEqual(200, masquerade_as_group_member(self.global_staff, self.course, partition_id, group_0_id))
+        # Can load the chapter since user is in the group.
+        self.assertTrue(
+            bool(access.has_access(self.global_staff, 'load', chapter, course_key=self.course.id))
+        )
+
+        # Move the user to be a part of the second group.
+        self.assertEqual(200, masquerade_as_group_member(self.global_staff, self.course, partition_id, group_1_id))
+        # Cannot load the chapter since user is in a different group.
+        self.assertFalse(
+            bool(access.has_access(self.global_staff, 'load', chapter, course_key=self.course.id))
+        )
 
     def test_has_access_to_course(self):
         self.assertFalse(access._has_access_to_course(

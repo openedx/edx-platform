@@ -9,7 +9,7 @@ from courseware.courses import get_course_info_section_module
 from static_replace import make_static_urls_absolute
 from openedx.core.lib.xblock_utils import get_course_update_items
 
-from ..utils import mobile_view, mobile_course_access
+from ..decorators import mobile_course_access, mobile_view
 
 
 @mobile_view()

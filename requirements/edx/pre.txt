@@ -4,15 +4,14 @@
 #   * @edx/ospr - to check licensing
 #   * @edx/devops - to check system requirements
 
-# Use a modern setuptools instead of distribute
-setuptools==18.0.1
+# Packaging pre-requisites.
+pyparsing==2.0.7
+setuptools==34.0.2
+pip==9.0.1
 
 # Numpy and scipy can't be installed in the same pip run.
 # Install numpy before other things to help resolve the problem.
 numpy==1.6.2
-
-# Needed to make sure that options in base.txt are allowed
-pip==7.1.2
 
 # Needed for meliae
 Cython==0.21.2

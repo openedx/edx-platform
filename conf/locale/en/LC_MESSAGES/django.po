@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-01-12 17:52+0000\n"
-"PO-Revision-Date: 2017-01-12 17:52:25.477141\n"
+"POT-Creation-Date: 2017-02-02 19:34+0000\n"
+"PO-Revision-Date: 2017-02-02 19:34:37.395873\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -82,8 +82,7 @@ msgid "Subsection"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/helpers.py
-#: lms/djangoapps/instructor/views/tools.py lms/templates/seq_module.html
-#: lms/templates/ccx/schedule.html
+#: lms/djangoapps/instructor/views/tools.py lms/templates/ccx/schedule.html
 msgid "Unit"
 msgstr ""
 
@@ -199,6 +198,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 #: common/lib/xmodule/xmodule/word_cloud_module.py
+#: common/lib/xmodule/xmodule/x_module.py
 #: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
 #: cms/templates/container.html cms/templates/library.html
 msgid "Display Name"
@@ -1721,22 +1721,24 @@ msgid "XML data for the annotation"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/annotatable_module.py
+#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/conditional_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/library_content_module.py
+#: common/lib/xmodule/xmodule/library_root_xblock.py
+#: common/lib/xmodule/xmodule/poll_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
-msgid "Display name for this module"
+#: common/lib/xmodule/xmodule/word_cloud_module.py
+#: common/lib/xmodule/xmodule/x_module.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+msgid "The display name for this component."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/annotatable_module.py
 msgid "Annotation"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/capa_base.py
-#: common/lib/xmodule/xmodule/conditional_module.py
-#: common/lib/xmodule/xmodule/html_module.py
-msgid "This name appears in the horizontal navigation at the top of the page."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
@@ -3175,10 +3177,6 @@ msgid "No Library Selected"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/library_root_xblock.py
-msgid "Enter the name of the library as it should appear in Studio."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/library_root_xblock.py
 msgid "Library Display Name"
 msgstr ""
 
@@ -3188,8 +3186,8 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
-"Enter the name that students see for this component.  Analytics reports may "
-"also use the display name to identify this component."
+"The display name for this component. Analytics reports may also use the "
+"display name to identify this component."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/lti_module.py
@@ -3541,6 +3539,26 @@ msgid ""
 " considered in the Entrance Exam scoring/gating algorithm."
 msgstr ""
 
+#: common/lib/xmodule/xmodule/poll_module.py
+msgid "Whether this student has voted on the poll"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/poll_module.py
+msgid "Student answer"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/poll_module.py
+msgid "Poll answers from all students"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/poll_module.py
+msgid "Poll answers from xml"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/poll_module.py
+msgid "Poll question"
+msgstr ""
+
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid "Enter the date by which problems are due."
 msgstr ""
@@ -3618,13 +3636,13 @@ msgid "This exam is hidden from the learner."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/seq_module.py
-msgid "subsection"
+msgid ""
+"Because the course has ended, this assignment is hidden from the learner."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid ""
-"Because the due date has passed, this {subsection_format} is hidden from the"
-" learner."
+"Because the due date has passed, this assignment is hidden from the learner."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/seq_module.py
@@ -3642,9 +3660,7 @@ msgid "Not Selected"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/split_test_module.py
-msgid ""
-"This name is used for organizing your course content, but is not shown to "
-"students."
+msgid "The display name for this component. (Not shown to learners)"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/split_test_module.py
@@ -3795,12 +3811,6 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid "Default Video URL"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid ""
-"The name students see. This name appears in the course ribbon and as a "
-"header for the video."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
@@ -4045,10 +4055,6 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "Poster URL"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/word_cloud_module.py
-msgid "The label for this word cloud on the course page."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
@@ -4734,6 +4740,10 @@ msgstr ""
 
 #: lms/djangoapps/commerce/models.py
 msgid "Path to order receipt page."
+msgstr ""
+
+#: lms/djangoapps/commerce/models.py
+msgid "Automatically approve valid refund requests, without manual processing"
 msgstr ""
 
 #: lms/djangoapps/commerce/signals.py
@@ -9021,10 +9031,6 @@ msgid "Gating milestone for {usage_key}"
 msgstr ""
 
 #: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
-msgid "Display name for this component"
-msgstr ""
-
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
 msgid "Category"
 msgstr ""
 
@@ -9590,13 +9596,6 @@ msgstr ""
 #: themes/edx.org/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
 msgid "Courses"
-msgstr ""
-
-#: cms/templates/index.html cms/templates/widgets/header.html
-#: lms/templates/navigation.html lms/templates/learner_dashboard/programs.html
-#: themes/edx.org/lms/templates/header.html
-#: themes/red-theme/lms/templates/header.html
-msgid "Programs"
 msgstr ""
 
 #: cms/templates/login.html cms/templates/widgets/header.html
@@ -10270,14 +10269,25 @@ msgid "Please try again later."
 msgstr ""
 
 #: lms/templates/hidden_content.html
-msgid "The due date for this {subsection_format} has passed."
+msgid "The course has ended."
+msgstr ""
+
+#: lms/templates/hidden_content.html
+msgid "The due date for this assignment has passed."
 msgstr ""
 
 #: lms/templates/hidden_content.html
 msgid ""
-"Because the due date has passed, this {subsection_format} is no longer "
-"available.{line_break}If you have completed this {subsection_format}, your "
-"grade is available on the {link_start}progress page{link_end}."
+"Because the course has ended, this assignment is no longer "
+"available.{line_break}If you have completed this assignment, your grade is "
+"available on the {link_start}progress page{link_end}."
+msgstr ""
+
+#: lms/templates/hidden_content.html
+msgid ""
+"Because the due date has passed, this assignment is no longer "
+"available.{line_break}If you have completed this assignment, your grade is "
+"available on the {link_start}progress page{link_end}."
 msgstr ""
 
 #: lms/templates/imageannotation.html
@@ -10539,6 +10549,12 @@ msgstr ""
 #: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
 msgid "{platform_name} Home Page"
+msgstr ""
+
+#: lms/templates/navigation.html lms/templates/learner_dashboard/programs.html
+#: themes/edx.org/lms/templates/header.html
+#: themes/red-theme/lms/templates/header.html
+msgid "Programs"
 msgstr ""
 
 #. Translators: This is short for "System administration".
@@ -10868,6 +10884,10 @@ msgstr ""
 
 #: lms/templates/seq_module.html
 msgid "Previous"
+msgstr ""
+
+#: lms/templates/seq_module.html
+msgid "Sequence"
 msgstr ""
 
 #: lms/templates/seq_module.html
@@ -15420,6 +15440,10 @@ msgid "(Learners not explicitly assigned to a cohort)"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
+msgid "Learners in the {track_name} Track"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Subject: "
 msgstr ""
 
@@ -16740,9 +16764,9 @@ msgstr ""
 
 #: themes/edx.org/lms/templates/footer.html
 msgid ""
-"© 2016 edX Inc.  All rights reserved except where noted.  EdX, Open edX and "
-"the edX and Open EdX logos are registered trademarks or trademarks of edX "
-"Inc."
+"© 2012-{year} edX Inc.  All rights reserved except where noted.  EdX, Open "
+"edX and the edX and Open EdX logos are registered trademarks or trademarks "
+"of edX Inc."
 msgstr ""
 
 #: themes/edx.org/lms/templates/header.html
@@ -17266,7 +17290,8 @@ msgstr ""
 #: cms/templates/course-create-rerun.html
 msgid ""
 "The unique number that identifies the new course within the organization.  "
-"(This number is often the same as the original course number.)"
+"(This number will be the same as the original course number and cannot be "
+"changed.)"
 msgstr ""
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
@@ -18365,10 +18390,6 @@ msgid "New Library"
 msgstr ""
 
 #: cms/templates/index.html
-msgid "New Program"
-msgstr ""
-
-#: cms/templates/index.html
 msgid "Please correct the highlighted fields below."
 msgstr ""
 
@@ -18618,18 +18639,6 @@ msgid ""
 msgstr ""
 
 #: cms/templates/index.html
-msgid "You haven't created any programs yet."
-msgstr ""
-
-#: cms/templates/index.html
-msgid "Programs are groups of courses related to a common subject."
-msgstr ""
-
-#: cms/templates/index.html
-msgid "Create Your First Program"
-msgstr ""
-
-#: cms/templates/index.html
 msgid "New to {studio_name}?"
 msgstr ""
 
@@ -18867,10 +18876,6 @@ msgid ""
 "Library Admins have full editing privileges and can also add and remove "
 "other team members. There must be at least one user with the Admin role in a"
 " library."
-msgstr ""
-
-#: cms/templates/program_authoring.html cms/templates/widgets/header.html
-msgid "Program Administration"
 msgstr ""
 
 #: cms/templates/register.html cms/templates/widgets/header.html

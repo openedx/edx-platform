@@ -37,6 +37,7 @@ from mobile_api.testutils import (
     MobileAuthUserTestMixin,
     MobileCourseAccessTestMixin,
 )
+
 from .serializers import CourseEnrollmentSerializer
 
 

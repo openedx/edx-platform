@@ -16,7 +16,9 @@ class SiteMixin(object):
             site=self.site,
             values={
                 "SITE_NAME": self.site.domain,
-                "course_org_filter": "fakeX",
+                "course_email_from_addr": "fake@example.com",
+                "course_email_template_name": "fake_email_template",
+                "course_org_filter": "fakeX"
             }
         )
 

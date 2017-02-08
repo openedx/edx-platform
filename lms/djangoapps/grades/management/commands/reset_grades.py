@@ -8,9 +8,7 @@ from textwrap import dedent
 from django.core.management.base import BaseCommand, CommandError
 from django.db.models import Count
 
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
-
+from openedx.core.lib.command_utils import get_mutually_exclusive_required_option, parse_course_keys
 from lms.djangoapps.grades.models import PersistentSubsectionGrade, PersistentCourseGrade
 
 
@@ -73,8 +71,8 @@ class Command(BaseCommand):
         modified_start = None
         modified_end = None
 
-        run_mode = self._get_mutually_exclusive_option(options, 'delete', 'dry_run')
-        courses_mode = self._get_mutually_exclusive_option(options, 'courses', 'all_courses')
+        run_mode = get_mutually_exclusive_required_option(options, 'delete', 'dry_run')
+        courses_mode = get_mutually_exclusive_required_option(options, 'courses', 'all_courses')
 
         if options.get('modified_start'):
             modified_start = datetime.strptime(options['modified_start'], DATE_FORMAT)
@@ -85,10 +83,7 @@ class Command(BaseCommand):
             modified_end = datetime.strptime(options['modified_end'], DATE_FORMAT)
 
         if courses_mode == 'courses':
-            try:
-                course_keys = [CourseKey.from_string(course_key_string) for course_key_string in options['courses']]
-            except InvalidKeyError as error:
-                raise CommandError('Invalid key specified: {}'.format(error.message))
+            course_keys = parse_course_keys(options['courses'])
 
         log.info("reset_grade: Started in %s mode!", run_mode)
 
@@ -135,16 +130,3 @@ class Command(BaseCommand):
             grade_model_class.__name__,
             total_for_all_courses,
         )
-
-    def _get_mutually_exclusive_option(self, options, option_1, option_2):
-        """
-        Validates that exactly one of the 2 given options is specified.
-        Returns the name of the found option.
-        """
-        if not options.get(option_1) and not options.get(option_2):
-            raise CommandError('Either --{} or --{} must be specified.'.format(option_1, option_2))
-
-        if options.get(option_1) and options.get(option_2):
-            raise CommandError('Both --{} and --{} cannot be specified.'.format(option_1, option_2))
-
-        return option_1 if options.get(option_1) else option_2

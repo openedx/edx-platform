@@ -1189,6 +1189,8 @@ MIDDLEWARE_CLASSES = (
 
     'openedx.core.djangoapps.theming.middleware.CurrentSiteThemeMiddleware',
 
+    'waffle.middleware.WaffleMiddleware',
+
     # This must be last
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
 )
@@ -1923,6 +1925,7 @@ INSTALLED_APPS = (
 
     # Database-backed configuration
     'config_models',
+    'waffle',
 
     # Monitor the status of services
     'openedx.core.djangoapps.service_status',
@@ -2155,6 +2158,13 @@ INSTALLED_APPS = (
 
     # additional release utilities to ease automation
     'release_util',
+
+    # Customized celery tasks, including persisting failed tasks so they can
+    # be retried
+    'openedx.core.djangoapps.celery_utils',
+
+    # Ability to detect and special-case crawler behavior
+    'openedx.core.djangoapps.crawlers',
 )
 
 # Migrations which are not in the standard module "migrations"
@@ -2176,6 +2186,10 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'openedx.core.lib.api.paginators.DefaultPagination',
     'PAGE_SIZE': 10,
     'URL_FORMAT_OVERRIDE': None,
+    'DEFAULT_THROTTLE_RATES': {
+        'user': '60/minute',
+        'service_user': '120/minute',
+    },
 }
 
 
@@ -2816,9 +2830,9 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
 # E-Commerce API Configuration
 ECOMMERCE_PUBLIC_URL_ROOT = None
 ECOMMERCE_API_URL = None
-ECOMMERCE_API_SIGNING_KEY = None
 ECOMMERCE_API_TIMEOUT = 5
 ECOMMERCE_SERVICE_WORKER_USERNAME = 'ecommerce_worker'
+ENTERPRISE_SERVICE_WORKER_USERNAME = 'enterprise_worker'
 
 COURSE_CATALOG_API_URL = None
 

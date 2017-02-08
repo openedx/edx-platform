@@ -24,6 +24,7 @@ from course_action_state.models import CourseRerunState
 from opaque_keys.edx.locator import CourseLocator
 from search.api import perform_search
 from student.auth import has_course_author_access
+from student.roles import LibraryUserRole
 from student.tests.factories import UserFactory
 from util.date_utils import get_default_time_display
 from xmodule.modulestore import ModuleStoreEnum
@@ -75,22 +76,37 @@ class TestCourseIndex(CourseTestCase):
         """
         Test getting the list of libraries from the course listing page
         """
+        def _assert_library_link_present(response, library):
+            """
+            Asserts there's a valid library link on libraries tab.
+            """
+            parsed_html = lxml.html.fromstring(response.content)
+            library_link_elements = parsed_html.find_class('library-link')
+            self.assertEqual(len(library_link_elements), 1)
+            link = library_link_elements[0]
+            self.assertEqual(
+                link.get("href"),
+                reverse_library_url('library_handler', library.location.library_key),
+            )
+            # now test that url
+            outline_response = self.client.get(link.get("href"), {}, HTTP_ACCEPT='text/html')
+            self.assertEqual(outline_response.status_code, 200)
+
         # Add a library:
         lib1 = LibraryFactory.create()
 
         index_url = '/home/'
         index_response = self.client.get(index_url, {}, HTTP_ACCEPT='text/html')
-        parsed_html = lxml.html.fromstring(index_response.content)
-        library_link_elements = parsed_html.find_class('library-link')
-        self.assertEqual(len(library_link_elements), 1)
-        link = library_link_elements[0]
-        self.assertEqual(
-            link.get("href"),
-            reverse_library_url('library_handler', lib1.location.library_key),
-        )
-        # now test that url
-        outline_response = self.client.get(link.get("href"), {}, HTTP_ACCEPT='text/html')
-        self.assertEqual(outline_response.status_code, 200)
+        _assert_library_link_present(index_response, lib1)
+
+        # Make sure libraries are visible to non-staff users too
+        self.client.logout()
+        non_staff_user, non_staff_userpassword = self.create_non_staff_user()
+        lib2 = LibraryFactory.create(user_id=non_staff_user.id)
+        LibraryUserRole(lib2.location.library_key).add_users(non_staff_user)
+        self.client.login(username=non_staff_user.username, password=non_staff_userpassword)
+        index_response = self.client.get(index_url, {}, HTTP_ACCEPT='text/html')
+        _assert_library_link_present(index_response, lib2)
 
     def test_is_staff_access(self):
         """

@@ -54,7 +54,7 @@ class ProfileHandler(object):
 
     def scope_profile(self, _data):
         """ Add specialized claims. """
-        return ['name', 'locale']
+        return ['name', 'locale', 'user_tracking_id']
 
     def claim_name(self, data):
         """ User displayable full name. """
@@ -76,6 +76,10 @@ class ProfileHandler(object):
             language = settings.LANGUAGE_CODE
 
         return language
+
+    def claim_user_tracking_id(self, data):
+        """ User tracking ID. """
+        return data['user'].id
 
 
 class CourseAccessHandler(object):

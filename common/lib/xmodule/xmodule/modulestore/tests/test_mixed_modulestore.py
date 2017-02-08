@@ -3395,13 +3395,17 @@ class TestAsidesWithMixedModuleStore(CommonMixedModuleStoreSetup):
         _check_asides(item)
 
         # Private -> Public
-        self.store.publish(item_location, self.user_id)
+        published_block = self.store.publish(item_location, self.user_id)
+        _check_asides(published_block)
+
         item = self.store.get_item(item_location)
         self.assertTrue(self.store.has_published_version(item))
         _check_asides(item)
 
         # Public -> Private
-        self.store.unpublish(item_location, self.user_id)
+        unpublished_block = self.store.unpublish(item_location, self.user_id)
+        _check_asides(unpublished_block)
+
         item = self.store.get_item(item_location)
         self.assertFalse(self.store.has_published_version(item))
         _check_asides(item)

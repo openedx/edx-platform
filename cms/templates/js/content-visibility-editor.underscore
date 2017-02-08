@@ -12,9 +12,19 @@
         <li class="field-radio">
             <label class="label">
                 <input class="input input-radio" name="content-visibility" type="radio" value="hide_after_due" aria-described-by="hide_after_due_description">
-                <%- gettext('Hide content after due date') %>
+                <% if (self_paced) { %>
+                    <%- gettext('Hide content after course end date') %>
+                <% } else { %>
+                    <%- gettext('Hide content after due date') %>
+                <% } %>
             </label>
-            <p class='field-message' id='hide_after_due_description'> <%- gettext('After the subsection\'s due date has passed, learners can no longer access its content. The subsection remains included in grade calculations.') %> </p>
+            <p class='field-message' id='hide_after_due_description'>
+                <% if (self_paced) { %>
+                    <%- gettext('After the course\'s end date has passed, learners can no longer access subsection content. The subsection remains included in grade calculations.') %>
+                <% } else { %>
+                    <%- gettext('After the subsection\'s due date has passed, learners can no longer access its content. The subsection remains included in grade calculations.') %>
+                <% } %>
+            </p>
         </li>
         <li class="field-radio">
             <label class="label">
@@ -29,7 +39,7 @@
     <% if (hasExplicitStaffLock && !ancestorLocked) { %>
         <p class="tip tip-warning">
             <%- interpolate(
-                gettext('If you select an option other than "%(hide_label)s", after the subsection release date has passed, published units in this subsection will become available to learners unless units are explicitly hidden.'),
+                gettext('If you select an option other than "%(hide_label)s", published units in this subsection become available to learners unless they are explicitly hidden.'),
                 { hide_label: hide_label },
                 true
             ) %>

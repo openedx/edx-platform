@@ -453,7 +453,12 @@ def send_video_status_update(updates):
     """
     for update in updates:
         update_video_status(update.get('edxVideoId'), update.get('status'))
-        LOGGER.info(update.get('message'))
+        LOGGER.info(
+            'VIDEOS: Video status update with id [%s], status [%s] and message [%s]',
+            update.get('edxVideoId'),
+            update.get('status'),
+            update.get('message')
+        )
 
     return JsonResponse()
 

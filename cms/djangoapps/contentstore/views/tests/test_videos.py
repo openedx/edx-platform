@@ -488,13 +488,13 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
         # Test should fail if video not found
         self.assertEqual(True, False, 'Invalid edx_video_id')
 
-    def test_video_status_update_request(self):
+    @patch('contentstore.views.videos.LOGGER')
+    def test_video_status_update_request(self, mock_logger):
         """
         Verifies that video status update request works as expected.
         """
         url = self.get_url_for_course_key(self.course.id)
         edx_video_id = 'test1'
-
         self.assert_video_status(url, edx_video_id, 'Uploading')
 
         response = self.client.post(
@@ -506,6 +506,14 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
             }]),
             content_type="application/json"
         )
+
+        mock_logger.info.assert_called_with(
+            'VIDEOS: Video status update with id [%s], status [%s] and message [%s]',
+            edx_video_id,
+            'upload_failed',
+            'server down'
+        )
+
         self.assertEqual(response.status_code, 204)
 
         self.assert_video_status(url, edx_video_id, 'Failed')

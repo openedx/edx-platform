@@ -33,9 +33,25 @@ from xmodule.x_module import XModule
 from xmodule.split_test_module import get_split_user_partitions
 from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError
 
-from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
+from courseware.access_response import (
+    MilestoneError,
+    MobileAvailabilityError,
+    VisibilityError,
+)
+from courseware.access_utils import (
+    ACCESS_DENIED,
+    ACCESS_GRANTED,
+    adjust_start_date,
+    check_start_date,
+    debug,
+    in_preview_mode
+)
 from courseware.masquerade import get_masquerade_role, is_masquerading_as_student
+from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
+from lms.djangoapps.ccx.models import CustomCourseForEdX
+from mobile_api.models import IgnoreMobileAvailableFlagConfig
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from student import auth
 from student.models import CourseEnrollmentAllowed
 from student.roles import (
@@ -54,19 +70,6 @@ from util.milestones_helpers import (
     is_prerequisite_courses_enabled,
 )
 from ccx_keys.locator import CCXLocator
-
-from courseware.access_response import (
-    MilestoneError,
-    MobileAvailabilityError,
-    VisibilityError,
-)
-from courseware.access_utils import (
-    adjust_start_date, check_start_date, debug, ACCESS_GRANTED, ACCESS_DENIED,
-    in_preview_mode
-)
-
-from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
-from lms.djangoapps.ccx.models import CustomCourseForEdX
 
 log = logging.getLogger(__name__)
 
@@ -469,6 +472,10 @@ def _has_group_access(descriptor, user, course_key):
         # via updating the children of the split_test module.
         return ACCESS_GRANTED
 
+    # Allow staff and instructors roles group access, as they are not masquerading as a student.
+    if get_user_role(user, course_key) in ['staff', 'instructor']:
+        return ACCESS_GRANTED
+
     # use merged_group_access which takes group access on the block's
     # parents / ancestors into account
     merged_access = descriptor.merged_group_access
@@ -550,14 +557,20 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
         students to see modules.  If not, views should check the course, so we
         don't have to hit the enrollments table on every module load.
         """
+        # If the user (or the role the user is currently masquerading as) does not have
+        # access to this content, then deny access. The problem with calling _has_staff_access_to_descriptor
+        # before this method is that _has_staff_access_to_descriptor short-circuits and returns True
+        # for staff users in preview mode.
+        if not _has_group_access(descriptor, user, course_key):
+            return ACCESS_DENIED
+
+        # If the user has staff access, they can load the module and checks below are not needed.
         if _has_staff_access_to_descriptor(user, descriptor, course_key):
             return ACCESS_GRANTED
 
-        # if the user has staff access, they can load the module so this code doesn't need to run
         return (
             _visible_to_nonstaff_users(descriptor) and
             _can_access_descriptor_with_milestones(user, descriptor, course_key) and
-            _has_group_access(descriptor, user, course_key) and
             (
                 _has_detached_class_tag(descriptor) or
                 _can_access_descriptor_with_start_date(user, descriptor, course_key)
@@ -849,7 +862,10 @@ def _is_descriptor_mobile_available(descriptor):
     """
     Returns if descriptor is available on mobile.
     """
-    return ACCESS_GRANTED if descriptor.mobile_available else MobileAvailabilityError()
+    if IgnoreMobileAvailableFlagConfig.is_enabled() or descriptor.mobile_available:
+        return ACCESS_GRANTED
+    else:
+        return MobileAvailabilityError()
 
 
 def is_mobile_available_for_user(user, descriptor):

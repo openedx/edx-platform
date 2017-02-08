@@ -46,19 +46,26 @@ class StructuredTagsAside(XBlockAside):
         if isinstance(block, CapaModule):
             tags = []
             for tag in self.get_available_tags():
-                values = tag.get_values()
-                current_value = self.saved_tags.get(tag.name, None)
+                tag_available_values = tag.get_values()
+                tag_current_values = self.saved_tags.get(tag.name, [])
 
-                if current_value is not None and current_value not in values:
-                    values.insert(0, current_value)
+                if isinstance(tag_current_values, basestring):
+                    tag_current_values = [tag_current_values]
+
+                tag_values_not_exists = [cur_val for cur_val in tag_current_values
+                                         if cur_val not in tag_available_values]
+
+                tag_values_available_to_choose = tag_available_values + tag_values_not_exists
+                tag_values_available_to_choose.sort()
 
                 tags.append({
                     'key': tag.name,
                     'title': tag.title,
-                    'values': values,
-                    'current_value': current_value
+                    'values': tag_values_available_to_choose,
+                    'current_values': tag_current_values,
                 })
             fragment = Fragment(render_to_string('structured_tags_block.html', {'tags': tags,
+                                                                                'tags_count': len(tags),
                                                                                 'block_location': block.location}))
             fragment.add_javascript_url(self._get_studio_resource_url('/js/xblock_asides/structured_tags.js'))
             fragment.initialize_js('StructuredTagsInit')
@@ -71,25 +78,36 @@ class StructuredTagsAside(XBlockAside):
         """
         Handler to save choosen tags with connected XBlock
         """
-        found = False
-        if 'tag' not in request.params:
-            return Response("The required parameter 'tag' is not passed", status=400)
+        try:
+            posted_data = request.json
+        except ValueError:
+            return Response("Invalid request body", status=400)
 
-        tag = request.params['tag'].split(':')
+        saved_tags = {}
+        need_update = False
 
         for av_tag in self.get_available_tags():
-            if av_tag.name == tag[0]:
-                if tag[1] == '':
-                    self.saved_tags[tag[0]] = None
-                    found = True
-                elif tag[1] in av_tag.get_values():
-                    self.saved_tags[tag[0]] = tag[1]
-                    found = True
+            if av_tag.name in posted_data and posted_data[av_tag.name]:
+                tag_available_values = av_tag.get_values()
+                tag_current_values = self.saved_tags.get(av_tag.name, [])
 
-        if not found:
-            return Response("Invalid 'tag' parameter", status=400)
+                if isinstance(tag_current_values, basestring):
+                    tag_current_values = [tag_current_values]
 
-        return Response()
+                for posted_tag_value in posted_data[av_tag.name]:
+                    if posted_tag_value not in tag_available_values and posted_tag_value not in tag_current_values:
+                        return Response("Invalid tag value was passed: %s" % posted_tag_value, status=400)
+
+                saved_tags[av_tag.name] = posted_data[av_tag.name]
+                need_update = True
+            if av_tag.name in posted_data:
+                need_update = True
+
+        if need_update:
+            self.saved_tags = saved_tags
+            return Response()
+        else:
+            return Response("Tags parameters were not passed", status=400)
 
     def get_event_context(self, event_type, event):  # pylint: disable=unused-argument
         """

@@ -395,7 +395,7 @@ class Pa11yCrawler(BokChoyTestSuite):
         Runs pa11ycrawler as staff user against the test course.
         """
         data_dir = os.path.join(self.report_dir, 'data')
-        url = "https://raw.githubusercontent.com/singingwolfboy/pa11ycrawler-ignore/master/ignore.yaml"
+        url = "https://raw.githubusercontent.com/edx/pa11ycrawler-ignore/master/ignore.yaml"
         return [
             "scrapy",
             "crawl",

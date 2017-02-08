@@ -1848,7 +1848,8 @@ class TestXmoduleRuntimeEvent(TestSubmittingProblems):
             'course_id': unicode(self.course.id),
             'usage_id': unicode(self.problem.location),
             'only_if_higher': None,
-            'modified': datetime.now().replace(tzinfo=pytz.UTC)
+            'modified': datetime.now().replace(tzinfo=pytz.UTC),
+            'score_db_table': 'csm',
         }
         send_mock.assert_called_with(**expected_signal_kwargs)
 

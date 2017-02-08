@@ -1,4 +1,4 @@
-<h4><%- gettext("Editing post") %></h4>
+<h3 class="thread-title"><%- gettext("Editing post") %></h3>
 <ul class="post-errors"></ul>
 <div class="forum-edit-post-form-wrapper"></div>
 <div class="post-field">

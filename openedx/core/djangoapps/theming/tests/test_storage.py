@@ -2,7 +2,6 @@
 Tests for comprehensive theme static files storage classes.
 """
 import ddt
-import unittest
 import re
 
 from mock import patch
@@ -12,9 +11,10 @@ from django.conf import settings
 
 from openedx.core.djangoapps.theming.helpers import get_theme_base_dirs, Theme, get_theme_base_dir
 from openedx.core.djangoapps.theming.storage import ThemeStorage
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 @ddt.ddt
 class TestStorageLMS(TestCase):
     """

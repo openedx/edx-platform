@@ -6,10 +6,8 @@ import shutil
 import csv
 from collections import defaultdict
 from nose.plugins.attrib import attr
-from unittest import skipUnless
 
 import ddt
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.management.base import CommandError
 
@@ -21,11 +19,12 @@ from student.models import CourseEnrollment
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
 from openedx.core.djangoapps.user_api.models import UserOrgTag
 from openedx.core.djangoapps.user_api.management.commands import email_opt_in_list
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
 @attr(shard=2)
 @ddt.ddt
-@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class EmailOptInListTest(ModuleStoreTestCase):
     """Tests for the email opt-in list management command. """
 
@@ -37,6 +36,8 @@ class EmailOptInListTest(ModuleStoreTestCase):
 
     OUTPUT_FILE_NAME = "test_org_email_opt_in.csv"
     OUTPUT_FIELD_NAMES = [
+        "user_id",
+        "username",
         "email",
         "full_name",
         "course_id",
@@ -401,6 +402,8 @@ class EmailOptInListTest(ModuleStoreTestCase):
 
         # Check the header row
         self.assertEqual({
+            "user_id": "user_id",
+            "username": "username",
             "email": "email",
             "full_name": "full_name",
             "course_id": "course_id",
@@ -411,6 +414,8 @@ class EmailOptInListTest(ModuleStoreTestCase):
         # Check data rows
         for user, course_id, opt_in_pref in args:
             self.assertIn({
+                "user_id": str(user.id),
+                "username": user.username.encode('utf-8'),
                 "email": user.email.encode('utf-8'),
                 "full_name": (
                     user.profile.name.encode('utf-8')

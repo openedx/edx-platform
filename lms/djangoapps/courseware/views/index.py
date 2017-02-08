@@ -26,6 +26,7 @@ from xblock.fragment import Fragment
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
+from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from shoppingcart.models import CourseRegistrationCode
 from student.models import CourseEnrollment
 from student.views import is_course_blocked
@@ -101,7 +102,7 @@ class CoursewareIndex(View):
                 self.course = get_course_with_access(request.user, 'load', self.course_key, depth=CONTENT_DEPTH)
                 self.is_staff = has_access(request.user, 'staff', self.course)
                 self._setup_masquerade_for_effective_user()
-                return self._get()
+                return self._get(request)
         except Redirect as redirect_error:
             return redirect(redirect_error.url)
         except UnicodeEncodeError:
@@ -127,12 +128,12 @@ class CoursewareIndex(View):
         # Set the user in the request to the effective user.
         self.request.user = self.effective_user
 
-    def _get(self):
+    def _get(self, request):
         """
         Render the index page.
         """
         self._redirect_if_needed_to_access_course()
-        self._prefetch_and_bind_course()
+        self._prefetch_and_bind_course(request)
 
         if self.course.has_children_at_depth(CONTENT_DEPTH):
             self._reset_section_to_exam_if_required()
@@ -324,13 +325,17 @@ class CoursewareIndex(View):
         if self.chapter:
             return self._find_block(self.chapter, self.section_url_name, 'section')
 
-    def _prefetch_and_bind_course(self):
+    def _prefetch_and_bind_course(self, request):
         """
         Prefetches all descendant data for the requested section and
         sets up the runtime, which binds the request user to the section.
         """
         self.field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-            self.course_key, self.effective_user, self.course, depth=CONTENT_DEPTH,
+            self.course_key,
+            self.effective_user,
+            self.course,
+            depth=CONTENT_DEPTH,
+            read_only=CrawlersConfig.is_crawler(request),
         )
 
         self.course = get_module_for_descriptor(

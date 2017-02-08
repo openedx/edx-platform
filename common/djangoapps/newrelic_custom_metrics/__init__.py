@@ -9,6 +9,12 @@ example:
 
 There is no need to do anything else.  The metrics are automatically cleared
 before the next request.
+
+We try to keep track of our custom metrics at:
+
+https://openedx.atlassian.net/wiki/display/PERF/Custom+Metrics+in+New+Relic
+
+TODO: supply additional public functions for storing strings and booleans.
 """
 
 from newrelic_custom_metrics import middleware
@@ -16,19 +22,22 @@ from newrelic_custom_metrics import middleware
 
 def accumulate(name, value):
     """
-    Queue up a custom New Relic metric for the current request.  At the end of
+    Accumulate custom New Relic metric for the current request.
+
+    The named metric is accumulated by a numerical amount using the sum.  All
+    metrics are queued up in the request_cache for this request.  At the end of
     the request, the newrelic_custom_metrics middleware will batch report all
-    queued metrics to NR.
+    queued accumulated metrics to NR.
 
-    Q: What style of names should I use?
-    A: Metric names should be comma delimited, becoming more specific from left
-       to right.
-
-    Q: What type can values be?
-    A: numbers only.
-
-    Q: What happens when I call this multiple times with the same name?
-    A: Like-named metrics will be accumulated using the sum.
+    Arguments:
+        name (str): The metric name.  It should be period-delimited, and
+            increase in specificty from left to right.  For example:
+            'xb_user_state.get_many.num_items'.
+        value (number):  The amount to accumulate into the named metric.  When
+            accumulate() is called multiple times for a given metric name
+            during a request, the sum of the values for each call is reported
+            for that metric.  For metrics which don't make sense to accumulate,
+            make sure to only call this function once during a request.
     """
     middleware.NewRelicCustomMetrics.accumulate_metric(name, value)
 

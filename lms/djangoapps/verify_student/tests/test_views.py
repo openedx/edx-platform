@@ -36,7 +36,7 @@ from course_modes.tests.factories import CourseModeFactory
 from courseware.url_helpers import get_redirect_url
 from common.test.utils import XssTestMixin
 from commerce.models import CommerceConfiguration
-from commerce.tests import TEST_PAYMENT_DATA, TEST_API_URL, TEST_API_SIGNING_KEY, TEST_PUBLIC_URL_ROOT
+from commerce.tests import TEST_PAYMENT_DATA, TEST_API_URL, TEST_PUBLIC_URL_ROOT
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
@@ -140,7 +140,6 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
     @httpretty.activate
     @override_settings(
         ECOMMERCE_API_URL=TEST_API_URL,
-        ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY,
         ECOMMERCE_PUBLIC_URL_ROOT=TEST_PUBLIC_URL_ROOT
     )
     def test_start_flow_with_ecommerce(self):
@@ -1053,7 +1052,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         self.assertEqual(response_dict['course_name'], mode_display_name)
 
     @httpretty.activate
-    @override_settings(ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY)
+    @override_settings(ECOMMERCE_API_URL=TEST_API_URL)
     @ddt.data("verify_student_start_flow", "verify_student_begin_flow")
     def test_processors_api(self, payment_flow):
         """
@@ -1223,7 +1222,7 @@ class TestCreateOrderShoppingCart(CheckoutTestMixin, ModuleStoreTestCase):
 
 
 @attr(shard=2)
-@override_settings(ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY)
+@override_settings(ECOMMERCE_API_URL=TEST_API_URL)
 @patch(
     'lms.djangoapps.verify_student.views.checkout_with_ecommerce_service',
     return_value=TEST_PAYMENT_DATA,
@@ -1248,7 +1247,7 @@ class TestCheckoutWithEcommerceService(ModuleStoreTestCase):
     """
 
     @httpretty.activate
-    @override_settings(ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY)
+    @override_settings(ECOMMERCE_API_URL=TEST_API_URL)
     def test_create_basket(self):
         """
         Check that when working with a product being processed by the

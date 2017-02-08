@@ -364,6 +364,7 @@
                 });
                 sortControl.val(newType).change();
                 expect($.ajax).toHaveBeenCalled();
+                expect(view.mode).toBe('commentables');
                 checkThreadsOrdering(view, sortOrder, newType);
             };
 

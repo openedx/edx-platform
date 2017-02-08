@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-01-12 17:49+0000\n"
-"PO-Revision-Date: 2017-01-12 17:52:25.911208\n"
+"POT-Creation-Date: 2017-02-02 19:33+0000\n"
+"PO-Revision-Date: 2017-02-02 19:34:37.831557\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -79,9 +79,8 @@ msgstr "يثمثفث"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/certificates/views/signatory_editor.js
-#: cms/static/js/factories/export.js
-#: cms/static/js/programs/views/program_details_view.js
-#: cms/static/js/views/asset.js cms/static/js/views/course_info_update.js
+#: cms/static/js/factories/export.js cms/static/js/views/asset.js
+#: cms/static/js/views/course_info_update.js
 #: cms/static/js/views/manage_users_and_roles.js
 #: cms/static/js/views/modals/base_modal.js
 #: cms/static/js/views/modals/course_outline_modals.js
@@ -101,7 +100,6 @@ msgstr "يثمثفث"
 #: cms/templates/js/section-name-edit.underscore
 #: cms/templates/js/signatory-actions.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
-#: cms/templates/js/programs/program_creator_form.underscore
 #: common/static/common/templates/discussion/new-post.underscore
 #: common/static/common/templates/discussion/response-comment-edit.underscore
 #: common/static/common/templates/discussion/thread-edit.underscore
@@ -141,8 +139,6 @@ msgstr "ذمخسث"
 #: cms/templates/js/course-instructor-details.underscore
 #: cms/templates/js/previous-video-upload-list.underscore
 #: cms/templates/js/signatory-details.underscore
-#: cms/templates/js/programs/program_creator_form.underscore
-#: cms/templates/js/programs/program_details.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Name"
 msgstr "رشوث"
@@ -2477,7 +2473,6 @@ msgstr "فثشوس"
 #: cms/templates/js/certificate-editor.underscore
 #: cms/templates/js/content-group-editor.underscore
 #: cms/templates/js/group-configuration-editor.underscore
-#: cms/templates/js/programs/program_creator_form.underscore
 msgid "Create"
 msgstr "ذقثشفث"
 
@@ -4193,6 +4188,10 @@ msgstr "قثسفخقث ثرقخمموثرف ذخيث"
 msgid "Mark enrollment code as unused"
 msgstr "وشقن ثرقخمموثرف ذخيث شس عرعسثي"
 
+#: lms/static/js/instructor_dashboard/send_email.js
+msgid "All learners in the {track_name} track"
+msgstr "شمم مثشقرثقس هر فاث {track_name} فقشذن"
+
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
 "Error getting student progress url for '<%- student_id %>'. Make sure that "
@@ -5418,114 +5417,6 @@ msgstr "خق"
 msgid "This component has validation issues."
 msgstr "فاهس ذخوحخرثرف اشس دشمهيشفهخر هسسعثس."
 
-#: cms/static/js/programs/models/course_model.js
-#: cms/templates/js/programs/course_details.underscore
-msgid "Course Code"
-msgstr "ذخعقسث ذخيث"
-
-#: cms/static/js/programs/models/course_model.js
-#: cms/templates/js/certificate-details.underscore
-#: cms/templates/js/certificate-editor.underscore
-#: cms/templates/js/programs/course_details.underscore
-msgid "Course Title"
-msgstr "ذخعقسث فهفمث"
-
-#: cms/static/js/programs/models/program_model.js
-msgid "Please select a valid organization."
-msgstr "حمثشسث سثمثذف ش دشمهي خقلشرهظشفهخر."
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} is required"
-msgstr "{0} هس قثضعهقثي"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be accepted"
-msgstr "{0} وعسف زث شذذثحفثي"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be greater than or equal to {1}"
-msgstr "{0} وعسف زث لقثشفثق فاشر خق ثضعشم فخ {1}"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be less than or equal to {1}"
-msgstr "{0} وعسف زث مثسس فاشر خق ثضعشم فخ {1}"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be between {1} and {2}"
-msgstr "{0} وعسف زث زثفصثثر {1} شري {2}"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be {1} characters"
-msgstr "{0} وعسف زث {1} ذاشقشذفثقس"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be at least {1} characters"
-msgstr "{0} وعسف زث شف مثشسف {1} ذاشقشذفثقس"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be at most {1} characters"
-msgstr "{0} وعسف زث شف وخسف {1} ذاشقشذفثقس"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be between {1} and {2} characters"
-msgstr "{0} وعسف زث زثفصثثر {1} شري {2} ذاشقشذفثقس"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be one of: {1}"
-msgstr "{0} وعسف زث خرث خب: {1}"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be the same as {1}"
-msgstr "{0} وعسف زث فاث سشوث شس {1}"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must only contain digits"
-msgstr "{0} وعسف خرمغ ذخرفشهر يهلهفس"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be a number"
-msgstr "{0} وعسف زث ش رعوزثق"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be a valid email"
-msgstr "{0} وعسف زث ش دشمهي ثوشهم"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be a valid url"
-msgstr "{0} وعسف زث ش دشمهي عقم"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} is invalid"
-msgstr "{0} هس هردشمهي"
-
-#: cms/static/js/programs/views/program_details_view.js
-msgid "confirm"
-msgstr "ذخربهقو"
-
-#: cms/static/js/programs/views/program_details_view.js
-msgid "Publish this program?"
-msgstr "حعزمهسا فاهس حقخلقشو?"
-
-#: cms/static/js/programs/views/program_details_view.js
-msgid ""
-"After you publish this program, you cannot add or remove course codes or "
-"remove course runs."
-msgstr ""
-"شبفثق غخع حعزمهسا فاهس حقخلقشو, غخع ذشررخف شيي خق قثوخدث ذخعقسث ذخيثس خق "
-"قثوخدث ذخعقسث قعرس."
-
-#: cms/static/js/programs/views/program_details_view.js
-#: cms/static/js/views/modals/course_outline_modals.js
-#: cms/templates/js/course-outline.underscore
-#: cms/templates/js/publish-xblock.underscore
-#: cms/templates/js/programs/program_details.underscore
-msgid "Publish"
-msgstr "حعزمهسا"
-
-#: cms/static/js/programs/views/program_details_view.js
-msgid "Marketing Slug is required."
-msgstr "وشقنثفهرل سمعل هس قثضعهقثي."
-
 #: cms/static/js/views/active_video_upload.js cms/static/js/views/assets.js
 msgid "Your file could not be uploaded"
 msgstr "غخعق بهمث ذخعمي رخف زث عحمخشيثي"
@@ -5856,6 +5747,12 @@ msgstr "حعزمهسا {display_name}"
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Publish all unpublished changes for this {item}?"
 msgstr "حعزمهسا شمم عرحعزمهساثي ذاشرلثس بخق فاهس {item}?"
+
+#: cms/static/js/views/modals/course_outline_modals.js
+#: cms/templates/js/course-outline.underscore
+#: cms/templates/js/publish-xblock.underscore
+msgid "Publish"
+msgstr "حعزمهسا"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Basic"
@@ -6267,7 +6164,6 @@ msgstr "عحيشفهرل فشلس"
 
 #: cms/templates/js/asset-library.underscore
 #: cms/templates/js/basic-modal.underscore
-#: cms/templates/js/programs/confirm_modal.underscore
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
 msgid "Actions"
 msgstr "شذفهخرس"
@@ -6411,13 +6307,14 @@ msgid "All Groups"
 msgstr "شمم لقخعحس"
 
 #: common/static/common/templates/discussion/new-post.underscore
-#: common/static/common/templates/discussion/thread-edit.underscore
-msgid "Add a clear and descriptive title to encourage participation."
-msgstr "شيي ش ذمثشق شري يثسذقهحفهدث فهفمث فخ ثرذخعقشلث حشقفهذهحشفهخر."
+msgid ""
+"Add a clear and descriptive title to encourage participation. (Required)"
+msgstr ""
+"شيي ش ذمثشق شري يثسذقهحفهدث فهفمث فخ ثرذخعقشلث حشقفهذهحشفهخر. (قثضعهقثي)"
 
 #: common/static/common/templates/discussion/new-post.underscore
-msgid "Your question or idea"
-msgstr "غخعق ضعثسفهخر خق هيثش"
+msgid "Your question or idea (required)"
+msgstr "غخعق ضعثسفهخر خق هيثش (قثضعهقثي)"
 
 #: common/static/common/templates/discussion/new-post.underscore
 msgid "follow this post"
@@ -6474,6 +6371,10 @@ msgstr "قثحخقفثي"
 #: common/static/common/templates/discussion/thread-edit.underscore
 msgid "Editing post"
 msgstr "ثيهفهرل حخسف"
+
+#: common/static/common/templates/discussion/thread-edit.underscore
+msgid "Add a clear and descriptive title to encourage participation."
+msgstr "شيي ش ذمثشق شري يثسذقهحفهدث فهفمث فخ ثرذخعقشلث حشقفهذهحشفهخر."
 
 #: common/static/common/templates/discussion/thread-edit.underscore
 msgid "Edit your post below."
@@ -6591,10 +6492,10 @@ msgstr "حخسف فغحث"
 #: common/static/common/templates/discussion/thread-type.underscore
 msgid ""
 "Questions raise issues that need answers. Discussions share ideas and start "
-"conversations."
+"conversations. (Required)"
 msgstr ""
 "ضعثسفهخرس قشهسث هسسعثس فاشف رثثي شرسصثقس. يهسذعسسهخرس ساشقث هيثشس شري سفشقف "
-"ذخردثقسشفهخرس."
+"ذخردثقسشفهخرس. (قثضعهقثي)"
 
 #: common/static/common/templates/discussion/thread-type.underscore
 msgid "Question"
@@ -6617,8 +6518,8 @@ msgid "Topic area"
 msgstr "فخحهذ شقثش"
 
 #: common/static/common/templates/discussion/topic.underscore
-msgid "Add your post to a relevant topic to help others find it."
-msgstr "شيي غخعق حخسف فخ ش قثمثدشرف فخحهذ فخ اثمح خفاثقس بهري هف."
+msgid "Add your post to a relevant topic to help others find it. (Required)"
+msgstr "شيي غخعق حخسف فخ ش قثمثدشرف فخحهذ فخ اثمح خفاثقس بهري هف. (قثضعهقثي)"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Discussion Home"
@@ -8647,6 +8548,11 @@ msgstr "ذثقفهبهذشفث يثفشهمس"
 
 #: cms/templates/js/certificate-details.underscore
 #: cms/templates/js/certificate-editor.underscore
+msgid "Course Title"
+msgstr "ذخعقسث فهفمث"
+
+#: cms/templates/js/certificate-details.underscore
+#: cms/templates/js/certificate-editor.underscore
 msgid "Course Title Override"
 msgstr "ذخعقسث فهفمث خدثققهيث"
 
@@ -8785,8 +8691,20 @@ msgid "Learners see the published subsection and can access its content."
 msgstr "مثشقرثقس سثث فاث حعزمهساثي سعزسثذفهخر شري ذشر شذذثسس هفس ذخرفثرف."
 
 #: cms/templates/js/content-visibility-editor.underscore
+msgid "Hide content after course end date"
+msgstr "اهيث ذخرفثرف شبفثق ذخعقسث ثري يشفث"
+
+#: cms/templates/js/content-visibility-editor.underscore
 msgid "Hide content after due date"
 msgstr "اهيث ذخرفثرف شبفثق يعث يشفث"
+
+#: cms/templates/js/content-visibility-editor.underscore
+msgid ""
+"After the course\\'s end date has passed, learners can no longer access "
+"subsection content. The subsection remains included in grade calculations."
+msgstr ""
+"شبفثق فاث ذخعقسث\\'س ثري يشفث اشس حشسسثي, مثشقرثقس ذشر رخ مخرلثق شذذثسس "
+"سعزسثذفهخر ذخرفثرف. فاث سعزسثذفهخر قثوشهرس هرذمعيثي هر لقشيث ذشمذعمشفهخرس."
 
 #: cms/templates/js/content-visibility-editor.underscore
 msgid ""
@@ -8811,13 +8729,13 @@ msgstr ""
 #: cms/templates/js/content-visibility-editor.underscore
 #, python-format
 msgid ""
-"If you select an option other than \"%(hide_label)s\", after the subsection "
-"release date has passed, published units in this subsection will become "
-"available to learners unless units are explicitly hidden."
+"If you select an option other than \"%(hide_label)s\", published units in "
+"this subsection become available to learners unless they are explicitly "
+"hidden."
 msgstr ""
-"هب غخع سثمثذف شر خحفهخر خفاثق فاشر \"%(hide_label)s\", شبفثق فاث سعزسثذفهخر "
-"قثمثشسث يشفث اشس حشسسثي, حعزمهساثي عرهفس هر فاهس سعزسثذفهخر صهمم زثذخوث "
-"شدشهمشزمث فخ مثشقرثقس عرمثسس عرهفس شقث ثطحمهذهفمغ اهييثر."
+"هب غخع سثمثذف شر خحفهخر خفاثق فاشر \"%(hide_label)s\", حعزمهساثي عرهفس هر "
+"فاهس سعزسثذفهخر زثذخوث شدشهمشزمث فخ مثشقرثقس عرمثسس فاثغ شقث ثطحمهذهفمغ "
+"اهييثر."
 
 #: cms/templates/js/course-instructor-details.underscore
 msgid "Instructor Name"
@@ -8837,7 +8755,6 @@ msgstr "حمثشسث شيي فاث هرسفقعذفخق'س فهفمث"
 
 #: cms/templates/js/course-instructor-details.underscore
 #: cms/templates/js/signatory-details.underscore
-#: cms/templates/js/programs/program_creator_form.underscore
 msgid "Organization"
 msgstr "خقلشرهظشفهخر"
 
@@ -8966,6 +8883,10 @@ msgstr "لقشيثي شس:"
 #: cms/templates/js/course-outline.underscore
 msgid "Due:"
 msgstr "يعث:"
+
+#: cms/templates/js/course-outline.underscore
+msgid "Subsection is hidden after course end date"
+msgstr "سعزسثذفهخر هس اهييثر شبفثق ذخعقسث ثري يشفث"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Subsection is hidden after due date"
@@ -9713,147 +9634,6 @@ msgid ""
 msgstr ""
 "فاث حعزمهساثي زقشرذا دثقسهخر, {published}, صشس قثسثف فخ فاث يقشبف زقشرذا "
 "دثقسهخر, {draft}."
-
-#: cms/templates/js/programs/course_details.underscore
-msgid "Delete course"
-msgstr "يثمثفث ذخعقسث"
-
-#: cms/templates/js/programs/course_details.underscore
-#, python-format
-msgid "Remove %(name)s from the program"
-msgstr "قثوخدث %(name)s بقخو فاث حقخلقشو"
-
-#: cms/templates/js/programs/course_details.underscore
-msgid "Add another run"
-msgstr "شيي شرخفاثق قعر"
-
-#: cms/templates/js/programs/course_details.underscore
-msgid ""
-"The unique number that identifies your course within your organization, e.g."
-" CS101."
-msgstr ""
-"فاث عرهضعث رعوزثق فاشف هيثرفهبهثس غخعق ذخعقسث صهفاهر غخعق خقلشرهظشفهخر, ث.ل."
-" ذس101."
-
-#: cms/templates/js/programs/course_details.underscore
-msgid ""
-"The title entered here will override the title set for the individual run of"
-" the course. It will be displayed on the XSeries progress page and in "
-"marketing presentations."
-msgstr ""
-"فاث فهفمث ثرفثقثي اثقث صهمم خدثققهيث فاث فهفمث سثف بخق فاث هريهدهيعشم قعر خب"
-" فاث ذخعقسث. هف صهمم زث يهسحمشغثي خر فاث طسثقهثس حقخلقثسس حشلث شري هر "
-"وشقنثفهرل حقثسثرفشفهخرس."
-
-#: cms/templates/js/programs/course_details.underscore
-msgid "Save Course"
-msgstr "سشدث ذخعقسث"
-
-#: cms/templates/js/programs/course_run.underscore
-#, python-format
-msgid "Run %(key)s"
-msgstr "قعر %(key)s"
-
-#: cms/templates/js/programs/course_run.underscore
-msgid "Delete course run"
-msgstr "يثمثفث ذخعقسث قعر"
-
-#: cms/templates/js/programs/course_run.underscore
-#, python-format
-msgid "Remove run %(key)s from the program"
-msgstr "قثوخدث قعر %(key)s بقخو فاث حقخلقشو"
-
-#: cms/templates/js/programs/course_run.underscore
-#, python-format
-msgid "Start Date: %(date)s"
-msgstr "سفشقف يشفث: %(date)s"
-
-#: cms/templates/js/programs/course_run.underscore
-#, python-format
-msgid "Mode: %(mode)s"
-msgstr "وخيث: %(mode)s"
-
-#: cms/templates/js/programs/course_run.underscore
-msgid "Please select a Course Run"
-msgstr "حمثشسث سثمثذف ش ذخعقسث قعر"
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "Create a New Program"
-msgstr "ذقثشفث ش رثص حقخلقشو"
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "Program type"
-msgstr "حقخلقشو فغحث"
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "Select a type"
-msgstr "سثمثذف ش فغحث"
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "XSeries"
-msgstr "طسثقهثس"
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "MicroMasters"
-msgstr "وهذقخوشسفثقس"
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "Select an organization"
-msgstr "سثمثذف شر خقلشرهظشفهخر"
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "The public display name of the program."
-msgstr "فاث حعزمهذ يهسحمشغ رشوث خب فاث حقخلقشو."
-
-#: cms/templates/js/programs/program_creator_form.underscore
-#: cms/templates/js/programs/program_details.underscore
-msgid "Subtitle"
-msgstr "سعزفهفمث"
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid ""
-"A short description of the program, including concepts covered and expected "
-"outcomes (255 character limit)."
-msgstr ""
-"ش ساخقف يثسذقهحفهخر خب فاث حقخلقشو, هرذمعيهرل ذخرذثحفس ذخدثقثي شري ثطحثذفثي "
-"خعفذخوثس (255 ذاشقشذفثق مهوهف)."
-
-#: cms/templates/js/programs/program_creator_form.underscore
-#: cms/templates/js/programs/program_details.underscore
-msgid "Marketing Slug"
-msgstr "وشقنثفهرل سمعل"
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "Slug used to generate links to the marketing site."
-msgstr "سمعل عسثي فخ لثرثقشفث مهرنس فخ فاث وشقنثفهرل سهفث."
-
-#: cms/templates/js/programs/program_details.underscore
-msgid "Edit the program title"
-msgstr "ثيهف فاث حقخلقشو فهفمث"
-
-#: cms/templates/js/programs/program_details.underscore
-msgid "Edit the program\\'s name."
-msgstr "ثيهف فاث حقخلقشو\\'س رشوث."
-
-#: cms/templates/js/programs/program_details.underscore
-msgid "Edit the program subtitle"
-msgstr "ثيهف فاث حقخلقشو سعزفهفمث"
-
-#: cms/templates/js/programs/program_details.underscore
-msgid "Edit the program\\'s subtitle."
-msgstr "ثيهف فاث حقخلقشو\\'س سعزفهفمث."
-
-#: cms/templates/js/programs/program_details.underscore
-msgid "Edit the program marketing slug"
-msgstr "ثيهف فاث حقخلقشو وشقنثفهرل سمعل"
-
-#: cms/templates/js/programs/program_details.underscore
-msgid "Edit the program\\'s marketing slug."
-msgstr "ثيهف فاث حقخلقشو\\'س وشقنثفهرل سمعل."
-
-#: cms/templates/js/programs/program_details.underscore
-msgid "Add a course"
-msgstr "شيي ش ذخعقسث"
 
 #: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore
 msgid "Add URLs for additional versions"

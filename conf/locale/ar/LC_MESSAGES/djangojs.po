@@ -1,5 +1,5 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
-# edX translation file.
+# edX community translations have been downloaded from Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/).
 # Copyright (C) 2017 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
@@ -92,7 +92,7 @@
 # Natalia Berdnikov <nberdnikov@edx.org>, 2016
 # Ned Batchelder <ned@edx.org>, 2016
 # Omar Al-Ithawi <oithawi@qrf.org>, 2015-2016
-# shefaa abu jabel <shefaa.aj@gmail.com>, 2016
+# shefaa abu jabel <shefaa.aj@gmail.com>, 2016-2017
 # Soha Assali <soha+transifex@qordoba.com>, 2015-2016
 # سيف المنايا <m2fahad9@gmail.com>, 2015
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
@@ -115,14 +115,14 @@
 # Ned Batchelder <ned@edx.org>, 2016
 # Omar Al-Ithawi <oithawi@qrf.org>, 2015-2016
 # Saramami.mami <saramami.mami@yahoo.com>, 2014
-# shefaa abu jabel <shefaa.aj@gmail.com>, 2016
+# shefaa abu jabel <shefaa.aj@gmail.com>, 2016-2017
 # Soha Assali <soha+transifex@qordoba.com>, 2015-2016
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-01-05 17:02+0000\n"
-"PO-Revision-Date: 2017-01-05 17:07+0000\n"
+"POT-Creation-Date: 2017-01-23 17:56+0000\n"
+"PO-Revision-Date: 2017-02-02 17:19+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
 "MIME-Version: 1.0\n"
@@ -1618,9 +1618,14 @@ msgstr ""
 "يبدو أن الرابط الذي أدخلته عبارة عن رابط خارجي، هل تريد إضافة البادئة "
 "http:// اللازمة؟"
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: cms/templates/js/course-instructor-details.underscore
+#: cms/templates/js/signatory-details.underscore
+#: common/static/common/templates/discussion/new-post.underscore
+#: common/static/common/templates/discussion/thread-edit.underscore
 msgid "Title"
 msgstr "العنوان"
 
@@ -4398,6 +4403,10 @@ msgstr "استعادة رمز التسجيل"
 msgid "Mark enrollment code as unused"
 msgstr "وسم رمز التسجيل على أنّه غير مستخدم"
 
+#: lms/static/js/instructor_dashboard/send_email.js
+msgid "All learners in the {track_name} track"
+msgstr ""
+
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
 "Error getting student progress url for '<%- student_id %>'. Make sure that "
@@ -6611,11 +6620,11 @@ msgstr "حدث خطأ في نشر رسالتك."
 
 #: common/static/common/templates/discussion/new-post.underscore
 msgid "Add a Post"
-msgstr ""
+msgstr "أضف منشوراً"
 
 #: common/static/common/templates/discussion/new-post.underscore
 msgid "Visible to"
-msgstr ""
+msgstr "مرئي ل"
 
 #: common/static/common/templates/discussion/new-post.underscore
 msgid ""
@@ -6636,7 +6645,7 @@ msgstr "أضِف عنوانًا واضحًا ومعبّرًا لتشجيع ال�
 
 #: common/static/common/templates/discussion/new-post.underscore
 msgid "Your question or idea"
-msgstr ""
+msgstr "سؤالك أو فكرتك"
 
 #: common/static/common/templates/discussion/new-post.underscore
 msgid "follow this post"
@@ -6809,7 +6818,7 @@ msgstr "هذا المنشور مرئيٌّ للجميع."
 
 #: common/static/common/templates/discussion/thread-type.underscore
 msgid "Post type"
-msgstr ""
+msgstr "نوع المنشور"
 
 #: common/static/common/templates/discussion/thread-type.underscore
 msgid ""
@@ -6837,7 +6846,7 @@ msgstr "أضف رداً:"
 
 #: common/static/common/templates/discussion/topic.underscore
 msgid "Topic area"
-msgstr ""
+msgstr "منطقة الموضوع"
 
 #: common/static/common/templates/discussion/topic.underscore
 msgid "Add your post to a relevant topic to help others find it."
@@ -6903,7 +6912,7 @@ msgstr ""
 
 #: lms/djangoapps/discussion/static/discussion/templates/user-profile.underscore
 msgid "All Posts"
-msgstr ""
+msgstr "كل المنشورات"
 
 #: lms/djangoapps/support/static/support/templates/certificates.underscore
 msgid "username or email"
@@ -8445,6 +8454,8 @@ msgid ""
 "you will need to have these by {date} to qualify to earn a Verified "
 "Certificate."
 msgstr ""
+"يمكنك أن تدفع الآن حتى لم لم تتوفّر لديك العناصر التالية، ولكن سيكون عليك "
+"توفيرها بحلول  {date} من أجل التأهّل لنيل \"شهادة موثّقة\". "
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid ""
@@ -8529,7 +8540,7 @@ msgstr "شهادة معتمدة لـ {courseName}"
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid ""
 "To receive a certificate, you must also verify your identity before {date}."
-msgstr ""
+msgstr "لا بدّ من إثبات هويّتك قبل تاريخ {date} من أجل الحصول على شهادة."
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "To receive a certificate, you must also verify your identity."
@@ -8746,11 +8757,11 @@ msgstr "التحميلات النشطة"
 
 #: cms/templates/js/active-video-upload.underscore
 msgid "Read More"
-msgstr ""
+msgstr "لقراءة المزيد"
 
 #: cms/templates/js/active-video-upload.underscore
 msgid "details about the failure"
-msgstr ""
+msgstr "تفاصيل عن الفشل"
 
 #: cms/templates/js/add-xblock-component-button.underscore
 msgid "Add Component:"
@@ -9002,10 +9013,22 @@ msgid "Learners see the published subsection and can access its content."
 msgstr "المتعلمون يرون القسم الفرعي المنشور ويمكنهم الوصول إلى محتواه."
 
 #: cms/templates/js/content-visibility-editor.underscore
+msgid "Hide content after course end date"
+msgstr "إخفاء المحتوى بعد تاريخ انتهاء الدورة التعليمية"
+
+#: cms/templates/js/content-visibility-editor.underscore
 msgid "Hide content after due date"
 msgstr ""
 "إخفاء المحتوى بعد التاريخ المحدد\n"
 " "
+
+#: cms/templates/js/content-visibility-editor.underscore
+msgid ""
+"After the course\\'s end date has passed, learners can no longer access "
+"subsection content. The subsection remains included in grade calculations."
+msgstr ""
+"بعد مرور تاريخ انتهاء الدورة\\ات التعليمية، لن يتمكن المتعلمين من الدخول إلى"
+" المحتوى الفرعي. يبقى القسم الفرعي مدرجاً في حساب العلامة."
 
 #: cms/templates/js/content-visibility-editor.underscore
 msgid ""
@@ -9030,13 +9053,12 @@ msgstr ""
 #: cms/templates/js/content-visibility-editor.underscore
 #, python-format
 msgid ""
-"If you select an option other than \"%(hide_label)s\", after the subsection "
-"release date has passed, published units in this subsection will become "
-"available to learners unless units are explicitly hidden."
+"If you select an option other than \"%(hide_label)s\", published units in "
+"this subsection become available to learners unless they are explicitly "
+"hidden."
 msgstr ""
-"إذا حدّدت خيارًا غير \"%(hide_label)s\"ـ بعد انتهاء تاريخ إصدار القسم "
-"الفرعي، فسوف تُتاح الوحدات المنشورة في هذا القسم الفرعي للمتعلّمين، ما لم "
-"تكن الوحدات مخفية صراحةً."
+"إذا قمت بتحديد خيار آخر غير  \"%(hide_label)s\"، ستصبح الوحدات المنشورة في "
+"هذا القسم الفرعي متاحة للمتعلمين إلا إذا تم اخفائها عمداً."
 
 #: cms/templates/js/course-instructor-details.underscore
 msgid "Instructor Name"
@@ -9138,7 +9160,7 @@ msgstr "امتحان مراقَب"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Timed Exam"
-msgstr ""
+msgstr "امتحان موقوت"
 
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
@@ -9156,7 +9178,7 @@ msgstr "ضبط الإعدادات"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Duplicate"
-msgstr ""
+msgstr "نسخة مطابقة"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Drag to reorder"
@@ -9184,6 +9206,10 @@ msgstr "مقيَّم بدرجة:"
 #: cms/templates/js/course-outline.underscore
 msgid "Due:"
 msgstr "يُستَحقّ في:"
+
+#: cms/templates/js/course-outline.underscore
+msgid "Subsection is hidden after course end date"
+msgstr "إخفاء القسم الفرعي بعد تاريخ انتهاء الدورة التعليمية"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Subsection is hidden after due date"
@@ -9550,11 +9576,11 @@ msgstr "الرقم التعريفي للفيديو"
 
 #: cms/templates/js/previous-video-upload.underscore
 msgid "Remove this video"
-msgstr ""
+msgstr "حذف هذا الفيديو"
 
 #: cms/templates/js/previous-video-upload.underscore
 msgid "Remove {video_name} video"
-msgstr ""
+msgstr "حذف الفيديو {video_name}"
 
 #: cms/templates/js/publish-history.underscore
 msgid "Never published"

@@ -36,9 +36,6 @@
                 }
                 return Problem.prototype.enableSubmitButton.apply(that, arguments);
             };
-            this.enableAllButtons = function(enable, isFromCheckOperation) { // eslint-disable-line no-unused-vars
-                return Problem.prototype.enableAllButtons.apply(that, arguments);
-            };
             this.disableAllButtonsWhileRunning = function(
                 operationCallback, isFromCheckOperation // eslint-disable-line no-unused-vars
             ) {
@@ -512,7 +509,7 @@
                     ref = element.files;
                     for (loopI = 0, loopLen = ref.length; loopI < loopLen; loopI++) {
                         file = ref[loopI];
-                        if (allowedFiles.length !== 0 && indexOfHelper.call(allowedFiles, file.name < 0)) {
+                        if (allowedFiles.length !== 0 && indexOfHelper.call(allowedFiles, file.name) < 0) {
                             unallowedFileSubmitted = true;
                             errors.push(edx.StringUtils.interpolate(
                                 gettext('You submitted {filename}; only {allowedFiles} are allowed.'), {
@@ -684,17 +681,8 @@
                 var answers;
                 answers = response.answers;
                 $.each(answers, function(key, value) {
-                    var answer, choice, i, len, results;
-                    if ($.isArray(value)) {
-                        results = [];
-                        for (i = 0, len = value.length; i < len; i++) {
-                            choice = value[i];
-                            results.push(that.$('label[for="input_' + key + '_' + choice + '"]').attr({
-                                correct_answer: 'true'
-                            }));
-                        }
-                        return results;
-                    } else {
+                    var answer;
+                    if (!$.isArray(value)) {
                         answer = that.$('#answer_' + key + ', #solution_' + key);
                         edx.HtmlUtils.setHtml(answer, edx.HtmlUtils.HTML(value));
                         Collapsible.setCollapsibles(answer);
@@ -725,7 +713,7 @@
                         display = that.inputtypeDisplays[$(inputtype).attr('id')];
                         showMethod = that.inputtypeShowAnswerMethods[cls];
                         if (showMethod != null) {
-                            results.push(showMethod(inputtype, display, answers));
+                            results.push(showMethod(inputtype, display, answers, response.correct_status_html));
                         } else {
                             results.push(void 0);
                         }
@@ -950,10 +938,10 @@
                     var $status;
                     $status = $('#status_' + id);
                     if ($status[0]) {
-                        $status.removeAttr('class').addClass('unanswered');
+                        $status.removeAttr('class').addClass('status unanswered');
                     } else {
                         $('<span>', {
-                            class: 'unanswered',
+                            class: 'status unanswered',
                             style: 'display: inline-block;',
                             id: 'status_' + id
                         });
@@ -1033,16 +1021,31 @@
         };
 
         Problem.prototype.inputtypeShowAnswerMethods = {
-            choicegroup: function(element, display, answers) {
-                var answer, choice, inputId, i, len, results, $element;
+            choicegroup: function(element, display, answers, correctStatusHtml) {
+                var answer, choice, inputId, i, len, results, $element, $inputLabel, $inputStatus;
                 $element = $(element);
                 inputId = $element.attr('id').replace(/inputtype_/, '');
                 answer = answers[inputId];
                 results = [];
                 for (i = 0, len = answer.length; i < len; i++) {
                     choice = answer[i];
-                    results.push($element.find('#input_' + inputId + '_' + choice).parent('label').
-                        addClass('choicegroup_correct'));
+                    $inputLabel = $element.find('#input_' + inputId + '_' + choice).parent('label');
+                    $inputStatus = $inputLabel.find('#status_' + inputId);
+                    // If the correct answer was already Submitted before "Show Answer" was selected,
+                    // the status HTML will already be present. Otherwise, inject the status HTML.
+
+                    // If the learner clicked a different answer after Submit, their submitted answers
+                    // will be marked as "unanswered". In that case, for correct answers update the
+                    // classes accordingly.
+                    if ($inputStatus.hasClass('unanswered')) {
+                        $inputStatus.removeAttr('class').addClass('status correct');
+                        $inputLabel.addClass('choicegroup_correct');
+                    } else if (!$inputLabel.hasClass('choicegroup_correct')) {
+                        // If the status HTML is not already present (due to clicking Submit), append
+                        // the status HTML for correct answers.
+                        edx.HtmlUtils.append($inputLabel, edx.HtmlUtils.HTML(correctStatusHtml));
+                        results.push($inputLabel.addClass('choicegroup_correct'));
+                    }
                 }
                 return results;
             },
@@ -1157,32 +1160,38 @@
          */
         Problem.prototype.disableAllButtonsWhileRunning = function(operationCallback, isFromCheckOperation) {
             var that = this;
-            this.enableAllButtons(false, isFromCheckOperation);
+            var allButtons = [this.resetButton, this.saveButton, this.showButton, this.hintButton, this.submitButton];
+            var initiallyEnabledButtons = allButtons.filter(function(button) {
+                return !button.attr('disabled');
+            });
+            this.enableButtons(initiallyEnabledButtons, false, isFromCheckOperation);
             return operationCallback().always(function() {
-                return that.enableAllButtons(true, isFromCheckOperation);
+                return that.enableButtons(initiallyEnabledButtons, true, isFromCheckOperation);
             });
         };
 
         /**
-         * Used to enable/disable all buttons in problem.
+         * Enables/disables buttons by removing/adding the disabled attribute. The submit button is checked
+         *     separately due to the changing text it contains.
          *
          * params:
-         *     'enable' is a boolean to determine enabling/disabling of buttons.
-         *     'isFromCheckOperation' is a boolean to keep track if operation was initiated
+         *     'buttons' is an array of buttons that will have their 'disabled' attribute modified
+         *     'enable' a boolean to either enable or disable the buttons passed in the first parameter
+         *     'changeSubmitButtonText' is a boolean to keep track if operation was initiated
          *         from submit so that text of submit button will also be changed while disabling/enabling
          *         the submit button.
          */
-        Problem.prototype.enableAllButtons = function(enable, isFromCheckOperation) {
-            // Called by disableAllButtonsWhileRunning to automatically disable all buttons while check,reset, or
-            // save internal are running. Then enable all the buttons again after it is done.
-            if (enable) {
-                this.resetButton.add(this.saveButton).add(this.hintButton).add(this.showButton).
-                    removeAttr('disabled');
-            } else {
-                this.resetButton.add(this.saveButton).add(this.hintButton).add(this.showButton).
-                    attr({disabled: 'disabled'});
-            }
-            return this.enableSubmitButton(enable, isFromCheckOperation);
+        Problem.prototype.enableButtons = function(buttons, enable, changeSubmitButtonText) {
+            var that = this;
+            buttons.forEach(function(button) {
+                if (button.hasClass('submit')) {
+                    that.enableSubmitButton(enable, changeSubmitButtonText);
+                } else if (enable) {
+                    button.removeAttr('disabled');
+                } else {
+                    button.attr({disabled: 'disabled'});
+                }
+            });
         };
 
         /**

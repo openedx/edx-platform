@@ -18,7 +18,7 @@ from social import actions, exceptions
 from social.apps.django_app import utils as social_utils
 from social.apps.django_app import views as social_views
 
-from lms.djangoapps.commerce.tests import TEST_API_URL, TEST_API_SIGNING_KEY
+from lms.djangoapps.commerce.tests import TEST_API_URL
 from student import models as student_models
 from student import views as student_views
 from student.tests.factories import UserFactory
@@ -911,7 +911,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
 
 
 # pylint: disable=test-inherits-tests, abstract-method
-@django_utils.override_settings(ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY)
+@django_utils.override_settings(ECOMMERCE_API_URL=TEST_API_URL)
 class Oauth2IntegrationTest(IntegrationTest):
     """Base test case for integration tests of Oauth2 providers."""
 

@@ -1,5 +1,5 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-# edX translation file.
+# edX community translations have been downloaded from Korean (Korea) (http://www.transifex.com/open-edx/edx-platform/language/ko_KR/).
 # Copyright (C) 2017 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
@@ -32,7 +32,7 @@
 # kmooc <shevious@gmail.com>, 2016
 # Young C. Kim, 2015
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-# edX translation file
+# edX community translations have been downloaded from Korean (Korea) (http://www.transifex.com/open-edx/edx-platform/language/ko_KR/)
 # Copyright (C) 2017 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
@@ -64,7 +64,7 @@
 # shevious <shevious@yahoo.com>, 2015
 # Jong-Dae Park <jdpark7@gmail.com>, 2013
 # jeon <bluerespect@nate.com>, 2014-2015
-# Chanseok <kcsgoodboy@naver.com>, 2014
+# Chanseok Kang <kcsgoodboy@naver.com>, 2014
 # Kevin Min <gr326887@graded.br>, 2015
 # JiyeonLee <leejiyeon00@gmail.com>, 2014
 # kmooc <shevious@gmail.com>, 2016
@@ -80,7 +80,7 @@
 # Gil <gedwarp@gmail.com>, 2014
 # kmooc <shevious@gmail.com>, 2015
 # shevious <shevious@yahoo.com>, 2015
-# Chanseok <kcsgoodboy@naver.com>, 2014
+# Chanseok Kang <kcsgoodboy@naver.com>, 2014
 # Kevin Min <gr326887@graded.br>, 2015
 # Nicole <dlruddk1112@gmail.com>, 2014
 # kmooc <shevious@gmail.com>, 2016
@@ -89,7 +89,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-01-05 17:03+0000\n"
+"POT-Creation-Date: 2017-01-23 17:57+0000\n"
 "PO-Revision-Date: 2016-11-25 05:04+0000\n"
 "Last-Translator: kmooc <shevious@gmail.com>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/open-edx/edx-platform/language/ko_KR/)\n"
@@ -134,7 +134,7 @@ msgstr "주제"
 msgid "Subsection"
 msgstr "소주제"
 
-#: lms/templates/seq_module.html lms/templates/ccx/schedule.html
+#: lms/templates/ccx/schedule.html
 msgid "Unit"
 msgstr "학습활동"
 
@@ -227,7 +227,7 @@ msgstr ""
 #: common/djangoapps/course_modes/models.py common/lib/xmodule/xmodule/tabs.py
 #: lms/djangoapps/courseware/tabs.py lms/djangoapps/courseware/views/views.py
 #: lms/djangoapps/shoppingcart/reports.py cms/templates/widgets/header.html
-#: lms/templates/courseware/courseware.html
+#: lms/templates/help_modal.html lms/templates/courseware/courseware.html
 msgid "Course"
 msgstr ""
 
@@ -1732,22 +1732,24 @@ msgid "XML data for the annotation"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/annotatable_module.py
+#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/conditional_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/library_content_module.py
+#: common/lib/xmodule/xmodule/library_root_xblock.py
+#: common/lib/xmodule/xmodule/poll_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
-msgid "Display name for this module"
+#: common/lib/xmodule/xmodule/word_cloud_module.py
+#: common/lib/xmodule/xmodule/x_module.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+msgid "The display name for this component."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/annotatable_module.py
 msgid "Annotation"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/capa_base.py
-#: common/lib/xmodule/xmodule/conditional_module.py
-#: common/lib/xmodule/xmodule/html_module.py
-msgid "This name appears in the horizontal navigation at the top of the page."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
@@ -3173,10 +3175,6 @@ msgid "No Library Selected"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/library_root_xblock.py
-msgid "Enter the name of the library as it should appear in Studio."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/library_root_xblock.py
 msgid "Library Display Name"
 msgstr ""
 
@@ -3186,8 +3184,8 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
-"Enter the name that students see for this component.  Analytics reports may "
-"also use the display name to identify this component."
+"The display name for this component. Analytics reports may also use the "
+"display name to identify this component."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/lti_module.py
@@ -3537,6 +3535,26 @@ msgid ""
 " considered in the Entrance Exam scoring/gating algorithm."
 msgstr ""
 
+#: common/lib/xmodule/xmodule/poll_module.py
+msgid "Whether this student has voted on the poll"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/poll_module.py
+msgid "Student answer"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/poll_module.py
+msgid "Poll answers from all students"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/poll_module.py
+msgid "Poll answers from xml"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/poll_module.py
+msgid "Poll question"
+msgstr ""
+
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid "Enter the date by which problems are due."
 msgstr ""
@@ -3614,13 +3632,13 @@ msgid "This exam is hidden from the learner."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/seq_module.py
-msgid "subsection"
+msgid ""
+"Because the course has ended, this assignment is hidden from the learner."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid ""
-"Because the due date has passed, this {subsection_format} is hidden from the"
-" learner."
+"Because the due date has passed, this assignment is hidden from the learner."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/seq_module.py
@@ -3638,9 +3656,7 @@ msgid "Not Selected"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/split_test_module.py
-msgid ""
-"This name is used for organizing your course content, but is not shown to "
-"students."
+msgid "The display name for this component. (Not shown to learners)"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/split_test_module.py
@@ -3790,12 +3806,6 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid "Default Video URL"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid ""
-"The name students see. This name appears in the course ribbon and as a "
-"header for the video."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
@@ -4040,10 +4050,6 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "Poster URL"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/word_cloud_module.py
-msgid "The label for this word cloud on the course page."
 msgstr ""
 
 #: lms/templates/annotatable.html lms/templates/imageannotation.html
@@ -5393,6 +5399,12 @@ msgstr ""
 msgid ""
 "Optional lms url scheme + host used to construct urls for content library, "
 "e.g. https://courses.edx.org."
+msgstr ""
+
+#: lms/djangoapps/email_marketing/models.py
+msgid ""
+"Number of seconds to delay the sending of User Welcome email after user has "
+"been activated"
 msgstr ""
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
@@ -8919,10 +8931,6 @@ msgid "Gating milestone for {usage_key}"
 msgstr ""
 
 #: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
-msgid "Display name for this component"
-msgstr ""
-
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
 msgid "Category"
 msgstr ""
 
@@ -10110,6 +10118,10 @@ msgid ""
 msgstr ""
 
 #: lms/templates/help_modal.html
+msgid "- Select -"
+msgstr ""
+
+#: lms/templates/help_modal.html
 msgid "problem"
 msgstr "문제"
 
@@ -10162,14 +10174,25 @@ msgid "Please try again later."
 msgstr "잠시 후에 다시 시도하세요."
 
 #: lms/templates/hidden_content.html
-msgid "The due date for this {subsection_format} has passed."
+msgid "The course has ended."
+msgstr ""
+
+#: lms/templates/hidden_content.html
+msgid "The due date for this assignment has passed."
 msgstr ""
 
 #: lms/templates/hidden_content.html
 msgid ""
-"Because the due date has passed, this {subsection_format} is no longer "
-"available.{line_break}If you have completed this {subsection_format}, your "
-"grade is available on the {link_start}progress page{link_end}."
+"Because the course has ended, this assignment is no longer "
+"available.{line_break}If you have completed this assignment, your grade is "
+"available on the {link_start}progress page{link_end}."
+msgstr ""
+
+#: lms/templates/hidden_content.html
+msgid ""
+"Because the due date has passed, this assignment is no longer "
+"available.{line_break}If you have completed this assignment, your grade is "
+"available on the {link_start}progress page{link_end}."
 msgstr ""
 
 #: lms/templates/imageannotation.html
@@ -10771,6 +10794,10 @@ msgstr ""
 #: lms/templates/seq_module.html
 msgid "Previous"
 msgstr "이전"
+
+#: lms/templates/seq_module.html
+msgid "Sequence"
+msgstr ""
 
 #: lms/templates/seq_module.html
 msgid "Next"
@@ -15425,6 +15452,10 @@ msgid "(Learners not explicitly assigned to a cohort)"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
+msgid "Learners in the {track_name} Track"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Subject: "
 msgstr "제목:"
 
@@ -16771,9 +16802,9 @@ msgstr "edX 소개"
 
 #: themes/edx.org/lms/templates/footer.html
 msgid ""
-"© 2016 edX Inc.  All rights reserved except where noted.  EdX, Open edX and "
-"the edX and Open EdX logos are registered trademarks or trademarks of edX "
-"Inc."
+"© 2012-{year} edX Inc.  All rights reserved except where noted.  EdX, Open "
+"edX and the edX and Open EdX logos are registered trademarks or trademarks "
+"of edX Inc."
 msgstr ""
 
 #: themes/edx.org/lms/templates/header.html
@@ -17226,9 +17257,9 @@ msgstr "위치 ID"
 
 #: cms/templates/container.html
 msgid ""
-"Use this ID when you create links to this unit from other course content. "
-"You enter the ID in the URL field."
-msgstr "다른 강좌 콘텐츠에서 이 학습활동으로 연결된 링크를 만들려면 이 ID를 사용하세요. ID를 URL 영역에 입력하면 됩니다."
+"To create a link to this unit from an HTML component in this course, enter "
+"\"/jump_to_id/<location ID>\" as the URL value."
+msgstr ""
 
 #: cms/templates/container.html
 msgid "Location in Course Outline"

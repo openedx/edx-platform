@@ -816,7 +816,7 @@ def create_user_partition_json(partition_id, name, description, groups, scheme="
     ).to_json()
 
 
-def assert_nav_help_link(test, page, href, signed_in=True):
+def assert_nav_help_link(test, page, href, signed_in=True, close_window=True):
     """
     Asserts that help link in navigation bar is correct.
 
@@ -827,7 +827,8 @@ def assert_nav_help_link(test, page, href, signed_in=True):
     test (AcceptanceTest): Test object
     page (PageObject): Page object to perform tests on.
     href (str): The help link which we expect to see when it is opened.
-    signed_in (bool): Specifies whether user is logged in or not. (It effects the css)
+    signed_in (bool): Specifies whether user is logged in or not. (It affects the css)
+    close_window(bool): Close the newly-opened help window before continuing
     """
     expected_link = {
         'href': href,
@@ -839,9 +840,12 @@ def assert_nav_help_link(test, page, href, signed_in=True):
     assert_link(test, expected_link, actual_link)
     # Assert that opened link is correct
     assert_opened_help_link_is_correct(test, href)
+    # Close the help window if not kept open intentionally
+    if close_window:
+        close_help_window(page)
 
 
-def assert_side_bar_help_link(test, page, href, help_text, as_list_item=False, index=-1):
+def assert_side_bar_help_link(test, page, href, help_text, as_list_item=False, index=-1, close_window=True):
     """
     Asserts that help link in side bar is correct.
 
@@ -856,6 +860,7 @@ def assert_side_bar_help_link(test, page, href, help_text, as_list_item=False, i
                          'li' inside a sidebar list DOM element.
     index (int): The index of element in case there are more than
                  one matching elements.
+    close_window(bool): Close the newly-opened help window before continuing
     """
     expected_link = {
         'href': href,
@@ -867,6 +872,21 @@ def assert_side_bar_help_link(test, page, href, help_text, as_list_item=False, i
     assert_link(test, expected_link, actual_link)
     # Assert that opened link is correct
     assert_opened_help_link_is_correct(test, href)
+    # Close the help window if not kept open intentionally
+    if close_window:
+        close_help_window(page)
+
+
+def close_help_window(page):
+    """
+    Closes the help window
+    Args:
+        page (PageObject): Page object to perform tests on.
+    """
+    browser_url = page.browser.current_url
+    if browser_url.startswith('https://edx.readthedocs.io') or browser_url.startswith('http://edx.readthedocs.io'):
+        page.browser.close()  # close only the current window
+        page.browser.switch_to_window(page.browser.window_handles[0])
 
 
 class TestWithSearchIndexMixin(object):

@@ -1,5 +1,5 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-# edX translation file.
+# edX community translations have been downloaded from Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/).
 # Copyright (C) 2017 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
@@ -72,7 +72,7 @@
 # Soha Assali <soha+transifex@qordoba.com>, 2015-2016
 # soliman osman <solimanosman@windowslive.com>, 2015
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-# edX translation file
+# edX community translations have been downloaded from Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)
 # Copyright (C) 2017 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
@@ -161,8 +161,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-01-05 17:03+0000\n"
-"PO-Revision-Date: 2016-11-08 08:16+0000\n"
+"POT-Creation-Date: 2017-01-23 17:57+0000\n"
+"PO-Revision-Date: 2017-02-01 18:13+0000\n"
 "Last-Translator: Soha Assali <soha+transifex@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
 "MIME-Version: 1.0\n"
@@ -212,8 +212,7 @@ msgid "Subsection"
 msgstr "قسمٌ فرعيّ"
 
 #: cms/djangoapps/contentstore/views/helpers.py
-#: lms/djangoapps/instructor/views/tools.py lms/templates/seq_module.html
-#: lms/templates/ccx/schedule.html
+#: lms/djangoapps/instructor/views/tools.py lms/templates/ccx/schedule.html
 msgid "Unit"
 msgstr "وحدة"
 
@@ -315,7 +314,7 @@ msgstr "التعليم المهني"
 #: common/djangoapps/course_modes/models.py common/lib/xmodule/xmodule/tabs.py
 #: lms/djangoapps/courseware/tabs.py lms/djangoapps/courseware/views/views.py
 #: lms/djangoapps/shoppingcart/reports.py cms/templates/widgets/header.html
-#: lms/templates/courseware/courseware.html
+#: lms/templates/help_modal.html lms/templates/courseware/courseware.html
 msgid "Course"
 msgstr "المساق "
 
@@ -331,6 +330,7 @@ msgstr "المساق "
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 #: common/lib/xmodule/xmodule/word_cloud_module.py
+#: common/lib/xmodule/xmodule/x_module.py
 #: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
 #: cms/templates/container.html cms/templates/library.html
 msgid "Display Name"
@@ -1983,23 +1983,25 @@ msgid "XML data for the annotation"
 msgstr "بيانات ’XML‘ للملاحظات التوضيحية"
 
 #: common/lib/xmodule/xmodule/annotatable_module.py
+#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/conditional_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/library_content_module.py
+#: common/lib/xmodule/xmodule/library_root_xblock.py
+#: common/lib/xmodule/xmodule/poll_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
-msgid "Display name for this module"
-msgstr "اسم العرض لهذه الوحدة"
+#: common/lib/xmodule/xmodule/word_cloud_module.py
+#: common/lib/xmodule/xmodule/x_module.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+msgid "The display name for this component."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/annotatable_module.py
 msgid "Annotation"
 msgstr "ملاحظة توضيحية"
-
-#: common/lib/xmodule/xmodule/capa_base.py
-#: common/lib/xmodule/xmodule/conditional_module.py
-#: common/lib/xmodule/xmodule/html_module.py
-msgid "This name appears in the horizontal navigation at the top of the page."
-msgstr "يظهر هذا الإسم في شريط التصفّح الأفقي في أعلى الصفحة."
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Blank Advanced Problem"
@@ -3681,10 +3683,6 @@ msgid "No Library Selected"
 msgstr "لم يجرِ اختيار أي مكتبة"
 
 #: common/lib/xmodule/xmodule/library_root_xblock.py
-msgid "Enter the name of the library as it should appear in Studio."
-msgstr "يُرجى إدخال اسم المكتبة كما يجب أن يظهر في استوديو."
-
-#: common/lib/xmodule/xmodule/library_root_xblock.py
 msgid "Library Display Name"
 msgstr "اسم المكتبة المعروض"
 
@@ -3694,11 +3692,9 @@ msgstr "يُرجى إدخال أسماء المكوِّنات المتقدّمة
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
-"Enter the name that students see for this component.  Analytics reports may "
-"also use the display name to identify this component."
+"The display name for this component. Analytics reports may also use the "
+"display name to identify this component."
 msgstr ""
-"يُرجى إدخال الاسم الذي سيراه الطلّاب لهذا المكوِّن. كما ويمكن أن تستخدم "
-"تقارير التحليلات اسم العرض لتمييز هذا المكوّن."
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "LTI ID"
@@ -4133,6 +4129,26 @@ msgstr ""
 "يُرجى إدخال ’true‘ أو ’false‘. باختيارك للقيمة ’true‘، ستُحتسب إجابات وحدات "
 "المسائل كجزء من خوارزمية تقييم/تحكيم امتحان الدخول أو القبول في المساق."
 
+#: common/lib/xmodule/xmodule/poll_module.py
+msgid "Whether this student has voted on the poll"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/poll_module.py
+msgid "Student answer"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/poll_module.py
+msgid "Poll answers from all students"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/poll_module.py
+msgid "Poll answers from xml"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/poll_module.py
+msgid "Poll question"
+msgstr ""
+
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid "Enter the date by which problems are due."
 msgstr "يُرجى إدخال تاريخ استحقاق حلّ المسائل."
@@ -4221,16 +4237,14 @@ msgid "This exam is hidden from the learner."
 msgstr "هذا الامتحان لا يظهر للمتعلم"
 
 #: common/lib/xmodule/xmodule/seq_module.py
-msgid "subsection"
-msgstr "قسم فرعي"
+msgid ""
+"Because the course has ended, this assignment is hidden from the learner."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid ""
-"Because the due date has passed, this {subsection_format} is hidden from the"
-" learner."
+"Because the due date has passed, this assignment is hidden from the learner."
 msgstr ""
-"نظرًا لأن التاريخ المحدد قد مر، يتم إخفاء هذا {subsection_format} عن "
-"المتعلم."
 
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid ""
@@ -4247,10 +4261,8 @@ msgid "Not Selected"
 msgstr "لم يجرِ تحديده"
 
 #: common/lib/xmodule/xmodule/split_test_module.py
-msgid ""
-"This name is used for organizing your course content, but is not shown to "
-"students."
-msgstr "يُستخدم هذا الاسم لتنظيم محتوى مساقك، إلا أنه لن يظهر للطلّاب."
+msgid "The display name for this component. (Not shown to learners)"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid "Content Experiment"
@@ -4426,12 +4438,6 @@ msgstr ""
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid "Default Video URL"
 msgstr "الرابط الافتراضي للفيديو "
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid ""
-"The name students see. This name appears in the course ribbon and as a "
-"header for the video."
-msgstr "الاسم الذي يراه الطلّاب، ويظهر كعنوان لمقطع الفيديو ضمن شريط المساق."
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid "Component Display Name"
@@ -4726,10 +4732,6 @@ msgstr "رابط صورة مُلصق الإعلان"
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "Poster URL"
 msgstr "رابط مُلصق الإعلان"
-
-#: common/lib/xmodule/xmodule/word_cloud_module.py
-msgid "The label for this word cloud on the course page."
-msgstr "اسم سحابة الكلمات هذه موجود على صفحة الدورة."
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 #: lms/templates/annotatable.html lms/templates/imageannotation.html
@@ -6225,6 +6227,12 @@ msgid ""
 msgstr ""
 "نظام lms url الاختياري + المضيف المستخدم في بناء عناوين المواقع  urls لمكتبة"
 " المحتوى، على سبيل المثال، https://courses.edx.org."
+
+#: lms/djangoapps/email_marketing/models.py
+msgid ""
+"Number of seconds to delay the sending of User Welcome email after user has "
+"been activated"
+msgstr ""
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 msgid "{platform_name} Staff"
@@ -10228,10 +10236,6 @@ msgid "Gating milestone for {usage_key}"
 msgstr "تقييد الإنجاز الهام من أجل {usage_key}"
 
 #: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
-msgid "Display name for this component"
-msgstr "اسم العرض الخاص بهذا العنصر"
-
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
 msgid "Category"
 msgstr "الفئة"
 
@@ -11486,6 +11490,10 @@ msgid ""
 msgstr ""
 
 #: lms/templates/help_modal.html
+msgid "- Select -"
+msgstr ""
+
+#: lms/templates/help_modal.html
 msgid "problem"
 msgstr "المشكلة"
 
@@ -11538,18 +11546,26 @@ msgid "Please try again later."
 msgstr "يُرجى إعادة المحاولة لاحقًا."
 
 #: lms/templates/hidden_content.html
-msgid "The due date for this {subsection_format} has passed."
-msgstr "لقد انقضى تاريخ استحقاق {subsection_format}"
+msgid "The course has ended."
+msgstr ""
+
+#: lms/templates/hidden_content.html
+msgid "The due date for this assignment has passed."
+msgstr ""
 
 #: lms/templates/hidden_content.html
 msgid ""
-"Because the due date has passed, this {subsection_format} is no longer "
-"available.{line_break}If you have completed this {subsection_format}, your "
-"grade is available on the {link_start}progress page{link_end}."
+"Because the course has ended, this assignment is no longer "
+"available.{line_break}If you have completed this assignment, your grade is "
+"available on the {link_start}progress page{link_end}."
 msgstr ""
-"هذا القسم: {subsection_format} لم يعد مفتوحاً لأن تاريخ الاستحقاق "
-"انتهى.{line_break} إن كنت قد أكملت {subsection_format}، ستجد علامتك موجودة "
-"في {link_start}صفحة العلامات{link_end}."
+
+#: lms/templates/hidden_content.html
+msgid ""
+"Because the due date has passed, this assignment is no longer "
+"available.{line_break}If you have completed this assignment, your grade is "
+"available on the {link_start}progress page{link_end}."
+msgstr ""
 
 #: lms/templates/imageannotation.html
 msgid "Note: only instructors may annotate."
@@ -12200,6 +12216,10 @@ msgstr ""
 #: lms/templates/seq_module.html
 msgid "Previous"
 msgstr "السابق"
+
+#: lms/templates/seq_module.html
+msgid "Sequence"
+msgstr ""
 
 #: lms/templates/seq_module.html
 msgid "Next"
@@ -17407,6 +17427,10 @@ msgid "(Learners not explicitly assigned to a cohort)"
 msgstr "(طلاب من غير شُعبة)"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
+msgid "Learners in the {track_name} Track"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Subject: "
 msgstr "الموضوع: "
 
@@ -18856,13 +18880,10 @@ msgstr "لمحة عن edX"
 
 #: themes/edx.org/lms/templates/footer.html
 msgid ""
-"© 2016 edX Inc.  All rights reserved except where noted.  EdX, Open edX and "
-"the edX and Open EdX logos are registered trademarks or trademarks of edX "
-"Inc."
+"© 2012-{year} edX Inc.  All rights reserved except where noted.  EdX, Open "
+"edX and the edX and Open EdX logos are registered trademarks or trademarks "
+"of edX Inc."
 msgstr ""
-"حقوق النشر © 2016 محفوظة لمؤسسة edX Inc.  جميع الحقوق محفوظة إلا إذاتمت "
-"الإشارة لغير ذلك. تعتبر الشعارات EdX وOpen edX  وedX وOpen EdX علامات تجارية"
-" مسجلة لمؤسسة edX Inc."
 
 #: themes/edx.org/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
@@ -19362,11 +19383,9 @@ msgstr "رمز الموقع"
 
 #: cms/templates/container.html
 msgid ""
-"Use this ID when you create links to this unit from other course content. "
-"You enter the ID in the URL field."
+"To create a link to this unit from an HTML component in this course, enter "
+"\"/jump_to_id/<location ID>\" as the URL value."
 msgstr ""
-"استخدم هذا الرمز التعريفي عندما تنشئ روابط لهذه الوحدة من محتوى آخر في "
-"المساق. وما عليك إلّا أن تدخل الرمز في حقل الرابط."
 
 #: cms/templates/container.html
 msgid "Location in Course Outline"
@@ -21694,7 +21713,7 @@ msgstr "نظرة عامة عن المساق"
 
 #: cms/templates/settings.html
 msgid "HTML Code Editor"
-msgstr ""
+msgstr "محرر رمز HTML"
 
 #: cms/templates/settings.html
 msgid ""

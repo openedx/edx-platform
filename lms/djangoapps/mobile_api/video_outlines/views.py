@@ -18,7 +18,7 @@ from opaque_keys.edx.locator import BlockUsageLocator
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
 
-from ..utils import mobile_view, mobile_course_access
+from ..decorators import mobile_course_access, mobile_view
 from .serializers import BlockOutline, video_summary
 
 

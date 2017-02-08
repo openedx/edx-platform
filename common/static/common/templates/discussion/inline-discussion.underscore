@@ -6,7 +6,7 @@
     <article class="new-post-article is-hidden"></article>
 
     <div class="inline-discussion-thread-container">
-        <section class="inline-threads">
+        <section class="inline-threads" data-discussion-id="<%- discussionId %>">
         </section>
 
         <div class="inline-thread">

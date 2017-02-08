@@ -5,7 +5,6 @@ Tests for EmbargoMiddleware
 from contextlib import contextmanager
 import mock
 from nose.plugins.attrib import attr
-import unittest
 import pygeoip
 import ddt
 
@@ -14,6 +13,7 @@ from django.test.utils import override_settings
 from django.core.cache import cache
 from django.db import connection
 
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import (
@@ -41,7 +41,7 @@ MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {})
 @attr(shard=3)
 @ddt.ddt
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
 class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
     """Test the embargo API calls to determine whether a user has access. """
@@ -239,7 +239,7 @@ class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
 
 @ddt.ddt
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class EmbargoMessageUrlApiTests(UrlResetMixin, ModuleStoreTestCase):
     """Test the embargo API calls for retrieving the blocking message URLs. """
 

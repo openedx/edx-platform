@@ -1,5 +1,5 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-# edX translation file.
+# edX community translations have been downloaded from Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/).
 # Copyright (C) 2017 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
@@ -76,7 +76,7 @@
 # Yermek Alimzhanov <aermek81@gmail.com>, 2015
 # Pavel Zamyshliaev, 2014
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-# edX translation file
+# edX community translations have been downloaded from Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)
 # Copyright (C) 2017 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
@@ -96,7 +96,7 @@
 # Евгений Козлов <eudjin@gmail.com>, 2014
 # Gubin Pavel <pashkun73@gmail.com>, 2013
 # Gubin Pavel <pashkun73@gmail.com>, 2013
-# Ihor Polyakov <ihor.polyakov@gmail.com>, 2014
+# Игорь Поляков (ihoru) <ihor.polyakov@gmail.com>, 2014
 # Katerina <rosemaily@gmail.com>, 2014
 # Liubov Fomicheva <liubov.nelapa@gmail.com>, 2015-2016
 # KhJulia <lnujulia@ukr.net>, 2014
@@ -195,7 +195,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-01-05 17:03+0000\n"
+"POT-Creation-Date: 2017-01-23 17:57+0000\n"
 "PO-Revision-Date: 2016-05-09 11:27+0000\n"
 "Last-Translator: Liubov Fomicheva <liubov.nelapa@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
@@ -246,8 +246,7 @@ msgid "Subsection"
 msgstr "Подраздел"
 
 #: cms/djangoapps/contentstore/views/helpers.py
-#: lms/djangoapps/instructor/views/tools.py lms/templates/seq_module.html
-#: lms/templates/ccx/schedule.html
+#: lms/djangoapps/instructor/views/tools.py lms/templates/ccx/schedule.html
 msgid "Unit"
 msgstr "Блок"
 
@@ -350,7 +349,7 @@ msgstr "Профессиональная подготовка"
 #: common/djangoapps/course_modes/models.py common/lib/xmodule/xmodule/tabs.py
 #: lms/djangoapps/courseware/tabs.py lms/djangoapps/courseware/views/views.py
 #: lms/djangoapps/shoppingcart/reports.py cms/templates/widgets/header.html
-#: lms/templates/courseware/courseware.html
+#: lms/templates/help_modal.html lms/templates/courseware/courseware.html
 msgid "Course"
 msgstr "Курс"
 
@@ -366,6 +365,7 @@ msgstr "Курс"
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 #: common/lib/xmodule/xmodule/word_cloud_module.py
+#: common/lib/xmodule/xmodule/x_module.py
 #: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
 #: cms/templates/container.html cms/templates/library.html
 msgid "Display Name"
@@ -2002,25 +2002,25 @@ msgid "XML data for the annotation"
 msgstr "Содержание пояснения в формате XML"
 
 #: common/lib/xmodule/xmodule/annotatable_module.py
+#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/conditional_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/library_content_module.py
+#: common/lib/xmodule/xmodule/library_root_xblock.py
+#: common/lib/xmodule/xmodule/poll_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
-msgid "Display name for this module"
-msgstr "Отображаемое название модуля"
+#: common/lib/xmodule/xmodule/word_cloud_module.py
+#: common/lib/xmodule/xmodule/x_module.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+msgid "The display name for this component."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/annotatable_module.py
 msgid "Annotation"
 msgstr "Пояснение"
-
-#: common/lib/xmodule/xmodule/capa_base.py
-#: common/lib/xmodule/xmodule/conditional_module.py
-#: common/lib/xmodule/xmodule/html_module.py
-msgid "This name appears in the horizontal navigation at the top of the page."
-msgstr ""
-"Это название отображается в горизонтальной навигационной панели в верхней "
-"части страницы."
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Blank Advanced Problem"
@@ -3692,10 +3692,6 @@ msgid "No Library Selected"
 msgstr "Библиотека не выбрана"
 
 #: common/lib/xmodule/xmodule/library_root_xblock.py
-msgid "Enter the name of the library as it should appear in Studio."
-msgstr "Введите название библиотеки для edX Studio."
-
-#: common/lib/xmodule/xmodule/library_root_xblock.py
 msgid "Library Display Name"
 msgstr "Библиотека имен"
 
@@ -3707,11 +3703,9 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
-"Enter the name that students see for this component.  Analytics reports may "
-"also use the display name to identify this component."
+"The display name for this component. Analytics reports may also use the "
+"display name to identify this component."
 msgstr ""
-"Введите название элемента, отображаемое для слушателей.  Это название "
-"элемента также будет использоваться в отчётах."
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "LTI ID"
@@ -4160,6 +4154,26 @@ msgstr ""
 "модулям заданий будут учитываться в оценочном/отборочном алгоритме "
 "вступительного испытания."
 
+#: common/lib/xmodule/xmodule/poll_module.py
+msgid "Whether this student has voted on the poll"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/poll_module.py
+msgid "Student answer"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/poll_module.py
+msgid "Poll answers from all students"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/poll_module.py
+msgid "Poll answers from xml"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/poll_module.py
+msgid "Poll question"
+msgstr ""
+
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid "Enter the date by which problems are due."
 msgstr "Введите дату, к которой необходимо сдать задания."
@@ -4253,16 +4267,14 @@ msgid "This exam is hidden from the learner."
 msgstr "Этот экзамен скрыт от слушателя."
 
 #: common/lib/xmodule/xmodule/seq_module.py
-msgid "subsection"
-msgstr "подраздел"
+msgid ""
+"Because the course has ended, this assignment is hidden from the learner."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid ""
-"Because the due date has passed, this {subsection_format} is hidden from the"
-" learner."
+"Because the due date has passed, this assignment is hidden from the learner."
 msgstr ""
-"Этот {subsection_format} скрыт от слушателя в связи с истечением срока "
-"сдачи."
 
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid ""
@@ -4281,12 +4293,8 @@ msgid "Not Selected"
 msgstr "Не выбрано"
 
 #: common/lib/xmodule/xmodule/split_test_module.py
-msgid ""
-"This name is used for organizing your course content, but is not shown to "
-"students."
+msgid "The display name for this component. (Not shown to learners)"
 msgstr ""
-"Это название используется для организации содержимого курса, но не "
-"отображается для слушателей."
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid "Content Experiment"
@@ -4468,14 +4476,6 @@ msgstr ""
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid "Default Video URL"
 msgstr "URL видео по умолчанию"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid ""
-"The name students see. This name appears in the course ribbon and as a "
-"header for the video."
-msgstr ""
-"Название, которое увидят обучающиеся.  Это название отображается в ленте "
-"курса и используется в качестве заголовка для видео."
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid "Component Display Name"
@@ -4773,10 +4773,6 @@ msgstr "URL изображения, загруженного автором"
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "Poster URL"
 msgstr "URL автора"
-
-#: common/lib/xmodule/xmodule/word_cloud_module.py
-msgid "The label for this word cloud on the course page."
-msgstr ""
 
 #: lms/templates/annotatable.html lms/templates/imageannotation.html
 #: lms/templates/textannotation.html lms/templates/videoannotation.html
@@ -6274,6 +6270,12 @@ msgstr ""
 msgid ""
 "Optional lms url scheme + host used to construct urls for content library, "
 "e.g. https://courses.edx.org."
+msgstr ""
+
+#: lms/djangoapps/email_marketing/models.py
+msgid ""
+"Number of seconds to delay the sending of User Welcome email after user has "
+"been activated"
 msgstr ""
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
@@ -10320,10 +10322,6 @@ msgid "Gating milestone for {usage_key}"
 msgstr "Этап открытия шлюза для {usage_key}"
 
 #: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
-msgid "Display name for this component"
-msgstr "Отображаемое наименование компонента"
-
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
 msgid "Category"
 msgstr "Тема"
 
@@ -11584,6 +11582,10 @@ msgid ""
 msgstr ""
 
 #: lms/templates/help_modal.html
+msgid "- Select -"
+msgstr ""
+
+#: lms/templates/help_modal.html
 msgid "problem"
 msgstr "проблема"
 
@@ -11636,18 +11638,26 @@ msgid "Please try again later."
 msgstr "Повторите попытку позже."
 
 #: lms/templates/hidden_content.html
-msgid "The due date for this {subsection_format} has passed."
-msgstr "Срок сдачи этого {subsection_format} истек."
+msgid "The course has ended."
+msgstr ""
+
+#: lms/templates/hidden_content.html
+msgid "The due date for this assignment has passed."
+msgstr ""
 
 #: lms/templates/hidden_content.html
 msgid ""
-"Because the due date has passed, this {subsection_format} is no longer "
-"available.{line_break}If you have completed this {subsection_format}, your "
-"grade is available on the {link_start}progress page{link_end}."
+"Because the course has ended, this assignment is no longer "
+"available.{line_break}If you have completed this assignment, your grade is "
+"available on the {link_start}progress page{link_end}."
 msgstr ""
-"Этот {subsection_format} недоступен: срок его сдачи истек.{line_break}Если "
-"Вы прошли этот {subsection_format}, Вы сможете увидеть свою оценку в разделе"
-" {link_start}прогресс{link_end}."
+
+#: lms/templates/hidden_content.html
+msgid ""
+"Because the due date has passed, this assignment is no longer "
+"available.{line_break}If you have completed this assignment, your grade is "
+"available on the {link_start}progress page{link_end}."
+msgstr ""
 
 #: lms/templates/imageannotation.html
 msgid "Note: only instructors may annotate."
@@ -12302,6 +12312,10 @@ msgstr ""
 #: lms/templates/seq_module.html
 msgid "Previous"
 msgstr "Предыдущее"
+
+#: lms/templates/seq_module.html
+msgid "Sequence"
+msgstr ""
 
 #: lms/templates/seq_module.html
 msgid "Next"
@@ -17502,6 +17516,10 @@ msgid "(Learners not explicitly assigned to a cohort)"
 msgstr "(Слушатели, не присоединенные ни к какой определенной группе)"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
+msgid "Learners in the {track_name} Track"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Subject: "
 msgstr "Тема:"
 
@@ -18948,9 +18966,9 @@ msgstr "Об edX"
 
 #: themes/edx.org/lms/templates/footer.html
 msgid ""
-"© 2016 edX Inc.  All rights reserved except where noted.  EdX, Open edX and "
-"the edX and Open EdX logos are registered trademarks or trademarks of edX "
-"Inc."
+"© 2012-{year} edX Inc.  All rights reserved except where noted.  EdX, Open "
+"edX and the edX and Open EdX logos are registered trademarks or trademarks "
+"of edX Inc."
 msgstr ""
 
 #: themes/edx.org/lms/templates/header.html
@@ -19462,11 +19480,9 @@ msgstr "Идентификатор местонахождения"
 
 #: cms/templates/container.html
 msgid ""
-"Use this ID when you create links to this unit from other course content. "
-"You enter the ID in the URL field."
+"To create a link to this unit from an HTML component in this course, enter "
+"\"/jump_to_id/<location ID>\" as the URL value."
 msgstr ""
-"Используйте этот идентификатор для создания ссылок на этот блок из других "
-"материалов курса. Идентификатор необходимо ввести в поле URL."
 
 #: cms/templates/container.html
 msgid "Location in Course Outline"

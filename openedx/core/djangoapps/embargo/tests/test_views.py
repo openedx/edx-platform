@@ -1,6 +1,5 @@
 """Tests for embargo app views. """
 
-import unittest
 from mock import patch
 from django.core.urlresolvers import reverse
 from django.conf import settings
@@ -8,11 +7,11 @@ import ddt
 
 from util.testing import UrlResetMixin
 from .. import messages
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 @ddt.ddt
 class CourseAccessMessageViewTest(CacheIsolationTestCase, UrlResetMixin):
     """Tests for the courseware access message view.

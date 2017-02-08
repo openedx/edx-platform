@@ -20,6 +20,7 @@ except ImportError:
 from pytz import utc
 
 from capa.capa_problem import LoncapaProblem, LoncapaSystem
+from capa.inputtypes import Status
 from capa.responsetypes import StudentInputError, ResponseError, LoncapaProblemError
 from capa.util import convert_files_to_filenames, get_inner_html_from_xpath
 from xblock.fields import Boolean, Dict, Float, Integer, Scope, String, XMLString
@@ -942,7 +943,12 @@ class CapaMixin(CapaFields):
         """
         For the "show answer" button.
 
-        Returns the answers: {'answers' : answers}
+        Returns the answers and rendered "correct status span" HTML:
+            {'answers' : answers, 'correct_status_html': correct_status_span_html}.
+            The "correct status span" HTML is injected beside the correct answers
+            for radio button and checkmark problems, so that there is a visual
+            indication of the correct answers that is not solely based on color
+            (and also screen reader text).
         """
         event_info = dict()
         event_info['problem_id'] = self.location.to_deprecated_string()
@@ -968,7 +974,13 @@ class CapaMixin(CapaFields):
                 new_answer = {answer_id: answers[answer_id]}
             new_answers.update(new_answer)
 
-        return {'answers': new_answers}
+        return {
+            'answers': new_answers,
+            'correct_status_html': self.runtime.render_template(
+                'status_span.html',
+                {'status': Status('correct', self.runtime.service(self, "i18n").ugettext)}
+            )
+        }
 
     # Figure out if we should move these to capa_problem?
     def get_problem(self, _data):

@@ -4,13 +4,13 @@ Tests for bookmarks api.
 import ddt
 from mock import patch
 from nose.plugins.attrib import attr
-from unittest import skipUnless
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 
 from opaque_keys.edx.keys import UsageKey
 
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from .. import api
@@ -38,7 +38,7 @@ class BookmarkApiEventTestMixin(object):
 
 @attr(shard=2)
 @ddt.ddt
-@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Tests only valid in LMS')
+@skip_unless_lms
 class BookmarksAPITests(BookmarkApiEventTestMixin, BookmarksTestsBase):
     """
     These tests cover the parts of the API methods.

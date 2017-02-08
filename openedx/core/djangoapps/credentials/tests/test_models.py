@@ -1,14 +1,13 @@
 """Tests for models supporting Credentials-related functionality."""
 
-import unittest
-
-from django.conf import settings
 from django.test import TestCase
 from nose.plugins.attrib import attr
+
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 @attr(shard=2)
 class TestCredentialsApiConfig(CredentialsApiConfigMixin, TestCase):
     """Tests covering the CredentialsApiConfig model."""
@@ -18,11 +17,11 @@ class TestCredentialsApiConfig(CredentialsApiConfigMixin, TestCase):
 
         self.assertEqual(
             credentials_config.internal_api_url,
-            credentials_config.internal_service_url.strip('/') + '/api/v1/')
+            credentials_config.internal_service_url.strip('/') + '/api/v2/')
 
         self.assertEqual(
             credentials_config.public_api_url,
-            credentials_config.public_service_url.strip('/') + '/api/v1/')
+            credentials_config.public_service_url.strip('/') + '/api/v2/')
 
     def test_is_learner_issuance_enabled(self):
         """

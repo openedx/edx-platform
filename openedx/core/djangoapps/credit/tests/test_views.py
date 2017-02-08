@@ -8,7 +8,6 @@ from __future__ import unicode_literals
 
 import datetime
 import json
-import unittest
 
 import ddt
 import pytz
@@ -28,6 +27,7 @@ from openedx.core.djangoapps.credit.signature import signature
 from openedx.core.djangoapps.credit.tests.factories import (
     CreditProviderFactory, CreditEligibilityFactory, CreditCourseFactory, CreditRequestFactory,
 )
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.core.lib.token_utils import JwtBuilder
 from student.tests.factories import UserFactory, AdminFactory
 from util.date_utils import to_timestamp
@@ -113,7 +113,7 @@ class ReadOnlyMixin(object):
 
 
 @attr(shard=2)
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class CreditCourseViewSetTests(AuthMixin, UserMixin, TestCase):
     """ Tests for the CreditCourse endpoints.
 
@@ -276,7 +276,7 @@ class CreditCourseViewSetTests(AuthMixin, UserMixin, TestCase):
 
 @attr(shard=2)
 @ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class CreditProviderViewSetTests(ApiTestCaseMixin, ReadOnlyMixin, AuthMixin, UserMixin, TestCase):
     """ Tests for CreditProviderViewSet. """
     list_path = 'credit:creditprovider-list'
@@ -320,7 +320,7 @@ class CreditProviderViewSetTests(ApiTestCaseMixin, ReadOnlyMixin, AuthMixin, Use
 
 
 @attr(shard=2)
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class CreditProviderRequestCreateViewTests(ApiTestCaseMixin, UserMixin, TestCase):
     """ Tests for CreditProviderRequestCreateView. """
 
@@ -470,7 +470,7 @@ class CreditProviderRequestCreateViewTests(ApiTestCaseMixin, UserMixin, TestCase
 
 @attr(shard=2)
 @ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class CreditProviderCallbackViewTests(UserMixin, TestCase):
     """ Tests for CreditProviderCallbackView. """
 
@@ -624,7 +624,7 @@ class CreditProviderCallbackViewTests(UserMixin, TestCase):
 
 @attr(shard=2)
 @ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class CreditEligibilityViewTests(AuthMixin, UserMixin, ReadOnlyMixin, TestCase):
     """ Tests for CreditEligibilityView. """
     view_name = 'credit:eligibility_details'
