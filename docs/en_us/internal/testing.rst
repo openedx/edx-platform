@@ -486,7 +486,7 @@ and the Automated Accessibility Tests `openedx Confluence page
 **Prerequisites**:
 
 These prerequisites are all automatically installed and available in `Devstack
-<https://github.com/edx/configuration/wiki/edX-Developer-Stack>`__ (since the Cypress release), the supported development enviornment for the edX Platform.
+<https://github.com/edx/configuration/wiki/edX-Developer-Stack>`__ (since the Cypress release), the supported development environment for the edX Platform.
 
 * Mongo
 

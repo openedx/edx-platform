@@ -6,24 +6,20 @@ import json
 from celery.exceptions import MaxRetriesExceededError
 import ddt
 from django.conf import settings
-from django.core.cache import cache
 from django.test import override_settings, TestCase
 from edx_rest_api_client.client import EdxRestApiClient
 from edx_oauth2_provider.tests.factories import ClientFactory
 import httpretty
 import mock
-from provider.constants import CONFIDENTIAL
 
-from lms.djangoapps.certificates.api import MODES
-from openedx.core.djangoapps.catalog.tests import factories, mixins
-from openedx.core.djangoapps.catalog.utils import munge_catalog_program
+from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin
 from openedx.core.djangoapps.programs.tasks.v1 import tasks
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory
 
+
 TASKS_MODULE = 'openedx.core.djangoapps.programs.tasks.v1.tasks'
-UTILS_MODULE = 'openedx.core.djangoapps.programs.utils'
 
 
 @skip_unless_lms
@@ -47,57 +43,6 @@ class GetApiClientTestCase(CredentialsApiConfigMixin, TestCase):
         api_client = tasks.get_api_client(api_config, student)
         self.assertEqual(api_client._store['base_url'], 'http://foo/api/v2/')  # pylint: disable=protected-access
         self.assertEqual(api_client._store['session'].auth.token, 'test-token')  # pylint: disable=protected-access
-
-
-@httpretty.activate
-@skip_unless_lms
-class GetCompletedProgramsTestCase(mixins.CatalogIntegrationMixin, CacheIsolationTestCase):
-    """
-    Test the get_completed_programs function
-    """
-    ENABLED_CACHES = ['default']
-
-    def setUp(self):
-        super(GetCompletedProgramsTestCase, self).setUp()
-
-        self.user = UserFactory()
-        self.catalog_integration = self.create_catalog_integration(cache_ttl=1)
-
-    def _mock_programs_api(self, data):
-        """Helper for mocking out Programs API URLs."""
-        self.assertTrue(httpretty.is_enabled(), msg='httpretty must be enabled to mock API calls.')
-
-        url = self.catalog_integration.internal_api_url.strip('/') + '/programs/'
-        body = json.dumps({'results': data})
-        httpretty.register_uri(httpretty.GET, url, body=body, content_type='application/json')
-
-    def _assert_num_requests(self, count):
-        """DRY helper for verifying request counts."""
-        self.assertEqual(len(httpretty.httpretty.latest_requests), count)
-
-    @mock.patch(UTILS_MODULE + '.get_completed_courses')
-    def test_get_completed_programs(self, mock_get_completed_courses):
-        """
-        Verify that completed programs are found, using the cache when possible.
-        """
-        data = [
-            factories.Program(),
-        ]
-        self._mock_programs_api(data)
-
-        munged_program = munge_catalog_program(data[0])
-        course_codes = munged_program['course_codes']
-
-        mock_get_completed_courses.return_value = [
-            {'course_id': run_mode['course_key'], 'mode': run_mode['mode_slug']}
-            for run_mode in course_codes[0]['run_modes']
-        ]
-        for _ in range(2):
-            result = tasks.get_completed_programs(self.user)
-            self.assertEqual(result[0], munged_program['id'])
-
-        # Verify that only one request to the catalog was made (i.e., the cache was hit).
-        self._assert_num_requests(1)
 
 
 @skip_unless_lms
@@ -175,7 +120,7 @@ class AwardProgramCertificateTestCase(TestCase):
 @mock.patch(TASKS_MODULE + '.get_certified_programs')
 @mock.patch(TASKS_MODULE + '.get_completed_programs')
 @override_settings(CREDENTIALS_SERVICE_USERNAME='test-service-username')
-class AwardProgramCertificatesTestCase(mixins.CatalogIntegrationMixin, CredentialsApiConfigMixin, TestCase):
+class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiConfigMixin, TestCase):
     """
     Tests for the 'award_program_certificates' celery task.
     """

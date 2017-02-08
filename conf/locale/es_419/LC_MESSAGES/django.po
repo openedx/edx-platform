@@ -113,7 +113,7 @@
 # Juan Fernando Villa <elite.linux@gmail.com>, 2015
 # Juan <juan.marrero@utec.edu.uy>, 2015
 # Lalo Cabrera <laloogcabrera@yahoo.com.mx>, 2014
-# Laura Silva <lingison@edx.org>, 2016
+# Laura Silva <lingison@edx.org>, 2016-2017
 # camilomaiden <inactive+camilomaiden@transifex.com>, 2014
 # Luis Benites <lbenitesanchez@gmail.com>, 2016
 # Luis Ricardo Ruiz <luislicardo1307@gmail.com>, 2013
@@ -126,6 +126,7 @@
 # Natalia, 2013
 # Natalia, 2013-2014,2016
 # Ned Batchelder <ned@edx.org>, 2016
+# Ned Weitzman <nweitzman@edx.org>, 2017
 # Nestor Alejandro Mendoza Espinoza <name1984@gmail.com>, 2015
 # Nicolas CS <nicolascs23@gmail.com>, 2016
 # Cristian Salamea <ovnicraft@gmail.com>, 2013
@@ -191,7 +192,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-01-05 17:03+0000\n"
+"POT-Creation-Date: 2017-01-23 17:57+0000\n"
 "PO-Revision-Date: 2016-10-22 05:21+0000\n"
 "Last-Translator: Laura Silva <lingison@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -242,8 +243,7 @@ msgid "Subsection"
 msgstr "Subsección"
 
 #: cms/djangoapps/contentstore/views/helpers.py
-#: lms/djangoapps/instructor/views/tools.py lms/templates/seq_module.html
-#: lms/templates/ccx/schedule.html
+#: lms/djangoapps/instructor/views/tools.py lms/templates/ccx/schedule.html
 msgid "Unit"
 msgstr "Unidad"
 
@@ -346,7 +346,7 @@ msgstr "Profesional en educación"
 #: common/djangoapps/course_modes/models.py common/lib/xmodule/xmodule/tabs.py
 #: lms/djangoapps/courseware/tabs.py lms/djangoapps/courseware/views/views.py
 #: lms/djangoapps/shoppingcart/reports.py cms/templates/widgets/header.html
-#: lms/templates/courseware/courseware.html
+#: lms/templates/help_modal.html lms/templates/courseware/courseware.html
 msgid "Course"
 msgstr "Curso"
 
@@ -362,6 +362,7 @@ msgstr "Curso"
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 #: common/lib/xmodule/xmodule/word_cloud_module.py
+#: common/lib/xmodule/xmodule/x_module.py
 #: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
 #: cms/templates/container.html cms/templates/library.html
 msgid "Display Name"
@@ -2017,25 +2018,25 @@ msgid "XML data for the annotation"
 msgstr "Datos XML para la anotación"
 
 #: common/lib/xmodule/xmodule/annotatable_module.py
+#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/conditional_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/library_content_module.py
+#: common/lib/xmodule/xmodule/library_root_xblock.py
+#: common/lib/xmodule/xmodule/poll_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
-msgid "Display name for this module"
-msgstr "Mostrar el nombre para este módulo"
+#: common/lib/xmodule/xmodule/word_cloud_module.py
+#: common/lib/xmodule/xmodule/x_module.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+msgid "The display name for this component."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/annotatable_module.py
 msgid "Annotation"
 msgstr "Anotacion"
-
-#: common/lib/xmodule/xmodule/capa_base.py
-#: common/lib/xmodule/xmodule/conditional_module.py
-#: common/lib/xmodule/xmodule/html_module.py
-msgid "This name appears in the horizontal navigation at the top of the page."
-msgstr ""
-"Este nombre aparece en el panel de navegación horizontal al principio de la "
-"pagina."
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Blank Advanced Problem"
@@ -3711,10 +3712,6 @@ msgid "No Library Selected"
 msgstr "No ha seleccionado una librería"
 
 #: common/lib/xmodule/xmodule/library_root_xblock.py
-msgid "Enter the name of the library as it should appear in Studio."
-msgstr "Ingrese el nombre de la libreria como debe aparecer en el curso"
-
-#: common/lib/xmodule/xmodule/library_root_xblock.py
 msgid "Library Display Name"
 msgstr "Nombre de la biblioteca para visualizar"
 
@@ -3726,11 +3723,9 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
-"Enter the name that students see for this component.  Analytics reports may "
-"also use the display name to identify this component."
+"The display name for this component. Analytics reports may also use the "
+"display name to identify this component."
 msgstr ""
-"Ingrese el nombre que los estudiantes verán para el componente. Los reportes"
-" también usarán este nombre para identificar este componente."
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "LTI ID"
@@ -4179,6 +4174,26 @@ msgstr ""
 "Ingrese true o false. Si se ingresa true, los envíos realizados para los "
 "problemas serán tenidos en cuenta en la puntuación del Examen de ingreso."
 
+#: common/lib/xmodule/xmodule/poll_module.py
+msgid "Whether this student has voted on the poll"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/poll_module.py
+msgid "Student answer"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/poll_module.py
+msgid "Poll answers from all students"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/poll_module.py
+msgid "Poll answers from xml"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/poll_module.py
+msgid "Poll question"
+msgstr ""
+
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid "Enter the date by which problems are due."
 msgstr "Ingrese la fecha límite para entrega de los problemas"
@@ -4268,16 +4283,14 @@ msgid "This exam is hidden from the learner."
 msgstr "Este exámen está oculto para el estudiante."
 
 #: common/lib/xmodule/xmodule/seq_module.py
-msgid "subsection"
-msgstr "subsección"
+msgid ""
+"Because the course has ended, this assignment is hidden from the learner."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid ""
-"Because the due date has passed, this {subsection_format} is hidden from the"
-" learner."
+"Because the due date has passed, this assignment is hidden from the learner."
 msgstr ""
-"Dado que la fecha límite ha pasado, esta {subsection_format} está oculta a "
-"los estudiantes."
 
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid ""
@@ -4296,12 +4309,8 @@ msgid "Not Selected"
 msgstr "No seleccionado"
 
 #: common/lib/xmodule/xmodule/split_test_module.py
-msgid ""
-"This name is used for organizing your course content, but is not shown to "
-"students."
+msgid "The display name for this component. (Not shown to learners)"
 msgstr ""
-"Este nombre sirve para organizar su contenido de curso, pero no se le "
-"muestra a los estudiantes."
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid "Content Experiment"
@@ -4486,14 +4495,6 @@ msgstr ""
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid "Default Video URL"
 msgstr "URL de video por defecto"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid ""
-"The name students see. This name appears in the course ribbon and as a "
-"header for the video."
-msgstr ""
-"El nombre que los estudiantes ven. Este nombre aparece en la cinta del curso"
-" y como encabezado en los videos."
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid "Component Display Name"
@@ -4789,10 +4790,6 @@ msgstr "URL de imagen"
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "Poster URL"
 msgstr "URL de imagen"
-
-#: common/lib/xmodule/xmodule/word_cloud_module.py
-msgid "The label for this word cloud on the course page."
-msgstr "Etiqueta para esta nube de palabras en la página del curso"
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 #: lms/templates/annotatable.html lms/templates/imageannotation.html
@@ -6324,6 +6321,12 @@ msgid ""
 msgstr ""
 "Esquema de URL opcional para el LMS + host utilizado para construir URLs "
 "para las bibliotecas de contenido, por ejemplo, https://courses.edx.org."
+
+#: lms/djangoapps/email_marketing/models.py
+msgid ""
+"Number of seconds to delay the sending of User Welcome email after user has "
+"been activated"
+msgstr ""
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 msgid "{platform_name} Staff"
@@ -10436,10 +10439,6 @@ msgid "Gating milestone for {usage_key}"
 msgstr "Hito de apertura para {usage_key}"
 
 #: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
-msgid "Display name for this component"
-msgstr "Nombre para mostrar de este componente"
-
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
 msgid "Category"
 msgstr "Categoría"
 
@@ -11690,6 +11689,9 @@ msgid ""
 "details that will help us to troubleshoot, including error messages that you"
 " saw."
 msgstr ""
+"Describa lo que estabas haciendo cuando surgió el problema. Incluya todos "
+"los detalles que nos puedan ayudar a solucionar el problema, incluidos los "
+"mensajes de error que usted vio."
 
 #: lms/templates/help_modal.html
 msgid "Thank You!"
@@ -11701,6 +11703,10 @@ msgid ""
 "within one business day, Monday to Friday.  In the meantime, please review "
 "our {link_start}detailed FAQs{link_end} where most questions have already "
 "been answered."
+msgstr ""
+
+#: lms/templates/help_modal.html
+msgid "- Select -"
 msgstr ""
 
 #: lms/templates/help_modal.html
@@ -11717,7 +11723,7 @@ msgstr "Breve descripción del problema"
 
 #: lms/templates/help_modal.html
 msgid "Details of the problem you are encountering{asterisk}"
-msgstr ""
+msgstr "Detalles del problema que está experimentando{asterisk}"
 
 #: lms/templates/help_modal.html
 msgid "suggestion"
@@ -11756,19 +11762,26 @@ msgid "Please try again later."
 msgstr "Por favor intente nuevamente."
 
 #: lms/templates/hidden_content.html
-msgid "The due date for this {subsection_format} has passed."
-msgstr "La fecha límite para esta {subsection_format} ha expirado."
+msgid "The course has ended."
+msgstr ""
+
+#: lms/templates/hidden_content.html
+msgid "The due date for this assignment has passed."
+msgstr ""
 
 #: lms/templates/hidden_content.html
 msgid ""
-"Because the due date has passed, this {subsection_format} is no longer "
-"available.{line_break}If you have completed this {subsection_format}, your "
-"grade is available on the {link_start}progress page{link_end}."
+"Because the course has ended, this assignment is no longer "
+"available.{line_break}If you have completed this assignment, your grade is "
+"available on the {link_start}progress page{link_end}."
 msgstr ""
-"Debido a que la fecha límite ha expirado, esta {subsection_format} ya no se "
-"encuentra disponible.{line_break}Si usted ha completado esta "
-"{subsection_format}, su nota está disponible en la {link_start}página de "
-"progreso{link_end}."
+
+#: lms/templates/hidden_content.html
+msgid ""
+"Because the due date has passed, this assignment is no longer "
+"available.{line_break}If you have completed this assignment, your grade is "
+"available on the {link_start}progress page{link_end}."
+msgstr ""
 
 #: lms/templates/imageannotation.html
 msgid "Note: only instructors may annotate."
@@ -12417,6 +12430,10 @@ msgstr ""
 #: lms/templates/seq_module.html
 msgid "Previous"
 msgstr "Previo"
+
+#: lms/templates/seq_module.html
+msgid "Sequence"
+msgstr ""
 
 #: lms/templates/seq_module.html
 msgid "Next"
@@ -15041,7 +15058,7 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Your current verification will expire soon!"
-msgstr ""
+msgstr "¡Su verificación actual vencerá  pronto!"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
@@ -15049,14 +15066,17 @@ msgid ""
 "on your dashboard when the verification process is complete (usually within "
 "1-2 days)."
 msgstr ""
+"Ud. ha enviado su información de verificación de identidad. Recibirá un "
+"mensaje en su Panel principal cuando el proceso de verificación esté "
+"completado (usualmente entre 1-2 días)."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You have successfully verified your ID with edX"
-msgstr ""
+msgstr "Usted ha verificado su ID con edX"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Your current verification is effective until {date}."
-msgstr ""
+msgstr "Su estado de verificación está válido hasta {date}."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Your current verification will expire soon."
@@ -17684,6 +17704,10 @@ msgid "(Learners not explicitly assigned to a cohort)"
 msgstr "(Estudiantes no asignados explícitamente a una cohorte)"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
+msgid "Learners in the {track_name} Track"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Subject: "
 msgstr "Asunto:"
 
@@ -19143,13 +19167,10 @@ msgstr "Acerca de edX"
 
 #: themes/edx.org/lms/templates/footer.html
 msgid ""
-"© 2016 edX Inc.  All rights reserved except where noted.  EdX, Open edX and "
-"the edX and Open EdX logos are registered trademarks or trademarks of edX "
-"Inc."
+"© 2012-{year} edX Inc.  All rights reserved except where noted.  EdX, Open "
+"edX and the edX and Open EdX logos are registered trademarks or trademarks "
+"of edX Inc."
 msgstr ""
-"© 2016 edX Inc. Todos los derechos reservados, excepto cuando se indique. "
-"EdX, Open edX, y los logos de edX y Open edX son marcas registradas o marcas"
-" de edX Inc."
 
 #: themes/edx.org/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
@@ -19655,11 +19676,9 @@ msgstr "ID de la Ubicación"
 
 #: cms/templates/container.html
 msgid ""
-"Use this ID when you create links to this unit from other course content. "
-"You enter the ID in the URL field."
+"To create a link to this unit from an HTML component in this course, enter "
+"\"/jump_to_id/<location ID>\" as the URL value."
 msgstr ""
-"Utilice este ID cuando cree vínculos a esta unidad desde otra parte del "
-"curso. Ingrese el ID en el campo del URL."
 
 #: cms/templates/container.html
 msgid "Location in Course Outline"

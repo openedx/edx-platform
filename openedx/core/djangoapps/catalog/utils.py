@@ -1,17 +1,18 @@
 """Helper functions for working with the catalog service."""
-import json
-
 from django.conf import settings
 from django.core.cache import cache
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from edx_rest_api_client.client import EdxRestApiClient
 from opaque_keys.edx.keys import CourseKey
 
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from openedx.core.lib.token_utils import JwtBuilder
-from openedx.core.djangoapps.cache_toolbox import app_settings
+from xmodule.modulestore.django import modulestore
+
+
+User = get_user_model()  # pylint: disable=invalid-name
 
 
 def create_catalog_api_client(user, catalog_integration):
@@ -23,25 +24,13 @@ def create_catalog_api_client(user, catalog_integration):
     return EdxRestApiClient(catalog_integration.internal_api_url, jwt=jwt)
 
 
-def _get_service_user(user, service_username):
-    """
-    Retrieve and return the Catalog Integration Service User Object
-    if the passed user is None or anonymous
-    """
-    if not user or user.is_anonymous():
-        try:
-            user = User.objects.get(username=service_username)
-        except User.DoesNotExist:
-            user = None
-    return user
-
-
-def get_programs(user=None, uuid=None, type=None):  # pylint: disable=redefined-builtin
+def get_programs(uuid=None, type=None, status=None):  # pylint: disable=redefined-builtin
     """Retrieve marketable programs from the catalog service.
 
     Keyword Arguments:
         uuid (string): UUID identifying a specific program.
         type (string): Filter programs by type (e.g., "MicroMasters" will only return MicroMasters programs).
+        status(string): Filter programs by status (e.g., "active", "unpublished" ...).
 
     Returns:
         list of dict, representing programs.
@@ -49,15 +38,18 @@ def get_programs(user=None, uuid=None, type=None):  # pylint: disable=redefined-
     """
     catalog_integration = CatalogIntegration.current()
     if catalog_integration.enabled:
-        user = _get_service_user(user, catalog_integration.service_username)
-        if not user:
+        try:
+            user = User.objects.get(username=catalog_integration.service_username)
+        except User.DoesNotExist:
             return []
 
         api = create_catalog_api_client(user, catalog_integration)
 
-        cache_key = '{base}.programs{type}'.format(
+        cache_key = '{base}.programs{type}{status}{full_course_serializer}'.format(
             base=catalog_integration.CACHE_KEY,
-            type='.' + type if type else ''
+            type='.' + type if type else '',
+            status='.' + status if status else '',
+            full_course_serializer='.full_course_serializer' if uuid else ''
         )
 
         querystring = {
@@ -66,6 +58,10 @@ def get_programs(user=None, uuid=None, type=None):  # pylint: disable=redefined-
         }
         if type:
             querystring['type'] = type
+        if status:
+            querystring['status'] = status
+        if uuid:
+            querystring['use_full_course_serializer'] = True
 
         return get_edx_api_data(
             catalog_integration,
@@ -80,100 +76,15 @@ def get_programs(user=None, uuid=None, type=None):  # pylint: disable=redefined-
         return []
 
 
-def get_program_types(user=None):  # pylint: disable=redefined-builtin
-    """
-    Retrieve all program types from the catalog service.
-
-    Returns:
-        list of dict, representing program types.
-    """
-    catalog_integration = CatalogIntegration.current()
-    if catalog_integration.enabled:
-        user = _get_service_user(user, catalog_integration.service_username)
-        if not user:
-            return []
-
-        api = create_catalog_api_client(user, catalog_integration)
-        cache_key = '{base}.program_types'.format(base=catalog_integration.CACHE_KEY)
-
-        return get_edx_api_data(
-            catalog_integration,
-            user,
-            'program_types',
-            cache_key=cache_key if catalog_integration.is_cache_enabled else None,
-            api=api
-        )
-    else:
-        return []
-
-
-def _get_program_instructors(program):
-    """
-    Returns the list of instructor from cached if cache key exists otherwise
-    iterate over the courses and return all the instructors of each course run
-    """
-    cache_key = 'program.instructors.{program_id}'.format(
-        program_id=program.get('uuid')
-    )
-
-    lookup_list = []
-    instructors = cache.get(cache_key) or []
-    if instructors:
-        return instructors
-
-    for queryset in CourseOverview.objects.filter(id__in=_get_all_course_run_keys(program)).values_list(
-            'instructor_info', flat=True):
-        queryset = json.loads(queryset)
-        for instructor in queryset.get("instructors", []):
-            if instructor.get('name') not in lookup_list:
-                lookup_list.append(instructor.get('name'))
-                instructors.append(instructor)
-    cache.set(cache_key, instructors, app_settings.CACHE_TOOLBOX_DEFAULT_TIMEOUT)
-    return instructors
-
-
-def _get_all_course_run_keys(program):
-    """
-    Returns the course keys of all the course runs of a program.
-    """
-    keys = []
-    for course in program.get("courses", []):       # pylint: disable=E1101
-        for course_run in course.get("course_runs", []):
-            keys.append(CourseKey.from_string(course_run.get("key")))
-    return keys
-
-
-def get_active_programs_data(user=None, program_id=None):
-    """
-    This will return the program details with its corresponding program_type if program_id
-    is given otherwise returns the list of all the active programs with their program_types.
-    """
-    program_data = []
-    programs = get_programs(user, program_id)
-    if not programs:
-        return None
-
-    # get_programs returns a dict when provided with the program_id parameter.
-    if isinstance(programs, dict):
-        programs = [programs]
-
-    program_types = {program_type["name"]: program_type for program_type in get_program_types(user)}
-    for program in programs:
-        if program["status"] == "active":
-            program["type"] = program_types[program["type"]]
-            program["instructors"] = _get_program_instructors(programs[0]) if program_id else None
-            program_data.append(program)
-    return program_data
-
-
 def munge_catalog_program(catalog_program):
-    """Make a program from the catalog service look like it came from the programs service.
+    """
+    Make a program from the catalog service look like it came from the programs service.
 
-    Catalog-based MicroMasters need to be displayed in the LMS. However, the LMS
-    currently retrieves all program data from the soon-to-be-retired programs service.
-    Consuming program data exclusively from the catalog service would have taken more time
-    than we had prior to the MicroMasters launch. This is a functional middle ground
-    introduced by ECOM-5460. Cleaning up this debt is tracked by ECOM-4418.
+    We want to display programs from the catalog service on the LMS. The LMS
+    originally retrieved all program data from the deprecated programs service.
+    This temporary utility is here to help incrementally swap out the backend.
+
+    Clean up of this debt is tracked by ECOM-4418.
 
     Arguments:
         catalog_program (dict): The catalog service's representation of a program.
@@ -204,10 +115,11 @@ def munge_catalog_program(catalog_program):
                 } if course['owners'] else {},
                 'run_modes': [
                     {
-                        'course_key': run['key'],
-                        'run_key': CourseKey.from_string(run['key']).run,
-                        'mode_slug': 'verified'
-                    } for run in course['course_runs']
+                        'course_key': course_run['key'],
+                        'run_key': CourseKey.from_string(course_run['key']).run,
+                        'mode_slug': course_run['type'],
+                        'marketing_url': course_run['marketing_url'],
+                    } for course_run in course['course_runs']
                 ],
             } for course in catalog_program['courses']
         ],
@@ -217,48 +129,107 @@ def munge_catalog_program(catalog_program):
             'w435h145': catalog_program['banner_image']['small']['url'],
             'w348h116': catalog_program['banner_image']['x-small']['url'],
         },
+        # If a detail URL has been added, we don't want to lose it.
+        'detail_url': catalog_program.get('detail_url'),
     }
 
 
-def get_course_run(course_key, user):
-    """Get a course run's data from the course catalog service.
-
-    Arguments:
-        course_key (CourseKey): Course key object identifying the run whose data we want.
-        user (User): The user to authenticate as when making requests to the catalog service.
+def get_program_types():
+    """Retrieve all program types from the catalog service.
 
     Returns:
-        dict, empty if no data could be retrieved.
+        list of dict, representing program types.
     """
     catalog_integration = CatalogIntegration.current()
-
     if catalog_integration.enabled:
-        api = create_catalog_api_client(user, catalog_integration)
+        try:
+            user = User.objects.get(username=catalog_integration.service_username)
+        except User.DoesNotExist:
+            return []
 
-        data = get_edx_api_data(
+        api = create_catalog_api_client(user, catalog_integration)
+        cache_key = '{base}.program_types'.format(base=catalog_integration.CACHE_KEY)
+
+        return get_edx_api_data(
             catalog_integration,
             user,
-            'course_runs',
-            resource_id=unicode(course_key),
-            cache_key=catalog_integration.CACHE_KEY if catalog_integration.is_cache_enabled else None,
-            api=api,
-            querystring={'exclude_utm': 1},
+            'program_types',
+            cache_key=cache_key if catalog_integration.is_cache_enabled else None,
+            api=api
         )
-
-        return data if data else {}
     else:
-        return {}
+        return []
 
 
-def get_run_marketing_url(course_key, user):
-    """Get a course run's marketing URL from the course catalog service.
-
-    Arguments:
-        course_key (CourseKey): Course key object identifying the run whose marketing URL we want.
-        user (User): The user to authenticate as when making requests to the catalog service.
-
-    Returns:
-        string, the marketing URL, or None if no URL is available.
+def _get_program_instructors(program):
     """
-    course_run = get_course_run(course_key, user)
-    return course_run.get('marketing_url')
+    Returns the list of instructor from cached if cache key exists otherwise
+    iterate over the courses and return all the instructors of each course run
+    """
+    cache_key = 'program.instructors.{program_id}'.format(
+        program_id=program.get('uuid')
+    )
+
+    program_instructors_dict = {}
+    program_instructors_list = cache.get(cache_key, [])
+    if program_instructors_list:
+        return program_instructors_list
+
+    module_store = modulestore()
+    for course_run_key in _get_all_course_run_keys(program):
+        course_descriptor = module_store.get_course(course_run_key)
+        if course_descriptor:
+            course_instructors = getattr(course_descriptor, 'instructor_info', {})
+            # Deduplicate program instructors using instructor name
+            program_instructors_dict.update(
+                {instructor.get('name'): instructor for instructor in course_instructors.get('instructors', [])}
+            )
+    program_instructors_list = program_instructors_dict.values()
+    cache.set(cache_key, program_instructors_list)
+    return program_instructors_list
+
+
+def _get_all_course_run_keys(program):
+    """
+    Returns the course keys of all the course runs of a program.
+    """
+    keys = []
+    for course in program.get('courses', []):  # pylint: disable=E1101
+        for course_run in course.get('course_runs', []):
+            keys.append(CourseKey.from_string(course_run.get('key')))
+    return keys
+
+
+def get_program_details(program_id=None):
+    """
+    This will return the program details with its corresponding program type and instructors.
+    """
+    program = get_programs(program_id, status="active")
+    if not program:
+        return None
+
+    program['type'] = next(
+        program_type
+        for program_type in get_program_types()
+        if program_type['name'] == program['type']
+    )
+    program['instructors'] = _get_program_instructors(program)
+    return program
+
+
+def get_active_programs_list():
+    """
+    Return the list of active Programs with its corresponding program types.
+    """
+    active_programs_list = []
+    programs = get_programs(status="active")
+    if not programs:
+        return []
+
+    program_types = {program_type['name']: program_type for program_type in get_program_types()}
+    enabled_program_types = configuration_helpers.get_value("ENABLED_PROGRAM_TYPES", program_types.keys())
+    for program in programs:
+        if program['type'] in enabled_program_types:
+            program['type'] = program_types[program['type']]
+            active_programs_list.append(program)
+    return active_programs_list

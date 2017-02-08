@@ -120,8 +120,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-01-05 17:02+0000\n"
-"PO-Revision-Date: 2017-01-12 16:45+0000\n"
+"POT-Creation-Date: 2017-01-23 17:56+0000\n"
+"PO-Revision-Date: 2017-01-23 18:00+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
 "MIME-Version: 1.0\n"
@@ -4331,6 +4331,10 @@ msgstr "Restaurar código de inscripción"
 #: lms/static/js/instructor_dashboard/ecommerce.js
 msgid "Mark enrollment code as unused"
 msgstr "Marcar código de inscripción como no utilizado"
+
+#: lms/static/js/instructor_dashboard/send_email.js
+msgid "All learners in the {track_name} track"
+msgstr ""
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -8941,8 +8945,18 @@ msgstr ""
 "Los estudiantes pueden ver la subsección publicada y acceder a su contenido"
 
 #: cms/templates/js/content-visibility-editor.underscore
+msgid "Hide content after course end date"
+msgstr ""
+
+#: cms/templates/js/content-visibility-editor.underscore
 msgid "Hide content after due date"
 msgstr "Ocultar el contenido después de la fecha límite"
+
+#: cms/templates/js/content-visibility-editor.underscore
+msgid ""
+"After the course\\'s end date has passed, learners can no longer access "
+"subsection content. The subsection remains included in grade calculations."
+msgstr ""
 
 #: cms/templates/js/content-visibility-editor.underscore
 msgid ""
@@ -8968,14 +8982,10 @@ msgstr ""
 #: cms/templates/js/content-visibility-editor.underscore
 #, python-format
 msgid ""
-"If you select an option other than \"%(hide_label)s\", after the subsection "
-"release date has passed, published units in this subsection will become "
-"available to learners unless units are explicitly hidden."
+"If you select an option other than \"%(hide_label)s\", published units in "
+"this subsection become available to learners unless they are explicitly "
+"hidden."
 msgstr ""
-"Si selecciona una opción distinta a \"%(hide_label)s\", después de que la "
-"fecha de liberación de la subsección haya pasado las unidades publicadas en "
-"esa subsección se encontrarán disponibles para los estudiantes a menos que "
-"las unidades estén explícitamente ocultas."
 
 #: cms/templates/js/course-instructor-details.underscore
 msgid "Instructor Name"
@@ -9124,6 +9134,10 @@ msgstr "Calificado como:"
 #: cms/templates/js/course-outline.underscore
 msgid "Due:"
 msgstr "Fecha de entrega:"
+
+#: cms/templates/js/course-outline.underscore
+msgid "Subsection is hidden after course end date"
+msgstr ""
 
 #: cms/templates/js/course-outline.underscore
 msgid "Subsection is hidden after due date"

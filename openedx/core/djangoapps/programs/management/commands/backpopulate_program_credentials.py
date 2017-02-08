@@ -80,10 +80,10 @@ class Command(BaseCommand):
         course_runs = set()
         for program in programs:
             for course in program['courses']:
-                for run in course['course_runs']:
-                    key = CourseKey.from_string(run['key'])
+                for course_run in course['course_runs']:
+                    key = CourseKey.from_string(course_run['key'])
                     course_runs.add(
-                        CourseRun(key, run['type'])
+                        CourseRun(key, course_run['type'])
                     )
 
         return course_runs
@@ -97,14 +97,7 @@ class Command(BaseCommand):
         status_query = Q(status__in=CertificateStatuses.PASSED_STATUSES)
         course_run_query = reduce(
             lambda x, y: x | y,
-            # A course run's type is assumed to indicate which mode must be
-            # completed in order for the run to count towards program completion.
-            # This supports the same flexible program construction allowed by the
-            # old programs service (e.g., completion of an old honor-only run may
-            # count towards completion of a course in a program). This may change
-            # in the future to make use of the more rigid set of "applicable seat
-            # types" associated with each program type in the catalog.
-            [Q(course_id=run.key, mode=run.type) for run in self.course_runs]
+            [Q(course_id=course_run.key, mode=course_run.type) for course_run in self.course_runs]
         )
 
         query = status_query & course_run_query

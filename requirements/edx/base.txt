@@ -132,7 +132,7 @@ watchdog==0.8.3
 
 # Metrics gathering and monitoring
 dogapi==1.2.1
-newrelic==2.74.0.54
+newrelic==2.78.0.57
 
 # Used for documentation gathering
 sphinx==1.1.3
@@ -170,7 +170,7 @@ nose-exclude
 nose-ignore-docstring
 nose-randomly==1.2.0
 nosexcover==1.0.7
-pa11ycrawler==1.5.4
+pa11ycrawler==1.5.8
 pep8==1.5.7
 PyContracts==1.7.1
 python-subunit==0.0.16
@@ -181,7 +181,7 @@ splinter==0.5.4
 testtools==0.9.34
 testfixtures==4.5.0
 nose-faulthandler==0.1
-nodeenv==1.0.0
+nodeenv==1.1.1
 
 # Used for Segment analytics
 analytics-python==1.1.0

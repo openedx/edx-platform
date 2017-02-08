@@ -8,7 +8,7 @@ import mock
 from nose.plugins.attrib import attr
 from provider.constants import CONFIDENTIAL
 
-from openedx.core.djangoapps.catalog.tests import factories as catalog_factories
+from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin, CredentialsDataMixin
 from openedx.core.djangoapps.credentials.utils import (
@@ -18,8 +18,6 @@ from openedx.core.djangoapps.credentials.utils import (
     get_programs_for_credentials
 )
 from openedx.core.djangoapps.credentials.tests import factories
-from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin, ProgramsDataMixin
-from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from student.tests.factories import UserFactory
 
@@ -37,7 +35,6 @@ class TestCredentialsRetrieval(CredentialsApiConfigMixin, CredentialsDataMixin, 
         super(TestCredentialsRetrieval, self).setUp()
 
         ClientFactory(name=CredentialsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
-        ClientFactory(name=ProgramsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
         self.user = UserFactory()
         self.primary_uuid = str(uuid.uuid4())
         self.alternate_uuid = str(uuid.uuid4())
@@ -129,7 +126,7 @@ class TestCredentialsRetrieval(CredentialsApiConfigMixin, CredentialsDataMixin, 
         }
         self.mock_credentials_api(self.user, data=credentials_api_response, reset_url=False)
         programs = [
-            catalog_factories.Program(uuid=primary_uuid), catalog_factories.Program(uuid=alternate_uuid)
+            ProgramFactory(uuid=primary_uuid), ProgramFactory(uuid=alternate_uuid)
         ]
 
         with mock.patch("openedx.core.djangoapps.credentials.utils.get_programs_for_credentials") as mock_get_programs:
@@ -165,7 +162,7 @@ class TestCredentialsRetrieval(CredentialsApiConfigMixin, CredentialsDataMixin, 
         }
         self.mock_credentials_api(self.user, data=credentials_api_response, reset_url=False)
         programs = [
-            catalog_factories.Program(uuid=primary_uuid), catalog_factories.Program(uuid=alternate_uuid)
+            ProgramFactory(uuid=primary_uuid), ProgramFactory(uuid=alternate_uuid)
         ]
 
         with mock.patch("openedx.core.djangoapps.credentials.utils.get_programs") as mock_get_programs:
@@ -199,14 +196,14 @@ class TestCredentialsRetrieval(CredentialsApiConfigMixin, CredentialsDataMixin, 
     def test_get_program_for_certificates(self):
         """Verify programs data can be retrieved and parsed correctly for certificates."""
         programs = [
-            catalog_factories.Program(uuid=self.primary_uuid),
-            catalog_factories.Program(uuid=self.alternate_uuid)
+            ProgramFactory(uuid=self.primary_uuid),
+            ProgramFactory(uuid=self.alternate_uuid)
         ]
 
         program_credentials_data = self._expected_program_credentials_data()
         with mock.patch("openedx.core.djangoapps.credentials.utils.get_programs") as patched_get_programs:
             patched_get_programs.return_value = programs
-            actual = get_programs_for_credentials(self.user, program_credentials_data)
+            actual = get_programs_for_credentials(program_credentials_data)
 
             self.assertEqual(len(actual), 2)
             self.assertEqual(actual, programs)
@@ -216,6 +213,6 @@ class TestCredentialsRetrieval(CredentialsApiConfigMixin, CredentialsDataMixin, 
         program_credentials_data = self._expected_program_credentials_data()
         with mock.patch("openedx.core.djangoapps.credentials.utils.get_programs") as patched_get_programs:
             patched_get_programs.return_value = []
-            actual = get_programs_for_credentials(self.user, program_credentials_data)
+            actual = get_programs_for_credentials(program_credentials_data)
 
             self.assertEqual(actual, [])

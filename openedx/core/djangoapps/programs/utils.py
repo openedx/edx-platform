@@ -1,24 +1,20 @@
 # -*- coding: utf-8 -*-
 """Helper functions for working with Programs."""
+from collections import defaultdict
 import datetime
 from urlparse import urljoin
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.utils.text import slugify
+from django.utils.functional import cached_property
 from opaque_keys.edx.keys import CourseKey
 from pytz import utc
 
 from course_modes.models import CourseMode
 from lms.djangoapps.certificates import api as certificate_api
 from lms.djangoapps.commerce.utils import EcommerceService
-from openedx.core.djangoapps.catalog.utils import (
-    get_programs as get_catalog_programs,
-    munge_catalog_program,
-    get_run_marketing_url,
-)
+from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from student.models import CourseEnrollment
 from util.date_utils import strftime_localized
@@ -27,78 +23,6 @@ from util.organizations_helpers import get_organization_by_short_name
 
 # The datetime module's strftime() methods require a year >= 1900.
 DEFAULT_ENROLLMENT_START_DATE = datetime.datetime(1900, 1, 1, tzinfo=utc)
-
-
-def get_programs(user, program_id=None, use_catalog=False):
-    """Given a user, get programs from the Programs service.
-
-    Returned value is cached depending on user permissions. Staff users making requests
-    against Programs will receive unpublished programs, while regular users will only receive
-    published programs.
-
-    Arguments:
-        user (User): The user to authenticate as when requesting programs.
-
-    Keyword Arguments:
-        program_id (int): Identifies a specific program for which to retrieve data.
-
-    Returns:
-        list of dict, representing programs returned by the Programs service.
-        dict, if a specific program is requested.
-    """
-
-    if use_catalog:
-        programs = [munge_catalog_program(program) for program in get_catalog_programs(user)]
-    else:
-        programs_config = ProgramsApiConfig.current()
-
-        # Bypass caching for staff users, who may be creating Programs and want
-        # to see them displayed immediately.
-        cache_key = programs_config.CACHE_KEY if programs_config.is_cache_enabled and not user.is_staff else None
-
-        programs = get_edx_api_data(programs_config, user, 'programs', resource_id=program_id, cache_key=cache_key)
-
-        # Mix in munged MicroMasters data from the catalog.
-        if not program_id:
-            programs += [
-                munge_catalog_program(micromaster) for micromaster in get_catalog_programs(user, type='MicroMasters')
-            ]
-
-    return programs
-
-
-def get_programs_by_run(programs, enrollments):
-    """Intersect programs and enrollments.
-
-    Builds a dictionary of program dict lists keyed by course ID. The resulting dictionary
-    is suitable for use in applications where programs must be filtered by the course
-    runs they contain (e.g., student dashboard).
-
-    Arguments:
-        programs (list): Containing dictionaries representing programs.
-        enrollments (list): Enrollments from which course IDs to key on can be extracted.
-
-    Returns:
-        tuple, dict of programs keyed by course ID and list of course IDs themselves
-    """
-    programs_by_run = {}
-    # enrollment.course_id is really a course key (╯ಠ_ಠ）╯︵ ┻━┻
-    course_ids = [unicode(e.course_id) for e in enrollments]
-
-    for program in programs:
-        for course_code in program['course_codes']:
-            for run in course_code['run_modes']:
-                run_id = run['course_key']
-                if run_id in course_ids:
-                    program_list = programs_by_run.setdefault(run_id, list())
-                    if program not in program_list:
-                        program_list.append(program)
-
-    # Sort programs by name for consistent presentation.
-    for program_list in programs_by_run.itervalues():
-        program_list.sort(key=lambda p: p['name'])
-
-    return programs_by_run, course_ids
 
 
 def get_program_marketing_url(programs_config):
@@ -118,31 +42,21 @@ def attach_program_detail_url(programs):
         list, containing extended program dicts
     """
     for program in programs:
-        base = reverse('program_details_view', kwargs={'program_id': program['id']}).rstrip('/')
-        slug = slugify(program['name'])
-        program['detail_url'] = '{base}/{slug}'.format(base=base, slug=slug)
+        program['detail_url'] = reverse('program_details_view', kwargs={'program_uuid': program['uuid']})
 
     return programs
 
 
-def get_completed_courses(student):
+def munge_progress_map(progress_map):
     """
-    Determine which courses have been completed by the user.
+    Temporary utility for making progress maps look like they were built using
+    data from the deprecated programs service.
 
-    Args:
-        student:
-            User object representing the student
-
-    Returns:
-        iterable of dicts with structure {'course_id': course_key, 'mode': cert_type}
-
+    Clean up of this debt is tracked by ECOM-4418.
     """
-    all_certs = certificate_api.get_certificates_for_user(student.username)
-    return [
-        {'course_id': unicode(cert['course_key']), 'mode': cert['type']}
-        for cert in all_certs
-        if certificate_api.is_passing_status(cert['status'])
-    ]
+    progress_map['id'] = progress_map.pop('uuid')
+
+    return progress_map
 
 
 class ProgramProgressMeter(object):
@@ -154,33 +68,62 @@ class ProgramProgressMeter(object):
     Keyword Arguments:
         enrollments (list): List of the user's enrollments.
     """
-    def __init__(self, user, enrollments=None, use_catalog=False):
+    def __init__(self, user, enrollments=None):
         self.user = user
-        self.enrollments = enrollments
-        self.course_ids = None
-        self.course_certs = None
-        self.use_catalog = use_catalog
 
-        self.programs = attach_program_detail_url(get_programs(self.user, use_catalog=use_catalog))
+        self.enrollments = enrollments or list(CourseEnrollment.enrollments_for_user(self.user))
+        self.enrollments.sort(key=lambda e: e.created, reverse=True)
 
-    def engaged_programs(self, by_run=False):
+        # enrollment.course_id is really a CourseKey (╯ಠ_ಠ）╯︵ ┻━┻
+        self.course_run_ids = [unicode(e.course_id) for e in self.enrollments]
+
+        self.programs = attach_program_detail_url(get_programs())
+
+    def invert_programs(self):
+        """Intersect programs and enrollments.
+
+        Builds a dictionary of program dict lists keyed by course run ID. The
+        resulting dictionary is suitable in applications where programs must be
+        filtered by the course runs they contain (e.g., the student dashboard).
+
+        Returns:
+            defaultdict, programs keyed by course run ID
+        """
+        inverted_programs = defaultdict(list)
+
+        for program in self.programs:
+            for course in program['courses']:
+                for course_run in course['course_runs']:
+                    course_run_id = course_run['key']
+                    if course_run_id in self.course_run_ids:
+                        program_list = inverted_programs[course_run_id]
+                        if program not in program_list:
+                            program_list.append(program)
+
+        # Sort programs by title for consistent presentation.
+        for program_list in inverted_programs.itervalues():
+            program_list.sort(key=lambda p: p['title'])
+
+        return inverted_programs
+
+    @cached_property
+    def engaged_programs(self):
         """Derive a list of programs in which the given user is engaged.
 
         Returns:
-            list of program dicts, ordered by most recent enrollment,
-            or dict of programs, keyed by course ID.
+            list of program dicts, ordered by most recent enrollment
         """
-        self.enrollments = self.enrollments or list(CourseEnrollment.enrollments_for_user(self.user))
-        self.enrollments.sort(key=lambda e: e.created, reverse=True)
-
-        programs_by_run, self.course_ids = get_programs_by_run(self.programs, self.enrollments)
-
-        if by_run:
-            return programs_by_run
+        inverted_programs = self.invert_programs()
 
         programs = []
-        for course_id in self.course_ids:
-            for program in programs_by_run.get(course_id, []):
+        # Remember that these course run ids are derived from a list of
+        # enrollments sorted from most recent to least recent. Iterating
+        # over the values in inverted_programs alone won't yield a program
+        # ordering consistent with the user's enrollments.
+        for course_run_id in self.course_run_ids:
+            for program in inverted_programs[course_run_id]:
+                # Dicts aren't a hashable type, so we can't use a set. Sets also
+                # aren't ordered, which is important here.
                 if program not in programs:
                     programs.append(program)
 
@@ -195,21 +138,23 @@ class ProgramProgressMeter(object):
                 towards completing a program.
         """
         progress = []
-        for program in self.engaged_programs():
+        for program in self.engaged_programs:
             completed, in_progress, not_started = [], [], []
 
-            for course_code in program['course_codes']:
-                name = course_code['display_name']
+            for course in program['courses']:
+                # TODO: What are these titles used for? If they're not used by
+                # the front-end, pass integer counts instead.
+                title = course['title']
 
-                if self._is_course_code_complete(course_code):
-                    completed.append(name)
-                elif self._is_course_code_in_progress(course_code):
-                    in_progress.append(name)
+                if self._is_course_complete(course):
+                    completed.append(title)
+                elif self._is_course_in_progress(course):
+                    in_progress.append(title)
                 else:
-                    not_started.append(name)
+                    not_started.append(title)
 
             progress.append({
-                'id': program['id'],
+                'uuid': program['uuid'],
                 'completed': completed,
                 'in_progress': in_progress,
                 'not_started': not_started,
@@ -222,75 +167,94 @@ class ProgramProgressMeter(object):
         """Identify programs completed by the student.
 
         Returns:
-            list of int, each the ID of a completed program.
+            list of UUIDs, each identifying a completed program.
         """
-        return [program['id'] for program in self.programs if self._is_program_complete(program)]
+        return [program['uuid'] for program in self.programs if self._is_program_complete(program)]
 
     def _is_program_complete(self, program):
         """Check if a user has completed a program.
 
-        A program is completed if the user has completed all nested course codes.
+        A program is completed if the user has completed all nested courses.
 
         Arguments:
             program (dict): Representing the program whose completion to assess.
 
         Returns:
-            bool, whether the program is complete.
+            bool, indicating whether the program is complete.
         """
-        return all(self._is_course_code_complete(course_code) for course_code in program['course_codes'])
+        return all(self._is_course_complete(course) for course in program['courses'])
 
-    def _is_course_code_complete(self, course_code):
-        """Check if a user has completed a course code.
+    def _is_course_complete(self, course):
+        """Check if a user has completed a course.
 
-        A course code is completed if the user has earned a certificate
-        in the right mode for any nested run.
+        A course is completed if the user has earned a certificate for any of
+        the nested course runs.
 
         Arguments:
-            course_code (dict): Containing nested run modes.
+            course (dict): Containing nested course runs.
 
         Returns:
-            bool, whether the course code is complete.
+            bool, indicating whether the course is complete.
         """
-        self.course_certs = self.course_certs or get_completed_courses(self.user)
-        return any(self._parse(run_mode) in self.course_certs for run_mode in course_code['run_modes'])
 
-    def _is_course_code_in_progress(self, course_code):
-        """Check if a user is in the process of completing a course code.
+        def reshape(course_run):
+            """
+            Modify the structure of a course run dict to facilitate comparison
+            with course run certificates.
+            """
+            return {
+                'course_run_id': course_run['key'],
+                # A course run's type is assumed to indicate which mode must be
+                # completed in order for the run to count towards program completion.
+                # This supports the same flexible program construction allowed by the
+                # old programs service (e.g., completion of an old honor-only run may
+                # count towards completion of a course in a program). This may change
+                # in the future to make use of the more rigid set of "applicable seat
+                # types" associated with each program type in the catalog.
+                'type': course_run['type'],
+            }
 
-        A user is in the process of completing a course code if they're
-        enrolled in the course.
+        return any(reshape(course_run) in self.completed_course_runs for course_run in course['course_runs'])
+
+    @property
+    def completed_course_runs(self):
+        """
+        Determine which course runs have been completed by the user.
+
+        Returns:
+            list of dicts, each representing a course run certificate
+        """
+        course_run_certificates = certificate_api.get_certificates_for_user(self.user.username)
+        return [
+            {'course_run_id': unicode(certificate['course_key']), 'type': certificate['type']}
+            for certificate in course_run_certificates
+            if certificate_api.is_passing_status(certificate['status'])
+        ]
+
+    def _is_course_in_progress(self, course):
+        """Check if a user is in the process of completing a course.
+
+        A user is considered to be in the process of completing a course if
+        they're enrolled in any of the nested course runs.
 
         Arguments:
-            course_code (dict): Containing nested run modes.
+            course (dict): Containing nested course runs.
 
         Returns:
-            bool, whether the course code is in progress.
+            bool, indicating whether the course is in progress.
         """
-        return any(run_mode['course_key'] in self.course_ids for run_mode in course_code['run_modes'])
-
-    def _parse(self, run_mode):
-        """Modify the structure of a run mode dict.
-
-        Arguments:
-            run_mode (dict): With `course_key` and `mode_slug` keys.
-
-        Returns:
-            dict, with `course_id` and `mode` keys.
-        """
-        parsed = {
-            'course_id': run_mode['course_key'],
-            'mode': run_mode['mode_slug'],
-        }
-
-        return parsed
+        return any(course_run['key'] in self.course_run_ids for course_run in course['course_runs'])
 
 
 # pylint: disable=missing-docstring
 class ProgramDataExtender(object):
-    """Utility for extending program course codes with CourseOverview and CourseEnrollment data.
+    """
+    Utility for extending program course codes with CourseOverview and
+    CourseEnrollment data.
 
     Arguments:
-        program_data (dict): Representation of a program.
+        program_data (dict): Representation of a program. Note that this dict must
+            be formatted as if it was returned by the deprecated program service.
         user (User): The user whose enrollments to inspect.
     """
     def __init__(self, program_data, user):
@@ -369,9 +333,6 @@ class ProgramDataExtender(object):
     def _attach_run_mode_is_enrollment_open(self, run_mode):
         enrollment_end = self.course_overview.enrollment_end or datetime.datetime.max.replace(tzinfo=utc)
         run_mode['is_enrollment_open'] = self.enrollment_start <= datetime.datetime.now(utc) < enrollment_end
-
-    def _attach_run_mode_marketing_url(self, run_mode):
-        run_mode['marketing_url'] = get_run_marketing_url(self.course_key, self.user)
 
     def _attach_run_mode_start_date(self, run_mode):
         run_mode['start_date'] = self.course_overview.start
