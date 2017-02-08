@@ -56,7 +56,7 @@ def stop_video_server(_total):
         video_server.shutdown()
 
 
-@before.each_scenario  # pylint: disable=no-member
+@before.each_feature  # pylint: disable=no-member
 def process_requires_tags(scenario):
     """
     Process the scenario tags to make sure that any
@@ -124,11 +124,13 @@ def is_youtube_available(urls):
     return True
 
 
-@after.each_scenario  # pylint: disable=no-member
+@after.each_feature  # pylint: disable=no-member
 def stop_stubs(_scenario):
     """
     Shut down any stub services that were started up for the scenario.
     """
+    # if world.browser.driver_name == 'Chrome':
+    #     world.browser.get('data;')
     for name in SERVICES.keys():
         stub_server = getattr(world, name, None)
         if stub_server is not None:

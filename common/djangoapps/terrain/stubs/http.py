@@ -263,14 +263,11 @@ class StubHttpService(HTTPServer, object):
 
     def shutdown(self):
         """
-        Stop the server and free up the port
+        Stop the server and close all connections
         """
-        # Don't need to call shutdown because when the main thread (testcase) is torn down, child daemons are killed
-        # as per Thread documentation
-        # HTTPServer.shutdown(self)
 
-        # We also need to manually close the socket
-        self.socket.close()
+        # Note: this will result in Bad File Descriptor errors
+        HTTPServer.server_close(self)
 
     @property
     def port(self):
