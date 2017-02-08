@@ -40,7 +40,7 @@ from lms.djangoapps.instructor.enrollment import uses_shib
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 
-from openedx.core.djangoapps.catalog.utils import get_active_programs_list
+from openedx.core.djangoapps.catalog.utils import get_active_programs_list, get_program_details
 import shoppingcart
 import survey.utils
 import survey.views
@@ -679,19 +679,19 @@ def program_detail(request, program_id):
 
     Assumes the program_id is in a valid format.
     """
-    program = get_active_programs_data(request.user, program_id)
+    program = get_program_details(program_id)
 
     if not program:
         raise Http404
 
     # TODO: put these keys dynamically
-    for course in program[0]['courses']:
+    for course in program['courses']:
         course_runs = course['course_runs'][0]
         course_runs['registered'] = False
         course_runs['can_enroll'] = True
         course_runs['is_shib_course'] = False
 
-    return render_to_response('courseware/program_detail.html', {'program': program[0]})
+    return render_to_response('courseware/program_detail.html', {'program': program})
 
 
 @transaction.non_atomic_requests
