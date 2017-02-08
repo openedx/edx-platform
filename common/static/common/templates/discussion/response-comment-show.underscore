@@ -1,0 +1,35 @@
+<div class="discussion-comment" id="comment_<%- id %>">
+  <div class="response-body"><%- body %></div>
+  <%=
+      _.template(
+          $('#forum-actions').html())(
+          {
+              contentId: cid,
+              contentType: 'comment',
+              primaryActions: [],
+              secondaryActions: ['edit', 'delete', 'report'],
+              readOnly: readOnly
+          }
+      )
+  %>
+  <p class="posted-details">
+    <%
+    var time_ago = interpolate(
+      '<span class="timeago" title="%(time)s">%(time)s</span>',
+      {time: created_at},
+      true
+    );
+    %>
+    <%= interpolate(
+      // Translators: 'timeago' is a placeholder for a fuzzy, relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
+      gettext("posted %(time_ago)s by %(author)s"),
+      {time_ago: time_ago, author: author_display},
+      true
+    ) %>
+  </p>
+  <div class="post-labels">
+    <span class="post-label post-label-reported">
+      <span class="icon fa fa-flag" aria-hidden="true"></span><%- gettext("Reported") %>
+    </span>
+  </div>
+</div>

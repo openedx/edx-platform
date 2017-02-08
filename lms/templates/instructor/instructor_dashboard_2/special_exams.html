@@ -1,0 +1,18 @@
+<%page args="section_data" expression_filter="h"/>
+<%!
+from django.utils.translation import ugettext as _
+from datetime import datetime, timedelta
+import pytz
+%>
+<div class="proctoring-wrapper">
+  <div id="proctoring-accordion">
+    <div class="wrap">
+       <h3 class="hd hd-3">${_('Allowance Section')}</h3>
+      <div class="special-allowance-container" data-course-id="${ section_data['course_id'] }"></div>
+    </div>
+    <div class="wrap">
+       <h3 class="hd hd-3">${_('Student Special Exam Attempts')}</h3>
+      <div class="student-proctored-exam-container" data-course-id="${ section_data['course_id'] }"></div>
+    </div>
+  </div>
+</div>

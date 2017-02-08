@@ -1,0 +1,33 @@
+<div class="placeholder-cam" id="camera">
+  <% if ( backendName === 'html5' ) { %>
+    <div class="placeholder-art">
+      <p class="copy"><%- gettext( "Don't see your picture? Make sure to allow your browser to use your camera when it asks for permission." ) %></p>
+    </div>
+
+    <video id="photo_id_video" aria-label="<%- gettext( 'Live view of webcam' ) %>" autoplay></video><br/>
+    <canvas id="photo_id_canvas" style="display:none;" width="640" height="480"></canvas>
+  <% } else if ( backendName === 'flash' ) { %>
+    <object type="application/x-shockwave-flash"
+      id="flash_video"
+      name="flash_video"
+      data="/static/js/verify_student/CameraCapture.swf"
+      width="500"
+      height="375">
+      <param name="quality" value="high">
+      <param name="allowscriptaccess" value="sameDomain">
+    </object>
+  <% } %>
+</div>
+
+<div class="controls photo-controls">
+  <div class="control control-retake is-hidden" id="webcam_reset_button">
+    <button class="action action-redo"><%- gettext( "Retake Photo" ) %></button>
+  </div>
+  <div class="control control-do is-hidden" id="webcam_capture_button">
+    <button class="action action-do">
+      <span class="icon fa fa-camera" aria-hidden="true"></span> <span class="sr"><%- gettext( "Take Photo" ) %></span>
+    </button>
+  </div>
+  <audio id="webcam_capture_sound"></audio>
+
+</div>

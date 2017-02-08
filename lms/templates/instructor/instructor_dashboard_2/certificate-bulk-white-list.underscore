@@ -1,0 +1,18 @@
+<h3 class="hd hd-3"><%- gettext("Bulk Exceptions") %></h3>
+<div class="white-list-csv">
+    <p class="under-heading">
+     <%- gettext("Upload a comma separated values (.csv) file that contains the usernames or email addresses of learners who have been given exceptions. Include the username or email address in the first comma separated field. You can include an optional note describing the reason for the exception in the second comma separated field.") %>
+    </p>
+    <form id="bulk-white-list-exception-form" enctype="multipart/form-data">
+        <div class="customBrowseBtn">
+            <label for="browseBtn-bulk-csv"><%- gettext("Upload a CSV file") %></label>
+            <span class="browse-file enhanced-input-file" id="bulk-exception-upload"></span>
+            <div class="file-browse btn btn-primary" aria-hidden="true">
+                <span class="browse"><%- gettext("Browse") %></span>
+                <input class="file_field" id="browseBtn-bulk-csv" name="students_list" type="file" accept=".csv"/>
+            </div>
+        </div>
+        <button type="submit" class="btn-blue upload-csv-button"><%- gettext("Add to Exception List") %></button>
+    </form>
+    <div class="bulk-exception-results hidden"></div>
+</div>

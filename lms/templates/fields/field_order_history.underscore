@@ -1,0 +1,11 @@
+<div class="field u-field-order" <% if (receiptUrl) { %> role="group" aria-labelledby="order-title-<%- orderId %>" <% } else { %> aria-hidden="true" <% } %>>
+    <span class="u-field-order-title" <% if (receiptUrl) { %> id="order-title-<%- orderId %>" <% } %>><%- title %></span>
+    <span class="u-field-order-date"><span class="sr">Date Placed: </span><%- orderDate %></span>
+    <span class="u-field-order-value u-field-order-price"><span class="sr">Cost: </span><% if (!isNaN(parseFloat(totalPrice))) { %>$<% } %><%- totalPrice %></span>
+    <span class="u-field-order-value u-field-order-number"><span class="sr">Order Number: </span><%- orderId %></span>
+    <span class="u-field-order-link">
+        <% if (receiptUrl) { %>
+            <a class="u-field-link" target="_blank" href="<%- receiptUrl %>"><%- gettext('Order Details') %><span class="sr"> for <%- orderId %></span></a>
+        <% } %>
+    </span>
+</div>

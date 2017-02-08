@@ -1,0 +1,111 @@
+## mako
+<%namespace name='static' file='static_content.html'/>
+<%!
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+%>
+
+<div class="wrapper wrapper-footer">
+  <footer>
+    <!-- This is super-ugly, don't use it! -->
+    <div class="colophon">
+      <nav class="nav-colophon" aria-label="${_('About')}">
+      <ol>
+          <li class="nav-colophon-01">
+          <a id="about" href="${marketing_link('ABOUT')}">
+              ${_("About")}
+          </a>
+          </li>
+          %if marketing_link('JOBS') and marketing_link('JOBS') != '#':
+            <li class="nav-colophon-02">
+              <a id="jobs" href="${marketing_link('JOBS')}">
+                ${_("Jobs")}
+              </a>
+            </li>
+          %endif
+          %if marketing_link('NEWS') and marketing_link('NEWS') != '#':
+            <li class="nav-colophon-03">
+              <a id="news" href="${marketing_link('NEWS')}">
+                ${_("News")}
+              </a>
+            </li>
+          %endif
+          <li class="nav-colophon-04">
+          <a id="faq" href="${marketing_link('FAQ')}">
+              ${_("FAQ")}
+          </a>
+          </li>
+          <li class="nav-colophon-05">
+          <a id="contact" href="${marketing_link('CONTACT')}">
+              ${_("Contact")}
+          </a>
+          </li>
+      </ol>
+      </nav>
+
+      <div class="wrapper-logo">
+        <p>
+          <a href="/">
+            ## this is just a placeholder logo
+            ## feel free to change this logo to your own by replacing "logo.png" with your own logo
+            <img alt="organization logo placeholder" src="${static.url("images/logo.png")}">
+          </a>
+        </p>
+      </div>
+
+      <p class="copyright">&copy; ${settings.COPYRIGHT_YEAR} ${static.get_platform_name()}.</p>
+
+      ## Site operators: Please do not remove this paragraph! This attributes back to edX and makes your acknowledgement of edX's trademarks clear.
+      <p class="copyright">
+        ## Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'. Please do not translate any of these trademarks and company names.
+        ${_("EdX, Open edX, and the edX and Open edX logos are registered trademarks or trademarks of {link_start}edX Inc.{link_end}").format(
+            link_start=u"<a href='https://www.edx.org/'>",
+            link_end=u"</a>"
+        )}
+      </p>
+      <nav class="nav-legal" aria-label="${_('Legal')}">
+        <ul>
+        % if marketing_link('HONOR') and marketing_link('HONOR') != '#':
+          <li class="nav-legal-01">
+            <%
+              tos_link = u"<a href='{}'>".format(marketing_link('TOS'))
+              honor_link = u"<a href='{}'>".format(marketing_link('HONOR'))
+            %>
+            ${
+              _(
+                "{tos_link_start}Terms of Service{tos_link_end} and {honor_link_start}Honor Code{honor_link_end}").format(
+                tos_link_start=tos_link,
+                tos_link_end="</a>",
+                honor_link_start=honor_link,
+                honor_link_end="</a>",
+              )
+            }
+          </li>
+        % else:
+          <li class="nav-legal-01">
+            <a href="${marketing_link('TOS')}">${_("Terms of Service")}</a>
+          </li>
+        % endif
+          <li class="nav-legal-02">
+            <a href="${marketing_link('PRIVACY')}">${_("Privacy Policy")}</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    ## please leave this link and use one of the logos provided
+    <div class="footer-about-openedx">
+      <p>
+        <a href="http://openedx.org/">
+          ## standard powered-by logo
+          ## Translators: 'Open edX' is a brand, please keep this untranslated. See http://openedx.org for more information.
+          <img src="https://files.edx.org/openedx-logos/edx-openedx-logo-tag.png" alt="${_('Powered by Open edX')}" width="140" />
+          ## greyscale logo for dark background
+          ## <img src="https://files.edx.org/openedx-logos/edx-openedx-logo-tag-light.png" alt="${_('Powered by Open edX')}" width="140" />
+          ## greyscale logo for light background
+          ## <img src="https://files.edx.org/openedx-logos/edx-openedx-logo-tag-dark.png" alt="${_('Powered by Open edX')}" width="140" />
+        </a>
+      </p>
+    </div>
+  </footer>
+</div>
