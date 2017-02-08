@@ -1,0 +1,7 @@
+{% load i18n %}
+<textarea {{ attrs }}>{{ content }}</textarea>
+<p id="hint_id_content" class="help-block">
+    {% blocktrans with start_link="<a id='cheatsheetLink' href='#cheatsheetModal' rel='leanModal'>" end_link="</a>" %}
+        Markdown syntax is allowed. See the {{ start_link }}cheatsheet{{ end_link }} for help.
+    {% endblocktrans %}
+</p>

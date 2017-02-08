@@ -1,0 +1,288 @@
+// edX LMS - developer
+// ====================
+// NOTE: use this area for any developer-needed or created styling that needs to be refactored into patterns or visually polished. Please list any template/view that your styles reference when definining them (example below):
+
+// Views: Login, Sign Up
+// .crazy-new-feature {
+//   background: transparent;
+// }
+
+// --------------------
+// rotate clockwise
+@include keyframes(rotateCW) {
+  0% {
+    @include transform(rotate(0deg));
+  }
+
+  50% {
+    @include transform(rotate(180deg));
+  }
+
+  100% {
+    @include transform(rotate(360deg));
+  }
+}
+
+// canned animation - use if you want out of the box/non-customized anim
+%anim-rotateCW {
+  @include animation(rotateCW $tmg-s1 linear infinite);
+}
+
+.ui-loading-base {
+  @include animation(fadeIn $tmg-f2 linear 1);
+  @extend %t-copy-base;
+
+  .spin {
+    @extend %anim-rotateCW;
+    display: inline-block;
+  }
+
+  .copy {
+    padding-left: ($baseline/4);
+  }
+}
+
+.ui-loading {
+  @extend .ui-loading-base;
+  @extend %ui-well;
+  opacity: 0.6;
+  background-color: $white;
+  padding: ($baseline*1.5) $baseline;
+  text-align: center;
+}
+
+// Below divider rules are moved here from _instructor_2.scss
+// UI: visual dividers
+.divider-lv0 {
+  border-top: ($baseline/5) solid $gray-l4;
+}
+
+.divider-lv1 {
+  border-top: ($baseline/10) solid $gray-l4;
+}
+
+.divider-lv2 {
+  border-top: ($baseline/20) solid $gray-l4;
+}
+
+// for verify_student/make_payment_step.underscore
+.payment-buttons {
+
+  .purchase {
+    float: left;
+    padding: ($baseline*.5) 0;
+
+    .product-info, .product-name, .price {
+      @extend %t-ultrastrong;
+      color: $m-blue-d3;
+    }
+  }
+
+  .payment-button {
+    float: right;
+    @include margin-left( ($baseline/2) );
+
+    &.is-selected {
+      background: $m-green-s1 !important;
+    }
+  }
+}
+
+// teams temporary
+
+//efischer; scratch space for teams instructor tools
+.view-teams {
+  .wrapper-msg {
+    @include clearfix();
+    max-width: grid-width(12);
+    margin: 0 auto;
+    border-top: 3px solid $orange;
+
+    .left-floater {
+      @include float(left);
+      text-transform: uppercase;
+      font-weight: $font-semibold;
+      color: $white;
+      line-height: $body-line-height;
+    }
+
+    .right-floater {
+      @include float(right);
+      line-height: $body-line-height;
+
+      button {
+        background: transparent;
+        border: 1px solid transparent;
+        color: $white;
+        box-shadow: 0 0 0 0;
+        font-weight: $font-regular;
+        text-shadow: 0 0;
+
+        &:hover {
+          color: $orange;
+          background: transparent;
+          border: 1px solid $orange;
+          box-shadow: 0 0 0 0;
+        }
+
+        &:focus {
+         box-shadow: 0 0 0 0;
+        }
+      }
+    }
+  }
+
+  .members-info {
+    margin: 0;
+    padding: 0;
+    li {
+      display: inline;
+    }
+  }
+
+  .edit-members {
+    @extend %ui-no-list;
+
+    .team-member {
+      line-height: $body-line-height;
+      padding: 10px;
+    }
+
+    .member-info-container {
+      display: inline-block;
+      vertical-align: middle;
+      @include margin-left($baseline/2);
+
+      .primary {
+        font-size: 120%;
+      }
+
+      .secondary {
+        color: $lighter-base-font-color;
+        font-size: 80%;
+        display: block;
+      }
+    }
+
+    .member-profile {
+      img {
+        border: 1px solid $gray;
+      }
+    }
+
+    .action-remove-member {
+      color: $blue;
+      background: transparent;
+      border: 1px solid transparent;
+      font: inherit;
+    }
+  }
+  //end instructor tools scratch space
+
+  //efischer TNL-3226
+  .search-field::-ms-clear {
+    width: 0;
+    height: 0;
+  }
+}
+
+//efischer - TNL-3189
+//copied from cms/static/sass/elements/_system-feedback.scss#L106
+//along with some "hide the inherited value, we want none" action
+.prompt.warning button {
+  @extend %btn-no-style;
+  box-shadow: none;
+  text-shadow: none;
+
+  &:hover {
+    color: $orange-s2;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  &:focus {
+    box-shadow: none;
+    border: 0;
+  }
+}
+
+//efischer - TNL-3189
+//copied from cms/static/sass/elements/_system-feedback.scss#L106
+//along with some "hide the inherited value, we want none" action
+.prompt.warning button {
+  @extend %btn-no-style;
+  box-shadow: none;
+  text-shadow: none;
+
+  &:hover {
+    color: $orange-s2;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  &:focus {
+    box-shadow: none;
+    border: 0;
+  }
+}
+
+// pfogg - ECOM-2604
+// styling for date summary blocks on the course info page
+.date-summary-container {
+  .date-summary {
+    @include clearfix;
+    padding: 10px;
+    @include border-left(3px solid $gray-l3);
+
+    .heading {
+      @extend %t-title7;
+      color: $gray-d2;
+    }
+
+    .description {
+      margin-top: $baseline/2;
+      margin-bottom: $baseline/2;
+      display: inline-block;
+      color: $gray-d1;
+      @extend %t-title8;
+    }
+
+    .date-summary-link {
+      @extend %t-title8;
+      font-weight: $font-semibold;
+      a {
+        color: $link-color;
+        font-weight: normal;
+      }
+    }
+
+    .date {
+      color: $gray-d1;
+      @extend %t-title9;
+    }
+
+    &-todays-date {
+      @include border-left(3px solid $blue);
+
+      .heading {
+        @extend %t-title8;
+      }
+    }
+
+    &-verified-upgrade-deadline {
+      @include border-left(3px solid $green);
+    }
+
+    &-verification-deadline-passed {
+      @include border-left(3px solid $red);
+    }
+
+    &-verification-deadline-retry {
+      @include border-left(3px solid $red);
+    }
+
+    &-verification-deadline-upcoming {
+      @include border-left(3px solid $orange);
+    }
+  }
+}

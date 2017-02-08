@@ -1,0 +1,6 @@
+<div class="<%- jsHook %> status">
+    <p class="message-copy">
+        <%- message %>
+    </p>
+</div>
+

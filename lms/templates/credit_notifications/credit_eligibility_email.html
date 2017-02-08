@@ -1,0 +1,103 @@
+<%! from django.utils.translation import ugettext as _ %>
+
+<!DOCTYPE html>
+<html>
+<head lang="en">
+  <meta charset="UTF-8">
+  <title></title>
+</head>
+<body>
+
+<table class="cn-container">
+  <tbody>
+  <tr>
+    <td class="cn-body">
+      <table>
+        <tr>
+          <td class="cn-img-wrapper">
+            <a target="_blank" title="" href="#">
+              <img class="cn-img" src="cid:${branded_logo}">
+            </a>
+          </td>
+        </tr>
+
+        <tr><td class="cn-content-clear"></td></tr>
+
+        <tr>
+          <td class="cn-content">
+            <p>
+                % if full_name is not UNDEFINED and full_name is not None:
+                    ${_(u"Hi {name},").format(name=full_name)}
+                % else:
+                    ${_(u"Hi,")}
+                % endif
+            </p>
+
+            <p>
+
+              % if providers:
+                  ${_(u"Congratulations! You are eligible to receive course credit from {providers} for successfully completing your {platform_name} course! {link_start}Get your credit now.{link_end}").format(
+                    link_start=u'<a href="{dashboard_url}">'.format(
+                        dashboard_url=dashboard_link
+                    ),
+                    link_end=u'</a>',
+                    platform_name=settings.PLATFORM_NAME,
+                    providers=providers
+                  )}
+              % else:
+                  ${_(u"Congratulations! You are eligible to receive course credit for successfully completing your {platform_name} course! {link_start}Get your credit now.{link_end}").format(
+                    link_start=u'<a href="{dashboard_url}">'.format(
+                        dashboard_url=dashboard_link
+                    ),
+                    link_end=u'</a>',
+                    platform_name=settings.PLATFORM_NAME
+                  )}
+              % endif
+            </p>
+
+            <p>
+              ${_(u"Course credit can help you get a jump start on your university degree, finish a degree already started, or fulfill requirements at a different academic institution.")}
+            </p>
+
+            <p>
+              ${_(u'To get course credit, simply go to your {link_start}{platform_name} dashboard{link_end} and click the <b>Get Credit</b> button. After you receive your credit, you will also have an official academic transcript at the institution that granted the credit.').format(
+                link_start=u'<a href="{dashboard_url}">'.format(
+                    dashboard_url=dashboard_link
+                ),
+                link_end=u'</a>',
+                platform_name=settings.PLATFORM_NAME
+              )}
+            </p>
+
+            <p>
+              ${_(u"We hope you enjoyed the course, and we hope to see you in future {platform_name} courses!").format(platform_name=settings.PLATFORM_NAME)}<br/>
+              ${_(u"The {platform_name} Team").format(platform_name=settings.PLATFORM_NAME)}
+            </p>
+          </td>
+        </tr>
+
+        <tr><td class="cn-content-clear cn-footer"></td></tr>
+
+        <tr>
+          <td class="cn-footer-content">
+            <p>
+              ${_(u"{link_start}Click here for more information on credit at {platform_name}{link_end}.").format(
+                link_start=u'<a href="https://www.edx.org/gfa">',
+                link_end=u'</a>',
+                platform_name=settings.PLATFORM_NAME
+              )}
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+
+  </tbody>
+</table>
+<img src="${tracking_pixel}"/>
+
+
+</body>
+</html>

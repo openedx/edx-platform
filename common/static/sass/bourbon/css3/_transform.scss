@@ -1,0 +1,15 @@
+@mixin transform($property: none) {
+//  none | <transform-function>
+  @include prefixer(transform, $property, spec);
+}
+
+@mixin transform-origin($axes: 50%) {
+// x-axis - left | center | right  | length | %
+// y-axis - top  | center | bottom | length | %
+// z-axis -                          length
+  @include prefixer(transform-origin, $axes, spec);
+}
+
+@mixin transform-style ($style: flat) {
+  @include prefixer(transform-style, $style, spec);
+}

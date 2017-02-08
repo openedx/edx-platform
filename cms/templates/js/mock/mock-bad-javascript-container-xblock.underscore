@@ -1,0 +1,54 @@
+<header class="xblock-header">
+    <div class="xblock-header-primary">
+        <div class="header-details">
+            <span class="xblock-display-name">Test Container</span>
+        </div>
+        <div class="header-actions">
+            <ul class="actions-list">
+            </ul>
+        </div>
+    </div>
+</header>
+<article class="xblock-render">
+    <div class="xblock" data-locator="locator-container"
+         data-init="MockXBlock" data-runtime-class="StudioRuntime" data-runtime-version="1">
+        <ol class="reorderable-container">
+            <li class="studio-xblock-wrapper is-draggable" data-locator="locator-broken-javascript">
+                <section class="wrapper-xblock level-element">
+                    <header class="xblock-header">
+                        <div class="xblock-header-primary">
+                            <div class="header-actions">
+                                <ul class="actions-list">
+                                    <li class="action-item action-edit">
+                                        <a href="#" class="edit-button action-button"></a>
+                                    </li>
+                                    <li class="action-item action-duplicate">
+                                        <a href="#" class="duplicate-button action-button"></a>
+                                    </li>
+                                    <li class="action-item action-delete">
+                                        <a href="#" class="delete-button action-button"></a>
+                                    </li>
+                                    <li class="action-item action-drag">
+                                        <span data-tooltip="Drag to reorder" class="drag-handle action"></span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </header>
+
+                    <article class="xblock-render">
+                        <div class="xblock xblock-student_view xmodule_display xmodule_HtmlModule"
+                             data-runtime-class="PreviewRuntime" data-init="XBlockToXModuleShim"
+                             data-request-token="5efb4488272611e48053080027880ca6" data-runtime-version="1"
+                             data-usage-id="i4x:;_;_edX;_mock"
+                             data-type="HTMLModule" data-block-type="html">
+                            <script type="text/javascript">
+                            noSuchVariable.noSuchFunction();
+                            </script>
+                        </div>
+                    </article>
+                </section>
+            </li>
+        </ol>
+    </div>
+</article>

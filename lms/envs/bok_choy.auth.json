@@ -1,0 +1,140 @@
+{
+    "ANALYTICS_API_KEY": "",
+    "AWS_ACCESS_KEY_ID": "",
+    "AWS_SECRET_ACCESS_KEY": "",
+    "CC_PROCESSOR_NAME": "CyberSource2",
+    "CC_PROCESSOR": {
+        "CyberSource2": {
+            "SECRET_KEY": "abcd123",
+            "ACCESS_KEY": "abcd123",
+            "PROFILE_ID": "edx",
+            "PURCHASE_ENDPOINT": "/shoppingcart/payment_fake"
+        }
+    },
+    "CELERY_BROKER_PASSWORD": "celery",
+    "CELERY_BROKER_USER": "celery",
+    "CONTENTSTORE": {
+        "DOC_STORE_CONFIG": {
+            "collection": "modulestore",
+            "db": "test",
+            "host": [
+                "localhost"
+            ],
+            "port": 27017
+        },
+        "ENGINE": "xmodule.contentstore.mongo.MongoContentStore",
+        "OPTIONS": {
+            "db": "test",
+            "host": [
+                "localhost"
+            ],
+            "port": 27017
+        }
+    },
+    "DATABASES": {
+        "default": {
+            "ENGINE": "django.db.backends.mysql",
+            "HOST": "localhost",
+            "NAME": "edxtest",
+            "PASSWORD": "",
+            "PORT": "3306",
+            "USER": "root"
+        },
+        "student_module_history": {
+            "ENGINE": "django.db.backends.mysql",
+            "HOST": "localhost",
+            "NAME": "student_module_history_test",
+            "PASSWORD": "",
+            "PORT": "3306",
+            "USER": "root"
+        }
+    },
+    "DOC_STORE_CONFIG": {
+        "collection": "modulestore",
+        "db": "test",
+        "host": [
+            "localhost"
+        ],
+        "port": 27017
+    },
+    "TRACKING_BACKENDS": {
+        "mongo": {
+            "ENGINE": "track.backends.mongodb.MongoBackend",
+            "OPTIONS": {
+                "database": "test",
+                "collection": "events"
+            }
+        }
+    },
+    "EVENT_TRACKING_BACKENDS": {
+        "mongo": {
+            "ENGINE": "eventtracking.backends.mongodb.MongoBackend",
+            "OPTIONS": {
+                "database": "test",
+                "collection": "events"
+            }
+        }
+    },
+    "MODULESTORE": {
+        "default": {
+            "ENGINE": "xmodule.modulestore.mixed.MixedModuleStore",
+            "OPTIONS": {
+                "mappings": {},
+                "stores": [
+                    {
+                        "NAME": "draft",
+                        "DOC_STORE_CONFIG": {
+                            "collection": "modulestore",
+                            "db": "test",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": 27017
+                        },
+                        "ENGINE": "xmodule.modulestore.mongo.DraftMongoModuleStore",
+                        "OPTIONS": {
+                            "collection": "modulestore",
+                            "db": "test",
+                            "default_class": "xmodule.hidden_module.HiddenDescriptor",
+                            "fs_root": "** OVERRIDDEN **",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": 27017,
+                            "render_template": "edxmako.shortcuts.render_to_string"
+                        }
+                    },
+                    {
+                        "NAME": "xml",
+                        "ENGINE": "xmodule.modulestore.xml.XMLModuleStore",
+                        "OPTIONS": {
+                            "data_dir": "** OVERRIDDEN **",
+                            "default_class": "xmodule.hidden_module.HiddenDescriptor"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    "SECRET_KEY": "",
+    "DJFS": {
+            "type": "s3fs",
+            "bucket": "test",
+            "prefix": "test",
+            "aws_access_key_id": "test",
+            "aws_secret_access_key": "test"
+    },
+    "XQUEUE_INTERFACE": {
+        "basic_auth": [
+            "edx",
+            "edx"
+        ],
+        "django_auth": {
+            "password": "password",
+            "username": "lms"
+        },
+        "url": "** OVERRIDDEN **"
+    },
+    "ZENDESK_API_KEY": "",
+    "ZENDESK_USER": ""
+}

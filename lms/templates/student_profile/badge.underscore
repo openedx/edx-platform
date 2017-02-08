@@ -1,0 +1,30 @@
+<div class="badge-image-container">
+  <img class="badge" src="<%- image_url %>" alt=""/>
+</div>
+<div class="badge-details">
+  <div class="badge-name"><%- badge_class.display_name %></div>
+  <p class="badge-description"><%- badge_class.description %></p>
+  <% if (ownProfile) { %>
+    <button class="share-button">
+      <div class="share-icon-container">
+        <img class="icon icon-mozillaopenbadges" src="<%- badgeMeta.badges_icon %>" alt="<%-
+          interpolate(
+            // Translators: display_name is the name of an OpenBadges award.
+            gettext('Share your "%(display_name)s" award'),
+            {'display_name': badge_class.display_name},
+            true
+          )%>">
+      </div>
+      <div class="share-prefix" aria-hidden="true"><%- gettext("Share") %></div>
+    </div>
+  <% } %>
+  <div class="badge-date-stamp">
+    <%-
+      interpolate(
+        // Translators: Date stamp for earned badges. Example: Earned December 3, 2015.
+        gettext('Earned %(created)s.'),
+        {created: created.format('LL')},
+        true
+      )
+    %></div>
+</div>

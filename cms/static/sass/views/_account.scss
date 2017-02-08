@@ -1,0 +1,245 @@
+// studio - views - sign up/in
+// ====================
+
+.view-signup,
+.view-signin,
+.view-util {
+
+  .wrapper-content {
+    margin: ($baseline*1.5) 0 0 0;
+    padding: 0 $baseline;
+    position: relative;
+    width: 100%;
+  }
+
+  .content {
+    @include clearfix();
+    @extend %t-copy-base;
+    max-width: $fg-max-width;
+    min-width: $fg-min-width;
+    width: flex-grid(12);
+    margin: 0 auto;
+    color: $gray-d2;
+
+    header {
+      position: relative;
+      margin-bottom: $baseline;
+      border-bottom: 1px solid $gray-l4;
+      padding-bottom: ($baseline/2);
+
+      h1 {
+        @extend %t-title3;
+        @extend %t-strong;
+        margin: 0;
+        padding: 0;
+      }
+
+      .action {
+        @extend %t-action3;
+        position: absolute;
+        @include right(0);
+        top: 40%;
+      }
+    }
+
+    .introduction {
+      @extend %t-copy-sub1;
+      margin: 0 0 $baseline 0;
+    }
+  }
+
+  .content-primary, .content-supplementary {
+    @include box-sizing(border-box);
+  }
+
+  .content-primary {
+    @extend .ui-col-wide;
+
+    form {
+      @include box-sizing(border-box);
+      box-shadow: 0 1px 2px $shadow-l1;
+      border-radius: 2px;
+      width: 100%;
+      border: 1px solid $gray-l2;
+      padding: $baseline ($baseline*1.5);
+      background: $white;
+
+      .form-actions {
+        margin-top: $baseline;
+
+        .action-primary {
+          @include blue-button();
+          @include transition(all $tmg-f3 linear 0s);
+          @extend %t-action2;
+          @extend %t-strong;
+          display: block;
+          width: 100%;
+          padding: ($baseline*0.75) ($baseline/2);
+          text-transform: uppercase;
+        }
+      }
+
+      .list-input {
+        @extend %cont-no-list;
+
+        .field {
+          margin: 0 0 ($baseline*0.75) 0;
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+
+          &.required {
+
+            label {
+              @extend %t-strong;
+            }
+
+            label:after {
+              margin-left: ($baseline/4);
+              content: "*";
+            }
+          }
+
+          label, input, textarea {
+            display: block;
+          }
+
+          label {
+            @extend %t-copy-sub1;
+            @include transition(color $tmg-f3 ease-in-out 0s);
+            margin: 0 0 ($baseline/4) 0;
+
+            &.is-focused {
+              color: $blue;
+            }
+          }
+
+          input, textarea {
+            @extend %t-copy-base;
+            height: 100%;
+            width: 100%;
+            padding: ($baseline/2);
+
+            &.long {
+              width: 100%;
+            }
+
+            &.short {
+              width: 25%;
+            }
+
+            ::-webkit-input-placeholder {
+               color: $gray-l4;
+            }
+
+            :-moz-placeholder {
+               color: $gray-l3;
+            }
+
+            ::-moz-placeholder {
+               color: $gray-l3;
+            }
+
+            :-ms-input-placeholder {
+               color: $gray-l3;
+            }
+
+            &:focus {
+
+              + .tip {
+                color: $gray-d1;
+              }
+            }
+          }
+
+          textarea.long {
+            height: ($baseline*5);
+          }
+
+          input[type="checkbox"] {
+            display: inline-block;
+            margin-right: ($baseline/4);
+            width: auto;
+            height: auto;
+
+            & + label {
+              display: inline-block;
+            }
+          }
+
+          .tip {
+            @extend %t-copy-sub2;
+            @include transition(color $tmg-f3 ease-in-out 0s);
+            display: block;
+            margin-top: ($baseline/4);
+            color: $gray-d1;
+          }
+        }
+
+        .field-group {
+          @include clearfix();
+          margin: 0 0 ($baseline/2) 0;
+
+          .field {
+            display: block;
+            width: 47%;
+            border-bottom: none;
+            margin: 0 $baseline 0 0;
+            padding-bottom: 0;
+
+            &:nth-child(odd) {
+              float: left;
+            }
+
+            &:nth-child(even) {
+              float: right;
+              margin-right: 0;
+            }
+
+            input, textarea {
+              width: 100%;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .content-supplementary {
+    @extend .ui-col-narrow;
+
+    .bit {
+      @extend %t-copy-sub1;
+      margin: 0 0 $baseline 0;
+      border-bottom: 1px solid $gray-l4;
+      padding: 0 0 $baseline 0;
+      color: $gray-d1;
+
+      &:last-child {
+        margin-bottom: 0;
+        border: none;
+        padding-bottom: 0;
+      }
+
+      h3 {
+        @extend %t-title7;
+        @extend %t-strong;
+        margin: 0 0 ($baseline/4) 0;
+        color: $gray-d2;
+      }
+
+    }
+  }
+
+  #field-password {
+    position: relative;
+
+    .action-forgotpassword {
+      @extend %t-action3;
+      position: absolute;
+      top: 0;
+      @include right(0);
+    }
+  }
+}

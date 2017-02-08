@@ -1,0 +1,192 @@
+.wrapper-course-material {
+  @include clearfix();
+  @include box-sizing(border-box);
+  @extend %ui-print-excluded;
+
+  border-bottom: none;
+  margin: 0 auto 0;
+  padding: 0;
+  width: 100%;
+
+  .course-material{
+    @extend %inner-wrapper;
+  }
+
+  .course-tabs {
+    @include border-top-radius(4px);
+    @include clearfix();
+    padding: ($baseline*0.75) 0 ($baseline*0.75) 0;
+
+    li {
+      display: inline-block;
+      list-style: none;
+
+      &.prominent {
+        @include margin-right(16px);
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 3px;
+      }
+
+      &.prominent + li {
+        @include padding-left($baseline*0.75);
+        @include border-left(1px solid $gray-d3);
+      }
+
+      a,
+      a:visited {
+        @include padding(($baseline/2), ($baseline*0.75), 13px, ($baseline*0.75));
+        @extend %t-title7;
+        @extend %t-regular;
+        color: $gray-d1;
+        display: block;
+        text-align: center;
+        text-decoration: none;
+        border-bottom: 4px solid transparent;
+
+        &:hover,
+        &:focus,
+        &.active {
+          color: $uxpl-blue-hover-active;
+          border-bottom-color: $uxpl-blue-hover-active;
+        }
+      }
+    }
+  }
+}
+
+.course-content {
+  margin-top: ($baseline*1.5);
+
+  .courseware {
+    min-height: 300px;
+  }
+}
+
+.header-global.slim {
+  box-shadow: 0 1px 2px $shadow-l1;
+  height: auto;
+  padding: ($baseline/4) 0 ($baseline/2) 0;
+  border-bottom: 1px solid $outer-border-color;
+  background: $header-bg;
+
+  .wrapper-header {
+    padding-top: ($baseline/4);
+  }
+
+  .nav-account-management {
+    padding: 0;
+  }
+
+  .guest .secondary {
+    @include margin-right(0);
+  }
+
+  .guest .secondary a {
+    display: none;
+
+    &#login {
+      display: block;
+      @include background-image(linear-gradient(-90deg, lighten($link-color, 8%), lighten($link-color, 5%) 50%, $link-color 50%, darken($link-color, 10%) 100%));
+      border: 1px solid transparent;
+      border-color: $uxpl-blue-base;
+      border-radius: 3px;
+      @include box-sizing(border-box);
+      box-shadow: 0 1px 0 0 rgba(255,255,255, 0.6);
+      color: $white;
+      display: inline-block;
+      font-family: $sans-serif;
+      font-size: 14px;
+      font-weight: bold;
+      display: inline-block;
+      letter-spacing: 0;
+      line-height: 1em;
+      margin: 4px;
+      padding: 6px 12px 8px;
+      text-decoration: none;
+      text-transform: none;
+      text-shadow: 0 -1px rgba(0, 0, 0, 0.6);
+      vertical-align: middle;
+
+      &:hover, &:active, &:focus {
+        @include background-image(linear-gradient(-90deg, $uxpl-blue-base, $uxpl-blue-base 50%, $uxpl-blue-base 50%, $uxpl-blue-base 100%));
+      }
+    }
+  }
+
+  nav {
+    padding-top: ($baseline/4);
+  }
+
+  h1.logo {
+    margin: 0 ($baseline/2) 0 0;
+    @include padding-right(20px);
+
+    &:before {
+      @extend %faded-vertical-divider;
+      content: "";
+      display: block;
+      height: 35px;
+      position: absolute;
+      @include right(3px);
+      top: 0;
+      width: 1px;
+    }
+
+    &:after {
+      @extend %faded-vertical-divider-light;
+      content: "";
+      display: block;
+      height: 35px;
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: 1px;
+    }
+
+    img {
+      height: 30px;
+      width: auto;
+    }
+  }
+
+  .nav-main,
+  .nav-global {
+    display: none;
+  }
+
+  h2 {
+    display: block;
+    width: 65%;
+    @include float(left);
+    font-size: 0.9em;
+    font-weight: 600;
+    color: $lighter-base-font-color;
+    letter-spacing: 0;
+    margin-top: 9px;
+    margin-bottom: 0;
+    text-transform: none;
+    text-shadow: 0 1px 0 #fff;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+
+    .provider {
+      font: inherit;
+      font-weight: bold;
+    }
+  }
+
+  a#signup {
+    position: relative;
+    margin-top: 3px;
+    padding: 6px 12px 8px;
+    text-transform: none;
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 0;
+  }
+
+  @media print {
+    background: transparent !important;
+  }
+}

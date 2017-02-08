@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<problem>
+  <p>
+    <h1>Finger Exercise 1</h1>
+  </p>
+  <p>
+Here are two definitions: </p>
+  <ol class="enumerate">
+    <li>
+      <p>
+Declarative knowledge refers to statements of fact. </p>
+    </li>
+    <li>
+      <p>
+Imperative knowledge refers to 'how to' methods. </p>
+    </li>
+  </ol>
+  <p>
+Which of the following choices is correct? </p>
+  <ol class="enumerate">
+    <li>
+      <p>
+Statement 1 is true, Statement 2 is false </p>
+    </li>
+    <li>
+      <p>
+Statement 1 is false, Statement 2 is true </p>
+    </li>
+    <li>
+      <p>
+Statement 1 and Statement 2 are both false </p>
+    </li>
+    <li>
+      <p>
+Statement 1 and Statement 2 are both true </p>
+    </li>
+  </ol>
+  <p>
+    <symbolicresponse answer="4">
+      <textline size="90" math="1"/>
+    </symbolicresponse>
+  </p>
+</problem>
