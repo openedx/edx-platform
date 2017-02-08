@@ -6,13 +6,17 @@
 from django.utils.translation import ugettext as _
 %>
 
-<section class="course-outline" id="course-outline">
-    <ul>
+<%static:require_module_async module_name="js/courseware/course_outline_factory" class_name="CourseOutlineFactory">
+    CourseOutlineFactory('.block-tree');
+</%static:require_module_async>
+
+<section class="course-outline" id="main">
+    <ul class="block-tree" role="tree">
         % for section in blocks.get('children') or []:
-            <li>${ section['display_name'] }</li>
-            <ul>
+            <li class="outline-item focusable" role="treeitem" tabindex="0" aria-expanded="true">${ section['display_name'] }</li>
+            <ul class="outline-item focusable" role="group" tabindex="0">
                 % for subsection in section.get('children') or []:
-                    <li>${ subsection['display_name'] }</li>
+                    <li class="outline-item focusable" role="treeitem" tabindex="0" aria-expanded="true">${ subsection['display_name'] }</li>
                 % endfor
             </ul>
         % endfor
