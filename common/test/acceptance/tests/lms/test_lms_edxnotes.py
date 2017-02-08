@@ -274,6 +274,7 @@ class EdxNotesDefaultInteractionsTest(EdxNotesTestMixin):
         components = self.note_unit_page.components
         self.assert_notes_are_removed(components)
 
+    @flaky #TODO: fix this, see TNL-6494
     def test_can_create_note_with_tags(self):
         """
         Scenario: a user of notes can define one with tags
