@@ -1,7 +1,6 @@
 """
 Courseware views functions
 """
-
 import json
 import logging
 import urllib
@@ -77,7 +76,7 @@ from courseware.models import StudentModule, BaseStudentModuleHistory
 from courseware.url_helpers import get_redirect_url, get_redirect_url_for_global_staff
 from courseware.user_state_client import DjangoXBlockUserStateClient
 from edxmako.shortcuts import render_to_response, render_to_string, marketing_link
-from openedx.core.djangoapps.catalog.utils import get_programs_with_type
+from openedx.core.djangoapps.catalog.utils import get_programs, get_programs_with_type
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.coursetalk.helpers import inject_coursetalk_keys_into_context
 from openedx.core.djangoapps.credit.api import (
@@ -85,6 +84,7 @@ from openedx.core.djangoapps.credit.api import (
     is_user_eligible_for_credit,
     is_credit_course
 )
+from openedx.core.djangoapps.programs.utils import ProgramMarketingDataExtender
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from shoppingcart.utils import is_shopping_cart_enabled
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
@@ -767,6 +767,22 @@ def course_about(request, course_id):
         inject_coursetalk_keys_into_context(context, course_key)
 
         return render_to_response('courseware/course_about.html', context)
+
+
+@ensure_csrf_cookie
+@cache_if_anonymous()
+def program_marketing(request, program_uuid):
+    """
+    Display the program marketing page.
+    """
+    program_data = get_programs(uuid=program_uuid)
+
+    if not program_data:
+        raise Http404
+
+    return render_to_response('courseware/program_marketing.html', {
+        'program': ProgramMarketingDataExtender(program_data, request.user).extend()
+    })
 
 
 @transaction.non_atomic_requests
