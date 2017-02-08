@@ -313,7 +313,7 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
                     'content': rendered_child.content,
                 })
 
-        fragment.add_content(self.system.render_template('vert_module.html', {
+        fragment.add_content(self.system.render_template('arbisoft_entrance_exam.html', {
             'items': contents,
             'xblock_context': context,
             'show_bookmark_button': False,
