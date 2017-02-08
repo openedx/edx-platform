@@ -93,6 +93,8 @@ class AcceptanceTest(TestSuite):
         report_file = self.report_dir / "{}.xml".format(self.system)
         report_args = ["--xunit-file {}".format(report_file)]
         return [
+            # set DBUS_SESSION_BUS_ADDRESS to avoid hangs on Chrome
+            "DBUS_SESSION_BUS_ADDRESS=/dev/null",
             "DEFAULT_STORE={}".format(self.default_store),
             "./manage.py",
             self.system,
