@@ -254,10 +254,6 @@ FEATURES = {
     # Set to True to change the course sorting behavior by their start dates, latest first.
     'ENABLE_COURSE_SORTING_BY_START_DATE': True,
 
-    # When set to True, a list of programs is displayed along with the list of courses
-    # when the user visits the homepage or the find courses page.
-    'DISPLAY_PROGRAMS_ON_MARKETING_PAGES': False,
-
     # Expose Mobile REST API. Note that if you use this, you must also set
     # ENABLE_OAUTH2_PROVIDER to True
     'ENABLE_MOBILE_REST_API': False,

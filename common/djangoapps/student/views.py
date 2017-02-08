@@ -123,7 +123,7 @@ import newrelic_custom_metrics
 # Note that this lives in LMS, so this dependency should be refactored.
 from notification_prefs.views import enable_notifications
 
-from openedx.core.djangoapps.catalog.utils import get_programs_with_type_logo
+from openedx.core.djangoapps.catalog.utils import get_programs_with_type
 from openedx.core.djangoapps.credit.email_utils import get_credit_provider_display_names, make_providers_strings
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
@@ -211,13 +211,15 @@ def index(request, extra_context=None, user=AnonymousUser()):
     # Insert additional context for use in the template
     context.update(extra_context)
 
-    # Getting all the programs from course-catalog service. The programs_list is being added to the context but it's
-    # not being used currently in lms/templates/index.html. To use this list, you need to create a custom theme that
-    # overrides index.html. The modifications to index.html to display the programs will be done after the support
-    # for edx-pattern-library is added.
-    if configuration_helpers.get_value("DISPLAY_PROGRAMS_ON_MARKETING_PAGES",
-                                       settings.FEATURES.get("DISPLAY_PROGRAMS_ON_MARKETING_PAGES")):
-        programs_list = get_programs_with_type_logo()
+    # Get the active programs of the type configured for the current site from the catalog service. The programs_list
+    # is being added to the context but it's not being used currently in courseware/courses.html. To use this list,
+    # you need to create a custom theme that overrides courses.html. The modifications to courses.html to display the
+    # programs will be done after the support for edx-pattern-library is added.
+    program_types = configuration_helpers.get_value('ENABLED_PROGRAM_TYPES')
+
+    # Do not add programs to the context if there are no program types enabled for the site.
+    if program_types:
+        programs_list = get_programs_with_type(program_types)
 
     context["programs_list"] = programs_list
 

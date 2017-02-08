@@ -5,6 +5,7 @@ import datetime
 from urlparse import urljoin
 
 from django.conf import settings
+from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.utils.functional import cached_property
 from opaque_keys.edx.keys import CourseKey
@@ -15,9 +16,9 @@ from lms.djangoapps.certificates import api as certificate_api
 from lms.djangoapps.commerce.utils import EcommerceService
 from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.lib.edx_api_utils import get_edx_api_data
 from student.models import CourseEnrollment
 from util.date_utils import strftime_localized
+from xmodule.modulestore.django import modulestore
 
 
 # The datetime module's strftime() methods require a year >= 1900.
@@ -247,9 +248,12 @@ class ProgramDataExtender(object):
         self.course_overview = None
         self.enrollment_start = None
 
-    def extend(self):
+    def extend(self, include_instructors=False):
         """Execute extension handlers, returning the extended data."""
-        self._execute('_extend')
+        if include_instructors:
+            self._execute('_extend')
+        else:
+            self._execute('_extend_course_runs')
         return self.data
 
     def _execute(self, prefix, *args):
@@ -260,6 +264,9 @@ class ProgramDataExtender(object):
     def _handlers(cls, prefix):
         """Returns a generator yielding method names beginning with the given prefix."""
         return (name for name in cls.__dict__ if name.startswith(prefix))
+
+    def _extend_with_instructors(self):
+        self._execute('_attach_instructors')
 
     def _extend_course_runs(self):
         """Execute course run data handlers."""
@@ -326,3 +333,32 @@ class ProgramDataExtender(object):
                 run_mode['upgrade_url'] = None
         else:
             run_mode['upgrade_url'] = None
+
+    def _attach_instructors(self):
+        """
+        Extend the program data with instructor data. The instructor data added here is persisted
+        on each course in modulestore and can be edited in Studio. Once the course metadata publisher tool
+        supports the authoring of course instructor data, we will be able to migrate course
+        instructor data into the catalog, retrieve it via the catalog API, and remove this code.
+        """
+        cache_key = 'program.instructors.{uuid}'.format(
+            uuid=self.data['uuid']
+        )
+        program_instructors = cache.get(cache_key)
+        if not program_instructors:
+            instructors_by_name = {}
+            module_store = modulestore()
+            for course in self.data['courses']:
+                for course_run in course['course_runs']:
+                    course_run_key = CourseKey.from_string(course_run['key'])
+                    course_descriptor = module_store.get_course(course_run_key)
+                    if course_descriptor:
+                        course_instructors = getattr(course_descriptor, 'instructor_info', {})
+                        # Deduplicate program instructors using instructor name
+                        instructors_by_name.update({instructor.get('name'): instructor for instructor
+                                                    in course_instructors.get('instructors', [])})
+
+            program_instructors = instructors_by_name.values()
+            cache.set(cache_key, program_instructors, 3600)
+
+        self.data['instructors'] = program_instructors
