@@ -1,6 +1,5 @@
 <%page expression_filter="h"/>
 <%inherit file="../main.html" />
-<%namespace name='static' file='static_content.html'/>
 <%!
 from datetime import datetime
 from django.utils.translation import ugettext as _
@@ -305,45 +304,7 @@ from openedx.core.djangolib.markup import HTML, Text
                                 </div>
                             </div>
                         </div>
-                        <div class="accordion-item">
-                            ## <div class="accordion-head">${program['type']['faq']['question']}</div>
-                            <div class="accordion-head">QUESTION</div>
-                            <div class="accordion-content">
-                                <p>ANSWER</p>
-                                <div class="vertical-icon-list">
-                                    <div class="list-item">
-                                        <div class="icon-container">
-                                            <img src="${static.url('images/programs/img-1.png')}"/>
-                                        </div>
-                                        <small>Choose Your Program</small>
-                                    </div>
-                                    <div class="list-item">
-                                        <div class="icon-container">
-                                            <img src="${static.url('images/programs/img-2.png')}"/>
-                                        </div>
-                                        <small>Learn Great Things at Your Own Place</small>
-                                    </div>
-                                    <div class="list-item">
-                                        <div class="icon-container">
-                                            <img src="${static.url('images/programs/img-3.png')}"/>
-                                        </div>
-                                        <small>Earn a valuable Credntial</small>
-                                    </div>
-                                    <div class="list-item">
-                                        <div class="icon-container">
-                                            <img src="${static.url('images/programs/img-4.png')}"/>
-                                        </div>
-                                        <small>Advance Your Career</small>
-                                    </div>
-                                    <div class="list-item">
-                                        <div class="icon-container">
-                                            <img src="${static.url('images/programs/img-5.png')}"/>
-                                        </div>
-                                        <small>Or Purchase a Full Master's Degree</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <%include file="_program_faq.html" />
                         <div class="accordion-item">
                             <div class="accordion-head">FAQ</div>
                             <div class="accordion-content">
