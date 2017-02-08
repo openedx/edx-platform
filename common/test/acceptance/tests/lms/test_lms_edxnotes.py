@@ -1061,6 +1061,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         self.assertNotIn(u"Search Results", self.notes_page.tabs)
         self.assertEqual(len(self.notes_page.notes), 5)
 
+    @flaky #TODO: fix this, see TNL-6493
     def test_open_note_when_accessed_from_notes_page(self):
         """
         Scenario: Ensure that the link to the Unit opens a note only once.
