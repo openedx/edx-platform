@@ -5,6 +5,7 @@
 <%!
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
+from openedx.core.djangolib.markup import HTML
 %>
 <%block name="bodyclass">view-in-course view-instructordash</%block>
 
@@ -63,6 +64,19 @@ from django.core.urlresolvers import reverse
   <script type="text/javascript" src="${static.url('js/views/notification.js')}"></script>
   <script type="text/javascript" src="${static.url('js/views/file_uploader.js')}"></script>
   <script type="text/javascript" src="${static.url('js/utils/animation.js')}"></script>
+  % for section_data in sections:
+    % if 'fragment' in section_data:
+      ${HTML(section_data['fragment'].head_html())}
+    % endif
+  % endfor
+</%block>
+
+<%block name="js_extra">
+  % for section_data in sections:
+    % if 'fragment' in section_data:
+      ${HTML(section_data['fragment'].foot_html())}
+    % endif
+  % endfor
 </%block>
 
 ## Include Underscore templates
