@@ -74,6 +74,9 @@ CELERY_RESULT_BACKEND = 'djcelery.backends.cache:CacheBackend'
 BROKER_HEARTBEAT = 10.0
 BROKER_HEARTBEAT_CHECKRATE = 2
 
+# Message expiry time in seconds, Default is 5 seconds
+CELERY_EVENT_QUEUE_TTL = 10
+
 # Each worker should only fetch one message at a time
 CELERYD_PREFETCH_MULTIPLIER = 1
 
