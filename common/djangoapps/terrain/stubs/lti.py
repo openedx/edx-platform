@@ -194,7 +194,7 @@ class StubLtiHandler(StubHttpRequestHandler):
                     <input type="submit" name="submit-button" value="Submit" id="submit-button">
                 </form>
                 <form action="{submit_url}/lti2_outcome" method="post">
-                    <input type="submit" name="submit-lti2-button" value="Submit" id="submit-lti-button">
+                    <input type="submit" name="submit-lti2-button" value="Submit" id="submit-lti2-button">
                 </form>
                 <form action="{submit_url}/lti2_delete" method="post">
                     <input type="submit" name="submit-lti2-delete-button" value="Submit" id="submit-lti-delete-button">
