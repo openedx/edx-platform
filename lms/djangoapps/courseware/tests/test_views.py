@@ -8,6 +8,7 @@ import ddt
 import json
 import itertools
 import unittest
+from uuid import uuid4
 from datetime import datetime, timedelta
 from HTMLParser import HTMLParser
 from nose.plugins.attrib import attr
@@ -61,8 +62,12 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
+from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory, CourseRunFactory
+from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.credit.api import set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
+from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 
 
 @attr(shard=1)
@@ -968,6 +973,47 @@ class ViewsTestCase(ModuleStoreTestCase):
         ]
         for test in test_responses:
             self.assertContains(response, test)
+
+
+@attr(shard=2)
+@patch('openedx.core.djangoapps.catalog.utils.get_edx_api_data')
+class TestProgramMarketingView(ProgramsApiConfigMixin, CatalogIntegrationMixin, SharedModuleStoreTestCase):
+    """Unit tests for the program marketing page."""
+    program_uuid = str(uuid4())
+    url = reverse('program_marketing_view', kwargs={'program_uuid': program_uuid})
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestProgramMarketingView, cls).setUpClass()
+
+        modulestore_course = CourseFactory()
+        course_run = CourseRunFactory(key=unicode(modulestore_course.id))  # pylint: disable=no-member
+        course = CatalogCourseFactory(course_runs=[course_run])
+
+        cls.data = ProgramFactory(uuid=cls.program_uuid, courses=[course])
+
+    def test_404_if_no_data(self, _mock_get_edx_api_data):
+        """
+        Verify that the page 404s if no program data is found.
+        """
+        self.create_programs_config()
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_200(self, mock_get_edx_api_data):
+        """
+        Verify the view returns a 200.
+        """
+        self.create_programs_config()
+
+        catalog_integration = self.create_catalog_integration()
+        UserFactory(username=catalog_integration.service_username)
+
+        mock_get_edx_api_data.return_value = self.data
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
 
 
 @attr(shard=1)
