@@ -6,6 +6,7 @@ from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.db.models import BooleanField
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
+from request_cache.middleware import request_cached
 
 
 class PersistentGradesEnabledFlag(ConfigurationModel):
@@ -19,6 +20,7 @@ class PersistentGradesEnabledFlag(ConfigurationModel):
     enabled_for_all_courses = BooleanField(default=False)
 
     @classmethod
+    @request_cached
     def feature_enabled(cls, course_id=None):
         """
         Looks at the currently active configuration model to determine whether
