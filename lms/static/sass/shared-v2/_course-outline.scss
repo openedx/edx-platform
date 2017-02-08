@@ -1,0 +1,44 @@
+.course-outline {
+  color: $lms-gray;
+
+  ul {
+    margin: 0 $baseline;
+    list-style: none;
+
+    > ul {
+      @include margin-left($baseline / 2);
+    }
+
+    li.section-name {
+      @include padding($baseline * 0.75, $baseline * 0.75, $baseline * 0.75, $baseline / 4);
+      background-color: $lms-background-color;
+      border-top: 1px solid $lms-border-color;
+    }
+
+    ul.outline-item {
+      @include margin-left($baseline);
+      padding-bottom: ($baseline / 2);
+
+      li {
+
+        a {
+          padding: ($baseline / 4) ($baseline * 1.5);
+          display: block;
+
+          &:hover {
+            background-color: $lms-background-color;
+            text-decoration: none;
+          }
+        }
+      }
+    }
+
+    .icon {
+      margin: 0 ($baseline * 0.75);
+      position: relative;
+      top: -2px;
+      font-size: 12px;
+    }
+  }
+
+}
