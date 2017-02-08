@@ -207,12 +207,12 @@ from openedx.core.djangolib.markup import HTML, Text
                         <button type="button" class="btn-brand hidden-sm">Start the ${program['type']['name']} Program</button>
                     </div>
                     <div class="col col-12 md-col-4 lg-col-3" id="course-trailer">
-                        <a href="#!" class="trailer-link visible-sm">
+                        <a href="#video-modal" class="media trailer-link visible-sm" rel="leanModal">
                             <i class="fa fa-play-circle-o" aria-hidden="true"></i>
                             <span>View Course Trailer</span>
                         </a>
                         <div class="hidden-sm">
-                            <a href="#!" class="btn-play">
+                            <a href="#video-modal" class="media btn-play" rel="leanModal">
                                 <img src="${static.url('images/programs/btn-play.png')}" alt="Play"/>
                             </a>
                         </div>
@@ -431,6 +431,14 @@ from openedx.core.djangolib.markup import HTML, Text
             </div>
             <span class="pagingInfo"></span>
         </div>
+
+    <section id="video-modal" class="modal modal-custom custom-video-modal">
+      <div class="inner-wrapper">
+        <iframe title="YouTube Video" width="640" height="360"
+                src="https://www.youtube.com/embed/${program.get('video').get('src')}?showinfo=0"
+                frameborder="0" allowfullscreen></iframe>
+      </div>
+    </section>
 
     </div> <!-- Program Details Page end -->
 

@@ -868,3 +868,35 @@ h1, h2, h3, h4, h5, h6{
 .ui-state-default .ui-icon {
     display: none;
 }
+
+//Modals
+.modal {
+  border-radius: 0px !important;
+  background: #FFFFFF !important;
+
+  .inner-wrapper {
+    padding: 0px !important;
+    border: none !important;
+  }
+}
+.modal-custom {
+  width: 320px;
+  background-color: $white;
+  padding: 30px 30px;
+  position: fixed !important;
+  overflow: auto;
+  overflow-x: hidden;
+  top: 10%;
+  bottom: 10%;
+  left: calc(50% - 160px) !important;
+  margin-left: 0 !important;
+  z-index: 999;
+  &.custom-video-modal {
+    padding: 10px;
+    max-height: 360px;
+    .inner-wrapper, iframe {
+      height: 100%;
+      width: 100%;
+    }
+  }
+ }
