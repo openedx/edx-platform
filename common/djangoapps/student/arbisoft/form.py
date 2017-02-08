@@ -1,6 +1,4 @@
 from django import forms
-from django.forms.extras import SelectDateWidget
-from django.forms.widgets import TextInput
 from student.models import (
     CandidateProfile,
     CandidateExpertise,
