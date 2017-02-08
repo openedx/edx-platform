@@ -24,6 +24,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey, CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from requests.auth import HTTPBasicAuth
+from track import contexts
 from xblock.core import XBlock
 from xblock.django.request import django_to_webob_request, webob_to_django_response
 from xblock.exceptions import NoSuchHandlerError, NoSuchViewError
@@ -476,13 +477,16 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
                 only_if_higher=event.get('only_if_higher'),
             )
         else:
-            aside_context = {}
+            context = contexts.course_context_from_course_id(course_id)
+            if block.runtime.user_id:
+                context['user_id'] = block.runtime.user_id
+            context['asides'] = {}
             for aside in block.runtime.get_asides(block):
                 if hasattr(aside, 'get_event_context'):
                     aside_event_info = aside.get_event_context(event_type, event)
                     if aside_event_info is not None:
-                        aside_context[aside.scope_ids.block_type] = aside_event_info
-            with tracker.get_tracker().context('asides', {'asides': aside_context}):
+                        context['asides'][aside.scope_ids.block_type] = aside_event_info
+            with tracker.get_tracker().context(event_type, context):
                 track_function(event_type, event)
 
     def rebind_noauth_module_to_user(module, real_user):
