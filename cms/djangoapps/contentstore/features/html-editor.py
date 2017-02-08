@@ -12,6 +12,7 @@ CODEMIRROR_SELECTOR_PREFIX = "$('iframe').contents().find"
 
 @step('I have created a Blank HTML Page$')
 def i_created_blank_html_page(step):
+    # from nose.tools import set_trace; set_trace()
     step.given('I am in Studio editing a new unit')
     world.create_component_instance(
         step=step,
@@ -229,10 +230,13 @@ def font_selector_dropdown_is_shown(step):
     assert_equal(actual_fonts, expected_fonts)
 
 
-@step('"Default" option sets "(.*)" font family')
-def default_options_sets_expected_font_family(step, expected_font_family):
+@step('"Default" option sets the expected font family')
+def default_options_sets_expected_font_family(step):
     fonts = get_available_fonts(get_fonts_list_panel(world))
-    assert_equal(fonts.get("Default", None), expected_font_family)
+    fonts_found = fonts.get("Default", None)
+    expected_font_family = CUSTOM_FONTS.get('Default')
+    for expected_font in expected_font_family:
+        assert_in(expected_font, fonts_found)
 
 
 @step('all standard tinyMCE fonts should be available')
@@ -263,7 +267,7 @@ TINYMCE_FONTS = OrderedDict([
 ])
 
 CUSTOM_FONTS = OrderedDict([
-    ('Default', "'Open Sans', Verdana, Arial, Helvetica, sans-serif"),
+    ('Default', ['Open Sans', 'Verdana', 'Arial', 'Helvetica', 'sans-serif']),
 ])
 
 
