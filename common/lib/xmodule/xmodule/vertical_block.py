@@ -21,7 +21,7 @@ CLASS_PRIORITY = ['video', 'problem']
 
 
 @XBlock.needs('user')
-@XBlock.needs('bookmarks')
+@XBlock.wants('bookmarks')
 class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParserMixin, MakoTemplateBlockBase, XBlock):
     """
     Layout XBlock for rendering subblocks vertically.
@@ -48,9 +48,13 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
         else:
             child_context = {}
 
+        # import pdb; pdb.set_trace()
         if 'bookmarked' not in child_context:
             bookmarks_service = self.runtime.service(self, 'bookmarks')
-            child_context['bookmarked'] = bookmarks_service.is_bookmarked(usage_key=self.location),  # pylint: disable=no-member
+            if bookmarks_service:
+                child_context['bookmarked'] = bookmarks_service.is_bookmarked(usage_key=self.location),  # pylint: disable=no-member
+            else:
+                child_context['bookmarked'] = False
         if 'username' not in child_context:
             user_service = self.runtime.service(self, 'user')
             child_context['username'] = user_service.get_current_user().opt_attrs['edx-platform.username']
@@ -72,7 +76,7 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
         fragment.add_content(self.system.render_template('vert_module.html', {
             'items': contents,
             'xblock_context': context,
-            'show_bookmark_button': True,
+            'show_bookmark_button': child_context.get('show_bookmark_button', not is_child_of_vertical),
             'bookmarked': child_context['bookmarked'],
             'bookmark_id': "{},{}".format(child_context['username'], unicode(self.location))
         }))
