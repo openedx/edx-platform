@@ -52,6 +52,7 @@ $link-color: rgb(26, 161, 222) !default;
 .sequence-nav {
   // TODO (cpennington): This doesn't work anymore. XModules aren't able to
   // import from external sources.
+  display: none;
   @extend .topbar;
   margin: -4px 0 $baseline;
   position: relative;

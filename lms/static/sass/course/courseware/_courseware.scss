@@ -485,6 +485,10 @@ html.video-fullscreen {
           }
         }
 
+        nav.sequence-nav {
+          display: none;
+        }
+
         nav.sequence-nav ul li.prev {
           left: 4px;
         }
