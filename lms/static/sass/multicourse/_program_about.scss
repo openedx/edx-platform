@@ -1,0 +1,902 @@
+.tbl-view {
+    display: table;
+    width: 100%;
+
+    > .tbl-row {
+        display: table-row;
+    }
+
+    .tbl-col {
+        display: table-cell;
+        vertical-align: top;
+
+        &.col-full-sm {
+            @media (max-width: $mobile) {
+                display: block;
+            }
+        }
+    }
+}
+
+.visible-sm {
+    @media (min-width: $tablet) {
+        display: none !important;
+    }
+}
+
+.hidden-sm {
+    @media (max-width: $mobile) {
+        display: none !important;
+    }
+}
+.content-wrapper{
+    max-width: none !important;
+    padding-top: 0 !important;
+}
+#program-details-page {
+    color: $gray;
+
+    .container {
+        min-width: auto;
+        border: none;
+    }
+
+    > .grid-manual {
+
+        > .row {
+            align-items: stretch;
+
+            [class*='col'] {
+                @media (max-width: $mobile) {
+                    margin: 0 auto;
+                    width: 100%;
+                    padding: 0;
+                }
+            }
+        }
+    }
+
+    .left-col,
+    .right-col {
+        @media (min-width: $tablet) {
+            padding: 0 0 15px;
+        }
+        @media (min-width: $desktop) {
+            padding: 15px 0;
+        }
+    }
+
+    .left-col {
+
+        @media (min-width: $tablet) {
+            border-right: 1px solid #979797;
+            padding-right: 20px;
+        }
+        @media (min-width: $desktop) {
+            padding-right: 50px;
+        }
+    }
+
+    .right-col {
+        @media (min-width: $tablet) {
+            padding-left: 0;
+        }
+        @media (min-width: $desktop) {
+            padding-left: 30px;
+        }
+    }
+
+    .instructors-title {
+        color: #126f9a;
+        font-family: $sans-serif;
+        text-transform: none;
+        letter-spacing: 0px;
+        @media (min-width: $tablet) {
+            margin-top: 5px;
+            font-size: 18px;
+        }
+        @media (min-width: $desktop) {
+            font-size: 22px;
+        }
+        @media (min-width: $desktop-xl) {
+            font-size: 26px;
+        }
+    }
+
+    .instructor-profiles {
+        margin-bottom: 30px;
+
+        .profile-item {
+            @extend .tbl-view;
+            margin-bottom: 30px;
+
+            .avatar,
+            .details {
+                @extend .tbl-col;
+                vertical-align: middle;
+            }
+
+            .avatar {
+                width: 54px;
+                @media (min-width: $tablet) {
+                    width: 60px;
+                }
+
+                .img-holder {
+                    width: 54px;
+                    height: 54px;
+                    border-radius: 50%;
+                    border: 2px solid $blue;
+                    overflow: hidden;
+                    @media (min-width: $tablet) {
+                        width: 60px;
+                        height: 60px;
+                    }
+
+                    img {
+                        max-width: 100%;
+                    }
+                }
+            }
+
+            .details {
+                padding-left: 15px;
+
+                .name {
+                    color: $blue;
+                    font-weight: 600;
+                    font-size: .9em;
+                    margin-bottom: 5px;
+                }
+                .dept {
+                    font-size: .8em;
+                    line-height: 1.5;
+                }
+            }
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
+    }
+}
+
+.vertical-icon-list {
+    background: white;
+    padding: 15px;
+    margin: 0 -15px -15px;
+    width: calc(100% + 30px);
+    @media (min-width: $tablet) {
+        display: table;
+        text-align: center;
+    }
+
+    .list-item {
+        display: table-cell;
+        vertical-align: top;
+        padding: 0 5px;
+        @media (max-width: $mobile) {
+            padding: 0;
+            display: table;
+            width: 100%;
+        }
+
+        .icon-container,
+        small {
+            display: block;
+            @media (max-width: $mobile) {
+                display: table-cell;
+                vertical-align: middle;
+            }
+        }
+
+        .icon-container {
+            margin: auto;
+            height: 40px;
+            position: relative;
+            @media (max-width: $mobile) {
+                width: 30px;
+            }
+            @media (min-width: $desktop) {
+                height: 60px;
+            }
+
+            img {
+                width: 100%;
+                max-width: 50px;
+                height: auto;
+                position: absolute;
+                left: 0;
+                right: 0;
+                top: 0;
+                margin: auto;
+                @media (max-width: $mobile) {
+                    bottom: 0;
+                }
+                @media (min-width: $desktop) {
+                    max-width: 75px;
+                }
+            }
+        }
+
+        small {
+            margin-top: 10px;
+            padding-left: 10px;
+            font-size: .7em;
+            @media (min-width: $tablet) {
+                font-size: .6em;
+                padding-left: 0;
+            }
+            @media (min-width: $desktop) {
+                font-size: .75em;
+            }
+        }
+    }
+}
+.courses-in-program .course-card .tbl-view .tbl-col:first-child{
+    width: 70% !important;
+}
+
+#course-trailer {
+
+    .trailer-link {
+        color: white;
+        font-weight: bold;
+
+        span {
+            text-decoration: underline;
+        }
+
+        &:hover {
+            cursor: pointer;
+        }
+    }
+}
+
+.program-quote {
+    margin-left: 0;
+    margin-right: 0;
+    margin-bottom: 0;
+    line-height: 1.4;
+    font-size: .8em;
+    @media (min-width: $tablet) {
+        line-height: 1.8;
+        font-size: 1em;
+    }
+
+    span {
+        display: block;
+        margin-bottom: 10px;
+        @media (min-width: $tablet) {
+            display: inline;
+        }
+
+        &.writer {
+            font-weight: 600;
+            padding-left: 50px;
+            @media (min-width: $tablet) {
+                padding-left: 0;
+            }
+
+            &:before {
+                @media (min-width: $tablet) {
+                    //content: '&#8212;';
+                    content: '\2014';
+                    margin-right: 3px;
+                    margin-left: 5px;
+                }
+            }
+        }
+    }
+
+    &.visible-mobile {
+        font-size: 1em;
+        line-height: 1.5;
+    }
+}
+
+#accordion-group {
+    font-family: "Open Sans", Arial, Helvetica, sans-serif;
+
+    .accordion-item {
+        border-bottom: 1px solid $blue-dark;
+        .accordion-head {
+            background: #004165;
+            padding: 18px 18px 18px 84px;
+            color: white;
+            border-radius: 0;
+            border: none;
+            margin: 0;
+            font-size: 1.13em;
+            position: relative;
+
+            &:hover,
+            &.active,
+            &:focus{
+                cursor: pointer;
+                outline:0;
+            }
+
+            &:before {
+                content: "\f054";
+                font-family: FontAwesome;
+                position: absolute;
+                left: 44px;
+                top: 20px;
+                width: 18px;
+                height: 22px;
+            }
+
+            &.ui-state-active {
+
+                &:before {
+                    content: "\f078";
+                    left: 40px;
+                }
+            }
+        }
+
+        .accordion-content {
+            display: none;
+            padding: 15px;
+            background: #f6f6f6;
+            border: none;
+
+            p,
+            ul {
+                color: #4a4a4a;
+                font-size: .85em;
+                line-height: 1.5;
+                margin-bottom: 15px;
+
+                &:last-child {
+                    margin-bottom: 0;
+                }
+            }
+
+            p {
+
+                &:last-child {
+                    margin: 0;
+                }
+            }
+
+            ul {
+
+                li {
+                    padding-left: 0 !important;
+                    color: #4a4a4a;
+                }
+            }
+        }
+
+        &.show {
+            .accordion-content {
+                display: block;
+            }
+        }
+
+        &:nth-of-type(2) .accordion-head {
+            background: #004a74;
+        }
+        &:nth-of-type(3) .accordion-head {
+            background: #00527f;
+        }
+        &:nth-of-type(4) .accordion-head {
+            background: #005d91;
+        }
+        &:nth-of-type(5) .accordion-head {
+            background: #016fad;
+        }
+        &:nth-of-type(6) .accordion-head {
+            background: #1878ad;
+        }
+
+        &.instructors-mobile-list {
+            @extend .visible-sm;
+
+            .accordion-content {
+                background: white;
+                padding: 0;
+
+                .instructor-profiles {
+                    margin: 0;
+
+                    .profile-item {
+                        padding: 15px 25px;
+                        margin: 0;
+
+                        .details {
+                            padding-left: 10px;
+
+                            .name {
+                                font-size: .8em;
+                            }
+                            .dept {
+                                font-size: .7em;
+                            }
+                        }
+
+                        &:nth-child(even) {
+                            background: #f0f0f0;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+.course-card {
+    background: white;
+    padding: 10px;
+    margin-bottom: 30px;
+    @include box-shadow(0, 1px, 5px, rgba(0, 0, 0, 0.4));
+    border-radius: 4px;
+    @media (min-width: $tablet) {
+        padding: 20px;
+        border: 1px solid #979797;
+        box-shadow: none;
+        border-radius: 0;
+    }
+
+    .title {
+        color: $blue-dark;
+        margin-bottom: 20px;
+        font-size: 1.1em;
+        text-decoration: underline;
+        @media (min-width: $tablet) {
+            font-size: 1.5em;
+        }
+        @media (min-width: $desktop) {
+            font-size: 2.25rem;
+        }
+
+        small {
+            color: #4a4a4a;
+            display: block;
+            font-size: 0;
+            margin-top: 5px;
+
+            > span {
+                display: inline-block;
+                text-decoration: none;
+                font-size: 0.85rem;
+                @media (min-width: $tablet) {
+                    font-size: 1.15rem;
+                }
+
+                &:first-child {
+                    border-right: 1px solid #4a4a4a;
+                    padding-right: 6px;
+                    margin-right: 6px;
+                    @media (min-width: $tablet) {
+                        padding-right: 10px;
+                        margin-right: 10px;
+                    }
+                }
+            }
+        }
+    }
+
+    p {
+        margin-bottom: 0;
+        font-weight: normal;
+        font-size: 1rem;
+    }
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.courses-in-program {
+    display: block;
+    padding: 20px 0;
+    background: #ececec;
+    margin-top: 15px;
+    @media (min-width: $tablet) {
+        margin-top: 0;
+        background: white;
+        padding: 20px;
+    }
+
+    .slick-track {
+        padding-top: 5px;
+    }
+
+    > .hd {
+        color: $blue-dark;
+        font-size: 20px;
+        padding: 0 1.25rem !important;
+        margin-bottom: 15px;
+        @media (min-width: $tablet) {
+            padding: 0;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        @media (min-width: $desktop) {
+            font-size: 30px;
+        }
+    }
+
+    .course-card {
+        margin-bottom: 20px;
+        min-height: 200px;
+        @media (max-width: $mobile) {
+            min-height: 300px;
+            margin-left: 5px;
+            margin-right: 5px;
+            padding-bottom: 50px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .tbl-view {
+
+            .tbl-col {
+
+                .btn-enroll-now {
+                    position: absolute;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    width: 100%;
+                    border-radius: 0;
+                    line-height: 22px;
+                    background: #0f8012;
+                    @media (min-width: $tablet) {
+                        position: relative;
+                        border: 1px solid #ccc;
+                        max-width: 200px;
+                    }
+                }
+
+                &:first-child {
+                    @media (min-width: $tablet) {
+                        width: 75%;
+                    }
+
+                    p {
+                        @media (min-width: $tablet) {
+                            max-width: 500px;
+                        }
+                    }
+                }
+            }
+        }
+        .btn-enroll-now{
+            width: 100% !important;
+            max-width: 300px !important;
+            min-height: 50px;
+            font-size: 1.33rem;
+            font-weight: bold;
+        }
+    }
+
+    .pagingInfo {
+        display: block;
+        text-align: center;
+    }
+}
+
+/* Custom SCSS */
+h1, h2, h3, h4, h5, h6{
+    font-family: $sans-serif;
+}
+.main-banner {
+    height: 260px;
+    background: $blue-dark;
+    margin-bottom: 20px;
+    position: relative;
+    @media(max-width: $mobile){
+        padding: 0 12px 25px;
+        height: auto;
+    }
+    @media (min-width: $tablet) {
+        height: 333px;
+        margin-bottom: 20px;
+    }
+    @media (min-width: $desktop) {
+        margin-bottom: 50px
+    }
+
+    .btn-play {
+        line-height: 333px;
+        margin: auto;
+        display: block;
+        width: 100px;
+        height: 100px;
+        @media (min-width: $desktop-xl) {
+            width: 150px;
+            height: 150px;
+        }
+    }
+
+    .org-logo {
+        display: inline-block;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 8px;
+        background: rgba(255, 255, 255, .8);
+        @include box-shadow(0, 3px, 4px, rgba(0, 0, 0, 0.5));
+        @media (max-width: $mobile) {
+            margin-bottom: 12px;
+            max-width: 120px;
+            box-shadow: none;
+        }
+        @media (min-width: $tablet) {
+            max-width: 150px;
+        }
+        @media (min-width: $desktop) {
+            max-width: 200px;
+        }
+
+        img {
+            max-width: 100%;
+        }
+        &:after{
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -2px;
+            right: -2px;
+            box-shadow: 0px 1px 3px #333;
+            height: 1px;
+            background: #a1a5a5;
+            z-index: 1;
+        }
+    }
+
+    .banner-title,
+    .banner-description {
+        color: white;
+    }
+
+    .banner-title {
+        font-size: 1.5em;
+        font-weight: 600;
+        text-align: left;
+        letter-spacing: inherit;
+        margin-bottom: 10px;
+        @media (min-width: $tablet) {
+            font-size: 1.9em;
+        }
+        @media (min-width: $desktop) {
+            font-size: 2em;
+        }
+        @media (min-width: $desktop-xl) {
+            font-size: 2.25em;
+        }
+    }
+
+    .banner-description {
+        min-height: 60px;
+        font-size: 1.06em;
+        font-weight: 600;
+        line-height: 1.35;
+        @media (max-width: $mobile) {
+            margin-bottom: 14px;
+            font-weight: normal;
+        }
+        @media (min-width: $tablet) {
+            font-size: 1.1em;
+        }
+        @media (min-width: $desktop) {
+            font-size: 1.25em;
+        }
+    }
+    .grid-manual, .row{
+        @media(max-width: $mobile){
+            display: block;
+        }
+    }
+}
+.pagination {
+    margin: 10px 0 40px;
+    width: 100%;
+    display: block;
+    .pages{
+        width: calc(100% - 120px);
+        text-align: right;
+        display: inline-block;
+    }
+    .controls{
+        text-align: center;
+        display: inline-block;
+        width: 115px;
+        a{
+            display: inline-block;
+            width: 50px;
+            &:first-child{
+                border-right: 1px solid $light-gray2;
+            }
+            .fa{
+                font-size: 1.4rem;
+                color: $border-color;
+            }
+            &.active{
+                .fa{
+                    color: $gray-d2;
+                }
+            }
+        }
+    }
+}
+.grid-container,
+.grid-manual {
+
+    [class*='col-'] {
+    }
+}
+
+.program-desc-tbl {
+    margin-bottom: 20px;
+
+    @extend .tbl-view;
+    border: 1px solid #e3e3e3;
+    border-radius: 6px;
+    @media (min-width: $tablet) {
+        border: 2px solid #126f9a;
+        border-radius: 0;
+        padding: 5px 15px;
+    }
+    @media (min-width: $desktop) {
+        padding: 8px 15px;
+    }
+
+    .item {
+        padding: 10px 10px 12px !important;
+        font-size: .9em;
+        border-color: #d0d0d0;
+        margin: 0;
+        @media (min-width: $tablet) {
+            font-size: 1em;
+            padding: 15px 0 !important;
+        }
+        @media (min-width: $desktop) {
+            font-size: 1.1em;
+            padding: 15px !important;
+        }
+        span,
+        span + a {
+            font-size: 1.024em;
+        }
+
+        > span {
+            @extend .tbl-col;
+            display: block;
+            width: 100%;
+            color: #4a4a4a;
+            line-height: 1.4;
+
+            @media (min-width: $tablet) {
+                display: inline-block;
+                width: 50%;
+            }
+
+            .fa {
+                display: none;
+                margin-right: 25px;
+                font-size: 1.5em;
+                @media (min-width: $desktop) {
+                    display: inline-block;
+                }
+            }
+
+            + a {
+                @media (max-width: $mobile) {
+                    color: #4a4a4a;
+                }
+            }
+
+            &:first-child {
+                color: $blue-dark;
+                margin-bottom: 5px;
+                @media (max-width: $mobile) {
+                    margin-bottom: 0;
+                }
+                font-size: .85em;
+                @media (max-width: $mobile) {
+                    text-transform: uppercase;
+                }
+                @media (min-width: $tablet) {
+                    width: 48%;
+                    color: #4a4a4a;
+                    margin-bottom: 0;
+                    font-size: 1.024em;
+                }
+            }
+        }
+    }
+}
+.data-table{
+    @media(max-width: $mobile){
+        padding: 0 20px;
+    }
+    .list-divided{
+        @media(min-width: $mobile){
+            padding: 0 12px !important;
+        }
+
+        .item{
+            margin-top: 0.625rem;
+            line-height: 1.4em;
+            padding: 15px 15px 19px 25px !important;
+            border-bottom: 1px solid $m-gray-l3 !important;
+            @media (min-width: $tablet) {
+                padding: 15px 0px 19px 0 !important;
+            }
+            @media(max-width: $mobile){
+                margin: 0 !important;
+            }
+            &:last-child{
+                border-bottom: 0 !important;
+            }
+        }
+    }
+}
+
+.faq-links-list {
+
+    li {
+        margin-bottom: 15px;
+
+        a {
+            display: block;
+            position: relative;
+            color: $blue;
+            padding-left: 30px;
+
+            &:before {
+                font-family: FontAwesome;
+                content: "\f105";
+                position: absolute;
+                left: 5px;
+                top: 1px;
+            }
+            & + div {
+                padding: 10px 30px;
+                font-size: 1rem;
+                color: $black;
+            }
+        }
+    }
+
+}
+
+.ui-state-default .ui-icon {
+    display: none;
+}
+
+//Modals
+.modal {
+  border-radius: 0px !important;
+  background: #FFFFFF !important;
+
+  .inner-wrapper {
+    padding: 0px !important;
+    border: none !important;
+  }
+}
+.modal-custom {
+  width: 320px;
+  background-color: $white;
+  padding: 30px 30px;
+  position: fixed !important;
+  overflow: auto;
+  overflow-x: hidden;
+  top: 10%;
+  bottom: 10%;
+  left: calc(50% - 160px) !important;
+  margin-left: 0 !important;
+  z-index: 999;
+  &.custom-video-modal {
+    padding: 10px;
+    max-height: 360px;
+    .inner-wrapper, iframe {
+      height: 100%;
+      width: 100%;
+    }
+  }
+ }
