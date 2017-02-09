@@ -1,2 +1,7 @@
-<h4>Question: <%= index %></h4>
-<iframe src="<%= url %>" onload="resizeIframe(this)"></iframe>
+<h4 class="question-number">Question: <%= index %></h4>
+<div class="vert-mod active-xblock">
+  <div class="vert vert-<%= index %>" data-id="<%= id %>">
+    <%= content %>
+  </div>
+</div>
+

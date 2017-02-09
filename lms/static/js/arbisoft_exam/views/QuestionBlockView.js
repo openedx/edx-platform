@@ -68,11 +68,15 @@
                   }
               },
               _render: function (block) {
-                  var url = "/xblock/" + block.attributes.id;
+                  var displayIndex = this.currentBlockIndex + 1;
+                  
                   $(this.container).html(this.template({
-                      url: url,
-                      index: this.currentBlockIndex + 1
+                      index: displayIndex,
+                      id: block.attributes.id,
+                      content: block.attributes.content
                   }));
+
+                  window.XBlock.initializeBlock($('.vert-' + displayIndex + ' > .xblock'))
               },
               _disableNext: function () {
                    $('button.next').addClass('disabled');
