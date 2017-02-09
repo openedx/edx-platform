@@ -1,3 +1,14 @@
+# When changing the `SECRET_KEY` of an instance, all anonymous user ids change as well.
+# Since #13717 the new anonymous ids are stored in the database in addition to the old
+# ones, so both the old and the new anonymous ids can be inverted.
+#
+# This has the negative side effect that e.g. ORA submissions and grades for the same
+# student are now stored under two different ids, so they don't show up correctly
+# anymore in the web interface. For Open edX installations that are not too big, the
+# problem can be solved by running the management command in this PR, which translates
+# all IDs in the database to the new values.
+#
+# See also https://openedx.atlassian.net/wiki/display/OpenOPS/Update+Your+LMS+and+CMS+SECRET_KEY
 import logging
 
 from django.core.management.base import BaseCommand
@@ -7,6 +18,10 @@ from submissions.models import StudentItem, ScoreAnnotation
 from openassessment.assessment.models import (
     AIGradingWorkflow, Assessment, PeerWorkflow, StaffWorkflow, StudentTrainingWorkflow,
 )
+try:
+    from problem_builder.models import Answer
+except ImportError:
+    Answer = None
 
 
 log = logging.getLogger(__name__)
@@ -43,6 +58,8 @@ class Command(BaseCommand):
             (StudentTrainingWorkflow, 'student_id'),
         ):
             self.update_anonymous_user_ids(model, field_name, anon_ids_map)
+        if Answer:  # If problem builder is installed:
+            self.update_anonymous_user_ids(Answer, 'student_id', anon_ids_map)
 
     @staticmethod
     def generate_anonymous_user_ids():
@@ -105,4 +122,3 @@ class Command(BaseCommand):
 
         log.info('%s.%s: updated %s of %s; %s unchanged; %s errors',
                  model, field_name, updated, total, unchanged, errors)
-
