@@ -28,7 +28,7 @@ class CoursewareTab(EnrolledTab):
     The main courseware view.
     """
     type = 'courseware'
-    title = ugettext_noop('Course')
+    title = ugettext_noop('Test')
     priority = 10
     view_name = 'courseware'
     is_movable = False
