@@ -86,6 +86,7 @@ from student.roles import GlobalStaff
 from util.cache import cache, cache_if_anonymous
 from util.date_utils import strftime_localized
 from util.db import outer_atomic
+from util.enterprise_helpers import consent_needed_for_course, get_course_specific_consent_url
 from util.milestones_helpers import get_prerequisite_courses_display
 from util.views import _record_feedback_in_zendesk
 from util.views import ensure_valid_course_key, ensure_valid_usage_key
@@ -314,6 +315,11 @@ def course_info(request, course_id):
             # self registration. Because only CCX coach can register/enroll a student. If un-enrolled user try
             # to access CCX redirect him to dashboard.
             return redirect(reverse('dashboard'))
+
+        # If the user is sponsored by an enterprise customer, and we still need to get data
+        # sharing consent, redirect to do that first.
+        if consent_needed_for_course(user, course_id):
+            return redirect(get_course_specific_consent_url(request, course_id, 'info'))
 
         # If the user needs to take an entrance exam to access this course, then we'll need
         # to send them to that specific course module before allowing them into other areas
@@ -701,6 +707,11 @@ def _progress(request, course_key, student_id):
 
     course = get_course_with_access(request.user, 'load', course_key, depth=None, check_if_enrolled=True)
     prep_course_for_grading(course, request)
+
+    # If the user is sponsored by an enterprise customer, and we still need to get data
+    # sharing consent, redirect to do that first.
+    if consent_needed_for_course(request.user, unicode(course.id)):
+        return redirect(get_course_specific_consent_url(request, unicode(course.id), 'progress'))
 
     # check to see if there is a required survey that must be taken before
     # the user can access the course.
