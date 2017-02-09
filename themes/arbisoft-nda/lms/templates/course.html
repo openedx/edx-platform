@@ -10,9 +10,15 @@
         tz = pytz.timezone('Asia/Karachi')
         now = datetime.datetime.now(tz=tz)
         td = start - now
-        message = "Test is already end"
+        hours = int(td.seconds // (60 * 60))
+        mins = int((td.seconds // 60) % 60)
+        message = "Test is end"
         if td.days > 0:
-             message = "{days} Days Left".format(days=td.days)
+             message = "Test start in {days} day(s)".format(days=td.days)
+        elif hours > 0:
+             message = "Test start in {hours} hour(s)".format(hours=hours)
+        elif mins > 0:
+             message = "Test start in {mins} min(s)".format(mins=mins)
         return message
 
 %>
