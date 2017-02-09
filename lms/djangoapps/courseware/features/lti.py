@@ -9,6 +9,7 @@ from splinter.exceptions import ElementDoesNotExist
 from selenium.common.exceptions import NoAlertPresentException
 from nose.tools import assert_true, assert_equal, assert_in, assert_is_none
 from lettuce import world, step
+from selenium.webdriver.common.keys import Keys
 
 from courseware.tests.factories import InstructorFactory, BetaTesterFactory
 from courseware.access import has_access
@@ -359,9 +360,19 @@ def click_grade(_step, version):
     location = world.scenario_dict['LTI'].location.html_id()
     iframe_name = 'ltiFrame-' + location
     with world.browser.get_iframe(iframe_name) as iframe:
-        css_loc = '#' + version_map[version]['selector']
+        css_ele = version_map[version]['selector']
+        css_loc = '#' + css_ele
         world.wait_for_visible(css_loc)
+        print 'waiting..'
+        # from nose.tools import set_trace; set_trace()
+        world.wait(8)
+        print 'proceding'
+        # world.css_click(css_loc)
+        # ele = world.css_find(css_loc).first
+        # ele._element.send_keys(Keys.ENTER)
+        # world.browser.execute_script('document.getElementById("{}").click()'.format(css_ele))
         world.css_click(css_loc)
+        # world.css_click(css_loc)
         assert iframe.is_text_present(version_map[version]['expected_text'])
 
 
