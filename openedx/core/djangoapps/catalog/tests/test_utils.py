@@ -15,7 +15,8 @@ from openedx.core.djangoapps.catalog.utils import (
     get_programs,
     munge_catalog_program,
     get_program_types,
-    get_programs_with_type_logo,
+    get_active_programs_list,
+    get_program_details,
 )
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory
@@ -34,11 +35,12 @@ class TestGetPrograms(CatalogIntegrationMixin, TestCase):
 
         self.uuid = str(uuid.uuid4())
         self.type = 'FooBar'
+        self.status = 'active'
         self.catalog_integration = self.create_catalog_integration(cache_ttl=1)
 
         UserFactory(username=self.catalog_integration.service_username)
 
-    def assert_contract(self, call_args, program_uuid=None, type=None):  # pylint: disable=redefined-builtin
+    def assert_contract(self, call_args, program_uuid=None, type=None, status=None):  # pylint: disable=redefined-builtin
         """Verify that API data retrieval utility is used correctly."""
         args, kwargs = call_args
 
@@ -47,9 +49,11 @@ class TestGetPrograms(CatalogIntegrationMixin, TestCase):
 
         self.assertEqual(kwargs['resource_id'], program_uuid)
 
-        cache_key = '{base}.programs{type}'.format(
+        cache_key = '{base}.programs{type}{status}{full_course_serializer}'.format(
             base=self.catalog_integration.CACHE_KEY,
-            type='.' + type if type else ''
+            type='.' + type if type else '',
+            status='.' + status if status else '',
+            full_course_serializer='.' + 'full_course_serializer' if program_uuid else ''
         )
         self.assertEqual(
             kwargs['cache_key'],
@@ -64,6 +68,10 @@ class TestGetPrograms(CatalogIntegrationMixin, TestCase):
         }
         if type:
             querystring['type'] = type
+        if status:
+            querystring['status'] = status
+        if program_uuid:
+            querystring['use_full_course_serializer'] = True
         self.assertEqual(kwargs['querystring'], querystring)
 
         return args, kwargs
@@ -93,6 +101,15 @@ class TestGetPrograms(CatalogIntegrationMixin, TestCase):
         data = get_programs(type=self.type)
 
         self.assert_contract(mock_get_edx_api_data.call_args, type=self.type)
+        self.assertEqual(data, programs)
+
+    def test_get_programs_by_status(self, mock_get_catalog_data):
+        programs = ProgramFactory.create_batch(2)
+        mock_get_catalog_data.return_value = programs
+
+        data = get_programs(status=self.status)
+
+        self.assert_contract(mock_get_catalog_data.call_args, status=self.status)
         self.assertEqual(data, programs)
 
     def test_programs_unavailable(self, mock_get_edx_api_data):
@@ -205,10 +222,10 @@ class TestGetProgramTypes(CatalogIntegrationMixin, TestCase):
         data = get_program_types()
         self.assertEqual(data, program_types)
 
-    def test_get_programs_with_type_logo(self, _mock_get_edx_api_data):
+    def test_get_active_programs_list(self, _mock_get_edx_api_data):
         programs = []
         program_types = []
-        programs_with_type_logo = []
+        programs_with_program_type = []
 
         for index in range(3):
             # Creating the Programs and their corresponding program types.
@@ -219,14 +236,31 @@ class TestGetProgramTypes(CatalogIntegrationMixin, TestCase):
             programs.append(program)
             program_types.append(program_type)
 
-            program_with_type_logo = copy.deepcopy(program)
-            program_with_type_logo['logo_image'] = program_type['logo_image']
-            programs_with_type_logo.append(program_with_type_logo)
+            program_with_type = copy.deepcopy(program)
+            program_with_type['type'] = program_type
+            programs_with_program_type.append(program_with_type)
 
-        with mock.patch('openedx.core.djangoapps.catalog.utils.get_programs') as patched_get_programs:
-            with mock.patch('openedx.core.djangoapps.catalog.utils.get_program_types') as patched_get_program_types:
+        with mock.patch(UTILS_MODULE + '.get_programs') as patched_get_programs:
+            with mock.patch(UTILS_MODULE + '.get_program_types') as patched_get_program_types:
                 patched_get_programs.return_value = programs
                 patched_get_program_types.return_value = program_types
 
-                actual = get_programs_with_type_logo()
-                self.assertEqual(actual, programs_with_type_logo)
+                actual = get_active_programs_list()
+                self.assertEqual(actual, programs_with_program_type)
+
+    def test_program_detail(self, _mock_get_edx_api_data):
+        program = ProgramFactory()
+        program_type = ProgramTypeFactory(name=program['type'])
+
+        program_detail = copy.deepcopy(program)
+        program_detail['type'] = program_type
+
+        with mock.patch(UTILS_MODULE + '.get_programs') as patched_get_programs:
+            with mock.patch(UTILS_MODULE + '.get_program_types') as patched_get_program_types:
+                with mock.patch(UTILS_MODULE + '._get_program_instructors') as patched_get_program_instructors:
+                    patched_get_programs.return_value = program
+                    patched_get_program_types.return_value = [program_type]
+                    patched_get_program_instructors.return_value = {}
+
+                    actual = get_program_details(program['uuid'])
+                    self.assertEqual(actual, program_detail)

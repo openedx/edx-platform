@@ -40,7 +40,7 @@ from lms.djangoapps.instructor.enrollment import uses_shib
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 
-from openedx.core.djangoapps.catalog.utils import get_programs_with_type_logo
+from openedx.core.djangoapps.catalog.utils import get_active_programs_list, get_program_details
 import shoppingcart
 import survey.utils
 import survey.views
@@ -153,7 +153,7 @@ def courses(request):
     # for edx-pattern-library is added.
     if configuration_helpers.get_value("DISPLAY_PROGRAMS_ON_MARKETING_PAGES",
                                        settings.FEATURES.get("DISPLAY_PROGRAMS_ON_MARKETING_PAGES")):
-        programs_list = get_programs_with_type_logo()
+        programs_list = get_active_programs_list()
 
     return render_to_response(
         "courseware/courses.html",
@@ -669,6 +669,29 @@ def course_about(request, course_id):
         inject_coursetalk_keys_into_context(context, course_key)
 
         return render_to_response('courseware/course_about.html', context)
+
+
+@ensure_csrf_cookie
+@cache_if_anonymous()
+def program_detail(request, program_id):
+    """
+    Display the program's detail page.
+
+    Assumes the program_id is in a valid format.
+    """
+    program = get_program_details(program_id)
+
+    if not program:
+        raise Http404
+
+    # TODO: put these keys dynamically
+    for course in program:
+        course_runs = course['course_runs'][0]
+        course_runs['registered'] = False
+        course_runs['can_enroll'] = True
+        course_runs['is_shib_course'] = False
+
+    return render_to_response('courseware/program_details.html', {'program': program})
 
 
 @transaction.non_atomic_requests

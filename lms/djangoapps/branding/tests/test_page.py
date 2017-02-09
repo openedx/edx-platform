@@ -299,19 +299,19 @@ class IndexPageProgramsTests(ModuleStoreTestCase):
         self.client.login(username=self.user.username, password=self.user_password)
 
     @ddt.data(True, False)
-    def test_programs_with_type_logo_called(self, display_programs):
+    def test_active_programs_list_called(self, display_programs):
         with patch.dict('django.conf.settings.FEATURES', {'DISPLAY_PROGRAMS_ON_MARKETING_PAGES': display_programs}):
             views = [
-                (reverse('dashboard'), 'student.views.get_programs_with_type_logo'),
-                (reverse('branding.views.courses'), 'courseware.views.views.get_programs_with_type_logo'),
+                (reverse('dashboard'), 'student.views.get_active_programs_list'),
+                (reverse('branding.views.courses'), 'courseware.views.views.get_active_programs_list'),
             ]
 
             for url, dotted_path in views:
-                with patch(dotted_path) as mock_get_programs_with_type_logo:
+                with patch(dotted_path) as mock_get_active_programs_list:
                     response = self.client.get(url)
                     self.assertEqual(response.status_code, 200)
 
                     if display_programs:
-                        mock_get_programs_with_type_logo.assert_called_once()
+                        mock_get_active_programs_list.assert_called_once()
                     else:
-                        mock_get_programs_with_type_logo.assert_not_called_()
+                        mock_get_active_programs_list.assert_not_called_()
