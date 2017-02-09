@@ -74,9 +74,6 @@ CELERY_RESULT_BACKEND = 'djcelery.backends.cache:CacheBackend'
 BROKER_HEARTBEAT = 10.0
 BROKER_HEARTBEAT_CHECKRATE = 2
 
-# Message expiry time in seconds, Default is 5 seconds
-CELERY_EVENT_QUEUE_TTL = 10
-
 # Each worker should only fetch one message at a time
 CELERYD_PREFETCH_MULTIPLIER = 1
 
@@ -264,6 +261,9 @@ BULK_EMAIL_ROUTING_KEY_SMALL_JOBS = ENV_TOKENS.get('BULK_EMAIL_ROUTING_KEY_SMALL
 
 # Queue to use for updating persistent grades
 RECALCULATE_GRADES_ROUTING_KEY = ENV_TOKENS.get('RECALCULATE_GRADES_ROUTING_KEY', LOW_PRIORITY_QUEUE)
+
+# Message expiry time in seconds
+CELERY_EVENT_QUEUE_TTL = ENV_TOKENS.get('CELERY_EVENT_QUEUE_TTL', None)
 
 # Allow CELERY_QUEUES to be overwritten by ENV_TOKENS,
 ENV_CELERY_QUEUES = ENV_TOKENS.get('CELERY_QUEUES', None)

@@ -65,9 +65,6 @@ CELERY_RESULT_BACKEND = 'djcelery.backends.cache:CacheBackend'
 BROKER_HEARTBEAT = 10.0
 BROKER_HEARTBEAT_CHECKRATE = 2
 
-# Message expiry time in seconds, Default is 5 seconds
-CELERY_EVENT_QUEUE_TTL = 10
-
 # Each worker should only fetch one message at a time
 CELERYD_PREFETCH_MULTIPLIER = 1
 
@@ -365,6 +362,9 @@ BROKER_URL = "{0}://{1}:{2}@{3}/{4}".format(CELERY_BROKER_TRANSPORT,
                                             CELERY_BROKER_HOSTNAME,
                                             CELERY_BROKER_VHOST)
 BROKER_USE_SSL = ENV_TOKENS.get('CELERY_BROKER_USE_SSL', False)
+
+# Message expiry time in seconds
+CELERY_EVENT_QUEUE_TTL = ENV_TOKENS.get('CELERY_EVENT_QUEUE_TTL', None)
 
 # Allow CELERY_QUEUES to be overwritten by ENV_TOKENS,
 ENV_CELERY_QUEUES = ENV_TOKENS.get('CELERY_QUEUES', None)
