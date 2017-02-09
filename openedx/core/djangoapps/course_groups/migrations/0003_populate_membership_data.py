@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 import logging
 from django.db import migrations
+from django.db import import transaction
 
 
 log = logging.getLogger(__name__)
@@ -22,7 +23,8 @@ def forwards(apps, schema_editor):
                 course_id=course_group.course_id
             )
             try:
-                membership.save()
+                with transaction.atomic():
+                    membership.save()
             except Exception:
                 log.info(
                     (
