@@ -94,6 +94,8 @@ class AcceptanceTest(TestSuite):
         report_args = ["--xunit-file {}".format(report_file)]
         return [
             "DBUS_SESSION_BUS_ADDRESS=/dev/null",
+            # 'LANG="en_US.UTF-8"',
+            'LC_NUMERIC="en_US.UTF-8"',
             "DEFAULT_STORE={}".format(self.default_store),
             "./manage.py",
             self.system,

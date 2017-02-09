@@ -81,6 +81,9 @@ def initial_setup(server):
             desired_capabilities['loggingPrefs'] = {
                 'browser': 'ALL',
             }
+            desired_capabilities['chromeOptions'] = {
+                "args": ["--dns-prefetch-disable"]
+            }
         else:
             desired_capabilities = {}
 
