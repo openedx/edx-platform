@@ -444,6 +444,9 @@ class CandidateProfile(models.Model):
     other_studied_course = models.CharField(max_length=255, blank=True, null=True)
     other_technology = models.CharField(max_length=255, blank=True, null=True)
 
+    def __str__(self):
+        return self.user.get_username()
+
 
 class CandidateCourse(models.Model):
     """

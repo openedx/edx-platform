@@ -15,6 +15,7 @@ from student.models import (
     CandidateProfile, CandidateCourse, CandidateExpertise, CandidateTechnology
 )
 from student.roles import REGISTERED_ACCESS_ROLES
+from util.admin import export_as_csv_action
 
 User = get_user_model()  # pylint:disable=invalid-name
 
@@ -169,24 +170,40 @@ class UserAdmin(BaseUserAdmin):
 
 @admin.register(CandidateProfile)
 class CandidateProfileAdmin(admin.ModelAdmin):
+    """ Admin interface for CandidateProfile model. """
+    list_display = ('user', 'graduation_date', 'phone_number', 'cgpa', 'position_in_class', 'expected_salary')
+    actions = [export_as_csv_action("CSV Export")]
+
     class Meta(object):
         model = CandidateProfile
 
 
 @admin.register(CandidateCourse)
 class CandidateCourseAdmin(admin.ModelAdmin):
+    """ Admin interface for CandidateCourseAdmin model. """
+    list_display = ('candidate', 'studied_course')
+    actions = [export_as_csv_action("CSV Export")]
+
     class Meta(object):
         model = CandidateCourse
 
 
 @admin.register(CandidateExpertise)
 class CandidateExpertiseAdmin(admin.ModelAdmin):
+    """ Admin interface for CandidateExpertiseAdmin model. """
+    list_display = ('candidate', 'expertise', 'rank')
+    actions = [export_as_csv_action("CSV Export")]
+
     class Meta(object):
         model = CandidateExpertise
 
 
 @admin.register(CandidateTechnology)
 class CandidateTechnologyAdmin(admin.ModelAdmin):
+    """ Admin interface for CandidateTechnologyAdmin model. """
+    list_display = ('candidate', 'technology')
+    actions = [export_as_csv_action("CSV Export")]
+
     class Meta(object):
         model = CandidateTechnology
 
