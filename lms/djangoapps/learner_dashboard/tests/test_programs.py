@@ -16,7 +16,6 @@ import mock
 
 from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory, CourseFactory, CourseRunFactory
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
-from openedx.core.djangoapps.catalog.utils import munge_catalog_program
 from openedx.core.djangoapps.credentials.tests.factories import UserCredential, ProgramCredential
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
@@ -64,13 +63,7 @@ class TestProgramListing(ProgramsApiConfigMixin, CredentialsApiConfigMixin, Shar
         """
         Helper function used to sort dictionaries representing programs.
         """
-        try:
-            return program['title']
-        except:  # pylint: disable=bare-except
-            # This is here temporarily because programs are still being munged
-            # to look like they came from the programs service before going out
-            # to the front end.
-            return program['name']
+        return program['title']
 
     def credential_sort_key(self, credential):
         """
@@ -157,7 +150,7 @@ class TestProgramListing(ProgramsApiConfigMixin, CredentialsApiConfigMixin, Shar
         actual = sorted(actual, key=self.program_sort_key)
 
         for index, actual_program in enumerate(actual):
-            expected_program = munge_catalog_program(self.data[index])
+            expected_program = self.data[index]
             self.assert_dict_contains_subset(actual_program, expected_program)
 
     def test_program_discovery(self, mock_get_programs):

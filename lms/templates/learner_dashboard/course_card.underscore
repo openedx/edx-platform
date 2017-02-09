@@ -7,7 +7,7 @@
                         class="header-img"
                         src="<%- course_image_url %>"
                         <% // safe-lint: disable=underscore-not-escaped %>
-                        alt="<%= interpolate(gettext('%(courseName)s Home Page.'), {courseName: display_name}, true) %>"/>
+                        alt="<%= interpolate(gettext('%(courseName)s Home Page.'), {courseName: title}, true) %>"/>
                 </a>
             <% } else { %>
                 <img class="header-img" src="<%- course_image_url %>" alt=""/>
@@ -18,10 +18,10 @@
             <h3 class="course-title">
                 <% if ( marketing_url || course_url ) { %>
                     <a href="<%- marketing_url || course_url %>" class="course-title-link">
-                        <%- display_name %>
+                        <%- title %>
                     </a>
                 <% } else { %>
-                    <%- display_name %>
+                    <%- title %>
                 <% } %>
             </h3>
             <div class="course-text">
@@ -29,7 +29,7 @@
                     <span class="run-period"><%- start_date %> - <%- end_date %></span>
                     -
                 <% } %>
-                <span class="course-key"><%- key %></span>
+                <span class="course-key"><%- course_key %></span>
             </div>
         </div>
     </div>

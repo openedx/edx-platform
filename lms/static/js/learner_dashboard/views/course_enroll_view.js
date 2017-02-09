@@ -21,7 +21,7 @@
 
                  events: {
                      'click .enroll-button': 'handleEnroll',
-                     'change .run-select': 'handleRunSelect'
+                     'change .run-select': 'handleCourseRunSelect'
                  },
 
                  initialize: function(options) {
@@ -45,12 +45,12 @@
 
                  handleEnroll: function() {
                     // Enrollment click event handled here
-                     if (!this.model.get('course_key')) {
+                     if (!this.model.get('course_run_key')) {
                          this.$('.select-error').css('visibility', 'visible');
                      } else if (!this.model.get('is_enrolled')) {
-                        // actually enroll
+                         // Create the enrollment.
                          this.enrollModel.save({
-                             course_id: this.model.get('course_key')
+                             course_id: this.model.get('course_run_key')
                          }, {
                              success: _.bind(this.enrollSuccess, this),
                              error: _.bind(this.enrollError, this)
@@ -58,24 +58,22 @@
                      }
                  },
 
-                 handleRunSelect: function(event) {
-                     var runKey;
-                     if (event.target) {
-                         runKey = $(event.target).val();
-                         if (runKey) {
-                             this.model.updateRun(runKey);
-                         } else {
-                            // Set back the unselected states
-                             this.model.setUnselected();
-                         }
+                 handleCourseRunSelect: function(event) {
+                     var courseRunKey = $(event.target).val();
+
+                     if (courseRunKey) {
+                         this.model.updateCourseRun(courseRunKey);
+                     } else {
+                         // Set back the unselected states
+                         this.model.setUnselected();
                      }
                  },
 
                  enrollSuccess: function() {
-                     var courseKey = this.model.get('course_key');
+                     var courseRunKey = this.model.get('course_run_key');
                      if (this.trackSelectionUrl) {
-                        // Go to track selection page
-                         this.redirect(this.trackSelectionUrl + courseKey);
+                         // Go to track selection page
+                         this.redirect(this.trackSelectionUrl + courseRunKey);
                      } else {
                          this.model.set({
                              is_enrolled: true
@@ -98,7 +96,7 @@
                          * This can occur, for example, when a course does not
                          * have a free enrollment mode, so we can't auto-enroll.
                          */
-                         this.redirect(this.trackSelectionUrl + this.model.get('course_key'));
+                         this.redirect(this.trackSelectionUrl + this.model.get('course_run_key'));
                      }
                  },
 

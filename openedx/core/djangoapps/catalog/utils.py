@@ -66,64 +66,6 @@ def get_programs(uuid=None, type=None):  # pylint: disable=redefined-builtin
         return []
 
 
-def munge_catalog_program(catalog_program):
-    """
-    Make a program from the catalog service look like it came from the programs service.
-
-    We want to display programs from the catalog service on the LMS. The LMS
-    originally retrieved all program data from the deprecated programs service.
-    This temporary utility is here to help incrementally swap out the backend.
-
-    Clean up of this debt is tracked by ECOM-4418.
-
-    Arguments:
-        catalog_program (dict): The catalog service's representation of a program.
-
-    Return:
-        dict, imitating the schema used by the programs service.
-    """
-    return {
-        'id': catalog_program['uuid'],
-        'name': catalog_program['title'],
-        'subtitle': catalog_program['subtitle'],
-        'category': catalog_program['type'],
-        'marketing_slug': catalog_program['marketing_slug'],
-        'organizations': [
-            {
-                'display_name': organization['name'],
-                'key': organization['key']
-            } for organization in catalog_program['authoring_organizations']
-        ],
-        'course_codes': [
-            {
-                'display_name': course['title'],
-                'key': course['key'],
-                'organization': {
-                    # The Programs schema only supports one organization here.
-                    'display_name': course['owners'][0]['name'],
-                    'key': course['owners'][0]['key']
-                } if course['owners'] else {},
-                'run_modes': [
-                    {
-                        'course_key': course_run['key'],
-                        'run_key': CourseKey.from_string(course_run['key']).run,
-                        'mode_slug': course_run['type'],
-                        'marketing_url': course_run['marketing_url'],
-                    } for course_run in course['course_runs']
-                ],
-            } for course in catalog_program['courses']
-        ],
-        'banner_image_urls': {
-            'w1440h480': catalog_program['banner_image']['large']['url'],
-            'w726h242': catalog_program['banner_image']['medium']['url'],
-            'w435h145': catalog_program['banner_image']['small']['url'],
-            'w348h116': catalog_program['banner_image']['x-small']['url'],
-        },
-        # If a detail URL has been added, we don't want to lose it.
-        'detail_url': catalog_program.get('detail_url'),
-    }
-
-
 def get_program_types():
     """Retrieve all program types from the catalog service.
 

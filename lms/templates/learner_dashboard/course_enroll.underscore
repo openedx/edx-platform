@@ -10,9 +10,9 @@
         </a>
     <% } %>
 <% } else { %>
-    <% if (enrollable_run_modes.length > 0) { %>
-        <div class="enrollment-info"><%- gettext('not enrolled') %></div>
-        <% if (enrollable_run_modes.length > 1) { %>
+    <% if (enrollable_course_runs.length > 0) { %>
+        <div class="enrollment-info"><%- gettext('Not Enrolled') %></div>
+        <% if (enrollable_course_runs.length > 1) { %>
             <div class="run-select-container">
                 <div class="select-error">
                     <%- gettext('Please select a course date') %>
@@ -24,16 +24,16 @@
                     <option value="" selected="selected">
                         <%- gettext('Choose Course Date') %>
                     </option>
-                    <% _.each (enrollable_run_modes, function(runMode) { %>
+                    <% _.each (enrollable_course_runs, function(courseRun) { %>
                         <option
-                            value="<%- runMode.run_key %>"
-                            <% if (run_key === runMode.run_key) { %>
+                            value="<%- courseRun.key %>"
+                            <% if (key === courseRun.key) { %>
                                 selected="selected"
                             <% }%>
                         >
                             <%= interpolate(
                                 gettext('Starts %(start)s'),
-                                { start: runMode.start_date },
+                                { start: courseRun.start_date },
                                 true)
                             %>
                         </option>
@@ -44,14 +44,14 @@
         <button type="button" class="btn-brand btn cta-primary enroll-button">
             <%- gettext('Enroll Now') %>
         </button>
-    <% } else if (upcoming_run_modes.length > 0) {%>
+    <% } else if (upcoming_course_runs.length > 0) {%>
         <div class="no-action-message">
             <%- gettext('Coming Soon') %>
         </div>
         <div class="enrollment-opens">
             <%- gettext('Enrollment Opens on') %>
             <span class="enrollment-open-date">
-                <%- upcoming_run_modes[0].enrollment_open_date %>
+                <%- upcoming_course_runs[0].enrollment_open_date %>
             </span>
         </div>
     <% } else { %>

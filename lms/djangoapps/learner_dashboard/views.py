@@ -6,12 +6,11 @@ from django.views.decorators.http import require_GET
 
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.learner_dashboard.utils import strip_course_id, FAKE_COURSE_KEY
-from openedx.core.djangoapps.catalog.utils import get_programs, munge_catalog_program
+from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.credentials.utils import get_programs_credentials
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.utils import (
     get_program_marketing_url,
-    munge_progress_map,
     ProgramProgressMeter,
     ProgramDataExtender,
 )
@@ -27,16 +26,14 @@ def program_listing(request):
         raise Http404
 
     meter = ProgramProgressMeter(request.user)
-    engaged_programs = [munge_catalog_program(program) for program in meter.engaged_programs]
-    progress = [munge_progress_map(progress_map) for progress_map in meter.progress]
 
     context = {
         'credentials': get_programs_credentials(request.user),
         'disable_courseware_js': True,
         'marketing_url': get_program_marketing_url(programs_config),
         'nav_hidden': True,
-        'programs': engaged_programs,
-        'progress': progress,
+        'programs': meter.engaged_programs,
+        'progress': meter.progress,
         'show_program_listing': programs_config.show_program_listing,
         'uses_pattern_library': True,
     }
@@ -56,7 +53,6 @@ def program_details(request, program_uuid):
     if not program_data:
         raise Http404
 
-    program_data = munge_catalog_program(program_data)
     program_data = ProgramDataExtender(program_data, request.user).extend()
 
     urls = {

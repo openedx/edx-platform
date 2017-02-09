@@ -1,4 +1,5 @@
 """Tests covering Programs utilities."""
+# pylint: disable=no-member
 import datetime
 import json
 import uuid
@@ -15,7 +16,6 @@ from pytz import utc
 
 from lms.djangoapps.certificates.api import MODES
 from lms.djangoapps.commerce.tests.test_utils import update_commerce_config
-from openedx.core.djangoapps.catalog.utils import munge_catalog_program
 from openedx.core.djangoapps.catalog.tests.factories import (
     generate_course_run_key,
     ProgramFactory,
@@ -59,10 +59,6 @@ class TestProgramProgressMeter(TestCase):
     def _assert_progress(self, meter, *progresses):
         """Variadic helper used to verify progress calculations."""
         self.assertEqual(meter.progress, list(progresses))
-
-    def _extract_titles(self, program, *indices):
-        """Construct a list containing the titles of the indicated courses."""
-        return [program['courses'][index]['title'] for index in indices]
 
     def _attach_detail_url(self, programs):
         """Add expected detail URLs to a list of program dicts."""
@@ -118,10 +114,7 @@ class TestProgramProgressMeter(TestCase):
         self.assertEqual(meter.engaged_programs, [program])
         self._assert_progress(
             meter,
-            ProgressFactory(
-                uuid=program['uuid'],
-                in_progress=self._extract_titles(program, 0)
-            )
+            ProgressFactory(uuid=program['uuid'], in_progress=1)
         )
         self.assertEqual(meter.completed_programs, [])
 
@@ -160,10 +153,7 @@ class TestProgramProgressMeter(TestCase):
         self.assertEqual(meter.engaged_programs, programs)
         self._assert_progress(
             meter,
-            *(
-                ProgressFactory(uuid=program['uuid'], in_progress=self._extract_titles(program, 0))
-                for program in programs
-            )
+            *(ProgressFactory(uuid=program['uuid'], in_progress=1) for program in programs)
         )
         self.assertEqual(meter.completed_programs, [])
 
@@ -208,10 +198,7 @@ class TestProgramProgressMeter(TestCase):
         self.assertEqual(meter.engaged_programs, programs)
         self._assert_progress(
             meter,
-            *(
-                ProgressFactory(uuid=program['uuid'], in_progress=self._extract_titles(program, 0))
-                for program in programs
-            )
+            *(ProgressFactory(uuid=program['uuid'], in_progress=1) for program in programs)
         )
         self.assertEqual(meter.completed_programs, [])
 
@@ -245,11 +232,7 @@ class TestProgramProgressMeter(TestCase):
         program, program_uuid = data[0], data[0]['uuid']
         self._assert_progress(
             meter,
-            ProgressFactory(
-                uuid=program_uuid,
-                in_progress=self._extract_titles(program, 0),
-                not_started=self._extract_titles(program, 1)
-            )
+            ProgressFactory(uuid=program_uuid, in_progress=1, not_started=1)
         )
         self.assertEqual(meter.completed_programs, [])
 
@@ -258,10 +241,7 @@ class TestProgramProgressMeter(TestCase):
         meter = ProgramProgressMeter(self.user)
         self._assert_progress(
             meter,
-            ProgressFactory(
-                uuid=program_uuid,
-                in_progress=self._extract_titles(program, 0, 1)
-            )
+            ProgressFactory(uuid=program_uuid, in_progress=2)
         )
         self.assertEqual(meter.completed_programs, [])
 
@@ -272,11 +252,7 @@ class TestProgramProgressMeter(TestCase):
         meter = ProgramProgressMeter(self.user)
         self._assert_progress(
             meter,
-            ProgressFactory(
-                uuid=program_uuid,
-                completed=self._extract_titles(program, 0),
-                in_progress=self._extract_titles(program, 1)
-            )
+            ProgressFactory(uuid=program_uuid, completed=1, in_progress=1)
         )
         self.assertEqual(meter.completed_programs, [])
 
@@ -288,11 +264,7 @@ class TestProgramProgressMeter(TestCase):
         meter = ProgramProgressMeter(self.user)
         self._assert_progress(
             meter,
-            ProgressFactory(
-                uuid=program_uuid,
-                completed=self._extract_titles(program, 0),
-                in_progress=self._extract_titles(program, 1)
-            )
+            ProgressFactory(uuid=program_uuid, completed=1, in_progress=1)
         )
         self.assertEqual(meter.completed_programs, [])
 
@@ -304,10 +276,7 @@ class TestProgramProgressMeter(TestCase):
         meter = ProgramProgressMeter(self.user)
         self._assert_progress(
             meter,
-            ProgressFactory(
-                uuid=program_uuid,
-                completed=self._extract_titles(program, 0, 1)
-            )
+            ProgressFactory(uuid=program_uuid, completed=2)
         )
         self.assertEqual(meter.completed_programs, [program_uuid])
 
@@ -340,7 +309,7 @@ class TestProgramProgressMeter(TestCase):
         program, program_uuid = data[0], data[0]['uuid']
         self._assert_progress(
             meter,
-            ProgressFactory(uuid=program_uuid, completed=self._extract_titles(program, 0))
+            ProgressFactory(uuid=program_uuid, completed=1)
         )
         self.assertEqual(meter.completed_programs, [program_uuid])
 
@@ -418,56 +387,55 @@ class TestProgramDataExtender(ModuleStoreTestCase):
     """Tests of the program data extender utility class."""
     maxDiff = None
     sku = 'abc123'
-    password = 'test'
     checkout_path = '/basket'
 
     def setUp(self):
         super(TestProgramDataExtender, self).setUp()
 
-        self.user = UserFactory()
-        self.client.login(username=self.user.username, password=self.password)
-
         self.course = ModuleStoreCourseFactory()
         self.course.start = datetime.datetime.now(utc) - datetime.timedelta(days=1)
         self.course.end = datetime.datetime.now(utc) + datetime.timedelta(days=1)
-        self.course = self.update_course(self.course, self.user.id)  # pylint: disable=no-member
+        self.course = self.update_course(self.course, self.user.id)
 
-        organization = OrganizationFactory()
-        course_run = CourseRunFactory(key=unicode(self.course.id))  # pylint: disable=no-member
-        course = CourseFactory(course_runs=[course_run])
-        program = ProgramFactory(authoring_organizations=[organization], courses=[course])
-
-        self.program = munge_catalog_program(program)
-        self.course_code = self.program['course_codes'][0]
-        self.run_mode = self.course_code['run_modes'][0]
+        self.course_run = CourseRunFactory(key=unicode(self.course.id))
+        self.catalog_course = CourseFactory(course_runs=[self.course_run])
+        self.program = ProgramFactory(courses=[self.catalog_course])
 
     def _assert_supplemented(self, actual, **kwargs):
         """DRY helper used to verify that program data is extended correctly."""
-        course_overview = CourseOverview.get_from_id(self.course.id)  # pylint: disable=no-member
-        run_mode = dict(
-            {
-                'certificate_url': None,
-                'course_image_url': course_overview.course_image_url,
-                'course_key': unicode(self.course.id),  # pylint: disable=no-member
-                'course_url': reverse('course_root', args=[self.course.id]),  # pylint: disable=no-member
-                'end_date': self.course.end.replace(tzinfo=utc),
-                'enrollment_open_date': strftime_localized(DEFAULT_ENROLLMENT_START_DATE, 'SHORT_DATE'),
-                'is_course_ended': self.course.end < datetime.datetime.now(utc),
-                'is_enrolled': False,
-                'is_enrollment_open': True,
-                'marketing_url': self.run_mode['marketing_url'],
-                'mode_slug': 'verified',
-                'start_date': self.course.start.replace(tzinfo=utc),
-                'upgrade_url': None,
-                'advertised_start': None,
-            },
-            **kwargs
+        self.course_run.update(
+            dict(
+                {
+                    'certificate_url': None,
+                    'course_url': reverse('course_root', args=[self.course.id]),
+                    'enrollment_open_date': strftime_localized(DEFAULT_ENROLLMENT_START_DATE, 'SHORT_DATE'),
+                    'is_course_ended': self.course.end < datetime.datetime.now(utc),
+                    'is_enrolled': False,
+                    'is_enrollment_open': True,
+                    'upgrade_url': None,
+                    'advertised_start': None,
+                },
+                **kwargs
+            )
         )
 
-        self.course_code['run_modes'] = [run_mode]
-        self.program['course_codes'] = [self.course_code]
+        self.catalog_course['course_runs'] = [self.course_run]
+        self.program['courses'] = [self.catalog_course]
 
         self.assertEqual(actual, self.program)
+
+    @ddt.data(-1, 0, 1)
+    def test_is_enrollment_open(self, days_offset):
+        """
+        Verify that changes to the course run end date do not affect our
+        assessment of the course run being open for enrollment.
+        """
+        self.course.end = datetime.datetime.now(utc) + datetime.timedelta(days=days_offset)
+        self.course = self.update_course(self.course, self.user.id)
+
+        data = ProgramDataExtender(self.program, self.user).extend()
+
+        self._assert_supplemented(data)
 
     @ddt.data(
         (False, None, False),
@@ -491,7 +459,7 @@ class TestProgramDataExtender(ModuleStoreTestCase):
         mock_get_mode.return_value = mock_mode
 
         if is_enrolled:
-            CourseEnrollmentFactory(user=self.user, course_id=self.course.id, mode=enrolled_mode)  # pylint: disable=no-member
+            CourseEnrollmentFactory(user=self.user, course_id=self.course.id, mode=enrolled_mode)
 
         data = ProgramDataExtender(self.program, self.user).extend()
 
@@ -503,12 +471,14 @@ class TestProgramDataExtender(ModuleStoreTestCase):
 
     @ddt.data(MODES.audit, MODES.verified)
     def test_inactive_enrollment_no_upgrade(self, enrolled_mode):
-        """Verify that a student with an inactive enrollment isn't encouraged to upgrade."""
+        """
+        Verify that a student with an inactive enrollment isn't encouraged to upgrade.
+        """
         update_commerce_config(enabled=True, checkout_page=self.checkout_path)
 
         CourseEnrollmentFactory(
             user=self.user,
-            course_id=self.course.id,  # pylint: disable=no-member
+            course_id=self.course.id,
             mode=enrolled_mode,
             is_active=False,
         )
@@ -519,14 +489,16 @@ class TestProgramDataExtender(ModuleStoreTestCase):
 
     @mock.patch(UTILS_MODULE + '.CourseMode.mode_for_course')
     def test_ecommerce_disabled(self, mock_get_mode):
-        """Verify that the utility can operate when the ecommerce service is disabled."""
+        """
+        Verify that the utility can operate when the ecommerce service is disabled.
+        """
         update_commerce_config(enabled=False, checkout_page=self.checkout_path)
 
         mock_mode = mock.Mock()
         mock_mode.sku = self.sku
         mock_get_mode.return_value = mock_mode
 
-        CourseEnrollmentFactory(user=self.user, course_id=self.course.id, mode=MODES.audit)  # pylint: disable=no-member
+        CourseEnrollmentFactory(user=self.user, course_id=self.course.id, mode=MODES.audit)
 
         data = ProgramDataExtender(self.program, self.user).extend()
 
@@ -537,14 +509,14 @@ class TestProgramDataExtender(ModuleStoreTestCase):
         (1, -1, True),
     )
     @ddt.unpack
-    def test_course_enrollment_status(self, start_offset, end_offset, is_enrollment_open):
+    def test_course_run_enrollment_status(self, start_offset, end_offset, is_enrollment_open):
         """
-        Verify that course enrollment status is reflected correctly.
+        Verify that course run enrollment status is reflected correctly.
         """
         self.course.enrollment_start = datetime.datetime.now(utc) - datetime.timedelta(days=start_offset)
         self.course.enrollment_end = datetime.datetime.now(utc) - datetime.timedelta(days=end_offset)
 
-        self.course = self.update_course(self.course, self.user.id)  # pylint: disable=no-member
+        self.course = self.update_course(self.course, self.user.id)
 
         data = ProgramDataExtender(self.program, self.user).extend()
 
@@ -555,12 +527,12 @@ class TestProgramDataExtender(ModuleStoreTestCase):
         )
 
     def test_no_enrollment_start_date(self):
-        """Verify that a closed course with no explicit enrollment start date doesn't cause an error.
-
-        Regression test for ECOM-4973.
+        """
+        Verify that a closed course run with no explicit enrollment start date
+        doesn't cause an error. Regression test for ECOM-4973.
         """
         self.course.enrollment_end = datetime.datetime.now(utc) - datetime.timedelta(days=1)
-        self.course = self.update_course(self.course, self.user.id)  # pylint: disable=no-member
+        self.course = self.update_course(self.course, self.user.id)
 
         data = ProgramDataExtender(self.program, self.user).extend()
 
@@ -573,7 +545,10 @@ class TestProgramDataExtender(ModuleStoreTestCase):
     @mock.patch(UTILS_MODULE + '.certificate_api.certificate_downloadable_status')
     @mock.patch(CERTIFICATES_API_MODULE + '.has_html_certificates_enabled')
     def test_certificate_url_retrieval(self, is_uuid_available, mock_html_certs_enabled, mock_get_cert_data):
-        """Verify that the student's run mode certificate is included, when available."""
+        """
+        Verify that the student's run mode certificate is included,
+        when available.
+        """
         test_uuid = uuid.uuid4().hex
         mock_get_cert_data.return_value = {'uuid': test_uuid} if is_uuid_available else {}
         mock_html_certs_enabled.return_value = True
@@ -586,42 +561,3 @@ class TestProgramDataExtender(ModuleStoreTestCase):
         ) if is_uuid_available else None
 
         self._assert_supplemented(data, certificate_url=expected_url)
-
-    @ddt.data(-1, 0, 1)
-    def test_course_course_ended(self, days_offset):
-        self.course.end = datetime.datetime.now(utc) + datetime.timedelta(days=days_offset)
-        self.course = self.update_course(self.course, self.user.id)  # pylint: disable=no-member
-
-        data = ProgramDataExtender(self.program, self.user).extend()
-
-        self._assert_supplemented(data)
-
-    @mock.patch(UTILS_MODULE + '.get_organization_by_short_name')
-    def test_organization_logo_exists(self, mock_get_organization_by_short_name):
-        """ Verify the logo image is set from the organizations api """
-        mock_logo_url = 'edx/logo.png'
-        mock_image = mock.Mock()
-        mock_image.url = mock_logo_url
-        mock_get_organization_by_short_name.return_value = {
-            'logo': mock_image
-        }
-
-        data = ProgramDataExtender(self.program, self.user).extend()
-        self.assertEqual(data['organizations'][0].get('img'), mock_logo_url)
-
-    @mock.patch(UTILS_MODULE + '.get_organization_by_short_name')
-    def test_organization_missing(self, mock_get_organization_by_short_name):
-        """ Verify the logo image is not set if the organizations api returns None """
-        mock_get_organization_by_short_name.return_value = None
-        data = ProgramDataExtender(self.program, self.user).extend()
-        self.assertEqual(data['organizations'][0].get('img'), None)
-
-    @mock.patch(UTILS_MODULE + '.get_organization_by_short_name')
-    def test_organization_logo_missing(self, mock_get_organization_by_short_name):
-        """
-        Verify the logo image is not set if the organizations api returns organization,
-        but the logo is not available
-        """
-        mock_get_organization_by_short_name.return_value = {'logo': None}
-        data = ProgramDataExtender(self.program, self.user).extend()
-        self.assertEqual(data['organizations'][0].get('img'), None)

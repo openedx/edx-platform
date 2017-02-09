@@ -9,12 +9,14 @@ define([
     describe('Course Card View', function() {
         var view = null,
             courseCardModel,
-            context,
+            course,
+            startDate = 'Feb 28, 2017',
+            endDate = 'May 30, 2017',
 
             setupView = function(data, isEnrolled) {
                 var programData = $.extend({}, data);
 
-                programData.run_modes[0].is_enrolled = isEnrolled;
+                programData.course_runs[0].is_enrolled = isEnrolled;
                 setFixtures('<div class="course-card card"></div>');
                 courseCardModel = new CourseCardModel(programData);
                 view = new CourseCardView({
@@ -24,48 +26,49 @@ define([
 
             validateCourseInfoDisplay = function() {
                 // DRY validation for course card in enrolled state
-                expect(view.$('.header-img').attr('src')).toEqual(context.run_modes[0].course_image_url);
-                expect(view.$('.course-details .course-title-link').text().trim()).toEqual(context.display_name);
+                expect(view.$('.header-img').attr('src')).toEqual(course.course_runs[0].image.src);
+                expect(view.$('.course-details .course-title-link').text().trim()).toEqual(course.title);
                 expect(view.$('.course-details .course-title-link').attr('href')).toEqual(
-                    context.run_modes[0].marketing_url
+                    course.course_runs[0].marketing_url
                 );
-                expect(view.$('.course-details .course-text .course-key').html()).toEqual(context.key);
+                expect(view.$('.course-details .course-text .course-key').html()).toEqual(course.key);
                 expect(view.$('.course-details .course-text .run-period').html()).toEqual(
-                    context.run_modes[0].start_date + ' - ' + context.run_modes[0].end_date
+                    startDate + ' - ' + endDate
                 );
             };
 
         beforeEach(function() {
-                // Redefine this data prior to each test case so that tests can't
-                // break each other by modifying data copied by reference.
-            context = {
-                course_modes: [],
-                display_name: 'Astrophysics: Exploring Exoplanets',
-                key: 'ANU-ASTRO1x',
-                organization: {
-                    display_name: 'Australian National University',
-                    key: 'ANUx'
-                },
-                run_modes: [{
-                    certificate_url: '',
-                    course_image_url: 'http://test.com/image1',
-                    course_key: 'course-v1:ANUx+ANU-ASTRO1x+3T2015',
-                    course_started: true,
-                    course_url: 'https://courses.example.com/courses/course-v1:edX+DemoX+Demo_Course',
-                    end_date: 'Jun 13, 2019',
-                    enrollment_open_date: 'Apr 1, 2016',
-                    is_course_ended: false,
-                    is_enrolled: true,
-                    is_enrollment_open: true,
-                    marketing_url: 'https://www.example.com/marketing/site',
-                    mode_slug: 'verified',
-                    run_key: '2T2016',
-                    start_date: 'Apr 25, 2016',
-                    upgrade_url: ''
-                }]
+            // NOTE: This data is redefined prior to each test case so that tests
+            // can't break each other by modifying data copied by reference.
+            course = {
+                key: 'WageningenX+FFESx',
+                uuid: '9f8562eb-f99b-45c7-b437-799fd0c15b6a',
+                title: 'Systems thinking and environmental sustainability',
+                course_runs: [
+                    {
+                        key: 'course-v1:WageningenX+FFESx+1T2017',
+                        title: 'Food Security and Sustainability: Systems thinking and environmental sustainability',
+                        image: {
+                            src: 'https://example.com/9f8562eb-f99b-45c7-b437-799fd0c15b6a.jpg'
+                        },
+                        marketing_url: 'https://www.edx.org/course/food-security-sustainability',
+                        start: '2017-02-28T05:00:00Z',
+                        end: '2017-05-30T23:00:00Z',
+                        enrollment_start: '2017-01-18T00:00:00Z',
+                        enrollment_end: null,
+                        type: 'verified',
+                        certificate_url: '',
+                        course_url: 'https://courses.example.com/courses/course-v1:WageningenX+FFESx+1T2017',
+                        enrollment_open_date: 'Jan 18, 2016',
+                        is_course_ended: false,
+                        is_enrolled: true,
+                        is_enrollment_open: true,
+                        upgrade_url: ''
+                    }
+                ]
             };
 
-            setupView(context, false);
+            setupView(course, false);
         });
 
         afterEach(function() {
@@ -78,7 +81,7 @@ define([
 
         it('should render the course card based on the data enrolled', function() {
             view.remove();
-            setupView(context, true);
+            setupView(course, true);
             validateCourseInfoDisplay();
         });
 
@@ -94,11 +97,11 @@ define([
         });
 
         it('should show the course advertised start date', function() {
-            var advertisedStart = 'This is an advertised start';
-            context.run_modes[0].advertised_start = advertisedStart;
-            setupView(context, false);
+            var advertisedStart = 'A long time ago...';
+            course.course_runs[0].advertised_start = advertisedStart;
+            setupView(course, false);
             expect(view.$('.course-details .course-text .run-period').html()).toEqual(
-                advertisedStart + ' - ' + context.run_modes[0].end_date
+                advertisedStart + ' - ' + endDate
             );
         });
 
@@ -108,8 +111,8 @@ define([
             expect(view.$('.certificate-status').length).toEqual(0);
             view.remove();
 
-            context.run_modes[0].certificate_url = certUrl;
-            setupView(context, false);
+            course.course_runs[0].certificate_url = certUrl;
+            setupView(course, false);
             expect(view.$('.certificate-status').length).toEqual(1);
             expect(view.$('.certificate-status .cta-secondary').attr('href')).toEqual(certUrl);
         });
@@ -120,53 +123,53 @@ define([
             expect(view.$('.upgrade-message').length).toEqual(0);
             view.remove();
 
-            context.run_modes[0].upgrade_url = upgradeUrl;
-            setupView(context, false);
+            course.course_runs[0].upgrade_url = upgradeUrl;
+            setupView(course, false);
             expect(view.$('.upgrade-message').length).toEqual(1);
             expect(view.$('.upgrade-message .cta-primary').attr('href')).toEqual(upgradeUrl);
         });
 
         it('should not show both the upgrade message and certificate status sections', function() {
-                // Verify that no empty elements are left in the DOM.
-            context.run_modes[0].upgrade_url = '';
-            context.run_modes[0].certificate_url = '';
-            setupView(context, false);
+            // Verify that no empty elements are left in the DOM.
+            course.course_runs[0].upgrade_url = '';
+            course.course_runs[0].certificate_url = '';
+            setupView(course, false);
             expect(view.$('.upgrade-message').length).toEqual(0);
             expect(view.$('.certificate-status').length).toEqual(0);
             view.remove();
 
-                // Verify that the upgrade message takes priority.
-            context.run_modes[0].upgrade_url = '/path/to/upgrade';
-            context.run_modes[0].certificate_url = '/path/to/certificate';
-            setupView(context, false);
+            // Verify that the upgrade message takes priority.
+            course.course_runs[0].upgrade_url = '/path/to/upgrade';
+            course.course_runs[0].certificate_url = '/path/to/certificate';
+            setupView(course, false);
             expect(view.$('.upgrade-message').length).toEqual(1);
             expect(view.$('.certificate-status').length).toEqual(0);
         });
 
         it('should show a message if an there is an upcoming course run', function() {
-            context.run_modes[0].is_enrollment_open = false;
+            course.course_runs[0].is_enrollment_open = false;
 
-            setupView(context, false);
+            setupView(course, false);
 
-            expect(view.$('.header-img').attr('src')).toEqual(context.run_modes[0].course_image_url);
-            expect(view.$('.course-details .course-title').text().trim()).toEqual(context.display_name);
-            expect(view.$('.course-details .course-text .course-key').html()).toEqual(context.key);
+            expect(view.$('.header-img').attr('src')).toEqual(course.course_runs[0].image.src);
+            expect(view.$('.course-details .course-title').text().trim()).toEqual(course.title);
+            expect(view.$('.course-details .course-text .course-key').html()).toEqual(course.key);
             expect(view.$('.course-details .course-text .run-period').length).toBe(0);
             expect(view.$('.no-action-message').text().trim()).toBe('Coming Soon');
             expect(view.$('.enrollment-open-date').text().trim()).toEqual(
-                    context.run_modes[0].enrollment_open_date
-                );
+                course.course_runs[0].enrollment_open_date
+            );
         });
 
-        it('should show a message if there are no known upcoming course runs', function() {
-            context.run_modes[0].is_enrollment_open = false;
-            context.run_modes[0].is_course_ended = true;
+        it('should show a message if there are no upcoming course runs', function() {
+            course.course_runs[0].is_enrollment_open = false;
+            course.course_runs[0].is_course_ended = true;
 
-            setupView(context, false);
+            setupView(course, false);
 
-            expect(view.$('.header-img').attr('src')).toEqual(context.run_modes[0].course_image_url);
-            expect(view.$('.course-details .course-title').text().trim()).toEqual(context.display_name);
-            expect(view.$('.course-details .course-text .course-key').html()).toEqual(context.key);
+            expect(view.$('.header-img').attr('src')).toEqual(course.course_runs[0].image.src);
+            expect(view.$('.course-details .course-title').text().trim()).toEqual(course.title);
+            expect(view.$('.course-details .course-text .course-key').html()).toEqual(course.key);
             expect(view.$('.course-details .course-text .run-period').length).toBe(0);
             expect(view.$('.no-action-message').text().trim()).toBe('Not Currently Available');
             expect(view.$('.enrollment-opens').length).toEqual(0);
@@ -174,23 +177,23 @@ define([
 
         it('should link to the marketing site when a URL is available', function() {
             $.each(['.course-image-link', '.course-title-link'], function(index, selector) {
-                expect(view.$(selector).attr('href')).toEqual(context.run_modes[0].marketing_url);
+                expect(view.$(selector).attr('href')).toEqual(course.course_runs[0].marketing_url);
             });
         });
 
         it('should link to the course home when no marketing URL is available', function() {
-            context.run_modes[0].marketing_url = null;
-            setupView(context, false);
+            course.course_runs[0].marketing_url = null;
+            setupView(course, false);
 
             $.each(['.course-image-link', '.course-title-link'], function(index, selector) {
-                expect(view.$(selector).attr('href')).toEqual(context.run_modes[0].course_url);
+                expect(view.$(selector).attr('href')).toEqual(course.course_runs[0].course_url);
             });
         });
 
         it('should not link to the marketing site or the course home if neither URL is available', function() {
-            context.run_modes[0].marketing_url = null;
-            context.run_modes[0].course_url = null;
-            setupView(context, false);
+            course.course_runs[0].marketing_url = null;
+            course.course_runs[0].course_url = null;
+            setupView(course, false);
 
             $.each(['.course-image-link', '.course-title-link'], function(index, selector) {
                 expect(view.$(selector).length).toEqual(0);
