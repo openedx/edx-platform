@@ -5,33 +5,62 @@
 <%namespace name='static' file='/static_content.html'/>
 
 <style>
+    h4{
+        font-size: 16px;
+        font-weight:bold;
+    }
+    #numbering-div{
+        margin: 20px 0 30px;
+        padding: 20px;
+        background: #fafafa;
+        box-shadow: 0px 0px 3px #ddd;
+        text-align: center;
+    }
+    #numbering-div h4{
+        display: inline-block;
+        vertical-align: middle;
+    }
+    #numbering-div #next-prev{
+        display: inline-block;
+        margin-left: 15px;
+        float: right;
+    }
+    #next-prev .button{
+        padding: 0 12px;
+    }
+    .xblock .xblock h3{
+        font-size: 1.25rem;
+    }
     h4.question-number{
         margin-bottom: 10px;
     }
-    #next-prev {
-        margin: 0 auto;
-        width: 300px;
+    .question-link {
+        background-color: transparent;
+        border-radius: 50%;
+        border: 1px solid transparent;
+        width: 30px;
+        height: 30px;
+        display: inline-block;
+        text-align: center;
+        line-height: 30px;
+        margin-left: -5px;
     }
-    #next-prev .button {
-        width: 120px;
-    }
-    #next-prev .next{
-        float: right;
-    }
-    #next-prev .previous{
-        float: left;
+    .question-link.highlight{
+        border: 1px solid #ddd;
+        background-color: #fff;
     }
     .clear{
         clear: both;
     }
     #question-nav{
-        float: left;
-        margin: 0;
+        overflow: hidden;
+        margin: 20px 0 10px;
         padding: 0;
+        text-align: center;
     }
     #question-nav li{
-        float: left;
-        margin-right: 10px;
+        display: inline-block;
+        margin-bottom: 0;
         list-style: none;
     }
     .question-link.highlight{
@@ -45,17 +74,17 @@
 
 <div id="nav-div">
     <div id="numbering-div">
-        <div>Questions</div>
+        <h4>Questions</h4>
+         <div id="next-prev">
+        <button class="button previous" data-value="Previous"><span class="icon fa fa-chevron-prev" aria-hidden="true"></span><span class="sr">Previous</span></button>
+        <button class="button next" data-value="Next"><span class="icon fa fa-chevron-next" aria-hidden="true"></span><span class="sr">Next</span></button>
+        <br class="clear" />
+    </div>
         <ul id="question-nav">
             % for index, item in enumerate(items):
                 <li><a class="question-link" href="#" data-index="${index}">${index + 1}</a></li>
             % endfor
         </ul>
-    </div>
-     <div id="next-prev">
-        <button class="button previous" data-value="Previous"><span class="icon fa fa-chevron-prev" aria-hidden="true"></span><span class="sr">Previous</span></button>
-        <button class="button next" data-value="Next"><span class="icon fa fa-chevron-next" aria-hidden="true"></span><span class="sr">Next</span></button>
-        <br class="clear" />
     </div>
 </div>
 <div id="arbi-exam"></div>
