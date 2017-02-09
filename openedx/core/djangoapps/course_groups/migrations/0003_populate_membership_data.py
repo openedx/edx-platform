@@ -26,7 +26,7 @@ def forwards(apps, schema_editor):
             except Exception:
                 log.info(
                     (
-                        "Faild to add membership with course_user_group %, "
+                        "Faild to add membership with course_user_group %s, "
                         "user %s, "
                         "course_id %s, "
                     ),
