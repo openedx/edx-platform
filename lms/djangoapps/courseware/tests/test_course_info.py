@@ -60,6 +60,31 @@ class CourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
         resp = self.client.get(url)
         self.assertNotIn("You are not currently enrolled in this course", resp.content)
 
+    @mock.patch('courseware.views.views.get_course_specific_consent_url')
+    @mock.patch('courseware.views.views.consent_needed_for_course')
+    def test_redirection_missing_enterprise_consent(self, mock_consent_needed, mock_get_url):
+        """
+        Verify that users viewing the course info who are enrolled, but have not provided
+        data sharing consent, are first redirected to a consent page, and then, once they've
+        provided consent, are able to view the course info.
+        """
+        self.setup_user()
+        self.enroll(self.course)
+        mock_consent_needed.return_value = True
+        mock_get_url.return_value = reverse('dashboard')
+        url = reverse('info', args=[self.course.id.to_deprecated_string()])
+
+        response = self.client.get(url)
+
+        self.assertRedirects(
+            response,
+            reverse('dashboard')
+        )
+        mock_consent_needed.assert_called_once_with(self.user, unicode(self.course.id))
+        mock_consent_needed.return_value = False
+        response = self.client.get(url)
+        self.assertNotIn("You are not currently enrolled in this course", response.content)
+
     def test_anonymous_user(self):
         url = reverse('info', args=[self.course.id.to_deprecated_string()])
         resp = self.client.get(url)
@@ -313,7 +338,7 @@ class CourseInfoTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
 
 
 @attr(shard=1)
-@override_settings(FEATURES=dict(settings.FEATURES, EMBARGO=False))
+@override_settings(FEATURES=dict(settings.FEATURES, EMBARGO=False), ENABLE_ENTERPRISE_INTEGRATION=False)
 class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
     """
     Tests for the info page of self-paced courses.

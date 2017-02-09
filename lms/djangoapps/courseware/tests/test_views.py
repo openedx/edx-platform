@@ -1130,6 +1130,7 @@ class StartDateTests(ModuleStoreTestCase):
 
 # pylint: disable=protected-access, no-member
 @attr(shard=1)
+@override_settings(ENABLE_ENTERPRISE_INTEGRATION=False)
 @ddt.ddt
 class ProgressPageTests(ModuleStoreTestCase):
     """

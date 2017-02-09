@@ -2,8 +2,11 @@
 Helpers to access the enterprise app
 """
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 import logging
+
+from django.utils.http import urlencode
 
 try:
     from enterprise.models import EnterpriseCustomer
@@ -13,6 +16,7 @@ try:
         active_provider_enforces_data_sharing,
         get_enterprise_customer_for_request,
     )
+    from enterprise.utils import consent_necessary_for_course
 
 except ImportError:
     pass
@@ -26,7 +30,32 @@ def enterprise_enabled():
     """
     Determines whether the Enterprise app is installed
     """
-    return 'enterprise' in settings.INSTALLED_APPS
+    return 'enterprise' in settings.INSTALLED_APPS and getattr(settings, 'ENABLE_ENTERPRISE_INTEGRATION', True)
+
+
+def consent_needed_for_course(user, course_id):
+    """
+    Wrap the enterprise app check to determine if the user needs to grant
+    data sharing permissions before accessing a course.
+    """
+    if not enterprise_enabled():
+        return False
+    return consent_necessary_for_course(user, course_id)
+
+
+def get_course_specific_consent_url(request, course_id, return_to):
+    """
+    Build a URL to redirect the user to the Enterprise app to provide data sharing
+    consent for a specific course ID.
+    """
+    url_params = {
+        'course_id': course_id,
+        'next': request.build_absolute_uri(reverse(return_to, args=(course_id,)))
+    }
+    querystring = urlencode(url_params)
+    full_url = reverse('grant_data_sharing_permissions') + '?' + querystring
+    LOGGER.info('Redirecting to %s to complete data sharing consent', full_url)
+    return full_url
 
 
 def data_sharing_consent_requested(request):
