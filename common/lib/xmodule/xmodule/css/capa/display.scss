@@ -898,7 +898,9 @@ div.problem .action {
   margin-top: $baseline;
   min-height: $baseline;
   width: 100%;
-  display: inline-block;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
 
   .problem-action-buttons-wrapper {
 
@@ -906,7 +908,6 @@ div.problem .action {
       @include text-align(right);
       @include float(right);
     }
-
   }
 
   .problem-action-button-wrapper {
@@ -934,11 +935,11 @@ div.problem .action {
   }
 
   .submit-attempt-container {
-    display: table;
+    display: inline-flex;
 
     @media (max-width: $bp-screen-lg) {
       max-width: 100%;
-      padding-top: $baseline;
+      padding-bottom: $baseline;
     }
     .submit {
       @include margin-right($baseline / 2);
