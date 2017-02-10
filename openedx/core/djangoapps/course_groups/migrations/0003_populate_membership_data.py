@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 import logging
 from django.db import migrations
-from django.db import import transaction
+from django.db import transaction
 
 
 log = logging.getLogger(__name__)
