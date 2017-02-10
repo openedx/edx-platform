@@ -2161,7 +2161,7 @@ INSTALLED_APPS = (
 
     # Customized celery tasks, including persisting failed tasks so they can
     # be retried
-    'openedx.core.djangoapps.celery_utils',
+    'celery_utils',
 
     # Ability to detect and special-case crawler behavior
     'openedx.core.djangoapps.crawlers',
