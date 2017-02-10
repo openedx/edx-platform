@@ -26,7 +26,7 @@ import third_party_auth
 from django_comment_common.models import Role
 from edxmako.shortcuts import marketing_link
 from student.forms import get_registration_extension_form
-from student.views import create_account_with_params
+from student.views import create_account_with_params, AccountValidationError
 from student.cookies import set_logged_in_cookies
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.api.authentication import SessionAuthenticationAllowInactiveUser
@@ -340,6 +340,9 @@ class RegistrationView(APIView):
 
         try:
             user = create_account_with_params(request, data)
+        except AccountValidationError as err:
+            errors = { err.field: [{"user_message": err.message}] }
+            return JsonResponse(errors, status=409)
         except ValidationError as err:
             # Should only get non-field errors from this function
             assert NON_FIELD_ERRORS not in err.message_dict
