@@ -17,9 +17,23 @@ define(['jquery', 'logger', 'js/courseware/course_home_events'], function($, Log
             });
         });
 
-        it('sends an event when "Upgrade to Verified" is clicked', function() {
+        it('sends an event when "Upgrade to Verified" is clicked from the sidebar', function() {
             $('.date-summary-link').click();
-            expect(Logger.log).toHaveBeenCalledWith('edx.course.home.upgrade_verified.clicked', {});
+            expect(Logger.log).toHaveBeenCalledWith('edx.course.home.upgrade_verified.clicked', {location: 'sidebar'});
+        });
+
+        it('sends an event when "Upgrade Now" is clicked from the upsell notification', function() {
+            $('.upgrade-banner-button').click();
+            expect(Logger.log).toHaveBeenCalledWith(
+                'edx.course.home.upgrade_verified.clicked', {location: 'notification'}
+            );
+        });
+
+        it('sends an event when "Learn More" is clicked from the upsell notification', function() {
+            $('.view-verified-info').click();
+            expect(Logger.log).toHaveBeenCalledWith(
+                'edx.course.home.learn_about_verified.clicked', {location: 'notification'}
+            );
         });
     });
 });

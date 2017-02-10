@@ -45,6 +45,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             days_till_upgrade_deadline=4,
             enroll_user=True,
             enrollment_mode=CourseMode.VERIFIED,
+            user_enrollment_mode=None,
             course_min_price=100,
             days_till_verification_deadline=14,
             verification_status=None,
@@ -72,8 +73,11 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             )
 
         if enroll_user:
-            enrollment_mode = enrollment_mode or CourseMode.DEFAULT_MODE_SLUG
-            CourseEnrollmentFactory.create(course_id=self.course.id, user=self.user, mode=enrollment_mode)
+            if user_enrollment_mode:
+                CourseEnrollmentFactory.create(course_id=self.course.id, user=self.user, mode=user_enrollment_mode)
+            else:
+                enrollment_mode = enrollment_mode or CourseMode.DEFAULT_MODE_SLUG
+                CourseEnrollmentFactory.create(course_id=self.course.id, user=self.user, mode=enrollment_mode)
 
         if days_till_verification_deadline is not None:
             VerificationDeadline.objects.create(
@@ -274,18 +278,64 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         )
         self.assertEqual(block.title, 'Course End')
 
-    ## Tests Verified Upgrade Deadline Date Block
+    # Tests Verified Upgrade Deadline Date Block
+
+    def check_upgrade_banner(self, banner_expected=True, include_url_parameter=True):
+        """
+        Helper method to check for the presence of the Upgrade Banner
+        """
+        url = reverse('info', args=[self.course.id.to_deprecated_string()])
+        if include_url_parameter:
+            url += '?upgrade=true'
+        resp = self.client.get(url)
+        expected_banner_text = "Give yourself an additional incentive to complete"
+        if banner_expected:
+            self.assertIn(expected_banner_text, resp.content)
+        else:
+            self.assertNotIn(expected_banner_text, resp.content)
+
     @freeze_time('2015-01-02')
     def test_verified_upgrade_deadline_date(self):
-        self.setup_course_and_user(days_till_upgrade_deadline=1)
+        self.setup_course_and_user(days_till_upgrade_deadline=1, user_enrollment_mode=CourseMode.AUDIT)
+        self.client.login(username='mrrobot', password='test')
         block = VerifiedUpgradeDeadlineDate(self.course, self.user)
         self.assertEqual(block.date, datetime.now(utc) + timedelta(days=1))
+        self.assertTrue(block.is_enabled)
         self.assertEqual(block.link, reverse('verify_student_upgrade_and_verify', args=(self.course.id,)))
+        self.check_upgrade_banner()
 
     def test_without_upgrade_deadline(self):
         self.setup_course_and_user(enrollment_mode=None)
+        self.client.login(username='mrrobot', password='test')
         block = VerifiedUpgradeDeadlineDate(self.course, self.user)
+        self.assertFalse(block.is_enabled)
         self.assertIsNone(block.date)
+        self.check_upgrade_banner(banner_expected=False)
+
+    @freeze_time('2015-01-02')
+    def test_verified_upgrade_banner_not_present_past_deadline(self):
+        self.setup_course_and_user(days_till_upgrade_deadline=-1, user_enrollment_mode=CourseMode.AUDIT)
+        self.client.login(username='mrrobot', password='test')
+        block = VerifiedUpgradeDeadlineDate(self.course, self.user)
+        self.assertFalse(block.is_enabled)
+        self.check_upgrade_banner(banner_expected=False)
+
+    @freeze_time('2015-01-02')
+    def test_verified_upgrade_banner_cookie(self):
+        self.setup_course_and_user(days_till_upgrade_deadline=1, user_enrollment_mode=CourseMode.AUDIT)
+        self.client.login(username='mrrobot', password='test')
+
+        # No URL parameter or cookie present, notification should not be shown.
+        self.check_upgrade_banner(include_url_parameter=False, banner_expected=False)
+
+        # Now pass URL parameter-- notification should be shown.
+        self.check_upgrade_banner(include_url_parameter=True)
+
+        # A cookie should be set in the previous call, so it is no longer necessary to pass
+        # the URL parameter in order to see the notification.
+        self.check_upgrade_banner(include_url_parameter=False)
+
+        # Unfortunately (according to django doc), it is not possible to test expiration of the cookie.
 
     def test_ecommerce_checkout_redirect(self):
         """Verify the block link redirects to ecommerce checkout if it's enabled."""
