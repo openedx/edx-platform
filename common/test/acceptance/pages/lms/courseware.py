@@ -164,8 +164,10 @@ class CoursewarePage(CoursePage):
             active_tab = self._active_sequence_tab
             return active_tab and previous_tab_id != active_tab.attrs('data-id')[0]
 
+        button_css = '.{} > .sequence-nav-button.{}'.format(top_or_bottom_class, next_or_previous_class)
+        self.wait_for_element_presence(button_css, "Navigation button present")
         self.q(
-            css='.{} > .sequence-nav-button.{}'.format(top_or_bottom_class, next_or_previous_class)
+            css=button_css
         ).first.click()
         EmptyPromise(is_at_new_tab_id, "Button navigation fulfilled").fulfill()
 
