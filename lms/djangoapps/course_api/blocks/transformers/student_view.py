@@ -8,7 +8,8 @@ class StudentViewTransformer(BlockStructureTransformer):
     """
     Only show information that is appropriate for a learner
     """
-    VERSION = 1
+    WRITE_VERSION = 1
+    READ_VERSION = 1
     STUDENT_VIEW_DATA = 'student_view_data'
     STUDENT_VIEW_MULTI_DEVICE = 'student_view_multi_device'
 
