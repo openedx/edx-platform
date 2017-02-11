@@ -2,7 +2,11 @@
 Block Structure Transformer Registry implemented using the platform's
 PluginManager.
 """
+from base64 import b64encode
+from hashlib import sha1
+
 from openedx.core.lib.api.plugins import PluginManager
+from openedx.core.lib.cache_utils import memoized
 
 
 class TransformerRegistry(PluginManager):
@@ -29,6 +33,22 @@ class TransformerRegistry(PluginManager):
             return set(cls.get_available_plugins().itervalues())
         else:
             return set()
+
+    @classmethod
+    @memoized
+    def get_write_version_hash(cls):
+        """
+        Returns a deterministic hash value of the WRITE_VERSION of all
+        registered transformers.
+        """
+        hash_obj = sha1()
+
+        sorted_transformers = sorted(cls.get_registered_transformers(), key=lambda t: t.name())
+        for transformer in sorted_transformers:
+            hash_obj.update(transformer.name().encode('utf-8'))
+            hash_obj.update(str(transformer.WRITE_VERSION))
+
+        return b64encode(hash_obj.digest())
 
     @classmethod
     def find_unregistered(cls, transformers):
