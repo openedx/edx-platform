@@ -24,7 +24,8 @@ class StartDateTransformer(FilteringTransformerMixin, BlockStructureTransformer)
 
     Staff users are exempted from visibility rules.
     """
-    VERSION = 1
+    WRITE_VERSION = 1
+    READ_VERSION = 1
     MERGED_START_DATE = 'merged_start_date'
 
     @classmethod

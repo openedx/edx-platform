@@ -56,11 +56,12 @@ class TestBlockStructureData(TestCase, ChildrenMapTestMixin):
             """
             Test transformer with default version number (0).
             """
-            VERSION = 0
+            WRITE_VERSION = 0
+            READ_VERSION = 0
 
         block_structure = BlockStructureModulestoreData(root_block_usage_key=0)
 
-        with self.assertRaisesRegexp(TransformerException, "VERSION attribute is not set"):
+        with self.assertRaisesRegexp(TransformerException, "Version attributes are not set"):
             block_structure._add_transformer(TestNonVersionedTransformer())
 
     def test_transformer_data(self):
@@ -103,7 +104,7 @@ class TestBlockStructureData(TestCase, ChildrenMapTestMixin):
         for t_info in transformers_info:
             self.assertEquals(
                 block_structure._get_transformer_data_version(t_info.transformer),
-                MockTransformer.VERSION
+                MockTransformer.WRITE_VERSION
             )
             for key, val in t_info.structure_wide_data:
                 self.assertEquals(

@@ -167,15 +167,24 @@ class TestBlockStructureManager(TestCase, ChildrenMapTestMixin):
         self.collect_and_verify(expect_modulestore_called=False, expect_cache_updated=False)
         self.assertEquals(TestTransformer1.collect_call_count, 1)
 
-    def test_get_collected_outdated_data(self):
+    def test_get_collected_transformer_version(self):
         self.collect_and_verify(expect_modulestore_called=True, expect_cache_updated=True)
-        TestTransformer1.VERSION += 1  # transformer code requires new schema version
-        self.collect_and_verify(expect_modulestore_called=True, expect_cache_updated=True)
-        TestTransformer1.VERSION -= 1  # old transformer code works with new schema version
+
+        # transformer code writes new schema version; data not re-collected
+        TestTransformer1.WRITE_VERSION += 1
         self.collect_and_verify(expect_modulestore_called=False, expect_cache_updated=False)
+
+        # transformer code requires new schema version; data re-collected
+        TestTransformer1.READ_VERSION += 1
+        self.collect_and_verify(expect_modulestore_called=True, expect_cache_updated=True)
+
+        # old transformer code can read new schema version; data not re-collected
+        TestTransformer1.READ_VERSION -= 1
+        self.collect_and_verify(expect_modulestore_called=False, expect_cache_updated=False)
+
         self.assertEquals(TestTransformer1.collect_call_count, 2)
 
-    def test_get_collected_version_update(self):
+    def test_get_collected_structure_version(self):
         self.collect_and_verify(expect_modulestore_called=True, expect_cache_updated=True)
         BlockStructureBlockData.VERSION += 1
         self.collect_and_verify(expect_modulestore_called=True, expect_cache_updated=True)

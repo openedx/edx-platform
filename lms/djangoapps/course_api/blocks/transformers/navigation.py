@@ -20,7 +20,8 @@ class BlockNavigationTransformer(BlockStructureTransformer):
     Prerequisites: BlockDepthTransformer must be run before this in the
     transform phase.
     """
-    VERSION = 1
+    WRITE_VERSION = 1
+    READ_VERSION = 1
     BLOCK_NAVIGATION = 'block_nav'
     BLOCK_NAVIGATION_FOR_CHILDREN = 'children_block_nav'
 

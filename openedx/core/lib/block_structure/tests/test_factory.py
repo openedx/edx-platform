@@ -6,6 +6,7 @@ from unittest import TestCase
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from ..cache import BlockStructureCache
+from ..exceptions import BlockStructureNotFound
 from ..factory import BlockStructureFactory
 from .helpers import (
     MockCache, MockModulestoreFactory, ChildrenMapTestMixin
@@ -43,17 +44,15 @@ class TestBlockStructureFactory(TestCase, ChildrenMapTestMixin):
             block_structure.root_block_usage_key,
             cache,
         )
-        self.assertIsNotNone(from_cache_block_structure)
         self.assert_block_structure(from_cache_block_structure, self.children_map)
 
     def test_from_cache_none(self):
         cache = BlockStructureCache(MockCache())
-        self.assertIsNone(
+        with self.assertRaises(BlockStructureNotFound):
             BlockStructureFactory.create_from_cache(
                 root_block_usage_key=0,
                 block_structure_cache=cache,
             )
-        )
 
     def test_new(self):
         block_structure = BlockStructureFactory.create_from_modulestore(
