@@ -52,6 +52,8 @@
 
                     this.thirdPartyAuthHint = options.third_party_auth_hint || null;
 
+                    this.disableRegistrationButton = options.disable_registration_button || false;
+
                     if (options.login_redirect_url) {
                     // Ensure that the next URL is internal for security reasons
                         if (! window.isExternal(options.login_redirect_url)) {
@@ -119,7 +121,8 @@
                             resetModel: this.resetModel,
                             thirdPartyAuth: this.thirdPartyAuth,
                             platformName: this.platformName,
-                            supportURL: this.supportURL
+                            supportURL: this.supportURL,
+                            disableRegistrationButton: this.disableRegistrationButton
                         });
 
                     // Listen for 'password-help' event to toggle sub-views

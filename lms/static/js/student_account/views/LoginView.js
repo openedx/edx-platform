@@ -36,6 +36,7 @@
                     this.errorMessage = data.thirdPartyAuth.errorMessage || '';
                     this.platformName = data.platformName;
                     this.resetModel = data.resetModel;
+                    this.disableRegistrationButton = data.disableRegistrationButton || false;
                     this.supportURL = data.supportURL;
 
                     this.listenTo(this.model, 'sync', this.saveSuccess);
@@ -53,7 +54,8 @@
                             currentProvider: this.currentProvider,
                             providers: this.providers,
                             hasSecondaryProviders: this.hasSecondaryProviders,
-                            platformName: this.platformName
+                            platformName: this.platformName,
+                            disableRegistrationButton: this.disableRegistrationButton
                         }
                     }));
 

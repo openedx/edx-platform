@@ -9,6 +9,7 @@ from django.utils.translation import ugettext as _
 from context_processors import doc_url
 from lms.djangoapps.ccx.overrides import get_current_ccx
 from openedx.core.djangolib.markup import HTML, Text
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 # App that handles subdomain specific branding
 from branding import api as branding_api
@@ -151,9 +152,11 @@ site_status_msg = get_site_status_msg(course_id)
                 <a class="btn-neutral" href="${reverse('course-specific-register', args=[course.id.to_deprecated_string()])}">${_("Register")}</a>
               </li>
             % else:
+              % if not configuration_helpers.get_value('DISABLE_REGISTER_BUTTON', settings.FEATURES['DISABLE_REGISTER_BUTTON']):
               <li class="item nav-global-04">
                 <a class="btn-neutral" href="/register${login_query()}">${_("Register")}</a>
               </li>
+              % endif
             % endif
           % endif
         </%block>

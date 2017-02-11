@@ -107,6 +107,9 @@ def login_and_registration_form(request, initial_mode="login"):
     if ext_auth_response is not None:
         return ext_auth_response
 
+    disable_registration_button = configuration_helpers.get_value('DISABLE_REGISTER_BUTTON',
+                                                                  settings.FEATURES['DISABLE_REGISTER_BUTTON'])
+
     # Otherwise, render the combined login/registration page
     context = {
         'data': {
@@ -124,6 +127,7 @@ def login_and_registration_form(request, initial_mode="login"):
             'login_form_desc': json.loads(form_descriptions['login']),
             'registration_form_desc': json.loads(form_descriptions['registration']),
             'password_reset_form_desc': json.loads(form_descriptions['password_reset']),
+            'disable_registration_button': disable_registration_button,
         },
         'login_redirect_url': redirect_to,  # This gets added to the query string of the "Sign In" button in header
         'responsive': True,
