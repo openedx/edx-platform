@@ -57,24 +57,26 @@ echo '-------------------'
 echo 'dpkg -l'
 dpkg -l
 
+# echo '-------------------'
+#
+# echo 'pip freeze'
+# # Reset the jenkins worker's virtualenv back to the
+# # state it was in when the instance was spun up.
+# if [ -e $HOME/edx-venv_clean.tar.gz ]; then
+#     rm -rf $HOME/edx-venv
+#     tar -C $HOME -xf $HOME/edx-venv_clean.tar.gz
+# fi
+#
+# bash -c 'source $HOME/edx-venv/bin/activate && pip freeze'
+
+# echo '-------------------'
+#
+# echo 'ls -lah for pip packages'
+# ls -lah source $HOME/edx-venv/lib/python2.7/
+
 echo '-------------------'
 
-echo 'pip freeze'
-# Reset the jenkins worker's virtualenv back to the
-# state it was in when the instance was spun up.
-if [ -e $HOME/edx-venv_clean.tar.gz ]; then
-    rm -rf $HOME/edx-venv
-    tar -C $HOME -xf $HOME/edx-venv_clean.tar.gz
-fi
-
-bash -c 'source $HOME/edx-venv/bin/activate && pip freeze'
-
-echo '-------------------'
-
-echo 'ls -lah for pip packages'
-ls -lah source $HOME/edx-venv/lib/python2.7/
-
-echo '-------------------'
+echo 'Uploading the venv tgz'
 
 API_USER="8Rux9wlxnWrt4crm6GaReksEpPliv8"
 API_PASS="dAZVV5MoMTEv7MaX5NClW7b7ltcL7X"
