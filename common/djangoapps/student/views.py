@@ -1752,7 +1752,7 @@ def create_account_with_params(request, params):
         organization = request.site.organizations.first()
 
     if organization:
-        UserOrganizationMapping.objects.get_or_create(user=user, organization=organization, is_active=True)
+        UserOrganizationMapping.objects.get_or_create(user=user, organization=organization, is_amc_admin=True)
 
     # allow users registered from AMC to create courses
     if "registered_from_amc" in params:
