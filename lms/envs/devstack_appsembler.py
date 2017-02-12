@@ -58,7 +58,11 @@ SITE_ID = 1
 # MULTITENANT_MAPPER_CLASS = 'microsite_configuration.mapper.SimpleTenantMapper'
 
 #DATABASES['default']['ENGINE'] = 'db_multitenant.db.backends.mysql'
-AUTHENTICATION_BACKENDS = ('organizations.backends.OrganizationMemberBackend',) + AUTHENTICATION_BACKENDS
+AUTHENTICATION_BACKENDS = (
+    'organizations.backends.DefaultSiteBackend',
+    'organizations.backends.SiteMemberBackend',
+    'organizations.backends.OrganizationMemberBackend',
+)
 
 INTERCOM_APP_ID = AUTH_TOKENS.get("INTERCOM_APP_ID")
 INTERCOM_APP_SECRET = AUTH_TOKENS.get("INTERCOM_APP_SECRET")

@@ -68,7 +68,11 @@ COURSE_ABOUT_VISIBILITY_PERMISSION = 'see_about_page'
 SEARCH_SKIP_ENROLLMENT_START_DATE_FILTERING = True
 
 # disable for now
-#AUTHENTICATION_BACKENDS = ('organizations.backends.OrganizationMemberBackend',) + AUTHENTICATION_BACKENDS
+AUTHENTICATION_BACKENDS = (
+    'organizations.backends.DefaultSiteBackend',
+    'organizations.backends.SiteMemberBackend',
+    'organizations.backends.OrganizationMemberBackend',
+)
 
 # SENTRY
 SENTRY_DSN = AUTH_TOKENS.get('SENTRY_DSN', False)
