@@ -113,7 +113,7 @@ def bootstrap_site(site, organization_slug=None, user_email=None):
         organization = {}
     if user_email:
         user = User.objects.get(email=user_email)
-        UserOrganizationMapping.objects.create(user=user, organization=organization)
+        UserOrganizationMapping.objects.create(user=user, organization=organization, is_amc_admin=True)
     else:
         user = {}
     return organization, site, user

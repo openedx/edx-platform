@@ -15,6 +15,7 @@ from openedx.core.lib.api.authentication import (
     OAuth2AuthenticationAllowInactiveUser,
 )
 
+from .permissions import AMCAdminPermission
 from .serializers import SiteConfigurationSerializer, SiteConfigurationListSerializer, SiteSerializer,\
     RegistrationSerializer
 from .utils import delete_site
@@ -45,6 +46,7 @@ class SiteConfigurationViewSet(viewsets.ModelViewSet):
     serializer_class = SiteConfigurationSerializer
     list_serializer_class = SiteConfigurationListSerializer
     create_serializer_class = SiteSerializer
+    permission_classes = [AMCAdminPermission]
 
     authentication_classes = (OAuth2AuthenticationAllowInactiveUser,)
 
