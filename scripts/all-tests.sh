@@ -80,5 +80,12 @@ API_USER="8Rux9wlxnWrt4crm6GaReksEpPliv8"
 API_PASS="dAZVV5MoMTEv7MaX5NClW7b7ltcL7X"
 END_POINT="https://edraak-omar.smartfile.com/api/2/path/data/venvs/"
 
+
+hostname
+HOSTNAME=`hostname`
+
 ENV_TGZ="$HOME/edx-venv_clean.tar.gz"
-curl -v -u "$API_USER:$API_PASS" "$END_POINT" -F upload=@$ENV_TGZ
+NAMED_ENV_TGZ="/tmp/$HOSTNAME-edx-venv_clean.tar.gz"
+cp "$ENV_TGZ" "$NAMED_ENV_TGZ"
+
+curl -v -u "$API_USER:$API_PASS" "$END_POINT" -F upload=@$NAMED_ENV_TGZ
