@@ -429,17 +429,16 @@ class CandidateProfile(models.Model):
     graduation_date = models.DateTimeField(blank=False, null=False)
     phone_number = models.CharField(max_length=20, blank=False, null=False)
     cgpa = models.DecimalField(max_digits=4, decimal_places=2, blank=False, null=False)
-    position_in_class = models.CharField(max_length=25, blank=False, null=False)
+    position_in_class = models.IntegerField(blank=True, null=True)
     academic_projects = models.CharField(max_length=255, blank=False, null=False)
-    extra_curricular_activities = models.CharField(max_length=255, blank=False, null=False)
-    freelance_work = models.CharField(max_length=255, blank=False, null=False)
+    extra_curricular_activities = models.CharField(max_length=255, blank=True, null=True)
+    freelance_work = models.CharField(max_length=255, blank=True, null=True)
     accomplishment = models.CharField(max_length=255, blank=False, null=False)
     individuality_factor = models.CharField(max_length=255, blank=False, null=False)
     ideal_organization = models.CharField(max_length=255, blank=False, null=False)
     why_arbisoft = models.CharField(max_length=255, blank=False, null=False)
     expected_salary = models.IntegerField(blank=False, null=False)
     career_plan = models.CharField(max_length=255, blank=False, null=False)
-    references = models.CharField(max_length=255, blank=False, null=False)
 
     other_studied_course = models.CharField(max_length=255, blank=True, null=True)
     other_technology = models.CharField(max_length=255, blank=True, null=True)
@@ -457,7 +456,7 @@ class CandidateCourse(models.Model):
         max_length=255,
         blank=False,
         choices=arbi_constants.STUDIED_COURSES,
-        default=arbi_constants.INTRO_TO_COMPUTING
+        default=arbi_constants.PROGRAMMING
     )
 
 
@@ -470,9 +469,9 @@ class CandidateExpertise(models.Model):
         max_length=255,
         blank=False,
         choices=arbi_constants.EXPERTISE,
-        default=arbi_constants.INTRO_TO_COMPUTING
+        default=arbi_constants.PROGRAMMING
     )
-    rank = models.IntegerField(blank=False)
+    rank = models.IntegerField(default=0, blank=False)
 
 
 class CandidateTechnology(models.Model):
@@ -484,8 +483,19 @@ class CandidateTechnology(models.Model):
         max_length=255,
         blank=False,
         choices=arbi_constants.TECHNOLOGIES,
-        default=arbi_constants.PYTHON_DJANGO
+        default=arbi_constants.WEB_DEV
     )
+
+
+class CandidateReference(models.Model):
+    """
+    Model to store reference's profile for candidate user.
+    """
+    candidate = models.ForeignKey(CandidateProfile, on_delete=models.CASCADE, null=True)
+    name = models.CharField(max_length=255, blank=False, null=False, db_index=True)
+    phone_number = models.CharField(max_length=20, blank=False, null=False)
+    position = models.CharField(max_length=255, blank=False, null=False)
+
 
 
 @receiver(models.signals.post_save, sender=UserProfile)

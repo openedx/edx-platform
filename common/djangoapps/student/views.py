@@ -57,6 +57,7 @@ from edxmako.shortcuts import render_to_response, render_to_string
 from course_modes.models import CourseMode
 from enrollment.api import add_enrollment, get_enrollment
 from shoppingcart.api import order_history
+from student.arbisoft.form import CandidateReferenceForm
 from student.models import (
     Registration, UserProfile,
     PendingEmailChange, CourseEnrollment, CourseEnrollmentAttribute, unique_id_for_user,
@@ -67,8 +68,8 @@ from student.models import (
     CandidateProfile,
     CandidateCourse,
     CandidateExpertise,
-    CandidateTechnology
-)
+    CandidateTechnology,
+    CandidateReference)
 from .arbisoft import constants as arbi_constants
 from student.forms import AccountCreationForm, PasswordResetFormNoActive, get_registration_extension_form
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
@@ -579,20 +580,31 @@ def arbisoft_survey(request):
     course_ranking_formset = CourseRankingFormset(
         queryset=CandidateExpertise.objects.none(),
         initial=[
-            {'expertise': course_id, 'rank': 1}
+            {'expertise': course_id, 'rank': 0}
             for course_id, course_name in arbi_constants.EXPERTISE
         ]
+    )
+
+    CandidateReferenceFormset = modelformset_factory(CandidateReference, form=CandidateReferenceForm, extra=2,)
+
+    reference_formset = CandidateReferenceFormset(
+        queryset=CandidateReference.objects.none(),
     )
 
     context = {
         'profile': profile_form,
         'ranking_formset': course_ranking_formset,
+        'reference_formset': reference_formset,
     }
 
     if request.method == "POST":
         ranking_formset = CourseRankingFormset(data=request.POST)
+        reference_formset = CandidateReferenceFormset(data=request.POST)
 
-        details_valid = ranking_formset.is_valid() and profile_form.is_valid()
+        #context['ranking_formset'] = ranking_formset
+        context['reference_formset'] = reference_formset
+
+        details_valid = ranking_formset.is_valid() and reference_formset.is_valid() and profile_form.is_valid()
 
         if details_valid:
             with transaction.atomic():
@@ -601,6 +613,11 @@ def arbisoft_survey(request):
                 profile = profile_form.save(commit=False)
                 profile.user = user
                 profile.save()
+
+                for reference_form in reference_formset:
+                    reference = reference_form.save(commit=False)
+                    reference.candidate = profile
+                    reference.save()
 
                 for rank_form in ranking_formset:
                     rank = rank_form.save(commit=False)

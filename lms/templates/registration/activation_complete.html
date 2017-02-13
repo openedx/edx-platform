@@ -25,7 +25,7 @@ from openedx.core.djangolib.markup import HTML, Text
       %endif
 
       %if user_logged_in:
-        ${Text(_("Visit your {link_start}dashboard{link_end} to see your courses.")).format(
+        ${Text(_("Visit your {link_start}dashboard{link_end}.")).format(
             link_start=HTML('<a href="{url}">').format(url=reverse('dashboard')), link_end=HTML('</a>'))}
       %else:
         ${Text(_("You can now {link_start}sign in{link_end}.")).format(

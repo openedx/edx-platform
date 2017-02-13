@@ -403,7 +403,7 @@ class RegistrationView(APIView):
 
         # Translators: These instructions appear on the registration form, immediately
         # below a field meant to hold the user's full name.
-        name_instructions = _(u"Your legal name, used for any certificates you earn.")
+        name_instructions = _(u"Your fullname as per your CNIC.")
 
         form_desc.add_field(
             "name",
@@ -433,8 +433,7 @@ class RegistrationView(APIView):
         username_instructions = _(
             # Translators: These instructions appear on the registration form, immediately
             # below a field meant to hold the user's public username.
-            u"The name that will identify you in your courses - "
-            u"{bold_start}(cannot be changed later){bold_end}"
+            u"{bold_start}Cannot be changed later.{bold_end}"
         ).format(bold_start=u'<strong>', bold_end=u'</strong>')
 
         # Translators: This example username is used as a placeholder in
@@ -761,7 +760,7 @@ class RegistrationView(APIView):
         else:
             # Translators: This is a legal document users must agree to
             # in order to register a new account.
-            terms_text = _(u"Terms of Service and Honor Code")
+            terms_text = _(u"Honor Code")
 
         terms_link = u"<a href=\"{url}\">{terms_text}</a>".format(
             url=marketing_link("HONOR"),
@@ -770,7 +769,7 @@ class RegistrationView(APIView):
 
         # Translators: "Terms of Service" is a legal document users must agree to
         # in order to register a new account.
-        label = _(u"I agree to the {platform_name} {terms_of_service}.").format(
+        label = _(u"I agree to the {platform_name}'s {terms_of_service}.").format(
             platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
             terms_of_service=terms_link
         )
