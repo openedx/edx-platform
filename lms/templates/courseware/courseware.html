@@ -150,9 +150,9 @@ ${HTML(fragment.foot_html())}
 
     </div>
 % endif
-    <section class="course-content" id="course-content">
+    <section class="course-content" id="course-content" tabindex="-1">
         <div class="path"></div>
-        <main id="main" aria-label="Content" tabindex="-1">
+        <main id="main" aria-label="Content">
         % if getattr(course, 'entrance_exam_enabled') and \
            getattr(course, 'entrance_exam_minimum_score_pct') and \
            entrance_exam_current_score is not UNDEFINED:
