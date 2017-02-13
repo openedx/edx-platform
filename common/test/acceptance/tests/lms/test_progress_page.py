@@ -8,6 +8,7 @@ import ddt
 from bok_choy.javascript import js_defined
 from contextlib import contextmanager
 from nose.plugins.attrib import attr
+from flaky import flaky
 
 from ..helpers import (
     UniqueCourseTest, auto_auth, create_multiple_choice_problem, create_multiple_choice_xml, get_modal_alert
@@ -228,6 +229,7 @@ class PersistentGradesTest(ProgressPageBaseTest):
         _change_subsection_structure,
         _change_weight_for_problem
     )
+    @flaky #TODO: fix this, see TNL-6040
     def test_content_changes_do_not_change_score(self, edit):
         with self._logged_in_session():
             self.courseware_page.visit()
