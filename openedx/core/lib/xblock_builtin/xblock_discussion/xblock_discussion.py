@@ -39,7 +39,7 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):
     discussion_id = String(scope=Scope.settings, default=UNIQUE_ID)
     display_name = String(
         display_name=_("Display Name"),
-        help=_("Display name for this component"),
+        help=_("The display name for this component."),
         default="Discussion",
         scope=Scope.settings
     )
@@ -169,8 +169,11 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):
 
         context = {
             'discussion_id': self.discussion_id,
+            'display_name': self.display_name if (self.display_name) else _("Discussion"),
             'user': self.django_user,
             'course_id': self.course_key,
+            'discussion_category': self.discussion_category,
+            'discussion_target': self.discussion_target,
             'can_create_thread': self.has_permission("create_thread"),
             'can_create_comment': self.has_permission("create_comment"),
             'can_create_subcomment': self.has_permission("create_sub_comment"),

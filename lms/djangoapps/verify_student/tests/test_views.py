@@ -36,8 +36,8 @@ from course_modes.tests.factories import CourseModeFactory
 from courseware.url_helpers import get_redirect_url
 from common.test.utils import XssTestMixin
 from commerce.models import CommerceConfiguration
-from commerce.tests import TEST_PAYMENT_DATA, TEST_API_URL, TEST_API_SIGNING_KEY, TEST_PUBLIC_URL_ROOT
-from embargo.test_utils import restrict_course
+from commerce.tests import TEST_PAYMENT_DATA, TEST_API_URL, TEST_PUBLIC_URL_ROOT
+from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from shoppingcart.models import Order, CertificateItem
@@ -104,7 +104,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
     YESTERDAY = NOW - timedelta(days=1)
     TOMORROW = NOW + timedelta(days=1)
 
-    URLCONF_MODULES = ['embargo']
+    URLCONF_MODULES = ['openedx.core.djangoapps.embargo']
 
     @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
@@ -140,7 +140,6 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
     @httpretty.activate
     @override_settings(
         ECOMMERCE_API_URL=TEST_API_URL,
-        ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY,
         ECOMMERCE_PUBLIC_URL_ROOT=TEST_PUBLIC_URL_ROOT
     )
     def test_start_flow_with_ecommerce(self):
@@ -514,7 +513,6 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
             response,
             unicode(course.id),
             course.display_name,
-            course.start_datetime_text(),
             courseware_url
         )
 
@@ -725,7 +723,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         # Expect that the expiration date is set
         response = self._get_page(payment_flow, course.id)
         data = self._get_page_data(response)
-        self.assertEqual(data['verification_deadline'], deadline.strftime("%b %d, %Y at %H:%M UTC"))
+        self.assertEqual(data['verification_deadline'], unicode(deadline))
 
     def test_course_mode_expired(self):
         deadline = datetime.now(tz=pytz.UTC) + timedelta(days=-360)
@@ -743,7 +741,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         # to the student that the deadline has passed
         response = self._get_page("verify_student_verify_now", course.id)
         self.assertContains(response, "verification deadline")
-        self.assertContains(response, deadline.strftime("%b %d, %Y at %H:%M UTC"))
+        self.assertContains(response, deadline)
 
     @ddt.data(datetime.now(tz=pytz.UTC) + timedelta(days=360), None)
     def test_course_mode_expired_verification_deadline_in_future(self, verification_deadline):
@@ -792,7 +790,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
 
         # Check that the verification deadline (rather than the upgrade deadline) is displayed
         if verification_deadline is not None:
-            self.assertEqual(data["verification_deadline"], verification_deadline.strftime("%b %d, %Y at %H:%M UTC"))
+            self.assertEqual(data["verification_deadline"], unicode(verification_deadline))
         else:
             self.assertEqual(data["verification_deadline"], "")
 
@@ -821,7 +819,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         # message when we go to verify.
         response = self._get_page("verify_student_verify_now", course.id)
         self.assertContains(response, "verification deadline")
-        self.assertContains(response, verification_deadline_in_past.strftime("%b %d, %Y at %H:%M UTC"))
+        self.assertContains(response, verification_deadline_in_past)
 
     @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
     @ddt.data("verify_student_start_flow", "verify_student_begin_flow")
@@ -966,12 +964,11 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
             else:
                 self.assertFalse(displayed, msg="Expected '{req}' requirement to be hidden".format(req=req))
 
-    def _assert_course_details(self, response, course_key, display_name, start_text, url):
+    def _assert_course_details(self, response, course_key, display_name, url):
         """Check the course information on the page. """
         response_dict = self._get_page_data(response)
         self.assertEqual(response_dict['course_key'], course_key)
         self.assertEqual(response_dict['course_name'], display_name)
-        self.assertEqual(response_dict['course_start_date'], start_text)
         self.assertEqual(response_dict['courseware_url'], url)
 
     def _assert_user_details(self, response, full_name):
@@ -1001,7 +998,6 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
             'full_name': pay_and_verify_div['data-full-name'],
             'course_key': pay_and_verify_div['data-course-key'],
             'course_name': pay_and_verify_div['data-course-name'],
-            'course_start_date': pay_and_verify_div['data-course-start-date'],
             'courseware_url': pay_and_verify_div['data-courseware-url'],
             'course_mode_name': pay_and_verify_div['data-course-mode-name'],
             'course_mode_slug': pay_and_verify_div['data-course-mode-slug'],
@@ -1056,7 +1052,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         self.assertEqual(response_dict['course_name'], mode_display_name)
 
     @httpretty.activate
-    @override_settings(ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY)
+    @override_settings(ECOMMERCE_API_URL=TEST_API_URL)
     @ddt.data("verify_student_start_flow", "verify_student_begin_flow")
     def test_processors_api(self, payment_flow):
         """
@@ -1226,7 +1222,7 @@ class TestCreateOrderShoppingCart(CheckoutTestMixin, ModuleStoreTestCase):
 
 
 @attr(shard=2)
-@override_settings(ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY)
+@override_settings(ECOMMERCE_API_URL=TEST_API_URL)
 @patch(
     'lms.djangoapps.verify_student.views.checkout_with_ecommerce_service',
     return_value=TEST_PAYMENT_DATA,
@@ -1251,7 +1247,7 @@ class TestCheckoutWithEcommerceService(ModuleStoreTestCase):
     """
 
     @httpretty.activate
-    @override_settings(ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY)
+    @override_settings(ECOMMERCE_API_URL=TEST_API_URL)
     def test_create_basket(self):
         """
         Check that when working with a product being processed by the
@@ -2070,6 +2066,23 @@ class TestReverifyView(TestCase):
 
         # Cannot reverify because the user is already verified.
         self._assert_cannot_reverify()
+
+    @override_settings(VERIFY_STUDENT={"DAYS_GOOD_FOR": 5, "EXPIRING_SOON_WINDOW": 10})
+    def test_reverify_view_can_reverify_approved_expired_soon(self):
+        """
+        Verify that learner can submit photos if verification is set to expired soon.
+        Verification will be good for next DAYS_GOOD_FOR (i.e here it is 5 days) days,
+        and learner can submit photos if verification is set to expire in
+        EXPIRING_SOON_WINDOW(i.e here it is 10 days) or less days.
+        """
+
+        attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
+        attempt.mark_ready()
+        attempt.submit()
+        attempt.approve()
+
+        # Can re-verify because verification is set to expired soon.
+        self._assert_can_reverify()
 
     def _get_reverify_page(self):
         """

@@ -16,7 +16,9 @@ class SiteMixin(object):
             site=self.site,
             values={
                 "SITE_NAME": self.site.domain,
-                "course_org_filter": "fakeX",
+                "course_email_from_addr": "fake@example.com",
+                "course_email_template_name": "fake_email_template",
+                "course_org_filter": "fakeX"
             }
         )
 
@@ -28,6 +30,7 @@ class SiteMixin(object):
             site=self.site_other,
             values={
                 "SITE_NAME": self.site_other.domain,
+                "SESSION_COOKIE_DOMAIN": self.site_other.domain,
                 "course_org_filter": "fakeOtherX",
                 "ENABLE_MKTG_SITE": True,
                 "SHOW_ECOMMERCE_REPORTS": True,
@@ -41,8 +44,22 @@ class SiteMixin(object):
         # Initialize client with default site domain
         self.use_site(self.site)
 
+    def set_up_site(self, domain, site_configuration_values):
+        """
+        Create Site and SiteConfiguration models and initialize test client with the created site
+        """
+        site = SiteFactory.create(
+            domain=domain,
+            name=domain
+        )
+        __ = SiteConfigurationFactory.create(
+            site=site,
+            values=site_configuration_values
+        )
+        self.use_site(site)
+
     def use_site(self, site):
         """
-        # Initializes the test client with the domain of the given site
+        Initializes the test client with the domain of the given site
         """
         self.client = self.client_class(SERVER_NAME=site.domain)

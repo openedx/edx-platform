@@ -91,4 +91,38 @@ describe('Tests for accessibility_tools.js', function() {
             });
         });
     });
+
+    describe('Tests for SR region', function() {
+        var getSRText = function() {
+            return $('#reader-feedback').html();
+        };
+
+        beforeEach(function() {
+            loadFixtures('js/fixtures/sr-fixture.html');
+        });
+
+        it('has the sr class and is aria-live', function() {
+            var $reader = $('#reader-feedback');
+            expect($reader.hasClass('sr')).toBe(true);
+            expect($reader.attr('aria-live')).toBe('polite');
+        });
+
+        it('supports the setting of simple text', function() {
+            window.SR.readText('Simple Text');
+            expect(getSRText()).toContain('<p>Simple Text</p>');
+        });
+
+        it('supports the setting of an array of text', function() {
+            window.SR.readTexts(['One', 'Two']);
+            expect(getSRText()).toContain('<p>One</p>\n<p>Two</p>');
+        });
+
+        it('supports setting an array of elements', function() {
+            window.SR.readElts($('.status'));
+            expect(getSRText()).toContain(
+                '<p>Yes!<span>Your answer is correct!</span></p>\n<p>No!<span>Your answer is wrong!</span></p>'
+            );
+        });
+    });
+
 });

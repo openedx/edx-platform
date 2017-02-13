@@ -5,9 +5,8 @@ Tests for minimum grade requirement status
 import ddt
 import pytz
 from datetime import timedelta, datetime
-from unittest import skipUnless
+from mock import MagicMock
 
-from django.conf import settings
 from django.test.client import RequestFactory
 from nose.plugins.attrib import attr
 from course_modes.models import CourseMode
@@ -21,10 +20,11 @@ from openedx.core.djangoapps.credit.api import (
 )
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
 from openedx.core.djangoapps.credit.signals import listen_for_grade_calculation
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
 @attr(shard=2)
-@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in LMS')
+@skip_unless_lms
 @ddt.ddt
 class TestMinGradedRequirementStatus(ModuleStoreTestCase):
     """Test cases to check the minimum grade requirement status updated.
@@ -73,7 +73,9 @@ class TestMinGradedRequirementStatus(ModuleStoreTestCase):
 
     def assert_requirement_status(self, grade, due_date, expected_status):
         """ Verify the user's credit requirement status is as expected after simulating a grading calculation. """
-        listen_for_grade_calculation(None, self.user, {'percent': grade}, self.course.id, due_date)
+        course_grade = MagicMock()
+        course_grade.percent = grade
+        listen_for_grade_calculation(None, self.user, course_grade, self.course.id, due_date)
         req_status = get_credit_requirement_status(self.course.id, self.request.user.username, 'grade', 'grade')
 
         self.assertEqual(req_status[0]['status'], expected_status)

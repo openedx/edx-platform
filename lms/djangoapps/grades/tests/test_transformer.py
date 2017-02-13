@@ -7,15 +7,17 @@ import pytz
 import random
 
 import ddt
+from copy import deepcopy
 
 from student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import check_mongo_calls
 
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.course_blocks.transformers.tests.helpers import CourseStructureTestCase
-from openedx.core.djangoapps.content.block_structure.api import get_cache
+from openedx.core.djangoapps.content.block_structure.api import clear_course_from_cache
 from ..transformer import GradesTransformer
 
 
@@ -38,6 +40,27 @@ class GradesTransformerTestCase(CourseStructureTestCase):
         password = u'test'
         self.student = UserFactory.create(is_staff=False, username=u'test_student', password=password)
         self.client.login(username=self.student.username, password=password)
+
+    def _update_course_grading_policy(self, course, grading_policy):
+        """
+        Helper to update a course's grading policy in the modulestore.
+        """
+        course.set_grading_policy(grading_policy)
+        modulestore().update_item(course, self.user.id)
+
+    def _validate_grading_policy_hash(self, course_location, grading_policy_hash):
+        """
+        Helper to retrieve the course at the given course_location and
+        assert that its hashed grading policy (from the grades transformer)
+        is as expected.
+        """
+        block_structure = get_course_blocks(self.student, course_location, self.transformers)
+        self.assert_collected_transformer_block_fields(
+            block_structure,
+            course_location,
+            self.TRANSFORMER_CLASS_TO_TEST,
+            grading_policy_hash=grading_policy_hash,
+        )
 
     def assert_collected_xblock_fields(self, block_structure, usage_key, **expectations):
         """
@@ -329,8 +352,45 @@ class GradesTransformerTestCase(CourseStructureTestCase):
             blocks = self.build_course_with_problems()
         block_structure = get_course_blocks(self.student, blocks[u'course'].location, self.transformers)
         self.assertIsNotNone(block_structure.get_xblock_field(blocks[u'course'].location, u'course_version'))
+        self.assertEqual(
+            block_structure.get_xblock_field(blocks[u'problem'].location, u'course_version'),
+            block_structure.get_xblock_field(blocks[u'course'].location, u'course_version')
+        )
+
+    def test_grading_policy_collected(self):
+        # the calculated hash of the original and updated grading policies of the test course
+        original_grading_policy_hash = u'ChVp0lHGQGCevD0t4njna/C44zQ='
+        updated_grading_policy_hash = u'TsbX04qWOy1WRnC0NHy+94upPd4='
+
+        blocks = self.build_course_with_problems()
+        course_block = blocks[u'course']
+        self._validate_grading_policy_hash(
+            course_block.location,
+            original_grading_policy_hash
+        )
+
+        # make sure the hash changes when the course grading policy is edited
+        grading_policy_with_updates = course_block.grading_policy
+        original_grading_policy = deepcopy(grading_policy_with_updates)
+        for section in grading_policy_with_updates['GRADER']:
+            self.assertNotEqual(section['weight'], 0.25)
+            section['weight'] = 0.25
+
+        self._update_course_grading_policy(course_block, grading_policy_with_updates)
+        self._validate_grading_policy_hash(
+            course_block.location,
+            updated_grading_policy_hash
+        )
+
+        # reset the grading policy and ensure the hash matches the original
+        self._update_course_grading_policy(course_block, original_grading_policy)
+        self._validate_grading_policy_hash(
+            course_block.location,
+            original_grading_policy_hash
+        )
 
 
+@ddt.ddt
 class MultiProblemModulestoreAccessTestCase(CourseStructureTestCase, SharedModuleStoreTestCase):
     """
     Test mongo usage in GradesTransformer.
@@ -344,7 +404,12 @@ class MultiProblemModulestoreAccessTestCase(CourseStructureTestCase, SharedModul
         self.student = UserFactory.create(is_staff=False, username=u'test_student', password=password)
         self.client.login(username=self.student.username, password=password)
 
-    def test_modulestore_performance(self):
+    @ddt.data(
+        (ModuleStoreEnum.Type.split, 3),
+        (ModuleStoreEnum.Type.mongo, 2),
+    )
+    @ddt.unpack
+    def test_modulestore_performance(self, store_type, expected_mongo_queries):
         """
         Test that a constant number of mongo calls are made regardless of how
         many grade-related blocks are in the course.
@@ -378,7 +443,8 @@ class MultiProblemModulestoreAccessTestCase(CourseStructureTestCase, SharedModul
                         </problem>'''.format(number=problem_number),
                 }
             )
-        blocks = self.build_course(course)
-        get_cache().clear()
-        with check_mongo_calls(2):
+        with self.store.default_store(store_type):
+            blocks = self.build_course(course)
+        clear_course_from_cache(blocks[u'course'].id)
+        with check_mongo_calls(expected_mongo_queries):
             get_course_blocks(self.student, blocks[u'course'].location, self.transformers)

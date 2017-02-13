@@ -129,7 +129,6 @@ class LibraryEditPageTest(StudioLibraryTest):
         """
         self.assertFalse(self.browser.find_elements_by_css_selector('span.large-discussion-icon'))
 
-    @flaky  # TODO fix this, see TNL-2322
     def test_library_pagination(self):
         """
         Scenario: Ensure that adding several XBlocks to a library results in pagination.
@@ -652,12 +651,9 @@ class StudioLibraryA11yTest(StudioLibraryTest):
         lib_page.visit()
         lib_page.wait_until_ready()
 
-        # There are several existing color contrast errors on this page,
-        # we will ignore this error in the test until we fix them.
         lib_page.a11y_audit.config.set_rules({
             "ignore": [
-                'icon-aria-hidden',  # TODO: AC-229
-                'link-href',  # TODO: AC-564
+                'link-href',  # TODO: AC-590
             ],
         })
 

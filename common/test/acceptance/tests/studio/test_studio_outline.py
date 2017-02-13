@@ -19,7 +19,7 @@ from common.test.acceptance.fixtures.config import ConfigModelFixture
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 
 from base_studio_test import StudioCourseTest
-from common.test.acceptance.tests.helpers import load_data_str
+from common.test.acceptance.tests.helpers import load_data_str, disable_animations
 from common.test.acceptance.pages.lms.progress import ProgressPage
 
 
@@ -1075,7 +1075,7 @@ class CreateSectionsTest(CourseOutlineTest):
         self.assertEqual(len(self.course_outline_page.section_at(0).subsections()), 1)
         self.course_outline_page.section_at(0).subsection_at(0).add_unit()
         unit_page = ContainerPage(self.browser, None)
-        EmptyPromise(unit_page.is_browser_on_page, 'Browser is on the unit page').fulfill()
+        unit_page.wait_for_page()
         self.assertTrue(unit_page.is_inline_editing_display_name())
 
 
@@ -1315,8 +1315,12 @@ class ExpandCollapseMultipleSectionsTest(CourseOutlineTest):
             And all sections are expanded
         """
         self.course_outline_page.visit()
+        # We have seen unexplainable sporadic failures in this test. Try disabling animations to see
+        # if that helps.
+        disable_animations(self.course_outline_page)
         self.course_outline_page.toggle_expand_collapse()
         self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.EXPAND)
+        self.verify_all_sections(collapsed=True)
         self.course_outline_page.section_at(0).expand_subsection()
         self.course_outline_page.toggle_expand_collapse()
         self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.COLLAPSE)
@@ -1469,7 +1473,7 @@ class UnitNavigationTest(CourseOutlineTest):
         self.course_outline_page.visit()
         self.course_outline_page.section_at(0).subsection_at(0).expand_subsection()
         unit = self.course_outline_page.section_at(0).subsection_at(0).unit_at(0).go_to()
-        self.assertTrue(unit.is_browser_on_page)
+        unit.wait_for_page()
 
 
 @attr(shard=3)

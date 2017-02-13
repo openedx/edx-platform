@@ -2,10 +2,12 @@
 from contextlib import contextmanager
 import ddt
 from functools import wraps
+import uuid
 
 from django.test import TestCase, RequestFactory
 from django.test.utils import override_settings
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from mock import patch
 from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import CourseLocator
@@ -323,43 +325,48 @@ class CertificateGetTests(SharedModuleStoreTestCase):
         super(CertificateGetTests, cls).setUpClass()
         cls.student = UserFactory()
         cls.student_no_cert = UserFactory()
-        cls.course_1 = CourseFactory.create(
+        cls.uuid = uuid.uuid4().hex
+        cls.web_cert_course = CourseFactory.create(
             org='edx',
             number='verified_1',
-            display_name='Verified Course 1'
+            display_name='Verified Course 1',
+            cert_html_view_enabled=True
         )
-        cls.course_2 = CourseFactory.create(
+        cls.pdf_cert_course = CourseFactory.create(
             org='edx',
             number='verified_2',
-            display_name='Verified Course 2'
+            display_name='Verified Course 2',
+            cert_html_view_enabled=False
         )
         # certificate for the first course
         GeneratedCertificateFactory.create(
             user=cls.student,
-            course_id=cls.course_1.id,
+            course_id=cls.web_cert_course.id,
             status=CertificateStatuses.downloadable,
             mode='verified',
             download_url='www.google.com',
             grade="0.88",
+            verify_uuid=cls.uuid,
         )
         # certificate for the second course
         GeneratedCertificateFactory.create(
             user=cls.student,
-            course_id=cls.course_2.id,
+            course_id=cls.pdf_cert_course.id,
             status=CertificateStatuses.downloadable,
             mode='honor',
             download_url='www.gmail.com',
             grade="0.99",
+            verify_uuid=cls.uuid,
         )
 
     def test_get_certificate_for_user(self):
         """
         Test to get a certificate for a user for a specific course.
         """
-        cert = certs_api.get_certificate_for_user(self.student.username, self.course_1.id)
+        cert = certs_api.get_certificate_for_user(self.student.username, self.web_cert_course.id)
 
         self.assertEqual(cert['username'], self.student.username)
-        self.assertEqual(cert['course_key'], self.course_1.id)
+        self.assertEqual(cert['course_key'], self.web_cert_course.id)
         self.assertEqual(cert['type'], CourseMode.VERIFIED)
         self.assertEqual(cert['status'], CertificateStatuses.downloadable)
         self.assertEqual(cert['grade'], "0.88")
@@ -373,8 +380,8 @@ class CertificateGetTests(SharedModuleStoreTestCase):
         self.assertEqual(len(certs), 2)
         self.assertEqual(certs[0]['username'], self.student.username)
         self.assertEqual(certs[1]['username'], self.student.username)
-        self.assertEqual(certs[0]['course_key'], self.course_1.id)
-        self.assertEqual(certs[1]['course_key'], self.course_2.id)
+        self.assertEqual(certs[0]['course_key'], self.web_cert_course.id)
+        self.assertEqual(certs[1]['course_key'], self.pdf_cert_course.id)
         self.assertEqual(certs[0]['type'], CourseMode.VERIFIED)
         self.assertEqual(certs[1]['type'], CourseMode.HONOR)
         self.assertEqual(certs[0]['status'], CertificateStatuses.downloadable)
@@ -389,7 +396,7 @@ class CertificateGetTests(SharedModuleStoreTestCase):
         Test the case when there is no certificate for a user for a specific course.
         """
         self.assertIsNone(
-            certs_api.get_certificate_for_user(self.student_no_cert.username, self.course_1.id)
+            certs_api.get_certificate_for_user(self.student_no_cert.username, self.web_cert_course.id)
         )
 
     def test_no_certificates_for_user(self):
@@ -400,6 +407,48 @@ class CertificateGetTests(SharedModuleStoreTestCase):
             certs_api.get_certificates_for_user(self.student_no_cert.username),
             []
         )
+
+    @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
+    def test_get_web_certificate_url(self):
+        """
+        Test the get_certificate_url with a web cert course
+        """
+        expected_url = reverse(
+            'certificates:render_cert_by_uuid',
+            kwargs=dict(certificate_uuid=self.uuid)
+        )
+        cert_url = certs_api.get_certificate_url(
+            user_id=self.student.id,  # pylint: disable=no-member
+            course_id=self.web_cert_course.id,
+            uuid=self.uuid
+        )
+        self.assertEqual(expected_url, cert_url)
+
+        expected_url = reverse(
+            'certificates:html_view',
+            kwargs={
+                "user_id": str(self.student.id),  # pylint: disable=no-member
+                "course_id": unicode(self.web_cert_course.id),
+            }
+        )
+
+        cert_url = certs_api.get_certificate_url(
+            user_id=self.student.id,  # pylint: disable=no-member
+            course_id=self.web_cert_course.id
+        )
+        self.assertEqual(expected_url, cert_url)
+
+    @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
+    def test_get_pdf_certificate_url(self):
+        """
+        Test the get_certificate_url with a pdf cert course
+        """
+        cert_url = certs_api.get_certificate_url(
+            user_id=self.student.id,  # pylint: disable=no-member
+            course_id=self.pdf_cert_course.id,
+            uuid=self.uuid
+        )
+        self.assertEqual('www.gmail.com', cert_url)
 
 
 @attr(shard=1)

@@ -112,6 +112,14 @@ if (is_proctored_exam) {
                         </a>
                     </li>
                 <% } %>
+                <% if (xblockInfo.isDuplicable()) { %>
+                    <li class="action-item action-duplicate">
+                        <a href="#" data-tooltip="<%- gettext('Duplicate') %>" class="duplicate-button action-button">
+                            <span class="icon fa fa-copy" aria-hidden="true"></span>
+                            <span class="sr action-button-text"><%- gettext('Duplicate') %></span>
+                        </a>
+                    </li>
+                <% } %>
                 <% if (xblockInfo.isDeletable()) { %>
                     <li class="action-item action-delete">
                         <a href="#" data-tooltip="<%- gettext('Delete') %>" class="delete-button action-button">
@@ -193,7 +201,12 @@ if (is_proctored_exam) {
                 <p>
                     <% if (xblockInfo.get('hide_after_due')) { %>
                         <span class="icon fa fa-eye-slash" aria-hidden="true"></span>
-                        <span class="status-hide-after-due-value"> <%- gettext("Subsection is hidden after due date") %> </span>
+                        <span class="status-hide-after-due-value">
+                        <% if (course.get('self_paced')) { %>
+                            <%- gettext("Subsection is hidden after course end date") %> </span>
+                        <% } else { %>
+                            <%- gettext("Subsection is hidden after due date") %> </span>
+                        <% } %>
                     <% } %>
                 </p>
             </div>

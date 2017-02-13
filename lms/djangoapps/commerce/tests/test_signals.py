@@ -1,26 +1,30 @@
+# coding=UTF-8
 """
 Tests for signal handling in commerce djangoapp.
 """
+from __future__ import unicode_literals
+
 import base64
 import json
 from urlparse import urljoin
 
 import ddt
+import httpretty
+import mock
+from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.test import TestCase
 from django.test.utils import override_settings
-import httpretty
-import mock
 from opaque_keys.edx.keys import CourseKey
 from requests import Timeout
 
+from commerce.models import CommerceConfiguration
+from commerce.signals import send_refund_notification, generate_refund_notification_body, create_zendesk_ticket
+from commerce.tests import JSON
+from commerce.tests.mocks import mock_create_refund, mock_process_refund
+from course_modes.models import CourseMode
 from student.models import UNENROLL_DONE
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
-from commerce.signals import (refund_seat, send_refund_notification, generate_refund_notification_body,
-                              create_zendesk_ticket)
-from commerce.tests import TEST_PUBLIC_URL_ROOT, TEST_API_URL, TEST_API_SIGNING_KEY, JSON
-from commerce.tests.mocks import mock_create_refund
-from course_modes.models import CourseMode
 
 ZENDESK_URL = 'http://zendesk.example.com/'
 ZENDESK_USER = 'test@example.com'
@@ -28,11 +32,7 @@ ZENDESK_API_KEY = 'abc123'
 
 
 @ddt.ddt
-@override_settings(
-    ECOMMERCE_PUBLIC_URL_ROOT=TEST_PUBLIC_URL_ROOT,
-    ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY,
-    ZENDESK_URL=ZENDESK_URL, ZENDESK_USER=ZENDESK_USER, ZENDESK_API_KEY=ZENDESK_API_KEY
-)
+@override_settings(ZENDESK_URL=ZENDESK_URL, ZENDESK_USER=ZENDESK_USER, ZENDESK_API_KEY=ZENDESK_API_KEY)
 class TestRefundSignal(TestCase):
     """
     Exercises logic triggered by the UNENROLL_DONE signal.
@@ -40,14 +40,25 @@ class TestRefundSignal(TestCase):
 
     def setUp(self):
         super(TestRefundSignal, self).setUp()
+
+        # Ensure the E-Commerce service user exists
+        UserFactory(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME, is_staff=True)
+
         self.requester = UserFactory(username="test-requester")
-        self.student = UserFactory(username="test-student", email="test-student@example.com")
+        self.student = UserFactory(
+            username="test-student",
+            email="test-student@example.com",
+        )
         self.course_enrollment = CourseEnrollmentFactory(
             user=self.student,
             course_id=CourseKey.from_string('course-v1:org+course+run'),
             mode=CourseMode.VERIFIED,
         )
         self.course_enrollment.refundable = mock.Mock(return_value=True)
+
+        self.config = CommerceConfiguration.current()
+        self.config.enable_automatic_refund_approval = True
+        self.config.save()
 
     def send_signal(self, skip_refund=False):
         """
@@ -59,7 +70,6 @@ class TestRefundSignal(TestCase):
     @override_settings(
         ECOMMERCE_PUBLIC_URL_ROOT=None,
         ECOMMERCE_API_URL=None,
-        ECOMMERCE_API_SIGNING_KEY=None,
     )
     def test_no_service(self):
         """
@@ -82,7 +92,7 @@ class TestRefundSignal(TestCase):
         """
         self.send_signal()
         self.assertTrue(mock_refund_seat.called)
-        self.assertEqual(mock_refund_seat.call_args[0], (self.course_enrollment, self.student))
+        self.assertEqual(mock_refund_seat.call_args[0], (self.course_enrollment,))
 
         # if skip_refund is set to True in the signal, we should not try to initiate a refund.
         mock_refund_seat.reset_mock()
@@ -104,36 +114,27 @@ class TestRefundSignal(TestCase):
         # no HTTP request/user: auth to commerce service as the unenrolled student.
         self.send_signal()
         self.assertTrue(mock_refund_seat.called)
-        self.assertEqual(mock_refund_seat.call_args[0], (self.course_enrollment, self.student))
+        self.assertEqual(mock_refund_seat.call_args[0], (self.course_enrollment,))
 
         # HTTP user is the student: auth to commerce service as the unenrolled student.
         mock_get_request_user.return_value = self.student
         mock_refund_seat.reset_mock()
         self.send_signal()
         self.assertTrue(mock_refund_seat.called)
-        self.assertEqual(mock_refund_seat.call_args[0], (self.course_enrollment, self.student))
+        self.assertEqual(mock_refund_seat.call_args[0], (self.course_enrollment,))
 
         # HTTP user is another user: auth to commerce service as the requester.
         mock_get_request_user.return_value = self.requester
         mock_refund_seat.reset_mock()
         self.send_signal()
         self.assertTrue(mock_refund_seat.called)
-        self.assertEqual(mock_refund_seat.call_args[0], (self.course_enrollment, self.requester))
+        self.assertEqual(mock_refund_seat.call_args[0], (self.course_enrollment,))
 
         # HTTP user is another server (AnonymousUser): do not try to initiate a refund at all.
         mock_get_request_user.return_value = AnonymousUser()
         mock_refund_seat.reset_mock()
         self.send_signal()
         self.assertFalse(mock_refund_seat.called)
-
-    @mock.patch('commerce.signals.log.warning')
-    def test_not_authorized_warning(self, mock_log_warning):
-        """
-        Ensure that expected authorization issues are logged as warnings.
-        """
-        with mock_create_refund(status=403):
-            refund_seat(self.course_enrollment, UserFactory())
-            self.assertTrue(mock_log_warning.called)
 
     @mock.patch('commerce.signals.log.exception')
     def test_error_logging(self, mock_log_exception):
@@ -146,14 +147,48 @@ class TestRefundSignal(TestCase):
             self.assertTrue(mock_log_exception.called)
 
     @mock.patch('commerce.signals.send_refund_notification')
-    def test_notification(self, mock_send_notification):
+    def test_notification_when_approval_fails(self, mock_send_notification):
         """
-        Ensure the notification function is triggered when refunds are
-        initiated
+        Ensure the notification function is triggered when refunds are initiated, and cannot be automatically approved.
         """
-        with mock_create_refund(status=200, response=[1, 2, 3]):
+        refund_id = 1
+        failed_refund_id = 2
+
+        with mock_create_refund(status=201, response=[refund_id, failed_refund_id]):
+            with mock_process_refund(refund_id, reset_on_exit=False):
+                with mock_process_refund(failed_refund_id, status=500, reset_on_exit=False):
+                    self.send_signal()
+                    self.assertTrue(mock_send_notification.called)
+                    mock_send_notification.assert_called_with(self.course_enrollment, [failed_refund_id])
+
+    @mock.patch('commerce.signals.send_refund_notification')
+    def test_notification_if_automatic_approval_disabled(self, mock_send_notification):
+        """
+        Ensure the notification is always sent if the automatic approval functionality is disabled.
+        """
+        refund_id = 1
+        self.config.enable_automatic_refund_approval = False
+        self.config.save()
+
+        with mock_create_refund(status=201, response=[refund_id]):
             self.send_signal()
             self.assertTrue(mock_send_notification.called)
+            mock_send_notification.assert_called_with(self.course_enrollment, [refund_id])
+
+    @mock.patch('commerce.signals.send_refund_notification')
+    def test_no_notification_after_approval(self, mock_send_notification):
+        """
+        Ensure the notification function is triggered when refunds are initiated, and cannot be automatically approved.
+        """
+        refund_id = 1
+
+        with mock_create_refund(status=201, response=[refund_id]):
+            with mock_process_refund(refund_id, reset_on_exit=False):
+                self.send_signal()
+                self.assertFalse(mock_send_notification.called)
+
+                last_request = httpretty.last_request()
+                self.assertDictEqual(json.loads(last_request.body), {'action': 'approve_payment_only'})
 
     @mock.patch('commerce.signals.send_refund_notification')
     def test_notification_no_refund(self, mock_send_notification):
@@ -207,25 +242,35 @@ class TestRefundSignal(TestCase):
         with self.assertRaises(NotImplementedError):
             send_refund_notification(self.course_enrollment, [1, 2, 3])
 
-    def test_send_refund_notification(self):
+    @ddt.data('email@example.com', 'üñîcode.email@example.com')
+    @mock.patch('lms.djangoapps.commerce.signals.create_zendesk_ticket')
+    def test_send_refund_notification(self, student_email, mock_zendesk):
         """ Verify the support team is notified of the refund request. """
+        refund_ids = [1, 2, 3]
 
-        with mock.patch('commerce.signals.create_zendesk_ticket') as mock_zendesk:
-            refund_ids = [1, 2, 3]
-            send_refund_notification(self.course_enrollment, refund_ids)
-            body = generate_refund_notification_body(self.student, refund_ids)
-            mock_zendesk.assert_called_with(self.student.profile.name, self.student.email,
-                                            "[Refund] User-Requested Refund", body, ['auto_refund'])
+        # pass a student with unicode and ascii email to ensure that
+        # generate_refund_notification_body can handle formatting a unicode
+        # message
+        self.student.email = student_email
+        send_refund_notification(self.course_enrollment, refund_ids)
+        body = generate_refund_notification_body(self.student, refund_ids)
+        mock_zendesk.assert_called_with(
+            self.student.profile.name,
+            self.student.email,
+            "[Refund] User-Requested Refund",
+            body,
+            ['auto_refund']
+        )
 
     def _mock_zendesk_api(self, status=201):
         """ Mock Zendesk's ticket creation API. """
         httpretty.register_uri(httpretty.POST, urljoin(ZENDESK_URL, '/api/v2/tickets.json'), status=status,
                                body='{}', content_type=JSON)
 
-    def call_create_zendesk_ticket(self, name=u'Test user', email=u'user@example.com', subject=u'Test Ticket',
-                                   body=u'I want a refund!', tags=None):
+    def call_create_zendesk_ticket(self, name='Test user', email='user@example.com', subject='Test Ticket',
+                                   body='I want a refund!', tags=None):
         """ Call the create_zendesk_ticket function. """
-        tags = tags or [u'auto_refund']
+        tags = tags or ['auto_refund']
         create_zendesk_ticket(name, email, subject, body, tags)
 
     @override_settings(ZENDESK_URL=ZENDESK_URL, ZENDESK_USER=None, ZENDESK_API_KEY=None)
@@ -250,11 +295,11 @@ class TestRefundSignal(TestCase):
         """ Verify the Zendesk API is called. """
         self._mock_zendesk_api()
 
-        name = u'Test user'
-        email = u'user@example.com'
-        subject = u'Test Ticket'
-        body = u'I want a refund!'
-        tags = [u'auto_refund']
+        name = 'Test user'
+        email = 'user@example.com'
+        subject = 'Test Ticket'
+        body = 'I want a refund!'
+        tags = ['auto_refund']
         self.call_create_zendesk_ticket(name, email, subject, body, tags)
         last_request = httpretty.last_request()
 
@@ -268,14 +313,14 @@ class TestRefundSignal(TestCase):
 
         # Verify the content
         expected = {
-            u'ticket': {
-                u'requester': {
-                    u'name': name,
-                    u'email': email
+            'ticket': {
+                'requester': {
+                    'name': name,
+                    'email': email
                 },
-                u'subject': subject,
-                u'comment': {u'body': body},
-                u'tags': [u'LMS'] + tags
+                'subject': subject,
+                'comment': {'body': body},
+                'tags': ['LMS'] + tags
             }
         }
         self.assertDictEqual(json.loads(last_request.body), expected)

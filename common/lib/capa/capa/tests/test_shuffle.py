@@ -194,7 +194,10 @@ class CapaShuffleTest(unittest.TestCase):
         """)
         problem = new_loncapa_problem(xml_str, seed=0)
         the_html = problem.get_html()
-        self.assertRegexpMatches(the_html, r"<div>.*\[.*'Alpha'.*'Beta'.*'B'.*'A'.*'C'.*'D'.*'Psi'.*'Omega'.*\].*</div>")
+        self.assertRegexpMatches(
+            the_html,
+            r"<div>.*\[.*'Alpha'.*'Beta'.*'B'.*'A'.*'C'.*'D'.*'Psi'.*'Omega'.*\].*</div>"
+        )
 
     def test_shuffle_fixed_both_ends_thin(self):
         xml_str = textwrap.dedent("""

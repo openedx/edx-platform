@@ -9,24 +9,25 @@ from django.contrib.auth.models import User
 from django.db import transaction
 from django.http import Http404
 from rest_framework import status
-from rest_framework.authentication import SessionAuthentication
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework_oauth.authentication import OAuth2Authentication
 
 from ccx_keys.locator import CCXLocator
 from courseware import courses
 from xmodule.modulestore.django import SignalHandler
 from edx_rest_framework_extensions.authentication import JwtAuthentication
-from instructor.enrollment import (
+from lms.djangoapps.instructor.enrollment import (
     enroll_email,
     get_email_params,
 )
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.lib.api import permissions
+from openedx.core.lib.api import (
+    authentication,
+    permissions,
+)
 from student.models import CourseEnrollment
 from student.roles import CourseCcxCoachRole
 
@@ -37,7 +38,7 @@ from lms.djangoapps.ccx.overrides import (
 )
 from lms.djangoapps.ccx.utils import (
     add_master_course_staff_to_ccx,
-    assign_coach_role_to_ccx,
+    assign_staff_role_to_ccx,
     is_email,
     get_course_chapters,
 )
@@ -363,7 +364,11 @@ class CCXListView(GenericAPIView):
                 ]
     }
     """
-    authentication_classes = (JwtAuthentication, OAuth2Authentication, SessionAuthentication,)
+    authentication_classes = (
+        JwtAuthentication,
+        authentication.OAuth2AuthenticationAllowInactiveUser,
+        authentication.SessionAuthenticationAllowInactiveUser,
+    )
     permission_classes = (IsAuthenticated, permissions.IsMasterCourseStaffInstructor)
     serializer_class = CCXCourseSerializer
     pagination_class = CCXAPIPagination
@@ -507,8 +512,8 @@ class CCXListView(GenericAPIView):
                 email_students=True,
                 email_params=email_params,
             )
-            # assign coach role for the coach to the newly created ccx
-            assign_coach_role_to_ccx(ccx_course_key, coach, master_course_object.id)
+            # assign staff role for the coach to the newly created ccx
+            assign_staff_role_to_ccx(ccx_course_key, coach, master_course_object.id)
             # assign staff role for all the staff and instructor of the master course to the newly created ccx
             add_master_course_staff_to_ccx(
                 master_course_object,
@@ -609,7 +614,11 @@ class CCXDetailView(GenericAPIView):
             response is returned.
     """
 
-    authentication_classes = (JwtAuthentication, OAuth2Authentication, SessionAuthentication,)
+    authentication_classes = (
+        JwtAuthentication,
+        authentication.OAuth2AuthenticationAllowInactiveUser,
+        authentication.SessionAuthenticationAllowInactiveUser,
+    )
     permission_classes = (IsAuthenticated, permissions.IsCourseStaffInstructor)
     serializer_class = CCXCourseSerializer
 
@@ -766,8 +775,8 @@ class CCXDetailView(GenericAPIView):
                     email_students=True,
                     email_params=email_params,
                 )
-                # enroll the coach to the newly created ccx
-                assign_coach_role_to_ccx(ccx_course_key, coach, master_course_object.id)
+                # make the new coach staff on the CCX
+                assign_staff_role_to_ccx(ccx_course_key, coach, master_course_object.id)
 
         # using CCX object as sender here.
         responses = SignalHandler.course_published.send(

@@ -5,7 +5,7 @@ describe 'MarkdownEditingDescriptor', ->
       @descriptor = new MarkdownEditingDescriptor($('.problem-editor'))
       saveResult = @descriptor.save()
       expect(saveResult.metadata.markdown).toEqual('markdown')
-      expect(saveResult.data).toEqual('<problem>\n  <p>markdown</p>\n</problem>')
+      expect(saveResult.data).toXMLEqual('<problem>\n  <p>markdown</p>\n</problem>')
     it 'clears markdown when xml editor is selected', ->
       loadFixtures 'problem-with-markdown.html'
       @descriptor = new MarkdownEditingDescriptor($('.problem-editor'))
@@ -101,7 +101,7 @@ describe 'MarkdownEditingDescriptor', ->
   describe 'markdownToXml', ->
     it 'converts raw text to paragraph', ->
       data = MarkdownEditingDescriptor.markdownToXml('foo')
-      expect(data).toEqual('<problem>\n  <p>foo</p>\n</problem>')
+      expect(data).toXMLEqual('<problem>\n  <p>foo</p>\n</problem>')
     # test default templates
     it 'converts numerical response to xml', ->
       data = MarkdownEditingDescriptor.markdownToXml("""A numerical response problem accepts a line of text input from the student, and evaluates the input for correctness based on its numerical value.
@@ -133,7 +133,7 @@ describe 'MarkdownEditingDescriptor', ->
         If you look at your hand, you can count that you have five fingers.
         [Explanation]
         """)
-      expect(data).toEqual("""<problem>
+      expect(data).toXMLEqual("""<problem>
           <p>A numerical response problem accepts a line of text input from the student, and evaluates the input for correctness based on its numerical value.</p>
           <p>The answer is correct if it is within a specified numerical tolerance of the expected answer.</p>
           <p>Enter the numerical value of Pi:</p>
@@ -187,21 +187,80 @@ describe 'MarkdownEditingDescriptor', ->
 
 
         </problem>""")
-    it 'markup with multiple answers doesn\'t break numerical response', ->
+    it 'markup with additional answer does not break numerical response', ->
       data =  MarkdownEditingDescriptor.markdownToXml("""
         Enter 1 with a tolerance:
         = 1 +- .02
-        or= 2 +- 5%
+        or= 2
         """)
       expect(data).toXMLEqual("""<problem>
         <numericalresponse answer="1">
           <p>Enter 1 with a tolerance:</p>
-        <responseparam type="tolerance" default=".02"/>
+          <responseparam type="tolerance" default=".02"/>
+          <additional_answer answer="2"/>
           <formulaequationinput/>
         </numericalresponse>
 
+        </problem>"""
+      )
+    it 'markup for numerical with multiple additional answers renders correctly', ->
+      data =  MarkdownEditingDescriptor.markdownToXml("""
+        Enter 1 with a tolerance:
+        = 1 +- .02
+        or= 2
+        or= 3
+        """)
+      expect(data).toXMLEqual("""<problem>
+        <numericalresponse answer="1">
+          <p>Enter 1 with a tolerance:</p>
+          <responseparam type="tolerance" default=".02"/>
+          <additional_answer answer="2"/>
+          <additional_answer answer="3"/>
+          <formulaequationinput/>
+        </numericalresponse>
 
-        </problem>""")
+        </problem>"""
+      )
+    it 'Do not render ranged/tolerance/alphabetical additional answers for numerical response', ->
+      data =  MarkdownEditingDescriptor.markdownToXml("""
+        Enter 1 with a tolerance:
+        = 1 +- .02
+        or= 2
+        or= 3 +- 0.1
+        or= [4,6]
+        or= ABC
+        or= 7
+        """)
+      expect(data).toXMLEqual("""<problem>
+        <numericalresponse answer="1">
+          <p>Enter 1 with a tolerance:</p>
+          <responseparam type="tolerance" default=".02"/>
+          <additional_answer answer="2"/>
+          <additional_answer answer="7"/>
+          <formulaequationinput/>
+        </numericalresponse>
+
+        </problem>"""
+      )
+    it 'markup with feedback renders correctly in additional answer for numerical response', ->
+      data =  MarkdownEditingDescriptor.markdownToXml("""
+        Enter 1 with a tolerance:
+        = 100 +- .02 {{ main feedback }}
+        or= 10 {{ additional feedback }}
+        """)
+      expect(data).toXMLEqual("""<problem>
+        <numericalresponse answer="100">
+          <p>Enter 1 with a tolerance:</p>
+          <responseparam type="tolerance" default=".02"/>
+          <additional_answer answer="10">
+            <correcthint>additional feedback</correcthint>
+          </additional_answer>
+          <formulaequationinput/>
+          <correcthint>main feedback</correcthint>
+        </numericalresponse>
+
+        </problem>"""
+      )
     it 'converts multiple choice to xml', ->
       data = MarkdownEditingDescriptor.markdownToXml("""A multiple choice problem presents radio buttons for student input. Students can only select a single option presented. Multiple Choice questions have been the subject of many areas of research due to the early invention and adoption of bubble sheets.
 
@@ -297,7 +356,7 @@ describe 'MarkdownEditingDescriptor', ->
         When the student is ready, the explanation appears.
         [Explanation]
         """)
-      expect(data).toEqual("""
+      expect(data).toXMLEqual("""
         <problem>
           <p>bleh</p>
           <multiplechoiceresponse>
@@ -621,7 +680,7 @@ describe 'MarkdownEditingDescriptor', ->
         Code should be nicely monospaced.
         [/code]
         """)
-      expect(data).toEqual("""
+      expect(data).toXMLEqual("""
       <problem>
         <p>Not a header</p>
         <h3 class="hd hd-2 problem-header">A header</h3>

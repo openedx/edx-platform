@@ -25,7 +25,7 @@ describe 'Markdown to xml extended hint dropdown', ->
       ]]
 
     """)
-    expect(data).toEqual("""
+    expect(data).toXMLEqual("""
     <problem>
       <p>Translation between Dropdown and ________ is straightforward.</p>
       <optionresponse>

@@ -6,4 +6,4 @@
     id="search"
     placeholder="<%- gettext("Search all posts") %>"
 />
-<button class="btn-brand btn-small search-btn" type="button"><%- gettext("Search") %></button>
+<button class="btn btn-small search-btn" type="button"><%- gettext("Search") %></button>

@@ -13,6 +13,7 @@
                 <th><%- gettext("Date Added") %></th>
                 <th><%- gettext("Video ID") %></th>
                 <th><%- gettext("Status") %></th>
+                <th><%- gettext("Action") %></th>
             </tr>
         </thead>
         <tbody class="js-table-body"></tbody>

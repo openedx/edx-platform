@@ -9,17 +9,23 @@ from student.models import anonymous_id_for_user, CourseEnrollment, UserProfile
 from util.testing import UrlResetMixin
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator
-from mock import patch
+from mock import patch, Mock
 import ddt
 import json
 
 
+class AutoAuthTestCase(UrlResetMixin, TestCase):
+    """
+    Base class for AutoAuth Tests that properly resets the urls.py
+    """
+    URLCONF_MODULES = ['student.urls']
+
+
 @ddt.ddt
-class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
+class AutoAuthEnabledTestCase(AutoAuthTestCase):
     """
     Tests for the Auto auth view that we have for load testing.
     """
-
     COURSE_ID_MONGO = 'edX/Test101/2014_Spring'
     COURSE_ID_SPLIT = 'course-v1:edX+Test101+2014_Spring'
     COURSE_IDS_DDT = (
@@ -255,8 +261,16 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
 
         return response
 
+    @patch("openedx.core.djangoapps.site_configuration.helpers.get_value", Mock(return_value=False))
+    def test_create_account_not_allowed(self):
+        """
+        Test case to check user creation is forbidden when ALLOW_PUBLIC_ACCOUNT_CREATION feature flag is turned off
+        """
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
 
-class AutoAuthDisabledTestCase(UrlResetMixin, TestCase):
+
+class AutoAuthDisabledTestCase(AutoAuthTestCase):
     """
     Test that the page is inaccessible with default settings
     """

@@ -12,7 +12,7 @@ from course_modes.models import CourseMode
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from util.testing import UrlResetMixin
-from embargo.test_utils import restrict_course
+from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from student.tests.factories import UserFactory, CourseModeFactory
 from student.models import CourseEnrollment, CourseFullError
 from student.roles import (
@@ -32,7 +32,7 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
     USERNAME = "Bob"
     EMAIL = "bob@example.com"
     PASSWORD = "edx"
-    URLCONF_MODULES = ['embargo']
+    URLCONF_MODULES = ['openedx.core.djangoapps.embargo']
 
     @classmethod
     def setUpClass(cls):

@@ -2,31 +2,36 @@
 """
 Test cases to cover Accounts-related behaviors of the User API application
 """
-from collections import OrderedDict
-from copy import deepcopy
 import datetime
 import ddt
 import hashlib
 import json
 
+import unittest
+from collections import OrderedDict
+from copy import deepcopy
 from mock import patch
 from nose.plugins.attrib import attr
 from pytz import UTC
-import unittest
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.test import TestCase
 from django.test.testcases import TransactionTestCase
 from django.test.utils import override_settings
+from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
-from openedx.core.djangoapps.user_api.models import UserPreference
 
-from student.tests.factories import UserFactory
-from student.models import UserProfile, LanguageProficiency, PendingEmailChange
-from openedx.core.djangoapps.user_api.accounts import ACCOUNT_VISIBILITY_PREF_KEY
-from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from .. import PRIVATE_VISIBILITY, ALL_USERS_VISIBILITY
+from openedx.core.djangoapps.user_api.accounts import ACCOUNT_VISIBILITY_PREF_KEY
+from openedx.core.djangoapps.user_api.models import UserPreference
+from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
+from openedx.core.lib.token_utils import JwtBuilder
+from student.models import UserProfile, LanguageProficiency, PendingEmailChange
+from student.tests.factories import (
+    AdminFactory, ContentTypeFactory, TEST_PASSWORD, PermissionFactory, SuperuserFactory, UserFactory
+)
 
 TEST_PROFILE_IMAGE_UPLOADED_AT = datetime.datetime(2002, 1, 9, 15, 43, 01, tzinfo=UTC)
 
@@ -41,23 +46,22 @@ class UserAPITestCase(APITestCase):
     """
     The base class for all tests of the User API
     """
-    test_password = "test"
 
     def setUp(self):
         super(UserAPITestCase, self).setUp()
 
         self.anonymous_client = APIClient()
-        self.different_user = UserFactory.create(password=self.test_password)
+        self.different_user = UserFactory.create(password=TEST_PASSWORD)
         self.different_client = APIClient()
-        self.staff_user = UserFactory(is_staff=True, password=self.test_password)
+        self.staff_user = UserFactory(is_staff=True, password=TEST_PASSWORD)
         self.staff_client = APIClient()
-        self.user = UserFactory.create(password=self.test_password)  # will be assigned to self.client by default
+        self.user = UserFactory.create(password=TEST_PASSWORD)  # will be assigned to self.client by default
 
     def login_client(self, api_client, user):
         """Helper method for getting the client and user and logging in. Returns client. """
         client = getattr(self, api_client)
         user = getattr(self, user)
-        client.login(username=user.username, password=self.test_password)
+        client.login(username=user.username, password=TEST_PASSWORD)
         return client
 
     def send_patch(self, client, json_data, content_type="application/merge-patch+json", expected_status=200):
@@ -112,28 +116,6 @@ class UserAPITestCase(APITestCase):
         legacy_profile.language_proficiencies.add(LanguageProficiency(code='en'))
         legacy_profile.save()
 
-
-@ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
-@patch('openedx.core.djangoapps.user_api.accounts.image_helpers._PROFILE_IMAGE_SIZES', [50, 10])
-@patch.dict(
-    'openedx.core.djangoapps.user_api.accounts.image_helpers.PROFILE_IMAGE_SIZES_MAP',
-    {'full': 50, 'small': 10},
-    clear=True
-)
-@attr(shard=2)
-class TestAccountAPI(CacheIsolationTestCase, UserAPITestCase):
-    """
-    Unit tests for the Account API.
-    """
-
-    ENABLED_CACHES = ['default']
-
-    def setUp(self):
-        super(TestAccountAPI, self).setUp()
-
-        self.url = reverse("accounts_api", kwargs={'username': self.user.username})
-
     def _verify_profile_image_data(self, data, has_profile_image):
         """
         Verify the profile image data in a GET response for self.user
@@ -159,6 +141,81 @@ class TestAccountAPI(CacheIsolationTestCase, UserAPITestCase):
                 'image_url_small': template.format(size=10),
             }
         )
+
+
+@ddt.ddt
+@skip_unless_lms
+@attr(shard=2)
+class TestOwnUsernameAPI(CacheIsolationTestCase, UserAPITestCase):
+    """
+    Unit tests for the Accounts API.
+    """
+
+    ENABLED_CACHES = ['default']
+
+    def setUp(self):
+        super(TestOwnUsernameAPI, self).setUp()
+
+        self.url = reverse("own_username_api")
+
+    def _verify_get_own_username(self, queries, expected_status=200):
+        """
+        Internal helper to perform the actual assertion
+        """
+        with self.assertNumQueries(queries):
+            response = self.send_get(self.client, expected_status=expected_status)
+        if expected_status == 200:
+            data = response.data
+            self.assertEqual(1, len(data))
+            self.assertEqual(self.user.username, data["username"])
+
+    def test_get_username(self):
+        """
+        Test that a client (logged in) can get her own username.
+        """
+        self.client.login(username=self.user.username, password=TEST_PASSWORD)
+        self._verify_get_own_username(15)
+
+    def test_get_username_inactive(self):
+        """
+        Test that a logged-in client can get their
+        username, even if inactive.
+        """
+        self.client.login(username=self.user.username, password=TEST_PASSWORD)
+        self.user.is_active = False
+        self.user.save()
+        self._verify_get_own_username(15)
+
+    def test_get_username_not_logged_in(self):
+        """
+        Test that a client (not logged in) gets a 401
+        when trying to retrieve their username.
+        """
+
+        # verify that the endpoint is inaccessible when not logged in
+        self._verify_get_own_username(12, expected_status=401)
+
+
+@ddt.ddt
+@skip_unless_lms
+@patch('openedx.core.djangoapps.user_api.accounts.image_helpers._PROFILE_IMAGE_SIZES', [50, 10])
+@patch.dict(
+    'openedx.core.djangoapps.user_api.accounts.image_helpers.PROFILE_IMAGE_SIZES_MAP',
+    {'full': 50, 'small': 10},
+    clear=True
+)
+@attr(shard=2)
+class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
+    """
+    Unit tests for the Accounts API.
+    """
+
+    ENABLED_CACHES = ['default']
+
+    def setUp(self):
+        super(TestAccountsAPI, self).setUp()
+
+        self.url = reverse("accounts_api", kwargs={'username': self.user.username})
 
     def _verify_full_shareable_account_response(self, response, account_privacy=None, badges_enabled=False):
         """
@@ -219,7 +276,7 @@ class TestAccountAPI(CacheIsolationTestCase, UserAPITestCase):
         """
         Test that DELETE, POST, and PUT are not supported.
         """
-        self.client.login(username=self.user.username, password=self.test_password)
+        self.client.login(username=self.user.username, password=TEST_PASSWORD)
         self.assertEqual(405, self.client.put(self.url).status_code)
         self.assertEqual(405, self.client.post(self.url).status_code)
         self.assertEqual(405, self.client.delete(self.url).status_code)
@@ -246,9 +303,9 @@ class TestAccountAPI(CacheIsolationTestCase, UserAPITestCase):
         Test that a client (logged in) can only get the shareable fields for a different user.
         This is the case when default_visibility is set to "all_users".
         """
-        self.different_client.login(username=self.different_user.username, password=self.test_password)
+        self.different_client.login(username=self.different_user.username, password=TEST_PASSWORD)
         self.create_mock_profile(self.user)
-        with self.assertNumQueries(18):
+        with self.assertNumQueries(19):
             response = self.send_get(self.different_client)
         self._verify_full_shareable_account_response(response, account_privacy=ALL_USERS_VISIBILITY)
 
@@ -261,9 +318,9 @@ class TestAccountAPI(CacheIsolationTestCase, UserAPITestCase):
         Test that a client (logged in) can only get the shareable fields for a different user.
         This is the case when default_visibility is set to "private".
         """
-        self.different_client.login(username=self.different_user.username, password=self.test_password)
+        self.different_client.login(username=self.different_user.username, password=TEST_PASSWORD)
         self.create_mock_profile(self.user)
-        with self.assertNumQueries(18):
+        with self.assertNumQueries(19):
             response = self.send_get(self.different_client)
         self._verify_private_account_response(response, account_privacy=PRIVATE_VISIBILITY)
 
@@ -311,6 +368,7 @@ class TestAccountAPI(CacheIsolationTestCase, UserAPITestCase):
         Test that a client (logged in) can get her own account information (using default legacy profile information,
         as created by the test UserFactory).
         """
+
         def verify_get_own_information(queries):
             """
             Internal helper to perform the actual assertions
@@ -336,7 +394,7 @@ class TestAccountAPI(CacheIsolationTestCase, UserAPITestCase):
             # Badges aren't on by default, so should not be present.
             self.assertEqual(False, data["accomplishments_shared"])
 
-        self.client.login(username=self.user.username, password=self.test_password)
+        self.client.login(username=self.user.username, password=TEST_PASSWORD)
         verify_get_own_information(17)
 
         # Now make sure that the user can get the same information, even if not active
@@ -355,7 +413,7 @@ class TestAccountAPI(CacheIsolationTestCase, UserAPITestCase):
         legacy_profile.bio = ""
         legacy_profile.save()
 
-        self.client.login(username=self.user.username, password=self.test_password)
+        self.client.login(username=self.user.username, password=TEST_PASSWORD)
         with self.assertNumQueries(17):
             response = self.send_get(self.client)
         for empty_field in ("level_of_education", "gender", "country", "bio"):
@@ -446,7 +504,7 @@ class TestAccountAPI(CacheIsolationTestCase, UserAPITestCase):
 
     def test_patch_inactive_user(self):
         """ Verify that a user can patch her own account, even if inactive. """
-        self.client.login(username=self.user.username, password=self.test_password)
+        self.client.login(username=self.user.username, password=TEST_PASSWORD)
         self.user.is_active = False
         self.user.save()
         response = self.send_patch(self.client, {"goals": "to not activate account"})
@@ -488,7 +546,7 @@ class TestAccountAPI(CacheIsolationTestCase, UserAPITestCase):
         """
         Test the behavior of patch when an incorrect content_type is specified.
         """
-        self.client.login(username=self.user.username, password=self.test_password)
+        self.client.login(username=self.user.username, password=TEST_PASSWORD)
         self.send_patch(self.client, {}, content_type="application/json", expected_status=415)
         self.send_patch(self.client, {}, content_type="application/xml", expected_status=415)
 
@@ -497,7 +555,7 @@ class TestAccountAPI(CacheIsolationTestCase, UserAPITestCase):
         Tests the behavior of patch when attempting to set fields with a select list of options to the empty string.
         Also verifies the behaviour when setting to None.
         """
-        self.client.login(username=self.user.username, password=self.test_password)
+        self.client.login(username=self.user.username, password=TEST_PASSWORD)
         for field_name in ["gender", "level_of_education", "country"]:
             response = self.send_patch(self.client, {field_name: ""})
             # Although throwing a 400 might be reasonable, the default DRF behavior with ModelSerializer
@@ -533,7 +591,7 @@ class TestAccountAPI(CacheIsolationTestCase, UserAPITestCase):
             get_response = self.send_get(self.client)
             self.assertEqual(new_name, get_response.data["name"])
 
-        self.client.login(username=self.user.username, password=self.test_password)
+        self.client.login(username=self.user.username, password=TEST_PASSWORD)
         legacy_profile = UserProfile.objects.get(id=self.user.id)
         self.assertEqual({}, legacy_profile.get_meta())
         old_name = legacy_profile.name
@@ -653,7 +711,7 @@ class TestAccountAPI(CacheIsolationTestCase, UserAPITestCase):
         Test that AccountUpdateErrors are passed through to the response.
         """
         serializer_save.side_effect = [Exception("bummer"), None]
-        self.client.login(username=self.user.username, password=self.test_password)
+        self.client.login(username=self.user.username, password=TEST_PASSWORD)
         error_response = self.send_patch(self.client, {"goals": "save an account field"}, expected_status=400)
         self.assertEqual(
             "Error thrown when saving account updates: 'bummer'",
@@ -668,7 +726,7 @@ class TestAccountAPI(CacheIsolationTestCase, UserAPITestCase):
         with a '/', the API generates the full URL to profile images based on
         the URL of the request.
         """
-        self.client.login(username=self.user.username, password=self.test_password)
+        self.client.login(username=self.user.username, password=TEST_PASSWORD)
         response = self.send_get(self.client)
         self.assertEqual(
             response.data["profile_image"],
@@ -729,17 +787,16 @@ class TestAccountAPI(CacheIsolationTestCase, UserAPITestCase):
 
 
 @attr(shard=2)
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class TestAccountAPITransactions(TransactionTestCase):
     """
     Tests the transactional behavior of the account API
     """
-    test_password = "test"
 
     def setUp(self):
         super(TestAccountAPITransactions, self).setUp()
         self.client = APIClient()
-        self.user = UserFactory.create(password=self.test_password)
+        self.user = UserFactory.create(password=TEST_PASSWORD)
         self.url = reverse("accounts_api", kwargs={'username': self.user.username})
 
     @patch('student.views.do_email_change_request')
@@ -751,7 +808,7 @@ class TestAccountAPITransactions(TransactionTestCase):
         # Throw an error from the method that is used to process the email change request
         # (this is the last thing done in the api method). Verify that the profile did not change.
         mock_email_change.side_effect = [ValueError, "mock value error thrown"]
-        self.client.login(username=self.user.username, password=self.test_password)
+        self.client.login(username=self.user.username, password=TEST_PASSWORD)
         old_email = self.user.email
 
         json_data = {"email": "foo@bar.com", "gender": "o"}
@@ -763,3 +820,85 @@ class TestAccountAPITransactions(TransactionTestCase):
         data = response.data
         self.assertEqual(old_email, data["email"])
         self.assertEqual(u"m", data["gender"])
+
+
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
+class TestAccountDeactivation(TestCase):
+    """
+    Tests the account deactivation endpoint.
+    """
+
+    def setUp(self):
+        super(TestAccountDeactivation, self).setUp()
+        self.test_user = UserFactory()
+        self.url = reverse('accounts_deactivation', kwargs={'username': self.test_user.username})
+
+    def build_jwt_headers(self, user):
+        """
+        Helper function for creating headers for the JWT authentication.
+        """
+        token = JwtBuilder(user).build_token([])
+        headers = {
+            'HTTP_AUTHORIZATION': 'JWT ' + token
+        }
+        return headers
+
+    def assert_activation_status(self, headers, expected_status=status.HTTP_200_OK, expected_activation_status=False):
+        """
+        Helper function for making a request to the deactivation endpoint, and asserting the status.
+
+        Args:
+            expected_status(int): Expected request's response status.
+            expected_activation_status(bool): Expected user has_usable_password attribute value.
+        """
+        self.assertTrue(self.test_user.has_usable_password())  # pylint: disable=no-member
+        response = self.client.post(self.url, **headers)
+        self.assertEqual(response.status_code, expected_status)
+        self.test_user.refresh_from_db()  # pylint: disable=no-member
+        self.assertEqual(self.test_user.has_usable_password(), expected_activation_status)  # pylint: disable=no-member
+
+    def test_superuser_deactivates_user(self):
+        """
+        Verify a user is deactivated when a superuser posts to the deactivation endpoint.
+        """
+        superuser = SuperuserFactory()
+        headers = self.build_jwt_headers(superuser)
+        self.assert_activation_status(headers)
+
+    def test_user_with_permission_deactivates_user(self):
+        """
+        Verify a user is deactivated when a user with permission posts to the deactivation endpoint.
+        """
+        user = UserFactory()
+        permission = PermissionFactory(
+            codename='can_deactivate_users',
+            content_type=ContentTypeFactory(
+                app_label='student'
+            )
+        )
+        user.user_permissions.add(permission)  # pylint: disable=no-member
+        headers = self.build_jwt_headers(user)
+        self.assertTrue(self.test_user.has_usable_password())  # pylint: disable=no-member
+        self.assert_activation_status(headers)
+
+    def test_unauthorized_rejection(self):
+        """
+        Verify unauthorized users cannot deactivate accounts.
+        """
+        headers = self.build_jwt_headers(self.test_user)
+        self.assert_activation_status(
+            headers,
+            expected_status=status.HTTP_403_FORBIDDEN,
+            expected_activation_status=True
+        )
+
+    def test_on_jwt_headers_rejection(self):
+        """
+        Verify users who are not JWT authenticated are rejected.
+        """
+        user = UserFactory()
+        self.assert_activation_status(
+            {},
+            expected_status=status.HTTP_401_UNAUTHORIZED,
+            expected_activation_status=True
+        )

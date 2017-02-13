@@ -16,7 +16,6 @@
     margin: 0 auto;
     padding: 18px ($baseline/2) 0;
     max-width: grid-width(12);
-    width: 100%;
   }
 
   h1.logo {
@@ -26,6 +25,11 @@
 
     a {
       display: block;
+    }
+
+    img.ec-logo-size {
+      width: 84px;
+      height: 56px;
     }
   }
 
@@ -324,7 +328,6 @@
 
   .nav-courseware {
     @include float(right);
-    margin-top: ($baseline/4);
     list-style: none;
 
     li, div {

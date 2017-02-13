@@ -5,7 +5,7 @@
         'backbone',
         'underscore',
         'gettext',
-        'moment-with-locales',
+        'moment',
         'js/components/card/views/card',
         'teams/js/views/team_utils',
         'text!teams/templates/team-membership-details.underscore',

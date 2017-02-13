@@ -83,7 +83,7 @@ def wait_for_server(server, port):
     attempts = 0
     server_ok = False
 
-    while attempts < 20:
+    while attempts < 30:
         try:
             connection = httplib.HTTPConnection(server, port, timeout=10)
             connection.request('GET', '/')

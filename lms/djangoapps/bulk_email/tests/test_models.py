@@ -12,11 +12,13 @@ from nose.plugins.attrib import attr
 from bulk_email.models import (
     CourseEmail,
     SEND_TO_COHORT,
+    SEND_TO_TRACK,
     SEND_TO_STAFF,
     CourseEmailTemplate,
     CourseAuthorization,
     BulkEmailFlag
 )
+from course_modes.models import CourseMode
 from openedx.core.djangoapps.course_groups.models import CourseCohort
 from opaque_keys.edx.keys import CourseKey
 
@@ -66,6 +68,22 @@ class CourseEmailTest(TestCase):
         html_message = "<html>dummy message</html>"
         with self.assertRaises(ValueError):
             CourseEmail.create(course_id, sender, to_option, subject, html_message)
+
+    def test_track_target(self):
+        course_id = CourseKey.from_string('abc/123/doremi')
+        sender = UserFactory.create()
+        to_option = 'track:test'
+        subject = "dummy subject"
+        html_message = "<html>dummy message</html>"
+        CourseMode.objects.create(mode_slug='test', mode_display_name='Test', course_id=course_id)
+        with patch('bulk_email.models.validate_course_mode'):
+            # we don't have a real course, so validation will fail. Mock it out!
+            email = CourseEmail.create(course_id, sender, [to_option], subject, html_message)
+        self.assertEqual(len(email.targets.all()), 1)
+        target = email.targets.all()[0]
+        self.assertEqual(target.target_type, SEND_TO_TRACK)
+        self.assertEqual(target.short_display(), 'track-test')
+        self.assertEqual(target.long_display(), 'Course mode: Test, Currencies: usd')
 
     def test_cohort_target(self):
         course_id = CourseKey.from_string('abc/123/doremi')

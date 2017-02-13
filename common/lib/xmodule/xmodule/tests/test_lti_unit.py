@@ -72,6 +72,7 @@ class LTIModuleTest(LogicTest):
 
         self.xmodule.due = None
         self.xmodule.graceperiod = None
+        self.xmodule.descriptor = self.system.construct_xblock_from_class(self.descriptor_class, self.xmodule.scope_ids)
 
     def get_request_body(self, params=None):
         """Fetches the body of a request specified by params"""

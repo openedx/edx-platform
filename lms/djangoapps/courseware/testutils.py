@@ -1,6 +1,7 @@
 """
 Common test utilities for courseware functionality
 """
+# pylint: disable=attribute-defined-outside-init
 
 from abc import ABCMeta, abstractmethod
 from datetime import datetime
@@ -31,7 +32,7 @@ class RenderXBlockTestMixin(object):
         '<footer id="footer-openedx"',
         '<div class="window-wrap"',
         '<div class="preview-menu"',
-        '<div class="container"'
+        '<div class="container"',
     ]
 
     # DOM elements that appear in an xBlock,
@@ -40,13 +41,31 @@ class RenderXBlockTestMixin(object):
         '<div class="wrap-instructor-info"',
     ]
 
+    # DOM elements that appear in the LMS Courseware, but are excluded from the
+    # xBlock-only rendering, and are specific to a particular block.
+    BLOCK_SPECIFIC_CHROME_HTML_ELEMENTS = {
+        # Although bookmarks were removed from all chromeless views of the
+        # vertical, it is LTI specifically that must never include them.
+        'vertical_block': ['<div class="bookmark-button-wrapper"'],
+        'html_block': [],
+    }
+
+    def setUp(self):
+        """
+        Clear out the block to be requested/tested before each test.
+        """
+        super(RenderXBlockTestMixin, self).setUp()
+        # to adjust the block to be tested, update block_name_to_be_tested before calling setup_course.
+        self.block_name_to_be_tested = 'html_block'
+
     @abstractmethod
-    def get_response(self, url_encoded_params=None):
+    def get_response(self, usage_key, url_encoded_params=None):
         """
         Abstract method to get the response from the endpoint that is being tested.
 
         Arguments:
-            url_encoded_params - URL encoded parameters that should be appended to the requested URL.
+            usage_key: The course block usage key. This ensures that the positive and negative tests stay in sync.
+            url_encoded_params: URL encoded parameters that should be appended to the requested URL.
         """
         pass   # pragma: no cover
 
@@ -70,19 +89,31 @@ class RenderXBlockTestMixin(object):
         if not default_store:
             default_store = self.store.default_modulestore.get_modulestore_type()
         with self.store.default_store(default_store):
-            self.course = CourseFactory.create(**self.course_options())  # pylint: disable=attribute-defined-outside-init
+            self.course = CourseFactory.create(**self.course_options())
             chapter = ItemFactory.create(parent=self.course, category='chapter')
-            self.html_block = ItemFactory.create(  # pylint: disable=attribute-defined-outside-init
-                parent=chapter,
+            self.vertical_block = ItemFactory.create(
+                parent_location=chapter.location,
+                category='vertical',
+                display_name="Vertical"
+            )
+            self.html_block = ItemFactory.create(
+                parent=self.vertical_block,
                 category='html',
                 data="<p>Test HTML Content<p>"
             )
+
+        # block_name_to_be_tested can be `html_block` or `vertical_block`.
+        # These attributes help ensure the positive and negative tests are in sync.
+        self.block_to_be_tested = getattr(self, self.block_name_to_be_tested)
+        self.block_specific_chrome_html_elements = self.BLOCK_SPECIFIC_CHROME_HTML_ELEMENTS[
+            self.block_name_to_be_tested
+        ]
 
     def setup_user(self, admin=False, enroll=False, login=False):
         """
         Helper method to create the user.
         """
-        self.user = AdminFactory() if admin else UserFactory()  # pylint: disable=attribute-defined-outside-init
+        self.user = AdminFactory() if admin else UserFactory()
 
         if enroll:
             CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
@@ -93,24 +124,34 @@ class RenderXBlockTestMixin(object):
     def verify_response(self, expected_response_code=200, url_params=None):
         """
         Helper method that calls the endpoint, verifies the expected response code, and returns the response.
+
+        Arguments:
+            expected_response_code: The expected response code.
+            url_params: URL parameters that will be encoded and passed to the request.
+
         """
         if url_params:
             url_params = urlencode(url_params)
-        response = self.get_response(url_params)
+
+        response = self.get_response(self.block_to_be_tested.location, url_params)
         if expected_response_code == 200:
             self.assertContains(response, self.html_block.data, status_code=expected_response_code)
-            for chrome_element in [self.COURSEWARE_CHROME_HTML_ELEMENTS + self.XBLOCK_REMOVED_HTML_ELEMENTS]:
+            unexpected_elements = self.block_specific_chrome_html_elements
+            unexpected_elements += self.COURSEWARE_CHROME_HTML_ELEMENTS + self.XBLOCK_REMOVED_HTML_ELEMENTS
+            for chrome_element in unexpected_elements:
                 self.assertNotContains(response, chrome_element)
         else:
             self.assertNotContains(response, self.html_block.data, status_code=expected_response_code)
         return response
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 7),
-        (ModuleStoreEnum.Type.split, 5),
+        ('vertical_block', ModuleStoreEnum.Type.mongo, 11),
+        ('vertical_block', ModuleStoreEnum.Type.split, 6),
+        ('html_block', ModuleStoreEnum.Type.mongo, 12),
+        ('html_block', ModuleStoreEnum.Type.split, 6),
     )
     @ddt.unpack
-    def test_courseware_html(self, default_store, mongo_calls):
+    def test_courseware_html(self, block_name, default_store, mongo_calls):
         """
         To verify that the removal of courseware chrome elements is working,
         we include this test here to make sure the chrome elements that should
@@ -119,13 +160,15 @@ class RenderXBlockTestMixin(object):
         has changed and COURSEWARE_CHROME_HTML_ELEMENTS needs to be updated.
         """
         with self.store.default_store(default_store):
+            self.block_name_to_be_tested = block_name
             self.setup_course(default_store)
             self.setup_user(admin=True, enroll=True, login=True)
 
             with check_mongo_calls(mongo_calls):
-                url = get_redirect_url(self.course.id, self.html_block.location)
+                url = get_redirect_url(self.course.id, self.block_to_be_tested.location)
                 response = self.client.get(url)
-                for chrome_element in self.COURSEWARE_CHROME_HTML_ELEMENTS:
+                expected_elements = self.block_specific_chrome_html_elements + self.COURSEWARE_CHROME_HTML_ELEMENTS
+                for chrome_element in expected_elements:
                     self.assertContains(response, chrome_element)
 
     @ddt.data(
@@ -178,18 +221,23 @@ class RenderXBlockTestMixin(object):
     def test_fail_block_unreleased(self):
         self.setup_course()
         self.setup_user(admin=False, enroll=True, login=True)
-        self.html_block.start = datetime.max
-        modulestore().update_item(self.html_block, self.user.id)
+        self.block_to_be_tested.start = datetime.max
+        modulestore().update_item(self.block_to_be_tested, self.user.id)
         self.verify_response(expected_response_code=404)
 
     def test_fail_block_nonvisible(self):
         self.setup_course()
         self.setup_user(admin=False, enroll=True, login=True)
-        self.html_block.visible_to_staff_only = True
-        modulestore().update_item(self.html_block, self.user.id)
+        self.block_to_be_tested.visible_to_staff_only = True
+        modulestore().update_item(self.block_to_be_tested, self.user.id)
         self.verify_response(expected_response_code=404)
 
-    def test_student_view_param(self):
+    @ddt.data(
+        'vertical_block',
+        'html_block',
+    )
+    def test_student_view_param(self, block_name):
+        self.block_name_to_be_tested = block_name
         self.setup_course()
         self.setup_user(admin=False, enroll=True, login=True)
         self.verify_response(url_params={'view': 'student_view'})

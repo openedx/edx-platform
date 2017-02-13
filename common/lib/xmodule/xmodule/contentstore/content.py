@@ -200,7 +200,10 @@ class StaticContent(object):
         if path.startswith('/static/'):
             path = path[len('/static/'):]
 
-        path = path.lstrip('/')
+        # Old-style asset keys start with `/`, so don't try and strip it
+        # in that case.
+        if not path.startswith('/c4x'):
+            path = path.lstrip('/')
 
         try:
             return AssetKey.from_string(path)

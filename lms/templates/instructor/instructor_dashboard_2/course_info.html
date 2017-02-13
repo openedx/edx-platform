@@ -66,14 +66,17 @@ from openedx.core.djangolib.markup import HTML, Text
 
     <li class="field text is-not-editable" id="field-course-start-date">
       <label for="course-start-date">${_("Course Start Date:")}</label>
-      <b>${ section_data['start_date'] }</b>
+      <b class="localized-datetime" data-datetime="${section_data['start_date']}" data-timezone="${user_timezone}" data-language="${user_language}"></b>
     </li>
 
     <li class="field text is-not-editable" id="field-course-end-date">
       <label for="course-end-date">${_("Course End Date:")}</label>
-      <b>${ section_data['end_date'] }</b>
+        % if course.end is None:
+            <b>${_("No end date set")}</b>
+        % else:
+            <b class="localized-datetime" data-datetime="${section_data['end_date']}" data-timezone="${user_timezone}" data-language="${user_language}"></b>
+        % endif
     </li>
-
     <li class="field text is-not-editable" id="field-course-started">
       <label for="start-date">${_("Has the course started?")}</label>
 
@@ -110,8 +113,8 @@ from openedx.core.djangolib.markup import HTML, Text
         )}
       </p>
   %endif
-</div>
 
+</div>
 
 %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
   <div class="running-tasks-container action-type-container">

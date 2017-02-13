@@ -5,6 +5,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.http import Http404
 from django.test import TestCase, RequestFactory
 from nose.plugins.attrib import attr
+from rest_framework.generics import GenericAPIView
 
 from student.roles import CourseStaffRole, CourseInstructorRole
 from openedx.core.lib.api.permissions import (
@@ -37,8 +38,8 @@ class IsCourseStaffInstructorTests(TestCase):
     def setUp(self):
         super(IsCourseStaffInstructorTests, self).setUp()
         self.permission = IsCourseStaffInstructor()
-        self.coach = UserFactory.create()
-        self.user = UserFactory.create()
+        self.coach = UserFactory()
+        self.user = UserFactory()
         self.request = RequestFactory().get('/')
         self.request.user = self.user
         self.course_key = CourseKey.from_string('edx/test123/run')
@@ -72,7 +73,7 @@ class IsMasterCourseStaffInstructorTests(TestCase):
         super(IsMasterCourseStaffInstructorTests, self).setUp()
         self.permission = IsMasterCourseStaffInstructor()
         master_course_id = 'edx/test123/run'
-        self.user = UserFactory.create()
+        self.user = UserFactory()
         self.get_request = RequestFactory().get('/?master_course_id={}'.format(master_course_id))
         self.get_request.user = self.user
         self.post_request = RequestFactory().post('/', data={'master_course_id': master_course_id})
@@ -133,36 +134,44 @@ class IsStaffOrOwnerTests(TestCase):
 
     def test_staff_user(self):
         """ Staff users should be permitted. """
-        user = UserFactory.create(is_staff=True)
+        user = UserFactory(is_staff=True)
         self.assert_user_has_object_permission(user, True)
 
     def test_owner(self):
         """ Owners should be permitted. """
-        user = UserFactory.create()
+        user = UserFactory()
         self.obj.user = user
         self.assert_user_has_object_permission(user, True)
 
     def test_non_staff_test_non_owner_or_staff_user(self):
         """ Non-staff and non-owner users should not be permitted. """
-        user = UserFactory.create()
+        user = UserFactory()
         self.assert_user_has_object_permission(user, False)
 
     def test_has_permission_as_staff(self):
         """ Staff users always have permission. """
-        self.request.user = UserFactory.create(is_staff=True)
+        self.request.user = UserFactory(is_staff=True)
         self.assertTrue(self.permission.has_permission(self.request, None))
 
     def test_has_permission_as_owner_with_get(self):
         """ Owners always have permission to make GET actions. """
-        user = UserFactory.create()
+        user = UserFactory()
         request = RequestFactory().get('/?username={}'.format(user.username))
         request.user = user
         self.assertTrue(self.permission.has_permission(request, None))
 
+    def test_has_permission_with_view_kwargs_as_owner_with_get(self):
+        """ Owners always have permission to make GET actions. """
+        user = UserFactory()
+        self.request.user = user
+        view = GenericAPIView()
+        view.kwargs = {'username': user.username}
+        self.assertTrue(self.permission.has_permission(self.request, view))
+
     @ddt.data('patch', 'post', 'put')
     def test_has_permission_as_owner_with_edit(self, action):
         """ Owners always have permission to edit. """
-        user = UserFactory.create()
+        user = UserFactory()
 
         data = {'username': user.username}
         request = getattr(RequestFactory(), action)('/', data, format='json')
@@ -172,7 +181,15 @@ class IsStaffOrOwnerTests(TestCase):
 
     def test_has_permission_as_non_owner(self):
         """ Non-owners should not have permission. """
-        user = UserFactory.create()
+        user = UserFactory()
         request = RequestFactory().get('/?username={}'.format(user.username))
-        request.user = UserFactory.create()
+        request.user = UserFactory()
         self.assertFalse(self.permission.has_permission(request, None))
+
+    def test_has_permission_with_view_kwargs_as_non_owner(self):
+        """ Non-owners should not have permission. """
+        user = UserFactory()
+        self.request.user = user
+        view = GenericAPIView()
+        view.kwargs = {'username': UserFactory().username}
+        self.assertFalse(self.permission.has_permission(self.request, view))

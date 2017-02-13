@@ -25,21 +25,23 @@ from xmodule.modulestore import ModuleStoreEnum
 
 from courseware.model_data import StudentModule
 
-from instructor_task.api import (submit_rescore_problem_for_all_students,
-                                 submit_rescore_problem_for_student,
-                                 submit_reset_problem_attempts_for_all_students,
-                                 submit_delete_problem_state_for_all_students)
-from instructor_task.models import InstructorTask
-from instructor_task.tasks_helper import upload_grades_csv
-from instructor_task.tests.test_base import (
+from lms.djangoapps.instructor_task.api import (
+    submit_rescore_problem_for_all_students,
+    submit_rescore_problem_for_student,
+    submit_reset_problem_attempts_for_all_students,
+    submit_delete_problem_state_for_all_students
+)
+from lms.djangoapps.instructor_task.models import InstructorTask
+from lms.djangoapps.instructor_task.tasks_helper import upload_grades_csv
+from lms.djangoapps.instructor_task.tests.test_base import (
     InstructorTaskModuleTestCase,
     TestReportMixin,
     OPTION_1,
     OPTION_2,
 )
 from capa.responsetypes import StudentInputError
-from lms.djangoapps.lms_xblock.runtime import quote_slashes
 from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
+from openedx.core.lib.url_utils import quote_slashes
 
 
 log = logging.getLogger(__name__)
@@ -132,41 +134,33 @@ class TestRescoringTask(TestIntegrationTask):
         # are in sync.
         expected_subsection_grade = expected_score
 
-        course_grade = CourseGradeFactory(user).create(self.course)
+        course_grade = CourseGradeFactory().create(user, self.course)
         self.assertEquals(
-            course_grade.subsection_grade_totals_by_format['Homework'][0].earned,
+            course_grade.graded_subsections_by_format['Homework'][self.problem_section.location].graded_total.earned,
             expected_subsection_grade,
         )
 
-    def submit_rescore_all_student_answers(self, instructor, problem_url_name):
+    def submit_rescore_all_student_answers(self, instructor, problem_url_name, only_if_higher=False):
         """Submits the particular problem for rescoring"""
-        return submit_rescore_problem_for_all_students(self.create_task_request(instructor),
-                                                       InstructorTaskModuleTestCase.problem_location(problem_url_name))
+        return submit_rescore_problem_for_all_students(
+            self.create_task_request(instructor),
+            InstructorTaskModuleTestCase.problem_location(problem_url_name),
+            only_if_higher,
+        )
 
-    def submit_rescore_one_student_answer(self, instructor, problem_url_name, student):
+    def submit_rescore_one_student_answer(self, instructor, problem_url_name, student, only_if_higher=False):
         """Submits the particular problem for rescoring for a particular student"""
-        return submit_rescore_problem_for_student(self.create_task_request(instructor),
-                                                  InstructorTaskModuleTestCase.problem_location(problem_url_name),
-                                                  student)
+        return submit_rescore_problem_for_student(
+            self.create_task_request(instructor),
+            InstructorTaskModuleTestCase.problem_location(problem_url_name),
+            student,
+            only_if_higher,
+        )
 
-    RescoreTestData = namedtuple('RescoreTestData', 'edit, new_expected_scores, new_expected_max')
-
-    @ddt.data(
-        RescoreTestData(edit=dict(correct_answer=OPTION_2), new_expected_scores=(0, 1, 1, 2), new_expected_max=2),
-        RescoreTestData(edit=dict(num_inputs=2), new_expected_scores=(2, 1, 1, 0), new_expected_max=4),
-        RescoreTestData(edit=dict(num_inputs=4), new_expected_scores=(2, 1, 1, 0), new_expected_max=8),
-        RescoreTestData(edit=dict(num_responses=4), new_expected_scores=(2, 1, 1, 0), new_expected_max=4),
-        RescoreTestData(edit=dict(num_inputs=2, num_responses=4), new_expected_scores=(2, 1, 1, 0), new_expected_max=8),
-    )
-    @ddt.unpack
-    def test_rescoring_option_problem(self, problem_edit, new_expected_scores, new_expected_max):
+    def verify_rescore_results(self, problem_edit, new_expected_scores, new_expected_max, rescore_if_higher):
         """
-        Run rescore scenario on option problem.
-        Verify rescoring updates grade after content change.
-        Original problem definition has:
-            num_inputs = 1
-            num_responses = 2
-            correct_answer = OPTION_1
+        Common helper to verify the results of rescoring for a single
+        student and all students are as expected.
         """
         # get descriptor:
         problem_url_name = 'H1P1'
@@ -194,15 +188,49 @@ class TestRescoringTask(TestIntegrationTask):
         self.check_state(self.user1, descriptor, expected_original_scores[0], expected_original_max)
 
         # rescore the problem for only one student -- only that student's grade should change:
-        self.submit_rescore_one_student_answer('instructor', problem_url_name, self.user1)
+        self.submit_rescore_one_student_answer('instructor', problem_url_name, self.user1, rescore_if_higher)
         self.check_state(self.user1, descriptor, new_expected_scores[0], new_expected_max)
         for i, user in enumerate(self.users[1:], start=1):  # everyone other than user1
             self.check_state(user, descriptor, expected_original_scores[i], expected_original_max)
 
         # rescore the problem for all students
-        self.submit_rescore_all_student_answers('instructor', problem_url_name)
+        self.submit_rescore_all_student_answers('instructor', problem_url_name, rescore_if_higher)
         for i, user in enumerate(self.users):
             self.check_state(user, descriptor, new_expected_scores[i], new_expected_max)
+
+    RescoreTestData = namedtuple('RescoreTestData', 'edit, new_expected_scores, new_expected_max')
+
+    @ddt.data(
+        RescoreTestData(edit=dict(correct_answer=OPTION_2), new_expected_scores=(0, 1, 1, 2), new_expected_max=2),
+        RescoreTestData(edit=dict(num_inputs=2), new_expected_scores=(2, 1, 1, 0), new_expected_max=4),
+        RescoreTestData(edit=dict(num_inputs=4), new_expected_scores=(2, 1, 1, 0), new_expected_max=8),
+        RescoreTestData(edit=dict(num_responses=4), new_expected_scores=(2, 1, 1, 0), new_expected_max=4),
+        RescoreTestData(edit=dict(num_inputs=2, num_responses=4), new_expected_scores=(2, 1, 1, 0), new_expected_max=8),
+    )
+    @ddt.unpack
+    def test_rescoring_option_problem(self, problem_edit, new_expected_scores, new_expected_max):
+        """
+        Run rescore scenario on option problem.
+        Verify rescoring updates grade after content change.
+        Original problem definition has:
+            num_inputs = 1
+            num_responses = 2
+            correct_answer = OPTION_1
+        """
+        self.verify_rescore_results(
+            problem_edit, new_expected_scores, new_expected_max, rescore_if_higher=False,
+        )
+
+    @ddt.data(
+        RescoreTestData(edit=dict(), new_expected_scores=(2, 1, 1, 0), new_expected_max=2),
+        RescoreTestData(edit=dict(correct_answer=OPTION_2), new_expected_scores=(2, 1, 1, 2), new_expected_max=2),
+        RescoreTestData(edit=dict(num_inputs=2), new_expected_scores=(2, 1, 1, 0), new_expected_max=2),
+    )
+    @ddt.unpack
+    def test_rescoring_if_higher(self, problem_edit, new_expected_scores, new_expected_max):
+        self.verify_rescore_results(
+            problem_edit, new_expected_scores, new_expected_max, rescore_if_higher=True,
+        )
 
     def test_rescoring_failure(self):
         """Simulate a failure in rescoring a problem"""
@@ -546,13 +574,13 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
         self.verify_rows_in_csv(
             [
                 merge_dicts(
-                    {'id': str(student.id), 'username': student.username, 'email': student.email},
+                    {'Student ID': str(student.id), 'Username': student.username, 'Email': student.email},
                     grades,
                     user_partition_group(student)
                 )
                 for student_grades in students_grades for student, grades in student_grades.iteritems()
             ],
-            ignore_other_columns=ignore_other_columns
+            ignore_other_columns=ignore_other_columns,
         )
 
     def test_both_groups_problems(self):
@@ -571,15 +599,25 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
         self.submit_student_answer(self.student_a.username, problem_a_url, [OPTION_1, OPTION_1])
         self.submit_student_answer(self.student_b.username, problem_b_url, [OPTION_1, OPTION_2])
 
-        with patch('instructor_task.tasks_helper._get_current_task'):
+        with patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task'):
             result = upload_grades_csv(None, None, self.course.id, None, 'graded')
             self.verify_csv_task_success(result)
             self.verify_grades_in_csv(
                 [
-                    {self.student_a: {'grade': '1.0', 'HW': '1.0'}},
-                    {self.student_b: {'grade': '0.5', 'HW': '0.5'}}
+                    {
+                        self.student_a: {
+                            u'Grade': '1.0',
+                            u'Homework': '1.0',
+                        }
+                    },
+                    {
+                        self.student_b: {
+                            u'Grade': '0.5',
+                            u'Homework': '0.5',
+                        }
+                    },
                 ],
-                ignore_other_columns=True
+                ignore_other_columns=True,
             )
 
     def test_one_group_problem(self):
@@ -594,13 +632,23 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
 
         self.submit_student_answer(self.student_a.username, problem_a_url, [OPTION_1, OPTION_1])
 
-        with patch('instructor_task.tasks_helper._get_current_task'):
+        with patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task'):
             result = upload_grades_csv(None, None, self.course.id, None, 'graded')
             self.verify_csv_task_success(result)
             self.verify_grades_in_csv(
                 [
-                    {self.student_a: {'grade': '1.0', 'HW': '1.0'}},
-                    {self.student_b: {'grade': '0.0', 'HW': '0.0'}}
+                    {
+                        self.student_a: {
+                            u'Grade': '1.0',
+                            u'Homework': '1.0',
+                        },
+                    },
+                    {
+                        self.student_b: {
+                            u'Grade': '0.0',
+                            u'Homework': u'Not Available',
+                        }
+                    },
                 ],
                 ignore_other_columns=True
             )

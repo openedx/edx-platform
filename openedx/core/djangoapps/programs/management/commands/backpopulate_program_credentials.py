@@ -2,20 +2,19 @@
 from collections import namedtuple
 import logging
 
-from django.core.management import BaseCommand, CommandError
+from django.contrib.auth.models import User
+from django.core.management import BaseCommand
 from django.db.models import Q
 from opaque_keys.edx.keys import CourseKey
-from provider.oauth2.models import Client
 
 from certificates.models import GeneratedCertificate, CertificateStatuses  # pylint: disable=import-error
-from openedx.core.djangoapps.programs.models import ProgramsApiConfig
+from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.programs.tasks.v1.tasks import award_program_certificates
-from openedx.core.djangoapps.programs.utils import get_programs
 
 
 # TODO: Log to console, even with debug mode disabled?
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
-RunMode = namedtuple('RunMode', ['course_key', 'mode_slug'])
+CourseRun = namedtuple('CourseRun', ['key', 'type'])
 
 
 class Command(BaseCommand):
@@ -25,8 +24,7 @@ class Command(BaseCommand):
     Celery task for further (parallelized) processing.
     """
     help = 'Backpopulate missing program credentials.'
-    client = None
-    run_modes = None
+    course_runs = None
     usernames = None
 
     def add_arguments(self, parser):
@@ -39,23 +37,10 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        programs_config = ProgramsApiConfig.current()
-        self.client = Client.objects.get(name=programs_config.OAUTH2_CLIENT_NAME)
-
-        if self.client.user is None:
-            msg = (
-                'No user is associated with the {} OAuth2 client. '
-                'A service user is necessary to make requests to the Programs API. '
-                'No tasks have been enqueued. '
-                'Associate a user with the client and try again.'
-            ).format(programs_config.OAUTH2_CLIENT_NAME)
-
-            raise CommandError(msg)
-
-        self._load_run_modes()
+        logger.info('Loading programs from the catalog.')
+        self._load_course_runs()
 
         logger.info('Looking for users who may be eligible for a program certificate.')
-
         self._load_usernames()
 
         if options.get('commit'):
@@ -85,37 +70,37 @@ class Command(BaseCommand):
             failed
         )
 
-    def _load_run_modes(self):
-        """Find all run modes which are part of a program."""
-        programs = get_programs(self.client.user)
-        self.run_modes = self._flatten(programs)
+    def _load_course_runs(self):
+        """Find all course runs which are part of a program."""
+        programs = get_programs()
+        self.course_runs = self._flatten(programs)
 
     def _flatten(self, programs):
-        """Flatten program dicts into a set of run modes."""
-        run_modes = set()
+        """Flatten programs into a set of course runs."""
+        course_runs = set()
         for program in programs:
-            for course_code in program['course_codes']:
-                for run in course_code['run_modes']:
-                    course_key = CourseKey.from_string(run['course_key'])
-                    run_modes.add(
-                        RunMode(course_key, run['mode_slug'])
+            for course in program['courses']:
+                for course_run in course['course_runs']:
+                    key = CourseKey.from_string(course_run['key'])
+                    course_runs.add(
+                        CourseRun(key, course_run['type'])
                     )
 
-        return run_modes
+        return course_runs
 
     def _load_usernames(self):
         """Identify a subset of users who may be eligible for a program certificate.
 
-        This is done by finding users who have earned a certificate in at least one
-        program course code's run mode.
+        This is done by finding users who have earned a qualifying certificate in
+        at least one program course's course run.
         """
         status_query = Q(status__in=CertificateStatuses.PASSED_STATUSES)
-        run_mode_query = reduce(
+        course_run_query = reduce(
             lambda x, y: x | y,
-            [Q(course_id=r.course_key, mode=r.mode_slug) for r in self.run_modes]
+            [Q(course_id=course_run.key, mode=course_run.type) for course_run in self.course_runs]
         )
 
-        query = status_query & run_mode_query
+        query = status_query & course_run_query
 
         username_dicts = GeneratedCertificate.eligible_certificates.filter(query).values('user__username').distinct()
         self.usernames = [d['user__username'] for d in username_dicts]

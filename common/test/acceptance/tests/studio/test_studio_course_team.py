@@ -26,6 +26,17 @@ class CourseTeamPageTest(StudioCourseTest):
         ).visit()
         return user
 
+    def _update_user(self, user_info):
+        """
+        Update user with provided `user_info`
+
+        Arguments:
+            `user_info`: dictionary containing values of attributes to be updated
+        """
+        AutoAuthPage(
+            self.browser, no_login=True, **user_info
+        ).visit()
+
     def setUp(self, is_staff=False):
         """
         Install a course with no content using a fixture.
@@ -173,6 +184,34 @@ class CourseTeamPageTest(StudioCourseTest):
 
         self.log_in(self.other_user)
         self._assert_current_course(visible=False)
+
+    def test_admins_can_delete_other_inactive_users(self):
+        """
+        Scenario: Admins can delete other inactive users
+        Given I have opened a new course in Studio
+        And I am viewing the course team settings.
+        When I add other user to the course team,
+        And then delete that other user from the course team.
+        And other user logs in
+        Then he/she does not see the course on page
+        """
+        self.page.add_user_to_course(self.other_user.get('email'))
+        self._assert_user_present(self.other_user, present=True)
+
+        # inactivate user
+        user_info = {
+            'username': self.other_user.get('username'),
+            'email': self.other_user.get('email'),
+            'password': self.other_user.get('password'),
+            'is_active': False
+        }
+        self._update_user(user_info)
+
+        # go to course team page to perform delete operation
+        self._go_to_course_team_page()
+        self.page.delete_user_from_course(self.other_user.get('email'))
+
+        self._assert_user_present(self.other_user, present=False)
 
     def test_admins_cannot_add_users_that_do_not_exist(self):
         """

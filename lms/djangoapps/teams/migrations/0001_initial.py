@@ -5,7 +5,7 @@ from django.db import migrations, models
 import django_countries.fields
 from django.conf import settings
 import student.models
-import xmodule_django.models
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
 
 class Migration(migrations.Migration):
@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
                 ('team_id', models.CharField(unique=True, max_length=255)),
                 ('discussion_topic_id', models.CharField(unique=True, max_length=255)),
                 ('name', models.CharField(max_length=255, db_index=True)),
-                ('course_id', xmodule_django.models.CourseKeyField(max_length=255, db_index=True)),
+                ('course_id', CourseKeyField(max_length=255, db_index=True)),
                 ('topic_id', models.CharField(db_index=True, max_length=255, blank=True)),
                 ('date_created', models.DateTimeField(auto_now_add=True)),
                 ('description', models.CharField(max_length=300)),

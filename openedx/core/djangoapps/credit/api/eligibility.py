@@ -297,7 +297,7 @@ def set_credit_requirement_status(user, course_key, req_namespace, req_name, sta
             try:
                 send_credit_notifications(user.username, course_key)
             except Exception:  # pylint: disable=broad-except
-                log.error("Error sending email")
+                log.exception("Error sending email")
 
 
 # pylint: disable=invalid-name

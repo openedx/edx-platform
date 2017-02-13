@@ -484,7 +484,8 @@ class DuplicateHelper(object):
             "Duplicated item differs from original"
         )
 
-    def _check_equality(self, source_usage_key, duplicate_usage_key, parent_usage_key=None, check_asides=False):
+    def _check_equality(self, source_usage_key, duplicate_usage_key, parent_usage_key=None, check_asides=False,
+                        is_child=False):
         """
         Gets source and duplicated items from the modulestore using supplied usage keys.
         Then verifies that they represent equivalent items (modulo parents and other
@@ -523,10 +524,9 @@ class DuplicateHelper(object):
                 "Parent duplicate should be different from source"
             )
 
-        # Set the location, display name, and parent to be the same so we can make sure the rest of the
+        # Set the location and parent to be the same so we can make sure the rest of the
         # duplicate is equal.
         duplicated_item.location = original_item.location
-        duplicated_item.display_name = original_item.display_name
         duplicated_item.parent = original_item.parent
 
         # Children will also be duplicated, so for the purposes of testing equality, we will set
@@ -538,11 +538,26 @@ class DuplicateHelper(object):
                 "Duplicated item differs in number of children"
             )
             for i in xrange(len(original_item.children)):
-                if not self._check_equality(original_item.children[i], duplicated_item.children[i]):
+                if not self._check_equality(original_item.children[i], duplicated_item.children[i], is_child=True):
                     return False
             duplicated_item.children = original_item.children
+        return self._verify_duplicate_display_name(original_item, duplicated_item, is_child)
 
-        return original_item == duplicated_item
+    def _verify_duplicate_display_name(self, original_item, duplicated_item, is_child=False):
+        """
+        Verifies display name of duplicated item.
+        """
+        if is_child:
+            if original_item.display_name is None:
+                return duplicated_item.display_name == original_item.category
+            return duplicated_item.display_name == original_item.display_name
+        if original_item.display_name is not None:
+            return duplicated_item.display_name == "Duplicate of '{display_name}'".format(
+                display_name=original_item.display_name
+            )
+        return duplicated_item.display_name == "Duplicate of {display_name}".format(
+            display_name=original_item.category
+        )
 
     def _duplicate_item(self, parent_usage_key, source_usage_key, display_name=None):
         """
@@ -571,16 +586,20 @@ class TestDuplicateItem(ItemTest, DuplicateHelper):
         resp = self.create_xblock(parent_usage_key=self.usage_key, category='chapter')
         self.chapter_usage_key = self.response_usage_key(resp)
 
-        # create a sequential containing a problem and an html component
+        # create a sequential
         resp = self.create_xblock(parent_usage_key=self.chapter_usage_key, category='sequential')
         self.seq_usage_key = self.response_usage_key(resp)
 
+        # create a vertical containing a problem and an html component
+        resp = self.create_xblock(parent_usage_key=self.seq_usage_key, category='vertical')
+        self.vert_usage_key = self.response_usage_key(resp)
+
         # create problem and an html component
-        resp = self.create_xblock(parent_usage_key=self.seq_usage_key, category='problem',
+        resp = self.create_xblock(parent_usage_key=self.vert_usage_key, category='problem',
                                   boilerplate='multiplechoice.yaml')
         self.problem_usage_key = self.response_usage_key(resp)
 
-        resp = self.create_xblock(parent_usage_key=self.seq_usage_key, category='html')
+        resp = self.create_xblock(parent_usage_key=self.vert_usage_key, category='html')
         self.html_usage_key = self.response_usage_key(resp)
 
         # Create a second sequential just (testing children of children)
@@ -591,8 +610,9 @@ class TestDuplicateItem(ItemTest, DuplicateHelper):
         Tests that a duplicated xblock is identical to the original,
         except for location and display name.
         """
-        self._duplicate_and_verify(self.problem_usage_key, self.seq_usage_key)
-        self._duplicate_and_verify(self.html_usage_key, self.seq_usage_key)
+        self._duplicate_and_verify(self.problem_usage_key, self.vert_usage_key)
+        self._duplicate_and_verify(self.html_usage_key, self.vert_usage_key)
+        self._duplicate_and_verify(self.vert_usage_key, self.seq_usage_key)
         self._duplicate_and_verify(self.seq_usage_key, self.chapter_usage_key)
         self._duplicate_and_verify(self.chapter_usage_key, self.usage_key)
 
@@ -625,9 +645,10 @@ class TestDuplicateItem(ItemTest, DuplicateHelper):
                     "duplicated item not ordered after source item"
                 )
 
-        verify_order(self.problem_usage_key, self.seq_usage_key, 0)
+        verify_order(self.problem_usage_key, self.vert_usage_key, 0)
         # 2 because duplicate of problem should be located before.
-        verify_order(self.html_usage_key, self.seq_usage_key, 2)
+        verify_order(self.html_usage_key, self.vert_usage_key, 2)
+        verify_order(self.vert_usage_key, self.seq_usage_key, 0)
         verify_order(self.seq_usage_key, self.chapter_usage_key, 0)
 
         # Test duplicating something into a location that is not the parent of the original item.
@@ -645,12 +666,12 @@ class TestDuplicateItem(ItemTest, DuplicateHelper):
             return usage_key
 
         # Display name comes from template.
-        dupe_usage_key = verify_name(self.problem_usage_key, self.seq_usage_key, "Duplicate of 'Multiple Choice'")
+        dupe_usage_key = verify_name(self.problem_usage_key, self.vert_usage_key, "Duplicate of 'Multiple Choice'")
         # Test dupe of dupe.
-        verify_name(dupe_usage_key, self.seq_usage_key, "Duplicate of 'Duplicate of 'Multiple Choice''")
+        verify_name(dupe_usage_key, self.vert_usage_key, "Duplicate of 'Duplicate of 'Multiple Choice''")
 
         # Uses default display_name of 'Text' from HTML component.
-        verify_name(self.html_usage_key, self.seq_usage_key, "Duplicate of 'Text'")
+        verify_name(self.html_usage_key, self.vert_usage_key, "Duplicate of 'Text'")
 
         # The sequence does not have a display_name set, so category is shown.
         verify_name(self.seq_usage_key, self.chapter_usage_key, "Duplicate of sequential")
@@ -1469,6 +1490,7 @@ class TestComponentTemplates(CourseTestCase):
         XBlockStudioConfiguration.objects.create(name='video', enabled=True, support_level="us")
         # XBlock masquerading as a problem
         XBlockStudioConfiguration.objects.create(name='openassessment', enabled=True, support_level="us")
+        XBlockStudioConfiguration.objects.create(name='drag-and-drop-v2', enabled=True, support_level="fs")
 
         self.templates = get_component_templates(self.course)
 
@@ -1508,7 +1530,17 @@ class TestComponentTemplates(CourseTestCase):
         self.templates = get_component_templates(self.course)
         self._verify_basic_component("discussion", "Discussion", "ps")
         self.assertEqual([], self.get_templates_of_type("video"))
-        self.assertEqual([], self.get_templates_of_type("problem"))
+        supported_problem_templates = [
+            {
+                'boilerplate_name': None,
+                'category': 'drag-and-drop-v2',
+                'display_name': u'Drag and Drop',
+                'hinted': False,
+                'support_level': u'fs',
+                'tab': 'advanced'
+            }
+        ]
+        self.assertEqual(supported_problem_templates, self.get_templates_of_type("problem"))
 
         self.course.allow_unsupported_xblocks = True
         self.templates = get_component_templates(self.course)
@@ -1607,33 +1639,49 @@ class TestComponentTemplates(CourseTestCase):
         """
         Test the integration of xblocks masquerading as problems.
         """
-        def get_openassessment():
-            """ Helper method to return the openassessment template from problem list """
+        def get_xblock_problem(label):
+            """
+            Helper method to get the template of any XBlock in the problems list
+            """
             self.templates = get_component_templates(self.course)
             problem_templates = self.get_templates_of_type('problem')
-            return self.get_template(problem_templates, u'Peer Assessment')
+            return self.get_template(problem_templates, label)
 
         def verify_openassessment_present(support_level):
             """ Helper method to verify that openassessment template is present """
-            openassessment = get_openassessment()
+            openassessment = get_xblock_problem('Peer Assessment')
             self.assertIsNotNone(openassessment)
             self.assertEqual(openassessment.get('category'), 'openassessment')
             self.assertEqual(openassessment.get('support_level'), support_level)
 
+        def verify_dndv2_present(support_level):
+            """
+            Helper method to verify that DnDv2 template is present
+            """
+            dndv2 = get_xblock_problem('Drag and Drop')
+            self.assertIsNotNone(dndv2)
+            self.assertEqual(dndv2.get('category'), 'drag-and-drop-v2')
+            self.assertEqual(dndv2.get('support_level'), support_level)
+
         verify_openassessment_present(True)
+        verify_dndv2_present(True)
 
         # Now enable XBlockStudioConfigurationFlag. The openassessment block is marked
-        # unsupported, so will no longer show up.
+        # unsupported, so will no longer show up, but DnDv2 will continue to appear.
         XBlockStudioConfigurationFlag.objects.create(enabled=True)
-        self.assertIsNone(get_openassessment())
+        self.assertIsNone(get_xblock_problem('Peer Assessment'))
+        self.assertIsNotNone(get_xblock_problem('Drag and Drop'))
 
         # Now allow unsupported components.
         self.course.allow_unsupported_xblocks = True
         verify_openassessment_present('us')
+        verify_dndv2_present('fs')
 
-        # Now disable openassessment completely through XBlockConfiguration
+        # Now disable the blocks completely through XBlockConfiguration
         XBlockConfiguration.objects.create(name='openassessment', enabled=False)
-        self.assertIsNone(get_openassessment())
+        XBlockConfiguration.objects.create(name='drag-and-drop-v2', enabled=False)
+        self.assertIsNone(get_xblock_problem('Peer Assessment'))
+        self.assertIsNone(get_xblock_problem('Drag and Drop'))
 
     def _verify_advanced_xblocks(self, expected_xblocks, expected_support_levels):
         """

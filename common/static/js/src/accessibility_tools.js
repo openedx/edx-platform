@@ -147,28 +147,52 @@ $(function() {
 
     SRAlert = (function() {
         function SRAlert() {
-            $('body').append('<div id="reader-feedback" class="sr" style="display:none" aria-hidden="false" aria-atomic="true" aria-live="assertive"></div>');
-            this.el = $('#reader-feedback');
+            // This initialization sometimes gets done twice, so take to only create a single reader-feedback div.
+            var readerFeedbackID = 'reader-feedback',
+                $readerFeedbackSelector = $('#' + readerFeedbackID);
+
+            if ($readerFeedbackSelector.length === 0) {
+                edx.HtmlUtils.append(
+                    $('body'),
+                    edx.HtmlUtils.interpolateHtml(
+                        edx.HtmlUtils.HTML('<div id="{readerFeedbackID}" class="sr" aria-live="polite"></div>'),
+                        {readerFeedbackID: readerFeedbackID}
+                    )
+                );
+            }
+            this.el = $('#' + readerFeedbackID);
         }
 
         SRAlert.prototype.clear = function() {
-            return this.el.html(' ');
+            edx.HtmlUtils.setHtml(this.el, '');
         };
 
         SRAlert.prototype.readElts = function(elts) {
-            var feedback = '';
+            var texts = [];
             $.each(elts, function(idx, value) {
-                return feedback += '<p>' + $(value).html() + '</p>\n';
+                texts.push($(value).html());
             });
-            return this.el.html(feedback);
+            return this.readTexts(texts);
         };
 
         SRAlert.prototype.readText = function(text) {
-            return this.el.text(text);
+            return this.readTexts([text]);
+        };
+
+        SRAlert.prototype.readTexts = function(texts) {
+            var htmlFeedback = edx.HtmlUtils.HTML('');
+            $.each(texts, function(idx, value) {
+                htmlFeedback = edx.HtmlUtils.interpolateHtml(
+                    edx.HtmlUtils.HTML('{previous_feedback}<p>{value}</p>\n'),
+                    // "value" may be HTML, if an element is being passed
+                    {previous_feedback: htmlFeedback, value: edx.HtmlUtils.HTML(value)}
+                );
+            });
+            edx.HtmlUtils.setHtml(this.el, htmlFeedback);
         };
 
         return SRAlert;
     })();
 
-    window.SR = new SRAlert;
+    window.SR = new SRAlert();
 });

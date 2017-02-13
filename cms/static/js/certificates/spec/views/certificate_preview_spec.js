@@ -83,12 +83,6 @@ function(_, $, Course, CertificatePreview, TemplateHelpers, ViewHelpers, AjaxHel
                 expect(this.view.toggleCertificateActivation).toHaveBeenCalled();
             });
 
-            it('toggle certificate activation button should not be present if user is not global staff', function() {
-                window.CMS.User = {isGlobalStaff: false};
-                appendSetFixtures(this.view.render().el);
-                expect(this.view.$(SELECTORS.activate_certificate)).not.toExist();
-            });
-
             it('certificate deactivation works fine', function() {
                 var requests = AjaxHelpers.requests(this),
                     notificationSpy = ViewHelpers.createNotificationSpy();

@@ -66,9 +66,9 @@ from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED
 from badges.events.course_complete import course_badge_check
 from badges.events.course_meta import completion_check, course_group_check
 from config_models.models import ConfigurationModel
-from instructor_task.models import InstructorTask
+from lms.djangoapps.instructor_task.models import InstructorTask
 from util.milestones_helpers import fulfill_course_milestone, is_prerequisite_courses_enabled
-from xmodule_django.models import CourseKeyField, NoneToEmptyManager
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, NoneToEmptyManager
 
 LOGGER = logging.getLogger(__name__)
 
@@ -95,7 +95,9 @@ class CertificateStatuses(object):
     readable_statuses = {
         downloadable: "already received",
         notpassing: "didn't receive",
-        error: "error states"
+        error: "error states",
+        audit_passing: "audit passing states",
+        audit_notpassing: "audit not passing states",
     }
 
     PASSED_STATUSES = (downloadable, generating)

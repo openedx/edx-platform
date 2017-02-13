@@ -20,7 +20,7 @@ from courseware.masquerade import (
     get_masquerading_group_info
 )
 from courseware.tests.factories import StaffFactory
-from courseware.tests.helpers import LoginEnrollmentTestCase, get_request_for_user
+from courseware.tests.helpers import LoginEnrollmentTestCase, masquerade_as_group_member
 from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from student.tests.factories import UserFactory
 from xblock.runtime import DictKeyValueStore
@@ -107,17 +107,6 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         )
         return self.client.get(url)
 
-    def _create_mock_json_request(self, user, body, method='POST', session=None):
-        """
-        Returns a mock JSON request for the specified user
-        """
-        request = get_request_for_user(user)
-        request.method = method
-        request.META = {'CONTENT_TYPE': ['application/json']}
-        request.body = body
-        request.session = session or {}
-        return request
-
     def verify_staff_debug_present(self, staff_debug_expected):
         """
         Verifies that the staff debug control visibility is as expected (for staff only).
@@ -156,10 +145,25 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         content = self.get_courseware_page().content
         self.assertIn(
-            '<a href="/u/{}" class="action dropdown-menuitem">Profile</a>'.format(self.test_user.username),
+            '<a href="/u/{}" role="menuitem" class="action dropdown-menuitem">Profile</a>'.format(
+                self.test_user.username
+            ),
             content,
             "Profile link should point to real user",
         )
+
+    def ensure_masquerade_as_group_member(self, partition_id, group_id):
+        """
+        Installs a masquerade for the test_user and test course, to enable the
+        user to masquerade as belonging to the specific partition/group combination.
+        Also verifies that the call to install the masquerade was successful.
+
+        Arguments:
+            partition_id (int): the integer partition id, referring to partitions already
+               configured in the course.
+            group_id (int); the integer group id, within the specified partition.
+        """
+        self.assertEqual(200, masquerade_as_group_member(self.test_user, self.course, partition_id, group_id))
 
 
 @attr(shard=1)
@@ -291,7 +295,9 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
 
         The return value is a string like u'1/2'.
         """
-        return json.loads(self.look_at_question(self.problem_display_name).content)['progress_detail']
+        json_data = json.loads(self.look_at_question(self.problem_display_name).content)
+        progress = '%s/%s' % (str(json_data['current_score']), str(json_data['total_possible']))
+        return progress
 
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_masquerade_as_specific_user_on_self_paced(self):
@@ -402,12 +408,7 @@ class TestGetMasqueradingGroupId(StaffMasqueradeTestCase):
         self.assertIsNone(user_partition_id)
 
         # Install a masquerading group
-        request = self._create_mock_json_request(
-            self.test_user,
-            body='{"role": "student", "user_partition_id": 0, "group_id": 1}'
-        )
-        handle_ajax(request, unicode(self.course.id))
-        setup_masquerade(request, self.test_user, True)
+        self.ensure_masquerade_as_group_member(0, 1)
 
         # Verify that the masquerading group is returned
         group_id, user_partition_id = get_masquerading_group_info(self.test_user, self.course.id)

@@ -39,26 +39,26 @@ var JSInput = (function($, undefined) {
 
         /*                      Private methods                          */
 
-        var section = $(elem).parent().find('section[class="jsinput"]'),
-            sectionAttr = function(e) { return $(section).attr(e); },
+        var jsinputContainer = $(elem).parent().find('.jsinput'),
+            jsinputAttr = function(e) { return $(jsinputContainer).attr(e); },
             iframe = $(elem).find('iframe[name^="iframe_"]').get(0),
             cWindow = iframe.contentWindow,
             path = iframe.src.substring(0, iframe.src.lastIndexOf('/') + 1),
             // Get the hidden input field to pass to customresponse
             inputField = $(elem).parent().find('input[id^="input_"]'),
             // Get the grade function name
-            gradeFn = sectionAttr('data'),
+            gradeFn = jsinputAttr('data'),
             // Get state getter
-            stateGetter = sectionAttr('data-getstate'),
+            stateGetter = jsinputAttr('data-getstate'),
             // Get state setter
-            stateSetter = sectionAttr('data-setstate'),
+            stateSetter = jsinputAttr('data-setstate'),
             // Get stored state
-            storedState = sectionAttr('data-stored'),
+            storedState = jsinputAttr('data-stored'),
             // Get initial state
-            initialState = sectionAttr('data-initial-state'),
+            initialState = jsinputAttr('data-initial-state'),
             // Bypass single-origin policy only if this attribute is "false"
             // In that case, use JSChannel to do so.
-            sop = sectionAttr('data-sop'),
+            sop = jsinputAttr('data-sop'),
             channel;
 
         sop = (sop !== 'false');
@@ -189,14 +189,14 @@ var JSInput = (function($, undefined) {
     }
 
     function walkDOM() {
-        var allSections = $('section.jsinput');
+        var $jsinputContainers = $('.jsinput');
         // When a JSInput problem loads, its data-processed attribute is false,
         // so the jsconstructor will be called for it.
         // The constructor will not be called again on subsequent reruns of
         // this file by other JSInput. Only if it is reloaded, either with the
         // rest of the page or when it is submitted, will this constructor be
         // called again.
-        allSections.each(function(index, value) {
+        $jsinputContainers.each(function(index, value) {
             var dataProcessed = ($(value).attr('data-processed') === 'true');
             if (!dataProcessed) {
                 jsinputConstructor(value);

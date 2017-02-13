@@ -133,23 +133,23 @@ define([
 
         failedSubmission = function() {
             expect(view.$('.js-success-message').length).toEqual(0);
-            expect(view.$('.submission-error')).toHaveClass('hidden');
+            expect(view.$formFeedback.find('.' + view.formErrorsJsHook).length).toEqual(0);
             validSubmission();
             view.model.trigger('error', {status: 500});
             expect(view.$('.js-success-message').length).toEqual(0);
-            expect(view.$('.submission-error')).not.toHaveClass('hidden');
+            expect(view.$formFeedback.find('.' + view.formErrorsJsHook).length).toEqual(1);
         };
 
         invalidCountry = function() {
             expect(view.$('.js-success-message').length).toEqual(0);
-            expect(view.$('.submission-error')).not.toHaveClass('hidden');
+            expect(view.$formFeedback.find('.' + view.formErrorsJsHook).length).toEqual(1);
             expect(view.$('#user-country-title')).toHaveClass('error');
             expect(view.$('.js-submit-form').prop('disabled')).toBeTruthy();
         };
 
         validCountry = function() {
             expect(view.$('.js-success-message').length).toEqual(0);
-            expect(view.$('.submission-error')).toHaveClass('hidden');
+            expect(view.$formFeedback.find('.' + view.formErrorsJsHook).length).toEqual(0);
             expect(view.$('#user-country-title')).not.toHaveClass('error');
             expect(view.$('.js-submit-form').prop('disabled')).toBeFalsy();
         };
@@ -184,10 +184,10 @@ define([
         });
 
         it('should not submit the form if the front end validation fails', function() {
-            expect(view.$('.submission-error')).toHaveClass('hidden');
+            expect(view.$formFeedback.find('.' + view.formErrorsJsHook).length).toEqual(0);
             view.$('.js-submit-form').click();
             expect(view.model.save).not.toHaveBeenCalled();
-            expect(view.$('.submission-error')).not.toHaveClass('hidden');
+            expect(view.$formFeedback.find('.' + view.formErrorsJsHook).length).toEqual(1);
         });
 
         it('should submit the form data and additional data if validation passes', function() {

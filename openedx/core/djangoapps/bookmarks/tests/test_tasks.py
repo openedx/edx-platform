@@ -103,11 +103,11 @@ class XBlockCacheTaskTests(BookmarksTestsBase):
         }
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 2, 2, 3),
-        (ModuleStoreEnum.Type.mongo, 4, 2, 3),
-        (ModuleStoreEnum.Type.mongo, 2, 3, 4),
-        (ModuleStoreEnum.Type.mongo, 4, 3, 4),
-        (ModuleStoreEnum.Type.mongo, 2, 4, 5),
+        (ModuleStoreEnum.Type.mongo, 2, 2, 4),
+        (ModuleStoreEnum.Type.mongo, 4, 2, 4),
+        (ModuleStoreEnum.Type.mongo, 2, 3, 5),
+        (ModuleStoreEnum.Type.mongo, 4, 3, 5),
+        (ModuleStoreEnum.Type.mongo, 2, 4, 6),
         # (ModuleStoreEnum.Type.mongo, 4, 4, 6), Too slow.
         (ModuleStoreEnum.Type.split, 2, 2, 3),
         (ModuleStoreEnum.Type.split, 4, 2, 3),
@@ -118,6 +118,9 @@ class XBlockCacheTaskTests(BookmarksTestsBase):
     def test_calculate_course_xblocks_data_queries(self, store_type, children_per_block, depth, expected_mongo_calls):
 
         course = self.create_course_with_blocks(children_per_block, depth, store_type)
+
+        # clear cache to get consistent query counts
+        self.clear_caches()
 
         with check_mongo_calls(expected_mongo_calls):
             blocks_data = _calculate_course_xblocks_data(course.id)

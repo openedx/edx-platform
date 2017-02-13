@@ -58,7 +58,7 @@ class SplitTestFields(object):
 
     display_name = String(
         display_name=_("Display Name"),
-        help=_("This name is used for organizing your course content, but is not shown to students."),
+        help=_("The display name for this component. (Not shown to learners)"),
         scope=Scope.settings,
         default=_("Content Experiment")
     )

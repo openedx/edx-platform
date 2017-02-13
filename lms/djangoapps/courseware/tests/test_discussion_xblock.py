@@ -241,14 +241,11 @@ class TestTemplates(TestDiscussionXBlock):
 
         self.block.has_permission = lambda perm: permission_dict[perm]
         fragment = self.block.student_view()
-
+        read_only = 'false' if permissions[0] else 'true'
         self.assertIn('data-discussion-id="{}"'.format(self.discussion_id), fragment.content)
         self.assertIn('data-user-create-comment="{}"'.format(json.dumps(permissions[1])), fragment.content)
         self.assertIn('data-user-create-subcomment="{}"'.format(json.dumps(permissions[2])), fragment.content)
-        if permissions[0]:
-            self.assertIn("Add a Post", fragment.content)
-        else:
-            self.assertNotIn("Add a Post", fragment.content)
+        self.assertIn('data-read-only="{read_only}"'.format(read_only=read_only), fragment.content)
 
 
 @ddt.ddt

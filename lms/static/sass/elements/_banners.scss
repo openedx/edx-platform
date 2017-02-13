@@ -22,7 +22,7 @@ $full-width-banner-margin: 20px;
             background: $black;
             opacity: 0.65;
 
-            @include susy-media($bp-screen-md) {
+            @media(min-width: $bp-screen-md) {
                 opacity: 0.4;
             }
         }
@@ -31,7 +31,7 @@ $full-width-banner-margin: 20px;
     .banner-background-image {
         height: $full-width-banner-img-height;
 
-        @include susy-media($full-width-banner-img-width) {
+        @media(min-width: $full-width-banner-img-width) {
             height: auto;
             width: 100%;
         }

@@ -28,13 +28,13 @@
                 context.topics_html = this.renderCategoryMap(this.course_settings.get('category_map'));
                 edx.HtmlUtils.setHtml(this.$el, edx.HtmlUtils.template($('#topic-template').html())(context));
 
-                $general = this.$('.post-topic option:contains(General)');
+                $general = this.$('.post-topic option:contains(General)');  // always return array.
 
                 if (this.getCurrentTopicId()) {
                     this.setTopic(this.$('.post-topic option').filter(
                         '[data-discussion-id="' + this.getCurrentTopicId() + '"]'
                     ));
-                } else if ($general) {
+                } else if ($general.length > 0) {
                     this.setTopic($general);
                 } else {
                     this.setTopic(this.$('.post-topic option').first());
@@ -45,10 +45,12 @@
             renderCategoryMap: function(map) {
                 var categoryTemplate = edx.HtmlUtils.template($('#new-post-menu-category-template').html()),
                     entryTemplate = edx.HtmlUtils.template($('#new-post-menu-entry-template').html()),
-                    mappedCategorySnippets = _.map(map.children, function(name) {
+                    mappedCategorySnippets = _.map(map.children, function(child) {
                         var entry,
-                            html = '';
-                        if (_.has(map.entries, name)) {
+                            html = '',
+                            name = child[0], // child[0] is the category name
+                            type = child[1]; // child[1] is the type (i.e. 'entry' or 'subcategory')
+                        if (_.has(map.entries, name) && type === 'entry') {
                             entry = map.entries[name];
                             html = entryTemplate({
                                 text: name,

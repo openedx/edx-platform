@@ -1,7 +1,9 @@
-<%
-
+<%!
 from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+%>
 
+<%
 def _message(reqm, message):
     return message.format(link="<a href={url}>{url_name}</a>".format(
         url = reverse('jump_to', kwargs=dict(course_id=reqm.course_id.to_deprecated_string(),
@@ -9,7 +11,13 @@ def _message(reqm, message):
         url_name = reqm.display_name_with_default_escaped))
 %>
 % if message:
-	% for reqm in module.required_modules:
-		<p class="conditional-message">${_message(reqm, message)}</p>
-	% endfor
+    % for reqm in module.required_modules:
+        % if reqm:
+            <p class="conditional-message">${_message(reqm, message)}</p>
+        % else:
+            <p class="conditional-message">
+                ${_("You do not have access to this dependency module.")}
+            </p>
+        % endif
+    % endfor
 % endif

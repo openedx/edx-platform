@@ -35,7 +35,8 @@
                         cohort: this.model,
                         isDefaultCohort: this.isDefault(this.model.get('name')),
                         contentGroups: this.contentGroups,
-                        studioGroupConfigurationsUrl: this.context.studioGroupConfigurationsUrl
+                        studioGroupConfigurationsUrl: this.context.studioGroupConfigurationsUrl,
+                        isCcxEnabled: this.context.isCcxEnabled
                     }));
                     return this;
                 },

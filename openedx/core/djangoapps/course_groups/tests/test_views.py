@@ -8,9 +8,7 @@ import json
 from collections import namedtuple
 from datetime import datetime
 from nose.plugins.attrib import attr
-from unittest import skipUnless
 
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import Http404
 from django.test.client import RequestFactory
@@ -21,6 +19,9 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.tests.factories import ItemFactory
+from lms.djangoapps.django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
+from openedx.core.djangolib.testing.utils import skip_unless_lms
+
 
 from ..models import CourseUserGroup, CourseCohort
 from ..views import (
@@ -1206,7 +1207,7 @@ class RemoveUserFromCohortTestCase(CohortViewsTestCase):
 
 
 @attr(shard=2)
-@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Tests only valid in LMS')
+@skip_unless_lms
 class CourseCohortDiscussionTopicsTestCase(CohortViewsTestCase):
     """
     Tests the `cohort_discussion_topics` view.
@@ -1229,7 +1230,7 @@ class CourseCohortDiscussionTopicsTestCase(CohortViewsTestCase):
         start_date = response['inline_discussions']['subcategories']['Chapter']['start_date']
         expected_response = {
             "course_wide_discussions": {
-                'children': ['Topic B'],
+                'children': [['Topic B', TYPE_ENTRY]],
                 'entries': {
                     'Topic B': {
                         'sort_key': 'A',
@@ -1243,7 +1244,7 @@ class CourseCohortDiscussionTopicsTestCase(CohortViewsTestCase):
                 'subcategories': {
                     'Chapter': {
                         'subcategories': {},
-                        'children': ['Discussion'],
+                        'children': [['Discussion', TYPE_ENTRY]],
                         'entries': {
                             'Discussion': {
                                 'sort_key': None,
@@ -1256,7 +1257,7 @@ class CourseCohortDiscussionTopicsTestCase(CohortViewsTestCase):
                         'start_date': start_date
                     }
                 },
-                'children': ['Chapter']
+                'children': [['Chapter', TYPE_SUBCATEGORY]]
             }
         }
         self.assertEqual(response, expected_response)

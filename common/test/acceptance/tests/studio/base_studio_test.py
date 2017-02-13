@@ -1,12 +1,11 @@
 """
 Base classes used by studio tests.
 """
-from bok_choy.web_app_test import WebAppTest
 from bok_choy.page_object import XSS_INJECTION
 from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
 from common.test.acceptance.fixtures.course import CourseFixture
 from common.test.acceptance.fixtures.library import LibraryFixture
-from common.test.acceptance.tests.helpers import UniqueCourseTest
+from common.test.acceptance.tests.helpers import AcceptanceTest, UniqueCourseTest
 from common.test.acceptance.pages.studio.overview import CourseOutlinePage
 from common.test.acceptance.pages.studio.utils import verify_ordering
 
@@ -130,7 +129,7 @@ class ContainerBase(StudioCourseTest):
         verify_ordering(self, container, expected_ordering)
 
 
-class StudioLibraryTest(WebAppTest):
+class StudioLibraryTest(AcceptanceTest):
     """
     Base class for all Studio library tests.
     """

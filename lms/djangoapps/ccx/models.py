@@ -1,6 +1,7 @@
 """
 Models for the custom course feature
 """
+from __future__ import unicode_literals
 import json
 import logging
 from datetime import datetime
@@ -8,10 +9,10 @@ from datetime import datetime
 from django.contrib.auth.models import User
 from django.db import models
 from pytz import utc
-
 from lazy import lazy
-from openedx.core.lib.time_zone_utils import get_time_zone_abbr
-from xmodule_django.models import CourseKeyField, LocationKeyField
+
+from ccx_keys.locator import CCXLocator
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, LocationKeyField
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 
@@ -82,36 +83,6 @@ class CustomCourseForEdX(models.Model):
 
         return datetime.now(utc) > self.due
 
-    def start_datetime_text(self, format_string="SHORT_DATE", time_zone=utc):
-        """Returns the desired text representation of the CCX start datetime
-
-        The returned value is in specified time zone, defaulted to UTC.
-        """
-        i18n = self.course.runtime.service(self.course, "i18n")
-        strftime = i18n.strftime
-        value = strftime(self.start.astimezone(time_zone), format_string)
-        if format_string == 'DATE_TIME':
-            value += ' ' + get_time_zone_abbr(time_zone, self.start)
-        return value
-
-    def end_datetime_text(self, format_string="SHORT_DATE", time_zone=utc):
-        """Returns the desired text representation of the CCX due datetime
-
-        If the due date for the CCX is not set, the value returned is the empty
-        string.
-
-        The returned value is in specified time zone, defaulted to UTC.
-        """
-        if self.due is None:
-            return ''
-
-        i18n = self.course.runtime.service(self.course, "i18n")
-        strftime = i18n.strftime
-        value = strftime(self.due.astimezone(time_zone), format_string)
-        if format_string == 'DATE_TIME':
-            value += ' ' + get_time_zone_abbr(time_zone, self.due)
-        return value
-
     @property
     def structure(self):
         """
@@ -120,6 +91,16 @@ class CustomCourseForEdX(models.Model):
         if self.structure_json:
             return json.loads(self.structure_json)
         return None
+
+    @property
+    def locator(self):
+        """
+        Helper property that gets a corresponding CCXLocator for this CCX.
+
+        Returns:
+            The CCXLocator corresponding to this CCX.
+        """
+        return CCXLocator.from_course_locator(self.course_id, unicode(self.id))
 
 
 class CcxFieldOverride(models.Model):

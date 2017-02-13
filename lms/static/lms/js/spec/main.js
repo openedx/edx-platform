@@ -1,5 +1,10 @@
+/* globals requirejs, requireSerial, MathJax */
+/* eslint-disable quote-props */
+
 (function(requirejs) {
     'use strict';
+
+    var i, specHelpers, testFiles;
 
     // TODO: how can we share the vast majority of this config that is in common with CMS?
     requirejs.config({
@@ -24,7 +29,7 @@
             'jquery.cookie': 'xmodule_js/common_static/js/vendor/jquery.cookie',
             'jquery.qtip': 'xmodule_js/common_static/js/vendor/jquery.qtip.min',
             'jquery.fileupload': 'xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.fileupload',
-            'jquery.iframe-transport': 'xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.iframe-transport',
+            'jquery.iframe-transport': 'xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.iframe-transport',  // eslint-disable-line max-len
             'jquery.inputnumber': 'xmodule_js/common_static/js/vendor/html5-input-polyfills/number-polyfill',
             'jquery.immediateDescendents': 'xmodule_js/common_static/coffee/src/jquery.immediateDescendents',
             'jquery.simulate': 'xmodule_js/common_static/js/vendor/jquery.simulate',
@@ -32,8 +37,8 @@
             'jquery.url': 'xmodule_js/common_static/js/vendor/url.min',
             'datepair': 'xmodule_js/common_static/js/vendor/timepicker/datepair',
             'date': 'xmodule_js/common_static/js/vendor/date',
-            'moment': 'xmodule_js/common_static/js/vendor/moment.min',
-            'moment-with-locales': 'xmodule_js/common_static/js/vendor/moment-with-locales.min',
+            moment: 'common/js/vendor/moment-with-locales',
+            'moment-timezone': 'common/js/vendor/moment-timezone-with-data',
             'text': 'xmodule_js/common_static/js/vendor/requirejs/text',
             'underscore': 'common/js/vendor/underscore',
             'underscore.string': 'common/js/vendor/underscore.string',
@@ -47,18 +52,19 @@
             'xmodule': 'xmodule_js/src/xmodule',
             'utility': 'xmodule_js/common_static/js/src/utility',
             'accessibility': 'xmodule_js/common_static/js/src/accessibility_tools',
-            'sinon': 'xmodule_js/common_static/js/vendor/sinon-1.17.0',
-            'squire': 'xmodule_js/common_static/js/vendor/Squire',
+            'sinon': 'common/js/vendor/sinon',
+            'squire': 'common/js/vendor/Squire',
             'jasmine-imagediff': 'xmodule_js/common_static/js/vendor/jasmine-imagediff',
             'domReady': 'xmodule_js/common_static/js/vendor/domReady',
-            mathjax: '//cdn.mathjax.org/mathjax/2.6-latest/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured',  // eslint-disable-line max-len
+            mathjax: '//cdn.mathjax.org/mathjax/2.7-latest/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured',  // eslint-disable-line max-len
             'youtube': '//www.youtube.com/player_api?noext',
             'coffee/src/ajax_prefix': 'xmodule_js/common_static/coffee/src/ajax_prefix',
-            'coffee/src/instructor_dashboard/student_admin': 'coffee/src/instructor_dashboard/student_admin',
+            'js/instructor_dashboard/student_admin': 'js/instructor_dashboard/student_admin',
             'xmodule_js/common_static/js/test/add_ajax_prefix': 'xmodule_js/common_static/js/test/add_ajax_prefix',
             'xblock/lms.runtime.v1': 'lms/js/xblock/lms.runtime.v1',
             'xblock': 'common/js/xblock',
             'capa/display': 'xmodule_js/src/capa/display',
+            'sequence/display': 'xmodule_js/src/sequence/display',
             'string_utils': 'xmodule_js/common_static/js/src/string_utils',
             'logger': 'xmodule_js/common_static/js/src/logger',
             'Markdown.Converter': 'js/Markdown.Converter',
@@ -283,24 +289,24 @@
                 exports: 'AjaxPrefix',
                 deps: ['coffee/src/ajax_prefix']
             },
-            'coffee/src/instructor_dashboard/util': {
-                exports: 'coffee/src/instructor_dashboard/util',
+            'js/instructor_dashboard/util': {
+                exports: 'js/instructor_dashboard/util',
                 deps: ['jquery', 'underscore', 'slick.core', 'slick.grid'],
                 init: function() {
                     // Set global variables that the util code is expecting to be defined
-                    require([
+                    require([  // eslint-disable-line global-require
                         'edx-ui-toolkit/js/utils/html-utils',
                         'edx-ui-toolkit/js/utils/string-utils'
                     ], function(HtmlUtils, StringUtils) {
-                        window.edx = edx || {};
+                        window.edx = window.edx || {};
                         window.edx.HtmlUtils = HtmlUtils;
                         window.edx.StringUtils = StringUtils;
                     });
                 }
             },
-            'coffee/src/instructor_dashboard/student_admin': {
-                exports: 'coffee/src/instructor_dashboard/student_admin',
-                deps: ['jquery', 'underscore', 'coffee/src/instructor_dashboard/util', 'string_utils']
+            'js/instructor_dashboard/student_admin': {
+                exports: 'js/instructor_dashboard/student_admin',
+                deps: ['jquery', 'underscore', 'js/instructor_dashboard/util', 'string_utils']
             },
             'js/instructor_dashboard/certificates': {
                 exports: 'js/instructor_dashboard/certificates',
@@ -383,7 +389,7 @@
                 deps: ['jquery', 'underscore', 'underscore.string', 'backbone', 'gettext'],
                 init: function() {
                     // Set global variables that the payment code is expecting to be defined
-                    require([
+                    require([  // eslint-disable-line global-require
                         'underscore',
                         'underscore.string',
                         'edx-ui-toolkit/js/utils/html-utils',
@@ -391,7 +397,7 @@
                     ], function(_, str, HtmlUtils, StringUtils) {
                         window._ = _;
                         window._.str = str;
-                        window.edx = edx || {};
+                        window.edx = window.edx || {};
                         window.edx.HtmlUtils = HtmlUtils;
                         window.edx.StringUtils = StringUtils;
                     });
@@ -527,10 +533,21 @@
                 exports: 'DiscussionUtil',
                 init: function() {
                     // Set global variables that the discussion code is expecting to be defined
-                    require(['backbone', 'URI'], function(Backbone, URI) {
-                        window.Backbone = Backbone;
-                        window.URI = URI;
-                    });
+                    require(  // eslint-disable-line global-require
+                        [
+                            'backbone',
+                            'URI',
+                            'edx-ui-toolkit/js/utils/html-utils',
+                            'edx-ui-toolkit/js/utils/string-utils'
+                        ],
+                        function(Backbone, URI, HtmlUtils, StringUtils) {
+                            window.Backbone = Backbone;
+                            window.URI = URI;
+                            window.edx = window.edx || {};
+                            window.edx.HtmlUtils = HtmlUtils;
+                            window.edx.StringUtils = StringUtils;
+                        }
+                    );
                 }
             },
             'common/js/discussion/content': {
@@ -542,11 +559,11 @@
             'common/js/discussion/discussion': {
                 deps: [
                     'common/js/discussion/utils',
-                    'xmodule_js/common_static/common/js/discussion/content'
+                    'common/js/discussion/content'
                 ],
                 exports: 'Discussion'
             },
-            'common/js/discussion/discussion_course_settings': {
+            'common/js/discussion/models/discussion_course_settings': {
                 deps: [
                     'common/js/discussion/utils'
                 ],
@@ -626,7 +643,7 @@
                 ],
                 exports: 'ThreadResponseView'
             },
-            'common/js/discussion/discussion_module_view': {
+            'common/js/discussion/views/discussion_inline_view': {
                 deps: [
                     'jquery',
                     'underscore',
@@ -650,7 +667,7 @@
                     'common/js/discussion/views/thread_response_show_view',
                     'common/js/discussion/views/thread_response_view'
                 ],
-                exports: 'DiscussionModuleView'
+                exports: 'DiscussionInlineView'
             },
             'common/js/spec_helpers/discussion_spec_helper': {
                 deps: [
@@ -661,10 +678,10 @@
         }
     });
 
-    var testFiles = [
+    testFiles = [
         'discussion/js/spec/discussion_board_factory_spec.js',
         'discussion/js/spec/discussion_profile_page_factory_spec.js',
-        'discussion/js/spec/views/discussion_search_view_spec.js',
+        'discussion/js/spec/discussion_board_view_spec.js',
         'discussion/js/spec/views/discussion_user_profile_view_spec.js',
         'lms/js/spec/preview/preview_factory_spec.js',
         'js/spec/api_admin/catalog_preview_spec.js',
@@ -701,6 +718,7 @@
         'js/spec/edxnotes/plugins/scroller_spec.js',
         'js/spec/edxnotes/plugins/store_error_handler_spec.js',
         'js/spec/edxnotes/utils/logger_spec.js',
+        'js/spec/edxnotes/utils/notes_collector_spec.js',
         'js/spec/edxnotes/views/note_item_spec.js',
         'js/spec/edxnotes/views/notes_factory_spec.js',
         'js/spec/edxnotes/views/notes_page_spec.js',
@@ -731,6 +749,7 @@
         'js/spec/learner_dashboard/course_card_view_spec.js',
         'js/spec/learner_dashboard/course_enroll_view_spec.js',
         'js/spec/markdown_editor_spec.js',
+        'js/spec/dateutil_factory_spec.js',
         'js/spec/navigation_spec.js',
         'js/spec/search/search_spec.js',
         'js/spec/shoppingcart/shoppingcart_spec.js',
@@ -791,11 +810,11 @@
         'teams/js/spec/views/topics_spec.js'
     ];
 
-    for (var i = 0; i < testFiles.length; i++) {
+    for (i = 0; i < testFiles.length; i++) {
         testFiles[i] = '/base/' + testFiles[i];
     }
 
-    var specHelpers = [
+    specHelpers = [
         'common/js/spec_helpers/jasmine-extensions',
         'common/js/spec_helpers/jasmine-stealth',
         'common/js/spec_helpers/jasmine-waituntil'
@@ -805,6 +824,6 @@
     // spec files one by one, otherwise some end up getting nested under others.
     window.requireSerial(specHelpers.concat(testFiles), function() {
         // start test run, once Require.js is done
-        window.__karma__.start();
+        window.__karma__.start();  // eslint-disable-line no-underscore-dangle
     });
 }).call(this, requirejs);

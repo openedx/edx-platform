@@ -2,7 +2,6 @@
 Celery task for Automatic Verifed Track Cohorting MVP feature.
 """
 from django.contrib.auth.models import User
-from django.db.utils import IntegrityError
 
 from celery.task import task
 from celery.utils.log import get_task_logger
@@ -31,18 +30,7 @@ def sync_cohort_with_mode(self, course_id, user_id, verified_cohort_name, defaul
         enrollment = CourseEnrollment.get_enrollment(user, course_key)
         # Note that this will enroll the user in the default cohort on initial enrollment.
         # That's good because it will force creation of the default cohort if necessary.
-        try:
-            current_cohort = get_cohort(user, course_key)
-        except IntegrityError as integrity_error:
-            # It is quite common that get_cohort will throw an IntegrityError. This happens
-            # when 2 celery workers are both handling enrollment change events for the same user
-            # (for example, if the enrollment mode goes from None -> Audit -> Honor); if the user
-            # was not previously in a cohort, calling get_cohort will result in a cohort assignment.
-            LOGGER.info(
-                "HANDLING_INTEGRITY_ERROR: IntegrityError encountered for course '%s' and user '%s': %s",
-                course_id, user.id, unicode(integrity_error)
-            )
-            current_cohort = get_cohort(user, course_key)
+        current_cohort = get_cohort(user, course_key)
 
         verified_cohort = get_cohort_by_name(course_key, verified_cohort_name)
 

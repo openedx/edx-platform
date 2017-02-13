@@ -161,7 +161,7 @@
                     mousewheel: this.onMovement,
                     DOMMouseScroll: this.onMovement
                 })
-                .on(events, 'li[data-index]', this.onCaptionHandler);
+                .on(events, 'span[data-index]', this.onCaptionHandler);
                 this.container.on({
                     mouseenter: this.onContainerMouseEnter,
                     mouseleave: this.onContainerMouseLeave
@@ -739,16 +739,16 @@
             */
             buildCaptions: function(container, start, captions) {
                 var process = function(text, index) {
-                    var liEl = $('<li>', {
+                    var $spanEl = $('<span>', {
                         'role': 'link',
                         'data-index': index,
                         'data-start': start[index],
                         'tabindex': 0
                     });
 
-                    HtmlUtils.setHtml($(liEl), HtmlUtils.HTML(text.toString()));
+                    HtmlUtils.setHtml($($spanEl), HtmlUtils.HTML(text.toString()));
 
-                    return liEl[0];
+                    return $spanEl.wrap('<li>').parent()[0]; // safe-lint: disable=javascript-jquery-insertion
                 };
 
                 return AsyncProcess.array(captions, process).done(function(list) {
@@ -912,20 +912,21 @@
             */
             captionFocus: function(event) {
                 var caption = $(event.target),
+                    container = caption.parent(),
                     captionIndex = parseInt(caption.attr('data-index'), 10);
                 // If the focus comes from a mouse click, hide the outline, turn on
                 // automatic scrolling and set currentCaptionIndex to point outside of
                 // caption list (ie -1) to disable mouseenter, mouseleave behavior.
                 if (this.isMouseFocus) {
                     this.autoScrolling = true;
-                    caption.removeClass('focused');
+                    container.removeClass('focused');
                     this.currentCaptionIndex = -1;
                 }
                 // If the focus comes from tabbing, show the outline and turn off
                 // automatic scrolling.
                 else {
                     this.currentCaptionIndex = captionIndex;
-                    caption.addClass('focused');
+                    container.addClass('focused');
                     // The second and second to last elements turn automatic scrolling
                     // off again as it may have been enabled in captionBlur.
                     if (
@@ -945,9 +946,10 @@
             */
             captionBlur: function(event) {
                 var caption = $(event.target),
+                    container = caption.parent(),
                     captionIndex = parseInt(caption.attr('data-index'), 10);
 
-                caption.removeClass('focused');
+                container.removeClass('focused');
                 // If we are on first or last index, we have to turn automatic scroll
                 // on again when losing focus. There is no way to know in what
                 // direction we are tabbing. So we could be on the first element and
@@ -1057,11 +1059,12 @@
                         }
 
                         this.subtitlesEl
-                            .find("li[data-index='" + newIndex + "']")
+                            .find("span[data-index='" + newIndex + "']")
+                            .parent()
                             .addClass('current');
 
                         this.currentIndex = newIndex;
-                        this.captionDisplayEl.text(this.subtitlesEl.find("li[data-index='" + newIndex + "']").text());
+                        this.captionDisplayEl.text(this.subtitlesEl.find("span[data-index='" + newIndex + "']").text());
                         this.scrollCaption();
                     }
                 }

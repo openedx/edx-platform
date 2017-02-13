@@ -199,8 +199,8 @@
 
   </div>
   <input type="hidden" name="r" value="" />
-  <section id="previewRevisionModal" class="modal" aria-hidden="true">
-    <div class="inner-wrapper" role="dialog" aria-labelledby="preview-title">
+  <div id="previewRevisionModal" class="modal" aria-hidden="true">
+    <div class="inner-wrapper" role="dialog" aria-labelledby="preview-title" aria-modal=true>
       <button class="close-modal"><span class="icon fa fa-remove" aria-hidden="true"></span> <span class="sr">{% trans 'Close' %}</span></button>
 
       <header>
@@ -228,10 +228,10 @@
       {% endif %}
       </div>
     </div>
-  </section>
+  </div>
 
-  <section id="mergeModal" class="modal" aria-hidden="true">
-    <div class="inner-wrapper" role="dialog" aria-labelledby="merge-title">
+  <div id="mergeModal" class="modal" aria-hidden="true">
+    <div class="inner-wrapper" role="dialog" aria-labelledby="merge-title" aria-modal=true>
       <button class="close-modal"><span class="icon fa fa-remove" aria-hidden="true"></span> <span class="sr">{% trans 'Close' %}</span></button>
 
       <header>

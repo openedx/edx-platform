@@ -95,24 +95,24 @@ class BlockStructureManager(object):
         )
         cache_miss = block_structure is None
         if cache_miss or BlockStructureTransformers.is_collected_outdated(block_structure):
-            with self._bulk_operations():
-                block_structure = BlockStructureFactory.create_from_modulestore(
-                    self.root_block_usage_key,
-                    self.modulestore
-                )
-                BlockStructureTransformers.collect(block_structure)
-                self.block_structure_cache.add(block_structure)
+            block_structure = self.update_collected()
         return block_structure
 
     def update_collected(self):
         """
         Updates the collected Block Structure for the root_block_usage_key.
 
-        Details: The cache is cleared and updated by collecting transformers
-        data from the modulestore.
+        Details: The cache is updated by collecting transformers data from
+        the modulestore.
         """
-        self.clear()
-        self.get_collected()
+        with self._bulk_operations():
+            block_structure = BlockStructureFactory.create_from_modulestore(
+                self.root_block_usage_key,
+                self.modulestore,
+            )
+            BlockStructureTransformers.collect(block_structure)
+            self.block_structure_cache.add(block_structure)
+            return block_structure
 
     def clear(self):
         """

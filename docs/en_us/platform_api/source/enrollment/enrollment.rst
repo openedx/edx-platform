@@ -33,6 +33,7 @@ Get the User's Enrollment Status in a Course
         "is_active": true,
         "course_details": {
             "course_id": "edX/DemoX/Demo_Course",
+            "course_name": "edX Demonstration Course",
             "enrollment_end": null,
             "course_modes": [
                 {
@@ -70,6 +71,7 @@ Get the User's Enrollment Information for a Course
 
     {
         "course_id": "edX/DemoX/Demo_Course",
+        "course_name": "edX Demonstration Course",
         "enrollment_end": null,
         "course_modes": [
             {
@@ -112,6 +114,7 @@ View a User's Enrollments or Enroll a User in a Course
             "is_active": true,
             "course_details": {
                 "course_id": "edX/DemoX/Demo_Course",
+                "course_name": "edX Demonstration Course",
                 "enrollment_end": null,
                 "course_modes": [
                     {
@@ -135,6 +138,7 @@ View a User's Enrollments or Enroll a User in a Course
             "is_active": true,
             "course_details": {
                 "course_id": "ArbisoftX/BulkyEmail101/2014-15",
+                "course_name": "Course Name Here",
                 "enrollment_end": null,
                 "course_modes": [
                     {

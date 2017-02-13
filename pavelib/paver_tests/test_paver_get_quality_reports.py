@@ -15,7 +15,7 @@ class TestGetReportFiles(unittest.TestCase):
     def test_get_pylint_reports(self, my_mock):
 
         my_mock.return_value = iter([
-            ('/foo', ('',), ('pylint.report',)),
+            ('/foo', (None,), ('pylint.report',)),
             ('/bar', ('/baz',), ('pylint.report',))
         ])
         reports = pavelib.quality.get_violations_reports("pylint")
@@ -24,7 +24,7 @@ class TestGetReportFiles(unittest.TestCase):
     @patch('os.walk')
     def test_get_pep8_reports(self, my_mock):
         my_mock.return_value = iter([
-            ('/foo', ('',), ('pep8.report',)),
+            ('/foo', (None,), ('pep8.report',)),
             ('/bar', ('/baz',), ('pep8.report',))
         ])
         reports = pavelib.quality.get_violations_reports("pep8")
@@ -34,7 +34,7 @@ class TestGetReportFiles(unittest.TestCase):
     def test_get_pep8_reports_noisy(self, my_mock):
         """ Several conditions: different report types, different files, multiple files """
         my_mock.return_value = iter([
-            ('/foo', ('',), ('pep8.report',)),
+            ('/foo', (None,), ('pep8.report',)),
             ('/fooz', ('/ball',), ('pylint.report',)),
             ('/fooz', ('/ball',), ('non.report',)),
             ('/fooz', ('/ball',), ('lms.xml',)),

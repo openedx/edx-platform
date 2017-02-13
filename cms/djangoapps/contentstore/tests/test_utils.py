@@ -11,6 +11,8 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.django import modulestore
 from xmodule.partitions.partitions import UserPartition, Group
 
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
+
 from contentstore import utils
 from contentstore.tests.utils import CourseTestCase
 
@@ -36,6 +38,31 @@ class LMSLinksTestCase(TestCase):
         location = course_key.make_usage_key('course', 'test')
         link = utils.get_lms_link_for_item(location)
         self.assertEquals(link, "//localhost:8000/courses/mitX/101/test/jump_to/i4x://mitX/101/course/test")
+
+    def lms_link_for_certificate_web_view_test(self):
+        """ Tests get_lms_link_for_certificate_web_view. """
+        course_key = SlashSeparatedCourseKey('mitX', '101', 'test')
+        dummy_user = ModuleStoreEnum.UserID.test
+        mode = 'professional'
+
+        self.assertEquals(
+            utils.get_lms_link_for_certificate_web_view(dummy_user, course_key, mode),
+            "//localhost:8000/certificates/user/{user_id}/course/{course_key}?preview={mode}".format(
+                user_id=dummy_user,
+                course_key=course_key,
+                mode=mode
+            )
+        )
+
+        with with_site_configuration_context(configuration={"course_org_filter": "mitX", "LMS_BASE": "dummyhost:8000"}):
+            self.assertEquals(
+                utils.get_lms_link_for_certificate_web_view(dummy_user, course_key, mode),
+                "//dummyhost:8000/certificates/user/{user_id}/course/{course_key}?preview={mode}".format(
+                    user_id=dummy_user,
+                    course_key=course_key,
+                    mode=mode
+                )
+            )
 
 
 class ExtraPanelTabTestCase(TestCase):

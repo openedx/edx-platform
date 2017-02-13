@@ -22,8 +22,8 @@ from django.conf import settings
 from util.json_request import JsonResponse
 from mock import patch
 
-from lms.djangoapps.lms_xblock.runtime import quote_slashes
 from openedx.core.lib.xblock_utils import wrap_xblock
+from openedx.core.lib.url_utils import quote_slashes
 from xmodule.html_module import HtmlDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import CourseTab
@@ -48,7 +48,6 @@ from certificates.models import (
 )
 from certificates import api as certs_api
 from bulk_email.models import BulkEmailFlag
-from util.date_utils import get_default_time_display
 
 from class_dashboard.dashboard_data import get_section_display_name, get_array_section_has_problem
 from .tools import get_units_with_due_date, title_or_url
@@ -76,6 +75,20 @@ class InstructorDashboardTab(CourseTab):
         Returns true if the specified user has staff access.
         """
         return bool(user and has_access(user, 'staff', course, course.id))
+
+
+def show_analytics_dashboard_message(course_key):
+    """
+    Defines whether or not the analytics dashboard URL should be displayed.
+
+    Arguments:
+        course_key (CourseLocator): The course locator to display the analytics dashboard message on.
+    """
+    if hasattr(course_key, 'ccx'):
+        ccx_analytics_enabled = settings.FEATURES.get('ENABLE_CCX_ANALYTICS_DASHBOARD_URL', False)
+        return settings.ANALYTICS_DASHBOARD_URL and ccx_analytics_enabled
+
+    return settings.ANALYTICS_DASHBOARD_URL
 
 
 @ensure_csrf_cookie
@@ -115,7 +128,7 @@ def instructor_dashboard_2(request, course_id):
     ]
 
     analytics_dashboard_message = None
-    if settings.ANALYTICS_DASHBOARD_URL:
+    if show_analytics_dashboard_message(course_key):
         # Construct a URL to the external analytics dashboard
         analytics_dashboard_url = '{0}/courses/{1}'.format(settings.ANALYTICS_DASHBOARD_URL, unicode(course_key))
         link_start = HTML("<a href=\"{}\" target=\"_blank\">").format(analytics_dashboard_url)
@@ -172,7 +185,8 @@ def instructor_dashboard_2(request, course_id):
     # Certificates panel
     # This is used to generate example certificates
     # and enable self-generated certificates for a course.
-    certs_enabled = CertificateGenerationConfiguration.current().enabled
+    # Note: This is hidden for all CCXs
+    certs_enabled = CertificateGenerationConfiguration.current().enabled and not hasattr(course_key, 'ccx')
     if certs_enabled and access['admin']:
         sections.append(_section_certificates(course))
 
@@ -271,7 +285,8 @@ def _section_e_commerce(course, access, paid_mode, coupons_enabled, reports_enab
         'coupons_enabled': coupons_enabled,
         'reports_enabled': reports_enabled,
         'course_price': course_price,
-        'total_amount': total_amount
+        'total_amount': total_amount,
+        'is_ecommerce_course': is_ecommerce_course(course_key)
     }
     return section_data
 
@@ -415,8 +430,8 @@ def _section_course_info(course, access):
         'course_display_name': course.display_name,
         'has_started': course.has_started(),
         'has_ended': course.has_ended(),
-        'start_date': get_default_time_display(course.start),
-        'end_date': get_default_time_display(course.end) or _('No end date set'),
+        'start_date': course.start,
+        'end_date': course.end,
         'num_sections': len(course.children),
         'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': unicode(course_key)}),
     }
@@ -424,7 +439,7 @@ def _section_course_info(course, access):
     if settings.FEATURES.get('DISPLAY_ANALYTICS_ENROLLMENTS'):
         section_data['enrollment_count'] = CourseEnrollment.objects.enrollment_counts(course_key)
 
-    if settings.ANALYTICS_DASHBOARD_URL:
+    if show_analytics_dashboard_message(course_key):
         #  dashboard_link is already made safe in _get_dashboard_link
         dashboard_link = _get_dashboard_link(course_key)
         #  so we can use Text() here so it's not double-escaped and rendering HTML on the front-end
@@ -474,10 +489,12 @@ def _section_membership(course, access, is_white_label):
 def _section_cohort_management(course, access):
     """ Provide data for the corresponding cohort management section """
     course_key = course.id
+    ccx_enabled = hasattr(course_key, 'ccx')
     section_data = {
         'section_key': 'cohort_management',
         'section_display_name': _('Cohorts'),
         'access': access,
+        'ccx_is_enabled': ccx_enabled,
         'course_cohort_settings_url': reverse(
             'course_cohort_settings',
             kwargs={'course_key_string': unicode(course_key)}
@@ -617,6 +634,10 @@ def _section_send_email(course, access):
     cohorts = []
     if is_course_cohorted(course_key):
         cohorts = get_course_cohorts(course)
+    course_modes = []
+    from verified_track_content.models import VerifiedTrackCohortedCourse
+    if not VerifiedTrackCohortedCourse.is_verified_track_cohort_enabled(course_key):
+        course_modes = CourseMode.modes_for_course(course_key)
     email_editor = fragment.content
     section_data = {
         'section_key': 'send_email',
@@ -625,6 +646,7 @@ def _section_send_email(course, access):
         'send_email': reverse('send_email', kwargs={'course_id': unicode(course_key)}),
         'editor': email_editor,
         'cohorts': cohorts,
+        'course_modes': course_modes,
         'default_cohort_name': DEFAULT_COHORT_NAME,
         'list_instructor_tasks_url': reverse(
             'list_instructor_tasks', kwargs={'course_id': unicode(course_key)}
@@ -674,3 +696,12 @@ def _section_metrics(course, access):
         'post_metrics_data_csv_url': reverse('post_metrics_data_csv'),
     }
     return section_data
+
+
+def is_ecommerce_course(course_key):
+    """
+    Checks if the given course is an e-commerce course or not, by checking its SKU value from
+    CourseMode records for the course
+    """
+    sku_count = len([mode.sku for mode in CourseMode.modes_for_course(course_key) if mode.sku])
+    return sku_count > 0

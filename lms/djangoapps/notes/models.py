@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.utils.html import strip_tags
 import json
 
-from xmodule_django.models import CourseKeyField
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
 
 class Note(models.Model):

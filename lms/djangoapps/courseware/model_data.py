@@ -33,7 +33,7 @@ from .models import (
 import logging
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.block_types import BlockTypeKeyV1
-from opaque_keys.edx.asides import AsideUsageKeyV1
+from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2
 from contracts import contract, new_contract
 
 from django.db import DatabaseError
@@ -67,6 +67,7 @@ def _all_usage_keys(descriptors, aside_types):
 
         for aside_type in aside_types:
             usage_ids.add(AsideUsageKeyV1(descriptor.scope_ids.usage_id, aside_type))
+            usage_ids.add(AsideUsageKeyV2(descriptor.scope_ids.usage_id, aside_type))
 
     return usage_ids
 
@@ -686,7 +687,7 @@ class FieldDataCache(object):
     A cache of django model objects needed to supply the data
     for a module and its descendants
     """
-    def __init__(self, descriptors, course_id, user, select_for_update=False, asides=None):
+    def __init__(self, descriptors, course_id, user, asides=None, read_only=False):
         """
         Find any courseware.models objects that are needed by any descriptor
         in descriptors. Attempts to minimize the number of queries to the database.
@@ -697,8 +698,8 @@ class FieldDataCache(object):
         descriptors: A list of XModuleDescriptors.
         course_id: The id of the current course
         user: The user for which to cache data
-        select_for_update: Ignored
         asides: The list of aside types to load, or None to prefetch no asides.
+        read_only: We should not perform writes (they become a no-op).
         """
         if asides is None:
             self.asides = []
@@ -708,6 +709,7 @@ class FieldDataCache(object):
         assert isinstance(course_id, CourseKey)
         self.course_id = course_id
         self.user = user
+        self.read_only = read_only
 
         self.cache = {
             Scope.user_state: UserStateCache(
@@ -782,7 +784,7 @@ class FieldDataCache(object):
     @classmethod
     def cache_for_descriptor_descendents(cls, course_id, user, descriptor, depth=None,
                                          descriptor_filter=lambda descriptor: True,
-                                         select_for_update=False, asides=None):
+                                         asides=None, read_only=False):
         """
         course_id: the course in the context of which we want StudentModules.
         user: the django user for whom to load modules.
@@ -791,9 +793,8 @@ class FieldDataCache(object):
             the supplied descriptor. If depth is None, load all descendant StudentModules
         descriptor_filter is a function that accepts a descriptor and return whether the field data
             should be cached
-        select_for_update: Ignored
         """
-        cache = FieldDataCache([], course_id, user, select_for_update, asides=asides)
+        cache = FieldDataCache([], course_id, user, asides=asides, read_only=read_only)
         cache.add_descriptor_descendents(descriptor, depth, descriptor_filter)
         return cache
 
@@ -839,6 +840,8 @@ class FieldDataCache(object):
             kv_dict (dict): dict mapping from `DjangoKeyValueStore.Key`s to field values
         Raises: DatabaseError if any fields fail to save
         """
+        if self.read_only:
+            return
 
         saved_fields = []
         by_scope = defaultdict(dict)
@@ -874,6 +877,8 @@ class FieldDataCache(object):
 
         Raises: KeyError if key isn't found in the cache
         """
+        if self.read_only:
+            return
 
         if key.scope.user == UserScope.ONE and not self.user.is_anonymous():
             # If we're getting user data, we expect that the key matches the
@@ -1007,3 +1012,21 @@ def set_score(user_id, usage_key, score, max_score):
         student_module.grade = score
         student_module.max_grade = max_score
         student_module.save()
+    return student_module.modified
+
+
+def get_score(user_id, usage_key):
+    """
+    Get the score and max_score for the specified user and xblock usage.
+    Returns None if not found.
+    """
+    try:
+        student_module = StudentModule.objects.get(
+            student_id=user_id,
+            module_state_key=usage_key,
+            course_id=usage_key.course_key,
+        )
+    except StudentModule.DoesNotExist:
+        return None
+    else:
+        return student_module

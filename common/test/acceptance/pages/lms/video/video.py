@@ -32,8 +32,8 @@ CSS_CLASS_NAMES = {
     'captions_closed': '.video.closed',
     'captions_rendered': '.video.is-captions-rendered',
     'captions': '.subtitles',
-    'captions_text': '.subtitles li',
-    'captions_text_getter': '.subtitles li[role="link"][data-index="1"]',
+    'captions_text': '.subtitles li span',
+    'captions_text_getter': '.subtitles li span[role="link"][data-index="1"]',
     'closed_captions': '.closed-captions',
     'error_message': '.video .video-player .video-error',
     'video_container': '.video',
@@ -629,14 +629,19 @@ class VideoPage(PageObject):
         """
         self.wait_for_ajax()
 
+        # TODO remove this sleep and wait for the right thing to finish rendering
+        time.sleep(1)
+
         # mouse over to transcript button
-        cc_button_selector = self.get_element_selector(VIDEO_BUTTONS["transcript"])
+        cc_button_selector = self.get_element_selector(VIDEO_BUTTONS["transcript_button"])
         element_to_hover_over = self.q(css=cc_button_selector).results[0]
         ActionChains(self.browser).move_to_element(element_to_hover_over).perform()
 
         language_selector = VIDEO_MENUS["language"] + ' li[data-lang-code="{code}"]'.format(code=code)
         language_selector = self.get_element_selector(language_selector)
         self.wait_for_element_visibility(language_selector, 'language menu is visible')
+        hover_target = self.q(css=language_selector).results[0]
+        ActionChains(self.browser).move_to_element(hover_target).perform()
         self.q(css=language_selector).first.click()
 
         # Sometimes language is not clicked correctly. So, if the current language code
@@ -887,7 +892,7 @@ class VideoPage(PageObject):
         Wait until captions rendered completely.
         """
         captions_rendered_selector = self.get_element_selector(CSS_CLASS_NAMES['captions_rendered'])
-        self.wait_for_element_presence(captions_rendered_selector, 'Captions Rendered')
+        self.wait_for_element_visibility(captions_rendered_selector, 'Captions Rendered')
 
     def wait_for_closed_captions(self):
         """

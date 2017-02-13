@@ -48,9 +48,12 @@
                             entries = inlineDiscussions.entries,
                             subcategories = inlineDiscussions.subcategories;
 
-                        return HtmlUtils.joinHtml.apply(this, _.map(children, function(name) {
-                            var htmlSnippet = '', entry;
-                            if (entries && _.has(entries, name)) {
+                        return HtmlUtils.joinHtml.apply(this, _.map(children, function(child) {
+                            var htmlSnippet = '',
+                                name = child[0], // child[0] is the category name
+                                type = child[1], // child[1] is the type (i.e. 'entry' or 'subcategory')
+                                entry;
+                            if (entries && _.has(entries, name) && type === 'entry') {
                                 entry = entries[name];
                                 htmlSnippet = entryTemplate({
                                     name: name,

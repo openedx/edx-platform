@@ -12,14 +12,13 @@ import ddt
 from django.conf import settings
 from django.contrib.auth.models import User, AnonymousUser
 from django.core.urlresolvers import reverse
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.test.client import Client
-from edx_oauth2_provider.tests.factories import ClientFactory
 import httpretty
 from markupsafe import escape
 from mock import Mock, patch
 from nose.plugins.attrib import attr
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey, CourseLocator
 from provider.constants import CONFIDENTIAL
 from pyquery import PyQuery as pq
 import pytz
@@ -30,10 +29,15 @@ from certificates.tests.factories import GeneratedCertificateFactory  # pylint: 
 from config_models.models import cache
 from course_modes.models import CourseMode
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from openedx.core.djangoapps.programs.models import ProgramsApiConfig
-from openedx.core.djangoapps.programs.tests import factories as programs_factories
+from openedx.core.djangoapps.catalog.tests.factories import (
+    generate_course_run_key,
+    ProgramFactory,
+    CourseFactory as CatalogCourseFactory,
+    CourseRunFactory,
+)
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
+from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 import shoppingcart  # pylint: disable=import-error
 from student.models import (
     anonymous_id_for_user, user_by_anonymous_id, CourseEnrollment,
@@ -58,6 +62,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
 log = logging.getLogger(__name__)
 
 
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt
 class CourseEndingTest(TestCase):
     """Test things related to course endings: certificates, surveys, etc"""
@@ -75,9 +80,13 @@ class CourseEndingTest(TestCase):
 
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': False})
     def test_cert_info(self):
-        user = Mock(username="fred")
+        user = Mock(username="fred", id="1")
         survey_url = "http://a_survey.com"
-        course = Mock(end_of_course_survey_url=survey_url, certificates_display_behavior='end')
+        course = Mock(
+            end_of_course_survey_url=survey_url,
+            certificates_display_behavior='end',
+            id=CourseLocator(org="x", course="y", run="z"),
+        )
         course_mode = 'honor'
 
         self.assertEqual(
@@ -104,6 +113,24 @@ class CourseEndingTest(TestCase):
                 'can_unenroll': True,
             }
         )
+
+        cert_status = {'status': 'generating', 'grade': '67', 'mode': 'honor'}
+        with patch('lms.djangoapps.grades.new.course_grade.CourseGradeFactory.get_persisted') as patch_persisted_grade:
+            patch_persisted_grade.return_value = Mock(percent=100)
+            self.assertEqual(
+                _cert_info(user, course, cert_status, course_mode),
+                {
+                    'status': 'generating',
+                    'show_disabled_download_button': True,
+                    'show_download_url': False,
+                    'show_survey_button': True,
+                    'survey_url': survey_url,
+                    'grade': '100',
+                    'mode': 'honor',
+                    'linked_in_url': None,
+                    'can_unenroll': False,
+                }
+            )
 
         cert_status = {'status': 'generating', 'grade': '67', 'mode': 'honor'}
         self.assertEqual(
@@ -165,7 +192,7 @@ class CourseEndingTest(TestCase):
         )
 
         # Test a course that doesn't have a survey specified
-        course2 = Mock(end_of_course_survey_url=None)
+        course2 = Mock(end_of_course_survey_url=None, id=CourseLocator(org="a", course="b", run="c"))
         cert_status = {
             'status': 'notpassing', 'grade': '67',
             'download_url': download_url, 'mode': 'honor'
@@ -525,6 +552,64 @@ class DashboardTest(ModuleStoreTestCase):
         return complete_course_mode_info(self.course.id, enrollment)
 
 
+@ddt.ddt
+class DashboardTestsWithSiteOverrides(SiteMixin, ModuleStoreTestCase):
+    """
+    Tests for site settings overrides used when rendering the dashboard view
+    """
+
+    def setUp(self):
+        super(DashboardTestsWithSiteOverrides, self).setUp()
+        self.org = 'fakeX'
+        self.course = CourseFactory.create(org=self.org)
+        self.user = UserFactory.create(username='jack', email='jack@fake.edx.org', password='test')
+        CourseModeFactory.create(mode_slug='no-id-professional', course_id=self.course.id)
+        CourseEnrollment.enroll(self.user, self.course.location.course_key, mode='no-id-professional')
+        cache.clear()
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @patch.dict("django.conf.settings.FEATURES", {'ENABLE_VERIFIED_CERTIFICATES': False})
+    @ddt.data(
+        ('testserver1.com', {'ENABLE_VERIFIED_CERTIFICATES': True}),
+        ('testserver2.com', {'ENABLE_VERIFIED_CERTIFICATES': True, 'DISPLAY_COURSE_MODES_ON_DASHBOARD': True}),
+    )
+    @ddt.unpack
+    def test_course_mode_visible(self, site_domain, site_configuration_values):
+        """
+        Test that the course mode for courses is visible on the dashboard
+        when settings have been overridden by site configuration.
+        """
+        site_configuration_values.update({
+            'SITE_NAME': site_domain,
+            'course_org_filter': self.org
+        })
+        self.set_up_site(site_domain, site_configuration_values)
+        self.client.login(username='jack', password='test')
+        response = self.client.get(reverse('dashboard'))
+        self.assertContains(response, 'class="course professional"')
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @patch.dict("django.conf.settings.FEATURES", {'ENABLE_VERIFIED_CERTIFICATES': False})
+    @ddt.data(
+        ('testserver3.com', {'ENABLE_VERIFIED_CERTIFICATES': False}),
+        ('testserver4.com', {'DISPLAY_COURSE_MODES_ON_DASHBOARD': False}),
+    )
+    @ddt.unpack
+    def test_course_mode_invisible(self, site_domain, site_configuration_values):
+        """
+        Test that the course mode for courses is invisible on the dashboard
+        when settings have been overridden by site configuration.
+        """
+        site_configuration_values.update({
+            'SITE_NAME': site_domain,
+            'course_org_filter': self.org
+        })
+        self.set_up_site(site_domain, site_configuration_values)
+        self.client.login(username='jack', password='test')
+        response = self.client.get(reverse('dashboard'))
+        self.assertNotContains(response, 'class="course professional"')
+
+
 class UserSettingsEventTestMixin(EventTestMixin):
     """
     Mixin for verifying that user setting events were emitted during a test.
@@ -863,7 +948,7 @@ class AnonymousLookupTable(ModuleStoreTestCase):
     def setUp(self):
         super(AnonymousLookupTable, self).setUp()
         self.course = CourseFactory.create()
-        self.user = UserFactory()
+        self.user = UserFactory.create()
         CourseModeFactory.create(
             course_id=self.course.id,
             mode_slug='honor',
@@ -892,13 +977,24 @@ class AnonymousLookupTable(ModuleStoreTestCase):
         self.assertEqual(self.user, real_user)
         self.assertEqual(anonymous_id, anonymous_id_for_user(self.user, course2.id, save=False))
 
+    def test_secret_key_changes(self):
+        """Test that a new anonymous id is returned when the secret key changes."""
+        CourseEnrollment.enroll(self.user, self.course.id)
+        anonymous_id = anonymous_id_for_user(self.user, self.course.id)
+        with override_settings(SECRET_KEY='some_new_and_totally_secret_key'):
+            # Recreate user object to clear cached anonymous id.
+            self.user = User.objects.get(pk=self.user.id)
+            new_anonymous_id = anonymous_id_for_user(self.user, self.course.id)
+            self.assertNotEqual(anonymous_id, new_anonymous_id)
+            self.assertEqual(self.user, user_by_anonymous_id(anonymous_id))
+            self.assertEqual(self.user, user_by_anonymous_id(new_anonymous_id))
+
 
 @attr(shard=3)
-@httpretty.activate
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
+@patch('openedx.core.djangoapps.programs.utils.get_programs')
 class RelatedProgramsTests(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
     """Tests verifying that related programs appear on the course dashboard."""
-    url = None
     maxDiff = None
     password = 'test'
     related_programs_preface = 'Related Programs'
@@ -910,18 +1006,6 @@ class RelatedProgramsTests(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         cls.user = UserFactory()
         cls.course = CourseFactory()
         cls.enrollment = CourseEnrollmentFactory(user=cls.user, course_id=cls.course.id)  # pylint: disable=no-member
-        ClientFactory(name=ProgramsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
-
-        cls.organization = programs_factories.Organization()
-        run_mode = programs_factories.RunMode(course_key=unicode(cls.course.id))  # pylint: disable=no-member
-        course_code = programs_factories.CourseCode(run_modes=[run_mode])
-
-        cls.programs = [
-            programs_factories.Program(
-                organizations=[cls.organization],
-                course_codes=[course_code]
-            ) for __ in range(2)
-        ]
 
     def setUp(self):
         super(RelatedProgramsTests, self).setUp()
@@ -931,14 +1015,9 @@ class RelatedProgramsTests(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         self.create_programs_config()
         self.client.login(username=self.user.username, password=self.password)
 
-    def mock_programs_api(self, data):
-        """Helper for mocking out Programs API URLs."""
-        self.assertTrue(httpretty.is_enabled(), msg='httpretty must be enabled to mock Programs API calls.')
-
-        url = ProgramsApiConfig.current().internal_api_url.strip('/') + '/programs/'
-        body = json.dumps({'results': data})
-
-        httpretty.register_uri(httpretty.GET, url, body=body, content_type='application/json')
+        course_run = CourseRunFactory(key=unicode(self.course.id))  # pylint: disable=no-member
+        course = CatalogCourseFactory(course_runs=[course_run])
+        self.programs = [ProgramFactory(courses=[course]) for __ in range(2)]
 
     def assert_related_programs(self, response, are_programs_present=True):
         """Assertion for verifying response contents."""
@@ -951,42 +1030,40 @@ class RelatedProgramsTests(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
 
     def expected_link_text(self, program):
         """Construct expected dashboard link text."""
-        return u'{name} {category}'.format(name=program['name'], category=program['category'])
+        return u'{title} {type}'.format(title=program['title'], type=program['type'])
 
-    def test_related_programs_listed(self):
-        """Verify that related programs are listed when the programs API returns data."""
-        self.mock_programs_api(self.programs)
+    def test_related_programs_listed(self, mock_get_programs):
+        """Verify that related programs are listed when available."""
+        mock_get_programs.return_value = self.programs
 
         response = self.client.get(self.url)
         self.assert_related_programs(response)
 
-    def test_no_data_no_programs(self):
-        """Verify that related programs aren't listed if the programs API returns no data."""
-        self.mock_programs_api([])
+    def test_no_data_no_programs(self, mock_get_programs):
+        """Verify that related programs aren't listed when none are available."""
+        mock_get_programs.return_value = []
 
         response = self.client.get(self.url)
         self.assert_related_programs(response, are_programs_present=False)
 
-    def test_unrelated_program_not_listed(self):
+    def test_unrelated_program_not_listed(self, mock_get_programs):
         """Verify that unrelated programs don't appear in the listing."""
-        run_mode = programs_factories.RunMode(course_key='some/nonexistent/run')
-        course_code = programs_factories.CourseCode(run_modes=[run_mode])
+        nonexistent_course_run_id = generate_course_run_key()
 
-        unrelated_program = programs_factories.Program(
-            organizations=[self.organization],
-            course_codes=[course_code]
-        )
+        course_run = CourseRunFactory(key=nonexistent_course_run_id)
+        course = CatalogCourseFactory(course_runs=[course_run])
+        unrelated_program = ProgramFactory(courses=[course])
 
-        self.mock_programs_api(self.programs + [unrelated_program])
+        mock_get_programs.return_value = self.programs + [unrelated_program]
 
         response = self.client.get(self.url)
         self.assert_related_programs(response)
-        self.assertNotContains(response, unrelated_program['name'])
+        self.assertNotContains(response, unrelated_program['title'])
 
-    def test_program_title_unicode(self):
+    def test_program_title_unicode(self, mock_get_programs):
         """Verify that the dashboard can deal with programs whose titles contain Unicode."""
-        self.programs[0]['name'] = u'Bases matemáticas para estudiar ingeniería'
-        self.mock_programs_api(self.programs)
+        self.programs[0]['title'] = u'Bases matemáticas para estudiar ingeniería'
+        mock_get_programs.return_value = self.programs
 
         response = self.client.get(self.url)
         self.assert_related_programs(response)

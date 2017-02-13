@@ -3,10 +3,10 @@ Tests for contentstore.views.preview.py
 """
 import re
 import ddt
-from mock import Mock
+import mock
 from xblock.core import XBlock
 
-from django.test.client import RequestFactory
+from django.test.client import Client, RequestFactory
 
 from xblock.core import XBlockAside
 from student.tests.factories import UserFactory
@@ -15,6 +15,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from contentstore.views.preview import get_preview_fragment, _preview_module_system
+from contentstore.utils import reverse_usage_url
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.test_asides import AsideTestType
 from xblock_config.models import StudioConfig
@@ -105,6 +106,37 @@ class GetPreviewHtmlTestCase(ModuleStoreTestCase):
         self.assertNotRegexpMatches(html, r"data-block-type=[\"\']test_aside[\"\']")
         self.assertNotRegexpMatches(html, "Aside rendered")
 
+    @mock.patch('xmodule.conditional_module.ConditionalModule.is_condition_satisfied')
+    def test_preview_conditional_module_children_context(self, mock_is_condition_satisfied):
+        """
+        Testst that when empty context is pass to children of ConditionalModule it will not raise KeyError.
+        """
+        mock_is_condition_satisfied.return_value = True
+        client = Client()
+        client.login(username=self.user.username, password=self.user_password)
+
+        with self.store.default_store(ModuleStoreEnum.Type.split):
+            course = CourseFactory.create()
+
+            conditional_block = ItemFactory.create(
+                parent_location=course.location,
+                category="conditional"
+            )
+
+            # child conditional_block
+            ItemFactory.create(
+                parent_location=conditional_block.location,
+                category="conditional"
+            )
+
+            url = reverse_usage_url(
+                'preview_handler',
+                conditional_block.location,
+                kwargs={'handler': 'xmodule_handler/conditional_get'}
+            )
+            response = client.post(url)
+            self.assertEqual(response.status_code, 200)
+
 
 @XBlock.needs("field-data")
 @XBlock.needs("i18n")
@@ -128,8 +160,8 @@ class StudioXBlockServiceBindingTest(ModuleStoreTestCase):
         super(StudioXBlockServiceBindingTest, self).setUp()
         self.user = UserFactory()
         self.course = CourseFactory.create()
-        self.request = Mock()
-        self.field_data = Mock()
+        self.request = mock.Mock()
+        self.field_data = mock.Mock()
 
     @XBlock.register_temp_plugin(PureXBlock, identifier='pure')
     @ddt.data("user", "i18n", "field-data")

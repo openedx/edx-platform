@@ -245,6 +245,7 @@
                 color: $red;
             }
             
+            &[for="register-data_sharing_consent"],
             &[for="register-honor_code"],
             &[for="register-terms_of_service"] {
                 display: inline-block;

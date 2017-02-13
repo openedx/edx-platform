@@ -2,11 +2,14 @@
 """
 Unit tests for video-related REST APIs.
 """
+from datetime import datetime
 import csv
+import ddt
 import json
 import dateutil.parser
 import re
 from StringIO import StringIO
+import pytz
 
 from django.conf import settings
 from django.test.utils import override_settings
@@ -15,7 +18,7 @@ from mock import Mock, patch
 from edxval.api import create_profile, create_video, get_video_info
 
 from contentstore.models import VideoUploadConfig
-from contentstore.views.videos import KEY_EXPIRATION_IN_SECONDS, StatusDisplayStrings
+from contentstore.views.videos import KEY_EXPIRATION_IN_SECONDS, StatusDisplayStrings, convert_video_status
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import reverse_course_url
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -25,9 +28,9 @@ class VideoUploadTestMixin(object):
     """
     Test cases for the video upload feature
     """
-    def get_url_for_course_key(self, course_key):
+    def get_url_for_course_key(self, course_key, kwargs=None):
         """Return video handler URL for the given course"""
-        return reverse_course_url(self.VIEW_NAME, course_key)
+        return reverse_course_url(self.VIEW_NAME, course_key, kwargs)
 
     def setUp(self):
         super(VideoUploadTestMixin, self).setUp()
@@ -37,6 +40,19 @@ class VideoUploadTestMixin(object):
             "course_video_upload_token": self.test_token,
         }
         self.save_course()
+
+        # create another course for videos belonging to multiple courses
+        self.course2 = CourseFactory.create()
+        self.course2.video_upload_pipeline = {
+            "course_video_upload_token": self.test_token,
+        }
+        self.course2.save()
+        self.store.update_item(self.course2, self.user.id)
+
+        # course ids for videos
+        course_ids = [unicode(self.course.id), unicode(self.course2.id)]
+        created = datetime.now(pytz.utc)
+
         self.profiles = ["profile1", "profile2"]
         self.previous_uploads = [
             {
@@ -44,15 +60,17 @@ class VideoUploadTestMixin(object):
                 "client_video_id": "test1.mp4",
                 "duration": 42.0,
                 "status": "upload",
-                "courses": [unicode(self.course.id)],
+                "courses": course_ids,
                 "encoded_videos": [],
+                "created": created
             },
             {
                 "edx_video_id": "test2",
                 "client_video_id": "test2.mp4",
                 "duration": 128.0,
                 "status": "file_complete",
-                "courses": [unicode(self.course.id)],
+                "courses": course_ids,
+                "created": created,
                 "encoded_videos": [
                     {
                         "profile": "profile1",
@@ -73,7 +91,8 @@ class VideoUploadTestMixin(object):
                 "client_video_id": u"nón-ascii-näme.mp4",
                 "duration": 256.0,
                 "status": "transcode_active",
-                "courses": [unicode(self.course.id)],
+                "courses": course_ids,
+                "created": created,
                 "encoded_videos": [
                     {
                         "profile": "profile1",
@@ -91,7 +110,8 @@ class VideoUploadTestMixin(object):
                 "client_video_id": "status_test.mp4",
                 "duration": 3.14,
                 "status": status,
-                "courses": [unicode(self.course.id)],
+                "courses": course_ids,
+                "created": created,
                 "encoded_videos": [],
             }
             for status in (
@@ -146,6 +166,7 @@ class VideoUploadTestMixin(object):
         self.assertEqual(self.client.get(self.url).status_code, 404)
 
 
+@ddt.ddt
 @patch.dict("django.conf.settings.FEATURES", {"ENABLE_VIDEO_UPLOAD_PIPELINE": True})
 @override_settings(VIDEO_UPLOAD_PIPELINE={"BUCKET": "test_bucket", "ROOT_PATH": "test_root"})
 class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
@@ -170,7 +191,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
                 self.assertEqual(response_video[field], original_video[field])
             self.assertEqual(
                 response_video["status"],
-                StatusDisplayStrings.get(original_video["status"])
+                convert_video_status(original_video)
             )
 
     def test_get_html(self):
@@ -211,6 +232,91 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
     @override_settings(AWS_ACCESS_KEY_ID="test_key_id", AWS_SECRET_ACCESS_KEY="test_secret")
     @patch("boto.s3.key.Key")
     @patch("boto.s3.connection.S3Connection")
+    @ddt.data(
+        (
+            [
+                {
+                    "file_name": "supported-1.mp4",
+                    "content_type": "video/mp4",
+                },
+                {
+                    "file_name": "supported-2.mov",
+                    "content_type": "video/quicktime",
+                },
+            ],
+            200
+        ),
+        (
+            [
+                {
+                    "file_name": "unsupported-1.txt",
+                    "content_type": "text/plain",
+                },
+                {
+                    "file_name": "unsupported-2.png",
+                    "content_type": "image/png",
+                },
+            ],
+            400
+        )
+    )
+    @ddt.unpack
+    def test_video_supported_file_formats(self, files, expected_status, mock_conn, mock_key):
+        """
+        Test that video upload works correctly against supported and unsupported file formats.
+        """
+        bucket = Mock()
+        mock_conn.return_value = Mock(get_bucket=Mock(return_value=bucket))
+        mock_key_instances = [
+            Mock(
+                generate_url=Mock(
+                    return_value="http://example.com/url_{}".format(file_info["file_name"])
+                )
+            )
+            for file_info in files
+        ]
+        # If extra calls are made, return a dummy
+        mock_key.side_effect = mock_key_instances + [Mock()]
+
+        # Check supported formats
+        response = self.client.post(
+            self.url,
+            json.dumps({"files": files}),
+            content_type="application/json"
+        )
+        self.assertEqual(response.status_code, expected_status)
+        response = json.loads(response.content)
+
+        if expected_status == 200:
+            self.assertNotIn('error', response)
+        else:
+            self.assertIn('error', response)
+            self.assertEqual(response['error'], "Request 'files' entry contain unsupported content_type")
+
+    @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
+    @patch('boto.s3.connection.S3Connection')
+    def test_upload_with_non_ascii_charaters(self, mock_conn):
+        """
+        Test that video uploads throws error message when file name contains special characters.
+        """
+        file_name = u'test\u2019_file.mp4'
+        files = [{'file_name': file_name, 'content_type': 'video/mp4'}]
+
+        bucket = Mock()
+        mock_conn.return_value = Mock(get_bucket=Mock(return_value=bucket))
+
+        response = self.client.post(
+            self.url,
+            json.dumps({'files': files}),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 400)
+        response = json.loads(response.content)
+        self.assertEqual(response['error'], 'The file name for %s must contain only ASCII characters.' % file_name)
+
+    @override_settings(AWS_ACCESS_KEY_ID="test_key_id", AWS_SECRET_ACCESS_KEY="test_secret")
+    @patch("boto.s3.key.Key")
+    @patch("boto.s3.connection.S3Connection")
     def test_post_success(self, mock_conn, mock_key):
         files = [
             {
@@ -218,8 +324,8 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
                 "content_type": "video/mp4",
             },
             {
-                "file_name": "second.webm",
-                "content_type": "video/webm",
+                "file_name": "second.mp4",
+                "content_type": "video/mp4",
             },
             {
                 "file_name": "third.mov",
@@ -297,6 +403,121 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
             self.assertEqual(response_file["file_name"], file_info["file_name"])
             self.assertEqual(response_file["upload_url"], mock_key_instance.generate_url())
 
+    def _assert_video_removal(self, url, edx_video_id, deleted_videos):
+        """
+        Verify that if correct video is removed from a particular course.
+
+        Arguments:
+            url (str): URL to get uploaded videos
+            edx_video_id (str): video id
+            deleted_videos (int): how many videos are deleted
+        """
+        response = self.client.get_json(url)
+        self.assertEqual(response.status_code, 200)
+        response_videos = json.loads(response.content)["videos"]
+        self.assertEqual(len(response_videos), len(self.previous_uploads) - deleted_videos)
+
+        if deleted_videos:
+            self.assertNotIn(edx_video_id, [video.get('edx_video_id') for video in response_videos])
+        else:
+            self.assertIn(edx_video_id, [video.get('edx_video_id') for video in response_videos])
+
+    def test_video_removal(self):
+        """
+        Verifies that video removal is working as expected.
+        """
+        edx_video_id = 'test1'
+        remove_url = self.get_url_for_course_key(self.course.id, {'edx_video_id': edx_video_id})
+        response = self.client.delete(remove_url, HTTP_ACCEPT="application/json")
+        self.assertEqual(response.status_code, 204)
+
+        self._assert_video_removal(self.url, edx_video_id, 1)
+
+    def test_video_removal_multiple_courses(self):
+        """
+        Verifies that video removal is working as expected for multiple courses.
+
+        If a video is used by multiple courses then removal from one course shouldn't effect the other course.
+        """
+        # remove video from course1
+        edx_video_id = 'test1'
+        remove_url = self.get_url_for_course_key(self.course.id, {'edx_video_id': edx_video_id})
+        response = self.client.delete(remove_url, HTTP_ACCEPT="application/json")
+        self.assertEqual(response.status_code, 204)
+
+        # verify that video is only deleted from course1 only
+        self._assert_video_removal(self.url, edx_video_id, 1)
+        self._assert_video_removal(self.get_url_for_course_key(self.course2.id), edx_video_id, 0)
+
+    def test_convert_video_status(self):
+        """
+        Verifies that convert_video_status works as expected.
+        """
+        video = self.previous_uploads[0]
+
+        # video status should be failed if it's in upload state for more than 24 hours
+        video['created'] = datetime(2016, 1, 1, 10, 10, 10, 0, pytz.UTC)
+        status = convert_video_status(video)
+        self.assertEqual(status, StatusDisplayStrings.get('upload_failed'))
+
+        # `invalid_token` should be converted to `youtube_duplicate`
+        video['created'] = datetime.now(pytz.UTC)
+        video['status'] = 'invalid_token'
+        status = convert_video_status(video)
+        self.assertEqual(status, StatusDisplayStrings.get('youtube_duplicate'))
+
+        # for all other status, there should not be any conversion
+        statuses = StatusDisplayStrings._STATUS_MAP.keys()  # pylint: disable=protected-access
+        statuses.remove('invalid_token')
+        for status in statuses:
+            video['status'] = status
+            new_status = convert_video_status(video)
+            self.assertEqual(new_status, StatusDisplayStrings.get(status))
+
+    def assert_video_status(self, url, edx_video_id, status):
+        """
+        Verifies that video with `edx_video_id` has `status`
+        """
+        response = self.client.get_json(url)
+        self.assertEqual(response.status_code, 200)
+        videos = json.loads(response.content)["videos"]
+        for video in videos:
+            if video['edx_video_id'] == edx_video_id:
+                return self.assertEqual(video['status'], status)
+
+        # Test should fail if video not found
+        self.assertEqual(True, False, 'Invalid edx_video_id')
+
+    @patch('contentstore.views.videos.LOGGER')
+    def test_video_status_update_request(self, mock_logger):
+        """
+        Verifies that video status update request works as expected.
+        """
+        url = self.get_url_for_course_key(self.course.id)
+        edx_video_id = 'test1'
+        self.assert_video_status(url, edx_video_id, 'Uploading')
+
+        response = self.client.post(
+            url,
+            json.dumps([{
+                'edxVideoId': edx_video_id,
+                'status': 'upload_failed',
+                'message': 'server down'
+            }]),
+            content_type="application/json"
+        )
+
+        mock_logger.info.assert_called_with(
+            'VIDEOS: Video status update with id [%s], status [%s] and message [%s]',
+            edx_video_id,
+            'upload_failed',
+            'server down'
+        )
+
+        self.assertEqual(response.status_code, 204)
+
+        self.assert_video_status(url, edx_video_id, 'Failed')
+
 
 @patch.dict("django.conf.settings.FEATURES", {"ENABLE_VIDEO_UPLOAD_PIPELINE": True})
 @override_settings(VIDEO_UPLOAD_PIPELINE={"BUCKET": "test_bucket", "ROOT_PATH": "test_root"})
@@ -341,7 +562,7 @@ class VideoUrlsCsvTestCase(VideoUploadTestMixin, CourseTestCase):
             self.assertEqual(response_video["Duration"], str(original_video["duration"]))
             dateutil.parser.parse(response_video["Date Added"])
             self.assertEqual(response_video["Video ID"], original_video["edx_video_id"])
-            self.assertEqual(response_video["Status"], StatusDisplayStrings.get(original_video["status"]))
+            self.assertEqual(response_video["Status"], convert_video_status(original_video))
             for profile in expected_profiles:
                 response_profile_url = response_video["{} URL".format(profile)]
                 original_encoded_for_profile = next(

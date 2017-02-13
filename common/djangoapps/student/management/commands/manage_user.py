@@ -50,7 +50,7 @@ class Command(BaseCommand):
         certain issues, for example if the expected username has already been
         taken by someone else.
         """
-        if user.email != email:
+        if user.email.lower() != email.lower():
             # The passed email address doesn't match this username's email address.
             # Assume a problem and fail.
             raise CommandError(

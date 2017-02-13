@@ -24,15 +24,37 @@ var edx = edx || {};
             this.render();
         },
 
-        renderReceipt: function (data) {
-            var templateHtml = $("#receipt-tpl").html(),
+        /**
+         * @param product
+         * @returns {bool} True if product requires user to be verified by Software Secure.
+         */
+        requiresVerification: function(product) {
+            function getAttribute(attribute, defaultValue) {
+                var attr = _.findWhere(product.attribute_values, {name: attribute});
+                if (!attr) {
+                    return defaultValue;
+                }
+                return attr.value;
+            }
+
+            return getAttribute('id_verification_required', true);
+        },
+
+        renderReceipt: function(data) {
+            var templateHtml = $('#receipt-tpl').html(),
                 self = this,
                 context = {
                     platformName: this.$el.data('platform-name'),
                     verified: this.$el.data('verified').toLowerCase() === 'true',
                     is_request_in_themed_site: this.$el.data('is-request-in-themed-site').toLowerCase() === 'true'
                 },
-                providerId;
+                providerId,
+                courseRequiresVerification;
+
+            // True if any of the courses bought requires verification
+            courseRequiresVerification = _.any(data.lines, function(line) {
+                return this.requiresVerification(line.product);
+            }, this);
 
             // Add the receipt info to the template context
             this.courseKey = this.getOrderCourseKey(data);
@@ -45,7 +67,7 @@ var edx = edx || {};
                 _.extend(context, {
                     receipt: self.receiptContext(data),
                     courseKey: self.courseKey,
-                    is_verification_required: response.is_verification_required
+                    is_verification_required: response.is_verification_required && courseRequiresVerification
                 });
 
                 self.$el.html(_.template(templateHtml)(context));
@@ -331,7 +353,7 @@ var edx = edx || {};
     new edx.commerce.ReceiptView({
         el: $('#receipt-container')
     });
-})(jQuery, _, Backbone);
+}(jQuery, _, Backbone));
 
 function completeOrder(event) {
     'use strict';

@@ -6,6 +6,7 @@ import datetime
 from uuid import uuid4
 
 from nose.plugins.attrib import attr
+from nose.tools import nottest
 from pytz import UTC
 from flaky import flaky
 
@@ -33,7 +34,8 @@ from common.test.acceptance.fixtures.discussion import (
     Response,
     Comment,
     SearchResult,
-    MultipleThreadFixture)
+    MultipleThreadFixture,
+)
 
 from common.test.acceptance.tests.discussion.helpers import BaseDiscussionMixin
 from common.test.acceptance.tests.helpers import skip_if_browser
@@ -181,7 +183,7 @@ class DiscussionResponsePaginationTestMixin(BaseDiscussionMixin):
 
 
 @attr(shard=2)
-class DiscussionHomePageTest(UniqueCourseTest):
+class DiscussionHomePageTest(BaseDiscussionTestCase):
     """
     Tests for the discussion home page.
     """
@@ -190,11 +192,11 @@ class DiscussionHomePageTest(UniqueCourseTest):
 
     def setUp(self):
         super(DiscussionHomePageTest, self).setUp()
-        CourseFixture(**self.course_info).install()
         AutoAuthPage(self.browser, course_id=self.course_id).visit()
         self.page = DiscussionTabHomePage(self.browser, self.course_id)
         self.page.visit()
 
+    @attr(shard=2)
     def test_new_post_button(self):
         """
         Scenario: I can create new posts from the Discussion home page.
@@ -206,12 +208,31 @@ class DiscussionHomePageTest(UniqueCourseTest):
         self.page.click_new_post_button()
         self.assertIsNotNone(self.page.new_post_form)
 
+    def test_receive_update_checkbox(self):
+        """
+        Scenario: I can save the receive update email notification checkbox
+                on Discussion home page.
+            Given that I am on the Discussion home page
+            When I click on the 'Receive update' checkbox
+            Then it should always shown selected.
+        """
+        receive_updates_selector = '.email-setting'
+        receive_updates_checkbox = self.page.is_element_visible(receive_updates_selector)
+        self.assertTrue(receive_updates_checkbox)
+
+        self.assertFalse(self.page.is_checkbox_selected(receive_updates_selector))
+        self.page.click_element(receive_updates_selector)
+
+        self.assertTrue(self.page.is_checkbox_selected(receive_updates_selector))
+        self.page.refresh_and_wait_for_load()
+        self.assertTrue(self.page.is_checkbox_selected(receive_updates_selector))
+
     @attr('a11y')
     def test_page_accessibility(self):
         self.page.a11y_audit.config.set_rules({
             "ignore": [
                 'section',  # TODO: AC-491
-                'aria-required-children',  # TNL-5169, AC-534
+                'aria-required-children',  # TODO: AC-534
             ]
         })
         self.page.a11y_audit.check_for_accessibility_errors()
@@ -397,8 +418,7 @@ class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePa
         self.assertFalse(self.thread_page.is_comment_deletable("comment1"))
 
 
-@attr(shard=2)
-class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
+class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase, BaseDiscussionMixin):
     """
     Tests for the discussion page with multiple threads
     """
@@ -423,40 +443,12 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
         )
         self.thread_page_1.visit()
 
-    def setup_multiple_threads(self, thread_count):
-        threads = []
-        for i in range(thread_count):
-            thread_id = "test_thread_{}_{}".format(i, uuid4().hex)
-            thread_body = "Dummy Long text body." * 50
-            threads.append(
-                Thread(id=thread_id, commentable_id=self.discussion_id, body=thread_body),
-            )
-            self.thread_ids.append(thread_id)
-        view = MultipleThreadFixture(threads)
-        view.push()
-
-    def test_page_scroll_on_thread_change_view(self):
-        """
-        Check switching between threads changes the page focus
-        """
-        # verify threads are rendered on the page
-        self.assertTrue(
-            self.thread_page_1.check_threads_rendered_successfully(thread_count=self.thread_count)
-        )
-
-        # From the thread_page_1 open & verify next thread
-        self.thread_page_1.click_and_open_thread(thread_id=self.thread_ids[1])
-        self.assertTrue(self.thread_page_2.is_browser_on_page())
-
-        # Verify that the focus is changed
-        self.thread_page_2.check_focus_is_set(selector=".discussion-article")
-
     @attr('a11y')
     def test_page_accessibility(self):
         self.thread_page_1.a11y_audit.config.set_rules({
             "ignore": [
                 'section',  # TODO: AC-491
-                'aria-required-children',  # TNL-5169, AC-534
+                'aria-required-children',  # TODO: AC-534
             ]
         })
 
@@ -465,14 +457,13 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
         self.thread_page_2.a11y_audit.config.set_rules({
             "ignore": [
                 'section',  # TODO: AC-491
-                'aria-required-children',  # TNL-5169, AC-534
+                'aria-required-children',  # TODO: AC-534
             ]
         })
 
         self.thread_page_2.a11y_audit.check_for_accessibility_errors()
 
 
-@attr(shard=2)
 class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
     """
     Tests for checking the display of attributes on open and closed threads
@@ -506,6 +497,7 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
         page.close_open_thread()
         return page
 
+    @attr(shard=2)
     def test_originally_open_thread_vote_display(self):
         page = self.setup_openclosed_thread_page()
         self.assertFalse(page.is_element_visible('.thread-main-wrapper .action-vote'))
@@ -513,6 +505,7 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
         self.assertFalse(page.is_element_visible('.response_response1 .action-vote'))
         self.assertTrue(page.is_element_visible('.response_response1 .display-vote'))
 
+    @attr(shard=2)
     def test_originally_closed_thread_vote_display(self):
         page = self.setup_openclosed_thread_page(True)
         self.assertTrue(page.is_element_visible('.thread-main-wrapper .action-vote'))
@@ -526,7 +519,8 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
         page.a11y_audit.config.set_rules({
             'ignore': [
                 'section',  # TODO: AC-491
-                'color-contrast',  # Commented out for now because they reproducibly fail on Jenkis but not locally
+                'aria-required-children',  # TODO: AC-534
+                'color-contrast',  # Commented out for now because they reproducibly fail on Jenkins but not locally
             ]
         })
         page.a11y_audit.check_for_accessibility_errors()
@@ -535,7 +529,8 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
         page.a11y_audit.config.set_rules({
             'ignore': [
                 'section',  # TODO: AC-491
-                'color-contrast',  # Commented out for now because they reproducibly fail on Jenkis but not locally
+                'aria-required-children',  # TODO: AC-534
+                'color-contrast',  # Commented out for now because they reproducibly fail on Jenkins but not locally
             ]
         })
         page.a11y_audit.check_for_accessibility_errors()
@@ -581,7 +576,6 @@ class DiscussionCommentDeletionTest(BaseDiscussionTestCase):
         page.delete_comment("comment_other_author")
 
 
-@attr(shard=2)
 class DiscussionResponseEditTest(BaseDiscussionTestCase):
     """
     Tests for editing responses displayed beneath thread in the single thread view.
@@ -607,6 +601,7 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         page.set_response_editor_value(response_id, new_response)
         page.submit_response_edit(response_id, new_response)
 
+    @attr(shard=2)
     def test_edit_response_add_link(self):
         """
         Scenario: User submits valid input to the 'add link' form
@@ -640,6 +635,7 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         ).html[0]
         self.assertEqual(expected_response_html, actual_response_html)
 
+    @attr(shard=2)
     def test_edit_response_add_image(self):
         """
         Scenario: User submits valid input to the 'add image' form
@@ -673,6 +669,7 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         ).html[0]
         self.assertEqual(expected_response_html, actual_response_html)
 
+    @attr(shard=2)
     def test_edit_response_add_image_error_msg(self):
         """
         Scenario: User submits invalid input to the 'add image' form
@@ -692,6 +689,7 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
             "image", "response_self_author", '', '')
         page.verify_link_editor_error_messages_shown()
 
+    @attr(shard=2)
     def test_edit_response_add_decorative_image(self):
         """
         Scenario: User submits invalid input to the 'add image' form
@@ -727,6 +725,7 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         ).html[0]
         self.assertEqual(expected_response_html, actual_response_html)
 
+    @attr(shard=2)
     def test_edit_response_add_link_error_msg(self):
         """
         Scenario: User submits invalid input to the 'add link' form
@@ -746,6 +745,7 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
             "link", "response_self_author", '', '')
         page.verify_link_editor_error_messages_shown()
 
+    @attr(shard=2)
     def test_edit_response_as_student(self):
         """
         Scenario: Students should be able to edit the response they created not responses of other users
@@ -763,6 +763,7 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         self.assertFalse(page.is_response_editable("response_other_author"))
         self.edit_response(page, "response_self_author")
 
+    @attr(shard=2)
     def test_edit_response_as_moderator(self):
         """
         Scenario: Moderator should be able to edit the response they created and responses of other users
@@ -779,6 +780,7 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         self.edit_response(page, "response_self_author")
         self.edit_response(page, "response_other_author")
 
+    @attr(shard=2)
     @flaky  # TODO fix this, see TNL-5453
     def test_vote_report_endorse_after_edit(self):
         """
@@ -822,14 +824,13 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         page.a11y_audit.config.set_rules({
             'ignore': [
                 'section',  # TODO: AC-491
-                'aria-required-children',  # TNL-5169, AC-534
+                'aria-required-children',  # TODO: AC-534
             ]
         })
         page.visit()
         page.a11y_audit.check_for_accessibility_errors()
 
 
-@attr(shard=2)
 class DiscussionCommentEditTest(BaseDiscussionTestCase):
     """
     Tests for editing comments displayed beneath responses in the single thread view.
@@ -851,6 +852,7 @@ class DiscussionCommentEditTest(BaseDiscussionTestCase):
         page.set_comment_editor_value(comment_id, new_comment)
         page.submit_comment_edit(comment_id, new_comment)
 
+    @attr(shard=2)
     def test_edit_comment_as_student(self):
         self.setup_user()
         self.setup_view()
@@ -861,6 +863,7 @@ class DiscussionCommentEditTest(BaseDiscussionTestCase):
         self.assertFalse(page.is_comment_editable("comment_other_author"))
         self.edit_comment(page, "comment_self_author")
 
+    @attr(shard=2)
     def test_edit_comment_as_moderator(self):
         self.setup_user(roles=["Moderator"])
         self.setup_view()
@@ -871,6 +874,7 @@ class DiscussionCommentEditTest(BaseDiscussionTestCase):
         self.edit_comment(page, "comment_self_author")
         self.edit_comment(page, "comment_other_author")
 
+    @attr(shard=2)
     def test_cancel_comment_edit(self):
         self.setup_user()
         self.setup_view()
@@ -882,6 +886,7 @@ class DiscussionCommentEditTest(BaseDiscussionTestCase):
         page.set_comment_editor_value("comment_self_author", "edited body")
         page.cancel_comment_edit("comment_self_author", original_body)
 
+    @attr(shard=2)
     def test_editor_visibility(self):
         """Only one editor should be visible at a time within a single response"""
         self.setup_user(roles=["Moderator"])
@@ -920,7 +925,7 @@ class DiscussionCommentEditTest(BaseDiscussionTestCase):
         page.a11y_audit.config.set_rules({
             'ignore': [
                 'section',  # TODO: AC-491
-                'aria-required-children',  # TNL-5169, AC-534
+                'aria-required-children',  # TODO: AC-534
             ]
         })
         page.a11y_audit.check_for_accessibility_errors()
@@ -958,6 +963,22 @@ class DiscussionEditorPreviewTest(UniqueCourseTest):
             "<li>line 2</li>\n"
             "</ul>"
         ))
+
+    def test_mathjax_rendering_in_order(self):
+        """
+        Tests that mathjax is rendered in proper order.
+
+        When user types mathjax expressions into discussion editor, it should render in the proper
+        order.
+        """
+        self.page.set_new_post_editor_value(
+            'Text line 1 \n'
+            '$$e[n]=d_1$$ \n'
+            'Text line 2 \n'
+            '$$e[n]=d_2$$'
+        )
+
+        self.assertEqual(self.page.get_new_post_preview_text(), 'Text line 1\nText line 2')
 
 
 @attr(shard=2)
@@ -999,41 +1020,39 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
 
     def setup_thread_page(self, thread_id):
         self.discussion_page.expand_discussion()
-        self.assertEqual(self.discussion_page.get_num_displayed_threads(), 1)
-        self.thread_page = InlineDiscussionThreadPage(self.browser, thread_id)  # pylint: disable=attribute-defined-outside-init
-        self.thread_page.expand()
+        self.discussion_page.show_thread(thread_id)
+        self.thread_page = self.discussion_page.thread_page  # pylint: disable=attribute-defined-outside-init
 
-    def setup_multiple_inline_threads(self, thread_count):
+    # This test is too flaky to run at all. TNL-6215
+    @attr('a11y')
+    @nottest
+    def test_inline_a11y(self):
         """
-        Set up multiple treads on the page by passing 'thread_count'
+        Tests Inline Discussion for accessibility issues.
         """
-        threads = []
-        for i in range(thread_count):
-            thread_id = "test_thread_{}_{}".format(i, uuid4().hex)
-            threads.append(
-                Thread(id=thread_id, commentable_id=self.discussion_id),
-            )
-            self.thread_ids.append(thread_id)
-        thread_fixture = MultipleThreadFixture(threads)
-        thread_fixture.add_response(
-            Response(id="response1"),
-            [Comment(id="comment1", user_id="other"), Comment(id="comment2", user_id=self.user_id)],
-            threads[0]
-        )
-        thread_fixture.push()
+        self.setup_multiple_threads(thread_count=3)
 
-    def test_page_while_expanding_inline_discussion(self):
-        """
-        Tests for the Inline Discussion page with multiple treads. Page should not focus 'thread-wrapper'
-        after loading responses.
-        """
-        self.setup_multiple_inline_threads(thread_count=3)
+        # First test the a11y of the expanded list of threads
         self.discussion_page.expand_discussion()
-        thread_page = InlineDiscussionThreadPage(self.browser, self.thread_ids[0])
-        thread_page.expand()
+        self.discussion_page.a11y_audit.config.set_rules({
+            'ignore': [
+                'section'
+            ]
+        })
+        self.discussion_page.a11y_audit.check_for_accessibility_errors()
 
-        # Check if 'thread-wrapper' is focused after expanding thread
-        self.assertFalse(thread_page.check_if_selector_is_focused(selector='.thread-wrapper'))
+        # Now show the first thread and test the a11y again
+        self.discussion_page.show_thread(self.thread_ids[0])
+        self.discussion_page.a11y_audit.check_for_accessibility_errors()
+
+        # Finally show the new post form and test its a11y
+        self.discussion_page.click_new_post_button()
+        self.discussion_page.a11y_audit.check_for_accessibility_errors()
+
+    def test_add_a_post_is_present_if_can_create_thread_when_expanded(self):
+        self.discussion_page.expand_discussion()
+        # Add a Post link is present
+        self.assertTrue(self.discussion_page.q(css='.new-post-btn').present)
 
     def test_initial_render(self):
         self.assertFalse(self.discussion_page.is_discussion_expanded())
@@ -1046,7 +1065,7 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
         thread = Thread(id=uuid4().hex, anonymous_to_peers=True, commentable_id=self.discussion_id)
         thread_fixture = SingleThreadViewFixture(thread)
         thread_fixture.push()
-        self.setup_thread_page(thread.get("id"))
+        self.setup_thread_page(thread.get("id"))  # pylint: disable=no-member
         self.assertEqual(self.thread_page.is_thread_anonymous(), not is_staff)
 
     def test_anonymous_to_peers_threads_as_staff(self):
@@ -1079,44 +1098,66 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
             Response(id="response1"),
             [Comment(id="comment1", user_id="other"), Comment(id="comment2", user_id=self.user_id)])
         thread_fixture.push()
-        self.setup_thread_page(thread.get("id"))
-        self.assertFalse(self.discussion_page.element_exists(".new-post-btn"))
+        self.setup_thread_page(thread.get("id"))  # pylint: disable=no-member
         self.assertFalse(self.thread_page.has_add_response_button())
-        self.assertFalse(self.thread_page.is_response_editable("response1"))
-        self.assertFalse(self.thread_page.is_add_comment_visible("response1"))
-        self.assertFalse(self.thread_page.is_comment_editable("comment1"))
-        self.assertFalse(self.thread_page.is_comment_editable("comment2"))
-        self.assertFalse(self.thread_page.is_comment_deletable("comment1"))
-        self.assertFalse(self.thread_page.is_comment_deletable("comment2"))
+        self.assertFalse(self.thread_page.is_element_visible("action-more"))
 
     def test_dual_discussion_xblock(self):
         """
         Scenario: Two discussion xblocks in one unit shouldn't override their actions
-        Given that I'm on courseware page where there are two inline discussion
-        When I click on one discussion xblock new post button
-        Then it should add new post form of that xblock in DOM
-        And I should be shown new post form of that xblock
-        And I shouldn't be shown second discussion xblock new post form
-        And I click on second discussion xblock new post button
-        Then it should add new post form of second xblock in DOM
-        And I should be shown second discussion new post form
-        And I shouldn't be shown first discussion xblock new post form
-        And I have two new post form in the DOM
-        When I click back on first xblock new post button
-        And I should be shown new post form of that xblock
-        And I shouldn't be shown second discussion xblock new post form
+        Given that I'm on a courseware page where there are two inline discussion
+        When I click on the first discussion block's new post button
+        Then I should be shown only the new post form for the first block
+        When I click on the second discussion block's new post button
+        Then I should be shown both new post forms
+        When I cancel the first form
+        Then I should be shown only the new post form for the second block
+        When I cancel the second form
+        And I click on the first discussion block's new post button
+        Then I should be shown only the new post form for the first block
+        When I cancel the first form
+        Then I should be shown none of the forms
         """
         self.discussion_page.wait_for_page()
         self.additional_discussion_page.wait_for_page()
+
+        # Expand the first discussion, click to add a post
+        self.discussion_page.expand_discussion()
         self.discussion_page.click_new_post_button()
-        with self.discussion_page.handle_alert():
-            self.discussion_page.click_cancel_new_post()
+
+        # Verify that only the first discussion's form is shown
+        self.assertIsNotNone(self.discussion_page.new_post_form)
+        self.assertIsNone(self.additional_discussion_page.new_post_form)
+
+        # Expand the second discussion, click to add a post
+        self.additional_discussion_page.expand_discussion()
         self.additional_discussion_page.click_new_post_button()
-        self.assertFalse(self.discussion_page._is_element_visible(".new-post-article"))
-        with self.additional_discussion_page.handle_alert():
-            self.additional_discussion_page.click_cancel_new_post()
+
+        # Verify that both discussion's forms are shown
+        self.assertIsNotNone(self.discussion_page.new_post_form)
+        self.assertIsNotNone(self.additional_discussion_page.new_post_form)
+
+        # Cancel the first form
+        self.discussion_page.click_cancel_new_post()
+
+        # Verify that only the second discussion's form is shown
+        self.assertIsNone(self.discussion_page.new_post_form)
+        self.assertIsNotNone(self.additional_discussion_page.new_post_form)
+
+        # Cancel the second form and click to show the first one
+        self.additional_discussion_page.click_cancel_new_post()
         self.discussion_page.click_new_post_button()
-        self.assertFalse(self.additional_discussion_page._is_element_visible(".new-post-article"))
+
+        # Verify that only the first discussion's form is shown
+        self.assertIsNotNone(self.discussion_page.new_post_form)
+        self.assertIsNone(self.additional_discussion_page.new_post_form)
+
+        # Cancel the first form
+        self.discussion_page.click_cancel_new_post()
+
+        # Verify that neither discussion's forms are shwon
+        self.assertIsNone(self.discussion_page.new_post_form)
+        self.assertIsNone(self.additional_discussion_page.new_post_form)
 
 
 @attr(shard=2)
@@ -1130,27 +1171,42 @@ class DiscussionUserProfileTest(UniqueCourseTest):
 
     def setUp(self):
         super(DiscussionUserProfileTest, self).setUp()
-        CourseFixture(**self.course_info).install()
+        self.setup_course()
         # The following line creates a user enrolled in our course, whose
         # threads will be viewed, but not the one who will view the page.
         # It isn't necessary to log them in, but using the AutoAuthPage
         # saves a lot of code.
-        self.profiled_user_id = AutoAuthPage(
-            self.browser,
-            username=self.PROFILED_USERNAME,
-            course_id=self.course_id
-        ).visit().get_user_id()
+        self.profiled_user_id = self.setup_user(username=self.PROFILED_USERNAME)
         # now create a second user who will view the profile.
-        self.user_id = AutoAuthPage(
-            self.browser,
-            course_id=self.course_id
-        ).visit().get_user_id()
+        self.user_id = self.setup_user()
 
-    def check_pages(self, num_threads):
-        # set up the stub server to return the desired amount of thread results
-        threads = [Thread(id=uuid4().hex) for _ in range(num_threads)]
-        UserProfileViewFixture(threads).push()
-        # navigate to default view (page 1)
+    def setup_course(self):
+        """
+        Set up the for the course discussion user-profile tests.
+        """
+        return CourseFixture(**self.course_info).install()
+
+    def setup_user(self, roles=None, **user_info):
+        """
+        Helper method to create and authenticate a user.
+        """
+        roles_str = ''
+        if roles:
+            roles_str = ','.join(roles)
+        return AutoAuthPage(self.browser, course_id=self.course_id, roles=roles_str, **user_info).visit().get_user_id()
+
+    def test_redirects_to_learner_profile(self):
+        """
+        Scenario: Verify that learner-profile link is present on forum discussions page and we can navigate to it.
+
+        Given that I am on discussion forum user's profile page.
+        And I can see a username on the page
+        When I click on my username.
+        Then I will be navigated to Learner Profile page.
+        And I can my username on Learner Profile page
+        """
+        learner_profile_page = LearnerProfilePage(self.browser, self.PROFILED_USERNAME)
+
         page = DiscussionUserProfilePage(
             self.browser,
             self.course_id,
@@ -1158,97 +1214,59 @@ class DiscussionUserProfileTest(UniqueCourseTest):
             self.PROFILED_USERNAME
         )
         page.visit()
-
-        current_page = 1
-        total_pages = max(num_threads - 1, 1) / self.PAGE_SIZE + 1
-        all_pages = range(1, total_pages + 1)
-        return page
-
-        def _check_page():
-            # ensure the page being displayed as "current" is the expected one
-            self.assertEqual(page.get_current_page(), current_page)
-            # ensure the expected threads are being shown in the right order
-            threads_expected = threads[(current_page - 1) * self.PAGE_SIZE:current_page * self.PAGE_SIZE]
-            self.assertEqual(page.get_shown_thread_ids(), [t["id"] for t in threads_expected])
-            # ensure the clickable page numbers are the expected ones
-            self.assertEqual(page.get_clickable_pages(), [
-                p for p in all_pages
-                if p != current_page
-                and p - 2 <= current_page <= p + 2
-                or (current_page > 2 and p == 1)
-                or (current_page < total_pages and p == total_pages)
-            ])
-            # ensure the previous button is shown, but only if it should be.
-            # when it is shown, make sure it works.
-            if current_page > 1:
-                self.assertTrue(page.is_prev_button_shown(current_page - 1))
-                page.click_prev_page()
-                self.assertEqual(page.get_current_page(), current_page - 1)
-                page.click_next_page()
-                self.assertEqual(page.get_current_page(), current_page)
-            else:
-                self.assertFalse(page.is_prev_button_shown())
-            # ensure the next button is shown, but only if it should be.
-            if current_page < total_pages:
-                self.assertTrue(page.is_next_button_shown(current_page + 1))
-            else:
-                self.assertFalse(page.is_next_button_shown())
-
-        # click all the way up through each page
-        for __ in range(current_page, total_pages):
-            _check_page()
-            if current_page < total_pages:
-                page.click_on_page(current_page + 1)
-                current_page += 1
-
-        # click all the way back down
-        for __ in range(current_page, 0, -1):
-            _check_page()
-            if current_page > 1:
-                page.click_on_page(current_page - 1)
-                current_page -= 1
-
-    def test_0_threads(self):
-        self.check_pages(0)
-
-    def test_1_thread(self):
-        self.check_pages(1)
-
-    def test_20_threads(self):
-        self.check_pages(20)
-
-    def test_21_threads(self):
-        self.check_pages(21)
-
-    def test_151_threads(self):
-        self.check_pages(151)
-
-    def test_pagination_window_reposition(self):
-        page = self.check_pages(50)
-        page.click_next_page()
-        page.wait_for_ajax()
-        self.assertTrue(page.is_window_on_top())
-
-    def test_redirects_to_learner_profile(self):
-        """
-        Scenario: Verify that learner-profile link is present on forum discussions page and we can navigate to it.
-
-        Given that I am on discussion forum user's profile page.
-        And I can see a username on left sidebar
-        When I click on my username.
-        Then I will be navigated to Learner Profile page.
-        And I can my username on Learner Profile page
-        """
-        learner_profile_page = LearnerProfilePage(self.browser, self.PROFILED_USERNAME)
-
-        page = self.check_pages(1)
         page.click_on_sidebar_username()
 
         learner_profile_page.wait_for_page()
         self.assertTrue(learner_profile_page.field_is_visible('username'))
 
+    def test_learner_profile_roles(self):
+        """
+        Test that on the learner profile page user roles are correctly listed according to the course.
+        """
+        # Setup a learner with roles in a Course-A.
+        expected_student_roles = ['Administrator', 'Community TA', 'Moderator', 'Student']
+        self.profiled_user_id = self.setup_user(
+            roles=expected_student_roles,
+            username=self.PROFILED_USERNAME
+        )
 
-@attr(shard=2)
+        # Visit the page and verify the roles are listed correctly.
+        page = DiscussionUserProfilePage(
+            self.browser,
+            self.course_id,
+            self.profiled_user_id,
+            self.PROFILED_USERNAME
+        )
+        page.visit()
+        student_roles = page.get_user_roles()
+        self.assertEqual(student_roles, ', '.join(expected_student_roles))
+
+        # Save the course_id of Course-A before setting up a new course.
+        old_course_id = self.course_id
+
+        # Setup Course-B and set user do not have additional roles and test roles are displayed correctly.
+        self.course_info['number'] = self.unique_id
+        self.setup_course()
+        new_course_id = self.course_id
+
+        # Set the user to have no extra role in the Course-B and verify the existing
+        # user is updated.
+        profiled_student_user_id = self.setup_user(roles=None, username=self.PROFILED_USERNAME)
+        self.assertEqual(self.profiled_user_id, profiled_student_user_id)
+        self.assertNotEqual(old_course_id, new_course_id)
+
+        # Visit the user profile in course discussion page of Course-B. Make sure the
+        # roles are listed correctly.
+        page = DiscussionUserProfilePage(
+            self.browser,
+            self.course_id,
+            self.profiled_user_id,
+            self.PROFILED_USERNAME
+        )
+        page.visit()
+        self.assertEqual(page.get_user_roles(), u'Student')
+
+
 class DiscussionSearchAlertTest(UniqueCourseTest):
     """
     Tests for spawning and dismissing alerts related to user search actions and their results.
@@ -1277,11 +1295,13 @@ class DiscussionSearchAlertTest(UniqueCourseTest):
         actual = self.page.get_search_alert_messages()
         self.assertTrue(all(map(lambda msg, sub: msg.lower().find(sub.lower()) >= 0, actual, expected)))
 
+    @attr(shard=2)
     def test_no_rewrite(self):
         self.setup_corrected_text(None)
         self.page.perform_search()
-        self.check_search_alert_messages(["no threads"])
+        self.check_search_alert_messages(["no posts"])
 
+    @attr(shard=2)
     def test_rewrite_dismiss(self):
         self.setup_corrected_text("foo")
         self.page.perform_search()
@@ -1289,6 +1309,7 @@ class DiscussionSearchAlertTest(UniqueCourseTest):
         self.page.dismiss_alert_message("foo")
         self.check_search_alert_messages([])
 
+    @attr(shard=2)
     def test_new_search(self):
         self.setup_corrected_text("foo")
         self.page.perform_search()
@@ -1300,17 +1321,19 @@ class DiscussionSearchAlertTest(UniqueCourseTest):
 
         self.setup_corrected_text(None)
         self.page.perform_search()
-        self.check_search_alert_messages(["no threads"])
+        self.check_search_alert_messages(["no posts"])
 
+    @attr(shard=2)
     def test_rewrite_and_user(self):
         self.setup_corrected_text("foo")
         self.page.perform_search(self.SEARCHED_USERNAME)
         self.check_search_alert_messages(["foo", self.SEARCHED_USERNAME])
 
+    @attr(shard=2)
     def test_user_only(self):
         self.setup_corrected_text(None)
         self.page.perform_search(self.SEARCHED_USERNAME)
-        self.check_search_alert_messages(["no threads", self.SEARCHED_USERNAME])
+        self.check_search_alert_messages(["no posts", self.SEARCHED_USERNAME])
         # make sure clicking the link leads to the user profile page
         UserProfileViewFixture([]).push()
         self.page.get_search_alert_links().first.click()
@@ -1326,7 +1349,7 @@ class DiscussionSearchAlertTest(UniqueCourseTest):
         self.page.a11y_audit.config.set_rules({
             'ignore': [
                 'section',  # TODO: AC-491
-                'aria-required-children',  # TNL-5169, AC-534
+                'aria-required-children',  # TODO: AC-534
             ]
         })
         self.page.a11y_audit.check_for_accessibility_errors()

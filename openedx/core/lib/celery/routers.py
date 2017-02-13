@@ -5,6 +5,9 @@ For more, see http://celery.readthedocs.io/en/latest/userguide/routing.html#rout
 """
 from abc import ABCMeta, abstractproperty
 from django.conf import settings
+import logging
+
+log = logging.getLogger(__name__)
 
 
 class AlternateEnvironmentRouter(object):

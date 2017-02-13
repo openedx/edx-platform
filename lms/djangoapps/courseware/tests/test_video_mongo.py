@@ -583,30 +583,97 @@ class TestGetHtmlMethod(BaseTestXmodule):
         )
 
     def test_get_html_with_existing_edx_video_id(self):
-        # create test profiles and their encodings
+        """
+        Tests the `VideoModule` `get_html` where `edx_video_id` is given and related video is found
+        """
+        edx_video_id = 'thundercats'
+        # create video with provided edx_video_id and return encoded_videos
+        encoded_videos = self.encode_and_create_video(edx_video_id)
+        # data to be used to retrieve video by edxval API
+        data = {
+            'download_video': 'true',
+            'source': 'example_source.mp4',
+            'sources': """
+                <source src="example.mp4"/>
+                <source src="example.webm"/>
+            """,
+            'edx_video_id': edx_video_id,
+            'result': {
+                'download_video_link': u'http://fake-video.edx.org/{}.mp4'.format(edx_video_id),
+                'sources': [u'example.mp4', u'example.webm'] + [video['url'] for video in encoded_videos],
+            },
+        }
+        # context returned by get_html when provided with above data
+        # expected_context, a dict to assert with context
+        context, expected_context = self.helper_get_html_with_edx_video_id(data)
+        self.assertEqual(
+            context,
+            self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
+        )
+
+    def test_get_html_with_existing_unstripped_edx_video_id(self):
+        """
+        Tests the `VideoModule` `get_html` where `edx_video_id` with some unwanted tab(\t)
+        is given and related video is found
+        """
+        edx_video_id = 'thundercats'
+        # create video with provided edx_video_id and return encoded_videos
+        encoded_videos = self.encode_and_create_video(edx_video_id)
+        # data to be used to retrieve video by edxval API
+        # unstripped edx_video_id is provided here
+        data = {
+            'download_video': 'true',
+            'source': 'example_source.mp4',
+            'sources': """
+                <source src="example.mp4"/>
+                <source src="example.webm"/>
+            """,
+            'edx_video_id': "{}\t".format(edx_video_id),
+            'result': {
+                'download_video_link': u'http://fake-video.edx.org/{}.mp4'.format(edx_video_id),
+                'sources': [u'example.mp4', u'example.webm'] + [video['url'] for video in encoded_videos],
+            },
+        }
+        # context returned by get_html when provided with above data
+        # expected_context, a dict to assert with context
+        context, expected_context = self.helper_get_html_with_edx_video_id(data)
+        self.assertEqual(
+            context,
+            self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
+        )
+
+    def encode_and_create_video(self, edx_video_id):
+        """
+        Create and encode video to be used for tests
+        """
         encoded_videos = []
         for profile, extension in [("desktop_webm", "webm"), ("desktop_mp4", "mp4")]:
             create_profile(profile)
             encoded_videos.append(
                 dict(
-                    url=u"http://fake-video.edx.org/thundercats.{}".format(extension),
+                    url=u"http://fake-video.edx.org/{}.{}".format(edx_video_id, extension),
                     file_size=9000,
                     bitrate=42,
                     profile=profile,
                 )
             )
-
         result = create_video(
             dict(
-                client_video_id="Thunder Cats",
+                client_video_id='A Client Video id',
                 duration=111,
-                edx_video_id="thundercats",
+                edx_video_id=edx_video_id,
                 status='test',
-                encoded_videos=encoded_videos
+                encoded_videos=encoded_videos,
             )
         )
-        self.assertEqual(result, "thundercats")
+        self.assertEqual(result, edx_video_id)
+        return encoded_videos
 
+    def helper_get_html_with_edx_video_id(self, data):
+        """
+        Create expected context and get actual context returned by `get_html` method.
+        """
+        # make sure the urls for the various encodings are included as part of the alternative sources.
         SOURCE_XML = """
             <video show_captions="true"
             display_name="A Name"
@@ -618,22 +685,6 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 {sources}
             </video>
         """
-
-        data = {
-            'download_video': 'true',
-            'source': 'example_source.mp4',
-            'sources': """
-                <source src="example.mp4"/>
-                <source src="example.webm"/>
-            """,
-            'edx_video_id': "thundercats",
-            'result': {
-                'download_video_link': u'http://fake-video.edx.org/thundercats.mp4',
-                # make sure the urls for the various encodings are included as part of the alternative sources.
-                'sources': [u'example.mp4', u'example.webm'] +
-                           [video['url'] for video in encoded_videos],
-            }
-        }
 
         # Video found for edx_video_id
         metadata = self.default_metadata_dict
@@ -658,6 +709,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'metadata': metadata,
         }
 
+        # pylint: disable=invalid-name
         DATA = SOURCE_XML.format(
             download_video=data['download_video'],
             source=data['source'],
@@ -665,8 +717,10 @@ class TestGetHtmlMethod(BaseTestXmodule):
             edx_video_id=data['edx_video_id']
         )
         self.initialize_module(data=DATA)
+        # context returned by get_html
         context = self.item_descriptor.render(STUDENT_VIEW).content
 
+        # expected_context, expected context to be returned by get_html
         expected_context = dict(initial_context)
         expected_context['metadata'].update({
             'transcriptTranslationUrl': self.item_descriptor.xmodule_runtime.handler_url(
@@ -683,11 +737,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'download_video_link': data['result']['download_video_link'],
             'metadata': json.dumps(expected_context['metadata'])
         })
-
-        self.assertEqual(
-            context,
-            self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
-        )
+        return context, expected_context
 
     # pylint: disable=invalid-name
     @patch('xmodule.video_module.video_module.BrandingInfoConfig')

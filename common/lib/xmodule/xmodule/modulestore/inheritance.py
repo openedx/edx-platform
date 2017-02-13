@@ -125,11 +125,6 @@ class InheritanceMixin(XBlockMixin):
         scope=Scope.settings,
         default='',
     )
-    text_customization = Dict(
-        display_name=_("Text Customization"),
-        help=_("Enter string customization substitutions for particular locations."),
-        scope=Scope.settings,
-    )
     use_latex_compiler = Boolean(
         display_name=_("Enable LaTeX Compiler"),
         help=_("Enter true or false. If true, you can use the LaTeX templates for HTML components and advanced Problem components."),

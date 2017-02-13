@@ -50,6 +50,7 @@ from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=im
 from milestones.tests.utils import MilestonesTestCaseMixin
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.lib.gating import api as gating_api
+from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory, UserFactory, CourseEnrollmentFactory
 from util.tests.test_date_utils import fake_ugettext, fake_pgettext
@@ -58,7 +59,7 @@ from util.views import ensure_valid_course_key
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 from openedx.core.djangoapps.credit.api import set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
@@ -191,6 +192,48 @@ class TestJumpTo(ModuleStoreTestCase):
 
 @attr(shard=2)
 @ddt.ddt
+class IndexQueryTestCase(ModuleStoreTestCase):
+    """
+    Tests for query count.
+    """
+    CREATE_USER = False
+    NUM_PROBLEMS = 20
+
+    @ddt.data(
+        (ModuleStoreEnum.Type.mongo, 9),
+        (ModuleStoreEnum.Type.split, 4),
+    )
+    @ddt.unpack
+    def test_index_query_counts(self, store_type, expected_query_count):
+        with self.store.default_store(store_type):
+            course = CourseFactory.create()
+            with self.store.bulk_operations(course.id):
+                chapter = ItemFactory.create(category='chapter', parent_location=course.location)
+                section = ItemFactory.create(category='sequential', parent_location=chapter.location)
+                vertical = ItemFactory.create(category='vertical', parent_location=section.location)
+                for _ in range(self.NUM_PROBLEMS):
+                    ItemFactory.create(category='problem', parent_location=vertical.location)
+
+        password = 'test'
+        self.user = UserFactory(password=password)
+        self.client.login(username=self.user.username, password=password)
+        CourseEnrollment.enroll(self.user, course.id)
+
+        with check_mongo_calls(expected_query_count):
+            url = reverse(
+                'courseware_section',
+                kwargs={
+                    'course_id': unicode(course.id),
+                    'chapter': unicode(chapter.location.name),
+                    'section': unicode(section.location.name),
+                }
+            )
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
+
+
+@attr(shard=2)
+@ddt.ddt
 class ViewsTestCase(ModuleStoreTestCase):
     """
     Tests for views.py methods.
@@ -209,6 +252,7 @@ class ViewsTestCase(ModuleStoreTestCase):
             parent_location=self.chapter.location,
             due=datetime(2013, 9, 18, 11, 30, 00),
             display_name='Sequential 1',
+            format='Homework'
         )
         self.vertical = ItemFactory.create(
             category='vertical',
@@ -907,33 +951,22 @@ class ViewsTestCase(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_accordion(self):
-        request = RequestFactory().get('foo')
-        request.user = self.user
-        table_of_contents = toc_for_course(
-            request.user,
-            request,
-            self.course,
-            unicode(self.course.get_children()[0].scope_ids.usage_id),
-            None,
-            None
-        )
-
-        # removes newlines and whitespace from the returned view string
-        view = ''.join(render_accordion(request, self.course, table_of_contents['chapters']).split())
-        # the course id unicode is re-encoded here because the quote function does not accept unicode
+        """
+        This needs a response_context, which is not included in the render_accordion's main method
+        returning a render_to_string, so we will render via the courseware URL in order to include
+        the needed context
+        """
         course_id = quote(unicode(self.course.id).encode("utf-8"))
-
-        self.assertIn(
-            u'href="/courses/{}/courseware/Chapter_1/Sequential_1/"><pclass="accordion-display-name">Sequential1</p>'
-            .format(course_id.decode("utf-8")),
-            view
+        response = self.client.get(
+            reverse('courseware', args=[unicode(course_id)]),
+            follow=True
         )
-
-        self.assertIn(
-            u'href="/courses/{}/courseware/Chapter_1/Sequential_2/"><pclass="accordion-display-name">Sequential2</p>'
-            .format(course_id.decode("utf-8")),
-            view
-        )
+        test_responses = [
+            '<p class="accordion-display-name">Sequential 1 <span class="sr">current section</span></p>',
+            '<p class="accordion-display-name">Sequential 2 </p>'
+        ]
+        for test in test_responses:
+            self.assertContains(response, test)
 
 
 @attr(shard=1)
@@ -960,7 +993,8 @@ class BaseDueDateTests(ModuleStoreTestCase):
         section = ItemFactory.create(
             category='sequential',
             parent_location=chapter.location,
-            due=datetime(2013, 9, 18, 11, 30, 00)
+            due=datetime(2013, 9, 18, 11, 30, 00),
+            format='homework'
         )
         vertical = ItemFactory.create(category='vertical', parent_location=section.location)
         ItemFactory.create(category='problem', parent_location=vertical.location)
@@ -975,8 +1009,7 @@ class BaseDueDateTests(ModuleStoreTestCase):
         self.user = UserFactory.create()
         self.assertTrue(self.client.login(username=self.user.username, password='test'))
 
-        self.time_with_tz = "due Sep 18, 2013 at 11:30 UTC"
-        self.time_without_tz = "due Sep 18, 2013 at 11:30"
+        self.time_with_tz = "2013-09-18 11:30:00+00:00"
 
     def test_backwards_compatability(self):
         # The test course being used has show_timezone = False in the policy file
@@ -985,8 +1018,7 @@ class BaseDueDateTests(ModuleStoreTestCase):
         # remove the timezone.
         course = self.set_up_course(due_date_display_format=None, show_timezone=False)
         response = self.get_response(course)
-        self.assertContains(response, self.time_without_tz)
-        self.assertNotContains(response, self.time_with_tz)
+        self.assertContains(response, self.time_with_tz)
         # Test that show_timezone has been cleared (which means you get the default value of True).
         self.assertTrue(course.show_timezone)
 
@@ -1001,25 +1033,11 @@ class BaseDueDateTests(ModuleStoreTestCase):
         response = self.get_response(course)
         self.assertContains(response, self.time_with_tz)
 
-    def test_format_plain_text(self):
-        # plain text due date
-        course = self.set_up_course(due_date_display_format="foobar")
-        response = self.get_response(course)
-        self.assertNotContains(response, self.time_with_tz)
-        self.assertContains(response, "due foobar")
-
     def test_format_date(self):
         # due date with no time
         course = self.set_up_course(due_date_display_format=u"%b %d %y")
         response = self.get_response(course)
-        self.assertNotContains(response, self.time_with_tz)
-        self.assertContains(response, "due Sep 18 13")
-
-    def test_format_hidden(self):
-        # hide due date completely
-        course = self.set_up_course(due_date_display_format=u"")
-        response = self.get_response(course)
-        self.assertNotContains(response, "due ")
+        self.assertContains(response, self.time_with_tz)
 
     def test_format_invalid(self):
         # improperly formatted due_date_display_format falls through to default
@@ -1049,7 +1067,10 @@ class TestAccordionDueDate(BaseDueDateTests):
 
     def get_response(self, course):
         """ Returns the HTML for the accordion """
-        return self.client.get(reverse('courseware', args=[unicode(course.id)]), follow=True)
+        return self.client.get(
+            reverse('courseware', args=[unicode(course.id)]),
+            follow=True
+        )
 
 
 @attr(shard=1)
@@ -1089,14 +1110,17 @@ class StartDateTests(ModuleStoreTestCase):
         course = self.set_up_course()
         response = self.get_about_response(course.id)
         # The start date is set in the set_up_course function above.
-        self.assertContains(response, "2013-SEPTEMBER-16")
+        # This should return in the format '%Y-%m-%dT%H:%M:%S%z'
+        self.assertContains(response, "2013-09-16T07:17:28+0000")
 
-    @patch('util.date_utils.pgettext', fake_pgettext(translations={
-        ("abbreviated month name", "Jul"): "JULY",
-    }))
-    @patch('util.date_utils.ugettext', fake_ugettext(translations={
-        "SHORT_DATE_FORMAT": "%Y-%b-%d",
-    }))
+    @patch(
+        'util.date_utils.pgettext',
+        fake_pgettext(translations={("abbreviated month name", "Jul"): "JULY", })
+    )
+    @patch(
+        'util.date_utils.ugettext',
+        fake_ugettext(translations={"SHORT_DATE_FORMAT": "%Y-%b-%d", })
+    )
     @unittest.skip
     def test_format_localized_in_xml_course(self):
         response = self.get_about_response(SlashSeparatedCourseKey('edX', 'toy', 'TT_2012_Fall'))
@@ -1106,6 +1130,7 @@ class StartDateTests(ModuleStoreTestCase):
 
 # pylint: disable=protected-access, no-member
 @attr(shard=1)
+@override_settings(ENABLE_ENTERPRISE_INTEGRATION=False)
 @ddt.ddt
 class ProgressPageTests(ModuleStoreTestCase):
     """
@@ -1254,7 +1279,7 @@ class ProgressPageTests(ModuleStoreTestCase):
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
     @patch(
         'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
-        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': []}),
+        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}}),
     )
     def test_view_certificate_link(self):
         """
@@ -1313,7 +1338,7 @@ class ProgressPageTests(ModuleStoreTestCase):
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': False})
     @patch(
         'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
-        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': []})
+        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}})
     )
     def test_view_certificate_link_hidden(self):
         """
@@ -1345,22 +1370,22 @@ class ProgressPageTests(ModuleStoreTestCase):
         """Test that query counts remain the same for self-paced and instructor-paced courses."""
         SelfPacedConfiguration(enabled=self_paced_enabled).save()
         self.setup_course(self_paced=self_paced)
-        with self.assertNumQueries(39), check_mongo_calls(4):
+        with self.assertNumQueries(38), check_mongo_calls(4):
             self._get_progress_page()
 
     def test_progress_queries(self):
         self.setup_course()
-        with self.assertNumQueries(39), check_mongo_calls(4):
+        with self.assertNumQueries(38), check_mongo_calls(4):
             self._get_progress_page()
 
         # subsequent accesses to the progress page require fewer queries.
         for _ in range(2):
-            with self.assertNumQueries(22), check_mongo_calls(4):
+            with self.assertNumQueries(24), check_mongo_calls(4):
                 self._get_progress_page()
 
     @patch(
         'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
-        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': []})
+        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}})
     )
     @ddt.data(
         *itertools.product(
@@ -1400,7 +1425,7 @@ class ProgressPageTests(ModuleStoreTestCase):
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
     @patch(
         'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
-        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': []})
+        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}})
     )
     def test_page_with_invalidated_certificate_with_html_view(self):
         """
@@ -1434,7 +1459,7 @@ class ProgressPageTests(ModuleStoreTestCase):
 
     @patch(
         'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
-        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': []})
+        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}})
     )
     def test_page_with_invalidated_certificate_with_pdf(self):
         """
@@ -1451,7 +1476,7 @@ class ProgressPageTests(ModuleStoreTestCase):
 
     @patch(
         'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
-        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': []})
+        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}})
     )
     def test_message_for_audit_mode(self):
         """ Verify that message appears on progress page, if learner is enrolled
@@ -1801,6 +1826,7 @@ class ViewCheckerBlock(XBlock):
     """
     has_children = True
     state = String(scope=Scope.user_state)
+    position = 0
 
     def student_view(self, context):  # pylint: disable=unused-argument
         """
@@ -2011,11 +2037,19 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase):
         reload_django_url_config()
         super(TestRenderXBlock, self).setUp()
 
-    def get_response(self, url_encoded_params=None):
+    def test_render_xblock_with_invalid_usage_key(self):
+        """
+        Test XBlockRendering with invalid usage key
+        """
+        response = self.get_response(usage_key='some_invalid_usage_key')
+        self.assertEqual(response.status_code, 404)
+        self.assertIn('Page not found', response.content)
+
+    def get_response(self, usage_key, url_encoded_params=None):
         """
         Overridable method to get the response from the endpoint that is being tested.
         """
-        url = reverse('render_xblock', kwargs={"usage_key_string": unicode(self.html_block.location)})
+        url = reverse('render_xblock', kwargs={'usage_key_string': unicode(usage_key)})
         if url_encoded_params:
             url += '?' + url_encoded_params
         return self.client.get(url)
@@ -2033,3 +2067,83 @@ class TestRenderXBlockSelfPaced(TestRenderXBlock):
 
     def course_options(self):
         return {'self_paced': True}
+
+
+class TestIndexViewCrawlerStudentStateWrites(SharedModuleStoreTestCase):
+    """
+    Ensure that courseware index requests do not trigger student state writes.
+
+    This is to prevent locking issues that have caused latency spikes in the
+    courseware_studentmodule table when concurrent requests each try to update
+    the same rows for sequence, section, and course positions.
+    """
+    @classmethod
+    def setUpClass(cls):
+        """Set up the simplest course possible."""
+        # setUpClassAndTestData() already calls setUpClass on SharedModuleStoreTestCase
+        # pylint: disable=super-method-not-called
+        with super(TestIndexViewCrawlerStudentStateWrites, cls).setUpClassAndTestData():
+            cls.course = CourseFactory.create()
+            with cls.store.bulk_operations(cls.course.id):
+                cls.chapter = ItemFactory.create(category='chapter', parent_location=cls.course.location)
+                cls.section = ItemFactory.create(category='sequential', parent_location=cls.chapter.location)
+                cls.vertical = ItemFactory.create(category='vertical', parent_location=cls.section.location)
+
+    @classmethod
+    def setUpTestData(cls):
+        """Set up and enroll our fake user in the course."""
+        cls.password = 'test'
+        cls.user = UserFactory(password=cls.password)
+        CourseEnrollment.enroll(cls.user, cls.course.id)
+
+    def setUp(self):
+        """Do the client login."""
+        super(TestIndexViewCrawlerStudentStateWrites, self).setUp()
+        self.client.login(username=self.user.username, password=self.password)
+
+    def test_write_by_default(self):
+        """By default, always write student state, regardless of user agent."""
+        with patch('courseware.model_data.UserStateCache.set_many') as patched_state_client_set_many:
+            # Simulate someone using Chrome
+            self._load_courseware('Mozilla/5.0 AppleWebKit/537.36')
+            self.assertTrue(patched_state_client_set_many.called)
+            patched_state_client_set_many.reset_mock()
+
+            # Common crawler user agent
+            self._load_courseware('edX-downloader/0.1')
+            self.assertTrue(patched_state_client_set_many.called)
+
+    def test_writes_with_config(self):
+        """Test state writes (or lack thereof) based on config values."""
+        CrawlersConfig.objects.create(known_user_agents='edX-downloader,crawler_foo', enabled=True)
+        with patch('courseware.model_data.UserStateCache.set_many') as patched_state_client_set_many:
+            # Exact matching of crawler user agent
+            self._load_courseware('crawler_foo')
+            self.assertFalse(patched_state_client_set_many.called)
+
+            # Partial matching of crawler user agent
+            self._load_courseware('edX-downloader/0.1')
+            self.assertFalse(patched_state_client_set_many.called)
+
+            # Simulate an actual browser hitting it (we should write)
+            self._load_courseware('Mozilla/5.0 AppleWebKit/537.36')
+            self.assertTrue(patched_state_client_set_many.called)
+
+        # Disabling the crawlers config should revert us to default behavior
+        CrawlersConfig.objects.create(enabled=False)
+        self.test_write_by_default()
+
+    def _load_courseware(self, user_agent):
+        """Helper to load the actual courseware page."""
+        url = reverse(
+            'courseware_section',
+            kwargs={
+                'course_id': unicode(self.course.id),
+                'chapter': unicode(self.chapter.location.name),
+                'section': unicode(self.section.location.name),
+            }
+        )
+        response = self.client.get(url, HTTP_USER_AGENT=user_agent)
+        # Make sure we get back an actual 200, and aren't redirected because we
+        # messed up the setup somehow (e.g. didn't enroll properly)
+        self.assertEqual(response.status_code, 200)

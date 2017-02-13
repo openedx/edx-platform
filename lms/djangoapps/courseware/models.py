@@ -23,7 +23,9 @@ from django.db.models.signals import post_save
 from model_utils.models import TimeStampedModel
 import coursewarehistoryextended
 
-from xmodule_django.models import CourseKeyField, LocationKeyField, BlockTypeKeyField
+from openedx.core.djangoapps.xmodule_django.models import (
+    CourseKeyField, LocationKeyField, BlockTypeKeyField
+)
 
 log = logging.getLogger("edx.courseware")
 

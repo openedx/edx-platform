@@ -13,7 +13,6 @@ from courseware.module_render import toc_for_course, get_module, handle_xblock_c
 from courseware.tests.factories import UserFactory, InstructorFactory, StaffFactory
 from courseware.tests.helpers import (
     LoginEnrollmentTestCase,
-    get_request_for_user
 )
 from courseware.entrance_exams import (
     course_has_entrance_exam,
@@ -22,6 +21,7 @@ from courseware.entrance_exams import (
     user_can_skip_entrance_exam,
     user_has_passed_entrance_exam,
 )
+from openedx.core.djangolib.testing.utils import get_mock_request
 from student.models import CourseEnrollment
 from student.tests.factories import CourseEnrollmentFactory, AnonymousUserFactory
 from util.milestones_helpers import (
@@ -141,7 +141,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         self.course.entrance_exam_id = unicode(self.entrance_exam.scope_ids.usage_id)
 
         self.anonymous_user = AnonymousUserFactory()
-        self.request = get_request_for_user(UserFactory())
+        self.request = get_mock_request(UserFactory())
         modulestore().update_item(self.course, self.request.user.id)  # pylint: disable=no-member
 
         self.client.login(username=self.request.user.username, password="test")

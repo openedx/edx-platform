@@ -14,8 +14,10 @@
  *  - edit_display_name - true if the shown xblock's display name should be in inline edit mode
  */
 define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/components/utils/view_utils',
-        'js/views/utils/xblock_utils', 'js/views/xblock_string_field_editor'],
-    function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, XBlockStringFieldEditor) {
+        'js/views/utils/xblock_utils', 'js/views/xblock_string_field_editor',
+        'edx-ui-toolkit/js/utils/string-utils', 'edx-ui-toolkit/js/utils/html-utils'],
+    function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, XBlockStringFieldEditor, StringUtils, HtmlUtils) {
+        'use strict';
         var XBlockOutlineView = BaseView.extend({
             // takes XBlockInfo as a model
 
@@ -68,7 +70,10 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/compo
                 if (this.parentInfo) {
                     this.setElement($(html));
                 } else {
-                    this.$el.html(html);
+                    HtmlUtils.setHtml(
+                        this.$el,
+                        HtmlUtils.HTML(html)
+                    );
                 }
             },
 
@@ -83,7 +88,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/compo
                     defaultNewChildName = null,
                     isCollapsed = this.shouldRenderChildren() && !this.shouldExpandChildren();
                 if (childInfo) {
-                    addChildName = interpolate(gettext('New %(component_type)s'), {
+                    addChildName = StringUtils.interpolate(gettext('New {component_type}'), {
                         component_type: childInfo.display_name
                     }, true);
                     defaultNewChildName = childInfo.display_name;
@@ -126,8 +131,12 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/compo
                 return this.$('> .outline-content > ol');
             },
 
-            addChildView: function(childView) {
-                this.getListElement().append(childView.$el);
+            addChildView: function(childView, xblockElement) {
+                if (xblockElement) {
+                    childView.$el.insertAfter(xblockElement);
+                } else {
+                    this.getListElement().append(childView.$el);
+                }
             },
 
             addNameEditor: function() {
@@ -186,6 +195,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/compo
             addButtonActions: function(element) {
                 var self = this;
                 element.find('.delete-button').click(_.bind(this.handleDeleteEvent, this));
+                element.find('.duplicate-button').click(_.bind(this.handleDuplicateEvent, this));
                 element.find('.button-new').click(_.bind(this.handleAddEvent, this));
             },
 
@@ -281,9 +291,9 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/compo
 
             handleDeleteEvent: function(event) {
                 var self = this,
-                    parentView = this.parentView;
+                    parentView = this.parentView,
+                    xblockType = XBlockViewUtils.getXBlockType(this.model.get('category'), parentView.model, true);
                 event.preventDefault();
-                var xblockType = XBlockViewUtils.getXBlockType(this.model.get('category'), parentView.model, true);
                 XBlockViewUtils.deleteXBlock(this.model, xblockType).done(function() {
                     if (parentView) {
                         parentView.onChildDeleted(self, event);
@@ -291,12 +301,50 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/compo
                 });
             },
 
+            /**
+             * Finds appropriate parent element for an xblock element.
+             * @param {jquery Element}  xblockElement  The xblock element to be duplicated.
+             * @param {String}  xblockType The front-end terminology of the xblock category.
+             * @returns {jquery Element} Appropriate parent element of xblock element.
+             */
+            getParentElement: function(xblockElement, xblockType) {
+                var xblockMap = {
+                        unit: 'subsection',
+                        subsection: 'section',
+                        section: 'course'
+                    },
+                    parentXblockType = xblockMap[xblockType];
+                return xblockElement.closest('.outline-' + parentXblockType);
+            },
+
+            /**
+             * Duplicate event handler.
+             */
+            handleDuplicateEvent: function(event) {
+                var self = this,
+                    xblockType = XBlockViewUtils.getXBlockType(self.model.get('category'), self.parentView.model),
+                    xblockElement = $(event.currentTarget).closest('.outline-item'),
+                    parentElement = self.getParentElement(xblockElement, xblockType);
+
+                event.preventDefault();
+                XBlockViewUtils.duplicateXBlock(xblockElement, parentElement)
+                    .done(function(data) {
+                        if (self.parentView) {
+                            self.parentView.onChildDuplicated(
+                                data.locator,
+                                xblockType,
+                                xblockElement
+                            );
+                        }
+                    });
+            },
+
             handleAddEvent: function(event) {
                 var self = this,
-                    target = $(event.currentTarget),
-                    category = target.data('category');
+                    $target = $(event.currentTarget),
+                    category = $target.data('category');
                 event.preventDefault();
-                XBlockViewUtils.addXBlock(target).done(function(locator) {
+                XBlockViewUtils.addXBlock($target).done(function(locator) {
                     self.onChildAdded(locator, category, event);
                 });
             }

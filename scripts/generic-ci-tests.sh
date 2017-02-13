@@ -83,7 +83,7 @@ case "$TEST_SUITE" in
         echo "Finding ESLint violations and storing report..."
         paver run_eslint -l $ESLINT_THRESHOLD > eslint.log || { cat eslint.log; EXIT=1; }
         echo "Running code complexity report (python)."
-        paver run_complexity > reports/code_complexity.log || echo "Unable to calculate code complexity. Ignoring error."
+        paver run_complexity || echo "Unable to calculate code complexity. Ignoring error."
         echo "Running safe template linter report."
         paver run_safelint -t $SAFELINT_THRESHOLDS > safelint.log || { cat safelint.log; EXIT=1; }
         echo "Running safe commit linter report."
@@ -162,12 +162,6 @@ case "$TEST_SUITE" in
 
     "bok-choy")
 
-        # Back compatibility support for firefox upgrade:
-        # Copy newer firefox version to project root,
-        # set that as the path for bok-choy to use.
-        cp -R $HOME/firefox/ firefox/
-        export SELENIUM_FIREFOX_PATH=firefox/firefox
-
         PAVER_ARGS="-n $NUMBER_OF_BOKCHOY_THREADS --with-flaky --with-xunit"
 
         case "$SHARD" in
@@ -176,11 +170,11 @@ case "$TEST_SUITE" in
                 paver test_bokchoy $PAVER_ARGS
                 ;;
 
-            [1-8])
+            [1-9]|10)
                 paver test_bokchoy --attr="shard=$SHARD" $PAVER_ARGS
                 ;;
 
-            9|"noshard")
+            11|"noshard")
                 paver test_bokchoy --attr='!shard,a11y=False' $PAVER_ARGS
                 ;;
 

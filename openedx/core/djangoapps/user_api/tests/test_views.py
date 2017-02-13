@@ -19,9 +19,10 @@ from pytz import common_timezones_set, UTC
 from social.apps.django_app.default.models import UserSocialAuth
 
 from django_comment_common import models
+from openedx.core.djangoapps.site_configuration.helpers import get_value
 from openedx.core.lib.api.test_utils import ApiTestCase, TEST_API_KEY
 from openedx.core.lib.time_zone_utils import get_display_time_zone
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from student.tests.factories import UserFactory
 from third_party_auth.tests.testutil import simulate_running_pipeline, ThirdPartyAuthTestMixin
 from third_party_auth.tests.utils import (
@@ -541,7 +542,7 @@ class PreferenceUsersListViewTest(UserApiTestCase):
 
 
 @ddt.ddt
-@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class LoginSessionViewTest(UserAPITestCase):
     """Tests for the login end-points of the user API. """
 
@@ -713,7 +714,7 @@ class LoginSessionViewTest(UserAPITestCase):
 
 
 @ddt.ddt
-@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class PasswordResetViewTest(UserAPITestCase):
     """Tests of the user API's password reset endpoint. """
 
@@ -771,7 +772,7 @@ class PasswordResetViewTest(UserAPITestCase):
 
 
 @ddt.ddt
-@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
     """Tests for the registration end-points of the User API. """
 
@@ -1020,9 +1021,46 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                     {"value": "hs", "name": "Secondary/high school"},
                     {"value": "jhs", "name": "Junior secondary/junior high/middle school"},
                     {"value": "el", "name": "Elementary/primary school"},
-                    {"value": "none", "name": "No Formal Education"},
-                    {"value": "other", "name": "Other Education"},
+                    {"value": "none", "name": "No formal education"},
+                    {"value": "other", "name": "Other education"},
                 ],
+            }
+        )
+
+    @mock.patch('util.enterprise_helpers.active_provider_requests_data_sharing')
+    @mock.patch('util.enterprise_helpers.active_provider_enforces_data_sharing')
+    @mock.patch('util.enterprise_helpers.get_enterprise_customer_for_request')
+    @mock.patch('util.enterprise_helpers.configuration_helpers')
+    def test_register_form_consent_field(self, config_helper, get_ec, mock_enforce, mock_request):
+        """
+        Test that if we have an EnterpriseCustomer active for the request, and that
+        EnterpriseCustomer is set to require data sharing consent, the correct
+        field is added to the form descriptor.
+        """
+        fake_ec = mock.MagicMock(
+            enforces_data_sharing_consent=mock.MagicMock(return_value=True),
+            requests_data_sharing_consent=True,
+        )
+        fake_ec.name = 'MegaCorp'
+        get_ec.return_value = fake_ec
+        config_helper.get_value.return_value = 'OpenEdX'
+        mock_request.return_value = True
+        mock_enforce.return_value = True
+        self._assert_reg_field(
+            dict(),
+            {
+                u"name": u"data_sharing_consent",
+                u"type": u"checkbox",
+                u"required": True,
+                u"label": (
+                    "I agree to allow OpenEdX to share data about my enrollment, "
+                    "completion and performance in all OpenEdX courses and programs "
+                    "where my enrollment is sponsored by MegaCorp."
+                ),
+                u"defaultValue": False,
+                u"errorMessages": {
+                    u'required': u'To link your account with MegaCorp, you are required to consent to data sharing.',
+                }
             }
         )
 
@@ -1046,8 +1084,8 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                     {"value": "hs", "name": "Secondary/high school TRANSLATED"},
                     {"value": "jhs", "name": "Junior secondary/junior high/middle school TRANSLATED"},
                     {"value": "el", "name": "Elementary/primary school TRANSLATED"},
-                    {"value": "none", "name": "No Formal Education TRANSLATED"},
-                    {"value": "other", "name": "Other Education TRANSLATED"},
+                    {"value": "none", "name": "No formal education TRANSLATED"},
+                    {"value": "other", "name": "Other education TRANSLATED"},
                 ],
             }
         )
@@ -1768,6 +1806,24 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
 
         self.assertContains(response, 'Kosovo')
 
+    def test_create_account_not_allowed(self):
+        """
+        Test case to check user creation is forbidden when ALLOW_PUBLIC_ACCOUNT_CREATION feature flag is turned off
+        """
+        def _side_effect_for_get_value(value, default=None):
+            """
+            returns a side_effect with given return value for a given value
+            """
+            if value == 'ALLOW_PUBLIC_ACCOUNT_CREATION':
+                return False
+            else:
+                return get_value(value, default)
+
+        with mock.patch('openedx.core.djangoapps.site_configuration.helpers.get_value') as mock_get_value:
+            mock_get_value.side_effect = _side_effect_for_get_value
+            response = self.client.post(self.url, {"email": self.EMAIL, "username": self.USERNAME})
+            self.assertEqual(response.status_code, 403)
+
 
 @httpretty.activate
 @ddt.ddt
@@ -1923,7 +1979,7 @@ class TestGoogleRegistrationView(
 
 
 @ddt.ddt
-@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class UpdateEmailOptInTestCase(UserAPITestCase, SharedModuleStoreTestCase):
     """Tests the UpdateEmailOptInPreference view. """
 
@@ -2037,8 +2093,8 @@ class CountryTimeZoneListViewTest(UserApiTestCase):
         self.assertIn(time_zone_name, common_timezones_set)
         self.assertEqual(time_zone_info['description'], get_display_time_zone(time_zone_name))
 
-    @ddt.data((ALL_TIME_ZONES_URI, 432),
-              (COUNTRY_TIME_ZONES_URI, 27))
+    @ddt.data((ALL_TIME_ZONES_URI, 436),
+              (COUNTRY_TIME_ZONES_URI, 28))
     @ddt.unpack
     def test_get_basic(self, country_uri, expected_count):
         """ Verify that correct time zone info is returned """

@@ -1,4 +1,5 @@
 /* globals requirejs, requireSerial */
+/* eslint-disable quote-props */
 
 (function(requirejs, requireSerial) {
     'use strict';
@@ -36,19 +37,18 @@
             'backbone': 'common/js/vendor/backbone',
             'backbone.associations': 'xmodule_js/common_static/js/vendor/backbone-associations-min',
             'backbone.paginator': 'common/js/vendor/backbone.paginator',
-            'backbone.validation': 'common/js/vendor/backbone-validation',
             'tinymce': 'xmodule_js/common_static/js/vendor/tinymce/js/tinymce/tinymce.full.min',
             'jquery.tinymce': 'xmodule_js/common_static/js/vendor/tinymce/js/tinymce/jquery.tinymce',
             'xmodule': 'xmodule_js/src/xmodule',
             'xblock/cms.runtime.v1': 'cms/js/xblock/cms.runtime.v1',
             'xblock': 'common/js/xblock',
             'utility': 'xmodule_js/common_static/js/src/utility',
-            'sinon': 'xmodule_js/common_static/js/vendor/sinon-1.17.0',
-            'squire': 'xmodule_js/common_static/js/vendor/Squire',
+            'sinon': 'common/js/vendor/sinon',
+            'squire': 'common/js/vendor/Squire',
             'draggabilly': 'xmodule_js/common_static/js/vendor/draggabilly',
             'domReady': 'xmodule_js/common_static/js/vendor/domReady',
             'URI': 'xmodule_js/common_static/js/vendor/URI.min',
-            mathjax: '//cdn.mathjax.org/mathjax/2.6-latest/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured',   // eslint-disable-line max-len
+            mathjax: '//cdn.mathjax.org/mathjax/2.7-latest/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured',   // eslint-disable-line max-len
             'youtube': '//www.youtube.com/player_api?noext',
             'coffee/src/ajax_prefix': 'xmodule_js/common_static/coffee/src/ajax_prefix'
         },
@@ -206,6 +206,6 @@
     ];
 
     requireSerial(specHelpers.concat(testFiles), function() {
-        return window.__karma__.start();
+        return window.__karma__.start();  // eslint-disable-line no-underscore-dangle
     });
 }).call(this, requirejs, requireSerial);

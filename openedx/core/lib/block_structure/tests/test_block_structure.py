@@ -131,6 +131,7 @@ class TestBlockStructureData(TestCase, ChildrenMapTestMixin):
         block_structure = BlockStructureModulestoreData(root_block_usage_key=0)
         for block in blocks:
             block_structure._add_xblock(block.location, block)
+            block_structure._get_or_create_block(block.location)
 
         # request fields
         fields = ["field1", "field2", "field3"]

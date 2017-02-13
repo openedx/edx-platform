@@ -18,7 +18,7 @@ class PythonTestSuite(TestSuite):
     def __init__(self, *args, **kwargs):
         super(PythonTestSuite, self).__init__(*args, **kwargs)
         self.opts = kwargs
-        self.disable_migrations = kwargs.get('disable_migrations', False)
+        self.disable_migrations = kwargs.get('disable_migrations', True)
         self.fasttest = kwargs.get('fasttest', False)
         self.subsuites = kwargs.get('subsuites', self._default_subsuites)
 

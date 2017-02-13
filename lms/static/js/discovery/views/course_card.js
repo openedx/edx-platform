@@ -4,24 +4,19 @@
         'underscore',
         'backbone',
         'gettext',
-        'date'
-    ], function($, _, Backbone, gettext, Date) {
+        'edx-ui-toolkit/js/utils/date-utils'
+    ], function($, _, Backbone, gettext, DateUtils) {
         'use strict';
 
-        function formatDate(date) {
-            return dateUTC(date).toString('MMM dd, yyyy');
-        }
-
-    // Return a date object using UTC time instead of local time
-        function dateUTC(date) {
-            return new Date(
-            date.getUTCFullYear(),
-            date.getUTCMonth(),
-            date.getUTCDate(),
-            date.getUTCHours(),
-            date.getUTCMinutes(),
-            date.getUTCSeconds()
-        );
+        function formatDate(date, userLanguage, userTimezone) {
+            var context;
+            context = {
+                datetime: date,
+                language: userLanguage,
+                timezone: userTimezone,
+                format: DateUtils.dateFormatEnum.shortDate
+            };
+            return DateUtils.localize(context);
         }
 
         return Backbone.View.extend({
@@ -36,8 +31,26 @@
 
             render: function() {
                 var data = _.clone(this.model.attributes);
-                data.start = formatDate(new Date(data.start));
-                data.enrollment_start = formatDate(new Date(data.enrollment_start));
+                var userLanguage = '',
+                    userTimezone = '';
+                if (this.model.userPreferences !== undefined) {
+                    userLanguage = this.model.userPreferences.userLanguage;
+                    userTimezone = this.model.userPreferences.userTimezone;
+                }
+                if (data.advertised_start !== undefined) {
+                    data.start = data.advertised_start;
+                } else {
+                    data.start = formatDate(
+                        new Date(data.start),
+                        userLanguage,
+                        userTimezone
+                    );
+                }
+                data.enrollment_start = formatDate(
+                    new Date(data.enrollment_start),
+                    userLanguage,
+                    userTimezone
+                );
                 this.$el.html(this.tpl(data));
                 return this;
             }

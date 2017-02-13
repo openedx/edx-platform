@@ -1,10 +1,10 @@
 // discussion - elements - labels
 // ====================
 
-body.discussion, .discussion-module {
+.discussion {
   .post-label {
     @include margin($baseline/4, $baseline/2, 0, 0);
-    @extend %t-weight4;
+    @extend %t-light;
     font-size: $forum-small-font-size;
     display: inline;
     white-space: nowrap;
@@ -42,13 +42,13 @@ body.discussion, .discussion-module {
     }
   }
 
-  .user-label-staff {
-    @include forum-user-label($forum-color-staff);
+  .user-label-staff,
+  .user-label-community-ta {
+    color: $forum-color-copy-light;
+    font-size: $forum-small-font-size;
+    white-space: nowrap;
   }
 
-  .user-label-community-ta {
-    @include forum-user-label($forum-color-community-ta);
-  }
 }
 
 // Make post labels tighter when shown inside the left nav

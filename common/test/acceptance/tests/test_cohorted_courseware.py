@@ -147,10 +147,6 @@ class EndToEndCohortedCoursewareTest(ContainerBase):
 
         def add_cohort_with_student(cohort_name, content_group, student):
             cohort_management_page.add_cohort(cohort_name, content_group=content_group)
-            # After adding the cohort, it should automatically be selected
-            EmptyPromise(
-                lambda: cohort_name == cohort_management_page.get_selected_cohort(), "Waiting for new cohort"
-            ).fulfill()
             cohort_management_page.add_students_to_selected_cohort([student])
 
         add_cohort_with_student("Cohort A", self.content_group_a, self.cohort_a_student_username)

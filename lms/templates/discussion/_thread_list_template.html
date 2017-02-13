@@ -1,7 +1,6 @@
 <%page expression_filter="h"/>
 <%! from django.utils.translation import ugettext as _ %>
 <script type="text/template" id="thread-list-template">
-    <%include file="_filter_dropdown.html" />
     <div class="forum-nav-thread-list-wrapper" id="sort-filter-wrapper" tabindex="-1">
         <div class="forum-nav-refine-bar">
             <label class="forum-nav-filter-main">
@@ -9,12 +8,12 @@
                 <span class="sr">${_("Filter:")}</span>
                 <select class="forum-nav-filter-main-control">
                     ## Translators: This is a menu option for showing all forum threads unfiltered
-                    <option value="all">${_("Show all")}</option>
+                    <option value="all">${_("Show all posts")}</option>
                     ## Translators: This is a menu option for showing only unread forum threads
-                    <option value="unread">${_("Unread")}</option>
+                    <option value="unread">${_("Unread posts")}</option>
                     ## Translators: This is a menu option for showing only unanswered forum
                     ## question threads
-                    <option value="unanswered">${_("Unanswered")}</option>
+                    <option value="unanswered">${_("Unanswered posts")}</option>
                     %if flag_moderator:
                         ## Translators: This is a menu option for showing only forum threads flagged
                         ## for abuse
@@ -27,7 +26,8 @@
                 <span class="sr">${_("Cohort:")}</span>
                 <select class="forum-nav-filter-cohort-control">
                     <option value="">${_("in all cohorts")}</option>
-                        %for c in cohorts:
+                        ## cohorts is not iterable sometimes because inline discussions xmodule doesn't pass it
+                        %for c in (cohorts or []):
                             <option value="${c['id']}">${c['name']}</option>
                         %endfor
                 </select>

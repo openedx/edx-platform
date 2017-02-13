@@ -5,7 +5,6 @@ Tests for bookmark views.
 import ddt
 import json
 from nose.plugins.attrib import attr
-from unittest import skipUnless
 import urllib
 
 from django.conf import settings
@@ -13,6 +12,7 @@ from django.core.urlresolvers import reverse
 from mock import patch
 from rest_framework.test import APIClient
 
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.modulestore import ModuleStoreEnum
 
 from .test_models import BookmarksTestsBase
@@ -66,7 +66,7 @@ class BookmarksViewsTestsBase(BookmarksTestsBase, BookmarkApiEventTestMixin):
 
 @attr(shard=2)
 @ddt.ddt
-@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Tests only valid in LMS')
+@skip_unless_lms
 class BookmarksListViewTests(BookmarksViewsTestsBase):
     """
     This contains the tests for GET & POST methods of bookmark.views.BookmarksListView class
@@ -371,7 +371,7 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
 
 @attr(shard=2)
 @ddt.ddt
-@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Tests only valid in LMS')
+@skip_unless_lms
 class BookmarksDetailViewTests(BookmarksViewsTestsBase):
     """
     This contains the tests for GET & DELETE methods of bookmark.views.BookmarksDetailView class

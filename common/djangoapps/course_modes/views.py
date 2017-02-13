@@ -23,7 +23,7 @@ from lms.djangoapps.commerce.utils import EcommerceService
 from course_modes.models import CourseMode
 from courseware.access import has_access
 from edxmako.shortcuts import render_to_response
-from embargo import api as embargo_api
+from openedx.core.djangoapps.embargo import api as embargo_api
 from student.models import CourseEnrollment
 from util.db import outer_atomic
 
@@ -272,6 +272,7 @@ def create_mode(request, course_id):
         `min_price` (int): The minimum price a user must pay to enroll in the new course mode
         `suggested_prices` (str): Comma-separated prices to suggest to the user.
         `currency` (str): The currency in which to list prices.
+        `sku` (str): The product SKU value.
 
     By default, this endpoint will create an 'honor' mode for the given course with display name
     'Honor Code', a minimum price of 0, no suggested prices, and using USD as the currency.
@@ -289,6 +290,7 @@ def create_mode(request, course_id):
         'min_price': 0,
         'suggested_prices': u'',
         'currency': u'usd',
+        'sku': None,
     }
 
     # Try pulling querystring parameters out of the request

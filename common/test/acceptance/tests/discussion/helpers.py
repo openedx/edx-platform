@@ -11,6 +11,8 @@ from common.test.acceptance.fixtures.discussion import (
     SingleThreadViewFixture,
     Thread,
     Response,
+    ForumsConfigMixin,
+    MultipleThreadFixture,
 )
 from common.test.acceptance.pages.lms.discussion import DiscussionTabSingleThreadPage
 from common.test.acceptance.tests.helpers import UniqueCourseTest
@@ -35,6 +37,22 @@ class BaseDiscussionMixin(object):
         thread_fixture.push()
         self.setup_thread_page(thread_id)
         return thread_id
+
+    def setup_multiple_threads(self, thread_count, **thread_kwargs):
+        """
+        Set up multiple threads on the page by passing 'thread_count'.
+        """
+        self.thread_ids = []  # pylint: disable=attribute-defined-outside-init
+        threads = []  # pylint: disable=attribute-defined-outside-init
+        for i in range(thread_count):
+            thread_id = "test_thread_{}_{}".format(i, uuid4().hex)
+            thread_body = "Dummy long text body." * 50
+            threads.append(
+                Thread(id=thread_id, commentable_id=self.discussion_id, body=thread_body, **thread_kwargs),
+            )
+            self.thread_ids.append(thread_id)
+        thread_fixture = MultipleThreadFixture(threads)
+        thread_fixture.push()
 
 
 class CohortTestMixin(object):
@@ -86,7 +104,8 @@ class CohortTestMixin(object):
         self.assertTrue(response.ok, "Failed to add user to cohort")
 
 
-class BaseDiscussionTestCase(UniqueCourseTest):
+class BaseDiscussionTestCase(UniqueCourseTest, ForumsConfigMixin):
+    """Base test case class for all discussions-related tests."""
     def setUp(self):
         super(BaseDiscussionTestCase, self).setUp()
 
@@ -96,6 +115,8 @@ class BaseDiscussionTestCase(UniqueCourseTest):
             {'discussion_topics': {'value': {'Test Discussion Topic': {'id': self.discussion_id}}}}
         )
         self.course_fixture.install()
+
+        self.enable_forums()
 
     def create_single_thread_page(self, thread_id):
         """

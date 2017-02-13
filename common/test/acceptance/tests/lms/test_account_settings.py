@@ -2,22 +2,20 @@
 """
 End-to-end tests for the Account Settings page.
 """
-from unittest import skip
-from nose.plugins.attrib import attr
-
-from bok_choy.web_app_test import WebAppTest
-from bok_choy.page_object import XSS_INJECTION
 from datetime import datetime
+from unittest import skip
+
+from bok_choy.page_object import XSS_INJECTION
+from nose.plugins.attrib import attr
 from pytz import timezone, utc
 
 from common.test.acceptance.pages.lms.account_settings import AccountSettingsPage
 from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.dashboard import DashboardPage
+from common.test.acceptance.tests.helpers import AcceptanceTest, EventsTestMixin
 
-from common.test.acceptance.tests.helpers import EventsTestMixin
 
-
-class AccountSettingsTestMixin(EventsTestMixin, WebAppTest):
+class AccountSettingsTestMixin(EventsTestMixin, AcceptanceTest):
     """
     Mixin with helper methods to test the account settings page.
     """
@@ -91,7 +89,7 @@ class AccountSettingsTestMixin(EventsTestMixin, WebAppTest):
 
 
 @attr(shard=8)
-class DashboardMenuTest(AccountSettingsTestMixin, WebAppTest):
+class DashboardMenuTest(AccountSettingsTestMixin, AcceptanceTest):
     """
     Tests that the dashboard menu works correctly with the account settings page.
     """
@@ -114,7 +112,7 @@ class DashboardMenuTest(AccountSettingsTestMixin, WebAppTest):
 
 
 @attr(shard=8)
-class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
+class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
     """
     Tests that verify behaviour of the Account Settings page.
     """
@@ -216,7 +214,13 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
                 self.assertEqual(self.account_settings_page.value_for_text_field(field_id), new_value)
 
     def _test_dropdown_field(
-            self, field_id, title, initial_value, new_values, success_message=SUCCESS_MESSAGE, reloads_on_save=False
+            self,
+            field_id,
+            title,
+            initial_value,
+            new_values,
+            success_message=SUCCESS_MESSAGE,  # pylint: disable=unused-argument
+            reloads_on_save=False
     ):
         """
         Test behaviour of a dropdown field.
@@ -417,7 +421,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
         self._test_dropdown_field(
             u'time_zone',
             u'Time Zone',
-            u'',
+            u'Default (Local Time Zone)',
             [
                 u'Europe/Kiev ({abbr}, UTC{offset})'.format(abbr=kiev_abbr, offset=kiev_offset),
                 u'US/Pacific ({abbr}, UTC{offset})'.format(abbr=pacific_abbr, offset=pacific_offset),
@@ -497,7 +501,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
 
 
 @attr('a11y')
-class AccountSettingsA11yTest(AccountSettingsTestMixin, WebAppTest):
+class AccountSettingsA11yTest(AccountSettingsTestMixin, AcceptanceTest):
     """
     Class to test account settings accessibility.
     """

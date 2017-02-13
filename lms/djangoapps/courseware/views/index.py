@@ -22,15 +22,16 @@ import logging
 import newrelic.agent
 import urllib
 
-from lang_pref import LANGUAGE_KEY
 from xblock.fragment import Fragment
 from opaque_keys.edx.keys import CourseKey
-from openedx.core.lib.time_zone_utils import get_user_time_zone
+from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
+from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from shoppingcart.models import CourseRegistrationCode
 from student.models import CourseEnrollment
 from student.views import is_course_blocked
 from student.roles import GlobalStaff
+from util.enterprise_helpers import consent_needed_for_course, get_course_specific_consent_url
 from util.views import ensure_valid_course_key
 from xmodule.modulestore.django import modulestore
 from xmodule.x_module import STUDENT_VIEW
@@ -102,7 +103,7 @@ class CoursewareIndex(View):
                 self.course = get_course_with_access(request.user, 'load', self.course_key, depth=CONTENT_DEPTH)
                 self.is_staff = has_access(request.user, 'staff', self.course)
                 self._setup_masquerade_for_effective_user()
-                return self._get()
+                return self._get(request)
         except Redirect as redirect_error:
             return redirect(redirect_error.url)
         except UnicodeEncodeError:
@@ -128,12 +129,12 @@ class CoursewareIndex(View):
         # Set the user in the request to the effective user.
         self.request.user = self.effective_user
 
-    def _get(self):
+    def _get(self, request):
         """
         Render the index page.
         """
         self._redirect_if_needed_to_access_course()
-        self._prefetch_and_bind_course()
+        self._prefetch_and_bind_course(request)
 
         if self.course.has_children_at_depth(CONTENT_DEPTH):
             self._reset_section_to_exam_if_required()
@@ -194,6 +195,21 @@ class CoursewareIndex(View):
         self._redirect_if_needed_to_register()
         self._redirect_if_needed_for_prereqs()
         self._redirect_if_needed_for_course_survey()
+        self._redirect_if_data_sharing_consent_needed()
+
+    def _redirect_if_data_sharing_consent_needed(self):
+        """
+        Determine if the user needs to provide data sharing consent before accessing
+        the course, and redirect the user to provide consent if needed.
+        """
+        course_id = unicode(self.course_key)
+        if consent_needed_for_course(self.real_user, course_id):
+            log.warning(
+                u'User %s cannot access the course %s because they have not granted consent',
+                self.real_user,
+                course_id,
+            )
+            raise Redirect(get_course_specific_consent_url(self.request, course_id, 'courseware'))
 
     def _redirect_if_needed_to_pay_for_course(self):
         """
@@ -325,13 +341,17 @@ class CoursewareIndex(View):
         if self.chapter:
             return self._find_block(self.chapter, self.section_url_name, 'section')
 
-    def _prefetch_and_bind_course(self):
+    def _prefetch_and_bind_course(self, request):
         """
         Prefetches all descendant data for the requested section and
         sets up the runtime, which binds the request user to the section.
         """
         self.field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-            self.course_key, self.effective_user, self.course, depth=CONTENT_DEPTH,
+            self.course_key,
+            self.effective_user,
+            self.course,
+            depth=CONTENT_DEPTH,
+            read_only=CrawlersConfig.is_crawler(request),
         )
 
         self.course = get_module_for_descriptor(
@@ -349,7 +369,7 @@ class CoursewareIndex(View):
         sets up the runtime, which binds the request user to the section.
         """
         # Pre-fetch all descendant data
-        self.section = modulestore().get_item(self.section.location, depth=None)
+        self.section = modulestore().get_item(self.section.location, depth=None, lazy=False)
         self.field_data_cache.add_descriptor_descendents(self.section, depth=None)
 
         # Bind section to user
@@ -389,6 +409,8 @@ class CoursewareIndex(View):
             'bookmarks_api_url': reverse('bookmarks'),
             'language_preference': self._get_language_preference(),
             'disable_optimizely': True,
+            'section_title': None,
+            'sequence_title': None
         }
         table_of_contents = toc_for_course(
             self.effective_user,
@@ -398,7 +420,11 @@ class CoursewareIndex(View):
             self.section_url_name,
             self.field_data_cache,
         )
-        courseware_context['accordion'] = render_accordion(self.request, self.course, table_of_contents['chapters'])
+        courseware_context['accordion'] = render_accordion(
+            self.request,
+            self.course,
+            table_of_contents['chapters'],
+        )
 
         # entrance exam data
         if course_has_entrance_exam(self.course):
@@ -434,6 +460,11 @@ class CoursewareIndex(View):
                 table_of_contents['next_of_active_section'],
             )
             courseware_context['fragment'] = self.section.render(STUDENT_VIEW, section_context)
+            if self.section.position and self.section.has_children:
+                display_items = self.section.get_display_items()
+                if display_items:
+                    courseware_context['sequence_title'] = display_items[self.section.position - 1] \
+                        .display_name_with_default
 
         return courseware_context
 
@@ -506,7 +537,6 @@ def render_accordion(request, course, table_of_contents):
             ('course_id', unicode(course.id)),
             ('csrf', csrf(request)['csrf_token']),
             ('due_date_display_format', course.due_date_display_format),
-            ('time_zone', get_user_time_zone(request.user).zone),
         ] + TEMPLATE_IMPORTS.items()
     )
     return render_to_string('courseware/accordion.html', context)

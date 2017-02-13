@@ -1,3 +1,5 @@
+/* globals Discussion */
+
 define(
     [
         'underscore',
@@ -15,10 +17,12 @@ define(
                     DiscussionProfilePageFactory(_.extend(
                         {
                             courseId: testCourseId,
-                            $el: $('.discussion-user-threads'),
-                            user_info: DiscussionSpecHelper.getTestUserInfo(),
                             roles: DiscussionSpecHelper.getTestRoleInfo(),
-                            sort_preference: null,
+                            courseSettings: DiscussionSpecHelper.createTestCourseSettings().attributes,
+                            el: $('.discussion-user-threads'),
+                            discussion: new Discussion(),
+                            userInfo: DiscussionSpecHelper.getTestUserInfo(),
+                            sortPreference: null,
                             threads: [],
                             page: 1,
                             numPages: 5
@@ -34,7 +38,7 @@ define(
 
             it('can render itself', function() {
                 initializeDiscussionProfilePageFactory();
-                expect($('.discussion-user-threads').text()).toContain('Active Threads');
+                expect($('.discussion-user-threads').text()).toContain('Show');
             });
         });
     }

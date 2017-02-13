@@ -1,14 +1,15 @@
+# coding=utf-8
 """
 Test the course_info xblock
 """
 import mock
 from nose.plugins.attrib import attr
 from pyquery import PyQuery as pq
-from urllib import urlencode
 
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.http import QueryDict
 from django.test.utils import override_settings
 
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
@@ -59,6 +60,31 @@ class CourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
         resp = self.client.get(url)
         self.assertNotIn("You are not currently enrolled in this course", resp.content)
 
+    @mock.patch('courseware.views.views.get_course_specific_consent_url')
+    @mock.patch('courseware.views.views.consent_needed_for_course')
+    def test_redirection_missing_enterprise_consent(self, mock_consent_needed, mock_get_url):
+        """
+        Verify that users viewing the course info who are enrolled, but have not provided
+        data sharing consent, are first redirected to a consent page, and then, once they've
+        provided consent, are able to view the course info.
+        """
+        self.setup_user()
+        self.enroll(self.course)
+        mock_consent_needed.return_value = True
+        mock_get_url.return_value = reverse('dashboard')
+        url = reverse('info', args=[self.course.id.to_deprecated_string()])
+
+        response = self.client.get(url)
+
+        self.assertRedirects(
+            response,
+            reverse('dashboard')
+        )
+        mock_consent_needed.assert_called_once_with(self.user, unicode(self.course.id))
+        mock_consent_needed.return_value = False
+        response = self.client.get(url)
+        self.assertNotIn("You are not currently enrolled in this course", response.content)
+
     def test_anonymous_user(self):
         url = reverse('info', args=[self.course.id.to_deprecated_string()])
         resp = self.client.get(url)
@@ -89,7 +115,34 @@ class CourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
         url = reverse('info', args=[unicode(self.course.id)])
         response = self.client.get(url)
         start_date = strftime_localized(self.course.start, 'SHORT_DATE')
-        self.assertRedirects(response, '{0}?{1}'.format(reverse('dashboard'), urlencode({'notlive': start_date})))
+        expected_params = QueryDict(mutable=True)
+        expected_params['notlive'] = start_date
+        expected_url = '{url}?{params}'.format(
+            url=reverse('dashboard'),
+            params=expected_params.urlencode()
+        )
+        self.assertRedirects(response, expected_url)
+
+    @mock.patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False})
+    @mock.patch("courseware.views.views.strftime_localized")
+    def test_non_live_course_other_language(self, mock_strftime_localized):
+        """Ensure that a user accessing a non-live course sees a redirect to
+        the student dashboard, not a 404, even if the localized date is unicode
+        """
+        self.setup_user()
+        self.enroll(self.course)
+        fake_unicode_start_time = u"üñîçø∂é_ßtå®t_tîµé"
+        mock_strftime_localized.return_value = fake_unicode_start_time
+
+        url = reverse('info', args=[unicode(self.course.id)])
+        response = self.client.get(url)
+        expected_params = QueryDict(mutable=True)
+        expected_params['notlive'] = fake_unicode_start_time
+        expected_url = u'{url}?{params}'.format(
+            url=reverse('dashboard'),
+            params=expected_params.urlencode()
+        )
+        self.assertRedirects(response, expected_url)
 
     def test_nonexistent_course(self):
         self.setup_user()
@@ -188,15 +241,15 @@ class CourseInfoTitleTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         )
         self.assertIn(
             expected_title,
-            content('h1.page-title').contents()
+            content('.page-title').contents()[0]
         )
         self.assertIn(
             expected_display_title,
-            display_content('h1.page-title').contents()
+            display_content('.page-title').contents()[0]
         )
         self.assertIn(
             display_course.display_name_with_default,
-            display_content('h2.page-subtitle').contents()
+            display_content('.page-subtitle').contents()
         )
 
 
@@ -285,7 +338,7 @@ class CourseInfoTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
 
 
 @attr(shard=1)
-@override_settings(FEATURES=dict(settings.FEATURES, EMBARGO=False))
+@override_settings(FEATURES=dict(settings.FEATURES, EMBARGO=False), ENABLE_ENTERPRISE_INTEGRATION=False)
 class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
     """
     Tests for the info page of self-paced courses.
@@ -316,7 +369,7 @@ class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
         self.assertEqual(resp.status_code, 200)
 
     def test_num_queries_instructor_paced(self):
-        self.fetch_course_info_with_queries(self.instructor_paced_course, 18, 4)
+        self.fetch_course_info_with_queries(self.instructor_paced_course, 21, 4)
 
     def test_num_queries_self_paced(self):
-        self.fetch_course_info_with_queries(self.self_paced_course, 18, 4)
+        self.fetch_course_info_with_queries(self.self_paced_course, 21, 4)

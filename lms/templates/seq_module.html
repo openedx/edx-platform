@@ -2,35 +2,37 @@
 <%! from django.utils.translation import ugettext as _ %>
 
 <div id="sequence_${element_id}" class="sequence" data-id="${item_id}" data-position="${position}" data-ajax-url="${ajax_url}" data-next-url="${next_url}" data-prev-url="${prev_url}">
-  <div class="path"></div>
-    % if banner_text:
-      <div class="pattern-library-shim alert alert-information subsection-header" tabindex="-1">
-        <span class="pattern-library-shim icon alert-icon fa fa-bullhorn" aria-hidden="true"></span>
-        <div class="pattern-library-shim alert-message">
-          <p class="pattern-library-shim alert-copy">
-            ${banner_text}
-          </p>
-        </div>
+  % if banner_text:
+    <div class="pattern-library-shim alert alert-information subsection-header" tabindex="-1">
+      <span class="pattern-library-shim icon alert-icon fa fa-bullhorn" aria-hidden="true"></span>
+      <div class="pattern-library-shim alert-message">
+        <p class="pattern-library-shim alert-copy">
+          ${banner_text}
+        </p>
       </div>
-    % endif
+    </div>
+  % endif
   <div class="sequence-nav">
-    <button class="sequence-nav-button button-previous">
-        <span class="icon fa fa-chevron-prev" aria-hidden="true"></span><span class="sr">${_('Previous')}</span>
+    <button class="sequence-nav-button button-previous" aria-hidden="true">
+      <span class="icon fa fa-chevron-prev" aria-hidden="true"></span>
+      <span>${_('Previous')}</span>
     </button>
-    <nav class="sequence-list-wrapper" aria-label="${_('Unit')}">
-      <ol id="sequence-list">
+    <nav class="sequence-list-wrapper" aria-label="${_('Sequence')}">
+      <ol id="sequence-list" role="tablist">
         % for idx, item in enumerate(items):
-        ## TODO (vshnayder): add item.progress_detail either to the title or somewhere else.
-        ## Make sure it gets updated after ajax calls.
-        ## implementation note: will need to figure out how to handle combining detail
-        ## statuses of multiple modules in js.
         <li>
-        <button class="seq_${item['type']} inactive progress-${item['progress_status']} nav-item"
-           data-id="${item['id']}"
-           data-element="${idx+1}"
-           data-page-title="${item['page_title']}"
-           data-path="${item['path']}"
-           id="tab_${idx}">
+        <button class="seq_${item['type']} inactive nav-item tab"
+            role="tab"
+            tabindex="-1"
+            aria-selected="false"
+            aria-expanded="false"
+            aria-controls="seq_content"
+            data-index="${idx}"
+            data-id="${item['id']}"
+            data-element="${idx+1}"
+            data-page-title="${item['page_title']}"
+            data-path="${item['path']}"
+            id="tab_${idx}">
             <span class="icon fa seq_${item['type']}" aria-hidden="true"></span>
             <span class="fa fa-fw fa-bookmark bookmark-icon ${"is-hidden" if not item['bookmarked'] else "bookmarked"}" aria-hidden="true"></span>
             <div class="sequence-tooltip sr"><span class="sr">${item['type']}&nbsp;</span>${item['page_title']}<span class="sr bookmark-icon-sr">&nbsp;${_("Bookmarked") if item['bookmarked'] else ""}</span></div>
@@ -39,8 +41,9 @@
         % endfor
       </ol>
     </nav>
-    <button class="sequence-nav-button button-next">
-        <span class="icon fa fa-chevron-next" aria-hidden="true"></span><span class="sr">${_('Next')}</span>
+    <button class="sequence-nav-button button-next" aria-hidden="true">
+      <span>${_('Next')}</span>
+      <span class="icon fa fa-chevron-next" aria-hidden="true"></span>
     </button>
   </div>
 
@@ -54,21 +57,16 @@
     ${item['content']}
   </div>
   % endfor
-  <div id="seq_content"></div>
+  <div id="seq_content" role="tabpanel"></div>
 
   <nav class="sequence-bottom" aria-label="${_('Section')}">
     <button class="sequence-nav-button button-previous">
-        <span class="icon fa fa-chevron-prev" aria-hidden="true"></span><span class="sr">${_('Previous')}</span>
+      <span class="icon fa fa-chevron-prev" aria-hidden="true"></span>
+      <span>${_('Previous')}</span>
     </button>
     <button class="sequence-nav-button button-next">
-        <span class="icon fa fa-chevron-next" aria-hidden="true"></span><span class="sr">${_('Next')}</span>
+      <span>${_('Next')}</span>
+      <span class="icon fa fa-chevron-next" aria-hidden="true"></span>
     </button>
   </nav>
 </div>
-
-<script type="text/javascript">
-  var sequenceNav;
-  $(document).ready(function() {
-    sequenceNav = new SequenceNav($('.sequence-nav'));
-  });
-</script>

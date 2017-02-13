@@ -19,13 +19,11 @@ from openedx.core.djangolib.js_utils import js_escaped_string
 
 <%block name="bodyclass">view-in-course view-courseware courseware ${course.css_class or ''}</%block>
 
-<%block name="title"><title>
-    % if section_title:
-${static.get_page_title_breadcrumbs(section_title, course_name())}
-    % else:
-${static.get_page_title_breadcrumbs(course_name())}
-    %endif
-</title></%block>
+<%block name="title">
+<title data-base-title="${static.get_page_title_breadcrumbs(section_title, course_name())}">
+  ${static.get_page_title_breadcrumbs(sequence_title, section_title, course_name())}
+</title>
+</%block>
 
 <%block name="header_extras">
 
@@ -76,7 +74,7 @@ ${static.get_page_title_breadcrumbs(course_name())}
   <script type="text/javascript" src="${static.url('js/vendor/codemirror-compressed.js')}"></script>
 
   <%static:js group='courseware'/>
-  <%include file="/mathjax_include.html" args="disable_fast_preview=disable_fast_preview"/>
+  <%include file="/mathjax_include.html" args="disable_fast_preview=True"/>
 
   % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
     <%static:require_module module_name="js/search/course/course_search_factory" class_name="CourseSearchFactory">
@@ -153,6 +151,7 @@ ${HTML(fragment.foot_html())}
     </div>
 % endif
     <section class="course-content" id="course-content">
+        <div class="path"></div>
         <main id="main" aria-label="Content" tabindex="-1">
         % if getattr(course, 'entrance_exam_enabled') and \
            getattr(course, 'entrance_exam_minimum_score_pct') and \
@@ -208,17 +207,17 @@ ${HTML(fragment.foot_html())}
     </div>
   % endif
 </div>
+% if course.show_calculator or is_edxnotes_enabled(course):
+    <nav class="nav-utilities ${"has-utility-calculator" if course.show_calculator else ""}" aria-label="${_('Course Utilities')}">
+      ## Utility: Notes
+      % if is_edxnotes_enabled(course):
+        <%include file="/edxnotes/toggle_notes.html" args="course=course"/>
+      % endif
 
-<nav class="nav-utilities ${"has-utility-calculator" if course.show_calculator else ""}" aria-label="${_('Course Utilities')}">
-  ## Utility: Notes
-  % if is_edxnotes_enabled(course):
-    <%include file="/edxnotes/toggle_notes.html" args="course=course"/>
-  % endif
-
-  ## Utility: Calc
-  % if course.show_calculator:
-    <%include file="/calculator/toggle_calculator.html" />
-  % endif
-</nav>
-
+      ## Utility: Calc
+      % if course.show_calculator:
+        <%include file="/calculator/toggle_calculator.html" />
+      % endif
+    </nav>
+% endif
 <%include file="../modal/accessible_confirm.html" />

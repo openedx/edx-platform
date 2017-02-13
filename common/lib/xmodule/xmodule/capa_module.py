@@ -29,11 +29,9 @@ class CapaModule(CapaMixin, XModule):
     icon_class = 'problem'
 
     js = {
-        'coffee': [
-            resource_string(__name__, 'js/src/capa/display.coffee'),
-            resource_string(__name__, 'js/src/javascript_loader.coffee'),
-        ],
         'js': [
+            resource_string(__name__, 'js/src/javascript_loader.js'),
+            resource_string(__name__, 'js/src/capa/display.js'),
             resource_string(__name__, 'js/src/collapsible.js'),
             resource_string(__name__, 'js/src/capa/imageinput.js'),
             resource_string(__name__, 'js/src/capa/schematic.js'),
@@ -69,7 +67,7 @@ class CapaModule(CapaMixin, XModule):
         handlers = {
             'hint_button': self.hint_button,
             'problem_get': self.get_problem,
-            'problem_check': self.check_problem,
+            'problem_check': self.submit_problem,
             'problem_reset': self.reset_problem,
             'problem_save': self.save_problem,
             'problem_show': self.get_answer,
@@ -94,6 +92,7 @@ class CapaModule(CapaMixin, XModule):
             return 'Error: {} is not a known capa action'.format(dispatch)
 
         before = self.get_progress()
+        before_attempts = self.attempts
 
         try:
             result = handlers[dispatch](data)
@@ -119,11 +118,14 @@ class CapaModule(CapaMixin, XModule):
             raise ProcessingError(generic_error_message), None, traceback_obj
 
         after = self.get_progress()
-
+        after_attempts = self.attempts
+        progress_changed = (after != before) or (after_attempts != before_attempts)
+        curr_score, total_possible = (after.frac() if after else (0, 0))
         result.update({
-            'progress_changed': after != before,
-            'progress_status': Progress.to_js_status_str(after),
-            'progress_detail': Progress.to_js_detail_str(after),
+            'progress_changed': progress_changed,
+            'current_score': curr_score,
+            'total_possible': total_possible,
+            'attempts_used': after_attempts,
         })
 
         return json.dumps(result, cls=ComplexEncoder)
@@ -156,7 +158,7 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     show_in_read_only_mode = True
     template_dir_name = 'problem'
     mako_template = "widgets/problem-edit.html"
-    js = {'coffee': [resource_string(__name__, 'js/src/problem/edit.coffee')]}
+    js = {'js': [resource_string(__name__, 'js/src/problem/edit.js')]}
     js_module_name = "MarkdownEditingDescriptor"
     has_author_view = True
     css = {
@@ -212,7 +214,6 @@ class CapaDescriptor(CapaFields, RawDescriptor):
             CapaDescriptor.graceperiod,
             CapaDescriptor.force_save_button,
             CapaDescriptor.markdown,
-            CapaDescriptor.text_customization,
             CapaDescriptor.use_latex_compiler,
         ])
         return non_editable_fields
@@ -274,11 +275,43 @@ class CapaDescriptor(CapaFields, RawDescriptor):
             )
         return False
 
+    def max_score(self):
+        """
+        Return the problem's max score
+        """
+        from capa.capa_problem import LoncapaProblem, LoncapaSystem
+        capa_system = LoncapaSystem(
+            ajax_url=None,
+            anonymous_student_id=None,
+            cache=None,
+            can_execute_unsafe_code=None,
+            get_python_lib_zip=None,
+            DEBUG=None,
+            filestore=self.runtime.resources_fs,
+            i18n=self.runtime.service(self, "i18n"),
+            node_path=None,
+            render_template=None,
+            seed=None,
+            STATIC_URL=None,
+            xqueue=None,
+            matlab_api_key=None,
+        )
+        lcp = LoncapaProblem(
+            problem_text=self.data,
+            id=self.location.html_id(),
+            capa_system=capa_system,
+            capa_module=self,
+            state={},
+            seed=1,
+            minimal_init=True,
+        )
+        return lcp.get_max_score()
+
     # Proxy to CapaModule for access to any of its attributes
     answer_available = module_attr('answer_available')
-    check_button_name = module_attr('check_button_name')
-    check_button_checking_name = module_attr('check_button_checking_name')
-    check_problem = module_attr('check_problem')
+    submit_button_name = module_attr('submit_button_name')
+    submit_button_submitting_name = module_attr('submit_button_submitting_name')
+    submit_problem = module_attr('submit_problem')
     choose_new_seed = module_attr('choose_new_seed')
     closed = module_attr('closed')
     get_answer = module_attr('get_answer')
@@ -301,7 +334,7 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     reset_problem = module_attr('reset_problem')
     save_problem = module_attr('save_problem')
     set_state_from_lcp = module_attr('set_state_from_lcp')
-    should_show_check_button = module_attr('should_show_check_button')
+    should_show_submit_button = module_attr('should_show_submit_button')
     should_show_reset_button = module_attr('should_show_reset_button')
     should_show_save_button = module_attr('should_show_save_button')
     update_score = module_attr('update_score')

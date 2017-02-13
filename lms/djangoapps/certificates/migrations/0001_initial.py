@@ -4,13 +4,13 @@ from __future__ import unicode_literals
 from django.db import migrations, models
 import certificates.models
 import model_utils.fields
-import xmodule_django.models
 import django_extensions.db.fields
 import django_extensions.db.fields.json
 import django.db.models.deletion
 import django.utils.timezone
 from badges.models import validate_badge_image
 from django.conf import settings
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
 
 class Migration(migrations.Migration):
@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
             name='BadgeAssertion',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('course_id', xmodule_django.models.CourseKeyField(default=None, max_length=255, blank=True)),
+                ('course_id', CourseKeyField(default=None, max_length=255, blank=True)),
                 ('mode', models.CharField(max_length=100)),
                 ('data', django_extensions.db.fields.json.JSONField()),
                 ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
@@ -58,7 +58,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, verbose_name='created', editable=False)),
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
-                ('course_key', xmodule_django.models.CourseKeyField(max_length=255, db_index=True)),
+                ('course_key', CourseKeyField(max_length=255, db_index=True)),
                 ('enabled', models.BooleanField(default=False)),
             ],
             options={
@@ -89,7 +89,7 @@ class Migration(migrations.Migration):
                 ('description', models.CharField(help_text='Description and/or admin notes.', max_length=255, null=True, blank=True)),
                 ('template', models.TextField(help_text='Django template HTML.')),
                 ('organization_id', models.IntegerField(help_text='Organization of template.', null=True, db_index=True, blank=True)),
-                ('course_key', xmodule_django.models.CourseKeyField(db_index=True, max_length=255, null=True, blank=True)),
+                ('course_key', CourseKeyField(db_index=True, max_length=255, null=True, blank=True)),
                 ('mode', models.CharField(default=b'honor', choices=[(b'verified', b'verified'), (b'honor', b'honor'), (b'audit', b'audit'), (b'professional', b'professional'), (b'no-id-professional', b'no-id-professional')], max_length=125, blank=True, help_text='The course mode for this template.', null=True)),
                 ('is_active', models.BooleanField(default=False, help_text='On/Off switch.')),
             ],
@@ -114,7 +114,7 @@ class Migration(migrations.Migration):
             name='CertificateWhitelist',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('course_id', xmodule_django.models.CourseKeyField(default=None, max_length=255, blank=True)),
+                ('course_id', CourseKeyField(default=None, max_length=255, blank=True)),
                 ('whitelist', models.BooleanField(default=0)),
                 ('created', django_extensions.db.fields.CreationDateTimeField(auto_now_add=True, verbose_name='created')),
                 ('notes', models.TextField(default=None, null=True)),
@@ -143,7 +143,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, verbose_name='created', editable=False)),
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
-                ('course_key', xmodule_django.models.CourseKeyField(max_length=255, db_index=True)),
+                ('course_key', CourseKeyField(max_length=255, db_index=True)),
             ],
             options={
                 'get_latest_by': 'created',
@@ -153,7 +153,7 @@ class Migration(migrations.Migration):
             name='GeneratedCertificate',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('course_id', xmodule_django.models.CourseKeyField(default=None, max_length=255, blank=True)),
+                ('course_id', CourseKeyField(default=None, max_length=255, blank=True)),
                 ('verify_uuid', models.CharField(default=b'', max_length=32, blank=True)),
                 ('download_uuid', models.CharField(default=b'', max_length=32, blank=True)),
                 ('download_url', models.CharField(default=b'', max_length=128, blank=True)),

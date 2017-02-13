@@ -151,6 +151,7 @@
                 },
                 linkClicked: function(event) {
                     event.preventDefault();
+                    this.toggleDisableButton(true);
                     this.resetPassword(event);
                 },
                 resetPassword: function() {
@@ -169,8 +170,15 @@
                         error: function(xhr) {
                             view.showErrorMessage(xhr);
                             view.setMessageTimeout();
+                            view.toggleDisableButton(false);
                         }
                     });
+                },
+                toggleDisableButton: function(disabled) {
+                    var button = this.$('#u-field-link-' + this.options.valueAttribute);
+                    if (button) {
+                        button.prop('disabled', disabled);
+                    }
                 },
                 setMessageTimeout: function() {
                     var view = this;

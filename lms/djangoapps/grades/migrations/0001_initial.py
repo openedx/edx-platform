@@ -5,7 +5,7 @@ from django.db import migrations, models
 import coursewarehistoryextended.fields
 import django.utils.timezone
 import model_utils.fields
-import xmodule_django.models
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, UsageKeyField
 
 
 class Migration(migrations.Migration):
@@ -21,8 +21,8 @@ class Migration(migrations.Migration):
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
                 ('id', coursewarehistoryextended.fields.UnsignedBigIntAutoField(serialize=False, primary_key=True)),
                 ('user_id', models.IntegerField()),
-                ('course_id', xmodule_django.models.CourseKeyField(max_length=255)),
-                ('usage_key', xmodule_django.models.UsageKeyField(max_length=255)),
+                ('course_id', CourseKeyField(max_length=255)),
+                ('usage_key', UsageKeyField(max_length=255)),
                 ('subtree_edited_date', models.DateTimeField(verbose_name=b'last content edit timestamp')),
                 ('course_version', models.CharField(max_length=255, verbose_name=b'guid of latest course version', blank=True)),
                 ('earned_all', models.FloatField()),

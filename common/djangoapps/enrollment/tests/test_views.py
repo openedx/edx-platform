@@ -22,7 +22,6 @@ from django.test.utils import override_settings
 import pytz
 
 from course_modes.models import CourseMode
-from embargo.models import CountryAccessRule, Country, RestrictedCourse
 from enrollment.views import EnrollmentUserThrottle
 from util.models import RateLimitConfiguration
 from util.testing import UrlResetMixin
@@ -34,7 +33,8 @@ from openedx.core.lib.django_test_client_utils import get_absolute_url
 from student.models import CourseEnrollment
 from student.roles import CourseStaffRole
 from student.tests.factories import AdminFactory, CourseModeFactory, UserFactory
-from embargo.test_utils import restrict_course
+from openedx.core.djangoapps.embargo.models import CountryAccessRule, Country, RestrictedCourse
+from openedx.core.djangoapps.embargo.test_utils import restrict_course
 
 
 class EnrollmentTestMixin(object):
@@ -191,8 +191,13 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase):
             )
 
         # Create an enrollment
-        self.assert_enrollment_status()
+        resp = self.assert_enrollment_status()
 
+        # Verify that the response contains the correct course_name
+        data = json.loads(resp.content)
+        self.assertEqual(self.course.display_name_with_default, data['course_details']['course_name'])
+
+        # Verify that the enrollment was created correctly
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course.id))
         course_mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
         self.assertTrue(is_active)
@@ -212,6 +217,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = json.loads(resp.content)
         self.assertEqual(unicode(self.course.id), data['course_details']['course_id'])
+        self.assertEqual(self.course.display_name_with_default, data['course_details']['course_name'])
         self.assertEqual(CourseMode.DEFAULT_MODE_SLUG, data['mode'])
         self.assertTrue(data['is_active'])
 
@@ -329,8 +335,8 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = json.loads(response.content)
         self.assertItemsEqual(
-            [enrollment['course_details']['course_id'] for enrollment in data],
-            [unicode(course.id) for course in courses]
+            [(datum['course_details']['course_id'], datum['course_details']['course_name']) for datum in data],
+            [(unicode(course.id), course.display_name_with_default) for course in courses]
         )
 
     def test_enrollment_list_permissions(self):
@@ -411,6 +417,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase):
 
         data = json.loads(resp.content)
         self.assertEqual(unicode(self.course.id), data['course_id'])
+        self.assertEqual(self.course.display_name_with_default, data['course_name'])
         mode = data['course_modes'][0]
         self.assertEqual(mode['slug'], CourseMode.HONOR)
         self.assertEqual(mode['sku'], '123')
@@ -925,7 +932,7 @@ class EnrollmentEmbargoTest(EnrollmentTestMixin, UrlResetMixin, ModuleStoreTestC
     EMAIL = "bob@example.com"
     PASSWORD = "edx"
 
-    URLCONF_MODULES = ['embargo']
+    URLCONF_MODULES = ['openedx.core.djangoapps.embargo']
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):

@@ -10,8 +10,8 @@ from common.test.acceptance.fixtures.course import CourseFixture
 from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.dashboard import DashboardPage
 
-DEFAULT_SHORT_DATE_FORMAT = "%b %d, %Y"
-DEFAULT_DAY_AND_TIME_FORMAT = "%A at %-I%P"
+DEFAULT_SHORT_DATE_FORMAT = '{dt:%b} {dt.day}, {dt.year}'
+TEST_DATE_FORMAT = '{dt:%b} {dt.day}, {dt.year} {dt.hour:02}:{dt.minute:02}'
 
 
 class BaseLmsDashboardTest(UniqueCourseTest):
@@ -193,7 +193,7 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         })
         self.course_fixture.configure_course()
 
-        end_date = course_end_date.strftime(DEFAULT_SHORT_DATE_FORMAT)
+        end_date = DEFAULT_SHORT_DATE_FORMAT.format(dt=course_end_date)
         expected_course_date = "Ended - {end_date}".format(end_date=end_date)
 
         # reload the page for changes to course date changes to appear in dashboard
@@ -226,7 +226,7 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         })
         self.course_fixture.configure_course()
 
-        start_date = course_start_date.strftime(DEFAULT_SHORT_DATE_FORMAT)
+        start_date = DEFAULT_SHORT_DATE_FORMAT.format(dt=course_start_date)
         expected_course_date = "Started - {start_date}".format(start_date=start_date)
 
         # reload the page for changes to course date changes to appear in dashboard
@@ -259,7 +259,7 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         })
         self.course_fixture.configure_course()
 
-        start_date = course_start_date.strftime(DEFAULT_SHORT_DATE_FORMAT)
+        start_date = DEFAULT_SHORT_DATE_FORMAT.format(dt=course_start_date)
         expected_course_date = "Starts - {start_date}".format(start_date=start_date)
 
         # reload the page for changes to course date changes to appear in dashboard
@@ -293,8 +293,8 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         })
         self.course_fixture.configure_course()
 
-        start_date = course_start_date.strftime(DEFAULT_DAY_AND_TIME_FORMAT)
-        expected_course_date = "Starts - {start_date} UTC".format(start_date=start_date)
+        start_date = TEST_DATE_FORMAT.format(dt=course_start_date)
+        expected_course_date = "Starts - {start_date} GMT".format(start_date=start_date)
 
         # reload the page for changes to course date changes to appear in dashboard
         self.dashboard_page.visit()
@@ -304,6 +304,13 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         # Test that proper course date with 'starts' message is displayed if a course is about to start in future,
         # and course starts within 5 days
         self.assertEqual(course_date, expected_course_date)
+
+    def test_profile_img_alt_empty(self):
+        """
+        Validate value of profile image alt attribue is null
+        """
+        profile_img = self.dashboard_page.get_profile_img()
+        self.assertEqual(profile_img.attrs('alt')[0], '')
 
 
 @attr('a11y')
@@ -318,10 +325,4 @@ class LmsDashboardA11yTest(BaseLmsDashboardTestMultiple):
         """
         course_listings = self.dashboard_page.get_courses()
         self.assertEqual(len(course_listings), 3)
-        self.dashboard_page.a11y_audit.config.set_rules({
-            'ignore': [
-                'link-href',  # AC-530
-                'aria-required-children',  # AC-534
-            ]
-        })
         self.dashboard_page.a11y_audit.check_for_accessibility_errors()

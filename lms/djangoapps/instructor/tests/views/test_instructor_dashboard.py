@@ -14,9 +14,9 @@ from django.test.utils import override_settings
 from edxmako.shortcuts import render_to_response
 
 from courseware.tabs import get_course_tab_list
-from courseware.tests.factories import UserFactory, StudentModuleFactory
+from courseware.tests.factories import UserFactory, StudentModuleFactory, StaffFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from instructor.views.gradebook_api import calculate_page_info
+from lms.djangoapps.instructor.views.gradebook_api import calculate_page_info
 
 from common.test.utils import XssTestMixin
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory
@@ -100,8 +100,29 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
             return len([tab for tab in tabs if tab.name == 'Instructor']) == 1
 
         self.assertTrue(has_instructor_tab(self.instructor, self.course))
+
+        staff = StaffFactory(course_key=self.course.id)
+        self.assertTrue(has_instructor_tab(staff, self.course))
+
         student = UserFactory.create()
         self.assertFalse(has_instructor_tab(student, self.course))
+
+    def test_student_admin_staff_instructor(self):
+        """
+        Verify that staff users are not able to see course-wide options, while still
+        seeing individual learner options.
+        """
+        # Original (instructor) user can see both specific grades, and course-wide grade adjustment tools
+        response = self.client.get(self.url)
+        self.assertIn('<h4 class="hd hd-4">Adjust all enrolled learners', response.content)
+        self.assertIn('<h4 class="hd hd-4">View a specific learner&#39;s grades and progress', response.content)
+
+        # But staff user can only see specific grades
+        staff = StaffFactory(course_key=self.course.id)
+        self.client.login(username=staff.username, password="test")
+        response = self.client.get(self.url)
+        self.assertNotIn('<h4 class="hd hd-4">Adjust all enrolled learners', response.content)
+        self.assertIn('<h4 class="hd hd-4">View a specific learner&#39;s grades and progress', response.content)
 
     def test_default_currency_in_the_html_response(self):
         """
@@ -275,7 +296,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         response = self.client.get(self.url)
         self.assertIn('D: 0.5, C: 0.57, B: 0.63, A: 0.75', response.content)
 
-    @patch('instructor.views.gradebook_api.MAX_STUDENTS_PER_PAGE_GRADE_BOOK', 2)
+    @patch('lms.djangoapps.instructor.views.gradebook_api.MAX_STUDENTS_PER_PAGE_GRADE_BOOK', 2)
     def test_calculate_page_info(self):
         page = calculate_page_info(offset=0, total_students=2)
         self.assertEqual(page["offset"], 0)
@@ -284,8 +305,8 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         self.assertEqual(page["previous_offset"], None)
         self.assertEqual(page["total_pages"], 1)
 
-    @patch('instructor.views.gradebook_api.render_to_response', intercept_renderer)
-    @patch('instructor.views.gradebook_api.MAX_STUDENTS_PER_PAGE_GRADE_BOOK', 1)
+    @patch('lms.djangoapps.instructor.views.gradebook_api.render_to_response', intercept_renderer)
+    @patch('lms.djangoapps.instructor.views.gradebook_api.MAX_STUDENTS_PER_PAGE_GRADE_BOOK', 1)
     def test_spoc_gradebook_pages(self):
         for i in xrange(2):
             username = "user_%d" % i

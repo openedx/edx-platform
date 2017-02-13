@@ -5,9 +5,6 @@ Tests for In-Course Reverification Access Control Partition scheme
 
 import ddt
 from nose.plugins.attrib import attr
-import unittest
-
-from django.conf import settings
 
 from lms.djangoapps.verify_student.models import (
     VerificationCheckpoint,
@@ -15,6 +12,7 @@ from lms.djangoapps.verify_student.models import (
     SkippedReverification,
 )
 from openedx.core.djangoapps.credit.partition_schemes import VerificationPartitionScheme
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.partitions.partitions import UserPartition, Group
@@ -24,7 +22,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 @attr(shard=2)
 @ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class ReverificationPartitionTest(ModuleStoreTestCase):
     """Tests for the Reverification Partition Scheme. """
 

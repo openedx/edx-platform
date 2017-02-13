@@ -39,17 +39,14 @@
                 },
 
                 render: function() {
-                    var self = this;
+                    var tabs,
+                        self = this;
 
                     this.sectionTwoView = new SectionTwoTab({
                         viewList: this.options.sectionTwoFieldViews,
                         showFullProfile: this.showFullProfile,
                         ownProfile: this.options.ownProfile
                     });
-
-                    var tabs = [
-                    {view: this.sectionTwoView, title: gettext('About Me'), url: 'about_me'}
-                    ];
 
                     HtmlUtils.setHtml(this.$el, HtmlUtils.template(learnerProfileTemplate)({
                         username: self.options.accountSettingsModel.get('username'),
@@ -59,45 +56,45 @@
                     this.renderFields();
 
                     if (this.showFullProfile() && (this.options.accountSettingsModel.get('accomplishments_shared'))) {
-                        tabs.push({
-                            view: this.options.badgeListContainer,
-                            title: gettext('Accomplishments'),
-                            url: 'accomplishments'
-                        });
+                        tabs = [
+                            {view: this.sectionTwoView, title: gettext('About Me'), url: 'about_me'},
+                            {
+                                view: this.options.badgeListContainer,
+                                title: gettext('Accomplishments'),
+                                url: 'accomplishments'
+                            }
+                        ];
+
+                        // Build the accomplishments Tab and fill with data
                         this.options.badgeListContainer.collection.fetch().done(function() {
                             self.options.badgeListContainer.render();
                         }).error(function() {
                             self.options.badgeListContainer.renderError();
                         });
-                    }
-                    this.tabbedView = new TabbedView({
-                        tabs: tabs,
-                        router: this.router,
-                        viewLabel: gettext('Profile')
-                    });
 
-                    this.tabbedView.render();
+                        this.tabbedView = new TabbedView({
+                            tabs: tabs,
+                            router: this.router,
+                            viewLabel: gettext('Profile')
+                        });
 
-                    if (tabs.length === 1) {
-                    // If the tab is unambiguous, don't display the tab interface.
-                        this.tabbedView.$el.find('.page-content-nav').hide();
-                    }
+                        this.tabbedView.render();
+                        this.$el.find('.account-settings-container').append(this.tabbedView.el);
 
-                    this.$el.find('.account-settings-container').append(this.tabbedView.el);
-
-                    if (this.firstRender) {
-                        this.router.on('route:loadTab', _.bind(this.setActiveTab, this));
-                        Backbone.history.start();
-                        this.firstRender = false;
-                    // Load from history.
-                        this.router.navigate((Backbone.history.getFragment() || 'about_me'), {trigger: true});
+                        if (this.firstRender) {
+                            this.router.on('route:loadTab', _.bind(this.setActiveTab, this));
+                            Backbone.history.start();
+                            this.firstRender = false;
+                            // Load from history.
+                            this.router.navigate((Backbone.history.getFragment() || 'about_me'), {trigger: true});
+                        } else {
+                            // Restart the router so the tab will be brought up anew.
+                            Backbone.history.stop();
+                            Backbone.history.start();
+                        }
                     } else {
-                    // Restart the router so the tab will be brought up anew.
-                        Backbone.history.stop();
-                        Backbone.history.start();
+                        this.$el.find('.account-settings-container').append(this.sectionTwoView.render().el);
                     }
-
-
                     return this;
                 },
 

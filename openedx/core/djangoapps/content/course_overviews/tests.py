@@ -127,10 +127,6 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
             ('clean_id', ('#',)),
             ('has_ended', ()),
             ('has_started', ()),
-            ('start_datetime_text', ('SHORT_DATE',)),
-            ('start_datetime_text', ('DATE_TIME',)),
-            ('end_datetime_text', ('SHORT_DATE',)),
-            ('end_datetime_text', ('DATE_TIME',)),
             ('may_certify', ()),
         ]
         for method_name, method_args in methods_to_test:
@@ -398,7 +394,7 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
                 # default value present. So mock it to avoid returning the empty str as primary key
                 # value. Due to empty str, model.save will do an update instead of insert which is
                 # incorrect and get exception in
-                # common.djangoapps.xmodule_django.models.OpaqueKeyField.get_prep_value
+                # openedx.core.djangoapps.xmodule_django.models.OpaqueKeyField.get_prep_value
                 with mock.patch('django.db.models.Field.get_pk_value_on_save') as mock_get_pk_value_on_save:
 
                     mock_get_pk_value_on_save.return_value = None

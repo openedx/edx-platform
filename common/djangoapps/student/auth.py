@@ -7,6 +7,7 @@ to decide whether to check course creator role, and other such functions.
 from django.core.exceptions import PermissionDenied
 from django.conf import settings
 from opaque_keys.edx.locator import LibraryLocator
+from ccx_keys.locator import CCXLocator, CCXBlockUsageLocator
 
 from student.roles import GlobalStaff, CourseCreatorRole, CourseStaffRole, CourseInstructorRole, CourseRole, \
     CourseBetaTesterRole, OrgInstructorRole, OrgStaffRole, LibraryUserRole, OrgLibraryUserRole
@@ -17,7 +18,16 @@ STUDIO_EDIT_ROLES = 8
 STUDIO_VIEW_USERS = 4
 STUDIO_EDIT_CONTENT = 2
 STUDIO_VIEW_CONTENT = 1
+STUDIO_NO_PERMISSIONS = 0
 # In addition to the above, one is always allowed to "demote" oneself to a lower role within a course, or remove oneself
+
+
+def is_ccx_course(course_key):
+    """
+    Check whether the course locator maps to a CCX course; this is important
+    because we don't allow access to CCX courses in Studio.
+    """
+    return isinstance(course_key, CCXLocator) or isinstance(course_key, CCXBlockUsageLocator)
 
 
 def user_has_role(user, role):
@@ -60,6 +70,9 @@ def get_user_permissions(user, course_key, org=None):
         course_key = course_key.for_branch(None)
     else:
         assert course_key is None
+    # No one has studio permissions for CCX courses
+    if is_ccx_course(course_key):
+        return STUDIO_NO_PERMISSIONS
     all_perms = STUDIO_EDIT_ROLES | STUDIO_VIEW_USERS | STUDIO_EDIT_CONTENT | STUDIO_VIEW_CONTENT
     # global staff, org instructors, and course instructors have all permissions:
     if GlobalStaff().has_user(user) or OrgInstructorRole(org=org).has_user(user):
@@ -73,7 +86,7 @@ def get_user_permissions(user, course_key, org=None):
     if course_key and isinstance(course_key, LibraryLocator):
         if OrgLibraryUserRole(org=org).has_user(user) or user_has_role(user, LibraryUserRole(course_key)):
             return STUDIO_VIEW_USERS | STUDIO_VIEW_CONTENT
-    return 0
+    return STUDIO_NO_PERMISSIONS
 
 
 def has_studio_write_access(user, course_key):

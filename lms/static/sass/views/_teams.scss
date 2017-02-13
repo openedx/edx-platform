@@ -337,19 +337,10 @@
 
   .team-profile {
 
-    .new-post-btn {
-      @include float(right);
-    }
-
     .page-content-main {
       display: inline-block;
       width: flex-grid(8, 12);
       vertical-align: top;
-
-      .forum-new-post-form,
-      .edit-post-form {
-        min-width: 700px;
-      }
     }
 
     .page-content-secondary {

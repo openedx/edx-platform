@@ -23,7 +23,7 @@ from django_comment_common.signals import (
     comment_voted,
     comment_endorsed
 )
-from xmodule_django.models import CourseKeyField
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from util.model_utils import slugify
 from student.models import LanguageField, CourseEnrollment
 from .errors import AlreadyOnTeamInCourse, NotEnrolledInCourseForTeam, ImmutableMembershipFieldException
@@ -263,5 +263,5 @@ class CourseTeamMembership(models.Model):
         membership.team.save()
         membership.save()
         emit_team_event('edx.team.activity_updated', membership.team.course_id, {
-            'team_id': membership.team_id,
+            'team_id': membership.team.team_id,
         })

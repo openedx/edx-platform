@@ -31,6 +31,8 @@
                  tpl: formViewTpl,
                  fieldTpl: formFieldTpl,
                  formType: 'financial-assistance',
+                 successTpl: successTpl,
+                 defaultFormErrorsTitle: gettext('Unable to submit application'),
                  requiredStr: '',
                  submitButton: '.js-submit-form',
 
@@ -81,7 +83,7 @@
                  },
 
                  renderSuccess: function() {
-                     this.$el.html(_.template(successTpl)({
+                     this.$el.html(_.template(this.successTpl)({
                          course: this.model.get('course'),
                          dashboard_url: this.context.dashboard_url
                      }));
@@ -102,8 +104,7 @@
                      }
 
                      this.errors = ['<li>' + msg + '</li>'];
-                     this.setErrors();
-                     this.element.hide(this.$resetSuccess);
+                     this.renderErrors(this.defaultFormErrorsTitle, this.errors);
                      this.toggleDisableButton(false);
                  },
 
@@ -112,9 +113,7 @@
                  },
 
                  validateCountry: function() {
-                     var $submissionContainer = $('.submission-error'),
-                         $errorMessageContainer = $submissionContainer.find('.message-copy'),
-                         $countryLabel = $('#user-country-title'),
+                     var $countryLabel = $('#user-country-title'),
                          txt = [
                              'Please go to your {link_start}profile page{link_end} ',
                              'and provide your country of residence.'
@@ -130,9 +129,8 @@
 
                      if (!this.model.get('country')) {
                          $countryLabel.addClass('error');
-                         $errorMessageContainer.append('<li>' + msg + '</li>');
+                         this.renderErrors(this.defaultFormErrorsTitle, ['<li>' + msg + '</li>']);
                          this.toggleDisableButton(true);
-                         $submissionContainer.removeClass('hidden');
                      }
                  },
 

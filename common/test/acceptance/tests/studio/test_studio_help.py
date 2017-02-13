@@ -2,13 +2,12 @@
 Test the Studio help links.
 """
 
-from flaky import flaky
-from bok_choy.web_app_test import WebAppTest
+from nose.plugins.attrib import attr
 from unittest import skip
 
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest, ContainerBase
-from common.test.acceptance.pages.studio.index import DashboardPage, DashboardPageWithPrograms
+from common.test.acceptance.pages.studio.index import DashboardPage
 from common.test.acceptance.pages.studio.utils import click_studio_help, studio_help_links
 from common.test.acceptance.pages.studio.index import IndexPage, HomePage
 from common.test.acceptance.tests.studio.base_studio_test import StudioLibraryTest
@@ -27,8 +26,8 @@ from common.test.acceptance.pages.studio.settings_advanced import AdvancedSettin
 from common.test.acceptance.pages.studio.settings_certificates import CertificatesPage
 from common.test.acceptance.pages.studio.import_export import ExportCoursePage, ImportCoursePage
 from common.test.acceptance.pages.studio.users import CourseTeamPage
-from common.test.acceptance.fixtures.programs import ProgramsConfigMixin
 from common.test.acceptance.tests.helpers import (
+    AcceptanceTest,
     assert_nav_help_link,
     assert_side_bar_help_link
 )
@@ -36,10 +35,10 @@ from common.test.acceptance.pages.studio.import_export import ExportLibraryPage,
 from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
 
 
+@attr(shard=10)
 class StudioHelpTest(StudioCourseTest):
     """Tests for Studio help."""
 
-    @flaky  # TODO: TNL-4954
     def test_studio_help_links(self):
         """Test that the help links are present and have the correct content."""
         page = DashboardPage(self.browser)
@@ -76,7 +75,8 @@ class StudioHelpTest(StudioCourseTest):
             )
 
 
-class SignInHelpTest(WebAppTest):
+@attr(shard=10)
+class SignInHelpTest(AcceptanceTest):
     """
     Tests help links on 'Sign In' page
     """
@@ -108,7 +108,8 @@ class SignInHelpTest(WebAppTest):
         )
 
 
-class SignUpHelpTest(WebAppTest):
+@attr(shard=10)
+class SignUpHelpTest(AcceptanceTest):
     """
     Tests help links on 'Sign Up' page.
     """
@@ -140,6 +141,7 @@ class SignUpHelpTest(WebAppTest):
         )
 
 
+@attr(shard=10)
 class HomeHelpTest(StudioCourseTest):
     """
     Tests help links on 'Home'(Courses tab) page.
@@ -192,7 +194,8 @@ class HomeHelpTest(StudioCourseTest):
         )
 
 
-class NewCourseHelpTest(WebAppTest):
+@attr(shard=10)
+class NewCourseHelpTest(AcceptanceTest):
     """
     Test help links while creating a new course.
     """
@@ -248,7 +251,8 @@ class NewCourseHelpTest(WebAppTest):
         )
 
 
-class NewLibraryHelpTest(WebAppTest):
+@attr(shard=10)
+class NewLibraryHelpTest(AcceptanceTest):
     """
     Test help links while creating a new library
     """
@@ -304,7 +308,8 @@ class NewLibraryHelpTest(WebAppTest):
         )
 
 
-class LibraryTabHelpTest(WebAppTest):
+@attr(shard=10)
+class LibraryTabHelpTest(AcceptanceTest):
     """
     Test help links on the library tab present at dashboard.
     """
@@ -338,6 +343,7 @@ class LibraryTabHelpTest(WebAppTest):
         )
 
 
+@attr(shard=10)
 class LibraryHelpTest(StudioLibraryTest):
     """
     Test help links on a Library page.
@@ -416,6 +422,7 @@ class LibraryHelpTest(StudioLibraryTest):
         )
 
 
+@attr(shard=10)
 class LibraryImportHelpTest(StudioLibraryTest):
     """
     Test help links on a Library import and export pages.
@@ -467,6 +474,7 @@ class LibraryImportHelpTest(StudioLibraryTest):
         )
 
 
+@attr(shard=10)
 class LibraryExportHelpTest(StudioLibraryTest):
     """
     Test help links on a Library export pages.
@@ -518,39 +526,7 @@ class LibraryExportHelpTest(StudioLibraryTest):
         )
 
 
-class NewProgramHelpTest(ProgramsConfigMixin, WebAppTest):
-    """
-    Test help links on a 'New Program' page
-    """
-    def setUp(self):
-        super(NewProgramHelpTest, self).setUp()
-        self.auth_page = AutoAuthPage(self.browser, staff=True)
-        self.program_page = DashboardPageWithPrograms(self.browser)
-        self.auth_page.visit()
-        self.set_programs_api_configuration(True)
-        self.program_page.visit()
-
-    def test_program_create_nav_help(self):
-        """
-        Scenario: Help link in navigation bar is working on 'New Program' page
-        Given that I am on the 'New Program' page
-        And I want help about the process
-        And I click the 'Help' in the navigation bar
-        Then Help link should open.
-        And help url should end with 'index.html'
-        """
-        self.program_page.click_new_program_button()
-        href = 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course' \
-               '/en/latest/index.html'
-
-        # Assert that help link is correct.
-        assert_nav_help_link(
-            test=self,
-            page=self.program_page,
-            href=href,
-        )
-
-
+@attr(shard=10)
 class CourseOutlineHelpTest(StudioCourseTest):
     """
     Tests help links on course outline page.
@@ -607,6 +583,7 @@ class CourseOutlineHelpTest(StudioCourseTest):
         )
 
 
+@attr(shard=10)
 class CourseUpdateHelpTest(StudioCourseTest):
     """
     Test help links on Course Update page
@@ -641,6 +618,7 @@ class CourseUpdateHelpTest(StudioCourseTest):
         )
 
 
+@attr(shard=10)
 class AssetIndexHelpTest(StudioCourseTest):
     """
     Test help links on Course 'Files & Uploads' page
@@ -695,6 +673,7 @@ class AssetIndexHelpTest(StudioCourseTest):
         )
 
 
+@attr(shard=10)
 class CoursePagesHelpTest(StudioCourseTest):
     """
     Test help links on Course 'Pages' page
@@ -729,6 +708,7 @@ class CoursePagesHelpTest(StudioCourseTest):
         )
 
 
+@attr(shard=10)
 class UploadTextbookHelpTest(StudioCourseTest):
     """
     Test help links on Course 'Textbooks' page
@@ -783,6 +763,7 @@ class UploadTextbookHelpTest(StudioCourseTest):
         )
 
 
+@attr(shard=10)
 class StudioUnitHelpTest(ContainerBase):
     """
     Tests help links on Unit page.
@@ -832,6 +813,7 @@ class StudioUnitHelpTest(ContainerBase):
         )
 
 
+@attr(shard=10)
 class SettingsHelpTest(StudioCourseTest):
     """
     Tests help links on Schedule and Details Settings page
@@ -868,6 +850,7 @@ class SettingsHelpTest(StudioCourseTest):
         )
 
 
+@attr(shard=10)
 class GradingPageHelpTest(StudioCourseTest):
     """
     Tests help links on Grading page
@@ -904,6 +887,7 @@ class GradingPageHelpTest(StudioCourseTest):
         )
 
 
+@attr(shard=10)
 class CourseTeamSettingsHelpTest(StudioCourseTest):
     """
     Tests help links on Course Team settings page
@@ -940,6 +924,7 @@ class CourseTeamSettingsHelpTest(StudioCourseTest):
         )
 
 
+@attr(shard=10)
 class CourseGroupConfigurationHelpTest(StudioCourseTest):
     """
     Tests help links on course Group Configurations settings page
@@ -998,6 +983,7 @@ class CourseGroupConfigurationHelpTest(StudioCourseTest):
         )
 
 
+@attr(shard=10)
 class AdvancedSettingHelpTest(StudioCourseTest):
     """
     Tests help links on course Advanced Settings page.
@@ -1034,6 +1020,7 @@ class AdvancedSettingHelpTest(StudioCourseTest):
         )
 
 
+@attr(shard=10)
 class CertificatePageHelpTest(StudioCourseTest):
     """
     Tests help links on course Certificate settings page.
@@ -1090,6 +1077,7 @@ class CertificatePageHelpTest(StudioCourseTest):
         )
 
 
+@attr(shard=10)
 class GroupExperimentConfigurationHelpTest(ContainerBase):
     """
     Tests help links on course Group Configurations settings page
@@ -1140,6 +1128,7 @@ class GroupExperimentConfigurationHelpTest(ContainerBase):
         )
 
 
+@attr(shard=10)
 class ToolsImportHelpTest(StudioCourseTest):
     """
     Tests help links on tools import pages.
@@ -1196,6 +1185,7 @@ class ToolsImportHelpTest(StudioCourseTest):
         )
 
 
+@attr(shard=10)
 class ToolsExportHelpTest(StudioCourseTest):
     """
     Tests help links on tools export pages.
@@ -1252,7 +1242,8 @@ class ToolsExportHelpTest(StudioCourseTest):
         )
 
 
-class StudioWelcomeHelpTest(WebAppTest):
+@attr(shard=10)
+class StudioWelcomeHelpTest(AcceptanceTest):
     """
     Tests help link on 'Welcome' page ( User not logged in)
     """

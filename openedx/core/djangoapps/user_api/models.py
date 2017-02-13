@@ -9,7 +9,7 @@ from django.dispatch import receiver
 from model_utils.models import TimeStampedModel
 
 from util.model_utils import get_changed_fields_dict, emit_setting_changed_event
-from xmodule_django.models import CourseKeyField
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
 # Currently, the "student" app is responsible for
 # accounts, profiles, enrollments, and the student dashboard.

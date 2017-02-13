@@ -5,6 +5,7 @@ Unit tests for handling email sending errors
 from itertools import cycle
 
 from celery.states import SUCCESS, RETRY  # pylint: disable=no-name-in-module, import-error
+import ddt
 from django.conf import settings
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
@@ -16,8 +17,8 @@ from smtplib import SMTPDataError, SMTPServerDisconnected, SMTPConnectError
 
 from bulk_email.models import CourseEmail, SEND_TO_MYSELF, BulkEmailFlag
 from bulk_email.tasks import perform_delegate_email_batches, send_course_email
-from instructor_task.models import InstructorTask
-from instructor_task.subtasks import (
+from lms.djangoapps.instructor_task.models import InstructorTask
+from lms.djangoapps.instructor_task.subtasks import (
     initialize_subtask_info,
     SubtaskStatus,
     check_subtask_is_valid,
@@ -36,6 +37,7 @@ class EmailTestException(Exception):
     pass
 
 
+@ddt.ddt
 @attr(shard=1)
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class TestEmailErrors(ModuleStoreTestCase):
@@ -213,15 +215,16 @@ class TestEmailErrors(ModuleStoreTestCase):
                 "dummy body goes here"
             )
 
-    def test_nonexistent_cohort(self):
+    @ddt.data('track', 'cohort')
+    def test_nonexistent_grouping(self, target_type):
         """
-        Tests exception when the cohort doesn't exist
+        Tests exception when the cohort or course mode doesn't exist
         """
-        with self.assertRaisesRegexp(ValueError, 'Cohort IDONTEXIST does not exist *'):
+        with self.assertRaisesRegexp(ValueError, '.* IDONTEXIST does not exist .*'):
             email = CourseEmail.create(  # pylint: disable=unused-variable
                 self.course.id,
                 self.instructor,
-                ["cohort:IDONTEXIST"],
+                ["{}:IDONTEXIST".format(target_type)],
                 "re: subject",
                 "dummy body goes here"
             )
@@ -344,7 +347,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         bogus_email_id = 1001
         to_list = ['test@test.com']
         global_email_context = {'course_title': 'dummy course'}
-        with patch('instructor_task.subtasks.InstructorTask.save') as mock_task_save:
+        with patch('lms.djangoapps.instructor_task.subtasks.InstructorTask.save') as mock_task_save:
             mock_task_save.side_effect = DatabaseError
             with self.assertRaises(DatabaseError):
                 send_course_email(entry_id, bogus_email_id, to_list, global_email_context, subtask_status.to_dict())

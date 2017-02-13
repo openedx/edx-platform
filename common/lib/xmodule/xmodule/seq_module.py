@@ -117,6 +117,12 @@ class ProctoringFields(object):
         scope=Scope.settings,
     )
 
+    def _get_course(self):
+        """
+        Return course by course id.
+        """
+        return self.descriptor.runtime.modulestore.get_course(self.course_id)  # pylint: disable=no-member
+
     @property
     def is_timed_exam(self):
         """
@@ -130,6 +136,14 @@ class ProctoringFields(object):
         """ Alias the is_proctored_enabled field to the more legible is_proctored_exam """
         return self.is_proctored_enabled
 
+    @property
+    def allow_proctoring_opt_out(self):
+        """
+        Returns true if the learner should be given the option to choose between
+        taking a proctored exam, or opting out to take the exam without proctoring.
+        """
+        return self._get_course().allow_proctoring_opt_out
+
     @is_proctored_exam.setter
     def is_proctored_exam(self, value):
         """ Alias the is_proctored_enabled field to the more legible is_proctored_exam """
@@ -137,17 +151,17 @@ class ProctoringFields(object):
 
 
 @XBlock.wants('proctoring')
+@XBlock.wants('verification')
 @XBlock.wants('milestones')
 @XBlock.wants('credit')
-@XBlock.needs("user")
-@XBlock.needs("bookmarks")
+@XBlock.needs('user')
+@XBlock.needs('bookmarks')
 class SequenceModule(SequenceFields, ProctoringFields, XModule):
     """
     Layout module which lays out content in a temporal sequence
     """
     js = {
-        'coffee': [resource_string(__name__, 'js/src/sequence/display.coffee')],
-        'js': [resource_string(__name__, 'js/src/sequence/display/jquery.sequence.js')],
+        'js': [resource_string(__name__, 'js/src/sequence/display.js')],
     }
     css = {
         'scss': [resource_string(__name__, 'css/sequence/display.scss')],
@@ -188,16 +202,16 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         raise NotFoundError('Unexpected dispatch type')
 
     @classmethod
-    def verify_current_content_visibility(cls, due, hide_after_due):
+    def verify_current_content_visibility(cls, date, hide_after_date):
         """
         Returns whether the content visibility policy passes
-        for the given due date and hide_after_due values and
+        for the given date and hide_after_date values and
         the current date-time.
         """
         return (
-            not due or
-            not hide_after_due or
-            datetime.now(UTC()) < due
+            not date or
+            not hide_after_date or
+            datetime.now(UTC()) < date
         )
 
     def student_view(self, context):
@@ -232,20 +246,17 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         runtime user. If so, returns a banner_text or the fragment to
         display depending on whether staff is masquerading.
         """
-        if not self._can_user_view_content():
-            subsection_format = (self.format or _("subsection")).lower()  # pylint: disable=no-member
-
-            # Translators: subsection_format refers to the assignment
-            # type of the subsection, such as Homework, Lab, Exam, etc.
-            banner_text = _(
-                "Because the due date has passed, "
-                "this {subsection_format} is hidden from the learner."
-            ).format(subsection_format=subsection_format)
+        course = self._get_course()
+        if not self._can_user_view_content(course):
+            if course.self_paced:
+                banner_text = _("Because the course has ended, this assignment is hidden from the learner.")
+            else:
+                banner_text = _("Because the due date has passed, this assignment is hidden from the learner.")
 
             hidden_content_html = self.system.render_template(
                 'hidden_content.html',
                 {
-                    'subsection_format': subsection_format,
+                    'self_paced': course.self_paced,
                     'progress_url': context.get('progress_url'),
                 }
             )
@@ -266,14 +277,15 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             if content_milestones and self.runtime.user_is_staff:
                 return banner_text
 
-    def _can_user_view_content(self):
+    def _can_user_view_content(self, course):
         """
         Returns whether the runtime user can view the content
         of this sequential.
         """
+        hidden_date = course.end if course.self_paced else self.due
         return (
             self.runtime.user_is_staff or
-            self.verify_current_content_visibility(self.due, self.hide_after_due)
+            self.verify_current_content_visibility(hidden_date, self.hide_after_due)
         )
 
     def _student_view(self, context, banner_text=None):
@@ -336,15 +348,12 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             is_bookmarked = bookmarks_service.is_bookmarked(usage_key=item.scope_ids.usage_id)
             context["bookmarked"] = is_bookmarked
 
-            progress = item.get_progress()
             rendered_item = item.render(STUDENT_VIEW, context)
             fragment.add_frag_resources(rendered_item)
 
             iteminfo = {
                 'content': rendered_item.content,
                 'page_title': getattr(item, 'tooltip_title', ''),
-                'progress_status': Progress.to_js_status_str(progress),
-                'progress_detail': Progress.to_js_detail_str(progress),
                 'type': item.get_icon_class(),
                 'id': item.scope_ids.usage_id.to_deprecated_string(),
                 'bookmarked': is_bookmarked,
@@ -433,6 +442,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
 
         proctoring_service = self.runtime.service(self, 'proctoring')
         credit_service = self.runtime.service(self, 'credit')
+        verification_service = self.runtime.service(self, 'verification')
 
         # Is this sequence designated as a Timed Examination, which includes
         # Proctored Exams
@@ -454,6 +464,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                     self.default_time_limit_minutes else 0
                 ),
                 'is_practice_exam': self.is_practice_exam,
+                'allow_proctoring_opt_out': self.allow_proctoring_opt_out,
                 'due_date': self.due
             }
 
@@ -464,6 +475,14 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                     context.update({
                         'credit_state': credit_state
                     })
+
+            # inject verification status
+            if verification_service:
+                verification_status, __ = verification_service.get_status(user_id)
+                context.update({
+                    'verification_status': verification_status,
+                    'reverify_url': verification_service.reverify_url(),
+                })
 
             # See if the edx-proctoring subsystem wants to present
             # a special view to the student rather

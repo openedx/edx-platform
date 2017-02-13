@@ -55,7 +55,7 @@ setup(
         'capa',
         'path.py',
         'webob',
-        'edx-opaque-keys>=0.3.4,<1.0.0',
+        'edx-opaque-keys>=0.4.0,<1.0.0',
     ],
     package_data={
         'xmodule': ['js/module/*'],

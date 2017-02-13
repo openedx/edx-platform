@@ -11,15 +11,15 @@
 // ------------------------------
 %layout-wrapper {
     margin-bottom: spacing-vertical(base);
-    padding: 0 (gutter()*2);
+    padding: 0 5%;
 
-    @include susy-breakpoint($bp-screen-md, $susy) {
-        padding: 0 gutter();
+    @media(min-width: $bp-screen-md) {
+        padding: 0 2.5%;
     }
 }
 
 %layout {
-    @include container();
+    @include grid-container();
 }
 
 // app header
@@ -45,8 +45,9 @@
 }
 
 .header-app-title {
-    margin: 0;
     @include text-align(center);
+    @include span(12);
+    margin: 0;
 }
 
 // banner
@@ -68,47 +69,52 @@
 .banner-user {
     @include text-align(center);
 
-    @include susy-breakpoint($bp-screen-lg, $susy) {
+    @media(min-width: $bp-screen-lg) {
         @include text-align(left);
     }
 
     .wrapper-copy-and-actions {
-        @include container();
+        @include grid-container();
 
         .message-copy {
             margin-bottom: spacing-vertical(small);
         }
 
-        .message-actions .action {
-            display: block;
-            width: 100%;
-            margin: 0 auto spacing-vertical(small) auto;
+        .message-actions {
+            @include span(12);
 
-            &:last-child {
-                margin-bottom: 0;
-            }
-
-            // CASE: icon display only
-            &.icon-only {
-
-                @include susy-breakpoint($bp-screen-md, $susy) {
-                    padding: spacing-vertical(x-small) spacing-horizontal(base);
-
-                    .icon {
-                        @include margin-right(0);
-                    }
-                }
-            }
-
-            @include susy-breakpoint($bp-screen-md, $susy) {
-                display: inline-block;
-                vertical-align: middle;
-                width: auto;
-                margin-bottom: 0;
-                margin-right: spacing-horizontal(mid-small);
+            .action {
+                display: block;
+                width: 100%;
+                margin: 0 auto spacing-vertical(small) auto;
 
                 &:last-child {
-                    margin-right: 0;
+                    margin-bottom: 0;
+                }
+
+                // CASE: icon display only
+                &.icon-only {
+
+                    @media(min-width: $bp-screen-md) {
+                        padding: spacing-vertical(x-small) spacing-horizontal(base);
+
+                        .icon {
+                            @include margin-right(0);
+                        }
+                    }
+                }
+
+                @media(min-width: $bp-screen-md) {
+                    display: inline-block;
+                    vertical-align: middle;
+                    min-width: 130px;
+                    width: auto;
+                    margin-bottom: 0;
+                    margin-right: spacing-horizontal(mid-small);
+
+                    &:last-child {
+                        margin-right: 0;
+                    }
                 }
             }
         }
@@ -126,16 +132,16 @@
 
 .footer-app-copyright {
 
-    @include susy-breakpoint($bp-screen-md, $susy) {
-        @include span(6 first);
+    @media(min-width: $bp-screen-md) {
+        @include span(6, after);
         margin-bottom: 0;
     }
 }
 
 .footer-app-nav {
 
-    @include susy-breakpoint($bp-screen-md, $susy) {
-        @include span(6 last);
+    @media(min-width: $bp-screen-md) {
+        @include span(6, before);
     }
 
     .list {
@@ -144,7 +150,7 @@
             display: block;
             margin-bottom: spacing-vertical(x-small);
 
-            @include susy-breakpoint($bp-screen-md, $susy) {
+            @media(min-width: $bp-screen-md) {
                 display: inline-block;
                 vertical-align: middle;
                 @include margin-right(spacing-horizontal(base));
@@ -155,7 +161,7 @@
 
     .list-legal {
 
-        @include susy-breakpoint($bp-screen-md, $susy) {
+        @media(min-width: $bp-screen-md) {
             @include text-align(right);
         }
     }
@@ -186,52 +192,46 @@
         top: -(spacing-vertical(base));
 
         .accomplishment-course,
-        .accomplishment-recipient {
-            width: span(12);
-
-            @include susy-breakpoint($bp-screen-lg, $susy) {
-                width: span(10);
-            }
+        .accomplishment-recipient,
+        .accomplishment-type {
+            @include span(12);
         }
 
         .accomplishment-summary,
         .accomplishment-statement-detail {
-           width: span(12);
-
-           @include susy-breakpoint($bp-screen-lg, $susy) {
-               width: span(8);
-           }
+           @include span(12);
         }
     }
 
     .accomplishment-orgs {
+        @include grid-row;
 
         .wrapper-orgs {
             @include text-align(center);
         }
 
         .wrapper-organization {
+            @include span(6);
+            @include margin-right(spacing-horizontal(base));
             display: inline-block;
             vertical-align: middle;
-            width: span(6);
             height: rem(100);
-            @include margin-right(spacing-horizontal(base));
             margin-bottom: spacing-vertical(small);
 
             &:last-child {
                 @include margin-right(0);
             }
 
-            @include susy-breakpoint($bp-screen-md, $susy) {
-                width: span(3);
+            @media(min-width: $bp-screen-md) {
+                @include span(3);
             }
 
-            @include susy-breakpoint($bp-screen-lg, $susy) {
-                width: span(2);
+            @media(min-width: $bp-screen-lg) {
+                @include span(2);
             }
 
-            @include susy-breakpoint($bp-screen-xl, $susy) {
-                width: span(2);
+            @media(min-width: $bp-screen-xl) {
+                @include span(2);
             }
         }
 
@@ -259,18 +259,18 @@
         .signatory {
             display: inline-block;
             vertical-align: middle;
-            width: span(12);
+            @include span(12);
 
-            @include susy-breakpoint($bp-screen-md, $susy) {
-                width: span(4);
+            @media(min-width: $bp-screen-md) {
+                @include span(4);
             }
 
-            @include susy-breakpoint($bp-screen-lg, $susy) {
-                width: span(3);
+            @media(min-width: $bp-screen-lg) {
+                @include span(3);
             }
 
-            @include susy-breakpoint($bp-screen-xl, $susy) {
-                width: span(3);
+            @media(min-width: $bp-screen-xl) {
+                @include span(3);
             }
 
             .signatory-signature {
@@ -286,24 +286,33 @@
         @extend %layout-wrapper;
 
         .accomplishment-metadata {
-            @extend %layout;
+           @extend %layout;
+
+           .accomplishment-metadata-title {
+               @include span(12);
+           }
         }
 
-        .wrapper-metadata .metadata {
-            @extend %divider-2;
-            margin-bottom: spacing-vertical(small);
-            border-bottom-color: palette(grayscale, x-back);
-            padding-bottom: spacing-vertical(small);
+        .wrapper-metadata {
+            @extend %layout;
 
-            &:last-child {
-                border-bottom: none;
-                padding-bottom: 0;
-            }
+            .metadata {
+                @extend %divider-2;
+                @include span(12);
+                margin-bottom: spacing-vertical(small);
+                border-bottom-color: palette(grayscale, x-back);
+                padding-bottom: spacing-vertical(small);
 
-            @include susy-breakpoint($bp-screen-md, $susy) {
-                @include gallery(4);
-                border-bottom: none;
-                padding-bottom: 0;
+                &:last-child {
+                    border-bottom: none;
+                    padding-bottom: 0;
+                }
+
+                @media(min-width: $bp-screen-md) {
+                    @include span(4);
+                    border-bottom: none;
+                    padding-bottom: 0;
+                }
             }
         }
     }
@@ -318,8 +327,8 @@
         .accomplishment-brief {
             margin-bottom: spacing-vertical(small);
 
-            @include susy-breakpoint($bp-screen-md, $susy) {
-                @include gallery(6);
+            @media(min-width: $bp-screen-md) {
+                @include span(6);
             }
 
             .accomplishment-type-symbol {
@@ -343,8 +352,8 @@
                 margin-bottom: 0;
             }
 
-            @include susy-breakpoint($bp-screen-md, $susy) {
-                @include gallery(6);
+            @media(min-width: $bp-screen-md) {
+                @include span(6);
                 margin-bottom: 0;
             }
         }

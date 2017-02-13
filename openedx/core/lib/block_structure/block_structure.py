@@ -445,7 +445,7 @@ class BlockStructureBlockData(BlockStructure):
         """
         Returns the BlockData associated with the given key.
         """
-        return self._block_data_map.get(usage_key)
+        return self._block_data_map[usage_key]
 
     def get_xblock_field(self, usage_key, field_name, default=None):
         """

@@ -11,9 +11,9 @@ from lti_provider.outcomes import store_outcome_parameters
 from lti_provider.models import LtiConsumer
 from lti_provider.signature_validator import SignatureValidator
 from lti_provider.users import authenticate_lti_user
-from lms_xblock.runtime import unquote_slashes
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys import InvalidKeyError
+from openedx.core.lib.url_utils import unquote_slashes
 from util.views import add_p3p_header
 
 log = logging.getLogger("edx.lti_provider")

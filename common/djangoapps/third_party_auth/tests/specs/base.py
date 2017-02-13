@@ -18,7 +18,7 @@ from social import actions, exceptions
 from social.apps.django_app import utils as social_utils
 from social.apps.django_app import views as social_views
 
-from lms.djangoapps.commerce.tests import TEST_API_URL, TEST_API_SIGNING_KEY
+from lms.djangoapps.commerce.tests import TEST_API_URL
 from student import models as student_models
 from student import views as student_views
 from student.tests.factories import UserFactory
@@ -76,15 +76,16 @@ class IntegrationTestMixin(object):
         self.assertEqual(form_fields['email']['defaultValue'], self.USER_EMAIL)
         self.assertEqual(form_fields['name']['defaultValue'], self.USER_NAME)
         self.assertEqual(form_fields['username']['defaultValue'], self.USER_USERNAME)
+        registration_values = {
+            'email': 'email-edited@tpa-test.none',
+            'name': 'My Customized Name',
+            'username': 'new_username',
+            'honor_code': True,
+        }
         # Now complete the form:
         ajax_register_response = self.client.post(
             reverse('user_api_registration'),
-            {
-                'email': 'email-edited@tpa-test.none',
-                'name': 'My Customized Name',
-                'username': 'new_username',
-                'honor_code': True,
-            }
+            registration_values
         )
         self.assertEqual(ajax_register_response.status_code, 200)
         # Then the AJAX will finish the third party auth:
@@ -910,7 +911,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
 
 
 # pylint: disable=test-inherits-tests, abstract-method
-@django_utils.override_settings(ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY)
+@django_utils.override_settings(ECOMMERCE_API_URL=TEST_API_URL)
 class Oauth2IntegrationTest(IntegrationTest):
     """Base test case for integration tests of Oauth2 providers."""
 

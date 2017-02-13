@@ -37,7 +37,7 @@ class ResponseXMLFactory(object):
         For all response types, **kwargs can contain:
 
         *question_text*: The text of the question to display,
-            wrapped in <p> tags.
+            wrapped in <label> tags.
 
         *explanation_text*: The detailed explanation that will
             be shown if the user answers incorrectly.
@@ -72,10 +72,6 @@ class ResponseXMLFactory(object):
             script_element.set("type", "loncapa/python")
             script_element.text = str(script)
 
-        # The problem has a child <p> with question text
-        question = etree.SubElement(root, "p")
-        question.text = question_text
-
         # Add the response(s)
         for __ in range(int(num_responses)):
             response_element = self.create_response_element(**kwargs)
@@ -85,6 +81,10 @@ class ResponseXMLFactory(object):
                 response_element.set('partial_credit', str(credit_type))
 
             root.append(response_element)
+
+            # Add the question label
+            question = etree.SubElement(response_element, "label")
+            question.text = question_text
 
             # Add input elements
             for __ in range(int(num_inputs)):
@@ -113,8 +113,12 @@ class ResponseXMLFactory(object):
         """
         math_display = kwargs.get('math_display', False)
         size = kwargs.get('size', None)
+        input_element_label = kwargs.get('input_element_label', '')
 
         input_element = etree.Element('textline')
+
+        if input_element_label:
+            input_element.set('label', input_element_label)
 
         if math_display:
             input_element.set('math', '1')
@@ -172,6 +176,8 @@ class ResponseXMLFactory(object):
                 correctness = 'false'
             elif 'partial' in correct_val:
                 correctness = 'partial'
+            else:
+                correctness = correct_val
 
             choice_element.set('correct', correctness)
 
@@ -198,6 +204,10 @@ class NumericalResponseXMLFactory(ResponseXMLFactory):
 
         *answer*: The correct answer (e.g. "5")
 
+        *correcthint*: The feedback describing correct answer.
+
+        *additional_answers*: A dict of additional answers along with their correcthint.
+
         *tolerance*: The tolerance within which a response
         is considered correct.  Can be a decimal (e.g. "0.01")
         or percentage (e.g. "2%")
@@ -213,6 +223,8 @@ class NumericalResponseXMLFactory(ResponseXMLFactory):
         """
 
         answer = kwargs.get('answer', None)
+        correcthint = kwargs.get('correcthint', '')
+        additional_answers = kwargs.get('additional_answers', {})
         tolerance = kwargs.get('tolerance', None)
         credit_type = kwargs.get('credit_type', None)
         partial_range = kwargs.get('partial_range', None)
@@ -226,6 +238,13 @@ class NumericalResponseXMLFactory(ResponseXMLFactory):
             else:
                 response_element.set('answer', str(answer))
 
+        for additional_answer, additional_correcthint in additional_answers.items():
+            additional_element = etree.SubElement(response_element, 'additional_answer')
+            additional_element.set('answer', str(additional_answer))
+            if additional_correcthint:
+                correcthint_element = etree.SubElement(additional_element, 'correcthint')
+                correcthint_element.text = str(additional_correcthint)
+
         if tolerance:
             responseparam_element = etree.SubElement(response_element, 'responseparam')
             responseparam_element.set('type', 'tolerance')
@@ -237,6 +256,10 @@ class NumericalResponseXMLFactory(ResponseXMLFactory):
             # The line below throws a false positive pylint violation, so it's excepted.
             responseparam_element = etree.SubElement(response_element, 'responseparam')
             responseparam_element.set('partial_answers', partial_answers)
+
+        if correcthint:
+            correcthint_element = etree.SubElement(response_element, 'correcthint')
+            correcthint_element.text = str(correcthint)
 
         return response_element
 
@@ -267,9 +290,6 @@ class CustomResponseXMLFactory(ResponseXMLFactory):
 
         *answer_attr*: The "answer" attribute on the tag itself (treated as an
         alias to "expect", though "expect" takes priority if both are given)
-
-        *group_label*: Text to represent group of inputs when there are
-        multiple inputs.
         """
 
         # Retrieve **kwargs
@@ -279,7 +299,6 @@ class CustomResponseXMLFactory(ResponseXMLFactory):
         answer = kwargs.get('answer', None)
         options = kwargs.get('options', None)
         cfn_extra_args = kwargs.get('cfn_extra_args', None)
-        group_label = kwargs.get('group_label', None)
 
         # Create the response element
         response_element = etree.Element("customresponse")
@@ -296,10 +315,6 @@ class CustomResponseXMLFactory(ResponseXMLFactory):
         if answer:
             answer_element = etree.SubElement(response_element, "answer")
             answer_element.text = str(answer)
-
-        if group_label:
-            group_label_element = etree.SubElement(response_element, "label")
-            group_label_element.text = group_label
 
         if options:
             response_element.set('options', str(options))
@@ -593,58 +608,16 @@ class ImageResponseXMLFactory(ResponseXMLFactory):
         return input_element
 
 
-class JavascriptResponseXMLFactory(ResponseXMLFactory):
-    """ Factory for producing <javascriptresponse> XML """
-
-    def create_response_element(self, **kwargs):
-        """ Create the <javascriptresponse> element.
-
-        Uses **kwargs:
-
-        *generator_src*: Name of the JS file to generate the problem.
-        *grader_src*: Name of the JS file to grade the problem.
-        *display_class*: Name of the class used to display the problem
-        *display_src*: Name of the JS file used to display the problem
-        *param_dict*: Dictionary of parameters to pass to the JS
-        """
-        # Get **kwargs
-        generator_src = kwargs.get("generator_src", None)
-        grader_src = kwargs.get("grader_src", None)
-        display_class = kwargs.get("display_class", None)
-        display_src = kwargs.get("display_src", None)
-        param_dict = kwargs.get("param_dict", {})
-
-        # Both display_src and display_class given,
-        # or neither given
-        assert((display_src and display_class) or
-               (not display_src and not display_class))
-
-        # Create the <javascriptresponse> element
-        response_element = etree.Element("javascriptresponse")
-
-        if generator_src:
-            generator_element = etree.SubElement(response_element, "generator")
-            generator_element.set("src", str(generator_src))
-
-        if grader_src:
-            grader_element = etree.SubElement(response_element, "grader")
-            grader_element.set("src", str(grader_src))
-
-        if display_class and display_src:
-            display_element = etree.SubElement(response_element, "display")
-            display_element.set("class", str(display_class))
-            display_element.set("src", str(display_src))
-
-        for (param_name, param_val) in param_dict.items():
-            responseparam_element = etree.SubElement(response_element, "responseparam")
-            responseparam_element.set("name", str(param_name))
-            responseparam_element.set("value", str(param_val))
-
-        return response_element
+class JSInputXMLFactory(CustomResponseXMLFactory):
+    """
+    Factory for producing <jsinput> XML.
+    Note that this factory currently does not create a functioning problem.
+    It will only create an empty iframe.
+    """
 
     def create_input_element(self, **kwargs):
-        """ Create the <javascriptinput> element """
-        return etree.Element("javascriptinput")
+        """ Create the <jsinput> element """
+        return etree.Element("jsinput")
 
 
 class MultipleChoiceResponseXMLFactory(ResponseXMLFactory):
@@ -734,7 +707,7 @@ class StringResponseXMLFactory(ResponseXMLFactory):
 
             *regexp*: Whether the response is regexp
 
-            *additional_answers*: list of additional asnwers.
+            *additional_answers*: list of additional answers.
 
             *non_attribute_answers*: list of additional answers to be coded in the
                 non-attribute format

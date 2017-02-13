@@ -1,6 +1,6 @@
 define(['jquery',
         'underscore',
-        'moment-with-locales',
+        'moment',
         'teams/js/views/team_card',
         'teams/js/models/team'],
     function($, _, moment, TeamCardView, Team) {

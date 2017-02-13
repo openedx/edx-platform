@@ -147,13 +147,6 @@ def _course_team_user(request, course_key, email):
     if not ((requester_perms & STUDIO_EDIT_ROLES) or (user.id == request.user.id)):
         return permissions_error_response
 
-    # can't modify an inactive user
-    if not user.is_active:
-        msg = {
-            "error": _('User {email} has registered but has not yet activated his/her account.').format(email=email),
-        }
-        return JsonResponse(msg, 400)
-
     if request.method == "DELETE":
         new_role = None
     else:
@@ -164,6 +157,13 @@ def _course_team_user(request, course_key, email):
             new_role = request.json.get("role", request.POST.get("role"))
         else:
             return JsonResponse({"error": _("No `role` specified.")}, 400)
+
+    # can't modify an inactive user but can remove it
+    if not (user.is_active or new_role is None):
+        msg = {
+            "error": _('User {email} has registered but has not yet activated his/her account.').format(email=email),
+        }
+        return JsonResponse(msg, 400)
 
     old_roles = set()
     role_added = False
@@ -177,7 +177,7 @@ def _course_team_user(request, course_key, email):
                 role_added = True
             else:
                 return permissions_error_response
-        elif role.has_user(user):
+        elif role.has_user(user, check_user_activation=False):
             # Remove the user from this old role:
             old_roles.add(role)
 

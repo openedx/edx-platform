@@ -1,3 +1,6 @@
+"""
+Helpers for courseware tests.
+"""
 import json
 
 from django.contrib.auth.models import User
@@ -6,20 +9,12 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 
 from courseware.access import has_access
+from courseware.masquerade import (
+    handle_ajax,
+    setup_masquerade
+)
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import Registration
-
-
-def get_request_for_user(user):
-    """Create a request object for user."""
-    request = RequestFactory()
-    request.user = user
-    request.COOKIES = {}
-    request.META = {}
-    request.is_secure = lambda: True
-    request.get_host = lambda: "edx.org"
-    request.method = 'GET'
-    return request
 
 
 class LoginEnrollmentTestCase(TestCase):
@@ -41,7 +36,8 @@ class LoginEnrollmentTestCase(TestCase):
             self.email,
             self.password,
         )
-        self.activate_user(self.email)
+        # activate_user re-fetches and returns the activated user record
+        self.user = self.activate_user(self.email)
         self.login(self.email, self.password)
 
     def assert_request_status_code(self, status_code, url, method="GET", **kwargs):
@@ -108,7 +104,10 @@ class LoginEnrollmentTestCase(TestCase):
         url = reverse('activate', kwargs={'key': activation_key})
         self.assert_request_status_code(200, url)
         # Now make sure that the user is now actually activated
-        self.assertTrue(User.objects.get(email=email).is_active)
+        user = User.objects.get(email=email)
+        self.assertTrue(user.is_active)
+        # And return the user we fetched.
+        return user
 
     def enroll(self, course, verify=False):
         """
@@ -182,3 +181,39 @@ class CourseAccessTestMixin(TestCase):
         """
         self.assertFalse(has_access(user, action, course))
         self.assertFalse(has_access(user, action, CourseOverview.get_from_id(course.id)))
+
+
+def masquerade_as_group_member(user, course, partition_id, group_id):
+    """
+    Installs a masquerade for the specified user and course, to enable
+    the user to masquerade as belonging to the specific partition/group
+    combination.
+
+    Arguments:
+        user (User): a user.
+        course (CourseDescriptor): a course.
+        partition_id (int): the integer partition id, referring to partitions already
+           configured in the course.
+        group_id (int); the integer group id, within the specified partition.
+
+    Returns: the status code for the AJAX response to update the user's masquerade for
+        the specified course.
+    """
+    request = _create_mock_json_request(
+        user,
+        data={"role": "student", "user_partition_id": partition_id, "group_id": group_id}
+    )
+    response = handle_ajax(request, unicode(course.id))
+    setup_masquerade(request, course.id, True)
+    return response.status_code
+
+
+def _create_mock_json_request(user, data, method='POST'):
+    """
+    Returns a mock JSON request for the specified user.
+    """
+    factory = RequestFactory()
+    request = factory.generic(method, '/', content_type='application/json', data=json.dumps(data))
+    request.user = user
+    request.session = {}
+    return request

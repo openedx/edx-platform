@@ -805,7 +805,7 @@ Annotator.Plugin.OpenSeaDragon = (function(_super) {
                 // Save source url
                 var source = osda.viewer.source;
                 var tilesUrl = typeof source.tilesUrl!='undefined'?source.tilesUrl:'';
-                var functionUrl = typeof source.getTileUrl!='undefined'?source.getTileUrl:'';
+                var functionUrl = typeof source.getTileUrl!='undefined'?source.getTileUrl():'';
                 annotation.target.src = tilesUrl!=''?tilesUrl:('' + functionUrl).replace(/\s+/g, ' '); // - target.src (media source)
                 annotation.target.ext = source.fileFormat || ""; // - target.ext (extension)
                 

@@ -183,12 +183,9 @@ span.edx {
 }
 
 .loading-animation {
-  position: absolute;
-  left: 50%;
-  width: 20px;
-  height: 20px;
-  margin-left: -($baseline/2);
-  background: url('#{$static-path}/images/spinner.gif') no-repeat;
+  @include animation(fa-spin 2s infinite linear);
+  text-align: center;
+  width: 100%;
 }
 
 mark {

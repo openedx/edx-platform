@@ -3,12 +3,17 @@ Command to load course blocks.
 """
 import logging
 
-from django.core.management.base import BaseCommand, CommandError
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
+from django.core.management.base import BaseCommand
 from xmodule.modulestore.django import modulestore
 
-from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache, update_course_in_cache
+import openedx.core.djangoapps.content.block_structure.api as api
+import openedx.core.djangoapps.content.block_structure.tasks as tasks
+import openedx.core.lib.block_structure.cache as cache
+from openedx.core.lib.command_utils import (
+    get_mutually_exclusive_required_option,
+    validate_dependent_option,
+    parse_course_keys,
+)
 
 
 log = logging.getLogger(__name__)
@@ -28,70 +33,109 @@ class Command(BaseCommand):
         Entry point for subclassed commands to add custom arguments.
         """
         parser.add_argument(
-            '--all',
-            help='Generate course blocks for all or specified courses.',
+            '--courses',
+            dest='courses',
+            nargs='+',
+            help='Generate course blocks for the list of courses provided.',
+        )
+        parser.add_argument(
+            '--all_courses',
+            help='Generate course blocks for all courses, given the requested start and end indices.',
             action='store_true',
             default=False,
         )
         parser.add_argument(
-            '--dags',
-            help='Find and log DAGs for all or specified courses.',
+            '--enqueue_task',
+            help='Enqueue the tasks for asynchronous computation.',
             action='store_true',
             default=False,
         )
         parser.add_argument(
-            '--force',
+            '--routing_key',
+            dest='routing_key',
+            help='Routing key to use for asynchronous computation.',
+        )
+        parser.add_argument(
+            '--force_update',
             help='Force update of the course blocks for the requested courses.',
             action='store_true',
             default=False,
         )
+        parser.add_argument(
+            '--start_index',
+            help='Starting index of course list.',
+            default=0,
+            type=int,
+        )
+        parser.add_argument(
+            '--end_index',
+            help='Ending index of course list.',
+            default=0,
+            type=int,
+        )
 
     def handle(self, *args, **options):
 
-        if options.get('all'):
-            course_keys = [course.id for course in modulestore().get_course_summaries()]
-        else:
-            if len(args) < 1:
-                raise CommandError('At least one course or --all must be specified.')
-            try:
-                course_keys = [CourseKey.from_string(arg) for arg in args]
-            except InvalidKeyError:
-                raise CommandError('Invalid key specified.')
+        courses_mode = get_mutually_exclusive_required_option(options, 'courses', 'all_courses')
+        validate_dependent_option(options, 'routing_key', 'enqueue_task')
+        validate_dependent_option(options, 'start_index', 'all_courses')
+        validate_dependent_option(options, 'end_index', 'all_courses')
 
-        log.info('Generating course blocks for %d courses.', len(course_keys))
-        log.debug('Generating course blocks for the following courses: %s', course_keys)
+        if courses_mode == 'all_courses':
+            course_keys = [course.id for course in modulestore().get_course_summaries()]
+            if options.get('start_index'):
+                end = options.get('end_index') or len(course_keys)
+                course_keys = course_keys[options['start_index']:end]
+        else:
+            course_keys = parse_course_keys(options['courses'])
+
+        self._set_log_levels(options)
+
+        log.warning('STARTED generating Course Blocks for %d courses.', len(course_keys))
+        self._generate_course_blocks(options, course_keys)
+        log.warning('FINISHED generating Course Blocks for %d courses.', len(course_keys))
+
+    def _set_log_levels(self, options):
+        """
+        Sets logging levels for this module and the block structure
+        cache module, based on the given the options.
+        """
+        if options.get('verbosity') == 0:
+            log_level = logging.CRITICAL
+        elif options.get('verbosity') == 1:
+            log_level = logging.WARNING
+        else:
+            log_level = logging.INFO
+
+        if options.get('verbosity') < 3:
+            cache_log_level = logging.CRITICAL
+        else:
+            cache_log_level = logging.INFO
+
+        log.setLevel(log_level)
+        cache.logger.setLevel(cache_log_level)
+
+    def _generate_course_blocks(self, options, course_keys):
+        """
+        Generates course blocks for the given course_keys per the given options.
+        """
 
         for course_key in course_keys:
             try:
-                if options.get('force'):
-                    block_structure = update_course_in_cache(course_key)
+                log.info('STARTED generating Course Blocks for course: %s.', course_key)
+
+                if options.get('enqueue_task'):
+                    action = tasks.update_course_in_cache if options.get('force_update') else tasks.get_course_in_cache
+                    task_options = {'routing_key': options['routing_key']} if options.get('routing_key') else {}
+                    action.apply_async([unicode(course_key)], **task_options)
                 else:
-                    block_structure = get_course_in_cache(course_key)
-                if options.get('dags'):
-                    self._find_and_log_dags(block_structure, course_key)
+                    action = api.update_course_in_cache if options.get('force_update') else api.get_course_in_cache
+                    action(course_key)
+
+                log.info('FINISHED generating Course Blocks for course: %s.', course_key)
             except Exception as ex:  # pylint: disable=broad-except
                 log.exception(
                     'An error occurred while generating course blocks for %s: %s',
                     unicode(course_key),
                     ex.message,
                 )
-
-        log.info('Finished generating course blocks.')
-
-    def _find_and_log_dags(self, block_structure, course_key):
-        """
-        Finds all DAGs within the given block structure.
-
-        Arguments:
-            BlockStructureBlockData - The block structure in which to find DAGs.
-        """
-        log.info('DAG check starting for course %s.', unicode(course_key))
-        for block_key in block_structure.get_block_keys():
-            parents = block_structure.get_parents(block_key)
-            if len(parents) > 1:
-                log.warning(
-                    'DAG alert - %s has multiple parents: %s.',
-                    unicode(block_key),
-                    [unicode(parent) for parent in parents],
-                )
-        log.info('DAG check complete for course %s.', unicode(course_key))

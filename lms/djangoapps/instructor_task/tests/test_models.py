@@ -11,8 +11,8 @@ from django.test import SimpleTestCase, override_settings, TestCase
 from mock import patch
 
 from common.test.utils import MockS3Mixin
-from instructor_task.models import ReportStore
-from instructor_task.tests.test_base import TestReportMixin
+from lms.djangoapps.instructor_task.models import ReportStore
+from lms.djangoapps.instructor_task.tests.test_base import TestReportMixin
 from opaque_keys.edx.locator import CourseLocator
 
 

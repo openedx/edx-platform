@@ -12,7 +12,7 @@ settings.INSTALLED_APPS  # pylint: disable=pointless-statement
 from openedx.core.lib.django_startup import autostartup
 import logging
 import analytics
-from monkey_patch import (
+from openedx.core.djangoapps.monkey_patch import (
     third_party_auth,
     django_db_models_options
 )
@@ -69,7 +69,7 @@ def run():
         # Import these here to avoid circular dependencies of the form:
         # edx-platform app --> DRF --> django translation --> edx-platform app
         from edx_proctoring.runtime import set_runtime_service
-        from instructor.services import InstructorService
+        from lms.djangoapps.instructor.services import InstructorService
         from openedx.core.djangoapps.credit.services import CreditService
         set_runtime_service('credit', CreditService())
 

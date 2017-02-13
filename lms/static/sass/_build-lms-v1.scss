@@ -12,6 +12,10 @@
 // base - starter
 @import 'base/base';
 
+// Pattern Library shims
+@import 'edx-pattern-library-shims/base/variables';
+@import 'edx-pattern-library-shims/buttons';
+
 // base - elements
 @import 'elements/controls';
 @import 'elements/creative-commons';
@@ -31,6 +35,7 @@
 @import 'shared/modal';
 @import 'shared/activation_messages';
 @import 'shared/unsubscribe';
+@import 'shared/help-tab';
 
 // shared - platform
 @import 'multicourse/home';

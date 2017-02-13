@@ -4,15 +4,16 @@ tests for the models
 import ddt
 import json
 from datetime import datetime, timedelta
-from mock import patch
 from nose.plugins.attrib import attr
-from pytz import timezone, utc
+from pytz import utc
 from student.roles import CourseCcxCoachRole
 from student.tests.factories import (
     AdminFactory,
 )
-from util.tests.test_date_utils import fake_ugettext
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import (
+    ModuleStoreTestCase,
+    TEST_DATA_SPLIT_MODULESTORE
+)
 from xmodule.modulestore.tests.factories import (
     CourseFactory,
     check_mongo_calls
@@ -29,6 +30,8 @@ from ..overrides import override_field_for_ccx
 class TestCCX(ModuleStoreTestCase):
     """Unit tests for the CustomCourseForEdX model
     """
+
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def setUp(self):
         """common setup for all tests"""
@@ -51,7 +54,7 @@ class TestCCX(ModuleStoreTestCase):
 
     def test_ccx_course_caching(self):
         """verify that caching the propery works to limit queries"""
-        with check_mongo_calls(1):
+        with check_mongo_calls(3):
             # these statements are used entirely to demonstrate the
             # instance-level caching of these values on CCX objects. The
             # check_mongo_calls context is the point here.
@@ -77,7 +80,7 @@ class TestCCX(ModuleStoreTestCase):
         """verify that caching the start property works to limit queries"""
         now = datetime.now(utc)
         self.set_ccx_override('start', now)
-        with check_mongo_calls(1):
+        with check_mongo_calls(3):
             # these statements are used entirely to demonstrate the
             # instance-level caching of these values on CCX objects. The
             # check_mongo_calls context is the point here.
@@ -102,7 +105,7 @@ class TestCCX(ModuleStoreTestCase):
         """verify that caching the due property works to limit queries"""
         expected = datetime.now(utc)
         self.set_ccx_override('due', expected)
-        with check_mongo_calls(1):
+        with check_mongo_calls(3):
             # these statements are used entirely to demonstrate the
             # instance-level caching of these values on CCX objects. The
             # check_mongo_calls context is the point here.
@@ -147,95 +150,6 @@ class TestCCX(ModuleStoreTestCase):
         """verify that a ccx without a due date has not ended"""
         self.assertFalse(self.ccx.has_ended())  # pylint: disable=no-member
 
-    # ensure that the expected localized format will be found by the i18n
-    # service
-    @patch('util.date_utils.ugettext', fake_ugettext(translations={
-        "SHORT_DATE_FORMAT": "%b %d, %Y",
-    }))
-    def test_start_datetime_short_date(self):
-        """verify that the start date for a ccx formats properly by default"""
-        start = datetime(2015, 1, 1, 12, 0, 0, tzinfo=utc)
-        expected = "Jan 01, 2015"
-        self.set_ccx_override('start', start)
-        actual = self.ccx.start_datetime_text()  # pylint: disable=no-member
-        self.assertEqual(expected, actual)
-
-    @patch('util.date_utils.ugettext', fake_ugettext(translations={
-        "DATE_TIME_FORMAT": "%b %d, %Y at %H:%M",
-    }))
-    def test_start_datetime_date_time_format(self):
-        """verify that the DATE_TIME format also works as expected"""
-        start = datetime(2015, 1, 1, 12, 0, 0, tzinfo=utc)
-        expected = "Jan 01, 2015 at 12:00 UTC"
-        self.set_ccx_override('start', start)
-        actual = self.ccx.start_datetime_text('DATE_TIME')  # pylint: disable=no-member
-        self.assertEqual(expected, actual)
-
-    @ddt.data((datetime(2015, 11, 1, 8, 59, 00, tzinfo=utc), "Nov 01, 2015", "Nov 01, 2015 at 01:59 PDT"),
-              (datetime(2015, 11, 1, 9, 00, 00, tzinfo=utc), "Nov 01, 2015", "Nov 01, 2015 at 01:00 PST"))
-    @ddt.unpack
-    def test_start_date_time_zone(self, start_date_time, expected_short_date, expected_date_time):
-        """
-        verify that start date is correctly converted when time zone specified
-        during normal daylight hours and daylight savings hours
-        """
-        time_zone = timezone('America/Los_Angeles')
-
-        self.set_ccx_override('start', start_date_time)
-        actual_short_date = self.ccx.start_datetime_text(time_zone=time_zone)  # pylint: disable=no-member
-        actual_datetime = self.ccx.start_datetime_text('DATE_TIME', time_zone)  # pylint: disable=no-member
-        self.assertEqual(expected_short_date, actual_short_date)
-        self.assertEqual(expected_date_time, actual_datetime)
-
-    @patch('util.date_utils.ugettext', fake_ugettext(translations={
-        "SHORT_DATE_FORMAT": "%b %d, %Y",
-    }))
-    def test_end_datetime_short_date(self):
-        """verify that the end date for a ccx formats properly by default"""
-        end = datetime(2015, 1, 1, 12, 0, 0, tzinfo=utc)
-        expected = "Jan 01, 2015"
-        self.set_ccx_override('due', end)
-        actual = self.ccx.end_datetime_text()  # pylint: disable=no-member
-        self.assertEqual(expected, actual)
-
-    @patch('util.date_utils.ugettext', fake_ugettext(translations={
-        "DATE_TIME_FORMAT": "%b %d, %Y at %H:%M",
-    }))
-    def test_end_datetime_date_time_format(self):
-        """verify that the DATE_TIME format also works as expected"""
-        end = datetime(2015, 1, 1, 12, 0, 0, tzinfo=utc)
-        expected = "Jan 01, 2015 at 12:00 UTC"
-        self.set_ccx_override('due', end)
-        actual = self.ccx.end_datetime_text('DATE_TIME')  # pylint: disable=no-member
-        self.assertEqual(expected, actual)
-
-    @ddt.data((datetime(2015, 11, 1, 8, 59, 00, tzinfo=utc), "Nov 01, 2015", "Nov 01, 2015 at 01:59 PDT"),
-              (datetime(2015, 11, 1, 9, 00, 00, tzinfo=utc), "Nov 01, 2015", "Nov 01, 2015 at 01:00 PST"))
-    @ddt.unpack
-    def test_end_datetime_time_zone(self, end_date_time, expected_short_date, expected_date_time):
-        """
-        verify that end date is correctly converted when time zone specified
-        during normal daylight hours and daylight savings hours
-        """
-        time_zone = timezone('America/Los_Angeles')
-
-        self.set_ccx_override('due', end_date_time)
-        actual_short_date = self.ccx.end_datetime_text(time_zone=time_zone)  # pylint: disable=no-member
-        actual_datetime = self.ccx.end_datetime_text('DATE_TIME', time_zone)  # pylint: disable=no-member
-        self.assertEqual(expected_short_date, actual_short_date)
-        self.assertEqual(expected_date_time, actual_datetime)
-
-    @patch('util.date_utils.ugettext', fake_ugettext(translations={
-        "DATE_TIME_FORMAT": "%b %d, %Y at %H:%M",
-    }))
-    def test_end_datetime_no_due_date(self):
-        """verify that without a due date, the end date is an empty string"""
-        expected = ''
-        actual = self.ccx.end_datetime_text()  # pylint: disable=no-member
-        self.assertEqual(expected, actual)
-        actual = self.ccx.end_datetime_text('DATE_TIME')  # pylint: disable=no-member
-        self.assertEqual(expected, actual)
-
     def test_ccx_max_student_enrollment_correct(self):
         """
         Verify the override value for max_student_enrollments_allowed
@@ -269,3 +183,10 @@ class TestCCX(ModuleStoreTestCase):
         )
         self.assertEqual(ccx.structure_json, json_struct)  # pylint: disable=no-member
         self.assertEqual(ccx.structure, dummy_struct)  # pylint: disable=no-member
+
+    def test_locator_property(self):
+        """
+        Verify that the locator helper property returns a correct CCXLocator
+        """
+        locator = self.ccx.locator  # pylint: disable=no-member
+        self.assertEqual(self.ccx.id, long(locator.ccx))

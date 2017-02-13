@@ -454,6 +454,10 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         self.assertEquals(len(blocks), 7)
         for block in blocks:
             self.assertEquals(block.course_version, course_version)
+            # ensure that when the block is retrieved from the runtime cache,
+            # the course version is still present
+            cached_block = course.runtime.load_item(block.location)
+            self.assertEqual(cached_block.course_version, block.course_version)
 
     @ddt.data((ModuleStoreEnum.Type.split, 2, False), (ModuleStoreEnum.Type.mongo, 3, True))
     @ddt.unpack
@@ -3391,13 +3395,17 @@ class TestAsidesWithMixedModuleStore(CommonMixedModuleStoreSetup):
         _check_asides(item)
 
         # Private -> Public
-        self.store.publish(item_location, self.user_id)
+        published_block = self.store.publish(item_location, self.user_id)
+        _check_asides(published_block)
+
         item = self.store.get_item(item_location)
         self.assertTrue(self.store.has_published_version(item))
         _check_asides(item)
 
         # Public -> Private
-        self.store.unpublish(item_location, self.user_id)
+        unpublished_block = self.store.unpublish(item_location, self.user_id)
+        _check_asides(unpublished_block)
+
         item = self.store.get_item(item_location)
         self.assertFalse(self.store.has_published_version(item))
         _check_asides(item)

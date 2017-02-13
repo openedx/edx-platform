@@ -127,6 +127,16 @@ class EmailMarketingConfiguration(ConfigurationModel):
         )
     )
 
+    # The number of seconds to delay for welcome emails sending. This is needed to acommendate those
+    # learners who created user account during course enrollment so we can send a different message
+    # in our welcome email.
+    welcome_email_send_delay = models.fields.IntegerField(
+        default=600,
+        help_text=_(
+            "Number of seconds to delay the sending of User Welcome email after user has been activated"
+        )
+    )
+
     def __unicode__(self):
         return u"Email marketing configuration: New user list %s, Activation template: %s" % \
                (self.sailthru_new_user_list, self.sailthru_activation_template)

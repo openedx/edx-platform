@@ -5,8 +5,8 @@
             return Backbone.View.extend({
                 errorMessage: gettext('An error has occurred. Please try again.'),
 
-                srAddBookmarkText: gettext('Click to add'),
-                srRemoveBookmarkText: gettext('Click to remove'),
+                bookmarkText: gettext('Bookmark this page'),
+                bookmarkedText: gettext('Bookmarked'),
 
                 events: {
                     'click': 'toggleBookmark'
@@ -85,11 +85,11 @@
                     if (bookmarked) {
                         this.$el.addClass('bookmarked');
                         this.$el.attr('aria-pressed', 'true');
-                        this.$el.find('.bookmark-sr').text(this.srRemoveBookmarkText);
+                        this.$el.find('.bookmark-text').text(this.bookmarkedText);
                     } else {
                         this.$el.removeClass('bookmarked');
                         this.$el.attr('aria-pressed', 'false');
-                        this.$el.find('.bookmark-sr').text(this.srAddBookmarkText);
+                        this.$el.find('.bookmark-text').text(this.bookmarkText);
                     }
                 },
 

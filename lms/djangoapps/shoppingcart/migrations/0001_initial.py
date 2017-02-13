@@ -6,7 +6,7 @@ import django.utils.timezone
 import django.db.models.deletion
 from django.conf import settings
 import model_utils.fields
-import xmodule_django.models
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
 
 class Migration(migrations.Migration):
@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('code', models.CharField(max_length=32, db_index=True)),
                 ('description', models.CharField(max_length=255, null=True, blank=True)),
-                ('course_id', xmodule_django.models.CourseKeyField(max_length=255)),
+                ('course_id', CourseKeyField(max_length=255)),
                 ('percentage_discount', models.IntegerField(default=0)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('is_active', models.BooleanField(default=True)),
@@ -42,7 +42,7 @@ class Migration(migrations.Migration):
             name='CourseRegCodeItemAnnotation',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('course_id', xmodule_django.models.CourseKeyField(unique=True, max_length=128, db_index=True)),
+                ('course_id', CourseKeyField(unique=True, max_length=128, db_index=True)),
                 ('annotation', models.TextField(null=True)),
             ],
         ),
@@ -51,7 +51,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('code', models.CharField(unique=True, max_length=32, db_index=True)),
-                ('course_id', xmodule_django.models.CourseKeyField(max_length=255, db_index=True)),
+                ('course_id', CourseKeyField(max_length=255, db_index=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('mode_slug', models.CharField(max_length=100, null=True)),
                 ('is_valid', models.BooleanField(default=True)),
@@ -90,7 +90,7 @@ class Migration(migrations.Migration):
                 ('zip', models.CharField(max_length=15, null=True)),
                 ('country', models.CharField(max_length=64, null=True)),
                 ('total_amount', models.FloatField()),
-                ('course_id', xmodule_django.models.CourseKeyField(max_length=255, db_index=True)),
+                ('course_id', CourseKeyField(max_length=255, db_index=True)),
                 ('internal_reference', models.CharField(help_text='Internal reference code for this invoice.', max_length=255, null=True, blank=True)),
                 ('customer_reference_number', models.CharField(help_text="Customer's reference code for this invoice.", max_length=63, null=True, blank=True)),
                 ('is_valid', models.BooleanField(default=True)),
@@ -185,7 +185,7 @@ class Migration(migrations.Migration):
             name='PaidCourseRegistrationAnnotation',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('course_id', xmodule_django.models.CourseKeyField(unique=True, max_length=128, db_index=True)),
+                ('course_id', CourseKeyField(unique=True, max_length=128, db_index=True)),
                 ('annotation', models.TextField(null=True)),
             ],
         ),
@@ -204,7 +204,7 @@ class Migration(migrations.Migration):
             name='CertificateItem',
             fields=[
                 ('orderitem_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='shoppingcart.OrderItem')),
-                ('course_id', xmodule_django.models.CourseKeyField(max_length=128, db_index=True)),
+                ('course_id', CourseKeyField(max_length=128, db_index=True)),
                 ('mode', models.SlugField()),
                 ('course_enrollment', models.ForeignKey(to='student.CourseEnrollment')),
             ],
@@ -214,7 +214,7 @@ class Migration(migrations.Migration):
             name='CourseRegCodeItem',
             fields=[
                 ('orderitem_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='shoppingcart.OrderItem')),
-                ('course_id', xmodule_django.models.CourseKeyField(max_length=128, db_index=True)),
+                ('course_id', CourseKeyField(max_length=128, db_index=True)),
                 ('mode', models.SlugField(default=b'honor')),
             ],
             bases=('shoppingcart.orderitem',),
@@ -223,7 +223,7 @@ class Migration(migrations.Migration):
             name='CourseRegistrationCodeInvoiceItem',
             fields=[
                 ('invoiceitem_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='shoppingcart.InvoiceItem')),
-                ('course_id', xmodule_django.models.CourseKeyField(max_length=128, db_index=True)),
+                ('course_id', CourseKeyField(max_length=128, db_index=True)),
             ],
             bases=('shoppingcart.invoiceitem',),
         ),
@@ -232,7 +232,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('orderitem_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='shoppingcart.OrderItem')),
                 ('donation_type', models.CharField(default=b'general', max_length=32, choices=[(b'general', b'A general donation'), (b'course', b'A donation to a particular course')])),
-                ('course_id', xmodule_django.models.CourseKeyField(max_length=255, db_index=True)),
+                ('course_id', CourseKeyField(max_length=255, db_index=True)),
             ],
             bases=('shoppingcart.orderitem',),
         ),
@@ -240,7 +240,7 @@ class Migration(migrations.Migration):
             name='PaidCourseRegistration',
             fields=[
                 ('orderitem_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='shoppingcart.OrderItem')),
-                ('course_id', xmodule_django.models.CourseKeyField(max_length=128, db_index=True)),
+                ('course_id', CourseKeyField(max_length=128, db_index=True)),
                 ('mode', models.SlugField(default=b'honor')),
                 ('course_enrollment', models.ForeignKey(to='student.CourseEnrollment', null=True)),
             ],

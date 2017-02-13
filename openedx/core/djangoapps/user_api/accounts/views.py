@@ -1,23 +1,27 @@
 """
-NOTE: this API is WIP and has not yet been approved. Do not use this API without talking to Christina or Andy.
+An API for retrieving user account information.
 
-For more information, see:
+For additional information and historical context, see:
 https://openedx.atlassian.net/wiki/display/TNL/User+API
 """
+
 from django.db import transaction
 from edx_rest_framework_extensions.authentication import JwtAuthentication
 from rest_framework import permissions
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
 
+from .api import get_account_settings, update_account_settings
+from .permissions import CanDeactivateUser
+from ..errors import UserNotFound, UserNotAuthorized, AccountUpdateError, AccountValidationError
 from openedx.core.lib.api.authentication import (
     SessionAuthenticationAllowInactiveUser,
     OAuth2AuthenticationAllowInactiveUser,
 )
 from openedx.core.lib.api.parsers import MergePatchParser
-from .api import get_account_settings, update_account_settings
-from ..errors import UserNotFound, UserNotAuthorized, AccountUpdateError, AccountValidationError
+from student.models import User
 
 
 class AccountViewSet(ViewSet):
@@ -29,12 +33,22 @@ class AccountViewSet(ViewSet):
 
         **Example Requests**
 
+            GET /api/user/v1/me[?view=shared]
             GET /api/user/v1/accounts?usernames={username1,username2}[?view=shared]
             GET /api/user/v1/accounts/{username}/[?view=shared]
 
             PATCH /api/user/v1/accounts/{username}/{"key":"value"} "application/merge-patch+json"
 
-        **Response Values for GET**
+        **Response Values for GET requests to the /me endpoint**
+            If the user is not logged in, an HTTP 401 "Not Authorized" response
+            is returned.
+
+            Otherwise, an HTTP 200 "OK" response is returned. The response
+            contains the following value:
+
+            * username: The username associated with the account.
+
+        **Response Values for GET requests to /accounts endpoints**
 
             If no user exists with the specified username, an HTTP 404 "Not
             Found" response is returned.
@@ -147,6 +161,12 @@ class AccountViewSet(ViewSet):
     permission_classes = (permissions.IsAuthenticated,)
     parser_classes = (MergePatchParser,)
 
+    def get(self, request):
+        """
+        GET /api/user/v1/me
+        """
+        return Response({'username': request.user.username})
+
     def list(self, request):
         """
         GET /api/user/v1/accounts?username={username1,username2}
@@ -201,4 +221,25 @@ class AccountViewSet(ViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+        return Response(account_settings)
+
+
+class AccountDeactivationView(APIView):
+    """
+    Account deactivation viewset. Currently only supports POST requests.
+    Only admins can deactivate accounts.
+    """
+    authentication_classes = (JwtAuthentication, )
+    permission_classes = (permissions.IsAuthenticated, CanDeactivateUser)
+
+    def post(self, request, username):
+        """
+        POST /api/user/v1/accounts/{username}/deactivate/
+
+        Marks the user as having no password set for deactivation purposes.
+        """
+        user = User.objects.get(username=username)
+        user.set_unusable_password()
+        user.save()
+        account_settings = get_account_settings(request, [username])[0]
         return Response(account_settings)

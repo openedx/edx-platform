@@ -16,7 +16,7 @@
                 'title': 'test thread title'
             });
             this.thread = new Thread(this.threadData);
-            this.course_settings = DiscussionSpecHelper.makeCourseSettings();
+            this.course_settings = DiscussionSpecHelper.createTestCourseSettings();
 
             this.createEditView = function(options) {
                 options = _.extend({
@@ -97,7 +97,11 @@
             beforeEach(function() {
                 this.course_settings = new DiscussionCourseSettings({
                     'category_map': {
-                        'children': ['Topic', 'General', 'Basic Question'],
+                        'children': [ // eslint-disable-line quote-props
+                            ['Topic', 'entry'],
+                            ['General', 'entry'],
+                            ['Basic Question', 'entry']
+                        ],
                         'entries': {
                             'Topic': {
                                 'is_cohorted': true,

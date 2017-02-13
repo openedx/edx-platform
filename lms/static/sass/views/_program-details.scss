@@ -36,7 +36,7 @@
     .breadcrumb-wrapper {
         padding: $full-width-banner-margin;
 
-        @include susy-media(1200px) {
+        @media(min-width: $bp-screen-xl) {
             padding-left: 0;
         }
     }

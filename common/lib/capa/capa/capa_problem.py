@@ -46,6 +46,7 @@ ACCESSIBLE_CAPA_INPUT_TYPES = [
     'optioninput',
     'textline',
     'formulaequationinput',
+    'textbox',
 ]
 
 # these get captured as student responses
@@ -128,7 +129,7 @@ class LoncapaProblem(object):
     Main class for capa Problems.
     """
     def __init__(self, problem_text, id, capa_system, capa_module,  # pylint: disable=redefined-builtin
-                 state=None, seed=None):
+                 state=None, seed=None, minimal_init=False):
         """
         Initializes capa Problem.
 
@@ -142,6 +143,7 @@ class LoncapaProblem(object):
             state (dict): containing the following keys:
                 - `seed` (int) random number generator seed
                 - `student_answers` (dict) maps input id to the stored answer for that input
+                - 'has_saved_answers' (Boolean) True if the answer has been saved since last submit.
                 - `correct_map` (CorrectMap) a map of each input to their 'correctness'
                 - `done` (bool) indicates whether or not this problem is considered done
                 - `input_state` (dict) maps input_id to a dictionary that holds the state for that input
@@ -164,6 +166,7 @@ class LoncapaProblem(object):
         assert self.seed is not None, "Seed must be provided for LoncapaProblem."
 
         self.student_answers = state.get('student_answers', {})
+        self.has_saved_answers = state.get('has_saved_answers', False)
         if 'correct_map' in state:
             self.correct_map.set_dict(state['correct_map'])
         self.done = state.get('done', False)
@@ -183,30 +186,34 @@ class LoncapaProblem(object):
         self._process_includes()
 
         # construct script processor context (eg for customresponse problems)
-        self.context = self._extract_context(self.tree)
+        if minimal_init:
+            self.context = {}
+        else:
+            self.context = self._extract_context(self.tree)
 
         # Pre-parse the XML tree: modifies it to add ID's and perform some in-place
         # transformations.  This also creates the dict (self.responders) of Response
         # instances for each question in the problem. The dict has keys = xml subtree of
         # Response, values = Response instance
-        self.problem_data = self._preprocess_problem(self.tree)
+        self.problem_data = self._preprocess_problem(self.tree, minimal_init)
 
-        if not self.student_answers:  # True when student_answers is an empty dict
-            self.set_initial_display()
+        if not minimal_init:
+            if not self.student_answers:  # True when student_answers is an empty dict
+                self.set_initial_display()
 
-        # dictionary of InputType objects associated with this problem
-        #   input_id string -> InputType object
-        self.inputs = {}
+            # dictionary of InputType objects associated with this problem
+            #   input_id string -> InputType object
+            self.inputs = {}
 
-        # Run response late_transforms last (see MultipleChoiceResponse)
-        # Sort the responses to be in *_1 *_2 ... order.
-        responses = self.responders.values()
-        responses = sorted(responses, key=lambda resp: int(resp.id[resp.id.rindex('_') + 1:]))
-        for response in responses:
-            if hasattr(response, 'late_transforms'):
-                response.late_transforms(self)
+            # Run response late_transforms last (see MultipleChoiceResponse)
+            # Sort the responses to be in *_1 *_2 ... order.
+            responses = self.responders.values()
+            responses = sorted(responses, key=lambda resp: int(resp.id[resp.id.rindex('_') + 1:]))
+            for response in responses:
+                if hasattr(response, 'late_transforms'):
+                    response.late_transforms(self)
 
-        self.extracted_tree = self._extract_html(self.tree)
+            self.extracted_tree = self._extract_html(self.tree)
 
     def make_xml_compatible(self, tree):
         """
@@ -256,6 +263,7 @@ class LoncapaProblem(object):
         Reset internal state to unfinished, with no answers
         """
         self.student_answers = dict()
+        self.has_saved_answers = False
         self.correct_map = CorrectMap()
         self.done = False
 
@@ -282,6 +290,7 @@ class LoncapaProblem(object):
 
         return {'seed': self.seed,
                 'student_answers': self.student_answers,
+                'has_saved_answers': self.has_saved_answers,
                 'correct_map': self.correct_map.get_dict(),
                 'input_state': self.input_state,
                 'done': self.done}
@@ -376,7 +385,7 @@ class LoncapaProblem(object):
 
     def grade_answers(self, answers):
         """
-        Grade student responses.  Called by capa_module.check_problem.
+        Grade student responses.  Called by capa_module.submit_problem.
 
         `answers` is a dict of all the entries from request.POST, but with the first part
         of each key removed (the string before the first "_").
@@ -496,6 +505,7 @@ class LoncapaProblem(object):
         choice-level explanations shown to a student after submission.
         Does nothing if there is no targeted-feedback attribute.
         """
+        _ = self.capa_system.i18n.ugettext
         # Note that the modifications has been done, avoiding problems if called twice.
         if hasattr(self, 'has_targeted'):
             return
@@ -515,9 +525,12 @@ class LoncapaProblem(object):
             # Keep track of the explanation-id that corresponds to the student's answer
             # Also, keep track of the solution-id
             solution_id = None
+            choice_correctness_for_student_answer = _('Incorrect')
             for choice in choices_list:
                 if choice.get('name') == student_answer:
                     expl_id_for_student_answer = choice.get('explanation-id')
+                    if choice.get('correct') == 'true':
+                        choice_correctness_for_student_answer = _('Correct')
                 if choice.get('correct') == 'true':
                     solution_id = choice.get('explanation-id')
 
@@ -527,7 +540,15 @@ class LoncapaProblem(object):
             if len(targetedfeedbackset) != 0:
                 targetedfeedbackset = targetedfeedbackset[0]
                 targetedfeedbacks = targetedfeedbackset.xpath('./targetedfeedback')
+                # find the legend by id in choicegroup.html for aria-describedby
+                problem_legend_id = str(choicegroup.get('id')) + '-legend'
                 for targetedfeedback in targetedfeedbacks:
+                    screenreadertext = etree.Element("span")
+                    targetedfeedback.insert(0, screenreadertext)
+                    screenreadertext.set('class', 'sr')
+                    screenreadertext.text = choice_correctness_for_student_answer
+                    targetedfeedback.set('role', 'group')
+                    targetedfeedback.set('aria-describedby', problem_legend_id)
                     # Don't show targeted feedback if the student hasn't answer the problem
                     # or if the target feedback doesn't match the student's (incorrect) answer
                     if not self.done or targetedfeedback.get('explanation-id') != expl_id_for_student_answer:
@@ -561,6 +582,7 @@ class LoncapaProblem(object):
 
             # Add our solution instead to the targetedfeedbackset and change its tag name
             solution_element.tag = 'targetedfeedback'
+
             targetedfeedbackset.append(solution_element)
 
     def get_html(self):
@@ -775,8 +797,14 @@ class LoncapaProblem(object):
             answervariable = None
             if problemid in self.correct_map:
                 pid = input_id
-                status = self.correct_map.get_correctness(pid)
-                msg = self.correct_map.get_msg(pid)
+
+                # If the the problem has not been saved since the last submit set the status to the
+                # current correctness value and set the message as expected. Otherwise we do not want to
+                # display correctness because the answer may have changed since the problem was graded.
+                if not self.has_saved_answers:
+                    status = self.correct_map.get_correctness(pid)
+                    msg = self.correct_map.get_msg(pid)
+
                 hint = self.correct_map.get_hint(pid)
                 hintmode = self.correct_map.get_hintmode(pid)
                 answervariable = self.correct_map.get_property(pid, 'answervariable')
@@ -796,6 +824,7 @@ class LoncapaProblem(object):
                 'input_state': self.input_state[input_id],
                 'answervariable': answervariable,
                 'response_data': response_data,
+                'has_saved_answers': self.has_saved_answers,
                 'feedback': {
                     'message': msg,
                     'hint': hint,
@@ -840,7 +869,7 @@ class LoncapaProblem(object):
 
         return tree
 
-    def _preprocess_problem(self, tree):  # private
+    def _preprocess_problem(self, tree, minimal_init):  # private
         """
         Assign IDs to all the responses
         Assign sub-IDs to all entries (textline, schematic, etc.)
@@ -878,28 +907,31 @@ class LoncapaProblem(object):
 
             # instantiate capa Response
             responsetype_cls = responsetypes.registry.get_class_for_tag(response.tag)
-            responder = responsetype_cls(response, inputfields, self.context, self.capa_system, self.capa_module)
+            responder = responsetype_cls(
+                response, inputfields, self.context, self.capa_system, self.capa_module, minimal_init
+            )
             # save in list in self
             self.responders[response] = responder
 
-        # get responder answers (do this only once, since there may be a performance cost,
-        # eg with externalresponse)
-        self.responder_answers = {}
-        for response in self.responders.keys():
-            try:
-                self.responder_answers[response] = self.responders[response].get_answers()
-            except:
-                log.debug('responder %s failed to properly return get_answers()',
-                          self.responders[response])  # FIXME
-                raise
+        if not minimal_init:
+            # get responder answers (do this only once, since there may be a performance cost,
+            # eg with externalresponse)
+            self.responder_answers = {}
+            for response in self.responders.keys():
+                try:
+                    self.responder_answers[response] = self.responders[response].get_answers()
+                except:
+                    log.debug('responder %s failed to properly return get_answers()',
+                              self.responders[response])  # FIXME
+                    raise
 
-        # <solution>...</solution> may not be associated with any specific response; give
-        # IDs for those separately
-        # TODO: We should make the namespaces consistent and unique (e.g. %s_problem_%i).
-        solution_id = 1
-        for solution in tree.findall('.//solution'):
-            solution.attrib['id'] = "%s_solution_%i" % (self.problem_id, solution_id)
-            solution_id += 1
+            # <solution>...</solution> may not be associated with any specific response; give
+            # IDs for those separately
+            # TODO: We should make the namespaces consistent and unique (e.g. %s_problem_%i).
+            solution_id = 1
+            for solution in tree.findall('.//solution'):
+                solution.attrib['id'] = "%s_solution_%i" % (self.problem_id, solution_id)
+                solution_id += 1
 
         return problem_data
 
@@ -923,12 +955,26 @@ class LoncapaProblem(object):
         if len(inputfields) > 1:
             response.set('multiple_inputtypes', 'true')
             group_label_tag = response.find('label')
+            group_description_tags = response.findall('description')
+            group_label_tag_id = u'multiinput-group-label-{}'.format(responsetype_id)
             group_label_tag_text = ''
             if group_label_tag is not None:
                 group_label_tag.tag = 'p'
-                group_label_tag.set('id', responsetype_id)
+                group_label_tag.set('id', group_label_tag_id)
                 group_label_tag.set('class', 'multi-inputs-group-label')
                 group_label_tag_text = stringify_children(group_label_tag)
+                response.set('multiinput-group-label-id', group_label_tag_id)
+
+            group_description_ids = []
+            for index, group_description_tag in enumerate(group_description_tags):
+                group_description_tag_id = u'multiinput-group-description-{}-{}'.format(responsetype_id, index)
+                group_description_tag.tag = 'p'
+                group_description_tag.set('id', group_description_tag_id)
+                group_description_tag.set('class', 'multi-inputs-group-description question-description')
+                group_description_ids.append(group_description_tag_id)
+
+            if group_description_ids:
+                response.set('multiinput-group_description_ids', ' '.join(group_description_ids))
 
             for inputfield in inputfields:
                 problem_data[inputfield.get('id')] = {

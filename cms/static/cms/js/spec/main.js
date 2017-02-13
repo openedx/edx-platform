@@ -1,7 +1,24 @@
 /* globals requirejs, requireSerial */
+/* eslint-disable quote-props */
 
 (function(requirejs, requireSerial) {
     'use strict';
+
+    if (window) {
+        define('add-a11y-deps',
+            [
+                'underscore',
+                'underscore.string',
+                'edx-ui-toolkit/js/utils/html-utils',
+                'edx-ui-toolkit/js/utils/string-utils'
+            ], function(_, str, HtmlUtils, StringUtils) {
+                window._ = _;
+                window._.str = str;
+                window.edx = window.edx || {};
+                window.edx.HtmlUtils = HtmlUtils;
+                window.edx.StringUtils = StringUtils;
+            });
+    }
 
     var i, specHelpers, testFiles;
 
@@ -32,15 +49,13 @@
             'jquery.simulate': 'xmodule_js/common_static/js/vendor/jquery.simulate',
             'datepair': 'xmodule_js/common_static/js/vendor/timepicker/datepair',
             'date': 'xmodule_js/common_static/js/vendor/date',
-            'moment': 'xmodule_js/common_static/js/vendor/moment.min',
-            'moment-with-locales': 'xmodule_js/common_static/js/vendor/moment-with-locales.min',
+            moment: 'common/js/vendor/moment-with-locales',
             'text': 'xmodule_js/common_static/js/vendor/requirejs/text',
             'underscore': 'common/js/vendor/underscore',
             'underscore.string': 'common/js/vendor/underscore.string',
             'backbone': 'common/js/vendor/backbone',
             'backbone.associations': 'xmodule_js/common_static/js/vendor/backbone-associations-min',
             'backbone.paginator': 'common/js/vendor/backbone.paginator',
-            'backbone.validation': 'common/js/vendor/backbone-validation-min',
             'backbone-relational': 'xmodule_js/common_static/js/vendor/backbone-relational.min',
             'tinymce': 'xmodule_js/common_static/js/vendor/tinymce/js/tinymce/tinymce.full.min',
             'jquery.tinymce': 'xmodule_js/common_static/js/vendor/tinymce/js/tinymce/jquery.tinymce',
@@ -49,14 +64,14 @@
             'xblock': 'common/js/xblock',
             'utility': 'xmodule_js/common_static/js/src/utility',
             'accessibility': 'xmodule_js/common_static/js/src/accessibility_tools',
-            'sinon': 'xmodule_js/common_static/js/vendor/sinon-1.17.0',
-            'squire': 'xmodule_js/common_static/js/vendor/Squire',
+            'sinon': 'common/js/vendor/sinon',
+            'squire': 'common/js/vendor/Squire',
             'jasmine-imagediff': 'xmodule_js/common_static/js/vendor/jasmine-imagediff',
             'draggabilly': 'xmodule_js/common_static/js/vendor/draggabilly',
             'domReady': 'xmodule_js/common_static/js/vendor/domReady',
             'URI': 'xmodule_js/common_static/js/vendor/URI.min',
             'mock-ajax': 'xmodule_js/common_static/js/vendor/mock-ajax',
-            mathjax: '//cdn.mathjax.org/mathjax/2.6-latest/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured',   // eslint-disable-line max-len
+            mathjax: '//cdn.mathjax.org/mathjax/2.7-latest/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured',   // eslint-disable-line max-len
             'youtube': '//www.youtube.com/player_api?noext',
             'coffee/src/ajax_prefix': 'xmodule_js/common_static/coffee/src/ajax_prefix',
             'js/spec/test_utils': 'js/spec/test_utils'
@@ -169,6 +184,10 @@
                     return window.MathJax.Hub.Configured();
                 }
             },
+            'accessibility': {
+                exports: 'accessibility',
+                deps: ['add-a11y-deps']
+            },
             'URI': {
                 exports: 'URI'
             },
@@ -270,10 +289,7 @@
         'js/certificates/spec/views/certificate_details_spec',
         'js/certificates/spec/views/certificate_editor_spec',
         'js/certificates/spec/views/certificates_list_spec',
-        'js/certificates/spec/views/certificate_preview_spec',
-        'js/spec/models/auto_auth_model_spec',
-        'js/spec/views/programs/program_creator_spec',
-        'js/spec/views/programs/program_details_spec'
+        'js/certificates/spec/views/certificate_preview_spec'
     ];
 
     i = 0;
@@ -290,6 +306,6 @@
     ];
 
     requireSerial(specHelpers.concat(testFiles), function() {
-        return window.__karma__.start();
+        return window.__karma__.start();  // eslint-disable-line no-underscore-dangle
     });
 }).call(this, requirejs, requireSerial);

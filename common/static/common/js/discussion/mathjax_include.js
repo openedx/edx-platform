@@ -1,5 +1,13 @@
-var vendorScript;
+// See common/templates/mathjax_include.html for info on Fast Preview mode.
+var disableFastPreview = true,
+    vendorScript;
 if (typeof MathJax === 'undefined') {
+    if (disableFastPreview) {
+        window.MathJax = {
+            menuSettings: {CHTMLpreview: false}
+        };
+    }
+
     vendorScript = document.createElement('script');
     vendorScript.onload = function() {
         'use strict';
@@ -17,6 +25,9 @@ if (typeof MathJax === 'undefined') {
                 ]
             }
         });
+        if (disableFastPreview) {
+            MathJax.Hub.processSectionDelay = 0;
+        }
         MathJax.Hub.signal.Interest(function(message) {
             if (message[0] === 'End Math') {
                 setMathJaxDisplayDivSettings();
@@ -31,6 +42,6 @@ if (typeof MathJax === 'undefined') {
             });
         };
     };
-    vendorScript.src = 'https://cdn.mathjax.org/mathjax/2.6-latest/MathJax.js?config=TeX-MML-AM_SVG';
+    vendorScript.src = 'https://cdn.mathjax.org/mathjax/2.7-latest/MathJax.js?config=TeX-MML-AM_SVG';
     document.body.appendChild(vendorScript);
 }

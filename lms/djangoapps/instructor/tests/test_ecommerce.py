@@ -30,7 +30,7 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
 
         # URL for instructor dash
         cls.url = reverse('instructor_dashboard', kwargs={'course_id': cls.course.id.to_deprecated_string()})
-        cls.e_commerce_link = '<button type="button" class="btn-link" data-section="e-commerce">E-Commerce</button>'
+        cls.ecommerce_link = '<button type="button" class="btn-link" data-section="e-commerce">E-Commerce</button>'
 
     def setUp(self):
         super(TestECommerceDashboardViews, self).setUp()
@@ -50,7 +50,7 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         Test Pass E-commerce Tab is in the Instructor Dashboard
         """
         response = self.client.get(self.url)
-        self.assertIn(self.e_commerce_link, response.content)
+        self.assertIn(self.ecommerce_link, response.content)
         # Coupons should show up for White Label sites with priced honor modes.
         self.assertIn('Coupon Code List', response.content)
 
@@ -61,7 +61,7 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         self.use_site(site=self.site_other)
         self.client.login(username=self.instructor.username, password="test")
         response = self.client.get(self.url)
-        self.assertIn(self.e_commerce_link, response.content)
+        self.assertIn(self.ecommerce_link, response.content)
         self.assertIn('Create Enrollment Report', response.content)
 
     def test_reports_section_not_under_e_commerce_tab(self):
@@ -70,12 +70,12 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         value
         """
         response = self.client.get(self.url)
-        self.assertIn(self.e_commerce_link, response.content)
+        self.assertIn(self.ecommerce_link, response.content)
         self.assertNotIn('Create Enrollment Report', response.content)
 
     def test_user_has_finance_admin_rights_in_e_commerce_tab(self):
         response = self.client.get(self.url)
-        self.assertIn(self.e_commerce_link, response.content)
+        self.assertIn(self.ecommerce_link, response.content)
 
         # Order/Invoice sales csv button text should render in e-commerce page
         self.assertIn('Total Credit Card Purchases', response.content)
@@ -96,7 +96,7 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
         the instructor dashboard
         """
         response = self.client.get(self.url)
-        self.assertIn(self.e_commerce_link, response.content)
+        self.assertIn(self.ecommerce_link, response.content)
 
         # Total amount html should render in e-commerce page, total amount will be 0
         course_honor_mode = CourseMode.mode_for_course(self.course.id, 'honor')
@@ -351,6 +351,39 @@ class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
 
         # Get the response value, ensure the Coupon section is not included.
         response = self.client.get(self.url)
-        self.assertIn(self.e_commerce_link, response.content)
+        self.assertIn(self.ecommerce_link, response.content)
         # Coupons should show up for White Label sites with priced honor modes.
         self.assertNotIn('Coupons List', response.content)
+
+    def test_coupon_code_section_not_under_e_commerce_tab(self):
+        """
+        Test Coupon Creation UI, under E-commerce Tab, should not be available in the Instructor Dashboard with
+        e-commerce course
+        """
+        # Setup e-commerce course
+        CourseMode.objects.filter(course_id=self.course.id).update(sku='test_sku')
+
+        response = self.client.get(self.url)
+        self.assertIn(self.ecommerce_link, response.content)
+        self.assertNotIn('Coupon Code List', response.content)
+
+    def test_enrollment_codes_section_not_under_e_commerce_tab(self):
+        """
+        Test Enrollment Codes UI, under E-commerce Tab, should not be available in the Instructor Dashboard with
+        e-commerce course
+        """
+        # Setup e-commerce course
+        CourseMode.objects.filter(course_id=self.course.id).update(sku='test_sku')
+
+        response = self.client.get(self.url)
+        self.assertIn(self.ecommerce_link, response.content)
+        self.assertNotIn('<h3 class="hd hd-3">Enrollment Codes</h3>', response.content)
+
+    def test_enrollment_codes_section_visible_for_non_ecommerce_course(self):
+        """
+        Test Enrollment Codes UI, under E-commerce Tab, should be available in the Instructor Dashboard with non
+        e-commerce course
+        """
+        response = self.client.get(self.url)
+        self.assertIn(self.ecommerce_link, response.content)
+        self.assertIn('<h3 class="hd hd-3">Enrollment Codes</h3>', response.content)

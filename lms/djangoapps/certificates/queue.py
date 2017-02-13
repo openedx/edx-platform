@@ -11,7 +11,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from requests.auth import HTTPBasicAuth
 
-from lms.djangoapps.grades import course_grades
+from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
 from xmodule.modulestore.django import modulestore
 from capa.xqueue_interface import XQueueInterface
 from capa.xqueue_interface import make_xheader, make_hashkey
@@ -199,6 +199,8 @@ class XQueueCertInterface(object):
         Will change the certificate status to 'generating' or
         `downloadable` in case of web view certificates.
 
+        The course must not be a CCX.
+
         Certificate must be in the 'unavailable', 'error',
         'deleted' or 'generating' state.
 
@@ -213,6 +215,18 @@ class XQueueCertInterface(object):
 
         Returns the newly created certificate instance
         """
+
+        if hasattr(course_id, 'ccx'):
+            LOGGER.warning(
+                (
+                    u"Cannot create certificate generation task for user %s "
+                    u"in the course '%s'; "
+                    u"certificates are not allowed for CCX courses."
+                ),
+                student.id,
+                unicode(course_id)
+            )
+            return None
 
         valid_statuses = [
             status.generating,
@@ -257,7 +271,7 @@ class XQueueCertInterface(object):
         self.request.session = {}
 
         is_whitelisted = self.whitelist.filter(user=student, course_id=course_id, whitelist=True).exists()
-        grade = course_grades.summary(student, course)
+        grade = CourseGradeFactory().create(student, course).summary
         enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(student, course_id)
         mode_is_verified = enrollment_mode in GeneratedCertificate.VERIFIED_CERTS_MODES
         user_is_verified = SoftwareSecurePhotoVerification.user_is_verified(student)

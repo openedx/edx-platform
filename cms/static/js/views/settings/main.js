@@ -337,7 +337,7 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                },
                codeMirrors: {},
                codeMirrorize: function(e, forcedTarget) {
-                   var thisTarget;
+                   var thisTarget, cachethis, field, cmTextArea;
                    if (forcedTarget) {
                        thisTarget = forcedTarget;
                        thisTarget.id = $(thisTarget).attr('id');
@@ -354,8 +354,8 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                    }
 
                    if (!this.codeMirrors[thisTarget.id]) {
-                       var cachethis = this;
-                       var field = this.selectorToField[thisTarget.id];
+                       cachethis = this;
+                       field = this.selectorToField[thisTarget.id];
                        this.codeMirrors[thisTarget.id] = CodeMirror.fromTextArea(thisTarget, {
                            mode: 'text/html', lineNumbers: true, lineWrapping: true});
                        this.codeMirrors[thisTarget.id].on('change', function(mirror) {
@@ -366,6 +366,8 @@ define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui'
                                cachethis.setAndValidate(field, newVal);
                            }
                        });
+                       cmTextArea = this.codeMirrors[thisTarget.id].getInputField();
+                       cmTextArea.setAttribute('id', 'course-overview-cm-textarea');
                    }
                },
 

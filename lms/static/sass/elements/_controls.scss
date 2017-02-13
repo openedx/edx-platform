@@ -461,6 +461,7 @@
     background-image: none;
     box-shadow: none;
     text-shadow: none;
+    white-space: nowrap;
 
     @extend %t-action3;
     @extend %t-strong;

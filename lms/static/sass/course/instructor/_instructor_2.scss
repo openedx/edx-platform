@@ -1283,7 +1283,8 @@
 
 // view - student admin
 // --------------------
-.instructor-dashboard-wrapper-2 section.idash-section#student_admin > {
+.instructor-dashboard-wrapper-2 section.idash-section#student_admin {
+
   .action-type-container{
     margin-bottom: $baseline * 2;
   }
@@ -1295,11 +1296,22 @@
   .task-history-all-table    {
     margin-top: 1em;
   }
+
   .task-history-single-table {
     margin-top: 1em;
   }
+
   .running-tasks-table {
     margin-top: 1em;
+  }
+
+  input[type="text"] {
+    width: 651px;
+  }
+
+  .location-example {
+    font-style: italic;
+    font-size: 0.9em;
   }
 }
 

@@ -69,6 +69,9 @@ def is_youtube_available():
         bool:
 
     """
+    # TODO: Design and implement a better solution that is reliable and repeatable,
+    # reflects how the application works in production, and limits the third-party
+    # network traffic (e.g. repeatedly retrieving the js from youtube from the browser).
 
     youtube_api_urls = {
         'main': 'https://www.youtube.com/',
@@ -88,6 +91,13 @@ def is_youtube_available():
             return False
 
     return True
+
+
+def is_focused_on_element(browser, selector):
+    """
+    Check if the focus is on the element that matches the selector.
+    """
+    return browser.execute_script("return $('{}').is(':focus')".format(selector))
 
 
 def load_data_str(rel_path):
@@ -353,17 +363,29 @@ def is_404_page(browser):
     return 'Page not found (404)' in browser.find_element_by_tag_name('h1').text
 
 
+def create_multiple_choice_xml(correct_choice=2, num_choices=4):
+    """
+    Return the Multiple Choice Problem XML, given the name of the problem.
+    """
+    # all choices are incorrect except for correct_choice
+    choices = [False for _ in range(num_choices)]
+    choices[correct_choice] = True
+
+    choice_names = ['choice_{}'.format(index) for index in range(num_choices)]
+    question_text = 'The correct answer is Choice {}'.format(correct_choice)
+
+    return MultipleChoiceResponseXMLFactory().build_xml(
+        question_text=question_text,
+        choices=choices,
+        choice_names=choice_names,
+    )
+
+
 def create_multiple_choice_problem(problem_name):
     """
     Return the Multiple Choice Problem Descriptor, given the name of the problem.
     """
-    factory = MultipleChoiceResponseXMLFactory()
-    xml_data = factory.build_xml(
-        question_text='The correct answer is Choice 2',
-        choices=[False, False, True, False],
-        choice_names=['choice_0', 'choice_1', 'choice_2', 'choice_3']
-    )
-
+    xml_data = create_multiple_choice_xml()
     return XBlockFixtureDesc(
         'problem',
         problem_name,
@@ -396,7 +418,7 @@ def assert_opened_help_link_is_correct(test, url):
     """
     Asserts that url of browser when help link is clicked is correct.
     Arguments:
-        test (WebAppTest): test calling this method.
+        test (AcceptanceTest): test calling this method.
         url (str): url to verify.
     """
     test.browser.switch_to_window(test.browser.window_handles[-1])
@@ -678,7 +700,19 @@ class CollectedEventsDescription(object):
         return '\n\n'.join(message_lines)
 
 
-class UniqueCourseTest(WebAppTest):
+class AcceptanceTest(WebAppTest):
+    """
+    The base class of all acceptance tests.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super(AcceptanceTest, self).__init__(*args, **kwargs)
+
+        # Use long messages so that failures show actual and expected values
+        self.longMessage = True  # pylint: disable=invalid-name
+
+
+class UniqueCourseTest(AcceptanceTest):
     """
     Test that provides a unique course ID.
     """
@@ -798,7 +832,7 @@ def create_user_partition_json(partition_id, name, description, groups, scheme="
     ).to_json()
 
 
-def assert_nav_help_link(test, page, href, signed_in=True):
+def assert_nav_help_link(test, page, href, signed_in=True, close_window=True):
     """
     Asserts that help link in navigation bar is correct.
 
@@ -806,10 +840,11 @@ def assert_nav_help_link(test, page, href, signed_in=True):
     then clicks to ensure that help opens correctly.
 
     Arguments:
-    test (WebAppTest): Test object
+    test (AcceptanceTest): Test object
     page (PageObject): Page object to perform tests on.
     href (str): The help link which we expect to see when it is opened.
-    signed_in (bool): Specifies whether user is logged in or not. (It effects the css)
+    signed_in (bool): Specifies whether user is logged in or not. (It affects the css)
+    close_window(bool): Close the newly-opened help window before continuing
     """
     expected_link = {
         'href': href,
@@ -821,9 +856,12 @@ def assert_nav_help_link(test, page, href, signed_in=True):
     assert_link(test, expected_link, actual_link)
     # Assert that opened link is correct
     assert_opened_help_link_is_correct(test, href)
+    # Close the help window if not kept open intentionally
+    if close_window:
+        close_help_window(page)
 
 
-def assert_side_bar_help_link(test, page, href, help_text, as_list_item=False, index=-1):
+def assert_side_bar_help_link(test, page, href, help_text, as_list_item=False, index=-1, close_window=True):
     """
     Asserts that help link in side bar is correct.
 
@@ -831,13 +869,14 @@ def assert_side_bar_help_link(test, page, href, help_text, as_list_item=False, i
     then clicks to ensure that help opens correctly.
 
     Arguments:
-    test (WebAppTest): Test object
+    test (AcceptanceTest): Test object
     page (PageObject): Page object to perform tests on.
     href (str): The help link which we expect to see when it is opened.
     as_list_item (bool): Specifies whether help element is in one of the
                          'li' inside a sidebar list DOM element.
     index (int): The index of element in case there are more than
                  one matching elements.
+    close_window(bool): Close the newly-opened help window before continuing
     """
     expected_link = {
         'href': href,
@@ -849,6 +888,21 @@ def assert_side_bar_help_link(test, page, href, help_text, as_list_item=False, i
     assert_link(test, expected_link, actual_link)
     # Assert that opened link is correct
     assert_opened_help_link_is_correct(test, href)
+    # Close the help window if not kept open intentionally
+    if close_window:
+        close_help_window(page)
+
+
+def close_help_window(page):
+    """
+    Closes the help window
+    Args:
+        page (PageObject): Page object to perform tests on.
+    """
+    browser_url = page.browser.current_url
+    if browser_url.startswith('https://edx.readthedocs.io') or browser_url.startswith('http://edx.readthedocs.io'):
+        page.browser.close()  # close only the current window
+        page.browser.switch_to_window(page.browser.window_handles[0])
 
 
 class TestWithSearchIndexMixin(object):

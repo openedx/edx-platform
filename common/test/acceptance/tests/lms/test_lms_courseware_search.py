@@ -3,6 +3,7 @@ Test courseware search
 """
 import json
 
+from flaky import flaky
 from nose.plugins.attrib import attr
 
 from common.test.acceptance.tests.helpers import UniqueCourseTest, remove_file
@@ -176,6 +177,7 @@ class CoursewareSearchTest(UniqueCourseTest):
         # Do the search again, this time we expect results.
         self.assertTrue(self._search_for_content(self.SEARCH_STRING))
 
+    @flaky  # TNL-5771
     def test_reindex(self):
         """
         Make sure new content gets reindexed on button press.

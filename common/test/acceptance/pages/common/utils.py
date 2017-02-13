@@ -3,6 +3,7 @@ Utility methods common to Studio and the LMS.
 """
 from bok_choy.promise import EmptyPromise
 from common.test.acceptance.tests.helpers import disable_animations
+from selenium.webdriver.common.action_chains import ActionChains
 
 
 def wait_for_notification(page):
@@ -17,8 +18,18 @@ def wait_for_notification(page):
         """Whether or not the notification is finished showing."""
         return page.q(css='.wrapper-notification-mini.is-hiding').present
 
-    EmptyPromise(_is_saving, 'Notification should have been shown.', timeout=60).fulfill()
-    EmptyPromise(_is_saving_done, 'Notification should have been hidden.', timeout=60).fulfill()
+    EmptyPromise(
+        _is_saving,
+        'Notification should have been shown.',
+        try_interval=0.1,
+        timeout=60,
+    ).fulfill()
+    EmptyPromise(
+        _is_saving_done,
+        'Notification should have been hidden.',
+        try_interval=0.1,
+        timeout=60,
+    ).fulfill()
 
 
 def click_css(page, css, source_index=0, require_notification=True):
@@ -60,3 +71,10 @@ def confirm_prompt(page, cancel=False, require_notification=None):
     page.wait_for_element_visibility(confirmation_button_css, 'Confirmation button is visible')
     require_notification = (not cancel) if require_notification is None else require_notification
     click_css(page, confirmation_button_css, require_notification=require_notification)
+
+
+def hover(browser, element):
+    """
+    Hover over an element.
+    """
+    ActionChains(browser).move_to_element(element).perform()

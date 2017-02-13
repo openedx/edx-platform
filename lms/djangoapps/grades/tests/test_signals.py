@@ -2,57 +2,92 @@
 Tests for the score change signals defined in the courseware models module.
 """
 
+import re
+
+from datetime import datetime
 import ddt
-from django.conf import settings
 from django.test import TestCase
 from mock import patch, MagicMock
-from unittest import skip
+import pytz
+from util.date_utils import to_timestamp
 
-from lms.djangoapps.grades.config.models import PersistentGradesEnabledFlag
-from student.models import anonymous_id_for_user
-from student.tests.factories import UserFactory
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
-
+from ..constants import ScoreDatabaseTableEnum
 from ..signals.handlers import (
+    enqueue_subsection_update,
     submissions_score_set_handler,
     submissions_score_reset_handler,
-    recalculate_subsection_grade_handler,
+    problem_raw_score_changed_handler,
 )
-from ..signals.signals import SCORE_CHANGED
 
+UUID_REGEX = re.compile(ur'%(hex)s{8}-%(hex)s{4}-%(hex)s{4}-%(hex)s{4}-%(hex)s{12}' % {'hex': u'[0-9a-f]'})
+
+FROZEN_NOW_DATETIME = datetime.now().replace(tzinfo=pytz.UTC)
+FROZEN_NOW_TIMESTAMP = to_timestamp(FROZEN_NOW_DATETIME)
 
 SUBMISSION_SET_KWARGS = {
     'points_possible': 10,
     'points_earned': 5,
     'anonymous_user_id': 'anonymous_id',
     'course_id': 'CourseID',
-    'item_id': 'i4x://org/course/usage/123456'
+    'item_id': 'i4x://org/course/usage/123456',
+    'created_at': FROZEN_NOW_TIMESTAMP,
 }
-
 
 SUBMISSION_RESET_KWARGS = {
     'anonymous_user_id': 'anonymous_id',
     'course_id': 'CourseID',
-    'item_id': 'i4x://org/course/usage/123456'
+    'item_id': 'i4x://org/course/usage/123456',
+    'created_at': FROZEN_NOW_TIMESTAMP,
+}
+
+PROBLEM_RAW_SCORE_CHANGED_KWARGS = {
+    'raw_earned': 1.0,
+    'raw_possible': 2.0,
+    'weight': 4,
+    'user_id': 'UserID',
+    'course_id': 'CourseID',
+    'usage_id': 'i4x://org/course/usage/123456',
+    'only_if_higher': False,
+    'score_deleted': True,
+    'modified': FROZEN_NOW_TIMESTAMP,
+    'score_db_table': ScoreDatabaseTableEnum.courseware_student_module,
+}
+
+PROBLEM_WEIGHTED_SCORE_CHANGED_KWARGS = {
+    'sender': None,
+    'weighted_earned': 2.0,
+    'weighted_possible': 4.0,
+    'user_id': 'UserID',
+    'course_id': 'CourseID',
+    'usage_id': 'i4x://org/course/usage/123456',
+    'only_if_higher': False,
+    'score_deleted': True,
+    'modified': FROZEN_NOW_TIMESTAMP,
+    'score_db_table': ScoreDatabaseTableEnum.courseware_student_module,
 }
 
 
-class SubmissionSignalRelayTest(TestCase):
+@ddt.ddt
+class ScoreChangedSignalRelayTest(TestCase):
     """
-    Tests to ensure that the courseware module correctly catches score_set and
-    score_reset signals from the Submissions API and recasts them as LMS
-    signals. This ensures that listeners in the LMS only have to handle one type
-    of signal for all scoring events.
+    Tests to ensure that the courseware module correctly catches
+    (a) score_set and score_reset signals from the Submissions API
+    (b) LMS PROBLEM_RAW_SCORE_CHANGED signals
+    and recasts them as LMS PROBLEM_WEIGHTED_SCORE_CHANGED signals.
+
+    This ensures that listeners in the LMS only have to handle one type
+    of signal for all scoring events regardless of their origin.
     """
 
     def setUp(self):
         """
         Configure mocks for all the dependencies of the render method
         """
-        super(SubmissionSignalRelayTest, self).setUp()
-        self.signal_mock = self.setup_patch('lms.djangoapps.grades.signals.signals.SCORE_CHANGED.send', None)
+        super(ScoreChangedSignalRelayTest, self).setUp()
+        self.signal_mock = self.setup_patch(
+            'lms.djangoapps.grades.signals.signals.PROBLEM_WEIGHTED_SCORE_CHANGED.send',
+            None,
+        )
         self.user_mock = MagicMock()
         self.user_mock.id = 42
         self.get_user_mock = self.setup_patch(
@@ -70,202 +105,99 @@ class SubmissionSignalRelayTest(TestCase):
         self.addCleanup(new_patch.stop)
         return mock
 
-    def test_score_set_signal_handler(self):
-        """
-        Ensure that, on receipt of a score_set signal from the Submissions API,
-        the courseware model correctly converts it to a score_changed signal
-        """
-        submissions_score_set_handler(None, **SUBMISSION_SET_KWARGS)
-        expected_set_kwargs = {
-            'sender': None,
-            'points_possible': 10,
-            'points_earned': 5,
-            'user': self.user_mock,
-            'course_id': 'CourseID',
-            'usage_id': 'i4x://org/course/usage/123456'
-        }
-        self.signal_mock.assert_called_once_with(**expected_set_kwargs)
-
-    def test_score_set_user_conversion(self):
-        """
-        Ensure that the score_set handler properly calls the
-        user_by_anonymous_id method to convert from an anonymized ID to a user
-        object
-        """
-        submissions_score_set_handler(None, **SUBMISSION_SET_KWARGS)
-        self.get_user_mock.assert_called_once_with('anonymous_id')
-
-    def test_score_set_missing_kwarg(self):
-        """
-        Ensure that, on receipt of a score_set signal from the Submissions API
-        that does not have the correct kwargs, the courseware model does not
-        generate a signal.
-        """
-        for missing in SUBMISSION_SET_KWARGS:
-            kwargs = SUBMISSION_SET_KWARGS.copy()
-            del kwargs[missing]
-
-            with self.assertRaises(KeyError):
-                submissions_score_set_handler(None, **kwargs)
-            self.signal_mock.assert_not_called()
-
-    def test_score_set_bad_user(self):
-        """
-        Ensure that, on receipt of a score_set signal from the Submissions API
-        that has an invalid user ID, the courseware model does not generate a
-        signal.
-        """
-        self.get_user_mock = self.setup_patch('lms.djangoapps.grades.signals.handlers.user_by_anonymous_id', None)
-        submissions_score_set_handler(None, **SUBMISSION_SET_KWARGS)
-        self.signal_mock.assert_not_called()
-
-    def test_score_reset_signal_handler(self):
-        """
-        Ensure that, on receipt of a score_reset signal from the Submissions
-        API, the courseware model correctly converts it to a score_changed
-        signal
-        """
-        submissions_score_reset_handler(None, **SUBMISSION_RESET_KWARGS)
-        expected_reset_kwargs = {
-            'sender': None,
-            'points_possible': 0,
-            'points_earned': 0,
-            'user': self.user_mock,
-            'course_id': 'CourseID',
-            'usage_id': 'i4x://org/course/usage/123456'
-        }
-        self.signal_mock.assert_called_once_with(**expected_reset_kwargs)
-
-    def test_score_reset_user_conversion(self):
-        """
-        Ensure that the score_reset handler properly calls the
-        user_by_anonymous_id method to convert from an anonymized ID to a user
-        object
-        """
-        submissions_score_reset_handler(None, **SUBMISSION_RESET_KWARGS)
-        self.get_user_mock.assert_called_once_with('anonymous_id')
-
-    def test_score_reset_missing_kwarg(self):
-        """
-        Ensure that, on receipt of a score_reset signal from the Submissions API
-        that does not have the correct kwargs, the courseware model does not
-        generate a signal.
-        """
-        for missing in SUBMISSION_RESET_KWARGS:
-            kwargs = SUBMISSION_RESET_KWARGS.copy()
-            del kwargs[missing]
-
-            with self.assertRaises(KeyError):
-                submissions_score_reset_handler(None, **kwargs)
-            self.signal_mock.assert_not_called()
-
-    def test_score_reset_bad_user(self):
-        """
-        Ensure that, on receipt of a score_reset signal from the Submissions API
-        that has an invalid user ID, the courseware model does not generate a
-        signal.
-        """
-        self.get_user_mock = self.setup_patch('lms.djangoapps.grades.signals.handlers.user_by_anonymous_id', None)
-        submissions_score_reset_handler(None, **SUBMISSION_RESET_KWARGS)
-        self.signal_mock.assert_not_called()
-
-
-@patch.dict(settings.FEATURES, {'PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS': False})
-@ddt.ddt
-class ScoreChangedUpdatesSubsectionGradeTest(ModuleStoreTestCase):
-    """
-    Ensures that upon SCORE_CHANGED signals, the handler
-    initiates an update to the affected subsection grade.
-    """
-    def setUp(self):
-        super(ScoreChangedUpdatesSubsectionGradeTest, self).setUp()
-        self.user = UserFactory()
-        PersistentGradesEnabledFlag.objects.create(enabled_for_all_courses=True, enabled=True)
-
-    def set_up_course(self, enable_subsection_grades=True):
-        """
-        Configures the course for this test.
-        """
-        # pylint: disable=attribute-defined-outside-init,no-member
-        self.course = CourseFactory.create(
-            org='edx',
-            name='course',
-            run='run',
-        )
-        if not enable_subsection_grades:
-            PersistentGradesEnabledFlag.objects.create(enabled=False)
-
-        self.chapter = ItemFactory.create(parent=self.course, category="chapter", display_name="Chapter")
-        self.sequential = ItemFactory.create(parent=self.chapter, category='sequential', display_name="Open Sequential")
-        self.problem = ItemFactory.create(parent=self.sequential, category='problem', display_name='problem')
-
-        self.score_changed_kwargs = {
-            'points_possible': 10,
-            'points_earned': 5,
-            'user': self.user,
-            'course_id': unicode(self.course.id),
-            'usage_id': unicode(self.problem.location),
-        }
-
-        # this call caches the anonymous id on the user object, saving 4 queries in all happy path tests
-        _ = anonymous_id_for_user(self.user, self.course.id)
-        # pylint: enable=attribute-defined-outside-init,no-member
-
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_subsection_grade_updated_on_signal(self, default_store):
-        with self.store.default_store(default_store):
-            self.set_up_course()
-            self.assertTrue(PersistentGradesEnabledFlag.feature_enabled(self.course.id))
-            with check_mongo_calls(2) and self.assertNumQueries(11):
-                recalculate_subsection_grade_handler(None, **self.score_changed_kwargs)
-
-    def test_single_call_to_create_block_structure(self):
-        self.set_up_course()
-        self.assertTrue(PersistentGradesEnabledFlag.feature_enabled(self.course.id))
-        with patch(
-            'openedx.core.lib.block_structure.factory.BlockStructureFactory.create_from_cache',
-            return_value=None,
-        ) as mock_block_structure_create:
-            recalculate_subsection_grade_handler(None, **self.score_changed_kwargs)
-            self.assertEquals(mock_block_structure_create.call_count, 1)
-
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_query_count_does_not_change_with_more_problems(self, default_store):
-        with self.store.default_store(default_store):
-            self.set_up_course()
-            self.assertTrue(PersistentGradesEnabledFlag.feature_enabled(self.course.id))
-            ItemFactory.create(parent=self.sequential, category='problem', display_name='problem2')
-            ItemFactory.create(parent=self.sequential, category='problem', display_name='problem3')
-            with check_mongo_calls(2) and self.assertNumQueries(11):
-                recalculate_subsection_grade_handler(None, **self.score_changed_kwargs)
-
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_subsection_grades_not_enabled_on_course(self, default_store):
-        with self.store.default_store(default_store):
-            self.set_up_course(enable_subsection_grades=False)
-            self.assertFalse(PersistentGradesEnabledFlag.feature_enabled(self.course.id))
-            with check_mongo_calls(2) and self.assertNumQueries(3):
-                recalculate_subsection_grade_handler(None, **self.score_changed_kwargs)
-
-    @skip("Pending completion of TNL-5089")
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, True),
-        (ModuleStoreEnum.Type.split, True),
-        (ModuleStoreEnum.Type.mongo, False),
-        (ModuleStoreEnum.Type.split, False),
+        [submissions_score_set_handler, SUBMISSION_SET_KWARGS, 5, 10],
+        [submissions_score_reset_handler, SUBMISSION_RESET_KWARGS, 0, 0],
     )
     @ddt.unpack
-    def test_score_changed_sent_with_feature_flag(self, default_store, feature_flag):
-        PersistentGradesEnabledFlag.objects.create(enabled=feature_flag)
-        with self.store.default_store(default_store):
-            self.set_up_course()
-            with check_mongo_calls(0) and self.assertNumQueries(15 if feature_flag else 1):
-                SCORE_CHANGED.send(sender=None, **self.score_changed_kwargs)
+    def test_score_set_signal_handler(self, handler, kwargs, earned, possible):
+        """
+        Ensure that on receipt of a score_(re)set signal from the Submissions API,
+        the signal handler correctly converts it to a PROBLEM_WEIGHTED_SCORE_CHANGED
+        signal.
 
-    @ddt.data('user', 'course_id', 'usage_id')
-    def test_missing_kwargs(self, kwarg):
-        self.set_up_course()
-        self.assertTrue(PersistentGradesEnabledFlag.feature_enabled(self.course.id))
-        del self.score_changed_kwargs[kwarg]
-        with self.assertRaises(KeyError):
-            recalculate_subsection_grade_handler(None, **self.score_changed_kwargs)
+        Also ensures that the handler calls user_by_anonymous_id correctly.
+        """
+        handler(None, **kwargs)
+        expected_set_kwargs = {
+            'sender': None,
+            'weighted_possible': possible,
+            'weighted_earned': earned,
+            'user_id': self.user_mock.id,
+            'anonymous_user_id': 'anonymous_id',
+            'course_id': 'CourseID',
+            'usage_id': 'i4x://org/course/usage/123456',
+            'modified': FROZEN_NOW_TIMESTAMP,
+            'score_db_table': 'submissions',
+        }
+        self.signal_mock.assert_called_once_with(**expected_set_kwargs)
+        self.get_user_mock.assert_called_once_with(kwargs['anonymous_user_id'])
+
+    @ddt.data(
+        [submissions_score_set_handler, SUBMISSION_SET_KWARGS],
+        [submissions_score_reset_handler, SUBMISSION_RESET_KWARGS]
+    )
+    @ddt.unpack
+    def test_score_set_missing_kwarg(self, handler, kwargs):
+        """
+        Ensure that, on receipt of a score_(re)set signal from the Submissions API
+        that does not have the correct kwargs, the courseware model does not
+        generate a signal.
+        """
+        for missing in kwargs:
+            local_kwargs = kwargs.copy()
+            del local_kwargs[missing]
+
+            with self.assertRaises(KeyError):
+                handler(None, **local_kwargs)
+            self.signal_mock.assert_not_called()
+
+    @ddt.data(
+        [submissions_score_set_handler, SUBMISSION_SET_KWARGS],
+        [submissions_score_reset_handler, SUBMISSION_RESET_KWARGS]
+    )
+    @ddt.unpack
+    def test_score_set_bad_user(self, handler, kwargs):
+        """
+        Ensure that, on receipt of a score_(re)set signal from the Submissions API
+        that has an invalid user ID, the courseware model does not generate a
+        signal.
+        """
+        self.get_user_mock = self.setup_patch('lms.djangoapps.grades.signals.handlers.user_by_anonymous_id', None)
+        handler(None, **kwargs)
+        self.signal_mock.assert_not_called()
+
+    def test_raw_score_changed_signal_handler(self):
+        problem_raw_score_changed_handler(None, **PROBLEM_RAW_SCORE_CHANGED_KWARGS)
+        expected_set_kwargs = PROBLEM_WEIGHTED_SCORE_CHANGED_KWARGS.copy()
+        self.signal_mock.assert_called_with(**expected_set_kwargs)
+
+    def test_raw_score_changed_score_deleted_optional(self):
+        local_kwargs = PROBLEM_RAW_SCORE_CHANGED_KWARGS.copy()
+        del local_kwargs['score_deleted']
+        problem_raw_score_changed_handler(None, **local_kwargs)
+        expected_set_kwargs = PROBLEM_WEIGHTED_SCORE_CHANGED_KWARGS.copy()
+        expected_set_kwargs['score_deleted'] = False
+        self.signal_mock.assert_called_with(**expected_set_kwargs)
+
+    @patch('lms.djangoapps.grades.signals.handlers.log.info')
+    def test_subsection_update_logging(self, mocklog):
+        enqueue_subsection_update(
+            sender='test',
+            user_id=1,
+            course_id=u'course-v1:edX+Demo_Course+DemoX',
+            usage_id=u'block-v1:block-key',
+            modified=FROZEN_NOW_DATETIME,
+            score_db_table=ScoreDatabaseTableEnum.courseware_student_module,
+        )
+        log_statement = mocklog.call_args[0][0]
+        log_statement = UUID_REGEX.sub(u'*UUID*', log_statement)
+        self.assertEqual(
+            log_statement,
+            (
+                u'Grades: Request async calculation of subsection grades with args: '
+                u'course_id:course-v1:edX+Demo_Course+DemoX, modified:{time}, '
+                u'score_db_table:csm, '
+                u'usage_id:block-v1:block-key, user_id:1. Task [*UUID*]'
+            ).format(time=FROZEN_NOW_DATETIME)
+        )

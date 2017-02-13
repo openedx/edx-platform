@@ -47,7 +47,7 @@ define([
             expect(this.view.$el.find('.course-name')).toContainHtml(data.org);
             expect(this.view.$el.find('.course-name')).toContainHtml(data.content.number);
             expect(this.view.$el.find('.course-name')).toContainHtml(data.content.display_name);
-            expect(this.view.$el.find('.course-date')).toContainHtml('Jan 01, 1970');
+            expect(this.view.$el.find('.course-date').text().trim()).toEqual('Starts: Jan 1, 1970');
         });
     });
 });

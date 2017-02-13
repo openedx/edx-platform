@@ -1,11 +1,9 @@
 <%! from django.utils.translation import ugettext as _ %>
-<section aria-labelledby="course-updates-heading">
-    <h2 class="hd hd-2 sr" id="course-updates-heading">${_('All course updates')}</h2>
 <div class="recent-updates">
   % for index, update in enumerate(visible_updates):
     <article class="updates-article">
       % if not update.get("is_error"):
-        <h2 class="date" id="msg-date-${index}">${update.get("date")}</h2>
+        <h5 class="date" id="msg-date-${index}">${update.get("date")}</h5>
         <button
             class="toggle-visibility-button"
             data-hide="${_('Hide')}"
@@ -16,7 +14,7 @@
         ></button>
       % endif
       <div class="toggle-visibility-element article-content ${'hidden' if index >= 1 else ''}" id="msg-content-${index}">
-        ${update.get("content")}
+      ${update.get("content")}
       </div>
     </article>
   % endfor
@@ -35,7 +33,7 @@
 <div class="old-updates hidden toggle-visibility-element" id="old-updates">
   % for index, update in enumerate(hidden_updates):
     <article class="updates-article">
-      <h2 class="date" id="msg-date-${index + len(visible_updates)}">${update.get("date")}</h2>
+      <h5 class="date" id="msg-date-${index + len(visible_updates)}">${update.get("date")}</h5>
       <button
           class="toggle-visibility-button"
           data-hide="${_('Hide')}"
@@ -48,4 +46,3 @@
     </article>
   % endfor
 </div>
-</section>

@@ -6,6 +6,7 @@ forums, and to the cohort admin views.
 import logging
 import random
 
+from django.db import IntegrityError, transaction
 from django.db.models.signals import post_save, m2m_changed
 from django.dispatch import receiver
 from django.http import Http404
@@ -13,7 +14,7 @@ from django.utils.translation import ugettext as _
 
 from courseware import courses
 from eventtracking import tracker
-from request_cache.middleware import RequestCache
+from request_cache.middleware import RequestCache, request_cached
 from student.models import get_user_by_username_or_email
 
 from .models import (
@@ -194,11 +195,22 @@ def get_cohort(user, course_key, assign=True, use_cached=False):
             return None
 
     # Otherwise assign the user a cohort.
-    membership = CohortMembership.objects.create(
-        user=user,
-        course_user_group=get_random_cohort(course_key)
-    )
-    return request_cache.data.setdefault(cache_key, membership.course_user_group)
+    try:
+        with transaction.atomic():
+            membership = CohortMembership.objects.create(
+                user=user,
+                course_user_group=get_random_cohort(course_key)
+            )
+            return request_cache.data.setdefault(cache_key, membership.course_user_group)
+    except IntegrityError as integrity_error:
+        # An IntegrityError is raised when multiple workers attempt to
+        # create the same row in one of the cohort model entries:
+        # CourseCohort, CohortMembership.
+        log.info(
+            "HANDLING_INTEGRITY_ERROR: IntegrityError encountered for course '%s' and user '%s': %s",
+            course_key, user.id, unicode(integrity_error)
+        )
+        return get_cohort(user, course_key, assign, use_cached)
 
 
 def get_random_cohort(course_key):
@@ -485,6 +497,7 @@ def set_course_cohort_settings(course_key, **kwargs):
     return course_cohort_settings
 
 
+@request_cached
 def get_course_cohort_settings(course_key):
     """
     Return cohort settings for a course.

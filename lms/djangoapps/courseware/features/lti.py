@@ -332,14 +332,7 @@ def check_progress(_step, text):
 
 @step('I see graph with total progress "([^"]*)"$')
 def see_graph(_step, progress):
-    selector = 'grade-detail-graph'
-    xpath = '//div[@id="{parent}"]//div[text()="{progress}"]'.format(
-        parent=selector,
-        progress=progress,
-    )
-    node = world.browser.find_by_xpath(xpath)
-
-    assert node
+    assert_equal(progress, world.css_find('#grade-detail-graph .overallGrade').first.text.split('\n')[1])
 
 
 @step('I see in the gradebook table that "([^"]*)" is "([^"]*)"$')

@@ -49,6 +49,7 @@ class VideoBaseTest(UniqueCourseTest):
         Initialization of pages and course fixture for video tests
         """
         super(VideoBaseTest, self).setUp()
+        self.longMessage = True  # pylint: disable=invalid-name
 
         self.video = VideoPage(self.browser)
         self.tab_nav = TabNavPage(self.browser)
@@ -411,7 +412,7 @@ class YouTubeVideoTest(VideoBaseTest):
         Then the video has rendered in "HTML5" mode
         """
         # configure youtube server
-        self.youtube_configuration['time_to_response'] = 2.0
+        self.youtube_configuration['time_to_response'] = 7.0
         self.metadata = self.metadata_for_mode('youtube_html5')
 
         self.navigate_to_video()
@@ -1034,6 +1035,8 @@ class Html5VideoTest(VideoBaseTest):
         # check if "Welcome to edX." text in the captions
         self.assertIn('Welcome to edX.', self.video.captions_text)
 
+        self.video.wait_for_element_visibility('.transcript-end', 'Transcript has loaded')
+
         # check if we can download transcript in "srt" format that has text "Welcome to edX."
         self.assertTrue(self.video.downloaded_transcript_contains_text('srt', 'Welcome to edX.'))
 
@@ -1223,7 +1226,7 @@ class DragAndDropTest(VideoBaseTest):
             )
         else:
             self.assertEqual(
-                captions_end.get('y') + 15,
+                captions_end.get('y') + 16,
                 captions_start.get('y'),
                 'Closed captions did not get dragged.'
             )

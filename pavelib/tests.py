@@ -26,7 +26,6 @@ __test__ = False  # do not collect
 @cmdopts([
     ("system=", "s", "System to act on"),
     ("test-id=", "t", "Test id"),
-    ("failed", "f", "Run only failed tests"),
     ("fail-fast", "x", "Fail suite on first failed test"),
     ("fasttest", "a", "Run without collectstatic"),
     make_option(
@@ -45,6 +44,12 @@ __test__ = False  # do not collect
         action='store_true',
         dest='disable_migrations',
         help="Create tables directly from apps' models. Can also be used by exporting DISABLE_MIGRATIONS=1."
+    ),
+    make_option(
+        '--enable-migrations',
+        action='store_false',
+        dest='disable_migrations',
+        help="Create tables by applying migrations."
     ),
     ("fail_fast", None, "deprecated in favor of fail-fast"),
     ("test_id=", None, "deprecated in favor of test-id"),
@@ -239,7 +244,7 @@ def test(options, passthrough_options):
 
 
 @task
-@needs('pavelib.prereqs.install_prereqs')
+@needs('pavelib.prereqs.install_coverage_prereqs')
 @cmdopts([
     ("compare-branch=", "b", "Branch to compare against, defaults to origin/master"),
     ("compare_branch=", None, "deprecated in favor of compare-branch"),
@@ -277,7 +282,7 @@ def coverage():
 
 
 @task
-@needs('pavelib.prereqs.install_prereqs')
+@needs('pavelib.prereqs.install_coverage_prereqs')
 @cmdopts([
     ("compare-branch=", "b", "Branch to compare against, defaults to origin/master"),
     ("compare_branch=", None, "deprecated in favor of compare-branch"),

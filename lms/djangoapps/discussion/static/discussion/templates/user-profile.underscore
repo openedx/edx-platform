@@ -1,7 +1,11 @@
-<h2><%- gettext("Active Threads") %></h2>
-<section class="discussion">
-    <% _.each(threads, function(thread) { %>
-        <article class="discussion-thread" id="thread_<%- thread.id %>"/>
-    <% }); %>
-</section>
-<section class="discussion-pagination"/>
+<div class="inline-threads"></div>
+<div class="inline-thread is-hidden">
+    <div class="forum-nav-bar">
+        <button class="btn-link all-posts-btn">
+            <span class="icon fa fa-chevron-prev" aria-hidden="true"></span>
+            <span><%- gettext("All Posts") %></span>
+        </button>
+    </div>
+    <div class="forum-content">
+    </div>
+</div>

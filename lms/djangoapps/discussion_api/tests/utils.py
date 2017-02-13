@@ -335,6 +335,43 @@ class CommentsServiceMockMixin(object):
             content_type="application/merge-patch+json"
         )
 
+    def expected_thread_data(self, overrides=None):
+        """
+        Returns expected thread data in API response
+        """
+        response_data = {
+            "author": self.user.username,
+            "author_label": None,
+            "created_at": "1970-01-01T00:00:00Z",
+            "updated_at": "1970-01-01T00:00:00Z",
+            "raw_body": "Test body",
+            "rendered_body": "<p>Test body</p>",
+            "abuse_flagged": False,
+            "voted": False,
+            "vote_count": 0,
+            "editable_fields": ["abuse_flagged", "following", "raw_body", "read", "title", "topic_id", "type", "voted"],
+            "course_id": unicode(self.course.id),
+            "topic_id": "test_topic",
+            "group_id": None,
+            "group_name": None,
+            "title": "Test Title",
+            "pinned": False,
+            "closed": False,
+            "following": False,
+            "comment_count": 1,
+            "unread_comment_count": 0,
+            "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread",
+            "endorsed_comment_list_url": None,
+            "non_endorsed_comment_list_url": None,
+            "read": False,
+            "has_endorsed": False,
+            "id": "test_thread",
+            "type": "discussion",
+            "response_count": 0,
+        }
+        response_data.update(overrides or {})
+        return response_data
+
 
 def make_minimal_cs_thread(overrides=None):
     """

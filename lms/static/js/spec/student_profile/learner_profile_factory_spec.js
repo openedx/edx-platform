@@ -72,7 +72,7 @@ define(['backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helper
                     tabbedView = context.learnerProfileView.tabbedView,
                     learnerProfileView = context.learnerProfileView;
 
-                LearnerProfileHelpers.expectTabbedViewToBeHidden(requests, tabbedView);
+                LearnerProfileHelpers.expectTabbedViewToBeUndefined(requests, tabbedView);
                 LearnerProfileHelpers.expectBadgesHidden(learnerProfileView);
             });
 
@@ -83,7 +83,7 @@ define(['backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helper
                     tabbedView = context.learnerProfileView.tabbedView,
                     learnerProfileView = context.learnerProfileView;
 
-                LearnerProfileHelpers.expectTabbedViewToBeHidden(requests, tabbedView);
+                LearnerProfileHelpers.expectTabbedViewToBeUndefined(requests, tabbedView);
                 LearnerProfileHelpers.expectBadgesHidden(learnerProfileView);
             });
 

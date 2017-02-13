@@ -1,12 +1,11 @@
 """
 Utilities related to API views
 """
-import functools
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError, ObjectDoesNotExist
 from django.http import Http404
 from django.utils.translation import ugettext as _
 
-from rest_framework import status, response
+from rest_framework import status
 from rest_framework.exceptions import APIException
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import clone_request
@@ -14,11 +13,7 @@ from rest_framework.response import Response
 from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin
 from rest_framework.generics import GenericAPIView
 
-from lms.djangoapps.courseware.courses import get_course_with_access
-from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
-from opaque_keys.edx.keys import CourseKey
-from xmodule.modulestore.django import modulestore
-
+from edx_rest_framework_extensions.authentication import JwtAuthentication
 from openedx.core.lib.api.authentication import (
     SessionAuthenticationAllowInactiveUser,
     OAuth2AuthenticationAllowInactiveUser,
@@ -89,36 +84,6 @@ class ExpandableFieldViewMixin(object):
         return result
 
 
-def view_course_access(depth=0, access_action='load', check_for_milestones=False):
-    """
-    Method decorator for an API endpoint that verifies the user has access to the course.
-    """
-    def _decorator(func):
-        """Outer method decorator."""
-        @functools.wraps(func)
-        def _wrapper(self, request, *args, **kwargs):
-            """
-            Expects kwargs to contain 'course_id'.
-            Passes the course descriptor to the given decorated function.
-            Raises 404 if access to course is disallowed.
-            """
-            course_id = CourseKey.from_string(kwargs.pop('course_id'))
-            with modulestore().bulk_operations(course_id):
-                try:
-                    course = get_course_with_access(
-                        request.user,
-                        access_action,
-                        course_id,
-                        depth=depth,
-                        check_if_enrolled=True,
-                    )
-                except CoursewareAccessException as error:
-                    return response.Response(data=error.to_json(), status=status.HTTP_404_NOT_FOUND)
-                return func(self, request, course=course, *args, **kwargs)
-        return _wrapper
-    return _decorator
-
-
 def view_auth_classes(is_user=False, is_authenticated=True):
     """
     Function and class decorator that abstracts the authentication and permission checks for api views.
@@ -129,6 +94,7 @@ def view_auth_classes(is_user=False, is_authenticated=True):
         If is_user is True, also requires username in URL matches the request user.
         """
         func_or_class.authentication_classes = (
+            JwtAuthentication,
             OAuth2AuthenticationAllowInactiveUser,
             SessionAuthenticationAllowInactiveUser
         )
