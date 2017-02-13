@@ -5,6 +5,7 @@ from django.core.files.storage import DefaultStorage
 from rest_framework import generics, views, viewsets
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
@@ -24,18 +25,12 @@ from .utils import delete_site
 class SiteViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Site.objects.all()
     serializer_class = SiteSerializer
-
     authentication_classes = (OAuth2AuthenticationAllowInactiveUser,)
+    permission_classes = (IsAuthenticated, AMCAdminPermission)
 
     def get_queryset(self):
         queryset = Site.objects.exclude(id=settings.SITE_ID)
-        user_email = self.request.query_params.get('user_email')
-        if not user_email:
-            return Response(status=400)
-        try:
-            user = User.objects.get(email=user_email)
-        except User.DoesNotExist:
-            return Response(status=400)
+        user = self.request.user
         if not user.is_superuser:
             queryset = queryset.filter(organizations=user.organizations.all())
         return queryset
@@ -46,9 +41,8 @@ class SiteConfigurationViewSet(viewsets.ModelViewSet):
     serializer_class = SiteConfigurationSerializer
     list_serializer_class = SiteConfigurationListSerializer
     create_serializer_class = SiteSerializer
-    permission_classes = [AMCAdminPermission]
-
     authentication_classes = (OAuth2AuthenticationAllowInactiveUser,)
+    permission_classes = (IsAuthenticated, AMCAdminPermission)
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -63,7 +57,7 @@ class SiteConfigurationViewSet(viewsets.ModelViewSet):
 
 class FileUploadView(views.APIView):
     parser_classes = (MultiPartParser,)
-    permission_classes = (ApiKeyHeaderPermission,)
+    permission_classes = (AMCAdminPermission,)
 
     def post(self, request, format=None):
         file_obj = request.data['file']
