@@ -205,3 +205,6 @@ py2neo==3.1.2
 
 # for calculating coverage
 -r coverage.txt
+
+# Third Party XBlocks
+edx-sga==0.6.2
