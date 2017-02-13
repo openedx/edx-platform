@@ -19,7 +19,8 @@ class SplitTestTransformer(FilteringTransformerMixin, BlockStructureTransformer)
     to actually enforce the access using the 'user_partitions' and
     'group_access' fields.
     """
-    VERSION = 1
+    WRITE_VERSION = 1
+    READ_VERSION = 1
 
     @classmethod
     def name(cls):

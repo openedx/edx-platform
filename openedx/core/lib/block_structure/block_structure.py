@@ -730,9 +730,9 @@ class BlockStructureBlockData(BlockStructure):
         Adds the given transformer to the block structure by recording
         its current version number.
         """
-        if transformer.VERSION == 0:
-            raise TransformerException('VERSION attribute is not set on transformer {0}.', transformer.name())
-        self.set_transformer_data(transformer, TRANSFORMER_VERSION_KEY, transformer.VERSION)
+        if transformer.READ_VERSION == 0 or transformer.WRITE_VERSION == 0:
+            raise TransformerException('Version attributes are not set on transformer {0}.', transformer.name())
+        self.set_transformer_data(transformer, TRANSFORMER_VERSION_KEY, transformer.WRITE_VERSION)
 
     def _get_or_create_block(self, usage_key):
         """

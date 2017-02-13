@@ -136,7 +136,8 @@ class MockTransformer(BlockStructureTransformer):
     """
     A mock BlockStructureTransformer class.
     """
-    VERSION = 1
+    WRITE_VERSION = 1
+    READ_VERSION = 1
 
     @classmethod
     def name(cls):
@@ -151,7 +152,8 @@ class MockFilteringTransformer(FilteringTransformerMixin, BlockStructureTransfor
     """
     A mock FilteringTransformerMixin class.
     """
-    VERSION = 1
+    WRITE_VERSION = 1
+    READ_VERSION = 1
 
     @classmethod
     def name(cls):

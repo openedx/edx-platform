@@ -4,7 +4,7 @@ Module for a collection of BlockStructureTransformers.
 import functools
 from logging import getLogger
 
-from .exceptions import TransformerException
+from .exceptions import TransformerException, TransformerDataIncompatible
 from .transformer import FilteringTransformerMixin
 from .transformer_registry import TransformerRegistry
 
@@ -83,23 +83,27 @@ class BlockStructureTransformers(object):
         block_structure._collect_requested_xblock_fields()  # pylint: disable=protected-access
 
     @classmethod
-    def is_collected_outdated(cls, block_structure):
+    def verify_versions(cls, block_structure):
         """
-        Returns whether the collected data in the block structure is outdated.
+        Returns whether the collected data in the block structure is
+        incompatible with the current version of the registered Transformers.
+
+        Raises:
+            TransformerDataIncompatible with information about all outdated
+            Transformers.
         """
         outdated_transformers = []
         for transformer in TransformerRegistry.get_registered_transformers():
             version_in_block_structure = block_structure._get_transformer_data_version(transformer)  # pylint: disable=protected-access
-            if transformer.VERSION > version_in_block_structure:
+            if transformer.READ_VERSION > version_in_block_structure:
                 outdated_transformers.append(transformer)
 
         if outdated_transformers:
-            logger.info(
+            raise TransformerDataIncompatible(
                 "Collected Block Structure data for the following transformers is outdated: '%s'.",
-                [(transformer.name(), transformer.VERSION) for transformer in outdated_transformers],
+                [(transformer.name(), transformer.READ_VERSION) for transformer in outdated_transformers],
             )
-
-        return bool(outdated_transformers)
+        return True
 
     def transform(self, block_structure):
         """

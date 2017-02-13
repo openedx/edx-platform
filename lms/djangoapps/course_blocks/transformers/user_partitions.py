@@ -16,7 +16,8 @@ class UserPartitionTransformer(FilteringTransformerMixin, BlockStructureTransfor
 
     Staff users are *not* exempted from user partition pathways.
     """
-    VERSION = 1
+    WRITE_VERSION = 1
+    READ_VERSION = 1
 
     @classmethod
     def name(cls):

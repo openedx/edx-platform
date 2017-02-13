@@ -18,7 +18,8 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
 
     Staff users are *not* exempted from library content pathways.
     """
-    VERSION = 1
+    WRITE_VERSION = 1
+    READ_VERSION = 1
 
     @classmethod
     def name(cls):

@@ -6,7 +6,7 @@ from contextlib import contextmanager
 
 from .cache import BlockStructureCache
 from .factory import BlockStructureFactory
-from .exceptions import UsageKeyNotInBlockStructure
+from .exceptions import UsageKeyNotInBlockStructure, TransformerDataIncompatible, BlockStructureNotFound
 from .transformers import BlockStructureTransformers
 
 
@@ -89,13 +89,16 @@ class BlockStructureManager(object):
                 starting at root_block_usage_key, with collected data
                 from each registered transformer.
         """
-        block_structure = BlockStructureFactory.create_from_cache(
-            self.root_block_usage_key,
-            self.block_structure_cache
-        )
-        cache_miss = block_structure is None
-        if cache_miss or BlockStructureTransformers.is_collected_outdated(block_structure):
+        try:
+            block_structure = BlockStructureFactory.create_from_cache(
+                self.root_block_usage_key,
+                self.block_structure_cache
+            )
+            BlockStructureTransformers.verify_versions(block_structure)
+
+        except (BlockStructureNotFound, TransformerDataIncompatible):
             block_structure = self.update_collected()
+
         return block_structure
 
     def update_collected(self):

@@ -10,23 +10,50 @@ class BlockStructureTransformer(object):
     Abstract base class for all block structure transformers.
     """
 
-    # All Transformers are expected to maintain a VERSION class
-    # attribute.  While the value for the base class is set to 0,
-    # the value for each concrete transformer should be 1 or higher.
+    # All Transformers are expected to maintain version-related class
+    # attributes.  While the values for the base class is set to 0,
+    # the values for each concrete transformer should be 1 or higher.
     #
-    # A transformer's version attribute is used by the block_structure
+    # A transformer's version attributes are used by the block_structure
     # framework in order to determine whether any collected data for a
-    # transformer is outdated.  When a transformer's data is collected
-    # and cached, it's version number at the time of collection is
-    # stored along with the data.  That version number is then checked
-    # at the time of accessing the collected data (during the transform
-    # phase).
+    # transformer is outdated because of a data schema change by the
+    # transformer.
     #
-    # The version number of a Transformer should be incremented each
-    # time the implementation of its collect method is updated such that
-    # its collected data is changed.
+    # The WRITE_VERSION number is stored along with the transformer's
+    # data when it is collected and cached (during the collect phase).
+    # The READ_VERSION number is then verified to be less than or equal
+    # to the version associated with the collected data when the
+    # collected data is accessed (during the transform phase).
     #
-    VERSION = 0
+    # We distinguish between WRITE_VERSION and READ_VERSION numbers in
+    # order to:
+    # 1. support blue-green deployments where new and previous versions
+    #    of the code base are simultaneously executing on different
+    #    workers for a period of time.
+    #
+    #    A 2-phase deployment is used to stagger read and write changes.
+    #
+    # 2. scale for large deployments where it is costly to recompute
+    #    block structures for all courses when a transformer's collected
+    #    data schema changes.
+    #
+    #    A background management command is run to prime the new data.
+    #
+    # See the following document for further information:
+    # https://openedx.atlassian.net/wiki/display/MA/Block+Structure+Cache+Invalidation+Proposal
+    #
+    # The WRITE_VERSION number of a Transformer should be incremented
+    # when it's collect implementation is additively changed. Backward
+    # compatibility should be maintained with previous READ_VERSIONs
+    # until all readers are updated.
+    #
+    # The READ_VERSION number of a Transformer should be incremented
+    # when its transform implementation is updated to make use of the
+    # newly collected data - and released only after all collected
+    # block structures are updated with the new WRITE_VERSION.
+    #
+    WRITE_VERSION = 0
+    READ_VERSION = 0
 
     @classmethod
     def name(cls):

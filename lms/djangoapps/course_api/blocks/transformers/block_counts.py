@@ -8,7 +8,8 @@ class BlockCountsTransformer(BlockStructureTransformer):
     """
     Keep a count of descendant blocks of the requested types
     """
-    VERSION = 1
+    WRITE_VERSION = 1
+    READ_VERSION = 1
     BLOCK_COUNTS = 'block_counts'
 
     def __init__(self, block_types_to_count):
