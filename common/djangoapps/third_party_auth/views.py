@@ -10,6 +10,8 @@ import social
 from social.apps.django_app.views import complete
 from social.apps.django_app.utils import load_strategy, load_backend
 from social.utils import setting_name
+from student.models import UserProfile
+from student.views import compose_and_send_activation_email
 from .models import SAMLConfiguration
 
 URL_NAMESPACE = getattr(settings, setting_name('URL_NAMESPACE'), None) or 'social'
@@ -28,6 +30,8 @@ def inactive_user_view(request):
     # 'next' may be set to '/account/finish_auth/.../' if this user needs to be auto-enrolled
     # in a course. Otherwise, just redirect them to the dashboard, which displays a message
     # about activating their account.
+    profile = UserProfile.objects.get(user=request.user)
+    compose_and_send_activation_email(request.user, profile)
     return redirect(request.GET.get('next', 'dashboard'))
 
 
