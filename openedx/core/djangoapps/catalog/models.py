@@ -35,6 +35,14 @@ class CatalogIntegration(ConfigurationModel):
         )
     )
 
+    page_size = models.PositiveIntegerField(
+        verbose_name=_('Page Size'),
+        default=100,
+        help_text=_(
+            'Maximum number of records in paginated response of a single request to catalog service.'
+        )
+    )
+
     @property
     def is_cache_enabled(self):
         """Whether responses from the catalog API will be cached."""

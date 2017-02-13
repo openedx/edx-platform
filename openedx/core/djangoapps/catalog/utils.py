@@ -1,5 +1,6 @@
 """Helper functions for working with the catalog service."""
 import copy
+import logging
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -9,6 +10,8 @@ from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from openedx.core.lib.token_utils import JwtBuilder
 
+
+log = logging.getLogger(__name__)
 
 User = get_user_model()  # pylint: disable=invalid-name
 
@@ -135,3 +138,40 @@ def get_programs_with_type(types=None):
             programs_with_type.append(program_with_type)
 
     return programs_with_type
+
+
+def get_course_runs():
+    """
+    Retrieve all the course runs from the catalog service.
+
+    Returns:
+        list of dict with each record representing a course run.
+    """
+    catalog_integration = CatalogIntegration.current()
+    course_runs = []
+    if catalog_integration.enabled:
+        try:
+            user = User.objects.get(username=catalog_integration.service_username)
+        except User.DoesNotExist:
+            log.error(
+                'Catalog service user with username [%s] does not exist. Course runs will not be retrieved.',
+                catalog_integration.service_username,
+            )
+            return course_runs
+
+        api = create_catalog_api_client(user, catalog_integration)
+
+        querystring = {
+            'page_size': catalog_integration.page_size,
+            'exclude_utm': 1,
+        }
+
+        course_runs = get_edx_api_data(
+            catalog_integration,
+            user,
+            'course_runs',
+            api=api,
+            querystring=querystring,
+        )
+
+    return course_runs
