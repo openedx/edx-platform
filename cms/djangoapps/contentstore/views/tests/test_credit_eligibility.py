@@ -14,7 +14,8 @@ from openedx.core.djangoapps.credit.signals import on_course_publish
 
 
 class CreditEligibilityTest(CourseTestCase):
-    """Base class to test the course settings details view in Studio for credit
+    """
+    Base class to test the course settings details view in Studio for credit
     eligibility requirements.
     """
     def setUp(self):
@@ -24,7 +25,8 @@ class CreditEligibilityTest(CourseTestCase):
 
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_CREDIT_ELIGIBILITY': False})
     def test_course_details_with_disabled_setting(self):
-        """Test that user don't see credit eligibility requirements in response
+        """
+        Test that user don't see credit eligibility requirements in response
         if the feature flag 'ENABLE_CREDIT_ELIGIBILITY' is not enabled.
         """
         response = self.client.get_html(self.course_details_url)
@@ -34,7 +36,8 @@ class CreditEligibilityTest(CourseTestCase):
 
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_CREDIT_ELIGIBILITY': True})
     def test_course_details_with_enabled_setting(self):
-        """Test that credit eligibility requirements are present in
+        """
+        Test that credit eligibility requirements are present in
         response if the feature flag 'ENABLE_CREDIT_ELIGIBILITY' is enabled.
         """
         # verify that credit eligibility requirements block don't show if the
