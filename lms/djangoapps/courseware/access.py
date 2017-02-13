@@ -878,12 +878,14 @@ def get_user_role(user, course_key):
     """
     role = get_masquerade_role(user, course_key)
 
+
+    # Check if user is a coach on this ccx.
     ccx_coach_role = False # Added by labster
-    if isinstance(course_key, CCXLocator): # Added by labster
-        try: # Added by labster
-            ccx_coach_role = has_ccx_coach_role(user, course_key) # Added by labster
-        except Exception as e: # Added by labster
-            log.warning(e, exc_info=False) # Added by labster
+    if isinstance(course_key, CCXLocator):
+        try:
+            ccx_coach_role = has_ccx_coach_role(user, course_key)
+        except CCXLocatorValidationException as err:
+            pass  # Added by labster
 
     if role:
         return role
