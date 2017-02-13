@@ -45,8 +45,14 @@ define([
             }),*/
             var previousView = new PreviousVideoUploadListView({
                 videoHandlerUrl: videoHandlerUrl,
-                collection: new VideoPagingCollection(previousUploads, {
-                    url: videoHandlerUrl
+                collection: new VideoPagingCollection(previousUploads["videos"], {
+                    url: videoHandlerUrl,
+                    first_page: previousUploads["start"],
+                    last_page: previousUploads["end"],
+                    page_size: previousUploads["page_size"],
+                    sort_field: previousUploads["sort_field"],
+                    total_count: previousUploads["total_count"],
+                    sort_dir: previousUploads["sort_dir"]  
                 }),
                 encodingsDownloadUrl: encodingsDownloadUrl
             });

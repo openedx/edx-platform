@@ -10,6 +10,7 @@ from uuid import uuid4
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.http import HttpResponse, HttpResponseNotFound
 from django.utils.translation import ugettext as _, ugettext_noop
 from django.views.decorators.http import require_GET, require_http_methods
@@ -134,9 +135,9 @@ def videos_handler(request, course_key_string, edx_video_id=None):
 
     if request.method == "GET":
         if "application/json" in request.META.get("HTTP_ACCEPT", ""):
-            return videos_index_json(course)
+            return videos_index_json(course, request)
         else:
-            return videos_index_html(course)
+            return videos_index_html(course, request)
     elif request.method == "DELETE":
         remove_video_for_course(course_key_string, edx_video_id)
         return JsonResponse()
@@ -285,33 +286,41 @@ def convert_video_status(video):
     return status
 
 
-def _get_videos(course):
+def _get_videos(course, request):
     """
     Retrieves the list of videos from VAL corresponding to this course.
     """
-    videos = list(get_videos_for_course(course.id, VideoSortField.created, SortDirection.desc))
+    params = request.GET.dict()
 
+    resp = get_videos_for_course(course.id, **params)
+
+    videos = resp["videos"]
     # convert VAL's status to studio's Video Upload feature status.
     for video in videos:
         video["status"] = convert_video_status(video)
 
-    return videos
+    resp["videos"] = videos
+    return resp
 
 
-def _get_index_videos(course):
+def _get_index_videos(course, request):
     """
     Returns the information about each video upload required for the video list
     """
-    return list(
+    resp = _get_videos(course, request)
+    videos = list(
         {
             attr: video[attr]
             for attr in ["edx_video_id", "client_video_id", "created", "duration", "status"]
         }
-        for video in _get_videos(course)
+        for video in resp["videos"]
     )
 
+    resp["videos"] = videos
+    return resp
 
-def videos_index_html(course):
+
+def videos_index_html(course, request):
     """
     Returns an HTML page to display previous video uploads and allow new ones
     """
@@ -321,7 +330,7 @@ def videos_index_html(course):
             "context_course": course,
             "video_handler_url": reverse_course_url("videos_handler", unicode(course.id)),
             "encodings_download_url": reverse_course_url("video_encodings_download", unicode(course.id)),
-            "previous_uploads": _get_index_videos(course),
+            "previous_uploads": _get_index_videos(course, request),
             "concurrent_upload_limit": settings.VIDEO_UPLOAD_PIPELINE.get("CONCURRENT_UPLOAD_LIMIT", 0),
             "video_supported_file_formats": VIDEO_SUPPORTED_FILE_FORMATS.keys(),
             "video_upload_max_file_size": VIDEO_UPLOAD_MAX_FILE_SIZE_GB
@@ -329,10 +338,15 @@ def videos_index_html(course):
     )
 
 
-def videos_index_json(course):
+def videos_index_json(course, request):
     """
     Returns JSON in the following format:
     {
+        "start": <first_page>,
+        "end": <last_page>,
+        "total_count": <total number of records>,
+        "sort_field": <sort field>,
+        "sort_dir": <sort direction>,
         "videos": [{
             "edx_video_id": "aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa",
             "client_video_id": "video.mp4",
@@ -342,7 +356,7 @@ def videos_index_json(course):
         }]
     }
     """
-    return JsonResponse({"videos": _get_index_videos(course)}, status=200)
+    return JsonResponse(_get_index_videos(course, request), status=200)
 
 
 def videos_post(course, request):
