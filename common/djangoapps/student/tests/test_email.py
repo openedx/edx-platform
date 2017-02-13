@@ -1,13 +1,15 @@
 
 import json
 import unittest
+import mock
 
 from student.tests.factories import UserFactory, RegistrationFactory, PendingEmailChangeFactory
 from student.views import (
     reactivation_email_for_user, do_email_change_request, confirm_email_change,
     validate_new_email, SETTING_CHANGE_INITIATED
 )
-from student.models import UserProfile, PendingEmailChange
+from student.models import UserProfile, PendingEmailChange, Registration
+from third_party_auth.views import inactive_user_view
 from django.core.urlresolvers import reverse
 from django.core import mail
 from django.contrib.auth.models import User
@@ -131,6 +133,24 @@ class ActivationEmailTests(TestCase):
         self.assertEqual(msg.subject, subject)
         for fragment in body_fragments:
             self.assertIn(fragment, msg.body)
+
+    @mock.patch('student.tasks.log')
+    def test_send_email_to_inactive_user(self, mock_log):
+        """
+        Tests that when an inactive user logs-in using the social auth, system
+        sends an activation email to the user.
+        """
+        inactive_user = UserFactory(is_active=False)
+        Registration().register(inactive_user)
+        request = RequestFactory().get(settings.SOCIAL_AUTH_INACTIVE_USER_URL)
+        request.user = inactive_user
+        with patch('edxmako.request_context.get_current_request'):
+            inactive_user_view(request)
+            mock_log.info.assert_called_with(
+                "Activation Email has been sent to User {user_email}".format(
+                    user_email=inactive_user.email
+                )
+            )
 
 
 @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
