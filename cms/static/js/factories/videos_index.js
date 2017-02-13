@@ -14,7 +14,7 @@ define([
         videoSupportedFileFormats,
         videoUploadMaxFileSizeInGB
     ) {
-        /*var activeView = new ActiveVideoUploadListView({
+        var activeView = new ActiveVideoUploadListView({
                 postUrl: videoHandlerUrl,
                 concurrentUploadLimit: concurrentUploadLimit,
                 uploadButton: uploadButton,
@@ -27,7 +27,15 @@ define([
                         dataType: 'json',
                         type: 'GET'
                     }).done(function(responseData) {
-                        var updatedCollection = new Backbone.Collection(responseData.videos).filter(function(video) {
+                        var updatedCollection = new VideoPagingCollection(responseData.videos, {
+                            url: videoHandlerUrl,
+                            first_page: responseData.start,
+                            last_page: responseData.end,
+                            page_size: responseData.page_size,
+                            sort_field: responseData.sort_field,
+                            total_count: responseData.total_count,
+                            sort_dir: responseData.sort_dir
+                        }).filter(function(video) {
                                 // Include videos that are not in the active video upload list,
                                 // or that are marked as Upload Complete
                                 var isActive = activeVideos.where({videoId: video.get('edx_video_id')});
@@ -42,8 +50,8 @@ define([
                         $contentWrapper.find('.wrapper-assets').replaceWith(updatedView.render().$el);
                     });
                 }
-            }),*/
-            var previousView = new PreviousVideoUploadListView({
+            }),
+            previousView = new PreviousVideoUploadListView({
                 videoHandlerUrl: videoHandlerUrl,
                 collection: new VideoPagingCollection(previousUploads["videos"], {
                     url: videoHandlerUrl,
@@ -56,7 +64,7 @@ define([
                 }),
                 encodingsDownloadUrl: encodingsDownloadUrl
             });
-        //$contentWrapper.append(activeView.render().$el);
+        $contentWrapper.append(activeView.render().$el);
         $contentWrapper.append(previousView.render().$el);
     };
 
