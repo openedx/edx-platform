@@ -6,22 +6,11 @@
     import datetime
     import pytz
 
-    def time_left(start):
-        tz = pytz.timezone('Asia/Karachi')
-        now = datetime.datetime.now(tz=tz)
-        td = start - now
-        hours = int(td.seconds // (60 * 60))
-        mins = int((td.seconds // 60) % 60)
-        message = "Test is end"
-        if td.days > 0:
-             message = "Test start in {days} day(s)".format(days=td.days)
-        elif hours > 0:
-             message = "Test start in {hours} hour(s)".format(hours=hours)
-        elif mins > 0:
-             message = "Test start in {mins} min(s)".format(mins=mins)
-        return message
-
+    PK_TIMEZONE = pytz.timezone('Asia/Karachi')
 %>
+    <%block name="js_extra">
+        <script type="text/javascript" src="${static.url('js/jquery.countdown.min.js')}"></script>
+    </%block>
     <%page args="course" expression_filter="h"/>
     <article class="course" id="${course.id}" role="region" aria-label="${course.display_name_with_default}">
         <a href="/login">
@@ -35,7 +24,17 @@
                 <h2 class="course-name">
                     <span class="course-organization">${course.display_org_with_default}
                         <span class="course-date pull-right" aria-hidden="true">
-                            <i class="fa fa-clock-o" aria-hidden="true"></i> ${time_left(course.start)}
+                            <% time_zone = PK_TIMEZONE %>
+                             % if course.has_ended():
+                                ${_("Ended - {end_date}").format(end_date=course.end_datetime_text("SHORT_DATE", time_zone))}
+                             % elif course.has_started():
+                                ${_("Started - {start_date}").format(start_date=course.start_datetime_text("SHORT_DATE", time_zone))}
+                             % elif course.start_date_is_still_default: # Course start date TBD
+                                ${_("Coming Soon")}
+                             % else:
+                                <i class="fa fa-clock-o" aria-hidden="true"></i>
+                                 <p style="display:inline" id="starts-in"></p>
+                             % endif
                         </span>
                     </span>
                     <span class="course-title">${course.display_name}</span>
@@ -52,3 +51,11 @@
             </div>
         </a>
     </article>
+    <script type="text/javascript">
+          $("#starts-in")
+              .countdown("${course.start.astimezone(PK_TIMEZONE).strftime('%Y/%m/%d %H:%M:%S')}", function(event) {
+                $(this).text(
+                  event.strftime('Test starts in %D days %H hours and %M minutes')
+                );
+          });
+    </script>

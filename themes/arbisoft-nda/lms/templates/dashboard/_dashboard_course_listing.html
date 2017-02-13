@@ -2,6 +2,7 @@
 
 <%!
 import urllib
+import pytz
 
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
@@ -19,6 +20,11 @@ from student.helpers import (
   VERIFY_STATUS_NEED_TO_REVERIFY,
   DISABLE_UNENROLL_CERT_STATES,
 )
+
+PK_TIMEZONE = pytz.timezone('Asia/Karachi')
+
+def get_formatted_start_data(start_date):
+    return start_date.astimezone(PK_TIMEZONE).strftime('%A %d, %b at %H:%M %p')
 %>
 
 <%
@@ -103,9 +109,8 @@ from student.helpers import (
           % endif
         </h3>
         <div class="course-info">
-          <span class="info-university">${course_overview.display_org_with_default} - ${course_overview.display_number_with_default} </span>
           <span class="info-date-block" data-tooltip="Hi">
-          <% time_zone = get_user_time_zone(user) %>
+          <% time_zone = PK_TIMEZONE %>
           % if course_overview.has_ended():
             ${_("Ended - {end_date}").format(end_date=course_overview.end_datetime_text("SHORT_DATE", time_zone))}
           % elif course_overview.has_started():
@@ -113,9 +118,9 @@ from student.helpers import (
           % elif course_overview.start_date_is_still_default: # Course start date TBD
             ${_("Coming Soon")}
           % elif course_overview.starts_within(days=5):   # hasn't started yet
-            ${_("Starts - {start_date}").format(start_date=course_overview.start_datetime_text("DAY_AND_TIME", time_zone))}
+            ${_("Starts - {start_date}").format(start_date=get_formatted_start_data(course_overview.start))}
           % else:   # hasn't started yet
-            ${_("Starts - {start_date}").format(start_date=course_overview.start_datetime_text("SHORT_DATE", time_zone))}
+            ${_("Starts - {start_date}").format(start_date=get_formatted_start_data(course_overview.start))}
           % endif
           </span>
         </div>

@@ -8,7 +8,8 @@
             return Backbone.Model.extend({
                 defaults: {
                     id: '0',
-                    content: ''
+                    content: '',
+                    attempted: false
                 }
             });
         }

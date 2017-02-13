@@ -23,8 +23,23 @@
                   $('button.next').on('click', _.bind(this.loadNext, this));
                   $('button.previous').on('click', _.bind(this.loadPrevious, this));
                   $('a.question-link').on('click', _.bind(this.loadIndex, this));
+                  $(document).ajaxSuccess(_.bind(this.postSubmitHandler, this));
 
                   this.renderCurrent();
+              },
+              postSubmitHandler: function(){
+                  // set updated content in the model
+                  var displayIndex = this.currentBlockIndex + 1;
+                  var blockModel = this.questionBlocks.models[this.currentBlockIndex];
+                  var problemBlock = $('.vert-' + displayIndex).find('.problems-wrapper');
+
+                  var modelContent = $(blockModel.attributes.content);
+                  modelContent.find('.problems-wrapper').attr('data-content', problemBlock.html());
+
+                  blockModel.set({
+                      content: modelContent[0].outerHTML,
+                      attempted: true
+                  });
               },
               loadNext: function(){
                   this.currentBlockIndex += 1;
