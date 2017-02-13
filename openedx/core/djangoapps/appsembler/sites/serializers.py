@@ -69,8 +69,7 @@ class RegistrationSerializer(serializers.Serializer):
         site = Site.objects.create(**site_data)
         organization_data = validated_data.pop('organization')
         user_email = validated_data.pop('user_email', None)
-        password = validated_data.pop('password', None)
-        organization, site, user = bootstrap_site(site, organization_data.get('name'), user_email, password)
+        organization, site, user = bootstrap_site(site, organization_data.get('name'), user_email)
         site_configuration = site.configuration
         initial_values = validated_data.get('initial_values', {})
         if initial_values:
