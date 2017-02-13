@@ -14,7 +14,7 @@ define([
         videoSupportedFileFormats,
         videoUploadMaxFileSizeInGB
     ) {
-        /*var activeView = new ActiveVideoUploadListView({
+        var activeView = new ActiveVideoUploadListView({
                 postUrl: videoHandlerUrl,
                 concurrentUploadLimit: concurrentUploadLimit,
                 uploadButton: uploadButton,
@@ -42,8 +42,8 @@ define([
                         $contentWrapper.find('.wrapper-assets').replaceWith(updatedView.render().$el);
                     });
                 }
-            }),*/
-            var previousView = new PreviousVideoUploadListView({
+            }),
+            previousView = new PreviousVideoUploadListView({
                 videoHandlerUrl: videoHandlerUrl,
                 collection: new VideoPagingCollection(previousUploads["videos"], {
                     url: videoHandlerUrl,
@@ -56,7 +56,7 @@ define([
                 }),
                 encodingsDownloadUrl: encodingsDownloadUrl
             });
-        //$contentWrapper.append(activeView.render().$el);
+        $contentWrapper.append(activeView.render().$el);
         $contentWrapper.append(previousView.render().$el);
     };
 
