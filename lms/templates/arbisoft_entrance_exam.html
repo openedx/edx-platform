@@ -70,6 +70,14 @@
     .question-link.highlight:visited{
         color: #222;
     }
+    .question-link.done{
+        background-color: #1e8142;
+        color: #ffffff;
+    }
+    .question-link.done:visited{
+        background-color: #1e8142;
+        color: #ffffff;
+    }
 </style>
 
 <div id="nav-div">
@@ -82,7 +90,7 @@
     </div>
         <ul id="question-nav">
             % for index, item in enumerate(items):
-                <li><a class="question-link" href="#" data-index="${index}">${index + 1}</a></li>
+                <li><a class="question-link ${item['done']}" href="#" data-index="${index}">${index + 1}</a></li>
             % endfor
         </ul>
     </div>

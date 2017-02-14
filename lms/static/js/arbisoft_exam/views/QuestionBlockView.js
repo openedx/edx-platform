@@ -40,6 +40,8 @@
                       content: modelContent[0].outerHTML,
                       attempted: true
                   });
+
+                  $('a.question-link[data-index=' + this.currentBlockIndex + ']').addClass('done');
               },
               loadNext: function(){
                   this.currentBlockIndex += 1;

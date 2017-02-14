@@ -445,7 +445,7 @@ class CapaMixin(CapaFields):
             return self.text_customization.get('custom_checking')
 
         _ = self.runtime.service(self, "i18n").ugettext
-        return _('Checking...')
+        return _('Submitting...')
 
     def should_show_check_button(self):
         """

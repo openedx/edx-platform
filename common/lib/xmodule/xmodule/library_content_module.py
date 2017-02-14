@@ -311,6 +311,7 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
                 contents.append({
                     'id': displayable.location.to_deprecated_string(),
                     'content': rendered_child.content,
+                    'done': "done" if child.done else "not_done"
                 })
 
         fragment.add_content(self.system.render_template('arbisoft_entrance_exam.html', {
