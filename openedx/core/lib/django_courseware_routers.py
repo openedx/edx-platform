@@ -51,7 +51,7 @@ class StudentModuleHistoryExtendedRouter(object):
         """
         if model_name is not None:
             model = hints.get('model')
-            if self._is_csmh(model):
+            if model is not None and self._is_csmh(model):
                 return db == self.DATABASE_NAME
         if db == self.DATABASE_NAME:
             return False
