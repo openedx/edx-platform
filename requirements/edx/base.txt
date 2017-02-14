@@ -115,7 +115,9 @@ django-ratelimit-backend==1.0
 unicodecsv==0.9.4
 django-require==1.0.11
 pyuca==1.1
+web-fragments==0.1.0
 wrapt==1.10.5
+XBlock==0.4.14
 zendesk==1.1.1
 
 # This needs to be installed *after* Cython, which is in pre.txt
