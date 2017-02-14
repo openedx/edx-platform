@@ -6,14 +6,17 @@
     import datetime
     import pytz
 
-    def enrollment_available(enrollment_end):
-        if not enrollment_end:
+    def course_available(end):
+        if not end:
             return False
 
         tz = pytz.timezone('Asia/Karachi')
         now = datetime.datetime.now(tz=tz)
-        td = enrollment_end - now
-        return td.days > 0
+        td = end - now
+        hours = int(td.seconds // (60 * 60))
+        mins = int((td.seconds // 60) % 60)
+
+        return td.days > 0 or hours > 0 or mins > 0
 %>
 <section class="courses-section">
   <div class="courses-container">
@@ -25,7 +28,7 @@
           <div class="grid-manual">
             <div class="row course-list">
               %for course in courses[:6]:
-                  %if course.enrollment_end and enrollment_available(course.enrollment_end):
+                  %if course.end and course_available(course.end):
                     <div class="col col-12 sm-col-12">
                       <div class="courses-listing-item">
                         <%include file="course.html" args="course=course" />
