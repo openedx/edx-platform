@@ -175,6 +175,7 @@ class RegistrationView(APIView):
         "goals",
         "honor_code",
         "terms_of_service",
+        "password_copy",
     ]
 
     # This end-point is available to anonymous users,
@@ -341,6 +342,13 @@ class RegistrationView(APIView):
         # for TOS, privacy policy, etc.
         if data.get("honor_code") and "terms_of_service" not in data:
             data["terms_of_service"] = data["honor_code"]
+        password = data.get("password")
+        password_copy = data.get("password_copy")
+        if password and password_copy and password != password_copy:
+            errors = {
+                'password_copy': [{"user_message": "The passwords must match."}]
+            }
+            return JsonResponse(errors, status=400)
 
         try:
             user = create_account_with_params(request, data)
@@ -481,6 +489,36 @@ class RegistrationView(APIView):
             restrictions={
                 "min_length": PASSWORD_MIN_LENGTH,
                 "max_length": PASSWORD_MAX_LENGTH,
+            },
+            required=required
+        )
+
+    def _add_password_copy_field(self, form_desc, required=True):
+        """Add a password copy field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to True
+
+        """
+        # Translators: This label appears above a field on the registration form
+        # meant to hold the user's retyped password.
+        password_copy_label = _(u"Confirm password")
+
+        error_msg = _(u"Confirm your password.")
+
+        form_desc.add_field(
+            "password_copy",
+            label=password_copy_label,
+            field_type="password",
+            restrictions={
+                "min_length": PASSWORD_MIN_LENGTH,
+                "max_length": PASSWORD_MAX_LENGTH,
+            },
+            error_messages={
+                "required": error_msg
             },
             required=required
         )
@@ -881,16 +919,17 @@ class RegistrationView(APIView):
                                 field_name, default=field_overrides[field_name]
                             )
 
-                    # Hide the password field
-                    form_desc.override_field_properties(
-                        "password",
-                        default="",
-                        field_type="hidden",
-                        required=False,
-                        label="",
-                        instructions="",
-                        restrictions={}
-                    )
+                    # Hide the password & password_copy fields
+                    for name in ["password", "password_copy"]:
+                        form_desc.override_field_properties(
+                            name,
+                            default="",
+                            field_type="hidden",
+                            required=False,
+                            label="",
+                            instructions="",
+                            restrictions={}
+                        )
 
 
 class PasswordResetView(APIView):

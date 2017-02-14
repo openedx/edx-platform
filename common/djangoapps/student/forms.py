@@ -188,6 +188,13 @@ class AccountCreationForm(forms.Form):
                                 "required": _("To enroll, you must follow the honor code.")
                             }
                         )
+                elif field_name == "password_copy":
+                    if field_value == "required" and data.get("password"):
+                        self.fields[field_name] = forms.CharField(
+                            error_messages={
+                                "required": _("Confirm password")
+                            }
+                        )
                 elif field_name == 'data_sharing_consent':
                     if field_value == "required":
                         self.fields[field_name] = TrueField(
@@ -236,6 +243,16 @@ class AccountCreationForm(forms.Form):
             except ValidationError, err:
                 raise ValidationError(_("Password: ") + "; ".join(err.messages))
         return password
+
+    def clean_password_copy(self):
+        """Enforce password_copy policies (if applicable)"""
+        password_copy = self.cleaned_data["password_copy"]
+        if (
+                "password" in self.cleaned_data and
+                self.cleaned_data["password"] != password_copy
+        ):
+            raise ValidationError(_("The passwords must match."))
+        return password_copy
 
     def clean_email(self):
         """ Enforce email restrictions (if applicable) """

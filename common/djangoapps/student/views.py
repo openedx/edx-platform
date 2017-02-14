@@ -1671,6 +1671,7 @@ def create_account_with_params(request, params):
 
     if should_link_with_social_auth or (third_party_auth.is_enabled() and pipeline.running(request)):
         params["password"] = pipeline.make_random_password()
+        params["password_copy"] = params["password"]
 
     # Add a form requirement for data sharing consent if the EnterpriseCustomer
     # for the request requires it at login
@@ -1691,6 +1692,7 @@ def create_account_with_params(request, params):
         if eamap.external_name.strip() != '':
             params["name"] = eamap.external_name
         params["password"] = eamap.internal_password
+        params["password_copy"] = params["password"]
         log.debug(u'In create_account with external_auth: user = %s, email=%s', params["name"], params["email"])
 
     extended_profile_fields = configuration_helpers.get_value('extended_profile_fields', [])
