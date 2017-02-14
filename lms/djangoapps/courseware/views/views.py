@@ -1660,7 +1660,7 @@ class CourseOutlineFragmentView(FragmentView):
 
         return block
 
-    def render_fragment(self, request, course_id=None):
+    def render_fragment(self, request, course_id=None, **kwargs):
         """
         Renders the course outline as a fragment.
         """
