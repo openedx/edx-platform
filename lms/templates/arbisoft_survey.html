@@ -7,7 +7,7 @@
         "phone_number": "Contact number",
         "cgpa": "CGPA",
         "position_in_class": "Position/Rank in class (e.g. 1, 3, 10 etc)",
-        "academic_projects": "Tell us about your 2 mojor projects",
+        "academic_projects": "Tell us about your 2 major projects",
         "extra_curricular_activities": "List down extra curricular activities you're involved in (if any)",
         "freelance_work": "Mention any freelance work you do or have done",
         "accomplishment": "Your biggest accomplishment to-date",
@@ -166,9 +166,9 @@ from openedx.core.djangolib.markup import HTML, Text
                 <div class="form-field">
                     <label>${get_label('expertise_ranking')}</label>
                     ${ ranking_formset.management_form }
-                    %for form in ranking_formset:
+                    %for rank_form in ranking_formset:
                         <div class="ranking-div">
-                            %for field in form:
+                            %for field in rank_form:
                                 %if field.name == 'expertise':
                                     <span class="course-title">${field.value()}</span>
                                 %endif
@@ -189,9 +189,9 @@ from openedx.core.djangolib.markup import HTML, Text
                             </tr>
                         </thead>
                         <tbody>
-                            %for form in reference_formset:
+                            %for reference_form in reference_formset:
                                 <tr>
-                                    %for field in form:
+                                    %for field in reference_form:
                                         <td class="padding-r">${field}</td>
                                     %endfor
                                 </tr>

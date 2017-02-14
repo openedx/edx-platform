@@ -582,13 +582,15 @@ def arbisoft_survey(request):
         initial=[
             {'expertise': course_id, 'rank': 0}
             for course_id, course_name in arbi_constants.EXPERTISE
-        ]
+        ],
+        prefix='ranking',
     )
 
     CandidateReferenceFormset = modelformset_factory(CandidateReference, form=CandidateReferenceForm, extra=2,)
 
     reference_formset = CandidateReferenceFormset(
         queryset=CandidateReference.objects.none(),
+        prefix='reference'
     )
 
     context = {
@@ -598,10 +600,10 @@ def arbisoft_survey(request):
     }
 
     if request.method == "POST":
-        ranking_formset = CourseRankingFormset(data=request.POST)
-        reference_formset = CandidateReferenceFormset(data=request.POST)
+        ranking_formset = CourseRankingFormset(data=request.POST, prefix='ranking')
+        reference_formset = CandidateReferenceFormset(data=request.POST, prefix='reference')
 
-        #context['ranking_formset'] = ranking_formset
+        context['ranking_formset'] = ranking_formset
         context['reference_formset'] = reference_formset
 
         details_valid = ranking_formset.is_valid() and reference_formset.is_valid() and profile_form.is_valid()

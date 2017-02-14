@@ -769,7 +769,7 @@ class RegistrationView(APIView):
 
         # Translators: "Terms of Service" is a legal document users must agree to
         # in order to register a new account.
-        label = _(u"I agree to the {platform_name}'s {terms_of_service}.").format(
+        label = _(u"<strong>I agree to the {platform_name}'s {terms_of_service}.</strong>").format(
             platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
             terms_of_service=terms_link
         )

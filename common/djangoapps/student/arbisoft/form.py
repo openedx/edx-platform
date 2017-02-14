@@ -87,11 +87,6 @@ class CandidateProfileForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super(CandidateProfileForm, self).clean()
-        #
-        # position_in_class = cleaned_data.get('position_in_class')
-        # if position_in_class < 0:
-        #     self.add_error('position_in_class', forms.ValidationError("Invalid value."))
-        #     raise forms.ValidationError("Invalid value.")
 
         cgpa = cleaned_data.get('cgpa')
         if cgpa < 0 or cgpa > 4:
