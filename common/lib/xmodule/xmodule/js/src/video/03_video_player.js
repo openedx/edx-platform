@@ -1,9 +1,10 @@
+/* eslint-disable no-console, no-param-reassign */
 (function(requirejs, require, define) {
 // VideoPlayer module.
     define(
 'video/03_video_player.js',
-['video/02_html5_video.js', 'video/00_resizer.js'],
-function(HTML5Video, Resizer) {
+['video/02_html5_video.js', 'video/02_html5_hls_video.js', 'video/00_resizer.js', 'hls', 'underscore'],
+function(HTML5Video, HTML5HLSVideo, Resizer, HLS, _) {
     var dfd = $.Deferred(),
         VideoPlayer = function(state) {
             state.videoPlayer = {};
@@ -100,8 +101,13 @@ function(HTML5Video, Resizer) {
     //     initial configuration. Also make the created DOM elements available
     //     via the 'state' object. Much easier to work this way - you don't
     //     have to do repeated jQuery element selects.
+    // eslint-disable-next-line no-underscore-dangle
     function _initialize(state) {
-        var youTubeId, player, userAgent;
+        var youTubeId,
+            player,
+            userAgent,
+            commonPlayerConfig,
+            eventToBeTriggered = 'loadedmetadata';
 
         // The function is called just once to apply pre-defined configurations
         // by student before video starts playing. Waits until the video's
@@ -147,19 +153,42 @@ function(HTML5Video, Resizer) {
         state.browserIsSafari = (userAgent.indexOf('safari') > -1 &&
                                  !state.browserIsChrome);
 
-        if (state.videoType === 'html5') {
-            state.videoPlayer.player = new HTML5Video.Player(state.el, {
-                playerVars: state.videoPlayer.playerVars,
-                videoSources: state.config.sources,
-                events: {
-                    onReady: state.videoPlayer.onReady,
-                    onStateChange: state.videoPlayer.onStateChange,
-                    onError: state.videoPlayer.onError
-                }
-            });
+        // Browser can play HLS videos if either `Media Source Extensions`
+        // feature is supported or browser is safari (native HLS support)
+        state.canPlayHLS = state.HLSVideoSources.length > 0 && (HLS.isSupported() || state.browserIsSafari);
+        state.HLSOnlySources = state.config.sources.length > 0 &&
+                               state.config.sources.length === state.HLSVideoSources.length;
 
+        commonPlayerConfig = {
+            playerVars: state.videoPlayer.playerVars,
+            videoSources: state.config.sources,
+            browserIsSafari: state.browserIsSafari,
+            events: {
+                onReady: state.videoPlayer.onReady,
+                onStateChange: state.videoPlayer.onStateChange,
+                onError: state.videoPlayer.onError
+            }
+        };
+
+        if (state.videoType === 'html5') {
+            if (state.canPlayHLS || state.HLSOnlySources) {
+                state.videoPlayer.player = new HTML5HLSVideo.Player(
+                    state.el,
+                    _.extend({}, commonPlayerConfig, {
+                        videoSources: state.HLSVideoSources,
+                        canPlayHLS: state.canPlayHLS,
+                        HLSOnlySources: state.HLSOnlySources
+                    })
+                );
+                // `loadedmetadata` event triggered too early on Safari due
+                // to which correct video dimensions were not calculated
+                eventToBeTriggered = state.browserIsSafari ? 'loadeddata' : eventToBeTriggered;
+            } else {
+                state.videoPlayer.player = new HTML5Video.Player(state.el, commonPlayerConfig);
+            }
             player = state.videoEl = state.videoPlayer.player.videoEl;
-            player[0].addEventListener('loadedmetadata', state.videoPlayer.onLoadMetadataHtml5, false);
+            player[0].addEventListener(eventToBeTriggered, state.videoPlayer.onLoadMetadataHtml5, false);
+            player.on('remove', state.videoPlayer.destroy);
         } else {
             youTubeId = state.youtubeId();
 
@@ -178,6 +207,8 @@ function(HTML5Video, Resizer) {
                 var player = state.videoEl = state.el.find('iframe'),
                     videoWidth = player.attr('width') || player.width(),
                     videoHeight = player.attr('height') || player.height();
+
+                player.on('remove', state.videoPlayer.destroy);
 
                 _resize(state, videoWidth, videoHeight);
                 _updateVcrAndRegion(state, true);
@@ -322,6 +353,9 @@ function(HTML5Video, Resizer) {
         }
         if (player && _.isFunction(player.destroy)) {
             player.destroy();
+        }
+        if (this.canPlayHLS && player.hls) {
+            player.hls.destroy();
         }
         delete this.videoPlayer;
     }
