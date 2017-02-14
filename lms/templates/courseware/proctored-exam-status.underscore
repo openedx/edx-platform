@@ -13,7 +13,7 @@
         <span>
             <% if(attempt_status !== 'ready_to_submit') {%>
                 <button class="exam-button-turn-in-exam btn btn-pl-primary">
-                    <%- gettext("End My Exam") %>
+                    <%- gettext("End My Test") %>
                 </button>
             <% } %>
         </span>

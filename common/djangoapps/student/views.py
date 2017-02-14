@@ -603,9 +603,6 @@ def arbisoft_survey(request):
         ranking_formset = CourseRankingFormset(data=request.POST, prefix='ranking')
         reference_formset = CandidateReferenceFormset(data=request.POST, prefix='reference')
 
-        context['ranking_formset'] = ranking_formset
-        context['reference_formset'] = reference_formset
-
         details_valid = ranking_formset.is_valid() and reference_formset.is_valid() and profile_form.is_valid()
 
         if details_valid:
@@ -648,6 +645,9 @@ def arbisoft_survey(request):
                     add_enrollment(user.username, course_id)
 
             return HttpResponseRedirect(reverse('dashboard'))
+        else:
+            context['ranking_formset'] = ranking_formset
+            context['reference_formset'] = reference_formset
 
     return render_to_response('arbisoft_survey.html', context)
 
