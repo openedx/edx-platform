@@ -38,7 +38,7 @@
     line-height: 33px;
     text-shadow: none;
     text-transform: none;
-    
+
     &:hover,
     &:focus,
     &:active {
@@ -132,11 +132,6 @@
   }
 
 }
-
-.courseware-search-bar {
-   width: flex-grid(7);
-}
-
 
 .dashboard-search-bar  {
   @include float(right);

@@ -79,15 +79,9 @@ class CoursewareIndex(View):
     @method_decorator(ensure_valid_course_key)
     def get(self, request, course_id, chapter=None, section=None, position=None):
         """
-        Displays courseware accordion and associated content.  If course, chapter,
+        Displays courseware and associated content.  If course, chapter,
         and section are all specified, renders the page, or returns an error if they
         are invalid.
-
-        If section is not specified, displays the accordion opened to the right
-        chapter.
-
-        If neither chapter or section are specified, displays the user's most
-        recent chapter, or the first chapter if this is the user's first visit.
 
         Arguments:
             request: HTTP request
@@ -431,11 +425,6 @@ class CoursewareIndex(View):
             self.section_url_name,
             self.field_data_cache,
         )
-        courseware_context['accordion'] = render_accordion(
-            self.request,
-            self.course,
-            table_of_contents['chapters'],
-        )
 
         # entrance exam data
         self._add_entrance_exam_to_context(courseware_context)
@@ -452,8 +441,6 @@ class CoursewareIndex(View):
             # chromeless data
             if self.section.chrome:
                 chrome = [s.strip() for s in self.section.chrome.lower().split(",")]
-                if 'accordion' not in chrome:
-                    courseware_context['disable_accordion'] = True
                 if 'tabs' not in chrome:
                     courseware_context['disable_tabs'] = True
 
@@ -542,23 +529,6 @@ class CoursewareIndex(View):
             # at least return a nice error message
             log.exception("Error while rendering courseware-error page")
             raise
-
-
-def render_accordion(request, course, table_of_contents):
-    """
-    Returns the HTML that renders the navigation for the given course.
-    Expects the table_of_contents to have data on each chapter and section,
-    including which ones are active.
-    """
-    context = dict(
-        [
-            ('toc', table_of_contents),
-            ('course_id', unicode(course.id)),
-            ('csrf', csrf(request)['csrf_token']),
-            ('due_date_display_format', course.due_date_display_format),
-        ] + TEMPLATE_IMPORTS.items()
-    )
-    return render_to_string('courseware/accordion.html', context)
 
 
 def save_child_position(seq_module, child_name):
