@@ -35,8 +35,9 @@
         baseUrl: '/base/',
         paths: {
             moment: 'common_static/common/js/vendor/moment-with-locales',
-            'draggabilly': 'common_static/js/vendor/draggabilly',
-            'edx-ui-toolkit': 'common_static/edx-ui-toolkit'
+            draggabilly: 'common_static/js/vendor/draggabilly',
+            'edx-ui-toolkit': 'common_static/edx-ui-toolkit',
+            hls: 'common_static/common/js/vendor/hls'
         },
         'moment': {
             exports: 'moment'

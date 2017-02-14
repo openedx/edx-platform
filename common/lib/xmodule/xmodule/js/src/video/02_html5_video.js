@@ -16,8 +16,8 @@
 (function(requirejs, require, define) {
     define(
 'video/02_html5_video.js',
-[],
-function() {
+['underscore'],
+function(_) {
     var HTML5Video = {};
 
     HTML5Video.Player = (function() {
@@ -157,6 +157,85 @@ function() {
             this.callStateChangeCallback();
         };
 
+        Player.prototype.init = function(el, config) {
+            var isTouch = onTouchBasedDevice() || '',
+                events = ['loadstart', 'progress', 'suspend', 'abort', 'error',
+                    'emptied', 'stalled', 'play', 'pause', 'loadedmetadata',
+                    'loadeddata', 'waiting', 'playing', 'canplay', 'canplaythrough',
+                    'seeking', 'seeked', 'timeupdate', 'ended', 'ratechange',
+                    'durationchange', 'volumechange'
+                ],
+                self = this;
+
+            this.config = config;
+            this.logs = [];
+            this.el = $(el);
+
+            // Because of problems with creating video element via jquery
+            // (http://bugs.jquery.com/ticket/9174) we create it using native JS.
+            this.video = document.createElement('video');
+
+            // Get the jQuery object and set error event handlers
+            this.videoEl = $(this.video);
+
+            // The player state is used by other parts of the VideoPlayer to
+            // determine what the video is currently doing.
+            this.playerState = HTML5Video.PlayerState.UNSTARTED;
+
+            _.bindAll(this, 'onLoadedMetadata', 'onPlay', 'onPlaying', 'onPause', 'onEnded');
+
+            // Attach a 'click' event on the <video> element. It will cause the
+            // video to pause/play.
+            this.videoEl.on('click', function() {
+                var PlayerState = HTML5Video.PlayerState;
+
+                if (self.playerState === PlayerState.PLAYING) {
+                    self.playerState = PlayerState.PAUSED;
+                    self.pauseVideo();
+                } else {
+                    self.playerState = PlayerState.PLAYING;
+                    self.playVideo();
+                }
+            });
+
+            this.debug = false;
+            $.each(events, function(index, eventName) {
+                self.video.addEventListener(eventName, function() {
+                    self.logs.push({
+                        'event name': eventName,
+                        state: self.playerState
+                    });
+
+                    if (self.debug) {
+                        console.log(
+                            'event name:', eventName,
+                            'state:', self.playerState,
+                            'readyState:', self.video.readyState,
+                            'networkState:', self.video.networkState
+                        );
+                    }
+
+                    el.trigger('html5:' + eventName, arguments);
+                });
+            });
+
+            // When the <video> tag has been processed by the browser, and it
+            // is ready for playback, notify other parts of the VideoPlayer,
+            // and initially pause the video.
+            this.video.addEventListener('loadedmetadata', this.onLoadedMetadata, false);
+            this.video.addEventListener('play', this.onPlay, false);
+            this.video.addEventListener('playing', this.onPlaying, false);
+            this.video.addEventListener('pause', this.onPause, false);
+            this.video.addEventListener('ended', this.onEnded, false);
+
+            if (/iP(hone|od)/i.test(isTouch[0])) {
+                this.videoEl.prop('controls', true);
+            }
+
+            // Place the <video> element on the page.
+            this.videoEl.appendTo(el.find('.video-player div'));
+        };
+
         return Player;
 
         /*
@@ -196,48 +275,7 @@ function() {
          *     }
          */
         function Player(el, config) {
-            var isTouch = onTouchBasedDevice() || '',
-                sourceList, _this, errorMessage, lastSource;
-
-            _.bindAll(this, 'onLoadedMetadata', 'onPlay', 'onPlaying', 'onPause', 'onEnded');
-            this.logs = [];
-            // Initially we assume that el is a DOM element. If jQuery selector
-            // fails to select something, we assume that el is an ID of a DOM
-            // element. We try to select by ID. If jQuery fails this time, we
-            // return. Nothing breaks because the player 'onReady' event will
-            // never be fired.
-
-            this.el = $(el);
-            if (this.el.length === 0) {
-                this.el = $('#' + el);
-
-                if (this.el.length === 0) {
-                    errorMessage = gettext('VideoPlayer: Element corresponding to the given selector was not found.');
-                    if (window.console && console.log) {
-                        console.log(errorMessage);
-                    } else {
-                        throw new Error(errorMessage);
-                    }
-                    return;
-                }
-            }
-
-            // A simple test to see that the 'config' is a normal object.
-            if ($.isPlainObject(config)) {
-                this.config = config;
-            } else {
-                return;
-            }
-
-            // We should have at least one video source. Otherwise there is no
-            // point to continue.
-            if (!config.videoSources && !config.videoSources.length) {
-                return;
-            }
-
-
-            // Will be used in inner functions to point to the current object.
-            _this = this;
+            var errorMessage, lastSource, sourceList;
 
             // Create HTML markup for individual sources of the HTML5 <video>
             // element.
@@ -254,88 +292,21 @@ function() {
                 ].join('');
             });
 
+            // do common initialization independent of player type
+            this.init(el, config);
 
             // Create HTML markup for the <video> element, populating it with
-            // sources from previous step. Because of problems with creating
-            // video element via jquery (http://bugs.jquery.com/ticket/9174) we
-            // create it using native JS.
-            this.video = document.createElement('video');
-
+            // sources from previous step. Set playback not supported error message.
             errorMessage = [
                 gettext('This browser cannot play .mp4, .ogg, or .webm files.'),
                 gettext('Try using a different browser, such as Google Chrome.')
             ].join('');
             this.video.innerHTML = sourceList.join('') + errorMessage;
 
-            // Get the jQuery object, and set the player state to UNSTARTED.
-            // The player state is used by other parts of the VideoPlayer to
-            // determine what the video is currently doing.
-            this.videoEl = $(this.video);
-
             lastSource = this.videoEl.find('source').last();
             lastSource.on('error', this.showErrorMessage.bind(this));
             lastSource.on('error', this.onError.bind(this));
             this.videoEl.on('error', this.onError.bind(this));
-
-            if (/iP(hone|od)/i.test(isTouch[0])) {
-                this.videoEl.prop('controls', true);
-            }
-
-            this.playerState = HTML5Video.PlayerState.UNSTARTED;
-
-            // Attach a 'click' event on the <video> element. It will cause the
-            // video to pause/play.
-            this.videoEl.on('click', function(event) {
-                var PlayerState = HTML5Video.PlayerState;
-
-                if (_this.playerState === PlayerState.PLAYING) {
-                    _this.playerState = PlayerState.PAUSED;
-                    _this.pauseVideo();
-                } else {
-                    _this.playerState = PlayerState.PLAYING;
-                    _this.playVideo();
-                }
-            });
-
-            var events = ['loadstart', 'progress', 'suspend', 'abort', 'error',
-                'emptied', 'stalled', 'play', 'pause', 'loadedmetadata',
-                'loadeddata', 'waiting', 'playing', 'canplay', 'canplaythrough',
-                'seeking', 'seeked', 'timeupdate', 'ended', 'ratechange',
-                'durationchange', 'volumechange'
-            ];
-
-            this.debug = false;
-            $.each(events, function(index, eventName) {
-                _this.video.addEventListener(eventName, function() {
-                    _this.logs.push({
-                        'event name': eventName,
-                        'state': _this.playerState
-                    });
-
-                    if (_this.debug) {
-                        console.log(
-                            'event name:', eventName,
-                            'state:', _this.playerState,
-                            'readyState:', _this.video.readyState,
-                            'networkState:', _this.video.networkState
-                        );
-                    }
-
-                    el.trigger('html5:' + eventName, arguments);
-                });
-            });
-
-            // When the <video> tag has been processed by the browser, and it
-            // is ready for playback, notify other parts of the VideoPlayer,
-            // and initially pause the video.
-            this.video.addEventListener('loadedmetadata', this.onLoadedMetadata, false);
-            this.video.addEventListener('play', this.onPlay, false);
-            this.video.addEventListener('playing', this.onPlaying, false);
-            this.video.addEventListener('pause', this.onPause, false);
-            this.video.addEventListener('ended', this.onEnded, false);
-
-            // Place the <video> element on the page.
-            this.videoEl.appendTo(this.el.find('.video-player div'));
         }
     }());
 
