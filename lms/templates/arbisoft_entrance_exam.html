@@ -9,6 +9,9 @@
         font-size: 16px;
         font-weight:bold;
     }
+    .sequence-bottom{
+        display: none;
+    }
     #numbering-div{
         margin: 20px 0 30px;
         padding: 20px;
@@ -24,6 +27,9 @@
         display: inline-block;
         margin-left: 15px;
         float: right;
+    }
+    #next-prev{
+        text-align: center;
     }
     #next-prev .button{
         padding: 0 12px;
@@ -83,11 +89,6 @@
 <div id="nav-div">
     <div id="numbering-div">
         <h4>Questions</h4>
-         <div id="next-prev">
-        <button class="button previous" data-value="Previous"><span class="icon fa fa-chevron-prev" aria-hidden="true"></span><span class="sr">Previous</span></button>
-        <button class="button next" data-value="Next"><span class="icon fa fa-chevron-next" aria-hidden="true"></span><span class="sr">Next</span></button>
-        <br class="clear" />
-    </div>
         <ul id="question-nav">
             % for index, item in enumerate(items):
                 <li><a class="question-link ${item['done']}" href="#" data-index="${index}">${index + 1}</a></li>
@@ -96,6 +97,11 @@
     </div>
 </div>
 <div id="arbi-exam"></div>
+<div id="next-prev">
+    <button class="button previous" data-value="Previous">Previous Question</button>
+    <button class="button next" data-value="Next">Next Question</button>
+    <br class="clear" />
+</div>
 
 
 <script type="text/template" id="arbisoft_exam">
