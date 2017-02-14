@@ -42,8 +42,6 @@ from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from lms.djangoapps.course_api.blocks.api import get_blocks
 
-from openedx.core.djangoapps.catalog.utils import get_programs_data
-
 import shoppingcart
 import survey.utils
 import survey.views
