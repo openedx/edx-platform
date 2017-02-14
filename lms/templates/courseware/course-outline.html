@@ -20,7 +20,7 @@ from django.utils.translation import ugettext as _
             <ul class="outline-item focusable" role="group" tabindex="0">
                 % for subsection in section.get('children') or []:
                     <li class="outline-item focusable" role="treeitem" tabindex="0" aria-expanded="true">
-                        <a href="#">${ subsection['display_name'] }</a>
+                        <a href="${ subsection['lms_web_url'] }">${ subsection['display_name'] }</a>
                     </li>
                 % endfor
             </ul>
