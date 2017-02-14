@@ -1,8 +1,9 @@
 """Helper functions for working with the catalog service."""
+import copy
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from edx_rest_api_client.client import EdxRestApiClient
-from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.lib.edx_api_utils import get_edx_api_data
@@ -21,12 +22,14 @@ def create_catalog_api_client(user, catalog_integration):
     return EdxRestApiClient(catalog_integration.internal_api_url, jwt=jwt)
 
 
-def get_programs(uuid=None, type=None):  # pylint: disable=redefined-builtin
+def get_programs(uuid=None, types=None):  # pylint: disable=redefined-builtin
     """Retrieve marketable programs from the catalog service.
 
     Keyword Arguments:
         uuid (string): UUID identifying a specific program.
-        type (string): Filter programs by type (e.g., "MicroMasters" will only return MicroMasters programs).
+        types (list of string): List of program type names used to filter programs by type
+                                (e.g., ["MicroMasters"] will only return MicroMasters programs,
+                                ["MicroMasters", "XSeries"] will return MicroMasters and XSeries programs).
 
     Returns:
         list of dict, representing programs.
@@ -40,18 +43,21 @@ def get_programs(uuid=None, type=None):  # pylint: disable=redefined-builtin
             return []
 
         api = create_catalog_api_client(user, catalog_integration)
+        types_param = ','.join(types) if types else None
 
-        cache_key = '{base}.programs{type}'.format(
+        cache_key = '{base}.programs{types}'.format(
             base=catalog_integration.CACHE_KEY,
-            type='.' + type if type else ''
+            types='.' + types_param if types_param else ''
         )
 
         querystring = {
             'marketable': 1,
             'exclude_utm': 1,
         }
-        if type:
-            querystring['type'] = type
+        if uuid:
+            querystring['use_full_course_serializer'] = 1
+        if types_param:
+            querystring['types'] = types_param
 
         return get_edx_api_data(
             catalog_integration,
@@ -66,11 +72,15 @@ def get_programs(uuid=None, type=None):  # pylint: disable=redefined-builtin
         return []
 
 
-def get_program_types():
-    """Retrieve all program types from the catalog service.
+def get_program_types(name=None):
+    """Retrieve program types from the catalog service.
+
+    Keyword Arguments:
+        name (string): Name identifying a specific program.
 
     Returns:
         list of dict, representing program types.
+        dict, if a specific program type is requested.
     """
     catalog_integration = CatalogIntegration.current()
     if catalog_integration.enabled:
@@ -82,27 +92,46 @@ def get_program_types():
         api = create_catalog_api_client(user, catalog_integration)
         cache_key = '{base}.program_types'.format(base=catalog_integration.CACHE_KEY)
 
-        return get_edx_api_data(
+        data = get_edx_api_data(
             catalog_integration,
             user,
             'program_types',
             cache_key=cache_key if catalog_integration.is_cache_enabled else None,
             api=api
         )
+
+        # Filter by name if a name was provided
+        if name:
+            data = next(program_type for program_type in data if program_type['name'] == name)
+
+        return data
     else:
         return []
 
 
-def get_programs_with_type_logo():
+def get_programs_with_type(types=None):
     """
-    Join program type logos with programs of corresponding type.
+    Return the list of programs. You can filter the types of programs returned using the optional
+    types parameter. If no filter is provided, all programs of all types will be returned.
+
+    The program dict is updated with the fully serialized program type.
+
+    Keyword Arguments:
+        types (list): List of program type slugs to filter by.
+
+    Return:
+        list of dict, representing the active programs.
     """
-    programs_list = get_programs()
-    program_types = get_program_types()
+    programs_with_type = []
+    programs = get_programs(types=types)
 
-    type_logo_map = {program_type['name']: program_type['logo_image'] for program_type in program_types}
+    if programs:
+        program_types = {program_type['name']: program_type for program_type in get_program_types()}
+        for program in programs:
+            # deepcopy the program dict here so we are not adding
+            # the type to the cached object
+            program_with_type = copy.deepcopy(program)
+            program_with_type['type'] = program_types[program['type']]
+            programs_with_type.append(program_with_type)
 
-    for program in programs_list:
-        program['logo_image'] = type_logo_map[program['type']]
-
-    return programs_list
+    return programs_with_type

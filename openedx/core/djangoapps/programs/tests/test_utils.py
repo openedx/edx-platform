@@ -1,17 +1,14 @@
 """Tests covering Programs utilities."""
 # pylint: disable=no-member
 import datetime
-import json
 import uuid
 
 import ddt
-from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
 import mock
 from nose.plugins.attrib import attr
-from opaque_keys.edx.keys import CourseKey
 from pytz import utc
 
 from lms.djangoapps.certificates.api import MODES
@@ -21,15 +18,12 @@ from openedx.core.djangoapps.catalog.tests.factories import (
     ProgramFactory,
     CourseFactory,
     CourseRunFactory,
-    OrganizationFactory,
 )
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin, CredentialsDataMixin
 from openedx.core.djangoapps.programs.tests.factories import ProgressFactory
 from openedx.core.djangoapps.programs.utils import (
     DEFAULT_ENROLLMENT_START_DATE, ProgramProgressMeter, ProgramDataExtender
 )
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from util.date_utils import strftime_localized
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -388,6 +382,18 @@ class TestProgramDataExtender(ModuleStoreTestCase):
     maxDiff = None
     sku = 'abc123'
     checkout_path = '/basket'
+    instructors = {
+        'instructors': [
+            {
+                'name': 'test-instructor1',
+                'organization': 'TextX',
+            },
+            {
+                'name': 'test-instructor2',
+                'organization': 'TextX',
+            }
+        ]
+    }
 
     def setUp(self):
         super(TestProgramDataExtender, self).setUp()
@@ -395,6 +401,7 @@ class TestProgramDataExtender(ModuleStoreTestCase):
         self.course = ModuleStoreCourseFactory()
         self.course.start = datetime.datetime.now(utc) - datetime.timedelta(days=1)
         self.course.end = datetime.datetime.now(utc) + datetime.timedelta(days=1)
+        self.course.instructor_info = self.instructors
         self.course = self.update_course(self.course, self.user.id)
 
         self.course_run = CourseRunFactory(key=unicode(self.course.id))
@@ -561,3 +568,9 @@ class TestProgramDataExtender(ModuleStoreTestCase):
         ) if is_uuid_available else None
 
         self._assert_supplemented(data, certificate_url=expected_url)
+
+    def test_instructors_retrieval(self):
+        data = ProgramDataExtender(self.program, self.user).extend(include_instructors=True)
+
+        self.program.update(self.instructors['instructors'])
+        self.assertEqual(data, self.program)

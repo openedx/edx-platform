@@ -18,6 +18,7 @@ from edxmako.shortcuts import render_to_response
 from branding.views import index
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from milestones.tests.utils import MilestonesTestCaseMixin
+from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from util.milestones_helpers import set_prerequisite_courses
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -289,29 +290,27 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
 
 @ddt.ddt
 @attr(shard=1)
-class IndexPageProgramsTests(ModuleStoreTestCase):
+class IndexPageProgramsTests(SiteMixin, ModuleStoreTestCase):
     """
     Tests for Programs List in Marketing Pages.
     """
+    @ddt.data([], ['fake_program_type'])
+    def test_get_programs_with_type_called(self, program_types):
+        self.site_configuration.values.update({
+            'ENABLED_PROGRAM_TYPES': program_types
+        })
+        self.site_configuration.save()
 
-    def setUp(self):
-        super(IndexPageProgramsTests, self).setUp()
-        self.client.login(username=self.user.username, password=self.user_password)
+        views = [
+            (reverse('root'), 'student.views.get_programs_with_type'),
+            (reverse('branding.views.courses'), 'courseware.views.views.get_programs_with_type'),
+        ]
+        for url, dotted_path in views:
+            with patch(dotted_path) as mock_get_programs_with_type:
+                response = self.client.get(url)
+                self.assertEqual(response.status_code, 200)
 
-    @ddt.data(True, False)
-    def test_programs_with_type_logo_called(self, display_programs):
-        with patch.dict('django.conf.settings.FEATURES', {'DISPLAY_PROGRAMS_ON_MARKETING_PAGES': display_programs}):
-            views = [
-                (reverse('dashboard'), 'student.views.get_programs_with_type_logo'),
-                (reverse('branding.views.courses'), 'courseware.views.views.get_programs_with_type_logo'),
-            ]
-
-            for url, dotted_path in views:
-                with patch(dotted_path) as mock_get_programs_with_type_logo:
-                    response = self.client.get(url)
-                    self.assertEqual(response.status_code, 200)
-
-                    if display_programs:
-                        mock_get_programs_with_type_logo.assert_called_once()
-                    else:
-                        mock_get_programs_with_type_logo.assert_not_called_()
+                if program_types:
+                    mock_get_programs_with_type.assert_called_once()
+                else:
+                    mock_get_programs_with_type.assert_not_called()
