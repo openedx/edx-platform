@@ -150,9 +150,8 @@ ${HTML(fragment.foot_html())}
 
     </div>
 % endif
-    <section class="course-content" id="course-content" tabindex="-1">
+    <main class="course-content" id="main" tabindex="-1" aria-label="Content">
         <div class="path"></div>
-        <main id="main" aria-label="Content">
         % if getattr(course, 'entrance_exam_enabled') and \
            getattr(course, 'entrance_exam_minimum_score_pct') and \
            entrance_exam_current_score is not UNDEFINED:
@@ -184,8 +183,7 @@ ${HTML(fragment.foot_html())}
         % endif
 
           ${HTML(fragment.body_html())}
-        </main>
-    </section>
+    </main>
 
     <section class="courseware-results-wrapper">
       <div id="loading-message" aria-live="polite" aria-relevant="all"></div>
