@@ -3,15 +3,16 @@
 Test labster for the access control framework
 """
 from ccx_keys.locator import CCXLocator
-import courseware.access as access
 from student.models import CourseEnrollment
-from ccx.tests.factories import CcxFactory
-from courseware.tests.factories import InstructorFactory
+from student.roles import CourseCcxCoachRole
+from courseware.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import (
     SharedModuleStoreTestCase,
     TEST_DATA_SPLIT_MODULESTORE
 )
+import courseware.access as access
+from lms.djangoapps.ccx.models import CustomCourseForEdX
 
 # pylint: disable=protected-access
 
@@ -21,48 +22,76 @@ class UserRoleTestCase(SharedModuleStoreTestCase):
     """
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
+    def make_coach(self, user, course_key):
+        """
+        Create coach user.
+        """
+        role = CourseCcxCoachRole(course_key)
+        role.add_users(user)
+
+    def make_ccx(self, coach, course, display_name):
+        """
+        Create ccx
+        """
+        ccx = CustomCourseForEdX(
+            course_id=course.id,
+            coach=coach,
+            display_name=display_name
+        )
+        ccx.save()
+
+        ccx_locator = CCXLocator.from_course_locator(course.id, unicode(ccx.id))
+        self.make_coach(coach, ccx_locator)
+        CourseEnrollment.enroll(coach, ccx_locator)
+
+        return ccx_locator
+
     def setUp(self):
         """
         Set up tests
         """
         super(UserRoleTestCase, self).setUp()
-
-        # setup course and user
-        self.course = CourseFactory.create()
+        self.course  = CourseFactory.create()
         self.course2 = CourseFactory.create()
-        self.course_instructor = InstructorFactory(course_key=self.course.id, password="test")
-        self.course_instructor2 = InstructorFactory(course_key=self.course2.id, password="test")
+
+        # Create coach account
+        self.coach = UserFactory.create(password="test")
+        self.coach2 = UserFactory.create(password="test")
+
+        # Create ccx
+        self.ccx_locator = self.make_ccx(self.coach, self.course, "Test CCX")
+        self.ccx_locator2 = self.make_ccx(self.coach2, self.course2, "Test CCX2")
 
     def test_user_role_instructor(self):
         """
         Ensure that user role is instructor in the course.
+
         """
+        # User have access as coach on ccx
         self.assertEqual(
             'instructor',
-            access.get_user_role(self.course_instructor, self.course.id)
+            access.get_user_role(self.coach, self.ccx_locator)
         )
         self.assertEqual(
             'instructor',
-            access.get_user_role(self.course_instructor2, self.course2.id)
+            access.get_user_role(self.coach2, self.ccx_locator2)
         )
 
     def test_user_role_instructor_as_role_student(self):
         """
         Ensure that user role instructor is student when the instructor is joining in another course.
         """
-        # create ccx
-        ccx = CcxFactory(course_id=self.course.id)
-        ccx_locator = CCXLocator.from_course_locator(self.course.id, ccx.id)
-        CourseEnrollment.enroll(self.course_instructor2, ccx_locator)
+        # Enroll user
+        CourseEnrollment.enroll(self.coach2, self.ccx_locator)
 
         # Test for role of a instructor in course
         self.assertEqual(
             'instructor',
-            access.get_user_role(self.course_instructor, self.course.id)
+            access.get_user_role(self.coach, self.ccx_locator)
         )
 
         # Test for role of a student in course
         self.assertEqual(
             'student',
-            access.get_user_role(self.course_instructor2, self.course.id)
+            access.get_user_role(self.coach2, self.ccx_locator)
         )
