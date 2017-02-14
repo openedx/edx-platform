@@ -59,7 +59,7 @@ class TestBlockStructureTransformers(ChildrenMapTestMixin, TestCase):
             with patch(
                 'openedx.core.lib.block_structure.tests.helpers.MockTransformer.collect'
             ) as mock_collect_call:
-                self.transformers.collect(block_structure=MagicMock())
+                BlockStructureTransformers.collect(block_structure=MagicMock())
                 self.assertTrue(mock_collect_call.called)
 
     def test_transform(self):

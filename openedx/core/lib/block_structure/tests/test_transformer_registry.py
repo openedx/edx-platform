@@ -7,7 +7,7 @@ from nose.plugins.attrib import attr
 from unittest import TestCase
 
 from ..transformer_registry import TransformerRegistry
-from .helpers import MockTransformer, mock_registered_transformers
+from .helpers import MockTransformer, mock_registered_transformers, clear_registered_transformers_cache
 
 
 class TestTransformer1(MockTransformer):
@@ -37,6 +37,10 @@ class TransformerRegistryTestCase(TestCase):
     """
     Test cases for TransformerRegistry.
     """
+    def tearDown(self):
+        super(TransformerRegistryTestCase, self).tearDown()
+        clear_registered_transformers_cache()
+
     @ddt.data(
         # None case
         ([], []),
@@ -61,3 +65,18 @@ class TransformerRegistryTestCase(TestCase):
                 TransformerRegistry.find_unregistered(transformers),
                 set(expected_unregistered),
             )
+
+    def test_write_version_hash(self):
+        # hash with TestTransformer1
+        with mock_registered_transformers([TestTransformer1]):
+            version_hash_1 = TransformerRegistry.get_write_version_hash()
+            self.assertEqual(version_hash_1, '+2nc5o2YRerVfAtItQBQ/6jVkkw=')
+
+            # should return the same value again
+            self.assertEqual(version_hash_1, TransformerRegistry.get_write_version_hash())
+
+        # hash with TestTransformer1 and TestTransformer2
+        with mock_registered_transformers([TestTransformer1, TestTransformer2]):
+            version_hash_2 = TransformerRegistry.get_write_version_hash()
+            self.assertEqual(version_hash_2, '5GwhvmSM9hknjUslzPnKDA5QaCo=')
+            self.assertNotEqual(version_hash_1, version_hash_2)
