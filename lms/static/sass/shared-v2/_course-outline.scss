@@ -1,21 +1,22 @@
 .course-outline {
   color: $lms-gray;
 
-  ul {
+  ol {
     margin: 0 $baseline;
     list-style: none;
 
-    > ul {
+    > ol {
       @include margin-left($baseline / 2);
     }
 
-    li.section-name {
+    div.section-name {
       @include padding($baseline * 0.75, $baseline * 0.75, $baseline * 0.75, $baseline / 4);
       background-color: $lms-background-color;
       border-top: 1px solid $lms-border-color;
+      margin-bottom: $baseline * 0.5;
     }
 
-    ul.outline-item {
+    ol.outline-item {
       @include margin-left($baseline);
       padding-bottom: ($baseline / 2);
 
