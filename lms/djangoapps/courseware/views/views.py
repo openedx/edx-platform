@@ -1680,7 +1680,7 @@ class CourseOutlineFragmentView(FragmentView):
 
         return block
 
-    def render_fragment(self, request, course_id=None):
+    def render_fragment(self, request, course_id=None, **kwargs):
         """
         Renders the course outline as a fragment.
         """
@@ -1704,5 +1704,5 @@ class CourseOutlineFragmentView(FragmentView):
             # Recurse through the block tree, fleshing out each child object
             'blocks': self.populate_children(course_block_tree, all_blocks['blocks'])
         }
-        html = render_to_string('courseware/course-outline.html', context)
+        html = render_to_string('courseware/course_outline.html', context)
         return Fragment(html)
