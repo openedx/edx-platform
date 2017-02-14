@@ -1,0 +1,70 @@
+// ------------------------------
+// LMS Courseware: Shared Build Compile
+
+// About: Sass compile for the LMS Courseware Elements that are shared between LTR and RTL UI. Configuration and vendor specific imports happen before this shared set of imports are compiled in the lms-course-*.scss files.
+
+@import 'base/base';
+@import 'base/headings';
+@import 'base/extends';
+@import 'base/animations';
+@import 'shared/alerts_pattern_library_shim';
+@import 'shared/tooltips';
+
+// Pattern Library shims
+@import 'edx-pattern-library-shims/base/variables';
+@import 'edx-pattern-library-shims/buttons';
+
+// base - elements
+@import 'elements/typography';
+@import 'elements/controls';
+@import 'elements/pagination';
+@import 'elements/navigation'; // all archetypes of navigation
+
+// course - base
+@import 'course/layout/courseware_header';
+@import 'course/layout/courseware_preview';
+@import 'course/layout/footer';
+@import 'course/base/mixins';
+@import 'course/base/base';
+@import 'course/base/extends';
+@import 'xmodule/modules/css/module-styles.scss';
+@import 'course/courseware/courseware';
+@import 'course/courseware/sidebar';
+@import 'course/courseware/amplifier';
+
+
+// course - modules
+@import 'course/modules/student-notes'; // student notes
+@import 'course/modules/calculator'; // calculator utility
+@import 'course/modules/timer'; // timer
+
+// course - wiki
+@import "course/wiki/basic-html";
+@import "course/wiki/sidebar";
+@import "course/wiki/create";
+@import "course/wiki/wiki";
+@import "course/wiki/table";
+
+// course - views
+@import "course/info";
+@import "course/syllabus"; // TODO arjun replace w/ custom tabs, see courseware/courses.py
+@import "course/textbook";
+@import "course/profile";
+@import "course/gradebook";
+@import "course/tabs";
+@import "course/student-notes";
+@import "views/teams";
+
+// course - instructor-only views
+@import "course/instructor/instructor_2";
+@import "course/instructor/email";
+@import "xmodule/descriptors/css/module-styles.scss";
+
+// course - ccx_coach
+@import "course/ccx_coach/dashboard";
+
+// search
+@import 'search/_search';
+
+// responsive
+@import 'base/layouts'; // temporary spot for responsive course

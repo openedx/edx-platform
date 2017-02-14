@@ -1,0 +1,131 @@
+<%inherit file="main.html" />
+<%namespace name='static' file='static_content.html'/>
+<%namespace file='main.html' import="login_query"/>
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+from django.utils import html
+from django_countries import countries
+from student.models import UserProfile
+from datetime import date
+import third_party_auth
+from third_party_auth import pipeline, provider
+import calendar
+%>
+
+<%block name="pagetitle">${_("Register for {platform_name}").format(platform_name=platform_name)}</%block>
+
+<%block name="bodyclass">view-register</%block>
+
+<%block name="js_extra">
+  <script type="text/javascript">
+    $(function() {
+
+      // adding js class for styling with accessibility in mind
+      $('body').addClass('js');
+
+      // new window/tab opening
+      $('a[rel="external"], a[class="new-vp"]')
+      .click( function() {
+      window.open( $(this).attr('href') );
+      return false;
+      });
+
+      // form field label styling on focus
+      $("form :input").focus(function() {
+        $("label[for='" + this.id + "']").parent().addClass("is-focused");
+      }).blur(function() {
+        $("label").parent().removeClass("is-focused");
+      });
+
+    });
+
+    (function() {
+      toggleSubmitButton(true);
+
+      $('#register-form').on('submit', function() {
+        toggleSubmitButton(false);
+      });
+
+      $('#register-form').on('ajax:error', function() {
+        toggleSubmitButton(true);
+      });
+
+      $('#register-form').on('ajax:success', function(event, json, xhr) {
+        var nextUrl = "${login_redirect_url}";
+        if (json.redirect_url) {
+          nextUrl = json.redirect_url; // Most likely third party auth completion. This trumps 'nextUrl' above.
+        }
+        if (!isExternal(nextUrl)) {
+          location.href=nextUrl;
+        } else {
+          location.href="${reverse('dashboard')}";
+        }
+      });
+
+      $('#register-form').on('ajax:error', function(event, jqXHR, textStatus) {
+        toggleSubmitButton(true);
+        json = $.parseJSON(jqXHR.responseText);
+        $('.status.message.submission-error').addClass('is-shown').focus();
+        $('.status.message.submission-error .message-copy').html(json.value).stop().css("display", "block");
+        $(".field-error").removeClass('field-error');
+        $("[data-field='"+json.field+"']").addClass('field-error')
+      });
+    })(this);
+
+    function thirdPartySignin(event, url) {
+      event.preventDefault();
+      window.location.href = url;
+    }
+
+    function toggleSubmitButton(enable) {
+      var $submitButton = $('form .form-actions #submit');
+
+      if(enable) {
+        $submitButton.
+          removeClass('is-disabled').
+          attr('aria-disabled', false).
+          removeProp('disabled').
+          html("${_('Create My {platform_name} Account').format(platform_name=platform_name)}");
+      }
+      else {
+        $submitButton.
+          addClass('is-disabled').
+          prop('disabled', true).
+          text("${_('Processing your account information')}");
+      }
+    }
+  </script>
+</%block>
+
+<section class="introduction">
+  <header>
+    <h1 class="title">
+      <span class="title-super">${_("Welcome!")}</span>
+      <span class="title-sub">${_("Register below to create your {platform_name} account").format(platform_name=platform_name)}</span>
+    </h1>
+  </header>
+</section>
+
+<section class="register container">
+  <section role="main" class="content">
+    <form role="form" id="register-form" method="post" data-remote="true" action="/create_account" novalidate>
+<%
+  # allow for theming override on the registration form
+  registration_form = static.get_template_path('register-form.html')
+%>
+      <%include file="${registration_form}" />
+    </form>
+  </section>
+
+  <aside role="complementary">
+
+<%
+  # allow for theming overrides on the registration sidebars, otherwise default to pre-existing ones
+  sidebar_file = static.get_template_path('register-sidebar.html')
+%>
+
+    <%include file="${sidebar_file}" />
+
+  </aside>
+</section>

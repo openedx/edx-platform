@@ -1,0 +1,226 @@
+$a11y--gray: rgb(127, 127, 127);
+$a11y--blue: rgb(0, 159, 230);
+$a11y--gray-d1: shade($gray,20%);
+$a11y--gray-l2: tint($gray,40%);
+$a11y--gray-l3: tint($gray,60%);
+$a11y--blue-s1: saturate($blue,15%);
+
+%use-font-awesome {
+  font-family: FontAwesome;
+  -webkit-font-smoothing: antialiased;
+  display: inline-block;
+  speak: none;
+}
+
+.a11y-menu-container {
+  position: relative;
+
+  &.open {
+    .a11y-menu-list {
+      display: block;
+    }
+  }
+
+  .a11y-menu-list {
+    @extend %ui-depth3;
+    top: 100%;
+    margin: 0;
+    padding: 0;
+    display: none;
+    position: absolute;
+    list-style: none;
+    background-color: $white;
+    border: 1px solid #eee;
+
+    li {
+      @extend %ui-fake-link;
+      margin: 0;
+      padding: 0;
+      border-bottom: 1px solid #eee;
+      color: $white;
+
+      a {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: $a11y--gray-l2;
+        font-size: 14px;
+        line-height: 23px;
+
+        &:hover, &:focus {
+          color: $a11y--gray-d1;
+        }
+      }
+
+      &.active{
+        a {
+          color: $a11y--blue;
+        }
+      }
+
+      &:last-child {
+        box-shadow: none;
+        border-bottom: 0;
+        margin-top: 0;
+      }
+    }
+  }
+}
+
+
+// Video track button specific styles
+
+.video-tracks {
+  .a11y-menu-container {
+    display: inline-block;
+    vertical-align: top;
+    border-left: 1px solid #eee;
+
+    &.open {
+      > a {
+        background-color: $action-primary-active-bg;
+        color: $very-light-text;
+
+        &:after {
+          color: $very-light-text;
+        }
+      }
+
+    }
+
+    > a {
+      @include transition(all $tmg-f2 ease-in-out 0s);
+      @include font-size(12);
+      display: block;
+      border-radius: 0 3px 3px 0;
+      background-color: $very-light-text;
+      padding: ($baseline*0.75) ($baseline*1.25) ($baseline*0.75) ($baseline*0.75);
+      color: $a11y--gray-l2;
+      min-width: 1.5em;
+      line-height: 14px;
+      text-align: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      &:after {
+        @extend %use-font-awesome;
+        content: "\f0d7";
+        position: absolute;
+        right: ($baseline*0.5);
+        top: 33%;
+        color: $lighter-base-font-color;
+      }
+    }
+
+    .a11y-menu-list {
+      right: 0;
+
+      li {
+        font-size: em(14);
+
+        a {
+          border: 0;
+          display: block;
+          padding: lh(0.5);
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+      }
+    }
+  }
+}
+
+
+.contextmenu, .submenu {
+  @extend %ui-depth5;
+  border: 1px solid #333;
+  background: $white;
+  color: #333;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  position: absolute;
+  top: 0;
+  display: none;
+  outline: none;
+  cursor: default;
+  white-space: nowrap;
+
+  &.is-opened {
+     display: block;
+  }
+
+  .menu-item, .submenu-item {
+    border-top: 1px solid $gray-l3;
+    padding: ($baseline/4) ($baseline/2);
+    outline: none;
+
+    & > span {
+        color: #333;
+      }
+
+    &:first-child {
+      border-top: none;
+    }
+
+    &:focus {
+      background: #333;
+      color: $white;
+
+      & > span {
+        color: $white;
+      }
+    }
+  }
+
+  .submenu-item {
+    position: relative;
+    padding: ($baseline/4) $baseline ($baseline/4) ($baseline/2);
+
+    &:after {
+      content: '\25B6';
+      position: absolute;
+      right: 5px;
+      line-height: 25px;
+      font-size: 10px;
+    }
+
+    .submenu {
+      display: none;
+    }
+
+    &.is-opened {
+      background: #333;
+      color: $white;
+
+      & > span {
+        color: $white;
+      }
+
+      & > .submenu {
+        display: block;
+      }
+    }
+
+    .is-selected {
+      font-weight: bold;
+    }
+  }
+
+  .is-disabled {
+    pointer-events: none;
+    color: $gray-l3;
+  }
+}
+
+.overlay {
+  @extend %ui-depth4;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: transparent;
+}

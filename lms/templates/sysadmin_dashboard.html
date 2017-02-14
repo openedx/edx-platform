@@ -1,0 +1,222 @@
+<%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/>
+<%!
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+%>
+
+<%block name="headextra">
+  <%static:css group='style-course'/>
+  <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.axislabels.js')}"></script>
+</%block>
+
+<style type="text/css">
+a.active-section {
+	color: #551A8B;
+}
+.sysadmin-dashboard-content h2 a {
+	margin-right: 1.2em;
+}
+table.stat_table {
+	font-family: verdana,arial,sans-serif;
+	font-size:11px;
+	color:#333333;
+	border-width: 1px;
+	border-color: #666666;
+	border-collapse: collapse;
+}
+table.stat_table th {
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #666666;
+	background-color: #dedede;
+}
+table.stat_table td {
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #666666;
+	background-color: #ffffff;
+}
+
+a.selectedmode { background-color: yellow; }
+
+textarea {
+  height: 200px;
+}
+</style>
+
+<section class="container">
+<div class="sysadmin-dashboard-wrapper">
+
+  <section class="sysadmin-dashboard-content" style="margin-left:10pt;margin-top:10pt;margin-right:10pt;margin-bottom:20pt">
+    <h1>${_('Sysadmin Dashboard')}</h1>
+	<hr />
+    <h2 class="instructor-nav">
+	  <a href="${reverse('sysadmin')}" class="${modeflag.get('users')}">${_('Users')}</a>
+      <a href="${reverse('sysadmin_courses')}" class="${modeflag.get('courses')}">${_('Courses')}</a>
+      <a href="${reverse('sysadmin_staffing')}" class="${modeflag.get('staffing')}">${_('Staffing and Enrollment')}</a>
+      ## Translators: refers to http://git-scm.com/docs/git-log
+      <a href="${reverse('gitlogs')}">${_('Git Logs')}</a>
+    </h2>
+	<hr />
+%if modeflag.get('users'):
+	<h3>${_('User Management')}</h3>
+
+    <form name="action" method="POST">
+    <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }" />
+
+	<ul class="list-input">
+	  <li class="field text" style="padding-bottom: 1.2em">
+		<label for="student_uname">${_('Email or username')}</label>
+		<input type="text" name="student_uname" size=40 />
+	  </li>
+
+	  <li class="field text">
+		<label for="student_fullname">${_('Full Name')}</label>
+		<input type="text" name="student_fullname" size=40 />
+	  </li>
+	  <li class="field text">
+		<label for="student_password">${_('Password')}</label>
+		<input type="password" name="student_password" size=40 />
+	  </li>
+	</ul>
+
+	<div class="form-actions">
+	  <p>
+		<button type="submit" name="action" value="del_user">${_('Delete user')}</button>
+		<button type="submit" name="action" value="create_user">${_('Create user')}</button>
+	  </p>
+    </div>
+
+	<hr />
+    <p>
+      <button type="submit" name="action" value="download_users" style="width: 350px;">
+		${_('Download list of all users (csv file)')}
+	  </button>
+    </p>
+
+    <p>
+    <button type="submit" name="action" value="repair_eamap" style="width: 350px;">
+	  ${_('Check and repair external authentication map')}
+	</button>
+    </p>
+
+    <hr width="40%" style="align:left">
+	</form>
+ %endif
+
+%if modeflag.get('staffing'):
+
+<p>${_("Go to each individual course's Instructor dashboard to manage course enrollment.")}</p>
+<hr />
+
+<h3>${_('Manage course staff and instructors')}</h3><br/>
+<form name="action" method="POST">
+  <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }" />
+  <button type="submit" name="action" value="get_staff_csv">${_('Download staff and instructor list (csv file)')}</button>
+</form>
+
+%endif
+
+%if modeflag.get('courses'):
+<h3>${_('Administer Courses')}</h3><br/>
+
+<form name="action" method="POST">
+  <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }" />
+  <ul class="list-input">
+	<li class="field text">
+	  <label for="repo_location">
+		## Translators: Repo is short for git repository or source of
+		## courseware; see http://git-scm.com/about
+		${_('Repo Location')}:
+	  </label>
+	  <input type="text" name="repo_location" style="width:60%" />
+	</li>
+	<li class="field text">
+	  <label for="repo_location">
+		## Translators: Repo is short for git repository (http://git-scm.com/about) or source of
+		## courseware and branch is a specific version within that repository
+		${_('Repo Branch (optional)')}:
+	  </label>
+	  <input type="text" name="repo_branch" style="width:60%" />
+	</li>
+  </ul>
+  <div class="form-actions">
+        ## Translators: GitHub is a popular website for hosting code
+	<button type="submit" name="action" value="add_course">${_('Load new course from GitHub')}</button>
+  </div>
+  <hr />
+  <ul class="list-input">
+	<li class="field text">
+	  <label for="course_id">
+	        ## Translators: 'dir' is short for 'directory'
+		${_('Course ID or dir')}:
+	  </label>
+	  <input type="text" name="course_id" style="width:60%" />
+	</li>
+  </ul>
+  <div class="form-actions">
+	<button type="submit" name="action" value="del_course">${_('Delete course from site')}</button>
+  </div>
+</form>
+<hr style="width:40%" />
+%endif
+
+%if msg:
+    <p>${msg}</p>
+%endif
+
+%if datatable:
+
+    <br/>
+    <br/>
+    <p>
+      <hr width="100%">
+      <h2>${datatable['title']}</h2>
+      <table class="stat_table">
+        <tr>
+	%for hname in datatable['header']:
+	  <th>${hname}</th>
+	%endfor
+	</tr>
+        %for row in datatable['data']:
+          <tr>
+	    %for value in row:
+	      <td>${value}</td>
+	    %endfor
+	  </tr>
+        %endfor
+      </table>
+    </p>
+%endif
+
+%if plots:
+
+    %for plot in plots:
+      <br/>
+      <h3>${plot['title']}</h3>
+      <br/>
+      <p>${plot['info']}</p>
+      <br/>
+      <div id="plot_${plot['id']}" style="width:600px;height:300px;"></div>
+      <script type="text/javascript">
+          $(function () {
+              ${plot['data']}
+              $.plot($("#plot_${plot['id']}"), ${plot['cmd']}  );
+          });
+      </script>
+      <br/>
+      <br/>
+    %endfor
+
+%endif
+
+  </section>
+  <div style="text-align:right; float: right"><span id="djangopid">'Django PID': ${djangopid}</span>
+  ## Translators: A version number appears after this string
+  | <span id="edxver">${_('Platform Version')}: ${edx_platform_version}</span></div>
+</div>
+</section>

@@ -1,0 +1,31 @@
+<%page expression_filter="h"/>
+
+<%include file="_underscore_templates.html" />
+<%include file="_thread_list_template.html" />
+
+<%!
+from django.utils.translation import ugettext as _
+from json import dumps as json_dumps
+from openedx.core.djangolib.js_utils import js_escaped_string
+%>
+
+<div class="discussion-module" data-discussion-id="${discussion_id}"
+    data-user-create-comment="${json_dumps(can_create_comment)}"
+    data-user-create-subcomment="${json_dumps(can_create_subcomment)}"
+    data-read-only="${'false' if can_create_thread else 'true'}">
+    <div class="discussion-module-header">
+        <h3 class="discussion-module-title">${_(display_name)}</h3>
+        <div class="inline-discussion-topic"><span class="inline-discussion-topic-title">${_("Topic:")}</span> ${discussion_category} / ${discussion_target}</div>
+    </div>
+    <button class="discussion-show btn" data-discussion-id="${discussion_id}">
+        <span class="button-text">${_("Show Discussion")}</span>
+    </button>
+</div>
+<script type="text/javascript">
+var $$course_id = "${course_id | n, js_escaped_string}";
+
+function DiscussionInlineBlock(runtime, element) {
+    'use strict';
+    new DiscussionInlineView({ el: $(element).find('.discussion-module') });
+}
+</script>

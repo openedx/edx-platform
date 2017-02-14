@@ -1,0 +1,92 @@
+## Override the default styles_version to the Pattern Library version (version 2)
+<%! main_css = "style-main-v2" %>
+
+<%page expression_filter="h"/>
+<%inherit file="/main.html" />
+
+<%block name="pagetitle">Course Skeleton</%block>
+
+<%block name="bodyclass">pattern-library</%block>
+
+<%block name="content">
+<nav class="wrapper-course-material">
+    <div class="course-material">
+        <ol class="tabs course-tabs">
+            <li class="tab">
+                <a href="index.html">
+                    Home
+                </a>
+            </li>
+
+            <li class="tab">
+                <button type="button">
+                    Course
+                </button>
+            </li>
+
+            <li class="tab">
+                <a href="course-skeleton.html" class="active">
+                    Skeleton
+                    <span class="sr-only">, current location</span>
+                </a>
+            </li>
+        </ol>
+    </div>
+</nav>
+<section class="container">
+    <header class="page-header has-secondary">
+        <div class="page-header-main">
+            <div class="sr-is-focusable" tabindex="-1"></div>
+            <h2 class="hd hd-2 page-title">Skeleton Page</h2>
+            <p class="page-description">This demonstrates the pieces available to a courseware page.</p>
+        </div>
+        <div class="page-header-secondary">
+            <div class="form-actions">
+                <button class="btn btn-small">Click Me!</button>
+                ## TODO: note that this search component markup is provisional
+                ##  - update to use Chris's placeholder recommendation: http://codepen.io/clrux/pen/YqMpRO
+                ##  - update the Pattern Library's markup to match
+                <div class="page-header-search">
+                    <form class="search-form" role="search">
+                        <label class="field-label sr-only" for="search" id="search-hint">Search all the things</label>
+                        <input
+                            class="field-input input-text search-input"
+                            type="search"
+                            name="search"
+                            id="search"
+                            placeholder="Search all the things"
+                        />
+                        <button class="btn btn-small search-btn" type="button">Search</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="page-content">
+        <div class="layout layout-1t2t">
+            <aside class="layout-col layout-col-a" role="complementary" aria-label="Navigation">
+                <h3>Sidebar</h3>
+                <ul>
+                    <li>Item one</li>
+                    <li>Item two</li>
+                    <li>Item three</li>
+                </ul>
+            </aside>
+
+            <main id="main" aria-label="Content" tabindex="-1" class="layout-col layout-col-b">
+                <article tabindex="-1" aria-label="Main Content">
+                    <h3>Main content goes here.</h3>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis molestie, orci at viverra ornare,
+                        augue urna fermentum ex, vitae dignissim magna est sit amet diam. Nunc sodales dolor finibus
+                        pulvinar placerat. Suspendisse vitae tellus auctor, sodales erat ac, venenatis quam. Etiam
+                        purus est, consequat nec erat vel, bibendum volutpat ex. Fusce vitae consectetur ante.
+                        Suspendisse elit mauris, iaculis sed diam eu, efficitur tempor dui. Praesent tristique nunc
+                        quam, in tincidunt ligula accumsan et. Etiam augue sem, commodo ac ipsum vel, fringilla dapibus
+                        lacus. Sed facilisis euismod felis, non malesuada massa scelerisque sed. Etiam et placerat
+                        lorem. Nullam quis tincidunt sapien.</p>
+                </article>
+            </main>
+        </div>
+    </div>
+</section>
+</%block>

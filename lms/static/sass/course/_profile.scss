@@ -1,0 +1,334 @@
+.profile-wrapper {
+  color: $black;
+
+  .user-info {
+    @extend .sidebar;
+    border-left: 1px solid #d3d3d3;
+    border-radius: 0px 4px 4px 0;
+    border-right: 0;
+
+    &:after {
+      left: -1px;
+      right: auto;
+    }
+
+    header {
+      @extend .bottom-border;
+      margin: 0;
+      padding: lh(0.5);
+
+      .hd {
+        margin: 0;
+        padding-right: 30px;
+      }
+    }
+
+    ul {
+      @extend %ui-no-list;
+
+      li {
+        border-bottom: 1px solid #d3d3d3;
+        box-shadow: 0 1px 0 #eee;
+        color: lighten($text-color, 10%);
+        display: block;
+        padding: lh(0.5) 0 lh(0.5) lh(0.5);
+        position: relative;
+        text-decoration: none;
+        @include transition(none);
+
+        div#location_sub, div#language_sub {
+          font-weight: bold;
+          display: inline-block;
+
+          form {
+            width: 100%;
+          }
+
+          input {
+
+            &[type="text"] {
+              @include box-sizing(border-box);
+              margin: lh(0.5) 0;
+              width: 100%;
+            }
+
+            &[type="input"]{
+            }
+          }
+
+          &:empty {
+            padding: 0;
+          }
+        }
+
+        #description {
+          font-size: 12px;
+        }
+
+        #change_language,
+        #change_location,
+        .edit-email,
+        .name-edit,
+        .email-edit {
+          color: #999;
+          font-size: 12px;
+          position: absolute;
+          right: lh(0.5);
+          text-transform: uppercase;
+          top: 9px;
+
+          &:hover, &:focus {
+            color: #555;
+          }
+        }
+
+        p {
+          color: #999;
+          font-size: 12px;
+          margin-bottom: 0;
+          margin-top: 4px;
+        }
+
+        .deactivate {
+          color: #aaa;
+          font-style: italic;
+        }
+
+        #pwd_reset_button {
+          background: none;
+          border: none;
+          box-shadow: none;
+          color: #999;
+          font-size: 12px;
+          font-weight: normal;
+          margin: 0;
+          padding: 0;
+          position: absolute;
+          right: lh(0.5);
+          text-transform: uppercase;
+          top: 9px;
+
+          &:hover, &:focus {
+            color: #555;
+          }
+        }
+      }
+    }
+
+    #change_password_pop {
+      border-bottom: 1px solid #d3d3d3;
+      box-shadow: 0 1px 0 #eee;
+      color: #4D4D4D;
+      padding: 7px lh();
+
+      h2 {
+        font-size: $body-font-size;
+        font-weight: bold;
+        margin-top: 0;
+        text-transform: uppercase;
+      }
+    }
+  }
+
+  .course-info {
+    @extend .content;
+
+    header {
+      @extend .clearfix;
+      @extend h1.top-header;
+      margin-bottom: lh();
+
+      .hd {
+        @include float(left);
+        font-size: 1em;
+        font-weight: 100;
+        margin: 0;
+      }
+
+      &.progress-certificates {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+
+        .progress-certificates-title {
+          float: none;
+        }
+      }
+    }
+
+    #course-success {
+      margin-bottom: ($baseline*1.5);
+      text-align: center;
+      > a {
+        @include button(simple, $button-color);
+        @include box-sizing(border-box);
+        border-radius: 3px;
+        font: normal 15px/1.6rem $sans-serif;
+        letter-spacing: 0;
+        padding: 5px 18px 6px;
+        text-align: center;
+
+        &:hover, &:focus {
+          text-decoration: none;
+        }
+      }
+    }
+
+    .grade-detail-graph {
+      min-height: 400px;
+      width: 100%;
+    }
+
+    > .credit-eligibility{
+      border-top: 1px solid $lightGrey;
+      margin-top: lh();
+      @include padding-left(0);
+
+      > .credit-eligibility-container {
+          padding: lh();
+        > .credit-help {
+          display: inline-block;
+          background: $blue;
+          color: $white;
+          width: lh(0.6);
+          margin: 0;
+          padding: 0;
+          border-radius: lh(0.9);
+          border-color: $white;
+          text-shadow: None;
+          @include padding-left(0.2em);
+        }
+        > .detail-collapse{
+          border: none;
+          box-shadow: none;
+          background: $white;
+          padding: 0;
+          color: $blue;
+          > i {
+            padding: lh(0.25);
+          }
+          > span{
+            color: inherit;
+          }
+        }
+        > .requirement-container{
+          padding: lh();
+          > .requirement{
+            border-bottom: 1px solid $lightGrey;
+            padding: lh(0.5);
+            > .requirement-name {
+              width: bi-app-invert-percentage(40%);
+              display: inline-block;
+            }
+            > .requirement-status{
+              width: bi-app-invert-percentage(60%);
+              @include float(right);
+              display: inline-block;
+              .fa-times{
+                @extend %t-icon6;
+                color: $alert-color;
+              }
+              .fa-check{
+                @extend %t-icon6;
+                color: $success-color;
+              }
+              > .not-achieve{
+                color: $darkGrey;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    > .chapters {
+      border-top: 1px solid #e3e3e3;
+      margin-top: lh();
+      padding-left: 0;
+
+      > section {
+        @extend .clearfix;
+        border-bottom: 1px solid #e3e3e3;
+        display: table;
+        padding: lh() 0;
+        width: 100%;
+
+        &:last-child {
+          border-bottom: 0px;
+        }
+
+        .hd {
+          @include border-right(1px dashed #ddd);
+          @include box-sizing(border-box);
+          display: table-cell;
+          letter-spacing: 0;
+          margin: 0;
+          padding: 0;
+          padding-right: flex-gutter(9);
+          text-transform: none;
+          width: flex-grid(2, 9);
+          vertical-align: top;
+        }
+
+        .sections {
+          display: inline-block;
+          @include padding-left(flex-gutter(9));
+          width: flex-grid(7, 9);
+
+          > div {
+            padding:0 0 lh() 0;
+
+            &:first-child {
+              padding-top: 0;
+            }
+
+            &:last-child {
+              border-bottom: 0;
+            }
+
+            .hd {
+              color: $gray-d1;
+
+              span {
+                color: $gray-d2;
+                font-size: em(14);
+                font-weight: 100;
+              }
+            }
+
+            p {
+              margin: lh(0.5) 0;
+              color: $gray-d1;;
+              font-size: em(14);
+              font-weight: 600;
+            }
+
+            .scores {
+              margin: lh(0.5) 0;
+
+              dt {
+                display: inline-block;
+                width: auto;
+                margin: initial;
+                @include margin-right($baseline);
+                border: initial;
+                padding: initial;
+                font-size: em(14);
+              }
+
+              dd {
+                display: inline-block;
+                margin: 0;
+                @include margin-right($baseline);
+                @include padding-right(1em);
+                font-size: em(14);
+                font-weight: normal;
+                color: $gray-d2;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
