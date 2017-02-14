@@ -21,6 +21,7 @@ from edxmako.shortcuts import render_to_response, render_to_string
 import logging
 import newrelic.agent
 import urllib
+import waffle
 
 from xblock.fragment import Fragment
 from opaque_keys.edx.keys import CourseKey
@@ -410,7 +411,8 @@ class CoursewareIndex(View):
             'language_preference': self._get_language_preference(),
             'disable_optimizely': True,
             'section_title': None,
-            'sequence_title': None
+            'sequence_title': None,
+            'disable_accordion': waffle.switch_is_active('unified_course_view')
         }
         table_of_contents = toc_for_course(
             self.effective_user,
