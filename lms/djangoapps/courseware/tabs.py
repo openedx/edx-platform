@@ -10,6 +10,7 @@ from django.utils.translation import ugettext as _, ugettext_noop
 from courseware.access import has_access
 from courseware.entrance_exams import user_must_complete_entrance_exam
 from openedx.core.lib.course_tabs import CourseTabPluginManager
+from request_cache.middleware import RequestCache
 from student.models import CourseEnrollment
 from xmodule.tabs import CourseTab, CourseTabList, key_checker, link_reverse_func
 
@@ -41,7 +42,8 @@ class CoursewareTab(EnrolledTab):
         """
         Returns a function that computes the URL for this tab.
         """
-        if waffle.switch_is_active('unified_course_view'):
+        request = RequestCache.get_current_request()
+        if waffle.flag_is_active(request, 'unified_course_view'):
             return link_reverse_func('unified_course_view')
         else:
             return link_reverse_func('courseware')
