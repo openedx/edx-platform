@@ -7,6 +7,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from ..block_structure import BlockStructureBlockData
 from ..transformer import BlockStructureTransformer, FilteringTransformerMixin
+from ..transformer_registry import TransformerRegistry
 
 
 class MockXBlock(object):
@@ -164,11 +165,19 @@ class MockFilteringTransformer(FilteringTransformerMixin, BlockStructureTransfor
         return [block_structure.create_universal_filter()]
 
 
+def clear_registered_transformers_cache():
+    """
+    Test helper to clear out any cached values of registered transformers.
+    """
+    TransformerRegistry.get_write_version_hash.cache.clear()
+
+
 @contextmanager
 def mock_registered_transformers(transformers):
     """
     Context manager for mocking the transformer registry to return the given transformers.
     """
+    clear_registered_transformers_cache()
     with patch(
         'openedx.core.lib.block_structure.transformer_registry.TransformerRegistry.get_registered_transformers'
     ) as mock_available_transforms:
