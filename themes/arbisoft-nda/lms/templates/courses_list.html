@@ -13,10 +13,9 @@
         tz = pytz.timezone('Asia/Karachi')
         now = datetime.datetime.now(tz=tz)
         td = end - now
-        hours = int(td.seconds // (60 * 60))
         mins = int((td.seconds // 60) % 60)
 
-        return td.days > 0 or hours > 0 or mins > 0
+        return mins > 0
 %>
 <section class="courses-section">
   <div class="courses-container">
@@ -28,7 +27,7 @@
           <div class="grid-manual">
             <div class="row course-list">
               %for course in courses[:6]:
-                  %if course.end and course_available(course.end):
+                  %if course_available(course.end):
                     <div class="col col-12 sm-col-12">
                       <div class="courses-listing-item">
                         <%include file="course.html" args="course=course" />
