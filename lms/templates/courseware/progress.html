@@ -48,9 +48,9 @@ from django.utils.http import urlquote_plus
                     <a class="instructor-info-action studio-view" href="${studio_url}">${_("View Grading in studio")}</a>
                 </div>
                 % endif
-                <h3 class="hd hd-3 progress-certificates-title">
+                <h2 class="hd hd-2 progress-certificates-title">
                     ${_("Course Progress for Student '{username}' ({email})").format(username=student.username, email=student.email)}
-                </h3>
+                </h2>
 
                 %if certificate_data:
                 <div class="wrapper-msg wrapper-auto-cert">
@@ -145,11 +145,11 @@ from django.utils.http import urlquote_plus
 
                 %if courseware_summary:
                 <section class="chapters">
-                    <h3 class="hd hd-4 sr">${_('Details for each chapter')}</h3>
+                    <h2 class="sr">${_('Details for each chapter')}</h2>
                     %for chapter in courseware_summary:
                         %if not chapter['display_name'] == "hidden":
                         <section aria-labelledby="chapter_${loop.index}">
-                            <h4 class="hd hd-4" id="chapter_${loop.index}">${ chapter['display_name']}</h4>
+                            <h3 class="hd hd-3" id="chapter_${loop.index}">${ chapter['display_name']}</h3>
                             <div class="sections">
                                 %for section in chapter['sections']:
                                     <div>
@@ -158,7 +158,7 @@ from django.utils.http import urlquote_plus
                                         total = section.all_total.possible
                                         percentageString = "{0:.0%}".format( float(earned)/total) if earned > 0 and total > 0 else ""
                                         %>
-                                        <h5 class="hd hd-5">
+                                        <h4 class="hd hd-4">
                                             <a href="${reverse('courseware_section', kwargs=dict(course_id=course.id.to_deprecated_string(), chapter=chapter['url_name'], section=section.url_name))}">
                                                 ${ section.display_name}
                                                 %if total > 0 or earned > 0:
@@ -170,7 +170,7 @@ from django.utils.http import urlquote_plus
                                             %if total > 0 or earned > 0:
                                             <span> ${"({0:.3n}/{1:.3n}) {2}".format( float(earned), float(total), percentageString )}</span>
                                             %endif
-                                        </h5>
+                                        </h4>
                                         <p>
                                             %if section.format is not None:
                                                 ${section.format}

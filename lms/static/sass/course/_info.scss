@@ -29,7 +29,7 @@ $notification-background:                  rgb(255, 255, 255) !default
     .page-title {
       margin-bottom: 5px;
       color: $dark-gray1;
-      font-size: 24px;
+      text-transform: none;
     }
 
     .page-subtitle {
@@ -64,14 +64,6 @@ div.info-wrapper {
     line-height: lh();
     width: 100%;
     display: block;
-
-    h1,h3 {
-      @include text-align(left);
-      @extend %t-strong;
-      @extend %t-title6;
-      margin-bottom: $baseline;
-      font-style: normal;
-    }
 
     div.upgrade-banner {
       // This banner uses the Pattern Library's defined variables
@@ -133,6 +125,7 @@ div.info-wrapper {
             font-weight: font-weight(semi-bold);
             font-size: font-size(large);
             line-height: $base-line-height;
+            margin: 0;
           }
           .view-verified-info {
             margin-top: $baseline/4;
@@ -315,7 +308,6 @@ div.info-wrapper {
       @extend %t-title6;
       margin-bottom: 0;
       padding: 12px 26px 20px 0;
-      font-style: normal;
     }
 
     ul {

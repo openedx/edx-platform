@@ -1,5 +1,5 @@
 <form class="forum-new-post-form">
-    <h3 class="thread-title"><%- gettext("Add a Post") %></h3>
+    <h2 class="thread-title"><%- gettext("Add a Post") %></h2>
     <% if (mode === 'inline') { %>
         <button class="btn-default add-post-cancel">
             <span class="sr"><%- gettext('Cancel') %></span>

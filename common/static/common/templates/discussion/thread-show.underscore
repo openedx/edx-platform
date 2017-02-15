@@ -17,7 +17,7 @@
             </div>
         <% } %>
         <div class="post-header-content">
-            <h4 class="post-title"><%- title %></h4>
+            <h2 class="post-title"><%- title %></h2>
             <p class="posted-details">
             <%
             var timeAgoHtml = interpolate(
