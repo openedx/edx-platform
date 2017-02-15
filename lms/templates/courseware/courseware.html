@@ -150,40 +150,42 @@ ${HTML(fragment.foot_html())}
 
     </div>
 % endif
-    <main class="course-content" id="main" tabindex="-1" aria-label="Content">
-        <div class="path"></div>
-        % if getattr(course, 'entrance_exam_enabled') and \
-           getattr(course, 'entrance_exam_minimum_score_pct') and \
-           entrance_exam_current_score is not UNDEFINED:
-            % if not entrance_exam_passed:
-            <p class="sequential-status-message">
-                ${_('To access course materials, you must score {required_score}% or higher on this \
-                exam. Your current score is {current_score}%.').format(
-                    required_score=int(round(course.entrance_exam_minimum_score_pct * 100)),
-                    current_score=int(round(entrance_exam_current_score * 100))
-                )}
-            </p>
-            <script type="text/javascript">
-            $(document).ajaxSuccess(function(event, xhr, settings) {
-                if (settings.url.indexOf("xmodule_handler/problem_check") > -1) {
-                    var data = JSON.parse(xhr.responseText);
-                    if (data.entrance_exam_passed){
-                        location.reload();
+    <section class="course-content" id="course-content">
+        <main id="main" tabindex="-1" aria-label="Content">
+            <div class="path"></div>
+            % if getattr(course, 'entrance_exam_enabled') and \
+               getattr(course, 'entrance_exam_minimum_score_pct') and \
+               entrance_exam_current_score is not UNDEFINED:
+                % if not entrance_exam_passed:
+                <p class="sequential-status-message">
+                    ${_('To access course materials, you must score {required_score}% or higher on this \
+                    exam. Your current score is {current_score}%.').format(
+                        required_score=int(round(course.entrance_exam_minimum_score_pct * 100)),
+                        current_score=int(round(entrance_exam_current_score * 100))
+                    )}
+                </p>
+                <script type="text/javascript">
+                $(document).ajaxSuccess(function(event, xhr, settings) {
+                    if (settings.url.indexOf("xmodule_handler/problem_check") > -1) {
+                        var data = JSON.parse(xhr.responseText);
+                        if (data.entrance_exam_passed){
+                            location.reload();
+                        }
                     }
-                }
-            });
-            </script>
-            % else:
-              <p class="sequential-status-message">
-                ${_('Your score is {current_score}%. You have passed the entrance exam.').format(
-                    current_score=int(round(entrance_exam_current_score * 100))
-                )}
-            </p>
+                });
+                </script>
+                % else:
+                  <p class="sequential-status-message">
+                    ${_('Your score is {current_score}%. You have passed the entrance exam.').format(
+                        current_score=int(round(entrance_exam_current_score * 100))
+                    )}
+                </p>
+                % endif
             % endif
-        % endif
 
-          ${HTML(fragment.body_html())}
-    </main>
+              ${HTML(fragment.body_html())}
+        </main>
+    </section>
 
     <section class="courseware-results-wrapper">
       <div id="loading-message" aria-live="polite" aria-relevant="all"></div>
