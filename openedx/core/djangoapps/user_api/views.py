@@ -365,7 +365,7 @@ class RegistrationView(APIView):
         """
         # Translators: This label appears above a field on the registration form
         # meant to hold the user's email address.
-        email_label = _(u"Email *")
+        email_label = _(u"Email")
 
         # Translators: This example email address is used as a placeholder in
         # a field on the registration form meant to hold the user's email address.
@@ -395,7 +395,7 @@ class RegistrationView(APIView):
         """
         # Translators: This label appears above a field on the registration form
         # meant to hold the user's full name.
-        name_label = _(u"Full name *")
+        name_label = _(u"Full name")
 
         # Translators: This example name is used as a placeholder in
         # a field on the registration form meant to hold the user's name.
@@ -428,7 +428,7 @@ class RegistrationView(APIView):
         """
         # Translators: This label appears above a field on the registration form
         # meant to hold the user's public username.
-        username_label = _(u"Public username *")
+        username_label = _(u"Public username")
 
         username_instructions = _(
             # Translators: These instructions appear on the registration form, immediately
@@ -464,7 +464,7 @@ class RegistrationView(APIView):
         """
         # Translators: This label appears above a field on the registration form
         # meant to hold the user's password.
-        password_label = _(u"Password *")
+        password_label = _(u"Password")
 
         form_desc.add_field(
             "password",
@@ -489,7 +489,7 @@ class RegistrationView(APIView):
         """
         # Translators: This label appears above a dropdown menu on the registration
         # form used to select the user's highest completed level of education.
-        education_level_label = _(u"Highest level of education completed *")
+        education_level_label = _(u"Highest level of education completed")
 
         # The labels are marked for translation in UserProfile model definition.
         options = [(name, _(label)) for name, label in UserProfile.LEVEL_OF_EDUCATION_CHOICES]  # pylint: disable=translation-of-non-string
@@ -514,7 +514,7 @@ class RegistrationView(APIView):
         """
         # Translators: This label appears above a dropdown menu on the registration
         # form used to select the user's gender.
-        gender_label = _(u"Gender *")
+        gender_label = _(u"Gender")
 
         # The labels are marked for translation in UserProfile model definition.
         options = [(name, _(label)) for name, label in UserProfile.GENDER_CHOICES]  # pylint: disable=translation-of-non-string
@@ -539,7 +539,7 @@ class RegistrationView(APIView):
         """
         # Translators: This label appears above a dropdown menu on the registration
         # form used to select the user's year of birth.
-        yob_label = _(u"Year of birth *")
+        yob_label = _(u"Year of birth")
 
         options = [(unicode(year), unicode(year)) for year in UserProfile.VALID_YEARS]
         form_desc.add_field(
@@ -563,7 +563,7 @@ class RegistrationView(APIView):
         """
         # Translators: This label appears above a field on the registration form
         # meant to hold the user's mailing address.
-        mailing_address_label = _(u"Mailing address *")
+        mailing_address_label = _(u"Mailing address")
 
         form_desc.add_field(
             "mailing_address",
