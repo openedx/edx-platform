@@ -169,7 +169,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         response = self.client.get(self.url)
 
         # enrollment information visible
-        self.assertIn('<h3 class="hd hd-3">Enrollment Information</h3>', response.content)
+        self.assertIn('<h4 class="hd hd-4">Enrollment Information</h4>', response.content)
         self.assertIn('<th scope="row">Verified</th>', response.content)
         self.assertIn('<th scope="row">Audit</th>', response.content)
         self.assertIn('<th scope="row">Honor</th>', response.content)
