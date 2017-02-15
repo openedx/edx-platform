@@ -5,6 +5,7 @@ import datetime
 
 from bok_choy.page_object import PageObject
 from bok_choy.promise import EmptyPromise
+from bok_choy.javascript import js_defined, wait_for_js
 
 from selenium.webdriver import ActionChains
 from selenium.webdriver.support.ui import Select
@@ -18,6 +19,7 @@ from common.test.acceptance.pages.studio.container import ContainerPage
 from common.test.acceptance.pages.studio.utils import set_input_value_and_save, set_input_value
 
 
+@js_defined('jQuery')
 class CourseOutlineItem(object):
     """
     A mixin class for any :class:`PageObject` shown in a course outline.
@@ -174,6 +176,7 @@ class CourseOutlineItem(object):
         element = self.q(css=self._bounded_selector(".status-grading-value"))  # pylint: disable=no-member
         return element.first.text[0] if element.present else None
 
+    @wait_for_js
     def publish(self):
         """
         Publish the unit.
