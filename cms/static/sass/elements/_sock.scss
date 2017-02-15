@@ -1,0 +1,154 @@
+// studio - elements - support sock
+// ====================
+
+.wrapper-sock {
+  @include clearfix();
+  position: relative;
+  margin: ($baseline*2) 0 0 0;
+  border-top: 1px solid $gray-l4;
+  width: 100%;
+
+  .wrapper-inner {
+    @include linear-gradient($gray-d3 0%, $gray-d3 98%, $black 100%);
+    @extend %ui-depth0;
+    display: none;
+    width: 100% !important;
+    border-bottom: 1px solid $white;
+    padding: 0 $baseline !important;
+  }
+
+  // sock - actions
+  .list-cta {
+    @extend %ui-depth1;
+    position: absolute;
+    top: -($baseline*0.75);
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
+
+    .cta-show-sock {
+      @extend %ui-btn-pill;
+      @extend %t-action4;
+      background: $gray-l5;
+      padding: ($baseline/2) $baseline;
+      color: $gray-d2;
+
+      .icon {
+        @extend %t-icon6;
+        @include margin-right($baseline/4);
+      }
+
+      &:hover {
+        background: $uxpl-blue-base;
+        color: $white;
+      }
+    }
+  }
+
+  // sock - additional help
+  .sock {
+    @include clearfix();
+    @extend %t-copy-sub2;
+    max-width: $fg-max-width;
+    min-width: $fg-min-width;
+    width: flex-grid(12);
+    margin: 0 auto;
+    padding: ($baseline*2) 0;
+    color: $gray-l3;
+
+    // support body
+    header {
+
+      .title {
+        @extend %t-title4;
+      }
+
+    }
+
+    // shared elements
+    .support, .feedback {
+      @include box-sizing(border-box);
+
+      .title {
+        @extend %t-title6;
+        color: $white;
+        margin-bottom: ($baseline/2);
+      }
+
+      .copy {
+        @extend %t-copy-sub2;
+        margin: 0 0 $baseline 0;
+      }
+
+      .list-actions {
+        @include clearfix();
+
+        .action-item {
+          @include float(left);
+          @include margin-right($baseline/2);
+          margin-bottom: ($baseline/2);
+
+          &:last-child {
+            @include margin-right(0);
+          }
+
+          .action {
+            @extend %t-action4;
+            display: block;
+
+            .icon {
+              @extend %t-icon4;
+              vertical-align: middle;
+              @include margin-right($baseline/4);
+            }
+
+            &:hover, &:active {
+
+            }
+          }
+
+          .tip {
+            @extend %cont-text-sr;
+          }
+        }
+
+        .action-primary {
+          @extend %btn-primary-blue;
+          @extend %t-action3;
+        }
+      }
+    }
+
+    // studio support content
+    .support {
+      width: flex-grid(8,12);
+      float: left;
+      margin-right: flex-gutter();
+
+      .action-item {
+        width: flexgrid(4,8);
+      }
+    }
+
+    // studio feedback content
+    .feedback {
+      width: flex-grid(4,12);
+      float: left;
+
+      .action-item {
+        width: flexgrid(4,4);
+      }
+    }
+  }
+
+  // case: sock content is shown
+  &.is-shown {
+    border-color: $gray-d3;
+
+    .list-cta .cta-show-sock {
+      background: $gray-d3;
+      border-color: $gray-d3;
+      color: $white;
+    }
+  }
+}

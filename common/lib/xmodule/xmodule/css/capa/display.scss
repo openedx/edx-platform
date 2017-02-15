@@ -1,0 +1,1595 @@
+// capa - styling
+// ====================
+
+// Table of Contents
+// * +Variables - Capa
+// * +Extends - Capa
+// * +Mixins - Status Icon - Capa
+// * +Resets - Deprecate Please
+// * +Problem - Base
+// * +Problem - Choice Group
+// * +Problem - Misc, Unclassified Mess
+// * +Problem - Text Input, Numerical Input
+// * +Problem - Option Input (Dropdown)
+// * +Problem - CodeMirror
+// * +Problem - Misc, Unclassified Mess Part 2
+// * +Problem - Rubric
+// * +Problem - Annotation
+// * +Problem - Choice Text Group
+// * +Problem - Image Input Overrides
+// * +Problem - Annotation Problem Overrides
+
+// +Variables - Capa
+// ====================
+$annotation-yellow: rgba(255,255,10,0.3);
+$color-copy-tip: rgb(100,100,100);
+
+// FontAwesome Icon code
+// ====================
+$checkmark-icon: '\f00c'; // .fa-check
+$cross-icon: '\f00d'; // .fa-close
+$asterisk-icon: '\f069'; // .fa-asterisk
+
+
+@import '../../../../../static/sass/edx-pattern-library-shims/base/variables';
+
+// +Extends - Capa
+// ====================
+// Duplicated from _mixins.scss due to xmodule compilation, inheritance issues
+%use-font-awesome {
+  font-family: FontAwesome;
+  -webkit-font-smoothing: antialiased;
+  display: inline-block;
+  speak: none;
+}
+
+// +Mixins - Status Icon - Capa
+// ====================
+@mixin status-icon($color: $gray, $fontAwesomeIcon: "\f00d"){
+
+  .status-icon {
+    &:after {
+      @extend %use-font-awesome;
+      color: $color;
+      font-size: 1.2em;
+      content: $fontAwesomeIcon;
+    }
+  }
+}
+
+// +Resets - Deprecate Please
+// ====================
+h2 {
+  margin-top: 0;
+  margin-bottom: ($baseline*0.75);
+
+  &.problem-header {
+    display: inline-block;
+    section.staff {
+      margin-top: ($baseline*1.5);
+      font-size: 80%;
+    }
+  }
+
+  @media print {
+    display: block;
+    width: auto;
+    border-right: 0;
+  }
+}
+
+.explanation-title {
+  font-weight: bold;
+}
+
+%feedback-hint {
+  margin-top: ($baseline / 4);
+
+  .icon {
+    @include margin-right($baseline / 4);
+  }
+}
+
+.feedback-hint-incorrect {
+  @extend %feedback-hint;
+  .icon {
+    color: $incorrect;
+  }
+}
+
+.feedback-hint-partially-correct,
+.feedback-hint-correct {
+  @extend %feedback-hint;
+  .icon {
+    color: $correct;
+  }
+}
+
+.feedback-hint-text {
+  color: $color-copy-tip;
+}
+
+.problem-hint {
+  margin-bottom: 20px;
+}
+
+.hint-label {
+  display: inline-block;
+  padding-right: 0.5em;
+}
+
+.hint-text {
+  display: inline-block;
+}
+
+.feedback-hint-multi .hint-text {
+  display: block;
+}
+
+iframe[seamless]{
+  overflow: hidden;
+  padding: 0;
+  border: 0px none transparent;
+  background-color: transparent;
+}
+
+.inline-error {
+  color: darken($error-color, 11%);
+}
+
+div.problem-progress {
+  display: inline-block;
+  color: $gray-d1;
+  font-size: em(14);
+}
+
+// +Problem - Base
+// ====================
+div.problem {
+  padding-top: $baseline;
+
+  @media print {
+    display: block;
+    padding: 0;
+    width: auto;
+
+    canvas, img {
+      page-break-inside: avoid;
+    }
+  }
+
+  input.math {
+    direction: ltr; // Equations are always English
+  }
+
+  .inline {
+    display: inline;
+
+    + p {
+      margin-top: $baseline;
+    }
+  }
+
+  .question-description {
+    color: $gray-d1;
+    font-size: $small-font-size;
+  }
+
+  form > label, .problem-group-label {
+    display: block;
+    margin-bottom: $baseline;
+    font: inherit;
+    color: inherit;
+    -webkit-font-smoothing: initial;
+  }
+
+  .problem-group-label + .question-description {
+    margin-top: -$baseline;
+  }
+
+}
+
+// CAPA gap spacing between problem parts
+// can not use the & + & since .problem is nested deeply in .xmodule_display.xmodule_CapaModule
+.wrapper-problem-response + .wrapper-problem-response,
+.wrapper-problem-response + p {
+  margin-top: ($baseline * 1.5);
+}
+
+// Choice Group - silent class
+%choicegroup-base {
+  @include clearfix();
+  min-width: 100px;
+  width: auto !important;
+  width: 100px;
+
+  label {
+    @include box-sizing(border-box);
+    display: inline-block;
+    clear: both;
+    margin-bottom: ($baseline/2);
+    border: 2px solid $gray-l4;
+    border-radius: 3px;
+    padding: ($baseline/2);
+    width: 100%;
+
+    &:after {
+      @include margin-left($baseline*.75);
+    }
+
+    &:hover {
+      border: 2px solid $blue;
+    }
+
+    &.choicegroup_correct {
+      @include status-icon($correct, $checkmark-icon);
+      border: 2px solid $correct;
+
+      // keep green for correct answers on hover.
+      &:hover {
+        border-color: $correct;
+      }
+    }
+
+    &.choicegroup_partially-correct {
+      @include status-icon($partially-correct, $asterisk-icon);
+      border: 2px solid $partially-correct;
+
+      // keep green for correct answers on hover.
+      &:hover {
+        border-color: $partially-correct;
+      }
+    }
+
+    &.choicegroup_incorrect {
+      @include status-icon($incorrect, $cross-icon);
+      border: 2px solid $incorrect;
+
+      // keep red for incorrect answers on hover.
+      &:hover {
+        border-color: $incorrect;
+      }
+    }
+  }
+
+  .indicator-container {
+    min-height: 1px;
+    width: 25px;
+    display: inline-block;
+  }
+
+  fieldset {
+    @include box-sizing(border-box);
+  }
+
+  input[type="radio"],
+  input[type="checkbox"] {
+    @include margin(($baseline/4) ($baseline/2) ($baseline/4) ($baseline/4));
+  }
+}
+
+// +Problem - Choice Group
+// ====================
+div.problem {
+  .choicegroup {
+    @extend %choicegroup-base;
+    label {
+      @include padding($baseline/2);
+      @include padding-left($baseline*1.9);
+      position: relative;
+      font-size: $base-font-size;
+      line-height: normal;
+      cursor: pointer;
+    }
+
+    input[type="radio"],
+    input[type="checkbox"] {
+      @include left(em(9));
+      position: absolute;
+      top: em(9);
+    }
+
+    legend {
+      margin-bottom: $baseline;
+    }
+
+    legend + .question-description {
+      margin-top: -$baseline;
+    }
+  }
+}
+
+// +Problem - Status Indicators
+// ====================
+// Summary status indicators shown after the input area
+div.problem {
+
+  .indicator-container {
+      @include margin-left($baseline*.75);
+
+    .status {
+      width: $baseline;
+
+      // CASE: correct answer
+      &.correct {
+        @include status-icon($correct, $checkmark-icon);
+      }
+
+      // CASE: partially correct answer
+      &.partially-correct {
+        @include status-icon($partially-correct, $asterisk-icon);
+      }
+
+      // CASE: incorrect answer
+      &.incorrect {
+        @include status-icon($incorrect, $cross-icon);
+      }
+
+      &.unsubmitted,
+      &.unanswered {
+        .status-icon {
+          content: '';
+        }
+      }
+    }
+  }
+}
+
+// +Problem - Misc, Unclassified Mess
+// ====================
+div.problem {
+  ol.enumerate {
+    li {
+      &:before {
+        display: block;
+        visibility: hidden;
+        height: 0;
+        content: " ";
+      }
+    }
+  }
+
+  .solution-span {
+    > span {
+      margin: $baseline 0;
+      display: block;
+      position: relative;
+
+      &:empty {
+        display: none;
+      }
+    }
+  }
+
+  .targeted-feedback-span {
+    > span {
+      display: block;
+      position: relative;
+
+      &:empty {
+        display: none;
+      }
+    }
+  }
+
+  // known classes using this div: .indicator-container, moved to section above
+  div {
+
+    // TO-DO: Styling used by advanced capa problem types. Should be synced up to use .status class
+    p {
+      &.answer {
+        margin-top: -2px;
+      }
+
+      span.clarification i {
+        font-style: normal;
+        &:hover {
+          color: $blue;
+        }
+      }
+    }
+
+    &.correct, &.ui-icon-check {
+      input {
+        border-color: $correct;
+      }
+    }
+
+    &.partially-correct, &.ui-icon-check {
+      input {
+        border-color: $partially-correct;
+      }
+    }
+
+    &.processing {
+      input {
+        border-color: #aaa;
+      }
+    }
+
+    &.ui-icon-close {
+      input {
+        border-color: $incorrect;
+      }
+    }
+
+    &.incorrect, &.incomplete {
+      input {
+        border-color: $incorrect;
+      }
+    }
+
+    p.answer {
+      display: inline-block;
+      margin-top: ($baseline / 2);
+      margin-bottom: 0;
+
+      &:before {
+        @extend %t-strong;
+        display: inline;
+        content: "Answer: ";
+
+      }
+      &:empty {
+        &:before {
+          display: none;
+        }
+      }
+    }
+
+    div.equation {
+      clear: both;
+      margin-top: 3px;
+
+      .MathJax_Display {
+        width: auto;
+      }
+
+      img.loading {
+        @include padding-left($baseline/2);
+        display: inline-block;
+      }
+
+      span {
+        margin-bottom: 0;
+        display: inline-block;
+
+        &.MathJax_CHTML, &.MathJax, &.MathJax_SVG {
+          padding: 6px;
+          min-width: 30px;
+          border: 1px solid #e3e3e3;
+          border-radius: 4px;
+          background: #f1f1f1;
+        }
+      }
+    }
+
+    // Hides equation previews in symbolic response problems when printing
+    [id^='display'].equation {
+      @media print {
+        display: none;
+      }
+    }
+
+    //TO-DO: review and deprecate all these styles within span {}
+    span {
+      &.ui-icon-bullet {
+        display: inline-block;
+        position: relative;
+        top: 4px;
+        width: 14px;
+        height: 14px;
+        background: url('#{$static-path}/images/unanswered-icon.png') center center no-repeat;
+      }
+
+      &.processing, &.ui-icon-processing {
+        display: inline-block;
+        position: relative;
+        top: 6px;
+        width: 25px;
+        height: 20px;
+        background: url('#{$static-path}/images/spinner.gif') center center no-repeat;
+      }
+
+      &.ui-icon-check {
+        display: inline-block;
+        position: relative;
+        top: 3px;
+        width: 25px;
+        height: 20px;
+        background: url('#{$static-path}/images/correct-icon.png') center center no-repeat;
+      }
+
+      &.incomplete, &.ui-icon-close {
+        display: inline-block;
+        position: relative;
+        top: 3px;
+        width: 20px;
+        height: 20px;
+        background: url('#{$static-path}/images/incorrect-icon.png') center center no-repeat;
+      }
+    }
+
+    .reload {
+      @include float(right);
+      margin: ($baseline/2);
+    }
+
+
+    .grader-status {
+      @include clearfix();
+      margin: $baseline/2 0;
+      padding: $baseline/2;
+      border-radius: 5px;
+      background: $gray-l6;
+
+      span {
+        display: block;
+        float: left;
+        overflow: hidden;
+        margin: -7px 7px 0 0;
+        text-indent: -9999px;
+      }
+
+      .grading {
+        margin: 0px 7px 0 0;
+        padding-left: 25px;
+        background: url('#{$static-path}/images/info-icon.png') left center no-repeat;
+        text-indent: 0px;
+      }
+
+      p {
+        float: left;
+        margin-bottom: 0;
+        text-transform: capitalize;
+        line-height: 20px;
+      }
+
+      &.file {
+        margin-top: $baseline;
+        padding: $baseline 0 0 0;
+        border: 0;
+        border-top: 1px solid #eee;
+        background: $white;
+
+        p.debug {
+          display: none;
+        }
+
+        input {
+          float: left;
+        }
+      }
+
+    }
+    .evaluation {
+      p {
+        margin-bottom: ($baseline/5);
+      }
+    }
+
+
+    .feedback-on-feedback {
+      margin-right: $baseline;
+      height: 100px;
+    }
+
+    .evaluation-response {
+      header {
+        text-align: right;
+        a {
+          font-size: .85em;
+        }
+      }
+    }
+
+    .evaluation-scoring {
+      .scoring-list {
+        margin-left: 3px;
+        list-style-type: none;
+
+        li {
+          display:inline;
+          margin-left: 50px;
+
+          &:first-child {
+            margin-left: 0;
+          }
+
+          label {
+            font-size: .9em;
+          }
+        }
+      }
+    }
+
+    .submit-message-container {
+      margin: $baseline 0px ;
+    }
+  }
+
+  div.inline {
+    > span {
+      display: inline;
+    }
+  }
+
+  ul {
+    margin-bottom: lh();
+    margin-left: .75em;
+    margin-left: .75rem;
+    list-style: disc outside none;
+  }
+
+  ol {
+    margin-bottom: lh();
+    margin-left: .75em;
+    margin-left: .75rem;
+    list-style: decimal outside none;
+  }
+
+  dl {
+    line-height: 1.4em;
+  }
+
+  dl dt {
+    @extend %t-strong;
+
+  }
+
+  dl dd {
+    margin-bottom: 0;
+  }
+
+  dd {
+    margin-left: .5em;
+    margin-left: .5rem;
+  }
+
+  li {
+    margin-bottom: lh(0.5);
+    line-height: 1.4em;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  p {
+    margin-bottom: lh();
+  }
+
+  table {
+    margin: lh() 0;
+    border-collapse: collapse;
+    table-layout: auto;
+
+    td, th {
+
+      &.cont-justified-left {
+        text-align: left !important; // nasty, but needed to override the bad specificity of the xmodule css selectors
+      }
+
+      &.cont-justified-right {
+        text-align: right !important; // nasty, but needed to override the bad specificity of the xmodule css selectors
+      }
+
+      &.cont-justified-center {
+        text-align: center !important; // nasty, but needed to override the bad specificity of the xmodule css selectorsstyles
+      }
+    }
+
+    th {
+      @extend %t-strong;
+      text-align: left;
+    }
+
+    td {
+      text-align: left;
+    }
+
+    caption, th, td {
+      padding: .25em .75em .25em 0;
+      padding: .25rem .75rem .25rem 0;
+    }
+
+    caption {
+      margin-bottom: .75em;
+      margin-bottom: .75rem;
+      padding: .75em 0;
+      padding: .75rem 0;
+      background: #f1f1f1;
+    }
+
+    tr, td, th {
+      vertical-align: middle;
+    }
+  }
+
+  code {
+    margin: 0 2px;
+    padding: 0px 5px;
+    border: 1px solid #eaeaea;
+    border-radius: 3px;
+    background-color: $gray-l6;
+    white-space: nowrap;
+    font-size: .9em;
+  }
+
+  pre {
+    overflow: auto;
+    padding: 6px $baseline/2;
+    border: 1px solid $gray-l3;
+    border-radius: 3px;
+    background-color: $gray-l6;
+    font-size: .9em;
+    line-height: 1.4;
+
+    > code {
+      margin: 0;
+      padding: 0;
+      border: none;
+      background: transparent;
+      white-space: pre;
+    }
+  }
+}
+
+// +Problem - Text Input, Numerical Input
+// ====================
+.problem {
+  .capa_inputtype.textline, .inputtype.formulaequationinput {
+
+    input {
+      @include box-sizing(border-box);
+      border: 2px solid $gray-l4;
+      border-radius: 3px;
+      min-width: 160px;
+      height: 46px;
+    }
+
+    .status {
+      display: inline-block;
+      margin-top: ($baseline/2);
+      background: none;
+    }
+
+    // CASE: incorrect answer
+    > .incorrect {
+
+      input {
+        border: 2px solid $incorrect;
+      }
+
+      .status {
+        @include status-icon($incorrect, $cross-icon);
+      }
+    }
+
+    // CASE: partially correct answer
+    > .partially-correct {
+
+      input {
+        border: 2px solid $partially-correct;
+      }
+
+      .status {
+        @include status-icon($partially-correct, $asterisk-icon);
+      }
+    }
+
+    // CASE: correct answer
+    > .correct {
+
+      input {
+        border: 2px solid $correct;
+      }
+
+      .status {
+        @include status-icon($correct, $checkmark-icon);
+      }
+    }
+
+    // CASE: unanswered and unsubmitted
+    > .unanswered, > .unsubmitted {
+
+      input {
+        border: 2px solid $gray-l4;
+      }
+
+      .status {
+        .status-icon {
+          &:after {
+            content: '';
+          }
+        }
+      }
+    }
+
+  }
+
+  .trailing_text {
+    @include margin-right($baseline/2);
+    display: inline-block;
+  }
+}
+
+
+// +Problem - Option Input (Dropdown)
+// ====================
+.problem {
+  .inputtype.option-input {
+    margin: (-$baseline/2) 0 $baseline;
+
+    .indicator-container {
+      display: inline-block;
+
+      .status.correct:after, .status.partially-correct:after, .status.incorrect:after, .status.unanswered:after {
+        @include margin-left(0);
+      }
+    }
+  }
+}
+
+// +Problem - CodeMirror
+// ====================
+div.problem {
+
+  .CodeMirror {
+    border: 1px solid black;
+    font-size: 14px;
+    line-height: 18px;
+    resize: none;
+
+    .cm-tab {
+        background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAMCAYAAAAkuj5RAAAAAXNSR0IArs4c6QAAAGFJREFUSMft1LsRQFAQheHPowAKoACx3IgEKtaEHujDjORSgWTH/ZOdnZOcM/sgk/kFFWY0qV8foQwS4MKBCS3qR6ixBJvElOobYAtivseIE120FaowJPN75GMu8j/LfMwNjh4HUpwg4LUAAAAASUVORK5CYII=);
+        background-position: right;
+        background-repeat: no-repeat;
+    }
+
+    pre {
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+      border-width: 0;
+      border-radius: 0;
+      background: transparent;
+      white-space: pre;
+      word-wrap: normal;
+      font-size: inherit;
+      font-family: inherit;
+      resize: none;
+
+      &.CodeMirror-cursor {
+        @extend %ui-depth1;
+        position: absolute;
+        visibility: hidden;
+        width: 0;
+        border-right: none;
+        border-left: 1px solid $black;
+      }
+    }
+  }
+
+  .CodeMirror-focused pre.CodeMirror-cursor {
+    visibility: visible;
+  }
+
+  .CodeMirror-code pre {
+    width: -webkit-fit-content;
+    width: -moz-fit-content;
+    width: fit-content;
+  }
+
+  .CodeMirror-scroll {
+    margin-right: 0px;
+  }
+}
+
+.capa-message {
+  display: inline-block;
+  color: $gray-d1;
+  -webkit-font-smoothing: antialiased;
+}
+
+// +Problem - Actions
+// ====================
+div.problem .action {
+  margin-top: $baseline;
+  min-height: $baseline;
+  width: 100%;
+  display: inline-block;
+
+  .problem-action-buttons-wrapper {
+
+    @media (min-width: $bp-screen-lg) {
+      @include text-align(right);
+      @include float(right);
+    }
+
+  }
+
+  .problem-action-button-wrapper {
+    @include border-right(1px solid $light-gray1);
+    display: inline-block;
+
+    &:last-child {
+      border: none;
+    }
+  }
+
+  .problem-action-btn {
+    @include margin-right($baseline / 5);
+    max-width: 110px;
+
+    .icon {
+      margin-bottom: $baseline / 10;
+      display: block;
+    }
+
+    @media print {
+      display: none;
+    }
+
+  }
+
+  .submit-attempt-container {
+    display: table;
+
+    @media (max-width: $bp-screen-lg) {
+      max-width: 100%;
+      padding-top: $baseline;
+    }
+    .submit {
+      @include margin-right($baseline / 2);
+      @include float(left);
+    }
+  }
+
+  .submission-feedback {
+    display: inline-block;
+    margin-top: $baseline / 2;
+    color: $gray-d1;
+    font-size: $medium-font-size;
+    -webkit-font-smoothing: antialiased;
+    vertical-align: middle;
+  }
+}
+
+
+// +Problem - Misc, Unclassified Mess Part 2
+// ====================
+div.problem {
+  hr {
+    float: none;
+    clear: both;
+    margin: 0 0 .75rem;
+    width: 100%;
+    height: 1px;
+    border: none;
+    background: #ddd;
+    color: #ddd;
+  }
+
+  .hidden {
+    display: none;
+    visibility: hidden;
+  }
+
+  #{$all-text-inputs} {
+    display: inline;
+    width: auto;
+  }
+
+  // this supports a deprecated element and should be removed once the center tag is removed
+  center {
+    display: block;
+    margin: lh() 0;
+    padding: lh();
+    border: 1px solid $gray-l3;
+  }
+
+  .message {
+    font-size: inherit;
+  }
+
+  .detailed-solution > p {
+    margin: 0;
+
+    &:first-child {
+      @extend %t-strong;
+      margin-bottom: 0;
+    }
+
+  }
+
+  .detailed-targeted-feedback,
+  .detailed-targeted-feedback-partially-correct,
+  .detailed-targeted-feedback-correct {
+    > p {
+        margin: 0;
+        font-weight: normal;
+
+        &:first-child {
+          @extend %t-strong;
+        }
+    }
+  }
+
+  div.capa_alert {
+    margin-top: $baseline;
+    padding: 8px 12px;
+    border: 1px solid $warning-color;
+    border-radius: 3px;
+    background: $warning-color-accent;
+    font-size: 0.9em;
+  }
+
+  .notification {
+    margin-top: $baseline / 2;
+    padding: ($baseline / 2.5) ($baseline / 2) ($baseline / 5) ($baseline / 2);
+    line-height: $base-line-height;
+
+    &.success {
+      @include notification-by-type($success-color);
+    }
+
+    &.error {
+      @include notification-by-type($error-color);
+    }
+
+    &.warning {
+      @include notification-by-type($warning-color);
+    }
+
+    &.problem-hint {
+      border: 1px solid $uxpl-gray-background;
+      border-radius: 6px;
+
+      .icon {
+        @include margin-right(3 * $baseline / 4);
+        color: $uxpl-gray-dark;
+      }
+
+      li {
+        color: $uxpl-gray-base;
+
+        strong {
+          color: $uxpl-gray-dark;
+        }
+      }
+    }
+
+    .icon {
+      @include float(left);
+      position: relative;
+      top: $baseline / 5;
+    }
+
+    .notification-message {
+      display: inline-block;
+      width: flex-grid(6,10);
+      // Make notification tall enough that when the "Review" button is displayed,
+      // the notification does not grow in height.
+      margin-bottom: 8px;
+
+      ol {
+        list-style: none outside none;
+        padding: 0;
+        margin: 0;
+
+        li:not(:last-child) {
+          margin-bottom: $baseline / 4;
+        }
+      }
+    }
+
+    .notification-btn-wrapper {
+      @include float(right);
+    }
+
+  }
+
+  .notification-btn {
+    @include float(right);
+    padding: ($baseline / 10) ($baseline / 4);
+    min-width: ($baseline * 3);
+    display: block;
+    clear: both;
+
+    &:first-child {
+      margin-bottom: $baseline / 4;
+    }
+  }
+
+  // override default button hover
+  button {
+    &:hover {
+      background-image: none;
+      box-shadow: none;
+    }
+
+    &:focus {
+      box-shadow: none;
+    }
+
+    &.btn-default {
+      background-color: transparent;
+    }
+
+    &.btn-brand {
+      &:hover {
+        background-color: $btn-brand-focus-background;
+      }
+    }
+  }
+
+  .review-btn {
+    color: $blue; // notification type has other colors
+    &.sr {
+      color: $blue;
+    }
+  }
+
+  div.capa_reset {
+    padding: 25px;
+    border: 1px solid $error-color;
+    background-color: lighten($error-color, 25%);
+    border-radius: 3px;
+    font-size: 1em;
+    margin-top: $baseline/2;
+    margin-bottom: $baseline/2;
+  }
+
+  .capa_reset>h2 {
+    color: #aa0000;
+  }
+
+  .capa_reset li {
+    font-size: 0.9em;
+  }
+
+  .hints {
+    border: 1px solid $gray-l3;
+
+    h3 {
+      @extend %t-strong;
+      padding: 9px;
+      border-bottom: 1px solid #e3e3e3;
+      background: #eee;
+      text-shadow: 0 1px 0 $white;
+      font-size: em(16);
+    }
+
+    div {
+      border-bottom: 1px solid #ddd;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      p {
+        margin-bottom: 0;
+      }
+
+      header {
+        a {
+          display: block;
+          padding: 9px;
+          background: $gray-l6;
+          box-shadow: inset 0 0 0 1px $white;
+        }
+      }
+
+      > section {
+        padding: 9px;
+      }
+    }
+  }
+
+  .test {
+    padding-top: 18px;
+
+    header {
+      margin-bottom: 12px;
+
+      h3 {
+        @extend %t-strong;
+        color: #aaa;
+        text-transform: uppercase;
+        font-style: normal;
+        font-size: 0.9em;
+      }
+    }
+
+    > section {
+      position: relative;
+      margin-bottom: ($baseline/2);
+      padding: 9px 9px $baseline;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+      background: $white;
+      box-shadow: inset 0 0 0 1px #eee;
+
+      p:last-of-type {
+        margin-bottom: 0;
+      }
+
+      .shortform {
+        margin-bottom: .6em;
+      }
+
+      a.full {
+        @include position(absolute, 0 0 1px 0);
+        @include box-sizing(border-box);
+        display: block;
+        padding: ($baseline/5);
+        background: $gray-l4;
+        text-align: right;
+        font-size: 1em;
+
+        &.full-top {
+          @include position(absolute, 1px 0 auto 0);
+        }
+
+        &.full-bottom {
+          @include position(absolute, auto 0 1px 0);
+        }
+      }
+    }
+  }
+
+  .external-grader-message {
+    section {
+      padding-top: ($baseline*1.5);
+      padding-left: $baseline;
+      background-color: #fafafa;
+      color: #2c2c2c;
+      font-size: 1em;
+      font-family: monospace;
+
+      header {
+        font-size: 1.4em;
+      }
+
+      .shortform {
+        @extend %t-strong;
+      }
+
+      .longform {
+        margin: 0;
+        padding: 0;
+
+        .result-errors {
+          margin: ($baseline/4);
+          padding: ($baseline/2) ($baseline/2) ($baseline/2) ($baseline*2);
+          background: url('#{$static-path}/images/incorrect-icon.png') center left no-repeat;
+
+          li {
+            color: #b00;
+          }
+        }
+
+        .result-output {
+          margin: $baseline/4;
+          padding: $baseline 0 ($baseline*0.75) 50px;
+          border-top: 1px solid #ddd;
+          border-left: $baseline solid #fafafa;
+
+          h4 {
+            font-size: 1em;
+            font-family: monospace;
+          }
+
+          dl {
+            margin: 0;
+          }
+
+          dt {
+            margin-top: $baseline;
+          }
+
+          dd {
+            margin-left: 24pt;
+          }
+        }
+
+        .result-correct {
+          background: url('#{$static-path}/images/correct-icon.png') left 20px no-repeat;
+
+          .result-actual-output {
+            color: #090;
+          }
+        }
+
+        .result-partially-correct {
+          background: url('#{$static-path}/images/partially-correct-icon.png') left 20px no-repeat;
+
+          .result-actual-output {
+            color: #090;
+          }
+        }
+
+        .result-incorrect {
+          background: url('#{$static-path}/images/incorrect-icon.png') left 20px no-repeat;
+
+          .result-actual-output {
+            color: #B00;
+          }
+        }
+
+        .markup-text{
+          margin: ($baseline/4);
+          padding: $baseline 0 15px 50px;
+          border-top: 1px solid #ddd;
+          border-left: 20px solid #fafafa;
+
+          bs {
+            color: #bb0000;
+          }
+
+          bg {
+            color: #bda046;
+          }
+        }
+      }
+    }
+  }
+}
+
+
+// +Problem - Rubric
+// ====================
+div.problem {
+  .rubric {
+    tr {
+      margin: ($baseline/2) 0;
+      height: 100%;
+    }
+
+    td {
+      margin: ($baseline/2) 0;
+      padding: $baseline 0;
+      height: 100%;
+    }
+
+    th {
+      margin: ($baseline/4);
+      padding: ($baseline/4);
+    }
+
+    label,
+    .view-only {
+      position: relative;
+      display: inline-block;
+      margin: 3px;
+      padding: ($baseline*0.75);
+      min-width: 50px;
+      min-height: 50px;
+      width: 150px;
+      height: 100%;
+      background-color: $gray-l3;
+      font-size: .9em;
+    }
+
+    .grade {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      margin: ($baseline/2);
+    }
+
+    .selected-grade {
+      background: #666;
+      color: white;
+    }
+
+    input[type=radio]:checked + label {
+      background: #666;
+      color: white;
+    }
+
+    input[class='score-selection'] {
+      display: none;
+    }
+  }
+}
+
+// +Problem - Annotation
+// ====================
+div.problem {
+  .annotation-input {
+    margin: 0 0 1em 0;
+    border: 1px solid $gray-l3;
+    border-radius: 1em;
+
+    .annotation-header {
+      @extend %t-strong;
+      padding: .5em 1em;
+      border-bottom: 1px solid $gray-l3;
+    }
+
+    .annotation-body { padding: .5em 1em; }
+
+    a.annotation-return {
+      float: right;
+      font: inherit;
+      font-weight: normal;
+    }
+
+    a.annotation-return:after { content: " \2191" }
+
+    .block, ul.tags {
+      margin: .5em 0;
+      padding: 0;
+    }
+
+    .block-highlight {
+      padding: .5em;
+      border: 1px solid darken($annotation-yellow, 10%);
+      background-color: $annotation-yellow;
+      color:  #333;
+      font-style: normal;
+    }
+
+    .block-comment { font-style: italic; }
+
+    ul.tags {
+      display: block;
+      margin-left: 1em;
+      list-style-type: none;
+
+      li {
+        position: relative;
+        display: block;
+        margin: 1em 0 0 0;
+
+        .tag {
+          @extend %ui-fake-link;
+          display: inline-block;
+          margin-left: ($baseline*2);
+          border: 1px solid rgb(102,102,102);
+
+          &.selected {
+            background-color: $annotation-yellow;
+          }
+        }
+        .tag-status {
+          position: absolute;
+          left: 0;
+        }
+        .tag-status, .tag { padding: .25em .5em; }
+      }
+    }
+
+    textarea.comment {
+      $num-lines-to-show: 5;
+      $line-height: 1.4em;
+      $padding: .2em;
+      padding: $padding (2 * $padding);
+      width: 100%;
+      height: ($num-lines-to-show * $line-height) + (2*$padding) - (($line-height - 1)/2);
+      line-height: $line-height;
+    }
+
+    .answer-annotation { display: block; margin: 0; }
+
+    /* for debugging the input value field. enable the debug flag on the inputtype */
+    .debug-value {
+      margin: 1em 0;
+      padding: 1em;
+      border: 1px solid $black;
+      background-color: #999;
+      color: $white;
+
+      input[type="text"] { width: 100%; }
+
+      pre { background-color: $gray-l3; color: $black; }
+
+      &:before {
+        @extend %t-strong;
+        display: block;
+        content: "debug input value";
+        text-transform: uppercase;
+        font-size: 1.5em;
+      }
+    }
+  }
+}
+
+// +Problem - Choice Text Group
+// ====================
+div.problem {
+  .choicetextgroup {
+    @extend %choicegroup-base;
+
+    input[type="text"]{
+      margin-bottom: 0.5em;
+    }
+
+    label.choicetextgroup_correct, section.choicetextgroup_correct {
+      @extend label.choicegroup_correct;
+
+      input[type="text"] {
+        border-color: $correct;
+      }
+    }
+
+    label.choicetextgroup_partially-correct, section.choicetextgroup_partially-correct {
+      @extend label.choicegroup_partially-correct;
+
+      input[type="text"] {
+        border-color: $partially-correct;
+      }
+    }
+
+    label.choicetextgroup_incorrect, section.choicetextgroup_incorrect {
+      @extend label.choicegroup_incorrect;
+    }
+
+    label.choicetextgroup_show_correct, section.choicetextgroup_show_correct {
+      &:after {
+        @include margin-left($baseline*.75);
+        content: url('#{$static-path}/images/correct-icon.png');
+      }
+    }
+
+    span.mock_label {
+      cursor : default;
+    }
+  }
+}
+
+// +Problem - Image Input Overrides
+// ====================
+
+// NOTE: temporary override until image inputs use same base html structure as other common capa input types.
+div.problem .imageinput.capa_inputtype {
+
+  .status {
+    display: inline-block;
+    position: relative;
+    top: 3px;
+    width: 25px;
+    height: 20px;
+  }
+
+  .correct {
+    @include status-icon($correct, $checkmark-icon);
+  }
+
+  .incorrect {
+    @include status-icon($incorrect, $cross-icon);
+  }
+
+  .partially-correct {
+    @include status-icon($partially-correct, $asterisk-icon);
+  }
+}
+
+// +Problem - Annotation Problem Overrides
+// ====================
+
+// NOTE: temporary override until annotation problem inputs use same base html structure as other common capa input types.
+div.problem .annotation-input {
+
+  .tag-status {
+    display: inline-block;
+    position: relative;
+    top: 3px;
+    width: 25px;
+    height: 20px;
+  }
+
+  .correct {
+    @include status-icon($correct, $checkmark-icon);
+  }
+
+  .incorrect {
+    @include status-icon($incorrect, $cross-icon);
+  }
+
+  .partially-correct {
+    @include status-icon($partially-correct, $asterisk-icon);
+  }
+}

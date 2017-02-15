@@ -1,0 +1,92 @@
+<div class="wrapper-content-main intro-step">
+  <article class="content-main">
+  <% if ( hasPaid ) { %>
+     <h3 class="title">
+      <%= HtmlUtils.interpolateHtml(
+          gettext( "Thanks for returning to verify your ID in: {courseName}"),
+          { courseName: HtmlUtils.joinHtml(
+            HtmlUtils.HTML('<span class="course-title">'),
+            courseName,
+            HtmlUtils.HTML('</span>')
+          ) }
+        ) %>
+     </h3>
+  <% } else { %>
+    <h3 class="title"><%- introTitle %></h3>
+    <% if ( !isActive ) { %>
+      <div class="instruction">
+        <p>
+          <%- gettext( "You need to activate your account before you can enroll in courses. Check your inbox for an activation email. After you complete activation you can return and refresh this page." ) %>
+        </p>
+      </div>
+    <% } else if ( introMsg ) { %>
+      <div class="instruction"><p><%- introMsg %></p></div>
+    <% } %>
+  <% } %>
+
+    <div class="requirements-container">
+      <ul class="list-reqs <% if ( requirements['account-activation-required'] ) { %>account-not-activated<% } %>">
+        <% if ( requirements['account-activation-required'] ) { %>
+          <li class="req req-0 req-activate">
+            <h4 class="title"><%- gettext( "Activate Your Account" ) %></h4>
+            <div class="placeholder-art">
+              <span class="icon fa fa-envelope-o" aria-hidden="true"></span>
+            </div>
+
+            <div class="copy">
+              <p>
+                <span class="copy-super"><%- gettext( "Check Your Email" ) %></span>
+              </p>
+            </div>
+          </li>
+        <% } else { %>
+          <% if ( requirements['photo-id-required'] ) { %>
+          <li class="req req-1 req-id">
+            <h4 class="title"><%- gettext( "Photo ID" ) %></h4>
+            <div class="placeholder-art fa-lg">
+              <span class="icon fa fa-list-alt fa-stack-2x" aria-hidden="true"></span>
+              <span class="icon fa fa-user id-photo fa-stack-1x" aria-hidden="true"></span>
+            </div>
+
+            <div class="copy">
+              <p>
+                <span class="copy-sub"><%- gettext( "A driver's license, passport, or other government-issued ID with your name and photo" ) %></span>
+              </p>
+            </div>
+          </li>
+          <% } %>
+
+          <% if ( requirements['webcam-required'] ) { %>
+          <li class="req req-2 req-webcam">
+            <h4 class="title"><%- gettext( "Webcam" ) %></h4>
+            <div class="placeholder-art">
+              <span class="icon fa fa-video-camera" aria-hidden="true"></span>
+            </div>
+
+            <div class="copy"></div>
+          </li>
+          <% } %>
+        <% } %>
+      </ul>
+    </div>
+
+    <% if ( nextStepTitle && isActive ) { %>
+    <nav class="nav-wizard is-ready">
+      <ol class="wizard-steps">
+        <li class="wizard-step">
+          <a class="next action-primary" id="next_step_button" href="?skip-first-step=1">
+            <% if ( hasPaid ) { %>
+              <%- _.sprintf(
+                gettext( "Next: %(nextStepTitle)s" ),
+                { nextStepTitle: nextStepTitle }
+              ) %>
+            <% } else { %>
+              <%- nextStepTitle %>
+            <% } %>
+          </a>
+        </li>
+      </ol>
+    </nav>
+    <% } %>
+  </article>
+</div>

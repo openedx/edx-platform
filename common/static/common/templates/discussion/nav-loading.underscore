@@ -1,0 +1,4 @@
+<div class="forum-nav-loading" tabindex="0">
+    <span class="icon fa fa-spinner fa-spin"/>
+    <span class="sr" role="alert"><%- srText %></span>
+</div>
