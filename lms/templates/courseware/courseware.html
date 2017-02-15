@@ -27,7 +27,7 @@ from openedx.core.djangolib.js_utils import js_escaped_string
 
 <%block name="header_extras">
 
-% for template_name in ["image-modal"]:
+% for template_name in ["image-modal", "sequence-breadcrumbs"]:
 <script type="text/template" id="${template_name}-tpl">
     <%static:include path="common/templates/${template_name}.underscore" />
 </script>
