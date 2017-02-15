@@ -181,7 +181,7 @@
   float: left;
   display: inline-block;
   position: relative;
-  width: 20px;
+  width: 16px;
   height: 100px; }
 
 .flip-clock-divider:first-child {
@@ -190,8 +190,8 @@
 .flip-clock-dot {
   display: block;
   background: #323434;
-  width: 10px;
-  height: 10px;
+  width: 5px;
+  height: 5px;
   position: absolute;
   border-radius: 50%;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
@@ -211,10 +211,10 @@
   right: -91px; }
 
 .flip-clock-dot.top {
-  top: 30px; }
+  top: 18px; }
 
 .flip-clock-dot.bottom {
-  bottom: 30px; }
+  bottom: 4px; }
 
 @-webkit-keyframes asd {
   0% {

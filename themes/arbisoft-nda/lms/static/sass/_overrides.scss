@@ -31,6 +31,49 @@ body{
                 vertical-align: middle;
                 text-align: center;
                 display: table-cell;
+                img{
+                    margin-bottom: 2rem;
+                    width: 200px;
+                }
+                .timer{
+                    margin-top: 10px;
+                    width: 300px;
+                    margin: auto;
+                    padding: 15px;
+                    background: rgba(255,255,255,0.4);
+                    border-radius: 20px;
+                    .flip-clock-wrapper {
+                            width: 624px;
+                            margin: 1.5rem auto 1rem;
+                            .flip-clock-divider{
+                                height: 20px;
+                                .flip-clock-label{
+                                    left:-25px;
+                                }
+                            }
+                        ul{
+                            margin: 2px;
+                            width: 24px;
+                            height: 30px;
+                            font-size: 20px;
+                            li{
+                                line-height: 30px;
+                                a div div.inn{
+                                    font-size: 17px;
+                                }
+                            }
+                        }
+                    }
+                    p{
+                        color: $white;
+                        margin-bottom: 0;
+                        &:first-child{
+                            font-weight: bold;
+                            text-shadow: 0px 1px 0px #888;
+                        }
+                    }
+                }
+
             }
         }
     }
