@@ -2154,6 +2154,9 @@ INSTALLED_APPS = (
 
     # additional release utilities to ease automation
     'release_util',
+
+    # Unusual migrations
+    'database_fixups',
 )
 
 # Migrations which are not in the standard module "migrations"
