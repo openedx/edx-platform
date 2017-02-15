@@ -27,21 +27,24 @@
 
                   this.renderCurrent();
               },
-              postSubmitHandler: function(){
-                  // set updated content in the model
-                  var displayIndex = this.currentBlockIndex + 1;
-                  var blockModel = this.questionBlocks.models[this.currentBlockIndex];
-                  var problemBlock = $('.vert-' + displayIndex).find('.problems-wrapper');
+              postSubmitHandler: function(evt, xhr, settings){
+                  if(settings.url && settings.url.match(/problem_check/)){
+                    // set updated content in the model
+                    var displayIndex = this.currentBlockIndex + 1;
+                    var blockModel = this.questionBlocks.models[this.currentBlockIndex];
+                    var problemBlock = $('.vert-' + displayIndex).find('.problems-wrapper');
 
-                  var modelContent = $(blockModel.attributes.content);
-                  modelContent.find('.problems-wrapper').attr('data-content', problemBlock.html());
+                    var modelContent = $(blockModel.attributes.content);
+                    modelContent.find('.problems-wrapper').attr('data-content', problemBlock.html());
 
-                  blockModel.set({
-                      content: modelContent[0].outerHTML,
-                      attempted: true
-                  });
+                    blockModel.set({
+                        content: modelContent[0].outerHTML,
+                        attempted: true
+                    });
 
-                  $('a.question-link[data-index=' + this.currentBlockIndex + ']').addClass('done');
+                    $('a.question-link[data-index=' + this.currentBlockIndex + ']')
+                        .addClass('done');
+                  }
               },
               loadNext: function(){
                   this.currentBlockIndex += 1;
