@@ -30,13 +30,13 @@ define([
 
             PreviousVideoUploadPagingView: PagingView.extend({
                 initialize: function(options){
-                    Backbone.View.prototype.initialize.call(this);
+                    PagingView.prototype.initialize.call(this);
                     this.encodingsDownloadUrl = options.encodingsDownloadUrl;
                     this.videoHandlerUrl = options.videoHandlerUrl;
                     this.template = options.template;
                 },
 
-                render: function(){
+                renderPageItems: function(){
                     var videoHandlerUrl = this.videoHandlerUrl;
                     this.itemViews = this.collection.map(function(model) {
                         return new PreviousVideoUploadView({
@@ -58,12 +58,12 @@ define([
                         el: $el.find('#video-paging-footer')});
                     this.pagingHeader.render();
                     this.pagingFooter.render();
-                },
+                }
 
             }),
 
             render: function() {
-                this.pagingView.render();
+                this.pagingView.renderPageItems();
                 return this;
             }
         });
