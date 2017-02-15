@@ -302,6 +302,13 @@ class PersistentSubsectionGrade(DeleteGradesMixin, TimeStampedModel):
         """
         return self.first_attempted is None and any(field != 0.0 for field in (self.earned_all, self.earned_graded))
 
+    def full_clean(self, exclude=None, validate_unique=True):
+        # efischer debug, nomerge
+        from nose.tools import set_trace; set_trace()
+        self.clean_fields(exclude='visible_blocks')
+        self.clean()
+        # validate_unique intentionally skipped here
+
     def clean(self):
         """
         If an grade has not been attempted, but was given a non-zero score,
