@@ -44,6 +44,10 @@
 
                     $('a.question-link[data-index=' + this.currentBlockIndex + ']')
                         .addClass('done');
+
+                    // move to next question
+                    if(this.currentBlockIndex < this.lastBlockIndex)
+                        this.loadNext();
                   }
               },
               loadNext: function(){
