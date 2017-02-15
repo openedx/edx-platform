@@ -1,0 +1,457 @@
+# Stanford OpenEdX translation file
+# Copyright (C) 2017 Stanford University
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: stanford-openedx\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-01-24 01:07+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Hang Pham <hpham3@stanford.edu>, 2017\n"
+"Language-Team: Vietnamese (https://www.transifex.com/stanford-online/teams/22259/vi/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: vi\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: common/djangoapps/student/forms.py:249
+msgid ""
+"It looks like {email} belongs to an existing account. Try again with a "
+"different email address."
+msgstr ""
+"Dường như {email} là của một tài khoản hiện nay. Hãy thử lại bằng một email "
+"khác."
+
+#: common/djangoapps/student/views.py:2278
+msgid ""
+"You are re-using a password that you have used recently. You must have {num}"
+" distinct password before reusing a previous password."
+msgid_plural ""
+"You are re-using a password that you have used recently. You must have {num}"
+" distinct passwords before reusing a previous password."
+msgstr[0] ""
+"Bạn đang sử dụng lại một mật khẩu đã dùng trước đây. Bạn cần có  {num} mật "
+"khẩu khác nhau trước khi sử dụng lại một mật khẩu cũ."
+
+#: common/djangoapps/student/views.py:2289
+msgid ""
+"You are resetting passwords too frequently. Due to security policies, {num} "
+"day must elapse between password resets."
+msgid_plural ""
+"You are resetting passwords too frequently. Due to security policies, {num} "
+"days must elapse between password resets."
+msgstr[0] ""
+"Bạn cài đặt lại mật khẩu quá nhiều lần. Vì lý do an toàn, khoảng cách giữa "
+"các lần cài đặt lại mật khẩu phải ít nhất là {num} ngày."
+
+#: common/djangoapps/util/file.py:61
+msgid "The file must end with the extension '{file_types}'."
+msgid_plural ""
+"The file must end with one of the following extensions: '{file_types}'."
+msgstr[0] "Tệp tin cần kết thúc với 1 trong các đuôi sau đây: '{file_types}'."
+
+#: common/lib/xmodule/xmodule/capa_base.py:1313
+msgid "{num_hour} hour"
+msgid_plural "{num_hour} hours"
+msgstr[0] "{num_hour} giờ"
+
+#: common/lib/xmodule/xmodule/capa_base.py:1318
+msgid "{num_minute} minute"
+msgid_plural "{num_minute} minutes"
+msgstr[0] "{num_minute} phút"
+
+#: common/lib/xmodule/xmodule/capa_base.py:1324
+msgid "{num_second} second"
+msgid_plural "{num_second} seconds"
+msgstr[0] "{num_second} giây"
+
+#. Translators: 'absolute' is a date such as "Jan 01,
+#. 2020". 'relative' is a fuzzy description of the time until
+#. 'absolute'. For example, 'absolute' might be "Jan 01, 2020",
+#. and if today were December 5th, 2020, 'relative' would be "1
+#. month".
+#: lms/djangoapps/courseware/date_summary.py:109
+msgid "{relative} ago - {absolute}"
+msgstr "{relative} trước - {absolute}"
+
+#: lms/djangoapps/courseware/date_summary.py:109
+msgid "in {relative} - {absolute}"
+msgstr "trong {relative} - {absolute}"
+
+#: openedx/core/djangoapps/profile_images/images.py:95
+msgid "The file must be smaller than {image_max_size} in size."
+msgstr "Tệp tin phải có kích thước nhỏ hơn {image_max_size}."
+
+#: openedx/core/djangoapps/profile_images/images.py:102
+msgid "The file must be at least {image_min_size} in size."
+msgstr "Tập tin phải có kích thước ít nhất {image_min_size}."
+
+#: openedx/core/djangoapps/profile_images/images.py:113
+msgid "The file must be one of the following types: {valid_file_types}."
+msgstr "Tập tin phải là một trong các dạng sau: {valid_file_types}."
+
+#: openedx/core/djangoapps/profile_images/images.py:121
+msgid ""
+"The Content-Type header for this file does not match the file data. The file"
+" may be corrupted."
+msgstr ""
+"Tiêu đề Nội dung-Định dạng cho tệp tin này không phù hợp với tệp tin dữ "
+"liệu. Có thể tệp tin đã bị lỗi."
+
+#: openedx/core/djangoapps/profile_images/images.py:130
+msgid ""
+"The file name extension for this file does not match the file data. The file"
+" may be corrupted."
+msgstr ""
+"Tên đuôi của tệp tin không phù hợp với số liệu tệp tin. Có thể tệp tin đã bị"
+" lỗi."
+
+#: lms/templates/bookmark_button.html:9
+msgid "Bookmark"
+msgstr "Đánh dấu"
+
+#: lms/templates/cme_register.html:171
+#, python-format
+msgid "Welcome! Register below to create your %(platform_name)s account"
+msgstr ""
+"Chào mừng! Chào mừng! Đăng ký dưới đây để tạo tài khoản %(platform_name)s "
+"của bạn"
+
+#: lms/templates/dashboard.html:105
+#: themes/edx.org/lms/templates/dashboard.html:106
+msgid "Looks like you haven't enrolled in any courses yet."
+msgstr "Bạn chưa đăng ký vào khoá học nào"
+
+#: lms/templates/dashboard.html:109
+#: themes/edx.org/lms/templates/dashboard.html:110
+msgid "Find courses now!"
+msgstr "Tìm kiếm khoá học!"
+
+#: lms/templates/help_modal.html:20 lms/templates/help_modal.html:33
+msgid "{platform_name} Help"
+msgstr "{platform_name} Trợ giúp"
+
+#: lms/templates/help_modal.html:100
+msgid "Include error messages, steps which lead to the issue, etc"
+msgstr "Bao gồm các tin nhắn lỗi, các bước dẫn tới vấn đề, v.v..."
+
+#: lms/templates/help_modal.html:212
+msgid "Details of the problem you are encountering"
+msgstr "Chi tiết về vấn đề mà bạn gặp"
+
+#: lms/templates/help_modal.html:213
+msgid "Include error messages, steps which lead to the issue, etc."
+msgstr "Bao gồm các tin nhắn lỗi, các bước dẫn tới vấn đề, v.v..."
+
+#: lms/templates/login-sidebar.html:27
+msgid "Looking for help in logging in or with your {platform_name} account?"
+msgstr ""
+"Tìm kiếm trợ giúp để đăng nhập hoặc về tài khoản {platform_name} của bạn?"
+
+#: lms/templates/navigation-edx.html:143 lms/templates/navigation.html:194
+#: themes/edx.org/lms/templates/header.html:142
+#: themes/red-theme/lms/templates/header.html:155
+msgid ""
+"<strong>Warning:</strong> Your browser is not fully supported. We strongly "
+"recommend using {chrome_link} or {ff_link}."
+msgstr ""
+"<strong>Cảnh báo:</strong> Trình duyệt của bạn không được hỗ trợ hoàn toàn. "
+"Chúng tôi khuyến nghị bạn dùng {chrome_link} hoặc {ff_link}."
+
+#: lms/templates/problem.html:54 lms/templates/problem.html:60
+#: lms/templates/problem.html:63
+msgid "your answer"
+msgstr "câu trả lời của bạn"
+
+#: lms/templates/problem.html:71
+msgid "Toggle Answer Visibility"
+msgstr "Thay đổi chế độ hiện câu hỏi"
+
+#: lms/templates/problem.html:75
+msgid "You have used {num_used} of {num_total} submissions"
+msgstr "Bạn đã sử dụng {num_used} trong số {num_total} lần gửi đi"
+
+#: lms/templates/register-sidebar.html:45
+msgid ""
+"As part of joining {platform_name}, you will receive an activation email.  "
+"You must click on the activation link to complete the process.  Don't see "
+"the email?  Check your spam folder and mark {platform_name} emails as 'not "
+"spam'.  At {platform_name}, we communicate mostly through email."
+msgstr ""
+"Khi tham gia {platform_name}, bạn sẽ nhận được email kích hoạt tài khoản. "
+"Bạn cần nhấp chuột vào đường dẫn để hoàn thành quá trình đăng ký. Nếu bạn "
+"không nhận được email? Hãy kiểm tra hòm thư rác và đánh dấu email "
+"{platform_name} là 'không phải thư rác'.  Tại {platform_name}, chúng tôi sẽ "
+"trao đổi thông tin qua email là chính."
+
+#: lms/templates/registration/password_reset_complete.html:5
+#: lms/templates/registration/password_reset_complete.html:39
+msgid "Your Password Reset is Complete"
+msgstr "Đã đặt lại mật khẩu thành công"
+
+#: lms/templates/registration/password_reset_confirm.html:62
+msgid ""
+"\n"
+"                We're sorry, but this version of your browser is not "
+"supported. Try again using a different browser or a newer version of your "
+"browser.\n"
+"            "
+msgstr ""
+"\n"
+"                Chúng tôi rất lấy làm tiếc, nhưng phiên bản trình duyệt này của bạn không được hỗ trợ. Hãy thử lại bằng một trình duyệt khác hoặc một phiên bản mới hơn của trình duyệt này.\n"
+"            "
+
+#: lms/templates/registration/password_reset_confirm.html:73
+msgid "The following errors occurred while processing your registration: "
+msgstr "Các lỗi sau đây xảy ra trong khi xử lý đăng ký của bạn:"
+
+#: lms/templates/video.html:18
+msgid "Skip to a navigable version of this video's transcript."
+msgstr "Bỏ qua tới phiên bản cho phép xem lời thoại của video"
+
+#: lms/templates/video.html:36
+msgid "Skip to end of transcript."
+msgstr "Bỏ qua để kết thúc xem lời thoại"
+
+#: lms/templates/video.html:40
+msgid "Go back to start of transcript."
+msgstr "Quay trở lại bắt đầu lời thoại"
+
+#: lms/templates/video.html:46
+msgid "Download video"
+msgstr "Tải video"
+
+#: lms/templates/courseware/course_about.html:223
+msgid "Course About"
+msgstr "Về khoá học"
+
+#: lms/templates/courseware/course_about.html:224
+msgid "Overview"
+msgstr "Tổng quan"
+
+#: lms/templates/courseware/courseware.html:148
+msgid "Bookmarks"
+msgstr "Đánh dấu"
+
+#: lms/templates/courseware/courseware.html:159
+msgid "search"
+msgstr "tìm kiếm"
+
+#: lms/templates/courseware/error-message.html:5
+msgid ""
+"We're sorry, this module is temporarily unavailable. Our staff is working to"
+" fix it as soon as possible. Please email us at {link_to_support_email} to "
+"report any problems or downtime."
+msgstr ""
+"Rất tiếc, khoá học này hiện không khả dụng. Chúng tôi sẽ phục hồi sớm nhất "
+"có thể. Vui lòng email cho chúng tôi tới {link_to_support_email} để báo cáo "
+"các lỗi kỹ thuật và thời gian mất truy cập."
+
+#: lms/templates/courseware/info.html:85
+msgid "Important Course Dates"
+msgstr "Các mốc thời gian quan trọng của khoá học"
+
+#: lms/templates/courseware/info.html:94
+msgid "Course Updates &amp; News"
+msgstr "Tin tức và cập nhập khoá học"
+
+#: lms/templates/courseware/progress.html:40
+msgid "Course Progress"
+msgstr "Quá trình học tập"
+
+#: lms/templates/courseware/progress.html:62
+msgid "Your certificate is available"
+msgstr "Chứng nhận của bạn đã có "
+
+#: lms/templates/courseware/progress.html:64
+#: lms/templates/courseware/progress.html:88
+msgid ""
+"You can keep working for a higher grade, or request your certificate now."
+msgstr ""
+"Bạn có thể tiếp tục học để có điểm cao hơn, hoặc yêu cầu có chứng nhận bây "
+"giờ."
+
+#: lms/templates/courseware/progress.html:69
+msgid "View certificate in a new browser window or tab."
+msgstr "Xem chứng nhận trong trình duyệt hoặc cửa sổ mới."
+
+#: lms/templates/courseware/progress.html:73
+msgid "PDF will open in a new browser window or tab."
+msgstr "PDF sẽ mở trong trình duyệt hoặc cửa sổ mới."
+
+#. Translators: This message appears to users when the system is processessing
+#. course certificates, which can take a few hours.
+#: lms/templates/courseware/progress.html:81
+msgid "We're working on it..."
+msgstr "Đang thực hiện..."
+
+#: lms/templates/courseware/progress.html:82
+msgid ""
+"We're creating your certificate. You can keep working in your courses and a "
+"link to it will appear here and on your Dashboard when it is ready."
+msgstr ""
+"Chúng tôi đang xử lý chứng chỉ của bạn. Bạn có thể tiếp tục khoá học, và sẽ "
+"có đường dẫn xuất hiện tại đây và trên Dashboard của bạn khi sẵn sàng."
+
+#: lms/templates/courseware/progress.html:87
+msgid "Congratulations, you qualified for a certificate!"
+msgstr "Xin chúc mừng, bạn đã đạt yêu cầu để được cấp chứng chỉ!"
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html:39
+msgid "Grade required to pass this course:"
+msgstr "Điểm cần đạt được "
+
+#: lms/templates/dashboard/_dashboard_course_listing.html:56
+msgid "{category} Program Course"
+msgstr "{category} Chương trình Khóa học"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html:105
+msgid "Ended - {end_date}"
+msgstr "Kết thúc - {end_date}"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html:107
+msgid "Started - {start_date}"
+msgstr "Bắt đầu - {start_date}"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html:111
+#: lms/templates/dashboard/_dashboard_course_listing.html:113
+msgid "Starts - {start_date}"
+msgstr "Bắt đầu - {start_date}"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html:182
+msgid "Course options dropdown"
+msgstr "Các lựa chọn khoá học"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html:185
+msgid "Additional Actions Menu"
+msgstr "Thanh công cụ với các lựa chọn khác"
+
+#: lms/templates/dashboard/_dashboard_info_language.html:8
+msgid "edit"
+msgstr "chỉnh sửa"
+
+#: lms/templates/discussion/_blank_slate.html:4
+msgid ""
+"Sorry! We can't find anything matching your search. Please try another "
+"search."
+msgstr ""
+"Rất tiếc! Không tìm thấy kết quả phù hợp với tìm kiếm của bạn. Hãy thử tìm "
+"kiếm khác."
+
+#: lms/templates/discussion/_blank_slate.html:6
+msgid "There are no posts here yet. Be the first one to post!"
+msgstr "Không có bài đăng nào tại đây. Hãy là người đăng bài đàu tiên!"
+
+#: lms/templates/discussion/_discussion_course_navigation.html:9
+#: lms/templates/discussion/_discussion_module.html:9
+msgid "New Post"
+msgstr "Bài đăng mới"
+
+#: lms/templates/discussion/_recent_active_posts.html:9
+msgid "Following"
+msgstr "Theo dõi"
+
+#: lms/templates/discussion/_search_bar.html:14
+msgid "Search posts"
+msgstr "Tìm kiếm bài đăng"
+
+#: lms/templates/discussion/_thread_list_template.html:8
+msgid "Discussion topics; current selection is: "
+msgstr "Các chủ đề thảo luận; lựa chọn hiện nay là:"
+
+#: lms/templates/discussion/_thread_list_template.html:14
+msgid "Search all posts"
+msgstr "Tìm kiếm tất cả các bài đăng"
+
+#: lms/templates/discussion/maintenance.html:3
+msgid "We're sorry"
+msgstr "Rất tiếc"
+
+#: lms/templates/discussion/maintenance.html:4
+msgid ""
+"The forums are currently undergoing maintenance. We'll have them back up "
+"shortly!"
+msgstr ""
+"Diễn đàn hiện đang được bảo trì. Chúng tôi sẽ sớm quay lại chế độ hoạt động!"
+
+#: lms/templates/discussion/user_profile.html:28
+msgid "User Profile"
+msgstr "Thông tin người sử dụng"
+
+#: lms/templates/emails/activation_email.txt:3
+msgid "Thank you for signing up for {platform_name}."
+msgstr "Cám ơn bạn đã đăng ký {platform_name}."
+
+#: lms/templates/emails/confirm_email_change.txt:8
+msgid ""
+"This is to confirm that you changed the e-mail associated with "
+"{platform_name} from {old_email} to {new_email}. If you did not make this "
+"request, please contact us at"
+msgstr ""
+"Thông báo này là để xác nhận bạn đã thay đổi địa chỉ email cho tài khoản "
+"{platform_name} từ {old_email} thành {new_email}. Nếu bạn không yêu cẩu đổi "
+"email, hãy liên hệ với chúng tôi tại"
+
+#: lms/templates/emails/email_change.txt:16
+msgid ""
+"If you didn't request this, you don't need to do anything; you won't receive"
+" any more email from us. Please do not reply to this e-mail; if you require "
+"assistance, check the about section of the {platform_name} Courses web site."
+msgstr ""
+"Nếu bạn không gửi yêu cầu này, bạn không cần là; bạn sẽ không nhận được các "
+"email tiếp theo từ chúng tôi. Vui lòng không trả lời lại email này; nếu bạn "
+"cần trợ giúp, hãy xem các nội dung của {platform_name} trang web Các khoá "
+"học."
+
+#: lms/templates/emails/reject_name_change.txt:7
+msgid ""
+"We are sorry. Our course staff did not approve your request to change your "
+"name from {old_name} to {new_name}. If you need further assistance, please "
+"e-mail the tech support at {email}"
+msgstr ""
+"Rất tiếc. Yêu cầu thay đổi tên của bạn từ {old_name} thành {new_name} không "
+"được chấp nhận. Nếu bạn cần trợ giúp, hãy email để được trợ giúp kỹ thuật "
+"tại {email}"
+
+#: lms/templates/registration/activate_account_notice.html:5
+msgid "Thanks for Registering!"
+msgstr "Cám ơn bạn đã đăng ký!"
+
+#: lms/templates/registration/activate_account_notice.html:7
+msgid ""
+"You've successfully created an account on {platform_name}. We've sent an "
+"account activation message to {email}. To activate your account and start "
+"enrolling in courses, click the link in the message."
+msgstr ""
+"Bạn đã đăng ký thành công tài khoản trên {platform_name}. Chúng tôi đã gửi "
+"email kích hoạt tài khoản tới {email}. Để kích hoạt tài khoản của bạn và "
+"đăng nhập khoá học, hãy nhấp chuột vào đường dẫn trong email."
+
+#: lms/templates/registration/activation_complete.html:12
+msgid "Activation Complete!"
+msgstr "Kích hoạt Thành công!"
+
+#: lms/templates/registration/activation_complete.html:14
+msgid "Account already active!"
+msgstr "Tài khoản đã được kích hoạt!"
+
+#: lms/templates/registration/activation_complete.html:28
+msgid "You can now {link_start}log in{link_end}."
+msgstr "Bây giờ bạn có thể {link_start}đăng nhập{link_end}."
+
+#: lms/templates/registration/activation_invalid.html:14
+msgid ""
+"Something went wrong. Check to make sure the URL you went to was correct -- "
+"e-mail programs will sometimes split it into two lines. If you still have "
+"issues, e-mail us to let us know what happened at {email}."
+msgstr ""
+"Có lỗi kỹ thuật. Hãy kiểm tra và chắc chắn rằng đường dẫn URL bạn đang kết "
+"nối chính xác -- các chương trình e-mail đôi khi chia đường dẫn thành 2 "
+"dòng. Nếu vẫn gặp lỗi, hãy email cho chúng tôi để thông báo {email}."
+
+#: lms/templates/registration/activation_invalid.html:19
+msgid "Or you can go back to the {link_start}home page{link_end}."
+msgstr "Hoặc bạn có thể quay lại {link_start}trang chủ{link_end}."
