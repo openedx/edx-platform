@@ -101,6 +101,7 @@ class ImportTestMixin(object):
         """
         return []
 
+    @flaky  # TODO fix this, see PLAT-1186
     def test_upload(self):
         """
         Scenario: I want to upload a course or library for import.
@@ -211,7 +212,7 @@ class TestEntranceExamCourseImport(ImportTestMixin, StudioCourseTest):
     def page_args(self):
         return [self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run']]
 
-    @flaky  # TODO fix this, see TNL-6009
+    @flaky  # TODO fix this, see PLAT-1186
     def test_course_updated_with_entrance_exam(self):
         """
         Given that I visit an empty course before import
@@ -258,7 +259,7 @@ class TestCourseImport(ImportTestMixin, StudioCourseTest):
     def page_args(self):
         return [self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run']]
 
-    @flaky  # TNL-6042
+    @flaky  # TODO fix this, see PLAT-1186
     def test_course_updated(self):
         """
         Given that I visit an empty course before import
@@ -329,7 +330,7 @@ class TestLibraryImport(ImportTestMixin, StudioLibraryTest):
     def page_args(self):
         return [self.browser, self.library_key]
 
-    @flaky  # TODO: SOL-430
+    @flaky  # TODO fix this, see PLAT-1186
     def test_library_updated(self):
         """
         Given that I visit an empty library
