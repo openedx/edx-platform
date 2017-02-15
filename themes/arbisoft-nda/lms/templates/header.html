@@ -36,8 +36,6 @@
                                         <span class="user-name">${username} <span class="fa fa-angle-down"></span></span>
                                         <ul>
                                             <li><a href="${reverse('dashboard')}">${_("Dashboard")}</a></li>
-                                            <li><a href="${reverse('learner_profile', kwargs={'username': user.username})}">${_("Profile")}</a></li>
-                                            <li><a href="${reverse('account_settings')}">${_("Account")}</a></li>
                                             <li><a href="${reverse('logout')}">${_("Sign Out")}</a></li>
                                         </ul>
                                     </li>
