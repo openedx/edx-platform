@@ -1,3 +1,4 @@
+import re
 from django import forms
 from student.models import (
     CandidateProfile,
@@ -88,12 +89,17 @@ class CandidateProfileForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super(CandidateProfileForm, self).clean()
 
+        phone_number = cleaned_data.get('phone_number')
+        if not re.match('^[0-9-+]*$', phone_number):
+            self.add_error('phone_number', forms.ValidationError("Valid phone number contains +,- and numbers."))
+            raise forms.ValidationError("Valid phone number contains +,- and numbers.")
+
         cgpa = cleaned_data.get('cgpa')
         if cgpa < 0 or cgpa > 4:
             self.add_error('cgpa', forms.ValidationError("Valid range is 0 to 4"))
             raise forms.ValidationError("Valid range is 0 to 4")
-        expected_salary = cleaned_data.get('expected_salary')
 
+        expected_salary = cleaned_data.get('expected_salary')
         if expected_salary < 0:
             self.add_error('expected_salary', forms.ValidationError("Invalid value."))
             raise forms.ValidationError("Invalid value.")
@@ -120,11 +126,21 @@ class CandidateReferenceForm(forms.ModelForm):
         model = CandidateReference
         fields = (
             'name',
-            'phone_number',
             'position',
+            'phone_number',
         )
         widgets = {
             'name': forms.TextInput(attrs={'class': 'input-block', 'required': 'true', 'maxlength': 255}),
             'position': forms.TextInput(attrs={'class': 'input-block', 'required': 'true', 'maxlength': 255}),
             'phone_number': forms.TextInput(attrs={'class': 'input-block', 'required': 'true', 'maxlength': 20}),
         }
+
+    def clean(self):
+        cleaned_data = super(CandidateReferenceForm, self).clean()
+
+        phone_number = cleaned_data.get('phone_number')
+        if not re.match('^[0-9-+]*$', phone_number):
+            self.add_error('phone_number', forms.ValidationError("Valid phone number contains +,- and numbers."))
+            raise forms.ValidationError("Valid phone number contains +,- and numbers.")
+
+        return cleaned_data

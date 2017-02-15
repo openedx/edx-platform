@@ -3,25 +3,25 @@
 <%def name="get_label(name)">
 <%
     labels = {
-        "graduation_date": "Graduating/Graduated on",
-        "phone_number": "Contact number",
-        "cgpa": "CGPA",
+        "graduation_date": "Graduating/Graduated on *",
+        "phone_number": "Contact number *",
+        "cgpa": "CGPA *",
         "position_in_class": "Position/Rank in class (e.g. 1, 3, 10 etc)",
-        "academic_projects": "Tell us about your 2 major projects",
-        "extra_curricular_activities": "List down extra curricular activities you're involved in (if any)",
+        "academic_projects": "Tell us about your 2 major projects *",
+        "extra_curricular_activities": "List down extra curricular activities you have been involved in (if any)",
         "freelance_work": "Mention any freelance work you do or have done",
-        "accomplishment": "Your biggest accomplishment to-date",
-        "individuality_factor": "What makes you different from your batchmates",
-        "ideal_organization": "Describe your ideal organization",
-        "why_arbisoft": "Why would you like to join Arbisoft",
-        "expected_salary": "Your salary expectations",
-        "career_plan": "Your career plans two years down the line",
-        "references": "Mention two university references along with their position and contact number",
+        "accomplishment": "Your biggest accomplishment to-date *",
+        "individuality_factor": "What makes you different from your batmates *",
+        "ideal_organization": "Describe your ideal organization *",
+        "why_arbisoft": "Why would you like to join Arbisoft *",
+        "expected_salary": "Your salary expectations *",
+        "career_plan": "Your career plans two years down the line *",
+        "references": "Mention two university references along with their position and contact number *",
         "other_studied_course": "Other Studied Course",
         "other_technology": "Other Technology",
         "expertise_ranking": "Mark the courses you are an expert at on a scale of 1 to 5 (5 being the most and 1 being the least expert)",
-        "studied_course": "Check mark the courses you studied",
-        "technology": "Mark the technology you'd like to work on/learn",
+        "studied_course": "Check mark the courses you studied *",
+        "technology": "Mark the technology you'd like to work on/learn *",
     }
     return labels.get(name, "Please enter:")
 %>
@@ -111,7 +111,7 @@ from openedx.core.djangolib.markup import HTML, Text
       <div class="form-type">
           <div class="form-wrapper">
               <div class="status">This form must be filled before you can attempt the test</div>
-              %if profile.errors:
+              %if profile.errors or reference_formset.errors:
                 <div class="status submission-error" aria-live="polite">
                     <h4 class="message-title">We couldn't save your details.</h4>
                     <div class="message-copy">Please enter correct values for highlighted fields</div>
@@ -135,9 +135,9 @@ from openedx.core.djangolib.markup import HTML, Text
                             <div class="form-field">
                          %endif
                             <label for="id_${element.name}">${get_label(element.name)}
-                            %for error in element.errors:
-                                <span class="error-message-title">&nbsp; ${error}</span>
-                            %endfor
+                            %if element.errors:
+                                <span class="error-message-title">&nbsp; ${element.errors[0]}</span>
+                            %endif
                             </label>
                             ${element}
 
@@ -164,7 +164,8 @@ from openedx.core.djangolib.markup import HTML, Text
                     <br/>
                 %endfor
                 <div class="form-field">
-                    <label>${get_label('expertise_ranking')}</label>
+                    <label>${get_label('expertise_ranking')}
+                    </label>
                     ${ ranking_formset.management_form }
                     %for rank_form in ranking_formset:
                         <div class="ranking-div">
@@ -178,8 +179,15 @@ from openedx.core.djangolib.markup import HTML, Text
                     %endfor
                 </div>
                 <div class="form-field">
-                    <label>${get_label('references')}</label>
                     ${ reference_formset.management_form }
+                    <label>${get_label('references')}
+                    %if reference_formset.errors:
+                        %for key in reference_formset.errors[0].keys():
+                            <span class="error-message-title">&nbsp; ${reference_formset.errors[0][key][0]}</span>
+                            <% break %>
+                        %endfor
+                    %endif
+                    </label>
                     <table>
                         <thead>
                             <tr>
