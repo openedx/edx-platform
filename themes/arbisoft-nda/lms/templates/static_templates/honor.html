@@ -1,93 +1,56 @@
-## mako
 <%page expression_filter="h"/>
 <%! from django.utils.translation import ugettext as _ %>
-<%namespace name='static' file='../static_content.html'/>
 <%inherit file="../main.html" />
 
 <%block name="pagetitle">${_("Honor Code")}</%block>
+<style>
+    .about ul li, p{
+        line-height:normal;
+    }
+</style>
+<main id="main" aria-label="Content" tabindex="-1">
+    <section class="container about">
+        <p>${_("Please read these Terms of Service (TOS) and Honor Code prior to registering for the test. If you do "
+        "not understand or do not wish to be bound by the terms of the agreements, you should not enroll in the test.")}</p>
 
-<div class="page-heading">
-  <h1>${_("Honor Code")}</h1>
-</div>
-<section class="static-content">
-  <div class="grid-manual grid-container">
-    <div class="inner-container">
-      <div class="row">
-        <div class="col col-12 sm-col-12 md-col-3">
-          <ul class="list-divided">
-            <li class="item"><a href="#collaboration-policy" class="brand-link">${_("Lorem ipsum dolor sit amet")}</a></li>
-            <li class="item"><a href="#honor-code-pledge" class="brand-link">${_("Lorem ipsum dolor sit amet")}</a></li>
-            <li class="item"><a href="#changing-the-honor-code" class="brand-link">${_("Lorem ipsum dolor sit amet")}</a></li>
-          </ul>
-        </div>
-        <div class="col col-12 sm-col-12 md-col-9">
-          <h3><strong>Effective Date:</strong> January 01, 1970</h3>
-          <h1 class="honor-code-heading">Lorem ipsum dolor sit amet, sea te quaeque.</h1>
+        <p>${_("Arbisoft reserves the right to modify these TOS and honor code at any time without advance notice. "
+        "Any changes will be effective immediately upon posting on this page, with an updated effective date.")}</p>
 
-          <h2 id="collaboration-policy">Lorem ipsum dolor sit amet</h2>
-          <p>
-            Lorem ipsum dolor sit amet, sea te quaeque suscipiantur. Nullam vituperata at his, usu ad solum augue.
-            Mel partem iudicabit te, an sed vocent offendit. Est prompta deserunt senserit et, ex ubique deleniti
-            sed. Lorem ipsum dolor sit amet, sea te quaeque suscipiantur. Nullam vituperata at his, usu ad solum augue.
-            Mel partem iudicabit te, an sed vocent offendit. Est prompta deserunt senserit et, ex ubique deleniti
-            sed. Lorem ipsum dolor sit amet, sea te quaeque suscipiantur. Nullam vituperata at his, usu ad solum augue.
-            Mel partem iudicabit te, an sed vocent offendit. Est prompta deserunt senserit et, ex ubique deleniti
-            sed.
-          </p>
-         <p>
-            Lorem ipsum dolor sit amet, sea te quaeque suscipiantur. Nullam vituperata at his, usu ad solum augue.
-            Mel partem iudicabit te, an sed vocent offendit. Est prompta deserunt senserit et, ex ubique deleniti
-            sed. Lorem ipsum dolor sit amet, sea te quaeque suscipiantur. Nullam vituperata at his, usu ad solum augue.
-            Mel partem iudicabit te, an sed vocent offendit. Est prompta deserunt senserit et, ex ubique deleniti
-            sed.
-          </p>
-          <a href="#" class="brand-link back-to-top">${_("Back to top")}</a>
+        <p><strong>${_("User Accounts and Authority")}</strong></p>
+        <ul>
+            <li>${_("In order to enroll in the fresh graduate test, you must provide your name, email address and "
+            "a user password in order to create a user account.")}</li>
+            <li>${_("You agree that you will never divulge or share access or access information for your user account "
+            "with any third party for any reason.")}</li>
+            <li>${_("In setting up your user account, you will be prompted to enter additional information."
+            "You represent that all information provided by you is accurate and current.")}</li>
+        </ul>
 
-          <h2 id="honor-code-pledge">Lorem ipsum dolor sit amet</h2>
-          <p>
-            Lorem ipsum dolor sit amet, sea te quaeque suscipiantur. Nullam vituperata at his, usu ad solum augue.
-            Mel partem iudicabit te, an sed vocent offendit. Est prompta deserunt senserit et, ex ubique deleniti
-            sed. Lorem ipsum dolor sit amet, sea te quaeque suscipiantur. Nullam vituperata at his, usu ad solum augue.
-            Mel partem iudicabit te, an sed vocent offendit. Est prompta deserunt senserit et, ex ubique deleniti
-            sed. Lorem ipsum dolor sit amet, sea te quaeque suscipiantur. Nullam vituperata at his, usu ad solum augue.
-            Mel partem iudicabit te, an sed vocent offendit. Est prompta deserunt senserit et, ex ubique deleniti
-            sed.
-          </p>
+        <p><strong>${_("Honor Code")}</strong></p>
+        <p>${_("In order to participate in the test, you must agree to the Honor Code below:")}</p>
 
-          <ul class="list-bulleted">
-            <li>Lorem ipsum dolor sit amet, sea te quaeque suscipiantur. Nullam vituperata at his, usu ad solum augue.</li>
-            <li> Lorem ipsum dolor sit amet, sea te quaeque suscipiantur. Lorem ipsum dolor sit amet, sea te quaeque suscipiantur. Nullam vituperata at his, usu ad solum augue.</li>
-            <li>Lorem ipsum dolor sit amet, sea te quaeque suscipiantur. Lorem ipsum dolor sit amet, sea te quaeque suscipiantur. Nullam vituperata at his, usu ad solum augue.
-              Lorem ipsum dolor sit amet, sea te quaeque suscipiantur. Nullam vituperata at his, usu ad solum augue..</li>
-          </ul>
-          <p>
-            Lorem ipsum dolor sit amet, sea te quaeque suscipiantur. Nullam vituperata at his, usu ad solum augue.
-          </p>
-          <ul class="list-bulleted">
-              <li>Lorem ipsum dolor sit amet, sea te quaeque suscipiantur. Nullam vituperata at his, usu ad solum augue.</li>
-            <li> Lorem ipsum dolor sit amet, sea te quaeque suscipiantur. Lorem ipsum dolor sit amet, sea te quaeque suscipiantur. Nullam vituperata at his, usu ad solum augue.</li>
-            <li>Lorem ipsum dolor sit amet, sea te quaeque suscipiantur. Lorem ipsum dolor sit amet, sea te quaeque suscipiantur. Nullam vituperata at his, usu ad solum augue.
-              Lorem ipsum dolor sit amet, sea te quaeque suscipiantur. Nullam vituperata at his, usu ad solum augue..</li>
-            <li>Lorem ipsum dolor sit amet, sea te quaeque suscipiantur. Nullam vituperata at his, usu ad solum augue.</li>
-            <li> Lorem ipsum dolor sit amet, sea te quaeque suscipiantur. Lorem ipsum dolor sit amet, sea te quaeque suscipiantur. Nullam vituperata at his, usu ad solum augue.</li>
-          </ul>
-          <a href="#" class="brand-link back-to-top">${_("Back to top")}</a>
+        <p><strong>${_("By enrolling in the test, I agree that I will")}</strong></p>
+        <ul>
+            <li>${_("Complete all tests and assignments on my own.")}</li>
+            <li>${_("Maintain only one user account and not let anyone else use my username and/or password.")}</li>
+            <li>${_("Not engage in any activity that would dishonestly improve my results, or improve or hurt the "
+            "results of others.")}</li>
+            <li>${_("Not post answers to problems that are being used to assess candidate's performance.")}</li>
+        </ul>
 
-          <h2 id="changing-the-honor-code">Lorem ipsum dolor sit amet</h2>
-          <p>
-            Lorem ipsum dolor sit amet, sea te quaeque suscipiantur. Nullam vituperata at his, usu ad solum augue.
-            Mel partem iudicabit te, an sed vocent offendit. Est prompta deserunt senserit et, ex ubique deleniti
-            sed. Lorem ipsum dolor sit amet, sea te quaeque suscipiantur. Nullam vituperata at his, usu ad solum augue.
-            Mel partem iudicabit te, an sed vocent offendit. Est prompta deserunt senserit et, ex ubique deleniti
-            sed. Lorem ipsum dolor sit amet, sea te quaeque suscipiantur. Nullam vituperata at his, usu ad solum augue.
-            Mel partem iudicabit te, an sed vocent offendit. Est prompta deserunt senserit et, ex ubique deleniti
-            sed.
-          </p>
-          <a href="#" class="brand-link back-to-top">${_("Back to top")}</a>
+        <p><strong>${_("Examples of conduct which have been regarded as being in violation of the Honor Code include:")}</strong></p>
+        <ul>
+            <li>${_("Copying from another's test or allowing another to copy from one's own paper")}</li>
+            <li>${_("Unpermitted collaboration")}</li>
+            <li>${_("Plagiarism")}</li>
+            <li>${_("Revising and resubmitting a test for re-grading")}</li>
+            <li>${_("Giving or receiving unpermitted aid")}</li>
+            <li>${_("Representing as one's own work the work of another")}</li>
+        </ul>
 
-          <h3><strong>Effective Date:</strong> Januray 01, 1970</h3>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+        <p>${_("The standard penalty on violation of the TOS and Honor Code would result in the candidate being "
+        "blacklisted from Arbisoft. He/She would not be considered for the fresh hiring program not only for this year "
+        "but also for any future opening as well.")}</p>
+
+    </section>
+</main>
