@@ -90,7 +90,7 @@ class CandidateProfileForm(forms.ModelForm):
 
         cgpa = cleaned_data.get('cgpa')
         if cgpa < 0 or cgpa > 4:
-            self.add_error('cgpa', forms.ValidationError("Invalid value."))
+            self.add_error('cgpa', forms.ValidationError("Valid range is 0 to 4"))
             raise forms.ValidationError("Valid range is 0 to 4")
         expected_salary = cleaned_data.get('expected_salary')
 
