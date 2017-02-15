@@ -9,9 +9,11 @@
 
     <%block name="headextra">
         <link rel="stylesheet" type="text/css" href="${static.url('css/slick.css')}"/>
+        <link rel="stylesheet" type="text/css" href="${static.url('css/flipclock.css')}"/>
         </%block>
 
     <%block name="js_extra">
+        <script type="text/javascript" src="${static.url('js/flipclock.min.js')}"></script>
         <script type="text/javascript">
             $(window).load(function () {
                 $(".more-about-btn").removeClass("hidden");
@@ -19,6 +21,13 @@
                     $('#login').trigger("click");
                 }
                 $(".hero-static").css("display", "table");
+
+                var exam_starts_in = (new Date('2017-02-25 15:00:00') - new Date()) / 1000;
+                var clock = $('.clock').FlipClock(exam_starts_in, {
+                clockFace: 'DailyCounter',
+                countdown: true
+            });
+
             });
         </script>
         <%include file="about_site.html" />
@@ -29,9 +38,9 @@
         <div class="hero-static">
             <div class="brand-logo">
                 <img src="${static.url('images/logo-white.png')}" alt="" />
+                <div class="clock"></div>
             </div>
         </div>
-
         <%include file="${courses_list}" />
 
     </section>
