@@ -26,6 +26,7 @@ var $$course_id = "${course_id | n, js_escaped_string}";
 
 function DiscussionInlineBlock(runtime, element) {
     'use strict';
-    new DiscussionInlineView({ el: $(element).find('.discussion-module') });
+    var el = $(element).find('.discussion-module');
+    new DiscussionInlineView({ el: el, readOnly: el.data('read-only') });
 }
 </script>

@@ -567,6 +567,12 @@ class InlineDiscussionPage(PageObject, DiscussionPageMixin):
         )
         self._find_within(selector).click()
 
+    def is_new_post_button_visible(self):
+        """
+        Check if new post button present and visible
+        """
+        return self._is_element_visible('.new-post-btn')
+
     @wait_for_js
     def _is_element_visible(self, selector):
         query = self._find_within(selector)
