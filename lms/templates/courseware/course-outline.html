@@ -13,14 +13,26 @@ from django.utils.translation import ugettext as _
 <section class="course-outline" id="main">
     <ul class="block-tree" role="tree">
         % for section in blocks.get('children') or []:
-            <li class="section-name outline-item focusable" role="treeitem" tabindex="0" aria-expanded="true">
+            <li
+                aria-expanded="true"
+                class="section-name outline-item focusable"
+                id="${ section['id'] }"
+                role="treeitem"
+                tabindex="0"
+            >
                 <span class="icon fa fa-chevron-down" aria-hidden="true"></span>
                 ${ section['display_name'] }
             </li>
             <ul class="outline-item focusable" role="group" tabindex="0">
                 % for subsection in section.get('children') or []:
-                    <li class="outline-item focusable" role="treeitem" tabindex="0" aria-expanded="true">
-                        <a href="${ subsection['lms_web_url'] }">${ subsection['display_name'] }</a>
+                    <li role="treeitem" tabindex="-1" aria-expanded="true">
+                        <a
+                            class="outline-item focusable"
+                            href="${ subsection['lms_web_url'] }"
+                            id="${ subsection['id'] }"
+                        >
+                            ${ subsection['display_name'] }
+                        </a>
                     </li>
                 % endfor
             </ul>
