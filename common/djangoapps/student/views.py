@@ -56,6 +56,7 @@ from edxmako.shortcuts import render_to_response, render_to_string
 
 from course_modes.models import CourseMode
 from enrollment.api import add_enrollment, get_enrollment
+from enrollment.errors import CourseEnrollmentClosedError
 from shoppingcart.api import order_history
 from student.arbisoft.form import CandidateReferenceForm
 from student.models import (
@@ -636,13 +637,17 @@ def arbisoft_survey(request):
                 ])
 
                 # make user active here
-                user.is_active = True
+                if not user.is_active:
+                    user.is_active = True
                 user.save()
 
                 # enroll user in course
-                course_id = settings.ARBISOFT_FRESH_GRAD_COURSE_ID
-                if not get_enrollment(user.username, course_id):
-                    add_enrollment(user.username, course_id)
+                try:
+                    course_id = settings.ARBISOFT_FRESH_GRAD_COURSE_ID
+                    if not get_enrollment(user.username, course_id):
+                        add_enrollment(user.username, course_id)
+                except CourseEnrollmentClosedError:
+                    log.exception("unable to enroll user %s in course %s", user.username, course_id)
 
             return HttpResponseRedirect(reverse('dashboard'))
         else:
