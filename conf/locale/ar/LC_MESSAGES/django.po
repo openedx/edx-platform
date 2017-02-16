@@ -38,7 +38,7 @@
 # Najwan Al Rousan <najwanrousan@gmail.com>, 2013
 # Najwan Al Rousan <najwanrousan@gmail.com>, 2013
 # Natalia Berdnikov <nberdnikov@edx.org>, 2016
-# Ned Batchelder <ned@edx.org>, 2015-2016
+# Ned Batchelder <ned@edx.org>, 2015-2017
 # Omar Al-Ithawi <oithawi@qrf.org>, 2014-2016
 # Osama M. Mneina <o.mneina@gmail.com>, 2014
 # RaghadG <raghad_g@yahoo.com>, 2014
@@ -6298,9 +6298,6 @@ msgid ""
 "{student_username} was reviewed as {review_status} by the proctored exam "
 "review provider."
 msgstr ""
-"محاولة امتحان مُراقب لـ {review_status} في  {course_name} حسب اسم المستخدم: "
-"لقد تمت مراجعة {student_username} باعتباره {review_status} من قبل مزود "
-"معاينة الامتحان المُراقب.  "
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "User does not exist."
