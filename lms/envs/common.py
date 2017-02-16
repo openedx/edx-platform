@@ -2164,6 +2164,9 @@ INSTALLED_APPS = (
 
     # Ability to detect and special-case crawler behavior
     'openedx.core.djangoapps.crawlers',
+
+    # Unusual migrations
+    'database_fixups',
 )
 
 # Migrations which are not in the standard module "migrations"

@@ -959,6 +959,9 @@ INSTALLED_APPS = (
 
     # management of user-triggered async tasks (course import/export, etc.)
     'user_tasks',
+
+    # Unusual migrations
+    'database_fixups',
 )
 
 
