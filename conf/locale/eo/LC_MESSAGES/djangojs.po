@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-02-02 19:33+0000\n"
-"PO-Revision-Date: 2017-02-02 19:34:37.831557\n"
+"POT-Creation-Date: 2017-02-16 15:58+0000\n"
+"PO-Revision-Date: 2017-02-16 16:00:25.099932\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -4067,16 +4067,8 @@ msgstr ""
 "¢σηѕє¢тєтυя#"
 
 #: lms/static/js/bookmarks/views/bookmark_button.js
-msgid "Click to add"
-msgstr "Çlïçk tö ädd Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: lms/static/js/bookmarks/views/bookmark_button.js
 msgid "Bookmark this page"
 msgstr "Böökmärk thïs pägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
-
-#: lms/static/js/bookmarks/views/bookmark_button.js
-msgid "Click to remove"
-msgstr "Çlïçk tö rémövé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/static/js/ccx/schedule.js
 msgid "All subsections"
@@ -5865,7 +5857,6 @@ msgstr ""
 
 #: cms/static/js/factories/manage_users.js
 #: cms/static/js/factories/manage_users_lib.js
-#: common/static/common/templates/discussion/post-user-display.underscore
 #: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "Staff"
 msgstr "Stäff Ⱡ'σяєм ιρѕ#"
@@ -7098,6 +7089,7 @@ msgid "All Groups"
 msgstr "Àll Gröüps Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: common/static/common/templates/discussion/new-post.underscore
+#: common/static/common/templates/discussion/thread-edit.underscore
 msgid ""
 "Add a clear and descriptive title to encourage participation. (Required)"
 msgstr ""
@@ -7129,9 +7121,12 @@ msgid "Submit"
 msgstr "Süßmït Ⱡ'σяєм ιρѕυ#"
 
 #: common/static/common/templates/discussion/post-user-display.underscore
-#: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "Community TA"
-msgstr "Çömmünïtý TÀ Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+msgid "(Community TA)"
+msgstr "(Çömmünïtý TÀ) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: common/static/common/templates/discussion/post-user-display.underscore
+msgid "(Staff)"
+msgstr "(Stäff) Ⱡ'σяєм ιρѕυм #"
 
 #: common/static/common/templates/discussion/profile-thread.underscore
 #: common/static/common/templates/discussion/thread.underscore
@@ -7166,12 +7161,6 @@ msgid "Editing post"
 msgstr "Édïtïng pöst Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: common/static/common/templates/discussion/thread-edit.underscore
-msgid "Add a clear and descriptive title to encourage participation."
-msgstr ""
-"Àdd ä çléär änd désçrïptïvé tïtlé tö énçöürägé pärtïçïpätïön. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: common/static/common/templates/discussion/thread-edit.underscore
 msgid "Edit your post below."
 msgstr "Édït ýöür pöst ßélöw. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
@@ -7199,6 +7188,10 @@ msgstr "Pïnnéd Ⱡ'σяєм ιρѕυ#"
 #: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "Following"
 msgstr "Föllöwïng Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+msgid "Community TA"
+msgstr "Çömmünïtý TÀ Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "{unread_comments_count} new"
@@ -8362,8 +8355,8 @@ msgid "View Archived Course"
 msgstr "Vïéw Àrçhïvéd Çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
-msgid "not enrolled"
-msgstr "nöt énrölléd Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+msgid "Not Enrolled"
+msgstr "Nöt Énrölléd Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "Please select a course date"

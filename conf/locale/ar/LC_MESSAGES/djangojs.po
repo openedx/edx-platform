@@ -36,7 +36,7 @@
 # Ned Batchelder <ned@edx.org>, 2015-2016
 # Omar Al-Ithawi <oithawi@qrf.org>, 2015-2016
 # Saramami.mami <saramami.mami@yahoo.com>, 2014
-# shefaa abu jabel <shefaa.aj@gmail.com>, 2016
+# shefaa abu jabel <shefaa.aj@gmail.com>, 2016-2017
 # SiddigSami <siddigsami@live.com>, 2014-2015
 # Soha Assali <soha+transifex@qordoba.com>, 2015-2016
 # Tariq Hamid <ou63@outlook.com>, 2015
@@ -121,8 +121,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-01-23 17:56+0000\n"
-"PO-Revision-Date: 2017-02-02 17:19+0000\n"
+"POT-Creation-Date: 2017-02-03 18:48+0000\n"
+"PO-Revision-Date: 2017-02-05 14:19+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
 "MIME-Version: 1.0\n"
@@ -174,9 +174,8 @@ msgstr "حذف"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/certificates/views/signatory_editor.js
-#: cms/static/js/factories/export.js
-#: cms/static/js/programs/views/program_details_view.js
-#: cms/static/js/views/asset.js cms/static/js/views/course_info_update.js
+#: cms/static/js/factories/export.js cms/static/js/views/asset.js
+#: cms/static/js/views/course_info_update.js
 #: cms/static/js/views/manage_users_and_roles.js
 #: cms/static/js/views/modals/base_modal.js
 #: cms/static/js/views/modals/course_outline_modals.js
@@ -196,7 +195,6 @@ msgstr "حذف"
 #: cms/templates/js/section-name-edit.underscore
 #: cms/templates/js/signatory-actions.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
-#: cms/templates/js/programs/program_creator_form.underscore
 #: common/static/common/templates/discussion/new-post.underscore
 #: common/static/common/templates/discussion/response-comment-edit.underscore
 #: common/static/common/templates/discussion/thread-edit.underscore
@@ -236,8 +234,6 @@ msgstr "إغلاق"
 #: cms/templates/js/course-instructor-details.underscore
 #: cms/templates/js/previous-video-upload-list.underscore
 #: cms/templates/js/signatory-details.underscore
-#: cms/templates/js/programs/program_creator_form.underscore
-#: cms/templates/js/programs/program_details.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Name"
 msgstr "الاسم"
@@ -2157,25 +2153,27 @@ msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "This vote could not be processed. Refresh the page and try again."
-msgstr ""
+msgstr "لا يمكن معالجة هذا التصويت. قم بتحديث الصفحة وحاول مرة أخرى."
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "This post could not be pinned. Refresh the page and try again."
-msgstr ""
+msgstr "لا يمكن إزالة تثبيت هذا المنشور. قم بتحديث الصفحة وحاول مرة أخرى."
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "This post could not be unpinned. Refresh the page and try again."
-msgstr ""
+msgstr "لا يمكن إزالة تثبيت هذا المنشور. قم بتحديث الصفحة وحاول مرة أخرى."
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid ""
 "This post could not be flagged for abuse. Refresh the page and try again."
 msgstr ""
+"لا يمكن الإبلاغ عن اساءة في هذا المنشور. قم بتحديث الصفحة وحاول مرة أخرى."
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid ""
 "This post could not be unflagged for abuse. Refresh the page and try again."
 msgstr ""
+"لا يمكن الإبلاغ عن اساءة في هذا المنشور. قم بتحديث الصفحة وحاول مرة أخرى."
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "This post could not be closed. Refresh the page and try again."
@@ -2183,7 +2181,7 @@ msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "This post could not be reopened. Refresh the page and try again."
-msgstr ""
+msgstr "لا يمكن إعادة فتح هذا المنشور. قم بتحديث الصفحة وحاول مرة أخرى."
 
 #: common/static/common/js/discussion/views/discussion_inline_view.js
 msgid "Hide Discussion"
@@ -2191,7 +2189,7 @@ msgstr "إخفاء النقاش"
 
 #: common/static/common/js/discussion/views/discussion_inline_view.js
 msgid "This discussion could not be loaded. Refresh the page and try again."
-msgstr ""
+msgstr "لا يمكن تحميل هذه المناقشة. قم بتحديث الصفحة وحاول مرة أخرى."
 
 #: common/static/common/js/discussion/views/discussion_inline_view.js
 msgid "Show Discussion"
@@ -2203,7 +2201,7 @@ msgstr "تحميل المزيد من المواضيع"
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "Additional posts could not be loaded. Refresh the page and try again."
-msgstr ""
+msgstr "لا يمكن تحميل المشاركات الإضافية. قم بتحديث الصفحة وحاول مرة أخرى."
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "Current conversation"
@@ -2211,7 +2209,7 @@ msgstr "المحادثة الحالية"
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "Loading posts list"
-msgstr ""
+msgstr "تحميل قائمة المشاركات"
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "No results found for {original_query}. "
@@ -2643,7 +2641,6 @@ msgstr "الفِرَق"
 #: cms/templates/js/certificate-editor.underscore
 #: cms/templates/js/content-group-editor.underscore
 #: cms/templates/js/group-configuration-editor.underscore
-#: cms/templates/js/programs/program_creator_form.underscore
 msgid "Create"
 msgstr "إنشاء "
 
@@ -3740,7 +3737,7 @@ msgstr "إدخال الرابط التشعّبي"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "e.g. 'http://google.com'"
-msgstr ""
+msgstr "على سبيل المثال  'http://google.com'"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Link Description"
@@ -4173,7 +4170,7 @@ msgstr "[لا يوجد أي وسم]"
 
 #: lms/static/js/financial-assistance/views/financial_assistance_form_view.js
 msgid "Unable to submit application"
-msgstr ""
+msgstr "نعتذّر لتعذّر تقديم الطلب"
 
 #: lms/static/js/financial-assistance/views/financial_assistance_form_view.js
 #: lms/static/js/student_account/views/LoginView.js
@@ -4405,7 +4402,7 @@ msgstr "وسم رمز التسجيل على أنّه غير مستخدم"
 
 #: lms/static/js/instructor_dashboard/send_email.js
 msgid "All learners in the {track_name} track"
-msgstr ""
+msgstr "كل المتعلمين في مسار  {track_name}."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -4620,17 +4617,18 @@ msgstr "جاري تحميل مساقاتك"
 #: lms/static/js/student_account/views/FormView.js
 #: lms/static/js/student_account/views/RegisterView.js
 msgid "An error occurred."
-msgstr ""
+msgstr "نأسف لحدوث خطأ. "
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid "We couldn't sign you in."
-msgstr ""
+msgstr "عذرًا، لم نتمكّن من تسجيل دخولك. "
 
 #: lms/static/js/student_account/views/LoginView.js
 #, c-format
 msgid "An error occurred when signing you in to %s."
-msgstr ""
+msgstr "حدث خطأ أثناء محاولة تسجيل الدخول إلى %s."
 
+#: lms/static/js/student_account/views/LoginView.js
 #: lms/templates/verify_student/intro_step.underscore
 msgid "Check Your Email"
 msgstr "يُرجى تفقّد بريدك الإلكتروني"
@@ -4658,20 +4656,23 @@ msgid ""
 "You have successfully signed into %(currentProvider)s, but your "
 "%(currentProvider)s"
 msgstr ""
+"لقد نجحت في تسجيل الدخول إلى %(currentProvider)s، ولكن %(currentProvider)s"
 
 #: lms/static/js/student_account/views/RegisterView.js
 msgid "We couldn't create your account."
-msgstr ""
+msgstr "لم نتمكّن من إنشاء حسابك. "
 
 #: lms/static/js/student_account/views/RegisterView.js
 msgid "You've successfully signed into %(currentProvider)s."
-msgstr ""
+msgstr "لقد نجحت في تسجيل الدخول إلى %(currentProvider)s. "
 
 #: lms/static/js/student_account/views/RegisterView.js
 msgid ""
 "We just need a little more information before you start learning with "
 "%(platformName)s."
 msgstr ""
+"نحتاج فقط إلى قليل من المعلومات الإضافية قبل أن تبدأ التعلّم مع "
+"%(platformName)s. "
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Basic Account Information"
@@ -4772,7 +4773,7 @@ msgstr "جميع المناطق الزمنية"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Default (Local Time Zone)"
-msgstr ""
+msgstr "الافتراضي (منطقة التوقيت المحلي)"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Additional Information"
@@ -5232,7 +5233,7 @@ msgstr "عدد الطلّاب"
 
 #: lms/templates/courseware/progress_graph.js
 msgid "Overall Score"
-msgstr ""
+msgstr "النتيجة الكلية"
 
 #: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
 msgid ""
@@ -5442,7 +5443,6 @@ msgstr "هل أنت متأكّد من رغبتك في حذف {email} من فري
 
 #: cms/static/js/factories/manage_users.js
 #: cms/static/js/factories/manage_users_lib.js
-#: common/static/common/templates/discussion/post-user-display.underscore
 #: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "Staff"
 msgstr "طاقم المساق"
@@ -5635,114 +5635,6 @@ msgstr "أو"
 #: cms/static/js/models/xblock_validation.js
 msgid "This component has validation issues."
 msgstr "هناك إشكالات في المصادقة على هذا المكوِّن."
-
-#: cms/static/js/programs/models/course_model.js
-#: cms/templates/js/programs/course_details.underscore
-msgid "Course Code"
-msgstr "رمز الدورة التدريبية"
-
-#: cms/static/js/programs/models/course_model.js
-#: cms/templates/js/certificate-details.underscore
-#: cms/templates/js/certificate-editor.underscore
-#: cms/templates/js/programs/course_details.underscore
-msgid "Course Title"
-msgstr "عنوان الدورة"
-
-#: cms/static/js/programs/models/program_model.js
-msgid "Please select a valid organization."
-msgstr "يرجى اختيار منظمة صالحة."
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} is required"
-msgstr "{0} مطلوب"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be accepted"
-msgstr "{0} يجب قبوله"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be greater than or equal to {1}"
-msgstr "{0} يجب أن يكون أكبر من أو يساوي {1}"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be less than or equal to {1}"
-msgstr "{0} يجب أن يكون أصغر من أو يساوي {1}"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be between {1} and {2}"
-msgstr "{0} يجب أن يكون بين {1} و {2} "
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be {1} characters"
-msgstr "{0} يجب أن يكون {1} رموز"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be at least {1} characters"
-msgstr "{0} يجب أن يكون على الأقل {1} رموز"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be at most {1} characters"
-msgstr "{0} يجب أن يكون على الأكثر {1} رموز"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be between {1} and {2} characters"
-msgstr "{0} يجب أن يكون بين {1} و {2} رموز"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be one of: {1}"
-msgstr "{0} يجب أن يكون واحدًا من: {1}"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be the same as {1}"
-msgstr "{0} يجب أن يكون نفس {1} "
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must only contain digits"
-msgstr "{0} يجب أن يحتوى على أرقام فقط"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be a number"
-msgstr "{0} يجب أن يكون رقمًا"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be a valid email"
-msgstr "{0} يجب أن يكون بريدًا إلكترونيًا صالحًا"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be a valid url"
-msgstr "{0} يجب أن يكون عنوان url صالحًا  "
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} is invalid"
-msgstr "{0} غير صالح"
-
-#: cms/static/js/programs/views/program_details_view.js
-msgid "confirm"
-msgstr "تأكيد"
-
-#: cms/static/js/programs/views/program_details_view.js
-msgid "Publish this program?"
-msgstr "نشر هذا البرنامج؟"
-
-#: cms/static/js/programs/views/program_details_view.js
-msgid ""
-"After you publish this program, you cannot add or remove course codes or "
-"remove course runs."
-msgstr ""
-"بعد نشر هذا البرنامج، لا يمكنك إضافة أو إزالة رموز الدورة الدراسية أو إزالة "
-"مسارات الدورة التدريبية."
-
-#: cms/static/js/programs/views/program_details_view.js
-#: cms/static/js/views/modals/course_outline_modals.js
-#: cms/templates/js/course-outline.underscore
-#: cms/templates/js/publish-xblock.underscore
-#: cms/templates/js/programs/program_details.underscore
-msgid "Publish"
-msgstr "نشر"
-
-#: cms/static/js/programs/views/program_details_view.js
-msgid "Marketing Slug is required."
-msgstr "الشارة التسويقية مطلوبة."
 
 #: cms/static/js/views/active_video_upload.js cms/static/js/views/assets.js
 msgid "Your file could not be uploaded"
@@ -6087,6 +5979,12 @@ msgid "Publish all unpublished changes for this {item}?"
 msgstr "نشر جميع التغييرات غير المنشورة لهذا {item}؟ "
 
 #: cms/static/js/views/modals/course_outline_modals.js
+#: cms/templates/js/course-outline.underscore
+#: cms/templates/js/publish-xblock.underscore
+msgid "Publish"
+msgstr "نشر"
+
+#: cms/static/js/views/modals/course_outline_modals.js
 msgid "Basic"
 msgstr "أساسي"
 
@@ -6243,13 +6141,15 @@ msgstr "قيد الانتظار"
 
 #: cms/static/js/views/previous_video_upload.js
 msgid "Are you sure you want to remove this video from the list?"
-msgstr ""
+msgstr "هل أنت واثقٌ من رغبتك في حذف هذا الفيديو من هذه القائمة؟"
 
 #: cms/static/js/views/previous_video_upload.js
 msgid ""
 "Removing a video from this list does not affect course content. Any content "
 "that uses a previously uploaded video ID continues to display in the course."
 msgstr ""
+"لا يؤثر حذف فيديو من هذه القائمة على محتوى المقرر. ويستمر عرض أي محتوى "
+"يستخدم معرف فيديو محملًا سابقًا في هذا المقرر."
 
 #: cms/static/js/views/settings/advanced.js
 msgid ""
@@ -6362,7 +6262,7 @@ msgstr "جاري إنشاء نسخة مطابقة "
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Deleting this {xblock_type} is permanent and cannot be undone."
-msgstr ""
+msgstr "إنّ حذف هذا الـ {xblock_type} دائم ولا يمكن التراجع عنه."
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid ""
@@ -6373,15 +6273,15 @@ msgstr ""
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Delete this {xblock_type} (and prerequisite)?"
-msgstr ""
+msgstr "هل تودّ حذف {xblock_type} هذه (بالإضافة إلى المتطلّب الأساسي)؟"
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Yes, delete this {xblock_type}"
-msgstr ""
+msgstr "نعم، احذف هذا الـ {xblock_type}"
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Delete this {xblock_type}?"
-msgstr ""
+msgstr "هل تريد حذف هذا الـ {xblock_type}؟"
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "section"
@@ -6480,7 +6380,7 @@ msgstr "الإعدادات"
 
 #: cms/static/js/views/xblock_outline.js
 msgid "New {component_type}"
-msgstr ""
+msgstr "{component_type} جديد"
 
 #. Translators: This message will be added to the front of messages of type
 #. warning,
@@ -6495,7 +6395,6 @@ msgstr "تحديث الشَارات"
 
 #: cms/templates/js/asset-library.underscore
 #: cms/templates/js/basic-modal.underscore
-#: cms/templates/js/programs/confirm_modal.underscore
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
 msgid "Actions"
 msgstr "الإجراءات"
@@ -6639,13 +6538,13 @@ msgid "All Groups"
 msgstr "كافّة المجموعات "
 
 #: common/static/common/templates/discussion/new-post.underscore
-#: common/static/common/templates/discussion/thread-edit.underscore
-msgid "Add a clear and descriptive title to encourage participation."
-msgstr "أضِف عنوانًا واضحًا ومعبّرًا لتشجيع المشاركة."
+msgid ""
+"Add a clear and descriptive title to encourage participation. (Required)"
+msgstr "أضف عنوان واضح ومفصل لتشجيع المشاركة. (مطلوب)"
 
 #: common/static/common/templates/discussion/new-post.underscore
-msgid "Your question or idea"
-msgstr "سؤالك أو فكرتك"
+msgid "Your question or idea (required)"
+msgstr "سؤالك أو فكرتك (مطلوب)"
 
 #: common/static/common/templates/discussion/new-post.underscore
 msgid "follow this post"
@@ -6667,9 +6566,12 @@ msgid "Submit"
 msgstr "تقديم"
 
 #: common/static/common/templates/discussion/post-user-display.underscore
-#: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "Community TA"
-msgstr "مساعد أستاذ لشؤون المتعلّمين"
+msgid "(Community TA)"
+msgstr "(مجتمع مساعدي التدريس)"
+
+#: common/static/common/templates/discussion/post-user-display.underscore
+msgid "(Staff)"
+msgstr "(الطاقم)"
 
 #: common/static/common/templates/discussion/profile-thread.underscore
 #: common/static/common/templates/discussion/thread.underscore
@@ -6704,6 +6606,10 @@ msgid "Editing post"
 msgstr "تعديل المنشور "
 
 #: common/static/common/templates/discussion/thread-edit.underscore
+msgid "Add a clear and descriptive title to encourage participation."
+msgstr "أضِف عنوانًا واضحًا ومعبّرًا لتشجيع المشاركة."
+
+#: common/static/common/templates/discussion/thread-edit.underscore
 msgid "Edit your post below."
 msgstr "تعديل المنشور أدناه."
 
@@ -6731,6 +6637,10 @@ msgstr "مُثَبَّت"
 #: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "Following"
 msgstr "جاري المتابعة"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+msgid "Community TA"
+msgstr "مساعد أستاذ لشؤون المتعلّمين"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "{unread_comments_count} new"
@@ -6823,10 +6733,10 @@ msgstr "نوع المنشور"
 #: common/static/common/templates/discussion/thread-type.underscore
 msgid ""
 "Questions raise issues that need answers. Discussions share ideas and start "
-"conversations."
+"conversations. (Required)"
 msgstr ""
-"تثير الأسئلة مواضيع تحتاج إلى إجابات، وتفتح النقاشات باب مشاركة الأفكار وبدء"
-" الحوارات."
+"أسئلة التي تثير قضايا التي تحتاج إلى إجابات. مناقشات تبادل الأفكار وبدء "
+"المحادثات. (مطلوب)"
 
 #: common/static/common/templates/discussion/thread-type.underscore
 msgid "Question"
@@ -6849,8 +6759,8 @@ msgid "Topic area"
 msgstr "منطقة الموضوع"
 
 #: common/static/common/templates/discussion/topic.underscore
-msgid "Add your post to a relevant topic to help others find it."
-msgstr "أضف منشورك إلى موضوع ذي صلة لمساعدة الآخرين على إيجاده."
+msgid "Add your post to a relevant topic to help others find it. (Required)"
+msgstr "أضف ردك للموضوع ذو الصلة لمساعدة الآخرين في العثور عليه. (مطلوب)"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Discussion Home"
@@ -8875,6 +8785,11 @@ msgstr "تفاصيل الشهادة"
 
 #: cms/templates/js/certificate-details.underscore
 #: cms/templates/js/certificate-editor.underscore
+msgid "Course Title"
+msgstr "عنوان المساق"
+
+#: cms/templates/js/certificate-details.underscore
+#: cms/templates/js/certificate-editor.underscore
 msgid "Course Title Override"
 msgstr "تجاوز عنوان المساق"
 
@@ -9078,7 +8993,6 @@ msgstr "قم بإضافة لقب المعلم"
 
 #: cms/templates/js/course-instructor-details.underscore
 #: cms/templates/js/signatory-details.underscore
-#: cms/templates/js/programs/program_creator_form.underscore
 msgid "Organization"
 msgstr "المؤسّسة"
 
@@ -9947,145 +9861,8 @@ msgid ""
 "The published branch version, {published}, was reset to the draft branch "
 "version, {draft}."
 msgstr ""
-
-#: cms/templates/js/programs/course_details.underscore
-msgid "Delete course"
-msgstr "حذف الدورة التدريبية"
-
-#: cms/templates/js/programs/course_details.underscore
-#, python-format
-msgid "Remove %(name)s from the program"
-msgstr "أزل %(name)s من البرنامج"
-
-#: cms/templates/js/programs/course_details.underscore
-msgid "Add another run"
-msgstr "إضافة مسار آخر"
-
-#: cms/templates/js/programs/course_details.underscore
-msgid ""
-"The unique number that identifies your course within your organization, e.g."
-" CS101."
-msgstr ""
-"الرقم الفريد الذي يحدد دورتك التدريبية داخل منظمتك، على سبيل المثال CS101."
-
-#: cms/templates/js/programs/course_details.underscore
-msgid ""
-"The title entered here will override the title set for the individual run of"
-" the course. It will be displayed on the XSeries progress page and in "
-"marketing presentations."
-msgstr ""
-"العنوان المسجل هنا سوف يتجاوز العنوان المضبوط للمسار الفردي للدورة "
-"التدريبية. سيتم عرضه على صفحة تقدم XSeries في العروض التسويقية."
-
-#: cms/templates/js/programs/course_details.underscore
-msgid "Save Course"
-msgstr "حفظ الدورة التدريبية"
-
-#: cms/templates/js/programs/course_run.underscore
-#, python-format
-msgid "Run %(key)s"
-msgstr " %(key)s المسار"
-
-#: cms/templates/js/programs/course_run.underscore
-msgid "Delete course run"
-msgstr "حذف مسار الدورة التدريبية"
-
-#: cms/templates/js/programs/course_run.underscore
-#, python-format
-msgid "Remove run %(key)s from the program"
-msgstr "إزالة %(key)s المسار من البرنامج "
-
-#: cms/templates/js/programs/course_run.underscore
-#, python-format
-msgid "Start Date: %(date)s"
-msgstr "تاريخ البدء: %(date)s"
-
-#: cms/templates/js/programs/course_run.underscore
-#, python-format
-msgid "Mode: %(mode)s"
-msgstr "الوضع: %(mode)s"
-
-#: cms/templates/js/programs/course_run.underscore
-msgid "Please select a Course Run"
-msgstr "يرجى تحديد مسار للدورة التدريبية"
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "Create a New Program"
-msgstr "إنشاء برنامج جديد"
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "Program type"
-msgstr "نوع البرنامج"
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "Select a type"
-msgstr "حدد نوعًا"
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "XSeries"
-msgstr "XSeries"
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "MicroMasters"
-msgstr "MicroMasters"
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "Select an organization"
-msgstr "حدد منظمة"
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "The public display name of the program."
-msgstr "اسم العرض العام للبرنامج."
-
-#: cms/templates/js/programs/program_creator_form.underscore
-#: cms/templates/js/programs/program_details.underscore
-msgid "Subtitle"
-msgstr "عنوان فرعي"
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid ""
-"A short description of the program, including concepts covered and expected "
-"outcomes (255 character limit)."
-msgstr ""
-"وصف موجز للبرنامج، بما في ذلك المفاهيم المشمولة والنتائج المتوقعة (255 عدد "
-"الأحرف المسموح بها)."
-
-#: cms/templates/js/programs/program_creator_form.underscore
-#: cms/templates/js/programs/program_details.underscore
-msgid "Marketing Slug"
-msgstr "الشارة التسويقية"
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "Slug used to generate links to the marketing site."
-msgstr "الشارة تستخدم لإنشاء روابط إلى الموقع التسويقي."
-
-#: cms/templates/js/programs/program_details.underscore
-msgid "Edit the program title"
-msgstr "تحرير عنوان البرنامج"
-
-#: cms/templates/js/programs/program_details.underscore
-msgid "Edit the program\\'s name."
-msgstr "تحرر اسم البرنامج."
-
-#: cms/templates/js/programs/program_details.underscore
-msgid "Edit the program subtitle"
-msgstr "تحرير العنوان الفرعي للبرنامج."
-
-#: cms/templates/js/programs/program_details.underscore
-msgid "Edit the program\\'s subtitle."
-msgstr "تحرير العنوان الفرعي للبرنامج."
-
-#: cms/templates/js/programs/program_details.underscore
-msgid "Edit the program marketing slug"
-msgstr "تحرير الشارة التسويقية للبرنامج"
-
-#: cms/templates/js/programs/program_details.underscore
-msgid "Edit the program\\'s marketing slug."
-msgstr "تحرير الشارة التسويقية للبرنامج."
-
-#: cms/templates/js/programs/program_details.underscore
-msgid "Add a course"
-msgstr "إضافة دورة تدريبية"
+"تم إعادة تعيين الإصدار الفرعي المنشور {المنشور} على مسودة الإصدار الفرعي، "
+"{المسودة}. "
 
 #: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore
 msgid "Add URLs for additional versions"

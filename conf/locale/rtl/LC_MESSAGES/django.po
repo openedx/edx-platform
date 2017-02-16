@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-02-02 19:34+0000\n"
-"PO-Revision-Date: 2017-02-02 19:34:37.395873\n"
+"POT-Creation-Date: 2017-02-16 16:00+0000\n"
+"PO-Revision-Date: 2017-02-16 16:00:24.686105\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -396,10 +396,6 @@ msgstr "ش ذخعرفقغ هس قثضعهقثي"
 #: common/djangoapps/student/forms.py
 msgid "To enroll, you must follow the honor code."
 msgstr "فخ ثرقخمم, غخع وعسف بخممخص فاث اخرخق ذخيث."
-
-#: common/djangoapps/student/forms.py
-msgid "You must consent to data sharing to register."
-msgstr "غخع وعسف ذخرسثرف فخ يشفش ساشقهرل فخ قثلهسفثق."
 
 #: common/djangoapps/student/forms.py
 msgid "You are missing one or more required fields"
@@ -797,6 +793,12 @@ msgstr "فاث حقخدهيثي شذذثسس_فخنثر هس شمقثشيغ شس
 #: common/djangoapps/student/views.py
 msgid "The provided access_token is not valid."
 msgstr "فاث حقخدهيثي شذذثسس_فخنثر هس رخف دشمهي."
+
+#: common/djangoapps/student/views.py
+#: openedx/core/djangoapps/user_api/accounts/api.py
+#: openedx/core/djangoapps/user_api/views.py
+msgid "Account creation not allowed."
+msgstr "شذذخعرف ذقثشفهخر رخف شممخصثي."
 
 #: common/djangoapps/student/views.py
 msgid "Unknown error. Please e-mail us to let us know how it happened."
@@ -1265,24 +1267,6 @@ msgstr "رخدثوزثق"
 msgctxt "month name"
 msgid "December"
 msgstr "يثذثوزثق"
-
-#: common/djangoapps/util/enterprise_helpers.py
-msgid ""
-"I agree to allow {platform_name} to share data about my enrollment, "
-"completion and performance in all {platform_name} courses and programs where"
-" my enrollment is sponsored by {ec_name}."
-msgstr ""
-"ه شلقثث فخ شممخص {platform_name} فخ ساشقث يشفش شزخعف وغ ثرقخمموثرف, "
-"ذخوحمثفهخر شري حثقبخقوشرذث هر شمم {platform_name} ذخعقسثس شري حقخلقشوس صاثقث"
-" وغ ثرقخمموثرف هس سحخرسخقثي زغ {ec_name}."
-
-#: common/djangoapps/util/enterprise_helpers.py
-msgid ""
-"To link your account with {ec_name}, you are required to consent to data "
-"sharing."
-msgstr ""
-"فخ مهرن غخعق شذذخعرف صهفا {ec_name}, غخع شقث قثضعهقثي فخ ذخرسثرف فخ يشفش "
-"ساشقهرل."
 
 #: common/djangoapps/util/file.py
 msgid "The file must end with the extension '{file_types}'."
@@ -5453,7 +5437,7 @@ msgid "Upgrade to Verified Certificate"
 msgstr "عحلقشيث فخ دثقهبهثي ذثقفهبهذشفث"
 
 #: lms/djangoapps/courseware/date_summary.py
-#: cms/templates/group_configurations.html
+#: cms/templates/group_configurations.html lms/templates/courseware/info.html
 msgid "Learn More"
 msgstr "مثشقر وخقث"
 
@@ -11016,14 +11000,6 @@ msgstr "لعهيثي يهسذعسسهخر"
 msgid "Hide Annotations"
 msgstr "اهيث شررخفشفهخرس"
 
-#: lms/templates/bookmark_button.html
-msgid "Click to remove"
-msgstr "ذمهذن فخ قثوخدث"
-
-#: lms/templates/bookmark_button.html
-msgid "Click to add"
-msgstr "ذمهذن فخ شيي"
-
 #: lms/templates/bookmark_button.html lms/templates/seq_module.html
 msgid "Bookmarked"
 msgstr "زخخنوشقنثي"
@@ -14249,6 +14225,18 @@ msgid "View Updates in Studio"
 msgstr "دهثص عحيشفثس هر سفعيهخ"
 
 #: lms/templates/courseware/info.html
+msgid "Give yourself an additional incentive to complete"
+msgstr "لهدث غخعقسثمب شر شييهفهخرشم هرذثرفهدث فخ ذخوحمثفث"
+
+#: lms/templates/courseware/info.html
+msgid "Earn a verified certificate."
+msgstr "ثشقر ش دثقهبهثي ذثقفهبهذشفث."
+
+#: lms/templates/courseware/info.html
+msgid "Upgrade Now"
+msgstr "عحلقشيث رخص"
+
+#: lms/templates/courseware/info.html
 msgid "Course Updates and News"
 msgstr "ذخعقسث عحيشفثس شري رثصس"
 
@@ -14976,19 +14964,19 @@ msgstr "بهمفثق:"
 
 #. Translators: This is a menu option for showing all forum threads unfiltered
 #: lms/templates/discussion/_thread_list_template.html
-msgid "Show all"
-msgstr "ساخص شمم"
+msgid "Show all posts"
+msgstr "ساخص شمم حخسفس"
 
 #. Translators: This is a menu option for showing only unread forum threads
 #: lms/templates/discussion/_thread_list_template.html
-msgid "Unread"
-msgstr "عرقثشي"
+msgid "Unread posts"
+msgstr "عرقثشي حخسفس"
 
 #. Translators: This is a menu option for showing only unanswered forum
 #. question threads
 #: lms/templates/discussion/_thread_list_template.html
-msgid "Unanswered"
-msgstr "عرشرسصثقثي"
+msgid "Unanswered posts"
+msgstr "عرشرسصثقثي حخسفس"
 
 #. Translators: This is a menu option for showing only forum threads flagged
 #. for abuse
@@ -18715,6 +18703,10 @@ msgstr "ذاشرلثس"
 #: lms/templates/wiki/includes/article_menu.html
 msgid "{span_start}active{span_end}"
 msgstr "{span_start}شذفهدث{span_end}"
+
+#: lms/templates/wiki/includes/breadcrumbs.html
+msgid "Course Wiki"
+msgstr "ذخعقسث صهنه"
 
 #: lms/templates/wiki/includes/breadcrumbs.html
 msgid "Add article"
@@ -22612,8 +22604,8 @@ msgid "Article unlocked for editing"
 msgstr "شقفهذمث عرمخذنثي بخق ثيهفهرل"
 
 #: wiki/forms.py
-msgid "Filter..."
-msgstr "بهمفثق..."
+msgid "Filter"
+msgstr "بهمفثق"
 
 #: wiki/core/plugins/base.py
 msgid "Settings for plugin"
