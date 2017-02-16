@@ -76,8 +76,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-01-23 17:57+0000\n"
-"PO-Revision-Date: 2017-01-31 08:32+0000\n"
+"POT-Creation-Date: 2017-02-03 18:49+0000\n"
+"PO-Revision-Date: 2017-02-05 14:14+0000\n"
 "Last-Translator: qualityalltext <quality@alltext.co.il>\n"
 "Language-Team: Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)\n"
 "MIME-Version: 1.0\n"
@@ -5181,6 +5181,10 @@ msgstr "מצוין בשניות. אפשר אחסון במטמון על ידי ה
 #: lms/djangoapps/commerce/models.py
 msgid "Path to order receipt page."
 msgstr "נתיב לעמוד הקבלה להזמנה."
+
+#: lms/djangoapps/commerce/models.py
+msgid "Automatically approve valid refund requests, without manual processing"
+msgstr ""
 
 #: lms/djangoapps/commerce/signals.py
 msgid ""
@@ -10418,13 +10422,6 @@ msgstr "מספר הקורס"
 msgid "Courses"
 msgstr "קורסים"
 
-#: cms/templates/index.html cms/templates/widgets/header.html
-#: lms/templates/navigation.html lms/templates/learner_dashboard/programs.html
-#: themes/edx.org/lms/templates/header.html
-#: themes/red-theme/lms/templates/header.html
-msgid "Programs"
-msgstr "תכניות"
-
 #: cms/templates/login.html cms/templates/widgets/header.html
 #: themes/red-theme/cms/templates/login.html
 msgid "Sign In"
@@ -11411,6 +11408,12 @@ msgstr "גלובלי"
 #: themes/red-theme/lms/templates/header.html
 msgid "{platform_name} Home Page"
 msgstr "{platform_name} עמוד הבית"
+
+#: lms/templates/navigation.html lms/templates/learner_dashboard/programs.html
+#: themes/edx.org/lms/templates/header.html
+#: themes/red-theme/lms/templates/header.html
+msgid "Programs"
+msgstr "תכניות"
 
 #. Translators: This is short for "System administration".
 #: lms/templates/navigation.html themes/red-theme/lms/templates/header.html
@@ -14583,19 +14586,19 @@ msgstr "סנן:"
 
 #. Translators: This is a menu option for showing all forum threads unfiltered
 #: lms/templates/discussion/_thread_list_template.html
-msgid "Show all"
-msgstr "הצג הכל"
+msgid "Show all posts"
+msgstr "הראה את כל הפוסטים"
 
 #. Translators: This is a menu option for showing only unread forum threads
 #: lms/templates/discussion/_thread_list_template.html
-msgid "Unread"
-msgstr "לא נקרא"
+msgid "Unread posts"
+msgstr "פוסטים שלא נקראו"
 
 #. Translators: This is a menu option for showing only unanswered forum
 #. question threads
 #: lms/templates/discussion/_thread_list_template.html
-msgid "Unanswered"
-msgstr "לא נענה"
+msgid "Unanswered posts"
+msgstr "פוסטים שלא נענו"
 
 #. Translators: This is a menu option for showing only forum threads flagged
 #. for abuse
@@ -18207,6 +18210,10 @@ msgid "{span_start}active{span_end}"
 msgstr "{span_start}פעיל{span_end}"
 
 #: lms/templates/wiki/includes/breadcrumbs.html
+msgid "Course Wiki"
+msgstr "קורס Wiki"
+
+#: lms/templates/wiki/includes/breadcrumbs.html
 msgid "Add article"
 msgstr "הוסף מאמר"
 
@@ -18743,6 +18750,8 @@ msgid ""
 "To create a link to this unit from an HTML component in this course, enter "
 "\"/jump_to_id/<location ID>\" as the URL value."
 msgstr ""
+"על מנת ליצור קישור ליחידה זו מרכיב HTML בקורס זה, הכנס "
+"\"/jump_to_id/<location ID>\"  כערך URL."
 
 #: cms/templates/container.html
 msgid "Location in Course Outline"
@@ -18831,10 +18840,11 @@ msgstr "לדוגמה: CS101"
 #: cms/templates/course-create-rerun.html
 msgid ""
 "The unique number that identifies the new course within the organization.  "
-"(This number is often the same as the original course number.)"
+"(This number will be the same as the original course number and cannot be "
+"changed.)"
 msgstr ""
-"המספר הייחודי המזהה את הקורס החדש בתוך הארגון.  (לרוב מספר זה זהה  למספר "
-"הקורס המקורי)."
+"המספר הייחודי המזהה את הקורס החדש בתוך הארגון. (מספר זה יהיה זהה למספר הקורס"
+" המקורי ולא ישתנה)."
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/settings.html
@@ -20087,10 +20097,6 @@ msgid "New Library"
 msgstr "ספריה חדשה"
 
 #: cms/templates/index.html
-msgid "New Program"
-msgstr "תכנית חדשה"
-
-#: cms/templates/index.html
 msgid "Please correct the highlighted fields below."
 msgstr "נא תקן את השדות המודגשים מטה"
 
@@ -20375,18 +20381,6 @@ msgstr ""
 "קורסים. צור את הספריה הראשונה שלך בלחיצת כפתור!"
 
 #: cms/templates/index.html
-msgid "You haven't created any programs yet."
-msgstr "לא יצרת עדיין שום תכניות."
-
-#: cms/templates/index.html
-msgid "Programs are groups of courses related to a common subject."
-msgstr "תכניות הן קבוצות של קורסים בעלי נושא משותף."
-
-#: cms/templates/index.html
-msgid "Create Your First Program"
-msgstr "צור את התוכנית הראשונה שלך"
-
-#: cms/templates/index.html
 msgid "New to {studio_name}?"
 msgstr "משתמש חדש ב{studio_name}?"
 
@@ -20667,10 +20661,6 @@ msgid ""
 msgstr ""
 "למנהלי ספריה יש זכויות עריכה מלאות והם יכולים גם להוסיף ולהסיר חברי צוות "
 "אחרים. בספריה חייב להיות לפחות משתמש אחד בתפקיד מנהל."
-
-#: cms/templates/program_authoring.html cms/templates/widgets/header.html
-msgid "Program Administration"
-msgstr "מינהל התכנית"
 
 #: cms/templates/register.html cms/templates/widgets/header.html
 msgid "Sign Up"
@@ -21481,6 +21471,9 @@ msgid ""
 "format on this page, an automated process creates those additional formats "
 "and stores them for you."
 msgstr ""
+"על מנת שסרטון וידאו יוכל להתנגן במכשירים שונים, עליו להיות זמין במספר "
+"פורמטים. לאחר העלאת קובץ הווידאו המקורי בפורמט {file_formats} שבעמוד זה, "
+"תהליך אוטומטי ייצור פורמטים נוספים ויאחסן אותם עבורך."
 
 #: cms/templates/videos_index.html
 msgid "Maximum Video File Size"
@@ -21491,6 +21484,8 @@ msgid ""
 "The maximum size for each video file that you upload is {em_start}5 "
 "GB{em_end}. The upload process fails for larger files."
 msgstr ""
+"הגודל המקסימלי לכל קובץ וידאו שניתן להעלות הוא {em_start} 5 GB {em_end}. "
+"תהליך ההעלאה ייכשל עבור קבצים גדולים יותר."
 
 #: cms/templates/videos_index.html
 msgid "Monitoring files as they upload"
@@ -21545,6 +21540,13 @@ msgid ""
 " as soon as its status is {em_start}Ready{em_end}, although processing may "
 "not be complete for all encodings and all video hosting sites."
 msgstr ""
+"כאשר סטטוס הקובץ הוא {em_start}מוכן{em_end}, תוכל להוסיף את קובץ הווידאו "
+"לרכיב שבקורס שלך. העתק מזהה סרטון וידאו ייחודי. בחלון דפדפן אחר, בדף 'תרשים "
+"הקורס', צור או אתר רכיב וידאו כדי להפעיל את סרטון הווידאו הזה. ערוך את רכיב "
+"הווידאו כדי להדביק את המזהה בשדה ההגדרה המתקדמת {em_start}מזהה סרטון "
+"וידאו{em_end}. סרטון הווידאו יכול להיות מופעל במערכת ניהול הלמידה ברגע "
+"שהסטטוס שלו הוא {em_start}מוכן{em_end}, אף על פי שהעיבוד לא הושלם עבור כל "
+"הקידודים וכל אתרי האירוח של הווידאו."
 
 #: cms/templates/visibility_editor.html
 msgid "No content groups exist"
