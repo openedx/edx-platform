@@ -251,7 +251,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-01-23 17:57+0000\n"
+"POT-Creation-Date: 2017-02-03 18:49+0000\n"
 "PO-Revision-Date: 2016-10-24 19:45+0000\n"
 "Last-Translator: Monica Farias <monifar.tp@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"
@@ -5457,6 +5457,10 @@ msgstr ""
 
 #: lms/djangoapps/commerce/models.py
 msgid "Path to order receipt page."
+msgstr ""
+
+#: lms/djangoapps/commerce/models.py
+msgid "Automatically approve valid refund requests, without manual processing"
 msgstr ""
 
 #: lms/djangoapps/commerce/signals.py
@@ -10838,13 +10842,6 @@ msgstr "Número do curso:"
 msgid "Courses"
 msgstr "Cursos"
 
-#: cms/templates/index.html cms/templates/widgets/header.html
-#: lms/templates/navigation.html lms/templates/learner_dashboard/programs.html
-#: themes/edx.org/lms/templates/header.html
-#: themes/red-theme/lms/templates/header.html
-msgid "Programs"
-msgstr ""
-
 #: cms/templates/login.html cms/templates/widgets/header.html
 #: themes/red-theme/cms/templates/login.html
 msgid "Sign In"
@@ -11829,6 +11826,12 @@ msgstr "Global"
 #: themes/red-theme/lms/templates/header.html
 msgid "{platform_name} Home Page"
 msgstr "Página inicial do {platform_name} "
+
+#: lms/templates/navigation.html lms/templates/learner_dashboard/programs.html
+#: themes/edx.org/lms/templates/header.html
+#: themes/red-theme/lms/templates/header.html
+msgid "Programs"
+msgstr ""
 
 #. Translators: This is short for "System administration".
 #: lms/templates/navigation.html themes/red-theme/lms/templates/header.html
@@ -14852,19 +14855,19 @@ msgstr "Filtrar:"
 
 #. Translators: This is a menu option for showing all forum threads unfiltered
 #: lms/templates/discussion/_thread_list_template.html
-msgid "Show all"
-msgstr "Mostrar todos"
+msgid "Show all posts"
+msgstr ""
 
 #. Translators: This is a menu option for showing only unread forum threads
 #: lms/templates/discussion/_thread_list_template.html
-msgid "Unread"
-msgstr "Não lido"
+msgid "Unread posts"
+msgstr ""
 
 #. Translators: This is a menu option for showing only unanswered forum
 #. question threads
 #: lms/templates/discussion/_thread_list_template.html
-msgid "Unanswered"
-msgstr "Não respondida"
+msgid "Unanswered posts"
+msgstr ""
 
 #. Translators: This is a menu option for showing only forum threads flagged
 #. for abuse
@@ -18589,6 +18592,10 @@ msgid "{span_start}active{span_end}"
 msgstr "{span_start}ativo{span_end}"
 
 #: lms/templates/wiki/includes/breadcrumbs.html
+msgid "Course Wiki"
+msgstr ""
+
+#: lms/templates/wiki/includes/breadcrumbs.html
 msgid "Add article"
 msgstr "Adicionar artigo"
 
@@ -19229,10 +19236,9 @@ msgstr "por exemplo, CS101"
 #: cms/templates/course-create-rerun.html
 msgid ""
 "The unique number that identifies the new course within the organization.  "
-"(This number is often the same as the original course number.)"
+"(This number will be the same as the original course number and cannot be "
+"changed.)"
 msgstr ""
-"Número único que identifica o novo curso dentro da organização. (O mais "
-"comum é esse número ser o mesmo do curso original)"
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/settings.html
@@ -20528,10 +20534,6 @@ msgid "New Library"
 msgstr "Nova biblioteca"
 
 #: cms/templates/index.html
-msgid "New Program"
-msgstr "Novo programa"
-
-#: cms/templates/index.html
 msgid "Please correct the highlighted fields below."
 msgstr "Por favor corrija os campos em destaque abaixo. "
 
@@ -20814,18 +20816,6 @@ msgid ""
 msgstr ""
 "Bibliotecas possuem uma conjunto de componentes que podem ser reutilizados "
 "por múltiplos cursos. Crie sua primeira biblioteca com um clique."
-
-#: cms/templates/index.html
-msgid "You haven't created any programs yet."
-msgstr "Você ainda não criou nenhum programa."
-
-#: cms/templates/index.html
-msgid "Programs are groups of courses related to a common subject."
-msgstr "Programas são grupos de cursos relacionados a um assunto comum."
-
-#: cms/templates/index.html
-msgid "Create Your First Program"
-msgstr "Criar seu primeiro programa."
 
 #: cms/templates/index.html
 msgid "New to {studio_name}?"
@@ -21120,10 +21110,6 @@ msgstr ""
 "Administradores da Biblioteca possuem privilégios plenos para edição e podem"
 " também adicionar e remover outros membros da equipe. Deve haver pelo menos "
 "um usuário com privilégios de Administrador em uma biblioteca."
-
-#: cms/templates/program_authoring.html cms/templates/widgets/header.html
-msgid "Program Administration"
-msgstr "Administração do Programa"
 
 #: cms/templates/register.html cms/templates/widgets/header.html
 msgid "Sign Up"

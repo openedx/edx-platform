@@ -124,7 +124,7 @@
 # INARES <contact@inares.org>, 2015
 # Kévin SEVERIN <kevin.severin@laposte.net>, 2015
 # Laetitia Pfaender <l.pfaender@learning-tribes.com>, 2016
-# laurentFUN <laurent.at.fun@gmail.com>, 2016
+# laurentFUN <laurent.at.fun@gmail.com>, 2016-2017
 # laurentFUN <laurent.at.fun@gmail.com>, 2016
 # Linda B.A <siria242@gmail.com>, 2016
 # Marie-Andrée Coulombe <coulombe.ma@gmail.com>, 2014
@@ -163,8 +163,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-01-23 17:56+0000\n"
-"PO-Revision-Date: 2017-01-23 18:00+0000\n"
+"POT-Creation-Date: 2017-02-03 18:48+0000\n"
+"PO-Revision-Date: 2017-02-03 18:57+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: French (http://www.transifex.com/open-edx/edx-platform/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -216,9 +216,8 @@ msgstr "Supprimer"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/certificates/views/signatory_editor.js
-#: cms/static/js/factories/export.js
-#: cms/static/js/programs/views/program_details_view.js
-#: cms/static/js/views/asset.js cms/static/js/views/course_info_update.js
+#: cms/static/js/factories/export.js cms/static/js/views/asset.js
+#: cms/static/js/views/course_info_update.js
 #: cms/static/js/views/manage_users_and_roles.js
 #: cms/static/js/views/modals/base_modal.js
 #: cms/static/js/views/modals/course_outline_modals.js
@@ -238,7 +237,6 @@ msgstr "Supprimer"
 #: cms/templates/js/section-name-edit.underscore
 #: cms/templates/js/signatory-actions.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
-#: cms/templates/js/programs/program_creator_form.underscore
 #: common/static/common/templates/discussion/new-post.underscore
 #: common/static/common/templates/discussion/response-comment-edit.underscore
 #: common/static/common/templates/discussion/thread-edit.underscore
@@ -278,8 +276,6 @@ msgstr "Fermer"
 #: cms/templates/js/course-instructor-details.underscore
 #: cms/templates/js/previous-video-upload-list.underscore
 #: cms/templates/js/signatory-details.underscore
-#: cms/templates/js/programs/program_creator_form.underscore
-#: cms/templates/js/programs/program_details.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Name"
 msgstr "Nom"
@@ -2601,7 +2597,6 @@ msgstr "Équipes"
 #: cms/templates/js/certificate-editor.underscore
 #: cms/templates/js/content-group-editor.underscore
 #: cms/templates/js/group-configuration-editor.underscore
-#: cms/templates/js/programs/program_creator_form.underscore
 msgid "Create"
 msgstr "Créer"
 
@@ -4168,7 +4163,7 @@ msgstr "[aucun tag]"
 
 #: lms/static/js/financial-assistance/views/financial_assistance_form_view.js
 msgid "Unable to submit application"
-msgstr ""
+msgstr "Impossible de soumettre votre demande"
 
 #: lms/static/js/financial-assistance/views/financial_assistance_form_view.js
 #: lms/static/js/student_account/views/LoginView.js
@@ -4580,11 +4575,11 @@ msgstr "Chargement de vos cours"
 #: lms/static/js/student_account/views/FormView.js
 #: lms/static/js/student_account/views/RegisterView.js
 msgid "An error occurred."
-msgstr ""
+msgstr "Une erreur est survenue."
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid "We couldn't sign you in."
-msgstr ""
+msgstr "Nous n'avons pas pu vous connecter."
 
 #: lms/static/js/student_account/views/LoginView.js
 #, c-format
@@ -4620,17 +4615,19 @@ msgstr ""
 
 #: lms/static/js/student_account/views/RegisterView.js
 msgid "We couldn't create your account."
-msgstr ""
+msgstr "Nous n'avons pas pu créer votre compte."
 
 #: lms/static/js/student_account/views/RegisterView.js
 msgid "You've successfully signed into %(currentProvider)s."
-msgstr ""
+msgstr "Vous êtes connectés avec succès avec %(currentProvider)s."
 
 #: lms/static/js/student_account/views/RegisterView.js
 msgid ""
 "We just need a little more information before you start learning with "
 "%(platformName)s."
 msgstr ""
+"Nous avons juste besoin d'un peu plus d'informations avant que vous "
+"commenciez votre apprentissage avec %(platformName)s."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Basic Account Information"
@@ -5400,7 +5397,6 @@ msgstr ""
 
 #: cms/static/js/factories/manage_users.js
 #: cms/static/js/factories/manage_users_lib.js
-#: common/static/common/templates/discussion/post-user-display.underscore
 #: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "Staff"
 msgstr "Équipe pédagogique"
@@ -5607,113 +5603,6 @@ msgstr "ou"
 #: cms/static/js/models/xblock_validation.js
 msgid "This component has validation issues."
 msgstr "Ce composant a des problèmes de validation."
-
-#: cms/static/js/programs/models/course_model.js
-msgid "Course Code"
-msgstr "Code de cours"
-
-#: cms/static/js/programs/models/course_model.js
-#: cms/templates/js/certificate-details.underscore
-#: cms/templates/js/certificate-editor.underscore
-#: cms/templates/js/programs/course_details.underscore
-msgid "Course Title"
-msgstr "Titre du cours"
-
-#: cms/static/js/programs/models/program_model.js
-msgid "Please select a valid organization."
-msgstr "Veuillez sélectionner une organisation valide, s'il vous plaît."
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} is required"
-msgstr "{0} est obligatoire"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be accepted"
-msgstr "{0} doit être accepté"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be greater than or equal to {1}"
-msgstr "{0} doit être supérieur ou égal à {1}"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be less than or equal to {1}"
-msgstr "{0} doit être inférieur ou égal à {1}"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be between {1} and {2}"
-msgstr "{0} doit être entre {1} et {2}"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be {1} characters"
-msgstr "{0} doit être {1} caractères"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be at least {1} characters"
-msgstr "{0} doit être d'au moins {1} caractères"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be at most {1} characters"
-msgstr "{0} doit être d'au plus {1} caractères"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be between {1} and {2} characters"
-msgstr "{0} doit être entre {1} et {2} caractères"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be one of: {1}"
-msgstr "{0} doit être l'un de : {1}"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be the same as {1}"
-msgstr "{0} doit être identique à {1}"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must only contain digits"
-msgstr "{0} doit seulement contenir des chiffres"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be a number"
-msgstr "{0} doit être un nombre"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be a valid email"
-msgstr "{0} doit être une adresse email valide"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be a valid url"
-msgstr "{0} doit être une URL valide"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} is invalid"
-msgstr "{0} est invalide"
-
-#: cms/static/js/programs/views/program_details_view.js
-msgid "confirm"
-msgstr "confirmer"
-
-#: cms/static/js/programs/views/program_details_view.js
-msgid "Publish this program?"
-msgstr "Publier ce programme ?"
-
-#: cms/static/js/programs/views/program_details_view.js
-msgid ""
-"After you publish this program, you cannot add or remove course codes or "
-"remove course runs."
-msgstr ""
-"Après la publication de ce programme, vous ne pouvez plus ajouter ou "
-"supprimer des codes de cours or supprimer des instances de cours."
-
-#: cms/static/js/programs/views/program_details_view.js
-#: cms/static/js/views/modals/course_outline_modals.js
-#: cms/templates/js/course-outline.underscore
-#: cms/templates/js/publish-xblock.underscore
-#: cms/templates/js/programs/program_details.underscore
-msgid "Publish"
-msgstr "Publier"
-
-#: cms/static/js/programs/views/program_details_view.js
-msgid "Marketing Slug is required."
-msgstr "L'identifiant marketing est obligatoire."
 
 #: cms/static/js/views/active_video_upload.js cms/static/js/views/assets.js
 msgid "Your file could not be uploaded"
@@ -6052,6 +5941,12 @@ msgstr "Publier {display_name}"
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Publish all unpublished changes for this {item}?"
 msgstr "Publier toutes les modifications non publiées pour cet {item} ?"
+
+#: cms/static/js/views/modals/course_outline_modals.js
+#: cms/templates/js/course-outline.underscore
+#: cms/templates/js/publish-xblock.underscore
+msgid "Publish"
+msgstr "Publier"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Basic"
@@ -6460,7 +6355,6 @@ msgstr "Mise à jour des étiquettes"
 
 #: cms/templates/js/asset-library.underscore
 #: cms/templates/js/basic-modal.underscore
-#: cms/templates/js/programs/confirm_modal.underscore
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
 msgid "Actions"
 msgstr "Actions"
@@ -6606,12 +6500,12 @@ msgid "All Groups"
 msgstr "Tous les groupes"
 
 #: common/static/common/templates/discussion/new-post.underscore
-#: common/static/common/templates/discussion/thread-edit.underscore
-msgid "Add a clear and descriptive title to encourage participation."
-msgstr "Ajouter un titre clair et explicite pour encourager la participation."
+msgid ""
+"Add a clear and descriptive title to encourage participation. (Required)"
+msgstr ""
 
 #: common/static/common/templates/discussion/new-post.underscore
-msgid "Your question or idea"
+msgid "Your question or idea (required)"
 msgstr ""
 
 #: common/static/common/templates/discussion/new-post.underscore
@@ -6634,9 +6528,12 @@ msgid "Submit"
 msgstr "Soumettre"
 
 #: common/static/common/templates/discussion/post-user-display.underscore
-#: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "Community TA"
-msgstr "Assistant communauté d'apprentissage"
+msgid "(Community TA)"
+msgstr ""
+
+#: common/static/common/templates/discussion/post-user-display.underscore
+msgid "(Staff)"
+msgstr ""
 
 #: common/static/common/templates/discussion/profile-thread.underscore
 #: common/static/common/templates/discussion/thread.underscore
@@ -6671,6 +6568,10 @@ msgid "Editing post"
 msgstr "Message en cours d'édition"
 
 #: common/static/common/templates/discussion/thread-edit.underscore
+msgid "Add a clear and descriptive title to encourage participation."
+msgstr "Ajouter un titre clair et explicite pour encourager la participation."
+
+#: common/static/common/templates/discussion/thread-edit.underscore
 msgid "Edit your post below."
 msgstr ""
 
@@ -6698,6 +6599,10 @@ msgstr "Épinglé"
 #: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "Following"
 msgstr "Suivi"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+msgid "Community TA"
+msgstr "Assistant communauté d'apprentissage"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "{unread_comments_count} new"
@@ -6786,10 +6691,8 @@ msgstr "Type de message"
 #: common/static/common/templates/discussion/thread-type.underscore
 msgid ""
 "Questions raise issues that need answers. Discussions share ideas and start "
-"conversations."
+"conversations. (Required)"
 msgstr ""
-"Les Questions soulèvent des problèmes qui appellent une réponse. Les "
-"Discussions partagent des idées et lancent des conversations."
 
 #: common/static/common/templates/discussion/thread-type.underscore
 msgid "Question"
@@ -6812,8 +6715,8 @@ msgid "Topic area"
 msgstr ""
 
 #: common/static/common/templates/discussion/topic.underscore
-msgid "Add your post to a relevant topic to help others find it."
-msgstr "Associer un sujet au post pour en faciliter la recherche."
+msgid "Add your post to a relevant topic to help others find it. (Required)"
+msgstr ""
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Discussion Home"
@@ -6835,7 +6738,7 @@ msgstr "Utilisez le menu 'Tous les sujets' pour trouver un sujet spécific"
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 #: lms/djangoapps/discussion/static/discussion/templates/search.underscore
 msgid "Search all posts"
-msgstr "Rechercher…"
+msgstr "Rechercher tous les messages"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Filter and sort topics"
@@ -8806,6 +8709,11 @@ msgstr "Détails du certificat"
 
 #: cms/templates/js/certificate-details.underscore
 #: cms/templates/js/certificate-editor.underscore
+msgid "Course Title"
+msgstr "Titre du cours"
+
+#: cms/templates/js/certificate-details.underscore
+#: cms/templates/js/certificate-editor.underscore
 msgid "Course Title Override"
 msgstr "Surcharge du Titre du Cours"
 
@@ -8990,7 +8898,6 @@ msgstr ""
 
 #: cms/templates/js/course-instructor-details.underscore
 #: cms/templates/js/signatory-details.underscore
-#: cms/templates/js/programs/program_creator_form.underscore
 msgid "Organization"
 msgstr "Organisation"
 
@@ -9833,140 +9740,6 @@ msgstr ""
 msgid ""
 "The published branch version, {published}, was reset to the draft branch "
 "version, {draft}."
-msgstr ""
-
-#: cms/templates/js/programs/course_details.underscore
-msgid "Delete course"
-msgstr ""
-
-#: cms/templates/js/programs/course_details.underscore
-#, python-format
-msgid "Remove %(name)s from the program"
-msgstr ""
-
-#: cms/templates/js/programs/course_details.underscore
-msgid "Add another run"
-msgstr ""
-
-#: cms/templates/js/programs/course_details.underscore
-msgid ""
-"The unique number that identifies your course within your organization, e.g."
-" CS101."
-msgstr ""
-
-#: cms/templates/js/programs/course_details.underscore
-msgid ""
-"The title entered here will override the title set for the individual run of"
-" the course. It will be displayed on the XSeries progress page and in "
-"marketing presentations."
-msgstr ""
-
-#: cms/templates/js/programs/course_details.underscore
-msgid "Save Course"
-msgstr ""
-
-#: cms/templates/js/programs/course_run.underscore
-#, python-format
-msgid "Run %(key)s"
-msgstr ""
-
-#: cms/templates/js/programs/course_run.underscore
-msgid "Delete course run"
-msgstr ""
-
-#: cms/templates/js/programs/course_run.underscore
-#, python-format
-msgid "Remove run %(key)s from the program"
-msgstr ""
-
-#: cms/templates/js/programs/course_run.underscore
-#, python-format
-msgid "Start Date: %(date)s"
-msgstr ""
-
-#: cms/templates/js/programs/course_run.underscore
-#, python-format
-msgid "Mode: %(mode)s"
-msgstr ""
-
-#: cms/templates/js/programs/course_run.underscore
-msgid "Please select a Course Run"
-msgstr ""
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "Create a New Program"
-msgstr ""
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "Program type"
-msgstr ""
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "Select a type"
-msgstr ""
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "XSeries"
-msgstr ""
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "MicroMasters"
-msgstr ""
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "Select an organization"
-msgstr ""
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "The public display name of the program."
-msgstr ""
-
-#: cms/templates/js/programs/program_creator_form.underscore
-#: cms/templates/js/programs/program_details.underscore
-msgid "Subtitle"
-msgstr ""
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid ""
-"A short description of the program, including concepts covered and expected "
-"outcomes (255 character limit)."
-msgstr ""
-
-#: cms/templates/js/programs/program_creator_form.underscore
-#: cms/templates/js/programs/program_details.underscore
-msgid "Marketing Slug"
-msgstr ""
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "Slug used to generate links to the marketing site."
-msgstr ""
-
-#: cms/templates/js/programs/program_details.underscore
-msgid "Edit the program title"
-msgstr ""
-
-#: cms/templates/js/programs/program_details.underscore
-msgid "Edit the program\\'s name."
-msgstr ""
-
-#: cms/templates/js/programs/program_details.underscore
-msgid "Edit the program subtitle"
-msgstr ""
-
-#: cms/templates/js/programs/program_details.underscore
-msgid "Edit the program\\'s subtitle."
-msgstr ""
-
-#: cms/templates/js/programs/program_details.underscore
-msgid "Edit the program marketing slug"
-msgstr ""
-
-#: cms/templates/js/programs/program_details.underscore
-msgid "Edit the program\\'s marketing slug."
-msgstr ""
-
-#: cms/templates/js/programs/program_details.underscore
-msgid "Add a course"
 msgstr ""
 
 #: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore

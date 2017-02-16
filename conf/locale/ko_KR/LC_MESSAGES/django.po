@@ -89,7 +89,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-01-23 17:57+0000\n"
+"POT-Creation-Date: 2017-02-03 18:49+0000\n"
 "PO-Revision-Date: 2016-11-25 05:04+0000\n"
 "Last-Translator: kmooc <shevious@gmail.com>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/open-edx/edx-platform/language/ko_KR/)\n"
@@ -4719,6 +4719,10 @@ msgstr ""
 
 #: lms/djangoapps/commerce/models.py
 msgid "Path to order receipt page."
+msgstr ""
+
+#: lms/djangoapps/commerce/models.py
+msgid "Automatically approve valid refund requests, without manual processing"
 msgstr ""
 
 #: lms/djangoapps/commerce/signals.py
@@ -9496,13 +9500,6 @@ msgstr "강좌 번호:"
 msgid "Courses"
 msgstr "강좌"
 
-#: cms/templates/index.html cms/templates/widgets/header.html
-#: lms/templates/navigation.html lms/templates/learner_dashboard/programs.html
-#: themes/edx.org/lms/templates/header.html
-#: themes/red-theme/lms/templates/header.html
-msgid "Programs"
-msgstr ""
-
 #: cms/templates/login.html cms/templates/widgets/header.html
 #: themes/red-theme/cms/templates/login.html
 msgid "Sign In"
@@ -10461,6 +10458,12 @@ msgstr "글로벌"
 #: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
 msgid "{platform_name} Home Page"
+msgstr ""
+
+#: lms/templates/navigation.html lms/templates/learner_dashboard/programs.html
+#: themes/edx.org/lms/templates/header.html
+#: themes/red-theme/lms/templates/header.html
+msgid "Programs"
 msgstr ""
 
 #. Translators: This is short for "System administration".
@@ -13325,19 +13328,19 @@ msgstr "필터:"
 
 #. Translators: This is a menu option for showing all forum threads unfiltered
 #: lms/templates/discussion/_thread_list_template.html
-msgid "Show all"
-msgstr "전체 보기"
+msgid "Show all posts"
+msgstr ""
 
 #. Translators: This is a menu option for showing only unread forum threads
 #: lms/templates/discussion/_thread_list_template.html
-msgid "Unread"
-msgstr "읽지 않음"
+msgid "Unread posts"
+msgstr ""
 
 #. Translators: This is a menu option for showing only unanswered forum
 #. question threads
 #: lms/templates/discussion/_thread_list_template.html
-msgid "Unanswered"
-msgstr "미응답"
+msgid "Unanswered posts"
+msgstr ""
 
 #. Translators: This is a menu option for showing only forum threads flagged
 #. for abuse
@@ -16769,6 +16772,10 @@ msgid "{span_start}active{span_end}"
 msgstr "{span_start}활성화됨{span_end}"
 
 #: lms/templates/wiki/includes/breadcrumbs.html
+msgid "Course Wiki"
+msgstr ""
+
+#: lms/templates/wiki/includes/breadcrumbs.html
 msgid "Add article"
 msgstr "글 쓰기"
 
@@ -17340,8 +17347,9 @@ msgstr "예: CS101"
 #: cms/templates/course-create-rerun.html
 msgid ""
 "The unique number that identifies the new course within the organization.  "
-"(This number is often the same as the original course number.)"
-msgstr "기관 안에서 새로운 강좌를 식별하는 고유 번호입니다. (이 숫자들은 강의 원래 번호와 동일합니다.)"
+"(This number will be the same as the original course number and cannot be "
+"changed.)"
+msgstr ""
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/settings.html
@@ -18505,10 +18513,6 @@ msgid "New Library"
 msgstr "새 콘텐츠 보관함"
 
 #: cms/templates/index.html
-msgid "New Program"
-msgstr ""
-
-#: cms/templates/index.html
 msgid "Please correct the highlighted fields below."
 msgstr "아래에 강조한 필드를 수정하세요."
 
@@ -18771,18 +18775,6 @@ msgstr ""
 "콘텐츠 보관함은 다양한 강좌에서 다시 사용할 수 있는 구성요소를 가지고 있습니다. 버튼 클릭 한 번으로 첫 콘텐츠 보관함을 만들어보세요!"
 
 #: cms/templates/index.html
-msgid "You haven't created any programs yet."
-msgstr ""
-
-#: cms/templates/index.html
-msgid "Programs are groups of courses related to a common subject."
-msgstr ""
-
-#: cms/templates/index.html
-msgid "Create Your First Program"
-msgstr ""
-
-#: cms/templates/index.html
 msgid "New to {studio_name}?"
 msgstr "{studio_name}에 처음 오셨나요?"
 
@@ -19041,10 +19033,6 @@ msgid ""
 msgstr ""
 "교수자는 콘텐츠 보관함의 전체 수정 권한을 가지며, 다른 강좌 운영팀 구성원을 추가하고 삭제할 수 있습니다. 이를 위해 보관함에 교수자가"
 " 최소 1명 이상 있어야 합니다.  "
-
-#: cms/templates/program_authoring.html cms/templates/widgets/header.html
-msgid "Program Administration"
-msgstr ""
 
 #: cms/templates/register.html cms/templates/widgets/header.html
 msgid "Sign Up"

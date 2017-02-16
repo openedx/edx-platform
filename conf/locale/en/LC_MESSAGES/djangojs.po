@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-02-02 19:33+0000\n"
-"PO-Revision-Date: 2017-02-02 19:34:37.831557\n"
+"POT-Creation-Date: 2017-02-16 15:58+0000\n"
+"PO-Revision-Date: 2017-02-16 16:00:25.099932\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -3563,15 +3563,7 @@ msgid "An error has occurred. Please try again."
 msgstr ""
 
 #: lms/static/js/bookmarks/views/bookmark_button.js
-msgid "Click to add"
-msgstr ""
-
-#: lms/static/js/bookmarks/views/bookmark_button.js
 msgid "Bookmark this page"
-msgstr ""
-
-#: lms/static/js/bookmarks/views/bookmark_button.js
-msgid "Click to remove"
 msgstr ""
 
 #: lms/static/js/ccx/schedule.js
@@ -4932,7 +4924,6 @@ msgstr ""
 
 #: cms/static/js/factories/manage_users.js
 #: cms/static/js/factories/manage_users_lib.js
-#: common/static/common/templates/discussion/post-user-display.underscore
 #: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "Staff"
 msgstr ""
@@ -5958,6 +5949,7 @@ msgid "All Groups"
 msgstr ""
 
 #: common/static/common/templates/discussion/new-post.underscore
+#: common/static/common/templates/discussion/thread-edit.underscore
 msgid ""
 "Add a clear and descriptive title to encourage participation. (Required)"
 msgstr ""
@@ -5986,8 +5978,11 @@ msgid "Submit"
 msgstr ""
 
 #: common/static/common/templates/discussion/post-user-display.underscore
-#: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "Community TA"
+msgid "(Community TA)"
+msgstr ""
+
+#: common/static/common/templates/discussion/post-user-display.underscore
+msgid "(Staff)"
 msgstr ""
 
 #: common/static/common/templates/discussion/profile-thread.underscore
@@ -6023,10 +6018,6 @@ msgid "Editing post"
 msgstr ""
 
 #: common/static/common/templates/discussion/thread-edit.underscore
-msgid "Add a clear and descriptive title to encourage participation."
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-edit.underscore
 msgid "Edit your post below."
 msgstr ""
 
@@ -6053,6 +6044,10 @@ msgstr ""
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "Following"
+msgstr ""
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+msgid "Community TA"
 msgstr ""
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
@@ -7078,7 +7073,7 @@ msgid "View Archived Course"
 msgstr ""
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
-msgid "not enrolled"
+msgid "Not Enrolled"
 msgstr ""
 
 #: lms/templates/learner_dashboard/course_enroll.underscore

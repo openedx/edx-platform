@@ -181,8 +181,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-01-23 17:56+0000\n"
-"PO-Revision-Date: 2017-01-23 18:00+0000\n"
+"POT-Creation-Date: 2017-02-03 18:48+0000\n"
+"PO-Revision-Date: 2017-02-03 18:57+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -234,9 +234,8 @@ msgstr "删除"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/certificates/views/signatory_editor.js
-#: cms/static/js/factories/export.js
-#: cms/static/js/programs/views/program_details_view.js
-#: cms/static/js/views/asset.js cms/static/js/views/course_info_update.js
+#: cms/static/js/factories/export.js cms/static/js/views/asset.js
+#: cms/static/js/views/course_info_update.js
 #: cms/static/js/views/manage_users_and_roles.js
 #: cms/static/js/views/modals/base_modal.js
 #: cms/static/js/views/modals/course_outline_modals.js
@@ -256,7 +255,6 @@ msgstr "删除"
 #: cms/templates/js/section-name-edit.underscore
 #: cms/templates/js/signatory-actions.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
-#: cms/templates/js/programs/program_creator_form.underscore
 #: common/static/common/templates/discussion/new-post.underscore
 #: common/static/common/templates/discussion/response-comment-edit.underscore
 #: common/static/common/templates/discussion/thread-edit.underscore
@@ -296,8 +294,6 @@ msgstr "关闭"
 #: cms/templates/js/course-instructor-details.underscore
 #: cms/templates/js/previous-video-upload-list.underscore
 #: cms/templates/js/signatory-details.underscore
-#: cms/templates/js/programs/program_creator_form.underscore
-#: cms/templates/js/programs/program_details.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Name"
 msgstr "名称"
@@ -5059,7 +5055,6 @@ msgstr "您确定要从“{container}”的课程团队中删除{email}？"
 
 #: cms/static/js/factories/manage_users.js
 #: cms/static/js/factories/manage_users_lib.js
-#: common/static/common/templates/discussion/post-user-display.underscore
 #: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "Staff"
 msgstr "教员"
@@ -5248,109 +5243,6 @@ msgstr "或者"
 #: cms/static/js/models/xblock_validation.js
 msgid "This component has validation issues."
 msgstr "该组件存在验证问题。"
-
-#: cms/static/js/programs/models/course_model.js
-#: cms/templates/js/programs/course_details.underscore
-msgid "Course Code"
-msgstr ""
-
-#: cms/static/js/programs/models/course_model.js
-#: cms/templates/js/certificate-details.underscore
-#: cms/templates/js/certificate-editor.underscore
-#: cms/templates/js/programs/course_details.underscore
-msgid "Course Title"
-msgstr ""
-
-#: cms/static/js/programs/models/program_model.js
-msgid "Please select a valid organization."
-msgstr ""
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} is required"
-msgstr ""
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be accepted"
-msgstr ""
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be greater than or equal to {1}"
-msgstr ""
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be less than or equal to {1}"
-msgstr ""
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be between {1} and {2}"
-msgstr ""
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be {1} characters"
-msgstr ""
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be at least {1} characters"
-msgstr ""
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be at most {1} characters"
-msgstr ""
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be between {1} and {2} characters"
-msgstr ""
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be one of: {1}"
-msgstr ""
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be the same as {1}"
-msgstr ""
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must only contain digits"
-msgstr ""
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be a number"
-msgstr ""
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be a valid email"
-msgstr ""
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be a valid url"
-msgstr ""
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} is invalid"
-msgstr ""
-
-#: cms/static/js/programs/views/program_details_view.js
-msgid "confirm"
-msgstr ""
-
-#: cms/static/js/programs/views/program_details_view.js
-msgid "Publish this program?"
-msgstr ""
-
-#: cms/static/js/programs/views/program_details_view.js
-msgid ""
-"After you publish this program, you cannot add or remove course codes or "
-"remove course runs."
-msgstr ""
-
-#: cms/static/js/programs/views/program_details_view.js
-#: cms/static/js/views/modals/course_outline_modals.js
-msgid "Publish"
-msgstr "发布"
-
-#: cms/static/js/programs/views/program_details_view.js
-msgid "Marketing Slug is required."
-msgstr ""
 
 #: cms/static/js/views/active_video_upload.js cms/static/js/views/assets.js
 msgid "Your file could not be uploaded"
@@ -5662,6 +5554,10 @@ msgstr ""
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Publish all unpublished changes for this {item}?"
 msgstr ""
+
+#: cms/static/js/views/modals/course_outline_modals.js
+msgid "Publish"
+msgstr "发布"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Basic"
@@ -6038,7 +5934,6 @@ msgstr ""
 
 #: cms/templates/js/asset-library.underscore
 #: cms/templates/js/basic-modal.underscore
-#: cms/templates/js/programs/confirm_modal.underscore
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
 msgid "Actions"
 msgstr "操作"
@@ -6180,12 +6075,12 @@ msgid "All Groups"
 msgstr "所有分组"
 
 #: common/static/common/templates/discussion/new-post.underscore
-#: common/static/common/templates/discussion/thread-edit.underscore
-msgid "Add a clear and descriptive title to encourage participation."
-msgstr "添加一个清晰并且描述性强的标题来鼓励参与。"
+msgid ""
+"Add a clear and descriptive title to encourage participation. (Required)"
+msgstr ""
 
 #: common/static/common/templates/discussion/new-post.underscore
-msgid "Your question or idea"
+msgid "Your question or idea (required)"
 msgstr ""
 
 #: common/static/common/templates/discussion/new-post.underscore
@@ -6208,9 +6103,12 @@ msgid "Submit"
 msgstr "提交"
 
 #: common/static/common/templates/discussion/post-user-display.underscore
-#: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "Community TA"
-msgstr "社区助教"
+msgid "(Community TA)"
+msgstr ""
+
+#: common/static/common/templates/discussion/post-user-display.underscore
+msgid "(Staff)"
+msgstr ""
 
 #: common/static/common/templates/discussion/profile-thread.underscore
 #: common/static/common/templates/discussion/thread.underscore
@@ -6245,6 +6143,10 @@ msgid "Editing post"
 msgstr "编辑讨论帖"
 
 #: common/static/common/templates/discussion/thread-edit.underscore
+msgid "Add a clear and descriptive title to encourage participation."
+msgstr "添加一个清晰并且描述性强的标题来鼓励参与。"
+
+#: common/static/common/templates/discussion/thread-edit.underscore
 msgid "Edit your post below."
 msgstr ""
 
@@ -6272,6 +6174,10 @@ msgstr "已固定"
 #: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "Following"
 msgstr "关注"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+msgid "Community TA"
+msgstr "社区助教"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "{unread_comments_count} new"
@@ -6359,8 +6265,8 @@ msgstr ""
 #: common/static/common/templates/discussion/thread-type.underscore
 msgid ""
 "Questions raise issues that need answers. Discussions share ideas and start "
-"conversations."
-msgstr "“问题”提出需要答案的议题，“讨论”分享想法并开始交流。"
+"conversations. (Required)"
+msgstr ""
 
 #: common/static/common/templates/discussion/thread-type.underscore
 msgid "Question"
@@ -6383,8 +6289,8 @@ msgid "Topic area"
 msgstr ""
 
 #: common/static/common/templates/discussion/topic.underscore
-msgid "Add your post to a relevant topic to help others find it."
-msgstr "把你的帖子发布到相应的话题里以帮助别人快速找到它。"
+msgid "Add your post to a relevant topic to help others find it. (Required)"
+msgstr ""
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Discussion Home"
@@ -8281,6 +8187,11 @@ msgstr ""
 
 #: cms/templates/js/certificate-details.underscore
 #: cms/templates/js/certificate-editor.underscore
+msgid "Course Title"
+msgstr ""
+
+#: cms/templates/js/certificate-details.underscore
+#: cms/templates/js/certificate-editor.underscore
 msgid "Course Title Override"
 msgstr ""
 
@@ -8465,7 +8376,6 @@ msgstr ""
 
 #: cms/templates/js/course-instructor-details.underscore
 #: cms/templates/js/signatory-details.underscore
-#: cms/templates/js/programs/program_creator_form.underscore
 msgid "Organization"
 msgstr ""
 
@@ -9285,140 +9195,6 @@ msgstr ""
 msgid ""
 "The published branch version, {published}, was reset to the draft branch "
 "version, {draft}."
-msgstr ""
-
-#: cms/templates/js/programs/course_details.underscore
-msgid "Delete course"
-msgstr ""
-
-#: cms/templates/js/programs/course_details.underscore
-#, python-format
-msgid "Remove %(name)s from the program"
-msgstr ""
-
-#: cms/templates/js/programs/course_details.underscore
-msgid "Add another run"
-msgstr ""
-
-#: cms/templates/js/programs/course_details.underscore
-msgid ""
-"The unique number that identifies your course within your organization, e.g."
-" CS101."
-msgstr ""
-
-#: cms/templates/js/programs/course_details.underscore
-msgid ""
-"The title entered here will override the title set for the individual run of"
-" the course. It will be displayed on the XSeries progress page and in "
-"marketing presentations."
-msgstr ""
-
-#: cms/templates/js/programs/course_details.underscore
-msgid "Save Course"
-msgstr ""
-
-#: cms/templates/js/programs/course_run.underscore
-#, python-format
-msgid "Run %(key)s"
-msgstr ""
-
-#: cms/templates/js/programs/course_run.underscore
-msgid "Delete course run"
-msgstr ""
-
-#: cms/templates/js/programs/course_run.underscore
-#, python-format
-msgid "Remove run %(key)s from the program"
-msgstr ""
-
-#: cms/templates/js/programs/course_run.underscore
-#, python-format
-msgid "Start Date: %(date)s"
-msgstr ""
-
-#: cms/templates/js/programs/course_run.underscore
-#, python-format
-msgid "Mode: %(mode)s"
-msgstr ""
-
-#: cms/templates/js/programs/course_run.underscore
-msgid "Please select a Course Run"
-msgstr ""
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "Create a New Program"
-msgstr ""
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "Program type"
-msgstr ""
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "Select a type"
-msgstr ""
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "XSeries"
-msgstr ""
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "MicroMasters"
-msgstr ""
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "Select an organization"
-msgstr ""
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "The public display name of the program."
-msgstr ""
-
-#: cms/templates/js/programs/program_creator_form.underscore
-#: cms/templates/js/programs/program_details.underscore
-msgid "Subtitle"
-msgstr ""
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid ""
-"A short description of the program, including concepts covered and expected "
-"outcomes (255 character limit)."
-msgstr ""
-
-#: cms/templates/js/programs/program_creator_form.underscore
-#: cms/templates/js/programs/program_details.underscore
-msgid "Marketing Slug"
-msgstr ""
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "Slug used to generate links to the marketing site."
-msgstr ""
-
-#: cms/templates/js/programs/program_details.underscore
-msgid "Edit the program title"
-msgstr ""
-
-#: cms/templates/js/programs/program_details.underscore
-msgid "Edit the program\\'s name."
-msgstr ""
-
-#: cms/templates/js/programs/program_details.underscore
-msgid "Edit the program subtitle"
-msgstr ""
-
-#: cms/templates/js/programs/program_details.underscore
-msgid "Edit the program\\'s subtitle."
-msgstr ""
-
-#: cms/templates/js/programs/program_details.underscore
-msgid "Edit the program marketing slug"
-msgstr ""
-
-#: cms/templates/js/programs/program_details.underscore
-msgid "Edit the program\\'s marketing slug."
-msgstr ""
-
-#: cms/templates/js/programs/program_details.underscore
-msgid "Add a course"
 msgstr ""
 
 #: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore

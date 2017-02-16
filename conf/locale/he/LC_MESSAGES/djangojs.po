@@ -63,9 +63,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-01-23 17:56+0000\n"
-"PO-Revision-Date: 2017-02-01 14:52+0000\n"
-"Last-Translator: qualityalltext <quality@alltext.co.il>\n"
+"POT-Creation-Date: 2017-02-03 18:48+0000\n"
+"PO-Revision-Date: 2017-02-03 18:57+0000\n"
+"Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -116,9 +116,8 @@ msgstr "מחק"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/certificates/views/signatory_editor.js
-#: cms/static/js/factories/export.js
-#: cms/static/js/programs/views/program_details_view.js
-#: cms/static/js/views/asset.js cms/static/js/views/course_info_update.js
+#: cms/static/js/factories/export.js cms/static/js/views/asset.js
+#: cms/static/js/views/course_info_update.js
 #: cms/static/js/views/manage_users_and_roles.js
 #: cms/static/js/views/modals/base_modal.js
 #: cms/static/js/views/modals/course_outline_modals.js
@@ -138,7 +137,6 @@ msgstr "מחק"
 #: cms/templates/js/section-name-edit.underscore
 #: cms/templates/js/signatory-actions.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
-#: cms/templates/js/programs/program_creator_form.underscore
 #: common/static/common/templates/discussion/new-post.underscore
 #: common/static/common/templates/discussion/response-comment-edit.underscore
 #: common/static/common/templates/discussion/thread-edit.underscore
@@ -178,8 +176,6 @@ msgstr "סגור"
 #: cms/templates/js/course-instructor-details.underscore
 #: cms/templates/js/previous-video-upload-list.underscore
 #: cms/templates/js/signatory-details.underscore
-#: cms/templates/js/programs/program_creator_form.underscore
-#: cms/templates/js/programs/program_details.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Name"
 msgstr "שם"
@@ -2494,7 +2490,6 @@ msgstr "צוותים"
 #: cms/templates/js/certificate-editor.underscore
 #: cms/templates/js/content-group-editor.underscore
 #: cms/templates/js/group-configuration-editor.underscore
-#: cms/templates/js/programs/program_creator_form.underscore
 msgid "Create"
 msgstr "צור"
 
@@ -5168,7 +5163,6 @@ msgstr ""
 
 #: cms/static/js/factories/manage_users.js
 #: cms/static/js/factories/manage_users_lib.js
-#: common/static/common/templates/discussion/post-user-display.underscore
 #: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "Staff"
 msgstr "צוות"
@@ -5360,113 +5354,6 @@ msgstr "או"
 #: cms/static/js/models/xblock_validation.js
 msgid "This component has validation issues."
 msgstr "לרכיב זה בעיות אימות."
-
-#: cms/static/js/programs/models/course_model.js
-#: cms/templates/js/programs/course_details.underscore
-msgid "Course Code"
-msgstr "קוד קורס"
-
-#: cms/static/js/programs/models/course_model.js
-#: cms/templates/js/certificate-details.underscore
-#: cms/templates/js/certificate-editor.underscore
-#: cms/templates/js/programs/course_details.underscore
-msgid "Course Title"
-msgstr "כותרת הקורס"
-
-#: cms/static/js/programs/models/program_model.js
-msgid "Please select a valid organization."
-msgstr "נא בחר ארגון חוקי."
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} is required"
-msgstr "{0} הוא שדה חובה"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be accepted"
-msgstr "חובה לקבל {0} "
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be greater than or equal to {1}"
-msgstr "{0} חייב להיות גדול או שווה ל-{1}"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be less than or equal to {1}"
-msgstr "{0} חייב להיות קטן או שווה ל- {1}"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be between {1} and {2}"
-msgstr "{0}  חייב להיות בין {1} ל-{2}"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be {1} characters"
-msgstr "{0} חייב להיות בעל {1} תווים"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be at least {1} characters"
-msgstr "{0} חייב להיות בעל {1} תווים לכל הפחות"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be at most {1} characters"
-msgstr "{0} חייב להיות בעל {1} תווים לכל היותר"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be between {1} and {2} characters"
-msgstr "{0} חייב להיות בין {1} ו-{2} תווים "
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be one of: {1}"
-msgstr "{0} חייב להיות אחד מ:  {1}"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be the same as {1}"
-msgstr "{0} חייב להיות זהה ל-{1}"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must only contain digits"
-msgstr "{0}  חייב להכיל רק ספרות"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be a number"
-msgstr "{0} חייב להיות מספר"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be a valid email"
-msgstr "{0} חייב להיות דואר אלקטרוני חוקי"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be a valid url"
-msgstr "{0} חייב להיות כתובת URL חוקית"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} is invalid"
-msgstr "{0} אינו חוקי"
-
-#: cms/static/js/programs/views/program_details_view.js
-msgid "confirm"
-msgstr "אשר"
-
-#: cms/static/js/programs/views/program_details_view.js
-msgid "Publish this program?"
-msgstr "פרסם תכנית זו?"
-
-#: cms/static/js/programs/views/program_details_view.js
-msgid ""
-"After you publish this program, you cannot add or remove course codes or "
-"remove course runs."
-msgstr ""
-"לאחר פרסום תכנית זו, אינך יכול להסיר את קודי הקורס או להסיר הרצת קורס."
-
-#: cms/static/js/programs/views/program_details_view.js
-#: cms/static/js/views/modals/course_outline_modals.js
-#: cms/templates/js/course-outline.underscore
-#: cms/templates/js/publish-xblock.underscore
-#: cms/templates/js/programs/program_details.underscore
-msgid "Publish"
-msgstr "פרסם"
-
-#: cms/static/js/programs/views/program_details_view.js
-msgid "Marketing Slug is required."
-msgstr "שם הסלאג לשיווק הוא שדה חובה."
 
 #: cms/static/js/views/active_video_upload.js cms/static/js/views/assets.js
 msgid "Your file could not be uploaded"
@@ -5793,6 +5680,12 @@ msgstr "פרסם את {display_name}"
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Publish all unpublished changes for this {item}?"
 msgstr "האם לפרסם את כל השינויים שלא פורסמו עבור {item}?"
+
+#: cms/static/js/views/modals/course_outline_modals.js
+#: cms/templates/js/course-outline.underscore
+#: cms/templates/js/publish-xblock.underscore
+msgid "Publish"
+msgstr "פרסם"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Basic"
@@ -6196,7 +6089,6 @@ msgstr "עדכון תגיות"
 
 #: cms/templates/js/asset-library.underscore
 #: cms/templates/js/basic-modal.underscore
-#: cms/templates/js/programs/confirm_modal.underscore
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
 msgid "Actions"
 msgstr "פעולות"
@@ -6340,13 +6232,13 @@ msgid "All Groups"
 msgstr "כל הקבוצות"
 
 #: common/static/common/templates/discussion/new-post.underscore
-#: common/static/common/templates/discussion/thread-edit.underscore
-msgid "Add a clear and descriptive title to encourage participation."
-msgstr "הוסף כותרת ברורה ותיאורית על מנת לעודד את ההשתתפות בדיון. "
+msgid ""
+"Add a clear and descriptive title to encourage participation. (Required)"
+msgstr "הוסף כותרת ברורה ותיאורית בכדי לעודד את ההשתתפות בדיון. (חובה)."
 
 #: common/static/common/templates/discussion/new-post.underscore
-msgid "Your question or idea"
-msgstr "שאלתך או רעיונך"
+msgid "Your question or idea (required)"
+msgstr "שאלתך או רעיונך (חובה)"
 
 #: common/static/common/templates/discussion/new-post.underscore
 msgid "follow this post"
@@ -6368,9 +6260,12 @@ msgid "Submit"
 msgstr "שלח"
 
 #: common/static/common/templates/discussion/post-user-display.underscore
-#: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "Community TA"
-msgstr "עוזר הוראה בפורום"
+msgid "(Community TA)"
+msgstr "(עוזר הוראה קהילתי)"
+
+#: common/static/common/templates/discussion/post-user-display.underscore
+msgid "(Staff)"
+msgstr "(צוות)"
 
 #: common/static/common/templates/discussion/profile-thread.underscore
 #: common/static/common/templates/discussion/thread.underscore
@@ -6405,6 +6300,10 @@ msgid "Editing post"
 msgstr "עורך פוסט"
 
 #: common/static/common/templates/discussion/thread-edit.underscore
+msgid "Add a clear and descriptive title to encourage participation."
+msgstr "הוסף כותרת ברורה ותיאורית על מנת לעודד את ההשתתפות בדיון. "
+
+#: common/static/common/templates/discussion/thread-edit.underscore
 msgid "Edit your post below."
 msgstr "ערוך את הפוסט שלהלן."
 
@@ -6432,6 +6331,10 @@ msgstr "מוצמד"
 #: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "Following"
 msgstr "עוקב"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+msgid "Community TA"
+msgstr "עוזר הוראה בפורום"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "{unread_comments_count} new"
@@ -6520,10 +6423,10 @@ msgstr "סוג הפוסט"
 #: common/static/common/templates/discussion/thread-type.underscore
 msgid ""
 "Questions raise issues that need answers. Discussions share ideas and start "
-"conversations."
+"conversations. (Required)"
 msgstr ""
 "בעזרת לחצן 'שאלות' תוכל להעלות סוגיה מסוימת המצריכה תשובה. בעזרת לחצן "
-"'דיונים' תוכל לחלוק רעיונות ולהתחיל בשיחות על נושאי הקורס השונים."
+"'דיונים' תוכל לחלוק רעיונות ולהתחיל בשיחות על נושאי הקורס השונים. (חובה)"
 
 #: common/static/common/templates/discussion/thread-type.underscore
 msgid "Question"
@@ -6546,8 +6449,9 @@ msgid "Topic area"
 msgstr "תחום הנושא"
 
 #: common/static/common/templates/discussion/topic.underscore
-msgid "Add your post to a relevant topic to help others find it."
-msgstr "הוסף את הפוסט שלך לנושא הרלוונטי על מנת להקל על אחרים למצוא אותו."
+msgid "Add your post to a relevant topic to help others find it. (Required)"
+msgstr ""
+"הוסף את הפוסט שלך לנושא הרלוונטי על מנת להקל על אחרים למצוא אותו. (חובה)"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Discussion Home"
@@ -8543,6 +8447,11 @@ msgstr "פרטי תעודה"
 
 #: cms/templates/js/certificate-details.underscore
 #: cms/templates/js/certificate-editor.underscore
+msgid "Course Title"
+msgstr "כותרת הקורס"
+
+#: cms/templates/js/certificate-details.underscore
+#: cms/templates/js/certificate-editor.underscore
 msgid "Course Title Override"
 msgstr "ביטול כותרת הקורס"
 
@@ -8743,7 +8652,6 @@ msgstr "נא הוסף את תואר המדריך"
 
 #: cms/templates/js/course-instructor-details.underscore
 #: cms/templates/js/signatory-details.underscore
-#: cms/templates/js/programs/program_creator_form.underscore
 msgid "Organization"
 msgstr "ארגון"
 
@@ -9600,144 +9508,6 @@ msgid ""
 "The published branch version, {published}, was reset to the draft branch "
 "version, {draft}."
 msgstr "גרסת המדור שפורסם, {published}, אופסה לגרסת מדור הטיוטה, {draft}."
-
-#: cms/templates/js/programs/course_details.underscore
-msgid "Delete course"
-msgstr "מחק קורס"
-
-#: cms/templates/js/programs/course_details.underscore
-#, python-format
-msgid "Remove %(name)s from the program"
-msgstr "הסר את %(name)s מהתכנית"
-
-#: cms/templates/js/programs/course_details.underscore
-msgid "Add another run"
-msgstr "הוסף הרצה נוספת"
-
-#: cms/templates/js/programs/course_details.underscore
-msgid ""
-"The unique number that identifies your course within your organization, e.g."
-" CS101."
-msgstr "המספר הייחודי המזהה את הקורס שלך בתוך הארגון, לדוגמה CS101."
-
-#: cms/templates/js/programs/course_details.underscore
-msgid ""
-"The title entered here will override the title set for the individual run of"
-" the course. It will be displayed on the XSeries progress page and in "
-"marketing presentations."
-msgstr ""
-"הכותרת שהוזנה כאן תמחק את הכותרת שהוגדרה להרצה יחידה של הקורס. היא תוצג בדף "
-"ההתקדמות של XSeries ובמצגות השיווק."
-
-#: cms/templates/js/programs/course_details.underscore
-msgid "Save Course"
-msgstr "שמור קורס"
-
-#: cms/templates/js/programs/course_run.underscore
-#, python-format
-msgid "Run %(key)s"
-msgstr "הרץ את %(key)s"
-
-#: cms/templates/js/programs/course_run.underscore
-msgid "Delete course run"
-msgstr "מחק הרצת קורס"
-
-#: cms/templates/js/programs/course_run.underscore
-#, python-format
-msgid "Remove run %(key)s from the program"
-msgstr "הסר את %(key)s של ההרצה מהתכנית"
-
-#: cms/templates/js/programs/course_run.underscore
-#, python-format
-msgid "Start Date: %(date)s"
-msgstr "תאריך התחלה: %(date)s"
-
-#: cms/templates/js/programs/course_run.underscore
-#, python-format
-msgid "Mode: %(mode)s"
-msgstr "מצב: %(mode)s"
-
-#: cms/templates/js/programs/course_run.underscore
-msgid "Please select a Course Run"
-msgstr "בחר הרצת קורס"
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "Create a New Program"
-msgstr "צור תכנית חדשה"
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "Program type"
-msgstr "סוג תכנית"
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "Select a type"
-msgstr "בחר סוג"
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "XSeries"
-msgstr "XSeries"
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "MicroMasters"
-msgstr "MicroMasters"
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "Select an organization"
-msgstr "בחר ארגון"
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "The public display name of the program."
-msgstr "שם הקמפוס של התכנית."
-
-#: cms/templates/js/programs/program_creator_form.underscore
-#: cms/templates/js/programs/program_details.underscore
-msgid "Subtitle"
-msgstr "כתובית"
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid ""
-"A short description of the program, including concepts covered and expected "
-"outcomes (255 character limit)."
-msgstr ""
-"תיאור קצר של התכנית כולל רעיונות שהועלו ותוצאות צפויות (המגבלה היא 255 "
-"תווים)."
-
-#: cms/templates/js/programs/program_creator_form.underscore
-#: cms/templates/js/programs/program_details.underscore
-msgid "Marketing Slug"
-msgstr "סלאג לשיווק"
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "Slug used to generate links to the marketing site."
-msgstr "שימוש בסלאג ליצירת קישורים לאתר השיווק."
-
-#: cms/templates/js/programs/program_details.underscore
-msgid "Edit the program title"
-msgstr "ערוך את כותרת התכנית"
-
-#: cms/templates/js/programs/program_details.underscore
-msgid "Edit the program\\'s name."
-msgstr "ערוך את שם/ות התכנית"
-
-#: cms/templates/js/programs/program_details.underscore
-msgid "Edit the program subtitle"
-msgstr "ערוך את כתובית התכנית"
-
-#: cms/templates/js/programs/program_details.underscore
-msgid "Edit the program\\'s subtitle."
-msgstr "ערוך את כתובית/ות התכנית"
-
-#: cms/templates/js/programs/program_details.underscore
-msgid "Edit the program marketing slug"
-msgstr "ערוך את הסלאג לשיווק התכנית"
-
-#: cms/templates/js/programs/program_details.underscore
-msgid "Edit the program\\'s marketing slug."
-msgstr "ערוך את הסלאג לשיווק התכנית"
-
-#: cms/templates/js/programs/program_details.underscore
-msgid "Add a course"
-msgstr "הוסף קורס"
 
 #: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore
 msgid "Add URLs for additional versions"
