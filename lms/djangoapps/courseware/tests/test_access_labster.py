@@ -14,7 +14,6 @@ from xmodule.modulestore.tests.django_utils import (
 import courseware.access as access
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 
-# pylint: disable=protected-access
 
 class UserRoleTestCase(SharedModuleStoreTestCase):
     """
@@ -31,7 +30,7 @@ class UserRoleTestCase(SharedModuleStoreTestCase):
 
     def make_ccx(self, coach, course, display_name):
         """
-        Create ccx
+        Create ccx.
         """
         ccx = CustomCourseForEdX(
             course_id=course.id,
@@ -48,10 +47,10 @@ class UserRoleTestCase(SharedModuleStoreTestCase):
 
     def setUp(self):
         """
-        Set up tests
+        Set up tests.
         """
         super(UserRoleTestCase, self).setUp()
-        self.course  = CourseFactory.create()
+        self.course = CourseFactory.create()
         self.course2 = CourseFactory.create()
 
         # Create coach account
@@ -65,7 +64,6 @@ class UserRoleTestCase(SharedModuleStoreTestCase):
     def test_user_role_instructor(self):
         """
         Ensure that user role is instructor in the course.
-
         """
         # User have access as coach on ccx
         self.assertEqual(
