@@ -498,7 +498,7 @@ class ExternalAuthShibTest(ModuleStoreTestCase):
         Should vary by course depending on its enrollment_domain
         """
         TARGET_URL = reverse('courseware', args=[self.course.id.to_deprecated_string()])            # pylint: disable=invalid-name
-        noshib_response = self.client.get(TARGET_URL, follow=True)
+        noshib_response = self.client.get(TARGET_URL, follow=True, HTTP_ACCEPT="text/html")
         self.assertEqual(noshib_response.redirect_chain[-1],
                          ('http://testserver/login?next={url}'.format(url=TARGET_URL), 302))
         self.assertContains(noshib_response, (u"Sign in or Register | {platform_name}"
@@ -509,7 +509,8 @@ class ExternalAuthShibTest(ModuleStoreTestCase):
         shib_response = self.client.get(**{'path': TARGET_URL_SHIB,
                                            'follow': True,
                                            'REMOTE_USER': self.extauth.external_id,
-                                           'Shib-Identity-Provider': 'https://idp.stanford.edu/'})
+                                           'Shib-Identity-Provider': 'https://idp.stanford.edu/',
+                                           'HTTP_ACCEPT': "text/html"})
         # Test that the shib-login redirect page with ?next= and the desired page are part of the redirect chain
         # The 'courseware' page actually causes a redirect itself, so it's not the end of the chain and we
         # won't test its contents
