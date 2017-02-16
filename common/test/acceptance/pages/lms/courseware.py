@@ -265,7 +265,7 @@ class CoursewarePage(CoursePage):
     @property
     def breadcrumb(self):
         """ Return the course tree breadcrumb shown above the sequential bar """
-        return [part.strip() for part in self.q(css='.path').text[0].split('>')]
+        return [part.strip() for part in self.q(css='.path .position').text[0].split('>')]
 
     def unit_title_visible(self):
         """ Check if unit title is visible """

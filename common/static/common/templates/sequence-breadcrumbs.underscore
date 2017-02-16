@@ -3,4 +3,5 @@
     <span class="sr-only" id="outline-description"><%- gettext('Return to course outline') %></span>
     <b><%- gettext('Outline') %></b>
 </a>
-<span> > <%- pathText %></span>
+<span> > </span>
+<span class="position"><%- pathText %></span>
