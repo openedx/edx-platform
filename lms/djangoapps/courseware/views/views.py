@@ -354,13 +354,16 @@ def course_info(request, course_id):
             if request.GET.get('upgrade', 'false') == 'true':
                 store_upgrade_cookie = True
                 show_upgrade_notification = True
-            elif upgrade_cookie_name in request.COOKIES and bool(request.COOKIES[upgrade_cookie_name]):
+            elif upgrade_cookie_name in request.COOKIES and course_id in request.COOKIES[upgrade_cookie_name]:
                 show_upgrade_notification = True
 
             if show_upgrade_notification:
                 upgrade_data = VerifiedUpgradeDeadlineDate(course, user)
                 if upgrade_data.is_enabled:
                     upgrade_link = upgrade_data.link
+                else:
+                    # The upgrade is not enabled so the cookie does not need to be stored
+                    store_upgrade_cookie = False
 
         context = {
             'request': request,
@@ -393,13 +396,21 @@ def course_info(request, course_id):
 
         response = render_to_response('courseware/info.html', context)
         if store_upgrade_cookie:
-            response.set_cookie(
-                upgrade_cookie_name,
-                True,
-                max_age=10 * 24 * 60 * 60,  # set for 10 days
-                domain=settings.SESSION_COOKIE_DOMAIN,
-                httponly=True  # no use case for accessing from JavaScript
-            )
+            if upgrade_cookie_name in request.COOKIES and str(course_id) not in request.COOKIES[upgrade_cookie_name]:
+                cookie_value = '%s,%s' % (course_id, request.COOKIES[upgrade_cookie_name])
+            elif upgrade_cookie_name in request.COOKIES and str(course_id) in request.COOKIES[upgrade_cookie_name]:
+                cookie_value = request.COOKIES[upgrade_cookie_name]
+            else:
+                cookie_value = course_id
+
+            if cookie_value is not None:
+                response.set_cookie(
+                    upgrade_cookie_name,
+                    cookie_value,
+                    max_age=10 * 24 * 60 * 60,  # set for 10 days
+                    domain=settings.SESSION_COOKIE_DOMAIN,
+                    httponly=True  # no use case for accessing from JavaScript
+                )
 
         return response
 
