@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-02-02 19:33+0000\n"
-"PO-Revision-Date: 2017-02-02 19:34:37.831557\n"
+"POT-Creation-Date: 2017-02-16 16:44+0000\n"
+"PO-Revision-Date: 2017-02-16 16:46:36.493989\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -3720,16 +3720,8 @@ msgid "An error has occurred. Please try again."
 msgstr "شر ثققخق اشس خذذعققثي. حمثشسث فقغ شلشهر."
 
 #: lms/static/js/bookmarks/views/bookmark_button.js
-msgid "Click to add"
-msgstr "ذمهذن فخ شيي"
-
-#: lms/static/js/bookmarks/views/bookmark_button.js
 msgid "Bookmark this page"
 msgstr "زخخنوشقن فاهس حشلث"
-
-#: lms/static/js/bookmarks/views/bookmark_button.js
-msgid "Click to remove"
-msgstr "ذمهذن فخ قثوخدث"
 
 #: lms/static/js/ccx/schedule.js
 msgid "All subsections"
@@ -5224,7 +5216,6 @@ msgstr ""
 
 #: cms/static/js/factories/manage_users.js
 #: cms/static/js/factories/manage_users_lib.js
-#: common/static/common/templates/discussion/post-user-display.underscore
 #: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "Staff"
 msgstr "سفشبب"
@@ -6307,6 +6298,7 @@ msgid "All Groups"
 msgstr "شمم لقخعحس"
 
 #: common/static/common/templates/discussion/new-post.underscore
+#: common/static/common/templates/discussion/thread-edit.underscore
 msgid ""
 "Add a clear and descriptive title to encourage participation. (Required)"
 msgstr ""
@@ -6336,9 +6328,12 @@ msgid "Submit"
 msgstr "سعزوهف"
 
 #: common/static/common/templates/discussion/post-user-display.underscore
-#: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "Community TA"
-msgstr "ذخووعرهفغ فش"
+msgid "(Community TA)"
+msgstr "(ذخووعرهفغ فش)"
+
+#: common/static/common/templates/discussion/post-user-display.underscore
+msgid "(Staff)"
+msgstr "(سفشبب)"
 
 #: common/static/common/templates/discussion/profile-thread.underscore
 #: common/static/common/templates/discussion/thread.underscore
@@ -6373,10 +6368,6 @@ msgid "Editing post"
 msgstr "ثيهفهرل حخسف"
 
 #: common/static/common/templates/discussion/thread-edit.underscore
-msgid "Add a clear and descriptive title to encourage participation."
-msgstr "شيي ش ذمثشق شري يثسذقهحفهدث فهفمث فخ ثرذخعقشلث حشقفهذهحشفهخر."
-
-#: common/static/common/templates/discussion/thread-edit.underscore
 msgid "Edit your post below."
 msgstr "ثيهف غخعق حخسف زثمخص."
 
@@ -6404,6 +6395,10 @@ msgstr "حهررثي"
 #: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "Following"
 msgstr "بخممخصهرل"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+msgid "Community TA"
+msgstr "ذخووعرهفغ فش"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "{unread_comments_count} new"
@@ -7487,7 +7482,7 @@ msgid "View Archived Course"
 msgstr "دهثص شقذاهدثي ذخعقسث"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
-msgid "not enrolled"
+msgid "Not Enrolled"
 msgstr "رخف ثرقخممثي"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore

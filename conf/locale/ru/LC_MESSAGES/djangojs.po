@@ -126,8 +126,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-01-23 17:56+0000\n"
-"PO-Revision-Date: 2017-01-23 18:00+0000\n"
+"POT-Creation-Date: 2017-02-03 18:48+0000\n"
+"PO-Revision-Date: 2017-02-03 18:57+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
 "MIME-Version: 1.0\n"
@@ -179,9 +179,8 @@ msgstr "Удалить"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/certificates/views/signatory_editor.js
-#: cms/static/js/factories/export.js
-#: cms/static/js/programs/views/program_details_view.js
-#: cms/static/js/views/asset.js cms/static/js/views/course_info_update.js
+#: cms/static/js/factories/export.js cms/static/js/views/asset.js
+#: cms/static/js/views/course_info_update.js
 #: cms/static/js/views/manage_users_and_roles.js
 #: cms/static/js/views/modals/base_modal.js
 #: cms/static/js/views/modals/course_outline_modals.js
@@ -201,7 +200,6 @@ msgstr "Удалить"
 #: cms/templates/js/section-name-edit.underscore
 #: cms/templates/js/signatory-actions.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
-#: cms/templates/js/programs/program_creator_form.underscore
 #: common/static/common/templates/discussion/new-post.underscore
 #: common/static/common/templates/discussion/response-comment-edit.underscore
 #: common/static/common/templates/discussion/thread-edit.underscore
@@ -241,8 +239,6 @@ msgstr "Закрыть"
 #: cms/templates/js/course-instructor-details.underscore
 #: cms/templates/js/previous-video-upload-list.underscore
 #: cms/templates/js/signatory-details.underscore
-#: cms/templates/js/programs/program_creator_form.underscore
-#: cms/templates/js/programs/program_details.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Name"
 msgstr "Имя"
@@ -2601,7 +2597,6 @@ msgstr "Команды"
 #: cms/templates/js/certificate-editor.underscore
 #: cms/templates/js/content-group-editor.underscore
 #: cms/templates/js/group-configuration-editor.underscore
-#: cms/templates/js/programs/program_creator_form.underscore
 msgid "Create"
 msgstr "Создать"
 
@@ -5370,7 +5365,6 @@ msgstr ""
 
 #: cms/static/js/factories/manage_users.js
 #: cms/static/js/factories/manage_users_lib.js
-#: common/static/common/templates/discussion/post-user-display.underscore
 #: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "Staff"
 msgstr "Сотрудник"
@@ -5571,114 +5565,6 @@ msgstr "или"
 #: cms/static/js/models/xblock_validation.js
 msgid "This component has validation issues."
 msgstr "Компонент имеет подтвержденный результат"
-
-#: cms/static/js/programs/models/course_model.js
-#: cms/templates/js/programs/course_details.underscore
-msgid "Course Code"
-msgstr "Код курса"
-
-#: cms/static/js/programs/models/course_model.js
-#: cms/templates/js/certificate-details.underscore
-#: cms/templates/js/certificate-editor.underscore
-#: cms/templates/js/programs/course_details.underscore
-msgid "Course Title"
-msgstr "Название курса"
-
-#: cms/static/js/programs/models/program_model.js
-msgid "Please select a valid organization."
-msgstr "Введите корректную организацию."
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} is required"
-msgstr "Требуется {0}"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be accepted"
-msgstr "Необходимо принять {0}"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be greater than or equal to {1}"
-msgstr "Значение {0} должно быть больше или равно {1}"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be less than or equal to {1}"
-msgstr "Значение {0} должно быть меньше или равно {1}"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be between {1} and {2}"
-msgstr "Значение {0} должно быть между {1} и {2}"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be {1} characters"
-msgstr "поле {0} должно содержать {1} символов"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be at least {1} characters"
-msgstr "поле {0} должно содержать по меньшей мере {1} символов"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be at most {1} characters"
-msgstr "поле {0} не должно превышать {1} символов"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be between {1} and {2} characters"
-msgstr "Поле {0} должно содержать от {1} до {2} символов"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be one of: {1}"
-msgstr "{0} должно быть в следующем списке: {1}"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be the same as {1}"
-msgstr "Значение {0} должно быть таким же как {1}"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must only contain digits"
-msgstr "{0} может содержать только цифры"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be a number"
-msgstr "{0} должно быть числом"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be a valid email"
-msgstr "{0} должен быть корректным адресом электронной почты"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} must be a valid url"
-msgstr "{0} должен быть корректным url"
-
-#: cms/static/js/programs/utils/validation_config.js
-msgid "{0} is invalid"
-msgstr "{0} недействительно"
-
-#: cms/static/js/programs/views/program_details_view.js
-msgid "confirm"
-msgstr "подтвердить"
-
-#: cms/static/js/programs/views/program_details_view.js
-msgid "Publish this program?"
-msgstr "Опубликовать программу?"
-
-#: cms/static/js/programs/views/program_details_view.js
-msgid ""
-"After you publish this program, you cannot add or remove course codes or "
-"remove course runs."
-msgstr ""
-"Опубликовав программу, Вы не сможете добавлять или удалять условные "
-"обозначения курсов, а также удалять запуски курсов."
-
-#: cms/static/js/programs/views/program_details_view.js
-#: cms/static/js/views/modals/course_outline_modals.js
-#: cms/templates/js/course-outline.underscore
-#: cms/templates/js/publish-xblock.underscore
-#: cms/templates/js/programs/program_details.underscore
-msgid "Publish"
-msgstr "Опубликовать"
-
-#: cms/static/js/programs/views/program_details_view.js
-msgid "Marketing Slug is required."
-msgstr "Краткое торговое название - обязательное поле."
 
 #: cms/static/js/views/active_video_upload.js cms/static/js/views/assets.js
 msgid "Your file could not be uploaded"
@@ -6020,6 +5906,12 @@ msgstr "Опубликовать {display_name}"
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Publish all unpublished changes for this {item}?"
 msgstr "Опубликовать все неопубликованные изменения для данного {item}?"
+
+#: cms/static/js/views/modals/course_outline_modals.js
+#: cms/templates/js/course-outline.underscore
+#: cms/templates/js/publish-xblock.underscore
+msgid "Publish"
+msgstr "Опубликовать"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Basic"
@@ -6431,7 +6323,6 @@ msgstr "Обновление тегов"
 
 #: cms/templates/js/asset-library.underscore
 #: cms/templates/js/basic-modal.underscore
-#: cms/templates/js/programs/confirm_modal.underscore
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
 msgid "Actions"
 msgstr "Действия"
@@ -6576,14 +6467,12 @@ msgid "All Groups"
 msgstr "Все группы"
 
 #: common/static/common/templates/discussion/new-post.underscore
-#: common/static/common/templates/discussion/thread-edit.underscore
-msgid "Add a clear and descriptive title to encourage participation."
+msgid ""
+"Add a clear and descriptive title to encourage participation. (Required)"
 msgstr ""
-"Добавьте чётко сформулированный, содержательный заголовок, чтобы побудить "
-"других к участию."
 
 #: common/static/common/templates/discussion/new-post.underscore
-msgid "Your question or idea"
+msgid "Your question or idea (required)"
 msgstr ""
 
 #: common/static/common/templates/discussion/new-post.underscore
@@ -6606,9 +6495,12 @@ msgid "Submit"
 msgstr "Отправить"
 
 #: common/static/common/templates/discussion/post-user-display.underscore
-#: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "Community TA"
-msgstr "Староста сообщества"
+msgid "(Community TA)"
+msgstr ""
+
+#: common/static/common/templates/discussion/post-user-display.underscore
+msgid "(Staff)"
+msgstr ""
 
 #: common/static/common/templates/discussion/profile-thread.underscore
 #: common/static/common/templates/discussion/thread.underscore
@@ -6643,6 +6535,12 @@ msgid "Editing post"
 msgstr "Редактирование сообщения"
 
 #: common/static/common/templates/discussion/thread-edit.underscore
+msgid "Add a clear and descriptive title to encourage participation."
+msgstr ""
+"Добавьте чётко сформулированный, содержательный заголовок, чтобы побудить "
+"других к участию."
+
+#: common/static/common/templates/discussion/thread-edit.underscore
 msgid "Edit your post below."
 msgstr ""
 
@@ -6670,6 +6568,10 @@ msgstr "Закреплено"
 #: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "Following"
 msgstr "Отслеживаемые"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+msgid "Community TA"
+msgstr "Староста сообщества"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "{unread_comments_count} new"
@@ -6760,10 +6662,8 @@ msgstr ""
 #: common/static/common/templates/discussion/thread-type.underscore
 msgid ""
 "Questions raise issues that need answers. Discussions share ideas and start "
-"conversations."
+"conversations. (Required)"
 msgstr ""
-"В вопросах поднимаются проблемы, требующие ответа. Обсуждения позволяют "
-"делиться идеями и участвовать в дискуссиях."
 
 #: common/static/common/templates/discussion/thread-type.underscore
 msgid "Question"
@@ -6786,10 +6686,8 @@ msgid "Topic area"
 msgstr ""
 
 #: common/static/common/templates/discussion/topic.underscore
-msgid "Add your post to a relevant topic to help others find it."
+msgid "Add your post to a relevant topic to help others find it. (Required)"
 msgstr ""
-"Поместите ваше сообщение в подходящую тему, чтобы упростить другим "
-"пользователям его поиск."
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Discussion Home"
@@ -8840,6 +8738,11 @@ msgstr "Реквизиты сертификата"
 
 #: cms/templates/js/certificate-details.underscore
 #: cms/templates/js/certificate-editor.underscore
+msgid "Course Title"
+msgstr "Название курса"
+
+#: cms/templates/js/certificate-details.underscore
+#: cms/templates/js/certificate-editor.underscore
 msgid "Course Title Override"
 msgstr "Замена названия курса"
 
@@ -9041,7 +8944,6 @@ msgstr "Пожалуйста, укажите форму обращения к п
 
 #: cms/templates/js/course-instructor-details.underscore
 #: cms/templates/js/signatory-details.underscore
-#: cms/templates/js/programs/program_creator_form.underscore
 msgid "Organization"
 msgstr "Организация"
 
@@ -9920,146 +9822,6 @@ msgid ""
 "version, {draft}."
 msgstr ""
 "Опубликованная версия, {published}, изменена на новую версию, {draft}."
-
-#: cms/templates/js/programs/course_details.underscore
-msgid "Delete course"
-msgstr "Удалить курс"
-
-#: cms/templates/js/programs/course_details.underscore
-#, python-format
-msgid "Remove %(name)s from the program"
-msgstr "Удалить %(name)s из программы"
-
-#: cms/templates/js/programs/course_details.underscore
-msgid "Add another run"
-msgstr "Добавить ещё один запуск"
-
-#: cms/templates/js/programs/course_details.underscore
-msgid ""
-"The unique number that identifies your course within your organization, e.g."
-" CS101."
-msgstr ""
-"Уникальный номер, присвоенный курсу Вашей организацией, например, CS101."
-
-#: cms/templates/js/programs/course_details.underscore
-msgid ""
-"The title entered here will override the title set for the individual run of"
-" the course. It will be displayed on the XSeries progress page and in "
-"marketing presentations."
-msgstr ""
-"Наименование, предложенное здесь, заменит наименование, указанное для "
-"отдельного запуска данного курса.  Оно будет отображаться на странице "
-"\"Прогресс\" программы XSeries, а также в рекламных презентациях."
-
-#: cms/templates/js/programs/course_details.underscore
-msgid "Save Course"
-msgstr "Сохранить курс"
-
-#: cms/templates/js/programs/course_run.underscore
-#, python-format
-msgid "Run %(key)s"
-msgstr "Запустить %(key)s"
-
-#: cms/templates/js/programs/course_run.underscore
-msgid "Delete course run"
-msgstr "Удалить запуск курса"
-
-#: cms/templates/js/programs/course_run.underscore
-#, python-format
-msgid "Remove run %(key)s from the program"
-msgstr "Удалить запуск курса %(key)s из программы"
-
-#: cms/templates/js/programs/course_run.underscore
-#, python-format
-msgid "Start Date: %(date)s"
-msgstr "Начало: %(date)s"
-
-#: cms/templates/js/programs/course_run.underscore
-#, python-format
-msgid "Mode: %(mode)s"
-msgstr "Режим: %(mode)s"
-
-#: cms/templates/js/programs/course_run.underscore
-msgid "Please select a Course Run"
-msgstr "Пожалуйста, выберите запуск курса"
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "Create a New Program"
-msgstr "Создать новую программу"
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "Program type"
-msgstr "Вид программы"
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "Select a type"
-msgstr "Выберите вид"
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "XSeries"
-msgstr "XSeries"
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "MicroMasters"
-msgstr "MicroMasters"
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "Select an organization"
-msgstr "Выберите организацию"
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "The public display name of the program."
-msgstr "Официальное название программы."
-
-#: cms/templates/js/programs/program_creator_form.underscore
-#: cms/templates/js/programs/program_details.underscore
-msgid "Subtitle"
-msgstr "Подзаголовок"
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid ""
-"A short description of the program, including concepts covered and expected "
-"outcomes (255 character limit)."
-msgstr ""
-"Краткое описание программы, включая понятия, которые будут изучены, и "
-"ожидаемые результаты (не более 255 знаков)."
-
-#: cms/templates/js/programs/program_creator_form.underscore
-#: cms/templates/js/programs/program_details.underscore
-msgid "Marketing Slug"
-msgstr "Краткое торговое название"
-
-#: cms/templates/js/programs/program_creator_form.underscore
-msgid "Slug used to generate links to the marketing site."
-msgstr "Краткое название для создания ссылок на страницу рекламы."
-
-#: cms/templates/js/programs/program_details.underscore
-msgid "Edit the program title"
-msgstr "Редактировать название программы"
-
-#: cms/templates/js/programs/program_details.underscore
-msgid "Edit the program\\'s name."
-msgstr "Редактировать название программы."
-
-#: cms/templates/js/programs/program_details.underscore
-msgid "Edit the program subtitle"
-msgstr "Редактировать подзаголовок программы"
-
-#: cms/templates/js/programs/program_details.underscore
-msgid "Edit the program\\'s subtitle."
-msgstr "Редактировать подзаголовок программы."
-
-#: cms/templates/js/programs/program_details.underscore
-msgid "Edit the program marketing slug"
-msgstr "Редактировать краткое торговое название программы"
-
-#: cms/templates/js/programs/program_details.underscore
-msgid "Edit the program\\'s marketing slug."
-msgstr "Редактировать краткое торговое название программы."
-
-#: cms/templates/js/programs/program_details.underscore
-msgid "Add a course"
-msgstr "Добавить курс"
 
 #: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore
 msgid "Add URLs for additional versions"
