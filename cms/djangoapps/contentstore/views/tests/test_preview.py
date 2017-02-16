@@ -22,6 +22,7 @@ from xblock_config.models import StudioConfig
 from xmodule.modulestore.django import modulestore
 
 
+@ddt.ddt
 class GetPreviewHtmlTestCase(ModuleStoreTestCase):
     """
     Tests for get_preview_fragment.
@@ -136,6 +137,31 @@ class GetPreviewHtmlTestCase(ModuleStoreTestCase):
             )
             response = client.post(url)
             self.assertEqual(response.status_code, 200)
+
+    @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
+    def test_block_branch_not_changed_by_preview_handler(self, default_store):
+        """
+        Tests preview_handler should not update blocks being previewed
+        """
+        client = Client()
+        client.login(username=self.user.username, password=self.user_password)
+
+        with self.store.default_store(default_store):
+            course = CourseFactory.create()
+
+            block = ItemFactory.create(
+                parent_location=course.location,
+                category="problem"
+            )
+
+            url = reverse_usage_url(
+                'preview_handler',
+                block.location,
+                kwargs={'handler': 'xmodule_handler/problem_check'}
+            )
+            response = client.post(url)
+            self.assertEqual(response.status_code, 200)
+            self.assertFalse(modulestore().has_changes(modulestore().get_item(block.location)))
 
 
 @XBlock.needs("field-data")
