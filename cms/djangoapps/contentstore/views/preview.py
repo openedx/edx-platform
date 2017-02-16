@@ -91,7 +91,9 @@ def preview_handler(request, usage_key_string, handler, suffix=''):
         log.exception("error processing ajax call")
         raise
 
-    modulestore().update_item(descriptor, request.user.id, asides=asides)
+    # Update block only if it has asides
+    if asides:
+        modulestore().update_item(descriptor, request.user.id, asides=asides)
     return webob_to_django_response(resp)
 
 
