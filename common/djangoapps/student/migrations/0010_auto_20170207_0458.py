@@ -26,9 +26,5 @@ class Migration(migrations.Migration):
     # )
 
     operations = [
-        migrations.RunSQL(
-            # Do nothing:
-            "select 1",
-            "select 1"
-        )
+        # Nothing to do.
     ]
