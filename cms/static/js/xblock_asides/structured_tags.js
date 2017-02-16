@@ -4,6 +4,8 @@
     function StructuredTagsView(runtime, element) {
         var $element = $(element);
         var saveTagsInProgress = false;
+        // we need studio runtime to get handler capable of saving xblock data
+        var studioRuntime = new window.StudioRuntime.v1();
 
         $($element).find('.save_tags').click(function(e) {
             var dataToPost = {};
@@ -23,7 +25,7 @@
 
                 $.ajax({
                     type: 'POST',
-                    url: runtime.handlerUrl(element, 'save_tags'),
+                    url: studioRuntime.handlerUrl(element, 'save_tags'),
                     data: JSON.stringify(dataToPost),
                     dataType: 'json',
                     contentType: 'application/json; charset=utf-8'

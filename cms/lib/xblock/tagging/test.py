@@ -189,7 +189,7 @@ class StructuredTagsAsideTestCase(ModuleStoreTestCase):
         Checks that handler to save tags in StructuredTagsAside works properly
         """
         handler_url = reverse_usage_url(
-            'preview_handler',
+            'component_handler',
             unicode(aside_key_class(self.problem.location, self.aside_name)),
             kwargs={'handler': 'save_tags'}
         )
