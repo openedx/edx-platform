@@ -77,7 +77,11 @@ class SiteConfiguration(models.Model):
             Configuration value for the given key.
         """
         for configuration in cls.objects.filter(values__contains=org, enabled=True).all():
-            course_org_filter = configuration.get_value('course_org_filter', None)
+            course_org_filter = configuration.get_value('course_org_filter', [])
+            # The value of 'course_org_filter' can be configured as a string representing
+            # a single organization or a list of strings representing multiple organizations.
+            if not isinstance(course_org_filter, list):
+                course_org_filter = [course_org_filter]
             if org in course_org_filter:
                 return configuration.get_value(name, default)
         return default
