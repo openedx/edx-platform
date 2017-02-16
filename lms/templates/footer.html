@@ -83,3 +83,7 @@
     <link rel="stylesheet" type="text/css" href="${url}"></link>
   % endfor
 % endif
+
+% if settings.FEATURES.get('ENABLE_COOKIE_CONSENT', False):
+  <%include file="widgets/cookie-consent.html" />
+% endif
