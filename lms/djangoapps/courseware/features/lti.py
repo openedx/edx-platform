@@ -363,16 +363,7 @@ def click_grade(_step, version):
         css_ele = version_map[version]['selector']
         css_loc = '#' + css_ele
         world.wait_for_visible(css_loc)
-        print 'waiting..'
-        # from nose.tools import set_trace; set_trace()
-        world.wait(8)
-        print 'proceding'
-        # world.css_click(css_loc)
-        # ele = world.css_find(css_loc).first
-        # ele._element.send_keys(Keys.ENTER)
-        # world.browser.execute_script('document.getElementById("{}").click()'.format(css_ele))
         world.css_click(css_loc)
-        # world.css_click(css_loc)
         assert iframe.is_text_present(version_map[version]['expected_text'])
 
 
