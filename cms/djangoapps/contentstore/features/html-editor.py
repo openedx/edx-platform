@@ -12,7 +12,6 @@ CODEMIRROR_SELECTOR_PREFIX = "$('iframe').contents().find"
 
 @step('I have created a Blank HTML Page$')
 def i_created_blank_html_page(step):
-    # from nose.tools import set_trace; set_trace()
     step.given('I am in Studio editing a new unit')
     world.create_component_instance(
         step=step,
@@ -231,7 +230,7 @@ def font_selector_dropdown_is_shown(step):
 
 
 @step('"Default" option sets the expected font family')
-def default_options_sets_expected_font_family(step):
+def default_options_sets_expected_font_family(step):  # pylint: disable=unused-argument, redefined-outer-name
     fonts = get_available_fonts(get_fonts_list_panel(world))
     fonts_found = fonts.get("Default", None)
     expected_font_family = CUSTOM_FONTS.get('Default')
@@ -242,28 +241,29 @@ def default_options_sets_expected_font_family(step):
 @step('all standard tinyMCE fonts should be available')
 def check_standard_tinyMCE_fonts(step):
     fonts = get_available_fonts(get_fonts_list_panel(world))
-    for label, expected_font in TINYMCE_FONTS.items():
-        assert_equal(fonts.get(label, None), expected_font)
+    for label, expected_fonts in TINYMCE_FONTS.items():
+        for expected_font in expected_fonts:
+            assert_in(expected_font, fonts.get(label, None))
 
 TINYMCE_FONTS = OrderedDict([
-    ("Andale Mono", "'andale mono', times"),
-    ("Arial", "arial, helvetica, sans-serif"),
-    ("Arial Black", "'arial black', 'avant garde'"),
-    ("Book Antiqua", "'book antiqua', palatino"),
-    ("Comic Sans MS", "'comic sans ms', sans-serif"),
-    ("Courier New", "'courier new', courier"),
-    ("Georgia", "georgia, palatino"),
-    ("Helvetica", "helvetica"),
-    ("Impact", "impact, chicago"),
-    ("Symbol", "symbol"),
-    ("Tahoma", "tahoma, arial, helvetica, sans-serif"),
-    ("Terminal", "terminal, monaco"),
-    ("Times New Roman", "'times new roman', times"),
-    ("Trebuchet MS", "'trebuchet ms', geneva"),
-    ("Verdana", "verdana, geneva"),
+    ("Andale Mono", ['andale mono', 'times']),
+    ("Arial", ['arial', 'helvetica', 'sans-serif']),
+    ("Arial Black", ['arial black', 'avant garde']),
+    ("Book Antiqua", ['book antiqua', 'palatino']),
+    ("Comic Sans MS", ['comic sans ms', 'sans-serif']),
+    ("Courier New", ['courier new', 'courier']),
+    ("Georgia", ['georgia', 'palatino']),
+    ("Helvetica", ['helvetica']),
+    ("Impact", ['impact', 'chicago']),
+    ("Symbol", ['symbol']),
+    ("Tahoma", ['tahoma', 'arial', 'helvetica', 'sans-serif']),
+    ("Terminal", ['terminal', 'monaco']),
+    ("Times New Roman", ['times new roman', 'times']),
+    ("Trebuchet MS", ['trebuchet ms', 'geneva']),
+    ("Verdana", ['verdana', 'geneva']),
     # tinyMCE does not set font-family on dropdown span for these two fonts
-    ("Webdings", ""),  # webdings
-    ("Wingdings", ""),  # wingdings, 'zapf dingbats'
+    ("Webdings", [""]),  # webdings
+    ("Wingdings", [""]),  # wingdings, 'zapf dingbats'
 ])
 
 CUSTOM_FONTS = OrderedDict([

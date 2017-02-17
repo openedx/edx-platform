@@ -56,7 +56,7 @@ def stop_video_server(_total):
         video_server.shutdown()
 
 
-@before.all
+@before.all  # pylint: disable=no-member
 def start_stub_servers():
     """
     Start all stub servers
