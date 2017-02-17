@@ -288,7 +288,7 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
     def setUp(self):
         super(StudentAccountLoginAndRegistrationTest, self).setUp()
 
-        # For these tests, three third party auth providers are enabled by default:
+        # Several third party auth providers are created for these tests:
         self.configure_google_provider(enabled=True, visible=True)
         self.configure_facebook_provider(enabled=True, visible=True)
         self.configure_dummy_provider(
@@ -297,6 +297,11 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
             icon_class='',
             icon_image=SimpleUploadedFile('icon.svg', '<svg><rect width="50" height="100"/></svg>'),
         )
+        self.hidden_enabled_provider = self.configure_linkedin_provider(
+            visible=False,
+            enabled=True,
+        )
+        self.hidden_disabled_provider = self.configure_azure_ad_provider()
 
     @ddt.data(
         ("signin_user", "login"),
@@ -426,6 +431,16 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         params = [("next", "/courses/something/?tpa_hint=oa2-google-oauth2")]
         response = self.client.get(reverse('signin_user'), params, HTTP_ACCEPT="text/html")
         self.assertContains(response, '"third_party_auth_hint": "oa2-google-oauth2"')
+
+        tpa_hint = self.hidden_enabled_provider.provider_id
+        params = [("next", "/courses/something/?tpa_hint={0}".format(tpa_hint))]
+        response = self.client.get(reverse('signin_user'), params, HTTP_ACCEPT="text/html")
+        self.assertContains(response, '"third_party_auth_hint": "{0}"'.format(tpa_hint))
+
+        tpa_hint = self.hidden_disabled_provider.provider_id
+        params = [("next", "/courses/something/?tpa_hint={0}".format(tpa_hint))]
+        response = self.client.get(reverse('signin_user'), params, HTTP_ACCEPT="text/html")
+        self.assertNotIn(response.content, tpa_hint)
 
     @override_settings(SITE_NAME=settings.MICROSITE_TEST_HOSTNAME)
     def test_microsite_uses_old_login_page(self):

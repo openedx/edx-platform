@@ -89,6 +89,45 @@ class RegistryTest(testutil.TestCase):
         self.assertNotIn(no_log_in_provider.provider_id, provider_ids)
         self.assertIn(normal_provider.provider_id, provider_ids)
 
+    def test_tpa_hint_provider_displayed_for_login(self):
+        """
+        Tests to ensure that an enabled-but-not-visible provider is presented
+        for use in the UI when the "tpa_hint" parameter is specified
+        """
+
+        # A hidden provider should be accessible with tpa_hint (this is the main case)
+        hidden_provider = self.configure_google_provider(visible=False, enabled=True)
+        provider_ids = [
+            idp.provider_id
+            for idp in provider.Registry.displayed_for_login(tpa_hint=hidden_provider.provider_id)
+        ]
+        self.assertIn(hidden_provider.provider_id, provider_ids)
+
+        # New providers are hidden (ie, not flagged as 'visible') by default
+        # The tpa_hint parameter should work for these providers as well
+        implicitly_hidden_provider = self.configure_linkedin_provider(enabled=True)
+        provider_ids = [
+            idp.provider_id
+            for idp in provider.Registry.displayed_for_login(tpa_hint=implicitly_hidden_provider.provider_id)
+        ]
+        self.assertIn(implicitly_hidden_provider.provider_id, provider_ids)
+
+        # Disabled providers should not be matched in tpa_hint scenarios
+        disabled_provider = self.configure_twitter_provider(visible=True, enabled=False)
+        provider_ids = [
+            idp.provider_id
+            for idp in provider.Registry.displayed_for_login(tpa_hint=disabled_provider.provider_id)
+        ]
+        self.assertNotIn(disabled_provider.provider_id, provider_ids)
+
+        # Providers not utilized for learner authentication should not match tpa_hint
+        no_log_in_provider = self.configure_lti_provider()
+        provider_ids = [
+            idp.provider_id
+            for idp in provider.Registry.displayed_for_login(tpa_hint=no_log_in_provider.provider_id)
+        ]
+        self.assertNotIn(no_log_in_provider.provider_id, provider_ids)
+
     def test_provider_enabled_for_current_site(self):
         """
         Verify that enabled_for_current_site returns True when the provider matches the current site.
