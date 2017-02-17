@@ -9,7 +9,6 @@ from splinter.exceptions import ElementDoesNotExist
 from selenium.common.exceptions import NoAlertPresentException
 from nose.tools import assert_true, assert_equal, assert_in, assert_is_none
 from lettuce import world, step
-from selenium.webdriver.common.keys import Keys
 
 from courseware.tests.factories import InstructorFactory, BetaTesterFactory
 from courseware.access import has_access
