@@ -27,7 +27,7 @@ paver a11y_coverage
     export SCRAPY_SETTINGS_MODULE='pa11ycrawler.settings'
 
     echo "Running pa11ycrawler against test course..."
-    paver pa11ycrawler --fasttest --skip-clean --fetch-course --with-html
+    time paver pa11ycrawler --fasttest --skip-clean --fetch-course --with-html
 
     echo "Generating coverage report..."
     paver pa11ycrawler_coverage
