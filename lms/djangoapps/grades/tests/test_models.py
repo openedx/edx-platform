@@ -9,7 +9,6 @@ from hashlib import sha1
 import json
 from mock import patch
 
-from django.core.exceptions import ValidationError
 from django.db.utils import IntegrityError
 from django.test import TestCase
 from django.utils.timezone import now
@@ -228,7 +227,7 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
             )
             self.assertEqual(created_grade, read_grade)
             self.assertEqual(read_grade.visible_blocks.blocks, self.block_records)
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(IntegrityError):
             PersistentSubsectionGrade.create_grade(**self.params)
 
     @ddt.data('course_version', 'subtree_edited_timestamp')
@@ -237,12 +236,12 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
         PersistentSubsectionGrade.create_grade(**self.params)
 
     @ddt.data(
-        ("user_id", ValidationError),
+        ("user_id", IntegrityError),
         ("usage_key", KeyError),
-        ("earned_all", ValidationError),
-        ("possible_all", ValidationError),
-        ("earned_graded", ValidationError),
-        ("possible_graded", ValidationError),
+        ("earned_all", IntegrityError),
+        ("possible_all", IntegrityError),
+        ("earned_graded", IntegrityError),
+        ("possible_graded", IntegrityError),
         ("visible_blocks", KeyError),
         ("attempted", KeyError),
     )
@@ -275,18 +274,6 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
         self.assertIsNone(grade.first_attempted)
         self.assertEqual(grade.earned_all, 0.0)
         self.assertEqual(grade.earned_graded, 0.0)
-
-    def test_create_inconsistent_unattempted(self):
-        self.params['attempted'] = False
-        with self.assertRaises(ValidationError):
-            PersistentSubsectionGrade.create_grade(**self.params)
-
-    def test_update_or_create_inconsistent_unattempted(self):
-        self.params['attempted'] = False
-        self.params['earned_all'] = 1.0
-        self.params['earned_graded'] = 1.0
-        with self.assertRaises(ValidationError):
-            PersistentSubsectionGrade.update_or_create_grade(**self.params)
 
     def test_first_attempted_not_changed_on_update(self):
         PersistentSubsectionGrade.create_grade(**self.params)
