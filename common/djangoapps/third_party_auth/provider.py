@@ -43,9 +43,23 @@ class Registry(object):
         return sorted(cls._enabled_providers(), key=lambda provider: provider.name)
 
     @classmethod
-    def displayed_for_login(cls):
-        """Returns list of providers that can be used to initiate logins in the UI"""
-        return [provider for provider in cls.enabled() if provider.display_for_login]
+    def displayed_for_login(cls, tpa_hint=None):
+        """
+        Args:
+            tpa_hint (string): An override used in certain third-party authentication
+                scenarios that will cause the specified provider to be included in the
+                set along with any providers matching the 'display_for_login' criteria.
+                Note that 'provider_id' cannot have a value of None according to the
+                current implementation.
+
+        Returns:
+            List of ProviderConfig entities
+        """
+        return [
+            provider
+            for provider in cls.enabled()
+            if provider.display_for_login or provider.provider_id == tpa_hint
+        ]
 
     @classmethod
     def get(cls, provider_id):

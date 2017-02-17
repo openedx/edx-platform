@@ -112,7 +112,7 @@ def login_and_registration_form(request, initial_mode="login"):
         'data': {
             'login_redirect_url': redirect_to,
             'initial_mode': initial_mode,
-            'third_party_auth': _third_party_auth_context(request, redirect_to),
+            'third_party_auth': _third_party_auth_context(request, redirect_to, third_party_auth_hint),
             'third_party_auth_hint': third_party_auth_hint or '',
             'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
             'support_link': configuration_helpers.get_value('SUPPORT_SITE_LINK', settings.SUPPORT_SITE_LINK),
@@ -190,7 +190,7 @@ def password_change_request_handler(request):
         return HttpResponseBadRequest(_("No email address provided."))
 
 
-def _third_party_auth_context(request, redirect_to):
+def _third_party_auth_context(request, redirect_to, tpa_hint=None):
     """Context for third party auth providers and the currently running pipeline.
 
     Arguments:
@@ -198,6 +198,8 @@ def _third_party_auth_context(request, redirect_to):
             is currently running.
         redirect_to: The URL to send the user to following successful
             authentication.
+        tpa_hint (string): An override flag that will return a matching provider
+            as long as its configuration has been enabled
 
     Returns:
         dict
@@ -212,7 +214,7 @@ def _third_party_auth_context(request, redirect_to):
     }
 
     if third_party_auth.is_enabled():
-        for enabled in third_party_auth.provider.Registry.displayed_for_login():
+        for enabled in third_party_auth.provider.Registry.displayed_for_login(tpa_hint=tpa_hint):
             info = {
                 "id": enabled.provider_id,
                 "name": enabled.name,
