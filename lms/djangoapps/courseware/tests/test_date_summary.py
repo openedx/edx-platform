@@ -49,14 +49,17 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             course_min_price=100,
             days_till_verification_deadline=14,
             verification_status=None,
-            sku=None
+            sku=None,
+            create_user=True
     ):
         """Set up the course and user for this test."""
         now = datetime.now(utc)
+        if create_user:
+            self.user = UserFactory.create(username='mrrobot', password='test')  # pylint: disable=attribute-defined-outside-init
+
         self.course = CourseFactory.create(  # pylint: disable=attribute-defined-outside-init
             start=now + timedelta(days=days_till_start)
         )
-        self.user = UserFactory.create(username='mrrobot', password='test')  # pylint: disable=attribute-defined-outside-init
 
         if days_till_end is not None:
             self.course.end = now + timedelta(days=days_till_end)
@@ -280,7 +283,12 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
 
     # Tests Verified Upgrade Deadline Date Block
 
-    def check_upgrade_banner(self, banner_expected=True, include_url_parameter=True):
+    def check_upgrade_banner(
+            self,
+            banner_expected=True,
+            include_url_parameter=True,
+            expected_cookie_value=None
+    ):
         """
         Helper method to check for the presence of the Upgrade Banner
         """
@@ -288,11 +296,17 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         if include_url_parameter:
             url += '?upgrade=true'
         resp = self.client.get(url)
+        upgrade_cookie_name = 'show_upgrade_notification'
         expected_banner_text = "Give yourself an additional incentive to complete"
         if banner_expected:
             self.assertIn(expected_banner_text, resp.content)
+            self.assertIn(str(self.course.id), self.client.cookies[upgrade_cookie_name].value)
         else:
             self.assertNotIn(expected_banner_text, resp.content)
+            if upgrade_cookie_name in self.client.cookies:
+                self.assertNotIn(str(self.course.id), self.client.cookies[upgrade_cookie_name].value)
+            if expected_cookie_value is not None:
+                self.assertIn(str(expected_cookie_value), self.client.cookies[upgrade_cookie_name].value)
 
     @freeze_time('2015-01-02')
     def test_verified_upgrade_deadline_date(self):
@@ -334,6 +348,19 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         # A cookie should be set in the previous call, so it is no longer necessary to pass
         # the URL parameter in order to see the notification.
         self.check_upgrade_banner(include_url_parameter=False)
+
+        # Store the current course_id for testing
+        old_course_id = self.course.id
+
+        # Change to another course
+        self.setup_course_and_user(days_till_upgrade_deadline=1,
+                                   user_enrollment_mode=CourseMode.AUDIT,
+                                   create_user=False)
+
+        # Banner should not be present in the newly created course
+        self.check_upgrade_banner(include_url_parameter=False,
+                                  banner_expected=False,
+                                  expected_cookie_value=old_course_id)
 
         # Unfortunately (according to django doc), it is not possible to test expiration of the cookie.
 
