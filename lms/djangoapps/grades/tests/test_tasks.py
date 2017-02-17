@@ -42,7 +42,7 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
         self.user = UserFactory()
         PersistentGradesEnabledFlag.objects.create(enabled_for_all_courses=True, enabled=True)
 
-    def set_up_course(self, enable_persistent_grades=True):
+    def set_up_course(self, enable_persistent_grades=True, create_multiple_subsections=False):
         """
         Configures the course for this test.
         """
@@ -58,6 +58,10 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
         self.chapter = ItemFactory.create(parent=self.course, category="chapter", display_name="Chapter")
         self.sequential = ItemFactory.create(parent=self.chapter, category='sequential', display_name="Sequential1")
         self.problem = ItemFactory.create(parent=self.sequential, category='problem', display_name='Problem')
+
+        if create_multiple_subsections:
+            seq2 = ItemFactory.create(parent=self.chapter, category='sequential')
+            ItemFactory.create(parent=seq2, category='problem')
 
         self.frozen_now_datetime = datetime.now().replace(tzinfo=pytz.UTC)
         self.frozen_now_timestamp = to_timestamp(self.frozen_now_datetime)
@@ -137,28 +141,28 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
             self.assertEquals(mock_block_structure_create.call_count, 1)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 1, 23),
-        (ModuleStoreEnum.Type.split, 3, 22),
+        (ModuleStoreEnum.Type.mongo, 1, 24, True),
+        (ModuleStoreEnum.Type.mongo, 1, 21, False),
+        (ModuleStoreEnum.Type.split, 3, 23, True),
+        (ModuleStoreEnum.Type.split, 3, 20, False),
     )
     @ddt.unpack
-    def test_query_counts(self, default_store, num_mongo_calls, num_sql_calls):
+    def test_query_counts(self, default_store, num_mongo_calls, num_sql_calls, create_multiple_subsections):
         with self.store.default_store(default_store):
-            self.set_up_course()
+            self.set_up_course(create_multiple_subsections=create_multiple_subsections)
             self.assertTrue(PersistentGradesEnabledFlag.feature_enabled(self.course.id))
             with check_mongo_calls(num_mongo_calls):
                 with self.assertNumQueries(num_sql_calls):
                     self._apply_recalculate_subsection_grade()
 
-    # TODO (TNL-6225) Fix the number of SQL queries so they
-    # don't grow linearly with the number of sequentials.
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 1, 46),
-        (ModuleStoreEnum.Type.split, 3, 45),
+        (ModuleStoreEnum.Type.mongo, 1, 24),
+        (ModuleStoreEnum.Type.split, 3, 23),
     )
     @ddt.unpack
     def test_query_counts_dont_change_with_more_content(self, default_store, num_mongo_calls, num_sql_calls):
         with self.store.default_store(default_store):
-            self.set_up_course()
+            self.set_up_course(create_multiple_subsections=True)
             self.assertTrue(PersistentGradesEnabledFlag.feature_enabled(self.course.id))
 
             num_problems = 10
