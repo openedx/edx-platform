@@ -15,7 +15,6 @@ import json
 from lazy import lazy
 import logging
 
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.timezone import now
 from eventtracking import tracker
@@ -295,21 +294,6 @@ class PersistentSubsectionGrade(DeleteGradesMixin, TimeStampedModel):
     # track which blocks were visible at the time of grade calculation
     visible_blocks = models.ForeignKey(VisibleBlocks, db_column='visible_blocks_hash', to_field='hashed')
 
-    def _is_unattempted_with_score(self):
-        """
-        Return True if the object has a non-zero score, but has not been
-        attempted.  This is an inconsistent state, and needs to be cleaned up.
-        """
-        return self.first_attempted is None and any(field != 0.0 for field in (self.earned_all, self.earned_graded))
-
-    def clean(self):
-        """
-        If an grade has not been attempted, but was given a non-zero score,
-        raise a ValidationError.
-        """
-        if self._is_unattempted_with_score():
-            raise ValidationError("Unattempted problems cannot have a non-zero score.")
-
     @property
     def full_usage_key(self):
         """
@@ -391,7 +375,6 @@ class PersistentSubsectionGrade(DeleteGradesMixin, TimeStampedModel):
         if attempted and not grade.first_attempted:
             grade.first_attempted = now()
             grade.save()
-        grade.full_clean()
         cls._emit_grade_calculated_event(grade)
         return grade
 
@@ -402,9 +385,7 @@ class PersistentSubsectionGrade(DeleteGradesMixin, TimeStampedModel):
         """
         cls._prepare_params_and_visible_blocks(params)
         cls._prepare_attempted_for_create(params, now())
-        grade = cls(**params)
-        grade.full_clean()
-        grade.save()
+        grade = cls.objects.create(**params)
         cls._emit_grade_calculated_event(grade)
         return grade
 
@@ -423,8 +404,6 @@ class PersistentSubsectionGrade(DeleteGradesMixin, TimeStampedModel):
         for params in grade_params_iter:
             cls._prepare_attempted_for_create(params, first_attempt_timestamp)
         grades = [PersistentSubsectionGrade(**params) for params in grade_params_iter]
-        for grade in grades:
-            grade.full_clean()
         grades = cls.objects.bulk_create(grades)
         for grade in grades:
             cls._emit_grade_calculated_event(grade)
