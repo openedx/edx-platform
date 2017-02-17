@@ -150,7 +150,7 @@ class CertificatesInstructorDashTest(SharedModuleStoreTestCase):
     @contextlib.contextmanager
     def _certificate_status(self, description, status):
         """Configure the certificate status by mocking the certificates API. """
-        patched = 'instructor.views.instructor_dashboard.certs_api.example_certificates_status'
+        patched = 'lms.djangoapps.instructor.views.instructor_dashboard.certs_api.example_certificates_status'
         with mock.patch(patched) as certs_api_status:
             cert_status = [{
                 'description': description,

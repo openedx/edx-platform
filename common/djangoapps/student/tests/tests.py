@@ -14,6 +14,7 @@ from django.contrib.auth.models import User, AnonymousUser
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.client import Client
+from django.test.utils import override_settings
 from edx_oauth2_provider.tests.factories import ClientFactory
 import httpretty
 from markupsafe import escape

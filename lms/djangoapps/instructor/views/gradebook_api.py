@@ -13,8 +13,8 @@ from opaque_keys.edx.keys import CourseKey
 
 from edxmako.shortcuts import render_to_response
 from courseware.courses import get_course_with_access
-from instructor.offline_gradecalc import student_grades
-from instructor.views.api import require_level
+from lms.djangoapps.instructor.offline_gradecalc import student_grades
+from lms.djangoapps.instructor.views.api import require_level
 from xmodule.modulestore.django import modulestore
 
 

@@ -23,7 +23,7 @@ from student.roles import CourseCcxCoachRole
 from student.tests.factories import (
     AdminFactory
 )
-from instructor.enrollment import (
+from lms.djangoapps.instructor.enrollment import (
     EmailEnrollmentState,
     enroll_email,
     get_email_params,
