@@ -1,29 +1,73 @@
 """
 Helpers to access the enterprise app
 """
-from django.conf import settings
-from django.core.urlresolvers import reverse
-from django.utils.translation import ugettext as _
 import logging
 
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 from django.utils.http import urlencode
-
+from edx_rest_api_client.client import EdxRestApiClient
 try:
-    from enterprise.models import EnterpriseCustomer
     from enterprise import utils as enterprise_utils
-    from enterprise.tpa_pipeline import (
-        active_provider_requests_data_sharing,
-        active_provider_enforces_data_sharing,
-        get_enterprise_customer_for_request,
-    )
     from enterprise.utils import consent_necessary_for_course
-
 except ImportError:
     pass
-
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.lib.token_utils import JwtBuilder
+from slumber.exceptions import HttpClientError, HttpServerError
+
+
 ENTERPRISE_CUSTOMER_BRANDING_OVERRIDE_DETAILS = 'enterprise_customer_branding_override_details'
 LOGGER = logging.getLogger("edx.enterprise_helpers")
+
+
+class EnterpriseApiException(Exception):
+    """
+    Exception for errors while communicating with the Enterprise service API.
+    """
+    pass
+
+
+class EnterpriseApiClient(object):
+    """
+    Class for producing an Enterprise service API client.
+    """
+
+    def __init__(self):
+        """
+        Initialize an Enterprise service API client, authenticated using the Enterprise worker username.
+        """
+        self.user = User.objects.get(username=settings.ENTERPRISE_SERVICE_WORKER_USERNAME)
+        jwt = JwtBuilder(self.user).build_token([])
+        self.client = EdxRestApiClient(
+            configuration_helpers.get_value('ENTERPRISE_API_URL', settings.ENTERPRISE_API_URL),
+            jwt=jwt
+        )
+
+    def post_enterprise_course_enrollment(self, username, course_id, consent_granted):
+        """
+        Create an EnterpriseCourseEnrollment by using the corresponding serializer (for validation).
+        """
+        data = {
+            'username': username,
+            'course_id': course_id,
+            'consent_granted': consent_granted,
+        }
+        endpoint = getattr(self.client, 'enterprise-course-enrollment')  # pylint: disable=literal-used-as-attribute
+        try:
+            endpoint.post(data=data)
+        except (HttpClientError, HttpServerError):
+            message = (
+                "An error occured while posting EnterpriseCourseEnrollment for user {username} and "
+                "course run {course_id} (consent_granted value: {consent_granted})"
+            ).format(
+                username=username,
+                course_id=course_id,
+                consent_granted=consent_granted,
+            )
+            LOGGER.exception(message)
+            raise EnterpriseApiException(message)
 
 
 def enterprise_enabled():
