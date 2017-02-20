@@ -3,18 +3,21 @@ $(document).ready(function() {
 
     $('.generate_certs').click(function(e) {
         e.preventDefault();
-        var post_url = $('.generate_certs').data('endpoint');
-        $('.generate_certs').attr('disabled', true).addClass('is-disabled').attr('aria-disabled', true);
+        var request_cert_btn = $('.generate_certs');
+        request_cert_btn.attr('disabled', true).addClass('is-disabled').attr('aria-disabled', true);
         $.ajax({
             type: 'POST',
-            url: post_url,
+            url: request_cert_btn.data('endpoint'),
+            data: {
+                username: request_cert_btn.data('username')
+            },
             dataType: 'text',
             success: function() {
                 location.reload();
             },
             error: function(jqXHR, textStatus, errorThrown) {
                 $('#errors-info').html(jqXHR.responseText);
-                $('.generate_certs').attr('disabled', false).removeClass('is-disabled').attr('aria-disabled', false);
+                request_cert_btn.attr('disabled', false).removeClass('is-disabled').attr('aria-disabled', false);
             }
         });
     });

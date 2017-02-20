@@ -898,3 +898,19 @@ def get_user_role(user, course_key):
         return 'staff'
     else:
         return 'student'
+
+def has_access_on_students_profiles(user, course_key):
+    """
+    Check if the user has access of other students profiles.
+
+    Arguments:
+        user: User object specifying for which user we are checking the access
+        course_key:  A course_key specifying on which course the access to be checked.
+    """
+    staff_access = bool(has_access(user, 'staff', course_key))
+    try:
+        coach_access = has_ccx_coach_role(user, course_key)
+    except CCXLocatorValidationException:
+        coach_access = False
+    return bool(staff_access or coach_access)
+

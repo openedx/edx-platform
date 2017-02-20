@@ -69,7 +69,7 @@ from django.utils.http import urlquote_plus
                                 %elif certificate_data.cert_status == CertificateStatuses.downloadable and certificate_data.download_url:
                                 <a class="btn" href="${certificate_data.download_url}" target="_blank">${_("Download Your Certificate")} <span class="sr">${_("Opens in a new browser window")}</span></a>
                                 %elif certificate_data.cert_status == CertificateStatuses.requesting:
-                                <button class="btn generate_certs" data-endpoint="${post_url}" id="btn_generate_cert">${_('Request Certificate')}</button>
+                                <button class="btn generate_certs" data-endpoint="${post_url}" id="btn_generate_cert" data-username="${student.username}">${_('Request Certificate')}</button>
                                 %endif
                             </div>
                         </div>

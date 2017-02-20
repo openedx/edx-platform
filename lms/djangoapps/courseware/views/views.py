@@ -49,7 +49,7 @@ from openedx.core.djangoapps.models.course_details import CourseDetails
 from commerce.utils import EcommerceService
 from enrollment.api import add_enrollment
 from course_modes.models import CourseMode
-from courseware.access import has_access, has_ccx_coach_role, _adjust_start_date_for_beta_testers
+from courseware.access import has_access, _adjust_start_date_for_beta_testers, has_access_on_students_profiles
 from courseware.access_response import StartDateError
 from courseware.access_utils import in_preview_mode
 from courseware.courses import (
@@ -754,14 +754,7 @@ def _progress(request, course_key, student_id):
         # always allowed to see your own profile
         student = request.user
     else:
-        try:
-            coach_access = has_ccx_coach_role(request.user, course_key)
-        except CCXLocatorValidationException:
-            coach_access = False
-
-        has_access_on_students_profiles = staff_access or coach_access
-        # Requesting access to a different student's profile
-        if not has_access_on_students_profiles:
+        if not has_access_on_students_profiles(request.user, course_key):
             raise Http404
         try:
             student = User.objects.get(id=student_id)
@@ -791,7 +784,7 @@ def _progress(request, course_key, student_id):
         'grade_summary': grade_summary,
         'staff_access': staff_access,
         'student': student,
-        'passed': is_course_passed(course, grade_summary),
+        'passed': is_course_passed(course, course_grade),
         'credit_course_requirements': _credit_course_requirements(course_key, student),
         'certificate_data': _get_cert_data(student, course, course_key, is_active, enrollment_mode)
     }
@@ -1162,32 +1155,27 @@ def course_survey(request, course_id):
     )
 
 
-def is_course_passed(course, grade_summary=None, student=None, request=None):
+def is_course_passed(course, course_grade=None, student=None):
     """
     check user's course passing status. return True if passed
 
     Arguments:
         course : course object
-        grade_summary (dict) : contains student grade details.
+        course_grade : CourseGradeFactory object.
         student : user object
-        request (HttpRequest)
-
     Returns:
         returns bool value
     """
-    nonzero_cutoffs = [cutoff for cutoff in course.grade_cutoffs.values() if cutoff > 0]
-    success_cutoff = min(nonzero_cutoffs) if nonzero_cutoffs else None
+    if course_grade is None:
+        course_grade = CourseGradeFactory().create(student, course)
 
-    if grade_summary is None:
-        grade_summary = CourseGradeFactory().create(student, course).summary
-
-    return success_cutoff and grade_summary['percent'] >= success_cutoff
+    return course_grade.passed
 
 
 # Grades can potentially be written - if so, let grading manage the transaction.
 @transaction.non_atomic_requests
 @require_POST
-def generate_user_cert(request, course_id):
+def generate_user_cert(request, course_id, student_id=None):
     """Start generating a new certificate for the user.
 
     Certificate generation is allowed if:
@@ -1203,12 +1191,20 @@ def generate_user_cert(request, course_id):
     Args:
         request (HttpRequest): The POST request to this view.
         course_id (unicode): The identifier for the course.
+        student_id (str): The ID of the user for which to generate a certificate.
 
     Returns:
         HttpResponse: 200 on success, 400 if a new certificate cannot be generated.
 
     """
+    def get_student_from_post_params(params):
+        try:
+            username = params.get("username")
+            return User.objects.get(username=username)
+        except User.DoesNotExist:
+            return None
 
+    course_key = CourseKey.from_string(course_id)
     if not request.user.is_authenticated():
         log.info(u"Anon user trying to generate certificate for %s", course_id)
         return HttpResponseBadRequest(
@@ -1216,15 +1212,24 @@ def generate_user_cert(request, course_id):
                 platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
             )
         )
+    student = get_student_from_post_params(request.POST)
+    if not student:
+        return HttpResponseBadRequest(_("User is not valid."))
 
-    student = request.user
-    course_key = CourseKey.from_string(course_id)
+    if request.user.id != student.id and not has_access_on_students_profiles(request.user, course_key):
+        log.info(
+            u"Non-staff user %s trying generate certificate for %s in %s",
+            request.user.id,
+            student_id,
+            course_id
+        )
+        return HttpResponseBadRequest(_("You do not have access to create certificate for this user."))
 
     course = modulestore().get_course(course_key, depth=2)
     if not course:
         return HttpResponseBadRequest(_("Course is not valid"))
 
-    if not is_course_passed(course, None, student, request):
+    if not is_course_passed(course, None, student):
         return HttpResponseBadRequest(_("Your certificate will be available when you pass the course."))
 
     certificate_status = certs_api.certificate_downloadable_status(student, course.id)

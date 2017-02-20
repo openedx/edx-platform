@@ -1658,19 +1658,19 @@ class IsCoursePassedTests(ModuleStoreTestCase):
 
     def test_user_fails_if_not_clear_exam(self):
         # If user has not grade then false will return
-        self.assertFalse(views.is_course_passed(self.course, None, self.student, self.request))
+        self.assertFalse(views.is_course_passed(self.course, None, self.student))
 
     @patch('lms.djangoapps.grades.new.course_grade.CourseGrade.summary', PropertyMock(return_value={'percent': 0.9}))
     def test_user_pass_if_percent_appears_above_passing_point(self):
         # Mocking the grades.grade
         # If user has above passing marks then True will return
-        self.assertTrue(views.is_course_passed(self.course, None, self.student, self.request))
+        self.assertTrue(views.is_course_passed(self.course, None, self.student))
 
     @patch('lms.djangoapps.grades.new.course_grade.CourseGrade.summary', PropertyMock(return_value={'percent': 0.2}))
     def test_user_fail_if_percent_appears_below_passing_point(self):
         # Mocking the grades.grade
         # If user has below passing marks then False will return
-        self.assertFalse(views.is_course_passed(self.course, None, self.student, self.request))
+        self.assertFalse(views.is_course_passed(self.course, None, self.student))
 
     @patch(
         'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
@@ -1680,7 +1680,7 @@ class IsCoursePassedTests(ModuleStoreTestCase):
         # Mocking the grades.grade
         # If user's achieved passing marks are equal to the required passing
         # marks then it will return True
-        self.assertTrue(views.is_course_passed(self.course, None, self.student, self.request))
+        self.assertTrue(views.is_course_passed(self.course, None, self.student))
 
 
 @attr(shard=1)
@@ -1703,15 +1703,24 @@ class GenerateUserCertTests(ModuleStoreTestCase):
         self.assertTrue(self.client.login(username=self.student, password='123456'))
         self.url = reverse('generate_user_cert', kwargs={'course_id': unicode(self.course.id)})
 
+    def make_generate_user_cert_post_request(self, course_id=None, username=None):
+        if not course_id:
+            course_id = self.course.id
+        if not username:
+            username = self.student.username
+
+        generate_user_cert_url = reverse('generate_user_cert', kwargs={'course_id': unicode(course_id)})
+        return self.client.post(generate_user_cert_url, data={'username': username})
+
     def test_user_with_out_passing_grades(self):
         # If user has no grading then json will return failed message and badrequest code
-        resp = self.client.post(self.url)
-        self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
-        self.assertIn("Your certificate will be available when you pass the course.", resp.content)
+        response = self.make_generate_user_cert_post_request()
+        self.assertEqual(response.status_code, HttpResponseBadRequest.status_code)
+        self.assertIn("Your certificate will be available when you pass the course.", response.content)
 
     @patch(
-        'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
-        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75})
+        'lms.djangoapps.grades.new.course_grade.CourseGrade.passed',
+        PropertyMock(return_value=True)
     )
     @override_settings(CERT_QUEUE='certificates', LMS_SEGMENT_KEY="foobar")
     def test_user_with_passing_grade(self):
@@ -1725,8 +1734,8 @@ class GenerateUserCertTests(ModuleStoreTestCase):
 
         with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_send_to_queue:
             mock_send_to_queue.return_value = (0, "Successfully queued")
-            resp = self.client.post(self.url)
-            self.assertEqual(resp.status_code, 200)
+            response = self.make_generate_user_cert_post_request()
+            self.assertEqual(response.status_code, 200)
 
             # Verify Google Analytics event fired after generating certificate
             mock_tracker.track.assert_called_once_with(  # pylint: disable=no-member
@@ -1745,8 +1754,8 @@ class GenerateUserCertTests(ModuleStoreTestCase):
             mock_tracker.reset_mock()
 
     @patch(
-        'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
-        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75})
+        'lms.djangoapps.grades.new.course_grade.CourseGrade.passed',
+        PropertyMock(return_value=True)
     )
     def test_user_with_passing_existing_generating_cert(self):
         # If user has passing grade but also has existing generating cert
@@ -1757,13 +1766,13 @@ class GenerateUserCertTests(ModuleStoreTestCase):
             status=CertificateStatuses.generating,
             mode='verified'
         )
-        resp = self.client.post(self.url)
-        self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
-        self.assertIn("Certificate is being created.", resp.content)
+        response = self.make_generate_user_cert_post_request()
+        self.assertEqual(response.status_code, HttpResponseBadRequest.status_code)
+        self.assertIn("Certificate is being created.", response.content)
 
     @patch(
-        'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
-        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75})
+        'lms.djangoapps.grades.new.course_grade.CourseGrade.passed',
+        PropertyMock(return_value=True)
     )
     @override_settings(CERT_QUEUE='certificates', LMS_SEGMENT_KEY="foobar")
     def test_user_with_passing_existing_downloadable_cert(self):
@@ -1777,30 +1786,36 @@ class GenerateUserCertTests(ModuleStoreTestCase):
             mode='verified'
         )
 
-        resp = self.client.post(self.url)
-        self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
-        self.assertIn("Certificate has already been created.", resp.content)
+        response = self.make_generate_user_cert_post_request()
+        self.assertEqual(response.status_code, HttpResponseBadRequest.status_code)
+        self.assertIn("Certificate has already been created.", response.content)
 
     def test_user_with_non_existing_course(self):
         # If try to access a course with valid key pattern then it will return
         # bad request code with course is not valid message
-        resp = self.client.post('/courses/def/abc/in_valid/generate_user_cert')
-        self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
-        self.assertIn("Course is not valid", resp.content)
+        response = self.make_generate_user_cert_post_request(course_id='def/abc/in_valid')
+        self.assertEqual(response.status_code, HttpResponseBadRequest.status_code)
+        self.assertIn("Course is not valid", response.content)
 
     def test_user_with_invalid_course_id(self):
         # If try to access a course with invalid key pattern then 404 will return
         resp = self.client.post('/courses/def/generate_user_cert')
         self.assertEqual(resp.status_code, 404)
 
+    def test_create_certificate_with_invalid_student_id(self):
+        # If try to access a course with invalid key pattern then 404 will return
+        response = self.make_generate_user_cert_post_request(username='invalid_id')
+        self.assertIn("User is not valid.", response.content)
+        self.assertEqual(response.status_code, 400)
+
     def test_user_without_login_return_error(self):
         # If user try to access without login should see a bad request status code with message
         self.client.logout()
-        resp = self.client.post(self.url)
-        self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
+        response = self.make_generate_user_cert_post_request()
+        self.assertEqual(response.status_code, HttpResponseBadRequest.status_code)
         self.assertIn(u"You must be signed in to {platform_name} to create a certificate.".format(
             platform_name=settings.PLATFORM_NAME
-        ), resp.content.decode('utf-8'))
+        ), response.content.decode('utf-8'))
 
 
 class ActivateIDCheckerBlock(XBlock):
