@@ -263,13 +263,11 @@ class StubHttpService(HTTPServer, object):
 
     def shutdown(self):
         """
-        Stop the server and free up the port
+        Stop the server and close all connections
         """
-        # First call superclass shutdown()
-        HTTPServer.shutdown(self)
 
-        # We also need to manually close the socket
-        self.socket.close()
+        # Note: this will result in Bad File Descriptor errors
+        HTTPServer.server_close(self)
 
     @property
     def port(self):
