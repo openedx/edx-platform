@@ -53,14 +53,12 @@ define([
             }),
             previousView = new PreviousVideoUploadListView({
                 videoHandlerUrl: videoHandlerUrl,
-                collection: new VideoPagingCollection(previousUploads["videos"], {
+                collection: new VideoPagingCollection(previousUploads["results"], {
                     url: videoHandlerUrl,
-                    first_page: previousUploads["start"],
-                    last_page: previousUploads["end"],
-                    page_size: previousUploads["page_size"],
-                    sort_field: previousUploads["sort_field"],
-                    total_count: previousUploads["total_count"],
-                    sort_dir: previousUploads["sort_dir"]  
+                    pageSize: previousUploads["page_size"],
+                    sortField: previousUploads["sort_field"],
+                    totalCount: previousUploads["total_count"],
+                    sortDir: previousUploads["sort_dir"]
                 }),
                 encodingsDownloadUrl: encodingsDownloadUrl
             });

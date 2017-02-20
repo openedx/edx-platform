@@ -172,7 +172,7 @@ def video_encodings_download(request, course_key_string):
 
     profile_whitelist = VideoUploadConfig.get_profile_whitelist()
 
-    videos = list(_get_videos(course))
+    videos = list(_get_videos(course, request)["videos"])
     name_col = _("Name")
     duration_col = _("Duration")
     added_col = _("Date Added")
@@ -290,34 +290,39 @@ def _get_videos(course, request):
     """
     Retrieves the list of videos from VAL corresponding to this course.
     """
-    params = request.GET.dict()
+    params = {
+        "page": request.GET.get("page", 1),
+        "page_size": request.GET.get("page_size", 20),
+        "paginated": True
+    }
 
     resp = get_videos_for_course(course.id, **params)
 
-    videos = resp["videos"]
+    videos_data = resp.data
+    videos = videos_data["results"]
     # convert VAL's status to studio's Video Upload feature status.
     for video in videos:
         video["status"] = convert_video_status(video)
 
-    resp["videos"] = videos
-    return resp
+    videos_data["results"] = videos
+    return videos_data
 
 
 def _get_index_videos(course, request):
     """
     Returns the information about each video upload required for the video list
     """
-    resp = _get_videos(course, request)
+    videos_data = _get_videos(course, request)
     videos = list(
         {
             attr: video[attr]
             for attr in ["edx_video_id", "client_video_id", "created", "duration", "status"]
         }
-        for video in resp["videos"]
+        for video in videos_data["results"]
     )
 
-    resp["videos"] = videos
-    return resp
+    videos_data["results"] = videos
+    return videos_data
 
 
 def videos_index_html(course, request):

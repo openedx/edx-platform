@@ -7,14 +7,10 @@ define([
 
     var VideoPagingCollection = PagingCollection.extend({
 
-        constructor: function(models, options){
-            this.state = this.initState(options);
-            PagingCollection.prototype.constructor.call(this, models, options);
-        },
-
         initialize: function(models, options){
-            PagingCollection.prototype.initialize.call(this, models, options);
+            this.state = this.initState(options);
             this.url = options.url;
+            PagingCollection.prototype.initialize.call(this, models, options);
         },
 
         queryParams: {
@@ -30,11 +26,9 @@ define([
 
         initState: function(options){
             return {
-                firstPage: options.first_page,
-                lastPage: options.last_page,
-                pageSize: options.page_size,
-                totalRecords: options.total_count,
-                sortKey: options.sort_field,
+                pageSize: options.pageSize,
+                totalRecords: options.totalCount,
+                sortKey: options.sortField,
                 order: function(options){
                     if (options.sort_dir === 'asc') {
                         return -1
@@ -48,16 +42,10 @@ define([
             };
         },
 
-        parse: function(response, options) {
-            response.results = response.videos;
-            delete response.videos;
-            return PagingCollection.prototype.parse.call(this, response, options);
-        },
-
         parseState: function(response) {
             return {
                 totalRecords: response[0].total_count,
-                totalPages: response[0].end - response[0].start + 1
+                totalPages: response[0].total_pages
             };
         }
     });
