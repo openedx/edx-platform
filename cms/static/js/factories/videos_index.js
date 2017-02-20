@@ -29,12 +29,10 @@ define([
                     }).done(function(responseData) {
                         var updatedCollection = new VideoPagingCollection(responseData.videos, {
                             url: videoHandlerUrl,
-                            first_page: responseData.start,
-                            last_page: responseData.end,
-                            page_size: responseData.page_size,
-                            sort_field: responseData.sort_field,
-                            total_count: responseData.total_count,
-                            sort_dir: responseData.sort_dir
+                            pageSize: responseData.page_size,
+                            sortField: responseData.sort_field,
+                            totalCount: responseData.total_count,
+                            sortDir: responseData.sort_dir
                         }).filter(function(video) {
                                 // Include videos that are not in the active video upload list,
                                 // or that are marked as Upload Complete
