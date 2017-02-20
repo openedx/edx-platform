@@ -12,6 +12,7 @@ from django.test.utils import override_settings
 from django.conf import settings
 from mock import patch
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from student.views import create_account
 
 
@@ -252,6 +253,7 @@ class TestPasswordPolicy(TestCase):
         """
         self.url_params['password'] = 'aaa'  # shouldn't pass validation
         request = self.request_factory.post(self.url, self.url_params)
+        request.site = SiteFactory.create()
         # now indicate we are doing ext_auth by setting 'ExternalAuthMap' in the session.
         request.session = import_module(settings.SESSION_ENGINE).SessionStore()  # empty session
         extauth = ExternalAuthMap(external_id='withmap@stanford.edu',
