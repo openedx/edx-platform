@@ -7,7 +7,7 @@
     "coffee-script": "1.6.1",
     "edx-pattern-library": "0.18.1",
     "edx-ui-toolkit": "1.5.1",
-    "hls.js": "^0.6.21",
+    "hls.js": "~0.6.21",
     "jquery": "~2.2.0",
     "jquery-migrate": "^1.4.1",
     "jquery.scrollto": "~2.1.2",
