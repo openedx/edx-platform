@@ -87,13 +87,13 @@ class EmailMarketingTests(TestCase):
             "success": True,
             "redirect_url": 'test.com/test',
         })
-        self.request.COOKIES['sailthru_content'] = 'cookie_content'
+        self.request.COOKIES['anonymous_interest'] = 'cookie_content'
         mock_get_current_request.return_value = self.request
         mock_sailthru.return_value = SailthruResponse(JsonResponse({'keys': {'cookie': 'test_cookie'}}))
         add_email_marketing_cookies(None, response=response, user=self.user)
         mock_sailthru.assert_called_with('user',
                                          {'fields': {'keys': 1},
-                                          'cookies': {'sailthru_content': 'cookie_content'},
+                                          'cookies': {'anonymous_interest': 'cookie_content'},
                                           'id': TEST_EMAIL,
                                           'vars': {'last_login_date': ANY}})
         self.assertTrue('sailthru_hid' in response.cookies)
