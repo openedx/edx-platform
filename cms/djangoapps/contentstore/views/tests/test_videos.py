@@ -181,8 +181,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
         response_videos = response_videos_data["results"]
         self.assertEqual(len(response_videos), len(self.previous_uploads))
         for i, response_video in enumerate(response_videos):
-            # Videos should be returned by creation date descending
-            original_video = self.previous_uploads[-(i + 1)]
+            original_video = self.previous_uploads[i]
             self.assertEqual(
                 set(response_video.keys()),
                 set(["edx_video_id", "client_video_id", "created", "duration", "status"])
@@ -559,8 +558,7 @@ class VideoUrlsCsvTestCase(VideoUploadTestMixin, CourseTestCase):
             response_video = {
                 key.decode("utf-8"): value.decode("utf-8") for key, value in row.items()
             }
-            # Videos should be returned by creation date descending
-            original_video = self.previous_uploads[-(i + 1)]
+            original_video = self.previous_uploads[i]
             self.assertEqual(response_video["Name"], original_video["client_video_id"])
             self.assertEqual(response_video["Duration"], str(original_video["duration"]))
             dateutil.parser.parse(response_video["Date Added"])
