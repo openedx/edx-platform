@@ -175,7 +175,7 @@ function(HTML5Video, HTML5HLSVideo, Resizer, HLS, _) {
             }
             player = state.videoEl = state.videoPlayer.player.videoEl;
             player[0].addEventListener(eventToBeTriggered, state.videoPlayer.onLoadMetadataHtml5, false);
-        } else if (state.videoType === 'youtube') {
+        } else {
             youTubeId = state.youtubeId();
 
             state.videoPlayer.player = new YT.Player(state.id, {

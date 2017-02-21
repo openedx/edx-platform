@@ -233,7 +233,7 @@ function(_) {
             }
 
             // Place the <video> element on the page.
-            this.videoEl.appendTo(el.find('.video-player div'));
+            this.videoEl.appendTo(el.find('.video-player > div:first-child'));
         };
 
         return Player;
