@@ -65,6 +65,12 @@ class Command(BaseCommand):
             dest='modified_end',
             help='Ending range for modified date (inclusive): e.g. "2016-12-23 16:43"',
         )
+        parser.add_argument(
+            '--db_table',
+            dest='db_table',
+            help='Specify "subsection" to reset subsection grades or "course" to reset course grades. If absent, both '
+                 'are reset.',
+        )
 
     def handle(self, *args, **options):
         course_keys = None
@@ -73,6 +79,9 @@ class Command(BaseCommand):
 
         run_mode = get_mutually_exclusive_required_option(options, 'delete', 'dry_run')
         courses_mode = get_mutually_exclusive_required_option(options, 'courses', 'all_courses')
+        db_table = options.get('db_table')
+        if db_table not in {'subsection', 'course', None}:
+            raise CommandError('Invalid value for db_table. Valid options are "subsection" or "course" only.')
 
         if options.get('modified_start'):
             modified_start = datetime.strptime(options['modified_start'], DATE_FORMAT)
@@ -89,8 +98,11 @@ class Command(BaseCommand):
 
         operation = self._query_grades if run_mode == 'dry_run' else self._delete_grades
 
-        operation(PersistentSubsectionGrade, course_keys, modified_start, modified_end)
-        operation(PersistentCourseGrade, course_keys, modified_start, modified_end)
+        if db_table == 'subsection' or db_table is None:
+            operation(PersistentSubsectionGrade, course_keys, modified_start, modified_end)
+
+        if db_table == 'course' or db_table is None:
+            operation(PersistentCourseGrade, course_keys, modified_start, modified_end)
 
         log.info("reset_grade: Finished in %s mode!", run_mode)
 
