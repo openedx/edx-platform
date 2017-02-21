@@ -98,5 +98,5 @@ git+https://github.com/open-craft/xblock-poll@v1.2.5#egg=xblock-poll==1.2.5
 git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.0.14#egg=xblock-drag-and-drop-v2==2.0.14
 
 # Hacked in stuff to test mongomock in jenkins land
-git+https://github.com/bmedx/mongomock.git@mocktest-3.7.0#egg=mongomock==3.7.0
-git+https://github.com/bmedx/mongo-python-driver.git@mocktest-2.9.1#egg=pymongo==2.9.1
+git+https://github.com/bmedx/mongomock.git@mocktest-3.7.0#egg=mongomock==0.0
+git+https://github.com/bmedx/mongo-python-driver.git@mocktest-2.9.1#egg=pymongo==0.0
