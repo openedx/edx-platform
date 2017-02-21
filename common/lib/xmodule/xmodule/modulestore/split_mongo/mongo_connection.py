@@ -308,7 +308,7 @@ class MongoConnection(object):
         """
         Check that the db is reachable.
         """
-        if self.database.connection.alive():
+        if self.database._client.alive():
             return True
         else:
             raise HeartbeatFailure("Can't connect to {}".format(self.database.name), 'mongo')
@@ -569,7 +569,7 @@ class MongoConnection(object):
         """
         Closes any open connections to the underlying databases
         """
-        self.database.connection.close()
+        self.database._client.close()
 
     def mongo_wire_version(self):
         """
@@ -589,7 +589,7 @@ class MongoConnection(object):
 
         If connections is True, then close the connection to the database as well.
         """
-        connection = self.database.connection
+        connection = self.database._client
 
         if database:
             connection.drop_database(self.database.name)

@@ -83,7 +83,8 @@ class UserAPITestCase(ApiTestCase):
         self.assertSelfReferential(pref)
         self.assertUserIsValid(pref["user"])
 
-
+import unittest
+@unittest.skip("wow")
 class EmptyUserTestCase(UserAPITestCase):
     """
     Test that the endpoint supports empty user result sets
@@ -95,7 +96,7 @@ class EmptyUserTestCase(UserAPITestCase):
         self.assertIsNone(result["previous"])
         self.assertEqual(result["results"], [])
 
-
+@unittest.skip("wow")
 class EmptyRoleTestCase(UserAPITestCase):
     """Test that the endpoint supports empty result sets"""
     course_id = SlashSeparatedCourseKey.from_deprecated_string("org/course/run")

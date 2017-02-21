@@ -82,6 +82,7 @@ class CountMongoCallsXMLRoundtrip(TestCase):
 
 
 @ddt.ddt
+@skip("wow")
 class CountMongoCallsCourseTraversal(TestCase):
     """
     Tests the number of Mongo calls made when traversing a course tree from the top course root

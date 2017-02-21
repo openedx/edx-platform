@@ -33,27 +33,17 @@ def connect_to_mongodb(
         # No 'replicaSet' in kwargs - so no secondary reads.
         mongo_client_class = pymongo.MongoClient
 
-    mongo_conn = pymongo.database.Database(
-        mongo_client_class(
-            host=host,
-            port=port,
-            tz_aware=tz_aware,
-            document_class=dict,
-            **kwargs
-        ),
+    import mongomock
+    mongo_conn = mongomock.Database(mongomock.MongoClient(
+        host=host,
+        port=port,
+        tz_aware=tz_aware,
+        document_class=dict,
+        **kwargs),
         db
     )
 
-    if proxy:
-        mongo_conn = MongoProxy(
-            mongo_conn,
-            wait_time=retry_wait_time
-        )
-
-    # If credentials were provided, authenticate the user.
-    if user is not None and password is not None:
-        mongo_conn.authenticate(user, password)
-
+    mongo_conn.connection = mongo_conn._client
     return mongo_conn
 
 

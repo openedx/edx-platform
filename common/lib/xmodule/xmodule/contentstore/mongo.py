@@ -51,7 +51,7 @@ class MongoContentStore(ContentStore):
         """
         Closes any open connections to the underlying databases
         """
-        self.fs_files.database.connection.close()
+        #self.fs_files.database.connection.close()
 
     def _drop_database(self, database=True, collections=True, connections=True):
         """

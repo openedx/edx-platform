@@ -602,14 +602,15 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         """
         Closes any open connections to the underlying database
         """
-        self.collection.database.connection.close()
+        #self.collection.database.connection.close()
 
     def mongo_wire_version(self):
         """
         Returns the wire version for mongo. Only used to unit tests which instrument the connection.
         """
-        self.database.connection._ensure_connected()
-        return self.database.connection.max_wire_version
+
+        #self.database.connection._ensure_connected()
+        #return self.database.connection.max_wire_version
 
     def _drop_database(self, database=True, collections=True, connections=True):
         """
@@ -635,8 +636,8 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         else:
             self.collection.remove({})
 
-        if connections:
-            connection.close()
+        #if connections:
+        #    connection.close()
 
     @autoretry_read()
     def fill_in_run(self, course_key):
