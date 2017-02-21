@@ -57,6 +57,9 @@ def submissions_score_set_handler(sender, **kwargs):  # pylint: disable=unused-a
     user = user_by_anonymous_id(kwargs['anonymous_user_id'])
     if user is None:
         return
+    if points_possible == 0:
+        # This scenario is known to not succeed, see TNL-6559 for details.
+        return
 
     PROBLEM_WEIGHTED_SCORE_CHANGED.send(
         sender=None,
@@ -100,6 +103,7 @@ def submissions_score_reset_handler(sender, **kwargs):  # pylint: disable=unused
         course_id=course_id,
         usage_id=usage_id,
         modified=kwargs['created_at'],
+        score_deleted=True,
         score_db_table=ScoreDatabaseTableEnum.submissions,
     )
 
