@@ -279,10 +279,9 @@ def after_each_step(step):
 
 
 @after.harvest
-def teardown_browser(total):
+def saucelabs_status(total):
     """
-    Quit the browser after executing the tests.
+    Collect data for saucelabs.
     """
     if world.LETTUCE_SELENIUM_CLIENT == 'saucelabs':
         set_saucelabs_job_status(world.jobid, total.scenarios_ran == total.scenarios_passed)
-    world.browser.quit()
