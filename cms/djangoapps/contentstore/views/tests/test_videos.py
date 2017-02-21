@@ -177,7 +177,8 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
     def test_get_json(self):
         response = self.client.get_json(self.url)
         self.assertEqual(response.status_code, 200)
-        response_videos = json.loads(response.content)["videos"]
+        response_videos_data = json.loads(response.content)
+        response_videos = response_videos_data["results"]
         self.assertEqual(len(response_videos), len(self.previous_uploads))
         for i, response_video in enumerate(response_videos):
             # Videos should be returned by creation date descending
@@ -414,7 +415,8 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
         """
         response = self.client.get_json(url)
         self.assertEqual(response.status_code, 200)
-        response_videos = json.loads(response.content)["videos"]
+        response_videos_data = json.loads(response.content)
+        response_videos = response_videos_data["results"]
         self.assertEqual(len(response_videos), len(self.previous_uploads) - deleted_videos)
 
         if deleted_videos:
@@ -480,7 +482,8 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
         """
         response = self.client.get_json(url)
         self.assertEqual(response.status_code, 200)
-        videos = json.loads(response.content)["videos"]
+        videos_data = json.loads(response.content)
+        videos = videos_data["results"]
         for video in videos:
             if video['edx_video_id'] == edx_video_id:
                 return self.assertEqual(video['status'], status)

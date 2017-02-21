@@ -1,7 +1,9 @@
 define(
     ['jquery', 'underscore', 'backbone', 'js/views/previous_video_upload_list',
-     'common/js/spec_helpers/template_helpers', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'],
-    function($, _, Backbone, PreviousVideoUploadListView, TemplateHelpers, AjaxHelpers) {
+     'common/js/spec_helpers/template_helpers', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+     'js/collections/video'],
+    function($, _, Backbone, PreviousVideoUploadListView, TemplateHelpers, AjaxHelpers,
+        VideoPagingCollection) {
         'use strict';
         describe('PreviousVideoUploadListView', function() {
             var videoHandlerUrl = '/videos/course-v1:org.0+course_0+Run_0',
@@ -13,7 +15,7 @@ define(
                         edx_video_id: 'dummy_id',
                         status: 'uploading'
                     };
-                    var collection = new Backbone.Collection(
+                    var collection = new VideoPagingCollection(
                         _.map(
                             _.range(numModels),
                             function(num, index) {
@@ -21,7 +23,13 @@ define(
                                     _.extend({}, modelData, {edx_video_id: 'dummy_id_' + index})
                                 );
                             }
-                        )
+                        ), {
+                            url: videoHandlerUrl,
+                            pageSize: 10,
+                            sortField: "Name",
+                            totalCount: numModels,
+                            sortDir: "asc"
+                        }
                     );
                     var view = new PreviousVideoUploadListView({
                         collection: collection,

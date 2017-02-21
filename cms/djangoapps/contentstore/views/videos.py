@@ -171,7 +171,8 @@ def video_encodings_download(request, course_key_string):
 
     profile_whitelist = VideoUploadConfig.get_profile_whitelist()
 
-    videos = list(_get_videos(course, request)["videos"])
+    videos_data = _get_videos(course, request)
+    videos = videos_data["results"]
     name_col = _("Name")
     duration_col = _("Duration")
     added_col = _("Date Added")
