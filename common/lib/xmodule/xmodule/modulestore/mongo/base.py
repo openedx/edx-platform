@@ -627,7 +627,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         # drop the assets
         super(MongoModuleStore, self)._drop_database(database, collections, connections)
 
-        connection = self.collection.database.connection
+        connection = self.collection.database._client
 
         if database:
             connection.drop_database(self.collection.database.proxied_object)

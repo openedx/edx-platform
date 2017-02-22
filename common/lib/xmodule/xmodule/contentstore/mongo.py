@@ -37,15 +37,15 @@ class MongoContentStore(ContentStore):
         # The appropriate methods below are marked as autoretry_read - those methods will handle
         # the AutoReconnect errors.
         proxy = False
-        mongo_db = connect_to_mongodb(
+        self.mongo_db = connect_to_mongodb(
             db, host,
             port=port, tz_aware=tz_aware, user=user, password=password, proxy=proxy, **kwargs
         )
 
-        self.fs = gridfs.GridFS(mongo_db, bucket)  # pylint: disable=invalid-name
+        self.fs = gridfs.GridFS(self.mongo_db, bucket)  # pylint: disable=invalid-name
 
-        self.fs_files = mongo_db[bucket + ".files"]  # the underlying collection GridFS uses
-        self.chunks = mongo_db[bucket + ".chunks"]
+        self.fs_files = self.mongo_db[bucket + ".files"]  # the underlying collection GridFS uses
+        self.chunks = self.mongo_db[bucket + ".chunks"]
 
     def close_connections(self):
         """
@@ -65,7 +65,7 @@ class MongoContentStore(ContentStore):
 
         If connections is True, then close the connection to the database as well.
         """
-        connection = self.fs_files.database.connection
+        connection = self.mongo_db._client
 
         if database:
             connection.drop_database(self.fs_files.database)
