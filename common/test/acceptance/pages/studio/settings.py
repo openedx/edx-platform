@@ -285,6 +285,8 @@ class SettingsPage(CoursePage):
                 '#alert-confirmation-title',
                 'Save confirmation message is visible'
             )
+        # After visibility an ajax call is in process, waiting for that to complete
+        self.wait_for_ajax()
 
     def refresh_page(self, wait_for_confirmation=True):
         """
