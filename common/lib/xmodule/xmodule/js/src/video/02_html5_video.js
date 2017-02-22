@@ -1,3 +1,4 @@
+/* eslint-disable no-console, no-param-reassign */
 /**
  * @file HTML5 video player module. Provides methods to control the in-browser
  * HTML5 video player.
@@ -21,6 +22,77 @@ function(_) {
     var HTML5Video = {};
 
     HTML5Video.Player = (function() {
+        /*
+         * Constructor function for HTML5 Video player.
+         *
+         * @param {String|Object} el A DOM element where the HTML5 player will
+         * be inserted (as returned by jQuery(selector) function), or a
+         * selector string which will be used to select an element. This is a
+         * required parameter.
+         *
+         * @param config - An object whose properties will be used as
+         * configuration options for the HTML5 video player. This is an
+         * optional parameter. In the case if this parameter is missing, or
+         * some of the config object's properties are missing, defaults will be
+         * used. The available options (and their defaults) are as
+         * follows:
+         *
+         *     config = {
+         *
+         *        videoSources: [],   // An array with properties being video
+         *                            // sources. The property name is the
+         *                            // video format of the source. Supported
+         *                            // video formats are: 'mp4', 'webm', and
+         *                            // 'ogg'.
+         *
+         *          events: {         // Object's properties identify the
+         *                            // events that the API fires, and the
+         *                            // functions (event listeners) that the
+         *                            // API will call when those events occur.
+         *                            // If value is null, or property is not
+         *                            // specified, then no callback will be
+         *                            // called for that event.
+         *
+         *              onReady: null,
+         *              onStateChange: null
+         *          }
+         *     }
+         */
+        function Player(el, config) {
+            var errorMessage, lastSource, sourceList;
+
+            // Create HTML markup for individual sources of the HTML5 <video>
+            // element.
+            sourceList = $.map(config.videoSources, function(source) {
+                return [
+                    '<source ',
+                    'src="', source,
+            // Following hack allows to open the same video twice
+            // https://code.google.com/p/chromium/issues/detail?id=31014
+            // Check whether the url already has a '?' inside, and if so,
+            // use '&' instead of '?' to prevent breaking the url's integrity.
+                        (source.indexOf('?') === -1 ? '?' : '&'),
+                    (new Date()).getTime(), '" />'
+                ].join('');
+            });
+
+            // do common initialization independent of player type
+            this.init(el, config);
+
+            // Create HTML markup for the <video> element, populating it with
+            // sources from previous step. Set playback not supported error message.
+            errorMessage = [
+                gettext('This browser cannot play .mp4, .ogg, or .webm files.'),
+                gettext('Try using a different browser, such as Google Chrome.')
+            ].join('');
+            this.video.innerHTML = sourceList.join('') + errorMessage;
+
+            lastSource = this.videoEl.find('source').last();
+            lastSource.on('error', this.showErrorMessage.bind(this));
+            lastSource.on('error', this.onError.bind(this));
+            this.videoEl.on('error', this.onError.bind(this));
+        }
+
         Player.prototype.callStateChangeCallback = function() {
             if ($.isFunction(this.config.events.onStateChange)) {
                 this.config.events.onStateChange({
@@ -89,6 +161,7 @@ function(_) {
             return [0.75, 1.0, 1.25, 1.5];
         };
 
+        // eslint-disable-next-line no-underscore-dangle
         Player.prototype._getLogs = function() {
             return this.logs;
         };
@@ -105,11 +178,11 @@ function(_) {
                 .find('.spinner')
                     .attr({
                         'aria-hidden': 'true',
-                        'tabindex': -1
+                        tabindex: -1
                     });
         };
 
-        Player.prototype.onError = function(event) {
+        Player.prototype.onError = function() {
             if ($.isFunction(this.config.events.onError)) {
                 this.config.events.onError();
             }
@@ -122,11 +195,15 @@ function(_) {
             this.video.removeEventListener('pause', this.onPause, false);
             this.video.removeEventListener('ended', this.onEnded, false);
             this.el
-                .find('.video-player div').removeClass('is-hidden')
+                .find('.video-player div')
+                .removeClass('is-hidden')
                 .end()
-                .find('.video-player .video-error').addClass('is-hidden')
-                .end().removeClass('is-initialized')
-                .find('.spinner').attr({'aria-hidden': 'false'});
+                .find('.video-player .video-error')
+                .addClass('is-hidden')
+                .end()
+                .removeClass('is-initialized')
+                .find('.spinner')
+                .attr({'aria-hidden': 'false'});
             this.videoEl.remove();
         };
 
@@ -158,7 +235,7 @@ function(_) {
         };
 
         Player.prototype.init = function(el, config) {
-            var isTouch = onTouchBasedDevice() || '',
+            var isTouch = window.onTouchBasedDevice() || '',
                 events = ['loadstart', 'progress', 'suspend', 'abort', 'error',
                     'emptied', 'stalled', 'play', 'pause', 'loadedmetadata',
                     'loadeddata', 'waiting', 'playing', 'canplay', 'canplaythrough',
@@ -237,77 +314,6 @@ function(_) {
         };
 
         return Player;
-
-        /*
-         * Constructor function for HTML5 Video player.
-         *
-         * @param {String|Object} el A DOM element where the HTML5 player will
-         * be inserted (as returned by jQuery(selector) function), or a
-         * selector string which will be used to select an element. This is a
-         * required parameter.
-         *
-         * @param config - An object whose properties will be used as
-         * configuration options for the HTML5 video player. This is an
-         * optional parameter. In the case if this parameter is missing, or
-         * some of the config object's properties are missing, defaults will be
-         * used. The available options (and their defaults) are as
-         * follows:
-         *
-         *     config = {
-         *
-         *        videoSources: [],   // An array with properties being video
-         *                            // sources. The property name is the
-         *                            // video format of the source. Supported
-         *                            // video formats are: 'mp4', 'webm', and
-         *                            // 'ogg'.
-         *
-         *          events: {         // Object's properties identify the
-         *                            // events that the API fires, and the
-         *                            // functions (event listeners) that the
-         *                            // API will call when those events occur.
-         *                            // If value is null, or property is not
-         *                            // specified, then no callback will be
-         *                            // called for that event.
-         *
-         *              onReady: null,
-         *              onStateChange: null
-         *          }
-         *     }
-         */
-        function Player(el, config) {
-            var errorMessage, lastSource, sourceList;
-
-            // Create HTML markup for individual sources of the HTML5 <video>
-            // element.
-            sourceList = $.map(config.videoSources, function(source) {
-                return [
-                    '<source ',
-                    'src="', source,
-            // Following hack allows to open the same video twice
-            // https://code.google.com/p/chromium/issues/detail?id=31014
-            // Check whether the url already has a '?' inside, and if so,
-            // use '&' instead of '?' to prevent breaking the url's integrity.
-                        (source.indexOf('?') === -1 ? '?' : '&'),
-                    (new Date()).getTime(), '" />'
-                ].join('');
-            });
-
-            // do common initialization independent of player type
-            this.init(el, config);
-
-            // Create HTML markup for the <video> element, populating it with
-            // sources from previous step. Set playback not supported error message.
-            errorMessage = [
-                gettext('This browser cannot play .mp4, .ogg, or .webm files.'),
-                gettext('Try using a different browser, such as Google Chrome.')
-            ].join('');
-            this.video.innerHTML = sourceList.join('') + errorMessage;
-
-            lastSource = this.videoEl.find('source').last();
-            lastSource.on('error', this.showErrorMessage.bind(this));
-            lastSource.on('error', this.onError.bind(this));
-            this.videoEl.on('error', this.onError.bind(this));
-        }
     }());
 
     // The YouTube API presents several constants which describe the player's

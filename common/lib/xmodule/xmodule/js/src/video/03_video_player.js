@@ -1,3 +1,4 @@
+/* eslint-disable no-console, no-param-reassign */
 (function(requirejs, require, define) {
 // VideoPlayer module.
     define(
@@ -100,6 +101,7 @@ function(HTML5Video, HTML5HLSVideo, Resizer, HLS, _) {
     //     initial configuration. Also make the created DOM elements available
     //     via the 'state' object. Much easier to work this way - you don't
     //     have to do repeated jQuery element selects.
+    // eslint-disable-next-line no-underscore-dangle
     function _initialize(state) {
         var youTubeId, player, userAgent, commonConfig, eventToBeTriggered;
 

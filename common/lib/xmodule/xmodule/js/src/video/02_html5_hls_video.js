@@ -1,3 +1,4 @@
+/* eslint-disable no-console, no-param-reassign */
 /**
  * HTML5 video player module to support HLS video playback.
  *
@@ -21,11 +22,12 @@
                 } else {
                     this.hls = new HLS();
                     this.hls.attachMedia(this.video);
+                    this.hls.on(HLS.Events.ERROR, this.onError.bind(this));
                     this.hls.on(HLS.Events.MEDIA_ATTACHED, function() {
                         self.hls.loadSource(config.videoSources[0]);
                         self.hls.on(HLS.Events.MANIFEST_PARSED, function(event, data) {
                             console.log(
-                                '[Video info]: manifest loaded, found ' + data.levels.length + ' quality level'
+                                '[HLS Video]: Manifest loaded, found ' + data.levels.length + ' quality level'
                             );
                         });
                     });
@@ -34,6 +36,33 @@
 
             PlayerHLS.prototype = Object.create(HTML5Video.Player.prototype);
             PlayerHLS.prototype.constructor = PlayerHLS;
+
+            PlayerHLS.prototype.onError = function(event, data) {
+                if (data.fatal) {
+                    switch (data.type) {
+                    case HLS.ErrorTypes.NETWORK_ERROR:
+                        console.error(
+                            '[HLS Video]: Fatal network error encountered, try to recover. Details: %s',
+                            data.details
+                        );
+                        this.hls.startLoad();
+                        break;
+                    case HLS.ErrorTypes.MEDIA_ERROR:
+                        console.error(
+                            '[HLS Video]: Fatal media error encountered, try to recover. Details: %s',
+                            data.details
+                        );
+                        this.hls.recoverMediaError();
+                        break;
+                    default:
+                        console.error(
+                            '[HLS Video]: Unrecoverable error encountered. Details: %s',
+                            data.details
+                        );
+                        break;
+                    }
+                }
+            };
 
             return PlayerHLS;
         }());
