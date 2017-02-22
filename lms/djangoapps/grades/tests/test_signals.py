@@ -130,8 +130,21 @@ class ScoreChangedSignalRelayTest(TestCase):
             'modified': FROZEN_NOW_TIMESTAMP,
             'score_db_table': 'submissions',
         }
+        if handler == submissions_score_reset_handler:
+            expected_set_kwargs['score_deleted'] = True
         self.signal_mock.assert_called_once_with(**expected_set_kwargs)
         self.get_user_mock.assert_called_once_with(kwargs['anonymous_user_id'])
+
+    def test_tnl_6599_zero_possible_bug(self):
+        """
+        Ensure that, if coming from the submissions API, signals indicating a
+        a possible score of 0 are swallowed for reasons outlined in TNL-6559.
+        """
+        local_kwargs = SUBMISSION_SET_KWARGS.copy()
+        local_kwargs['points_earned'] = 0
+        local_kwargs['points_possible'] = 0
+        submissions_score_set_handler(None, **local_kwargs)
+        self.signal_mock.assert_not_called()
 
     @ddt.data(
         [submissions_score_set_handler, SUBMISSION_SET_KWARGS],
