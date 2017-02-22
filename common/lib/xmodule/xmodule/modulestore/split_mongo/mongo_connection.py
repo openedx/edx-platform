@@ -23,7 +23,7 @@ except ImportError:
 import dogstats_wrapper as dog_stats_api
 import logging
 
-from contracts import check, new_contract
+#from contracts import check, new_contract
 from mongodb_proxy import autoretry_read
 from xmodule.exceptions import HeartbeatFailure
 from xmodule.modulestore import BlockData
@@ -31,8 +31,12 @@ from xmodule.modulestore.split_mongo import BlockKey
 from xmodule.mongo_utils import connect_to_mongodb, create_collection_index
 
 
-new_contract('BlockData', BlockData)
+#new_contract('BlockData', BlockData)
 log = logging.getLogger(__name__)
+
+
+def check(*args, **kwargs):
+    pass
 
 
 def get_cache(alias):
