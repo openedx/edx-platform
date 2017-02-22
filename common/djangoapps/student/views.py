@@ -2529,11 +2529,12 @@ class LogoutView(TemplateView):
 
         # Get the list of authorized clients before we clear the session.
         self.oauth_client_ids = request.session.get(edx_oauth2_provider.constants.AUTHORIZED_CLIENTS_SESSION_KEY, [])
+        self.oauth2_clients_count = Client.objects.exclude(logout_uri=None).count()
 
         logout(request)
 
         # If we don't need to deal with OIDC logouts, just redirect the user.
-        if LogoutViewConfiguration.current().enabled and self.oauth_client_ids:
+        if self.oauth2_clients_count > 0 or (LogoutViewConfiguration.current().enabled and self.oauth_client_ids):
             response = super(LogoutView, self).dispatch(request, *args, **kwargs)
         else:
             response = redirect(self.target)
