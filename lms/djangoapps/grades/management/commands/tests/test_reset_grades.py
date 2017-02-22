@@ -94,26 +94,30 @@ class TestResetGrades(TestCase):
                     subsection_grade_params['usage_key'] = subsection_key
                     PersistentSubsectionGrade.update_or_create_grade(**subsection_grade_params)
 
-    def _assert_grades_exist_for_courses(self, course_keys):
+    def _assert_grades_exist_for_courses(self, course_keys, db_table=None):
         """
         Assert grades for given courses exist.
         """
         for course_key in course_keys:
-            self.assertIsNotNone(PersistentCourseGrade.read_course_grade(self.user_ids[0], course_key))
-            for subsection_key in self.subsection_keys_by_course[course_key]:
-                self.assertIsNotNone(PersistentSubsectionGrade.read_grade(self.user_ids[0], subsection_key))
+            if db_table == "course" or db_table is None:
+                self.assertIsNotNone(PersistentCourseGrade.read_course_grade(self.user_ids[0], course_key))
+            if db_table == "subsection" or db_table is None:
+                for subsection_key in self.subsection_keys_by_course[course_key]:
+                    self.assertIsNotNone(PersistentSubsectionGrade.read_grade(self.user_ids[0], subsection_key))
 
-    def _assert_grades_absent_for_courses(self, course_keys):
+    def _assert_grades_absent_for_courses(self, course_keys, db_table=None):
         """
         Assert grades for given courses do not exist.
         """
         for course_key in course_keys:
-            with self.assertRaises(PersistentCourseGrade.DoesNotExist):
-                PersistentCourseGrade.read_course_grade(self.user_ids[0], course_key)
+            if db_table == "course" or db_table is None:
+                with self.assertRaises(PersistentCourseGrade.DoesNotExist):
+                    PersistentCourseGrade.read_course_grade(self.user_ids[0], course_key)
 
-            for subsection_key in self.subsection_keys_by_course[course_key]:
-                with self.assertRaises(PersistentSubsectionGrade.DoesNotExist):
-                    PersistentSubsectionGrade.read_grade(self.user_ids[0], subsection_key)
+            if db_table == "subsection" or db_table is None:
+                for subsection_key in self.subsection_keys_by_course[course_key]:
+                    with self.assertRaises(PersistentSubsectionGrade.DoesNotExist):
+                        PersistentSubsectionGrade.read_grade(self.user_ids[0], subsection_key)
 
     def _assert_stat_logged(self, mock_log, num_rows, grade_model_class, message_substring, log_offset):
         self.assertIn('reset_grade: ' + message_substring, mock_log.info.call_args_list[log_offset][0][0])
@@ -222,6 +226,17 @@ class TestResetGrades(TestCase):
         self._assert_grades_absent_for_courses(self.course_keys[:2])
         self._assert_grades_exist_for_courses(self.course_keys[2:])
 
+    @ddt.data('subsection', 'course')
+    def test_specify_db_table(self, db_table):
+        self._update_or_create_grades()
+        self._assert_grades_exist_for_courses(self.course_keys)
+        self.command.handle(delete=True, all_courses=True, db_table=db_table)
+        self._assert_grades_absent_for_courses(self.course_keys, db_table=db_table)
+        if db_table == "subsection":
+            self._assert_grades_exist_for_courses(self.course_keys, db_table='course')
+        else:
+            self._assert_grades_exist_for_courses(self.course_keys, db_table='subsection')
+
     @patch('lms.djangoapps.grades.management.commands.reset_grades.log')
     def test_dry_run_all_courses(self, mock_log):
         self._update_or_create_grades()
@@ -278,6 +293,13 @@ class TestResetGrades(TestCase):
     def test_invalid_key(self):
         with self.assertRaisesRegexp(CommandError, 'Invalid key specified.*invalid/key'):
             self.command.handle(dry_run=True, courses=['invalid/key'])
+
+    def test_invalid_db_table(self):
+        with self.assertRaisesMessage(
+                CommandError,
+                'Invalid value for db_table. Valid options are "subsection" or "course" only.'
+        ):
+            self.command.handle(delete=True, all_courses=True, db_table="not course or subsection")
 
     def test_no_run_mode(self):
         with self.assertRaisesMessage(CommandError, 'Either --delete or --dry_run must be specified.'):
