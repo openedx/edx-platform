@@ -621,7 +621,10 @@ def ccx_invite(request, course, ccx=None):
     email_params = get_email_params(course, auto_enroll=True, course_key=course_key, display_name=ccx.display_name)
 
     _ccx_students_enrrolling_center(action, identifiers, email_students, course_key, email_params)
-
+    log.info(
+        "User: %s;\nAction: %s;\nIdentifiers: %s;\nSend email: %s;\nCourse: %s;\nEmail parameters: %s.",
+        request.user, action, identifiers, email_students, course_key, email_params
+    )
     url = reverse('ccx_coach_dashboard', kwargs={'course_id': course_key})
     return redirect(url)
 
