@@ -1523,6 +1523,14 @@ class CourseEnrollment(models.Model):
         return self.course_overview
 
     @property
+    def course_progress(self):
+        return self._course_progress
+
+    @course_progress.setter
+    def course_progress(self, value):
+        self._course_progress = value
+
+    @property
     def course_overview(self):
         """
         Returns a CourseOverview of the course to which this enrollment refers.

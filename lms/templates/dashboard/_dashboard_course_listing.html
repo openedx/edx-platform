@@ -101,6 +101,10 @@ from student.helpers import (
             <span>${course_overview.display_name_with_default}</span>
           % endif
         </h3>
+        <div>
+          My Course Progress (${int(enrollment.course_progress['percent']*100)}%)
+          <progress max=1 value=${enrollment.course_progress['percent']}></progress>
+        </div>
         <div class="course-info">
           <span class="info-university">${course_overview.display_org_with_default} - </span>
           <span class="info-course-id">${course_overview.display_number_with_default}</span>
