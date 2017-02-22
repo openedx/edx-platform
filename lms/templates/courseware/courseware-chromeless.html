@@ -71,7 +71,9 @@ ${HTML(fragment.foot_html())}
 
 <div class="course-wrapper">
   <section class="course-content" id="course-content">
-    ${HTML(fragment.body_html())}
+      <main id="main" tabindex="-1" aria-label="Content">
+        ${HTML(fragment.body_html())}
+      </main>
   </section>
 </div>
 % if course.show_calculator or is_edxnotes_enabled(course):
