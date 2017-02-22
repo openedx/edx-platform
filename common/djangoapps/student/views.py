@@ -125,6 +125,8 @@ from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 
+from courseware import grades
+
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
@@ -541,11 +543,12 @@ def is_course_blocked(request, redeemed_registration_codes, course_key):
 
     return blocked
 
-
+@transaction.non_atomic_requests
 @login_required
 @ensure_csrf_cookie
 def dashboard(request):
     user = request.user
+    store = modulestore()
 
     platform_name = configuration_helpers.get_value("platform_name", settings.PLATFORM_NAME)
 
@@ -568,6 +571,11 @@ def dashboard(request):
 
     # sort the enrollment pairs by the enrollment date
     course_enrollments.sort(key=lambda x: x.created, reverse=True)
+
+    # set progress for each course
+    for course_enrollment in course_enrollments:
+        course = store.get_course(course_enrollments[0].course_id)
+        course_enrollment.course_progress = grades.grade(user, course)
 
     # Retrieve the course modes for each course
     enrolled_course_ids = [enrollment.course_id for enrollment in course_enrollments]
