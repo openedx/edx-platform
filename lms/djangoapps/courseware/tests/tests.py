@@ -19,7 +19,7 @@ from xmodule.modulestore.tests.django_utils import (
 from xmodule.modulestore.tests.factories import ToyCourseFactory
 
 
-@attr('shard_1')
+@attr(shard=1)
 class ActivateLoginTest(LoginEnrollmentTestCase):
     """
     Test logging in and logging out.
@@ -123,7 +123,7 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
             self.assertNotIsInstance(descriptor, ErrorDescriptor)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestMongoCoursesLoad(ModuleStoreTestCase, PageLoaderTestCase):
     """
     Check that all pages in test courses load properly from Mongo.
@@ -147,7 +147,7 @@ class TestMongoCoursesLoad(ModuleStoreTestCase, PageLoaderTestCase):
         self.assertGreater(len(course.textbooks), 0)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestDraftModuleStore(ModuleStoreTestCase):
     def test_get_items_with_course_items(self):
         store = modulestore()
@@ -160,7 +160,7 @@ class TestDraftModuleStore(ModuleStoreTestCase):
         # not allowed to be passed in (i.e. was throwing exception)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestLmsFieldData(TestCase):
     """
     Tests of the LmsFieldData class

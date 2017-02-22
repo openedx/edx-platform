@@ -1,0 +1,6 @@
+<div class="<%- jsHook %> status submission-error">
+    <h4 class="message-title"><%- title %></h4>
+    <ul class="message-copy">
+        <%= HtmlUtils.ensureHtml(messagesHtml) %>
+    </ul>
+</div>

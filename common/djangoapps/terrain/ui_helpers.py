@@ -39,7 +39,7 @@ REQUIREJS_WAIT = {
     # Unit page
     re.compile(r'^Unit \|'): [
         "jquery", "js/base", "js/models/xblock_info", "js/views/pages/container",
-        "js/collections/component_template", "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
+        "js/collections/component_template", "xmodule", "cms/js/main", "xblock/cms.runtime.v1"],
 
     # Content - Outline
     # Note that calling your org, course number, or display name, 'course' will mess this up
@@ -49,18 +49,18 @@ REQUIREJS_WAIT = {
     # Dashboard
     re.compile(r'^Studio Home \|'): [
         "js/sock", "gettext", "js/base",
-        "jquery.ui", "coffee/src/main", "underscore"],
+        "jquery.ui", "cms/js/main", "underscore"],
 
     # Upload
     re.compile(r'^\s*Files & Uploads'): [
-        'js/base', 'jquery.ui', 'coffee/src/main', 'underscore',
+        'js/base', 'jquery.ui', 'cms/js/main', 'underscore',
         'js/views/assets', 'js/views/asset'
     ],
 
     # Pages
     re.compile(r'^Pages \|'): [
         'js/models/explicit_url', 'js/views/tabs',
-        'xmodule', 'coffee/src/main', 'xblock/cms.runtime.v1'
+        'xmodule', 'cms/js/main', 'xblock/cms.runtime.v1'
     ],
 }
 
@@ -534,6 +534,14 @@ def css_fill(css_selector, text, index=0):
 def click_link(partial_text, index=0):
     retry_on_exception(lambda: world.browser.find_link_by_partial_text(partial_text)[index].click())
     wait_for_js_to_load()
+
+
+@world.absorb
+def click_button(data_attr, index=0):
+    xpath = '//button[text()="{button_text}"]'.format(
+        button_text=data_attr
+    )
+    world.browser.find_by_xpath(xpath)[index].click()
 
 
 @world.absorb

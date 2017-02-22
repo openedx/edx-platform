@@ -70,14 +70,13 @@ FEATURES['ENABLE_VERIFIED_CERTIFICATES'] = True
 FEATURES['ENABLE_GRADE_DOWNLOADS'] = True
 FEATURES['ALLOW_COURSE_STAFF_GRADE_DOWNLOADS'] = True
 
-GRADES_DOWNLOAD['ROOT_PATH'] += "-{}".format(os.getpid())
-FINANCIAL_REPORTS['ROOT_PATH'] += "-{}".format(os.getpid())
-
-
 # Toggles embargo on for testing
 FEATURES['EMBARGO'] = True
 
 FEATURES['ENABLE_COMBINED_LOGIN_REGISTRATION'] = True
+
+# Enable the milestones app in tests to be consistent with it being enabled in production
+FEATURES['MILESTONES_APP'] = True
 
 # Need wiki for courseware views to work. TODO (vshnayder): shouldn't need it.
 WIKI_ENABLED = True
@@ -299,6 +298,9 @@ OIDC_COURSE_HANDLER_CACHE_TIMEOUT = 0
 FEATURES['ENABLE_MOBILE_REST_API'] = True
 FEATURES['ENABLE_VIDEO_ABSTRACTION_LAYER_API'] = True
 
+########################### Grades #################################
+FEATURES['PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS'] = True
+
 ###################### Payment ##############################3
 # Enable fake payment processing page
 FEATURES['ENABLE_PAYMENT_FAKE'] = True
@@ -422,7 +424,8 @@ FEATURES['CLASS_DASHBOARD'] = True
 import openid.oidutil
 openid.oidutil.log = lambda message, level=0: None
 
-PLATFORM_NAME = "edX"
+# Include a non-ascii character in PLATFORM_NAME to uncover possible UnicodeEncodeErrors in tests.
+PLATFORM_NAME = u"édX"
 SITE_NAME = "edx.org"
 
 # set up some testing for microsites
@@ -579,10 +582,9 @@ JWT_AUTH.update({
     'JWT_AUDIENCE': 'test-key',
 })
 
-# Set the default Oauth2 Provider Model so that migrations can run in
-# verbose mode
-OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth2_provider.Application'
-
 COURSE_CATALOG_API_URL = 'https://catalog.example.com/api/v1'
 
 COMPREHENSIVE_THEME_DIRS = [REPO_ROOT / "themes", REPO_ROOT / "common/test"]
+COMPREHENSIVE_THEME_LOCALE_PATHS = [REPO_ROOT / "themes/conf/locale", ]
+
+LMS_ROOT_URL = "http://localhost:8000"

@@ -13,7 +13,7 @@
  * ~ Chinese Proverb
  */
 
-window.ImageInput = (function ($, undefined) {
+window.ImageInput = (function($, undefined) {
     var ImageInput = ImageInputConstructor;
 
     ImageInput.prototype = {

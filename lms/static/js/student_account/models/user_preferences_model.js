@@ -1,9 +1,8 @@
-;(function (define, undefined) {
+(function(define, undefined) {
     'use strict';
     define([
         'gettext', 'underscore', 'backbone'
-    ], function (gettext, _, Backbone) {
-
+    ], function(gettext, _, Backbone) {
         var UserPreferencesModel = Backbone.Model.extend({
             idAttribute: 'account_privacy',
             defaults: {

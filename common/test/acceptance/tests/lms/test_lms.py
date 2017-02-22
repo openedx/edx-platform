@@ -11,7 +11,7 @@ import pytz
 import urllib
 
 from bok_choy.promise import EmptyPromise
-from ..helpers import (
+from common.test.acceptance.tests.helpers import (
     UniqueCourseTest,
     EventsTestMixin,
     load_data_str,
@@ -21,28 +21,28 @@ from ..helpers import (
     select_option_by_text,
     get_selected_option_text
 )
-from ...pages.lms import BASE_URL
-from ...pages.lms.account_settings import AccountSettingsPage
-from ...pages.lms.auto_auth import AutoAuthPage
-from ...pages.lms.create_mode import ModeCreationPage
-from ...pages.common.logout import LogoutPage
-from ...pages.lms.course_info import CourseInfoPage
-from ...pages.lms.tab_nav import TabNavPage
-from ...pages.lms.course_nav import CourseNavPage
-from ...pages.lms.progress import ProgressPage
-from ...pages.lms.dashboard import DashboardPage
-from ...pages.lms.problem import ProblemPage
-from ...pages.lms.video.video import VideoPage
-from ...pages.lms.courseware import CoursewarePage
-from ...pages.studio.settings import SettingsPage
-from ...pages.lms.login_and_register import CombinedLoginAndRegisterPage, ResetPasswordPage
-from ...pages.lms.track_selection import TrackSelectionPage
-from ...pages.lms.pay_and_verify import PaymentAndVerificationFlow, FakePaymentPage
-from ...pages.lms.course_wiki import CourseWikiPage, CourseWikiEditPage
-from ...fixtures.course import CourseFixture, XBlockFixtureDesc, CourseUpdateDesc
+from common.test.acceptance.pages.lms import BASE_URL
+from common.test.acceptance.pages.lms.account_settings import AccountSettingsPage
+from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.lms.create_mode import ModeCreationPage
+from common.test.acceptance.pages.common.logout import LogoutPage
+from common.test.acceptance.pages.lms.course_info import CourseInfoPage
+from common.test.acceptance.pages.lms.tab_nav import TabNavPage
+from common.test.acceptance.pages.lms.course_nav import CourseNavPage
+from common.test.acceptance.pages.lms.progress import ProgressPage
+from common.test.acceptance.pages.lms.dashboard import DashboardPage
+from common.test.acceptance.pages.lms.problem import ProblemPage
+from common.test.acceptance.pages.lms.video.video import VideoPage
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.pages.studio.settings import SettingsPage
+from common.test.acceptance.pages.lms.login_and_register import CombinedLoginAndRegisterPage, ResetPasswordPage
+from common.test.acceptance.pages.lms.track_selection import TrackSelectionPage
+from common.test.acceptance.pages.lms.pay_and_verify import PaymentAndVerificationFlow, FakePaymentPage
+from common.test.acceptance.pages.lms.course_wiki import CourseWikiPage, CourseWikiEditPage
+from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc, CourseUpdateDesc
 
 
-@attr('shard_8')
+@attr(shard=8)
 class ForgotPasswordPageTest(UniqueCourseTest):
     """
     Test that forgot password forms is rendered if url contains 'forgot-password-modal'
@@ -81,10 +81,10 @@ class ForgotPasswordPageTest(UniqueCourseTest):
         self.reset_password_page.is_success_visible(".submission-success")
 
         # Expect that we're shown a success message
-        self.assertIn("Password Reset Email Sent", self.reset_password_page.get_success_message())
+        self.assertIn("Check Your Email", self.reset_password_page.get_success_message())
 
 
-@attr('shard_8')
+@attr(shard=8)
 class LoginFromCombinedPageTest(UniqueCourseTest):
     """Test that we can log in using the combined login/registration page.
 
@@ -143,20 +143,17 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
         self.login_page.visit().password_reset(email=email)
 
         # Expect that we're shown a success message
-        self.assertIn("Password Reset Email Sent", self.login_page.wait_for_success())
+        self.assertIn("Check Your Email", self.login_page.wait_for_success())
 
-    def test_password_reset_failure(self):
+    def test_password_reset_no_user(self):
         # Navigate to the password reset form
         self.login_page.visit()
 
         # User account does not exist
         self.login_page.password_reset(email="nobody@nowhere.com")
 
-        # Expect that we're shown a failure message
-        self.assertIn(
-            "No user with the provided email address exists.",
-            self.login_page.wait_for_errors()
-        )
+        # Expect that we're shown a success message
+        self.assertIn("Check Your Email", self.login_page.wait_for_success())
 
     def test_third_party_login(self):
         """
@@ -169,7 +166,8 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
         # Navigate to the login page
         self.login_page.visit()
         # Baseline screen-shots are different for chrome and firefox.
-        self.assertScreenshot('#login .login-providers', 'login-providers-{}'.format(self.browser.name))
+        #self.assertScreenshot('#login .login-providers', 'login-providers-{}'.format(self.browser.name), .25)
+        #The line above is commented out temporarily see SOL-1937
 
         # Try to log in using "Dummy" provider
         self.login_page.click_third_party_dummy_provider()
@@ -177,7 +175,10 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
         # The user will be redirected somewhere and then back to the login page:
         msg_text = self.login_page.wait_for_auth_status_message()
         self.assertIn("You have successfully signed into Dummy", msg_text)
-        self.assertIn("To link your accounts, sign in now using your edX password", msg_text)
+        self.assertIn(
+            u"To link your accounts, sign in now using your édX password",
+            msg_text
+        )
 
         # Now login with username and password:
         self.login_page.login(email=email, password=password)
@@ -217,7 +218,8 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
             )
 
             # Baseline screen-shots are different for chrome and firefox.
-            self.assertScreenshot('#hinted-login-form', 'hinted-login-{}'.format(self.browser.name))
+            #self.assertScreenshot('#hinted-login-form', 'hinted-login-{}'.format(self.browser.name), .25)
+            #The line above is commented out temporarily see SOL-1937
             self.login_page.click_third_party_dummy_provider()
 
             # We should now be redirected to the course page
@@ -276,7 +278,7 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
         return (email, password)
 
 
-@attr('shard_8')
+@attr(shard=8)
 class RegisterFromCombinedPageTest(UniqueCourseTest):
     """Test that we can register a new user from the combined login/registration page. """
 
@@ -338,7 +340,10 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
         # Verify that the expected errors are displayed.
         errors = self.register_page.wait_for_errors()
         self.assertIn(u'Please enter your Public username.', errors)
-        self.assertIn(u'You must agree to the edX Terms of Service and Honor Code.', errors)
+        self.assertIn(
+            u'You must agree to the édX Terms of Service and Honor Code',
+            errors
+        )
         self.assertIn(u'Please select your Country.', errors)
         self.assertIn(u'Please tell us your favorite movie.', errors)
 
@@ -354,7 +359,8 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
         # Navigate to the register page
         self.register_page.visit()
         # Baseline screen-shots are different for chrome and firefox.
-        self.assertScreenshot('#register .login-providers', 'register-providers-{}'.format(self.browser.name))
+        #self.assertScreenshot('#register .login-providers', 'register-providers-{}'.format(self.browser.name), .25)
+        # The line above is commented out temporarily see SOL-1937
 
         # Try to authenticate using the "Dummy" provider
         self.register_page.click_third_party_dummy_provider()
@@ -398,7 +404,7 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
         account_settings.wait_for_message(field_id, "Successfully unlinked")
 
 
-@attr('shard_8')
+@attr(shard=8)
 class PayAndVerifyTest(EventsTestMixin, UniqueCourseTest):
     """Test that we can proceed through the payment and verification flow."""
     def setUp(self):
@@ -537,7 +543,7 @@ class PayAndVerifyTest(EventsTestMixin, UniqueCourseTest):
         self.assertEqual(enrollment_mode, 'verified')
 
 
-@attr('shard_1')
+@attr(shard=1)
 class CourseWikiTest(UniqueCourseTest):
     """
     Tests that verify the course wiki.
@@ -591,7 +597,7 @@ class CourseWikiTest(UniqueCourseTest):
         self.assertEqual(content, actual_content)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class HighLevelTabTest(UniqueCourseTest):
     """
     Tests that verify each of the high-level tabs available within a course.
@@ -732,6 +738,7 @@ class HighLevelTabTest(UniqueCourseTest):
         }
 
         actual_sections = self.course_nav.sections
+
         for section, subsections in EXPECTED_SECTIONS.iteritems():
             self.assertIn(section, actual_sections)
             self.assertEqual(actual_sections[section], EXPECTED_SECTIONS[section])
@@ -747,8 +754,12 @@ class HighLevelTabTest(UniqueCourseTest):
         for expected in EXPECTED_ITEMS:
             self.assertIn(expected, actual_items)
 
+        # Navigate to a particular section other than the default landing section.
+        self.course_nav.go_to_section('Test Section 2', 'Test Subsection 3')
+        self.assertTrue(self.course_nav.is_on_section('Test Section 2', 'Test Subsection 3'))
 
-@attr('shard_1')
+
+@attr(shard=1)
 class PDFTextBooksTabTest(UniqueCourseTest):
     """
     Tests that verify each of the textbook tabs available within a course.
@@ -789,7 +800,7 @@ class PDFTextBooksTabTest(UniqueCourseTest):
             self.tab_nav.go_to_tab("PDF Book {}".format(i))
 
 
-@attr('shard_1')
+@attr(shard=1)
 class VisibleToStaffOnlyTest(UniqueCourseTest):
     """
     Tests that content with visible_to_staff_only set to True cannot be viewed by students.
@@ -874,7 +885,7 @@ class VisibleToStaffOnlyTest(UniqueCourseTest):
         self.assertEqual([u'Test Unit'], self.course_nav.sequence_items)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TooltipTest(UniqueCourseTest):
     """
     Tests that tooltips are displayed
@@ -919,7 +930,7 @@ class TooltipTest(UniqueCourseTest):
         self.courseware_page.verify_tooltips_displayed()
 
 
-@attr('shard_1')
+@attr(shard=1)
 class PreRequisiteCourseTest(UniqueCourseTest):
     """
     Tests that pre-requisite course messages are displayed
@@ -1004,7 +1015,7 @@ class PreRequisiteCourseTest(UniqueCourseTest):
         self.settings_page.save_changes()
 
 
-@attr('shard_1')
+@attr(shard=1)
 class ProblemExecutionTest(UniqueCourseTest):
     """
     Tests of problems.
@@ -1074,16 +1085,16 @@ class ProblemExecutionTest(UniqueCourseTest):
 
         # Fill in the answer correctly.
         problem_page.fill_answer("20")
-        problem_page.click_check()
+        problem_page.click_submit()
         self.assertTrue(problem_page.is_correct())
 
         # Fill in the answer incorrectly.
         problem_page.fill_answer("4")
-        problem_page.click_check()
+        problem_page.click_submit()
         self.assertFalse(problem_page.is_correct())
 
 
-@attr('shard_1')
+@attr(shard=1)
 class EntranceExamTest(UniqueCourseTest):
     """
     Tests that course has an entrance exam.
@@ -1135,8 +1146,6 @@ class EntranceExamTest(UniqueCourseTest):
 
         # visit course settings page and set/enabled entrance exam for that course.
         self.settings_page.visit()
-        self.settings_page.wait_for_page()
-        self.assertTrue(self.settings_page.is_browser_on_page())
         self.settings_page.entrance_exam_field.click()
         self.settings_page.save_changes()
 
@@ -1154,7 +1163,7 @@ class EntranceExamTest(UniqueCourseTest):
         ))
 
 
-@attr('shard_1')
+@attr(shard=1)
 class NotLiveRedirectTest(UniqueCourseTest):
     """
     Test that a banner is shown when the user is redirected to
@@ -1186,7 +1195,7 @@ class NotLiveRedirectTest(UniqueCourseTest):
         )
 
 
-@attr('shard_1')
+@attr(shard=1)
 class EnrollmentClosedRedirectTest(UniqueCourseTest):
     """
     Test that a banner is shown when the user is redirected to the
@@ -1275,7 +1284,7 @@ class EnrollmentClosedRedirectTest(UniqueCourseTest):
         self._assert_dashboard_message()
 
 
-@attr('shard_1')
+@attr(shard=1)
 class LMSLanguageTest(UniqueCourseTest):
     """ Test suite for the LMS Language """
     def setUp(self):

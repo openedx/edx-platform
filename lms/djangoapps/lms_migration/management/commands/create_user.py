@@ -15,7 +15,7 @@ import readline
 
 from django.core.management.base import BaseCommand
 from student.models import UserProfile, Registration
-from external_auth.models import ExternalAuthMap
+from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from django.contrib.auth.models import User, Group
 from pytz import UTC
 

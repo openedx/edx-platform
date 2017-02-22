@@ -33,7 +33,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
         Returns: a CourseDescriptor
         """
         master_branch = kwargs.pop('master_branch', ModuleStoreEnum.BranchName.draft)
-        with self.bulk_operations(CourseLocator(org, course, run)):
+        with self.bulk_operations(CourseLocator(org, course, run), ignore_case=True):
             item = super(DraftVersioningModuleStore, self).create_course(
                 org, course, run, user_id, master_branch=master_branch, **kwargs
             )

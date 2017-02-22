@@ -1,4 +1,4 @@
-;(function (define) {
+(function(define) {
     'use strict';
     define([
         'backbone',
@@ -7,9 +7,9 @@
         'edx-ui-toolkit/js/utils/html-utils',
         'edx-ui-toolkit/js/utils/string-utils',
         'text!common/templates/components/paging-header.underscore'
-    ], function (Backbone, _, gettext, HtmlUtils, StringUtils, headerTemplate) {
+    ], function(Backbone, _, gettext, HtmlUtils, StringUtils, headerTemplate) {
         var PagingHeader = Backbone.View.extend({
-            initialize: function (options) {
+            initialize: function(options) {
                 this.srInfo = options.srInfo;
                 this.showSortControls = options.showSortControls;
                 this.collection.bind('add', _.bind(this.render, this));
@@ -21,7 +21,7 @@
                 'change #paging-header-select': 'sortCollection'
             },
 
-            render: function () {
+            render: function() {
                 var message,
                     start = (this.collection.getPageNumber() - 1) * this.collection.getPageSize(),
                     end = start + this.collection.size(),
@@ -43,7 +43,7 @@
                         context
                     );
                 }
-                
+
                 HtmlUtils.setHtml(
                     this.$el,
                     HtmlUtils.template(headerTemplate)({
@@ -62,7 +62,7 @@
              * results.
              * @returns {*} A promise for the collection being updated
              */
-            sortCollection: function () {
+            sortCollection: function() {
                 var selected = this.$('#paging-header-select option:selected');
                 this.sortOrder = selected.attr('value');
                 this.collection.setSortField(this.sortOrder);

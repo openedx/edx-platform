@@ -14,7 +14,7 @@ from ..middleware import SafeCookieData, SafeCookieError
 from .test_utils import TestSafeSessionsLogMixin
 
 
-@attr('shard_2')
+@attr(shard=2)
 @ddt.ddt
 class TestSafeCookieData(TestSafeSessionsLogMixin, TestCase):
     """

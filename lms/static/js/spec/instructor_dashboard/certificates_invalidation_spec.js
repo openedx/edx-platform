@@ -1,15 +1,15 @@
-/*global define */
+/* global define */
 define([
-        'jquery',
-        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
-        'js/certificates/models/certificate_invalidation',
-        'js/certificates/views/certificate_invalidation_view',
-        'js/certificates/collections/certificate_invalidation_collection'
-    ],
+    'jquery',
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+    'js/certificates/models/certificate_invalidation',
+    'js/certificates/views/certificate_invalidation_view',
+    'js/certificates/collections/certificate_invalidation_collection'
+],
     function($, AjaxHelpers, CertificateInvalidationModel, CertificateInvalidationView,
              CertificateInvalidationCollection) {
         'use strict';
-        describe("Field validation of invalidation model.", function() {
+        describe('Field validation of invalidation model.', function() {
             var certificate_invalidation = null;
             var assertValid = function(fields, isValid, expectedErrors) {
                 certificate_invalidation.set(fields);
@@ -28,45 +28,44 @@ define([
             };
 
             beforeEach(function() {
-
                 certificate_invalidation = new CertificateInvalidationModel({user: 'test_user'}, {url: 'test/url/'});
                 certificate_invalidation.set({
-                    notes: "Test notes"
+                    notes: 'Test notes'
                 });
             });
 
-            it("accepts valid email addresses", function() {
-                assertValid({user: "bob@example.com"}, true);
-                assertValid({user: "bob+smith@example.com"}, true);
-                assertValid({user: "bob+smith@example.com"}, true);
-                assertValid({user: "bob+smith@example.com"}, true);
-                assertValid({user: "bob@test.example.com"}, true);
-                assertValid({user: "bob@test-example.com"}, true);
+            it('accepts valid email addresses', function() {
+                assertValid({user: 'bob@example.com'}, true);
+                assertValid({user: 'bob+smith@example.com'}, true);
+                assertValid({user: 'bob+smith@example.com'}, true);
+                assertValid({user: 'bob+smith@example.com'}, true);
+                assertValid({user: 'bob@test.example.com'}, true);
+                assertValid({user: 'bob@test-example.com'}, true);
             });
 
-            it("displays username or email required error", function() {
-                assertValid({user: ""}, false, EXPECTED_ERRORS.user_name_or_email_required);
+            it('displays username or email required error', function() {
+                assertValid({user: ''}, false, EXPECTED_ERRORS.user_name_or_email_required);
             });
         });
 
-        describe("Certificate invalidation collection initialization and updates.",
+        describe('Certificate invalidation collection initialization and updates.',
             function() {
                 var certificate_invalidations = null,
                     certificate_invalidation_url = 'test/url/';
                 var certificate_invalidations_json = [
                     {
                         id: 1,
-                        user: "test1",
+                        user: 'test1',
                         invalidated_by: 2,
-                        created: "Thursday, October 29, 2015",
-                        notes: "test notes for test certificate invalidation"
+                        created: 'Thursday, October 29, 2015',
+                        notes: 'test notes for test certificate invalidation'
                     },
                     {
                         id: 2,
-                        user: "test2",
+                        user: 'test2',
                         invalidated_by: 2,
-                        created: "Thursday, October 29, 2015",
-                        notes: "test notes for test certificate invalidation"
+                        created: 'Thursday, October 29, 2015',
+                        notes: 'test notes for test certificate invalidation'
                     }
                 ];
 
@@ -78,11 +77,11 @@ define([
                     });
                 });
 
-                it("has 2 models in the collection after initialization", function() {
+                it('has 2 models in the collection after initialization', function() {
                     expect(certificate_invalidations.models.length).toEqual(2);
                 });
 
-                it("model is removed from collection on destroy", function() {
+                it('model is removed from collection on destroy', function() {
                     var model = certificate_invalidations.get({id: 2});
                     model.destroy();
                     expect(certificate_invalidations.models.length).toEqual(1);
@@ -91,61 +90,61 @@ define([
             }
         );
 
-        describe("Certificate invalidation success/error messages on add/remove invalidations.", function() {
+        describe('Certificate invalidation success/error messages on add/remove invalidations.', function() {
             var view = null,
                 certificate_invalidation_url = 'test/url/',
                 user_name_field = null,
                 notes_field = null,
-                invalidate_button=null,
-                duplicate_user='test2',
-                new_user='test4@test.com',
-                requests=null;
+                invalidate_button = null,
+                duplicate_user = 'test2',
+                new_user = 'test4@test.com',
+                requests = null;
 
-                var messages = {
-                    error: {
-                        empty_user_name_email: 'Student username/email field is required and can not be empty. ' +
+            var messages = {
+                error: {
+                    empty_user_name_email: 'Student username/email field is required and can not be empty. ' +
                         'Kindly fill in username/email and then press "Invalidate Certificate" button.',
-                        duplicate_user: "Certificate of " + (duplicate_user) + " has already been invalidated. " +
-                        "Please check your spelling and retry.",
-                        server_error: "Server Error, Please refresh the page and try again.",
-                        from_server: "Test Message from server"
-                    },
-                    success: {
-                        saved: "Certificate has been successfully invalidated for " + new_user + '.',
-                        re_validated: 'The certificate for this learner has been re-validated and ' +
+                    duplicate_user: 'Certificate of ' + (duplicate_user) + ' has already been invalidated. ' +
+                        'Please check your spelling and retry.',
+                    server_error: 'Server Error, Please refresh the page and try again.',
+                    from_server: 'Test Message from server'
+                },
+                success: {
+                    saved: 'Certificate has been successfully invalidated for ' + new_user + '.',
+                    re_validated: 'The certificate for this learner has been re-validated and ' +
                         'the system is re-running the grade for this learner.'
-                    }
-                };
+                }
+            };
 
             var certificate_invalidations_json = [
                 {
                     id: 1,
-                    user: "test1",
+                    user: 'test1',
                     invalidated_by: 2,
-                    created: "Thursday, October 29, 2015",
-                    notes: "test notes for test certificate invalidation"
+                    created: 'Thursday, October 29, 2015',
+                    notes: 'test notes for test certificate invalidation'
                 },
                 {
                     id: 2,
-                    user: "test2",
+                    user: 'test2',
                     invalidated_by: 2,
-                    created: "Thursday, October 29, 2015",
-                    notes: "test notes for test certificate invalidation"
+                    created: 'Thursday, October 29, 2015',
+                    notes: 'test notes for test certificate invalidation'
                 }
             ];
 
             beforeEach(function() {
                 setFixtures();
-                var fixture =readFixtures(
-                    "templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore"
+                var fixture = readFixtures(
+                    'templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore'
                 );
 
                 setFixtures(
                     "<div class='certificate-invalidation-container'>" +
-                    "   <h2>Invalidate Certificates</h2> " +
+                    '   <h2>Invalidate Certificates</h2> ' +
                     "   <div id='certificate-invalidation'></div>" +
-                    "</div>" +
-                    "<script type='text/template' id='certificate-invalidation-tpl'>" + fixture + "</script>"
+                    '</div>' +
+                    "<script type='text/template' id='certificate-invalidation-tpl'>" + fixture + '</script>'
                 );
 
                 var certificate_invalidations = new CertificateInvalidationCollection(certificate_invalidations_json, {
@@ -159,19 +158,19 @@ define([
                 view = new CertificateInvalidationView({collection: certificate_invalidations});
                 view.render();
 
-                user_name_field = $("#certificate-invalidation-user");
-                notes_field = $("#certificate-invalidation-notes");
-                invalidate_button = $("#invalidate-certificate");
+                user_name_field = $('#certificate-invalidation-user');
+                notes_field = $('#certificate-invalidation-notes');
+                invalidate_button = $('#invalidate-certificate');
 
                 requests = AjaxHelpers.requests(this);
             });
 
-            it("verifies view is initialized and rendered successfully", function() {
+            it('verifies view is initialized and rendered successfully', function() {
                 expect(view).not.toBe(undefined);
                 expect(view.$el.find('table tbody tr').length).toBe(2);
             });
 
-            it("verifies view is rendered on add/remove to collection", function() {
+            it('verifies view is rendered on add/remove to collection', function() {
                 var user = 'test3',
                     notes = 'test3 notes',
                     model = new CertificateInvalidationModel(
@@ -193,27 +192,25 @@ define([
 
                 // Verify view is updated
                 expect(view.$el.find('table tbody tr').length).toBe(2);
-
-
             });
 
-            it("verifies view error message on duplicate certificate validation.", function() {
+            it('verifies view error message on duplicate certificate validation.', function() {
                 $(user_name_field).val(duplicate_user);
                 $(invalidate_button).click();
 
-                expect($("#certificate-invalidation div.message").text()).toEqual(messages.error.duplicate_user);
+                expect($('#certificate-invalidation div.message').text()).toEqual(messages.error.duplicate_user);
             });
 
-            it("verifies view error message on empty username/email field.", function() {
-                $(user_name_field).val("");
+            it('verifies view error message on empty username/email field.', function() {
+                $(user_name_field).val('');
                 $(invalidate_button).click();
 
-                expect($("#certificate-invalidation div.message").text()).toEqual(messages.error.empty_user_name_email);
+                expect($('#certificate-invalidation div.message').text()).toEqual(messages.error.empty_user_name_email);
             });
 
-            it("verifies view success message on certificate invalidation.", function() {
+            it('verifies view success message on certificate invalidation.', function() {
                 $(user_name_field).val(new_user);
-                $(notes_field).val("test notes for user test4");
+                $(notes_field).val('test notes for user test4');
                 $(invalidate_button).click();
 
                 AjaxHelpers.respondWithJson(
@@ -222,36 +219,36 @@ define([
                         id: 4,
                         user: 'test4',
                         validated_by: 5,
-                        created: "Thursday, December 29, 2015",
-                        notes: "test notes for user test4"
+                        created: 'Thursday, December 29, 2015',
+                        notes: 'test notes for user test4'
                     }
                 );
-                expect($("#certificate-invalidation div.message").text()).toEqual(messages.success.saved);
+                expect($('#certificate-invalidation div.message').text()).toEqual(messages.success.saved);
             });
 
-            it("verifies view server error if server returns unknown response.", function() {
+            it('verifies view server error if server returns unknown response.', function() {
                 $(user_name_field).val(new_user);
-                $(notes_field).val("test notes for user test4");
+                $(notes_field).val('test notes for user test4');
                 $(invalidate_button).click();
 
                 // Response with empty body
-                AjaxHelpers.respondWithTextError(requests, 400, "");
+                AjaxHelpers.respondWithTextError(requests, 400, '');
 
-                expect($("#certificate-invalidation div.message").text()).toEqual(messages.error.server_error);
+                expect($('#certificate-invalidation div.message').text()).toEqual(messages.error.server_error);
             });
 
-            it("verifies certificate re-validation request and success message.", function() {
+            it('verifies certificate re-validation request and success message.', function() {
                 var user = 'test1',
-                    re_validate_certificate = "div.certificate-invalidation-container table tr:contains('" + 
+                    re_validate_certificate = "div.certificate-invalidation-container table tr:contains('" +
                         user + "') td .re-validate-certificate";
 
                 $(re_validate_certificate).click();
                 AjaxHelpers.respondWithJson(requests, {});
 
-                expect($("#certificate-invalidation div.message").text()).toEqual(messages.success.re_validated);
+                expect($('#certificate-invalidation div.message').text()).toEqual(messages.success.re_validated);
             });
 
-            it("verifies error message from server is displayed.", function() {
+            it('verifies error message from server is displayed.', function() {
                 var user = 'test1',
                     re_validate_certificate = "div.certificate-invalidation-container table tr:contains('" +
                         user + "') td .re-validate-certificate";
@@ -262,9 +259,8 @@ define([
                     message: messages.error.from_server
                 });
 
-                expect($("#certificate-invalidation div.message").text()).toEqual(messages.error.from_server);
+                expect($('#certificate-invalidation div.message').text()).toEqual(messages.error.from_server);
             });
-
         });
     }
 );

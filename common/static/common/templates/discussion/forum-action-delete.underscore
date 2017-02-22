@@ -1,6 +1,6 @@
 <li class="actions-item">
-    <a href="javascript:void(0)" class="action-list-item action-delete" role="button">
+    <button class="btn-link action-list-item action-delete">
         <span class="action-label"><%- gettext("Delete") %></span>
         <span class="action-icon"><span class="icon fa fa-remove" aria-hidden="true"></span></span>
-    </a>
+    </button>
 </li>

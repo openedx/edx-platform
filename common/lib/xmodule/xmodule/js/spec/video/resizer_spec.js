@@ -1,26 +1,24 @@
-(function (requirejs, require, define, undefined) {
-
-require(
+(function(requirejs, require, define, undefined) {
+    require(
 ['video/00_resizer.js'],
-function (Resizer) {
-
-    describe('Resizer', function () {
+function(Resizer) {
+    describe('Resizer', function() {
         var html = [
                 '<div ' +
                     'class="rszr-wrapper" ' +
                     'style="width:200px; height: 200px;"' +
                 '>',
-                    '<div ' +
+                '<div ' +
                         'class="rszr-el" ' +
                         'style="width:100px; height: 150px;"' +
                     '>',
-                        'Content',
-                    '</div>',
+                'Content',
+                '</div>',
                 '</div>'
             ].join(''),
             config, container, element;
 
-        beforeEach(function () {
+        beforeEach(function() {
             setFixtures(html);
 
             container = $('.rszr-wrapper');
@@ -34,13 +32,13 @@ function (Resizer) {
         });
 
         it('When Initialize without required parameters, log message is shown',
-            function () {
+            function() {
                 new Resizer({ });
                 expect(console.log).toHaveBeenCalled();
             }
         );
 
-        it('`alignByWidthOnly` works correctly', function () {
+        it('`alignByWidthOnly` works correctly', function() {
             var resizer = new Resizer(config).alignByWidthOnly(),
                 expectedWidth = container.width(),
                 realWidth = element.width();
@@ -48,7 +46,7 @@ function (Resizer) {
             expect(realWidth).toBe(expectedWidth);
         });
 
-        it('`alignByHeightOnly` works correctly', function () {
+        it('`alignByHeightOnly` works correctly', function() {
             var resizer = new Resizer(config).alignByHeightOnly(),
                 expectedHeight = container.height(),
                 realHeight = element.height();
@@ -56,7 +54,7 @@ function (Resizer) {
             expect(realHeight).toBe(expectedHeight);
         });
 
-        it('`align` works correctly', function () {
+        it('`align` works correctly', function() {
             var resizer = new Resizer(config).align(),
                 expectedHeight = container.height(),
                 realHeight = element.height(),
@@ -71,10 +69,9 @@ function (Resizer) {
             realWidth = element.width();
 
             expect(realWidth).toBe(expectedWidth);
-
         });
 
-        it('`setMode` works correctly', function () {
+        it('`setMode` works correctly', function() {
             var resizer = new Resizer(config).setMode('height'),
                 expectedHeight = container.height(),
                 realHeight = element.height(),
@@ -91,7 +88,7 @@ function (Resizer) {
             expect(realWidth).toBe(expectedWidth);
         });
 
-        it('`setElement` works correctly', function () {
+        it('`setElement` works correctly', function() {
             container.append('<div ' +
                 'id="Another-el" ' +
                 'style="width:100px; height: 150px;"' +
@@ -105,14 +102,14 @@ function (Resizer) {
             expect(newElement.height()).toBe(expectedHeight);
         });
 
-        describe('Callbacks', function () {
+        describe('Callbacks', function() {
             var resizer,
                 spiesList = [];
 
-            beforeEach(function () {
+            beforeEach(function() {
                 var spiesCount = _.range(3);
 
-                spiesList = $.map(spiesCount, function () {
+                spiesList = $.map(spiesCount, function() {
                     return jasmine.createSpy();
                 });
 
@@ -120,19 +117,19 @@ function (Resizer) {
             });
 
 
-            it('callbacks are called', function () {
-                $.each(spiesList, function (index, spy) {
+            it('callbacks are called', function() {
+                $.each(spiesList, function(index, spy) {
                     resizer.callbacks.add(spy);
                 });
 
                 resizer.align();
 
-                $.each(spiesList, function (index, spy) {
+                $.each(spiesList, function(index, spy) {
                     expect(spy).toHaveBeenCalled();
                 });
             });
 
-            it('callback called just once', function () {
+            it('callback called just once', function() {
                 resizer.callbacks.once(spiesList[0]);
 
                 resizer
@@ -142,21 +139,21 @@ function (Resizer) {
                 expect(spiesList[0].calls.count()).toEqual(1);
             });
 
-            it('all callbacks are removed', function () {
-                $.each(spiesList, function (index, spy) {
+            it('all callbacks are removed', function() {
+                $.each(spiesList, function(index, spy) {
                     resizer.callbacks.add(spy);
                 });
 
                 resizer.callbacks.removeAll();
                 resizer.align();
 
-                $.each(spiesList, function (index, spy) {
+                $.each(spiesList, function(index, spy) {
                     expect(spy).not.toHaveBeenCalled();
                 });
             });
 
-            it('specific callback is removed', function () {
-                $.each(spiesList, function (index, spy) {
+            it('specific callback is removed', function() {
+                $.each(spiesList, function(index, spy) {
                     resizer.callbacks.add(spy);
                 });
 
@@ -168,32 +165,31 @@ function (Resizer) {
 
             it(
                 'Error message is shown when wrong argument type is passed',
-                function ()
+                function()
             {
-                var methods = ['add', 'once'],
-                    errorMessage = '[Video info]: TypeError: Argument is not a function.',
-                    arg = {};
+                    var methods = ['add', 'once'],
+                        errorMessage = '[Video info]: TypeError: Argument is not a function.',
+                        arg = {};
 
-                spyOn(console, 'error');
+                    spyOn(console, 'error');
 
-                $.each(methods, function (index, methodName) {
-                     resizer.callbacks[methodName](arg);
-                     expect(console.error).toHaveBeenCalledWith(errorMessage);
-                     //reset spy
-                     console.log.calls.reset();
+                    $.each(methods, function(index, methodName) {
+                        resizer.callbacks[methodName](arg);
+                        expect(console.error).toHaveBeenCalledWith(errorMessage);
+                     // reset spy
+                        console.log.calls.reset();
+                    });
                 });
-
-            });
         });
 
-        describe('Delta', function () {
+        describe('Delta', function() {
             var resizer;
 
-            beforeEach(function () {
+            beforeEach(function() {
                 resizer = new Resizer(config);
             });
 
-            it('adding delta align correctly by height', function () {
+            it('adding delta align correctly by height', function() {
                 var delta = 100,
                     expectedHeight = container.height() + delta,
                     realHeight;
@@ -207,7 +203,7 @@ function (Resizer) {
                 expect(realHeight).toBe(expectedHeight);
             });
 
-            it('adding delta align correctly by width', function () {
+            it('adding delta align correctly by width', function() {
                 var delta = 100,
                     expectedWidth = container.width() + delta,
                     realWidth;
@@ -221,7 +217,7 @@ function (Resizer) {
                 expect(realWidth).toBe(expectedWidth);
             });
 
-            it('substract delta align correctly by height', function () {
+            it('substract delta align correctly by height', function() {
                 var delta = 100,
                     expectedHeight = container.height() - delta,
                     realHeight;
@@ -235,7 +231,7 @@ function (Resizer) {
                 expect(realHeight).toBe(expectedHeight);
             });
 
-            it('substract delta align correctly by width', function () {
+            it('substract delta align correctly by width', function() {
                 var delta = 100,
                     expectedWidth = container.width() - delta,
                     realWidth;
@@ -249,7 +245,7 @@ function (Resizer) {
                 expect(realWidth).toBe(expectedWidth);
             });
 
-            it('reset delta', function () {
+            it('reset delta', function() {
                 var delta = 100,
                     expectedWidth = container.width(),
                     realWidth;
@@ -266,6 +262,4 @@ function (Resizer) {
         });
     });
 });
-
-
 }(RequireJS.requirejs, RequireJS.require, RequireJS.define));

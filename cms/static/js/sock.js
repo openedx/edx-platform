@@ -1,6 +1,6 @@
-require(["domReady", "jquery", "jquery.smoothScroll"],
-    function (domReady, $) {
-        var toggleSock = function (e) {
+require(['domReady', 'jquery', 'jquery.smoothScroll'],
+    function(domReady, $) {
+        var toggleSock = function(e) {
             e.preventDefault();
 
             var $btnShowSockLabel = $(this).find('.copy-show');
@@ -11,13 +11,13 @@ require(["domReady", "jquery", "jquery.smoothScroll"],
             if ($sock.hasClass('is-shown')) {
                 $sock.removeClass('is-shown');
                 $sockContent.hide('fast');
-                $btnHideSockLabel.removeClass("is-shown").addClass("is-hidden");
-                $btnShowSockLabel.removeClass("is-hidden").addClass("is-shown");
+                $btnHideSockLabel.removeClass('is-shown').addClass('is-hidden');
+                $btnShowSockLabel.removeClass('is-hidden').addClass('is-shown');
             } else {
                 $sock.addClass('is-shown');
                 $sockContent.show('fast');
-                $btnHideSockLabel.removeClass("is-hidden").addClass("is-shown");
-                $btnShowSockLabel.removeClass("is-shown").addClass("is-hidden");
+                $btnHideSockLabel.removeClass('is-hidden').addClass('is-shown');
+                $btnShowSockLabel.removeClass('is-shown').addClass('is-hidden');
             }
 
             $.smoothScroll({
@@ -29,7 +29,7 @@ require(["domReady", "jquery", "jquery.smoothScroll"],
             });
         };
 
-        domReady(function () {
+        domReady(function() {
             // toggling footer additional support
             $('.cta-show-sock').bind('click', toggleSock);
         });

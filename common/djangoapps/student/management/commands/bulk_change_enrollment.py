@@ -91,9 +91,10 @@ class Command(BaseCommand):
             if not commit:
                 logger.info('Dry run, changes have not been saved. Run again with "commit" argument to save changes')
                 raise Exception('The --commit flag was not given; forcing rollback.')
-            with transaction.atomic():
-                # call `change_mode` which will change the mode and also emit tracking event
-                for enrollment in course_enrollments:
+
+            # call `change_mode` which will change the mode and also emit tracking event
+            for enrollment in course_enrollments:
+                with transaction.atomic():
                     enrollment.change_mode(mode=to_mode)
 
             logger.info('Finished moving users from %s to %s in course %s.', from_mode, to_mode, course_key_str)

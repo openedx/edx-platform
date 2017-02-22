@@ -5,27 +5,27 @@ Test courseware search
 import json
 import uuid
 
-from ..helpers import remove_file
-from ...pages.common.logout import LogoutPage
-from ...pages.studio.overview import CourseOutlinePage
-from ...pages.lms.courseware_search import CoursewareSearchPage
-from ...pages.lms.staff_view import StaffPage
-from ...fixtures.course import XBlockFixtureDesc
+from common.test.acceptance.tests.helpers import remove_file
+from common.test.acceptance.pages.common.logout import LogoutPage
+from common.test.acceptance.pages.studio.overview import CourseOutlinePage
+from common.test.acceptance.pages.lms.courseware_search import CoursewareSearchPage
+from common.test.acceptance.pages.lms.staff_view import StaffPage
+from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 
 from nose.plugins.attrib import attr
 
-from ..studio.base_studio_test import ContainerBase
+from common.test.acceptance.tests.studio.base_studio_test import ContainerBase
 
-from ...pages.studio.settings_group_configurations import GroupConfigurationsPage
-from ...pages.studio.auto_auth import AutoAuthPage as StudioAutoAuthPage
-from ...fixtures import LMS_BASE_URL
-from ...pages.studio.component_editor import ComponentVisibilityEditorView
-from ...pages.lms.instructor_dashboard import InstructorDashboardPage
+from common.test.acceptance.pages.studio.settings_group_configurations import GroupConfigurationsPage
+from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage as StudioAutoAuthPage
+from common.test.acceptance.fixtures import LMS_BASE_URL
+from common.test.acceptance.pages.studio.component_editor import ComponentVisibilityEditorView
+from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage
 
 from bok_choy.promise import EmptyPromise
 
 
-@attr('shard_1')
+@attr(shard=1)
 class CoursewareSearchCohortTest(ContainerBase):
     """
     Test courseware search.
@@ -207,10 +207,6 @@ class CoursewareSearchCohortTest(ContainerBase):
             Create cohort and assign student to it.
             """
             cohort_management_page.add_cohort(cohort_name, content_group=content_group)
-            # After adding the cohort, it should automatically be selected
-            EmptyPromise(
-                lambda: cohort_name == cohort_management_page.get_selected_cohort(), "Waiting for new cohort"
-            ).fulfill()
             cohort_management_page.add_students_to_selected_cohort([student])
         add_cohort_with_student("Cohort A", self.content_group_a, self.cohort_a_student_username)
         add_cohort_with_student("Cohort B", self.content_group_b, self.cohort_b_student_username)

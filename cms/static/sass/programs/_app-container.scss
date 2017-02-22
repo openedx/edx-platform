@@ -1,0 +1,15 @@
+
+// ------------------------------
+// Programs: App Container
+
+// About: styling for setting up the wrapper.
+.program-app {
+  &.layout-1q3q {
+    max-width: 1250px;
+
+    // HtmlUtils.template wraps children of this in an anonymous div. We need to make sure they render at full width
+    & > div {
+      @include span(12);
+    }
+  }
+}

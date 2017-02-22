@@ -1,20 +1,20 @@
-define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/js/spec_helpers/template_helpers",
-        "js/spec_helpers/edit_helpers", "js/models/xblock_info", "js/views/xblock_string_field_editor"],
-       function ($, AjaxHelpers, TemplateHelpers, EditHelpers, XBlockInfo, XBlockStringFieldEditor) {
-           describe("XBlockStringFieldEditorView", function () {
+define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/js/spec_helpers/template_helpers',
+        'js/spec_helpers/edit_helpers', 'js/models/xblock_info', 'js/views/xblock_string_field_editor'],
+       function($, AjaxHelpers, TemplateHelpers, EditHelpers, XBlockInfo, XBlockStringFieldEditor) {
+           describe('XBlockStringFieldEditorView', function() {
                var initialDisplayName, updatedDisplayName, getXBlockInfo, getFieldEditorView;
 
-               getXBlockInfo = function (displayName) {
+               getXBlockInfo = function(displayName) {
                    return new XBlockInfo(
                        {
                            display_name: displayName,
-                           id: "my_xblock"
+                           id: 'my_xblock'
                        },
-                       { parse: true }
+                       {parse: true}
                    );
                };
 
-               getFieldEditorView = function (xblockInfo) {
+               getFieldEditorView = function(xblockInfo) {
                    if (xblockInfo === undefined) {
                        xblockInfo = getXBlockInfo(initialDisplayName);
                    }
@@ -24,9 +24,9 @@ define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/j
                    });
                };
 
-               beforeEach(function () {
-                   initialDisplayName = "Default Display Name";
-                   updatedDisplayName = "Updated Display Name";
+               beforeEach(function() {
+                   initialDisplayName = 'Default Display Name';
+                   updatedDisplayName = 'Updated Display Name';
                    TemplateHelpers.installTemplate('xblock-string-field-editor');
                    appendSetFixtures(
                            '<div class="wrapper-xblock-field incontext-editor is-editable"' +
@@ -38,10 +38,10 @@ define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/j
                    );
                });
 
-               describe('Editing', function () {
+               describe('Editing', function() {
                    var expectPostedNewDisplayName, expectEditCanceled;
 
-                   expectPostedNewDisplayName = function (requests, displayName) {
+                   expectPostedNewDisplayName = function(requests, displayName) {
                        AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/my_xblock', {
                            metadata: {
                                display_name: displayName
@@ -49,13 +49,13 @@ define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/j
                        });
                    };
 
-                   expectEditCanceled = function (test, fieldEditorView, options) {
+                   expectEditCanceled = function(test, fieldEditorView, options) {
                        var requests, initialRequests, displayNameInput;
                        requests = AjaxHelpers.requests(test);
                        displayNameInput = EditHelpers.inlineEdit(fieldEditorView.$el, options.newTitle);
                        if (options.pressEscape) {
-                           displayNameInput.simulate("keydown", { keyCode: $.simulate.keyCode.ESCAPE });
-                           displayNameInput.simulate("keyup", { keyCode: $.simulate.keyCode.ESCAPE });
+                           displayNameInput.simulate('keydown', {keyCode: $.simulate.keyCode.ESCAPE});
+                           displayNameInput.simulate('keyup', {keyCode: $.simulate.keyCode.ESCAPE});
                        } else if (options.clickCancel) {
                            fieldEditorView.$('button[name=cancel]').click();
                        } else {
@@ -67,7 +67,7 @@ define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/j
                        expect(fieldEditorView.model.get('display_name')).toBe(initialDisplayName);
                    };
 
-                   it('can inline edit the display name', function () {
+                   it('can inline edit the display name', function() {
                        var requests, fieldEditorView;
                        requests = AjaxHelpers.requests(this);
                        fieldEditorView = getFieldEditorView().render();
@@ -77,11 +77,11 @@ define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/j
                        // This is the response for the change operation.
                        AjaxHelpers.respondWithJson(requests, { });
                        // This is the response for the subsequent fetch operation.
-                       AjaxHelpers.respondWithJson(requests, {display_name:  updatedDisplayName});
+                       AjaxHelpers.respondWithJson(requests, {display_name: updatedDisplayName});
                        EditHelpers.verifyInlineEditChange(fieldEditorView.$el, updatedDisplayName);
                    });
 
-                   it('does not change the title when a display name update fails', function () {
+                   it('does not change the title when a display name update fails', function() {
                        var requests, fieldEditorView, initialRequests;
                        requests = AjaxHelpers.requests(this);
                        fieldEditorView = getFieldEditorView().render();
@@ -94,7 +94,7 @@ define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/j
                        EditHelpers.verifyInlineEditChange(fieldEditorView.$el, initialDisplayName, updatedDisplayName);
                    });
 
-                   it('trims whitespace from the display name', function () {
+                   it('trims whitespace from the display name', function() {
                        var requests, fieldEditorView;
                        requests = AjaxHelpers.requests(this);
                        fieldEditorView = getFieldEditorView().render();
@@ -105,50 +105,50 @@ define(["jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/j
                        // This is the response for the change operation.
                        AjaxHelpers.respondWithJson(requests, { });
                        // This is the response for the subsequent fetch operation.
-                       AjaxHelpers.respondWithJson(requests, {display_name:  updatedDisplayName.trim()});
+                       AjaxHelpers.respondWithJson(requests, {display_name: updatedDisplayName.trim()});
                        EditHelpers.verifyInlineEditChange(fieldEditorView.$el, updatedDisplayName.trim());
                    });
 
-                   it('does not change the title when input is the empty string', function () {
+                   it('does not change the title when input is the empty string', function() {
                        var fieldEditorView = getFieldEditorView().render();
                        expectEditCanceled(this, fieldEditorView, {newTitle: ''});
                    });
 
-                   it('does not change the title when input is whitespace-only', function () {
+                   it('does not change the title when input is whitespace-only', function() {
                        var fieldEditorView = getFieldEditorView().render();
                        expectEditCanceled(this, fieldEditorView, {newTitle: ' '});
                    });
 
-                   it('can cancel an inline edit by pressing escape', function () {
+                   it('can cancel an inline edit by pressing escape', function() {
                        var fieldEditorView = getFieldEditorView().render();
                        expectEditCanceled(this, fieldEditorView, {newTitle: updatedDisplayName, pressEscape: true});
                    });
 
-                   it('can cancel an inline edit by clicking cancel', function () {
+                   it('can cancel an inline edit by clicking cancel', function() {
                        var fieldEditorView = getFieldEditorView().render();
                        expectEditCanceled(this, fieldEditorView, {newTitle: updatedDisplayName, clickCancel: true});
                    });
                });
 
-               describe('Rendering', function () {
-                   var expectInputMatchesModelDisplayName = function (displayName) {
+               describe('Rendering', function() {
+                   var expectInputMatchesModelDisplayName = function(displayName) {
                        var fieldEditorView = getFieldEditorView(getXBlockInfo(displayName)).render();
                        expect(fieldEditorView.$('.xblock-field-input').val()).toBe(displayName);
                    };
 
-                   it('renders single quotes in input field', function () {
+                   it('renders single quotes in input field', function() {
                        expectInputMatchesModelDisplayName('Updated \'Display Name\'');
                    });
 
-                   it('renders double quotes in input field', function () {
+                   it('renders double quotes in input field', function() {
                        expectInputMatchesModelDisplayName('Updated "Display Name"');
                    });
 
-                   it('renders open angle bracket in input field', function () {
+                   it('renders open angle bracket in input field', function() {
                        expectInputMatchesModelDisplayName(updatedDisplayName + '<');
                    });
 
-                   it('renders close angle bracket in input field', function () {
+                   it('renders close angle bracket in input field', function() {
                        expectInputMatchesModelDisplayName('>' + updatedDisplayName);
                    });
                });

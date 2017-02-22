@@ -10,19 +10,19 @@ define([
         var notes = Helpers.getDefaultNotes(),
             getView, getText;
 
-        getText = function (selector) {
-            return $(selector).map(function () {
+        getText = function(selector) {
+            return $(selector).map(function() {
                 return _.trim($(this).text());
             }).toArray();
         };
 
-        getView = function (collection, tabsCollection, options) {
+        getView = function(collection, tabsCollection, options) {
             var view;
 
             options = _.defaults(options || {}, {
                 el: $('.wrapper-student-notes'),
                 collection: collection,
-                tabsCollection: tabsCollection,
+                tabsCollection: tabsCollection
             });
 
             view = new CourseStructureView(options);
@@ -31,7 +31,7 @@ define([
             return view;
         };
 
-        beforeEach(function () {
+        beforeEach(function() {
             loadFixtures('js/fixtures/edxnotes/edxnotes.html');
             TemplateHelpers.installTemplates([
                 'templates/edxnotes/note-item', 'templates/edxnotes/tab-item'
@@ -41,7 +41,7 @@ define([
             this.tabsCollection = new TabsCollection();
         });
 
-        it('displays a tab and content with proper data and order', function () {
+        it('displays a tab and content with proper data and order', function() {
             var view = getView(this.collection, this.tabsCollection),
                 chapters = getText('.course-title'),
                 sections = getText('.course-subtitle'),

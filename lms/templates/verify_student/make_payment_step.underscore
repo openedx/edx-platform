@@ -30,11 +30,14 @@
     <div class="instruction <% if ( !upgrade && isActive ) { %>center-col<% } %>">
       <% if ( _.some( requirements, function( isVisible ) { return isVisible; } ) ) { %>
       <p class="instruction-info">
-        <% if ( verificationDeadline ) { %>
-          <%- _.sprintf(
-            gettext( "You can pay now even if you don't have the following items available, but you will need to have these by %(date)s to qualify to earn a Verified Certificate." ),
-            { date: verificationDeadline }
-          ) %>
+        <% if ( verificationDeadline && isActive) { %>
+          <p
+            class="localized-datetime"
+            data-datetime="<%-verificationDeadline%>"
+            data-string="<%-gettext( "You can pay now even if you don't have the following items available, but you will need to have these by {date} to qualify to earn a Verified Certificate." )%>"
+            data-timezone="<%-userTimezone%>"
+            data-language="<%-userLanguage%>"
+          >
         <% } else if ( !isActive ) { %>
           <i class="fa fa-envelope-o" aria-hidden="true"></i>
           <%= HtmlUtils.interpolateHtml(
@@ -85,7 +88,7 @@
     <% } %>
 
     <% if ( courseModeSlug === 'no-id-professional') { %>
-    <div class="container register is-verified">
+    <div class="container register is-verified no-min-scale">
       <h3 class="title"><%- gettext( "ID-Verification is not required for this Professional Education course." ) %></h3>
       <p><%- gettext( "All professional education courses are fee-based, and require payment to complete the enrollment process." ) %></p>
     </div>

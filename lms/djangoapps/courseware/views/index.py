@@ -22,11 +22,9 @@ import logging
 import newrelic.agent
 import urllib
 
-from lang_pref import LANGUAGE_KEY
 from xblock.fragment import Fragment
 from opaque_keys.edx.keys import CourseKey
-from openedx.core.lib.gating import api as gating_api
-from openedx.core.lib.time_zone_utils import get_user_time_zone
+from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from shoppingcart.models import CourseRegistrationCode
 from student.models import CourseEnrollment
@@ -143,7 +141,6 @@ class CoursewareIndex(View):
 
             if self.chapter and self.section:
                 self._redirect_if_not_requested_section()
-                self._verify_section_not_gated()
                 self._save_positions()
                 self._prefetch_and_bind_section()
 
@@ -272,15 +269,6 @@ class CoursewareIndex(View):
                     self.chapter_url_name = exam_chapter.url_name
                     self.section_url_name = exam_section.url_name
 
-    def _verify_section_not_gated(self):
-        """
-        Verify whether the section is gated and accessible to the user.
-        """
-        gated_content = gating_api.get_gated_content(self.course, self.effective_user)
-        if gated_content:
-            if unicode(self.section.location) in gated_content:
-                raise Http404
-
     def _get_language_preference(self):
         """
         Returns the preferred language for the actual user making the request.
@@ -360,7 +348,7 @@ class CoursewareIndex(View):
         sets up the runtime, which binds the request user to the section.
         """
         # Pre-fetch all descendant data
-        self.section = modulestore().get_item(self.section.location, depth=None)
+        self.section = modulestore().get_item(self.section.location, depth=None, lazy=False)
         self.field_data_cache.add_descriptor_descendents(self.section, depth=None)
 
         # Bind section to user
@@ -395,6 +383,7 @@ class CoursewareIndex(View):
             'staff_access': self.is_staff,
             'studio_url': get_studio_url(self.course, 'course'),
             'masquerade': self.masquerade,
+            'real_user': self.real_user,
             'xqa_server': settings.FEATURES.get('XQA_SERVER', "http://your_xqa_server.com"),
             'bookmarks_api_url': reverse('bookmarks'),
             'language_preference': self._get_language_preference(),
@@ -408,7 +397,11 @@ class CoursewareIndex(View):
             self.section_url_name,
             self.field_data_cache,
         )
-        courseware_context['accordion'] = render_accordion(self.request, self.course, table_of_contents['chapters'])
+        courseware_context['accordion'] = render_accordion(
+            self.request,
+            self.course,
+            table_of_contents['chapters'],
+        )
 
         # entrance exam data
         if course_has_entrance_exam(self.course):
@@ -458,7 +451,7 @@ class CoursewareIndex(View):
             return "{url}?child={requested_child}".format(
                 url=reverse(
                     'courseware_section',
-                    args=[unicode(self.course.id), section_info['chapter_url_name'], section_info['url_name']],
+                    args=[unicode(self.course_key), section_info['chapter_url_name'], section_info['url_name']],
                 ),
                 requested_child=requested_child,
             )
@@ -466,6 +459,7 @@ class CoursewareIndex(View):
         section_context = {
             'activate_block_id': self.request.GET.get('activate_block_id'),
             'requested_child': self.request.GET.get("child"),
+            'progress_url': reverse('progress', kwargs={'course_id': unicode(self.course_key)}),
         }
         if previous_of_active_section:
             section_context['prev_url'] = _compute_section_url(previous_of_active_section, 'last')
@@ -515,7 +509,6 @@ def render_accordion(request, course, table_of_contents):
             ('course_id', unicode(course.id)),
             ('csrf', csrf(request)['csrf_token']),
             ('due_date_display_format', course.due_date_display_format),
-            ('time_zone', get_user_time_zone(request.user).zone),
         ] + TEMPLATE_IMPORTS.items()
     )
     return render_to_string('courseware/accordion.html', context)

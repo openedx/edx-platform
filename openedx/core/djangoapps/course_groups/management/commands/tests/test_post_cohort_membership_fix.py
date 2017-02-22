@@ -14,7 +14,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr('shard_2')
+@attr(shard=2)
 class TestPostMigrationFix(ModuleStoreTestCase):
     """
     Base class for testing post-migration fix commands

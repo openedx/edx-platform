@@ -20,7 +20,7 @@ def view_word_cloud(_step):
 
 @step('I press the Save button')
 def press_the_save_button(_step):
-    button_css = '.input_cloud_section input.save'
+    button_css = '.input_cloud_section .save'
     world.css_click(button_css)
 
 

@@ -2,7 +2,7 @@
 Staff view of courseware
 """
 from bok_choy.page_object import PageObject
-from .courseware import CoursewarePage
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
 
 
 class StaffPage(CoursewarePage):
@@ -79,7 +79,7 @@ class StaffDebugPage(PageObject):
     url = None
 
     def is_browser_on_page(self):
-        return self.q(css='section.staff-modal').present
+        return self.q(css='.staff-modal').present
 
     def reset_attempts(self, user=None):
         """
@@ -88,15 +88,15 @@ class StaffDebugPage(PageObject):
         """
         if user:
             self.q(css='input[id^=sd_fu_]').first.fill(user)
-        self.q(css='section.staff-modal a.staff-debug-reset').click()
+        self.q(css='.staff-modal .staff-debug-reset').click()
 
     def delete_state(self, user=None):
         """
         This delete's a student's state for the problem
         """
         if user:
-            self.q(css='input[id^=sd_fu_]').fill(user)
-        self.q(css='section.staff-modal a.staff-debug-sdelete').click()
+            self.q(css='input[id^=sd_fu_]').first.fill(user)
+        self.q(css='.staff-modal .staff-debug-sdelete').first.click()
 
     def rescore(self, user=None):
         """
@@ -105,7 +105,16 @@ class StaffDebugPage(PageObject):
         """
         if user:
             self.q(css='input[id^=sd_fu_]').first.fill(user)
-        self.q(css='section.staff-modal a.staff-debug-rescore').click()
+        self.q(css='.staff-modal .staff-debug-rescore').click()
+
+    def rescore_if_higher(self, user=None):
+        """
+        This clicks on the reset attempts link with an optionally
+        specified user.
+        """
+        if user:
+            self.q(css='input[id^=sd_fu_]').first.fill(user)
+        self.q(css='.staff-modal .staff-debug-rescore-if-higher').click()
 
     @property
     def idash_msg(self):

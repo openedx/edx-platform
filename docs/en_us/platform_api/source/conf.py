@@ -101,7 +101,7 @@ MOCK_MODULES = [
     'openid',
     'openid.store',
     'openid.store.interface',
-    'external_auth.views',
+    'openedx.core.djangoapps.external_auth.views',
     'mail_utils',
     'ratelimitbackend.backends',
     'social.apps.django_app.default',
@@ -128,7 +128,7 @@ MOCK_MODULES = [
     'celery',
     'celery.task',
     'student.roles',
-    'embargo.models',
+    'openedx.core.djangoapps.embargo.models',
     'xmodule.vertical_block',
     'xmodule.course_module',
     'user_api.accounts.api',
@@ -157,6 +157,11 @@ MOCK_MODULES = [
     'celery.signals',
     'edx_rest_framework_extensions',
     'edx_rest_framework_extensions.authentication',
+    'django_extensions',
+    'django_extensions.db',
+    'django_extensions.db.models',
+    'jsonfield',
+    'jsonfield.fields',
 ]
 
 for mod_name in MOCK_MODULES:
@@ -236,7 +241,6 @@ extensions = [
     'sphinx.ext.todo', 'sphinx.ext.coverage', 'sphinx.ext.pngmath',
     'sphinx.ext.mathjax', 'sphinx.ext.viewcode', 'sphinxcontrib.napoleon']
 
-project = u'Open edX Platform APIs: Eucalyptus Release'
-copyright = u'2016, edX Inc. and licensed under a Creative Commons Attribution-ShareAlike 4.0 International License unless otherwise specified'
+project = 'Open edX Platform APIs'
 
 exclude_patterns = ['build', 'links.rst']

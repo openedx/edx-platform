@@ -1,5 +1,10 @@
+/* globals requirejs, requireSerial, MathJax */
+/* eslint-disable quote-props */
+
 (function(requirejs) {
     'use strict';
+
+    var i, specHelpers, testFiles;
 
     // TODO: how can we share the vast majority of this config that is in common with CMS?
     requirejs.config({
@@ -8,8 +13,8 @@
         paths: {
             'gettext': 'xmodule_js/common_static/js/test/i18n',
             'codemirror': 'xmodule_js/common_static/js/vendor/CodeMirror/codemirror',
-            'jquery': 'xmodule_js/common_static/common/js/vendor/jquery',
-            'jquery-migrate': 'xmodule_js/common_static/common/js/vendor/jquery-migrate',
+            jquery: 'common/js/vendor/jquery',
+            'jquery-migrate': 'common/js/vendor/jquery-migrate',
             'jquery.ui': 'xmodule_js/common_static/js/vendor/jquery-ui.min',
             'jquery.eventDrag': 'xmodule_js/common_static/js/vendor/jquery.event.drag-2.2',
             'jquery.flot': 'xmodule_js/common_static/js/vendor/flot/jquery.flot.min',
@@ -24,7 +29,7 @@
             'jquery.cookie': 'xmodule_js/common_static/js/vendor/jquery.cookie',
             'jquery.qtip': 'xmodule_js/common_static/js/vendor/jquery.qtip.min',
             'jquery.fileupload': 'xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.fileupload',
-            'jquery.iframe-transport': 'xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.iframe-transport',
+            'jquery.iframe-transport': 'xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.iframe-transport',  // eslint-disable-line max-len
             'jquery.inputnumber': 'xmodule_js/common_static/js/vendor/html5-input-polyfills/number-polyfill',
             'jquery.immediateDescendents': 'xmodule_js/common_static/coffee/src/jquery.immediateDescendents',
             'jquery.simulate': 'xmodule_js/common_static/js/vendor/jquery.simulate',
@@ -32,8 +37,8 @@
             'jquery.url': 'xmodule_js/common_static/js/vendor/url.min',
             'datepair': 'xmodule_js/common_static/js/vendor/timepicker/datepair',
             'date': 'xmodule_js/common_static/js/vendor/date',
-            'moment': 'xmodule_js/common_static/js/vendor/moment.min',
-            'moment-with-locales': 'xmodule_js/common_static/js/vendor/moment-with-locales.min',
+            moment: 'common/js/vendor/moment-with-locales',
+            'moment-timezone': 'common/js/vendor/moment-timezone-with-data',
             'text': 'xmodule_js/common_static/js/vendor/requirejs/text',
             'underscore': 'common/js/vendor/underscore',
             'underscore.string': 'common/js/vendor/underscore.string',
@@ -47,14 +52,14 @@
             'xmodule': 'xmodule_js/src/xmodule',
             'utility': 'xmodule_js/common_static/js/src/utility',
             'accessibility': 'xmodule_js/common_static/js/src/accessibility_tools',
-            'sinon': 'xmodule_js/common_static/js/vendor/sinon-1.17.0',
-            'squire': 'xmodule_js/common_static/js/vendor/Squire',
+            'sinon': 'common/js/vendor/sinon',
+            'squire': 'common/js/vendor/Squire',
             'jasmine-imagediff': 'xmodule_js/common_static/js/vendor/jasmine-imagediff',
             'domReady': 'xmodule_js/common_static/js/vendor/domReady',
-            'mathjax': '//cdn.mathjax.org/mathjax/2.6-latest/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured', // jshint ignore:line
+            mathjax: '//cdn.mathjax.org/mathjax/2.7-latest/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured',  // eslint-disable-line max-len
             'youtube': '//www.youtube.com/player_api?noext',
             'coffee/src/ajax_prefix': 'xmodule_js/common_static/coffee/src/ajax_prefix',
-            'coffee/src/instructor_dashboard/student_admin': 'coffee/src/instructor_dashboard/student_admin',
+            'js/instructor_dashboard/student_admin': 'js/instructor_dashboard/student_admin',
             'xmodule_js/common_static/js/test/add_ajax_prefix': 'xmodule_js/common_static/js/test/add_ajax_prefix',
             'xblock/lms.runtime.v1': 'lms/js/xblock/lms.runtime.v1',
             'xblock': 'common/js/xblock',
@@ -69,9 +74,6 @@
             'MathJaxProcessor': 'coffee/src/customwmd',
             'picturefill': 'common/js/vendor/picturefill',
             'draggabilly': 'xmodule_js/common_static/js/vendor/draggabilly',
-            'modernizr': 'edx-pattern-library/js/modernizr-custom',
-            'afontgarde': 'edx-pattern-library/js/afontgarde',
-            'edxicons': 'edx-pattern-library/js/edx-icons',
 
             // Manually specify LMS files that are not converted to RequireJS
             'history': 'js/vendor/history',
@@ -89,9 +91,6 @@
             'js/student_profile/views/learner_profile_factory': 'js/student_profile/views/learner_profile_factory',
             'js/student_profile/views/learner_profile_view': 'js/student_profile/views/learner_profile_view',
             'js/ccx/schedule': 'js/ccx/schedule',
-
-            // Discussion classes loaded explicitly until they are converted to use RequireJS
-            'DiscussionModuleView': 'xmodule_js/common_static/common/js/discussion/discussion_module_view',
 
             'js/bookmarks/collections/bookmarks': 'js/bookmarks/collections/bookmarks',
             'js/bookmarks/models/bookmark': 'js/bookmarks/models/bookmark',
@@ -289,24 +288,24 @@
                 exports: 'AjaxPrefix',
                 deps: ['coffee/src/ajax_prefix']
             },
-            'coffee/src/instructor_dashboard/util': {
-                exports: 'coffee/src/instructor_dashboard/util',
+            'js/instructor_dashboard/util': {
+                exports: 'js/instructor_dashboard/util',
                 deps: ['jquery', 'underscore', 'slick.core', 'slick.grid'],
                 init: function() {
                     // Set global variables that the util code is expecting to be defined
-                    require([
+                    require([  // eslint-disable-line global-require
                         'edx-ui-toolkit/js/utils/html-utils',
                         'edx-ui-toolkit/js/utils/string-utils'
                     ], function(HtmlUtils, StringUtils) {
-                        window.edx = edx || {};
+                        window.edx = window.edx || {};
                         window.edx.HtmlUtils = HtmlUtils;
                         window.edx.StringUtils = StringUtils;
                     });
                 }
             },
-            'coffee/src/instructor_dashboard/student_admin': {
-                exports: 'coffee/src/instructor_dashboard/student_admin',
-                deps: ['jquery', 'underscore', 'coffee/src/instructor_dashboard/util', 'string_utils']
+            'js/instructor_dashboard/student_admin': {
+                exports: 'js/instructor_dashboard/student_admin',
+                deps: ['jquery', 'underscore', 'js/instructor_dashboard/util', 'string_utils']
             },
             'js/instructor_dashboard/certificates': {
                 exports: 'js/instructor_dashboard/certificates',
@@ -389,15 +388,15 @@
                 deps: ['jquery', 'underscore', 'underscore.string', 'backbone', 'gettext'],
                 init: function() {
                     // Set global variables that the payment code is expecting to be defined
-                    require([
+                    require([  // eslint-disable-line global-require
                         'underscore',
                         'underscore.string',
                         'edx-ui-toolkit/js/utils/html-utils',
                         'edx-ui-toolkit/js/utils/string-utils'
-                    ], function (_, str, HtmlUtils, StringUtils) {
+                    ], function(_, str, HtmlUtils, StringUtils) {
                         window._ = _;
                         window._.str = str;
-                        window.edx = edx || {};
+                        window.edx = window.edx || {};
                         window.edx.HtmlUtils = HtmlUtils;
                         window.edx.StringUtils = StringUtils;
                     });
@@ -520,7 +519,7 @@
                 exports: 'Slick'
             },
             // Discussions
-            'xmodule_js/common_static/common/js/discussion/utils': {
+            'common/js/discussion/utils': {
                 deps: [
                     'jquery',
                     'jquery.timeago',
@@ -533,154 +532,156 @@
                 exports: 'DiscussionUtil',
                 init: function() {
                     // Set global variables that the discussion code is expecting to be defined
-                    require(['backbone', 'URI'], function(Backbone, URI) {
-                        window.Backbone = Backbone;
-                        window.URI = URI;
-                    });
+                    require(  // eslint-disable-line global-require
+                        [
+                            'backbone',
+                            'URI',
+                            'edx-ui-toolkit/js/utils/html-utils',
+                            'edx-ui-toolkit/js/utils/string-utils'
+                        ],
+                        function(Backbone, URI, HtmlUtils, StringUtils) {
+                            window.Backbone = Backbone;
+                            window.URI = URI;
+                            window.edx = window.edx || {};
+                            window.edx.HtmlUtils = HtmlUtils;
+                            window.edx.StringUtils = StringUtils;
+                        }
+                    );
                 }
             },
-            'xmodule_js/common_static/common/js/discussion/content': {
+            'common/js/discussion/content': {
                 deps: [
-                    'xmodule_js/common_static/common/js/discussion/utils'
+                    'common/js/discussion/utils'
                 ],
                 exports: 'Content'
             },
-            'xmodule_js/common_static/common/js/discussion/discussion': {
+            'common/js/discussion/discussion': {
                 deps: [
-                    'xmodule_js/common_static/common/js/discussion/utils',
-                    'xmodule_js/common_static/common/js/discussion/content'
+                    'common/js/discussion/utils',
+                    'common/js/discussion/content'
                 ],
                 exports: 'Discussion'
             },
-            'xmodule_js/common_static/common/js/discussion/models/discussion_course_settings': {
+            'common/js/discussion/models/discussion_course_settings': {
                 deps: [
-                    'xmodule_js/common_static/common/js/discussion/utils'
+                    'common/js/discussion/utils'
                 ],
                 exports: 'DiscussionCourseSettings'
             },
-            'xmodule_js/common_static/common/js/discussion/models/discussion_user': {
+            'common/js/discussion/models/discussion_user': {
                 deps: [
-                    'xmodule_js/common_static/common/js/discussion/utils'
+                    'common/js/discussion/utils'
                 ],
                 exports: 'DiscussionUser'
             },
-            'xmodule_js/common_static/common/js/discussion/views/discussion_content_view': {
+            'common/js/discussion/views/discussion_content_view': {
                 deps: [
-                    'xmodule_js/common_static/common/js/discussion/utils'
+                    'common/js/discussion/utils'
                 ],
                 exports: 'DiscussionContentView'
             },
-            'xmodule_js/common_static/common/js/discussion/views/discussion_thread_edit_view': {
+            'common/js/discussion/views/discussion_thread_edit_view': {
                 deps: [
-                    'xmodule_js/common_static/common/js/discussion/utils'
+                    'common/js/discussion/utils'
                 ],
                 exports: 'DiscussionThreadEditView'
             },
-            'xmodule_js/common_static/common/js/discussion/views/discussion_thread_list_view': {
+            'common/js/discussion/views/discussion_thread_list_view': {
                 deps: [
-                    'xmodule_js/common_static/common/js/discussion/utils'
+                    'common/js/discussion/utils'
                 ],
                 exports: 'DiscussionThreadListView'
             },
-            'xmodule_js/common_static/common/js/discussion/views/discussion_thread_profile_view': {
+            'common/js/discussion/views/discussion_thread_profile_view': {
                 deps: [
-                    'xmodule_js/common_static/common/js/discussion/utils'
+                    'common/js/discussion/utils'
                 ],
                 exports: 'DiscussionThreadProfileView'
             },
             'xmodule_js/common_static/common/js/discussion/views/discussion_thread_show_view': {
                 deps: [
-                    'xmodule_js/common_static/common/js/discussion/utils',
-                    'xmodule_js/common_static/common/js/discussion/views/discussion_content_view'
+                    'common/js/discussion/utils',
+                    'common/js/discussion/views/discussion_content_view'
                 ],
                 exports: 'DiscussionThreadShowView'
             },
-            'xmodule_js/common_static/common/js/discussion/views/discussion_thread_view': {
+            'common/js/discussion/views/discussion_thread_view': {
                 deps: [
-                    'xmodule_js/common_static/common/js/discussion/utils',
-                    'xmodule_js/common_static/common/js/discussion/views/discussion_content_view'
+                    'common/js/discussion/utils',
+                    'common/js/discussion/views/discussion_content_view'
                 ],
                 exports: 'DiscussionThreadView'
             },
-            'xmodule_js/common_static/common/js/discussion/views/discussion_topic_menu_view': {
+            'common/js/discussion/views/discussion_topic_menu_view': {
                 deps: [
-                    'xmodule_js/common_static/common/js/discussion/utils'
+                    'common/js/discussion/utils'
                 ],
                 exports: 'DiscussionTopicMenuView'
             },
-            'xmodule_js/common_static/common/js/discussion/views/discussion_user_profile_view': {
+            'common/js/discussion/views/new_post_view': {
                 deps: [
-                    'xmodule_js/common_static/common/js/discussion/utils'
-                ],
-                exports: 'DiscussionUserProfileView'
-            },
-            'xmodule_js/common_static/common/js/discussion/views/new_post_view': {
-                deps: [
-                    'xmodule_js/common_static/common/js/discussion/utils'
+                    'common/js/discussion/utils'
                 ],
                 exports: 'NewPostView'
             },
-            'xmodule_js/common_static/common/js/discussion/views/thread_response_edit_view': {
+            'common/js/discussion/views/thread_response_edit_view': {
                 deps: [
-                    'xmodule_js/common_static/common/js/discussion/utils'
+                    'common/js/discussion/utils'
                 ],
                 exports: 'ThreadResponseEditView'
             },
-            'xmodule_js/common_static/common/js/discussion/views/thread_response_show_view': {
+            'common/js/discussion/views/thread_response_show_view': {
                 deps: [
-                    'xmodule_js/common_static/common/js/discussion/utils'
+                    'common/js/discussion/utils'
                 ],
                 exports: 'ThreadResponseShowView'
             },
-            'xmodule_js/common_static/common/js/discussion/views/thread_response_view': {
+            'common/js/discussion/views/thread_response_view': {
                 deps: [
-                    'xmodule_js/common_static/common/js/discussion/utils'
+                    'common/js/discussion/utils'
                 ],
                 exports: 'ThreadResponseView'
             },
-            'DiscussionModuleView': {
+            'common/js/discussion/views/discussion_inline_view': {
                 deps: [
                     'jquery',
                     'underscore',
                     'backbone',
                     'gettext',
                     'URI',
-                    'xmodule_js/common_static/common/js/discussion/content',
-                    'xmodule_js/common_static/common/js/discussion/discussion',
-                    'xmodule_js/common_static/common/js/discussion/utils',
-                    'xmodule_js/common_static/common/js/discussion/models/discussion_course_settings',
-                    'xmodule_js/common_static/common/js/discussion/models/discussion_user',
-                    'xmodule_js/common_static/common/js/discussion/views/discussion_content_view',
-                    'xmodule_js/common_static/common/js/discussion/views/discussion_thread_edit_view',
-                    'xmodule_js/common_static/common/js/discussion/views/discussion_thread_list_view',
-                    'xmodule_js/common_static/common/js/discussion/views/discussion_thread_profile_view',
-                    'xmodule_js/common_static/common/js/discussion/views/discussion_thread_show_view',
-                    'xmodule_js/common_static/common/js/discussion/views/discussion_thread_view',
-                    'xmodule_js/common_static/common/js/discussion/views/discussion_topic_menu_view',
-                    'xmodule_js/common_static/common/js/discussion/views/discussion_user_profile_view',
-                    'xmodule_js/common_static/common/js/discussion/views/new_post_view',
-                    'xmodule_js/common_static/common/js/discussion/views/thread_response_edit_view',
-                    'xmodule_js/common_static/common/js/discussion/views/thread_response_show_view',
-                    'xmodule_js/common_static/common/js/discussion/views/thread_response_view'
+                    'common/js/discussion/content',
+                    'common/js/discussion/discussion',
+                    'common/js/discussion/models/discussion_course_settings',
+                    'common/js/discussion/models/discussion_user',
+                    'common/js/discussion/utils',
+                    'common/js/discussion/views/discussion_content_view',
+                    'common/js/discussion/views/discussion_thread_edit_view',
+                    'common/js/discussion/views/discussion_thread_list_view',
+                    'common/js/discussion/views/discussion_thread_profile_view',
+                    'common/js/discussion/views/discussion_thread_show_view',
+                    'common/js/discussion/views/discussion_thread_view',
+                    'common/js/discussion/views/discussion_topic_menu_view',
+                    'common/js/discussion/views/new_post_view',
+                    'common/js/discussion/views/thread_response_edit_view',
+                    'common/js/discussion/views/thread_response_show_view',
+                    'common/js/discussion/views/thread_response_view'
                 ],
-                exports: 'DiscussionModuleView'
+                exports: 'DiscussionInlineView'
             },
-            'xmodule_js/common_static/common/js/spec_helpers/discussion_spec_helper': {
+            'common/js/spec_helpers/discussion_spec_helper': {
                 deps: [
-                    'xmodule_js/common_static/common/js/discussion/utils'
+                    'common/js/discussion/utils'
                 ],
                 exports: 'DiscussionSpecHelper'
-            },
-            'modernizr': {
-                exports: 'Modernizr'
-            },
-            'afontgarde': {
-                exports: 'AFontGarde'
             }
         }
     });
 
-    var testFiles = [
+    testFiles = [
+        'discussion/js/spec/discussion_board_factory_spec.js',
+        'discussion/js/spec/discussion_profile_page_factory_spec.js',
+        'discussion/js/spec/discussion_board_view_spec.js',
+        'discussion/js/spec/views/discussion_user_profile_view_spec.js',
         'lms/js/spec/preview/preview_factory_spec.js',
         'js/spec/api_admin/catalog_preview_spec.js',
         'js/spec/courseware/bookmark_button_view_spec.js',
@@ -716,6 +717,7 @@
         'js/spec/edxnotes/plugins/scroller_spec.js',
         'js/spec/edxnotes/plugins/store_error_handler_spec.js',
         'js/spec/edxnotes/utils/logger_spec.js',
+        'js/spec/edxnotes/utils/notes_collector_spec.js',
         'js/spec/edxnotes/views/note_item_spec.js',
         'js/spec/edxnotes/views/notes_factory_spec.js',
         'js/spec/edxnotes/views/notes_page_spec.js',
@@ -746,6 +748,7 @@
         'js/spec/learner_dashboard/course_card_view_spec.js',
         'js/spec/learner_dashboard/course_enroll_view_spec.js',
         'js/spec/markdown_editor_spec.js',
+        'js/spec/dateutil_factory_spec.js',
         'js/spec/navigation_spec.js',
         'js/spec/search/search_spec.js',
         'js/spec/shoppingcart/shoppingcart_spec.js',
@@ -806,11 +809,11 @@
         'teams/js/spec/views/topics_spec.js'
     ];
 
-    for (var i = 0; i < testFiles.length; i++) {
+    for (i = 0; i < testFiles.length; i++) {
         testFiles[i] = '/base/' + testFiles[i];
     }
 
-    var specHelpers = [
+    specHelpers = [
         'common/js/spec_helpers/jasmine-extensions',
         'common/js/spec_helpers/jasmine-stealth',
         'common/js/spec_helpers/jasmine-waituntil'
@@ -820,6 +823,6 @@
     // spec files one by one, otherwise some end up getting nested under others.
     window.requireSerial(specHelpers.concat(testFiles), function() {
         // start test run, once Require.js is done
-        window.__karma__.start();
+        window.__karma__.start();  // eslint-disable-line no-underscore-dangle
     });
 }).call(this, requirejs);

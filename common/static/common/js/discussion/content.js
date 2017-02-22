@@ -1,4 +1,4 @@
-/* globals DiscussionUtil */
+/* globals DiscussionUtil, Comments */
 (function() {
     'use strict';
 
@@ -21,17 +21,16 @@
     }
 
     var __indexOf = [].indexOf || function(item) {
-            for (var i = 0, l = this.length; i < l; i++) {
-                if (i in this && this[i] === item) {
-                    return i;
-                }
+        for (var i = 0, l = this.length; i < l; i++) {
+            if (i in this && this[i] === item) {
+                return i;
             }
-            return -1;
-        };
+        }
+        return -1;
+    };
 
-    if (typeof Backbone !== "undefined" && Backbone !== null) {
+    if (typeof Backbone !== 'undefined' && Backbone !== null) {
         this.Content = (function(_super) {
-
             __extends(Content, _super);
 
             function Content() {
@@ -90,7 +89,7 @@
                     thread: this.get('thread')
                 }));
                 this.get('comments').add(model);
-                this.trigger("comment:add");
+                this.trigger('comment:add');
                 return model;
             };
 
@@ -99,13 +98,13 @@
                 thread = this.get('thread');
                 comments_count = parseInt(thread.get('comments_count'));
                 thread.set('comments_count', comments_count - 1 - comment.getCommentsCount());
-                return this.trigger("comment:remove");
+                return this.trigger('comment:remove');
             };
 
             Content.prototype.resetComments = function(children) {
                 var comment, _i, _len, _ref, _results;
                 this.set('children', []);
-                this.set('comments', new Comments());  // jshint ignore:line
+                this.set('comments', new Comments());
                 _ref = children || [];
                 _results = [];
                 for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -138,9 +137,9 @@
             Content.prototype.remove = function() {
                 if (this.get('type') === 'comment') {
                     this.get('thread').removeComment(this);
-                    return this.get('thread').trigger("comment:remove", this);
+                    return this.get('thread').trigger('comment:remove', this);
                 } else {
-                    return this.trigger("thread:remove", this);
+                    return this.trigger('thread:remove', this);
                 }
             };
 
@@ -171,35 +170,35 @@
 
             Content.prototype.pinThread = function() {
                 var pinned;
-                pinned = this.get("pinned");
-                this.set("pinned", pinned);
-                return this.trigger("change", this);
+                pinned = this.get('pinned');
+                this.set('pinned', pinned);
+                return this.trigger('change', this);
             };
 
             Content.prototype.unPinThread = function() {
                 var pinned;
-                pinned = this.get("pinned");
-                this.set("pinned", pinned);
-                return this.trigger("change", this);
+                pinned = this.get('pinned');
+                this.set('pinned', pinned);
+                return this.trigger('change', this);
             };
 
             Content.prototype.flagAbuse = function() {
                 var temp_array;
-                temp_array = this.get("abuse_flaggers");
+                temp_array = this.get('abuse_flaggers');
                 temp_array.push(window.user.get('id'));
-                this.set("abuse_flaggers", temp_array);
-                return this.trigger("change", this);
+                this.set('abuse_flaggers', temp_array);
+                return this.trigger('change', this);
             };
 
             Content.prototype.unflagAbuse = function() {
-                this.get("abuse_flaggers").pop(window.user.get('id'));
-                return this.trigger("change", this);
+                this.get('abuse_flaggers').pop(window.user.get('id'));
+                return this.trigger('change', this);
             };
 
             Content.prototype.isFlagged = function() {
                 var flaggers, user;
                 user = DiscussionUtil.getUser();
-                flaggers = this.get("abuse_flaggers");
+                flaggers = this.get('abuse_flaggers');
                 return user && (
                     (__indexOf.call(flaggers, user.id) >= 0) ||
                     (DiscussionUtil.isPrivilegedUser(user.id) && flaggers.length > 0)
@@ -208,9 +207,9 @@
 
             Content.prototype.incrementVote = function(increment) {
                 var newVotes;
-                newVotes = _.clone(this.get("votes"));
+                newVotes = _.clone(this.get('votes'));
                 newVotes.up_count = newVotes.up_count + increment;
-                return this.set("votes", newVotes);
+                return this.set('votes', newVotes);
             };
 
             Content.prototype.vote = function() {
@@ -222,10 +221,8 @@
             };
 
             return Content;
-
         })(Backbone.Model);
         this.Thread = (function(_super) {
-
             __extends(Thread, _super);
 
             function Thread() {
@@ -240,13 +237,13 @@
                     return DiscussionUtil.urlFor('create_comment', this.id);
                 },
                 'unvote': function() {
-                    return DiscussionUtil.urlFor("undo_vote_for_" + (this.get('type')), this.id);
+                    return DiscussionUtil.urlFor('undo_vote_for_' + (this.get('type')), this.id);
                 },
                 'upvote': function() {
-                    return DiscussionUtil.urlFor("upvote_" + (this.get('type')), this.id);
+                    return DiscussionUtil.urlFor('upvote_' + (this.get('type')), this.id);
                 },
                 'downvote': function() {
-                    return DiscussionUtil.urlFor("downvote_" + (this.get('type')), this.id);
+                    return DiscussionUtil.urlFor('downvote_' + (this.get('type')), this.id);
                 },
                 'close': function() {
                     return DiscussionUtil.urlFor('openclose_thread', this.id);
@@ -264,16 +261,16 @@
                     return DiscussionUtil.urlFor('unfollow_thread', this.id);
                 },
                 'flagAbuse': function() {
-                    return DiscussionUtil.urlFor("flagAbuse_" + (this.get('type')), this.id);
+                    return DiscussionUtil.urlFor('flagAbuse_' + (this.get('type')), this.id);
                 },
                 'unFlagAbuse': function() {
-                    return DiscussionUtil.urlFor("unFlagAbuse_" + (this.get('type')), this.id);
+                    return DiscussionUtil.urlFor('unFlagAbuse_' + (this.get('type')), this.id);
                 },
                 'pinThread': function() {
-                    return DiscussionUtil.urlFor("pin_thread", this.id);
+                    return DiscussionUtil.urlFor('pin_thread', this.id);
                 },
                 'unPinThread': function() {
-                    return DiscussionUtil.urlFor("un_pin_thread", this.id);
+                    return DiscussionUtil.urlFor('un_pin_thread', this.id);
                 }
             };
 
@@ -283,7 +280,7 @@
             };
 
             Thread.prototype.comment = function() {
-                return this.set("comments_count", parseInt(this.get("comments_count")) + 1);
+                return this.set('comments_count', parseInt(this.get('comments_count')) + 1);
             };
 
             Thread.prototype.follow = function() {
@@ -295,22 +292,22 @@
             };
 
             Thread.prototype.display_body = function() {
-                if (this.has("highlighted_body")) {
-                    return String(this.get("highlighted_body"))
+                if (this.has('highlighted_body')) {
+                    return String(this.get('highlighted_body'))
                         .replace(/<highlight>/g, '<mark>')
                         .replace(/<\/highlight>/g, '</mark>');
                 } else {
-                    return this.get("body");
+                    return this.get('body');
                 }
             };
 
             Thread.prototype.display_title = function() {
-                if (this.has("highlighted_title")) {
-                    return String(this.get("highlighted_title"))
+                if (this.has('highlighted_title')) {
+                    return String(this.get('highlighted_title'))
                         .replace(/<highlight>/g, '<mark>')
                         .replace(/<\/highlight>/g, '</mark>');
                 } else {
-                    return this.get("title");
+                    return this.get('title');
                 }
             };
 
@@ -324,11 +321,11 @@
             };
 
             Thread.prototype.created_at_date = function() {
-                return new Date(this.get("created_at"));
+                return new Date(this.get('created_at'));
             };
 
             Thread.prototype.created_at_time = function() {
-                return new Date(this.get("created_at")).getTime();
+                return new Date(this.get('created_at')).getTime();
             };
 
             Thread.prototype.hasResponses = function() {
@@ -336,10 +333,8 @@
             };
 
             return Thread;
-
         })(this.Content);
         this.Comment = (function(_super) {
-
             __extends(Comment, _super);
 
             function Comment() {
@@ -355,13 +350,13 @@
                     return DiscussionUtil.urlFor('create_sub_comment', this.id);
                 },
                 'unvote': function() {
-                    return DiscussionUtil.urlFor("undo_vote_for_" + (this.get('type')), this.id);
+                    return DiscussionUtil.urlFor('undo_vote_for_' + (this.get('type')), this.id);
                 },
                 'upvote': function() {
-                    return DiscussionUtil.urlFor("upvote_" + (this.get('type')), this.id);
+                    return DiscussionUtil.urlFor('upvote_' + (this.get('type')), this.id);
                 },
                 'downvote': function() {
-                    return DiscussionUtil.urlFor("downvote_" + (this.get('type')), this.id);
+                    return DiscussionUtil.urlFor('downvote_' + (this.get('type')), this.id);
                 },
                 'endorse': function() {
                     return DiscussionUtil.urlFor('endorse_comment', this.id);
@@ -373,10 +368,10 @@
                     return DiscussionUtil.urlFor('delete_comment', this.id);
                 },
                 'flagAbuse': function() {
-                    return DiscussionUtil.urlFor("flagAbuse_" + (this.get('type')), this.id);
+                    return DiscussionUtil.urlFor('flagAbuse_' + (this.get('type')), this.id);
                 },
                 'unFlagAbuse': function() {
-                    return DiscussionUtil.urlFor("unFlagAbuse_" + (this.get('type')), this.id);
+                    return DiscussionUtil.urlFor('unFlagAbuse_' + (this.get('type')), this.id);
                 }
             };
 
@@ -391,7 +386,7 @@
 
             Comment.prototype.canBeEndorsed = function() {
                 var user_id;
-                user_id = window.user.get("id");
+                user_id = window.user.get('id');
                 return user_id && (
                     DiscussionUtil.isPrivilegedUser(user_id) ||
                     (
@@ -402,11 +397,9 @@
             };
 
             return Comment;
-
         })(this.Content);
 
         this.Comments = (function(_super) {
-
             __extends(Comments, _super);
 
             function Comments() {
@@ -417,7 +410,7 @@
 
             Comments.prototype.initialize = function() {
                 var self = this;
-                return this.bind("add", function(item) {
+                return this.bind('add', function(item) {
                     item.collection = self;
                 });
             };
@@ -429,8 +422,6 @@
             };
 
             return Comments;
-
         })(Backbone.Collection);
     }
-
 }).call(window);

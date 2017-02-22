@@ -14,7 +14,7 @@ from xmodule.partitions.partitions import Group, UserPartition
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 
 
-@attr('shard_1')
+@attr(shard=1)
 class SplitTestBase(SharedModuleStoreTestCase):
     """
     Sets up a basic course and user for split test testing.
@@ -125,7 +125,7 @@ class SplitTestBase(SharedModuleStoreTestCase):
         content = resp.content
 
         # Assert we see the proper icon in the top display
-        self.assertIn('<button class="{} inactive progress-0 nav-item"'.format(self.ICON_CLASSES[user_tag]), content)
+        self.assertIn('<button class="{} inactive nav-item"'.format(self.ICON_CLASSES[user_tag]), content)
         # And proper tooltips
         for tooltip in self.TOOLTIPS[user_tag]:
             self.assertIn(tooltip, content)
@@ -284,7 +284,7 @@ class TestVertSplitTestVert(SplitTestBase):
         ]
 
 
-@attr('shard_1')
+@attr(shard=1)
 class SplitTestPosition(SharedModuleStoreTestCase):
     """
     Check that we can change positions in a course with partitions defined

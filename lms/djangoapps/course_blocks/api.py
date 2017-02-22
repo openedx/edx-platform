@@ -2,11 +2,8 @@
 API entry point to the course_blocks app with top-level
 get_course_blocks function.
 """
-from django.core.cache import cache
 from openedx.core.djangoapps.content.block_structure.api import get_block_structure_manager
-from openedx.core.lib.block_structure.manager import BlockStructureManager
 from openedx.core.lib.block_structure.transformers import BlockStructureTransformers
-from xmodule.modulestore.django import modulestore
 
 from .transformers import (
     library_content,
@@ -31,6 +28,7 @@ def get_course_blocks(
         user,
         starting_block_usage_key,
         transformers=None,
+        collected_block_structure=None,
 ):
     """
     A higher order function implemented on top of the
@@ -48,6 +46,11 @@ def get_course_blocks(
             transformers whose transform methods are to be called.
             If None, COURSE_BLOCK_ACCESS_TRANSFORMERS is used.
 
+        collected_block_structure (BlockStructureBlockData) - A
+            block structure retrieved from a prior call to
+            BlockStructureManager.get_collected.  Can be optionally
+            provided if already available, for optimization.
+
     Returns:
         BlockStructureBlockData - A transformed block structure,
             starting at starting_block_usage_key, that has undergone the
@@ -64,4 +67,5 @@ def get_course_blocks(
     return get_block_structure_manager(starting_block_usage_key.course_key).get_transformed(
         transformers,
         starting_block_usage_key,
+        collected_block_structure,
     )

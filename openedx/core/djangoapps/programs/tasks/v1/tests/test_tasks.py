@@ -34,8 +34,8 @@ class GetApiClientTestCase(TestCase, ProgramsApiConfigMixin):
     Test the get_api_client function
     """
 
-    @mock.patch(TASKS_MODULE + '.get_id_token')
-    def test_get_api_client(self, mock_get_id_token):
+    @mock.patch(TASKS_MODULE + '.JwtBuilder.build_token')
+    def test_get_api_client(self, mock_build_token):
         """
         Ensure the function is making the right API calls based on inputs
         """
@@ -45,10 +45,9 @@ class GetApiClientTestCase(TestCase, ProgramsApiConfigMixin):
             internal_service_url='http://foo',
             api_version_number=99,
         )
-        mock_get_id_token.return_value = 'test-token'
+        mock_build_token.return_value = 'test-token'
 
         api_client = tasks.get_api_client(api_config, student)
-        self.assertEqual(mock_get_id_token.call_args[0], (student, 'programs'))
         self.assertEqual(api_client._store['base_url'], 'http://foo/api/v99/')  # pylint: disable=protected-access
         self.assertEqual(api_client._store['session'].auth.token, 'test-token')  # pylint: disable=protected-access
 

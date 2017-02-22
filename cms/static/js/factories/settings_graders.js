@@ -2,7 +2,7 @@ define([
     'jquery', 'js/views/settings/grading', 'js/models/settings/course_grading_policy'
 ], function($, GradingView, CourseGradingPolicyModel) {
     'use strict';
-    return function (courseDetails, gradingUrl) {
+    return function(courseDetails, gradingUrl) {
         var model, editor;
 
         $('form :input')
@@ -13,11 +13,11 @@ define([
                 $('label').removeClass('is-focused');
             });
 
-        model = new CourseGradingPolicyModel(courseDetails,{parse:true});
+        model = new CourseGradingPolicyModel(courseDetails, {parse: true});
         model.urlRoot = gradingUrl;
         editor = new GradingView({
             el: $('.settings-grading'),
-            model : model
+            model: model
         });
         editor.render();
     };

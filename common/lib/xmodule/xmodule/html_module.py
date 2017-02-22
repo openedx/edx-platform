@@ -92,10 +92,10 @@ class HtmlModuleMixin(HtmlBlock, XModule):
     """
     js = {
         'coffee': [
-            resource_string(__name__, 'js/src/javascript_loader.coffee'),
             resource_string(__name__, 'js/src/html/display.coffee'),
         ],
         'js': [
+            resource_string(__name__, 'js/src/javascript_loader.js'),
             resource_string(__name__, 'js/src/collapsible.js'),
             resource_string(__name__, 'js/src/html/imageModal.js'),
             resource_string(__name__, 'js/common_static/js/vendor/draggabilly.js'),
@@ -368,6 +368,13 @@ class StaticTabFields(object):
         scope=Scope.settings,
         default="Empty",
     )
+    course_staff_only = Boolean(
+        display_name=_("Hide Page From Learners"),
+        help=_("If you select this option, only course team members with"
+               " the Staff or Admin role see this page."),
+        default=False,
+        scope=Scope.settings
+    )
     data = String(
         default=textwrap.dedent(u"""\
             <p>Add the content you want students to see on this page.</p>
@@ -440,8 +447,10 @@ class CourseInfoModule(CourseInfoFields, HtmlModuleMixin):
             return self.data
         else:
             course_updates = [item for item in self.items if item.get('status') == self.STATUS_VISIBLE]
-            course_updates.sort(key=lambda item: CourseInfoModule.safe_parse_date(item['date']), reverse=True)
-
+            course_updates.sort(
+                key=lambda item: (CourseInfoModule.safe_parse_date(item['date']), item['id']),
+                reverse=True
+            )
             context = {
                 'visible_updates': course_updates[:3],
                 'hidden_updates': course_updates[3:],

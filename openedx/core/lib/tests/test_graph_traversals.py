@@ -11,7 +11,7 @@ from ..graph_traversals import (
 )
 
 
-@attr('shard_2')
+@attr(shard=2)
 class TestGraphTraversals(TestCase):
     """
     Test Class for graph traversal generator functions.

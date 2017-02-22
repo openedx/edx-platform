@@ -124,7 +124,10 @@ class TestReverificationService(ModuleStoreTestCase):
             'skipped'
         )
 
-    def test_declined_verification_on_skip(self):
+    @ddt.data(
+        *CourseMode.CREDIT_ELIGIBLE_MODES
+    )
+    def test_declined_verification_on_skip(self, mode):
         """Test that status with value 'declined' is added in credit
         requirement status model when a user skip's an ICRV.
         """
@@ -135,6 +138,8 @@ class TestReverificationService(ModuleStoreTestCase):
         )
         # Create credit course and set credit requirements.
         CreditCourse.objects.create(course_key=self.course_key, enabled=True)
+        self.enrollment.update_enrollment(mode=mode)
+
         set_credit_requirements(
             self.course_key,
             [

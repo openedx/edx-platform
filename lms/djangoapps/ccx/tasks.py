@@ -33,7 +33,7 @@ def send_ccx_course_published(course_key):
     course_key = CourseLocator.from_string(course_key)
     for ccx in CustomCourseForEdX.objects.filter(course_id=course_key):
         try:
-            ccx_key = CCXLocator.from_course_locator(course_key, ccx.id)
+            ccx_key = CCXLocator.from_course_locator(course_key, unicode(ccx.id))
         except InvalidKeyError:
             log.info('Attempt to publish course with deprecated id. Course: %s. CCX: %s', course_key, ccx.id)
             continue

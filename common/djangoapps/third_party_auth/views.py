@@ -36,7 +36,7 @@ def saml_metadata_view(request):
     Get the Service Provider metadata for this edx-platform instance.
     You must send this XML to any Shibboleth Identity Provider that you wish to use.
     """
-    if not SAMLConfiguration.is_enabled():
+    if not SAMLConfiguration.is_enabled(request.site):
         raise Http404
     complete_url = reverse('social:complete', args=("tpa-saml", ))
     if settings.APPEND_SLASH and not complete_url.endswith('/'):

@@ -1,5 +1,5 @@
 <li class="actions-item">
-    <a href="javascript:void(0)" class="action-list-item action-pin" role="checkbox" aria-checked="false">
+    <button class="btn-link action-list-item action-pin" role="checkbox" aria-checked="false">
         <span class="sr"><%- gettext("Pin") %></span>
         <span class="action-label" aria-hidden="true">
             <span class="label-unchecked"><%- gettext("Pin") %></span>
@@ -8,5 +8,5 @@
         <span class="action-icon">
           <span class="icon fa fa-thumb-tack" aria-hidden="true"></span>
         </span>
-    </a>
+    </button>
 </li>

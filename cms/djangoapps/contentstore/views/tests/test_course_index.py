@@ -10,7 +10,6 @@ import pytz
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
-from django.test.utils import override_settings
 from django.utils.translation import ugettext as _
 
 from contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
@@ -150,14 +149,14 @@ class TestCourseIndex(CourseTestCase):
 
         # Now verify the first child
         children = json_response['child_info']['children']
-        self.assertTrue(len(children) > 0)
+        self.assertGreater(len(children), 0)
         first_child_response = children[0]
         self.assertEqual(first_child_response['category'], 'chapter')
         self.assertEqual(first_child_response['id'], unicode(chapter.location))
         self.assertEqual(first_child_response['display_name'], 'Week 1')
         self.assertTrue(json_response['published'])
         self.assertEqual(first_child_response['visibility_state'], VisibilityState.unscheduled)
-        self.assertTrue(len(first_child_response['child_info']['children']) > 0)
+        self.assertGreater(len(first_child_response['child_info']['children']), 0)
 
         # Finally, validate the entire response for consistency
         self.assert_correct_json_response(json_response)
@@ -352,14 +351,14 @@ class TestCourseOutline(CourseTestCase):
 
         # Now verify the first child
         children = json_response['child_info']['children']
-        self.assertTrue(len(children) > 0)
+        self.assertGreater(len(children), 0)
         first_child_response = children[0]
         self.assertEqual(first_child_response['category'], 'chapter')
         self.assertEqual(first_child_response['id'], unicode(self.chapter.location))
         self.assertEqual(first_child_response['display_name'], 'Week 1')
         self.assertTrue(json_response['published'])
         self.assertEqual(first_child_response['visibility_state'], VisibilityState.unscheduled)
-        self.assertTrue(len(first_child_response['child_info']['children']) > 0)
+        self.assertGreater(len(first_child_response['child_info']['children']), 0)
 
         # Finally, validate the entire response for consistency
         self.assert_correct_json_response(json_response)
@@ -470,37 +469,24 @@ class TestCourseOutline(CourseTestCase):
         )
 
     @ddt.data(
-        {'publish': True},
-        {'publish': False},
+        [{'publish': True}, ['notes']],
+        [{'publish': False}, ['notes']],
+        [{'publish': True}, ['notes', 'lti']]
     )
     @ddt.unpack
-    def test_verify_deprecated_warning_message_with_single_feature(self, publish):
+    def test_verify_deprecated_warning_message(self, publish, block_types):
         """
-        Verify deprecated warning info for single deprecated feature.
+        Verify deprecated warning info.
         """
-        block_types = ['notes']
-        with override_settings(DEPRECATED_BLOCK_TYPES=block_types):
-            course_module = modulestore().get_item(self.course.location)
-            self._create_test_data(course_module, create_blocks=True, block_types=block_types, publish=publish)
-            info = _deprecated_blocks_info(course_module, block_types)
-            self._verify_deprecated_info(
-                course_module.id,
-                course_module.advanced_modules,
-                info,
-                block_types
-            )
-
-    def test_verify_deprecated_warning_message_with_multiple_features(self):
-        """
-        Verify deprecated warning info for multiple deprecated features.
-        """
-        block_types = ['notes', 'lti']
-        with override_settings(DEPRECATED_BLOCK_TYPES=block_types):
-            course_module = modulestore().get_item(self.course.location)
-            self._create_test_data(course_module, create_blocks=True, block_types=block_types)
-
-            info = _deprecated_blocks_info(course_module, block_types)
-            self._verify_deprecated_info(course_module.id, course_module.advanced_modules, info, block_types)
+        course_module = modulestore().get_item(self.course.location)
+        self._create_test_data(course_module, create_blocks=True, block_types=block_types, publish=publish)
+        info = _deprecated_blocks_info(course_module, block_types)
+        self._verify_deprecated_info(
+            course_module.id,
+            course_module.advanced_modules,
+            info,
+            block_types
+        )
 
     @ddt.data(
         {'delete_vertical': True},

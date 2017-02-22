@@ -71,6 +71,7 @@ class EnrollmentDataTest(ModuleStoreTestCase):
         # Confirm the returned enrollment and the data match up.
         self.assertEqual(course_mode, enrollment['mode'])
         self.assertEqual(is_active, enrollment['is_active'])
+        self.assertEqual(self.course.display_name_with_default, enrollment['course_details']['course_name'])
 
     def test_unenroll(self):
         # Enroll the user in the course
@@ -244,13 +245,13 @@ class EnrollmentDataTest(ModuleStoreTestCase):
 
     @raises(CourseEnrollmentFullError)
     @patch.object(CourseEnrollment, "enroll")
-    def test_enrollment_for_closed_course(self, mock_enroll):
+    def test_enrollment_for_full_course(self, mock_enroll):
         mock_enroll.side_effect = CourseFullError("Bad things happened")
         data.create_course_enrollment(self.user.username, unicode(self.course.id), 'honor', True)
 
     @raises(CourseEnrollmentExistsError)
     @patch.object(CourseEnrollment, "enroll")
-    def test_enrollment_for_closed_course(self, mock_enroll):
+    def test_enrollment_for_enrolled_course(self, mock_enroll):
         mock_enroll.side_effect = AlreadyEnrolledError("Bad things happened")
         data.create_course_enrollment(self.user.username, unicode(self.course.id), 'honor', True)
 

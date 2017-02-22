@@ -1,11 +1,11 @@
+<%page expression_filter="h" args="bookmark_id, is_bookmarked" />
 <%! from django.utils.translation import ugettext as _ %>
-<%page args="bookmark_id, is_bookmarked" />
 
 <div class="bookmark-button-wrapper">
-  <button class="btn bookmark-button ${"bookmarked" if is_bookmarked else ""}"
+  <button class="btn btn-link bookmark-button ${"bookmarked" if is_bookmarked else ""}"
     aria-pressed="${"true" if is_bookmarked else "false"}"
     data-bookmark-id="${bookmark_id}">
-     <span class="sr bookmark-sr">${_("Click to remove") if is_bookmarked else _("Click to add")}</span>&nbsp;
-     ${_("Bookmark")}
+     <span class="sr bookmark-sr">${_("Click to remove") if is_bookmarked else _("Click to add")}</span>
+     <span class="bookmark-text">${_("Bookmarked") if is_bookmarked else _("Bookmark this page")}</span>
     </button>
 </div>

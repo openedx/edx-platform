@@ -14,12 +14,18 @@ import ddt
 import json
 
 
+class AutoAuthTestCase(UrlResetMixin, TestCase):
+    """
+    Base class for AutoAuth Tests that properly resets the urls.py
+    """
+    URLCONF_MODULES = ['student.urls']
+
+
 @ddt.ddt
-class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
+class AutoAuthEnabledTestCase(AutoAuthTestCase):
     """
     Tests for the Auto auth view that we have for load testing.
     """
-
     COURSE_ID_MONGO = 'edX/Test101/2014_Spring'
     COURSE_ID_SPLIT = 'course-v1:edX+Test101+2014_Spring'
     COURSE_IDS_DDT = (
@@ -256,7 +262,7 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
         return response
 
 
-class AutoAuthDisabledTestCase(UrlResetMixin, TestCase):
+class AutoAuthDisabledTestCase(AutoAuthTestCase):
     """
     Test that the page is inaccessible with default settings
     """

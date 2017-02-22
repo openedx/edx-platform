@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 import json
 import itertools
 from uuid import uuid4
+import httpretty
 
 import ddt
 from django.conf import settings
@@ -21,23 +22,29 @@ from commerce.tests.mocks import mock_basket_order, mock_create_basket
 from commerce.tests.test_views import UserMixin
 from course_modes.models import CourseMode
 from edx_rest_api_client import exceptions
-from embargo.test_utils import restrict_course
+from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from enrollment.api import get_enrollment
 from openedx.core.lib.django_test_client_utils import get_absolute_url
 from student.models import CourseEnrollment
 from student.tests.factories import CourseModeFactory
 from student.tests.tests import EnrollmentEventTestMixin
 from xmodule.modulestore.django import modulestore
+from commerce.api.v0.views import SAILTHRU_CAMPAIGN_COOKIE
+
+UTM_COOKIE_NAME = 'edx.test.utm'
+UTM_COOKIE_CONTENTS = {
+    'utm_source': 'test-source'
+}
 
 
-@attr('shard_1')
+@attr(shard=1)
 @ddt.ddt
 @override_settings(ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY)
 class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase):
     """
     Tests for the commerce orders view.
     """
-    def _post_to_view(self, course_id=None, marketing_email_opt_in=False):
+    def _post_to_view(self, course_id=None, marketing_email_opt_in=False, include_utm_cookie=False):
         """
         POST to the view being tested.
 
@@ -51,6 +58,10 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         }
         if marketing_email_opt_in:
             payload["email_opt_in"] = True
+
+        self.client.cookies[SAILTHRU_CAMPAIGN_COOKIE] = 'sailthru id'
+        if include_utm_cookie:
+            self.client.cookies[UTM_COOKIE_NAME] = json.dumps(UTM_COOKIE_CONTENTS)
         return self.client.post(self.url, payload)
 
     def assertResponseMessage(self, response, expected_msg):
@@ -156,12 +167,12 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         self.assertValidEcommerceInternalRequestErrorResponse(response)
         self.assertUserNotEnrolled()
 
-    def _test_successful_ecommerce_api_call(self, is_completed=True):
+    def _test_successful_ecommerce_api_call(self, is_completed=True, utm_tracking_present=False):
         """
         Verifies that the view contacts the E-Commerce API with the correct data and headers.
         """
         with mock.patch('commerce.api.v0.views.audit_log') as mock_audit_log:
-            response = self._post_to_view()
+            response = self._post_to_view(include_utm_cookie=utm_tracking_present)
 
             # Verify that an audit message was logged
             self.assertTrue(mock_audit_log.called)
@@ -172,6 +183,15 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
             self.assertResponseMessage(response, msg)
         else:
             self.assertResponsePaymentData(response)
+
+        # Make sure ecommerce API call forwards Sailthru cookie
+        self.assertIn('{}=sailthru id'.format(SAILTHRU_CAMPAIGN_COOKIE), httpretty.last_request().headers['cookie'])
+
+        # Check that UTM tracking cookie is passed along in request to ecommerce for attribution
+        if utm_tracking_present:
+            cookie_string = '{cookie_name}={cookie_contents}'.format(
+                cookie_name=UTM_COOKIE_NAME, cookie_contents=json.dumps(UTM_COOKIE_CONTENTS))
+            self.assertIn(cookie_string, httpretty.last_request().headers['cookie'])
 
     @ddt.data(True, False)
     def test_course_with_honor_seat_sku(self, user_is_active):
@@ -186,7 +206,14 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
 
         return_value = {'id': TEST_BASKET_ID, 'payment_data': None, 'order': {'number': TEST_ORDER_NUMBER}}
         with mock_create_basket(response=return_value):
+            # Test that call without utm tracking works
             self._test_successful_ecommerce_api_call()
+            with mock.patch('student.models.RegistrationCookieConfiguration.current') as config:
+                instance = config.return_value
+                instance.utm_cookie_name = UTM_COOKIE_NAME
+
+                # Test that call with cookie passes cookie along
+                self._test_successful_ecommerce_api_call(utm_tracking_present=True)
 
     @ddt.data(True, False)
     def test_course_with_paid_seat_sku(self, user_is_active):
@@ -200,7 +227,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
 
         return_value = {'id': TEST_BASKET_ID, 'payment_data': TEST_PAYMENT_DATA, 'order': None}
         with mock_create_basket(response=return_value):
-            self._test_successful_ecommerce_api_call(False)
+            self._test_successful_ecommerce_api_call(is_completed=False)
 
     def _test_course_without_sku(self, enrollment_mode=CourseMode.DEFAULT_MODE_SLUG):
         """
@@ -327,7 +354,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         self.assertIsNotNone(get_enrollment(self.user.username, unicode(self.course.id)))
 
         with mock_create_basket():
-            self._test_successful_ecommerce_api_call(False)
+            self._test_successful_ecommerce_api_call(is_completed=False)
 
     @mock.patch('commerce.api.v0.views.update_email_opt_in')
     @ddt.data(*itertools.product((False, True), (False, True), (False, True)))
@@ -362,7 +389,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
             self.assertEqual(self._post_to_view().status_code, 406)
 
 
-@attr('shard_1')
+@attr(shard=1)
 @override_settings(ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY)
 class BasketOrderViewTests(UserMixin, TestCase):
     """ Tests for the basket order view. """

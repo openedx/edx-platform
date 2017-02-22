@@ -4,10 +4,10 @@ from __future__ import unicode_literals
 from django.db import migrations, models
 import lms.djangoapps.verify_student.models
 import model_utils.fields
-import xmodule_django.models
 import django.db.models.deletion
 import django.utils.timezone
 from django.conf import settings
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
 
 class Migration(migrations.Migration):
@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
                 ('id', models.IntegerField(verbose_name='ID', db_index=True, auto_created=True, blank=True)),
                 ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, verbose_name='created', editable=False)),
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
-                ('course_key', xmodule_django.models.CourseKeyField(help_text='The course for which this deadline applies', max_length=255, db_index=True)),
+                ('course_key', CourseKeyField(help_text='The course for which this deadline applies', max_length=255, db_index=True)),
                 ('deadline', models.DateTimeField(help_text='The datetime after which users are no longer allowed to submit photos for verification.')),
                 ('history_id', models.AutoField(serialize=False, primary_key=True)),
                 ('history_date', models.DateTimeField()),
@@ -66,7 +66,7 @@ class Migration(migrations.Migration):
             name='SkippedReverification',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('course_id', xmodule_django.models.CourseKeyField(max_length=255, db_index=True)),
+                ('course_id', CourseKeyField(max_length=255, db_index=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
             ],
         ),
@@ -101,7 +101,7 @@ class Migration(migrations.Migration):
             name='VerificationCheckpoint',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('course_id', xmodule_django.models.CourseKeyField(max_length=255, db_index=True)),
+                ('course_id', CourseKeyField(max_length=255, db_index=True)),
                 ('checkpoint_location', models.CharField(max_length=255)),
                 ('photo_verification', models.ManyToManyField(to='verify_student.SoftwareSecurePhotoVerification')),
             ],
@@ -112,7 +112,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, verbose_name='created', editable=False)),
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
-                ('course_key', xmodule_django.models.CourseKeyField(help_text='The course for which this deadline applies', unique=True, max_length=255, db_index=True)),
+                ('course_key', CourseKeyField(help_text='The course for which this deadline applies', unique=True, max_length=255, db_index=True)),
                 ('deadline', models.DateTimeField(help_text='The datetime after which users are no longer allowed to submit photos for verification.')),
             ],
             options={

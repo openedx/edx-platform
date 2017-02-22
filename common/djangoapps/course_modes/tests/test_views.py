@@ -14,21 +14,20 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 
 from lms.djangoapps.commerce.tests import test_utils as ecomm_test_utils
-from openedx.core.djangoapps.theming.tests import test_util as theming_test_utils
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from course_modes.models import CourseMode, Mode
 from course_modes.tests.factories import CourseModeFactory
-from embargo.test_utils import restrict_course
+from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from student.models import CourseEnrollment
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 
 
-@attr('shard_3')
+@attr(shard=3)
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
@@ -410,7 +409,7 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
 class TrackSelectionEmbargoTest(UrlResetMixin, ModuleStoreTestCase):
     """Test embargo restrictions on the track selection page. """
 
-    URLCONF_MODULES = ['embargo']
+    URLCONF_MODULES = ['openedx.core.djangoapps.embargo']
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):

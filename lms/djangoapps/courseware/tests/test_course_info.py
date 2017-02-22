@@ -1,16 +1,16 @@
+# coding=utf-8
 """
 Test the course_info xblock
 """
 import mock
 from nose.plugins.attrib import attr
 from pyquery import PyQuery as pq
-from urllib import urlencode
 
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.http import QueryDict
 from django.test.utils import override_settings
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from util.date_utils import strftime_localized
@@ -31,7 +31,7 @@ from .helpers import LoginEnrollmentTestCase
 from lms.djangoapps.ccx.tests.factories import CcxFactory
 
 
-@attr('shard_1')
+@attr(shard=1)
 class CourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
     """
     Tests for the Course Info page
@@ -90,7 +90,34 @@ class CourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
         url = reverse('info', args=[unicode(self.course.id)])
         response = self.client.get(url)
         start_date = strftime_localized(self.course.start, 'SHORT_DATE')
-        self.assertRedirects(response, '{0}?{1}'.format(reverse('dashboard'), urlencode({'notlive': start_date})))
+        expected_params = QueryDict(mutable=True)
+        expected_params['notlive'] = start_date
+        expected_url = '{url}?{params}'.format(
+            url=reverse('dashboard'),
+            params=expected_params.urlencode()
+        )
+        self.assertRedirects(response, expected_url)
+
+    @mock.patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False})
+    @mock.patch("courseware.views.views.strftime_localized")
+    def test_non_live_course_other_language(self, mock_strftime_localized):
+        """Ensure that a user accessing a non-live course sees a redirect to
+        the student dashboard, not a 404, even if the localized date is unicode
+        """
+        self.setup_user()
+        self.enroll(self.course)
+        fake_unicode_start_time = u"üñîçø∂é_ßtå®t_tîµé"
+        mock_strftime_localized.return_value = fake_unicode_start_time
+
+        url = reverse('info', args=[unicode(self.course.id)])
+        response = self.client.get(url)
+        expected_params = QueryDict(mutable=True)
+        expected_params['notlive'] = fake_unicode_start_time
+        expected_url = u'{url}?{params}'.format(
+            url=reverse('dashboard'),
+            params=expected_params.urlencode()
+        )
+        self.assertRedirects(response, expected_url)
 
     def test_nonexistent_course(self):
         self.setup_user()
@@ -99,7 +126,7 @@ class CourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
         self.assertEqual(response.status_code, 404)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class CourseInfoLastAccessedTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Tests of the CourseInfo last accessed link.
@@ -147,7 +174,7 @@ class CourseInfoLastAccessedTestCase(LoginEnrollmentTestCase, ModuleStoreTestCas
         self.assertEqual(content('.page-header-secondary .last-accessed-link').attr('href'), section_url)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class CourseInfoTitleTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Tests of the CourseInfo page title.
@@ -189,15 +216,15 @@ class CourseInfoTitleTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         )
         self.assertIn(
             expected_title,
-            content('h1.page-title').contents()
+            content('.page-title').contents()[0]
         )
         self.assertIn(
             expected_display_title,
-            display_content('h1.page-title').contents()
+            display_content('.page-title').contents()[0]
         )
         self.assertIn(
             display_course.display_name_with_default,
-            display_content('h2.page-subtitle').contents()
+            display_content('.page-subtitle').contents()
         )
 
 
@@ -237,7 +264,7 @@ class CourseInfoTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertRedirects(response, expected, status_code=302, target_status_code=200)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class CourseInfoTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Tests for the Course Info page for an XML course
@@ -285,7 +312,7 @@ class CourseInfoTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.assertNotIn(self.xml_data, resp.content)
 
 
-@attr('shard_1')
+@attr(shard=1)
 @override_settings(FEATURES=dict(settings.FEATURES, EMBARGO=False))
 class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
     """
@@ -317,7 +344,7 @@ class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
         self.assertEqual(resp.status_code, 200)
 
     def test_num_queries_instructor_paced(self):
-        self.fetch_course_info_with_queries(self.instructor_paced_course, 22, 4)
+        self.fetch_course_info_with_queries(self.instructor_paced_course, 21, 4)
 
     def test_num_queries_self_paced(self):
-        self.fetch_course_info_with_queries(self.self_paced_course, 22, 4)
+        self.fetch_course_info_with_queries(self.self_paced_course, 21, 4)

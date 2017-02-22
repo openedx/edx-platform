@@ -1,4 +1,3 @@
-
 from mock import patch, Mock
 import unittest
 import ddt
@@ -27,12 +26,12 @@ class ShortcutsTests(UrlResetMixin, TestCase):
     """
     Test the edxmako shortcuts file
     """
-    @override_settings(MKTG_URLS={'ROOT': 'dummy-root', 'ABOUT': '/about-us'})
+    @override_settings(MKTG_URLS={'ROOT': 'https://dummy-root', 'ABOUT': '/about-us'})
     @override_settings(MKTG_URL_LINK_MAP={'ABOUT': 'login'})
     def test_marketing_link(self):
         # test marketing site on
         with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
-            expected_link = 'dummy-root/about-us'
+            expected_link = 'https://dummy-root/about-us'
             link = marketing_link('ABOUT')
             self.assertEquals(link, expected_link)
         # test marketing site off
@@ -42,7 +41,7 @@ class ShortcutsTests(UrlResetMixin, TestCase):
             link = marketing_link('ABOUT')
             self.assertEquals(link, expected_link)
 
-    @override_settings(MKTG_URLS={'ROOT': 'dummy-root', 'ABOUT': '/about-us'})
+    @override_settings(MKTG_URLS={'ROOT': 'https://dummy-root', 'ABOUT': '/about-us'})
     @override_settings(MKTG_URL_LINK_MAP={'ABOUT': 'login'})
     def test_is_marketing_link_set(self):
         # test marketing site on
@@ -54,7 +53,7 @@ class ShortcutsTests(UrlResetMixin, TestCase):
             self.assertTrue(is_marketing_link_set('ABOUT'))
             self.assertFalse(is_marketing_link_set('NOT_CONFIGURED'))
 
-    @override_settings(MKTG_URLS={'ROOT': 'dummy-root', 'ABOUT': '/about-us'})
+    @override_settings(MKTG_URLS={'ROOT': 'https://dummy-root', 'ABOUT': '/about-us'})
     @override_settings(MKTG_URL_LINK_MAP={'ABOUT': 'login'})
     def test_is_any_marketing_link_set(self):
         # test marketing site on

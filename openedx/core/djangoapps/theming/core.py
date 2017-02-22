@@ -3,6 +3,7 @@ Core logic for Comprehensive Theming.
 """
 import os
 from django.conf import settings
+from path import Path as path
 
 from .helpers import get_themes
 
@@ -22,10 +23,6 @@ def enable_theming():
         )
 
     for theme in get_themes():
-        locale_dir = theme.path / "conf" / "locale"
-        if locale_dir.isdir():
-            settings.LOCALE_PATHS = (locale_dir, ) + settings.LOCALE_PATHS
-
         if theme.themes_base_dir not in settings.MAKO_TEMPLATES['main']:
             settings.MAKO_TEMPLATES['main'].insert(0, theme.themes_base_dir)
 
@@ -38,3 +35,15 @@ def enable_theming():
             settings.STATICFILES_DIRS.append(
                 (u'', theme_static)
             )
+
+    _add_theming_locales()
+
+
+
+def _add_theming_locales():
+    """
+    Add locale paths to settings for comprehensive theming.
+    """
+    theme_locale_paths = settings.COMPREHENSIVE_THEME_LOCALE_PATHS
+    for locale_path in theme_locale_paths:
+        settings.LOCALE_PATHS += (path(locale_path), )  # pylint: disable=no-member

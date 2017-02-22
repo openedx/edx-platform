@@ -8,6 +8,7 @@ from calc import evaluator
 from cmath import isinf, isnan
 import re
 from lxml import etree
+from openedx.core.djangolib.markup import HTML
 #-----------------------------------------------------------------------------
 #
 # Utility functions used in CAPA responsetypes
@@ -195,3 +196,15 @@ def get_inner_html_from_xpath(xpath_node):
     # strips outer tag from html string
     inner_html = re.sub('(?ms)<%s[^>]*>(.*)</%s>' % (xpath_node.tag, xpath_node.tag), '\\1', html)
     return inner_html.strip()
+
+
+def remove_markup(html):
+    """
+    Return html with markup stripped and text HTML-escaped.
+
+    >>> bleach.clean("<b>Rock & Roll</b>", tags=[], strip=True)
+    u'Rock &amp; Roll'
+    >>> bleach.clean("<b>Rock &amp; Roll</b>", tags=[], strip=True)
+    u'Rock &amp; Roll'
+    """
+    return HTML(bleach.clean(html, tags=[], strip=True))

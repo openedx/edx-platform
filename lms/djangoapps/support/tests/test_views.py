@@ -41,7 +41,7 @@ class SupportViewTestCase(ModuleStoreTestCase):
         self.assertTrue(success, msg="Could not log in")
 
 
-@attr('shard_3')
+@attr(shard=3)
 @ddt.ddt
 class SupportViewAccessTests(SupportViewTestCase):
     """

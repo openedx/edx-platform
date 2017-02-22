@@ -131,6 +131,13 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
 
         class_ = self.load_block_type(block_data.block_type)
         block = self.xblock_from_json(class_, course_key, block_key, block_data, course_entry_override, **kwargs)
+
+        # TODO Once TNL-5092 is implemented, we can expose the course version
+        # information within the key identifier of the block.  Until then, set
+        # the course_version as a field on the returned block so higher layers
+        # can use it when needed.
+        block.course_version = version_guid
+
         self.modulestore.cache_block(course_key, version_guid, block_key, block)
         return block
 

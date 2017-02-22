@@ -80,7 +80,7 @@ class TabsPageTests(CourseTestCase):
         num_orig_tabs = len(orig_tab_ids)
 
         # make sure we have enough tabs to play around with
-        self.assertTrue(num_orig_tabs >= 5)
+        self.assertGreaterEqual(num_orig_tabs, 5)
 
         # reorder the last two tabs
         tab_ids[num_orig_tabs - 1], tab_ids[num_orig_tabs - 2] = tab_ids[num_orig_tabs - 2], tab_ids[num_orig_tabs - 1]
@@ -88,7 +88,7 @@ class TabsPageTests(CourseTestCase):
         # remove the middle tab
         # (the code needs to handle the case where tabs requested for re-ordering is a subset of the tabs in the course)
         removed_tab = tab_ids.pop(num_orig_tabs / 2)
-        self.assertTrue(len(tab_ids) == num_orig_tabs - 1)
+        self.assertEqual(len(tab_ids), num_orig_tabs - 1)
 
         # post the request
         resp = self.client.ajax_post(
@@ -205,7 +205,7 @@ class PrimitiveTabEdit(ModuleStoreTestCase):
         with self.assertRaises(IndexError):
             tabs.primitive_delete(course, 6)
         tabs.primitive_delete(course, 2)
-        self.assertFalse({u'type': u'textbooks'} in course.tabs)
+        self.assertNotIn({u'type': u'textbooks'}, course.tabs)
         # Check that discussion has shifted up
         self.assertEquals(course.tabs[2], {'type': 'discussion', 'name': 'Discussion'})
 

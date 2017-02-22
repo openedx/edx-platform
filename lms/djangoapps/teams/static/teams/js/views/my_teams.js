@@ -1,8 +1,8 @@
-;(function (define) {
+(function(define) {
     'use strict';
 
     define(['backbone', 'gettext', 'teams/js/views/teams'],
-        function (Backbone, gettext, TeamsView) {
+        function(Backbone, gettext, TeamsView) {
             var MyTeamsView = TeamsView.extend({
                 render: function() {
                     var view = this;

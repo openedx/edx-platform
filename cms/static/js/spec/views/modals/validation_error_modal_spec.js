@@ -1,10 +1,9 @@
 define(['jquery', 'underscore', 'js/spec_helpers/validation_helpers', 'js/views/modals/validation_error_modal'],
-    function ($, _, ValidationHelpers, ValidationErrorModal) {
-
+    function($, _, ValidationHelpers, ValidationErrorModal) {
         describe('ValidationErrorModal', function() {
             var modal, showModal;
 
-            showModal = function (jsonContent, callback) {
+            showModal = function(jsonContent, callback) {
                 modal = new ValidationErrorModal();
                 modal.setResetCallback(callback);
                 modal.setContent(jsonContent);
@@ -13,7 +12,7 @@ define(['jquery', 'underscore', 'js/spec_helpers/validation_helpers', 'js/views/
 
             /* Before each, install templates required for the base modal
                and validation error modal. */
-            beforeEach(function () {
+            beforeEach(function() {
                 ValidationHelpers.installValidationTemplates();
             });
 
@@ -21,12 +20,12 @@ define(['jquery', 'underscore', 'js/spec_helpers/validation_helpers', 'js/views/
                 ValidationHelpers.hideModalIfShowing(modal);
             });
 
-            it('is visible after show is called', function () {
+            it('is visible after show is called', function() {
                 showModal([]);
                 expect(ValidationHelpers.isShowingModal(modal)).toBeTruthy();
             });
 
-            it('displays none if no error given', function () {
+            it('displays none if no error given', function() {
                 var errorObjects = [];
 
                 showModal(errorObjects);
@@ -34,7 +33,7 @@ define(['jquery', 'underscore', 'js/spec_helpers/validation_helpers', 'js/views/
                 ValidationHelpers.checkErrorContents(modal, errorObjects);
             });
 
-            it('correctly displays json error message objects', function () {
+            it('correctly displays json error message objects', function() {
                 var errorObjects = [
                     {
                         model: {display_name: 'test_attribute1'},
@@ -51,7 +50,7 @@ define(['jquery', 'underscore', 'js/spec_helpers/validation_helpers', 'js/views/
                 ValidationHelpers.checkErrorContents(modal, errorObjects);
             });
 
-            it('run callback when undo changes button is clicked', function (done) {
+            it('run callback when undo changes button is clicked', function(done) {
                 var errorObjects = [
                     {
                         model: {display_name: 'test_attribute1'},

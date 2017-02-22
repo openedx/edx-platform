@@ -6,16 +6,14 @@ import unittest
 
 from nose.plugins.attrib import attr
 
+from django.conf import settings
 from django.core.urlresolvers import reverse
-
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
-from lms.djangoapps.lms_xblock.runtime import quote_slashes
-
-from django.conf import settings
+from openedx.core.lib.url_utils import quote_slashes
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 class TestCrowdsourceHinter(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
@@ -137,7 +135,7 @@ class TestCrowdsourceHinter(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assert_request_status_code(200, self.course_url)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestHinterFunctions(TestCrowdsourceHinter):
     """
     Check that the essential functions of the hinter work as expected.

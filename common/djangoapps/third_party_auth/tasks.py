@@ -6,9 +6,11 @@ Code to manage fetching and storing the metadata of IdPs.
 from celery.task import task
 import datetime
 import dateutil.parser
+import pytz
 import logging
 from lxml import etree
 import requests
+from requests import exceptions
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
 from third_party_auth.models import SAMLConfiguration, SAMLProviderConfig, SAMLProviderData
 
@@ -31,21 +33,20 @@ def fetch_saml_metadata():
     It's OK to run this whether or not SAML is enabled.
 
     Return value:
-        tuple(num_changed, num_failed, num_total)
+        tuple(num_changed, num_failed, num_total, failure_messages)
         num_changed: Number of providers that are either new or whose metadata has changed
         num_failed: Number of providers that could not be updated
         num_total: Total number of providers whose metadata was fetched
+        failure_messages: List of error messages for the providers that could not be updated
     """
-    if not SAMLConfiguration.is_enabled():
-        return (0, 0, 0)  # Nothing to do until SAML is enabled.
-
-    num_changed, num_failed = 0, 0
+    num_changed = 0
+    failure_messages = []
 
     # First make a list of all the metadata XML URLs:
     url_map = {}
     for idp_slug in SAMLProviderConfig.key_values('idp_slug', flat=True):
         config = SAMLProviderConfig.current(idp_slug)
-        if not config.enabled:
+        if not config.enabled or not SAMLConfiguration.is_enabled(config.site):
             continue
         url = config.metadata_source
         if url not in url_map:
@@ -77,10 +78,38 @@ def fetch_saml_metadata():
                     num_changed += 1
                 else:
                     log.info(u"→ Updated existing SAMLProviderData. Nothing has changed.")
-        except Exception as err:  # pylint: disable=broad-except
-            log.exception(err.message)
-            num_failed += 1
-    return (num_changed, num_failed, len(url_map))
+        except (exceptions.SSLError, exceptions.HTTPError, exceptions.RequestException, MetadataParseError) as error:
+            # Catch and process exception in case of errors during fetching and processing saml metadata.
+            # Here is a description of each exception.
+            # SSLError is raised in case of errors caused by SSL (e.g. SSL cer verification failure etc.)
+            # HTTPError is raised in case of unexpected status code (e.g. 500 error etc.)
+            # RequestException is the base exception for any request related error that "requests" lib raises.
+            # MetadataParseError is raised if there is error in the fetched meta data (e.g. missing @entityID etc.)
+
+            log.exception(error.message)
+            failure_messages.append(
+                "{error_type}: {error_message}\nMetadata Source: {url}\nEntity IDs: \n{entity_ids}.".format(
+                    error_type=type(error).__name__,
+                    error_message=error.message,
+                    url=url,
+                    entity_ids="\n".join(
+                        ["\t{}: {}".format(count, item) for count, item in enumerate(entity_ids, start=1)],
+                    )
+                )
+            )
+        except etree.XMLSyntaxError as error:
+            log.exception(error.message)
+            failure_messages.append(
+                "XMLSyntaxError: {error_message}\nMetadata Source: {url}\nEntity IDs: \n{entity_ids}.".format(
+                    error_message=str(error.error_log),
+                    url=url,
+                    entity_ids="\n".join(
+                        ["\t{}: {}".format(count, item) for count, item in enumerate(entity_ids, start=1)],
+                    )
+                )
+            )
+
+    return num_changed, len(failure_messages), len(url_map), failure_messages
 
 
 def _parse_metadata_xml(xml, entity_id):
@@ -106,6 +135,7 @@ def _parse_metadata_xml(xml, entity_id):
         expires_at = dateutil.parser.parse(xml.attrib["validUntil"])
     if "cacheDuration" in xml.attrib:
         cache_expires = OneLogin_Saml2_Utils.parse_duration(xml.attrib["cacheDuration"])
+        cache_expires = datetime.datetime.fromtimestamp(cache_expires, tz=pytz.utc)
         if expires_at is None or cache_expires < expires_at:
             expires_at = cache_expires
 

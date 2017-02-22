@@ -147,13 +147,13 @@
   @include button;
   @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
   box-shadow: 0 1px 0 rgba(255, 255, 255, .3) inset;
-  border: 1px solid $green-d1;
+  border: 1px solid $uxpl-green-base;
   border-radius: 3px;
-  background-color: $green;
+  background-color: $uxpl-green-base;
   color: $white;
 
   &:hover, &:focus {
-    background-color: $green-s1;
+    background-color: $uxpl-green-hover-active;
     color: $white;
   }
 
@@ -168,13 +168,13 @@
 @mixin blue-button {
   @include button;
   @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
-  border: 1px solid $blue-d1;
+  border: 1px solid $uxpl-blue-base;
   border-radius: 3px;
-  background-color: $blue;
+  background-color: $uxpl-blue-base;
   color: $white;
 
   &:hover, &:focus, &:active {
-    background-color: $blue-s2;
+    background-color: $uxpl-blue-hover-active;
     color: $white;
   }
 

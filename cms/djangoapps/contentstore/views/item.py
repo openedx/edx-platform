@@ -546,9 +546,16 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
             # find the course's reference to this tab and update the name.
             static_tab = CourseTabList.get_tab_by_slug(course.tabs, xblock.location.name)
             # only update if changed
-            if static_tab and static_tab['name'] != xblock.display_name:
-                static_tab['name'] = xblock.display_name
-                store.update_item(course, user.id)
+            if static_tab:
+                update_tab = False
+                if static_tab['name'] != xblock.display_name:
+                    static_tab['name'] = xblock.display_name
+                    update_tab = True
+                if static_tab['course_staff_only'] != xblock.course_staff_only:
+                    static_tab['course_staff_only'] = xblock.course_staff_only
+                    update_tab = True
+                if update_tab:
+                    store.update_item(course, user.id)
 
         result = {
             'id': unicode(xblock.location),
@@ -628,7 +635,7 @@ def _create_item(request):
     )
 
 
-def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_name=None):
+def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_name=None, is_child=False):
     """
     Duplicate an existing xblock as a child of the supplied parent_usage_key.
     """
@@ -646,6 +653,10 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_
         for field in source_item.fields.values():
             if field.scope == Scope.settings and field.is_set_on(source_item):
                 duplicate_metadata[field.name] = field.read_from(source_item)
+
+        if is_child:
+            display_name = display_name or source_item.display_name or source_item.category
+
         if display_name is not None:
             duplicate_metadata['display_name'] = display_name
         else:
@@ -691,7 +702,7 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_
         if source_item.has_children and not children_handled:
             dest_module.children = dest_module.children or []
             for child in source_item.children:
-                dupe = _duplicate_item(dest_module.location, child, user=user)
+                dupe = _duplicate_item(dest_module.location, child, user=user, is_child=True)
                 if dupe not in dest_module.children:  # _duplicate_item may add the child for us.
                     dest_module.children.append(dupe)
             store.update_item(dest_module, user.id)
@@ -937,8 +948,9 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         visibility_state = None
     published = modulestore().has_published_version(xblock) if not is_library_block else None
 
-    # defining the default value 'True' for delete, drag and add new child actions in xblock_actions for each xblock.
-    xblock_actions = {'deletable': True, 'draggable': True, 'childAddable': True}
+    # defining the default value 'True' for delete, duplicate, drag and add new child actions
+    # in xblock_actions for each xblock.
+    xblock_actions = {'deletable': True, 'draggable': True, 'childAddable': True, 'duplicable': True}
     explanatory_message = None
 
     # is_entrance_exam is inherited metadata.
@@ -982,6 +994,11 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         "user_partitions": get_user_partition_info(xblock, course=course),
     }
 
+    if xblock.category == 'sequential':
+        xblock_info.update({
+            "hide_after_due": xblock.hide_after_due,
+        })
+
     # update xblock_info with special exam information if the feature flag is enabled
     if settings.FEATURES.get('ENABLE_SPECIAL_EXAMS'):
         if xblock.category == 'course':
@@ -997,7 +1014,6 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
                 "is_time_limited": xblock.is_time_limited,
                 "exam_review_rules": xblock.exam_review_rules,
                 "default_time_limit_minutes": xblock.default_time_limit_minutes,
-                "hide_after_due": xblock.hide_after_due,
             })
 
     # Update with gating info

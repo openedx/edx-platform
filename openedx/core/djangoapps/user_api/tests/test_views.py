@@ -15,11 +15,12 @@ from django.test.client import RequestFactory
 from django.test.testcases import TransactionTestCase
 from django.test.utils import override_settings
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from pytz import UTC
+from pytz import common_timezones_set, UTC
 from social.apps.django_app.default.models import UserSocialAuth
 
 from django_comment_common import models
 from openedx.core.lib.api.test_utils import ApiTestCase, TEST_API_KEY
+from openedx.core.lib.time_zone_utils import get_display_time_zone
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import UserFactory
 from third_party_auth.tests.testutil import simulate_running_pipeline, ThirdPartyAuthTestMixin
@@ -587,7 +588,7 @@ class LoginSessionViewTest(UserAPITestCase):
                 "required": True,
                 "label": "Email",
                 "placeholder": "username@domain.com",
-                "instructions": "The email address you used to register with {platform_name}".format(
+                "instructions": u"The email address you used to register with {platform_name}".format(
                     platform_name=settings.PLATFORM_NAME
                 ),
                 "restrictions": {
@@ -595,6 +596,8 @@ class LoginSessionViewTest(UserAPITestCase):
                     "max_length": EMAIL_MAX_LENGTH
                 },
                 "errorMessages": {},
+                "supplementalText": "",
+                "supplementalLink": "",
             },
             {
                 "name": "password",
@@ -609,6 +612,8 @@ class LoginSessionViewTest(UserAPITestCase):
                     "max_length": PASSWORD_MAX_LENGTH
                 },
                 "errorMessages": {},
+                "supplementalText": "",
+                "supplementalLink": "",
             },
             {
                 "name": "remember",
@@ -620,6 +625,8 @@ class LoginSessionViewTest(UserAPITestCase):
                 "instructions": "",
                 "restrictions": {},
                 "errorMessages": {},
+                "supplementalText": "",
+                "supplementalLink": "",
             },
         ])
 
@@ -749,7 +756,7 @@ class PasswordResetViewTest(UserAPITestCase):
                 "required": True,
                 "label": "Email",
                 "placeholder": "username@domain.com",
-                "instructions": "The email address you used to register with {platform_name}".format(
+                "instructions": u"The email address you used to register with {platform_name}".format(
                     platform_name=settings.PLATFORM_NAME
                 ),
                 "restrictions": {
@@ -757,6 +764,8 @@ class PasswordResetViewTest(UserAPITestCase):
                     "max_length": EMAIL_MAX_LENGTH
                 },
                 "errorMessages": {},
+                "supplementalText": "",
+                "supplementalLink": "",
             }
         ])
 
@@ -1011,9 +1020,46 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                     {"value": "hs", "name": "Secondary/high school"},
                     {"value": "jhs", "name": "Junior secondary/junior high/middle school"},
                     {"value": "el", "name": "Elementary/primary school"},
-                    {"value": "none", "name": "No Formal Education"},
-                    {"value": "other", "name": "Other Education"},
+                    {"value": "none", "name": "No formal education"},
+                    {"value": "other", "name": "Other education"},
                 ],
+            }
+        )
+
+    @mock.patch('util.enterprise_helpers.active_provider_requests_data_sharing')
+    @mock.patch('util.enterprise_helpers.active_provider_enforces_data_sharing')
+    @mock.patch('util.enterprise_helpers.get_enterprise_customer_for_request')
+    @mock.patch('util.enterprise_helpers.configuration_helpers')
+    def test_register_form_consent_field(self, config_helper, get_ec, mock_enforce, mock_request):
+        """
+        Test that if we have an EnterpriseCustomer active for the request, and that
+        EnterpriseCustomer is set to require data sharing consent, the correct
+        field is added to the form descriptor.
+        """
+        fake_ec = mock.MagicMock(
+            enforces_data_sharing_consent=mock.MagicMock(return_value=True),
+            requests_data_sharing_consent=True,
+        )
+        fake_ec.name = 'MegaCorp'
+        get_ec.return_value = fake_ec
+        config_helper.get_value.return_value = 'OpenEdX'
+        mock_request.return_value = True
+        mock_enforce.return_value = True
+        self._assert_reg_field(
+            dict(),
+            {
+                u"name": u"data_sharing_consent",
+                u"type": u"checkbox",
+                u"required": True,
+                u"label": (
+                    "I agree to allow OpenEdX to share data about my enrollment, "
+                    "completion and performance in all OpenEdX courses and programs "
+                    "where my enrollment is sponsored by MegaCorp."
+                ),
+                u"defaultValue": False,
+                u"errorMessages": {
+                    u'required': u'To link your account with MegaCorp, you are required to consent to data sharing.',
+                }
             }
         )
 
@@ -1037,8 +1083,8 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                     {"value": "hs", "name": "Secondary/high school TRANSLATED"},
                     {"value": "jhs", "name": "Junior secondary/junior high/middle school TRANSLATED"},
                     {"value": "el", "name": "Elementary/primary school TRANSLATED"},
-                    {"value": "none", "name": "No Formal Education TRANSLATED"},
-                    {"value": "other", "name": "Other Education TRANSLATED"},
+                    {"value": "none", "name": "No formal education TRANSLATED"},
+                    {"value": "other", "name": "Other education TRANSLATED"},
                 ],
             }
         )
@@ -1117,7 +1163,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 "name": "goals",
                 "type": "textarea",
                 "required": False,
-                "label": "Tell us why you're interested in {platform_name}".format(
+                "label": u"Tell us why you're interested in {platform_name}".format(
                     platform_name=settings.PLATFORM_NAME
                 )
             }
@@ -1172,22 +1218,22 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
     )
     @mock.patch.dict(settings.FEATURES, {"ENABLE_MKTG_SITE": True})
     def test_registration_honor_code_mktg_site_enabled(self):
-        link_html = '<a href=\"https://www.test.com/honor\">Terms of Service and Honor Code</a>'
+        link_label = 'Terms of Service and Honor Code'
         self._assert_reg_field(
             {"honor_code": "required"},
             {
-                "label": "I agree to the {platform_name} {link_html}.".format(
+                "label": u"I agree to the {platform_name} {link_label}".format(
                     platform_name=settings.PLATFORM_NAME,
-                    link_html=link_html
+                    link_label=link_label
                 ),
                 "name": "honor_code",
                 "defaultValue": False,
                 "type": "checkbox",
                 "required": True,
                 "errorMessages": {
-                    "required": "You must agree to the {platform_name} {link_html}.".format(
+                    "required": u"You must agree to the {platform_name} {link_label}".format(
                         platform_name=settings.PLATFORM_NAME,
-                        link_html=link_html
+                        link_label=link_label
                     )
                 }
             }
@@ -1196,22 +1242,22 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
     @override_settings(MKTG_URLS_LINK_MAP={"HONOR": "honor"})
     @mock.patch.dict(settings.FEATURES, {"ENABLE_MKTG_SITE": False})
     def test_registration_honor_code_mktg_site_disabled(self):
-        link_html = '<a href=\"/honor\">Terms of Service and Honor Code</a>'
+        link_label = 'Terms of Service and Honor Code'
         self._assert_reg_field(
             {"honor_code": "required"},
             {
-                "label": "I agree to the {platform_name} {link_html}.".format(
+                "label": u"I agree to the {platform_name} {link_label}".format(
                     platform_name=settings.PLATFORM_NAME,
-                    link_html=link_html
+                    link_label=link_label
                 ),
                 "name": "honor_code",
                 "defaultValue": False,
                 "type": "checkbox",
                 "required": True,
                 "errorMessages": {
-                    "required": "You must agree to the {platform_name} {link_html}.".format(
+                    "required": u"You must agree to the {platform_name} {link_label}".format(
                         platform_name=settings.PLATFORM_NAME,
-                        link_html=link_html
+                        link_label=link_label
                     )
                 }
             }
@@ -1226,44 +1272,44 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
     def test_registration_separate_terms_of_service_mktg_site_enabled(self):
         # Honor code field should say ONLY honor code,
         # not "terms of service and honor code"
-        link_html = '<a href=\"https://www.test.com/honor\">Honor Code</a>'
+        link_label = 'Honor Code'
         self._assert_reg_field(
             {"honor_code": "required", "terms_of_service": "required"},
             {
-                "label": "I agree to the {platform_name} {link_html}.".format(
+                "label": u"I agree to the {platform_name} {link_label}".format(
                     platform_name=settings.PLATFORM_NAME,
-                    link_html=link_html
+                    link_label=link_label
                 ),
                 "name": "honor_code",
                 "defaultValue": False,
                 "type": "checkbox",
                 "required": True,
                 "errorMessages": {
-                    "required": "You must agree to the {platform_name} {link_html}.".format(
+                    "required": u"You must agree to the {platform_name} {link_label}".format(
                         platform_name=settings.PLATFORM_NAME,
-                        link_html=link_html
+                        link_label=link_label
                     )
                 }
             }
         )
 
         # Terms of service field should also be present
-        link_html = '<a href=\"https://www.test.com/tos\">Terms of Service</a>'
+        link_label = 'Terms of Service'
         self._assert_reg_field(
             {"honor_code": "required", "terms_of_service": "required"},
             {
-                "label": "I agree to the {platform_name} {link_html}.".format(
+                "label": u"I agree to the {platform_name} {link_label}".format(
                     platform_name=settings.PLATFORM_NAME,
-                    link_html=link_html
+                    link_label=link_label
                 ),
                 "name": "terms_of_service",
                 "defaultValue": False,
                 "type": "checkbox",
                 "required": True,
                 "errorMessages": {
-                    "required": "You must agree to the {platform_name} {link_html}.".format(
+                    "required": u"You must agree to the {platform_name} {link_label}".format(
                         platform_name=settings.PLATFORM_NAME,
-                        link_html=link_html
+                        link_label=link_label
                     )
                 }
             }
@@ -1277,7 +1323,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         self._assert_reg_field(
             {"honor_code": "required", "terms_of_service": "required"},
             {
-                "label": "I agree to the {platform_name} <a href=\"/honor\">Honor Code</a>.".format(
+                "label": u"I agree to the {platform_name} Honor Code".format(
                     platform_name=settings.PLATFORM_NAME
                 ),
                 "name": "honor_code",
@@ -1285,7 +1331,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 "type": "checkbox",
                 "required": True,
                 "errorMessages": {
-                    "required": "You must agree to the {platform_name} <a href=\"/honor\">Honor Code</a>.".format(
+                    "required": u"You must agree to the {platform_name} Honor Code".format(
                         platform_name=settings.PLATFORM_NAME
                     )
                 }
@@ -1296,7 +1342,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         self._assert_reg_field(
             {"honor_code": "required", "terms_of_service": "required"},
             {
-                "label": "I agree to the {platform_name} <a href=\"/tos\">Terms of Service</a>.".format(
+                "label": u"I agree to the {platform_name} Terms of Service".format(
                     platform_name=settings.PLATFORM_NAME
                 ),
                 "name": "terms_of_service",
@@ -1304,7 +1350,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 "type": "checkbox",
                 "required": True,
                 "errorMessages": {
-                    "required": "You must agree to the {platform_name} <a href=\"/tos\">Terms of Service</a>.".format(
+                    "required": u"You must agree to the {platform_name} Terms of Service".format(  # pylint: disable=line-too-long
                         platform_name=settings.PLATFORM_NAME
                     )
                 }
@@ -1470,7 +1516,10 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         self.assertEqual(len(mail.outbox), 1)
         sent_email = mail.outbox[0]
         self.assertEqual(sent_email.to, [self.EMAIL])
-        self.assertEqual(sent_email.subject, "Activate Your edX Account")
+        self.assertEqual(
+            sent_email.subject,
+            u"Activate Your {platform} Account".format(platform=settings.PLATFORM_NAME)
+        )
         self.assertIn(
             u"you need to activate your {platform} account".format(platform=settings.PLATFORM_NAME),
             sent_email.body
@@ -1874,10 +1923,9 @@ class TestGoogleRegistrationView(
     """Tests the User API registration endpoint with Google authentication."""
     __test__ = True
 
-    pass
-
 
 @ddt.ddt
+@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class UpdateEmailOptInTestCase(UserAPITestCase, SharedModuleStoreTestCase):
     """Tests the UpdateEmailOptInPreference view. """
 
@@ -1963,3 +2011,40 @@ class UpdateEmailOptInTestCase(UserAPITestCase, SharedModuleStoreTestCase):
         self.assertHttpBadRequest(response)
         with self.assertRaises(UserOrgTag.DoesNotExist):
             UserOrgTag.objects.get(user=self.user, org=self.course.id.org, key="email-optin")
+
+
+@ddt.ddt
+class CountryTimeZoneListViewTest(UserApiTestCase):
+    """
+    Test cases covering the list viewing behavior for country time zones
+    """
+    ALL_TIME_ZONES_URI = "/user_api/v1/preferences/time_zones/"
+    COUNTRY_TIME_ZONES_URI = "/user_api/v1/preferences/time_zones/?country_code=cA"
+
+    @ddt.data(ALL_TIME_ZONES_URI, COUNTRY_TIME_ZONES_URI)
+    def test_options(self, country_uri):
+        """ Verify that following options are allowed """
+        self.assertAllowedMethods(country_uri, ['OPTIONS', 'GET', 'HEAD'])
+
+    @ddt.data(ALL_TIME_ZONES_URI, COUNTRY_TIME_ZONES_URI)
+    def test_methods_not_allowed(self, country_uri):
+        """ Verify that put, patch, and delete are not allowed """
+        unallowed_methods = ['put', 'patch', 'delete']
+        for unallowed_method in unallowed_methods:
+            self.assertHttpMethodNotAllowed(self.request_with_auth(unallowed_method, country_uri))
+
+    def _assert_time_zone_is_valid(self, time_zone_info):
+        """ Asserts that the time zone is a valid pytz time zone """
+        time_zone_name = time_zone_info['time_zone']
+        self.assertIn(time_zone_name, common_timezones_set)
+        self.assertEqual(time_zone_info['description'], get_display_time_zone(time_zone_name))
+
+    @ddt.data((ALL_TIME_ZONES_URI, 436),
+              (COUNTRY_TIME_ZONES_URI, 28))
+    @ddt.unpack
+    def test_get_basic(self, country_uri, expected_count):
+        """ Verify that correct time zone info is returned """
+        results = self.get_json(country_uri)
+        self.assertEqual(len(results), expected_count)
+        for time_zone_info in results:
+            self._assert_time_zone_is_valid(time_zone_info)

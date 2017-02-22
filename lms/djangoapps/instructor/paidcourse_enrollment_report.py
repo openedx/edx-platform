@@ -7,7 +7,7 @@ import collections
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from courseware.courses import get_course_by_id
-from instructor.enrollment_report import BaseAbstractEnrollmentReportProvider
+from lms.djangoapps.instructor.enrollment_report import BaseAbstractEnrollmentReportProvider
 from shoppingcart.models import RegistrationCodeRedemption, PaidCourseRegistration, CouponRedemption, OrderItem, \
     InvoiceTransaction
 from student.models import CourseEnrollment, ManualEnrollmentAudit

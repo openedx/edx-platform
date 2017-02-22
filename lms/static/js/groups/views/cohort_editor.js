@@ -1,11 +1,11 @@
-;(function (define) {
+(function(define) {
     'use strict';
-    define(['backbone', 'underscore', 'jquery', 'gettext', 'js/groups/views/cohort_form', 'string_utils', 
+    define(['backbone', 'underscore', 'jquery', 'gettext', 'js/groups/views/cohort_form', 'string_utils',
             'js/models/notification', 'js/views/notification'],
         function(Backbone, _, $, gettext, CohortFormView) {
             var CohortEditorView = Backbone.View.extend({
 
-                events : {
+                events: {
                     'click .wrapper-tabs .tab': 'selectTab',
                     'click .tab-content-settings .action-save': 'saveSettings',
                     'click .tab-content-settings .action-cancel': 'cancelSettings',
@@ -123,7 +123,7 @@
                     return this.cohorts.fetch();
                 },
 
-                undelegateViewEvents: function (view) {
+                undelegateViewEvents: function(view) {
                     if (view) {
                         view.undelegateEvents();
                     }
@@ -161,13 +161,13 @@
                     numPresent = modifiedUsers.present.length;
                     if (numUsersAdded > 0 || numPresent > 0) {
                         title = interpolate_text(
-                            ngettext("{numUsersAdded} student has been added to this cohort",
-                                "{numUsersAdded} students have been added to this cohort", numUsersAdded),
+                            ngettext('{numUsersAdded} student has been added to this cohort',
+                                '{numUsersAdded} students have been added to this cohort', numUsersAdded),
                             {numUsersAdded: numUsersAdded}
                         );
 
                         var movedByCohort = {};
-                        _.each(modifiedUsers.changed, function (changedInfo) {
+                        _.each(modifiedUsers.changed, function(changedInfo) {
                             oldCohort = changedInfo.previous_cohort;
                             if (oldCohort in movedByCohort) {
                                 movedByCohort[oldCohort] = movedByCohort[oldCohort] + 1;
@@ -181,8 +181,8 @@
                         for (oldCohort in movedByCohort) {
                             details.push(
                                 interpolate_text(
-                                    ngettext("{numMoved} student was removed from {oldCohort}",
-                                        "{numMoved} students were removed from {oldCohort}", movedByCohort[oldCohort]),
+                                    ngettext('{numMoved} student was removed from {oldCohort}',
+                                        '{numMoved} students were removed from {oldCohort}', movedByCohort[oldCohort]),
                                     {numMoved: movedByCohort[oldCohort], oldCohort: oldCohort}
                                 )
                             );
@@ -190,8 +190,8 @@
                         if (numPresent > 0) {
                             details.push(
                                 interpolate_text(
-                                    ngettext("{numPresent} student was already in the cohort",
-                                        "{numPresent} students were already in the cohort", numPresent),
+                                    ngettext('{numPresent} student was already in the cohort',
+                                        '{numPresent} students were already in the cohort', numPresent),
                                     {numPresent: numPresent}
                                 )
                             );
@@ -200,7 +200,7 @@
                         this.confirmationNotifications = new NotificationView({
                             el: this.$('.cohort-confirmations'),
                             model: new NotificationModel({
-                                type: "confirmation",
+                                type: 'confirmation',
                                 title: title,
                                 details: details
                             })
@@ -216,31 +216,31 @@
                     this.undelegateViewEvents(this.errorNotifications);
                     numErrors = modifiedUsers.unknown.length;
                     if (numErrors > 0) {
-                        createErrorDetails = function (unknownUsers, showAllErrors) {
+                        createErrorDetails = function(unknownUsers, showAllErrors) {
                             var numErrors = unknownUsers.length, details = [];
 
                             for (var i = 0; i < (showAllErrors ? numErrors : Math.min(errorLimit, numErrors)); i++) {
-                                details.push(interpolate_text(gettext("Unknown user: {user}"), {user: unknownUsers[i]}));
+                                details.push(interpolate_text(gettext('Unknown user: {user}'), {user: unknownUsers[i]}));
                             }
                             return details;
                         };
 
                         title = interpolate_text(
-                            ngettext("There was an error when trying to add students:",
-                                "There were {numErrors} errors when trying to add students:", numErrors),
+                            ngettext('There was an error when trying to add students:',
+                                'There were {numErrors} errors when trying to add students:', numErrors),
                             {numErrors: numErrors}
                         );
                         details = createErrorDetails(modifiedUsers.unknown, false);
 
-                        errorActionCallback = function (view) {
-                            view.model.set("actionText", null);
-                            view.model.set("details", createErrorDetails(modifiedUsers.unknown, true));
+                        errorActionCallback = function(view) {
+                            view.model.set('actionText', null);
+                            view.model.set('details', createErrorDetails(modifiedUsers.unknown, true));
                             view.render();
                         };
 
                         errorModel = new NotificationModel({
                             details: details,
-                            actionText: numErrors > errorLimit ? gettext("View all errors") : null,
+                            actionText: numErrors > errorLimit ? gettext('View all errors') : null,
                             actionCallback: errorActionCallback,
                             actionClass: 'action-expand'
                         });
@@ -254,5 +254,5 @@
                 }
             });
             return CohortEditorView;
-    });
+        });
 }).call(this, define || RequireJS.define);

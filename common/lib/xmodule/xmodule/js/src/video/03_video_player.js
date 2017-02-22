@@ -1,12 +1,11 @@
-(function (requirejs, require, define) {
-
+(function(requirejs, require, define) {
 // VideoPlayer module.
-define(
+    define(
 'video/03_video_player.js',
 ['video/02_html5_video.js', 'video/00_resizer.js'],
-function (HTML5Video, Resizer) {
+function(HTML5Video, Resizer) {
     var dfd = $.Deferred(),
-        VideoPlayer = function (state) {
+        VideoPlayer = function(state) {
             state.videoPlayer = {};
             _makeFunctionsPublic(state);
             _initialize(state);
@@ -69,7 +68,7 @@ function (HTML5Video, Resizer) {
     //     these functions will get the 'state' object as a context.
     function _makeFunctionsPublic(state) {
         var debouncedF = _.debounce(
-            function (params) {
+            function(params) {
                 // Can't cancel a queued debounced function on destroy
                 if (state.videoPlayer) {
                     return onSeek.call(this, params);
@@ -108,9 +107,8 @@ function (HTML5Video, Resizer) {
         // by student before video starts playing. Waits until the video's
         // metadata is loaded, which normally happens just after the video
         // starts playing. Just after that configurations can be applied.
-        state.videoPlayer.ready = _.once(function () {
+        state.videoPlayer.ready = _.once(function() {
             if (!state.isFlashMode() && state.speed != '1.0') {
-
                 // Work around a bug in the Youtube API that causes videos to
                 // play at normal speed rather than at the configured speed in
                 // Safari.  Setting the playback rate to 1.0 *after* playing
@@ -160,10 +158,10 @@ function (HTML5Video, Resizer) {
 
         if (state.videoType === 'html5') {
             state.videoPlayer.player = new HTML5Video.Player(state.el, {
-                playerVars:   state.videoPlayer.playerVars,
+                playerVars: state.videoPlayer.playerVars,
                 videoSources: state.config.sources,
                 events: {
-                    onReady:       state.videoPlayer.onReady,
+                    onReady: state.videoPlayer.onReady,
                     onStateChange: state.videoPlayer.onStateChange,
                     onError: state.videoPlayer.onError
                 }
@@ -171,7 +169,6 @@ function (HTML5Video, Resizer) {
 
             player = state.videoEl = state.videoPlayer.player.videoEl;
             player[0].addEventListener('loadedmetadata', state.videoPlayer.onLoadMetadataHtml5, false);
-
         } else {
             youTubeId = state.youtubeId();
 
@@ -186,7 +183,7 @@ function (HTML5Video, Resizer) {
                 }
             });
 
-            state.el.on('initialize', function () {
+            state.el.on('initialize', function() {
                 var player = state.videoEl = state.el.find('iframe'),
                     videoWidth = player.attr('width') || player.width(),
                     videoHeight = player.attr('height') || player.height();
@@ -202,7 +199,7 @@ function (HTML5Video, Resizer) {
     }
 
     function _updateVcrAndRegion(state, isYoutube) {
-        var update = function (state) {
+        var update = function(state) {
             var duration = state.videoPlayer.duration(),
                 time;
 
@@ -244,7 +241,7 @@ function (HTML5Video, Resizer) {
             // We wait for metadata to arrive, before we request the update
             // of the VCR video time, and of the start-end time region.
             // Metadata contains duration of the video.
-            state.el.on('metadata_received', function () {
+            state.el.on('metadata_received', function() {
                 update(state);
             });
         }
@@ -252,10 +249,10 @@ function (HTML5Video, Resizer) {
 
     function _resize(state, videoWidth, videoHeight) {
         state.resizer = new Resizer({
-                element: state.videoEl,
-                elementRatio: videoWidth/videoHeight,
-                container: state.container
-            })
+            element: state.videoEl,
+            elementRatio: videoWidth / videoHeight,
+            container: state.container
+        })
             .callbacks.once(function() {
                 state.el.trigger('caption:resize');
             })
@@ -263,12 +260,12 @@ function (HTML5Video, Resizer) {
 
         // Update captions size when controls becomes visible on iPad or Android
         if (/iPad|Android/i.test(state.isTouch[0])) {
-            state.el.on('controls:show', function () {
+            state.el.on('controls:show', function() {
                 state.el.trigger('caption:resize');
             });
         }
 
-        $(window).on('resize.video', _.debounce(function () {
+        $(window).on('resize.video', _.debounce(function() {
             state.trigger('videoFullScreen.updateControlsHeight', null);
             state.el.trigger('caption:resize');
             state.resizer.align();
@@ -372,7 +369,6 @@ function (HTML5Video, Resizer) {
                 this.videoPlayer.endTime !== null &&
                 this.videoPlayer.endTime <= this.videoPlayer.currentTime
             ) {
-
                 this.videoPlayer.pause();
 
                 this.trigger('videoProgressSlider.notifyThroughHandleEnd', {
@@ -508,7 +504,7 @@ function (HTML5Video, Resizer) {
             // Youtube video cannot be rewinded during bufferization, so wait to
             // finish bufferization and then rewind the video.
             if (this.isYoutubeType() && this.videoPlayer.isBuffering()) {
-                this.el.on('play.seek', function () {
+                this.el.on('play.seek', function() {
                     this.videoPlayer.player.seekTo(time, true);
                 }.bind(this));
             } else {
@@ -601,11 +597,11 @@ function (HTML5Video, Resizer) {
 
         dfd.resolve();
 
-        this.el.on('speedchange', function (event, speed) {
+        this.el.on('speedchange', function(event, speed) {
             _this.videoPlayer.onSpeedChange(speed);
         });
 
-        this.el.on('volumechange volumechange:silent', function (event, volume) {
+        this.el.on('volumechange volumechange:silent', function(event, volume) {
             _this.videoPlayer.onVolumeChange(volume);
         });
 
@@ -621,7 +617,7 @@ function (HTML5Video, Resizer) {
 
         availablePlaybackRates = _.filter(
             availablePlaybackRates,
-            function (item) {
+            function(item) {
                 var speed = Number(item);
                 return speed > 0.25 && speed <= 5;
             }
@@ -664,12 +660,12 @@ function (HTML5Video, Resizer) {
                 // and their associated subs.
 
                 // First clear the dictionary.
-                $.each(this.videos, function (index, value) {
+                $.each(this.videos, function(index, value) {
                     delete _this.videos[index];
                 });
                 this.speeds = [];
                 // Recreate it with the supplied frame rates.
-                $.each(availablePlaybackRates, function (index, value) {
+                $.each(availablePlaybackRates, function(index, value) {
                     var key = value.toFixed(2).replace(/\.00$/, '.0');
 
                     _this.videos[key] = baseSpeedSubs;
@@ -712,36 +708,36 @@ function (HTML5Video, Resizer) {
         ].join(' '));
 
         switch (event.data) {
-            case this.videoPlayer.PlayerState.UNSTARTED:
-                this.el.addClass('is-unstarted');
-                this.videoPlayer.onUnstarted();
-                break;
-            case this.videoPlayer.PlayerState.PLAYING:
-                this.el.addClass('is-playing');
-                this.videoPlayer.onPlay();
-                break;
-            case this.videoPlayer.PlayerState.PAUSED:
-                this.el.addClass('is-paused');
-                this.videoPlayer.onPause();
-                break;
-            case this.videoPlayer.PlayerState.BUFFERING:
-                this.el.addClass('is-buffered');
-                this.el.trigger('buffering');
-                break;
-            case this.videoPlayer.PlayerState.ENDED:
-                this.el.addClass('is-ended');
-                this.videoPlayer.onEnded();
-                break;
-            case this.videoPlayer.PlayerState.CUED:
-                this.el.addClass('is-cued');
-                if (this.isFlashMode()) {
-                    this.videoPlayer.play();
-                }
-                break;
+        case this.videoPlayer.PlayerState.UNSTARTED:
+            this.el.addClass('is-unstarted');
+            this.videoPlayer.onUnstarted();
+            break;
+        case this.videoPlayer.PlayerState.PLAYING:
+            this.el.addClass('is-playing');
+            this.videoPlayer.onPlay();
+            break;
+        case this.videoPlayer.PlayerState.PAUSED:
+            this.el.addClass('is-paused');
+            this.videoPlayer.onPause();
+            break;
+        case this.videoPlayer.PlayerState.BUFFERING:
+            this.el.addClass('is-buffered');
+            this.el.trigger('buffering');
+            break;
+        case this.videoPlayer.PlayerState.ENDED:
+            this.el.addClass('is-ended');
+            this.videoPlayer.onEnded();
+            break;
+        case this.videoPlayer.PlayerState.CUED:
+            this.el.addClass('is-cued');
+            if (this.isFlashMode()) {
+                this.videoPlayer.play();
+            }
+            break;
         }
     }
 
-    function onError (code) {
+    function onError(code) {
         this.el.trigger('error', [code]);
     }
 
@@ -779,7 +775,7 @@ function (HTML5Video, Resizer) {
         this.videoPlayer.figureOutStartEndTime(duration);
 
         startTime = this.videoPlayer.startTime;
-        endTime   = this.videoPlayer.endTime;
+        endTime = this.videoPlayer.endTime;
 
         if (startTime > 0) {
             if (
@@ -931,5 +927,4 @@ function (HTML5Video, Resizer) {
         this.videoPlayer.player.setVolume(volume);
     }
 });
-
 }(RequireJS.requirejs, RequireJS.require, RequireJS.define));

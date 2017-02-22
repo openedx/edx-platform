@@ -1,6 +1,9 @@
+# coding=UTF-8
 """
 Tests for signal handling in commerce djangoapp.
 """
+from __future__ import unicode_literals
+
 import base64
 import json
 from urlparse import urljoin
@@ -41,7 +44,10 @@ class TestRefundSignal(TestCase):
     def setUp(self):
         super(TestRefundSignal, self).setUp()
         self.requester = UserFactory(username="test-requester")
-        self.student = UserFactory(username="test-student", email="test-student@example.com")
+        self.student = UserFactory(
+            username="test-student",
+            email="test-student@example.com",
+        )
         self.course_enrollment = CourseEnrollmentFactory(
             user=self.student,
             course_id=CourseKey.from_string('course-v1:org+course+run'),
@@ -207,25 +213,35 @@ class TestRefundSignal(TestCase):
         with self.assertRaises(NotImplementedError):
             send_refund_notification(self.course_enrollment, [1, 2, 3])
 
-    def test_send_refund_notification(self):
+    @ddt.data('email@example.com', 'üñîcode.email@example.com')
+    @mock.patch('lms.djangoapps.commerce.signals.create_zendesk_ticket')
+    def test_send_refund_notification(self, student_email, mock_zendesk):
         """ Verify the support team is notified of the refund request. """
+        refund_ids = [1, 2, 3]
 
-        with mock.patch('commerce.signals.create_zendesk_ticket') as mock_zendesk:
-            refund_ids = [1, 2, 3]
-            send_refund_notification(self.course_enrollment, refund_ids)
-            body = generate_refund_notification_body(self.student, refund_ids)
-            mock_zendesk.assert_called_with(self.student.profile.name, self.student.email,
-                                            "[Refund] User-Requested Refund", body, ['auto_refund'])
+        # pass a student with unicode and ascii email to ensure that
+        # generate_refund_notification_body can handle formatting a unicode
+        # message
+        self.student.email = student_email
+        send_refund_notification(self.course_enrollment, refund_ids)
+        body = generate_refund_notification_body(self.student, refund_ids)
+        mock_zendesk.assert_called_with(
+            self.student.profile.name,
+            self.student.email,
+            "[Refund] User-Requested Refund",
+            body,
+            ['auto_refund']
+        )
 
     def _mock_zendesk_api(self, status=201):
         """ Mock Zendesk's ticket creation API. """
         httpretty.register_uri(httpretty.POST, urljoin(ZENDESK_URL, '/api/v2/tickets.json'), status=status,
                                body='{}', content_type=JSON)
 
-    def call_create_zendesk_ticket(self, name=u'Test user', email=u'user@example.com', subject=u'Test Ticket',
-                                   body=u'I want a refund!', tags=None):
+    def call_create_zendesk_ticket(self, name='Test user', email='user@example.com', subject='Test Ticket',
+                                   body='I want a refund!', tags=None):
         """ Call the create_zendesk_ticket function. """
-        tags = tags or [u'auto_refund']
+        tags = tags or ['auto_refund']
         create_zendesk_ticket(name, email, subject, body, tags)
 
     @override_settings(ZENDESK_URL=ZENDESK_URL, ZENDESK_USER=None, ZENDESK_API_KEY=None)
@@ -250,11 +266,11 @@ class TestRefundSignal(TestCase):
         """ Verify the Zendesk API is called. """
         self._mock_zendesk_api()
 
-        name = u'Test user'
-        email = u'user@example.com'
-        subject = u'Test Ticket'
-        body = u'I want a refund!'
-        tags = [u'auto_refund']
+        name = 'Test user'
+        email = 'user@example.com'
+        subject = 'Test Ticket'
+        body = 'I want a refund!'
+        tags = ['auto_refund']
         self.call_create_zendesk_ticket(name, email, subject, body, tags)
         last_request = httpretty.last_request()
 
@@ -268,14 +284,14 @@ class TestRefundSignal(TestCase):
 
         # Verify the content
         expected = {
-            u'ticket': {
-                u'requester': {
-                    u'name': name,
-                    u'email': email
+            'ticket': {
+                'requester': {
+                    'name': name,
+                    'email': email
                 },
-                u'subject': subject,
-                u'comment': {u'body': body},
-                u'tags': [u'LMS'] + tags
+                'subject': subject,
+                'comment': {'body': body},
+                'tags': ['LMS'] + tags
             }
         }
         self.assertDictEqual(json.loads(last_request.body), expected)

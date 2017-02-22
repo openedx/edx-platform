@@ -4,10 +4,8 @@ Tests for student enrollment.
 from mock import patch, Mock
 
 import ddt
-from django.core.cache import cache
 from nose.tools import raises
 import unittest
-from django.test import TestCase
 from django.test.utils import override_settings
 from django.conf import settings
 

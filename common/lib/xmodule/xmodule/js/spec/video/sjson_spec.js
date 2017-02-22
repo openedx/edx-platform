@@ -1,8 +1,8 @@
-(function (require) {
-require(
+(function(require) {
+    require(
 ['video/00_sjson.js'],
-function (Sjson) {
-    describe('Sjson', function () {
+function(Sjson) {
+    describe('Sjson', function() {
         var data = jasmine.stubbedCaption,
             sjson;
         var videoStops = [0, 3120, 6270, 8490, 21620, 24920];
@@ -12,19 +12,19 @@ function (Sjson) {
             sjson = new Sjson(data);
         });
 
-        it ('returns captions', function () {
+        it('returns captions', function() {
             expect(sjson.getCaptions()).toEqual(data.text);
         });
 
-        it ('returns start times', function () {
+        it('returns start times', function() {
             expect(sjson.getStartTimes()).toEqual(data.start);
         });
 
-        it ('returns correct length', function () {
+        it('returns correct length', function() {
             expect(sjson.getSize()).toEqual(data.text.length);
         });
 
-        it('search returns a correct caption index', function () {
+        it('search returns a correct caption index', function() {
             expect(sjson.search(videoStops[0])).toEqual(0);
             expect(sjson.search(videoStops[1])).toEqual(1);
             expect(sjson.search(videoStops[2])).toEqual(2);
@@ -41,7 +41,7 @@ function (Sjson) {
             expect(sjson.search(-1)).toEqual(0);
         });
 
-        it('search only searches through a subrange of times if start / end times are specified', function () {
+        it('search only searches through a subrange of times if start / end times are specified', function() {
             var start = videoStops[2] - 100;
             var end = videoStops[5] - 100;
             var results = sjson.filter(start, end);
@@ -54,7 +54,7 @@ function (Sjson) {
             expect(sjson.search(OUT_OF_BOUNDS_STOP, start, end)).toEqual(expectedLength);
         });
 
-        it('filters results correctly given a start and end time', function () {
+        it('filters results correctly given a start and end time', function() {
             var start = videoStops[1] - 100;
             var end = videoStops[4] - 100;
             var results = sjson.filter(start, end);

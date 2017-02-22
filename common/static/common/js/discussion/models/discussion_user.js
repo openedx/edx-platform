@@ -17,9 +17,8 @@
             return child;
         };
 
-    if (typeof Backbone !== "undefined" && Backbone !== null) {
+    if (typeof Backbone !== 'undefined' && Backbone !== null) {
         this.DiscussionUser = (function(_super) {
-
             __extends(DiscussionUser, _super);
 
             function DiscussionUser() {
@@ -45,8 +44,6 @@
             };
 
             return DiscussionUser;
-
         })(Backbone.Model);
     }
-
 }).call(this);

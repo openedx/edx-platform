@@ -25,17 +25,18 @@
             },
 
             render: function() {
-                var threadTypeTemplate,
-                    formId = _.uniqueId("form-");
-                this.template = _.template($('#thread-edit-template').html());
-                this.$el.html(this.template(this.model.toJSON())).appendTo(this.container);
-                this.submitBtn = this.$('.post-update');
-                threadTypeTemplate = _.template($("#thread-type-template").html());
-                this.addField(threadTypeTemplate({form_id: formId}));
-                this.$("#" + formId + "-post-type-" + this.threadType).attr('checked', true);
+                var formId = _.uniqueId('form-'),
+                    threadTypeTemplate = edx.HtmlUtils.template($('#thread-type-template').html()),
+                    $threadTypeSelector = $(threadTypeTemplate({form_id: formId}).toString()),
+                    mainTemplate = edx.HtmlUtils.template($('#thread-edit-template').html());
+                edx.HtmlUtils.setHtml(this.$el, mainTemplate(this.model.toJSON()));
+                this.container.append(this.$el);
+                this.$submitBtn = this.$('.post-update');
+                this.addField($threadTypeSelector);
+                this.$('#' + formId + '-post-type-' + this.threadType).attr('checked', true);
                 // Only allow the topic field for course threads, as standalone threads
                 // cannot be moved.
-                if (this.context === 'course') {
+                if (this.isTabMode()) {
                     this.topicView = new DiscussionTopicMenuView({
                         topicId: this.topicId,
                         course_settings: this.course_settings
@@ -46,8 +47,8 @@
                 return this;
             },
 
-            addField: function(fieldView) {
-                this.$('.forum-edit-post-form-wrapper').append(fieldView);
+            addField: function($fieldView) {
+                this.$('.forum-edit-post-form-wrapper').append($fieldView);
                 return this;
             },
 
@@ -57,7 +58,7 @@
 
             save: function() {
                 var title = this.$('.edit-post-title').val(),
-                    threadType = this.$(".post-type-input:checked").val(),
+                    threadType = this.$('.post-type-input:checked').val(),
                     body = this.$('.edit-post-body textarea').val(),
                     postData = {
                         title: title,
@@ -69,8 +70,8 @@
                 }
 
                 return DiscussionUtil.safeAjax({
-                    $elem: this.submitBtn,
-                    $loading: this.submitBtn,
+                    $elem: this.$submitBtn,
+                    $loading: this.$submitBtn,
                     url: DiscussionUtil.urlFor('update_thread', this.model.id),
                     type: 'POST',
                     dataType: 'json',
@@ -86,7 +87,7 @@
                         this.model.set(postData).unset('abbreviatedBody');
                         this.trigger('thread:updated');
                         if (this.threadType !== threadType) {
-                            this.model.set("thread_type", threadType);
+                            this.model.set('thread_type', threadType);
                             this.model.trigger('thread:thread_type_updated');
                             this.trigger('comment:endorse');
                         }
@@ -104,10 +105,10 @@
 
             cancelHandler: function(event) {
                 event.preventDefault();
-                this.trigger("thread:cancel_edit", event);
+                this.trigger('thread:cancel_edit', event);
                 this.remove();
                 return this;
             }
         });
     }
-}).call(window); // jshint ignore:line
+}).call(window);

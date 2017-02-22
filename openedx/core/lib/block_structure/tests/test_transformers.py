@@ -13,7 +13,7 @@ from .helpers import (
 )
 
 
-@attr('shard_2')
+@attr(shard=2)
 class TestBlockStructureTransformers(ChildrenMapTestMixin, TestCase):
     """
     Test class for testing BlockStructureTransformers

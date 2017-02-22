@@ -104,7 +104,7 @@ class TestConditionalContent(ModuleStoreTestCase):
     """
     Construct a course with graded problems that exist within a split test.
     """
-    TEST_SECTION_NAME = 'Problem'
+    TEST_SECTION_NAME = 'Subsection'
 
     def setUp(self):
         """

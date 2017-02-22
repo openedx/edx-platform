@@ -35,6 +35,7 @@ from lms.envs.test import (
     MEDIA_ROOT,
     MEDIA_URL,
     COMPREHENSIVE_THEME_DIRS,
+    JWT_AUTH,
 )
 
 # mongo connection settings
@@ -140,6 +141,7 @@ if os.environ.get('DISABLE_MIGRATIONS'):
     MIGRATION_MODULES = NoOpMigrationModules()
 
 LMS_BASE = "localhost:8000"
+LMS_ROOT_URL = "http://{}".format(LMS_BASE)
 FEATURES['PREVIEW_LMS_BASE'] = "preview.localhost"
 
 
@@ -329,7 +331,3 @@ FEATURES['CUSTOM_COURSES_EDX'] = True
 
 # API access management -- needed for simple-history to run.
 INSTALLED_APPS += ('openedx.core.djangoapps.api_admin',)
-
-# Set the default Oauth2 Provider Model so that migrations can run in
-# verbose mode
-OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth2_provider.Application'

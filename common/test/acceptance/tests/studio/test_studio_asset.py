@@ -5,11 +5,11 @@ Acceptance tests for Studio related to the asset index page.
 from flaky import flaky
 from unittest import skip
 
-from ...pages.studio.asset_index import AssetIndexPage
+from common.test.acceptance.pages.studio.asset_index import AssetIndexPage
 
-from .base_studio_test import StudioCourseTest
-from ...fixtures.base import StudioApiLoginError
-from ..helpers import skip_if_browser
+from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest
+from common.test.acceptance.fixtures.base import StudioApiLoginError
+from common.test.acceptance.tests.helpers import skip_if_browser
 
 
 @skip('FEDX-88')

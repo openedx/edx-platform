@@ -1,14 +1,6 @@
 '''
 Progress class for modules.  Represents where a student is in a module.
 
-Useful things to know:
- - Use Progress.to_js_status_str() to convert a progress into a simple
-   status string to pass to js.
- - Use Progress.to_js_detail_str() to convert a progress into a more detailed
-   string to pass to js.
-
-In particular, these functions have a canonical handing of None.
-
 For most subclassing needs, you should only need to reimplement
 frac() and __str__().
 '''
@@ -140,25 +132,3 @@ class Progress(object):
         (n, d) = a.frac()
         (n2, d2) = b.frac()
         return Progress(n + n2, d + d2)
-
-    @staticmethod
-    def to_js_status_str(progress):
-        '''
-        Return the "status string" version of the passed Progress
-        object that should be passed to js.  Use this function when
-        sending Progress objects to js to limit dependencies.
-        '''
-        if progress is None:
-            return "0"
-        return progress.ternary_str()
-
-    @staticmethod
-    def to_js_detail_str(progress):
-        '''
-        Return the "detail string" version of the passed Progress
-        object that should be passed to js.  Use this function when
-        passing Progress objects to js to limit dependencies.
-        '''
-        if progress is None:
-            return "0"
-        return str(progress)

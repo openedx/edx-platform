@@ -11,12 +11,14 @@ from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
-from django.utils import timezone
+from django.utils.text import slugify
 import httpretty
 import mock
 from nose.plugins.attrib import attr
+from opaque_keys.edx.keys import CourseKey
 from edx_oauth2_provider.tests.factories import ClientFactory
 from provider.constants import CONFIDENTIAL
+from pytz import utc
 
 from lms.djangoapps.certificates.api import MODES
 from lms.djangoapps.commerce.tests.test_utils import update_commerce_config
@@ -36,11 +38,14 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 UTILS_MODULE = 'openedx.core.djangoapps.programs.utils'
 CERTIFICATES_API_MODULE = 'lms.djangoapps.certificates.api'
-ECOMMERCE_URL_ROOT = 'http://example-ecommerce.com'
+ECOMMERCE_URL_ROOT = 'https://example-ecommerce.com'
+MARKETING_URL = 'https://www.example.com/marketing/path'
 
 
+@ddt.ddt
+@attr(shard=2)
+@httpretty.activate
 @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-@attr('shard_2')
 class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin, CredentialsDataMixin,
                            CredentialsApiConfigMixin, CacheIsolationTestCase):
     """Tests covering the retrieval of programs from the Programs service."""
@@ -76,7 +81,6 @@ class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin, Credential
             )
         ]
 
-    @httpretty.activate
     def test_get_programs(self):
         """Verify programs data can be retrieved."""
         self.create_programs_config()
@@ -91,7 +95,6 @@ class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin, Credential
         # Verify the API was actually hit (not the cache).
         self.assertEqual(len(httpretty.httpretty.latest_requests), 1)
 
-    @httpretty.activate
     def test_get_programs_caching(self):
         """Verify that when enabled, the cache is used for non-staff users."""
         self.create_programs_config(cache_ttl=1)
@@ -132,7 +135,6 @@ class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin, Credential
         self.assertEqual(actual, [])
         self.assertTrue(mock_init.called)
 
-    @httpretty.activate
     def test_get_programs_data_retrieval_failure(self):
         """Verify behavior when data can't be retrieved from Programs."""
         self.create_programs_config()
@@ -141,49 +143,6 @@ class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin, Credential
         actual = utils.get_programs(self.user)
         self.assertEqual(actual, [])
 
-    @httpretty.activate
-    def test_get_programs_for_dashboard(self):
-        """Verify programs data can be retrieved and parsed correctly."""
-        self.create_programs_config()
-        self.mock_programs_api()
-
-        actual = utils.get_programs_for_dashboard(self.user, self.COURSE_KEYS)
-        expected = {}
-        for program in self.PROGRAMS_API_RESPONSE['results']:
-            for course_code in program['course_codes']:
-                for run in course_code['run_modes']:
-                    course_key = run['course_key']
-                    expected.setdefault(course_key, []).append(program)
-
-        self.assertEqual(actual, expected)
-
-    def test_get_programs_for_dashboard_dashboard_display_disabled(self):
-        """Verify behavior when student dashboard display is disabled."""
-        self.create_programs_config(enable_student_dashboard=False)
-
-        actual = utils.get_programs_for_dashboard(self.user, self.COURSE_KEYS)
-        self.assertEqual(actual, {})
-
-    @httpretty.activate
-    def test_get_programs_for_dashboard_no_data(self):
-        """Verify behavior when no programs data is found for the user."""
-        self.create_programs_config()
-        self.mock_programs_api(data={'results': []})
-
-        actual = utils.get_programs_for_dashboard(self.user, self.COURSE_KEYS)
-        self.assertEqual(actual, {})
-
-    @httpretty.activate
-    def test_get_programs_for_dashboard_invalid_data(self):
-        """Verify behavior when the Programs API returns invalid data and parsing fails."""
-        self.create_programs_config()
-        invalid_program = {'invalid_key': 'invalid_data'}
-        self.mock_programs_api(data={'results': [invalid_program]})
-
-        actual = utils.get_programs_for_dashboard(self.user, self.COURSE_KEYS)
-        self.assertEqual(actual, {})
-
-    @httpretty.activate
     def test_get_program_for_certificates(self):
         """Verify programs data can be retrieved and parsed correctly for certificates."""
         self.create_programs_config()
@@ -198,7 +157,6 @@ class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin, Credential
         self.assertEqual(len(actual), 2)
         self.assertEqual(actual, expected)
 
-    @httpretty.activate
     def test_get_program_for_certificates_no_data(self):
         """Verify behavior when no programs data is found for the user."""
         self.create_programs_config()
@@ -209,7 +167,6 @@ class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin, Credential
         actual = utils.get_programs_for_credentials(self.user, program_credentials_data)
         self.assertEqual(actual, [])
 
-    @httpretty.activate
     def test_get_program_for_certificates_id_not_exist(self):
         """Verify behavior when no program with the given program_id in
         credentials exists.
@@ -232,18 +189,77 @@ class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin, Credential
         actual = utils.get_programs_for_credentials(self.user, credential_data)
         self.assertEqual(actual, [])
 
-    @httpretty.activate
-    def test_get_display_category_success(self):
-        self.create_programs_config()
-        self.mock_programs_api()
-        actual_programs = utils.get_programs(self.user)
-        for program in actual_programs:
-            expected = 'XSeries'
-            self.assertEqual(expected, utils.get_display_category(program))
 
-    def test_get_display_category_none(self):
-        self.assertEqual('', utils.get_display_category(None))
-        self.assertEqual('', utils.get_display_category({"id": "test"}))
+@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+class GetProgramsByRunTests(TestCase):
+    """Tests verifying that programs are inverted correctly."""
+    maxDiff = None
+
+    @classmethod
+    def setUpClass(cls):
+        super(GetProgramsByRunTests, cls).setUpClass()
+
+        cls.user = UserFactory()
+
+        course_keys = [
+            CourseKey.from_string('some/course/run'),
+            CourseKey.from_string('some/other/run'),
+        ]
+
+        cls.enrollments = [CourseEnrollmentFactory(user=cls.user, course_id=c) for c in course_keys]
+        cls.course_ids = [unicode(c) for c in course_keys]
+
+        organization = factories.Organization()
+        joint_programs = sorted([
+            factories.Program(
+                organizations=[organization],
+                course_codes=[
+                    factories.CourseCode(run_modes=[
+                        factories.RunMode(course_key=cls.course_ids[0]),
+                    ]),
+                ]
+            ) for __ in range(2)
+        ], key=lambda p: p['name'])
+
+        cls.programs = joint_programs + [
+            factories.Program(
+                organizations=[organization],
+                course_codes=[
+                    factories.CourseCode(run_modes=[
+                        factories.RunMode(course_key=cls.course_ids[1]),
+                    ]),
+                ]
+            ),
+            factories.Program(
+                organizations=[organization],
+                course_codes=[
+                    factories.CourseCode(run_modes=[
+                        factories.RunMode(course_key='yet/another/run'),
+                    ]),
+                ]
+            ),
+        ]
+
+    def test_get_programs_by_run(self):
+        """Verify that programs are organized by run ID."""
+        programs_by_run, course_ids = utils.get_programs_by_run(self.programs, self.enrollments)
+
+        self.assertEqual(programs_by_run[self.course_ids[0]], self.programs[:2])
+        self.assertEqual(programs_by_run[self.course_ids[1]], self.programs[2:3])
+
+        self.assertEqual(course_ids, self.course_ids)
+
+    def test_no_programs(self):
+        """Verify that the utility can cope with missing programs data."""
+        programs_by_run, course_ids = utils.get_programs_by_run([], self.enrollments)
+        self.assertEqual(programs_by_run, {})
+        self.assertEqual(course_ids, self.course_ids)
+
+    def test_no_enrollments(self):
+        """Verify that the utility can cope with missing enrollment data."""
+        programs_by_run, course_ids = utils.get_programs_by_run(self.programs, [])
+        self.assertEqual(programs_by_run, {})
+        self.assertEqual(course_ids, [])
 
 
 @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -290,7 +306,7 @@ class GetCompletedCoursesTestCase(TestCase):
         ])
 
 
-@attr('shard_2')
+@attr(shard=2)
 @httpretty.activate
 @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
@@ -325,6 +341,14 @@ class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
         """Construct a list containing the display names of the indicated course codes."""
         return [program['course_codes'][cc]['display_name'] for cc in course_codes]
 
+    def _attach_detail_url(self, programs):
+        """Add expected detail URLs to a list of program dicts."""
+        for program in programs:
+            base = reverse('program_details_view', kwargs={'program_id': program['id']}).rstrip('/')
+            slug = slugify(program['name'])
+
+            program['detail_url'] = '{base}/{slug}'.format(base=base, slug=slug)
+
     def test_no_enrollments(self):
         """Verify behavior when programs exist, but no relevant enrollments do."""
         data = [
@@ -339,7 +363,7 @@ class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
 
         meter = utils.ProgramProgressMeter(self.user)
 
-        self.assertEqual(meter.engaged_programs, [])
+        self.assertEqual(meter.engaged_programs(), [])
         self._assert_progress(meter)
         self.assertEqual(meter.completed_programs, [])
 
@@ -350,7 +374,7 @@ class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
         self._create_enrollments('org/course/run')
         meter = utils.ProgramProgressMeter(self.user)
 
-        self.assertEqual(meter.engaged_programs, [])
+        self.assertEqual(meter.engaged_programs(), [])
         self._assert_progress(meter)
         self.assertEqual(meter.completed_programs, [])
 
@@ -381,8 +405,9 @@ class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
         self._create_enrollments(course_id)
         meter = utils.ProgramProgressMeter(self.user)
 
+        self._attach_detail_url(data)
         program = data[0]
-        self.assertEqual(meter.engaged_programs, [program])
+        self.assertEqual(meter.engaged_programs(), [program])
         self._assert_progress(
             meter,
             factories.Progress(
@@ -427,8 +452,9 @@ class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
         self._create_enrollments(second_course_id, first_course_id)
         meter = utils.ProgramProgressMeter(self.user)
 
+        self._attach_detail_url(data)
         programs = data[:2]
-        self.assertEqual(meter.engaged_programs, programs)
+        self.assertEqual(meter.engaged_programs(), programs)
         self._assert_progress(
             meter,
             factories.Progress(id=programs[0]['id'], in_progress=self._extract_names(programs[0], 0)),
@@ -442,7 +468,8 @@ class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
         appearing in multiple programs.
         """
         shared_course_id, solo_course_id = 'org/shared-course/run', 'org/solo-course/run'
-        data = [
+
+        joint_programs = sorted([
             factories.Program(
                 organizations=[factories.Organization()],
                 course_codes=[
@@ -450,15 +477,10 @@ class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
                         factories.RunMode(course_key=shared_course_id),
                     ]),
                 ]
-            ),
-            factories.Program(
-                organizations=[factories.Organization()],
-                course_codes=[
-                    factories.CourseCode(run_modes=[
-                        factories.RunMode(course_key=shared_course_id),
-                    ]),
-                ]
-            ),
+            ) for __ in range(2)
+        ], key=lambda p: p['name'])
+
+        data = joint_programs + [
             factories.Program(
                 organizations=[factories.Organization()],
                 course_codes=[
@@ -474,14 +496,16 @@ class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
                 ]
             ),
         ]
+
         self._mock_programs_api(data)
 
         # Enrollment for the shared course ID created last (most recently).
         self._create_enrollments(solo_course_id, shared_course_id)
         meter = utils.ProgramProgressMeter(self.user)
 
+        self._attach_detail_url(data)
         programs = data[:3]
-        self.assertEqual(meter.engaged_programs, programs)
+        self.assertEqual(meter.engaged_programs(), programs)
         self._assert_progress(
             meter,
             factories.Progress(id=programs[0]['id'], in_progress=self._extract_names(programs[0], 0)),
@@ -677,15 +701,16 @@ class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
 @ddt.ddt
 @override_settings(ECOMMERCE_PUBLIC_URL_ROOT=ECOMMERCE_URL_ROOT)
 @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class TestSupplementProgramData(ProgramsApiConfigMixin, ModuleStoreTestCase):
-    """Tests of the utility function used to supplement program data."""
+@mock.patch(UTILS_MODULE + '.get_run_marketing_url', mock.Mock(return_value=MARKETING_URL))
+class TestProgramDataExtender(ProgramsApiConfigMixin, ModuleStoreTestCase):
+    """Tests of the program data extender utility class."""
     maxDiff = None
     sku = 'abc123'
     password = 'test'
     checkout_path = '/basket'
 
     def setUp(self):
-        super(TestSupplementProgramData, self).setUp()
+        super(TestProgramDataExtender, self).setUp()
 
         self.user = UserFactory()
         self.client.login(username=self.user.username, password=self.password)
@@ -693,8 +718,8 @@ class TestSupplementProgramData(ProgramsApiConfigMixin, ModuleStoreTestCase):
         ClientFactory(name=ProgramsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
 
         self.course = CourseFactory()
-        self.course.start = timezone.now() - datetime.timedelta(days=1)
-        self.course.end = timezone.now() + datetime.timedelta(days=1)
+        self.course.start = datetime.datetime.now(utc) - datetime.timedelta(days=1)
+        self.course.end = datetime.datetime.now(utc) + datetime.timedelta(days=1)
         self.course = self.update_course(self.course, self.user.id)  # pylint: disable=no-member
 
         self.organization = factories.Organization()
@@ -714,14 +739,15 @@ class TestSupplementProgramData(ProgramsApiConfigMixin, ModuleStoreTestCase):
                 course_image_url=course_overview.course_image_url,
                 course_key=unicode(self.course.id),  # pylint: disable=no-member
                 course_url=reverse('course_root', args=[self.course.id]),  # pylint: disable=no-member
-                end_date=strftime_localized(self.course.end, 'SHORT_DATE'),
-                enrollment_open_date=None,
-                is_course_ended=self.course.end < timezone.now(),
+                end_date=self.course.end.replace(tzinfo=utc),
+                enrollment_open_date=strftime_localized(utils.DEFAULT_ENROLLMENT_START_DATE, 'SHORT_DATE'),
+                is_course_ended=self.course.end < datetime.datetime.now(utc),
                 is_enrolled=False,
                 is_enrollment_open=True,
-                marketing_url=None,
-                start_date=strftime_localized(self.course.start, 'SHORT_DATE'),
+                marketing_url=MARKETING_URL,
+                start_date=self.course.start.replace(tzinfo=utc),
                 upgrade_url=None,
+                advertised_start=None
             ),
             **kwargs
         )
@@ -755,7 +781,7 @@ class TestSupplementProgramData(ProgramsApiConfigMixin, ModuleStoreTestCase):
         if is_enrolled:
             CourseEnrollmentFactory(user=self.user, course_id=self.course.id, mode=enrolled_mode)  # pylint: disable=no-member
 
-        data = utils.supplement_program_data(self.program, self.user)
+        data = utils.ProgramDataExtender(self.program, self.user).extend()
 
         self._assert_supplemented(
             data,
@@ -775,7 +801,7 @@ class TestSupplementProgramData(ProgramsApiConfigMixin, ModuleStoreTestCase):
             is_active=False,
         )
 
-        data = utils.supplement_program_data(self.program, self.user)
+        data = utils.ProgramDataExtender(self.program, self.user).extend()
 
         self._assert_supplemented(data)
 
@@ -790,7 +816,7 @@ class TestSupplementProgramData(ProgramsApiConfigMixin, ModuleStoreTestCase):
 
         CourseEnrollmentFactory(user=self.user, course_id=self.course.id, mode=MODES.audit)  # pylint: disable=no-member
 
-        data = utils.supplement_program_data(self.program, self.user)
+        data = utils.ProgramDataExtender(self.program, self.user).extend()
 
         self._assert_supplemented(data, is_enrolled=True, upgrade_url=None)
 
@@ -800,22 +826,35 @@ class TestSupplementProgramData(ProgramsApiConfigMixin, ModuleStoreTestCase):
     )
     @ddt.unpack
     def test_course_enrollment_status(self, start_offset, end_offset, is_enrollment_open):
-        """Verify that course enrollment status is reflected correctly."""
-        self.course.enrollment_start = timezone.now() - datetime.timedelta(days=start_offset)
-        self.course.enrollment_end = timezone.now() - datetime.timedelta(days=end_offset)
+        """
+        Verify that course enrollment status is reflected correctly.
+        """
+        self.course.enrollment_start = datetime.datetime.now(utc) - datetime.timedelta(days=start_offset)
+        self.course.enrollment_end = datetime.datetime.now(utc) - datetime.timedelta(days=end_offset)
+
         self.course = self.update_course(self.course, self.user.id)  # pylint: disable=no-member
 
-        data = utils.supplement_program_data(self.program, self.user)
-
-        if is_enrollment_open:
-            enrollment_open_date = None
-        else:
-            enrollment_open_date = strftime_localized(self.course.enrollment_start, 'SHORT_DATE')
+        data = utils.ProgramDataExtender(self.program, self.user).extend()
 
         self._assert_supplemented(
             data,
             is_enrollment_open=is_enrollment_open,
-            enrollment_open_date=enrollment_open_date,
+            enrollment_open_date=strftime_localized(self.course.enrollment_start, 'SHORT_DATE'),
+        )
+
+    def test_no_enrollment_start_date(self):
+        """Verify that a closed course with no explicit enrollment start date doesn't cause an error.
+
+        Regression test for ECOM-4973.
+        """
+        self.course.enrollment_end = datetime.datetime.now(utc) - datetime.timedelta(days=1)
+        self.course = self.update_course(self.course, self.user.id)  # pylint: disable=no-member
+
+        data = utils.ProgramDataExtender(self.program, self.user).extend()
+
+        self._assert_supplemented(
+            data,
+            is_enrollment_open=False,
         )
 
     @ddt.data(True, False)
@@ -827,7 +866,7 @@ class TestSupplementProgramData(ProgramsApiConfigMixin, ModuleStoreTestCase):
         mock_get_cert_data.return_value = {'uuid': test_uuid} if is_uuid_available else {}
         mock_html_certs_enabled.return_value = True
 
-        data = utils.supplement_program_data(self.program, self.user)
+        data = utils.ProgramDataExtender(self.program, self.user).extend()
 
         expected_url = reverse(
             'certificates:render_cert_by_uuid',
@@ -838,10 +877,10 @@ class TestSupplementProgramData(ProgramsApiConfigMixin, ModuleStoreTestCase):
 
     @ddt.data(-1, 0, 1)
     def test_course_course_ended(self, days_offset):
-        self.course.end = timezone.now() + datetime.timedelta(days=days_offset)
+        self.course.end = datetime.datetime.now(utc) + datetime.timedelta(days=days_offset)
         self.course = self.update_course(self.course, self.user.id)  # pylint: disable=no-member
 
-        data = utils.supplement_program_data(self.program, self.user)
+        data = utils.ProgramDataExtender(self.program, self.user).extend()
 
         self._assert_supplemented(data)
 
@@ -855,14 +894,14 @@ class TestSupplementProgramData(ProgramsApiConfigMixin, ModuleStoreTestCase):
             'logo': mock_image
         }
 
-        data = utils.supplement_program_data(self.program, self.user)
+        data = utils.ProgramDataExtender(self.program, self.user).extend()
         self.assertEqual(data['organizations'][0].get('img'), mock_logo_url)
 
     @mock.patch(UTILS_MODULE + '.get_organization_by_short_name')
     def test_organization_missing(self, mock_get_organization_by_short_name):
         """ Verify the logo image is not set if the organizations api returns None """
         mock_get_organization_by_short_name.return_value = None
-        data = utils.supplement_program_data(self.program, self.user)
+        data = utils.ProgramDataExtender(self.program, self.user).extend()
         self.assertEqual(data['organizations'][0].get('img'), None)
 
     @mock.patch(UTILS_MODULE + '.get_organization_by_short_name')
@@ -872,5 +911,5 @@ class TestSupplementProgramData(ProgramsApiConfigMixin, ModuleStoreTestCase):
         but the logo is not available
         """
         mock_get_organization_by_short_name.return_value = {'logo': None}
-        data = utils.supplement_program_data(self.program, self.user)
+        data = utils.ProgramDataExtender(self.program, self.user).extend()
         self.assertEqual(data['organizations'][0].get('img'), None)

@@ -33,7 +33,7 @@ from xmodule.errortracker import exc_info_to_str
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from opaque_keys.edx.keys import UsageKey
-from opaque_keys.edx.asides import AsideUsageKeyV1, AsideDefinitionKeyV1
+from opaque_keys.edx.asides import AsideUsageKeyV2, AsideDefinitionKeyV2
 from xmodule.exceptions import UndefinedContext
 import dogstats_wrapper as dog_stats_api
 
@@ -155,8 +155,8 @@ class AsideKeyGenerator(IdGenerator):
         Returns:
             (aside_definition_id, aside_usage_id)
         """
-        def_key = AsideDefinitionKeyV1(definition_id, aside_type)
-        usage_key = AsideUsageKeyV1(usage_id, aside_type)
+        def_key = AsideDefinitionKeyV2(definition_id, aside_type)
+        usage_key = AsideUsageKeyV2(usage_id, aside_type)
         return (def_key, usage_key)
 
     def create_usage(self, def_id):
@@ -806,6 +806,7 @@ class XModule(HTMLSnippet, XModuleMixin):
     entry_point = "xmodule.v1"
 
     has_score = descriptor_attr('has_score')
+    max_score = descriptor_attr('max_score')
     show_in_read_only_mode = descriptor_attr('show_in_read_only_mode')
     _field_data_cache = descriptor_attr('_field_data_cache')
     _field_data = descriptor_attr('_field_data')
@@ -1201,7 +1202,6 @@ class XModuleDescriptor(HTMLSnippet, ResourceTemplates, XModuleMixin):
     get_progress = module_attr('get_progress')
     get_score = module_attr('get_score')
     handle_ajax = module_attr('handle_ajax')
-    max_score = module_attr('max_score')
     student_view = module_attr(STUDENT_VIEW)
     get_child_descriptors = module_attr('get_child_descriptors')
     xmodule_handler = module_attr('xmodule_handler')
@@ -1371,7 +1371,7 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
     """
     # pylint: disable=bad-continuation
     def __init__(
-        self, load_item, resources_fs, error_tracker, get_policy=None, disabled_xblock_types=(), **kwargs
+        self, load_item, resources_fs, error_tracker, get_policy=None, disabled_xblock_types=lambda: [], **kwargs
     ):
         """
         load_item: Takes a Location and returns an XModuleDescriptor
@@ -1439,7 +1439,7 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
         """
         Returns a subclass of :class:`.XBlock` that corresponds to the specified `block_type`.
         """
-        if block_type in self.disabled_xblock_types:
+        if block_type in self.disabled_xblock_types():
             return self.default_class
         return super(DescriptorSystem, self).load_block_type(block_type)
 

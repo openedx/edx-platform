@@ -7,7 +7,7 @@ define([
             return NotesLogger.getLogger(id, mode);
         };
 
-        beforeEach(function () {
+        beforeEach(function() {
             spyOn(window.console, 'log');
             spyOn(window.console, 'error');
             spyOn(Logger, 'log');
@@ -109,7 +109,7 @@ define([
             expect(log[1][3]).toBe('ms');
         });
 
-        it('can emit an event properly', function () {
+        it('can emit an event properly', function() {
             var logger = getLogger('id', 0);
             logger.emit('event_name', {id: 'some_id'});
             expect(Logger.log).toHaveBeenCalledWith('event_name', {

@@ -109,7 +109,7 @@ from django.core.urlresolvers import reverse
           % for section_data in sections:
             ## This is necessary so we don't scrape 'section_display_name' as a string.
             <% dname = section_data['section_display_name'] %>
-            <li class="nav-item"><a href="" data-section="${ section_data['section_key'] }">${_(dname)}</a></li>
+            <li class="nav-item"><button type="button" class="btn-link" data-section="${ section_data['section_key'] }">${_(dname)}</button></li>
           % endfor
         </ul>
 
@@ -126,3 +126,7 @@ from django.core.urlresolvers import reverse
         </main>
   </div>
 </div>
+
+<%static:require_module_async module_name="js/dateutil_factory" class_name="DateUtilFactory">
+    DateUtilFactory.transform(iterationKey=".localized-datetime");
+</%static:require_module_async>

@@ -12,7 +12,7 @@ from xmodule.modulestore.tests.django_utils import (
 from xmodule.modulestore.tests.factories import ToyCourseFactory
 
 
-@attr('shard_1')
+@attr(shard=1)
 class RoleClassTestCase(ModuleStoreTestCase):
     """
     Tests for roles of the comment client service integration
@@ -54,7 +54,7 @@ class RoleClassTestCase(ModuleStoreTestCase):
         self.TA_role_2.inherit_permissions(self.TA_role)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class PermissionClassTestCase(TestCase):
     """
     Tests for permissions of the comment client service integration

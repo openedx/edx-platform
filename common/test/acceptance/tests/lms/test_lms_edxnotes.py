@@ -6,13 +6,13 @@ import random
 from uuid import uuid4
 from datetime import datetime
 from nose.plugins.attrib import attr
-from ..helpers import UniqueCourseTest, EventsTestMixin
-from ...fixtures.course import CourseFixture, XBlockFixtureDesc
-from ...pages.lms.auto_auth import AutoAuthPage
-from ...pages.lms.course_nav import CourseNavPage
-from ...pages.lms.courseware import CoursewarePage
-from ...pages.lms.edxnotes import EdxNotesUnitPage, EdxNotesPage, EdxNotesPageNoContent
-from ...fixtures.edxnotes import EdxNotesFixture, Note, Range
+from common.test.acceptance.tests.helpers import UniqueCourseTest, EventsTestMixin
+from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
+from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.lms.course_nav import CourseNavPage
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.pages.lms.edxnotes import EdxNotesUnitPage, EdxNotesPage, EdxNotesPageNoContent
+from common.test.acceptance.fixtures.edxnotes import EdxNotesFixture, Note, Range
 from flaky import flaky
 
 
@@ -122,7 +122,7 @@ class EdxNotesTestMixin(UniqueCourseTest):
         self.edxnotes_fixture.install()
 
 
-@attr('shard_4')
+@attr(shard=4)
 class EdxNotesDefaultInteractionsTest(EdxNotesTestMixin):
     """
     Tests for creation, editing, deleting annotations inside annotatable components in LMS.
@@ -338,7 +338,7 @@ class EdxNotesDefaultInteractionsTest(EdxNotesTestMixin):
             self.assertTrue(note.has_sr_label(1, 3, "Tags (space-separated)"))
 
 
-@attr('shard_4')
+@attr(shard=4)
 class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
     """
     Tests for Notes page.
@@ -842,7 +842,6 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
 
         self.assert_viewed_event('Tags')
 
-    @flaky  # TNL-4590
     def test_easy_access_from_notes_page(self):
         """
         Scenario: Ensure that the link to the Unit works correctly.
@@ -874,27 +873,22 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
 
         self._add_default_notes()
         self.notes_page.visit()
-        # visiting the page results in an ajax request to fetch the notes
-        self.notes_page.wait_for_ajax()
         note = self.notes_page.notes[0]
         assert_page(note, self.raw_note_list[4]['usage_id'], "Recent Activity")
 
-        self.notes_page.visit().switch_to_tab("structure")
-        # visiting the page results in an ajax request to fetch the notes
-        self.notes_page.wait_for_ajax()
+        self.notes_page.visit()
+        self.notes_page.switch_to_tab("structure")
         note = self.notes_page.notes[1]
         assert_page(note, self.raw_note_list[2]['usage_id'], "Location in Course")
 
-        self.notes_page.visit().switch_to_tab("tags")
-        # visiting the page results in an ajax request to fetch the notes
-        self.notes_page.wait_for_ajax()
+        self.notes_page.visit()
+        self.notes_page.switch_to_tab("tags")
         note = self.notes_page.notes[0]
         assert_page(note, self.raw_note_list[2]['usage_id'], "Tags")
 
-        self.notes_page.visit().search("Fifth")
-        # visiting the page results in an ajax request to fetch the notes
+        self.notes_page.visit()
+        self.notes_page.search("Fifth")
         self.notes_page.wait_for_ajax()
-
         note = self.notes_page.notes[0]
         assert_page(note, self.raw_note_list[4]['usage_id'], "Search Results")
 
@@ -1410,7 +1404,7 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         )
 
 
-@attr('shard_4')
+@attr(shard=4)
 class EdxNotesToggleSingleNoteTest(EdxNotesTestMixin):
     """
     Tests for toggling single annotation.
@@ -1479,7 +1473,7 @@ class EdxNotesToggleSingleNoteTest(EdxNotesTestMixin):
         self.assertTrue(note_2.is_visible)
 
 
-@attr('shard_4')
+@attr(shard=4)
 class EdxNotesToggleNotesTest(EdxNotesTestMixin):
     """
     Tests for toggling visibility of all notes.

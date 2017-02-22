@@ -9,6 +9,7 @@ from django.test.utils import override_settings
 from django.conf import settings
 import ddt
 import copy
+from mock import patch
 
 from openedx.core.djangoapps.content.course_structures.tests import SignalDisconnectTestMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -38,6 +39,14 @@ class ContentStoreImportTest(SignalDisconnectTestMixin, ModuleStoreTestCase):
 
         self.client = Client()
         self.client.login(username=self.user.username, password=self.user_password)
+
+        # block_structure.update_course_in_cache cannot succeed in tests, as it needs to be run async on an lms worker
+        self.task_patcher = patch('openedx.core.djangoapps.content.block_structure.tasks.update_course_in_cache')
+        self._mock_lms_task = self.task_patcher.start()
+
+    def tearDown(self):
+        self.task_patcher.stop()
+        super(ContentStoreImportTest, self).tearDown()
 
     def load_test_import_course(self, target_id=None, create_if_not_present=True, module_store=None):
         '''

@@ -1,10 +1,10 @@
 <li class="actions-item">
-    <a href="javascript:void(0)" class="action-button action-follow" role="checkbox" aria-checked="false">
+    <button class="btn-link action-button action-follow" role="checkbox" aria-checked="false">
         <span class="sr"><%- gettext("Follow") %></span>
         <span class="action-label" aria-hidden="true">
             <span class="label-unchecked"><%- gettext("Follow") %></span>
             <span class="label-checked"><%- gettext("Unfollow") %></span>
         </span>
         <span class="action-icon"><span class="icon fa fa-star" aria-hidden="true"></span></span>
-    </a>
+    </button>
 </li>

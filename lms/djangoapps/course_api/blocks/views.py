@@ -30,7 +30,7 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
         GET /api/courses/v1/blocks/<usage_id>/?
             username=anjali
             &depth=all
-            &requested_fields=graded,format,student_view_multi_device,lti_url
+            &requested_fields=graded,format,student_view_multi_device,lti_url,due
             &block_counts=video
             &student_view_data=video
             &block_types_filter=problem,html
@@ -170,6 +170,8 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
           * lti_url: The block URL for an LTI consumer. Returned only if the
             "ENABLE_LTI_PROVIDER" Django settign is set to "True".
 
+          * due: The due date of the block. Returned only if "due" is included
+            in the "requested_fields" parameter.
     """
 
     def list(self, request, usage_key_string):  # pylint: disable=arguments-differ

@@ -5,7 +5,7 @@ from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestDraftModuleStore(TestCase):
     """
     Test the draft modulestore

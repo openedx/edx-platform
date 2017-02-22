@@ -1,8 +1,7 @@
 // Karma config for lms-coffee suite.
 // Docs and troubleshooting tips in common/static/common/js/karma.common.conf.js
 
-/* jshint node: true */
-/*jshint -W079 */
+/* eslint-env node */
 'use strict';
 var path = require('path');
 var configModule = require(path.join(__dirname, '../../common/static/common/js/karma.common.conf.js'));
@@ -14,7 +13,7 @@ var options = {
 
     // Avoid adding files to this list. Use RequireJS.
     libraryFilesToInclude: [
-        {pattern: 'xmodule_js/common_static/js/vendor/requirejs/require.js', included: true},
+        {pattern: 'common/js/vendor/require.js', included: true},
         {pattern: 'js/RequireJS-namespace-undefine.js', included: true},
 
         {pattern: 'common/js/vendor/jquery.js', included: true},
@@ -22,8 +21,6 @@ var options = {
         {pattern: 'xmodule_js/common_static/js/vendor/jquery.event.drag-2.2.js', included: true},
         {pattern: 'xmodule_js/common_static/js/vendor/slick.core.js', included: true},
         {pattern: 'xmodule_js/common_static/js/vendor/slick.grid.js', included: true},
-
-        {pattern: 'xmodule_js/common_static/js/vendor/requirejs/require.js', included: true},
 
         {pattern: 'xmodule_js/common_static/coffee/src/ajax_prefix.js', included: true},
         {pattern: 'common/js/vendor/jquery.js', included: true},
@@ -68,6 +65,6 @@ var options = {
     ]
 };
 
-module.exports = function (config) {
+module.exports = function(config) {
     configModule.configure(config, options);
 };

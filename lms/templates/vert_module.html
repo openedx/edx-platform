@@ -1,4 +1,8 @@
 <%page expression_filter="h"/>
+<%! from openedx.core.djangolib.markup import HTML %>
+%if unit_title:
+  <h3 class="unit-title">${unit_title}</h3>
+% endif
 
 % if show_bookmark_button:
     <%include file='bookmark_button.html' args="bookmark_id=bookmark_id, is_bookmarked=bookmarked"/>
@@ -7,7 +11,7 @@
 <div class="vert-mod">
 % for idx, item in enumerate(items):
   <div class="vert vert-${idx}" data-id="${item['id']}">
-    ${item['content'] | n, unicode}
+    ${HTML(item['content'])}
   </div>
 % endfor
 </div>

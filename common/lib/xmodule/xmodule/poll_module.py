@@ -13,6 +13,7 @@ from copy import deepcopy
 from collections import OrderedDict
 
 from lxml import etree
+from openedx.core.djangolib.markup import Text
 from pkg_resources import resource_string
 
 from xmodule.x_module import XModule
@@ -41,8 +42,8 @@ class PollFields(object):
 class PollModule(PollFields, XModule):
     """Poll Module"""
     js = {
-        'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee')],
         'js': [
+            resource_string(__name__, 'js/src/javascript_loader.js'),
             resource_string(__name__, 'js/src/poll/poll.js'),
             resource_string(__name__, 'js/src/poll/poll_main.js')
         ]
@@ -195,9 +196,11 @@ class PollDescriptor(PollFields, MakoModuleDescriptor, XmlDescriptor):
         xml_object.set('display_name', self.display_name)
 
         def add_child(xml_obj, answer):
+            # Escape answer text before adding to xml tree.
+            answer_text = unicode(Text(answer['text']))
             child_str = u'<{tag_name} id="{id}">{text}</{tag_name}>'.format(
                 tag_name=self._child_tag_name, id=answer['id'],
-                text=answer['text'])
+                text=answer_text)
             child_node = etree.fromstring(child_str)
             xml_object.append(child_node)
 

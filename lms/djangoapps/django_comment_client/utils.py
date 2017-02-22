@@ -14,11 +14,11 @@ import pystache_custom as pystache
 from opaque_keys.edx.locations import i4xEncoder
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
-from lms.djangoapps.ccx.overrides import get_current_ccx
 
 from django_comment_common.models import Role, FORUM_ROLE_STUDENT
 from django_comment_client.permissions import check_permissions_by_view, has_permission, get_team
 from django_comment_client.settings import MAX_COMMENT_DEPTH
+from django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
 from edxmako import lookup_template
 
 from courseware import courses
@@ -28,6 +28,7 @@ from openedx.core.djangoapps.course_groups.cohorts import (
     get_course_cohort_settings, get_cohort_by_id, get_cohort_id, is_course_cohorted
 )
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
+from request_cache.middleware import request_cached
 
 
 log = logging.getLogger(__name__)
@@ -155,17 +156,19 @@ class DiscussionIdMapIsNotCached(Exception):
     pass
 
 
-def get_cached_discussion_key(course, discussion_id):
+@request_cached
+def get_cached_discussion_key(course_id, discussion_id):
     """
     Returns the usage key of the discussion xblock associated with discussion_id if it is cached. If the discussion id
     map is cached but does not contain discussion_id, returns None. If the discussion id map is not cached for course,
     raises a DiscussionIdMapIsNotCached exception.
     """
     try:
-        cached_mapping = CourseStructure.objects.get(course_id=course.id).discussion_id_map
-        if not cached_mapping:
+        mapping = CourseStructure.objects.get(course_id=course_id).discussion_id_map
+        if not mapping:
             raise DiscussionIdMapIsNotCached()
-        return cached_mapping.get(discussion_id)
+
+        return mapping.get(discussion_id)
     except CourseStructure.DoesNotExist:
         raise DiscussionIdMapIsNotCached()
 
@@ -178,7 +181,7 @@ def get_cached_discussion_id_map(course, discussion_ids, user):
     try:
         entries = []
         for discussion_id in discussion_ids:
-            key = get_cached_discussion_key(course, discussion_id)
+            key = get_cached_discussion_key(course.id, discussion_id)
             if not key:
                 continue
             xblock = modulestore().get_item(key)
@@ -219,10 +222,10 @@ def _filter_unstarted_categories(category_map, course):
         filtered_map["entries"] = {}
         filtered_map["subcategories"] = {}
 
-        for child in unfiltered_map["children"]:
-            if child in unfiltered_map["entries"]:
+        for child, c_type in unfiltered_map["children"]:
+            if child in unfiltered_map["entries"] and c_type == TYPE_ENTRY:
                 if course.self_paced or unfiltered_map["entries"][child]["start_date"] <= now:
-                    filtered_map["children"].append(child)
+                    filtered_map["children"].append((child, c_type))
                     filtered_map["entries"][child] = {}
                     for key in unfiltered_map["entries"][child]:
                         if key != "start_date":
@@ -231,7 +234,7 @@ def _filter_unstarted_categories(category_map, course):
                     log.debug(u"Filtering out:%s with start_date: %s", child, unfiltered_map["entries"][child]["start_date"])
             else:
                 if course.self_paced or unfiltered_map["subcategories"][child]["start_date"] < now:
-                    filtered_map["children"].append(child)
+                    filtered_map["children"].append((child, c_type))
                     filtered_map["subcategories"][child] = {}
                     unfiltered_queue.append(unfiltered_map["subcategories"][child])
                     filtered_queue.append(filtered_map["subcategories"][child])
@@ -247,11 +250,11 @@ def _sort_map_entries(category_map, sort_alpha):
     for title, entry in category_map["entries"].items():
         if entry["sort_key"] is None and sort_alpha:
             entry["sort_key"] = title
-        things.append((title, entry))
+        things.append((title, entry, TYPE_ENTRY))
     for title, category in category_map["subcategories"].items():
-        things.append((title, category))
+        things.append((title, category, TYPE_SUBCATEGORY))
         _sort_map_entries(category_map["subcategories"][title], sort_alpha)
-    category_map["children"] = [x[0] for x in sorted(things, key=lambda x: x[1]["sort_key"])]
+    category_map["children"] = [(x[0], x[2]) for x in sorted(things, key=lambda x: x[1]["sort_key"])]
 
 
 def get_discussion_category_map(course, user, cohorted_if_in_list=False, exclude_unstarted=True):
@@ -274,13 +277,16 @@ def get_discussion_category_map(course, user, cohorted_if_in_list=False, exclude
         >>>                       "id": "i4x-edx-eiorguegnru-course-foobarbaz"
         >>>                   }
         >>>               },
-        >>>               "children": ["General", "Getting Started"],
+        >>>               "children": [
+        >>>                     ["General", "entry"],
+        >>>                     ["Getting Started", "subcategory"]
+        >>>               ],
         >>>               "subcategories": {
         >>>                   "Getting Started": {
         >>>                       "subcategories": {},
         >>>                       "children": [
-        >>>                           "Working with Videos",
-        >>>                           "Videos on edX"
+        >>>                           ["Working with Videos", "entry"],
+        >>>                           ["Videos on edX", "entry"]
         >>>                       ],
         >>>                       "entries": {
         >>>                           "Working with Videos": {
@@ -399,7 +405,7 @@ def discussion_category_id_access(course, user, discussion_id, xblock=None):
         return True
     try:
         if not xblock:
-            key = get_cached_discussion_key(course, discussion_id)
+            key = get_cached_discussion_key(course.id, discussion_id)
             if not key:
                 return False
             xblock = modulestore().get_item(key)
@@ -591,10 +597,10 @@ def permalink(content):
     else:
         course_id = content['course_id']
     if content['type'] == 'thread':
-        return reverse('django_comment_client.forum.views.single_thread',
+        return reverse('discussion.views.single_thread',
                        args=[course_id, content['commentable_id'], content['id']])
     else:
-        return reverse('django_comment_client.forum.views.single_thread',
+        return reverse('discussion.views.single_thread',
                        args=[course_id, content['commentable_id'], content['thread_id']]) + '#' + content['id']
 
 
@@ -806,11 +812,8 @@ def is_commentable_cohorted(course_key, commentable_id):
 
 def is_discussion_enabled(course_id):
     """
-    Return True if Discussion is enabled for a course; else False
+    Return True if discussions are enabled; else False
     """
-    if settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
-        if get_current_ccx(course_id):
-            return False
     return settings.FEATURES.get('ENABLE_DISCUSSION_SERVICE')
 
 

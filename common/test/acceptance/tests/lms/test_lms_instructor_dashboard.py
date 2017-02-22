@@ -7,22 +7,23 @@ import ddt
 
 from nose.plugins.attrib import attr
 from bok_choy.promise import EmptyPromise
+from flaky import flaky
 
-from ..helpers import UniqueCourseTest, get_modal_alert, EventsTestMixin
-from ...pages.common.logout import LogoutPage
-from ...pages.lms.auto_auth import AutoAuthPage
-from ...pages.studio.overview import CourseOutlinePage
-from ...pages.lms.create_mode import ModeCreationPage
-from ...pages.lms.courseware import CoursewarePage
-from ...pages.lms.instructor_dashboard import InstructorDashboardPage
-from ...fixtures.course import CourseFixture, XBlockFixtureDesc
-from ...pages.lms.dashboard import DashboardPage
-from ...pages.lms.problem import ProblemPage
-from ...pages.lms.track_selection import TrackSelectionPage
-from ...pages.lms.pay_and_verify import PaymentAndVerificationFlow, FakePaymentPage
-from ...pages.lms.login_and_register import CombinedLoginAndRegisterPage
+from common.test.acceptance.tests.helpers import UniqueCourseTest, get_modal_alert, EventsTestMixin
+from common.test.acceptance.pages.common.logout import LogoutPage
+from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.studio.overview import CourseOutlinePage
+from common.test.acceptance.pages.lms.create_mode import ModeCreationPage
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage, EntranceExamAdmin
+from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
+from common.test.acceptance.pages.lms.dashboard import DashboardPage
+from common.test.acceptance.pages.lms.problem import ProblemPage
+from common.test.acceptance.pages.lms.track_selection import TrackSelectionPage
+from common.test.acceptance.pages.lms.pay_and_verify import PaymentAndVerificationFlow, FakePaymentPage
+from common.test.acceptance.pages.lms.login_and_register import CombinedLoginAndRegisterPage
 from common.test.acceptance.tests.helpers import disable_animations
-from ...fixtures.certificates import CertificateConfigFixture
+from common.test.acceptance.fixtures.certificates import CertificateConfigFixture
 
 
 class BaseInstructorDashboardTest(EventsTestMixin, UniqueCourseTest):
@@ -58,12 +59,6 @@ class LMSInstructorDashboardA11yTest(BaseInstructorDashboardTest):
         self.instructor_dashboard_page = self.visit_instructor_dashboard()
 
     def test_instructor_dashboard_a11y(self):
-        self.instructor_dashboard_page.a11y_audit.config.set_rules({
-            "ignore": [
-                'link-href',  # TODO: AC-491
-                'data-table',  # TODO: AC-491
-            ]
-        })
         self.instructor_dashboard_page.a11y_audit.check_for_accessibility_errors()
 
 
@@ -81,7 +76,6 @@ class BulkEmailTest(BaseInstructorDashboardTest):
 
     @ddt.data(["myself"], ["staff"], ["learners"], ["myself", "staff", "learners"])
     def test_email_queued_for_sending(self, recipient):
-        self.assertTrue(self.send_email_page.is_browser_on_page())
         self.send_email_page.send_message(recipient)
         self.send_email_page.verify_message_queued_successfully()
 
@@ -95,14 +89,13 @@ class BulkEmailTest(BaseInstructorDashboardTest):
         ])
         self.send_email_page.a11y_audit.config.set_rules({
             "ignore": [
-                'button-name',  # TinyMCE button is missing accessible text
-                'color-contrast',  # TODO: AC-491
+                'button-name',  # TODO: TNL-5830
             ]
         })
         self.send_email_page.a11y_audit.check_for_accessibility_errors()
 
 
-@attr('shard_7')
+@attr(shard=10)
 class AutoEnrollmentWithCSVTest(BaseInstructorDashboardTest):
     """
     End-to-end tests for Auto-Registration and enrollment functionality via CSV file.
@@ -220,7 +213,7 @@ class AutoEnrollmentWithCSVTest(BaseInstructorDashboardTest):
         self.auto_enroll_section.a11y_audit.check_for_accessibility_errors()
 
 
-@attr('shard_7')
+@attr(shard=10)
 class ProctoredExamsTest(BaseInstructorDashboardTest):
     """
     End-to-end tests for Proctoring Sections of the Instructor Dashboard.
@@ -384,6 +377,7 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         # Then, the added record should be visible
         self.assertTrue(allowance_section.is_allowance_record_visible)
 
+    @flaky  # TNL-5832
     def test_can_reset_attempts(self):
         """
         Make sure that Exam attempts are visible and can be reset.
@@ -409,11 +403,18 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         self.assertFalse(exam_attempts_section.is_student_attempt_visible)
 
 
-@attr('shard_7')
+@attr(shard=10)
+@ddt.ddt
 class EntranceExamGradeTest(BaseInstructorDashboardTest):
     """
     Tests for Entrance exam specific student grading tasks.
     """
+    admin_buttons = (
+        'reset_attempts_button',
+        'rescore_button',
+        'rescore_if_higher_button',
+        'delete_state_button',
+    )
 
     def setUp(self):
         super(EntranceExamGradeTest, self).setUp()
@@ -433,7 +434,7 @@ class EntranceExamGradeTest(BaseInstructorDashboardTest):
 
         # go to the student admin page on the instructor dashboard
         self.log_in_as_instructor()
-        self.student_admin_section = self.visit_instructor_dashboard().select_student_admin()
+        self.entrance_exam_admin = self.visit_instructor_dashboard().select_student_admin(EntranceExamAdmin)
 
     def test_input_text_and_buttons_are_visible(self):
         """
@@ -444,86 +445,57 @@ class EntranceExamGradeTest(BaseInstructorDashboardTest):
             Then I see Student Email input box, Reset Student Attempt, Rescore Student Submission,
             Delete Student State for entrance exam and Show Background Task History for Student buttons
         """
-        self.assertTrue(self.student_admin_section.is_student_email_input_visible())
-        self.assertTrue(self.student_admin_section.is_reset_attempts_button_visible())
-        self.assertTrue(self.student_admin_section.is_rescore_submission_button_visible())
-        self.assertTrue(self.student_admin_section.is_delete_student_state_button_visible())
-        self.assertTrue(self.student_admin_section.is_background_task_history_button_visible())
+        self.assertTrue(self.entrance_exam_admin.are_all_buttons_visible())
 
-    def test_clicking_reset_student_attempts_button_without_email_shows_error(self):
+    @ddt.data(*admin_buttons)
+    def test_admin_button_without_email_shows_error(self, button_to_test):
         """
-        Scenario: Clicking on the Reset Student Attempts button without entering student email
+        Scenario: Clicking on the requested button without entering student email
         address or username results in error.
             Given that I am on the Student Admin tab on the Instructor Dashboard
-            When I click the Reset Student Attempts Button  under Entrance Exam Grade
+            When I click the requested button under Entrance Exam Grade
             Adjustment without enter an email address
             Then I should be shown an Error Notification
             And The Notification message should read 'Please enter a student email address or username.'
         """
-        self.student_admin_section.click_reset_attempts_button()
+        getattr(self.entrance_exam_admin, button_to_test).click()
         self.assertEqual(
             'Please enter a student email address or username.',
-            self.student_admin_section.top_notification.text[0]
+            self.entrance_exam_admin.top_notification.text[0]
         )
 
-    def test_clicking_reset_student_attempts_button_with_success(self):
+    @ddt.data(*admin_buttons)
+    def test_admin_button_with_success(self, button_to_test):
         """
-        Scenario: Clicking on the Reset Student Attempts button with valid student email
+        Scenario: Clicking on the requested button with valid student email
         address or username should result in success prompt.
             Given that I am on the Student Admin tab on the Instructor Dashboard
-            When I click the Reset Student Attempts Button under Entrance Exam Grade
+            When I click the requested button under Entrance Exam Grade
             Adjustment after entering a valid student
             email address or username
             Then I should be shown an alert with success message
         """
-        self.student_admin_section.set_student_email(self.student_identifier)
-        self.student_admin_section.click_reset_attempts_button()
-        alert = get_modal_alert(self.student_admin_section.browser)
+        self.entrance_exam_admin.set_student_email_or_username(self.student_identifier)
+        getattr(self.entrance_exam_admin, button_to_test).click()
+        alert = get_modal_alert(self.entrance_exam_admin.browser)
         alert.dismiss()
 
-    def test_clicking_reset_student_attempts_button_with_error(self):
+    @ddt.data(*admin_buttons)
+    def test_admin_button_with_error(self, button_to_test):
         """
-        Scenario: Clicking on the Reset Student Attempts button with email address or username
+        Scenario: Clicking on the requested button with email address or username
         of a non existing student should result in error message.
             Given that I am on the Student Admin tab on the Instructor Dashboard
-            When I click the Reset Student Attempts Button  under Entrance Exam Grade
+            When I click the requested Button under Entrance Exam Grade
             Adjustment after non existing student email address or username
             Then I should be shown an error message
         """
-        self.student_admin_section.set_student_email('non_existing@example.com')
-        self.student_admin_section.click_reset_attempts_button()
-        self.student_admin_section.wait_for_ajax()
-        self.assertGreater(len(self.student_admin_section.top_notification.text[0]), 0)
+        self.entrance_exam_admin.set_student_email_or_username('non_existing@example.com')
+        getattr(self.entrance_exam_admin, button_to_test).click()
+        self.entrance_exam_admin.wait_for_ajax()
+        self.assertGreater(len(self.entrance_exam_admin.top_notification.text[0]), 0)
 
-    def test_clicking_rescore_submission_button_with_success(self):
-        """
-        Scenario: Clicking on the Rescore Student Submission button with valid student email
-        address or username should result in success prompt.
-            Given that I am on the Student Admin tab on the Instructor Dashboard
-            When I click the Rescore Student Submission Button  under Entrance Exam Grade
-            Adjustment after entering a valid student email address or username
-            Then I should be shown an alert with success message
-        """
-        self.student_admin_section.set_student_email(self.student_identifier)
-        self.student_admin_section.click_rescore_submissions_button()
-        alert = get_modal_alert(self.student_admin_section.browser)
-        alert.dismiss()
-
-    def test_clicking_rescore_submission_button_with_error(self):
-        """
-        Scenario: Clicking on the Rescore Student Submission button with email address or username
-        of a non existing student should result in error message.
-            Given that I am on the Student Admin tab on the Instructor Dashboard
-            When I click the Rescore Student Submission Button under Entrance Exam Grade
-            Adjustment after non existing student email address or username
-            Then I should be shown an error message
-        """
-        self.student_admin_section.set_student_email('non_existing@example.com')
-        self.student_admin_section.click_rescore_submissions_button()
-        self.student_admin_section.wait_for_ajax()
-        self.assertGreater(len(self.student_admin_section.top_notification.text[0]), 0)
-
-    def test_clicking_skip_entrance_exam_button_with_success(self):
+    def test_skip_entrance_exam_button_with_success(self):
         """
         Scenario: Clicking on the  Let Student Skip Entrance Exam button with
         valid student email address or username should result in success prompt.
@@ -533,17 +505,18 @@ class EntranceExamGradeTest(BaseInstructorDashboardTest):
             email address or username
             Then I should be shown an alert with success message
         """
-        self.student_admin_section.set_student_email(self.student_identifier)
-        self.student_admin_section.click_skip_entrance_exam_button()
+        self.entrance_exam_admin.set_student_email_or_username(self.student_identifier)
+        self.entrance_exam_admin.skip_entrance_exam_button.click()
+
         #first we have window.confirm
-        alert = get_modal_alert(self.student_admin_section.browser)
+        alert = get_modal_alert(self.entrance_exam_admin.browser)
         alert.accept()
 
         # then we have alert confirming action
-        alert = get_modal_alert(self.student_admin_section.browser)
+        alert = get_modal_alert(self.entrance_exam_admin.browser)
         alert.dismiss()
 
-    def test_clicking_skip_entrance_exam_button_with_error(self):
+    def test_skip_entrance_exam_button_with_error(self):
         """
         Scenario: Clicking on the Let Student Skip Entrance Exam button with
         email address or username of a non existing student should result in error message.
@@ -553,47 +526,17 @@ class EntranceExamGradeTest(BaseInstructorDashboardTest):
             student email address or username
             Then I should be shown an error message
         """
-        self.student_admin_section.set_student_email('non_existing@example.com')
-        self.student_admin_section.click_skip_entrance_exam_button()
+        self.entrance_exam_admin.set_student_email_or_username('non_existing@example.com')
+        self.entrance_exam_admin.skip_entrance_exam_button.click()
+
         #first we have window.confirm
-        alert = get_modal_alert(self.student_admin_section.browser)
+        alert = get_modal_alert(self.entrance_exam_admin.browser)
         alert.accept()
 
-        self.student_admin_section.wait_for_ajax()
-        self.assertGreater(len(self.student_admin_section.top_notification.text[0]), 0)
+        self.entrance_exam_admin.wait_for_ajax()
+        self.assertGreater(len(self.entrance_exam_admin.top_notification.text[0]), 0)
 
-    def test_clicking_delete_student_attempts_button_with_success(self):
-        """
-        Scenario: Clicking on the Delete Student State for entrance exam button
-        with valid student email address or username should result in success prompt.
-            Given that I am on the Student Admin tab on the Instructor Dashboard
-            When I click the Delete Student State for entrance exam Button
-            under Entrance Exam Grade Adjustment after entering a valid student
-            email address or username
-            Then I should be shown an alert with success message
-        """
-        self.student_admin_section.set_student_email(self.student_identifier)
-        self.student_admin_section.click_delete_student_state_button()
-        alert = get_modal_alert(self.student_admin_section.browser)
-        alert.dismiss()
-
-    def test_clicking_delete_student_attempts_button_with_error(self):
-        """
-        Scenario: Clicking on the Delete Student State for entrance exam button
-        with email address or username of a non existing student should result
-        in error message.
-            Given that I am on the Student Admin tab on the Instructor Dashboard
-            When I click the Delete Student State for entrance exam Button
-            under Entrance Exam Grade Adjustment after non existing student
-            email address or username
-            Then I should be shown an error message
-        """
-        self.student_admin_section.set_student_email('non_existing@example.com')
-        self.student_admin_section.click_delete_student_state_button()
-        self.student_admin_section.wait_for_ajax()
-        self.assertGreater(len(self.student_admin_section.top_notification.text[0]), 0)
-
-    def test_clicking_task_history_button_with_success(self):
+    def test_task_history_button_with_success(self):
         """
         Scenario: Clicking on the Show Background Task History for Student
         with valid student email address or username should result in table of tasks.
@@ -601,14 +544,14 @@ class EntranceExamGradeTest(BaseInstructorDashboardTest):
             When I click the Show Background Task History for Student Button
             under Entrance Exam Grade Adjustment after entering a valid student
             email address or username
-            Then I should be shown an table listing all background tasks
+            Then I should be shown a table listing all background tasks
         """
-        self.student_admin_section.set_student_email(self.student_identifier)
-        self.student_admin_section.click_task_history_button()
-        self.assertTrue(self.student_admin_section.is_background_task_history_table_visible())
+        self.entrance_exam_admin.set_student_email_or_username(self.student_identifier)
+        self.entrance_exam_admin.task_history_button.click()
+        self.entrance_exam_admin.wait_for_task_history_table()
 
 
-@attr('shard_7')
+@attr(shard=10)
 class DataDownloadsTest(BaseInstructorDashboardTest):
     """
     Bok Choy tests for the "Data Downloads" tab.
@@ -726,7 +669,7 @@ class DataDownloadsTest(BaseInstructorDashboardTest):
         self.data_download_section.a11y_audit.check_for_accessibility_errors()
 
 
-@attr('shard_7')
+@attr(shard=10)
 @ddt.ddt
 class CertificatesTest(BaseInstructorDashboardTest):
     """
@@ -1049,20 +992,10 @@ class CertificatesTest(BaseInstructorDashboardTest):
         self.certificates_section.a11y_audit.config.set_scope([
             '.certificates-wrapper'
         ])
-        self.certificates_section.a11y_audit.config.set_rules({
-            "ignore": [
-                'aria-valid-attr-value',  # TODO: AC-491
-                'checkboxgroup',  # TODO: AC-491
-                'color-contrast',  # TODO: AC-491
-                'duplicate-id',  # TODO: AC-491
-                'label',  # TODO: AC-491
-                'radiogroup',  # TODO: AC-491
-            ]
-        })
         self.certificates_section.a11y_audit.check_for_accessibility_errors()
 
 
-@attr('shard_7')
+@attr(shard=10)
 class CertificateInvalidationTest(BaseInstructorDashboardTest):
     """
     Tests for Certificates functionality on instructor dashboard.
@@ -1268,15 +1201,4 @@ class CertificateInvalidationTest(BaseInstructorDashboardTest):
         self.certificates_section.a11y_audit.config.set_scope([
             '.certificates-wrapper'
         ])
-        self.certificates_section.a11y_audit.config.set_rules({
-            "ignore": [
-                'data-table',  # TODO: AC-491
-                'aria-valid-attr-value',  # TODO: AC-491
-                'checkboxgroup',  # TODO: AC-491
-                'color-contrast',  # TODO: AC-491
-                'duplicate-id',  # TODO: AC-491
-                'label',  # TODO: AC-491
-                'radiogroup',  # TODO: AC-491
-            ]
-        })
         self.certificates_section.a11y_audit.check_for_accessibility_errors()

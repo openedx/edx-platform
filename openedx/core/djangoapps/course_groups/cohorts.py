@@ -13,7 +13,7 @@ from django.utils.translation import ugettext as _
 
 from courseware import courses
 from eventtracking import tracker
-from request_cache.middleware import RequestCache
+from request_cache.middleware import RequestCache, request_cached
 from student.models import get_user_by_username_or_email
 
 from .models import (
@@ -485,6 +485,7 @@ def set_course_cohort_settings(course_key, **kwargs):
     return course_cohort_settings
 
 
+@request_cached
 def get_course_cohort_settings(course_key):
     """
     Return cohort settings for a course.

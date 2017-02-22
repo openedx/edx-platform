@@ -14,9 +14,9 @@ from django.test.utils import override_settings
 from edxmako.shortcuts import render_to_response
 
 from courseware.tabs import get_course_tab_list
-from courseware.tests.factories import UserFactory, StudentModuleFactory
+from courseware.tests.factories import UserFactory, StudentModuleFactory, StaffFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from instructor.views.gradebook_api import calculate_page_info
+from lms.djangoapps.instructor.views.gradebook_api import calculate_page_info
 
 from common.test.utils import XssTestMixin
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory
@@ -43,7 +43,7 @@ def intercept_renderer(path, context):
     return response
 
 
-@attr('shard_3')
+@attr(shard=3)
 @ddt.ddt
 class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssTestMixin):
     """
@@ -100,8 +100,29 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
             return len([tab for tab in tabs if tab.name == 'Instructor']) == 1
 
         self.assertTrue(has_instructor_tab(self.instructor, self.course))
+
+        staff = StaffFactory(course_key=self.course.id)
+        self.assertTrue(has_instructor_tab(staff, self.course))
+
         student = UserFactory.create()
         self.assertFalse(has_instructor_tab(student, self.course))
+
+    def test_student_admin_staff_instructor(self):
+        """
+        Verify that staff users are not able to see course-wide options, while still
+        seeing individual learner options.
+        """
+        # Original (instructor) user can see both specific grades, and course-wide grade adjustment tools
+        response = self.client.get(self.url)
+        self.assertIn('<h4 class="hd hd-4">Adjust all enrolled learners', response.content)
+        self.assertIn('<h4 class="hd hd-4">View a specific learner&#39;s grades and progress', response.content)
+
+        # But staff user can only see specific grades
+        staff = StaffFactory(course_key=self.course.id)
+        self.client.login(username=staff.username, password="test")
+        response = self.client.get(self.url)
+        self.assertNotIn('<h4 class="hd hd-4">Adjust all enrolled learners', response.content)
+        self.assertIn('<h4 class="hd hd-4">View a specific learner&#39;s grades and progress', response.content)
 
     def test_default_currency_in_the_html_response(self):
         """
@@ -110,7 +131,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
         total_amount = PaidCourseRegistration.get_total_amount_of_purchased_item(self.course.id)
         response = self.client.get(self.url)
-        self.assertTrue('${amount}'.format(amount=total_amount) in response.content)
+        self.assertIn('${amount}'.format(amount=total_amount), response.content)
 
     def test_course_name_xss(self):
         """Test that the instructor dashboard correctly escapes course names
@@ -149,13 +170,13 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
 
         # enrollment information visible
         self.assertIn('<h3 class="hd hd-3">Enrollment Information</h3>', response.content)
-        self.assertTrue('<td>Verified</td>' in response.content)
-        self.assertTrue('<td>Audit</td>' in response.content)
-        self.assertTrue('<td>Honor</td>' in response.content)
-        self.assertTrue('<td>Professional</td>' in response.content)
+        self.assertIn('<th scope="row">Verified</th>', response.content)
+        self.assertIn('<th scope="row">Audit</th>', response.content)
+        self.assertIn('<th scope="row">Honor</th>', response.content)
+        self.assertIn('<th scope="row">Professional</th>', response.content)
 
         # dashboard link hidden
-        self.assertFalse(self.get_dashboard_enrollment_message() in response.content)
+        self.assertNotIn(self.get_dashboard_enrollment_message(), response.content)
 
     @patch.dict(settings.FEATURES, {'DISPLAY_ANALYTICS_ENROLLMENTS': True})
     @override_settings(ANALYTICS_DASHBOARD_URL='')
@@ -166,11 +187,10 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         users = [UserFactory() for _ in range(2)]
         CourseEnrollment.enroll(users[0], self.course.id, mode="professional")
         CourseEnrollment.enroll(users[1], self.course.id, mode="no-id-professional")
-
         response = self.client.get(self.url)
 
         # Check that the number of professional enrollments is two
-        self.assertContains(response, "<td>Professional</td><td>2</td>")
+        self.assertContains(response, '<th scope="row">Professional</th><td>2</td>')
 
     @patch.dict(settings.FEATURES, {'DISPLAY_ANALYTICS_ENROLLMENTS': False})
     @override_settings(ANALYTICS_DASHBOARD_URL='http://example.com')
@@ -182,14 +202,14 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         response = self.client.get(self.url)
 
         # enrollment information hidden
-        self.assertFalse('<td>Verified</td>' in response.content)
-        self.assertFalse('<td>Audit</td>' in response.content)
-        self.assertFalse('<td>Honor</td>' in response.content)
-        self.assertFalse('<td>Professional</td>' in response.content)
+        self.assertNotIn('<th scope="row">Verified</th>', response.content)
+        self.assertNotIn('<th scope="row">Audit</th>', response.content)
+        self.assertNotIn('<th scope="row">Honor</th>', response.content)
+        self.assertNotIn('<th scope="row">Professional</th>', response.content)
 
         # link to dashboard shown
         expected_message = self.get_dashboard_enrollment_message()
-        self.assertTrue(expected_message in response.content)
+        self.assertIn(expected_message, response.content)
 
     @override_settings(ANALYTICS_DASHBOARD_URL='')
     @override_settings(ANALYTICS_DASHBOARD_NAME='')
@@ -199,7 +219,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         """
         response = self.client.get(self.url)
         analytics_section = '<li class="nav-item"><a href="" data-section="instructor_analytics">Analytics</a></li>'
-        self.assertFalse(analytics_section in response.content)
+        self.assertNotIn(analytics_section, response.content)
 
     @override_settings(ANALYTICS_DASHBOARD_URL='http://example.com')
     @override_settings(ANALYTICS_DASHBOARD_NAME='Example')
@@ -208,12 +228,12 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         Test analytics dashboard message is shown
         """
         response = self.client.get(self.url)
-        analytics_section = '<li class="nav-item"><a href="" data-section="instructor_analytics">Analytics</a></li>'
-        self.assertTrue(analytics_section in response.content)
+        analytics_section = '<li class="nav-item"><button type="button" class="btn-link" data-section="instructor_analytics">Analytics</button></li>'  # pylint: disable=line-too-long
+        self.assertIn(analytics_section, response.content)
 
         # link to dashboard shown
         expected_message = self.get_dashboard_analytics_message()
-        self.assertTrue(expected_message in response.content)
+        self.assertIn(expected_message, response.content)
 
     def add_course_to_user_cart(self, cart, course_key):
         """
@@ -276,7 +296,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         response = self.client.get(self.url)
         self.assertIn('D: 0.5, C: 0.57, B: 0.63, A: 0.75', response.content)
 
-    @patch('instructor.views.gradebook_api.MAX_STUDENTS_PER_PAGE_GRADE_BOOK', 2)
+    @patch('lms.djangoapps.instructor.views.gradebook_api.MAX_STUDENTS_PER_PAGE_GRADE_BOOK', 2)
     def test_calculate_page_info(self):
         page = calculate_page_info(offset=0, total_students=2)
         self.assertEqual(page["offset"], 0)
@@ -285,8 +305,8 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         self.assertEqual(page["previous_offset"], None)
         self.assertEqual(page["total_pages"], 1)
 
-    @patch('instructor.views.gradebook_api.render_to_response', intercept_renderer)
-    @patch('instructor.views.gradebook_api.MAX_STUDENTS_PER_PAGE_GRADE_BOOK', 1)
+    @patch('lms.djangoapps.instructor.views.gradebook_api.render_to_response', intercept_renderer)
+    @patch('lms.djangoapps.instructor.views.gradebook_api.MAX_STUDENTS_PER_PAGE_GRADE_BOOK', 1)
     def test_spoc_gradebook_pages(self):
         for i in xrange(2):
             username = "user_%d" % i

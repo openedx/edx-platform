@@ -1,30 +1,33 @@
-;(function(require, define) {
+/* globals _, requirejs */
+/* eslint-disable quote-props */
+
+(function(require, define) {
     'use strict';
+
+    var defineDependency;
 
     // We do not wish to bundle common libraries (that may also be used by non-RequireJS code on the page
     // into the optimized files. Therefore load these libraries through script tags and explicitly define them.
     // Note that when the optimizer executes this code, window will not be defined.
     if (window) {
-        var defineDependency = function (globalName, name, noShim) {
-            var getGlobalValue = function(name) {
-                var globalNamePath = name.split('.'),
-                    result = window,
-                    i;
-                for (i = 0; i < globalNamePath.length; i++) {
-                    result = result[globalNamePath[i]];
-                }
-                return result;
-            },
-                globalValue = getGlobalValue(globalName);
+        defineDependency = function(globalName, name, noShim) {
+            var getGlobalValue = function() {
+                    var globalNamePath = globalName.split('.'),
+                        result = window,
+                        i;
+                    for (i = 0; i < globalNamePath.length; i++) {
+                        result = result[globalNamePath[i]];
+                    }
+                    return result;
+                },
+                globalValue = getGlobalValue();
             if (globalValue) {
                 if (noShim) {
                     define(name, {});
-                }
-                else {
+                } else {
                     define(name, [], function() { return globalValue; });
                 }
-            }
-            else {
+            } else {
                 console.error('Expected library to be included on page, but not found on window object: ' + name);
             }
         };
@@ -40,8 +43,8 @@
         defineDependency('gettext', 'gettext');
         defineDependency('Logger', 'logger');
         defineDependency('URI', 'URI');
+        defineDependency('jQuery.url', 'jquery.url');
         defineDependency('Backbone', 'backbone');
-        defineDependency('Modernizr', 'modernizr');
 
         // Add the UI Toolkit helper classes that have been installed in the 'edx' namespace
         defineDependency('edx.HtmlUtils', 'edx-ui-toolkit/js/utils/html-utils');
@@ -57,8 +60,8 @@
         paths: {
             'annotator_1.2.9': 'js/vendor/edxnotes/annotator-full.min',
             'date': 'js/vendor/date',
-            'moment': 'js/vendor/moment.min',
-            'moment-with-locales': 'xmodule_js/common_static/js/vendor/moment-with-locales.min',
+            moment: 'common/js/vendor/moment-with-locales',
+            'moment-timezone': 'common/js/vendor/moment-timezone-with-data',
             'text': 'js/vendor/requirejs/text',
             'logger': 'js/src/logger',
             'backbone': 'common/js/vendor/backbone',
@@ -82,9 +85,6 @@
             'URI': 'js/vendor/URI.min',
             'string_utils': 'js/src/string_utils',
             'utility': 'js/src/utility',
-            'modernizr': 'edx-pattern-library/js/modernizr-custom',
-            'afontgarde': 'edx-pattern-library/js/afontgarde',
-            'edxicons': 'edx-pattern-library/js/edx-icons',
             'draggabilly': 'js/vendor/draggabilly',
 
             // Files needed by OVA
@@ -215,11 +215,9 @@
             'moment': {
                 exports: 'moment'
             },
-            'moment-with-locales': {
-                exports: 'moment'
-            },
-            'afontgarde': {
-                exports: 'AFontGarde'
+            'moment-timezone': {
+                exports: 'moment',
+                deps: ['moment']
             },
             // Because Draggabilly is being used by video code, the namespaced version of
             // require is not being recognized. Therefore the library is being added to the

@@ -3,15 +3,15 @@
  * It is invoked using the edit method which is passed an existing rendered xblock,
  * and upon save an optional refresh function can be invoked to update the display.
  */
-define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "common/js/components/utils/view_utils",
-    "js/models/xblock_info", "js/views/xblock_editor"],
+define(['jquery', 'underscore', 'gettext', 'js/views/modals/base_modal', 'common/js/components/utils/view_utils',
+    'js/models/xblock_info', 'js/views/xblock_editor'],
     function($, _, gettext, BaseModal, ViewUtils, XBlockInfo, XBlockEditorView) {
-        "strict mode";
+        'strict mode';
 
         var EditXBlockModal = BaseModal.extend({
             events: _.extend({}, BaseModal.prototype.events, {
-                "click .action-save": "save",
-                "click .action-modes a": "changeMode"
+                'click .action-save': 'save',
+                'click .action-modes a': 'changeMode'
             }),
 
             options: $.extend({}, BaseModal.prototype.options, {
@@ -20,7 +20,7 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "common
                 view: 'studio_view',
                 viewSpecificClasses: 'modal-editor confirm',
                 // Translators: "title" is the name of the current component being edited.
-                titleFormat: gettext("Editing: %(title)s")
+                titleFormat: gettext('Editing: %(title)s')
             }),
 
             initialize: function() {
@@ -121,7 +121,7 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "common
                 if (!displayName) {
                     displayName = gettext('Component');
                 }
-                return interpolate(this.options.titleFormat, { title: displayName }, true);
+                return interpolate(this.options.titleFormat, {title: displayName}, true);
             },
 
             addDefaultModes: function() {

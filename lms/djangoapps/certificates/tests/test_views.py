@@ -7,7 +7,6 @@ import ddt
 from django.conf import settings
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
-from django.test import TestCase
 from django.test.client import Client
 from django.test.utils import override_settings
 from nose.plugins.attrib import attr
@@ -37,7 +36,7 @@ FEATURES_WITH_CUSTOM_CERTS_ENABLED = {
 FEATURES_WITH_CUSTOM_CERTS_ENABLED.update(FEATURES_WITH_CERTS_ENABLED)
 
 
-@attr('shard_1')
+@attr(shard=1)
 @ddt.ddt
 class UpdateExampleCertificateViewTest(CacheIsolationTestCase):
     """Tests for the XQueue callback that updates example certificates. """
@@ -181,7 +180,7 @@ class UpdateExampleCertificateViewTest(CacheIsolationTestCase):
         self.assertEqual(content['return_code'], 0)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
     """
     Tests for the microsite certificates web/html views

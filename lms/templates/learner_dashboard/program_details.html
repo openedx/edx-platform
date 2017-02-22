@@ -16,6 +16,7 @@ from openedx.core.djangolib.js_utils import (
 ProgramDetailsFactory({
     programData: ${program_data | n, dump_js_escaped_json},
     urls: ${urls | n, dump_js_escaped_json},
+    userPreferences: ${user_preferences | n, dump_js_escaped_json},
 });
 </%static:require_module>
 </%block>

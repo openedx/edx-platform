@@ -33,7 +33,7 @@ from .models import (
 import logging
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.block_types import BlockTypeKeyV1
-from opaque_keys.edx.asides import AsideUsageKeyV1
+from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2
 from contracts import contract, new_contract
 
 from django.db import DatabaseError
@@ -67,6 +67,7 @@ def _all_usage_keys(descriptors, aside_types):
 
         for aside_type in aside_types:
             usage_ids.add(AsideUsageKeyV1(descriptor.scope_ids.usage_id, aside_type))
+            usage_ids.add(AsideUsageKeyV2(descriptor.scope_ids.usage_id, aside_type))
 
     return usage_ids
 
@@ -1007,3 +1008,21 @@ def set_score(user_id, usage_key, score, max_score):
         student_module.grade = score
         student_module.max_grade = max_score
         student_module.save()
+    return student_module.modified
+
+
+def get_score(user_id, usage_key):
+    """
+    Get the score and max_score for the specified user and xblock usage.
+    Returns None if not found.
+    """
+    try:
+        student_module = StudentModule.objects.get(
+            student_id=user_id,
+            module_state_key=usage_key,
+            course_id=usage_key.course_key,
+        )
+    except StudentModule.DoesNotExist:
+        return None
+    else:
+        return student_module

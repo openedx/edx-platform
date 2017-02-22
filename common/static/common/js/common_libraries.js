@@ -1,13 +1,13 @@
 define([
-        'edx-ui-toolkit/js/utils/string-utils',
-        'edx-ui-toolkit/js/utils/html-utils',
-        'domReady!',
-        'jquery',
-        'jquery-migrate',
-        'backbone',
-        'underscore',
-        'gettext'
-    ],
+    'edx-ui-toolkit/js/utils/string-utils',
+    'edx-ui-toolkit/js/utils/html-utils',
+    'domReady!',
+    'jquery',
+    'jquery-migrate',
+    'backbone',
+    'underscore',
+    'gettext'
+],
     function(StringUtils, HtmlUtils) {
         'use strict';
 

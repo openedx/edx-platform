@@ -21,6 +21,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.tests.factories import ItemFactory
+from lms.djangoapps.django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
 
 from ..models import CourseUserGroup, CourseCohort
 from ..views import (
@@ -36,7 +37,7 @@ from .helpers import (
 )
 
 
-@attr('shard_2')
+@attr(shard=2)
 class CohortViewsTestCase(ModuleStoreTestCase):
     """
     Base class which sets up a course and staff/non-staff users.
@@ -176,7 +177,7 @@ class CohortViewsTestCase(ModuleStoreTestCase):
         return json.loads(response.content)
 
 
-@attr('shard_2')
+@attr(shard=2)
 class CourseCohortSettingsHandlerTestCase(CohortViewsTestCase):
     """
     Tests the `course_cohort_settings_handler` view.
@@ -326,7 +327,7 @@ class CourseCohortSettingsHandlerTestCase(CohortViewsTestCase):
         )
 
 
-@attr('shard_2')
+@attr(shard=2)
 class CohortHandlerTestCase(CohortViewsTestCase):
     """
     Tests the `cohort_handler` view.
@@ -679,7 +680,7 @@ class CohortHandlerTestCase(CohortViewsTestCase):
         )
 
 
-@attr('shard_2')
+@attr(shard=2)
 class UsersInCohortTestCase(CohortViewsTestCase):
     """
     Tests the `users_in_cohort` view.
@@ -812,7 +813,7 @@ class UsersInCohortTestCase(CohortViewsTestCase):
         self.request_users_in_cohort(cohort, self.course, -1, should_return_bad_request=True)
 
 
-@attr('shard_2')
+@attr(shard=2)
 class AddUsersToCohortTestCase(CohortViewsTestCase):
     """
     Tests the `add_users_to_cohort` view.
@@ -1111,7 +1112,7 @@ class AddUsersToCohortTestCase(CohortViewsTestCase):
         )
 
 
-@attr('shard_2')
+@attr(shard=2)
 class RemoveUserFromCohortTestCase(CohortViewsTestCase):
     """
     Tests the `remove_user_from_cohort` view.
@@ -1205,7 +1206,7 @@ class RemoveUserFromCohortTestCase(CohortViewsTestCase):
         self.verify_removed_user_from_cohort(user.username, response_dict, cohort)
 
 
-@attr('shard_2')
+@attr(shard=2)
 @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Tests only valid in LMS')
 class CourseCohortDiscussionTopicsTestCase(CohortViewsTestCase):
     """
@@ -1229,7 +1230,7 @@ class CourseCohortDiscussionTopicsTestCase(CohortViewsTestCase):
         start_date = response['inline_discussions']['subcategories']['Chapter']['start_date']
         expected_response = {
             "course_wide_discussions": {
-                'children': ['Topic B'],
+                'children': [['Topic B', TYPE_ENTRY]],
                 'entries': {
                     'Topic B': {
                         'sort_key': 'A',
@@ -1243,7 +1244,7 @@ class CourseCohortDiscussionTopicsTestCase(CohortViewsTestCase):
                 'subcategories': {
                     'Chapter': {
                         'subcategories': {},
-                        'children': ['Discussion'],
+                        'children': [['Discussion', TYPE_ENTRY]],
                         'entries': {
                             'Discussion': {
                                 'sort_key': None,
@@ -1256,7 +1257,7 @@ class CourseCohortDiscussionTopicsTestCase(CohortViewsTestCase):
                         'start_date': start_date
                     }
                 },
-                'children': ['Chapter']
+                'children': [['Chapter', TYPE_SUBCATEGORY]]
             }
         }
         self.assertEqual(response, expected_response)

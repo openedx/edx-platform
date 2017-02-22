@@ -1,117 +1,150 @@
-;(function (define) {
+(function(define) {
     'use strict';
     define([
-            'jquery',
-            'underscore',
-            'gettext',
-            'js/student_account/views/FormView'
-        ],
-        function($, _, gettext, FormView) {
+        'jquery',
+        'underscore',
+        'gettext',
+        'edx-ui-toolkit/js/utils/html-utils',
+        'js/student_account/views/FormView',
+        'text!templates/student_account/form_success.underscore',
+        'text!templates/student_account/form_status.underscore'
+    ],
+        function($, _, gettext, HtmlUtils, FormView, formSuccessTpl, formStatusTpl) {
+            return FormView.extend({
+                el: '#login-form',
+                tpl: '#login-tpl',
+                events: {
+                    'click .js-login': 'submitForm',
+                    'click .forgot-password': 'forgotPassword',
+                    'click .login-provider': 'thirdPartyAuth'
+                },
+                formType: 'login',
+                requiredStr: '',
+                submitButton: '.js-login',
+                formSuccessTpl: formSuccessTpl,
+                formStatusTpl: formStatusTpl,
+                authWarningJsHook: 'js-auth-warning',
+                passwordResetSuccessJsHook: 'js-password-reset-success',
+                defaultFormErrorsTitle: gettext('We couldn\'t sign you in.'),
 
-        return FormView.extend({
-            el: '#login-form',
-            tpl: '#login-tpl',
-            events: {
-                'click .js-login': 'submitForm',
-                'click .forgot-password': 'forgotPassword',
-                'click .login-provider': 'thirdPartyAuth'
-            },
-            formType: 'login',
-            requiredStr: '',
-            submitButton: '.js-login',
+                preRender: function(data) {
+                    this.providers = data.thirdPartyAuth.providers || [];
+                    this.hasSecondaryProviders = (
+                        data.thirdPartyAuth.secondaryProviders && data.thirdPartyAuth.secondaryProviders.length
+                    );
+                    this.currentProvider = data.thirdPartyAuth.currentProvider || '';
+                    this.errorMessage = data.thirdPartyAuth.errorMessage || '';
+                    this.platformName = data.platformName;
+                    this.resetModel = data.resetModel;
+                    this.supportURL = data.supportURL;
 
-            preRender: function( data ) {
-                this.providers = data.thirdPartyAuth.providers || [];
-                this.hasSecondaryProviders = (
-                    data.thirdPartyAuth.secondaryProviders && data.thirdPartyAuth.secondaryProviders.length
-                );
-                this.currentProvider = data.thirdPartyAuth.currentProvider || '';
-                this.errorMessage = data.thirdPartyAuth.errorMessage || '';
-                this.platformName = data.platformName;
-                this.resetModel = data.resetModel;
+                    this.listenTo(this.model, 'sync', this.saveSuccess);
+                    this.listenTo(this.resetModel, 'sync', this.resetEmail);
+                },
 
-                this.listenTo( this.model, 'sync', this.saveSuccess );
-                this.listenTo( this.resetModel, 'sync', this.resetEmail );
-            },
+                render: function(html) {
+                    var fields = html || '';
 
-            render: function( html ) {
-                var fields = html || '';
-
-                $(this.el).html(_.template(this.tpl)({
+                    $(this.el).html(_.template(this.tpl)({
                     // We pass the context object to the template so that
                     // we can perform variable interpolation using sprintf
-                    context: {
-                        fields: fields,
-                        currentProvider: this.currentProvider,
-                        errorMessage: this.errorMessage,
-                        providers: this.providers,
-                        hasSecondaryProviders: this.hasSecondaryProviders,
-                        platformName: this.platformName
+                        context: {
+                            fields: fields,
+                            currentProvider: this.currentProvider,
+                            providers: this.providers,
+                            hasSecondaryProviders: this.hasSecondaryProviders,
+                            platformName: this.platformName
+                        }
+                    }));
+
+                    this.postRender();
+
+                    return this;
+                },
+
+                postRender: function() {
+                    var formErrorsTitle;
+                    this.$container = $(this.el);
+                    this.$form = this.$container.find('form');
+                    this.$formFeedback = this.$container.find('.js-form-feedback');
+                    this.$submitButton = this.$container.find(this.submitButton);
+
+                    if (this.errorMessage) {
+                        formErrorsTitle = _.sprintf(
+                            gettext('An error occurred when signing you in to %s.'),
+                            this.platformName
+                        );
+                        this.renderErrors(formErrorsTitle, [this.errorMessage]);
+                    } else if (this.currentProvider) {
+                        /* If we're already authenticated with a third-party
+                         * provider, try logging in. The easiest way to do this
+                         * is to simply submit the form.
+                         */
+                        this.model.save();
                     }
-                }));
+                },
 
-                this.postRender();
+                forgotPassword: function(event) {
+                    event.preventDefault();
 
-                return this;
-            },
+                    this.trigger('password-help');
+                    this.clearPasswordResetSuccess();
+                },
 
-            postRender: function() {
-                this.$container = $(this.el);
+                postFormSubmission: function() {
+                    this.clearPasswordResetSuccess();
+                },
 
-                this.$form = this.$container.find('form');
-                this.$errors = this.$container.find('.submission-error');
-                this.$resetSuccess = this.$container.find('.js-reset-success');
-                this.$authError = this.$container.find('.already-authenticated-msg');
-                this.$submitButton = this.$container.find(this.submitButton);
+                resetEmail: function() {
+                    var email = $('#password-reset-email').val(),
+                        successTitle = gettext('Check Your Email'),
+                        successMessageHtml = HtmlUtils.interpolateHtml(
+                            gettext('{paragraphStart}You entered {boldStart}{email}{boldEnd}. If this email address is associated with your {platform_name} account, we will send a message with password reset instructions to this email address.{paragraphEnd}' + // eslint-disable-line max-len
+                            '{paragraphStart}If you do not receive a password reset message, verify that you entered the correct email address, or check your spam folder.{paragraphEnd}' + // eslint-disable-line max-len
+                            '{paragraphStart}If you need further assistance, {anchorStart}contact technical support{anchorEnd}.{paragraphEnd}'), { // eslint-disable-line max-len
+                                boldStart: HtmlUtils.HTML('<b>'),
+                                boldEnd: HtmlUtils.HTML('</b>'),
+                                paragraphStart: HtmlUtils.HTML('<p>'),
+                                paragraphEnd: HtmlUtils.HTML('</p>'),
+                                email: email,
+                                platform_name: this.platformName,
+                                anchorStart: HtmlUtils.HTML('<a href="' + this.supportURL + '">'),
+                                anchorEnd: HtmlUtils.HTML('</a>')
+                            }
+                        );
 
-                /* If we're already authenticated with a third-party
-                 * provider, try logging in.  The easiest way to do this
-                 * is to simply submit the form.
-                 */
-                if (this.currentProvider) {
-                    this.model.save();
-                }
-            },
+                    this.clearFormErrors();
+                    this.clearPasswordResetSuccess();
 
-            forgotPassword: function( event ) {
-                event.preventDefault();
+                    this.renderFormFeedback(this.formSuccessTpl, {
+                        jsHook: this.passwordResetSuccessJsHook,
+                        title: successTitle,
+                        messageHtml: successMessageHtml
+                    });
+                },
 
-                this.trigger('password-help');
-                this.element.hide( this.$resetSuccess );
-            },
+                thirdPartyAuth: function(event) {
+                    var providerUrl = $(event.currentTarget).data('provider-url') || '';
 
-            postFormSubmission: function() {
-                this.element.hide( this.$resetSuccess );
-            },
+                    if (providerUrl) {
+                        window.location.href = providerUrl;
+                    }
+                },
 
-            resetEmail: function() {
-                this.element.hide( this.$errors );
-                this.element.show( this.$resetSuccess );
-            },
+                saveSuccess: function() {
+                    this.trigger('auth-complete');
+                    this.clearPasswordResetSuccess();
+                },
 
-            thirdPartyAuth: function( event ) {
-                var providerUrl = $(event.currentTarget).data('provider-url') || '';
-
-                if (providerUrl) {
-                    window.location.href = providerUrl;
-                }
-            },
-
-            saveSuccess: function() {
-                this.trigger('auth-complete');
-                this.element.hide( this.$resetSuccess );
-            },
-
-            saveError: function( error ) {
-                var msg = error.responseText;
-                if (error.status === 0) {
-                    msg = gettext('An error has occurred. Check your Internet connection and try again.');
-                } else if(error.status === 500){
-                    msg = gettext('An error has occurred. Try refreshing the page, or check your Internet connection.');
-                }
-                this.errors = ['<li>' + msg + '</li>'];
-                this.setErrors();
-                this.element.hide( this.$resetSuccess );
+                saveError: function(error) {
+                    var msg = error.responseText;
+                    if (error.status === 0) {
+                        msg = gettext('An error has occurred. Check your Internet connection and try again.');
+                    } else if (error.status === 500) {
+                        msg = gettext('An error has occurred. Try refreshing the page, or check your Internet connection.');
+                    }
+                    this.errors = ['<li>' + msg + '</li>'];
+                    this.clearPasswordResetSuccess();
 
                 /* If we've gotten a 403 error, it means that we've successfully
                  * authenticated with a third-party provider, but we haven't
@@ -119,18 +152,41 @@
                  * we need to prompt the user to enter a little more information
                  * to complete the registration process.
                  */
-                if ( error.status === 403 &&
+                    if (error.status === 403 &&
                      error.responseText === 'third-party-auth' &&
-                     this.currentProvider ) {
-                    this.element.show( this.$authError );
-                    this.element.hide( this.$errors );
-                } else {
-                    this.element.hide( this.$authError );
-                    this.element.show( this.$errors );
-                }
-                this.toggleDisableButton(false);
-            }
-        });
-    });
-}).call(this, define || RequireJS.define);
+                     this.currentProvider) {
+                        this.clearFormErrors();
+                        this.renderAuthWarning();
+                    } else {
+                        this.renderErrors(this.defaultFormErrorsTitle, this.errors);
+                    }
+                    this.toggleDisableButton(false);
+                },
 
+                renderAuthWarning: function() {
+                    var message = _.sprintf(
+                        gettext('You have successfully signed into %(currentProvider)s, but your %(currentProvider)s' +
+                                ' account does not have a linked %(platformName)s account. To link your accounts,' +
+                                ' sign in now using your %(platformName)s password.'),
+                        {currentProvider: this.currentProvider, platformName: this.platformName}
+                    );
+
+                    this.clearAuthWarning();
+                    this.renderFormFeedback(this.formStatusTpl, {
+                        jsHook: this.authWarningJsHook,
+                        message: message
+                    });
+                },
+
+                clearPasswordResetSuccess: function() {
+                    var query = '.' + this.passwordResetSuccessJsHook;
+                    this.clearFormFeedbackItems(query);
+                },
+
+                clearAuthWarning: function() {
+                    var query = '.' + this.authWarningJsHook;
+                    this.clearFormFeedbackItems(query);
+                }
+            });
+        });
+}).call(this, define || RequireJS.define);

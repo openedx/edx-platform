@@ -60,7 +60,7 @@ from openedx.core.djangolib.js_utils import (
       window.baseUrl = "${settings.STATIC_URL | n, js_escaped_string}";
       var require = {baseUrl: window.baseUrl};
     </script>
-    <script type="text/javascript" src="${static.url("js/vendor/requirejs/require.js")}"></script>
+    <script type="text/javascript" src="${static.url("common/js/vendor/require.js")}"></script>
     <script type="text/javascript" src="${static.url("cms/js/require-config.js")}"></script>
 
     <!-- view -->

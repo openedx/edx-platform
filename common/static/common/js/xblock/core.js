@@ -55,7 +55,6 @@
         blockArgs.unshift(runtime);
 
         if (runtime) {
-
             block = (function() {
                 var initFn = window[$element.data('init')];
 
@@ -150,5 +149,4 @@
     };
 
     this.XBlock = XBlock;
-
 }).call(this, $, JSON);

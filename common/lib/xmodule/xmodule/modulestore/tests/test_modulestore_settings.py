@@ -199,7 +199,7 @@ class ModuleStoreSettingsMigration(TestCase):
     def test_update_settings(self, default_store):
         mixed_setting = self.ALREADY_UPDATED_MIXED_CONFIG
         update_module_store_settings(mixed_setting, default_store=default_store)
-        self.assertTrue(get_mixed_stores(mixed_setting)[0]['NAME'] == default_store)
+        self.assertEqual(get_mixed_stores(mixed_setting)[0]['NAME'], default_store)
 
     def test_update_settings_error(self):
         mixed_setting = self.ALREADY_UPDATED_MIXED_CONFIG

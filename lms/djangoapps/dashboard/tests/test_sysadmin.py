@@ -109,7 +109,7 @@ class SysadminBaseTestCase(SharedModuleStoreTestCase):
         self.addCleanup(shutil.rmtree, path)
 
 
-@attr('shard_1')
+@attr(shard=1)
 @override_settings(
     MONGODB_LOG=TEST_MONGODB_LOG,
     GIT_REPO_DIR=settings.TEST_ROOT / "course_repos_{}".format(uuid4().hex)
@@ -166,7 +166,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         self._mkdir(settings.GIT_REPO_DIR)
 
         def_ms = modulestore()
-        self.assertFalse('xml' == def_ms.get_modulestore_type(None))
+        self.assertNotEqual('xml', def_ms.get_modulestore_type(None))
 
         self._add_edx4edx()
         course = def_ms.get_course(SlashSeparatedCourseKey('MITx', 'edx4edx', 'edx4edx'))

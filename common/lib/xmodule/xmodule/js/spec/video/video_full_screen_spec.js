@@ -1,32 +1,32 @@
-(function () {
+(function() {
     'use strict';
-    describe('VideoFullScreen', function () {
+    describe('VideoFullScreen', function() {
         var state, oldOTBD;
 
-        beforeEach(function () {
+        beforeEach(function() {
             oldOTBD = window.onTouchBasedDevice;
             window.onTouchBasedDevice = jasmine
                 .createSpy('onTouchBasedDevice').and.returnValue(null);
         });
 
-        afterEach(function () {
+        afterEach(function() {
             $('source').remove();
             state.storage.clear();
             state.videoPlayer.destroy();
             window.onTouchBasedDevice = oldOTBD;
         });
 
-        describe('constructor', function () {
-            beforeEach(function () {
+        describe('constructor', function() {
+            beforeEach(function() {
                 state = jasmine.initializePlayer();
             });
 
-            it('renders the fullscreen control', function () {
+            it('renders the fullscreen control', function() {
                 expect($('.add-fullscreen')).toExist();
                 expect(state.videoFullScreen.fullScreenState).toBe(false);
             });
 
-            it('correctly adds ARIA attributes to fullscreen control', function () {
+            it('correctly adds ARIA attributes to fullscreen control', function() {
                 var fullScreenControl = $('.add-fullscreen');
 
                 expect(fullScreenControl).toHaveAttrs({
@@ -34,7 +34,7 @@
                 });
             });
 
-            it('correctly triggers the event handler to toggle fullscreen mode', function () {
+            it('correctly triggers the event handler to toggle fullscreen mode', function() {
                 spyOn(state.videoFullScreen, 'exit');
                 spyOn(state.videoFullScreen, 'enter');
 
@@ -47,7 +47,7 @@
                 expect(state.videoFullScreen.exit).toHaveBeenCalled();
             });
 
-            it('correctly updates ARIA on state change', function () {
+            it('correctly updates ARIA on state change', function() {
                 var fullScreenControl = $('.add-fullscreen');
                 fullScreenControl.click();
                 expect(fullScreenControl).toHaveAttrs({
@@ -59,7 +59,7 @@
                 });
             });
 
-            it('correctly can out of fullscreen by pressing esc', function () {
+            it('correctly can out of fullscreen by pressing esc', function() {
                 spyOn(state.videoCommands, 'execute');
                 var esc = $.Event('keyup');
                 esc.keyCode = 27;
@@ -68,23 +68,23 @@
                 expect(state.videoCommands.execute).toHaveBeenCalledWith('toggleFullScreen');
             });
 
-            it('can update video dimensions on state change', function () {
+            it('can update video dimensions on state change', function() {
                 state.el.trigger('fullscreen', [true]);
                 expect(state.resizer.setMode).toHaveBeenCalledWith('both');
                 state.el.trigger('fullscreen', [false]);
                 expect(state.resizer.setMode).toHaveBeenCalledWith('width');
             });
 
-            it('can destroy itself', function () {
+            it('can destroy itself', function() {
                 state.videoFullScreen.destroy();
                 expect($('.add-fullscreen')).not.toExist();
                 expect(state.videoFullScreen).toBeUndefined();
             });
         });
 
-        it('Controls height is actual on switch to fullscreen', function () {
-            spyOn($.fn, 'height').and.callFake(function (val) {
-                return _.isUndefined(val) ? 100: this;
+        it('Controls height is actual on switch to fullscreen', function() {
+            spyOn($.fn, 'height').and.callFake(function(val) {
+                return _.isUndefined(val) ? 100 : this;
             });
 
             state = jasmine.initializePlayer();

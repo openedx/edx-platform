@@ -9,10 +9,19 @@ from . import BaseTestXmodule
 from xmodule.x_module import STUDENT_VIEW
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestWordCloud(BaseTestXmodule):
     """Integration test for word cloud xmodule."""
     CATEGORY = "word_cloud"
+
+    def _get_resource_url(self, item):
+        """
+        Creates a resource URL for a given asset that is compatible with this old XModule testing stuff.
+        """
+        display_name = self.item_descriptor.display_name.replace(' ', '_')
+        return "resource/i4x://{}/{}/word_cloud/{}/{}".format(
+            self.course.id.org, self.course.id.course, display_name, item
+        )
 
     def _get_users_state(self):
         """Return current state for each user:
@@ -241,14 +250,18 @@ class TestWordCloud(BaseTestXmodule):
             )
 
     def test_word_cloud_constructor(self):
-        """Make sure that all parameters extracted correclty from xml"""
+        """
+        Make sure that all parameters extracted correctly from xml.
+        """
         fragment = self.runtime.render(self.item_descriptor, STUDENT_VIEW)
-
         expected_context = {
             'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url,
+            'display_name': self.item_descriptor.display_name,
+            'instructions': self.item_descriptor.instructions,
             'element_class': self.item_descriptor.location.category,
             'element_id': self.item_descriptor.location.html_id(),
             'num_inputs': 5,  # default value
-            'submitted': False  # default value
+            'submitted': False,  # default value,
         }
+
         self.assertEqual(fragment.content, self.runtime.render_template('word_cloud.html', expected_context))

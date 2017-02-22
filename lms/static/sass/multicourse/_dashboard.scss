@@ -24,7 +24,6 @@
       @include clearfix();
       box-sizing: border-box;
       padding: $baseline;
-      background-color: $body-bg;
       border: 1px solid $border-color-l3;
       .advertise-message {
         @include font-size(12);
@@ -59,32 +58,6 @@
           }
         }
       }
-    }
-  }
-
-  .wrapper-xseries-certificates{
-    @include float(right);
-    @include margin-left(flex-gutter());
-    width: flex-grid(3);
-
-    .title{
-      @extend %t-title7;
-      @extend %t-weight4;
-    }
-
-    ul{
-      @include padding-left(0);
-      margin-top: ($baseline/2);
-    }
-
-    li{
-      @include line-height(20);
-      list-style-type: none;
-    }
-
-    .copy {
-      @extend %t-copy-sub1;
-      margin-top: ($baseline/2);
     }
   }
 
@@ -222,7 +195,6 @@
         @include clearfix();
         box-sizing: border-box;
         padding: $baseline;
-        background-color: $body-bg;
         border: 1px solid $border-color-l3;
 
         .list--nav {
@@ -301,34 +273,13 @@
 
       .course-item {
         margin-bottom: $baseline;
-        border-bottom: 4px solid $border-color-l4;
         padding-bottom: $baseline;
 
-        .course-container{
-          border: 1px solid $border-color-l4;
+        .course-container {
+          border: 2px solid $border-color-l4;
           border-radius: 3px;
-
-          // CASE: Xseries associated course
-          .label-xseries-association{
-            @include margin($baseline/2, $baseline/5, 0, $baseline/2);
-
-            .xseries-icon{
-              @include float(left);
-
-              @include margin-right($baseline*0.4);
-              background: url('#{$static-path}/images/icon-sm-xseries-black.png') no-repeat;
-              background-color: transparent;
-
-              width: ($baseline*1.1);
-              height: ($baseline*1.1);
-            }
-
-            .message-copy{
-              padding-top: ($baseline/5);
-              @extend %t-action3;
-            }
-          }
         }
+
         &:last-child {
           margin-bottom: 0;
           border-bottom: none;
@@ -646,8 +597,7 @@
         display: none;
         margin: $baseline 0 ($baseline/2) 0;
         padding: ($baseline/2) $baseline;
-        background: $gray-l5;
-        border: 1px solid $gray-l4;
+        border-top: 1px solid $gray-l4;
         color: $base-font-color; // Overrides the normal white color in this one case
 
         // STATE: shown
@@ -841,11 +791,6 @@
           .message-copy {
             @extend %t-copy-sub1;
             margin: 0;
-
-            .grade-value {
-              font-size: 1.2rem;
-              font-weight: bold;
-            }
           }
 
           .credit-action {
@@ -857,100 +802,6 @@
               text-shadow: none;
               box-shadow: none;
               text-transform: none;
-            }
-          }
-
-          .xseries-action{
-            .xseries-msg{
-              @include float(left);
-              width: flex-grid(9, 12);
-            }
-
-            .message-copy{
-              @extend %t-demi-strong;
-              margin-top: 0;
-            }
-
-            .message-copy-bold{
-              @extend %t-strong;
-            }
-
-            .xseries-border-btn {
-              @extend %btn-pl-black-border;
-              @include float(right);
-              position: relative;
-              @include left(10px);
-              padding: ($baseline*0.4) ($baseline*0.6);
-              background-image: none ;
-              text-shadow: none;
-              box-shadow: none;
-              text-transform: none;
-
-              .action-xseries-icon{
-                @include float(left);
-                display: inline;
-
-                @include margin-right($baseline*0.4);
-                background: url('#{$static-path}/images/icon-sm-xseries-black.png') no-repeat;
-                background-color: transparent;
-
-                width: ($baseline*1.1);
-                height: ($baseline*1.1);
-              }
-              &:hover,
-              &:focus {
-
-                .action-xseries-icon{
-                  @include float(left);
-                  display: inline;
-
-                  @include margin-right($baseline*0.4);
-                  background: url('#{$static-path}/images/icon-sm-xseries-white.png') no-repeat;
-                  background-color: transparent;
-
-                  width: ($baseline*1.1);
-                  height: ($baseline*1.1);
-                }
-              }
-            }
-
-            .xseries-base-btn {
-              @extend %btn-pl-black-base;
-              @include float(right);
-              position: relative;
-              @include left(10px);
-              padding: ($baseline*0.4) ($baseline*0.6);
-              background-image: none ;
-              text-shadow: none;
-              box-shadow: none;
-              text-transform: none;
-
-              .action-xseries-icon{
-                @include float(left);
-                display: inline;
-
-                @include margin-right($baseline*0.4);
-                background: url('#{$static-path}/images/icon-sm-xseries-white.png') no-repeat;
-                background-color: transparent;
-
-                width: ($baseline*1.1);
-                height: ($baseline*1.1);
-              }
-              &:hover,
-              &:focus {
-
-                .action-xseries-icon {
-                  @include float(left);
-                  display: inline;
-
-                  @include margin-right($baseline*0.4);
-                  background: url('#{$static-path}/images/icon-sm-xseries-black.png') no-repeat;
-                  background-color: transparent;
-
-                  width: ($baseline*1.1);
-                  height: ($baseline*1.1);
-                }
-              }
             }
           }
 
@@ -1126,6 +977,46 @@
               @extend %btn-pl-green-base;
               @include float(right);
             }
+          }
+        }
+
+        &.message-related-programs {
+          background: none;
+          border: none;
+          margin-top: ($baseline/4);
+          padding-bottom: 0;
+
+          .related-programs-preface {
+            @include float(left);
+            font-weight: bold;
+          }
+
+          ul {
+            display: inline;
+            padding: 0;
+            margin: 0;
+          }
+
+          li {
+            @include float(left);
+            display: inline;
+            padding: 0 0.5em;
+            border-right: 1px solid;
+
+            .category-icon {
+              @include float(left);
+              @include margin-right($baseline/4);
+              margin-top: ($baseline/10);
+              background-color: transparent;
+              background-size: 100%;
+              width: ($baseline*0.7);
+              height: ($baseline*0.7);
+            }
+          }
+
+          // Remove separator from last list item.
+          li:last-child {
+            border: 0;
           }
         }
 

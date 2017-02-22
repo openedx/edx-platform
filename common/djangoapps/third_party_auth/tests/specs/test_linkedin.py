@@ -10,6 +10,7 @@ class LinkedInOauth2IntegrationTest(base.Oauth2IntegrationTest):
         super(LinkedInOauth2IntegrationTest, self).setUp()
         self.provider = self.configure_linkedin_provider(
             enabled=True,
+            visible=True,
             key='linkedin_oauth2_key',
             secret='linkedin_oauth2_secret',
         )

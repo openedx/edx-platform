@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """ Tests for student account views. """
 
-from copy import copy
+import logging
 import re
 from unittest import skipUnless
 from urllib import urlencode
@@ -13,17 +13,29 @@ from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.urlresolvers import reverse
 from django.contrib import messages
+from django.contrib.auth import get_user_model
 from django.contrib.messages.middleware import MessageMiddleware
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.http import HttpRequest
+from edx_oauth2_provider.tests.factories import ClientFactory, AccessTokenFactory, RefreshTokenFactory
 from edx_rest_api_client import exceptions
 from nose.plugins.attrib import attr
+from oauth2_provider.models import (
+    AccessToken as dot_access_token,
+    RefreshToken as dot_refresh_token
+)
+from provider.oauth2.models import (
+    AccessToken as dop_access_token,
+    RefreshToken as dop_refresh_token
+)
+from testfixtures import LogCapture
 
 from commerce.models import CommerceConfiguration
 from commerce.tests import TEST_API_URL, TEST_API_SIGNING_KEY, factories
 from commerce.tests.mocks import mock_get_orders
 from course_modes.models import CourseMode
+from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from openedx.core.djangoapps.user_api.accounts.api import activate_account, create_account
 from openedx.core.djangoapps.user_api.accounts import EMAIL_MAX_LENGTH
@@ -35,6 +47,10 @@ from third_party_auth.tests.testutil import simulate_running_pipeline, ThirdPart
 from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme_context
+
+
+LOGGER_NAME = 'audit'
+User = get_user_model()  # pylint:disable=invalid-name
 
 
 @ddt.ddt
@@ -96,7 +112,7 @@ class StudentAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
 
         # Retrieve the activation link from the email body
         email_body = mail.outbox[0].body
-        result = re.search('(?P<url>https?://[^\s]+)', email_body)
+        result = re.search(r'(?P<url>https?://[^\s]+)', email_body)
         self.assertIsNot(result, None)
         activation_link = result.group('url')
 
@@ -122,11 +138,8 @@ class StudentAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
         self.assertTrue(result)
 
         # Try reusing the activation link to change the password again
-        response = self.client.post(
-            activation_link,
-            {'new_password1': self.OLD_PASSWORD, 'new_password2': self.OLD_PASSWORD},
-            follow=True
-        )
+        # Visit the activation link again.
+        response = self.client.get(activation_link)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "This password reset link is invalid. It may have been used already.")
 
@@ -157,6 +170,23 @@ class StudentAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
             response = self._change_password()
             self.assertEqual(response.status_code, 400)
 
+    def test_access_token_invalidation_logged_out(self):
+        self.client.logout()
+        user = User.objects.get(email=self.OLD_EMAIL)
+        self._create_dop_tokens(user)
+        self._create_dot_tokens(user)
+        response = self._change_password(email=self.OLD_EMAIL)
+        self.assertEqual(response.status_code, 200)
+        self.assert_access_token_destroyed(user)
+
+    def test_access_token_invalidation_logged_in(self):
+        user = User.objects.get(email=self.OLD_EMAIL)
+        self._create_dop_tokens(user)
+        self._create_dot_tokens(user)
+        response = self._change_password()
+        self.assertEqual(response.status_code, 200)
+        self.assert_access_token_destroyed(user)
+
     def test_password_change_inactive_user(self):
         # Log out the user created during test setup
         self.client.logout()
@@ -176,9 +206,11 @@ class StudentAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
         # Log out the user created during test setup
         self.client.logout()
 
-        # Send the view an email address not tied to any user
-        response = self._change_password(email=self.NEW_EMAIL)
-        self.assertEqual(response.status_code, 400)
+        with LogCapture(LOGGER_NAME, level=logging.INFO) as logger:
+            # Send the view an email address not tied to any user
+            response = self._change_password(email=self.NEW_EMAIL)
+            self.assertEqual(response.status_code, 200)
+            logger.check((LOGGER_NAME, 'INFO', 'Invalid password reset attempt'))
 
     def test_password_change_rate_limited(self):
         # Log out the user created during test setup, to prevent the view from
@@ -187,7 +219,7 @@ class StudentAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
         self.client.logout()
 
         # Make many consecutive bad requests in an attempt to trigger the rate limiter
-        for attempt in xrange(self.INVALID_ATTEMPTS):
+        for __ in xrange(self.INVALID_ATTEMPTS):
             self._change_password(email=self.NEW_EMAIL)
 
         response = self._change_password(email=self.NEW_EMAIL)
@@ -214,8 +246,33 @@ class StudentAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
 
         return self.client.post(path=reverse('password_change_request'), data=data)
 
+    def _create_dop_tokens(self, user=None):
+        """Create dop access token for given user if user provided else for default user."""
+        if not user:
+            user = User.objects.get(email=self.OLD_EMAIL)
 
-@attr('shard_3')
+        client = ClientFactory()
+        access_token = AccessTokenFactory(user=user, client=client)
+        RefreshTokenFactory(user=user, client=client, access_token=access_token)
+
+    def _create_dot_tokens(self, user=None):
+        """Create dop access token for given user if user provided else for default user."""
+        if not user:
+            user = User.objects.get(email=self.OLD_EMAIL)
+
+        application = dot_factories.ApplicationFactory(user=user)
+        access_token = dot_factories.AccessTokenFactory(user=user, application=application)
+        dot_factories.RefreshTokenFactory(user=user, application=application, access_token=access_token)
+
+    def assert_access_token_destroyed(self, user):
+        """Assert all access tokens are destroyed."""
+        self.assertFalse(dot_access_token.objects.filter(user=user).exists())
+        self.assertFalse(dot_refresh_token.objects.filter(user=user).exists())
+        self.assertFalse(dop_access_token.objects.filter(user=user).exists())
+        self.assertFalse(dop_refresh_token.objects.filter(user=user).exists())
+
+
+@attr(shard=3)
 @ddt.ddt
 class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleStoreTestCase):
     """ Tests for the student account views that update the user's account information. """
@@ -224,16 +281,17 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
     EMAIL = "bob@example.com"
     PASSWORD = "password"
 
-    URLCONF_MODULES = ['embargo']
+    URLCONF_MODULES = ['openedx.core.djangoapps.embargo']
 
     @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
         super(StudentAccountLoginAndRegistrationTest, self).setUp()
 
         # For these tests, three third party auth providers are enabled by default:
-        self.configure_google_provider(enabled=True)
-        self.configure_facebook_provider(enabled=True)
+        self.configure_google_provider(enabled=True, visible=True)
+        self.configure_facebook_provider(enabled=True, visible=True)
         self.configure_dummy_provider(
+            visible=True,
             enabled=True,
             icon_class='',
             icon_image=SimpleUploadedFile('icon.svg', '<svg><rect width="50" height="100"/></svg>'),
@@ -462,9 +520,6 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase, ProgramsApiConf
         'password',
         'year_of_birth',
         'preferred_language',
-    ]
-
-    HIDDEN_FIELDS = [
         'time_zone',
     ]
 
@@ -479,8 +534,8 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase, ProgramsApiConf
         self.request.user = self.user
 
         # For these tests, two third party auth providers are enabled by default:
-        self.configure_google_provider(enabled=True)
-        self.configure_facebook_provider(enabled=True)
+        self.configure_google_provider(enabled=True, visible=True)
+        self.configure_facebook_provider(enabled=True, visible=True)
 
         # Python-social saves auth failure notifcations in Django messages.
         # See pipeline.get_duplicate_provider() for details.
@@ -512,35 +567,15 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase, ProgramsApiConf
         self.assertEqual(context['auth']['providers'][0]['name'], 'Facebook')
         self.assertEqual(context['auth']['providers'][1]['name'], 'Google')
 
-    def test_hidden_fields_not_visible(self):
+    def test_view(self):
         """
-        Test that hidden fields are not visible when disabled.
+        Test that all fields are  visible
         """
-        temp_features = copy(settings.FEATURES)
-        temp_features['ENABLE_TIME_ZONE_PREFERENCE'] = False
-        with self.settings(FEATURES=temp_features):
-            view_path = reverse('account_settings')
-            response = self.client.get(path=view_path)
+        view_path = reverse('account_settings')
+        response = self.client.get(path=view_path)
 
-            for attribute in self.FIELDS:
-                self.assertIn(attribute, response.content)
-            for attribute in self.HIDDEN_FIELDS:
-                self.assertIn('"%s": {"enabled": false' % (attribute), response.content)
-
-    def test_hidden_fields_are_visible(self):
-        """
-        Test that hidden fields are visible when enabled.
-        """
-        temp_features = copy(settings.FEATURES)
-        temp_features['ENABLE_TIME_ZONE_PREFERENCE'] = True
-        with self.settings(FEATURES=temp_features):
-            view_path = reverse('account_settings')
-            response = self.client.get(path=view_path)
-
-            for attribute in self.FIELDS:
-                self.assertIn(attribute, response.content)
-            for attribute in self.HIDDEN_FIELDS:
-                self.assertIn('"%s": {"enabled": true' % (attribute), response.content)
+        for attribute in self.FIELDS:
+            self.assertIn(attribute, response.content)
 
     def test_header_with_programs_listing_enabled(self):
         """

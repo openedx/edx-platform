@@ -167,7 +167,7 @@
       display: inline-block;
       vertical-align: top;
       width: flex-grid(9, 12);
-      color: $gray-l1;
+      color: $gray-d1;
 
       .count-current-shown,
       .count-total,
@@ -248,6 +248,7 @@
         color: $color-visibility-set;
       }
     }
+
   }
 
   // +Messaging - Xblocks
@@ -599,7 +600,7 @@
       }
     }
 
-    .wrapper-comp-setting {
+    .wrapper-comp-setting, .wrapper-comp-setting-text {
       min-width: 300px;
       top: 0;
       vertical-align: top;
@@ -701,6 +702,11 @@
       font-color: $gray-l6;
       min-width: ($baseline*10);
       vertical-align: top;
+    }
+
+    .setting-text {
+      display: inline;
+      white-space: nowrap;
     }
 
 

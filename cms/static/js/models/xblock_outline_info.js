@@ -1,4 +1,4 @@
-define(["js/models/custom_sync_xblock_info"],
+define(['js/models/custom_sync_xblock_info'],
     function(CustomSyncXBlockInfo) {
         var XBlockOutlineInfo = CustomSyncXBlockInfo.extend({
 
@@ -7,7 +7,7 @@ define(["js/models/custom_sync_xblock_info"],
             },
 
             createChild: function(response) {
-                return new XBlockOutlineInfo(response, { parse: true });
+                return new XBlockOutlineInfo(response, {parse: true});
             }
         });
         return XBlockOutlineInfo;

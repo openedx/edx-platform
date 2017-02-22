@@ -96,9 +96,6 @@ FEATURES['ENABLE_VIDEO_BUMPER'] = True  # Enable video bumper in Studio settings
 # Enable partner support link in Studio footer
 PARTNER_SUPPORT_EMAIL = 'partner-support@example.com'
 
-# Disable some block types to test block deprecation logic
-DEPRECATED_BLOCK_TYPES = ['poll', 'survey']
-
 ########################### Entrance Exams #################################
 FEATURES['ENTRANCE_EXAMS'] = True
 
@@ -106,6 +103,7 @@ FEATURES['ENABLE_SPECIAL_EXAMS'] = True
 
 # Point the URL used to test YouTube availability to our stub YouTube server
 YOUTUBE_PORT = 9080
+YOUTUBE['TEST_TIMEOUT'] = 5000
 YOUTUBE['API'] = "http://127.0.0.1:{0}/get_youtube_api/".format(YOUTUBE_PORT)
 YOUTUBE['METADATA_URL'] = "http://127.0.0.1:{0}/test_youtube/".format(YOUTUBE_PORT)
 YOUTUBE['TEXT_API']['url'] = "127.0.0.1:{0}/test_transcripts_youtube/".format(YOUTUBE_PORT)
@@ -122,6 +120,8 @@ MOCK_SEARCH_BACKING_FILE = (
 
 # this secret key should be the same as lms/envs/bok_choy.py's
 SECRET_KEY = "very_secret_bok_choy_key"
+
+LMS_ROOT_URL = "http://localhost:8000"
 
 #####################################################################
 # Lastly, see if the developer has any local overrides.

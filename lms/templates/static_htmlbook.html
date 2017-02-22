@@ -126,7 +126,7 @@ from openedx.core.djangolib.js_utils import (
               <ul id="booknav" class="treeview-booknav">
                 <%def name="print_entry(entry, index_value)">
                   <li id="htmlchapter-${index_value}">
-                    <a class="chapter">
+                    <a href="#bookpage" class="chapter">
                       ${entry.get('title')}
                     </a>
                   </li>

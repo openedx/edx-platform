@@ -30,7 +30,7 @@ def make_random_form():
 
 def create(num, course_key):
     """Create num users, enrolling them in course_key if it's not None"""
-    for idx in range(num):
+    for __ in range(num):
         (user, _, _) = _do_create_account(make_random_form())
         if course_key is not None:
             CourseEnrollment.enroll(user, course_key)

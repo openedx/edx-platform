@@ -8,6 +8,7 @@ The following internal data structures are implemented:
     _BlockRelations - Data structure for a single block's relations.
     _BlockData - Data structure for a single block's data.
 """
+from copy import deepcopy
 from functools import partial
 from logging import getLogger
 
@@ -413,6 +414,19 @@ class BlockStructureBlockData(BlockStructure):
         # Map of a transformer's name to its non-block-specific data.
         self.transformer_data = TransformerDataMap()
 
+    def copy(self):
+        """
+        Returns a new instance of BlockStructureBlockData with a
+        deep-copy of this instance's contents.
+        """
+        from .factory import BlockStructureFactory
+        return BlockStructureFactory.create_new(
+            self.root_block_usage_key,
+            deepcopy(self._block_relations),
+            deepcopy(self.transformer_data),
+            deepcopy(self._block_data_map),
+        )
+
     def iteritems(self):
         """
         Returns iterator of (UsageKey, BlockData) pairs for all
@@ -431,7 +445,7 @@ class BlockStructureBlockData(BlockStructure):
         """
         Returns the BlockData associated with the given key.
         """
-        return self._block_data_map.get(usage_key)
+        return self._block_data_map[usage_key]
 
     def get_xblock_field(self, usage_key, field_name, default=None):
         """

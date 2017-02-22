@@ -1,8 +1,10 @@
 define([
-    'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'teams/js/views/team_discussion',
+    'underscore',
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+    'common/js/spec_helpers/discussion_spec_helper',
     'teams/js/spec_helpers/team_spec_helpers',
-    'xmodule_js/common_static/common/js/spec_helpers/discussion_spec_helper'
-], function (_, AjaxHelpers, TeamDiscussionView, TeamSpecHelpers, DiscussionSpecHelper) {
+    'teams/js/views/team_discussion'
+], function(_, AjaxHelpers, DiscussionSpecHelper, TeamSpecHelpers, TeamDiscussionView) {
     'use strict';
     xdescribe('TeamDiscussionView', function() {
         var discussionView, createDiscussionView, createPost, expandReplies, postReply;
@@ -38,9 +40,9 @@ define([
         };
 
         createPost = function(requests, view, title, body, threadID) {
-            title = title || "Test title";
-            body = body || "Test body";
-            threadID = threadID || "999";
+            title = title || 'Test title';
+            body = body || 'Test body';
+            threadID = threadID || '999';
             view.$('.new-post-button').click();
             view.$('.js-post-title').val(title);
             view.$('.js-post-body textarea').val(body);
@@ -83,7 +85,7 @@ define([
                     {
                         courseID: TeamSpecHelpers.testCourseID,
                         discussionID: TeamSpecHelpers.testTeamDiscussionID,
-                        threadID: threadID || "999"
+                        threadID: threadID || '999'
                     },
                     true
                 )
@@ -104,7 +106,7 @@ define([
                     '/courses/%(courseID)s/discussion/threads/%(threadID)s/reply?ajax=1',
                     {
                         courseID: TeamSpecHelpers.testCourseID,
-                        threadID: threadID || "999"
+                        threadID: threadID || '999'
                     },
                     true
                 ),
@@ -115,7 +117,7 @@ define([
                     body: reply,
                     comments_count: 1
                 }),
-                "annotated_content_info": TeamSpecHelpers.createAnnotatedContentInfo()
+                annotated_content_info: TeamSpecHelpers.createAnnotatedContentInfo()
             });
         };
 
@@ -143,8 +145,8 @@ define([
         it('can post a reply', function() {
             var requests = AjaxHelpers.requests(this),
                 view = createDiscussionView(requests),
-                testReply = "Test reply",
-                testThreadID = "1";
+                testReply = 'Test reply',
+                testThreadID = '1';
             expandReplies(requests, view, testThreadID);
             postReply(requests, view, testReply, testThreadID);
             expect(view.$('.discussion-response .response-body').text().trim()).toBe(testReply);
@@ -153,7 +155,7 @@ define([
         it('can post a reply to a new post', function() {
             var requests = AjaxHelpers.requests(this),
                 view = createDiscussionView(requests, []),
-                testReply = "Test reply";
+                testReply = 'Test reply';
             createPost(requests, view);
             expandReplies(requests, view);
             postReply(requests, view, testReply);
@@ -166,7 +168,7 @@ define([
                 postTopicButton, updatedThreadElement,
                 updatedTitle = 'Updated title',
                 updatedBody = 'Updated body',
-                testThreadID = "1";
+                testThreadID = '1';
             expandReplies(requests, view, testThreadID);
             view.$('.action-more .icon').first().click();
             view.$('.action-edit').first().click();
@@ -189,7 +191,7 @@ define([
             );
             AjaxHelpers.respondWithJson(requests, {
                 content: TeamSpecHelpers.createMockPostResponse({
-                    id: "999", title: updatedTitle, body: updatedBody
+                    id: '999', title: updatedTitle, body: updatedBody
                 }),
                 annotated_content_info: TeamSpecHelpers.createAnnotatedContentInfo()
             });
@@ -202,8 +204,7 @@ define([
 
         it('cannot move a new thread to a different topic', function() {
             var requests = AjaxHelpers.requests(this),
-                view = createDiscussionView(requests),
-                postTopicButton;
+                view = createDiscussionView(requests);
             createPost(requests, view);
             expandReplies(requests, view);
             view.$('.action-more .icon').first().click();

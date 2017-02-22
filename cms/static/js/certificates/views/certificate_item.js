@@ -1,13 +1,13 @@
 // Backbone Application View: Certificate Item
 // Renders an editor view or a details view depending on the state of the underlying model.
 
-define([ // jshint ignore:line
+define([
     'gettext',
     'js/views/list_item',
     'js/certificates/views/certificate_details',
     'js/certificates/views/certificate_editor'
 ],
-function (gettext, ListItemView, CertificateDetailsView, CertificateEditorView) {
+function(gettext, ListItemView, CertificateDetailsView, CertificateEditorView) {
     'use strict';
     var CertificateItemView = ListItemView.extend({
         events: {
@@ -20,7 +20,7 @@ function (gettext, ListItemView, CertificateDetailsView, CertificateEditorView) 
         // Translators: This field pertains to the custom label for a certificate.
         itemDisplayName: gettext('certificate'),
 
-        attributes: function () {
+        attributes: function() {
             // Retrieves the defined attribute set
             return {
                 'id': this.model.get('id'),

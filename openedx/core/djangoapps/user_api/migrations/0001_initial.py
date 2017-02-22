@@ -6,7 +6,7 @@ import django.utils.timezone
 from django.conf import settings
 import model_utils.fields
 import django.core.validators
-import xmodule_django.models
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
 
 class Migration(migrations.Migration):
@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('key', models.CharField(max_length=255, db_index=True)),
-                ('course_id', xmodule_django.models.CourseKeyField(max_length=255, db_index=True)),
+                ('course_id', CourseKeyField(max_length=255, db_index=True)),
                 ('value', models.TextField()),
                 ('user', models.ForeignKey(related_name='+', to=settings.AUTH_USER_MODEL)),
             ],

@@ -21,6 +21,7 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from student.roles import CourseInstructorRole, CourseStaffRole
 from student.tests.factories import UserFactory
+from xblock_django.models import XBlockStudioConfigurationFlag
 from xmodule.fields import Date
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -166,13 +167,13 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         elif field in encoded and encoded[field] is not None:
             self.fail(field + " included in encoding but missing from details at " + context)
 
-    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
+    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True})
     def test_pre_requisite_course_list_present(self):
         settings_details_url = get_url(self.course.id)
         response = self.client.get_html(settings_details_url)
         self.assertContains(response, "Prerequisite Course")
 
-    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
+    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True})
     def test_pre_requisite_course_update_and_fetch(self):
         url = get_url(self.course.id)
         resp = self.client.get_json(url)
@@ -199,7 +200,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         course_detail_json = json.loads(resp.content)
         self.assertEqual([], course_detail_json['pre_requisite_courses'])
 
-    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
+    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True})
     def test_invalid_pre_requisite_course(self):
         url = get_url(self.course.id)
         resp = self.client.get_json(url)
@@ -218,6 +219,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         (False, True, False),
         (True, True, True),
     )
+    @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
     def test_visibility_of_entrance_exam_section(self, feature_flags):
         """
         Tests entrance exam section is available if ENTRANCE_EXAMS feature is enabled no matter any other
@@ -784,6 +786,15 @@ class CourseMetadataEditingTest(CourseTestCase):
         )
         self.assertNotIn('edxnotes', test_model)
 
+    def test_allow_unsupported_xblocks(self):
+        """
+        allow_unsupported_xblocks is only shown in Advanced Settings if
+        XBlockStudioConfigurationFlag is enabled.
+        """
+        self.assertNotIn('allow_unsupported_xblocks', CourseMetadata.fetch(self.fullcourse))
+        XBlockStudioConfigurationFlag(enabled=True).save()
+        self.assertIn('allow_unsupported_xblocks', CourseMetadata.fetch(self.fullcourse))
+
     def test_validate_from_json_correct_inputs(self):
         is_valid, errors, test_model = CourseMetadata.validate_and_update_from_json(
             self.course,
@@ -795,7 +806,7 @@ class CourseMetadataEditingTest(CourseTestCase):
             user=self.user
         )
         self.assertTrue(is_valid)
-        self.assertTrue(len(errors) == 0)
+        self.assertEqual(len(errors), 0)
         self.update_check(test_model)
 
         # Tab gets tested in test_advanced_settings_munge_tabs
@@ -1061,7 +1072,7 @@ class CourseEnrollmentEndFieldTest(CourseTestCase):
     Base class to test the enrollment end fields in the course settings details view in Studio
     when using marketing site flag and global vs non-global staff to access the page.
     """
-    NOT_EDITABLE_HELPER_MESSAGE = "Contact your edX Partner Manager to update these settings."
+    NOT_EDITABLE_HELPER_MESSAGE = "Contact your edX partner manager to update these settings."
     NOT_EDITABLE_DATE_WRAPPER = "<div class=\"field date is-not-editable\" id=\"field-enrollment-end-date\">"
     NOT_EDITABLE_TIME_WRAPPER = "<div class=\"field time is-not-editable\" id=\"field-enrollment-end-time\">"
     NOT_EDITABLE_DATE_FIELD = "<input type=\"text\" class=\"end-date date end\" \
@@ -1151,6 +1162,7 @@ id=\"course-enrollment-end-time\" value=\"\" placeholder=\"HH:MM\" autocomplete=
         self._verify_editable(self._get_course_details_response(False))
 
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_MKTG_SITE': True})
+    @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
     def test_course_details_with_enabled_setting_global_staff(self):
         """ Test that user enrollment end date is editable in response.
 
@@ -1160,6 +1172,7 @@ id=\"course-enrollment-end-time\" value=\"\" placeholder=\"HH:MM\" autocomplete=
         self._verify_editable(self._get_course_details_response(True))
 
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_MKTG_SITE': True})
+    @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
     def test_course_details_with_enabled_setting_non_global_staff(self):
         """ Test that user enrollment end date is not editable in response.
 

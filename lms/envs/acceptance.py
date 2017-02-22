@@ -35,7 +35,7 @@ LOG_OVERRIDES = [
     ('codejail.safe_exec', logging.ERROR),
     ('edx.courseware', logging.ERROR),
     ('audit', logging.ERROR),
-    ('instructor_task.api_helper', logging.ERROR),
+    ('lms.djangoapps.instructor_task.api_helper', logging.ERROR),
 ]
 
 for log_name, log_level in LOG_OVERRIDES:
@@ -188,6 +188,7 @@ XQUEUE_INTERFACE = {
 YOUTUBE['API'] = "http://127.0.0.1:{0}/get_youtube_api/".format(YOUTUBE_PORT)
 YOUTUBE['METADATA_URL'] = "http://127.0.0.1:{0}/test_youtube/".format(YOUTUBE_PORT)
 YOUTUBE['TEXT_API']['url'] = "127.0.0.1:{0}/test_transcripts_youtube/".format(YOUTUBE_PORT)
+YOUTUBE['TEST_TIMEOUT'] = 1500
 
 if FEATURES.get('ENABLE_COURSEWARE_SEARCH') or \
    FEATURES.get('ENABLE_DASHBOARD_SEARCH') or \

@@ -1,4 +1,4 @@
-/*global course */
+/* global course */
 
 define(['underscore', 'jquery', 'gettext', 'edx-ui-toolkit/js/utils/html-utils',
         'js/views/baseview', 'js/models/uploads', 'js/views/uploads', 'text!templates/edit-chapter.underscore'],
@@ -34,26 +34,26 @@ define(['underscore', 'jquery', 'gettext', 'edx-ui-toolkit/js/utils/html-utils',
                 'submit': 'uploadAsset'
             },
             changeName: function(e) {
-                if(e && e.preventDefault) { e.preventDefault(); }
+                if (e && e.preventDefault) { e.preventDefault(); }
                 this.model.set({
                     name: this.$('.chapter-name').val()
                 }, {silent: true});
                 return this;
             },
             changeAssetPath: function(e) {
-                if(e && e.preventDefault) { e.preventDefault(); }
+                if (e && e.preventDefault) { e.preventDefault(); }
                 this.model.set({
                     asset_path: this.$('.chapter-asset-path').val()
                 }, {silent: true});
                 return this;
             },
             removeChapter: function(e) {
-                if(e && e.preventDefault) { e.preventDefault(); }
+                if (e && e.preventDefault) { e.preventDefault(); }
                 this.model.collection.remove(this.model);
                 return this.remove();
             },
             openUploadDialog: function(e) {
-                if(e && e.preventDefault) { e.preventDefault(); }
+                if (e && e.preventDefault) { e.preventDefault(); }
                 this.model.set({
                     name: this.$('input.chapter-name').val(),
                     asset_path: this.$('input.chapter-asset-path').val()

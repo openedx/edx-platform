@@ -1,19 +1,21 @@
 """
 Signal handling functions for use with external commerce service.
 """
+from __future__ import unicode_literals
+
 import json
 import logging
 from urlparse import urljoin
 
+import requests
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.dispatch import receiver
 from django.utils.translation import ugettext as _
 from edx_rest_api_client.exceptions import HttpClientError
-import requests
-
 from request_cache.middleware import RequestCache
 from student.models import UNENROLL_DONE
+
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client, is_commerce_service_configured
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
@@ -182,7 +184,7 @@ def create_zendesk_ticket(requester_name, requester_email, subject, body, tags=N
 
         # Check for HTTP codes other than 201 (Created)
         if response.status_code != 201:
-            log.error(u'Failed to create ticket. Status: [%d], Body: [%s]', response.status_code, response.content)
+            log.error('Failed to create ticket. Status: [%d], Body: [%s]', response.status_code, response.content)
         else:
             log.debug('Successfully created ticket.')
     except Exception:  # pylint: disable=broad-except

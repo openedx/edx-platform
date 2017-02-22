@@ -9,7 +9,7 @@ from certificates.management.commands import create_fake_cert
 from certificates.models import GeneratedCertificate
 
 
-@attr('shard_1')
+@attr(shard=1)
 class CreateFakeCertTest(TestCase):
     """Tests for the create_fake_certs management command. """
 

@@ -1,8 +1,7 @@
-;(function (define) {
+(function(define) {
     'use strict';
-    define(["underscore", "backbone", "gettext"],
+    define(['underscore', 'backbone', 'gettext'],
         function(_, Backbone, gettext) {
-
             var PagingView = Backbone.View.extend({
                 // takes a Backbone Paginator as a model
 
@@ -19,7 +18,7 @@
                     collection.bind('remove', _.bind(this.onPageRefresh, this));
                     collection.bind('reset', _.bind(this.onPageRefresh, this));
                     collection.bind('error', _.bind(this.onError, this));
-                    collection.bind('page_changed', function () { window.scrollTo(0, 0); });
+                    collection.bind('page_changed', function() { window.scrollTo(0, 0); });
                 },
 
                 onPageRefresh: function() {
@@ -33,15 +32,15 @@
                     // Do nothing by default
                 },
 
-                setPage: function (page) {
+                setPage: function(page) {
                     this.collection.setPage(page);
                 },
 
-                nextPage: function () {
+                nextPage: function() {
                     this.collection.nextPage();
                 },
 
-                previousPage: function () {
+                previousPage: function() {
                     this.collection.previousPage();
                 },
 

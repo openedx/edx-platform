@@ -1,9 +1,9 @@
-(function () {
+(function() {
     'use strict';
-    describe('VideoPlaySkipControl', function () {
+    describe('VideoPlaySkipControl', function() {
         var state, oldOTBD;
 
-        beforeEach(function () {
+        beforeEach(function() {
             oldOTBD = window.onTouchBasedDevice;
             window.onTouchBasedDevice = jasmine
                 .createSpy('onTouchBasedDevice').and.returnValue(null);
@@ -12,7 +12,7 @@
             spyOn(state.bumperState.videoCommands, 'execute');
         });
 
-        afterEach(function () {
+        afterEach(function() {
             $('source').remove();
             state.storage.clear();
             if (state.bumperState && state.bumperState.videoPlayer) {
@@ -24,29 +24,29 @@
             }
         });
 
-        it('can render the control', function () {
+        it('can render the control', function() {
             expect($('.video_control.play')).toBeInDOM();
         });
 
-        it('can update state on play', function () {
+        it('can update state on play', function() {
             state.el.trigger('play');
             expect($('.video_control.play')).not.toBeInDOM();
             expect($('.video_control.skip')).toBeInDOM();
         });
 
-        it('can start video playing on click', function () {
+        it('can start video playing on click', function() {
             $('.video_control.play').click();
             expect(state.bumperState.videoCommands.execute).toHaveBeenCalledWith('play');
         });
 
-        it('can skip the video on click', function () {
+        it('can skip the video on click', function() {
             state.el.trigger('play');
             spyOn(state.bumperState.videoPlayer, 'isPlaying').and.returnValue(true);
             $('.video_control.skip').first().click();
             expect(state.bumperState.videoCommands.execute).toHaveBeenCalledWith('skip');
         });
 
-        it('can destroy itself', function () {
+        it('can destroy itself', function() {
             var plugin = state.bumperState.videoPlaySkipControl,
                 el = plugin.el;
             spyOn($.fn, 'off').and.callThrough();

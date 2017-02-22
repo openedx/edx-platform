@@ -1,13 +1,13 @@
 /*
  Code for editing users and assigning roles within a course or library team context.
  */
-define(['jquery', 'underscore', 'gettext', "js/views/baseview",
+define(['jquery', 'underscore', 'gettext', 'js/views/baseview',
         'common/js/components/views/feedback_prompt', 'common/js/components/utils/view_utils'],
-    function ($, _, gettext, BaseView, PromptView, ViewUtils) {
+    function($, _, gettext, BaseView, PromptView, ViewUtils) {
         'use strict';
         var default_messages = {
             defaults: {
-                confirmation: gettext("Ok"),
+                confirmation: gettext('Ok'),
                 changeRoleError: gettext("There was an error changing the user's role"),
                 unknown: gettext('Unknown')
             },
@@ -22,7 +22,7 @@ define(['jquery', 'underscore', 'gettext', "js/views/baseview",
             },
             alreadyMember: {
                 title: gettext('Already a member'),
-                messageTpl: gettext("{email} is already on the {container} team. Recheck the email address if you want to add a new member."),
+                messageTpl: gettext('{email} is already on the {container} team. Recheck the email address if you want to add a new member.'),
                 primaryAction: gettext('Return to team listing')
             },
             deleteUser: {
@@ -40,7 +40,7 @@ define(['jquery', 'underscore', 'gettext', "js/views/baseview",
                 actions: {
                     primary: {
                         text: messages.invalidEmail.primaryAction,
-                        click: function (view) {
+                        click: function(view) {
                             view.hide();
                             $('#user-email-input').focus();
                         }
@@ -60,7 +60,7 @@ define(['jquery', 'underscore', 'gettext', "js/views/baseview",
                 actions: {
                     primary: {
                         text: messages.alreadyMember.primaryAction,
-                        click: function (view) {
+                        click: function(view) {
                             view.hide();
                             $('#user-email-input').focus();
                         }
@@ -76,7 +76,7 @@ define(['jquery', 'underscore', 'gettext', "js/views/baseview",
                 actions: {
                     primary: {
                         text: messages.defaults.confirmation,
-                        click: function (view) {
+                        click: function(view) {
                             view.hide();
                             onErrorCallback();
                         }
@@ -90,13 +90,13 @@ define(['jquery', 'underscore', 'gettext', "js/views/baseview",
         }
 
         var ManageUsersAndRoles = BaseView.extend({
-            events: function () {
+            events: function() {
                 var baseEvents = {
-                    'click .create-user-button': "addUserHandler",
-                    'submit #create-user-form': "createUserFormSubmit",
-                    'click .action-cancel': "cancelEditHandler",
-                    'keyup': "keyUpHandler",
-                    'click .remove-user': "removeUserHandler"
+                    'click .create-user-button': 'addUserHandler',
+                    'submit #create-user-form': 'createUserFormSubmit',
+                    'click .action-cancel': 'cancelEditHandler',
+                    'keyup': 'keyUpHandler',
+                    'click .remove-user': 'removeUserHandler'
                 };
                 var roleEvents = {};
                 var self = this;
@@ -104,14 +104,14 @@ define(['jquery', 'underscore', 'gettext', "js/views/baseview",
                     var role_name = self.options.roles[i].key;
                     var role_selector = 'click .user-actions .make-' + role_name;
 
-                    (function (role) {
-                        roleEvents[role_selector] = function (event) { self.handleRoleButtonClick(event.target, role); };
+                    (function(role) {
+                        roleEvents[role_selector] = function(event) { self.handleRoleButtonClick(event.target, role); };
                     })(role_name);
                 }
                 return _.extend(baseEvents, roleEvents);
             },
 
-            initialize: function (options) {
+            initialize: function(options) {
                 BaseView.prototype.initialize.call(this);
                 this.containerName = options.containerName;
                 this.tplUserURL = options.tplUserURL;
@@ -124,7 +124,7 @@ define(['jquery', 'underscore', 'gettext', "js/views/baseview",
                 this.initial_role = this.roles[0];
                 this.admin_role = this.roles[this.roles.length - 1];
 
-                var message_mod = options.messages_modifier || function (messages) { return messages; };
+                var message_mod = options.messages_modifier || function(messages) { return messages; };
                 this.messages = message_mod(default_messages);
 
                 this.$userEmailInput = this.$el.find('#user-email-input');
@@ -134,13 +134,13 @@ define(['jquery', 'underscore', 'gettext', "js/views/baseview",
                 this.$userList = this.$el.find('#user-list');
             },
 
-            render: function () {
+            render: function() {
                 this.$userList.empty();
-                var templateFn = this.loadTemplate("team-member"),
-                    roles = _.object(_.pluck(this.roles, 'key'), _.pluck(this.roles, "name")),
+                var templateFn = this.loadTemplate('team-member'),
+                    roles = _.object(_.pluck(this.roles, 'key'), _.pluck(this.roles, 'name')),
                     adminRoleCount = this.getAdminRoleCount(),
                     viewHelpers = {
-                        format: function (template, data) {
+                        format: function(template, data) {
                             return _.template(template, {interpolate: /\{(.+?)}/g})(data);
                         }
                     };
@@ -161,14 +161,14 @@ define(['jquery', 'underscore', 'gettext', "js/views/baseview",
                 }
             },
 
-            getAdminRoleCount: function () {
+            getAdminRoleCount: function() {
                 var self = this;
-                return _.filter(this.users, function (user) { return user.role === self.admin_role.key; }).length;
+                return _.filter(this.users, function(user) { return user.role === self.admin_role.key; }).length;
             },
 
-            getPossibleRoleChangesForRole: function (role, adminRoleCount) {
+            getPossibleRoleChangesForRole: function(role, adminRoleCount) {
                 var result = [],
-                    role_names = _.map(this.roles, function (role) { return role.key });
+                    role_names = _.map(this.roles, function(role) { return role.key; });
                 if (role === this.admin_role.key && adminRoleCount === 1) {
                     result.push({notoggle: true});
                 }
@@ -181,15 +181,15 @@ define(['jquery', 'underscore', 'gettext', "js/views/baseview",
                         result.push({
                             to_role: other_role.key,
                             label: (i < currentRoleIdx) ? this.roles[currentRoleIdx].name : other_role.name,
-                            direction: (i < currentRoleIdx) ? "remove" : "add"
+                            direction: (i < currentRoleIdx) ? 'remove' : 'add'
                         });
                     }
                 }
                 return result;
             },
 
-            checkEmail: function (email) {
-                var allUsersEmails = _.map(this.users, function (user) { return user.email; });
+            checkEmail: function(email) {
+                var allUsersEmails = _.map(this.users, function(user) { return user.email; });
 
                 if (!email) {
                     return {valid: false, msg: makeInvalidEmailMessage(this.messages)};
@@ -202,12 +202,12 @@ define(['jquery', 'underscore', 'gettext', "js/views/baseview",
             },
 
             // Our helper method that calls the RESTful API to add/remove/change user roles:
-            changeRole: function (email, newRole, opts) {
+            changeRole: function(email, newRole, opts) {
                 var self = this;
                 var url = this.tplUserURL.replace('@@EMAIL@@', email);
                 var errMessage = opts.errMessage || this.messages.defaults.changeRoleError;
-                var onSuccess = opts.onSuccess || function (data) { ViewUtils.reload(); };
-                var onError = opts.onError || function () {};
+                var onSuccess = opts.onSuccess || function(data) { ViewUtils.reload(); };
+                var onError = opts.onError || function() {};
                 $.ajax({
                     url: url,
                     type: newRole ? 'POST' : 'DELETE',
@@ -215,7 +215,7 @@ define(['jquery', 'underscore', 'gettext', "js/views/baseview",
                     contentType: 'application/json',
                     data: JSON.stringify({role: newRole}),
                     success: onSuccess,
-                    error: function (jqXHR, textStatus, errorThrown) {
+                    error: function(jqXHR, textStatus, errorThrown) {
                         var message, prompt;
                         try {
                             message = JSON.parse(jqXHR.responseText).error || self.messages.defaults.unknown;
@@ -228,11 +228,11 @@ define(['jquery', 'underscore', 'gettext', "js/views/baseview",
                 });
             },
 
-            handleRoleButtonClick: function (button, role) {
+            handleRoleButtonClick: function(button, role) {
                 this.changeRole(getEmail(button), role, {});
             },
 
-            addUserHandler: function (event) {
+            addUserHandler: function(event) {
                 event.preventDefault();
                 this.$createUserButton
                     .toggleClass('is-disabled')
@@ -241,7 +241,7 @@ define(['jquery', 'underscore', 'gettext', "js/views/baseview",
                 this.$userEmailInput.focus();
             },
 
-            cancelEditHandler: function (event) {
+            cancelEditHandler: function(event) {
                 event.preventDefault();
                 this.$createUserButton
                     .toggleClass('is-disabled')
@@ -250,7 +250,7 @@ define(['jquery', 'underscore', 'gettext', "js/views/baseview",
                 this.$userEmailInput.val('');
             },
 
-            createUserFormSubmit: function (event) {
+            createUserFormSubmit: function(event) {
                 event.preventDefault();
                 var self = this;
                 var email = this.$userEmailInput.val().trim();
@@ -267,18 +267,18 @@ define(['jquery', 'underscore', 'gettext', "js/views/baseview",
                     this.initial_role.key,
                     {
                         errMessage: this.messages.errors.addUser,
-                        onError: function () { self.$userEmailInput.focus(); }
+                        onError: function() { self.$userEmailInput.focus(); }
                     }
                 );
             },
 
-            keyUpHandler: function (event) {
+            keyUpHandler: function(event) {
                 if (event.which === jQuery.ui.keyCode.ESCAPE && this.$createUserFormWrapper.is('.is-shown')) {
                     this.$cancelButton.click();
                 }
             },
 
-            removeUserHandler: function (event) {
+            removeUserHandler: function(event) {
                 event.preventDefault();
                 var self = this;
                 var email = getEmail(event.target);
@@ -292,7 +292,7 @@ define(['jquery', 'underscore', 'gettext', "js/views/baseview",
                     actions: {
                         primary: {
                             text: self.messages.deleteUser.primaryAction,
-                            click: function (view) {
+                            click: function(view) {
                                 view.hide();
                                 // Use the REST API to delete the user:
                                 self.changeRole(email, null, {errMessage: self.messages.errors.deleteUser});
@@ -300,7 +300,7 @@ define(['jquery', 'underscore', 'gettext', "js/views/baseview",
                         },
                         secondary: {
                             text: self.messages.deleteUser.secondaryAction,
-                            click: function (view) { view.hide(); }
+                            click: function(view) { view.hide(); }
                         }
                     }
                 });

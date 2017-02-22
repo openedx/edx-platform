@@ -28,7 +28,6 @@ from .component import (
 from .item import create_xblock_info
 from .library import LIBRARIES_ENABLED
 from ccx_keys.locator import CCXLocator
-from contentstore import utils
 from contentstore.course_group_config import (
     COHORT_SCHEME,
     GroupConfiguration,
@@ -77,6 +76,7 @@ from student.auth import has_course_author_access, has_studio_write_access, has_
 from student.roles import (
     CourseInstructorRole, CourseStaffRole, CourseCreatorRole, GlobalStaff, UserBasedRole
 )
+from util.course import get_lms_link_for_about_page
 from util.date_utils import get_default_time_display
 from util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
 from util.milestones_helpers import (
@@ -91,6 +91,7 @@ from util.organizations_helpers import (
     organizations_enabled,
 )
 from util.string_utils import _has_non_ascii_characters
+from xblock_django.api import deprecated_xblocks
 from xmodule.contentstore.content import StaticContent
 from xmodule.course_module import CourseFields
 from xmodule.course_module import DEFAULT_START_DATE
@@ -599,7 +600,8 @@ def course_index(request, course_key):
         except (ItemNotFoundError, CourseActionStateItemNotFoundError):
             current_action = None
 
-        deprecated_blocks_info = _deprecated_blocks_info(course_module, settings.DEPRECATED_BLOCK_TYPES)
+        deprecated_block_names = [block.name for block in deprecated_xblocks()]
+        deprecated_blocks_info = _deprecated_blocks_info(course_module, deprecated_block_names)
 
         return render_to_response('course_outline.html', {
             'context_course': course_module,
@@ -988,13 +990,17 @@ def settings_handler(request, course_key_string):
 
             about_page_editable = not marketing_site_enabled
             enrollment_end_editable = GlobalStaff().has_user(request.user) or not marketing_site_enabled
-            short_description_editable = settings.FEATURES.get('EDITABLE_SHORT_DESCRIPTION', True)
+            short_description_editable = configuration_helpers.get_value_for_org(
+                course_module.location.org,
+                'EDITABLE_SHORT_DESCRIPTION',
+                settings.FEATURES.get('EDITABLE_SHORT_DESCRIPTION', True)
+            )
             self_paced_enabled = SelfPacedConfiguration.current().enabled
 
             settings_context = {
                 'context_course': course_module,
                 'course_locator': course_key,
-                'lms_link_for_about_page': utils.get_lms_link_for_about_page(course_key),
+                'lms_link_for_about_page': get_lms_link_for_about_page(course_key),
                 'course_image_url': course_image_url(course_module, 'course_image'),
                 'banner_image_url': course_image_url(course_module, 'banner_image'),
                 'video_thumbnail_image_url': course_image_url(course_module, 'video_thumbnail_image'),

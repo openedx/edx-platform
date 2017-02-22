@@ -1,8 +1,7 @@
-;(function (define) {
+(function(define) {
     'use strict';
-    define(['jquery', 'underscore', 'backbone', 'gettext', 'js/models/notification', 'js/views/notification'], 
-        function ($, _, Backbone) {
-
+    define(['jquery', 'underscore', 'backbone', 'gettext', 'js/models/notification', 'js/views/notification'],
+        function($, _, Backbone) {
             var CohortDiscussionConfigurationView = Backbone.View.extend({
 
                 /**
@@ -20,11 +19,11 @@
                 * @returns {Array} - Cohorted discussions.
                 */
                 getCohortedDiscussions: function(selector) {
-                    var self=this,
+                    var self = this,
                         cohortedDiscussions = [];
 
-                    _.each(self.$(selector), function (topic) {
-                        cohortedDiscussions.push($(topic).data('id'))
+                    _.each(self.$(selector), function(topic) {
+                        cohortedDiscussions.push($(topic).data('id'));
                     });
                     return cohortedDiscussions;
                 },
@@ -35,22 +34,22 @@
                 * @param {object} $element - Messages would be shown before this element.
                 * @param {object} fieldData - Data to update on the server.
                 */
-                saveForm: function ($element, fieldData) {
+                saveForm: function($element, fieldData) {
                     var self = this,
                         cohortSettingsModel = this.cohortSettings,
                         saveOperation = $.Deferred(),
                         showErrorMessage;
 
-                    showErrorMessage = function (message, $element) {
+                    showErrorMessage = function(message, $element) {
                         self.showMessage(message, $element, 'error');
                     };
                     this.removeNotification();
 
                     cohortSettingsModel.save(
                         fieldData, {patch: true, wait: true}
-                    ).done(function () {
+                    ).done(function() {
                         saveOperation.resolve();
-                    }).fail(function (result) {
+                    }).fail(function(result) {
                         var errorMessage = null;
                         try {
                             var jsonResponse = JSON.parse(result.responseText);
@@ -73,7 +72,7 @@
                 * @param {object} $element - Message would be shown before this element.
                 * @param {string} type - Type of message to show e.g. confirmation or error.
                 */
-                showMessage: function (message, $element, type) {
+                showMessage: function(message, $element, type) {
                     var model = new NotificationModel({type: type || 'confirmation', title: message});
                     this.removeNotification();
                     this.notification = new NotificationView({
@@ -86,7 +85,7 @@
                 /**
                 *Removes the notification messages.
                 */
-                removeNotification: function () {
+                removeNotification: function() {
                     if (this.notification) {
                         this.notification.remove();
                     }

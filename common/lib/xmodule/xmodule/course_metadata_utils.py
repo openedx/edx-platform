@@ -10,10 +10,7 @@ from datetime import datetime, timedelta
 import dateutil.parser
 from math import exp
 
-from openedx.core.lib.time_zone_utils import get_time_zone_abbr
 from pytz import utc
-
-from .fields import Date
 
 DEFAULT_START_DATE = datetime(2030, 1, 1, tzinfo=utc)
 
@@ -94,83 +91,6 @@ def course_start_date_is_default(start, advertised_start):
             in question.
     """
     return advertised_start is None and start == DEFAULT_START_DATE
-
-
-def _datetime_to_string(date_time, format_string, time_zone, strftime_localized):
-    """
-    Formats the given datetime with the given function and format string.
-
-    Adds time zone abbreviation to the resulting string if the format is DATE_TIME or TIME.
-
-    Arguments:
-        date_time (datetime): the datetime to be formatted
-        format_string (str): the date format type, as passed to strftime
-        time_zone (pytz time zone): the time zone to convert to
-        strftime_localized ((datetime, str) -> str): a nm localized string
-            formatting function
-    """
-    result = strftime_localized(date_time.astimezone(time_zone), format_string)
-    abbr = get_time_zone_abbr(time_zone, date_time)
-    return (
-        result + ' ' + abbr if format_string in ['DATE_TIME', 'TIME', 'DAY_AND_TIME']
-        else result
-    )
-
-
-def course_start_datetime_text(start_date, advertised_start, format_string, time_zone, ugettext, strftime_localized):
-    """
-    Calculates text to be shown to user regarding a course's start
-    datetime in specified time zone.
-
-    Prefers .advertised_start, then falls back to .start.
-
-    Arguments:
-        start_date (datetime): the course's start datetime
-        advertised_start (str): the course's advertised start date
-        format_string (str): the date format type, as passed to strftime
-        time_zone (pytz time zone): the time zone to convert to
-        ugettext ((str) -> str): a text localization function
-        strftime_localized ((datetime, str) -> str): a localized string
-            formatting function
-    """
-    if advertised_start is not None:
-        # TODO: This will return an empty string if advertised_start == ""... consider changing this behavior?
-        try:
-            # from_json either returns a Date, returns None, or raises a ValueError
-            parsed_advertised_start = Date().from_json(advertised_start)
-            if parsed_advertised_start is not None:
-                # In the Django implementation of strftime_localized, if
-                # the year is <1900, _datetime_to_string will raise a ValueError.
-                return _datetime_to_string(parsed_advertised_start, format_string, time_zone, strftime_localized)
-        except ValueError:
-            pass
-        return advertised_start.title()
-    elif start_date != DEFAULT_START_DATE:
-        return _datetime_to_string(start_date, format_string, time_zone, strftime_localized)
-    else:
-        _ = ugettext
-        # Translators: TBD stands for 'To Be Determined' and is used when a course
-        # does not yet have an announced start date.
-        return _('TBD')
-
-
-def course_end_datetime_text(end_date, format_string, time_zone, strftime_localized):
-    """
-    Returns a formatted string for a course's end date or datetime.
-
-    If end_date is None, an empty string will be returned.
-
-    Arguments:
-        end_date (datetime): the end datetime of a course
-        format_string (str): the date format type, as passed to strftime
-        time_zone (pytz time zone): the time zone to convert to
-        strftime_localized ((datetime, str) -> str): a localized string
-            formatting function
-    """
-    return (
-        _datetime_to_string(end_date, format_string, time_zone, strftime_localized) if end_date is not None
-        else ''
-    )
 
 
 def may_certify_for_course(certificates_display_behavior, certificates_show_before_end, has_ended):

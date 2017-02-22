@@ -1,21 +1,21 @@
 <div class="discussion-response"></div>
-<a href="#" class="action-show-comments">
+<button class="btn-link action-show-comments">
     <%
     var fmts = ngettext("Show Comment (%(num_comments)s)", "Show Comments (%(num_comments)s)", comments.length);
     print(interpolate(fmts, {num_comments: comments.length}, true));
     %>
     <span class="icon fa fa-caret-down" aria-hidden="true"></span>
-</a>
+</button>
 <ol class="comments">
     <li class="new-comment">
         <% if (create_sub_comment && !readOnly) { %>
             <form class="comment-form" data-id="<%- wmdId %>">
                 <ul class="discussion-errors"></ul>
-                <label class="sr" for="add-new-comment"><%- gettext("Add a comment") %></label>
-                <div class="comment-body" id="add-new-comment" data-id="<%- wmdId %>"
+                <label class="sr" for="add-new-comment-<%- wmdId %>"><%- gettext("Add a comment") %></label>
+                <div class="comment-body" id="add-new-comment-<%- wmdId %>" data-id="<%- wmdId %>"
                 data-placeholder="<%- gettext('Add a comment') %>"></div>
                 <div class="comment-post-control">
-                    <a class="discussion-submit-comment control-button" href="#"><%- gettext("Submit") %></a>
+                    <button class="btn-brand discussion-submit-comment control-button"><%- gettext("Submit") %></button>
                 </div>
             </form>
         <% } %>

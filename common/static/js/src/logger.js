@@ -1,4 +1,4 @@
-;(function() {
+(function() {
     'use strict';
     var Logger = (function() {
         // listeners[event_type][element] -> list of callbacks

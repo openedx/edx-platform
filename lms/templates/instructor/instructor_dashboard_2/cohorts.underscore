@@ -34,17 +34,17 @@
         <hr class="divider divider-lv1" />
 
         <!-- Uploading a CSV file of cohort assignments. -->
-        <a class="toggle-cohort-management-secondary" href="#cohort-management-file-upload"><%- gettext('Assign students to cohorts by uploading a CSV file') %></a>
-        <div class="cohort-management-file-upload csv-upload is-hidden" id="cohort-management-file-upload"></div>
+        <button class="toggle-cohort-management-secondary" data-href="#cohort-management-file-upload"><%- gettext('Assign students to cohorts by uploading a CSV file') %></button>
+        <div class="cohort-management-file-upload csv-upload is-hidden" id="cohort-management-file-upload" tabindex="-1"></div>
 
         <div class="cohort-management-supplemental">
             <p class="">
                 <span class="icon fa fa-info-circle" aria-hidden="true"></span>
                 <%= HtmlUtils.interpolateHtml(
-                    gettext('To review student cohort assignments or see the results of uploading a CSV file, download course profile information or cohort results on {link_start} the Data Download page. {link_end}'),
+                    gettext('To review student cohort assignments or see the results of uploading a CSV file, download course profile information or cohort results on the {link_start}Data Download{link_end} page.'),
                     {
-                        link_start: HtmlUtils.HTML('<a href="" class="link-cross-reference" data-section="data_download">'),
-                        link_end: HtmlUtils.HTML('</a>')
+                        link_start: HtmlUtils.HTML('<button type="button" class="btn-link link-cross-reference" data-section="data_download">'),
+                        link_end: HtmlUtils.HTML('</button>')
                     })
                 %>
             </p>
@@ -53,8 +53,8 @@
         <hr class="divider divider-lv1" />
 
         <!-- Discussion Topics. -->
-        <a class="toggle-cohort-management-discussions" href="#cohort-discussions-management"><%- gettext('Specify whether discussion topics are divided by cohort') %></a>
-        <div class="cohort-discussions-nav is-hidden" id="cohort-management-discussion-topics">
+        <button class="toggle-cohort-management-discussions" data-href="#cohort-discussions-management"><%- gettext('Specify whether discussion topics are divided by cohort') %></button>
+        <div class="cohort-discussions-nav is-hidden" id="cohort-discussions-management" tabindex="-1">
             <div class="cohort-course-wide-discussions-nav"></div>
             <div class="cohort-inline-discussions-nav"></div>
         </div>

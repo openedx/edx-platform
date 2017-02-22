@@ -44,7 +44,7 @@ var edx = edx || {};
                 model.trigger('sync');
             })
             .fail(function() {
-                var error = gettext("The data could not be saved.");
+                var error = gettext('The data could not be saved.');
                 model.trigger('error', error);
             });
         },
@@ -55,10 +55,10 @@ var edx = edx || {};
             if (attrs.email.length < this.EMAIL_MIN_LENGTH ||
                 attrs.email.length > this.EMAIL_MAX_LENGTH ||
                 !this.EMAIL_REGEX.test(attrs.email)
-            ) { errors.email = gettext("Please enter a valid email address"); }
+            ) { errors.email = gettext('Please enter a valid email address'); }
 
             if (attrs.password.length < this.PASSWORD_MIN_LENGTH || attrs.password.length > this.PASSWORD_MAX_LENGTH) {
-                errors.password = gettext("Please enter a valid password");
+                errors.password = gettext('Please enter a valid password');
             }
 
             if (!$.isEmptyObject(errors)) {
@@ -125,7 +125,7 @@ var edx = edx || {};
             .done(function() {
                 self.$passwordResetStatus
                     .addClass('success')
-                    .text(gettext("Password reset email sent. Follow the link in the email to change your password."));
+                    .text(gettext('Password reset email sent. Follow the link in the email to change your password.'));
             })
             .fail(function() {
                 self.$passwordResetStatus
@@ -159,25 +159,25 @@ var edx = edx || {};
         sync: function() {
             this.$requestStatus
                 .addClass('success')
-                .text(gettext("Please check your email to confirm the change"));
+                .text(gettext('Please check your email to confirm the change'));
         },
 
         clearStatus: function() {
             this.$emailStatus
                 .removeClass('validation-error')
-                .text("");
+                .text('');
 
             this.$passwordStatus
                 .removeClass('validation-error')
-                .text("");
+                .text('');
 
             this.$requestStatus
                 .removeClass('error')
-                .text("");
+                .text('');
 
             this.$passwordResetStatus
                 .removeClass('error')
-                .text("");
+                .text('');
         }
     });
 
@@ -188,5 +188,4 @@ var edx = edx || {};
     } catch (e) {
         // TODO: handle exception
     }
-
 })(jQuery, _, Backbone, gettext);

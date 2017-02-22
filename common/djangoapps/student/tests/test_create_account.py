@@ -12,14 +12,16 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.utils.importlib import import_module
 import mock
+import pytz
 
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
-from lang_pref import LANGUAGE_KEY
+from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from notification_prefs import NOTIFICATION_PREF_KEY
-from external_auth.models import ExternalAuthMap
+from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 import student
 from student.models import UserAttribute
-from student.views import REGISTRATION_AFFILIATE_ID
+from student.views import REGISTRATION_AFFILIATE_ID, REGISTRATION_UTM_PARAMETERS, REGISTRATION_UTM_CREATED_AT
+from django_comment_common.models import ForumsConfig
 
 TEST_CS_URL = 'https://comments.service.test:123/'
 
@@ -231,7 +233,7 @@ class TestCreateAccount(TestCase):
         request.user = AnonymousUser()
 
         with mock.patch('edxmako.request_context.get_current_request', return_value=request):
-            with mock.patch('django.contrib.auth.models.User.email_user') as mock_send_mail:
+            with mock.patch('django.core.mail.send_mail') as mock_send_mail:
                 student.views.create_account(request)
 
         # check that send_mail is called
@@ -251,7 +253,7 @@ class TestCreateAccount(TestCase):
 
     @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
     @mock.patch.dict(settings.FEATURES, {'BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH': False, 'AUTOMATIC_AUTH_FOR_TESTING': False})
-    def test_extauth_bypass_sending_activation_email_without_bypass(self):
+    def test_extauth_bypass_sending_activation_email_without_bypass_1(self):
         """
         Tests user creation without sending activation email when
         settings.FEATURES['BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH']=False and doing external auth
@@ -260,7 +262,7 @@ class TestCreateAccount(TestCase):
 
     @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
     @mock.patch.dict(settings.FEATURES, {'BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH': False, 'AUTOMATIC_AUTH_FOR_TESTING': False, 'SKIP_EMAIL_VALIDATION': True})
-    def test_extauth_bypass_sending_activation_email_without_bypass(self):
+    def test_extauth_bypass_sending_activation_email_without_bypass_2(self):
         """
         Tests user creation without sending activation email when
         settings.FEATURES['BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH']=False and doing external auth
@@ -280,7 +282,7 @@ class TestCreateAccount(TestCase):
                 self.assertIsNone(preference)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-    def test_referral_attribution(self):
+    def test_affiliate_referral_attribution(self):
         """
         Verify that a referral attribution is recorded if an affiliate
         cookie is present upon a new user's registration.
@@ -291,11 +293,116 @@ class TestCreateAccount(TestCase):
         self.assertEqual(UserAttribute.get_user_attribute(user, REGISTRATION_AFFILIATE_ID), affiliate_id)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    def test_utm_referral_attribution(self):
+        """
+        Verify that a referral attribution is recorded if an affiliate
+        cookie is present upon a new user's registration.
+        """
+        utm_cookie_name = 'edx.test.utm'
+        with mock.patch('student.models.RegistrationCookieConfiguration.current') as config:
+            instance = config.return_value
+            instance.utm_cookie_name = utm_cookie_name
+
+            timestamp = 1475521816879
+            utm_cookie = {
+                'utm_source': 'test-source',
+                'utm_medium': 'test-medium',
+                'utm_campaign': 'test-campaign',
+                'utm_term': 'test-term',
+                'utm_content': 'test-content',
+                'created_at': timestamp
+            }
+
+            created_at = datetime.fromtimestamp(timestamp / float(1000), tz=pytz.UTC)
+
+            self.client.cookies[utm_cookie_name] = json.dumps(utm_cookie)
+            user = self.create_account_and_fetch_profile().user
+            self.assertEqual(
+                UserAttribute.get_user_attribute(user, REGISTRATION_UTM_PARAMETERS.get('utm_source')),
+                utm_cookie.get('utm_source')
+            )
+            self.assertEqual(
+                UserAttribute.get_user_attribute(user, REGISTRATION_UTM_PARAMETERS.get('utm_medium')),
+                utm_cookie.get('utm_medium')
+            )
+            self.assertEqual(
+                UserAttribute.get_user_attribute(user, REGISTRATION_UTM_PARAMETERS.get('utm_campaign')),
+                utm_cookie.get('utm_campaign')
+            )
+            self.assertEqual(
+                UserAttribute.get_user_attribute(user, REGISTRATION_UTM_PARAMETERS.get('utm_term')),
+                utm_cookie.get('utm_term')
+            )
+            self.assertEqual(
+                UserAttribute.get_user_attribute(user, REGISTRATION_UTM_PARAMETERS.get('utm_content')),
+                utm_cookie.get('utm_content')
+            )
+            self.assertEqual(
+                UserAttribute.get_user_attribute(user, REGISTRATION_UTM_CREATED_AT),
+                str(created_at)
+            )
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_no_referral(self):
         """Verify that no referral is recorded when a cookie is not present."""
-        self.assertIsNone(self.client.cookies.get(settings.AFFILIATE_COOKIE_NAME))  # pylint: disable=no-member
-        user = self.create_account_and_fetch_profile().user
-        self.assertIsNone(UserAttribute.get_user_attribute(user, REGISTRATION_AFFILIATE_ID))
+        utm_cookie_name = 'edx.test.utm'
+        with mock.patch('student.models.RegistrationCookieConfiguration.current') as config:
+            instance = config.return_value
+            instance.utm_cookie_name = utm_cookie_name
+
+            self.assertIsNone(self.client.cookies.get(settings.AFFILIATE_COOKIE_NAME))  # pylint: disable=no-member
+            self.assertIsNone(self.client.cookies.get(utm_cookie_name))  # pylint: disable=no-member
+            user = self.create_account_and_fetch_profile().user
+            self.assertIsNone(UserAttribute.get_user_attribute(user, REGISTRATION_AFFILIATE_ID))
+            self.assertIsNone(UserAttribute.get_user_attribute(user, REGISTRATION_UTM_PARAMETERS.get('utm_source')))
+            self.assertIsNone(UserAttribute.get_user_attribute(user, REGISTRATION_UTM_PARAMETERS.get('utm_medium')))
+            self.assertIsNone(UserAttribute.get_user_attribute(user, REGISTRATION_UTM_PARAMETERS.get('utm_campaign')))
+            self.assertIsNone(UserAttribute.get_user_attribute(user, REGISTRATION_UTM_PARAMETERS.get('utm_term')))
+            self.assertIsNone(UserAttribute.get_user_attribute(user, REGISTRATION_UTM_PARAMETERS.get('utm_content')))
+            self.assertIsNone(UserAttribute.get_user_attribute(user, REGISTRATION_UTM_CREATED_AT))
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    def test_incomplete_utm_referral(self):
+        """Verify that no referral is recorded when a cookie is not present."""
+        utm_cookie_name = 'edx.test.utm'
+        with mock.patch('student.models.RegistrationCookieConfiguration.current') as config:
+            instance = config.return_value
+            instance.utm_cookie_name = utm_cookie_name
+
+            utm_cookie = {
+                'utm_source': 'test-source',
+                'utm_medium': 'test-medium',
+                # No campaign
+                'utm_term': 'test-term',
+                'utm_content': 'test-content',
+                # No created at
+            }
+
+            self.client.cookies[utm_cookie_name] = json.dumps(utm_cookie)
+            user = self.create_account_and_fetch_profile().user
+
+            self.assertEqual(
+                UserAttribute.get_user_attribute(user, REGISTRATION_UTM_PARAMETERS.get('utm_source')),
+                utm_cookie.get('utm_source')
+            )
+            self.assertEqual(
+                UserAttribute.get_user_attribute(user, REGISTRATION_UTM_PARAMETERS.get('utm_medium')),
+                utm_cookie.get('utm_medium')
+            )
+            self.assertEqual(
+                UserAttribute.get_user_attribute(user, REGISTRATION_UTM_PARAMETERS.get('utm_term')),
+                utm_cookie.get('utm_term')
+            )
+            self.assertEqual(
+                UserAttribute.get_user_attribute(user, REGISTRATION_UTM_PARAMETERS.get('utm_content')),
+                utm_cookie.get('utm_content')
+            )
+            self.assertIsNone(
+                UserAttribute.get_user_attribute(user, REGISTRATION_UTM_PARAMETERS.get('utm_campaign'))
+            )
+            self.assertIsNone(
+                UserAttribute.get_user_attribute(user, REGISTRATION_UTM_CREATED_AT)
+            )
 
 
 @ddt.ddt
@@ -365,7 +472,8 @@ class TestCreateAccountValidation(TestCase):
 
         # Invalid
         params["username"] = "invalid username"
-        assert_username_error("Usernames must contain only letters, numbers, underscores (_), and hyphens (-).")
+        assert_username_error("Usernames can only contain Roman letters, western numerals (0-9), underscores (_), and "
+                              "hyphens (-).")
 
     def test_email(self):
         params = dict(self.minimal_params)
@@ -587,6 +695,10 @@ class TestCreateCommentsServiceUser(TransactionTestCase):
             "terms_of_service": "true",
         }
 
+        config = ForumsConfig.current()
+        config.enabled = True
+        config.save()
+
     def test_cs_user_created(self, request):
         "If user account creation succeeds, we should create a comments service user"
         response = self.client.post(self.url, self.params)
@@ -601,7 +713,7 @@ class TestCreateCommentsServiceUser(TransactionTestCase):
     def test_cs_user_not_created(self, register, request):
         "If user account creation fails, we should not create a comments service user"
         try:
-            response = self.client.post(self.url, self.params)
+            self.client.post(self.url, self.params)
         except:
             pass
         with self.assertRaises(User.DoesNotExist):

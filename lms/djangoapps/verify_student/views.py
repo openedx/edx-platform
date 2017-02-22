@@ -30,18 +30,19 @@ from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
-from commerce.utils import audit_log, EcommerceService
+from commerce.utils import EcommerceService
 from course_modes.models import CourseMode
 from courseware.url_helpers import get_redirect_url
 from edx_rest_api_client.exceptions import SlumberBaseException
 from edxmako.shortcuts import render_to_response, render_to_string
-from embargo import api as embargo_api
+from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.user_api.accounts import NAME_MIN_LENGTH
 from openedx.core.djangoapps.user_api.accounts.api import update_account_settings
 from openedx.core.djangoapps.user_api.errors import UserNotFound, AccountValidationError
 from openedx.core.djangoapps.credit.api import set_credit_requirement_status
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.lib.log_utils import audit_log
 from student.models import CourseEnrollment
 from shoppingcart.models import Order, CertificateItem
 from shoppingcart.processors import (
@@ -423,10 +424,7 @@ class PayAndVerifyView(View):
             'processors': processors,
             'requirements': requirements,
             'user_full_name': full_name,
-            'verification_deadline': (
-                get_default_time_display(verification_deadline)
-                if verification_deadline else ""
-            ),
+            'verification_deadline': verification_deadline or "",
             'already_verified': already_verified,
             'verification_good_until': verification_good_until,
             'capture_sound': staticfiles_storage.url("audio/camera_capture.wav"),
@@ -437,8 +435,8 @@ class PayAndVerifyView(View):
         return render_to_response("verify_student/pay_and_verify.html", context)
 
     def _redirect_if_necessary(
-        self, message, already_verified, already_paid, is_enrolled, course_key,  # pylint: disable=bad-continuation
-        user_is_trying_to_pay, user, sku  # pylint: disable=bad-continuation
+            self, message, already_verified, already_paid, is_enrolled, course_key,  # pylint: disable=bad-continuation
+            user_is_trying_to_pay, user, sku  # pylint: disable=bad-continuation
     ):
         """Redirect the user to a more appropriate page if necessary.
 
@@ -497,8 +495,8 @@ class PayAndVerifyView(View):
             else:
                 url = reverse('verify_student_start_flow', kwargs=course_kwargs)
 
-        if user_is_trying_to_pay and user.is_active:
-            # IIf the user is trying to pay, has activated their account, and the ecommerce service
+        if user_is_trying_to_pay and user.is_active and not already_paid:
+            # If the user is trying to pay, has activated their account, and the ecommerce service
             # is enabled redirect him to the ecommerce checkout page.
             ecommerce_service = EcommerceService()
             if ecommerce_service.is_enabled(user):
@@ -696,10 +694,7 @@ class PayAndVerifyView(View):
             context = {
                 'course': course,
                 'deadline_name': deadline_name,
-                'deadline': (
-                    get_default_time_display(deadline_datetime)
-                    if deadline_datetime else ""
-                )
+                'deadline': deadline_datetime
             }
             return render_to_response("verify_student/missed_deadline.html", context)
 
@@ -1105,7 +1100,7 @@ class SubmitPhotosView(View):
 
         subject = _("Verification photos received")
         message = render_to_string('emails/photo_submission_confirmation.txt', context)
-        from_address = configuration_helpers.get_value('default_from_email', settings.DEFAULT_FROM_EMAIL)
+        from_address = configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
         to_address = user.email
 
         try:
@@ -1245,7 +1240,7 @@ def _set_user_requirement_status(attempt, namespace, status, reason=None):
     if checkpoint is not None:
         try:
             set_credit_requirement_status(
-                attempt.user.username,
+                attempt.user,
                 checkpoint.course_id,
                 namespace,
                 checkpoint.checkpoint_location,
@@ -1376,12 +1371,22 @@ class ReverifyView(View):
         """
         status, _ = SoftwareSecurePhotoVerification.user_status(request.user)
 
+        expiration_datetime = SoftwareSecurePhotoVerification.get_expiration_datetime(request.user)
+        can_reverify = False
+        if expiration_datetime:
+            if SoftwareSecurePhotoVerification.is_verification_expiring_soon(expiration_datetime):
+                # The user has an active verification, but the verification
+                # is set to expire within "EXPIRING_SOON_WINDOW" days (default is 4 weeks).
+                # In this case user can resubmit photos for reverification.
+                can_reverify = True
+
         # If the user has no initial verification or if the verification
         # process is still ongoing 'pending' or expired then allow the user to
         # submit the photo verification.
         # A photo verification is marked as 'pending' if its status is either
         # 'submitted' or 'must_retry'.
-        if status in ["none", "must_reverify", "expired", "pending"]:
+
+        if status in ["none", "must_reverify", "expired", "pending"] or can_reverify:
             context = {
                 "user_full_name": request.user.profile.name,
                 "platform_name": configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),

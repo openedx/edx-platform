@@ -1,8 +1,7 @@
 // Karma config for common suite.
 // Docs and troubleshooting tips in common/static/common/js/karma.common.conf.js
 
-/* jshint node: true */
-/*jshint -W079 */
+/* eslint-env node */
 'use strict';
 var path = require('path');
 var configModule = require(path.join(__dirname, '../../common/static/common/js/karma.common.conf.js'));
@@ -35,9 +34,8 @@ var options = {
         {pattern: 'common/js/vendor/backbone.js', included: true},
 
         {pattern: 'edx-ui-toolkit/js/utils/global-loader.js', included: true},
-        {pattern: 'edx-pattern-library/js/modernizr-custom.js', included: true},
-        {pattern: 'edx-pattern-library/js/afontgarde.js', included: true},
-        {pattern: 'edx-pattern-library/js/edx-icons.js', included: true},
+        {pattern: 'edx-ui-toolkit/js/utils/string-utils.js', included: true},
+        {pattern: 'edx-ui-toolkit/js/utils/html-utils.js', included: true},
 
         {pattern: 'js/vendor/jasmine-imagediff.js', included: true},
         {pattern: 'common/js/spec_helpers/jasmine-extensions.js', included: true},

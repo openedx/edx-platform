@@ -9,6 +9,7 @@ import factory
 import requests
 
 from common.test.acceptance.fixtures import COMMENTS_STUB_URL
+from common.test.acceptance.fixtures.config import ConfigModelFixture
 
 
 class ContentFactory(factory.Factory):
@@ -50,6 +51,7 @@ class Thread(ContentFactory):
     group_id = None
     pinned = False
     read = False
+    context = "course"
 
 
 class Comment(ContentFactory):
@@ -170,3 +172,12 @@ class SearchResultFixture(DiscussionContentFixture):
 
     def get_config_data(self):
         return {"search_result": json.dumps(self.result)}
+
+
+class ForumsConfigMixin(object):
+    """Mixin providing a method used to configure the forums integration."""
+    def enable_forums(self, is_enabled=True):
+        """Configures whether or not forums are enabled."""
+        ConfigModelFixture('/config/forums', {
+            'enabled': is_enabled,
+        }).install()

@@ -4,7 +4,7 @@ Utilities for tests within the django_comment_client module.
 from mock import patch
 
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
-from django_comment_common.models import Role
+from django_comment_common.models import Role, ForumsConfig
 from django_comment_common.utils import seed_permissions_roles
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
@@ -12,7 +12,19 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 
-class CohortedTestCase(UrlResetMixin, SharedModuleStoreTestCase):
+class ForumsEnableMixin(object):
+    """
+    Ensures that the forums are enabled for a given test class.
+    """
+    def setUp(self):
+        super(ForumsEnableMixin, self).setUp()
+
+        config = ForumsConfig.current()
+        config.enabled = True
+        config.save()
+
+
+class CohortedTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase):
     """
     Sets up a course with a student, a moderator and their cohorts.
     """

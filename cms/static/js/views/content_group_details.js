@@ -16,7 +16,7 @@ define([
             'click .hide-groups': 'hideContentGroupUsages'
         },
 
-        className: function () {
+        className: function() {
             var index = this.model.collection.indexOf(this.model);
 
             return [
@@ -36,7 +36,7 @@ define([
         },
 
         render: function(showContentGroupUsages) {
-           var attrs = $.extend({}, this.model.attributes, {
+            var attrs = $.extend({}, this.model.attributes, {
                 usageCountMessage: this.getUsageCountTitle(),
                 courseOutlineUrl: this.model.collection.parents[0].outlineUrl,
                 index: this.model.collection.indexOf(this.model),
@@ -57,7 +57,7 @@ define([
             this.render(false);
         },
 
-        getUsageCountTitle: function () {
+        getUsageCountTitle: function() {
             var count = this.model.get('usage').length;
 
             if (count === 0) {

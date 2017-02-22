@@ -15,10 +15,9 @@ import urllib
 
 import ddt
 from freezegun import freeze_time
-from mock import Mock, patch
+from mock import Mock, patch, MagicMock
 from nose.plugins.attrib import attr
 import tempfile
-from openedx.core.djangoapps.course_groups import cohorts
 import unicodecsv
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
@@ -28,7 +27,11 @@ from certificates.models import CertificateStatuses, GeneratedCertificate
 from certificates.tests.factories import GeneratedCertificateFactory, CertificateWhitelistFactory
 from course_modes.models import CourseMode
 from courseware.tests.factories import InstructorFactory
-from instructor_task.tests.test_base import InstructorTaskCourseTestCase, TestReportMixin, InstructorTaskModuleTestCase
+from lms.djangoapps.instructor_task.tests.test_base import (
+    InstructorTaskCourseTestCase,
+    TestReportMixin,
+    InstructorTaskModuleTestCase
+)
 from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup, CohortMembership
 from django.conf import settings
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -45,9 +48,9 @@ from student.models import CourseEnrollment, CourseEnrollmentAllowed, ManualEnro
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import Group, UserPartition
-from instructor_task.models import ReportStore
+from lms.djangoapps.instructor_task.models import ReportStore
 from survey.models import SurveyForm, SurveyAnswer
-from instructor_task.tasks_helper import (
+from lms.djangoapps.instructor_task.tasks_helper import (
     cohort_students_and_upload,
     upload_problem_responses_csv,
     upload_grades_csv,
@@ -74,7 +77,7 @@ class InstructorGradeReportTestCase(TestReportMixin, InstructorTaskCourseTestCas
         """
         Verify cell data in the grades CSV for a particular user.
         """
-        with patch('instructor_task.tasks_helper._get_current_task'):
+        with patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task'):
             result = upload_grades_csv(None, None, course_id, None, 'graded')
             self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
             report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
@@ -105,22 +108,21 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
 
         self.current_task = Mock()
         self.current_task.update_state = Mock()
-        with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
+        with patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task') as mock_current_task:
             mock_current_task.return_value = self.current_task
             result = upload_grades_csv(None, None, self.course.id, None, 'graded')
         num_students = len(emails)
         self.assertDictContainsSubset({'attempted': num_students, 'succeeded': num_students, 'failed': 0}, result)
 
-    @patch('instructor_task.tasks_helper._get_current_task')
-    @patch('instructor_task.tasks_helper.iterate_grades_for')
-    def test_grading_failure(self, mock_iterate_grades_for, _mock_current_task):
+    @patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task')
+    @patch('lms.djangoapps.grades.new.course_grade.CourseGradeFactory.iter')
+    def test_grading_failure(self, mock_grades_iter, _mock_current_task):
         """
         Test that any grading errors are properly reported in the
         progress dict and uploaded to the report store.
         """
-        # mock an error response from `iterate_grades_for`
-        mock_iterate_grades_for.return_value = [
-            (self.create_student('username', 'student@example.com'), {}, 'Cannot grade student')
+        mock_grades_iter.return_value = [
+            (self.create_student('username', 'student@example.com'), None, 'Cannot grade student')
         ]
         result = upload_grades_csv(None, None, self.course.id, None, 'graded')
         self.assertDictContainsSubset({'attempted': 1, 'succeeded': 0, 'failed': 1}, result)
@@ -289,18 +291,21 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
             u'Default Group',
         )
 
-    @patch('instructor_task.tasks_helper._get_current_task')
-    @patch('instructor_task.tasks_helper.iterate_grades_for')
-    def test_unicode_in_csv_header(self, mock_iterate_grades_for, _mock_current_task):
+    @patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task')
+    @patch('lms.djangoapps.grades.new.course_grade.CourseGradeFactory.iter')
+    def test_unicode_in_csv_header(self, mock_grades_iter, _mock_current_task):
         """
         Tests that CSV grade report works if unicode in headers.
         """
-        # mock a response from `iterate_grades_for`
-        mock_iterate_grades_for.return_value = [
+        mock_course_grade = MagicMock()
+        mock_course_grade.summary = {'section_breakdown': [{'label': u'\u8282\u540e\u9898 01'}]}
+        mock_course_grade.letter_grade = None
+        mock_course_grade.percent = 0
+        mock_grades_iter.return_value = [
             (
                 self.create_student('username', 'student@example.com'),
-                {'section_breakdown': [{'label': u'\u8282\u540e\u9898 01'}], 'percent': 0, 'grade': None},
-                'Cannot grade student'
+                mock_course_grade,
+                '',
             )
         ]
         result = upload_grades_csv(None, None, self.course.id, None, 'graded')
@@ -355,8 +360,8 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskCourseTestCase):
 
     def test_success(self):
         task_input = {'problem_location': ''}
-        with patch('instructor_task.tasks_helper._get_current_task'):
-            with patch('instructor_task.tasks_helper.list_problem_responses') as patched_data_source:
+        with patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task'):
+            with patch('lms.djangoapps.instructor_task.tasks_helper.list_problem_responses') as patched_data_source:
                 patched_data_source.return_value = [
                     {'username': 'user0', 'state': u'state0'},
                     {'username': 'user1', 'state': u'state1'},
@@ -403,7 +408,7 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
     def test_success(self):
         self.create_student('student', 'student@example.com')
         task_input = {'features': []}
-        with patch('instructor_task.tasks_helper._get_current_task'):
+        with patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task'):
             result = upload_enrollment_report(None, None, self.course.id, task_input, 'generating_enrollment_report')
 
         self.assertDictContainsSubset({'attempted': 1, 'succeeded': 1, 'failed': 0}, result)
@@ -419,7 +424,7 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
         student_cart.purchase()
 
         task_input = {'features': []}
-        with patch('instructor_task.tasks_helper._get_current_task'):
+        with patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task'):
             result = upload_enrollment_report(None, None, self.course.id, task_input, 'generating_enrollment_report')
         self.assertDictContainsSubset({'attempted': 1, 'succeeded': 1, 'failed': 0}, result)
         self._verify_cell_data_in_csv(student.username, 'Enrollment Source', 'Credit Card - Individual')
@@ -438,7 +443,7 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
         )
 
         task_input = {'features': []}
-        with patch('instructor_task.tasks_helper._get_current_task'):
+        with patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task'):
             result = upload_enrollment_report(None, None, self.course.id, task_input, 'generating_enrollment_report')
 
         enrollment_source = u'manually enrolled by username: {username}'.format(
@@ -472,13 +477,13 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
-        self.assertTrue('Activate Course Enrollment' in response.content)
+        self.assertIn('Activate Course Enrollment', response.content)
 
         response = self.client.post(redeem_url)
         self.assertEquals(response.status_code, 200)
 
         task_input = {'features': []}
-        with patch('instructor_task.tasks_helper._get_current_task'):
+        with patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task'):
             result = upload_enrollment_report(None, None, self.course.id, task_input, 'generating_enrollment_report')
         self.assertDictContainsSubset({'attempted': 1, 'succeeded': 1, 'failed': 0}, result)
         self._verify_cell_data_in_csv(student.username, 'Enrollment Source', 'Used Registration Code')
@@ -506,13 +511,13 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
-        self.assertTrue('Activate Course Enrollment' in response.content)
+        self.assertIn('Activate Course Enrollment', response.content)
 
         response = self.client.post(redeem_url)
         self.assertEquals(response.status_code, 200)
 
         task_input = {'features': []}
-        with patch('instructor_task.tasks_helper._get_current_task'):
+        with patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task'):
             result = upload_enrollment_report(None, None, self.course.id, task_input, 'generating_enrollment_report')
         self.assertDictContainsSubset({'attempted': 1, 'succeeded': 1, 'failed': 0}, result)
         self._verify_cell_data_in_csv(student.username, 'Enrollment Source', 'Used Registration Code')
@@ -547,13 +552,13 @@ class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCour
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
-        self.assertTrue('Activate Course Enrollment' in response.content)
+        self.assertIn('Activate Course Enrollment', response.content)
 
         response = self.client.post(redeem_url)
         self.assertEquals(response.status_code, 200)
 
         task_input = {'features': []}
-        with patch('instructor_task.tasks_helper._get_current_task'):
+        with patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task'):
             result = upload_enrollment_report(None, None, self.course.id, task_input, 'generating_enrollment_report')
         self.assertDictContainsSubset({'attempted': 1, 'succeeded': 1, 'failed': 0}, result)
         self._verify_cell_data_in_csv(student.username, 'Enrollment Source', 'Used Registration Code')
@@ -585,9 +590,9 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         # technically possible in openedx.
         self.student_1 = self.create_student(u'üser_1')
         self.student_2 = self.create_student(u'üser_2')
-        self.csv_header_row = [u'Student ID', u'Email', u'Username', u'Final Grade']
+        self.csv_header_row = [u'Student ID', u'Email', u'Username', u'Grade']
 
-    @patch('instructor_task.tasks_helper._get_current_task')
+    @patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task')
     def test_no_problems(self, _get_current_task):
         """
         Verify that we see no grade information for a course with no graded
@@ -606,7 +611,7 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
             ))
         ])
 
-    @patch('instructor_task.tasks_helper._get_current_task')
+    @patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task')
     def test_single_problem(self, _get_current_task):
         vertical = ItemFactory.create(
             parent_location=self.problem_section.location,
@@ -614,12 +619,12 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
             metadata={'graded': True},
             display_name='Problem Vertical'
         )
-        self.define_option_problem(u'Pröblem1', parent=vertical)
+        self.define_option_problem(u'Problem1', parent=vertical)
 
-        self.submit_student_answer(self.student_1.username, u'Pröblem1', ['Option 1'])
+        self.submit_student_answer(self.student_1.username, u'Problem1', ['Option 1'])
         result = upload_problem_grade_report(None, None, self.course.id, None, 'graded')
         self.assertDictContainsSubset({'action_name': 'graded', 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
-        problem_name = u'Homework 1: Problem - Pröblem1'
+        problem_name = u'Homework 1: Subsection - Problem1'
         header_row = self.csv_header_row + [problem_name + ' (Earned)', problem_name + ' (Possible)']
         self.verify_rows_in_csv([
             dict(zip(
@@ -628,7 +633,8 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
                     unicode(self.student_1.id),
                     self.student_1.email,
                     self.student_1.username,
-                    '0.01', '1.0', '2.0']
+                    '0.01', '1.0', '2.0',
+                ]
             )),
             dict(zip(
                 header_row,
@@ -636,23 +642,22 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
                     unicode(self.student_2.id),
                     self.student_2.email,
                     self.student_2.username,
-                    '0.0', 'N/A', 'N/A'
+                    '0.0', u'Not Attempted', '2.0',
                 ]
             ))
         ])
 
-    @patch('instructor_task.tasks_helper._get_current_task')
-    @patch('instructor_task.tasks_helper.iterate_grades_for')
-    @ddt.data(u'Cannöt grade student', '')
-    def test_grading_failure(self, error_message, mock_iterate_grades_for, _mock_current_task):
+    @patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task')
+    @patch('lms.djangoapps.grades.new.course_grade.CourseGradeFactory.iter')
+    @ddt.data(u'Cannot grade student', '')
+    def test_grading_failure(self, error_message, mock_grades_iter, _mock_current_task):
         """
         Test that any grading errors are properly reported in the progress
         dict and uploaded to the report store.
         """
-        # mock an error response from `iterate_grades_for`
         student = self.create_student(u'username', u'student@example.com')
-        mock_iterate_grades_for.return_value = [
-            (student, {}, error_message)
+        mock_grades_iter.return_value = [
+            (student, None, error_message)
         ]
         result = upload_problem_grade_report(None, None, self.course.id, None, 'graded')
         self.assertDictContainsSubset({'attempted': 1, 'succeeded': 0, 'failed': 1}, result)
@@ -669,7 +674,7 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         ])
 
 
-@attr('shard_3')
+@attr(shard=3)
 class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent, InstructorTaskModuleTestCase):
     """
     Test the problem report on a course that has split tests.
@@ -680,8 +685,8 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
 
     def setUp(self):
         super(TestProblemReportSplitTestContent, self).setUp()
-        self.problem_a_url = u'pröblem_a_url'
-        self.problem_b_url = u'pröblem_b_url'
+        self.problem_a_url = u'problem_a_url'
+        self.problem_b_url = u'problem_b_url'
         self.define_option_problem(self.problem_a_url, parent=self.vertical_a)
         self.define_option_problem(self.problem_b_url, parent=self.vertical_b)
 
@@ -691,7 +696,8 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
 
         In order to verify that the behavior of the grade report is correct, we submit answers for problems
         that the student won't have access to. A/B tests won't restrict access to the problems, but it should
-        not show up in that student's course tree when generating the grade report, hence the N/A's in the grade report.
+        not show up in that student's course tree when generating the grade report, hence the Not Available's
+        in the grade report.
         """
         # student A will get 100%, student B will get 50% because
         # OPTION_1 is the correct option, and OPTION_2 is the
@@ -702,14 +708,14 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
         self.submit_student_answer(self.student_b.username, self.problem_a_url, [self.OPTION_1, self.OPTION_2])
         self.submit_student_answer(self.student_b.username, self.problem_b_url, [self.OPTION_1, self.OPTION_2])
 
-        with patch('instructor_task.tasks_helper._get_current_task'):
+        with patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task'):
             result = upload_problem_grade_report(None, None, self.course.id, None, 'graded')
             self.assertDictContainsSubset(
                 {'action_name': 'graded', 'attempted': 2, 'succeeded': 2, 'failed': 0}, result
             )
 
-        problem_names = [u'Homework 1: Problem - pröblem_a_url', u'Homework 1: Problem - pröblem_b_url']
-        header_row = [u'Student ID', u'Email', u'Username', u'Final Grade']
+        problem_names = [u'Homework 1: Subsection - problem_a_url', u'Homework 1: Subsection - problem_b_url']
+        header_row = [u'Student ID', u'Email', u'Username', u'Grade']
         for problem in problem_names:
             header_row += [problem + ' (Earned)', problem + ' (Possible)']
 
@@ -720,7 +726,7 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
                     unicode(self.student_a.id),
                     self.student_a.email,
                     self.student_a.username,
-                    u'1.0', u'2.0', u'2.0', u'N/A', u'N/A'
+                    u'1.0', u'2.0', u'2.0', u'Not Available', u'Not Available'
                 ]
             )),
             dict(zip(
@@ -728,7 +734,7 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
                 [
                     unicode(self.student_b.id),
                     self.student_b.email,
-                    self.student_b.username, u'0.5', u'N/A', u'N/A', u'1.0', u'2.0'
+                    self.student_b.username, u'0.5', u'Not Available', u'Not Available', u'1.0', u'2.0'
                 ]
             ))
         ])
@@ -790,11 +796,11 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
             title = 'Homework %d 1: Problem section %d - %s' % (i, i, problem_url)
             problem_names.append(title)
 
-        header_row = [u'Student ID', u'Email', u'Username', u'Final Grade']
+        header_row = [u'Student ID', u'Email', u'Username', u'Grade']
         for problem in problem_names:
             header_row += [problem + ' (Earned)', problem + ' (Possible)']
 
-        with patch('instructor_task.tasks_helper._get_current_task'):
+        with patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task'):
             upload_problem_grade_report(None, None, self.course.id, None, 'graded')
         self.assertEquals(self.get_csv_row_with_headers(), header_row)
 
@@ -814,12 +820,12 @@ class TestProblemReportCohortedContent(TestReportMixin, ContentGroupTestCase, In
             display_name='Problem Vertical'
         )
         self.define_option_problem(
-            u"Pröblem0",
+            u"Problem0",
             parent=vertical,
             group_access={self.course.user_partitions[0].id: [self.course.user_partitions[0].groups[0].id]}
         )
         self.define_option_problem(
-            u"Pröblem1",
+            u"Problem1",
             parent=vertical,
             group_access={self.course.user_partitions[0].id: [self.course.user_partitions[0].groups[1].id]}
         )
@@ -842,29 +848,41 @@ class TestProblemReportCohortedContent(TestReportMixin, ContentGroupTestCase, In
         ))
 
     def test_cohort_content(self):
-        self.submit_student_answer(self.alpha_user.username, u'Pröblem0', ['Option 1', 'Option 1'])
-        resp = self.submit_student_answer(self.alpha_user.username, u'Pröblem1', ['Option 1', 'Option 1'])
+        self.submit_student_answer(self.alpha_user.username, u'Problem0', ['Option 1', 'Option 1'])
+        resp = self.submit_student_answer(self.alpha_user.username, u'Problem1', ['Option 1', 'Option 1'])
         self.assertEqual(resp.status_code, 404)
 
-        resp = self.submit_student_answer(self.beta_user.username, u'Pröblem0', ['Option 1', 'Option 2'])
+        resp = self.submit_student_answer(self.beta_user.username, u'Problem0', ['Option 1', 'Option 2'])
         self.assertEqual(resp.status_code, 404)
-        self.submit_student_answer(self.beta_user.username, u'Pröblem1', ['Option 1', 'Option 2'])
+        self.submit_student_answer(self.beta_user.username, u'Problem1', ['Option 1', 'Option 2'])
 
-        with patch('instructor_task.tasks_helper._get_current_task'):
+        with patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task'):
             result = upload_problem_grade_report(None, None, self.course.id, None, 'graded')
             self.assertDictContainsSubset(
                 {'action_name': 'graded', 'attempted': 4, 'succeeded': 4, 'failed': 0}, result
             )
-        problem_names = [u'Homework 1: Problem - Pröblem0', u'Homework 1: Problem - Pröblem1']
-        header_row = [u'Student ID', u'Email', u'Username', u'Final Grade']
+        problem_names = [u'Homework 1: Subsection - Problem0', u'Homework 1: Subsection - Problem1']
+        header_row = [u'Student ID', u'Email', u'Username', u'Grade']
         for problem in problem_names:
             header_row += [problem + ' (Earned)', problem + ' (Possible)']
 
         user_grades = [
-            {'user': self.staff_user, 'grade': [u'0.0', u'N/A', u'N/A', u'N/A', u'N/A']},
-            {'user': self.alpha_user, 'grade': [u'1.0', u'2.0', u'2.0', u'N/A', u'N/A']},
-            {'user': self.beta_user, 'grade': [u'0.5', u'N/A', u'N/A', u'1.0', u'2.0']},
-            {'user': self.non_cohorted_user, 'grade': [u'0.0', u'N/A', u'N/A', u'N/A', u'N/A']},
+            {
+                'user': self.staff_user,
+                'grade': [u'0.0', u'Not Available', u'Not Available', u'Not Available', u'Not Available'],
+            },
+            {
+                'user': self.alpha_user,
+                'grade': [u'1.0', u'2.0', u'2.0', u'Not Available', u'Not Available'],
+            },
+            {
+                'user': self.beta_user,
+                'grade': [u'0.5', u'Not Available', u'Not Available', u'1.0', u'2.0'],
+            },
+            {
+                'user': self.non_cohorted_user,
+                'grade': [u'0.0', u'Not Available', u'Not Available', u'Not Available', u'Not Available'],
+            },
         ]
 
         # Verify generated grades and expected grades match
@@ -923,7 +941,7 @@ class TestExecutiveSummaryReport(TestReportMixin, InstructorTaskCourseTestCase):
         Test that successfully generates the executive summary report.
         """
         task_input = {'features': []}
-        with patch('instructor_task.tasks_helper._get_current_task'):
+        with patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task'):
             result = upload_exec_summary_report(
                 None, None, self.course.id,
                 task_input, 'generating executive summary report'
@@ -954,7 +972,7 @@ class TestExecutiveSummaryReport(TestReportMixin, InstructorTaskCourseTestCase):
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
-        self.assertTrue('Activate Course Enrollment' in response.content)
+        self.assertIn('Activate Course Enrollment', response.content)
 
         response = self.client.post(redeem_url)
         self.assertEquals(response.status_code, 200)
@@ -976,7 +994,7 @@ class TestExecutiveSummaryReport(TestReportMixin, InstructorTaskCourseTestCase):
         """
         self.students_purchases()
         task_input = {'features': []}
-        with patch('instructor_task.tasks_helper._get_current_task'):
+        with patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task'):
             result = upload_exec_summary_report(
                 None, None, self.course.id,
                 task_input, 'generating executive summary report'
@@ -1000,7 +1018,7 @@ class TestExecutiveSummaryReport(TestReportMixin, InstructorTaskCourseTestCase):
         with report_store.storage.open(report_path) as html_file:
             html_file_data = html_file.read()
             for data in expected_data:
-                self.assertTrue(data in html_file_data)
+                self.assertIn(data, html_file_data)
 
 
 @ddt.ddt
@@ -1042,7 +1060,7 @@ class TestCourseSurveyReport(TestReportMixin, InstructorTaskCourseTestCase):
         Test that successfully generates the course survey report.
         """
         task_input = {'features': []}
-        with patch('instructor_task.tasks_helper._get_current_task'):
+        with patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task'):
             result = upload_course_survey_report(
                 None, None, self.course.id,
                 task_input, 'generating course survey report'
@@ -1057,7 +1075,7 @@ class TestCourseSurveyReport(TestReportMixin, InstructorTaskCourseTestCase):
         """
 
         task_input = {'features': []}
-        with patch('instructor_task.tasks_helper._get_current_task'):
+        with patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task'):
             result = upload_course_survey_report(
                 None, None, self.course.id,
                 task_input, 'generating course survey report'
@@ -1109,7 +1127,7 @@ class TestStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
     def test_success(self):
         self.create_student('student', 'student@example.com')
         task_input = {'features': []}
-        with patch('instructor_task.tasks_helper._get_current_task'):
+        with patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task'):
             result = upload_students_csv(None, None, self.course.id, task_input, 'calculated')
         report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
         links = report_store.links_for(self.course.id)
@@ -1135,7 +1153,7 @@ class TestStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
                 'goals'
             ]
         }
-        with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
+        with patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task') as mock_current_task:
             mock_current_task.return_value = self.current_task
             result = upload_students_csv(None, None, self.course.id, task_input, 'calculated')
         # This assertion simply confirms that the generation completed with no errors
@@ -1167,7 +1185,7 @@ class TestTeamStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
                 'goals', 'team'
             ]
         }
-        with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
+        with patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task') as mock_current_task:
             mock_current_task.return_value = current_task
             result = upload_students_csv(None, None, self.course.id, task_input, 'calculated')
             self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
@@ -1224,7 +1242,7 @@ class TestListMayEnroll(TestReportMixin, InstructorTaskCourseTestCase):
     def test_success(self):
         self._create_enrollment('user@example.com')
         task_input = {'features': []}
-        with patch('instructor_task.tasks_helper._get_current_task'):
+        with patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task'):
             result = upload_may_enroll_csv(None, None, self.course.id, task_input, 'calculated')
         report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
         links = report_store.links_for(self.course.id)
@@ -1242,7 +1260,7 @@ class TestListMayEnroll(TestReportMixin, InstructorTaskCourseTestCase):
             self._create_enrollment(email)
 
         task_input = {'features': ['email']}
-        with patch('instructor_task.tasks_helper._get_current_task'):
+        with patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task'):
             result = upload_may_enroll_csv(None, None, self.course.id, task_input, 'calculated')
         # This assertion simply confirms that the generation completed with no errors
         num_enrollments = len(enrollments)
@@ -1259,7 +1277,7 @@ class MockDefaultStorage(object):
         return open(file_name)
 
 
-@patch('instructor_task.tasks_helper.DefaultStorage', new=MockDefaultStorage)
+@patch('lms.djangoapps.instructor_task.tasks_helper.DefaultStorage', new=MockDefaultStorage)
 class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
     """
     Tests that bulk student cohorting works.
@@ -1281,7 +1299,7 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         with tempfile.NamedTemporaryFile() as temp_file:
             temp_file.write(csv_data.encode('utf-8'))
             temp_file.flush()
-            with patch('instructor_task.tasks_helper._get_current_task'):
+            with patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task'):
                 return cohort_students_and_upload(None, None, self.course.id, {'file_name': temp_file.name}, 'cohorted')
 
     def test_username(self):
@@ -1489,8 +1507,92 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         )
 
 
+@patch('lms.djangoapps.instructor_task.tasks_helper.DefaultStorage', new=MockDefaultStorage)
+class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
+    """
+    Test that grade report has correct grade values.
+    """
+    def setUp(self):
+        super(TestGradeReport, self).setUp()
+        self.create_course()
+        self.student = self.create_student(u'üser_1')
+
+    def create_course(self):
+        """
+        Creates a course with various subsections for testing
+        """
+        self.course = CourseFactory.create(
+            grading_policy={
+                "GRADER": [
+                    {
+                        "type": "Homework",
+                        "min_count": 4,
+                        "drop_count": 0,
+                        "weight": 1.0
+                    },
+                ],
+            },
+        )
+        self.chapter = ItemFactory.create(parent=self.course, category='chapter')
+
+        self.problem_section = ItemFactory.create(
+            parent=self.chapter,
+            category='sequential',
+            metadata={'graded': True, 'format': 'Homework'},
+            display_name='Subsection'
+        )
+        self.define_option_problem(u'Problem1', parent=self.problem_section, num_responses=1)
+        self.hidden_section = ItemFactory.create(
+            parent=self.chapter,
+            category='sequential',
+            metadata={'graded': True, 'format': 'Homework'},
+            visible_to_staff_only=True,
+            display_name='Hidden',
+        )
+        self.define_option_problem(u'Problem2', parent=self.hidden_section)
+        self.unattempted_section = ItemFactory.create(
+            parent=self.chapter,
+            category='sequential',
+            metadata={'graded': True, 'format': 'Homework'},
+            display_name='Unattempted',
+        )
+        self.define_option_problem(u'Problem3', parent=self.unattempted_section)
+        self.empty_section = ItemFactory.create(
+            parent=self.chapter,
+            category='sequential',
+            metadata={'graded': True, 'format': 'Homework'},
+            display_name='Empty',
+        )
+
+    def test_grade_report(self):
+        self.submit_student_answer(self.student.username, u'Problem1', ['Option 1'])
+
+        with patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task'):
+            result = upload_grades_csv(None, None, self.course.id, None, 'graded')
+            self.assertDictContainsSubset(
+                {'action_name': 'graded', 'attempted': 1, 'succeeded': 1, 'failed': 0},
+                result,
+            )
+            self.verify_rows_in_csv(
+                [
+                    {
+                        u'Student ID': unicode(self.student.id),
+                        u'Email': self.student.email,
+                        u'Username': self.student.username,
+                        u'Grade': '0.13',
+                        u'Homework 1: Subsection': '0.5',
+                        u'Homework 2: Hidden': u'Not Available',
+                        u'Homework 3: Unattempted': u'Not Attempted',
+                        u'Homework 4: Empty': u'Not Available',
+                        u'Homework (Avg)': '0.125',
+                    },
+                ],
+                ignore_other_columns=True,
+            )
+
+
 @ddt.ddt
-@patch('instructor_task.tasks_helper.DefaultStorage', new=MockDefaultStorage)
+@patch('lms.djangoapps.instructor_task.tasks_helper.DefaultStorage', new=MockDefaultStorage)
 class TestGradeReportEnrollmentAndCertificateInfo(TestReportMixin, InstructorTaskModuleTestCase):
     """
     Test that grade report has correct user enrolment, verification, and certificate information.
@@ -1540,7 +1642,7 @@ class TestGradeReportEnrollmentAndCertificateInfo(TestReportMixin, InstructorTas
         """
         Verify grade report data.
         """
-        with patch('instructor_task.tasks_helper._get_current_task'):
+        with patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task'):
             upload_grades_csv(None, None, self.course.id, None, 'graded')
             report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
             report_csv_filename = report_store.links_for(self.course.id)[0][0]
@@ -1628,7 +1730,7 @@ class TestGradeReportEnrollmentAndCertificateInfo(TestReportMixin, InstructorTas
         self._verify_csv_data(user.username, expected_output)
 
 
-@attr('shard_3')
+@attr(shard=3)
 @ddt.ddt
 @override_settings(CERT_QUEUE='test-queue')
 class TestCertificateGeneration(InstructorTaskModuleTestCase):
@@ -1671,8 +1773,18 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             'failed': 3,
             'skipped': 2
         }
+        with self.assertNumQueries(166):
+            self.assertCertificatesGenerated(task_input, expected_results)
 
-        with self.assertNumQueries(214):
+        expected_results = {
+            'action_name': 'certificates generated',
+            'total': 10,
+            'attempted': 0,
+            'succeeded': 0,
+            'failed': 0,
+            'skipped': 10
+        }
+        with self.assertNumQueries(3):
             self.assertCertificatesGenerated(task_input, expected_results)
 
     @ddt.data(
@@ -2152,7 +2264,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
         current_task = Mock()
         current_task.update_state = Mock()
 
-        with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
+        with patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task') as mock_current_task:
             mock_current_task.return_value = current_task
             with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_queue:
                 mock_queue.return_value = (0, "Successfully queued")
@@ -2199,10 +2311,12 @@ class TestInstructorOra2Report(SharedModuleStoreTestCase):
             shutil.rmtree(settings.GRADES_DOWNLOAD['ROOT_PATH'])
 
     def test_report_fails_if_error(self):
-        with patch('instructor_task.tasks_helper.OraAggregateData.collect_ora2_data') as mock_collect_data:
+        with patch(
+            'lms.djangoapps.instructor_task.tasks_helper.OraAggregateData.collect_ora2_data'
+        ) as mock_collect_data:
             mock_collect_data.side_effect = KeyError
 
-            with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
+            with patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task') as mock_current_task:
                 mock_current_task.return_value = self.current_task
 
                 response = upload_ora2_data(None, None, self.course.id, None, 'generated')
@@ -2213,13 +2327,17 @@ class TestInstructorOra2Report(SharedModuleStoreTestCase):
         test_header = ['field1', 'field2']
         test_rows = [['row1_field1', 'row1_field2'], ['row2_field1', 'row2_field2']]
 
-        with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
+        with patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task') as mock_current_task:
             mock_current_task.return_value = self.current_task
 
-            with patch('instructor_task.tasks_helper.OraAggregateData.collect_ora2_data') as mock_collect_data:
+            with patch(
+                'lms.djangoapps.instructor_task.tasks_helper.OraAggregateData.collect_ora2_data'
+            ) as mock_collect_data:
                 mock_collect_data.return_value = (test_header, test_rows)
 
-                with patch('instructor_task.models.DjangoStorageReportStore.store_rows') as mock_store_rows:
+                with patch(
+                    'lms.djangoapps.instructor_task.models.DjangoStorageReportStore.store_rows'
+                ) as mock_store_rows:
                     return_val = upload_ora2_data(None, None, self.course.id, None, 'generated')
 
                     # pylint: disable=maybe-no-member

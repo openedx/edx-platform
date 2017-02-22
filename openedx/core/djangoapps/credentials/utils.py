@@ -66,7 +66,7 @@ def get_user_program_credentials(user):
     return programs_credentials_data
 
 
-def get_programs_credentials(user, category=None):
+def get_programs_credentials(user):
     """Return program credentials data required for display.
 
     Given a user, find all programs for which certificates have been earned
@@ -74,7 +74,6 @@ def get_programs_credentials(user, category=None):
 
     Arguments:
         user (User): user object for getting programs credentials.
-        category(str) : program category for getting credentials.
 
     Returns:
         list of dict, containing data corresponding to the programs for which
@@ -83,16 +82,14 @@ def get_programs_credentials(user, category=None):
     programs_credentials = get_user_program_credentials(user)
     credentials_data = []
     for program in programs_credentials:
-        is_included = (category is None) or (program.get('category') == category)
-        if is_included:
-            try:
-                program_data = {
-                    'display_name': program['name'],
-                    'subtitle': program['subtitle'],
-                    'credential_url': program['credential_url'],
-                }
-                credentials_data.append(program_data)
-            except KeyError:
-                log.warning('Program structure is invalid: %r', program)
+        try:
+            program_data = {
+                'display_name': program['name'],
+                'subtitle': program['subtitle'],
+                'credential_url': program['credential_url'],
+            }
+            credentials_data.append(program_data)
+        except KeyError:
+            log.warning('Program structure is invalid: %r', program)
 
     return credentials_data

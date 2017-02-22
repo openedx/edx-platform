@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.db import migrations, models
 import django.utils.timezone
 import model_utils.fields
-import xmodule_django.models
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, UsageKeyField
 
 
 class Migration(migrations.Migration):
@@ -19,8 +19,8 @@ class Migration(migrations.Migration):
                 ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, verbose_name='created', editable=False)),
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
                 ('version', models.IntegerField()),
-                ('id', xmodule_django.models.CourseKeyField(max_length=255, serialize=False, primary_key=True, db_index=True)),
-                ('_location', xmodule_django.models.UsageKeyField(max_length=255)),
+                ('id', CourseKeyField(max_length=255, serialize=False, primary_key=True, db_index=True)),
+                ('_location', UsageKeyField(max_length=255)),
                 ('display_name', models.TextField(null=True)),
                 ('display_number_with_default', models.TextField()),
                 ('display_org_with_default', models.TextField()),

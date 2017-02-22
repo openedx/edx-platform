@@ -1,5 +1,5 @@
-define(["jquery", "underscore", "js/views/baseview", "gettext"],
-    function ($, _, BaseView, gettext) {
+define(['jquery', 'underscore', 'js/views/baseview', 'gettext'],
+    function($, _, BaseView, gettext) {
         /**
          * View for xblock validation messages as displayed in Studio.
          */
@@ -12,7 +12,7 @@ define(["jquery", "underscore", "js/views/baseview", "gettext"],
                 this.root = options.root;
             },
 
-            render: function () {
+            render: function() {
                 this.$el.html(this.template({
                     validation: this.model,
                     additionalClasses: this.getAdditionalClasses(),
@@ -27,7 +27,7 @@ define(["jquery", "underscore", "js/views/baseview", "gettext"],
              * @param messageType
              * @returns string representation of css class that will render the correct icon, or null if unknown type
              */
-            getIcon: function (messageType) {
+            getIcon: function(messageType) {
                 if (messageType === this.model.ERROR) {
                     return 'fa-exclamation-circle';
                 }
@@ -42,16 +42,16 @@ define(["jquery", "underscore", "js/views/baseview", "gettext"],
              * @param messageType
              * @returns string display name (translated)
              */
-            getDisplayName: function (messageType) {
+            getDisplayName: function(messageType) {
                 if (messageType === this.model.WARNING || messageType === this.model.NOT_CONFIGURED) {
                     // Translators: This message will be added to the front of messages of type warning,
                     // e.g. "Warning: this component has not been configured yet".
-                    return gettext("Warning");
+                    return gettext('Warning');
                 }
                 else if (messageType === this.model.ERROR) {
                     // Translators: This message will be added to the front of messages of type error,
                     // e.g. "Error: required field is missing".
-                    return gettext("Error");
+                    return gettext('Error');
                 }
                 return null;
             },
@@ -62,13 +62,12 @@ define(["jquery", "underscore", "js/views/baseview", "gettext"],
              *
              * @returns string of additional css classes (or empty string)
              */
-            getAdditionalClasses: function () {
-                if (this.root && this.model.get("summary").type === this.model.NOT_CONFIGURED &&
-                    this.model.get("messages").length === 0) {
-
-                    return "no-container-content";
+            getAdditionalClasses: function() {
+                if (this.root && this.model.get('summary').type === this.model.NOT_CONFIGURED &&
+                    this.model.get('messages').length === 0) {
+                    return 'no-container-content';
                 }
-                return "";
+                return '';
             }
         });
 

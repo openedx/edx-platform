@@ -99,20 +99,6 @@ theme (so far):
 * ``header.html``
 * ``footer.html``
 
-You should **not** use the following names in your comprehensive theme:
-
-* ``themable-footer.html``
-
-If you look at the ``main.html`` template file, you will notice that it includes
-``header.html`` and ``themable-footer.html``, rather than ``footer.html``.
-You might be inclined to override ``themable-footer.html`` as a result. DO NOT
-DO THIS. ``themable-footer.html`` is an additional layer of indirection that
-is necessary to avoid breaking microsites, which also refers to a file named
-``footer.html``. The goal is to eventually make comprehensive theming do
-everything that microsites does now, and then deprecate and remove microsites
-from the codebase. At that point, the ``themable-footer.html`` file will go
-away, since the additional layer of indirection will no longer be necessary.
-
 Installing your theme
 ---------------------
 

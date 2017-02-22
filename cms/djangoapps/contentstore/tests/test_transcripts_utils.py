@@ -9,6 +9,7 @@ from mock import patch, Mock
 from django.test.utils import override_settings
 from django.conf import settings
 from django.utils import translation
+from django.utils.crypto import get_random_string
 
 from nose.plugins.skip import SkipTest
 
@@ -229,6 +230,17 @@ class TestDownloadYoutubeSubs(SharedModuleStoreTestCase):
         self.assertEqual(html5_ids[1], 'foo.1.bar')
         self.assertEqual(html5_ids[2], 'baz.1.4')
         self.assertEqual(html5_ids[3], 'foo')
+
+    def test_html5_id_length(self):
+        """
+        Test that html5_id is parsed with length less than 255, as html5 ids are
+        used as name for transcript objects and ultimately as filename while creating
+        file for transcript at the time of exporting a course.
+        Filename can't be longer than 255 characters.
+        150 chars is agreed length.
+        """
+        html5_ids = transcripts_utils.get_html5_ids([get_random_string(255)])
+        self.assertEqual(len(html5_ids[0]), 150)
 
     @patch('xmodule.video_module.transcripts_utils.requests.get')
     def test_fail_downloading_subs(self, mock_get):

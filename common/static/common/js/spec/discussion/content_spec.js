@@ -8,9 +8,9 @@
         describe('Staff and TA Content', function() {
             beforeEach(function() {
                 return DiscussionUtil.loadRoles({
-                    "Moderator": [567],
-                    "Administrator": [567],
-                    "Community TA": [567]
+                    'Moderator': [567],
+                    'Administrator': [567],
+                    'Community TA': [567]
                 });
             });
             it('anonymous thread should not include login role label', function() {
@@ -73,7 +73,7 @@
                 var temp_array;
                 temp_array = [];
                 temp_array.push(window.user.get('id'));
-                this.content.set("abuse_flaggers", temp_array);
+                this.content.set('abuse_flaggers', temp_array);
                 this.content.unflagAbuse();
                 return expect(this.content.get('abuse_flaggers')).toEqual([]);
             });
@@ -104,13 +104,13 @@
             });
             return it('can be endorsed', function() {
                 DiscussionUtil.loadRoles({
-                    "Moderator": [111],
-                    "Administrator": [222],
-                    "Community TA": [333]
+                    'Moderator': [111],
+                    'Administrator': [222],
+                    'Community TA': [333]
                 });
                 this.discussionThread = new Thread({
                     id: 1,
-                    thread_type: "discussion",
+                    thread_type: 'discussion',
                     user_id: 99
                 });
                 this.discussionResponse = new Comment({
@@ -119,7 +119,7 @@
                 });
                 this.questionThread = new Thread({
                     id: 1,
-                    thread_type: "question",
+                    thread_type: 'question',
                     user_id: 99
                 });
                 this.questionResponse = new Comment({
@@ -154,5 +154,4 @@
             });
         });
     });
-
 }).call(this);

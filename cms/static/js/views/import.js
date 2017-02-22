@@ -2,12 +2,11 @@
  * Course import-related js.
  */
 define(
-    ["jquery", "underscore", "gettext", "moment", "jquery.cookie"],
+    ['jquery', 'underscore', 'gettext', 'moment', 'jquery.cookie'],
     function($, _, gettext, moment) {
+        'use strict';
 
-        "use strict";
-
-        /********** Private properties ****************************************/
+        /** ******** Private properties ****************************************/
 
         var COOKIE_NAME = 'lastimportupload';
 
@@ -15,35 +14,35 @@ define(
             'UPLOADING': 0,
             'UNPACKING': 1,
             'VERIFYING': 2,
-            'UPDATING' : 3,
-            'SUCCESS'  : 4
+            'UPDATING': 3,
+            'SUCCESS': 4
         };
 
         var STATE = {
-            'READY'      : 1,
+            'READY': 1,
             'IN_PROGRESS': 2,
-            'SUCCESS'    : 3,
-            'ERROR'      : 4
+            'SUCCESS': 3,
+            'ERROR': 4
         };
 
-        var current = { stage: 0, state: STATE.READY };
+        var current = {stage: 0, state: STATE.READY};
         var deferred = null;
-        var file = { name: null, url: null };
-        var timeout = { id: null, delay: 1000 };
+        var file = {name: null, url: null};
+        var timeout = {id: null, delay: 1000};
         var $dom = {
             stages: $('ol.status-progress').children(),
             successStage: $('.item-progresspoint-success'),
             wrapper: $('div.wrapper-status')
         };
 
-        /********** Private functions *****************************************/
+        /** ******** Private functions *****************************************/
 
         /**
          * Destroys any event listener Import might have needed
          * during the process the import
          *
          */
-        var destroyEventListeners = function () {
+        var destroyEventListeners = function() {
             $(window).off('beforeunload.import');
         };
 
@@ -51,7 +50,7 @@ define(
          * Makes Import feedback status list visible
          *
          */
-        var displayFeedbackList = function () {
+        var displayFeedbackList = function() {
             $dom.wrapper.removeClass('is-hidden');
         };
 
@@ -65,7 +64,7 @@ define(
          * @param {string} msg Error message to display.
          * @param {int} [stage=current.stage] Stage of import process at which error occurred.
          */
-        var error = function (msg, stage) {
+        var error = function(msg, stage) {
             current.stage = Math.abs(stage || current.stage); // Could be negative
             current.state = STATE.ERROR;
 
@@ -80,8 +79,8 @@ define(
          * Initializes the event listeners
          *
          */
-        var initEventListeners = function () {
-            $(window).on('beforeunload.import', function () {
+        var initEventListeners = function() {
+            $(window).on('beforeunload.import', function() {
                 if (current.stage <= STAGE.UNPACKING) {
                     return gettext('Your import is in progress; navigating away will abort it.');
                 }
@@ -93,7 +92,7 @@ define(
          *
          * @param {boolean} [completed=false] If the import has been completed or not
          */
-        var storeImport = function (completed) {
+        var storeImport = function(completed) {
             $.cookie(COOKIE_NAME, JSON.stringify({
                 file: file,
                 date: moment().valueOf(),
@@ -107,7 +106,7 @@ define(
          * If it wasn't already, marks the stored import as "completed",
          * and updates its date timestamp
          */
-        var success = function () {
+        var success = function() {
             current.state = STATE.SUCCESS;
 
             if (CourseImport.storedImport().completed !== true) {
@@ -126,7 +125,7 @@ define(
          * @param {string} [currStageMsg=''] The message to show on the
          *   current stage (for now only in case of error)
          */
-        var updateFeedbackList = function (currStageMsg) {
+        var updateFeedbackList = function(currStageMsg) {
             var $checkmark, $curr, $prev, $next;
             var date, successUnix, time;
 
@@ -135,8 +134,8 @@ define(
 
             function completeStage(stage) {
                 $(stage)
-                    .removeClass("is-not-started is-started")
-                    .addClass("is-complete");
+                    .removeClass('is-not-started is-started')
+                    .addClass('is-complete');
             }
 
             function errorStage(stage) {
@@ -146,57 +145,57 @@ define(
                         .addClass('has-error')
                         .find('p.copy')
                         .hide()
-                        .after("<p class='copy error'>" + currStageMsg + "</p>");
+                        .after("<p class='copy error'>" + currStageMsg + '</p>');
                 }
             }
 
             function resetStage(stage) {
                 $(stage)
-                    .removeClass("is-complete is-started has-error")
-                    .addClass("is-not-started")
+                    .removeClass('is-complete is-started has-error')
+                    .addClass('is-not-started')
                     .find('p.error').remove().end()
                     .find('p.copy').show();
             }
 
             switch (current.state) {
-                case STATE.READY:
-                    _.map($dom.stages, resetStage);
+            case STATE.READY:
+                _.map($dom.stages, resetStage);
 
-                    break;
+                break;
 
-                case STATE.IN_PROGRESS:
-                    $prev = $dom.stages.slice(0, current.stage);
-                    $curr = $dom.stages.eq(current.stage);
+            case STATE.IN_PROGRESS:
+                $prev = $dom.stages.slice(0, current.stage);
+                $curr = $dom.stages.eq(current.stage);
 
-                    _.map($prev, completeStage);
-                    $curr.removeClass("is-not-started").addClass("is-started");
+                _.map($prev, completeStage);
+                $curr.removeClass('is-not-started').addClass('is-started');
 
-                    break;
+                break;
 
-                case STATE.SUCCESS:
-                    successUnix = CourseImport.storedImport().date;
-                    date = moment(successUnix).utc().format('MM/DD/YYYY');
-                    time = moment(successUnix).utc().format('HH:mm');
+            case STATE.SUCCESS:
+                successUnix = CourseImport.storedImport().date;
+                date = moment(successUnix).utc().format('MM/DD/YYYY');
+                time = moment(successUnix).utc().format('HH:mm');
 
-                    _.map($dom.stages, completeStage);
+                _.map($dom.stages, completeStage);
 
-                    $dom.successStage
+                $dom.successStage
                         .find('.item-progresspoint-success-date')
                         .html('(' + date + ' at ' + time + ' UTC)');
 
-                    break;
+                break;
 
-                case STATE.ERROR:
+            case STATE.ERROR:
                     // Make all stages up to, and including, the error stage 'complete'.
-                    $prev = $dom.stages.slice(0, current.stage + 1);
-                    $curr = $dom.stages.eq(current.stage);
-                    $next = $dom.stages.slice(current.stage + 1);
+                $prev = $dom.stages.slice(0, current.stage + 1);
+                $curr = $dom.stages.eq(current.stage);
+                $next = $dom.stages.slice(current.stage + 1);
 
-                    _.map($prev, completeStage);
-                    _.map($next, resetStage);
-                    errorStage($curr);
+                _.map($prev, completeStage);
+                _.map($next, resetStage);
+                errorStage($curr);
 
-                    break;
+                break;
             }
 
             if (current.state === STATE.SUCCESS) {
@@ -206,7 +205,7 @@ define(
             }
         };
 
-        /********** Public functions ******************************************/
+        /** ******** Public functions ******************************************/
 
         var CourseImport = {
 
@@ -216,7 +215,7 @@ define(
              * @param {string} msg Error message to display.
              * @param {int} stage Stage of import process at which error occurred.
              */
-            cancel: function (msg, stage) {
+            cancel: function(msg, stage) {
                 error(msg, stage);
             },
 
@@ -228,7 +227,7 @@ define(
              *
              * @param {int} [stage=0] Starting stage.
              */
-            pollStatus: function (stage) {
+            pollStatus: function(stage) {
                 if (current.state !== STATE.IN_PROGRESS) {
                     return;
                 }
@@ -238,12 +237,12 @@ define(
                 if (current.stage === STAGE.SUCCESS) {
                     success();
                 } else if (current.stage < STAGE.UPLOADING) { // Failed
-                    error(gettext("Error importing course"));
+                    error(gettext('Error importing course'));
                 } else { // In progress
                     updateFeedbackList();
 
-                    $.getJSON(file.url, function (data) {
-                        timeout.id = setTimeout(function () {
+                    $.getJSON(file.url, function(data) {
+                        timeout.id = setTimeout(function() {
                             this.pollStatus(data.ImportStatus);
                         }.bind(this), timeout.delay);
                     }.bind(this));
@@ -254,7 +253,7 @@ define(
              * Resets the Import internally and visually
              *
              */
-            reset: function () {
+            reset: function() {
                 current.stage = STAGE.UPLOADING;
                 current.state = STATE.READY;
 
@@ -268,11 +267,11 @@ define(
              *
              * @return {jQuery promise}
              */
-            resume: function () {
+            resume: function() {
                 deferred = $.Deferred();
                 file = this.storedImport().file;
 
-                $.getJSON(file.url, function (data) {
+                $.getJSON(file.url, function(data) {
                     current.stage = data.ImportStatus;
 
                     displayFeedbackList();
@@ -283,7 +282,7 @@ define(
                         this.pollStatus(current.stage);
                     } else {
                         // An import in the upload stage cannot be resumed
-                        error(gettext("There was an error with the upload"));
+                        error(gettext('There was an error with the upload'));
                     }
                 }.bind(this));
 
@@ -299,7 +298,7 @@ define(
              *     about the import status
              * @return {jQuery promise}
              */
-            start: function (fileName, fileUrl) {
+            start: function(fileName, fileUrl) {
                 current.state = STATE.IN_PROGRESS;
                 deferred = $.Deferred();
 
@@ -319,7 +318,7 @@ define(
              *
              * @return {JSON} the data of the previous import
              */
-            storedImport: function () {
+            storedImport: function() {
                 return JSON.parse($.cookie(COOKIE_NAME));
             }
         };

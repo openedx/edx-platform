@@ -22,6 +22,7 @@
 # -----------------------------------------------------------------------------
 
 import os
+import datetime
 
 BASEDIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -63,8 +64,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'edX'
-copyright = u'2013, EdX Doc Team'
+project = 'edX'
+copyright = '{year}, edX Inc. and licensed under a Creative Commons Attribution-ShareAlike 4.0 International License unless otherwise specified'.format(year=datetime.datetime.now().year)
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

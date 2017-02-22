@@ -11,7 +11,6 @@ from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
 import mock
 from nose.plugins.attrib import attr
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from courseware.courses import (
     get_cms_block_link,
@@ -24,9 +23,9 @@ from courseware.courses import (
     get_course_with_access,
 )
 from courseware.module_render import get_module_for_descriptor
-from courseware.tests.helpers import get_request_for_user
 from courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
+from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.courses import course_image_url
 from student.tests.factories import UserFactory
 from xmodule.modulestore.django import _get_modulestore_branch_setting, modulestore
@@ -44,7 +43,7 @@ CMS_BASE_TEST = 'testcms'
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
 
-@attr('shard_1')
+@attr(shard=1)
 @ddt.ddt
 class CoursesTest(ModuleStoreTestCase):
     """Test methods related to fetching courses."""
@@ -161,7 +160,7 @@ class CoursesTest(ModuleStoreTestCase):
             )
 
 
-@attr('shard_1')
+@attr(shard=1)
 class ModuleStoreBranchSettingTest(ModuleStoreTestCase):
     """Test methods related to the modulestore branch setting."""
     @mock.patch(
@@ -187,7 +186,7 @@ class ModuleStoreBranchSettingTest(ModuleStoreTestCase):
         self.assertEqual(_get_modulestore_branch_setting(), 'fake_default_branch')
 
 
-@attr('shard_1')
+@attr(shard=1)
 @override_settings(CMS_BASE=CMS_BASE_TEST)
 class MongoCourseImageTestCase(ModuleStoreTestCase):
     """Tests for course image URLs when using a mongo modulestore."""
@@ -243,7 +242,7 @@ class MongoCourseImageTestCase(ModuleStoreTestCase):
         )
 
 
-@attr('shard_1')
+@attr(shard=1)
 class XmlCourseImageTestCase(XModuleXmlImportTest):
     """Tests for course image URLs when using an xml modulestore."""
 
@@ -261,7 +260,7 @@ class XmlCourseImageTestCase(XModuleXmlImportTest):
         self.assertEquals(course_image_url(course), u'/static/xml_test_course/before after.jpg')
 
 
-@attr('shard_1')
+@attr(shard=1)
 class CoursesRenderTest(ModuleStoreTestCase):
     """Test methods related to rendering courses content."""
 
@@ -277,7 +276,7 @@ class CoursesRenderTest(ModuleStoreTestCase):
         course_items = import_course_from_xml(store, self.user.id, TEST_DATA_DIR, ['toy'])
         course_key = course_items[0].id
         self.course = get_course_by_id(course_key)
-        self.request = get_request_for_user(UserFactory.create())
+        self.request = get_mock_request(UserFactory.create())
 
     def test_get_course_info_section_render(self):
         # Test render works okay
@@ -307,7 +306,7 @@ class CoursesRenderTest(ModuleStoreTestCase):
             self.assertIn("this module is temporarily unavailable", course_about)
 
 
-@attr('shard_1')
+@attr(shard=1)
 @ddt.ddt
 class CourseInstantiationTests(ModuleStoreTestCase):
     """

@@ -147,9 +147,14 @@
 
         .retake-photos {
             color: $blue;
+            background:none!important;
+            border:0!important;
+            padding:0!important;
+            box-shadow: none;
+            cursor: pointer;
 
-            &:hover {
-                cursor: pointer;
+          &:hover, &:focus {
+              text-decoration: underline;
             }
         }
 

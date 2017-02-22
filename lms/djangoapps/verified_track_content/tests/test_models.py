@@ -71,6 +71,7 @@ class TestMoveToVerified(SharedModuleStoreTestCase):
         cls.course = CourseFactory.create()
 
     def setUp(self):
+        super(TestMoveToVerified, self).setUp()
         self.user = UserFactory()
         # Spy on number of calls to celery task.
         celery_task_patcher = patch.object(

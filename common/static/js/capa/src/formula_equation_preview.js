@@ -4,8 +4,7 @@ var formulaEquationPreview = {
 };
 
 /** Setup the FormulaEquationInputs and associated javascript code. */
-formulaEquationPreview.enable = function () {
-
+formulaEquationPreview.enable = function() {
     /**
      * Accumulate all the variables and attach event handlers.
      * This includes rate-limiting `sendRequest` and creating a closure for
@@ -14,7 +13,7 @@ formulaEquationPreview.enable = function () {
     function setupInput() {
         var $this = $(this); // cache the jQuery object
 
-        var $preview = $("#" + this.id + "_preview");
+        var $preview = $('#' + this.id + '_preview');
         var inputData = {
             // These are the mutable values
 
@@ -33,7 +32,7 @@ formulaEquationPreview.enable = function () {
             // Store the DOM/MathJax elements in which visible output occurs.
             $preview: $preview,
             jax: null,  // Fill this in later.
-            $img: $preview.find("img.loading"),
+            $img: $preview.find('img.loading'),
 
             requestCallback: null  // Fill it in in a bit.
         };
@@ -48,7 +47,7 @@ formulaEquationPreview.enable = function () {
             {leading: false}
         );
         // The following acts as a closure of `inputData`.
-        var initializeRequest = function () {
+        var initializeRequest = function() {
             // Show the loading icon.
             inputData.$img.css('visibility', 'visible');
 
@@ -58,16 +57,16 @@ formulaEquationPreview.enable = function () {
             throttledRequest(inputData, this.value);
         };
 
-        if (!$this.data("inputInitialized")) {
+        if (!$this.data('inputInitialized')) {
             // Hack alert: since this javascript file is loaded every time a
             // problem with mathjax preview is loaded, we wrap this step in this
             // condition to make sure we don't attach multiple event listeners
             // per math input if multiple such problems are loaded on a page.
-            $this.on("input", initializeRequest);
+            $this.on('input', initializeRequest);
             // Ask for initial preview.
             initializeRequest.call(this);
             // indicates that the initial preview is done for current $this!
-            $this.data("inputInitialized", true);
+            $this.data('inputInitialized', true);
         }
     }
 
@@ -88,7 +87,7 @@ formulaEquationPreview.enable = function () {
                 inputData.url,
                 inputData.inputId,
                 'preview_formcalc',
-                {"formula" : formula, "request_start" : now},
+                {'formula': formula, 'request_start': now},
                 inputData.requestCallback
             );
             // ).fail(function () {
@@ -135,14 +134,14 @@ formulaEquationPreview.enable = function () {
         }
 
         function display(latex) {
-            MathJax.Hub.Startup.signal.Interest(function (message) {
-                if(message === "End") {
+            MathJax.Hub.Startup.signal.Interest(function(message) {
+                if (message === 'End') {
                     var previewElement = inputData.$preview[0];
-                    MathJax.Hub.Queue(function () {
+                    MathJax.Hub.Queue(function() {
                         inputData.jax = MathJax.Hub.getAllJax(previewElement)[0];
                     });
 
-                    MathJax.Hub.Queue(function () {
+                    MathJax.Hub.Queue(function() {
                         // Check if MathJax is loaded
                         if (inputData.jax) {
                             // Set the text as the latex code, and then update the MathJax.
@@ -150,11 +149,11 @@ formulaEquationPreview.enable = function () {
                                 ['Text', inputData.jax, latex]
                             );
                         } else if (latex) {
-                            console.log("[FormulaEquationInput] Oops no mathjax for ", latex);
+                            console.log('[FormulaEquationInput] Oops no mathjax for ', latex);
                             // Fall back to modifying the actual element.
                             var textNode = previewElement.childNodes[0];
-                            textNode.data = "\\(" + latex + "\\)";
-                            MathJax.Hub.Queue(["Typeset", MathJax.Hub, previewElement]);
+                            textNode.data = '\\(' + latex + '\\)';
+                            MathJax.Hub.Queue(['Typeset', MathJax.Hub, previewElement]);
                         }
                     });
                 }
@@ -163,8 +162,8 @@ formulaEquationPreview.enable = function () {
 
         if (response.error) {
             inputData.$img.css('visibility', 'visible');
-            inputData.errorWaitTimeout = window.setTimeout(function () {
-                display("\\text{" + response.error + "}");
+            inputData.errorWaitTimeout = window.setTimeout(function() {
+                display('\\text{' + response.error + '}');
                 inputData.$img.css('visibility', 'hidden');
             }, formulaEquationPreview.errorDelay);
         } else {

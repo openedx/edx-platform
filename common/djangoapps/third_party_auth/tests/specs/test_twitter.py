@@ -13,6 +13,7 @@ class TwitterIntegrationTest(base.Oauth2IntegrationTest):
         super(TwitterIntegrationTest, self).setUp()
         self.provider = self.configure_twitter_provider(
             enabled=True,
+            visible=True,
             key='twitter_oauth1_key',
             secret='twitter_oauth1_secret',
         )

@@ -6,22 +6,25 @@
   overflow: hidden;
 }
 
-.program-card{
-  @include span(12);  
+.program-card {
+  @include span(12);
   border: 1px solid $border-color-l3;
   border-bottom: none;
   margin-bottom: $baseline;
   position: relative;
 
-  @include susy-media($bp-screen-md) {
+  @media(min-width: $bp-screen-md) {
     @include span(6);
 
     &:nth-child(2n) {
-      @include margin-right(0);
+      @include span(6, before);
+    }
+    &:nth-child(2n+1) {
+      @include span(6, after);
     }
   }
 
-  .card-link{
+  .card-link {
     @include left(0);
     @include right(0);
     position: absolute;
@@ -30,23 +33,23 @@
     border: 0;
     z-index: 1;
     opacity: 0.8;
-    
+
     &:active,
     &:hover,
-    &:focus{
+    &:focus {
       opacity: 1;
     }
 
-    .banner-image-container{
+    .banner-image-container {
       position: relative;
       overflow: hidden;
       height: 166px;
 
-      @include susy-media($bp-screen-sm) { height: 242px; }
-      @include susy-media($bp-screen-md) { height: 116px; }
-      @include susy-media($bp-screen-lg) { height: 145px; }
+      @media(min-width: $bp-screen-sm) { height: 242px; }
+      @media(min-width: $bp-screen-md) { height: 116px; }
+      @media(min-width: $bp-screen-lg) { height: 145px; }
 
-      .banner-image{
+      .banner-image {
         @include left(50%);
         position: absolute;
         top: 0;
@@ -57,17 +60,17 @@
     }
   }
 
-  .text-section{
+  .text-section {
     padding: 40px $baseline $baseline;
     position: relative;
     margin-top: 156px;
 
-    @include susy-media($bp-screen-sm) { margin-top: 232px; }
-    @include susy-media($bp-screen-md) { margin-top: 106px; }
-    @include susy-media($bp-screen-lg) { margin-top: 135px; }
+    @media(min-width: $bp-screen-sm) { margin-top: 232px; }
+    @media(min-width: $bp-screen-md) { margin-top: 106px; }
+    @media(min-width: $bp-screen-lg) { margin-top: 135px; }
   }
 
-  .meta-info{
+  .meta-info {
     font-size: font-size(x-small);
     color: palette(grayscale, dark);
     position: absolute;
@@ -75,33 +78,32 @@
     width: calc(100% - 40px);
   }
 
-  .organization{
-    @include span(6);
+  .organization {
+    @include span(6, none);
     white-space: nowrap;
     overflow: hidden;
   }
 
-  .category{
-    @include span(6);
+  .category {
+    @include span(6, none);
     @include text-align(right);
 
-    .category-text{
-        @include float(right);
+    .category-text {
+      @include float(right);
     }
 
-    .xseries-icon{
+    .category-icon {
       @include float(right);
       @include margin-right($baseline*0.25);
-      background: url('#{$static-path}/images/icon-sm-xseries-black.png') no-repeat;
       background-color: transparent;
       background-size: 100%;
       width: ($baseline*0.7);
       height: ($baseline*0.7);
     }
   }
-  
+
   .hd-3 {
-    color: palette(grayscale, x-dark);
+    color: palette(grayscale, dark);
     min-height: ($baseline*3);
     line-height: 1;
   }
@@ -114,7 +116,7 @@
       color: palette(grayscale, dark);
       line-height: 1;
     }
- 
+
     .secondary {
       @extend %hide-until-focus;
     }
@@ -138,7 +140,7 @@
 
   .progress {
     height: 5px;
-    background: palette(grayscale-cool, x-light);
+    background: palette(grayscale, back);
 
     .bar {
       @include float(left);
@@ -146,11 +148,11 @@
       position: relative;
 
       &.complete {
-        background: palette(success, dark);
+        background: palette(success, accent);
       }
 
       &.in-progress {
-        background: palette(warning, base);
+        background: palette(warning, accent);
       }
     }
   }

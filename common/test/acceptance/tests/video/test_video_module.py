@@ -4,21 +4,22 @@
 Acceptance tests for Video.
 """
 import os
+from ddt import ddt, unpack, data
 
 from mock import patch
 from nose.plugins.attrib import attr
 from unittest import skipIf, skip
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
-from ..helpers import UniqueCourseTest, is_youtube_available, YouTubeStubConfig
-from ...pages.lms.video.video import VideoPage
-from ...pages.lms.tab_nav import TabNavPage
-from ...pages.lms.courseware import CoursewarePage
-from ...pages.lms.course_nav import CourseNavPage
-from ...pages.lms.auto_auth import AutoAuthPage
-from ...pages.lms.course_info import CourseInfoPage
-from ...fixtures.course import CourseFixture, XBlockFixtureDesc
-from ..helpers import skip_if_browser
+from common.test.acceptance.tests.helpers import UniqueCourseTest, is_youtube_available, YouTubeStubConfig
+from common.test.acceptance.pages.lms.video.video import VideoPage
+from common.test.acceptance.pages.lms.tab_nav import TabNavPage
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.pages.lms.course_nav import CourseNavPage
+from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.lms.course_info import CourseInfoPage
+from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
+from common.test.acceptance.tests.helpers import skip_if_browser
 
 from flaky import flaky
 
@@ -48,6 +49,7 @@ class VideoBaseTest(UniqueCourseTest):
         Initialization of pages and course fixture for video tests
         """
         super(VideoBaseTest, self).setUp()
+        self.longMessage = True  # pylint: disable=invalid-name
 
         self.video = VideoPage(self.browser)
         self.tab_nav = TabNavPage(self.browser)
@@ -198,7 +200,8 @@ class VideoBaseTest(UniqueCourseTest):
         self.video.wait_for_video_player_render()
 
 
-@attr('shard_4')
+@attr(shard=4)
+@ddt
 class YouTubeVideoTest(VideoBaseTest):
     """ Test YouTube Video Player """
 
@@ -409,7 +412,7 @@ class YouTubeVideoTest(VideoBaseTest):
         Then the video has rendered in "HTML5" mode
         """
         # configure youtube server
-        self.youtube_configuration['time_to_response'] = 2.0
+        self.youtube_configuration['time_to_response'] = 7.0
         self.metadata = self.metadata_for_mode('youtube_html5')
 
         self.navigate_to_video()
@@ -491,15 +494,16 @@ class YouTubeVideoTest(VideoBaseTest):
         self.assertTrue(self.video.is_button_shown('transcript_button'))
         self._verify_caption_text('Welcome to edX.')
 
-    def test_download_transcript_button_works_correctly(self):
+    @data(('srt', '00:00:00,260'), ('txt', 'Welcome to edX.'))
+    @unpack
+    def test_download_transcript_links_work_correctly(self, file_type, search_text):
         """
-        Scenario: Download Transcript button works correctly
+        Scenario: Download 'srt' transcript link works correctly.
+        Download 'txt' transcript link works correctly.
         Given the course has Video components A and B in "Youtube" mode
         And Video component C in "HTML5" mode
         And I have defined downloadable transcripts for the videos
         Then I can download a transcript for Video A in "srt" format
-        And I can download a transcript for Video A in "txt" format
-        And I can download a transcript for Video B in "txt" format
         And the Download Transcript menu does not exist for Video C
         """
 
@@ -524,19 +528,7 @@ class YouTubeVideoTest(VideoBaseTest):
         self.navigate_to_video()
 
         # check if we can download transcript in "srt" format that has text "00:00:00,260"
-        self.assertTrue(self.video.downloaded_transcript_contains_text('srt', '00:00:00,260'))
-
-        # select the transcript format "txt"
-        self.assertTrue(self.video.select_transcript_format('txt'))
-
-        # check if we can download transcript in "txt" format that has text "Welcome to edX."
-        self.assertTrue(self.video.downloaded_transcript_contains_text('txt', 'Welcome to edX.'))
-
-        # open vertical containing video "B"
-        self.course_nav.go_to_vertical('Test Vertical-1')
-
-        # check if we can download transcript in "txt" format that has text "Equal transcripts"
-        self.assertTrue(self.video.downloaded_transcript_contains_text('txt', 'Equal transcripts'))
+        self.assertTrue(self.video.downloaded_transcript_contains_text(file_type, search_text))
 
         # open vertical containing video "C"
         self.course_nav.go_to_vertical('Test Vertical-2')
@@ -935,7 +927,7 @@ class YouTubeVideoTest(VideoBaseTest):
         execute_video_steps(tab1_video_names)
 
 
-@attr('shard_4')
+@attr(shard=4)
 class YouTubeHtml5VideoTest(VideoBaseTest):
     """ Test YouTube HTML5 Video Player """
 
@@ -957,7 +949,7 @@ class YouTubeHtml5VideoTest(VideoBaseTest):
         self.assertTrue(self.video.is_video_rendered('youtube'))
 
 
-@attr('shard_4')
+@attr(shard=4)
 class Html5VideoTest(VideoBaseTest):
     """ Test HTML5 Video Player """
 
@@ -1042,6 +1034,8 @@ class Html5VideoTest(VideoBaseTest):
 
         # check if "Welcome to edX." text in the captions
         self.assertIn('Welcome to edX.', self.video.captions_text)
+
+        self.video.wait_for_element_visibility('.transcript-end', 'Transcript has loaded')
 
         # check if we can download transcript in "srt" format that has text "Welcome to edX."
         self.assertTrue(self.video.downloaded_transcript_contains_text('srt', 'Welcome to edX.'))
@@ -1143,7 +1137,7 @@ class Html5VideoTest(VideoBaseTest):
         self.assertTrue(all([source in HTML5_SOURCES for source in self.video.sources]))
 
 
-@attr('shard_4')
+@attr(shard=4)
 class YouTubeQualityTest(VideoBaseTest):
     """ Test YouTube Video Quality Button """
 
@@ -1192,7 +1186,7 @@ class YouTubeQualityTest(VideoBaseTest):
         self.video.wait_for(lambda: self.video.is_quality_button_active, 'waiting for quality button activation')
 
 
-@attr('shard_4')
+@attr(shard=4)
 class DragAndDropTest(VideoBaseTest):
     """
     Tests draggability of closed captions within videos.
@@ -1232,7 +1226,7 @@ class DragAndDropTest(VideoBaseTest):
             )
         else:
             self.assertEqual(
-                captions_end.get('y') + 15,
+                captions_end.get('y') + 16,
                 captions_start.get('y'),
                 'Closed captions did not get dragged.'
             )

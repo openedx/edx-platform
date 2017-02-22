@@ -59,17 +59,20 @@
             @include text-align(left);
             text-shadow: 0 1px rgba(255,255,255, 0.6);
 
-            a {
-              color: $lighter-base-font-color;
-              font: italic 700 0.6em/1em $sans-serif;
-              letter-spacing: 0px;
-              @include margin-left($baseline*0.75);
-              text-shadow: 0 1px rgba(255,255,255, 0.6);
-              text-transform: none;
+            .button-org {
+                @include margin-left($baseline*0.75);
+                background: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
+                text-shadow: none !important;
+                text-transform: normal !important;
+                font-size: $body-font-size;
+                color: $base-font-color !important;
+                letter-spacing: 0px !important;
 
-              &:hover, &:focus {
-                color: $link-color;
-              }
+                &:hover, &:focus {
+                    color: $link-color;
+                }
             }
           }
 
@@ -78,7 +81,7 @@
             margin: 0;
 
             a {
-              color: $lighter-base-font-color;
+              color: $base-font-color;
               font: italic 700 1em/1em $sans-serif;
               letter-spacing: 0px;
               text-shadow: 0 1px rgba(255,255,255, 0.6);
@@ -249,7 +252,7 @@
         @include float(right);
         padding: ($baseline/4) ($baseline/2);
         border-radius: ($baseline/4);
-        background-color: $shadow-l2;
+        background-color: $light-gray1;
         @include text-align(right);
         text-transform: uppercase;
         color: $staff-color;

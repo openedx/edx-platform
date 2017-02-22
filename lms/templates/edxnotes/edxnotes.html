@@ -1,7 +1,7 @@
 <%page expression_filter="h"/>
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
-
+<%def name="online_help_token()"><% return "notes" %></%def>
 <%!
 from django.utils.translation import ugettext as _
 from edxnotes.helpers import NoteJSONEncoder

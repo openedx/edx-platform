@@ -21,7 +21,7 @@
             return child;
         };
 
-    if (typeof Backbone !== "undefined" && Backbone !== null) {
+    if (typeof Backbone !== 'undefined' && Backbone !== null) {
         this.DiscussionThreadView = (function(_super) {
             var INITIAL_RESPONSE_PAGE_SIZE, SUBSEQUENT_RESPONSE_PAGE_SIZE;
 
@@ -61,10 +61,10 @@
             SUBSEQUENT_RESPONSE_PAGE_SIZE = 100;
 
             DiscussionThreadView.prototype.events = {
-                "click .discussion-submit-post": "submitComment",
-                "click .add-response-btn": "scrollToAddResponse",
-                "click .forum-thread-expand": "expand",
-                "click .forum-thread-collapse": "collapse"
+                'click .discussion-submit-post': 'submitComment',
+                'click .add-response-btn': 'scrollToAddResponse',
+                'click .forum-thread-expand': 'expand',
+                'click .forum-thread-collapse': 'collapse'
             };
 
             DiscussionThreadView.prototype.$ = function(selector) {
@@ -72,23 +72,23 @@
             };
 
             DiscussionThreadView.prototype.isQuestion = function() {
-                return this.model.get("thread_type") === "question";
+                return this.model.get('thread_type') === 'question';
             };
 
             DiscussionThreadView.prototype.initialize = function(options) {
                 var _ref,
                     self = this;
                 DiscussionThreadView.__super__.initialize.call(this);
-                this.mode = options.mode || "inline";
-                this.context = options.context || "course";
+                this.mode = options.mode || 'inline';
+                this.context = options.context || 'course';
                 this.options = _.extend({}, options);
-                if ((_ref = this.mode) !== "tab" && _ref !== "inline") {
-                    throw new Error("invalid mode: " + this.mode);
+                if ((_ref = this.mode) !== 'tab' && _ref !== 'inline') {
+                    throw new Error('invalid mode: ' + this.mode);
                 }
-                this.readOnly = $(".discussion-module").data('read-only');
-                this.model.collection.on("reset", function(collection) {
+                this.readOnly = $('.discussion-module').data('read-only');
+                this.model.collection.on('reset', function(collection) {
                     var id;
-                    id = self.model.get("id");
+                    id = self.model.get('id');
                     if (collection.get(id)) {
                         self.model = collection.get(id);
                     }
@@ -119,53 +119,48 @@
 
             DiscussionThreadView.prototype.renderTemplate = function() {
                 var container, templateData;
-                this.template = _.template($("#thread-template").html());
-                container = $("#discussion-container");
+                this.template = _.template($('#thread-template').html());
+                container = $('#discussion-container');
                 if (!container.length) {
-                    container = $(".discussion-module");
+                    container = $('.discussion-module');
                 }
                 templateData = _.extend(this.model.toJSON(), {
                     readOnly: this.readOnly,
-                    can_create_comment: container.data("user-create-comment")
+                    can_create_comment: container.data('user-create-comment')
                 });
                 return this.template(templateData);
             };
 
             DiscussionThreadView.prototype.render = function() {
                 var self = this;
-                this.$el.html(this.renderTemplate());
+                var $element = $(this.renderTemplate());
+                this.$el.empty();
+                this.$el.append($element);
                 this.delegateEvents();
                 this.renderShowView();
                 this.renderAttrs();
-                this.$("span.timeago").timeago();
-                this.makeWmdEditor("reply-body");
+                this.$('span.timeago').timeago();
+                this.makeWmdEditor('reply-body');
                 this.renderAddResponseButton();
-                this.responses.on("add", function(response) {
-                    return self.renderResponseToList(response, ".js-response-list", {});
+                this.responses.on('add', function(response) {
+                    return self.renderResponseToList(response, '.js-response-list', {});
                 });
                 if (this.isQuestion()) {
-                    this.markedAnswers.on("add", function(response) {
-                        return self.renderResponseToList(response, ".js-marked-answer-list", {
+                    this.markedAnswers.on('add', function(response) {
+                        return self.renderResponseToList(response, '.js-marked-answer-list', {
                             collapseComments: true
                         });
                     });
                 }
-                if (this.mode === "tab") {
-                    setTimeout(function() {
-                        return self.loadInitialResponses();
-                    }, 100);
-                    return this.$(".post-tools").hide();
-                } else {
-                    return this.collapse();
-                }
+                this.loadInitialResponses();
             };
 
             DiscussionThreadView.prototype.attrRenderer = $.extend({}, DiscussionContentView.prototype.attrRenderer, {
                 closed: function(closed) {
-                    this.$(".discussion-reply-new").toggle(!closed);
+                    this.$('.discussion-reply-new').toggle(!closed);
                     this.$('.comment-form').closest('li').toggle(!closed);
-                    this.$(".action-vote").toggle(!closed);
-                    this.$(".display-vote").toggle(closed);
+                    this.$('.action-vote').toggle(!closed);
+                    this.$('.display-vote').toggle(closed);
                     return this.renderAddResponseButton();
                 }
             });
@@ -174,12 +169,12 @@
                 if (event) {
                     event.preventDefault();
                 }
-                this.$el.addClass("expanded");
-                this.$el.find(".post-body").text(this.model.get("body"));
+                this.$el.addClass('expanded');
+                this.$el.find('.post-body').text(this.model.get('body'));
                 this.showView.convertMath();
-                this.$el.find(".forum-thread-expand").hide();
-                this.$el.find(".forum-thread-collapse").show();
-                this.$el.find(".post-extended-content").show();
+                this.$el.find('.forum-thread-expand').hide();
+                this.$el.find('.forum-thread-collapse').show();
+                this.$el.find('.post-extended-content').show();
                 if (!this.loadedResponses) {
                     return this.loadInitialResponses();
                 }
@@ -189,22 +184,22 @@
                 if (event) {
                     event.preventDefault();
                 }
-                this.$el.removeClass("expanded");
-                this.$el.find(".post-body").text(this.getAbbreviatedBody());
+                this.$el.removeClass('expanded');
+                this.$el.find('.post-body').text(this.getAbbreviatedBody());
                 this.showView.convertMath();
-                this.$el.find(".forum-thread-expand").show();
-                this.$el.find(".forum-thread-collapse").hide();
-                return this.$el.find(".post-extended-content").hide();
+                this.$el.find('.forum-thread-expand').show();
+                this.$el.find('.forum-thread-collapse').hide();
+                return this.$el.find('.post-extended-content').hide();
             };
 
             DiscussionThreadView.prototype.getAbbreviatedBody = function() {
                 var abbreviated, cached;
-                cached = this.model.get("abbreviatedBody");
+                cached = this.model.get('abbreviatedBody');
                 if (cached) {
                     return cached;
                 } else {
-                    abbreviated = DiscussionUtil.abbreviateString(this.model.get("body"), 140);
-                    this.model.set("abbreviatedBody", abbreviated);
+                    abbreviated = DiscussionUtil.abbreviateString(this.model.get('body'), 140);
+                    this.model.set('abbreviatedBody', abbreviated);
                     return abbreviated;
                 }
             };
@@ -218,10 +213,8 @@
                 }
             };
 
-            DiscussionThreadView.prototype.loadResponses = function(responseLimit, elem, firstLoad) {
-                var takeFocus,
-                    self = this;
-                takeFocus = this.mode === "tab" ? false : true;
+            DiscussionThreadView.prototype.loadResponses = function(responseLimit, $elem, firstLoad) {
+                var self = this;
                 this.responsesRequest = DiscussionUtil.safeAjax({
                     url: DiscussionUtil.urlFor(
                         'retrieve_single_thread', this.model.get('commentable_id'), this.model.id
@@ -230,9 +223,9 @@
                         resp_skip: this.responses.size(),
                         resp_limit: responseLimit ? responseLimit : void 0
                     },
-                    $elem: elem,
-                    $loading: elem,
-                    takeFocus: takeFocus,
+                    $elem: $elem,
+                    $loading: $elem,
+                    takeFocus: false,
                     complete: function() {
                         self.responsesRequest = null;
                     },
@@ -249,9 +242,8 @@
                                 data.content.non_endorsed_resp_total :
                                 data.content.resp_total
                         );
-                        self.trigger("thread:responses:rendered");
+                        self.trigger('thread:responses:rendered');
                         self.loadedResponses = true;
-                        return self.$el.find('.discussion-article[data-id="' + self.model.id + '"]').focus();
                     },
                     error: function(xhr, textStatus) {
                         if (textStatus === 'abort') {
@@ -259,18 +251,18 @@
                         }
                         if (xhr.status === 404) {
                             DiscussionUtil.discussionAlert(
-                                gettext("Sorry"),
-                                gettext("The thread you selected has been deleted. Please select another thread.")
+                                gettext('Error'),
+                                gettext('The post you selected has been deleted.')
                             );
                         } else if (firstLoad) {
                             DiscussionUtil.discussionAlert(
-                                gettext("Sorry"),
-                                gettext("We had some trouble loading responses. Please reload the page.")
+                                gettext('Error'),
+                                gettext('Responses could not be loaded. Refresh the page and try again.')
                             );
                         } else {
                             DiscussionUtil.discussionAlert(
-                                gettext("Sorry"),
-                                gettext("We had some trouble loading more responses. Please try again.")
+                                gettext('Error'),
+                                gettext('Additional responses could not be loaded. Refresh the page and try again.')
                             );
                         }
                     }
@@ -278,60 +270,69 @@
             };
 
             DiscussionThreadView.prototype.loadInitialResponses = function() {
-                return this.loadResponses(INITIAL_RESPONSE_PAGE_SIZE, this.$el.find(".js-response-list"), true);
+                return this.loadResponses(INITIAL_RESPONSE_PAGE_SIZE, this.$el.find('.js-response-list'), true);
             };
 
             DiscussionThreadView.prototype.renderResponseCountAndPagination = function(responseTotal) {
-                var buttonText, loadMoreButton, responseCountFormat, responseLimit, responsePagination,
+                var buttonText, $loadMoreButton, responseCountFormat, responseLimit, responsePagination,
                     responsesRemaining, showingResponsesText, self = this;
                 if (this.isQuestion() && this.markedAnswers.length !== 0) {
                     responseCountFormat = ngettext(
-                        "%(numResponses)s other response", "%(numResponses)s other responses", responseTotal
+                        '{numResponses} other response', '{numResponses} other responses', responseTotal
                     );
+                    if (responseTotal === 0) {
+                        this.$el.find('.response-count').hide();
+                    }
                 } else {
                     responseCountFormat = ngettext(
-                        "%(numResponses)s response", "%(numResponses)s responses", responseTotal
+                        '{numResponses} response', '{numResponses} responses', responseTotal
                     );
                 }
-                this.$el.find(".response-count").html(interpolate(responseCountFormat, {
-                    numResponses: responseTotal
-                }, true));
-                responsePagination = this.$el.find(".response-pagination");
+                this.$el.find('.response-count').text(
+                    edx.StringUtils.interpolate(responseCountFormat, {numResponses: responseTotal}, true)
+                );
+
+                responsePagination = this.$el.find('.response-pagination');
                 responsePagination.empty();
                 if (responseTotal > 0) {
                     responsesRemaining = responseTotal - this.responses.size();
                     if (responsesRemaining === 0) {
-                        showingResponsesText = gettext("Showing all responses");
+                        showingResponsesText = gettext('Showing all responses');
                     }
                     else {
-                        showingResponsesText = interpolate(
+                        showingResponsesText = edx.StringUtils.interpolate(
                             ngettext(
-                                "Showing first response", "Showing first %(numResponses)s responses",
+                                'Showing first response', 'Showing first {numResponses} responses',
                                 this.responses.size()
                             ),
-                            { numResponses: this.responses.size() },
+                            {numResponses: this.responses.size()},
                             true
                         );
                     }
 
-                    responsePagination.append($("<span>")
-                        .addClass("response-display-count").html(_.escape(showingResponsesText)));
+                    responsePagination.append($('<span>')
+                        .addClass('response-display-count').text(showingResponsesText));
                     if (responsesRemaining > 0) {
                         if (responsesRemaining < SUBSEQUENT_RESPONSE_PAGE_SIZE) {
                             responseLimit = null;
-                            buttonText = gettext("Load all responses");
+                            buttonText = gettext('Load all responses');
                         } else {
                             responseLimit = SUBSEQUENT_RESPONSE_PAGE_SIZE;
-                            buttonText = interpolate(gettext("Load next %(numResponses)s responses"), {
+                            buttonText = edx.StringUtils.interpolate(gettext('Load next {numResponses} responses'), {
                                 numResponses: responseLimit
                             }, true);
                         }
-                        loadMoreButton = $("<button>").addClass("load-response-button").html(_.escape(buttonText));
-                        loadMoreButton.click(function() {
-                            return self.loadResponses(responseLimit, loadMoreButton);
+                        $loadMoreButton = $('<button>')
+                            .addClass('btn-neutral')
+                            .addClass('load-response-button')
+                            .text(buttonText);
+                        $loadMoreButton.click(function() {
+                            return self.loadResponses(responseLimit, $loadMoreButton);
                         });
-                        return responsePagination.append(loadMoreButton);
+                        return responsePagination.append($loadMoreButton);
                     }
+                } else {
+                    this.$el.find('.add-response').hide();
                 }
             };
 
@@ -341,8 +342,8 @@
                 view = new ThreadResponseView($.extend({
                     model: response
                 }, options));
-                view.on("comment:add", this.addComment);
-                view.on("comment:endorse", this.endorseThread);
+                view.on('comment:add', this.addComment);
+                view.on('comment:endorse', this.endorseThread);
                 view.render();
                 this.$el.find(listSelector).append(view.el);
                 return view.afterInsert();
@@ -350,9 +351,9 @@
 
             DiscussionThreadView.prototype.renderAddResponseButton = function() {
                 if (this.model.hasResponses() && this.model.can('can_reply') && !this.model.get('closed')) {
-                    return this.$el.find('div.add-response').show();
+                    return this.$el.find('.add-response').show();
                 } else {
-                    return this.$el.find('div.add-response').hide();
+                    return this.$el.find('.add-response').hide();
                 }
             };
 
@@ -369,37 +370,37 @@
             };
 
             DiscussionThreadView.prototype.endorseThread = function() {
-                return this.model.set('endorsed', this.$el.find(".action-answer.is-checked").length > 0);
+                return this.model.set('endorsed', this.$el.find('.action-answer.is-checked').length > 0);
             };
 
             DiscussionThreadView.prototype.submitComment = function(event) {
                 var body, comment, url;
                 event.preventDefault();
                 url = this.model.urlFor('reply');
-                body = this.getWmdContent("reply-body");
+                body = this.getWmdContent('reply-body');
                 if (!body.trim().length) {
                     return;
                 }
-                this.setWmdContent("reply-body", "");
+                this.setWmdContent('reply-body', '');
                 comment = new Comment({
                     body: body,
                     created_at: (new Date()).toISOString(),
-                    username: window.user.get("username"),
+                    username: window.user.get('username'),
                     votes: {
                         up_count: 0
                     },
                     abuse_flaggers: [],
                     endorsed: false,
-                    user_id: window.user.get("id")
+                    user_id: window.user.get('id')
                 });
                 comment.set('thread', this.model.get('thread'));
-                this.renderResponseToList(comment, ".js-response-list");
+                this.renderResponseToList(comment, '.js-response-list');
                 this.model.addComment();
                 this.renderAddResponseButton();
                 return DiscussionUtil.safeAjax({
                     $elem: $(event.target),
                     url: url,
-                    type: "POST",
+                    type: 'POST',
                     dataType: 'json',
                     data: {
                         body: body
@@ -429,8 +430,8 @@
                     context: this.context,
                     course_settings: this.options.course_settings
                 });
-                this.editView.bind("thread:updated thread:cancel_edit", this.closeEditView);
-                return this.editView.bind("comment:endorse", this.endorseThread);
+                this.editView.bind('thread:updated thread:cancel_edit', this.closeEditView);
+                return this.editView.bind('comment:endorse', this.endorseThread);
             };
 
             DiscussionThreadView.prototype.renderSubView = function(view) {
@@ -448,8 +449,8 @@
                     model: this.model,
                     mode: this.mode
                 });
-                this.showView.bind("thread:_delete", this._delete);
-                return this.showView.bind("thread:edit", this.edit);
+                this.showView.bind('thread:_delete', this._delete);
+                return this.showView.bind('thread:edit', this.edit);
             };
 
             DiscussionThreadView.prototype.renderShowView = function() {
@@ -460,7 +461,7 @@
                 this.createShowView();
                 this.renderShowView();
                 this.renderAttrs();
-                return this.$el.find(".post-extended-content").show();
+                return this.$el.find('.post-extended-content').show();
             };
 
             DiscussionThreadView.prototype._delete = function(event) {
@@ -469,7 +470,7 @@
                 if (!this.model.can('can_delete')) {
                     return;
                 }
-                if (!confirm(gettext("Are you sure you want to delete this post?"))) {
+                if (!confirm(gettext('Are you sure you want to delete this post?'))) {
                     return;
                 }
                 this.model.remove();
@@ -480,13 +481,11 @@
                 return DiscussionUtil.safeAjax({
                     $elem: $elem,
                     url: url,
-                    type: "POST"
+                    type: 'POST'
                 });
             };
 
             return DiscussionThreadView;
-
         })(DiscussionContentView);
     }
-
 }).call(window);

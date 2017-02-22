@@ -1,8 +1,7 @@
 // Karma config for common-requirejs suite.
 // Docs and troubleshooting tips in common/static/common/js/karma.common.conf.js
 
-/* jshint node: true */
-/*jshint -W079 */
+/* eslint-env node */
 
 'use strict';
 var path = require('path');
@@ -12,7 +11,7 @@ var options = {
 
     includeCommonFiles: true,
 
-    normalizePathsForCoverageFunc: function (appRoot, pattern) {
+    normalizePathsForCoverageFunc: function(appRoot, pattern) {
         return path.join(appRoot, '/common/static/' + pattern);
     },
 
@@ -40,6 +39,6 @@ var options = {
     ]
 };
 
-module.exports = function (config) {
+module.exports = function(config) {
     configModule.configure(config, options);
 };

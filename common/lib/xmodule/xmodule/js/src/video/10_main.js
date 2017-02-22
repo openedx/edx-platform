@@ -1,4 +1,4 @@
-(function (require, $) {
+(function(require, $) {
     'use strict';
     // In the case when the Video constructor will be called before RequireJS finishes loading all of the Video
     // dependencies, we will have a mock function that will collect all the elements that must be initialized as
@@ -7,15 +7,15 @@
     // Once RequireJS will load all of the necessary dependencies, main code will invoke the mock function with
     // the second parameter set to truthy value. This will trigger the actual Video constructor on all elements
     // that are stored in a temporary list.
-    window.Video = (function () {
+    window.Video = (function() {
         // Temporary storage place for elements that must be initialized as Video elements.
         var tempCallStack = [];
 
-        return function (element, processTempCallStack) {
+        return function(element, processTempCallStack) {
             // If mock function was called with second parameter set to truthy value, we invoke the real `window.Video`
             // on all the stored elements so far.
             if (processTempCallStack) {
-                $.each(tempCallStack, function (index, element) {
+                $.each(tempCallStack, function(index, element) {
                     // By now, `window.Video` is the real constructor.
                     window.Video(element);
                 });
@@ -57,7 +57,7 @@
             'video/10_commands.js',
             'video/095_video_context_menu.js'
         ],
-        function (
+        function(
             VideoStorage, initialize, FocusGrabber, VideoAccessibleMenu, VideoControl, VideoFullScreen,
             VideoQualityControl, VideoProgressSlider, VideoVolumeControl, VideoSpeedControl, VideoCaption,
             VideoPlayPlaceholder, VideoPlayPauseControl, VideoPlaySkipControl, VideoSkipControl, VideoBumper,
@@ -67,7 +67,7 @@
             var youtubeXhr = null,
                 oldVideo = window.Video;
 
-            window.Video = function (element) {
+            window.Video = function(element) {
                 var el = $(element).find('.video'),
                     id = el.attr('id').replace(/video_/, ''),
                     storage = VideoStorage('VideoState', id),
@@ -88,14 +88,14 @@
                         modules: mainVideoModules
                     };
 
-                var getBumperState = function (metadata) {
+                var getBumperState = function(metadata) {
                     var bumperState = $.extend(true, {
-                            el: el,
-                            id: id,
-                            storage: storage,
-                            options: {},
-                            youtubeXhr: youtubeXhr
-                        }, {metadata: metadata});
+                        el: el,
+                        id: id,
+                        storage: storage,
+                        options: {},
+                        youtubeXhr: youtubeXhr
+                    }, {metadata: metadata});
 
                     bumperState.modules = bumperVideoModules;
                     bumperState.options = {
@@ -104,8 +104,8 @@
                     return bumperState;
                 };
 
-                var player = function (state) {
-                    return function () {
+                var player = function(state) {
+                    return function() {
                         _.extend(state.metadata, {autoplay: true, focusFirstControl: true});
                         initialize(state, element);
                     };
@@ -119,7 +119,7 @@
                 if (bumperMetadata) {
                     new VideoPoster(el, {
                         poster: el.data('poster'),
-                        onClick: _.once(function () {
+                        onClick: _.once(function() {
                             var mainVideoPlayer = player(state), bumper, bumperState;
                             if (storage.getItem('isBumperShown')) {
                                 mainVideoPlayer();
@@ -127,7 +127,7 @@
                                 bumperState = getBumperState(bumperMetadata);
                                 bumper = new VideoBumper(player(bumperState), bumperState);
                                 state.bumperState = bumperState;
-                                bumper.getPromise().done(function () {
+                                bumper.getPromise().done(function() {
                                     delete state.bumperState;
                                     mainVideoPlayer();
                                 });
@@ -143,7 +143,7 @@
                 }
 
                 el.data('video-player-state', state);
-                var onSequenceChange = function onSequenceChange () {
+                var onSequenceChange = function onSequenceChange() {
                     if (state && state.videoPlayer) {
                         state.videoPlayer.destroy();
                     }
@@ -156,7 +156,7 @@
                 return state;
             };
 
-            window.Video.clearYoutubeXhr = function () {
+            window.Video.clearYoutubeXhr = function() {
                 youtubeXhr = null;
             };
 

@@ -236,7 +236,7 @@ class AuthTestCase(ContentStoreTestCase):
         # check the the HTML has links to the right login page. Note that this is merely a content
         # check and thus could be fragile should the wording change on this page
         expected = 'You can now <a href="' + reverse('login') + '">sign in</a>.'
-        self.assertIn(expected, resp.content)
+        self.assertIn(expected, resp.content.decode('utf-8'))
 
     def test_private_pages_auth(self):
         """Make sure pages that do require login work."""

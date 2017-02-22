@@ -10,6 +10,7 @@ from paver.easy import call_task, cmdopts, consume_args, needs, sh, task
 from .assets import collect_assets
 from .utils.cmd import django_cmd
 from .utils.process import run_process, run_multi_processes
+from .utils.timer import timed
 
 
 DEFAULT_PORT = {"lms": 8000, "studio": 8001}
@@ -256,6 +257,7 @@ def run_all_servers(options):
     ("settings=", "s", "Django settings"),
     ("fake-initial", None, "Fake the initial migrations"),
 ])
+@timed
 def update_db(options):
     """
     Migrates the lms and cms across all databases
@@ -273,6 +275,7 @@ def update_db(options):
 @task
 @needs('pavelib.prereqs.install_prereqs')
 @consume_args
+@timed
 def check_settings(args):
     """
     Checks settings files.

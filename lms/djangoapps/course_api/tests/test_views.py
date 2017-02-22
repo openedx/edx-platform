@@ -47,7 +47,7 @@ class CourseApiTestViewMixin(CourseApiFactoryMixin):
         return response
 
 
-@attr('shard_3')
+@attr(shard=3)
 class CourseListViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase):
     """
     Test responses returned from CourseListView.

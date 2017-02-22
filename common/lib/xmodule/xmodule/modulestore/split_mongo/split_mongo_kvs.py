@@ -136,7 +136,7 @@ class SplitMongoKVS(InheritanceKeyValueStore):
 
     def has(self, key):
         """
-        Is the given field explicitly set in this kvs (not inherited nor default)
+        Is the given field explicitly set in this kvs (neither inherited nor default)
         """
         # handle any special cases
         if key.scope not in self.VALID_SCOPES:
@@ -157,6 +157,12 @@ class SplitMongoKVS(InheritanceKeyValueStore):
             # it's not clear whether inherited values should return True. Right now they don't
             # if someone changes it so that they do, then change any tests of field.name in xx._field_data
             return key.field_name in self._fields
+
+    def has_default_value(self, field_name):
+        """
+        Is the given field has default value in this kvs
+        """
+        return field_name in self._defaults
 
     def default(self, key):
         """

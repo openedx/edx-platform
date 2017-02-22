@@ -4,10 +4,10 @@
 Acceptance tests for CMS Video Editor.
 """
 from nose.plugins.attrib import attr
-from .test_studio_video_module import CMSVideoBaseTest
+from common.test.acceptance.tests.video.test_studio_video_module import CMSVideoBaseTest
 
 
-@attr('shard_6')
+@attr(shard=6)
 class VideoEditorTest(CMSVideoBaseTest):
     """
     CMS Video Editor Test Class
@@ -125,6 +125,27 @@ class VideoEditorTest(CMSVideoBaseTest):
         self.assertTrue(self.video.is_captions_visible())
         self.assertIn(unicode_text, self.video.captions_text)
         self.assertEqual(self.video.caption_languages.keys(), ['zh', 'uk'])
+
+    def test_save_language_upload_no_transcript(self):
+        """
+        Scenario: Transcript language is not shown in language menu if no transcript file is uploaded
+        Given I have created a Video component
+        And I edit the component
+        And I open tab "Advanced"
+        And I add a language "uk" but do not upload an .srt file
+        And I save changes
+        When I view the video language menu
+        Then I am not able to see the language "uk" translation language
+        """
+        self._create_video_component()
+        self.edit_component()
+        self.open_advanced_tab()
+        language_code = 'uk'
+        self.video.click_button('translation_add')
+        translations_count = self.video.translations_count()
+        self.video.select_translation_language(language_code, translations_count - 1)
+        self.save_unit_settings()
+        self.assertNotIn(language_code, self.video.caption_languages.keys())
 
     def test_upload_large_transcript(self):
         """

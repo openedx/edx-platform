@@ -36,20 +36,16 @@ from django.core.mail import EmailMultiAlternatives, get_connection
 from django.core.mail.message import forbid_multi_line_headers
 from django.core.urlresolvers import reverse
 
-from bulk_email.models import (
-    CourseEmail, Optout, Target
-)
+from bulk_email.models import CourseEmail, Optout
 from courseware.courses import get_course
 from openedx.core.lib.courses import course_image_url
-from student.roles import CourseStaffRole, CourseInstructorRole
-from instructor_task.models import InstructorTask
-from instructor_task.subtasks import (
+from lms.djangoapps.instructor_task.models import InstructorTask
+from lms.djangoapps.instructor_task.subtasks import (
     SubtaskStatus,
     queue_subtasks_for_query,
     check_subtask_is_valid,
     update_subtask_status,
 )
-from util.query import use_read_replica_if_available
 from util.date_utils import get_default_time_display
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
@@ -104,18 +100,20 @@ def _get_course_email_context(course):
     course_id = course.id.to_deprecated_string()
     course_title = course.display_name
     course_end_date = get_default_time_display(course.end)
-    course_url = 'https://{}{}'.format(
-        settings.SITE_NAME,
-        reverse('course_root', kwargs={'course_id': course_id})
+    course_root = reverse('course_root', kwargs={'course_id': course_id})
+    course_url = '{}{}'.format(
+        settings.LMS_ROOT_URL,
+        course_root
     )
-    image_url = u'https://{}{}'.format(settings.SITE_NAME, course_image_url(course))
+    image_url = u'{}{}'.format(settings.LMS_ROOT_URL, course_image_url(course))
     email_context = {
         'course_title': course_title,
+        'course_root': course_root,
         'course_url': course_url,
         'course_image_url': image_url,
         'course_end_date': course_end_date,
-        'account_settings_url': 'https://{}{}'.format(settings.SITE_NAME, reverse('account_settings')),
-        'email_settings_url': 'https://{}{}'.format(settings.SITE_NAME, reverse('dashboard')),
+        'account_settings_url': '{}{}'.format(settings.LMS_ROOT_URL, reverse('account_settings')),
+        'email_settings_url': '{}{}'.format(settings.LMS_ROOT_URL, reverse('dashboard')),
         'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
     }
     return email_context
@@ -795,8 +793,11 @@ def _submit_for_retry(entry_id, email_id, to_list, global_email_context,
         raise retry_task
     except RetryTaskError as retry_error:
         # If the retry call is successful, update with the current progress:
-        log.exception(u'Task %s: email with id %d caused send_course_email task to retry.',
-                      task_id, email_id)
+        log.info(
+            u'Task %s: email with id %d caused send_course_email task to retry again.',
+            task_id,
+            email_id
+        )
         return subtask_status, retry_error
     except Exception as retry_exc:  # pylint: disable=broad-except
         # If there are no more retries, because the maximum has been reached,

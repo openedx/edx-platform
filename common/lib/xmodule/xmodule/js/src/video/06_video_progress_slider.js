@@ -1,5 +1,4 @@
-(function (requirejs, require, define) {
-
+(function(requirejs, require, define) {
 /*
 "This is as true in everyday life as it is in battle: we are given one life
 and the decision is ours whether to wait for circumstances to make up our
@@ -8,16 +7,16 @@ mind, or whether to act, and in acting, to live."
  */
 
 // VideoProgressSlider module.
-define(
+    define(
 'video/06_video_progress_slider.js',
 [],
-function () {
+function() {
     var template = [
         '<div class="slider" title="', gettext('Video position'), '"></div>'
     ].join('');
 
     // VideoProgressSlider() function - what this module "exports".
-    return function (state) {
+    return function(state) {
         var dfd = $.Deferred();
 
         state.videoProgressSlider = {};
@@ -298,19 +297,19 @@ function () {
         var seconds = Math.floor(time),
             minutes = Math.floor(seconds / 60),
             hours = Math.floor(minutes / 60),
-            i18n = function (value, word) {
+            i18n = function(value, word) {
                 var msg;
 
-                switch(word) {
-                    case 'hour':
-                        msg = ngettext('%(value)s hour', '%(value)s hours', value);
-                        break;
-                    case 'minute':
-                        msg = ngettext('%(value)s minute', '%(value)s minutes', value);
-                        break;
-                    case 'second':
-                        msg = ngettext('%(value)s second', '%(value)s seconds', value);
-                        break;
+                switch (word) {
+                case 'hour':
+                    msg = ngettext('%(value)s hour', '%(value)s hours', value);
+                    break;
+                case 'minute':
+                    msg = ngettext('%(value)s minute', '%(value)s minutes', value);
+                    break;
+                case 'second':
+                    msg = ngettext('%(value)s second', '%(value)s seconds', value);
+                    break;
                 }
                 return interpolate(msg, {'value': value}, true);
             };
@@ -319,17 +318,15 @@ function () {
         minutes = minutes % 60;
 
         if (hours) {
-            return  i18n(hours, 'hour') + ' ' +
+            return i18n(hours, 'hour') + ' ' +
                     i18n(minutes, 'minute') + ' ' +
                     i18n(seconds, 'second');
         } else if (minutes) {
-            return  i18n(minutes, 'minute') + ' ' +
+            return i18n(minutes, 'minute') + ' ' +
                     i18n(seconds, 'second');
         }
 
         return i18n(seconds, 'second');
     }
-
 });
-
 }(RequireJS.requirejs, RequireJS.require, RequireJS.define));

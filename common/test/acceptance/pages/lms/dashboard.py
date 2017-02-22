@@ -3,7 +3,7 @@
 Student dashboard page.
 """
 from bok_choy.page_object import PageObject
-from . import BASE_URL
+from common.test.acceptance.pages.lms import BASE_URL
 
 
 class DashboardPage(PageObject):
@@ -156,6 +156,10 @@ class DashboardPage(PageObject):
         """ Retrieves the specified social sharing widget by its classification """
         return self.q(css='a.action-{}'.format(widget_name))
 
+    def get_profile_img(self):
+        """ Retrieves the user's profile image """
+        return self.q(css='img.user-image-frame')
+
     def get_courses(self):
         """
         Get all courses shown in the dashboard
@@ -166,7 +170,7 @@ class DashboardPage(PageObject):
         """
         Get course date of the first course from dashboard
         """
-        return self.q(css='ul.listing-courses .course-item .info-date-block').first.text[0]
+        return self.q(css='ul.listing-courses .course-item:first-of-type .info-date-block').first.text[0]
 
     def click_username_dropdown(self):
         """

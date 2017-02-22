@@ -52,14 +52,6 @@
                 </label>
                 <p class='field-message' id='review-rules-description'><%- gettext('Specify any additional rules or rule exceptions that the proctoring review team should enforce when reviewing the videos. For example, you could specify that calculators are allowed.') %></p>
             </li>
-            <li class="field-checkbox field-hide-after-due">
-                <label class="label">
-                    <input type="checkbox" class="input input-checkbox"
-                        aria-describedby="hide-after-due-description"/>
-                    <%- gettext('Hide Exam After Due Date') %>
-                </label>
-                <p class='field-message' id='hide-after-due-description'><%- gettext('By default, submitted exams are available for review after the due date has passed. Select this option to keep exams hidden after that date.') %></p>
-            </li>
         </ul>
     </div>
 </form>

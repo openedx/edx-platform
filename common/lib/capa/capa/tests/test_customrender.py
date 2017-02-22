@@ -2,7 +2,7 @@ from lxml import etree
 import unittest
 import xml.sax.saxutils as saxutils
 
-from . import test_capa_system
+from capa.tests.helpers import test_capa_system
 from capa import customrender
 
 # just a handy shortcut

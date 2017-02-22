@@ -18,7 +18,7 @@
     padding: ($baseline*0.75) 0 ($baseline*0.75) 0;
 
     li {
-      @include float(left);
+      display: inline-block;
       list-style: none;
 
       &.prominent {
@@ -41,22 +41,13 @@
         display: block;
         text-align: center;
         text-decoration: none;
+        border-bottom: 4px solid transparent;
 
         &:hover,
-        &:focus {
-          color: $blue;
-          border-bottom: 4px solid $blue;
-        }
-
+        &:focus,
         &.active {
-          border-bottom: 4px solid $blue;
-          background-color: transparent;
-          color: $blue;
-
-          &:hover,
-          &:focus {
-            color: $blue;
-          }
+          color: $uxpl-blue-hover-active;
+          border-bottom-color: $uxpl-blue-hover-active;
         }
       }
     }
@@ -97,7 +88,7 @@
       display: block;
       @include background-image(linear-gradient(-90deg, lighten($link-color, 8%), lighten($link-color, 5%) 50%, $link-color 50%, darken($link-color, 10%) 100%));
       border: 1px solid transparent;
-      border-color: darken($link-color, 10%);
+      border-color: $uxpl-blue-base;
       border-radius: 3px;
       @include box-sizing(border-box);
       box-shadow: 0 1px 0 0 rgba(255,255,255, 0.6);
@@ -117,7 +108,7 @@
       vertical-align: middle;
 
       &:hover, &:active, &:focus {
-        @include background-image(linear-gradient(-90deg, $link-color, $link-color 50%, $link-color 50%, $link-color 100%));
+        @include background-image(linear-gradient(-90deg, $uxpl-blue-base, $uxpl-blue-base 50%, $uxpl-blue-base 50%, $uxpl-blue-base 100%));
       }
     }
   }
@@ -154,6 +145,7 @@
 
     img {
       height: 30px;
+      width: auto;
     }
   }
 

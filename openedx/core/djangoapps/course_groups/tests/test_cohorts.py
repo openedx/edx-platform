@@ -27,7 +27,7 @@ from ..tests.helpers import (
 )
 
 
-@attr('shard_2')
+@attr(shard=2)
 @patch("openedx.core.djangoapps.course_groups.cohorts.tracker", autospec=True)
 class TestCohortSignals(TestCase):
     """
@@ -133,7 +133,7 @@ class TestCohortSignals(TestCase):
         self.assertFalse(mock_tracker.emit.called)
 
 
-@attr('shard_2')
+@attr(shard=2)
 @ddt.ddt
 class TestCohorts(ModuleStoreTestCase):
     """
@@ -264,7 +264,7 @@ class TestCohorts(ModuleStoreTestCase):
 
     @ddt.data(
         (True, 3),
-        (False, 9),
+        (False, 7),
     )
     @ddt.unpack
     def test_get_cohort_sql_queries(self, use_cached, num_sql_queries):
@@ -727,7 +727,7 @@ class TestCohorts(ModuleStoreTestCase):
             )
 
 
-@attr('shard_2')
+@attr(shard=2)
 @ddt.ddt
 class TestCohortsAndPartitionGroups(ModuleStoreTestCase):
     """

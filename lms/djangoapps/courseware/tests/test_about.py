@@ -10,7 +10,6 @@ from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 from mock import patch
 from nose.plugins.attrib import attr
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from course_modes.models import CourseMode
 from track.tests import EventTrackingTestCase
@@ -42,7 +41,7 @@ REG_STR = "<form id=\"class_enroll_form\" method=\"post\" data-remote=\"true\" a
 SHIB_ERROR_STR = "The currently logged-in user account does not have permission to enroll in this course."
 
 
-@attr('shard_1')
+@attr(shard=1)
 class AboutTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase, EventTrackingTestCase, MilestonesTestCaseMixin):
     """
     Tests about xblock.
@@ -141,7 +140,7 @@ class AboutTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase, EventTra
         info_url = reverse('info', args=[self.course.id.to_deprecated_string()])
         self.assertTrue(target_url.endswith(info_url))
 
-    @patch.dict(settings.FEATURES, {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
+    @patch.dict(settings.FEATURES, {'ENABLE_PREREQUISITE_COURSES': True})
     def test_pre_requisite_course(self):
         pre_requisite_course = CourseFactory.create(org='edX', course='900', display_name='pre requisite course')
         course = CourseFactory.create(pre_requisite_courses=[unicode(pre_requisite_course.id)])
@@ -155,7 +154,7 @@ class AboutTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase, EventTra
                       .format(pre_requisite_course_about_url, pre_requisite_courses[0]['display']),
                       resp.content.strip('\n'))
 
-    @patch.dict(settings.FEATURES, {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
+    @patch.dict(settings.FEATURES, {'ENABLE_PREREQUISITE_COURSES': True})
     def test_about_page_unfulfilled_prereqs(self):
         pre_requisite_course = CourseFactory.create(
             org='edX',
@@ -196,7 +195,7 @@ class AboutTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase, EventTra
         self.assertEqual(resp.status_code, 200)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class AboutTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Tests for the course about page
@@ -244,7 +243,7 @@ class AboutTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.assertIn(self.xml_data, resp.content)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class AboutWithCappedEnrollmentsTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
     """
     This test case will check the About page when a course has a capped enrollment
@@ -297,7 +296,7 @@ class AboutWithCappedEnrollmentsTestCase(LoginEnrollmentTestCase, SharedModuleSt
         self.assertNotIn(REG_STR, resp.content)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class AboutWithInvitationOnly(SharedModuleStoreTestCase):
     """
     This test case will check the About page when a course is invitation only.
@@ -346,7 +345,7 @@ class AboutWithInvitationOnly(SharedModuleStoreTestCase):
         self.assertIn(REG_STR, resp.content)
 
 
-@attr('shard_1')
+@attr(shard=1)
 @patch.dict(settings.FEATURES, {'RESTRICT_ENROLL_BY_REG_METHOD': True})
 class AboutTestCaseShibCourse(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
     """
@@ -390,7 +389,7 @@ class AboutTestCaseShibCourse(LoginEnrollmentTestCase, SharedModuleStoreTestCase
         self.assertIn(REG_STR, resp.content)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class AboutWithClosedEnrollment(ModuleStoreTestCase):
     """
     This test case will check the About page for a course that has enrollment start/end
@@ -433,7 +432,7 @@ class AboutWithClosedEnrollment(ModuleStoreTestCase):
         self.assertNotIn('<span class="important-dates-item-text">$10</span>', resp.content)
 
 
-@attr('shard_1')
+@attr(shard=1)
 @patch.dict(settings.FEATURES, {'ENABLE_SHOPPING_CART': True})
 @patch.dict(settings.FEATURES, {'ENABLE_PAID_COURSE_REGISTRATION': True})
 class AboutPurchaseCourseTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):

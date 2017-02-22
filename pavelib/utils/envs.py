@@ -22,12 +22,15 @@ class Env(object):
     REPORT_DIR = REPO_ROOT / 'reports'
     METRICS_DIR = REPORT_DIR / 'metrics'
 
+    # Generic log dir
+    GEN_LOG_DIR = REPO_ROOT / "test_root" / "log"
+
     # Python unittest dirs
     PYTHON_COVERAGERC = REPO_ROOT / ".coveragerc"
 
     # Bok_choy dirs
     BOK_CHOY_DIR = REPO_ROOT / "common" / "test" / "acceptance"
-    BOK_CHOY_LOG_DIR = REPO_ROOT / "test_root" / "log"
+    BOK_CHOY_LOG_DIR = GEN_LOG_DIR
     BOK_CHOY_REPORT_DIR = REPORT_DIR / "bok_choy"
     BOK_CHOY_A11Y_REPORT_DIR = REPORT_DIR / "a11y"
     BOK_CHOY_COVERAGERC = BOK_CHOY_DIR / ".coveragerc"
@@ -103,15 +106,20 @@ class Env(object):
             'log': BOK_CHOY_LOG_DIR / "bok_choy_edxnotes.log",
         },
 
+        'ecommerce': {
+            'port': 8043,
+            'log': BOK_CHOY_LOG_DIR / "bok_choy_ecommerce.log",
+        },
+
         'programs': {
             'port': 8090,
             'log': BOK_CHOY_LOG_DIR / "bok_choy_programs.log",
         },
 
-        'ecommerce': {
-            'port': 8043,
-            'log': BOK_CHOY_LOG_DIR / "bok_choy_ecommerce.log",
-        }
+        'catalog': {
+            'port': 8091,
+            'log': BOK_CHOY_LOG_DIR / "bok_choy_catalog.log",
+        },
     }
 
     # Mongo databases that will be dropped before/after the tests run

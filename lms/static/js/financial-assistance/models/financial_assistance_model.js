@@ -1,9 +1,9 @@
 /**
  * Model for Financial Assistance.
  */
-(function (define) {
+(function(define) {
     'use strict';
-    define(['backbone'], function (Backbone) {
+    define(['backbone'], function(Backbone) {
         var FinancialAssistance = Backbone.Model.extend({
             initialize: function(options) {
                 this.url = options.url;

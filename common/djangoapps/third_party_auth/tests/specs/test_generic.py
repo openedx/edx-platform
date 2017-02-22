@@ -22,7 +22,7 @@ class GenericIntegrationTest(IntegrationTestMixin, testutil.TestCase):
 
     def setUp(self):
         super(GenericIntegrationTest, self).setUp()
-        self.configure_dummy_provider(enabled=True)
+        self.configure_dummy_provider(enabled=True, visible=True)
 
     def do_provider_login(self, provider_redirect_url):
         """

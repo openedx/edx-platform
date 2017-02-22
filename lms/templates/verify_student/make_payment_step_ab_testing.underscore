@@ -74,10 +74,13 @@
             <% if ( _.some( requirements, function( isVisible ) { return isVisible; } ) ) { %>
                 <p>
                     <% if ( verificationDeadline ) { %>
-                      <%- _.sprintf(
-                        gettext( "To receive a certificate, you must also verify your identity before %(date)s." ),
-                        { date: verificationDeadline }
-                      ) %>
+                      <p
+                        class="localized-datetime"
+                        data-datetime="<%-verificationDeadline%>"
+                        data-string="<%-gettext( "To receive a certificate, you must also verify your identity before {date}." )%>"
+                        data-timezone="<%-userTimezone%>"
+                        data-language="<%-userLanguage%>"
+                      >
                     <% } else  { %>
                         <%- gettext( "To receive a certificate, you must also verify your identity." ) %>
                     <% } %>

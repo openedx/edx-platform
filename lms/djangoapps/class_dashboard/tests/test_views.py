@@ -13,7 +13,7 @@ from class_dashboard import views
 from student.tests.factories import AdminFactory
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestViews(ModuleStoreTestCase):
     """
     Tests related to class_dashboard/views.py

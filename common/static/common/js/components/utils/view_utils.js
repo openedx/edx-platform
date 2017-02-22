@@ -1,12 +1,12 @@
 /**
  * Provides useful utilities for views.
  */
-;(function (define, require) {
+(function(define, require) {
     'use strict';
 
-    define(["jquery", "underscore", "gettext", "common/js/components/views/feedback_notification",
-            "common/js/components/views/feedback_prompt"],
-        function ($, _, gettext, NotificationView, PromptView) {
+    define(['jquery', 'underscore', 'gettext', 'common/js/components/views/feedback_notification',
+            'common/js/components/views/feedback_prompt'],
+        function($, _, gettext, NotificationView, PromptView) {
             var toggleExpandCollapse, showLoadingIndicator, hideLoadingIndicator, confirmThenRunOperation,
                 runOperationShowingMessage, withDisabledElement, disableElementWhileRunning,
                 getScrollOffset, setScrollOffset, setScrollTop, redirect, reload, hasChangedAttributes,
@@ -102,7 +102,7 @@
                 return function(event) {
                     var view = this;
                     disableElementWhileRunning($(event.currentTarget), function() {
-                        //call view.functionName(event), with view as the current this
+                        // call view.functionName(event), with view as the current this
                         return view[functionName].apply(view, [event]);
                     });
                 };
@@ -116,9 +116,9 @@
              * a JQuery promise.
              */
             disableElementWhileRunning = function(element, operation) {
-                element.addClass("is-disabled").attr('aria-disabled', true);
+                element.addClass('is-disabled').attr('aria-disabled', true);
                 return operation().always(function() {
-                    element.removeClass("is-disabled").attr('aria-disabled', false);
+                    element.removeClass('is-disabled').attr('aria-disabled', false);
                 });
             };
 
@@ -127,7 +127,7 @@
              * @param callback function to call when deletion succeeds
              */
             deleteNotificationHandler = function(callback) {
-                return function (event) {
+                return function(event) {
                     event.preventDefault();
                     $.ajax({
                         url: $(this).data('dismiss-link'),
@@ -193,7 +193,7 @@
                 if (!changedAttributes) {
                     return false;
                 }
-                for (i=0; i < attributes.length; i++) {
+                for (i = 0; i < attributes.length; i++) {
                     if (_.has(changedAttributes, attributes[i])) {
                         return true;
                     }
@@ -204,7 +204,7 @@
             /**
              * Helper method for course/library creation - verifies a required field is not blank.
              */
-            validateRequiredField = function (msg) {
+            validateRequiredField = function(msg) {
                 return msg.length === 0 ? gettext('Required field.') : '';
             };
 
@@ -212,7 +212,7 @@
              * Helper method for course/library creation.
              * Check that a course (org, number, run) doesn't use any special characters
              */
-            validateURLItemEncoding = function (item, allowUnicode) {
+            validateURLItemEncoding = function(item, allowUnicode) {
                 var required = validateRequiredField(item);
                 if (required) {
                     return required;
@@ -231,10 +231,10 @@
             };
 
             // Ensure that sum length of key field values <= ${MAX_SUM_KEY_LENGTH} chars.
-            validateTotalKeyLength = function (key_field_selectors) {
+            validateTotalKeyLength = function(key_field_selectors) {
                 var totalLength = _.reduce(
                     key_field_selectors,
-                    function (sum, ele) { return sum + $(ele).val().length;},
+                    function(sum, ele) { return sum + $(ele).val().length; },
                     0
                 );
                 return totalLength <= MAX_SUM_KEY_LENGTH;

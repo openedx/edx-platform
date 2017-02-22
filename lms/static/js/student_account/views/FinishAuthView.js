@@ -23,7 +23,7 @@
  * - The specified 'nextUrl' if safe, or
  * - The dashboard
  */
-;(function (define, undefined) {
+(function(define, undefined) {
     'use strict';
     define([
         'jquery',
@@ -33,8 +33,7 @@
         'js/student_account/emailoptin',
         'js/student_account/enrollment',
         'js/student_account/shoppingcart'
-    ], function ($, _, Backbone, gettext, emailOptInInterface, enrollmentInterface, shoppingCartInterface) {
-
+    ], function($, _, Backbone, gettext, emailOptInInterface, enrollmentInterface, shoppingCartInterface) {
         var FinishAuthView = Backbone.View.extend({
             el: '#finish-auth-status',
 
@@ -45,14 +44,14 @@
                 trackSelection: '/course_modes/choose/'
             },
 
-            initialize: function( obj ) {
+            initialize: function(obj) {
                 var queryParams = {
-                    next: $.url( '?next' ),
-                    enrollmentAction: $.url( '?enrollment_action' ),
-                    courseId: $.url( '?course_id' ),
-                    courseMode: $.url( '?course_mode' ),
-                    emailOptIn: $.url( '?email_opt_in' ),
-                    purchaseWorkflow: $.url( '?purchase_workflow' )
+                    next: $.url('?next'),
+                    enrollmentAction: $.url('?enrollment_action'),
+                    courseId: $.url('?course_id'),
+                    courseMode: $.url('?course_mode'),
+                    emailOptIn: $.url('?email_opt_in'),
+                    purchaseWorkflow: $.url('?purchase_workflow')
                 };
                 for (var key in queryParams) {
                     if (queryParams[key]) {
@@ -67,7 +66,7 @@
                 this.purchaseWorkflow = queryParams.purchaseWorkflow;
                 if (queryParams.next) {
                     // Ensure that the next URL is internal for security reasons
-                    if ( ! window.isExternal( queryParams.next ) ) {
+                    if (! window.isExternal(queryParams.next)) {
                         this.nextUrl = queryParams.next;
                     }
                 }
@@ -77,8 +76,8 @@
                 try {
                     var next = _.bind(this.enrollment, this);
                     this.checkEmailOptIn(next);
-                } catch(err) {
-                    this.updateTaskDescription(gettext("Error") + ": " + err.message);
+                } catch (err) {
+                    this.updateTaskDescription(gettext('Error') + ': ' + err.message);
                     this.redirect(this.nextUrl);
                 }
             },
@@ -104,8 +103,8 @@
              */
             checkEmailOptIn: function(next) {
                 // Set the email opt in preference. this.emailOptIn is null or "true" or "false"
-                if ((this.emailOptIn === "true" || this.emailOptIn === "false") && this.enrollmentAction) {
-                    this.updateTaskDescription(gettext("Saving your email preference"));
+                if ((this.emailOptIn === 'true' || this.emailOptIn === 'false') && this.enrollmentAction) {
+                    this.updateTaskDescription(gettext('Saving your email preference'));
                     emailOptInInterface
                         .setPreference(this.courseId, this.emailOptIn)
                         .always(next);
@@ -122,12 +121,12 @@
             enrollment: function() {
                 var redirectUrl = this.nextUrl;
 
-                if ( this.enrollmentAction === 'enroll' && this.courseId ) {
-                    this.updateTaskDescription(gettext("Enrolling you in the selected course"));
-                    var courseId = decodeURIComponent( this.courseId );
+                if (this.enrollmentAction === 'enroll' && this.courseId) {
+                    this.updateTaskDescription(gettext('Enrolling you in the selected course'));
+                    var courseId = decodeURIComponent(this.courseId);
 
                     // Determine where to redirect the user after auto-enrollment.
-                    if ( !this.courseMode ) {
+                    if (!this.courseMode) {
                         /* Backwards compatibility with the original course details page.
                         The old implementation did not specify the course mode for enrollment,
                         so we'd always send the user to the "track selection" page.
@@ -135,7 +134,7 @@
                         ("verified", "honor", etc.) -- or, if the only course mode was "honor",
                         it would redirect the user to the dashboard. */
                         redirectUrl = this.appendPurchaseWorkflow(this.urls.trackSelection + courseId + '/');
-                    } else if ( this.courseMode === 'honor' || this.courseMode === 'audit' ) {
+                    } else if (this.courseMode === 'honor' || this.courseMode === 'audit') {
                         /* The newer version of the course details page allows the user
                         to specify which course mode to enroll as.  If the student has
                         chosen "honor", we send them immediately to the next URL
@@ -149,17 +148,17 @@
 
                     /* Attempt to auto-enroll the user in a free mode of the course,
                     then redirect to the next location. */
-                    enrollmentInterface.enroll( courseId, redirectUrl );
-                } else if ( this.enrollmentAction === 'add_to_cart' && this.courseId) {
+                    enrollmentInterface.enroll(courseId, redirectUrl);
+                } else if (this.enrollmentAction === 'add_to_cart' && this.courseId) {
                     /*
                     If this is a paid course, add it to the shopping cart and redirect
                     the user to the "view cart" page.
                     */
-                    this.updateTaskDescription(gettext("Adding the selected course to your cart"));
-                    shoppingCartInterface.addCourseToCart( this.courseId );
+                    this.updateTaskDescription(gettext('Adding the selected course to your cart'));
+                    shoppingCartInterface.addCourseToCart(this.courseId);
                 } else {
                     // Otherwise, redirect the user to the next page.
-                    this.redirect( redirectUrl );
+                    this.redirect(redirectUrl);
                 }
             },
 
@@ -167,8 +166,8 @@
              * Redirect to a URL.  Mainly useful for mocking out in tests.
              * @param  {string} url The URL to redirect to.
              */
-            redirect: function( url ) {
-                this.updateTaskDescription(gettext("Loading your courses"));
+            redirect: function(url) {
+                this.updateTaskDescription(gettext('Loading your courses'));
                 window.location.replace(url);
             }
         });

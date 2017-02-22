@@ -5,6 +5,7 @@ import unittest
 
 from mock import Mock
 from nose.tools import assert_equals, assert_not_equals, assert_true, assert_false, assert_in, assert_not_in  # pylint: disable=no-name-in-module
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
 from xblock.field_data import DictFieldData
 from xblock.fields import Scope, String, Dict, Boolean, Integer, Float, Any, List
@@ -12,6 +13,7 @@ from xblock.runtime import KvsFieldData, DictKeyValueStore
 
 from xmodule.fields import Date, Timedelta, RelativeTime
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore, InheritanceMixin, InheritingFieldData
+from xmodule.modulestore.split_mongo.split_mongo_kvs import SplitMongoKVS
 from xmodule.xml_module import XmlDescriptor, serialize_field, deserialize_field
 from xmodule.course_module import CourseDescriptor
 from xmodule.seq_module import SequenceDescriptor
@@ -56,15 +58,20 @@ class TestFields(object):
 
 
 class InheritingFieldDataTest(unittest.TestCase):
-    """Tests of InheritingFieldData."""
+    """
+    Tests of InheritingFieldData.
+    """
 
     class TestableInheritingXBlock(XmlDescriptor):
-        """An XBlock we can use in these tests."""
+        """
+        An XBlock we can use in these tests.
+        """
         inherited = String(scope=Scope.settings, default="the default")
         not_inherited = String(scope=Scope.settings, default="nothing")
 
     def setUp(self):
         super(InheritingFieldDataTest, self).setUp()
+        self.dummy_course_key = CourseLocator('test_org', 'test_123', 'test_run')
         self.system = get_test_descriptor_system()
         self.all_blocks = {}
         self.system.get_block = self.all_blocks.get
@@ -73,11 +80,34 @@ class InheritingFieldDataTest(unittest.TestCase):
             kvs=DictKeyValueStore({}),
         )
 
+    def get_block_using_split_kvs(self, block_type, block_id, fields, defaults):
+        """
+        Construct an Xblock with split mongo kvs.
+        """
+        kvs = SplitMongoKVS(
+            definition=Mock(),
+            initial_values=fields,
+            default_values=defaults,
+            parent=None
+        )
+        self.field_data = InheritingFieldData(
+            inheritable_names=['inherited'],
+            kvs=kvs,
+        )
+        block = self.get_a_block(
+            usage_id=self.get_usage_id(block_type, block_id)
+        )
+
+        return block
+
     def get_a_block(self, usage_id=None):
-        """Construct an XBlock for testing with."""
+        """
+        Construct an XBlock for testing with.
+        """
         scope_ids = Mock()
         if usage_id is None:
-            usage_id = "_auto%d" % len(self.all_blocks)
+            block_id = "_auto{id}".format(id=len(self.all_blocks))
+            usage_id = self.get_usage_id("course", block_id)
         scope_ids.usage_id = usage_id
         block = self.system.construct_xblock_from_class(
             self.TestableInheritingXBlock,
@@ -87,14 +117,24 @@ class InheritingFieldDataTest(unittest.TestCase):
         self.all_blocks[usage_id] = block
         return block
 
+    def get_usage_id(self, block_type, block_id):
+        """
+        Constructs usage id using 'block_type' and 'block_id'
+        """
+        return BlockUsageLocator(self.dummy_course_key, block_type=block_type, block_id=block_id)
+
     def test_default_value(self):
-        # Blocks with nothing set with return the fields' defaults.
+        """
+        Test that the Blocks with nothing set with return the fields' defaults.
+        """
         block = self.get_a_block()
         self.assertEqual(block.inherited, "the default")
         self.assertEqual(block.not_inherited, "nothing")
 
     def test_set_value(self):
-        # If you set a value, that's what you get back.
+        """
+        Test that If you set a value, that's what you get back.
+        """
         block = self.get_a_block()
         block.inherited = "Changed!"
         block.not_inherited = "New Value!"
@@ -102,35 +142,85 @@ class InheritingFieldDataTest(unittest.TestCase):
         self.assertEqual(block.not_inherited, "New Value!")
 
     def test_inherited(self):
-        # A child with get a value inherited from the parent.
-        parent = self.get_a_block(usage_id="parent")
-        parent.inherited = "Changed!"
-        self.assertEqual(parent.inherited, "Changed!")
+        """
+        Test that a child with get a value inherited from the parent.
+        """
+        parent_block = self.get_a_block(usage_id=self.get_usage_id("course", "parent"))
+        parent_block.inherited = "Changed!"
+        self.assertEqual(parent_block.inherited, "Changed!")
 
-        child = self.get_a_block(usage_id="child")
-        child.parent = "parent"
+        child = self.get_a_block(usage_id=self.get_usage_id("vertical", "child"))
+        child.parent = parent_block.location
         self.assertEqual(child.inherited, "Changed!")
 
     def test_inherited_across_generations(self):
-        # A child with get a value inherited from a great-grandparent.
-        parent = self.get_a_block(usage_id="parent")
+        """
+        Test that a child with get a value inherited from a great-grandparent.
+        """
+        parent = self.get_a_block(usage_id=self.get_usage_id("course", "parent"))
         parent.inherited = "Changed!"
         self.assertEqual(parent.inherited, "Changed!")
         for child_num in range(10):
-            usage_id = "child_{}".format(child_num)
+            usage_id = self.get_usage_id("vertical", "child_{}".format(child_num))
             child = self.get_a_block(usage_id=usage_id)
-            child.parent = "parent"
+            child.parent = parent.location
             self.assertEqual(child.inherited, "Changed!")
 
     def test_not_inherited(self):
-        # Fields not in the inherited_names list won't be inherited.
-        parent = self.get_a_block(usage_id="parent")
+        """
+        Test that the fields not in the inherited_names list won't be inherited.
+        """
+        parent = self.get_a_block(usage_id=self.get_usage_id("course", "parent"))
         parent.not_inherited = "Changed!"
         self.assertEqual(parent.not_inherited, "Changed!")
 
-        child = self.get_a_block(usage_id="child")
-        child.parent = "parent"
+        child = self.get_a_block(usage_id=self.get_usage_id("vertical", "child"))
+        child.parent = parent.location
         self.assertEqual(child.not_inherited, "nothing")
+
+    def test_non_defaults_inherited_across_lib(self):
+        """
+        Test that a child inheriting from library_content block, inherits fields
+        from parent if these fields are not in its defaults.
+        """
+        parent_block = self.get_block_using_split_kvs(
+            block_type="library_content",
+            block_id="parent",
+            fields=dict(inherited="changed!"),
+            defaults=dict(inherited="parent's default"),
+        )
+        self.assertEqual(parent_block.inherited, "changed!")
+
+        child = self.get_block_using_split_kvs(
+            block_type="problem",
+            block_id="child",
+            fields={},
+            defaults={},
+        )
+        child.parent = parent_block.location
+        self.assertEqual(child.inherited, "changed!")
+
+    def test_defaults_not_inherited_across_lib(self):
+        """
+        Test that a child inheriting from library_content block, does not inherit
+        fields from parent if these fields are in its defaults already.
+        """
+        parent_block = self.get_block_using_split_kvs(
+            block_type="library_content",
+            block_id="parent",
+            fields=dict(inherited="changed!"),
+            defaults=dict(inherited="parent's default"),
+        )
+        self.assertEqual(parent_block.inherited, "changed!")
+
+        child = self.get_block_using_split_kvs(
+            block_type="library_content",
+            block_id="parent",
+            fields={},
+            defaults=dict(inherited="child's default"),
+        )
+        child.parent = parent_block.location
+        self.assertEqual(child.inherited, "child's default")
 
 
 class EditableMetadataFieldsTest(unittest.TestCase):

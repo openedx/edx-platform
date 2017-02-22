@@ -14,6 +14,7 @@ from django.test import override_settings
 from django.utils.text import slugify
 from edx_oauth2_provider.tests.factories import ClientFactory
 import httpretty
+import mock
 from provider.constants import CONFIDENTIAL
 
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
@@ -22,10 +23,13 @@ from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfi
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.tests import factories as programs_factories
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
-from openedx.core.djangoapps.programs.utils import get_display_category
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+
+
+UTILS_MODULE = 'openedx.core.djangoapps.programs.utils'
+MARKETING_URL = 'https://www.example.com/marketing/path'
 
 
 @httpretty.activate
@@ -59,8 +63,6 @@ class TestProgramListing(ProgramsApiConfigMixin, CredentialsApiConfigMixin, Shar
         )
 
         cls.data = sorted([cls.first_program, cls.second_program], key=cls.program_sort_key)
-
-        cls.marketing_root = urljoin(settings.MKTG_URLS.get('ROOT'), 'xseries').rstrip('/')
 
     def setUp(self):
         super(TestProgramListing, self).setUp()
@@ -182,35 +184,23 @@ class TestProgramListing(ProgramsApiConfigMixin, CredentialsApiConfigMixin, Shar
 
         for index, actual_program in enumerate(actual):
             expected_program = self.data[index]
-
             self.assert_dict_contains_subset(actual_program, expected_program)
-            self.assertEqual(
-                actual_program['display_category'],
-                get_display_category(expected_program)
-            )
 
-    def test_toggle_xseries_advertising(self):
+    def test_program_discovery(self):
         """
-        Verify that when XSeries advertising is disabled, no link to the marketing site
-        appears in the response (and vice versa).
+        Verify that a link to a programs marketing page appears in the response.
         """
-        # Verify the URL is present when advertising is enabled.
-        self.create_programs_config()
+        self.create_programs_config(marketing_path='bar')
         self.mock_programs_api(self.data)
 
-        response = self.client.get(self.url)
-        self.assertContains(response, self.marketing_root)
-
-        # Verify the URL is missing when advertising is disabled.
-        self.create_programs_config(xseries_ad_enabled=False)
+        marketing_root = urljoin(settings.MKTG_URLS.get('ROOT'), 'bar').rstrip('/')
 
         response = self.client.get(self.url)
-        self.assertNotContains(response, self.marketing_root)
+        self.assertContains(response, marketing_root)
 
     def test_links_to_detail_pages(self):
         """
-        Verify that links to detail pages are present when enabled, instead of
-        links to the marketing site.
+        Verify that links to detail pages are present.
         """
         self.create_programs_config()
         self.mock_programs_api(self.data)
@@ -229,21 +219,6 @@ class TestProgramListing(ProgramsApiConfigMixin, CredentialsApiConfigMixin, Shar
             self.assertEqual(
                 actual_program['detail_url'],
                 '{}/{}'.format(base, slug)
-            )
-
-        # Verify that links to the marketing site are present when detail pages are disabled.
-        self.create_programs_config(program_details_enabled=False)
-
-        response = self.client.get(self.url)
-        actual = self.load_serialized_data(response, 'programsData')
-        actual = sorted(actual, key=self.program_sort_key)
-
-        for index, actual_program in enumerate(actual):
-            expected_program = self.data[index]
-
-            self.assertEqual(
-                actual_program['detail_url'],
-                '{}/{}'.format(self.marketing_root, expected_program['marketing_slug'])
             )
 
     def test_certificates_listed(self):
@@ -290,6 +265,7 @@ class TestProgramListing(ProgramsApiConfigMixin, CredentialsApiConfigMixin, Shar
 @httpretty.activate
 @override_settings(MKTG_URLS={'ROOT': 'https://www.example.com'})
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@mock.patch(UTILS_MODULE + '.get_run_marketing_url', mock.Mock(return_value=MARKETING_URL))
 class TestProgramDetails(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
     """Unit tests for the program details page."""
     program_id = 123

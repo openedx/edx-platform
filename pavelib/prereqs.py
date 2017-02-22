@@ -8,14 +8,16 @@ import os
 import re
 import sys
 
-from paver.easy import sh, task
+from paver.easy import sh, task, BuildFailure
 
 from .utils.envs import Env
+from .utils.timer import timed
 
 
 PREREQS_STATE_DIR = os.getenv('PREREQ_CACHE_DIR', Env.REPO_ROOT / '.prereqs_cache')
-NPM_REGISTRY = "http://registry.npmjs.org/"
+NPM_REGISTRY = "https://registry.npmjs.org/"
 NO_PREREQ_MESSAGE = "NO_PREREQ_INSTALL is set, not installing prereqs"
+COVERAGE_REQ_FILE = 'requirements/edx/coverage.txt'
 
 # If you make any changes to this list you also need to make
 # a corresponding change to circle.yml, which is how the python
@@ -130,10 +132,22 @@ def node_prereqs_installation():
     """
     Configures npm and installs Node prerequisites
     """
+    cb_error_text = "Subprocess return code: 1"
     sh("test `npm config get registry` = \"{reg}\" || "
        "(echo setting registry; npm config set registry"
        " {reg})".format(reg=NPM_REGISTRY))
-    sh('npm install')
+
+    # Error handling around a race condition that produces "cb() never called" error. This
+    # evinces itself as `cb_error_text` and it ought to disappear when we upgrade
+    # npm to 3 or higher. TODO: clean this up when we do that.
+    try:
+        sh('npm install')
+    except BuildFailure, error_text:
+        if cb_error_text in error_text:
+            print "npm install error detected. Retrying..."
+            sh('npm install')
+        else:
+            raise BuildFailure(error_text)
 
 
 def python_prereqs_installation():
@@ -141,10 +155,17 @@ def python_prereqs_installation():
     Installs Python prerequisites
     """
     for req_file in PYTHON_REQ_FILES:
-        sh("pip install -q --disable-pip-version-check --exists-action w -r {req_file}".format(req_file=req_file))
+        pip_install_req_file(req_file)
+
+
+def pip_install_req_file(req_file):
+    """Pip install the requirements file."""
+    pip_cmd = 'pip install -q --disable-pip-version-check --exists-action w'
+    sh("{pip_cmd} -r {req_file}".format(pip_cmd=pip_cmd, req_file=req_file))
 
 
 @task
+@timed
 def install_node_prereqs():
     """
     Installs Node prerequisites
@@ -164,10 +185,12 @@ PACKAGES_TO_UNINSTALL = [
     "django-storages",
     "django-oauth2-provider",       # Because now it's called edx-django-oauth2-provider.
     "edx-oauth2-provider",          # Because it moved from github to pypi
+    "i18n-tools",                   # Because now it's called edx-i18n-tools
 ]
 
 
 @task
+@timed
 def uninstall_python_packages():
     """
     Uninstall Python packages that need explicit uninstallation.
@@ -235,6 +258,17 @@ def package_in_frozen(package_name, frozen_output):
 
 
 @task
+@timed
+def install_coverage_prereqs():
+    """ Install python prereqs for measuring coverage. """
+    if no_prereq_install():
+        print NO_PREREQ_MESSAGE
+        return
+    pip_install_req_file(COVERAGE_REQ_FILE)
+
+
+@task
+@timed
 def install_python_prereqs():
     """
     Installs Python prerequisites.
@@ -268,6 +302,7 @@ def install_python_prereqs():
 
 
 @task
+@timed
 def install_prereqs():
     """
     Installs Node and Python prerequisites
@@ -278,3 +313,10 @@ def install_prereqs():
 
     install_node_prereqs()
     install_python_prereqs()
+    log_installed_python_prereqs()
+
+
+def log_installed_python_prereqs():
+    """  Logs output of pip freeze for debugging. """
+    sh("pip freeze > {}".format(Env.GEN_LOG_DIR + "/pip_freeze.log"))
+    return

@@ -1,6 +1,6 @@
 from base_studio_test import ContainerBase
-from ...fixtures.course import XBlockFixtureDesc
-from ...pages.studio.utils import verify_ordering
+from common.test.acceptance.fixtures.course import XBlockFixtureDesc
+from common.test.acceptance.pages.studio.utils import verify_ordering
 
 
 class BadComponentTest(ContainerBase):

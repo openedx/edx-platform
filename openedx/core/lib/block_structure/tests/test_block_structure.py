@@ -16,7 +16,7 @@ from ..exceptions import TransformerException
 from .helpers import MockXBlock, MockTransformer, ChildrenMapTestMixin
 
 
-@attr('shard_2')
+@attr(shard=2)
 @ddt.ddt
 class TestBlockStructure(TestCase, ChildrenMapTestMixin):
     """
@@ -45,7 +45,7 @@ class TestBlockStructure(TestCase, ChildrenMapTestMixin):
         self.assertNotIn(len(children_map) + 1, block_structure)
 
 
-@attr('shard_2')
+@attr(shard=2)
 @ddt.ddt
 class TestBlockStructureData(TestCase, ChildrenMapTestMixin):
     """
@@ -131,6 +131,7 @@ class TestBlockStructureData(TestCase, ChildrenMapTestMixin):
         block_structure = BlockStructureModulestoreData(root_block_usage_key=0)
         for block in blocks:
             block_structure._add_xblock(block.location, block)
+            block_structure._get_or_create_block(block.location)
 
         # request fields
         fields = ["field1", "field2", "field3"]
@@ -221,3 +222,48 @@ class TestBlockStructureData(TestCase, ChildrenMapTestMixin):
         block_structure = self.create_block_structure(ChildrenMapTestMixin.LINEAR_CHILDREN_MAP)
         block_structure.remove_block_traversal(lambda block: block == 2)
         self.assert_block_structure(block_structure, [[1], [], [], []], missing_blocks=[2])
+
+    def test_copy(self):
+        def _set_value(structure, value):
+            """
+            Sets a test transformer block field to the given value in the given structure.
+            """
+            structure.set_transformer_block_field(1, 'transformer', 'test_key', value)
+
+        def _get_value(structure):
+            """
+            Returns the value of the test transformer block field in the given structure.
+            """
+            return structure[1].transformer_data['transformer'].test_key
+
+        # create block structure and verify blocks pre-exist
+        block_structure = self.create_block_structure(ChildrenMapTestMixin.LINEAR_CHILDREN_MAP)
+        self.assert_block_structure(block_structure, [[1], [2], [3], []])
+        _set_value(block_structure, 'original_value')
+
+        # create a new copy of the structure and verify they are equivalent
+        new_copy = block_structure.copy()
+        self.assertEquals(block_structure.root_block_usage_key, new_copy.root_block_usage_key)
+        for block in block_structure:
+            self.assertIn(block, new_copy)
+            self.assertEquals(block_structure.get_parents(block), new_copy.get_parents(block))
+            self.assertEquals(block_structure.get_children(block), new_copy.get_children(block))
+            self.assertEquals(_get_value(block_structure), _get_value(new_copy))
+
+        # verify edits to original block structure do not affect the copy
+        block_structure.remove_block(2, keep_descendants=True)
+        self.assert_block_structure(block_structure, [[1], [3], [], []], missing_blocks=[2])
+        self.assert_block_structure(new_copy, [[1], [2], [3], []])
+
+        _set_value(block_structure, 'edit1')
+        self.assertEquals(_get_value(block_structure), 'edit1')
+        self.assertEquals(_get_value(new_copy), 'original_value')
+
+        # verify edits to copy do not affect the original
+        new_copy.remove_block(3, keep_descendants=True)
+        self.assert_block_structure(block_structure, [[1], [3], [], []], missing_blocks=[2])
+        self.assert_block_structure(new_copy, [[1], [2], [], []], missing_blocks=[3])
+
+        _set_value(new_copy, 'edit2')
+        self.assertEquals(_get_value(block_structure), 'edit1')
+        self.assertEquals(_get_value(new_copy), 'edit2')

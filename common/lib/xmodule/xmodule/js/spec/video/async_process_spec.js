@@ -1,8 +1,8 @@
-(function (require) {
-require(
+(function(require) {
+    require(
 ['video/00_async_process.js'],
-function (AsyncProcess) {
-    var getArrayNthLength = function (n, multiplier) {
+function(AsyncProcess) {
+    var getArrayNthLength = function(n, multiplier) {
             var result = [],
                 mul = multiplier || 1;
 
@@ -14,65 +14,65 @@ function (AsyncProcess) {
         },
         items = getArrayNthLength(1000);
 
-    describe('AsyncProcess', function () {
-        it ('Array is processed successfully', function (done) {
+    describe('AsyncProcess', function() {
+        it('Array is processed successfully', function(done) {
             var processedArray,
                 expectedArray = getArrayNthLength(1000, 2),
-                process = function (item) {
+                process = function(item) {
                     return 2 * item;
                 };
 
-            AsyncProcess.array(items, process).done(function (result) {
+            AsyncProcess.array(items, process).done(function(result) {
                 processedArray = result;
             });
 
-            jasmine.waitUntil(function () {
+            jasmine.waitUntil(function() {
                 return processedArray;
-            }).then(function () {
+            }).then(function() {
                 expect(processedArray).toEqual(expectedArray);
             }).always(done);
         });
 
-        it ('If non-array is passed, error callback is called', function (done) {
+        it('If non-array is passed, error callback is called', function(done) {
             var isError,
-                process = function () {};
+                process = function() {};
 
-            AsyncProcess.array('string', process).fail(function () {
+            AsyncProcess.array('string', process).fail(function() {
                 isError = true;
             });
 
-            jasmine.waitUntil(function () {
+            jasmine.waitUntil(function() {
                 return isError;
-            }).then(function () {
+            }).then(function() {
                 expect(isError).toBeTruthy();
             }).always(done);
         });
 
-        it ('If an empty array is passed, returns initial array', function (done) {
+        it('If an empty array is passed, returns initial array', function(done) {
             var processedArray,
-                process = function () {};
+                process = function() {};
 
-            AsyncProcess.array([], process).done(function (result) {
+            AsyncProcess.array([], process).done(function(result) {
                 processedArray = result;
             });
 
-            jasmine.waitUntil(function () {
+            jasmine.waitUntil(function() {
                 return processedArray;
-            }).then(function () {
+            }).then(function() {
                 expect(processedArray).toEqual([]);
             }).always(done);
         });
 
-        it ('If no process function passed, returns initial array', function (done) {
+        it('If no process function passed, returns initial array', function(done) {
             var processedArray;
 
-            AsyncProcess.array(items).done(function (result) {
+            AsyncProcess.array(items).done(function(result) {
                 processedArray = result;
             });
 
-            jasmine.waitUntil(function () {
+            jasmine.waitUntil(function() {
                 return processedArray;
-            }).then(function () {
+            }).then(function() {
                 expect(processedArray).toEqual(items);
             }).always(done);
         });

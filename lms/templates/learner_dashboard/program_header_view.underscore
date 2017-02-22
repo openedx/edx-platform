@@ -4,10 +4,10 @@
         <source srcset="<%- programData.banner_image_urls.w726h242 %>" media="(min-width: <%- breakpoints.min.medium %>)">
         <img class="banner-background-image" srcset="<%- programData.banner_image_urls.w348h116 %>" alt="">
     </picture>
-    
+
     <div class="banner-content grid-container">
-        <h2 class="hd-1 title"><%- programData.name %></h2>
-        <p class="hd-4 subtitle"><%- programData.subtitle %></p>
+        <h2 class="hd-1 title row"><%- programData.name %></h2>
+        <p class="hd-4 subtitle row"><%- programData.subtitle %></p>
         <% if (programData.organizations.length) { %>
             <div class="org-wrapper">
               <% _.each(programData.organizations, function(org) { %>

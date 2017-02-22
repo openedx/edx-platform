@@ -27,7 +27,7 @@ DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 XML_COURSE_DIRS = ['simple']
 
 
-@attr('shard_1')
+@attr(shard=1)
 class CommandsTestBase(SharedModuleStoreTestCase):
     """
     Base class for testing different django commands.

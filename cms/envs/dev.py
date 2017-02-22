@@ -60,6 +60,7 @@ DATABASES = {
 }
 
 LMS_BASE = "localhost:8000"
+LMS_ROOT_URL = "http://{}".format(LMS_BASE)
 FEATURES['PREVIEW_LMS_BASE'] = "localhost:8000"
 
 REPOS = {

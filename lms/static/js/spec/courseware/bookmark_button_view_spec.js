@@ -1,15 +1,15 @@
 define(['backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
         'common/js/spec_helpers/template_helpers', 'js/bookmarks/views/bookmark_button'
        ],
-    function (Backbone, $, _, AjaxHelpers, TemplateHelpers, BookmarkButtonView) {
+    function(Backbone, $, _, AjaxHelpers, TemplateHelpers, BookmarkButtonView) {
         'use strict';
 
-        describe("bookmarks.button", function () {
+        describe('bookmarks.button', function() {
             var timerCallback;
 
             var API_URL = 'bookmarks/api/v1/bookmarks/';
 
-            beforeEach(function () {
+            beforeEach(function() {
                 loadFixtures('js/fixtures/bookmarks/bookmark_button.html');
                 TemplateHelpers.installTemplates(
                     [
@@ -35,7 +35,7 @@ define(['backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helper
                 });
             };
 
-            var verifyBookmarkButtonState = function (view, bookmarked) {
+            var verifyBookmarkButtonState = function(view, bookmarked) {
                 if (bookmarked) {
                     expect(view.$el).toHaveAttr('aria-pressed', 'true');
                     expect(view.$el).toHaveClass('bookmarked');
@@ -48,7 +48,7 @@ define(['backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helper
                 expect(view.$el.data('bookmarkId')).toBe('bilbo,usage_1');
             };
 
-            it("rendered correctly ", function () {
+            it('rendered correctly ', function() {
                 var view = createBookmarkButtonView(false);
                 verifyBookmarkButtonState(view, false);
 
@@ -57,7 +57,7 @@ define(['backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helper
                 verifyBookmarkButtonState(view, true);
             });
 
-            it("bookmark/un-bookmark the block correctly", function () {
+            it('bookmark/un-bookmark the block correctly', function() {
                 var addBookmarkedData = {
                     bookmarked: true,
                     handler: 'removeBookmark',
@@ -79,7 +79,7 @@ define(['backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helper
                 var bookmarkedData = [[addBookmarkedData, removeBookmarkData], [removeBookmarkData, addBookmarkedData]];
                 _.each(bookmarkedData, function(actionsData) {
                     var firstActionData = actionsData[0];
-                    var secondActionData =  actionsData[1];
+                    var secondActionData = actionsData[1];
 
                     var bookmarkButtonView = createBookmarkButtonView(firstActionData.bookmarked);
                     verifyBookmarkButtonState(bookmarkButtonView, firstActionData.bookmarked);
@@ -126,10 +126,9 @@ define(['backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helper
                     verifyBookmarkButtonState(bookmarkButtonView, firstActionData.bookmarked);
                     bookmarkButtonView.undelegateEvents();
                 });
-
             });
 
-            it("shows an error message for HTTP 500", function () {
+            it('shows an error message for HTTP 500', function() {
                 var requests = AjaxHelpers.requests(this),
                     $messageBanner = $('.message-banner'),
                     bookmarkButtonView = createBookmarkButtonView(false);
@@ -148,7 +147,7 @@ define(['backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helper
                 expect($messageBanner.text().trim()).toBe(bookmarkButtonView.errorMessage);
             });
 
-            it('removes error message after 5 seconds', function () {
+            it('removes error message after 5 seconds', function() {
                 var requests = AjaxHelpers.requests(this),
                     $messageBanner = $('.message-banner'),
                     bookmarkButtonView = createBookmarkButtonView(false);

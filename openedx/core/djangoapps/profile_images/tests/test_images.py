@@ -24,11 +24,12 @@ from ..images import (
     validate_uploaded_image,
     _get_exif_orientation,
     _get_valid_file_types,
+    _update_exif_orientation
 )
 from .helpers import make_image_file, make_uploaded_file
 
 
-@attr('shard_2')
+@attr(shard=2)
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Profile Image API is only supported in LMS')
 class TestValidateUploadedImage(TestCase):
@@ -124,7 +125,7 @@ class TestValidateUploadedImage(TestCase):
             self.assertEqual(ctx.exception.message, file_upload_bad_mimetype)
 
 
-@attr('shard_2')
+@attr(shard=2)
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Profile Image API is only supported in LMS')
 class TestGenerateProfileImages(TestCase):
@@ -186,6 +187,20 @@ class TestGenerateProfileImages(TestCase):
             for _, image in self._create_mocked_profile_images(imfile, requested_images):
                 self.check_exif_orientation(image, None)
 
+    def test_update_exif_orientation_without_orientation(self):
+        """
+        Test the update_exif_orientation without orientation will not throw exception.
+        """
+        requested_images = {10: "ten.jpg"}
+        with make_image_file(extension='.jpg') as imfile:
+            for _, image in self._create_mocked_profile_images(imfile, requested_images):
+                self.check_exif_orientation(image, None)
+                exif = image.info.get('exif', piexif.dump({}))
+                self.assertEqual(
+                    _update_exif_orientation(exif, None),
+                    image.info.get('exif', piexif.dump({}))
+                )
+
     def _create_mocked_profile_images(self, image_file, requested_images):
         """
         Create image files with mocked-out storage.
@@ -208,7 +223,7 @@ class TestGenerateProfileImages(TestCase):
                 yield name, image
 
 
-@attr('shard_2')
+@attr(shard=2)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Profile Image API is only supported in LMS')
 class TestRemoveProfileImages(TestCase):
     """

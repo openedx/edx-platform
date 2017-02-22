@@ -1,23 +1,22 @@
-(function (requirejs, require, define) {
-
+(function(requirejs, require, define) {
 // VideoQualityControl module.
-'use strict';
-define(
+    'use strict';
+    define(
 'video/05_video_quality_control.js',
 ['edx-ui-toolkit/js/utils/html-utils'],
-function (HtmlUtils) {
+function(HtmlUtils) {
     var template = HtmlUtils.interpolateHtml(
         HtmlUtils.HTML([
             '<button class="control quality-control is-hidden" aria-disabled="false" title="',
-                '{highDefinition}',
+            '{highDefinition}',
             '">',
-                '<span class="icon icon-hd" aria-hidden="true">HD</span>',
-                '<span class="sr text-translation">',
-                    '{highDefinition}',
-                '</span>&nbsp;',
-                '<span class="sr control-text">',
-                    '{off}',
-                '</span>',
+            '<span class="icon icon-hd" aria-hidden="true">HD</span>',
+            '<span class="sr text-translation">',
+            '{highDefinition}',
+            '</span>&nbsp;',
+            '<span class="sr control-text">',
+            '{off}',
+            '</span>',
             '</button>'
         ].join('')),
         {
@@ -27,7 +26,7 @@ function (HtmlUtils) {
     );
 
     // VideoQualityControl() function - what this module "exports".
-    return function (state) {
+    return function(state) {
         var dfd = $.Deferred();
 
         // Changing quality for now only works for YouTube videos.
@@ -159,7 +158,6 @@ function (HtmlUtils) {
                                     .removeClass('active')
                                     .find('.control-text')
                                         .text(controlStateStr);
-
         }
     }
 
@@ -175,7 +173,5 @@ function (HtmlUtils) {
 
         this.trigger('videoPlayer.handlePlaybackQualityChange', newQuality);
     }
-
 });
-
 }(RequireJS.requirejs, RequireJS.require, RequireJS.define));

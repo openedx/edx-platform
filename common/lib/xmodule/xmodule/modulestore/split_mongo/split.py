@@ -226,11 +226,11 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
                 course_key.replace(org=None, course=None, run=None, branch=None)
             ]
 
-    def _start_outermost_bulk_operation(self, bulk_write_record, course_key):
+    def _start_outermost_bulk_operation(self, bulk_write_record, course_key, ignore_case=False):
         """
         Begin a bulk write operation on course_key.
         """
-        bulk_write_record.initial_index = self.db_connection.get_course_index(course_key)
+        bulk_write_record.initial_index = self.db_connection.get_course_index(course_key, ignore_case=ignore_case)
         # Ensure that any edits to the index don't pollute the initial_index
         bulk_write_record.index = copy.deepcopy(bulk_write_record.initial_index)
         bulk_write_record.course_key = course_key
@@ -432,9 +432,11 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
 
         if len(ids):
             # Query the db for the definitions.
-            defs_from_db = self.db_connection.get_definitions(list(ids), course_key)
+            defs_from_db = list(self.db_connection.get_definitions(list(ids), course_key))
+            defs_dict = {d.get('_id'): d for d in defs_from_db}
             # Add the retrieved definitions to the cache.
-            bulk_write_record.definitions.update({d.get('_id'): d for d in defs_from_db})
+            bulk_write_record.definitions_in_db.update(defs_dict.iterkeys())
+            bulk_write_record.definitions.update(defs_dict)
             definitions.extend(defs_from_db)
         return definitions
 
@@ -772,11 +774,16 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         Load the definitions into each block if lazy is in kwargs and is False;
         otherwise, do not load the definitions - they'll be loaded later when needed.
         """
+        lazy = kwargs.pop('lazy', True)
+        should_cache_items = not lazy
+
         runtime = self._get_cache(course_entry.structure['_id'])
         if runtime is None:
-            lazy = kwargs.pop('lazy', True)
             runtime = self.create_runtime(course_entry, lazy)
             self._add_cache(course_entry.structure['_id'], runtime)
+            should_cache_items = True
+
+        if should_cache_items:
             self.cache_items(runtime, block_keys, course_entry.course_key, depth, lazy)
 
         return [runtime.load_item(block_key, course_entry, **kwargs) for block_key in block_keys]
@@ -1876,7 +1883,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         Internal code for creating a course or library
         """
-        index = self.get_course_index(locator)
+        index = self.get_course_index(locator, ignore_case=True)
         if index is not None:
             raise DuplicateCourseError(locator, index)
 
@@ -2509,7 +2516,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 del new_block_info.defaults['markdown']
             # </workaround>
 
-            new_block_info.fields = existing_block_info.fields  # Preserve any existing overrides
+            # Preserve any existing overrides
+            new_block_info.fields = existing_block_info.fields
+
             if 'children' in new_block_info.defaults:
                 del new_block_info.defaults['children']  # Will be set later
 

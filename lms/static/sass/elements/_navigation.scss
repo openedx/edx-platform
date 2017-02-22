@@ -8,6 +8,7 @@
 // +utility navigation
 // +toggling utilities
 // +case - calculator spacing
+// +tabs
 
 // +notes:
 // --------------------
@@ -128,26 +129,43 @@
 
 %page-content-nav {
   margin-bottom: $baseline;
-  border-bottom: 3px solid $gray-l5;
+  border-bottom: 1px solid $gray-l5;
 
   .nav-item {
     @extend %button-reset;
     display: inline-block;
-    margin-bottom: -3px; // to match the border
-    border-bottom: 3px solid $gray-l5;
     padding: ($baseline*.75);
     color: $gray-d2;
 
     &.is-active {
-      border-bottom: 3px solid $gray-d2;
+      border-bottom: 4px solid $link-color;
       color: $gray-d2;
     }
 
     // STATE: hover and focus
     &:hover,
     &:focus {
-      border-bottom: 3px solid $link-color;
+      border-bottom: 4px solid $link-color;
       color: $link-color;
     }
   }
+}
+
+// +tabs - styles for tabs and tabpanels (teams and learner profile, currently)
+// --------------------
+.page-content-nav {
+
+    .tab {
+        
+    }
+}
+
+.page-content-main {
+
+    .tabs {
+
+        .tabpanel {
+            outline: none;
+        }
+    }
 }

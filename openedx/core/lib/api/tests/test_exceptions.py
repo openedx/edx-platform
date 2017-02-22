@@ -9,7 +9,7 @@ from rest_framework import exceptions as drf_exceptions
 from .. import exceptions
 
 
-@attr('shard_2')
+@attr(shard=2)
 @ddt.ddt
 class TestDictExceptionsAllowDictDetails(TestCase):
     """
@@ -46,7 +46,7 @@ class TestDictExceptionsAllowDictDetails(TestCase):
         self.assertEqual(exc.available_renderers, ['application/json'])
 
 
-@attr('shard_2')
+@attr(shard=2)
 @ddt.ddt
 class TestDictExceptionSubclassing(TestCase):
     """

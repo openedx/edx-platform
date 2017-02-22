@@ -243,8 +243,9 @@ class StubEdxNotesServiceHandler(StubHttpRequestHandler):
         """
         Search for a notes by user id, course_id and usage_id.
         """
+        search_with_usage_id = False
         user = self.get_params.get("user", None)
-        usage_id = self.get_params.get("usage_id", None)
+        usage_ids = self.get_params.get("usage_id", [])
         course_id = self.get_params.get("course_id", None)
         text = self.get_params.get("text", None)
         page = int(self.get_params.get("page", 1))
@@ -257,11 +258,14 @@ class StubEdxNotesServiceHandler(StubHttpRequestHandler):
         notes = self.server.get_all_notes()
         if course_id is not None:
             notes = self.server.filter_by_course_id(notes, course_id)
-        if usage_id is not None:
-            notes = self.server.filter_by_usage_id(notes, usage_id)
+        if len(usage_ids) > 0:
+            search_with_usage_id = True
+            notes = self.server.filter_by_usage_id(notes, usage_ids)
         if text:
             notes = self.server.search(notes, text)
-        self.respond(content=self._get_paginated_response(notes, page, page_size))
+        if not search_with_usage_id:
+            notes = self._get_paginated_response(notes, page, page_size)
+        self.respond(content=notes)
 
     def _collection(self):
         """
@@ -356,11 +360,13 @@ class StubEdxNotesService(StubHttpService):
         """
         return self.filter_by(data, "user", user)
 
-    def filter_by_usage_id(self, data, usage_id):
+    def filter_by_usage_id(self, data, usage_ids):
         """
         Filters provided `data(list)` by the `usage_id(str)`.
         """
-        return self.filter_by(data, "usage_id", usage_id)
+        if not isinstance(usage_ids, list):
+            usage_ids = [usage_ids]
+        return self.filter_by_list(data, "usage_id", usage_ids)
 
     def filter_by_course_id(self, data, course_id):
         """
@@ -373,6 +379,12 @@ class StubEdxNotesService(StubHttpService):
         Filters provided `data(list)` by the `field_name(str)` with `value`.
         """
         return [note for note in data if note.get(field_name) == value]
+
+    def filter_by_list(self, data, field_name, values):
+        """
+        Filters provided `data(list)` by the `field_name(str)` in values.
+        """
+        return [note for note in data if note.get(field_name) in values]
 
     def search(self, data, query):
         """

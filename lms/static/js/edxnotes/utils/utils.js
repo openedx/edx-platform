@@ -1,6 +1,6 @@
-;(function (define, undefined) {
-'use strict';
-define([], function($, _) {
+(function(define, undefined) {
+    'use strict';
+    define([], function($, _) {
     /**
      * Replaces all newlines in a string by HTML line breaks.
      * @param {String} str The input string.
@@ -13,12 +13,12 @@ define([], function($, _) {
      *   a<br>
      *   string<br>
      */
-    var nl2br = function (str) {
-        return (str + '').replace(/(\r\n|\n\r|\r|\n)/g, '<br>');
-    }
+        var nl2br = function(str) {
+            return (str + '').replace(/(\r\n|\n\r|\r|\n)/g, '<br>');
+        };
 
-    return {
-        nl2br: nl2br
-    };
-});
+        return {
+            nl2br: nl2br
+        };
+    });
 }).call(this, define || RequireJS.define);

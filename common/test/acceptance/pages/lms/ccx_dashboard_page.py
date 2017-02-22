@@ -40,3 +40,9 @@ class CoachDashboardPage(CoursePage):
             lambda: self.q(css=create_ccx_button).present, "Create a new Custom Course for edX"
         ).fulfill()
         self.q(css=create_ccx_button).click()
+
+    def is_button_view_unit_in_studio_visible(self):
+        """
+        check if the View Unit in Studio button is on the page
+        """
+        return self.q(css='instructor-info-action').present

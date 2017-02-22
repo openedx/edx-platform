@@ -88,37 +88,41 @@ metadata:
 
 data: |
     <?xml version="1.0"?>
-    <problem showanswer="closed" rerandomize="never" weight="10" display_name="lec1_Q2">
-      <p>If you have a problem that is already written in LaTeX, you can use this problem type to
-      easily convert your code into XML. After you paste your code into the LaTeX editor,
-      you only need to make a few minor adjustments.</p>
-      <p>For more information, see
-      <a href="http://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/problem_in_latex.html" target="_blank">
-      Problem Written in LaTeX</a> in <i>Building and Running an edX Course</i>.</p>
+    <problem>
+      <p>
+          If you have a problem that is already written in LaTeX, you can use this problem type to
+          easily convert your code into XML. After you paste your code into the LaTeX editor,
+          you only need to make a few minor adjustments.
+      </p>
+      <p>
+          For more information, see
+          <a href="http://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/problem_in_latex.html" target="_blank">
+          Problem Written in LaTeX</a> in <i>Building and Running an edX Course</i>.
+      </p>
       <p>You can use the following example problems as models.</p>
-       <p><strong>Example Option Problem</strong></p>
-          <p>Which of the following countries celebrates its independence on August 15?</p>
-          <br/>
-          <optionresponse>
-            <optioninput options="('India','Spain','China','Bermuda')" correct="India"></optioninput>
-          </optionresponse>
+      <p><strong>Example Option Problem</strong></p>
+      <br/>
+      <optionresponse>
+        <label>Which of the following countries celebrates its independence on August 15?</label>
+        <optioninput options="('India','Spain','China','Bermuda')" correct="India"></optioninput>
         <solution>
           <div class="detailed-solution">
             <p>Explanation</p>
             <p>India became an independent nation on August 15, 1947.</p>
           </div>
         </solution>
-        <br/>
-        <p><strong>Example Multiple Choice Problem</strong></p>
-          <p>Which of the following countries has the largest population?</p>
-          <multiplechoiceresponse>
-            <choicegroup type="MultipleChoice">
-              <choice correct="false" name="brazil">Brazil</choice>
-              <choice correct="false" name="germany">Germany</choice>
-              <choice correct="true" name="indonesia">Indonesia</choice>
-              <choice correct="false" name="russia">Russia</choice>
-           </choicegroup>
-          </multiplechoiceresponse>
+      </optionresponse>
+      <br/>
+
+      <p><strong>Example Multiple Choice Problem</strong></p>
+      <multiplechoiceresponse>
+        <label>Which of the following countries has the largest population?</label>
+        <choicegroup type="MultipleChoice">
+          <choice correct="false" name="brazil">Brazil</choice>
+          <choice correct="false" name="germany">Germany</choice>
+          <choice correct="true" name="indonesia">Indonesia</choice>
+          <choice correct="false" name="russia">Russia</choice>
+        </choicegroup>
         <solution>
           <div class="detailed-solution">
             <p>Explanation</p>
@@ -129,38 +133,58 @@ data: |
             <p>The population of Germany is approximately 81 million.</p>
           </div>
         </solution>
-        <br/>
-        <p><strong>Example Math Expression Problem</strong></p>
-          <p>What is Einstein's equation for the energy equivalent of a mass [mathjaxinline]m[/mathjaxinline]?</p>
-          <symbolicresponse expect="m*c^2">
-            <textline size="90" correct_answer="m*c^2" math="1"/>
-          </symbolicresponse>
-        <br/>
-        <p><strong>Example Numerical Problem</strong></p>
-          <p>Estimate the energy savings (in J/y) if all the people ([mathjaxinline]3\times 10^8[/mathjaxinline]) in the U.&#xA0;S. switched from U.&#xA0;S. code to low-flow shower heads.</p>
-          <p style="display:inline">Energy saved = </p>
-          <numericalresponse inline="1" answer="0.52">
-            <textline inline="1">
-              <responseparam type="tolerance" default="0.02"/>
-            </textline>
-            <p style="display:inline">&#xA0;EJ/year</p>
-          </numericalresponse>
-        <br/>
-        <p><strong>Example Fill-in-the-Blank Problem</strong></p>
-          <p>What was the first post-secondary school in China to allow both male and female students?</p>
-          <stringresponse answer="Nanjing Higher Normal Institute" type="ci" >
-            <additional_answer>National Central University</additional_answer>
-            <additional_answer>Nanjing University</additional_answer>
-            <textline label="What was the first post-secondary school in China to allow both male and female students?" size="40"/>
-          </stringresponse>
+      </multiplechoiceresponse>
+      <br/>
+
+      <p><strong>Example Math Expression Problem</strong></p>
+      <symbolicresponse expect="m*c^2">
+        <p>What is Einstein's equation for the energy equivalent of a mass [mathjaxinline]m[/mathjaxinline]?</p>
+        <textline size="90" correct_answer="m*c^2" math="1"/>
+      </symbolicresponse>
+      <br/>
+
+      <p><strong>Example Numerical Problem</strong></p>
+      <numericalresponse inline="1" answer="0.52">
+        <label>Estimate the energy savings (in J/y) if all the people ([mathjaxinline]3\times 10^8[/mathjaxinline]) in the U.&#xA0;S. switched from U.&#xA0;S. code to low-flow shower heads.</label>
+        <formulaequationinput trailing_text="EJ/year" />
+        <responseparam type="tolerance" default="0.02"/>
+      </numericalresponse>
+      <br/>
+
+      <p><strong>Example Fill-in-the-Blank Problem</strong></p>
+      <stringresponse answer="Nanjing Higher Normal Institute" type="ci" >
+        <label>What was the first post-secondary school in China to allow both male and female students?</label>
+        <additional_answer>National Central University</additional_answer>
+        <additional_answer>Nanjing University</additional_answer>
+        <textline size="40"/>
         <solution>
           <div class="detailed-solution">
             <p>Explanation</p>
             <p>Nanjing Higher Normal Institute first admitted female students in 1920.</p>
           </div>
         </solution>
-       <br/>
-       <p><strong>Example Custom Python-Evaluated Input Problem</strong></p>
+      </stringresponse>
+      <br/>
+
+      <p><strong>Example Custom Python-Evaluated Input Problem</strong></p>
+
+      <customresponse cfn="test_add_to_ten">
+        <script type="loncapa/python">
+    def test_add_to_ten(expect, ans):
+        return test_add(10, ans)
+      </script>
+        <p>Enter two integers that sum to 10.</p>
+        <textline size="40" correct_answer="3"/><br/>
+        <textline size="40" correct_answer="7"/>
+        <solution>
+          <div class="detailed-solution">
+            <p>Explanation</p>
+            <p>Any set of integers on the line \(y = 10 - x\) satisfy these constraints.</p>
+          </div>
+        </solution>
+      </customresponse>
+
+      <customresponse cfn="test_add" expect="20">
         <script type="loncapa/python">
     def test_add(expect, ans):
         try:
@@ -169,37 +193,30 @@ data: |
             return (a1+a2) == int(expect)
         except ValueError:
             return False
-
-    def test_add_to_ten(expect, ans):
-        return test_add(10, ans)
       </script>
-        <p>Enter two integers that sum to 10.</p>
-        <customresponse cfn="test_add_to_ten">
-          <textline size="40" correct_answer="3" label="Integer #1"/><br/>
-          <textline size="40" correct_answer="7" label="Integer #2"/>
-        </customresponse>
         <p>Enter two integers that sum to 20.</p>
-        <customresponse cfn="test_add" expect="20">
-          <textline size="40" correct_answer="11" label="Integer #1"/><br/>
-          <textline size="40" correct_answer="9" label="Integer #2"/>
-        </customresponse>
-      <solution>
-        <div class="detailed-solution">
-          <p>Explanation</p>
-          <p>Any set of integers on the line \(y = 10 - x\) and \(y = 20 - x\) satisfy these constraints.</p>
-          <p>To add an image to the solution, use an HTML "img" tag. Make sure to include alt text.</p>
-          <img src="/static/images/placeholder-image.png" width="400" alt="Description of image"/>
-        </div>
-      </solution>
+        <textline size="40" correct_answer="11"/><br/>
+        <textline size="40" correct_answer="9"/>
+        <solution>
+          <div class="detailed-solution">
+            <p>Explanation</p>
+            <p>Any set of integers on the line \(y = 20 - x\) satisfy these constraints.</p>
+            <p>To add an image to the solution, use an HTML "img" tag. Make sure to include alt text.</p>
+            <img src="/static/images/placeholder-image.png" width="400" alt="Description of image"/>
+          </div>
+        </solution>
+      </customresponse>
       <br/>
+
       <p><strong>Example Image Mapped Input Problem</strong></p>
-          <p>What country is home to the Great Pyramid of Giza as well as the cities
-          of Cairo and Memphis? Click the country on the map below.</p>
-          <imageresponse>
-           <imageinput src="https://studio.edx.org/c4x/edX/DemoX/asset/Africa.png"
-           width="600" height="638" rectangle="(338,98)-(412,168)" alt="Map of
-           Africa"/>
-          </imageresponse>
+      <imageresponse>
+        <p>
+          What country is home to the Great Pyramid of Giza as well as the cities
+          of Cairo and Memphis? Click the country on the map below.
+        </p>
+        <imageinput src="https://studio.edx.org/c4x/edX/DemoX/asset/Africa.png"
+        width="600" height="638" rectangle="(338,98)-(412,168)" alt="Map of
+        Africa"/>
         <solution>
           <div class="detailed-solution">
             <p>Explanation</p>
@@ -207,22 +224,24 @@ data: |
             the Sphinx and the ancient Royal Library of Alexandria.</p>
           </div>
         </solution>
-        <br/>
-        <p><strong>Example Hidden Explanation</strong></p>
-        <p>You can provide additional information that only appears at certain times by including a "showhide" flag. </p>
-        <p>
-          <table class="wikitable collapsible collapsed">
-            <tbody>
-              <tr>
-                <th> More Information [<a href="javascript:$('#sh1').toggle()" id="sh1l">show</a>]</th>
-              </tr>
-              <tr id="sh1" style="display:none">
-                <td>
-                  <p>This is a hidden explanation. It can contain equations, such as [mathjaxinline]\alpha = \frac{2}{\sqrt {1+\gamma }}[/mathjaxinline].  </p>
-                  <p>This is additional text after the hidden explanation. </p>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </p>
+      </imageresponse>
+      <br/>
+
+      <p><strong>Example Hidden Explanation</strong></p>
+      <p>You can provide additional information that only appears at certain times by including a "showhide" flag. </p>
+      <p>
+        <table class="wikitable collapsible collapsed">
+          <tbody>
+            <tr>
+              <th> More Information [<a href="javascript:$('#sh1').toggle()" id="sh1l">show</a>]</th>
+            </tr>
+            <tr id="sh1" style="display:none">
+              <td>
+                <p>This is a hidden explanation. It can contain equations, such as [mathjaxinline]\alpha = \frac{2}{\sqrt {1+\gamma }}[/mathjaxinline].  </p>
+                <p>This is additional text after the hidden explanation. </p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </p>
     </problem>

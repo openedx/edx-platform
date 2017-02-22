@@ -9,15 +9,15 @@ from django.test.utils import override_settings
 from nose.plugins.attrib import attr
 
 from courseware.tests.factories import InstructorFactory
-from lang_pref import LANGUAGE_KEY
+from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
+from openedx.core.djangoapps.user_api.preferences.api import set_user_preference, delete_user_preference
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
-from openedx.core.djangoapps.user_api.preferences.api import set_user_preference, delete_user_preference
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestInstructorAPIEnrollmentEmailLocalization(SharedModuleStoreTestCase):
     """
     Test whether the enroll, unenroll and beta role emails are sent in the
