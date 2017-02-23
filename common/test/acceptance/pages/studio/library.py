@@ -11,7 +11,7 @@ from common.test.acceptance.pages.studio.users import UsersPageMixin
 from common.test.acceptance.pages.studio.pagination import PaginatedMixin
 from selenium.webdriver.common.keys import Keys
 from common.test.acceptance.pages.studio.utils import HelpMixin
-from common.test.acceptance.pages.common.utils import confirm_prompt, wait_for_notification
+from common.test.acceptance.pages.common.utils import confirm_prompt, sync_on_notification
 
 from common.test.acceptance.pages.studio import BASE_URL
 
@@ -92,7 +92,7 @@ class LibraryEditPage(LibraryPage, PaginatedMixin, UsersPageMixin):
         Click on the duplicate button for the given XBlock
         """
         self._action_btn_for_xblock_id(xblock_id, "duplicate").click()
-        wait_for_notification(self)
+        sync_on_notification(self)
         self.wait_for_ajax()
 
     def click_delete_button(self, xblock_id, confirm=True):
@@ -101,7 +101,7 @@ class LibraryEditPage(LibraryPage, PaginatedMixin, UsersPageMixin):
         """
         self._action_btn_for_xblock_id(xblock_id, "delete").click()
         if confirm:
-            confirm_prompt(self)  # this will also wait_for_notification()
+            confirm_prompt(self)  # this will also sync_on_notification()
             self.wait_for_ajax()
 
     def _get_xblocks(self):
