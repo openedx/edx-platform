@@ -42,7 +42,7 @@
 # mariana1201 <gogo3135@naver.com>, 2014
 # kmooc <shevious@gmail.com>, 2015-2016
 # shevious <shevious@yahoo.com>, 2015
-# Hongseob Lee <shevreg@yahoo.com>, 2015
+# Hongseob Lee <shevreg@yahoo.com>, 2015,2017
 # Jong-Dae Park <jdpark7@gmail.com>, 2013
 # jeon <bluerespect@nate.com>, 2014-2015
 # Jong-Dae Park <jdpark7@gmail.com>, 2013
