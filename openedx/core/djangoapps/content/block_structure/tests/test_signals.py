@@ -10,7 +10,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from ..api import get_block_structure_manager
-from ..signals import INVALIDATE_CACHE_ON_PUBLISH_SWITCH
+from ..config import INVALIDATE_CACHE_ON_PUBLISH, waffle_switch_name
 from .helpers import is_course_in_block_structure_cache
 
 
@@ -51,7 +51,7 @@ class CourseBlocksSignalTest(ModuleStoreTestCase):
     def test_cache_invalidation(self, invalidate_cache_enabled, mock_bs_manager_clear):
         test_display_name = "Jedi 101"
 
-        with override_switch(INVALIDATE_CACHE_ON_PUBLISH_SWITCH, active=invalidate_cache_enabled):
+        with override_switch(waffle_switch_name(INVALIDATE_CACHE_ON_PUBLISH), active=invalidate_cache_enabled):
             self.course.display_name = test_display_name
             self.store.update_item(self.course, self.user.id)
 
