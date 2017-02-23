@@ -21,6 +21,7 @@ class TestSites(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
 
     STUDENT_INFO = [('view@test.com', 'foo'), ('view2@test.com', 'foo')]
+    ENABLED_SIGNALS = ['course_published']
 
     @classmethod
     def setUpClass(cls):

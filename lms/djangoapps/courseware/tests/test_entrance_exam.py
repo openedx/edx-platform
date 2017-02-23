@@ -58,81 +58,82 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
                 'entrance_exam_enabled': True,
             }
         )
-        self.chapter = ItemFactory.create(
-            parent=self.course,
-            display_name='Overview'
-        )
-        self.welcome = ItemFactory.create(
-            parent=self.chapter,
-            display_name='Welcome'
-        )
-        ItemFactory.create(
-            parent=self.course,
-            category='chapter',
-            display_name="Week 1"
-        )
-        self.chapter_subsection = ItemFactory.create(
-            parent=self.chapter,
-            category='sequential',
-            display_name="Lesson 1"
-        )
-        chapter_vertical = ItemFactory.create(
-            parent=self.chapter_subsection,
-            category='vertical',
-            display_name='Lesson 1 Vertical - Unit 1'
-        )
-        ItemFactory.create(
-            parent=chapter_vertical,
-            category="problem",
-            display_name="Problem - Unit 1 Problem 1"
-        )
-        ItemFactory.create(
-            parent=chapter_vertical,
-            category="problem",
-            display_name="Problem - Unit 1 Problem 2"
-        )
+        with self.store.bulk_operations(self.course.id):
+            self.chapter = ItemFactory.create(
+                parent=self.course,
+                display_name='Overview'
+            )
+            self.welcome = ItemFactory.create(
+                parent=self.chapter,
+                display_name='Welcome'
+            )
+            ItemFactory.create(
+                parent=self.course,
+                category='chapter',
+                display_name="Week 1"
+            )
+            self.chapter_subsection = ItemFactory.create(
+                parent=self.chapter,
+                category='sequential',
+                display_name="Lesson 1"
+            )
+            chapter_vertical = ItemFactory.create(
+                parent=self.chapter_subsection,
+                category='vertical',
+                display_name='Lesson 1 Vertical - Unit 1'
+            )
+            ItemFactory.create(
+                parent=chapter_vertical,
+                category="problem",
+                display_name="Problem - Unit 1 Problem 1"
+            )
+            ItemFactory.create(
+                parent=chapter_vertical,
+                category="problem",
+                display_name="Problem - Unit 1 Problem 2"
+            )
 
-        ItemFactory.create(
-            category="instructor",
-            parent=self.course,
-            data="Instructor Tab",
-            display_name="Instructor"
-        )
-        self.entrance_exam = ItemFactory.create(
-            parent=self.course,
-            category="chapter",
-            display_name="Entrance Exam Section - Chapter 1",
-            is_entrance_exam=True,
-            in_entrance_exam=True
-        )
-        self.exam_1 = ItemFactory.create(
-            parent=self.entrance_exam,
-            category='sequential',
-            display_name="Exam Sequential - Subsection 1",
-            graded=True,
-            in_entrance_exam=True
-        )
-        subsection = ItemFactory.create(
-            parent=self.exam_1,
-            category='vertical',
-            display_name='Exam Vertical - Unit 1'
-        )
-        problem_xml = MultipleChoiceResponseXMLFactory().build_xml(
-            question_text='The correct answer is Choice 3',
-            choices=[False, False, True, False],
-            choice_names=['choice_0', 'choice_1', 'choice_2', 'choice_3']
-        )
-        self.problem_1 = ItemFactory.create(
-            parent=subsection,
-            category="problem",
-            display_name="Exam Problem - Problem 1",
-            data=problem_xml
-        )
-        self.problem_2 = ItemFactory.create(
-            parent=subsection,
-            category="problem",
-            display_name="Exam Problem - Problem 2"
-        )
+            ItemFactory.create(
+                category="instructor",
+                parent=self.course,
+                data="Instructor Tab",
+                display_name="Instructor"
+            )
+            self.entrance_exam = ItemFactory.create(
+                parent=self.course,
+                category="chapter",
+                display_name="Entrance Exam Section - Chapter 1",
+                is_entrance_exam=True,
+                in_entrance_exam=True
+            )
+            self.exam_1 = ItemFactory.create(
+                parent=self.entrance_exam,
+                category='sequential',
+                display_name="Exam Sequential - Subsection 1",
+                graded=True,
+                in_entrance_exam=True
+            )
+            subsection = ItemFactory.create(
+                parent=self.exam_1,
+                category='vertical',
+                display_name='Exam Vertical - Unit 1'
+            )
+            problem_xml = MultipleChoiceResponseXMLFactory().build_xml(
+                question_text='The correct answer is Choice 3',
+                choices=[False, False, True, False],
+                choice_names=['choice_0', 'choice_1', 'choice_2', 'choice_3']
+            )
+            self.problem_1 = ItemFactory.create(
+                parent=subsection,
+                category="problem",
+                display_name="Exam Problem - Problem 1",
+                data=problem_xml
+            )
+            self.problem_2 = ItemFactory.create(
+                parent=subsection,
+                category="problem",
+                display_name="Exam Problem - Problem 2"
+            )
 
         add_entrance_exam_milestone(self.course, self.entrance_exam)
 
@@ -295,7 +296,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         """
         # One query is for getting the list of disabled XBlocks (which is
         # then stored in the request).
-        with self.assertNumQueries(2):
+        with self.assertNumQueries(1):
             exam_score = get_entrance_exam_score(self.request, self.course)
         self.assertEqual(exam_score, 0)
 

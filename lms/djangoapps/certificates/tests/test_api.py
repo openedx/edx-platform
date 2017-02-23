@@ -88,6 +88,7 @@ class WebCertificateTestMixin(object):
 @attr(shard=1)
 class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTestCase):
     """Tests for the `certificate_downloadable_status` helper function. """
+    ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
         super(CertificateDownloadableStatusTests, self).setUp()
@@ -457,6 +458,7 @@ class GenerateUserCertificatesTest(EventTestMixin, WebCertificateTestMixin, Modu
     """Tests for generating certificates for students. """
 
     ERROR_REASON = "Kaboom!"
+    ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):  # pylint: disable=arguments-differ
         super(GenerateUserCertificatesTest, self).setUp('certificates.api.tracker')

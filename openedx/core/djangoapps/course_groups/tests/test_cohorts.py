@@ -263,8 +263,8 @@ class TestCohorts(ModuleStoreTestCase):
         )
 
     @ddt.data(
-        (True, 3),
-        (False, 7),
+        (True, 2),
+        (False, 6),
     )
     @ddt.unpack
     def test_get_cohort_sql_queries(self, use_cached, num_sql_queries):

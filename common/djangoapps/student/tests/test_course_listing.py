@@ -29,6 +29,8 @@ class TestCourseListing(ModuleStoreTestCase, MilestonesTestCaseMixin):
     """
     Unit tests for getting the list of courses for a logged in user
     """
+    ENABLED_SIGNALS = ['course_deleted']
+
     def setUp(self):
         """
         Add a student & teacher

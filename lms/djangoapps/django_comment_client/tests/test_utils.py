@@ -210,6 +210,8 @@ class CachedDiscussionIdMapTestCase(ModuleStoreTestCase):
     """
     Tests that using the cache of discussion id mappings has the same behavior as searching through the course.
     """
+    ENABLED_SIGNALS = ['course_published']
+
     def setUp(self):
         super(CachedDiscussionIdMapTestCase, self).setUp()
 

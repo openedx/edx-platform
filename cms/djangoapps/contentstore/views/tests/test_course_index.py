@@ -331,6 +331,8 @@ class TestCourseOutline(CourseTestCase):
     """
     Unit tests for the course outline.
     """
+    ENABLED_SIGNALS = ['course_published']
+
     def setUp(self):
         """
         Set up the for the course outline tests.
@@ -578,6 +580,8 @@ class TestCourseReIndex(CourseTestCase):
     Unit tests for the course outline.
     """
     SUCCESSFUL_RESPONSE = _("Course has been successfully reindexed.")
+
+    ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
         """
