@@ -274,6 +274,27 @@ class CourseOverview(TimeStampedModel):
 
         return course_overview or cls.load_from_module_store(course_id)
 
+    @classmethod
+    def get_from_ids_if_exists(cls, course_ids):
+        """
+        Return a dict mapping course_ids to CourseOverviews, if they exist.
+
+        This method will *not* generate new CourseOverviews or delete outdated
+        ones. It exists only as a small optimization used when CourseOverviews
+        are known to exist, for common situations like the student dashboard.
+
+        Callers should assume that this list is incomplete and fall back to
+        get_from_id if they need to guarantee CourseOverview generation.
+        """
+        return {
+            overview.id: overview
+            for overview
+            in cls.objects.select_related('image_set').filter(
+                id__in=course_ids,
+                version__gte=cls.VERSION
+            )
+        }
+
     def clean_id(self, padding_char='='):
         """
         Returns a unique deterministic base32-encoded ID for the course.
