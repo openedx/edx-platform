@@ -371,7 +371,7 @@ else
             blockText = blockText.replace(/\n+$/g, '');
 
             // Replace the element text with a marker ("~KxK" where x is its key)
-            blockText = '\n\n~K' + (g_html_blocks.push(blockText) - 1) + 'K\n\n';
+            blockText = '~K' + (g_html_blocks.push(blockText) - 1) + 'K';
 
             return blockText;
         }
@@ -800,7 +800,7 @@ else
                     return result;
                 });
             } else {
-                whole_list = /(\n\n|^\n?)(([ ]{0,3}([*+-]|\d+[.])[ \t]+)[^\r]+?(~0|\n{2,}(?=\S)(?![ \t]*(?:[*+-]|\d+[.])[ \t]+)))/g;
+                whole_list = /(\n|^\n?)(([ ]{0,3}([*+-]|\d+[.])[ \t]+)[^\r]+?(~0|\n{2,}(?=\S)(?![ \t]*(?:[*+-]|\d+[.])[ \t]+)))/g;
                 text = text.replace(whole_list, function(wholeMatch, m1, m2, m3) {
                     var runup = m1;
                     var list = m2;
@@ -1111,7 +1111,7 @@ else
             text = text.replace(/^\n+/g, '');
             text = text.replace(/\n+$/g, '');
 
-            var grafs = text.split(/\n{2,}/g);
+            var grafs = text.split(/\n/g);
             var grafsOut = [];
 
             var markerRe = /~K(\d+)K/;
@@ -1133,6 +1133,9 @@ else
                     str += '</p>';
                     grafsOut.push(str);
                 }
+                else if (str === '' && end > 1) {
+                    grafsOut.push('<br>');
+                }
             }
             //
             // Unhashify HTML blocks
@@ -1150,7 +1153,7 @@ else
                     }
                 }
             }
-            return grafsOut.join('\n\n');
+            return grafsOut.join('');
         }
 
         function _EncodeAmpsAndAngles(text) {

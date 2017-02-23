@@ -950,14 +950,12 @@ class DiscussionEditorPreviewTest(UniqueCourseTest):
         """When I type Markdown into the editor, it should be rendered as formatted Markdown in the preview box"""
         self.page.set_new_post_editor_value(
             "Some markdown\n"
-            "\n"
             "- line 1\n"
             "- line 2"
         )
 
         self.assertEqual(self.page.get_new_post_preview_value(), (
-            "<p>Some markdown</p>\n"
-            "\n"
+            "<p>Some markdown</p>"
             "<ul>\n"
             "<li>line 1</li>\n"
             "<li>line 2</li>\n"
