@@ -5,13 +5,10 @@ from django.conf import settings
 from django.dispatch.dispatcher import receiver
 
 from xmodule.modulestore.django import SignalHandler
-from waffle import switch_is_active
 
+from . import config
 from .api import clear_course_from_cache
 from .tasks import update_course_in_cache
-
-
-INVALIDATE_CACHE_ON_PUBLISH_SWITCH = 'block_structure_invalidate_cache_on_publish'
 
 
 @receiver(SignalHandler.course_published)
@@ -20,7 +17,7 @@ def _listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable
     Catches the signal that a course has been published in the module
     store and creates/updates the corresponding cache entry.
     """
-    if switch_is_active(INVALIDATE_CACHE_ON_PUBLISH_SWITCH):
+    if config.is_enabled(config.INVALIDATE_CACHE_ON_PUBLISH):
         clear_course_from_cache(course_key)
 
     update_course_in_cache.apply_async(
