@@ -1439,7 +1439,7 @@ class CourseEnrollment(models.Model):
 
     @classmethod
     def enrollments_for_user(cls, user):
-        return cls.objects.filter(user=user, is_active=1)
+        return cls.objects.filter(user=user, is_active=1).select_related('user')
 
     @classmethod
     def enrollment_status_hash_cache_key(cls, user):
