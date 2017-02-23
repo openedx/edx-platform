@@ -163,6 +163,8 @@
       letter-spacing: 0;
 
       .user-image-frame {
+        margin: 0;
+        padding: 0;
         max-width: ($baseline*2);
         border-radius: 10%;
       }
