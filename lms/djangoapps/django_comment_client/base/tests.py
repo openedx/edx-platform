@@ -356,6 +356,7 @@ class ViewsQueryCountTestCase(
 
     CREATE_USER = False
     ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
+    ENABLED_SIGNALS = ['course_published']
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):

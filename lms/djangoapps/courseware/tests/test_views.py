@@ -1138,6 +1138,7 @@ class ProgressPageTests(ModuleStoreTestCase):
     """
 
     ENABLED_CACHES = ['default', 'mongo_modulestore_inheritance', 'loc_cache']
+    ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
         super(ProgressPageTests, self).setUp()
@@ -2032,7 +2033,6 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase):
     This class overrides the get_response method, which is used by
     the tests defined in RenderXBlockTestMixin.
     """
-
     def setUp(self):
         reload_django_url_config()
         super(TestRenderXBlock, self).setUp()
@@ -2060,7 +2060,6 @@ class TestRenderXBlockSelfPaced(TestRenderXBlock):
     Test rendering XBlocks for a self-paced course. Relies on the query
     count assertions in the tests defined by RenderXBlockMixin.
     """
-
     def setUp(self):
         super(TestRenderXBlockSelfPaced, self).setUp()
         SelfPacedConfiguration(enabled=True).save()

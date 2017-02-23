@@ -26,6 +26,8 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
     Tests integration between the eventing in various layers
     of the grading infrastructure.
     """
+    ENABLED_SIGNALS = ['course_published']
+
     @classmethod
     def reset_course(cls):
         """

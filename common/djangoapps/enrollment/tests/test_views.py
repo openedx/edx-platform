@@ -142,6 +142,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase):
     OTHER_EMAIL = "jane@example.com"
 
     ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
+    ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
         """ Create a course and user, then log in. """

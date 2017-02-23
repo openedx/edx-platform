@@ -31,6 +31,8 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
     maxDiff = 5000  # long enough to show mismatched dicts, in case of error
     serializer_class = CourseSerializer
 
+    ENABLED_SIGNALS = ['course_published']
+
     def setUp(self):
         super(TestCourseSerializer, self).setUp()
         self.staff_user = self.create_user('staff', is_staff=True)

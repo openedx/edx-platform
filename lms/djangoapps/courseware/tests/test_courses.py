@@ -47,6 +47,7 @@ TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 @ddt.ddt
 class CoursesTest(ModuleStoreTestCase):
     """Test methods related to fetching courses."""
+    ENABLED_SIGNALS = ['course_published']
 
     @override_settings(CMS_BASE=CMS_BASE_TEST)
     def test_get_cms_course_block_link(self):

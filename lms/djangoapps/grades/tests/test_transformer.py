@@ -29,6 +29,8 @@ class GradesTransformerTestCase(CourseStructureTestCase):
 
     TRANSFORMER_CLASS_TO_TEST = GradesTransformer
 
+    ENABLED_SIGNALS = ['course_published']
+
     problem_metadata = {
         u'graded': True,
         u'weight': 1,

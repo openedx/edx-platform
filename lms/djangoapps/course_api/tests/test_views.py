@@ -101,6 +101,7 @@ class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreT
     Test responses returned from CourseListView (with tests that modify the
     courseware).
     """
+    ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
         super(CourseListViewTestCaseMultipleCourses, self).setUp()

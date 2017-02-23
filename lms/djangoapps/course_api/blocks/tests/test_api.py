@@ -105,6 +105,8 @@ class TestGetBlocksQueryCounts(SharedModuleStoreTestCase):
     """
     Tests query counts for the get_blocks function.
     """
+    ENABLED_SIGNALS = ['course_published']
+
     def setUp(self):
         super(TestGetBlocksQueryCounts, self).setUp()
 

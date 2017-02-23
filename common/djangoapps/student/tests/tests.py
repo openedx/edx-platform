@@ -229,6 +229,7 @@ class DashboardTest(ModuleStoreTestCase):
     """
     Tests for dashboard utility functions
     """
+    ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
         super(DashboardTest, self).setUp()
@@ -434,10 +435,11 @@ class DashboardTest(ModuleStoreTestCase):
         # If user has a certificate with valid linked-in config then Add Certificate to LinkedIn button
         # should be visible. and it has URL value with valid parameters.
         self.client.login(username="jack", password="test")
-        LinkedInAddToProfileConfiguration(
+
+        LinkedInAddToProfileConfiguration.objects.create(
             company_identifier='0_mC_o2MizqdtZEmkVXjH4eYwMj4DnkCWrZP_D9',
             enabled=True
-        ).save()
+        )
 
         CourseModeFactory.create(
             course_id=self.course.id,
@@ -474,6 +476,7 @@ class DashboardTest(ModuleStoreTestCase):
             u'pfCertificationUrl=www.edx.org&'
             u'source=o'
         ).format(platform=quote(settings.PLATFORM_NAME.encode('utf-8')))
+
         self.assertContains(response, escape(expected_url))
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')

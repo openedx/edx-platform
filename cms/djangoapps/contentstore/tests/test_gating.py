@@ -13,6 +13,8 @@ class TestHandleItemDeleted(ModuleStoreTestCase, MilestonesTestCaseMixin):
     """
     Test case for handle_score_changed django signal handler
     """
+    ENABLED_SIGNALS = ['course_published']
+
     def setUp(self):
         """
         Initial data setup

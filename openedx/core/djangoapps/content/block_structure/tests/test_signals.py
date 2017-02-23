@@ -19,6 +19,8 @@ class CourseBlocksSignalTest(ModuleStoreTestCase):
     """
     Tests for the Course Blocks signal
     """
+    ENABLED_SIGNALS = ['course_deleted', 'course_published']
+
     def setUp(self):
         super(CourseBlocksSignalTest, self).setUp()
         self.course = CourseFactory.create()

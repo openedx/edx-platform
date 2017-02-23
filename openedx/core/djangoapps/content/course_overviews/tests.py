@@ -52,6 +52,8 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
 
     COURSE_OVERVIEW_TABS = {'courseware', 'info', 'textbooks', 'discussion', 'wiki', 'progress'}
 
+    ENABLED_SIGNALS = ['course_deleted', 'course_published']
+
     def check_course_overview_against_course(self, course):
         """
         Compares a CourseOverview object against its corresponding
