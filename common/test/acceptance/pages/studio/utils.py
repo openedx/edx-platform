@@ -6,7 +6,7 @@ from selenium.webdriver.common.keys import Keys
 from bok_choy.javascript import js_defined
 from bok_choy.promise import EmptyPromise
 
-from common.test.acceptance.pages.common.utils import click_css, wait_for_notification
+from common.test.acceptance.pages.common.utils import click_css, sync_on_notification
 
 
 NAV_HELP_NOT_SIGNED_IN_CSS = '.nav-item.nav-not-signedin-help a'
@@ -103,7 +103,7 @@ def add_component(page, item_type, specific_type, is_advanced_problem=False):
         all_options = page.q(css='.new-component-{} ul.new-component-template li button span'.format(item_type))
         chosen_option = all_options.filter(text=specific_type).first
         chosen_option.click()
-    wait_for_notification(page)
+    sync_on_notification(page)
     page.wait_for_ajax()
 
 
@@ -219,7 +219,7 @@ def drag(page, source_index, target_index, placeholder_height=0):
         action.release(target).perform()
     else:
         action.release().perform()
-    wait_for_notification(page)
+    sync_on_notification(page)
 
 
 def verify_ordering(test_class, page, expected_orderings):
