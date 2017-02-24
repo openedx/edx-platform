@@ -261,6 +261,23 @@ class GeneratedCertificate(models.Model):
         return None
 
     @classmethod
+    def course_ids_with_certs_for_user(cls, user):
+        """
+        Return a set of CourseKeys for which the user has certificates.
+
+        Sometimes we just want to check if a user has already been issued a
+        certificate for a given course (e.g. to test refund elibigility).
+        Instead of checking if `certificate_for_student` returns `None` on each
+        course_id individually, we instead just return a set of all CourseKeys
+        for which this student has certificates all at once.
+        """
+        return {
+            cert.course_id
+            for cert
+            in cls.objects.filter(user=user).only('course_id')  # pylint: disable=no-member
+        }
+
+    @classmethod
     def get_unique_statuses(cls, course_key=None, flat=False):
         """
         1 - Return unique statuses as a list of dictionaries containing the following key value pairs
