@@ -590,3 +590,4 @@ COMPREHENSIVE_THEME_LOCALE_PATHS = [REPO_ROOT / "themes/conf/locale", ]
 LMS_ROOT_URL = "http://localhost:8000"
 
 ECOMMERCE_API_URL = 'https://ecommerce.example.com/api/v2/'
+ENTERPRISE_API_URL = 'http://enterprise.example.com/enterprise/api/v1/'
