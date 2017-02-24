@@ -6,6 +6,8 @@ from django.dispatch.dispatcher import receiver
 
 from xmodule.modulestore.django import SignalHandler
 
+from opaque_keys.edx.locator import LibraryLocator
+
 from . import config
 from .api import clear_course_from_cache
 from .tasks import update_course_in_cache
@@ -16,7 +18,11 @@ def _listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable
     """
     Catches the signal that a course has been published in the module
     store and creates/updates the corresponding cache entry.
+    Ignores publish signals from content libraries.
     """
+    if isinstance(course_key, LibraryLocator):
+        return
+
     if config.is_enabled(config.INVALIDATE_CACHE_ON_PUBLISH):
         clear_course_from_cache(course_key)
 
