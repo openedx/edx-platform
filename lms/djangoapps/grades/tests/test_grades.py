@@ -148,20 +148,21 @@ class TestWeightedProblems(SharedModuleStoreTestCase):
     def setUpClass(cls):
         super(TestWeightedProblems, cls).setUpClass()
         cls.course = CourseFactory.create()
-        cls.chapter = ItemFactory.create(parent=cls.course, category="chapter", display_name="chapter")
-        cls.sequential = ItemFactory.create(parent=cls.chapter, category="sequential", display_name="sequential")
-        cls.vertical = ItemFactory.create(parent=cls.sequential, category="vertical", display_name="vertical1")
-        problem_xml = cls._create_problem_xml()
-        cls.problems = []
-        for i in range(2):
-            cls.problems.append(
-                ItemFactory.create(
-                    parent=cls.vertical,
-                    category="problem",
-                    display_name="problem_{}".format(i),
-                    data=problem_xml,
+        with cls.store.bulk_operations(cls.course.id):
+            cls.chapter = ItemFactory.create(parent=cls.course, category="chapter", display_name="chapter")
+            cls.sequential = ItemFactory.create(parent=cls.chapter, category="sequential", display_name="sequential")
+            cls.vertical = ItemFactory.create(parent=cls.sequential, category="vertical", display_name="vertical1")
+            problem_xml = cls._create_problem_xml()
+            cls.problems = []
+            for i in range(2):
+                cls.problems.append(
+                    ItemFactory.create(
+                        parent=cls.vertical,
+                        category="problem",
+                        display_name="problem_{}".format(i),
+                        data=problem_xml,
+                    )
                 )
-            )
 
     def setUp(self):
         super(TestWeightedProblems, self).setUp()
@@ -261,20 +262,21 @@ class TestScoreForModule(SharedModuleStoreTestCase):
     def setUpClass(cls):
         super(TestScoreForModule, cls).setUpClass()
         cls.course = CourseFactory.create()
-        cls.a = ItemFactory.create(parent=cls.course, category="chapter", display_name="a")
-        cls.b = ItemFactory.create(parent=cls.a, category="sequential", display_name="b")
-        cls.c = ItemFactory.create(parent=cls.a, category="sequential", display_name="c")
-        cls.d = ItemFactory.create(parent=cls.b, category="vertical", display_name="d")
-        cls.e = ItemFactory.create(parent=cls.b, category="vertical", display_name="e")
-        cls.f = ItemFactory.create(parent=cls.b, category="vertical", display_name="f")
-        cls.g = ItemFactory.create(parent=cls.c, category="vertical", display_name="g")
-        cls.h = ItemFactory.create(parent=cls.d, category="problem", display_name="h")
-        cls.i = ItemFactory.create(parent=cls.d, category="problem", display_name="i")
-        cls.j = ItemFactory.create(parent=cls.e, category="problem", display_name="j")
-        cls.k = ItemFactory.create(parent=cls.e, category="html", display_name="k")
-        cls.l = ItemFactory.create(parent=cls.e, category="problem", display_name="l")
-        cls.m = ItemFactory.create(parent=cls.f, category="html", display_name="m")
-        cls.n = ItemFactory.create(parent=cls.g, category="problem", display_name="n")
+        with cls.store.bulk_operations(cls.course.id):
+            cls.a = ItemFactory.create(parent=cls.course, category="chapter", display_name="a")
+            cls.b = ItemFactory.create(parent=cls.a, category="sequential", display_name="b")
+            cls.c = ItemFactory.create(parent=cls.a, category="sequential", display_name="c")
+            cls.d = ItemFactory.create(parent=cls.b, category="vertical", display_name="d")
+            cls.e = ItemFactory.create(parent=cls.b, category="vertical", display_name="e")
+            cls.f = ItemFactory.create(parent=cls.b, category="vertical", display_name="f")
+            cls.g = ItemFactory.create(parent=cls.c, category="vertical", display_name="g")
+            cls.h = ItemFactory.create(parent=cls.d, category="problem", display_name="h")
+            cls.i = ItemFactory.create(parent=cls.d, category="problem", display_name="i")
+            cls.j = ItemFactory.create(parent=cls.e, category="problem", display_name="j")
+            cls.k = ItemFactory.create(parent=cls.e, category="html", display_name="k")
+            cls.l = ItemFactory.create(parent=cls.e, category="problem", display_name="l")
+            cls.m = ItemFactory.create(parent=cls.f, category="html", display_name="m")
+            cls.n = ItemFactory.create(parent=cls.g, category="problem", display_name="n")
 
         cls.request = get_mock_request(UserFactory())
         CourseEnrollment.enroll(cls.request.user, cls.course.id)
@@ -341,96 +343,97 @@ class TestGetModuleScore(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
     def setUpClass(cls):
         super(TestGetModuleScore, cls).setUpClass()
         cls.course = CourseFactory.create()
-        cls.chapter = ItemFactory.create(
-            parent=cls.course,
-            category="chapter",
-            display_name="Test Chapter"
-        )
-        cls.seq1 = ItemFactory.create(
-            parent=cls.chapter,
-            category='sequential',
-            display_name="Test Sequential 1",
-            graded=True
-        )
-        cls.seq2 = ItemFactory.create(
-            parent=cls.chapter,
-            category='sequential',
-            display_name="Test Sequential 2",
-            graded=True
-        )
-        cls.seq3 = ItemFactory.create(
-            parent=cls.chapter,
-            category='sequential',
-            display_name="Test Sequential 3",
-            graded=True
-        )
-        cls.vert1 = ItemFactory.create(
-            parent=cls.seq1,
-            category='vertical',
-            display_name='Test Vertical 1'
-        )
-        cls.vert2 = ItemFactory.create(
-            parent=cls.seq2,
-            category='vertical',
-            display_name='Test Vertical 2'
-        )
-        cls.vert3 = ItemFactory.create(
-            parent=cls.seq3,
-            category='vertical',
-            display_name='Test Vertical 3'
-        )
-        cls.randomize = ItemFactory.create(
-            parent=cls.vert2,
-            category='randomize',
-            display_name='Test Randomize'
-        )
-        cls.library_content = ItemFactory.create(
-            parent=cls.vert3,
-            category='library_content',
-            display_name='Test Library Content'
-        )
-        problem_xml = MultipleChoiceResponseXMLFactory().build_xml(
-            question_text='The correct answer is Choice 3',
-            choices=[False, False, True, False],
-            choice_names=['choice_0', 'choice_1', 'choice_2', 'choice_3']
-        )
-        cls.problem1 = ItemFactory.create(
-            parent=cls.vert1,
-            category="problem",
-            display_name="Test Problem 1",
-            data=problem_xml
-        )
-        cls.problem2 = ItemFactory.create(
-            parent=cls.vert1,
-            category="problem",
-            display_name="Test Problem 2",
-            data=problem_xml
-        )
-        cls.problem3 = ItemFactory.create(
-            parent=cls.randomize,
-            category="problem",
-            display_name="Test Problem 3",
-            data=problem_xml
-        )
-        cls.problem4 = ItemFactory.create(
-            parent=cls.randomize,
-            category="problem",
-            display_name="Test Problem 4",
-            data=problem_xml
-        )
+        with cls.store.bulk_operations(cls.course.id):
+            cls.chapter = ItemFactory.create(
+                parent=cls.course,
+                category="chapter",
+                display_name="Test Chapter"
+            )
+            cls.seq1 = ItemFactory.create(
+                parent=cls.chapter,
+                category='sequential',
+                display_name="Test Sequential 1",
+                graded=True
+            )
+            cls.seq2 = ItemFactory.create(
+                parent=cls.chapter,
+                category='sequential',
+                display_name="Test Sequential 2",
+                graded=True
+            )
+            cls.seq3 = ItemFactory.create(
+                parent=cls.chapter,
+                category='sequential',
+                display_name="Test Sequential 3",
+                graded=True
+            )
+            cls.vert1 = ItemFactory.create(
+                parent=cls.seq1,
+                category='vertical',
+                display_name='Test Vertical 1'
+            )
+            cls.vert2 = ItemFactory.create(
+                parent=cls.seq2,
+                category='vertical',
+                display_name='Test Vertical 2'
+            )
+            cls.vert3 = ItemFactory.create(
+                parent=cls.seq3,
+                category='vertical',
+                display_name='Test Vertical 3'
+            )
+            cls.randomize = ItemFactory.create(
+                parent=cls.vert2,
+                category='randomize',
+                display_name='Test Randomize'
+            )
+            cls.library_content = ItemFactory.create(
+                parent=cls.vert3,
+                category='library_content',
+                display_name='Test Library Content'
+            )
+            problem_xml = MultipleChoiceResponseXMLFactory().build_xml(
+                question_text='The correct answer is Choice 3',
+                choices=[False, False, True, False],
+                choice_names=['choice_0', 'choice_1', 'choice_2', 'choice_3']
+            )
+            cls.problem1 = ItemFactory.create(
+                parent=cls.vert1,
+                category="problem",
+                display_name="Test Problem 1",
+                data=problem_xml
+            )
+            cls.problem2 = ItemFactory.create(
+                parent=cls.vert1,
+                category="problem",
+                display_name="Test Problem 2",
+                data=problem_xml
+            )
+            cls.problem3 = ItemFactory.create(
+                parent=cls.randomize,
+                category="problem",
+                display_name="Test Problem 3",
+                data=problem_xml
+            )
+            cls.problem4 = ItemFactory.create(
+                parent=cls.randomize,
+                category="problem",
+                display_name="Test Problem 4",
+                data=problem_xml
+            )
 
-        cls.problem5 = ItemFactory.create(
-            parent=cls.library_content,
-            category="problem",
-            display_name="Test Problem 5",
-            data=problem_xml
-        )
-        cls.problem6 = ItemFactory.create(
-            parent=cls.library_content,
-            category="problem",
-            display_name="Test Problem 6",
-            data=problem_xml
-        )
+            cls.problem5 = ItemFactory.create(
+                parent=cls.library_content,
+                category="problem",
+                display_name="Test Problem 5",
+                data=problem_xml
+            )
+            cls.problem6 = ItemFactory.create(
+                parent=cls.library_content,
+                category="problem",
+                display_name="Test Problem 6",
+                data=problem_xml
+            )
 
     def setUp(self):
         """
