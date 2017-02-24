@@ -5,11 +5,13 @@ import ddt
 from mock import patch
 from waffle.testutils import override_switch
 
+from opaque_keys.edx.locator import LibraryLocator, CourseLocator
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from ..api import get_block_structure_manager
+from ..signals import _listen_for_course_publish
 from ..config import INVALIDATE_CACHE_ON_PUBLISH, waffle_switch_name
 from .helpers import is_course_in_block_structure_cache
 
@@ -69,3 +71,13 @@ class CourseBlocksSignalTest(ModuleStoreTestCase):
             bs_manager.get_collected()
 
         self.assertFalse(is_course_in_block_structure_cache(self.course.id, self.store))
+
+    @ddt.data(
+        (CourseLocator(org='org', course='course', run='run'), True),
+        (LibraryLocator(org='org', course='course'), False),
+    )
+    @ddt.unpack
+    @patch('openedx.core.djangoapps.content.block_structure.tasks.update_course_in_cache.apply_async')
+    def test_update_only_for_courses(self, key, expect_update_called, mock_update):
+        _listen_for_course_publish(sender=None, course_key=key)
+        self.assertEqual(mock_update.called, expect_update_called)
