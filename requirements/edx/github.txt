@@ -96,3 +96,6 @@ git+https://github.com/edx/edx-celeryutils.git@v0.1.0#egg=edx-celeryutils==0.1.0
 # Third Party XBlocks
 git+https://github.com/open-craft/xblock-poll@v1.2.5#egg=xblock-poll==1.2.5
 git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.0.15#egg=xblock-drag-and-drop-v2==2.0.15
+
+# Testing this...
+git+https://github.com/edx/opaque-keys.git@eb86f0d8a613ba1e1b018b0f7421d22b96e77998#egg=edx-opaque-keys==0.4.1
