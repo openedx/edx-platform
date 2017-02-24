@@ -91,6 +91,42 @@ class CertificatesModelTest(ModuleStoreTestCase, MilestonesTestCaseMixin):
         certificate_info = certificate_info_for_user(student, course.id, grade, whitelisted)
         self.assertEqual(certificate_info, output)
 
+    def test_course_ids_with_certs_for_user(self):
+        # Create one user with certs and one without
+        student_no_certs = UserFactory()
+        student_with_certs = UserFactory()
+        student_with_certs.profile.allow_certificate = True
+        student_with_certs.profile.save()
+
+        # Set up a couple of courses
+        course_1 = CourseFactory.create()
+        course_2 = CourseFactory.create()
+
+        # Generate certificates
+        GeneratedCertificateFactory.create(
+            user=student_with_certs,
+            course_id=course_1.id,
+            status=CertificateStatuses.downloadable,
+            mode='honor'
+        )
+        GeneratedCertificateFactory.create(
+            user=student_with_certs,
+            course_id=course_2.id,
+            status=CertificateStatuses.downloadable,
+            mode='honor'
+        )
+
+        # User with no certs should return an empty set.
+        self.assertSetEqual(
+            GeneratedCertificate.course_ids_with_certs_for_user(student_no_certs),
+            set()
+        )
+        # User with certs should return a set with the two course_ids
+        self.assertSetEqual(
+            GeneratedCertificate.course_ids_with_certs_for_user(student_with_certs),
+            {course_1.id, course_2.id}
+        )
+
     @patch.dict(settings.FEATURES, {'ENABLE_PREREQUISITE_COURSES': True})
     def test_course_milestone_collected(self):
         student = UserFactory()

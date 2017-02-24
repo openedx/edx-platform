@@ -61,7 +61,9 @@ from student.tasks import send_activation_email
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification  # pylint: disable=import-error
 from bulk_email.models import Optout, BulkEmailFlag  # pylint: disable=import-error
-from certificates.models import CertificateStatuses, certificate_status_for_student
+from certificates.models import (  # pylint: disable=import-error
+    CertificateStatuses, GeneratedCertificate, certificate_status_for_student
+)
 from certificates.api import (  # pylint: disable=import-error
     get_certificate_url,
     has_html_certificates_enabled,
@@ -716,9 +718,12 @@ def dashboard(request):
     statuses = ["approved", "denied", "pending", "must_reverify"]
     reverifications = reverification_info(statuses)
 
+    user_already_has_certs_for = GeneratedCertificate.course_ids_with_certs_for_user(request.user)
     show_refund_option_for = frozenset(
         enrollment.course_id for enrollment in course_enrollments
-        if enrollment.refundable()
+        if enrollment.refundable(
+            user_already_has_certs_for=user_already_has_certs_for
+        )
     )
 
     block_courses = frozenset(
