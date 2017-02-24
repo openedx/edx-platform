@@ -28,6 +28,7 @@ from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
+from request_cache.middleware import RequestCache
 from shoppingcart.models import CourseRegistrationCode
 from student.models import CourseEnrollment
 from student.views import is_course_blocked
@@ -396,6 +397,7 @@ class CoursewareIndex(View):
         Returns and creates the rendering context for the courseware.
         Also returns the table of contents for the courseware.
         """
+        request = RequestCache.get_current_request()
         courseware_context = {
             'csrf': csrf(self.request)['csrf_token'],
             'COURSE_TITLE': self.course.display_name_with_default_escaped,
@@ -412,7 +414,7 @@ class CoursewareIndex(View):
             'disable_optimizely': True,
             'section_title': None,
             'sequence_title': None,
-            'disable_accordion': waffle.switch_is_active('unified_course_view')
+            'disable_accordion': waffle.flag_is_active(request, 'unified_course_view')
         }
         table_of_contents = toc_for_course(
             self.effective_user,
