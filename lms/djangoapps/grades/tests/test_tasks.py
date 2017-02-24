@@ -145,8 +145,8 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
     @ddt.data(
         (ModuleStoreEnum.Type.mongo, 1, 24, True),
         (ModuleStoreEnum.Type.mongo, 1, 21, False),
-        (ModuleStoreEnum.Type.split, 3, 23, True),
-        (ModuleStoreEnum.Type.split, 3, 20, False),
+        (ModuleStoreEnum.Type.split, 3, 24, True),
+        (ModuleStoreEnum.Type.split, 3, 21, False),
     )
     @ddt.unpack
     def test_query_counts(self, default_store, num_mongo_calls, num_sql_calls, create_multiple_subsections):
@@ -159,7 +159,7 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
 
     @ddt.data(
         (ModuleStoreEnum.Type.mongo, 1, 24),
-        (ModuleStoreEnum.Type.split, 3, 23),
+        (ModuleStoreEnum.Type.split, 3, 24),
     )
     @ddt.unpack
     def test_query_counts_dont_change_with_more_content(self, default_store, num_mongo_calls, num_sql_calls):
