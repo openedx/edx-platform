@@ -4,6 +4,9 @@
 #   * @edx/ospr - to check licensing
 #   * @edx/devops - to check system requirements
 
+# Note this pinned version of azure-storage is important. While there are newer versions, i.e. v.0.33.0,
+# only this version works with django-storages
+azure-storage==v0.20.3
 beautifulsoup4==4.1.3
 beautifulsoup==3.2.1
 bleach==1.4
