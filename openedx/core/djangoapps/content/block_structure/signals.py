@@ -28,7 +28,7 @@ def _listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable
 
     update_course_in_cache.apply_async(
         [unicode(course_key)],
-        countdown=settings.BLOCK_STRUCTURES_SETTINGS['BLOCK_STRUCTURES_COURSE_PUBLISH_TASK_DELAY'],
+        countdown=settings.BLOCK_STRUCTURES_SETTINGS['COURSE_PUBLISH_TASK_DELAY'],
     )
 
 
