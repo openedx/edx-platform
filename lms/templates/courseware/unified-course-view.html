@@ -46,7 +46,7 @@ ${HTML(outline_fragment.foot_html())}
         </div>
         <div class="page-header-secondary">
             <div class="form-actions">
-                <a class="btn btn-small" href="${reverse('courseware', kwargs={'course_id': unicode(course.id.to_deprecated_string())})}">
+                <a class="btn" href="${reverse('courseware', kwargs={'course_id': unicode(course.id.to_deprecated_string())})}">
                     ${_("Resume Course")}
                 </a>
             </div>
