@@ -85,17 +85,10 @@ def request_cached(f):
         """
         Wrapper function to decorate with.
         """
-
-        # Build our cache key based on the module the function belongs to, the functions name, and a stringified
-        # list of arguments and a query string-style stringified list of keyword arguments.
-        converted_args = map(str, args)
-        converted_kwargs = map(str, reduce(list.__add__, map(list, sorted(kwargs.iteritems())), []))
-        cache_keys = [f.__module__, f.func_name] + converted_args + converted_kwargs
-        cache_key = '.'.join(cache_keys)
-
         # Check to see if we have a result in cache.  If not, invoke our wrapped
         # function.  Cache and return the result to the caller.
         rcache = RequestCache.get_request_cache()
+        cache_key = func_call_cache_key(f, *args, **kwargs)
 
         if cache_key in rcache.data:
             return rcache.data.get(cache_key)
@@ -105,4 +98,17 @@ def request_cached(f):
 
             return result
 
+    wrapper.request_cached_contained_func = f
     return wrapper
+
+
+def func_call_cache_key(func, *args, **kwargs):
+    """
+    Returns a cache key based on the function's module
+    the function's name, and a stringified list of arguments
+    and a query string-style stringified list of keyword arguments.
+    """
+    converted_args = map(str, args)
+    converted_kwargs = map(str, reduce(list.__add__, map(list, sorted(kwargs.iteritems())), []))
+    cache_keys = [func.__module__, func.func_name] + converted_args + converted_kwargs
+    return '.'.join(cache_keys)
