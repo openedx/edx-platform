@@ -107,6 +107,106 @@ define(
                 // Verify that nothing changes when we click on Cancel button on confirmation popup
                 verifyVideosInfo(this, false);
             });
+
+            describe('Paging Previous Video Upload List View', function() {
+
+                var videoView
+
+                beforeEach(function() {
+                    var collection = new VideoPagingCollection([],
+                        {
+                            url: videoHandlerUrl,
+                            pageSize: 2,
+                            sortField: "Name",
+                            totalCount: 3,
+                            sortDir: "asc"
+                        }
+                    );
+                    videoView = new PreviousVideoUploadListView({
+                        collection: collection,
+                        videoHandlerUrl: videoHandlerUrl
+                    });
+
+                    videoView.render();
+                });
+
+                var firstPageResults = {
+                        sort: 'uploadDate',
+                        end: 1,
+                        results: [
+                            {
+                                'client_video_id': 'foo.mp4',
+                                'duration': 42,
+                                'created': '2014-11-25T23:13:05',
+                                'edx_video_id': 'dummy_id_1',
+                                'status': 'uploading'
+                            },
+                            {
+                                'client_video_id': 'foo.mp4',
+                                'duration': 42,
+                                'created': '2014-11-25T23:13:05',
+                                'edx_video_id': 'dummy_id_2',
+                                'status': 'uploading'
+                            }
+                        ],
+                        pageSize: 2,
+                        totalCount: 3,
+                        start: 0,
+                        page: 0
+                    }, secondPageResults = {
+                        sort: 'uploadDate',
+                        end: 2,
+                        results: [
+                            {
+                                'client_video_id': 'foo.mp4',
+                                'duration': 42,
+                                'created': '2014-11-25T23:13:05',
+                                'edx_video_id': 'dummy_id_3',
+                                'status': 'uploading'
+                            }
+                        ],
+                        pageSize: 2,
+                        totalCount: 3,
+                        start: 2,
+                        page: 1
+                    };
+
+                it('can move forward a page using the next page button', function() {
+                    var requests = AjaxHelpers.requests(this);
+                    expect(videoView.pagingView.pagingFooter).toBeDefined();
+                    expect(videoView.pagingView.pagingFooter.$('button.next-page-link'))
+                        .not.toHaveClass('is-disabled');
+                    videoView.pagingView.pagingFooter.$('button.next-page-link').click();
+                    AjaxHelpers.respondWithJson(requests, secondPageResults);
+                    expect(videoView.pagingView.pagingFooter.$('button.next-page-link'))
+                        .toHaveClass('is-disabled');
+                });
+
+                it('can move back a page using the previous page button', function() {
+                    var requests = AjaxHelpers.requests(this);
+                    videoView.pagingView.setPage(2);
+                    AjaxHelpers.respondWithJson(requests, secondPageResults);
+                    expect(videoView.pagingView.pagingFooter).toBeDefined();
+                    expect(videoView.pagingView.pagingFooter.$('button.previous-page-link'))
+                        .not.toHaveClass('is-disabled');
+                    videoView.pagingView.pagingFooter.$('button.previous-page-link').click();
+                    AjaxHelpers.respondWithJson(requests, firstPageResults);
+                    expect(videoView.pagingView.pagingFooter.$('button.previous-page-link'))
+                        .toHaveClass('is-disabled');
+                });
+
+                it('can set the current page using the page number input', function() {
+                    var requests = AjaxHelpers.requests(this);
+                    videoView.pagingView.setPage(1);
+                    AjaxHelpers.respondWithJson(requests, firstPageResults);
+                    videoView.pagingView.pagingFooter.$('#page-number-input').val('2');
+                    videoView.pagingView.pagingFooter.$('#page-number-input').trigger('change');
+                    AjaxHelpers.respondWithJson(requests, secondPageResults);
+                    expect(videoView.collection.getPageNumber()).toBe(2);
+                    expect(videoView.pagingView.pagingFooter.$('button.previous-page-link'))
+                        .not.toHaveClass('is-disabled');
+                });
+            });
         });
     }
 );

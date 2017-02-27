@@ -296,9 +296,7 @@ def _get_videos(course, request):
         "paginated": True
     }
 
-    resp = get_videos_for_course(course.id, **params)
-
-    videos_data = resp.data
+    videos_data = get_videos_for_course(course.id, **params)
     videos = videos_data["results"]
     # convert VAL's status to studio's Video Upload feature status.
     for video in videos:
