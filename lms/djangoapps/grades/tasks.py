@@ -33,7 +33,20 @@ from .transformer import GradesTransformer
 
 log = getLogger(__name__)
 
-KNOWN_RETRY_ERRORS = (DatabaseError, ValidationError)  # Errors we expect occasionally, should be resolved on retry
+
+class DatabaseNotReadyError(IOError):
+    """
+    Subclass of IOError to indicate the database has not yet committed
+    the data we're trying to find.
+    """
+    pass
+
+
+KNOWN_RETRY_ERRORS = (  # Errors we expect occasionally, should be resolved on retry
+    DatabaseError,
+    ValidationError,
+    DatabaseNotReadyError
+)
 RECALCULATE_GRADE_DELAY = 2  # in seconds, to prevent excessive _has_db_updated failures. See TNL-6424.
 
 
@@ -101,7 +114,7 @@ def _recalculate_subsection_grade(self, **kwargs):
         has_database_updated = _has_db_updated_with_new_score(self, scored_block_usage_key, **kwargs)
 
         if not has_database_updated:
-            raise _retry_recalculate_subsection_grade(self, **kwargs)
+            raise DatabaseNotReadyError
 
         _update_subsection_grades(
             course_key,
@@ -109,8 +122,6 @@ def _recalculate_subsection_grade(self, **kwargs):
             kwargs['only_if_higher'],
             kwargs['user_id'],
         )
-    except Retry:
-        raise
     except Exception as exc:   # pylint: disable=broad-except
         if not isinstance(exc, KNOWN_RETRY_ERRORS):
             log.info("tnl-6244 grades unexpected failure: {}. task id: {}. kwargs={}".format(
