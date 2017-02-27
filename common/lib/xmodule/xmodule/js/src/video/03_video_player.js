@@ -170,7 +170,7 @@ function(HTML5Video, HTML5HLSVideo, Resizer, HLS, _) {
                     state.el,
                     _.extend({}, commonConfig, {videoSources: state.HLSVideoSources})
                 );
-                eventToBeTriggered = 'canplay';
+                eventToBeTriggered = 'loadeddata';
             } else {
                 state.videoPlayer.player = new HTML5Video.Player(state.el, commonConfig);
                 eventToBeTriggered = 'loadedmetadata';
