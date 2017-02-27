@@ -3,7 +3,6 @@ Unit tests for the Course Blocks signals
 """
 import ddt
 from mock import patch
-from waffle.testutils import override_switch
 
 from opaque_keys.edx.locator import LibraryLocator, CourseLocator
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -11,9 +10,9 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from ..api import get_block_structure_manager
+from ..config import INVALIDATE_CACHE_ON_PUBLISH
 from ..signals import _listen_for_course_publish
-from ..config import INVALIDATE_CACHE_ON_PUBLISH, waffle_switch_name
-from .helpers import is_course_in_block_structure_cache
+from .helpers import is_course_in_block_structure_cache, override_config_setting
 
 
 @ddt.ddt
@@ -55,7 +54,7 @@ class CourseBlocksSignalTest(ModuleStoreTestCase):
     def test_cache_invalidation(self, invalidate_cache_enabled, mock_bs_manager_clear):
         test_display_name = "Jedi 101"
 
-        with override_switch(waffle_switch_name(INVALIDATE_CACHE_ON_PUBLISH), active=invalidate_cache_enabled):
+        with override_config_setting(INVALIDATE_CACHE_ON_PUBLISH, active=invalidate_cache_enabled):
             self.course.display_name = test_display_name
             self.store.update_item(self.course, self.user.id)
 
