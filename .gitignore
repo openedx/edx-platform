@@ -75,6 +75,10 @@ jscover.log.*
 .tddium*
 common/test/data/test_unicode/static/
 test_root/courses/
+test_root/data/test_bare.git/
+test_root/export_course_repos/
+test_root/paver_logs/
+test_root/uploads/
 django-pyfs
 
 ### Installation artifacts
