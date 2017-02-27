@@ -15,18 +15,17 @@ from django.utils.translation import ugettext as _
         % for section in blocks.get('children') or []:
             <li
                 aria-expanded="true"
-                class="outline-item focusable"
+                class="outline-item focusable section"
                 id="${ section['id'] }"
                 role="treeitem"
                 tabindex="0"
             >
                 <div class="section-name">
-                    <span class="icon fa fa-chevron-down" aria-hidden="true"></span>
                     <span>${ section['display_name'] }</span>
                 </div>
                 <ol class="outline-item focusable" role="group" tabindex="0">
                     % for subsection in section.get('children') or []:
-                        <li role="treeitem" tabindex="-1" aria-expanded="true">
+                        <li class="subsection" role="treeitem" tabindex="-1" aria-expanded="true">
                             <a
                                 class="outline-item focusable"
                                 href="${ subsection['lms_web_url'] }"
