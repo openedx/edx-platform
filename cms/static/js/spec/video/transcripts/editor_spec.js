@@ -31,10 +31,21 @@ function($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCol
                 type: MetadataModel.GENERIC_TYPE,
                 value: 'display value'
             },
-            models = [DisplayNameEntry, VideoListEntry],
+            VideoIDEntry = {
+                default_value: 'test default value',
+                display_name: 'Video ID',
+                explicitly_set: true,
+                field_name: 'edx_video_id',
+                help: 'Specifies the video ID.',
+                options: [],
+                type: MetadataModel.GENERIC_TYPE,
+                value: 'basic tab video id'
+            },
+            models = [DisplayNameEntry, VideoListEntry, VideoIDEntry],
             testData = {
-                'display_name': DisplayNameEntry,
-                'video_url': VideoListEntry
+                display_name: DisplayNameEntry,
+                video_url: VideoListEntry,
+                edx_video_id: VideoIDEntry
             },
             metadataDict = {
                 object: testData,
@@ -132,6 +143,16 @@ function($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCol
                     type: MetadataModel.GENERIC_TYPE,
                     value: 'OEoXaMPEzfM'
                 },
+                videoIDEntry = {
+                    default_value: 'test default value',
+                    display_name: 'Video ID',
+                    explicitly_set: true,
+                    field_name: 'edx_video_id',
+                    help: 'Specifies the video ID.',
+                    options: [],
+                    type: MetadataModel.GENERIC_TYPE,
+                    value: 'advanced tab video id'
+                },
                 metadataCollection,
                 metadataView;
 
@@ -148,7 +169,8 @@ function($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCol
                         nameEntry,
                         subEntry,
                         html5SourcesEntry,
-                        youtubeEntry
+                        youtubeEntry,
+                        videoIDEntry
                     ]
                 );
 
@@ -166,35 +188,56 @@ function($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCol
                     var collection = transcripts.collection.models;
 
                     waitsForDisplayName(collection)
-                        .then(function() {
-                            var displayNameValue = collection[0].getValue(),
-                                videoUrlValue = collection[1].getValue();
+                    .then(function() {
+                        var displayNameValue, videoUrlValue, videoIDValue;
 
-                            expect(displayNameValue).toEqual('default');
-                            expect(videoUrlValue).toEqual([
-                                'http://youtu.be/OEoXaMPEzfM',
-                                'default.mp4',
-                                'default.webm'
-                            ]);
-                        })
-                        .always(done);
+                        displayNameValue = transcripts.collection.findWhere({
+                            field_name: 'display_name'
+                        }).getValue();
+                        expect(displayNameValue).toEqual('default');
+
+                        videoUrlValue = transcripts.collection.findWhere({
+                            field_name: 'video_url'
+                        }).getValue();
+                        expect(videoUrlValue).toEqual([
+                            'http://youtu.be/OEoXaMPEzfM',
+                            'default.mp4',
+                            'default.webm'
+                        ]);
+
+                        videoIDValue = transcripts.collection.findWhere({
+                            field_name: 'edx_video_id'
+                        }).getValue();
+                        expect(videoIDValue).toEqual('advanced tab video id');
+                    })
+                    .always(done);
                 });
 
                 it('If metadataCollection is not defined', function() {
+                    var videoUrlValue, videoIDValue;
+
                     transcripts.syncBasicTab(null);
 
-                    var collection = transcripts.collection.models,
-                        videoUrlValue = collection[1].getValue();
+                    videoUrlValue = transcripts.collection.findWhere({
+                        field_name: 'video_url'
+                    }).getValue();
 
                     expect(videoUrlValue).toEqual([
                         'http://youtu.be/12345678901',
                         'video.mp4',
                         'video.webm'
                     ]);
+
+                    videoIDValue = transcripts.collection.findWhere({
+                        field_name: 'edx_video_id'
+                    }).getValue();
+                    expect(videoIDValue).toEqual('basic tab video id');
                 });
 
                 it('Youtube Id has length not eqaul 11', function() {
-                    var model = metadataCollection.findWhere({
+                    var model, videoUrlValue;
+
+                    model = metadataCollection.findWhere({
                         field_name: 'youtube_id_1_0'
                     });
 
@@ -206,8 +249,9 @@ function($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCol
 
                     transcripts.syncBasicTab(metadataCollection, metadataView);
 
-                    var collection = transcripts.collection.models,
-                        videoUrlValue = collection[1].getValue();
+                    videoUrlValue = transcripts.collection.findWhere({
+                        field_name: 'video_url'
+                    }).getValue();
 
                     expect(videoUrlValue).toEqual([
                         '',
@@ -223,43 +267,80 @@ function($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCol
 
                     var collection = metadataCollection.models;
                     waitsForDisplayName(collection)
-                        .then(function() {
-                            var displayNameValue = collection[0].getValue();
-                            var subValue = collection[1].getValue();
-                            var html5SourcesValue = collection[2].getValue();
-                            var youtubeValue = collection[3].getValue();
+                    .then(function() {
+                        var displayNameValue, subValue, html5SourcesValue, youtubeValue, videoIDValue;
 
-                            expect(displayNameValue).toEqual('display value');
-                            expect(subValue).toEqual('default');
-                            expect(html5SourcesValue).toEqual([
-                                'video.mp4',
-                                'video.webm'
-                            ]);
-                            expect(youtubeValue).toEqual('12345678901');
-                        })
-                        .always(done);
+                        displayNameValue = metadataCollection.findWhere({
+                            field_name: 'display_name'
+                        }).getValue();
+                        expect(displayNameValue).toEqual('display value');
+
+                        subValue = metadataCollection.findWhere({
+                            field_name: 'sub'
+                        }).getValue();
+                        expect(subValue).toEqual('default');
+
+                        html5SourcesValue = metadataCollection.findWhere({
+                            field_name: 'html5_sources'
+                        }).getValue();
+                        expect(html5SourcesValue).toEqual([
+                            'video.mp4',
+                            'video.webm'
+                        ]);
+
+                        youtubeValue = metadataCollection.findWhere({
+                            field_name: 'youtube_id_1_0'
+                        }).getValue();
+                        expect(youtubeValue).toEqual('12345678901');
+
+                        videoIDValue = metadataCollection.findWhere({
+                            field_name: 'edx_video_id'
+                        }).getValue();
+                        expect(videoIDValue).toEqual('basic tab video id');
+                    })
+                    .always(done);
                 });
 
                 it('metadataCollection is not defined', function() {
+                    var displayNameValue, subValue, html5SourcesValue, youtubeValue, videoIDValue;
+
                     transcripts.syncAdvancedTab(null);
 
-                    var collection = metadataCollection.models,
-                        displayNameValue = collection[0].getValue(),
-                        subValue = collection[1].getValue(),
-                        html5SourcesValue = collection[2].getValue(),
-                        youtubeValue = collection[3].getValue();
-
+                    displayNameValue = metadataCollection.findWhere({
+                        field_name: 'display_name'
+                    }).getValue();
                     expect(displayNameValue).toEqual('default');
+
+                    subValue = metadataCollection.findWhere({
+                        field_name: 'sub'
+                    }).getValue();
                     expect(subValue).toEqual('default');
+
+                    html5SourcesValue = metadataCollection.findWhere({
+                        field_name: 'html5_sources'
+                    }).getValue();
                     expect(html5SourcesValue).toEqual([
                         'default.mp4',
                         'default.webm'
                     ]);
+
+                    youtubeValue = metadataCollection.findWhere({
+                        field_name: 'youtube_id_1_0'
+                    }).getValue();
                     expect(youtubeValue).toEqual('OEoXaMPEzfM');
+
+                    videoIDValue = metadataCollection.findWhere({
+                        field_name: 'edx_video_id'
+                    }).getValue();
+                    expect(videoIDValue).toEqual('advanced tab video id');
                 });
 
                 it('Youtube Id is not adjusted', function() {
-                    var model = transcripts.collection.models[1];
+                    var model, html5SourcesValue, youtubeValue;
+
+                    model = transcripts.collection.findWhere({
+                        field_name: 'video_url'
+                    });
 
                     model.setValue([
                         'video.mp4',
@@ -268,14 +349,17 @@ function($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCol
 
                     transcripts.syncAdvancedTab(metadataCollection);
 
-                    var collection = metadataCollection.models,
-                        html5SourcesValue = collection[2].getValue(),
-                        youtubeValue = collection[3].getValue();
-
+                    html5SourcesValue = metadataCollection.findWhere({
+                        field_name: 'html5_sources'
+                    }).getValue();
                     expect(html5SourcesValue).toEqual([
                         'video.mp4',
                         'video.webm'
                     ]);
+
+                    youtubeValue = metadataCollection.findWhere({
+                        field_name: 'youtube_id_1_0'
+                    }).getValue();
                     expect(youtubeValue).toEqual('');
                 });
 

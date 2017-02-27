@@ -667,6 +667,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
 
         display_name = metadata_fields['display_name']
         video_url = metadata_fields['html5_sources']
+        video_id = metadata_fields['edx_video_id']
         youtube_id_1_0 = metadata_fields['youtube_id_1_0']
 
         def get_youtube_link(video_id):
@@ -698,7 +699,8 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
 
         metadata = {
             'display_name': display_name,
-            'video_url': video_url
+            'video_url': video_url,
+            'edx_video_id': video_id
         }
 
         _context.update({'transcripts_basic_tab_metadata': metadata})
