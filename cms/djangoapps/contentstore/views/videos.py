@@ -293,7 +293,9 @@ def _get_videos(course, request):
     params = {
         "page": request.GET.get("page", 1),
         "page_size": request.GET.get("page_size", 20),
-        "paginated": True
+        "paginated": True,
+        "sort_field": VideoSortField[request.GET.get("sort_field", "created")],
+        "sort_dir": SortDirection[request.GET.get("sort_dir", "asc")]
     }
 
     videos_data = get_videos_for_course(course.id, **params)

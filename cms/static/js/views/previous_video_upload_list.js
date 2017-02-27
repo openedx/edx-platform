@@ -14,6 +14,10 @@ define([
             tagName: 'section',
             className: 'wrapper-assets',
 
+            events: {
+                'click .column-sort-link': 'onToggleColumn'
+            },
+
             initialize: function(options) {
                 this.pagingView = new this.PreviousVideoUploadPagingView({
                     el: this.$el,
@@ -22,10 +26,8 @@ define([
                     videoHandlerUrl: options.videoHandlerUrl,
                     template: this.loadTemplate('previous-video-upload-list')
                 });
-                this.pagingView.registerSortableColumn('js-video-name-col', gettext('Name'), 'asc');
-                this.pagingView.registerSortableColumn('js-video-duration-col', gettext('Duration'), 'asc');
-                this.pagingView.registerSortableColumn('js-video-date-col', gettext('Date Added'), 'asc');
-                this.pagingView.setInitialSortColumn('js-video-name-col')
+                this.pagingView.registerSortableColumn('js-video-date-col', gettext('Date Added'), 'created', 'asc');
+                this.pagingView.setInitialSortColumn('js-video-date-col')
             },
 
             PreviousVideoUploadPagingView: PagingView.extend({
@@ -61,6 +63,11 @@ define([
                 }
 
             }),
+
+            onToggleColumn: function(event) {
+                var columnName = event.target.id;
+                this.pagingView.toggleSortOrder(columnName);
+            },
 
             render: function() {
                 this.pagingView.renderPageItems();
