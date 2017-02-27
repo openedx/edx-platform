@@ -198,7 +198,7 @@ def get_initial_page_elements():
                     "margin-top":"marg-t-30",
                     "padding-right":"padd-r-30",
                     "margin-left":"marg-l-0",
-                    "url":"www.appsembler.com",
+                    "url":"http://help.appsembler.com",
                     "padding-bottom":"padd-b-15",
                     "text-content":"Visit our knowledgebase",
                     "padding-top":"padd-t-15",
