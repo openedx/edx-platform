@@ -55,6 +55,7 @@ DEFAULT_SETTINGS = [
     # basic
     [DISPLAY_NAME, 'Video', False],
     ['Default Video URL', 'https://www.youtube.com/watch?v=3_yD_cEKoCk, , ', False],
+    ['Video ID', '', False],
 
     # advanced
     [DISPLAY_NAME, 'Video', False],
