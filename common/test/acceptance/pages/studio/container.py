@@ -291,7 +291,7 @@ class ContainerPage(PageObject, HelpMixin):
         """
         click_css(self, '#page-alert .alert.confirmation .nav-actions .action-primary')
 
-    def click_take_me_link(self):
+    def click_take_me_there_link(self):
         """
         Click take me there link.
         """

@@ -1154,9 +1154,10 @@ class MoveComponentTest(ContainerBase):
             'subsection': 0,
             'unit': 1,
         }
+        self.source_component_display_name = 'HTML 11'
         self.source_xblock_category = 'component'
-        self.message_move = 'Success! "HTML 11" has been moved.'
-        self.message_undo = 'Move cancelled. "HTML 11" has been moved back to its original location.'
+        self.message_move = 'Success! "{display_name}" has been moved.'
+        self.message_undo = 'Move cancelled. "{display_name}" has been moved back to its original location.'
 
     def populate_course_fixture(self, course_fixture):
         """
@@ -1180,73 +1181,167 @@ class MoveComponentTest(ContainerBase):
             )
         )
 
-    def verify_move_opertions(self, operation, component_display_names_after_operation):
+    def verify_move_opertions(self, unit_page, source_component, operation, component_display_names_after_operation):
         """
         Verify move operations.
 
         Arguments:
-            operation (str),                                  `move` or `undo move` operation
+            unit_page (Object)                                Unit container page.
+            source_component (Object)                         source XBlock object to be moved.
+            operation (str),                                  `move` or `undo move` operation.
             component_display_names_after_operation (dict)    display names of components after operation in source/dest
         """
-        unit_page = self.go_to_unit_page(unit_name='Test Unit 1')
-        components = unit_page.displayed_children
-        self.assertEqual(len(components), 2)
-
-        components[0].open_move_modal()
+        source_component.open_move_modal()
         self.move_modal_view.navigate_to_category(self.source_xblock_category, self.navigation_options)
         self.assertEqual(self.move_modal_view.is_move_button_enabled, True)
 
         self.move_modal_view.click_move_button()
-        self.container.verify_confirmation_message(self.message_move)
+        self.container.verify_confirmation_message(
+            self.message_move.format(display_name=self.source_component_display_name)
+        )
         self.assertEqual(len(unit_page.displayed_children), 1)
 
         if operation == 'move':
-            self.container.click_take_me_link()
+            self.container.click_take_me_there_link()
         elif operation == 'undo_move':
             self.container.click_undo_move_link()
-            self.container.verify_confirmation_message(self.message_undo)
+            self.container.verify_confirmation_message(
+                self.message_undo.format(display_name=self.source_component_display_name)
+            )
 
-        unit_page = ContainerPage(self.browser, self.unit_page2.locator)
+        unit_page = ContainerPage(self.browser, None)
         components = unit_page.displayed_children
         self.assertEqual(
             [component.name for component in components],
             component_display_names_after_operation
         )
 
-    def test_move(self):
+    def test_move_component_successfully(self):
         """
         Test if we can move a component successfully.
 
         Given I am a staff user
-        When I go to unit page in first section
-        Then I open the move modal
-        Then I navigate to unit in second section from within move modal
-        Then I see move button is enabled
-        Then I click on the move button
-        Then I see move operation successfull message
-        When I go to unit page in second section
-        Then I see move compoenent there
+        And I go to unit page in first section
+        And I open the move modal
+        And I navigate to unit in second section
+        And I see move button is enabled
+        When I click on the move button
+        Then I see move operation success message
+        And When I click on take me there link
+        Then I see moved component there.
         """
+        unit_page = self.go_to_unit_page(unit_name='Test Unit 1')
+        components = unit_page.displayed_children
+        self.assertEqual(len(components), 2)
+
         self.verify_move_opertions(
+            unit_page=unit_page,
+            source_component=components[0],
             operation='move',
             component_display_names_after_operation=['HTML 21', 'HTML 22', 'HTML 11']
         )
 
-    def test_undo_move(self):
+    def test_undo_move_component_successfully(self):
         """
         Test if we can undo move a component successfully.
 
         Given I am a staff user
-        When I go to unit page in first section
-        Then I open the move modal
-        Then I click on the move button
-        Then I see move operation successfull message
-        When I clicked on undo move link
-        Then I verified that undo move operation is successfull
+        And I go to unit page in first section
+        And I open the move modal
+        When I click on the move button
+        Then I see move operation successful message
+        And When I clicked on undo move link
+        Then I see that undo move operation is successful
         """
+        unit_page = self.go_to_unit_page(unit_name='Test Unit 1')
+        components = unit_page.displayed_children
+        self.assertEqual(len(components), 2)
+
         self.verify_move_opertions(
+            unit_page=unit_page,
+            source_component=components[0],
             operation='undo_move',
             component_display_names_after_operation=['HTML 11', 'HTML 12']
+        )
+
+    def test_content_experiment(self):
+        """
+        Test if we can move a component of content experiment successfully.
+
+        Given that I am a staff user
+        And I go to content experiment page
+        And I open the move dialogue modal
+        When I navigate to the unit in second section
+        Then I see move button is enabled
+        And when I click on the move button
+        Then I see move operation success message
+        And when I click on take me there link
+        Then I see moved component there
+        And when I undo move a component
+        Then I see that undo move operation success message
+        """
+        # Add content experiment support to course.
+        self.course_fixture.add_advanced_settings({
+            u'advanced_modules': {'value': ['split_test']},
+        })
+
+        # Create group configurations
+        # pylint: disable=protected-access
+        self.course_fixture._update_xblock(self.course_fixture._course_location, {
+            'metadata': {
+                u'user_partitions': [
+                    create_user_partition_json(
+                        0,
+                        'Test Group Configuration',
+                        'Description of the group configuration.',
+                        [Group('0', 'Group A'), Group('1', 'Group B')]
+                    ),
+                ],
+            },
+        })
+
+        # Add split test to unit_page1 and assign newly created group configuration to it
+        split_test = XBlockFixtureDesc('split_test', 'Test Content Experiment', metadata={'user_partition_id': 0})
+        self.course_fixture.create_xblock(self.unit_page1.locator, split_test)
+
+        # Visit content experiment container page.
+        unit_page = ContainerPage(self.browser, split_test.locator)
+        unit_page.visit()
+
+        group_a_locator = unit_page.displayed_children[0].locator
+
+        # Add some components to Group A.
+        self.course_fixture.create_xblock(
+            group_a_locator, XBlockFixtureDesc('html', 'HTML 311')
+        )
+        self.course_fixture.create_xblock(
+            group_a_locator, XBlockFixtureDesc('html', 'HTML 312')
+        )
+
+        # Go to group page to move it's component.
+        group_container_page = ContainerPage(self.browser, group_a_locator)
+        group_container_page.visit()
+
+        # Verify content experiment block has correct groups and components.
+        components = group_container_page.displayed_children
+        self.assertEqual(len(components), 2)
+
+        self.source_component_display_name = 'HTML 311'
+
+        # Verify undo move operation for content experiment.
+        self.verify_move_opertions(
+            unit_page=group_container_page,
+            source_component=components[0],
+            operation='undo_move',
+            component_display_names_after_operation=['HTML 311', 'HTML 312']
+        )
+
+        # Verify move operation for content experiment.
+        self.verify_move_opertions(
+            unit_page=group_container_page,
+            source_component=components[0],
+            operation='move',
+            component_display_names_after_operation=['HTML 21', 'HTML 22', 'HTML 311']
         )
 
     def test_a11y(self):
@@ -1260,8 +1355,8 @@ class MoveComponentTest(ContainerBase):
         )
         unit_page.a11y_audit.config.set_rules({
             'ignore': [
-                'color-contrast',
-                'link-href',
+                'color-contrast',  # TODO: AC-716
+                'link-href',  # TODO: AC-716
             ]
         })
 
