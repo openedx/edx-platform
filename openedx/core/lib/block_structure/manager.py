@@ -4,9 +4,11 @@ BlockStructures.
 """
 from contextlib import contextmanager
 
-from .cache import BlockStructureCache
-from .factory import BlockStructureFactory
+from openedx.core.djangoapps.content.block_structure import config
+
 from .exceptions import UsageKeyNotInBlockStructure, TransformerDataIncompatible, BlockStructureNotFound
+from .factory import BlockStructureFactory
+from .store import BlockStructureStore
 from .transformers import BlockStructureTransformers
 
 
@@ -31,7 +33,7 @@ class BlockStructureManager(object):
         """
         self.root_block_usage_key = root_block_usage_key
         self.modulestore = modulestore
-        self.block_structure_cache = BlockStructureCache(cache)
+        self.store = BlockStructureStore(cache)
 
     def get_transformed(self, transformers, starting_block_usage_key=None, collected_block_structure=None):
         """
@@ -90,22 +92,32 @@ class BlockStructureManager(object):
                 from each registered transformer.
         """
         try:
-            block_structure = BlockStructureFactory.create_from_cache(
+            block_structure = BlockStructureFactory.create_from_store(
                 self.root_block_usage_key,
-                self.block_structure_cache
+                self.store,
             )
             BlockStructureTransformers.verify_versions(block_structure)
 
         except (BlockStructureNotFound, TransformerDataIncompatible):
-            block_structure = self.update_collected()
+            if config.is_enabled(config.RAISE_ERROR_WHEN_NOT_FOUND):
+                raise
+            else:
+                block_structure = self._update_collected()
 
         return block_structure
 
-    def update_collected(self):
+    def update_collected_if_needed(self):
         """
-        Updates the collected Block Structure for the root_block_usage_key.
+        The store is updated with newly collected transformers data from
+        the modulestore, only if the data in the store is outdated.
+        """
+        with self._bulk_operations():
+            if not self.store.is_up_to_date(self.root_block_usage_key, self.modulestore):
+                self._update_collected()
 
-        Details: The cache is updated by collecting transformers data from
+    def _update_collected(self):
+        """
+        The store is updated with newly collected transformers data from
         the modulestore.
         """
         with self._bulk_operations():
@@ -114,15 +126,15 @@ class BlockStructureManager(object):
                 self.modulestore,
             )
             BlockStructureTransformers.collect(block_structure)
-            self.block_structure_cache.add(block_structure)
+            self.store.add(block_structure)
             return block_structure
 
     def clear(self):
         """
-        Removes cached data for the block structure associated with the given
+        Removes data for the block structure associated with the given
         root block key.
         """
-        self.block_structure_cache.delete(self.root_block_usage_key)
+        self.store.delete(self.root_block_usage_key)
 
     @contextmanager
     def _bulk_operations(self):

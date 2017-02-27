@@ -8,7 +8,7 @@ from xmodule.modulestore.django import modulestore
 
 import openedx.core.djangoapps.content.block_structure.api as api
 import openedx.core.djangoapps.content.block_structure.tasks as tasks
-import openedx.core.lib.block_structure.cache as cache
+import openedx.core.lib.block_structure.store as store
 from openedx.core.lib.command_utils import (
     get_mutually_exclusive_required_option,
     validate_dependent_option,
@@ -113,7 +113,7 @@ class Command(BaseCommand):
             cache_log_level = logging.INFO
 
         log.setLevel(log_level)
-        cache.logger.setLevel(cache_log_level)
+        store.logger.setLevel(cache_log_level)
 
     def _generate_course_blocks(self, options, course_keys):
         """
