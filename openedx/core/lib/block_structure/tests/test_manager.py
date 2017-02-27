@@ -1,15 +1,21 @@
 """
 Tests for manager.py
 """
+import ddt
 from nose.plugins.attrib import attr
 from unittest import TestCase
 
+from openedx.core.djangoapps.content.block_structure.config import RAISE_ERROR_WHEN_NOT_FOUND, STORAGE_BACKING_FOR_CACHE
+from openedx.core.djangoapps.content.block_structure.tests.helpers import override_config_setting
+
 from ..block_structure import BlockStructureBlockData
-from ..exceptions import UsageKeyNotInBlockStructure
+from ..exceptions import UsageKeyNotInBlockStructure, BlockStructureNotFound
 from ..manager import BlockStructureManager
 from ..transformers import BlockStructureTransformers
 from .helpers import (
-    MockModulestoreFactory, MockCache, MockTransformer, ChildrenMapTestMixin, mock_registered_transformers
+    MockModulestoreFactory, MockCache, MockTransformer,
+    ChildrenMapTestMixin, UsageKeyFactoryMixin,
+    mock_registered_transformers,
 )
 
 
@@ -86,7 +92,8 @@ class TestTransformer1(MockTransformer):
 
 
 @attr(shard=2)
-class TestBlockStructureManager(TestCase, ChildrenMapTestMixin):
+@ddt.ddt
+class TestBlockStructureManager(UsageKeyFactoryMixin, ChildrenMapTestMixin, TestCase):
     """
     Test class for BlockStructureManager.
     """
@@ -99,13 +106,9 @@ class TestBlockStructureManager(TestCase, ChildrenMapTestMixin):
             self.transformers = BlockStructureTransformers(self.registered_transformers)
 
         self.children_map = self.SIMPLE_CHILDREN_MAP
-        self.modulestore = MockModulestoreFactory.create(self.children_map)
+        self.modulestore = MockModulestoreFactory.create(self.children_map, self.block_key_factory)
         self.cache = MockCache()
-        self.bs_manager = BlockStructureManager(
-            root_block_usage_key=0,
-            modulestore=self.modulestore,
-            cache=self.cache,
-        )
+        self.bs_manager = BlockStructureManager(self.block_key_factory(0), self.modulestore, self.cache)
 
     def collect_and_verify(self, expect_modulestore_called, expect_cache_updated):
         """
@@ -133,7 +136,10 @@ class TestBlockStructureManager(TestCase, ChildrenMapTestMixin):
 
     def test_get_transformed_with_starting_block(self):
         with mock_registered_transformers(self.registered_transformers):
-            block_structure = self.bs_manager.get_transformed(self.transformers, starting_block_usage_key=1)
+            block_structure = self.bs_manager.get_transformed(
+                self.transformers,
+                starting_block_usage_key=self.block_key_factory(1),
+            )
         substructure_of_children_map = [[], [3, 4], [], [], []]
         self.assert_block_structure(block_structure, substructure_of_children_map, missing_blocks=[0, 2])
         TestTransformer1.assert_collected(block_structure)
@@ -152,7 +158,7 @@ class TestBlockStructureManager(TestCase, ChildrenMapTestMixin):
         ]:
             block_structure = self.bs_manager.get_transformed(
                 self.transformers,
-                starting_block_usage_key=starting_block,
+                starting_block_usage_key=self.block_key_factory(starting_block),
                 collected_block_structure=collected_block_structure,
             )
             self.assert_block_structure(block_structure, expected_structure, missing_blocks=expected_missing_blocks)
@@ -166,6 +172,26 @@ class TestBlockStructureManager(TestCase, ChildrenMapTestMixin):
         self.collect_and_verify(expect_modulestore_called=True, expect_cache_updated=True)
         self.collect_and_verify(expect_modulestore_called=False, expect_cache_updated=False)
         self.assertEquals(TestTransformer1.collect_call_count, 1)
+
+    def test_get_collected_error_raised(self):
+        with override_config_setting(RAISE_ERROR_WHEN_NOT_FOUND, active=True):
+            with mock_registered_transformers(self.registered_transformers):
+                with self.assertRaises(BlockStructureNotFound):
+                    self.bs_manager.get_collected()
+
+    @ddt.data(True, False)
+    def test_update_collected_if_needed(self, with_storage_backing):
+        with override_config_setting(STORAGE_BACKING_FOR_CACHE, active=with_storage_backing):
+            with mock_registered_transformers(self.registered_transformers):
+                self.assertEquals(TestTransformer1.collect_call_count, 0)
+
+                self.bs_manager.update_collected_if_needed()
+                self.assertEquals(TestTransformer1.collect_call_count, 1)
+
+                self.bs_manager.update_collected_if_needed()
+                self.assertEquals(TestTransformer1.collect_call_count, 1 if with_storage_backing else 2)
+
+                self.collect_and_verify(expect_modulestore_called=False, expect_cache_updated=False)
 
     def test_get_collected_transformer_version(self):
         self.collect_and_verify(expect_modulestore_called=True, expect_cache_updated=True)

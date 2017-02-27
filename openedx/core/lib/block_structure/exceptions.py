@@ -36,4 +36,7 @@ class BlockStructureNotFound(BlockStructureException):
     """
     Exception for when a Block Structure is not found.
     """
-    pass
+    def __init__(self, root_block_usage_key):
+        super(BlockStructureNotFound, self).__init__(
+            'Block structure not found; data_usage_key: {}'.format(root_block_usage_key)
+        )

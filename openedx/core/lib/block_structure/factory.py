@@ -2,7 +2,6 @@
 Module for factory class for BlockStructure objects.
 """
 from .block_structure import BlockStructureModulestoreData, BlockStructureBlockData
-from .exceptions import BlockStructureNotFound
 
 
 class BlockStructureFactory(object):
@@ -59,10 +58,10 @@ class BlockStructureFactory(object):
         return block_structure
 
     @classmethod
-    def create_from_cache(cls, root_block_usage_key, block_structure_cache):
+    def create_from_store(cls, root_block_usage_key, block_structure_store):
         """
         Deserializes and returns the block structure starting at
-        root_block_usage_key from the given cache, if it's found in the cache.
+        root_block_usage_key from the given store, if it's found in the store.
 
         The given root_block_usage_key must equate the root_block_usage_key
         previously passed to serialize_to_cache.
@@ -72,8 +71,8 @@ class BlockStructureFactory(object):
                 of the block structure that is to be deserialized from
                 the given cache.
 
-            block_structure_cache (BlockStructureCache) - The
-                cache from which the block structure is to be
+            block_structure_store (BlockStructureStore) - The
+                store from which the block structure is to be
                 deserialized.
 
         Returns:
@@ -82,12 +81,9 @@ class BlockStructureFactory(object):
 
         Raises:
             BlockStructureNotFound - If the root_block_usage_key is not found
-                in the cache.
+                in the store.
         """
-        block_structure = block_structure_cache.get(root_block_usage_key)
-        if block_structure is None:
-            raise BlockStructureNotFound('Block structure for {} not found in the cache.'.format(root_block_usage_key))
-        return block_structure
+        return block_structure_store.get(root_block_usage_key)
 
     @classmethod
     def create_new(cls, root_block_usage_key, block_relations, transformer_data, block_data_map):
