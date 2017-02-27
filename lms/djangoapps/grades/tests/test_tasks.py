@@ -136,8 +136,8 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
         self.set_up_course()
         self.assertTrue(PersistentGradesEnabledFlag.feature_enabled(self.course.id))
         with patch(
-            'openedx.core.lib.block_structure.factory.BlockStructureFactory.create_from_cache',
-            side_effect=BlockStructureNotFound,
+            'openedx.core.lib.block_structure.factory.BlockStructureFactory.create_from_store',
+            side_effect=BlockStructureNotFound(self.course.location),
         ) as mock_block_structure_create:
             self._apply_recalculate_subsection_grade()
             self.assertEquals(mock_block_structure_create.call_count, 1)

@@ -71,11 +71,11 @@ class TestGradeIteration(SharedModuleStoreTestCase):
         """
         with patch.object(
             BlockStructureFactory,
-            'create_from_cache',
-            wraps=BlockStructureFactory.create_from_cache
-        ) as mock_create_from_cache:
+            'create_from_store',
+            wraps=BlockStructureFactory.create_from_store
+        ) as mock_create_from_store:
             all_course_grades, all_errors = self._course_grades_and_errors_for(self.course, self.students)
-            self.assertEquals(mock_create_from_cache.call_count, 1)
+            self.assertEquals(mock_create_from_store.call_count, 1)
 
         self.assertEqual(len(all_errors), 0)
         for course_grade in all_course_grades.values():
@@ -100,7 +100,8 @@ class TestGradeIteration(SharedModuleStoreTestCase):
             else mock_course_grade.return_value
             for student in self.students
         ]
-        all_course_grades, all_errors = self._course_grades_and_errors_for(self.course, self.students)
+        with self.assertNumQueries(4):
+            all_course_grades, all_errors = self._course_grades_and_errors_for(self.course, self.students)
         self.assertEqual(
             all_errors,
             {
