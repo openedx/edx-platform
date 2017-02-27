@@ -12,7 +12,7 @@ from xmodule.annotator_token import retrieve_token
 from courseware.access import has_access
 from courseware.courses import get_course_with_access
 from notes.utils import notes_enabled_for_course
-from static_replace import replace_static_urls
+from openedx.core.djangoapps.static_replace import replace_static_urls
 
 
 @login_required

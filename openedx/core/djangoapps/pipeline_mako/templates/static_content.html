@@ -1,12 +1,12 @@
 <%page expression_filter="h"/>
 <%!
 from django.contrib.staticfiles.storage import staticfiles_storage
-from pipeline_mako import compressed_css, compressed_js
 from django.utils.translation import get_language_bidi
 from mako.exceptions import TemplateLookupException
 from edxmako.shortcuts import marketing_link
 
 from openedx.core.djangolib.js_utils import js_escaped_string
+from openedx.core.djangoapps.pipeline_mako import compressed_css, compressed_js
 from openedx.core.djangoapps.site_configuration.helpers import (
   page_title_breadcrumbs,
   get_value,
@@ -119,7 +119,7 @@ source, template_path = Loader(engine).load_template_source(path)
           }).call(this, require || RequireJS.require);
       % else:
         ## The "raw" parameter is specified to avoid the URL from being further maninpulated by
-        ## static_replace calls (as woudl happen if require_module is used within courseware).
+        ## static_replace calls (as would happen if require_module is used within courseware).
         ## Without specifying "raw", a call to static_replace would result in the MD5 hash being
         ## being appended more than once, causing the import to fail in production environments.
         require(['${staticfiles_storage.url(module_name + ".js") + "?raw" | n, js_escaped_string}'], function () {

@@ -124,7 +124,7 @@ We use a fork of django-pipeline to make sure that the js and css always reflect
 
 In production, the django `collectstatic` command recompiles everything and puts all the generated static files in a static/ dir.  A starting point in the code is `django-pipeline/pipeline/packager.py:pack`.
 
-In development, we don't use collectstatic, instead accessing the files in place.  The auto-compilation is run via `common/djangoapps/pipeline_mako/templates/static_content.html`.  Details: templates include `<%namespace name='static' file='static_content.html'/>`, then something like `<%static:css group='application'/>` to call the functions in `common/djangoapps/pipeline_mako/__init__.py`, which call the `django-pipeline` compilers.
+In development, we don't use collectstatic, instead accessing the files in place.  The auto-compilation is run via `openedx/core/djangoapps/pipeline_mako/templates/static_content.html`.  Details: templates include `<%namespace name='static' file='static_content.html'/>`, then something like `<%static:css group='application'/>` to call the functions in `openedx/core/djangoapps/pipeline_mako/__init__.py`, which call the `django-pipeline` compilers.
 
 ## Testing
 

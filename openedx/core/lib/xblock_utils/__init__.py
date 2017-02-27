@@ -7,7 +7,6 @@ import json
 import logging
 import markupsafe
 import re
-import static_replace
 import uuid
 from lxml import html, etree
 from contracts import contract
@@ -19,6 +18,7 @@ from django.utils.timezone import UTC
 from django.utils.html import escape
 from django.contrib.auth.models import User
 from edxmako.shortcuts import render_to_string
+import openedx.core.djangoapps.static_replace
 from xblock.core import XBlock
 from xblock.exceptions import InvalidScopeError
 from xblock.fragment import Fragment
@@ -214,7 +214,7 @@ def replace_jump_to_id_urls(course_id, jump_to_id_base_url, block, view, frag, c
     This will replace a link between courseware in the format
     /jump_to_id/<id> with a URL for a page that will correctly redirect
     This is similar to replace_course_urls, but much more flexible and
-    durable for Studio authored courses. See more comments in static_replace.replace_jump_to_urls
+    durable for Studio authored courses. See more comments in replace_jump_to_urls.
 
     course_id: The course_id in which this rewrite happens
     jump_to_id_base_url:
@@ -225,7 +225,10 @@ def replace_jump_to_id_urls(course_id, jump_to_id_base_url, block, view, frag, c
     output: a new :class:`~xblock.fragment.Fragment` that modifies `frag` with
         content that has been update with /jump_to_id links replaced
     """
-    return wrap_fragment(frag, static_replace.replace_jump_to_id_urls(frag.content, course_id, jump_to_id_base_url))
+    return wrap_fragment(
+        frag,
+        openedx.core.djangoapps.static_replace.replace_jump_to_id_urls(frag.content, course_id, jump_to_id_base_url)
+    )
 
 
 def replace_course_urls(course_id, block, view, frag, context):  # pylint: disable=unused-argument
@@ -234,7 +237,7 @@ def replace_course_urls(course_id, block, view, frag, context):  # pylint: disab
     the old get_html function and substitutes urls of the form /course/...
     with urls that are /courses/<course_id>/...
     """
-    return wrap_fragment(frag, static_replace.replace_course_urls(frag.content, course_id))
+    return wrap_fragment(frag, openedx.core.djangoapps.static_replace.replace_course_urls(frag.content, course_id))
 
 
 def replace_static_urls(data_dir, block, view, frag, context, course_id=None, static_asset_path=''):  # pylint: disable=unused-argument
@@ -243,12 +246,15 @@ def replace_static_urls(data_dir, block, view, frag, context, course_id=None, st
     the old get_html function and substitutes urls of the form /static/...
     with urls that are /static/<prefix>/...
     """
-    return wrap_fragment(frag, static_replace.replace_static_urls(
-        frag.content,
-        data_dir,
-        course_id,
-        static_asset_path=static_asset_path
-    ))
+    return wrap_fragment(
+        frag,
+        openedx.core.djangoapps.static_replace.replace_static_urls(
+            frag.content,
+            data_dir,
+            course_id,
+            static_asset_path=static_asset_path,
+        )
+    )
 
 
 def grade_histogram(module_id):

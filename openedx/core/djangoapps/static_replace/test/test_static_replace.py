@@ -10,7 +10,7 @@ from urlparse import urlparse, urlunparse, parse_qsl
 from PIL import Image
 from cStringIO import StringIO
 from nose.tools import assert_equals, assert_true, assert_false  # pylint: disable=no-name-in-module
-from static_replace import (
+from openedx.core.djangoapps.static_replace import (
     replace_static_urls,
     replace_course_urls,
     _url_replace_regex,
@@ -93,7 +93,7 @@ def test_static_urls(mock_request):
     assert_equals(result, '\"http:///static/file.png\"')
 
 
-@patch('static_replace.staticfiles_storage', autospec=True)
+@patch('openedx.core.djangoapps.static_replace.staticfiles_storage', autospec=True)
 def test_storage_url_exists(mock_storage):
     mock_storage.exists.return_value = True
     mock_storage.url.return_value = '/static/file.png'
@@ -103,7 +103,7 @@ def test_storage_url_exists(mock_storage):
     mock_storage.url.assert_called_once_with('file.png')
 
 
-@patch('static_replace.staticfiles_storage', autospec=True)
+@patch('openedx.core.djangoapps.static_replace.staticfiles_storage', autospec=True)
 def test_storage_url_not_exists(mock_storage):
     mock_storage.exists.return_value = False
     mock_storage.url.return_value = '/static/data_dir/file.png'
@@ -113,10 +113,10 @@ def test_storage_url_not_exists(mock_storage):
     mock_storage.url.assert_called_once_with('data_dir/file.png')
 
 
-@patch('static_replace.StaticContent', autospec=True)
-@patch('static_replace.modulestore', autospec=True)
-@patch('static_replace.AssetBaseUrlConfig.get_base_url')
-@patch('static_replace.AssetExcludedExtensionsConfig.get_excluded_extensions')
+@patch('openedx.core.djangoapps.static_replace.StaticContent', autospec=True)
+@patch('openedx.core.djangoapps.static_replace.modulestore', autospec=True)
+@patch('openedx.core.djangoapps.static_replace.AssetBaseUrlConfig.get_base_url')
+@patch('openedx.core.djangoapps.static_replace.AssetExcludedExtensionsConfig.get_excluded_extensions')
 def test_mongo_filestore(mock_get_excluded_extensions, mock_get_base_url, mock_modulestore, mock_static_content):
 
     mock_modulestore.return_value = Mock(MongoModuleStore)
@@ -136,9 +136,9 @@ def test_mongo_filestore(mock_get_excluded_extensions, mock_get_base_url, mock_m
     mock_static_content.get_canonicalized_asset_path.assert_called_once_with(COURSE_KEY, 'file.png', u'', ['foobar'])
 
 
-@patch('static_replace.settings', autospec=True)
-@patch('static_replace.modulestore', autospec=True)
-@patch('static_replace.staticfiles_storage', autospec=True)
+@patch('openedx.core.djangoapps.static_replace.settings', autospec=True)
+@patch('openedx.core.djangoapps.static_replace.modulestore', autospec=True)
+@patch('openedx.core.djangoapps.static_replace.staticfiles_storage', autospec=True)
 def test_data_dir_fallback(mock_storage, mock_modulestore, mock_settings):
     mock_modulestore.return_value = Mock(XMLModuleStore)
     mock_storage.url.side_effect = Exception
@@ -161,8 +161,8 @@ def test_raw_static_check():
     assert_equals(path, replace_static_urls(path, text))
 
 
-@patch('static_replace.staticfiles_storage', autospec=True)
-@patch('static_replace.modulestore', autospec=True)
+@patch('openedx.core.djangoapps.static_replace.staticfiles_storage', autospec=True)
+@patch('openedx.core.djangoapps.static_replace.modulestore', autospec=True)
 def test_static_url_with_query(mock_modulestore, mock_storage):
     """
     Make sure that for urls with query params:
@@ -197,8 +197,8 @@ def test_regex():
         assert_false(re.match(regex, s))
 
 
-@patch('static_replace.staticfiles_storage', autospec=True)
-@patch('static_replace.modulestore', autospec=True)
+@patch('openedx.core.djangoapps.static_replace.staticfiles_storage', autospec=True)
+@patch('openedx.core.djangoapps.static_replace.modulestore', autospec=True)
 def test_static_url_with_xblock_resource(mock_modulestore, mock_storage):
     """
     Make sure that for URLs with XBlock resource URL, which start with /static/,
@@ -212,8 +212,8 @@ def test_static_url_with_xblock_resource(mock_modulestore, mock_storage):
     assert_equals(post_text, replace_static_urls(pre_text, DATA_DIRECTORY, COURSE_KEY))
 
 
-@patch('static_replace.staticfiles_storage', autospec=True)
-@patch('static_replace.modulestore', autospec=True)
+@patch('openedx.core.djangoapps.static_replace.staticfiles_storage', autospec=True)
+@patch('openedx.core.djangoapps.static_replace.modulestore', autospec=True)
 @override_settings(STATIC_URL='https://example.com/static/')
 def test_static_url_with_xblock_resource_on_cdn(mock_modulestore, mock_storage):
     """

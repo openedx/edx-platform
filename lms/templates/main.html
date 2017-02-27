@@ -17,8 +17,10 @@ from django.core.urlresolvers import reverse
 from django.utils.http import urlquote_plus
 from django.utils.translation import ugettext as _
 from django.utils.translation import get_language_bidi
+
+from openedx.core.djangoapps.pipeline_mako import render_require_js_path_overrides
+
 from branding import api as branding_api
-from pipeline_mako import render_require_js_path_overrides
 %>
 <!DOCTYPE html>
 <!--[if lte IE 9]><html class="ie ie9 lte9" lang="${LANGUAGE_CODE}"><![endif]-->
