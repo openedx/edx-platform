@@ -113,7 +113,22 @@ define(
                 var videoView
 
                 beforeEach(function() {
-                    var collection = new VideoPagingCollection([],
+                    var collection = new VideoPagingCollection([
+                            {
+                                'client_video_id': 'foo.mp4',
+                                'duration': 42,
+                                'created': '2014-11-25T23:13:05',
+                                'edx_video_id': 'dummy_id_1',
+                                'status': 'uploading'
+                            },
+                            {
+                                'client_video_id': 'foo.mp4',
+                                'duration': 42,
+                                'created': '2014-11-25T23:13:05',
+                                'edx_video_id': 'dummy_id_2',
+                                'status': 'uploading'
+                            }
+                        ],
                         {
                             url: videoHandlerUrl,
                             pageSize: 2,
