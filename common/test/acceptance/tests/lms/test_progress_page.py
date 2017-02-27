@@ -144,6 +144,7 @@ class PersistentGradesTest(ProgressPageBaseTest):
         subsection = self.course_outline.section(self.SECTION_NAME).subsection(self.SUBSECTION_NAME)
         subsection.expand_subsection()
         subsection.add_unit()
+        self.course_outline.wait_for_ajax()
         subsection.publish()
 
     def _set_staff_lock_on_subsection(self, locked):
@@ -227,7 +228,6 @@ class PersistentGradesTest(ProgressPageBaseTest):
         _change_subsection_structure,
         _change_weight_for_problem
     )
-    @flaky  # TODO: fix this, see TNL-6040
     def test_content_changes_do_not_change_score(self, edit):
         with self._logged_in_session():
             self.courseware_page.visit()
