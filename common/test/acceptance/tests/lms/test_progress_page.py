@@ -144,6 +144,7 @@ class PersistentGradesTest(ProgressPageBaseTest):
         subsection = self.course_outline.section(self.SECTION_NAME).subsection(self.SUBSECTION_NAME)
         subsection.expand_subsection()
         subsection.add_unit()
+        self.course_outline.wait_for_ajax()
         subsection.publish()
 
     def _set_staff_lock_on_subsection(self, locked):
