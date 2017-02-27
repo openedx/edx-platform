@@ -574,7 +574,7 @@ def dashboard(request):
 
     # set progress for each course
     for course_enrollment in course_enrollments:
-        course = store.get_course(course_enrollments[0].course_id)
+        course = store.get_course(course_enrollment.course_id)
         course_enrollment.course_progress = grades.grade(user, course)
 
     # Retrieve the course modes for each course
