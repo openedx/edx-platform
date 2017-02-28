@@ -1665,16 +1665,6 @@ def create_account_with_params(request, params):
         getattr(settings, 'REGISTRATION_EXTRA_FIELDS', {})
     )
 
-    # Boolean of whether a 3rd party auth provider and credentials were provided in
-    # the API so the newly created account can link with the 3rd party account.
-    #
-    # Note: this is orthogonal to the 3rd party authentication pipeline that occurs
-    # when the account is created via the browser and redirect URLs.
-    should_link_with_social_auth = third_party_auth.is_enabled() and 'provider' in params
-
-    if should_link_with_social_auth or (third_party_auth.is_enabled() and pipeline.running(request)):
-        params["password"] = pipeline.make_random_password()
-
     # if doing signup for an external authorization, then get email, password, name from the eamap
     # don't use the ones from the form, since the user could have hacked those
     # unless originally we didn't get a valid email or name from the external auth
@@ -1724,9 +1714,13 @@ def create_account_with_params(request, params):
         # first, create the account
         (user, profile, registration) = _do_create_account(form, custom_form, site=request.site)
 
-        # next, link the account with social auth, if provided via the API.
+        # If a 3rd party auth provider and credentials were provided in the API, link the account with social auth
         # (If the user is using the normal register page, the social auth pipeline does the linking, not this code)
-        if should_link_with_social_auth:
+
+        # Note: this is orthogonal to the 3rd party authentication pipeline that occurs
+        # when the account is created via the browser and redirect URLs.
+
+        if third_party_auth.is_enabled() and 'provider' in params:
             backend_name = params['provider']
             request.social_strategy = social_utils.load_strategy(request)
             redirect_uri = reverse('social:complete', args=(backend_name, ))

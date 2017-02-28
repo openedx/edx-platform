@@ -877,10 +877,10 @@ class RegistrationView(APIView):
                                 field_name, default=field_overrides[field_name]
                             )
 
-                    # Hide the password field
+                    # Hide the password field and set random password
                     form_desc.override_field_properties(
                         "password",
-                        default="",
+                        default=third_party_auth.pipeline.make_random_password(),
                         field_type="hidden",
                         required=False,
                         label="",
