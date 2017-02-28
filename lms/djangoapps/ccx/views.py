@@ -496,7 +496,7 @@ def ccx_gradebook(request, course, ccx=None):
     if not ccx:
         raise Http404
 
-    ccx_key = CCXLocator.from_course_locator(course.id, ccx.id)
+    ccx_key = CCXLocator.from_course_locator(course.id, unicode(ccx.id))
     with ccx_course(ccx_key) as course:
         prep_course_for_grading(course, request)
         student_info, page = get_grade_book_page(request, course, course_key=ccx_key)
