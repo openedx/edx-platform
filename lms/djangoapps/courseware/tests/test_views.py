@@ -242,44 +242,45 @@ class ViewsTestCase(ModuleStoreTestCase):
     def setUp(self):
         super(ViewsTestCase, self).setUp()
         self.course = CourseFactory.create(display_name=u'teꜱᴛ course', run="Testing_course")
-        self.chapter = ItemFactory.create(
-            category='chapter',
-            parent_location=self.course.location,
-            display_name="Chapter 1",
-        )
-        self.section = ItemFactory.create(
-            category='sequential',
-            parent_location=self.chapter.location,
-            due=datetime(2013, 9, 18, 11, 30, 00),
-            display_name='Sequential 1',
-            format='Homework'
-        )
-        self.vertical = ItemFactory.create(
-            category='vertical',
-            parent_location=self.section.location,
-            display_name='Vertical 1',
-        )
-        self.problem = ItemFactory.create(
-            category='problem',
-            parent_location=self.vertical.location,
-            display_name='Problem 1',
-        )
+        with self.store.bulk_operations(self.course.id):
+            self.chapter = ItemFactory.create(
+                category='chapter',
+                parent_location=self.course.location,
+                display_name="Chapter 1",
+            )
+            self.section = ItemFactory.create(
+                category='sequential',
+                parent_location=self.chapter.location,
+                due=datetime(2013, 9, 18, 11, 30, 00),
+                display_name='Sequential 1',
+                format='Homework'
+            )
+            self.vertical = ItemFactory.create(
+                category='vertical',
+                parent_location=self.section.location,
+                display_name='Vertical 1',
+            )
+            self.problem = ItemFactory.create(
+                category='problem',
+                parent_location=self.vertical.location,
+                display_name='Problem 1',
+            )
 
-        self.section2 = ItemFactory.create(
-            category='sequential',
-            parent_location=self.chapter.location,
-            display_name='Sequential 2',
-        )
-        self.vertical2 = ItemFactory.create(
-            category='vertical',
-            parent_location=self.section2.location,
-            display_name='Vertical 2',
-        )
-        self.problem2 = ItemFactory.create(
-            category='problem',
-            parent_location=self.vertical2.location,
-            display_name='Problem 2',
-        )
+            self.section2 = ItemFactory.create(
+                category='sequential',
+                parent_location=self.chapter.location,
+                display_name='Sequential 2',
+            )
+            self.vertical2 = ItemFactory.create(
+                category='vertical',
+                parent_location=self.section2.location,
+                display_name='Vertical 2',
+            )
+            self.problem2 = ItemFactory.create(
+                category='problem',
+                parent_location=self.vertical2.location,
+                display_name='Problem 2',
+            )
 
         self.course_key = self.course.id
         self.password = '123456'
@@ -989,15 +990,16 @@ class BaseDueDateTests(ModuleStoreTestCase):
         :param course_kwargs: All kwargs are passed to through to the :class:`CourseFactory`
         """
         course = CourseFactory.create(**course_kwargs)
-        chapter = ItemFactory.create(category='chapter', parent_location=course.location)
-        section = ItemFactory.create(
-            category='sequential',
-            parent_location=chapter.location,
-            due=datetime(2013, 9, 18, 11, 30, 00),
-            format='homework'
-        )
-        vertical = ItemFactory.create(category='vertical', parent_location=section.location)
-        ItemFactory.create(category='problem', parent_location=vertical.location)
+        with self.store.bulk_operations(course.id):
+            chapter = ItemFactory.create(category='chapter', parent_location=course.location)
+            section = ItemFactory.create(
+                category='sequential',
+                parent_location=chapter.location,
+                due=datetime(2013, 9, 18, 11, 30, 00),
+                format='homework'
+            )
+            vertical = ItemFactory.create(category='vertical', parent_location=section.location)
+            ItemFactory.create(category='problem', parent_location=vertical.location)
 
         course = modulestore().get_course(course.id)
         self.assertIsNotNone(course.get_children()[0].get_children()[0].due)
@@ -1149,18 +1151,17 @@ class ProgressPageTests(ModuleStoreTestCase):
 
     def setup_course(self, **options):
         """Create the test course."""
-        course = CourseFactory.create(
+        self.course = CourseFactory.create(
             start=datetime(2013, 9, 16, 7, 17, 28),
             grade_cutoffs={u'çü†øƒƒ': 0.75, 'Pass': 0.5},
             **options
         )
+        with self.store.bulk_operations(self.course.id):
+            self.chapter = ItemFactory.create(category='chapter', parent_location=self.course.location)
+            self.section = ItemFactory.create(category='sequential', parent_location=self.chapter.location)
+            self.vertical = ItemFactory.create(category='vertical', parent_location=self.section.location)
 
-        self.course = modulestore().get_course(course.id)
         CourseEnrollmentFactory(user=self.user, course_id=self.course.id, mode=CourseMode.HONOR)
-
-        self.chapter = ItemFactory.create(category='chapter', parent_location=self.course.location)
-        self.section = ItemFactory.create(category='sequential', parent_location=self.chapter.location)
-        self.vertical = ItemFactory.create(category='vertical', parent_location=self.section.location)
 
     def _get_progress_page(self, expected_status_code=200):
         """
@@ -1898,10 +1899,11 @@ class TestIndexView(ModuleStoreTestCase):
         user = UserFactory()
 
         course = CourseFactory.create()
-        chapter = ItemFactory.create(parent=course, category='chapter')
-        section = ItemFactory.create(parent=chapter, category='sequential', display_name="Sequence")
-        vertical = ItemFactory.create(parent=section, category='vertical', display_name="Vertical")
-        ItemFactory.create(parent=vertical, category='id_checker', display_name="ID Checker")
+        with self.store.bulk_operations(course.id):
+            chapter = ItemFactory.create(parent=course, category='chapter')
+            section = ItemFactory.create(parent=chapter, category='sequential', display_name="Sequence")
+            vertical = ItemFactory.create(parent=section, category='vertical', display_name="Vertical")
+            ItemFactory.create(parent=vertical, category='id_checker', display_name="ID Checker")
 
         CourseEnrollmentFactory(user=user, course_id=course.id)
 
@@ -1936,11 +1938,12 @@ class TestIndexViewWithVerticalPositions(ModuleStoreTestCase):
 
         # create course with 3 positions
         self.course = CourseFactory.create()
-        self.chapter = ItemFactory.create(parent=self.course, category='chapter')
-        self.section = ItemFactory.create(parent=self.chapter, category='sequential', display_name="Sequence")
-        ItemFactory.create(parent=self.section, category='vertical', display_name="Vertical1")
-        ItemFactory.create(parent=self.section, category='vertical', display_name="Vertical2")
-        ItemFactory.create(parent=self.section, category='vertical', display_name="Vertical3")
+        with self.store.bulk_operations(self.course.id):
+            self.chapter = ItemFactory.create(parent=self.course, category='chapter')
+            self.section = ItemFactory.create(parent=self.chapter, category='sequential', display_name="Sequence")
+            ItemFactory.create(parent=self.section, category='vertical', display_name="Vertical1")
+            ItemFactory.create(parent=self.section, category='vertical', display_name="Vertical2")
+            ItemFactory.create(parent=self.section, category='vertical', display_name="Vertical3")
 
         self.client.login(username=self.user, password='test')
         CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
@@ -1995,14 +1998,20 @@ class TestIndexViewWithGating(ModuleStoreTestCase, MilestonesTestCaseMixin):
 
         self.user = UserFactory()
         self.course = CourseFactory.create()
-        self.course.enable_subsection_gating = True
-        self.course.save()
-        self.store.update_item(self.course, 0)
-        self.chapter = ItemFactory.create(parent=self.course, category="chapter", display_name="Chapter")
-        self.open_seq = ItemFactory.create(parent=self.chapter, category='sequential', display_name="Open Sequential")
-        ItemFactory.create(parent=self.open_seq, category='problem', display_name="Problem 1")
-        self.gated_seq = ItemFactory.create(parent=self.chapter, category='sequential', display_name="Gated Sequential")
-        ItemFactory.create(parent=self.gated_seq, category='problem', display_name="Problem 2")
+        with self.store.bulk_operations(self.course.id):
+            self.course.enable_subsection_gating = True
+            self.course.save()
+            self.store.update_item(self.course, 0)
+            self.chapter = ItemFactory.create(parent=self.course, category="chapter", display_name="Chapter")
+            self.open_seq = ItemFactory.create(
+                parent=self.chapter, category='sequential', display_name="Open Sequential"
+            )
+            ItemFactory.create(parent=self.open_seq, category='problem', display_name="Problem 1")
+            self.gated_seq = ItemFactory.create(
+                parent=self.chapter, category='sequential', display_name="Gated Sequential"
+            )
+            ItemFactory.create(parent=self.gated_seq, category='problem', display_name="Problem 2")
+
         gating_api.add_prerequisite(self.course.id, self.open_seq.location)
         gating_api.set_required_content(self.course.id, self.gated_seq.location, self.open_seq.location, 100)
 
