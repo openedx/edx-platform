@@ -60,5 +60,4 @@ class SettingsUnitTest(testutil.TestCase):
     @unittest.skipUnless(enterprise_enabled(), 'enterprise not enabled')
     def test_enterprise_elements_inserted(self):
         settings.apply_settings(self.settings)
-        self.assertIn('enterprise.tpa_pipeline.set_data_sharing_consent_record', self.settings.SOCIAL_AUTH_PIPELINE)
-        self.assertIn('enterprise.tpa_pipeline.verify_data_sharing_consent', self.settings.SOCIAL_AUTH_PIPELINE)
+        self.assertIn('enterprise.tpa_pipeline.handle_enterprise_logistration', self.settings.SOCIAL_AUTH_PIPELINE)
