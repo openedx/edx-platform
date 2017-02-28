@@ -5,7 +5,6 @@ This file contains utility functions which will responsible for sending emails.
 import os
 
 import logging
-import pynliner
 import urlparse
 import uuid
 import HTMLParser
@@ -144,6 +143,13 @@ def with_inline_css(html_without_css):
     if css_filepath:
         with open(css_filepath, "r") as _file:
             css_content = _file.read()
+
+        # pynliner imports cssutils, which has an expensive initialization. All
+        # told, it can account for 15-20% of "fast" LMS startup (without asset
+        # compilation). So we're going to load it locally here so that we delay
+        # that one-time hit until we actually do the (rare) operation that is
+        # sending a credit notification email.
+        import pynliner
 
         # insert style tag in the html and run pyliner.
         html_with_inline_css = pynliner.fromString('<style>' + css_content + '</style>' + html_without_css)
