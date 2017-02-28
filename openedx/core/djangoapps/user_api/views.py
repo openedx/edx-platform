@@ -887,6 +887,14 @@ class RegistrationView(APIView):
                         instructions="",
                         restrictions={}
                     )
+                    # used to identify that request is running third party social auth
+                    form_desc.add_field(
+                        "social_auth_provider",
+                        field_type="hidden",
+                        label="",
+                        default=current_provider.name if current_provider.name else "Third Party",
+                        required=False,
+                    )
 
 
 class PasswordResetView(APIView):

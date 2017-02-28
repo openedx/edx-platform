@@ -951,6 +951,17 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                     "required": False,
                 }
             )
+            # social_auth_provider should be present
+            # with value `Google`(we are setting up google provider for this test).
+            self._assert_reg_field(
+                no_extra_fields_setting,
+                {
+                    "name": "social_auth_provider",
+                    "type": "hidden",
+                    "required": False,
+                    "defaultValue": "Google"
+                }
+            )
 
             # Email should be filled in
             self._assert_reg_field(
@@ -1784,6 +1795,7 @@ class ThirdPartyRegistrationTestMixin(ThirdPartyOAuthTestMixin, CacheIsolationTe
             "username": user.username if user else "test_username",
             "name": user.first_name if user else "test name",
             "email": user.email if user else "test@test.com",
+
         }
 
     def _assert_existing_user_error(self, response):
@@ -1804,6 +1816,15 @@ class ThirdPartyRegistrationTestMixin(ThirdPartyOAuthTestMixin, CacheIsolationTe
             {"access_token": [{"user_message": expected_error_message}]}
         )
         self.assertNotIn("partial_pipeline", self.client.session)
+
+    def _assert_third_party_session_expired_error(self, response, expected_error_message):
+        """Assert that given response is an error due to third party session expiry"""
+        self.assertEqual(response.status_code, 400)
+        response_json = json.loads(response.content)
+        self.assertEqual(
+            response_json,
+            {"session_expired": [{"user_message": expected_error_message}]}
+        )
 
     def _verify_user_existence(self, user_exists, social_link_exists, user_is_active=None, username=None):
         """Verifies whether the user object exists."""
@@ -1876,6 +1897,32 @@ class ThirdPartyRegistrationTestMixin(ThirdPartyOAuthTestMixin, CacheIsolationTe
         self._assert_access_token_error(
             response,
             "An access_token is required when passing value ({}) for provider.".format(self.BACKEND)
+        )
+        self._verify_user_existence(user_exists=False, social_link_exists=False)
+
+    def test_expired_pipeline(self):
+
+        """
+        Test that there is an error and account is not created
+        when request is made for account creation using third (Google, Facebook etc) party with pipeline
+        getting expired using browser (not mobile application).
+
+        NOTE: We are NOT using actual pipeline here so pipeline is always expired in this environment.
+        we don't have to explicitly expire pipeline.
+
+        """
+
+        data = self.data()
+        # provider is sent along request when request is made from mobile application
+        data.pop("provider")
+        # to identify that request is made using browser
+        data.update({"social_auth_provider": "Google"})
+        response = self.client.post(self.url, data)
+        # NO partial_pipeline in session means pipeline is expired
+        self.assertNotIn("partial_pipeline", self.client.session)
+        self._assert_third_party_session_expired_error(
+            response,
+            u"Registration using {provider} has timed out.".format(provider="Google")
         )
         self._verify_user_existence(user_exists=False, social_link_exists=False)
 
