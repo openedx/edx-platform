@@ -111,8 +111,7 @@ def insert_enterprise_pipeline_elements(pipeline):
         return
 
     additional_elements = (
-        'enterprise.tpa_pipeline.set_data_sharing_consent_record',
-        'enterprise.tpa_pipeline.verify_data_sharing_consent',
+        'enterprise.tpa_pipeline.handle_enterprise_logistration',
     )
     # Find the item we need to insert the data sharing consent elements before
     insert_point = pipeline.index('social.pipeline.social_auth.load_extra_data')
