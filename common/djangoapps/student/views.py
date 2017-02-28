@@ -1669,16 +1669,28 @@ def create_account_with_params(request, params):
         'REGISTRATION_EXTRA_FIELDS',
         getattr(settings, 'REGISTRATION_EXTRA_FIELDS', {})
     )
+    # registration via third party (Google, Facebook) using mobile application
+    # doesn't use social auth pipeline (no redirect uri(s) etc involved).
+    # In this case all related info (required for account linking)
+    # is sent in params.
+    # `third_party_auth_credentials_in_api` essentially means 'request
+    # is made from mobile application'
+    third_party_auth_credentials_in_api = 'provider' in params
 
-    # Boolean of whether a 3rd party auth provider and credentials were provided in
-    # the API so the newly created account can link with the 3rd party account.
-    #
-    # Note: this is orthogonal to the 3rd party authentication pipeline that occurs
-    # when the account is created via the browser and redirect URLs.
-    should_link_with_social_auth = third_party_auth.is_enabled() and 'provider' in params
+    is_third_party_auth_enabled = third_party_auth.is_enabled()
 
-    if should_link_with_social_auth or (third_party_auth.is_enabled() and pipeline.running(request)):
+    if is_third_party_auth_enabled and (pipeline.running(request) or third_party_auth_credentials_in_api):
         params["password"] = pipeline.make_random_password()
+
+    # in case user is registering via third party (Google, Facebook) and pipeline has expired, show appropriate
+    # error message
+    if is_third_party_auth_enabled and ('social_auth_provider' in params and not pipeline.running(request)):
+        raise ValidationError(
+            {'session_expired': [
+                _(u"Registration using {provider} has timed out.").format(
+                    provider=params.get('social_auth_provider'))
+            ]}
+        )
 
     # if doing signup for an external authorization, then get email, password, name from the eamap
     # don't use the ones from the form, since the user could have hacked those
@@ -1729,9 +1741,13 @@ def create_account_with_params(request, params):
         # first, create the account
         (user, profile, registration) = _do_create_account(form, custom_form, site=request.site)
 
-        # next, link the account with social auth, if provided via the API.
+        # If a 3rd party auth provider and credentials were provided in the API, link the account with social auth
         # (If the user is using the normal register page, the social auth pipeline does the linking, not this code)
-        if should_link_with_social_auth:
+
+        # Note: this is orthogonal to the 3rd party authentication pipeline that occurs
+        # when the account is created via the browser and redirect URLs.
+
+        if is_third_party_auth_enabled and third_party_auth_credentials_in_api:
             backend_name = params['provider']
             request.social_strategy = social_utils.load_strategy(request)
             redirect_uri = reverse('social:complete', args=(backend_name, ))
@@ -1773,7 +1789,7 @@ def create_account_with_params(request, params):
     # If the user is registering via 3rd party auth, track which provider they use
     third_party_provider = None
     running_pipeline = None
-    if third_party_auth.is_enabled() and pipeline.running(request):
+    if is_third_party_auth_enabled and pipeline.running(request):
         running_pipeline = pipeline.get(request)
         third_party_provider = provider.Registry.get_from_pipeline(running_pipeline)
 
