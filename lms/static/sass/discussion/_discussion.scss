@@ -24,60 +24,61 @@
     }
   }
 
-.container .discussion-body, .discussion-module, .discussion-course {
-  @include clearfix;
-  border: none;
-  background: transparent;
-  box-shadow: none;
+  .container .discussion-body, .discussion-module, .discussion-course {
+    @include clearfix;
+    border: none;
+    background: transparent;
+    box-shadow: none;
 
-  .sidebar ul {
-    list-style: none !important;
-    margin: 0 !important;
-    padding-left: 0 !important;
-  }
-
-  .sr {
-    @extend %text-sr;
-  }
-
-  .wmd-panel textarea.wmd-input {
-    margin-bottom: 0px;
-  }
-
-  .bottom-post-status {
-    padding: 30px;
-    font-size: $forum-x-large-font-size;
-    font-weight: 700;
-    color: $forum-color-copy-light;
-    text-align: center;
-  }
-
-  .discussion-article {
-    position: relative;
-
-    a,
-    p {
-      word-wrap: break-word;
+    .sidebar ul {
+      list-style: none !important;
+      margin: 0 !important;
+      padding-left: 0 !important;
     }
-  }
 
-  .main-article.new {
-    display: none;
-    padding: ($baseline*2.5);
-  }
+    .sr {
+      @extend %text-sr;
+    }
 
-  .discussion-reply-new {
-    @include clearfix();
-    @include transition(opacity .2s linear 0s);
+    .wmd-panel textarea.wmd-input {
+      margin-bottom: 0px;
+    }
 
-    h4 {
-      font-size: $forum-large-font-size;
+    .bottom-post-status {
+      padding: 30px;
+      font-size: $forum-x-large-font-size;
       font-weight: 700;
+      color: $forum-color-copy-light;
+      text-align: center;
     }
-  }
 
-  .reply-post-control {
-    margin-top: $baseline;
+    .discussion-article {
+      position: relative;
+
+      a,
+      p {
+        word-wrap: break-word;
+      }
+    }
+
+    .main-article.new {
+      display: none;
+      padding: ($baseline*2.5);
+    }
+
+    .discussion-reply-new {
+      @include clearfix();
+      @include transition(opacity .2s linear 0s);
+
+      h4 {
+        font-size: $forum-large-font-size;
+        font-weight: 700;
+      }
+    }
+
+    .reply-post-control {
+      margin-top: $baseline;
+    }
   }
 }
 
