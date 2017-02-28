@@ -800,6 +800,9 @@ def dashboard(request):
     else:
         redirect_message = ''
 
+    valid_verification_statuses = ['approved', 'must_reverify', 'pending', 'expired']
+    display_sidebar_on_dashboard = len(order_history_list) or verification_status in valid_verification_statuses
+
     context = {
         'enrollment_message': enrollment_message,
         'redirect_message': redirect_message,
@@ -833,6 +836,7 @@ def dashboard(request):
         'show_program_listing': ProgramsApiConfig.current().show_program_listing,
         'disable_courseware_js': True,
         'display_course_modes_on_dashboard': enable_verified_certificates and display_course_modes_on_dashboard,
+        'display_sidebar_on_dashboard': display_sidebar_on_dashboard,
     }
 
     ecommerce_service = EcommerceService()
