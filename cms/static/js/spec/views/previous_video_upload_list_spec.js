@@ -108,12 +108,11 @@ define(
                 verifyVideosInfo(this, false);
             });
 
-            describe('Paging Previous Video Upload List View', function() {
+            describe('PagingPreviousVideoUploadListView', function() {
 
-                var videoView
-
+                var videoView, collection;
                 beforeEach(function() {
-                    var collection = new VideoPagingCollection([
+                    collection = new VideoPagingCollection([
                             {
                                 'client_video_id': 'foo.mp4',
                                 'duration': 42,
@@ -132,9 +131,9 @@ define(
                         {
                             url: videoHandlerUrl,
                             pageSize: 2,
-                            sortField: "Name",
+                            sortField: 'Name',
                             totalCount: 3,
-                            sortDir: "asc"
+                            sortDir: 'asc'
                         }
                     );
                     videoView = new PreviousVideoUploadListView({

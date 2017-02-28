@@ -7,7 +7,7 @@ define([
 
     var VideoPagingCollection = PagingCollection.extend({
 
-        initialize: function(models, options){
+        initialize: function(models, options) {
             this.state = this.initState(options);
             this.url = options.url;
             PagingCollection.prototype.initialize.call(this, models, options);
@@ -24,7 +24,7 @@ define([
             }
         },
 
-        initState: function(options){
+        initState: function(options) {
             return {
                 pageSize: options.pageSize,
                 totalRecords: options.totalCount,

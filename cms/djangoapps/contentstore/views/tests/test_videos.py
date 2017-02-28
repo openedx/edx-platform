@@ -180,6 +180,12 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
         response_videos_data = json.loads(response.content)
         response_videos = response_videos_data["results"]
         self.assertEqual(len(response_videos), len(self.previous_uploads))
+        self.assertEqual(response_videos_data["sort_dir"], "asc")
+        self.assertEqual(response_videos_data["total_count"], 20)
+        self.assertEqual(response_videos_data["current_page"], 1)
+        self.assertEqual(response_videos_data["total_pages"], 1)
+        self.assertEqual(response_videos_data["page_size"], 20)
+        self.assertEqual(response_videos_data["sort_field"], "created")
         for i, response_video in enumerate(response_videos):
             original_video = self.previous_uploads[i]
             self.assertEqual(
