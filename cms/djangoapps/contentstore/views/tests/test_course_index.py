@@ -474,10 +474,9 @@ class TestCourseOutline(CourseTestCase):
                 ]
             )
 
-        self.assertEqual(info['block_types'], deprecated_block_types)
         self.assertEqual(
-            info['block_types_enabled'],
-            any(component in advanced_modules for component in deprecated_block_types)
+            info['deprecated_enabled_block_types'],
+            [component for component in advanced_modules if component in deprecated_block_types]
         )
 
         self.assertItemsEqual(info['blocks'], expected_blocks)
@@ -504,6 +503,28 @@ class TestCourseOutline(CourseTestCase):
             course_module.advanced_modules,
             info,
             block_types
+        )
+
+    @ddt.data(
+        (["a", "b", "c"], ["a", "b", "c"]),
+        (["a", "b", "c"], ["a", "b", "d"]),
+        (["a", "b", "c"], ["a", "d", "e"]),
+        (["a", "b", "c"], ["d", "e", "f"])
+    )
+    @ddt.unpack
+    def test_verify_warn_only_on_enabled_modules(self, enabled_block_types, deprecated_block_types):
+        """
+        Verify that we only warn about block_types that are both deprecated and enabled.
+        """
+        expected_block_types = list(set(enabled_block_types) & set(deprecated_block_types))
+        course_module = modulestore().get_item(self.course.location)
+        self._create_test_data(course_module, create_blocks=True, block_types=enabled_block_types)
+        info = _deprecated_blocks_info(course_module, deprecated_block_types)
+        self._verify_deprecated_info(
+            course_module.id,
+            course_module.advanced_modules,
+            info,
+            expected_block_types
         )
 
     @ddt.data(
