@@ -152,6 +152,7 @@ class SystemTestSuite(NoseTestSuite):
             self.extra_args,
             '--xunitmp-file={}'.format(self.report_dir / "nosetests.xml"),
             '--with-database-isolation',
+            #'--stop'
         ]
 
         if self.processes != 0:
@@ -190,9 +191,6 @@ class SystemTestSuite(NoseTestSuite):
         if self.root == 'lms':
             default_test_id += " {system}/tests.py"
             default_test_id += " openedx/core/djangolib"
-
-        if self.root == 'cms':
-            default_test_id += " {system}/tests/*"
 
         return default_test_id.format(system=self.root)
 
