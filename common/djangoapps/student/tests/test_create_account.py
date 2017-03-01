@@ -4,6 +4,7 @@ import json
 import unittest
 
 import ddt
+from mock import patch
 from django.conf import settings
 from django.contrib.auth.models import User, AnonymousUser
 from django.core.urlresolvers import reverse
@@ -403,6 +404,14 @@ class TestCreateAccount(TestCase):
             self.assertIsNone(
                 UserAttribute.get_user_attribute(user, REGISTRATION_UTM_CREATED_AT)
             )
+
+    @patch("openedx.core.djangoapps.site_configuration.helpers.get_value", mock.Mock(return_value=False))
+    def test_create_account_not_allowed(self):
+        """
+        Test case to check user creation is forbidden when ALLOW_PUBLIC_ACCOUNT_CREATION feature flag is turned off
+        """
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
 
 
 @ddt.ddt

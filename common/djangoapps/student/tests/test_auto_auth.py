@@ -9,7 +9,7 @@ from student.models import anonymous_id_for_user, CourseEnrollment, UserProfile
 from util.testing import UrlResetMixin
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator
-from mock import patch
+from mock import patch, Mock
 import ddt
 import json
 
@@ -260,6 +260,14 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase):
             self.assertTrue(response.cookies[cookie].value)  # pylint: disable=maybe-no-member
 
         return response
+
+    @patch("openedx.core.djangoapps.site_configuration.helpers.get_value", Mock(return_value=False))
+    def test_create_account_not_allowed(self):
+        """
+        Test case to check user creation is forbidden when ALLOW_PUBLIC_ACCOUNT_CREATION feature flag is turned off
+        """
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
 
 
 class AutoAuthDisabledTestCase(AutoAuthTestCase):

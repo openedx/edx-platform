@@ -3,13 +3,14 @@
 from datetime import datetime
 from pytz import UTC
 
-from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
-from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
-from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.partitions.partitions import UserPartition, Group
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
+
+from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
+from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
+from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 
 
 class ContentGroupTestCase(ModuleStoreTestCase):

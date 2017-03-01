@@ -53,22 +53,23 @@
                 ),
                     THIRD_PARTY_COMPLETE_URL = '/auth/complete/provider/';
 
-                var ajaxSpyAndInitialize = function(that, mode, nextUrl, finishAuthUrl) {
-                    var options = {
-                            initial_mode: mode,
-                            third_party_auth: {
-                                currentProvider: null,
-                                providers: [],
-                                secondaryProviders: [{name: 'provider'}],
-                                finishAuthUrl: finishAuthUrl
-                            },
-                            login_redirect_url: nextUrl, // undefined for default
-                            platform_name: 'edX',
-                            login_form_desc: FORM_DESCRIPTION,
-                            registration_form_desc: FORM_DESCRIPTION,
-                            password_reset_form_desc: FORM_DESCRIPTION
+            var ajaxSpyAndInitialize = function(that, mode, nextUrl, finishAuthUrl, createAccountOption) {
+                var options = {
+                        initial_mode: mode,
+                        third_party_auth: {
+                            currentProvider: null,
+                            providers: [],
+                            secondaryProviders: [{name: "provider"}],
+                            finishAuthUrl: finishAuthUrl
                         },
-                        $logistrationElement = $('#login-and-registration-container');
+                        login_redirect_url: nextUrl, // undefined for default
+                        platform_name: 'edX',
+                        login_form_desc: FORM_DESCRIPTION,
+                        registration_form_desc: FORM_DESCRIPTION,
+                        password_reset_form_desc: FORM_DESCRIPTION,
+                        account_creation_allowed: createAccountOption
+                    },
+                    $logistrationElement = $('#login-and-registration-container');
 
                 // Spy on AJAX requests
                     requests = AjaxHelpers.requests(that);
@@ -223,8 +224,22 @@
                     view.subview.register.trigger('auth-complete');
 
                 // Expect that we ignore the external URL and redirect to the dashboard
-                    expect(view.redirect).toHaveBeenCalledWith('/dashboard');
-                });
+                expect( view.redirect ).toHaveBeenCalledWith( "/dashboard" );
+            });
+            
+            it('hides create an account section', function() {
+                    ajaxSpyAndInitialize(this, 'login', '', '', false);
+
+                    // Expect the Create an account section is hidden
+                    expect((view.$el.find('.toggle-form')).length).toEqual(0);
+            });
+
+            it('shows create an account section', function() {
+                ajaxSpyAndInitialize(this, 'login', '', '', true);
+
+                // Expect the Create an account section is visible
+                expect((view.$el.find('.toggle-form')).length).toEqual(1);
             });
         });
+    });
 }).call(this, define || RequireJS.define);

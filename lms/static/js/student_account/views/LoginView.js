@@ -27,16 +27,17 @@
                 passwordResetSuccessJsHook: 'js-password-reset-success',
                 defaultFormErrorsTitle: gettext('We couldn\'t sign you in.'),
 
-                preRender: function(data) {
-                    this.providers = data.thirdPartyAuth.providers || [];
-                    this.hasSecondaryProviders = (
-                        data.thirdPartyAuth.secondaryProviders && data.thirdPartyAuth.secondaryProviders.length
-                    );
-                    this.currentProvider = data.thirdPartyAuth.currentProvider || '';
-                    this.errorMessage = data.thirdPartyAuth.errorMessage || '';
-                    this.platformName = data.platformName;
-                    this.resetModel = data.resetModel;
-                    this.supportURL = data.supportURL;
+            preRender: function( data ) {
+                this.providers = data.thirdPartyAuth.providers || [];
+                this.hasSecondaryProviders = (
+                    data.thirdPartyAuth.secondaryProviders && data.thirdPartyAuth.secondaryProviders.length
+                );
+                this.currentProvider = data.thirdPartyAuth.currentProvider || '';
+                this.errorMessage = data.thirdPartyAuth.errorMessage || '';
+                this.platformName = data.platformName;
+                this.resetModel = data.resetModel;
+                this.supportURL = data.supportURL;
+                this.createAccountOption = data.createAccountOption;
 
                     this.listenTo(this.model, 'sync', this.saveSuccess);
                     this.listenTo(this.resetModel, 'sync', this.resetEmail);
@@ -48,14 +49,16 @@
                     $(this.el).html(_.template(this.tpl)({
                     // We pass the context object to the template so that
                     // we can perform variable interpolation using sprintf
-                        context: {
-                            fields: fields,
-                            currentProvider: this.currentProvider,
-                            providers: this.providers,
-                            hasSecondaryProviders: this.hasSecondaryProviders,
-                            platformName: this.platformName
-                        }
-                    }));
+                    context: {
+                        fields: fields,
+                        currentProvider: this.currentProvider,
+                        errorMessage: this.errorMessage,
+                        providers: this.providers,
+                        hasSecondaryProviders: this.hasSecondaryProviders,
+                        platformName: this.platformName,
+                        createAccountOption: this.createAccountOption
+                    }
+                }));
 
                     this.postRender();
 

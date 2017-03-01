@@ -8,6 +8,7 @@ from pytz import UTC
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from django.core.validators import validate_email, validate_slug, ValidationError
+from django.http import HttpResponseForbidden
 from openedx.core.djangoapps.user_api.preferences.api import update_user_preferences
 from openedx.core.djangoapps.user_api.errors import PreferenceValidationError
 
@@ -292,6 +293,13 @@ def create_account(username, password, email):
         AccountPasswordInvalid
         UserAPIInternalError: the operation failed due to an unexpected error.
     """
+    # Check if ALLOW_PUBLIC_ACCOUNT_CREATION flag turned off to restrict user account creation
+    if not configuration_helpers.get_value(
+            'ALLOW_PUBLIC_ACCOUNT_CREATION',
+            settings.FEATURES.get('ALLOW_PUBLIC_ACCOUNT_CREATION', True)
+    ):
+        return HttpResponseForbidden(_("Account creation not allowed."))
+
     # Validate the username, password, and email
     # This will raise an exception if any of these are not in a valid format.
     _validate_username(username)

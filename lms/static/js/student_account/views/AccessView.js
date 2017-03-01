@@ -67,8 +67,9 @@
                         hinted_login: null
                     };
 
-                    this.platformName = options.platform_name;
-                    this.supportURL = options.support_link;
+                this.platformName = options.platform_name;
+                this.supportURL = options.support_link;
+                this.createAccountOption = options.account_creation_allowed;
 
                 // The login view listens for 'sync' events from the reset model
                     this.resetModel = new PasswordResetModel({}, {
@@ -113,14 +114,15 @@
                             url: data.submit_url
                         });
 
-                        this.subview.login = new LoginView({
-                            fields: data.fields,
-                            model: model,
-                            resetModel: this.resetModel,
-                            thirdPartyAuth: this.thirdPartyAuth,
-                            platformName: this.platformName,
-                            supportURL: this.supportURL
-                        });
+                    this.subview.login = new LoginView({
+                        fields: data.fields,
+                        model: model,
+                        resetModel: this.resetModel,
+                        thirdPartyAuth: this.thirdPartyAuth,
+                        platformName: this.platformName,
+                        supportURL: this.supportURL,
+                        createAccountOption: this.createAccountOption
+                    });
 
                     // Listen for 'password-help' event to toggle sub-views
                         this.listenTo(this.subview.login, 'password-help', this.resetPassword);

@@ -18,6 +18,7 @@ from django_comment_client.permissions import check_permissions_by_view, has_per
 from django_comment_client.settings import MAX_COMMENT_DEPTH
 from django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
 from edxmako import lookup_template
+from lms.djangoapps.ccx.overrides import get_current_ccx
 
 from courseware import courses
 from courseware.access import has_access
@@ -28,6 +29,12 @@ from openedx.core.djangoapps.course_groups.cohorts import (
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from request_cache.middleware import request_cached
 
+
+from xmodule.modulestore.django import modulestore
+from django.utils.timezone import UTC
+from opaque_keys.edx.locations import i4xEncoder
+from opaque_keys.edx.keys import CourseKey
+import json
 
 from xmodule.modulestore.django import modulestore
 from django.utils.timezone import UTC
