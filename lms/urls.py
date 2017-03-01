@@ -8,7 +8,7 @@ from django.views.generic.base import RedirectView
 from ratelimitbackend import admin
 from django.conf.urls.static import static
 
-from courseware.views.views import EnrollStaffView
+from courseware.views.views import CourseTabView, EnrollStaffView, StaticCourseTabView
 from config_models.views import ConfigurationModelCurrentAPIView
 from courseware.views.index import CoursewareIndex
 from openedx.core.djangoapps.auth_exchange.views import LoginWithAccessTokenView
@@ -685,13 +685,24 @@ if settings.FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
             name='resubscribe_forum_update',
         ),
     )
+
+urlpatterns += (
+    url(
+        r'^courses/{}/tab/(?P<tab_type>[^/]+)/$'.format(
+            settings.COURSE_ID_PATTERN,
+        ),
+        CourseTabView.as_view(),
+        name='course_tab_view',
+    ),
+)
+
 urlpatterns += (
     # This MUST be the last view in the courseware--it's a catch-all for custom tabs.
     url(
         r'^courses/{}/(?P<tab_slug>[^/]+)/$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'courseware.views.views.static_tab',
+        StaticCourseTabView.as_view(),
         name='static_tab',
     ),
 )

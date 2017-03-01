@@ -56,7 +56,7 @@
                         el: this.$('.forum-content'),
                         model: thread,
                         mode: 'inline',
-                        course_settings: this.courseSettings
+                        courseSettings: this.courseSettings
                     });
                     this.threadView.render();
                     this.listenTo(this.threadView.showView, 'thread:_delete', this.navigateToAllThreads);
