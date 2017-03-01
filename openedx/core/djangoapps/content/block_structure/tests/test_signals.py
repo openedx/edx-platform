@@ -50,7 +50,7 @@ class CourseBlocksSignalTest(ModuleStoreTestCase):
         )
 
     @ddt.data(True, False)
-    @patch('openedx.core.lib.block_structure.manager.BlockStructureManager.clear')
+    @patch('openedx.core.djangoapps.content.block_structure.manager.BlockStructureManager.clear')
     def test_cache_invalidation(self, invalidate_cache_enabled, mock_bs_manager_clear):
         test_display_name = "Jedi 101"
 

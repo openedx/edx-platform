@@ -12,7 +12,7 @@ from courseware.model_data import set_score
 from courseware.tests.helpers import LoginEnrollmentTestCase
 
 from lms.djangoapps.course_blocks.api import get_course_blocks
-from openedx.core.lib.block_structure.factory import BlockStructureFactory
+from openedx.core.djangoapps.content.block_structure.factory import BlockStructureFactory
 from openedx.core.djangolib.testing.utils import get_mock_request
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment

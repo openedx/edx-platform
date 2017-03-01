@@ -4,7 +4,10 @@ Milestones Transformer
 
 from django.conf import settings
 
-from openedx.core.lib.block_structure.transformer import BlockStructureTransformer, FilteringTransformerMixin
+from openedx.core.djangoapps.content.block_structure.transformer import (
+    BlockStructureTransformer,
+    FilteringTransformerMixin,
+)
 from util import milestones_helpers
 
 

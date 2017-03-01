@@ -4,8 +4,7 @@ BlockStructures.
 """
 from contextlib import contextmanager
 
-from openedx.core.djangoapps.content.block_structure import config
-
+from . import config
 from .exceptions import UsageKeyNotInBlockStructure, TransformerDataIncompatible, BlockStructureNotFound
 from .factory import BlockStructureFactory
 from .store import BlockStructureStore
