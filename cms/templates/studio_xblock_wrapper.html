@@ -89,7 +89,8 @@ messages = xblock.validate().to_json()
                                     <span class="sr">${_("Duplicate")}</span>
                                     </button>
                                 </li>
-
+                            % endif
+                            % if can_move:
                                 <li class="action-item action-move">
                                     <button data-tooltip="${_("Move")}" class="btn-default move-button action-button">
                                         <span class="stack-move-icon fa-stack fa-lg ">

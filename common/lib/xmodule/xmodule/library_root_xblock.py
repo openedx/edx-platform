@@ -80,6 +80,7 @@ class LibraryRoot(XBlock):
         children_to_show = self.children[item_start:item_end]  # pylint: disable=no-member
 
         force_render = context.get('force_render', None)
+        context['can_move'] = False
 
         for child_key in children_to_show:
             # Children must have a separate context from the library itself. Make a copy.

@@ -283,6 +283,23 @@ def reverse_usage_url(handler_name, usage_key, kwargs=None):
     return reverse_url(handler_name, 'usage_key_string', usage_key, kwargs)
 
 
+def get_group_display_name(user_partitions, xblock_display_name):
+    """
+    Get the group name if matching group xblock is found.
+
+    Arguments:
+        user_partitions (Dict): Locator of source item.
+        xblock_display_name (String): Display name of group xblock.
+
+    Returns:
+        group name (String): Group name of the matching group.
+    """
+    for user_partition in user_partitions:
+        for group in user_partition['groups']:
+            if str(group['id']) in xblock_display_name:
+                return group['name']
+
+
 def get_user_partition_info(xblock, schemes=None, course=None):
     """
     Retrieve user partition information for an XBlock for display in editors.

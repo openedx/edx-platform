@@ -205,13 +205,17 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
                         return category + '_display_name_' + xblockIndex;
                     })
                 );
-                if (category !== 'component') {
+                if (category === 'component') {
+                    if (hasCurrentLocation) {
+                        expect(displayedInfo.currentLocationText).toEqual('(Currently selected)');
+                    }
+                } else {
                     if (hasCurrentLocation) {
                         expect(displayedInfo.currentLocationText).toEqual('(Current location)');
                     }
                     expect(displayedInfo.forwardButtonSRTexts).toEqual(
                         _.map(_.range(expectedXBlocksCount), function() {
-                            return 'Click for children';
+                            return 'View child items';
                         })
                     );
                     expect(displayedInfo.forwardButtonCount).toEqual(expectedXBlocksCount);
@@ -519,15 +523,8 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
                 });
             });
 
-            describe('Move an xblock', function() {
-                it('can not move in a disabled state', function() {
-                    verifyMoveEnabled(false);
-                    modal.$el.find('.modal-actions .action-move').click();
-                    expect(modal.movedAlertView).toBeNull();
-                    expect(getSentRequests().length).toEqual(0);
-                });
-
-                it('move button is disabled when navigating to same parent', function() {
+            describe('Move button', function() {
+                it('is disabled when navigating to same parent', function() {
                     // select a target parent as the same as source parent and click
                     renderViews(courseOutline);
                     _.each(_.range(3), function() {
@@ -536,7 +533,7 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
                     verifyMoveEnabled('component', true);
                 });
 
-                it('move button is enabled when navigating to different parent', function() {
+                it('is enabled when navigating to different parent', function() {
                     // select a target parent as the different as source parent and click
                     renderViews(courseOutline);
                     _.each(_.range(3), function() {
@@ -551,6 +548,111 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
                     // start from course outline again
                     modal.moveXBlockBreadcrumbView.$el.find('.bc-container button').first().click();
                     verifyXBlockInfo(courseOutlineOptions, 'section', 1, 'forward', false);
+                });
+
+                it('is disbabled when navigating to same source xblock', function() {
+                    var outline,
+                        libraryContentXBlockInfo = {
+                            category: 'library_content',
+                            display_name: 'Library Content',
+                            has_children: true,
+                            id: 'LIBRARY_CONTENT_ID'
+                        },
+                        outlineOptions = {library_content: 1, component: 1};
+
+                    // make above xblock source xblock.
+                    modal.sourceXBlockInfo = libraryContentXBlockInfo;
+                    outline = createXBlockInfo('component', outlineOptions, libraryContentXBlockInfo);
+                    renderViews(outline);
+                    expect(modal.$el.find('.modal-actions .action-move').hasClass('is-disabled')).toBeTruthy();
+
+                    // select a target parent
+                    clickForwardButton(0);
+                    expect(modal.$el.find('.modal-actions .action-move').hasClass('is-disabled')).toBeTruthy();
+                });
+
+                it('is disabled when navigating inside source content experiment', function() {
+                    var outline,
+                        splitTestXBlockInfo = {
+                            category: 'split_test',
+                            display_name: 'Content Experiment',
+                            has_children: true,
+                            id: 'SPLIT_TEST_ID'
+                        },
+                        outlineOptions = {split_test: 1, unit: 2, component: 1};
+
+                    // make above xblock source xblock.
+                    modal.sourceXBlockInfo = splitTestXBlockInfo;
+                    outline = createXBlockInfo('unit', outlineOptions, splitTestXBlockInfo);
+                    renderViews(outline);
+                    expect(modal.$el.find('.modal-actions .action-move').hasClass('is-disabled')).toBeTruthy();
+
+                    // navigate to groups level
+                    clickForwardButton(0);
+                    expect(modal.$el.find('.modal-actions .action-move').hasClass('is-disabled')).toBeTruthy();
+
+                    // navigate to component level inside a group
+                    clickForwardButton(0);
+
+                    // move should be disabled because we are navigating inside source xblock
+                    expect(modal.$el.find('.modal-actions .action-move').hasClass('is-disabled')).toBeTruthy();
+                });
+
+                it('is disabled when navigating to any content experiment groups', function() {
+                    var outline,
+                        splitTestXBlockInfo = {
+                            category: 'split_test',
+                            display_name: 'Content Experiment',
+                            has_children: true,
+                            id: 'SPLIT_TEST_ID'
+                        },
+                        outlineOptions = {split_test: 1, unit: 2, component: 1};
+
+                    // group level should be disabled but component level inside groups should be movable
+                    outline = createXBlockInfo('unit', outlineOptions, splitTestXBlockInfo);
+                    renderViews(outline);
+
+                    // move is disabled on groups level
+                    expect(modal.$el.find('.modal-actions .action-move').hasClass('is-disabled')).toBeTruthy();
+
+                    // navigate to component level inside a group
+                    clickForwardButton(1);
+                    expect(modal.$el.find('.modal-actions .action-move').hasClass('is-disabled')).toBeFalsy();
+                });
+
+                it('is enabled when navigating to any parentable component', function() {
+                    var parentableXBlockInfo = {
+                        category: 'vertical',
+                        display_name: 'Parentable Component',
+                        has_children: true,
+                        id: 'PARENTABLE_ID'
+                    };
+                    renderViews(parentableXBlockInfo);
+
+                    // move is enabled on parentable xblocks.
+                    expect(modal.$el.find('.modal-actions .action-move').hasClass('is-disabled')).toBeFalsy();
+                });
+
+                it('is disabled when navigating to any non-parentable component', function() {
+                    var nonParentableXBlockInfo = {
+                        category: 'html',
+                        display_name: 'Non Parentable Component',
+                        has_children: false,
+                        id: 'NON_PARENTABLE_ID'
+                    };
+                    renderViews(nonParentableXBlockInfo);
+
+                    // move is disabled on non-parent xblocks.
+                    expect(modal.$el.find('.modal-actions .action-move').hasClass('is-disabled')).toBeTruthy();
+                });
+            });
+
+            describe('Move an xblock', function() {
+                it('can not move in a disabled state', function() {
+                    verifyMoveEnabled(false);
+                    modal.$el.find('.modal-actions .action-move').click();
+                    expect(modal.movedAlertView).toBeNull();
+                    expect(getSentRequests().length).toEqual(0);
                 });
 
                 it('move an xblock when move button is clicked', function() {
