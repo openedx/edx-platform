@@ -7,11 +7,16 @@ import logging
 from xblock.fields import List
 from openedx.core.lib.api.plugins import PluginError
 
+from django.core.files.storage import get_storage_class
+
 log = logging.getLogger("edx.courseware")
 
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
 #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
+
+# A list of attributes on course tabs that can not be updated
+READ_ONLY_COURSE_TAB_ATTRIBUTES = ['type']
 
 
 class CourseTab(object):
@@ -30,6 +35,12 @@ class CourseTab(object):
     # The title of the tab, which should be internationalized using
     # ugettext_noop since the user won't be available in this context.
     title = None
+
+    # HTML class to add to the tab page's body, or None if no class it to be added
+    body_class = None
+
+    # Token to identify the online help URL, or None if no help is provided
+    online_help_token = None
 
     # Class property that specifies whether the tab can be hidden for a particular course
     is_hideable = False
@@ -68,13 +79,24 @@ class CourseTab(object):
         Args:
             tab_dict (dict) - a dictionary of parameters used to build the tab.
         """
-
+        super(CourseTab, self).__init__()
         self.name = tab_dict.get('name', self.title)
         self.tab_id = tab_dict.get('tab_id', getattr(self, 'tab_id', self.type))
-        self.link_func = tab_dict.get('link_func', link_reverse_func(self.view_name))
         self.course_staff_only = tab_dict.get('course_staff_only', False)
-
         self.is_hidden = tab_dict.get('is_hidden', False)
+
+        self.tab_dict = tab_dict
+
+    @property
+    def link_func(self):
+        """
+        Returns a function that will determine a course URL for this tab.
+
+        The returned function takes two arguments:
+            course (Course) - the course in question.
+            view_name (str) - the name of the view.
+        """
+        return self.tab_dict.get('link_func', link_reverse_func(self.view_name))
 
     @classmethod
     def is_enabled(cls, course, user=None):
@@ -101,16 +123,8 @@ class CourseTab(object):
         This method allows callers to access CourseTab members with the d[key] syntax as is done with
         Python dictionary objects.
         """
-        if key == 'name':
-            return self.name
-        elif key == 'type':
-            return self.type
-        elif key == 'tab_id':
-            return self.tab_id
-        elif key == 'is_hidden':
-            return self.is_hidden
-        elif key == 'course_staff_only':
-            return self.course_staff_only
+        if hasattr(self, key):
+            return getattr(self, key, None)
         else:
             raise KeyError('Key {0} not present in tab {1}'.format(key, self.to_json()))
 
@@ -121,14 +135,8 @@ class CourseTab(object):
 
         Note: the 'type' member can be 'get', but not 'set'.
         """
-        if key == 'name':
-            self.name = value
-        elif key == 'tab_id':
-            self.tab_id = value
-        elif key == 'is_hidden':
-            self.is_hidden = value
-        elif key == 'course_staff_only':
-            self.course_staff_only = value
+        if hasattr(self, key) and key not in READ_ONLY_COURSE_TAB_ATTRIBUTES:
+            setattr(self, key, value)
         else:
             raise KeyError('Key {0} cannot be set in tab {1}'.format(key, self.to_json()))
 
@@ -230,6 +238,54 @@ class CourseTab(object):
         return tab_type(tab_dict=tab_dict)
 
 
+class TabFragmentViewMixin(object):
+    """
+    A mixin for tabs that render themselves as web fragments.
+    """
+    fragment_view_name = None
+
+    def __init__(self, tab_dict):
+        super(TabFragmentViewMixin, self).__init__(tab_dict)
+        self._fragment_view = None
+
+    @property
+    def link_func(self):
+        """ Returns a function that returns the course tab's URL. """
+
+        # If a view_name is specified, then use the default link function
+        if self.view_name:
+            return super(TabFragmentViewMixin, self).link_func
+
+        # If not, then use the generic course tab URL
+        def link_func(course, reverse_func):
+            """ Returns a function that returns the course tab's URL. """
+            return reverse_func("course_tab_view", args=[course.id.to_deprecated_string(), self.type])
+
+        return link_func
+
+    @property
+    def url_slug(self):
+        """
+        Returns the slug to be included in this tab's URL.
+        """
+        return "tab/" + self.type
+
+    @property
+    def fragment_view(self):
+        """
+        Returns the view that will be used to render the fragment.
+        """
+        if not self._fragment_view:
+            self._fragment_view = get_storage_class(self.fragment_view_name)()
+        return self._fragment_view
+
+    def render_to_fragment(self, request, course, **kwargs):
+        """
+        Renders this tab to a web fragment.
+        """
+        return self.fragment_view.render_to_fragment(request, course_id=unicode(course.id), **kwargs)
+
+
 class StaticTab(CourseTab):
     """
     A custom tab.
@@ -240,7 +296,7 @@ class StaticTab(CourseTab):
 
     def __init__(self, tab_dict=None, name=None, url_slug=None):
         def link_func(course, reverse_func):
-            """ Returns a url for a given course and reverse function. """
+            """ Returns a function that returns the static tab's URL. """
             return reverse_func(self.type, args=[course.id.to_deprecated_string(), self.url_slug])
 
         self.url_slug = tab_dict.get('url_slug') if tab_dict else url_slug
