@@ -80,11 +80,11 @@ BLOCK_STRUCTURES_SETTINGS = dict(
     # We have CELERY_ALWAYS_EAGER set to True, so there's no asynchronous
     # code running and the celery routing is unimportant.
     # It does not make sense to retry.
-    BLOCK_STRUCTURES_TASK_MAX_RETRIES=0,
+    TASK_MAX_RETRIES=0,
     # course publish task delay is irrelevant is because the task is run synchronously
-    BLOCK_STRUCTURES_COURSE_PUBLISH_TASK_DELAY=0,
+    COURSE_PUBLISH_TASK_DELAY=0,
     # retry delay is irrelevent because we never retry
-    BLOCK_STRUCTURES_TASK_DEFAULT_RETRY_DELAY=0,
+    TASK_DEFAULT_RETRY_DELAY=0,
 )
 
 ###################### Grade Downloads ######################
