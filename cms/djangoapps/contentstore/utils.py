@@ -438,6 +438,20 @@ def get_visibility_partition_info(xblock):
     }
 
 
+def get_xblock_aside_instance(usage_key):
+    """
+    Returns: aside instance of a aside xblock
+    :param usage_key: Usage key of aside xblock
+    """
+    try:
+        descriptor = modulestore().get_item(usage_key.usage_key)
+        for aside in descriptor.runtime.get_asides(descriptor):
+            if aside.scope_ids.block_type == usage_key.aside_type:
+                return aside
+    except ItemNotFoundError:
+        log.warning(u'Unable to load item %s', usage_key.usage_key)
+
+
 def is_self_paced(course):
     """
     Returns True if course is self-paced, False otherwise.
