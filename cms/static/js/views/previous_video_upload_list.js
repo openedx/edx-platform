@@ -27,6 +27,8 @@ define([
                     template: this.loadTemplate('previous-video-upload-list')
                 });
                 this.pagingView.registerSortableColumn('js-video-date-col', gettext('Date Added'), 'created', 'asc');
+                this.pagingView.registerSortableColumn('js-video-name-col', gettext('Name'), 'client_video_id', 'asc');
+                this.pagingView.registerSortableColumn('js-video-duration-col', gettext('Duration'), 'duration', 'asc');
                 this.pagingView.setInitialSortColumn('js-video-date-col')
             },
 

@@ -9,9 +9,19 @@
     <table class="assets-table">
         <thead>
             <tr>
-                <th><%- gettext("Name") %></th>
-                <th><%- gettext("Duration") %></th>
                 <th class="name-col sortable-column">
+                    <span class="column-sort-link" id="js-video-name-col">
+                        <%- gettext("Name") %>
+                        <span class="sr"><%- gettext("- Sortable") %></span>
+                    </span>
+                </th>
+                <th class="duration-col sortable-column">
+                    <span class="column-sort-link" id="js-video-duration-col">
+                        <%- gettext("Duration") %>
+                        <span class="sr"><%- gettext("- Sortable") %></span>
+                    </span>
+                </th>
+                <th class="date-col sortable-column">
                     <span class="column-sort-link" id="js-video-date-col">
                         <%- gettext("Date Added") %>
                         <span class="sr"><%- gettext("- Sortable") %></span>
