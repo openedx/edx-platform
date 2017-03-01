@@ -29,18 +29,115 @@ class TemplateCheckMixin(object):
         return self.q(css='h1.page-header')[0].text.split('\n')[-1]
 
 
-class ExportMixin(object):
+class ImportExportMixin(object):
+    """
+    Mixin for functionality common to both the import and export pages
+    """
+
+    def is_task_list_showing(self):
+        """
+        The task list shows a series of steps being performed during import or
+        export. It is normally hidden until the process begins.
+
+        Tell us whether it's currently visible.
+        """
+        return self.q(css='.wrapper-status').visible
+
+    def is_timestamp_visible(self):
+        """
+        Checks if the UTC timestamp of the last successful import/export is visible
+        """
+        return self.q(css='.item-progresspoint-success-date').visible
+
+    @property
+    def parsed_timestamp(self):
+        """
+        Return python datetime object from the parsed timestamp tuple (date, time)
+        """
+        timestamp = "{0} {1}".format(*self.timestamp)
+        formatted_timestamp = time.strptime(timestamp, "%m/%d/%Y %H:%M")
+        return datetime.fromtimestamp(time.mktime(formatted_timestamp))
+
+    @property
+    def timestamp(self):
+        """
+        The timestamp is displayed on the page as "(MM/DD/YYYY at HH:mm)"
+        It parses the timestamp and returns a (date, time) tuple
+        """
+        string = self.q(css='.item-progresspoint-success-date').text[0]
+
+        return re.match(r'\(([^ ]+).+?(\d{2}:\d{2})', string).groups()
+
+    def wait_for_tasks(self, completed=False, fail_on=None):
+        """
+        Wait for all of the items in the task list to be set to the correct state.
+        """
+        if fail_on:
+            # Makes no sense to include this if the tasks haven't run.
+            completed = True
+
+        state, desc_template = self._task_properties(completed)
+
+        for desc, css_class in self.task_classes.items():
+            desc_text = desc_template.format(desc)
+            # pylint: disable=cell-var-from-loop
+            EmptyPromise(lambda: self.q(css='.{}.{}'.format(css_class, state)).present, desc_text, timeout=30)
+            if fail_on == desc:
+                EmptyPromise(
+                    lambda: self.q(css='.{}.is-complete.has-error'.format(css_class)).present,
+                    "{} checkpoint marked as failed".format(desc),
+                    timeout=30
+                )
+                # The rest should never run.
+                state, desc_template = self._task_properties(False)
+
+    def wait_for_timestamp_visible(self):
+        """
+        Wait for the timestamp of the last successful import/export to be visible.
+        """
+        EmptyPromise(self.is_timestamp_visible, 'Timestamp Visible', timeout=30).fulfill()
+
+    @staticmethod
+    def _task_properties(completed):
+        """
+        Outputs the CSS class and promise description for task states based on completion.
+        """
+        if completed:
+            return 'is-complete', "'{}' is marked complete"
+        else:
+            return 'is-not-started', "'{}' is in not-yet-started status"
+
+
+class ExportMixin(ImportExportMixin):
     """
     Export page Mixin.
     """
 
     url_path = "export"
 
+    task_classes = {
+        'Preparing': 'item-progresspoint-prepare',
+        'Exporting': 'item-progresspoint-export',
+        'Compressing': 'item-progresspoint-compress',
+        'Success': 'item-progresspoint-success'
+    }
+
     def is_browser_on_page(self):
         """
         Verify this is the export page
         """
         return self.q(css='body.view-export').present
+
+    def is_click_handler_registered(self):
+        """
+        Check if the click handler for the export button has been registered yet
+        """
+        script = """
+            var $ = require('jquery'),
+                    buttonEvents = $._data($('a.action-primary')[0], 'events');
+            return buttonEvents && buttonEvents.hasOwnProperty('click');"""
+        stripped_script = ''.join([line.strip() for line in script.split('\n')])
+        return self.browser.execute_script(stripped_script)
 
     def _get_tarball(self, url):
         """
@@ -61,14 +158,13 @@ class ExportMixin(object):
         """
         Downloads the course or library in tarball form.
         """
-        tarball_url = self.q(css='a.action-export').attrs('href')[0]
+        tarball_url = self.q(css='#download-exported-button')[0].get_attribute('href')
         good_status, headers = self._get_tarball(tarball_url)
         return good_status, headers['content-type'] == 'application/x-tgz'
 
     def click_export(self):
         """
-        Click the export button. Should only be used if expected to fail, as
-        otherwise a browser dialog for saving the file will be presented.
+        Click the export button.
         """
         self.q(css='a.action-export').click()
 
@@ -77,6 +173,13 @@ class ExportMixin(object):
         Indicates whether or not the error modal is showing.
         """
         return self.q(css='.prompt.error').visible
+
+    def is_export_finished(self):
+        """
+        Checks if the 'Download Exported Course/Library' button is showing.
+        """
+        button = self.q(css='#download-exported-button')[0]
+        return button.is_displayed() and button.get_attribute('href')
 
     def click_modal_button(self):
         """
@@ -89,6 +192,18 @@ class ExportMixin(object):
         If an import or export has an error, an error modal will be shown.
         """
         EmptyPromise(self.is_error_modal_showing, 'Error Modal Displayed', timeout=30).fulfill()
+
+    def wait_for_export(self):
+        """
+        Wait for the export process to finish.
+        """
+        EmptyPromise(self.is_export_finished, 'Export Finished', timeout=30).fulfill()
+
+    def wait_for_export_click_handler(self):
+        """
+        Wait for the export button click handler to be registered
+        """
+        EmptyPromise(self.is_click_handler_registered, 'Export Button Click Handler Registered', timeout=30).fulfill()
 
 
 class LibraryLoader(object):
@@ -117,37 +232,37 @@ class ExportLibraryPage(ExportMixin, TemplateCheckMixin, LibraryLoader, LibraryP
     """
 
 
-class ImportMixin(object):
+class ImportMixin(ImportExportMixin):
     """
     Import page mixin
     """
 
     url_path = "import"
 
-    @property
-    def timestamp(self):
-        """
-        The timestamp is displayed on the page as "(MM/DD/YYYY at HH:mm)"
-        It parses the timestamp and returns a (date, time) tuple
-        """
-        string = self.q(css='.item-progresspoint-success-date').text[0]
-
-        return re.match(r'\(([^ ]+).+?(\d{2}:\d{2})', string).groups()
-
-    @property
-    def parsed_timestamp(self):
-        """
-        Return python datetime object from the parsed timestamp tuple (date, time)
-        """
-        timestamp = "{0} {1}".format(*self.timestamp)
-        formatted_timestamp = time.strptime(timestamp, "%m/%d/%Y %H:%M")
-        return datetime.fromtimestamp(time.mktime(formatted_timestamp))
+    task_classes = {
+        'Uploading': 'item-progresspoint-upload',
+        'Unpacking': 'item-progresspoint-unpack',
+        'Verifying': 'item-progresspoint-verify',
+        'Updating': 'item-progresspoint-import',
+        'Success': 'item-progresspoint-success'
+    }
 
     def is_browser_on_page(self):
         """
         Verify this is the export page
         """
         return self.q(css='.choose-file-button').present
+
+    def is_click_handler_registered(self):
+        """
+        Check if the click handler for the file selector button has been registered yet
+        """
+        script = """
+            var $ = require('jquery'),
+                    buttonEvents = $._data($('a.choose-file-button')[0], 'events');
+            return buttonEvents && buttonEvents.hasOwnProperty('click');"""
+        stripped_script = ''.join([line.strip() for line in script.split('\n')])
+        return self.browser.execute_script(stripped_script)
 
     @staticmethod
     def file_path(filename):
@@ -196,46 +311,6 @@ class ImportMixin(object):
         """
         return self.q(css='#view-updated-button').visible
 
-    @staticmethod
-    def _task_properties(completed):
-        """
-        Outputs the CSS class and promise description for task states based on completion.
-        """
-        if completed:
-            return 'is-complete', "'{}' is marked complete"
-        else:
-            return 'is-not-started', "'{}' is in not-yet-started status"
-
-    def wait_for_tasks(self, completed=False, fail_on=None):
-        """
-        Wait for all of the items in the task list to be set to the correct state.
-        """
-        classes = {
-            'Uploading': 'item-progresspoint-upload',
-            'Unpacking': 'item-progresspoint-unpack',
-            'Verifying': 'item-progresspoint-verify',
-            'Updating': 'item-progresspoint-import',
-            'Success': 'item-progresspoint-success'
-        }
-        if fail_on:
-            # Makes no sense to include this if the tasks haven't run.
-            completed = True
-
-        state, desc_template = self._task_properties(completed)
-
-        for desc, css_class in classes.items():
-            desc_text = desc_template.format(desc)
-            # pylint: disable=cell-var-from-loop
-            EmptyPromise(lambda: self.q(css='.{}.{}'.format(css_class, state)).present, desc_text, timeout=30)
-            if fail_on == desc:
-                EmptyPromise(
-                    lambda: self.q(css='.{}.is-complete.has-error'.format(css_class)).present,
-                    "{} checkpoint marked as failed".format(desc),
-                    timeout=30
-                )
-                # The rest should never run.
-                state, desc_template = self._task_properties(False)
-
     def wait_for_upload(self):
         """
         Wait for the upload to be confirmed.
@@ -250,26 +325,12 @@ class ImportMixin(object):
         """
         return self.q(css='#fileupload .error-block').visible
 
-    def is_task_list_showing(self):
+    def wait_for_choose_file_click_handler(self):
         """
-        The task list shows a series of steps being performed during import. It is normally
-        hidden until the upload begins.
-
-        Tell us whether it's currently visible.
+        Wait for the choose file button click handler to be registered
         """
-        return self.q(css='.wrapper-status').visible
-
-    def is_timestamp_visible(self):
-        """
-        Checks if the UTC timestamp of the last successful import is visible
-        """
-        return self.q(css='.item-progresspoint-success-date').visible
-
-    def wait_for_timestamp_visible(self):
-        """
-        Wait for the timestamp of the last successful import to be visible.
-        """
-        EmptyPromise(self.is_timestamp_visible, 'Timestamp Visible', timeout=30).fulfill()
+        EmptyPromise(self.is_click_handler_registered, 'Choose File Button Click Handler Registered',
+                     timeout=30).fulfill()
 
     def wait_for_filename_error(self):
         """
