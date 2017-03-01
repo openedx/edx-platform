@@ -58,6 +58,7 @@ from student.models import (
 from student.forms import AccountCreationForm, PasswordResetFormNoActive, get_registration_extension_form
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification  # pylint: disable=import-error
+from lms.djangoapps.ccx.models import CustomCourseForEdX
 from bulk_email.models import Optout, BulkEmailFlag  # pylint: disable=import-error
 from certificates.models import CertificateStatuses, certificate_status_for_student
 from certificates.api import (  # pylint: disable=import-error
@@ -573,9 +574,20 @@ def dashboard(request):
     course_enrollments.sort(key=lambda x: x.created, reverse=True)
 
     # set progress for each course
+    # set author for each course
     for course_enrollment in course_enrollments:
-        course = store.get_course(course_enrollment.course_id)
+        course_id = course_enrollment.course_id
+        course = store.get_course(course_id)
+        # progress
         course_enrollment.course_progress = grades.grade(user, course)
+        # author
+        if "ccx" in str(course_id):
+            ccx_id = int(course.id.ccx)
+            ccx = CustomCourseForEdX.objects.get(pk=ccx_id)
+            author = ccx.coach
+        else:
+            author = User.objects.get(pk=course.published_by)
+        course_enrollment.author = author.get_full_name() if author.get_full_name() else author.username
 
     # Retrieve the course modes for each course
     enrolled_course_ids = [enrollment.course_id for enrollment in course_enrollments]
