@@ -8,7 +8,7 @@ from logging import getLogger
 import json
 
 from lms.djangoapps.course_blocks.transformers.utils import collect_unioned_set_field, get_field_on_block
-from openedx.core.lib.block_structure.transformer import BlockStructureTransformer
+from openedx.core.djangoapps.content.block_structure.transformer import BlockStructureTransformer
 
 
 log = getLogger(__name__)

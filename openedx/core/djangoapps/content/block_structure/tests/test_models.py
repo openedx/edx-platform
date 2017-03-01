@@ -10,9 +10,9 @@ from mock import patch, Mock
 from uuid import uuid4
 
 from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
-from openedx.core.lib.block_structure.exceptions import BlockStructureNotFound
 
 from ..config import PRUNE_OLD_VERSIONS
+from ..exceptions import BlockStructureNotFound
 from ..models import BlockStructureModel
 from .helpers import override_config_setting
 

@@ -4,7 +4,7 @@ API function for retrieving course blocks data
 
 from lms.djangoapps.course_blocks.api import get_course_blocks, COURSE_BLOCK_ACCESS_TRANSFORMERS
 from lms.djangoapps.course_blocks.transformers.hidden_content import HiddenContentTransformer
-from openedx.core.lib.block_structure.transformers import BlockStructureTransformers
+from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
 
 from .transformers.blocks_api import BlocksAPITransformer
 from .transformers.milestones import MilestonesTransformer

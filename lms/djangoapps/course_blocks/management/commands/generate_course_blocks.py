@@ -8,7 +8,7 @@ from xmodule.modulestore.django import modulestore
 
 import openedx.core.djangoapps.content.block_structure.api as api
 import openedx.core.djangoapps.content.block_structure.tasks as tasks
-import openedx.core.lib.block_structure.store as store
+import openedx.core.djangoapps.content.block_structure.store as store
 from openedx.core.lib.command_utils import (
     get_mutually_exclusive_required_option,
     validate_dependent_option,
