@@ -124,6 +124,35 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
 
         self._assert_num_requests(1)
 
+    def test_get_specific_resource_with_falsey_id(self):
+        """
+        Verify that a specific resource can be retrieved, and pagination parsing is
+        not attempted, if the ID passed is falsey (e.g., 0). The expected resource contains
+        a "results" key, as a paginatable item would have, so if the function looks for falsey
+        values in the resource_id field, rather than specifically None, the function will
+        return the value of that "results" key.
+        """
+        catalog_integration = self.create_catalog_integration()
+        api = create_catalog_api_client(self.user, catalog_integration)
+
+        resource_id = 0
+        url = '{api_root}/programs/{resource_id}/'.format(
+            api_root=CatalogIntegration.current().internal_api_url.strip('/'),
+            resource_id=resource_id,
+        )
+
+        expected_resource = {'key': 'value', 'results': []}
+
+        self._mock_catalog_api(
+            [httpretty.Response(body=json.dumps(expected_resource), content_type='application/json')],
+            url=url
+        )
+
+        actual_resource = get_edx_api_data(catalog_integration, self.user, 'programs', api=api, resource_id=resource_id)
+        self.assertEqual(actual_resource, expected_resource)
+
+        self._assert_num_requests(1)
+
     def test_cache_utilization(self):
         """Verify that when enabled, the cache is used."""
         catalog_integration = self.create_catalog_integration(cache_ttl=5)
@@ -209,6 +238,61 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
 
         self.assertTrue(mock_exception.called)
         self.assertEqual(actual, [])
+
+    @mock.patch(UTILITY_MODULE + '.log.warning')
+    def test_api_config_disabled_with_id_and_not_collection(self, mock_warning):
+        """Verify that no data is retrieved if the provided config model is disabled."""
+        catalog_integration = self.create_catalog_integration(enabled=False)
+
+        actual = get_edx_api_data(
+            catalog_integration,
+            self.user,
+            'programs',
+            resource_id=100,
+            many=False,
+        )
+
+        self.assertTrue(mock_warning.called)
+        self.assertEqual(actual, {})
+
+    @mock.patch('edx_rest_api_client.client.EdxRestApiClient.__init__')
+    @mock.patch(UTILITY_MODULE + '.log.exception')
+    def test_client_initialization_failure_with_id(self, mock_exception, mock_init):
+        """Verify that an exception is logged when the API client fails to initialize."""
+        mock_init.side_effect = Exception
+
+        catalog_integration = self.create_catalog_integration()
+
+        actual = get_edx_api_data(
+            catalog_integration,
+            self.user,
+            'programs',
+            resource_id=100,
+            many=False,
+        )
+        self.assertTrue(mock_exception.called)
+        self.assertEqual(actual, {})
+
+    @mock.patch(UTILITY_MODULE + '.log.exception')
+    def test_data_retrieval_failure_with_id(self, mock_exception):
+        """Verify that an exception is logged when data can't be retrieved."""
+        catalog_integration = self.create_catalog_integration()
+        api = create_catalog_api_client(self.user, catalog_integration)
+
+        self._mock_catalog_api(
+            [httpretty.Response(body='clunk', content_type='application/json', status_code=500)]
+        )
+
+        actual = get_edx_api_data(
+            catalog_integration,
+            self.user,
+            'programs',
+            api=api,
+            resource_id=100,
+            many=False,
+        )
+        self.assertTrue(mock_exception.called)
+        self.assertEqual(actual, {})
 
     def test_api_client_not_provided(self):
         """Verify that an API client doesn't need to be provided."""
