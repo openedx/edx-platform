@@ -27,14 +27,22 @@
 
       <div class="site-details">
           <nav class="site-nav" aria-label="${_("About edX")}">
-              % for link in footer["navigation_links"]:
-              <a href="${link['url']}">${link['title']}</a>
-              % endfor
+            <ul class="about-links">
+                % for link in footer["navigation_links"]:
+                <li class="list-item">
+                  <a href="${link['url']}">${link['title']}</a>
+                </li>
+                % endfor
+            </ul>
           </nav>
           <nav class="legal-notices" aria-label="${_("Legal")}">
+            <ul class="legal-links">
               % for link in footer["legal_links"]:
-              <a href="${link['url']}">${link['title']}</a>
+                <li class="list-item">
+                  <a href="${link['url']}">${link['title']}</a>
+                </li>
               % endfor
+            </ul>
           </nav>
           <p class="copyright">${_(
           u"\u00A9 2012-{year} edX Inc.  All rights reserved except where noted.  "
