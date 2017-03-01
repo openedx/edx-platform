@@ -4,6 +4,9 @@ Common utilities for tests in block_structure module
 from contextlib import contextmanager
 from mock import patch
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from uuid import uuid4
+
+from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
 
 from ..block_structure import BlockStructureBlockData
 from ..transformer import BlockStructureTransformer, FilteringTransformerMixin
@@ -115,7 +118,7 @@ class MockModulestoreFactory(object):
     A factory for creating MockModulestore objects.
     """
     @classmethod
-    def create(cls, children_map):
+    def create(cls, children_map, block_key_factory):
         """
         Creates and returns a MockModulestore from the given
         children_map.
@@ -127,7 +130,11 @@ class MockModulestoreFactory(object):
         """
         modulestore = MockModulestore()
         modulestore.set_blocks({
-            block_key: MockXBlock(block_key, children=children, modulestore=modulestore)
+            block_key_factory(block_key): MockXBlock(
+                block_key_factory(block_key),
+                children=[block_key_factory(child) for child in children],
+                modulestore=modulestore,
+            )
             for block_key, children in enumerate(children_map)
         })
         return modulestore
@@ -216,18 +223,26 @@ class ChildrenMapTestMixin(object):
     #  5  6
     DAG_CHILDREN_MAP = [[1, 2], [3], [3, 4], [5, 6], [], [], []]
 
+    def block_key_factory(self, block_id):
+        """
+        Returns a block key object for the given block_id.
+        Override this method if the block_key should be anything
+        different from the index integer values in the Children Maps.
+        """
+        return block_id
+
     def create_block_structure(self, children_map, block_structure_cls=BlockStructureBlockData):
         """
         Factory method for creating and returning a block structure
         for the given children_map.
         """
         # create empty block structure
-        block_structure = block_structure_cls(root_block_usage_key=0)
+        block_structure = block_structure_cls(root_block_usage_key=self.block_key_factory(0))
 
         # _add_relation
         for parent, children in enumerate(children_map):
             for child in children:
-                block_structure._add_relation(parent, child)  # pylint: disable=protected-access
+                block_structure._add_relation(self.block_key_factory(parent), self.block_key_factory(child))  # pylint: disable=protected-access
         return block_structure
 
     def get_parents_map(self, children_map):
@@ -253,8 +268,8 @@ class ChildrenMapTestMixin(object):
 
         for block_key, children in enumerate(children_map):
             # Verify presence
-            self.assertEquals(
-                block_key in block_structure,
+            self.assertEqual(
+                self.block_key_factory(block_key) in block_structure,
                 block_key not in missing_blocks,
                 'Expected presence in block_structure for block_key {} to match absence in missing_blocks.'.format(
                     unicode(block_key)
@@ -263,16 +278,33 @@ class ChildrenMapTestMixin(object):
 
             # Verify children
             if block_key not in missing_blocks:
-                self.assertEquals(
-                    set(block_structure.get_children(block_key)),
-                    set(children),
+                self.assertEqual(
+                    set(block_structure.get_children(self.block_key_factory(block_key))),
+                    set(self.block_key_factory(child) for child in children),
                 )
 
         # Verify parents
         parents_map = self.get_parents_map(children_map)
         for block_key, parents in enumerate(parents_map):
             if block_key not in missing_blocks:
-                self.assertEquals(
-                    set(block_structure.get_parents(block_key)),
-                    set(parents),
+                self.assertEqual(
+                    set(block_structure.get_parents(self.block_key_factory(block_key))),
+                    set(self.block_key_factory(parent) for parent in parents),
                 )
+
+
+class UsageKeyFactoryMixin(object):
+    """
+    Test Mixin that provides a block_key_factory to create OpaqueKey objects
+    for block_ids rather than simple integers. By default, the children maps in
+    ChildrenMapTestMixin use integers for block_ids.
+    """
+    def setUp(self):
+        super(UsageKeyFactoryMixin, self).setUp()
+        self.course_key = CourseLocator('org', 'course', unicode(uuid4()))
+
+    def block_key_factory(self, block_id):
+        """
+        Returns a block key object for the given block_id.
+        """
+        return BlockUsageLocator(course_key=self.course_key, block_type='course', block_id=unicode(block_id))

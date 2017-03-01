@@ -5,7 +5,7 @@ from nose.plugins.attrib import attr
 from unittest import TestCase
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from ..cache import BlockStructureCache
+from ..store import BlockStructureStore
 from ..exceptions import BlockStructureNotFound
 from ..factory import BlockStructureFactory
 from .helpers import (
@@ -21,7 +21,7 @@ class TestBlockStructureFactory(TestCase, ChildrenMapTestMixin):
     def setUp(self):
         super(TestBlockStructureFactory, self).setUp()
         self.children_map = self.SIMPLE_CHILDREN_MAP
-        self.modulestore = MockModulestoreFactory.create(self.children_map)
+        self.modulestore = MockModulestoreFactory.create(self.children_map, self.block_key_factory)
 
     def test_from_modulestore(self):
         block_structure = BlockStructureFactory.create_from_modulestore(
@@ -37,21 +37,21 @@ class TestBlockStructureFactory(TestCase, ChildrenMapTestMixin):
             )
 
     def test_from_cache(self):
-        cache = BlockStructureCache(MockCache())
+        store = BlockStructureStore(MockCache())
         block_structure = self.create_block_structure(self.children_map)
-        cache.add(block_structure)
-        from_cache_block_structure = BlockStructureFactory.create_from_cache(
+        store.add(block_structure)
+        from_cache_block_structure = BlockStructureFactory.create_from_store(
             block_structure.root_block_usage_key,
-            cache,
+            store,
         )
         self.assert_block_structure(from_cache_block_structure, self.children_map)
 
     def test_from_cache_none(self):
-        cache = BlockStructureCache(MockCache())
+        store = BlockStructureStore(MockCache())
         with self.assertRaises(BlockStructureNotFound):
-            BlockStructureFactory.create_from_cache(
+            BlockStructureFactory.create_from_store(
                 root_block_usage_key=0,
-                block_structure_cache=cache,
+                block_structure_store=store,
             )
 
     def test_new(self):
