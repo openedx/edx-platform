@@ -142,8 +142,10 @@ class SiteConfiguration(models.Model):
             domain_without_port_number))
         with open(output_path, 'w') as f:
             f.write(css_output.encode('utf-8'))
+            os.chmod(output_path, 0777)
         with open(collected_output_path, 'w') as f:
             f.write(css_output.encode('utf-8'))
+            os.chmod(collected_output_path, 0777)
 
     def collect_css_file(self):
         path = self.values.get('css_overrides_file')
