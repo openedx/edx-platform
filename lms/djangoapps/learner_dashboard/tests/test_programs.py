@@ -121,7 +121,7 @@ class TestProgramListing(ProgramsApiConfigMixin, CredentialsApiConfigMixin, Shar
         """
         Verify that the page 404s if disabled.
         """
-        self.create_programs_config(program_listing_enabled=False)
+        self.create_programs_config(enabled=False)
 
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 404)
@@ -294,7 +294,7 @@ class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, Shared
         """
         Verify that the page 404s if disabled.
         """
-        self.create_programs_config(program_details_enabled=False)
+        self.create_programs_config(enabled=False)
 
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 404)
