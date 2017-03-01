@@ -1805,13 +1805,18 @@ BLOCK_STRUCTURES_SETTINGS = dict(
     # for a better chance at getting the latest changes when there
     # are secondary reads in sharded mongoDB clusters. See TNL-5041
     # for more info.
-    BLOCK_STRUCTURES_COURSE_PUBLISH_TASK_DELAY=30,
+    COURSE_PUBLISH_TASK_DELAY=30,
 
     # Delay, in seconds, between retry attempts if a task fails.
-    BLOCK_STRUCTURES_TASK_DEFAULT_RETRY_DELAY=30,
+    TASK_DEFAULT_RETRY_DELAY=30,
 
     # Maximum number of retries per task.
-    BLOCK_STRUCTURES_TASK_MAX_RETRIES=5,
+    TASK_MAX_RETRIES=5,
+
+    # Backend storage
+    # STORAGE_CLASS='storages.backends.s3boto.S3BotoStorage',
+    # STORAGE_KWARGS=dict(bucket='nim-beryl-test'),
+    # DIRECTORY_PREFIX='/modeltest/',
 )
 
 ################################ Bulk Email ###################################
