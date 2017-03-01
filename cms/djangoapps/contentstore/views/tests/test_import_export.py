@@ -531,6 +531,7 @@ class ExportTestCase(CourseTestCase):
         """
         super(ExportTestCase, self).setUp()
         self.url = reverse_course_url('export_handler', self.course.id)
+        self.status_url = reverse_course_url('export_status_handler', self.course.id)
 
     def test_export_html(self):
         """
@@ -546,6 +547,21 @@ class ExportTestCase(CourseTestCase):
         """
         resp = self.client.get(self.url, HTTP_ACCEPT='application/json')
         self.assertEquals(resp.status_code, 406)
+
+    def test_export_async(self):
+        """
+        Get tar.gz file, using asynchronous background task
+        """
+        resp = self.client.post(self.url)
+        self.assertEquals(resp.status_code, 200)
+        resp = self.client.get(self.status_url)
+        result = json.loads(resp.content)
+        status = result['ExportStatus']
+        self.assertEquals(status, 3)
+        self.assertIn('ExportOutput', result)
+        output_url = result['ExportOutput']
+        resp = self.client.get(output_url)
+        self._verify_export_succeeded(resp)
 
     def test_export_targz(self):
         """
@@ -588,11 +604,16 @@ class ExportTestCase(CourseTestCase):
 
     def _verify_export_failure(self, expected_text):
         """ Export failure helper method. """
-        resp = self.client.get(self.url, HTTP_ACCEPT='application/x-tgz')
+        resp = self.client.post(self.url)
         self.assertEquals(resp.status_code, 200)
-        self.assertIsNone(resp.get('Content-Disposition'))
-        self.assertContains(resp, 'Unable to create xml for module')
-        self.assertContains(resp, expected_text)
+        resp = self.client.get(self.status_url)
+        self.assertEquals(resp.status_code, 200)
+        result = json.loads(resp.content)
+        self.assertNotIn('ExportOutput', result)
+        self.assertIn('ExportError', result)
+        error = result['ExportError']
+        self.assertIn('Unable to create xml for module', error['raw_error_msg'])
+        self.assertIn(expected_text, error['edit_unit_url'])
 
     def test_library_export(self):
         """
@@ -639,7 +660,7 @@ class ExportTestCase(CourseTestCase):
             data=xml_string
         )
 
-        self.test_export_targz_urlparam()
+        self.test_export_async()
 
     @ddt.data(
         '/export/non.1/existence_1/Run_1',  # For mongo
