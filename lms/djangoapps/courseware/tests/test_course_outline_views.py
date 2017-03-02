@@ -5,12 +5,13 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 
 from student.models import CourseEnrollment
+from student.tests.factories import UserFactory
 
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
 
-class TestCourseOutlineView(SharedModuleStoreTestCase):
+class TestCourseOutlinePage(SharedModuleStoreTestCase):
     """
     Test the new course outline view.
     """
@@ -19,7 +20,7 @@ class TestCourseOutlineView(SharedModuleStoreTestCase):
         """Set up the simplest course possible."""
         # setUpClassAndTestData() already calls setUpClass on SharedModuleStoreTestCase
         # pylint: disable=super-method-not-called
-        with super(TestCourseOutlineView, cls).setUpClassAndTestData():
+        with super(TestCourseOutlinePage, cls).setUpClassAndTestData():
             cls.course = CourseFactory.create()
             with cls.store.bulk_operations(cls.course.id):
                 cls.chapter = ItemFactory.create(category='chapter', parent_location=cls.course.location)
@@ -44,4 +45,8 @@ class TestCourseOutlineView(SharedModuleStoreTestCase):
             }
         )
         response = self.client.get(url)
-        self.assertEqual(response.code, 200)
+        self.assertEqual(response.status_code, 200)
+        response_content = response.content.decode("utf-8")
+        self.assertIn(self.chapter.display_name, response_content)
+        self.assertIn(self.section.display_name, response_content)
+        self.assertNotIn(self.vertical.display_name, response_content)
