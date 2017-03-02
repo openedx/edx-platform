@@ -73,6 +73,7 @@ class RegistrationSerializer(serializers.Serializer):
         site_configuration = site.configuration
         initial_values = validated_data.get('initial_values', {})
         if initial_values:
+            site_configuration.values['SITE_NAME'] = site.domain
             site_configuration.values['platform_name'] = initial_values.get('platform_name')
             site_configuration.values['logo_positive'] = initial_values.get('logo_positive')
             site_configuration.values['logo_negative'] = initial_values.get('logo_negative')
