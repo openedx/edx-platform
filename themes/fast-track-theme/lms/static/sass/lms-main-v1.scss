@@ -1,0 +1,13 @@
+@import 'lms/static/sass/lms-main-v1';
+
+/**
+*   HEADER ADJUSTMENT
+**/
+
+.header-global {
+  h1.logo {
+    img {
+      max-height: 50px;
+    }
+  }
+}
