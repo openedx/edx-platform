@@ -13,6 +13,7 @@ from ..api import get_cache
 from ..block_structure import BlockStructureBlockData
 from ..config import _bs_waffle_switch_name
 from ..exceptions import BlockStructureNotFound
+from ..models import BlockStructureModel
 from ..store import BlockStructureStore
 from ..transformer import BlockStructureTransformer, FilteringTransformerMixin
 from ..transformer_registry import TransformerRegistry
@@ -25,6 +26,18 @@ def is_course_in_block_structure_cache(course_key, store):
     course_usage_key = store.make_course_usage_key(course_key)
     try:
         BlockStructureStore(get_cache()).get(course_usage_key)
+        return True
+    except BlockStructureNotFound:
+        return False
+
+
+def is_course_in_block_structure_storage(course_key, store):
+    """
+    Returns whether the given course is in Block Structure storage.
+    """
+    course_usage_key = store.make_course_usage_key(course_key)
+    try:
+        BlockStructureModel.get(course_usage_key)
         return True
     except BlockStructureNotFound:
         return False
