@@ -145,7 +145,7 @@ class TestUserTaskStopped(APITestCase):
             platform_name=settings.PLATFORM_NAME, studio_name=settings.STUDIO_NAME
         )
         body_fragments = [
-            "Your {task_name} task has completed with the status".format(task_name=self.status.name),
+            "Your {task_name} task has completed with the status".format(task_name=self.status.name.lower()),
             "https://test.edx.org/",
             reverse('usertaskstatus-detail', args=[self.status.uuid])
         ]
@@ -182,7 +182,7 @@ class TestUserTaskStopped(APITestCase):
             platform_name=settings.PLATFORM_NAME, studio_name=settings.STUDIO_NAME
         )
         fragments = [
-            "Your {task_name} task has completed with the status".format(task_name=self.status.name),
+            "Your {task_name} task has completed with the status".format(task_name=self.status.name.lower()),
             "Sign in to view the details of your task or download any files created."
         ]
 

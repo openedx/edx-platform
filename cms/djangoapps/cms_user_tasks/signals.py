@@ -1,6 +1,7 @@
 """
 Receivers of signals sent from django-user-tasks
 """
+import logging
 from urlparse import urljoin
 
 from django.core.urlresolvers import reverse
@@ -42,4 +43,8 @@ def user_task_stopped_handler(sender, **kwargs):  # pylint: disable=unused-argum
                 reverse('usertaskstatus-detail', args=[status.uuid])
             )
 
-        send_task_complete_email.delay(status.name, status.state_text, status.user.email, detail_url)
+        try:
+            # Need to str state_text here because it is a proxy object and won't serialize correctly
+            send_task_complete_email.delay(status.name.lower(), str(status.state_text), status.user.email, detail_url)
+        except Exception as e:  # pylint: disable=broad-except
+            logging.exception("Unable to queue send_task_complete_email")
