@@ -1,15 +1,11 @@
 (function(undefined) {
     'use strict';
-    describe('VideoPlayer Events plugin', function() {
-        var state, oldOTBD, Logger = window.Logger;
+    var multiDescribe, state, oldOTBD;
+
+    multiDescribe = new jasmine.MultiDescribe('', function() {
+        var Logger = window.Logger;
 
         beforeEach(function() {
-            oldOTBD = window.onTouchBasedDevice;
-            window.onTouchBasedDevice = jasmine
-                .createSpy('onTouchBasedDevice')
-                .and.returnValue(null);
-
-            state = jasmine.initializePlayer();
             spyOn(Logger, 'log');
             spyOn(state.videoEventsPlugin, 'getCurrentTime').and.returnValue(10);
         });
@@ -27,7 +23,7 @@
             state.el.trigger('ready');
             expect(Logger.log).toHaveBeenCalledWith('load_video', {
                 id: 'id',
-                code: 'html5'
+                code: this.code
             });
         });
 
@@ -36,7 +32,7 @@
             state.el.trigger('play');
             expect(Logger.log).toHaveBeenCalledWith('play_video', {
                 id: 'id',
-                code: 'html5',
+                code: this.code,
                 currentTime: 10
             });
             expect(state.videoEventsPlugin.emitPlayVideoEvent).toBeFalsy();
@@ -52,7 +48,7 @@
             state.el.trigger('pause');
             expect(Logger.log).toHaveBeenCalledWith('pause_video', {
                 id: 'id',
-                code: 'html5',
+                code: this.code,
                 currentTime: 10
             });
             expect(state.videoEventsPlugin.emitPlayVideoEvent).toBeTruthy();
@@ -62,7 +58,7 @@
             state.el.trigger('speedchange', ['2.0', '1.0']);
             expect(Logger.log).toHaveBeenCalledWith('speed_change_video', {
                 id: 'id',
-                code: 'html5',
+                code: this.code,
                 current_time: 10,
                 old_speed: '1.0',
                 new_speed: '2.0'
@@ -73,7 +69,7 @@
             state.el.trigger('seek', [1, 0, 'any']);
             expect(Logger.log).toHaveBeenCalledWith('seek_video', {
                 id: 'id',
-                code: 'html5',
+                code: this.code,
                 old_time: 0,
                 new_time: 1,
                 type: 'any'
@@ -91,7 +87,7 @@
             state.el.trigger('ended');
             expect(Logger.log).toHaveBeenCalledWith('stop_video', {
                 id: 'id',
-                code: 'html5',
+                code: this.code,
                 currentTime: 10
             });
             expect(state.videoEventsPlugin.emitPlayVideoEvent).toBeTruthy();
@@ -100,7 +96,7 @@
             state.el.trigger('stop');
             expect(Logger.log).toHaveBeenCalledWith('stop_video', {
                 id: 'id',
-                code: 'html5',
+                code: this.code,
                 currentTime: 10
             });
             expect(state.videoEventsPlugin.emitPlayVideoEvent).toBeTruthy();
@@ -110,7 +106,7 @@
             state.el.trigger('skip', [false]);
             expect(Logger.log).toHaveBeenCalledWith('skip_video', {
                 id: 'id',
-                code: 'html5',
+                code: this.code,
                 currentTime: 10
             });
         });
@@ -119,7 +115,7 @@
             state.el.trigger('skip', [true]);
             expect(Logger.log).toHaveBeenCalledWith('do_not_show_again_video', {
                 id: 'id',
-                code: 'html5',
+                code: this.code,
                 currentTime: 10
             });
         });
@@ -128,7 +124,7 @@
             state.el.trigger('language_menu:show');
             expect(Logger.log).toHaveBeenCalledWith('edx.video.language_menu.shown', {
                 id: 'id',
-                code: 'html5'
+                code: this.code
             });
         });
 
@@ -136,7 +132,7 @@
             state.el.trigger('language_menu:hide');
             expect(Logger.log).toHaveBeenCalledWith('edx.video.language_menu.hidden', {
                 id: 'id',
-                code: 'html5',
+                code: this.code,
                 language: 'en'
             });
         });
@@ -145,7 +141,7 @@
             state.el.trigger('transcript:show');
             expect(Logger.log).toHaveBeenCalledWith('show_transcript', {
                 id: 'id',
-                code: 'html5',
+                code: this.code,
                 current_time: 10
             });
         });
@@ -154,7 +150,7 @@
             state.el.trigger('transcript:hide');
             expect(Logger.log).toHaveBeenCalledWith('hide_transcript', {
                 id: 'id',
-                code: 'html5',
+                code: this.code,
                 current_time: 10
             });
         });
@@ -163,7 +159,7 @@
             state.el.trigger('captions:show');
             expect(Logger.log).toHaveBeenCalledWith('edx.video.closed_captions.shown', {
                 id: 'id',
-                code: 'html5',
+                code: this.code,
                 current_time: 10
             });
         });
@@ -172,7 +168,7 @@
             state.el.trigger('captions:hide');
             expect(Logger.log).toHaveBeenCalledWith('edx.video.closed_captions.hidden', {
                 id: 'id',
-                code: 'html5',
+                code: this.code,
                 current_time: 10
             });
         });
@@ -198,6 +194,33 @@
                 'captions:hide': plugin.onHideCaptions,
                 'destroy': plugin.destroy
             });
+        });
+    });
+
+    describe('VideoPlayer Events plugin', function() {
+        beforeEach(function() {
+            oldOTBD = window.onTouchBasedDevice;
+            window.onTouchBasedDevice = jasmine
+                .createSpy('onTouchBasedDevice')
+                .and.returnValue(null);
+        });
+
+        describe('non-hls encoding', function() {
+            beforeEach(function(done) {
+                this.code = 'html5';
+                state = jasmine.initializePlayer('video_html5.html');
+                done();
+            });
+            jasmine.getEnv().describe(multiDescribe.description, multiDescribe.specDefinitions);
+        });
+
+        describe('hls encoding', function() {
+            beforeEach(function(done) {
+                this.code = 'HLS';
+                state = jasmine.initializeHLSPlayer();
+                done();
+            });
+            jasmine.getEnv().describe(multiDescribe.description, multiDescribe.specDefinitions);
         });
     });
 }).call(this);

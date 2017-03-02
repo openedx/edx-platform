@@ -26,6 +26,9 @@ from openedx.core.djangolib.js_utils import js_escaped_string
           <div class="video-player">
               <div id="${id}"></div>
               <h4 class="hd hd-4 video-error is-hidden">${_('No playable video sources found.')}</h4>
+              <h4 class="hd hd-4 video-error hls-video is-hidden">
+                  ${_('This browser can not play HLS videos. Try using a different browser, such as Google Chrome.')}
+                </h4>
           </div>
           <div class="video-player-post"></div>
           <div class="closed-captions"></div>
@@ -39,7 +42,7 @@ from openedx.core.djangolib.js_utils import js_escaped_string
     </div>
 
     <div class="focus_grabber last"></div>
-    
+
     % if download_video_link or track or handout or branding_info:
     <h3 class="hd hd-4 downloads-heading sr" id="video-download-transcripts_${id}">${_('Downloads and transcripts')}</h3>
     <div class="wrapper-downloads" role="region" aria-labelledby="video-download-transcripts_${id}">

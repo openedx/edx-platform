@@ -103,7 +103,7 @@ function(HTML5Video, HTML5HLSVideo, Resizer, HLS, _) {
     //     have to do repeated jQuery element selects.
     // eslint-disable-next-line no-underscore-dangle
     function _initialize(state) {
-        var youTubeId, player, userAgent, commonConfig, eventToBeTriggered;
+        var youTubeId, player, userAgent, commonConfig, eventToBeTriggered = 'loadedmetadata';
 
         // The function is called just once to apply pre-defined configurations
         // by student before video starts playing. Waits until the video's
@@ -152,6 +152,7 @@ function(HTML5Video, HTML5HLSVideo, Resizer, HLS, _) {
         // Browser can play HLS videos if either `Media Source Extensions`
         // feature is supported or browser is safari (native HLS support)
         state.canPlayHLS = state.HLSVideoSources.length > 0 && (HLS.isSupported() || state.browserIsSafari);
+        state.HLSOnlySources = _.difference(state.config.sources, state.HLSVideoSources).length === 0;
 
         commonConfig = {
             playerVars: state.videoPlayer.playerVars,
@@ -165,15 +166,20 @@ function(HTML5Video, HTML5HLSVideo, Resizer, HLS, _) {
         };
 
         if (state.videoType === 'html5') {
-            if (state.canPlayHLS) {
+            if (state.canPlayHLS || state.HLSOnlySources) {
                 state.videoPlayer.player = new HTML5HLSVideo.Player(
                     state.el,
-                    _.extend({}, commonConfig, {videoSources: state.HLSVideoSources})
+                    _.extend({}, commonConfig, {
+                        videoSources: state.HLSVideoSources,
+                        canPlayHLS: state.canPlayHLS,
+                        HLSOnlySources: state.HLSOnlySources
+                    })
                 );
-                eventToBeTriggered = 'loadeddata';
+                // `loadedmetadata` event triggered too early on Safari due
+                // to which correct video dimensions were not calculated
+                eventToBeTriggered = state.browserIsSafari ? 'loadeddata' : eventToBeTriggered;
             } else {
                 state.videoPlayer.player = new HTML5Video.Player(state.el, commonConfig);
-                eventToBeTriggered = 'loadedmetadata';
             }
             player = state.videoEl = state.videoPlayer.player.videoEl;
             player[0].addEventListener(eventToBeTriggered, state.videoPlayer.onLoadMetadataHtml5, false);
@@ -339,6 +345,9 @@ function(HTML5Video, HTML5HLSVideo, Resizer, HLS, _) {
         }
         if (player && _.isFunction(player.destroy)) {
             player.destroy();
+        }
+        if (this.canPlayHLS && player.hls) {
+            player.hls.destroy();
         }
         delete this.videoPlayer;
     }

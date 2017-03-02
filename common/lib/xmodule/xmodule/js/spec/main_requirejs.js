@@ -39,8 +39,13 @@
             'edx-ui-toolkit': 'common_static/edx-ui-toolkit',
             hls: 'common_static/common/js/vendor/hls'
         },
-        'moment': {
-            exports: 'moment'
+        shim: {
+            moment: {
+                exports: 'moment'
+            },
+            hls: {
+                exports: 'Hls'
+            }
         }
     });
 }).call(this, RequireJS.requirejs, RequireJS.define);

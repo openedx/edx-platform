@@ -1,7 +1,10 @@
 (function(undefined) {
     describe('Video HTML5Video', function() {
         var STATUS = window.STATUS;
-        var state, oldOTBD, playbackRates = [0.75, 1.0, 1.25, 1.5];
+        var state,
+            oldOTBD,
+            playbackRates = [0.75, 1.0, 1.25, 1.5],
+            multiDescribe;
 
         beforeEach(function() {
             oldOTBD = window.onTouchBasedDevice;
@@ -17,10 +20,8 @@
             window.onTouchBasedDevice = oldOTBD;
         });
 
-        describe('on non-Touch devices', function() {
+        multiDescribe = new jasmine.MultiDescribe('on non-Touch devices ', function() {
             beforeEach(function() {
-                state = jasmine.initializePlayer('video_html5.html');
-
                 state.videoPlayer.player.config.events.onReady = jasmine.createSpy('onReady');
             });
 
@@ -319,6 +320,22 @@
                     }).done(done);
                 });
             });
+        });
+
+        describe('non-hls encoding', function() {
+            beforeEach(function(done) {
+                state = jasmine.initializePlayer('video_html5.html');
+                done();
+            });
+            jasmine.getEnv().describe(multiDescribe.description, multiDescribe.specDefinitions);
+        });
+
+        describe('hls encoding', function() {
+            beforeEach(function(done) {
+                state = jasmine.initializeHLSPlayer();
+                done();
+            });
+            jasmine.getEnv().describe(multiDescribe.description, multiDescribe.specDefinitions);
         });
 
         it('native controls are used on  iPhone', function() {

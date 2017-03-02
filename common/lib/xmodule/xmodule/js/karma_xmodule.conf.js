@@ -78,7 +78,8 @@ var options = {
     ],
 
     fixtureFiles: [
-        {pattern: 'fixtures/*.*'}
+        {pattern: 'fixtures/*.*'},
+        {pattern: 'fixtures/hls/**/*.*', included: false}
     ],
 
     runFiles: [

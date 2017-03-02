@@ -264,8 +264,17 @@
         return state;
     };
 
+    jasmine.initializeHLSPlayer = function(fixture, params) {
+        return jasmine.initializePlayer('video_hls.html', params);
+    };
+
     jasmine.initializePlayerYouTube = function(params) {
         // "video.html" contains HTML template for a YouTube video.
         return jasmine.initializePlayer('video.html', params);
+    };
+
+    jasmine.MultiDescribe = function(description, specDefinitions) {
+        this.description = description;
+        this.specDefinitions = specDefinitions;
     };
 }).call(this);
