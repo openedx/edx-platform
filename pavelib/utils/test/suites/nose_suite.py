@@ -152,7 +152,6 @@ class SystemTestSuite(NoseTestSuite):
             self.extra_args,
             '--xunitmp-file={}'.format(self.report_dir / "nosetests.xml"),
             '--with-database-isolation',
-            #'--stop'
         ]
 
         if self.processes != 0:
