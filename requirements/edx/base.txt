@@ -208,9 +208,5 @@ py2neo==3.1.2
 # for calculating coverage
 -r coverage.txt
 
-# Support for plugins
-web-fragments==0.2.1
-xblock==0.4.14
-
 # Third Party XBlocks
 edx-sga==0.6.2
