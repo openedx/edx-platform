@@ -101,6 +101,36 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
 
         self._assert_num_requests(len(expected_collection))
 
+    def test_get_paginated_data_do_not_traverse_pagination(self):
+        """
+        Verify that pagination is not traversed if traverse_pagination=False is passed as argument.
+        """
+        catalog_integration = self.create_catalog_integration()
+        api = create_catalog_api_client(self.user, catalog_integration)
+
+        url = CatalogIntegration.current().internal_api_url.strip('/') + '/programs/?page={}'
+        responses = [
+            {
+                'next': url.format(2),
+                'results': ['some'],
+            },
+            {
+                'next': url.format(None),
+                'results': ['test'],
+            },
+        ]
+        expected_response = responses[0]
+
+        self._mock_catalog_api(
+            [httpretty.Response(body=json.dumps(body), content_type='application/json') for body in responses]
+        )
+
+        actual_collection = get_edx_api_data(
+            catalog_integration, self.user, 'programs', api=api, traverse_pagination=False,
+        )
+        self.assertEqual(actual_collection, expected_response)
+        self._assert_num_requests(1)
+
     def test_get_specific_resource(self):
         """Verify that a specific resource can be retrieved."""
         catalog_integration = self.create_catalog_integration()
