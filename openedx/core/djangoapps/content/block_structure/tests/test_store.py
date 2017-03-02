@@ -4,14 +4,13 @@ Tests for block_structure/cache.py
 import ddt
 from nose.plugins.attrib import attr
 
-from openedx.core.djangoapps.content.block_structure.config import STORAGE_BACKING_FOR_CACHE
-from openedx.core.djangoapps.content.block_structure.config.models import BlockStructureConfiguration
-from openedx.core.djangoapps.content.block_structure.tests.helpers import override_config_setting
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 
-from ..store import BlockStructureStore
+from ..config import STORAGE_BACKING_FOR_CACHE
+from ..config.models import BlockStructureConfiguration
 from ..exceptions import BlockStructureNotFound
-from .helpers import ChildrenMapTestMixin, UsageKeyFactoryMixin, MockCache, MockTransformer
+from ..store import BlockStructureStore
+from .helpers import ChildrenMapTestMixin, UsageKeyFactoryMixin, MockCache, MockTransformer, override_config_setting
 
 
 @attr(shard=2)

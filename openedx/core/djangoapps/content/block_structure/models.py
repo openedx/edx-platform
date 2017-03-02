@@ -10,10 +10,10 @@ from logging import getLogger
 
 from model_utils.models import TimeStampedModel
 from openedx.core.djangoapps.xmodule_django.models import UsageKeyField
-from openedx.core.lib.block_structure.exceptions import BlockStructureNotFound
 from openedx.core.storage import get_storage
 
-import openedx.core.djangoapps.content.block_structure.config as config
+from . import config
+from .exceptions import BlockStructureNotFound
 
 
 log = getLogger(__name__)

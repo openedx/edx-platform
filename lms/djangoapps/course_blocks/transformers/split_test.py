@@ -1,7 +1,10 @@
 """
 Split Test Block Transformer
 """
-from openedx.core.lib.block_structure.transformer import BlockStructureTransformer, FilteringTransformerMixin
+from openedx.core.djangoapps.content.block_structure.transformer import (
+    BlockStructureTransformer,
+    FilteringTransformerMixin,
+)
 
 
 class SplitTestTransformer(FilteringTransformerMixin, BlockStructureTransformer):

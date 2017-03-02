@@ -1,7 +1,10 @@
 """
 User Partitions Transformer
 """
-from openedx.core.lib.block_structure.transformer import BlockStructureTransformer, FilteringTransformerMixin
+from openedx.core.djangoapps.content.block_structure.transformer import (
+    BlockStructureTransformer,
+    FilteringTransformerMixin,
+)
 
 from .split_test import SplitTestTransformer
 from .utils import get_field_on_block

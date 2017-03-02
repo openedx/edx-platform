@@ -2,8 +2,9 @@
 Higher order functions built on the BlockStructureManager to interact with a django cache.
 """
 from django.core.cache import cache
-from openedx.core.lib.block_structure.manager import BlockStructureManager
 from xmodule.modulestore.django import modulestore
+
+from .manager import BlockStructureManager
 
 
 def get_course_in_cache(course_key):
