@@ -2413,9 +2413,6 @@ def reactivation_email_for_user(user):
 
     try:
         user.email_user(subject, message, from_address)
-            'email_from_address',
-            settings.DEFAULT_FROM_EMAIL,
-        ))
     except Exception:  # pylint: disable=broad-except
         log.error(
             u'Unable to send reactivation email from "%s" to "%s"',
