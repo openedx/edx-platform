@@ -28,7 +28,6 @@ MICROSITE_BACKEND = 'microsite_configuration.backends.database.DatabaseMicrosite
 
 INSTALLED_APPS += (
     'django_extensions',
-    'appsembler',
     'openedx.core.djangoapps.appsembler.sites',
 )
 
