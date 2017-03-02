@@ -1647,7 +1647,7 @@ class UnifiedCourseView(View):
         course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
 
         # Render the outline as a fragment
-        outline_fragment = CourseOutlineFragmentView().render_fragment(request, course_id=course_id)
+        outline_fragment = CourseOutlineFragmentView().render_to_fragment(request, course_id=course_id)
 
         # Render the entire unified course view
         context = {
@@ -1680,7 +1680,7 @@ class CourseOutlineFragmentView(FragmentView):
 
         return block
 
-    def render_fragment(self, request, course_id=None, **kwargs):
+    def render_to_fragment(self, request, course_id=None, **kwargs):
         """
         Renders the course outline as a fragment.
         """
