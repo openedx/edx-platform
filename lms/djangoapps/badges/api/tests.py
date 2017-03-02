@@ -22,6 +22,13 @@ class UserAssertionTestCase(UrlResetMixin, ModuleStoreTestCase, ApiTestCase):
     """
     Mixin for badge API tests.
     """
+    URLS_AUTO_RESET = False
+
+    @classmethod
+    def setUpClass(cls):
+        """Reset the URLs to enable Badges views."""
+        super(UserAssertionTestCase, cls).setUpClass()
+        cls.reset_urls()
 
     def setUp(self, *args, **kwargs):
         super(UserAssertionTestCase, self).setUp(*args, **kwargs)

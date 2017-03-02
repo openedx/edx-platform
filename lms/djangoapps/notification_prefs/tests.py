@@ -9,15 +9,15 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from mock import Mock, patch
 
+from django_comment_client.tests.utils import ForumUrlResetMixin
 from notification_prefs import NOTIFICATION_PREF_KEY
 from notification_prefs.views import ajax_enable, ajax_disable, ajax_status, set_subscription, UsernameCipher
 from student.tests.factories import UserFactory
 from openedx.core.djangoapps.user_api.models import UserPreference
-from util.testing import UrlResetMixin
 
 
 @override_settings(SECRET_KEY="test secret key")
-class NotificationPrefViewTest(UrlResetMixin, TestCase):
+class NotificationPrefViewTest(ForumUrlResetMixin, TestCase):
     INITIALIZATION_VECTOR = "\x00" * 16
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})

@@ -35,6 +35,21 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase):
         (COURSE_ID_SPLIT, CourseLocator.from_string(COURSE_ID_SPLIT)),
     )
 
+    URLS_AUTO_RESET = False
+
+    @classmethod
+    def setUpClass(cls):
+        """Reset the URLs to include AUTO_AUTH views."""
+        super(AutoAuthEnabledTestCase, cls).setUpClass()
+        with patch.dict("django.conf.settings.FEATURES", {"AUTOMATIC_AUTH_FOR_TESTING": True}):
+            cls.reset_urls()
+
+    @classmethod
+    def tearDownClass(cls):
+        """Reset the URLs to the default."""
+        super(AutoAuthEnabledTestCase, cls).tearDownClass()
+        cls.reset_urls()
+
     @patch.dict("django.conf.settings.FEATURES", {"AUTOMATIC_AUTH_FOR_TESTING": True})
     def setUp(self):
         # Patching the settings.FEATURES['AUTOMATIC_AUTH_FOR_TESTING']

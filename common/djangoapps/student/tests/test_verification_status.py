@@ -20,7 +20,7 @@ from student.helpers import (
 )
 
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.verify_student.models import VerificationDeadline, SoftwareSecurePhotoVerification
@@ -31,20 +31,27 @@ from util.testing import UrlResetMixin
 @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt
-class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
+class TestCourseVerificationStatus(UrlResetMixin, SharedModuleStoreTestCase):
     """Tests for per-course verification status on the dashboard. """
 
     PAST = datetime.now(UTC) - timedelta(days=5)
     FUTURE = datetime.now(UTC) + timedelta(days=5)
 
     URLCONF_MODULES = ['verify_student.urls']
+    URLS_AUTO_RESET = False
+
+    @classmethod
+    def setUpClass(cls):
+        """Reset the URLs to disable ENABLE_COMBINED_LOGIN_REGISTRATION views."""
+        super(TestCourseVerificationStatus, cls).setUpClass()
+        cls.course = CourseFactory.create()
+        cls.reset_urls()
 
     def setUp(self):
         # Invoke UrlResetMixin
         super(TestCourseVerificationStatus, self).setUp()
 
         self.user = UserFactory(password="edx")
-        self.course = CourseFactory.create()
         success = self.client.login(username=self.user.username, password="edx")
         self.assertTrue(success, msg="Did not log in successfully")
         self.dashboard_url = reverse('dashboard')

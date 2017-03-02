@@ -105,6 +105,20 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
     TOMORROW = NOW + timedelta(days=1)
 
     URLCONF_MODULES = ['openedx.core.djangoapps.embargo']
+    URLS_AUTO_RESET = False
+
+    @classmethod
+    def setUpClass(cls):
+        """Reset the URLs to turn on Forums views."""
+        super(TestPayAndVerifyView, cls).setUpClass()
+        with mock.patch.dict("django.conf.settings.FEATURES", {'EMBARGO': True}):
+            cls.reset_urls()
+
+    @classmethod
+    def tearDownClass(cls):
+        """Reset the URLs to the default."""
+        super(TestPayAndVerifyView, cls).tearDownClass()
+        cls.reset_urls()
 
     @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):

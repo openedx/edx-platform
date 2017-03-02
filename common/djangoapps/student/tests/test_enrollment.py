@@ -33,12 +33,20 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
     EMAIL = "bob@example.com"
     PASSWORD = "edx"
     URLCONF_MODULES = ['openedx.core.djangoapps.embargo']
+    URLS_AUTO_RESET = False
 
     @classmethod
     def setUpClass(cls):
         super(EnrollmentTest, cls).setUpClass()
         cls.course = CourseFactory.create()
         cls.course_limited = CourseFactory.create()
+        with patch.dict(settings.FEATURES, {'EMBARGO': True}):
+            cls.reset_urls()
+
+    @classmethod
+    def tearDownClass(cls):
+        """Reset the URLs to the default."""
+        super(EnrollmentTest, cls).tearDownClass()
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):

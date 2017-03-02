@@ -35,6 +35,20 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
     Course Mode View tests
     """
     URLCONF_MODULES = ['course_modes.urls']
+    URLS_AUTO_RESET = False
+
+    @classmethod
+    def setUpClass(cls):
+        """Reset the URLs to include MODE_CREATION_FOR_TESTING views."""
+        super(CourseModeViewTest, cls).setUpClass()
+        with patch.dict("django.conf.settings.FEATURES", {"MODE_CREATION_FOR_TESTING": True}):
+            cls.reset_urls()
+
+    @classmethod
+    def tearDownClass(cls):
+        """Reset the URLs to the default."""
+        super(CourseModeViewTest, cls).tearDownClass()
+        cls.reset_urls()
 
     @patch.dict(settings.FEATURES, {'MODE_CREATION_FOR_TESTING': True})
     def setUp(self):
@@ -410,6 +424,20 @@ class TrackSelectionEmbargoTest(UrlResetMixin, ModuleStoreTestCase):
     """Test embargo restrictions on the track selection page. """
 
     URLCONF_MODULES = ['openedx.core.djangoapps.embargo']
+    URLS_AUTO_RESET = False
+
+    @classmethod
+    def setUpClass(cls):
+        """Reset the URLs to include EMBARGO views."""
+        super(TrackSelectionEmbargoTest, cls).setUpClass()
+        with patch.dict("django.conf.settings.FEATURES", {"EMBARGO": True}):
+            cls.reset_urls()
+
+    @classmethod
+    def tearDownClass(cls):
+        """Reset the URLs to the default."""
+        super(TrackSelectionEmbargoTest, cls).tearDownClass()
+        cls.reset_urls()
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):

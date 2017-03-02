@@ -1847,6 +1847,7 @@ class RedeemCodeEmbargoTests(UrlResetMixin, ModuleStoreTestCase):
     PASSWORD = 'test'
 
     URLCONF_MODULES = ['openedx.core.djangoapps.embargo']
+    URLS_AUTO_RESET = False
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
@@ -1855,6 +1856,19 @@ class RedeemCodeEmbargoTests(UrlResetMixin, ModuleStoreTestCase):
         self.user = UserFactory.create(username=self.USERNAME, password=self.PASSWORD)
         result = self.client.login(username=self.user.username, password=self.PASSWORD)
         self.assertTrue(result, msg="Could not log in")
+
+    @classmethod
+    def setUpClass(cls):
+        """Reset the URLs to include EMBARGO views."""
+        super(RedeemCodeEmbargoTests, cls).setUpClass()
+        with patch.dict("django.conf.settings.FEATURES", {"EMBARGO": True}):
+            cls.reset_urls()
+
+    @classmethod
+    def tearDownClass(cls):
+        """Reset the URLs to the default."""
+        super(RedeemCodeEmbargoTests, cls).tearDownClass()
+        cls.reset_urls()
 
     @ddt.data('get', 'post')
     @patch.dict(settings.FEATURES, {'EMBARGO': True})

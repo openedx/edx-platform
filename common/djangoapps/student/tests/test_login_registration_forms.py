@@ -41,11 +41,21 @@ class LoginFormTest(ThirdPartyAuthTestMixin, UrlResetMixin, SharedModuleStoreTes
     """Test rendering of the login form. """
 
     URLCONF_MODULES = ['lms.urls']
+    URLS_AUTO_RESET = False
 
     @classmethod
     def setUpClass(cls):
+        """Reset the URLs to disable ENABLE_COMBINED_LOGIN_REGISTRATION views."""
         super(LoginFormTest, cls).setUpClass()
         cls.course = CourseFactory.create()
+        with patch.dict(settings.FEATURES, {"ENABLE_COMBINED_LOGIN_REGISTRATION": False}):
+            cls.reset_urls()
+
+    @classmethod
+    def tearDownClass(cls):
+        """Reset the URLs to the default."""
+        super(LoginFormTest, cls).tearDownClass()
+        cls.reset_urls()
 
     @patch.dict(settings.FEATURES, {"ENABLE_COMBINED_LOGIN_REGISTRATION": False})
     def setUp(self):
@@ -158,11 +168,21 @@ class RegisterFormTest(ThirdPartyAuthTestMixin, UrlResetMixin, SharedModuleStore
     """Test rendering of the registration form. """
 
     URLCONF_MODULES = ['lms.urls']
+    URLS_AUTO_RESET = False
 
     @classmethod
     def setUpClass(cls):
+        """Reset the URLs to disable ENABLE_COMBINED_LOGIN_REGISTRATION views."""
         super(RegisterFormTest, cls).setUpClass()
         cls.course = CourseFactory.create()
+        with patch.dict(settings.FEATURES, {"ENABLE_COMBINED_LOGIN_REGISTRATION": False}):
+            cls.reset_urls()
+
+    @classmethod
+    def tearDownClass(cls):
+        """Reset the URLs to the default."""
+        super(RegisterFormTest, cls).tearDownClass()
+        cls.reset_urls()
 
     @patch.dict(settings.FEATURES, {"ENABLE_COMBINED_LOGIN_REGISTRATION": False})
     def setUp(self):

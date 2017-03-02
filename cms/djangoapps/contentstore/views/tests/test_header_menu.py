@@ -19,12 +19,13 @@ class TestHeaderMenu(CourseTestCase, UrlResetMixin):
     """
     Unit tests for the course header menu.
     """
-    def setUp(self):
-        """
-        Set up the for the course header menu tests.
-        """
-        super(TestHeaderMenu, self).setUp()
-        self.reset_urls()
+    URLS_AUTO_RESET = False
+
+    @classmethod
+    def setUpClass(cls):
+        """Reset the URLs to include FEATURES_WITH_CERTS_ENABLED views."""
+        super(TestHeaderMenu, cls).setUpClass()
+        cls.reset_urls()
 
     def test_header_menu_without_web_certs_enabled(self):
         """

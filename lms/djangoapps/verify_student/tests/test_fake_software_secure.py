@@ -14,7 +14,6 @@ class SoftwareSecureFakeViewTest(UrlResetMixin, TestCase):
     """
     Base class to test the fake software secure view.
     """
-
     URLCONF_MODULES = ['verify_student.urls']
 
     def setUp(self, **kwargs):

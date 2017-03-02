@@ -1007,6 +1007,20 @@ class EnrollmentEmbargoTest(EnrollmentTestMixin, UrlResetMixin, ModuleStoreTestC
     PASSWORD = "edx"
 
     URLCONF_MODULES = ['openedx.core.djangoapps.embargo']
+    URLS_AUTO_RESET = False
+
+    @classmethod
+    def setUpClass(cls):
+        """Reset the URLs to include EMBARGO views."""
+        super(EnrollmentEmbargoTest, cls).setUpClass()
+        with patch.dict(settings.FEATURES, {"EMBARGO": True}):
+            cls.reset_urls()
+
+    @classmethod
+    def tearDownClass(cls):
+        """Reset the URLs to the default."""
+        super(EnrollmentEmbargoTest, cls).tearDownClass()
+        cls.reset_urls()
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):

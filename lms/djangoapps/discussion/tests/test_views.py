@@ -18,11 +18,14 @@ from django_comment_client.tests.group_id import (
     NonCohortedTopicGroupIdTestMixin,
 )
 from django_comment_client.tests.unicode import UnicodeTestMixin
-from django_comment_client.tests.utils import CohortedTestCase, ForumsEnableMixin
+from django_comment_client.tests.utils import (
+    CohortedTestCase,
+    ForumsEnableMixin,
+    ForumUrlResetMixin
+)
 from django_comment_client.utils import strip_none
 from lms.djangoapps.discussion import views
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
-from util.testing import UrlResetMixin
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -46,7 +49,7 @@ log = logging.getLogger(__name__)
 # pylint: disable=missing-docstring
 
 
-class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
+class ViewsExceptionTestCase(ForumUrlResetMixin, ModuleStoreTestCase):
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
@@ -606,7 +609,7 @@ class SingleThreadGroupIdTestCase(CohortedTestCase, GroupIdAssertionMixin):
 
 
 @patch('requests.request', autospec=True)
-class SingleThreadContentGroupTestCase(ForumsEnableMixin, UrlResetMixin, ContentGroupTestCase):
+class SingleThreadContentGroupTestCase(ForumsEnableMixin, ForumUrlResetMixin, ContentGroupTestCase):
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
@@ -1103,7 +1106,7 @@ class InlineDiscussionTestCase(ForumsEnableMixin, ModuleStoreTestCase):
 
 
 @patch('requests.request', autospec=True)
-class UserProfileTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase):
+class UserProfileTestCase(ForumsEnableMixin, ForumUrlResetMixin, ModuleStoreTestCase):
 
     TEST_THREAD_TEXT = 'userprofile-test-text'
     TEST_THREAD_ID = 'userprofile-test-thread-id'
@@ -1232,7 +1235,7 @@ class UserProfileTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
 
 
 @patch('requests.request', autospec=True)
-class CommentsServiceRequestHeadersTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase):
+class CommentsServiceRequestHeadersTestCase(ForumsEnableMixin, ForumUrlResetMixin, ModuleStoreTestCase):
 
     CREATE_USER = False
 
@@ -1243,7 +1246,7 @@ class CommentsServiceRequestHeadersTestCase(ForumsEnableMixin, UrlResetMixin, Mo
         username = "foo"
         password = "bar"
 
-        # Invoke UrlResetMixin
+        # Invoke ForumUrlResetMixin
         super(CommentsServiceRequestHeadersTestCase, self).setUp()
         self.course = CourseFactory.create(discussion_topics={'dummy discussion': {'id': 'dummy_discussion_id'}})
         self.student = UserFactory.create(username=username, password=password)
@@ -1364,7 +1367,7 @@ class ForumFormDiscussionUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTes
 
 @ddt.ddt
 @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
-class ForumDiscussionXSSTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase):
+class ForumDiscussionXSSTestCase(ForumsEnableMixin, ForumUrlResetMixin, ModuleStoreTestCase):
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super(ForumDiscussionXSSTestCase, self).setUp()

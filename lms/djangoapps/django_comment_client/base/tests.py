@@ -17,14 +17,13 @@ from lms.lib.comment_client import Thread
 from common.test.utils import MockSignalHandlerMixin, disable_signal
 from django_comment_client.base import views
 from django_comment_client.tests.group_id import CohortedTopicGroupIdTestMixin, NonCohortedTopicGroupIdTestMixin, GroupIdAssertionMixin
-from django_comment_client.tests.utils import CohortedTestCase, ForumsEnableMixin
+from django_comment_client.tests.utils import CohortedTestCase, ForumsEnableMixin, ForumUrlResetMixin
 from django_comment_client.tests.unicode import UnicodeTestMixin
 from django_comment_common.models import Role
 from django_comment_common.utils import seed_permissions_roles, ThreadContext
 
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
 from student.tests.factories import CourseEnrollmentFactory, UserFactory, CourseAccessRoleFactory
-from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import check_mongo_calls
@@ -348,7 +347,7 @@ class ViewsTestCaseMixin(object):
 @disable_signal(views, 'thread_edited')
 class ViewsQueryCountTestCase(
         ForumsEnableMixin,
-        UrlResetMixin,
+        ForumUrlResetMixin,
         ModuleStoreTestCase,
         MockRequestSetupMixin,
         ViewsTestCaseMixin
@@ -400,7 +399,7 @@ class ViewsQueryCountTestCase(
 @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
 class ViewsTestCase(
         ForumsEnableMixin,
-        UrlResetMixin,
+        ForumUrlResetMixin,
         SharedModuleStoreTestCase,
         MockRequestSetupMixin,
         ViewsTestCaseMixin,
@@ -410,6 +409,9 @@ class ViewsTestCase(
     @classmethod
     def setUpClass(cls):
         # pylint: disable=super-method-not-called
+        with patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True}):
+            cls.reset_urls()
+
         with super(ViewsTestCase, cls).setUpClassAndTestData():
             cls.course = CourseFactory.create(
                 org='MITx', course='999',
@@ -430,7 +432,7 @@ class ViewsTestCase(
     def setUp(self):
         # Patching the ENABLE_DISCUSSION_SERVICE value affects the contents of urls.py,
         # so we need to call super.setUp() which reloads urls.py (because
-        # of the UrlResetMixin)
+        # of the ForumUrlResetMixin)
         super(ViewsTestCase, self).setUp()
 
         # Patch the comment client user save method so it does not try
@@ -1027,13 +1029,15 @@ class ViewsTestCase(
 @attr(shard=2)
 @patch("lms.lib.comment_client.utils.requests.request", autospec=True)
 @disable_signal(views, 'comment_endorsed')
-class ViewPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase, MockRequestSetupMixin):
+class ViewPermissionsTestCase(ForumsEnableMixin, ForumUrlResetMixin, SharedModuleStoreTestCase, MockRequestSetupMixin):
 
     @classmethod
     def setUpClass(cls):
         # pylint: disable=super-method-not-called
         with super(ViewPermissionsTestCase, cls).setUpClassAndTestData():
             cls.course = CourseFactory.create()
+        with patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True}):
+            cls.reset_urls()
 
     @classmethod
     def setUpTestData(cls):
@@ -1379,7 +1383,7 @@ class CreateSubCommentUnicodeTestCase(
 @disable_signal(views, 'comment_created')
 @disable_signal(views, 'comment_voted')
 @disable_signal(views, 'comment_deleted')
-class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase, MockRequestSetupMixin):
+class TeamsPermissionsTestCase(ForumsEnableMixin, ForumUrlResetMixin, SharedModuleStoreTestCase, MockRequestSetupMixin):
     # Most of the test points use the same ddt data.
     # args: user, commentable_id, status_code
     ddt_permissions_args = [
@@ -1403,6 +1407,8 @@ class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleSto
                 'topics': [{'id': "topic_id", 'name': 'Solar Power', 'description': 'Solar power is hot'}]
             }
             cls.course = CourseFactory.create(teams_configuration=teams_configuration)
+        with patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True}):
+            cls.reset_urls()
 
     @classmethod
     def setUpTestData(cls):

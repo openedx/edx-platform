@@ -203,12 +203,19 @@ class CertificatesListHandlerTestCase(
     """
     Test cases for certificates_list_handler.
     """
+    URLS_AUTO_RESET = False
+
+    @classmethod
+    def setUpClass(cls):
+        """Reset the URLs to include FEATURES_WITH_CERTS_ENABLED views."""
+        super(CertificatesListHandlerTestCase, cls).setUpClass()
+        cls.reset_urls()
+
     def setUp(self):
         """
         Set up CertificatesListHandlerTestCase.
         """
         super(CertificatesListHandlerTestCase, self).setUp('contentstore.views.certificates.tracker')
-        self.reset_urls()
 
     def _url(self):
         """
@@ -432,12 +439,19 @@ class CertificatesDetailHandlerTestCase(
 
     _id = 0
 
+    URLS_AUTO_RESET = False
+
+    @classmethod
+    def setUpClass(cls):
+        """Reset the URLs to include FEATURES_WITH_CERTS_ENABLED views."""
+        super(CertificatesDetailHandlerTestCase, cls).setUpClass()
+        cls.reset_urls()
+
     def setUp(self):  # pylint: disable=arguments-differ
         """
         Set up CertificatesDetailHandlerTestCase.
         """
         super(CertificatesDetailHandlerTestCase, self).setUp('contentstore.views.certificates.tracker')
-        self.reset_urls()
 
     def _url(self, cid=-1):
         """

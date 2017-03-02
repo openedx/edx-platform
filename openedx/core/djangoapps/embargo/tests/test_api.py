@@ -244,12 +244,26 @@ class EmbargoMessageUrlApiTests(UrlResetMixin, ModuleStoreTestCase):
     """Test the embargo API calls for retrieving the blocking message URLs. """
 
     URLCONF_MODULES = ['openedx.core.djangoapps.embargo']
+    URLS_AUTO_RESET = False
     ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
         super(EmbargoMessageUrlApiTests, self).setUp()
         self.course = CourseFactory.create()
+
+    @classmethod
+    def setUpClass(cls):
+        """Reset the URLs to include EMBARGO views."""
+        super(EmbargoMessageUrlApiTests, cls).setUpClass()
+        with patch.dict("django.conf.settings.FEATURES", {"EMBARGO": True}):
+            cls.reset_urls()
+
+    @classmethod
+    def tearDownClass(cls):
+        """Reset the URLs to the default."""
+        super(EmbargoMessageUrlApiTests, cls).tearDownClass()
+        cls.reset_urls()
 
     @ddt.data(
         ('enrollment', '/embargo/blocked-message/enrollment/embargo/'),

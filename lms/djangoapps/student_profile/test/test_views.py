@@ -12,7 +12,7 @@ from student.tests.factories import UserFactory
 from student_profile.views import learner_profile_context
 
 
-class LearnerProfileViewTest(UrlResetMixin, TestCase):
+class LearnerProfileViewTest(TestCase):
     """ Tests for the student profile view. """
 
     USERNAME = "username"

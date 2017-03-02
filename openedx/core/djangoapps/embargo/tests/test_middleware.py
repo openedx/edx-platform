@@ -36,6 +36,7 @@ class EmbargoMiddlewareAccessTests(UrlResetMixin, ModuleStoreTestCase):
     PASSWORD = 'secret'
 
     URLCONF_MODULES = ['openedx.core.djangoapps.embargo']
+    URLS_AUTO_RESET = False
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
@@ -53,6 +54,19 @@ class EmbargoMiddlewareAccessTests(UrlResetMixin, ModuleStoreTestCase):
         # Clear the cache to avoid interference between tests
         django_cache.clear()
         config_cache.clear()
+
+    @classmethod
+    def setUpClass(cls):
+        """Reset the URLs to include EMBARGO views."""
+        super(EmbargoMiddlewareAccessTests, cls).setUpClass()
+        with patch.dict(settings.FEATURES, {"EMBARGO": True}):
+            cls.reset_urls()
+
+    @classmethod
+    def tearDownClass(cls):
+        """Reset the URLs to the default."""
+        super(EmbargoMiddlewareAccessTests, cls).tearDownClass()
+        cls.reset_urls()
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     @ddt.data(True, False)

@@ -49,12 +49,11 @@ from django_comment_common.models import (
     FORUM_ROLE_STUDENT,
     Role,
 )
-from django_comment_client.tests.utils import ForumsEnableMixin
+from django_comment_client.tests.utils import ForumsEnableMixin, ForumUrlResetMixin
 from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.lib.exceptions import CourseNotFoundError, PageNotFoundError
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from util.testing import UrlResetMixin
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -86,7 +85,7 @@ def _discussion_disabled_course_for(user):
 
 @attr(shard=2)
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
-class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase):
+class GetCourseTest(ForumsEnableMixin, ForumUrlResetMixin, SharedModuleStoreTestCase):
     """Test for get_course"""
 
     @classmethod
@@ -94,7 +93,6 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
         super(GetCourseTest, cls).setUpClass()
         cls.course = CourseFactory.create(org="x", course="y", run="z")
 
-    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super(GetCourseTest, self).setUp()
         self.user = UserFactory.create()
@@ -134,11 +132,10 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
 @attr(shard=2)
 @ddt.ddt
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
-class GetCourseTestBlackouts(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase):
+class GetCourseTestBlackouts(ForumsEnableMixin, ForumUrlResetMixin, ModuleStoreTestCase):
     """
     Tests of get_course for courses that have blackout dates.
     """
-
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super(GetCourseTestBlackouts, self).setUp()
@@ -178,8 +175,9 @@ class GetCourseTestBlackouts(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCa
 @attr(shard=2)
 @mock.patch.dict("django.conf.settings.FEATURES", {"DISABLE_START_DATES": False})
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
-class GetCourseTopicsTest(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase):
+class GetCourseTopicsTest(ForumsEnableMixin, ForumUrlResetMixin, ModuleStoreTestCase):
     """Test for get_course_topics"""
+
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super(GetCourseTopicsTest, self).setUp()
@@ -552,7 +550,7 @@ class GetCourseTopicsTest(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
 @attr(shard=2)
 @ddt.ddt
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
-class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMixin, SharedModuleStoreTestCase):
+class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, ForumUrlResetMixin, SharedModuleStoreTestCase):
     """Test for get_thread_list"""
 
     @classmethod
@@ -1403,7 +1401,7 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
 class CreateThreadTest(
         ForumsEnableMixin,
         CommentsServiceMockMixin,
-        UrlResetMixin,
+        ForumUrlResetMixin,
         SharedModuleStoreTestCase,
         MockSignalHandlerMixin
 ):
@@ -1631,7 +1629,7 @@ class CreateThreadTest(
 class CreateCommentTest(
         ForumsEnableMixin,
         CommentsServiceMockMixin,
-        UrlResetMixin,
+        ForumUrlResetMixin,
         SharedModuleStoreTestCase,
         MockSignalHandlerMixin
 ):
@@ -1900,7 +1898,7 @@ class CreateCommentTest(
 class UpdateThreadTest(
         ForumsEnableMixin,
         CommentsServiceMockMixin,
-        UrlResetMixin,
+        ForumUrlResetMixin,
         SharedModuleStoreTestCase,
         MockSignalHandlerMixin
 ):
@@ -2284,7 +2282,7 @@ class UpdateThreadTest(
 class UpdateCommentTest(
         ForumsEnableMixin,
         CommentsServiceMockMixin,
-        UrlResetMixin,
+        ForumUrlResetMixin,
         SharedModuleStoreTestCase,
         MockSignalHandlerMixin
 ):
@@ -2689,7 +2687,7 @@ class UpdateCommentTest(
 class DeleteThreadTest(
         ForumsEnableMixin,
         CommentsServiceMockMixin,
-        UrlResetMixin,
+        ForumUrlResetMixin,
         SharedModuleStoreTestCase,
         MockSignalHandlerMixin
 ):
@@ -2830,7 +2828,7 @@ class DeleteThreadTest(
 class DeleteCommentTest(
         ForumsEnableMixin,
         CommentsServiceMockMixin,
-        UrlResetMixin,
+        ForumUrlResetMixin,
         SharedModuleStoreTestCase,
         MockSignalHandlerMixin
 ):
@@ -2989,7 +2987,7 @@ class DeleteCommentTest(
 class RetrieveThreadTest(
         ForumsEnableMixin,
         CommentsServiceMockMixin,
-        UrlResetMixin,
+        ForumUrlResetMixin,
         SharedModuleStoreTestCase
 ):
     """Tests for get_thread"""

@@ -25,6 +25,7 @@ from courseware.access_response import (
     VisibilityError,
 )
 from course_modes.models import CourseMode
+from django_comment_client.tests.utils import ForumUrlResetMixin
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from openedx.core.lib.courses import course_image_url
 from student.models import CourseEnrollment
@@ -75,7 +76,7 @@ class TestUserInfoApi(MobileAPITestCase, MobileAuthTestMixin):
 @attr(shard=2)
 @ddt.ddt
 @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
-class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTestMixin,
+class TestUserEnrollmentApi(ForumUrlResetMixin, MobileAPITestCase, MobileAuthUserTestMixin,
                             MobileCourseAccessTestMixin, MilestonesTestCaseMixin):
     """
     Tests for /api/mobile/v0.5/users/<user_name>/course_enrollments/

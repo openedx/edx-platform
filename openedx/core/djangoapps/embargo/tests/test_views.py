@@ -34,10 +34,24 @@ class CourseAccessMessageViewTest(CacheIsolationTestCase, UrlResetMixin):
     ENABLED_CACHES = ['default']
 
     URLCONF_MODULES = ['openedx.core.djangoapps.embargo']
+    URLS_AUTO_RESET = False
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
         super(CourseAccessMessageViewTest, self).setUp()
+
+    @classmethod
+    def setUpClass(cls):
+        """Reset the URLs to include EMBARGO views."""
+        super(CourseAccessMessageViewTest, cls).setUpClass()
+        with patch.dict("django.conf.settings.FEATURES", {"EMBARGO": True}):
+            cls.reset_urls()
+
+    @classmethod
+    def tearDownClass(cls):
+        """Reset the URLs to the default."""
+        super(CourseAccessMessageViewTest, cls).tearDownClass()
+        cls.reset_urls()
 
     @ddt.data(*messages.ENROLL_MESSAGES.keys())
     def test_enrollment_messages(self, msg_key):

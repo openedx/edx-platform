@@ -55,7 +55,7 @@ User = get_user_model()  # pylint:disable=invalid-name
 
 
 @ddt.ddt
-class StudentAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
+class StudentAccountUpdateTest(CacheIsolationTestCase):
     """ Tests for the student account views that update the user's account information. """
 
     USERNAME = u"heisenberg"
@@ -85,8 +85,6 @@ class StudentAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
     ]
 
     INVALID_KEY = u"123abc"
-
-    URLCONF_MODULES = ['student_accounts.urls']
 
     ENABLED_CACHES = ['default']
 
@@ -283,6 +281,7 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
     PASSWORD = "password"
 
     URLCONF_MODULES = ['openedx.core.djangoapps.embargo']
+    URLS_AUTO_RESET = False
 
     @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
@@ -302,6 +301,19 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
             enabled=True,
         )
         self.hidden_disabled_provider = self.configure_azure_ad_provider()
+
+    @classmethod
+    def setUpClass(cls):
+        """Reset the URLs to include EMBARGO views."""
+        super(StudentAccountLoginAndRegistrationTest, cls).setUpClass()
+        with mock.patch.dict(settings.FEATURES, {"EMBARGO": True}):
+            cls.reset_urls()
+
+    @classmethod
+    def tearDownClass(cls):
+        """Reset the URLs to the default."""
+        super(StudentAccountLoginAndRegistrationTest, cls).tearDownClass()
+        cls.reset_urls()
 
     @ddt.data(
         ("signin_user", "login"),

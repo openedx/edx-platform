@@ -28,16 +28,17 @@ class UrlResetMixin(object):
     Doing this is expensive, so it should only be added to tests that modify settings
     that affect the contents of urls.py
     """
-
+    URLS_AUTO_RESET = True
     URLCONF_MODULES = None
 
-    def reset_urls(self, urlconf_modules=None):
+    @classmethod
+    def reset_urls(cls, urlconf_modules=None):
         """Reset `urls.py` for a set of Django apps."""
 
         if urlconf_modules is None:
             urlconf_modules = [settings.ROOT_URLCONF]
-            if self.URLCONF_MODULES is not None:
-                urlconf_modules.extend(self.URLCONF_MODULES)
+            if cls.URLCONF_MODULES is not None:
+                urlconf_modules.extend(cls.URLCONF_MODULES)
 
         for urlconf in urlconf_modules:
             if urlconf in sys.modules:
@@ -66,9 +67,9 @@ class UrlResetMixin(object):
 
         """
         super(UrlResetMixin, self).setUp()
-
-        self.reset_urls()
-        self.addCleanup(self.reset_urls)
+        if self.URLS_AUTO_RESET:
+            self.reset_urls()
+            self.addCleanup(self.reset_urls)
 
 
 class EventTestMixin(object):
