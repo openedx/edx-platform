@@ -171,8 +171,7 @@ def video_encodings_download(request, course_key_string):
 
     profile_whitelist = VideoUploadConfig.get_profile_whitelist()
 
-    videos_data = _get_videos(course, request)
-    videos = videos_data["results"]
+    videos = _get_videos(course, {"paginated": False})
     name_col = _("Name")
     duration_col = _("Duration")
     added_col = _("Date Added")
@@ -286,18 +285,10 @@ def convert_video_status(video):
     return status
 
 
-def _get_videos(course, request):
+def _get_videos(course, params):
     """
     Retrieves the list of videos from VAL corresponding to this course.
     """
-    params = {
-        "page": request.GET.get("page", 1),
-        "page_size": request.GET.get("page_size", 20),
-        "paginated": True,
-        "sort_field": VideoSortField[request.GET.get("sort_field", "created")],
-        "sort_dir": SortDirection[request.GET.get("sort_dir", "asc")]
-    }
-
     videos_data = get_videos_for_course(course.id, **params)
     videos = videos_data["results"]
     # convert VAL's status to studio's Video Upload feature status.
@@ -312,7 +303,14 @@ def _get_index_videos(course, request):
     """
     Returns the information about each video upload required for the video list
     """
-    videos_data = _get_videos(course, request)
+    params = {
+        "page": request.GET.get("page", 1),
+        "page_size": request.GET.get("page_size", 20),
+        "paginated": True,
+        "sort_field": VideoSortField[request.GET.get("sort_field", "created")],
+        "sort_dir": SortDirection[request.GET.get("sort_dir", "asc")]
+    }
+    videos_data = _get_videos(course, params)
     videos = list(
         {
             attr: video[attr]
