@@ -6,11 +6,13 @@ from django.core.management.base import CommandError
 import itertools
 from mock import patch
 
-from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory
 from .. import generate_course_blocks
-from openedx.core.djangoapps.content.block_structure.tests.helpers import is_course_in_block_structure_cache
+from openedx.core.djangoapps.content.block_structure.tests.helpers import (
+    is_course_in_block_structure_cache,
+    is_course_in_block_structure_storage,
+)
 
 
 @ddt.ddt
@@ -43,6 +45,20 @@ class TestGenerateCourseBlocks(ModuleStoreTestCase):
         for course_key in course_keys:
             self.assertTrue(is_course_in_block_structure_cache(course_key, self.store))
 
+    def _assert_courses_not_in_block_storage(self, *course_keys):
+        """
+        Assert courses don't exist in course block storage.
+        """
+        for course_key in course_keys:
+            self.assertFalse(is_course_in_block_structure_storage(course_key, self.store))
+
+    def _assert_courses_in_block_storage(self, *course_keys):
+        """
+        Assert courses exist in course block storage.
+        """
+        for course_key in course_keys:
+            self.assertTrue(is_course_in_block_structure_storage(course_key, self.store))
+
     def _assert_message_presence_in_logs(self, message, mock_log, expected_presence=True):
         """
         Asserts that the logger was called with the given message.
@@ -69,6 +85,13 @@ class TestGenerateCourseBlocks(ModuleStoreTestCase):
         self.command.handle(courses=[unicode(self.course_keys[0])])
         self._assert_courses_in_block_cache(self.course_keys[0])
         self._assert_courses_not_in_block_cache(*self.course_keys[1:])
+        self._assert_courses_not_in_block_storage(*self.course_keys)
+
+    def test_with_storage(self):
+        self.command.handle(with_storage=True, courses=[unicode(self.course_keys[0])])
+        self._assert_courses_in_block_cache(self.course_keys[0])
+        self._assert_courses_in_block_storage(self.course_keys[0])
+        self._assert_courses_not_in_block_storage(*self.course_keys[1:])
 
     @ddt.data(
         *itertools.product(
