@@ -4,7 +4,10 @@ Visibility Transformer implementation.
 from datetime import datetime
 from pytz import utc
 
-from openedx.core.lib.block_structure.transformer import BlockStructureTransformer, FilteringTransformerMixin
+from openedx.core.djangoapps.content.block_structure.transformer import (
+    BlockStructureTransformer,
+    FilteringTransformerMixin,
+)
 from xmodule.seq_module import SequenceModule
 from .utils import collect_merged_boolean_field, collect_merged_date_field
 

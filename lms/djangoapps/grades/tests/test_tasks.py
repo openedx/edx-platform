@@ -13,7 +13,7 @@ from mock import patch, MagicMock
 import pytz
 from util.date_utils import to_timestamp
 
-from openedx.core.lib.block_structure.exceptions import BlockStructureNotFound
+from openedx.core.djangoapps.content.block_structure.exceptions import BlockStructureNotFound
 from student.models import anonymous_id_for_user
 from student.tests.factories import UserFactory
 from track.event_transaction_utils import (
@@ -136,7 +136,7 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
         self.set_up_course()
         self.assertTrue(PersistentGradesEnabledFlag.feature_enabled(self.course.id))
         with patch(
-            'openedx.core.lib.block_structure.factory.BlockStructureFactory.create_from_store',
+            'openedx.core.djangoapps.content.block_structure.factory.BlockStructureFactory.create_from_store',
             side_effect=BlockStructureNotFound(self.course.location),
         ) as mock_block_structure_create:
             self._apply_recalculate_subsection_grade()

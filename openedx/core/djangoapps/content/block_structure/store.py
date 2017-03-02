@@ -4,14 +4,13 @@ Module for the Storage of BlockStructure objects.
 # pylint: disable=protected-access
 from logging import getLogger
 
-import openedx.core.djangoapps.content.block_structure.config as config
-from openedx.core.djangoapps.content.block_structure.models import BlockStructureModel
-
 from openedx.core.lib.cache_utils import zpickle, zunpickle
 
+from . import config
 from .block_structure import BlockStructureBlockData
 from .exceptions import BlockStructureNotFound
 from .factory import BlockStructureFactory
+from .models import BlockStructureModel
 from .transformer_registry import TransformerRegistry
 
 

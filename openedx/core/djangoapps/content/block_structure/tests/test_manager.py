@@ -5,10 +5,8 @@ import ddt
 from nose.plugins.attrib import attr
 from unittest import TestCase
 
-from openedx.core.djangoapps.content.block_structure.config import RAISE_ERROR_WHEN_NOT_FOUND, STORAGE_BACKING_FOR_CACHE
-from openedx.core.djangoapps.content.block_structure.tests.helpers import override_config_setting
-
 from ..block_structure import BlockStructureBlockData
+from ..config import RAISE_ERROR_WHEN_NOT_FOUND, STORAGE_BACKING_FOR_CACHE
 from ..exceptions import UsageKeyNotInBlockStructure, BlockStructureNotFound
 from ..manager import BlockStructureManager
 from ..transformers import BlockStructureTransformers
@@ -16,6 +14,7 @@ from .helpers import (
     MockModulestoreFactory, MockCache, MockTransformer,
     ChildrenMapTestMixin, UsageKeyFactoryMixin,
     mock_registered_transformers,
+    override_config_setting,
 )
 
 
