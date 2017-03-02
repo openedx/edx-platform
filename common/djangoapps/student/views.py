@@ -576,6 +576,38 @@ def is_course_blocked(request, redeemed_registration_codes, course_key):
     return blocked
 
 
+def compose_and_send_activation_email(user, profile, user_registration=None):
+    """
+    Construct all the required params and send the activation email
+    through celery task
+
+    Arguments:
+        user: current logged-in user
+        profile: profile object of the current logged-in user
+        user_registration: registration of the current logged-in user
+    """
+    dest_addr = user.email
+    if user_registration is None:
+        user_registration = Registration.objects.get(user=user)
+    context = {
+        'name': profile.name,
+        'key': user_registration.activation_key,
+    }
+    subject = render_to_string('emails/activation_email_subject.txt', context)
+    # Email subject *must not* contain newlines
+    subject = ''.join(subject.splitlines())
+    message_for_activation = render_to_string('emails/activation_email.txt', context)
+    from_address = configuration_helpers.get_value(
+        'email_from_address',
+        settings.DEFAULT_FROM_EMAIL
+    )
+    if settings.FEATURES.get('REROUTE_ACTIVATION_EMAIL'):
+        dest_addr = settings.FEATURES['REROUTE_ACTIVATION_EMAIL']
+        message_for_activation = ("Activation for %s (%s): %s\n" % (user, user.email, profile.name) +
+                                  '-' * 80 + '\n\n' + message_for_activation)
+    send_activation_email.delay(subject, message_for_activation, from_address, dest_addr)
+
+
 @login_required
 @ensure_csrf_cookie
 def dashboard(request):
@@ -1356,7 +1388,6 @@ def login_user(request, error=""):  # pylint: disable=too-many-statements,unused
                 }
             }
         )
-
     if user is not None and user.is_active:
         try:
             # We do not log here, because we have a handler registered
@@ -1848,27 +1879,7 @@ def create_account_with_params(request, params):
         )
     )
     if send_email:
-        dest_addr = user.email
-        context = {
-            'name': profile.name,
-            'key': registration.activation_key,
-        }
-
-        # composes activation email
-        subject = render_to_string('emails/activation_email_subject.txt', context)
-        # Email subject *must not* contain newlines
-        subject = ''.join(subject.splitlines())
-        message = render_to_string('emails/activation_email.txt', context)
-
-        from_address = configuration_helpers.get_value(
-            'email_from_address',
-            settings.DEFAULT_FROM_EMAIL
-        )
-        if settings.FEATURES.get('REROUTE_ACTIVATION_EMAIL'):
-            dest_addr = settings.FEATURES['REROUTE_ACTIVATION_EMAIL']
-            message = ("Activation for %s (%s): %s\n" % (user, user.email, profile.name) +
-                       '-' * 80 + '\n\n' + message)
-        send_activation_email.delay(subject, message, from_address, dest_addr)
+        compose_and_send_activation_email(user, profile, registration)
     else:
         registration.activate()
         _enroll_user_in_pending_courses(user)  # Enroll student in any pending courses
