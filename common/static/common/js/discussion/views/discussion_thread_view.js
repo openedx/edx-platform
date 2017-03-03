@@ -109,7 +109,7 @@
                     mode: this.mode,
                     model: this.model,
                     el: this.el,
-                    course_settings: this.options.course_settings,
+                    courseSettings: this.options.courseSettings,
                     topicId: this.topicId
                 });
                 return this.render();
@@ -396,7 +396,7 @@
                     model: this.model,
                     mode: this.mode,
                     context: this.context,
-                    course_settings: this.options.course_settings
+                    course_settings: this.options.courseSettings
                 });
                 this.editView.bind('thread:updated thread:cancel_edit', this.closeEditView);
                 return this.editView.bind('comment:endorse', this.endorseThread);
