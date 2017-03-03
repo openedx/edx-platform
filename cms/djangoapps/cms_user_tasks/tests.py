@@ -4,7 +4,9 @@ Unit tests for integration of the django-user-tasks app and its REST API.
 
 from __future__ import absolute_import, print_function, unicode_literals
 
+import sys
 from uuid import uuid4
+import logging
 
 import mock
 from boto.exception import NoAuthHandlerFound
@@ -20,6 +22,24 @@ from user_tasks.models import UserTaskArtifact, UserTaskStatus
 from user_tasks.serializers import ArtifactSerializer, StatusSerializer
 from .signals import user_task_stopped
 
+
+# Mock logging handler to check for expected logs.
+class MockLoggingHandler(logging.Handler):
+    def __init__(self, *args, **kwargs):
+        self.reset()
+        logging.Handler.__init__(self, *args, **kwargs)
+
+    def emit(self, record):
+        self.messages[record.levelname.lower()].append(record.getMessage())
+
+    def reset(self):
+        self.messages = {
+            'debug': [],
+            'info': [],
+            'warning': [],
+            'error': [],
+            'critical': [],
+        }
 
 # Helper functions for stuff that pylint complains about without disable comments
 
@@ -199,3 +219,14 @@ class TestUserTaskStopped(APITestCase):
             with mock.patch('cms_user_tasks.tasks.send_task_complete_email.retry') as mock_retry:
                 user_task_stopped.send(sender=UserTaskStatus, status=self.status)
                 self.assertTrue(mock_retry.called)
+
+    def test_queue_email_failure(self):
+        logger = logging.getLogger("cms_user_tasks.signals")
+        hdlr = MockLoggingHandler(level="DEBUG")
+        logger.addHandler(hdlr)
+
+        with mock.patch('cms_user_tasks.tasks.send_task_complete_email.delay') as mock_delay:
+            mock_delay.side_effect = NoAuthHandlerFound()
+            user_task_stopped.send(sender=UserTaskStatus, status=self.status)
+            self.assertTrue(mock_delay.called)
+            self.assertEqual(hdlr.messages['error'][0], u'Unable to queue send_task_complete_email')
