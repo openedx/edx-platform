@@ -31,7 +31,7 @@ from shoppingcart.models import CourseRegistrationCode
 from student.models import CourseEnrollment
 from student.views import is_course_blocked
 from student.roles import GlobalStaff
-from util.enterprise_helpers import consent_needed_for_course, get_course_specific_consent_url
+from util.enterprise_helpers import get_enterprise_consent_url
 from util.views import ensure_valid_course_key
 from xmodule.modulestore.django import modulestore
 from xmodule.x_module import STUDENT_VIEW
@@ -203,13 +203,14 @@ class CoursewareIndex(View):
         the course, and redirect the user to provide consent if needed.
         """
         course_id = unicode(self.course_key)
-        if consent_needed_for_course(self.real_user, course_id):
+        consent_url = get_enterprise_consent_url(self.request, course_id, user=self.real_user, return_to='courseware')
+        if consent_url:
             log.warning(
                 u'User %s cannot access the course %s because they have not granted consent',
                 self.real_user,
                 course_id,
             )
-            raise Redirect(get_course_specific_consent_url(self.request, course_id, 'courseware'))
+            raise Redirect(consent_url)
 
     def _redirect_if_needed_to_pay_for_course(self):
         """

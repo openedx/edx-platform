@@ -47,6 +47,7 @@ from django_comment_client.utils import (
 )
 import django_comment_client.utils as utils
 import lms.lib.comment_client as cc
+from util.enterprise_helpers import data_sharing_consent_required
 
 from opaque_keys.edx.keys import CourseKey
 
@@ -179,6 +180,7 @@ def use_bulk_ops(view_func):
 
 
 @login_required
+@data_sharing_consent_required
 @use_bulk_ops
 def inline_discussion(request, course_key, discussion_id):
     """
@@ -214,6 +216,7 @@ def inline_discussion(request, course_key, discussion_id):
 
 
 @login_required
+@data_sharing_consent_required
 @use_bulk_ops
 def forum_form_discussion(request, course_key):
     """
@@ -256,6 +259,7 @@ def forum_form_discussion(request, course_key):
 
 @require_GET
 @login_required
+@data_sharing_consent_required
 @use_bulk_ops
 def single_thread(request, course_key, discussion_id, thread_id):
     """
