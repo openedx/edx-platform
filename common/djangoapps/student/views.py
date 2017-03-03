@@ -833,7 +833,7 @@ def dashboard(request):
         'courses_requirements_not_met': courses_requirements_not_met,
         'nav_hidden': True,
         'inverted_programs': inverted_programs,
-        'show_program_listing': ProgramsApiConfig.current().show_program_listing,
+        'show_program_listing': ProgramsApiConfig.is_enabled(),
         'disable_courseware_js': True,
         'display_course_modes_on_dashboard': enable_verified_certificates and display_course_modes_on_dashboard,
         'display_sidebar_on_dashboard': display_sidebar_on_dashboard,
