@@ -113,7 +113,6 @@ class TestUserTasks(APITestCase):
         assert _data(response)['results'] == serializer.data
 
 
-
 @override_settings(BROKER_URL='memory://localhost/')
 class TestUserTaskStopped(APITestCase):
     """
