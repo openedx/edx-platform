@@ -367,6 +367,10 @@ FEATURES = {
 
     # Allow public account creation
     'ALLOW_PUBLIC_ACCOUNT_CREATION': True,
+
+    # Enable footer banner for cookie consent.
+    # See https://cookieconsent.insites.com/ for more.
+    'ENABLE_COOKIE_CONSENT': False,
 }
 
 # Ignore static asset files on import which match this pattern
