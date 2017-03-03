@@ -111,7 +111,7 @@ class BlockStructureModel(TimeStampedModel):
         Returns the collected data for this instance.
         """
         serialized_data = self.data.read()
-        log.info("BlockStructure: Read data from store; %r, size: %d", self, len(serialized_data))
+        log.info("BlockStructure: Read data from store; %r, size: %d", unicode(self), len(serialized_data))
         return serialized_data
 
     @classmethod
@@ -139,7 +139,7 @@ class BlockStructureModel(TimeStampedModel):
         log.info(
             'BlockStructure: %s in store; %r, size: %d',
             'Created' if created else 'Updated',
-            bs_model,
+            unicode(bs_model),
             len(serialized_data),
         )
         if not created:
