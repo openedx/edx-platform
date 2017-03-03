@@ -46,5 +46,5 @@ def user_task_stopped_handler(sender, **kwargs):  # pylint: disable=unused-argum
         try:
             # Need to str state_text here because it is a proxy object and won't serialize correctly
             send_task_complete_email.delay(status.name.lower(), str(status.state_text), status.user.email, detail_url)
-        except Exception as e:  # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             logging.exception("Unable to queue send_task_complete_email")
