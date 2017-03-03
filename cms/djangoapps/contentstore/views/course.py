@@ -535,16 +535,14 @@ def _deprecated_blocks_info(course_module, deprecated_block_types):
 
     Returns:
         Dict with following keys:
-        block_types (list): list containing types of all deprecated blocks
-        block_types_enabled (bool): True if any or all `deprecated_blocks` present in Advanced Module List else False
-        blocks (list): List of `deprecated_block_types` component names and their parent's url
+        deprecated_enabled_block_types (list): list containing all deprecated blocks types enabled on this course
+        blocks (list): List of `deprecated_enabled_block_types` instances and their parent's url
         advance_settings_url (str): URL to advance settings page
     """
     data = {
-        'block_types': deprecated_block_types,
-        'block_types_enabled': any(
-            block_type in course_module.advanced_modules for block_type in deprecated_block_types
-        ),
+        'deprecated_enabled_block_types': [
+            block_type for block_type in course_module.advanced_modules if block_type in deprecated_block_types
+        ],
         'blocks': [],
         'advance_settings_url': reverse_course_url('advanced_settings_handler', course_module.id)
     }
