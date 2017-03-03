@@ -75,6 +75,12 @@ class OrganizationFactory(DictFactoryBase):
     uuid = factory.Faker('uuid4')
 
 
+class SeatFactory(DictFactoryBase):
+    type = factory.Faker('word')
+    price = factory.Faker('random_int')
+    currency = 'USD'
+
+
 class CourseRunFactory(DictFactoryBase):
     end = factory.LazyFunction(generate_zulu_datetime)
     enrollment_end = factory.LazyFunction(generate_zulu_datetime)
@@ -82,6 +88,7 @@ class CourseRunFactory(DictFactoryBase):
     image = ImageFactory()
     key = factory.LazyFunction(generate_course_run_key)
     marketing_url = factory.Faker('url')
+    seats = factory.LazyFunction(partial(generate_instances, SeatFactory))
     pacing_type = 'self_paced'
     short_description = factory.Faker('sentence')
     start = factory.LazyFunction(generate_zulu_datetime)

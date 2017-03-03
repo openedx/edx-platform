@@ -18,10 +18,11 @@ from openedx.core.djangoapps.catalog.tests.factories import (
     ProgramFactory,
     CourseFactory,
     CourseRunFactory,
+    SeatFactory,
 )
 from openedx.core.djangoapps.programs.tests.factories import ProgressFactory
 from openedx.core.djangoapps.programs.utils import (
-    DEFAULT_ENROLLMENT_START_DATE, ProgramProgressMeter, ProgramDataExtender
+    DEFAULT_ENROLLMENT_START_DATE, ProgramProgressMeter, ProgramDataExtender, ProgramMarketingDataExtender
 )
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
@@ -382,18 +383,6 @@ class TestProgramDataExtender(ModuleStoreTestCase):
     maxDiff = None
     sku = 'abc123'
     checkout_path = '/basket'
-    instructors = {
-        'instructors': [
-            {
-                'name': 'test-instructor1',
-                'organization': 'TextX',
-            },
-            {
-                'name': 'test-instructor2',
-                'organization': 'TextX',
-            }
-        ]
-    }
 
     def setUp(self):
         super(TestProgramDataExtender, self).setUp()
@@ -401,7 +390,6 @@ class TestProgramDataExtender(ModuleStoreTestCase):
         self.course = ModuleStoreCourseFactory()
         self.course.start = datetime.datetime.now(utc) - datetime.timedelta(days=1)
         self.course.end = datetime.datetime.now(utc) + datetime.timedelta(days=1)
-        self.course.instructor_info = self.instructors
         self.course = self.update_course(self.course, self.user.id)
 
         self.course_run = CourseRunFactory(key=unicode(self.course.id))
@@ -569,8 +557,76 @@ class TestProgramDataExtender(ModuleStoreTestCase):
 
         self._assert_supplemented(data, certificate_url=expected_url)
 
-    def test_instructors_retrieval(self):
-        data = ProgramDataExtender(self.program, self.user).extend(include_instructors=True)
+
+@ddt.ddt
+@override_settings(ECOMMERCE_PUBLIC_URL_ROOT=ECOMMERCE_URL_ROOT)
+@skip_unless_lms
+class TestProgramMarketingDataExtender(ModuleStoreTestCase):
+    """Tests of the program data extender utility class."""
+    instructors = {
+        'instructors': [
+            {
+                'name': 'test-instructor1',
+                'organization': 'TextX',
+            },
+            {
+                'name': 'test-instructor2',
+                'organization': 'TextX',
+            }
+        ]
+    }
+
+    def setUp(self):
+        super(TestProgramMarketingDataExtender, self).setUp()
+
+        self.course_price = 100
+        self.number_of_courses = 2
+        self.program = ProgramFactory(
+            courses=[self._create_course(self.course_price) for __ in range(self.number_of_courses)]
+        )
+
+    def _create_course(self, course_price):
+        """
+        Creates the course in mongo and update it with the instructor data.
+        Also creates catalog course with respect to course run.
+
+        Returns:
+            Catalog course dict.
+        """
+        course = ModuleStoreCourseFactory()
+        course.start = datetime.datetime.now(utc) - datetime.timedelta(days=1)
+        course.end = datetime.datetime.now(utc) + datetime.timedelta(days=1)
+        course.instructor_info = self.instructors
+        course = self.update_course(course, self.user.id)
+
+        course_run = CourseRunFactory(
+            key=unicode(course.id),
+            seats=[SeatFactory(price=course_price)]
+        )
+        return CourseFactory(course_runs=[course_run])
+
+    def test_instructors(self):
+        data = ProgramMarketingDataExtender(self.program, self.user).extend()
 
         self.program.update(self.instructors['instructors'])
         self.assertEqual(data, self.program)
+
+    def test_course_pricing(self):
+        data = ProgramMarketingDataExtender(self.program, self.user).extend()
+
+        program_full_price = self.course_price * self.number_of_courses
+        self.assertEqual(data['number_of_courses'], self.number_of_courses)
+        self.assertEqual(data['full_program_price'], program_full_price)
+        self.assertEqual(data['avg_price_per_course'], program_full_price / self.number_of_courses)
+
+    @ddt.data(True, False)
+    @mock.patch(UTILS_MODULE + '.has_access')
+    def test_can_enroll(self, can_enroll, mock_has_access):
+        """
+        Verify that the student's can_enroll status is included.
+        """
+        mock_has_access.return_value = can_enroll
+
+        data = ProgramMarketingDataExtender(self.program, self.user).extend()
+
+        self.assertEqual(data['courses'][0]['course_runs'][0]['can_enroll'], can_enroll)
