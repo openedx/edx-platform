@@ -401,7 +401,7 @@ class BlockStructureBlockData(BlockStructure):
     # update this value whenever the data structure changes. Dependent storage
     # layers can then use this value when serializing/deserializing block
     # structures, and invalidating any previously cached/stored data.
-    VERSION = 1
+    VERSION = 2
 
     def __init__(self, root_block_usage_key):
         super(BlockStructureBlockData, self).__init__(root_block_usage_key)
