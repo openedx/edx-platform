@@ -81,7 +81,7 @@
             Content.loadContentInfos(response.annotated_content_info);
             DiscussionUtil.loadRoles(response.roles);
 
-            this.course_settings = new DiscussionCourseSettings(response.course_settings);
+            this.courseSettings = new DiscussionCourseSettings(response.course_settings);
 
             this.discussion = new Discussion(undefined, {pages: response.num_pages});
             this.discussion.reset(response.discussion_data, {
@@ -104,7 +104,7 @@
             this.threadListView = new DiscussionThreadListView({
                 el: this.$('.inline-threads'),
                 collection: self.discussion,
-                courseSettings: self.course_settings
+                courseSettings: self.courseSettings
             });
 
             this.threadListView.render();
@@ -118,7 +118,7 @@
             this.newPostView = new NewPostView({
                 el: this.newPostForm,
                 collection: this.discussion,
-                course_settings: this.course_settings,
+                course_settings: this.courseSettings,
                 topicId: discussionId,
                 is_commentable_cohorted: response.is_commentable_cohorted
             });
@@ -146,7 +146,7 @@
                 el: this.$('.forum-content'),
                 model: thread,
                 mode: 'inline',
-                course_settings: this.course_settings
+                courseSettings: this.courseSettings
             });
             this.threadView.render();
             this.listenTo(this.threadView.showView, 'thread:_delete', this.navigateToAllPosts);
