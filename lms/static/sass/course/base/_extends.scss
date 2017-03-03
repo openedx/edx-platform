@@ -28,19 +28,19 @@ h1.top-header {
 
 .light-button, a.light-button, // only used in askbot as classes
 .gray-button {
-  @include button(simple, $gray-l5);
+  @include simple($gray-l5);
   @extend .button-reset;
   font-size: em(13);
 }
 
 .blue-button {
-  @include button(simple, $blue);
+  @include simple($blue);
   @extend .button-reset;
   font-size: em(13);
 }
 
 .pink-button {
-  @include button(simple, $pink);
+  @include simple($pink);
   @extend .button-reset;
   font-size: em(13);
 }
