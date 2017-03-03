@@ -155,27 +155,29 @@ from openedx.core.djangolib.markup import HTML, Text
         <div id="dashboard-search-results" class="search-results dashboard-search-results"></div>
       % endif
 
-      <div class="profile-sidebar" id="profile-sidebar" role="region" aria-label="Account Status Info">
-        <header class="profile">
-          <h2 class="account-status-title sr">${_("Account Status Info")}: </h2>
-        </header>
-        <div class="user-info">
-          <ul>
+      % if display_sidebar_on_dashboard:
+        <div class="profile-sidebar" id="profile-sidebar" role="region" aria-label="Account Status Info">
+          <header class="profile">
+            <h2 class="account-status-title sr">${_("Account Status Info")}: </h2>
+          </header>
+          <div class="user-info">
+            <ul>
 
-            % if len(order_history_list):
-            <li class="order-history">
-              <span class="title">${_("Order History")}</span>
-              % for order_history_item in order_history_list:
-                <span><a href="${order_history_item['receipt_url']}" target="_blank" class="edit-name">${order_history_item['order_date']}</a></span>
-              % endfor
-            </li>
-            % endif
+              % if len(order_history_list):
+              <li class="order-history">
+                <span class="title">${_("Order History")}</span>
+                % for order_history_item in order_history_list:
+                  <span><a href="${order_history_item['receipt_url']}" target="_blank" class="edit-name">${order_history_item['order_date']}</a></span>
+                % endfor
+              </li>
+              % endif
 
-            <%include file="${static.get_template_path('dashboard/_dashboard_status_verification.html')}" />
+              <%include file="${static.get_template_path('dashboard/_dashboard_status_verification.html')}" />
 
-          </ul>
-            </div>
+            </ul>
+          </div>
         </div>
+      % endif
     </div>
 </main>
 
