@@ -4,7 +4,6 @@ Unit tests for integration of the django-user-tasks app and its REST API.
 
 from __future__ import absolute_import, print_function, unicode_literals
 
-import sys
 from uuid import uuid4
 import logging
 
@@ -23,16 +22,24 @@ from user_tasks.serializers import ArtifactSerializer, StatusSerializer
 from .signals import user_task_stopped
 
 
-# Mock logging handler to check for expected logs.
 class MockLoggingHandler(logging.Handler):
+    """
+    Mock logging handler to help check for logging statements
+    """
     def __init__(self, *args, **kwargs):
         self.reset()
         logging.Handler.__init__(self, *args, **kwargs)
 
     def emit(self, record):
+        """
+        Override to catch messages and store them messages in our internal dicts
+        """
         self.messages[record.levelname.lower()].append(record.getMessage())
 
     def reset(self):
+        """
+        Clear out all messages, also called to initially populate messages dict
+        """
         self.messages = {
             'debug': [],
             'info': [],
@@ -41,8 +48,8 @@ class MockLoggingHandler(logging.Handler):
             'critical': [],
         }
 
-# Helper functions for stuff that pylint complains about without disable comments
 
+# Helper functions for stuff that pylint complains about without disable comments
 def _context(response):
     """
     Get a context dictionary for a serializer appropriate for the given response.
