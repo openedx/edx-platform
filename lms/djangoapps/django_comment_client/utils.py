@@ -29,6 +29,7 @@ from openedx.core.djangoapps.course_groups.cohorts import (
 )
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from request_cache.middleware import request_cached
+from student.roles import GlobalStaff
 
 
 log = logging.getLogger(__name__)
@@ -525,12 +526,12 @@ def get_ability(course_id, content, user):
             content,
             "vote_for_thread" if content['type'] == 'thread' else "vote_for_comment"
         ),
-        'can_report': not is_content_authored_by(content, user) and check_permissions_by_view(
+        'can_report': not is_content_authored_by(content, user) and (check_permissions_by_view(
             user,
             course_id,
             content,
             "flag_abuse_for_thread" if content['type'] == 'thread' else "flag_abuse_for_comment"
-        )
+        ) or GlobalStaff().has_user(user))
     }
 
 # TODO: RENAME
