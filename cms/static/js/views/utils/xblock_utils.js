@@ -272,7 +272,8 @@ define(['jquery', 'underscore', 'gettext', 'common/js/components/utils/view_util
         findXBlockInfo = function(xblockWrapperElement, defaultXBlockInfo) {
             var xblockInfo = defaultXBlockInfo,
                 xblockElement,
-                displayName;
+                displayName,
+                hasChildren;
             if (xblockWrapperElement.length > 0) {
                 xblockElement = xblockWrapperElement.find('.xblock');
                 displayName = xblockWrapperElement.find(
@@ -283,11 +284,13 @@ define(['jquery', 'underscore', 'gettext', 'common/js/components/utils/view_util
                 if (!displayName) {
                     displayName = xblockElement.find('.component-header').text().trim();
                 }
+                hasChildren = defaultXBlockInfo ? defaultXBlockInfo.get('has_children') : false;
                 xblockInfo = new XBlockInfo({
                     id: xblockWrapperElement.data('locator'),
                     courseKey: xblockWrapperElement.data('course-key'),
                     category: xblockElement.data('block-type'),
-                    display_name: displayName
+                    display_name: displayName,
+                    has_children: hasChildren
                 });
             }
             return xblockInfo;

@@ -229,6 +229,18 @@ class ContainerPage(PageObject, HelpMixin):
         self.q(css='.button-view').first.click()
         self._switch_to_lms()
 
+    def verify_publish_title(self, expected_title):
+        """
+        Waits for the publish title to change to the expected value.
+        """
+        def wait_for_title_change():
+            """
+            Promise function to check publish title.
+            """
+            return (self.publish_title == expected_title, self.publish_title)
+
+        Promise(wait_for_title_change, "Publish title incorrect. Found '" + self.publish_title + "'").fulfill()
+
     def preview(self):
         """
         Clicks "Preview", which will open the draft version of the unit page in the LMS.

@@ -4,25 +4,53 @@
 define([
     'jquery',
     'underscore',
+    'backbone',
     'common/js/components/views/feedback',
     'common/js/components/views/feedback_alert',
     'js/views/utils/xblock_utils',
     'js/views/utils/move_xblock_utils',
     'edx-ui-toolkit/js/utils/string-utils'
 ],
-function($, _, Feedback, AlertView, XBlockViewUtils, MoveXBlockUtils, StringUtils) {
+function($, _, Backbone, Feedback, AlertView, XBlockViewUtils, MoveXBlockUtils, StringUtils) {
     'use strict';
-    var redirectLink, undoMoveXBlock, showMovedNotification, hideMovedNotification;
+    var redirectLink, moveXBlock, undoMoveXBlock, showMovedNotification, hideMovedNotification;
 
     redirectLink = function(link) {
         window.location.href = link;
     };
 
+    moveXBlock = function(data) {
+        XBlockViewUtils.moveXBlock(data.sourceLocator, data.targetParentLocator)
+        .done(function(response) {
+            // hide modal
+            Backbone.trigger('move:hideMoveModal');
+            // hide xblock element
+            data.sourceXBlockElement.hide();
+            showMovedNotification(
+                StringUtils.interpolate(
+                    gettext('Success! "{displayName}" has been moved.'),
+                    {
+                        displayName: data.sourceDisplayName
+                    }
+                ),
+                {
+                    sourceXBlockElement: data.sourceXBlockElement,
+                    sourceDisplayName: data.sourceDisplayName,
+                    sourceLocator: data.sourceLocator,
+                    sourceParentLocator: data.sourceParentLocator,
+                    targetParentLocator: data.targetParentLocator,
+                    targetIndex: response.source_index
+                }
+            );
+            Backbone.trigger('move:onXBlockMoved');
+        });
+    };
+
     undoMoveXBlock = function(data) {
         XBlockViewUtils.moveXBlock(data.sourceLocator, data.sourceParentLocator, data.targetIndex)
-        .done(function(response) {
+        .done(function() {
             // show XBlock element
-            $('.studio-xblock-wrapper[data-locator="' + response.move_source_locator + '"]').show();
+            data.sourceXBlockElement.show();
             showMovedNotification(
                 StringUtils.interpolate(
                     gettext('Move cancelled. "{sourceDisplayName}" has been moved back to its original location.'),
@@ -31,6 +59,7 @@ function($, _, Feedback, AlertView, XBlockViewUtils, MoveXBlockUtils, StringUtil
                     }
                 )
             );
+            Backbone.trigger('move:onXBlockMoved');
         });
     };
 
@@ -44,15 +73,10 @@ function($, _, Feedback, AlertView, XBlockViewUtils, MoveXBlockUtils, StringUtil
                     primary: {
                         text: gettext('Undo move'),
                         class: 'action-save',
-                        data: JSON.stringify({
-                            sourceDisplayName: data.sourceDisplayName,
-                            sourceLocator: data.sourceLocator,
-                            sourceParentLocator: data.sourceParentLocator,
-                            targetIndex: data.targetIndex
-                        }),
                         click: function() {
                             undoMoveXBlock(
                                 {
+                                    sourceXBlockElement: data.sourceXBlockElement,
                                     sourceDisplayName: data.sourceDisplayName,
                                     sourceLocator: data.sourceLocator,
                                     sourceParentLocator: data.sourceParentLocator,
@@ -65,9 +89,6 @@ function($, _, Feedback, AlertView, XBlockViewUtils, MoveXBlockUtils, StringUtil
                         {
                             text: gettext('Take me to the new location'),
                             class: 'action-cancel',
-                            data: JSON.stringify({
-                                targetParentLocator: data.targetParentLocator
-                            }),
                             click: function() {
                                 redirectLink('/container/' + data.targetParentLocator);
                             }
@@ -100,6 +121,8 @@ function($, _, Feedback, AlertView, XBlockViewUtils, MoveXBlockUtils, StringUtil
 
     return {
         redirectLink: redirectLink,
+        moveXBlock: moveXBlock,
+        undoMoveXBlock: undoMoveXBlock,
         showMovedNotification: showMovedNotification,
         hideMovedNotification: hideMovedNotification
     };
