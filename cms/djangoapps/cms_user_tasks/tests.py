@@ -149,10 +149,6 @@ class TestUserTaskStopped(APITestCase):
             reverse('usertaskstatus-detail', args=[self.status.uuid])
         ]
 
-        for m in mail.outbox:
-            print (m.subject)
-            print (m.body)
-
         self.assertEqual(len(mail.outbox), 1)
 
         msg = mail.outbox[0]
@@ -184,10 +180,6 @@ class TestUserTaskStopped(APITestCase):
             "Your {task_name} task has completed with the status".format(task_name=self.status.name.lower()),
             "Sign in to view the details of your task or download any files created."
         ]
-
-        for m in mail.outbox:
-            print (m.subject)
-            print (m.body)
 
         self.assertEqual(len(mail.outbox), 1)
 
