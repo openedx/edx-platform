@@ -17,7 +17,7 @@ define([
             currentPage: 'page',
             pageSize: 'page_size',
             sortKey: 'sort_field',
-            order: 'sort_dir',
+            order: 'sort_order',
             directions: {
                 asc: 'asc',
                 desc: 'desc'
@@ -27,25 +27,16 @@ define([
         initState: function(options) {
             return {
                 pageSize: options.pageSize,
-                totalRecords: options.totalCount,
+                totalRecords: options.count,
                 sortKey: options.sortField,
-                order: function(options){
-                    if (options.sort_dir === 'asc') {
-                        return -1
-                    } else if (options.sort_dir === 'desc'){
-                        return 1
-                    } else {
-                        return -1
-                    }
-                }
-
+                order: options.sort_order
             };
         },
 
         parseState: function(response) {
             return {
-                totalRecords: response[0].total_count,
-                totalPages: response[0].total_pages
+                totalRecords: response[0].count,
+                totalPages: response[0].num_pages
             };
         }
     });

@@ -303,15 +303,21 @@ def _get_index_videos(course, request):
     """
     Returns the information about each video upload required for the video list
     """
-    params = {
-        "page": request.GET.get("page", 1),
-        "page_size": request.GET.get("page_size", 20),
-        "paginated": True,
-        "sort_field": VideoSortField[request.GET.get("sort_field", "created")],
-        "sort_dir": SortDirection[request.GET.get("sort_dir", "asc")]
-    }
+    params = { "paginated": True }
+
+    page = request.GET.get("page")
+    page_size = request.GET.get("page_size")
+    sort_field = request.GET.get("sort_field")
+    sort_order = request.GET.get("sort_order")
+
+    # Add parameter if it exists in request
+    if page: params["page"] = page
+    if page_size: params["page_size"] = page_size
+    if sort_field: params["sort_field"] = VideoSortField[sort_field]
+    if sort_order: params["sort_dir"] = SortDirection[sort_order]
+
     videos_data = _get_videos(course, params)
-    videos = list(
+    videos_data["results"] = list(
         {
             attr: video[attr]
             for attr in ["edx_video_id", "client_video_id", "created", "duration", "status"]
@@ -319,7 +325,6 @@ def _get_index_videos(course, request):
         for video in videos_data["results"]
     )
 
-    videos_data["results"] = videos
     return videos_data
 
 
@@ -345,12 +350,13 @@ def videos_index_json(course, request):
     """
     Returns JSON in the following format:
     {
-        "start": <first_page>,
-        "end": <last_page>,
-        "total_count": <total number of records>,
+        "count": <total number of records>,
         "sort_field": <sort field>,
-        "sort_dir": <sort direction>,
-        "videos": [{
+        "sort_order": <sort direction>,
+        "page": <current page numver>,
+        "num_page": <total number of pages>,
+        "page_size": <size of each page>,
+        "results": [{
             "edx_video_id": "aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa",
             "client_video_id": "video.mp4",
             "created": "1970-01-01T00:00:00Z",

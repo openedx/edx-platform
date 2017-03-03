@@ -1,8 +1,9 @@
 define([
-    'jquery', 'backbone', 'js/views/active_video_upload_list', 'js/collections/video',
-    'js/views/previous_video_upload_list', 'js/views/active_video_upload'
-], function($, Backbone, ActiveVideoUploadListView, VideoPagingCollection,
-    PreviousVideoUploadListView, ActiveVideoUpload) {
+    'jquery', 'backbone', 'js/views/active_video_upload_list',
+    'js/views/previous_video_upload_list', 'js/views/active_video_upload',
+    'js/collections/video'
+], function($, Backbone, ActiveVideoUploadListView, PreviousVideoUploadListView,
+    ActiveVideoUpload, VideoPagingCollection) {
     'use strict';
     var VideosIndexFactory = function(
         $contentWrapper,
@@ -27,12 +28,12 @@ define([
                         dataType: 'json',
                         type: 'GET'
                     }).done(function(responseData) {
-                        var updatedCollection = new VideoPagingCollection(responseData.videos, {
+                        var updatedCollection = new VideoPagingCollection(responseData.results, {
                             url: videoHandlerUrl,
                             pageSize: responseData.page_size,
                             sortField: responseData.sort_field,
-                            totalCount: responseData.total_count,
-                            sortDir: responseData.sort_dir
+                            count: responseData.count,
+                            sortOrder: responseData.sort_oder
                         }).filter(function(video) {
                                 // Include videos that are not in the active video upload list,
                                 // or that are marked as Upload Complete
@@ -55,8 +56,8 @@ define([
                     url: videoHandlerUrl,
                     pageSize: previousUploads["page_size"],
                     sortField: previousUploads["sort_field"],
-                    totalCount: previousUploads["total_count"],
-                    sortDir: previousUploads["sort_dir"]
+                    count: previousUploads["count"],
+                    sortOder: previousUploads["sort_order"]
                 }),
                 encodingsDownloadUrl: encodingsDownloadUrl
             });

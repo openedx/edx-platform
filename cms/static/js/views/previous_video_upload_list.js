@@ -26,21 +26,21 @@ define([
                     videoHandlerUrl: options.videoHandlerUrl,
                     template: this.loadTemplate('previous-video-upload-list')
                 });
-                this.pagingView.registerSortableColumn('js-video-date-col', gettext('Date Added'), 'created', 'asc');
+                this.pagingView.registerSortableColumn('js-video-date-col', gettext('Date Added'), 'created', 'desc');
                 this.pagingView.registerSortableColumn('js-video-name-col', gettext('Name'), 'client_video_id', 'asc');
                 this.pagingView.registerSortableColumn('js-video-duration-col', gettext('Duration'), 'duration', 'asc');
                 this.pagingView.setInitialSortColumn('js-video-date-col')
             },
 
             PreviousVideoUploadPagingView: PagingView.extend({
-                initialize: function(options){
+                initialize: function(options) {
                     PagingView.prototype.initialize.call(this);
                     this.encodingsDownloadUrl = options.encodingsDownloadUrl;
                     this.videoHandlerUrl = options.videoHandlerUrl;
                     this.template = options.template;
                 },
 
-                renderPageItems: function(){
+                renderPageItems: function() {
                     var videoHandlerUrl = this.videoHandlerUrl;
                     this.itemViews = this.collection.map(function(model) {
                         return new PreviousVideoUploadView({
@@ -54,12 +54,10 @@ define([
                     $el.html(this.template({encodingsDownloadUrl: this.encodingsDownloadUrl}));
                     $tabBody = $el.find('.js-table-body');
                     _.each(this.itemViews, function(view) {
-                                   $tabBody.append(view.render().$el);
+                        $tabBody.append(view.render().$el);
                     });
-                    this.pagingHeader = new PagingHeader({view: this,
-                        el: $el.find('#video-paging-header')});
-                    this.pagingFooter = new PagingFooter({collection: this.collection,
-                        el: $el.find('#video-paging-footer')});
+                    this.pagingHeader = new PagingHeader({view: this, el: $el.find('#video-paging-header')});
+                    this.pagingFooter = new PagingFooter({collection: this.collection, el: $el.find('#video-paging-footer')});
                     this.pagingHeader.render();
                     this.pagingFooter.render();
                 }
