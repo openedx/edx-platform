@@ -664,7 +664,7 @@ class UnitPublishingTest(ContainerBase):
             And the last saved text contains "Last published"
         """
         unit = self.go_to_unit_page()
-        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
+        unit.verify_publish_title(self.PUBLISHED_LIVE_STATUS)
         # Start date set in course fixture to 1970.
         self._verify_release_date_info(
             unit, self.RELEASE_TITLE_RELEASED, 'Jan 01, 1970 at 00:00 UTC\nwith Section "Test Section"'
@@ -675,11 +675,11 @@ class UnitPublishingTest(ContainerBase):
 
         # Add a component to the page so it will have unpublished changes.
         add_discussion(unit)
-        self._verify_publish_title(unit, self.DRAFT_STATUS)
+        unit.verify_publish_title(self.DRAFT_STATUS)
         self._verify_last_published_and_saved(unit, self.LAST_PUBLISHED, self.LAST_SAVED)
         unit.publish_action.click()
         unit.wait_for_ajax()
-        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
+        unit.verify_publish_title(self.PUBLISHED_LIVE_STATUS)
         self._verify_last_published_and_saved(unit, self.LAST_PUBLISHED, self.LAST_PUBLISHED)
 
     def test_discard_changes(self):
@@ -696,9 +696,9 @@ class UnitPublishingTest(ContainerBase):
         """
         unit = self.go_to_unit_page()
         add_discussion(unit)
-        self._verify_publish_title(unit, self.DRAFT_STATUS)
+        unit.verify_publish_title(self.DRAFT_STATUS)
         unit.discard_changes()
-        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
+        unit.verify_publish_title(self.PUBLISHED_LIVE_STATUS)
 
     def test_view_live_no_changes(self):
         """
@@ -757,7 +757,7 @@ class UnitPublishingTest(ContainerBase):
             Then I see the content in the unit
         """
         unit = self.go_to_unit_page("Unlocked Section", "Unlocked Subsection", "Unlocked Unit")
-        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
+        unit.verify_publish_title(self.PUBLISHED_LIVE_STATUS)
         self.assertTrue(unit.currently_visible_to_students)
         self._verify_release_date_info(
             unit, self.RELEASE_TITLE_RELEASED, self.past_start_date_text + '\n' + 'with Section "Unlocked Section"'
@@ -783,7 +783,7 @@ class UnitPublishingTest(ContainerBase):
         self.assertTrue(checked)
         self.assertFalse(unit.currently_visible_to_students)
         self.assertFalse(unit.shows_inherited_staff_lock())
-        self._verify_publish_title(unit, self.LOCKED_STATUS)
+        unit.verify_publish_title(self.LOCKED_STATUS)
         self._view_published_version(unit)
         # Will initially be in staff view, locked component should be visible.
         self._verify_components_visible(['problem'])
@@ -802,7 +802,7 @@ class UnitPublishingTest(ContainerBase):
             Then I do not see any content in the unit
         """
         unit = self.go_to_unit_page("Section With Locked Unit", "Subsection With Locked Unit", "Locked Unit")
-        self._verify_publish_title(unit, self.LOCKED_STATUS)
+        unit.verify_publish_title(self.LOCKED_STATUS)
         self.assertFalse(unit.currently_visible_to_students)
         self._verify_release_date_info(
             unit, self.RELEASE_TITLE_RELEASE,
@@ -826,7 +826,7 @@ class UnitPublishingTest(ContainerBase):
         unit = self.go_to_unit_page("Section With Locked Unit", "Subsection With Locked Unit", "Locked Unit")
         checked = unit.toggle_staff_lock()
         self.assertFalse(checked)
-        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
+        unit.verify_publish_title(self.PUBLISHED_LIVE_STATUS)
         self.assertTrue(unit.currently_visible_to_students)
         self._view_published_version(unit)
         # Will initially be in staff view, components always visible.
@@ -894,10 +894,10 @@ class UnitPublishingTest(ContainerBase):
         component.edit()
         HtmlComponentEditorView(self.browser, component.locator).set_content_and_save(modified_content)
         self.assertEqual(component.student_content, modified_content)
-        self._verify_publish_title(unit, self.DRAFT_STATUS)
+        unit.verify_publish_title(self.DRAFT_STATUS)
         unit.publish_action.click()
         unit.wait_for_ajax()
-        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
+        unit.verify_publish_title(self.PUBLISHED_LIVE_STATUS)
         self._view_published_version(unit)
         self.assertIn(modified_content, self.courseware.xblock_component_html_content(0))
 
@@ -917,10 +917,10 @@ class UnitPublishingTest(ContainerBase):
         component.edit()
         HtmlComponentEditorView(self.browser, component.locator).set_content_and_cancel("modified content")
         self.assertEqual(component.student_content, "Body of HTML Unit.")
-        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
+        unit.verify_publish_title(self.PUBLISHED_LIVE_STATUS)
         self.browser.refresh()
         unit.wait_for_page()
-        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
+        unit.verify_publish_title(self.PUBLISHED_LIVE_STATUS)
 
     def test_delete_child_in_published_unit(self):
         """
@@ -936,10 +936,10 @@ class UnitPublishingTest(ContainerBase):
         """
         unit = self.go_to_unit_page()
         unit.delete(0)
-        self._verify_publish_title(unit, self.DRAFT_STATUS)
+        unit.verify_publish_title(self.DRAFT_STATUS)
         unit.publish_action.click()
         unit.wait_for_ajax()
-        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
+        unit.verify_publish_title(self.PUBLISHED_LIVE_STATUS)
         self._view_published_version(unit)
         self.assertEqual(0, self.courseware.num_xblock_components)
 
@@ -955,12 +955,12 @@ class UnitPublishingTest(ContainerBase):
             Then the title in the Publish information box is "Published (not yet released)"
         """
         unit = self.go_to_unit_page('Unreleased Section', 'Unreleased Subsection', 'Unreleased Unit')
-        self._verify_publish_title(unit, self.PUBLISHED_STATUS)
+        unit.verify_publish_title(self.PUBLISHED_STATUS)
         add_discussion(unit)
-        self._verify_publish_title(unit, self.DRAFT_STATUS)
+        unit.verify_publish_title(self.DRAFT_STATUS)
         unit.publish_action.click()
         unit.wait_for_ajax()
-        self._verify_publish_title(unit, self.PUBLISHED_STATUS)
+        unit.verify_publish_title(self.PUBLISHED_STATUS)
 
     def _view_published_version(self, unit):
         """
@@ -1006,15 +1006,6 @@ class UnitPublishingTest(ContainerBase):
         """
         self.assertEqual(expected_title, unit.release_title)
         self.assertEqual(expected_date, unit.release_date)
-
-    def _verify_publish_title(self, unit, expected_title):
-        """
-        Waits for the publish title to change to the expected value.
-        """
-        def wait_for_title_change():
-            return (unit.publish_title == expected_title, unit.publish_title)
-
-        Promise(wait_for_title_change, "Publish title incorrect. Found '" + unit.publish_title + "'").fulfill()
 
     def _verify_last_published_and_saved(self, unit, expected_published_prefix, expected_saved_prefix):
         """
@@ -1144,6 +1135,9 @@ class MoveComponentTest(ContainerBase):
     """
     Tests of moving an XBlock to another XBlock.
     """
+    PUBLISHED_LIVE_STATUS = "Publishing Status\nPublished and Live"
+    DRAFT_STATUS = "Publishing Status\nDraft (Unpublished changes)"
+
     def setUp(self, is_staff=True):
         super(MoveComponentTest, self).setUp(is_staff=is_staff)
         self.container = ContainerPage(self.browser, None)
@@ -1181,25 +1175,35 @@ class MoveComponentTest(ContainerBase):
             )
         )
 
-    def verify_move_opertions(self, unit_page, source_component, operation, component_display_names_after_operation):
+    def verify_move_opertions(self, unit_page, source_component, operation, component_display_names_after_operation,
+                              should_verify_publish_title=True):
         """
         Verify move operations.
 
         Arguments:
             unit_page (Object)                                Unit container page.
-            source_component (Object)                         source XBlock object to be moved.
+            source_component (Object)                         Source XBlock object to be moved.
             operation (str),                                  `move` or `undo move` operation.
-            component_display_names_after_operation (dict)    display names of components after operation in source/dest
+            component_display_names_after_operation (dict)    Display names of components after operation in source/dest
+            should_verify_publish_title (Boolean)             Should verify publish title ot not. Default is True.
         """
         source_component.open_move_modal()
         self.move_modal_view.navigate_to_category(self.source_xblock_category, self.navigation_options)
         self.assertEqual(self.move_modal_view.is_move_button_enabled, True)
+
+        # Verify unit is in published state before move operation
+        if should_verify_publish_title:
+            self.container.verify_publish_title(self.PUBLISHED_LIVE_STATUS)
 
         self.move_modal_view.click_move_button()
         self.container.verify_confirmation_message(
             self.message_move.format(display_name=self.source_component_display_name)
         )
         self.assertEqual(len(unit_page.displayed_children), 1)
+
+        # Verify unit in draft state now
+        if should_verify_publish_title:
+            self.container.verify_publish_title(self.DRAFT_STATUS)
 
         if operation == 'move':
             self.container.click_take_me_there_link()
@@ -1333,7 +1337,8 @@ class MoveComponentTest(ContainerBase):
             unit_page=group_container_page,
             source_component=components[0],
             operation='undo_move',
-            component_display_names_after_operation=['HTML 311', 'HTML 312']
+            component_display_names_after_operation=['HTML 311', 'HTML 312'],
+            should_verify_publish_title=False
         )
 
         # Verify move operation for content experiment.
@@ -1341,7 +1346,8 @@ class MoveComponentTest(ContainerBase):
             unit_page=group_container_page,
             source_component=components[0],
             operation='move',
-            component_display_names_after_operation=['HTML 21', 'HTML 22', 'HTML 311']
+            component_display_names_after_operation=['HTML 21', 'HTML 22', 'HTML 311'],
+            should_verify_publish_title=False
         )
 
     def test_a11y(self):

@@ -948,17 +948,17 @@ class TestMoveItem(ItemTest):
         """
         Test invalid move.
         """
-        parent_loc = self.store.get_parent_location(self.chapter_usage_key)
-        response = self._move_component(self.chapter_usage_key, self.usage_key)
+        parent_loc = self.store.get_parent_location(self.html_usage_key)
+        response = self._move_component(self.html_usage_key, self.seq_usage_key)
         self.assertEqual(response.status_code, 400)
         response = json.loads(response.content)
 
         expected_error = 'You can not move {source_type} into {target_type}.'.format(
-            source_type=self.chapter_usage_key.block_type,
-            target_type=self.usage_key.block_type
+            source_type=self.html_usage_key.block_type,
+            target_type=self.seq_usage_key.block_type
         )
         self.assertEqual(expected_error, response['error'])
-        new_parent_loc = self.store.get_parent_location(self.chapter_usage_key)
+        new_parent_loc = self.store.get_parent_location(self.html_usage_key)
         self.assertEqual(new_parent_loc, parent_loc)
 
     def test_move_current_parent(self):
@@ -1039,10 +1039,22 @@ class TestMoveItem(ItemTest):
 
     def test_move_into_content_experiment_groups(self):
         """
-        Test that a component can be moved to content experiment.
+        Test that a component can be moved to content experiment groups.
         """
         split_test = self.setup_and_verify_content_experiment(0)
         self.assert_move_item(self.html_usage_key, split_test.children[0])
+
+    def test_can_not_move_into_content_experiment_level(self):
+        """
+        Test that a component can not be moved directly to content experiment level.
+        """
+        self.setup_and_verify_content_experiment(0)
+        response = self._move_component(self.html_usage_key, self.split_test_usage_key)
+        self.assertEqual(response.status_code, 400)
+        response = json.loads(response.content)
+
+        self.assertEqual(response['error'], 'You can not move an item directly into content experiment.')
+        self.assertEqual(self.store.get_parent_location(self.html_usage_key), self.vert_usage_key)
 
     def test_can_not_move_content_experiment_into_its_children(self):
         """
