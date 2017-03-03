@@ -471,7 +471,7 @@ def account_settings_context(request):
         'user_accounts_api_url': reverse("accounts_api", kwargs={'username': user.username}),
         'user_preferences_api_url': reverse('preferences_api', kwargs={'username': user.username}),
         'disable_courseware_js': True,
-        'show_program_listing': ProgramsApiConfig.current().show_program_listing,
+        'show_program_listing': ProgramsApiConfig.is_enabled(),
         'order_history': user_orders
     }
 

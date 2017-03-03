@@ -596,7 +596,7 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase, ProgramsApiConf
         """
         Verify that tabs header will be shown while program listing is enabled.
         """
-        self.create_programs_config(program_listing_enabled=True)
+        self.create_programs_config()
         view_path = reverse('account_settings')
         response = self.client.get(path=view_path)
 
@@ -606,7 +606,7 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase, ProgramsApiConf
         """
         Verify that nav header will be shown while program listing is disabled.
         """
-        self.create_programs_config(program_listing_enabled=False)
+        self.create_programs_config(enabled=False)
         view_path = reverse('account_settings')
         response = self.client.get(path=view_path)
 

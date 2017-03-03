@@ -22,7 +22,7 @@ from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 def program_listing(request):
     """View a list of programs in which the user is engaged."""
     programs_config = ProgramsApiConfig.current()
-    if not programs_config.show_program_listing:
+    if not programs_config.enabled:
         raise Http404
 
     meter = ProgramProgressMeter(request.user)
@@ -34,7 +34,7 @@ def program_listing(request):
         'nav_hidden': True,
         'programs': meter.engaged_programs,
         'progress': meter.progress,
-        'show_program_listing': programs_config.show_program_listing,
+        'show_program_listing': programs_config.enabled,
         'uses_pattern_library': True,
     }
 
@@ -46,7 +46,7 @@ def program_listing(request):
 def program_details(request, program_uuid):
     """View details about a specific program."""
     programs_config = ProgramsApiConfig.current()
-    if not programs_config.show_program_details:
+    if not programs_config.enabled:
         raise Http404
 
     program_data = get_programs(uuid=program_uuid)
@@ -66,7 +66,7 @@ def program_details(request, program_uuid):
     context = {
         'program_data': program_data,
         'urls': urls,
-        'show_program_listing': programs_config.show_program_listing,
+        'show_program_listing': programs_config.enabled,
         'nav_hidden': True,
         'disable_courseware_js': True,
         'uses_pattern_library': True,

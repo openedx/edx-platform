@@ -8,6 +8,7 @@ class ProgramsConfigMixin(object):
     """Mixin providing a method used to configure the programs feature."""
     def set_programs_api_configuration(self, is_enabled=False, api_version=1):
         """Dynamically adjusts the Programs config model during tests."""
+        # Update these paramters once fields are removed from model
         ConfigModelFixture('/config/programs', {
             'enabled': is_enabled,
             'api_version_number': api_version,
