@@ -4,7 +4,7 @@ Receivers of signals sent from django-user-tasks
 from __future__ import absolute_import, print_function, unicode_literals
 
 import logging
-from six.moves.urllib.parse import urljoin
+from six.moves.urllib.parse import urljoin  # pylint: disable=import-error
 
 from django.core.urlresolvers import reverse
 from django.dispatch import receiver
