@@ -21,7 +21,7 @@ from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from notification_prefs import NOTIFICATION_PREF_KEY
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 import student
-from student.models import UserAttribute
+from student.models import UserAttribute, LanguageProficiency
 from student.views import REGISTRATION_AFFILIATE_ID, REGISTRATION_UTM_PARAMETERS, REGISTRATION_UTM_CREATED_AT
 from django_comment_common.models import ForumsConfig
 
@@ -40,7 +40,7 @@ TEST_CS_URL = 'https://comments.service.test:123/'
         key: "optional"
         for key in [
             "level_of_education", "gender", "mailing_address", "city", "country", "goals",
-            "year_of_birth"
+            "year_of_birth", "language"
         ]
     }
 )
@@ -212,6 +212,29 @@ class TestCreateAccount(SiteMixin, TestCase):
             {"extra1": "", "extra2": ""}
         )
         self.assertEqual(profile.year_of_birth, None)
+
+    def test_user_language_proficiency_saved(self):
+        """
+        Test user's language proficiency saved in LanguageProficiency Model.
+        """
+        self.params.update({
+            "language": "en"
+        })
+        profile = self.create_account_and_fetch_profile()
+        language_proficiency = LanguageProficiency.objects.get(user_profile=profile)
+        self.assertEqual(language_proficiency.code, "en")
+
+    @mock.patch("student.models.LanguageProficiency.objects.create", side_effect=Exception)
+    def test_user_invalid_language_proficiency(self, mock_create):
+        """
+        Test exception handling for user's language proficiency.
+        """
+        self.params.update({
+            "language": "fake-language-code"
+        })
+        with self.assertRaises(Exception):
+            self.create_account_and_fetch_profile()
+        self.assertTrue(mock_create.called)
 
     def test_profile_year_of_birth_non_integer(self):
         self.params["year_of_birth"] = "not_an_integer"

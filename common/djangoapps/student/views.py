@@ -58,6 +58,7 @@ from student.models import (
     LogoutViewConfiguration, RegistrationCookieConfiguration)
 from student.forms import AccountCreationForm, PasswordResetFormNoActive, get_registration_extension_form
 from student.tasks import send_activation_email
+from student.models import LanguageProficiency
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification  # pylint: disable=import-error
 from bulk_email.models import Optout, BulkEmailFlag  # pylint: disable=import-error
@@ -1665,6 +1666,14 @@ def _do_create_account(form, custom_form=None, site=None):
         log.exception("UserProfile creation failed for user {id}.".format(id=user.id))
         raise
 
+    # Language field added in registration form for WL Sites.
+    language = form.cleaned_data.get('language')
+    if language:
+        try:
+            LanguageProficiency.objects.create(user_profile=profile, code=language)
+        except Exception:  # pylint: disable=broad-except
+            log.exception("LanguageProficiency creation failed for user {id}.".format(id=user.id))
+            raise
     return (user, profile, registration)
 
 

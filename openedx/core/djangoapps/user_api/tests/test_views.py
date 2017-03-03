@@ -1070,6 +1070,25 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             }
         )
 
+    @mock.patch('openedx.core.djangoapps.user_api.views.all_languages')
+    def test_register_form_language(self, mocked_all_language):
+        mocked_all_language.return_value = ([u"en", u"English"], [u"fr", u"French"], [u"ur", u"Urdu"])
+        self._assert_reg_field(
+            {"language": "optional"},
+            {
+                "name": "language",
+                "type": "select",
+                "required": False,
+                "label": "Preferred Language",
+                "options": [
+                    {"value": "", "name": "--", "default": True},
+                    {"value": "en", "name": "English"},
+                    {"value": "fr", "name": "French"},
+                    {"value": "ur", "name": "Urdu"}
+                ],
+            }
+        )
+
     @mock.patch('openedx.core.djangoapps.user_api.views._')
     def test_register_form_gender_translations(self, fake_gettext):
         fake_gettext.side_effect = lambda text: text + ' TRANSLATED'

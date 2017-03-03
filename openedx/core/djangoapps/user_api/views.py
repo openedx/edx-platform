@@ -21,6 +21,7 @@ from rest_framework.exceptions import ParseError
 from django_countries import countries
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
+from openedx.core.djangoapps.lang_pref.api import all_languages
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
 import third_party_auth
 from django_comment_common.models import Role
@@ -171,6 +172,7 @@ class RegistrationView(APIView):
         "company",
         "title",
         "mailing_address",
+        "language",
         "goals",
         "honor_code",
         "terms_of_service",
@@ -716,6 +718,30 @@ class RegistrationView(APIView):
         form_desc.add_field(
             "last_name",
             label=last_name_label,
+            required=required
+        )
+
+    def _add_language_field(self, form_desc, required=False):
+        """Add a Language field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to False
+
+        """
+        # Translators: This label appears above a field on the registration form
+        # which allows the user to input the Language
+        language_label = _(u"Preferred Language")
+
+        options = all_languages()
+        form_desc.add_field(
+            "language",
+            label=language_label,
+            field_type="select",
+            options=options,
+            include_default_option=True,
             required=required
         )
 
