@@ -1467,6 +1467,17 @@ class CourseEnrollment(models.Model):
         return enrollments
 
     @classmethod
+    def enrollments_for_mode(cls, course_key, mode_slug):
+        """
+        Returns enrollments for the given course and mode.
+        """
+        return cls.objects.filter(
+            is_active=True,
+            course_id=course_key,
+            mode=mode_slug,
+        )
+
+    @classmethod
     def enrollment_status_hash_cache_key(cls, user):
         """ Returns the cache key for the cached enrollment status hash.
 

@@ -23,6 +23,7 @@ Mode = namedtuple('Mode',
                       'description',
                       'sku',
                       'bulk_sku',
+                      'course_id',
                   ])
 
 
@@ -116,7 +117,6 @@ class CourseMode(models.Model):
     NO_ID_PROFESSIONAL_MODE = "no-id-professional"
     CREDIT_MODE = "credit"
 
-    DEFAULT_MODE = Mode(AUDIT, _('Audit'), 0, '', 'usd', None, None, None, None)
     DEFAULT_MODE_SLUG = AUDIT
 
     # Modes that allow a student to pursue a verified certificate
@@ -139,10 +139,17 @@ class CourseMode(models.Model):
     # "honor" to "audit", we still need to have the shoppingcart
     # use "honor"
     DEFAULT_SHOPPINGCART_MODE_SLUG = HONOR
-    DEFAULT_SHOPPINGCART_MODE = Mode(HONOR, _('Honor'), 0, '', 'usd', None, None, None, None)
+    DEFAULT_SHOPPINGCART_MODE = Mode(HONOR, _('Honor'), 0, '', 'usd', None, None, None, None, None)
 
     class Meta(object):
         unique_together = ('course_id', 'mode_slug', 'currency')
+
+    @classmethod
+    def default_mode(cls, course_id):
+        """
+        Returns the default course mode for the given course.
+        """
+        return Mode(cls.AUDIT, _('Audit'), 0, '', 'usd', None, None, None, None, course_id)
 
     def clean(self):
         """
@@ -205,7 +212,7 @@ class CourseMode(models.Model):
         # Assign default modes if nothing available in the database
         missing_courses = set(course_id_list) - set(modes_by_course.keys())
         for course_id in missing_courses:
-            modes_by_course[course_id] = [cls.DEFAULT_MODE]
+            modes_by_course[course_id] = [cls.default_mode(course_id)]
 
         return modes_by_course
 
@@ -306,7 +313,7 @@ class CourseMode(models.Model):
 
         modes = ([mode.to_tuple() for mode in found_course_modes])
         if not modes:
-            modes = [cls.DEFAULT_MODE]
+            modes = [cls.default_mode(course_id)]
 
         return modes
 
@@ -654,7 +661,8 @@ class CourseMode(models.Model):
             self.expiration_datetime,
             self.description,
             self.sku,
-            self.bulk_sku
+            self.bulk_sku,
+            self.course_id,
         )
 
     def __unicode__(self):

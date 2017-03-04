@@ -58,7 +58,7 @@ class CourseModeFactory(DjangoModelFactory):
         model = CourseMode
 
     course_id = None
-    mode_display_name = CourseMode.DEFAULT_MODE.name
+    mode_display_name = CourseMode.default_mode(None).name
     mode_slug = CourseMode.DEFAULT_MODE_SLUG
     suggested_prices = ''
     currency = 'usd'

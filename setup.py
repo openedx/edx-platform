@@ -54,5 +54,9 @@ setup(
             "milestones = lms.djangoapps.course_api.blocks.transformers.milestones:MilestonesTransformer",
             "grades = lms.djangoapps.grades.transformer:GradesTransformer",
         ],
+        "openedx.user_tag_provider": [
+            "openedx.enrollment.track = lms.djangoapps.verified_track_content.enrollment_user_tag:EnrollmentTrackUserTagProvider",
+            "openedx.partitioned_cohorts = openedx.core.djangoapps.course_groups.cohort_user_tag:CohortUserTagProvider",
+        ],
     }
 )

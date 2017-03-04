@@ -307,7 +307,9 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
 
         self.assertEquals(response.status_code, 200)
 
-        expected_mode = [Mode(u'honor', u'Honor Code Certificate', 0, '', 'usd', None, None, None, None)]
+        expected_mode = [
+            Mode(u'honor', u'Honor Code Certificate', 0, '', 'usd', None, None, None, None, self.course.id)
+        ]
         course_mode = CourseMode.modes_for_course(self.course.id)
 
         self.assertEquals(course_mode, expected_mode)
@@ -341,7 +343,8 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
                 None,
                 None,
                 None,
-                None
+                None,
+                self.course.id,
             )
         ]
         course_mode = CourseMode.modes_for_course(self.course.id)
@@ -366,8 +369,10 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
         url = reverse('create_mode', args=[unicode(self.course.id)])
         self.client.get(url, parameters)
 
-        honor_mode = Mode(u'honor', u'Honor Code Certificate', 0, '', 'usd', None, None, None, None)
-        verified_mode = Mode(u'verified', u'Verified Certificate', 10, '10,20', 'usd', None, None, None, None)
+        honor_mode = Mode(u'honor', u'Honor Code Certificate', 0, '', 'usd', None, None, None, None, self.course.id)
+        verified_mode = Mode(
+            u'verified', u'Verified Certificate', 10, '10,20', 'usd', None, None, None, None, self.course.id,
+        )
         expected_modes = [honor_mode, verified_mode]
         course_modes = CourseMode.modes_for_course(self.course.id)
 
