@@ -97,6 +97,7 @@ class CourseOverview(TimeStampedModel):
     course_video_url = TextField(null=True)
     effort = TextField(null=True)
     self_paced = BooleanField(default=False)
+    marketing_url = TextField(null=True)
 
     @classmethod
     def _create_from_course(cls, course):
