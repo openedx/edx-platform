@@ -17,7 +17,7 @@ edx-platfom/themes/fast-track-theme
 
 ### Setup environment variables
 
-Change your *lms.env.json* file located in */edx/app/edxapp* folder.
+Change your *lms.env.json* and *cms.env.json* files located in */edx/app/edxapp* folder.
 
 ```
 "DEFAULT_SITE_THEME": "fast-track-theme",
@@ -34,17 +34,19 @@ Change your *lms.env.json* file located in */edx/app/edxapp* folder.
 ```
 ### Update assets (local server)
 
-Restart LMS with following command:
+Restart LMS and CMS with following commands:
 ```
 paver devstack lms
+paver devstack studio
 ```
 
-If you don't want to stop the server, from *edx-platform/* run:
+If you don't want to stop the servers, from *edx-platform/* run:
 ```
 paver update_assets lms
+paver update_assets studio
 ```
-and hard refresh the page. You should now be able to see changes in LMS.
-Restarting local server with compiling assets is a long process. If you are interested in making your local servers run faster, see [Developing on the edX / Making the local servers run faster](https://github.com/edx/edx-platform/wiki/Developing-on-the-edX-Developer-Stack#making-the-local-servers-run-faster).
+and hard refresh the page. You should now be able to see changes in LMS and CMS (studio).
+Restarting local servers with compiling assets is a long process. If you are interested in making your local servers run faster, see [Developing on the edX / Making the local servers run faster](https://github.com/edx/edx-platform/wiki/Developing-on-the-edX-Developer-Stack#making-the-local-servers-run-faster).
 
 ## EDX comprehensive theme
 
