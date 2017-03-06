@@ -11,7 +11,6 @@ from django.conf.urls.static import static
 from courseware.views.views import CourseTabView, EnrollStaffView, StaticCourseTabView
 from config_models.views import ConfigurationModelCurrentAPIView
 from courseware.views.index import CoursewareIndex
-from courseware.views.views import UnifiedCourseView, CourseOutlineFragmentView
 from openedx.core.djangoapps.auth_exchange.views import LoginWithAccessTokenView
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
@@ -381,20 +380,6 @@ urlpatterns += (
     ),
 
     url(
-        r'^courses/{}/course/?$'.format(
-            settings.COURSE_ID_PATTERN,
-        ),
-        UnifiedCourseView.as_view(),
-        name='unified_course_view',
-    ),
-    url(
-        r'^courses/{}/course/outline?$'.format(
-            settings.COURSE_ID_PATTERN,
-        ),
-        CourseOutlineFragmentView.as_view(),
-        name='course_outline_fragment_view',
-    ),
-    url(
         r'^courses/{}/courseware/?$'.format(
             settings.COURSE_ID_PATTERN,
         ),
@@ -608,9 +593,18 @@ urlpatterns += (
         name='edxnotes_endpoints',
     ),
 
+    # Branding API
     url(
         r'^api/branding/v1/',
         include('branding.api_urls')
+    ),
+
+    # Course experience
+    url(
+        r'^courses/{}/course/'.format(
+            settings.COURSE_ID_PATTERN,
+        ),
+        include('openedx.features.course_experience.urls'),
     ),
 )
 

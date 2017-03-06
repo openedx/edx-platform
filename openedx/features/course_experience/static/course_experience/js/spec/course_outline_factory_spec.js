@@ -1,7 +1,7 @@
 define([
     'jquery',
     'edx-ui-toolkit/js/utils/constants',
-    'js/courseware/course_outline_factory'
+    'course_experience/js/course_outline_factory'
 ],
     function($, constants, CourseOutlineFactory) {
         'use strict';
@@ -19,7 +19,7 @@ define([
                 };
 
                 beforeEach(function() {
-                    loadFixtures('js/fixtures/courseware/course_outline.html');
+                    loadFixtures('course_experience/fixtures/course-outline-fragment.html');
                     CourseOutlineFactory('.block-tree');
                 });
 

@@ -46,7 +46,6 @@ from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
 from lms.djangoapps.instructor.enrollment import uses_shib
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
-from lms.djangoapps.course_api.blocks.api import get_blocks
 
 import shoppingcart
 import survey.utils
@@ -1605,84 +1604,3 @@ def financial_assistance_form(request):
             }
         ],
     })
-
-
-class UnifiedCourseView(View):
-    """
-    Unified view for a course.
-    """
-    @method_decorator(login_required)
-    @method_decorator(ensure_csrf_cookie)
-    @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True))
-    @method_decorator(ensure_valid_course_key)
-    def get(self, request, course_id):
-        """
-        Displays the main view for the specified course.
-
-        Arguments:
-            request: HTTP request
-            course_id (unicode): course id
-        """
-        course_key = CourseKey.from_string(course_id)
-        course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
-
-        # Render the outline as a fragment
-        outline_fragment = CourseOutlineFragmentView().render_to_fragment(request, course_id=course_id)
-
-        # Render the entire unified course view
-        context = {
-            'csrf': csrf(request)['csrf_token'],
-            'course': course,
-            'outline_fragment': outline_fragment,
-            'disable_courseware_js': True,
-            'uses_pattern_library': True,
-        }
-        return render_to_response('courseware/unified-course-view.html', context)
-
-
-class CourseOutlineFragmentView(FragmentView):
-    """
-    Course outline fragment to be shown in the unified course view.
-    """
-
-    def populate_children(self, block, all_blocks):
-        """
-        For a passed block, replace each id in its children array with the full representation of that child,
-        which will be looked up by id in the passed all_blocks dict.
-        Recursively do the same replacement for children of those children.
-        """
-        children = block.get('children') or []
-
-        for i in range(len(children)):
-            child_id = block['children'][i]
-            child_detail = self.populate_children(all_blocks[child_id], all_blocks)
-            block['children'][i] = child_detail
-
-        return block
-
-    def render_to_fragment(self, request, course_id=None, **kwargs):
-        """
-        Renders the course outline as a fragment.
-        """
-        course_key = CourseKey.from_string(course_id)
-        course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
-        course_usage_key = modulestore().make_course_usage_key(course_key)
-        all_blocks = get_blocks(
-            request,
-            course_usage_key,
-            user=request.user,
-            nav_depth=3,
-            requested_fields=['children', 'display_name', 'type'],
-            block_types_filter=['course', 'chapter', 'vertical', 'sequential']
-        )
-
-        course_block_tree = all_blocks['blocks'][all_blocks['root']]  # Get the root of the block tree
-
-        context = {
-            'csrf': csrf(request)['csrf_token'],
-            'course': course,
-            # Recurse through the block tree, fleshing out each child object
-            'blocks': self.populate_children(course_block_tree, all_blocks['blocks'])
-        }
-        html = render_to_string('courseware/course_outline.html', context)
-        return Fragment(html)

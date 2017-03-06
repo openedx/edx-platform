@@ -55,7 +55,7 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
     def test_render(self):
         for course in self.courses:
             url = reverse(
-                'unified_course_view',
+                'edx.course_experience.course_home',
                 kwargs={
                     'course_id': unicode(course.id),
                 }

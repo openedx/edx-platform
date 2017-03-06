@@ -679,6 +679,7 @@
     });
 
     testFiles = [
+        'course_experience/js/spec/course_outline_factory_spec.js',
         'discussion/js/spec/discussion_board_factory_spec.js',
         'discussion/js/spec/discussion_profile_page_factory_spec.js',
         'discussion/js/spec/discussion_board_view_spec.js',
@@ -694,7 +695,6 @@
         'js/spec/courseware/course_home_events_spec.js',
         'js/spec/courseware/link_clicked_events_spec.js',
         'js/spec/courseware/updates_visibility_spec.js',
-        'js/spec/courseware/course_outline_factory_spec.js',
         'js/spec/dashboard/donation.js',
         'js/spec/dashboard/dropdown_spec.js',
         'js/spec/dashboard/track_events_spec.js',

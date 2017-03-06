@@ -44,7 +44,7 @@ class CoursewareTab(EnrolledTab):
         """
         request = RequestCache.get_current_request()
         if waffle.flag_is_active(request, 'unified_course_view'):
-            return link_reverse_func('unified_course_view')
+            return link_reverse_func('edx.course_experience.course_home')
         else:
             return link_reverse_func('courseware')
 
