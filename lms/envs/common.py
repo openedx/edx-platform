@@ -2692,8 +2692,10 @@ OPTIONAL_APPS = (
     # Organizations App (http://github.com/edx/edx-organizations)
     'organizations',
 
-    # Enterprise App (http://github.com/edx/edx-enterprise)
+    # Enterprise Apps (http://github.com/edx/edx-enterprise)
     'enterprise',
+    'integrated_channels.integrated_channel',
+    'integrated_channels.sap_success_factors',
     # Required by the Enterprise App
     'django_object_actions',  # https://github.com/crccheck/django-object-actions
 )
