@@ -6,7 +6,7 @@ from textwrap import dedent
 
 from common.test.acceptance.tests.helpers import UniqueCourseTest
 from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
-from common.test.acceptance.pages.studio.overview import CourseOutlinePage
+from common.test.acceptance.pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.problem import ProblemPage
 from common.test.acceptance.pages.lms.staff_view import StaffPage
@@ -29,7 +29,7 @@ class GatingTest(UniqueCourseTest):
 
         self.logout_page = LogoutPage(self.browser)
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
-        self.course_outline = CourseOutlinePage(
+        self.studio_course_outline = StudioCourseOutlinePage(
             self.browser,
             self.course_info['org'],
             self.course_info['number'],
@@ -89,10 +89,10 @@ class GatingTest(UniqueCourseTest):
         self._auto_auth(self.STAFF_USERNAME, self.STAFF_EMAIL, True)
 
         # Make the first subsection a prerequisite
-        self.course_outline.visit()
-        self.course_outline.open_subsection_settings_dialog(0)
-        self.course_outline.select_advanced_tab(desired_item='gated_content')
-        self.course_outline.make_gating_prerequisite()
+        self.studio_course_outline.visit()
+        self.studio_course_outline.open_subsection_settings_dialog(0)
+        self.studio_course_outline.select_advanced_tab(desired_item='gated_content')
+        self.studio_course_outline.make_gating_prerequisite()
 
     def _setup_gated_subsection(self):
         """
@@ -102,10 +102,10 @@ class GatingTest(UniqueCourseTest):
         self._auto_auth(self.STAFF_USERNAME, self.STAFF_EMAIL, True)
 
         # Gate the second subsection based on the score achieved in the first subsection
-        self.course_outline.visit()
-        self.course_outline.open_subsection_settings_dialog(1)
-        self.course_outline.select_advanced_tab(desired_item='gated_content')
-        self.course_outline.add_prerequisite_to_subsection("80")
+        self.studio_course_outline.visit()
+        self.studio_course_outline.open_subsection_settings_dialog(1)
+        self.studio_course_outline.select_advanced_tab(desired_item='gated_content')
+        self.studio_course_outline.add_prerequisite_to_subsection("80")
 
     def _fulfill_prerequisite(self):
         """
@@ -127,23 +127,23 @@ class GatingTest(UniqueCourseTest):
         self._setup_prereq()
 
         # Assert settings are displayed correctly for a prerequisite subsection
-        self.course_outline.visit()
-        self.course_outline.open_subsection_settings_dialog(0)
-        self.course_outline.select_advanced_tab(desired_item='gated_content')
-        self.assertTrue(self.course_outline.gating_prerequisite_checkbox_is_visible())
-        self.assertTrue(self.course_outline.gating_prerequisite_checkbox_is_checked())
-        self.assertFalse(self.course_outline.gating_prerequisites_dropdown_is_visible())
-        self.assertFalse(self.course_outline.gating_prerequisite_min_score_is_visible())
+        self.studio_course_outline.visit()
+        self.studio_course_outline.open_subsection_settings_dialog(0)
+        self.studio_course_outline.select_advanced_tab(desired_item='gated_content')
+        self.assertTrue(self.studio_course_outline.gating_prerequisite_checkbox_is_visible())
+        self.assertTrue(self.studio_course_outline.gating_prerequisite_checkbox_is_checked())
+        self.assertFalse(self.studio_course_outline.gating_prerequisites_dropdown_is_visible())
+        self.assertFalse(self.studio_course_outline.gating_prerequisite_min_score_is_visible())
 
         self._setup_gated_subsection()
 
         # Assert settings are displayed correctly for a gated subsection
-        self.course_outline.visit()
-        self.course_outline.open_subsection_settings_dialog(1)
-        self.course_outline.select_advanced_tab(desired_item='gated_content')
-        self.assertTrue(self.course_outline.gating_prerequisite_checkbox_is_visible())
-        self.assertTrue(self.course_outline.gating_prerequisites_dropdown_is_visible())
-        self.assertTrue(self.course_outline.gating_prerequisite_min_score_is_visible())
+        self.studio_course_outline.visit()
+        self.studio_course_outline.open_subsection_settings_dialog(1)
+        self.studio_course_outline.select_advanced_tab(desired_item='gated_content')
+        self.assertTrue(self.studio_course_outline.gating_prerequisite_checkbox_is_visible())
+        self.assertTrue(self.studio_course_outline.gating_prerequisites_dropdown_is_visible())
+        self.assertTrue(self.studio_course_outline.gating_prerequisite_min_score_is_visible())
 
     def test_gated_subsection_in_lms_for_student(self):
         """

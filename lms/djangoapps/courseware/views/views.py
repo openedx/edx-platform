@@ -25,7 +25,6 @@ from django.http import (
     QueryDict,
 )
 from django.shortcuts import redirect
-from django.template.loader import render_to_string
 from django.utils.decorators import method_decorator
 from django.utils.timezone import UTC
 from django.utils.translation import ugettext as _

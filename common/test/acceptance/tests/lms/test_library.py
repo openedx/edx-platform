@@ -8,7 +8,7 @@ import textwrap
 from nose.plugins.attrib import attr
 from common.test.acceptance.tests.helpers import UniqueCourseTest, TestWithSearchIndexMixin
 from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
-from common.test.acceptance.pages.studio.overview import CourseOutlinePage
+from common.test.acceptance.pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
 from common.test.acceptance.pages.studio.library import StudioLibraryContentEditor, StudioLibraryContainerXBlockWrapper
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.library import LibraryContentXBlockWrapper
@@ -44,7 +44,7 @@ class LibraryContentTestBase(UniqueCourseTest):
 
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
 
-        self.course_outline = CourseOutlinePage(
+        self.studio_course_outline = StudioCourseOutlinePage(
             self.browser,
             self.course_info['org'],
             self.course_info['number'],
@@ -116,9 +116,9 @@ class LibraryContentTestBase(UniqueCourseTest):
         if change_login:
             LogoutPage(self.browser).visit()
             self._auto_auth(self.STAFF_USERNAME, self.STAFF_EMAIL, True)
-        self.course_outline.visit()
+        self.studio_course_outline.visit()
 
-        subsection = self.course_outline.section(SECTION_NAME).subsection(SUBSECTION_NAME)
+        subsection = self.studio_course_outline.section(SECTION_NAME).subsection(SUBSECTION_NAME)
         return subsection.expand_subsection().unit(UNIT_NAME).go_to()
 
     def _goto_library_block_page(self, block_id=None):
