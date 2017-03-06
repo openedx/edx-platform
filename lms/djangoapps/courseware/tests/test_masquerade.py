@@ -107,6 +107,18 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         )
         return self.client.get(url)
 
+    def get_progress_page(self):
+        """
+        Returns the server response for progress page.
+        """
+        url = reverse(
+            'progress',
+            kwargs={
+                'course_id': unicode(self.course.id),
+            }
+        )
+        return self.client.get(url)
+
     def verify_staff_debug_present(self, staff_debug_expected):
         """
         Verifies that the staff debug control visibility is as expected (for staff only).
@@ -380,6 +392,31 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         self.update_masquerade(role='student', user_name=self.student_user.username)
         content = self.get_course_info_page().content
         self.assertIn("OOGIE BLOOGIE", content)
+
+    def test_masquerade_as_specific_student_progress(self):
+        """
+        Test masquesrading as a specific user for progress page.
+        """
+        # Give the student some correct answers, check their progress page
+        self.login_student()
+        self.submit_answer('Correct', 'Correct')
+        student_progress = self.get_progress_page().content
+        self.assertNotIn("1 of 2 possible points", student_progress)
+        self.assertIn("2 of 2 possible points", student_progress)
+
+        # Staff answers are slightly different
+        self.login_staff()
+        self.submit_answer('Incorrect', 'Correct')
+        staff_progress = self.get_progress_page().content
+        self.assertNotIn("2 of 2 possible points", staff_progress)
+        self.assertIn("1 of 2 possible points", staff_progress)
+
+        # Should now see the student's scores
+        self.update_masquerade(role='student', user_name=self.student_user.username)
+        masquerade_progress = self.get_progress_page().content
+        self.assertNotIn("1 of 2 possible points", masquerade_progress)
+        self.assertIn("2 of 2 possible points", masquerade_progress)
+        self.verify_real_user_profile_link()
 
 
 @attr(shard=1)
