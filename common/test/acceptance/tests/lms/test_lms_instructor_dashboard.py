@@ -12,7 +12,7 @@ from flaky import flaky
 from common.test.acceptance.tests.helpers import UniqueCourseTest, get_modal_alert, EventsTestMixin
 from common.test.acceptance.pages.common.logout import LogoutPage
 from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
-from common.test.acceptance.pages.studio.overview import CourseOutlinePage
+from common.test.acceptance.pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
 from common.test.acceptance.pages.lms.create_mode import ModeCreationPage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage, EntranceExamAdmin
@@ -227,7 +227,7 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
 
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
 
-        self.course_outline = CourseOutlinePage(
+        self.studio_course_outline = StudioCourseOutlinePage(
             self.browser,
             self.course_info['org'],
             self.course_info['number'],
@@ -301,15 +301,15 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         # Visit the course outline page in studio
         LogoutPage(self.browser).visit()
         self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
-        self.course_outline.visit()
+        self.studio_course_outline.visit()
 
         # open the exam settings to make it a proctored exam.
-        self.course_outline.open_subsection_settings_dialog()
+        self.studio_course_outline.open_subsection_settings_dialog()
 
         # select advanced settings tab
-        self.course_outline.select_advanced_tab()
+        self.studio_course_outline.select_advanced_tab()
 
-        self.course_outline.make_exam_proctored()
+        self.studio_course_outline.make_exam_proctored()
 
         # login as a verified student and visit the courseware.
         LogoutPage(self.browser).visit()
@@ -327,15 +327,15 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         # Visit the course outline page in studio
         LogoutPage(self.browser).visit()
         self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
-        self.course_outline.visit()
+        self.studio_course_outline.visit()
 
         # open the exam settings to make it a proctored exam.
-        self.course_outline.open_subsection_settings_dialog()
+        self.studio_course_outline.open_subsection_settings_dialog()
 
         # select advanced settings tab
-        self.course_outline.select_advanced_tab()
+        self.studio_course_outline.select_advanced_tab()
 
-        self.course_outline.make_exam_timed()
+        self.studio_course_outline.make_exam_timed()
 
         # login as a verified student and visit the courseware.
         LogoutPage(self.browser).visit()

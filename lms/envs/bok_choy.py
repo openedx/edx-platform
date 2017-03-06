@@ -223,6 +223,18 @@ ECOMMERCE_API_URL = 'http://localhost:8043/api/v2/'
 LMS_ROOT_URL = "http://localhost:8000"
 DOC_LINK_BASE_URL = 'http://edx.readthedocs.io/projects/edx-guide-for-students'
 
+# TODO: TNL-6546: Remove this waffle and flag code.
+from django.db.utils import ProgrammingError
+from waffle.models import Flag
+try:
+    flag, created = Flag.objects.get_or_create(name='unified_course_view')
+    flag.everyone = True
+    flag.save
+    WAFFLE_OVERRIDE = True
+except ProgrammingError:
+    # during initial reset_db, the table for the flag doesn't yet exist.
+    pass
+
 #####################################################################
 # Lastly, see if the developer has any local overrides.
 try:

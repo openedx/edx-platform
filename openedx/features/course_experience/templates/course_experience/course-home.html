@@ -36,14 +36,8 @@ ${HTML(outline_fragment.foot_html())}
 </%block>
 
 <%block name="content">
-<section class="course-view container" id="course-container">
+<div class="course-view container" id="course-container">
     <header class="page-header has-secondary">
-        ## Breadcrumb navigation
-        <div class="page-header-main">
-            <nav aria-label="${_('Discussions')}" class="sr-is-focusable" tabindex="-1">
-                <div class="has-breadcrumbs"></div>
-            </nav>
-        </div>
         <div class="page-header-secondary">
             <div class="form-actions">
                 <a class="btn" href="${reverse('courseware', kwargs={'course_id': unicode(course.id.to_deprecated_string())})}">
@@ -52,15 +46,15 @@ ${HTML(outline_fragment.foot_html())}
             </div>
             <div class="page-header-search">
                 <form class="search-form" role="search">
-                    <label class="field-label sr-only" for="search" id="search-hint">Search the course</label>
+                    <label class="field-label sr-only" for="search" id="search-hint">${_('Search the course')}</label>
                     <input
                             class="field-input input-text search-input"
                             type="search"
                             name="search"
                             id="search"
-                            placeholder="Search the course"
+                            placeholder="${_('Search the course')}'"
                     />
-                    <button class="btn btn-small search-btn" type="button">Search</button>
+                    <button class="btn btn-small search-btn" type="button">${_('Search')}</button>
                 </form>
             </div>
         </div>
@@ -68,5 +62,5 @@ ${HTML(outline_fragment.foot_html())}
     <div class="page-content">
         ${HTML(outline_fragment.body_html())}
     </div>
-</section>
+</div>
 </%block>
