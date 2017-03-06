@@ -1,16 +1,8 @@
 """
 Discussion API pagination support
 """
-from rest_framework.pagination import BasePaginationSerializer, NextPageField, PreviousPageField
-
-
-class _PaginationSerializer(BasePaginationSerializer):
-    """
-    A pagination serializer without the count field, because the Comments
-    Service does not return result counts
-    """
-    next = NextPageField(source="*")
-    previous = PreviousPageField(source="*")
+from rest_framework.utils.urls import replace_query_param
+from openedx.core.lib.api.paginators import NamespacedPageNumberPagination
 
 
 class _Page(object):
@@ -18,12 +10,11 @@ class _Page(object):
     Implements just enough of the django.core.paginator.Page interface to allow
     PaginationSerializer to work.
     """
-    def __init__(self, object_list, page_num, num_pages):
+    def __init__(self, page_num, num_pages):
         """
         Create a new page containing the given objects, with the given page
         number and number of pages
         """
-        self.object_list = object_list
         self.page_num = page_num
         self.num_pages = num_pages
 
@@ -44,15 +35,50 @@ class _Page(object):
         return self.page_num - 1
 
 
-def get_paginated_data(request, results, page_num, per_page):
+class DiscussionAPIPagination(NamespacedPageNumberPagination):
     """
-    Return a dict with the following values:
+    Subclasses NamespacedPageNumberPagination to provide custom implementation of pagination metadata
+    by overriding it's methods
+    """
+    def __init__(self, request, page_num, num_pages, result_count=0):
+        """
+        Overrides parent constructor to take information from discussion api
+        essential for the parent method
+        """
+        self.page = _Page(page_num, num_pages)
+        self.base_url = request.build_absolute_uri()
+        self.count = result_count
 
-    next: The URL for the next page
-    previous: The URL for the previous page
-    results: The results on this page
-    """
-    return _PaginationSerializer(
-        instance=_Page(results, page_num, per_page),
-        context={"request": request}
-    ).data
+        super(DiscussionAPIPagination, self).__init__()
+
+    def get_result_count(self):
+        """
+        Returns total number of results
+        """
+        return self.count
+
+    def get_num_pages(self):
+        """
+        Returns total number of pages the response is divided into
+        """
+        return self.page.num_pages
+
+    def get_next_link(self):
+        """
+        Returns absolute url of the next page if there's a next page available
+        otherwise returns None
+        """
+        next_url = None
+        if self.page.has_next():
+            next_url = replace_query_param(self.base_url, "page", self.page.next_page_number())
+        return next_url
+
+    def get_previous_link(self):
+        """
+        Returns absolute url of the previous page if there's a previous page available
+        otherwise returns None
+        """
+        previous_url = None
+        if self.page.has_previous():
+            previous_url = replace_query_param(self.base_url, "page", self.page.previous_page_number())
+        return previous_url

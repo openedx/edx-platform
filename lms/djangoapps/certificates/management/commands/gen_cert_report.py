@@ -13,6 +13,10 @@ from django.db.models import Count
 
 
 class Command(BaseCommand):
+    """
+    Management command to generate a certificate status
+    report for a given course.
+    """
 
     help = """
 
@@ -48,7 +52,8 @@ class Command(BaseCommand):
             try:
                 course_id = CourseKey.from_string(options['course'])
             except InvalidKeyError:
-                print("Course id {} could not be parsed as a CourseKey; falling back to SSCK.from_dep_str".format(options['course']))
+                print ("Course id {} could not be parsed as a CourseKey; "
+                       "falling back to SSCK.from_dep_str").format(options['course'])
                 course_id = SlashSeparatedCourseKey.from_deprecated_string(options['course'])
         else:
             raise CommandError("You must specify a course")
@@ -65,14 +70,17 @@ class Command(BaseCommand):
         enrolled_total = User.objects.filter(
             courseenrollment__course_id=course_id
         )
-        verified_enrolled = GeneratedCertificate.objects.filter(
-            course_id__exact=course_id, mode__exact='verified'
+        verified_enrolled = GeneratedCertificate.objects.filter(  # pylint: disable=no-member
+            course_id__exact=course_id,
+            mode__exact='verified'
         )
-        honor_enrolled = GeneratedCertificate.objects.filter(
-            course_id__exact=course_id, mode__exact='honor'
+        honor_enrolled = GeneratedCertificate.objects.filter(  # pylint: disable=no-member
+            course_id__exact=course_id,
+            mode__exact='honor'
         )
-        audit_enrolled = GeneratedCertificate.objects.filter(
-            course_id__exact=course_id, mode__exact='audit'
+        audit_enrolled = GeneratedCertificate.objects.filter(  # pylint: disable=no-member
+            course_id__exact=course_id,
+            mode__exact='audit'
         )
 
         cert_data[course_id] = {
@@ -83,38 +91,36 @@ class Command(BaseCommand):
             'audit_enrolled': audit_enrolled.count()
         }
 
-        status_tally = GeneratedCertificate.objects.filter(
+        status_tally = GeneratedCertificate.objects.filter(  # pylint: disable=no-member
             course_id__exact=course_id
         ).values('status').annotate(
             dcount=Count('status')
         )
 
         cert_data[course_id].update(
-            {status['status']: status['dcount']
-                for status in status_tally})
+            {
+                status['status']: status['dcount'] for status in status_tally
+            }
+        )
 
-        mode_tally = GeneratedCertificate.objects.filter(
+        mode_tally = GeneratedCertificate.objects.filter(  # pylint: disable=no-member
             course_id__exact=course_id,
             status__exact='downloadable'
         ).values('mode').annotate(
             dcount=Count('mode')
         )
         cert_data[course_id].update(
-            {mode['mode']: mode['dcount']
-                for mode in mode_tally}
+            {mode['mode']: mode['dcount'] for mode in mode_tally}
         )
 
         # all states we have seen far all courses
-        status_headings = sorted(set(
-            [status for course in cert_data
-                for status in cert_data[course]])
+        status_headings = sorted(
+            set([status for course in cert_data for status in cert_data[course]])
         )
 
         # print the heading for the report
         print "{:>26}".format("course ID"),
-        print ' '.join(["{:>16}".format(heading)
-                        for heading in status_headings]
-                       )
+        print ' '.join(["{:>16}".format(heading) for heading in status_headings])
 
         # print the report
         print "{0:>26}".format(course_id.to_deprecated_string()),

@@ -1,23 +1,38 @@
 ;(function (define) {
     'use strict';
-    define(['common/js/components/collections/paging_collection', 'teams/js/models/topic', 'gettext'],
-        function(PagingCollection, TopicModel, gettext) {
-            var TopicCollection = PagingCollection.extend({
-                initialize: function(topics, options) {
-                    PagingCollection.prototype.initialize.call(this);
+    define(['underscore', 'gettext', 'teams/js/collections/base', 'teams/js/models/topic'],
+        function(_, gettext, BaseCollection, TopicModel) {
+            var TopicCollection = BaseCollection.extend({
+                model: TopicModel,
 
-                    this.course_id = options.course_id;
-                    this.perPage = topics.results.length;
-                    this.server_api['course_id'] = function () { return encodeURIComponent(this.course_id); };
-                    this.server_api['order_by'] = function () { return this.sortField; };
-                    delete this.server_api['sort_order']; // Sort order is not specified for the Team API
+                state: {
+                    sortKey: 'name'
+                },
+
+                queryParams: {
+                    course_id: function () { return this.course_id; },
+                    text_search: function () { return this.searchString || ''; }
+                },
+
+                constructor: function(topics, options) {
+                    if (topics.sort_order) {
+                        this.state.sortKey = topics.sort_order;
+                    }
+
+                    options.perPage = topics.results.length;
+                    BaseCollection.prototype.constructor.call(this, topics, options);
 
                     this.registerSortableField('name', gettext('name'));
+                    // Translators: This refers to the number of teams (a count of how many teams there are)
                     this.registerSortableField('team_count', gettext('team count'));
                 },
 
-                model: TopicModel
+                onUpdate: function(event) {
+                    if (_.contains(['create', 'delete'], event.action)) {
+                        this.isStale = true;
+                    }
+                }
             });
             return TopicCollection;
-    });
+        });
 }).call(this, define || RequireJS.define);

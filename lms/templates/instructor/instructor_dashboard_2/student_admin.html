@@ -1,10 +1,9 @@
+<%page args="section_data" expression_filter="h"/>
 <%! from django.utils.translation import ugettext as _ %>
-<%page args="section_data"/>
-
 <div>
   %if section_data['is_small_course']:
   ## Show the gradebook for small courses
-    <h2>${_("Student Gradebook")}</h2>
+    <h3 class="hd hd-3">${_("Student Gradebook")}</h3>
       <p>
 	${_("Click here to view the gradebook for enrolled students. This feature is only visible to courses with a small number of total enrolled students.")}
       </p>
@@ -17,7 +16,7 @@
 </div>
 
 <div class="student-specific-container action-type-container">
-  <h2>${_("Student-specific grade inspection")}</h2>
+  <h3 class="hd hd-3">${_("Student-specific grade inspection")}</h3>
   <div class="request-response-error"></div>
   <br />
   <label>
@@ -38,7 +37,7 @@
 </div>
 
 <div class="student-grade-container action-type-container">
-  <h2>${_("Student-specific grade adjustment")}</h2>
+  <h3 class="hd hd-3">${_("Student-specific grade adjustment")}</h3>
   <div class="request-response-error"></div>
   <p>
   <label>
@@ -54,7 +53,7 @@
 
   ## Translators: A location (string of text) follows this sentence.
   <p>${_("You must provide the complete location of the problem. In the Staff Debug viewer, the location looks like this:")}<br/>
-  <code>i4x://edX/Open_DemoX/problem/78c98390884243b89f6023745231c525</code></p>
+  <code>block-v1:edX+DemoX+2015+type@problem+block@618c5933b8b544e4a4cc103d3e508378</code></p>
 
   <p>
   ${_("Next, select an action to perform for the given user and problem:")}
@@ -78,7 +77,7 @@
 
   %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS') and section_data['access']['instructor']:
     <p id="task-history-single-help">
-      ${_("Rescoring runs in the background, and status for active tasks will appear in the 'Pending Instructor Tasks' table. "
+      ${_("Rescoring runs in the background, and status for active tasks will appear in the 'Pending Tasks' table. "
       "To see status for all tasks submitted for this problem and student, click on this button:")}
     </p>
 
@@ -90,7 +89,7 @@
 
 % if course.entrance_exam_enabled:
 <div class="entrance-exam-grade-container action-type-container">
-  <h2>${_("Entrance Exam Adjustment")}</h2>
+  <h3 class="hd hd-3">${_("Entrance Exam Adjustment")}</h3>
   <div class="request-response-error"></div>
   <label>
   ${_("Student's {platform_name} email address or username:").format(platform_name=settings.PLATFORM_NAME)}
@@ -119,7 +118,7 @@
 
   %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS') and section_data['access']['instructor']:
     <p id="entrance-exam-task-history-help">
-      ${_("Rescoring runs in the background, and status for active tasks will appear in the 'Pending Instructor Tasks' table. "
+      ${_("Rescoring runs in the background, and status for active tasks will appear in the 'Pending Tasks' table. "
       "To see status for all tasks submitted for this problem and student, click on this button:")}
     </p>
 
@@ -132,7 +131,7 @@
 
 %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS') and section_data['access']['instructor']:
   <div class="course-specific-container action-type-container">
-    <h2>${_('Course-specific grade adjustment')}</h2>
+    <h3 class="hd hd-3">${_('Course-specific grade adjustment')}</h3>
     <div class="request-response-error"></div>
 
     <label>
@@ -141,7 +140,7 @@
     </label>
     ## Translators: A location (string of text) follows this sentence.
     <p id="problem-select-all-help">${_("You must provide the complete location of the problem. In the Staff Debug viewer, the location looks like this:")}<br/>
-    <code>i4x://edX/Open_DemoX/problem/78c98390884243b89f6023745231c525</code></p>
+    <code>block-v1:edX+DemoX+2015+type@problem+block@618c5933b8b544e4a4cc103d3e508378</code></p>
     <p>
       ${_("Then select an action")}:
       <input type="button" class="molly-guard" name="reset-attempts-all" value="${_("Reset ALL students' attempts")}" data-endpoint="${ section_data['reset_student_attempts_url'] }">
@@ -161,7 +160,7 @@
 %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
   <div class="running-tasks-container action-type-container">
     <hr>
-    <h2> ${_("Pending Instructor Tasks")} </h2>
+    <h3 class="hd hd-3">${_("Pending Tasks")}</h3>
     <div class="running-tasks-section">
       <p>${_("The status for any active tasks appears in a table below.")} </p>
       <br />

@@ -1,10 +1,21 @@
 ;(function (define, undefined) {
     'use strict';
     define([
-        'gettext', 'jquery', 'underscore', 'backbone', 'js/mustache', 'backbone-super'
-    ], function (gettext, $, _, Backbone, RequireMustache) {
-
-        var Mustache = window.Mustache || RequireMustache;
+        'gettext', 'jquery', 'underscore', 'backbone', 
+        'edx-ui-toolkit/js/utils/html-utils',
+        'text!templates/fields/field_readonly.underscore',
+        'text!templates/fields/field_dropdown.underscore',
+        'text!templates/fields/field_link.underscore',
+        'text!templates/fields/field_text.underscore',
+        'text!templates/fields/field_textarea.underscore',
+        'backbone-super'
+    ], function (gettext, $, _, Backbone, HtmlUtils,
+                 field_readonly_template,
+                 field_dropdown_template,
+                 field_link_template,
+                 field_text_template,
+                 field_textarea_template
+    ) {
 
         var messageRevertDelay = 6000;
         var FieldViews = {};
@@ -20,12 +31,36 @@
             tagName: 'div',
 
             indicators: {
-                'canEdit': '<i class="icon fa fa-pencil message-can-edit" aria-hidden="true"></i><span class="sr">' + gettext("Editable") + '</span>',
-                'error': '<i class="fa fa-exclamation-triangle message-error" aria-hidden="true"></i><span class="sr">' + gettext("Error") + '</span>',
-                'validationError': '<i class="fa fa-exclamation-triangle message-validation-error" aria-hidden="true"></i><span class="sr">' + gettext("Validation Error") + '</span>',
-                'inProgress': '<i class="fa fa-spinner fa-pulse message-in-progress" aria-hidden="true"></i><span class="sr">' + gettext("In Progress") + '</span>',
-                'success': '<i class="fa fa-check message-success" aria-hidden="true"></i><span class="sr">' + gettext("Success") + '</span>',
-                'plus': '<i class="fa fa-plus placeholder" aria-hidden="true"></i><span class="sr">' + gettext("Placeholder")+ '</span>'
+                'canEdit': HtmlUtils.joinHtml(
+                    HtmlUtils.HTML('<span class="icon fa fa-pencil message-can-edit" aria-hidden="true"></span><span class="sr">'), // jshint ignore:line
+                    gettext("Editable"),
+                    HtmlUtils.HTML('</span>')
+                ),
+                'error': HtmlUtils.joinHtml(
+                    HtmlUtils.HTML('<span class="fa fa-exclamation-triangle message-error" aria-hidden="true"></span><span class="sr">'), // jshint ignore:line
+                    gettext("Error"),
+                    HtmlUtils.HTML('</span>')
+                ),
+                'validationError': HtmlUtils.joinHtml(
+                    HtmlUtils.HTML('<span class="fa fa-exclamation-triangle message-validation-error" aria-hidden="true"></span><span class="sr">'), // jshint ignore:line
+                    gettext("Validation Error"),
+                    HtmlUtils.HTML('</span>')
+                ),
+                'inProgress': HtmlUtils.joinHtml(
+                    HtmlUtils.HTML('<span class="fa fa-spinner fa-pulse message-in-progress" aria-hidden="true"></span><span class="sr">'), // jshint ignore:line
+                    gettext("In Progress"),
+                    HtmlUtils.HTML('</span>')
+                ),
+                'success': HtmlUtils.joinHtml(
+                    HtmlUtils.HTML('<span class="fa fa-check message-success" aria-hidden="true"></span><span class="sr">'), // jshint ignore:line
+                    gettext("Success"),
+                    HtmlUtils.HTML('</span>')
+                ),
+                'plus': HtmlUtils.joinHtml(
+                    HtmlUtils.HTML('<span class="fa fa-plus placeholder" aria-hidden="true"></span><span class="sr">'),
+                    gettext("Placeholder"),
+                    HtmlUtils.HTML('</span>')
+                ),
             },
 
             messages: {
@@ -36,12 +71,18 @@
                 'success': gettext('Your changes have been saved.')
             },
 
+            constructor: function(options) {
+                this.options = _.extend({}, options);
+                Backbone.View.apply(this, arguments);
+            },
+
             initialize: function () {
 
-                this.template = _.template($(this.templateSelector).text());
+                this.template = _.template(this.fieldTemplate || '');
 
                 this.helpMessage = this.options.helpMessage || '';
                 this.showMessages = _.isUndefined(this.options.showMessages) ? true : this.options.showMessages;
+                this.enabled = _.isUndefined(this.options.enabled) ? true: this.options.enabled;
 
                 _.bindAll(this, 'modelValue', 'modelValueIsSet', 'showNotificationMessage','getNotificationMessage',
                     'getMessage', 'title', 'showHelpMessage', 'showInProgressMessage', 'showSuccessMessage',
@@ -57,15 +98,15 @@
                 return (this.modelValue() === true);
             },
 
-            title: function (text) {
-                return this.$('.u-field-title').html(text);
+            title: function (title) {
+                return HtmlUtils.setHtml(this.$('.u-field-title'), title);
             },
 
             getMessage: function(message_status) {
                 if ((message_status + 'Message') in this) {
                     return this[message_status + 'Message'].call(this);
                 } else if (this.showMessages) {
-                    return this.indicators[message_status] + this.messages[message_status];
+                    return HtmlUtils.joinHtml(this.indicators[message_status], this.messages[message_status]);
                 }
                 return this.indicators[message_status];
             },
@@ -75,16 +116,16 @@
                     message = this.helpMessage;
                 }
                 this.$('.u-field-message-notification').html('');
-                this.$('.u-field-message-help').html(message);
+                HtmlUtils.setHtml(this.$('.u-field-message-help'), message);
             },
 
             getNotificationMessage: function() {
-                return this.$('.u-field-message-notification').html();
+                return HtmlUtils.HTML(this.$('.u-field-message-notification').html());
             },
 
             showNotificationMessage: function(message) {
                 this.$('.u-field-message-help').html('');
-                this.$('.u-field-message-notification').html(message);
+                HtmlUtils.setHtml(this.$('.u-field-message-notification'), message);
             },
 
             showCanEditMessage: function(show) {
@@ -104,7 +145,7 @@
                 this.showNotificationMessage(successMessage);
 
                 if (this.options.refreshPageOnSave) {
-                    document.location.reload();
+                    location.reload(true);
                 }
 
                 var view = this;
@@ -113,7 +154,8 @@
                 this.lastSuccessMessageContext = context;
 
                 setTimeout(function () {
-                    if ((context === view.lastSuccessMessageContext) && (view.getNotificationMessage() === successMessage)) {
+                    if ((context === view.lastSuccessMessageContext) &&
+                        (view.getNotificationMessage().toString() === successMessage.toString())) {
                         if (view.editable === 'toggle') {
                             view.showCanEditMessage(true);
                         } else {
@@ -127,10 +169,8 @@
                 if (xhr.status === 400) {
                     try {
                         var errors = JSON.parse(xhr.responseText),
-                            validationErrorMessage = Mustache.escapeHtml(
-                                errors.field_errors[this.options.valueAttribute].user_message
-                            ),
-                            message = this.indicators.validationError + validationErrorMessage;
+                            validationErrorMessage = errors.field_errors[this.options.valueAttribute].user_message,
+                            message = HtmlUtils.joinHtml(this.indicators.validationError, validationErrorMessage);
                         this.showNotificationMessage(message);
                     } catch (error) {
                         this.showNotificationMessage(this.getMessage('error'));
@@ -144,6 +184,7 @@
         FieldViews.EditableFieldView = FieldViews.FieldView.extend({
 
             initialize: function (options) {
+                this.persistChanges = _.isUndefined(options.persistChanges) ? false : options.persistChanges;
                 _.bindAll(this, 'saveAttributes', 'saveSucceeded', 'showDisplayMode', 'showEditMode',
                     'startEditing', 'finishEditing'
                 );
@@ -160,20 +201,22 @@
             },
 
             saveAttributes: function (attributes, options) {
-                var view = this;
-                var defaultOptions = {
-                    contentType: 'application/merge-patch+json',
-                    patch: true,
-                    wait: true,
-                    success: function () {
-                        view.saveSucceeded();
-                    },
-                    error: function (model, xhr) {
-                        view.showErrorMessage(xhr);
-                    }
-                };
-                this.showInProgressMessage();
-                this.model.save(attributes, _.extend(defaultOptions, options));
+                if (this.persistChanges === true) {
+                    var view = this;
+                    var defaultOptions = {
+                        contentType: 'application/merge-patch+json',
+                        patch: true,
+                        wait: true,
+                        success: function () {
+                            view.saveSucceeded();
+                        },
+                        error: function (model, xhr) {
+                            view.showErrorMessage(xhr);
+                        }
+                    };
+                    this.showInProgressMessage();
+                    this.model.save(attributes, _.extend(defaultOptions, options));
+                }
             },
 
             saveSucceeded: function () {
@@ -212,7 +255,15 @@
             },
 
             finishEditing: function() {
-                if (this.fieldValue() !== this.modelValue()) {
+                var modelValue;
+                if (this.persistChanges === false || this.mode !== 'edit') {return;}
+
+                modelValue = this.modelValue();
+                if (!(_.isUndefined(modelValue) || _.isNull(modelValue))) {
+                    modelValue = modelValue.toString();
+                }
+
+                if (this.fieldValue() !== modelValue) {
                     this.saveValue();
                 } else {
                     if (this.editable === 'always') {
@@ -221,6 +272,14 @@
                         this.showDisplayMode(true);
                     }
                 }
+            },
+
+            highlightFieldOnError: function () {
+                this.$el.addClass('error');
+            },
+
+            unhighlightField: function () {
+                this.$el.removeClass('error');
             }
         });
 
@@ -228,7 +287,7 @@
 
             fieldType: 'readonly',
 
-            templateSelector: '#field_readonly-tpl',
+            fieldTemplate: field_readonly_template,
 
             initialize: function (options) {
                 this._super(options);
@@ -237,7 +296,7 @@
             },
 
             render: function () {
-                this.$el.html(this.template({
+                HtmlUtils.setHtml(this.$el, HtmlUtils.template(this.fieldTemplate)({
                     id: this.options.valueAttribute,
                     title: this.options.title,
                     screenReaderTitle: this.options.screenReaderTitle || this.options.title,
@@ -249,11 +308,11 @@
             },
 
             fieldValue: function () {
-                return this.$('.u-field-value input').val();
+                return this.$('.u-field-value').text();
             },
 
             updateValueInField: function () {
-                this.$('.u-field-value input').val(Mustache.escapeHtml(this.modelValue()));
+                this.$('.u-field-value ').text(this.modelValue());
             }
         });
 
@@ -261,7 +320,7 @@
 
             fieldType: 'text',
 
-            templateSelector: '#field_text-tpl',
+            fieldTemplate: field_text_template,
 
             events: {
                 'change input': 'saveValue'
@@ -274,7 +333,7 @@
             },
 
             render: function () {
-                this.$el.html(this.template({
+                HtmlUtils.setHtml(this.$el, HtmlUtils.template(this.fieldTemplate)({
                     id: this.options.valueAttribute,
                     title: this.options.title,
                     value: this.modelValue(),
@@ -290,7 +349,7 @@
 
             updateValueInField: function () {
                 var value = (_.isUndefined(this.modelValue()) || _.isNull(this.modelValue())) ? '' : this.modelValue();
-                this.$('.u-field-value input').val(Mustache.escapeHtml(value));
+                this.$('.u-field-value input').val(value);
             },
 
             saveValue: function () {
@@ -304,7 +363,7 @@
 
             fieldType: 'dropdown',
 
-            templateSelector: '#field_dropdown-tpl',
+            fieldTemplate: field_dropdown_template,
 
             events: {
                 'click': 'startEditing',
@@ -320,12 +379,13 @@
             },
 
             render: function () {
-                this.$el.html(this.template({
+                HtmlUtils.setHtml(this.$el, HtmlUtils.template(this.fieldTemplate)({
                     id: this.options.valueAttribute,
                     mode: this.mode,
+                    editable: this.editable,
                     title: this.options.title,
                     screenReaderTitle: this.options.screenReaderTitle || this.options.title,
-                    titleVisible: this.options.titleVisible || true,
+                    titleVisible: this.options.titleVisible !== undefined ? this.options.titleVisible : true,
                     iconName: this.options.iconName,
                     showBlankOption: (!this.options.required || !this.modelValueIsSet()),
                     selectOptions: this.options.options,
@@ -354,7 +414,13 @@
             },
 
             fieldValue: function () {
-                var value = this.$('.u-field-value select').val();
+                var value;
+                if (this.editable === 'never') {
+                    value = this.modelValueIsSet() ? this.modelValue () : null;
+                }
+                else {
+                    value = this.$('.u-field-value select').val();
+                }
                 return value === '' ? null : value;
             },
 
@@ -368,14 +434,16 @@
             },
 
             updateValueInField: function () {
-                this.$('.u-field-value select').val(this.modelValue() || '');
+                if (this.editable !== 'never') {
+                    this.$('.u-field-value select').val(this.modelValue() || '');
+                }
 
                 var value = this.displayValue(this.modelValue() || '');
                 if (this.modelValueIsSet() === false) {
                     value = this.options.placeholderValue || '';
                 }
                 this.$('.u-field-value').attr('aria-label', this.options.title);
-                this.$('.u-field-value-readonly').html(Mustache.escapeHtml(value));
+                this.$('.u-field-value-readonly').text(value);
 
                 if (this.mode === 'display') {
                     this.updateDisplayModeClass();
@@ -415,7 +483,9 @@
             },
 
             disableField: function(disable) {
-                this.$('.u-field-value select').prop('disabled', disable);
+                if (this.editable !== 'never') {
+                    this.$('.u-field-value select').prop('disabled', disable);
+                }
             }
         });
 
@@ -423,7 +493,7 @@
 
             fieldType: 'textarea',
 
-            templateSelector: '#field_textarea-tpl',
+            fieldTemplate: field_textarea_template,
 
             events: {
                 'click .wrapper-u-field': 'startEditing',
@@ -447,16 +517,19 @@
                 if (this.mode === 'display') {
                     value = value || this.options.placeholderValue;
                 }
-                this.$el.html(this.template({
+                HtmlUtils.setHtml(this.$el, HtmlUtils.template(this.fieldTemplate)({
                     id: this.options.valueAttribute,
                     screenReaderTitle: this.options.screenReaderTitle || this.options.title,
                     mode: this.mode,
+                    editable: this.editable,
                     value: value,
                     message: this.helpMessage,
+                    messagePosition: this.options.messagePosition || 'footer',
                     placeholderValue: this.options.placeholderValue
                 }));
                 this.delegateEvents();
-                this.title((this.modelValue() || this.mode === 'edit') ? this.options.title : this.indicators['plus'] + this.options.title);
+                this.title((this.modelValue() || this.mode === 'edit') ?
+                    this.options.title : HtmlUtils.joinHtml(this.indicators.plus, this.options.title));
 
                 if (this.editable === 'toggle') {
                     this.showCanEditMessage(this.mode === 'display');
@@ -474,17 +547,23 @@
             },
 
             adjustTextareaHeight: function() {
+                if (this.persistChanges === false) {return;}
                 var textarea = this.$('textarea');
                 textarea.css('height', 'auto').css('height', textarea.prop('scrollHeight') + 10);
             },
 
             modelValue: function() {
                 var value = this._super();
-                return  value ? $.trim(value) : '';
+                return value ? $.trim(value) : '';
             },
 
             fieldValue: function () {
-                return this.$('.u-field-value textarea').val();
+                if (this.mode === 'edit') {
+                    return this.$('.u-field-value textarea').val();
+                }
+                else {
+                    return this.$('.u-field-value .u-field-value-readonly').text();
+                }
             },
 
             saveValue: function () {
@@ -522,7 +601,7 @@
 
             fieldType: 'link',
 
-            templateSelector: '#field_link-tpl',
+            fieldTemplate: field_link_template,
 
             events: {
                 'click a': 'linkClicked'
@@ -534,7 +613,7 @@
             },
 
             render: function () {
-                this.$el.html(this.template({
+                HtmlUtils.setHtml(this.$el, HtmlUtils.template(this.fieldTemplate)({
                     id: this.options.valueAttribute,
                     title: this.options.title,
                     screenReaderTitle: this.options.screenReaderTitle || this.options.title,
@@ -548,225 +627,6 @@
 
             linkClicked: function (event) {
                 event.preventDefault();
-            }
-        });
-
-        FieldViews.ImageFieldView = FieldViews.FieldView.extend({
-
-            fieldType: 'image',
-
-            templateSelector: '#field_image-tpl',
-            uploadButtonSelector: '.upload-button-input',
-
-            titleAdd: gettext("Upload an image"),
-            titleEdit: gettext("Change image"),
-            titleRemove: gettext("Remove"),
-
-            titleUploading: gettext("Uploading"),
-            titleRemoving: gettext("Removing"),
-
-            titleImageAlt: '',
-            screenReaderTitle: gettext("Image"),
-
-            iconUpload: '<i class="icon fa fa-camera" aria-hidden="true"></i>',
-            iconRemove: '<i class="icon fa fa-remove" aria-hidden="true"></i>',
-            iconProgress: '<i class="icon fa fa-spinner fa-pulse fa-spin" aria-hidden="true"></i>',
-
-            errorMessage: gettext("An error has occurred. Refresh the page, and then try again."),
-
-            events: {
-                'click .u-field-upload-button': 'clickedUploadButton',
-                'click .u-field-remove-button': 'clickedRemoveButton',
-                'click .upload-submit': 'clickedUploadButton',
-                'focus .upload-button-input': 'showHoverState',
-                'blur .upload-button-input': 'hideHoverState'
-            },
-
-            initialize: function (options) {
-                this._super(options);
-                _.bindAll(this, 'render', 'imageChangeSucceeded', 'imageChangeFailed', 'fileSelected',
-                          'watchForPageUnload', 'onBeforeUnload');
-            },
-
-            render: function () {
-                this.$el.html(this.template({
-                    id: this.options.valueAttribute,
-                    inputName: (this.options.inputName || 'file'),
-                    imageUrl: _.result(this, 'imageUrl'),
-                    imageAltText: _.result(this, 'imageAltText'),
-                    uploadButtonIcon: _.result(this, 'iconUpload'),
-                    uploadButtonTitle: _.result(this, 'uploadButtonTitle'),
-                    removeButtonIcon: _.result(this, 'iconRemove'),
-                    removeButtonTitle: _.result(this, 'removeButtonTitle'),
-                    screenReaderTitle: _.result(this, 'screenReaderTitle')
-                }));
-                this.delegateEvents();
-                this.updateButtonsVisibility();
-                this.watchForPageUnload();
-                return this;
-            },
-
-            showHoverState: function () {
-                this.$('.u-field-upload-button').addClass('button-visible');
-            },
-
-            hideHoverState: function () {
-                this.$('.u-field-upload-button').removeClass('button-visible');
-            },
-
-            showErrorMessage: function (message) {
-                return message;
-            },
-
-            imageUrl: function () {
-                return '';
-            },
-
-            uploadButtonTitle: function () {
-                if (this.isShowingPlaceholder()) {
-                    return _.result(this, 'titleAdd');
-                } else {
-                    return _.result(this, 'titleEdit');
-                }
-            },
-
-            removeButtonTitle: function () {
-                return this.titleRemove;
-            },
-
-            isEditingAllowed: function () {
-                return true;
-            },
-
-            isShowingPlaceholder: function () {
-                return false;
-            },
-
-            setUploadButtonVisibility: function (state) {
-                this.$('.u-field-upload-button').css('display', state);
-            },
-
-            setRemoveButtonVisibility: function (state) {
-                this.$('.u-field-remove-button').css('display', state);
-            },
-
-            updateButtonsVisibility: function () {
-                if (!this.isEditingAllowed() || !this.options.editable) {
-                    this.setUploadButtonVisibility('none');
-                }
-
-                if (this.isShowingPlaceholder() || !this.options.editable) {
-                    this.setRemoveButtonVisibility('none');
-                }
-            },
-
-            clickedUploadButton: function () {
-                $(this.uploadButtonSelector).fileupload({
-                    url: this.options.imageUploadUrl,
-                    type: 'POST',
-                    add: this.fileSelected,
-                    done: this.imageChangeSucceeded,
-                    fail: this.imageChangeFailed
-                });
-            },
-
-            clickedRemoveButton: function () {
-                var view = this;
-                this.setCurrentStatus('removing');
-                this.setUploadButtonVisibility('none');
-                this.showRemovalInProgressMessage();
-                $.ajax({
-                    type: 'POST',
-                    url: this.options.imageRemoveUrl
-                }).done(function () {
-                    view.imageChangeSucceeded();
-                }).fail(function (jqXHR) {
-                    view.showImageChangeFailedMessage(jqXHR.status, jqXHR.responseText);
-                });
-            },
-
-            imageChangeSucceeded: function () {
-                this.render();
-            },
-
-            imageChangeFailed: function (e, data) {
-            },
-
-            showImageChangeFailedMessage: function (status, responseText) {
-            },
-
-            fileSelected: function (e, data) {
-                if (_.isUndefined(data.files[0].size) || this.validateImageSize(data.files[0].size)) {
-                    this.setCurrentStatus('uploading');
-                    this.setRemoveButtonVisibility('none');
-                    this.showUploadInProgressMessage();
-                    data.submit();
-                }
-            },
-
-            validateImageSize: function (imageBytes) {
-                var humanReadableSize;
-                if (imageBytes < this.options.imageMinBytes) {
-                    humanReadableSize = this.bytesToHumanReadable(this.options.imageMinBytes);
-                    this.showErrorMessage(
-                        interpolate_text(
-                            gettext("The file must be at least {size} in size."), {size: humanReadableSize}
-                        )
-                    );
-                    return false;
-                } else if (imageBytes > this.options.imageMaxBytes) {
-                    humanReadableSize = this.bytesToHumanReadable(this.options.imageMaxBytes);
-                    this.showErrorMessage(
-                        interpolate_text(
-                            gettext("The file must be smaller than {size} in size."), {size: humanReadableSize}
-                        )
-                    );
-                    return false;
-                }
-                return true;
-            },
-
-            showUploadInProgressMessage: function () {
-                this.$('.u-field-upload-button').css('opacity', 1);
-                this.$('.upload-button-icon').html(this.iconProgress);
-                this.$('.upload-button-title').html(this.titleUploading);
-            },
-
-            showRemovalInProgressMessage: function () {
-                this.$('.u-field-remove-button').css('opacity', 1);
-                this.$('.remove-button-icon').html(this.iconProgress);
-                this.$('.remove-button-title').html(this.titleRemoving);
-            },
-
-            setCurrentStatus: function (status) {
-                this.$('.image-wrapper').attr('data-status', status);
-            },
-
-            getCurrentStatus: function () {
-                return this.$('.image-wrapper').attr('data-status');
-            },
-
-            watchForPageUnload: function () {
-                $(window).on('beforeunload', this.onBeforeUnload);
-            },
-
-            onBeforeUnload: function () {
-                var status = this.getCurrentStatus();
-                if (status === 'uploading') {
-                    return gettext("Upload is in progress. To avoid errors, stay on this page until the process is complete.");
-                } else if (status === 'removing') {
-                    return gettext("Removal is in progress. To avoid errors, stay on this page until the process is complete.");
-                }
-            },
-
-            bytesToHumanReadable: function (size) {
-                var units = [gettext('bytes'), gettext('KB'), gettext('MB')];
-                var i = 0;
-                while(size >= 1024) {
-                    size /= 1024;
-                    ++i;
-                }
-                return size.toFixed(1)*1 + ' ' + units[i];
             }
         });
 

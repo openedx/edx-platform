@@ -37,18 +37,31 @@ class BaseVerticalBlockTest(XModuleXmlImportTest):
         self.vertical = course_seq.get_children()[0]
         self.vertical.xmodule_runtime = self.module_system
 
+        self.username = "bilbo"
+        self.default_context = {"bookmarked": False, "username": self.username}
+
 
 class VerticalBlockTestCase(BaseVerticalBlockTest):
     """
     Tests for the VerticalBlock.
     """
+    def assert_bookmark_info_in(self, content):
+        """
+        Assert content has all the bookmark info.
+        """
+        self.assertIn('bookmark_id', content)
+        self.assertIn('{},{}'.format(self.username, unicode(self.vertical.location)), content)
+        self.assertIn('bookmarked', content)
+        self.assertIn('show_bookmark_button', content)
+
     def test_render_student_view(self):
         """
         Test the rendering of the student view.
         """
-        html = self.module_system.render(self.vertical, STUDENT_VIEW, {}).content
+        html = self.module_system.render(self.vertical, STUDENT_VIEW, self.default_context).content
         self.assertIn(self.test_html_1, html)
         self.assertIn(self.test_html_2, html)
+        self.assert_bookmark_info_in(html)
 
     def test_render_studio_view(self):
         """

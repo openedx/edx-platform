@@ -9,16 +9,27 @@ from django.conf import settings
 settings.INSTALLED_APPS  # pylint: disable=pointless-statement
 
 from openedx.core.lib.django_startup import autostartup
+import django
+from monkey_patch import (
+    third_party_auth,
+    django_db_models_options
+)
+from openedx.core.lib.xblock_utils import xblock_local_resource_url
 
-from edx_notifications import startup
-from monkey_patch import django_utils_translation
+import xmodule.x_module
+import cms.lib.xblock.runtime
 
+from openedx.core.djangoapps.theming.core import enable_theming
+from openedx.core.djangoapps.theming.helpers import is_comprehensive_theming_enabled
+
+# edx notifications related imports
 from openedx.core.djangoapps.course_groups.scope_resolver import CourseGroupScopeResolver
 from student.scope_resolver import CourseEnrollmentsScopeResolver, StudentEmailScopeResolver
 from edx_solutions_projects.scope_resolver import GroupProjectParticipantsScopeResolver
 from edx_notifications.scopes import register_user_scope_resolver
 from edx_notifications.namespaces import register_namespace_resolver
 from util.namespace_resolver import CourseNamespaceResolver
+from edx_notifications import startup
 
 log = logging.getLogger(__name__)
 
@@ -27,7 +38,15 @@ def run():
     """
     Executed during django startup
     """
-    django_utils_translation.patch()
+    third_party_auth.patch()
+    django_db_models_options.patch()
+
+    # Comprehensive theming needs to be set up before django startup,
+    # because modifying django template paths after startup has no effect.
+    if is_comprehensive_theming_enabled():
+        enable_theming()
+
+    django.setup()
 
     autostartup()
 
@@ -35,8 +54,20 @@ def run():
 
     if settings.FEATURES.get('USE_CUSTOM_THEME', False):
         enable_theme()
+
     if settings.FEATURES.get('ENABLE_NOTIFICATIONS', False):
         startup_notification_subsystem()
+
+    if settings.FEATURES.get('EDX_SOLUTIONS_API', False) and \
+        settings.FEATURES.get('DISABLE_SOLUTIONS_APPS_SIGNALS', False):
+        disable_solutions_apps_signals()
+
+    # In order to allow descriptors to use a handler url, we need to
+    # monkey-patch the x_module library.
+    # TODO: Remove this code when Runtimes are no longer created by modulestores
+    # https://openedx.atlassian.net/wiki/display/PLAT/Convert+from+Storage-centric+runtimes+to+Application-centric+runtimes
+    xmodule.x_module.descriptor_global_handler_url = cms.lib.xblock.runtime.handler_url
+    xmodule.x_module.descriptor_global_local_resource_url = xblock_local_resource_url
 
 
 def add_mimetypes():
@@ -82,6 +113,14 @@ def enable_theme():
     settings.STATICFILES_DIRS.append(
         (u'themes/{}'.format(settings.THEME_NAME), theme_root / 'static')
     )
+
+
+def disable_solutions_apps_signals():
+    """
+    Disables signals receivers in solutions apps
+    """
+    from edx_solutions_api_integration.test_utils import SignalDisconnectTestMixin
+    SignalDisconnectTestMixin.disconnect_signals()
 
 
 def startup_notification_subsystem():

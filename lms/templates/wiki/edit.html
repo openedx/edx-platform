@@ -25,7 +25,7 @@
   {% include "wiki/includes/editor.html" %}
   <div class="form-actions">
       <button type="submit" name="save" value="1" class="btn btn-large btn-primary" onclick="this.form.target=''; this.form.action='{% url 'wiki:edit' path=urlpath.path article_id=article.id %}'">
-        <i class="icon fa fa-check-square-o"></i>
+        <span class="icon fa fa-check-square-o" aria-hidden="true"></span>
         {% trans "Save changes" %}
       </button>
       <a class="btn btn-large" id="previewButton" href="#previewModal" rel="leanModal"
@@ -33,19 +33,19 @@
           document.article_edit_form.target='previewWindow';
           document.article_edit_form.action='{% url 'wiki:preview' path=urlpath.path article_id=article.id %}';
           document.article_edit_form.submit();">
-        <i class="icon fa fa-eye"></i>
+        <span class="icon fa fa-eye" aria-hidden="true"></span>
         {% trans "Preview" %}
       </a>
 
       <a href="{% url 'wiki:delete' path=urlpath.path article_id=article.id %}" class="pull-right btn btn-danger">
-        <i class="icon fa fa-remove"></i>
+        <span class="icon fa fa-remove" aria-hidden="true"></span>
         {% trans "Delete article" %}
       </a>
 
   </div>
   <section id="previewModal" class="modal" aria-hidden="true">
     <div class="inner-wrapper" role="dialog" aria-labelledby="preview-title">
-      <button class="close-modal"><i class="icon fa fa-remove"></i> <span class="sr">{% trans 'Close' %}</span></button>
+      <button class="close-modal"><span class="icon fa fa-remove" aria-hidden="true"></span> <span class="sr">{% trans 'Close' %}</span></button>
 
       <header>
         <h2 id="preview-title">{% trans "Wiki Preview" %}<span class="sr">, {% trans "window open" %}</span></h2>
@@ -57,12 +57,12 @@
     </div>
     <div class="modal-footer">
       <button type="submit" name="save" value="1" class="btn btn-large btn-primary" onclick="this.form.target=''; this.form.action='{% url 'wiki:edit' path=urlpath.path article_id=article.id %}'">
-        <i class="icon fa fa-check-square-o"></i>
+        <span class="icon fa fa-check-square-o" aria-hidden="true"></span>
         {% trans "Save changes" %}
       </button>
 
       <a id="previewModalBackToEditor" href="#" class="btn btn-large">
-        <i class="icon fa fa-circle-arrow-left"></i>
+        <span class="icon fa fa-circle-arrow-left" aria-hidden="true"></span>
         {% trans "Back to editor" %}
       </a>
     </div>

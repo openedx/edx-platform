@@ -10,7 +10,6 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from openedx.core.djangoapps.content.course_structures.signals import listen_for_course_publish
-from openedx.core.djangoapps.util.testing import SignalDisconnectTestMixin
 
 
 class CourseStructureApiTests(ModuleStoreTestCase):
@@ -18,6 +17,8 @@ class CourseStructureApiTests(ModuleStoreTestCase):
     CourseStructure API Tests
     """
     MOCK_CACHE = "openedx.core.djangoapps.content.course_structures.api.v0.api.cache"
+
+    ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
 
     def setUp(self):
         """
@@ -45,7 +46,14 @@ class CourseStructureApiTests(ModuleStoreTestCase):
             parent_location=self.vertical.location, category="html", display_name="My HTML"
         )
 
-        self.addCleanup(SignalDisconnectTestMixin.disconnect_course_published_signals)
+        self.addCleanup(self._disconnect_course_published_event)
+
+    def _disconnect_course_published_event(self):
+        """
+        Disconnect course_published event.
+        """
+        # If we don't disconnect then tests are getting failed in test_crud.py
+        SignalHandler.course_published.disconnect(listen_for_course_publish)
 
     def _expected_blocks(self, block_types=None, get_parent=False):
         """
@@ -95,7 +103,7 @@ class CourseStructureApiTests(ModuleStoreTestCase):
         """
         Verify that course_structure returns info for entire course.
         """
-        with mock.patch(self.MOCK_CACHE, cache.get_cache(backend='default')):
+        with mock.patch(self.MOCK_CACHE, cache.caches['default']):
             with self.assertNumQueries(3):
                 structure = course_structure(self.course.id)
 
@@ -106,7 +114,7 @@ class CourseStructureApiTests(ModuleStoreTestCase):
 
         self.assertDictEqual(structure, expected)
 
-        with mock.patch(self.MOCK_CACHE, cache.get_cache(backend='default')):
+        with mock.patch(self.MOCK_CACHE, cache.caches['default']):
             with self.assertNumQueries(2):
                 course_structure(self.course.id)
 
@@ -116,7 +124,7 @@ class CourseStructureApiTests(ModuleStoreTestCase):
         """
         block_types = ['html', 'video']
 
-        with mock.patch(self.MOCK_CACHE, cache.get_cache(backend='default')):
+        with mock.patch(self.MOCK_CACHE, cache.caches['default']):
             with self.assertNumQueries(3):
                 structure = course_structure(self.course.id, block_types=block_types)
 
@@ -127,7 +135,7 @@ class CourseStructureApiTests(ModuleStoreTestCase):
 
         self.assertDictEqual(structure, expected)
 
-        with mock.patch(self.MOCK_CACHE, cache.get_cache(backend='default')):
+        with mock.patch(self.MOCK_CACHE, cache.caches['default']):
             with self.assertNumQueries(2):
                 course_structure(self.course.id, block_types=block_types)
 

@@ -47,9 +47,8 @@ define(['jquery', 'underscore', 'annotator_1.2.9'], function ($, _, Annotator) {
 
         addFocusGrabber: function () {
             this.focusGrabber = $('<span />', {
-                'class': 'sr edx-notes-focus-grabber',
-                'tabindex': '-1',
-                'text': gettext('Focus grabber')
+                'class': 'edx-notes-focus-grabber',
+                'tabindex': '-1'
             });
             this.annotator.wrapper.before(this.focusGrabber);
         },

@@ -38,6 +38,7 @@ define([
         render: function(model) {
             this.$el.html(this.template({
                 itemCategoryDisplayName: this.itemCategoryDisplayName,
+                newItemMessage: this.newItemMessage,
                 emptyMessage: this.emptyMessage,
                 length: this.collection.length,
                 isEditing: model && model.get('editing'),

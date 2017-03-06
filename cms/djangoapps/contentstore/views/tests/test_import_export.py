@@ -2,6 +2,7 @@
 Unit tests for course import and export
 """
 import copy
+import ddt
 import json
 import logging
 import lxml
@@ -9,23 +10,31 @@ import os
 import shutil
 import tarfile
 import tempfile
-from path import path
+from path import Path as path
 from uuid import uuid4
 
 from django.test.utils import override_settings
 from django.conf import settings
 from xmodule.contentstore.django import contentstore
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml_exporter import export_library_to_xml
 from xmodule.modulestore.xml_importer import import_library_from_xml
-from xmodule.modulestore import LIBRARY_ROOT
+from xmodule.modulestore import LIBRARY_ROOT, ModuleStoreEnum
 from contentstore.utils import reverse_course_url
+from contentstore.tests.utils import CourseTestCase
 
 from xmodule.modulestore.tests.factories import ItemFactory, LibraryFactory
+from xmodule.modulestore.tests.utils import (
+    MongoContentstoreBuilder, SPLIT_MODULESTORE_SETUP, TEST_DATA_DIR
+)
+from opaque_keys.edx.locator import LibraryLocator
 
-from contentstore.tests.utils import CourseTestCase
 from openedx.core.lib.extract_tar import safetar_extractall
 from student import auth
 from student.roles import CourseInstructorRole, CourseStaffRole
+from models.settings.course_metadata import CourseMetadata
+from util import milestones_helpers
+from milestones.tests.utils import MilestonesTestCaseMixin
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
@@ -34,6 +43,92 @@ TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 log = logging.getLogger(__name__)
 
 
+@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
+class ImportEntranceExamTestCase(CourseTestCase, MilestonesTestCaseMixin):
+    """
+    Unit tests for importing a course with entrance exam
+    """
+    def setUp(self):
+        super(ImportEntranceExamTestCase, self).setUp()
+        self.url = reverse_course_url('import_handler', self.course.id)
+        self.content_dir = path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, self.content_dir)
+
+        # Create tar test file -----------------------------------------------
+        # OK course with entrance exam section:
+        entrance_exam_dir = tempfile.mkdtemp(dir=self.content_dir)
+        # test course being deeper down than top of tar file
+        embedded_exam_dir = os.path.join(entrance_exam_dir, "grandparent", "parent")
+        os.makedirs(os.path.join(embedded_exam_dir, "course"))
+        os.makedirs(os.path.join(embedded_exam_dir, "chapter"))
+        with open(os.path.join(embedded_exam_dir, "course.xml"), "w+") as f:
+            f.write('<course url_name="2013_Spring" org="EDx" course="0.00x"/>')
+
+        with open(os.path.join(embedded_exam_dir, "course", "2013_Spring.xml"), "w+") as f:
+            f.write(
+                '<course '
+                'entrance_exam_enabled="true" entrance_exam_id="xyz" entrance_exam_minimum_score_pct="0.7">'
+                '<chapter url_name="2015_chapter_entrance_exam"/></course>'
+            )
+
+        with open(os.path.join(embedded_exam_dir, "chapter", "2015_chapter_entrance_exam.xml"), "w+") as f:
+            f.write('<chapter display_name="Entrance Exam" in_entrance_exam="true" is_entrance_exam="true"></chapter>')
+
+        self.entrance_exam_tar = os.path.join(self.content_dir, "entrance_exam.tar.gz")
+        with tarfile.open(self.entrance_exam_tar, "w:gz") as gtar:
+            gtar.add(entrance_exam_dir)
+
+    def test_import_existing_entrance_exam_course(self):
+        """
+        Check that course is imported successfully as an entrance exam.
+        """
+        course = self.store.get_course(self.course.id)
+        self.assertIsNotNone(course)
+        self.assertEquals(course.entrance_exam_enabled, False)
+
+        with open(self.entrance_exam_tar) as gtar:
+            args = {"name": self.entrance_exam_tar, "course-data": [gtar]}
+            resp = self.client.post(self.url, args)
+        self.assertEquals(resp.status_code, 200)
+        course = self.store.get_course(self.course.id)
+        self.assertIsNotNone(course)
+        self.assertEquals(course.entrance_exam_enabled, True)
+        self.assertEquals(course.entrance_exam_minimum_score_pct, 0.7)
+
+    def test_import_delete_pre_exiting_entrance_exam(self):
+        """
+        Check that pre existed entrance exam content should be overwrite with the imported course.
+        """
+        exam_url = '/course/{}/entrance_exam/'.format(unicode(self.course.id))
+        resp = self.client.post(exam_url, {'entrance_exam_minimum_score_pct': 0.5}, http_accept='application/json')
+        self.assertEqual(resp.status_code, 201)
+
+        # Reload the test course now that the exam module has been added
+        self.course = modulestore().get_course(self.course.id)
+        metadata = CourseMetadata.fetch_all(self.course)
+        self.assertTrue(metadata['entrance_exam_enabled'])
+        self.assertIsNotNone(metadata['entrance_exam_minimum_score_pct'])
+        self.assertEqual(metadata['entrance_exam_minimum_score_pct']['value'], 0.5)
+        self.assertTrue(len(milestones_helpers.get_course_milestones(unicode(self.course.id))))
+        content_milestones = milestones_helpers.get_course_content_milestones(
+            unicode(self.course.id),
+            metadata['entrance_exam_id']['value'],
+            milestones_helpers.get_milestone_relationship_types()['FULFILLS']
+        )
+        self.assertTrue(len(content_milestones))
+
+        # Now import entrance exam course
+        with open(self.entrance_exam_tar) as gtar:
+            args = {"name": self.entrance_exam_tar, "course-data": [gtar]}
+            resp = self.client.post(self.url, args)
+        self.assertEquals(resp.status_code, 200)
+        course = self.store.get_course(self.course.id)
+        self.assertIsNotNone(course)
+        self.assertEquals(course.entrance_exam_enabled, True)
+        self.assertEquals(course.entrance_exam_minimum_score_pct, 0.7)
+
+
+@ddt.ddt
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
 class ImportTestCase(CourseTestCase):
     """
@@ -346,8 +441,76 @@ class ImportTestCase(CourseTestCase):
         self.assertIn(test_block3.url_name, children)
         self.assertIn(test_block4.url_name, children)
 
+    @ddt.data(
+        ModuleStoreEnum.Branch.draft_preferred,
+        ModuleStoreEnum.Branch.published_only,
+    )
+    def test_library_import_branch_settings(self, branch_setting):
+        """
+        Try importing a known good library archive under either branch setting.
+        The branch setting should have no effect on library import.
+        """
+        with self.store.branch_setting(branch_setting):
+            library = LibraryFactory.create(modulestore=self.store)
+            lib_key = library.location.library_key
+            extract_dir = path(tempfile.mkdtemp(dir=settings.DATA_DIR))
+            # the extract_dir needs to be passed as a relative dir to
+            # import_library_from_xml
+            extract_dir_relative = path.relpath(extract_dir, settings.DATA_DIR)
+
+            try:
+                with tarfile.open(path(TEST_DATA_DIR) / 'imports' / 'library.HhJfPD.tar.gz') as tar:
+                    safetar_extractall(tar, extract_dir)
+                import_library_from_xml(
+                    self.store,
+                    self.user.id,
+                    settings.GITHUB_REPO_ROOT,
+                    [extract_dir_relative / 'library'],
+                    load_error_modules=False,
+                    static_content_store=contentstore(),
+                    target_id=lib_key
+                )
+            finally:
+                shutil.rmtree(extract_dir)
+
+    @ddt.data(
+        ModuleStoreEnum.Branch.draft_preferred,
+        ModuleStoreEnum.Branch.published_only,
+    )
+    def test_library_import_branch_settings_again(self, branch_setting):
+        # Construct the contentstore for storing the import
+        with MongoContentstoreBuilder().build() as source_content:
+            # Construct the modulestore for storing the import (using the previously created contentstore)
+            with SPLIT_MODULESTORE_SETUP.build(contentstore=source_content) as source_store:
+                # Use the test branch setting.
+                with source_store.branch_setting(branch_setting):
+                    source_library_key = LibraryLocator(org='TestOrg', library='TestProbs')
+
+                    extract_dir = path(tempfile.mkdtemp(dir=settings.DATA_DIR))
+                    # the extract_dir needs to be passed as a relative dir to
+                    # import_library_from_xml
+                    extract_dir_relative = path.relpath(extract_dir, settings.DATA_DIR)
+
+                    try:
+                        with tarfile.open(path(TEST_DATA_DIR) / 'imports' / 'library.HhJfPD.tar.gz') as tar:
+                            safetar_extractall(tar, extract_dir)
+                        import_library_from_xml(
+                            source_store,
+                            self.user.id,
+                            settings.GITHUB_REPO_ROOT,
+                            [extract_dir_relative / 'library'],
+                            static_content_store=source_content,
+                            target_id=source_library_key,
+                            load_error_modules=False,
+                            raise_on_failure=True,
+                            create_if_not_present=True,
+                        )
+                    finally:
+                        shutil.rmtree(extract_dir)
+
 
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
+@ddt.ddt
 class ExportTestCase(CourseTestCase):
     """
     Tests for export_handler.
@@ -439,14 +602,12 @@ class ExportTestCase(CourseTestCase):
         root_dir = path(tempfile.mkdtemp())
         try:
             export_library_to_xml(self.store, contentstore(), lib_key, root_dir, name)
-            # pylint: disable=no-member
             lib_xml = lxml.etree.XML(open(root_dir / name / LIBRARY_ROOT).read())
             self.assertEqual(lib_xml.get('org'), lib_key.org)
             self.assertEqual(lib_xml.get('library'), lib_key.library)
             block = lib_xml.find('video')
             self.assertIsNotNone(block)
             self.assertEqual(block.get('url_name'), video_block.url_name)
-            # pylint: disable=no-member
             video_xml = lxml.etree.XML(open(root_dir / name / 'video' / video_block.url_name + '.xml').read())
             self.assertEqual(video_xml.tag, 'video')
             self.assertEqual(video_xml.get('youtube_id_1_0'), youtube_id)
@@ -469,3 +630,70 @@ class ExportTestCase(CourseTestCase):
         )
 
         self.test_export_targz_urlparam()
+
+    @ddt.data(
+        '/export/non.1/existence_1/Run_1',  # For mongo
+        '/export/course-v1:non1+existence1+Run1',  # For split
+    )
+    def test_export_course_doest_not_exist(self, url):
+        """
+        Export failure if course is not exist
+        """
+        resp = self.client.get_html(url)
+        self.assertEquals(resp.status_code, 404)
+
+
+@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
+class TestLibraryImportExport(CourseTestCase):
+    """
+    Tests for importing content libraries from XML and exporting them to XML.
+    """
+    def setUp(self):
+        super(TestLibraryImportExport, self).setUp()
+        self.export_dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.export_dir, ignore_errors=True)
+
+    def test_content_library_export_import(self):
+        library1 = LibraryFactory.create(modulestore=self.store)
+        source_library1_key = library1.location.library_key
+        library2 = LibraryFactory.create(modulestore=self.store)
+        source_library2_key = library2.location.library_key
+
+        import_library_from_xml(
+            self.store,
+            'test_user',
+            TEST_DATA_DIR,
+            ['library_empty_problem'],
+            static_content_store=contentstore(),
+            target_id=source_library1_key,
+            load_error_modules=False,
+            raise_on_failure=True,
+            create_if_not_present=True,
+        )
+
+        export_library_to_xml(
+            self.store,
+            contentstore(),
+            source_library1_key,
+            self.export_dir,
+            'exported_source_library',
+        )
+
+        source_library = self.store.get_library(source_library1_key)
+        self.assertEqual(source_library.url_name, 'library')
+
+        # Import the exported library into a different content library.
+        import_library_from_xml(
+            self.store,
+            'test_user',
+            self.export_dir,
+            ['exported_source_library'],
+            static_content_store=contentstore(),
+            target_id=source_library2_key,
+            load_error_modules=False,
+            raise_on_failure=True,
+            create_if_not_present=True,
+        )
+
+        # Compare the two content libraries for equality.
+        self.assertCoursesEqual(source_library1_key, source_library2_key)

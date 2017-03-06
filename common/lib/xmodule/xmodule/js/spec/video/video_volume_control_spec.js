@@ -3,10 +3,16 @@
 describe('VideoVolumeControl', function () {
     var state, oldOTBD, volumeControl;
 
+    var KEY = $.ui.keyCode,
+
+    keyPressEvent = function(key) {
+        return $.Event('keydown', { keyCode: key });
+    };
+
     beforeEach(function () {
         oldOTBD = window.onTouchBasedDevice;
         window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice')
-            .andReturn(null);
+            .and.returnValue(null);
     });
 
     afterEach(function () {
@@ -17,7 +23,7 @@ describe('VideoVolumeControl', function () {
     });
 
     it('Volume level has correct value even if cookie is broken', function () {
-        $.cookie.andReturn('broken_cookie');
+        $.cookie.and.returnValue('broken_cookie');
         state = jasmine.initializePlayer();
         volumeControl = state.videoVolumeControl;
         expect(volumeControl.volume).toEqual(100);
@@ -25,8 +31,8 @@ describe('VideoVolumeControl', function () {
 
     describe('constructor', function () {
         beforeEach(function () {
-            spyOn($.fn, 'slider').andCallThrough();
-            $.cookie.andReturn('75');
+            spyOn($.fn, 'slider').and.callThrough();
+            $.cookie.and.returnValue('75');
             state = jasmine.initializePlayer();
             volumeControl = state.videoVolumeControl;
         });
@@ -40,7 +46,7 @@ describe('VideoVolumeControl', function () {
         });
 
         it('create the slider', function () {
-            expect($.fn.slider.calls[2].args).toEqual([{
+            expect($.fn.slider.calls.argsFor(2)).toEqual([{
                 orientation: 'vertical',
                 range: 'min',
                 min: 0,
@@ -56,24 +62,20 @@ describe('VideoVolumeControl', function () {
             var liveRegion = $('.video-live-region');
 
             expect(liveRegion).toHaveAttrs({
-                'role': 'status',
-                'aria-live': 'polite',
-                'aria-atomic': 'false'
+                'aria-live': 'polite'
             });
         });
 
         it('add ARIA attributes to volume control', function () {
-            var button = $('.volume > a');
+            var button = $('.volume .control');
 
             expect(button).toHaveAttrs({
-                'role': 'button',
-                'title': 'Volume',
                 'aria-disabled': 'false'
             });
         });
 
         it('bind the volume control', function () {
-            var button = $('.volume > a');
+            var button = $('.volume .control');
 
             expect(button).toHandle('keydown');
             expect(button).toHandle('mousedown');
@@ -92,16 +94,23 @@ describe('VideoVolumeControl', function () {
             state = jasmine.initializePlayer();
             volumeControl = state.videoVolumeControl;
 
-            this.addMatchers({
-                assertLiveRegionState: function (volume, expectation) {
-                    var region = $('.video-live-region');
+            jasmine.addMatchers({
+                assertLiveRegionState: function () {
+                    return {
+                        compare: function (actual, volume, expectation) {
+                            var region = $('.video-live-region');
 
-                    var getExpectedText = function (text) {
-                        return text + ' Volume.';
+                            var getExpectedText = function (text) {
+                                return text + ' Volume.';
+                            };
+
+                            actual.setVolume(volume, true, true);
+                            return {
+                                pass: region.text() === getExpectedText(expectation)
+                            };
+
+                        }
                     };
-
-                    this.actual.setVolume(volume, true, true);
-                    return region.text() === getExpectedText(expectation);
                 }
             });
         });
@@ -185,16 +194,19 @@ describe('VideoVolumeControl', function () {
     });
 
     describe('increaseVolume', function () {
+
         beforeEach(function () {
             state = jasmine.initializePlayer();
             volumeControl = state.videoVolumeControl;
         });
 
         it('volume is increased correctly', function () {
+            var button = $('.volume .control');
             volumeControl.volume = 60;
-            state.el.trigger(jQuery.Event("keydown", {
-                keyCode: $.ui.keyCode.UP
-            }));
+
+            // adjust the volume
+            button.focus();
+            button.trigger(keyPressEvent(KEY.UP));
             expect(volumeControl.volume).toEqual(80);
         });
 
@@ -206,16 +218,19 @@ describe('VideoVolumeControl', function () {
     });
 
     describe('decreaseVolume', function () {
+
         beforeEach(function () {
             state = jasmine.initializePlayer();
             volumeControl = state.videoVolumeControl;
         });
 
         it('volume is decreased correctly', function () {
+            var button = $('.volume .control');
             volumeControl.volume = 60;
-            state.el.trigger(jQuery.Event("keydown", {
-                keyCode: $.ui.keyCode.DOWN
-            }));
+
+            // adjust the volume
+            button.focus();
+            button.trigger(keyPressEvent(KEY.DOWN));
             expect(volumeControl.volume).toEqual(40);
         });
 
@@ -274,21 +289,21 @@ describe('VideoVolumeControl', function () {
 
         it('nothing happens if ALT+keyUp are pushed down', function () {
             assertVolumeIsNotChanged({
-                keyCode: $.ui.keyCode.UP,
+                keyCode: KEY.UP,
                 altKey: true
             });
         });
 
         it('nothing happens if SHIFT+keyUp are pushed down', function () {
             assertVolumeIsNotChanged({
-                keyCode: $.ui.keyCode.UP,
+                keyCode: KEY.UP,
                 shiftKey: true
             });
         });
 
         it('nothing happens if SHIFT+keyDown are pushed down', function () {
             assertVolumeIsNotChanged({
-                keyCode: $.ui.keyCode.DOWN,
+                keyCode: KEY.DOWN,
                 shiftKey: true
             });
         });
@@ -302,8 +317,8 @@ describe('VideoVolumeControl', function () {
 
         it('nothing happens if ALT+ENTER are pushed down', function () {
             var isMuted = volumeControl.getMuteStatus();
-            $('.volume > a').trigger(jQuery.Event("keydown", {
-                keyCode: $.ui.keyCode.ENTER,
+            $('.volume .control').trigger(jQuery.Event("keydown", {
+                keyCode: KEY.ENTER,
                 altKey: true
             }));
             expect(volumeControl.getMuteStatus()).toEqual(isMuted);

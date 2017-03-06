@@ -2,13 +2,13 @@
 
 define([
     'backbone',
-    'js/discovery/result'
-], function (Backbone, Result) {
+    'js/discovery/models/course_card'
+], function (Backbone, CourseCard) {
     'use strict';
 
     return Backbone.Collection.extend({
 
-        model: Result,
+        model: CourseCard,
         pageSize: 20,
         totalCount: 0,
         latestModelsCount: 0,

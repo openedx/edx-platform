@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 import datetime
+import ddt
 import mock
 from nose.plugins.attrib import attr
 import ddt
@@ -17,11 +18,19 @@ import django_comment_client.utils as utils
 
 from courseware.tests.factories import InstructorFactory
 from courseware.tabs import get_course_tab_list
+from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohort_settings
+from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts, topic_name_to_id
 from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentFactory
+from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from student.roles import CourseStaffRole
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, ToyCourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_MIXED_MODULESTORE
+from xmodule.modulestore.django import modulestore
+from opaque_keys.edx.locator import CourseLocator
+from lms.djangoapps.teams.tests.factories import CourseTeamFactory
 
 
 @attr('shard_1')
@@ -55,8 +64,10 @@ class AccessUtilsTestCase(ModuleStoreTestCase):
     Base testcase class for access and roles for the
     comment client service integration
     """
+    CREATE_USER = False
+
     def setUp(self):
-        super(AccessUtilsTestCase, self).setUp(create_user=False)
+        super(AccessUtilsTestCase, self).setUp()
 
         self.course = CourseFactory.create()
         self.course_id = self.course.id
@@ -75,11 +86,21 @@ class AccessUtilsTestCase(ModuleStoreTestCase):
         self.community_ta_role.users.add(self.community_ta1)
         self.community_ta2 = UserFactory(username='community_ta2', email='community_ta2@edx.org')
         self.community_ta_role.users.add(self.community_ta2)
+        self.course_staff = UserFactory(username='course_staff', email='course_staff@edx.org')
+        CourseStaffRole(self.course_id).add_users(self.course_staff)
 
     def test_get_role_ids(self):
         ret = utils.get_role_ids(self.course_id)
         expected = {u'Moderator': [3], u'Community TA': [4, 5]}
         self.assertEqual(ret, expected)
+
+    def test_has_discussion_privileges(self):
+        self.assertFalse(utils.has_discussion_privileges(self.student1, self.course_id))
+        self.assertFalse(utils.has_discussion_privileges(self.student2, self.course_id))
+        self.assertFalse(utils.has_discussion_privileges(self.course_staff, self.course_id))
+        self.assertTrue(utils.has_discussion_privileges(self.moderator, self.course_id))
+        self.assertTrue(utils.has_discussion_privileges(self.community_ta1, self.course_id))
+        self.assertTrue(utils.has_discussion_privileges(self.community_ta2, self.course_id))
 
     def test_has_forum_access(self):
         ret = utils.has_forum_access('student', self.course_id, 'Student')
@@ -92,6 +113,7 @@ class AccessUtilsTestCase(ModuleStoreTestCase):
         self.assertFalse(ret)
 
 
+@ddt.ddt
 @attr('shard_1')
 class CoursewareContextTestCase(ModuleStoreTestCase):
     """
@@ -99,7 +121,7 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
     comment client service integration
     """
     def setUp(self):
-        super(CoursewareContextTestCase, self).setUp(create_user=True)
+        super(CoursewareContextTestCase, self).setUp()
 
         self.course = CourseFactory.create(org="TestX", number="101", display_name="Test Course")
         self.discussion1 = ItemFactory.create(
@@ -154,6 +176,149 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
         assertThreadCorrect(threads[0], self.discussion1, "Chapter / Discussion 1")
         assertThreadCorrect(threads[1], self.discussion2, "Subsection / Discussion 2")
 
+    @ddt.data((ModuleStoreEnum.Type.mongo, 2), (ModuleStoreEnum.Type.split, 1))
+    @ddt.unpack
+    def test_get_accessible_discussion_xblocks(self, modulestore_type, expected_discussion_xblocks):
+        """
+        Tests that the accessible discussion xblocks having no parents do not get fetched for split modulestore.
+        """
+        course = CourseFactory.create(default_store=modulestore_type)
+
+        # Create a discussion xblock.
+        test_discussion = self.store.create_child(self.user.id, course.location, 'discussion', 'test_discussion')
+
+        # Assert that created discussion xblock is not an orphan.
+        self.assertNotIn(test_discussion.location, self.store.get_orphans(course.id))
+
+        # Assert that there is only one discussion xblock in the course at the moment.
+        self.assertEqual(len(utils.get_accessible_discussion_xblocks(course, self.user)), 1)
+
+        # Add an orphan discussion xblock to that course
+        orphan = course.id.make_usage_key('discussion', 'orphan_discussion')
+        self.store.create_item(self.user.id, orphan.course_key, orphan.block_type, block_id=orphan.block_id)
+
+        # Assert that the discussion xblock is an orphan.
+        self.assertIn(orphan, self.store.get_orphans(course.id))
+
+        self.assertEqual(len(utils.get_accessible_discussion_xblocks(course, self.user)), expected_discussion_xblocks)
+
+
+@attr('shard_3')
+class CachedDiscussionIdMapTestCase(ModuleStoreTestCase):
+    """
+    Tests that using the cache of discussion id mappings has the same behavior as searching through the course.
+    """
+    def setUp(self):
+        super(CachedDiscussionIdMapTestCase, self).setUp()
+
+        self.course = CourseFactory.create(org='TestX', number='101', display_name='Test Course')
+        self.discussion = ItemFactory.create(
+            parent_location=self.course.location,
+            category='discussion',
+            discussion_id='test_discussion_id',
+            discussion_category='Chapter',
+            discussion_target='Discussion 1'
+        )
+        self.discussion2 = ItemFactory.create(
+            parent_location=self.course.location,
+            category='discussion',
+            discussion_id='test_discussion_id_2',
+            discussion_category='Chapter 2',
+            discussion_target='Discussion 2'
+        )
+        self.private_discussion = ItemFactory.create(
+            parent_location=self.course.location,
+            category='discussion',
+            discussion_id='private_discussion_id',
+            discussion_category='Chapter 3',
+            discussion_target='Beta Testing',
+            visible_to_staff_only=True
+        )
+        self.bad_discussion = ItemFactory.create(
+            parent_location=self.course.location,
+            category='discussion',
+            discussion_id='bad_discussion_id',
+            discussion_category=None,
+            discussion_target=None
+        )
+
+    def test_cache_returns_correct_key(self):
+        usage_key = utils.get_cached_discussion_key(self.course, 'test_discussion_id')
+        self.assertEqual(usage_key, self.discussion.location)
+
+    def test_cache_returns_none_if_id_is_not_present(self):
+        usage_key = utils.get_cached_discussion_key(self.course, 'bogus_id')
+        self.assertIsNone(usage_key)
+
+    def test_cache_raises_exception_if_course_structure_not_cached(self):
+        CourseStructure.objects.all().delete()
+        with self.assertRaises(utils.DiscussionIdMapIsNotCached):
+            utils.get_cached_discussion_key(self.course, 'test_discussion_id')
+
+    def test_cache_raises_exception_if_discussion_id_not_cached(self):
+        cache = CourseStructure.objects.get(course_id=self.course.id)
+        cache.discussion_id_map_json = None
+        cache.save()
+
+        with self.assertRaises(utils.DiscussionIdMapIsNotCached):
+            utils.get_cached_discussion_key(self.course, 'test_discussion_id')
+
+    def test_xblock_does_not_have_required_keys(self):
+        self.assertTrue(utils.has_required_keys(self.discussion))
+        self.assertFalse(utils.has_required_keys(self.bad_discussion))
+
+    def verify_discussion_metadata(self):
+        """Retrieves the metadata for self.discussion and self.discussion2 and verifies that it is correct"""
+        metadata = utils.get_cached_discussion_id_map(
+            self.course,
+            ['test_discussion_id', 'test_discussion_id_2'],
+            self.user
+        )
+        discussion1 = metadata[self.discussion.discussion_id]
+        discussion2 = metadata[self.discussion2.discussion_id]
+        self.assertEqual(discussion1['location'], self.discussion.location)
+        self.assertEqual(discussion1['title'], 'Chapter / Discussion 1')
+        self.assertEqual(discussion2['location'], self.discussion2.location)
+        self.assertEqual(discussion2['title'], 'Chapter 2 / Discussion 2')
+
+    def test_get_discussion_id_map_from_cache(self):
+        self.verify_discussion_metadata()
+
+    def test_get_discussion_id_map_without_cache(self):
+        CourseStructure.objects.all().delete()
+        self.verify_discussion_metadata()
+
+    def test_get_missing_discussion_id_map_from_cache(self):
+        metadata = utils.get_cached_discussion_id_map(self.course, ['bogus_id'], self.user)
+        self.assertEqual(metadata, {})
+
+    def test_get_discussion_id_map_from_cache_without_access(self):
+        user = UserFactory.create()
+
+        metadata = utils.get_cached_discussion_id_map(self.course, ['private_discussion_id'], self.user)
+        self.assertEqual(metadata['private_discussion_id']['title'], 'Chapter 3 / Beta Testing')
+
+        metadata = utils.get_cached_discussion_id_map(self.course, ['private_discussion_id'], user)
+        self.assertEqual(metadata, {})
+
+    def test_get_bad_discussion_id(self):
+        metadata = utils.get_cached_discussion_id_map(self.course, ['bad_discussion_id'], self.user)
+        self.assertEqual(metadata, {})
+
+    def test_discussion_id_accessible(self):
+        self.assertTrue(utils.discussion_category_id_access(self.course, self.user, 'test_discussion_id'))
+
+    def test_bad_discussion_id_not_accessible(self):
+        self.assertFalse(utils.discussion_category_id_access(self.course, self.user, 'bad_discussion_id'))
+
+    def test_missing_discussion_id_not_accessible(self):
+        self.assertFalse(utils.discussion_category_id_access(self.course, self.user, 'bogus_id'))
+
+    def test_discussion_id_not_accessible_without_access(self):
+        user = UserFactory.create()
+        self.assertTrue(utils.discussion_category_id_access(self.course, self.user, 'private_discussion_id'))
+        self.assertFalse(utils.discussion_category_id_access(self.course, user, 'private_discussion_id'))
+
 
 class CategoryMapTestMixin(object):
     """
@@ -178,7 +343,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
     comment client service integration
     """
     def setUp(self):
-        super(CategoryMapTestCase, self).setUp(create_user=True)
+        super(CategoryMapTestCase, self).setUp()
 
         self.course = CourseFactory.create(
             org="TestX", number="101", display_name="Test Course",
@@ -341,7 +506,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
             cohorted_if_in_list=True
         )
 
-    def test_get_unstarted_discussion_modules(self):
+    def test_get_unstarted_discussion_xblocks(self):
         later = datetime.datetime(datetime.MAXYEAR, 1, 1, tzinfo=django_utc())
 
         self.create_discussion("Chapter 1", "Discussion 1", start=later)
@@ -505,6 +670,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         self.create_discussion("Chapter 2 / Section 1 / Subsection 2", "Discussion", start=later)
         self.create_discussion("Chapter 3 / Section 1", "Discussion", start=later)
 
+        self.assertFalse(self.course.self_paced)
         self.assert_category_map_equals(
             {
                 "entries": {},
@@ -535,7 +701,102 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                 "children": ["Chapter 1", "Chapter 2"]
             }
         )
-        self.maxDiff = None
+
+    def test_self_paced_start_date_filter(self):
+        self.course.self_paced = True
+        self.course.save()
+
+        now = datetime.datetime.now()
+        later = datetime.datetime.max
+        self.create_discussion("Chapter 1", "Discussion 1", start=now)
+        self.create_discussion("Chapter 1", "Discussion 2", start=later)
+        self.create_discussion("Chapter 2", "Discussion", start=now)
+        self.create_discussion("Chapter 2 / Section 1 / Subsection 1", "Discussion", start=later)
+        self.create_discussion("Chapter 2 / Section 1 / Subsection 2", "Discussion", start=later)
+        self.create_discussion("Chapter 3 / Section 1", "Discussion", start=later)
+
+        self.assertTrue(self.course.self_paced)
+        self.assert_category_map_equals(
+            {
+                "entries": {},
+                "subcategories": {
+                    "Chapter 1": {
+                        "entries": {
+                            "Discussion 1": {
+                                "id": "discussion1",
+                                "sort_key": None,
+                                "is_cohorted": False,
+                            },
+                            "Discussion 2": {
+                                "id": "discussion2",
+                                "sort_key": None,
+                                "is_cohorted": False,
+                            }
+                        },
+                        "subcategories": {},
+                        "children": ["Discussion 1", "Discussion 2"]
+                    },
+                    "Chapter 2": {
+                        "entries": {
+                            "Discussion": {
+                                "id": "discussion3",
+                                "sort_key": None,
+                                "is_cohorted": False,
+                            }
+                        },
+                        "subcategories": {
+                            "Section 1": {
+                                "entries": {},
+                                "subcategories": {
+                                    "Subsection 1": {
+                                        "entries": {
+                                            "Discussion": {
+                                                "id": "discussion4",
+                                                "sort_key": None,
+                                                "is_cohorted": False,
+                                            }
+                                        },
+                                        "subcategories": {},
+                                        "children": ["Discussion"]
+                                    },
+                                    "Subsection 2": {
+                                        "entries": {
+                                            "Discussion": {
+                                                "id": "discussion5",
+                                                "sort_key": None,
+                                                "is_cohorted": False,
+                                            }
+                                        },
+                                        "subcategories": {},
+                                        "children": ["Discussion"]
+                                    }
+                                },
+                                "children": ["Subsection 1", "Subsection 2"]
+                            }
+                        },
+                        "children": ["Discussion", "Section 1"]
+                    },
+                    "Chapter 3": {
+                        "entries": {},
+                        "subcategories": {
+                            "Section 1": {
+                                "entries": {
+                                    "Discussion": {
+                                        "id": "discussion6",
+                                        "sort_key": None,
+                                        "is_cohorted": False,
+                                    }
+                                },
+                                "subcategories": {},
+                                "children": ["Discussion"]
+                            }
+                        },
+                        "children": ["Section 1"]
+                    }
+                },
+                "children": ["Chapter 1", "Chapter 2", "Chapter 3"]
+            }
+        )
 
     def test_sort_inline_explicit(self):
         self.create_discussion("Chapter", "Discussion 1", sort_key="D")
@@ -766,7 +1027,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
 @attr('shard_1')
 class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase):
     """
-    Tests `get_discussion_category_map` on discussion modules which are
+    Tests `get_discussion_category_map` on discussion xblocks which are
     only visible to some content groups.
     """
     def test_staff_user(self):
@@ -1001,3 +1262,177 @@ class FormatFilenameTests(TestCase):
     def test_format_filename(self, raw_filename, expected_output):
         """ Tests that format_filename produces expected output for certain inputs """
         self.assertEqual(utils.format_filename(raw_filename), expected_output)
+
+
+class IsCommentableCohortedTestCase(ModuleStoreTestCase):
+    """
+    Test the is_commentable_cohorted function.
+    """
+
+    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
+
+    def setUp(self):
+        """
+        Make sure that course is reloaded every time--clear out the modulestore.
+        """
+        super(IsCommentableCohortedTestCase, self).setUp()
+        self.toy_course_key = ToyCourseFactory.create().id
+
+    def test_is_commentable_cohorted(self):
+        course = modulestore().get_course(self.toy_course_key)
+        self.assertFalse(cohorts.is_course_cohorted(course.id))
+
+        def to_id(name):
+            """Helper for topic_name_to_id that uses course."""
+            return topic_name_to_id(course, name)
+
+        # no topics
+        self.assertFalse(
+            utils.is_commentable_cohorted(course.id, to_id("General")),
+            "Course doesn't even have a 'General' topic"
+        )
+
+        # not cohorted
+        config_course_cohorts(course, is_cohorted=False, discussion_topics=["General", "Feedback"])
+
+        self.assertFalse(
+            utils.is_commentable_cohorted(course.id, to_id("General")),
+            "Course isn't cohorted"
+        )
+
+        # cohorted, but top level topics aren't
+        config_course_cohorts(course, is_cohorted=True, discussion_topics=["General", "Feedback"])
+
+        self.assertTrue(cohorts.is_course_cohorted(course.id))
+        self.assertFalse(
+            utils.is_commentable_cohorted(course.id, to_id("General")),
+            "Course is cohorted, but 'General' isn't."
+        )
+
+        # cohorted, including "Feedback" top-level topics aren't
+        config_course_cohorts(
+            course,
+            is_cohorted=True,
+            discussion_topics=["General", "Feedback"],
+            cohorted_discussions=["Feedback"]
+        )
+
+        self.assertTrue(cohorts.is_course_cohorted(course.id))
+        self.assertFalse(
+            utils.is_commentable_cohorted(course.id, to_id("General")),
+            "Course is cohorted, but 'General' isn't."
+        )
+        self.assertTrue(
+            utils.is_commentable_cohorted(course.id, to_id("Feedback")),
+            "Feedback was listed as cohorted.  Should be."
+        )
+
+    def test_is_commentable_cohorted_inline_discussion(self):
+        course = modulestore().get_course(self.toy_course_key)
+        self.assertFalse(cohorts.is_course_cohorted(course.id))
+
+        def to_id(name):  # pylint: disable=missing-docstring
+            return topic_name_to_id(course, name)
+
+        config_course_cohorts(
+            course,
+            is_cohorted=True,
+            discussion_topics=["General", "Feedback"],
+            cohorted_discussions=["Feedback", "random_inline"]
+        )
+        self.assertTrue(
+            utils.is_commentable_cohorted(course.id, to_id("random")),
+            "By default, Non-top-level discussion is always cohorted in cohorted courses."
+        )
+
+        # if always_cohort_inline_discussions is set to False, non-top-level discussion are always
+        # non cohorted unless they are explicitly set in cohorted_discussions
+        config_course_cohorts(
+            course,
+            is_cohorted=True,
+            discussion_topics=["General", "Feedback"],
+            cohorted_discussions=["Feedback", "random_inline"],
+            always_cohort_inline_discussions=False
+        )
+        self.assertFalse(
+            utils.is_commentable_cohorted(course.id, to_id("random")),
+            "Non-top-level discussion is not cohorted if always_cohort_inline_discussions is False."
+        )
+        self.assertTrue(
+            utils.is_commentable_cohorted(course.id, to_id("random_inline")),
+            "If always_cohort_inline_discussions set to False, Non-top-level discussion is "
+            "cohorted if explicitly set in cohorted_discussions."
+        )
+        self.assertTrue(
+            utils.is_commentable_cohorted(course.id, to_id("Feedback")),
+            "If always_cohort_inline_discussions set to False, top-level discussion are not affected."
+        )
+
+    def test_is_commentable_cohorted_team(self):
+        course = modulestore().get_course(self.toy_course_key)
+        self.assertFalse(cohorts.is_course_cohorted(course.id))
+
+        config_course_cohorts(course, is_cohorted=True)
+        team = CourseTeamFactory(course_id=course.id)
+
+        # Verify that team discussions are not cohorted, but other discussions are
+        self.assertFalse(utils.is_commentable_cohorted(course.id, team.discussion_topic_id))
+        self.assertTrue(utils.is_commentable_cohorted(course.id, "random"))
+
+
+class PermissionsTestCase(ModuleStoreTestCase):
+    """Test utils functionality related to forums "abilities" (permissions)"""
+
+    def test_get_ability(self):
+        content = {}
+        content['user_id'] = '1'
+        content['type'] = 'thread'
+
+        user = mock.Mock()
+        user.id = 1
+
+        with mock.patch('django_comment_client.utils.check_permissions_by_view') as check_perm:
+            check_perm.return_value = True
+            self.assertEqual(utils.get_ability(None, content, user), {
+                'editable': True,
+                'can_reply': True,
+                'can_delete': True,
+                'can_openclose': True,
+                'can_vote': False,
+                'can_report': False
+            })
+
+            content['user_id'] = '2'
+            self.assertEqual(utils.get_ability(None, content, user), {
+                'editable': True,
+                'can_reply': True,
+                'can_delete': True,
+                'can_openclose': True,
+                'can_vote': True,
+                'can_report': True
+            })
+
+    def test_is_content_authored_by(self):
+        content = {}
+        user = mock.Mock()
+        user.id = 1
+
+        # strict equality checking
+        content['user_id'] = 1
+        self.assertTrue(utils.is_content_authored_by(content, user))
+
+        # cast from string to int
+        content['user_id'] = '1'
+        self.assertTrue(utils.is_content_authored_by(content, user))
+
+        # strict equality checking, fails
+        content['user_id'] = 2
+        self.assertFalse(utils.is_content_authored_by(content, user))
+
+        # cast from string to int, fails
+        content['user_id'] = 'string'
+        self.assertFalse(utils.is_content_authored_by(content, user))
+
+        # content has no known author
+        del content['user_id']
+        self.assertFalse(utils.is_content_authored_by(content, user))

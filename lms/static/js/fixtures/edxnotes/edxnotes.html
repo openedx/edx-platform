@@ -1,7 +1,7 @@
 <section class="container">
   <div class="wrapper-student-notes">
     <div class="student-notes">
-
+    <main id="main" aria-label="Content" tabindex="-1">
       <div class="title-search-container">
         <div class="wrapper-title">
           <h1 class="page-title">
@@ -15,7 +15,7 @@
             <label for="search-notes-input" class="sr">Search notes for:</label>
             <input type="search" class="search-notes-input" id="search-notes-input" name="note" placeholder="Search notes for...">
             <button type="submit" class="search-notes-submit">
-              <i class="icon fa fa-search"></i>
+              <span class="icon fa fa-search" aria-hidden="true"></span>
               <span class="sr">Search</span>
             </button>
           </form>
@@ -37,12 +37,12 @@
 
         <div class="ui-loading" tabindex="-1">
           <span class="spin">
-            <i class="icon fa fa-refresh"></i>
+            <span class="icon fa fa-refresh" aria-hidden="true"></span>
           </span>
           <span class="copy">Loading</span>
         </div>
       </section>
-
+    </main>
     </div>
   </div>
 </section>

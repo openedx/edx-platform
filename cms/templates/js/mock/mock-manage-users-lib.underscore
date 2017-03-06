@@ -13,7 +13,7 @@
           <h3 class="sr">Page Actions</h3>
           <ul>
             <li class="nav-item">
-              <a href="#" class="button new-button create-user-button"><i class="icon fa fa-plus"></i> Add Instructor</a>
+              <a href="#" class="button new-button create-user-button"><span class="icon fa fa-plus" aria-hidden="true"></span> Add Instructor</a>
             </li>
           </ul>
         </nav>
@@ -50,7 +50,7 @@
 
           <ol id="user-list" class="user-list">
             <div class="ui-loading">
-              <p><span class="spin"><i class="icon fa fa-refresh"></i></span> <span class="copy">Loading</span></p>
+              <p><span class="spin"><span class="icon fa fa-refresh" aria-hidden="true"></span></span> <span class="copy">Loading</span></p>
             </div>
           </ol>
 

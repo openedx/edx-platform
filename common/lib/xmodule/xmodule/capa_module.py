@@ -2,6 +2,7 @@
 import json
 import logging
 import sys
+import re
 from lxml import etree
 
 from pkg_resources import resource_string
@@ -10,6 +11,7 @@ import dogstats_wrapper as dog_stats_api
 from .capa_base import CapaMixin, CapaFields, ComplexEncoder
 from capa import responsetypes
 from .progress import Progress
+from xmodule.util.misc import escape_html_characters
 from xmodule.x_module import XModule, module_attr, DEPRECATION_VSCOMPAT_EVENT
 from xmodule.raw_module import RawDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
@@ -46,6 +48,12 @@ class CapaModule(CapaMixin, XModule):
         Accepts the same arguments as xmodule.x_module:XModule.__init__
         """
         super(CapaModule, self).__init__(*args, **kwargs)
+
+    def author_view(self, context):
+        """
+        Renders the Studio preview view.
+        """
+        return self.student_view(context)
 
     def handle_ajax(self, dispatch, data):
         """
@@ -90,11 +98,23 @@ class CapaModule(CapaMixin, XModule):
         try:
             result = handlers[dispatch](data)
 
-        except NotFoundError as err:
+        except NotFoundError:
+            log.info(
+                "Unable to find data when dispatching %s to %s for user %s",
+                dispatch,
+                self.scope_ids.usage_id,
+                self.scope_ids.user_id
+            )
             _, _, traceback_obj = sys.exc_info()  # pylint: disable=redefined-outer-name
             raise ProcessingError(not_found_error_message), None, traceback_obj
 
         except Exception as err:
+            log.exception(
+                "Unknown error when dispatching %s to %s for user %s",
+                dispatch,
+                self.scope_ids.usage_id,
+                self.scope_ids.user_id
+            )
             _, _, traceback_obj = sys.exc_info()  # pylint: disable=redefined-outer-name
             raise ProcessingError(generic_error_message), None, traceback_obj
 
@@ -108,6 +128,19 @@ class CapaModule(CapaMixin, XModule):
 
         return json.dumps(result, cls=ComplexEncoder)
 
+    @property
+    def display_name_with_default(self):
+        """
+        Constructs the display name for a CAPA problem.
+
+        Default to the display_name if it isn't None or not an empty string,
+        else fall back to problem category.
+        """
+        if self.display_name is None or not self.display_name.strip():
+            return self.location.block_type
+
+        return self.display_name
+
 
 class CapaDescriptor(CapaFields, RawDescriptor):
     """
@@ -117,12 +150,15 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     INDEX_CONTENT_TYPE = 'CAPA'
 
     module_class = CapaModule
+    resources_dir = None
 
     has_score = True
+    show_in_read_only_mode = True
     template_dir_name = 'problem'
     mako_template = "widgets/problem-edit.html"
     js = {'coffee': [resource_string(__name__, 'js/src/problem/edit.coffee')]}
     js_module_name = "MarkdownEditingDescriptor"
+    has_author_view = True
     css = {
         'scss': [
             resource_string(__name__, 'css/editor/edit.scss'),
@@ -143,7 +179,7 @@ class CapaDescriptor(CapaFields, RawDescriptor):
         Show them only if use_latex_compiler is set to True in
         course settings.
         """
-        return ('latex' not in template['template_id'] or course.use_latex_compiler)
+        return 'latex' not in template['template_id'] or course.use_latex_compiler
 
     def get_context(self):
         _context = RawDescriptor.get_context(self)
@@ -184,31 +220,54 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     @property
     def problem_types(self):
         """ Low-level problem type introspection for content libraries filtering by problem type """
-        tree = etree.XML(self.data)  # pylint: disable=no-member
+        tree = etree.XML(self.data)
         registered_tags = responsetypes.registry.registered_tags()
         return set([node.tag for node in tree.iter() if node.tag in registered_tags])
-
-    @property
-    def has_responsive_ui(self):
-        """
-        Returns whether this module has support for responsive UI.
-        """
-        return self.lcp.has_responsive_ui
 
     def index_dictionary(self):
         """
         Return dictionary prepared with module content and type for indexing.
         """
-        result = super(CapaDescriptor, self).index_dictionary()
-        if not result:
-            result = {}
-        index = {
-            'content_type': self.INDEX_CONTENT_TYPE,
-            'problem_types': list(self.problem_types),
-            "display_name": self.display_name
+        xblock_body = super(CapaDescriptor, self).index_dictionary()
+        # Removing solutions and hints, as well as script and style
+        capa_content = re.sub(
+            re.compile(
+                r"""
+                    <solution>.*?</solution> |
+                    <script>.*?</script> |
+                    <style>.*?</style> |
+                    <[a-z]*hint.*?>.*?</[a-z]*hint>
+                """,
+                re.DOTALL |
+                re.VERBOSE),
+            "",
+            self.data
+        )
+        capa_content = escape_html_characters(capa_content)
+        capa_body = {
+            "capa_content": capa_content,
+            "display_name": self.display_name,
         }
-        result.update(index)
-        return result
+        if "content" in xblock_body:
+            xblock_body["content"].update(capa_body)
+        else:
+            xblock_body["content"] = capa_body
+        xblock_body["content_type"] = self.INDEX_CONTENT_TYPE
+        xblock_body["problem_types"] = list(self.problem_types)
+        return xblock_body
+
+    def has_support(self, view, functionality):
+        """
+        Override the XBlock.has_support method to return appropriate
+        value for the multi-device functionality.
+        Returns whether the given view has support for the given functionality.
+        """
+        if functionality == "multi_device":
+            return all(
+                responsetypes.registry.get_class_for_tag(tag).multi_device_support
+                for tag in self.problem_types
+            )
+        return False
 
     # Proxy to CapaModule for access to any of its attributes
     answer_available = module_attr('answer_available')

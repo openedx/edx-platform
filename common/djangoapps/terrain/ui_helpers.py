@@ -1,5 +1,4 @@
 # pylint: disable=missing-docstring
-# pylint: disable=redefined-outer-name
 
 from lettuce import world
 
@@ -22,7 +21,7 @@ from selenium.common.exceptions import (
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
-from nose.tools import assert_true  # pylint: disable=no-name-in-module
+from nose.tools import assert_true
 
 GLOBAL_WAIT_FOR_TIMEOUT = 60
 
@@ -60,7 +59,7 @@ REQUIREJS_WAIT = {
 
     # Pages
     re.compile(r'^Pages \|'): [
-        'js/models/explicit_url', 'coffee/src/views/tabs',
+        'js/models/explicit_url', 'js/views/tabs',
         'xmodule', 'coffee/src/main', 'xblock/cms.runtime.v1'
     ],
 }
@@ -347,9 +346,9 @@ def css_contains_text(css_selector, partial_text, index=0):
     # If we're expecting a non-empty string, give the page
     # a chance to fill in text fields.
     if partial_text:
-        wait_for(lambda _: css_text(css_selector, index=index))
+        wait_for(lambda _: css_html(css_selector, index=index), timeout=8)
 
-    actual_text = css_text(css_selector, index=index)
+    actual_text = css_html(css_selector, index=index)
 
     return partial_text in actual_text
 

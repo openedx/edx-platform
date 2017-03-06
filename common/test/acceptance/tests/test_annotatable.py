@@ -2,17 +2,14 @@
 """
 E2E tests for the LMS.
 """
-import time
-
-from unittest import skip
 
 from .helpers import UniqueCourseTest
 from ..pages.studio.auto_auth import AutoAuthPage
 from ..pages.lms.courseware import CoursewarePage
 from ..pages.lms.annotation_component import AnnotationComponentPage
 from ..fixtures.course import CourseFixture, XBlockFixtureDesc
-from ..fixtures.xqueue import XQueueResponseFixture
 from textwrap import dedent
+from ..tests.helpers import disable_animations
 
 
 def _correctness(choice, target):
@@ -118,17 +115,18 @@ class AnnotatableProblemTest(UniqueCourseTest):
         self.courseware_page.visit()
         annotation_component_page = AnnotationComponentPage(self.browser)
         self.assertEqual(
-            annotation_component_page.component_name, 'TEST ANNOTATION MODULE'.format()
+            annotation_component_page.component_name, 'Test Annotation Module'.format()
         )
         return annotation_component_page
 
-    @skip  # TODO fix TNL-1590
     def test_annotation_component(self):
         """
         Test annotation components links to annotation problems.
         """
 
         annotation_component_page = self._goto_annotation_component_page()
+        # This will avoid scrolling related problems on different browsers and instead directly jump on the problem
+        disable_animations(annotation_component_page)
 
         for i in xrange(self.annotation_count):
             annotation_component_page.click_reply_annotation(i)

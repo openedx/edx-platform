@@ -6,13 +6,12 @@ from io import BytesIO
 from pytz import UTC
 from PIL import Image
 import json
-
+from mock import patch
 from django.conf import settings
 
 from contentstore.tests.utils import CourseTestCase
 from contentstore.views import assets
 from contentstore.utils import reverse_course_url
-from xmodule.assetstore.assetmgr import AssetMetadataFoundTemporary
 from xmodule.assetstore import AssetMetadata
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
@@ -127,7 +126,7 @@ class BasicAssetsTestCase(AssetsTestCase):
             )
             course = module_store.get_course(course_id)
 
-            filename = 'sample_static.txt'
+            filename = 'sample_static.html'
             html_src_attribute = '"/static/{}"'.format(filename)
             asset_url = replace_static_urls(html_src_attribute, course_id=course.id)
             url = asset_url.replace('"', '')
@@ -331,23 +330,13 @@ class DownloadTestCase(AssetsTestCase):
         resp = self.client.get(url, HTTP_ACCEPT='text/html')
         self.assertEquals(resp.status_code, 404)
 
-    def test_metadata_found_in_modulestore(self):
-        # Insert asset metadata into the modulestore (with no accompanying asset).
-        asset_key = self.course.id.make_asset_key(AssetMetadata.GENERAL_ASSET_TYPE, 'pic1.jpg')
-        asset_md = AssetMetadata(asset_key, {
-            'internal_name': 'EKMND332DDBK',
-            'basename': 'pix/archive',
-            'locked': False,
-            'curr_version': '14',
-            'prev_version': '13'
-        })
-        modulestore().save_asset_metadata(asset_md, 15)
-        # Get the asset metadata and have it be found in the modulestore.
-        # Currently, no asset metadata should be found in the modulestore. The code is not yet storing it there.
-        # If asset metadata *is* found there, an exception is raised. This test ensures the exception is indeed raised.
-        # THIS IS TEMPORARY. Soon, asset metadata *will* be stored in the modulestore.
-        with self.assertRaises((AssetMetadataFoundTemporary, NameError)):
-            self.client.get(unicode(asset_key), HTTP_ACCEPT='text/html')
+    @patch('xmodule.modulestore.mixed.MixedModuleStore.find_asset_metadata')
+    def test_pickling_calls(self, patched_find_asset_metadata):
+        """ Tests if assets are not calling find_asset_metadata
+        """
+        patched_find_asset_metadata.return_value = None
+        self.client.get(self.uploaded_url, HTTP_ACCEPT='text/html')
+        self.assertFalse(patched_find_asset_metadata.called)
 
 
 class AssetToJsonTestCase(AssetsTestCase):
@@ -390,7 +379,7 @@ class LockAssetTestCase(AssetsTestCase):
         """
         def verify_asset_locked_state(locked):
             """ Helper method to verify lock state in the contentstore """
-            asset_location = StaticContent.get_location_from_path('/c4x/edX/toy/asset/sample_static.txt')
+            asset_location = StaticContent.get_location_from_path('/c4x/edX/toy/asset/sample_static.html')
             content = contentstore().find(asset_location)
             self.assertEqual(content.locked, locked)
 
@@ -398,14 +387,14 @@ class LockAssetTestCase(AssetsTestCase):
             """ Helper method for posting asset update. """
             content_type = 'application/txt'
             upload_date = datetime(2013, 6, 1, 10, 30, tzinfo=UTC)
-            asset_location = course.id.make_asset_key('asset', 'sample_static.txt')
+            asset_location = course.id.make_asset_key('asset', 'sample_static.html')
             url = reverse_course_url('assets_handler', course.id, kwargs={'asset_key_string': unicode(asset_location)})
 
             resp = self.client.post(
                 url,
                 # pylint: disable=protected-access
                 json.dumps(assets._get_asset_json(
-                    "sample_static.txt", content_type, upload_date, asset_location, None, lock)),
+                    "sample_static.html", content_type, upload_date, asset_location, None, lock)),
                 "application/json"
             )
 

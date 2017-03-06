@@ -139,7 +139,7 @@ function (Resizer) {
                     .align()
                     .alignByHeightOnly();
 
-                expect(spiesList[0].calls.length).toEqual(1);
+                expect(spiesList[0].calls.count()).toEqual(1);
             });
 
             it('all callbacks are removed', function () {
@@ -180,7 +180,7 @@ function (Resizer) {
                      resizer.callbacks[methodName](arg);
                      expect(console.error).toHaveBeenCalledWith(errorMessage);
                      //reset spy
-                     console.log.reset();
+                     console.log.calls.reset();
                 });
 
             });

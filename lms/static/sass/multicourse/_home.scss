@@ -1,7 +1,7 @@
 @import '../base/grid-settings';
 @import 'neat/neat'; // lib - Neat
 
-$title-left-margin: grid-width(2) + $gw-gutter;
+$title-left-margin: grid-width(3);
 $button-size: ($baseline*2.75);
 $course-search-input-height: ($button-size);
 
@@ -15,14 +15,11 @@ $course-search-input-height: ($button-size);
 
   > header {
     @include linear-gradient($homepage__header--gradient__color--alpha, $homepage__header--gradient__color--bravo);
+    @include clearfix();
     background-size: cover;
     background-image: $homepage-bg-image;
-    border-bottom: 1px solid $border-color-3;
     box-shadow: 0 1px 0 0 $course-header-bg, inset 0 -1px 5px 0 $shadow-l1;
-    @include clearfix();
-    height: 460px;
     overflow: hidden;
-    margin-top: $header_image_margin;
     padding: 0;
     width: flex-grid(12);
 
@@ -30,9 +27,13 @@ $course-search-input-height: ($button-size);
       @include clearfix();
       @extend .animation-home-header-pop-up;
       position: relative;
-      margin: 0 auto ($baseline);
-      padding: ($baseline*5) ($baseline/2);
+      margin: 0 auto;
+      padding: ($baseline*3);
       max-width: ($baseline*60);
+
+      @include media($bp-tiny) {
+        padding: ($baseline/2);
+      }
     }
 
     .title {
@@ -41,8 +42,7 @@ $course-search-input-height: ($button-size);
       @include box-sizing(border-box);
       @include transition(all 0.2s linear 0s);
       position: relative;
-      border: 1px solid $border-color-3;
-      box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.5);
+      box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.5);
       background: $white;
       padding: ($baseline) ($baseline*1.5);
       min-height: ($baseline*6);
@@ -73,7 +73,7 @@ $course-search-input-height: ($button-size);
         @include shift(0);
       }
 
-      > hgroup {
+      > .heading-group {
         @include left(0);
         @include box-sizing(border-box);
         @include transition(all 0.2s linear 0s);
@@ -90,9 +90,10 @@ $course-search-input-height: ($button-size);
           text-transform: none;
         }
 
-        h2 {
+        p {
+          @extend h2;
           margin-bottom: 0;
-          text-transform: lowercase;
+          text-transform: none;
           font-style: italic;
         }
       }
@@ -105,15 +106,15 @@ $course-search-input-height: ($button-size);
           @include padding-right($button-size);
           @include padding-left($baseline*0.5);
           @extend %ui-depth1;
-          @extend %t-icon4;
-          @extend %t-demi-strong;
+          @extend %t-title5;
           border: 2px solid $gray-l3;
           border-radius: 3px;
           box-shadow: none;
           width: 100%;
           height: $course-search-input-height;
           color: $black;
-          font-style: $sans-serif;
+          font-style: normal;
+          font-weight: normal;
 
           // STATE: focus
           &:focus {
@@ -153,11 +154,11 @@ $course-search-input-height: ($button-size);
       background: $white;
       background: $course-header-bg;
       border: 1px solid $border-color-3;
-      border-left: 0;
+      @include border-left(0);
       @include box-sizing(border-box);
       // box-shadow: 0 4px 25px 0 rgba(0,0,0, 0.5);
       height: 120px;
-      float: left;
+      @include float(left);
       padding: 4px;
       position: relative;
       vertical-align: top;
@@ -182,9 +183,9 @@ $course-search-input-height: ($button-size);
           @include box-sizing(border-box);
           border: 2px solid rgba(255,255,255, 0.8);
           height: 60px;
-          left: 50%;
+          @include left(50%);
           margin-top: -30px;
-          margin-left: -($baseline*1.5);
+          @include margin-left(-($baseline*1.5));
           position: absolute;
           top: 50%;
           @include transition(all 0.15s linear 0s);
@@ -196,8 +197,8 @@ $course-search-input-height: ($button-size);
             content: "\25B6";
             display: block;
             font: normal 2em/1em $sans-serif;
-            left: 50%;
-            margin-left: -11px;
+            @include left(50%);
+            @include margin-left(-11px);
             margin-top: -16px;
             position: absolute;
             text-shadow: 0 -1px rgba(0,0,0, 0.8);
@@ -304,7 +305,7 @@ $course-search-input-height: ($button-size);
           content: "";
           display: block;
           height: 80px;
-          right: 0px;
+          @include right(0);
           position: absolute;
           top: -5px;
           width: 1px;
@@ -315,7 +316,7 @@ $course-search-input-height: ($button-size);
           content: "";
           display: block;
           height: 80px;
-          right: 1px;
+          @include right(1px);
           position: absolute;
           top: -5px;
           width: 1px;
@@ -340,8 +341,8 @@ $course-search-input-height: ($button-size);
           content: "";
           display: block;
           height: 200px;
-          left: 50%;
-          margin-left: -100px;
+          @include left(50%);
+          @include margin-left(-100px);
           margin-top: -100px;
           opacity: 0;
           width: 200px;
@@ -353,7 +354,7 @@ $course-search-input-height: ($button-size);
 
         .name {
           bottom: -60px;
-          left: 0px;
+          @include left(0);
           position: absolute;
           text-align: center;
           @include transition(all $tmg-f2 ease-in-out 0s);
@@ -362,7 +363,7 @@ $course-search-input-height: ($button-size);
 
           > span {
             color: $base-font-color;
-            font: 800 italic 1.4em/1.4em $sans-serif;
+            font: 700 italic 1.4em/1.4em $sans-serif;
             text-shadow: 0 1px rgba(255,255,255, 0.6);
             @include transition(all 0.15s ease-in-out 0s);
 
@@ -404,14 +405,14 @@ $course-search-input-height: ($button-size);
       .partners {
         @include box-sizing(border-box);
         @include clearfix();
-        margin-left: 60px;
+        @include margin-left(60px);
         padding: 12px 0;
 
         .partner {
           @include box-sizing(border-box);
           width: flex-grid(2, 12);
           display: block;
-          float: left;
+          @include float(left);
           padding: 0 12px;
 
           a {
@@ -449,13 +450,13 @@ $course-search-input-height: ($button-size);
       position: relative;
 
       h2 {
-        float: left;
+        @include float(left);
         margin: 0;
         text-shadow: 0 1px rgba(255,255,255, 0.6);
       }
 
       .action.action-mediakit {
-        float: right;
+        @include float(right);
         position: relative;
         top: 1px;
         font-family: $sans-serif;
@@ -466,7 +467,7 @@ $course-search-input-height: ($button-size);
           position: relative;
           top: -1px;
           display: inline-block;
-          margin: 0 0 0 5px;
+          @include margin(0, 0, 0, 5px);
           content: "➤";
           font-size: 11px;
         }
@@ -496,8 +497,8 @@ $course-search-input-height: ($button-size);
           border-color: $border-color-2;
           @include box-sizing(border-box);
           @include clearfix();
-          float: left;
-          margin-right: flex-gutter();
+          @include float(left);
+          @include margin-right(flex-gutter());
           padding: 10px;
           @include transition(all 0.15s linear 0s);
           width: flex-grid(4);
@@ -509,16 +510,16 @@ $course-search-input-height: ($button-size);
           }
 
           &:last-child {
-            margin-right: 0;
+            @include margin-right(0);
           }
 
           .post-graphics {
             border: 1px solid $border-color-1;
             @include box-sizing(border-box);
             display: block;
-            float: left;
+            @include float(left);
             height: 84px;
-            margin-right: flex-gutter();
+            @include margin-right(flex-gutter());
             overflow: hidden;
             width: flex-grid(4);
             vertical-align: top;
@@ -530,7 +531,7 @@ $course-search-input-height: ($button-size);
           }
 
           .post-name {
-            float: left;
+            @include float(left);
             width: flex-grid(8);
             vertical-align: top;
 
@@ -565,10 +566,10 @@ $course-search-input-height: ($button-size);
           line-height: 1.6em;
           font-family: $serif;
           font-style: italic;
-          margin-left: ($baseline/2);
+          @include margin-left($baseline/2);
 
           &.read-more {
-            float: right;
+            @include float(right);
             color: lighten($base-font-color, 50%);
 
             &:hover, &:focus {

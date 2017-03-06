@@ -3,6 +3,9 @@
 """
 Acceptance tests for CMS Video Module.
 """
+import os
+
+from mock import patch
 from nose.plugins.attrib import attr
 from unittest import skipIf
 from ...pages.studio.auto_auth import AutoAuthPage
@@ -42,6 +45,38 @@ class CMSVideoBaseTest(UniqueCourseTest):
         )
 
         self.assets = []
+        self.addCleanup(YouTubeStubConfig.reset)
+
+    def _create_course_unit(self, youtube_stub_config=None, subtitles=False):
+        """
+        Create a Studio Video Course Unit and Navigate to it.
+
+        Arguments:
+            youtube_stub_config (dict)
+            subtitles (bool)
+
+        """
+        if youtube_stub_config:
+            YouTubeStubConfig.configure(youtube_stub_config)
+
+        if subtitles:
+            self.assets.append('subs_3_yD_cEKoCk.srt.sjson')
+
+        self.navigate_to_course_unit()
+
+    def _create_video(self):
+        """
+        Create Xblock Video Component.
+        """
+        self.video.create_video()
+
+        video_xblocks = self.video.xblocks()
+
+        # Total video xblock components count should be equals to 2
+        # Why 2? One video component is created by default for each test. Please see
+        # test_studio_video_module.py:CMSVideoTest._create_course_unit
+        # And we are creating second video component here.
+        self.assertTrue(video_xblocks == 2)
 
     def _install_course_fixture(self):
         """
@@ -132,42 +167,6 @@ class CMSVideoTest(CMSVideoBaseTest):
     CMS Video Test Class
     """
 
-    def setUp(self):
-        super(CMSVideoTest, self).setUp()
-
-        self.addCleanup(YouTubeStubConfig.reset)
-
-    def _create_course_unit(self, youtube_stub_config=None, subtitles=False):
-        """
-        Create a Studio Video Course Unit and Navigate to it.
-
-        Arguments:
-            youtube_stub_config (dict)
-            subtitles (bool)
-
-        """
-        if youtube_stub_config:
-            YouTubeStubConfig.configure(youtube_stub_config)
-
-        if subtitles:
-            self.assets.append('subs_3_yD_cEKoCk.srt.sjson')
-
-        self.navigate_to_course_unit()
-
-    def _create_video(self):
-        """
-        Create Xblock Video Component.
-        """
-        self.video.create_video()
-
-        video_xblocks = self.video.xblocks()
-
-        # Total video xblock components count should be equals to 2
-        # Why 2? One video component is created by default for each test. Please see
-        # test_studio_video_module.py:CMSVideoTest._create_course_unit
-        # And we are creating second video component here.
-        self.assertTrue(video_xblocks == 2)
-
     def test_youtube_stub_proxy(self):
         """
         Scenario: YouTube stub server proxies YouTube API correctly
@@ -235,6 +234,7 @@ class CMSVideoTest(CMSVideoBaseTest):
         And first is private video
         When I reload the page
         Then video controls for all videos are visible
+        And the error message isn't shown
         """
         self._create_course_unit(youtube_stub_config={'youtube_api_private_video': True})
         self.video.create_video()
@@ -249,6 +249,9 @@ class CMSVideoTest(CMSVideoBaseTest):
         self._navigate_to_course_unit_page()
         self.assertTrue(self.video.is_controls_visible())
 
+        # verify that the error message isn't shown by default
+        self.assertFalse(self.video.is_error_message_shown)
+
     def test_captions_shown_correctly(self):
         """
         Scenario: Captions are shown correctly
@@ -256,7 +259,6 @@ class CMSVideoTest(CMSVideoBaseTest):
         Then when I view the video it does show the captions
         """
         self._create_course_unit(subtitles=True)
-
         self.assertTrue(self.video.is_captions_visible())
 
     def test_captions_toggling(self):
@@ -268,11 +270,11 @@ class CMSVideoTest(CMSVideoBaseTest):
         """
         self._create_course_unit(subtitles=True)
 
-        self.video.click_player_button('CC')
+        self.video.click_player_button('transcript_button')
 
         self.assertFalse(self.video.is_captions_visible())
 
-        self.video.click_player_button('CC')
+        self.video.click_player_button('transcript_button')
 
         self.assertTrue(self.video.is_captions_visible())
 
@@ -320,3 +322,40 @@ class CMSVideoTest(CMSVideoBaseTest):
         self.save_unit_settings()
 
         self.video.click_player_button('play')
+
+
+@attr('a11y')
+class CMSVideoA11yTest(CMSVideoBaseTest):
+    """
+    CMS Video Accessibility Test Class
+    """
+
+    def setUp(self):
+        browser = os.environ.get('SELENIUM_BROWSER', 'firefox')
+
+        # the a11y tests run in CI under phantomjs which doesn't
+        # support html5 video or flash player, so the video tests
+        # don't work in it. We still want to be able to run these
+        # tests in CI, so override the browser setting if it is
+        # phantomjs.
+        if browser == 'phantomjs':
+            browser = 'firefox'
+
+        with patch.dict(os.environ, {'SELENIUM_BROWSER': browser}):
+            super(CMSVideoA11yTest, self).setUp()
+
+    def test_video_player_a11y(self):
+        # we're loading a shorter transcript to ensure both skip links are available
+        self._create_course_unit(subtitles=True)
+        self.edit_component()
+        self.video.upload_transcript('english_single_transcript.srt')
+
+        self.save_unit_settings()
+        self.video.wait_for_captions()
+        self.assertTrue(self.video.is_captions_visible())
+
+        # limit the scope of the audit to the video player only.
+        self.outline.a11y_audit.config.set_scope(
+            include=["div.video"]
+        )
+        self.outline.a11y_audit.check_for_accessibility_errors()

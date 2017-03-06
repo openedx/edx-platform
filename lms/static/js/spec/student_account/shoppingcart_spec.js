@@ -1,8 +1,8 @@
-define(['common/js/spec_helpers/ajax_helpers', 'js/student_account/shoppingcart'],
+define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/student_account/shoppingcart'],
     function(AjaxHelpers, ShoppingCartInterface) {
         'use strict';
 
-        describe( 'edx.student.account.ShoppingCartInterface', function() {
+        describe( 'ShoppingCartInterface', function() {
 
             var COURSE_KEY = "edX/DemoX/Fall",
                 ADD_COURSE_URL = "/shoppingcart/add/course/edX/DemoX/Fall/",
@@ -10,7 +10,7 @@ define(['common/js/spec_helpers/ajax_helpers', 'js/student_account/shoppingcart'
 
             beforeEach(function() {
                 // Mock the redirect call
-                spyOn(ShoppingCartInterface, 'redirect').andCallFake(function() {});
+                spyOn(ShoppingCartInterface, 'redirect').and.callFake(function() {});
             });
 
             it('adds a course to the cart', function() {

@@ -3,6 +3,8 @@ from collections import defaultdict
 from datetime import datetime
 import logging
 import string
+import re
+from django.conf import settings
 
 import pytz
 from django.contrib.auth.models import User
@@ -10,15 +12,18 @@ from django.core.urlresolvers import reverse
 from django.db import connection
 from django.http import HttpResponse
 import pystache_custom as pystache
-from courseware.access import has_access
 
 from django_comment_common.models import Role, FORUM_ROLE_STUDENT
-from django_comment_client.permissions import check_permissions_by_view, has_permission
+from django_comment_client.permissions import check_permissions_by_view, has_permission, get_team
 from django_comment_client.settings import MAX_COMMENT_DEPTH
 from edxmako import lookup_template
+from lms.djangoapps.ccx.overrides import get_current_ccx
 
+from courseware import courses
+from courseware.access import has_access
+from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from openedx.core.djangoapps.course_groups.cohorts import (
-    get_course_cohort_settings, get_cohort_by_id, get_cohort_id, is_commentable_cohorted, is_course_cohorted
+    get_course_cohort_settings, get_cohort_by_id, get_cohort_id, is_course_cohorted
 )
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 
@@ -33,15 +38,27 @@ log = logging.getLogger(__name__)
 
 
 def extract(dic, keys):
+    """
+    Returns a subset of keys from the provided dictionary
+    """
     return {k: dic.get(k) for k in keys}
 
 
 def strip_none(dic):
+    """
+    Returns a dictionary stripped of any keys having values of None
+    """
     return dict([(k, v) for k, v in dic.iteritems() if v is not None])
 
 
 def strip_blank(dic):
+    """
+    Returns a dictionary stripped of any 'blank' (empty) keys
+    """
     def _is_blank(v):
+        """
+        Determines if the provided value contains no information
+        """
         return isinstance(v, str) and len(v.strip()) == 0
     return dict([(k, v) for k, v in dic.iteritems() if not _is_blank(v)])
 
@@ -49,15 +66,45 @@ def strip_blank(dic):
 
 
 def merge_dict(dic1, dic2):
+    """
+    Combines the keys from the two provided dictionaries
+    """
     return dict(dic1.items() + dic2.items())
 
 
 def get_role_ids(course_id):
+    """
+    Returns a dictionary having role names as keys and a list of users as values
+    """
     roles = Role.objects.filter(course_id=course_id).exclude(name=FORUM_ROLE_STUDENT)
     return dict([(role.name, list(role.users.values_list('id', flat=True))) for role in roles])
 
 
+def has_discussion_privileges(user, course_id):
+    """
+    Returns True if the user is privileged in teams discussions for
+    this course. The user must be one of Discussion Admin, Moderator,
+    or Community TA.
+
+    Args:
+      user (User): The user to check privileges for.
+      course_id (CourseKey): A key for the course to check privileges for.
+
+    Returns:
+      bool
+    """
+    # get_role_ids returns a dictionary of only admin, moderator and community TAs.
+    roles = get_role_ids(course_id)
+    for role in roles:
+        if user.id in roles[role]:
+            return True
+    return False
+
+
 def has_forum_access(uname, course_id, rolename):
+    """
+    Boolean operation which tests a user's role-based permissions (not actually forums-specific)
+    """
     try:
         role = Role.objects.get(name=rolename, course_id=course_id)
     except Role.DoesNotExist:
@@ -65,43 +112,103 @@ def has_forum_access(uname, course_id, rolename):
     return role.users.filter(username=uname).exists()
 
 
-def get_accessible_discussion_modules(course, user, include_all=False):  # pylint: disable=invalid-name
+def has_required_keys(xblock):
     """
-    Return a list of all valid discussion modules in this course that
+    Returns True iff xblock has the proper attributes for generating metadata
+    with get_discussion_id_map_entry()
+    """
+    for key in ('discussion_id', 'discussion_category', 'discussion_target'):
+        if getattr(xblock, key, None) is None:
+            log.debug(
+                "Required key '%s' not in discussion %s, leaving out of category map",
+                key,
+                xblock.location
+            )
+            return False
+    return True
+
+
+def get_accessible_discussion_xblocks(course, user, include_all=False):  # pylint: disable=invalid-name
+    """
+    Return a list of all valid discussion xblocks in this course that
     are accessible to the given user.
     """
-    discussion_modules = modulestore().get_items(course.id, qualifiers={'category': 'discussion'})
-    discussion_xblocks = modulestore().get_items(course.id, qualifiers={'category': 'discussion-forum'})
-    all_modules = discussion_modules + discussion_xblocks
+    all_xblocks = modulestore().get_items(course.id, qualifiers={
+        'category': re.compile(r'discussion|discussion-forum')
+    }, include_orphans=False)
 
-    def has_required_keys(module):
-        for key in ('discussion_id', 'discussion_category', 'discussion_target'):
-            if getattr(module, key, None) is None:
-                log.warning("Required key '%s' not in discussion %s, leaving out of category map" % (key, module.location))
-                return False
-        return True
     return [
-        module for module in all_modules
-        if has_required_keys(module) and (include_all or has_access(user, 'load', module, course.id))
+        xblock for xblock in all_xblocks
+        if has_required_keys(xblock) and (include_all or has_access(user, 'load', xblock, course.id))
     ]
+
+
+def get_discussion_id_map_entry(xblock):
+    """
+    Returns a tuple of (discussion_id, metadata) suitable for inclusion in the results of get_discussion_id_map().
+    """
+    return (
+        xblock.discussion_id,
+        {
+            "location": xblock.location,
+            "title": xblock.discussion_category.split("/")[-1].strip() + " / " + xblock.discussion_target
+        }
+    )
+
+
+class DiscussionIdMapIsNotCached(Exception):
+    """Thrown when the discussion id map is not cached for this course, but an attempt was made to access it."""
+    pass
+
+
+def get_cached_discussion_key(course, discussion_id):
+    """
+    Returns the usage key of the discussion xblock associated with discussion_id if it is cached. If the discussion id
+    map is cached but does not contain discussion_id, returns None. If the discussion id map is not cached for course,
+    raises a DiscussionIdMapIsNotCached exception.
+    """
+    try:
+        cached_mapping = CourseStructure.objects.get(course_id=course.id).discussion_id_map
+        if not cached_mapping:
+            raise DiscussionIdMapIsNotCached()
+        return cached_mapping.get(discussion_id)
+    except CourseStructure.DoesNotExist:
+        raise DiscussionIdMapIsNotCached()
+
+
+def get_cached_discussion_id_map(course, discussion_ids, user):
+    """
+    Returns a dict mapping discussion_ids to respective discussion xblock metadata if it is cached and visible to the
+    user. If not, returns the result of get_discussion_id_map
+    """
+    try:
+        entries = []
+        for discussion_id in discussion_ids:
+            key = get_cached_discussion_key(course, discussion_id)
+            if not key:
+                continue
+            xblock = modulestore().get_item(key)
+            if not (has_required_keys(xblock) and has_access(user, 'load', xblock, course.id)):
+                continue
+            entries.append(get_discussion_id_map_entry(xblock))
+        return dict(entries)
+    except DiscussionIdMapIsNotCached:
+        return get_discussion_id_map(course, user)
 
 
 def get_discussion_id_map(course, user):
     """
-    Transform the list of this course's discussion modules (visible to a given user) into a dictionary of metadata keyed
+    Transform the list of this course's discussion xblocks (visible to a given user) into a dictionary of metadata keyed
     by discussion_id.
     """
-    def get_entry(module):  # pylint: disable=missing-docstring
-        discussion_id = module.discussion_id
-        title = module.discussion_target
-        last_category = module.discussion_category.split("/")[-1].strip()
-        return (discussion_id, {"location": module.location, "title": last_category + " / " + title})
-
-    return dict(map(get_entry, get_accessible_discussion_modules(course, user)))
+    return dict(map(get_discussion_id_map_entry, get_accessible_discussion_xblocks(course, user)))
 
 
-def _filter_unstarted_categories(category_map):
-
+def _filter_unstarted_categories(category_map, course):
+    """
+    Returns a subset of categories from the provided map which have not yet met the start date
+    Includes information about category children, subcategories (different), and entries
+    """
     now = datetime.now(UTC())
 
     result_map = {}
@@ -120,7 +227,7 @@ def _filter_unstarted_categories(category_map):
 
         for child in unfiltered_map["children"]:
             if child in unfiltered_map["entries"]:
-                if unfiltered_map["entries"][child]["start_date"] <= now:
+                if course.self_paced or unfiltered_map["entries"][child]["start_date"] <= now:
                     filtered_map["children"].append(child)
                     filtered_map["entries"][child] = {}
                     for key in unfiltered_map["entries"][child]:
@@ -129,7 +236,7 @@ def _filter_unstarted_categories(category_map):
                 else:
                     log.debug(u"Filtering out:%s with start_date: %s", child, unfiltered_map["entries"][child]["start_date"])
             else:
-                if unfiltered_map["subcategories"][child]["start_date"] < now:
+                if course.self_paced or unfiltered_map["subcategories"][child]["start_date"] < now:
                     filtered_map["children"].append(child)
                     filtered_map["subcategories"][child] = {}
                     unfiltered_queue.append(unfiltered_map["subcategories"][child])
@@ -139,6 +246,9 @@ def _filter_unstarted_categories(category_map):
 
 
 def _sort_map_entries(category_map, sort_alpha):
+    """
+    Internal helper method to list category entries according to the provided sort order
+    """
     things = []
     for title, entry in category_map["entries"].items():
         if entry["sort_key"] is None and sort_alpha:
@@ -152,7 +262,7 @@ def _sort_map_entries(category_map, sort_alpha):
 
 def get_discussion_category_map(course, user, cohorted_if_in_list=False, exclude_unstarted=True):
     """
-    Transform the list of this course's discussion modules into a recursive dictionary structure.  This is used
+    Transform the list of this course's discussion xblocks into a recursive dictionary structure.  This is used
     to render the discussion category map in the discussion tab sidebar for a given user.
 
     Args:
@@ -197,18 +307,21 @@ def get_discussion_category_map(course, user, cohorted_if_in_list=False, exclude
     """
     unexpanded_category_map = defaultdict(list)
 
-    modules = get_accessible_discussion_modules(course, user)
+    xblocks = get_accessible_discussion_xblocks(course, user)
 
     course_cohort_settings = get_course_cohort_settings(course.id)
 
-    for module in modules:
-        id = module.discussion_id
-        title = module.discussion_target
-        sort_key = module.sort_key
-        category = " / ".join([x.strip() for x in module.discussion_category.split("/")])
-        # Handle case where module.start is None
-        entry_start_date = module.start if module.start else datetime.max.replace(tzinfo=pytz.UTC)
-        unexpanded_category_map[category].append({"title": title, "id": id, "sort_key": sort_key, "start_date": entry_start_date})
+    for xblock in xblocks:
+        discussion_id = xblock.discussion_id
+        title = xblock.discussion_target
+        sort_key = xblock.sort_key
+        category = " / ".join([x.strip() for x in xblock.discussion_category.split("/")])
+        # Handle case where xblock.start is None
+        entry_start_date = xblock.start if xblock.start else datetime.max.replace(tzinfo=pytz.UTC)
+        unexpanded_category_map[category].append({"title": title,
+                                                  "id": discussion_id,
+                                                  "sort_key": sort_key,
+                                                  "start_date": entry_start_date})
 
     category_map = {"entries": defaultdict(dict), "subcategories": defaultdict(dict)}
     for category_path, entries in unexpanded_category_map.items():
@@ -278,7 +391,27 @@ def get_discussion_category_map(course, user, cohorted_if_in_list=False, exclude
 
     _sort_map_entries(category_map, course.discussion_sort_alpha)
 
-    return _filter_unstarted_categories(category_map) if exclude_unstarted else category_map
+    return _filter_unstarted_categories(category_map, course) if exclude_unstarted else category_map
+
+
+def discussion_category_id_access(course, user, discussion_id, xblock=None):
+    """
+    Returns True iff the given discussion_id is accessible for user in course.
+    Assumes that the commentable identified by discussion_id has a null or 'course' context.
+    Uses the discussion id cache if available, falling back to
+    get_discussion_categories_ids if there is no cache.
+    """
+    if discussion_id in course.top_level_discussion_topic_ids:
+        return True
+    try:
+        if not xblock:
+            key = get_cached_discussion_key(course, discussion_id)
+            if not key:
+                return False
+            xblock = modulestore().get_item(key)
+        return has_required_keys(xblock) and has_access(user, 'load', xblock, course.id)
+    except DiscussionIdMapIsNotCached:
+        return discussion_id in get_discussion_categories_ids(course, user)
 
 
 def get_discussion_categories_ids(course, user, include_all=False):
@@ -293,34 +426,58 @@ def get_discussion_categories_ids(course, user, include_all=False):
 
     """
     accessible_discussion_ids = [
-        module.discussion_id for module in get_accessible_discussion_modules(course, user, include_all=include_all)
+        xblock.discussion_id for xblock in get_accessible_discussion_xblocks(course, user, include_all=include_all)
     ]
     return course.top_level_discussion_topic_ids + accessible_discussion_ids
 
 
 class JsonResponse(HttpResponse):
+    """
+    Django response object delivering JSON representations
+    """
     def __init__(self, data=None):
+        """
+        Object constructor, converts data (if provided) to JSON
+        """
         content = json.dumps(data, cls=i4xEncoder)
         super(JsonResponse, self).__init__(content,
-                                           mimetype='application/json; charset=utf-8')
+                                           content_type='application/json; charset=utf-8')
 
 
 class JsonError(HttpResponse):
+    """
+    Django response object delivering JSON exceptions
+    """
     def __init__(self, error_messages=[], status=400):
+        """
+        Object constructor, returns an error response containing the provided exception messages
+        """
         if isinstance(error_messages, basestring):
             error_messages = [error_messages]
         content = json.dumps({'errors': error_messages}, indent=2, ensure_ascii=False)
         super(JsonError, self).__init__(content,
-                                        mimetype='application/json; charset=utf-8', status=status)
+                                        content_type='application/json; charset=utf-8', status=status)
 
 
 class HtmlResponse(HttpResponse):
+    """
+    Django response object delivering HTML representations
+    """
     def __init__(self, html=''):
+        """
+        Object constructor, brokers provided HTML to caller
+        """
         super(HtmlResponse, self).__init__(html, content_type='text/plain')
 
 
 class ViewNameMiddleware(object):
+    """
+    Django middleware object to inject view name into request context
+    """
     def process_view(self, request, view_func, view_args, view_kwargs):
+        """
+        Injects the view name value into the request context
+        """
         request.view_name = view_func.__name__
 
 
@@ -332,6 +489,9 @@ class QueryCountDebugMiddleware(object):
     multi-db setups.
     """
     def process_response(self, request, response):
+        """
+        Log information for 200 OK responses as part of the outbound pipeline
+        """
         if response.status_code == 200:
             total_time = 0
 
@@ -346,17 +506,31 @@ class QueryCountDebugMiddleware(object):
                     query_time = query.get('duration', 0) / 1000
                 total_time += float(query_time)
 
-            log.info('%s queries run, total %s seconds' % (len(connection.queries), total_time))
+            log.info(u'%s queries run, total %s seconds', len(connection.queries), total_time)
         return response
 
 
 def get_ability(course_id, content, user):
+    """
+    Return a dictionary of forums-oriented actions and the user's permission to perform them
+    """
     return {
         'editable': check_permissions_by_view(user, course_id, content, "update_thread" if content['type'] == 'thread' else "update_comment"),
         'can_reply': check_permissions_by_view(user, course_id, content, "create_comment" if content['type'] == 'thread' else "create_sub_comment"),
         'can_delete': check_permissions_by_view(user, course_id, content, "delete_thread" if content['type'] == 'thread' else "delete_comment"),
         'can_openclose': check_permissions_by_view(user, course_id, content, "openclose_thread") if content['type'] == 'thread' else False,
-        'can_vote': check_permissions_by_view(user, course_id, content, "vote_for_thread" if content['type'] == 'thread' else "vote_for_comment"),
+        'can_vote': not is_content_authored_by(content, user) and check_permissions_by_view(
+            user,
+            course_id,
+            content,
+            "vote_for_thread" if content['type'] == 'thread' else "vote_for_comment"
+        ),
+        'can_report': not is_content_authored_by(content, user) and check_permissions_by_view(
+            user,
+            course_id,
+            content,
+            "flag_abuse_for_thread" if content['type'] == 'thread' else "flag_abuse_for_comment"
+        )
     }
 
 # TODO: RENAME
@@ -399,6 +573,10 @@ def get_annotated_content_infos(course_id, thread, user, user_info):
 
 
 def get_metadata_for_threads(course_id, threads, user, user_info):
+    """
+    Returns annotated content information for the specified course, threads, and user information
+    """
+
     def infogetter(thread):
         return get_annotated_content_infos(course_id, thread, user, user_info)
 
@@ -433,7 +611,11 @@ def extend_content(content):
             user = User.objects.get(pk=content['user_id'])
             roles = dict(('name', role.name.lower()) for role in user.roles.filter(course_id=content['course_id']))
         except User.DoesNotExist:
-            log.error('User ID {0} in comment content {1} but not in our DB.'.format(content.get('user_id'), content.get('id')))
+            log.error(
+                'User ID %s in comment content %s but not in our DB.',
+                content.get('user_id'),
+                content.get('id')
+            )
 
     content_info = {
         'displayed_title': content.get('highlighted_title') or content.get('title', ''),
@@ -447,10 +629,14 @@ def extend_content(content):
 
 def add_courseware_context(content_list, course, user, id_map=None):
     """
-    Decorates `content_list` with courseware metadata.
+    Decorates `content_list` with courseware metadata using the discussion id map cache if available.
     """
     if id_map is None:
-        id_map = get_discussion_id_map(course, user)
+        id_map = get_cached_discussion_id_map(
+            course,
+            [content['commentable_id'] for content in content_list],
+            user
+        )
 
     for content in content_list:
         commentable_id = content['commentable_id']
@@ -489,7 +675,7 @@ def prepare_content(content, course_key, is_staff=False, course_is_cohorted=None
         'read', 'group_id', 'group_name', 'pinned', 'abuse_flaggers',
         'stats', 'resp_skip', 'resp_limit', 'resp_total', 'thread_type',
         'endorsed_responses', 'non_endorsed_responses', 'non_endorsed_resp_total',
-        'endorsement',
+        'endorsement', 'context', 'last_activity_at'
     ]
 
     if (content.get('anonymous') is False) and ((content.get('anonymous_to_peers') is False) or is_staff):
@@ -504,9 +690,10 @@ def prepare_content(content, course_key, is_staff=False, course_is_cohorted=None
             try:
                 endorser = User.objects.get(pk=endorsement["user_id"])
             except User.DoesNotExist:
-                log.error("User ID {0} in endorsement for comment {1} but not in our DB.".format(
+                log.error(
+                    "User ID %s in endorsement for comment %s but not in our DB.",
                     content.get('user_id'),
-                    content.get('id'))
+                    content.get('id')
                 )
 
         # Only reveal endorser if requester can see author or if endorser is staff
@@ -553,10 +740,10 @@ def get_group_id_for_comments_service(request, course_key, commentable_id=None):
         ValueError if the requested group_id is invalid
     """
     if commentable_id is None or is_commentable_cohorted(course_key, commentable_id):
-        if request.method == "POST":
-            requested_group_id = request.POST.get('group_id')
-        else:
+        if request.method == "GET":
             requested_group_id = request.GET.get('group_id')
+        elif request.method == "POST":
+            requested_group_id = request.POST.get('group_id')
         if has_permission(request.user, "see_all_cohorts", course_key):
             if not requested_group_id:
                 return None
@@ -613,3 +800,57 @@ def is_comment_too_deep(parent):
             (parent and parent["depth"] >= MAX_COMMENT_DEPTH)
         )
     )
+
+
+def is_commentable_cohorted(course_key, commentable_id):
+    """
+    Args:
+        course_key: CourseKey
+        commentable_id: string
+
+    Returns:
+        Bool: is this commentable cohorted?
+
+    Raises:
+        Http404 if the course doesn't exist.
+    """
+    course = courses.get_course_by_id(course_key)
+    course_cohort_settings = get_course_cohort_settings(course_key)
+
+    if not course_cohort_settings.is_cohorted or get_team(commentable_id):
+        # this is the easy case :)
+        ans = False
+    elif (
+            commentable_id in course.top_level_discussion_topic_ids or
+            course_cohort_settings.always_cohort_inline_discussions is False
+    ):
+        # top level discussions have to be manually configured as cohorted
+        # (default is not).
+        # Same thing for inline discussions if the default is explicitly set to False in settings
+        ans = commentable_id in course_cohort_settings.cohorted_discussions
+    else:
+        # inline discussions are cohorted by default
+        ans = True
+
+    log.debug(u"is_commentable_cohorted(%s, %s) = {%s}", course_key, commentable_id, ans)
+    return ans
+
+
+def is_discussion_enabled(course_id):
+    """
+    Return True if Discussion is enabled for a course; else False
+    """
+    if settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
+        if get_current_ccx(course_id):
+            return False
+    return settings.FEATURES.get('ENABLE_DISCUSSION_SERVICE')
+
+
+def is_content_authored_by(content, user):
+    """
+    Return True if the author is this content is the passed user, else False
+    """
+    try:
+        return int(content.get('user_id')) == user.id
+    except (ValueError, TypeError):
+        return False

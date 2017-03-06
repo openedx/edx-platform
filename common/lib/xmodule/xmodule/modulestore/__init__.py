@@ -10,7 +10,6 @@ import datetime
 
 from pytz import UTC
 from collections import defaultdict
-import collections
 from contextlib import contextmanager
 import threading
 from operator import itemgetter
@@ -38,6 +37,11 @@ new_contract('XBlock', XBlock)
 LIBRARY_ROOT = 'library.xml'
 COURSE_ROOT = 'course.xml'
 
+# List of names of computed fields on xmodules that are of type usage keys.
+# This list can be used to determine which fields need to be stripped of
+# extraneous usage key data when entering/exiting modulestores.
+XMODULE_FIELDS_WITH_USAGE_KEYS = ['location', 'parent']
+
 
 class ModuleStoreEnum(object):
     """
@@ -50,7 +54,6 @@ class ModuleStoreEnum(object):
         """
         split = 'split'
         mongo = 'mongo'
-        xml = 'xml'
 
     class RevisionOption(object):
         """
@@ -100,6 +103,9 @@ class ModuleStoreEnum(object):
 
         # user ID to use for tests that do not have a django user available
         test = -3
+
+        # user ID for automatic update by the system
+        system = -4
 
     class SortOrder(object):
         """
@@ -169,6 +175,7 @@ class BulkOperationsMixin(object):
     def __init__(self, *args, **kwargs):
         super(BulkOperationsMixin, self).__init__(*args, **kwargs)
         self._active_bulk_ops = ActiveBulkThread(self._bulk_ops_record_type)
+        self.signal_handler = None
 
     @contextmanager
     def bulk_operations(self, course_id, emit_signals=True):
@@ -263,6 +270,12 @@ class BulkOperationsMixin(object):
         if not bulk_ops_record.active:
             return
 
+        # Send the pre-publish signal within the context of the bulk operation.
+        # Writes performed by signal handlers will be persisted when the bulk
+        # operation ends.
+        if emit_signals and bulk_ops_record.is_root:
+            self.send_pre_publish_signal(bulk_ops_record, structure_key)
+
         bulk_ops_record.unnest()
 
         # If this wasn't the outermost context, then don't close out the
@@ -292,22 +305,29 @@ class BulkOperationsMixin(object):
         """
         return self._get_bulk_ops_record(course_key, ignore_case).active
 
+    def send_pre_publish_signal(self, bulk_ops_record, course_id):
+        """
+        Send a signal just before items are published in the course.
+        """
+        signal_handler = getattr(self, "signal_handler", None)
+        if signal_handler and bulk_ops_record.has_publish_item:
+            signal_handler.send("pre_publish", course_key=course_id)
+
     def send_bulk_published_signal(self, bulk_ops_record, course_id):
         """
         Sends out the signal that items have been published from within this course.
         """
-        signal_handler = getattr(self, 'signal_handler', None)
-        if signal_handler and bulk_ops_record.has_publish_item:
-            signal_handler.send("course_published", course_key=course_id)
+        if self.signal_handler and bulk_ops_record.has_publish_item:
+            # We remove the branch, because publishing always means copying from draft to published
+            self.signal_handler.send("course_published", course_key=course_id.for_branch(None))
             bulk_ops_record.has_publish_item = False
 
     def send_bulk_library_updated_signal(self, bulk_ops_record, library_id):
         """
         Sends out the signal that library have been updated.
         """
-        signal_handler = getattr(self, 'signal_handler', None)
-        if signal_handler and bulk_ops_record.has_library_updated_item:
-            signal_handler.send("library_updated", library_key=library_id)
+        if self.signal_handler and bulk_ops_record.has_library_updated_item:
+            self.signal_handler.send("library_updated", library_key=library_id)
             bulk_ops_record.has_library_updated_item = False
 
 
@@ -411,7 +431,8 @@ class BlockData(object):
             'block_type': self.block_type,
             'definition': self.definition,
             'defaults': self.defaults,
-            'edit_info': self.edit_info.to_storable()
+            'asides': self.get_asides(),
+            'edit_info': self.edit_info.to_storable(),
         }
 
     def from_storable(self, block_data):
@@ -432,8 +453,20 @@ class BlockData(object):
         # blocks are copied from a library to a course)
         self.defaults = block_data.get('defaults', {})
 
+        # Additional field data that stored in connected XBlockAsides
+        self.asides = block_data.get('asides', {})
+
         # EditInfo object containing all versioning/editing data.
         self.edit_info = EditInfo(**block_data.get('edit_info', {}))
+
+    def get_asides(self):
+        """
+        For the situations if block_data has no asides attribute
+        (in case it was taken from memcache)
+        """
+        if not hasattr(self, 'asides'):
+            self.asides = {}   # pylint: disable=attribute-defined-outside-init
+        return self.asides
 
     def __repr__(self):
         # pylint: disable=bad-continuation, redundant-keyword-arg
@@ -442,17 +475,19 @@ class BlockData(object):
                 "definition={self.definition}, "
                 "definition_loaded={self.definition_loaded}, "
                 "defaults={self.defaults}, "
+                "asides={asides}, "
                 "edit_info={self.edit_info})").format(
             self=self,
             classname=self.__class__.__name__,
+            asides=self.get_asides()
         )  # pylint: disable=bad-continuation
 
     def __eq__(self, block_data):
         """
         Two BlockData objects are equal iff all their attributes are equal.
         """
-        attrs = ['fields', 'block_type', 'definition', 'defaults', 'edit_info']
-        return all(getattr(self, attr) == getattr(block_data, attr) for attr in attrs)
+        attrs = ['fields', 'block_type', 'definition', 'defaults', 'asides', 'edit_info']
+        return all(getattr(self, attr, None) == getattr(block_data, attr, None) for attr in attrs)
 
     def __neq__(self, block_data):
         """
@@ -742,7 +777,6 @@ class ModuleStoreAssetWriteInterface(ModuleStoreAssetBase):
         pass
 
 
-# pylint: disable=abstract-method
 class ModuleStoreRead(ModuleStoreAssetBase):
     """
     An abstract interface for a database backend that stores XModuleDescriptor
@@ -890,6 +924,14 @@ class ModuleStoreRead(ModuleStoreAssetBase):
         pass
 
     @abstractmethod
+    def make_course_usage_key(self, course_key):
+        """
+        Return a valid :class:`~opaque_keys.edx.keys.UsageKey` for this modulestore
+        that matches the supplied course_key.
+        """
+        pass
+
+    @abstractmethod
     def get_courses(self, **kwargs):
         '''
         Returns a list containing the top level XModuleDescriptors of the courses
@@ -992,7 +1034,6 @@ class ModuleStoreRead(ModuleStoreAssetBase):
         pass
 
 
-# pylint: disable=abstract-method
 class ModuleStoreWrite(ModuleStoreRead, ModuleStoreAssetWriteInterface):
     """
     An abstract interface for a database backend that stores XModuleDescriptor
@@ -1102,10 +1143,17 @@ class ModuleStoreWrite(ModuleStoreRead, ModuleStoreAssetWriteInterface):
         pass
 
     @abstractmethod
-    def _drop_database(self):
+    def _drop_database(self, database=True, collections=True, connections=True):
         """
         A destructive operation to drop the underlying database and close all connections.
         Intended to be used by test code for cleanup.
+
+        If database is True, then this should drop the entire database.
+        Otherwise, if collections is True, then this should drop all of the collections used
+        by this modulestore.
+        Otherwise, the modulestore should remove all data from the collections.
+
+        If connections is True, then close the connection to the database as well.
         """
         pass
 
@@ -1122,7 +1170,7 @@ class ModuleStoreReadBase(BulkOperationsMixin, ModuleStoreRead):
         contentstore=None,
         doc_store_config=None,  # ignore if passed up
         metadata_inheritance_cache_subsystem=None, request_cache=None,
-        xblock_mixins=(), xblock_select=None, disabled_xblock_types=(),  # pylint: disable=bad-continuation
+        xblock_mixins=(), xblock_select=None, xblock_field_data_wrappers=(), disabled_xblock_types=(),  # pylint: disable=bad-continuation
         # temporary parms to enable backward compatibility. remove once all envs migrated
         db=None, collection=None, host=None, port=None, tz_aware=True, user=None, password=None,
         # allow lower level init args to pass harmlessly
@@ -1139,6 +1187,7 @@ class ModuleStoreReadBase(BulkOperationsMixin, ModuleStoreRead):
         self.request_cache = request_cache
         self.xblock_mixins = xblock_mixins
         self.xblock_select = xblock_select
+        self.xblock_field_data_wrappers = xblock_field_data_wrappers
         self.disabled_xblock_types = disabled_xblock_types
         self.contentstore = contentstore
 
@@ -1151,7 +1200,7 @@ class ModuleStoreReadBase(BulkOperationsMixin, ModuleStoreRead):
         # pylint: disable=fixme
         # TODO (vshnayder): post-launch, make errors properties of items
         # self.get_item(location)
-        assert(isinstance(course_key, CourseKey))
+        assert isinstance(course_key, CourseKey)
         return self._course_errors[course_key].errors
 
     def get_errored_courses(self):
@@ -1169,7 +1218,7 @@ class ModuleStoreReadBase(BulkOperationsMixin, ModuleStoreRead):
 
         Default impl--linear search through course list
         """
-        assert(isinstance(course_id, CourseKey))
+        assert isinstance(course_id, CourseKey)
         for course in self.get_courses(**kwargs):
             if course.id == course_id:
                 return course
@@ -1184,7 +1233,7 @@ class ModuleStoreReadBase(BulkOperationsMixin, ModuleStoreRead):
                 to search for whether a potentially conflicting course exists in that case.
         """
         # linear search through list
-        assert(isinstance(course_id, CourseKey))
+        assert isinstance(course_id, CourseKey)
         if ignore_case:
             return next(
                 (
@@ -1248,7 +1297,7 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         :param category: the xblock category
         :param fields: the dictionary of {fieldname: value}
         """
-        result = collections.defaultdict(dict)
+        result = defaultdict(dict)
         if fields is None:
             return result
         cls = self.mixologist.mix(XBlock.load_class(category, select=prefer_xmodules))
@@ -1299,14 +1348,21 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
             self.contentstore.delete_all_course_assets(course_key)
         super(ModuleStoreWriteBase, self).delete_course(course_key, user_id)
 
-    def _drop_database(self):
+    def _drop_database(self, database=True, collections=True, connections=True):
         """
         A destructive operation to drop the underlying database and close all connections.
         Intended to be used by test code for cleanup.
+
+        If database is True, then this should drop the entire database.
+        Otherwise, if collections is True, then this should drop all of the collections used
+        by this modulestore.
+        Otherwise, the modulestore should remove all data from the collections.
+
+        If connections is True, then close the connection to the database as well.
         """
         if self.contentstore:
-            self.contentstore._drop_database()  # pylint: disable=protected-access
-        super(ModuleStoreWriteBase, self)._drop_database()  # pylint: disable=protected-access
+            self.contentstore._drop_database(database, collections, connections)  # pylint: disable=protected-access
+        super(ModuleStoreWriteBase, self)._drop_database(database, collections, connections)
 
     def create_child(self, user_id, parent_usage_key, block_type, block_id=None, fields=None, **kwargs):
         """
@@ -1329,23 +1385,6 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         parent.children.append(item.location)
         self.update_item(parent, user_id)
 
-    def _flag_publish_event(self, course_key):
-        """
-        Wrapper around calls to fire the course_published signal
-        Unless we're nested in an active bulk operation, this simply fires the signal
-        otherwise a publish will be signalled at the end of the bulk operation
-
-        Arguments:
-            course_key - course_key to which the signal applies
-        """
-        signal_handler = getattr(self, 'signal_handler', None)
-        if signal_handler:
-            bulk_record = self._get_bulk_ops_record(course_key) if isinstance(self, BulkOperationsMixin) else None
-            if bulk_record and bulk_record.active:
-                bulk_record.has_publish_item = True
-            else:
-                signal_handler.send("course_published", course_key=course_key)
-
     def _flag_library_updated_event(self, library_key):
         """
         Wrapper around calls to fire the library_updated signal
@@ -1353,15 +1392,28 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         otherwise a publish will be signalled at the end of the bulk operation
 
         Arguments:
-            library_updated - library_updated to which the signal applies
+            library_key - library_key to which the signal applies
         """
-        signal_handler = getattr(self, 'signal_handler', None)
-        if signal_handler:
+        if self.signal_handler:
             bulk_record = self._get_bulk_ops_record(library_key) if isinstance(self, BulkOperationsMixin) else None
             if bulk_record and bulk_record.active:
                 bulk_record.has_library_updated_item = True
             else:
-                signal_handler.send("library_updated", library_key=library_key)
+                self.signal_handler.send("library_updated", library_key=library_key)
+
+    def _emit_course_deleted_signal(self, course_key):
+        """
+        Helper method used to emit the course_deleted signal.
+        """
+        if self.signal_handler:
+            self.signal_handler.send("course_deleted", course_key=course_key)
+
+    def _emit_item_deleted_signal(self, usage_key, user_id):
+        """
+        Helper method used to emit the item_deleted signal.
+        """
+        if self.signal_handler:
+            self.signal_handler.send("item_deleted", usage_key=usage_key, user_id=user_id)
 
 
 def only_xmodules(identifier, entry_points):

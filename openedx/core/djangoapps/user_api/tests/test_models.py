@@ -1,5 +1,6 @@
-import json
-
+"""
+Test UserPreferenceModel and UserPreference events
+"""
 from django.db import IntegrityError
 from django.test import TestCase
 
@@ -14,6 +15,9 @@ from ..preferences.api import set_user_preference
 
 
 class UserPreferenceModelTest(ModuleStoreTestCase):
+    """
+    Test case covering User Preference ORM model attributes and custom operations
+    """
     def test_duplicate_user_key(self):
         user = UserFactory.create()
         UserPreferenceFactory.create(user=user, key="testkey", value="first")

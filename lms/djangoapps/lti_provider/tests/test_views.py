@@ -6,10 +6,10 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.client import RequestFactory
 from mock import patch, MagicMock
+from nose.plugins.attrib import attr
 
 from courseware.testutils import RenderXBlockTestMixin
 from lti_provider import views, models
-from lti_provider.signature_validator import SignatureValidator
 from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -57,17 +57,6 @@ def build_launch_request(authenticated=True):
     return request
 
 
-def build_run_request(authenticated=True):
-    """
-    Helper method to create a new request object
-    """
-    request = RequestFactory().get('/')
-    request.user = UserFactory.create()
-    request.user.is_authenticated = MagicMock(return_value=authenticated)
-    request.session = {views.LTI_SESSION_KEY: ALL_PARAMS.copy()}
-    return request
-
-
 class LtiTestMixin(object):
     """
     Mixin for LTI tests
@@ -76,7 +65,11 @@ class LtiTestMixin(object):
     def setUp(self):
         super(LtiTestMixin, self).setUp()
         # Always accept the OAuth signature
-        SignatureValidator.verify = MagicMock(return_value=True)
+        self.mock_verify = MagicMock(return_value=True)
+        patcher = patch('lti_provider.signature_validator.SignatureValidator.verify', self.mock_verify)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
         self.consumer = models.LtiConsumer(
             consumer_name='consumer',
             consumer_key=LTI_DEFAULT_PARAMS['oauth_consumer_key'],
@@ -144,129 +137,40 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
             response = views.lti_launch(request, None, None)
             self.assertEqual(response.status_code, 403)
 
-    @patch('lti_provider.views.lti_run')
-    @patch('lti_provider.views.authenticate_lti_user')
-    def test_session_contents_after_launch(self, _authenticate, _run):
-        """
-        Verifies that the LTI parameters and the course and usage IDs are
-        properly stored in the session
-        """
-        request = build_launch_request()
-        views.lti_launch(request, unicode(COURSE_KEY), unicode(USAGE_KEY))
-        session = request.session[views.LTI_SESSION_KEY]
-        self.assertEqual(session['course_key'], COURSE_KEY, 'Course key not set in the session')
-        self.assertEqual(session['usage_key'], USAGE_KEY, 'Usage key not set in the session')
-        for key in views.REQUIRED_PARAMETERS:
-            self.assertEqual(session[key], request.POST[key], key + ' not set in the session')
-
-    @patch('lti_provider.views.lti_run')
-    @patch('lti_provider.views.authenticate_lti_user')
-    def test_optional_parameters_in_session(self, _authenticate, _run):
-        """
-        Verifies that the outcome-related optional LTI parameters are properly
-        stored in the session
-        """
-        request = build_launch_request()
-        request.POST.update(LTI_OPTIONAL_PARAMS)
-        views.lti_launch(
-            request,
-            unicode(COURSE_PARAMS['course_key']),
-            unicode(COURSE_PARAMS['usage_key'])
-        )
-        session = request.session[views.LTI_SESSION_KEY]
-        self.assertEqual(
-            session['lis_result_sourcedid'], u'result sourcedid',
-            'Result sourcedid not set in the session'
-        )
-        self.assertEqual(
-            session['lis_outcome_service_url'], u'outcome service URL',
-            'Outcome service URL not set in the session'
-        )
-        self.assertEqual(
-            session['tool_consumer_instance_guid'], u'consumer instance guid',
-            'Consumer instance GUID not set in the session'
-        )
-
     def test_forbidden_if_signature_fails(self):
         """
         Verifies that the view returns Forbidden if the LTI OAuth signature is
         incorrect.
         """
-        SignatureValidator.verify = MagicMock(return_value=False)
+        self.mock_verify.return_value = False
+
         request = build_launch_request()
         response = views.lti_launch(request, None, None)
         self.assertEqual(response.status_code, 403)
         self.assertEqual(response.status_code, 403)
 
-
-class LtiRunTest(LtiTestMixin, TestCase):
-    """
-    Tests for the lti_run view
-    """
-    @patch('lti_provider.views.render_courseware')
-    def test_valid_launch(self, render):
-        """
-        Verifies that the view returns OK if called with the correct context
-        """
-        request = build_run_request()
-        views.lti_run(request)
-        render.assert_called_with(request, ALL_PARAMS['usage_key'])
-
-    def test_forbidden_if_session_key_missing(self):
-        """
-        Verifies that the lti_run view returns a Forbidden status if the session
-        doesn't have an entry for the LTI parameters.
-        """
-        request = build_run_request()
-        del request.session[views.LTI_SESSION_KEY]
-        response = views.lti_run(request)
-        self.assertEqual(response.status_code, 403)
-
-    def test_forbidden_if_session_incomplete(self):
-        """
-        Verifies that the lti_run view returns a Forbidden status if the session
-        is missing any of the required LTI parameters or course information.
-        """
-        extra_keys = ['course_key', 'usage_key']
-        for key in views.REQUIRED_PARAMETERS + extra_keys:
-            request = build_run_request()
-            del request.session[views.LTI_SESSION_KEY][key]
-            response = views.lti_run(request)
-            self.assertEqual(
-                response.status_code,
-                403,
-                'Expected Forbidden response when session is missing ' + key
-            )
-
-    @patch('lti_provider.views.render_courseware')
-    def test_session_cleared_in_view(self, _render):
-        """
-        Verifies that the LTI parameters are cleaned out of the session after
-        launching the view to prevent a launch being replayed.
-        """
-        request = build_run_request()
-        views.lti_run(request)
-        self.assertNotIn(views.LTI_SESSION_KEY, request.session)
-
     @patch('lti_provider.views.render_courseware')
     def test_lti_consumer_record_supplemented_with_guid(self, _render):
-        request = build_run_request()
-        request.session[views.LTI_SESSION_KEY]['tool_consumer_instance_guid'] = 'instance_guid'
-        with self.assertNumQueries(4):
-            views.lti_run(request)
+        self.mock_verify.return_value = False
+
+        request = build_launch_request()
+        request.POST.update(LTI_OPTIONAL_PARAMS)
+        with self.assertNumQueries(3):
+            views.lti_launch(request, None, None)
         consumer = models.LtiConsumer.objects.get(
             consumer_key=LTI_DEFAULT_PARAMS['oauth_consumer_key']
         )
-        self.assertEqual(consumer.instance_guid, 'instance_guid')
+        self.assertEqual(consumer.instance_guid, u'consumer instance guid')
 
 
-class LtiRunTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCase):
+@attr('shard_3')
+class LtiLaunchTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCase):
     """
-    Tests for the rendering returned by lti_run view.
+    Tests for the rendering returned by lti_launch view.
     This class overrides the get_response method, which is used by
     the tests defined in RenderXBlockTestMixin.
     """
-    def get_response(self):
+    def get_response(self, url_encoded_params=None):
         """
         Overridable method to get the response from the endpoint that is being tested.
         """
@@ -277,15 +181,28 @@ class LtiRunTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCase)
                 'usage_id': unicode(self.html_block.location)
             }
         )
-        SignatureValidator.verify = MagicMock(return_value=True)
+        if url_encoded_params:
+            lti_launch_url += '?' + url_encoded_params
+
         return self.client.post(lti_launch_url, data=LTI_DEFAULT_PARAMS)
 
+    # The following test methods override the base tests for verifying access
+    # by unenrolled and unauthenticated students, since there is a discrepancy
+    # of access rules between the 2 endpoints (LTI and xBlock_render).
+    # TODO fix this access discrepancy to the same underlying data.
+
     def test_unenrolled_student(self):
+        """
+        Override since LTI allows access to unenrolled students.
+        """
         self.setup_course()
         self.setup_user(admin=False, enroll=False, login=True)
         self.verify_response()
 
     def test_unauthenticated(self):
+        """
+        Override since LTI allows access to unauthenticated users.
+        """
         self.setup_course()
         self.setup_user(admin=False, enroll=True, login=False)
         self.verify_response()

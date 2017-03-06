@@ -31,6 +31,15 @@ define(["jquery", "underscore", "js/views/modals/base_modal", "js/spec_helpers/m
                     expect(ModelHelpers.isShowingModal(modal)).toBeTruthy();
                 });
 
+                it('sends focus to the modal window after show is called', function(done) {
+                    showMockModal();
+
+                    jasmine.waitUntil(function() {
+                        var modalWindow = ModelHelpers.getModalWindow(modal);
+                        return ($(modalWindow)[0] === $(modalWindow)[0].ownerDocument.activeElement);
+                    }).then(done);
+                });
+
                 it('is removed after hide is called', function () {
                     showMockModal();
                     modal.hide();

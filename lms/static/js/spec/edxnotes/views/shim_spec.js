@@ -1,5 +1,5 @@
 define([
-    'jquery', 'underscore', 'annotator_1.2.9', 'js/edxnotes/views/notes_factory', 'jasmine-jquery'
+    'jquery', 'underscore', 'annotator_1.2.9', 'js/edxnotes/views/notes_factory'
 ], function($, _, Annotator, NotesFactory) {
     'use strict';
     describe('EdxNotes Shim', function() {
@@ -38,15 +38,17 @@ define([
             ];
             _.each(annotators, function(annotator) {
                 highlights.push($('<span class="annotator-hl" />').appendTo(annotator.element));
-                spyOn(annotator, 'onHighlightClick').andCallThrough();
-                spyOn(annotator, 'onHighlightMouseover').andCallThrough();
-                spyOn(annotator, 'startViewerHideTimer').andCallThrough();
+                spyOn(annotator, 'onHighlightClick').and.callThrough();
+                spyOn(annotator, 'onHighlightMouseover').and.callThrough();
+                spyOn(annotator, 'startViewerHideTimer').and.callThrough();
             });
-            spyOn($.fn, 'off').andCallThrough();
+            spyOn($.fn, 'off').and.callThrough();
         });
 
         afterEach(function () {
-            _.invoke(Annotator._instances, 'destroy');
+            while (Annotator._instances.length > 0) {
+                Annotator._instances[0].destroy();
+            }
         });
 
         it('does not show the viewer if the editor is opened', function() {
@@ -57,9 +59,9 @@ define([
         });
 
         it('clicking on highlights does not open the viewer when the editor is opened', function() {
-            spyOn(annotators[1].editor, 'isShown').andReturn(false);
+            spyOn(annotators[1].editor, 'isShown').and.returnValue(false);
             highlights[0].click();
-            annotators[1].editor.isShown.andReturn(true);
+            annotators[1].editor.isShown.and.returnValue(true);
             highlights[1].click();
             expect($('#edx-notes-wrapper-123 .annotator-viewer')).not.toHaveClass('annotator-hide');
             expect($('#edx-notes-wrapper-456 .annotator-viewer')).toHaveClass('annotator-hide');
@@ -74,7 +76,7 @@ define([
             // in turn calls onHighlightMouseover.
             // To test if onHighlightMouseover is called or not on
             // mouseover, we'll have to reset onHighlightMouseover.
-            annotators[0].onHighlightMouseover.reset();
+            annotators[0].onHighlightMouseover.calls.reset();
             // Check that both instances of annotator are frozen
             _.invoke(highlights, 'mouseover');
             _.invoke(highlights, 'mouseout');
@@ -84,7 +86,7 @@ define([
         it('clicking twice reverts to default behavior', function() {
             highlights[0].click();
             $(document).click();
-            annotators[0].onHighlightMouseover.reset();
+            annotators[0].onHighlightMouseover.calls.reset();
 
             // Check that both instances of annotator are unfrozen
             _.invoke(highlights, 'mouseover');
@@ -114,7 +116,7 @@ define([
            'and unbinds one document click.edxnotes:freeze event handlers', function() {
             // Freeze all instances
             highlights[0].click();
-            annotators[0].onHighlightMouseover.reset();
+            annotators[0].onHighlightMouseover.calls.reset();
             // Destroy second instance
             annotators[1].destroy();
 
@@ -161,17 +163,17 @@ define([
                     element: element
                 };
 
-                mockViewer.on = jasmine.createSpy().andReturn(mockViewer);
-                mockViewer.hide = jasmine.createSpy().andReturn(mockViewer);
-                mockViewer.destroy = jasmine.createSpy().andReturn(mockViewer);
-                mockViewer.addField = jasmine.createSpy().andCallFake(function (options) {
+                mockViewer.on = jasmine.createSpy().and.returnValue(mockViewer);
+                mockViewer.hide = jasmine.createSpy().and.returnValue(mockViewer);
+                mockViewer.destroy = jasmine.createSpy().and.returnValue(mockViewer);
+                mockViewer.addField = jasmine.createSpy().and.callFake(function (options) {
                     mockViewer.fields.push(options);
                     return mockViewer;
                 });
 
-                spyOn(element, 'bind').andReturn(element);
-                spyOn(element, 'appendTo').andReturn(element);
-                spyOn(Annotator, 'Viewer').andReturn(mockViewer);
+                spyOn(element, 'bind').and.returnValue(element);
+                spyOn(element, 'appendTo').and.returnValue(element);
+                spyOn(Annotator, 'Viewer').and.returnValue(mockViewer);
 
                 annotators[0]._setupViewer();
             });
@@ -181,13 +183,13 @@ define([
             });
 
             it('should hide the annotator on creation', function () {
-                expect(mockViewer.hide.callCount).toBe(1);
+                expect(mockViewer.hide.calls.count()).toBe(1);
             });
 
             it('should setup the default text field', function () {
-                var args = mockViewer.addField.mostRecentCall.args[0];
+                var args = mockViewer.addField.calls.mostRecent().args[0];
 
-                expect(mockViewer.addField.callCount).toBe(1);
+                expect(mockViewer.addField.calls.count()).toBe(1);
                 expect(_.isFunction(args.load)).toBeTruthy();
             });
 

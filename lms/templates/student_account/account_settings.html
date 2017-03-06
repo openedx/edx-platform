@@ -1,31 +1,22 @@
+<%page expression_filter="h"/>
+
 <%!
 import json
+
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.utils.translation import ugettext as _
-from microsite_configuration import microsite
+
+from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 %>
 
 <!--<%namespace name='static' file='/static_content.html'/>-->
 
 <%inherit file="/main.html" />
+<%def name="online_help_token()"><% return "learneraccountsettings" %></%def>
 <%namespace name='static' file='/static_content.html'/>
 
 <%block name="pagetitle">${_("Account Settings")}</%block>
-<%block name="nav_skip">#u-field-input-username</%block>
-
-<%block name="header_extras">
-
-    <script type="text/template" id="account_settings-tpl">
-        <%static:include path="student_account/account_settings.underscore" />
-    </script>
-
-    % for template_name in ["field_dropdown", "field_link", "field_readonly", "field_text"]:
-        <script type="text/template" id="${template_name}-tpl">
-            <%static:include path="fields/${template_name}.underscore" />
-        </script>
-    % endfor
-</%block>
 
 % if duplicate_provider:
     <section>
@@ -37,21 +28,23 @@ from microsite_configuration import microsite
 
 <%block name="headextra">
     <%static:css group='style-course'/>
+</%block>
 
-    <script>
-          (function (require) {
-            require(['js/student_account/views/account_settings_factory'], function(setupAccountSettingsSection) {
+<%block name="js_extra">
+<%static:require_module module_name="js/student_account/views/account_settings_factory" class_name="AccountSettingsFactory">
+    var fieldsData = ${ fields | n, dump_js_escaped_json },
+    ordersHistoryData = ${ order_history | n, dump_js_escaped_json },
+    authData = ${ auth | n, dump_js_escaped_json },
+    platformName = '${ static.get_platform_name() | n, js_escaped_string }';
 
-                var fieldsData = ${ json.dumps(fields) };
-                var authData = ${ json.dumps(auth) };
-                var platformName = ${ json.dumps(microsite.get_value('platform_name', settings.PLATFORM_NAME))};
-
-                setupAccountSettingsSection(
-                        fieldsData, authData, '${user_accounts_api_url}', '${user_preferences_api_url}', ${user.id},
-                        platformName
-                );
-            });
-          }).call(this, require || RequireJS.require);
-    </script>
-
+    AccountSettingsFactory(
+        fieldsData,
+        ordersHistoryData,
+        authData,
+        '${ user_accounts_api_url | n, js_escaped_string }',
+        '${ user_preferences_api_url | n, js_escaped_string }',
+        ${ user.id | n, dump_js_escaped_json },
+        platformName
+    );
+</%static:require_module>
 </%block>

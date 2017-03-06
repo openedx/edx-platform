@@ -1,3 +1,8 @@
+"""
+Django Management Command:  Generate Course Structure
+Generates and stores course structure information for one or more courses.
+"""
+
 import logging
 from optparse import make_option
 
@@ -12,6 +17,9 @@ log = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
+    """
+    Generates and stores course structure information for one or more courses.
+    """
     args = '<course_id course_id ...>'
     help = 'Generates and stores course structure for one or more courses.'
 
@@ -23,7 +31,9 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **options):
-
+        """
+        Perform the course structure generation workflow
+        """
         if options['all']:
             course_keys = [course.id for course in modulestore().get_courses()]
         else:
@@ -42,7 +52,7 @@ class Command(BaseCommand):
                 # TODO Future improvement: Use .delay(), add return value to ResultSet, and wait for execution of
                 # all tasks using ResultSet.join(). I (clintonb) am opting not to make this improvement right now
                 # as I do not have time to test it fully.
-                update_course_structure.apply(unicode(course_key))
+                update_course_structure.apply(args=[unicode(course_key)])
             except Exception as ex:
                 log.exception('An error occurred while generating course structure for %s: %s',
                               unicode(course_key), ex.message)

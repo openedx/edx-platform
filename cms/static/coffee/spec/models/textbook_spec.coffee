@@ -1,12 +1,6 @@
 define ["backbone", "js/models/textbook", "js/collections/textbook", "js/models/chapter", "js/collections/chapter", "coffee/src/main"],
 (Backbone, Textbook, TextbookSet, Chapter, ChapterSet, main) ->
 
-    beforeEach ->
-        @addMatchers
-            toBeInstanceOf: (expected) ->
-                return @actual instanceof expected
-
-
     describe "Textbook model", ->
         beforeEach ->
             main()

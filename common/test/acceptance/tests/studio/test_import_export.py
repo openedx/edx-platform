@@ -1,9 +1,13 @@
 """
 Acceptance tests for the Import and Export pages
 """
+from nose.plugins.attrib import attr
+from datetime import datetime
+
+from flaky import flaky
+
 from abc import abstractmethod
 from bok_choy.promise import EmptyPromise
-from datetime import datetime
 
 from .base_studio_test import StudioLibraryTest, StudioCourseTest
 from ...fixtures.course import XBlockFixtureDesc
@@ -11,9 +15,10 @@ from ...pages.studio.import_export import ExportLibraryPage, ExportCoursePage, I
 from ...pages.studio.library import LibraryEditPage
 from ...pages.studio.container import ContainerPage
 from ...pages.studio.overview import CourseOutlinePage
+from ...pages.lms.courseware import CoursewarePage
+from ...pages.lms.staff_view import StaffPage
 
 
-# pylint: disable=no-member
 class ExportTestMixin(object):
     """
     Tests to run both for course and library export pages.
@@ -31,6 +36,7 @@ class ExportTestMixin(object):
         self.assertTrue(is_tarball_mimetype)
 
 
+@attr('shard_7')
 class TestCourseExport(ExportTestMixin, StudioCourseTest):
     """
     Export tests for courses.
@@ -53,11 +59,12 @@ class TestCourseExport(ExportTestMixin, StudioCourseTest):
         self.assertEqual(self.export_page.header_text, 'Course Export')
 
 
+@attr('shard_7')
 class TestLibraryExport(ExportTestMixin, StudioLibraryTest):
     """
     Export tests for libraries.
     """
-    def setUp(self):  # pylint: disable=arguments-differ
+    def setUp(self):
         """
         Ensure a library exists and navigate to the library edit page.
         """
@@ -75,7 +82,6 @@ class TestLibraryExport(ExportTestMixin, StudioLibraryTest):
         self.assertEqual(self.export_page.header_text, 'Library Export')
 
 
-# pylint: disable=no-member
 class BadExportMixin(object):
     """
     Test mixin for bad exports.
@@ -102,6 +108,7 @@ class BadExportMixin(object):
         )
 
 
+@attr('shard_7')
 class TestLibraryBadExport(BadExportMixin, StudioLibraryTest):
     """
     Verify exporting a bad library causes an error.
@@ -125,6 +132,7 @@ class TestLibraryBadExport(BadExportMixin, StudioLibraryTest):
         )
 
 
+@attr('shard_7')
 class TestCourseBadExport(BadExportMixin, StudioCourseTest):
     """
     Verify exporting a bad course causes an error.
@@ -156,7 +164,7 @@ class TestCourseBadExport(BadExportMixin, StudioCourseTest):
         )
 
 
-# pylint: disable=no-member
+@attr('shard_7')
 class ImportTestMixin(object):
     """
     Tests to run for both course and library import pages.
@@ -192,15 +200,33 @@ class ImportTestMixin(object):
             And if I refresh the page, the timestamp is still displayed
         """
         self.assertFalse(self.import_page.is_timestamp_visible())
+
+        # Get the time when the import has started.
+        # import_page timestamp is in (MM/DD/YYYY at HH:mm) so replacing (second, microsecond) to
+        # keep the comparison consistent
+        upload_start_time = datetime.utcnow().replace(microsecond=0, second=0)
         self.import_page.upload_tarball(self.tarball_name)
         self.import_page.wait_for_upload()
 
-        utc_now = datetime.utcnow()
-        import_date, import_time = self.import_page.timestamp
+        # Get the time when the import has finished.
+        # import_page timestamp is in (MM/DD/YYYY at HH:mm) so replacing (second, microsecond) to
+        # keep the comparison consistent
+        upload_finish_time = datetime.utcnow().replace(microsecond=0, second=0)
 
+        import_timestamp = self.import_page.parsed_timestamp
         self.import_page.wait_for_timestamp_visible()
-        self.assertEqual(utc_now.strftime('%m/%d/%Y'), import_date)
-        self.assertEqual(utc_now.strftime('%H:%M'), import_time)
+
+        # Verify that 'import_timestamp' is between start and finish upload time
+        self.assertLessEqual(
+            upload_start_time,
+            import_timestamp,
+            "Course import timestamp should be upload_start_time <= import_timestamp <= upload_end_time"
+        )
+        self.assertGreaterEqual(
+            upload_finish_time,
+            import_timestamp,
+            "Course import timestamp should be upload_start_time <= import_timestamp <= upload_end_time"
+        )
 
         self.import_page.visit()
         self.import_page.wait_for_tasks(completed=True)
@@ -253,6 +279,53 @@ class ImportTestMixin(object):
         self.import_page.wait_for_tasks(fail_on='Updating')
 
 
+@attr('shard_7')
+class TestEntranceExamCourseImport(ImportTestMixin, StudioCourseTest):
+    """
+    Tests the Course import page
+    """
+    tarball_name = 'entrance_exam_course.2015.tar.gz'
+    bad_tarball_name = 'bad_course.tar.gz'
+    import_page_class = ImportCoursePage
+    landing_page_class = CourseOutlinePage
+
+    def page_args(self):
+        return [self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run']]
+
+    def test_course_updated_with_entrance_exam(self):
+        """
+        Given that I visit an empty course before import
+        I should not see a section named 'Section' or 'Entrance Exam'
+        When I visit the import page
+        And I upload a course that has an entrance exam section named 'Entrance Exam'
+        And I visit the course outline page again
+        The section named 'Entrance Exam' should now be available.
+        And when I switch the view mode to student view and Visit CourseWare
+        Then I see one section in the sidebar that is 'Entrance Exam'
+        """
+        self.landing_page.visit()
+        # Should not exist yet.
+        self.assertRaises(IndexError, self.landing_page.section, "Section")
+        self.assertRaises(IndexError, self.landing_page.section, "Entrance Exam")
+        self.import_page.visit()
+        self.import_page.upload_tarball(self.tarball_name)
+        self.import_page.wait_for_upload()
+        self.landing_page.visit()
+        # There should be two sections. 'Entrance Exam' and 'Section' on the landing page.
+        self.landing_page.section("Entrance Exam")
+        self.landing_page.section("Section")
+
+        self.landing_page.view_live()
+        courseware = CoursewarePage(self.browser, self.course_id)
+        courseware.wait_for_page()
+        StaffPage(self.browser, self.course_id).set_staff_view_mode('Student')
+        self.assertEqual(courseware.num_sections, 1)
+        self.assertIn(
+            "To access course materials, you must score", courseware.entrance_exam_message_selector.text[0]
+        )
+
+
+@attr('shard_7')
 class TestCourseImport(ImportTestMixin, StudioCourseTest):
     """
     Tests the Course import page
@@ -293,7 +366,36 @@ class TestCourseImport(ImportTestMixin, StudioCourseTest):
         """
         self.assertEqual(self.import_page.header_text, 'Course Import')
 
+    def test_multiple_course_import_message(self):
+        """
+        Given that I visit an empty course before import
+        When I visit the import page
+        And I upload a course with file name 2015.lzdwNM.tar.gz
+        Then timestamp is visible after course is updated successfully
+        And then I create a new course
+        When I visit the import page of this new course
+        Then timestamp is not visible
+        """
+        self.import_page.visit()
+        self.import_page.upload_tarball(self.tarball_name)
+        self.import_page.wait_for_upload()
+        self.assertTrue(self.import_page.is_timestamp_visible())
 
+        # Create a new course and visit the import page
+        self.course_info = {
+            'org': 'orgX',
+            'number': self.unique_id + '_2',
+            'run': 'test_run_2',
+            'display_name': 'Test Course 2' + self.unique_id
+        }
+        self.install_course_fixture()
+        self.import_page = self.import_page_class(*self.page_args())
+        self.import_page.visit()
+        # As this is new course which is never import so timestamp should not present
+        self.assertFalse(self.import_page.is_timestamp_visible())
+
+
+@attr('shard_7')
 class TestLibraryImport(ImportTestMixin, StudioLibraryTest):
     """
     Tests the Library import page
@@ -306,6 +408,7 @@ class TestLibraryImport(ImportTestMixin, StudioLibraryTest):
     def page_args(self):
         return [self.browser, self.library_key]
 
+    @flaky  # TODO: SOL-430
     def test_library_updated(self):
         """
         Given that I visit an empty library

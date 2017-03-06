@@ -1,11 +1,11 @@
 // lms - views - homepage view
 // ====================
+// TO-DO: combine this with _home.scss as a cleanup story
 
 $learn-more-horizontal-position: calc(50% - 100px); // calculate the left position for "LEARN MORE" content
 
 .courses-container {
   @include outer-container;
-  padding: ($baseline*0.9) ($baseline/2) 0 ($baseline/2);
 
   .courses {
     @include row();
@@ -16,7 +16,7 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
       @extend %ui-no-list;
 
       .courses-listing-item {
-        margin: ($baseline*0.75) 0 ($baseline*1.5) 0;
+        margin: 0 0 ($baseline*1.5) 0;
         max-height: $course-card-height;
       }
     }
@@ -72,14 +72,20 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
 
       .course-info {
         height: $course-info-height;
+        font-family: $sans-serif;
+
+        h2 {
+          font-family: $sans-serif;
+        }
 
         .course-organization, .course-code, .course-date {
           @extend %t-icon6;
-          color: $black;
+          color: $gray-d2;
         }
 
         .course-organization, .course-code, .course-title {
           display: block;
+          text-transform: none;
         }
 
         .course-organization {

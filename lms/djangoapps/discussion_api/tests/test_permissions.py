@@ -4,6 +4,7 @@ Tests for discussion API permission logic
 import itertools
 
 import ddt
+from nose.plugins.attrib import attr
 
 from discussion_api.permissions import (
     can_delete,
@@ -41,7 +42,7 @@ class GetInitializableFieldsTest(ModuleStoreTestCase):
         )
         actual = get_initializable_thread_fields(context)
         expected = {
-            "abuse_flagged", "course_id", "following", "raw_body", "title", "topic_id", "type", "voted"
+            "abuse_flagged", "course_id", "following", "raw_body", "read", "title", "topic_id", "type", "voted"
         }
         if is_privileged and is_cohorted:
             expected |= {"group_id"}
@@ -64,6 +65,7 @@ class GetInitializableFieldsTest(ModuleStoreTestCase):
         self.assertEqual(actual, expected)
 
 
+@attr('shard_3')
 @ddt.ddt
 class GetEditableFieldsTest(ModuleStoreTestCase):
     """Tests for get_editable_fields"""
@@ -77,7 +79,7 @@ class GetEditableFieldsTest(ModuleStoreTestCase):
             is_cohorted=is_cohorted
         )
         actual = get_editable_fields(thread, context)
-        expected = {"abuse_flagged", "following", "voted"}
+        expected = {"abuse_flagged", "following", "read", "voted"}
         if is_author or is_privileged:
             expected |= {"topic_id", "type", "title", "raw_body"}
         if is_privileged and is_cohorted:

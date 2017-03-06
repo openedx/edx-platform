@@ -6,7 +6,7 @@ from django.core.urlresolvers import reverse
 <div class="wrapper-sock wrapper">
   <ul class="list-actions list-cta">
     <li class="action-item">
-      <a href="#sock" class="cta cta-show-sock"><i class="icon fa fa-question-circle"></i>
+      <a href="#sock" class="cta cta-show-sock"><span class="icon fa fa-question-circle" aria-hidden="true"></span>
         <span class="copy-show is-shown">${_("Looking for help with {studio_name}?").format(studio_name=settings.STUDIO_SHORT_NAME)}</span>
         <span class="copy-hide is-hidden">${_("Hide {studio_name} Help").format(studio_name=settings.STUDIO_SHORT_NAME)}</span>
       </a>
@@ -14,52 +14,54 @@ from django.core.urlresolvers import reverse
   </ul>
 
   <div class="wrapper-inner wrapper">
-    <section class="sock" id="sock">
-      <header>
-        <h2 class="title sr">${_("{studio_name} Documentation").format(studio_name=settings.STUDIO_NAME)}</h2>
-      </header>
+    <section class="sock" id="sock" aria-labelledby="sock-heading">
+        <h2 id="sock-heading" class="title sr">${_("{studio_name} Documentation").format(studio_name=settings.STUDIO_NAME)}</h2>
 
       <div class="support">
-        <h3 class="title">${_("{studio_name} Documentation").format(studio_name=settings.STUDIO_NAME)}</h3>
+        <%!
+        from django.conf import settings
 
-        <div class="copy">
-           <p>${_("You can click Help in the upper right corner of any page to get more information about the page you're on. You can also use the links below to download the Building and Running an {platform_name} Course PDF file, to go to the {platform_name} Author Support site, or to enroll in edX101.").format(platform_name=settings.PLATFORM_NAME)}</p>
-        </div>
+        partner_email = settings.PARTNER_SUPPORT_EMAIL
 
-      <ul class="list-actions">
-          <li class="action-item js-help-pdf">
-            <a href="${get_online_help_info(online_help_token)['pdf_url']}" target="_blank" rel="external" class="action action-primary">${_("Building and Running an {platform_name} Course PDF").format(platform_name=settings.PLATFORM_NAME)}</a>
-          </li>
-
-        % if settings.TENDER_DOMAIN:
-          <li class="action-item">
-            <a href="http://${settings.TENDER_DOMAIN}" rel="external" class="action action-primary">${_("{studio_name} Author Support").format(studio_name=settings.STUDIO_NAME)}</a>
-            <span class="tip">${_("{studio_name} Author Support").format(studio_name=settings.STUDIO_NAME)}</span>
-          </li>
-        % endif
-
-        <li class="action-item">
-          <a href="https://www.edx.org/course/overview-creating-edx-course-edx-edx101#.VO4eaLPF-n1" rel="external" class="action action-primary">${_("Enroll in edX101")}</a>
-          <span class="tip">${_("How to use {studio_name} to build your course").format(studio_name=settings.STUDIO_NAME)}</span>
-        </li>
-      </ul>
-      </div>
-
-    % if settings.TENDER_DOMAIN:
-      <div class="feedback">
-        <h3 class="title">${_("Request help with {studio_name}").format(studio_name=settings.STUDIO_NAME)}</h3>
-
-        <div class="copy">
-           <p>${_("Have problems, questions, or suggestions about {studio_name}?").format(studio_name=settings.STUDIO_NAME)}</p>
-        </div>
+        links = [{
+            'href': 'http://docs.edx.org',
+            'sr_mouseover_text': _('Access documentation on http://docs.edx.org'),
+            'text': _('edX Documentation'),
+            'condition': True
+        }, {
+            'href': 'https://open.edx.org',
+            'sr_mouseover_text': _('Access the Open edX Portal'),
+            'text': _('Open edX Portal'),
+            'condition': True
+        }, {
+            'href': 'https://www.edx.org/course/overview-creating-edx-course-edx-edx101#.VO4eaLPF-n1',
+            'sr_mouseover_text': _('Enroll in edX101: Overview of Creating an edX Course'),
+            'text': _('Enroll in edX101'),
+            'condition': True
+        }, {
+            'href': 'https://www.edx.org/course/creating-course-edx-studio-edx-studiox',
+            'sr_mouseover_text': _('Enroll in StudioX: Creating a Course with edX Studio'),
+            'text': _('Enroll in StudioX'),
+            'condition': True
+        }, {
+            'href': 'mailto:{email}'.format(email=partner_email),
+            'sr_mouseover_text': _('Send an email to {email}').format(email=partner_email),
+            'text': _('Contact Us'),
+            'condition': bool(partner_email)
+        }]
+        %>
 
         <ul class="list-actions">
-          <li class="action-item">
-            <a href="http://${settings.TENDER_DOMAIN}/discussion/new" class="action action-primary" title="${_("Use our feedback tool, Tender, to share your feedback")}"><i class="icon fa fa-comments"></i>${_("Contact Us")}</a>
-          </li>
+          % for link in links:
+            % if link['condition']:
+              <li class="action-item">
+                <a href="${link['href']}" title="${link['sr_mouseover_text']}" rel="external" class="action action-primary">${link['text']}</a>
+                <span class="tip">${link['sr_mouseover_text']}</span>
+              </li>
+            %endif
+          % endfor
         </ul>
       </div>
-    % endif
     </section>
   </div>
 </div>

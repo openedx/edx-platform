@@ -1,4 +1,8 @@
-define(["js/views/baseview", "underscore"], function(BaseView, _) {
+define([
+    "js/views/baseview",
+    "underscore",
+    "text!templates/license-selector.underscore"
+], function(BaseView, _, licenseSelectorTemplate) {
     var defaultLicenseInfo = {
         "all-rights-reserved": {
             "name": gettext("All Rights Reserved"),
@@ -55,7 +59,6 @@ define(["js/views/baseview", "underscore"], function(BaseView, _) {
         initialize: function(options) {
             this.licenseInfo = options.licenseInfo || defaultLicenseInfo;
             this.showPreview = !!options.showPreview; // coerce to boolean
-            this.template = this.loadTemplate("license-selector");
 
             // Rerender when the model changes
             this.listenTo(this.model, 'change', this.render);
@@ -79,7 +82,7 @@ define(["js/views/baseview", "underscore"], function(BaseView, _) {
         },
 
         render: function() {
-            this.$el.html(this.template({
+            this.$el.html(_.template(licenseSelectorTemplate)({
                 model: this.model.attributes,
                 licenseString: this.model.toString() || "",
                 licenseInfo: this.licenseInfo,

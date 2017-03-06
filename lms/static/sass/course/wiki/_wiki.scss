@@ -100,7 +100,7 @@ section.wiki {
       width: 180px;
       height: 27px;
       padding: 0 15px 0 35px;
-      background: url(../images/search-icon.png) no-repeat 9px center $gray-l6;
+      background: url('#{$static-path}/images/search-icon.png') no-repeat 9px center $gray-l6;
       border: 1px solid #c8c8c8;
       border-radius: 14px;
       box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12) inset;
@@ -896,19 +896,22 @@ section.wiki {
 
   .alert {
     position: relative;
-    margin: 24px 40px;
+    width: auto;
+    margin: 24px 0px;
     padding: 8px 12px;
     border: 1px solid #EBE8BF;
     border-radius: 3px;
     background: $yellow;
+    color: $black;
     font-size: 0.9em;
+    min-width: inherit;
 
     .close {
       position: absolute;
       right: 12px;
       font-size: 1.3em;
       top: 6px;
-      color: #999;
+      color: $black;
       text-decoration: none;
     }
   }
@@ -972,58 +975,4 @@ section.wiki {
 .modal-preview .main-article {
   width: 100% !important;
   margin-left: 0;
-}
-
-
-#circuit_editor_modal.modal {
-  @extend %ui-depth4;
-  width: 648px;
-  margin-left: -325px;
-  top: 150px;
-
-  .modal-header {
-    h1, p {
-      color: $white;
-    }
-
-    h1 {
-      margin: 3px 12px 8px;
-      font-size: 1.1em;
-    }
-
-    p {
-      font-size: 0.9em;
-      margin: 5px 12px 20px;
-      line-height: 1em;
-    }
-  }
-
-  .modal-body {
-    padding-bottom: 8px;
-  }
-
-  .modal-footer {
-    margin: 12px;
-  }
-
-  .modal-footer .btn {
-    @include button(simple, #eee);
-    font-size: 0.8em;
-    margin-right: ($baseline/4);
-    line-height: 1.2em;
-    text-transform: none !important;
-    letter-spacing: 0 !important;
-
-    &:hover, &:focus {
-      color: $base-font-color;
-      text-decoration: none;
-    }
-
-    &.btn-primary {
-      @include button;
-      font-size: 0.8em;
-    }
-
-    margin-right: ($baseline/2);
-  }
 }

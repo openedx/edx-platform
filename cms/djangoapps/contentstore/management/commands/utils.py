@@ -2,6 +2,8 @@
 Common methods for cms commands to use
 """
 from django.contrib.auth.models import User
+from opaque_keys.edx.keys import CourseKey
+from xmodule.modulestore.django import modulestore
 
 
 def user_from_str(identifier):
@@ -17,3 +19,21 @@ def user_from_str(identifier):
         return User.objects.get(email=identifier)
 
     return User.objects.get(id=user_id)
+
+
+def get_course_versions(course_key):
+    """
+    Fetches the latest course versions
+    :param course_key:
+    :return: { 'draft-branch' : value1, 'published-branch' : value2}
+    """
+    course_locator = CourseKey.from_string(course_key)
+    store = modulestore()._get_modulestore_for_courselike(course_locator)  # pylint: disable=protected-access
+    index_entry = store.get_course_index(course_locator)
+    if index_entry is not None:
+        return {
+            'draft-branch': index_entry['versions']['draft-branch'],
+            'published-branch': index_entry['versions']['published-branch']
+        }
+
+    return None

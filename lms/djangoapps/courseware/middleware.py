@@ -18,7 +18,7 @@ class RedirectUnenrolledMiddleware(object):
             course_key = exception.course_key
             return redirect(
                 reverse(
-                    'courseware.views.course_about',
+                    'courseware.views.views.course_about',
                     args=[course_key.to_deprecated_string()]
                 )
             )

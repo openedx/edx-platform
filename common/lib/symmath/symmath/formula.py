@@ -12,7 +12,7 @@ Provides sympy representation.
 #
 
 import os
-import string       # pylint: disable=deprecated-module
+import string
 import re
 import logging
 import operator
@@ -78,7 +78,8 @@ def to_latex(expr):
     # substitute back into latex form for scripts
     # literally something of the form
     # 'scriptN' becomes '\\mathcal{N}'
-    # note: can't use something akin to the _print_hat method above because we sometimes get 'script(N)__B' or more complicated terms
+    # note: can't use something akin to the _print_hat method above because we
+    # sometimes get 'script(N)__B' or more complicated terms
     expr_s = re.sub(
         r'script([a-zA-Z0-9]+)',
         '\\mathcal{\\1}',
@@ -99,11 +100,11 @@ def my_evalf(expr, chop=False):
     if isinstance(expr, list):
         try:
             return [x.evalf(chop=chop) for x in expr]
-        except:
+        except Exception:  # pylint: disable=broad-except
             return expr
     try:
         return expr.evalf(chop=chop)
-    except:
+    except Exception:  # pylint: disable=broad-except
         return expr
 
 
@@ -115,23 +116,25 @@ def my_sympify(expr, normphase=False, matrix=False, abcsym=False, do_qubit=False
     if symtab:
         varset = symtab
     else:
-        varset = {'p': sympy.Symbol('p'),
-                  'g': sympy.Symbol('g'),
-                  'e': sympy.E,			# for exp
-                  'i': sympy.I,			# lowercase i is also sqrt(-1)
-                  'Q': sympy.Symbol('Q'),	 # otherwise it is a sympy "ask key"
-                  'I': sympy.Symbol('I'),	 # otherwise it is sqrt(-1)
-                  'N': sympy.Symbol('N'),	 # or it is some kind of sympy function
-                  'ZZ': sympy.Symbol('ZZ'),	 # otherwise it is the PythonIntegerRing
-                  'XI': sympy.Symbol('XI'),	 # otherwise it is the capital \XI
-                  'hat': sympy.Function('hat'),	 # for unit vectors (8.02)
-                  }
+        varset = {
+            'p': sympy.Symbol('p'),
+            'g': sympy.Symbol('g'),
+            'e': sympy.E,			# for exp
+            'i': sympy.I,			# lowercase i is also sqrt(-1)
+            'Q': sympy.Symbol('Q'),	 # otherwise it is a sympy "ask key"
+            'I': sympy.Symbol('I'),	 # otherwise it is sqrt(-1)
+            'N': sympy.Symbol('N'),	 # or it is some kind of sympy function
+            'ZZ': sympy.Symbol('ZZ'),	 # otherwise it is the PythonIntegerRing
+            'XI': sympy.Symbol('XI'),	 # otherwise it is the capital \XI
+            'hat': sympy.Function('hat'),	 # for unit vectors (8.02)
+        }
     if do_qubit:		# turn qubit(...) into Qubit instance
-        varset.update({'qubit': Qubit,
-                       'Ket': Ket,
-                       'dot': dot,
-                       'bit': sympy.Function('bit'),
-                       })
+        varset.update({
+            'qubit': Qubit,
+            'Ket': Ket,
+            'dot': dot,
+            'bit': sympy.Function('bit'),
+        })
     if abcsym:			# consider all lowercase letters as real symbols, in the parsing
         for letter in string.lowercase:
             if letter in varset:	 # exclude those already done
@@ -207,7 +210,7 @@ class formula(object):
                 usym = unicode(k.text)
                 try:
                     udata = unicodedata.name(usym)
-                except Exception:
+                except Exception:  # pylint: disable=broad-except
                     udata = None
                 # print "usym = %s, udata=%s" % (usym,udata)
                 if udata:			# eg "GREEK SMALL LETTER BETA"
@@ -271,7 +274,8 @@ class formula(object):
                             newk = etree.Element('mi')
                             newk.text = 'hat(%s)' % k[0].text
                             xml.replace(k, newk)
-                        if gettag(k[0]) == 'mrow' and gettag(k[0][0]) == 'mi' and gettag(k[1]) == 'mo' and str(k[1].text) == '^':
+                        if gettag(k[0]) == 'mrow' and gettag(k[0][0]) == 'mi' and \
+                           gettag(k[1]) == 'mo' and str(k[1].text) == '^':
                             newk = etree.Element('mi')
                             newk.text = 'hat(%s)' % k[0][0].text
                             xml.replace(k, newk)
@@ -309,7 +313,7 @@ class formula(object):
             with 'scriptN'. There have been problems using script_N or script(N)
             """
             for child in parent:
-                if (gettag(child) == 'mstyle' and child.get('mathvariant') == 'script'):
+                if gettag(child) == 'mstyle' and child.get('mathvariant') == 'script':
                     newchild = etree.Element('mi')
                     newchild.text = 'script%s' % flatten_pmathml(child[0])
                     parent.replace(child, newchild)
@@ -397,7 +401,7 @@ class formula(object):
             """
             for child in parent:
                 # fix msubsup
-                if (gettag(child) == 'msubsup' and len(child) == 3):
+                if gettag(child) == 'msubsup' and len(child) == 3:
                     newchild = etree.Element('msup')
                     newbase = etree.Element('mi')
                     newbase.text = '%s_%s' % (flatten_pmathml(child[0]), flatten_pmathml(child[1]))
@@ -419,7 +423,7 @@ class formula(object):
         # pre-process the presentation mathml before sending it to snuggletex to convert to content mathml
         try:
             xml = self.preprocess_pmathml(self.expr)
-        except Exception, err:
+        except Exception as err:  # pylint: disable=broad-except
             log.warning('Err %s while preprocessing; expr=%s', err, self.expr)
             return "<html>Error! Cannot process pmathml</html>"
         pmathml = etree.tostring(xml, pretty_print=True)
@@ -468,13 +472,6 @@ class formula(object):
         def gettag(expr):
             return re.sub('{http://[^}]+}', '', expr.tag)
 
-        # simple math
-        def op_divide(*args):
-            if not len(args) == 2:
-                raise Exception('divide given wrong number of arguments!')
-            # print "divide: arg0=%s, arg1=%s" % (args[0],args[1])
-            return sympy.Mul(args[0], sympy.Pow(args[1], -1))
-
         def op_plus(*args):
             return args[0] if len(args) == 1 else op_plus(*args[:-1]) + args[-1]
 
@@ -491,7 +488,7 @@ class formula(object):
 
         opdict = {
             'plus': op_plus,
-            'divide': operator.div,  # should this be op_divide?
+            'divide': operator.div,
             'times': op_times,
             'minus': op_minus,
             'root': sympy.sqrt,
@@ -518,12 +515,7 @@ class formula(object):
             'ln': sympy.ln,
         }
 
-        # simple symbols - TODO is this code used?
-        nums1dict = {
-            'pi': sympy.pi,
-        }
-
-        def parsePresentationMathMLSymbol(xml):
+        def parse_presentation_symbol(xml):
             """
             Parse <msub>, <msup>, <mi>, and <mn>
             """
@@ -533,10 +525,10 @@ class formula(object):
             elif tag == 'mi':
                 return xml.text
             elif tag == 'msub':
-                return '_'.join([parsePresentationMathMLSymbol(y) for y in xml])
+                return '_'.join([parse_presentation_symbol(y) for y in xml])
             elif tag == 'msup':
-                return '^'.join([parsePresentationMathMLSymbol(y) for y in xml])
-            raise Exception('[parsePresentationMathMLSymbol] unknown tag %s' % tag)
+                return '^'.join([parse_presentation_symbol(y) for y in xml])
+            raise Exception('[parse_presentation_symbol] unknown tag %s' % tag)
 
         # parser tree for Content MathML
         tag = gettag(xml)
@@ -574,11 +566,10 @@ class formula(object):
 
         elif tag == 'cn':			# number
             return sympy.sympify(xml.text)
-            # return float(xml.text)
 
         elif tag == 'ci':			# variable (symbol)
             if len(xml) > 0 and (gettag(xml[0]) == 'msub' or gettag(xml[0]) == 'msup'):	 # subscript or superscript
-                usym = parsePresentationMathMLSymbol(xml[0])
+                usym = parse_presentation_symbol(xml[0])
                 sym = sympy.Symbol(str(usym))
             else:
                 usym = unicode(xml.text)
@@ -596,25 +587,22 @@ class formula(object):
 
     sympy = property(make_sympy, None, None, 'sympy representation')
 
-    def GetContentMathML(self, asciimath, mathml):
+    def GetContentMathML(self, asciimath, mathml):  # pylint: disable=invalid-name
         """
         Handle requests to snuggletex API to convert the Ascii math to MathML
         """
-        # url = 'http://192.168.1.2:8080/snuggletex-webapp-1.2.2/ASCIIMathMLUpConversionDemo'
-        # url = 'http://127.0.0.1:8080/snuggletex-webapp-1.2.2/ASCIIMathMLUpConversionDemo'
         url = 'https://math-xserver.mitx.mit.edu/snuggletex-webapp-1.2.2/ASCIIMathMLUpConversionDemo'
 
-        if 1:
-            payload = {
-                'asciiMathInput': asciimath,
-                'asciiMathML': mathml,
-                #'asciiMathML':unicode(mathml).encode('utf-8'),
-            }
-            headers = {'User-Agent': "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13"}
-            request = requests.post(url, data=payload, headers=headers, verify=False)
-            request.encoding = 'utf-8'
-            ret = request.text
-            # print "encoding: ", request.encoding
+        payload = {
+            'asciiMathInput': asciimath,
+            'asciiMathML': mathml,
+        }
+        headers = {
+            'User-Agent': "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13"
+        }
+        request = requests.post(url, data=payload, headers=headers, verify=False)
+        request.encoding = 'utf-8'
+        ret = request.text
 
         mode = 0
         cmathml = []
@@ -629,153 +617,4 @@ class formula(object):
                 cmathml.append(k)
         cmathml = '\n'.join(cmathml[2:])
         cmathml = '<math xmlns="http://www.w3.org/1998/Math/MathML">\n' + unescape(cmathml) + '\n</math>'
-        # print cmathml
         return cmathml
-
-#-----------------------------------------------------------------------------
-
-
-def test1():
-    """Test XML strings - addition"""
-    xmlstr = """
-<math xmlns="http://www.w3.org/1998/Math/MathML">
-   <apply>
-      <plus/>
-      <cn>1</cn>
-      <cn>2</cn>
-   </apply>
-</math>
-    """
-    return formula(xmlstr)
-
-
-def test2():
-    """Test XML strings - addition, Greek alpha"""
-    xmlstr = u"""
-<math xmlns="http://www.w3.org/1998/Math/MathML">
-   <apply>
-      <plus/>
-      <cn>1</cn>
-      <apply>
-         <times/>
-         <cn>2</cn>
-     <ci>α</ci>
-      </apply>
-   </apply>
-</math>
-    """
-    return formula(xmlstr)
-
-
-def test3():
-    """Test XML strings - addition, Greek gamma"""
-    xmlstr = """
-<math xmlns="http://www.w3.org/1998/Math/MathML">
-   <apply>
-      <divide/>
-      <cn>1</cn>
-      <apply>
-         <plus/>
-         <cn>2</cn>
-         <ci>γ</ci>
-      </apply>
-   </apply>
-</math>
-    """
-    return formula(xmlstr)
-
-
-def test4():
-    """Test XML strings - addition, Greek alpha, mfrac"""
-    xmlstr = u"""
-<math xmlns="http://www.w3.org/1998/Math/MathML">
-  <mstyle displaystyle="true">
-    <mn>1</mn>
-    <mo>+</mo>
-    <mfrac>
-      <mn>2</mn>
-      <mi>α</mi>
-    </mfrac>
-  </mstyle>
-</math>
-"""
-    return formula(xmlstr)
-
-
-def test5():
-    """Test XML strings - sum of two matrices"""
-    xmlstr = u"""
-<math xmlns="http://www.w3.org/1998/Math/MathML">
-  <mstyle displaystyle="true">
-    <mrow>
-      <mi>cos</mi>
-      <mrow>
-        <mo>(</mo>
-        <mi>&#x3B8;</mi>
-        <mo>)</mo>
-      </mrow>
-    </mrow>
-    <mo>&#x22C5;</mo>
-    <mrow>
-      <mo>[</mo>
-      <mtable>
-        <mtr>
-          <mtd>
-            <mn>1</mn>
-          </mtd>
-          <mtd>
-            <mn>0</mn>
-          </mtd>
-        </mtr>
-        <mtr>
-          <mtd>
-            <mn>0</mn>
-          </mtd>
-          <mtd>
-            <mn>1</mn>
-          </mtd>
-        </mtr>
-      </mtable>
-      <mo>]</mo>
-    </mrow>
-    <mo>+</mo>
-    <mrow>
-      <mo>[</mo>
-      <mtable>
-        <mtr>
-          <mtd>
-            <mn>0</mn>
-          </mtd>
-          <mtd>
-            <mn>1</mn>
-          </mtd>
-        </mtr>
-        <mtr>
-          <mtd>
-            <mn>1</mn>
-          </mtd>
-          <mtd>
-            <mn>0</mn>
-          </mtd>
-        </mtr>
-      </mtable>
-      <mo>]</mo>
-    </mrow>
-  </mstyle>
-</math>
-"""
-    return formula(xmlstr)
-
-
-def test6():
-    """Test XML strings - imaginary numbers"""
-    xmlstr = u"""
-<math xmlns="http://www.w3.org/1998/Math/MathML">
-  <mstyle displaystyle="true">
-    <mn>1</mn>
-    <mo>+</mo>
-    <mi>i</mi>
-  </mstyle>
-</math>
-"""
-    return formula(xmlstr, options='imaginary')

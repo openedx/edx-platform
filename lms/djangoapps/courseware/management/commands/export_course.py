@@ -3,6 +3,14 @@ A Django command that exports a course to a tar.gz file.
 
 If <filename> is '-', it pipes the file to stdout
 
+NOTE: This used to be used by Analytics research exports to provide
+researchers with course content.  It is now DEPRECATED, and
+functionality has moved to export_olx.py in
+cms/djangoapps/contentstore/management/commands.
+
+Note: when removing this file, also remove references to it
+from test_dump_course.
+
 """
 
 import os
@@ -12,7 +20,7 @@ import tarfile
 from tempfile import mktemp, mkdtemp
 from textwrap import dedent
 
-from path import path
+from path import Path as path
 
 from django.core.management.base import BaseCommand, CommandError
 
@@ -37,7 +45,7 @@ class Command(BaseCommand):
 
         results = self._get_results(filename) if pipe_results else None
 
-        return results
+        self.stdout.write(results, ending="")
 
     def _parse_arguments(self, args):
         """Parse command line arguments"""

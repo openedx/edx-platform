@@ -14,10 +14,9 @@
 
 define(
 'video/01_initialize.js',
-['video/03_video_player.js', 'video/00_i18n.js'],
-function (VideoPlayer, i18n) {
-    var moment = window.moment;
-
+['video/03_video_player.js', 'video/00_i18n.js', 'moment'],
+function (VideoPlayer, i18n, moment) {
+    var moment = moment || window.moment;
     /**
      * @function
      *
@@ -133,7 +132,6 @@ function (VideoPlayer, i18n) {
 
             onYTApiReady = function () {
                 console.log('[Video info]: YouTube API is available and is loaded.');
-
                 if (state.htmlPlayerLoaded) { return; }
 
                 console.log('[Video info]: Starting YouTube player.');
@@ -141,7 +139,6 @@ function (VideoPlayer, i18n) {
 
                 state.modules.push(video);
                 state.__dfd__.resolve();
-
                 state.youtubeApiAvailable = true;
             };
 
@@ -212,7 +209,6 @@ function (VideoPlayer, i18n) {
 
     function _waitForYoutubeApi(state) {
         console.log('[Video info]: Starting to wait for YouTube API to load.');
-
         window.setTimeout(function () {
             // If YouTube API will load OK, it will run `onYouTubeIframeAPIReady`
             // callback, which will set `state.youtubeApiAvailable` to `true`.
@@ -294,10 +290,10 @@ function (VideoPlayer, i18n) {
             _hideWaitPlaceholder(state);
             state.el
                 .find('.video-player div')
-                    .addClass('hidden')
-                .end()
-                .find('.video-player h3')
-                    .removeClass('hidden');
+                    .addClass('hidden');
+            state.el
+                .find('.video-player .video-error')
+                    .removeClass('is-hidden');
 
             return false;
         }
@@ -498,8 +494,8 @@ function (VideoPlayer, i18n) {
 
             this.el.find('.video-player div')
                 .removeClass('hidden');
-            this.el.find('.video-player h3')
-                .addClass('hidden');
+            this.el.find('.video-player .video-error')
+                .addClass('is-hidden');
 
             // If in reality the timeout was to short, try to
             // continue loading the YouTube video anyways.
@@ -511,7 +507,7 @@ function (VideoPlayer, i18n) {
 
             // In-browser HTML5 player does not support quality
             // control.
-            this.el.find('a.quality_control').hide();
+            this.el.find('.quality_control').hide();
             _renderElements(this);
         }
     }
@@ -596,7 +592,11 @@ function (VideoPlayer, i18n) {
                     '[Video info]: YouTube returned an error for ' +
                     'video with id "' + self.id + '".'
                 );
-                self.loadHtmlPlayer();
+                // If the video is already loaded in `_waitForYoutubeApi` by the
+                // time we get here, then we shouldn't load it again.
+                if (!self.htmlPlayerLoaded) {
+                    self.loadHtmlPlayer();
+                }
             });
 
             window.Video.loadYouTubeIFrameAPI(scriptTag);

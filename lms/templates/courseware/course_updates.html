@@ -1,0 +1,51 @@
+<%! from django.utils.translation import ugettext as _ %>
+<section aria-labelledby="course-updates-heading">
+    <h2 class="hd hd-2 sr" id="course-updates-heading">${_('All course updates')}</h2>
+<div class="recent-updates">
+  % for index, update in enumerate(visible_updates):
+    <article class="updates-article">
+      % if not update.get("is_error"):
+        <h2 class="date" id="msg-date-${index}">${update.get("date")}</h2>
+        <button
+            class="toggle-visibility-button"
+            data-hide="${_('Hide')}"
+            data-show="${_('Show')}"
+            aria-describedby="msg-date-${index}"
+            aria-controls="msg-content-${index}"
+            aria-expanded="true"
+        ></button>
+      % endif
+      <div class="toggle-visibility-element article-content ${'hidden' if index >= 1 else ''}" id="msg-content-${index}">
+        ${update.get("content")}
+      </div>
+    </article>
+  % endfor
+</div>
+
+% if len(hidden_updates) > 0:
+<button
+    class="toggle-visibility-button show-older-updates"
+    data-hide=""
+    data-show="${_('Show Earlier Course Updates')}"
+    aria-expanded="false"
+    aria-controls="old-updates"
+></button>
+% endif
+
+<div class="old-updates hidden toggle-visibility-element" id="old-updates">
+  % for index, update in enumerate(hidden_updates):
+    <article class="updates-article">
+      <h2 class="date" id="msg-date-${index + len(visible_updates)}">${update.get("date")}</h2>
+      <button
+          class="toggle-visibility-button"
+          data-hide="${_('Hide')}"
+          data-show="${_('Show')}"
+          aria-describedby="msg-date-${index + len(visible_updates)}"
+          aria-controls="msg-content-${index + len(visible_updates)}"
+          aria-expanded="false"
+      ></button>
+      <div class="toggle-visibility-element article-content hidden" id="msg-content-${index + len(visible_updates)}">${update.get("content")}</div>
+    </article>
+  % endfor
+</div>
+</section>

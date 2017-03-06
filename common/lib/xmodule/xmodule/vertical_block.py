@@ -24,10 +24,15 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
     """
     Layout XBlock for rendering subblocks vertically.
     """
+
+    resources_dir = 'assets/vertical'
+
     mako_template = 'widgets/sequence-edit.html'
     js_module_name = "VerticalBlock"
 
     has_children = True
+
+    show_in_read_only_mode = True
 
     def student_view(self, context):
         """
@@ -52,7 +57,14 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
         fragment.add_content(self.system.render_template('vert_module.html', {
             'items': contents,
             'xblock_context': context,
+            'show_bookmark_button': True,
+            'bookmarked': child_context['bookmarked'],
+            'bookmark_id': "{},{}".format(child_context['username'], unicode(self.location))
         }))
+
+        fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/vertical_student_view.js'))
+        fragment.initialize_js('VerticalStudentView')
+
         return fragment
 
     def author_view(self, context):
@@ -75,7 +87,7 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
         Returns the progress on this block and all children.
         """
         # TODO: Cache progress or children array?
-        children = self.get_children()  # pylint: disable=no-member
+        children = self.get_children()
         progresses = [child.get_progress() for child in children]
         progress = reduce(Progress.add_counts, progresses, None)
         return progress
@@ -84,7 +96,7 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
         """
         Returns the highest priority icon class.
         """
-        child_classes = set(child.get_icon_class() for child in self.get_children())  # pylint: disable=no-member
+        child_classes = set(child.get_icon_class() for child in self.get_children())
         new_class = 'other'
         for higher_class in CLASS_PRIORITY:
             if higher_class in child_classes:
@@ -96,7 +108,7 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
         children = []
         for child in xml_object:
             try:
-                child_block = system.process_xml(etree.tostring(child, encoding='unicode'))  # pylint: disable=no-member
+                child_block = system.process_xml(etree.tostring(child, encoding='unicode'))
                 children.append(child_block.scope_ids.usage_id)
             except Exception as exc:  # pylint: disable=broad-except
                 log.exception("Unable to load child when parsing Vertical. Continuing...")
@@ -106,8 +118,8 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
         return {}, children
 
     def definition_to_xml(self, resource_fs):
-        xml_object = etree.Element('vertical')  # pylint: disable=no-member
-        for child in self.get_children():  # pylint: disable=no-member
+        xml_object = etree.Element('vertical')
+        for child in self.get_children():
             self.runtime.add_block_as_child_node(child, xml_object)
         return xml_object
 

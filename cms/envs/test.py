@@ -20,9 +20,10 @@ sessions. Assumes structure:
 
 from .common import *
 import os
-from path import path
+from path import Path as path
 from warnings import filterwarnings, simplefilter
 from uuid import uuid4
+from util.db import NoOpMigrationModules
 
 # import settings from LMS for consistent behavior with CMS
 # pylint: disable=unused-import
@@ -33,9 +34,7 @@ from lms.envs.test import (
     DEFAULT_FILE_STORAGE,
     MEDIA_ROOT,
     MEDIA_URL,
-    # This is practically unused but needed by the oauth2_provider package, which
-    # some tests in common/ rely on.
-    OAUTH_OIDC_ISSUER,
+    COMPREHENSIVE_THEME_DIRS,
 )
 
 # mongo connection settings
@@ -45,7 +44,7 @@ MONGO_HOST = os.environ.get('EDXAPP_TEST_MONGO_HOST', 'localhost')
 THIS_UUID = uuid4().hex[:5]
 
 # Nose Test Runner
-TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+TEST_RUNNER = 'openedx.core.djangolib.nose.NoseTestSuiteRunner'
 
 _SYSTEM = 'cms'
 
@@ -56,7 +55,10 @@ _NOSEID_DIR.makedirs_p()
 
 NOSE_ARGS = [
     '--id-file', _NOSEID_DIR / 'noseids',
-    '--xunit-file', _REPORT_DIR / 'nosetests.xml',
+]
+
+NOSE_PLUGINS = [
+    'openedx.core.djangolib.testing.utils.NoseDatabaseIsolation'
 ]
 
 TEST_ROOT = path('test_root')
@@ -92,10 +94,6 @@ STATICFILES_DIRS += [
 # http://stackoverflow.com/questions/12816941/unit-testing-with-django-pipeline
 STATICFILES_STORAGE = 'pipeline.storage.NonPackagingPipelineStorage'
 STATIC_URL = "/static/"
-PIPELINE_ENABLED = False
-
-TENDER_DOMAIN = "help.edge.edx.org"
-TENDER_SUBDOMAIN = "edxedge"
 
 # Update module store settings per defaults for tests
 update_module_store_settings(
@@ -132,11 +130,18 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': TEST_ROOT / "db" / "cms.db",
+        'ATOMIC_REQUESTS': True,
     },
 }
 
+if os.environ.get('DISABLE_MIGRATIONS'):
+    # Create tables directly from apps' models. This can be removed once we upgrade
+    # to Django 1.9, which allows setting MIGRATION_MODULES to None in order to skip migrations.
+    MIGRATION_MODULES = NoOpMigrationModules()
+
 LMS_BASE = "localhost:8000"
-FEATURES['PREVIEW_LMS_BASE'] = "preview"
+FEATURES['PREVIEW_LMS_BASE'] = "preview.localhost"
+
 
 CACHES = {
     # This is the cache used for most things. Askbot will not work without a
@@ -175,22 +180,6 @@ CACHES = {
     },
 }
 
-# Add external_auth to Installed apps for testing
-INSTALLED_APPS += ('external_auth', )
-
-# Add milestones to Installed apps for testing
-INSTALLED_APPS += ('milestones', 'openedx.core.djangoapps.call_stack_manager')
-
-# Add edx_solutions_projects, edx_solutions_organizations,'edx_solutions_api_integration', 'progress', 'gradebook'
-# to Installed apps for testing
-INSTALLED_APPS += (
-    'edx_solutions_projects',
-    'edx_solutions_organizations',
-    'edx_solutions_api_integration',
-    'progress',
-    'gradebook',
-)
-
 # hide ratelimit warnings while running tests
 filterwarnings('ignore', message='No request passed to the backend, unable to rate-limit')
 
@@ -223,8 +212,8 @@ PASSWORD_HASHERS = (
     'django.contrib.auth.hashers.MD5PasswordHasher',
 )
 
-# dummy segment-io key
-SEGMENT_IO_KEY = '***REMOVED***'
+# No segment key
+CMS_SEGMENT_KEY = None
 
 FEATURES['ENABLE_SERVICE_STATUS'] = True
 
@@ -232,32 +221,72 @@ FEATURES['ENABLE_SERVICE_STATUS'] = True
 FEATURES['EMBARGO'] = True
 
 # set up some testing for microsites
+FEATURES['USE_MICROSITES'] = True
+MICROSITE_ROOT_DIR = COMMON_ROOT / 'test' / 'test_sites'
 MICROSITE_CONFIGURATION = {
-    "test_microsite": {
-        "domain_prefix": "testmicrosite",
-        "university": "test_microsite",
-        "platform_name": "Test Microsite",
-        "logo_image_url": "test_microsite/images/header-logo.png",
-        "email_from_address": "test_microsite@edx.org",
-        "payment_support_email": "test_microsite@edx.org",
+    "test_site": {
+        "domain_prefix": "test-site",
+        "university": "test_site",
+        "platform_name": "Test Site",
+        "logo_image_url": "test_site/images/header-logo.png",
+        "email_from_address": "test_site@edx.org",
+        "payment_support_email": "test_site@edx.org",
         "ENABLE_MKTG_SITE": False,
-        "SITE_NAME": "test_microsite.localhost",
-        "course_org_filter": "TestMicrositeX",
+        "SITE_NAME": "test_site.localhost",
+        "course_org_filter": "TestSiteX",
         "course_about_show_social_links": False,
-        "css_overrides_file": "test_microsite/css/test_microsite.css",
+        "css_overrides_file": "test_site/css/test_site.css",
         "show_partners": False,
         "show_homepage_promo_video": False,
-        "course_index_overlay_text": "This is a Test Microsite Overlay Text.",
-        "course_index_overlay_logo_file": "test_microsite/images/header-logo.png",
-        "homepage_overlay_html": "<h1>This is a Test Microsite Overlay HTML</h1>"
+        "course_index_overlay_text": "This is a Test Site Overlay Text.",
+        "course_index_overlay_logo_file": "test_site/images/header-logo.png",
+        "homepage_overlay_html": "<h1>This is a Test Site Overlay HTML</h1>",
+        "ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER": False,
+        "COURSE_CATALOG_VISIBILITY_PERMISSION": "see_in_catalog",
+        "COURSE_ABOUT_VISIBILITY_PERMISSION": "see_about_page",
+        "ENABLE_SHOPPING_CART": True,
+        "ENABLE_PAID_COURSE_REGISTRATION": True,
+        "SESSION_COOKIE_DOMAIN": "test_site.localhost",
+        "urls": {
+            'ABOUT': 'test-site/about',
+            'PRIVACY': 'test-site/privacy',
+            'TOS_AND_HONOR': 'test-site/tos-and-honor',
+        },
+    },
+    "site_with_logistration": {
+        "domain_prefix": "logistration",
+        "university": "logistration",
+        "platform_name": "Test logistration",
+        "logo_image_url": "test_site/images/header-logo.png",
+        "email_from_address": "test_site@edx.org",
+        "payment_support_email": "test_site@edx.org",
+        "ENABLE_MKTG_SITE": False,
+        "ENABLE_COMBINED_LOGIN_REGISTRATION": True,
+        "SITE_NAME": "test_site.localhost",
+        "course_org_filter": "LogistrationX",
+        "course_about_show_social_links": False,
+        "css_overrides_file": "test_site/css/test_site.css",
+        "show_partners": False,
+        "show_homepage_promo_video": False,
+        "course_index_overlay_text": "Logistration.",
+        "course_index_overlay_logo_file": "test_site/images/header-logo.png",
+        "homepage_overlay_html": "<h1>This is a Logistration HTML</h1>",
+        "ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER": False,
+        "COURSE_CATALOG_VISIBILITY_PERMISSION": "see_in_catalog",
+        "COURSE_ABOUT_VISIBILITY_PERMISSION": "see_about_page",
+        "ENABLE_SHOPPING_CART": True,
+        "ENABLE_PAID_COURSE_REGISTRATION": True,
+        "SESSION_COOKIE_DOMAIN": "test_logistration.localhost",
     },
     "default": {
         "university": "default_university",
         "domain_prefix": "www",
     }
 }
-MICROSITE_ROOT_DIR = COMMON_ROOT / 'test' / 'test_microsites'
-FEATURES['USE_MICROSITES'] = True
+MICROSITE_TEST_HOSTNAME = 'test-site.testserver'
+MICROSITE_LOGISTRATION_HOSTNAME = 'logistration.testserver'
+
+TEST_THEME = COMMON_ROOT / "test" / "test-theme"
 
 # For consistency in user-experience, keep the value of this setting in sync with
 # the one in lms/envs/test.py
@@ -294,6 +323,28 @@ FEATURES['ENABLE_TEAMS'] = True
 # Dummy secret key for dev/test
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
-# Test mode. Used to let code that might otherwise affect global state know that it shouldn't
-# (such as management commands.)
+######### custom courses #########
+INSTALLED_APPS += ('openedx.core.djangoapps.ccxcon',)
+FEATURES['CUSTOM_COURSES_EDX'] = True
+
+# API access management -- needed for simple-history to run.
+INSTALLED_APPS += ('openedx.core.djangoapps.api_admin',)
+
+# Set the default Oauth2 Provider Model so that migrations can run in
+# verbose mode
+OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth2_provider.Application'
+
+##### edx solutions apps for McKA #####
+EDX_API_KEY = 'test_api_key'
 TEST_MODE = True
+if FEATURES.get('EDX_SOLUTIONS_API'):
+    INSTALLED_APPS += (
+        'course_metadata',
+        'edx_solutions_api_integration',
+        'social_engagement',
+        'gradebook',
+        'progress',
+        'edx_solutions_projects',
+        'edx_solutions_organizations',
+    )
+FEATURES['DISABLE_SOLUTIONS_APPS_SIGNALS'] = True

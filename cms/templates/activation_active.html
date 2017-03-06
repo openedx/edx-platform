@@ -1,3 +1,4 @@
+<%page expression_filter="h"/>
 <%! from django.utils.translation import ugettext as _ %>
 <%inherit file="base.html" />
 
@@ -26,7 +27,7 @@
       <ul class="list-actions">
         <li class="action-item">
           <a href="/signin" class="action-primary action-signin">
-            ${_("Sign into {studio_name}").format(platform_name=settings.STUDIO_SHORT_NAME)}
+            ${_("Sign into {studio_name}").format(studio_name=settings.STUDIO_SHORT_NAME)}
           </a>
         </li>
       </ul>

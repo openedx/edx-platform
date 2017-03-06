@@ -51,6 +51,20 @@
   text-align: center;
 }
 
+// Below divider rules are moved here from _instructor_2.scss
+// UI: visual dividers
+.divider-lv0 {
+  border-top: ($baseline/5) solid $gray-l4;
+}
+
+.divider-lv1 {
+  border-top: ($baseline/10) solid $gray-l4;
+}
+
+.divider-lv2 {
+  border-top: ($baseline/20) solid $gray-l4;
+}
+
 // for verify_student/make_payment_step.underscore
 .payment-buttons {
 
@@ -75,149 +89,200 @@
 }
 
 // teams temporary
+
+//efischer; scratch space for teams instructor tools
 .view-teams {
-  .global-new, #global-navigation {
-    display: none;
-  }
-
-  // Copied from _pagination.scss in cms
-  .pagination {
+  .wrapper-msg {
     @include clearfix();
-    display: inline-block;
-    width: flex-grid(3, 12);
+    max-width: grid-width(12);
+    margin: 0 auto;
+    border-top: 3px solid $orange;
 
-    &.pagination-compact {
-      @include text-align(right);
+    .left-floater {
+      @include float(left);
+      text-transform: uppercase;
+      font-weight: $font-semibold;
+      color: $white;
+      line-height: $body-line-height;
     }
 
-    &.pagination-full {
-      display: block;
-      width: flex-grid(4, 12);
-      margin: $baseline auto;
-    }
+    .right-floater {
+      @include float(right);
+      line-height: $body-line-height;
 
-    .nav-item {
-      position: relative;
-      display: inline-block;
-      vertical-align: middle;
-    }
-
-    .nav-link {
-      @include transition(all $tmg-f2 ease-in-out 0s);
-      display: block;
-      border: 0;
-      background-image: none;
-      background-color: transparent;
-      padding: ($baseline/2) ($baseline*0.75);
-
-      &.previous {
-        margin-right: ($baseline/2);
-      }
-
-      &.next {
-        margin-left: ($baseline/2);
-      }
-
-      &:hover {
-        background-color: $blue;
-        border-radius: 3px;
-        color: $white;
-      }
-
-      &.is-disabled {
-        background-color: transparent;
-        color: $gray-l2;
-        pointer-events: none;
-      }
-    }
-
-    .nav-label {
-      /* This wasn't working for me, so I directly copied the rule
-      @extend %cont-text-sr; */
-      border: 0;
-      clip: rect(0 0 0 0);
-      height: 1px;
-      margin: -1px;
-      overflow: hidden;
-      padding: 0;
-      position: absolute;
-      width: 1px;
-    }
-
-    .pagination-form,
-    .current-page,
-    .page-divider,
-    .total-pages {
-      display: inline-block;
-    }
-
-    .current-page,
-    .page-number-input,
-    .total-pages {
-      @extend %t-copy-base;
-      @extend %t-strong;
-      width: ($baseline*2.5);
-      vertical-align: middle;
-      margin: 0 ($baseline*0.75);
-      padding: ($baseline/4);
-      text-align: center;
-      color: $gray;
-    }
-
-    .current-page {
-      @extend %ui-depth1;
-      position: absolute;
-      @include left(-($baseline/4));
-    }
-
-    .page-divider {
-      @extend %t-title4;
-      @extend %t-regular;
-      vertical-align: middle;
-      color: $gray-l2;
-    }
-
-    .pagination-form {
-      @extend %ui-depth2;
-      position: relative;
-
-      .page-number-label,
-      .submit-pagination-form {
-        /* This wasn't working for me, so I directly copied the rule
-        @extend %cont-text-sr; */
-        border: 0;
-        clip: rect(0 0 0 0);
-        height: 1px;
-        margin: -1px;
-        overflow: hidden;
-        padding: 0;
-        position: absolute;
-        width: 1px;
-      }
-
-      .page-number-input {
-        @include transition(all $tmg-f2 ease-in-out 0s);
+      button {
+        background: transparent;
         border: 1px solid transparent;
-        border-bottom: 1px dotted $gray-l2;
-        border-radius: 0;
-        box-shadow: none;
-        background: none;
+        color: $white;
+        box-shadow: 0 0 0 0;
+        font-weight: $font-regular;
+        text-shadow: 0 0;
 
         &:hover {
-          background-color: $white;
-          opacity: 0.6;
+          color: $orange;
+          background: transparent;
+          border: 1px solid $orange;
+          box-shadow: 0 0 0 0;
         }
 
         &:focus {
-          // borrowing the base input focus styles to match overall app
-          @include linear-gradient($paleYellow, tint($paleYellow, 90%));
-          opacity: 1.0;
-          box-shadow: 0 0 3px $shadow-d1 inset;
-          background-color: $white;
-          border: 1px solid transparent;
-          border-radius: 3px;
+         box-shadow: 0 0 0 0;
         }
       }
+    }
+  }
+
+  .members-info {
+    margin: 0;
+    padding: 0;
+    li {
+      display: inline;
+    }
+  }
+
+  .edit-members {
+    @extend %ui-no-list;
+
+    .team-member {
+      line-height: $body-line-height;
+      padding: 10px;
+    }
+
+    .member-info-container {
+      display: inline-block;
+      vertical-align: middle;
+      @include margin-left($baseline/2);
+
+      .primary {
+        font-size: 120%;
+      }
+
+      .secondary {
+        color: $lighter-base-font-color;
+        font-size: 80%;
+        display: block;
+      }
+    }
+
+    .member-profile {
+      img {
+        border: 1px solid $gray;
+      }
+    }
+
+    .action-remove-member {
+      color: $blue;
+      background: transparent;
+      border: 1px solid transparent;
+      font: inherit;
+    }
+  }
+  //end instructor tools scratch space
+
+  //efischer TNL-3226
+  .search-field::-ms-clear {
+    width: 0;
+    height: 0;
+  }
+}
+
+//efischer - TNL-3189
+//copied from cms/static/sass/elements/_system-feedback.scss#L106
+//along with some "hide the inherited value, we want none" action
+.prompt.warning button {
+  @extend %btn-no-style;
+  box-shadow: none;
+  text-shadow: none;
+
+  &:hover {
+    color: $orange-s2;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  &:focus {
+    box-shadow: none;
+    border: 0;
+  }
+}
+
+//efischer - TNL-3189
+//copied from cms/static/sass/elements/_system-feedback.scss#L106
+//along with some "hide the inherited value, we want none" action
+.prompt.warning button {
+  @extend %btn-no-style;
+  box-shadow: none;
+  text-shadow: none;
+
+  &:hover {
+    color: $orange-s2;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  &:focus {
+    box-shadow: none;
+    border: 0;
+  }
+}
+
+// pfogg - ECOM-2604
+// styling for date summary blocks on the course info page
+.date-summary-container {
+  .date-summary {
+    @include clearfix;
+    padding: 10px;
+    @include border-left(3px solid $gray-l3);
+
+    .heading {
+      @extend %t-title7;
+      color: $gray-d2;
+    }
+
+    .description {
+      margin-top: $baseline/2;
+      margin-bottom: $baseline/2;
+      display: inline-block;
+      color: $gray-d1;
+      @extend %t-title8;
+    }
+
+    .date-summary-link {
+      @extend %t-title8;
+      font-weight: $font-semibold;
+      a {
+        color: $link-color;
+        font-weight: normal;
+      }
+    }
+
+    .date {
+      color: $gray-d1;
+      @extend %t-title9;
+    }
+
+    &-todays-date {
+      @include border-left(3px solid $blue);
+
+      .heading {
+        @extend %t-title8;
+      }
+    }
+
+    &-verified-upgrade-deadline {
+      @include border-left(3px solid $green);
+    }
+
+    &-verification-deadline-passed {
+      @include border-left(3px solid $red);
+    }
+
+    &-verification-deadline-retry {
+      @include border-left(3px solid $red);
+    }
+
+    &-verification-deadline-upcoming {
+      @include border-left(3px solid $orange);
     }
   }
 }

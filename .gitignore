@@ -38,10 +38,10 @@ codekit-config.json
 !django.mo
 !djangojs.po
 !djangojs.mo
-conf/locale/en/LC_MESSAGES/*.po
 conf/locale/en/LC_MESSAGES/*.mo
 conf/locale/fake*/LC_MESSAGES/*.po
 conf/locale/fake*/LC_MESSAGES/*.mo
+# this was a mistake in i18n_tools, now fixed.
 conf/locale/messages.mo
 
 ### Testing artifacts
@@ -58,6 +58,7 @@ jscover.log
 jscover.log.*
 .tddium*
 common/test/data/test_unicode/static/
+test_root/courses/
 django-pyfs
 
 ### Installation artifacts
@@ -66,7 +67,6 @@ django-pyfs
 .prereqs_cache
 .vagrant/
 node_modules
-.bundle/
 bin/
 
 ### Static assets pipeline artifacts
@@ -74,15 +74,18 @@ bin/
 lms/static/css/
 lms/static/certificates/css/
 cms/static/css/
+common/static/common/js/vendor/
 
 ### Styling generated from templates
-lms/static/sass/lms-main.scss
-lms/static/sass/lms-main-rtl.scss
-lms/static/sass/lms-course.scss
-lms/static/sass/lms-course-rtl.scss
-lms/static/sass/lms-footer.scss
-lms/static/sass/lms-footer-rtl.scss
-
+lms/static/sass/*.css
+lms/static/sass/*.css.map
+lms/static/certificates/sass/*.css
+lms/static/themed_sass/
+cms/static/css/
+cms/static/sass/*.css
+cms/static/sass/*.css.map
+cms/static/themed_sass/
+themes/**/css/*.css
 
 ### Logging artifacts
 log/

@@ -3,29 +3,21 @@
 
 define(['jquery'], function($) { // jshint ignore:line
     'use strict';
-    return function (that) {
-        that.addMatchers({
-
-            toContainText: function (text) {
-                // Assert the value being tested has text which matches the provided text
-                var trimmedText = $.trim($(this.actual).text());
-                if (text && $.isFunction(text.test)) {
-                    return text.test(trimmedText);
-                } else {
-                    return trimmedText.indexOf(text) !== -1;
-                }
-            },
-
-            toBeCorrectValuesInModel: function (values) {
+    return function () {
+        jasmine.addMatchers({
+            toBeCorrectValuesInModel: function () {
                 // Assert the value being tested has key values which match the provided values
-                return _.every(values, function (value, key) {
-                    return this.actual.get(key) === value;
-                }.bind(this));
-            },
+                return {
+                    compare: function (actual, values) {
+                        var passed = _.every(values, function (value, key) {
+                            return actual.get(key) === value;
+                        }.bind(this));
 
-            toBeInstanceOf: function(expected) {
-                // Assert the type of the value being tested matches the provided type
-                return this.actual instanceof expected;
+                        return {
+                            pass: passed
+                        };
+                    }
+                };
             }
         });
     };

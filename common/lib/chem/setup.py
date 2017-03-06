@@ -5,9 +5,9 @@ setup(
     version="0.1.1",
     packages=["chem"],
     install_requires=[
-        "pyparsing==2.0.1",
+        "pyparsing==2.0.7",
         "numpy",
         "scipy",
-        "nltk==2.0.5",
+        "nltk<3.0",
     ],
 )

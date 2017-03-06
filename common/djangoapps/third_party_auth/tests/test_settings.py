@@ -13,18 +13,23 @@ _SETTINGS_MAP = {
     'AUTHENTICATION_BACKENDS': _ORIGINAL_AUTHENTICATION_BACKENDS,
     'INSTALLED_APPS': _ORIGINAL_INSTALLED_APPS,
     'MIDDLEWARE_CLASSES': _ORIGINAL_MIDDLEWARE_CLASSES,
-    'TEMPLATE_CONTEXT_PROCESSORS': _ORIGINAL_TEMPLATE_CONTEXT_PROCESSORS,
+    'TEMPLATES': [{
+        'OPTIONS': {
+            'context_processors': _ORIGINAL_TEMPLATE_CONTEXT_PROCESSORS
+        }
+    }],
     'FEATURES': {},
 }
+_SETTINGS_MAP['DEFAULT_TEMPLATE_ENGINE'] = _SETTINGS_MAP['TEMPLATES'][0]
 
 
 class SettingsUnitTest(testutil.TestCase):
     """Unit tests for settings management code."""
 
-    # Allow access to protected methods (or module-protected methods) under
-    # test. pylint: disable-msg=protected-access
+    # Allow access to protected methods (or module-protected methods) under test.
+    # pylint: disable=protected-access
     # Suppress sprurious no-member warning on fakes.
-    # pylint: disable-msg=no-member
+    # pylint: disable=no-member
 
     def setUp(self):
         super(SettingsUnitTest, self).setUp()
@@ -38,10 +43,6 @@ class SettingsUnitTest(testutil.TestCase):
     def test_apply_settings_adds_fields_stored_in_session(self):
         settings.apply_settings(self.settings)
         self.assertEqual(settings._FIELDS_STORED_IN_SESSION, self.settings.FIELDS_STORED_IN_SESSION)
-
-    def test_apply_settings_adds_third_party_auth_to_installed_apps(self):
-        settings.apply_settings(self.settings)
-        self.assertIn('third_party_auth', self.settings.INSTALLED_APPS)
 
     @unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, 'third_party_auth not enabled')
     def test_apply_settings_enables_no_providers_by_default(self):

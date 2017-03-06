@@ -1,0 +1,51 @@
+<h4 id="editor-dialog-title"><%- title %></h4>
+<div role="status" id="wmd-editor-dialog-form-errors" class="sr" tabindex="-1"></div>
+<div>
+    <form class="form">
+        <fieldset class="field-group">
+            <legend class="form-group-hd sr"><%- title %></legend>
+            <div class="field <%- uploadFieldClass %>">
+                <label id="new-url-input-label" for="new-url-input" class="field-label">
+                    <%- urlLabel %></label>
+                <input type="text" id="new-url-input" class="field-input input-text" aria-describedby="new-url-input-help">
+                <% if (imageUploadHandler) { %>
+                    <button id="file-upload-proxy" class="btn btn-primary btn-base form-btn">
+                        <%- chooseFileText %>
+                    </button>
+                    <input type="file" name="file-upload" id="file-upload" style="display:none;"/>
+                <% } %>
+                <div id="new-url-input-field-message" class="field-message has-error" style="display:none">
+                    <span class="field-message-content"><%- urlError %></span>
+                </div>
+                <div id="new-url-input-help" class="field-hint">
+                    <%- urlHelp %>
+                </div>
+            </div>
+            <div class="field">
+                <label for="new-url-desc-input" class="field-label"><%- urlDescLabel %></label>
+                <input type="text" id="new-url-desc-input" class="field-input input-text" required aria-describedby="new-url-desc-input-help">
+                <div id="new-url-desc-input-field-message" class="field-message has-error" style="display:none">
+                    <span class="field-message-content"><%- descError %></span>
+                </div>
+                <div id="new-url-desc-input-help" class="field-hint">
+                    <%- urlDescHelp %>
+                    <% if (urlDescHelpLink) { %>
+                        <a href="<%- urlDescHelpLink['href'] %>">
+                            <%- urlDescHelpLink['text'] %>
+                        </a>
+                    <% } %>
+                </div>
+            </div>
+            <div class="field"><% if (imageUploadHandler) { %>
+                <label for="img-is-decorative" class="field-label label-inline">
+                    <input type="checkbox" id="img-is-decorative" class="field-input input-checkbox">
+                    <span class="field-input-label"><%- imageIsDecorativeLabel %></span>
+                </label> <% }
+            %></div>
+        </fieldset>
+        <div class="form-actions">
+            <input type="button" id="new-link-image-ok" class="btn btn-primary btn-base form-btn" value="<%- okText %>" />
+            <input type="button" id="new-link-image-cancel" class="btn btn-primary btn-base form-btn" value="<%- cancelText %>" >
+        </div>
+    </form>
+</div>

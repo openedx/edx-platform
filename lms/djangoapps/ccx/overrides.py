@@ -5,13 +5,15 @@ by the individual custom courses feature.
 import json
 import logging
 
-from django.db import transaction, IntegrityError
+from django.db import transaction
 
-from courseware.field_overrides import FieldOverrideProvider  # pylint: disable=import-error
+import request_cache
+
+from courseware.field_overrides import FieldOverrideProvider
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from ccx_keys.locator import CCXLocator, CCXBlockUsageLocator
 
-from .models import CcxFieldOverride, CustomCourseForEdX
+from lms.djangoapps.ccx.models import CcxFieldOverride, CustomCourseForEdX
 
 
 log = logging.getLogger(__name__)
@@ -48,12 +50,11 @@ class CustomCoursesForEdxOverrideProvider(FieldOverrideProvider):
         return default
 
     @classmethod
-    def enabled_for(cls, course):
-        """CCX field overrides are enabled per-course
-
-        protect against missing attributes
+    def enabled_for(cls, block):
         """
-        return getattr(course, 'enable_ccx', False)
+        CCX field overrides are enabled for CCX blocks.
+        """
+        return getattr(block.location, 'ccx', None) or getattr(block, 'enable_ccx', False)
 
 
 def get_current_ccx(course_key):
@@ -69,7 +70,11 @@ def get_current_ccx(course_key):
     if not isinstance(course_key, CCXLocator):
         return None
 
-    return CustomCourseForEdX.objects.get(pk=course_key.ccx)
+    ccx_cache = request_cache.get_cache('ccx')
+    if course_key not in ccx_cache:
+        ccx_cache[course_key] = CustomCourseForEdX.objects.get(pk=course_key.ccx)
+
+    return ccx_cache[course_key]
 
 
 def get_override_for_ccx(ccx, block, name, default=None):
@@ -78,38 +83,60 @@ def get_override_for_ccx(ccx, block, name, default=None):
     specify the block and the name of the field.  If the field is not
     overridden for the given ccx, returns `default`.
     """
-    if not hasattr(block, '_ccx_overrides'):
-        block._ccx_overrides = {}  # pylint: disable=protected-access
-    overrides = block._ccx_overrides.get(ccx.id)  # pylint: disable=protected-access
-    if overrides is None:
-        overrides = _get_overrides_for_ccx(ccx, block)
-        block._ccx_overrides[ccx.id] = overrides  # pylint: disable=protected-access
-    return overrides.get(name, default)
+    overrides = _get_overrides_for_ccx(ccx)
+
+    clean_ccx_key = _clean_ccx_key(block.location)
+
+    block_overrides = overrides.get(clean_ccx_key, {})
+    if name in block_overrides:
+        try:
+            return block.fields[name].from_json(block_overrides[name])
+        except KeyError:
+            return block_overrides[name]
+    else:
+        return default
 
 
-def _get_overrides_for_ccx(ccx, block):
+def _clean_ccx_key(block_location):
+    """
+    Converts the given BlockUsageKey from a CCX key to the
+    corresponding key for its parent course, while handling the case
+    where no conversion is needed.  Also strips any version and
+    branch information from the key.
+    Returns the cleaned key.
+    """
+    if isinstance(block_location, CCXBlockUsageLocator):
+        clean_key = block_location.to_block_locator()
+    else:
+        clean_key = block_location
+    return clean_key.version_agnostic().for_branch(None)
+
+
+def _get_overrides_for_ccx(ccx):
     """
     Returns a dictionary mapping field name to overriden value for any
     overrides set on this block for this CCX.
     """
-    overrides = {}
-    # block as passed in may have a location specific to a CCX, we must strip
-    # that for this query
-    location = block.location
-    if isinstance(block.location, CCXBlockUsageLocator):
-        location = block.location.to_block_locator()
-    query = CcxFieldOverride.objects.filter(
-        ccx=ccx,
-        location=location
-    )
-    for override in query:
-        field = block.fields[override.field]
-        value = field.from_json(json.loads(override.value))
-        overrides[override.field] = value
-    return overrides
+    overrides_cache = request_cache.get_cache('ccx-overrides')
+
+    if ccx not in overrides_cache:
+        overrides = {}
+        query = CcxFieldOverride.objects.filter(
+            ccx=ccx,
+        )
+
+        for override in query:
+            block_overrides = overrides.setdefault(override.location, {})
+            block_overrides[override.field] = json.loads(override.value)
+            block_overrides[override.field + "_id"] = override.id
+            block_overrides[override.field + "_instance"] = override
+
+        overrides_cache[ccx] = overrides
+
+    return overrides_cache[ccx]
 
 
-@transaction.commit_on_success
+@transaction.atomic
 def override_field_for_ccx(ccx, block, name, value):
     """
     Overrides a field for the `ccx`.  `block` and `name` specify the block
@@ -117,23 +144,33 @@ def override_field_for_ccx(ccx, block, name, value):
     value to set for the given field.
     """
     field = block.fields[name]
-    value = json.dumps(field.to_json(value))
-    try:
-        override = CcxFieldOverride.objects.create(
+    value_json = field.to_json(value)
+    serialized_value = json.dumps(value_json)
+    override_has_changes = False
+    clean_ccx_key = _clean_ccx_key(block.location)
+
+    override = get_override_for_ccx(ccx, block, name + "_instance")
+    if override:
+        override_has_changes = serialized_value != override.value
+
+    if not override:
+        override, created = CcxFieldOverride.objects.get_or_create(
             ccx=ccx,
             location=block.location,
             field=name,
-            value=value)
-    except IntegrityError:
-        transaction.commit()
-        override = CcxFieldOverride.objects.get(
-            ccx=ccx,
-            location=block.location,
-            field=name)
-        override.value = value
-    override.save()
-    if hasattr(block, '_ccx_overrides'):
-        del block._ccx_overrides[ccx.id]  # pylint: disable=protected-access
+            defaults={'value': serialized_value},
+        )
+        if created:
+            _get_overrides_for_ccx(ccx).setdefault(clean_ccx_key, {})[name + "_id"] = override.id
+        else:
+            override_has_changes = serialized_value != override.value
+
+    if override_has_changes:
+        override.value = serialized_value
+        override.save()
+
+    _get_overrides_for_ccx(ccx).setdefault(clean_ccx_key, {})[name] = value_json
+    _get_overrides_for_ccx(ccx).setdefault(clean_ccx_key, {})[name + "_instance"] = override
 
 
 def clear_override_for_ccx(ccx, block, name):
@@ -149,8 +186,31 @@ def clear_override_for_ccx(ccx, block, name):
             location=block.location,
             field=name).delete()
 
-        if hasattr(block, '_ccx_overrides'):
-            del block._ccx_overrides[ccx.id]  # pylint: disable=protected-access
+        clear_ccx_field_info_from_ccx_map(ccx, block, name)
 
     except CcxFieldOverride.DoesNotExist:
         pass
+
+
+def clear_ccx_field_info_from_ccx_map(ccx, block, name):  # pylint: disable=invalid-name
+    """
+    Remove field information from ccx overrides mapping dictionary
+    """
+    try:
+        clean_ccx_key = _clean_ccx_key(block.location)
+        ccx_override_map = _get_overrides_for_ccx(ccx).setdefault(clean_ccx_key, {})
+        ccx_override_map.pop(name)
+        ccx_override_map.pop(name + "_id")
+        ccx_override_map.pop(name + "_instance")
+    except KeyError:
+        pass
+
+
+def bulk_delete_ccx_override_fields(ccx, ids):
+    """
+    Bulk delete for CcxFieldOverride model
+    """
+    ids = filter(None, ids)
+    ids = list(set(ids))
+    if ids:
+        CcxFieldOverride.objects.filter(ccx=ccx, id__in=ids).delete()

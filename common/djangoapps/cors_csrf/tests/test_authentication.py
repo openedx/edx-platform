@@ -6,7 +6,7 @@ from django.test.utils import override_settings
 from django.test.client import RequestFactory
 from django.conf import settings
 
-from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.exceptions import PermissionDenied
 
 from cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 
@@ -24,7 +24,7 @@ class CrossDomainAuthTest(TestCase):
 
     def test_perform_csrf_referer_check(self):
         request = self._fake_request()
-        with self.assertRaisesRegexp(AuthenticationFailed, 'CSRF'):
+        with self.assertRaisesRegexp(PermissionDenied, 'CSRF'):
             self.auth.enforce_csrf(request)
 
     @patch.dict(settings.FEATURES, {

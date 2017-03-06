@@ -3,7 +3,6 @@
 from datetime import datetime
 from pytz import UTC
 
-from xmodule.modulestore.django import SignalHandler
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.partitions.partitions import UserPartition, Group
@@ -11,15 +10,6 @@ from student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
-from openedx.core.djangoapps.content.course_structures.signals import (
-    listen_for_course_publish as listener_in_course_structures
-)
-from course_metadata.signals import (
-    listen_for_course_publish as listener_in_course_metadata
-)
-from openedx.core.djangoapps.content.course_overviews.signals import (
-    listen_for_course_publish as listener_in_course_overviews
-)
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 
 
@@ -179,13 +169,13 @@ class TestConditionalContent(ModuleStoreTestCase):
         UserCourseTagFactory(
             user=self.student_a,
             course_id=self.course.id,
-            key='xblock.partition_service.partition_{0}'.format(self.partition.id),  # pylint: disable=no-member
+            key='xblock.partition_service.partition_{0}'.format(self.partition.id),
             value=str(self.user_partition_group_a)
         )
         UserCourseTagFactory(
             user=self.student_b,
             course_id=self.course.id,
-            key='xblock.partition_service.partition_{0}'.format(self.partition.id),  # pylint: disable=no-member
+            key='xblock.partition_service.partition_{0}'.format(self.partition.id),
             value=str(self.user_partition_group_b)
         )
 
@@ -203,7 +193,7 @@ class TestConditionalContent(ModuleStoreTestCase):
             parent_location=problem_vertical.location,
             category='split_test',
             display_name='Split Test',
-            user_partition_id=self.partition.id,  # pylint: disable=no-member
+            user_partition_id=self.partition.id,
             group_id_to_child={str(index): url for index, url in enumerate([vertical_a_url, vertical_b_url])}
         )
         self.vertical_a = ItemFactory.create(
@@ -217,29 +207,4 @@ class TestConditionalContent(ModuleStoreTestCase):
             category='vertical',
             display_name='Group B problem container',
             location=vertical_b_url
-        )
-
-
-class SignalDisconnectTestMixin(object):
-    """
-    Mixin for tests to disable calls to signals.
-    """
-
-    def setUp(self):
-        super(SignalDisconnectTestMixin, self).setUp()
-        SignalDisconnectTestMixin.disconnect_course_published_signals()
-
-    @staticmethod
-    def disconnect_course_published_signals():
-        """
-        Disconnects receivers from course_published signals
-        """
-        SignalHandler.course_published.disconnect(
-            listener_in_course_structures, dispatch_uid='openedx.core.djangoapps.content.course_structures'
-        )
-        SignalHandler.course_published.disconnect(
-            listener_in_course_metadata, dispatch_uid='course_metadata'
-        )
-        SignalHandler.course_published.disconnect(
-            listener_in_course_overviews, dispatch_uid='openedx.core.djangoapps.content.course_overviews'
         )

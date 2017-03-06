@@ -184,9 +184,13 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor):
 
     module_class = ConditionalModule
 
+    resources_dir = None
+
     filename_extension = "xml"
 
     has_score = False
+
+    show_in_read_only_mode = True
 
     def __init__(self, *args, **kwargs):
         """

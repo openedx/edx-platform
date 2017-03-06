@@ -130,7 +130,7 @@
             }
           }
 
-          hgroup {
+          .heading-group {
             left: 0px;
             padding: 0px 10px;
             position: absolute;
@@ -243,7 +243,7 @@
       &:hover, &:focus {
         background: $course-profile-bg;
         border-color: $border-color-1;
-        box-shadow: 0 1px 16px 0 rgba($shadow-color, 0.4);
+        box-shadow: 0 1px 4px 0 rgba($shadow-color, 0.4);
 
         .info {
           top: -150px;

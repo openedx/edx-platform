@@ -5,6 +5,20 @@
             .title.center-col {
                 padding: 0 calc( ( 100% - 750px ) / 2 ) 10px;
             }
+            h2 {
+              font-size: 16px;
+              font-weight: 600;
+              text-transform: unset;
+              color: #4a4a4a;
+              margin-bottom: 40px;
+
+              .course-title {
+                display: block;
+                font-weight: 100;
+                font-size: 24px;
+                margin-top: 5px;
+              }
+            }
         }
 
         .instruction {
@@ -12,6 +26,28 @@
                 width: 750px;
                 margin-left: auto;
                 margin-right: auto;
+            }
+            .instruction-info {
+              font-size: 24px;
+              font-weight: 100;
+              color: #57595a;
+              margin-bottom: 30px;
+
+              .fa-envelope-o {
+                color: #b92167;
+                font-size: 26px;
+                margin-right: 8px;
+              }
+            }
+            .activate {
+              font-size: 16px;
+              font-weight: 600;
+              color: #4a4a4a;
+            }
+            .activate-info {
+              font-size: 16px;
+              font-weight: 100;
+              color: #4a4a4a;
             }
         }
 

@@ -49,11 +49,11 @@ class CertificatePage(PageObject):
         """
         returns add to LinkedIn profile button
         """
-        return self.q(css='a.action-linkedin-profile')
+        return self.q(css='button.action-linkedin-profile')
 
     @property
     def add_to_facebook_profile_button(self):
         """
         returns Facebook share button
         """
-        return self.q(css='a.action-share-facebook')
+        return self.q(css='button.action-share-facebook')

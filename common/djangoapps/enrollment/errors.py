@@ -13,10 +13,6 @@ class CourseEnrollmentError(Exception):
         self.data = data
 
 
-class CourseNotFoundError(CourseEnrollmentError):
-    pass
-
-
 class UserNotFoundError(CourseEnrollmentError):
     pass
 
@@ -49,4 +45,9 @@ class EnrollmentNotFoundError(CourseEnrollmentError):
 
 class EnrollmentApiLoadError(CourseEnrollmentError):
     """The data API could not be loaded."""
+    pass
+
+
+class InvalidEnrollmentAttribute(CourseEnrollmentError):
+    """Enrollment Attributes could not be validated"""
     pass

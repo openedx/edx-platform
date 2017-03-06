@@ -14,14 +14,19 @@ source =
 omit =
     cms/envs/*
     cms/manage.py
+    cms/djangoapps/contentstore/views/dev.py
     cms/djangoapps/*/migrations/*
     cms/djangoapps/*/features/*
+    lms/debug/*
     lms/envs/*
     lms/djangoapps/*/migrations/*
     lms/djangoapps/*/features/*
     common/djangoapps/terrain/*
     common/djangoapps/*/migrations/*
     openedx/core/djangoapps/*/migrations/*
+    openedx/core/djangoapps/debug/*
+
+concurrency=multiprocessing
 
 [report]
 ignore_errors = True

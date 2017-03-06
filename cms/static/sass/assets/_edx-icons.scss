@@ -1,0 +1,14 @@
+// common - assets - ux pattern library icons
+// ====================
+
+// +Base - Utilities
+// ====================
+@import 'variables';
+
+@font-face {
+    font-family: 'edx-icons';
+    src:
+        url('#{$static-path}/fonts/edx-icons/edx-icons.woff') format('woff'), // NOTE: woff2 format currently not supported by IcoMoon font output
+        url('#{$static-path}/fonts/edx-icons/edx-icons.ttf') format('truetype');
+    font-weight: 300;
+}

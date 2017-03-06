@@ -1,6 +1,6 @@
 <problem>
     <choiceresponse>
-      <checkboxgroup label="Select all the vegetables from the list" direction="vertical">
+      <checkboxgroup label="Select all the vegetables from the list">
         <choice correct="false">Banana
                    <choicehint selected="true">No, sorry, a banana is a fruit.
                    </choicehint>

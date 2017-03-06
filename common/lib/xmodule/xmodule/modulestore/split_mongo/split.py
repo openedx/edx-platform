@@ -60,18 +60,21 @@ import logging
 from contracts import contract, new_contract
 from importlib import import_module
 from mongodb_proxy import autoretry_read
-from path import path
+from path import Path as path
 from pytz import UTC
 from bson.objectid import ObjectId
 
 from xblock.core import XBlock
 from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
+from xmodule.course_module import CourseSummary
 from xmodule.errortracker import null_error_tracker
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import (
     BlockUsageLocator, DefinitionLocator, CourseLocator, LibraryLocator, VersionTree, LocalId,
 )
+from ccx_keys.locator import CCXLocator, CCXBlockUsageLocator
 from xmodule.modulestore.exceptions import InsufficientSpecificationError, VersionConflictError, DuplicateItemError, \
-    DuplicateCourseError
+    DuplicateCourseError, MultipleCourseBlocksFound
 from xmodule.modulestore import (
     inheritance, ModuleStoreWriteBase, ModuleStoreEnum,
     BulkOpsRecord, BulkOperationsMixin, SortedAssetList, BlockData
@@ -81,6 +84,7 @@ from ..exceptions import ItemNotFoundError
 from .caching_descriptor_system import CachingDescriptorSystem
 from xmodule.modulestore.split_mongo.mongo_connection import MongoConnection, DuplicateKeyError
 from xmodule.modulestore.split_mongo import BlockKey, CourseEnvelope
+from xmodule.modulestore.store_utilities import DETACHED_XBLOCK_TYPES
 from xmodule.error_module import ErrorDescriptor
 from collections import defaultdict
 from types import NoneType
@@ -312,7 +316,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
         if bulk_write_record.active:
             bulk_write_record.index = updated_index_entry
         else:
-            self.db_connection.update_course_index(updated_index_entry, course_key)
+            self.db_connection.update_course_index(updated_index_entry, course_context=course_key)
 
     def get_structure(self, course_key, version_guid):
         bulk_write_record = self._get_bulk_ops_record(course_key)
@@ -538,6 +542,17 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
 
         return indexes
 
+    def find_course_blocks_by_id(self, ids):
+        """
+        Find all structures that specified in `ids`. Filter the course blocks to only return whose
+        `block_type` is `course`
+
+        Arguments:
+            ids (list): A list of structure ids
+        """
+        ids = set(ids)
+        return self.db_connection.find_course_blocks_by_id(list(ids))
+
     def find_structures_by_id(self, ids):
         """
         Return all structures that specified in ``ids``.
@@ -648,7 +663,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         super(SplitMongoModuleStore, self).__init__(contentstore, **kwargs)
 
         self.db_connection = MongoConnection(**doc_store_config)
-        self.db = self.db_connection.database
 
         if default_class is not None:
             module_path, __, class_name = default_class.rpartition('.')
@@ -678,25 +692,30 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         Closes any open connections to the underlying databases
         """
-        self.db.connection.close()
+        self.db_connection.close_connections()
 
     def mongo_wire_version(self):
         """
         Returns the wire version for mongo. Only used to unit tests which instrument the connection.
         """
-        return self.db.connection.max_wire_version
+        return self.db_connection.mongo_wire_version
 
-    def _drop_database(self):
+    def _drop_database(self, database=True, collections=True, connections=True):
         """
         A destructive operation to drop the underlying database and close all connections.
         Intended to be used by test code for cleanup.
+
+        If database is True, then this should drop the entire database.
+        Otherwise, if collections is True, then this should drop all of the collections used
+        by this modulestore.
+        Otherwise, the modulestore should remove all data from the collections.
+
+        If connections is True, then close the connection to the database as well.
         """
         # drop the assets
-        super(SplitMongoModuleStore, self)._drop_database()
+        super(SplitMongoModuleStore, self)._drop_database(database, collections, connections)
 
-        connection = self.db.connection
-        connection.drop_database(self.db.name)
-        connection.close()
+        self.db_connection._drop_database(database, collections, connections)  # pylint: disable=protected-access
 
     def cache_items(self, system, base_block_ids, course_key, depth=0, lazy=True):
         """
@@ -848,15 +867,39 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         # add it in the envelope for the structure.
         return CourseEnvelope(course_key.replace(version_guid=version_guid), entry)
 
+    def _get_course_blocks_for_branch(self, branch, **kwargs):
+        """
+        Internal generator for fetching lists of courses without loading them.
+        """
+        version_guids, id_version_map = self.collect_ids_from_matching_indexes(branch, **kwargs)
+
+        if not version_guids:
+            return
+
+        for entry in self.find_course_blocks_by_id(version_guids):
+            for course_index in id_version_map[entry['_id']]:
+                yield entry, course_index
+
     def _get_structures_for_branch(self, branch, **kwargs):
         """
         Internal generator for fetching lists of courses, libraries, etc.
         """
+        version_guids, id_version_map = self.collect_ids_from_matching_indexes(branch, **kwargs)
 
-        # if we pass in a 'org' parameter that means to
-        # only get the course which match the passed in
-        # ORG
+        if not version_guids:
+            return
 
+        for entry in self.find_structures_by_id(version_guids):
+            for course_index in id_version_map[entry['_id']]:
+                yield entry, course_index
+
+    def collect_ids_from_matching_indexes(self, branch, **kwargs):
+        """
+        Find the course_indexes which have the specified branch. if `kwargs` contains `org`
+        to apply an ORG filter to return only the courses that are part of that ORG. Extract `version_guids`
+        from the course_indexes.
+
+        """
         matching_indexes = self.find_matching_course_indexes(
             branch,
             search_targets=None,
@@ -865,17 +908,12 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
         # collect ids and then query for those
         version_guids = []
-        id_version_map = {}
+        id_version_map = defaultdict(list)
         for course_index in matching_indexes:
             version_guid = course_index['versions'][branch]
             version_guids.append(version_guid)
-            id_version_map[version_guid] = course_index
-
-        if not version_guids:
-            return
-
-        for entry in self.find_structures_by_id(version_guids):
-            yield entry, id_version_map[entry['_id']]
+            id_version_map[version_guid].append(course_index)
+        return version_guids, id_version_map
 
     def _get_structures_for_branch_and_locator(self, branch, locator_factory, **kwargs):
 
@@ -931,6 +969,50 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         # get the blocks for each course index (s/b the root)
         return self._get_structures_for_branch_and_locator(branch, self._create_course_locator, **kwargs)
 
+    @autoretry_read()
+    def get_course_summaries(self, branch, **kwargs):
+        """
+        Returns a list of `CourseSummary` which matching any given qualifiers.
+
+        qualifiers should be a dict of keywords matching the db fields or any
+        legal query for mongo to use against the active_versions collection.
+
+        Note, this is to find the current head of the named branch type.
+        To get specific versions via guid use get_course.
+
+        :param branch: the branch for which to return courses.
+        """
+        def extract_course_summary(course):
+            """
+            Extract course information from the course block for split.
+            """
+            return {
+                field: course.fields[field]
+                for field in CourseSummary.course_info_fields
+                if field in course.fields
+            }
+
+        courses_summaries = []
+        for entry, structure_info in self._get_course_blocks_for_branch(branch, **kwargs):
+            course_locator = self._create_course_locator(structure_info, branch=None)
+            course_block = [
+                block_data
+                for block_key, block_data in entry['blocks'].items()
+                if block_key.type == "course"
+            ]
+            if not course_block:
+                raise ItemNotFoundError
+
+            if len(course_block) > 1:
+                raise MultipleCourseBlocksFound(
+                    "Expected 1 course block to be found in the course, but found {0}".format(len(course_block))
+                )
+            course_summary = extract_course_summary(course_block[0])
+            courses_summaries.append(
+                CourseSummary(course_locator, **course_summary)
+            )
+        return courses_summaries
+
     def get_libraries(self, branch="library", **kwargs):
         """
         Returns a list of "library" root blocks matching any given qualifiers.
@@ -947,6 +1029,14 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         This key may represent a course that doesn't exist in this modulestore.
         """
         return CourseLocator(org, course, run)
+
+    def make_course_usage_key(self, course_key):
+        """
+        Return a valid :class:`~opaque_keys.edx.keys.UsageKey` for this modulestore
+        that matches the supplied course_key.
+        """
+        locator_cls = CCXBlockUsageLocator if isinstance(course_key, CCXLocator) else BlockUsageLocator
+        return locator_cls(course_key, 'course', 'course')
 
     def _get_structure(self, structure_id, depth, head_validation=True, **kwargs):
         """
@@ -1049,7 +1139,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 log.debug("Found more than one item for '{}'".format(usage_key))
             return items[0]
 
-    def get_items(self, course_locator, settings=None, content=None, qualifiers=None, **kwargs):
+    def get_items(self, course_locator, settings=None, content=None, qualifiers=None, include_orphans=True, **kwargs):
         """
         Returns:
             list of XModuleDescriptor instances for the matching items within the course with
@@ -1069,9 +1159,14 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 For substring matching pass a regex object.
                 For split,
                 you can search by ``edited_by``, ``edited_on`` providing a function testing limits.
+            include_orphans (boolean): Returns all items in a course, including orphans if present.
+                True - This would return all items irrespective of course in tree checking. It may fetch orphans
+                if present in the course.
+                False - if we want only those items which are in the course tree. This would ensure no orphans are
+                fetched.
         """
-        if not isinstance(course_locator, CourseLocator) or course_locator.deprecated:
-            # The supplied CourseKey is of the wrong type, so it can't possibly be stored in this modulestore.
+        if not isinstance(course_locator, CourseKey) or course_locator.deprecated:
+            # The supplied courselike key is of the wrong type, so it can't possibly be stored in this modulestore.
             return []
 
         course = self._lookup_course(course_locator)
@@ -1100,7 +1195,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             block_name = qualifiers.pop('name')
             block_ids = []
             for block_id, block in course.structure['blocks'].iteritems():
-                if block_name == block_id.id and _block_matches_all(block):
+                # Do an in comparison on the name qualifier
+                # so that a list can be used to filter on block_id
+                if block_id.id in block_name and _block_matches_all(block):
                     block_ids.append(block_id)
 
             return self._load_items(course, block_ids, **kwargs)
@@ -1111,14 +1208,85 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         # don't expect caller to know that children are in fields
         if 'children' in qualifiers:
             settings['children'] = qualifiers.pop('children')
+
+        # No need of these caches unless include_orphans is set to False
+        path_cache = None
+        parents_cache = None
+
+        if not include_orphans:
+            path_cache = {}
+            parents_cache = self.build_block_key_to_parents_mapping(course.structure)
+
         for block_id, value in course.structure['blocks'].iteritems():
             if _block_matches_all(value):
-                items.append(block_id)
+                if not include_orphans:
+                    if (  # pylint: disable=bad-continuation
+                        block_id.type in DETACHED_XBLOCK_TYPES or
+                        self.has_path_to_root(block_id, course, path_cache, parents_cache)
+                    ):
+                        items.append(block_id)
+                else:
+                    items.append(block_id)
 
         if len(items) > 0:
             return self._load_items(course, items, depth=0, **kwargs)
         else:
             return []
+
+    def build_block_key_to_parents_mapping(self, structure):
+        """
+        Given a structure, builds block_key to parents mapping for all block keys in structure
+        and returns it
+
+        :param structure: db json of course structure
+
+        :return dict: a dictionary containing mapping of block_keys against their parents.
+        """
+        children_to_parents = defaultdict(list)
+        for parent_key, value in structure['blocks'].iteritems():
+            for child_key in value.fields.get('children', []):
+                children_to_parents[child_key].append(parent_key)
+
+        return children_to_parents
+
+    def has_path_to_root(self, block_key, course, path_cache=None, parents_cache=None):
+        """
+        Check recursively if an xblock has a path to the course root
+
+        :param block_key: BlockKey of the component whose path is to be checked
+        :param course: actual db json of course from structures
+        :param path_cache: a dictionary that records which modules have a path to the root so that we don't have to
+        double count modules if we're computing this for a list of modules in a course.
+        :param parents_cache: a dictionary containing mapping of block_key to list of its parents. Optionally, this
+        should be built for course structure to make this method faster.
+
+        :return Bool: whether or not component has path to the root
+        """
+
+        if path_cache and block_key in path_cache:
+            return path_cache[block_key]
+
+        if parents_cache is None:
+            xblock_parents = self._get_parents_from_structure(block_key, course.structure)
+        else:
+            xblock_parents = parents_cache[block_key]
+
+        if len(xblock_parents) == 0 and block_key.type in ["course", "library"]:
+            # Found, xblock has the path to the root
+            if path_cache is not None:
+                path_cache[block_key] = True
+
+            return True
+
+        has_path = any(
+            self.has_path_to_root(xblock_parent, course, path_cache, parents_cache)
+            for xblock_parent in xblock_parents
+        )
+
+        if path_cache is not None:
+            path_cache[block_key] = has_path
+
+        return has_path
 
     def get_parent_location(self, locator, **kwargs):
         """
@@ -1133,9 +1301,19 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             raise ItemNotFoundError(locator)
 
         course = self._lookup_course(locator.course_key)
-        parent_ids = self._get_parents_from_structure(BlockKey.from_usage_key(locator), course.structure)
+        all_parent_ids = self._get_parents_from_structure(BlockKey.from_usage_key(locator), course.structure)
+
+        # Check and verify the found parent_ids are not orphans; Remove parent which has no valid path
+        # to the course root
+        parent_ids = [
+            valid_parent
+            for valid_parent in all_parent_ids
+            if self.has_path_to_root(valid_parent, course)
+        ]
+
         if len(parent_ids) == 0:
             return None
+
         # find alphabetically least
         parent_ids.sort(key=lambda parent: (parent.type, parent.id))
         return BlockUsageLocator.make_relative(
@@ -1431,11 +1609,8 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             serial += 1
 
     @contract(returns='XBlock')
-    def create_item(
-        self, user_id, course_key, block_type, block_id=None,
-        definition_locator=None, fields=None,
-        force=False, **kwargs
-    ):
+    def create_item(self, user_id, course_key, block_type, block_id=None, definition_locator=None, fields=None,
+                    asides=None, force=False, **kwargs):
         """
         Add a descriptor to persistence as an element
         of the course. Return the resulting post saved version with populated locators.
@@ -1495,7 +1670,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             partitioned_fields = self.partition_fields_by_scope(block_type, fields)
             new_def_data = partitioned_fields.get(Scope.content, {})
             # persist the definition if persisted != passed
-            if (definition_locator is None or isinstance(definition_locator.definition_id, LocalId)):
+            if definition_locator is None or isinstance(definition_locator.definition_id, LocalId):
                 definition_locator = self.create_definition_from_data(course_key, new_def_data, block_type, user_id)
             elif new_def_data:
                 definition_locator, _ = self.update_definition_from_data(course_key, definition_locator, new_def_data, user_id)
@@ -1522,6 +1697,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 block_fields,
                 definition_locator.definition_id,
                 new_id,
+                asides=asides
             ))
 
             self.update_structure(course_key, new_structure)
@@ -1550,7 +1726,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             # reconstruct the new_item from the cache
             return self.get_item(item_loc)
 
-    def create_child(self, user_id, parent_usage_key, block_type, block_id=None, fields=None, **kwargs):
+    def create_child(self, user_id, parent_usage_key, block_type, block_id=None, fields=None, asides=None, **kwargs):
         """
         Creates and saves a new xblock that as a child of the specified block
 
@@ -1565,10 +1741,12 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 a new identifier will be generated
             fields (dict): A dictionary specifying initial values for some or all fields
                 in the newly created block
+            asides (dict): A dictionary specifying initial values for some or all aside fields
+                in the newly created block
         """
         with self.bulk_operations(parent_usage_key.course_key):
             xblock = self.create_item(
-                user_id, parent_usage_key.course_key, block_type, block_id=block_id, fields=fields,
+                user_id, parent_usage_key.course_key, block_type, block_id=block_id, fields=fields, asides=asides,
                 **kwargs)
 
             # skip attach to parent if xblock has 'detached' tag
@@ -1813,10 +1991,8 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             partitioned_fields, descriptor.definition_locator, allow_not_found, force, **kwargs
         ) or descriptor
 
-    def _update_item_from_fields(
-        self, user_id, course_key, block_key, partitioned_fields,
-        definition_locator, allow_not_found, force, **kwargs
-    ):
+    def _update_item_from_fields(self, user_id, course_key, block_key, partitioned_fields,    # pylint: disable=too-many-statements
+                                 definition_locator, allow_not_found, force, asides=None, **kwargs):
         """
         Broke out guts of update_item for short-circuited internal use only
         """
@@ -1826,7 +2002,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 for subfields in partitioned_fields.itervalues():
                     fields.update(subfields)
                 return self.create_item(
-                    user_id, course_key, block_key.type, fields=fields, force=force
+                    user_id, course_key, block_key.type, fields=fields, asides=asides, force=force
                 )
 
             original_structure = self._lookup_course(course_key).structure
@@ -1838,9 +2014,8 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                     fields = {}
                     for subfields in partitioned_fields.itervalues():
                         fields.update(subfields)
-                    return self.create_item(
-                        user_id, course_key, block_key.type, block_id=block_key.id, fields=fields, force=force,
-                    )
+                    return self.create_item(user_id, course_key, block_key.type, block_id=block_key.id, fields=fields,
+                                            asides=asides, force=force)
                 else:
                     raise ItemNotFoundError(course_key.make_usage_key(block_key.type, block_key.id))
 
@@ -1866,13 +2041,23 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 if is_updated:
                     settings['children'] = serialized_children
 
+            asides_data_to_update = None
+            if asides:
+                asides_data_to_update, asides_updated = self._get_asides_to_update_from_structure(original_structure,
+                                                                                                  block_key, asides)
+            else:
+                asides_updated = False
+
             # if updated, rev the structure
-            if is_updated:
+            if is_updated or asides_updated:
                 new_structure = self.version_structure(course_key, original_structure, user_id)
                 block_data = self._get_block_from_structure(new_structure, block_key)
 
                 block_data.definition = definition_locator.definition_id
                 block_data.fields = settings
+
+                if asides_updated:
+                    block_data.asides = asides_data_to_update
 
                 new_id = new_structure['_id']
 
@@ -1916,7 +2101,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             else:
                 return None
 
-    # pylint: disable=unused-argument
     def create_xblock(
             self, runtime, course_key, block_type, block_id=None, fields=None,
             definition_id=None, parent_xblock=None, **kwargs
@@ -2031,7 +2215,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             else:
                 block_key = BlockKey(xblock.scope_ids.block_type, block_id)
             new_usage_id = xblock.scope_ids.usage_id.replace(block_id=block_key.id)
-            xblock.scope_ids = xblock.scope_ids._replace(usage_id=new_usage_id)  # pylint: disable=protected-access
+            xblock.scope_ids = xblock.scope_ids._replace(usage_id=new_usage_id)
         else:
             is_new = False
             block_key = BlockKey(xblock.scope_ids.block_type, xblock.scope_ids.usage_id.block_id)
@@ -2282,8 +2466,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
         Returns the new set of BlockKeys that are the new descendants of the block with key 'block_key'
         """
-        # pylint: disable=no-member
-        # ^-- Until pylint gets namedtuple support, it will give warnings about BlockKey attributes
         new_blocks = set()
 
         new_children = list()  # ordered list of the new children of new_parent_block_key
@@ -2384,7 +2566,10 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             if original_structure['root'] == block_key:
                 raise ValueError("Cannot delete the root of a course")
             if block_key not in original_structure['blocks']:
-                raise ValueError("Cannot delete a block that does not exist")
+                raise ValueError("Cannot delete block_key {} from course {}, because that block does not exist.".format(
+                    block_key,
+                    usage_locator,
+                ))
             index_entry = self._get_index_if_valid(usage_locator.course_key, force)
             new_structure = self.version_structure(usage_locator.course_key, original_structure, user_id)
             new_blocks = new_structure['blocks']
@@ -2416,16 +2601,40 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             if isinstance(usage_locator.course_key, LibraryLocator):
                 self._flag_library_updated_event(usage_locator.course_key)
 
+            self._emit_item_deleted_signal(usage_locator, user_id)
+
             return result
 
-    @contract(block_key=BlockKey, blocks='dict(BlockKey: BlockData)')
-    def _remove_subtree(self, block_key, blocks):
+    @contract(root_block_key=BlockKey, blocks='dict(BlockKey: BlockData)')
+    def _remove_subtree(self, root_block_key, blocks):
         """
-        Remove the subtree rooted at block_key
+        Remove the subtree rooted at root_block_key
+        We do this breadth-first to make sure that we don't remove
+        any children that may have parents that we don't want to delete.
         """
-        for child in blocks[block_key].fields.get('children', []):
-            self._remove_subtree(BlockKey(*child), blocks)
-        del blocks[block_key]
+        # create mapping from each child's key to its parents' keys
+        child_parent_map = defaultdict(set)
+        for block_key, block_data in blocks.iteritems():
+            for child in block_data.fields.get('children', []):
+                child_parent_map[BlockKey(*child)].add(block_key)
+
+        to_delete = {root_block_key}
+        tier = {root_block_key}
+        while tier:
+            next_tier = set()
+            for block_key in tier:
+                for child in blocks[block_key].fields.get('children', []):
+                    child_block_key = BlockKey(*child)
+                    parents = child_parent_map[child_block_key]
+                    # Make sure we want to delete all of the child's parents
+                    # before slating it for deletion
+                    if parents.issubset(to_delete):
+                        next_tier.add(child_block_key)
+            tier = next_tier
+            to_delete.update(tier)
+
+        for block_key in to_delete:
+            del blocks[block_key]
 
     def delete_course(self, course_key, user_id):
         """
@@ -2442,6 +2651,8 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         # We do NOT call the super class here since we need to keep the assets
         # in case the course is later restored.
         # super(SplitMongoModuleStore, self).delete_course(course_key, user_id)
+
+        self._emit_course_deleted_signal(course_key)
 
     @contract(block_map="dict(BlockKey: dict)", block_key=BlockKey)
     def inherit_settings(
@@ -2739,10 +2950,11 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         output_fields = dict(jsonfields)
         for field_name, value in output_fields.iteritems():
             if value:
-                field = xblock_class.fields.get(field_name)
-                if field is None:
+                try:
+                    field = xblock_class.fields.get(field_name)
+                except AttributeError:
                     continue
-                elif isinstance(field, Reference):
+                if isinstance(field, Reference):
                     output_fields[field_name] = robust_usage_key(value)
                 elif isinstance(field, ReferenceList):
                     output_fields[field_name] = [robust_usage_key(ele) for ele in value]
@@ -2770,7 +2982,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 course_key.version_guid is None or
                 index_entry['versions'][course_key.branch] == course_key.version_guid
             )
-            if (is_head or force):
+            if is_head or force:
                 return index_entry
             else:
                 raise VersionConflictError(
@@ -3011,12 +3223,13 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         Delete the orphan and any of its descendants which no longer have parents.
         """
         if len(self._get_parents_from_structure(orphan, structure)) == 0:
-            for child in structure['blocks'][orphan].fields.get('children', []):
+            orphan_data = structure['blocks'].pop(orphan)
+            for child in orphan_data.fields.get('children', []):
                 self._delete_if_true_orphan(BlockKey(*child), structure)
-            del structure['blocks'][orphan]
 
     @contract(returns=BlockData)
-    def _new_block(self, user_id, category, block_fields, definition_id, new_id, raw=False, block_defaults=None):
+    def _new_block(self, user_id, category, block_fields, definition_id, new_id, raw=False,
+                   asides=None, block_defaults=None):
         """
         Create the core document structure for a block.
 
@@ -3027,10 +3240,13 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         if not raw:
             block_fields = self._serialize_fields(category, block_fields)
+        if not asides:
+            asides = []
         document = {
             'block_type': category,
             'definition': definition_id,
             'fields': block_fields,
+            'asides': asides,
             'edit_info': {
                 'edited_on': datetime.datetime.now(UTC),
                 'edited_by': user_id,
@@ -3049,6 +3265,38 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         be a json dict key.
         """
         return structure['blocks'].get(block_key)
+
+    @contract(block_key=BlockKey)
+    def _get_asides_to_update_from_structure(self, structure, block_key, asides):
+        """
+        Get list of aside fields that should be updated/inserted
+        """
+        block = self._get_block_from_structure(structure, block_key)
+
+        if asides:
+            updated = False
+
+            tmp_new_asides_data = {}
+            for asd in asides:
+                aside_type = asd['aside_type']
+                tmp_new_asides_data[aside_type] = asd
+
+            result_list = []
+            for i, aside in enumerate(block.asides):
+                if aside['aside_type'] in tmp_new_asides_data:
+                    result_list.append(tmp_new_asides_data.pop(aside['aside_type']))
+                    updated = True
+                else:
+                    result_list.append(aside)
+
+            if tmp_new_asides_data:
+                for _, asd in tmp_new_asides_data.iteritems():
+                    result_list.append(asd)
+                    updated = True
+
+            return result_list, updated
+        else:
+            return block.asides, False
 
     @contract(block_key=BlockKey, content=BlockData)
     def _update_block_in_structure(self, structure, block_key, content):

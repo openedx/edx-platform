@@ -105,7 +105,7 @@ class LTI20ModuleMixin(object):
         """
         sha1 = hashlib.sha1()
         sha1.update(request.body)
-        oauth_body_hash = unicode(base64.b64encode(sha1.digest()))  # pylint: disable=too-many-function-args
+        oauth_body_hash = unicode(base64.b64encode(sha1.digest()))
         log.debug("[LTI] oauth_body_hash = {}".format(oauth_body_hash))
         client_key, client_secret = self.get_client_key_secret()
         client = Client(client_key, client_secret)

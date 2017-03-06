@@ -1,7 +1,7 @@
 import logging
 
 from eventtracking import tracker
-from .utils import merge_dict, strip_blank, strip_none, extract, perform_request
+from .utils import merge_dict, strip_blank, strip_none, extract, perform_request, CommentClientPaginatedResult
 from .utils import CommentClientRequestError
 import models
 import settings
@@ -11,6 +11,7 @@ log = logging.getLogger(__name__)
 
 class Thread(models.Model):
 
+    # accessible_fields can be set and retrieved on the model
     accessible_fields = [
         'id', 'title', 'body', 'anonymous', 'anonymous_to_peers', 'course_id',
         'closed', 'tags', 'votes', 'commentable_id', 'username', 'user_id',
@@ -19,19 +20,23 @@ class Thread(models.Model):
         'highlighted_body', 'endorsed', 'read', 'group_id', 'group_name', 'pinned',
         'abuse_flaggers', 'resp_skip', 'resp_limit', 'resp_total', 'thread_type',
         'endorsed_responses', 'non_endorsed_responses', 'non_endorsed_resp_total',
+        'context', 'last_activity_at',
     ]
 
+    # updateable_fields are sent in PUT requests
     updatable_fields = [
-        'title', 'body', 'anonymous', 'anonymous_to_peers', 'course_id',
+        'title', 'body', 'anonymous', 'anonymous_to_peers', 'course_id', 'read',
         'closed', 'user_id', 'commentable_id', 'group_id', 'group_name', 'pinned', 'thread_type'
     ]
 
+    # metric_tag_fields are used by Datadog to record metrics about the model
     metric_tag_fields = [
         'course_id', 'group_id', 'pinned', 'closed', 'anonymous', 'anonymous_to_peers',
         'endorsed', 'read'
     ]
 
-    initializable_fields = updatable_fields + ['thread_type']
+    # initializable_fields are sent in POST requests
+    initializable_fields = updatable_fields + ['thread_type', 'context']
 
     base_url = "{prefix}/threads".format(prefix=settings.PREFIX)
     default_retrieve_params = {'recursive': False}
@@ -89,7 +94,14 @@ class Thread(models.Model):
                     total_results=total_results
                 )
             )
-        return response.get('collection', []), response.get('page', 1), response.get('num_pages', 1), response.get('corrected_text')
+
+        return CommentClientPaginatedResult(
+            collection=response.get('collection', []),
+            page=response.get('page', 1),
+            num_pages=response.get('num_pages', 1),
+            thread_count=response.get('thread_count', 0),
+            corrected_text=response.get('corrected_text', None)
+        )
 
     @classmethod
     def url_for_threads(cls, params={}):

@@ -175,7 +175,7 @@ class WeightedSubsectionsGrader(CourseGrader):
     All items in section_breakdown for each subgrader will be combined. A grade_breakdown will be
     composed using the score from each grader.
 
-    Note that the sum of the weights is not take into consideration. If the weights add up to
+    Note that the sum of the weights is not taken into consideration. If the weights add up to
     a value > 1, the student may end up with a percent > 100%. This allows for sections that
     are extra credit.
     """
@@ -312,7 +312,7 @@ class AssignmentFormatGrader(CourseGrader):
                 if index not in dropped_indices:
                     aggregate_score += mark['percent']
 
-            if (len(breakdown) - drop_count > 0):
+            if len(breakdown) - drop_count > 0:
                 aggregate_score /= len(breakdown) - drop_count
 
             return aggregate_score, dropped_indices

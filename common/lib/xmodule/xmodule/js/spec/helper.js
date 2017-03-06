@@ -1,5 +1,6 @@
 (function () {
     'use strict';
+    var origAjax = $.ajax;
 
     var stubbedYT = {
         Player: function () {
@@ -15,9 +16,9 @@
                 ]
             );
 
-            Player.getDuration.andReturn(60);
-            Player.getAvailablePlaybackRates.andReturn([0.50, 1.0, 1.50, 2.0]);
-            Player.getAvailableQualityLevels.andReturn(
+            Player.getDuration.and.returnValue(60);
+            Player.getAvailablePlaybackRates.and.returnValue([0.50, 1.0, 1.50, 2.0]);
+            Player.getAvailableQualityLevels.and.returnValue(
                 ['highres', 'hd1080', 'hd720', 'large', 'medium', 'small']
             );
 
@@ -124,11 +125,11 @@
 
     jasmine.stubRequests = function () {
         var spy = $.ajax;
-
-        if (!($.ajax.isSpy)) {
+        if (!jasmine.isSpy($.ajax)) {
             spy = spyOn($, 'ajax');
         }
-        return spy.andCallFake(function (settings) {
+
+        return spy.and.callFake(function (settings) {
             var match = settings.url
                     .match(/googleapis\.com\/.+\/videos\/\?id=(.+)&part=contentDetails/),
                 status, callCallback;
@@ -176,46 +177,16 @@
                 return;
             } else if (settings.url === '/save_user_state') {
                 return {success: true};
+            } else if(settings.url.match(new RegExp(jasmine.getFixtures().fixturesPath + ".+", 'g'))) {
+                return origAjax(settings);
             } else {
-                throw 'External request attempted for ' +
-                    settings.url +
-                    ', which is not defined.';
+                $.ajax.and.callThrough();
             }
         });
     };
 
-    // Add custom Jasmine matchers.
-    beforeEach(function () {
-        this.addMatchers({
-            toHaveAttrs: function (attrs) {
-                var element;
-
-                if ($.isEmptyObject(attrs)) {
-                    return false;
-                }
-
-                element = this.actual;
-
-                return _.every(attrs, function (value, name) {
-                    return element.attr(name) === value;
-                });
-            },
-            toBeInRange: function (min, max) {
-                return min <= this.actual && this.actual <= max;
-            },
-            toBeInArray: function (array) {
-                return $.inArray(this.actual, array) > -1;
-            },
-            toBeFocused: function () {
-                return $(this.actual)[0] === $(this.actual)[0].ownerDocument.activeElement;
-            }
-        });
-
-        return this.addMatchers(window.imagediff.jasmine);
-    });
-
-    // Stub jQuery.cookie module.
-    $.cookie = jasmine.createSpy('jQuery.cookie').andReturn('1.0');
+   // Stub jQuery.cookie module.
+    $.cookie = jasmine.createSpy('jQuery.cookie').and.returnValue('1.0');
 
     // # Stub jQuery.qtip module.
     $.fn.qtip = jasmine.createSpy('jQuery.qtip');
@@ -224,7 +195,7 @@
     $.fn.scrollTo = jasmine.createSpy('jQuery.scrollTo');
 
     // Stub window.Video.loadYouTubeIFrameAPI()
-    window.Video.loadYouTubeIFrameAPI = jasmine.createSpy('window.Video.loadYouTubeIFrameAPI').andReturn(
+    window.Video.loadYouTubeIFrameAPI = jasmine.createSpy('window.Video.loadYouTubeIFrameAPI').and.returnValue(
         function (scriptTag) {
             var event = document.createEvent('Event');
             if (fixture === "video.html") {
@@ -275,13 +246,13 @@
                 ],
                 obj = {},
                 delta = {
-                    add: jasmine.createSpy().andReturn(obj),
-                    substract: jasmine.createSpy().andReturn(obj),
-                    reset: jasmine.createSpy().andReturn(obj)
+                    add: jasmine.createSpy().and.returnValue(obj),
+                    substract: jasmine.createSpy().and.returnValue(obj),
+                    reset: jasmine.createSpy().and.returnValue(obj)
                 };
 
             $.each(methods, function (index, method) {
-                obj[method] = jasmine.createSpy(method).andReturn(obj);
+                obj[method] = jasmine.createSpy(method).and.returnValue(obj);
             });
 
             obj.delta = delta;

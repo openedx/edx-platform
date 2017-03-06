@@ -29,7 +29,7 @@ class UserCartContextProcessorUnitTest(ModuleStoreTestCase):
         Adds content to self.user's cart
         """
         course = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')
-        CourseModeFactory(course_id=course.id)
+        CourseModeFactory.create(course_id=course.id)
         cart = Order.get_cart_for_user(self.user)
         PaidCourseRegistration.add_to_order(cart, course.id)
 

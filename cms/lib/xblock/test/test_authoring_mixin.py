@@ -56,6 +56,26 @@ class AuthoringMixinTestCase(ModuleStoreTestCase):
         self.course.user_partitions = [self.content_partition]
         self.store.update_item(self.course, self.user.id)
 
+    def create_verification_user_partitions(self, checkpoint_names):
+        """
+        Create user partitions for verification checkpoints.
+        """
+        scheme = UserPartition.get_scheme("verification")
+        self.course.user_partitions = [
+            UserPartition(
+                id=0,
+                name=checkpoint_name,
+                description="Verification checkpoint",
+                scheme=scheme,
+                groups=[
+                    Group(scheme.ALLOW, "Completed verification at {}".format(checkpoint_name)),
+                    Group(scheme.DENY, "Did not complete verification at {}".format(checkpoint_name)),
+                ],
+            )
+            for checkpoint_name in checkpoint_names
+        ]
+        self.store.update_item(self.course, self.user.id)
+
     def set_staff_only(self, item_location):
         """Make an item visible to staff only."""
         item = self.store.get_item(item_location)
@@ -68,7 +88,7 @@ class AuthoringMixinTestCase(ModuleStoreTestCase):
         ids within the content partition.
         """
         item = self.store.get_item(item_location)
-        item.group_access[self.content_partition.id] = group_ids  # pylint: disable=no-member
+        item.group_access[self.content_partition.id] = group_ids
         self.store.update_item(item, self.user.id)
 
     def verify_visibility_view_contains(self, item_location, substrings):
@@ -127,5 +147,16 @@ class AuthoringMixinTestCase(ModuleStoreTestCase):
                 'Dog Lovers',
                 'The Unit this component is contained in is hidden from students.',
                 'Content group no longer exists.'
+            ]
+        )
+
+    def test_html_verification_checkpoints(self):
+        self.create_verification_user_partitions(["Midterm A", "Midterm B"])
+        self.verify_visibility_view_contains(
+            self.video_location,
+            [
+                "Verification Checkpoint",
+                "Midterm A",
+                "Midterm B",
             ]
         )

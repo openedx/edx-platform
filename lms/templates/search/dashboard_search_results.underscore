@@ -15,7 +15,7 @@
                 { num_items: pageSize },
                 true
             ) %>
-            <i class="icon fa fa-spinner fa-spin"></i>
+            <span class="icon fa fa-spinner fa-spin" aria-hidden="true"></span>
         </a>
     <% } %>
 

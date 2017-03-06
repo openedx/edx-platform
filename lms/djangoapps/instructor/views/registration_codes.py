@@ -3,10 +3,10 @@ E-commerce Tab Instructor Dashboard Query Registration Code Status.
 """
 from django.core.urlresolvers import reverse
 from django.views.decorators.http import require_GET, require_POST
-from instructor.enrollment import get_email_params, send_mail_to_student
+from lms.djangoapps.instructor.enrollment import get_email_params, send_mail_to_student
 from django.utils.translation import ugettext as _
 from courseware.courses import get_course_by_id
-from instructor.views.api import require_level
+from lms.djangoapps.instructor.views.api import require_level
 from student.models import CourseEnrollment
 from util.json_request import JsonResponse
 from shoppingcart.models import CourseRegistrationCode, RegistrationCodeRedemption
@@ -20,7 +20,7 @@ log = logging.getLogger(__name__)
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @require_GET
-def look_up_registration_code(request, course_id):  # pylint: disable=unused-argument
+def look_up_registration_code(request, course_id):
     """
     Look for the registration_code in the database.
     and check if it is still valid, allowed to redeem or not.

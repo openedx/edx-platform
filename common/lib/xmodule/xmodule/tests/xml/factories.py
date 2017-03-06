@@ -8,6 +8,7 @@ from fs.memoryfs import MemoryFS
 from factory import Factory, lazy_attribute, post_generation, Sequence
 from lxml import etree
 
+from xblock.mixins import HierarchyMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.x_module import XModuleMixin
 from xmodule.modulestore import only_xmodules
@@ -64,10 +65,11 @@ class XmlImportFactory(Factory):
     Factory for generating XmlImportData's, which can hold all the data needed
     to run an XModule XML import
     """
-    FACTORY_FOR = XmlImportData
+    class Meta(object):
+        model = XmlImportData
 
     filesystem = MemoryFS()
-    xblock_mixins = (InheritanceMixin, XModuleMixin)
+    xblock_mixins = (InheritanceMixin, XModuleMixin, HierarchyMixin)
     xblock_select = only_xmodules
     url_name = Sequence(str)
     attribs = {}
@@ -139,6 +141,11 @@ class CourseFactory(XmlImportFactory):
     tag = 'course'
     name = '101'
     static_asset_path = 'xml_test_course'
+
+
+class ChapterFactory(XmlImportFactory):
+    """Factory for <chapter> nodes"""
+    tag = 'chapter'
 
 
 class SequenceFactory(XmlImportFactory):

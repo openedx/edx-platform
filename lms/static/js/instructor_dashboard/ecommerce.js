@@ -17,12 +17,18 @@ var edx = edx || {};
         },
         clicked: function (event) {
             if (event.currentTarget.checked) {
-                this.$el.find('#coupon_expiration_date').show();
+                this.show(this.$('#coupon_expiration_date'));
                 this.$el.find('#coupon_expiration_date').focus();
             }
             else {
-                this.$el.find('#coupon_expiration_date').hide();
+                this.hide(this.$('#coupon_expiration_date'));
             }
+        },
+        show: function ($el) {
+            $el.css('display', 'inline');
+        },
+        hide: function ($el) {
+            $el.css('display', 'none');
         }
     });
 
@@ -39,6 +45,7 @@ var edx = edx || {};
         $('input[name="user-enrollment-report"]').click(function(){
             var url = $(this).data('endpoint');
             $.ajax({
+             type: 'POST',
              dataType: "json",
              url: url,
              success: function (data) {
@@ -58,6 +65,7 @@ var edx = edx || {};
         $('input[name="exec-summary-report"]').click(function(){
             var url = $(this).data('endpoint');
             $.ajax({
+             type: 'POST',
              dataType: "json",
              url: url,
              success: function (data) {

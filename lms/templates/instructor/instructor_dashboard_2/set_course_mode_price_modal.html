@@ -1,12 +1,13 @@
+<%page args="section_data" expression_filter="h"/>
 <%!
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 %>
-<%page args="section_data"/>
-<section id="set-course-mode-price-modal" class="modal" role="dialog" tabindex="-1" aria-label="${_('Set Course Mode Price')}">
+<section id="set-course-mode-price-modal" class="modal" role="dialog" tabindex="-1" aria-labelledby="header-course-price">
+    <h2 id="header-course-price" class="hd hd-2">${_("Set Course Mode Price")}</h2>
   <div class="inner-wrapper">
     <button class="close-modal">
-      <i class="icon fa fa-remove"></i>
+      <span class="icon fa fa-remove" aria-hidden="true"></span>
       <span class="sr">
         ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
         ${_('Close')}
@@ -15,7 +16,7 @@ from django.core.urlresolvers import reverse
 
     <div id="course-content">
       <header>
-        <h2>${_("Set Course Mode Price")}</h2>
+        <h3 class="hd hd-3">${_("Set Course Mode Price")}</h3>
       </header>
 
       <div class="instructions">

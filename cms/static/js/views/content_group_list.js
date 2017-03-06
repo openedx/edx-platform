@@ -15,6 +15,8 @@ define([
         // Translators: This refers to a content group that can be linked to a student cohort.
         itemCategoryDisplayName: gettext('content group'),
 
+        newItemMessage: gettext('Add your first content group'),
+
         emptyMessage: gettext('You have not created any content groups yet.'),
 
         createItemView: function(options) {

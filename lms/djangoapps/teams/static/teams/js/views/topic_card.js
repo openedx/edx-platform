@@ -30,13 +30,13 @@
                     CardView.prototype.initialize.apply(this, arguments);
                 },
 
-                action: function (event) {
-                    event.preventDefault();
-                    // TODO implement actual navigation
+                actionUrl: function () {
+                    return '#topics/' + this.model.get('id');
                 },
 
                 configuration: 'square_card',
                 cardClass: 'topic-card',
+                pennant: gettext('Topic'),
                 title: function () { return this.model.get('name'); },
                 description: function () { return this.model.get('description'); },
                 details: function () { return this.detailViews; },
@@ -46,7 +46,7 @@
                         gettext('View Teams in the %(topic_name)s Topic'),
                         { topic_name: this.model.get('name') }, true
                     ));
-                    return '<span class="sr">' + screenReaderText + '</span><i class="icon fa fa-arrow-right" aria-hidden="true"></i>';
+                    return '<span class="sr">' + screenReaderText + '</span><span class="icon fa fa-arrow-right" aria-hidden="true"></span>'; // jshint ignore:line
                 }
             });
 

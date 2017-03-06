@@ -48,9 +48,9 @@ def parse_license(lic):
         </a>
     % else:
         ## <span> must come before <i> icon or else spacing gets messed up
-        <span class="sr">${_("Creative Commons licensed content, with terms as follow:")}&nbsp;</span><i aria-hidden="true" class="icon-cc"></i>
+        <span class="sr">${_("Creative Commons licensed content, with terms as follow:")}&nbsp;</span><span aria-hidden="true" class="icon-cc"></span>
         % for option in enabled:
-            <span class="sr">${names[option]}&nbsp;</span><i aria-hidden="true" class="icon-cc-${option}"></i>
+            <span class="sr">${names[option]}&nbsp;</span><span aria-hidden="true" class="icon-cc-${option}"></span>
         % endfor
         <span class="license-text">${_("Some Rights Reserved")}</span>
     % endif

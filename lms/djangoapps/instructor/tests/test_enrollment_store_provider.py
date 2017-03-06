@@ -3,8 +3,8 @@ Exercises tests on the base_store_provider file
 """
 
 from django.test import TestCase
-from instructor.enrollment_report import AbstractEnrollmentReportProvider
-from instructor.paidcourse_enrollment_report import PaidCourseEnrollmentReportProvider
+from lms.djangoapps.instructor.enrollment_report import AbstractEnrollmentReportProvider
+from lms.djangoapps.instructor.paidcourse_enrollment_report import PaidCourseEnrollmentReportProvider
 
 
 class BadImplementationAbstractEnrollmentReportProvider(AbstractEnrollmentReportProvider):

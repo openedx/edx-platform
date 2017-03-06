@@ -73,6 +73,10 @@ class Date(JSONField):
             return time.strftime('%Y-%m-%dT%H:%M:%SZ', value)
         elif isinstance(value, datetime.datetime):
             if value.tzinfo is None or value.utcoffset().total_seconds() == 0:
+                if value.year < 1900:
+                    # strftime doesn't work for pre-1900 dates, so use
+                    # isoformat instead
+                    return value.isoformat()
                 # isoformat adds +00:00 rather than Z
                 return value.strftime('%Y-%m-%dT%H:%M:%SZ')
             else:

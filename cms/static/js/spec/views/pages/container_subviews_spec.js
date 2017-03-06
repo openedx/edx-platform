@@ -1,25 +1,40 @@
-define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/ajax_helpers",
+define(["jquery", "underscore", "underscore.string", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers",
         "common/js/spec_helpers/template_helpers", "js/spec_helpers/edit_helpers",
-        "js/views/feedback_prompt", "js/views/pages/container", "js/views/pages/container_subviews",
-        "js/models/xblock_info", "js/views/utils/xblock_utils"],
+        "common/js/components/views/feedback_prompt", "js/views/pages/container",
+        "js/views/pages/container_subviews", "js/models/xblock_info", "js/views/utils/xblock_utils",
+        'js/models/course'],
     function ($, _, str, AjaxHelpers, TemplateHelpers, EditHelpers, Prompt, ContainerPage, ContainerSubviews,
-              XBlockInfo, XBlockUtils) {
+              XBlockInfo, XBlockUtils, Course) {
         var VisibilityState = XBlockUtils.VisibilityState;
 
         describe("Container Subviews", function() {
             var model, containerPage, requests, createContainerPage, renderContainerPage,
-                respondWithHtml, respondWithJson, fetch,
+                respondWithHtml, fetch,
                 disabledCss = "is-disabled", defaultXBlockInfo, createXBlockInfo,
                 mockContainerPage = readFixtures('mock/mock-container-page.underscore'),
                 mockContainerXBlockHtml = readFixtures('mock/mock-empty-container-xblock.underscore');
 
             beforeEach(function () {
+                window.course = new Course({
+                    id: '5',
+                    name: 'Course Name',
+                    url_name: 'course_name',
+                    org: 'course_org',
+                    num: 'course_num',
+                    revision: 'course_rev'
+                });
+
                 TemplateHelpers.installTemplate('xblock-string-field-editor');
                 TemplateHelpers.installTemplate('publish-xblock');
                 TemplateHelpers.installTemplate('publish-history');
                 TemplateHelpers.installTemplate('unit-outline');
                 TemplateHelpers.installTemplate('container-message');
                 appendSetFixtures(mockContainerPage);
+                requests = AjaxHelpers.requests(this);
+            });
+
+            afterEach(function() {
+                delete window.course;
             });
 
             defaultXBlockInfo = {
@@ -39,7 +54,6 @@ define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/aja
             };
 
             createContainerPage = function (test, options) {
-                requests = AjaxHelpers.requests(test);
                 model = new XBlockInfo(createXBlockInfo(options), { parse: true });
                 containerPage = new ContainerPage({
                     model: model,
@@ -52,30 +66,23 @@ define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/aja
             renderContainerPage = function (test, html, options) {
                 createContainerPage(test, options);
                 containerPage.render();
-                respondWithHtml(html);
+                respondWithHtml(html, options);
             };
 
-            respondWithHtml = function(html) {
-                var requestIndex = requests.length - 1;
+            respondWithHtml = function(html, options) {
                 AjaxHelpers.respondWithJson(
                     requests,
-                    { html: html, "resources": [] },
-                    requestIndex
+                    { html: html, "resources": [] }
                 );
-            };
-
-            respondWithJson = function(json, requestIndex) {
-                AjaxHelpers.respondWithJson(
-                    requests,
-                    json,
-                    requestIndex
-                );
+                AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/locator-container');
+                AjaxHelpers.respondWithJson(requests, createXBlockInfo(options));
             };
 
             fetch = function (json) {
                 json = createXBlockInfo(json);
                 model.fetch();
-                respondWithJson(json);
+                AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/locator-container');
+                AjaxHelpers.respondWithJson(requests, json);
             };
 
             describe("ViewLiveButtonController", function () {
@@ -142,7 +149,7 @@ define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/aja
 
                     // Confirm the discard.
                     expect(promptSpies.constructor).toHaveBeenCalled();
-                    promptSpies.constructor.mostRecentCall.args[0].actions.primary.click(promptSpies);
+                    promptSpies.constructor.calls.mostRecent().args[0].actions.primary.click(promptSpies);
 
                     AjaxHelpers.expectJsonRequest(requests, "POST", "/xblock/locator-container",
                         {"publish": "discard_changes"}
@@ -159,8 +166,8 @@ define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/aja
                 };
 
                 beforeEach(function() {
-                    promptSpies = spyOnConstructor(Prompt, "Warning", ["show", "hide"]);
-                    promptSpies.show.andReturn(this.promptSpies);
+                    promptSpies = jasmine.stealth.spyOnConstructor(Prompt, "Warning", ["show", "hide"]);
+                    promptSpies.show.and.returnValue(this.promptSpies);
                 });
 
                 it('renders correctly with private content', function () {
@@ -236,14 +243,17 @@ define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/aja
                     );
 
                     // Response to publish call
-                    respondWithJson({"id": "locator-container", "data": null, "metadata":{}});
+                    AjaxHelpers.respondWithJson(requests, {"id": "locator-container", "data": null, "metadata":{}});
                     EditHelpers.verifyNotificationHidden(notificationSpy);
 
                     AjaxHelpers.expectJsonRequest(requests, "GET", "/xblock/locator-container");
                     // Response to fetch
-                    respondWithJson(createXBlockInfo({
-                        published: true, has_changes: false, visibility_state: VisibilityState.ready
-                    }));
+                    AjaxHelpers.respondWithJson(
+                        requests,
+                        createXBlockInfo({
+                            published: true, has_changes: false, visibility_state: VisibilityState.ready
+                        })
+                    );
 
                     // Verify updates displayed
                     expect(containerPage.$(bitPublishingCss)).toHaveClass(readyClass);
@@ -258,11 +268,9 @@ define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/aja
                     // Click publish
                     containerPage.$(publishButtonCss).click();
 
-                    var numRequests = requests.length;
                     // Respond with failure
                     AjaxHelpers.respondWithError(requests);
-
-                    expect(requests.length).toEqual(numRequests);
+                    AjaxHelpers.expectNoRequests(requests);
 
                     // Verify still in draft (unscheduled) state.
                     verifyPublishingBitUnscheduled();
@@ -274,13 +282,13 @@ define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/aja
                     var notificationSpy, renderPageSpy, numRequests;
                     createContainerPage(this);
                     notificationSpy = EditHelpers.createNotificationSpy();
-                    renderPageSpy = spyOn(containerPage.xblockPublisher, 'renderPage').andCallThrough();
+                    renderPageSpy = spyOn(containerPage.xblockPublisher, 'renderPage').and.callThrough();
 
                     sendDiscardChangesToServer();
                     numRequests = requests.length;
 
                     // Respond with success.
-                    respondWithJson({"id": "locator-container"});
+                    AjaxHelpers.respondWithJson(requests, {"id": "locator-container"});
                     EditHelpers.verifyNotificationHidden(notificationSpy);
 
                     // Verify other requests are sent to the server to update page state.
@@ -293,15 +301,13 @@ define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/aja
                 it('does not fetch if discard changes fails', function () {
                     var renderPageSpy, numRequests;
                     createContainerPage(this);
-                    renderPageSpy = spyOn(containerPage.xblockPublisher, 'renderPage').andCallThrough();
+                    renderPageSpy = spyOn(containerPage.xblockPublisher, 'renderPage').and.callThrough();
 
                     sendDiscardChangesToServer();
-                    numRequests = requests.length;
 
                     // Respond with failure
                     AjaxHelpers.respondWithError(requests);
-
-                    expect(requests.length).toEqual(numRequests);
+                    AjaxHelpers.expectNoRequests(requests);
                     expect(containerPage.$(discardChangesButtonCss)).not.toHaveClass('is-disabled');
                     expect(containerPage.model.get("publish")).toBeNull();
                     expect(renderPageSpy).not.toHaveBeenCalled();
@@ -310,7 +316,6 @@ define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/aja
                 it('does not discard changes on cancel', function () {
                     renderContainerPage(this, mockContainerXBlockHtml);
                     fetch({published: true, has_changes: true, visibility_state: VisibilityState.needsAttention});
-                    var numRequests = requests.length;
 
                     // Click discard changes
                     expect(containerPage.$(discardChangesButtonCss)).not.toHaveClass('is-disabled');
@@ -318,9 +323,8 @@ define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/aja
 
                     // Click cancel to confirmation.
                     expect(promptSpies.constructor).toHaveBeenCalled();
-                    promptSpies.constructor.mostRecentCall.args[0].actions.secondary.click(promptSpies);
-
-                    expect(requests.length).toEqual(numRequests);
+                    promptSpies.constructor.calls.mostRecent().args[0].actions.secondary.click(promptSpies);
+                    AjaxHelpers.expectNoRequests(requests);
                     expect(containerPage.$(discardChangesButtonCss)).not.toHaveClass('is-disabled');
                 });
 
@@ -439,9 +443,9 @@ define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/aja
 
                     verifyExplicitStaffOnly = function(isStaffOnly) {
                         if (isStaffOnly) {
-                            expect(containerPage.$('.action-staff-lock i')).toHaveClass('fa-check-square-o');
+                            expect(containerPage.$('.action-staff-lock .fa')).toHaveClass('fa-check-square-o');
                         } else {
-                            expect(containerPage.$('.action-staff-lock i')).toHaveClass('fa-square-o');
+                            expect(containerPage.$('.action-staff-lock .fa')).toHaveClass('fa-square-o');
                         }
                     };
 
@@ -534,28 +538,24 @@ define(["jquery", "underscore", "underscore.string", "common/js/spec_helpers/aja
                     });
 
                     it("does not refresh if removing staff only is canceled", function() {
-                        var requestCount;
                         promptSpy = EditHelpers.createPromptSpy();
                         renderContainerPage(this, mockContainerXBlockHtml, {
                             visibility_state: VisibilityState.staffOnly,
                             has_explicit_staff_lock: true,
                             ancestor_has_staff_lock: false
                         });
-                        requestCount = requests.length;
                         containerPage.$('.action-staff-lock').click();
                         EditHelpers.confirmPrompt(promptSpy, true);    // Click 'No' to cancel
-                        expect(requests.length).toBe(requestCount);
+                        AjaxHelpers.expectNoRequests(requests);
                         verifyExplicitStaffOnly(true);
                         verifyStaffOnly(true);
                     });
 
                     it("does not refresh when failing to set staff only", function() {
-                        var requestCount;
                         renderContainerPage(this, mockContainerXBlockHtml);
-                        containerPage.$('.lock-checkbox').click();
-                        requestCount = requests.length;
+                        containerPage.$('.action-staff-lock').click();
                         AjaxHelpers.respondWithError(requests);
-                        expect(requests.length).toBe(requestCount);
+                        AjaxHelpers.expectNoRequests(requests);
                         verifyStaffOnly(false);
                     });
                 });

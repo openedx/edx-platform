@@ -1,0 +1,39 @@
+// ------------------------------
+// Discussion shared build
+
+// Set the relative path to the static root
+$static-path: '../..' !default;
+
+// Configuration
+@import '../config';
+@import 'base/variables';
+@import '../base-v2/extends';
+
+// Common extensions
+@import '../shared-v2/variables';
+@import '../shared-v2/base';
+@import '../shared-v2/navigation';
+@import '../shared-v2/header';
+@import '../shared-v2/footer';
+@import '../shared-v2/layouts';
+@import '../shared-v2/components';
+@import '../shared-v2/modal';
+@import '../shared-v2/help-tab';
+
+// Compatibility support for non-Pattern Library mixins and extensions
+@import 'utilities/v1-compatibility';
+@import 'utilities/variables-v2';
+
+// Discussion styling
+@import 'mixins';
+@import 'discussion'; // Process old file after definitions but before everything else, partial is deprecated.
+@import 'elements/actions';
+@import 'elements/editor';
+@import 'elements/labels';
+@import 'elements/navigation';
+@import 'views/home';
+@import 'views/thread';
+@import 'views/create-edit-post';
+@import 'views/response';
+@import 'utilities/developer';
+@import 'utilities/shame';

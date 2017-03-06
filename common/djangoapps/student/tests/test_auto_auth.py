@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.test.client import Client
 from django.contrib.auth.models import User
+from django.conf import settings
 from django_comment_common.models import (
     Role, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_STUDENT)
 from django_comment_common.utils import seed_permissions_roles
@@ -8,7 +9,7 @@ from student.models import anonymous_id_for_user, CourseEnrollment, UserProfile
 from util.testing import UrlResetMixin
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator
-from mock import patch
+from mock import patch, Mock
 import ddt
 import json
 
@@ -58,6 +59,7 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
         Test to make sure multiple users are created.
         """
         self._auto_auth()
+        self.client.logout()
         self._auto_auth()
         self.assertEqual(User.objects.all().count(), 2)
 
@@ -137,6 +139,7 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
         self.assertEqual(len(user_roles), 1)
         self.assertEqual(user_roles[0], course_roles[FORUM_ROLE_STUDENT])
 
+        self.client.logout()
         self._auto_auth({'username': 'a_moderator', 'course_id': course_id, 'roles': 'Moderator'})
         user = User.objects.get(username='a_moderator')
         user_roles = user.roles.all()
@@ -146,6 +149,7 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
                 course_roles[FORUM_ROLE_MODERATOR]]))
 
         # check multiple roles work.
+        self.client.logout()
         self._auto_auth({
             'username': 'an_admin', 'course_id': course_id,
             'roles': '{},{}'.format(FORUM_ROLE_MODERATOR, FORUM_ROLE_ADMINISTRATOR)
@@ -175,7 +179,58 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
             response_data
         )
 
-    def _auto_auth(self, params=None, **kwargs):
+    @ddt.data(*COURSE_IDS_DDT)
+    @ddt.unpack
+    def test_redirect_to_course(self, course_id, course_key):
+        # Create a user and enroll in a course
+        response = self._auto_auth({
+            'username': 'test',
+            'course_id': course_id,
+            'redirect': True,
+            'staff': 'true',
+        }, status_code=302)
+
+        # Check that a course enrollment was created for the user
+        self.assertEqual(CourseEnrollment.objects.count(), 1)
+        enrollment = CourseEnrollment.objects.get(course_id=course_key)
+        self.assertEqual(enrollment.user.username, "test")
+
+        # Check that the redirect was to the course info/outline page
+        if settings.ROOT_URLCONF == 'lms.urls':
+            url_pattern = '/info'
+        else:
+            url_pattern = '/course/{}'.format(unicode(course_key))
+
+        self.assertTrue(response.url.endswith(url_pattern))  # pylint: disable=no-member
+
+    def test_redirect_to_main(self):
+        # Create user and redirect to 'home' (cms) or 'dashboard' (lms)
+        response = self._auto_auth({
+            'username': 'test',
+            'redirect': True,
+            'staff': 'true',
+        }, status_code=302)
+
+        # Check that the redirect was to either /dashboard or /home
+        if settings.ROOT_URLCONF == 'lms.urls':
+            url_pattern = '/dashboard'
+        else:
+            url_pattern = '/home'
+
+        self.assertTrue(response.url.endswith(url_pattern))  # pylint: disable=no-member
+
+    def test_redirect_to_specified(self):
+        # Create user and redirect to specified url
+        url_pattern = '/u/test#about_me'
+        response = self._auto_auth({
+            'username': 'test',
+            'redirect_to': url_pattern,
+            'staff': 'true',
+        }, status_code=302)
+
+        self.assertTrue(response.url.endswith(url_pattern))  # pylint: disable=no-member
+
+    def _auto_auth(self, params=None, status_code=None, **kwargs):
         """
         Make a request to the auto-auth end-point and check
         that the response is successful.
@@ -189,7 +244,9 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
         """
         params = params or {}
         response = self.client.get(self.url, params, **kwargs)
-        self.assertEqual(response.status_code, 200)
+
+        expected_status_code = status_code if status_code else 200
+        self.assertEqual(response.status_code, expected_status_code)
 
         # Check that session and CSRF are set in the response
         for cookie in ['csrftoken', 'sessionid']:
@@ -197,6 +254,14 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
             self.assertTrue(response.cookies[cookie].value)  # pylint: disable=maybe-no-member
 
         return response
+
+    @patch("openedx.core.djangoapps.site_configuration.helpers.get_value", Mock(return_value=False))
+    def test_create_account_not_allowed(self):
+        """
+        Test case to check user creation is forbidden when ALLOW_PUBLIC_ACCOUNT_CREATION feature flag is turned off
+        """
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
 
 
 class AutoAuthDisabledTestCase(UrlResetMixin, TestCase):

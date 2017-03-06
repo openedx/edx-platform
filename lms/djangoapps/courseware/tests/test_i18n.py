@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.test import TestCase
 from django.test.client import Client
+from django.utils import translation
 
 from dark_lang.models import DarkLangConfig
 from lang_pref import LANGUAGE_KEY
@@ -20,6 +21,11 @@ class BaseI18nTestCase(TestCase):
     """
     Base utilities for i18n test classes to derive from
     """
+
+    def setUp(self):
+        super(BaseI18nTestCase, self).setUp()
+        self.addCleanup(translation.deactivate)
+
     def assert_tag_has_attr(self, content, tag, attname, value):
         """Assert that a tag in `content` has a certain value in a certain attribute."""
         regex = r"""<{tag} [^>]*\b{attname}=['"]([\w\d\- ]+)['"][^>]*>""".format(tag=tag, attname=attname)

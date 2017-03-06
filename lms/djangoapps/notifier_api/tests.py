@@ -5,7 +5,7 @@ from django.conf import settings
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 
-from openedx.core.djangoapps.course_groups.models import CourseUserGroup
+from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from django_comment_common.models import Role, Permission
 from lang_pref import LANGUAGE_KEY
 from notification_prefs import NOTIFICATION_PREF_KEY
@@ -46,12 +46,11 @@ class NotifierUsersViewSetTest(UrlResetMixin, ModuleStoreTestCase):
         self.courses.append(course)
         CourseEnrollmentFactory(user=self.user, course_id=course.id)
         if is_user_cohorted:
-            cohort = CourseUserGroup.objects.create(
+            cohort = CohortFactory.create(
                 name="Test Cohort",
                 course_id=course.id,
-                group_type=CourseUserGroup.COHORT
+                users=[self.user]
             )
-            cohort.users.add(self.user)
             self.cohorts.append(cohort)
         if is_moderator:
             moderator_perm, _ = Permission.objects.get_or_create(name="see_all_cohorts")

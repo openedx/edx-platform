@@ -6,6 +6,7 @@ from xblock.exceptions import InvalidScopeError
 from .definition_lazy_loader import DefinitionLazyLoader
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore
 from opaque_keys.edx.locator import BlockUsageLocator
+from xblock.core import XBlockAside
 
 # id is a BlockUsageLocator, def_id is the definition's guid
 SplitMongoKVSid = namedtuple('SplitMongoKVSid', 'id, def_id')
@@ -21,7 +22,7 @@ class SplitMongoKVS(InheritanceKeyValueStore):
     VALID_SCOPES = (Scope.parent, Scope.children, Scope.settings, Scope.content)
 
     @contract(parent="BlockUsageLocator | None")
-    def __init__(self, definition, initial_values, default_values, parent, field_decorator=None):
+    def __init__(self, definition, initial_values, default_values, parent, aside_fields=None, field_decorator=None):
         """
 
         :param definition: either a lazyloader or definition id for the definition
@@ -42,34 +43,52 @@ class SplitMongoKVS(InheritanceKeyValueStore):
             self.field_decorator = field_decorator
 
         self.parent = parent
+        self.aside_fields = aside_fields if aside_fields else {}
 
     def get(self, key):
-        # load the field, if needed
-        if key.field_name not in self._fields:
-            # parent undefined in editing runtime (I think)
-            if key.scope == Scope.parent:
-                return self.parent
-            if key.scope == Scope.children:
-                # didn't find children in _fields; so, see if there's a default
-                raise KeyError()
-            elif key.scope == Scope.settings:
-                # get default which may be the inherited value
-                raise KeyError()
-            elif key.scope == Scope.content:
-                if isinstance(self._definition, DefinitionLazyLoader):
-                    self._load_definition()
-                else:
-                    raise KeyError()
-            else:
+        if key.block_family == XBlockAside.entry_point:
+            if key.scope not in self.VALID_SCOPES:
                 raise InvalidScopeError(key, self.VALID_SCOPES)
 
-        if key.field_name in self._fields:
-            field_value = self._fields[key.field_name]
+            if key.block_scope_id.block_type not in self.aside_fields:
+                # load the definition to see if it has the aside_fields
+                self._load_definition()
+                if key.block_scope_id.block_type not in self.aside_fields:
+                    raise KeyError()
+            aside_fields = self.aside_fields[key.block_scope_id.block_type]
+            # load the field, if needed
+            if key.field_name not in aside_fields:
+                self._load_definition()
 
-            # return the "decorated" field value
-            return self.field_decorator(field_value)
+            if key.field_name in aside_fields:
+                return self.field_decorator(aside_fields[key.field_name])
 
-        return None
+            raise KeyError()
+        else:
+            # load the field, if needed
+            if key.field_name not in self._fields:
+                if key.scope == Scope.parent:
+                    return self.parent
+                if key.scope == Scope.children:
+                    # didn't find children in _fields; so, see if there's a default
+                    raise KeyError()
+                elif key.scope == Scope.settings:
+                    # get default which may be the inherited value
+                    raise KeyError()
+                elif key.scope == Scope.content:
+                    if isinstance(self._definition, DefinitionLazyLoader):
+                        self._load_definition()
+                    else:
+                        raise KeyError()
+                else:
+                    raise InvalidScopeError(key)
+
+            if key.field_name in self._fields:
+                field_value = self._fields[key.field_name]
+                # return the "decorated" field value
+                return self.field_decorator(field_value)
+
+            return None
 
     def set(self, key, value):
         # handle any special cases
@@ -78,17 +97,23 @@ class SplitMongoKVS(InheritanceKeyValueStore):
         if key.scope == Scope.content:
             self._load_definition()
 
-        # set the field
-        self._fields[key.field_name] = value
+        if key.block_family == XBlockAside.entry_point:
+            if key.scope == Scope.children:
+                raise InvalidScopeError(key)
 
-        # This function is currently incomplete: it doesn't handle side effects.
-        # To complete this function, here is some pseudocode for what should happen:
-        #
-        # if key.scope == Scope.children:
-        #     remove inheritance from any exchildren
-        #     add inheritance to any new children
-        # if key.scope == Scope.settings:
-        #     if inheritable, push down to children
+            self.aside_fields.setdefault(key.block_scope_id.block_type, {})[key.field_name] = value
+        else:
+            # set the field
+            self._fields[key.field_name] = value
+
+            # This function is currently incomplete: it doesn't handle side effects.
+            # To complete this function, here is some pseudocode for what should happen:
+            #
+            # if key.scope == Scope.children:
+            #     remove inheritance from any exchildren
+            #     add inheritance to any new children
+            # if key.scope == Scope.settings:
+            #     if inheritable, push down to children
 
     def delete(self, key):
         # handle any special cases
@@ -97,23 +122,41 @@ class SplitMongoKVS(InheritanceKeyValueStore):
         if key.scope == Scope.content:
             self._load_definition()
 
-        # delete the field value
-        if key.field_name in self._fields:
-            del self._fields[key.field_name]
+        if key.block_family == XBlockAside.entry_point:
+            if key.scope == Scope.children:
+                raise InvalidScopeError(key)
+
+            if key.block_scope_id.block_type in self.aside_fields \
+                    and key.field_name in self.aside_fields[key.block_scope_id.block_type]:
+                del self.aside_fields[key.block_scope_id.block_type][key.field_name]
+        else:
+            # delete the field value
+            if key.field_name in self._fields:
+                del self._fields[key.field_name]
 
     def has(self, key):
         """
         Is the given field explicitly set in this kvs (not inherited nor default)
         """
         # handle any special cases
+        if key.scope not in self.VALID_SCOPES:
+            return False
+
         if key.scope == Scope.content:
             self._load_definition()
         elif key.scope == Scope.parent:
             return True
 
-        # it's not clear whether inherited values should return True. Right now they don't
-        # if someone changes it so that they do, then change any tests of field.name in xx._field_data
-        return key.field_name in self._fields
+        if key.block_family == XBlockAside.entry_point:
+            if key.scope == Scope.children:
+                return False
+
+            b_type = key.block_scope_id.block_type
+            return b_type in self.aside_fields and key.field_name in self.aside_fields[b_type]
+        else:
+            # it's not clear whether inherited values should return True. Right now they don't
+            # if someone changes it so that they do, then change any tests of field.name in xx._field_data
+            return key.field_name in self._fields
 
     def default(self, key):
         """
@@ -134,5 +177,10 @@ class SplitMongoKVS(InheritanceKeyValueStore):
             if persisted_definition is not None:
                 fields = self._definition.field_converter(persisted_definition.get('fields'))
                 self._fields.update(fields)
+                aside_fields_p = persisted_definition.get('aside_fields')
+                if aside_fields_p:
+                    aside_fields = self._definition.field_converter(aside_fields_p)
+                    for aside_type, fields in aside_fields.iteritems():
+                        self.aside_fields.setdefault(aside_type, {}).update(fields)
                 # do we want to cache any of the edit_info?
             self._definition = None  # already loaded

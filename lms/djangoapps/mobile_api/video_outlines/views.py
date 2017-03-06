@@ -30,51 +30,48 @@ class VideoSummaryList(generics.ListAPIView):
         Get a list of all videos in the specified course. You can use the
         video_url value to access the video file.
 
-    **Example request**:
+    **Example Request**
 
         GET /api/mobile/v0.5/video_outlines/courses/{organization}/{course_number}/{course_run}
 
     **Response Values**
 
-        An array of videos in the course. For each video:
+        If the request is successful, the request returns an HTTP 200 "OK"
+        response along with an array of videos in the course. The array
+        includes the following information for each video.
+
+            * named_path: An array that consists of the display names of the
+              courseware objects in the path to the video.
+            * path: An array that specifies the complete path to the video in
+              the courseware hierarchy. The array contains the following
+              values.
+
+                * category: The type of division in the course outline.
+                  Possible values are "chapter", "sequential", and "vertical".
+                * name: The display name for the object.
+                * id: The The unique identifier for the video.
 
             * section_url: The URL to the first page of the section that
               contains the video in the Learning Management System.
+            * summary: An array of data about the video that includes the
+              following values.
 
-            * path: An array containing category, name, and id values specifying the
-              complete path the the video in the courseware hierarchy. The
-              following categories values are included: "chapter", "sequential",
-              and "vertical". The name value is the display name for that object.
-
-            * unit_url: The URL to the unit contains the video in the Learning
-              Management System.
-
-            * named_path: An array consisting of the display names of the
-              courseware objects in the path to the video.
-
-            * summary:  An array of data about the video that includes:
-
-                * category:  The type of component, in this case always "video".
-
-                * video_thumbnail_url: The URL to the thumbnail image for the
-                  video, if available.
-
-                * language: The language code for the video.
-
-                * name:  The display name of the video.
-
-                * video_url: The URL to the video file. Use this value to access
-                  the video.
-
+                * category: The type of component. This value will always be "video".
                 * duration: The length of the video, if available.
-
+                * id: The unique identifier for the video.
+                * language: The language code for the video.
+                * name:  The display name of the video.
+                * size: The size of the video file.
                 * transcripts: An array of language codes and URLs to available
                   video transcripts. Use the URL value to access a transcript
                   for the video.
+                * video_thumbnail_url: The URL to the thumbnail image for the
+                  video, if available.
+                * video_url: The URL to the video file. Use this value to access
+                  the video.
 
-                * id: The unique identifier for the video.
-
-                * size: The size of the video file
+            * unit_url: The URL to the unit that contains the video in the Learning
+              Management System.
     """
 
     @mobile_course_access(depth=None)
@@ -97,15 +94,16 @@ class VideoTranscripts(generics.RetrieveAPIView):
     """
     **Use Case**
 
-        Use to get a transcript for a specified video and language.
+        Get a transcript for a specified video and language.
 
-    **Example request**:
+    **Example request**
 
         GET /api/mobile/v0.5/video_outlines/transcripts/{organization}/{course_number}/{course_run}/{video ID}/{language code}
 
     **Response Values**
 
-        An HttpResponse with an SRT file download.
+        If the request is successful, the request returns an HTTP 200 "OK"
+        response along with an .srt file that you can download.
 
     """
 

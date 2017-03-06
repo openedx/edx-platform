@@ -1,16 +1,15 @@
 """
 tests for the models
 """
+import ddt
+import json
 from datetime import datetime, timedelta
-from django.utils.timezone import UTC
 from mock import patch
 from nose.plugins.attrib import attr
-from student.models import CourseEnrollment  # pylint: disable=import-error
-from student.roles import CourseCcxCoachRole  # pylint: disable=import-error
-from student.tests.factories import (  # pylint: disable=import-error
+from pytz import timezone, utc
+from student.roles import CourseCcxCoachRole
+from student.tests.factories import (
     AdminFactory,
-    CourseEnrollmentFactory,
-    UserFactory,
 )
 from util.tests.test_date_utils import fake_ugettext
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -21,122 +20,11 @@ from xmodule.modulestore.tests.factories import (
 
 from .factories import (
     CcxFactory,
-    CcxFutureMembershipFactory,
-)
-from ..models import (
-    CcxMembership,
-    CcxFutureMembership,
 )
 from ..overrides import override_field_for_ccx
 
 
-@attr('shard_1')
-class TestCcxMembership(ModuleStoreTestCase):
-    """Unit tests for the CcxMembership model
-    """
-
-    def setUp(self):
-        """common setup for all tests"""
-        super(TestCcxMembership, self).setUp()
-        self.course = course = CourseFactory.create()
-        coach = AdminFactory.create()
-        role = CourseCcxCoachRole(course.id)
-        role.add_users(coach)
-        self.ccx = CcxFactory(course_id=course.id, coach=coach)
-        enrollment = CourseEnrollmentFactory.create(course_id=course.id)
-        self.enrolled_user = enrollment.user
-        self.unenrolled_user = UserFactory.create()
-
-    def create_future_enrollment(self, user, auto_enroll=True):
-        """
-        utility method to create future enrollment
-        """
-        pfm = CcxFutureMembershipFactory.create(
-            ccx=self.ccx,
-            email=user.email,
-            auto_enroll=auto_enroll
-        )
-        return pfm
-
-    def has_course_enrollment(self, user):
-        """
-        utility method to create future enrollment
-        """
-        enrollment = CourseEnrollment.objects.filter(
-            user=user, course_id=self.course.id
-        )
-        return enrollment.exists()
-
-    def has_ccx_membership(self, user):
-        """
-        verify ccx membership
-        """
-        membership = CcxMembership.objects.filter(
-            student=user, ccx=self.ccx, active=True
-        )
-        return membership.exists()
-
-    def has_ccx_future_membership(self, user):
-        """
-        verify future ccx membership
-        """
-        future_membership = CcxFutureMembership.objects.filter(
-            email=user.email, ccx=self.ccx
-        )
-        return future_membership.exists()
-
-    def call_mut(self, student, future_membership):
-        """
-        Call the method undser test
-        """
-        CcxMembership.auto_enroll(student, future_membership)
-
-    def test_ccx_auto_enroll_unregistered_user(self):
-        """verify auto_enroll works when user is not enrolled in the MOOC
-
-        n.b.  After auto_enroll, user will have both a MOOC enrollment and a
-              CCX membership
-        """
-        user = self.unenrolled_user
-        pfm = self.create_future_enrollment(user)
-        self.assertTrue(self.has_ccx_future_membership(user))
-        self.assertFalse(self.has_course_enrollment(user))
-        # auto_enroll user
-        self.call_mut(user, pfm)
-
-        self.assertTrue(self.has_course_enrollment(user))
-        self.assertTrue(self.has_ccx_membership(user))
-        self.assertFalse(self.has_ccx_future_membership(user))
-
-    def test_ccx_auto_enroll_registered_user(self):
-        """verify auto_enroll works when user is enrolled in the MOOC
-        """
-        user = self.enrolled_user
-        pfm = self.create_future_enrollment(user)
-        self.assertTrue(self.has_ccx_future_membership(user))
-        self.assertTrue(self.has_course_enrollment(user))
-
-        self.call_mut(user, pfm)
-
-        self.assertTrue(self.has_course_enrollment(user))
-        self.assertTrue(self.has_ccx_membership(user))
-        self.assertFalse(self.has_ccx_future_membership(user))
-
-    def test_future_membership_disallows_auto_enroll(self):
-        """verify that the CcxFutureMembership can veto auto_enroll
-        """
-        user = self.unenrolled_user
-        pfm = self.create_future_enrollment(user, auto_enroll=False)
-        self.assertTrue(self.has_ccx_future_membership(user))
-        self.assertFalse(self.has_course_enrollment(user))
-
-        self.assertRaises(ValueError, self.call_mut, user, pfm)
-
-        self.assertFalse(self.has_course_enrollment(user))
-        self.assertFalse(self.has_ccx_membership(user))
-        self.assertTrue(self.has_ccx_future_membership(user))
-
-
+@ddt.ddt
 @attr('shard_1')
 class TestCCX(ModuleStoreTestCase):
     """Unit tests for the CustomCourseForEdX model
@@ -145,11 +33,11 @@ class TestCCX(ModuleStoreTestCase):
     def setUp(self):
         """common setup for all tests"""
         super(TestCCX, self).setUp()
-        self.course = course = CourseFactory.create()
-        coach = AdminFactory.create()
-        role = CourseCcxCoachRole(course.id)
-        role.add_users(coach)
-        self.ccx = CcxFactory(course_id=course.id, coach=coach)
+        self.course = CourseFactory.create()
+        self.coach = AdminFactory.create()
+        role = CourseCcxCoachRole(self.course.id)
+        role.add_users(self.coach)
+        self.ccx = CcxFactory(course_id=self.course.id, coach=self.coach)
 
     def set_ccx_override(self, field, value):
         """Create a field override for the test CCX on <field> with <value>"""
@@ -179,15 +67,15 @@ class TestCCX(ModuleStoreTestCase):
         For this reason we test the difference between and make sure it is less
         than one second.
         """
-        expected = datetime.now(UTC())
+        expected = datetime.now(utc)
         self.set_ccx_override('start', expected)
         actual = self.ccx.start  # pylint: disable=no-member
         diff = expected - actual
-        self.assertTrue(abs(diff.total_seconds()) < 1)
+        self.assertLess(abs(diff.total_seconds()), 1)
 
     def test_ccx_start_caching(self):
         """verify that caching the start property works to limit queries"""
-        now = datetime.now(UTC())
+        now = datetime.now(utc)
         self.set_ccx_override('start', now)
         with check_mongo_calls(1):
             # these statements are used entirely to demonstrate the
@@ -204,15 +92,15 @@ class TestCCX(ModuleStoreTestCase):
 
     def test_ccx_due_is_correct(self):
         """verify that the due datetime for a ccx is correctly retrieved"""
-        expected = datetime.now(UTC())
+        expected = datetime.now(utc)
         self.set_ccx_override('due', expected)
         actual = self.ccx.due  # pylint: disable=no-member
         diff = expected - actual
-        self.assertTrue(abs(diff.total_seconds()) < 1)
+        self.assertLess(abs(diff.total_seconds()), 1)
 
     def test_ccx_due_caching(self):
         """verify that caching the due property works to limit queries"""
-        expected = datetime.now(UTC())
+        expected = datetime.now(utc)
         self.set_ccx_override('due', expected)
         with check_mongo_calls(1):
             # these statements are used entirely to demonstrate the
@@ -224,7 +112,7 @@ class TestCCX(ModuleStoreTestCase):
 
     def test_ccx_has_started(self):
         """verify that a ccx marked as starting yesterday has started"""
-        now = datetime.now(UTC())
+        now = datetime.now(utc)
         delta = timedelta(1)
         then = now - delta
         self.set_ccx_override('start', then)
@@ -232,7 +120,7 @@ class TestCCX(ModuleStoreTestCase):
 
     def test_ccx_has_not_started(self):
         """verify that a ccx marked as starting tomorrow has not started"""
-        now = datetime.now(UTC())
+        now = datetime.now(utc)
         delta = timedelta(1)
         then = now + delta
         self.set_ccx_override('start', then)
@@ -240,7 +128,7 @@ class TestCCX(ModuleStoreTestCase):
 
     def test_ccx_has_ended(self):
         """verify that a ccx that has a due date in the past has ended"""
-        now = datetime.now(UTC())
+        now = datetime.now(utc)
         delta = timedelta(1)
         then = now - delta
         self.set_ccx_override('due', then)
@@ -249,7 +137,7 @@ class TestCCX(ModuleStoreTestCase):
     def test_ccx_has_not_ended(self):
         """verify that a ccx that has a due date in the future has not eneded
         """
-        now = datetime.now(UTC())
+        now = datetime.now(utc)
         delta = timedelta(1)
         then = now + delta
         self.set_ccx_override('due', then)
@@ -266,7 +154,7 @@ class TestCCX(ModuleStoreTestCase):
     }))
     def test_start_datetime_short_date(self):
         """verify that the start date for a ccx formats properly by default"""
-        start = datetime(2015, 1, 1, 12, 0, 0, tzinfo=UTC())
+        start = datetime(2015, 1, 1, 12, 0, 0, tzinfo=utc)
         expected = "Jan 01, 2015"
         self.set_ccx_override('start', start)
         actual = self.ccx.start_datetime_text()  # pylint: disable=no-member
@@ -277,18 +165,34 @@ class TestCCX(ModuleStoreTestCase):
     }))
     def test_start_datetime_date_time_format(self):
         """verify that the DATE_TIME format also works as expected"""
-        start = datetime(2015, 1, 1, 12, 0, 0, tzinfo=UTC())
+        start = datetime(2015, 1, 1, 12, 0, 0, tzinfo=utc)
         expected = "Jan 01, 2015 at 12:00 UTC"
         self.set_ccx_override('start', start)
         actual = self.ccx.start_datetime_text('DATE_TIME')  # pylint: disable=no-member
         self.assertEqual(expected, actual)
+
+    @ddt.data((datetime(2015, 11, 1, 8, 59, 00, tzinfo=utc), "Nov 01, 2015", "Nov 01, 2015 at 01:59 PDT"),
+              (datetime(2015, 11, 1, 9, 00, 00, tzinfo=utc), "Nov 01, 2015", "Nov 01, 2015 at 01:00 PST"))
+    @ddt.unpack
+    def test_start_date_time_zone(self, start_date_time, expected_short_date, expected_date_time):
+        """
+        verify that start date is correctly converted when time zone specified
+        during normal daylight hours and daylight savings hours
+        """
+        time_zone = timezone('America/Los_Angeles')
+
+        self.set_ccx_override('start', start_date_time)
+        actual_short_date = self.ccx.start_datetime_text(time_zone=time_zone)  # pylint: disable=no-member
+        actual_datetime = self.ccx.start_datetime_text('DATE_TIME', time_zone)  # pylint: disable=no-member
+        self.assertEqual(expected_short_date, actual_short_date)
+        self.assertEqual(expected_date_time, actual_datetime)
 
     @patch('util.date_utils.ugettext', fake_ugettext(translations={
         "SHORT_DATE_FORMAT": "%b %d, %Y",
     }))
     def test_end_datetime_short_date(self):
         """verify that the end date for a ccx formats properly by default"""
-        end = datetime(2015, 1, 1, 12, 0, 0, tzinfo=UTC())
+        end = datetime(2015, 1, 1, 12, 0, 0, tzinfo=utc)
         expected = "Jan 01, 2015"
         self.set_ccx_override('due', end)
         actual = self.ccx.end_datetime_text()  # pylint: disable=no-member
@@ -299,11 +203,27 @@ class TestCCX(ModuleStoreTestCase):
     }))
     def test_end_datetime_date_time_format(self):
         """verify that the DATE_TIME format also works as expected"""
-        end = datetime(2015, 1, 1, 12, 0, 0, tzinfo=UTC())
+        end = datetime(2015, 1, 1, 12, 0, 0, tzinfo=utc)
         expected = "Jan 01, 2015 at 12:00 UTC"
         self.set_ccx_override('due', end)
         actual = self.ccx.end_datetime_text('DATE_TIME')  # pylint: disable=no-member
         self.assertEqual(expected, actual)
+
+    @ddt.data((datetime(2015, 11, 1, 8, 59, 00, tzinfo=utc), "Nov 01, 2015", "Nov 01, 2015 at 01:59 PDT"),
+              (datetime(2015, 11, 1, 9, 00, 00, tzinfo=utc), "Nov 01, 2015", "Nov 01, 2015 at 01:00 PST"))
+    @ddt.unpack
+    def test_end_datetime_time_zone(self, end_date_time, expected_short_date, expected_date_time):
+        """
+        verify that end date is correctly converted when time zone specified
+        during normal daylight hours and daylight savings hours
+        """
+        time_zone = timezone('America/Los_Angeles')
+
+        self.set_ccx_override('due', end_date_time)
+        actual_short_date = self.ccx.end_datetime_text(time_zone=time_zone)  # pylint: disable=no-member
+        actual_datetime = self.ccx.end_datetime_text('DATE_TIME', time_zone)  # pylint: disable=no-member
+        self.assertEqual(expected_short_date, actual_short_date)
+        self.assertEqual(expected_date_time, actual_datetime)
 
     @patch('util.date_utils.ugettext', fake_ugettext(translations={
         "DATE_TIME_FORMAT": "%b %d, %Y at %H:%M",
@@ -315,3 +235,37 @@ class TestCCX(ModuleStoreTestCase):
         self.assertEqual(expected, actual)
         actual = self.ccx.end_datetime_text('DATE_TIME')  # pylint: disable=no-member
         self.assertEqual(expected, actual)
+
+    def test_ccx_max_student_enrollment_correct(self):
+        """
+        Verify the override value for max_student_enrollments_allowed
+        """
+        expected = 200
+        self.set_ccx_override('max_student_enrollments_allowed', expected)
+        actual = self.ccx.max_student_enrollments_allowed  # pylint: disable=no-member
+        self.assertEqual(expected, actual)
+
+    def test_structure_json_default_empty(self):
+        """
+        By default structure_json does not contain anything
+        """
+        self.assertEqual(self.ccx.structure_json, None)  # pylint: disable=no-member
+        self.assertEqual(self.ccx.structure, None)  # pylint: disable=no-member
+
+    def test_structure_json(self):
+        """
+        Test a json stored in the structure_json
+        """
+        dummy_struct = [
+            "block-v1:Organization+CN101+CR-FALL15+type@chapter+block@Unit_4",
+            "block-v1:Organization+CN101+CR-FALL15+type@chapter+block@Unit_5",
+            "block-v1:Organization+CN101+CR-FALL15+type@chapter+block@Unit_11"
+        ]
+        json_struct = json.dumps(dummy_struct)
+        ccx = CcxFactory(
+            course_id=self.course.id,
+            coach=self.coach,
+            structure_json=json_struct
+        )
+        self.assertEqual(ccx.structure_json, json_struct)  # pylint: disable=no-member
+        self.assertEqual(ccx.structure, dummy_struct)  # pylint: disable=no-member

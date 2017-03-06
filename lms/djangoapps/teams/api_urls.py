@@ -14,12 +14,12 @@ from .views import (
 
 TEAM_ID_PATTERN = r'(?P<team_id>[a-z\d_-]+)'
 USERNAME_PATTERN = r'(?P<username>[\w.+-]+)'
-TOPIC_ID_PATTERN = TEAM_ID_PATTERN.replace('team_id', 'topic_id')
+TOPIC_ID_PATTERN = r'(?P<topic_id>[A-Za-z\d_.-]+)'
 
 urlpatterns = patterns(
     '',
     url(
-        r'^v0/teams$',
+        r'^v0/teams/$',
         TeamsListView.as_view(),
         name="teams_list"
     ),
@@ -39,7 +39,7 @@ urlpatterns = patterns(
         name="topics_detail"
     ),
     url(
-        r'^v0/team_membership$',
+        r'^v0/team_membership/$',
         MembershipListView.as_view(),
         name="team_membership_list"
     ),

@@ -15,7 +15,7 @@
 // Override global input rules
 .forum-nav-search-input {
   box-shadow: none !important;
-  border: 1px solid $gray-l2 !important;
+  border: 1px solid $forum-color-border !important;
   border-radius: 3px !important;
   height: auto !important;
   @include padding-left($baseline/4 !important);
@@ -153,5 +153,26 @@ li[class*=forum-nav-thread-label-] {
   // Override global span
   .action-label span, .action-icon span {
     color: inherit;
+  }
+}
+
+// -------
+// Inline Discussion Module Overrides
+// -------
+.discussion-module {
+  
+  .wrapper-post-header .post-title {
+    margin-bottom: 0 !important; // overrides "#seq_content h1" styling
+  }
+}
+
+// -------
+// Inline Discussion and Discussion Course Overrides
+// -------
+.vert-mod > div {
+  .discussion-course ul.post-errors,
+  .xblock-student_view-discussion ul.post-errors {
+    padding: 0;
+    list-style: none;
   }
 }

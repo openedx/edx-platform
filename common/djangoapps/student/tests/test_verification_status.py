@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import unittest
 import ddt
 from mock import patch
+from nose.plugins.attrib import attr
 from pytz import UTC
 from django.core.urlresolvers import reverse
 from django.conf import settings
@@ -20,10 +21,11 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from course_modes.tests.factories import CourseModeFactory
-from verify_student.models import SoftwareSecurePhotoVerification  # pylint: disable=F0401
+from lms.djangoapps.verify_student.models import VerificationDeadline, SoftwareSecurePhotoVerification
 from util.testing import UrlResetMixin
 
 
+@attr('shard_3')
 @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt
@@ -33,9 +35,11 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
     PAST = datetime.now(UTC) - timedelta(days=5)
     FUTURE = datetime.now(UTC) + timedelta(days=5)
 
+    URLCONF_MODULES = ['verify_student.urls']
+
     def setUp(self):
         # Invoke UrlResetMixin
-        super(TestCourseVerificationStatus, self).setUp('verify_student.urls')
+        super(TestCourseVerificationStatus, self).setUp()
 
         self.user = UserFactory(password="edx")
         self.course = CourseFactory.create()
@@ -44,7 +48,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         self.dashboard_url = reverse('dashboard')
 
     def test_enrolled_as_non_verified(self):
-        self._setup_mode_and_enrollment(None, "honor")
+        self._setup_mode_and_enrollment(None, "audit")
 
         # Expect that the course appears on the dashboard
         # without any verification messaging
@@ -61,9 +65,11 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
             mode="verified"
         )
 
-        # The default course has no verified mode,
-        # so no verification status should be displayed
-        self._assert_course_verification_status(None)
+        # Continue to show the student as needing to verify.
+        # The student is enrolled as verified, so we might as well let them
+        # complete verification.  We'd need to change their enrollment mode
+        # anyway to ensure that the student is issued the correct kind of certificate.
+        self._assert_course_verification_status(VERIFY_STATUS_NEED_TO_VERIFY)
 
     def test_need_to_verify_no_expiration(self):
         self._setup_mode_and_enrollment(None, "verified")
@@ -243,7 +249,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         # Adding another verification with different course.
         # Its created_at is greater than course deadline.
         course2 = CourseFactory.create()
-        CourseModeFactory(
+        CourseModeFactory.create(
             course_id=course2.id,
             mode_slug="verified",
             expiration_datetime=self.PAST
@@ -275,7 +281,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
             enrollment_mode (str): The mode of the enrollment.
 
         """
-        CourseModeFactory(
+        CourseModeFactory.create(
             course_id=self.course.id,
             mode_slug="verified",
             expiration_datetime=deadline
@@ -285,14 +291,12 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
             user=self.user,
             mode=enrollment_mode
         )
+        VerificationDeadline.set_deadline(self.course.id, deadline)
 
     BANNER_ALT_MESSAGES = {
-        None: "Honor",
         VERIFY_STATUS_NEED_TO_VERIFY: "ID verification pending",
         VERIFY_STATUS_SUBMITTED: "ID verification pending",
         VERIFY_STATUS_APPROVED: "ID Verified Ribbon/Badge",
-        VERIFY_STATUS_MISSED_DEADLINE: "Honor",
-        VERIFY_STATUS_NEED_TO_REVERIFY: "Honor"
     }
 
     NOTIFICATION_MESSAGES = {
@@ -306,12 +310,12 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
     }
 
     MODE_CLASSES = {
-        None: "honor",
+        None: "audit",
         VERIFY_STATUS_NEED_TO_VERIFY: "verified",
         VERIFY_STATUS_SUBMITTED: "verified",
         VERIFY_STATUS_APPROVED: "verified",
-        VERIFY_STATUS_MISSED_DEADLINE: "honor",
-        VERIFY_STATUS_NEED_TO_REVERIFY: "honor"
+        VERIFY_STATUS_MISSED_DEADLINE: "audit",
+        VERIFY_STATUS_NEED_TO_REVERIFY: "audit"
     }
 
     def _assert_course_verification_status(self, status):
@@ -331,7 +335,9 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         self.assertContains(response, unicode(self.course.id))
 
         # Verify that the correct banner is rendered on the dashboard
-        self.assertContains(response, self.BANNER_ALT_MESSAGES[status])
+        alt_text = self.BANNER_ALT_MESSAGES.get(status)
+        if alt_text:
+            self.assertContains(response, alt_text)
 
         # Verify that the correct banner color is rendered
         self.assertContains(

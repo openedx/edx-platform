@@ -8,6 +8,7 @@ from unittest import skip
 
 from ...fixtures.course import XBlockFixtureDesc
 from ...pages.studio.component_editor import ComponentEditorView, ComponentVisibilityEditorView
+from ...pages.studio.container import ContainerPage
 from ...pages.studio.html_component_editor import HtmlComponentEditorView
 from ...pages.studio.utils import add_discussion, drag
 from ...pages.lms.courseware import CoursewarePage
@@ -292,7 +293,26 @@ class EditContainerTest(NestedVerticalTest):
         container = self.go_to_nested_container_page()
         self.modify_display_name_and_verify(container)
 
+    def test_edit_raw_html(self):
+        """
+        Test the raw html editing functionality.
+        """
+        modified_content = "<p>modified content</p>"
 
+        #navigate to and open the component for editing
+        unit = self.go_to_unit_page()
+        container = unit.xblocks[1].go_to_container()
+        component = container.xblocks[1].children[0]
+        component.edit()
+
+        html_editor = HtmlComponentEditorView(self.browser, component.locator)
+        html_editor.set_content_and_save(modified_content, raw=True)
+
+        #note we're expecting the <p> tags to have been removed
+        self.assertEqual(component.student_content, "modified content")
+
+
+@attr('shard_3')
 class EditVisibilityModalTest(ContainerBase):
     """
     Tests of the visibility settings modal for components on the unit
@@ -378,6 +398,7 @@ class EditVisibilityModalTest(ContainerBase):
         # Re-open the modal and inspect its selected inputs
         visibility_editor = self.edit_component_visibility(component)
         self.verify_selected_labels(visibility_editor, expected_labels)
+        visibility_editor.save()
 
     def verify_component_validation_error(self, component):
         """
@@ -408,14 +429,13 @@ class EditVisibilityModalTest(ContainerBase):
         self.browser.refresh()
         self.container_page.wait_for_page()
 
-    def remove_missing_groups(self, component):
+    def remove_missing_groups(self, visibility_editor, component):
         """
         Deselect the missing groups for a component.  After save,
         verify that there are no missing group messages in the modal
         and that there is no validation error on the component.
         """
-        visibility_editor = self.edit_component_visibility(component)
-        for option in self.edit_component_visibility(component).selected_options:
+        for option in visibility_editor.selected_options:
             if option.text == self.MISSING_GROUP_LABEL:
                 option.click()
         visibility_editor.save()
@@ -522,7 +542,7 @@ class EditVisibilityModalTest(ContainerBase):
         self.verify_component_validation_error(self.html_component)
         visibility_editor = self.edit_component_visibility(self.html_component)
         self.verify_selected_labels(visibility_editor, [self.MISSING_GROUP_LABEL] * 2)
-        self.remove_missing_groups(self.html_component)
+        self.remove_missing_groups(visibility_editor, self.html_component)
         self.verify_visibility_set(self.html_component, False)
 
     def test_found_and_missing_groups(self):
@@ -546,7 +566,7 @@ class EditVisibilityModalTest(ContainerBase):
         self.verify_component_validation_error(self.html_component)
         visibility_editor = self.edit_component_visibility(self.html_component)
         self.verify_selected_labels(visibility_editor, ['Dogs', 'Cats'] + [self.MISSING_GROUP_LABEL] * 2)
-        self.remove_missing_groups(self.html_component)
+        self.remove_missing_groups(visibility_editor, self.html_component)
         visibility_editor = self.edit_component_visibility(self.html_component)
         self.verify_selected_labels(visibility_editor, ['Dogs', 'Cats'])
         self.verify_visibility_set(self.html_component, True)
@@ -1022,6 +1042,7 @@ class UnitPublishingTest(ContainerBase):
     #     self.assertEqual('discussion', self.courseware.xblock_component_type(1))
 
 
+@attr('shard_3')
 class DisplayNameTest(ContainerBase):
     """
     Test consistent use of display_name_with_default
@@ -1056,3 +1077,62 @@ class DisplayNameTest(ContainerBase):
         title_on_unit_page = test_block.name
         container = test_block.go_to_container()
         self.assertEqual(container.name, title_on_unit_page)
+
+
+@attr('shard_3')
+class ProblemCategoryTabsTest(ContainerBase):
+    """
+    Test to verify tabs in problem category.
+    """
+    def setUp(self, is_staff=True):
+        super(ProblemCategoryTabsTest, self).setUp(is_staff=is_staff)
+
+    def populate_course_fixture(self, course_fixture):
+        """
+        Sets up course structure.
+        """
+        course_fixture.add_children(
+            XBlockFixtureDesc('chapter', 'Test Section').add_children(
+                XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
+                    XBlockFixtureDesc('vertical', 'Test Unit')
+                )
+            )
+        )
+
+    def test_correct_tabs_present(self):
+        """
+        Scenario: Verify that correct tabs are present in problem category.
+
+        Given I am a staff user
+        When I go to unit page
+        Then I only see `Common Problem Types` and `Advanced` tabs in `problem` category
+        """
+        self.go_to_unit_page()
+        page = ContainerPage(self.browser, None)
+        self.assertEqual(page.get_category_tab_names('problem'), ['Common Problem Types', 'Advanced'])
+
+    def test_common_problem_types_tab(self):
+        """
+        Scenario: Verify that correct components are present in Common Problem Types tab.
+
+        Given I am a staff user
+        When I go to unit page
+        Then I see correct components under `Common Problem Types` tab in `problem` category
+        """
+        self.go_to_unit_page()
+        page = ContainerPage(self.browser, None)
+
+        expected_components = [
+            "Blank Common Problem",
+            "Checkboxes",
+            "Dropdown",
+            "Multiple Choice",
+            "Numerical Input",
+            "Text Input",
+            "Checkboxes with Hints and Feedback",
+            "Dropdown with Hints and Feedback",
+            "Multiple Choice with Hints and Feedback",
+            "Numerical Input with Hints and Feedback",
+            "Text Input with Hints and Feedback",
+        ]
+        self.assertEqual(page.get_category_tab_components('problem', 1), expected_components)

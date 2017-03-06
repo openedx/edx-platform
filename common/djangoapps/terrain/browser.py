@@ -19,23 +19,6 @@ from json import dumps
 import xmodule.modulestore.django
 from xmodule.contentstore.django import _CONTENTSTORE
 
-# There is an import issue when using django-staticfiles with lettuce
-# Lettuce assumes that we are using django.contrib.staticfiles,
-# but the rest of the app assumes we are using django-staticfiles
-# (in particular, django-pipeline and our mako implementation)
-# To resolve this, we check whether staticfiles is installed,
-# then redirect imports for django.contrib.staticfiles
-# to use staticfiles.
-try:
-    import staticfiles
-    import staticfiles.handlers
-except ImportError:
-    pass
-else:
-    import sys
-    sys.modules['django.contrib.staticfiles'] = staticfiles
-    sys.modules['django.contrib.staticfiles.handlers'] = staticfiles.handlers
-
 LOGGER = getLogger(__name__)
 LOGGER.info("Loading the lettuce acceptance testing terrain file...")
 
@@ -98,8 +81,6 @@ def initial_setup(server):
             desired_capabilities['loggingPrefs'] = {
                 'browser': 'ALL',
             }
-        elif browser_driver == 'firefox':
-            desired_capabilities = DesiredCapabilities.FIREFOX
         else:
             desired_capabilities = {}
 
@@ -115,11 +96,18 @@ def initial_setup(server):
             # the browser session is invalid, this will
             # raise a WebDriverException
             try:
-                world.browser = Browser(browser_driver, desired_capabilities=desired_capabilities)
+                if browser_driver == 'firefox':
+                    # Lettuce initializes differently for firefox, and sending
+                    # desired_capabilities will not work. So initialize without
+                    # sending desired_capabilities.
+                    world.browser = Browser(browser_driver)
+                else:
+                    world.browser = Browser(browser_driver, desired_capabilities=desired_capabilities)
                 world.browser.driver.set_script_timeout(GLOBAL_SCRIPT_TIMEOUT)
                 world.visit('/')
 
             except WebDriverException:
+                LOGGER.warn("Error acquiring %s browser, retrying", browser_driver, exc_info=True)
                 if hasattr(world, 'browser'):
                     world.browser.quit()
                 num_attempts += 1

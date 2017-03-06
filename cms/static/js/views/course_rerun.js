@@ -1,4 +1,4 @@
-define(["domReady", "jquery", "underscore", "js/views/utils/create_course_utils", "js/views/utils/view_utils"],
+define(["domReady", "jquery", "underscore", "js/views/utils/create_course_utils", "common/js/components/utils/view_utils"],
     function (domReady, $, _, CreateCourseUtilsFactory, ViewUtils) {
         var CreateCourseUtils = new CreateCourseUtilsFactory({
             name: '.rerun-course-name',
@@ -50,7 +50,7 @@ define(["domReady", "jquery", "underscore", "js/views/utils/create_course_utils"
 
             // Go into creating re-run state
             $('.rerun-course-save').addClass('is-disabled').attr('aria-disabled', true).addClass('is-processing').html(
-               '<i class="icon fa fa-refresh fa-spin"></i>' + gettext('Processing Re-run Request')
+               '<span class="icon fa fa-refresh fa-spin" aria-hidden="true"></span>' + gettext('Processing Re-run Request') //jshint ignore:line
             );
             $('.action-cancel').addClass('is-hidden');
         };

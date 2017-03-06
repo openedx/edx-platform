@@ -2,7 +2,6 @@ class @Courseware
   @prefix: ''
 
   constructor: ->
-    new Navigation
     Logger.bind()
     @render()
 

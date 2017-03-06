@@ -1,0 +1,17 @@
+// Discussions - CSS application architecture
+// Version 1 styling (pre-Pattern Library)
+// ====================
+
+// From lms-discussion-main.scss
+
+@import 'edx-pattern-library/pattern-library/sass/global/ltr';                    // LTR-specific settings and utilities
+@import 'edx-pattern-library-loader';
+
+@import '../vendor/bi-app/bi-app-ltr'; // set the layout for left to right languages
+@import '../base/variables-ltr';
+@import '../build-base-v1-no-reset';
+
+@import '../elements/typography';
+
+// app - discussion
+@import 'build-discussion';

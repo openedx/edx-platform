@@ -13,8 +13,8 @@ define(["jquery", "underscore", "js/views/baseview", "js/utils/handle_iframe_bin
 
                     spyOn(baseViewPrototype, 'initialize');
                     spyOn(baseViewPrototype, 'beforeRender');
-                    spyOn(baseViewPrototype, 'render').andCallThrough();
-                    spyOn(baseViewPrototype, 'afterRender').andCallThrough();
+                    spyOn(baseViewPrototype, 'render').and.callThrough();
+                    spyOn(baseViewPrototype, 'afterRender').and.callThrough();
                 });
 
                 afterEach(function () {

@@ -7,6 +7,7 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.utils.translation import ugettext_noop
 
+from config_models.models import ConfigurationModel
 from student.models import CourseEnrollment
 
 from xmodule.modulestore.django import modulestore
@@ -57,7 +58,7 @@ class Role(models.Model):
     users = models.ManyToManyField(User, related_name="roles")
     course_id = CourseKeyField(max_length=255, blank=True, db_index=True)
 
-    class Meta:
+    class Meta(object):
         # use existing table that was originally created from django_comment_client app
         db_table = 'django_comment_client_role'
 
@@ -92,14 +93,14 @@ class Role(models.Model):
         if permission_blacked_out(course, {self.name}, permission):
             return False
 
-        return self.permissions.filter(name=permission).exists()  # pylint: disable=no-member
+        return self.permissions.filter(name=permission).exists()
 
 
 class Permission(models.Model):
     name = models.CharField(max_length=30, null=False, blank=False, primary_key=True)
     roles = models.ManyToManyField(Role, related_name="permissions")
 
-    class Meta:
+    class Meta(object):
         # use existing table that was originally created from django_comment_client app
         db_table = 'django_comment_client_permission'
 
@@ -137,3 +138,14 @@ def all_permissions_for_user_in_course(user, course_id):  # pylint: disable=inva
         if not permission_blacked_out(course, all_roles, permission.name)
     }
     return permissions
+
+
+class ForumsConfig(ConfigurationModel):
+    """Config for the connection to the cs_comments_service forums backend."""
+
+    # For now, just tweak the connection timeout settings. We can add more later.
+    connection_timeout = models.FloatField(default=5.0)
+
+    def __unicode__(self):
+        """Simple representation so the admin screen looks less ugly."""
+        return u"ForumsConfig: timeout={}".format(self.connection_timeout)

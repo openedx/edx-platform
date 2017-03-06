@@ -22,7 +22,7 @@ class CourseEmailTemplateForm(forms.ModelForm):
 
     name = forms.CharField(required=False)
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         model = CourseEmailTemplate
         fields = ('html_template', 'plain_template', 'name')
 
@@ -76,8 +76,9 @@ class CourseEmailTemplateForm(forms.ModelForm):
 class CourseAuthorizationAdminForm(forms.ModelForm):
     """Input form for email enabling, allowing us to verify data."""
 
-    class Meta(object):  # pylint: disable=missing-docstring
+    class Meta(object):
         model = CourseAuthorization
+        fields = '__all__'
 
     def clean_course_id(self):
         """Validate the course id"""
@@ -97,13 +98,6 @@ class CourseAuthorizationAdminForm(forms.ModelForm):
             msg = u'COURSE NOT FOUND'
             msg += u' --- Entered course id was: "{0}". '.format(course_key.to_deprecated_string())
             msg += 'Please recheck that you have supplied a valid course id.'
-            raise forms.ValidationError(msg)
-
-        # Now, try and discern if it is a Studio course - HTML editor doesn't work with XML courses
-        is_studio_course = modulestore().get_modulestore_type(course_key) != ModuleStoreEnum.Type.xml
-        if not is_studio_course:
-            msg = "Course Email feature is only available for courses authored in Studio. "
-            msg += '"{0}" appears to be an XML backed course.'.format(course_key.to_deprecated_string())
             raise forms.ValidationError(msg)
 
         return course_key

@@ -1,18 +1,17 @@
 """
 Implement CourseTab
 """
-
 from abc import ABCMeta
 import logging
 
 from xblock.fields import List
 from openedx.core.lib.api.plugins import PluginError
 
-# We should only scrape strings for i18n in this file, since the target language is known only when
-# they are rendered in the template.  So ugettext gets called in the template.
-_ = lambda text: text
-
 log = logging.getLogger("edx.courseware")
+
+# Make '_' a no-op so we can scrape strings. Using lambda instead of
+#  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
+_ = lambda text: text
 
 
 class CourseTab(object):
@@ -74,7 +73,7 @@ class CourseTab(object):
         self.is_hidden = tab_dict.get('is_hidden', False)
 
     @classmethod
-    def is_enabled(cls, course, user=None):  # pylint: disable=unused-argument
+    def is_enabled(cls, course, user=None):
         """Returns true if this course tab is enabled in the course.
 
         Args:
@@ -146,7 +145,7 @@ class CourseTab(object):
         """
         Overrides the not equal operator as a partner to the equal operator.
         """
-        return not (self == other)
+        return not self == other
 
     @classmethod
     def validate(cls, tab_dict, raise_error=True):
@@ -250,7 +249,7 @@ class StaticTab(CourseTab):
         super(StaticTab, self).__init__(tab_dict)
 
     @classmethod
-    def is_enabled(cls, course, user=None):  # pylint: disable=unused-argument
+    def is_enabled(cls, course, user=None):
         """
         Static tabs are viewable to everyone, even anonymous users.
         """
@@ -306,8 +305,8 @@ class CourseTabList(List):
         """
 
         course.tabs.extend([
-            CourseTab.load('courseware'),
-            CourseTab.load('course_info')
+            CourseTab.load('course_info'),
+            CourseTab.load('courseware')
         ])
 
         # Presence of syllabus tab is indicated by a course attribute
@@ -391,6 +390,19 @@ class CourseTabList(List):
                     yield tab
 
     @classmethod
+    def upgrade_tabs(cls, tabs):
+        """
+        Reverse and Rename Courseware to Course and Course Info to Home Tabs.
+        """
+        if tabs and len(tabs) > 1:
+            if tabs[0].get('type') == 'courseware' and tabs[1].get('type') == 'course_info':
+                tabs[0], tabs[1] = tabs[1], tabs[0]
+                tabs[0]['name'] = _('Home')
+                tabs[1]['name'] = _('Course')
+
+        return tabs
+
+    @classmethod
     def validate_tabs(cls, tabs):
         """
         Check that the tabs set for the specified course is valid.  If it
@@ -407,13 +419,13 @@ class CourseTabList(List):
         if len(tabs) < 2:
             raise InvalidTabsException("Expected at least two tabs.  tabs: '{0}'".format(tabs))
 
-        if tabs[0].get('type') != 'courseware':
+        if tabs[0].get('type') != 'course_info':
             raise InvalidTabsException(
-                "Expected first tab to have type 'courseware'.  tabs: '{0}'".format(tabs))
+                "Expected first tab to have type 'course_info'.  tabs: '{0}'".format(tabs))
 
-        if tabs[1].get('type') != 'course_info':
+        if tabs[1].get('type') != 'courseware':
             raise InvalidTabsException(
-                "Expected second tab to have type 'course_info'.  tabs: '{0}'".format(tabs))
+                "Expected second tab to have type 'courseware'.  tabs: '{0}'".format(tabs))
 
         # the following tabs should appear only once
         # TODO: don't import openedx capabilities from common
@@ -456,6 +468,7 @@ class CourseTabList(List):
         """
         Overrides the from_json method to de-serialize the CourseTab objects from a json-like representation.
         """
+        self.upgrade_tabs(values)
         self.validate_tabs(values)
         tabs = []
         for tab_dict in values:

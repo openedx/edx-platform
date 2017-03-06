@@ -28,7 +28,7 @@ def celery_status(_):
     """
     stats = celery.control.inspect().stats() or {}
     return HttpResponse(json.dumps(stats, indent=4),
-                        mimetype="application/json")
+                        content_type="application/json")
 
 
 @dog_stats_api.timed('status.service.celery.ping')
@@ -56,4 +56,4 @@ def celery_ping(_):
     }
 
     return HttpResponse(json.dumps(output, indent=4),
-                        mimetype="application/json")
+                        content_type="application/json")

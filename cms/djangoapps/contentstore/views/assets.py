@@ -10,7 +10,7 @@ from django.views.decorators.http import require_http_methods, require_POST
 from django.conf import settings
 
 from edxmako.shortcuts import render_to_response
-from cache_toolbox.core import del_cached_content
+from contentserver.caching import del_cached_content
 
 from contentstore.utils import reverse_course_url
 from xmodule.contentstore.django import contentstore
@@ -61,7 +61,7 @@ def assets_handler(request, course_key_string=None, asset_key_string=None):
     if not has_course_author_access(request.user, course_key):
         raise PermissionDenied()
 
-    response_format = request.REQUEST.get('format', 'html')
+    response_format = request.GET.get('format') or request.POST.get('format') or 'html'
     if response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
         if request.method == 'GET':
             return _assets_json(request, course_key)
@@ -97,10 +97,10 @@ def _assets_json(request, course_key):
 
     Supports start (0-based index into the list of assets) and max query parameters.
     """
-    requested_page = int(request.REQUEST.get('page', 0))
-    requested_page_size = int(request.REQUEST.get('page_size', 50))
-    requested_sort = request.REQUEST.get('sort', 'date_added')
-    requested_filter = request.REQUEST.get('asset_type', '')
+    requested_page = int(request.GET.get('page', 0))
+    requested_page_size = int(request.GET.get('page_size', 50))
+    requested_sort = request.GET.get('sort', 'date_added')
+    requested_filter = request.GET.get('asset_type', '')
     requested_file_types = settings.FILES_AND_UPLOAD_TYPE_FILTERS.get(
         requested_filter, None)
     filter_params = None
@@ -124,7 +124,7 @@ def _assets_json(request, course_key):
             }
 
     sort_direction = DESCENDING
-    if request.REQUEST.get('direction', '').lower() == 'asc':
+    if request.GET.get('direction', '').lower() == 'asc':
         sort_direction = ASCENDING
 
     # Convert the field name to the Mongo name

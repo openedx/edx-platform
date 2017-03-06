@@ -1,4 +1,4 @@
-define([ "jquery", "underscore", "common/js/spec_helpers/ajax_helpers", "js/spec_helpers/edit_helpers",
+define([ "jquery", "underscore", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "js/spec_helpers/edit_helpers",
     "js/views/xblock_editor", "js/models/xblock_info"],
     function ($, _, AjaxHelpers, EditHelpers, XBlockEditorView, XBlockInfo) {
 
@@ -86,7 +86,7 @@ define([ "jquery", "underscore", "common/js/spec_helpers/ajax_helpers", "js/spec
                     // Give the mock xblock a save method...
                     editor.xblock.save = window.MockDescriptor.save;
                     editor.model.save(editor.getXBlockFieldData());
-                    request = requests[requests.length - 1];
+                    request = AjaxHelpers.currentRequest(requests);
                     response = JSON.parse(request.requestBody);
                     expect(response.metadata.display_name).toBe(testDisplayName);
                     expect(response.metadata.custom_field).toBe('Custom Value');

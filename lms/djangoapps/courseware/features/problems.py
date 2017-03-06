@@ -82,8 +82,8 @@ def input_problem_answer(_, problem_type, correctness):
     """
     Have the browser input an answer (either correct or incorrect)
     """
-    assert(correctness in ['correct', 'incorrect'])
-    assert(problem_type in PROBLEM_DICT)
+    assert correctness in ['correct', 'incorrect']
+    assert problem_type in PROBLEM_DICT
     answer_problem(world.scenario_dict['COURSE'].number, problem_type, correctness)
 
 
@@ -92,10 +92,19 @@ def check_problem(step):
     # first scroll down so the loading mathjax button does not
     # cover up the Check button
     world.browser.execute_script("window.scrollTo(0,1024)")
+    assert world.is_css_not_present("button.check.is-disabled")
     world.css_click("button.check")
 
     # Wait for the problem to finish re-rendering
     world.wait_for_ajax_complete()
+
+
+@step(u"I can't check a problem")
+def assert_cant_check_problem(step):   # pylint: disable=unused-argument
+    # first scroll down so the loading mathjax button does not
+    # cover up the Check button
+    world.browser.execute_script("window.scrollTo(0,1024)")
+    assert world.is_css_present("button.check.is-disabled")
 
 
 @step(u'The "([^"]*)" problem displays a "([^"]*)" answer')
@@ -166,8 +175,8 @@ def assert_answer_mark(_step, problem_type, isnt_marked, correctness):
     *correctness* is in ['correct', 'incorrect', 'unanswered']
     """
     # Determine which selector(s) to look for based on correctness
-    assert(correctness in ['correct', 'incorrect', 'unanswered'])
-    assert(problem_type in PROBLEM_DICT)
+    assert correctness in ['correct', 'incorrect', 'unanswered']
+    assert problem_type in PROBLEM_DICT
 
     # At least one of the correct selectors should be present
     for sel in PROBLEM_DICT[problem_type][correctness]:
@@ -183,4 +192,4 @@ def assert_answer_mark(_step, problem_type, isnt_marked, correctness):
             break
 
     # Expect that we found the expected selector
-    assert(has_expected)
+    assert has_expected

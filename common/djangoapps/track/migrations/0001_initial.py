@@ -1,48 +1,32 @@
 # -*- coding: utf-8 -*-
-import datetime
-from south.db import db
-from south.v2 import SchemaMigration
-from django.db import models
+from __future__ import unicode_literals
+
+from django.db import migrations, models
 
 
-class Migration(SchemaMigration):
+class Migration(migrations.Migration):
 
-    def forwards(self, orm):
-        # Adding model 'TrackingLog'
-        db.create_table('track_trackinglog', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('dtcreated', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('username', self.gf('django.db.models.fields.CharField')(max_length=32, blank=True)),
-            ('ip', self.gf('django.db.models.fields.CharField')(max_length=32, blank=True)),
-            ('event_source', self.gf('django.db.models.fields.CharField')(max_length=32)),
-            ('event_type', self.gf('django.db.models.fields.CharField')(max_length=32, blank=True)),
-            ('event', self.gf('django.db.models.fields.TextField')(blank=True)),
-            ('agent', self.gf('django.db.models.fields.CharField')(max_length=256, blank=True)),
-            ('page', self.gf('django.db.models.fields.CharField')(max_length=32, null=True, blank=True)),
-            ('time', self.gf('django.db.models.fields.DateTimeField')()),
-        ))
-        db.send_create_signal('track', ['TrackingLog'])
+    dependencies = [
+    ]
 
-
-    def backwards(self, orm):
-        # Deleting model 'TrackingLog'
-        db.delete_table('track_trackinglog')
-
-
-    models = {
-        'track.trackinglog': {
-            'Meta': {'object_name': 'TrackingLog'},
-            'agent': ('django.db.models.fields.CharField', [], {'max_length': '256', 'blank': 'True'}),
-            'dtcreated': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'event': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'event_source': ('django.db.models.fields.CharField', [], {'max_length': '32'}),
-            'event_type': ('django.db.models.fields.CharField', [], {'max_length': '32', 'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'ip': ('django.db.models.fields.CharField', [], {'max_length': '32', 'blank': 'True'}),
-            'page': ('django.db.models.fields.CharField', [], {'max_length': '32', 'null': 'True', 'blank': 'True'}),
-            'time': ('django.db.models.fields.DateTimeField', [], {}),
-            'username': ('django.db.models.fields.CharField', [], {'max_length': '32', 'blank': 'True'})
-        }
-    }
-
-    complete_apps = ['track']
+    operations = [
+        migrations.CreateModel(
+            name='TrackingLog',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('dtcreated', models.DateTimeField(auto_now_add=True, verbose_name=b'creation date')),
+                ('username', models.CharField(max_length=32, blank=True)),
+                ('ip', models.CharField(max_length=32, blank=True)),
+                ('event_source', models.CharField(max_length=32)),
+                ('event_type', models.CharField(max_length=512, blank=True)),
+                ('event', models.TextField(blank=True)),
+                ('agent', models.CharField(max_length=256, blank=True)),
+                ('page', models.CharField(max_length=512, null=True, blank=True)),
+                ('time', models.DateTimeField(verbose_name=b'event time')),
+                ('host', models.CharField(max_length=64, blank=True)),
+            ],
+            options={
+                'db_table': 'track_trackinglog',
+            },
+        ),
+    ]

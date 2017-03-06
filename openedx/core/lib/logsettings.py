@@ -87,11 +87,6 @@ def get_logger_config(log_dir,
                 'filters': ['require_debug_false'],
                 'class': 'django.utils.log.AdminEmailHandler'
             },
-            'newrelic': {
-                'level': 'ERROR',
-                'class': 'lms.lib.newrelic_logging.NewRelicHandler',
-                'formatter': 'raw',
-            }
         },
         'loggers': {
             'tracking': {

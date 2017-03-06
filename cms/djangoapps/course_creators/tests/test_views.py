@@ -5,13 +5,13 @@ Tests course_creators.views.py.
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.test import TestCase, RequestFactory
+from django.core.urlresolvers import reverse
 
 from course_creators.views import add_user_with_status_unrequested, add_user_with_status_granted
 from course_creators.views import get_course_creator_status, update_course_creator_group, user_requested_access
 import mock
 from student.roles import CourseCreatorRole
 from student import auth
-from edxmako.tests import mako_middleware_process_request
 
 
 class CourseCreatorView(TestCase):
@@ -50,7 +50,7 @@ class CourseCreatorView(TestCase):
     def test_add_granted(self):
         with mock.patch.dict('django.conf.settings.FEATURES', {"ENABLE_CREATOR_GROUP": True}):
             # Calling add_user_with_status_granted impacts is_user_in_course_group_role.
-            self.assertFalse(auth.has_access(self.user, CourseCreatorRole()))
+            self.assertFalse(auth.user_has_role(self.user, CourseCreatorRole()))
 
             add_user_with_status_granted(self.admin, self.user)
             self.assertEqual('granted', get_course_creator_status(self.user))
@@ -59,25 +59,26 @@ class CourseCreatorView(TestCase):
             add_user_with_status_unrequested(self.user)
             self.assertEqual('granted', get_course_creator_status(self.user))
 
-            self.assertTrue(auth.has_access(self.user, CourseCreatorRole()))
+            self.assertTrue(auth.user_has_role(self.user, CourseCreatorRole()))
 
     def test_update_creator_group(self):
         with mock.patch.dict('django.conf.settings.FEATURES', {"ENABLE_CREATOR_GROUP": True}):
-            self.assertFalse(auth.has_access(self.user, CourseCreatorRole()))
+            self.assertFalse(auth.user_has_role(self.user, CourseCreatorRole()))
             update_course_creator_group(self.admin, self.user, True)
-            self.assertTrue(auth.has_access(self.user, CourseCreatorRole()))
+            self.assertTrue(auth.user_has_role(self.user, CourseCreatorRole()))
             update_course_creator_group(self.admin, self.user, False)
-            self.assertFalse(auth.has_access(self.user, CourseCreatorRole()))
+            self.assertFalse(auth.user_has_role(self.user, CourseCreatorRole()))
 
     def test_user_requested_access(self):
         add_user_with_status_unrequested(self.user)
         self.assertEqual('unrequested', get_course_creator_status(self.user))
 
-        request = RequestFactory().get('/')
-        request.user = self.user
+        self.client.login(username=self.user.username, password='foo')
 
-        mako_middleware_process_request(request)
-        user_requested_access(self.user)
+        # The user_requested_access function renders a template that requires
+        # request-specific information. Use the django TestClient to supply
+        # the appropriate request context.
+        self.client.post(reverse('request_course_creator'))
         self.assertEqual('pending', get_course_creator_status(self.user))
 
     def test_user_requested_already_granted(self):

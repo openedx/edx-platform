@@ -1,5 +1,4 @@
-''' Text annotation module '''
-
+"""Text annotation module"""
 from lxml import etree
 from pkg_resources import resource_string
 
@@ -11,7 +10,8 @@ from xmodule.annotator_token import retrieve_token
 from xblock.fragment import Fragment
 import textwrap
 
-# Make '_' a no-op so we can scrape strings
+# Make '_' a no-op so we can scrape strings. Using lambda instead of
+#  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
 
 
@@ -121,7 +121,7 @@ class TextAnnotationModule(AnnotatableFields, XModule):
         """ Renders parameters to template. """
         context = {
             'course_key': self.runtime.course_id,
-            'display_name': self.display_name_with_default,
+            'display_name': self.display_name_with_default_escaped,
             'tag': self.instructor_tags,
             'source': self.source,
             'instructions_html': self.instructions,
@@ -147,6 +147,7 @@ class TextAnnotationModule(AnnotatableFields, XModule):
 class TextAnnotationDescriptor(AnnotatableFields, RawDescriptor):
     ''' Text Annotation Descriptor '''
     module_class = TextAnnotationModule
+    resources_dir = None
     mako_template = "widgets/raw-edit.html"
 
     @property

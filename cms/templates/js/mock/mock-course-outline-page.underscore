@@ -12,18 +12,18 @@
                 <ul>
                     <li class="nav-item">
                         <a href="#" class="button button-toggle button-toggle-expand-collapse collapse-all is-hidden">
-                            <span class="collapse-all"><i class="icon fa fa-arrow-up"></i> <span class="label">Collapse All Sections</span></span>
-                            <span class="expand-all"><i class="icon fa fa-arrow-down"></i> <span class="label">Expand All Sections</span></span>
+                            <span class="collapse-all"><span class="icon fa fa-arrow-up" aria-hidden="true"></span> <span class="label">Collapse All Sections</span></span>
+                            <span class="expand-all"><span class="icon fa fa-arrow-down" aria-hidden="true"></span> <span class="label">Expand All Sections</span></span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a href="#" class="button button-new" data-category="chapter" data-parent="mock-course" data-default-name="Section" title="Click to add a new section">
-                            <i class="icon fa fa-plus"></i>New Section
+                            <span class="icon fa fa-plus" aria-hidden="true"></span>New Section
                         </a>
                     </li>
                     <li class="nav-item">
                         <a title="Reindex current course" data-category="reindex" class="button button-reindex" href="#">
-                            <i class="icon-arrow-right"></i>Reindex
+                            <span class="icon-arrow-right" aria-hidden="true"></span>Reindex
                         </a>
                     </li>
                     <li class="nav-item">
@@ -42,14 +42,14 @@
                         <div class="no-content add-xblock-component">
                             <p>You haven't added any content to this course yet.
                                 <a href="#" class="button button-new" data-category="chapter" data-parent="mock-course" data-default-name="Section" title="Click to add a new section">
-                                    <i class="icon fa fa-plus"></i>Add Section
+                                    <span class="icon fa fa-plus" aria-hidden="true"></span>Add Section
                                 </a>
                             </p>
                         </div>
                     </article>
                 </div>
                 <div class="ui-loading">
-                    <p><span class="spin"><i class="icon fa fa-refresh"></i></span> <span class="copy">Loading</span></p>
+                    <p><span class="spin"><span class="icon fa fa-refresh" aria-hidden="true"></span></span> <span class="copy">Loading</span></p>
                 </div>
             </article>
             <aside class="content-supplementary" role="complementary">

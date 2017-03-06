@@ -1,8 +1,8 @@
 // studio - base styling
 // ====================
 
-// Table of Contents 
-// * +Basic Setup 
+// Table of Contents
+// * +Basic Setup
 // * +Typography - Basic
 // * +Typography - Primary Content
 // * +Typography - Secondary Content
@@ -19,7 +19,7 @@
 // * +JS Dependent
 
 // +Basic Setup
-// ==================== 
+// ====================
 html {
   font-size: 62.5%;
   height: 102%; // force scrollbar to prevent jump when scroll appears, cannot use overflow because it breaks drag
@@ -34,6 +34,11 @@ body {
 
 body, input, button {
   font-family: 'Open Sans', sans-serif;
+}
+
+// removing the outline on any element that we make programmatically focusable
+[tabindex="-1"] {
+    outline: none;
 }
 
 a {
@@ -66,7 +71,7 @@ h1 {
 }
 
 // +Typography - Basic
-// ==================== 
+// ====================
 .page-header {
   @extend %t-title3;
   @extend %t-strong;
@@ -111,7 +116,7 @@ h1 {
 }
 
 // +Typography - Primary Content
-// ==================== 
+// ====================
 .content-primary {
 
   .section-header {
@@ -148,7 +153,7 @@ h1 {
 }
 
 // +Typography - Secondary Content
-// ==================== 
+// ====================
 .content-secondary {
 
   .section-header {
@@ -177,7 +182,7 @@ h1 {
 }
 
 // +Typography - Loose Headings  (BT: needs to be removed once html is clean)
-// ==================== 
+// ====================
 .title-1, .title-2, .title-3, .title-4, .title-5, .title-6 {
   @extend %t-strong;
 }
@@ -226,13 +231,13 @@ p, ul, ol, dl {
 }
 
 // +Layout - Basic
-// ==================== 
+// ====================
 .wrapper-view {
 
 }
 
 // +Layout - Basic Page Header
-// ==================== 
+// ====================
 .wrapper-mast {
   margin: ($baseline*1.5) 0 0 0;
   padding: 0 $baseline;
@@ -375,7 +380,7 @@ p, ul, ol, dl {
 }
 
 // +Layout - Basic Page Content
-// ==================== 
+// ====================
 .wrapper-content {
   margin: 0;
   padding: 0 $baseline;
@@ -419,7 +424,7 @@ p, ul, ol, dl {
 }
 
 // +Layout - Primary Content
-// ==================== 
+// ====================
 .content-primary {
 
   .title-1 {
@@ -457,7 +462,7 @@ p, ul, ol, dl {
 }
 
 // +Layout - Supplemental Content
-// ==================== 
+// ====================
 .content-supplementary {
 
   > section {
@@ -466,7 +471,7 @@ p, ul, ol, dl {
 }
 
 // +Layout - Grandfathered
-// ==================== 
+// ====================
 .main-wrapper {
   position: relative;
   margin: 0 ($baseline*2);
@@ -503,7 +508,7 @@ p, ul, ol, dl {
 }
 
 // +UI - Actions
-// ==================== 
+// ====================
 .new-unit-item,
 .new-subsection-item,
 .new-policy-item {
@@ -534,7 +539,7 @@ p, ul, ol, dl {
 }
 
 // +UI - Misc
-// ==================== 
+// ====================
 hr.divide {
   @extend %cont-text-sr;
 }
@@ -622,10 +627,10 @@ hr.divide {
 
 
 // +Utility - Basic
-// ==================== 
+// ====================
 
 // UI - semantically hide text
-.sr {
+.sr, .sr-only {
   @extend %cont-text-sr;
 }
 
@@ -645,23 +650,25 @@ hr.divider {
 }
 
 // ui - skipnav
-.nav-skip {
+.nav-skip,
+.transcript-skip {
   @extend %t-action3;
-  display: block;
+  display: inline-block;
   position: absolute;
   left: 0px;
   top: -($baseline*30);
-  width: 1px;
-  height: 1px;
   overflow: hidden;
   background: $white;
   border-bottom: 1px solid $gray-l4;
   padding: ($baseline*0.75) ($baseline/2);
 
-  &:focus, &:active {
-    position: static;
+  &:focus,
+  &:active {
+    position: relative;
+    top: auto;
     width: auto;
     height: auto;
+    margin: 0;
   }
 }
 
@@ -724,4 +731,3 @@ hr.divider {
     color: $gray-l1;
   }
 }
-

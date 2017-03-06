@@ -7,17 +7,20 @@ from django.test import TestCase
 from mock import patch
 from student.tests.factories import UserFactory
 from util.testing import UrlResetMixin
-from verify_student.models import SoftwareSecurePhotoVerification
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 
 
 class SoftwareSecureFakeViewTest(UrlResetMixin, TestCase):
     """
     Base class to test the fake software secure view.
     """
+
+    URLCONF_MODULES = ['verify_student.urls']
+
     def setUp(self, **kwargs):
         enable_software_secure_fake = kwargs.get('enable_software_secure_fake', False)
         with patch.dict('django.conf.settings.FEATURES', {'ENABLE_SOFTWARE_SECURE_FAKE': enable_software_secure_fake}):
-            super(SoftwareSecureFakeViewTest, self).setUp('verify_student.urls')
+            super(SoftwareSecureFakeViewTest, self).setUp()
 
         self.user = UserFactory.create(username="test", password="test")
         self.attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)

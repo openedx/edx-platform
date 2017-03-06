@@ -1,0 +1,4 @@
+<div class="sr-is-focusable sr-teams-view" tabindex="-1"></div>
+<div class="teams-paging-header"></div>
+<div class="teams-list"></div>
+<div class="teams-paging-footer"></div>

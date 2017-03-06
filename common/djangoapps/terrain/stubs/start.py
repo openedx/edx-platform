@@ -4,13 +4,15 @@ Command-line utility to start a stub service.
 import sys
 import time
 import logging
+
 from .comments import StubCommentsService
+from .ecommerce import StubEcommerceService
 from .xqueue import StubXQueueService
 from .youtube import StubYouTubeService
-from .ora import StubOraService
 from .lti import StubLtiService
 from .video_source import VideoSourceHttpService
 from .edxnotes import StubEdxNotesService
+from .programs import StubProgramsService
 
 
 USAGE = "USAGE: python -m stubs.start SERVICE_NAME PORT_NUM [CONFIG_KEY=CONFIG_VAL, ...]"
@@ -18,11 +20,12 @@ USAGE = "USAGE: python -m stubs.start SERVICE_NAME PORT_NUM [CONFIG_KEY=CONFIG_V
 SERVICES = {
     'xqueue': StubXQueueService,
     'youtube': StubYouTubeService,
-    'ora': StubOraService,
     'comments': StubCommentsService,
     'lti': StubLtiService,
     'video': VideoSourceHttpService,
     'edxnotes': StubEdxNotesService,
+    'programs': StubProgramsService,
+    'ecommerce': StubEcommerceService,
 }
 
 # Log to stdout, including debug messages

@@ -11,6 +11,13 @@ class ItemWriteConflictError(Exception):
     pass
 
 
+class MultipleCourseBlocksFound(Exception):
+    """
+    Raise this exception when Iterating over the course blocks return multiple course blocks.
+    """
+    pass
+
+
 class InsufficientSpecificationError(Exception):
     pass
 

@@ -1,9 +1,9 @@
 @import '../base/grid-settings';
 @import 'neat/neat'; // lib - Neat
 
-header.global {
+.header-global {
   @extend %ui-depth1;
-  border-bottom: 1px solid $m-gray;
+  border-bottom: 1px solid $gray-l1;
   box-shadow: 0 1px 5px 0 $shadow-l1;
   background: $header-bg;
   position: relative;
@@ -88,8 +88,6 @@ header.global {
     > a {
       @include background-image($button-bg-image);
       background-color: $button-bg-color;
-      border: 1px solid $border-color-2;
-      border-radius: 3px;
       @include box-sizing(border-box);
       box-shadow: 0 1px 0 0 rgba(255,255,255, 0.6);
       color: $base-font-color;
@@ -117,8 +115,15 @@ header.global {
   .user {
     @include float(right);
     @extend %ui-print-excluded;
-    margin-top: ($baseline/4);
     padding-left: 0;
+    margin: 0;
+
+    .settings-language-form {
+      margin: 4px;
+      .language-selector {
+        width: 120px;
+      }
+    }
 
     > .primary {
       display: block;
@@ -128,15 +133,12 @@ header.global {
 
       > a {
         margin: 0;
-        @include border-right-radius(0px);
         background-image: none;
       }
 
       &:last-child {
         > a {
-          @include border-radius(0, 4px, 4px, 0);
-          @include border-left(none);
-          padding: ($baseline/4) 8px 11px ($baseline/2);
+          padding: ($baseline/2);
 
           &.shopping-cart {
             border-radius: 4px;
@@ -148,13 +150,18 @@ header.global {
       }
     }
 
-    a.user-link {
-      @include padding(5px, 12px, 10px, 10px);
+    .user-link {
+      padding: 0;
       position: relative;
       text-transform: none;
       font-size: 14px;
       font-weight: bold;
       letter-spacing: 0;
+
+      .user-image-frame {
+        max-width: ($baseline*2);
+        border-radius: 10%;
+      }
 
       .icon {
         display: inline-block;
@@ -164,36 +171,20 @@ header.global {
         color: $m-gray;
       }
 
-      .avatar {
+      .label-username {
+        @include float(right);
+        @include margin(($baseline*0.75), ($baseline/4), ($baseline*0.75), ($baseline*0.75));
+      }
+    }
 
-        // CASE: right to left layout
-
-        display: inline-block;
-        @include left(8px);
-        opacity: 0.5;
-        overflow: hidden;
-        top: 4px;
-        margin-top: 1px;
-        margin-right: 2px;
-        @include transition(all 0.15s linear 0s);
-        width: 19px;
-      }
-      div {
-        margin-top: 3px;
-        float: right;
-        margin-left: 4px;
-      }
-      div {
-        margin-top: 3px;
-        float: right;
-        margin-left: 4px;
-      }
-
-      &:hover, &:focus {
-        .avatar {
-          opacity: 0.8;
-        }
-      }
+    .dropdown {
+      font-size: $body-font-size;
+      padding: 0 ($baseline/2);
+      color: $base-font-color;
+      border: none;
+      background: $white;
+      box-shadow: none;
+      text-shadow: none;
     }
 
     .dropdown-menu {
@@ -271,7 +262,26 @@ header.global {
     margin-top: ($baseline/2);
     list-style: none;
     @include float(left);
-
+    .tab-nav-item{
+      display: flex;
+      margin: 0px;
+      text-transform: none;
+      @include float(left);
+      justify-content: center;
+      .tab-nav-link{
+        font-size: em(16);
+        color: $gray;
+        padding: 5px 25px 23px;
+        display: inline-block;
+        &:hover,
+        &:focus{
+          border-bottom: 4px solid $courseware-border-bottom-color;
+        }
+      }
+      .active{
+        border-bottom: 4px solid $black-t3 !important;
+      }
+    }
     li,
     div {
       display: inline-block;
@@ -288,7 +298,7 @@ header.global {
       a {
         display:block;
         padding: ($baseline/4);
-        color: $lighter-base-font-color;
+        color: $link-color;
         font-weight: 600;
 
         &:hover, &:focus, &:active {
@@ -320,7 +330,7 @@ header.global {
     li, div {
       display: inline-block;
 
-      .cta {
+      .btn {
         @extend %m-btn-primary;
       }
     }
@@ -330,7 +340,7 @@ header.global {
 // marketing site design syncing
 .view-register, .view-login, .view-passwordreset {
 
-  header.global nav {
+  .header-global nav {
     width: 960px;
   }
 }
@@ -346,18 +356,17 @@ header.global {
   }
 }
 
-
 // edX theme: Global Header
 // ====================
 
 // CASE: marketing/course discovery
-header.global-new {
+.header-global-new {
   @extend %ui-depth1;
   /* Temp. fix until applied globally */
   @include box-sizing(border-box);
   position: relative;
   width: 100%;
-  border-bottom: 4px solid $courseware-border-bottom-color;
+  border-bottom: 1px solid $gray-l1;
   box-shadow: 0 1px 5px 0 $shadow-l1;
   background: $header-bg;
 
@@ -386,6 +395,26 @@ header.global-new {
 
   .nav-global {
     @include float(left);
+    .tab-nav-item{
+      display: flex;
+      margin: 0px;
+      text-transform: none;
+      @include float(left);
+      justify-content: center;
+      .tab-nav-link{
+        font-size: em(16);
+        color: $gray;
+        display: inline-block;
+        padding: 5px 25px 19px;
+        &:hover,
+        &:focus{
+          border-bottom: 4px solid $courseware-border-bottom-color;
+        }
+      }
+      .active{
+        border-bottom: 4px solid $black-t3 !important;
+      }
+    }
   }
 
   .nav-account-management {
@@ -437,8 +466,6 @@ header.global-new {
     > a {
       @include background-image($button-bg-image);
       background-color: $button-bg-color;
-      border: 1px solid $border-color-2;
-      border-radius: 3px;
       @include box-sizing(border-box);
       box-shadow: 0 1px 0 0 rgba(255,255,255, 0.6);
       color: $base-font-color;
@@ -464,7 +491,7 @@ header.global-new {
 
   .user {
     @include float(right);
-    margin-top: 4px;
+    margin-top: 0;
 
     > .primary {
       display: block;
@@ -482,7 +509,7 @@ header.global-new {
         > a {
           @include border-radius(0, 4px, 4px, 0);
           @include border-left(none);
-          padding: 5px 8px 7px 8px;
+          padding: ($baseline/2) ($baseline/2);
 
           &.shopping-cart {
             border-radius: 4px;
@@ -493,13 +520,18 @@ header.global-new {
         }
       }
     }
-     a.user-link {
-      @include padding(3px, 12px, 8px, 8px);
+    .user-link {
+      padding: 0;
       position: relative;
       text-transform: none;
       font-size: 14px;
       font-weight: bold;
       letter-spacing: 0;
+
+      .user-image-frame {
+        max-width: ($baseline*2);
+        border-radius: 10%;
+      }
 
       .icon {
         display: inline-block;
@@ -509,36 +541,20 @@ header.global-new {
         color: $m-gray;
       }
 
-      .avatar {
+      .label-username {
+        @include float(right);
+        @include margin(($baseline*0.75), ($baseline/4), ($baseline*0.75), ($baseline*0.75));
+      }
+    }
 
-        // CASE: right to left layout
-
-        display: inline-block;
-        @include left(8px);
-        opacity: 0.5;
-        overflow: hidden;
-        top: 4px;
-        margin-top: 1px;
-        margin-right: 2px;
-        @include transition(all 0.15s linear 0s);
-        width: 19px;
-      }
-      div {
-        margin-top: 3px;
-        float: right;
-        margin-left: 4px;
-      }
-      div {
-        margin-top: 3px;
-        float: right;
-        margin-left: 4px;
-      }
-
-      &:hover, &:focus {
-        .avatar {
-          opacity: 0.8;
-        }
-      }
+    .dropdown {
+      font-size: $body-font-size;
+      padding: ($baseline/5) ($baseline/2);
+      color: $base-font-color;
+      border: none;
+      background: $white;
+      box-shadow: none;
+      text-shadow: none;
     }
 
     .dropdown-menu {
@@ -627,8 +643,8 @@ header.global-new {
       a {
         display:block;
         padding: 3px 10px;
-        font-size: 18px;
-        line-height: 24px;
+        font-size: 14px;
+        line-height: 1.5;
         font-weight: 600;
         font-family: $header-sans-serif;
         color: $courseware-navigation-color;
@@ -715,7 +731,6 @@ header.global-new {
         font-size: 14px;
 
         &.nav-courseware-button {
-          width: 86px;
           text-align: center;
           margin-top: -3px;
         }
@@ -833,24 +848,17 @@ header.global-new {
       .wrapper-header {
         padding: 17px 0;
       }
-
-      .nav-global,
-      .nav-courseware {
-        a {
-          font-size: 18px;
-        }
-      }
     }
   }
 }
 
-.view-register header.global-new .cta-register {
+.view-register .header-global-new .btn-register {
   text-decoration: none;
   color: $courseware-hover-color;
   border-bottom-color: $courseware-border-bottom-color;
 }
 
-.view-login header.global-new .cta-login {
+.view-login .header-global-new .btn-login {
   text-decoration: none;
   color: $courseware-hover-color;
 }
@@ -858,7 +866,7 @@ header.global-new {
 // marketing site design syncing
 .view-register, .view-login {
 
-  header.global nav {
+  .header-global nav {
     width: 960px;
   }
 }

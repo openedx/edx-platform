@@ -23,7 +23,8 @@ from xblock.fragment import Fragment
 
 log = logging.getLogger('edx.' + __name__)
 
-# Make '_' a no-op so we can scrape strings
+# Make '_' a no-op so we can scrape strings. Using lambda instead of
+#  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
 
 DEFAULT_GROUP_NAME = _(u'Group ID {group_id}')
@@ -355,6 +356,10 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
                     return (group.name, group.id)
         return (None, None)
 
+    @property
+    def tooltip_title(self):
+        return getattr(self.child, 'tooltip_title', '')
+
     def validate(self):
         """
         Message for either error or warning validation message/s.
@@ -371,9 +376,13 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
     # the editing interface can be the same as for sequences -- just a container
     module_class = SplitTestModule
 
+    resources_dir = 'assets/split_test'
+
     filename_extension = "xml"
 
     mako_template = "widgets/metadata-only-edit.html"
+
+    show_in_read_only_mode = True
 
     child_descriptor = module_attr('child_descriptor')
     log_child_render = module_attr('log_child_render')
@@ -556,7 +565,7 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
         Returns a StudioValidation object describing the current state of the split_test_module
         (not including superclass validation messages).
         """
-        _ = self.runtime.service(self, "i18n").ugettext  # pylint: disable=redefined-outer-name
+        _ = self.runtime.service(self, "i18n").ugettext
         split_validation = StudioValidation(self.location)
         if self.user_partition_id < 0:
             split_validation.add(
@@ -692,3 +701,5 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
         )
         self.children.append(dest_usage_key)  # pylint: disable=no-member
         self.group_id_to_child[unicode(group.id)] = dest_usage_key
+
+    tooltip_title = module_attr('tooltip_title')

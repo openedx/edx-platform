@@ -4,7 +4,7 @@ ${_("Dear {full_name}").format(full_name=full_name)}
 
 ${_("You have been invited to be a beta tester for {course_name} at {site_name} by a "
 	"member of the course staff.").format(
-		course_name=course.display_name_with_default,
+		course_name=course.display_name_with_default_escaped,
 		site_name=site_name
 	)}
 

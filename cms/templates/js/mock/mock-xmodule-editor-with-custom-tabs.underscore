@@ -1,6 +1,6 @@
 <div class="xblock xblock-studio_view xmodule_edit xmodule_WrapperDescriptor" data-runtime-class="StudioRuntime"
      data-init="XBlockToXModuleShim" data-runtime-version="1" data-usage-id="i4x:;_;_edX;_mock"
-     data-type="VerticalDescriptor" tabindex="0">
+     data-type="MockDescriptor" tabindex="0">
     <div class="wrapper-comp-editor is-active" id="editor-tab" data-base-asset-url="/c4x/AndyA/ABT101/asset/">
 <section class="editor-with-tabs">
      <div class="edit-header">

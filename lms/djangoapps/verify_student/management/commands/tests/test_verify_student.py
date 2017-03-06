@@ -3,30 +3,34 @@ Tests for django admin commands in the verify_student module
 
 Lots of imports from verify_student's model tests, since they cover similar ground
 """
+import boto
 from nose.tools import assert_equals
 from mock import patch
 
 from django.test import TestCase
 from django.conf import settings
 
+from common.test.utils import MockS3Mixin
 from student.tests.factories import UserFactory
-from verify_student.models import SoftwareSecurePhotoVerification
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from django.core.management import call_command
-from verify_student.tests.test_models import (
-    MockKey, MockS3Connection, mock_software_secure_post,
-    mock_software_secure_post_error, FAKE_SETTINGS,
+from lms.djangoapps.verify_student.tests.test_models import (
+    mock_software_secure_post, mock_software_secure_post_error, FAKE_SETTINGS,
 )
 
 
-# Lots of patching to stub in our own settings, S3 substitutes, and HTTP posting
+# Lots of patching to stub in our own settings, and HTTP posting
 @patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
-@patch('verify_student.models.S3Connection', new=MockS3Connection)
-@patch('verify_student.models.Key', new=MockKey)
-@patch('verify_student.models.requests.post', new=mock_software_secure_post)
-class TestVerifyStudentCommand(TestCase):
+@patch('lms.djangoapps.verify_student.models.requests.post', new=mock_software_secure_post)
+class TestVerifyStudentCommand(MockS3Mixin, TestCase):
     """
     Tests for django admin commands in the verify_student module
     """
+
+    def setUp(self):
+        super(TestVerifyStudentCommand, self).setUp()
+        connection = boto.connect_s3()
+        connection.create_bucket(FAKE_SETTINGS['SOFTWARE_SECURE']['S3_BUCKET'])
 
     def create_and_submit(self, username):
         """
@@ -48,9 +52,9 @@ class TestVerifyStudentCommand(TestCase):
         """
         # set up some fake data to use...
         self.create_and_submit("SuccessfulSally")
-        with patch('verify_student.models.requests.post', new=mock_software_secure_post_error):
+        with patch('lms.djangoapps.verify_student.models.requests.post', new=mock_software_secure_post_error):
             self.create_and_submit("RetryRoger")
-        with patch('verify_student.models.requests.post', new=mock_software_secure_post_error):
+        with patch('lms.djangoapps.verify_student.models.requests.post', new=mock_software_secure_post_error):
             self.create_and_submit("RetryRick")
         # check to make sure we had two successes and two failures; otherwise we've got problems elsewhere
         assert_equals(len(SoftwareSecurePhotoVerification.objects.filter(status="submitted")), 1)

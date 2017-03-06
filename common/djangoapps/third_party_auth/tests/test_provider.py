@@ -12,7 +12,6 @@ class RegistryTest(testutil.TestCase):
 
     def test_configure_once_adds_gettable_providers(self):
         facebook_provider = self.configure_facebook_provider(enabled=True)
-        # pylint: disable=no-member
         self.assertEqual(facebook_provider.id, provider.Registry.get(facebook_provider.provider_id).id)
 
     def test_no_providers_by_default(self):
@@ -24,7 +23,7 @@ class RegistryTest(testutil.TestCase):
         enabled_providers = provider.Registry.enabled()
         self.assertEqual(len(enabled_providers), 1)
         self.assertEqual(enabled_providers[0].name, "Google")
-        self.assertEqual(enabled_providers[0].secret, "opensesame")
+        self.assertEqual(enabled_providers[0].get_setting("SECRET"), "opensesame")
 
         self.configure_google_provider(enabled=False)
         enabled_providers = provider.Registry.enabled()
@@ -33,7 +32,17 @@ class RegistryTest(testutil.TestCase):
         self.configure_google_provider(enabled=True, secret="alohomora")
         enabled_providers = provider.Registry.enabled()
         self.assertEqual(len(enabled_providers), 1)
-        self.assertEqual(enabled_providers[0].secret, "alohomora")
+        self.assertEqual(enabled_providers[0].get_setting("SECRET"), "alohomora")
+
+    def test_secure_configuration(self):
+        """ Test that some sensitive values can be configured via Django settings """
+        self.configure_google_provider(enabled=True, secret="")
+        enabled_providers = provider.Registry.enabled()
+        self.assertEqual(len(enabled_providers), 1)
+        self.assertEqual(enabled_providers[0].name, "Google")
+        self.assertEqual(enabled_providers[0].get_setting("SECRET"), "")
+        with self.settings(SOCIAL_AUTH_OAUTH_SECRETS={'google-oauth2': 'secret42'}):
+            self.assertEqual(enabled_providers[0].get_setting("SECRET"), "secret42")
 
     def test_cannot_load_arbitrary_backends(self):
         """ Test that only backend_names listed in settings.AUTHENTICATION_BACKENDS can be used """
@@ -55,7 +64,6 @@ class RegistryTest(testutil.TestCase):
 
     def test_get_returns_enabled_provider(self):
         google_provider = self.configure_google_provider(enabled=True)
-        # pylint: disable=no-member
         self.assertEqual(google_provider.id, provider.Registry.get(google_provider.provider_id).id)
 
     def test_get_returns_none_if_provider_not_enabled(self):

@@ -1,22 +1,16 @@
 """
 Dummy factories for tests
 """
+from factory import SubFactory, Sequence
 from factory.django import DjangoModelFactory
-from ccx.models import CustomCourseForEdX  # pylint: disable=import-error
-from ccx.models import CcxMembership  # pylint: disable=import-error
-from ccx.models import CcxFutureMembership  # pylint: disable=import-error
+from student.tests.factories import UserFactory
+from lms.djangoapps.ccx.models import CustomCourseForEdX
 
 
 class CcxFactory(DjangoModelFactory):  # pylint: disable=missing-docstring
-    FACTORY_FOR = CustomCourseForEdX
-    display_name = "Test CCX"
-    id = None  # pylint: disable=redefined-builtin, invalid-name
+    class Meta(object):
+        model = CustomCourseForEdX
 
-
-class CcxMembershipFactory(DjangoModelFactory):  # pylint: disable=missing-docstring
-    FACTORY_FOR = CcxMembership
-    active = False
-
-
-class CcxFutureMembershipFactory(DjangoModelFactory):  # pylint: disable=missing-docstring
-    FACTORY_FOR = CcxFutureMembership
+    display_name = Sequence(lambda n: 'Test CCX #{0}'.format(n))  # pylint: disable=unnecessary-lambda
+    id = None  # pylint: disable=invalid-name
+    coach = SubFactory(UserFactory)

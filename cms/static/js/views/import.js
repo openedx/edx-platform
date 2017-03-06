@@ -98,7 +98,7 @@ define(
                 file: file,
                 date: moment().valueOf(),
                 completed: completed || false
-            }));
+            }), {path: window.location.pathname});
         };
 
         /**

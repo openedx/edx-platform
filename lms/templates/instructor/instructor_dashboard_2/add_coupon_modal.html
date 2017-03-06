@@ -1,12 +1,13 @@
+<%page args="section_data" expression_filter="h"/>
 <%!
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 %>
-<%page args="section_data"/>
-<section id="add-coupon-modal" class="modal" role="dialog" tabindex="-1" aria-label="${_('Add Coupon Code')}">
+<section id="add-coupon-modal" class="modal" role="dialog" tabindex="-1" aria-labelledby="header-coupon-code">
+    <h2 id="header-coupon-code" class="hd hd-2">${_("Add Coupon Code")}</h2>
   <div class="inner-wrapper">
     <button class="close-modal">
-      <i class="icon fa fa-remove"></i>
+      <span class="icon fa fa-remove" aria-hidden="true"></span>
       <span class="sr">
         ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
         ${_('Close')}
@@ -15,7 +16,7 @@ from django.core.urlresolvers import reverse
 
     <div id="coupon-content">
       <header>
-        <h2>${_("Add Coupon Code")}</h2>
+        <h3 class="hd hd-3">${_("Add Coupon Code")}</h3>
       </header>
 
       <div class="instructions">
@@ -48,7 +49,7 @@ from django.core.urlresolvers import reverse
 
             <li class="field" id="add-coupon-modal-field-course_id">
               <label for="coupon_course_id">${_("Course ID")}</label>
-              <input class="field readonly" id="coupon_course_id" type="text" name="course_id" value="${section_data['course_id'] | h}"
+              <input class="field readonly" id="coupon_course_id" type="text" name="course_id" value="${section_data['course_id']}"
                      readonly aria-required="true"/>
             </li>
             <li class="field full-width" id="add-coupon-modal-field-expiry">

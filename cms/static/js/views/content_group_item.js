@@ -5,7 +5,7 @@
  * It is expected to be backed by a Group model.
  */
 define([
-    'js/views/list_item', 'js/views/content_group_editor', 'js/views/content_group_details', 'gettext', "js/views/utils/view_utils"
+    'js/views/list_item', 'js/views/content_group_editor', 'js/views/content_group_details', 'gettext', "common/js/components/utils/view_utils"
 ], function(ListItemView, ContentGroupEditorView, ContentGroupDetailsView, gettext) {
     'use strict';
 

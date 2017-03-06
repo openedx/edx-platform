@@ -6,7 +6,7 @@
 
 import os
 import sys
-import string       # pylint: disable=deprecated-module
+import string
 import datetime
 from getpass import getpass
 import json

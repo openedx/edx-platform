@@ -1,6 +1,14 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%page expression_filter="h"/>
+<%!
+from openedx.core.djangolib.markup import HTML, Text
+from django.utils.translation import ugettext as _
+%>
 <%inherit file="base.html" />
-<%block name="title">${_("{studio_name} Server Error").format(studio_name=settings.STUDIO_SHORT_NAME)}</%block>
+<%block name="title">
+${Text(_("{studio_name} Server Error")).format(
+  studio_name=Text(settings.STUDIO_SHORT_NAME)
+)}
+</%block>
 <%block name="bodyclass">view-util util-500</%block>
 
 <%block name="content">
@@ -8,20 +16,24 @@
   <section class="content">
     <header>
       <h1 class="title title-1">
-        ${_("The {studio_name} servers encountered an error").format(
-          studio_name=u"<em>{studio_name}</em>".format(studio_name=settings.STUDIO_SHORT_NAME)
+        ${Text(_(u"The {em_start}{studio_name}{em_end} servers encountered an error")).format(
+          em_start=HTML('<em>'),
+          em_end=HTML('</em>'),
+          studio_name=Text(settings.STUDIO_SHORT_NAME),
         )}
       </h1>
     </header>
     <article class="content-primary" role="main">
       <p>
-        ${_("An error occurred in {studio_name} and the page could not be loaded. Please try again in a few moments.").format(studio_name=settings.STUDIO_SHORT_NAME)}
+        ${Text(_("An error occurred in {studio_name} and the page could not be loaded. Please try again in a few moments.")).format(
+          studio_name=Text(settings.STUDIO_SHORT_NAME),
+        )}
         ${_("We've logged the error and our staff is currently working to resolve this error as soon as possible.")}
-        ${_('If the problem persists, please email us at {email_link}.').format(
-              email_link=u'<a href="mailto:{email_address}">{email_address}</a>'.format(
-                  email_address=settings.TECH_SUPPORT_EMAIL,
-              )
-          )}
+        ${Text(_(u'If the problem persists, please email us at {email_link}.')).format(
+          email_link=HTML(u'<a href="mailto:{email_address}">{email_address}</a>').format(
+            email_address=Text(settings.TECH_SUPPORT_EMAIL),
+          )
+        )}
       </p>
     </article>
   </section>

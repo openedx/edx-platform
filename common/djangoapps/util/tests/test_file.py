@@ -88,7 +88,6 @@ class StoreUploadedFileTestCase(TestCase):
         super(StoreUploadedFileTestCase, self).setUp()
         self.request = Mock(spec=HttpRequest)
         self.file_content = "test file content"
-        self.request.FILES = {"uploaded_file": SimpleUploadedFile("tempfile.csv", self.file_content)}
         self.stored_file_name = None
         self.file_storage = None
         self.default_max_size = 2000000
@@ -109,22 +108,27 @@ class StoreUploadedFileTestCase(TestCase):
         Verifies that exceptions are thrown in the expected cases.
         """
         with self.assertRaises(ValueError) as error:
+            self.request.FILES = {"uploaded_file": SimpleUploadedFile("tempfile.csv", self.file_content)}
             store_uploaded_file(self.request, "wrong_key", [".txt", ".csv"], "stored_file", self.default_max_size)
         self.verify_exception("No file uploaded with key 'wrong_key'.", error)
 
         with self.assertRaises(exceptions.PermissionDenied) as error:
+            self.request.FILES = {"uploaded_file": SimpleUploadedFile("tempfile.csv", self.file_content)}
             store_uploaded_file(self.request, "uploaded_file", [], "stored_file", self.default_max_size)
         self.verify_exception("The file must end with one of the following extensions: ''.", error)
 
         with self.assertRaises(exceptions.PermissionDenied) as error:
+            self.request.FILES = {"uploaded_file": SimpleUploadedFile("tempfile.csv", self.file_content)}
             store_uploaded_file(self.request, "uploaded_file", [".bar"], "stored_file", self.default_max_size)
         self.verify_exception("The file must end with the extension '.bar'.", error)
 
         with self.assertRaises(exceptions.PermissionDenied) as error:
+            self.request.FILES = {"uploaded_file": SimpleUploadedFile("tempfile.csv", self.file_content)}
             store_uploaded_file(self.request, "uploaded_file", [".xxx", ".bar"], "stored_file", self.default_max_size)
         self.verify_exception("The file must end with one of the following extensions: '.xxx', '.bar'.", error)
 
         with self.assertRaises(exceptions.PermissionDenied) as error:
+            self.request.FILES = {"uploaded_file": SimpleUploadedFile("tempfile.csv", self.file_content)}
             store_uploaded_file(self.request, "uploaded_file", [".csv"], "stored_file", 2)
         self.verify_exception("Maximum upload file size is 2 bytes.", error)
 
@@ -158,6 +162,7 @@ class StoreUploadedFileTestCase(TestCase):
             store_file_data(storage, filename)
 
         with self.assertRaises(FileValidationException) as error:
+            self.request.FILES = {"uploaded_file": SimpleUploadedFile("tempfile.csv", self.file_content)}
             store_uploaded_file(
                 self.request, "uploaded_file", [".csv"], "error_file",
                 self.default_max_size, validator=exception_validator
@@ -166,6 +171,7 @@ class StoreUploadedFileTestCase(TestCase):
         # Verify the file was deleted.
         verify_file_presence(False)
 
+        self.request.FILES = {"uploaded_file": SimpleUploadedFile("tempfile.csv", self.file_content)}
         store_uploaded_file(
             self.request, "uploaded_file", [".csv"], "success_file", self.default_max_size, validator=success_validator
         )
@@ -176,6 +182,7 @@ class StoreUploadedFileTestCase(TestCase):
         """
         Tests uploading a file with lower case extension. Verifies that the stored file contents are correct.
         """
+        self.request.FILES = {"uploaded_file": SimpleUploadedFile("tempfile.csv", self.file_content)}
         file_storage, stored_file_name = store_uploaded_file(
             self.request, "uploaded_file", [".csv"], "stored_file", self.default_max_size
         )
@@ -204,6 +211,7 @@ class StoreUploadedFileTestCase(TestCase):
             self.request, "nonunique_file", [".txt"], requested_file_name, self.default_max_size
         )
 
+        self.request.FILES = {"nonunique_file": SimpleUploadedFile("nonunique.txt", file_content)}
         file_storage, second_stored_file_name = store_uploaded_file(
             self.request, "nonunique_file", [".txt"], requested_file_name, self.default_max_size
         )

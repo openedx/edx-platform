@@ -1,16 +1,15 @@
 define([
-    "jquery", "common/js/spec_helpers/ajax_helpers", "js/spec_helpers/view_helpers",
-    "js/factories/manage_users_lib", "js/views/utils/view_utils"
+    "jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/js/spec_helpers/view_helpers",
+    "js/factories/manage_users_lib", "common/js/components/utils/view_utils"
 ],
 function ($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
     "use strict";
     describe("Library Instructor Access Page", function () {
-        const changeRoleUrl = "dummy_change_role_url/@@EMAIL@@";
+        var changeRoleUrl = "dummy_change_role_url/@@EMAIL@@";
         var team_member_fixture = readFixtures("team-member.underscore");
-        var systemFeedbackFixture = readFixtures("system-feedback.underscore");
 
         function setRole(email, role){
-            var user_li = $("li.user-item[data-email="+ email + "]");
+            var user_li = $('li.user-item[data-email="'+ email + '"]');
             var role_action = $("li.action-role a.make-"+role, user_li);
             expect(role_action).toBeVisible();
             role_action.click();
@@ -23,11 +22,10 @@ function ($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
         describe("read-write access", function() {
             var mockHTML = readFixtures('mock/mock-manage-users-lib.underscore');
 
-            beforeEach(function () {
+            beforeEach(function (done) {
                 ViewHelpers.installMockAnalytics();
                 setFixtures(mockHTML);
                 appendSetFixtures($("<script>", { id: "team-member-tpl", type: "text/template"}).text(team_member_fixture));
-                appendSetFixtures($("<script>", { id: "system-feedback-tpl", type: "text/template"}).text(systemFeedbackFixture));
                 ManageUsersFactory(
                     "Mock Library",
                     [
@@ -39,9 +37,10 @@ function ($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
                     10000,
                     true
                 );
-                waitsFor(function(){
-                   return $(".ui-loading").length === 0;
-                }, "Waiting for backbone render to happen", 1000);
+
+                jasmine.waitUntil(function() {
+                    return ($(".ui-loading").length === 0);
+                }).then(done);
             });
 
             afterEach(function () {
@@ -49,7 +48,7 @@ function ($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
             });
 
             it("can give a user permission to use the library", function () {
-                const email = 'other@example.com';
+                var email = 'other@example.com';
                 var requests = AjaxHelpers.requests(this);
                 var reloadSpy = spyOn(ViewUtils, 'reload');
                 $('.create-user-button').click();
@@ -62,7 +61,7 @@ function ($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
             });
 
             it("can promote user", function() {
-                const email = "staff@example.com";
+                var email = "staff@example.com";
                 var requests = AjaxHelpers.requests(this);
                 var reloadSpy = spyOn(ViewUtils, 'reload');
                 setRole("staff@example.com", 'staff');
@@ -86,29 +85,29 @@ function ($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
                 $('.form-create.create-user .action-primary').click();
                 expect($(errorPromptSelector).length).toEqual(1);
                 expect($(errorPromptSelector)).toContainText('You must enter a valid email address');
-                expect(requests.length).toEqual(0);
+                AjaxHelpers.expectNoRequests(requests);
             });
 
             it("displays an error when the user has already been added", function () {
                 var requests = AjaxHelpers.requests(this);
+                var promptSpy = ViewHelpers.createPromptSpy();
                 $('.create-user-button').click();
                 $('.user-email-input').val('honor@example.com');
-                var warningPromptSelector = '.wrapper-prompt.is-shown .prompt.warning';
-                expect($(warningPromptSelector).length).toEqual(0);
                 $('.form-create.create-user .action-primary').click();
-                expect($(warningPromptSelector).length).toEqual(1);
-                expect($(warningPromptSelector)).toContainText('Already a library team member');
-                expect(requests.length).toEqual(0);
+                ViewHelpers.verifyPromptShowing(promptSpy, 'Already a library team member');
+                AjaxHelpers.expectNoRequests(requests);
             });
 
 
             it("can remove a user's permission to access the library", function () {
                 var requests = AjaxHelpers.requests(this);
+                var promptSpy = ViewHelpers.createPromptSpy();
                 var reloadSpy = spyOn(ViewUtils, 'reload');
                 var email = "honor@example.com";
                 $('.user-item[data-email="'+email+'"] .action-delete .delete').click();
-                expect($('.wrapper-prompt.is-shown .prompt.warning').length).toEqual(1);
-                $('.wrapper-prompt.is-shown .action-primary').click();
+                ViewHelpers.verifyPromptShowing(promptSpy, 'Are you sure?');
+                ViewHelpers.confirmPrompt(promptSpy);
+                ViewHelpers.verifyPromptHidden(promptSpy);
                 AjaxHelpers.expectJsonRequest(requests, 'DELETE', getUrl(email), {role: null});
                 AjaxHelpers.respondWithJson(requests, {'result': 'ok'});
                 expect(reloadSpy).toHaveBeenCalled();
@@ -122,7 +121,6 @@ function ($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
                 ViewHelpers.installMockAnalytics();
                 setFixtures(mockHTML);
                 appendSetFixtures($("<script>", { id: "team-member-tpl", type: "text/template"}).text(team_member_fixture));
-                appendSetFixtures($("<script>", { id: "system-feedback-tpl", type: "text/template"}).text(systemFeedbackFixture));
                 ManageUsersFactory(
                     "Mock Library",
                     [

@@ -1,6 +1,4 @@
 """ Tests for library reindex command """
-import sys
-import contextlib
 import ddt
 from django.core.management import call_command, CommandError
 import mock
@@ -14,27 +12,6 @@ from opaque_keys import InvalidKeyError
 
 from contentstore.management.commands.reindex_library import Command as ReindexCommand
 from contentstore.courseware_index import SearchIndexingError
-
-
-@contextlib.contextmanager
-def nostderr():
-    """
-    ContextManager to suppress stderr messages
-    http://stackoverflow.com/a/1810086/882918
-    """
-    savestderr = sys.stderr
-
-    class Devnull(object):
-        """ /dev/null incarnation as output-stream-like object """
-        def write(self, _):
-            """ Write method - just does nothing"""
-            pass
-
-    sys.stderr = Devnull()
-    try:
-        yield
-    finally:
-        sys.stderr = savestderr
 
 
 @ddt.ddt
@@ -72,9 +49,8 @@ class TestReindexLibrary(ModuleStoreTestCase):
 
     def test_given_no_arguments_raises_command_error(self):
         """ Test that raises CommandError for incorrect arguments """
-        with self.assertRaises(SystemExit), nostderr():
-            with self.assertRaisesRegexp(CommandError, ".* requires one or more arguments .*"):
-                call_command('reindex_library')
+        with self.assertRaisesRegexp(CommandError, ".* requires one or more arguments.*"):
+            call_command('reindex_library')
 
     @ddt.data('qwerty', 'invalid_key', 'xblock-v1:qwe+rty')
     def test_given_invalid_lib_key_raises_not_found(self, invalid_key):
@@ -84,21 +60,18 @@ class TestReindexLibrary(ModuleStoreTestCase):
 
     def test_given_course_key_raises_command_error(self):
         """ Test that raises CommandError if course key is passed """
-        with self.assertRaises(SystemExit), nostderr():
-            with self.assertRaisesRegexp(CommandError, ".* is not a library key"):
-                call_command('reindex_library', unicode(self.first_course.id))
+        with self.assertRaisesRegexp(CommandError, ".* is not a library key"):
+            call_command('reindex_library', unicode(self.first_course.id))
 
-        with self.assertRaises(SystemExit), nostderr():
-            with self.assertRaisesRegexp(CommandError, ".* is not a library key"):
-                call_command('reindex_library', unicode(self.second_course.id))
+        with self.assertRaisesRegexp(CommandError, ".* is not a library key"):
+            call_command('reindex_library', unicode(self.second_course.id))
 
-        with self.assertRaises(SystemExit), nostderr():
-            with self.assertRaisesRegexp(CommandError, ".* is not a library key"):
-                call_command(
-                    'reindex_library',
-                    unicode(self.second_course.id),
-                    unicode(self._get_lib_key(self.first_lib))
-                )
+        with self.assertRaisesRegexp(CommandError, ".* is not a library key"):
+            call_command(
+                'reindex_library',
+                unicode(self.second_course.id),
+                unicode(self._get_lib_key(self.first_lib))
+            )
 
     def test_given_id_list_indexes_libraries(self):
         """ Test that reindexes libraries when given single library key or a list of library keys """

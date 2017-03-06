@@ -80,6 +80,15 @@ class FieldsMixin(object):
         query = self.q(css='.u-field-{} .u-field-message'.format(field_id))
         return query.text[0] if query.present else None
 
+    def message_for_textarea_field(self, field_id):
+        """
+        Return the current message for textarea field.
+        """
+        self.wait_for_field(field_id)
+
+        query = self.q(css='.u-field-{} .u-field-message-help'.format(field_id))
+        return query.text[0] if query.present else None
+
     def wait_for_message(self, field_id, message):
         """
         Wait for a message to appear in a field.
@@ -95,7 +104,7 @@ class FieldsMixin(object):
         """
         self.wait_for_field(field_id)
 
-        query = self.q(css='.u-field-{} .u-field-message i'.format(field_id))
+        query = self.q(css='.u-field-{} .u-field-message .fa'.format(field_id))
         return [
             class_name for class_name
             in query.attrs('class')[0].split(' ')
@@ -124,7 +133,9 @@ class FieldsMixin(object):
 
         if 'mode-placeholder' in field_classes or 'mode-display' in field_classes:
             if field_id == 'bio':
-                self.q(css='.u-field-bio > .wrapper-u-field').first.click()
+                bio_field_selector = '.u-field-bio > .wrapper-u-field'
+                self.wait_for_element_visibility(bio_field_selector, 'Bio field is visible')
+                self.browser.execute_script("$('" + bio_field_selector + "').click();")
             else:
                 self.q(css='.u-field-{}'.format(field_id)).first.click()
 
@@ -134,9 +145,13 @@ class FieldsMixin(object):
         """
         self.wait_for_field(field_id)
 
-        return self.value_for_text_field(field_id)
+        query = self.q(css='.u-field-{} .u-field-value'.format(field_id))
+        if not query.present:
+            return None
 
-    def value_for_text_field(self, field_id, value=None):
+        return query.text[0]
+
+    def value_for_text_field(self, field_id, value=None, press_enter=True):
         """
         Get or set the value of a text field.
         """
@@ -150,35 +165,30 @@ class FieldsMixin(object):
             current_value = query.attrs('value')[0]
             query.results[0].send_keys(u'\ue003' * len(current_value))  # Delete existing value.
             query.results[0].send_keys(value)  # Input new value
-            query.results[0].send_keys(u'\ue007')  # Press Enter
+            if press_enter:
+                query.results[0].send_keys(u'\ue007')  # Press Enter
         return query.attrs('value')[0]
 
-    def value_for_textarea_field(self, field_id, value=None):
+    def set_value_for_textarea_field(self, field_id, value):
         """
-        Get or set the value of a textarea field.
+        Set the value of a textarea field.
         """
         self.wait_for_field(field_id)
-
         self.make_field_editable(field_id)
 
-        query = self.q(css='.u-field-{} textarea'.format(field_id))
-        if not query.present:
-            return None
+        field_selector = '.u-field-{} textarea'.format(field_id)
+        self.wait_for_element_presence(field_selector, 'Editable textarea is present.')
 
-        if value is not None:
-            query.fill(value)
-            query.results[0].send_keys(u'\ue004')  # Focus Out using TAB
-
-        if self.mode_for_field(field_id) == 'edit':
-            return query.text[0]
-        else:
-            return self.get_non_editable_mode_value(field_id)
+        query = self.q(css=field_selector)
+        query.fill(value)
+        query.results[0].send_keys(u'\ue007')  # Press Enter
 
     def get_non_editable_mode_value(self, field_id):
         """
         Return value of field in `display` or `placeholder` mode.
         """
         self.wait_for_field(field_id)
+        self.wait_for_ajax()
 
         return self.q(css='.u-field-{} .u-field-value .u-field-value-readonly'.format(field_id)).text[0]
 
@@ -220,12 +230,19 @@ class FieldsMixin(object):
             "Link field with link title \"{0}\" is visible.".format(expected_title)
         ).fulfill()
 
-    def click_on_link_in_link_field(self, field_id):
+    def click_on_link_in_link_field(self, field_id, field_type='a'):
         """
         Click the link in a link field.
         """
         self.wait_for_field(field_id)
 
-        query = self.q(css='.u-field-{} a'.format(field_id))
+        query = self.q(css='.u-field-{} {}'.format(field_id, field_type))
         if query.present:
             query.first.click()
+
+    def error_for_field(self, field_id):
+        """
+        Returns bool based on the highlighted border for field.
+        """
+        query = self.q(css='.u-field-{}.error'.format(field_id))
+        return True if query.present else False

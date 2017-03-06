@@ -16,7 +16,6 @@ from nose.plugins.attrib import attr
 from edxmako.shortcuts import render_to_response
 
 from branding.views import index
-from edxmako.tests import mako_middleware_process_request
 import student.views
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -24,10 +23,8 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from django.core.urlresolvers import reverse
 from courseware.tests.helpers import LoginEnrollmentTestCase
 
-from util.milestones_helpers import (
-    seed_milestone_relationship_types,
-    set_prerequisite_courses,
-)
+from util.milestones_helpers import set_prerequisite_courses
+from milestones.tests.utils import MilestonesTestCaseMixin
 
 FEATURES_WITH_STARTDATE = settings.FEATURES.copy()
 FEATURES_WITH_STARTDATE['DISABLE_START_DATES'] = False
@@ -65,11 +62,9 @@ class AnonymousIndexPageTest(ModuleStoreTestCase):
         anonymous and start dates are being checked.  It replaces a previous
         test as it solves the issue in a different way
         """
-        request = self.factory.get('/')
-        request.user = AnonymousUser()
-
-        mako_middleware_process_request(request)
-        student.views.index(request)
+        self.client.logout()
+        response = self.client.get(reverse('root'))
+        self.assertEqual(response.status_code, 200)
 
     @override_settings(FEATURES=FEATURES_WITH_STARTDATE)
     def test_anon_user_with_startdate_index(self):
@@ -119,17 +114,11 @@ class AnonymousIndexPageTest(ModuleStoreTestCase):
 
 
 @attr('shard_1')
-class PreRequisiteCourseCatalog(ModuleStoreTestCase, LoginEnrollmentTestCase):
+class PreRequisiteCourseCatalog(ModuleStoreTestCase, LoginEnrollmentTestCase, MilestonesTestCaseMixin):
     """
     Test to simulate and verify fix for disappearing courses in
     course catalog when using pre-requisite courses
     """
-    @patch.dict(settings.FEATURES, {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
-    def setUp(self):
-        super(PreRequisiteCourseCatalog, self).setUp()
-
-        seed_milestone_relationship_types()
-
     @patch.dict(settings.FEATURES, {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
     def test_course_with_prereq(self):
         """
@@ -140,6 +129,7 @@ class PreRequisiteCourseCatalog(ModuleStoreTestCase, LoginEnrollmentTestCase):
             org='edX',
             course='900',
             display_name='pre requisite course',
+            emit_signals=True,
         )
 
         pre_requisite_courses = [unicode(pre_requisite_course.id)]
@@ -155,6 +145,7 @@ class PreRequisiteCourseCatalog(ModuleStoreTestCase, LoginEnrollmentTestCase):
             start=datetime.datetime(2013, 1, 1),
             end=datetime.datetime(2030, 1, 1),
             pre_requisite_courses=pre_requisite_courses,
+            emit_signals=True,
         )
         set_prerequisite_courses(course.id, pre_requisite_courses)
 
@@ -180,7 +171,8 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
             metadata={
                 'start': datetime.datetime.now(UTC) + datetime.timedelta(days=4),
                 'announcement': datetime.datetime.now(UTC) + datetime.timedelta(days=3),
-            }
+            },
+            emit_signals=True,
         )
         self.starting_earlier = CourseFactory.create(
             org='MITx',
@@ -189,17 +181,19 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
             metadata={
                 'start': datetime.datetime.now(UTC) + datetime.timedelta(days=2),
                 'announcement': datetime.datetime.now(UTC) + datetime.timedelta(days=1),
-            }
+            },
+            emit_signals=True,
         )
         self.course_with_default_start_date = CourseFactory.create(
             org='MITx',
             number='1002',
             display_name='Tech Beta Course',
+            emit_signals=True,
         )
         self.factory = RequestFactory()
 
     @patch('student.views.render_to_response', RENDER_MOCK)
-    @patch('courseware.views.render_to_response', RENDER_MOCK)
+    @patch('courseware.views.views.render_to_response', RENDER_MOCK)
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_DISCOVERY': False})
     def test_course_discovery_off(self):
         """
@@ -217,13 +211,13 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
 
         # assert that the course discovery UI is not present
         self.assertNotIn('Search for a course', response.content)
-        self.assertNotIn('<aside aria-label="Refine your search" class="search-facets phone-menu">', response.content)
+        self.assertNotIn('<aside aria-label="Refine Your Search" class="search-facets phone-menu">', response.content)
 
         # make sure we have the special css class on the section
-        self.assertIn('<section class="courses no-course-discovery">', response.content)
+        self.assertIn('<div class="courses no-course-discovery"', response.content)
 
     @patch('student.views.render_to_response', RENDER_MOCK)
-    @patch('courseware.views.render_to_response', RENDER_MOCK)
+    @patch('courseware.views.views.render_to_response', RENDER_MOCK)
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_DISCOVERY': True})
     def test_course_discovery_on(self):
         """
@@ -239,13 +233,13 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         response = self.client.get(reverse('branding.views.courses'))
         self.assertEqual(response.status_code, 200)
 
-        # assert that the course discovery UI is not present
+        # assert that the course discovery UI is present
         self.assertIn('Search for a course', response.content)
-        self.assertIn('<aside aria-label="Refine your search" class="search-facets phone-menu">', response.content)
-        self.assertIn('<section class="courses">', response.content)
+        self.assertIn('<aside aria-label="Refine Your Search" class="search-facets phone-menu">', response.content)
+        self.assertIn('<div class="courses"', response.content)
 
     @patch('student.views.render_to_response', RENDER_MOCK)
-    @patch('courseware.views.render_to_response', RENDER_MOCK)
+    @patch('courseware.views.views.render_to_response', RENDER_MOCK)
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_DISCOVERY': False})
     def test_course_cards_sorted_by_default_sorting(self):
         response = self.client.get('/')
@@ -270,7 +264,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         self.assertEqual(context['courses'][2].id, self.course_with_default_start_date.id)
 
     @patch('student.views.render_to_response', RENDER_MOCK)
-    @patch('courseware.views.render_to_response', RENDER_MOCK)
+    @patch('courseware.views.views.render_to_response', RENDER_MOCK)
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_SORTING_BY_START_DATE': False})
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_DISCOVERY': False})
     def test_course_cards_sorted_by_start_date_disabled(self):

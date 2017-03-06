@@ -1,12 +1,13 @@
+<%page args="section_data" expression_filter="h"/>
 <%!
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 %>
-<%page args="section_data"/>
-<section id="registration_code_generation_modal" class="modal" role="dialog" tabindex="-1" aria-label="${_('Generate Registration Code Modal')}">
+<section id="registration_code_generation_modal" class="modal" role="dialog" tabindex="-1" aria-labelledby="header-registration-code">
+    <h2 id="header-registration-code" class="hd hd-2">${_("Generate Registration Code Modal")}</h2>
   <div class="inner-wrapper">
     <button class="close-modal">
-      <i class="icon fa fa-remove"></i>
+      <span class="icon fa fa-remove" aria-hidden="true"></span>
       <span class="sr">
         ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
         ${_('Close')}
@@ -15,7 +16,7 @@ from django.core.urlresolvers import reverse
 
     <div id="registration-content">
       <header>
-        <h2>${_("Create Enrollment Codes")}</h2>
+        <h3 class="hd hd-3">${_("Create Enrollment Codes")}</h3>
       </header>
 
       <div class="instructions">

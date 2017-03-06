@@ -1,7 +1,7 @@
 // studio - elements - UI controls
 // ====================
 
-// Table of Contents 
+// Table of Contents
 // * +General Action - Extend
 // * +General Type and Size - Extend
 // * +Primary Button - Extends
@@ -16,7 +16,7 @@
 
 
 // +General Action - Extend
-// ==================== 
+// ====================
 %action {
   @extend %ui-fake-link;
 
@@ -28,7 +28,7 @@
 }
 
 // +General Type and Size - Extend
-// ==================== 
+// ====================
 %sizing {
   @extend %t-action4;
   padding: ($baseline/4) ($baseline/2) ($baseline/3) ($baseline/2);
@@ -36,7 +36,7 @@
 
 
 // +Primary Button - Extends
-// ==================== 
+// ====================
 // gray primary button
 %btn-primary-gray {
   @extend %ui-btn-primary;
@@ -106,7 +106,7 @@
 }
 
 // +Secondary Button - Extends
-// ==================== 
+// ====================
 // gray secondary button
 %btn-secondary-gray {
   @extend %ui-btn-secondary;
@@ -193,7 +193,7 @@
 }
 
 // +Button Element
-// ==================== 
+// ====================
 .button {
 
   .icon {
@@ -295,12 +295,12 @@
 
       // CASE: right to left layout
       @include rtl {
-       background: transparent url("../images/drag-handles.png") no-repeat left center;
+       background: transparent url("#{$static-path}/images/drag-handles.png") no-repeat left center;
       }
 
       // CASE: left to right layout
       @include ltr {
-        background: transparent url("../images/drag-handles.png") no-repeat right center;
+        background: transparent url("#{$static-path}/images/drag-handles.png") no-repeat right center;
       }
     }
 
@@ -385,7 +385,7 @@
     cursor: move;
   }
 }
- 
+
 // UI: is draggable
 .is-draggable {
   @include transition(border-color $tmg-f2 ease-in-out 0, box-shadow $tmg-f2 ease-in-out 0, margin $tmg-f2 ease-in-out 0);

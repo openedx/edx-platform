@@ -77,7 +77,8 @@ var CourseGradingPolicy = Backbone.Model.extend({
             }
         }
         if(this.get('is_credit_course') && _.has(attrs, 'minimum_grade_credit')) {
-            var minimum_grade_cutoff = _.values(attrs.grade_cutoffs).pop();
+            // Getting minimum grade cutoff value
+            var minimum_grade_cutoff = _.min(_.values(attrs.grade_cutoffs));
             if(isNaN(attrs.minimum_grade_credit) || attrs.minimum_grade_credit === null || attrs.minimum_grade_credit < minimum_grade_cutoff) {
                 return {
                     'minimum_grade_credit': interpolate(

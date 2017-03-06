@@ -34,7 +34,6 @@ def request_course_creator(request):
     return JsonResponse({"Status": "OK"})
 
 
-# pylint: disable=unused-argument
 @login_required
 @ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT", "DELETE"))

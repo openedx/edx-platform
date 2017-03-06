@@ -1,0 +1,11 @@
+<div class="search-alert <%- css_class %>" id="search-alert-<%- cid %>">
+    <div class="search-alert-content">
+        <p class="message"><%= HtmlUtils.ensureHtml(messageHtml) %></p>
+    </div>
+
+    <div class="search-alert-controls">
+        <button class="btn-link dismiss control control-dismiss" title="<%- gettext('Close') %>">
+            <span class="icon fa fa-remove" aria-hidden="true"></span>
+        </button>
+    </div>
+</div>

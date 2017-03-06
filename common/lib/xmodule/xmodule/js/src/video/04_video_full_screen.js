@@ -1,11 +1,12 @@
 (function (define) {
 'use strict';
-define('video/04_video_full_screen.js', [], function () {
+define('video/04_video_full_screen.js', ['edx-ui-toolkit/js/utils/html-utils'], function (HtmlUtils) {
     var template = [
-        '<a href="#" class="add-fullscreen" title="',
-            gettext('Fill browser'), '" role="button" aria-disabled="false">',
+        '<button class="control add-fullscreen" aria-disabled="false" title="',
             gettext('Fill browser'),
-        '</a>'
+        '">',
+            '<span class="icon fa fa-arrows-alt" aria-hidden="true"></span>',
+        '</button>'
     ].join('');
 
     // VideoControl() function - what this module "exports".
@@ -67,7 +68,7 @@ define('video/04_video_full_screen.js', [], function () {
         state.videoFullScreen.fullScreenEl = $(template);
         state.videoFullScreen.sliderEl = state.el.find('.slider');
         state.videoFullScreen.fullScreenState = false;
-        state.el.find('.secondary-controls').append(state.videoFullScreen.fullScreenEl);
+        HtmlUtils.append(state.el.find('.secondary-controls'), HtmlUtils.HTML(state.videoFullScreen.fullScreenEl));
         state.videoFullScreen.updateControlsHeight();
     }
 
@@ -127,19 +128,29 @@ define('video/04_video_full_screen.js', [], function () {
     }
 
     function exit() {
-        var fullScreenClassNameEl = this.el.add(document.documentElement);
+        var fullScreenClassNameEl = this.el.add(document.documentElement),
+            closedCaptionsEl = this.el.find('.closed-captions');
 
         this.videoFullScreen.fullScreenState = this.isFullScreen = false;
         fullScreenClassNameEl.removeClass('video-fullscreen');
         $(window).scrollTop(this.scrollPos);
         this.videoFullScreen.fullScreenEl
             .attr('title', gettext('Fill browser'))
-            .text(gettext('Fill browser'));
+            .find('.icon')
+                .removeClass('fa-compress')
+                .addClass('fa-arrows-alt');
+
         this.el.trigger('fullscreen', [this.isFullScreen]);
+
+        $(closedCaptionsEl).css({
+            'top': '70%',
+            'left': '5%'
+        });
     }
 
     function enter() {
-        var fullScreenClassNameEl = this.el.add(document.documentElement);
+        var fullScreenClassNameEl = this.el.add(document.documentElement),
+            closedCaptionsEl = this.el.find('.closed-captions');
 
         this.scrollPos = $(window).scrollTop();
         $(window).scrollTop(0);
@@ -147,8 +158,16 @@ define('video/04_video_full_screen.js', [], function () {
         fullScreenClassNameEl.addClass('video-fullscreen');
         this.videoFullScreen.fullScreenEl
             .attr('title', gettext('Exit full browser'))
-            .text(gettext('Exit full browser'));
+            .find('.icon')
+                .removeClass('fa-arrows-alt')
+                .addClass('fa-compress');
+
         this.el.trigger('fullscreen', [this.isFullScreen]);
+
+        $(closedCaptionsEl).css({
+            'top': '70%',
+            'left': '5%'
+        });
     }
 
     /** Toggle fullscreen mode. */

@@ -6,7 +6,7 @@ from mock import patch
 from nose.plugins.attrib import attr
 
 from courseware.access import has_access
-from courseware.tests.helpers import LoginEnrollmentTestCase
+from courseware.tests.helpers import CourseAccessTestMixin, LoginEnrollmentTestCase
 from courseware.tests.factories import (
     BetaTesterFactory,
     StaffFactory,
@@ -379,17 +379,19 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertFalse(self.enroll(self.course))
         self.assertTrue(self.enroll(self.test_course))
 
+        # Then, try as an instructor
         self.logout()
         self.login(self.instructor_user)
         self.assertTrue(self.enroll(self.course))
 
-        # unenroll and try again
+        # Then, try as global staff
+        self.logout()
         self.login(self.global_staff_user)
         self.assertTrue(self.enroll(self.course))
 
 
 @attr('shard_1')
-class TestBetatesterAccess(ModuleStoreTestCase):
+class TestBetatesterAccess(ModuleStoreTestCase, CourseAccessTestMixin):
     """
     Tests for the beta tester feature
     """
@@ -411,12 +413,8 @@ class TestBetatesterAccess(ModuleStoreTestCase):
         Check that beta-test access works for courses.
         """
         self.assertFalse(self.course.has_started())
-
-        # student user shouldn't see it
-        self.assertFalse(has_access(self.normal_student, 'load', self.course))
-
-        # now the student should see it
-        self.assertTrue(has_access(self.beta_tester, 'load', self.course))
+        self.assertCannotAccessCourse(self.normal_student, 'load', self.course)
+        self.assertCanAccessCourse(self.beta_tester, 'load', self.course)
 
     @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_content_beta_period(self):

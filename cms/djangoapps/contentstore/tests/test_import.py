@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=no-member
 # pylint: disable=protected-access
 """
 Tests for import_course_from_xml using the mongo modulestore.
@@ -11,7 +10,7 @@ from django.conf import settings
 import ddt
 import copy
 
-from openedx.core.djangoapps.util.testing import SignalDisconnectTestMixin
+from openedx.core.djangoapps.content.course_structures.tests import SignalDisconnectTestMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -35,10 +34,10 @@ class ContentStoreImportTest(SignalDisconnectTestMixin, ModuleStoreTestCase):
     NOTE: refactor using CourseFactory so they do not.
     """
     def setUp(self):
-        password = super(ContentStoreImportTest, self).setUp()
+        super(ContentStoreImportTest, self).setUp()
 
         self.client = Client()
-        self.client.login(username=self.user.username, password=password)
+        self.client.login(username=self.user.username, password=self.user_password)
 
     def load_test_import_course(self, target_id=None, create_if_not_present=True, module_store=None):
         '''
@@ -173,8 +172,8 @@ class ContentStoreImportTest(SignalDisconnectTestMixin, ModuleStoreTestCase):
         # we try to refresh the inheritance tree for each update_item in the import
         with check_exact_number_of_calls(store, 'refresh_cached_metadata_inheritance_tree', 28):
 
-            # _get_cached_metadata_inheritance_tree should be called only once
-            with check_exact_number_of_calls(store, '_get_cached_metadata_inheritance_tree', 1):
+            # _get_cached_metadata_inheritance_tree should be called twice (once for import, once on publish)
+            with check_exact_number_of_calls(store, '_get_cached_metadata_inheritance_tree', 2):
 
                 # with bulk-edit in progress, the inheritance tree should be recomputed only at the end of the import
                 # NOTE: On Jenkins, with memcache enabled, the number of calls here is only 1.
@@ -218,26 +217,6 @@ class ContentStoreImportTest(SignalDisconnectTestMixin, ModuleStoreTestCase):
                 target_id.make_usage_key('html', 'secret_page')
             ],
             conditional_module.show_tag_list
-        )
-
-    def test_rewrite_reference(self):
-        module_store = modulestore()
-        target_id = module_store.make_course_key('testX', 'peergrading_copy', 'copy_run')
-        import_course_from_xml(
-            module_store,
-            self.user.id,
-            TEST_DATA_DIR,
-            ['open_ended'],
-            target_id=target_id,
-            create_if_not_present=True
-        )
-        peergrading_module = module_store.get_item(
-            target_id.make_usage_key('peergrading', 'PeerGradingLinked')
-        )
-        self.assertIsNotNone(peergrading_module)
-        self.assertEqual(
-            target_id.make_usage_key('combinedopenended', 'SampleQuestion'),
-            peergrading_module.link_to_location
         )
 
     def test_rewrite_reference_value_dict_published(self):

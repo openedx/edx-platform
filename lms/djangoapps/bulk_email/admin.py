@@ -3,7 +3,9 @@ Django admin page for bulk email models
 """
 from django.contrib import admin
 
-from bulk_email.models import CourseEmail, Optout, CourseEmailTemplate, CourseAuthorization
+from config_models.admin import ConfigurationModelAdmin
+
+from bulk_email.models import CourseEmail, Optout, CourseEmailTemplate, CourseAuthorization, BulkEmailFlag
 from bulk_email.forms import CourseEmailTemplateForm, CourseAuthorizationAdminForm
 
 
@@ -36,7 +38,8 @@ Other tags that may be used (surrounded by one curly brace on each side):
 {course_title}         : the name of the course
 {course_url}           : the course's full URL
 {email}                : the user's email address
-{account_settings_url} : URL at which users can change email preferences
+{account_settings_url} : URL at which users can change account preferences
+{email_settings_url}   : URL at which users can change course email preferences
 {course_image_url}     : URL for the course's course image.
     Will return a broken link if course doesn't have a course image set.
 
@@ -53,7 +56,9 @@ unsupported tags will cause email sending to fail.
         return True
 
     def has_delete_permission(self, request, obj=None):
-        """Disables the ability to remove existing templates, as we'd like to make sure we don't have dangling references."""
+        """
+        Disables the ability to remove existing templates, as we'd like to make sure we don't have dangling references.
+        """
         return False
 
 
@@ -77,3 +82,4 @@ admin.site.register(CourseEmail, CourseEmailAdmin)
 admin.site.register(Optout, OptoutAdmin)
 admin.site.register(CourseEmailTemplate, CourseEmailTemplateAdmin)
 admin.site.register(CourseAuthorization, CourseAuthorizationAdmin)
+admin.site.register(BulkEmailFlag, ConfigurationModelAdmin)

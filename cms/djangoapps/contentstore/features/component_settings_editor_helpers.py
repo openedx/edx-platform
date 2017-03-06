@@ -2,7 +2,7 @@
 # pylint: disable=missing-docstring
 
 from lettuce import world
-from nose.tools import assert_equal, assert_in  # pylint: disable=no-name-in-module
+from nose.tools import assert_equal, assert_in
 from terrain.steps import reload_the_page
 from common import type_in_codemirror
 from selenium.webdriver.common.keys import Keys
@@ -27,6 +27,8 @@ def create_component_instance(step, category, component_type=None, is_advanced=F
         module_css = 'div.xmodule_CapaModule'
     elif category == 'advanced':
         module_css = 'div.xmodule_{}Module'.format(advanced_component.title())
+    elif category == 'discussion':
+        module_css = 'div.xblock-author_view-{}'.format(category.lower())
     else:
         module_css = 'div.xmodule_{}Module'.format(category.title())
 
@@ -59,28 +61,28 @@ def click_new_component_button(step, component_button_css):
 
 
 def _click_advanced():
-    css = 'ul.problem-type-tabs a[href="#tab3"]'
+    css = 'ul.problem-type-tabs a[href="#tab2"]'
     world.css_click(css)
 
     # Wait for the advanced tab items to be displayed
-    tab3_css = 'div.ui-tabs-panel#tab3'
-    world.wait_for_visible(tab3_css)
+    tab2_css = 'div.ui-tabs-panel#tab2'
+    world.wait_for_visible(tab2_css)
 
 
-def _find_matching_link(category, component_type):
+def _find_matching_button(category, component_type):
     """
-    Find the link with the specified text. There should be one and only one.
+    Find the button with the specified text. There should be one and only one.
     """
 
-    # The tab shows links for the given category
-    links = world.css_find('div.new-component-{} a'.format(category))
+    # The tab shows buttons for the given category
+    buttons = world.css_find('div.new-component-{} button'.format(category))
 
-    # Find the link whose text matches what you're looking for
-    matched_links = [link for link in links if link.text == component_type]
+    # Find the button whose text matches what you're looking for
+    matched_buttons = [btn for btn in buttons if btn.text == component_type]
 
     # There should be one and only one
-    assert_equal(len(matched_links), 1)
-    return matched_links[0]
+    assert_equal(len(matched_buttons), 1)
+    return matched_buttons[0]
 
 
 def click_component_from_menu(category, component_type, is_advanced):
@@ -100,7 +102,7 @@ def click_component_from_menu(category, component_type, is_advanced):
 
     # Retry this in case the list is empty because you tried too fast.
     link = world.retry_on_exception(
-        lambda: _find_matching_link(category, component_type),
+        lambda: _find_matching_button(category, component_type),
         ignored_exceptions=AssertionError
     )
 
@@ -168,7 +170,9 @@ def verify_setting_entry(setting, display_name, value, explicitly_set):
         for the problem, rather than derived from the defaults. This is verified
         by the existence of a "Clear" button next to the field value.
     """
-    assert_equal(display_name, setting.find_by_css('.setting-label')[0].html.strip())
+    label_element = setting.find_by_css('.setting-label')[0]
+    assert_equal(display_name, label_element.html.strip())
+    label_for = label_element['for']
 
     # Check if the web object is a list type
     # If so, we use a slightly different mechanism for determining its value
@@ -179,7 +183,7 @@ def verify_setting_entry(setting, display_name, value, explicitly_set):
         list_value = ', '.join(ele.find_by_css('input')[0].value for ele in setting.find_by_css('.videolist-settings-item'))
         assert_equal(value, list_value)
     else:
-        assert_equal(value, setting.find_by_css('.setting-input')[0].value)
+        assert_equal(value, setting.find_by_id(label_for).value)
 
     # VideoList doesn't have clear button
     if not setting.has_class('metadata-videolist-enum'):
@@ -201,7 +205,7 @@ def verify_all_setting_entries(expected_entries):
 
 @world.absorb
 def save_component():
-    world.css_click("a.action-save")
+    world.css_click("a.action-save,a.save-button")
     world.wait_for_ajax_complete()
 
 
@@ -241,7 +245,7 @@ def get_setting_entry(label):
 @world.absorb
 def get_setting_entry_index(label):
     def get_index():
-        settings = world.css_find('.metadata_edit .wrapper-comp-setting')
+        settings = world.css_find('.wrapper-comp-setting')
         for index, setting in enumerate(settings):
             if setting.find_by_css('.setting-label')[0].value == label:
                 return index
@@ -259,6 +263,6 @@ def set_field_value(index, value):
     Instead we will find the element, set its value, then hit the Tab key
     to get to the next field.
     """
-    elem = world.css_find('.metadata_edit div.wrapper-comp-setting input.setting-input')[index]
+    elem = world.css_find('div.wrapper-comp-setting input')[index]
     elem.value = value
     elem.type(Keys.TAB)

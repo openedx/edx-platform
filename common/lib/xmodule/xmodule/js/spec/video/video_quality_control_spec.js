@@ -19,7 +19,7 @@
 
                 // Define empty methods in YouTube stub
                 player.quality = 'large';
-                player.setPlaybackQuality.andCallFake(function (quality){
+                player.setPlaybackQuality.and.callFake(function (quality){
                     player.quality = quality;
                 });
             });
@@ -33,8 +33,6 @@
 
             it('add ARIA attributes to quality control', function () {
                 expect(qualityControl.el).toHaveAttrs({
-                    'role': 'button',
-                    'title': 'HD off',
                     'aria-disabled': 'false'
                 });
             });
@@ -48,13 +46,13 @@
             });
 
             it('calls fetchAvailableQualities only once', function () {
-                expect(player.getAvailableQualityLevels.calls.length)
+                expect(player.getAvailableQualityLevels.calls.count())
                     .toEqual(0);
 
                 videoPlayer.onPlay();
                 videoPlayer.onPlay();
 
-                expect(player.getAvailableQualityLevels.calls.length)
+                expect(player.getAvailableQualityLevels.calls.count())
                     .toEqual(1);
             });
 
@@ -73,7 +71,7 @@
 
             it('leaves quality control hidden on play if HD is not available',
                function () {
-                player.getAvailableQualityLevels.andReturn(
+                player.getAvailableQualityLevels.and.returnValue(
                     ['large', 'medium', 'small']
                 );
 
@@ -96,7 +94,7 @@
 
             it('quality control is active if HD is available',
                 function () {
-                 player.getAvailableQualityLevels.andReturn(
+                 player.getAvailableQualityLevels.and.returnValue(
                      ['highres', 'hd1080', 'hd720']
                  );
 
@@ -117,7 +115,7 @@
             it('does not contain the quality control', function () {
                 state =  jasmine.initializePlayer();
 
-                expect(state.el.find('a.quality-control').length).toBe(0);
+                expect(state.el.find('.quality-control').length).toBe(0);
             });
         });
     });

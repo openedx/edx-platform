@@ -3,7 +3,7 @@
 # pylint: disable=unused-argument
 
 from lettuce import world, step
-from nose.tools import assert_equal, assert_in  # pylint: disable=no-name-in-module
+from nose.tools import assert_equal, assert_in
 
 
 CSS_FOR_TAB_ELEMENT = "li[data-tab-id='{0}'] input.toggle-checkbox"
@@ -33,7 +33,7 @@ def see_a_static_page_named_foo(step, name):
 @step(u'I should not see any static pages$')
 def not_see_any_static_pages(step):
     pages_css = 'div.xmodule_StaticTabModule'
-    assert (world.is_css_not_present(pages_css, wait_time=30))
+    assert world.is_css_not_present(pages_css, wait_time=30)
 
 
 @step(u'I "(edit|delete)" the static page$')
@@ -98,25 +98,25 @@ def _verify_page_names(first, second):
 
 @step(u'the built-in pages are in the default order$')
 def built_in_pages_in_default_order(step):
-    expected_pages = ['Courseware', 'Course Info', 'Wiki', 'Progress']
+    expected_pages = ['Home', 'Course', 'Wiki', 'Progress']
     see_pages_in_expected_order(expected_pages)
 
 
 @step(u'the built-in pages are switched$')
 def built_in_pages_switched(step):
-    expected_pages = ['Courseware', 'Course Info', 'Progress', 'Wiki']
+    expected_pages = ['Home', 'Course', 'Progress', 'Wiki']
     see_pages_in_expected_order(expected_pages)
 
 
 @step(u'the pages are in the default order$')
 def pages_in_default_order(step):
-    expected_pages = ['Courseware', 'Course Info', 'Wiki', 'Progress', 'First', 'Empty']
+    expected_pages = ['Home', 'Course', 'Wiki', 'Progress', 'First', 'Empty']
     see_pages_in_expected_order(expected_pages)
 
 
 @step(u'the pages are switched$$')
 def pages_are_switched(step):
-    expected_pages = ['Courseware', 'Course Info', 'Progress', 'First', 'Empty', 'Wiki']
+    expected_pages = ['Home', 'Course', 'Progress', 'First', 'Empty', 'Wiki']
     see_pages_in_expected_order(expected_pages)
 
 

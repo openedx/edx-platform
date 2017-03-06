@@ -31,6 +31,11 @@ class PaverTestCase(TestCase):
         """Returns the messages output by the Paver task."""
         return tasks.environment.messages
 
+    @property
+    def platform_root(self):
+        """Returns the current platform's root directory."""
+        return os.getcwd()
+
     def reset_task_messages(self):
         """Clear the recorded message"""
         tasks.environment.messages = []
@@ -52,4 +57,4 @@ class MockEnvironment(tasks.Environment):
         else:
             output = message
         if not output.startswith("--->"):
-            self.messages.append(output)
+            self.messages.append(unicode(output))

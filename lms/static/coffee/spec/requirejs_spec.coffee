@@ -3,15 +3,30 @@ describe "RequireJS namespacing", ->
 
         # Jasmine does not provide a way to use the typeof operator. We need
         # to create our own custom matchers so that a TypeError is not thrown.
-        @addMatchers
+        jasmine.addMatchers
             requirejsTobeUndefined: ->
-                typeof requirejs is "undefined"
+                {
+                compare: ->
+                    {
+                        pass: typeof requirejs is "undefined"
+                    }
+                }
 
             requireTobeUndefined: ->
-                typeof require is "undefined"
+                {
+                compare: ->
+                    {
+                        pass: typeof require is "undefined"
+                    }
+                }
 
             defineTobeUndefined: ->
-                typeof define is "undefined"
+                {
+                compare: ->
+                    {
+                        pass: typeof define is "undefined"
+                    }
+                }
 
 
     it "check that the RequireJS object is present in the global namespace", ->
@@ -34,12 +49,13 @@ describe "RequireJS namespacing", ->
 describe "RequireJS module creation", ->
     inDefineCallback = undefined
     inRequireCallback = undefined
-    it "check that we can use RequireJS to define() and require() a module", ->
-
+    it "check that we can use RequireJS to define() and require() a module", (done) ->
+        d1 = $.Deferred()
+        d2 = $.Deferred()
         # Because Require JS works asynchronously when defining and requiring
         # modules, we need to use the special Jasmine functions runs(), and
         # waitsFor() to set up this test.
-        runs ->
+        func = () ->
 
             # Initialize the variable that we will test for. They will be set
             # to true in the appropriate callback functions called by Require
@@ -51,6 +67,8 @@ describe "RequireJS module creation", ->
             # Define our test module.
             RequireJS.define "test_module", [], ->
                 inDefineCallback = true
+
+                d1.resolve()
 
                 # This module returns an object. It can be accessed via the
                 # Require JS require() function.
@@ -66,24 +84,12 @@ describe "RequireJS module creation", ->
                 # property.
                 expect(test_module.module_status).toBe "OK"
 
+                d2.resolve()
 
-
-        # We will wait for a specified amount of time (1 second), before
-        # checking if our module was defined and that we were able to
-        # require() the module.
-        waitsFor (->
-
-            # If at least one of the callback functions was not reached, we
-            # fail this test.
-            return false  if (inDefineCallback isnt true) or (inRequireCallback isnt true)
-
-            # Both of the callbacks were reached.
-            true
-        ), "We should eventually end up in the defined callback", 1000
-
-        # The final test behavior, after waitsFor() finishes waiting.
-        runs ->
+        func()
+        # We will wait before checking if our module was defined and that we were able to require() the module.
+        $.when(d1, d2).done(->
+            # The final test behavior
             expect(inDefineCallback).toBeTruthy()
             expect(inRequireCallback).toBeTruthy()
-
-
+        ).always(done)

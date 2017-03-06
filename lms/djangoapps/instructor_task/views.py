@@ -7,9 +7,8 @@ from django.utils.translation import ugettext as _
 
 from celery.states import FAILURE, REVOKED, READY_STATES
 
-from instructor_task.api_helper import (get_status_from_instructor_task,
-                                        get_updated_instructor_task)
-from instructor_task.models import PROGRESS
+from lms.djangoapps.instructor_task.api_helper import (get_status_from_instructor_task, get_updated_instructor_task)
+from lms.djangoapps.instructor_task.models import PROGRESS
 
 
 log = logging.getLogger(__name__)
@@ -76,11 +75,11 @@ def instructor_task_status(request):
 
     """
     output = {}
-    if 'task_id' in request.REQUEST:
-        task_id = request.REQUEST['task_id']
+    task_id = request.GET.get('task_id') or request.POST.get('task_id')
+    tasks = request.GET.get('task_ids[]') or request.POST.get('task_ids[]')
+    if task_id:
         output = _get_instructor_task_status(task_id)
-    elif 'task_ids[]' in request.REQUEST:
-        tasks = request.REQUEST.getlist('task_ids[]')
+    elif tasks:
         for task_id in tasks:
             task_output = _get_instructor_task_status(task_id)
             if task_output is not None:

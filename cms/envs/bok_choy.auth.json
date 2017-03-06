@@ -30,6 +30,14 @@
             "PASSWORD": "",
             "PORT": "3306",
             "USER": "root"
+        },
+        "student_module_history": {
+            "ENGINE": "django.db.backends.mysql",
+            "HOST": "localhost",
+            "NAME": "student_module_history_test",
+            "PASSWORD": "",
+            "PORT": "3306",
+            "USER": "root"
         }
     },
     "DOC_STORE_CONFIG": {
@@ -80,14 +88,6 @@
                 ]
             }
         }
-    },
-    "OPEN_ENDED_GRADING_INTERFACE": {
-        "grading_controller": "grading_controller",
-        "password": "password",
-        "peer_grading": "peer_grading",
-        "staff_grading": "staff_grading",
-        "url": "http://localhost:18060/",
-        "username": "lms"
     },
     "DJFS": {
             "type": "s3fs",

@@ -15,17 +15,13 @@ from xmodule.modulestore.store_utilities import draft_node_constructor, get_draf
 from xmodule.modulestore import LIBRARY_ROOT
 from fs.osfs import OSFS
 from json import dumps
-import json
 import os
-from path import path
-import shutil
+
 from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
 from opaque_keys.edx.locator import CourseLocator, LibraryLocator
 
 DRAFT_DIR = "drafts"
 PUBLISHED_DIR = "published"
-EXPORT_VERSION_FILE = "format.json"
-EXPORT_VERSION_KEY = "export_format"
 
 DEFAULT_CONTENT_FIELDS = ['metadata', 'data']
 
@@ -45,7 +41,6 @@ def _export_drafts(modulestore, course_key, export_fs, xml_centric_course_key):
         # Check to see if the returned draft modules have changes w.r.t. the published module.
         # Only modules with changes will be exported into the /drafts directory.
         draft_modules = [module for module in draft_modules if modulestore.has_changes(module)]
-
         if draft_modules:
             draft_course_dir = export_fs.makeopendir(DRAFT_DIR)
 
@@ -89,15 +84,17 @@ def _export_drafts(modulestore, course_key, export_fs, xml_centric_course_key):
                     continue
 
                 logging.debug('parent_loc = %s', draft_node.parent_location)
-
                 draft_node.module.xml_attributes['parent_url'] = draft_node.parent_url
                 parent = modulestore.get_item(draft_node.parent_location)
+
+                # Don't try to export orphaned items
+                if draft_node.module.location not in parent.children:
+                    continue
                 index = parent.children.index(draft_node.module.location)
                 draft_node.module.xml_attributes['index_in_children_list'] = str(index)
 
                 draft_node.module.runtime.export_fs = draft_course_dir
                 adapt_references(draft_node.module, xml_centric_course_key, draft_course_dir)
-                # pylint: disable=no-member
                 node = lxml.etree.Element('unknown')
 
                 draft_node.module.add_xml_to_node(node)
@@ -158,7 +155,7 @@ class ExportManager(object):
         with self.modulestore.bulk_operations(self.courselike_key):
 
             fsm = OSFS(self.root_dir)
-            root = lxml.etree.Element('unknown')  # pylint: disable=no-member
+            root = lxml.etree.Element('unknown')
 
             # export only the published content
             with self.modulestore.branch_setting(ModuleStoreEnum.Branch.published_only, self.courselike_key):
@@ -200,7 +197,7 @@ class CourseExportManager(ExportManager):
 
     def process_root(self, root, export_fs):
         with export_fs.open('course.xml', 'w') as course_xml:
-            lxml.etree.ElementTree(root).write(course_xml)  # pylint: disable=no-member
+            lxml.etree.ElementTree(root).write(course_xml)
 
     def process_extra(self, root, courselike, root_courselike_dir, xml_centric_courselike_key, export_fs):
         # Export the modulestore's asset metadata.
@@ -211,10 +208,10 @@ class CourseExportManager(ExportManager):
         course_assets = self.modulestore.get_all_asset_metadata(self.courselike_key, None)
         for asset_md in course_assets:
             # All asset types are exported using the "asset" tag - but their asset type is specified in each asset key.
-            asset = lxml.etree.SubElement(asset_root, AssetMetadata.ASSET_XML_TAG)  # pylint: disable=no-member
+            asset = lxml.etree.SubElement(asset_root, AssetMetadata.ASSET_XML_TAG)
             asset_md.to_xml(asset)
         with OSFS(asset_dir).open(AssetMetadata.EXPORTED_ASSET_FILENAME, 'w') as asset_xml_file:
-            lxml.etree.ElementTree(asset_root).write(asset_xml_file)  # pylint: disable=no-member
+            lxml.etree.ElementTree(asset_root).write(asset_xml_file)
 
         # export the static assets
         policies_dir = export_fs.makeopendir('policies')
@@ -284,9 +281,7 @@ class CourseExportManager(ExportManager):
             policy = {'course/' + courselike.location.name: own_metadata(courselike)}
             course_policy.write(dumps(policy, cls=EdxJSONEncoder, sort_keys=True, indent=4))
 
-        # xml backed courses don't support drafts!
-        if courselike.runtime.modulestore.get_modulestore_type() != ModuleStoreEnum.Type.xml:
-            _export_drafts(self.modulestore, self.courselike_key, export_fs, xml_centric_courselike_key)
+        _export_drafts(self.modulestore, self.courselike_key, export_fs, xml_centric_courselike_key)
 
 
 class LibraryExportManager(ExportManager):
@@ -338,7 +333,6 @@ class LibraryExportManager(ExportManager):
         """
         # Create the Library.xml file, which acts as the index of all library contents.
         xml_file = export_fs.open(LIBRARY_ROOT, 'w')
-        # pylint: disable=no-member
         xml_file.write(lxml.etree.tostring(root, pretty_print=True, encoding='utf-8'))
         xml_file.close()
 
@@ -410,90 +404,3 @@ def export_extra_content(export_fs, modulestore, source_course_key, dest_course_
 
                 # export content fields other then metadata and data in json format in current directory
                 _export_field_content(item, item_dir)
-
-
-def convert_between_versions(source_dir, target_dir):
-    """
-    Converts a version 0 export format to version 1, and vice versa.
-
-    @param source_dir: the directory structure with the course export that should be converted.
-       The contents of source_dir will not be altered.
-    @param target_dir: the directory where the converted export should be written.
-    @return: the version number of the converted export.
-    """
-    def convert_to_version_1():
-        """ Convert a version 0 archive to version 0 """
-        os.mkdir(copy_root)
-        with open(copy_root / EXPORT_VERSION_FILE, 'w') as f:
-            f.write('{{"{export_key}": 1}}\n'.format(export_key=EXPORT_VERSION_KEY))
-
-        # If a drafts folder exists, copy it over.
-        copy_drafts()
-
-        # Now copy everything into the published directory
-        published_dir = copy_root / PUBLISHED_DIR
-        shutil.copytree(path(source_dir) / course_name, published_dir)
-        # And delete the nested drafts directory, if it exists.
-        nested_drafts_dir = published_dir / DRAFT_DIR
-        if nested_drafts_dir.isdir():
-            shutil.rmtree(nested_drafts_dir)
-
-    def convert_to_version_0():
-        """ Convert a version 1 archive to version 0 """
-        # Copy everything in "published" up to the top level.
-        published_dir = path(source_dir) / course_name / PUBLISHED_DIR
-        if not published_dir.isdir():
-            raise ValueError("a version 1 archive must contain a published branch")
-
-        shutil.copytree(published_dir, copy_root)
-
-        # If there is a DRAFT branch, copy it. All other branches are ignored.
-        copy_drafts()
-
-    def copy_drafts():
-        """
-        Copy drafts directory from the old archive structure to the new.
-        """
-        draft_dir = path(source_dir) / course_name / DRAFT_DIR
-        if draft_dir.isdir():
-            shutil.copytree(draft_dir, copy_root / DRAFT_DIR)
-
-    root = os.listdir(source_dir)
-    if len(root) != 1 or (path(source_dir) / root[0]).isfile():
-        raise ValueError("source archive does not have single course directory at top level")
-
-    course_name = root[0]
-
-    # For this version of the script, we simply convert back and forth between version 0 and 1.
-    original_version = get_version(path(source_dir) / course_name)
-    if original_version not in [0, 1]:
-        raise ValueError("unknown version: " + str(original_version))
-    desired_version = 1 if original_version is 0 else 0
-
-    copy_root = path(target_dir) / course_name
-
-    if desired_version == 1:
-        convert_to_version_1()
-    else:
-        convert_to_version_0()
-
-    return desired_version
-
-
-def get_version(course_path):
-    """
-    Return the export format version number for the given
-    archive directory structure (represented as a path instance).
-
-    If the archived file does not correspond to a known export
-    format, None will be returned.
-    """
-    format_file = course_path / EXPORT_VERSION_FILE
-    if not format_file.isfile():
-        return 0
-    with open(format_file, "r") as f:
-        data = json.load(f)
-        if EXPORT_VERSION_KEY in data:
-            return data[EXPORT_VERSION_KEY]
-
-    return None

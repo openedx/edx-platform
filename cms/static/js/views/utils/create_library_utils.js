@@ -1,7 +1,7 @@
 /**
  * Provides utilities for validating libraries during creation.
  */
-define(["jquery", "gettext", "js/views/utils/view_utils", "js/views/utils/create_utils_base"],
+define(["jquery", "gettext", "common/js/components/utils/view_utils", "js/views/utils/create_utils_base"],
     function ($, gettext, ViewUtils, CreateUtilsFactory) {
         "use strict";
         return function (selectors, classes) {

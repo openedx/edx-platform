@@ -1,7 +1,14 @@
 <div class="wrapper-content-main payment-confirmation-step">
   <article class="content-main">
     <h3 class="title">
-      <%= _.sprintf( gettext( "Thank you! We have received your payment for %(courseName)s." ), { courseName: '<span class="course-title">' + courseName + '</span>' } ) %>
+      <%= HtmlUtils.interpolateHtml(
+        gettext( "Thank you! We have received your payment for {courseName}." ),
+        { courseName: HtmlUtils.joinHtml(
+          HtmlUtils.HTML('<span class="course-title">'),
+          courseName,
+          HtmlUtils.HTML('</span>')
+        ) }
+      ) %>
     </h3>
 
     <% if ( receipt ) { %>
@@ -86,7 +93,7 @@
           <li class="req req-0 req-activate">
             <h4 class="title"><%- gettext( "Activate Your Account" ) %></h4>
             <div class="placeholder-art">
-              <i class="icon fa fa-envelope-o" aria-hidden="true"></i>
+              <span class="icon fa fa-envelope-o" aria-hidden="true"></span>
             </div>
 
             <div class="copy">
@@ -104,8 +111,8 @@
           <li class="req req-1 req-id">
             <h4 class="title"><%- gettext( "Photo ID" ) %></h4>
             <div class="placeholder-art fa-lg">
-              <i class="icon fa fa-list-alt fa-stack-2x" aria-hidden="true"></i>
-              <i class="icon fa fa-user id-photo fa-stack-1x" aria-hidden="true"></i>
+              <span class="icon fa fa-list-alt fa-stack-2x" aria-hidden="true"></span>
+              <span class="icon fa fa-user id-photo fa-stack-1x" aria-hidden="true"></span>
             </div>
 
             <div class="copy">
@@ -120,7 +127,7 @@
           <li class="req req-2 req-webcam">
             <h4 class="title"><%- gettext( "Webcam" ) %></h4>
             <div class="placeholder-art">
-              <i class="icon fa fa-video-camera" aria-hidden="true"></i>
+              <span class="icon fa fa-video-camera" aria-hidden="true"></span>
             </div>
 
             <div class="copy"></div>

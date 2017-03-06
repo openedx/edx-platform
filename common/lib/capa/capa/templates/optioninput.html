@@ -12,14 +12,14 @@
       % endfor
     </select>
 
-  <span id="answer_${id}"></span>  
   <div class="indicator-container">
     <span class="status ${status.classname}"
         id="status_${id}"
         aria-describedby="input_${id}" data-tooltip="${status.display_tooltip}">
-      <span class="sr">${value|h} - ${status.display_name}</span>
+      <span class="sr">${value|h} - ${status.display_tooltip}</span>
     </span>
   </div>
+  <p class="answer" id="answer_${id}"></p>
   % if msg:
       <span class="message">${msg|n}</span>
   % endif

@@ -1,19 +1,22 @@
-define(['common/js/spec_helpers/ajax_helpers', 'js/ccx/schedule'],
+define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/ccx/schedule'],
     function(AjaxHelpers) {
         describe("edx.ccx.schedule.ScheduleView", function() {
             var view = null;
+            var data;
 
             beforeEach(function() {
                 loadFixtures("js/fixtures/ccx/schedule.html");
 
                 var scheduleFixture = readFixtures("templates/ccx/schedule.underscore");
-                appendSetFixtures("<div id=\"schedule_template\">" + scheduleFixture + "</div>");
+                appendSetFixtures(
+                    "<script id=\"schedule_template\" type=\"text/template\" >" + scheduleFixture + "</script>"
+                );
                 schedule_template = _.template($('#schedule_template').html());
                 save_url = 'save_ccx';
 
                 $.fn.leanModal = function(param) {
                     return true;
-                }
+                };
 
                 data = [{
                     "category": "chapter",
@@ -44,10 +47,8 @@ define(['common/js/spec_helpers/ajax_helpers', 'js/ccx/schedule'],
                     ]
                 }];
                 view = new edx.ccx.schedule.ScheduleView({el: $('#new-ccx-schedule')});
-                view.schedule_collection.set(data)
+                view.schedule_collection.set(data);
                 view.render();
-
-
             });
 
             it("verifies correct view setup", function() {
@@ -124,7 +125,7 @@ define(['common/js/spec_helpers/ajax_helpers', 'js/ccx/schedule'],
                 val = "i4x://edX/DemoX/sequential/edx_introduction";
                 view.sequential_select.val(val);
                 view.sequential_select.change();
-                val = "i4x://edX/DemoX/vertical/vertical_0270f6de40fc",
+                val = "i4x://edX/DemoX/vertical/vertical_0270f6de40fc";
                 view.vertical_select.val(val);
                 view.vertical_select.change();
                 expect(view.vertical_select.val()).toEqual(val);
@@ -141,9 +142,51 @@ define(['common/js/spec_helpers/ajax_helpers', 'js/ccx/schedule'],
                 view.vertical_select.val(val);
                 view.vertical_select.change();
                 var unit = view.find_unit(view.schedule, 'i4x://edX/DemoX/chapter/d8a6192ade314473a78242dfeedfbf5b');
+                view.set_datetime('start', '2015-12-12 10:00');
+                view.set_datetime('due', '2015-12-12 10:30');
                 expect(unit.hidden).toBe(true);
                 $('#add-unit-button').click();
                 expect(unit.hidden).toBe(false);
+            });
+
+            it("add unit when start date is greater the due date", function() {
+                var val = 'i4x://edX/DemoX/chapter/d8a6192ade314473a78242dfeedfbf5b';
+                view.chapter_select.val(val);
+                view.chapter_select.change();
+                val = "i4x://edX/DemoX/sequential/edx_introduction";
+                view.sequential_select.val(val);
+                view.sequential_select.change();
+                val = "i4x://edX/DemoX/vertical/vertical_0270f6de40fc";
+                view.vertical_select.val(val);
+                view.vertical_select.change();
+                var unit = view.find_unit(view.schedule, 'i4x://edX/DemoX/chapter/d8a6192ade314473a78242dfeedfbf5b');
+                // start date is before due date
+                view.set_datetime('start', '2015-11-13 10:45');
+                view.set_datetime('due', '2015-11-12 10:00');
+                expect(unit.hidden).toBe(true);
+                $('#add-unit-button').click();
+                // Assert unit is not added to schedule
+                expect(unit.hidden).toBe(true);
+            });
+
+            it("add unit when start date is missing", function() {
+                var val = 'i4x://edX/DemoX/chapter/d8a6192ade314473a78242dfeedfbf5b';
+                view.chapter_select.val(val);
+                view.chapter_select.change();
+                val = "i4x://edX/DemoX/sequential/edx_introduction";
+                view.sequential_select.val(val);
+                view.sequential_select.change();
+                val = "i4x://edX/DemoX/vertical/vertical_0270f6de40fc";
+                view.vertical_select.val(val);
+                view.vertical_select.change();
+                var unit = view.find_unit(view.schedule, 'i4x://edX/DemoX/chapter/d8a6192ade314473a78242dfeedfbf5b');
+                // start date is missing
+                view.set_datetime('start', null);
+                view.set_datetime('due', '2015-12-12 10:00');
+                expect(unit.hidden).toBe(true);
+                $('#add-unit-button').click();
+                // Assert unit is not added to schedule
+                expect(unit.hidden).toBe(true);
             });
 
             it("gets a datetime string from date and time fields", function() {
@@ -164,7 +207,7 @@ define(['common/js/spec_helpers/ajax_helpers', 'js/ccx/schedule'],
                 view.save();
                 expect(requests.length).toEqual(1)
                 AjaxHelpers.expectJsonRequest(requests, 'POST', 'save_ccx', view.schedule);
-                expect($('#dirty-schedule #save-changes').text()).toEqual("Saving...");
+                expect($('#dirty-schedule #save-changes').text()).toEqual("Saving");
                 AjaxHelpers.respondWithJson(requests, {
                     data: view.schedule
                 });

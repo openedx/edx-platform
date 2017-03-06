@@ -3,9 +3,11 @@ Tests for discussion pages
 """
 
 import datetime
-from pytz import UTC
 from uuid import uuid4
+
+from flaky import flaky
 from nose.plugins.attrib import attr
+from pytz import UTC
 from common.test.acceptance.tests.discussion.helpers import BaseDiscussionTestCase
 
 from ..helpers import UniqueCourseTest
@@ -112,7 +114,46 @@ class DiscussionResponsePaginationTestMixin(BaseDiscussionMixin):
         self.assertFalse(self.thread_page.has_add_response_button())
 
 
-@attr('shard_1')
+@attr('shard_2')
+class DiscussionHomePageTest(UniqueCourseTest):
+    """
+    Tests for the discussion home page.
+    """
+
+    SEARCHED_USERNAME = "gizmo"
+
+    def setUp(self):
+        super(DiscussionHomePageTest, self).setUp()
+        CourseFixture(**self.course_info).install()
+        AutoAuthPage(self.browser, course_id=self.course_id).visit()
+        self.page = DiscussionTabHomePage(self.browser, self.course_id)
+        self.page.visit()
+
+    def test_new_post_button(self):
+        """
+        Scenario: I can create new posts from the Discussion home page.
+            Given that I am on the Discussion home page
+            When I click on the 'New Post' button
+            Then I should be shown the new post form
+        """
+        self.assertIsNotNone(self.page.new_post_button)
+        self.page.click_new_post_button()
+        self.assertIsNotNone(self.page.new_post_form)
+
+    @attr('a11y')
+    def test_page_accessibility(self):
+        self.page.a11y_audit.config.set_rules({
+            "ignore": [
+                'section',  # TODO: AC-491
+                'color-contrast',  # TNL-4635
+                'link-href',  # TNL-4636
+                'icon-aria-hidden',  # TNL-4637
+            ]
+        })
+        self.page.a11y_audit.check_for_accessibility_errors()
+
+
+@attr('shard_2')
 class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePaginationTestMixin):
     """
     Tests for the discussion page displaying a single thread
@@ -125,6 +166,26 @@ class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePa
     def setup_thread_page(self, thread_id):
         self.thread_page = self.create_single_thread_page(thread_id)  # pylint: disable=attribute-defined-outside-init
         self.thread_page.visit()
+
+    def test_markdown_reference_link(self):
+        """
+        Check markdown editor renders reference link correctly
+        and colon(:) in reference link is not converted to %3a
+        """
+        sample_link = "http://example.com/colon:test"
+        thread_content = """[enter link description here][1]\n[1]: http://example.com/colon:test"""
+        thread_id = "test_thread_{}".format(uuid4().hex)
+        thread_fixture = SingleThreadViewFixture(
+            Thread(
+                id=thread_id,
+                body=thread_content,
+                commentable_id=self.discussion_id,
+                thread_type="discussion"
+            )
+        )
+        thread_fixture.push()
+        self.setup_thread_page(thread_id)
+        self.assertEqual(self.thread_page.get_link_href(), sample_link)
 
     def test_marked_answer_comments(self):
         thread_id = "test_thread_{}".format(uuid4().hex)
@@ -161,8 +222,11 @@ class DiscussionCommentDeletionTest(BaseDiscussionTestCase):
     def setup_view(self):
         view = SingleThreadViewFixture(Thread(id="comment_deletion_test_thread", commentable_id=self.discussion_id))
         view.addResponse(
-            Response(id="response1"),
-            [Comment(id="comment_other_author", user_id="other"), Comment(id="comment_self_author", user_id=self.user_id)])
+            Response(id="response1"), [
+                Comment(id="comment_other_author"),
+                Comment(id="comment_self_author", user_id=self.user_id, thread_id="comment_deletion_test_thread")
+            ]
+        )
         view.push()
 
     def test_comment_deletion_as_student(self):
@@ -268,6 +332,23 @@ class DiscussionCommentEditTest(BaseDiscussionTestCase):
         page.cancel_comment_edit("comment_self_author", original_body)
         self.assertFalse(page.is_comment_editor_visible("comment_self_author"))
         self.assertTrue(page.is_add_comment_visible("response1"))
+
+    @attr('a11y')
+    def test_page_accessibility(self):
+        self.setup_user()
+        self.setup_view()
+        page = self.create_single_thread_page("comment_edit_test_thread")
+        page.visit()
+        page.a11y_audit.config.set_rules({
+            'ignore': [
+                'section',  # TODO: AC-491
+                'aria-valid-attr-value',  # TNL-4643
+                'color-contrast',  # TNL-4644
+                'link-href',  # TNL-4640
+                'icon-aria-hidden',  # TNL-4645
+            ]
+        })
+        page.a11y_audit.check_for_accessibility_errors()
 
 
 class InlineDiscussionTestMixin(BaseDiscussionMixin):
@@ -590,6 +671,18 @@ class DiscussionSearchAlertTest(UniqueCourseTest):
             self.SEARCHED_USERNAME
         ).wait_for_page()
 
+    @attr('a11y')
+    def test_page_accessibility(self):
+        self.page.a11y_audit.config.set_rules({
+            'ignore': [
+                'section',  # TODO: AC-491
+                'color-contrast',  # TNL-4639
+                'link-href',  # TNL-4640
+                'icon-aria-hidden',  # TNL-4641
+            ]
+        })
+        self.page.a11y_audit.check_for_accessibility_errors()
+
 
 @attr('shard_1')
 class DiscussionSortPreferenceTest(UniqueCourseTest):
@@ -613,14 +706,14 @@ class DiscussionSortPreferenceTest(UniqueCourseTest):
         Test to check the default sorting preference of user. (Default = date )
         """
         selected_sort = self.sort_page.get_selected_sort_preference()
-        self.assertEqual(selected_sort, "date")
+        self.assertEqual(selected_sort, "activity")
 
     def test_change_sort_preference(self):
         """
         Test that if user sorting preference is changing properly.
         """
         selected_sort = ""
-        for sort_type in ["votes", "comments", "date"]:
+        for sort_type in ["votes", "comments", "activity"]:
             self.assertNotEqual(selected_sort, sort_type)
             self.sort_page.change_sort_preference(sort_type)
             selected_sort = self.sort_page.get_selected_sort_preference()
@@ -631,7 +724,7 @@ class DiscussionSortPreferenceTest(UniqueCourseTest):
         Test that user last preference is saved.
         """
         selected_sort = ""
-        for sort_type in ["votes", "comments", "date"]:
+        for sort_type in ["votes", "comments", "activity"]:
             self.assertNotEqual(selected_sort, sort_type)
             self.sort_page.change_sort_preference(sort_type)
             selected_sort = self.sort_page.get_selected_sort_preference()

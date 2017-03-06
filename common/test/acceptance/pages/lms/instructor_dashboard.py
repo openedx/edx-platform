@@ -23,7 +23,7 @@ class InstructorDashboardPage(CoursePage):
         """
         Selects the membership tab and returns the MembershipSection
         """
-        self.q(css='a[data-section=membership]').first.click()
+        self.q(css='[data-section=membership]').first.click()
         membership_section = MembershipPage(self.browser)
         membership_section.wait_for_page()
         return membership_section
@@ -32,7 +32,7 @@ class InstructorDashboardPage(CoursePage):
         """
         Selects the cohort management tab and returns the CohortManagementSection
         """
-        self.q(css='a[data-section=cohort_management]').first.click()
+        self.q(css='[data-section=cohort_management]').first.click()
         cohort_management_section = CohortManagementSection(self.browser)
         # The first time cohort management is selected, an ajax call is made.
         cohort_management_section.wait_for_ajax()
@@ -43,7 +43,7 @@ class InstructorDashboardPage(CoursePage):
         """
         Selects the data download tab and returns a DataDownloadPage.
         """
-        self.q(css='a[data-section=data_download]').first.click()
+        self.q(css='[data-section=data_download]').first.click()
         data_download_section = DataDownloadPage(self.browser)
         data_download_section.wait_for_page()
         return data_download_section
@@ -52,7 +52,7 @@ class InstructorDashboardPage(CoursePage):
         """
         Selects the student admin tab and returns the MembershipSection
         """
-        self.q(css='a[data-section=student_admin]').first.click()
+        self.q(css='[data-section=student_admin]').first.click()
         student_admin_section = StudentAdminPage(self.browser)
         student_admin_section.wait_for_page()
         return student_admin_section
@@ -61,10 +61,28 @@ class InstructorDashboardPage(CoursePage):
         """
         Selects the certificates tab and returns the CertificatesSection
         """
-        self.q(css='a[data-section=certificates]').first.click()
+        self.q(css='[data-section=certificates]').first.click()
         certificates_section = CertificatesPage(self.browser)
         certificates_section.wait_for_page()
         return certificates_section
+
+    def select_special_exams(self):
+        """
+        Selects the timed exam tab and returns the Special Exams Section
+        """
+        self.q(css='[data-section=special_exams]').first.click()
+        timed_exam_section = SpecialExamsPage(self.browser)
+        timed_exam_section.wait_for_page()
+        return timed_exam_section
+
+    def select_bulk_email(self):
+        """
+        Selects the email tab and returns the bulk email section
+        """
+        self.q(css='[data-section=send_email]').first.click()
+        email_section = BulkEmailPage(self.browser)
+        email_section.wait_for_page()
+        return email_section
 
     @staticmethod
     def get_asset_path(file_name):
@@ -89,6 +107,61 @@ class InstructorDashboardPage(CoursePage):
         return os.sep.join(folders_list_in_path)
 
 
+class BulkEmailPage(PageObject):
+    """
+    Bulk email section of the instructor dashboard.
+    This feature is controlled by an admin panel feature flag, which is turned on via database fixture for testing.
+    """
+    url = None
+
+    def is_browser_on_page(self):
+        return self.q(css='[data-section=send_email].active-section').present
+
+    def _bounded_selector(self, selector):
+        """
+        Return `selector`, but limited to the bulk-email context.
+        """
+        return '.send-email {}'.format(selector)
+
+    def _select_recipient(self, recipient):
+        """
+        Selects the specified recipient from the selector. Assumes that recipient is not None.
+        """
+        recipient_selector_css = "input[name='send_to'][value='{}']".format(recipient)
+        self.q(css=self._bounded_selector(recipient_selector_css))[0].click()
+
+    def send_message(self, recipients):
+        """
+        Send a test message to the specified recipient.
+        """
+        send_css = "input[name='send']"
+        test_subject = "Hello"
+        test_body = "This is a test email"
+
+        for recipient in recipients:
+            self._select_recipient(recipient)
+        self.q(css=self._bounded_selector("input[name='subject']")).fill(test_subject)
+        self.q(css=self._bounded_selector("iframe#mce_0_ifr"))[0].click()
+        self.q(css=self._bounded_selector("iframe#mce_0_ifr"))[0].send_keys(test_body)
+
+        with self.handle_alert(confirm=True):
+            self.q(css=self._bounded_selector(send_css)).click()
+
+    def verify_message_queued_successfully(self):
+        """
+        Verifies that the "you email was queued" message appears.
+
+        Note that this does NOT ensure the message gets sent successfully, that functionality
+        is covered by the bulk_email unit tests.
+        """
+        confirmation_selector = self._bounded_selector(".msg-confirm")
+        expected_text = u"Your email message was successfully queued for sending."
+        EmptyPromise(
+            lambda: expected_text in self.q(css=confirmation_selector)[0].text,
+            "Message Queued Confirmation"
+        ).fulfill()
+
+
 class MembershipPage(PageObject):
     """
     Membership section of the Instructor dashboard.
@@ -96,13 +169,47 @@ class MembershipPage(PageObject):
     url = None
 
     def is_browser_on_page(self):
-        return self.q(css='a[data-section=membership].active-section').present
+        return self.q(css='[data-section=membership].active-section').present
 
     def select_auto_enroll_section(self):
         """
         Returns the MembershipPageAutoEnrollSection page object.
         """
         return MembershipPageAutoEnrollSection(self.browser)
+
+
+class SpecialExamsPage(PageObject):
+    """
+    Timed exam section of the Instructor dashboard.
+    """
+    url = None
+
+    def is_browser_on_page(self):
+        return self.q(css='[data-section=special_exams].active-section').present
+
+    def select_allowance_section(self):
+        """
+        Expand the allowance section
+        """
+        allowance_section = SpecialExamsPageAllowanceSection(self.browser)
+        if not self.q(css="div.wrap #ui-accordion-proctoring-accordion-header-0[aria-selected=true]").present:
+            self.q(css="div.wrap #ui-accordion-proctoring-accordion-header-0").click()
+            self.wait_for_element_presence("div.wrap #ui-accordion-proctoring-accordion-header-0[aria-selected=true]",
+                                           "Allowance Section")
+        allowance_section.wait_for_page()
+        return allowance_section
+
+    def select_exam_attempts_section(self):
+        """
+        Expand the Student Attempts Section
+        """
+        exam_attempts_section = SpecialExamsPageAttemptsSection(self.browser)
+        if not self.q(css="div.wrap #ui-accordion-proctoring-accordion-header-1[aria-selected=true]").present:
+            self.q(css="div.wrap #ui-accordion-proctoring-accordion-header-1").click()
+            self.wait_for_element_presence("div.wrap #ui-accordion-proctoring-accordion-header-1[aria-selected=true]",
+                                           "Attempts Section")
+        exam_attempts_section.wait_for_page()
+        return exam_attempts_section
 
 
 class CohortManagementSection(PageObject):
@@ -272,6 +379,14 @@ class CohortManagementSection(PageObject):
         # There are 2 create buttons on the page. The second one is only present when no cohort yet exists
         # (in which case the first is not visible). Click on the last present create button.
         create_buttons.results[len(create_buttons.results) - 1].click()
+
+        # Both the edit and create forms have an element with id="cohort-name". Verify that the create form
+        # has been rendered.
+        self.wait_for(
+            lambda: "Add a New Cohort" in self.q(css=self._bounded_selector(".form-title")).text,
+            "Create cohort form is visible"
+        )
+
         textinput = self.q(css=self._bounded_selector("#cohort-name")).results[0]
         textinput.send_keys(cohort_name)
 
@@ -505,6 +620,7 @@ class CohortManagementSection(PageObject):
         """
         if state != self.is_cohorted:
             self.q(css=self._bounded_selector('.cohorts-state')).first.click()
+            self.wait_for_ajax()
 
     def toggles_showing_of_discussion_topics(self):
         """
@@ -634,6 +750,7 @@ class MembershipPageAutoEnrollSection(PageObject):
 
     auto_enroll_browse_button_selector = '.auto_enroll_csv .file-browse input.file_field#browseBtn'
     auto_enroll_upload_button_selector = '.auto_enroll_csv button[name="enrollment_signup_button"]'
+    batch_enrollment_selector = '.batch-enrollment'
     NOTIFICATION_ERROR = 'error'
     NOTIFICATION_WARNING = 'warning'
     NOTIFICATION_SUCCESS = 'confirmation'
@@ -706,6 +823,129 @@ class MembershipPageAutoEnrollSection(PageObject):
         self.q(css=self.auto_enroll_browse_button_selector).results[0].send_keys(file_path)
         self.click_upload_file_button()
 
+    def fill_enrollment_batch_text_box(self, email):
+        """
+        Fill in the form with the provided email and submit it.
+        """
+        email_selector = "{} textarea".format(self.batch_enrollment_selector)
+        enrollment_button = "{} .enrollment-button[data-action='enroll']".format(self.batch_enrollment_selector)
+
+        # Fill the email addresses after the email selector is visible.
+        self.wait_for_element_visibility(email_selector, 'Email field is visible')
+        self.q(css=email_selector).fill(email)
+
+        # Verify enrollment button is present before clicking
+        EmptyPromise(
+            lambda: self.q(css=enrollment_button).present, "Enrollment button"
+        ).fulfill()
+        self.q(css=enrollment_button).click()
+
+    def get_notification_text(self):
+        """
+        Check notification div is visible and have message.
+        """
+        notification_selector = '{} .request-response'.format(self.batch_enrollment_selector)
+        self.wait_for_element_visibility(notification_selector, 'Notification div is visible')
+        return self.q(css="{} h3".format(notification_selector)).text
+
+
+class SpecialExamsPageAllowanceSection(PageObject):
+    """
+    Allowance section of the Instructor dashboard's Special Exams tab.
+    """
+    url = None
+
+    def is_browser_on_page(self):
+        return self.q(css="div.wrap #ui-accordion-proctoring-accordion-header-0[aria-selected=true]").present
+
+    @property
+    def is_add_allowance_button_visible(self):
+        """
+        Returns True if the Add Allowance button is present.
+        """
+        return self.q(css="a#add-allowance").present
+
+    @property
+    def is_allowance_record_visible(self):
+        """
+        Returns True if the Add Allowance button is present.
+        """
+        return self.q(css="table.allowance-table tr.allowance-items").present
+
+    @property
+    def is_add_allowance_popup_visible(self):
+        """
+        Returns True if the Add Allowance popup and it's all assets are present.
+        """
+        return self.q(css="div.modal div.modal-header").present and self._are_all_assets_present()
+
+    def _are_all_assets_present(self):
+        """
+        Returns True if all the assets present in add allowance popup/form
+        """
+        return (
+            self.q(css="select#proctored_exam").present and
+            self.q(css="label#exam_type_label").present and
+            self.q(css="input#allowance_value").present and
+            self.q(css="input#user_info").present and
+            self.q(css="input#addNewAllowance").present
+        ) and (
+            # This will be present if exam is proctored
+            self.q(css="select#allowance_type").present or
+            # This will be present if exam is timed
+            self.q(css="label#timed_exam_allowance_type").present
+        )
+
+    def click_add_allowance_button(self):
+        """
+        Click the add allowance button
+        """
+        self.q(css="a#add-allowance").click()
+        self.wait_for_element_presence("div.modal div.modal-header", "Popup should be visible")
+
+    def submit_allowance_form(self, allowed_minutes, username):
+        """
+        Fill and submit the allowance
+        """
+        self.q(css='input#allowance_value').fill(allowed_minutes)
+        self.q(css='input#user_info').fill(username)
+        self.q(css="input#addNewAllowance").click()
+        self.wait_for_element_absence("div.modal div.modal-header", "Popup should be hidden")
+        self.wait_for_ajax()
+
+
+class SpecialExamsPageAttemptsSection(PageObject):
+    """
+    Exam Attempts section of the Instructor dashboard's Special Exams tab.
+    """
+    url = None
+
+    def is_browser_on_page(self):
+        return (self.q(css="div.wrap #ui-accordion-proctoring-accordion-header-1[aria-selected=true]").present and
+                self.q(css="#search_attempt_id").present)
+
+    @property
+    def is_search_text_field_visible(self):
+        """
+        Returns True if the search field is present
+        """
+        return self.q(css="#search_attempt_id").present
+
+    @property
+    def is_student_attempt_visible(self):
+        """
+        Returns True if a row with the Student's attempt is present
+        """
+        return self.q(css="a.remove-attempt").present
+
+    def remove_student_attempt(self):
+        """
+        Clicks the "x" to remove the Student's attempt.
+        """
+        with self.handle_alert(confirm=True):
+            self.q(css="a.remove-attempt").first.click()
+        self.wait_for_element_absence("a.remove-attempt", "exam attempt")
+
 
 class DataDownloadPage(PageObject):
     """
@@ -714,7 +954,7 @@ class DataDownloadPage(PageObject):
     url = None
 
     def is_browser_on_page(self):
-        return self.q(css='a[data-section=data_download].active-section').present
+        return self.q(css='[data-section=data_download].active-section').present
 
     @property
     def generate_student_report_button(self):
@@ -744,6 +984,13 @@ class DataDownloadPage(PageObject):
         """
         return self.q(css="#report-downloads-table .file-download-link>a")
 
+    @property
+    def generate_ora2_response_report_button(self):
+        """
+        Returns the ORA2 response download button for the current page.
+        """
+        return self.q(css='input[name=export-ora2-data]')
+
     def wait_for_available_report(self):
         """
         Waits for a downloadable report to be available.
@@ -770,7 +1017,7 @@ class StudentAdminPage(PageObject):
         """
         Confirms student admin section is present
         """
-        return self.q(css='a[data-section=student_admin].active-section').present
+        return self.q(css='[data-section=student_admin].active-section').present
 
     @property
     def student_email_input(self):
@@ -902,8 +1149,35 @@ class CertificatesPage(PageObject):
     url = None
     PAGE_SELECTOR = 'section#certificates'
 
+    def wait_for_certificate_exceptions_section(self):
+        """
+        Wait for Certificate Exceptions to be rendered on page
+        """
+        self.wait_for_element_visibility(
+            'div.certificate-exception-container',
+            'Certificate Exception Section is visible'
+        )
+        self.wait_for_element_visibility('#add-exception', 'Add Exception button is visible')
+
+    def wait_for_certificate_invalidations_section(self):  # pylint: disable=invalid-name
+        """
+        Wait for certificate invalidations section to be rendered on page
+        """
+        self.wait_for_element_visibility(
+            'div.certificate-invalidation-container',
+            'Certificate invalidations section is visible.'
+        )
+        self.wait_for_element_visibility('#invalidate-certificate', 'Invalidate Certificate button is visible')
+
+    def refresh(self):
+        """
+        Refresh Certificates Page and wait for the page to load completely.
+        """
+        self.browser.refresh()
+        self.wait_for_page()
+
     def is_browser_on_page(self):
-        return self.q(css='a[data-section=certificates].active-section').present
+        return self.q(css='[data-section=certificates].active-section').present
 
     def get_selector(self, css_selector):
         """
@@ -911,12 +1185,97 @@ class CertificatesPage(PageObject):
         """
         return self.q(css=' '.join([self.PAGE_SELECTOR, css_selector]))
 
+    def add_certificate_exception(self, student, free_text_note):
+        """
+        Add Certificate Exception for 'student'.
+        """
+        self.wait_for_element_visibility('#add-exception', 'Add Exception button is visible')
+
+        self.get_selector('#certificate-exception').fill(student)
+        self.get_selector('#notes').fill(free_text_note)
+        self.get_selector('#add-exception').click()
+
+        self.wait_for_ajax()
+        self.wait_for(
+            lambda: student in self.get_selector('div.white-listed-students table tr:last-child td').text,
+            description='Certificate Exception added to list'
+        )
+
+    def remove_first_certificate_exception(self):
+        """
+        Remove Certificate Exception from the white list.
+        """
+        self.wait_for_element_visibility('#add-exception', 'Add Exception button is visible')
+        self.get_selector('div.white-listed-students table tr td .delete-exception').first.click()
+        self.wait_for_ajax()
+
+    def click_generate_certificate_exceptions_button(self):  # pylint: disable=invalid-name
+        """
+        Click 'Generate Exception Certificates' button in 'Certificates Exceptions' section
+        """
+        self.get_selector('#generate-exception-certificates').click()
+
+    def fill_user_name_field(self, student):
+        """
+        Fill username/email field with given text
+        """
+        self.get_selector('#certificate-exception').fill(student)
+
+    def click_add_exception_button(self):
+        """
+        Click 'Add Exception' button in 'Certificates Exceptions' section
+        """
+        self.get_selector('#add-exception').click()
+
+    def add_certificate_invalidation(self, student, notes):
+        """
+        Add certificate invalidation for 'student'.
+        """
+        self.wait_for_element_visibility('#invalidate-certificate', 'Invalidate Certificate button is visible')
+
+        self.get_selector('#certificate-invalidation-user').fill(student)
+        self.get_selector('#certificate-invalidation-notes').fill(notes)
+        self.get_selector('#invalidate-certificate').click()
+
+        self.wait_for_ajax()
+        self.wait_for(
+            lambda: student in self.get_selector('div.invalidation-history table tr:last-child td').text,
+            description='Certificate invalidation added to list.'
+        )
+
+    def remove_first_certificate_invalidation(self):
+        """
+        Remove certificate invalidation from the invalidation list.
+        """
+        self.wait_for_element_visibility('#invalidate-certificate', 'Invalidate Certificate button is visible')
+        self.get_selector('div.invalidation-history table tr td .re-validate-certificate').first.click()
+        self.wait_for_ajax()
+
+    def fill_certificate_invalidation_user_name_field(self, student):  # pylint: disable=invalid-name
+        """
+        Fill username/email field with given text
+        """
+        self.get_selector('#certificate-invalidation-user').fill(student)
+
+    def click_invalidate_certificate_button(self):
+        """
+        Click 'Invalidate Certificate' button in 'certificates invalidations' section
+        """
+        self.get_selector('#invalidate-certificate').click()
+
     @property
     def generate_certificates_button(self):
         """
         Returns the "Generate Certificates" button.
         """
         return self.get_selector('#btn-start-generating-certificates')
+
+    @property
+    def generate_certificates_disabled_button(self):  # pylint: disable=invalid-name
+        """
+        Returns the disabled state of button
+        """
+        return self.get_selector('#disabled-btn-start-generating-certificates')
 
     @property
     def certificate_generation_status(self):
@@ -931,3 +1290,38 @@ class CertificatesPage(PageObject):
         Returns the "Pending Instructor Tasks" section.
         """
         return self.get_selector('div.running-tasks-container')
+
+    @property
+    def certificate_exceptions_section(self):
+        """
+        Returns the "Certificate Exceptions" section.
+        """
+        return self.get_selector('div.certificate-exception-container')
+
+    @property
+    def last_certificate_exception(self):
+        """
+        Returns the Last Certificate Exception in Certificate Exceptions list in "Certificate Exceptions" section.
+        """
+        return self.get_selector('div.white-listed-students table tr:last-child td')
+
+    @property
+    def message(self):
+        """
+        Returns the Message (error/success) in "Certificate Exceptions" section.
+        """
+        return self.get_selector('.certificate-exception-container div.message')
+
+    @property
+    def last_certificate_invalidation(self):
+        """
+        Returns last certificate invalidation from "Certificate Invalidations" section.
+        """
+        return self.get_selector('div.certificate-invalidation-container table tr:last-child td')
+
+    @property
+    def certificate_invalidation_message(self):  # pylint: disable=invalid-name
+        """
+        Returns the message (error/success) in "Certificate Invalidation" section.
+        """
+        return self.get_selector('.certificate-invalidation-container div.message')

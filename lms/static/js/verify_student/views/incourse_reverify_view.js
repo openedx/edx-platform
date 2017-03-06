@@ -6,7 +6,7 @@
  */
  var edx = edx || {};
 
- (function( $, _, _s, Backbone, gettext ) {
+ (function( $, _, _s, Backbone, gettext, HtmlUtils ) {
     'use strict';
 
     edx.verify_student = edx.verify_student || {};
@@ -30,9 +30,9 @@
             this.usageId = obj.usageId || null;
 
 
-            this.model = new edx.verify_student.ReverificationModel({
+            this.model = new edx.verify_student.VerificationModel({
                 courseKey: this.courseKey,
-                usageId: this.usageId
+                checkpoint: this.usageId
             });
 
             this.listenTo( this.model, 'sync', _.bind( this.handleSubmitPhotoSuccess, this ));
@@ -40,14 +40,15 @@
         },
 
         render: function() {
-            var renderedTemplate = _.template(
-                $( this.templateId ).html(),
-                {
-                    courseKey: this.courseKey,
-                    platformName: this.platformName
-                }
+            HtmlUtils.setHtml(
+                this.el,
+                HtmlUtils.template($( this.templateId ).html())(
+                    {
+                        courseKey: this.courseKey,
+                        platformName: this.platformName
+                    }
+                )
             );
-            $( this.el ).html( renderedTemplate );
 
             // Render the webcam view *after* the parent view
             // so that the container div for the webcam
@@ -74,8 +75,7 @@
         },
 
         handleSubmitPhotoSuccess: function(redirect_url) {
-            // Eventually this will be a redirect back into the courseware,
-            // but for now we can return to the student dashboard.
+            // Redirect back to the courseware at the checkpoint location
             window.location.href = redirect_url;
         },
 
@@ -102,4 +102,4 @@
                 .attr('aria-disabled', !isEnabled);
         }
     });
-})(jQuery, _, _.str, Backbone, gettext);
+})(jQuery, _, _.str, Backbone, gettext, edx.HtmlUtils);

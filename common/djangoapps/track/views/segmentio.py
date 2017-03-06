@@ -1,4 +1,4 @@
-"""Handle events that were forwarded from the segment.io webhook integration"""
+"""Handle events that were forwarded from the Segment webhook integration"""
 
 import datetime
 import json
@@ -19,8 +19,6 @@ log = logging.getLogger(__name__)
 
 
 ERROR_UNAUTHORIZED = 'Unauthorized'
-WARNING_IGNORED_SOURCE = 'Source ignored'
-WARNING_IGNORED_TYPE = 'Type ignored'
 ERROR_MISSING_USER_ID = 'Required user_id missing from context'
 ERROR_USER_NOT_EXIST = 'Specified user does not exist'
 ERROR_INVALID_USER_ID = 'Unable to parse userId as an integer'
@@ -35,28 +33,28 @@ ERROR_MISSING_RECEIVED_AT = 'Required receivedAt field not found'
 @csrf_exempt
 def segmentio_event(request):
     """
-    An endpoint for logging events using segment.io's webhook integration.
+    An endpoint for logging events using Segment's webhook integration.
 
-    segment.io provides a custom integration mechanism that initiates a request to a configurable URL every time an
+    Segment provides a custom integration mechanism that initiates a request to a configurable URL every time an
     event is received by their system. This endpoint is designed to receive those requests and convert the events into
     standard tracking log entries.
 
     For now we limit the scope of handled events to track and screen events from mobile devices. In the future we could
-    enable logging of other types of events, however, there is significant overlap with our non-segment.io based event
-    tracking. Given that segment.io is closed third party solution we are limiting its required usage to just
+    enable logging of other types of events, however, there is significant overlap with our non-Segment based event
+    tracking. Given that Segment is closed third party solution we are limiting its required usage to just
     collecting events from mobile devices for the time being.
 
     Many of the root fields of a standard edX tracking event are read out of the "properties" dictionary provided by the
-    segment.io event, which is, in turn, provided by the client that emitted the event.
+    Segment event, which is, in turn, provided by the client that emitted the event.
 
     In order for an event to be accepted and logged the "key" query string parameter must exactly match the django
     setting TRACKING_SEGMENTIO_WEBHOOK_SECRET. While the endpoint is public, we want to limit access to it to the
-    segment.io servers only.
+    Segment servers only.
 
     """
 
     # Validate the security token. We must use a query string parameter for this since we cannot customize the POST body
-    # in the segment.io webhook configuration, we can only change the URL that they call, so we force this token to be
+    # in the Segment webhook configuration, we can only change the URL that they call, so we force this token to be
     # included in the URL and reject any requests that do not include it. This also assumes HTTPS is used to make the
     # connection between their server and ours.
     expected_secret = getattr(settings, 'TRACKING_SEGMENTIO_WEBHOOK_SECRET', None)
@@ -67,8 +65,8 @@ def segmentio_event(request):
     try:
         track_segmentio_event(request)
     except EventValidationError as err:
-        log.warning(
-            'Unable to process event received from segment.io: message="%s" event="%s"',
+        log.debug(
+            'Unable to process event received from Segment: message="%s" event="%s"',
             str(err),
             request.body
         )
@@ -85,24 +83,24 @@ class EventValidationError(Exception):
 
 def track_segmentio_event(request):  # pylint: disable=too-many-statements
     """
-    Record an event received from segment.io to the tracking logs.
+    Record an event received from Segment to the tracking logs.
 
     This method assumes that the event has come from a trusted source.
 
     The received event must meet the following conditions in order to be logged:
 
     * The value of the "type" field of the event must be included in the list specified by the django setting
-      TRACKING_SEGMENTIO_ALLOWED_TYPES. In order to make use of *all* of the features segment.io offers we would have
+      TRACKING_SEGMENTIO_ALLOWED_TYPES. In order to make use of *all* of the features Segment offers we would have
       to implement some sort of persistent storage of information contained in some actions (like identify). For now,
       we defer support of those actions and just support a limited set that can be handled without storing information
       in external state.
     * The value of the standard "userId" field of the event must be an integer that can be used to look up the user
       using the primary key of the User model.
     * Include a "name" field in the properties dictionary that indicates the edX event name. Note this can differ
-      from the "event" field found in the root of a segment.io event. The "event" field at the root of the structure is
+      from the "event" field found in the root of a Segment event. The "event" field at the root of the structure is
       intended to be human readable, the "name" field is expected to conform to the standard for naming events
       found in the edX data documentation.
-    * Have originated from a known and trusted segment.io client library. The django setting
+    * Have originated from a known and trusted Segment client library. The django setting
       TRACKING_SEGMENTIO_SOURCE_MAP maps the known library names to internal "event_source" strings. In order to be
       logged the event must have a library name that is a valid key in that map.
 
@@ -122,40 +120,41 @@ def track_segmentio_event(request):  # pylint: disable=too-many-statements
     # We mostly care about the properties
     segment_properties = full_segment_event.get('properties', {})
 
-    # Start with the context provided by segment.io in the "client" field if it exists
+    # Start with the context provided by Segment in the "client" field if it exists
     # We should tightly control which fields actually get included in the event emitted.
     segment_context = full_segment_event.get('context')
 
-    # Build up the event context by parsing fields out of the event received from segment.io
+    # Build up the event context by parsing fields out of the event received from Segment
     context = {}
 
     library_name = segment_context.get('library', {}).get('name')
     source_map = getattr(settings, 'TRACKING_SEGMENTIO_SOURCE_MAP', {})
     event_source = source_map.get(library_name)
     if not event_source:
-        raise EventValidationError(WARNING_IGNORED_SOURCE)
+        return
     else:
         context['event_source'] = event_source
+
+    # Ignore event types that are unsupported
+    segment_event_type = full_segment_event.get('type')
+    allowed_types = [a.lower() for a in getattr(settings, 'TRACKING_SEGMENTIO_ALLOWED_TYPES', [])]
+    if not segment_event_type or (segment_event_type.lower() not in allowed_types):
+        return
 
     if 'name' not in segment_properties:
         raise EventValidationError(ERROR_MISSING_NAME)
 
-    if 'data' not in segment_properties:
-        raise EventValidationError(ERROR_MISSING_DATA)
-
-    # Ignore event types and names that are unsupported
-    segment_event_type = full_segment_event.get('type')
+    # Ignore event names that are unsupported
     segment_event_name = segment_properties['name']
-    allowed_types = [a.lower() for a in getattr(settings, 'TRACKING_SEGMENTIO_ALLOWED_TYPES', [])]
     disallowed_substring_names = [
         a.lower() for a in getattr(settings, 'TRACKING_SEGMENTIO_DISALLOWED_SUBSTRING_NAMES', [])
     ]
-    if (
-        not segment_event_type or
-        (segment_event_type.lower() not in allowed_types) or
-        any(disallowed_subs_name in segment_event_name.lower() for disallowed_subs_name in disallowed_substring_names)
-    ):
-        raise EventValidationError(WARNING_IGNORED_TYPE)
+
+    if any(disallowed_subs_name in segment_event_name.lower() for disallowed_subs_name in disallowed_substring_names):
+        return
+
+    if 'data' not in segment_properties:
+        raise EventValidationError(ERROR_MISSING_DATA)
 
     # create and populate application field if it doesn't exist
     app_context = segment_properties.get('context', {})

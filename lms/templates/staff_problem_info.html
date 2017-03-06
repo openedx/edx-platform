@@ -6,7 +6,7 @@ from django.template.defaultfilters import escapejs
 
 ## The JS for this is defined in xqa_interface.html
 ${block_content}
-%if location.category in ['problem','video','html','combinedopenended','graphical_slider_tool', 'library_content']:
+%if 'detached' not in tags:
 %  if edit_link:
   <div>
       <a href="${edit_link}">Edit</a>
@@ -21,7 +21,7 @@ ${block_content}
   </div>
 %  endif
 %  if not disable_staff_debug_info:
-<div class="wrap-instructor-info" aria-hidden="true">
+<div class="wrap-instructor-info">
   <a class="instructor-info-action" href="#${element_id}_debug" id="${element_id}_trig">${_("Staff Debug Info")}</a>
 
   %  if settings.FEATURES.get('ENABLE_STUDENT_HISTORY_VIEW') and \
@@ -38,9 +38,9 @@ ${block_content}
     </header>
 
     <form id="${element_id}_xqa_form" class="xqa_form">
-      <label>${_("Comment")}</label>
+      <label for="${element_id}_xqa_entry">${_("Comment")}</label>
       <input id="${element_id}_xqa_entry" type="text" placeholder="${_('comment')}">
-      <label>${_("Tag")}</label>
+      <label for="${element_id}_xqa_tag">${_("Tag")}</label>
       <span style="color:black;vertical-align: -10pt">${_('Optional tag (eg "done" or "broken"):') + '&nbsp; '}      </span>
       <input id="${element_id}_xqa_tag" type="text" placeholder="${_('tag')}" style="width:80px;display:inline">
       <div class="submit">

@@ -25,20 +25,20 @@ from boto.ses.exceptions import (
 )
 from boto.exception import AWSConnectionError
 
-from celery.states import SUCCESS, FAILURE
+from celery.states import SUCCESS, FAILURE  # pylint: disable=no-name-in-module, import-error
 
 from django.conf import settings
 from django.core.management import call_command
 
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from bulk_email.models import CourseEmail, Optout, SEND_TO_ALL
+from bulk_email.models import CourseEmail, Optout, SEND_TO_MYSELF, SEND_TO_STAFF, SEND_TO_LEARNERS
 
-from instructor_task.tasks import send_bulk_course_email
-from instructor_task.subtasks import update_subtask_status, SubtaskStatus
-from instructor_task.models import InstructorTask
-from instructor_task.tests.test_base import InstructorTaskCourseTestCase
-from instructor_task.tests.factories import InstructorTaskFactory
+from lms.djangoapps.instructor_task.tasks import send_bulk_course_email
+from lms.djangoapps.instructor_task.subtasks import update_subtask_status, SubtaskStatus
+from lms.djangoapps.instructor_task.models import InstructorTask
+from lms.djangoapps.instructor_task.tests.test_base import InstructorTaskCourseTestCase
+from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
@@ -75,8 +75,8 @@ def my_update_subtask_status(entry_id, current_task_id, new_subtask_status):
         update_subtask_status(entry_id, current_task_id, new_subtask_status)
 
 
-@attr('shard_1')
-@patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message'))
+@attr('shard_3')
+@patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
     """Tests instructor task that send bulk email."""
 
@@ -94,10 +94,12 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
 
         Overrides the base class version in that this creates CourseEmail.
         """
-        to_option = SEND_TO_ALL
+        targets = [SEND_TO_MYSELF, SEND_TO_STAFF, SEND_TO_LEARNERS]
         course_id = course_id or self.course.id
-        course_email = CourseEmail.create(course_id, self.instructor, to_option, "Test Subject", "<p>This is a test message</p>")
-        task_input = {'email_id': course_email.id}  # pylint: disable=no-member
+        course_email = CourseEmail.create(
+            course_id, self.instructor, targets, "Test Subject", "<p>This is a test message</p>"
+        )
+        task_input = {'email_id': course_email.id}
         task_id = str(uuid4())
         instructor_task = InstructorTaskFactory.create(
             course_id=course_id,
@@ -134,7 +136,7 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
 
         with self.assertRaises(ValueError):
             with patch('bulk_email.tasks.update_subtask_status', dummy_update_subtask_status):
-                send_bulk_course_email(task_entry.id, {})  # pylint: disable=no-member
+                send_bulk_course_email(task_entry.id, {})
 
     def _create_students(self, num_students):
         """Create students for testing"""
@@ -153,7 +155,7 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         self.assertEquals(len(task_id_list), 1)
         task_id = task_id_list[0]
         subtask_status = subtask_status_info.get(task_id)
-        print("Testing subtask status: {}".format(subtask_status))
+        print "Testing subtask status: {}".format(subtask_status)
         self.assertEquals(subtask_status.get('task_id'), task_id)
         self.assertEquals(subtask_status.get('attempted'), succeeded + failed)
         self.assertEquals(subtask_status.get('succeeded'), succeeded)
@@ -163,7 +165,9 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         self.assertEquals(subtask_status.get('retried_withmax'), retried_withmax)
         self.assertEquals(subtask_status.get('state'), SUCCESS if succeeded > 0 else FAILURE)
 
-    def _test_run_with_task(self, task_class, action_name, total, succeeded, failed=0, skipped=0, retried_nomax=0, retried_withmax=0):
+    def _test_run_with_task(
+            self, task_class, action_name, total, succeeded,
+            failed=0, skipped=0, retried_nomax=0, retried_withmax=0):
         """Run a task and check the number of emails processed."""
         task_entry = self._create_input_entry()
         parent_status = self._run_task_with_mock_celery(task_class, task_entry.id, task_entry.task_id)
@@ -238,7 +242,9 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         # mark some students as opting out
         with patch('bulk_email.tasks.get_connection', autospec=True) as get_conn:
             get_conn.return_value.send_messages.side_effect = cycle([None])
-            self._test_run_with_task(send_bulk_course_email, 'emailed', num_emails, expected_succeeds, skipped=expected_skipped)
+            self._test_run_with_task(
+                send_bulk_course_email, 'emailed', num_emails, expected_succeeds, skipped=expected_skipped
+            )
 
     def _test_email_address_failures(self, exception):
         """Test that celery handles bad address errors by failing and not retrying."""
@@ -251,7 +257,9 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         with patch('bulk_email.tasks.get_connection', autospec=True) as get_conn:
             # have every fourth email fail due to some address failure:
             get_conn.return_value.send_messages.side_effect = cycle([exception, None, None, None])
-            self._test_run_with_task(send_bulk_course_email, 'emailed', num_emails, expected_succeeds, failed=expected_fails)
+            self._test_run_with_task(
+                send_bulk_course_email, 'emailed', num_emails, expected_succeeds, failed=expected_fails
+            )
 
     def test_smtp_blacklisted_user(self):
         # Test that celery handles permanent SMTPDataErrors by failing and not retrying.
@@ -329,10 +337,14 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         self._test_max_retry_limit_causes_failure(SMTPConnectError(424, "Bad Connection"))
 
     def test_retry_after_aws_connect_error(self):
-        self._test_retry_after_limited_retry_error(AWSConnectionError("Unable to provide secure connection through proxy"))
+        self._test_retry_after_limited_retry_error(
+            AWSConnectionError("Unable to provide secure connection through proxy")
+        )
 
     def test_max_retry_after_aws_connect_error(self):
-        self._test_max_retry_limit_causes_failure(AWSConnectionError("Unable to provide secure connection through proxy"))
+        self._test_max_retry_limit_causes_failure(
+            AWSConnectionError("Unable to provide secure connection through proxy")
+        )
 
     def test_retry_after_general_error(self):
         self._test_retry_after_limited_retry_error(Exception("This is some random exception."))
@@ -371,7 +383,9 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         self._test_retry_after_unlimited_retry_error(SMTPDataError(455, "Throttling: Sending rate exceeded"))
 
     def test_retry_after_ses_throttling_error(self):
-        self._test_retry_after_unlimited_retry_error(SESMaxSendingRateExceededError(455, "Throttling: Sending rate exceeded"))
+        self._test_retry_after_unlimited_retry_error(
+            SESMaxSendingRateExceededError(455, "Throttling: Sending rate exceeded")
+        )
 
     def _test_immediate_failure(self, exception):
         """Test that celery can hit a maximum number of retries."""
@@ -413,8 +427,9 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         course_image = u'在淡水測試.jpg'
         self.course = CourseFactory.create(course_image=course_image)
 
-        num_emails = 1
-        self._create_students(num_emails)
+        num_emails = 2
+        # We also send email to the instructor:
+        self._create_students(num_emails - 1)
 
         with patch('bulk_email.tasks.get_connection', autospec=True) as get_conn:
             get_conn.return_value.send_messages.side_effect = cycle([None])

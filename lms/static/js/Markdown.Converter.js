@@ -4,7 +4,7 @@ if (typeof exports === "object" && typeof require === "function") // we're in a 
     Markdown = exports;
 else
     Markdown = {};
-    
+
 // The following text is included for historical reasons, but should
 // be taken with a pinch of salt; it's not all true anymore.
 
@@ -583,8 +583,7 @@ else
                     }
                 }
             }
-            url = encodeProblemUrlChars(url);
-            url = escapeCharacters(url, "*_");
+            url = attributeSafeUrl(url);
             var result = "<a href=\"" + url + "\"";
 
             if (title != "") {
@@ -1201,7 +1200,7 @@ else
             // *except* for the <http://www.foo.com> case
 
             // automatically add < and > around unadorned raw hyperlinks
-            // must be preceded by space/BOF and followed by non-word/EOF character    
+            // must be preceded by space/BOF and followed by non-word/EOF character
             text = text.replace(/(^|\s)(https?|ftp)(:\/\/[-A-Z0-9+&@#\/%?=~_|\[\]\(\)!:,\.;]*[-A-Z0-9+&@#\/%=~_|\[\]])($|\W)/gi, "$1<$2$3>$4");
 
             //  autolink anything like <http://example.com>
@@ -1285,26 +1284,12 @@ else
         //  attacklab: Utility functions
         //
 
-        var _problemUrlChars = /(?:["'*()[\]:]|~D)/g;
-
-        // hex-encodes some unusual "problem" chars in URLs to avoid URL detection problems 
-        function encodeProblemUrlChars(url) {
-            if (!url)
-                return "";
-
-            var len = url.length;
-
-            return url.replace(_problemUrlChars, function (match, offset) {
-                if (match == "~D") // escape for dollar
-                    return "%24";
-                if (match == ":") {
-                    if (offset == len - 1 || /[0-9\/]/.test(url.charAt(offset + 1)))
-                        return ":"
-                }
-                return "%" + match.charCodeAt(0).toString(16);
-            });
+        // Replacing encodeProblemUrlChars with attributeSafeUrl. See more at https://code.google.com/p/pagedown/source/detail?r=016a78c093843e203de5364117d34d406a09e8c0
+        function attributeSafeUrl(url) {
+            url = attributeEncode(url);
+            url = escapeCharacters(url, "*_:()[]")
+            return url;
         }
-
 
         function escapeCharacters(text, charsToEscape, afterBackslash) {
             // First we have to escape the escape characters so that

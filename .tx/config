@@ -37,12 +37,6 @@ source_file = conf/locale/en/LC_MESSAGES/mako-studio.po
 source_lang = en
 type = PO
 
-[edx-platform.messages]
-file_filter = conf/locale/<lang>/LC_MESSAGES/messages.po
-source_file = conf/locale/en/LC_MESSAGES/messages.po
-source_lang = en
-type = PO
-
 [edx-platform.underscore]
 file_filter = conf/locale/<lang>/LC_MESSAGES/underscore.po
 source_file = conf/locale/en/LC_MESSAGES/underscore.po

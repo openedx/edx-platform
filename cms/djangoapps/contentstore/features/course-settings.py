@@ -2,12 +2,11 @@
 # pylint: disable=redefined-outer-name
 
 from lettuce import world, step
-from terrain.steps import reload_the_page
 from selenium.webdriver.common.keys import Keys
 from common import type_in_codemirror, upload_file
 from django.conf import settings
 
-from nose.tools import assert_true, assert_false, assert_equal  # pylint: disable=no-name-in-module
+from nose.tools import assert_true, assert_false
 
 TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
 
@@ -131,37 +130,6 @@ def test_i_change_fields(step):
 @step('I change the course overview')
 def test_change_course_overview(_step):
     type_in_codemirror(0, "<h1>Overview</h1>")
-
-
-@step('I click the "Upload Course Image" button')
-def click_upload_button(_step):
-    button_css = '.action-upload-image'
-    world.css_click(button_css)
-
-
-@step('I upload a new course image$')
-def upload_new_course_image(_step):
-    upload_file('image.jpg', sub_path="uploads")
-
-
-@step('I should see the new course image$')
-def i_see_new_course_image(_step):
-    img_css = '#course-image'
-    images = world.css_find(img_css)
-    assert len(images) == 1
-    img = images[0]
-    expected_src = 'image.jpg'
-
-    # Don't worry about the domain in the URL
-    success_func = lambda _: img['src'].endswith(expected_src)
-    world.wait_for(success_func)
-
-
-@step('the image URL should be present in the field')
-def image_url_present(_step):
-    field_css = '#course-image-url'
-    expected_value = 'image.jpg'
-    assert world.css_value(field_css).endswith(expected_value)
 
 
 ############### HELPER METHODS ####################

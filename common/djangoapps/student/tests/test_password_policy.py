@@ -7,11 +7,10 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import AnonymousUser
-from django.utils.importlib import import_module
+from importlib import import_module
 from django.test.utils import override_settings
 from django.conf import settings
 from mock import patch
-from edxmako.tests import mako_middleware_process_request
 from external_auth.models import ExternalAuthMap
 from student.views import create_account
 
@@ -60,7 +59,7 @@ class TestPasswordPolicy(TestCase):
         obj = json.loads(response.content)
         self.assertEqual(
             obj['value'],
-            "Password: Invalid Length (must be 12 characters or less)",
+            "Password: Invalid Length (must be 12 characters or fewer)",
         )
 
     @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'UPPER': 3})
@@ -262,8 +261,8 @@ class TestPasswordPolicy(TestCase):
         request.session['ExternalAuthMap'] = extauth
         request.user = AnonymousUser()
 
-        mako_middleware_process_request(request)
-        response = create_account(request)
+        with patch('edxmako.request_context.get_current_request', return_value=request):
+            response = create_account(request)
         self.assertEqual(response.status_code, 200)
         obj = json.loads(response.content)
         self.assertTrue(obj['success'])

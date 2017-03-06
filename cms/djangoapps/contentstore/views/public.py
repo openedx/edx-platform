@@ -2,6 +2,7 @@
 Public views
 """
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.clickjacking import xframe_options_deny
 from django.core.context_processors import csrf
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
@@ -11,12 +12,13 @@ from edxmako.shortcuts import render_to_response
 
 from external_auth.views import (ssl_login_shortcut, ssl_get_cert_from_request,
                                  redirect_with_get)
-from microsite_configuration import microsite
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 __all__ = ['signup', 'login_page', 'howitworks']
 
 
 @ensure_csrf_cookie
+@xframe_options_deny
 def signup(request):
     """
     Display the signup form.
@@ -34,6 +36,7 @@ def signup(request):
 
 @ssl_login_shortcut
 @ensure_csrf_cookie
+@xframe_options_deny
 def login_page(request):
     """
     Display the login form.
@@ -58,7 +61,7 @@ def login_page(request):
         {
             'csrf': csrf_token,
             'forgot_password_link': "//{base}/login#forgot-password-modal".format(base=settings.LMS_BASE),
-            'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
+            'platform_name': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME),
         }
     )
 

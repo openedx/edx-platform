@@ -19,7 +19,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.xml_exporter import export_course_to_xml
 from xmodule.modulestore.tests.test_split_w_old_mongo import SplitWMongoCourseBootstrapper
 from xmodule.modulestore.tests.factories import check_mongo_calls, mongo_uses_error_check, CourseFactory, ItemFactory
-from xmodule.modulestore.tests.test_cross_modulestore_import_export import (
+from xmodule.modulestore.tests.utils import (
     MongoContentstoreBuilder, MODULESTORE_SETUPS,
     DRAFT_MODULESTORE_SETUP, SPLIT_MODULESTORE_SETUP, MongoModulestoreBuilder,
 )
@@ -925,48 +925,15 @@ class ElementalUnpublishingTests(DraftPublishedOpBaseTestSetup):
             self.assertOLXIsDraftOnly(block_list_unpublished_children)
             self.assertOLXIsDraftOnly(block_list_untouched)
 
-    @ddt.data(DRAFT_MODULESTORE_SETUP, MongoModulestoreBuilder())
-    def test_unpublish_old_mongo_draft_sequential(self, modulestore_builder):
+    @ddt.data(SPLIT_MODULESTORE_SETUP, DRAFT_MODULESTORE_SETUP, MongoModulestoreBuilder())
+    def test_unpublish_draft_sequential(self, modulestore_builder):
         with self._setup_test(modulestore_builder):
 
-            # MODULESTORE_DIFFERENCE:
-            # In old Mongo, you cannot successfully unpublish an autopublished sequential.
-            # An exception is thrown.
             block_list_to_unpublish = (
                 ('sequential', 'sequential03'),
             )
             with self.assertRaises(InvalidVersionError):
                 self.unpublish(block_list_to_unpublish)
-
-    @ddt.data(SPLIT_MODULESTORE_SETUP)
-    def test_unpublish_split_draft_sequential(self, modulestore_builder):
-        with self._setup_test(modulestore_builder):
-
-            # MODULESTORE_DIFFERENCE:
-            # In Split, the sequential is deleted.
-            # The sequential's children are orphaned - but they stay in
-            # the same draft state they were before.
-            block_list_to_unpublish = (
-                ('sequential', 'sequential03'),
-            )
-            block_list_unpublished_children = (
-                ('vertical', 'vertical06'),
-                ('vertical', 'vertical07'),
-                ('html', 'html12'),
-                ('html', 'html13'),
-                ('html', 'html14'),
-                ('html', 'html15'),
-            )
-            # The autopublished sequential is published - its children are draft.
-            self.assertOLXIsPublishedOnly(block_list_to_unpublish)
-            self.assertOLXIsDraftOnly(block_list_unpublished_children)
-            # Unpublish the sequential.
-            self.unpublish(block_list_to_unpublish)
-            # Since the sequential was autopublished, a draft version of the sequential never existed.
-            # So unpublishing the sequential doesn't make it a draft - it deletes it!
-            self.assertOLXIsDeleted(block_list_to_unpublish)
-            # Its children are orphaned and remain as drafts.
-            self.assertOLXIsDraftOnly(block_list_unpublished_children)
 
 
 @ddt.ddt
@@ -1122,20 +1089,7 @@ class ElementalDeleteItemTests(DraftPublishedOpBaseTestSetup):
             self.assertOLXIsPublishedOnly(block_list_to_delete)
             self.delete_item(block_list_to_delete, revision=revision)
             self._check_for_item_deletion(block_list_to_delete, result)
-            # MODULESTORE_DIFFERENCE
-            if self.is_split_modulestore:
-                # Split:
-                if revision == ModuleStoreEnum.RevisionOption.published_only:
-                    # If deleting published_only items, the children that are drafts remain.
-                    self.assertOLXIsDraftOnly(block_list_children)
-                else:
-                    self.assertOLXIsDeleted(block_list_children)
-            elif self.is_old_mongo_modulestore:
-                # Old Mongo:
-                # If deleting draft_only or both items, the drafts will be deleted.
-                self.assertOLXIsDeleted(block_list_children)
-            else:
-                raise Exception("Must test either Old Mongo or Split modulestore!")
+            self.assertOLXIsDeleted(block_list_children)
 
     @ddt.data(*itertools.product(
         MODULESTORE_SETUPS,
@@ -1176,20 +1130,7 @@ class ElementalDeleteItemTests(DraftPublishedOpBaseTestSetup):
             self.delete_item(block_list_to_delete, revision=revision)
             self._check_for_item_deletion(block_list_to_delete, result)
             self.assertOLXIsDeleted(autopublished_children)
-            # MODULESTORE_DIFFERENCE
-            if self.is_split_modulestore:
-                # Split:
-                if revision == ModuleStoreEnum.RevisionOption.published_only:
-                    # If deleting published_only items, the children that are drafts remain.
-                    self.assertOLXIsDraftOnly(block_list_draft_children)
-                else:
-                    self.assertOLXIsDeleted(block_list_draft_children)
-            elif self.is_old_mongo_modulestore:
-                # Old Mongo:
-                # If deleting draft_only or both items, the drafts will be deleted.
-                self.assertOLXIsDeleted(block_list_draft_children)
-            else:
-                raise Exception("Must test either Old Mongo or Split modulestore!")
+            self.assertOLXIsDeleted(block_list_draft_children)
 
 
 @ddt.ddt

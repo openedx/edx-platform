@@ -49,7 +49,7 @@
   @return false;
 }
 
-@mixin directional-property($pre, $suf, $vals) {
+@mixin directional-property($pre, $suf, $vals...) {
   // Property Names
   $top:    $pre + "-top"    + if($suf, "-#{$suf}", "");
   $bottom: $pre + "-bottom" + if($suf, "-#{$suf}", "");

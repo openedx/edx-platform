@@ -1,8 +1,3 @@
-var schematic_height = 220;
-var schematic_width = 400;
-var styling_height_delta = 2; //How many pixels are added to the height of the box because of styling (like a shadow)
-var styling_width_delta = 2;
-
 $(function() {
     // TODO: someone should fix all of this...
     //$("a[rel*=leanModal]").leanModal(); //TODO: Make this work with the new modal library. Try and integrate this with the "slices"
@@ -50,9 +45,5 @@ $(function() {
 
       editingCircuit.schematic.load_schematic(saving_circuit, "");
       editingCircuit.schematic.zoomall();
-
-      if (editingCircuit.codeMirrorLine) {
-        editingCircuit.codeMirrorLine.replace(0, null, "circuit-schematic:" + saving_circuit);
-      }
     });
 });

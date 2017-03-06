@@ -1,20 +1,24 @@
 """
 Module implementing `xblock.runtime.Runtime` functionality for the LMS
 """
-
 import re
-import xblock.reference.plugins
 
-from django.core.urlresolvers import reverse
 from django.conf import settings
-from request_cache.middleware import RequestCache
-from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
+from django.core.urlresolvers import reverse
+
+from badges.service import BadgingService
+from badges.utils import badges_enabled
 from openedx.core.djangoapps.user_api.course_tag import api as user_course_tag_api
-from xmodule.modulestore.django import modulestore
-from xmodule.services import SettingsService
+from openedx.core.lib.xblock_utils import xblock_local_resource_url
+from request_cache.middleware import RequestCache
+import xblock.reference.plugins
 from xmodule.library_tools import LibraryToolsService
-from xmodule.x_module import ModuleSystem
+from xmodule.modulestore.django import modulestore, ModuleI18nService
 from xmodule.partitions.partitions_service import PartitionService
+from xmodule.services import SettingsService
+from xmodule.x_module import ModuleSystem
+
+from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 
 
 def _quote_slashes(match):
@@ -66,65 +70,64 @@ def unquote_slashes(text):
     return re.sub(r'(;;|;_)', _unquote_slashes, text)
 
 
-class LmsHandlerUrls(object):
+def handler_url(block, handler_name, suffix='', query='', thirdparty=False):
     """
-    A runtime mixin that provides a handler_url function that routes
-    to the LMS' xblock handler view.
+    This method matches the signature for `xblock.runtime:Runtime.handler_url()`
 
-    This must be mixed in to a runtime that already accepts and stores
-    a course_id
+    See :method:`xblock.runtime:Runtime.handler_url`
     """
-    # pylint: disable=unused-argument
-    # pylint: disable=no-member
-    def handler_url(self, block, handler_name, suffix='', query='', thirdparty=False):
-        """See :method:`xblock.runtime:Runtime.handler_url`"""
-        view_name = 'xblock_handler'
-        if handler_name:
-            # Be sure this is really a handler.
-            func = getattr(block, handler_name, None)
-            if not func:
-                raise ValueError("{!r} is not a function name".format(handler_name))
-            if not getattr(func, "_is_xblock_handler", False):
-                raise ValueError("{!r} is not a handler name".format(handler_name))
+    view_name = 'xblock_handler'
+    if handler_name:
+        # Be sure this is really a handler.
+        #
+        # We're checking the .__class__ instead of the block itself to avoid
+        # auto-proxying from Descriptor -> Module, in case descriptors want
+        # to ask for handler URLs without a student context.
+        func = getattr(block.__class__, handler_name, None)
+        if not func:
+            raise ValueError("{!r} is not a function name".format(handler_name))
 
-        if thirdparty:
-            view_name = 'xblock_handler_noauth'
+        # Is the following necessary? ProxyAttribute causes an UndefinedContext error
+        # if trying this without the module system.
+        #
+        #if not getattr(func, "_is_xblock_handler", False):
+        #    raise ValueError("{!r} is not a handler name".format(handler_name))
 
-        url = reverse(view_name, kwargs={
-            'course_id': unicode(self.course_id),
-            'usage_id': quote_slashes(unicode(block.scope_ids.usage_id).encode('utf-8')),
-            'handler': handler_name,
-            'suffix': suffix,
-        })
+    if thirdparty:
+        view_name = 'xblock_handler_noauth'
 
-        # If suffix is an empty string, remove the trailing '/'
-        if not suffix:
-            url = url.rstrip('/')
+    url = reverse(view_name, kwargs={
+        'course_id': unicode(block.location.course_key),
+        'usage_id': quote_slashes(unicode(block.scope_ids.usage_id).encode('utf-8')),
+        'handler': handler_name,
+        'suffix': suffix,
+    })
 
-        # If there is a query string, append it
-        if query:
-            url += '?' + query
+    # If suffix is an empty string, remove the trailing '/'
+    if not suffix:
+        url = url.rstrip('/')
 
-        # If third-party, return fully-qualified url
-        if thirdparty:
-            scheme = "https" if settings.HTTPS == "on" else "http"
-            url = '{scheme}://{host}{path}'.format(
-                scheme=scheme,
-                host=settings.SITE_NAME,
-                path=url
-            )
+    # If there is a query string, append it
+    if query:
+        url += '?' + query
 
-        return url
+    # If third-party, return fully-qualified url
+    if thirdparty:
+        scheme = "https" if settings.HTTPS == "on" else "http"
+        url = '{scheme}://{host}{path}'.format(
+            scheme=scheme,
+            host=settings.SITE_NAME,
+            path=url
+        )
 
-    def local_resource_url(self, block, uri):
-        """
-        local_resource_url for Studio
-        """
-        path = reverse('xblock_resource_url', kwargs={
-            'block_type': block.scope_ids.block_type,
-            'uri': uri,
-        })
-        return '//{}{}'.format(settings.SITE_NAME, path)
+    return url
+
+
+def local_resource_url(block, uri):
+    """
+    local_resource_url for Studio
+    """
+    return xblock_local_resource_url(block, uri)
 
 
 class LmsCourse(object):
@@ -219,25 +222,53 @@ class UserTagsService(object):
         )
 
 
-class LmsModuleSystem(LmsHandlerUrls, LmsCourse, LmsUser, ModuleSystem):  # pylint: disable=abstract-method
+class LmsModuleSystem(LmsCourse, LmsUser, ModuleSystem):  # pylint: disable=abstract-method
     """
     ModuleSystem specialized to the LMS
     """
     def __init__(self, **kwargs):
         request_cache_dict = RequestCache.get_request_cache().data
         services = kwargs.setdefault('services', {})
-        services['user_tags'] = UserTagsService(self)
+        services['fs'] = xblock.reference.plugins.FSService()
+        services['i18n'] = ModuleI18nService
+        services['library_tools'] = LibraryToolsService(modulestore())
         services['partitions'] = LmsPartitionService(
             user=kwargs.get('user'),
             course_id=kwargs.get('course_id'),
             track_function=kwargs.get('track_function', None),
             cache=request_cache_dict
         )
-        services['library_tools'] = LibraryToolsService(modulestore())
-        services['fs'] = xblock.reference.plugins.FSService()
+        store = modulestore()
         services['settings'] = SettingsService()
+        services['user_tags'] = UserTagsService(self)
+        if badges_enabled():
+            services['badging'] = BadgingService(course_id=kwargs.get('course_id'), modulestore=store)
         self.request_token = kwargs.pop('request_token', None)
         super(LmsModuleSystem, self).__init__(**kwargs)
+
+    def handler_url(self, *args, **kwargs):
+        """
+        Implement the XBlock runtime handler_url interface.
+
+        This is mostly just proxying to the module level `handler_url` function
+        defined higher up in this file.
+
+        We're doing this indirection because the module level `handler_url`
+        logic is also needed by the `DescriptorSystem`. The particular
+        `handler_url` that a `DescriptorSystem` needs will be different when
+        running an LMS process or a CMS/Studio process. That's accomplished by
+        monkey-patching a global. It's a long story, but please know that you
+        can't just refactor and fold that logic into here without breaking
+        things.
+
+        https://openedx.atlassian.net/wiki/display/PLAT/Convert+from+Storage-centric+runtimes+to+Application-centric+runtimes
+
+        See :method:`xblock.runtime:Runtime.handler_url`
+        """
+        return handler_url(*args, **kwargs)
+
+    def local_resource_url(self, *args, **kwargs):
+        return local_resource_url(*args, **kwargs)
 
     def wrap_aside(self, block, aside, view, frag, context):
         """
@@ -278,4 +309,10 @@ class LmsModuleSystem(LmsHandlerUrls, LmsCourse, LmsUser, ModuleSystem):  # pyli
         if block.scope_ids.block_type in config.disabled_blocks.split():
             return []
 
-        return super(LmsModuleSystem, self).applicable_aside_types()
+        # TODO: aside_type != 'acid_aside' check should be removed once AcidBlock is only installed during tests
+        # (see https://openedx.atlassian.net/browse/TE-811)
+        return [
+            aside_type
+            for aside_type in super(LmsModuleSystem, self).applicable_aside_types(block)
+            if aside_type != 'acid_aside'
+        ]

@@ -48,8 +48,23 @@ define(
                 };
                 $(window).on("dragover", preventDefault);
                 $(window).on("drop", preventDefault);
+                $(window).on("beforeunload", this.onBeforeUnload.bind(this));
 
                 return this;
+            },
+
+            onBeforeUnload: function () {
+                // Are there are uploads queued or in progress?
+                var uploading = this.collection.filter(function(model) {
+                    var stat = model.get("status");
+                    return (model.get("progress") < 1) &&
+                          ((stat === ActiveVideoUpload.STATUS_QUEUED ||
+                           (stat === ActiveVideoUpload.STATUS_UPLOADING)));
+                });
+                // If so, show a warning message.
+                if (uploading.length) {
+                    return gettext("Your video uploads are not complete.");
+                }
             },
 
             addUpload: function(model) {

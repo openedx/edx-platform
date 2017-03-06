@@ -29,7 +29,7 @@ data: |
         <p>You can use the following example problem as a model.</p>
           <p>The following languages are in the Indo-European family:</p>
           <choiceresponse>
-            <checkboxgroup direction="vertical">
+            <checkboxgroup>
               <choice correct="true" name="urdu">Urdu</choice>
               <choice correct="false" name="finnish">Finnish</choice>
               <choice correct="true" name="marathi">Marathi</choice>

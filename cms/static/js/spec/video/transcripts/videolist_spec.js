@@ -1,12 +1,13 @@
 define(
     [
         'jquery', 'underscore',
+        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
         'js/views/video/transcripts/utils',
         'js/views/video/transcripts/metadata_videolist', 'js/models/metadata',
         'js/views/abstract_editor',
-        'sinon', 'xmodule', 'jasmine-jquery'
+        'xmodule'
     ],
-function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
+function ($, _, AjaxHelpers, Utils, VideoList, MetadataModel, AbstractEditor) {
     'use strict';
     describe('CMS.Views.Metadata.VideoList', function () {
         var videoListEntryTemplate = readFixtures(
@@ -50,24 +51,26 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
                 status: 'Success',
                 subs: 'video_id'
             }),
-            view, sinonXhr, MessageManager, messenger;
+            MessageManager, messenger;
+
+
+        var createMockAjaxServer = function () {
+            var mockServer = AjaxHelpers.server(
+                [
+                    200,
+                    { 'Content-Type': 'application/json'},
+                    response
+                ]
+            );
+            mockServer.autoRespond = true;
+            return mockServer;
+        };
 
         beforeEach(function () {
-            sinonXhr = sinon.fakeServer.create();
-            sinonXhr.respondWith([
-                200,
-                { 'Content-Type': 'application/json'},
-                response
-            ]);
-
-            sinonXhr.autoRespond = true;
-
             var tpl = sandbox({
                     'class': 'component',
                     'data-locator': component_locator
-                }),
-                model = new MetadataModel(modelStub),
-                $el;
+                });
 
             setFixtures(tpl);
 
@@ -80,9 +83,12 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
                 ).text(videoListEntryTemplate)
             );
 
-            spyOn(Utils, 'command').andCallThrough();
-            spyOn(abstractEditor, 'initialize').andCallThrough();
-            spyOn(abstractEditor, 'render').andCallThrough();
+            // create mock server
+            this.mockServer = createMockAjaxServer();
+
+            spyOn(Utils, 'command').and.callThrough();
+            spyOn(abstractEditor, 'initialize').and.callThrough();
+            spyOn(abstractEditor, 'render').and.callThrough();
             spyOn(console, 'error');
 
             messenger = jasmine.createSpyObj('MessageManager',[
@@ -90,7 +96,7 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
             ]);
 
             $.each(messenger, function(index, method) {
-                 method.andReturn(messenger);
+                 method.and.returnValue(messenger);
             });
 
             MessageManager = function () {
@@ -99,69 +105,83 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
                 return messenger;
             };
 
-            $el = $('.component');
+            jasmine.addMatchers({
+                assertValueInView: function() {
+                    return {
+                        compare: function (actual, expected) {
+                            var actualValue = actual.getValueFromEditor(),
+                            passed = _.isEqual(actualValue, expected);
 
-            view = new VideoList({
-                el: $el,
-                model: model,
-                MessageManager: MessageManager
-            });
-
-            this.addMatchers({
-                assertValueInView: function(expected) {
-                    var actualValue = this.actual.getValueFromEditor();
-                    return this.env.equals_(actualValue, expected);
+                            return {
+                                pass: passed
+                            };
+                        }
+                    };
                 },
-                assertCanUpdateView: function (expected) {
-                    var actual = this.actual,
-                        actualValue;
+                assertCanUpdateView: function () {
+                    return {
+                        compare: function (actual, expected) {
+                            var actualValue,
+                                passed;
 
-                    actual.setValueInEditor(expected);
-                    actualValue = actual.getValueFromEditor();
+                            actual.setValueInEditor(expected);
+                            actualValue = actual.getValueFromEditor();
+                            passed = _.isEqual(actualValue, expected);
 
-                    return this.env.equals_(actualValue, expected);
+                            return {
+                                pass: passed
+                            };
+                        }
+                    };
                 },
-                assertIsCorrectVideoList: function (expected) {
-                    var actualValue = this.actual.getVideoObjectsList();
+                assertIsCorrectVideoList: function () {
+                    return {
+                        compare: function (actual, expected) {
+                            var actualValue = actual.getVideoObjectsList(),
+                            passed = _.isEqual(actualValue, expected);
 
-                    return this.env.equals_(actualValue, expected);
+                            return {
+                                pass: passed
+                            };
+                        }
+                    };
                 }
             });
         });
 
         afterEach(function () {
-            sinonXhr.restore();
+            // restore mock server
+            this.mockServer.restore();
         });
 
-        var waitsForResponse = function (expectFunc, prep) {
-            var flag = false;
+        var createVideoListView = function () {
+            var model = new MetadataModel(modelStub);
+            return new VideoList({
+                el: $('.component'),
+                model: model,
+                MessageManager: MessageManager
+            });
+        };
 
-            if (prep) {
-                runs(prep);
-            }
+        var waitsForResponse = function (mockServer) {
+            return jasmine.waitUntil(function () {
+                var requests = mockServer.requests,
+                    len = requests.length;
 
-            waitsFor(function() {
-                var req = sinonXhr.requests,
-                    len = req.length;
-
-                if (len && req[0].readyState === 4) {
-                    flag = true;
-                }
-
-                return flag;
-            }, 'Ajax Timeout', 750);
-
-            runs(expectFunc);
+                return len && requests[0].readyState === 4;
+            });
         };
 
 
-        it('Initialize', function () {
-            waitsForResponse(function () {
-                expect(abstractEditor.initialize).toHaveBeenCalled();
-                expect(messenger.initialize).toHaveBeenCalled();
-                expect(view.component_locator).toBe(component_locator);
-                expect(view.$el).toHandle('input');
-            });
+        it('Initialize', function (done) {
+            var view = createVideoListView();
+            waitsForResponse(this.mockServer)
+              .then(function () {
+                  expect(abstractEditor.initialize).toHaveBeenCalled();
+                  expect(messenger.initialize).toHaveBeenCalled();
+                  expect(view.component_locator).toBe(component_locator);
+                  expect(view.$el).toHandle('input');
+              }).always(done);
         });
 
         describe('Render', function () {
@@ -175,20 +195,24 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
 
                     expect(messenger.render).toHaveBeenCalled();
                 },
-                resetSpies = function() {
-                    abstractEditor.render.reset();
-                    Utils.command.reset();
-                    messenger.render.reset();
-                    sinonXhr.requests.length = 0;
+                resetSpies = function(mockServer) {
+                    abstractEditor.render.calls.reset();
+                    Utils.command.calls.reset();
+                    messenger.render.calls.reset();
+                    mockServer.requests.length = 0;
                 };
 
-            it('is rendered in correct way', function () {
-                waitsForResponse(function () {
-                    assertToHaveBeenRendered(videoList);
-                });
+            it('is rendered in correct way', function (done) {
+                createVideoListView();
+                waitsForResponse(this.mockServer)
+                  .then(function () {
+                      assertToHaveBeenRendered(videoList);
+                  })
+                  .always(done);
             });
 
-            it('is rendered with opened extra videos bar', function () {
+            it('is rendered with opened extra videos bar', function (done) {
+                var view = createVideoListView();
                 var videoListLength = [
                         {
                             mode: 'youtube',
@@ -209,38 +233,36 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
                         }
                     ];
 
-                spyOn(view, 'getVideoObjectsList').andReturn(videoListLength);
+                spyOn(view, 'getVideoObjectsList').and.returnValue(videoListLength);
                 spyOn(view, 'openExtraVideosBar');
 
-                waitsForResponse(
-                    function () {
-                        assertToHaveBeenRendered(videoListLength);
-                        view.getVideoObjectsList.andReturn(videoListLength);
-                        expect(view.openExtraVideosBar).toHaveBeenCalled();
-                    },
-                    function () {
-                        resetSpies();
-                        view.render();
-                    }
-                );
+                resetSpies(this.mockServer);
+                view.render();
 
-                waitsForResponse(
-                    function () {
-                        assertToHaveBeenRendered(videoListHtml5mode);
+                waitsForResponse(this.mockServer)
+                    .then(function () {
+                        assertToHaveBeenRendered(videoListLength);
+                        view.getVideoObjectsList.and.returnValue(videoListLength);
                         expect(view.openExtraVideosBar).toHaveBeenCalled();
-                    },
-                    function () {
-                        resetSpies();
-                        view.openExtraVideosBar.reset();
-                        view.getVideoObjectsList.andReturn(videoListHtml5mode);
+                    })
+                    .then(_.bind(function () {
+                        resetSpies(this.mockServer);
+                        view.openExtraVideosBar.calls.reset();
+                        view.getVideoObjectsList.and.returnValue(videoListHtml5mode);
                         view.render();
-                    }
-                );
+
+                        return waitsForResponse(this.mockServer)
+                            .then(function () {
+                                assertToHaveBeenRendered(videoListHtml5mode);
+                                expect(view.openExtraVideosBar).toHaveBeenCalled();
+                            }).then(done);
+                    }, this));
 
             });
 
-            it('is rendered without opened extra videos bar', function () {
-                var videoList = [
+            it('is rendered without opened extra videos bar', function (done) {
+                var view = createVideoListView(),
+                    videoList = [
                         {
                             mode: 'youtube',
                             type: 'youtube',
@@ -248,41 +270,41 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
                         }
                     ];
 
-                spyOn(view, 'getVideoObjectsList').andReturn(videoList);
+                spyOn(view, 'getVideoObjectsList').and.returnValue(videoList);
                 spyOn(view, 'closeExtraVideosBar');
 
-                waitsForResponse(
-                    function () {
-                        assertToHaveBeenRendered(videoList);
-                        expect(view.closeExtraVideosBar).toHaveBeenCalled();
-                    },
-                    function () {
-                        resetSpies();
-                        view.render();
-                    }
-                );
-            });
+                resetSpies(this.mockServer);
+                view.render();
 
+                waitsForResponse(this.mockServer)
+                  .then(function () {
+                      assertToHaveBeenRendered(videoList);
+                      expect(view.closeExtraVideosBar).toHaveBeenCalled();
+                  })
+                  .always(done);
+            });
         });
 
         describe('isUniqOtherVideos', function () {
-            it('Unique data - return true', function () {
-                var data = videoList.concat([{
-                    mode: 'html5',
-                    type: 'other',
-                    video: 'pxxZrg'
-                }]);
+            it('Unique data - return true', function (done) {
+                var view = createVideoListView(),
+                    data = videoList.concat([{
+                        mode: 'html5',
+                        type: 'other',
+                        video: 'pxxZrg'
+                    }]);
 
-                waitsForResponse(function () {
-                    var result = view.isUniqOtherVideos(data);
-
-                    expect(result).toBe(true);
-                });
-
+                waitsForResponse(this.mockServer)
+                  .then(function () {
+                      var result = view.isUniqOtherVideos(data);
+                      expect(result).toBe(true);
+                  })
+                  .always(done);
             });
 
-            it('Not Unique data - return false', function () {
-                var data = [
+            it('Not Unique data - return false', function (done) {
+                var view = createVideoListView(),
+                    data = [
                         {
                             mode: 'html5',
                             type: 'mp4',
@@ -310,29 +332,31 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
                         }
                     ];
 
-                waitsForResponse(function () {
-                    var result = view.isUniqOtherVideos(data);
-
-                    expect(result).toBe(false);
-                });
+                waitsForResponse(this.mockServer)
+                  .then(function () {
+                      var result = view.isUniqOtherVideos(data);
+                      expect(result).toBe(false);
+                  })
+                  .always(done);
             });
         });
 
         describe('isUniqVideoTypes', function () {
+            it('Unique data - return true', function (done) {
+                var view = createVideoListView(),
+                    data = videoList;
 
-            it('Unique data - return true', function () {
-                var data = videoList;
-
-                waitsForResponse(function () {
-                    var result = view.isUniqVideoTypes(data);
-
-                    expect(result).toBe(true);
-                });
-
+                waitsForResponse(this.mockServer)
+                  .then(function () {
+                      var result = view.isUniqVideoTypes(data);
+                      expect(result).toBe(true);
+                  })
+                  .always(done);
             });
 
-            it('Not Unique data - return false', function () {
-                var data = [
+            it('Not Unique data - return false', function (done) {
+                var view = createVideoListView(),
+                    data = [
                         {
                             mode: 'html5',
                             type: 'mp4',
@@ -355,17 +379,19 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
                         }
                     ];
 
-                waitsForResponse(function () {
-                    var result = view.isUniqVideoTypes(data);
-
-                    expect(result).toBe(false);
-                });
+                waitsForResponse(this.mockServer)
+                  .then(function () {
+                      var result = view.isUniqVideoTypes(data);
+                      expect(result).toBe(false);
+                  })
+                  .always(done);
             });
         });
 
         describe('checkIsUniqVideoTypes', function () {
-            it('Error is shown', function () {
-                var data = [
+            it('Error is shown', function (done) {
+                var view = createVideoListView(),
+                    data = [
                         {
                             mode: 'html5',
                             type: 'mp4',
@@ -388,107 +414,137 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
                         }
                     ];
 
-                waitsForResponse(function () {
-                    var result = view.checkIsUniqVideoTypes(data);
+                waitsForResponse(this.mockServer)
+                  .then(function () {
+                      var result = view.checkIsUniqVideoTypes(data);
 
-                    expect(messenger.showError).toHaveBeenCalled();
-                    expect(result).toBe(false);
-                });
+                      expect(messenger.showError).toHaveBeenCalled();
+                      expect(result).toBe(false);
+                  })
+                  .always(done);
             });
 
-            it('All works okay if arguments are not passed', function () {
-                spyOn(view, 'getVideoObjectsList').andReturn(videoList);
+            it('All works okay if arguments are not passed', function (done) {
+                var view = createVideoListView();
+                spyOn(view, 'getVideoObjectsList').and.returnValue(videoList);
 
-                waitsForResponse(function () {
-                    var result = view.checkIsUniqVideoTypes();
+                waitsForResponse(this.mockServer)
+                  .then(function () {
+                      var result = view.checkIsUniqVideoTypes();
 
-                    expect(view.getVideoObjectsList).toHaveBeenCalled();
-                    expect(messenger.showError).not.toHaveBeenCalled();
-                    expect(result).toBe(true);
-                });
+                      expect(view.getVideoObjectsList).toHaveBeenCalled();
+                      expect(messenger.showError).not.toHaveBeenCalled();
+                      expect(result).toBe(true);
+                  })
+                  .always(done);
             });
         });
 
         describe('checkValidity', function () {
-            beforeEach(function () {
-                spyOn(view, 'checkIsUniqVideoTypes').andReturn(true);
-            });
+            it('Error message is shown', function (done) {
+                var view = createVideoListView();
+                spyOn(view, 'checkIsUniqVideoTypes').and.returnValue(true);
 
-            it('Error message is shown', function () {
-                waitsForResponse(function () {
-                    var data = { mode: 'incorrect' },
+                waitsForResponse(this.mockServer)
+                  .then(function () {
+                      var data = {mode: 'incorrect'},
                         result = view.checkValidity(data, true);
 
-                    expect(messenger.showError).toHaveBeenCalled();
-                    expect(view.checkIsUniqVideoTypes).toHaveBeenCalled();
-                    expect(result).toBe(false);
-                });
+                      expect(messenger.showError).toHaveBeenCalled();
+                      expect(view.checkIsUniqVideoTypes).toHaveBeenCalled();
+                      expect(result).toBe(false);
+                  })
+                  .always(done);
             });
 
-            it('Error message is shown when flag is not passed', function () {
-                waitsForResponse(function () {
-                    var data = { mode: 'incorrect' },
+            it('Error message is shown when flag is not passed', function (done) {
+                var view = createVideoListView();
+                spyOn(view, 'checkIsUniqVideoTypes').and.returnValue(true);
+
+                waitsForResponse(this.mockServer)
+                  .then(function () {
+                      var data = {mode: 'incorrect'},
                         result = view.checkValidity(data);
 
-                    expect(messenger.showError).not.toHaveBeenCalled();
-                    expect(view.checkIsUniqVideoTypes).toHaveBeenCalled();
-                    expect(result).toBe(true);
-                });
+                      expect(messenger.showError).not.toHaveBeenCalled();
+                      expect(view.checkIsUniqVideoTypes).toHaveBeenCalled();
+                      expect(result).toBe(true);
+                  }).always(done);
             });
 
-            it('All works okay if correct data is passed', function () {
-                waitsForResponse(function () {
-                    var data = videoList,
+            it('All works okay if correct data is passed', function (done) {
+                var view = createVideoListView();
+                spyOn(view, 'checkIsUniqVideoTypes').and.returnValue(true);
+
+                waitsForResponse(this.mockServer)
+                  .then(function () {
+                      var data = videoList,
                         result = view.checkValidity(data);
 
-                    expect(messenger.showError).not.toHaveBeenCalled();
-                    expect(view.checkIsUniqVideoTypes).toHaveBeenCalled();
-                    expect(result).toBe(true);
-                });
+                      expect(messenger.showError).not.toHaveBeenCalled();
+                      expect(view.checkIsUniqVideoTypes).toHaveBeenCalled();
+                      expect(result).toBe(true);
+                  })
+                  .always(done);
             });
         });
 
-        it('openExtraVideosBar', function () {
-            waitsForResponse(function () {
-                view.$extraVideosBar.removeClass('is-visible');
-
-                view.openExtraVideosBar();
-                expect(view.$extraVideosBar).toHaveClass('is-visible');
-            });
+        it('openExtraVideosBar', function (done) {
+            var view = createVideoListView();
+            waitsForResponse(this.mockServer)
+              .then(function () {
+                  view.$extraVideosBar.removeClass('is-visible');
+                  view.openExtraVideosBar();
+                  expect(view.$extraVideosBar).toHaveClass('is-visible');
+              })
+              .always(done);
         });
 
-        it('closeExtraVideosBar', function () {
-            waitsForResponse(function () {
-                view.$extraVideosBar.addClass('is-visible');
-                view.closeExtraVideosBar();
+        it('closeExtraVideosBar', function (done) {
+            var view = createVideoListView();
+            waitsForResponse(this.mockServer)
+              .then(function () {
+                  view.$extraVideosBar.addClass('is-visible');
+                  view.closeExtraVideosBar();
 
-                expect(view.$extraVideosBar).not.toHaveClass('is-visible');
-            });
+                  expect(view.$extraVideosBar).not.toHaveClass('is-visible');
+              })
+              .always(done);
         });
 
-        it('toggleExtraVideosBar', function () {
-            waitsForResponse(function () {
-                view.$extraVideosBar.addClass('is-visible');
-                view.toggleExtraVideosBar();
-                expect(view.$extraVideosBar).not.toHaveClass('is-visible');
-                view.toggleExtraVideosBar();
-                expect(view.$extraVideosBar).toHaveClass('is-visible');
-            });
+        it('toggleExtraVideosBar', function (done) {
+            var view = createVideoListView();
+            waitsForResponse(this.mockServer)
+              .then(function () {
+                  view.$extraVideosBar.addClass('is-visible');
+                  view.toggleExtraVideosBar();
+                  expect(view.$extraVideosBar).not.toHaveClass('is-visible');
+                  view.toggleExtraVideosBar();
+                  expect(view.$extraVideosBar).toHaveClass('is-visible');
+              })
+              .always(done);
         });
 
-        it('getValueFromEditor', function () {
-            waitsForResponse(function () {
-                expect(view).assertValueInView(modelStub.value);
-            });
+        it('getValueFromEditor', function (done) {
+            var view = createVideoListView();
+            waitsForResponse(this.mockServer)
+              .then(function () {
+                  expect(view).assertValueInView(modelStub.value);
+              })
+              .always(done);
         });
 
-        it('setValueInEditor', function () {
-            waitsForResponse(function () {
-                expect(view).assertCanUpdateView(['abc.mp4']);
-            });
+        it('setValueInEditor', function (done) {
+            var view = createVideoListView();
+            waitsForResponse(this.mockServer)
+              .then(function () {
+                  expect(view).assertCanUpdateView(['abc.mp4']);
+              })
+              .always(done);
         });
 
-        it('getVideoObjectsList', function () {
+        it('getVideoObjectsList', function (done) {
+            var view = createVideoListView();
             var value = [
                 {
                     mode: 'youtube',
@@ -507,37 +563,40 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
                 }
             ];
 
-            waitsForResponse(function () {
-                view.setValueInEditor([
-                    'http://youtu.be/12345678901',
-                    'video.mp4',
-                    'http://goo.gl/pxxZrg',
-                    'video'
-                ]);
-                expect(view).assertIsCorrectVideoList(value);
-            });
+            waitsForResponse(this.mockServer)
+              .then(function () {
+                  view.setValueInEditor([
+                      'http://youtu.be/12345678901',
+                      'video.mp4',
+                      'http://goo.gl/pxxZrg',
+                      'video'
+                  ]);
+                  expect(view).assertIsCorrectVideoList(value);
+              })
+              .always(done);
         });
 
         describe('getPlaceholders', function () {
-            var defaultPlaceholders;
 
-            beforeEach(function () {
-                defaultPlaceholders = view.placeholders;
+            it('All works okay if empty values are passed', function (done) {
+                var view = createVideoListView(),
+                    defaultPlaceholders = view.placeholders;
+
+                waitsForResponse(this.mockServer)
+                  .then(function () {
+                      var result = view.getPlaceholders([]),
+                        expectedResult = _.values(defaultPlaceholders).reverse();
+
+                      expect(result).toEqual(expectedResult);
+                  })
+                  .always(done);
             });
-
-            it('All works okay if empty values are passed', function () {
-                waitsForResponse(function () {
-                    var result = view.getPlaceholders([]),
-                    expectedResult = _.values(defaultPlaceholders).reverse();
-
-                    expect(result).toEqual(expectedResult);
-                });
-            });
-
 
             it('On filling less than 3 fields, remaining fields should have ' +
 'placeholders for video types that were not filled yet',
-                function () {
+                function (done) {
+                    var view = createVideoListView(),
+                        defaultPlaceholders = view.placeholders;
                     var dataDict = {
                         youtube: {
                             value: [modelStub.value[0]],
@@ -565,13 +624,16 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
                         }
                     };
 
-                    waitsForResponse(function () {
-                        $.each(dataDict, function(index, val) {
-                            var result = view.getPlaceholders(val.value);
+                    defaultPlaceholders = view.placeholders;
+                    waitsForResponse(this.mockServer)
+                      .then(function () {
+                          $.each(dataDict, function (index, val) {
+                              var result = view.getPlaceholders(val.value);
 
-                            expect(result).toEqual(val.expectedResult);
-                        });
-                    });
+                              expect(result).toEqual(val.expectedResult);
+                          });
+                      })
+                      .always(done);
                 }
             );
         });
@@ -579,13 +641,13 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
         describe('inputHandler', function () {
             var eventObject;
 
-            var resetSpies = function () {
-                messenger.hideError.reset();
-                view.updateModel.reset();
-                view.closeExtraVideosBar.reset();
+            var resetSpies = function (view) {
+                messenger.hideError.calls.reset();
+                view.updateModel.calls.reset();
+                view.closeExtraVideosBar.calls.reset();
             };
 
-            beforeEach(function () {
+            var setUp = function (view) {
                 eventObject = jQuery.Event('input');
 
                 spyOn(view, 'updateModel');
@@ -594,89 +656,104 @@ function ($, _, Utils, VideoList, MetadataModel, AbstractEditor, sinon) {
                 spyOn($.fn, 'hasClass');
                 spyOn($.fn, 'addClass');
                 spyOn($.fn, 'removeClass');
-                spyOn($.fn, 'prop').andCallThrough();
+                spyOn($.fn, 'prop').and.callThrough();
                 spyOn(_, 'isEqual');
 
-                resetSpies();
-            });
+                resetSpies(view);
+            };
 
             it('Field has invalid value - nothing should happen',
-                function () {
-                    $.fn.hasClass.andReturn(false);
-                    view.checkValidity.andReturn(false);
+                function (done) {
+                    var view = createVideoListView();
+                    setUp(view);
+                    $.fn.hasClass.and.returnValue(false);
+                    view.checkValidity.and.returnValue(false);
 
-                    waitsForResponse(function () {
-                        view.inputHandler(eventObject);
-                        expect(messenger.hideError).not.toHaveBeenCalled();
-                        expect(view.updateModel).not.toHaveBeenCalled();
-                        expect(view.closeExtraVideosBar).not.toHaveBeenCalled();
-                        expect($.fn.prop).toHaveBeenCalledWith(
-                            'disabled', true
-                        );
-                        expect($.fn.addClass).toHaveBeenCalledWith(
-                            'is-disabled'
-                        );
-                    });
+                    waitsForResponse(this.mockServer)
+                        .then(function () {
+                            view.inputHandler(eventObject);
+                            expect(messenger.hideError).not.toHaveBeenCalled();
+                            expect(view.updateModel).not.toHaveBeenCalled();
+                            expect(view.closeExtraVideosBar).not.toHaveBeenCalled();
+                            expect($.fn.prop).toHaveBeenCalledWith(
+                                'disabled', true
+                            );
+                            expect($.fn.addClass).toHaveBeenCalledWith(
+                                'is-disabled'
+                            );
+                        })
+                        .always(done);
                 }
             );
 
             it('Main field has invalid value - extra Videos Bar is closed',
-                function () {
-                    $.fn.hasClass.andReturn(true);
-                    view.checkValidity.andReturn(false);
+                function (done) {
+                    var view = createVideoListView();
+                    setUp(view);
+                    $.fn.hasClass.and.returnValue(true);
+                    view.checkValidity.and.returnValue(false);
 
-                    waitsForResponse(function () {
-                        view.inputHandler(eventObject);
-                        expect(messenger.hideError).not.toHaveBeenCalled();
-                        expect(view.updateModel).not.toHaveBeenCalled();
-                        expect(view.closeExtraVideosBar).toHaveBeenCalled();
-                        expect($.fn.prop).toHaveBeenCalledWith(
-                            'disabled', true
-                        );
-                        expect($.fn.addClass).toHaveBeenCalledWith(
-                            'is-disabled'
-                        );
-                    });
+                    waitsForResponse(this.mockServer)
+                        .then(function () {
+                            view.inputHandler(eventObject);
+                            expect(messenger.hideError).not.toHaveBeenCalled();
+                            expect(view.updateModel).not.toHaveBeenCalled();
+                            expect(view.closeExtraVideosBar).toHaveBeenCalled();
+                            expect($.fn.prop).toHaveBeenCalledWith(
+                                'disabled', true
+                            );
+                            expect($.fn.addClass).toHaveBeenCalledWith(
+                                'is-disabled'
+                            );
+                        })
+                        .always(done);
                 }
             );
 
             it('Model is updated if value is valid',
-                function () {
-                    view.checkValidity.andReturn(true);
-                    _.isEqual.andReturn(false);
+                function (done) {
+                    var view = createVideoListView();
+                    setUp(view);
+                    view.checkValidity.and.returnValue(true);
+                    _.isEqual.and.returnValue(false);
 
-                    waitsForResponse(function () {
-                        view.inputHandler(eventObject);
-                        expect(messenger.hideError).not.toHaveBeenCalled();
-                        expect(view.updateModel).toHaveBeenCalled();
-                        expect(view.closeExtraVideosBar).not.toHaveBeenCalled();
-                        expect($.fn.prop).toHaveBeenCalledWith(
-                            'disabled', false
-                        );
-                        expect($.fn.removeClass).toHaveBeenCalledWith(
-                            'is-disabled'
-                        );
-                    });
+                    waitsForResponse(this.mockServer)
+                        .then(function () {
+                            view.inputHandler(eventObject);
+                            expect(messenger.hideError).not.toHaveBeenCalled();
+                            expect(view.updateModel).toHaveBeenCalled();
+                            expect(view.closeExtraVideosBar).not.toHaveBeenCalled();
+                            expect($.fn.prop).toHaveBeenCalledWith(
+                                'disabled', false
+                            );
+                            expect($.fn.removeClass).toHaveBeenCalledWith(
+                                'is-disabled'
+                            );
+                        })
+                        .always(done);
                 }
             );
 
             it('Corner case: Error is hided',
-                function () {
-                    view.checkValidity.andReturn(true);
-                    _.isEqual.andReturn(true);
-
-                    waitsForResponse(function () {
-                        view.inputHandler(eventObject);
-                        expect(messenger.hideError).toHaveBeenCalled();
-                        expect(view.updateModel).not.toHaveBeenCalled();
-                        expect(view.closeExtraVideosBar).not.toHaveBeenCalled();
-                        expect($.fn.prop).toHaveBeenCalledWith(
-                            'disabled', false
-                        );
-                        expect($.fn.removeClass).toHaveBeenCalledWith(
-                            'is-disabled'
-                        );
-                    });
+                function (done) {
+                    var view = createVideoListView();
+                    setUp(view);
+                    view.checkValidity.and.returnValue(true);
+                    _.isEqual.and.returnValue(true);
+                    waitsForResponse(this.mockServer)
+                        .then(function () {
+                            view.inputHandler(eventObject);
+                            expect(messenger.hideError).toHaveBeenCalled();
+                            expect(view.updateModel).not.toHaveBeenCalled();
+                            expect(view.closeExtraVideosBar).not.toHaveBeenCalled();
+                            expect($.fn.prop).toHaveBeenCalledWith(
+                                'disabled', false
+                            );
+                            expect($.fn.removeClass).toHaveBeenCalledWith(
+                                'is-disabled'
+                            );
+                        })
+                        .always(done);
                 }
             );
 

@@ -1,5 +1,4 @@
 """Integration tests for Google providers."""
-
 import base64
 import hashlib
 import hmac
@@ -72,7 +71,7 @@ class GoogleOauth2IntegrationTest(base.Oauth2IntegrationTest):
             response = self.client.get(complete_url)
         # This should redirect to the custom login/register form:
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['Location'], 'http://testserver/auth/custom_auth_entry')
+        self.assertEqual(response['Location'], 'http://example.none/auth/custom_auth_entry')
 
         response = self.client.get(response['Location'])
         self.assertEqual(response.status_code, 200)
@@ -106,7 +105,7 @@ class GoogleOauth2IntegrationTest(base.Oauth2IntegrationTest):
         # Now our custom login/registration page must resume the pipeline:
         response = self.client.get(complete_url)
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['Location'], 'http://testserver/misc/final-destination')
+        self.assertEqual(response['Location'], 'http://example.none/misc/final-destination')
 
         _, strategy = self.get_request_and_strategy()
         self.assert_social_auth_exists_for_user(created_user, strategy)
@@ -133,4 +132,4 @@ class GoogleOauth2IntegrationTest(base.Oauth2IntegrationTest):
             response = self.client.get(complete_url)
         # This should redirect to the custom error URL
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['Location'], 'http://testserver/misc/my-custom-sso-error-page')
+        self.assertEqual(response['Location'], 'http://example.none/misc/my-custom-sso-error-page')

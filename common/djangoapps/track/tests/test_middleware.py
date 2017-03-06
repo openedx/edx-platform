@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+"""Tests for tracking middleware."""
+import ddt
 from mock import patch
 from mock import sentinel
 
@@ -11,7 +14,9 @@ from eventtracking import tracker
 from track.middleware import TrackMiddleware
 
 
+@ddt.ddt
 class TrackMiddlewareTestCase(TestCase):
+    """  Class for checking tracking requests """
 
     def setUp(self):
         super(TrackMiddlewareTestCase, self).setUp()
@@ -26,6 +31,26 @@ class TrackMiddlewareTestCase(TestCase):
         request = self.request_factory.get('/somewhere')
         self.track_middleware.process_request(request)
         self.assertTrue(self.mock_server_track.called)
+
+    @ddt.unpack
+    @ddt.data(
+        ('HTTP_USER_AGENT', 'agent'),
+        ('PATH_INFO', 'path'),
+        ('HTTP_REFERER', 'referer'),
+        ('HTTP_ACCEPT_LANGUAGE', 'accept_language'),
+    )
+    def test_request_with_latin1_characters(self, meta_key, context_key):
+        """
+        When HTTP headers contains latin1 characters.
+        """
+        request = self.request_factory.get('/somewhere')
+        # pylint: disable=no-member
+        request.META[meta_key] = 'test latin1 \xd3 \xe9 \xf1'  # pylint: disable=no-member
+
+        context = self.get_context_for_request(request)
+        # The bytes in the string on the right are utf8 encoded in the source file, so we decode them to construct
+        # a valid unicode string.
+        self.assertEqual(context[context_key], 'test latin1 Ó é ñ'.decode('utf8'))
 
     def test_default_filters_do_not_render_view(self):
         for url in ['/event', '/event/1', '/login', '/heartbeat']:
@@ -67,6 +92,37 @@ class TrackMiddlewareTestCase(TestCase):
             'course_id': '',
             'client_id': None,
         })
+
+    def test_no_forward_for_header_ip_context(self):
+        request = self.request_factory.get('/courses/')
+        remote_addr = '127.0.0.1'
+
+        request.META['REMOTE_ADDR'] = remote_addr
+        context = self.get_context_for_request(request)
+
+        self.assertEquals(context['ip'], remote_addr)
+
+    def test_single_forward_for_header_ip_context(self):
+        request = self.request_factory.get('/courses/')
+        remote_addr = '127.0.0.1'
+        forwarded_ip = '11.22.33.44'
+
+        request.META['REMOTE_ADDR'] = remote_addr
+        request.META['HTTP_X_FORWARDED_FOR'] = forwarded_ip
+        context = self.get_context_for_request(request)
+
+        self.assertEquals(context['ip'], forwarded_ip)
+
+    def test_multiple_forward_for_header_ip_context(self):
+        request = self.request_factory.get('/courses/')
+        remote_addr = '127.0.0.1'
+        forwarded_ip = '11.22.33.44, 10.0.0.1, 127.0.0.1'
+
+        request.META['REMOTE_ADDR'] = remote_addr
+        request.META['HTTP_X_FORWARDED_FOR'] = forwarded_ip
+        context = self.get_context_for_request(request)
+
+        self.assertEquals(context['ip'], '11.22.33.44')
 
     def get_context_for_path(self, path):
         """Extract the generated event tracking context for a given request for the given path."""
@@ -136,12 +192,16 @@ class TrackMiddlewareTestCase(TestCase):
     def test_request_headers(self):
         ip_address = '10.0.0.0'
         user_agent = 'UnitTest/1.0'
+        client_id_header = '123.123'
 
-        factory = RequestFactory(REMOTE_ADDR=ip_address, HTTP_USER_AGENT=user_agent)
+        factory = RequestFactory(
+            REMOTE_ADDR=ip_address, HTTP_USER_AGENT=user_agent, HTTP_X_EDX_GA_CLIENT_ID=client_id_header
+        )
         request = factory.get('/some-path')
         context = self.get_context_for_request(request)
 
         self.assert_dict_subset(context, {
             'ip': ip_address,
             'agent': user_agent,
+            'client_id': client_id_header
         })

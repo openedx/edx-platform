@@ -1,7 +1,7 @@
 /**
  * Mixin class for creation of things like courses and libraries.
  */
-define(["jquery", "underscore", "gettext", "js/views/utils/view_utils"],
+define(["jquery", "underscore", "gettext", "common/js/components/utils/view_utils"],
     function ($, _, gettext, ViewUtils) {
         return function (selectors, classes, keyLengthViolationMessage, keyFieldSelectors, nonEmptyCheckFieldSelectors) {
             var self = this;

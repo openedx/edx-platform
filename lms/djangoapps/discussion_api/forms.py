@@ -6,26 +6,13 @@ from django.forms import (
     BooleanField,
     CharField,
     ChoiceField,
-    Field,
     Form,
     IntegerField,
-    MultipleHiddenInput,
-    NullBooleanField,
 )
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseLocator
-
-
-class TopicIdField(Field):
-    """
-    Field for a list of topic_ids
-    """
-    widget = MultipleHiddenInput
-
-    def validate(self, value):
-        if value and "" in value:
-            raise ValidationError("This field cannot be empty.")
+from openedx.core.djangoapps.util.forms import MultiValueField, ExtendedNullBooleanField
 
 
 class _PaginationForm(Form):
@@ -49,9 +36,30 @@ class ThreadListGetForm(_PaginationForm):
     EXCLUSIVE_PARAMS = ["topic_id", "text_search", "following"]
 
     course_id = CharField()
-    topic_id = TopicIdField(required=False)
+    topic_id = MultiValueField(required=False)
     text_search = CharField(required=False)
-    following = NullBooleanField(required=False)
+    following = ExtendedNullBooleanField(required=False)
+    view = ChoiceField(
+        choices=[(choice, choice) for choice in ["unread", "unanswered"]],
+        required=False,
+    )
+    order_by = ChoiceField(
+        choices=[(choice, choice) for choice in ["last_activity_at", "comment_count", "vote_count"]],
+        required=False
+    )
+    order_direction = ChoiceField(
+        choices=[(choice, choice) for choice in ["asc", "desc"]],
+        required=False
+    )
+    requested_fields = MultiValueField(required=False)
+
+    def clean_order_by(self):
+        """Return a default choice"""
+        return self.cleaned_data.get("order_by") or "last_activity_at"
+
+    def clean_order_direction(self):
+        """Return a default choice"""
+        return self.cleaned_data.get("order_direction") or "desc"
 
     def clean_course_id(self):
         """Validate course_id"""
@@ -91,6 +99,7 @@ class ThreadActionsForm(Form):
     following = BooleanField(required=False)
     voted = BooleanField(required=False)
     abuse_flagged = BooleanField(required=False)
+    read = BooleanField(required=False)
 
 
 class CommentListGetForm(_PaginationForm):
@@ -98,9 +107,8 @@ class CommentListGetForm(_PaginationForm):
     A form to validate query parameters in the comment list retrieval endpoint
     """
     thread_id = CharField()
-    # TODO: should we use something better here? This only accepts "True",
-    # "False", "1", and "0"
-    endorsed = NullBooleanField(required=False)
+    endorsed = ExtendedNullBooleanField(required=False)
+    requested_fields = MultiValueField(required=False)
 
 
 class CommentActionsForm(Form):
@@ -110,3 +118,10 @@ class CommentActionsForm(Form):
     """
     voted = BooleanField(required=False)
     abuse_flagged = BooleanField(required=False)
+
+
+class CommentGetForm(_PaginationForm):
+    """
+    A form to validate query parameters in the comment retrieval endpoint
+    """
+    requested_fields = MultiValueField(required=False)

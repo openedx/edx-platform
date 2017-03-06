@@ -1,6 +1,6 @@
 define([
-    'logger', 'js/edxnotes/utils/logger', 'js/spec/edxnotes/custom_matchers'
-], function(Logger, NotesLogger, customMatchers) {
+    'logger', 'js/edxnotes/utils/logger'
+], function(Logger, NotesLogger) {
     'use strict';
     describe('Edxnotes NotesLogger', function() {
         var getLogger = function(id, mode) {
@@ -11,7 +11,6 @@ define([
             spyOn(window.console, 'log');
             spyOn(window.console, 'error');
             spyOn(Logger, 'log');
-            customMatchers(this);
         });
 
         it('keeps a correct history of logs', function() {
@@ -94,11 +93,11 @@ define([
         it('can use timers', function() {
             var logger = getLogger('id', 1), logs, log;
 
-            spyOn(performance, 'now').andReturn(1);
-            spyOn(Date, 'now').andReturn(1);
+            spyOn(performance, 'now').and.returnValue(1);
+            spyOn(Date, 'now').and.returnValue(1);
             logger.time('timer');
-            performance.now.andReturn(201);
-            Date.now.andReturn(201);
+            performance.now.and.returnValue(201);
+            Date.now.and.returnValue(201);
             logger.timeEnd('timer');
 
             logs = logger.getHistory();

@@ -13,7 +13,7 @@ jasmine.stubbedCaption =
   text: ['Caption at 0', 'Caption at 10000', 'Caption at 20000', 'Caption at 30000']
 
 jasmine.stubRequests = ->
-  spyOn($, 'ajax').andCallFake (settings) ->
+  spyOn($, 'ajax').and.callFake (settings) ->
     if match = settings.url.match /youtube\.com\/.+\/videos\/(.+)\?v=2&alt=jsonc/
       settings.success data: jasmine.stubbedMetadata[match[1]]
     else if match = settings.url.match /static\/subs\/(.+)\.srt\.sjson/
@@ -52,8 +52,6 @@ jasmine.stubVideoPlayer = (context, enableParts, createPlayer=true) ->
   if createPlayer
     return new VideoPlayer(video: context.video)
 
-spyOn(window, 'onunload')
-
 # Stub Youtube API
 window.YT =
   PlayerState:
@@ -65,7 +63,7 @@ window.YT =
     CUED: 5
 
 # Stub jQuery.cookie
-$.cookie = jasmine.createSpy('jQuery.cookie').andReturn '1.0'
+$.cookie = jasmine.createSpy('jQuery.cookie').and.returnValue '1.0'
 
 # Stub jQuery.qtip
 $.fn.qtip = jasmine.createSpy 'jQuery.qtip'

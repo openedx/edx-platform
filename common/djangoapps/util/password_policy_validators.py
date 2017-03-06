@@ -1,4 +1,3 @@
-# pylint: disable=no-member
 """
 This file exposes a number of password complexity validators which can be optionally added to
 account creation
@@ -7,13 +6,33 @@ This file was inspired by the django-passwords project at https://github.com/dst
 authored by dstufft (https://github.com/dstufft)
 """
 from __future__ import division
-import string  # pylint: disable=deprecated-module
+import string
 
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
 import nltk
+
+
+def validate_password_strength(value):
+    """
+    This function loops through each validator defined in this file
+    and applies it to a user's proposed password
+
+    Args:
+        value: a user's proposed password
+
+    Returns: None, but raises a ValidationError if the proposed password
+        fails any one of the validators in password_validators
+    """
+    password_validators = [
+        validate_password_length,
+        validate_password_complexity,
+        validate_password_dictionary,
+    ]
+    for validator in password_validators:
+        validator(value)
 
 
 def validate_password_length(value):
@@ -29,7 +48,7 @@ def validate_password_length(value):
     if min_length and len(value) < min_length:
         raise ValidationError(message.format(_("must be {0} characters or more").format(min_length)), code=code)
     elif max_length and len(value) > max_length:
-        raise ValidationError(message.format(_("must be {0} characters or less").format(max_length)), code=code)
+        raise ValidationError(message.format(_("must be {0} characters or fewer").format(max_length)), code=code)
 
 
 def validate_password_complexity(value):

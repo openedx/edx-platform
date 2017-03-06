@@ -1,10 +1,10 @@
 /**
  * Provides helper methods for invoking Studio modal windows in Jasmine tests.
  */
-define(["jquery", "common/js/spec_helpers/template_helpers", "js/spec_helpers/view_helpers"],
+define(["jquery", "common/js/spec_helpers/template_helpers", "common/js/spec_helpers/view_helpers"],
     function($, TemplateHelpers, ViewHelpers) {
-        var installModalTemplates, getModalElement, getModalTitle, isShowingModal, hideModalIfShowing,
-            pressModalButton, cancelModal, cancelModalIfShowing;
+        var installModalTemplates, getModalElement, getModalWindow, getModalTitle, isShowingModal, 
+            hideModalIfShowing, pressModalButton, cancelModal, cancelModalIfShowing;
 
         installModalTemplates = function(append) {
             ViewHelpers.installViewTemplates(append);
@@ -20,6 +20,11 @@ define(["jquery", "common/js/spec_helpers/template_helpers", "js/spec_helpers/vi
                 modalElement = $('.wrapper-modal-window');
             }
             return modalElement;
+        };
+
+        getModalWindow = function(modal) {
+            var modalElement = getModalElement(modal);
+            return modalElement.find('.modal-window');
         };
 
         getModalTitle = function(modal) {
@@ -58,6 +63,7 @@ define(["jquery", "common/js/spec_helpers/template_helpers", "js/spec_helpers/vi
 
         return $.extend(ViewHelpers, {
             'getModalElement': getModalElement,
+            'getModalWindow': getModalWindow,
             'getModalTitle': getModalTitle,
             'installModalTemplates': installModalTemplates,
             'isShowingModal': isShowingModal,

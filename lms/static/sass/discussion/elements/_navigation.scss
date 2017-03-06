@@ -2,7 +2,7 @@
 // ====================
 
 .forum-nav {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
   @include float(left);
   position: relative;
   width: 31%;
@@ -41,23 +41,35 @@ div.discussion-course, div.content-wrapper {
 // Header
 // ------
 .forum-nav-header {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
+  // TODO: don't use table for layout purposes as it switches the screenreader mode
   display: table;
-  border-bottom: 1px solid $gray-l2;
+  border-bottom: 1px solid $forum-color-border;
   width: 100%;
   background-color: $gray-l3;
 }
 
 .forum-nav-browse {
-  @include box-sizing(border-box);
-  display: table-cell;
-  vertical-align: middle;
-  width: 50%;
-  padding: ($baseline/4);
+    box-sizing: border-box;
+    // TODO: don't use table-cell for layout purposes as it switches the screenreader mode
+    display: table-cell;
+    vertical-align: middle;
+    width: auto;
+    padding: 11px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
 
-  &:hover, &:focus, &.is-active {
-    background-color: $gray-l5;
-  }
+    &:hover,
+    &:focus,
+    &.is-active {
+        // converted to button from a;
+        // need importants to overwrite later button styles
+        box-shadow: none !important;
+        background-image: none !important;
+        background-color: $gray-l5 !important;
+    }
 
   .icon {
     @include font-size(14);
@@ -74,7 +86,8 @@ div.discussion-course, div.content-wrapper {
 }
 
 .forum-nav-search {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
+  // TODO: don't use table-cell for layout purposes as it switches the screenreader mode
   display: table-cell;
   position: relative;
   vertical-align: middle;
@@ -98,13 +111,13 @@ div.discussion-course, div.content-wrapper {
 // Browse menu
 // -----------
 .forum-nav-browse-menu-wrapper {
-  border-bottom: 1px solid $gray-l3;
+  border-bottom: 1px solid $forum-color-border;
   background: $gray-l5;
 }
 
 .forum-nav-browse-filter {
   position: relative;
-  border-bottom: 1px solid $gray-l2;
+  border-bottom: 1px solid $forum-color-border;
   padding: ($baseline/4);
 }
 
@@ -120,26 +133,41 @@ div.discussion-course, div.content-wrapper {
   width: 100%;
 }
 
+.forum-nav-browse-title {
+    display: block;
+    width: 100%;
+    border: 0;
+    border-radius: 0;
+    border-bottom: 1px solid $forum-color-border;
+    padding: ($baseline/2);
+    background: transparent;
+    box-shadow: none;
+    background-image: none;
+    color: $link-color;
+    text-align: left;
+
+    &:hover,
+    &:focus {
+        // switched from a to button;
+        // need to override button styles
+        background-image: none !important;
+        box-shadow: none !important;
+        background: $forum-color-background !important;
+    }
+}
+
+.forum-nav-browse-title .icon {
+  @include margin-right($baseline/2);
+}
+
 .forum-nav-browse-menu {
   @include font-size(14);
   overflow-y: scroll;
   list-style: none;
 }
 
-
-
 .forum-nav-browse-title {
-  display: block;
-  border-bottom: 1px solid $gray-l3;
-  padding: ($baseline/2) ($baseline/2);
-
-  &:hover, &:focus {
-    background: $forum-color-active-thread;
-  }
-}
-
-.forum-nav-browse-title .icon {
-  @include margin-right($baseline/2);
+    padding-left: $baseline;
 }
 
 // -------------------
@@ -148,7 +176,7 @@ div.discussion-course, div.content-wrapper {
 .forum-nav-refine-bar {
   @include clearfix();
   @include font-size(11);
-  border-bottom: 1px solid $gray-l3;
+  border-bottom: 1px solid $forum-color-border;
   background-color: $gray-l5;
   padding: ($baseline/4) ($baseline/2);
   color: $black;
@@ -156,14 +184,14 @@ div.discussion-course, div.content-wrapper {
 }
 
 .forum-nav-filter-main {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
   display: inline-block;
   width: 50%;
   @include text-align(left);
 }
 
 .forum-nav-filter-cohort, .forum-nav-sort {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
   display: inline-block;
   width: 50%;
   @include text-align(right);
@@ -196,11 +224,21 @@ div.discussion-course, div.content-wrapper {
 }
 
 .forum-nav-thread {
-  border-bottom: 1px solid $gray-l3;
-  background-color: $gray-l5;
+  border-bottom: 1px solid $forum-color-border;
+  background-color: $forum-color-background;
 
   &.is-unread {
-    background-color: $white;
+    background: $forum-color-background;
+    color: $blue-d1;
+
+    .forum-nav-thread-comments-count {
+      background-color: tint($blue-d1, 90%);;
+      color: $blue-d1;
+
+      &:after {
+        border-right-color: tint($blue-d1, 90%);;
+      }
+    }
   }
 }
 
@@ -208,8 +246,31 @@ div.discussion-course, div.content-wrapper {
   display: block;
   padding: ($baseline/4) ($baseline/2);
 
-  &.is-active, &:hover, &:focus {
-    background-color: $forum-color-active-thread;
+  &.is-active {
+    background-color: $forum-color-background;
+    color: $base-font-color;
+
+    .forum-nav-thread-comments-count {
+      background-color: $gray-l4;
+      color: $base-font-color;
+
+      &:after {
+        border-right-color: $gray-l4;
+      }
+    }
+  }
+
+  .forum-nav-thread-comments-count {
+
+    // topic read, but has unread comments
+    &.is-unread {
+      background-color: $blue-d1;
+      color: $white;
+
+      &:after {
+        border-right-color: $blue-d1;
+      }
+    }
   }
 }
 
@@ -286,7 +347,7 @@ div.discussion-course, div.content-wrapper {
   border-radius: 2px;
   padding: ($baseline/10) ($baseline/5);
   min-width: 2em; // Fit most comment counts but allow expansion if necessary
-  background-color: $gray-l3;
+  background-color: $gray-l4;
 
   // Speech bubble tail
   &:after {
@@ -299,29 +360,12 @@ div.discussion-course, div.content-wrapper {
     height: 0;
     border-style: solid;
     @include border-width(0, ($baseline/4), ($baseline/4), 0);
-    @include border-color(transparent, $gray-l3, transparent, transparent);
-  }
-
-  &.is-unread {
-    background-color: $white;
-
-    &:after {
-      border-right-color: $white
-    }
-  }
-}
-
-.forum-nav-thread.is-unread .forum-nav-thread-comments-count {
-  background-color: $blue;
-  color: $white;
-
-  &:after {
-    border-right-color: $blue;
+    @include border-color(transparent, $gray-l4, transparent, transparent);
   }
 }
 
 .forum-nav-load-more {
-  border-bottom: 1px solid $gray-l3;
+  border-bottom: 1px solid $forum-color-border;
   background-color: $gray-l5;
 }
 
@@ -335,7 +379,8 @@ div.discussion-course, div.content-wrapper {
   @extend %forum-nav-load-more-content;
   color: $link-color;
 
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     color: $link-color;
     background-color: $forum-color-active-thread;
   }

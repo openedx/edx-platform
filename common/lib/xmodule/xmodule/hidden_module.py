@@ -15,3 +15,4 @@ class HiddenModule(XModule):
 
 class HiddenDescriptor(RawDescriptor):
     module_class = HiddenModule
+    resources_dir = None

@@ -2,12 +2,10 @@
 Acceptance tests for Studio.
 """
 
-from unittest import skip
 from bok_choy.web_app_test import WebAppTest
 
 from ...pages.studio.asset_index import AssetIndexPage
 from ...pages.studio.auto_auth import AutoAuthPage
-from ...pages.studio.checklists import ChecklistsPage
 from ...pages.studio.course_info import CourseUpdatesPage
 from ...pages.studio.edit_tabs import PagesPage
 from ...pages.studio.import_export import ExportCoursePage, ImportCoursePage
@@ -20,7 +18,7 @@ from ...pages.studio.settings import SettingsPage
 from ...pages.studio.settings_advanced import AdvancedSettingsPage
 from ...pages.studio.settings_graders import GradingPage
 from ...pages.studio.signup import SignupPage
-from ...pages.studio.textbooks import TextbooksPage
+from ...pages.studio.textbook_upload import TextbookUploadPage
 from ...fixtures.course import XBlockFixtureDesc
 
 from base_studio_test import StudioCourseTest
@@ -81,9 +79,10 @@ class CoursePagesTest(StudioCourseTest):
         self.pages = [
             clz(self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run'])
             for clz in [
-                AssetIndexPage, ChecklistsPage, CourseUpdatesPage,
+                # AssetIndexPage, # TODO: Skip testing this page due to FEDX-88
+                CourseUpdatesPage,
                 PagesPage, ExportCoursePage, ImportCoursePage, CourseTeamPage, CourseOutlinePage, SettingsPage,
-                AdvancedSettingsPage, GradingPage, TextbooksPage
+                AdvancedSettingsPage, GradingPage, TextbookUploadPage
             ]
         ]
 
@@ -96,7 +95,6 @@ class CoursePagesTest(StudioCourseTest):
         self.dashboard_page.visit()
         self.assertEqual(self.browser.current_url.strip('/').rsplit('/')[-1], 'home')
 
-    @skip('Intermittently failing with Page not found error for Assets. TE-418')
     def test_page_existence(self):
         """
         Make sure that all these pages are accessible once you have a course.

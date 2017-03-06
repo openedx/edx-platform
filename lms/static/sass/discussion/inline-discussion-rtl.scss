@@ -1,0 +1,15 @@
+// Discussions - CSS application architecture
+// Version 1 styling (pre-Pattern Library)
+// ====================
+@import 'edx-pattern-library/pattern-library/sass/global/rtl';                    // RTL-specific settings and utilities
+@import 'edx-pattern-library-loader';
+
+@import '../vendor/bi-app/bi-app-rtl'; // set the layout for right to left languages
+@import '../base/variables-rtl';
+@import '../build-base-v1-no-reset';
+
+// base - elements
+@import '../elements/typography';
+
+// app - discussion
+@import 'build-discussion';

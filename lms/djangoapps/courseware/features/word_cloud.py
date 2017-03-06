@@ -1,9 +1,6 @@
 # pylint: disable=missing-docstring
 
-from time import sleep
-
 from lettuce import world, step
-from lettuce.django import django_url
 from common import i_am_registered_for_the_course, section_location, visit_scenario_item
 
 
@@ -29,7 +26,7 @@ def press_the_save_button(_step):
 
 @step('I see the empty result')
 def see_empty_result(_step):
-    assert (world.css_text('.your_words', 0) == '')
+    assert world.css_text('.your_words', 0) == ''
 
 
 @step('I fill inputs')
@@ -43,6 +40,9 @@ def fill_inputs(_step):
 
 @step('I see the result with words count')
 def see_result(_step):
+    """
+    Uppercasing since CSS capitalizes the headings
+    """
     strong_css = '.your_words strong'
     target_text = set([world.css_text(strong_css, i) for i in range(2)])
     assert set(['text1', 'text2']) == target_text

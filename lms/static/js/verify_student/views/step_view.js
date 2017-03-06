@@ -1,3 +1,5 @@
+/*global jQuery, _, Backbone, gettext */
+
 /**
  * Base view for defining steps in the payment/verification flow.
  *
@@ -8,7 +10,7 @@
  */
  var edx = edx || {};
 
- (function( $, _, _s, Backbone, gettext ) {
+ (function( $, _, Backbone, gettext ) {
     'use strict';
 
     edx.verify_student = edx.verify_student || {};
@@ -20,9 +22,9 @@
 
             /* Mix non-conflicting functions from underscore.string
              * (all but include, contains, and reverse) into the
-             * Underscore namespace
+             * Underscore namespace.
              */
-            _.mixin( _s.exports() );
+            _.mixin(_.str.exports());
         },
 
         render: function() {
@@ -33,7 +35,7 @@
             this.updateContext( this.templateContext() ).done(
                 function( templateContext ) {
                     // Render the template into the DOM
-                    $( this.el ).html( _.template( templateHtml, templateContext ) );
+                    edx.HtmlUtils.setHtml( $(this.el), edx.HtmlUtils.template(templateHtml)( templateContext ) );
 
                     // Allow subclasses to install custom event handlers
                     this.postRender();
@@ -101,4 +103,4 @@
 
     });
 
- })( jQuery, _, _.str, Backbone, gettext );
+ })( jQuery, _, Backbone, gettext );

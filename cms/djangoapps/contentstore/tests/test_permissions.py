@@ -22,10 +22,10 @@ class TestCourseAccess(ModuleStoreTestCase):
 
         Create a pool of users w/o granting them any permissions
         """
-        user_password = super(TestCourseAccess, self).setUp()
+        super(TestCourseAccess, self).setUp()
 
         self.client = AjaxEnabledTestClient()
-        self.client.login(username=self.user.username, password=user_password)
+        self.client.login(username=self.user.username, password=self.user_password)
 
         # create a course via the view handler which has a different strategy for permissions than the factory
         self.course_key = self.store.make_course_key('myu', 'mydept.mycourse', 'myrun')

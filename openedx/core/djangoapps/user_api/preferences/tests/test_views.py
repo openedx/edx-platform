@@ -90,11 +90,13 @@ class TestPreferencesAPI(UserAPITestCase):
         # Create some test preferences values.
         set_user_preference(self.user, "dict_pref", {"int_key": 10})
         set_user_preference(self.user, "string_pref", "value")
+        set_user_preference(self.user, "time_zone", "Asia/Tokyo")
 
         # Log in the client and do the GET.
         client = self.login_client(api_client, user)
         response = self.send_get(client)
-        self.assertEqual({"dict_pref": "{'int_key': 10}", "string_pref": "value"}, response.data)
+        self.assertEqual({"dict_pref": "{'int_key': 10}", "string_pref": "value", "time_zone": "Asia/Tokyo"},
+                         response.data)
 
     @ddt.data(
         ("client", "user"),
@@ -133,14 +135,21 @@ class TestPreferencesAPI(UserAPITestCase):
         self._do_create_preferences_test(False)
 
     def _do_create_preferences_test(self, is_active):
+        """
+        Internal helper to generalize the creation of a set of preferences
+        """
         self.client.login(username=self.user.username, password=self.test_password)
         if not is_active:
             self.user.is_active = False
             self.user.save()
-        self.send_patch(self.client, {
-            "dict_pref": {"int_key": 10},
-            "string_pref": "value",
-        })
+        self.send_patch(
+            self.client,
+            {
+                "dict_pref": {"int_key": 10},
+                "string_pref": "value",
+            },
+            expected_status=204
+        )
         response = self.send_get(self.client)
         self.assertEqual({u"dict_pref": u"{u'int_key': 10}", u"string_pref": u"value"}, response.data)
 
@@ -171,14 +180,20 @@ class TestPreferencesAPI(UserAPITestCase):
         set_user_preference(self.user, "dict_pref", {"int_key": 10})
         set_user_preference(self.user, "string_pref", "value")
         set_user_preference(self.user, "extra_pref", "extra_value")
+        set_user_preference(self.user, "time_zone", "Asia/Macau")
 
         # Send the patch request
         self.client.login(username=self.user.username, password=self.test_password)
-        self.send_patch(self.client, {
-            "string_pref": "updated_value",
-            "new_pref": "new_value",
-            "extra_pref": None,
-        })
+        self.send_patch(
+            self.client,
+            {
+                "string_pref": "updated_value",
+                "new_pref": "new_value",
+                "extra_pref": None,
+                "time_zone": "Europe/London",
+            },
+            expected_status=204
+        )
 
         # Verify that GET returns the updated preferences
         response = self.send_get(self.client)
@@ -186,6 +201,7 @@ class TestPreferencesAPI(UserAPITestCase):
             "dict_pref": "{'int_key': 10}",
             "string_pref": "updated_value",
             "new_pref": "new_value",
+            "time_zone": "Europe/London",
         }
         self.assertEqual(expected_preferences, response.data)
 
@@ -197,6 +213,7 @@ class TestPreferencesAPI(UserAPITestCase):
         set_user_preference(self.user, "dict_pref", {"int_key": 10})
         set_user_preference(self.user, "string_pref", "value")
         set_user_preference(self.user, "extra_pref", "extra_value")
+        set_user_preference(self.user, "time_zone", "Pacific/Midway")
 
         # Send the patch request
         self.client.login(username=self.user.username, password=self.test_password)
@@ -207,6 +224,7 @@ class TestPreferencesAPI(UserAPITestCase):
                 TOO_LONG_PREFERENCE_KEY: "new_value",
                 "new_pref": "new_value",
                 u"empty_pref_ȻħȺɍłɇs": "",
+                "time_zone": "Asia/Africa",
             },
             expected_status=400
         )
@@ -227,6 +245,11 @@ class TestPreferencesAPI(UserAPITestCase):
                     "developer_message": u"Preference 'empty_pref_ȻħȺɍłɇs' cannot be set to an empty value.",
                     "user_message": u"Preference 'empty_pref_ȻħȺɍłɇs' cannot be set to an empty value.",
                 },
+                "time_zone": {
+                    "developer_message": u"Value 'Asia/Africa' not valid for preference 'time_zone': Not in "
+                                         u"timezone set.",
+                    "user_message": u"Value 'Asia/Africa' is not a valid time zone selection."
+                },
             }
         )
 
@@ -236,6 +259,7 @@ class TestPreferencesAPI(UserAPITestCase):
             u"dict_pref": u"{'int_key': 10}",
             u"string_pref": u"value",
             u"extra_pref": u"extra_value",
+            u"time_zone": u"Pacific/Midway",
         }
         self.assertEqual(expected_preferences, response.data)
 
@@ -353,6 +377,9 @@ class TestPreferencesDetailAPI(UserAPITestCase):
         self._set_url(self.test_pref_key)
 
     def _set_url(self, preference_key):
+        """
+        Sets the url attribute including the username and provided preference key
+        """
         self.url = reverse(
             self.url_endpoint_name,
             kwargs={'username': self.user.username, 'preference_key': preference_key}
@@ -440,6 +467,9 @@ class TestPreferencesDetailAPI(UserAPITestCase):
         self._do_create_preference_test(False)
 
     def _do_create_preference_test(self, is_active):
+        """
+        Generalization of the actual test workflow
+        """
         self.client.login(username=self.user.username, password=self.test_password)
         if not is_active:
             self.user.is_active = False

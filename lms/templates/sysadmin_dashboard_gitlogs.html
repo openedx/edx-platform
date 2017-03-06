@@ -189,11 +189,11 @@ textarea {
       %else:
           <div class="page-status">
             %if not course_id:
-                # If viewing all logs there are no logs available, let the user know
+                ## If viewing all logs there are no logs available, let the user know.
                 ## Translators: git is a version-control system; see http://git-scm.com/about
                 ${_('No git import logs have been recorded.')}
             %else:
-                # If viewing a single course and there are no logs available, let the user know
+                ## If viewing a single course and there are no logs available, let the user know.
                 ## Translators: git is a version-control system; see http://git-scm.com/about
                 ${_('No git import logs have been recorded for this course.')}
             %endif

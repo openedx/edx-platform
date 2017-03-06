@@ -3,7 +3,7 @@ import unittest
 from mock import Mock
 
 from xblock.field_data import DictFieldData
-from xmodule.html_module import HtmlModule, HtmlDescriptor
+from xmodule.html_module import HtmlModule, HtmlDescriptor, CourseInfoModule
 
 from . import get_test_system, get_test_descriptor_system
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -59,7 +59,7 @@ class HtmlDescriptorIndexingTestCase(unittest.TestCase):
     Make sure that HtmlDescriptor can format data for indexing as expected.
     """
 
-    def test_index_dictionary(self):
+    def test_index_dictionary_simple_html_module(self):
         sample_xml = '''
             <html>
                 <p>Hello World!</p>
@@ -71,6 +71,7 @@ class HtmlDescriptorIndexingTestCase(unittest.TestCase):
             "content_type": "Text"
         })
 
+    def test_index_dictionary_cdata_html_module(self):
         sample_xml_cdata = '''
             <html>
                 <p>This has CDATA in it.</p>
@@ -83,6 +84,7 @@ class HtmlDescriptorIndexingTestCase(unittest.TestCase):
             "content_type": "Text"
         })
 
+    def test_index_dictionary_multiple_spaces_html_module(self):
         sample_xml_tab_spaces = '''
             <html>
                 <p>     Text has spaces :)  </p>
@@ -94,6 +96,7 @@ class HtmlDescriptorIndexingTestCase(unittest.TestCase):
             "content_type": "Text"
         })
 
+    def test_index_dictionary_html_module_with_comment(self):
         sample_xml_comment = '''
             <html>
                 <p>This has HTML comment in it.</p>
@@ -106,6 +109,7 @@ class HtmlDescriptorIndexingTestCase(unittest.TestCase):
             "content_type": "Text"
         })
 
+    def test_index_dictionary_html_module_with_both_comments_and_cdata(self):
         sample_xml_mix_comment_cdata = '''
             <html>
                 <!-- Beginning of the html -->
@@ -120,3 +124,60 @@ class HtmlDescriptorIndexingTestCase(unittest.TestCase):
             "content": {"html_content": " This has HTML comment in it. HTML end. ", "display_name": "Text"},
             "content_type": "Text"
         })
+
+    def test_index_dictionary_html_module_with_script_and_style_tags(self):
+        sample_xml_style_script_tags = '''
+            <html>
+                <style>p {color: green;}</style>
+                <!-- Beginning of the html -->
+                <p>This has HTML comment in it.<!-- Commenting Content --></p>
+                <!-- Here comes CDATA -->
+                <![CDATA[This is just a CDATA!]]>
+                <p>HTML end.</p>
+                <script>
+                    var message = "Hello world!"
+                </script>
+            </html>
+        '''
+        descriptor = instantiate_descriptor(data=sample_xml_style_script_tags)
+        self.assertEqual(descriptor.index_dictionary(), {
+            "content": {"html_content": " This has HTML comment in it. HTML end. ", "display_name": "Text"},
+            "content_type": "Text"
+        })
+
+
+class CourseInfoModuleTestCase(unittest.TestCase):
+    """
+    Make sure that CourseInfoModule renders updates properly
+    """
+    def test_updates_render(self):
+        """
+        Tests that a course info module will render its updates, even if they are malformed.
+        """
+        sample_update_data = [
+            {
+                "id": i,
+                "date": data,
+                "content": "This is a very important update!",
+                "status": CourseInfoModule.STATUS_VISIBLE,
+            } for i, data in enumerate(
+                [
+                    'January 1, 1970',
+                    'Marchtober 45, -1963',
+                    'Welcome!',
+                    'Date means "title", right?'
+                ]
+            )
+        ]
+        info_module = CourseInfoModule(
+            Mock(),
+            get_test_system(),
+            DictFieldData({'items': sample_update_data, 'data': ""}),
+            Mock()
+        )
+
+        # Prior to TNL-4115, an exception would be raised when trying to parse invalid dates in this method
+        try:
+            info_module.get_html()
+        except ValueError:
+            self.fail("CourseInfoModule could not parse an invalid date!")

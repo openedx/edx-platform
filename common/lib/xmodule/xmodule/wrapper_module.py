@@ -2,7 +2,6 @@
 # But w/o css delimiters between children
 
 from xmodule.vertical_block import VerticalBlock
-from pkg_resources import resource_string
 
 # HACK: This shouldn't be hard-coded to two types
 # OBSOLETE: This obsoletes 'type'

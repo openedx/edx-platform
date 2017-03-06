@@ -6,8 +6,8 @@ define([ // jshint ignore:line
     'js/models/course',
     'js/certificates/views/certificate_preview',
     'common/js/spec_helpers/template_helpers',
-    'js/spec_helpers/view_helpers',
-    'common/js/spec_helpers/ajax_helpers'
+    'common/js/spec_helpers/view_helpers',
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
 ],
 function(_, $, Course, CertificatePreview, TemplateHelpers, ViewHelpers, AjaxHelpers) {
     'use strict';
@@ -17,21 +17,6 @@ function(_, $, Course, CertificatePreview, TemplateHelpers, ViewHelpers, AjaxHel
         activate_certificate: '.activate-cert',
         preview_certificate: '.preview-certificate-link'
     };
-
-     beforeEach(function() {
-        window.course = new Course({
-            id: '5',
-            name: 'Course Name',
-            url_name: 'course_name',
-            org: 'course_org',
-            num: 'course_num',
-            revision: 'course_rev'
-        });
-    });
-
-    afterEach(function() {
-         delete window.course;
-     });
 
     describe('Certificate Web Preview Spec:', function() {
 
@@ -43,6 +28,16 @@ function(_, $, Course, CertificatePreview, TemplateHelpers, ViewHelpers, AjaxHel
         };
 
         beforeEach(function() {
+            window.course = new Course({
+                id: '5',
+                name: 'Course Name',
+                url_name: 'course_name',
+                org: 'course_org',
+                num: 'course_num',
+                revision: 'course_rev'
+            });
+            window.CMS.User = {isGlobalStaff: true};
+
             TemplateHelpers.installTemplate('certificate-web-preview', true);
             appendSetFixtures('<div class="preview-certificate nav-actions"></div>');
             this.view = new CertificatePreview({
@@ -55,8 +50,12 @@ function(_, $, Course, CertificatePreview, TemplateHelpers, ViewHelpers, AjaxHel
             appendSetFixtures(this.view.render().el);
         });
 
-        describe('Certificate preview', function() {
+        afterEach(function() {
+            delete window.course;
+            delete window.CMS.User;
+        });
 
+        describe('Certificate preview', function() {
             it('course mode event should call when user choose a new mode', function () {
                 spyOn(this.view, 'courseModeChanged');
                 this.view.delegateEvents();
@@ -83,6 +82,12 @@ function(_, $, Course, CertificatePreview, TemplateHelpers, ViewHelpers, AjaxHel
                 this.view.delegateEvents();
                 this.view.$(SELECTORS.activate_certificate).click();
                 expect(this.view.toggleCertificateActivation).toHaveBeenCalled();
+            });
+
+            it('toggle certificate activation button should not be present if user is not global staff', function () {
+                window.CMS.User = {isGlobalStaff: false};
+                appendSetFixtures(this.view.render().el);
+                expect(this.view.$(SELECTORS.activate_certificate)).not.toExist();
             });
 
             it('certificate deactivation works fine', function () {
@@ -115,7 +120,7 @@ function(_, $, Course, CertificatePreview, TemplateHelpers, ViewHelpers, AjaxHel
 
             it('certificate web preview should be removed when method "remove" called', function () {
                 this.view.remove();
-                expect(this.view.el.innerHTML).toContain("");
+                expect(this.view.el.innerHTML).toBe('');
             });
 
             it('method "show" should call the render function', function () {

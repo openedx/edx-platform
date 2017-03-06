@@ -49,6 +49,9 @@ class ResponseXMLFactory(object):
         *num_inputs*: The number of input elements
             to create [DEFAULT: 1]
 
+        *credit_type*: String of comma-separated words specifying the
+            partial credit grading scheme.
+
         Returns a string representation of the XML tree.
         """
 
@@ -58,6 +61,7 @@ class ResponseXMLFactory(object):
         script = kwargs.get('script', None)
         num_responses = kwargs.get('num_responses', 1)
         num_inputs = kwargs.get('num_inputs', 1)
+        credit_type = kwargs.get('credit_type', None)
 
         # The root is <problem>
         root = etree.Element("problem")
@@ -75,12 +79,17 @@ class ResponseXMLFactory(object):
         # Add the response(s)
         for __ in range(int(num_responses)):
             response_element = self.create_response_element(**kwargs)
+
+            # Set partial credit
+            if credit_type is not None:
+                response_element.set('partial_credit', str(credit_type))
+
             root.append(response_element)
 
             # Add input elements
             for __ in range(int(num_inputs)):
                 input_element = self.create_input_element(**kwargs)
-                if not (None == input_element):
+                if not None == input_element:
                     response_element.append(input_element)
 
             # The problem has an explanation of the solution
@@ -132,6 +141,10 @@ class ResponseXMLFactory(object):
         *choice_names": List of strings identifying the choices.
                         If specified, you must ensure that
                         len(choice_names) == len(choices)
+
+        *points*: List of strings giving partial credit values (0-1)
+                  for each choice. Interpreted as floats in problem.
+                  If specified, ensure len(points) == len(choices)
         """
         # Names of group elements
         group_element_names = {
@@ -144,15 +157,23 @@ class ResponseXMLFactory(object):
         choices = kwargs.get('choices', [True])
         choice_type = kwargs.get('choice_type', 'multiple')
         choice_names = kwargs.get('choice_names', [None] * len(choices))
+        points = kwargs.get('points', [None] * len(choices))
 
         # Create the <choicegroup>, <checkboxgroup>, or <radiogroup> element
-        assert(choice_type in group_element_names)
+        assert choice_type in group_element_names
         group_element = etree.Element(group_element_names[choice_type])
 
         # Create the <choice> elements
-        for (correct_val, name) in zip(choices, choice_names):
+        for (correct_val, name, pointval) in zip(choices, choice_names, points):
             choice_element = etree.SubElement(group_element, "choice")
-            choice_element.set("correct", "true" if correct_val else "false")
+            if correct_val is True:
+                correctness = 'true'
+            elif correct_val is False:
+                correctness = 'false'
+            elif 'partial' in correct_val:
+                correctness = 'partial'
+
+            choice_element.set('correct', correctness)
 
             # Add a name identifying the choice, if one exists
             # For simplicity, we use the same string as both the
@@ -160,6 +181,10 @@ class ResponseXMLFactory(object):
             if name:
                 choice_element.text = str(name)
                 choice_element.set("name", str(name))
+
+            # Add point values for partially-correct choices.
+            if pointval:
+                choice_element.set("point_value", str(pointval))
 
         return group_element
 
@@ -176,10 +201,22 @@ class NumericalResponseXMLFactory(ResponseXMLFactory):
         *tolerance*: The tolerance within which a response
         is considered correct.  Can be a decimal (e.g. "0.01")
         or percentage (e.g. "2%")
+
+        *credit_type*: String of comma-separated words specifying the
+        partial credit grading scheme.
+
+        *partial_range*: The multiplier for the tolerance that will
+        still provide partial credit in the "close" grading style
+
+        *partial_answers*: A string of comma-separated alternate
+        answers that will receive partial credit in the "list" style
         """
 
         answer = kwargs.get('answer', None)
         tolerance = kwargs.get('tolerance', None)
+        credit_type = kwargs.get('credit_type', None)
+        partial_range = kwargs.get('partial_range', None)
+        partial_answers = kwargs.get('partial_answers', None)
 
         response_element = etree.Element('numericalresponse')
 
@@ -193,6 +230,13 @@ class NumericalResponseXMLFactory(ResponseXMLFactory):
             responseparam_element = etree.SubElement(response_element, 'responseparam')
             responseparam_element.set('type', 'tolerance')
             responseparam_element.set('default', str(tolerance))
+            if partial_range is not None and 'close' in credit_type:
+                responseparam_element.set('partial_range', str(partial_range))
+
+        if partial_answers is not None and 'list' in credit_type:
+            # The line below throws a false positive pylint violation, so it's excepted.
+            responseparam_element = etree.SubElement(response_element, 'responseparam')
+            responseparam_element.set('partial_answers', partial_answers)
 
         return response_element
 
@@ -220,11 +264,15 @@ class CustomResponseXMLFactory(ResponseXMLFactory):
         *expect*: The value passed to the function cfn
 
         *answer*: Inline script that calculates the answer
+
+        *answer_attr*: The "answer" attribute on the tag itself (treated as an
+        alias to "expect", though "expect" takes priority if both are given)
         """
 
         # Retrieve **kwargs
         cfn = kwargs.get('cfn', None)
         expect = kwargs.get('expect', None)
+        answer_attr = kwargs.get('answer_attr', None)
         answer = kwargs.get('answer', None)
         options = kwargs.get('options', None)
         cfn_extra_args = kwargs.get('cfn_extra_args', None)
@@ -237,6 +285,9 @@ class CustomResponseXMLFactory(ResponseXMLFactory):
 
         if expect:
             response_element.set('expect', str(expect))
+
+        if answer_attr:
+            response_element.set('answer', str(answer_attr))
 
         if answer:
             answer_element = etree.SubElement(response_element, "answer")
@@ -412,8 +463,8 @@ class FormulaResponseXMLFactory(ResponseXMLFactory):
         answer = kwargs.get("answer", None)
         hint_list = kwargs.get("hints", None)
 
-        assert(answer)
-        assert(sample_dict and num_samples)
+        assert answer
+        assert sample_dict and num_samples
 
         # Create the <formularesponse> element
         response_element = etree.Element("formularesponse")
@@ -518,7 +569,7 @@ class ImageResponseXMLFactory(ResponseXMLFactory):
         rectangle = kwargs.get('rectangle', None)
         regions = kwargs.get('regions', None)
 
-        assert(rectangle or regions)
+        assert rectangle or regions
 
         # Create the <imageinput> element
         input_element = etree.Element("imageinput")
@@ -635,9 +686,9 @@ class OptionResponseXMLFactory(ResponseXMLFactory):
         options_list = kwargs.get('options', None)
         correct_option = kwargs.get('correct_option', None)
 
-        assert(options_list and correct_option)
-        assert(len(options_list) > 1)
-        assert(correct_option in options_list)
+        assert options_list and correct_option
+        assert len(options_list) > 1
+        assert correct_option in options_list
 
         # Create the <optioninput> element
         optioninput_element = etree.Element("optioninput")
@@ -727,11 +778,11 @@ class StringResponseXMLFactory(ResponseXMLFactory):
                 hintgroup_element.set("hintfn", hint_fn)
 
         for additional_answer in additional_answers:
-            additional_node = etree.SubElement(response_element, "additional_answer")  # pylint: disable=no-member
+            additional_node = etree.SubElement(response_element, "additional_answer")
             additional_node.set("answer", additional_answer)
 
         for answer in non_attribute_answers:
-            additional_node = etree.SubElement(response_element, "additional_answer")  # pylint: disable=no-member
+            additional_node = etree.SubElement(response_element, "additional_answer")
             additional_node.text = answer
 
         return response_element

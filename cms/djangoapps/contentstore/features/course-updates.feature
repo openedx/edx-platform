@@ -34,7 +34,7 @@ Feature: CMS.Course updates
         Given I have opened a new course in Studio
         And I go to the course updates page
         And I add a new update with the text "Hello"
-        When I edit the date to "June 1, 2013"
+        When I edit the date to "06/01/13"
         Then I should see the date "June 1, 2013"
         And I see a "saving" notification
 

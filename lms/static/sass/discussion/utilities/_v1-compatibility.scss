@@ -1,0 +1,198 @@
+// Utilities to provide v1-styling compatibility
+
+@mixin font-size($sizeValue: 16){
+  font-size: $sizeValue + px;
+}
+
+@mixin line-height($fontSize: auto){
+  line-height: ($fontSize*1.48) + px;
+}
+
+%text-sr {
+    // clip has been deprecated but is still supported
+    clip: rect(1px 1px 1px 1px);
+    clip: rect(1px, 1px, 1px, 1px);
+    position: absolute;
+    margin: -1px;
+    height: 1px;
+    width: 1px;
+    border: 0;
+    padding: 0;
+    overflow: hidden;
+    // ensure there are spaces in sr text
+    word-wrap: normal;
+}
+
+// extends - UI - depth levels
+%ui-depth0 { z-index: 0; }
+%ui-depth1 { z-index: 10; }
+%ui-depth2 { z-index: 100; }
+%ui-depth3 { z-index: 1000; }
+%ui-depth4 { z-index: 10000; }
+%ui-depth5 { z-index: 100000; }
+
+%t-icon1 {
+  @include font-size(48);
+}
+
+%t-icon2 {
+  @include font-size(36);
+}
+
+%t-icon3 {
+  @include font-size(24);
+}
+
+%t-icon4 {
+  @include font-size(18);
+}
+
+%t-icon5 {
+  @include font-size(16);
+}
+
+%t-icon6 {
+  @include font-size(14);
+}
+
+%t-icon7 {
+  @include font-size(12);
+}
+
+%t-icon8 {
+  @include font-size(11);
+}
+
+%t-icon9 {
+  @include font-size(10);
+}
+
+%t-icon-solo {
+  @include line-height(0);
+}
+
+// weights
+%t-ultrastrong {
+ font-weight: 700;
+}
+%t-strong {
+ font-weight: 600;
+}
+%t-demi-strong {
+ font-weight: 500;
+}
+%t-regular {
+ font-weight: 400;
+}
+%t-light {
+ font-weight: 300;
+}
+%t-ultralight {
+ font-weight: 200;
+}
+
+// headings/titles
+%t-title {
+  font-family: $f-sans-serif;
+}
+
+%t-title1 {
+  @extend %t-title;
+  @include font-size(60);
+  @include line-height(60);
+}
+
+%t-title2 {
+  @extend %t-title;
+  @include font-size(48);
+  @include line-height(48);
+}
+
+%t-title3 {
+  @include font-size(36);
+  @include line-height(36);
+}
+
+%t-title4 {
+  @extend %t-title;
+  @include font-size(24);
+  @include line-height(24);
+}
+
+%t-title5 {
+  @extend %t-title;
+  @include font-size(18);
+  @include line-height(18);
+}
+
+%t-title6 {
+  @extend %t-title;
+  @include font-size(16);
+  @include line-height(16);
+}
+
+%t-title7 {
+  @extend %t-title;
+  @include font-size(14);
+  @include line-height(14);
+}
+
+%t-title8 {
+  @extend %t-title;
+  @include font-size(12);
+  @include line-height(12);
+}
+
+%t-title9 {
+  @extend %t-title;
+  @include font-size(11);
+  @include line-height(11);
+}
+
+// copy
+%t-copy {
+  font-family: $f-sans-serif;
+}
+
+%t-copy-base {
+  @extend %t-copy;
+  @include font-size(16);
+  @include line-height(16);
+}
+
+%t-copy-lead1 {
+  @extend %t-copy;
+  @include font-size(18);
+  @include line-height(18);
+}
+
+%t-copy-lead2 {
+  @extend %t-copy;
+  @include font-size(24);
+  @include line-height(24);
+}
+
+%t-copy-sub1 {
+  @extend %t-copy;
+  @include font-size(14);
+  @include line-height(14);
+}
+
+%t-copy-sub2 {
+  @extend %t-copy;
+  @include font-size(12);
+  @include line-height(12);
+}
+
+// extends - UI - removes list styling/spacing when using uls, ols for navigation and less content-centric cases
+%ui-no-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  text-indent: 0;
+
+  li, dt, dd {
+    margin: 0;
+    padding: 0;
+  }
+}

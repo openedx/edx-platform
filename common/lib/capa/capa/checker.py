@@ -7,7 +7,7 @@ from __future__ import unicode_literals
 import argparse
 import logging
 import sys
-from path import path
+from path import Path as path
 
 from cStringIO import StringIO
 
@@ -99,7 +99,7 @@ def check_that_blanks_fail(problem):
                          for answer_id in problem.get_question_answers())
     grading_results = problem.grade_answers(blank_answers)
     try:
-        assert(all(result == 'incorrect' for result in grading_results.values()))
+        assert all(result == 'incorrect' for result in grading_results.values())
     except AssertionError:
         log.error("Blank accepted as correct answer in {0} for {1}"
                   .format(problem,

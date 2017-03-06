@@ -5,6 +5,8 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.client import RequestFactory
 
+from courseware.access import has_access
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import Registration
 
 
@@ -137,3 +139,46 @@ class LoginEnrollmentTestCase(TestCase):
             'course_id': course.id.to_deprecated_string(),
         }
         self.assert_request_status_code(200, url, method="POST", data=request_data)
+
+
+class CourseAccessTestMixin(TestCase):
+    """
+    Utility mixin for asserting access (or lack thereof) to courses.
+    If relevant, also checks access for courses' corresponding CourseOverviews.
+    """
+
+    def assertCanAccessCourse(self, user, action, course):
+        """
+        Assert that a user has access to the given action for a given course.
+
+        Test with both the given course and with a CourseOverview of the given
+        course.
+
+        Arguments:
+            user (User): a user.
+            action (str): type of access to test.
+            course (CourseDescriptor): a course.
+        """
+        self.assertTrue(has_access(user, action, course))
+        self.assertTrue(has_access(user, action, CourseOverview.get_from_id(course.id)))
+
+    def assertCannotAccessCourse(self, user, action, course):
+        """
+        Assert that a user lacks access to the given action the given course.
+
+        Test with both the given course and with a CourseOverview of the given
+        course.
+
+        Arguments:
+            user (User): a user.
+            action (str): type of access to test.
+            course (CourseDescriptor): a course.
+
+        Note:
+            It may seem redundant to have one method for testing access
+            and another method for testing lack thereof (why not just combine
+            them into one method with a boolean flag?), but it makes reading
+            stack traces of failed tests easier to understand at a glance.
+        """
+        self.assertFalse(has_access(user, action, course))
+        self.assertFalse(has_access(user, action, CourseOverview.get_from_id(course.id)))

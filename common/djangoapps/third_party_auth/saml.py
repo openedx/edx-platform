@@ -2,8 +2,10 @@
 Slightly customized python-social-auth backend for SAML 2.0 support
 """
 import logging
+from django.http import Http404
+from django.utils.functional import cached_property
 from social.backends.saml import SAMLAuth, OID_EDU_PERSON_ENTITLEMENT
-from social.exceptions import AuthForbidden
+from social.exceptions import AuthForbidden, AuthMissingParameter
 
 log = logging.getLogger(__name__)
 
@@ -22,16 +24,28 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
 
     def setting(self, name, default=None):
         """ Get a setting, from SAMLConfiguration """
-        if not hasattr(self, '_config'):
-            from .models import SAMLConfiguration
-            self._config = SAMLConfiguration.current()  # pylint: disable=attribute-defined-outside-init
-        if not self._config.enabled:
-            from django.core.exceptions import ImproperlyConfigured
-            raise ImproperlyConfigured("SAML Authentication is not enabled.")
         try:
             return self._config.get_setting(name)
         except KeyError:
             return self.strategy.setting(name, default)
+
+    def auth_url(self):
+        """
+        Check that SAML is enabled and that the request includes an 'idp'
+        parameter before getting the URL to which we must redirect in order to
+        authenticate the user.
+
+        raise Http404 if SAML authentication is disabled.
+        raise AuthMissingParameter if the 'idp' parameter is missing.
+        """
+        if not self._config.enabled:
+            log.error('SAML authentication is not enabled')
+            raise Http404
+        # TODO: remove this check once the fix is merged upstream:
+        # https://github.com/omab/python-social-auth/pull/821
+        if 'idp' not in self.strategy.request_data():
+            raise AuthMissingParameter(self, 'idp')
+        return super(SAMLAuthBackend, self).auth_url()
 
     def _check_entitlements(self, idp, attributes):
         """
@@ -47,3 +61,8 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
                     log.warning(
                         "SAML user from IdP %s rejected due to missing eduPersonEntitlement %s", idp.name, expected)
                     raise AuthForbidden(self)
+
+    @cached_property
+    def _config(self):
+        from .models import SAMLConfiguration
+        return SAMLConfiguration.current()

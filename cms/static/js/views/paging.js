@@ -116,12 +116,15 @@
                         sortInfo = this.sortableColumnInfo(sortColumn),
                         sortField = sortInfo.fieldName,
                         defaultSortDirection = sortInfo.defaultSortDirection;
+
                     if (collection.sortField === sortField) {
                         collection.sortDirection = collection.sortDirection === 'asc' ? 'desc' : 'asc';
                     } else {
                         collection.sortField = sortField;
                         collection.sortDirection = defaultSortDirection;
                     }
+
+                    collection.setSorting(sortField, collection.sortDirection);
                     this.sortColumn = sortColumn;
                     this.collection.setPage(1);
                 },
@@ -129,8 +132,8 @@
                 selectFilter: function(filterColumn) {
                     var collection = this.collection,
                         filterInfo = this.filterableColumnInfo(filterColumn),
-                        filterField = filterInfo.fieldName,
-                        defaultFilterKey = false;
+                        filterField = filterInfo.fieldName;
+
                     if (collection.filterField !== filterField) {
                         collection.filterField = filterField;
                     }

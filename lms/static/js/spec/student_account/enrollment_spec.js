@@ -1,17 +1,17 @@
-define(['common/js/spec_helpers/ajax_helpers', 'js/student_account/enrollment'],
+define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/student_account/enrollment'],
     function( AjaxHelpers, EnrollmentInterface ) {
         'use strict';
 
-        describe( 'edx.student.account.EnrollmentInterface', function() {
+        describe( 'EnrollmentInterface', function() {
 
             var COURSE_KEY = 'edX/DemoX/Fall',
-                ENROLL_URL = '/commerce/baskets/',
+                ENROLL_URL = '/api/commerce/v0/baskets/',
                 FORWARD_URL = '/course_modes/choose/edX/DemoX/Fall/',
                 EMBARGO_MSG_URL = '/embargo/blocked-message/enrollment/default/';
 
             beforeEach(function() {
                 // Mock the redirect call
-                spyOn(EnrollmentInterface, 'redirect').andCallFake(function() {});
+                spyOn(EnrollmentInterface, 'redirect').and.callFake(function() {});
             });
 
             it('enrolls a user in a course', function() {

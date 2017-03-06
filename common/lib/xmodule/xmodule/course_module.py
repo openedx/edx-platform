@@ -1,33 +1,30 @@
 """
 Django module container for classes and operations related to the "Course Module" content type
 """
+import json
 import logging
 from cStringIO import StringIO
-from math import exp
-from lxml import etree
-from path import path  # NOTE (THK): Only used for detecting presence of syllabus
-import requests
 from datetime import datetime
-import dateutil.parser
+
+import requests
 from lazy import lazy
+from lxml import etree
+from path import Path as path
+from pytz import utc
+from xblock.fields import Scope, List, String, Dict, Boolean, Integer, Float
 
 from xmodule import course_metadata_utils
 from xmodule.course_metadata_utils import DEFAULT_START_DATE
-from xmodule.exceptions import UndefinedContext
-from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.graders import grader_from_conf
-from xmodule.tabs import CourseTabList
 from xmodule.mixin import LicenseMixin
-import json
-
-from xblock.fields import Scope, List, String, Dict, Boolean, Integer, Float
+from xmodule.seq_module import SequenceDescriptor, SequenceModule
+from xmodule.tabs import CourseTabList, InvalidTabsException
 from .fields import Date
-from django.utils.timezone import UTC
-
 
 log = logging.getLogger(__name__)
 
-# Make '_' a no-op so we can scrape strings
+# Make '_' a no-op so we can scrape strings. Using lambda instead of
+#  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
 
 CATALOG_VISIBILITY_CATALOG_AND_ABOUT = "both"
@@ -109,7 +106,7 @@ class Textbook(object):
             # see if we already fetched this
             if toc_url in _cached_toc:
                 (table_of_contents, timestamp) = _cached_toc[toc_url]
-                age = datetime.now(UTC) - timestamp
+                age = datetime.now(utc) - timestamp
                 # expire every 10 minutes
                 if age.seconds < 600:
                     return table_of_contents
@@ -117,7 +114,7 @@ class Textbook(object):
             pass
 
         # Get the table of contents from S3
-        log.info("Retrieving textbook table of contents from %s" % toc_url)
+        log.info("Retrieving textbook table of contents from %s", toc_url)
         try:
             r = requests.get(toc_url)
         except Exception as err:
@@ -179,7 +176,7 @@ class CourseFields(object):
         scope=Scope.settings
     )
     textbooks = TextbookList(
-        help=_("List of pairs of (title, url) for textbooks used in this course"),
+        help=_("List of Textbook objects with (title, url) for textbooks used in this course"),
         default=[],
         scope=Scope.content
     )
@@ -272,17 +269,12 @@ class CourseFields(object):
         scope=Scope.settings,
         deprecated=True  # Deprecated because someone would not edit this value within Studio.
     )
-    show_chat = Boolean(
-        display_name=_("Show Chat Widget"),
-        help=_("Enter true or false. When true, students can see the chat widget in the course."),
-        default=False,
-        scope=Scope.settings
-    )
     tabs = CourseTabList(help="List of tabs to enable in this course", scope=Scope.settings, default=[])
     end_of_course_survey_url = String(
         display_name=_("Course Survey URL"),
         help=_("Enter the URL for the end-of-course survey. If your course does not have a survey, enter null."),
-        scope=Scope.settings
+        scope=Scope.settings,
+        deprecated=True  # We wish to remove this entirely, TNL-3399
     )
     discussion_blackouts = List(
         display_name=_("Discussion Blackout Dates"),
@@ -312,7 +304,7 @@ class CourseFields(object):
         scope=Scope.settings, default=False,
         help=_(
             "Enter true or false. If true, discussion categories and subcategories are sorted alphabetically. "
-            "If false, they are sorted chronologically."
+            "If false, they are sorted chronologically by creation date and time."
         )
     )
     announcement = Date(
@@ -347,15 +339,6 @@ class CourseFields(object):
         help=_("Enter the unique identifier for your course's video files provided by edX."),
         scope=Scope.settings
     )
-    facebook_url = String(
-        help=_(
-            "Enter the URL for the official course Facebook group. "
-            "If you provide a URL, the mobile app includes a button that students can tap to access the group."
-        ),
-        default=None,
-        display_name=_("Facebook URL"),
-        scope=Scope.settings
-    )
     no_grade = Boolean(
         display_name=_("Course Not Graded"),
         help=_("Enter true or false. If true, the course will not be graded."),
@@ -375,8 +358,8 @@ class CourseFields(object):
     html_textbooks = List(
         display_name=_("HTML Textbooks"),
         help=_(
-            "For HTML textbooks that appear as separate tabs in the courseware, enter the name of the tab (usually "
-            "the name of the book) as well as the URLs and titles of all the chapters in the book."
+            "For HTML textbooks that appear as separate tabs in the course, enter the name of the tab (usually "
+            "the title of the book) as well as the URLs and titles of each chapter in the book."
         ),
         scope=Scope.settings
     )
@@ -393,15 +376,25 @@ class CourseFields(object):
         # a role created by a course Instructor to enable a person (the "Coach") to manage the custom course for
         # his students.
         display_name=_("Enable CCX"),
-        # Translators: Custom Courses for edX (CCX) is an edX feature for re-using course content. CCX Coach is
-        # a role created by a course Instructor to enable a person (the "Coach") to manage the custom course for
-        # his students.
         help=_(
+            # Translators: Custom Courses for edX (CCX) is an edX feature for re-using course content. CCX Coach is
+            # a role created by a course Instructor to enable a person (the "Coach") to manage the custom course for
+            # his students.
             "Allow course instructors to assign CCX Coach roles, and allow coaches to manage Custom Courses on edX."
             " When false, Custom Courses cannot be created, but existing Custom Courses will be preserved."
         ),
         default=False,
         scope=Scope.settings
+    )
+    ccx_connector = String(
+        # Translators: Custom Courses for edX (CCX) is an edX feature for re-using course content.
+        display_name=_("CCX Connector URL"),
+        # Translators: Custom Courses for edX (CCX) is an edX feature for re-using course content.
+        help=_(
+            "URL for CCX Connector application for managing creation of CCXs. (optional)."
+            " Ignored unless 'Enable CCX' is set to 'true'."
+        ),
+        scope=Scope.settings, default=""
     )
     allow_anonymous = Boolean(
         display_name=_("Allow Anonymous Discussion Posts"),
@@ -422,219 +415,16 @@ class CourseFields(object):
         scope=Scope.settings
     )
     has_children = True
-    checklists = List(
-        scope=Scope.settings,
-        default=[
-            {
-                "short_description": _("Getting Started With Studio"),
-                "items": [
-                    {
-                        "short_description": _("Add Course Team Members"),
-                        "long_description": _(
-                            "Grant your collaborators permission to edit your course so you can work together."
-                        ),
-                        "is_checked": False,
-                        "action_url": "ManageUsers",
-                        "action_text": _("Edit Course Team"),
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": _("Set Important Dates for Your Course"),
-                        "long_description": _(
-                            "Establish your course's student enrollment and launch dates on the Schedule and Details "
-                            "page."
-                        ),
-                        "is_checked": False,
-                        "action_url": "SettingsDetails",
-                        "action_text": _("Edit Course Details &amp; Schedule"),
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": _("Draft Your Course's Grading Policy"),
-                        "long_description": _(
-                            "Set up your assignment types and grading policy even if you haven't created all your "
-                            "assignments."
-                        ),
-                        "is_checked": False,
-                        "action_url": "SettingsGrading",
-                        "action_text": _("Edit Grading Settings"),
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": _("Explore the Other Studio Checklists"),
-                        "long_description": _(
-                            "Discover other available course authoring tools, and find help when you need it."
-                        ),
-                        "is_checked": False,
-                        "action_url": "",
-                        "action_text": "",
-                        "action_external": False,
-                    },
-                ],
-            },
-            {
-                "short_description": _("Draft a Rough Course Outline"),
-                "items": [
-                    {
-                        "short_description": _("Create Your First Section and Subsection"),
-                        "long_description": _("Use your course outline to build your first Section and Subsection."),
-                        "is_checked": False,
-                        "action_url": "CourseOutline",
-                        "action_text": _("Edit Course Outline"),
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": _("Set Section Release Dates"),
-                        "long_description": _(
-                            "Specify the release dates for each Section in your course. Sections become visible to "
-                            "students on their release dates."
-                        ),
-                        "is_checked": False,
-                        "action_url": "CourseOutline",
-                        "action_text": _("Edit Course Outline"),
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": _("Designate a Subsection as Graded"),
-                        "long_description": _(
-                            "Set a Subsection to be graded as a specific assignment type. Assignments within graded "
-                            "Subsections count toward a student's final grade."
-                        ),
-                        "is_checked": False,
-                        "action_url": "CourseOutline",
-                        "action_text": _("Edit Course Outline"),
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": _("Reordering Course Content"),
-                        "long_description": _("Use drag and drop to reorder the content in your course."),
-                        "is_checked": False,
-                        "action_url": "CourseOutline",
-                        "action_text": _("Edit Course Outline"),
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": _("Renaming Sections"),
-                        "long_description": _("Rename Sections by clicking the Section name from the Course Outline."),
-                        "is_checked": False,
-                        "action_url": "CourseOutline",
-                        "action_text": _("Edit Course Outline"),
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": _("Deleting Course Content"),
-                        "long_description": _(
-                            "Delete Sections, Subsections, or Units you don't need anymore. Be careful, as there is "
-                            "no Undo function."
-                        ),
-                        "is_checked": False,
-                        "action_url": "CourseOutline",
-                        "action_text": _("Edit Course Outline"),
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": _("Add an Instructor-Only Section to Your Outline"),
-                        "long_description": _(
-                            "Some course authors find using a section for unsorted, in-progress work useful. To do "
-                            "this, create a section and set the release date to the distant future."
-                        ),
-                        "is_checked": False,
-                        "action_url": "CourseOutline",
-                        "action_text": _("Edit Course Outline"),
-                        "action_external": False,
-                    },
-                ],
-            },
-            {
-                "short_description": _("Explore edX's Support Tools"),
-                "items": [
-                    {
-                        "short_description": _("Explore the Studio Help Forum"),
-                        "long_description": _(
-                            "Access the Studio Help forum from the menu that appears when you click your user name "
-                            "in the top right corner of Studio."
-                        ),
-                        "is_checked": False,
-                        "action_url": "http://help.edge.edx.org/",
-                        "action_text": _("Visit Studio Help"),
-                        "action_external": True,
-                    },
-                    {
-                        "short_description": _("Enroll in edX 101"),
-                        "long_description": _("Register for edX 101, edX's primer for course creation."),
-                        "is_checked": False,
-                        "action_url": "https://edge.edx.org/courses/edX/edX101/How_to_Create_an_edX_Course/about",
-                        "action_text": _("Register for edX 101"),
-                        "action_external": True,
-                    },
-                    {
-                        "short_description": _("Download the Studio Documentation"),
-                        "long_description": _("Download the searchable Studio reference documentation in PDF form."),
-                        "is_checked": False,
-                        "action_url": "http://files.edx.org/Getting_Started_with_Studio.pdf",
-                        "action_text": _("Download Documentation"),
-                        "action_external": True,
-                    },
-                ],
-            },
-            {
-                "short_description": _("Draft Your Course About Page"),
-                "items": [
-                    {
-                        "short_description": _("Draft a Course Description"),
-                        "long_description": _(
-                            "Courses on edX have an About page that includes a course video, description, and more. "
-                            "Draft the text students will read before deciding to enroll in your course."
-                        ),
-                        "is_checked": False,
-                        "action_url": "SettingsDetails",
-                        "action_text": _("Edit Course Schedule &amp; Details"),
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": _("Add Staff Bios"),
-                        "long_description": _(
-                            "Showing prospective students who their instructor will be is helpful. "
-                            "Include staff bios on the course About page."
-                        ),
-                        "is_checked": False,
-                        "action_url": "SettingsDetails",
-                        "action_text": _("Edit Course Schedule &amp; Details"),
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": _("Add Course FAQs"),
-                        "long_description": _("Include a short list of frequently asked questions about your course."),
-                        "is_checked": False,
-                        "action_url": "SettingsDetails",
-                        "action_text": _("Edit Course Schedule &amp; Details"),
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": _("Add Course Prerequisites"),
-                        "long_description": _(
-                            "Let students know what knowledge and/or skills they should have before "
-                            "they enroll in your course."
-                        ),
-                        "is_checked": False,
-                        "action_url": "SettingsDetails",
-                        "action_text": _("Edit Course Schedule &amp; Details"),
-                        "action_external": False,
-                    },
-                ],
-            },
-        ],
-    )
     info_sidebar_name = String(
-        display_name=_("Course Info Sidebar Name"),
+        display_name=_("Course Home Sidebar Name"),
         help=_(
-            "Enter the heading that you want students to see above your course handouts on the Course Info page. "
+            "Enter the heading that you want students to see above your course handouts on the Course Home page. "
             "Your course handouts appear in the right panel of the page."
         ),
-        scope=Scope.settings, default='Course Handouts')
+        scope=Scope.settings, default=_('Course Handouts'))
     show_timezone = Boolean(
         help=_(
-            "True if timezones should be shown on dates in the courseware. "
+            "True if timezones should be shown on dates in the course. "
             "Deprecated in favor of due_date_display_format."
         ),
         scope=Scope.settings, default=True
@@ -686,6 +476,26 @@ class CourseFields(object):
         # Ensure that courses imported from XML keep their image
         default="images_course_image.jpg"
     )
+    banner_image = String(
+        display_name=_("Course Banner Image"),
+        help=_(
+            "Edit the name of the banner image file. "
+            "You can set the banner image on the Settings & Details page."
+        ),
+        scope=Scope.settings,
+        # Ensure that courses imported from XML keep their image
+        default="images_course_image.jpg"
+    )
+    video_thumbnail_image = String(
+        display_name=_("Course Video Thumbnail Image"),
+        help=_(
+            "Edit the name of the video thumbnail image file. "
+            "You can set the video thumbnail image on the Settings & Details page."
+        ),
+        scope=Scope.settings,
+        # Ensure that courses imported from XML keep their image
+        default="images_course_image.jpg"
+    )
     issue_badges = Boolean(
         display_name=_("Issue Open Badges"),
         help=_(
@@ -697,9 +507,9 @@ class CourseFields(object):
     ## Course level Certificate Name overrides.
     cert_name_short = String(
         help=_(
-            "Use this setting only when generating PDF certificates. "
-            "Between quotation marks, enter the short name of the course to use on the certificate that "
-            "students receive when they complete the course."
+            'Use this setting only when generating PDF certificates. '
+            'Between quotation marks, enter the short name of the type of certificate that '
+            'students receive when they complete the course. For instance, "Certificate".'
         ),
         display_name=_("Certificate Name (Short)"),
         scope=Scope.settings,
@@ -707,13 +517,19 @@ class CourseFields(object):
     )
     cert_name_long = String(
         help=_(
-            "Use this setting only when generating PDF certificates. "
-            "Between quotation marks, enter the long name of the course to use on the certificate that students "
-            "receive when they complete the course."
+            'Use this setting only when generating PDF certificates. '
+            'Between quotation marks, enter the long name of the type of certificate that students '
+            'receive when they complete the course. For instance, "Certificate of Achievement".'
         ),
         display_name=_("Certificate Name (Long)"),
         scope=Scope.settings,
         default=""
+    )
+    cert_html_view_enabled = Boolean(
+        display_name=_("Certificate Web/HTML View Enabled"),
+        help=_("If true, certificate Web/HTML views are enabled for the course."),
+        scope=Scope.settings,
+        default=False,
     )
     cert_html_view_overrides = Dict(
         # Translators: This field is the container for course-specific certifcate configuration values
@@ -773,7 +589,7 @@ class CourseFields(object):
     display_organization = String(
         display_name=_("Course Organization Display String"),
         help=_(
-            "Enter the course organization that you want to appear in the courseware. This setting overrides the "
+            "Enter the course organization that you want to appear in the course. This setting overrides the "
             "organization that you entered when you created the course. To use the organization that you entered "
             "when you created the course, enter null."
         ),
@@ -783,11 +599,12 @@ class CourseFields(object):
     display_coursenumber = String(
         display_name=_("Course Number Display String"),
         help=_(
-            "Enter the course number that you want to appear in the courseware. This setting overrides the course "
+            "Enter the course number that you want to appear in the course. This setting overrides the course "
             "number that you entered when you created the course. To use the course number that you entered when "
             "you created the course, enter null."
         ),
-        scope=Scope.settings
+        scope=Scope.settings,
+        default=""
     )
 
     max_student_enrollments_allowed = Integer(
@@ -896,10 +713,51 @@ class CourseFields(object):
 
     teams_configuration = Dict(
         display_name=_("Teams Configuration"),
+        # Translators: please don't translate "id".
         help=_(
-            "Enter configuration for the teams feature. Expects two entries: max_team_size and topics, where "
-            "topics is a list of topics."
+            'Specify the maximum team size and topics for teams inside the provided set of curly braces. '
+            'Make sure that you enclose all of the sets of topic values within a set of square brackets, '
+            'with a comma after the closing curly brace for each topic, and another comma after the '
+            'closing square brackets. '
+            'For example, to specify that teams should have a maximum of 5 participants and provide a list of '
+            '2 topics, enter the configuration in this format: {example_format}. '
+            'In "id" values, the only supported special characters are underscore, hyphen, and period.'
+        ).format(
+            # Put the sample JSON into a format variable so that translators
+            # don't muck with it.
+            example_format=(
+                '{"topics": [{"name": "Topic1Name", "description": "Topic1Description", "id": "Topic1ID"}, '
+                '{"name": "Topic2Name", "description": "Topic2Description", "id": "Topic2ID"}], "max_team_size": 5}'
+            ),
         ),
+        scope=Scope.settings,
+    )
+
+    enable_proctored_exams = Boolean(
+        display_name=_("Enable Proctored Exams"),
+        help=_(
+            "Enter true or false. If this value is true, proctored exams are enabled in your course. "
+            "Note that enabling proctored exams will also enable timed exams."
+        ),
+        default=False,
+        scope=Scope.settings
+    )
+
+    create_zendesk_tickets = Boolean(
+        display_name=_("Create Zendesk Tickets For Suspicious Proctored Exam Attempts"),
+        help=_(
+            "Enter true or false. If this value is true, a Zendesk ticket will be created for suspicious attempts."
+        ),
+        default=True,
+        scope=Scope.settings
+    )
+
+    enable_timed_exams = Boolean(
+        display_name=_("Enable Timed Exams"),
+        help=_(
+            "Enter true or false. If this value is true, timed exams are enabled in your course."
+        ),
+        default=False,
         scope=Scope.settings
     )
 
@@ -911,6 +769,69 @@ class CourseFields(object):
         ),
         default=0.8,
         scope=Scope.settings,
+    )
+
+    self_paced = Boolean(
+        display_name=_("Self Paced"),
+        help=_(
+            "Set this to \"true\" to mark this course as self-paced. Self-paced courses do not have "
+            "due dates for assignments, and students can progress through the course at any rate before "
+            "the course ends."
+        ),
+        default=False,
+        scope=Scope.settings
+    )
+
+    bypass_home = Boolean(
+        display_name=_("Bypass Course Home"),
+        help=_(
+            "Bypass the course home tab when students arrive from the dashboard, "
+            "sending them directly to course content."
+        ),
+        default=False,
+        scope=Scope.settings,
+        deprecated=True
+    )
+
+    enable_subsection_gating = Boolean(
+        display_name=_("Enable Subsection Prerequisites"),
+        help=_(
+            "Enter true or false. If this value is true, you can hide a "
+            "subsection until learners earn a minimum score in another, "
+            "prerequisite subsection."
+        ),
+        default=False,
+        scope=Scope.settings
+    )
+
+    learning_info = List(
+        display_name=_("Course Learning Information"),
+        help=_("Specify what student can learn from the course."),
+        default=[],
+        scope=Scope.settings
+    )
+
+    """
+    instructor_info dict structure:
+    {
+        "instructors": [
+            {
+                "name": "",
+                "title": "",
+                "organization": "",
+                "image": "",
+                "bio": ""
+            }
+        ]
+    }
+    """
+    instructor_info = Dict(
+        display_name=_("Course Instructor"),
+        help=_("Enter the details for Course Instructor"),
+        default={
+            "instructors": []
+        },
+        scope=Scope.settings
     )
 
 
@@ -928,12 +849,16 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
     """
     module_class = CourseModule
 
+    resources_dir = None
+
     def __init__(self, *args, **kwargs):
         """
         Expects the same arguments as XModuleDescriptor.__init__
         """
         super(CourseDescriptor, self).__init__(*args, **kwargs)
         _ = self.runtime.service(self, "i18n").ugettext
+
+        self._gating_prerequisites = None
 
         if self.wiki_slug is None:
             self.wiki_slug = self.location.course
@@ -944,7 +869,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
             # Then remove show_timezone so that if the user clears out the due_date_display_format,
             # they get the default date display.
             self.due_date_display_format = "DATE_TIME"
-            delattr(self, 'show_timezone')
+            del self.show_timezone
 
         # NOTE: relies on the modulestore to call set_grading_policy() right after
         # init.  (Modulestore is in charge of figuring out where to load the policy from)
@@ -962,8 +887,11 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         if self.discussion_topics == {}:
             self.discussion_topics = {_('General'): {'id': self.location.html_id()}}
 
-        if not getattr(self, "tabs", []):
-            CourseTabList.initialize_default(self)
+        try:
+            if not getattr(self, "tabs", []):
+                CourseTabList.initialize_default(self)
+        except InvalidTabsException as err:
+            raise type(err)('{msg} For course: {course_id}'.format(msg=err.message, course_id=unicode(self.id)))
 
     def set_grading_policy(self, course_policy):
         """
@@ -1005,7 +933,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
                     policy_str = grading_policy_file.read()
                     # if we successfully read the file, stop looking at backups
                     break
-            except (IOError):
+            except IOError:
                 msg = "Unable to load course settings file from '{0}'".format(policy_path)
                 log.warning(msg)
 
@@ -1228,7 +1156,9 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         flag = self.is_new
         if flag is None:
             # Use a heuristic if the course has not been flagged
-            announcement, start, now = self._sorting_dates()
+            announcement, start, now = course_metadata_utils.sorting_dates(
+                self.start, self.advertised_start, self.announcement
+            )
             if announcement and (now - announcement).days < 30:
                 # The course has been announced for less that month
                 return True
@@ -1248,105 +1178,11 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         Returns a tuple that can be used to sort the courses according
         the how "new" they are. The "newness" score is computed using a
         heuristic that takes into account the announcement and
-        (advertized) start dates of the course if available.
+        (advertised) start dates of the course if available.
 
         The lower the number the "newer" the course.
         """
-        # Make courses that have an announcement date shave a lower
-        # score than courses than don't, older courses should have a
-        # higher score.
-        announcement, start, now = self._sorting_dates()
-        scale = 300.0  # about a year
-        if announcement:
-            days = (now - announcement).days
-            score = -exp(-days / scale)
-        else:
-            days = (now - start).days
-            score = exp(days / scale)
-        return score
-
-    def _sorting_dates(self):
-        # utility function to get datetime objects for dates used to
-        # compute the is_new flag and the sorting_score
-
-        announcement = self.announcement
-        if announcement is not None:
-            announcement = announcement
-
-        try:
-            start = dateutil.parser.parse(self.advertised_start)
-            if start.tzinfo is None:
-                start = start.replace(tzinfo=UTC())
-        except (ValueError, AttributeError):
-            start = self.start
-
-        now = datetime.now(UTC())
-
-        return announcement, start, now
-
-    @lazy
-    def grading_context(self):
-        """
-        This returns a dictionary with keys necessary for quickly grading
-        a student. They are used by grades.grade()
-
-        The grading context has two keys:
-        graded_sections - This contains the sections that are graded, as
-            well as all possible children modules that can affect the
-            grading. This allows some sections to be skipped if the student
-            hasn't seen any part of it.
-
-            The format is a dictionary keyed by section-type. The values are
-            arrays of dictionaries containing
-                "section_descriptor" : The section descriptor
-                "xmoduledescriptors" : An array of xmoduledescriptors that
-                    could possibly be in the section, for any student
-
-        all_descriptors - This contains a list of all xmodules that can
-            effect grading a student. This is used to efficiently fetch
-            all the xmodule state for a FieldDataCache without walking
-            the descriptor tree again.
-
-
-        """
-        # If this descriptor has been bound to a student, return the corresponding
-        # XModule. If not, just use the descriptor itself
-        try:
-            module = getattr(self, '_xmodule', None)
-            if not module:
-                module = self
-        except UndefinedContext:
-            module = self
-
-        all_descriptors = []
-        graded_sections = {}
-
-        def yield_descriptor_descendents(module_descriptor):
-            for child in module_descriptor.get_children():
-                yield child
-                for module_descriptor in yield_descriptor_descendents(child):
-                    yield module_descriptor
-
-        for chapter in self.get_children():
-            for section in chapter.get_children():
-                if hasattr(section, 'graded') and section.graded:
-                    xmoduledescriptors = list(yield_descriptor_descendents(section))
-                    xmoduledescriptors.append(section)
-
-                    # The xmoduledescriptors included here are only the ones that have scores.
-                    section_description = {
-                        'section_descriptor': section,
-                        'xmoduledescriptors': [child for child in xmoduledescriptors if child.has_score]
-                    }
-
-                    section_format = section.format if section.format is not None else ''
-                    graded_sections[section_format] = graded_sections.get(section_format, []) + [section_description]
-
-                    all_descriptors.extend(xmoduledescriptors)
-                    all_descriptors.append(section)
-
-        return {'graded_sections': graded_sections,
-                'all_descriptors': all_descriptors, }
+        return course_metadata_utils.sorting_score(self.start, self.advertised_start, self.announcement)
 
     @staticmethod
     def make_id(org, course, url_name):
@@ -1357,16 +1193,17 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         """Return the course_id for this course"""
         return self.location.course_key
 
-    def start_datetime_text(self, format_string="SHORT_DATE"):
+    def start_datetime_text(self, format_string="SHORT_DATE", time_zone=utc):
         """
-        Returns the desired text corresponding the course's start date and time in UTC.  Prefers .advertised_start,
-        then falls back to .start
+        Returns the desired text corresponding the course's start date and time in specified time zone, defaulted
+        to UTC. Prefers .advertised_start, then falls back to .start
         """
         i18n = self.runtime.service(self, "i18n")
         return course_metadata_utils.course_start_datetime_text(
             self.start,
             self.advertised_start,
             format_string,
+            time_zone,
             i18n.ugettext,
             i18n.strftime
         )
@@ -1382,13 +1219,14 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
             self.advertised_start
         )
 
-    def end_datetime_text(self, format_string="SHORT_DATE"):
+    def end_datetime_text(self, format_string="SHORT_DATE", time_zone=utc):
         """
         Returns the end date or date_time for the course formatted as a string.
         """
         return course_metadata_utils.course_end_datetime_text(
             self.end,
             format_string,
+            time_zone,
             self.runtime.service(self, "i18n").strftime
         )
 
@@ -1409,7 +1247,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
                     raise ValueError
             return ret
         except (TypeError, ValueError):
-            log.exception(
+            log.info(
                 "Error parsing discussion_blackouts %s for course %s",
                 self.discussion_blackouts,
                 self.id
@@ -1423,7 +1261,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         setting
         """
         blackouts = self.get_discussion_blackout_datetimes()
-        now = datetime.now(UTC())
+        now = datetime.now(utc)
         for blackout in blackouts:
             if blackout["start"] <= now <= blackout["end"]:
                 return False
@@ -1506,3 +1344,102 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         Returns the topics that have been configured for teams for this course, else None.
         """
         return self.teams_configuration.get('topics', None)
+
+    def get_user_partitions_for_scheme(self, scheme):
+        """
+        Retrieve all user partitions defined in the course for a particular
+        partition scheme.
+
+        Arguments:
+            scheme (object): The user partition scheme.
+
+        Returns:
+            list of `UserPartition`
+
+        """
+        return [
+            p for p in self.user_partitions
+            if p.scheme == scheme
+        ]
+
+    def set_user_partitions_for_scheme(self, partitions, scheme):
+        """
+        Set the user partitions for a particular scheme.
+
+        Preserves partitions associated with other schemes.
+
+        Arguments:
+            scheme (object): The user partition scheme.
+
+        Returns:
+            list of `UserPartition`
+
+        """
+        other_partitions = [
+            p for p in self.user_partitions  # pylint: disable=access-member-before-definition
+            if p.scheme != scheme
+        ]
+        self.user_partitions = other_partitions + partitions  # pylint: disable=attribute-defined-outside-init
+
+    @property
+    def can_toggle_course_pacing(self):
+        """
+        Whether or not the course can be set to self-paced at this time.
+
+        Returns:
+          bool: False if the course has already started, True otherwise.
+        """
+        return datetime.now(utc) <= self.start
+
+
+class CourseSummary(object):
+    """
+    A lightweight course summary class, which constructs split/mongo course summary without loading
+    the course. It is used at cms for listing courses to global staff user.
+    """
+    course_info_fields = ['display_name', 'display_coursenumber', 'display_organization']
+
+    def __init__(self, course_locator, display_name=u"Empty", display_coursenumber=None, display_organization=None):
+        """
+        Initialize and construct course summary
+
+        Arguments:
+        course_locator (CourseLocator):  CourseLocator object of the course.
+
+        display_name (unicode): display name of the course. When you create a course from console, display_name
+        isn't set (course block has no key `display_name`). "Empty" name is returned when we load the course.
+        If `display_name` isn't present in the course block, use the `Empty` as default display name.
+        We can set None as a display_name in Course Advance Settings; Do not use "Empty" when display_name is
+        set to None.
+
+        display_coursenumber (unicode|None): Course number that is specified & appears in the courseware
+
+        display_organization (unicode|None): Course organization that is specified & appears in the courseware
+
+        """
+        self.display_coursenumber = display_coursenumber
+        self.display_organization = display_organization
+        self.display_name = display_name
+
+        self.id = course_locator  # pylint: disable=invalid-name
+        self.location = course_locator.make_usage_key('course', 'course')
+
+    @property
+    def display_org_with_default(self):
+        """
+        Return a display organization if it has been specified, otherwise return the 'org' that
+        is in the location
+        """
+        if self.display_organization:
+            return self.display_organization
+        return self.location.org
+
+    @property
+    def display_number_with_default(self):
+        """
+        Return a display course number if it has been specified, otherwise return the 'course' that
+        is in the location
+        """
+        if self.display_coursenumber:
+            return self.display_coursenumber
+        return self.location.course

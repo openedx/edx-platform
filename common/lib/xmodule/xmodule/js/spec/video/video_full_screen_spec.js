@@ -6,7 +6,7 @@
         beforeEach(function () {
             oldOTBD = window.onTouchBasedDevice;
             window.onTouchBasedDevice = jasmine
-                .createSpy('onTouchBasedDevice').andReturn(null);
+                .createSpy('onTouchBasedDevice').and.returnValue(null);
         });
 
         afterEach(function () {
@@ -30,8 +30,6 @@
                 var fullScreenControl = $('.add-fullscreen');
 
                 expect(fullScreenControl).toHaveAttrs({
-                    'role': 'button',
-                    'title': 'Fill browser',
                     'aria-disabled': 'false'
                 });
             });
@@ -53,14 +51,10 @@
                 var fullScreenControl = $('.add-fullscreen');
                 fullScreenControl.click();
                 expect(fullScreenControl).toHaveAttrs({
-                    'role': 'button',
-                    'title': 'Exit full browser',
                     'aria-disabled': 'false'
                 });
                 fullScreenControl.click();
                 expect(fullScreenControl).toHaveAttrs({
-                    'role': 'button',
-                    'title': 'Fill browser',
                     'aria-disabled': 'false'
                 });
             });
@@ -89,7 +83,7 @@
         });
 
         it('Controls height is actual on switch to fullscreen', function () {
-            spyOn($.fn, 'height').andCallFake(function (val) {
+            spyOn($.fn, 'height').and.callFake(function (val) {
                 return _.isUndefined(val) ? 100: this;
             });
 

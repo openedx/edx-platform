@@ -227,6 +227,17 @@ class StaticPdfBookTest(StaticBookTest):
         self.assertContains(response, 'file=/static/awesomesauce/{}'.format(
             PORTABLE_PDF_BOOK['chapters'][0]['url'].replace('/static/', '')))
 
+    def test_invalid_chapter_id(self):
+        """
+        Test that 1st chapter is displayed to the user when an invalid chapter id is provided
+        """
+        self.make_course(pdf_textbooks=[PDF_BOOK])
+        invalid_chapter = len(PDF_BOOK['chapters']) + 1
+        url = self.make_url('pdf_book', book_index=0, chapter=invalid_chapter)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Chapter 1 for PDF")
+
 
 class StaticHtmlBookTest(StaticBookTest):
     """

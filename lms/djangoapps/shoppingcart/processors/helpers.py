@@ -4,13 +4,13 @@ These methods should be shared among all processor implementations,
 but should NOT be imported by modules outside this package.
 """
 from django.conf import settings
-from microsite_configuration import microsite
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
 def get_processor_config():
     """
     Return a dictionary of configuration settings for the active credit card processor.
-    If we're in a microsite and overrides are available, return those instead.
+    If configuration overrides are available, return those instead.
 
     Returns:
         dict
@@ -21,10 +21,10 @@ def get_processor_config():
         settings.CC_PROCESSOR_NAME, {}
     )
 
-    # Check whether we're in a microsite that overrides our configuration
-    # If so, find the microsite-specific configuration in the 'microsites'
+    # Check whether configuration override exists,
+    # If so, find the configuration-specific cybersource config in the configurations.
     # sub-key of the normal processor configuration.
-    config_key = microsite.get_value('cybersource_config_key')
+    config_key = configuration_helpers.get_value('cybersource_config_key')
     if config_key:
         config = config['microsites'][config_key]
 

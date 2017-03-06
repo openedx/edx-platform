@@ -7,11 +7,12 @@ import re
 from uuid import uuid4
 from datetime import datetime
 from copy import deepcopy
+from math import ceil
+from urllib import urlencode
 
 from .http import StubHttpRequestHandler, StubHttpService
 
 
-# pylint: disable=invalid-name
 class StubEdxNotesServiceHandler(StubHttpRequestHandler):
     """
     Handler for EdxNotes requests.
@@ -165,7 +166,7 @@ class StubEdxNotesServiceHandler(StubHttpRequestHandler):
         """
         Return the note by note id.
         """
-        notes = self.server.get_notes()
+        notes = self.server.get_all_notes()
         result = self.server.filter_by_id(notes, note_id)
         if result:
             self.respond(content=result[0])
@@ -191,6 +192,53 @@ class StubEdxNotesServiceHandler(StubHttpRequestHandler):
         else:
             self.respond(404, "404 Not Found")
 
+    @staticmethod
+    def _get_next_prev_url(url_path, query_params, page_num, page_size):
+        """
+        makes url with the query params including pagination params
+        for pagination next and previous urls
+        """
+        query_params = deepcopy(query_params)
+        query_params.update({
+            "page": page_num,
+            "page_size": page_size
+        })
+        return url_path + "?" + urlencode(query_params)
+
+    def _get_paginated_response(self, notes, page_num, page_size):
+        """
+        Returns a paginated response of notes.
+        """
+        start = (page_num - 1) * page_size
+        end = start + page_size
+        total_notes = len(notes)
+        url_path = "http://{server_address}:{port}{path}".format(
+            server_address=self.client_address[0],
+            port=self.server.port,
+            path=self.path_only
+        )
+
+        next_url = None if end >= total_notes else self._get_next_prev_url(
+            url_path, self.get_params, page_num + 1, page_size
+        )
+        prev_url = None if page_num == 1 else self._get_next_prev_url(
+            url_path, self.get_params, page_num - 1, page_size)
+
+        # Get notes from range
+        notes = deepcopy(notes[start:end])
+
+        paginated_response = {
+            'total': total_notes,
+            'num_pages': int(ceil(float(total_notes) / page_size)),
+            'current_page': page_num,
+            'rows': notes,
+            'next': next_url,
+            'start': start,
+            'previous': prev_url
+        }
+
+        return paginated_response
+
     def _search(self):
         """
         Search for a notes by user id, course_id and usage_id.
@@ -199,32 +247,35 @@ class StubEdxNotesServiceHandler(StubHttpRequestHandler):
         usage_id = self.get_params.get("usage_id", None)
         course_id = self.get_params.get("course_id", None)
         text = self.get_params.get("text", None)
+        page = int(self.get_params.get("page", 1))
+        page_size = int(self.get_params.get("page_size", 2))
 
         if user is None:
             self.respond(400, "Bad Request")
             return
 
-        notes = self.server.get_notes()
+        notes = self.server.get_all_notes()
         if course_id is not None:
             notes = self.server.filter_by_course_id(notes, course_id)
         if usage_id is not None:
             notes = self.server.filter_by_usage_id(notes, usage_id)
         if text:
             notes = self.server.search(notes, text)
-        self.respond(content={
-            "total": len(notes),
-            "rows": notes,
-        })
+        self.respond(content=self._get_paginated_response(notes, page, page_size))
 
     def _collection(self):
         """
         Return all notes for the user.
         """
         user = self.get_params.get("user", None)
+        page = int(self.get_params.get("page", 1))
+        page_size = int(self.get_params.get("page_size", 2))
+        notes = self.server.get_all_notes()
+
         if user is None:
             self.send_response(400, content="Bad Request")
             return
-        notes = self.server.get_notes()
+        notes = self._get_paginated_response(notes, page, page_size)
         self.respond(content=notes)
 
     def _cleanup(self):
@@ -245,9 +296,9 @@ class StubEdxNotesService(StubHttpService):
         super(StubEdxNotesService, self).__init__(*args, **kwargs)
         self.notes = list()
 
-    def get_notes(self):
+    def get_all_notes(self):
         """
-        Returns a list of all notes.
+        Returns a list of all notes without pagination
         """
         notes = deepcopy(self.notes)
         notes.reverse()

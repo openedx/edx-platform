@@ -8,8 +8,8 @@ $(document).ajaxError(function (event, jXHR) {
         );
 
         if (window.confirm(message)) {
-            var currentLocation = window.location.href;
-            window.location.href = '/login?next=' + currentLocation;
+            var currentLocation = window.location.pathname;
+            window.location.href = '/login?next=' + encodeURIComponent(currentLocation);
         };
     }
 });

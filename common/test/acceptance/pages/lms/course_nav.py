@@ -3,7 +3,7 @@ Course navigation page object
 """
 
 import re
-from bok_choy.page_object import PageObject
+from bok_choy.page_object import PageObject, unguarded
 from bok_choy.promise import EmptyPromise
 
 
@@ -57,7 +57,7 @@ class CourseNavPage(PageObject):
         Example return value:
             ['Chemical Bonds Video', 'Practice Problems', 'Homework']
         """
-        seq_css = 'ol#sequence-list>li>a>p'
+        seq_css = 'ol#sequence-list>li>.nav-item>.sequence-tooltip'
         return self.q(css=seq_css).map(self._clean_seq_titles).results
 
     def go_to_section(self, section_title, subsection_title):
@@ -82,7 +82,7 @@ class CourseNavPage(PageObject):
 
         # Click the section to ensure it's open (no harm in clicking twice if it's already open)
         # Add one to convert from list index to CSS index
-        section_css = 'nav>div.chapter:nth-of-type({0})>h3>a'.format(sec_index + 1)
+        section_css = '.course-navigation .chapter:nth-of-type({0})'.format(sec_index + 1)
         self.q(css=section_css).first.click()
 
         # Get the subsection by index
@@ -94,28 +94,29 @@ class CourseNavPage(PageObject):
             return
 
         # Convert list indices (start at zero) to CSS indices (start at 1)
-        subsection_css = "nav>div.chapter:nth-of-type({0})>ul>li:nth-of-type({1})>a".format(
-            sec_index + 1, subsec_index + 1
-        )
+        subsection_css = (
+            ".course-navigation .chapter-content-container:nth-of-type({0}) "
+            ".menu-item:nth-of-type({1})"
+        ).format(sec_index + 1, subsec_index + 1)
 
         # Click the subsection and ensure that the page finishes reloading
         self.q(css=subsection_css).first.click()
         self._on_section_promise(section_title, subsection_title).fulfill()
 
-    def go_to_sequential(self, sequential_title):
+    def go_to_vertical(self, vertical_title):
         """
-        Within a section/subsection, navigate to the sequential with `sequential_title`.
+        Within a section/subsection, navigate to the vertical with `vertical_title`.
         """
 
         # Get the index of the item in the sequence
         all_items = self.sequence_items
 
         try:
-            seq_index = all_items.index(sequential_title)
+            seq_index = all_items.index(vertical_title)
 
         except ValueError:
             msg = "Could not find sequential '{0}'.  Available sequentials: [{1}]".format(
-                sequential_title, ", ".join(all_items)
+                vertical_title, ", ".join(all_items)
             )
             self.warning(msg)
 
@@ -123,14 +124,16 @@ class CourseNavPage(PageObject):
 
             # Click on the sequence item at the correct index
             # Convert the list index (starts at 0) to a CSS index (starts at 1)
-            seq_css = "ol#sequence-list>li:nth-of-type({0})>a".format(seq_index + 1)
+            seq_css = "ol#sequence-list>li:nth-of-type({0})>.nav-item".format(seq_index + 1)
             self.q(css=seq_css).first.click()
+            # Click triggers an ajax event
+            self.wait_for_ajax()
 
     def _section_titles(self):
         """
         Return a list of all section titles on the page.
         """
-        chapter_css = 'nav > div.chapter > h3 > a'
+        chapter_css = '.course-navigation .chapter .group-heading'
         return self.q(css=chapter_css).map(lambda el: el.text.strip()).results
 
     def _subsection_titles(self, section_index):
@@ -140,7 +143,10 @@ class CourseNavPage(PageObject):
         """
         # Retrieve the subsection title for the section
         # Add one to the list index to get the CSS index, which starts at one
-        subsection_css = 'nav>div.chapter:nth-of-type({0})>ul>li>a>p:nth-of-type(1)'.format(section_index)
+        subsection_css = (
+            ".course-navigation .chapter-content-container:nth-of-type({0}) "
+            ".menu-item a p:nth-of-type(1)"
+        ).format(section_index)
 
         # If the element is visible, we can get its text directly
         # Otherwise, we need to get the HTML
@@ -159,10 +165,11 @@ class CourseNavPage(PageObject):
         """
         desc = "currently at section '{0}' and subsection '{1}'".format(section_title, subsection_title)
         return EmptyPromise(
-            lambda: self._is_on_section(section_title, subsection_title), desc
+            lambda: self.is_on_section(section_title, subsection_title), desc
         )
 
-    def _is_on_section(self, section_title, subsection_title):
+    @unguarded
+    def is_on_section(self, section_title, subsection_title):
         """
         Return a boolean indicating whether the user is on the section and subsection
         with the specified titles.
@@ -171,8 +178,8 @@ class CourseNavPage(PageObject):
         That's true right after we click the section/subsection, but not true in general
         (the user could go to a section, then expand another tab).
         """
-        current_section_list = self.q(css='nav>div.chapter.is-open>h3>a').text
-        current_subsection_list = self.q(css='nav>div.chapter.is-open li.active>a>p').text
+        current_section_list = self.q(css='.course-navigation .chapter.is-open .group-heading').text
+        current_subsection_list = self.q(css='.course-navigation .chapter-content-container .menu-item.active a p').text
 
         if len(current_section_list) == 0:
             self.warning("Could not find the current section")
@@ -189,21 +196,17 @@ class CourseNavPage(PageObject):
             )
 
     # Regular expression to remove HTML span tags from a string
-    REMOVE_SPAN_TAG_RE = re.compile(r'<span.+/span>')
+    REMOVE_SPAN_TAG_RE = re.compile(r'</span>(.+)<span')
 
     def _clean_seq_titles(self, element):
         """
         Clean HTML of sequence titles, stripping out span tags and returning the first line.
         """
-        return self.REMOVE_SPAN_TAG_RE.sub('', element.get_attribute('innerHTML')).strip().split('\n')[0]
+        return self.REMOVE_SPAN_TAG_RE.search(element.get_attribute('innerHTML')).groups()[0].strip()
 
-    def go_to_sequential_position(self, sequential_position):
+    @property
+    def active_subsection_url(self):
         """
-        Within a section/subsection navigate to the sequential position specified by `sequential_position`.
-
-        Arguments:
-            sequential_position (int): position in sequential bar
-
+        return the url of the active subsection in the left nav
         """
-        sequential_position_css = '#tab_{0}'.format(sequential_position - 1)
-        self.q(css=sequential_position_css).first.click()
+        return self.q(css='.chapter-content-container .menu-item.active a').attrs('href')[0]

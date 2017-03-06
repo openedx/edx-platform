@@ -6,9 +6,8 @@ from mock import Mock, patch
 from nose.plugins.attrib import attr
 from functools import partial
 
-from courseware.model_data import DjangoKeyValueStore
-from courseware.model_data import InvalidScopeError, FieldDataCache
-from courseware.models import StudentModule
+from courseware.model_data import DjangoKeyValueStore, FieldDataCache, InvalidScopeError
+from courseware.models import StudentModule, XModuleUserStateSummaryField
 from courseware.models import XModuleStudentInfoField, XModuleStudentPrefsField
 
 from student.tests.factories import UserFactory
@@ -104,6 +103,8 @@ class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
     """Tests for user_state storage via StudentModule"""
     other_key_factory = partial(DjangoKeyValueStore.Key, Scope.user_state, 2, location('usage_id'))  # user_id=2, not 1
     existing_field_name = "a_field"
+    # Tell Django to clean out all databases, not just default
+    multi_db = True
 
     def setUp(self):
         super(TestStudentModuleStorage, self).setUp()
@@ -138,8 +139,9 @@ class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
         # to discover if something other than the DjangoXBlockUserStateClient
         # has written to the StudentModule (such as UserStateCache setting the score
         # on the StudentModule).
-        with self.assertNumQueries(3):
-            self.kvs.set(user_state_key('a_field'), 'new_value')
+        with self.assertNumQueries(2, using='default'):
+            with self.assertNumQueries(1, using='student_module_history'):
+                self.kvs.set(user_state_key('a_field'), 'new_value')
         self.assertEquals(1, StudentModule.objects.all().count())
         self.assertEquals({'b_field': 'b_value', 'a_field': 'new_value'}, json.loads(StudentModule.objects.all()[0].state))
 
@@ -150,8 +152,9 @@ class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
         # to discover if something other than the DjangoXBlockUserStateClient
         # has written to the StudentModule (such as UserStateCache setting the score
         # on the StudentModule).
-        with self.assertNumQueries(3):
-            self.kvs.set(user_state_key('not_a_field'), 'new_value')
+        with self.assertNumQueries(2, using='default'):
+            with self.assertNumQueries(1, using='student_module_history'):
+                self.kvs.set(user_state_key('not_a_field'), 'new_value')
         self.assertEquals(1, StudentModule.objects.all().count())
         self.assertEquals({'b_field': 'b_value', 'a_field': 'a_value', 'not_a_field': 'new_value'}, json.loads(StudentModule.objects.all()[0].state))
 
@@ -162,8 +165,9 @@ class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
         # to discover if something other than the DjangoXBlockUserStateClient
         # has written to the StudentModule (such as UserStateCache setting the score
         # on the StudentModule).
-        with self.assertNumQueries(3):
-            self.kvs.delete(user_state_key('a_field'))
+        with self.assertNumQueries(2, using='default'):
+            with self.assertNumQueries(1, using='student_module_history'):
+                self.kvs.delete(user_state_key('a_field'))
         self.assertEquals(1, StudentModule.objects.all().count())
         self.assertRaises(KeyError, self.kvs.get, user_state_key('not_a_field'))
 
@@ -202,8 +206,9 @@ class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
         # We also need to read the database to discover if something other than the
         # DjangoXBlockUserStateClient has written to the StudentModule (such as
         # UserStateCache setting the score on the StudentModule).
-        with self.assertNumQueries(3):
-            self.kvs.set_many(kv_dict)
+        with self.assertNumQueries(2, using="default"):
+            with self.assertNumQueries(1, using="student_module_history"):
+                self.kvs.set_many(kv_dict)
 
         for key in kv_dict:
             self.assertEquals(self.kvs.get(key), kv_dict[key])
@@ -224,6 +229,9 @@ class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
 
 @attr('shard_1')
 class TestMissingStudentModule(TestCase):
+    # Tell Django to clean out all databases, not just default
+    multi_db = True
+
     def setUp(self):
         super(TestMissingStudentModule, self).setUp()
 
@@ -245,13 +253,15 @@ class TestMissingStudentModule(TestCase):
         self.assertEquals(0, len(self.field_data_cache))
         self.assertEquals(0, StudentModule.objects.all().count())
 
-        # We are updating a problem, so we write to courseware_studentmodulehistory
+        # We are updating a problem, so we write to courseware_studentmodulehistoryextended
         # as well as courseware_studentmodule. We also need to read the database
         # to discover if something other than the DjangoXBlockUserStateClient
         # has written to the StudentModule (such as UserStateCache setting the score
         # on the StudentModule).
-        with self.assertNumQueries(3):
-            self.kvs.set(user_state_key('a_field'), 'a_value')
+        # Django 1.8 also has a number of other BEGIN and SAVESTATE queries.
+        with self.assertNumQueries(4, using='default'):
+            with self.assertNumQueries(1, using='student_module_history'):
+                self.kvs.set(user_state_key('a_field'), 'a_value')
 
         self.assertEquals(1, sum(len(cache) for cache in self.field_data_cache.cache.values()))
         self.assertEquals(1, StudentModule.objects.all().count())
@@ -395,7 +405,7 @@ class TestUserStateSummaryStorage(StorageTestBase, TestCase):
     factory = UserStateSummaryFactory
     scope = Scope.user_state_summary
     key_factory = user_state_summary_key
-    storage_class = factory.FACTORY_FOR
+    storage_class = XModuleUserStateSummaryField
 
 
 class TestStudentPrefsStorage(OtherUserFailureTestMixin, StorageTestBase, TestCase):

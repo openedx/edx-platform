@@ -37,7 +37,7 @@ from edxmako.shortcuts import render_to_string
 from shoppingcart.models import Order
 from shoppingcart.processors.exceptions import *
 from shoppingcart.processors.helpers import get_processor_config
-from microsite_configuration import microsite
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 log = logging.getLogger(__name__)
 
@@ -357,7 +357,7 @@ def _payment_accepted(order_id, auth_amount, currency, decision):
         raise CCProcessorDataException(_("The payment processor accepted an order whose number is not in our system."))
 
     if decision == 'ACCEPT':
-        if auth_amount == order.total_cost and currency == order.currency:
+        if auth_amount == order.total_cost and currency.lower() == order.currency.lower():
             return {
                 'accepted': True,
                 'amt_charged': auth_amount,
@@ -377,7 +377,6 @@ def _payment_accepted(order_id, auth_amount, currency, decision):
                 )
             )
 
-            #pylint: disable=attribute-defined-outside-init
             ex.order = order
             raise ex
     else:
@@ -462,7 +461,7 @@ def _get_processor_decline_html(params):
         unicode: The rendered HTML.
 
     """
-    payment_support_email = microsite.get_value('payment_support_email', settings.PAYMENT_SUPPORT_EMAIL)
+    payment_support_email = configuration_helpers.get_value('payment_support_email', settings.PAYMENT_SUPPORT_EMAIL)
     return _format_error_html(
         _(
             "Sorry! Our payment processor did not accept your payment.  "
@@ -492,7 +491,7 @@ def _get_processor_exception_html(exception):
         unicode: The rendered HTML.
 
     """
-    payment_support_email = microsite.get_value('payment_support_email', settings.PAYMENT_SUPPORT_EMAIL)
+    payment_support_email = configuration_helpers.get_value('payment_support_email', settings.PAYMENT_SUPPORT_EMAIL)
     if isinstance(exception, CCProcessorDataException):
         return _format_error_html(
             _(

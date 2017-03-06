@@ -25,10 +25,11 @@ define('video/09_play_pause_control.js', [], function() {
 
     PlayPauseControl.prototype = {
         template: [
-            '<a class="video_control play" href="#" title="',
-                gettext('Play'), '" role="button" aria-disabled="false">',
+            '<button class="control video_control play" aria-disabled="false" title="',
                 gettext('Play'),
-            '</a>'
+            '">',
+                '<span class="icon fa fa-play" aria-hidden="true"></span>',
+            '</button>'
         ].join(''),
 
         destroy: function () {
@@ -71,14 +72,22 @@ define('video/09_play_pause_control.js', [], function() {
 
         play: function () {
             this.el
-                .attr('title', this.i18n['Pause']).text(this.i18n['Pause'])
-                .removeClass('play').addClass('pause');
+                .addClass('pause')
+                .removeClass('play')
+                .attr('title', gettext('Pause'))
+                .find('.icon')
+                    .removeClass('fa-play')
+                    .addClass('fa-pause');
         },
 
         pause: function () {
             this.el
-                .attr('title', this.i18n['Play']).text(this.i18n['Play'])
-                .removeClass('pause').addClass('play');
+                .removeClass('pause')
+                .addClass('play')
+                .attr('title', gettext('Play'))
+                .find('.icon')
+                    .removeClass('fa-pause')
+                    .addClass('fa-play');
         }
     };
 

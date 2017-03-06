@@ -1,27 +1,29 @@
-'''
-django admin pages for courseware model
-'''
+""" Django admin pages for student app """
 from django import forms
-from config_models.admin import ConfigurationModelAdmin
-from django.contrib.auth.models import User
-
-from student.models import UserProfile, UserTestGroup, CourseEnrollmentAllowed, DashboardConfiguration
-from student.models import (
-    CourseEnrollment, Registration, PendingNameChange, CourseAccessRole, LinkedInAddToProfileConfiguration
-)
+from django.contrib.auth import get_user_model
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.utils.translation import ugettext_lazy as _
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
 from ratelimitbackend import admin
-from student.roles import REGISTERED_ACCESS_ROLES
-
 from xmodule.modulestore.django import modulestore
 
-from opaque_keys.edx.keys import CourseKey
-from opaque_keys import InvalidKeyError
+from config_models.admin import ConfigurationModelAdmin
+from student.models import (
+    UserProfile, UserTestGroup, CourseEnrollmentAllowed, DashboardConfiguration, CourseEnrollment, Registration,
+    PendingNameChange, CourseAccessRole, LinkedInAddToProfileConfiguration, UserAttribute, LogoutViewConfiguration
+)
+from student.roles import REGISTERED_ACCESS_ROLES
+
+User = get_user_model()  # pylint:disable=invalid-name
 
 
 class CourseAccessRoleForm(forms.ModelForm):
     """Form for adding new Course Access Roles view the Django Admin Panel."""
-    class Meta:
+
+    class Meta(object):
         model = CourseAccessRole
+        fields = '__all__'
 
     email = forms.EmailField(required=True)
     COURSE_ACCESS_ROLES = [(role_name, role_name) for role_name in REGISTERED_ACCESS_ROLES.keys()]
@@ -95,7 +97,13 @@ class CourseAccessRoleForm(forms.ModelForm):
 
         return cleaned_data
 
+    def __init__(self, *args, **kwargs):
+        super(CourseAccessRoleForm, self).__init__(*args, **kwargs)
+        if self.instance.user_id:
+            self.fields['email'].initial = self.instance.user.email
 
+
+@admin.register(CourseAccessRole)
 class CourseAccessRoleAdmin(admin.ModelAdmin):
     """Admin panel for the Course Access Role. """
     form = CourseAccessRoleForm
@@ -120,30 +128,63 @@ class CourseAccessRoleAdmin(admin.ModelAdmin):
         super(CourseAccessRoleAdmin, self).save_model(request, obj, form, change)
 
 
+@admin.register(LinkedInAddToProfileConfiguration)
 class LinkedInAddToProfileConfigurationAdmin(admin.ModelAdmin):
     """Admin interface for the LinkedIn Add to Profile configuration. """
 
-    class Meta:
+    class Meta(object):
         model = LinkedInAddToProfileConfiguration
 
     # Exclude deprecated fields
     exclude = ('dashboard_tracking_code',)
 
 
-admin.site.register(UserProfile)
+@admin.register(CourseEnrollment)
+class CourseEnrollmentAdmin(admin.ModelAdmin):
+    """ Admin interface for the CourseEnrollment model. """
+    list_display = ('id', 'course_id', 'mode', 'user', 'is_active',)
+    list_filter = ('mode', 'is_active',)
+    raw_id_fields = ('user',)
+    search_fields = ('course_id', 'mode', 'user__username',)
+
+    def queryset(self, request):
+        return super(CourseEnrollmentAdmin, self).queryset(request).select_related('user')
+
+    class Meta(object):
+        model = CourseEnrollment
+
+
+class UserProfileInline(admin.StackedInline):
+    """ Inline admin interface for UserProfile model. """
+    model = UserProfile
+    can_delete = False
+    verbose_name_plural = _('User profile')
+
+
+class UserAdmin(BaseUserAdmin):
+    """ Admin interface for the User model. """
+    inlines = (UserProfileInline,)
+
+
+@admin.register(UserAttribute)
+class UserAttributeAdmin(admin.ModelAdmin):
+    """ Admin interface for the UserAttribute model. """
+    list_display = ('user', 'name', 'value',)
+    list_filter = ('name',)
+    raw_id_fields = ('user',)
+    search_fields = ('name', 'value', 'user__username',)
+
+    class Meta(object):
+        model = UserAttribute
+
 
 admin.site.register(UserTestGroup)
-
-admin.site.register(CourseEnrollment)
-
 admin.site.register(CourseEnrollmentAllowed)
-
 admin.site.register(Registration)
-
 admin.site.register(PendingNameChange)
-
-admin.site.register(CourseAccessRole, CourseAccessRoleAdmin)
-
 admin.site.register(DashboardConfiguration, ConfigurationModelAdmin)
+admin.site.register(LogoutViewConfiguration, ConfigurationModelAdmin)
 
-admin.site.register(LinkedInAddToProfileConfiguration, LinkedInAddToProfileConfigurationAdmin)
+
+# We must first un-register the User model since it may also be registered by the auth app.
+admin.site.register(User, UserAdmin)

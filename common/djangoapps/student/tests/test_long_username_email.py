@@ -38,11 +38,14 @@ class TestLongUsernameEmail(TestCase):
 
     def test_long_email(self):
         """
-        Test email cannot be more than 75 characters long.
+        Test email cannot be more than 254 characters long.
         """
 
-        self.url_params['email'] = '{0}@bar.com'.format('foo_bar' * 15)
+        self.url_params['email'] = '{email}@bar.com'.format(email='foo_bar' * 36)
         response = self.client.post(self.url, self.url_params)
+
+        # Assert that we get error when email has more than 254 characters.
+        self.assertGreater(len(self.url_params['email']), 254)
 
         # Status code should be 400.
         self.assertEqual(response.status_code, 400)
@@ -50,5 +53,5 @@ class TestLongUsernameEmail(TestCase):
         obj = json.loads(response.content)
         self.assertEqual(
             obj['value'],
-            "Email cannot be more than 75 characters long",
+            "Email cannot be more than 254 characters long",
         )

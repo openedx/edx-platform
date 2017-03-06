@@ -1,57 +1,48 @@
 <!DOCTYPE html>
-{% load compressed %}
-{% load sekizai_tags i18n microsite %}
+{% load sekizai_tags i18n configuration theme_pipeline optional_include staticfiles %}
 {% load url from future %}
-{% load staticfiles %}
 <html lang="{{LANGUAGE_CODE}}">
 <head>
   <meta charset="UTF-8">
-  {% block title %}<title>{% platform_name %}</title>{% endblock %}
+  <title>{% block title %}{{ platform_name }}{% endblock %}</title>
 
- <link rel="icon" type="image/x-icon" href="{% favicon_path %}" />
+  <link rel="icon" type="image/x-icon" href="{% favicon_path %}" />
 
-  {% compressed_css 'style-vendor' %}
-  {% compressed_css 'style-main' %}
-  {% compressed_css 'style-course-vendor' %}
-  {% compressed_css 'style-course' %}
+  {% with "js/i18n/"|add:LANGUAGE_CODE|add:"/djangojs.js" as i18njs_path %}
+    <script type="text/javascript" src="{% static i18njs_path %}"></script>
+  {% endwith %}
+
+  {% stylesheet 'style-vendor' %}
+  {% stylesheet 'style-main-v1' %}
 
   {% block main_vendor_js %}
-  {% compressed_js 'main_vendor' %}
+  {% javascript 'main_vendor' %}
   {% endblock %}
   {% block headextra %}{% endblock %}
   {% render_block "css" %}
 
-  {% microsite_css_overrides_file %}
+  {% optional_include "head-extra.html"|microsite_template_path %}
 
   <meta name="path_prefix" content="{{EDX_ROOT_URL}}">
 </head>
 
 <body class="{% block bodyclass %}{% endblock %} lang_{{LANGUAGE_CODE}}">
-  <div class="window-wrap" dir="${static.dir_rtl()}">
-    <a class="nav-skip" href="{% block nav_skip %}#content{% endblock %}">{% trans "Skip to main content" %}</a>
+  <div class="window-wrap" dir="{{LANGUAGE_BIDI|yesno:'rtl,ltr'}}">
+    <a class="nav-skip" href="#main">{% trans "Skip to main content" %}</a>
     {% with course=request.course %}
-      {% if IS_EDX_DOMAIN %}
-        {% include "navigation-edx.html" %}
-      {% else %}
-        {% include "navigation.html" %}
-      {% endif %}
+      {% include "header.html"|microsite_template_path with online_help_token=online_help_token  %}
     {% endwith %}
     <div class="content-wrapper" id="content">
       {% block body %}{% endblock %}
       {% block bodyextra %}{% endblock %}
     </div>
-    {% if IS_REQUEST_IN_MICROSITE %}
-    {# For now we don't support overriden Django templates in microsites. Leave footer blank for now which is better than saying Edx.#}
-    {% elif IS_EDX_DOMAIN %}
-      {% include "footer-edx-v3.html" %}
-    {% else %}
-      {% include "footer.html" %}
-    {% endif %}
+    {% with course=request.course %}
+      {% include "footer.html"|microsite_template_path %}
+    {% endwith %}
 
   </div>
 
-    {% compressed_js 'application' %}
-    {% compressed_js 'module-js' %}
+    {% javascript 'base_application' %}
     {% include "mathjax_include.html" %}
 
     {% render_block "js" %}

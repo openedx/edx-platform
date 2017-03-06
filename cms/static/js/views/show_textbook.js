@@ -1,4 +1,5 @@
-define(["js/views/baseview", "underscore", "gettext", "js/views/feedback_notification", "js/views/feedback_prompt"],
+define(["js/views/baseview", "underscore", "gettext", "common/js/components/views/feedback_notification",
+        "common/js/components/views/feedback_prompt"],
         function(BaseView, _, gettext, NotificationView, PromptView) {
     var ShowTextbook = BaseView.extend({
         initialize: function() {
@@ -26,10 +27,11 @@ define(["js/views/baseview", "underscore", "gettext", "js/views/feedback_notific
         },
         confirmDelete: function(e) {
             if(e && e.preventDefault) { e.preventDefault(); }
-            var textbook = this.model, collection = this.model.collection;
-            var msg = new PromptView.Warning({
-                title: _.template(gettext("Delete “<%= name %>”?"),
-                    {name: textbook.escape('name')}),
+            var textbook = this.model;
+            new PromptView.Warning({
+                title: _.template(gettext("Delete “<%= name %>”?"))(
+                    {name: textbook.get('name')}
+                ),
                 message: gettext("Deleting a textbook cannot be undone and once deleted any reference to it in your courseware's navigation will also be removed."),
                 actions: {
                     primary: {

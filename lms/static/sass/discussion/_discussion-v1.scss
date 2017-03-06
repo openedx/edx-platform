@@ -1,0 +1,67 @@
+// ------------------------------------------------
+// Styling for non-Pattern Library discussion pages
+// ------------------------------------------------
+
+// Note: replace with globals from common/static/sass/edx-pattern-library-shims when available
+%pattern-library-btn {
+    @include transition(
+        color 0.125s ease-in-out 0s,
+        border-color 0.125s ease-in-out 0s,
+        background 0.125s ease-in-out 0s,
+        box-shadow 0.125s ease-in-out 0s
+    );
+    display: inline-block;
+    border: 1px solid $forum-color-active-thread;
+    border-radius: 3px;
+    margin: 0;
+    background-image: none;
+    box-shadow: none;
+    text-shadow: none;
+    font-size: 14px;
+    font-weight: 600;
+
+    // Display: block, one button per line, full width
+    &.block {
+        display: block;
+        width: 100%;
+    }
+
+    // STATE: is disabled
+    &:disabled,
+    &.is-disabled {
+        pointer-events: none;
+        outline: none;
+        cursor: not-allowed;
+    }
+
+    &:hover,
+    &:active,
+    &:focus {
+        border-color: $forum-color-hover;
+        background-color: $forum-color-hover;
+        background-image: none;
+        box-shadow: none;
+        color: $forum-color-active-text;
+        text-decoration: none;  // Don't show underlines on links that are styled as buttons
+    }
+}
+
+// Layout control for discussion modules that does not apply to the discussion board
+.discussion-module {
+    .discussion {
+        clear: both;
+        padding-top: ($baseline/2);
+    }
+
+    .btn {
+        @extend %pattern-library-btn;
+        background-color: $forum-color-background;
+        color: $forum-color-active-thread;
+     }
+
+    .btn-brand {
+        @extend %pattern-library-btn;
+        background-color: $forum-color-active-thread;
+        color: $forum-color-active-text;
+    }
+}

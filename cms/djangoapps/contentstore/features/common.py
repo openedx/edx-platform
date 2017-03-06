@@ -3,7 +3,7 @@
 
 import os
 from lettuce import world, step
-from nose.tools import assert_true, assert_in  # pylint: disable=no-name-in-module
+from nose.tools import assert_true, assert_in
 from django.conf import settings
 
 from student.roles import CourseStaffRole, CourseInstructorRole, GlobalStaff
@@ -92,7 +92,7 @@ def press_the_notification_button(_step, name):
     # the "Save" button at the UI level.
     # Instead, we use JavaScript to reliably click
     # the button.
-    btn_css = 'div#page-notification a.action-%s' % name.lower()
+    btn_css = 'div#page-notification button.action-%s' % name.lower()
     world.trigger_event(btn_css, event='focus')
     world.browser.execute_script("$('{}').click()".format(btn_css))
     world.wait_for_ajax_complete()
@@ -284,7 +284,7 @@ def button_disabled(step, value):
 def _do_studio_prompt_action(intent, action):
     """
     Wait for a studio prompt to appear and press the specified action button
-    See cms/static/js/views/feedback_prompt.js for implementation
+    See common/js/components/views/feedback_prompt.js for implementation
     """
     assert intent in [
         'warning',
@@ -299,7 +299,7 @@ def _do_studio_prompt_action(intent, action):
 
     world.wait_for_present('div.wrapper-prompt.is-shown#prompt-{}'.format(intent))
 
-    action_css = 'li.nav-item > a.action-{}'.format(action)
+    action_css = 'li.nav-item > button.action-{}'.format(action)
     world.trigger_event(action_css, event='focus')
     world.browser.execute_script("$('{}').click()".format(action_css))
 

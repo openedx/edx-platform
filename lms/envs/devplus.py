@@ -30,6 +30,16 @@ DATABASES = {
         'PASSWORD': '',
         'HOST': '127.0.0.1',
         'PORT': '3306',
+        'ATOMIC_REQUESTS': True,
+    },
+    'student_module_history': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'student_module_history',
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
+        'ATOMIC_REQUESTS': True,
     }
 }
 

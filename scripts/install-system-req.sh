@@ -37,8 +37,6 @@ case `uname -s` in
                 # add repositories
                 cat $APT_REPOS_FILE | xargs -n 1 sudo add-apt-repository -y
                 sudo apt-get -yq update
-
-                # install packages listed in APT_PKGS_FILE
                 cat $APT_PKGS_FILE | xargs sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install
                 ;;
             *)

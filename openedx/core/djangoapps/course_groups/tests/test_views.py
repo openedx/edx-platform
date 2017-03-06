@@ -7,15 +7,13 @@ import json
 
 from collections import namedtuple
 from datetime import datetime
+from nose.plugins.attrib import attr
 from unittest import skipUnless
 
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import Http404
 from django.test.client import RequestFactory
-
-# monkey-patch for PATCH request method.
-import openedx.core.lib.django_test_client_utils    # pylint: disable=unused-import
 
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
@@ -38,6 +36,7 @@ from .helpers import (
 )
 
 
+@attr('shard_2')
 class CohortViewsTestCase(ModuleStoreTestCase):
     """
     Base class which sets up a course and staff/non-staff users.
@@ -100,6 +99,9 @@ class CohortViewsTestCase(ModuleStoreTestCase):
         self.assertRaises(Http404, view, *view_args)
 
     def create_cohorted_discussions(self):
+        """
+        Set up a cohorted discussion in the system, complete with all the fixings
+        """
         cohorted_inline_discussions = ['Topic A']
         cohorted_course_wide_discussions = ["Topic B"]
         cohorted_discussions = cohorted_inline_discussions + cohorted_course_wide_discussions
@@ -174,6 +176,7 @@ class CohortViewsTestCase(ModuleStoreTestCase):
         return json.loads(response.content)
 
 
+@attr('shard_2')
 class CourseCohortSettingsHandlerTestCase(CohortViewsTestCase):
     """
     Tests the `course_cohort_settings_handler` view.
@@ -323,6 +326,7 @@ class CourseCohortSettingsHandlerTestCase(CohortViewsTestCase):
         )
 
 
+@attr('shard_2')
 class CohortHandlerTestCase(CohortViewsTestCase):
     """
     Tests the `cohort_handler` view.
@@ -675,6 +679,7 @@ class CohortHandlerTestCase(CohortViewsTestCase):
         )
 
 
+@attr('shard_2')
 class UsersInCohortTestCase(CohortViewsTestCase):
     """
     Tests the `users_in_cohort` view.
@@ -807,6 +812,7 @@ class UsersInCohortTestCase(CohortViewsTestCase):
         self.request_users_in_cohort(cohort, self.course, -1, should_return_bad_request=True)
 
 
+@attr('shard_2')
 class AddUsersToCohortTestCase(CohortViewsTestCase):
     """
     Tests the `add_users_to_cohort` view.
@@ -849,7 +855,7 @@ class AddUsersToCohortTestCase(CohortViewsTestCase):
         self.assertEqual(
             response_dict.get("added"),
             [
-                {"username": user.username, "name": user.profile.name, "email": user.email}
+                {"username": user.username, "email": user.email}
                 for user in expected_added
             ]
         )
@@ -858,7 +864,6 @@ class AddUsersToCohortTestCase(CohortViewsTestCase):
             [
                 {
                     "username": user.username,
-                    "name": user.profile.name,
                     "email": user.email,
                     "previous_cohort": previous_cohort
                 }
@@ -1106,6 +1111,7 @@ class AddUsersToCohortTestCase(CohortViewsTestCase):
         )
 
 
+@attr('shard_2')
 class RemoveUserFromCohortTestCase(CohortViewsTestCase):
     """
     Tests the `remove_user_from_cohort` view.
@@ -1199,6 +1205,7 @@ class RemoveUserFromCohortTestCase(CohortViewsTestCase):
         self.verify_removed_user_from_cohort(user.username, response_dict, cohort)
 
 
+@attr('shard_2')
 @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Tests only valid in LMS')
 class CourseCohortDiscussionTopicsTestCase(CohortViewsTestCase):
     """

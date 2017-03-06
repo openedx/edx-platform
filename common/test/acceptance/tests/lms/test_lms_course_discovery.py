@@ -2,9 +2,8 @@
 Test course discovery.
 """
 import datetime
-from flaky import flaky
 import json
-import os
+import uuid
 
 from bok_choy.web_app_test import WebAppTest
 from ..helpers import remove_file
@@ -36,28 +35,13 @@ class CourseDiscoveryTest(WebAppTest):
         super(CourseDiscoveryTest, self).setUp()
         self.page = CourseDiscoveryPage(self.browser)
 
-        for i in range(10):
-            org = self.unique_id
-            number = unicode(i)
+        for i in range(12):
+            org = 'test_org'
+            number = "{}{}".format(str(i), str(uuid.uuid4().get_hex().upper()[0:6]))
             run = "test_run"
-            name = "test course"
+            name = "test course" if i < 10 else "grass is always greener"
             settings = {'enrollment_start': datetime.datetime(1970, 1, 1).isoformat()}
             CourseFixture(org, number, run, name, settings=settings).install()
-
-        for i in range(2):
-            org = self.unique_id
-            number = unicode(i)
-            run = "test_run"
-            name = "grass is always greener"
-            CourseFixture(
-                org,
-                number,
-                run,
-                name,
-                settings={
-                    'enrollment_start': datetime.datetime(1970, 1, 1).isoformat()
-                }
-            ).install()
 
     def _auto_auth(self, username, email, staff):
         """

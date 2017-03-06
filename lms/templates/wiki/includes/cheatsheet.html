@@ -1,7 +1,7 @@
 {% load i18n %}
 <section id="cheatsheetModal" class="modal" aria-hidden="true">
   <div class="inner-wrapper" role="dialog" aria-labelledby="cheatsheet-title">
-    <button class="close-modal"><i class="icon fa fa-remove"></i> <span class="sr">{% trans 'Close' %}</span></button>
+    <button class="close-modal"><span class="icon fa fa-remove" aria-hidden="true"></span> <span class="sr">{% trans 'Close' %}</span></button>
 
     <header>
       <h2 id="cheatsheet-title">{% trans "Wiki Cheatsheet" %}<span class="sr">, {% trans "window open" %}</span></h2>
@@ -22,7 +22,6 @@
         </section>
         <section>
           <h3>{% blocktrans with platform_name=settings.PLATFORM_NAME %}{{ platform_name }} Additions:{% endblocktrans %}</h3>
-          <pre>circuit-schematic:</pre>
           <pre>$LaTeX {% trans "Math Expression" %}$</pre>
         </section>
       </div>

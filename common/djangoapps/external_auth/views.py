@@ -3,7 +3,7 @@ import json
 import logging
 import random
 import re
-import string       # pylint: disable=deprecated-module
+import string
 import fnmatch
 import unicodedata
 import urllib
@@ -25,7 +25,7 @@ if settings.FEATURES.get('AUTH_USE_CAS'):
 from student.helpers import get_next_url_for_login_page
 from student.models import UserProfile
 
-from django.http import HttpResponse, HttpResponseRedirect, HttpRequest, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
 from django.utils.http import urlquote, is_safe_url
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
@@ -172,10 +172,13 @@ def _external_login_or_signup(request,
                 else:
                     # otherwise, there must have been an error, b/c we've already linked a user with these external
                     # creds
-                    failure_msg = _(dedent("""
-                        You have already created an account using an external login like WebAuth or Shibboleth.
-                        Please contact %s for support """
-                                           % getattr(settings, 'TECH_SUPPORT_EMAIL', 'techsupport@class.stanford.edu')))
+                    failure_msg = _(
+                        "You have already created an account using "
+                        "an external login like WebAuth or Shibboleth. "
+                        "Please contact {tech_support_email} for support."
+                    ).format(
+                        tech_support_email=settings.TECH_SUPPORT_EMAIL,
+                    )
                     return default_render_failure(request, failure_msg)
             except User.DoesNotExist:
                 log.info(u'SHIB: No user for %s yet, doing signup', eamap.external_email)
@@ -192,7 +195,7 @@ def _external_login_or_signup(request,
         if settings.AUTHENTICATION_BACKENDS:
             auth_backend = settings.AUTHENTICATION_BACKENDS[0]
         else:
-            auth_backend = 'django.contrib.auth.backends.ModelBackend'
+            auth_backend = 'ratelimitbackend.backends.RateLimitModelBackend'
         user.backend = auth_backend
         if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
             AUDIT_LOG.info(u'Linked user.id: {0} logged in via Shibboleth'.format(user.id))
@@ -201,7 +204,7 @@ def _external_login_or_signup(request,
     elif uses_certs:
         # Certificates are trusted, so just link the user and log the action
         user = internal_user
-        user.backend = 'django.contrib.auth.backends.ModelBackend'
+        user.backend = 'ratelimitbackend.backends.RateLimitModelBackend'
         if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
             AUDIT_LOG.info(u'Linked user_id {0} logged in via SSL certificate'.format(user.id))
         else:
@@ -475,9 +478,10 @@ def cas_login(request, next_page=None, required=False):
 
     if request.user.is_authenticated():
         user = request.user
-        if not UserProfile.objects.filter(user=user):
-            user_profile = UserProfile(name=user.username, user=user)
-            user_profile.save()
+        UserProfile.objects.get_or_create(
+            user=user,
+            defaults={'name': user.username}
+        )
 
     return ret
 
@@ -753,7 +757,10 @@ def provider_login(request):
     # first check to see if the request is an OpenID request.
     # If so, the client will have specified an 'openid.mode' as part
     # of the request.
-    querydict = dict(request.REQUEST.items())
+    if request.method == 'GET':
+        querydict = dict(request.GET.items())
+    else:
+        querydict = dict(request.POST.items())
     error = False
     if 'openid.mode' in request.GET or 'openid.mode' in request.POST:
         # decode request
@@ -833,9 +840,9 @@ def provider_login(request):
         except User.DoesNotExist:
             request.session['openid_error'] = True
             if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
-                AUDIT_LOG.warning("OpenID login failed - Unknown user email")
+                AUDIT_LOG.warning(u"OpenID login failed - Unknown user email")
             else:
-                msg = "OpenID login failed - Unknown user email: {0}".format(email)
+                msg = u"OpenID login failed - Unknown user email: {0}".format(email)
                 AUDIT_LOG.warning(msg)
             return HttpResponseRedirect(openid_request_url)
 
@@ -846,16 +853,16 @@ def provider_login(request):
         try:
             user = authenticate(username=username, password=password, request=request)
         except RateLimitException:
-            AUDIT_LOG.warning('OpenID - Too many failed login attempts.')
+            AUDIT_LOG.warning(u'OpenID - Too many failed login attempts.')
             return HttpResponseRedirect(openid_request_url)
 
         if user is None:
             request.session['openid_error'] = True
             if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
-                AUDIT_LOG.warning("OpenID login failed - invalid password")
+                AUDIT_LOG.warning(u"OpenID login failed - invalid password")
             else:
-                msg = "OpenID login failed - password for {0} is invalid".format(email)
-                AUDIT_LOG.warning(msg)
+                AUDIT_LOG.warning(
+                    u"OpenID login failed - password for %s is invalid", email)
             return HttpResponseRedirect(openid_request_url)
 
         # authentication succeeded, so fetch user information
@@ -866,11 +873,10 @@ def provider_login(request):
                 del request.session['openid_error']
 
             if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
-                AUDIT_LOG.info("OpenID login success - user.id: {0}".format(user.id))
+                AUDIT_LOG.info(u"OpenID login success - user.id: %s", user.id)
             else:
-                AUDIT_LOG.info("OpenID login success - {0} ({1})".format(
-                               user.username, user.email))
-
+                AUDIT_LOG.info(
+                    u"OpenID login success - %s (%s)", user.username, user.email)
             # redirect user to return_to location
             url = endpoint + urlquote(user.username)
             response = openid_request.answer(True, None, url)
@@ -889,16 +895,16 @@ def provider_login(request):
         # the account is not active, so redirect back to the login page:
         request.session['openid_error'] = True
         if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
-            AUDIT_LOG.warning("Login failed - Account not active for user.id {0}".format(user.id))
+            AUDIT_LOG.warning(
+                u"Login failed - Account not active for user.id %s", user.id)
         else:
-            msg = "Login failed - Account not active for user {0}".format(username)
-            AUDIT_LOG.warning(msg)
+            AUDIT_LOG.warning(
+                u"Login failed - Account not active for user %s", username)
         return HttpResponseRedirect(openid_request_url)
 
     # determine consumer domain if applicable
-    return_to = ''
-    if 'openid.return_to' in request.REQUEST:
-        return_to = request.REQUEST['openid.return_to']
+    return_to = request.GET.get('openid.return_to') or request.POST.get('openid.return_to') or ''
+    if return_to:
         matches = re.match(r'\w+:\/\/([\w\.-]+)', return_to)
         return_to = matches.group(1)
 
@@ -920,7 +926,7 @@ def provider_identity(request):
 
     response = render_to_response('identity.xml',
                                   {'url': get_xrds_url('login', request)},
-                                  mimetype='text/xml')
+                                  content_type='text/xml')
 
     # custom XRDS header necessary for discovery process
     response['X-XRDS-Location'] = get_xrds_url('identity', request)
@@ -934,7 +940,7 @@ def provider_xrds(request):
 
     response = render_to_response('xrds.xml',
                                   {'url': get_xrds_url('login', request)},
-                                  mimetype='text/xml')
+                                  content_type='text/xml')
 
     # custom XRDS header necessary for discovery process
     response['X-XRDS-Location'] = get_xrds_url('xrds', request)

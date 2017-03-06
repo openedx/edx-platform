@@ -35,7 +35,7 @@ class Model(object):
             return self.__getattr__(name)
 
     def __setattr__(self, name, value):
-        if name == 'attributes' or name not in (self.accessible_fields + self.updatable_fields):
+        if name == 'attributes' or name not in self.accessible_fields + self.updatable_fields:
             super(Model, self).__setattr__(name, value)
         else:
             self.attributes[name] = value
@@ -46,7 +46,7 @@ class Model(object):
         return self.attributes.get(key)
 
     def __setitem__(self, key, value):
-        if key not in (self.accessible_fields + self.updatable_fields):
+        if key not in self.accessible_fields + self.updatable_fields:
             raise KeyError("Field {0} does not exist".format(key))
         self.attributes.__setitem__(key, value)
 
@@ -124,14 +124,20 @@ class Model(object):
     def after_save(cls, instance):
         pass
 
-    def save(self):
+    def save(self, params=None):
+        """
+        Invokes Forum's POST/PUT service to create/update thread
+        """
         self.before_save(self)
         if self.id:   # if we have id already, treat this as an update
+            request_params = self.updatable_attributes()
+            if params:
+                request_params.update(params)
             url = self.url(action='put', params=self.attributes)
             response = perform_request(
                 'put',
                 url,
-                self.updatable_attributes(),
+                request_params,
                 metric_tags=self._metric_tags,
                 metric_action='model.update'
             )

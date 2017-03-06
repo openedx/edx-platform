@@ -1,4 +1,3 @@
-# pylint: disable=no-member
 '''
 Utilities for contentstore tests
 '''
@@ -11,8 +10,8 @@ from django.contrib.auth.models import User
 from django.test.client import Client
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
 
-from contentstore.utils import reverse_url  # pylint: disable=import-error
-from student.models import Registration  # pylint: disable=import-error
+from contentstore.utils import reverse_url
+from student.models import Registration
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
 from lms import startup
 from xmodule.contentstore.django import contentstore
@@ -83,7 +82,7 @@ class CourseTestCase(ProceduralCourseTestMixin, ModuleStoreTestCase):
         afterwards.
         """
 
-        self.user_password = super(CourseTestCase, self).setUp()
+        super(CourseTestCase, self).setUp()
 
         self.client = AjaxEnabledTestClient()
         self.client.login(username=self.user.username, password=self.user_password)
@@ -126,7 +125,7 @@ class CourseTestCase(ProceduralCourseTestMixin, ModuleStoreTestCase):
     SEQUENTIAL = 'vertical_sequential'
     DRAFT_HTML = 'draft_html'
     DRAFT_VIDEO = 'draft_video'
-    LOCKED_ASSET_KEY = AssetLocation.from_deprecated_string('/c4x/edX/toy/asset/sample_static.txt')
+    LOCKED_ASSET_KEY = AssetLocation.from_deprecated_string('/c4x/edX/toy/asset/sample_static.html')
 
     def import_and_populate_course(self):
         """

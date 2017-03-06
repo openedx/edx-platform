@@ -27,13 +27,14 @@ from django.utils.translation import ugettext_noop
 
 from celery import task
 from bulk_email.tasks import perform_delegate_email_batches
-from instructor_task.tasks_helper import (
+from lms.djangoapps.instructor_task.tasks_helper import (
     run_main_task,
     BaseInstructorTask,
     perform_module_state_update,
     rescore_problem_module_state,
     reset_attempts_module_state,
     delete_problem_module_state,
+    upload_problem_responses_csv,
     upload_grades_csv,
     upload_problem_grade_report,
     upload_students_csv,
@@ -41,7 +42,10 @@ from instructor_task.tasks_helper import (
     upload_enrollment_report,
     upload_may_enroll_csv,
     upload_exec_summary_report,
+    upload_course_survey_report,
     generate_students_certificates,
+    upload_proctored_exam_results_report,
+    upload_ora2_data,
 )
 
 
@@ -145,6 +149,18 @@ def send_bulk_course_email(entry_id, _xmodule_instance_args):
 
 
 @task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=not-callable
+def calculate_problem_responses_csv(entry_id, xmodule_instance_args):
+    """
+    Compute student answers to a given problem and upload the CSV to
+    an S3 bucket for download.
+    """
+    # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
+    action_name = ugettext_noop('generated')
+    task_fn = partial(upload_problem_responses_csv, xmodule_instance_args)
+    return run_main_task(entry_id, task_fn, action_name)
+
+
+@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=not-callable
 def calculate_grades_csv(entry_id, xmodule_instance_args):
     """
     Grade a course and push the results to an S3 bucket for download.
@@ -189,7 +205,7 @@ def calculate_students_features_csv(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=not-callable
+@task(base=BaseInstructorTask)  # pylint: disable=not-callable
 def enrollment_report_features_csv(entry_id, xmodule_instance_args):
     """
     Compute student profile information for a course and upload the
@@ -201,7 +217,7 @@ def enrollment_report_features_csv(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=not-callable
+@task(base=BaseInstructorTask)  # pylint: disable=not-callable
 def exec_summary_report_csv(entry_id, xmodule_instance_args):
     """
     Compute executive summary report for a course and upload the
@@ -210,6 +226,29 @@ def exec_summary_report_csv(entry_id, xmodule_instance_args):
     # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
     action_name = 'generating_exec_summary_report'
     task_fn = partial(upload_exec_summary_report, xmodule_instance_args)
+    return run_main_task(entry_id, task_fn, action_name)
+
+
+@task(base=BaseInstructorTask)  # pylint: disable=not-callable
+def course_survey_report_csv(entry_id, xmodule_instance_args):
+    """
+    Compute the survey report for a course and upload the
+    generated report to an S3 bucket for download.
+    """
+    # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
+    action_name = ugettext_noop('generated')
+    task_fn = partial(upload_course_survey_report, xmodule_instance_args)
+    return run_main_task(entry_id, task_fn, action_name)
+
+
+@task(base=BaseInstructorTask)  # pylint: disable=not-callable
+def proctored_exam_results_csv(entry_id, xmodule_instance_args):
+    """
+    Compute proctored exam results report for a course and upload the
+    CSV for download.
+    """
+    action_name = 'generating_proctored_exam_results_report'
+    task_fn = partial(upload_proctored_exam_results_report, xmodule_instance_args)
     return run_main_task(entry_id, task_fn, action_name)
 
 
@@ -242,7 +281,7 @@ def generate_certificates(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-@task(base=BaseInstructorTask)  # pylint: disable=E1102
+@task(base=BaseInstructorTask)  # pylint: disable=not-callable
 def cohort_students(entry_id, xmodule_instance_args):
     """
     Cohort students in bulk, and upload the results.
@@ -251,4 +290,14 @@ def cohort_students(entry_id, xmodule_instance_args):
     # An example of such a message is: "Progress: {action} {succeeded} of {attempted} so far"
     action_name = ugettext_noop('cohorted')
     task_fn = partial(cohort_students_and_upload, xmodule_instance_args)
+    return run_main_task(entry_id, task_fn, action_name)
+
+
+@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=not-callable
+def export_ora2_data(entry_id, xmodule_instance_args):
+    """
+    Generate a CSV of ora2 responses and push it to S3.
+    """
+    action_name = ugettext_noop('generated')
+    task_fn = partial(upload_ora2_data, xmodule_instance_args)
     return run_main_task(entry_id, task_fn, action_name)

@@ -1,10 +1,12 @@
+<%namespace name='static' file='/static_content.html'/>
+
 <%inherit file="shopping_cart_flow.html" />
 <%!
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
 from django.core.urlresolvers import reverse
-from courseware.courses import course_image_url, get_course_about_section, get_course_by_id
-from microsite_configuration import microsite
+from markupsafe import escape
+from openedx.core.lib.courses import course_image_url
 %>
 
 <%block name="billing_details_highlight">
@@ -30,12 +32,12 @@ from microsite_configuration import microsite
            ## in case of multiple courses in single self purchase scenario,
            ## we will show the button View Dashboard
           <% dashboard_url = reverse('dashboard') %>
-          <a href="${dashboard_url}" class="blue pull-right">${_("View Dashboard")} <i class="icon fa fa-caret-right"></i></a>
+          <a href="${dashboard_url}" class="blue pull-right">${_("View Dashboard")} <span class="icon fa fa-caret-right" aria-hidden="true"></span></a>
           <span class="mt-7">
             ${_(u"You have successfully been enrolled for {course_names}. "
                 u"The following receipt has been emailed to {receipient_emails}").format(
                   course_names=u"<b>{course_names}</b>".format(
-                    course_names=appended_course_names
+                    course_names=escape(appended_course_names)
                   ),
                   receipient_emails=u"<strong>{receipient_emails}</strong>".format(
                     receipient_emails=appended_recipient_emails
@@ -50,7 +52,7 @@ from microsite_configuration import microsite
           ).format(
             number=total_registration_codes,
             course_names=u"<b>{course_names}</b>".format(
-              course_names=appended_course_names
+              course_names=escape(appended_course_names)
             )
           )}
           ${_("The following receipt has been emailed to {receipient_emails}").format(
@@ -97,7 +99,7 @@ from microsite_configuration import microsite
     %endif
     <div class="bordered-bar">
       <h2>${_('Invoice')} #${order.id}<span>${_('Date of purchase')}: ${order_purchase_date} </span><span
-          class="pull-right"><a href="" onclick="window.print();" class="blue-link"><i class="icon fa fa-print"></i> ${_('Print Receipt')}</a></span>
+          class="pull-right"><a href="" onclick="window.print();" class="blue-link"><span class="icon fa fa-print" aria-hidden="true"></span> ${_('Print Receipt')}</a></span>
       </h2>
     </div>
     % if order.total_cost > 0:
@@ -291,13 +293,13 @@ from microsite_configuration import microsite
         <div class="clearfix">
           <div class="image">
             <img class="item-image" src="${course_image_url(course)}"
-                 alt="${course.display_number_with_default | h} ${get_course_about_section(course, 'title')} Image"/>
+                 alt="${course.display_number_with_default | h} ${course.display_name_with_default_escaped} Image"/>
           </div>
           <div class="data-input">
 
             <h3 class="course-title-info" id="course-title">
               <span class="course-registration-title">${_('Registration for:')}</span>
-              <span class="course-display-name">${ course.display_name }</span>
+              <span class="course-display-name">${ course.display_name | h }</span>
             </h3>
             <p class="course-meta-info" aria-describedby="course-title">
               <span class="course-dates-title">
@@ -376,8 +378,8 @@ from microsite_configuration import microsite
         <span class="pull-right">${_("Total")}: <b> ${currency_symbol}${"{0:0.2f}".format(order.total_cost)}  ${currency.upper()}</b></span>
       </div>
     </div>
-    ## Allow for a microsite to be able to insert additional text at the bottom of the page
-    <%include file="${microsite.get_template_path('receipt_custom_pane.html')}" />
+    ## Allow for a theming to be able to insert additional text at the bottom of the page
+    <%include file="${static.get_template_path('receipt_custom_pane.html')}" />
   </section>
 </div>
 </%block>

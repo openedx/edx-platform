@@ -1,4 +1,10 @@
 """Exceptions raised by the credit API. """
+from __future__ import unicode_literals
+from django.utils.translation import ugettext_lazy as _
+from rest_framework import status
+from rest_framework.exceptions import APIException
+
+# TODO: Cleanup this mess! ECOM-2908
 
 
 class CreditApiBadRequest(Exception):
@@ -56,3 +62,25 @@ class InvalidCreditStatus(CreditApiBadRequest):
     The status is not either "approved" or "rejected".
     """
     pass
+
+
+class InvalidCreditRequest(APIException):
+    """ API request is invalid. """
+    status_code = status.HTTP_400_BAD_REQUEST
+
+
+class UserNotEligibleException(InvalidCreditRequest):
+    """ User not eligible for credit for a given course. """
+
+    def __init__(self, course_key, username):
+        detail = _('[{username}] is not eligible for credit for [{course_key}].').format(username=username,
+                                                                                         course_key=course_key)
+        super(UserNotEligibleException, self).__init__(detail)
+
+
+class InvalidCourseKey(InvalidCreditRequest):
+    """ Course key is invalid. """
+
+    def __init__(self, course_key):
+        detail = _('[{course_key}] is not a valid course key.').format(course_key=course_key)
+        super(InvalidCourseKey, self).__init__(detail)

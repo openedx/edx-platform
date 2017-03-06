@@ -5,23 +5,28 @@ Unit tests for the localization of emails sent by instructor.api methods.
 
 from django.core import mail
 from django.core.urlresolvers import reverse
+from django.test.utils import override_settings
 from nose.plugins.attrib import attr
 
 from courseware.tests.factories import InstructorFactory
 from lang_pref import LANGUAGE_KEY
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
-from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
+from openedx.core.djangoapps.user_api.preferences.api import set_user_preference, delete_user_preference
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 
 @attr('shard_1')
-class TestInstructorAPIEnrollmentEmailLocalization(ModuleStoreTestCase):
+class TestInstructorAPIEnrollmentEmailLocalization(SharedModuleStoreTestCase):
     """
     Test whether the enroll, unenroll and beta role emails are sent in the
     proper language, i.e: the student's language.
     """
+    @classmethod
+    def setUpClass(cls):
+        super(TestInstructorAPIEnrollmentEmailLocalization, cls).setUpClass()
+        cls.course = CourseFactory.create()
 
     def setUp(self):
         super(TestInstructorAPIEnrollmentEmailLocalization, self).setUp()
@@ -29,7 +34,6 @@ class TestInstructorAPIEnrollmentEmailLocalization(ModuleStoreTestCase):
         # Platform language is English, instructor's language is Chinese,
         # student's language is French, so the emails should all be sent in
         # French.
-        self.course = CourseFactory.create()
         self.instructor = InstructorFactory(course_key=self.course.id)
         set_user_preference(self.instructor, LANGUAGE_KEY, 'zh-cn')
         self.client.login(username=self.instructor.username, password='test')
@@ -86,3 +90,10 @@ class TestInstructorAPIEnrollmentEmailLocalization(ModuleStoreTestCase):
         # Student is unknown, so the platform language should be used
         self.update_enrollement("enroll", "newuser@hotmail.com")
         self.check_outbox("You have been")
+
+    @override_settings(LANGUAGE_CODE="fr")
+    def test_user_without_preference_receives_email_in_french(self):
+        delete_user_preference(self.student, LANGUAGE_KEY)
+        self.update_enrollement("enroll", self.student.email)
+
+        self.check_outbox_is_french()
