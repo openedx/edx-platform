@@ -7,7 +7,7 @@ import uuid
 
 from common.test.acceptance.tests.helpers import remove_file
 from common.test.acceptance.pages.common.logout import LogoutPage
-from common.test.acceptance.pages.studio.overview import CourseOutlinePage
+from common.test.acceptance.pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
 from common.test.acceptance.pages.lms.courseware_search import CoursewareSearchPage
 from common.test.acceptance.pages.lms.staff_view import StaffPage
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
@@ -45,7 +45,7 @@ class CoursewareSearchCohortTest(ContainerBase):
         super(CoursewareSearchCohortTest, self).setUp(is_staff=is_staff)
         self.staff_user = self.user
 
-        self.course_outline = CourseOutlinePage(
+        self.studio_course_outline = StudioCourseOutlinePage(
             self.browser,
             self.course_info['org'],
             self.course_info['number'],
@@ -101,9 +101,9 @@ class CoursewareSearchCohortTest(ContainerBase):
         Reindex course content on studio course page
         """
         self._auto_auth(self.staff_user["username"], self.staff_user["email"], True)
-        self.course_outline.visit()
-        self.course_outline.start_reindex()
-        self.course_outline.wait_for_ajax()
+        self.studio_course_outline.visit()
+        self.studio_course_outline.start_reindex()
+        self.studio_course_outline.wait_for_ajax()
 
     def _goto_staff_page(self):
         """
