@@ -789,15 +789,15 @@ def program_marketing(request, program_uuid):
 @login_required
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @ensure_valid_course_key
-def progress(request, course_id, student_id=None):
+def progress(request, course_id):
     """ Display the progress page. """
     course_key = CourseKey.from_string(course_id)
 
     with modulestore().bulk_operations(course_key):
-        return _progress(request, course_key, student_id)
+        return _progress(request, course_key)
 
 
-def _progress(request, course_key, student_id):
+def _progress(request, course_key):
     """
     Unwrapped version of "progress".
 
@@ -805,14 +805,6 @@ def _progress(request, course_key, student_id):
 
     Course staff are allowed to see the progress of students in their class.
     """
-
-    if student_id is not None:
-        try:
-            student_id = int(student_id)
-        # Check for ValueError if 'student_id' cannot be converted to integer.
-        except ValueError:
-            raise Http404
-
     course = get_course_with_access(request.user, 'load', course_key, depth=None, check_if_enrolled=True)
     prep_course_for_grading(course, request)
 
@@ -828,27 +820,10 @@ def _progress(request, course_key, student_id):
 
     staff_access = bool(has_access(request.user, 'staff', course))
 
-    masquerade = None
-    if student_id is None or student_id == request.user.id:
-        # This will be a no-op for non-staff users, returning request.user
-        masquerade, student = setup_masquerade(request, course_key, staff_access, reset_masquerade_data=True)
-    else:
-        try:
-            coach_access = has_ccx_coach_role(request.user, course_key)
-        except CCXLocatorValidationException:
-            coach_access = False
+    # This will be a no-op for non-staff users, returning request.user
+    masquerade, student = setup_masquerade(request, course_key, staff_access, reset_masquerade_data=True)
 
-        has_access_on_students_profiles = staff_access or coach_access
-        # Requesting access to a different student's profile
-        if not has_access_on_students_profiles:
-            raise Http404
-        try:
-            student = User.objects.get(id=student_id)
-        except User.DoesNotExist:
-            raise Http404
-
-    # NOTE: To make sure impersonation by instructor works, use
-    # student instead of request.user in the rest of the function.
+    # TODO: make sure ccx coaches can still masquerade for progress page inspection
 
     # The pre-fetching of groups is done to make auth checks not require an
     # additional DB lookup (this kills the Progress page in particular).

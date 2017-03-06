@@ -37,8 +37,6 @@ urlpatterns = patterns(
         'lms.djangoapps.instructor.views.api.sale_validation', name="sale_validation"),
     url(r'^get_anon_ids$',
         'lms.djangoapps.instructor.views.api.get_anon_ids', name="get_anon_ids"),
-    url(r'^get_student_progress_url$',
-        'lms.djangoapps.instructor.views.api.get_student_progress_url', name="get_student_progress_url"),
     url(r'^reset_student_attempts$',
         'lms.djangoapps.instructor.views.api.reset_student_attempts', name="reset_student_attempts"),
     url(

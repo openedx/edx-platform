@@ -84,20 +84,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         for url in urls:
             self.assert_request_status_code(200, url)
 
-        # The student progress tab is not accessible to a student
-        # before launch, so the instructor view-as-student feature
-        # should return a 403.
-        # TODO (vshnayder): If this is not the behavior we want, will need
-        # to make access checking smarter and understand both the effective
-        # user (the student), and the requesting user (the prof)
-        url = reverse(
-            'student_progress',
-            kwargs={
-                'course_id': course.id.to_deprecated_string(),
-                'student_id': self.enrolled_user.id,
-            }
-        )
-        self.assert_request_status_code(403, url)
+        # TODO: TNL-5047 re-add some sort of check here
 
         # The courseware url should redirect, not 200
         url = self._reverse_urls(['courseware'], course)[0]

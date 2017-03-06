@@ -417,15 +417,6 @@ urlpatterns += (
         name='progress',
     ),
 
-    # Takes optional student_id for instructor use--shows profile as that student sees it.
-    url(
-        r'^courses/{}/progress/(?P<student_id>[^/]*)/$'.format(
-            settings.COURSE_ID_PATTERN,
-        ),
-        'courseware.views.views.progress',
-        name='student_progress',
-    ),
-
     url(
         r'^programs/{}/about'.format(
             r'(?P<program_uuid>[0-9a-f-]+)',
