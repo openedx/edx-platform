@@ -10,6 +10,7 @@ class CatalogIntegrationMixin(object):
         'internal_api_url': 'https://catalog-internal.example.com/api/v1/',
         'cache_ttl': 0,
         'service_username': 'lms_catalog_service_user',
+        'page_size': 20,
     }
 
     def create_catalog_integration(self, **kwargs):

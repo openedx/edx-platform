@@ -8,12 +8,13 @@ from django.test import TestCase
 import mock
 
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
-from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory, ProgramTypeFactory
+from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory, ProgramFactory, ProgramTypeFactory
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.catalog.utils import (
     get_programs,
     get_program_types,
     get_programs_with_type,
+    get_course_runs,
 )
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory
@@ -176,3 +177,73 @@ class TestGetProgramTypes(CatalogIntegrationMixin, TestCase):
         program = program_types[0]
         data = get_program_types(name=program['name'])
         self.assertEqual(data, program)
+
+
+@skip_unless_lms
+@mock.patch(UTILS_MODULE + '.get_edx_api_data')
+class TestGetCourseRuns(CatalogIntegrationMixin, TestCase):
+    """
+    Tests covering retrieval of course runs from the catalog service.
+    """
+    def setUp(self):
+        super(TestGetCourseRuns, self).setUp()
+
+        self.catalog_integration = self.create_catalog_integration(cache_ttl=1)
+        self.user = UserFactory(username=self.catalog_integration.service_username)
+
+    def assert_contract(self, call_args):  # pylint: disable=redefined-builtin
+        """
+        Verify that API data retrieval utility is used correctly.
+        """
+        args, kwargs = call_args
+
+        for arg in (self.catalog_integration, self.user, 'course_runs'):
+            self.assertIn(arg, args)
+
+        self.assertEqual(kwargs['api']._store['base_url'], self.catalog_integration.internal_api_url)  # pylint: disable=protected-access
+
+        querystring = {
+            'page_size': 20,
+            'exclude_utm': 1,
+        }
+
+        self.assertEqual(kwargs['querystring'], querystring)
+
+        return args, kwargs
+
+    def test_config_missing(self, mock_get_edx_api_data):
+        """
+        Verify that no errors occur when catalog config is missing.
+        """
+        CatalogIntegration.objects.all().delete()
+
+        data = get_course_runs()
+        self.assertFalse(mock_get_edx_api_data.called)
+        self.assertEqual(data, [])
+
+    @mock.patch(UTILS_MODULE + '.log.error')
+    def test_service_user_missing(self, mock_log_error, mock_get_edx_api_data):
+        """
+        Verify that no errors occur when the catalog service user is missing.
+        """
+        catalog_integration = self.create_catalog_integration(service_username='nonexistent-user')
+
+        data = get_course_runs()
+        mock_log_error.any_call(
+            'Catalog service user with username [%s] does not exist. Course runs will not be retrieved.',
+            catalog_integration.service_username,
+        )
+        self.assertFalse(mock_get_edx_api_data.called)
+        self.assertEqual(data, [])
+
+    def test_get_course_runs(self, mock_get_edx_api_data):
+        """
+        Test retrieval of course runs.
+        """
+        catalog_course_runs = [CourseRunFactory() for __ in xrange(10)]
+        mock_get_edx_api_data.return_value = catalog_course_runs
+
+        data = get_course_runs()
+        self.assertTrue(mock_get_edx_api_data.called)
+        self.assert_contract(mock_get_edx_api_data.call_args)
+        self.assertEqual(data, catalog_course_runs)
