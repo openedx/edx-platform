@@ -53,7 +53,7 @@ if SENTRY_DSN:
     INSTALLED_APPS += ('raven.contrib.django.raven_compat',)
 
 INSTALLED_APPS += ('tiers',)
-MIDDLEWARE_CLASSES += ('tiers.middleware.TierMiddleware',)
+MIDDLEWARE_CLASSES += ('organizations.middleware.OrganizationMiddleware', 'tiers.middleware.TierMiddleware',)
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 

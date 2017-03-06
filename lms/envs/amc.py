@@ -95,3 +95,11 @@ if SENTRY_DSN:
 # from the redirect mechanics.
 MAIN_SITE_REDIRECT_WHITELIST = ['api', 'admin', 'oauth']
 
+INSTALLED_APPS += ('tiers',)
+MIDDLEWARE_CLASSES += ('organizations.middleware.OrganizationMiddleware', 'tiers.middleware.TierMiddleware',)
+
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
+
+TIERS_ORGANIZATION_MODEL = 'organizations.Organization'
+TIERS_EXPIRED_REDIRECT_URL = None
+
