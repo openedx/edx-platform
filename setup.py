@@ -41,7 +41,6 @@ setup(
         "openedx.user_partition_scheme": [
             "random = openedx.core.djangoapps.user_api.partition_schemes:RandomUserPartitionScheme",
             "cohort = openedx.core.djangoapps.course_groups.partition_scheme:CohortPartitionScheme",
-            "verification = openedx.core.djangoapps.credit.partition_schemes:VerificationPartitionScheme",
         ],
         "openedx.block_structure_transformer": [
             "library_content = lms.djangoapps.course_blocks.transformers.library_content:ContentLibraryTransformer",

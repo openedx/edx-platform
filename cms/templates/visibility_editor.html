@@ -1,12 +1,10 @@
 <%
 from django.utils.translation import ugettext as _
-from openedx.core.djangoapps.credit.partition_schemes import VerificationPartitionScheme
 from contentstore.utils import ancestor_has_staff_lock, get_visibility_partition_info
 
 partition_info = get_visibility_partition_info(xblock)
 user_partitions = partition_info["user_partitions"]
 cohort_partitions = partition_info["cohort_partitions"]
-verification_partitions = partition_info["verification_partitions"]
 has_selected_groups = partition_info["has_selected_groups"]
 selected_verified_partition_id = partition_info["selected_verified_partition_id"]
 
@@ -92,42 +90,6 @@ is_staff_locked = ancestor_has_staff_lock(xblock)
                                 % endfor
                             % endfor
 
-                            ## Allow only one verification checkpoint to be selected at a time.
-                            % if verification_partitions:
-                                <div role="group" aria-labelledby="verification-access-title">
-                                    <div id="verification-access-title" class="sr">${_('Verification Checkpoint')}</div>
-                                    <div class="field field-checkbox field-visibility-verification">
-                                        <input type="checkbox"
-                                            id="verification-access-checkbox"
-                                            name="verification-access-checkbox"
-                                            class="input input-checkbox"
-                                            value=""
-                                            aria-describedby="verification-help-text"
-                                            ${'checked="checked"' if selected_verified_partition_id is not None else ''}
-                                        />
-                                        <label for="verification-access-checkbox" class="label">
-                                            ${_('Verification Checkpoint')}:
-                                        </label>
-
-                                        <label class="sr" for="verification-access-dropdown">
-                                            ${_('Verification checkpoint to complete')}
-                                        </label>
-
-                                        <select id="verification-access-dropdown">
-                                            % for partition in verification_partitions:
-                                            <option
-                                                value="${partition["id"]}"
-                                                ${ "selected" if partition["id"] == selected_verified_partition_id else ""}
-                                            >${partition["name"]}</option>
-                                            % endfor
-                                        </select>
-
-                                        <div class="note" id="verification-help-text">
-                                            ${_("Learners who require verification must pass the selected checkpoint to see the content in this component. Learners who do not require verification see this content by default.")}
-                                        </div>
-                                    </div>
-                                </div>
-                            % endif
                             </div>
                         </div>
                     </section>
