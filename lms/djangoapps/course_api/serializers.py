@@ -73,9 +73,16 @@ class CourseSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
     pacing = serializers.CharField()
     mobile_available = serializers.BooleanField()
     hidden = serializers.SerializerMethodField()
+    instructor_info = serializers.SerializerMethodField()
 
     # 'course_id' is a deprecated field, please use 'id' instead.
     course_id = serializers.CharField(source='id', read_only=True)
+
+    def get_instructor_info(self, course_overview):
+        """
+        Get the instructor_info dict and returns the list of instructors
+        """
+        return course_overview.instructor_info.get('instructors', [])
 
     def get_hidden(self, course_overview):
         """
