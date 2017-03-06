@@ -398,7 +398,7 @@ class CourseTabList(List):
             if tabs[0].get('type') == 'courseware' and tabs[1].get('type') == 'course_info':
                 tabs[0], tabs[1] = tabs[1], tabs[0]
                 tabs[0]['name'] = _('Home')
-                tabs[1]['name'] = _('Course')
+                tabs[1]['name'] = _('Simulations')
 
         return tabs
 
