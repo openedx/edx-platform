@@ -1,4 +1,4 @@
-@import 'lms/static/sass/lms-main-v1';
+@import 'cms/static/sass/studio-main-v1';
 
 /** Roboto font **/
 @import url('https://fonts.googleapis.com/css?family=Roboto');
@@ -10,17 +10,5 @@
 html, body {
   * {
     font-family: 'Roboto', sans-serif !important;
-  }
-}
-
-/**
-*   HEADER ADJUSTMENT
-**/
-
-.header-global {
-  h1.logo {
-    img {
-      max-height: 50px;
-    }
   }
 }
