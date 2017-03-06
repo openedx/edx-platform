@@ -171,7 +171,7 @@ def video_encodings_download(request, course_key_string):
 
     profile_whitelist = VideoUploadConfig.get_profile_whitelist()
 
-    videos = get_videos_for_course(course.id)
+    videos = _get_videos(course, {"paginated": False})
     name_col = _("Name")
     duration_col = _("Duration")
     added_col = _("Date Added")
@@ -289,14 +289,16 @@ def _get_videos(course, params):
     """
     Retrieves the list of videos from VAL corresponding to this course.
     """
-    videos_data = get_videos_for_course(course.id, **params)
-    videos = videos_data["results"]
-    # convert VAL's status to studio's Video Upload feature status.
-    for video in videos:
-        video["status"] = convert_video_status(video)
+    videos = get_videos_for_course(course.id, **params)
 
-    videos_data["results"] = videos
-    return videos_data
+    if "paginated" in params and params["paginated"]:
+        # convert VAL's status to studio's Video Upload feature status.
+        for video in videos["results"]:
+            video["status"] = convert_video_status(video)
+    else:
+        for video in videos:
+            video["status"] = convert_video_status(video)
+    return videos
 
 
 def _get_index_videos(course, request):
