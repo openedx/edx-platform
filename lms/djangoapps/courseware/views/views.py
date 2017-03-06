@@ -828,9 +828,10 @@ def _progress(request, course_key, student_id):
 
     staff_access = bool(has_access(request.user, 'staff', course))
 
+    masquerade = None
     if student_id is None or student_id == request.user.id:
-        # always allowed to see your own profile
-        student = request.user
+        # This will be a no-op for non-staff users, returning request.user
+        masquerade, student = setup_masquerade(request, course_key, staff_access, reset_masquerade_data=True)
     else:
         try:
             coach_access = has_ccx_coach_role(request.user, course_key)
@@ -871,7 +872,8 @@ def _progress(request, course_key, student_id):
         'student': student,
         'passed': is_course_passed(course, grade_summary),
         'credit_course_requirements': _credit_course_requirements(course_key, student),
-        'certificate_data': _get_cert_data(student, course, course_key, is_active, enrollment_mode)
+        'certificate_data': _get_cert_data(student, course, course_key, is_active, enrollment_mode),
+        'masquerade': masquerade
     }
 
     with outer_atomic():
