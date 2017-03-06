@@ -21,5 +21,5 @@ ${_("If you have any questions please contact: {support_email}").format(
 )}
 ${_("If you did not request this mail, you do not need to do anything further. "
 "You will not receive any further communications from {platform_name}.").format(
-    configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
+    platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
 )}
