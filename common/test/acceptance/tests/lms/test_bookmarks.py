@@ -8,9 +8,9 @@ import requests
 from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage as StudioAutoAuthPage
 from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage as LmsAutoAuthPage
 from common.test.acceptance.pages.lms.bookmarks import BookmarksPage
+from common.test.acceptance.pages.lms.course_home import CourseHomePage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
-from common.test.acceptance.pages.lms.course_nav import CourseNavPage
-from common.test.acceptance.pages.studio.overview import CourseOutlinePage
+from common.test.acceptance.pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
 from common.test.acceptance.pages.common.logout import LogoutPage
 from common.test.acceptance.pages.common import BASE_URL
 
@@ -72,7 +72,7 @@ class BookmarksTest(BookmarksTestMixin):
         """
         super(BookmarksTest, self).setUp()
 
-        self.course_outline_page = CourseOutlinePage(
+        self.studio_course_outline_page = StudioCourseOutlinePage(
             self.browser,
             self.course_info['org'],
             self.course_info['number'],
@@ -80,8 +80,8 @@ class BookmarksTest(BookmarksTestMixin):
         )
 
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
+        self.course_home_page = CourseHomePage(self.browser, self.course_id)
         self.bookmarks_page = BookmarksPage(self.browser, self.course_id)
-        self.course_nav = CourseNavPage(self.browser)
 
         # Get session to be used for bookmarking units
         self.session = requests.Session()
@@ -166,10 +166,10 @@ class BookmarksTest(BookmarksTestMixin):
         ).visit()
 
         # Visit course outline page in studio.
-        self.course_outline_page.visit()
-        self.course_outline_page.wait_for_page()
+        self.studio_course_outline_page.visit()
+        self.studio_course_outline_page.wait_for_page()
 
-        self.course_outline_page.section_at(index).delete()
+        self.studio_course_outline_page.section_at(index).delete()
 
         # Logout and login as a student.
         LogoutPage(self.browser).visit()
@@ -232,11 +232,11 @@ class BookmarksTest(BookmarksTestMixin):
         """
         Update and publish the block/unit display name.
         """
-        self.course_outline_page.visit()
-        self.course_outline_page.wait_for_page()
+        self.studio_course_outline_page.visit()
+        self.studio_course_outline_page.wait_for_page()
 
-        self.course_outline_page.expand_all_subsections()
-        section = self.course_outline_page.section_at(0)
+        self.studio_course_outline_page.expand_all_subsections()
+        section = self.studio_course_outline_page.section_at(0)
         container_page = section.subsection_at(0).unit_at(0).go_to()
 
         self.course_fixture._update_xblock(container_page.locator, {  # pylint: disable=protected-access
@@ -267,7 +267,8 @@ class BookmarksTest(BookmarksTestMixin):
         """
         self._test_setup()
         for index in range(2):
-            self.course_nav.go_to_section('TestSection{}'.format(index), 'TestSubsection{}'.format(index))
+            self.course_home_page.visit()
+            self.course_home_page.outline.go_to_section('TestSection{}'.format(index), 'TestSubsection{}'.format(index))
 
             self._toggle_bookmark_and_verify(True, 'bookmarked', 1)
             self.bookmarks_page.click_bookmarks_button(False)
