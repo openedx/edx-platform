@@ -27,13 +27,25 @@ from django.utils.translation import ugettext as _
                 </div>
                 <ol class="outline-item focusable" role="group" tabindex="0">
                     % for subsection in section.get('children') or []:
-                        <li class="subsection" role="treeitem" tabindex="-1" aria-expanded="true">
+                        <li
+                            class="subsection ${ 'current' if subsection['current'] else '' }"
+                            role="treeitem"
+                            tabindex="-1"
+                            aria-expanded="true"
+                        >
                             <a
                                 class="outline-item focusable"
                                 href="${ subsection['lms_web_url'] }"
                                 id="${ subsection['id'] }"
                             >
-                                ${ subsection['display_name'] }
+                                <span>${ subsection['display_name'] }</span>
+                                <span class="sr-only">This is your last visited course section.</span>
+                                % if subsection['current']:
+                                    <span class="resume-right">
+                                        <b>Resume Course</b>
+                                        <span class="icon fa fa-arrow-circle-right" aria-hidden="true"></span>
+                                    </span>
+                                %endif
                             </a>
                         </li>
                     % endfor
