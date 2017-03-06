@@ -1027,6 +1027,7 @@ div.problem {
   }
 
   .notification {
+    @include float(left);
     margin-top: $baseline / 2;
     padding: ($baseline / 2.5) ($baseline / 2) ($baseline / 5) ($baseline / 2);
     line-height: $base-line-height;
