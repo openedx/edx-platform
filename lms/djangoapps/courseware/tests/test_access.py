@@ -146,6 +146,7 @@ class CoachAccessTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
     def test_access_student_progress_ccx(self):
         """
         Assert that only a coach can see progress of student.
+        TODO: TNL-5047, remove or update this test
         """
         ccx_locator = self.make_ccx()
         student = UserFactory()
