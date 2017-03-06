@@ -46,7 +46,7 @@ class CourseOutlineFragmentView(FragmentView):
             user=request.user,
             nav_depth=3,
             requested_fields=['children', 'display_name', 'type'],
-            block_types_filter=['course', 'chapter', 'vertical', 'sequential']
+            block_types_filter=['course', 'chapter', 'sequential']
         )
 
         course_block_tree = all_blocks['blocks'][all_blocks['root']]  # Get the root of the block tree

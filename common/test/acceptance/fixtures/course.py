@@ -227,9 +227,9 @@ class CourseFixture(XBlockContainerFixture):
         self._configure_course()
 
     @property
-    def course_outline(self):
+    def studio_course_outline_as_json(self):
         """
-        Retrieves course outline in JSON format.
+        Retrieves Studio course outline in JSON format.
         """
         url = STUDIO_BASE_URL + '/course/' + self._course_key + "?format=json"
         response = self.session.get(url, headers=self.headers)

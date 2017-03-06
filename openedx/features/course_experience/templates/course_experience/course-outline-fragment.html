@@ -10,7 +10,7 @@ from django.utils.translation import ugettext as _
     CourseOutlineFactory('.block-tree');
 </%static:require_module_async>
 
-<section class="course-outline" id="main">
+<div class="course-outline" id="main" tabindex="-1">
     <ol class="block-tree" role="tree">
         % for section in blocks.get('children') or []:
             <li
@@ -39,4 +39,4 @@ from django.utils.translation import ugettext as _
             </li>
         % endfor
     </ol>
-</section>
+</div>
