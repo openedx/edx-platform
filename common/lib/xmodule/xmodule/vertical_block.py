@@ -48,7 +48,6 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
         else:
             child_context = {}
 
-        # import pdb; pdb.set_trace()
         if 'bookmarked' not in child_context:
             bookmarks_service = self.runtime.service(self, 'bookmarks')
             if bookmarks_service:
