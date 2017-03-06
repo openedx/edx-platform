@@ -1571,11 +1571,6 @@ class CourseEnrollment(models.Model):
         # If it is after the refundable cutoff date they should not be refunded.
         refund_cutoff_date = self.refund_cutoff_date()
         if refund_cutoff_date and datetime.now(UTC) > refund_cutoff_date:
-            log.info(
-                u"user [%s] cannot be refunded because his/her cutoff date [%s] has passed",
-                self.username,
-                refund_cutoff_date
-            )
             return False
 
         course_mode = CourseMode.mode_for_course(self.course_id, 'verified')
