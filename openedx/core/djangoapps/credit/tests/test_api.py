@@ -287,7 +287,7 @@ class CreditRequirementApiTests(CreditApiTestBase):
         # Set initial requirements
         requirements = [
             {
-                "namespace": "reverification",
+                "namespace": "grade",
                 "name": "midterm",
                 "display_name": "Midterm",
                 "criteria": {},
@@ -328,8 +328,8 @@ class CreditRequirementApiTests(CreditApiTestBase):
 
         requirements = [
             {
-                "namespace": "reverification",
-                "name": "i4x://edX/DemoX/edx-reverification-block/assessment_uuid",
+                "namespace": "grade",
+                "name": "other_grade",
                 "display_name": "Assessment 1",
                 "criteria": {},
             }
@@ -457,8 +457,8 @@ class CreditRequirementApiTests(CreditApiTestBase):
                 },
             },
             {
-                "namespace": "reverification",
-                "name": "i4x://edX/DemoX/edx-reverification-block/assessment_uuid",
+                "namespace": "grade",
+                "name": "other_grade",
                 "display_name": "Assessment 1",
                 "criteria": {},
             }
@@ -499,15 +499,15 @@ class CreditRequirementApiTests(CreditApiTestBase):
         # Set the requirement to "declined" and check that it's actually set
         api.set_credit_requirement_status(
             self.user, self.course_key,
-            "reverification",
-            "i4x://edX/DemoX/edx-reverification-block/assessment_uuid",
+            "grade",
+            "other_grade",
             status="declined"
         )
         req_status = api.get_credit_requirement_status(
             self.course_key,
             username,
-            namespace="reverification",
-            name="i4x://edX/DemoX/edx-reverification-block/assessment_uuid"
+            namespace="grade",
+            name="other_grade"
         )
         self.assertEqual(req_status[0]["status"], "declined")
 
@@ -528,8 +528,8 @@ class CreditRequirementApiTests(CreditApiTestBase):
                 },
             },
             {
-                "namespace": "reverification",
-                "name": "i4x://edX/DemoX/edx-reverification-block/assessment_uuid",
+                "namespace": "grade",
+                "name": "other_grade",
                 "display_name": "Assessment 1",
                 "criteria": {},
             }
@@ -600,8 +600,8 @@ class CreditRequirementApiTests(CreditApiTestBase):
                 },
             },
             {
-                "namespace": "reverification",
-                "name": "i4x://edX/DemoX/edx-reverification-block/assessment_uuid",
+                "namespace": "grade",
+                "name": "other_grade",
                 "display_name": "Assessment 1",
                 "criteria": {},
             }
@@ -727,8 +727,8 @@ class CreditRequirementApiTests(CreditApiTestBase):
                 },
             },
             {
-                "namespace": "reverification",
-                "name": "i4x://edX/DemoX/edx-reverification-block/assessment_uuid",
+                "namespace": "grade",
+                "name": "other_grade",
                 "display_name": "Assessment 1",
                 "criteria": {},
             }
@@ -790,8 +790,8 @@ class CreditRequirementApiTests(CreditApiTestBase):
                 },
             },
             {
-                "namespace": "reverification",
-                "name": "i4x://edX/DemoX/edx-reverification-block/assessment_uuid",
+                "namespace": "grade",
+                "name": "other_grade",
                 "display_name": "Assessment 1",
                 "criteria": {},
             }
