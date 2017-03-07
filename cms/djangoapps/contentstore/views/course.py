@@ -125,7 +125,6 @@ WAFFLE_NAMESPACE = 'studio_home'
 
 
 
-
 class AccessListFallback(Exception):
     """
     An exception that is raised whenever we need to `fall back` to fetching *all* courses

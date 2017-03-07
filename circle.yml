@@ -46,6 +46,7 @@ dependencies:
     - tar -xzvf 2.8.3.tar.gz
     - cp -av sqlite-autoconf-3140100/. pysqlite-2.8.3/
     - cd ./pysqlite-2.8.3 && python setup.py build_static install
+    - rm -rf 2.8.3.tar.gz sqlite-autoconf-3140100.tar.gz pysqlite-2.8.3 sqlite-autoconf-3140100
 
 test:
   override:
@@ -56,6 +57,7 @@ test:
     # to understand how multiple containers can be used to
     # run subsets of tests in parallel.
     - ./scripts/all-tests.sh:
+        timeout: 900  # if a command runs this many seconds without output, kill it
         parallel: true
 
   post:
