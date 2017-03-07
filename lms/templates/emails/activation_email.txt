@@ -12,9 +12,9 @@ ${_("There's just one more step before you can enroll in a course: "
     )}
 
 % if is_secure:
-  https://${ request.site }/activate/${ key }
+  https://${ site }/activate/${ key }
 % else:
-  http://${ request.site }/activate/${ key }
+  http://${ site }/activate/${ key }
 % endif
 ${_("If you didn't create an account, you don't need to do anything; you "
       "won't receive any more email from us. If you need assistance, please "
