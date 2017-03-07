@@ -58,5 +58,5 @@ MIDDLEWARE_CLASSES += ('organizations.middleware.OrganizationMiddleware', 'tiers
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
 TIERS_ORGANIZATION_MODEL = 'organizations.Organization'
-TIERS_EXPIRED_REDIRECT_URL = "/"
+TIERS_EXPIRED_REDIRECT_URL = AMC_APP_URL + "/expired"
 
