@@ -8,7 +8,7 @@
             'edx-ui-toolkit/js/utils/constants',
             'common/js/discussion/discussion',
             'common/js/spec_helpers/discussion_spec_helper',
-            'discussion/js/views/discussion_board_view'
+            'discussions/js/views/discussion_board_view'
         ],
         function(_, $, constants, Discussion, DiscussionSpecHelper, DiscussionBoardView) {
             describe('DiscussionBoardView', function() {

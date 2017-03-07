@@ -6,7 +6,7 @@ define(
         'jquery',
         'backbone',
         'common/js/spec_helpers/discussion_spec_helper',
-        'discussion/js/discussion_profile_page_factory'
+        'discussions/js/discussion_profile_page_factory'
     ],
     function(_, $, Backbone, DiscussionSpecHelper, DiscussionProfilePageFactory) {
         'use strict';

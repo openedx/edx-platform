@@ -7,7 +7,7 @@ define([
     'common/js/discussion/views/discussion_thread_profile_view',
     'common/js/discussion/discussion',
     'common/js/spec_helpers/discussion_spec_helper',
-    'discussion/js/views/discussion_user_profile_view'
+    'discussions/js/views/discussion_user_profile_view'
 ],
 function(_, $, URI, DiscussionUtil, DiscussionThreadProfileView, Discussion,
 DiscussionSpecHelper, DiscussionUserProfileView) {

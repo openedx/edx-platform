@@ -25,7 +25,7 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_str
 
 <%block name="js_extra">
 <%include file="_js_body_dependencies.html" />
-<%static:require_module module_name="discussion/js/discussion_profile_page_factory" class_name="DiscussionProfilePageFactory">
+<%static:require_module module_name="discussions/js/discussion_profile_page_factory" class_name="DiscussionProfilePageFactory">
     profile_page_context = {
         'courseSettings': ${course_settings | n, dump_js_escaped_json},
         'courseId': '${unicode(course.id) | n, js_escaped_string}',

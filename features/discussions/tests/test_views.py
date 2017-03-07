@@ -20,7 +20,6 @@ from django_comment_client.tests.group_id import (
 from django_comment_client.tests.unicode import UnicodeTestMixin
 from django_comment_client.tests.utils import CohortedTestCase, ForumsEnableMixin
 from django_comment_client.utils import strip_none
-from lms.djangoapps.discussion import views
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from util.testing import UrlResetMixin
 from util.tests.mixins.enterprise import EnterpriseTestConsentRequired
@@ -41,6 +40,8 @@ from mock import patch, Mock, ANY, call
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
+
+from features.discussions import views
 
 log = logging.getLogger(__name__)
 
@@ -94,8 +95,10 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
         # that gets the current user's info
         mock_from_django_user.return_value = Mock()
 
-        url = reverse('discussion.views.user_profile',
-                      kwargs={'course_id': self.course.id.to_deprecated_string(), 'user_id': '12345'})  # There is no user 12345
+        url = reverse(
+            'edx.discussions.user_profile',
+            kwargs={'course_id': self.course.id.to_deprecated_string(), 'user_id': '12345'}
+        )  # There is no user 12345
         self.response = self.client.get(url)
         self.assertEqual(self.response.status_code, 404)
 
@@ -111,8 +114,10 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
         # that gets the current user's info
         mock_from_django_user.return_value = Mock()
 
-        url = reverse('discussion.views.followed_threads',
-                      kwargs={'course_id': self.course.id.to_deprecated_string(), 'user_id': '12345'})  # There is no user 12345
+        url = reverse(
+            'edx.discussions.followed_threads',
+            kwargs={'course_id': self.course.id.to_deprecated_string(), 'user_id': '12345'}
+        )  # There is no user 12345
         self.response = self.client.get(url)
         self.assertEqual(self.response.status_code, 404)
 
@@ -833,7 +838,7 @@ class ForumFormDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdT
 
         self.client.login(username=user.username, password='test')
         return self.client.get(
-            reverse("discussion.views.forum_form_discussion", args=[unicode(self.course.id)]),
+            reverse("edx.discussions.forum_form_discussion", args=[unicode(self.course.id)]),
             data=request_data,
             **headers
         )
@@ -1286,7 +1291,7 @@ class CommentsServiceRequestHeadersTestCase(ForumsEnableMixin, UrlResetMixin, Mo
 
         self.client.get(
             reverse(
-                "discussion.views.single_thread",
+                "edx.discussions.single_thread",
                 kwargs={
                     "course_id": self.course.id.to_deprecated_string(),
                     "discussion_id": "dummy_discussion_id",
@@ -1303,7 +1308,7 @@ class CommentsServiceRequestHeadersTestCase(ForumsEnableMixin, UrlResetMixin, Mo
 
         self.client.get(
             reverse(
-                "discussion.views.forum_form_discussion",
+                "edx.discussions.forum_form_discussion",
                 kwargs={"course_id": self.course.id.to_deprecated_string()}
             ),
         )
@@ -1397,7 +1402,7 @@ class ForumDiscussionXSSTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTe
         """
         mock_user.return_value.to_dict.return_value = {}
         reverse_url = "%s%s" % (reverse(
-            "discussion.views.forum_form_discussion",
+            "edx.discussions.forum_form_discussion",
             kwargs={"course_id": unicode(self.course.id)}), '/forum_form_discussion')
         # Test that malicious code does not appear in html
         url = "%s?%s=%s" % (reverse_url, 'sort_key', malicious_code)
@@ -1416,8 +1421,10 @@ class ForumDiscussionXSSTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTe
         mock_from_django_user.return_value.to_dict.return_value = {}
         mock_request.side_effect = make_mock_request_impl(course=self.course, text='dummy')
 
-        url = reverse('discussion.views.user_profile',
-                      kwargs={'course_id': unicode(self.course.id), 'user_id': str(self.student.id)})
+        url = reverse(
+            'edx.discussions.user_profile',
+            kwargs={'course_id': unicode(self.course.id), 'user_id': str(self.student.id)}
+        )
         # Test that malicious code does not appear in html
         url_string = "%s?%s=%s" % (url, 'page', malicious_code)
         resp = self.client.get(url_string)
