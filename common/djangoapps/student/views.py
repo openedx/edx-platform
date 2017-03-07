@@ -579,7 +579,8 @@ def dashboard(request):
         course_id = course_enrollment.course_id
         course = store.get_course(course_id)
         # progress
-        course_enrollment.course_progress = grades.grade(user, course)
+        # use unwrapped _grade method to prevent triggering grade update signal
+        course_enrollment.course_progress = grades._grade(user, course, False)
         # author
         if "ccx" in str(course_id):
             ccx_id = int(course.id.ccx)
