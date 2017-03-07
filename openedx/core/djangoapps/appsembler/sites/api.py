@@ -93,7 +93,7 @@ class TierCreateUpdateView(views.APIView):
     permission_classes = (ApiKeyHeaderPermission,)
 
     def post(self, request):
-        params = request.json()
+        params = request.data
         # TODO: Fix this. We should add a unique constraint on the Organiztion model
         # with some field that will be the same in both systems
         org = Organization.objects.filter(name=params['organization_name']).first()
