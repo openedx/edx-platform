@@ -1247,6 +1247,12 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
         rendered_context = self.descriptor.get_context()
         self.assertListEqual(rendered_context['tabs'], correct_tabs)
 
+        # Assert that the Video ID field is present in basic tab metadata context.
+        self.assertEqual(
+            rendered_context['transcripts_basic_tab_metadata']['edx_video_id'],
+            self.descriptor.editable_metadata_fields['edx_video_id']
+        )
+
     def test_export_val_data(self):
         self.descriptor.edx_video_id = 'test_edx_video_id'
         create_profile('mobile')
