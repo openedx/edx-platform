@@ -75,11 +75,11 @@ else
             ;;
 
         1)  # run all of the lms unit tests
-            paver test_system -s lms --with-flaky --cov-args="-p" --with-xunitmp
+            paver test_system -s lms --with-flaky --cov-args="-p" --with-xunitmp --settings=test_appsembler
             ;;
 
         2)  # run all of the cms unit tests
-            paver test_system -s cms --with-flaky --cov-args="-p" --with-xunitmp
+            paver test_system -s cms --with-flaky --cov-args="-p" --with-xunitmp --settings=test_appsembler
             ;;
 
         3)  # run the commonlib unit tests
