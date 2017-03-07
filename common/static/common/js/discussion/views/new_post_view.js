@@ -136,8 +136,8 @@
                 title = this.$('.js-post-title').val();
                 body = this.$('.js-post-body').find('.wmd-input').val();
                 group = this.$('.js-group-select option:selected').attr('value');
-                anonymous = false || this.$('.js-anon').is(':checked');
-                anonymousToPeers = false || this.$('.js-anon-peers').is(':checked');
+                anonymous = false || this.$('input[name=anonymous]').is(':checked');
+                anonymousToPeers = false || this.$('input[name=anonymous_to_peers]').is(':checked');
                 follow = false || this.$('input[name=follow]').is(':checked');
                 topicId = this.isTabMode() ? this.topicView.getCurrentTopicId() : this.topicId;
                 url = DiscussionUtil.urlFor('create_thread', topicId);
