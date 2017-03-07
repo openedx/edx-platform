@@ -32,6 +32,9 @@ dependencies:
     - pip install --exists-action w -r requirements/edx/paver.txt
     - if [ -e requirements/edx/post.txt ]; then pip install --exists-action w -r requirements/edx/post.txt ; fi
 
+    # Try to fix SSL handshake problems when running tests
+    - pip install ndg-httpsclient pyasn1 --upgrade
+     
     - pip install coveralls==1.0
     - pip install -U codecov
 
