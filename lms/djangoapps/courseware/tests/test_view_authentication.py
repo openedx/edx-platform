@@ -84,7 +84,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         for url in urls:
             self.assert_request_status_code(200, url)
 
-        # TODO: TNL-5047 re-add some sort of check here
+        # TODO: TNL-6652 re-add some sort of check here
 
         # The courseware url should redirect, not 200
         url = self._reverse_urls(['courseware'], course)[0]

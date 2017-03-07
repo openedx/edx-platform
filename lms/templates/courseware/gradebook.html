@@ -56,6 +56,7 @@ from django.core.urlresolvers import reverse
         %for student in students:
         <tr>
           <td>
+            <!-- TODO TNL-6652: this is super broken as well -->
             <a href="${reverse('student_progress', kwargs=dict(course_id=course_id.to_deprecated_string(), student_id=student['id']))}">${student['username']}</a>
           </td>
         </tr>

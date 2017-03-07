@@ -3080,7 +3080,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
 
     def test_get_student_progress_url(self):
         """ Test that progress_url is in the successful response. """
-        # TODO TNL-5047: this endpoint no longer exists, use a masquerade
+        # TODO TNL-6652: this endpoint no longer exists, use a masquerade
         url = reverse('get_student_progress_url', kwargs={'course_id': self.course.id.to_deprecated_string()})
         data = {'unique_student_identifier': self.students[0].email.encode("utf-8")}
         response = self.client.post(url, data)
@@ -3090,7 +3090,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
 
     def test_get_student_progress_url_from_uname(self):
         """ Test that progress_url is in the successful response. """
-        # TODO TNL-5047: this endpoint no longer exists, use a masquerade
+        # TODO TNL-6652: this endpoint no longer exists, use a masquerade
         url = reverse('get_student_progress_url', kwargs={'course_id': self.course.id.to_deprecated_string()})
         data = {'unique_student_identifier': self.students[0].username.encode("utf-8")}
         response = self.client.post(url, data)
@@ -3100,14 +3100,14 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
 
     def test_get_student_progress_url_noparams(self):
         """ Test that the endpoint 404's without the required query params. """
-        # TODO TNL-5047: this endpoint no longer exists, use a masquerade
+        # TODO TNL-6652: this endpoint no longer exists, use a masquerade
         url = reverse('get_student_progress_url', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.post(url)
         self.assertEqual(response.status_code, 400)
 
     def test_get_student_progress_url_nostudent(self):
         """ Test that the endpoint 400's when requesting an unknown email. """
-        # TODO TNL-5047: this endpoint no longer exists, use a masquerade
+        # TODO TNL-6652: this endpoint no longer exists, use a masquerade
         url = reverse('get_student_progress_url', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.post(url)
         self.assertEqual(response.status_code, 400)

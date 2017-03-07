@@ -1228,7 +1228,7 @@ class ProgressPageTests(ModuleStoreTestCase):
         # Test that malicious code does not appear in html
         self.assertNotIn(malicious_code, resp.content)
 
-    # TODO: add some more tests to replace the ones I just removed, TNL-5047
+    # TODO: add some more tests to replace the ones I just removed, TNL-6652
 
     def test_pure_ungraded_xblock(self):
         ItemFactory.create(category='acid', parent_location=self.vertical.location)
