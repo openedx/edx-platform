@@ -1,15 +1,12 @@
 @import 'lms/static/sass/lms-main-v1';
 
-/** Roboto font **/
-@import url('https://fonts.googleapis.com/css?family=Roboto');
-
 /**
 *   GLOBAL
 **/
 
 html, body {
   * {
-    font-family: 'Roboto', sans-serif !important;
+    font-family: 'roboto-regular', sans-serif !important;
   }
 }
 
