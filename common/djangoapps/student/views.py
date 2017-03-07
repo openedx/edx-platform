@@ -1835,7 +1835,6 @@ def create_account_with_params(request, params):
 
     # APPSEMBLER SPECIFIC END
 
-
     # Don't send email if we are:
     #
     # 1. Doing load testing.

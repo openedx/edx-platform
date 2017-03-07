@@ -147,6 +147,7 @@ def devstack(args):
         contracts=not args.no_contracts,
     )
 
+
 @task
 @needs('pavelib.prereqs.install_prereqs')
 @consume_args
@@ -159,6 +160,7 @@ def devstack_appsembler(args):
     parser.add_argument('--fast', action='store_true', default=False, help="Skip updating assets")
     args = parser.parse_args(args)
     run_server(args.system[0], settings='devstack_appsembler', skip_assets=args.fast)
+
 
 @task
 @needs('pavelib.prereqs.install_prereqs')

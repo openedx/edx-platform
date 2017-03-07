@@ -74,4 +74,3 @@ django.contrib.sites.models.clear_site_cache = patched_clear_site_cache
 SiteManager.clear_cache = patched_clear_cache
 SiteManager._get_site_by_id = patched_get_site_by_id  # pylint: disable=protected-access
 SiteManager._get_site_by_request = patched_get_site_by_request  # pylint: disable=protected-access
-

@@ -94,4 +94,3 @@ if SENTRY_DSN:
 # This is used in the appsembler_sites.middleware.RedirectMiddleware to exclude certain paths
 # from the redirect mechanics.
 MAIN_SITE_REDIRECT_WHITELIST = ['api', 'admin', 'oauth']
-

@@ -39,7 +39,6 @@ def enable_theming():
     _add_theming_locales()
 
 
-
 def _add_theming_locales():
     """
     Add locale paths to settings for comprehensive theming.

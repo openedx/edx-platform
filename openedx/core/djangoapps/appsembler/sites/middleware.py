@@ -33,4 +33,3 @@ class RedirectMiddleware(object):
         redirect_to = redirects.get(request.path)
         if redirect_to:
             return redirect(redirect_to, permanent=True)
-
