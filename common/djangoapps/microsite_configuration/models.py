@@ -6,18 +6,12 @@ that would have been used in the settings.
 
 """
 import collections
-import os
 
-from django.conf import settings
 from django.db import models
 from django.dispatch import receiver
 from django.db.models.signals import pre_save, pre_delete
 from django.db.models.base import ObjectDoesNotExist
 from django.contrib.sites.models import Site
-from django.contrib.staticfiles.storage import staticfiles_storage
-from django.core.files.storage import FileSystemStorage
-
-import sass
 
 from jsonfield.fields import JSONField
 from model_utils.models import TimeStampedModel
@@ -43,20 +37,6 @@ class Microsite(models.Model):
 
     def __unicode__(self):
         return self.key
-
-    def save(self, **kwargs):
-        # When creating a new object, save default microsite values. Not implemented as a default method on the field
-        # because it depends on other fields that should be already filled.
-        if not self.id:
-            self.values = self._get_initial_microsite_values()
-
-        # fix for a bug with some pages requiring uppercase platform_name variable
-        self.values['PLATFORM_NAME'] = self.values.get('platform_name', '')
-
-        # recompile SASS on every save
-        self.compile_microsite_sass()
-        #self.collect_css_file()
-        return super(Microsite, self).save(**kwargs)
 
     def get_organizations(self):
         """

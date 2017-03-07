@@ -1,3 +1,8 @@
 from .test import *
 
-APPSEMBLER_SECRET_KEY = "secret_key"
+COMPREHENSIVE_THEME_DIRS = [
+    REPO_ROOT / "themes",
+    REPO_ROOT / "common/test",
+    REPO_ROOT / "common/test/appsembler",
+]
+DEFAULT_SITE_THEME = "appsembler-theme"

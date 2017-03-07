@@ -11,6 +11,7 @@ from django.contrib.sites.models import Site
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from organizations.api import add_organization
 from organizations.models import UserOrganizationMapping, Organization
+
 from openedx.core.djangoapps.theming.models import SiteTheme
 
 
@@ -23,12 +24,16 @@ def get_initial_sass_variables():
 
 
 def get_branding_values_from_file():
-    sass_var_file = os.path.join(settings.COMPREHENSIVE_THEME_DIR,
-                                 settings.DEFAULT_SITE_THEME, 'customer_specific', 'lms', 'static',
-                                 'sass', 'base', '_branding-basics.scss')
-    with open(sass_var_file, 'r') as f:
-        contents = f.read()
-        values = sass_to_dict(contents)
+    from openedx.core.djangoapps.theming.helpers import get_current_theme
+    theme = get_current_theme()
+    if theme:
+        sass_var_file = os.path.join(theme.customer_specific_path, 'static',
+                                     'sass', 'base', '_branding-basics.scss')
+        with open(sass_var_file, 'r') as f:
+            contents = f.read()
+            values = sass_to_dict(contents)
+    else:
+        values = {}
     return values
 
 
@@ -44,19 +49,21 @@ def get_branding_labels_from_file(custom_branding=None):
 
 
 def compile_sass(sass_file, custom_branding=None):
-    sass_var_file = os.path.join(settings.COMPREHENSIVE_THEME_DIR,
-                                 settings.DEFAULT_SITE_THEME, 'lms', 'static', 'sass', sass_file)
-    customer_specific_includes = os.path.join(settings.COMPREHENSIVE_THEME_DIR,
-                                              settings.DEFAULT_SITE_THEME,
-                                              'customer_specific', 'lms', 'static', 'sass')
-    importers = None
-    if custom_branding:
-        importers = [(0, custom_branding)]
-    css_output = sass.compile(
-        filename=sass_var_file,
-        include_paths=[customer_specific_includes],
-        importers=importers
-    )
+    from openedx.core.djangoapps.theming.helpers import get_current_theme
+    theme = get_current_theme()
+    if theme:
+        sass_var_file = os.path.join(theme.path, 'static', 'sass', sass_file)
+        customer_specific_includes = os.path.join(theme.customer_specific_path, 'static', 'sass')
+        importers = None
+        if custom_branding:
+            importers = [(0, custom_branding)]
+        css_output = sass.compile(
+            filename=sass_var_file,
+            include_paths=[customer_specific_includes],
+            importers=importers
+        )
+    else:
+        css_output = ""
     return css_output
 
 

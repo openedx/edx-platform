@@ -75,7 +75,7 @@ def index(request):
         settings.FEATURES.get('ENABLE_MKTG_SITE', False)
     )
 
-    if enable_mktg_site and settings.MKTG_URLS.get('ROOT'):
+    if enable_mktg_site:
         marketing_urls = configuration_helpers.get_value(
             'MKTG_URLS',
             settings.MKTG_URLS

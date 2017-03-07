@@ -50,7 +50,7 @@ class SiteConfiguration(models.Model):
     def save(self, **kwargs):
         # When creating a new object, save default microsite values. Not implemented as a default method on the field
         # because it depends on other fields that should be already filled.
-        if not self.id:
+        if not self.id and not self.values:
             self.values = self._get_initial_microsite_values()
 
         # fix for a bug with some pages requiring uppercase platform_name variable
@@ -136,14 +136,23 @@ class SiteConfiguration(models.Model):
     def compile_microsite_sass(self):
         css_output = compile_sass('main.scss', custom_branding=self._sass_var_override)
         domain_without_port_number = self.site.domain.split(':')[0]
-        output_path = os.path.join(settings.COMPREHENSIVE_THEME_DIRS[0], 'customer_themes', '{}.css'.format(
-            domain_without_port_number))
-        collected_output_path = os.path.join(settings.STATIC_ROOT, 'customer_themes', '{}.css'.format(
-            domain_without_port_number))
-        with open(output_path, 'w') as f:
-            f.write(css_output.encode('utf-8'))
-            os.chmod(output_path, 0777)
-        with open(collected_output_path, 'w') as f:
+
+        if settings.DEBUG:
+            from openedx.core.djangoapps.theming.helpers import get_theme_base_dir
+            theme_dir = get_theme_base_dir(settings.DEFAULT_SITE_THEME)
+            output_path = os.path.join(theme_dir, 'customer_themes')
+            if not os.path.exists(output_path):
+                os.makedirs(output_path)
+            output_file_path = os.path.join(output_path, '{}.css'.format(domain_without_port_number))
+            with open(output_file_path, 'w') as f:
+                f.write(css_output.encode('utf-8'))
+                os.chmod(output_path, 0777)
+
+        collected_output_path = os.path.join(settings.STATIC_ROOT, 'customer_themes')
+        if not os.path.exists(collected_output_path):
+            os.makedirs(collected_output_path)
+        collected_output_file_path = os.path.join(collected_output_path, '{}.css'.format(domain_without_port_number))
+        with open(collected_output_file_path, 'w') as f:
             f.write(css_output.encode('utf-8'))
             os.chmod(collected_output_path, 0777)
 

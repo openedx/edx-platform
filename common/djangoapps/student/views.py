@@ -1821,7 +1821,7 @@ def create_account_with_params(request, params):
             organization = Organization.objects.get(name=organization_name)
         except:
             pass
-    else:
+    elif hasattr(request, 'site'):
         organization = request.site.organizations.first()
 
     if organization:
