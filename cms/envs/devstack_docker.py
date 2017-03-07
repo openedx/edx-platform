@@ -23,3 +23,8 @@ JWT_AUTH.update({
     'JWT_ISSUER': OAUTH_OIDC_ISSUER,
     'JWT_AUDIENCE': 'lms-key',
 })
+
+FEATURES.update({
+    'ENABLE_COURSEWARE_INDEX': False,
+    'ENABLE_LIBRARY_INDEX': False,
+})
