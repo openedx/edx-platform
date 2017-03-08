@@ -94,9 +94,8 @@ def run():
         startup_notification_subsystem()
 
     if settings.FEATURES.get('EDX_SOLUTIONS_API', False) and \
-        settings.FEATURES.get('DISABLE_SOLUTIONS_APPS_SIGNALS', False):
+            settings.FEATURES.get('DISABLE_SOLUTIONS_APPS_SIGNALS', False):
         disable_solutions_apps_signals()
-
 
     # In order to allow modules to use a handler url, we need to
     # monkey-patch the x_module library.

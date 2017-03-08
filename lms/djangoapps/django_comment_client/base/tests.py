@@ -499,8 +499,6 @@ class ViewsQueryCountTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSet
     def test_create_thread(self, mock_request):
         self.create_thread_helper(mock_request)
 
-
-
     @ddt.data(
         (ModuleStoreEnum.Type.mongo, 3, 3, 25),
         (ModuleStoreEnum.Type.split, 3, 10, 25),
