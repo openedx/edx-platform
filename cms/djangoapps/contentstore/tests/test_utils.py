@@ -535,9 +535,9 @@ class GetUserPartitionInfoTest(ModuleStoreTestCase):
             ),
             UserPartition(
                 id=1,
-                name="Completely random user partition",
-                scheme=UserPartition.get_scheme("random"),
-                description="Random user partition",
+                name="Verification user partition",
+                scheme=UserPartition.get_scheme("verification"),
+                description="Verification user partition",
                 groups=[
                     Group(id=0, name="Group C"),
                 ],
@@ -562,9 +562,9 @@ class GetUserPartitionInfoTest(ModuleStoreTestCase):
             ),
             UserPartition(
                 id=1,
-                name="Completely random user partition",
-                scheme=UserPartition.get_scheme("random"),
-                description="Random user partition",
+                name="Verification user partition",
+                scheme=UserPartition.get_scheme("verification"),
+                description="Verification user partition",
                 groups=[
                     Group(id=0, name="Group C"),
                 ],
@@ -574,7 +574,7 @@ class GetUserPartitionInfoTest(ModuleStoreTestCase):
         # Expect that the partition with no groups is excluded from the results
         partitions = self._get_partition_info()
         self.assertEqual(len(partitions), 1)
-        self.assertEqual(partitions[0]["scheme"], "random")
+        self.assertEqual(partitions[0]["scheme"], "verification")
 
     def _set_partitions(self, partitions):
         """Set the user partitions of the course descriptor. """
