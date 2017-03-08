@@ -68,6 +68,7 @@
   padding: ($baseline/4) 0 ($baseline/2) 0;
   border-bottom: 1px solid $outer-border-color;
   background: $header-bg;
+  line-height: 1.4;
 
   .wrapper-header {
     padding-top: ($baseline/4);
@@ -117,35 +118,12 @@
     padding-top: ($baseline/4);
   }
 
-  h1.logo {
+  .logo {
     margin: 0 ($baseline/2) 0 0;
-    @include padding-right(20px);
-
-    &:before {
-      @extend %faded-vertical-divider;
-      content: "";
-      display: block;
-      height: 35px;
-      position: absolute;
-      @include right(3px);
-      top: 0;
-      width: 1px;
-    }
-
-    &:after {
-      @extend %faded-vertical-divider-light;
-      content: "";
-      display: block;
-      height: 35px;
-      position: absolute;
-      right: 0;
-      top: 0;
-      width: 1px;
-    }
 
     img {
       height: 30px;
-      width: auto;
+      vertical-align: middle;
     }
   }
 
@@ -154,26 +132,21 @@
     display: none;
   }
 
-  h2 {
-    display: block;
-    width: 65%;
+  .course-header {
     @include float(left);
-    font-size: 0.9em;
-    font-weight: 600;
-    color: $lighter-base-font-color;
-    letter-spacing: 0;
-    margin-top: 9px;
-    margin-bottom: 0;
-    text-transform: none;
-    text-shadow: 0 1px 0 #fff;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
+    @include margin(10px, 10px, 0px, 10px);
+
+    display: inline-block;
+    width: 65%;
+    font-weight: font-weight(normal);
+    font-size: font-size(base);
+    line-height: 1.5;
 
     .provider {
       font: inherit;
       font-weight: bold;
     }
+
   }
 
   a#signup {

@@ -187,10 +187,10 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         self.client.login(username='mrrobot', password='test')
 
         html_elements = [
-            '<h4 class="handouts-header">Important Course Dates</h4>',
+            '<h3 class="hd hd-3 handouts-header">Important Course Dates</h3>',
             '<div class="date-summary-container">',
             '<div class="date-summary date-summary-todays-date">',
-            '<h3 class="heading localized-datetime"',
+            '<span class="hd hd-4 heading localized-datetime"',
             'data-datetime="2015-01-02 00:00:00+00:00"',
             'data-string="Today is {date}"',
             'data-timezone="None"'
@@ -209,10 +209,10 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         response = self.client.get(url)
 
         html_elements = [
-            '<h4 class="handouts-header">Important Course Dates</h4>',
+            '<h3 class="hd hd-3 handouts-header">Important Course Dates</h3>',
             '<div class="date-summary-container">',
             '<div class="date-summary date-summary-todays-date">',
-            '<h3 class="heading localized-datetime"',
+            '<span class="hd hd-4 heading localized-datetime"',
             'data-datetime="2015-01-02 00:00:00+00:00"',
             'data-string="Today is {date}"',
             'data-timezone="America/Los_Angeles"'
