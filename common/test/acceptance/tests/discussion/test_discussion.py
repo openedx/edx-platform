@@ -288,6 +288,33 @@ class DiscussionNavigationTest(BaseDiscussionTestCase):
         self.thread_page.q(css=".breadcrumbs .nav-item")[0].click()
         self.assertEqual(len(self.thread_page.q(css=".breadcrumbs .nav-item")), 1)
 
+    def test_breadcrumbs_toggle_browser_menu(self):
+        """
+        Scenario: If click the "All Topics" breadcrumb twice,
+            navigating away and back to a particular topic,
+            the breadcrumb is restored to that of the last topic.
+        """
+        topic_button = self.thread_page.q(
+            css=".forum-nav-browse-menu-item[data-discussion-id='{}']".format(self.discussion_id)
+        )
+        self.assertTrue(topic_button.visible)
+        self.assertEqual(len(self.thread_page.q(css=".breadcrumbs .nav-item")), 1)
+
+        topic_button.click()
+        self.assertEqual(len(self.thread_page.q(css=".breadcrumbs .nav-item")), 2)
+        self.assertEqual(self.thread_page.q(
+            css=".breadcrumbs .nav-item")[1].text, 'Test Discussion Topic')
+
+        # Verify clicking the first breadcrumb takes you back to all topics
+        self.thread_page.q(css=".breadcrumbs .nav-item")[0].click()
+        self.assertEqual(len(self.thread_page.q(css=".breadcrumbs .nav-item")), 1)
+
+        # Verify again clicking the first breadcrumb takes you back to previoulsy loaded topic
+        topic_button.click()
+        self.assertEqual(self.thread_page.q(
+            css=".breadcrumbs .nav-item")[1].text, 'Test Discussion Topic')
+        self.assertEqual(len(self.thread_page.q(css=".breadcrumbs .nav-item")), 2)
+
     def test_breadcrumbs_clear_search(self):
         self.thread_page.q(css=".search-input").fill("search text")
         self.thread_page.q(css=".search-btn").click()
