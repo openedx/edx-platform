@@ -34,7 +34,6 @@ h1, h2, h3, h4, h5, h6 {
 h1 {
   color: $base-font-color;
   font: normal 2em/1.4em $sans-serif;
-  letter-spacing: 1px;
   margin-bottom: ($baseline*1.5);
   text-align: center;
 }
@@ -42,9 +41,7 @@ h1 {
 h2 {
   color: $lighter-base-font-color;
   font: normal 1.2em/1.2em $serif;
-  letter-spacing: 1px;
   margin-bottom: ($baseline*0.75);
-  text-transform: uppercase;
   -webkit-font-smoothing: antialiased;
 }
 

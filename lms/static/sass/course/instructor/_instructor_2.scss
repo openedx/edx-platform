@@ -242,7 +242,7 @@
     }
   }
 
-  h1 {
+  .instructor-dashboard-title {
     @extend .top-header;
     display: inline-block;
     margin-bottom: ($baseline*.75);
