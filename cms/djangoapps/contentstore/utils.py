@@ -411,8 +411,9 @@ def get_visibility_partition_info(xblock):
     Returns: dict
 
     """
-    user_partitions = get_user_partition_info(xblock, schemes=["verification", "cohort"])
+    user_partitions = get_user_partition_info(xblock, schemes=["verification", "enrollment_mode", "cohort"])
     cohort_partitions = []
+    enrollment_mode_partitions = []
     verification_partitions = []
     has_selected_groups = False
     selected_verified_partition_id = None
@@ -428,10 +429,13 @@ def get_visibility_partition_info(xblock):
             verification_partitions.append(p)
             if has_selected:
                 selected_verified_partition_id = p["id"]
+        elif p["scheme"] == "enrollment_mode":
+            enrollment_mode_partitions.append(p)
 
     return {
         "user_partitions": user_partitions,
         "cohort_partitions": cohort_partitions,
+        "enrollment_mode_partitions": enrollment_mode_partitions,
         "verification_partitions": verification_partitions,
         "has_selected_groups": has_selected_groups,
         "selected_verified_partition_id": selected_verified_partition_id,
