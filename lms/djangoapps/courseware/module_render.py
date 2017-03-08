@@ -50,7 +50,6 @@ from courseware.masquerade import (
     setup_masquerade,
 )
 from courseware.model_data import DjangoKeyValueStore, FieldDataCache
-from courseware.models import SCORE_CHANGED
 from edxmako.shortcuts import render_to_string
 from lms.djangoapps.grades.signals.signals import SCORE_PUBLISHED
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData

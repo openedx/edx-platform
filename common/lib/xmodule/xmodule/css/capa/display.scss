@@ -203,16 +203,16 @@ div.problem {
   width: auto !important;
   width: 100px;
 
-    label {
-      @include box-sizing(border-box);
-      display: inline-block;
-      @include float(left);
-      clear: both;
-      margin-bottom: ($baseline/2);
-      border: 2px solid $gray-l4;
-      border-radius: 3px;
-      padding: ($baseline/2);
-      width: 100%;
+  label {
+    @include box-sizing(border-box);
+    display: inline-block;
+    @include float(left);
+    clear: both;
+    margin-bottom: ($baseline/2);
+    border: 2px solid $gray-l4;
+    border-radius: 3px;
+    padding: ($baseline/2);
+    width: 100%;
 
     &:after {
       @include margin-left($baseline*.75);
@@ -253,27 +253,27 @@ div.problem {
     }
   }
 
+  .indicator_container {
+    display: inline-block;
+    @include float(left);
+    width: 25px;
+    height: 1px;
+    @include margin-right(15px);
+  }
 
-    .indicator_container {
-      display: inline-block;
-      @include float(left);
-      width: 25px;
-      height: 1px;
-      @include margin-right(15px);
-    }
+  fieldset {
+    @include box-sizing(border-box);
+    margin: 0px 0px $baseline;
+    @include padding-left($baseline);
+    @include border-left(1px solid #ddd);
+  }
 
-    fieldset {
-      @include box-sizing(border-box);
-      margin: 0px 0px $baseline;
-      @include padding-left($baseline);
-      @include border-left(1px solid #ddd);
-    }
-
-    input[type="radio"],
-    input[type="checkbox"] {
-      @include margin(($baseline/4) ($baseline/2) ($baseline/4) ($baseline/4));
-      @include float(left);
-    }
+  input[type="radio"],
+  input[type="checkbox"] {
+    @include margin(($baseline/4) ($baseline/2) ($baseline/4) ($baseline/4));
+    @include float(left);
+  }
+}
 
 // +Problem - Choice Group
 // ====================

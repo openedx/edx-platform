@@ -7,10 +7,12 @@ import json
 import logging
 
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
 from django.core.context_processors import csrf
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.http import Http404, HttpResponseBadRequest
+from django.utils.translation import ugettext_noop
 from django.shortcuts import render_to_response
 from django.views.decorators.http import require_GET
 import newrelic.agent
