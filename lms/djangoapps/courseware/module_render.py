@@ -495,17 +495,36 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
             content_id=unicode(descriptor.location)
         )
 
+    def handle_grade_event(block, event_type, event):  # pylint: disable=unused-argument
+        """
+        Manages the workflow for recording and updating of student module grade state
+        """
+
+        if not settings.FEATURES.get("ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE", True):
+            # if a course has ended, don't register grading events
+            course = modulestore().get_course(course_id, depth=0)
+            now = datetime.now(UTC())
+            if course.end is not None and now > course.end:
+                return
+
+        SCORE_PUBLISHED.send(
+            sender=None,
+            block=block,
+            user=user,
+            raw_earned=event['value'],
+            raw_possible=event['max_value'],
+            only_if_higher=event.get('only_if_higher'),
+            )
+
+        # we can treat a grading event as a indication that a user
+        # "completed" an xBlock
+        if settings.FEATURES.get('MARK_PROGRESS_ON_GRADING_EVENT', False):
+            handle_progress_event(block, event_type, event)
+
     def publish(block, event_type, event):
         """A function that allows XModules to publish events."""
         if event_type == 'grade' and not is_masquerading_as_specific_student(user, course_id):
-            SCORE_PUBLISHED.send(
-                sender=None,
-                block=block,
-                user=user,
-                raw_earned=event['value'],
-                raw_possible=event['max_value'],
-                only_if_higher=event.get('only_if_higher'),
-            )
+            handle_grade_event(block, event_type, event)
         elif event_type == 'progress':
             # expose another special case event type which gets sent
             # into the CourseCompletions models

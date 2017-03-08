@@ -585,8 +585,6 @@ INSTALLED_APPS += (
 
 
 ############# Student Module #################
-FEATURES['SIGNAL_ON_SCORE_CHANGED'] = True
-
 FEATURES['DISABLE_SOLUTIONS_APPS_SIGNALS'] = True
 
 # Set dummy values for profile image settings.
