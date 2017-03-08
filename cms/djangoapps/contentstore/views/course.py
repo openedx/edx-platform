@@ -1601,55 +1601,7 @@ def group_configurations_detail_handler(request, course_key_string, group_config
                 )
                 course.user_partitions.append(partition)
 
-
-
-            # course = modulestore().get_course(course_key)
-            # if course is None:
-            #     log.error("Could not find course %s", course_key)
-            #     return []
-            #
-            # verified_partitions = course.get_user_partitions_for_scheme(scheme)
-            # partition_id_for_location = {
-            #     p.parameters["location"]: p.id
-            #     for p in verified_partitions
-            #     if "location" in p.parameters
-            #     }
-            #
-            # partitions = []
-            # for block in icrv_blocks:
-            #     partition = UserPartition(
-            #         id=partition_id_for_location.get(
-            #             unicode(block.location),
-            #             _unique_partition_id(course)
-            #         ),
-            #         name=block.related_assessment,
-            #         description=u"Verification checkpoint at {}".format(block.related_assessment),
-            #         scheme=scheme,
-            #         parameters={"location": unicode(block.location)},
-            #         groups=[
-            #             Group(scheme.ALLOW, "Completed verification at {}".format(block.related_assessment)),
-            #             Group(scheme.DENY, "Did not complete verification at {}".format(block.related_assessment)),
-            #         ]
-            #     )
-            #     partitions.append(partition)
-            #
-            #     log.info(
-            #         (
-            #             "Configured partition %s for course %s using a verified partition scheme "
-            #             "for the in-course-reverification checkpoint at location %s"
-            #         ),
-            #         partition.id,
-            #         course_key,
-            #         partition.parameters["location"]
-            #     )
-            #
-            # # Preserve existing, non-verified partitions from the course
-            # # Mark partitions for deleted in-course reverification as disabled.
-            # partitions += _other_partitions(verified_partitions, partitions, course_key)
-            # course.set_user_partitions_for_scheme(partitions, scheme)
-
-
-            # Back to original code
+            # Resume original code
             store.update_item(course, request.user.id)
             configuration = GroupConfiguration.update_usage_info(store, course, new_configuration)
             return JsonResponse(configuration, status=201)
