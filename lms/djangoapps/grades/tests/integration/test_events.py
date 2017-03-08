@@ -4,6 +4,8 @@ Test grading events across apps.
 # pylint: disable=protected-access
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
+from flaky import flaky
+
 from lms.djangoapps.instructor.enrollment import reset_student_attempts
 from lms.djangoapps.instructor_task.api import submit_rescore_problem_for_student
 from mock import patch
@@ -72,6 +74,7 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
         self.instructor = UserFactory.create(is_staff=True, username=u'test_instructor', password=u'test')
         self.refresh_course()
 
+    @flaky
     @patch('lms.djangoapps.instructor.enrollment.tracker')
     @patch('lms.djangoapps.grades.signals.handlers.tracker')
     @patch('lms.djangoapps.grades.models.tracker')
