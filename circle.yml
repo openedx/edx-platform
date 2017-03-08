@@ -36,7 +36,7 @@ dependencies:
     - pip install ndg-httpsclient==0.3.0 pyasn1
      
     - pip install coveralls==1.0
-    - pip install -U codecov
+    - pip install codecov requests
 
     # Output the installed python packages to the console to help
     # with troubleshooting any issues with python requirements.
