@@ -12,7 +12,7 @@
     @include float(right);
 
     .new-post-btn {
-      @include blue-button;
+      //@include blue-button;
       @include margin-right(4px);
     }
 

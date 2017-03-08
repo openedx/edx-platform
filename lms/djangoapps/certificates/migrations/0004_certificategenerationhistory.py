@@ -59,7 +59,7 @@ class Migration(migrations.Migration):
                 ('description', models.CharField(help_text='Description and/or admin notes.', max_length=255, null=True, blank=True)),
                 ('template', models.TextField(help_text='Django template HTML.')),
                 ('organization_id', models.IntegerField(help_text='Organization of template.', null=True, db_index=True, blank=True)),
-                ('course_key', xmodule_django.models.CourseKeyField(db_index=True, max_length=255, null=True, blank=True)),
+                ('course_key', CourseKeyField(db_index=True, max_length=255, null=True, blank=True)),
                 ('mode', models.CharField(default=b'honor', choices=[(b'verified', b'verified'), (b'honor', b'honor'), (b'audit', b'audit'), (b'professional', b'professional'), (b'no-id-professional', b'no-id-professional')], max_length=125, blank=True, help_text='The course mode for this template.', null=True)),
                 ('is_active', models.BooleanField(default=False, help_text='On/Off switch.')),
             ],
