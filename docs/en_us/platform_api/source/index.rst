@@ -1,8 +1,8 @@
 .. _Open edX Platform APIs:
 
-#######################
-Open edX Platform APIs
-#######################
+#####################################
+Open edX Platform APIs: Ficus Release
+#####################################
 
 .. toctree::
     :titlesonly:
