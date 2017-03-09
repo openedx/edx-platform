@@ -30,15 +30,16 @@
                 var _ref;
                 DiscussionThreadShowView.__super__.initialize.call(this);
                 this.mode = options.mode || 'inline';
+                this.startHeader = options.startHeader;
                 if ((_ref = this.mode) !== 'tab' && _ref !== 'inline') {
                     throw new Error('invalid mode: ' + this.mode);
                 }
             };
 
             DiscussionThreadShowView.prototype.renderTemplate = function() {
-                var context;
-                context = $.extend({
+                var context = $.extend({
                     mode: this.mode,
+                    startHeader: this.startHeader,
                     flagged: this.model.isFlagged(),
                     author_display: this.getAuthorDisplay(),
                     cid: this.model.cid,
