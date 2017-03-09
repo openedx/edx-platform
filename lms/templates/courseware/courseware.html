@@ -5,12 +5,13 @@
 <%!
 import waffle
 
-from django.utils.translation import ugettext as _
 from django.conf import settings
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
 
 from edxnotes.helpers import is_feature_enabled as is_edxnotes_enabled
-from openedx.core.djangolib.markup import HTML
 from openedx.core.djangolib.js_utils import js_escaped_string
+from openedx.core.djangolib.markup import HTML
 %>
 <%
   include_special_exams = settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and (course.enable_proctored_exams or course.enable_timed_exams)
@@ -117,10 +118,10 @@ ${HTML(fragment.foot_html())}
 
       <div class="wrapper-course-modes">
 
-          <div class="courseware-bookmarks-button" data-bookmarks-api-url="${bookmarks_api_url}">
-              <button type="button" class="bookmarks-list-button is-inactive" aria-pressed="false">
+          <div class="courseware-bookmarks-button">
+              <a class="bookmarks-list-button" href="${reverse('openedx.course_bookmarks.home', args=[course.id])}">
                   ${_('Bookmarks')}
-              </button>
+              </a>
           </div>
 
           % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):

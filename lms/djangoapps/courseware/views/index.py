@@ -38,6 +38,7 @@ from util.views import ensure_valid_course_key
 from xmodule.modulestore.django import modulestore
 from xmodule.x_module import STUDENT_VIEW
 from survey.utils import must_answer_survey
+from web_fragments.fragment import Fragment
 
 from ..access import has_access, _adjust_start_date_for_beta_testers
 from ..access_utils import in_preview_mode
@@ -401,7 +402,6 @@ class CoursewareIndex(View):
         request = RequestCache.get_current_request()
         courseware_context = {
             'csrf': csrf(self.request)['csrf_token'],
-            'COURSE_TITLE': self.course.display_name_with_default_escaped,
             'course': self.course,
             'init': '',
             'fragment': Fragment(),
@@ -459,7 +459,7 @@ class CoursewareIndex(View):
                 courseware_context['default_tab'] = self.section.default_tab
 
             # section data
-            courseware_context['section_title'] = self.section.display_name_with_default_escaped
+            courseware_context['section_title'] = self.section.display_name_with_default
             section_context = self._create_section_context(
                 table_of_contents['previous_of_active_section'],
                 table_of_contents['next_of_active_section'],
