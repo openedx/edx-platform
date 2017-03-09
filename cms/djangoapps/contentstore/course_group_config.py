@@ -362,3 +362,15 @@ class GroupConfiguration(object):
             content_group_configuration
         )
         return content_group_configuration
+
+    @staticmethod
+    def get_enrollment_mode_partition(course):
+        enrollment_partition = None
+        for user_partition in course.user_partitions:
+            if user_partition.scheme.name == "enrollment_mode":
+                enrollment_partition = user_partition
+                break
+
+        return enrollment_partition.to_json()
+
+

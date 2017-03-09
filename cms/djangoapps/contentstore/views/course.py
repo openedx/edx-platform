@@ -1522,12 +1522,14 @@ def group_configurations_list_handler(request, course_key_string):
                 experiment_group_configurations = None
 
             content_group_configuration = GroupConfiguration.get_or_create_content_group(store, course)
+            enrollment_configuration = GroupConfiguration.get_enrollment_mode_partition(course)
 
             return render_to_response('group_configurations.html', {
                 'context_course': course,
                 'group_configuration_url': group_configuration_url,
                 'course_outline_url': course_outline_url,
                 'experiment_group_configurations': experiment_group_configurations,
+                'enrollment_configuration': enrollment_configuration,
                 'should_show_experiment_groups': should_show_experiment_groups,
                 'content_group_configuration': content_group_configuration
             })

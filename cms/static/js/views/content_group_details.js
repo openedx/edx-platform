@@ -41,6 +41,7 @@ define([
                 courseOutlineUrl: this.model.collection.parents[0].outlineUrl,
                 index: this.model.collection.indexOf(this.model),
                 showContentGroupUsages: showContentGroupUsages || false,
+                canEdit: this.options.canEdit,
                 HtmlUtils: HtmlUtils
             });
             this.$el.html(this.template(attrs));

@@ -29,6 +29,7 @@ from openedx.core.djangolib.markup import HTML, Text
           ${should_show_experiment_groups | n, dump_js_escaped_json},
           ${experiment_group_configurations | n, dump_js_escaped_json},
           ${content_group_configuration | n, dump_js_escaped_json},
+          ${enrollment_configuration | n, dump_js_escaped_json},
           "${group_configuration_url | n, js_escaped_string}",
           "${course_outline_url | n, js_escaped_string}"
       );
@@ -48,6 +49,14 @@ from openedx.core.djangolib.markup import HTML, Text
   <div class="wrapper-content wrapper">
     <section class="content">
       <article class="content-primary" role="main">
+
+          % if enrollment_configuration:
+        <div class="wrapper-groups enrollment-tracks">
+          <h3 class="title">${_("Enrollment Tracks")}</h3>
+
+        </div>
+        % endif
+
         <div class="wrapper-groups content-groups">
           <h3 class="title">${_("Content Groups")}</h3>
             <div class="ui-loading">

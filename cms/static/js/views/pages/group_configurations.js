@@ -1,8 +1,9 @@
 define([
     'jquery', 'underscore', 'gettext', 'js/views/pages/base_page',
-    'js/views/group_configurations_list', 'js/views/content_group_list'
+    'js/views/group_configurations_list', 'js/views/content_group_list',
+    'js/views/enrollment_track_list'
 ],
-function($, _, gettext, BasePage, GroupConfigurationsListView, ContentGroupListView) {
+function($, _, gettext, BasePage, GroupConfigurationsListView, ContentGroupListView, EnrollmentTrackListView) {
     'use strict';
     var GroupConfigurationsPage = BasePage.extend({
         initialize: function(options) {
@@ -18,6 +19,10 @@ function($, _, gettext, BasePage, GroupConfigurationsListView, ContentGroupListV
             this.cohortGroupsListView = new ContentGroupListView({
                 collection: this.contentGroupConfiguration.get('groups')
             });
+            this.enrollmentTrackConfiguration = options.enrollmentTrackConfiguration;
+            this.enrollmentTracksListView = new EnrollmentTrackListView({
+                collection: this.enrollmentTrackConfiguration.get('groups')
+            });
         },
 
         renderPage: function() {
@@ -26,6 +31,7 @@ function($, _, gettext, BasePage, GroupConfigurationsListView, ContentGroupListV
                 this.$('.wrapper-groups.experiment-groups').append(this.experimentGroupsListView.render().el);
             }
             this.$('.wrapper-groups.content-groups').append(this.cohortGroupsListView.render().el);
+            this.$('.wrapper-groups.enrollment-tracks').append(this.enrollmentTracksListView.render().el);
             this.addWindowActions();
             if (hash) {
                 // Strip leading '#' to get id string to match

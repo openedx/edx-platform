@@ -3,11 +3,15 @@ define([
 ], function(GroupConfigurationCollection, GroupConfigurationModel, GroupConfigurationsPage) {
     'use strict';
     return function(experimentsEnabled, experimentGroupConfigurationsJson, contentGroupConfigurationJson,
-                     groupConfigurationUrl, courseOutlineUrl) {
+                    enrollmentTrackConfigurationJson, groupConfigurationUrl, courseOutlineUrl) {
+        debugger
         var experimentGroupConfigurations = new GroupConfigurationCollection(
                 experimentGroupConfigurationsJson, {parse: true}
             ),
             contentGroupConfiguration = new GroupConfigurationModel(contentGroupConfigurationJson, {
+                parse: true, canBeEmpty: true
+            }),
+            enrollmentTrackConfiguration = new GroupConfigurationModel(enrollmentTrackConfigurationJson, {
                 parse: true, canBeEmpty: true
             });
 
@@ -19,7 +23,8 @@ define([
             el: $('#content'),
             experimentsEnabled: experimentsEnabled,
             experimentGroupConfigurations: experimentGroupConfigurations,
-            contentGroupConfiguration: contentGroupConfiguration
+            contentGroupConfiguration: contentGroupConfiguration,
+            enrollmentTrackConfiguration: enrollmentTrackConfiguration
         }).render();
     };
 });
