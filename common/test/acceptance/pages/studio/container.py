@@ -286,16 +286,18 @@ class ContainerPage(PageObject, HelpMixin):
         """
         return _click_edit(self, '.edit-button', '.xblock-studio_view')
 
-    def verify_confirmation_message(self, message):
+    def verify_confirmation_message(self, message, verify_hidden=False):
         """
-        Verify for confirmation message.
+        Verify for confirmation message is present or hidden.
         """
         def _verify_message():
             """ promise function to check confirmation message state """
             text = self.q(css='#page-alert .alert.confirmation #alert-confirmation-title').text
-            return text and message in text[0]
+            return text and message not in text[0] if verify_hidden else text and message in text[0]
 
-        self.wait_for(_verify_message, description='confirmation message present')
+        self.wait_for(_verify_message, description='confirmation message {status}'.format(
+            status='hidden' if verify_hidden else 'present'
+        ))
 
     def click_undo_move_link(self):
         """
