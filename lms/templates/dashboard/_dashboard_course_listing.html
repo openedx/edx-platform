@@ -128,6 +128,8 @@ from student.helpers import (
                         course_date_string = course_date.strftime('%Y-%m-%dT%H:%M:%S%z')
                     %>
                     <span class="info-date-block localized-datetime" data-language="${user_language}" data-tooltip="Hi" data-timezone="${user_timezone}" data-datetime="${course_date_string}" data-format=${format} data-string="${container_string}"></span>
+                % else:
+                    <span class="info-date-block" data-tooltip="Hi">${container_string}</span>
                 % endif
         </div>
         <div class="wrapper-course-actions">
