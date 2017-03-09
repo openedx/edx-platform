@@ -1,0 +1,87 @@
+$bookmark-icon: "\f097"; // .fa-bookmark-o
+$bookmarked-icon: "\f02e"; // .fa-bookmark
+
+// Rules for Bookmarks Results Header
+.bookmarks-results-header {
+    letter-spacing: 0;
+    text-transform: none;
+    margin-bottom: ($baseline/2);
+}
+
+// Rules for Bookmarks Results
+.bookmarks-results-list {
+    padding-top: ($baseline/2);
+
+    .bookmarks-results-list-item {
+        @include padding(0, $baseline, ($baseline/4), $baseline);
+        display: block;
+        border: 1px solid $lms-border-color;
+        margin-bottom: $baseline;
+
+        &:hover {
+            border-color: palette(primary, base);
+
+            .list-item-breadcrumbtrail {
+                color: palette(primary, base);
+            }
+        }
+    }
+
+    .results-list-item-view {
+        @include float(right);
+        margin-top: $baseline;
+    }
+
+    .list-item-date {
+        margin-top: ($baseline/4);
+        color: $lms-gray;
+        font-size: font-size(small);
+    }
+
+    .bookmarks-results-list-item:before {
+        content: $bookmarked-icon;
+        position: relative;
+        top: -7px;
+        font-family: FontAwesome;
+        color: palette(primary, base);
+    }
+
+    .list-item-content {
+        overflow: hidden;
+    }
+
+    .list-item-left-section {
+        display: inline-block;
+        vertical-align: middle;
+        width: 90%;
+    }
+
+    .list-item-right-section {
+        display: inline-block;
+        vertical-align: middle;
+
+        .fa-arrow-right {
+
+            @include rtl {
+                @include transform(rotate(180deg));
+            }
+        }
+    }
+}
+
+// Rules for empty bookmarks list
+.bookmarks-empty {
+    margin-top: $baseline;
+    border: 1px solid $lms-border-color;
+    padding: $baseline;
+    background-color: $white;
+}
+
+.bookmarks-empty-header {
+    @extend %t-title5;
+    margin-bottom: ($baseline/2);
+}
+
+.bookmarks-empty-detail {
+    @extend %t-copy-sub1;
+}

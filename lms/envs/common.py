@@ -1724,7 +1724,7 @@ REQUIRE_ENVIRONMENT = "node"
 # but you don't want to include those dependencies in the JS bundle for the page,
 # then you need to add the js urls in this list.
 REQUIRE_JS_PATH_OVERRIDES = {
-    'js/bookmarks/views/bookmark_button': 'js/bookmarks/views/bookmark_button.js',
+    'course_bookmarks/js/views/bookmark_button': 'course_bookmarks/js/views/bookmark_button.js',
     'js/views/message_banner': 'js/views/message_banner.js',
     'moment': 'common/js/vendor/moment-with-locales.js',
     'moment-timezone': 'common/js/vendor/moment-timezone-with-data.js',
@@ -2175,6 +2175,7 @@ INSTALLED_APPS = (
     'database_fixups',
 
     # Features
+    'openedx.features.course_bookmarks',
     'openedx.features.course_experience',
 )
 

@@ -18,6 +18,7 @@
          * done.
          */
         modules: getModulesList([
+            'course_bookmarks/js/course_bookmarks_factory',
             'course_experience/js/course_outline_factory',
             'discussion/js/discussion_board_factory',
             'discussion/js/discussion_profile_page_factory',
