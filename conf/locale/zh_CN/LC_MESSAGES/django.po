@@ -6,6 +6,7 @@
 # Translators:
 # vingte <411029240@qq.com>, 2014
 # Alfred <alfredhuang211@qq.com>, 2015
+# alisan617, 2017
 # BertZou <turingcat@gmail.com>, 2015
 # bnw, 2014
 # 肖寒 <bookman@vip.163.com>, 2013
@@ -134,6 +135,7 @@
 # perypery <410224186@qq.com>, 2014
 # vingte <411029240@qq.com>, 2014
 # Alfred <alfredhuang211@qq.com>, 2015
+# alisan617, 2017
 # 刘家骅 <alphaf52@gmail.com>, 2013
 # BertZou <turingcat@gmail.com>, 2015
 # bnw, 2014
@@ -348,7 +350,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
 "POT-Creation-Date: 2017-02-23 18:58+0000\n"
-"PO-Revision-Date: 2017-02-23 19:11+0000\n"
+"PO-Revision-Date: 2017-03-07 21:30+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
