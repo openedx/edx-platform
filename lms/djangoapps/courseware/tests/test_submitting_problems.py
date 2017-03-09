@@ -818,7 +818,7 @@ class ProblemWithUploadedFilesTest(TestSubmittingProblems):
         self.assertEqual(name, "post")
         self.assertEqual(len(args), 1)
         self.assertTrue(args[0].endswith("/submit/"))
-        self.assertItemsEqual(kwargs.keys(), ["files", "data"])
+        self.assertItemsEqual(kwargs.keys(), ["files", "data", "timeout"])
         self.assertItemsEqual(kwargs['files'].keys(), filenames.split())
 
 
