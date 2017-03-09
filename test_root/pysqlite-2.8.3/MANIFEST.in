@@ -1,8 +1,0 @@
-include MANIFEST.in
-include LICENSE
-include cross_bdist_wininst.py
-include doc/*.txt
-include doc/includes/sqlite3/*.py
-include doc/sphinx/*
-include doc/sphinx/.static/.keepme
-include src/*.h
