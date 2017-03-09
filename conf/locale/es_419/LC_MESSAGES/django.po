@@ -20,7 +20,7 @@
 # Fernando Abramowitz <ferabra@gmail.com>, 2014
 # jorgebarrero <jorgebarrero@gmail.com>, 2014
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013
-# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2016
+# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2017
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013-2014
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013
 # Juan <juan.marrero@utec.edu.uy>, 2015
@@ -107,7 +107,7 @@
 # Jonathan Amaya <jonathan.amaya88@yahoo.com>, 2014
 # jorgebarrero <jorgebarrero@gmail.com>, 2014
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013-2014
-# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2016
+# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2017
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013-2014
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013
 # Juan Fernando Villa <elite.linux@gmail.com>, 2015
@@ -193,8 +193,8 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
 "POT-Creation-Date: 2017-02-23 18:58+0000\n"
-"PO-Revision-Date: 2017-02-23 19:11+0000\n"
-"Last-Translator: Ned Batchelder <ned@edx.org>\n"
+"PO-Revision-Date: 2017-03-08 04:35+0000\n"
+"Last-Translator: Juan Camilo Montoya Franco <juan.montoya@edunext.co>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -509,6 +509,8 @@ msgid ""
 "Usernames can only contain Roman letters, western numerals (0-9), "
 "underscores (_), and hyphens (-)."
 msgstr ""
+"Los nombres de usuario solo deben contener letras, números (0-9), guiones "
+"bajos (_) y guiones (-)."
 
 #: common/djangoapps/student/forms.py
 #, python-format
@@ -738,12 +740,12 @@ msgstr "Enseñanza primaria"
 #. Translators: 'None' refers to the student's level of education
 #: common/djangoapps/student/models.py
 msgid "No formal education"
-msgstr ""
+msgstr "Ninguna educación formal"
 
 #. Translators: 'Other' refers to the student's level of education
 #: common/djangoapps/student/models.py
 msgid "Other education"
-msgstr ""
+msgstr "Otra educación"
 
 #: common/djangoapps/student/models.py
 #, python-brace-format
@@ -1710,11 +1712,13 @@ msgstr ""
 #: common/lib/capa/capa/inputtypes.py
 #, python-brace-format
 msgid "{programming_language} editor"
-msgstr ""
+msgstr "editor de {programming_language}"
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "Press ESC then TAB or click outside of the code editor to exit"
 msgstr ""
+"Presione ESC y después TAB o haga clic afuera del editor de código para "
+"salir"
 
 #: common/lib/capa/capa/inputtypes.py
 msgid ""
@@ -1776,15 +1780,15 @@ msgstr "Pregunta {index}"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Correct:"
-msgstr ""
+msgstr "Correcto:"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Incorrect:"
-msgstr ""
+msgstr "Incorrecto:"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Answer"
-msgstr ""
+msgstr "Respuesta"
 
 #: common/lib/capa/capa/responsetypes.py
 #, python-brace-format
@@ -2082,7 +2086,7 @@ msgstr "Datos XML para la anotación"
 #: common/lib/xmodule/xmodule/x_module.py
 #: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
 msgid "The display name for this component."
-msgstr ""
+msgstr "El nombre para mostrar para este componente. "
 
 #: common/lib/xmodule/xmodule/annotatable_module.py
 msgid "Annotation"
@@ -2223,7 +2227,7 @@ msgstr "Diccionario con las respuestas de los estudiantes actuales"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Whether or not the answers have been saved since last submit"
-msgstr ""
+msgstr "Si las respuestas se han guardado después del último envío o no"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Whether the student has answered the problem"
@@ -2299,8 +2303,8 @@ msgstr ""
 "para su curso, o reportar algún problema, contacte a "
 "moocsupport@mathworks.com."
 
-#: lms/templates/help_modal.html lms/templates/manage_user_standing.html
-#: lms/templates/register-shib.html
+#: common/lib/xmodule/xmodule/capa_base.py lms/templates/help_modal.html
+#: lms/templates/manage_user_standing.html lms/templates/register-shib.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 #: lms/templates/survey/survey.html
 #: themes/stanford-style/lms/templates/register-shib.html
@@ -2309,7 +2313,7 @@ msgstr "Enviar"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Submitting"
-msgstr ""
+msgstr "Enviando"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Warning: The problem has been reset to its initial state!"
@@ -2341,6 +2345,7 @@ msgstr ""
 msgid ""
 "{previous_hints}<li><strong>{hint_number_prefix}</strong>{hint_text}</li>"
 msgstr ""
+"{previous_hints}<li><strong>{hint_number_prefix}</strong>{hint_text}</li>"
 
 #. Translators: e.g. "Hint 1 of 3: " meaning we are showing the first of three
 #. hints.
@@ -2355,31 +2360,33 @@ msgstr "Consejo ({hint_num} de {hints_count}):"
 msgid ""
 "Your answers were previously saved. Click '{button_name}' to grade them."
 msgstr ""
+"Sus respuestas han sido guardadas. Haga clic en '{button_name}' para "
+"calificarlas."
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #, python-brace-format
 msgid "Incorrect ({progress} point)"
 msgid_plural "Incorrect ({progress} points)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Incorrecto ({progress} punto)"
+msgstr[1] "Incorrecto ({progress} puntos)"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #, python-brace-format
 msgid "Correct ({progress} point)"
 msgid_plural "Correct ({progress} points)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Correcto ({progress} punto)"
+msgstr[1] "Correcto ({progress} puntos)"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #, python-brace-format
 msgid "Partially correct ({progress} point)"
 msgid_plural "Partially correct ({progress} points)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Parcialmente correcto ({progress} punto)"
+msgstr[1] "Parcialmente correcto ({progress} puntos)"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Partially Correct"
-msgstr ""
+msgstr "Parcialmente correcto"
 
 #. Translators: 'closed' means the problem's due date has passed. You may no
 #. longer attempt to solve the problem.
@@ -2390,6 +2397,7 @@ msgstr "El problema está cerrado."
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Problem must be reset before it can be submitted again."
 msgstr ""
+"El problema debe ser restablecido antes de que pueda ser enviado nuevamente."
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #, python-brace-format
@@ -2465,11 +2473,11 @@ msgstr ""
 #. longer attempt to solve the problem.
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "You cannot select Reset for a problem that is closed."
-msgstr ""
+msgstr "No puede seleccionar Restablecer, para un problema que está cerrado."
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "You must submit an answer before you can select Reset."
-msgstr ""
+msgstr "Debe enviar una respuesta antes de poder seleccionar Reiniciar."
 
 #: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
@@ -2489,15 +2497,15 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid "Conditional"
-msgstr ""
+msgstr "Condicional"
 
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid "List of urls of children that are references to external modules"
-msgstr ""
+msgstr "Lista de urls de hijos que son referencias a módulos externos"
 
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid "Source Components"
-msgstr ""
+msgstr "Componentes fuentes"
 
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid ""
@@ -2509,27 +2517,32 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid "Conditional Attribute"
-msgstr ""
+msgstr "Atributo condicional"
 
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid ""
 "The attribute of the source components that determines whether a learner is "
 "shown the content of this conditional module."
 msgstr ""
+"El atributo de los componentes fuentes que determina si un estudiante puede "
+"ver el contenido de este módulo condicional."
 
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid "Conditional Value"
-msgstr ""
+msgstr "Valor de condicional"
 
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid ""
 "The value that the conditional attribute of the source components must match"
 " before a learner is shown the content of this conditional module."
 msgstr ""
+"El valor que el atributo condicional de los componentes fuentes tiene que "
+"coincidir para que un estudiante pueda ver el contenido de este módulo "
+"condicional."
 
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid "Blocked Content Message"
-msgstr ""
+msgstr "Mensaje de contenido bloqueado"
 
 #: common/lib/xmodule/xmodule/conditional_module.py
 #, python-brace-format
@@ -2539,19 +2552,25 @@ msgid ""
 "your message to give learners a direct link to required units. For example, "
 "'You must complete {link} before you can access this unit'."
 msgstr ""
+"El mensaje que se muestra a los estudiantes cuando no todas las condiciones "
+"para mostrar el contenido de este módulo condicional se han cumplido. "
+"Incluya {link} en el texto de su mensaje para dar a los estudiantes un "
+"enlace directo a las unidades requeridas. Por ejemplo, 'Hay que completar "
+"{link} antes de poder acceder a la unidad.'"
 
 #: common/lib/xmodule/xmodule/conditional_module.py
 #, python-brace-format
 msgid "You must complete {link} before you can access this unit."
-msgstr ""
+msgstr "Hay que completar {link} antes de poder acceder a esta unidad."
 
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid "This component has no source components configured yet."
 msgstr ""
+"Todavía no se han configurado los componentes fuentes de este componente."
 
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid "Configure list of sources"
-msgstr ""
+msgstr "Configurar lista de fuentes"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "LTI Passports"
@@ -2608,7 +2627,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Advertised Start"
-msgstr ""
+msgstr "Fecha de inicio del curso publicada"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
@@ -2616,6 +2635,9 @@ msgid ""
 "for the course, such as \"Winter 2018\". If you enter null for this value, "
 "the start date that you have set for this course is used."
 msgstr ""
+"Introduzca el texto que quiere usar como el periodo de tiempo de inicio "
+"publicado para este curso, como \"Invierno 2018\". Si Ud. marca este valor "
+"con \"nulo,\" se usa la fecha de inicio que ha establecido para este curso."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Pre-Requisite Courses"
@@ -3384,7 +3406,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Allow Opting Out of Proctored Exams"
-msgstr ""
+msgstr "Habilitar Opción de No Tomar Exámenes Supervisados"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
@@ -3393,6 +3415,11 @@ msgid ""
 "must take the exam with proctoring. This setting only applies if proctored "
 "exams are enabled for the course."
 msgstr ""
+"Marque true o false. Si se marca true, los estudiantes pueden optar para "
+"tomar los exámenes supervisados sin supervisión. Si se marca false, todos "
+"los estudiantes tendrán que tomar el examen con supervisión. Esta "
+"configuración aplica solamente si los exámenes supervisados están "
+"habilitados en el curso."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Create Zendesk Tickets For Suspicious Proctored Exam Attempts"
@@ -3417,6 +3444,9 @@ msgid ""
 "course. Regardless of this setting, timed exams are enabled if Enable "
 "Proctored Exams is set to true."
 msgstr ""
+"Ingrese true o false. Cuando ingrese true, los exámenes cronometrados "
+"estarán habilitados en su curso. En todos casos, exámenes cronometrados son "
+"habilitados si \"Habilitar Exámenes Supervisados\" es marcado true."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Minimum Grade for Credit"
@@ -3551,13 +3581,15 @@ msgstr "HTML"
 
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "Hide Page From Learners"
-msgstr ""
+msgstr "Ocultar página a estudiantes"
 
 #: common/lib/xmodule/xmodule/html_module.py
 msgid ""
 "If you select this option, only course team members with the Staff or Admin "
 "role see this page."
 msgstr ""
+"Si selecciona esta opción, soló los miembros del equipo de curso con rol de "
+"Staff o Admin podrán ver esta pagina"
 
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "HTML for the additional pages"
@@ -4561,8 +4593,8 @@ msgstr "Básico"
 msgid "There is no transcript file associated with the {lang} language."
 msgid_plural ""
 "There are no transcript files associated with the {lang} languages."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No hay archivo de transcripción asociado con el idioma {lang}."
+msgstr[1] "No hay archivos de transcripción asociados con los idiomas {lang}."
 
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid ""
@@ -5055,7 +5087,7 @@ msgstr "Con la tecnología de Open edX"
 #: lms/djangoapps/branding/api.py
 #, python-brace-format
 msgid "{platform_name} for Business"
-msgstr ""
+msgstr "{platform_name} para Negocios"
 
 #: lms/djangoapps/branding/api.py lms/templates/static_templates/blog.html
 msgid "Blog"
@@ -5110,6 +5142,7 @@ msgstr "Políticas de Accesibilidad"
 msgid "Sitemap"
 msgstr "Mapa del Sitio"
 
+#: lms/djangoapps/branding/api.py
 #: lms/templates/static_templates/media-kit.html
 msgid "Media Kit"
 msgstr "Kit Multimedia"
@@ -5849,6 +5882,7 @@ msgid "Upgrade to Verified Certificate"
 msgstr "Cambiarse a la ruta de certificados verificados"
 
 #: lms/djangoapps/courseware/date_summary.py
+#: cms/templates/group_configurations.html lms/templates/courseware/info.html
 msgid "Learn More"
 msgstr "Aprender más"
 
@@ -6721,11 +6755,11 @@ msgstr "Objetivos"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Enrollment Mode"
-msgstr ""
+msgstr "Modo de inscripción"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Verification Status"
-msgstr ""
+msgstr "Estado de verificación"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Cohort"
@@ -9431,12 +9465,13 @@ msgstr "Ir al contenido principal"
 
 #: lms/templates/oauth2_provider/authorize.html
 msgid "Authorize"
-msgstr ""
+msgstr "Autorizar"
 
 #: lms/templates/oauth2_provider/authorize.html
 msgid ""
 "The above application requests the following permissions from your account:"
 msgstr ""
+"La aplicación indicada arriba pide los siguientes permisos de su cuenta:"
 
 #: lms/templates/oauth2_provider/authorize.html
 msgid ""
@@ -9445,6 +9480,7 @@ msgid ""
 "'Cancel' button."
 msgstr ""
 
+#: lms/templates/oauth2_provider/authorize.html
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: lms/templates/modal/accessible_confirm.html
@@ -9453,8 +9489,9 @@ msgstr "Cancelar"
 
 #: lms/templates/oauth2_provider/authorize.html
 msgid "Allow"
-msgstr ""
+msgstr "Permitir"
 
+#: lms/templates/oauth2_provider/authorize.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/ccx/schedule.html
 msgid "Error"
@@ -11181,7 +11218,7 @@ msgstr "Falló"
 #. by user
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "Cancelled"
-msgstr ""
+msgstr "Cancelado"
 
 #. Translators: This is the status for a video which has failed
 #. due to being flagged as a duplicate by an external or internal CMS
@@ -11590,7 +11627,7 @@ msgstr "Cerrar sesión"
 
 #: common/lib/capa/capa/templates/codeinput.html
 msgid "Code Editor"
-msgstr ""
+msgstr "Editor de código"
 
 #: common/templates/license.html
 msgid "All Rights Reserved"
@@ -11623,35 +11660,35 @@ msgstr "Algunos derechos reservados"
 
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Feedback Form"
-msgstr ""
+msgstr "Formulario de comentarios"
 
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Email: {email}"
-msgstr ""
+msgstr "Correo Electrónico: {email}"
 
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Full Name: {realname}"
-msgstr ""
+msgstr "Nombre Completo: {realname}"
 
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Inquiry Type: {inquiry_type}"
-msgstr ""
+msgstr "Tipo de pregunta: {inquiry_type}"
 
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Message: {message}"
-msgstr ""
+msgstr "Mensaje: {message}"
 
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Tags: {tags}"
-msgstr ""
+msgstr "Etiquetas: {tags}"
 
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Additional Info:"
-msgstr ""
+msgstr "Información Adicional:"
 
 #: common/templates/emails/contact_us_feedback_email_subject.txt
 msgid "Feedback from user"
-msgstr ""
+msgstr "Retroalimentación de usuario"
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_board.html
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
@@ -11721,11 +11758,11 @@ msgstr "Añadido a marcadores"
 
 #: lms/templates/bookmark_button.html
 msgid "Bookmark this page"
-msgstr ""
+msgstr "Marcar esta página"
 
 #: lms/templates/conditional_module.html
 msgid "You do not have access to this dependency module."
-msgstr ""
+msgstr "Usted no tiene acceso a este módulo de dependencia"
 
 #: lms/templates/course.html
 msgid "LEARN MORE"
@@ -11737,7 +11774,7 @@ msgstr "Empieza"
 
 #: lms/templates/course.html
 msgid "Starts: {date}"
-msgstr ""
+msgstr "Inicia: {date}"
 
 #: lms/templates/courses_list.html
 msgid "View all Courses"
@@ -12016,10 +12053,14 @@ msgid ""
 "our {link_start}detailed FAQs{link_end} where most questions have already "
 "been answered."
 msgstr ""
+"Gracias por sus preguntas y aportes. Generalmente respondemos cada solicitud"
+" en un día hábil, Lunes a Viernes. Mientras tanto, por favor revise nuestra "
+"sección de {link_start}Preguntas Frecuentes detalladas{link_end} en donde la"
+" mayoría de preguntas ya han sido respondidas."
 
 #: lms/templates/help_modal.html
 msgid "- Select -"
-msgstr ""
+msgstr "- Seleccionar -"
 
 #: lms/templates/help_modal.html
 msgid "problem"
@@ -12075,11 +12116,11 @@ msgstr "Por favor intente nuevamente."
 
 #: lms/templates/hidden_content.html
 msgid "The course has ended."
-msgstr ""
+msgstr "El curso ha terminado."
 
 #: lms/templates/hidden_content.html
 msgid "The due date for this assignment has passed."
-msgstr ""
+msgstr "La fecha límite para esta tarea ha pasado."
 
 #: lms/templates/hidden_content.html
 msgid ""
@@ -12087,6 +12128,9 @@ msgid ""
 "available.{line_break}If you have completed this assignment, your grade is "
 "available on the {link_start}progress page{link_end}."
 msgstr ""
+"Debido a que el curso ha terminado, esta tarea ya no se encuentra "
+"disponible.{line_break}Si usted ha completado esta tarea, su nota está "
+"disponible en la {link_start}página de progreso{link_end}."
 
 #: lms/templates/hidden_content.html
 msgid ""
@@ -12094,6 +12138,9 @@ msgid ""
 "available.{line_break}If you have completed this assignment, your grade is "
 "available on the {link_start}progress page{link_end}."
 msgstr ""
+"Debido a que la fecha límite ha expirado, esta tarea ya no se encuentra "
+"disponible.{line_break}Si usted ha completado esta tarea, su nota está "
+"disponible en la {link_start}página de progreso{link_end}."
 
 #: lms/templates/imageannotation.html
 msgid "Note: only instructors may annotate."
@@ -12438,8 +12485,8 @@ msgstr "Usted no tiene ninguna anotación."
 #: lms/templates/problem.html
 msgid "You have used {num_used} of {num_total} attempt"
 msgid_plural "You have used {num_used} of {num_total} attempts"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Usted ha realizado {num_used} de {num_total} intento"
+msgstr[1] "Usted ha realizado {num_used} de {num_total} intentos"
 
 #: lms/templates/problem.html
 msgid ""
@@ -12457,15 +12504,15 @@ msgstr "Guardar"
 
 #: lms/templates/problem.html
 msgid "Save your answer"
-msgstr ""
+msgstr "Guardar respuesta"
 
 #: lms/templates/problem.html
 msgid "Reset your answer"
-msgstr ""
+msgstr "Restablecer respuesta"
 
 #: lms/templates/problem_notifications.html
 msgid "Next Hint"
-msgstr ""
+msgstr "Próximo consejo"
 
 #: lms/templates/problem_notifications.html
 #: lms/templates/shoppingcart/shopping_cart_flow.html
@@ -12753,7 +12800,7 @@ msgstr "Previo"
 
 #: lms/templates/seq_module.html
 msgid "Sequence"
-msgstr ""
+msgstr "Secuencia"
 
 #: lms/templates/seq_module.html
 msgid "Next"
@@ -12862,22 +12909,22 @@ msgstr "Acciones"
 
 #: lms/templates/staff_problem_info.html
 msgid "Reset Learner's Attempts to Zero"
-msgstr ""
+msgstr "Reiniciar los intentos del estudiante"
 
 #: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Delete Learner's State"
-msgstr ""
+msgstr "Borrar estado del estudiante"
 
 #: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Rescore Learner's Submission"
-msgstr ""
+msgstr "Calificar el envío del estudiante nuevamente"
 
 #: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Rescore Only If Score Improves"
-msgstr ""
+msgstr "Puntuar de nuevo solamente si se mejora la calificación"
 
 #: lms/templates/staff_problem_info.html
 msgid "Module Fields"
@@ -13213,6 +13260,11 @@ msgid ""
 "when processing is complete. You can also return to this page to see the "
 "status of your API access request."
 msgstr ""
+"Su solicitud para acceder a la API de catálogo de cursos de {platform_name} "
+"se está procesando. Usted recibirá un mensaje en la dirección de correo "
+"electrónico de su perfil cuando se complete el proceso. También puede "
+"regresar a esta página para ver el estado de su solicitud de acceso a la "
+"API."
 
 #. Translators: "platform_name" is the name of this Open edX installation.
 #. "api_support_email_link" is HTML for a link to email the API support staff.
@@ -13222,6 +13274,9 @@ msgid ""
 "denied. If you think this is an error, or for other questions about using "
 "this API, contact {api_support_email_link}."
 msgstr ""
+"Su solicitud para acceder a la API de catálogo de cursos de {platform_name} "
+"ha sido denegada. Si usted piensa que esto es un error, o para otras "
+"preguntas sobre el uso de esta API, contacte a {api_support_email_link}."
 
 #: lms/templates/api_admin/status.html
 msgid ""
@@ -13269,6 +13324,10 @@ msgid ""
 "{link_start}our API documentation page{link_end}. For questions about using "
 "this API, contact {api_support_email_link}."
 msgstr ""
+"Para aprender más sobre la API de catálogo de cursos de {platform_name} "
+"visite {link_start}Nuestra página de documentación de la API{link_end}. Si "
+"tiene preguntas sobre el uso de esta API, contacte a "
+"{api_support_email_link}."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "API Terms of Service"
@@ -13296,6 +13355,18 @@ msgid ""
 " do not understand or do not wish to be bound by the Terms, you should not "
 "use the APIs."
 msgstr ""
+"Bienvenido a {platform_name}. Gracias por usar la API de Descubrimiento de "
+"cursos de {platform_name} y cualquier API adicional que podemos ofrecer de "
+"vez en cuando (colectivamente, la \"API\"). Por favor, lea estas Condiciones"
+" de servicio antes de acceder o utilizar las API. Estas Condiciones del "
+"servicio, cualquiera de los términos adicionales dentro de la documentación "
+"de la API, y las directivas e instrucciones aplicables que {platform_name} "
+"pone a disposición y / o actualizaciones de vez en cuando son acuerdos "
+"(colectivamente, las \"Condiciones\") entre usted y {platform_name}. Al "
+"acceder o utilizar las API, usted acepta y acuerda estar legalmente sometido"
+" a los Términos, independientemente de si usted es un usuario registrado. Si"
+" no entiende o no desea estar obligado por los términos, no debe utilizar "
+"las API."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "API Access"
@@ -13370,6 +13441,11 @@ msgid ""
 "time, in its sole discretion, does not benefit or serve the best interests "
 "of {platform_name}, its users and its partners."
 msgstr ""
+"{platform_name} tendrá el derecho exclusivo de determinar si un uso "
+"específico de las API es o no es aceptable, y {platform_name} se reserva el "
+"derecho de revocar acceso a la API para cualquier uso que {platform_name} "
+"determine en cualquier momento, a su sola discreción, si no beneficia o "
+"atiende los mejores intereses de {platform_name}, sus usuarios y sus socios."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -13475,6 +13551,15 @@ msgid ""
 "or mask either your identity or yourApplication's identity when using the "
 "APIs."
 msgstr ""
+"Usted se compromete a cumplir con todas las leyes aplicables, regulaciones, "
+"y los derechos de terceros (incluyendo, sin limitación las leyes relativas a"
+" la importación o exportación de datos o software, privacidad, derechos de "
+"autor y las leyes locales). Usted no va a utilizar las API para fomentar o "
+"promover la actividad ilegal o violación de derechos de terceros. No violará"
+" cualquier otro término de servicio con {platform_name}. Sólo accederá (o "
+"intentará acceder) a una API por los medios descritos en la documentación de"
+" esa API. Usted no va a falsear o enmascarar su identidad o la identidad de "
+"su Aplicación al utilizar las API."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Ownership"
@@ -13574,6 +13659,13 @@ msgid ""
 " collect and how you may use and share such information (including for "
 "advertising) with {platform_name} and other third parties."
 msgstr ""
+"Usted acepta cumplir con todas las leyes y regulaciones de privacidad "
+"aplicables y ser transparente con respecto a cualquier colección y uso de "
+"los datos del usuario final. Usted proporcionará y adherirse a una política "
+"de privacidad para su aplicación que describe con claridad y precisión a los"
+" usuarios finales información de usuario que usted recoge y cómo se puede "
+"usar y compartir la información (incluida la publicidad) con {platform_name}"
+" y otros terceros."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Right to Charge"
@@ -13589,6 +13681,14 @@ msgid ""
 "return to this page periodically to ensure familiarity with the most current"
 " version of the Terms."
 msgstr ""
+"{platform_name} se reserva el derecho a modificar los términos en cualquier "
+"momento sin previo aviso. Cualquier cambio en las condiciones entrarán en "
+"vigor inmediatamente después de su publicación en esta página, con fecha "
+"efectiva actualizada. Al acceder o utilizar se han hecho las API después de "
+"cualquier cambio, usted acepta de forma prospectiva a las condiciones "
+"modificadas y todos los cambios. Asegúrese de volver a esta página "
+"periódicamente para asegurarse de estar familiarizado con la versión más "
+"actualizada de los Términos."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -13598,6 +13698,11 @@ msgid ""
 "unacceptable to you, you should stop using the APIs. Continued use of the "
 "APIs means you accept the change."
 msgstr ""
+"{platform_name} también puede actualizar o modificar las API de vez en "
+"cuando sin previo aviso. Estos cambios pueden afectar el uso de las API o la"
+" forma en que su integración interactúa con la API. Si hacemos un cambio que"
+" es inaceptable para usted, usted debe dejar de usar la API. El uso "
+"continuado de las API implica la aceptación de los cambios."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Confidentiality"
@@ -13610,6 +13715,10 @@ msgid ""
 "others from using your credentials. Your credentials may not be embedded in "
 "open source projects."
 msgstr ""
+"Sus credenciales (tales como el secreto de cliente y el ID) están destinados"
+" a ser utilizados únicamente por usted. Va a mantener sus credenciales "
+"confidenciales y desalentar a otros del uso de sus credenciales. Sus "
+"credenciales no podrán formar parte de proyectos de código abierto."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -13629,6 +13738,22 @@ msgid ""
 "so by law if you provide {platform_name} with reasonable prior notice, "
 "unless a court orders that {platform_name} not receive notice."
 msgstr ""
+"En el caso de que {platform_name} le proporcione acceso a la información "
+"específica a {platform_name} y / o las API que se hayan marcado como "
+"\"confidencial\", o que una persona razonable asumiría que es confidencial o"
+" propietaria dados los términos de su divulgación ( \"información "
+"confidencial\"), usted se compromete a utilizar esta información sólo para "
+"utilizar y construir con la API. No puede revelar la información "
+"confidencial a cualquier persona sin previo consentimiento por escrito de "
+"{platform_name}, y se compromete a proteger la información confidencial de "
+"un uso no autorizado y la divulgación de la misma manera que lo haría "
+"proteger su propia información confidencial. La información confidencial no "
+"incluye información que ha desarrollado de forma independiente, que se le "
+"dio razón a usted por un tercero sin obligación de confidencialidad, o que "
+"se hace público por causas ajenas a su cuenta. Usted puede revelar "
+"información confidencial cuando sea obligado a hacerlo por ley si "
+"proporciona a {platform_name} la notificación con una antelación razonable, "
+"a menos que un tribunal ordene que {platform_name} no reciba aviso."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Disclaimer of Warranty / Limitation of Liabilities"
@@ -13724,6 +13849,14 @@ msgid ""
 "DEFAMATION, ERRORS, LOSS OF PROFITS, LOSS OF DATA OR INTERRUPTION IN "
 "AVAILABILITY OF DATA)."
 msgstr ""
+"EN PARTICULAR, EN LA MEDIDA MÁXIMA PERMITIDA POR LA LEY, NI {platform_name} "
+"NI NINGUNO DE LOS PARTICIPANTES DE {platform_name} TENDRÁN CUALQUIER "
+"RESPONSABILIDAD POR DAÑOS DERIVADOS, PUNITIVOS, INDIRECTOS, ESPECIALES, "
+"EJEMPLARES O INDIRECTOS, PREVISIBLES O IMPREVISIBLES Y YA SEA O NO QUE "
+"{platform_name} O CUALQUIERA DE LOS PARTICIPANTES DE {platform_name} HAYA "
+"SIDO NEGLIGENTE O DE ALGUNA FORMA HAYA COMETIDO UNA FALTA (INCLUYENDO, PERO "
+"NO LIMITADO A, LAS RECLAMACIONES POR DIFAMACIÓN, ERRORES, PÉRDIDA DE "
+"BENEFICIOS, PÉRDIDA DE DATOS O INTERRUPCIÓN DE DISPONIBILIDAD DE DATOS)."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -13732,6 +13865,10 @@ msgid ""
 " OR ALL OF THE ABOVE DISCLAIMERS, EXCLUSIONS, OR LIMITATIONS MAY NOT APPLY "
 "TO YOU, AND YOU MIGHT HAVE ADDITIONAL RIGHTS."
 msgstr ""
+"CIERTAS LEYES ESTATALES NO PERMITEN LIMITACIONES SOBRE GARANTÍAS IMPLÍCITAS "
+"O LA EXCLUSIÓN O LIMITACIÓN DE CIERTOS DAÑOS. SI ESTAS LEYES SE APLICAN A "
+"USTED, ALGUNAS O TODAS LAS RENUNCIAS, EXCLUSIONES O LIMITACIONES PUEDEN NO "
+"APLICARSE A USTED, Y USTED PODRÍA TENER DERECHOS ADICIONALES."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -13827,6 +13964,20 @@ msgid ""
 "still be allowed to apply to injunctive remedies (or an equivalent type of "
 "urgent legal relief) in any jursdiction."
 msgstr ""
+"El usuario acepta que los términos, las API, y cualquier reclamo o disputa "
+"que surja de o esté relacionada con las condiciones o las API se rige por "
+"las leyes del Estado de Massachusetts, con exclusión de sus conflictos de "
+"disposiciones legales. El usuario acepta que todas las reclamaciones y "
+"disputas serán escuchadas y resueltas exclusivamente en los tribunales "
+"estatales o federales ubicados en y sirviendo de Cambridge, Massachusetts, "
+"EE.UU. Usted da su consentimiento a la jurisdicción personal de dichos "
+"tribunales más que para este propósito, y el usuario renuncia y está de "
+"acuerdo hacer valer ninguna objeción a dichos procedimientos en los "
+"tribunales (incluyendo cualquier defensa o excepción de falta de "
+"jurisdicción apropiada o el lugar o la inconveniencia del foro). No obstante"
+" lo anterior, el usuario acepta que {platform_name} aún podrá aplicar a "
+"medidas cautelares (o un tipo equivalente de medida legal urgente) en "
+"cualquier jurisdicción."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Termination"
@@ -14637,7 +14788,7 @@ msgstr "fecha límite: {date}"
 
 #: lms/templates/courseware/accordion.html
 msgid "{section_format} due {{date}}"
-msgstr ""
+msgstr "{section_format} fecha límite {{date}}"
 
 #: lms/templates/courseware/accordion.html
 msgid "This content is graded"
@@ -14911,7 +15062,7 @@ msgstr ""
 
 #: lms/templates/courseware/info.html
 msgid "Upgrade Now"
-msgstr ""
+msgstr "Actualizar Ahora"
 
 #: lms/templates/courseware/info.html
 msgid "Course Updates and News"
@@ -14927,7 +15078,7 @@ msgstr "Fechas importantes del curso"
 
 #: lms/templates/courseware/info.html
 msgid "Today is {date}"
-msgstr ""
+msgstr "Hoy es {date}"
 
 #: lms/templates/courseware/news.html
 msgid "News - MITx 6.002x"
@@ -14955,7 +15106,7 @@ msgstr "Ver certificado"
 
 #: lms/templates/courseware/progress.html
 msgid "Opens in a new browser window"
-msgstr ""
+msgstr "Se abrirá en una nueva ventana del navegador"
 
 #: lms/templates/courseware/progress.html
 msgid "Download Your Certificate"
@@ -14979,6 +15130,9 @@ msgid ""
 "{student_name}, you have met the requirements for credit in this course. "
 "{a_start}Go to your dashboard{a_end} to purchase course credit."
 msgstr ""
+"{student_name}, usted ha completado los requerimientos para obtener crédito "
+"por este curso. {a_start}Visite su panel de control{a_end} para comprar "
+"crédito del curso."
 
 #: lms/templates/courseware/progress.html
 msgid "{student_name}, you have not yet met the requirements for credit."
@@ -15008,7 +15162,7 @@ msgstr "Verificación rechazada"
 
 #: lms/templates/courseware/progress.html
 msgid "Completed by {date}"
-msgstr ""
+msgstr "Completado antes del {date}"
 
 #: lms/templates/courseware/progress.html
 msgid "Upcoming"
@@ -15020,7 +15174,7 @@ msgstr "Menos"
 
 #: lms/templates/courseware/progress.html
 msgid "Details for each chapter"
-msgstr ""
+msgstr "Detalles para cada capítulo"
 
 #: lms/templates/courseware/progress.html
 msgid "{earned} of {total} possible points"
@@ -15274,15 +15428,15 @@ msgstr "Próximamente"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Ended - {date}"
-msgstr ""
+msgstr "Finalizado - {date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Started - {date}"
-msgstr ""
+msgstr "Iniciado - {date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Starts - {date}"
-msgstr ""
+msgstr "Inicia - {start_date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "View Archived Course"
@@ -15378,13 +15532,15 @@ msgstr "Verificar ahora"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You have submitted your verification information."
-msgstr ""
+msgstr "Ud. ha enviado su información de verificación."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
 "You will see a message on your dashboard when the verification process is "
 "complete (usually within 1-2 days)."
 msgstr ""
+"Recibirá un mensaje en su panel de control cuando el proceso de verificación"
+" esté completado (usualmente entre 1-2 días)."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Your current verification will expire soon!"
@@ -15410,7 +15566,7 @@ msgstr "Su estado de verificación está válido hasta {date}."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Your current verification will expire soon."
-msgstr ""
+msgstr "¡Su verificación actual vencerá  pronto!"
 
 #. Translators: start_link and end_link will be replaced with HTML tags;
 #. please do not translate these.
@@ -15419,6 +15575,9 @@ msgid ""
 "Your current verification will expire in {days} days. {start_link}Re-verify "
 "your identity now{end_link} using a webcam and a government-issued photo ID."
 msgstr ""
+"Su verificación actual vencerá en {days} días. {start_link}Verifique su "
+"identidad nuevamente ahora{end_link} con una cámara web y un documento de "
+"identificación oficial con foto."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
@@ -15537,27 +15696,31 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Current Verification Status: Approved"
-msgstr ""
+msgstr "Estado de verificación actual: Aprobado"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
 "Your edX verification has been approved. Your verification is effective for "
 "one year after submission."
 msgstr ""
+"Su verificación de identidad ha sido aprobada. Su verificación tiene validez"
+" por un año después del envío."
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Current Verification Status: Pending"
-msgstr ""
+msgstr "Estado de verificación actual: Pendiente"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
 "Your edX ID verification is pending. Your verification information has been "
 "submitted and will be reviewed shortly."
 msgstr ""
+"Su verificación de edX está pendiente. Su información de verificación ha "
+"sido enviada y será revisada pronto."
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Current Verification Status: Expired"
-msgstr ""
+msgstr "Estado de verificación actual: Expirado"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
@@ -15565,6 +15728,9 @@ msgid ""
 "submit a new photo of yourself and your government-issued photo ID before "
 "the verification deadline for your course."
 msgstr ""
+"Su estado de verificación con edX ha expirado. Para recibir un Certificado "
+"Verificado, será necesario enviar una nueva foto de sí mismo y otra de un "
+"documento de identidad oficial antes de la fecha límite en su curso."
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Resubmit Verification"
@@ -15595,7 +15761,7 @@ msgstr "Resultados:"
 
 #: lms/templates/discussion/_discussion_inline.html
 msgid "Topic:"
-msgstr ""
+msgstr "Tema:"
 
 #: lms/templates/discussion/_discussion_inline.html
 msgid "Show Discussion"
@@ -16714,10 +16880,14 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Regenerate for learners with audit passing state. ({count})"
 msgstr ""
+"Regenerar para estudiantes con estado de aprobación en la ruta gratuita. "
+"({count})"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Regenerate for learners with audit not passing state. ({count})"
 msgstr ""
+"Regenerar para estudiantes en la ruta gratuita sin estado de aprobación. "
+"({count})"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Regenerate for learners in an error state. ({count})"
@@ -16783,7 +16953,7 @@ msgstr "Fecha de finalización del curso:"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "No end date set"
-msgstr ""
+msgstr "Sin fecha de finalización definida"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Has the course started?"
@@ -18035,7 +18205,7 @@ msgstr "(Estudiantes no asignados explícitamente a una cohorte)"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Learners in the {track_name} Track"
-msgstr ""
+msgstr "Estudiantes en la ruta {track_name}"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Subject: "
@@ -18140,13 +18310,15 @@ msgstr "Intentos de estudiantes para examenes especiales."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View gradebook for enrolled learners"
-msgstr ""
+msgstr "Ver libro de calificaciones para estudiantes inscritos"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
 "Note: This feature is available only to courses with a small number of "
 "enrolled learners."
 msgstr ""
+"Nota: Esta herramienta está disponible solamente en cursos con un número "
+"pequeño de estudiantes inscritos."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View Gradebook"
@@ -18154,31 +18326,32 @@ msgstr "Ver libro de calificaciones"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View a specific learner's grades and progress"
-msgstr ""
+msgstr "Ver las notas y el progreso de un estudiante específico"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Learner's {platform_name} email address or username *"
 msgstr ""
+"Dirección de email {platform_name} o nombre de usuario del estudiante *"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Learner email address or username"
-msgstr ""
+msgstr "Dirección de email o nombre de usuario del estudiante"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View Progress Page"
-msgstr ""
+msgstr "Ver página de progreso"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Adjust a learner's grade for a specific problem"
-msgstr ""
+msgstr "Ajustar la calificación del estudiante para una pregunta específica"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Location of problem in course *"
-msgstr ""
+msgstr "Localizador del problema dentro del curso *"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Example"
-msgstr ""
+msgstr "Ejemplo"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Problem location"
@@ -18186,20 +18359,22 @@ msgstr "Localización del problema"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Attempts"
-msgstr ""
+msgstr "Intentos"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
 "Allow a learner who has used up all attempts to work on the problem again."
 msgstr ""
+"Permitir que un estudiante que ha usado todos sus intentos trabaje en la "
+"pregunta de nuevo."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Reset Attempts to Zero"
-msgstr ""
+msgstr "Reiniciar los intentos"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Rescore"
-msgstr ""
+msgstr "Calificar de nuevo"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
@@ -18207,50 +18382,57 @@ msgid ""
 "Only If Score Improves' option updates the learner's score only if it "
 "improves in the learner's favor."
 msgstr ""
+"Para la pregunta específica, calificar las respuestas del estudiante "
+"nuevamente. La opción \"Recalificar solamente si se mejora la nota\" "
+"actualiza la nota del estudiante solamente si se mejora."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Problem History"
-msgstr ""
+msgstr "Historial del problema"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
 "For the specified problem, permanently and completely delete the learner's "
 "answers and scores from the database."
 msgstr ""
+"Para el problema específico, borrar las respuestas del estudiante "
+"completamente y permanentemente de la base de datos."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Task Status"
-msgstr ""
+msgstr "Estado de la tarea"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
 "Show the status for the rescoring tasks that you submitted for this learner "
 "and problem."
 msgstr ""
+"Mostrar el estado de tareas de recalificación que Ud. inició para este "
+"estudiante y problema."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Show Task Status"
-msgstr ""
+msgstr "Mostrar estado de la tarea"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Adjust a learner's entrance exam results"
-msgstr ""
+msgstr "Ajustar los resultados del examen de entrada para un estudiante"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Allow the learner to take the exam again."
-msgstr ""
+msgstr "Permitir que el estudiante haga el examen de nuevo."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Allow Skip"
-msgstr ""
+msgstr "Permitir salto"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Waive the requirement for the learner to take the exam."
-msgstr ""
+msgstr "Negar el requerimiento de que el estudiante haga el examen."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Let Learner Skip Entrance Exam"
-msgstr ""
+msgstr "Permitir que el estudiante salte el examen de ingreso"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
@@ -18258,6 +18440,9 @@ msgid ""
 "Only If Score Improves' option updates the learner's scores only if it "
 "improves in the learner's favor."
 msgstr ""
+"Recalificar cualquier respuesta que haya sido enviada. La opción "
+"\"Recalificar solamente si se mejora la nota\" actualiza la nota del "
+"estudiante solamente si se mejora."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Rescore All Problems"
@@ -18265,49 +18450,57 @@ msgstr "Reevalúa Todos los Problemas"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Rescore All Problems Only If Score Improves"
-msgstr ""
+msgstr "Recalificar todas las preguntas solamente si se mejora la nota"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Entrance Exam History"
-msgstr ""
+msgstr "Historial del examen de entrada"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
 "For the entire entrance exam, permanently and completely delete the "
 "learner's answers and scores from the database."
 msgstr ""
+"Para el examen de entrada entero, borrar las respuestas del estudiante "
+"completamente y permanentemente de la base de datos."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
 "Show the status for the rescoring tasks that you submitted for this learner "
 "and entrance exam."
 msgstr ""
+"Mostrar el estado de tareas de recalificación que Ud. inició para este "
+"estudiante y examen de entrada."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Adjust all enrolled learners' grades for a specific problem"
 msgstr ""
+"Ajustar la calificación de cada estudiante inscrito para una pregunta "
+"específica"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Allows all learners to work on the problem again."
-msgstr ""
+msgstr "Permite que todos los estudiantes trabajen en el problema de nuevo."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
 "Rescore submitted responses. The 'Rescore Only If Scores Improve' option "
 "updates a learner's score only if it improves in the learner's favor."
 msgstr ""
+"Recalificar respuestas enviadas. La opción \"Recalificar solamente si se "
+"mejora la nota\" actualiza la nota del estudiante solamente si se mejora."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Rescore All Learners' Submissions"
-msgstr ""
+msgstr "Recalificar los envíos de cada estudiante"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Rescore Only If Scores Improve"
-msgstr ""
+msgstr "Recalificar solamente si se mejora la nota"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Show the status for the tasks that you submitted for this problem."
-msgstr ""
+msgstr "Mostrar el estado de las tareas que Ud. inició para este problema."
 
 #: lms/templates/learner_dashboard/program_details.html
 msgid "Program Details"
@@ -19374,6 +19567,8 @@ msgid ""
 "The verification deadline for {course_name} was {{date}}. Verification is no"
 " longer available."
 msgstr ""
+"La fecha límite para verificaciones para {course_name} fué el {{date}}. Ya "
+"no está disponible la verificación."
 
 #: lms/templates/verify_student/missed_deadline.html
 msgid ""
@@ -23429,7 +23624,7 @@ msgstr "Artículo desbloqueado para edición"
 
 #: wiki/forms.py
 msgid "Filter"
-msgstr ""
+msgstr "Filtrar"
 
 #: wiki/core/plugins/base.py
 msgid "Settings for plugin"
