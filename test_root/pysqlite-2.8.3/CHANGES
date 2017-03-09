@@ -1,0 +1,139 @@
+pysqlite Changelog
+==================
+
+Version 2.8.3
+-------------
+
+(released on August 30th 2016)
+
+- Fixed bug where cursor.description was an emtpy tuple instead of None for
+  non-SELECT statements
+
+Version 2.8.2
+-------------
+
+(released on March 26th 2016)
+
+- Make sure pysqlite compiles with Visual Studio, which does not support C99
+- Switch to sqlite3_open_v2. The flags parameter is now exposed. You can use it
+  to modify the behaviour of the opened database connection, for example
+  opening a database file in read-only mode or enable URI mode.
+
+
+Version 2.8.1
+-------------
+
+(released on August 23rd 2015)
+
+BUG FIXES
+
+- Fixed multiple refcount problems.
+
+IMPROVEMENTS
+
+- Added versionchanged about changed transaction behaviour wrt DDL statements
+  to documentation.
+- I was informed by Roger Binns that FTS5 is not stable yet. The amalgamation
+  is now built with FTS3 and FTS4 instead.
+
+
+Version 2.8.0
+-------------
+
+(released on August 19th 2015)
+
+NEW FEATURES
+
+- No new features, but tons of bugfixes. These mean that things now work that
+  didn't before:
+- Transactional DDL now works
+- You can use SAVEPOINTs now
+
+
+BUILD PROCESS
+
+- Python 2.7.x is now required. If trying to use it with Python 3, print a
+  useful error message.  Integrated all fixes from the sqlite3 module in Python
+  2.7.10.
+
+
+MAJOR IMPROVEMENTS
+
+- Completety got rid of statement parsing. We now use SQLite functions to
+  determine if a statement modifies the database or not. If a statement
+  modifies the database, then we implicitly start a transaction. For backwards
+  compatibility reasons, we do NOT implicitly start a transaction if we
+  encounter a DDL statement.
+
+  You can, however, now have transactional DDL if you want to:
+
+    cur = con.cursor()
+    cur.execute("begin")
+    cur.execute("create table foo(bar)")
+    con.rollback()
+
+  This also means that people can now finally use SAVEPOINTS.
+
+- Use sqlite3_get_autocommit() to determine if we are within a transaction
+  instead of trying to be smart.
+
+- Switch to v2 statement API. This simplified the code and will increase
+  stability.
+
+MINOR IMPROVEMENTS
+
+- You can use unicode strings as index for Row objects.
+
+
+BUGFIXES
+
+- Fixed a regression: statements should not be reset after a commit.
+
+
+GENERAL CLEANUP AND DEPRECATIONS
+
+- Since december 2005, row_factory is a feature of the Connection class instead
+  of the Cursor class. It was kept in the Cursor class for backwards
+  compatibility. Now it was time to finally remove it from the Cursor class.
+- DEPRECATE converters and adapters.
+- DEPRECATE text_factory.
+- Remove compatibility workarounds for old Python versions.
+- Remove workarounds for old SQLite versions.
+- Remove apsw related code.
+
+
+Version 2.7.0
+-------------
+
+(released on August 12th 2015)
+
+NEW FEATURES
+
+- The limit functionality of SQLite is now wrapped.
+
+BUILD PROCESS
+
+- Instead of fts3, build fts5 extension when using amalgamation.
+- use pkg-config for finding SQLite if available
+- Removed the download/unpacking of SQLite amalgamation files. If you now want
+  to statically build against the SQLite amalgamation files, download them
+  yourself and put them in the pysqlite root directory.
+
+IMPROVEMENTS
+
+- Use toc.db file from the SQLite web site and a custom script to make sure
+  that we have all integer constants mapped to Python.
+- Use Travis CI
+- Added Trove classifier to make sure Python 3 users do not accidentally try to install it.
+
+BUGFIXES 
+
+- Fix for parsing fractional second part of timestamps.
+- Fixed bug where when using converters, empty strings ended up as None on the Python side.
+- SQLite can cope with text with embedded NUL. We can now, too.
+- many others
+
+Version 2.6.3
+-------------
+
+(released on February 16th 2011)

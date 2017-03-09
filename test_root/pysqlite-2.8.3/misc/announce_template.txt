@@ -1,0 +1,20 @@
+pysqlite x.y.z released
+=======================
+
+Release focus: minor bugfixes, minor new features.
+
+pysqlite is a DB-API 2.0-compliant database interface for SQLite.
+
+SQLite is a in-process library that implements a self-contained,
+serverless, zero-configuration, transactional SQL database
+engine.
+
+Go to http://github.com/ghaering/pysqlite/ for downloads, online documentation and
+for reporting bugs.
+
+Changes
+=======
+
+Compatibility
+=============
+
