@@ -49,6 +49,9 @@ define(['jquery', 'underscore', 'underscore.string', 'edx-ui-toolkit/js/utils/sp
 
                 afterEach(function() {
                     EditHelpers.uninstallMockXBlock();
+                    if (containerPage !== undefined) {
+                        containerPage.remove();
+                    }
                 });
 
                 respondWithHtml = function(html) {

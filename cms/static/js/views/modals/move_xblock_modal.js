@@ -41,7 +41,6 @@ function($, Backbone, _, gettext, BaseView, XBlockViewUtils, MoveXBlockUtils, Ht
         initialize: function() {
             var self = this;
             BaseModal.prototype.initialize.call(this);
-            this.listenTo(Backbone, 'move:breadcrumbRendered', this.focusModal);
             this.sourceXBlockInfo = this.options.sourceXBlockInfo;
             this.sourceParentXBlockInfo = this.options.sourceParentXBlockInfo;
             this.targetParentXBlockInfo = null;
@@ -57,9 +56,9 @@ function($, Backbone, _, gettext, BaseView, XBlockViewUtils, MoveXBlockUtils, Ht
                 $('.breadcrumb-container').removeClass('is-hidden');
                 self.renderViews(courseOutlineInfo, ancestorInfo);
             });
-            this.movedAlertView = null;
-            this.isValidMove = false;
+            this.listenTo(Backbone, 'move:breadcrumbRendered', this.focusModal);
             this.listenTo(Backbone, 'move:enableMoveOperation', this.enableMoveOperation);
+            this.listenTo(Backbone, 'move:hideMoveModal', this.hide);
         },
 
         getTitle: function() {
@@ -137,15 +136,22 @@ function($, Backbone, _, gettext, BaseView, XBlockViewUtils, MoveXBlockUtils, Ht
             }
         },
 
-        isValidCategory: function(sourceParentType, targetParentType, targetHasChildren) {
-            var basicBlockTypes = ['course', 'chapter', 'sequential', 'vertical'];
+        isValidCategory: function(targetParentXBlockInfo) {
+            var basicBlockTypes = ['course', 'chapter', 'sequential', 'vertical'],
+                sourceParentType = this.sourceParentXBlockInfo.get('category'),
+                targetParentType = targetParentXBlockInfo.get('category'),
+                sourceParentHasChildren = this.sourceParentXBlockInfo.get('has_children'),
+                targetParentHasChildren = targetParentXBlockInfo.get('has_children');
+
             // Treat source parent component as vertical to support move child components under content experiment
             // and other similar xblocks.
-            // eslint-disable-next-line no-param-reassign
-            sourceParentType = sourceParentType === 'split_test' ? 'vertical' : sourceParentType;
+            if (sourceParentHasChildren && !_.contains(basicBlockTypes, sourceParentType)) {
+                sourceParentType = 'vertical';  // eslint-disable-line no-param-reassign
+            }
+
             // Treat target parent component as a vertical to support move to parentable target parent components.
             // Also, moving a component directly to content experiment is not allowed, we need to visit to group level.
-            if (targetHasChildren && !_.contains(basicBlockTypes, targetParentType) &&
+            if (targetParentHasChildren && !_.contains(basicBlockTypes, targetParentType) &&
                 targetParentType !== 'split_test') {
                 targetParentType = 'vertical';  // eslint-disable-line no-param-reassign
             }
@@ -153,44 +159,28 @@ function($, Backbone, _, gettext, BaseView, XBlockViewUtils, MoveXBlockUtils, Ht
         },
 
         enableMoveOperation: function(targetParentXBlockInfo) {
-            var isValidMove = false,
-                sourceParentType = this.sourceParentXBlockInfo.get('category'),
-                targetParentType = targetParentXBlockInfo.get('category'),
-                targetHasChildren = targetParentXBlockInfo.get('has_children');
+            var isValidMove = false;
 
-            if (this.isValidCategory(sourceParentType, targetParentType, targetHasChildren) &&
+            // update target parent on navigation
+            this.targetParentXBlockInfo = targetParentXBlockInfo;
+            if (this.isValidCategory(targetParentXBlockInfo) &&
                 this.sourceParentXBlockInfo.id !== targetParentXBlockInfo.id && // same parent case
                 this.sourceXBlockInfo.id !== targetParentXBlockInfo.id) { // same source item case
                 isValidMove = true;
-                this.targetParentXBlockInfo = targetParentXBlockInfo;
             }
             this.updateMoveState(isValidMove);
         },
 
         moveXBlock: function() {
-            var self = this;
-            XBlockViewUtils.moveXBlock(self.sourceXBlockInfo.id, self.targetParentXBlockInfo.id)
-            .done(function(response) {
-                // hide modal
-                self.hide();
-                // hide xblock element
-                $("li.studio-xblock-wrapper[data-locator='" + self.sourceXBlockInfo.id + "']").hide();
-                self.movedAlertView = MoveXBlockUtils.showMovedNotification(
-                    StringUtils.interpolate(
-                        gettext('Success! "{displayName}" has been moved.'),
-                        {
-                            displayName: self.sourceXBlockInfo.get('display_name')
-                        }
-                    ),
-                    {
-                        sourceDisplayName: self.sourceXBlockInfo.get('display_name'),
-                        sourceLocator: self.sourceXBlockInfo.id,
-                        sourceParentLocator: self.sourceParentXBlockInfo.id,
-                        targetParentLocator: response.parent_locator,
-                        targetIndex: response.source_index
-                    }
-                );
-            });
+            MoveXBlockUtils.moveXBlock(
+                {
+                    sourceXBlockElement: $("li.studio-xblock-wrapper[data-locator='" + this.sourceXBlockInfo.id + "']"),
+                    sourceDisplayName: this.sourceXBlockInfo.get('display_name'),
+                    sourceLocator: this.sourceXBlockInfo.id,
+                    sourceParentLocator: this.sourceParentXBlockInfo.id,
+                    targetParentLocator: this.targetParentXBlockInfo.id
+                }
+            );
         }
     });
 

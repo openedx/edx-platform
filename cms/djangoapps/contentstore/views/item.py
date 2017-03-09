@@ -739,6 +739,8 @@ def _move_item(source_usage_key, target_parent_usage_key, user, target_index=Non
             error = 'You can not move an item into itself.'
         elif is_source_item_in_target_parents(source_item, target_parent):
             error = 'You can not move an item into it\'s child.'
+        elif target_parent_type == 'split_test':
+            error = 'You can not move an item directly into content experiment.'
         elif source_index is None:
             error = '{source_usage_key} not found in {parent_usage_key}.'.format(
                 source_usage_key=unicode(source_usage_key),
@@ -1119,7 +1121,8 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     xblock_info = {
         'id': unicode(xblock.location),
         'display_name': xblock.display_name_with_default,
-        'category': xblock.category
+        'category': xblock.category,
+        'has_children': xblock.has_children
     }
     if is_concise:
         if child_info and len(child_info.get('children', [])) > 0:
@@ -1127,7 +1130,6 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         # Groups are labelled with their internal ids, rather than with the group name. Replace id with display name.
         group_display_name = get_group_display_name(user_partitions, xblock_info['display_name'])
         xblock_info['display_name'] = group_display_name if group_display_name else xblock_info['display_name']
-        xblock_info['has_children'] = xblock.has_children
     else:
         xblock_info.update({
             'edited_on': get_default_time_display(xblock.subtree_edited_on) if xblock.subtree_edited_on else None,
