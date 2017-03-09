@@ -1,17 +1,19 @@
-define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/spec_helpers/edit_helpers',
         'common/js/spec_helpers/template_helpers', 'common/js/spec_helpers/view_helpers',
-        'js/views/modals/move_xblock_modal', 'edx-ui-toolkit/js/utils/html-utils',
+        'js/views/modals/move_xblock_modal', 'js/views/pages/container', 'edx-ui-toolkit/js/utils/html-utils',
         'edx-ui-toolkit/js/utils/string-utils', 'js/models/xblock_info'],
-    function($, _, AjaxHelpers, TemplateHelpers, ViewHelpers, MoveXBlockModal, HtmlUtils, StringUtils, XBlockInfo) {
+    function($, _, AjaxHelpers, EditHelpers, TemplateHelpers, ViewHelpers, MoveXBlockModal, ContainerPage, HtmlUtils,
+             StringUtils, XBlockInfo) {
         'use strict';
         describe('MoveXBlock', function() {
             var modal, showModal, renderViews, createXBlockInfo, createCourseOutline, courseOutlineOptions,
                 parentChildMap, categoryMap, createChildXBlockInfo, xblockAncestorInfo, courseOutline,
                 verifyBreadcrumbViewInfo, verifyListViewInfo, getDisplayedInfo, clickForwardButton,
                 clickBreadcrumbButton, verifyXBlockInfo, nextCategory, verifyMoveEnabled, getSentRequests,
-                verifyNotificationStatus, sendMoveXBlockRequest, moveXBlockWithSuccess,
-                verifyConfirmationFeedbackTitleHtml, verifyConfirmationFeedbackRedirectLinkHtml,
-                verifyUndoConfirmationFeedbackTitleHtml, verifyConfirmationFeedbackUndoMoveActionHtml,
+                verifyNotificationStatus, sendMoveXBlockRequest, moveXBlockWithSuccess, getMovedAlertNotification,
+                verifyConfirmationFeedbackTitleText, verifyConfirmationFeedbackRedirectLinkText,
+                verifyUndoConfirmationFeedbackTitleText, verifyConfirmationFeedbackUndoMoveActionText,
+                sourceParentXBlockInfo, mockContainerPage, createContainerPage, containerPage,
                 sourceDisplayName = 'component_display_name_0',
                 sourceLocator = 'component_ID_0',
                 sourceParentLocator = 'unit_ID_0';
@@ -62,13 +64,31 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
                 ]
             };
 
+            sourceParentXBlockInfo = new XBlockInfo({
+                id: sourceParentLocator,
+                display_name: 'unit_display_name_0',
+                category: 'vertical'
+            });
+
+            createContainerPage = function() {
+                containerPage = new ContainerPage({
+                    model: sourceParentXBlockInfo,
+                    templates: EditHelpers.mockComponentTemplates,
+                    el: $('#content'),
+                    isUnitPage: true
+                });
+            };
+
             beforeEach(function() {
                 setFixtures("<div id='page-alert'></div>");
+                mockContainerPage = readFixtures('mock/mock-container-page.underscore');
                 TemplateHelpers.installTemplates([
                     'basic-modal',
                     'modal-button',
                     'move-xblock-modal'
                 ]);
+                appendSetFixtures(mockContainerPage);
+                createContainerPage();
                 courseOutline = createCourseOutline(courseOutlineOptions);
                 showModal();
             });
@@ -76,6 +96,7 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
             afterEach(function() {
                 modal.hide();
                 courseOutline = null;
+                containerPage.remove();
             });
 
             showModal = function() {
@@ -85,11 +106,7 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
                         display_name: sourceDisplayName,
                         category: 'component'
                     }),
-                    sourceParentXBlockInfo: new XBlockInfo({
-                        id: sourceParentLocator,
-                        display_name: 'unit_display_name_0',
-                        category: 'vertical'
-                    }),
+                    sourceParentXBlockInfo: sourceParentXBlockInfo,
                     XBlockUrlRoot: '/xblock'
                 });
                 modal.show();
@@ -339,6 +356,13 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
             };
 
             /**
+             * Get move alert confirmation message HTML
+             */
+            getMovedAlertNotification = function() {
+                return $('#page-alert');
+            };
+
+            /**
              * Send move xblock request.
              *
              * @param {Object} requests             requests object
@@ -384,33 +408,36 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
                 });
                 modal.$el.find('.modal-actions .action-move').click();
                 sendMoveXBlockRequest(requests, sourceLocator);
-                expect(modal.movedAlertView).toBeDefined();
-                verifyConfirmationFeedbackTitleHtml(sourceDisplayName);
-                verifyConfirmationFeedbackRedirectLinkHtml();
-                verifyConfirmationFeedbackUndoMoveActionHtml();
+                AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/' + sourceParentLocator);
+                AjaxHelpers.respondWithJson(requests, sourceParentXBlockInfo);
+                expect(getMovedAlertNotification().html().length).not.toEqual(0);
+                verifyConfirmationFeedbackTitleText(sourceDisplayName);
+                verifyConfirmationFeedbackRedirectLinkText();
+                verifyConfirmationFeedbackUndoMoveActionText();
             };
 
             /**
-             * Verify success banner message html has correct title html.
+             * Verify success banner message html has correct title text.
              *
              * @param {String} displayName             XBlock display name
              */
-            verifyConfirmationFeedbackTitleHtml = function(displayName) {
-                expect(modal.movedAlertView.$el.find('.title').html().trim())
-                .toEqual(StringUtils.interpolate('Success! "{displayName}" has been moved.',
-                    {
-                        displayName: displayName
-                    })
-                );
+            verifyConfirmationFeedbackTitleText = function(displayName) {
+                expect(getMovedAlertNotification().find('.title').html()
+                    .trim())
+                    .toEqual(StringUtils.interpolate('Success! "{displayName}" has been moved.',
+                        {
+                            displayName: displayName
+                        })
+                    );
             };
 
             /**
-             * Verify undo success banner message html has correct title html.
+             * Verify undo success banner message html has correct title text.
              *
              * @param {String} displayName             XBlock display name
              */
-            verifyUndoConfirmationFeedbackTitleHtml = function(displayName) {
-                expect(modal.movedAlertView.$el.find('.title').html()).toEqual(
+            verifyUndoConfirmationFeedbackTitleText = function(displayName) {
+                expect(getMovedAlertNotification().find('.title').html()).toEqual(
                     StringUtils.interpolate(
                         'Move cancelled. "{sourceDisplayName}" has been moved back to its original location.',
                         {
@@ -421,25 +448,18 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
             };
 
             /**
-             * Verify success banner message html has correct redirect link html.
+             * Verify success banner message html has correct redirect link text.
              */
-            verifyConfirmationFeedbackRedirectLinkHtml = function() {
-                expect(modal.movedAlertView.$el.find('.copy').html().indexOf(
-                    HtmlUtils.HTML(
-                        '<button class="action-secondary action-cancel">Take me to the new location</button>'
-                    ) !== -1
-                )).toBeTruthy();
+            verifyConfirmationFeedbackRedirectLinkText = function() {
+                expect(getMovedAlertNotification().find('.nav-actions .action-secondary').html())
+                    .toEqual('Take me to the new location');
             };
 
             /**
-             * Verify success banner message html has correct undo move button html.
+             * Verify success banner message html has correct undo move text.
              */
-            verifyConfirmationFeedbackUndoMoveActionHtml = function() {
-                expect(modal.movedAlertView.$el.find('.copy').html().indexOf(
-                    HtmlUtils.HTML(
-                        '<button class="action-primary action-save">Undo Move</button>'
-                    ) !== -1
-                )).toBeTruthy();
+            verifyConfirmationFeedbackUndoMoveActionText = function() {
+                expect(getMovedAlertNotification().find('.nav-actions .action-primary').html()).toEqual('Undo move');
             };
 
             /**
@@ -633,6 +653,24 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
                     expect(modal.$el.find('.modal-actions .action-move').hasClass('is-disabled')).toBeFalsy();
                 });
 
+                it('is enabled when moving a component inside a parentable component', function() {
+                    // create a source parent with has_childern set true
+                    modal.sourceParentXBlockInfo = new XBlockInfo({
+                        category: 'conditional',
+                        display_name: 'Parentable Component',
+                        has_children: true,
+                        id: 'PARENTABLE_ID'
+                    });
+                    // navigate and verify move button is enabled
+                    renderViews(courseOutline);
+                    _.each(_.range(3), function() {
+                        clickForwardButton(0);
+                    });
+
+                    // move is enabled when moving a component.
+                    expect(modal.$el.find('.modal-actions .action-move').hasClass('is-disabled')).toBeFalsy();
+                });
+
                 it('is disabled when navigating to any non-parentable component', function() {
                     var nonParentableXBlockInfo = {
                         category: 'html',
@@ -651,7 +689,7 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
                 it('can not move in a disabled state', function() {
                     verifyMoveEnabled(false);
                     modal.$el.find('.modal-actions .action-move').click();
-                    expect(modal.movedAlertView).toBeNull();
+                    expect(getMovedAlertNotification().html().length).toEqual(0);
                     expect(getSentRequests().length).toEqual(0);
                 });
 
@@ -662,7 +700,7 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
 
                 it('do not move an xblock when cancel button is clicked', function() {
                     modal.$el.find('.modal-actions .action-cancel').click();
-                    expect(modal.movedAlertView).toBeNull();
+                    expect(getMovedAlertNotification().html().length).toEqual(0);
                     expect(getSentRequests().length).toEqual(0);
                 });
 
@@ -670,13 +708,13 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
                     var sourceIndex = 0,
                         requests = AjaxHelpers.requests(this);
                     moveXBlockWithSuccess(requests);
-                    modal.movedAlertView.$el.find('.action-save').click();
+                    getMovedAlertNotification().find('.action-save').click();
                     AjaxHelpers.respondWithJson(requests, {
                         move_source_locator: sourceLocator,
                         parent_locator: sourceParentLocator,
                         target_index: sourceIndex
                     });
-                    verifyUndoConfirmationFeedbackTitleHtml(sourceDisplayName);
+                    verifyUndoConfirmationFeedbackTitleText(sourceDisplayName);
                 });
             });
 
@@ -698,7 +736,7 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
                         requests = AjaxHelpers.requests(this);
                     moveXBlockWithSuccess(requests);
                     notificationSpy = ViewHelpers.createNotificationSpy();
-                    modal.movedAlertView.$el.find('.action-save').click();
+                    getMovedAlertNotification().find('.action-save').click();
                     verifyNotificationStatus(requests, notificationSpy, 'Undo moving');
                 });
 
@@ -719,7 +757,7 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
                     var requests = AjaxHelpers.requests(this),
                         notificationSpy = ViewHelpers.createNotificationSpy('Error');
                     moveXBlockWithSuccess(requests);
-                    modal.movedAlertView.$el.find('.action-save').click();
+                    getMovedAlertNotification().find('.action-save').click();
                     AjaxHelpers.respondWithError(requests);
                     ViewHelpers.verifyNotificationShowing(notificationSpy, "Studio's having trouble saving your work");
                 });
