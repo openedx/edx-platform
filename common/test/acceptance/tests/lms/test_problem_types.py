@@ -278,7 +278,7 @@ class ProblemTypeTestMixin(ProblemTypeA11yTestMixin):
         And I should see the problem title is focused
         """
         self.problem_page.click_show()
-        self.problem_page.wait_for_focus_on_problem_meta()
+        self.problem_page.wait_for_show_answer_notification()
 
     @attr(shard=7)
     def test_save_reaction(self):
@@ -495,7 +495,7 @@ class CheckboxProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         self.problem_page.click_show()
         self.assertTrue(self.problem_page.is_solution_tag_present())
         self.assertTrue(self.problem_page.is_correct_choice_highlighted(correct_choices=[1, 3]))
-        self.problem_page.wait_for_focus_on_problem_meta()
+        self.problem_page.wait_for_show_answer_notification()
 
 
 class MultipleChoiceProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
@@ -562,7 +562,7 @@ class MultipleChoiceProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         self.assertTrue(self.problem_page.is_correct_choice_highlighted(correct_choices=[3]))
 
         # Finally, make sure that clicking Show Answer moved focus to the correct place.
-        self.problem_page.wait_for_focus_on_problem_meta()
+        self.problem_page.wait_for_show_answer_notification()
 
 
 class RadioProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
