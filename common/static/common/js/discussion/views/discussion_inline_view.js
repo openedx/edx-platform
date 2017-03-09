@@ -24,13 +24,18 @@
 
         initialize: function(options) {
             var match;
-
             this.$el = options.el;
             this.readOnly = options.readOnly;
             this.showByDefault = options.showByDefault || false;
             this.toggleDiscussionBtn = this.$('.discussion-show');
             this.listenTo(this.model, 'change', this.render);
             this.escKey = 27;
+
+            if (options.startHeader !== undefined) {
+                this.startHeader = options.startHeader;
+            } else {
+                this.startHeader = 4; // Start the header levels at H<startHeader>
+            }
 
             match = this.page_re.exec(window.location.href);
             if (match) {
@@ -73,7 +78,6 @@
             var discussionHtml,
                 user = new DiscussionUser(response.user_info),
                 self = this;
-
             $elem.focus();
 
             window.user = user;
@@ -120,6 +124,7 @@
                 collection: this.discussion,
                 course_settings: this.courseSettings,
                 topicId: discussionId,
+                startHeader: this.startHeader,
                 is_commentable_cohorted: response.is_commentable_cohorted
             });
 
@@ -146,6 +151,7 @@
                 el: this.$('.forum-content'),
                 model: thread,
                 mode: 'inline',
+                startHeader: this.startHeader,
                 courseSettings: this.courseSettings
             });
             this.threadView.render();
