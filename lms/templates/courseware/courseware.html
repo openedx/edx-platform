@@ -3,6 +3,8 @@
 <%namespace name='static' file='/static_content.html'/>
 <%def name="online_help_token()"><% return "courseware" %></%def>
 <%!
+import waffle
+
 from django.utils.translation import ugettext as _
 from django.conf import settings
 
@@ -152,7 +154,10 @@ ${HTML(fragment.foot_html())}
 % endif
     <section class="course-content" id="course-content">
         <main id="main" tabindex="-1" aria-label="Content">
-            <div class="path"></div>
+            <div
+              class="path"
+              data-unified-course-view="${'true' if waffle.flag_is_active(request, 'unified_course_view') else 'false'}"
+            ></div>
             % if getattr(course, 'entrance_exam_enabled') and \
                getattr(course, 'entrance_exam_minimum_score_pct') and \
                entrance_exam_current_score is not UNDEFINED:
