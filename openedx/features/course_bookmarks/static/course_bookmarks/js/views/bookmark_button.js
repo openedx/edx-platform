@@ -1,4 +1,4 @@
-(function(define, undefined) {
+(function(define) {
     'use strict';
     define(['gettext', 'jquery', 'underscore', 'backbone', 'js/views/message_banner'],
         function(gettext, $, _, Backbone, MessageBannerView) {
@@ -9,7 +9,7 @@
                 bookmarkedText: gettext('Bookmarked'),
 
                 events: {
-                    'click': 'toggleBookmark'
+                    click: 'toggleBookmark'
                 },
 
                 showBannerInterval: 5000,   // time in ms
@@ -46,14 +46,14 @@
                             view.setBookmarkState(true);
                         },
                         error: function(jqXHR) {
+                            var response, userMessage;
                             try {
-                                var response = jqXHR.responseText ? JSON.parse(jqXHR.responseText) : '';
-                                var userMessage = response ? response.user_message : '';
+                                response = jqXHR.responseText ? JSON.parse(jqXHR.responseText) : '';
+                                userMessage = response ? response.user_message : '';
                                 view.showError(userMessage);
+                            } catch (err) {
+                                view.showError();
                             }
-                        catch (err) {
-                            view.showError();
-                        }
                         },
                         complete: function() {
                             view.$el.prop('disabled', false);
