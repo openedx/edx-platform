@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-03-02 19:09+0000\n"
-"PO-Revision-Date: 2017-03-02 19:09:10.453552\n"
+"POT-Creation-Date: 2017-03-09 11:59+0000\n"
+"PO-Revision-Date: 2017-03-09 11:59:07.633676\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -920,6 +920,13 @@ msgid "An account with the Email '{email}' already exists."
 msgstr ""
 "Àn äççöünt wïth thé Émäïl '{email}' älréädý éxïsts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α#"
+
+#: common/djangoapps/student/views.py
+#, python-brace-format
+msgid "Registration using {provider} has timed out."
+msgstr ""
+"Régïsträtïön üsïng {provider} häs tïméd öüt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυ#"
 
 #: common/djangoapps/student/views.py
 msgid "An access_token is required when passing value ({}) for provider."
@@ -6288,14 +6295,12 @@ msgstr ""
 #: lms/djangoapps/commerce/models.py openedx/core/djangoapps/catalog/models.py
 #: openedx/core/djangoapps/credentials/models.py
 #: openedx/core/djangoapps/credit/models.py
-#: openedx/core/djangoapps/programs/models.py
 msgid "Cache Time To Live"
 msgstr "Çäçhé Tïmé Tö Lïvé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: lms/djangoapps/commerce/models.py
 #: openedx/core/djangoapps/credentials/models.py
 #: openedx/core/djangoapps/credit/models.py
-#: openedx/core/djangoapps/programs/models.py
 msgid ""
 "Specified in seconds. Enable caching by setting this to a value greater than"
 " 0."
@@ -11220,6 +11225,18 @@ msgstr ""
 "Ûsérnämé çréätéd för Çöürsé Çätälög Ìntégrätïön, é.g. "
 "lms_çätälög_sérvïçé_üsér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
+#: openedx/core/djangoapps/catalog/models.py
+msgid "Page Size"
+msgstr "Pägé Sïzé Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: openedx/core/djangoapps/catalog/models.py
+msgid ""
+"Maximum number of records in paginated response of a single request to "
+"catalog service."
+msgstr ""
+"Mäxïmüm nümßér öf réçörds ïn pägïnätéd réspönsé öf ä sïnglé réqüést tö "
+"çätälög sérvïçé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+
 #: openedx/core/djangoapps/cors_csrf/models.py
 msgid ""
 "List of domains that are allowed to make cross-domain requests to this site."
@@ -11267,12 +11284,10 @@ msgstr ""
 "ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт#"
 
 #: openedx/core/djangoapps/credentials/models.py
-#: openedx/core/djangoapps/programs/models.py
 msgid "Internal Service URL"
 msgstr "Ìntérnäl Sérvïçé ÛRL Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: openedx/core/djangoapps/credentials/models.py
-#: openedx/core/djangoapps/programs/models.py
 msgid "Public Service URL"
 msgstr "Püßlïç Sérvïçé ÛRL Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
@@ -11649,75 +11664,10 @@ msgstr ""
 "Nö fïlé prövïdéd för pröfïlé ïmägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: openedx/core/djangoapps/programs/models.py
-msgid "API Version"
-msgstr "ÀPÌ Vérsïön Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: openedx/core/djangoapps/programs/models.py
 msgid "Path used to construct URLs to programs marketing pages (e.g., \"/foo\")."
 msgstr ""
 "Päth üséd tö çönstrüçt ÛRLs tö prögräms märkétïng pägés (é.g., \"/föö\"). "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
-
-#: openedx/core/djangoapps/programs/models.py
-msgid "Path to authoring app's JS"
-msgstr "Päth tö äüthörïng äpp's JS Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: openedx/core/djangoapps/programs/models.py
-msgid ""
-"This value is required in order to enable the Studio authoring interface."
-msgstr ""
-"Thïs välüé ïs réqüïréd ïn ördér tö énäßlé thé Stüdïö äüthörïng ïntérfäçé. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
-
-#: openedx/core/djangoapps/programs/models.py
-msgid "Path to authoring app's CSS"
-msgstr "Päth tö äüthörïng äpp's ÇSS Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
-
-#: openedx/core/djangoapps/programs/models.py
-msgid "Enable Student Dashboard Displays"
-msgstr ""
-"Énäßlé Stüdént Däshßöärd Dïspläýs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
-
-#: openedx/core/djangoapps/programs/models.py
-msgid "Enable Studio Authoring Interface"
-msgstr ""
-"Énäßlé Stüdïö Àüthörïng Ìntérfäçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
-
-#: openedx/core/djangoapps/programs/models.py
-msgid "Enable Program Certificate Generation"
-msgstr ""
-"Énäßlé Prögräm Çértïfïçäté Générätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυ#"
-
-#: openedx/core/djangoapps/programs/models.py
-msgid "Maximum Certification Retries"
-msgstr "Mäxïmüm Çértïfïçätïön Rétrïés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
-
-#: openedx/core/djangoapps/programs/models.py
-msgid ""
-"When making requests to award certificates, make at most this many attempts "
-"to retry a failing request."
-msgstr ""
-"Whén mäkïng réqüésts tö äwärd çértïfïçätés, mäké ät möst thïs mäný ättémpts "
-"tö rétrý ä fäïlïng réqüést. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#: openedx/core/djangoapps/programs/models.py
-msgid "Do we want to show xseries program advertising"
-msgstr ""
-"Dö wé wänt tö shöw xsérïés prögräm ädvértïsïng Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя α#"
-
-#: openedx/core/djangoapps/programs/models.py
-msgid "Do we want to show program listing page"
-msgstr ""
-"Dö wé wänt tö shöw prögräm lïstïng pägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
-
-#: openedx/core/djangoapps/programs/models.py
-msgid "Do we want to show program details pages"
-msgstr ""
-"Dö wé wänt tö shöw prögräm détäïls pägés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
 
 #: openedx/core/djangoapps/self_paced/models.py
 msgid "Enable course home page improvements."
@@ -14641,9 +14591,9 @@ msgstr "Däshßöärd för: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 msgid "Profile"
 msgstr "Pröfïlé Ⱡ'σяєм ιρѕυм #"
 
-#: lms/templates/user_dropdown.html themes/red-theme/lms/templates/header.html
-msgid "More options dropdown"
-msgstr "Möré öptïöns dröpdöwn Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+#: lms/templates/user_dropdown.html
+msgid "More options"
+msgstr "Möré öptïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/templates/using.html
 msgid "Using the system"
@@ -21872,6 +21822,22 @@ msgstr ""
 msgid "Return to Your Dashboard"
 msgstr "Rétürn tö Ýöür Däshßöärd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
+#: lms/templates/widgets/cookie-consent.html
+msgid ""
+"This website uses cookies to ensure you get the best experience on our "
+"website."
+msgstr ""
+"Thïs wéßsïté üsés çöökïés tö énsüré ýöü gét thé ßést éxpérïénçé ön öür "
+"wéßsïté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: lms/templates/widgets/cookie-consent.html
+msgid "Got it!"
+msgstr "Göt ït! Ⱡ'σяєм ιρѕυм #"
+
+#: lms/templates/widgets/cookie-consent.html
+msgid "Learn more"
+msgstr "Léärn möré Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
 #: lms/templates/wiki/includes/article_menu.html
 msgid "{span_start}(active){span_end}"
 msgstr "{span_start}(äçtïvé){span_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
@@ -21973,6 +21939,10 @@ msgid ""
 msgstr ""
 "{tos_link_start}Térms öf Sérvïçé{tos_link_end} änd {honor_link_start}Hönör "
 "Çödé{honor_link_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#: themes/red-theme/lms/templates/header.html
+msgid "More options dropdown"
+msgstr "Möré öptïöns dröpdöwn Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: themes/red-theme/lms/templates/header.html
 msgid "My Profile"
@@ -26136,6 +26106,29 @@ msgid "Your course creator status for {studio_name}"
 msgstr ""
 "Ýöür çöürsé çréätör stätüs för {studio_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєт#"
+
+#: cms/templates/emails/user_task_complete_email.txt
+msgid ""
+"Your {task_name} task has completed with the status '{task_status}'. Use "
+"this URL to view task details or download any files created: {detail_url}"
+msgstr ""
+"Ýöür {task_name} täsk häs çömplétéd wïth thé stätüs '{task_status}'. Ûsé "
+"thïs ÛRL tö vïéw täsk détäïls ör döwnlöäd äný fïlés çréätéd: {detail_url} "
+"Ⱡ'σяєм ιρѕυм#"
+
+#: cms/templates/emails/user_task_complete_email.txt
+msgid ""
+"Your {task_name} task has completed with the status '{task_status}'. Sign in"
+" to view the details of your task or download any files created."
+msgstr ""
+"Ýöür {task_name} täsk häs çömplétéd wïth thé stätüs '{task_status}'. Sïgn ïn"
+" tö vïéw thé détäïls öf ýöür täsk ör döwnlöäd äný fïlés çréätéd. Ⱡ'σяєм ιρѕ#"
+
+#: cms/templates/emails/user_task_complete_email_subject.txt
+msgid "{platform_name} {studio_name}: Task Status Update"
+msgstr ""
+"{platform_name} {studio_name}: Täsk Stätüs Ûpdäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє#"
 
 #: cms/templates/maintenance/_force_publish_course.html
 msgid "Required data to force publish course."
