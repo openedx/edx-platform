@@ -8,8 +8,8 @@ general:
     - "test_root/log"
 
 dependencies:
-  #pre:
-  #  - bash ./scripts/install-system-req.sh
+  pre:
+    - bash ./scripts/install-system-req.sh
   override:
     - npm install
 
