@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-03-02 19:09+0000\n"
-"PO-Revision-Date: 2017-03-02 19:09:10.453552\n"
+"POT-Creation-Date: 2017-03-09 15:34+0000\n"
+"PO-Revision-Date: 2017-03-09 15:34:13.475003\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -801,6 +801,11 @@ msgstr "شر شذذخعرف صهفا فاث حعزمهذ عسثقرشوث '{user
 #, python-brace-format
 msgid "An account with the Email '{email}' already exists."
 msgstr "شر شذذخعرف صهفا فاث ثوشهم '{email}' شمقثشيغ ثطهسفس."
+
+#: common/djangoapps/student/views.py
+#, python-brace-format
+msgid "Registration using {provider} has timed out."
+msgstr "قثلهسفقشفهخر عسهرل {provider} اشس فهوثي خعف."
 
 #: common/djangoapps/student/views.py
 msgid "An access_token is required when passing value ({}) for provider."
@@ -5388,14 +5393,12 @@ msgstr "حشفا فخ سهرلمث ذخعقسث ذاثذنخعف حشلث اخس
 #: lms/djangoapps/commerce/models.py openedx/core/djangoapps/catalog/models.py
 #: openedx/core/djangoapps/credentials/models.py
 #: openedx/core/djangoapps/credit/models.py
-#: openedx/core/djangoapps/programs/models.py
 msgid "Cache Time To Live"
 msgstr "ذشذاث فهوث فخ مهدث"
 
 #: lms/djangoapps/commerce/models.py
 #: openedx/core/djangoapps/credentials/models.py
 #: openedx/core/djangoapps/credit/models.py
-#: openedx/core/djangoapps/programs/models.py
 msgid ""
 "Specified in seconds. Enable caching by setting this to a value greater than"
 " 0."
@@ -9728,6 +9731,18 @@ msgstr ""
 "عسثقرشوث ذقثشفثي بخق ذخعقسث ذشفشمخل هرفثلقشفهخر, ث.ل. "
 "موس_ذشفشمخل_سثقدهذث_عسثق."
 
+#: openedx/core/djangoapps/catalog/models.py
+msgid "Page Size"
+msgstr "حشلث سهظث"
+
+#: openedx/core/djangoapps/catalog/models.py
+msgid ""
+"Maximum number of records in paginated response of a single request to "
+"catalog service."
+msgstr ""
+"وشطهوعو رعوزثق خب قثذخقيس هر حشلهرشفثي قثسحخرسث خب ش سهرلمث قثضعثسف فخ "
+"ذشفشمخل سثقدهذث."
+
 #: openedx/core/djangoapps/cors_csrf/models.py
 msgid ""
 "List of domains that are allowed to make cross-domain requests to this site."
@@ -9765,12 +9780,10 @@ msgstr ""
 "حمشفبخقو هس اففح://ثيط.خقل, فاث حمشفبخقو نثغ هس \"ثيط\"."
 
 #: openedx/core/djangoapps/credentials/models.py
-#: openedx/core/djangoapps/programs/models.py
 msgid "Internal Service URL"
 msgstr "هرفثقرشم سثقدهذث عقم"
 
 #: openedx/core/djangoapps/credentials/models.py
-#: openedx/core/djangoapps/programs/models.py
 msgid "Public Service URL"
 msgstr "حعزمهذ سثقدهذث عقم"
 
@@ -10062,62 +10075,8 @@ msgid "No file provided for profile image"
 msgstr "رخ بهمث حقخدهيثي بخق حقخبهمث هوشلث"
 
 #: openedx/core/djangoapps/programs/models.py
-msgid "API Version"
-msgstr "شحه دثقسهخر"
-
-#: openedx/core/djangoapps/programs/models.py
 msgid "Path used to construct URLs to programs marketing pages (e.g., \"/foo\")."
 msgstr "حشفا عسثي فخ ذخرسفقعذف عقمس فخ حقخلقشوس وشقنثفهرل حشلثس (ث.ل., \"/بخخ\")."
-
-#: openedx/core/djangoapps/programs/models.py
-msgid "Path to authoring app's JS"
-msgstr "حشفا فخ شعفاخقهرل شحح'س تس"
-
-#: openedx/core/djangoapps/programs/models.py
-msgid ""
-"This value is required in order to enable the Studio authoring interface."
-msgstr ""
-"فاهس دشمعث هس قثضعهقثي هر خقيثق فخ ثرشزمث فاث سفعيهخ شعفاخقهرل هرفثقبشذث."
-
-#: openedx/core/djangoapps/programs/models.py
-msgid "Path to authoring app's CSS"
-msgstr "حشفا فخ شعفاخقهرل شحح'س ذسس"
-
-#: openedx/core/djangoapps/programs/models.py
-msgid "Enable Student Dashboard Displays"
-msgstr "ثرشزمث سفعيثرف يشسازخشقي يهسحمشغس"
-
-#: openedx/core/djangoapps/programs/models.py
-msgid "Enable Studio Authoring Interface"
-msgstr "ثرشزمث سفعيهخ شعفاخقهرل هرفثقبشذث"
-
-#: openedx/core/djangoapps/programs/models.py
-msgid "Enable Program Certificate Generation"
-msgstr "ثرشزمث حقخلقشو ذثقفهبهذشفث لثرثقشفهخر"
-
-#: openedx/core/djangoapps/programs/models.py
-msgid "Maximum Certification Retries"
-msgstr "وشطهوعو ذثقفهبهذشفهخر قثفقهثس"
-
-#: openedx/core/djangoapps/programs/models.py
-msgid ""
-"When making requests to award certificates, make at most this many attempts "
-"to retry a failing request."
-msgstr ""
-"صاثر وشنهرل قثضعثسفس فخ شصشقي ذثقفهبهذشفثس, وشنث شف وخسف فاهس وشرغ شففثوحفس "
-"فخ قثفقغ ش بشهمهرل قثضعثسف."
-
-#: openedx/core/djangoapps/programs/models.py
-msgid "Do we want to show xseries program advertising"
-msgstr "يخ صث صشرف فخ ساخص طسثقهثس حقخلقشو شيدثقفهسهرل"
-
-#: openedx/core/djangoapps/programs/models.py
-msgid "Do we want to show program listing page"
-msgstr "يخ صث صشرف فخ ساخص حقخلقشو مهسفهرل حشلث"
-
-#: openedx/core/djangoapps/programs/models.py
-msgid "Do we want to show program details pages"
-msgstr "يخ صث صشرف فخ ساخص حقخلقشو يثفشهمس حشلثس"
 
 #: openedx/core/djangoapps/self_paced/models.py
 msgid "Enable course home page improvements."
@@ -12730,9 +12689,9 @@ msgstr "يشسازخشقي بخق:"
 msgid "Profile"
 msgstr "حقخبهمث"
 
-#: lms/templates/user_dropdown.html themes/red-theme/lms/templates/header.html
-msgid "More options dropdown"
-msgstr "وخقث خحفهخرس يقخحيخصر"
+#: lms/templates/user_dropdown.html
+msgid "More options"
+msgstr "وخقث خحفهخرس"
 
 #: lms/templates/using.html
 msgid "Using the system"
@@ -19048,6 +19007,22 @@ msgstr "غخع ذشررخف دثقهبغ غخعق هيثرفهفغ شف فاهس
 msgid "Return to Your Dashboard"
 msgstr "قثفعقر فخ غخعق يشسازخشقي"
 
+#: lms/templates/widgets/cookie-consent.html
+msgid ""
+"This website uses cookies to ensure you get the best experience on our "
+"website."
+msgstr ""
+"فاهس صثزسهفث عسثس ذخخنهثس فخ ثرسعقث غخع لثف فاث زثسف ثطحثقهثرذث خر خعق "
+"صثزسهفث."
+
+#: lms/templates/widgets/cookie-consent.html
+msgid "Got it!"
+msgstr "لخف هف!"
+
+#: lms/templates/widgets/cookie-consent.html
+msgid "Learn more"
+msgstr "مثشقر وخقث"
+
 #: lms/templates/wiki/includes/article_menu.html
 msgid "{span_start}(active){span_end}"
 msgstr "{span_start}(شذفهدث){span_end}"
@@ -19144,6 +19119,10 @@ msgid ""
 msgstr ""
 "{tos_link_start}فثقوس خب سثقدهذث{tos_link_end} شري {honor_link_start}اخرخق "
 "ذخيث{honor_link_end}"
+
+#: themes/red-theme/lms/templates/header.html
+msgid "More options dropdown"
+msgstr "وخقث خحفهخرس يقخحيخصر"
 
 #: themes/red-theme/lms/templates/header.html
 msgid "My Profile"
@@ -22647,6 +22626,26 @@ msgstr ""
 #: cms/templates/emails/course_creator_subject.txt
 msgid "Your course creator status for {studio_name}"
 msgstr "غخعق ذخعقسث ذقثشفخق سفشفعس بخق {studio_name}"
+
+#: cms/templates/emails/user_task_complete_email.txt
+msgid ""
+"Your {task_name} task has completed with the status '{task_status}'. Use "
+"this URL to view task details or download any files created: {detail_url}"
+msgstr ""
+"غخعق {task_name} فشسن اشس ذخوحمثفثي صهفا فاث سفشفعس '{task_status}'. عسث "
+"فاهس عقم فخ دهثص فشسن يثفشهمس خق يخصرمخشي شرغ بهمثس ذقثشفثي: {detail_url}"
+
+#: cms/templates/emails/user_task_complete_email.txt
+msgid ""
+"Your {task_name} task has completed with the status '{task_status}'. Sign in"
+" to view the details of your task or download any files created."
+msgstr ""
+"غخعق {task_name} فشسن اشس ذخوحمثفثي صهفا فاث سفشفعس '{task_status}'. سهلر هر"
+" فخ دهثص فاث يثفشهمس خب غخعق فشسن خق يخصرمخشي شرغ بهمثس ذقثشفثي."
+
+#: cms/templates/emails/user_task_complete_email_subject.txt
+msgid "{platform_name} {studio_name}: Task Status Update"
+msgstr "{platform_name} {studio_name}: فشسن سفشفعس عحيشفث"
 
 #: cms/templates/maintenance/_force_publish_course.html
 msgid "Required data to force publish course."
