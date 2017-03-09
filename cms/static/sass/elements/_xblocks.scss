@@ -424,6 +424,7 @@
     .xblock-render {
       margin: ($baseline/2);
       padding: ($baseline/2);
+      overflow: hidden;
     }
 
     // STATE: container/component with children - abbreviated preview
