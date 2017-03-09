@@ -30,6 +30,7 @@
 # Mecabotware <mecabotware.ideas@gmail.com>, 2015
 # Natalia, 2013
 # Natalia, 2013-2014,2016
+# Ned Batchelder <ned@edx.org>, 2017
 # Ned Weitzman <nweitzman@edx.org>, 2017
 # Nuri Plans Toral <nplans@gmail.com>, 2015
 # Cristian Salamea <ovnicraft@gmail.com>, 2013
@@ -3943,7 +3944,7 @@ msgid ""
 "Error getting student progress url for '<%- student_id %>'. Make sure that "
 "the student identifier is spelled correctly."
 msgstr ""
-"Error al obtener la url de progreso del estudiante '<%= student_id %>'. "
+"Error al obtener la url de progreso del estudiante '<%- student_id %>'. "
 "Asegúrese de que el identificador del estudiante esté escrito correctamente."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
@@ -3955,8 +3956,8 @@ msgid ""
 "Success! Problem attempts reset for problem '<%- problem_id %>' and student "
 "'<%- student_id %>'."
 msgstr ""
-"Se han reiniciado exitósamente los envíos para el problema '<%= problem_id "
-"%>' y el estudiante '<%= student_id %>'."
+"Se han reiniciado exitósamente los envíos para el problema '<%- problem_id "
+"%>' y el estudiante '<%- student_id %>'."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -3981,8 +3982,8 @@ msgid ""
 " %>'. Make sure that the problem and student identifiers are complete and "
 "correct."
 msgstr ""
-"Error al borrar el estado del estudiante '<%= student_id %>' para el "
-"problema '<%= problem_id %>'.  Verifique que el problema y el estudiante "
+"Error al borrar el estado del estudiante '<%- student_id %>' para el "
+"problema '<%- problem_id %>'.  Verifique que el problema y el estudiante "
 "estén identificados correctamente."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
@@ -3995,8 +3996,8 @@ msgid ""
 "student_id %>'. Make sure that the problem and student identifiers are "
 "complete and correct."
 msgstr ""
-"Error al obtener el historial de tareas para el problema '<%= problem_id %>'"
-" y el estudiante '<%= student_id %>'.  Verifique que el problema y el "
+"Error al obtener el historial de tareas para el problema '<%- problem_id %>'"
+" y el estudiante '<%- student_id %>'.  Verifique que el problema y el "
 "estudiante estén identificados correctamente."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
@@ -4059,7 +4060,7 @@ msgstr ""
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Reset attempts for all students on problem '<%- problem_id %>'?"
 msgstr ""
-"¿Reiniciar los envíos para todos los estudiantes en el problema '<%= "
+"¿Reiniciar los envíos para todos los estudiantes en el problema '<%- "
 "problem_id %>'?"
 
 #: lms/static/js/instructor_dashboard/student_admin.js
@@ -4068,7 +4069,7 @@ msgid ""
 " Click the 'Show Task Status' button to see the status of the task."
 msgstr ""
 "Se ha programado la tarea de reinicio de los envíos para todos los "
-"estudiantes en el problema '<%= problem_id %>'. Haga clic en el botón de "
+"estudiantes en el problema '<%- problem_id %>'. Haga clic en el botón de "
 "'Mostrar estado de tareas' para ver el estado de dicha tarea."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
@@ -4078,7 +4079,7 @@ msgid ""
 "correct."
 msgstr ""
 "Error en el proceso de reinicio de envíos para todos los estudiantes para el"
-" problema '<%= problem_id %>'.  Verifique que el problema esté identificado "
+" problema '<%- problem_id %>'.  Verifique que el problema esté identificado "
 "correctamente."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
@@ -4092,8 +4093,8 @@ msgid ""
 "'<%- student_id %>'. Click the 'Show Task Status' button to see the status "
 "of the task."
 msgstr ""
-"Inició el proceso de re puntuación del problema '<%= problem_id %>' para el "
-"estudiante '<%= student_id %>'.  Haga clic en el botón de 'Mostrar estado de"
+"Inició el proceso de re puntuación del problema '<%- problem_id %>' para el "
+"estudiante '<%- student_id %>'.  Haga clic en el botón de 'Mostrar estado de"
 " tareas' para ver el estado de dicha tarea."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
@@ -4102,8 +4103,8 @@ msgid ""
 "'<%- student_id %>'. Make sure that the the problem and student identifiers "
 "are complete and correct."
 msgstr ""
-"Error al iniciar el proceso de re puntuación del problema '<%= problem_id "
-"%>' para el estudiante '<%= student_id %>'.  Verifique que el problema y el "
+"Error al iniciar el proceso de re puntuación del problema '<%- problem_id "
+"%>' para el estudiante '<%- student_id %>'.  Verifique que el problema y el "
 "estudiante estén identificados correctamente."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
@@ -4128,14 +4129,14 @@ msgstr ""
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Rescore problem '<%- problem_id %>' for all students?"
 msgstr ""
-"¿Re puntuar el problema '<%= problem_id %>' para todos los estudiantes?"
+"¿Re puntuar el problema '<%- problem_id %>' para todos los estudiantes?"
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
 "Successfully started task to rescore problem '<%- problem_id %>' for all "
 "students. Click the 'Show Task Status' button to see the status of the task."
 msgstr ""
-"Se programó la tarea para re puntuar el problema '<%= problem_id %>' para "
+"Se programó la tarea para re puntuar el problema '<%- problem_id %>' para "
 "todos los estudiantes.  Haga clic en el botón de 'Mostrar estado de tareas' "
 "para ver el estado de dicha tarea."
 
@@ -4144,7 +4145,7 @@ msgid ""
 "Error starting a task to rescore problem '<%- problem_id %>'. Make sure that"
 " the problem identifier is complete and correct."
 msgstr ""
-"Error al iniciar la tarea para re puntuar el problema '<%= problem_id %>'.  "
+"Error al iniciar la tarea para re puntuar el problema '<%- problem_id %>'.  "
 "Verifique que el problema esté identificado correctamente."
 
 #. Translators: a "Task" is a background process such as grading students or

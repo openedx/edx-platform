@@ -125,7 +125,7 @@
 # MarnyLopez, 2014
 # Natalia, 2013
 # Natalia, 2013-2014,2016
-# Ned Batchelder <ned@edx.org>, 2016
+# Ned Batchelder <ned@edx.org>, 2016-2017
 # Ned Weitzman <nweitzman@edx.org>, 2017
 # Nestor Alejandro Mendoza Espinoza <name1984@gmail.com>, 2015
 # Nicolas CS <nicolascs23@gmail.com>, 2016
@@ -15436,7 +15436,7 @@ msgstr "Iniciado - {date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Starts - {date}"
-msgstr "Inicia - {start_date}"
+msgstr "Inicia - {date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "View Archived Course"
