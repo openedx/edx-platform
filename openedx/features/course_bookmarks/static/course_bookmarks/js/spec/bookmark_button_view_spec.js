@@ -1,23 +1,23 @@
 define(['backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
-        'common/js/spec_helpers/template_helpers', 'js/bookmarks/views/bookmark_button'
+        'common/js/spec_helpers/template_helpers', 'course_bookmarks/js/views/bookmark_button'
        ],
     function(Backbone, $, _, AjaxHelpers, TemplateHelpers, BookmarkButtonView) {
         'use strict';
 
-        describe('bookmarks.button', function() {
-            var timerCallback;
+        describe('BookmarkButtonView', function() {
+            var createBookmarkButtonView, verifyBookmarkButtonState;
 
             var API_URL = 'bookmarks/api/v1/bookmarks/';
 
             beforeEach(function() {
-                loadFixtures('js/fixtures/bookmarks/bookmark_button.html');
+                loadFixtures('course_bookmarks/fixtures/bookmark_button.html');
                 TemplateHelpers.installTemplates(
                     [
                         'templates/fields/message_banner'
                     ]
                 );
 
-                timerCallback = jasmine.createSpy('timerCallback');
+                jasmine.createSpy('timerCallback');
                 jasmine.clock().install();
             });
 
@@ -25,7 +25,7 @@ define(['backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helper
                 jasmine.clock().uninstall();
             });
 
-            var createBookmarkButtonView = function(isBookmarked) {
+            createBookmarkButtonView = function(isBookmarked) {
                 return new BookmarkButtonView({
                     el: '.bookmark-button',
                     bookmarked: isBookmarked,
@@ -35,7 +35,7 @@ define(['backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helper
                 });
             };
 
-            var verifyBookmarkButtonState = function(view, bookmarked) {
+            verifyBookmarkButtonState = function(view, bookmarked) {
                 if (bookmarked) {
                     expect(view.$el).toHaveAttr('aria-pressed', 'true');
                     expect(view.$el).toHaveClass('bookmarked');
@@ -46,7 +46,7 @@ define(['backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helper
                 expect(view.$el.data('bookmarkId')).toBe('bilbo,usage_1');
             };
 
-            it('rendered correctly ', function() {
+            it('rendered correctly', function() {
                 var view = createBookmarkButtonView(false);
                 verifyBookmarkButtonState(view, false);
 
