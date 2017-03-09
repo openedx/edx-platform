@@ -19,7 +19,15 @@ from django.shortcuts import redirect
 from courseware.url_helpers import get_redirect_url_for_global_staff
 from edxmako.shortcuts import render_to_response, render_to_string
 import logging
-import newrelic.agent
+
+log = logging.getLogger("edx.courseware.views.index")
+
+try:
+    import newrelic.agent
+except ImportError:
+    newrelic = None  # pylint: disable=invalid-name
+    log.warning("Unable to load NewRelic agent module")
+
 import urllib
 
 from lang_pref import LANGUAGE_KEY
@@ -54,7 +62,6 @@ from ..module_render import toc_for_course, get_module_for_descriptor
 from .views import get_current_child, registered_for_course
 
 
-log = logging.getLogger("edx.courseware.views.index")
 TEMPLATE_IMPORTS = {'urllib': urllib}
 CONTENT_DEPTH = 2
 
@@ -175,6 +182,8 @@ class CoursewareIndex(View):
         """
         Initialize metrics for New Relic so we can slice data in New Relic Insights
         """
+        if not newrelic:
+            return
         newrelic.agent.add_custom_parameter('course_id', unicode(self.course_key))
         newrelic.agent.add_custom_parameter('org', unicode(self.course_key.org))
 

@@ -14,7 +14,13 @@ from django.contrib.auth.models import User
 from django.http import Http404, HttpResponseBadRequest
 from django.utils.translation import ugettext_noop
 from django.views.decorators.http import require_GET
-import newrelic.agent
+
+log = logging.getLogger("edx.discussions")
+try:
+    import newrelic.agent
+except ImportError:
+    newrelic = None  # pylint: disable=invalid-name
+    log.warning("Unable to load NewRelic module")
 
 from edxmako.shortcuts import render_to_response
 from courseware.courses import get_course_with_access
@@ -42,12 +48,14 @@ import lms.lib.comment_client as cc
 
 from opaque_keys.edx.keys import CourseKey
 
+from contextlib import contextmanager
+
 THREADS_PER_PAGE = 20
 INLINE_THREADS_PER_PAGE = 20
 PAGES_NEARBY_DELTA = 2
-log = logging.getLogger("edx.discussions")
 
 
+<<<<<<< HEAD:lms/djangoapps/django_comment_client/forum/views.py
 class DiscussionTab(EnrolledTab):
     """
     A tab for the cs_comments_service forums.
@@ -68,6 +76,22 @@ class DiscussionTab(EnrolledTab):
 
 
 @newrelic.agent.function_trace()
+=======
+@contextmanager
+def newrelic_function_trace(function_name):
+    """
+    A wrapper context manager newrelic.agent.FunctionTrace to no-op if the
+    newrelic package is not installed
+    """
+    if newrelic:
+        nr_transaction = newrelic.agent.current_transaction()
+        with newrelic.agent.FunctionTrace(nr_transaction, function_name):
+            yield
+    else:
+        yield
+
+
+>>>>>>> 7550cf6... Wrap all newrelic dependencies in a check to see if the module is loaded:lms/djangoapps/discussion/views.py
 def make_course_settings(course, user):
     """
     Generate a JSON-serializable model for course settings, which will be used to initialize a
@@ -85,8 +109,12 @@ def make_course_settings(course, user):
     return obj
 
 
+<<<<<<< HEAD:lms/djangoapps/django_comment_client/forum/views.py
 @newrelic.agent.function_trace()
 def get_threads(request, course, discussion_id=None, per_page=THREADS_PER_PAGE):
+=======
+def get_threads(request, course, user_info, discussion_id=None, per_page=THREADS_PER_PAGE):
+>>>>>>> 7550cf6... Wrap all newrelic dependencies in a check to see if the module is loaded:lms/djangoapps/discussion/views.py
     """
     This may raise an appropriate subclass of cc.utils.CommentClientError
     if something goes wrong, or ValueError if the group_id is invalid.
@@ -190,7 +218,6 @@ def inline_discussion(request, course_key, discussion_id):
     """
     Renders JSON for DiscussionModules
     """
-    nr_transaction = newrelic.agent.current_transaction()
 
     course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
     cc_user = cc.User.from_django_user(request.user)
@@ -201,12 +228,14 @@ def inline_discussion(request, course_key, discussion_id):
     except ValueError:
         return HttpResponseBadRequest("Invalid group_id")
 
-    with newrelic.agent.FunctionTrace(nr_transaction, "get_metadata_for_threads"):
+    with newrelic_function_trace("get_metadata_for_threads"):
         annotated_content_info = utils.get_metadata_for_threads(course_key, threads, request.user, user_info)
+
     is_staff = has_permission(request.user, 'openclose_thread', course.id)
     threads = [utils.prepare_content(thread, course_key, is_staff) for thread in threads]
-    with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
+    with newrelic_function_trace("add_courseware_context"):
         add_courseware_context(threads, course, request.user)
+
     return utils.JsonResponse({
         'is_commentable_cohorted': is_commentable_cohorted(course_key, discussion_id),
         'discussion_data': threads,
@@ -225,14 +254,13 @@ def forum_form_discussion(request, course_key):
     """
     Renders the main Discussion page, potentially filtered by a search query
     """
-    nr_transaction = newrelic.agent.current_transaction()
-
     course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
     course_settings = make_course_settings(course, request.user)
 
     user = cc.User.from_django_user(request.user)
     user_info = user.to_dict()
 
+<<<<<<< HEAD:lms/djangoapps/django_comment_client/forum/views.py
     try:
         unsafethreads, query_params = get_threads(request, course)   # This might process a search query
         is_staff = has_permission(request.user, 'openclose_thread', course.id)
@@ -245,6 +273,13 @@ def forum_form_discussion(request, course_key):
 
     with newrelic.agent.FunctionTrace(nr_transaction, "get_metadata_for_threads"):
         annotated_content_info = utils.get_metadata_for_threads(course_key, threads, request.user, user_info)
+=======
+        with newrelic_function_trace("get_metadata_for_threads"):
+            annotated_content_info = utils.get_metadata_for_threads(course_key, threads, request.user, user_info)
+
+        with newrelic_function_trace("add_courseware_context"):
+            add_courseware_context(threads, course, request.user)
+>>>>>>> 7550cf6... Wrap all newrelic dependencies in a check to see if the module is loaded:lms/djangoapps/discussion/views.py
 
     with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
         add_courseware_context(threads, course, request.user)
@@ -300,8 +335,6 @@ def single_thread(request, course_key, discussion_id, thread_id):
     """
     Renders a response to display a single discussion thread.
     """
-    nr_transaction = newrelic.agent.current_transaction()
-
     course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
     course_settings = make_course_settings(course, request.user)
     cc_user = cc.User.from_django_user(request.user)
@@ -334,9 +367,13 @@ def single_thread(request, course_key, discussion_id, thread_id):
         if getattr(thread, "group_id", None) is not None and user_group_id != thread.group_id:
             raise Http404
 
+<<<<<<< HEAD:lms/djangoapps/django_comment_client/forum/views.py
     is_staff = has_permission(request.user, 'openclose_thread', course.id)
     if request.is_ajax():
         with newrelic.agent.FunctionTrace(nr_transaction, "get_annotated_content_infos"):
+=======
+        with newrelic_function_trace("get_annotated_content_infos"):
+>>>>>>> 7550cf6... Wrap all newrelic dependencies in a check to see if the module is loaded:lms/djangoapps/discussion/views.py
             annotated_content_info = utils.get_annotated_content_infos(
                 course_key,
                 thread,
@@ -344,7 +381,7 @@ def single_thread(request, course_key, discussion_id, thread_id):
                 user_info=user_info
             )
         content = utils.prepare_content(thread.to_dict(), course_key, is_staff)
-        with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
+        with newrelic_function_trace("add_courseware_context"):
             add_courseware_context([content], course, request.user)
         return utils.JsonResponse({
             'content': content,
@@ -358,18 +395,127 @@ def single_thread(request, course_key, discussion_id, thread_id):
             return HttpResponseBadRequest("Invalid group_id")
         threads.append(thread.to_dict())
 
+<<<<<<< HEAD:lms/djangoapps/django_comment_client/forum/views.py
         with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
             add_courseware_context(threads, course, request.user)
+=======
+def _find_thread(request, course, discussion_id, thread_id):
+    """
+    Finds the discussion thread with the specified ID.
+
+    Args:
+        request: The Django request.
+        course_id: The ID of the owning course.
+        discussion_id: The ID of the owning discussion.
+        thread_id: The ID of the thread.
+
+    Returns:
+        The thread in question if the user can see it, else None.
+    """
+    try:
+        thread = cc.Thread.find(thread_id).retrieve(
+            with_responses=request.is_ajax(),
+            recursive=request.is_ajax(),
+            user_id=request.user.id,
+            response_skip=request.GET.get("resp_skip"),
+            response_limit=request.GET.get("resp_limit")
+        )
+    except cc.utils.CommentClientRequestError:
+        return None
+
+    # Verify that the student has access to this thread if belongs to a course discussion module
+    thread_context = getattr(thread, "context", "course")
+    if thread_context == "course" and not utils.discussion_category_id_access(course, request.user, discussion_id):
+        return None
+
+    # verify that the thread belongs to the requesting student's cohort
+    is_moderator = has_permission(request.user, "see_all_cohorts", course.id)
+    if is_commentable_cohorted(course.id, discussion_id) and not is_moderator:
+        user_group_id = get_cohort_id(request.user, course.id)
+        if getattr(thread, "group_id", None) is not None and user_group_id != thread.group_id:
+            return None
+
+    return thread
+
+
+def _create_base_discussion_view_context(request, course_key):
+    """
+    Returns the default template context for rendering any discussion view.
+    """
+    user = request.user
+    cc_user = cc.User.from_django_user(user)
+    user_info = cc_user.to_dict()
+    course = get_course_with_access(user, 'load', course_key, check_if_enrolled=True)
+    course_settings = make_course_settings(course, user)
+    return {
+        'csrf': csrf(request)['csrf_token'],
+        'course': course,
+        'user': user,
+        'user_info': user_info,
+        'staff_access': bool(has_access(user, 'staff', course)),
+        'roles': utils.get_role_ids(course_key),
+        'can_create_comment': has_permission(user, "create_comment", course.id),
+        'can_create_subcomment': has_permission(user, "create_sub_comment", course.id),
+        'can_create_thread': has_permission(user, "create_thread", course.id),
+        'flag_moderator': bool(
+            has_permission(user, 'openclose_thread', course.id) or
+            has_access(user, 'staff', course)
+        ),
+        'course_settings': course_settings,
+        'disable_courseware_js': True,
+        'uses_pattern_library': True,
+    }
+
+
+def _create_discussion_board_context(request, course_key, discussion_id=None, thread_id=None):
+    """
+    Returns the template context for rendering the discussion board.
+    """
+    context = _create_base_discussion_view_context(request, course_key)
+    course = context['course']
+    course_settings = context['course_settings']
+    user = context['user']
+    cc_user = cc.User.from_django_user(user)
+    user_info = context['user_info']
+    if thread_id:
+        thread = _find_thread(request, course, discussion_id=discussion_id, thread_id=thread_id)
+        if not thread:
+            raise Http404
+
+        # Since we're in page render mode, and the discussions UI will request the thread list itself,
+        # we need only return the thread information for this one.
+        threads = [thread.to_dict()]
+>>>>>>> 7550cf6... Wrap all newrelic dependencies in a check to see if the module is loaded:lms/djangoapps/discussion/views.py
 
         for thread in threads:
             # patch for backward compatibility with comments service
             if "pinned" not in thread:
                 thread["pinned"] = False
+<<<<<<< HEAD:lms/djangoapps/django_comment_client/forum/views.py
 
         threads = [utils.prepare_content(thread, course_key, is_staff) for thread in threads]
 
         with newrelic.agent.FunctionTrace(nr_transaction, "get_metadata_for_threads"):
             annotated_content_info = utils.get_metadata_for_threads(course_key, threads, request.user, user_info)
+=======
+        thread_pages = 1
+        root_url = reverse('forum_form_discussion', args=[unicode(course.id)])
+    else:
+        threads, query_params = get_threads(request, course, user_info)   # This might process a search query
+        thread_pages = query_params['num_pages']
+        root_url = request.path
+    is_staff = has_permission(user, 'openclose_thread', course.id)
+    threads = [utils.prepare_content(thread, course_key, is_staff) for thread in threads]
+
+    with newrelic_function_trace("get_metadata_for_threads"):
+        annotated_content_info = utils.get_metadata_for_threads(course_key, threads, user, user_info)
+
+    with newrelic_function_trace("add_courseware_context"):
+        add_courseware_context(threads, course, user)
+
+    with newrelic_function_trace("get_cohort_info"):
+        user_cohort_id = get_cohort_id(user, course_key)
+>>>>>>> 7550cf6... Wrap all newrelic dependencies in a check to see if the module is loaded:lms/djangoapps/discussion/views.py
 
         with newrelic.agent.FunctionTrace(nr_transaction, "get_cohort_info"):
             user_cohort = get_cohort_id(request.user, course_key)
@@ -415,10 +561,14 @@ def user_profile(request, course_key, user_id):
     Renders a response to display the user profile page (shown after clicking
     on a post author's username).
     """
+<<<<<<< HEAD:lms/djangoapps/django_comment_client/forum/views.py
 
     nr_transaction = newrelic.agent.current_transaction()
 
     #TODO: Allow sorting?
+=======
+    user = cc.User.from_django_user(request.user)
+>>>>>>> 7550cf6... Wrap all newrelic dependencies in a check to see if the module is loaded:lms/djangoapps/discussion/views.py
     course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
     try:
         query_params = {
@@ -441,11 +591,21 @@ def user_profile(request, course_key, user_id):
         query_params['num_pages'] = num_pages
         user_info = cc.User.from_django_user(request.user).to_dict()
 
+<<<<<<< HEAD:lms/djangoapps/django_comment_client/forum/views.py
         with newrelic.agent.FunctionTrace(nr_transaction, "get_metadata_for_threads"):
+=======
+        with newrelic_function_trace("get_metadata_for_threads"):
+            user_info = cc.User.from_django_user(request.user).to_dict()
+>>>>>>> 7550cf6... Wrap all newrelic dependencies in a check to see if the module is loaded:lms/djangoapps/discussion/views.py
             annotated_content_info = utils.get_metadata_for_threads(course_key, threads, request.user, user_info)
 
         is_staff = has_permission(request.user, 'openclose_thread', course.id)
         threads = [utils.prepare_content(thread, course_key, is_staff) for thread in threads]
+<<<<<<< HEAD:lms/djangoapps/django_comment_client/forum/views.py
+=======
+        with newrelic_function_trace("add_courseware_context"):
+            add_courseware_context(threads, course, request.user)
+>>>>>>> 7550cf6... Wrap all newrelic dependencies in a check to see if the module is loaded:lms/djangoapps/discussion/views.py
         if request.is_ajax():
             return utils.JsonResponse({
                 'discussion_data': threads,
@@ -454,10 +614,22 @@ def user_profile(request, course_key, user_id):
                 'annotated_content_info': json.dumps(annotated_content_info),
             })
         else:
+<<<<<<< HEAD:lms/djangoapps/django_comment_client/forum/views.py
             django_user = User.objects.get(id=user_id)
             context = {
                 'course': course,
                 'user': request.user,
+=======
+            user_roles = django_user.roles.filter(
+                course_id=course.id
+            ).order_by("name").values_list("name", flat=True).distinct()
+
+            with newrelic_function_trace("get_cohort_info"):
+                user_cohort_id = get_cohort_id(request.user, course_key)
+
+            context = _create_base_discussion_view_context(request, course_key)
+            context.update({
+>>>>>>> 7550cf6... Wrap all newrelic dependencies in a check to see if the module is loaded:lms/djangoapps/discussion/views.py
                 'django_user': django_user,
                 'profiled_user': profiled_user.to_dict(),
                 'threads': json.dumps(threads),
@@ -479,9 +651,6 @@ def followed_threads(request, course_key, user_id):
     """
     Ajax-only endpoint retrieving the threads followed by a specific user.
     """
-
-    nr_transaction = newrelic.agent.current_transaction()
-
     course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
     try:
         profiled_user = cc.User(id=user_id, course_id=course_key)
@@ -524,7 +693,7 @@ def followed_threads(request, course_key, user_id):
         query_params['num_pages'] = paginated_results.num_pages
         user_info = cc.User.from_django_user(request.user).to_dict()
 
-        with newrelic.agent.FunctionTrace(nr_transaction, "get_metadata_for_threads"):
+        with newrelic_function_trace("get_metadata_for_threads"):
             annotated_content_info = utils.get_metadata_for_threads(
                 course_key,
                 paginated_results.collection,
