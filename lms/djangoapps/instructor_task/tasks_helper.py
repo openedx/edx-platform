@@ -310,7 +310,8 @@ def perform_module_state_update(update_fcn, filter_fcn, _entry_id, course_id, ta
 
     StudentModule instances are those that match the specified `course_id` and `module_state_key`.
     If `student_identifier` is not None, it is used as an additional filter to limit the modules to those belonging
-    to that student. If `student_identifier` is None, performs update on modules for all students on the specified problem.
+    to that student. If `student_identifier` is None, performs update on modules for all students on the specified
+    problem.
 
     If a `filter_fcn` is not None, it is applied to the query that has been constructed.  It takes one
     argument, which is the query being filtered, and returns the filtered version of the query.
@@ -405,12 +406,18 @@ def perform_module_state_update(update_fcn, filter_fcn, _entry_id, course_id, ta
 
 def _get_task_id_from_xmodule_args(xmodule_instance_args):
     """Gets task_id from `xmodule_instance_args` dict, or returns default value if missing."""
-    return xmodule_instance_args.get('task_id', UNKNOWN_TASK_ID) if xmodule_instance_args is not None else UNKNOWN_TASK_ID
+    if xmodule_instance_args is None:
+        return UNKNOWN_TASK_ID
+    else:
+        return xmodule_instance_args.get('task_id', UNKNOWN_TASK_ID)
 
 
 def _get_xqueue_callback_url_prefix(xmodule_instance_args):
     """Gets prefix to use when constructing xqueue_callback_url."""
-    return xmodule_instance_args.get('xqueue_callback_url_prefix', '') if xmodule_instance_args is not None else ''
+    if xmodule_instance_args is None:
+        return ''
+    else:
+        return xmodule_instance_args.get('xqueue_callback_url_prefix', '')
 
 
 def _get_track_function_for_task(student, xmodule_instance_args=None, source_page='x_module_task'):
@@ -517,83 +524,75 @@ def rescore_problem_module_state(xmodule_instance_args, module_descriptor, stude
             TASK_LOG.warning(msg)
             return UPDATE_STATUS_FAILED
 
-        if not hasattr(instance, 'rescore_problem'):
-            # This should also not happen, since it should be already checked in the caller,
-            # but check here to be sure.
+        # TODO: (TNL-6594)  Remove this switch once rescore_problem support
+        # once CAPA uses ScorableXBlockMixin.
+        for method in ['rescore', 'rescore_problem']:
+            rescore_method = getattr(instance, method, None)
+            if rescore_method is not None:
+                break
+        else:  # for-else: Neither method exists on the block.
+            # This should not happen, since it should be already checked in the
+            # caller, but check here to be sure.
             msg = "Specified problem does not support rescoring."
             raise UpdateProblemModuleStateError(msg)
 
-        # Set the tracking info before this call, because
-        # it makes downstream calls that create events.
-        # We retrieve and store the id here because
+        # Set the tracking info before this call, because it makes downstream
+        # calls that create events.  We retrieve and store the id here because
         # the request cache will be erased during downstream calls.
         event_transaction_id = create_new_event_transaction_id()
         set_event_transaction_type(GRADES_RESCORE_EVENT_TYPE)
 
-        result = instance.rescore_problem(only_if_higher=task_input['only_if_higher'])
+        result = rescore_method(only_if_higher=task_input['only_if_higher'])
         instance.save()
 
-        if 'success' not in result:
-            # don't consider these fatal, but false means that the individual call didn't complete:
-            TASK_LOG.warning(
-                u"error processing rescore call for course %(course)s, problem %(loc)s "
-                u"and student %(student)s: unexpected response %(msg)s",
-                dict(
-                    msg=result,
-                    course=course_id,
-                    loc=usage_key,
-                    student=student
-                )
-            )
-            return UPDATE_STATUS_FAILED
-        elif result['success'] not in ['correct', 'incorrect']:
-            TASK_LOG.warning(
-                u"error processing rescore call for course %(course)s, problem %(loc)s "
-                u"and student %(student)s: %(msg)s",
-                dict(
-                    msg=result['success'],
-                    course=course_id,
-                    loc=usage_key,
-                    student=student
-                )
-            )
-            return UPDATE_STATUS_FAILED
-        else:
+        if result is None or result.get(u'success') in {u'correct', u'incorrect'}:
             TASK_LOG.debug(
                 u"successfully processed rescore call for course %(course)s, problem %(loc)s "
-                u"and student %(student)s: %(msg)s",
+                u"and student %(student)s",
                 dict(
-                    msg=result['success'],
                     course=course_id,
                     loc=usage_key,
                     student=student
                 )
             )
-            new_weighted_earned, new_weighted_possible = weighted_score(
-                result['new_raw_earned'],
-                result['new_raw_possible'],
-                module_descriptor.weight,
-            )
 
-            # TODO: remove this context manager after completion of AN-6134
-            context = contexts.course_context_from_course_id(course_id)
-            with tracker.get_tracker().context(GRADES_RESCORE_EVENT_TYPE, context):
-                tracker.emit(
-                    unicode(GRADES_RESCORE_EVENT_TYPE),
-                    {
-                        'course_id': unicode(course_id),
-                        'user_id': unicode(student.id),
-                        'problem_id': unicode(usage_key),
-                        'new_weighted_earned': new_weighted_earned,
-                        'new_weighted_possible': new_weighted_possible,
-                        'only_if_higher': task_input['only_if_higher'],
-                        'instructor_id': unicode(xmodule_instance_args['request_info']['user_id']),
-                        'event_transaction_id': unicode(event_transaction_id),
-                        'event_transaction_type': unicode(GRADES_RESCORE_EVENT_TYPE),
-                    }
+            if result is not None:  # Only for CAPA. This will get moved to the grade handler.
+                new_weighted_earned, new_weighted_possible = weighted_score(
+                    result['new_raw_earned'] if result else None,
+                    result['new_raw_possible'] if result else None,
+                    module_descriptor.weight,
                 )
 
-        return UPDATE_STATUS_SUCCEEDED
+                # TODO: remove this context manager after completion of AN-6134
+                context = contexts.course_context_from_course_id(course_id)
+                with tracker.get_tracker().context(GRADES_RESCORE_EVENT_TYPE, context):
+                    tracker.emit(
+                        unicode(GRADES_RESCORE_EVENT_TYPE),
+                        {
+                            'course_id': unicode(course_id),
+                            'user_id': unicode(student.id),
+                            'problem_id': unicode(usage_key),
+                            'new_weighted_earned': new_weighted_earned,
+                            'new_weighted_possible': new_weighted_possible,
+                            'only_if_higher': task_input['only_if_higher'],
+                            'instructor_id': unicode(xmodule_instance_args['request_info']['user_id']),
+                            'event_transaction_id': unicode(event_transaction_id),
+                            'event_transaction_type': unicode(GRADES_RESCORE_EVENT_TYPE),
+                        }
+                    )
+            return UPDATE_STATUS_SUCCEEDED
+        else:
+            TASK_LOG.warning(
+                u"error processing rescore call for course %(course)s, problem %(loc)s "
+                u"and student %(student)s: %(msg)s",
+                dict(
+                    msg=result.get('success', result),
+                    course=course_id,
+                    loc=usage_key,
+                    student=student
+                )
+            )
+            return UPDATE_STATUS_FAILED
 
 
 @outer_atomic
