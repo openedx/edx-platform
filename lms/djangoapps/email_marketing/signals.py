@@ -59,6 +59,11 @@ def add_email_marketing_cookies(sender, response=None, user=None,
 
     try:
         sailthru_client = SailthruClient(email_config.sailthru_key, email_config.sailthru_secret)
+        log.info(
+            'Sending to Sailthru the user interest cookie [%s] for user [%s]',
+            post_parms.get('cookies', ''),
+            user.email
+        )
         sailthru_response = \
             sailthru_client.api_post("user", post_parms)
     except SailthruClientError as exc:
