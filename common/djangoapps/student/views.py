@@ -1684,7 +1684,9 @@ def create_account_with_params(request, params):
 
     extended_profile_fields = configuration_helpers.get_value('extended_profile_fields', [])
     enforce_password_policy = (
-        settings.FEATURES.get("ENFORCE_PASSWORD_POLICY", False) and
+        configuration_helpers.get_value(
+            "ENFORCE_PASSWORD_POLICY", settings.FEATURES.get("ENFORCE_PASSWORD_POLICY", False)
+        ) and
         not do_external_auth
     )
     # Can't have terms of service for certain SHIB users, like at Stanford
@@ -2259,7 +2261,11 @@ def validate_password(user, password):
     """
     err_msg = None
 
-    if settings.FEATURES.get('ENFORCE_PASSWORD_POLICY', False):
+    enforce_password_policy = configuration_helpers.get_value(
+        "ENFORCE_PASSWORD_POLICY", settings.FEATURES.get("ENFORCE_PASSWORD_POLICY", False)
+    ) 
+
+    if enforce_password_policy:
         try:
             validate_password_strength(password)
         except ValidationError as err:
