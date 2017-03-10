@@ -55,7 +55,7 @@ test:
         parallel: true
 
   post:
-    - coverage report
+    - paver coverage
     - mkdir -p $CIRCLE_TEST_REPORTS/junit
     # Copy the junit results up to be consumed by circleci,
     # but only do this if there actually are results.
