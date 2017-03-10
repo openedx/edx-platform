@@ -5,10 +5,11 @@ define([
     'js/views/paging',
     'js/views/previous_video_upload',
     'common/js/components/views/paging_footer',
-    'js/views/paging_header'],
+    'js/views/paging_header',
+    'js/views/search'],
 
     function($, _, Backbone, gettext, BaseView, PagingView,
-        PreviousVideoUploadView, PagingFooter, PagingHeader) {
+        PreviousVideoUploadView, PagingFooter, PagingHeader, SearchView) {
         'use strict';
         var PreviousVideoUploadListView = BaseView.extend({
             tagName: 'section',
@@ -58,8 +59,11 @@ define([
                     });
                     this.pagingHeader = new PagingHeader({view: this, el: $el.find('#video-paging-header')});
                     this.pagingFooter = new PagingFooter({collection: this.collection, el: $el.find('#video-paging-footer')});
+                    this.searchView = new SearchView({el: this.$el.find('.forum-search'), collection: this.collection});
+
                     this.pagingHeader.render();
                     this.pagingFooter.render();
+                    this.searchView.render();
                 }
 
             }),

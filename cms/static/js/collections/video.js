@@ -26,10 +26,11 @@ define([
 
         initState: function(options) {
             return {
+                searchKey: options.searchKey,
                 pageSize: options.pageSize,
                 totalRecords: options.count,
                 sortKey: options.sortField,
-                order: options.sort_order
+                order: options.sortOrder
             };
         },
 
@@ -38,6 +39,10 @@ define([
                 totalRecords: response[0].count,
                 totalPages: response[0].num_pages
             };
+        },
+
+        setSearchKey: function(searchKey) {
+            this.queryParams['search_key'] = searchKey;
         }
     });
 
