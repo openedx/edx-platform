@@ -54,6 +54,7 @@ from openedx.core.lib.gating import api as gating_api
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory, UserFactory, CourseEnrollmentFactory
+from util.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from util.tests.test_date_utils import fake_ugettext, fake_pgettext
 from util.url import reload_django_url_config
 from util.views import ensure_valid_course_key
@@ -2201,3 +2202,28 @@ class TestIndexViewCrawlerStudentStateWrites(SharedModuleStoreTestCase):
         # Make sure we get back an actual 200, and aren't redirected because we
         # messed up the setup somehow (e.g. didn't enroll properly)
         self.assertEqual(response.status_code, 200)
+
+
+@attr(shard=1)
+class EnterpriseConsentTestCase(EnterpriseTestConsentRequired, ModuleStoreTestCase):
+    """
+    Ensure that the Enterprise Data Consent redirects are in place only when consent is required.
+    """
+    def setUp(self):
+        super(EnterpriseConsentTestCase, self).setUp()
+        self.user = UserFactory.create()
+        self.assertTrue(self.client.login(username=self.user.username, password='test'))
+        self.course = CourseFactory.create()
+        CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
+
+    def test_consent_required(self):
+        """
+        Test that enterprise data sharing consent is required when enabled for the various courseware views.
+        """
+        course_id = unicode(self.course.id)
+        for url in (
+                reverse("courseware", kwargs=dict(course_id=course_id)),
+                reverse("progress", kwargs=dict(course_id=course_id)),
+                reverse("student_progress", kwargs=dict(course_id=course_id, student_id=str(self.user.id))),
+        ):
+            self.verify_consent_required(self.client, url)

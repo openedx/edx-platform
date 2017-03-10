@@ -197,28 +197,28 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
             )
         )
 
-    @patch('courseware.views.index.get_course_specific_consent_url')
-    @patch('courseware.views.index.consent_needed_for_course')
-    def test_redirection_missing_enterprise_consent(self, mock_consent_needed, mock_get_url):
+    @patch('courseware.views.index.get_enterprise_consent_url')
+    def test_redirection_missing_enterprise_consent(self, mock_get_url):
         """
         Verify that enrolled students are redirected to the Enterprise consent
         URL if a linked Enterprise Customer requires data sharing consent
         and it has not yet been provided.
         """
-        mock_consent_needed.return_value = True
         mock_get_url.return_value = reverse('dashboard')
         self.login(self.enrolled_user)
-        response = self.client.get(
-            reverse(
-                'courseware',
-                kwargs={'course_id': self.course.id.to_deprecated_string()}
-            )
+        url = reverse(
+            'courseware',
+            kwargs={'course_id': self.course.id.to_deprecated_string()}
         )
+        response = self.client.get(url)
         self.assertRedirects(
             response,
             reverse('dashboard')
         )
-        mock_consent_needed.assert_called_once_with(self.enrolled_user, unicode(self.course.id))
+        mock_get_url.assert_called_once()
+        mock_get_url.return_value = None
+        response = self.client.get(url)
+        self.assertNotIn("You are not currently enrolled in this course", response.content)
 
     def test_instructor_page_access_nonstaff(self):
         """

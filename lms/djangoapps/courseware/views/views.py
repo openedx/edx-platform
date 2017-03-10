@@ -93,7 +93,7 @@ from student.roles import GlobalStaff
 from util.cache import cache, cache_if_anonymous
 from util.date_utils import strftime_localized
 from util.db import outer_atomic
-from util.enterprise_helpers import consent_needed_for_course, get_course_specific_consent_url
+from util.enterprise_helpers import get_enterprise_consent_url
 from util.milestones_helpers import get_prerequisite_courses_display
 from util.views import _record_feedback_in_zendesk
 from util.views import ensure_valid_course_key, ensure_valid_usage_key
@@ -330,8 +330,9 @@ def course_info(request, course_id):
 
         # If the user is sponsored by an enterprise customer, and we still need to get data
         # sharing consent, redirect to do that first.
-        if consent_needed_for_course(user, course_id):
-            return redirect(get_course_specific_consent_url(request, course_id, 'info'))
+        consent_url = get_enterprise_consent_url(request, course_id, user=user, return_to='info')
+        if consent_url:
+            return redirect(consent_url)
 
         # If the user needs to take an entrance exam to access this course, then we'll need
         # to send them to that specific course module before allowing them into other areas
@@ -818,8 +819,9 @@ def _progress(request, course_key, student_id):
 
     # If the user is sponsored by an enterprise customer, and we still need to get data
     # sharing consent, redirect to do that first.
-    if consent_needed_for_course(request.user, unicode(course.id)):
-        return redirect(get_course_specific_consent_url(request, unicode(course.id), 'progress'))
+    consent_url = get_enterprise_consent_url(request, unicode(course.id), return_to='progress')
+    if consent_url:
+        return redirect(consent_url)
 
     # check to see if there is a required survey that must be taken before
     # the user can access the course.
