@@ -89,6 +89,7 @@ def newrelic_function_trace(function_name):
         yield
 
 
+@newrelic.agent.function_trace()
 def make_course_settings(course, user):
     """
     Generate a JSON-serializable model for course settings, which will be used to initialize a
@@ -315,9 +316,40 @@ def forum_form_discussion(request, course_key):
             'corrected_text': query_params['corrected_text'],
         })
     else:
-        course_id = unicode(course.id)
-        tab_view = CourseTabView()
-        return tab_view.get(request, course_id, 'discussion')
+        with newrelic.agent.FunctionTrace(nr_transaction, "get_cohort_info"):
+            user_cohort_id = get_cohort_id(request.user, course_key)
+
+        context = {
+            'csrf': csrf(request)['csrf_token'],
+            'course': course,
+            #'recent_active_threads': recent_active_threads,
+            'staff_access': bool(has_access(request.user, 'staff', course)),
+            'threads': threads,
+            'thread_pages': query_params['num_pages'],
+            'user_info': user_info,
+            'can_create_comment': has_permission(request.user, "create_comment", course.id),
+            'can_create_subcomment': has_permission(request.user, "create_sub_comment", course.id),
+            'can_create_thread': has_permission(request.user, "create_thread", course.id),
+            'flag_moderator': bool(
+                has_permission(request.user, 'openclose_thread', course.id) or
+                has_access(request.user, 'staff', course)
+            ),
+            'annotated_content_info': annotated_content_info,
+            'course_id': course.id.to_deprecated_string(),
+            'roles': utils.get_role_ids(course_key),
+            'is_moderator': has_permission(request.user, "see_all_cohorts", course_key),
+            'cohorts': course_settings["cohorts"],  # still needed to render _thread_list_template
+            'user_cohort': user_cohort_id,  # read from container in NewPostView
+            'cohorted_commentables': (get_cohorted_commentables(course_key)),
+            'is_course_cohorted': is_course_cohorted(course_key),  # still needed to render _thread_list_template
+            'sort_preference': user.default_sort_key,
+            'category_map': course_settings["category_map"],
+            'course_settings': course_settings,
+            'disable_courseware_js': True,
+            'uses_pattern_library': True,
+        }
+        # print "start rendering.."
+        return render_to_response('discussion/discussion_board.html', context)
 
 
 @require_GET
@@ -547,7 +579,7 @@ def user_profile(request, course_key, user_id):
                 'discussion_data': threads,
                 'page': query_params['page'],
                 'num_pages': query_params['num_pages'],
-                'annotated_content_info': json.dumps(annotated_content_info),
+                'annotated_content_info': annotated_content_info,
             })
         else:
             user_roles = django_user.roles.filter(
