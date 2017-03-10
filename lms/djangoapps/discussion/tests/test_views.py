@@ -21,6 +21,7 @@ from django_comment_client.tests.unicode import UnicodeTestMixin
 from django_comment_client.tests.utils import CohortedTestCase, ForumsEnableMixin
 from django_comment_client.utils import strip_none
 from lms.djangoapps.discussion import views
+import lms.lib.comment_client as cc
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from util.testing import UrlResetMixin
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
@@ -259,9 +260,7 @@ class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase):
         # django view performs prior to writing thread data to the response
         self.assertEquals(
             response_data["content"],
-            strip_none(make_mock_thread_data(
-                course=self.course, text=text, thread_id=thread_id, num_children=1
-            ))
+            strip_none(make_mock_thread_data(course=self.course, text=text, thread_id=thread_id, num_children=1))
         )
         mock_request.assert_called_with(
             "get",
@@ -297,9 +296,7 @@ class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase):
         # django view performs prior to writing thread data to the response
         self.assertEquals(
             response_data["content"],
-            strip_none(make_mock_thread_data(
-                course=self.course, text=text, thread_id=thread_id, num_children=1
-            ))
+            strip_none(make_mock_thread_data(course=self.course, text=text, thread_id=thread_id, num_children=1))
         )
         mock_request.assert_called_with(
             "get",
@@ -385,7 +382,7 @@ class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
 
         test_thread_id = "test_thread_id"
         mock_request.side_effect = make_mock_request_impl(
-            course=course, text="dummy content", thread_id=test_thread_id, num_thread_responses=num_thread_responses,
+            course=course, text="dummy content", thread_id=test_thread_id, num_thread_responses=num_thread_responses
         )
         request = RequestFactory().get(
             "dummy_url",
@@ -451,7 +448,7 @@ class SingleCohortedThreadTestCase(CohortedTestCase):
                 thread_id=self.mock_thread_id,
                 num_children=1,
                 group_id=self.student_cohort.id,
-                group_name=self.student_cohort.name,
+                group_name=self.student_cohort.name
             )
         )
 
@@ -1580,19 +1577,28 @@ class ThreadListingTestCase(CohortedTestCase):
     def test_index_send_id(self, _mock_request):
         request = RequestFactory().get('dummy_url')
         request.user = self.student
-        _threads, params = get_threads(request, self.course)
+        user = cc.User.from_django_user(request.user)
+        user_info = user.to_dict()
+
+        _threads, params = views.get_threads(request, self.course, user_info)
         self.assertEqual(params['group_id'], self.student_cohort.id)
 
     @patch('lms.lib.comment_client.utils.requests.request')
     def test_cohorted_commentable_send_id(self, _mock_request):
         request = RequestFactory().get('dummy_url')
         request.user = self.student
-        _threads, params = get_threads(request, self.course, 'cohorted_topic')
+        user = cc.User.from_django_user(request.user)
+        user_info = user.to_dict()
+
+        _threads, params = views.get_threads(request, self.course, user_info, 'cohorted_topic')
         self.assertEqual(params['group_id'], self.student_cohort.id)
 
     @patch('lms.lib.comment_client.utils.requests.request')
     def test_non_cohorted_commentable_does_not_send_id(self, _mock_request):
         request = RequestFactory().get('dummy_url')
         request.user = self.student
-        _threads, params = get_threads(request, self.course, 'non_cohorted_topic')
+        user = cc.User.from_django_user(request.user)
+        user_info = user.to_dict()
+
+        _threads, params = views.get_threads(request, self.course, user_info, 'non_cohorted_topic')
         self.assertNotIn('group_id', params)

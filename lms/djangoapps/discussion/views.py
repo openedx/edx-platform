@@ -3,16 +3,13 @@ Views handling read (GET) requests for the Discussion tab and inline discussions
 """
 
 from functools import wraps
-import json
 import logging
 
 from django.contrib.auth.decorators import login_required
-from django.conf import settings
 from django.core.context_processors import csrf
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.http import Http404, HttpResponseBadRequest
-from django.utils.translation import ugettext_noop
 from django.shortcuts import render_to_response
 from django.views.decorators.http import require_GET
 import newrelic.agent
@@ -26,7 +23,6 @@ from openedx.core.djangoapps.course_groups.cohorts import (
     get_cohort_by_id,
 )
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
-from courseware.tabs import EnrolledTab
 from courseware.access import has_access
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
@@ -50,25 +46,6 @@ THREADS_PER_PAGE = 20
 INLINE_THREADS_PER_PAGE = 20
 PAGES_NEARBY_DELTA = 2
 log = logging.getLogger("edx.discussions")
-
-
-class DiscussionTab(EnrolledTab):
-    """
-    A tab for the cs_comments_service forums.
-    """
-
-    type = 'discussion'
-    title = ugettext_noop('Discussion')
-    priority = None
-    view_name = 'django_comment_client.forum.views.forum_form_discussion'
-    is_hideable = settings.FEATURES.get('ALLOW_HIDING_DISCUSSION_TAB', False)
-    is_default = False
-
-    @classmethod
-    def is_enabled(cls, course, user=None):
-        if not super(DiscussionTab, cls).is_enabled(course, user):
-            return False
-        return utils.is_discussion_enabled(course.id)
 
 
 @newrelic.agent.function_trace()
@@ -328,9 +305,9 @@ def forum_form_discussion(request, course_key):
             'course': course,
             #'recent_active_threads': recent_active_threads,
             'staff_access': bool(has_access(request.user, 'staff', course)),
-            'threads': json.dumps(threads),
+            'threads': threads,
             'thread_pages': query_params['num_pages'],
-            'user_info': json.dumps(user_info, default=lambda x: None),
+            'user_info': user_info,
             'can_create_comment': has_permission(request.user, "create_comment", course.id),
             'can_create_subcomment': has_permission(request.user, "create_sub_comment", course.id),
             'can_create_thread': has_permission(request.user, "create_thread", course.id),
@@ -338,9 +315,9 @@ def forum_form_discussion(request, course_key):
                 has_permission(request.user, 'openclose_thread', course.id) or
                 has_access(request.user, 'staff', course)
             ),
-            'annotated_content_info': json.dumps(annotated_content_info),
+            'annotated_content_info': annotated_content_info,
             'course_id': course.id.to_deprecated_string(),
-            'roles': json.dumps(utils.get_role_ids(course_key)),
+            'roles': utils.get_role_ids(course_key),
             'is_moderator': has_permission(request.user, "see_all_cohorts", course_key),
             'cohorts': course_settings["cohorts"],  # still needed to render _thread_list_template
             'user_cohort': user_cohort_id,  # read from container in NewPostView
@@ -348,7 +325,7 @@ def forum_form_discussion(request, course_key):
             'is_course_cohorted': is_course_cohorted(course_key),  # still needed to render _thread_list_template
             'sort_preference': user.default_sort_key,
             'category_map': course_settings["category_map"],
-            'course_settings': json.dumps(course_settings),
+            'course_settings': course_settings,
             'disable_courseware_js': True,
             'uses_pattern_library': True,
         }
@@ -375,10 +352,6 @@ def single_thread(request, course_key, discussion_id, thread_id):
     user_info = cc_user.to_dict()
     is_moderator = has_permission(request.user, "see_all_cohorts", course_key)
     is_staff = has_permission(request.user, 'openclose_thread', course.id)
-
-    # Verify that the student has access to this thread if belongs to a discussion module
-    if discussion_id not in utils.get_discussion_categories_ids(course, request.user):
-        raise Http404
 
     try:
         thread = cc.Thread.find(thread_id).retrieve(
@@ -412,9 +385,11 @@ def single_thread(request, course_key, discussion_id, thread_id):
                 request.user,
                 user_info=user_info
             )
+
         content = utils.prepare_content(thread.to_dict(), course_key, is_staff)
         with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
             add_courseware_context([content], course, request.user)
+
         return utils.JsonResponse({
             'content': content,
             'annotated_content_info': annotated_content_info,
@@ -444,17 +419,17 @@ def single_thread(request, course_key, discussion_id, thread_id):
             'discussion_id': discussion_id,
             'csrf': csrf(request)['csrf_token'],
             'init': '',   # TODO: What is this?
-            'user_info': json.dumps(user_info),
+            'user_info': user_info,
             'can_create_comment': has_permission(request.user, "create_comment", course.id),
             'can_create_subcomment': has_permission(request.user, "create_sub_comment", course.id),
             'can_create_thread': has_permission(request.user, "create_thread", course.id),
-            'annotated_content_info': json.dumps(annotated_content_info),
+            'annotated_content_info': annotated_content_info,
             'course': course,
             #'recent_active_threads': recent_active_threads,
             'course_id': course.id.to_deprecated_string(),   # TODO: Why pass both course and course.id to template?
             'thread_id': thread_id,
-            'threads': json.dumps(threads),
-            'roles': json.dumps(utils.get_role_ids(course_key)),
+            'threads': threads,
+            'roles': utils.get_role_ids(course_key),
             'is_moderator': is_moderator,
             'thread_pages': 1,
             'is_course_cohorted': is_course_cohorted(course_key),
@@ -467,7 +442,7 @@ def single_thread(request, course_key, discussion_id, thread_id):
             'cohorted_commentables': (get_cohorted_commentables(course.id)),
             'sort_preference': cc_user.default_sort_key,
             'category_map': course_settings["category_map"],
-            'course_settings': json.dumps(course_settings),
+            'course_settings': course_settings,
             'disable_courseware_js': True,
             'uses_pattern_library': True,
         }
@@ -529,7 +504,7 @@ def user_profile(request, course_key, user_id):
                 'discussion_data': threads,
                 'page': query_params['page'],
                 'num_pages': query_params['num_pages'],
-                'annotated_content_info': json.dumps(annotated_content_info),
+                'annotated_content_info': annotated_content_info,
             })
         else:
             user_roles = django_user.roles.filter(
@@ -545,8 +520,8 @@ def user_profile(request, course_key, user_id):
                 'django_user': django_user,
                 'django_user_roles': user_roles,
                 'profiled_user': profiled_user.to_dict(),
-                'threads': json.dumps(threads),
-                'user_info': json.dumps(user_info, default=lambda x: None),
+                'threads': threads,
+                'user_info': user_info,
                 'roles': utils.get_role_ids(course_key),
                 'can_create_comment': has_permission(request.user, "create_comment", course.id),
                 'can_create_subcomment': has_permission(request.user, "create_sub_comment", course.id),
@@ -556,7 +531,7 @@ def user_profile(request, course_key, user_id):
                     has_access(request.user, 'staff', course)
                 ),
                 'user_cohort': user_cohort_id,
-                'annotated_content_info': json.dumps(annotated_content_info),
+                'annotated_content_info': annotated_content_info,
                 'page': query_params['page'],
                 'num_pages': query_params['num_pages'],
                 'sort_preference': user.default_sort_key,
@@ -579,7 +554,6 @@ def followed_threads(request, course_key, user_id):
     """
 
     nr_transaction = newrelic.agent.current_transaction()
-
     course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
     try:
         profiled_user = cc.User(id=user_id, course_id=course_key)
@@ -643,9 +617,9 @@ def followed_threads(request, course_key, user_id):
                 'user': request.user,
                 'django_user': User.objects.get(id=user_id),
                 'profiled_user': profiled_user.to_dict(),
-                'threads': json.dumps(threads),
-                'user_info': json.dumps(user_info),
-                'annotated_content_info': json.dumps(annotated_content_info),
+                'threads': paginated_results.collection,
+                'user_info': user_info,
+                'annotated_content_info': annotated_content_info,
                 #                'content': content,
             }
 
