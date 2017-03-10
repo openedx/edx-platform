@@ -1,0 +1,8 @@
+<problem display_name="Numerical Input" markdown="&gt;&gt;How many orphans is it acceptable to have in a newly imported course?&lt;&lt;&#10;&#10;= 0&#10;">
+<p>How many orphans is it acceptable to have in a newly imported course?</p>
+
+<numericalresponse answer="0">
+  <formulaequationinput label="How many orphans is it acceptable to have in a newly imported course?"/>
+</numericalresponse>
+
+</problem>
