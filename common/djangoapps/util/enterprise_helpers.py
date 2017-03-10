@@ -3,9 +3,11 @@ Helpers to access the enterprise app
 """
 import logging
 
+from functools import wraps
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from django.shortcuts import redirect
 from django.utils.http import urlencode
 from edx_rest_api_client.client import EdxRestApiClient
 try:
@@ -70,6 +72,36 @@ class EnterpriseApiClient(object):
             raise EnterpriseApiException(message)
 
 
+def data_sharing_consent_required(view_func):
+    """
+    Decorator which makes a view method redirect to the Data Sharing Consent form if:
+
+    * The wrapped method is passed request, course_id as the first two arguments.
+    * Enterprise integration is enabled
+    * Data sharing consent is required before accessing this course view.
+    * The request.user has not yet given data sharing consent for this course.
+
+    After granting consent, the user will be redirected back to the original request.path.
+
+    """
+    @wraps(view_func)
+    def inner(request, course_id, *args, **kwargs):
+        """
+        Redirect to the consent page if the request.user must consent to data sharing before viewing course_id.
+
+        Otherwise, just call the wrapped view function.
+        """
+        # Redirect to the consent URL, if consent is required.
+        consent_url = get_enterprise_consent_url(request, course_id)
+        if consent_url:
+            return redirect(consent_url)
+
+        # Otherwise, drop through to wrapped view
+        return view_func(request, course_id, *args, **kwargs)
+
+    return inner
+
+
 def enterprise_enabled():
     """
     Determines whether the Enterprise app is installed
@@ -87,14 +119,32 @@ def consent_needed_for_course(user, course_id):
     return consent_necessary_for_course(user, course_id)
 
 
-def get_course_specific_consent_url(request, course_id, return_to):
+def get_enterprise_consent_url(request, course_id, user=None, return_to=None):
     """
     Build a URL to redirect the user to the Enterprise app to provide data sharing
     consent for a specific course ID.
+
+    Arguments:
+    * request: Request object
+    * course_id: Course key/identifier string.
+    * user: user to check for consent. If None, uses request.user
+    * return_to: url name label for the page to return to after consent is granted.
+                 If None, return to request.path instead.
     """
+    if user is None:
+        user = request.user
+
+    if not consent_needed_for_course(user, course_id):
+        return None
+
+    if return_to is None:
+        return_path = request.path
+    else:
+        return_path = reverse(return_to, args=(course_id,))
+
     url_params = {
         'course_id': course_id,
-        'next': request.build_absolute_uri(reverse(return_to, args=(course_id,)))
+        'next': request.build_absolute_uri(return_path)
     }
     querystring = urlencode(url_params)
     full_url = reverse('grant_data_sharing_permissions') + '?' + querystring
