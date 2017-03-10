@@ -16,24 +16,35 @@
          */
         var searchView = Backbone.View.extend({
             events: {
+<<<<<<< cac68c7cb170e74479b89dc43811b9cec2834b7a
                     'click .search-button': 'searchKey',
                     'click .cancel-button': 'cancelSearch'
+=======
+                    'click .search-btn': 'searchKey',
+>>>>>>> [WIP] Add search box to video page
             },
 
             initialize: function(options) {
                 this.template = HtmlUtils.template(searchTemplate);
+<<<<<<< cac68c7cb170e74479b89dc43811b9cec2834b7a
                 this.render();
+=======
+>>>>>>> [WIP] Add search box to video page
             },
 
             render: function() {
                 HtmlUtils.setHtml(this.$el, this.template());
+<<<<<<< cac68c7cb170e74479b89dc43811b9cec2834b7a
                 this.$searchField = this.$el.find('.search-field');
                 this.$searchButton = this.$el.find('.search-button');
                 this.$cancelButton = this.$el.find('.cancel-button');
+=======
+>>>>>>> [WIP] Add search box to video page
                 return this;
             },
 
             searchKey: function() {
+<<<<<<< cac68c7cb170e74479b89dc43811b9cec2834b7a
                 var searchKey = this.$('.search-field').val();
                 this.collection.setSearchKey(searchKey);
                 this.collection.setPage(1);
@@ -49,6 +60,12 @@
                 this.$searchField.removeClass('is-active');
                 this.$searchButton.show();
                 this.$cancelButton.hide();
+=======
+                var searchKey = this.$('.search-input').val();
+                this.collection.setSearchKey(searchKey);
+                this.collection.setPage(1);
+                searchKey.val('');
+>>>>>>> [WIP] Add search box to video page
             }
         });
 

@@ -67,6 +67,7 @@ define([
 
                     this.pagingHeader.render();
                     this.pagingFooter.render();
+                    this.searchView.render();
                 }
 
             }),
