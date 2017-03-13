@@ -729,20 +729,20 @@ def _move_item(source_usage_key, target_parent_usage_key, user, target_index=Non
 
         if (valid_move_type.get(target_parent_type, '') != source_type and
                 target_parent_type not in parent_component_types):
-            error = 'You can not move {source_type} into {target_parent_type}.'.format(
+            error = _('You can not move {source_type} into {target_parent_type}.').format(
                 source_type=source_type,
                 target_parent_type=target_parent_type,
             )
         elif source_parent.location == target_parent.location:
-            error = 'You can not move an item into the same parent.'
+            error = _('You can not move an item into the same parent.')
         elif source_item.location == target_parent.location:
-            error = 'You can not move an item into itself.'
+            error = _('You can not move an item into itself.')
         elif is_source_item_in_target_parents(source_item, target_parent):
-            error = 'You can not move an item into it\'s child.'
+            error = _('You can not move an item into it\'s child.')
         elif target_parent_type == 'split_test':
-            error = 'You can not move an item directly into content experiment.'
+            error = _('You can not move an item directly into content experiment.')
         elif source_index is None:
-            error = '{source_usage_key} not found in {parent_usage_key}.'.format(
+            error = _('{source_usage_key} not found in {parent_usage_key}.').format(
                 source_usage_key=unicode(source_usage_key),
                 parent_usage_key=unicode(source_parent.location)
             )
@@ -750,12 +750,12 @@ def _move_item(source_usage_key, target_parent_usage_key, user, target_index=Non
             try:
                 target_index = int(target_index) if target_index is not None else None
                 if len(target_parent.children) < target_index:
-                    error = 'You can not move {source_usage_key} at an invalid index ({target_index}).'.format(
+                    error = _('You can not move {source_usage_key} at an invalid index ({target_index}).').format(
                         source_usage_key=unicode(source_usage_key),
                         target_index=target_index
                     )
             except ValueError:
-                error = 'You must provide target_index ({target_index}) as an integer.'.format(
+                error = _('You must provide target_index ({target_index}) as an integer.').format(
                     target_index=target_index
                 )
         if error:
@@ -771,6 +771,14 @@ def _move_item(source_usage_key, target_parent_usage_key, user, target_index=Non
         # Add to new parent at particular location.
         target_parent.children.insert(insert_at, source_item.location)
         store.update_item(target_parent, user.id)
+
+        log.info(
+            'MOVE: %s moved from %s to %s at %d index',
+            unicode(source_usage_key),
+            unicode(source_parent.location),
+            unicode(target_parent_usage_key),
+            insert_at
+        )
 
         context = {
             'move_source_locator': unicode(source_usage_key),
