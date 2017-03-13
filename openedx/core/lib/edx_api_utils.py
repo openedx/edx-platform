@@ -14,8 +14,8 @@ from openedx.core.lib.token_utils import JwtBuilder
 log = logging.getLogger(__name__)
 
 
-def get_edx_api_data(api_config, user, resource,
-                     api=None, resource_id=None, querystring=None, cache_key=None, many=True):
+def get_edx_api_data(api_config, user, resource, api=None, resource_id=None,
+                     querystring=None, cache_key=None, many=True, traverse_pagination=True):
     """GET data from an edX REST API.
 
     DRY utility for handling caching and pagination.
@@ -33,6 +33,7 @@ def get_edx_api_data(api_config, user, resource,
             (neither inspected nor updated).
         many (bool): Whether the resource requested is a collection of objects, or a single object.
             If false, an empty dict will be returned in cases of failure rather than the default empty list.
+        traverse_pagination (bool): Whether to traverse pagination or return paginated response..
 
     Returns:
         Data returned by the API. When hitting a list endpoint, extracts "results" (list of dict)
@@ -79,8 +80,10 @@ def get_edx_api_data(api_config, user, resource,
 
         if resource_id is not None:
             results = response
-        else:
+        elif traverse_pagination:
             results = _traverse_pagination(response, endpoint, querystring, no_data)
+        else:
+            results = response
     except:  # pylint: disable=bare-except
         log.exception('Failed to retrieve data from the %s API.', api_config.API_NAME)
         return no_data
