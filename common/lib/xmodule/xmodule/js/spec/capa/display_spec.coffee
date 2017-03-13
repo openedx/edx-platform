@@ -438,24 +438,10 @@ describe 'Problem', ->
         expect($('#answer_1_1')).toHaveHtml 'One'
         expect($('#answer_1_2')).toHaveHtml 'Two'
 
-      it 'sends a message to the window SR element', ->
-        spyOn($, 'postWithPrefix').and.callFake (url, callback) -> callback(answers: {})
-        @problem.show()
-        expect(window.SR.readText).toHaveBeenCalledWith 'Answers to this problem are now shown. Navigate through the problem to review it with answers inline.'
-
       it 'disables the show answer button', ->
         spyOn($, 'postWithPrefix').and.callFake (url, callback) -> callback(answers: {})
         @problem.show()
         expect(@problem.el.find('.show').attr('disabled')).toEqual('disabled')
-
-      it 'sends a SR message when answer is present', ->
-
-        spyOn($, 'postWithPrefix').and.callFake (url, callback) ->
-          callback answers:
-            '1_1': 'answers'
-        @problem.show()
-
-        expect(window.SR.readText).toHaveBeenCalledWith 'Answers to this problem are now shown. Navigate through the problem to review it with answers inline.'
 
       describe 'radio text question', ->
         radio_text_xml='''
