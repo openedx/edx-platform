@@ -16,14 +16,14 @@ from verified_track_content.models import VerifiedTrackCohortedCourse
 from xmodule.partitions.partitions import NoSuchUserPartitionGroupError, Group, UserPartition
 
 # TODO: how to make sure IDs are unique across all partitions?
-# TODO: show display names instead of slugs (add names in the groups method)
+# Note that course-specific display names will be set by the EnrollmentTrackUserPartition
 ENROLLMENT_GROUPS = {
-    CourseMode.HONOR: Group(91111, _('Honor')),
-    CourseMode.PROFESSIONAL: Group(91112, _('Professional')),
-    CourseMode.VERIFIED: Group(91113, _('Verified')),
-    CourseMode.AUDIT: Group(91114, _('Audit')),
-    CourseMode.NO_ID_PROFESSIONAL_MODE: Group(91115, _('No ID Professional')),
-    CourseMode.CREDIT_MODE: Group(91116, _('Credit'))
+    CourseMode.HONOR: Group(91111, CourseMode.HONOR),
+    CourseMode.PROFESSIONAL: Group(91112, CourseMode.PROFESSIONAL),
+    CourseMode.VERIFIED: Group(91113, CourseMode.VERIFIED),
+    CourseMode.AUDIT: Group(91114, CourseMode.AUDIT),
+    CourseMode.NO_ID_PROFESSIONAL_MODE: Group(91115, CourseMode.NO_ID_PROFESSIONAL_MODE),
+    CourseMode.CREDIT_MODE: Group(91116, CourseMode.CREDIT_MODE)
 }
 
 
@@ -35,7 +35,9 @@ class EnrollmentTrackUserPartition(UserPartition):
         course_key = CourseKey.from_string(self.parameters["course_id"]).for_branch(None)
         all_groups = []
         for mode in CourseMode.all_modes_for_courses([course_key])[course_key]:
-            all_groups.append(ENROLLMENT_GROUPS[mode.slug])
+            group = ENROLLMENT_GROUPS[mode.slug]
+            # group.name = mode.name
+            all_groups.append(group)
 
         return all_groups
 
