@@ -9,7 +9,8 @@ from mock import Mock
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from stevedore.extension import Extension, ExtensionManager
 from xmodule.partitions.partitions import (
-    Group, UserPartition, UserPartitionError, NoSuchUserPartitionGroupError, USER_PARTITION_SCHEME_NAMESPACE
+    Group, UserPartition, UserPartitionScheme, UserPartitionError,
+    NoSuchUserPartitionGroupError, USER_PARTITION_SCHEME_NAMESPACE
 )
 from xmodule.partitions.partitions_service import PartitionService
 
@@ -84,7 +85,7 @@ class TestGroup(TestCase):
         self.assertNotIn("programmer", group.to_json())
 
 
-class MockUserPartitionScheme(object):
+class MockUserPartitionScheme(UserPartitionScheme):
     """
     Mock user partition scheme
     """
@@ -93,6 +94,7 @@ class MockUserPartitionScheme(object):
         self.name = name
         self.current_group = current_group
 
+    @classmethod
     def get_group_for_user(self, course_id, user, user_partition, assign=True, track_function=None):  # pylint: disable=unused-argument
         """
         Returns the current group if set, else the first group from the specified user partition.

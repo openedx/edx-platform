@@ -8,7 +8,7 @@ from courseware.masquerade import (  # pylint: disable=import-error
     get_masquerading_group_info,
     is_masquerading_as_specific_student,
 )
-from xmodule.partitions.partitions import NoSuchUserPartitionGroupError
+from xmodule.partitions.partitions import UserPartitionScheme, NoSuchUserPartitionGroupError
 
 from .cohorts import get_cohort, get_group_info_for_cohort
 
@@ -16,7 +16,7 @@ from .cohorts import get_cohort, get_group_info_for_cohort
 log = logging.getLogger(__name__)
 
 
-class CohortPartitionScheme(object):
+class CohortPartitionScheme(UserPartitionScheme):
     """
     This scheme uses lms cohorts (CourseUserGroups) and cohort-partition
     mappings (CourseUserGroupPartitionGroup) to map lms users into Partition
