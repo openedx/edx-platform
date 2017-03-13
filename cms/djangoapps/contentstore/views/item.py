@@ -733,8 +733,8 @@ def _move_item(source_usage_key, target_parent_usage_key, user, target_index=Non
                 source_type=source_type,
                 target_parent_type=target_parent_type,
             )
-        elif source_parent.location == target_parent.location:
-            error = _('You can not move an item into the same parent.')
+        elif source_parent.location == target_parent.location or source_item.location in target_parent.children:
+            error = _('Item is already present in target location.')
         elif source_item.location == target_parent.location:
             error = _('You can not move an item into itself.')
         elif is_source_item_in_target_parents(source_item, target_parent):
@@ -761,16 +761,16 @@ def _move_item(source_usage_key, target_parent_usage_key, user, target_index=Non
         if error:
             return JsonResponse({'error': error}, status=400)
 
-        # Remove reference from old parent.
-        source_parent.children.remove(source_item.location)
-        store.update_item(source_parent, user.id)
-
         # When target_index is provided, insert xblock at target_index position, otherwise insert at the end.
         insert_at = target_index if target_index is not None else len(target_parent.children)
 
-        # Add to new parent at particular location.
-        target_parent.children.insert(insert_at, source_item.location)
-        store.update_item(target_parent, user.id)
+        store.update_item_parent(
+            item_location=source_item.location,
+            new_parent_location=target_parent.location,
+            old_parent_location=source_parent.location,
+            insert_at=insert_at,
+            user_id=user.id
+        )
 
         log.info(
             'MOVE: %s moved from %s to %s at %d index',
