@@ -796,6 +796,15 @@ class DraftModuleStore(MongoModuleStore):
             # If 2 versions versions exist, we can assume one is a published version. Go ahead and do the delete
             # of the draft version.
             if versions_found.count() > 1:
+                # Moving a child from published parent creates a draft of the parent and moved child.
+                published_version = [
+                    version
+                    for version in versions_found
+                    if version.get('_id').get('revision') != MongoRevisionKey.draft
+                ]
+                if len(published_version) > 0:
+                    # This change makes sure that parents are updated too i.e. an item will have only one parent.
+                    self.update_parent_if_moved(root_location, published_version[0], delete_draft_only, user_id)
                 self._delete_subtree(root_location, [as_draft], draft_only=True)
             elif versions_found.count() == 1:
                 # Since this method cannot be called on something in DIRECT_ONLY_CATEGORIES and we call
@@ -808,6 +817,28 @@ class DraftModuleStore(MongoModuleStore):
                     delete_draft_only(child_loc)
 
         delete_draft_only(location)
+
+    def update_parent_if_moved(self, original_parent_location, published_version, delete_draft_only, user_id):
+        """
+        Update parent of an item if it has moved.
+
+        Arguments:
+            original_parent_location (BlockUsageLocator)  : Original parent block locator.
+            published_version (dict)   : Published version of the block.
+            delete_draft_only (function)    : A callback function to delete draft children if it was moved.
+            user_id (int)   : User id
+        """
+        for child_location in published_version.get('definition', {}).get('children', []):
+            item_location = original_parent_location.course_key.make_usage_key_from_deprecated_string(child_location)
+            try:
+                source_item = self.get_item(item_location)
+            except ItemNotFoundError:
+                log.error('Unable to find the item %s', unicode(item_location))
+                return
+
+            if source_item.parent and source_item.parent.block_id != original_parent_location.block_id:
+                if self.update_item_parent(item_location, original_parent_location, source_item.parent, user_id):
+                    delete_draft_only(Location.from_deprecated_string(child_location))
 
     def _query_children_for_cache_children(self, course_key, items):
         # first get non-draft in a round-trip
