@@ -20,8 +20,8 @@
   },
   "devDependencies": {
     "edx-custom-a11y-rules": "0.1.3",
-    "eslint": "^2.13.1",
-    "eslint-config-edx": "^1.2.1",
+    "eslint-config-edx": "file:../eslint-config-edx/packages/eslint-config-edx",
+    "eslint-config-edx-es5": "file:../eslint-config-edx/packages/eslint-config-edx-es5",
     "jasmine-core": "^2.4.1",
     "jasmine-jquery": "^2.1.1",
     "karma": "^0.13.22",
