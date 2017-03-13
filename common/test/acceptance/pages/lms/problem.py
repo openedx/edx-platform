@@ -200,6 +200,15 @@ class ProblemPage(PageObject):
         self.wait_for(lambda: self.q(css='.notification.warning.notification-gentle-alert').focused,
                       'Waiting for the focus to be on the gentle alert notification')
 
+    def wait_for_show_answer_notification(self):
+        """
+        Wait for the show answer Notification to be present
+        """
+        self.wait_for_element_visibility('.notification.general.notification-show-answer',
+                                         'Waiting for Show Answer notification to be visible')
+        self.wait_for(lambda: self.q(css='.notification.general.notification-show-answer').focused,
+                      'Waiting for the focus to be on the show answer notification')
+
     def is_gentle_alert_notification_visible(self):
         """
         Is the Gentle Alert Notification visible?
