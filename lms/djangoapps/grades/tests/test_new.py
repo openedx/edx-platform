@@ -251,8 +251,8 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
                 self.assert_grade(grade, *expected_grade)
 
         verify_update_if_higher((1, 2), (1, 2))  # previous value was non-existent
-        verify_update_if_higher((2, 4), (1, 2))  # previous value was equivalent
-        verify_update_if_higher((1, 4), (1, 2))  # previous value was greater
+        verify_update_if_higher((2, 4), (2, 4))  # previous value was equivalent
+        verify_update_if_higher((1, 4), (2, 4))  # previous value was greater
         verify_update_if_higher((3, 4), (3, 4))  # previous value was less
 
     @patch.dict(settings.FEATURES, {'PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS': False})

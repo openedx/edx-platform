@@ -8,7 +8,7 @@ from courseware.model_data import ScoresClient
 from lms.djangoapps.grades.scores import get_score, possibly_scored
 from lms.djangoapps.grades.models import BlockRecord, PersistentSubsectionGrade
 from lms.djangoapps.grades.config.models import PersistentGradesEnabledFlag
-from openedx.core.lib.grade_utils import is_score_higher
+from openedx.core.lib.grade_utils import is_score_higher_or_equal
 from student.models import anonymous_id_for_user
 from submissions import api as submissions_api
 from xmodule import block_metadata_utils, graders
@@ -265,7 +265,7 @@ class SubsectionGradeFactory(object):
                 orig_subsection_grade = SubsectionGrade(subsection).init_from_model(
                     self.student, grade_model, self.course_structure, self._submissions_scores, self._csm_scores,
                 )
-                if not is_score_higher(
+                if not is_score_higher_or_equal(
                         orig_subsection_grade.graded_total.earned,
                         orig_subsection_grade.graded_total.possible,
                         calculated_grade.graded_total.earned,
