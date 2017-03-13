@@ -127,7 +127,7 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
         try:
             scheme = UserPartition.scheme_extensions[name].plugin
         except KeyError:
-            raise UserPartitionError("Unrecognized scheme {0}".format(name))
+            raise UserPartitionError("Unrecognized scheme '{0}'".format(name))
         scheme.name = name
         return scheme
 
