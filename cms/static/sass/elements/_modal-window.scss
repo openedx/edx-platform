@@ -485,7 +485,7 @@
     .visibility-controls-secondary {
       max-height: 100%;
       overflow-y: auto;
-      @include margin(($baseline*0.75), 0, 0, $baseline);
+      @include margin(0, 0, ($baseline*0.75), $baseline);
     }
 
     .visibility-controls-group {

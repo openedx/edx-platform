@@ -83,7 +83,6 @@ def delete_course_and_groups(course_key, user_id):
 def get_lms_link_for_item(location, preview=False):
     """
     Returns an LMS link to the course with a jump_to to the provided location.
-
     :param location: the location to jump to
     :param preview: True if the preview version of LMS should be returned. Default value is false.
     """
@@ -303,25 +302,18 @@ def get_group_display_name(user_partitions, xblock_display_name):
 def get_user_partition_info(xblock, schemes=None, course=None):
     """
     Retrieve user partition information for an XBlock for display in editors.
-
     * If a partition has been disabled, it will be excluded from the results.
-
     * If a group within a partition is referenced by the XBlock, but the group has been deleted,
       the group will be marked as deleted in the results.
-
     Arguments:
         xblock (XBlock): The courseware component being edited.
-
     Keyword Arguments:
         schemes (iterable of str): If provided, filter partitions to include only
             schemes with the provided names.
-
         course (XBlock): The course descriptor.  If provided, uses this to look up the user partitions
             instead of loading the course.  This is useful if we're calling this function multiple
             times for the same course want to minimize queries to the modulestore.
-
     Returns: list
-
     Example Usage:
     >>> get_user_partition_info(block, schemes=["cohort", "verification"])
     [
@@ -358,7 +350,6 @@ def get_user_partition_info(xblock, schemes=None, course=None):
             ]
         }
     ]
-
     """
     course = course or modulestore().get_course(xblock.location.course_key)
 
@@ -419,38 +410,39 @@ def get_user_partition_info(xblock, schemes=None, course=None):
 def get_visibility_partition_info(xblock):
     """
     Retrieve user partition information for the component visibility editor.
-
     This pre-processes partition information to simplify the template.
-
     Arguments:
         xblock (XBlock): The component being edited.
-
     Returns: dict
-
     """
-    user_partitions = get_user_partition_info(xblock, schemes=["verification", "cohort"])
+    user_partitions = get_user_partition_info(xblock, schemes=["verification", "enrollment_track", "cohort"])
     cohort_partitions = []
+    enrollment_mode_partitions = []
     verification_partitions = []
-    has_selected_groups = False
+    has_selected_content_groups = False
+    has_selected_enrollment_modes = False
     selected_verified_partition_id = None
 
     # Pre-process the partitions to make it easier to display the UI
     for p in user_partitions:
-        has_selected = any(g["selected"] for g in p["groups"])
-        has_selected_groups = has_selected_groups or has_selected
-
         if p["scheme"] == "cohort":
             cohort_partitions.append(p)
+            has_selected_content_groups = any(g["selected"] for g in p["groups"])
         elif p["scheme"] == "verification":
             verification_partitions.append(p)
-            if has_selected:
-                selected_verified_partition_id = p["id"]
+            # if has_selected:
+            #     selected_verified_partition_id = p["id"]
+        elif p["scheme"] == "enrollment_track":
+            enrollment_mode_partitions.append(p)
+            has_selected_enrollment_modes = any(g["selected"] for g in p["groups"])
 
     return {
         "user_partitions": user_partitions,
         "cohort_partitions": cohort_partitions,
+        "enrollment_mode_partitions": enrollment_mode_partitions,
         "verification_partitions": verification_partitions,
-        "has_selected_groups": has_selected_groups,
+        "has_selected_content_groups": has_selected_content_groups,
+        "has_selected_enrollment_modes": has_selected_enrollment_modes,
         "selected_verified_partition_id": selected_verified_partition_id,
     }
 
