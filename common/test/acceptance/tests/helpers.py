@@ -26,6 +26,7 @@ from openedx.core.lib.tests.assertions.events import assert_event_matches, is_ma
 from xmodule.partitions.partitions import UserPartition
 from xmodule.partitions.tests.test_partitions import MockUserPartitionScheme
 from selenium.common.exceptions import StaleElementReferenceException
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -213,7 +214,7 @@ def enable_css_animations(page):
     """)
 
 
-def select_option_by_text(select_browser_query, option_text):
+def select_option_by_text(select_browser_query, option_text, focus_out=False):
     """
     Chooses an option within a select by text (helper method for Select's select_by_visible_text method).
 
@@ -225,6 +226,8 @@ def select_option_by_text(select_browser_query, option_text):
         try:
             select = Select(query.first.results[0])
             select.select_by_visible_text(value)
+            if focus_out:
+                query.first.results[0].send_keys(Keys.TAB)
             return True
         except StaleElementReferenceException:
             return False
@@ -267,7 +270,7 @@ def generate_course_key(org, number, run):
     return CourseLocator(org, number, run, deprecated=(default_store == 'draft'))
 
 
-def select_option_by_value(browser_query, value):
+def select_option_by_value(browser_query, value, focus_out=False):
     """
     Selects a html select element by matching value attribute
     """
@@ -288,9 +291,10 @@ def select_option_by_value(browser_query, value):
                 if not opt.is_selected():
                     all_options_selected = False
                     opt.click()
-        # if value is not an option choice then it should return false
         if all_options_selected and not has_option:
             all_options_selected = False
+        if focus_out:
+            browser_query.first.results[0].send_keys(Keys.TAB)
         return all_options_selected
 
     # Make sure specified option is actually selected
