@@ -188,12 +188,11 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
         if not scheme:
             raise TypeError("UserPartition dict {0} has unrecognized scheme {1}".format(value, scheme_id))
 
-        return UserPartition(
+        return scheme.create_user_partition(
             value["id"],
             value["name"],
             value["description"],
             groups,
-            scheme,
             parameters,
             active,
         )

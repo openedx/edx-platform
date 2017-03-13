@@ -906,14 +906,18 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
 
         try:
             verification_track_scheme = UserPartition.get_scheme("enrollment_track")
-            self.user_partitions.append(
-                verification_track_scheme.create_user_partition(
-                    id=1, # Since this is the first user partition to be created, there should be no id collisions.
-                    name=_(u"Enrollment Track Partition"),
-                    description=_(u"Partition for segmenting users by enrollment track"),
-                    parameters={"course_id": unicode(self.id)}
-                 )
-            )
+            if len(self.get_user_partitions_for_scheme(verification_track_scheme)) == 0:
+                used_ids = set(p.id for p in self.user_partitions)
+                max_id = 1 if len(used_ids) == 0 else max(used_ids)
+                self.user_partitions.append(
+                    verification_track_scheme.create_user_partition(
+                        id=max_id+1,
+                        name=_(u"Enrollment Track Partition"),
+                        description=_(u"Partition for segmenting users by enrollment track"),
+                        parameters={"course_id": unicode(self.id)}
+                     )
+                )
+
         except UserPartitionError:
             log.warning(
                 "No 'enrollment_track' scheme registered, EnrollmentTrackUserPartition will not be created."

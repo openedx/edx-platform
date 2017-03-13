@@ -31,7 +31,8 @@ class EnrollmentTrackUserPartition(UserPartition):
 
     @property
     def groups(self):
-        course_key = CourseKey.from_string(self.parameters["course_id"])
+        # Note that when the key is stored during course_module creation, it is the draft version.
+        course_key = CourseKey.from_string(self.parameters["course_id"]).for_branch(None)
         all_groups = []
         for mode in CourseMode.all_modes_for_courses([course_key])[course_key]:
             all_groups.append(ENROLLMENT_GROUPS[mode.slug])
@@ -81,7 +82,7 @@ class EnrollmentTrackPartitionScheme(object):
             return None
 
     @classmethod
-    def create_user_partition(cls, id, name, description, groups=None, parameters=None, active=None):
+    def create_user_partition(cls, id, name, description, groups=None, parameters=None, active=True):
         return EnrollmentTrackUserPartition(id, name, description, [], cls, parameters, active)
 
     @classmethod
