@@ -5,11 +5,11 @@ from __future__ import absolute_import
 
 import base64
 import json
-import logging
 import os
 import shutil
 import tarfile
 from datetime import datetime
+from tempfile import NamedTemporaryFile, mkdtemp
 
 from celery.task import task
 from celery.utils.log import get_task_logger
@@ -20,17 +20,19 @@ from six import iteritems, text_type
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import SuspiciousOperation
+from django.core.files import File
 from django.test import RequestFactory
 from django.utils.text import get_valid_filename
 from django.utils.translation import ugettext as _
 
 from djcelery.common import respect_language
+from user_tasks.models import UserTaskArtifact, UserTaskStatus
 from user_tasks.tasks import UserTask
 
 import dogstats_wrapper as dog_stats_api
 from contentstore.courseware_index import CoursewareSearchIndexer, LibrarySearchIndexer, SearchIndexingError
 from contentstore.storage import course_import_export_storage
-from contentstore.utils import initialize_permissions
+from contentstore.utils import initialize_permissions, reverse_usage_url
 from course_action_state.models import CourseRerunState
 from models.settings.course_metadata import CourseMetadata
 from opaque_keys.edx.keys import CourseKey
@@ -39,9 +41,11 @@ from openedx.core.lib.extract_tar import safetar_extractall
 from student.auth import has_course_author_access
 from xmodule.contentstore.django import contentstore
 from xmodule.course_module import CourseFields
+from xmodule.exceptions import SerializationError
 from xmodule.modulestore import COURSE_ROOT, LIBRARY_ROOT
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import DuplicateCourseError, ItemNotFoundError
+from xmodule.modulestore.xml_exporter import export_course_to_xml, export_library_to_xml
 from xmodule.modulestore.xml_importer import import_course_from_xml, import_library_from_xml
 
 
@@ -153,6 +157,136 @@ def push_course_update_task(course_key_string, course_subscription_id, course_di
     # TODO Use edx-notifications library instead (MA-638).
     from .push_notification import send_push_course_update
     send_push_course_update(course_key_string, course_subscription_id, course_display_name)
+
+
+class CourseExportTask(UserTask):  # pylint: disable=abstract-method
+    """
+    Base class for course and library export tasks.
+    """
+
+    @staticmethod
+    def calculate_total_steps(arguments_dict):
+        """
+        Get the number of in-progress steps in the export process, as shown in the UI.
+
+        For reference, these are:
+
+        1. Exporting
+        2. Compressing
+        """
+        return 2
+
+    @classmethod
+    def generate_name(cls, arguments_dict):
+        """
+        Create a name for this particular import task instance.
+
+        Arguments:
+            arguments_dict (dict): The arguments given to the task function
+
+        Returns:
+            text_type: The generated name
+        """
+        key = arguments_dict[u'course_key_string']
+        return u'Export of {}'.format(key)
+
+
+@task(base=CourseExportTask, bind=True)
+def export_olx(self, user_id, course_key_string, language):
+    """
+    Export a course or library to an OLX .tar.gz archive and prepare it for download.
+    """
+    courselike_key = CourseKey.from_string(course_key_string)
+
+    try:
+        user = User.objects.get(pk=user_id)
+    except User.DoesNotExist:
+        with respect_language(language):
+            self.status.fail(_(u'Unknown User ID: {0}').format(user_id))
+        return
+    if not has_course_author_access(user, courselike_key):
+        with respect_language(language):
+            self.status.fail(_(u'Permission denied'))
+        return
+
+    if isinstance(courselike_key, LibraryLocator):
+        courselike_module = modulestore().get_library(courselike_key)
+    else:
+        courselike_module = modulestore().get_course(courselike_key)
+
+    try:
+        self.status.set_state(u'Exporting')
+        tarball = create_export_tarball(courselike_module, courselike_key, {}, self.status)
+        artifact = UserTaskArtifact(status=self.status, name=u'Output')
+        artifact.file.save(name=tarball.name, content=File(tarball))  # pylint: disable=no-member
+        artifact.save()
+    # catch all exceptions so we can record useful error messages
+    except Exception as exception:  # pylint: disable=broad-except
+        LOGGER.exception(u'Error exporting course %s', courselike_key)
+        if self.status.state != UserTaskStatus.FAILED:
+            self.status.fail({'raw_error_msg': text_type(exception)})
+        return
+
+
+def create_export_tarball(course_module, course_key, context, status=None):
+    """
+    Generates the export tarball, or returns None if there was an error.
+
+    Updates the context with any error information if applicable.
+    """
+    name = course_module.url_name
+    export_file = NamedTemporaryFile(prefix=name + '.', suffix=".tar.gz")
+    root_dir = path(mkdtemp())
+
+    try:
+        if isinstance(course_key, LibraryLocator):
+            export_library_to_xml(modulestore(), contentstore(), course_key, root_dir, name)
+        else:
+            export_course_to_xml(modulestore(), contentstore(), course_module.id, root_dir, name)
+
+        if status:
+            status.set_state(u'Compressing')
+            status.increment_completed_steps()
+        LOGGER.debug(u'tar file being generated at %s', export_file.name)
+        with tarfile.open(name=export_file.name, mode='w:gz') as tar_file:
+            tar_file.add(root_dir / name, arcname=name)
+
+    except SerializationError as exc:
+        LOGGER.exception(u'There was an error exporting %s', course_key)
+        parent = None
+        try:
+            failed_item = modulestore().get_item(exc.location)
+            parent_loc = modulestore().get_parent_location(failed_item.location)
+
+            if parent_loc is not None:
+                parent = modulestore().get_item(parent_loc)
+        except:  # pylint: disable=bare-except
+            # if we have a nested exception, then we'll show the more generic error message
+            pass
+
+        context.update({
+            'in_err': True,
+            'raw_err_msg': str(exc),
+            'edit_unit_url': reverse_usage_url("container_handler", parent.location) if parent else "",
+        })
+        if status:
+            status.fail(json.dumps({'raw_error_msg': context['raw_err_msg'],
+                                    'edit_unit_url': context['edit_unit_url']}))
+        raise
+    except Exception as exc:
+        LOGGER.exception('There was an error exporting %s', course_key)
+        context.update({
+            'in_err': True,
+            'edit_unit_url': None,
+            'raw_err_msg': str(exc)})
+        if status:
+            status.fail(json.dumps({'raw_error_msg': context['raw_err_msg']}))
+        raise
+    finally:
+        if os.path.exists(root_dir / name):
+            shutil.rmtree(root_dir / name)
+
+    return export_file
 
 
 class CourseImportTask(UserTask):  # pylint: disable=abstract-method

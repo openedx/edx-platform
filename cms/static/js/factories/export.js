@@ -1,66 +1,57 @@
-define(['gettext', 'common/js/components/views/feedback_prompt'], function(gettext, PromptView) {
+define([
+    'domReady', 'js/views/export', 'jquery', 'gettext'
+], function(domReady, Export, $, gettext) {
     'use strict';
-    return function(hasUnit, editUnitUrl, courselikeHomeUrl, library, errMsg) {
-        var dialog;
-        if (hasUnit) {
-            dialog = new PromptView({
-                title: gettext('There has been an error while exporting.'),
-                message: gettext('There has been a failure to export to XML at least one component. It is recommended that you go to the edit page and repair the error before attempting another export. Please check that all components on the page are valid and do not display any error messages.'),
-                intent: 'error',
-                actions: {
-                    primary: {
-                        text: gettext('Correct failed component'),
-                        click: function(view) {
-                            view.hide();
-                            document.location = editUnitUrl;
-                        }
-                    },
-                    secondary: {
-                        text: gettext('Return to Export'),
-                        click: function(view) {
-                            view.hide();
+    return function(courselikeHomeUrl, library, statusUrl) {
+        var $submitBtn = $('.action-export'),
+            unloading = false,
+            previousExport = Export.storedExport(courselikeHomeUrl);
+
+        var onComplete = function() {
+            $submitBtn.show();
+        };
+
+        var startExport = function(e) {
+            e.preventDefault();
+            $submitBtn.hide();
+            Export.reset(library);
+            Export.start(statusUrl).then(onComplete);
+            $.ajax({
+                type: 'POST',
+                url: window.location.pathname,
+                data: {},
+                success: function(result, textStatus, xhr) {
+                    if (xhr.status === 200) {
+                        setTimeout(function() { Export.pollStatus(result); }, 1000);
+                    } else {
+                        // It could be that the user is simply refreshing the page
+                        // so we need to be sure this is an actual error from the server
+                        if (!unloading) {
+                            $(window).off('beforeunload.import');
+
+                            Export.reset(library);
+                            onComplete();
+
+                            Export.showError(gettext('Your export has failed.'));
                         }
                     }
                 }
             });
-        } else {
-            var msg = '<p>';
-            var action;
-            if (library) {
-                msg += gettext('Your library could not be exported to XML. There is not enough information to identify the failed component. Inspect your library to identify any problematic components and try again.');
-                action = gettext('Take me to the main library page');
-            } else {
-                msg += gettext('Your course could not be exported to XML. There is not enough information to identify the failed component. Inspect your course to identify any problematic components and try again.');
-                action = gettext('Take me to the main course page');
+        };
+
+        $(window).on('beforeunload', function() { unloading = true; });
+
+        // Display the status of last file upload on page load
+        if (previousExport) {
+            if (previousExport.completed !== true) {
+                $submitBtn.hide();
             }
-            msg += '</p><p>' + gettext('The raw error message is:') + '</p>' + errMsg;
-            dialog = new PromptView({
-                title: gettext('There has been an error with your export.'),
-                message: msg,
-                intent: 'error',
-                actions: {
-                    primary: {
-                        text: action,
-                        click: function(view) {
-                            view.hide();
-                            document.location = courselikeHomeUrl;
-                        }
-                    },
-                    secondary: {
-                        text: gettext('Cancel'),
-                        click: function(view) {
-                            view.hide();
-                        }
-                    }
-                }
-            });
+            Export.resume(library).then(onComplete);
         }
 
-        // The CSS animation for the dialog relies on the 'js' class
-        // being on the body. This happens after this JavaScript is executed,
-        // causing a 'bouncing' of the dialog after it is initially shown.
-        // As a workaround, add this class first.
-        $('body').addClass('js');
-        dialog.show();
+        domReady(function() {
+            // export form setup
+            $submitBtn.bind('click', startExport);
+        });
     };
 });
