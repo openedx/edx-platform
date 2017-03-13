@@ -12,10 +12,6 @@ from django.utils.translation import ugettext as _
 from openedx.core.djangolib.markup import HTML, Text
 %>
 
-<%static:require_module_async module_name="course_experience/js/course_outline_factory" class_name="CourseOutlineFactory">
-    CourseOutlineFactory('.block-tree');
-</%static:require_module_async>
-
 <main role="main" class="course-outline" id="main" tabindex="-1">
     % if blocks.get('children'):
         <ol class="block-tree" role="tree">
@@ -163,3 +159,7 @@ from openedx.core.djangolib.markup import HTML, Text
 <%static:require_module_async module_name="js/dateutil_factory" class_name="DateUtilFactory">
     DateUtilFactory.transform('.localized-datetime');
 </%static:require_module_async>
+
+<%static:webpack entry="CourseOutline">
+    new CourseOutline('.block-tree');
+</%static:webpack>
