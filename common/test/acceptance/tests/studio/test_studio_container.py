@@ -17,7 +17,7 @@ from common.test.acceptance.pages.lms.staff_view import StaffPage
 from common.test.acceptance.tests.helpers import create_user_partition_json
 
 import datetime
-from bok_choy.promise import Promise, EmptyPromise
+import ddt
 from base_studio_test import ContainerBase
 from xmodule.partitions.partitions import Group
 
@@ -1131,6 +1131,7 @@ class ProblemCategoryTabsTest(ContainerBase):
 
 
 @attr(shard=1)
+@ddt.ddt
 class MoveComponentTest(ContainerBase):
     """
     Tests of moving an XBlock to another XBlock.
@@ -1220,6 +1221,30 @@ class MoveComponentTest(ContainerBase):
             component_display_names_after_operation
         )
 
+    def verify_state_change(self, unit_page, operation):
+        """
+        Verify that after state change, confirmation message is hidden.
+
+        Arguments:
+            unit_page (Object)  Unit container page.
+            operation (String)  Publish or discard changes operation.
+        """
+        # Verify unit in draft state now
+        self.container.verify_publish_title(self.DRAFT_STATUS)
+
+        # Now click publish/discard button
+        if operation == 'publish':
+            unit_page.publish_action.click()
+        else:
+            unit_page.discard_changes()
+
+        # Now verify success message is hidden
+        self.container.verify_publish_title(self.PUBLISHED_LIVE_STATUS)
+        self.container.verify_confirmation_message(
+            message=self.message_move.format(display_name=self.source_component_display_name),
+            verify_hidden=True
+        )
+
     def test_move_component_successfully(self):
         """
         Test if we can move a component successfully.
@@ -1267,6 +1292,40 @@ class MoveComponentTest(ContainerBase):
             operation='undo_move',
             component_display_names_after_operation=['HTML 11', 'HTML 12']
         )
+
+    @ddt.data('publish', 'discard')
+    def test_publish_discard_changes_afer_move(self, operation):
+        """
+        Test if success banner is hidden when we  discard changes or publish the unit after a move operation.
+
+        Given I am a staff user
+        And I go to unit page in first section
+        And I open the move modal
+        And I navigate to unit in second section
+        And I see move button is enabled
+        When I click on the move button
+        Then I see move operation success message
+        And When I click on publish or discard changes button
+        Then I see move operation success message is hidden.
+        """
+        unit_page = self.go_to_unit_page(unit_name='Test Unit 1')
+        components = unit_page.displayed_children
+        self.assertEqual(len(components), 2)
+
+        components[0].open_move_modal()
+        self.move_modal_view.navigate_to_category(self.source_xblock_category, self.navigation_options)
+        self.assertEqual(self.move_modal_view.is_move_button_enabled, True)
+
+        # Verify unit is in published state before move operation
+        self.container.verify_publish_title(self.PUBLISHED_LIVE_STATUS)
+
+        self.move_modal_view.click_move_button()
+        self.container.verify_confirmation_message(
+            self.message_move.format(display_name=self.source_component_display_name)
+        )
+        self.assertEqual(len(unit_page.displayed_children), 1)
+
+        self.verify_state_change(unit_page, operation)
 
     def test_content_experiment(self):
         """

@@ -1126,6 +1126,24 @@ class TestMoveItem(ItemTest):
         response = json.loads(response.content)
         self.assertEqual(response['error'], 'Patch request did not recognise any parameters to handle.')
 
+    @patch('contentstore.views.item.log')
+    def test_move_logging(self, mock_logger):
+        """
+        Test logging when an item is successfully moved.
+
+        Arguments:
+            mock_logger (object):  A mock logger object.
+        """
+        insert_at = 0
+        self.assert_move_item(self.html_usage_key, self.vert2_usage_key, insert_at)
+        mock_logger.info.assert_called_with(
+            'MOVE: %s moved from %s to %s at %d index',
+            unicode(self.html_usage_key),
+            unicode(self.vert_usage_key),
+            unicode(self.vert2_usage_key),
+            insert_at
+        )
+
 
 class TestDuplicateItemWithAsides(ItemTest, DuplicateHelper):
     """
