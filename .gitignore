@@ -95,6 +95,8 @@ lms/static/css/
 lms/static/certificates/css/
 cms/static/css/
 common/static/common/js/vendor/
+common/static/bundles
+webpack-stats.json
 
 ### Styling generated from templates
 lms/static/sass/*.css
