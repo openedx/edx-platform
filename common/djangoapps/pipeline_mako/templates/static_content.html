@@ -85,6 +85,26 @@ engine = Engine(dirs=settings.DEFAULT_TEMPLATE_ENGINE['DIRS'])
 source, template_path = Loader(engine).load_template_source(path)
 %>${source | n, decode.utf8}</%def>
 
+<%def name="webpack(entry)">
+    <%doc>
+        Loads Javascript onto your page from a Webpack-generated bundle.
+        Uses the Django template engine because our webpack loader only provides template tags for Jinja and Django.
+    </%doc>
+    <%
+        from django.template import Template, Context
+        return Template("""
+            {% load render_bundle from webpack_loader %}
+            {% render_bundle entry %}
+            <script type="text/javascript">
+                {% autoescape off %}{{ body }}{% endautoescape %}
+            </script>
+        """).render(Context({
+            'entry': entry,
+            'body': capture(caller.body)
+        }))
+    %>
+</%def>
+
 <%def name="require_module(module_name, class_name)">
     <%doc>
       Loads Javascript onto your page synchronously.
