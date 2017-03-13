@@ -33,34 +33,34 @@ class HelpContextProcessorTest(TestCase):
 
     def test_get_doc_url(self):
         # Test default values.
-        self.assertEqual(
-            "http://edx.readthedocs.io/projects/open-edx-learner-guide/en/latest/index.html",
-            self._get_doc_url()
+        self.assertRegexpMatches(
+            self._get_doc_url(),
+            "http://edx.readthedocs.io/projects/open-edx-learner-guide/en/.*/index.html"
         )
 
         # Provide a known page_token.
-        self.assertEqual(
-            "http://edx.readthedocs.io/projects/open-edx-learner-guide/en/latest/sfd_dashboard_profile/index.html",
-            self._get_doc_url('profile')
+        self.assertRegexpMatches(
+            self._get_doc_url('profile'),
+            "http://edx.readthedocs.io/projects/open-edx-learner-guide/en/.*/sfd_dashboard_profile/index.html"
         )
 
         # Use settings.DOC_LINK_BASE_URL to override default base_url.
         with patch('django.conf.settings.DOC_LINK_BASE_URL', 'settings_base_url'):
-            self.assertEqual(
-                "settings_base_url/en/latest/SFD_instructor_dash_help.html",
-                self._get_doc_url('instructor')
+            self.assertRegexpMatches(
+                self._get_doc_url('instructor'),
+                "settings_base_url/en/.*/SFD_instructor_dash_help.html"
             )
 
     def test_get_pdf_url(self):
         # Test default values.
-        self.assertEqual(
-            "https://media.readthedocs.org/pdf/open-edx-learner-guide/latest/open-edx-learner-guide.pdf",
-            self._get_pdf_url()
+        self.assertRegexpMatches(
+            self._get_pdf_url(),
+            "https://media.readthedocs.org/pdf/open-edx-learner-guide/.*/open-edx-learner-guide.pdf"
         )
 
         # Use settings.DOC_LINK_BASE_URL to override default base_url.
         with patch('django.conf.settings.DOC_LINK_BASE_URL', 'settings_base_url'):
-            self.assertEqual(
-                "settings_base_url/latest/open-edx-learner-guide.pdf",
-                self._get_pdf_url()
+            self.assertRegexpMatches(
+                self._get_pdf_url(),
+                "settings_base_url/.*/open-edx-learner-guide.pdf"
             )
