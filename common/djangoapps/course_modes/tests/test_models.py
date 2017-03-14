@@ -16,7 +16,7 @@ from opaque_keys.edx.locator import CourseLocator
 import pytz
 
 from course_modes.helpers import enrollment_mode_display
-from course_modes.models import CourseMode, Mode
+from course_modes.models import CourseMode, Mode, EnrollmentMode
 from course_modes.tests.factories import CourseModeFactory
 
 
@@ -471,3 +471,22 @@ class CourseModeModelTest(TestCase):
             self.assertTrue(is_error_expected, "Did not expect a ValidationError to be thrown.")
         else:
             self.assertFalse(is_error_expected, "Expected a ValidationError to be thrown.")
+
+
+class EnrollmentModeTest(TestCase):
+    """
+    Tests for EnrollmentMode Model.
+    """
+    def tearDown(self):
+        super(EnrollmentModeTest, self).tearDown()
+        EnrollmentMode.objects.all().delete()
+
+    def test_default_mode_ids(self):
+        """
+        Test that the generated mode IDs are small integers (we never expect this table to grow large).
+        """
+        EnrollmentMode.objects.get_or_create(mode_slug="audit")
+        EnrollmentMode.objects.get_or_create(mode_slug="verified")
+        modes = EnrollmentMode.objects.all()
+        for mode in modes:
+            self.assertLess(mode.id, 100, "Mode IDs must be less than 100")

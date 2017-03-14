@@ -26,6 +26,25 @@ Mode = namedtuple('Mode',
                   ])
 
 
+class EnrollmentMode(models.Model):
+    """
+    A model for storing attributes of an enrollment mode. Currently used mostly for
+    the EnrollmentTrackUserPartition, but this could be extended to add properties of enrollment
+    modes (for example, that "verified" and "professional" issue certificates, but "audit" does not.
+    """
+    class Meta(object):
+        app_label = "course_modes"
+
+    # TODO: should we try to tie "mode_slug" in CourseMode and this together?
+    mode_slug = models.CharField(max_length=100, unique=True)
+
+    def __unicode__(self):
+        """ Return a string representation """
+        return u"EnrollmentMode {} (id={})".format(
+            self.mode_slug, self.id
+        )
+
+
 class CourseMode(models.Model):
     """
     We would like to offer a course in a variety of modes.

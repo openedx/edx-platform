@@ -5,8 +5,8 @@ from __future__ import absolute_import
 
 from django.conf import settings
 
-from xmodule.partitions.partitions import UserPartition
-from xblock.fields import Scope, Boolean, String, Float, XBlockMixin, Dict, Integer, List
+from xmodule.partitions.partitions import UserPartitionList
+from xblock.fields import Scope, Boolean, String, Float, XBlockMixin, Dict, Integer
 from xblock.runtime import KeyValueStore, KvsFieldData
 from xmodule.fields import Date, Timedelta
 from ..course_metadata_utils import DEFAULT_START_DATE
@@ -15,16 +15,6 @@ from ..course_metadata_utils import DEFAULT_START_DATE
 # Make '_' a no-op so we can scrape strings
 # Using lambda instead of `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
-
-
-class UserPartitionList(List):
-    """Special List class for listing UserPartitions"""
-    def from_json(self, values):
-        return [UserPartition.from_json(v) for v in values]
-
-    def to_json(self, values):
-        return [user_partition.to_json()
-                for user_partition in values]
 
 
 class InheritanceMixin(XBlockMixin):
@@ -147,6 +137,7 @@ class InheritanceMixin(XBlockMixin):
     )
     # This is should be scoped to content, but since it's defined in the policy
     # file, it is currently scoped to settings.
+    # user_partitions should be removed from this file-- See TNL-6738.
     user_partitions = UserPartitionList(
         display_name=_("Group Configurations"),
         help=_("Enter the configurations that govern how students are grouped together."),

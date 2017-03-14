@@ -13,7 +13,7 @@ from xmodule.seq_module import SequenceDescriptor
 from xmodule.studio_editable import StudioEditableModule, StudioEditableDescriptor
 from xmodule.x_module import XModule, module_attr, STUDENT_VIEW
 from xmodule.validation import StudioValidation, StudioValidationMessage
-from xmodule.modulestore.inheritance import UserPartitionList
+from xmodule.partitions.partitions import UserPartitionList
 
 from lxml import etree
 
