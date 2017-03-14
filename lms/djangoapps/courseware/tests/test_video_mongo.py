@@ -854,6 +854,46 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
             )
 
+    @patch('xmodule.video_module.video_module.edxval_api.get_urls_for_profiles')
+    def test_get_html_hls(self, get_urls_for_profiles):
+        """
+        Verify that hls profile functionality works as expected.
+
+        * HLS source should be added into list of available sources
+        * HLS source should not be used for download URL If available from edxval
+        """
+        video_xml = '<video display_name="Video" download_video="true" edx_video_id="12345-67890">[]</video>'
+
+        get_urls_for_profiles.return_value = {
+            'desktop_webm': 'https://webm.com/dw.webm',
+            'hls': 'https://hls.com/hls.m3u8',
+            'youtube': 'https://yt.com/?v=v0TFmdO4ZP0',
+            'desktop_mp4': 'https://mp4.com/dm.mp4'
+        }
+
+        self.initialize_module(data=video_xml)
+        context = self.item_descriptor.render(STUDENT_VIEW).content
+
+        self.assertIn("'download_video_link': 'https://mp4.com/dm.mp4'", context)
+        self.assertIn('"streams": "1.00:https://yt.com/?v=v0TFmdO4ZP0"', context)
+        self.assertIn(
+            '"sources": ["https://webm.com/dw.webm", "https://mp4.com/dm.mp4", "https://hls.com/hls.m3u8"]', context
+        )
+
+    def test_get_html_hls_no_video_id(self):
+        """
+        Verify that `download_video_link` is set to None for HLS videos if no video id
+        """
+        video_xml = """
+        <video display_name="Video" download_video="true" source="https://hls.com/hls.m3u8">
+        ["https://hls.com/hls2.m3u8", "https://hls.com/hls3.m3u8"]
+        </video>
+        """
+
+        self.initialize_module(data=video_xml)
+        context = self.item_descriptor.render(STUDENT_VIEW).content
+        self.assertIn("'download_video_link': None", context)
+
 
 @attr(shard=1)
 class TestVideoCDNRewriting(BaseTestXmodule):
