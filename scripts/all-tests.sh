@@ -10,33 +10,66 @@ set -e
 #
 ###############################################################################
 
-# Violations thresholds for failing the build
-export PYLINT_THRESHOLD=3600
-export ESLINT_THRESHOLD=9850
+# echo 'Printing environment variables'
+# env
 
-SAFELINT_THRESHOLDS=`cat scripts/safelint_thresholds.json`
-export SAFELINT_THRESHOLDS=${SAFELINT_THRESHOLDS//[[:space:]]/}
+echo 'Machine specs'
+top -n 1 | head -n 20
 
-doCheckVars() {
-    if [ -n "$CIRCLECI" ] ; then
-        SCRIPT_TO_RUN=scripts/circle-ci-tests.sh
+echo '-------------------'
 
-    elif [ -n "$JENKINS_HOME" ] ; then
-        source scripts/jenkins-common.sh
-        SCRIPT_TO_RUN=scripts/generic-ci-tests.sh
-    fi
-}
+echo 'CPU information'
+lscpu
 
-# Determine the CI system for the environment
-doCheckVars
+echo '-------------------'
 
-# Run appropriate CI system script
-if [ -n "$SCRIPT_TO_RUN" ] ; then
-    $SCRIPT_TO_RUN
+echo 'Linux release'
+lsb_release -a
 
-    # Exit with the exit code of the called script
-    exit $?
-else
-    echo "ERROR. Could not detect continuous integration system."
-    exit 1
+echo '-------------------'
+
+echo 'Google Chrome version'
+google-chrome --version
+
+echo '-------------------'
+
+echo 'Google Chrome driver version'
+# Port 80 should fail, and that's what I want!
+chromedriver --port=80 || true
+
+echo '-------------------'
+
+echo 'XVFB status'
+dpkg -l xvfb || true
+
+echo '-------------------'
+
+echo 'Machine meta data'
+curl http://169.254.169.254/latest/meta-data/
+
+echo '-------------------'
+
+echo 'Python virtualenv info'
+ls -lah $HOME/edx-venv_clean.tar.gz
+
+echo '-------------------'
+
+echo 'dpkg -l'
+dpkg -l
+
+echo '-------------------'
+
+echo 'pip freeze'
+# Reset the jenkins worker's virtualenv back to the
+# state it was in when the instance was spun up.
+if [ -e $HOME/edx-venv_clean.tar.gz ]; then
+    rm -rf $HOME/edx-venv
+    tar -C $HOME -xf $HOME/edx-venv_clean.tar.gz
 fi
+
+bash -c 'source $HOME/edx-venv/bin/activate && pip freeze'
+
+echo '-------------------'
+
+echo 'ls -lah for pip packages'
+ls -lah source $HOME/edx-venv/lib/python2.7/
