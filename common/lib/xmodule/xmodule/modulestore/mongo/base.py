@@ -47,6 +47,7 @@ from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished
 from xmodule.modulestore.edit_info import EditInfoRuntimeMixin
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError, ReferentialIntegrityError
 from xmodule.modulestore.inheritance import InheritanceMixin, inherit_metadata, InheritanceKeyValueStore
+from xmodule.partitions.partitions_service import PartitionService
 from xmodule.modulestore.xml import CourseLocationManager
 from xmodule.modulestore.store_utilities import DETACHED_XBLOCK_TYPES
 from xmodule.services import SettingsService
@@ -934,6 +935,8 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             if self.request_cache:
                 services["request_cache"] = self.request_cache
 
+            services["partitions"] = PartitionService(course_key)
+
             system = CachingDescriptorSystem(
                 modulestore=self,
                 course_key=course_key,
@@ -1345,6 +1348,8 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
 
             if self.user_service:
                 services["user"] = self.user_service
+
+            services["partitions"] = PartitionService(course_key)
 
             runtime = CachingDescriptorSystem(
                 modulestore=self,

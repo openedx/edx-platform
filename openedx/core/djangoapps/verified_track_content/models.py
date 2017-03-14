@@ -8,9 +8,9 @@ from django.db.models.signals import post_save, pre_save
 
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from student.models import CourseEnrollment
-from courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.courses import get_course_by_id
 
-from verified_track_content.tasks import sync_cohort_with_mode
+from openedx.core.djangoapps.verified_track_content.tasks import sync_cohort_with_mode
 from openedx.core.djangoapps.course_groups.cohorts import (
     get_course_cohorts, CourseCohort, is_course_cohorted, get_random_cohort
 )

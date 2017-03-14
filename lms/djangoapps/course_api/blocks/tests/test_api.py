@@ -146,7 +146,7 @@ class TestGetBlocksQueryCounts(SharedModuleStoreTestCase):
             self._get_blocks(
                 course,
                 expected_mongo_queries=0,
-                expected_sql_queries=3 if with_storage_backing else 2,
+                expected_sql_queries=5 if with_storage_backing else 4,
             )
 
     @ddt.data(
@@ -164,5 +164,5 @@ class TestGetBlocksQueryCounts(SharedModuleStoreTestCase):
             self._get_blocks(
                 course,
                 expected_mongo_queries,
-                expected_sql_queries=11 if with_storage_backing else 3,
+                expected_sql_queries=13 if with_storage_backing else 5,
             )
