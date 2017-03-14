@@ -16,6 +16,7 @@ from xmodule.x_module import PREVIEW_VIEWS, STUDENT_VIEW, AUTHOR_VIEW
 from xmodule.contentstore.django import contentstore
 from xmodule.error_module import ErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
+from xmodule.partitions.partitions_service import PartitionService
 from xmodule.studio_editable import has_author_view
 from xmodule.services import SettingsService
 from xmodule.modulestore.django import modulestore, ModuleI18nService
@@ -213,8 +214,22 @@ def _preview_module_system(request, descriptor, field_data):
             "i18n": ModuleI18nService,
             "settings": SettingsService(),
             "user": DjangoXBlockUserService(request.user),
+            "partitions": StudioPartitionService(course_id=course_id)
         },
     )
+
+
+class StudioPartitionService(PartitionService):
+    """
+    A runtime mixin to allow the display and editing of component visibility based on user partitions.
+    """
+    def get_user_group_id_for_partition(self, user, user_partition_id):
+        """
+        Override this method to return None, as the split_test_module calls this
+        to determine which group a user should see, but is robust to getting a return
+        value of None meaning that all groups should be shown.
+        """
+        return None
 
 
 def _load_preview_module(request, descriptor):

@@ -4,8 +4,8 @@ Django admin page for verified track configuration
 
 from django.contrib import admin
 
-from verified_track_content.forms import VerifiedTrackCourseForm
-from verified_track_content.models import VerifiedTrackCohortedCourse
+from openedx.core.djangoapps.verified_track_content.forms import VerifiedTrackCourseForm
+from openedx.core.djangoapps.verified_track_content.models import VerifiedTrackCohortedCourse
 
 
 @admin.register(VerifiedTrackCohortedCourse)

@@ -14,6 +14,7 @@ from django_comment_common.utils import seed_permissions_roles
 
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
+from xmodule.partitions.partitions_service import get_all_partitions_for_course
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -373,11 +374,11 @@ def get_user_partition_info(xblock, schemes=None, course=None):
         schemes = set(schemes)
 
     partitions = []
-    for p in sorted(course.user_partitions, key=lambda p: p.name):
+    for p in sorted(get_all_partitions_for_course(course, active_only=True), key=lambda p: p.name):
 
         # Exclude disabled partitions, partitions with no groups defined
         # Also filter by scheme name if there's a filter defined.
-        if p.active and p.groups and (schemes is None or p.scheme.name in schemes):
+        if p.groups and (schemes is None or p.scheme.name in schemes):
 
             # First, add groups defined by the partition
             groups = []
@@ -408,7 +409,7 @@ def get_user_partition_info(xblock, schemes=None, course=None):
             # Put together the entire partition dictionary
             partitions.append({
                 "id": p.id,
-                "name": p.name,
+                "name": unicode(p.name),  # Convert into a string in case ugettext_lazy was used
                 "scheme": p.scheme.name,
                 "groups": groups,
             })

@@ -1341,23 +1341,6 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         """
         return self.teams_configuration.get('topics', None)
 
-    def get_user_partitions_for_scheme(self, scheme):
-        """
-        Retrieve all user partitions defined in the course for a particular
-        partition scheme.
-
-        Arguments:
-            scheme (object): The user partition scheme.
-
-        Returns:
-            list of `UserPartition`
-
-        """
-        return [
-            p for p in self.user_partitions
-            if p.scheme == scheme
-        ]
-
     def set_user_partitions_for_scheme(self, partitions, scheme):
         """
         Set the user partitions for a particular scheme.
