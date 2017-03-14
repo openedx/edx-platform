@@ -2,10 +2,21 @@
 
 from collections import namedtuple
 from stevedore.extension import ExtensionManager
+from xblock.fields import List
 
 # We use ``id`` in this file as the IDs of our Groups and UserPartitions,
 # which Pylint disapproves of.
 # pylint: disable=redefined-builtin
+
+
+class UserPartitionList(List):
+    """Special List class for listing UserPartitions"""
+    def from_json(self, values):
+        return [UserPartition.from_json(v) for v in values]
+
+    def to_json(self, values):
+        return [user_partition.to_json()
+                for user_partition in values]
 
 
 class UserPartitionError(Exception):
@@ -127,7 +138,7 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
         try:
             scheme = UserPartition.scheme_extensions[name].plugin
         except KeyError:
-            raise UserPartitionError("Unrecognized scheme {0}".format(name))
+            raise UserPartitionError("Unrecognized scheme '{0}'".format(name))
         scheme.name = name
         return scheme
 
@@ -188,15 +199,25 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
         if not scheme:
             raise TypeError("UserPartition dict {0} has unrecognized scheme {1}".format(value, scheme_id))
 
-        return UserPartition(
-            value["id"],
-            value["name"],
-            value["description"],
-            groups,
-            scheme,
-            parameters,
-            active,
-        )
+        if hasattr(scheme, "create_user_partition"):
+            return scheme.create_user_partition(
+                value["id"],
+                value["name"],
+                value["description"],
+                groups,
+                parameters,
+                active,
+            )
+        else:
+            return UserPartition(
+                value["id"],
+                value["name"],
+                value["description"],
+                groups,
+                scheme,
+                parameters,
+                active,
+            )
 
     def get_group(self, group_id):
         """
@@ -214,5 +235,7 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
                 return group
 
         raise NoSuchUserPartitionGroupError(
-            "could not find a Group with ID [{}] in UserPartition [{}]".format(group_id, self.id)
+            "could not find a Group with ID [{group_id}] in UserPartition [{partition_id}]".format(
+                group_id=group_id, partition_id=self.id
+            )
         )

@@ -2146,8 +2146,8 @@ INSTALLED_APPS = (
     # API access administration
     'openedx.core.djangoapps.api_admin',
 
-    # Verified Track Content Cohorting
-    'verified_track_content',
+    # Verified Track Content Cohorting (Beta feature that will hopefully be removed)
+    'openedx.core.djangoapps.verified_track_content',
 
     # Learner's dashboard
     'learner_dashboard',

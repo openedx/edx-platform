@@ -7,10 +7,14 @@ import itertools
 from fs.memoryfs import MemoryFS
 from mock import Mock, patch
 from pytz import utc
+from stevedore.extension import Extension, ExtensionManager
 from xblock.runtime import KvsFieldData, DictKeyValueStore
 
 import xmodule.course_module
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
+from xmodule.partitions.partitions import (
+    UserPartition, USER_PARTITION_SCHEME_NAMESPACE
+)
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
@@ -251,6 +255,62 @@ class DiscussionTopicsTestCase(unittest.TestCase):
     def test_default_discussion_topics(self):
         d = get_dummy_course('2012-12-02T12:00')
         self.assertEqual({'General': {'id': 'i4x-test_org-test_course-course-test'}}, d.discussion_topics)
+
+
+class MockEnrollmentTrackPartitionScheme(object):
+    """
+    Mock user partition scheme
+    """
+    name = "enrollment_track"
+
+    def get_group_for_user(self, course_id, user, user_partition, assign=True, track_function=None):  # pylint: disable=unused-argument
+        """
+        Returns None for all users.
+        """
+        return None
+
+    @classmethod
+    def create_user_partition(cls, id, name, description, groups=None, parameters=None, active=True):  # pylint: disable=redefined-builtin, invalid-name, unused-argument
+        """
+        Create a UserPartition, as the real EnrollmentTrackPartitionScheme supports this method
+        to create a custom UserPartition.
+        """
+        return UserPartition(id, name, description, [], cls, parameters, active)
+
+
+class EnrollmentTrackUserPartitionTestCase(unittest.TestCase):
+    """
+    Tests that the "enrollment_track" UserPartition is created on new courses.
+    """
+
+    def setUp(self):
+        super(EnrollmentTrackUserPartitionTestCase, self).setUp()
+        # Set on a mock "enrollment track" partition scheme.
+        enrollment_track_scheme = MockEnrollmentTrackPartitionScheme
+
+        extensions = [
+            Extension(
+                enrollment_track_scheme.name, USER_PARTITION_SCHEME_NAMESPACE, enrollment_track_scheme, None
+            )
+        ]
+        UserPartition.scheme_extensions = ExtensionManager.make_test_instance(
+            extensions, namespace=USER_PARTITION_SCHEME_NAMESPACE
+        )
+
+        # Be sure to clean up the global scheme_extensions after the test.
+        self.addCleanup(self.cleanup_scheme_extensions)
+
+    def cleanup_scheme_extensions(self):
+        """
+        Unset the UserPartition.scheme_extensions cache.
+        """
+        UserPartition.scheme_extensions = None
+
+    def test_default_user_partitions(self):
+        course = get_dummy_course('2012-12-02T12:00')
+        self.assertEqual(len(course.user_partitions), 1)
+        user_partition = course.user_partitions[0]
+        self.assertEqual(user_partition.scheme.name, "enrollment_track")
 
 
 class TeamsConfigurationTestCase(unittest.TestCase):

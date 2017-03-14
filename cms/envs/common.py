@@ -882,6 +882,9 @@ INSTALLED_APPS = (
     # for managing course modes
     'course_modes',
 
+    # Verified Track Content Cohorting (Beta feature that will hopefully be removed)
+    'openedx.core.djangoapps.verified_track_content',
+
     # Dark-launching languages
     'openedx.core.djangoapps.dark_lang',
 
