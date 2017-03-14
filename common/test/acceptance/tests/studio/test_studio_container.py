@@ -10,13 +10,14 @@ from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.studio.component_editor import ComponentEditorView, ComponentVisibilityEditorView
 from common.test.acceptance.pages.studio.container import ContainerPage
 from common.test.acceptance.pages.studio.html_component_editor import HtmlComponentEditorView
+from common.test.acceptance.pages.studio.move_xblock import MoveModalView
 from common.test.acceptance.pages.studio.utils import add_discussion, drag
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.staff_view import StaffPage
 from common.test.acceptance.tests.helpers import create_user_partition_json
 
 import datetime
-from bok_choy.promise import Promise, EmptyPromise
+import ddt
 from base_studio_test import ContainerBase
 from xmodule.partitions.partitions import Group
 
@@ -663,7 +664,7 @@ class UnitPublishingTest(ContainerBase):
             And the last saved text contains "Last published"
         """
         unit = self.go_to_unit_page()
-        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
+        unit.verify_publish_title(self.PUBLISHED_LIVE_STATUS)
         # Start date set in course fixture to 1970.
         self._verify_release_date_info(
             unit, self.RELEASE_TITLE_RELEASED, 'Jan 01, 1970 at 00:00 UTC\nwith Section "Test Section"'
@@ -674,11 +675,11 @@ class UnitPublishingTest(ContainerBase):
 
         # Add a component to the page so it will have unpublished changes.
         add_discussion(unit)
-        self._verify_publish_title(unit, self.DRAFT_STATUS)
+        unit.verify_publish_title(self.DRAFT_STATUS)
         self._verify_last_published_and_saved(unit, self.LAST_PUBLISHED, self.LAST_SAVED)
         unit.publish_action.click()
         unit.wait_for_ajax()
-        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
+        unit.verify_publish_title(self.PUBLISHED_LIVE_STATUS)
         self._verify_last_published_and_saved(unit, self.LAST_PUBLISHED, self.LAST_PUBLISHED)
 
     def test_discard_changes(self):
@@ -695,9 +696,9 @@ class UnitPublishingTest(ContainerBase):
         """
         unit = self.go_to_unit_page()
         add_discussion(unit)
-        self._verify_publish_title(unit, self.DRAFT_STATUS)
+        unit.verify_publish_title(self.DRAFT_STATUS)
         unit.discard_changes()
-        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
+        unit.verify_publish_title(self.PUBLISHED_LIVE_STATUS)
 
     def test_view_live_no_changes(self):
         """
@@ -756,7 +757,7 @@ class UnitPublishingTest(ContainerBase):
             Then I see the content in the unit
         """
         unit = self.go_to_unit_page("Unlocked Section", "Unlocked Subsection", "Unlocked Unit")
-        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
+        unit.verify_publish_title(self.PUBLISHED_LIVE_STATUS)
         self.assertTrue(unit.currently_visible_to_students)
         self._verify_release_date_info(
             unit, self.RELEASE_TITLE_RELEASED, self.past_start_date_text + '\n' + 'with Section "Unlocked Section"'
@@ -782,7 +783,7 @@ class UnitPublishingTest(ContainerBase):
         self.assertTrue(checked)
         self.assertFalse(unit.currently_visible_to_students)
         self.assertFalse(unit.shows_inherited_staff_lock())
-        self._verify_publish_title(unit, self.LOCKED_STATUS)
+        unit.verify_publish_title(self.LOCKED_STATUS)
         self._view_published_version(unit)
         # Will initially be in staff view, locked component should be visible.
         self._verify_components_visible(['problem'])
@@ -801,7 +802,7 @@ class UnitPublishingTest(ContainerBase):
             Then I do not see any content in the unit
         """
         unit = self.go_to_unit_page("Section With Locked Unit", "Subsection With Locked Unit", "Locked Unit")
-        self._verify_publish_title(unit, self.LOCKED_STATUS)
+        unit.verify_publish_title(self.LOCKED_STATUS)
         self.assertFalse(unit.currently_visible_to_students)
         self._verify_release_date_info(
             unit, self.RELEASE_TITLE_RELEASE,
@@ -825,7 +826,7 @@ class UnitPublishingTest(ContainerBase):
         unit = self.go_to_unit_page("Section With Locked Unit", "Subsection With Locked Unit", "Locked Unit")
         checked = unit.toggle_staff_lock()
         self.assertFalse(checked)
-        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
+        unit.verify_publish_title(self.PUBLISHED_LIVE_STATUS)
         self.assertTrue(unit.currently_visible_to_students)
         self._view_published_version(unit)
         # Will initially be in staff view, components always visible.
@@ -893,10 +894,10 @@ class UnitPublishingTest(ContainerBase):
         component.edit()
         HtmlComponentEditorView(self.browser, component.locator).set_content_and_save(modified_content)
         self.assertEqual(component.student_content, modified_content)
-        self._verify_publish_title(unit, self.DRAFT_STATUS)
+        unit.verify_publish_title(self.DRAFT_STATUS)
         unit.publish_action.click()
         unit.wait_for_ajax()
-        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
+        unit.verify_publish_title(self.PUBLISHED_LIVE_STATUS)
         self._view_published_version(unit)
         self.assertIn(modified_content, self.courseware.xblock_component_html_content(0))
 
@@ -916,10 +917,10 @@ class UnitPublishingTest(ContainerBase):
         component.edit()
         HtmlComponentEditorView(self.browser, component.locator).set_content_and_cancel("modified content")
         self.assertEqual(component.student_content, "Body of HTML Unit.")
-        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
+        unit.verify_publish_title(self.PUBLISHED_LIVE_STATUS)
         self.browser.refresh()
         unit.wait_for_page()
-        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
+        unit.verify_publish_title(self.PUBLISHED_LIVE_STATUS)
 
     def test_delete_child_in_published_unit(self):
         """
@@ -935,10 +936,10 @@ class UnitPublishingTest(ContainerBase):
         """
         unit = self.go_to_unit_page()
         unit.delete(0)
-        self._verify_publish_title(unit, self.DRAFT_STATUS)
+        unit.verify_publish_title(self.DRAFT_STATUS)
         unit.publish_action.click()
         unit.wait_for_ajax()
-        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
+        unit.verify_publish_title(self.PUBLISHED_LIVE_STATUS)
         self._view_published_version(unit)
         self.assertEqual(0, self.courseware.num_xblock_components)
 
@@ -954,12 +955,12 @@ class UnitPublishingTest(ContainerBase):
             Then the title in the Publish information box is "Published (not yet released)"
         """
         unit = self.go_to_unit_page('Unreleased Section', 'Unreleased Subsection', 'Unreleased Unit')
-        self._verify_publish_title(unit, self.PUBLISHED_STATUS)
+        unit.verify_publish_title(self.PUBLISHED_STATUS)
         add_discussion(unit)
-        self._verify_publish_title(unit, self.DRAFT_STATUS)
+        unit.verify_publish_title(self.DRAFT_STATUS)
         unit.publish_action.click()
         unit.wait_for_ajax()
-        self._verify_publish_title(unit, self.PUBLISHED_STATUS)
+        unit.verify_publish_title(self.PUBLISHED_STATUS)
 
     def _view_published_version(self, unit):
         """
@@ -1005,15 +1006,6 @@ class UnitPublishingTest(ContainerBase):
         """
         self.assertEqual(expected_title, unit.release_title)
         self.assertEqual(expected_date, unit.release_date)
-
-    def _verify_publish_title(self, unit, expected_title):
-        """
-        Waits for the publish title to change to the expected value.
-        """
-        def wait_for_title_change():
-            return (unit.publish_title == expected_title, unit.publish_title)
-
-        Promise(wait_for_title_change, "Publish title incorrect. Found '" + unit.publish_title + "'").fulfill()
 
     def _verify_last_published_and_saved(self, unit, expected_published_prefix, expected_saved_prefix):
         """
@@ -1136,3 +1128,305 @@ class ProblemCategoryTabsTest(ContainerBase):
             "Text Input with Hints and Feedback",
         ]
         self.assertEqual(page.get_category_tab_components('problem', 1), expected_components)
+
+
+@attr(shard=1)
+@ddt.ddt
+class MoveComponentTest(ContainerBase):
+    """
+    Tests of moving an XBlock to another XBlock.
+    """
+    PUBLISHED_LIVE_STATUS = "Publishing Status\nPublished and Live"
+    DRAFT_STATUS = "Publishing Status\nDraft (Unpublished changes)"
+
+    def setUp(self, is_staff=True):
+        super(MoveComponentTest, self).setUp(is_staff=is_staff)
+        self.container = ContainerPage(self.browser, None)
+        self.move_modal_view = MoveModalView(self.browser)
+
+        self.navigation_options = {
+            'section': 0,
+            'subsection': 0,
+            'unit': 1,
+        }
+        self.source_component_display_name = 'HTML 11'
+        self.source_xblock_category = 'component'
+        self.message_move = 'Success! "{display_name}" has been moved.'
+        self.message_undo = 'Move cancelled. "{display_name}" has been moved back to its original location.'
+
+    def populate_course_fixture(self, course_fixture):
+        """
+        Sets up a course structure.
+        """
+        # pylint: disable=attribute-defined-outside-init
+        self.unit_page1 = XBlockFixtureDesc('vertical', 'Test Unit 1').add_children(
+            XBlockFixtureDesc('html', 'HTML 11'),
+            XBlockFixtureDesc('html', 'HTML 12')
+        )
+        self.unit_page2 = XBlockFixtureDesc('vertical', 'Test Unit 2').add_children(
+            XBlockFixtureDesc('html', 'HTML 21'),
+            XBlockFixtureDesc('html', 'HTML 22')
+        )
+        course_fixture.add_children(
+            XBlockFixtureDesc('chapter', 'Test Section').add_children(
+                XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
+                    self.unit_page1,
+                    self.unit_page2
+                )
+            )
+        )
+
+    def verify_move_opertions(self, unit_page, source_component, operation, component_display_names_after_operation,
+                              should_verify_publish_title=True):
+        """
+        Verify move operations.
+
+        Arguments:
+            unit_page (Object)                                Unit container page.
+            source_component (Object)                         Source XBlock object to be moved.
+            operation (str),                                  `move` or `undo move` operation.
+            component_display_names_after_operation (dict)    Display names of components after operation in source/dest
+            should_verify_publish_title (Boolean)             Should verify publish title ot not. Default is True.
+        """
+        source_component.open_move_modal()
+        self.move_modal_view.navigate_to_category(self.source_xblock_category, self.navigation_options)
+        self.assertEqual(self.move_modal_view.is_move_button_enabled, True)
+
+        # Verify unit is in published state before move operation
+        if should_verify_publish_title:
+            self.container.verify_publish_title(self.PUBLISHED_LIVE_STATUS)
+
+        self.move_modal_view.click_move_button()
+        self.container.verify_confirmation_message(
+            self.message_move.format(display_name=self.source_component_display_name)
+        )
+        self.assertEqual(len(unit_page.displayed_children), 1)
+
+        # Verify unit in draft state now
+        if should_verify_publish_title:
+            self.container.verify_publish_title(self.DRAFT_STATUS)
+
+        if operation == 'move':
+            self.container.click_take_me_there_link()
+        elif operation == 'undo_move':
+            self.container.click_undo_move_link()
+            self.container.verify_confirmation_message(
+                self.message_undo.format(display_name=self.source_component_display_name)
+            )
+
+        unit_page = ContainerPage(self.browser, None)
+        components = unit_page.displayed_children
+        self.assertEqual(
+            [component.name for component in components],
+            component_display_names_after_operation
+        )
+
+    def verify_state_change(self, unit_page, operation):
+        """
+        Verify that after state change, confirmation message is hidden.
+
+        Arguments:
+            unit_page (Object)  Unit container page.
+            operation (String)  Publish or discard changes operation.
+        """
+        # Verify unit in draft state now
+        self.container.verify_publish_title(self.DRAFT_STATUS)
+
+        # Now click publish/discard button
+        if operation == 'publish':
+            unit_page.publish_action.click()
+        else:
+            unit_page.discard_changes()
+
+        # Now verify success message is hidden
+        self.container.verify_publish_title(self.PUBLISHED_LIVE_STATUS)
+        self.container.verify_confirmation_message(
+            message=self.message_move.format(display_name=self.source_component_display_name),
+            verify_hidden=True
+        )
+
+    def test_move_component_successfully(self):
+        """
+        Test if we can move a component successfully.
+
+        Given I am a staff user
+        And I go to unit page in first section
+        And I open the move modal
+        And I navigate to unit in second section
+        And I see move button is enabled
+        When I click on the move button
+        Then I see move operation success message
+        And When I click on take me there link
+        Then I see moved component there.
+        """
+        unit_page = self.go_to_unit_page(unit_name='Test Unit 1')
+        components = unit_page.displayed_children
+        self.assertEqual(len(components), 2)
+
+        self.verify_move_opertions(
+            unit_page=unit_page,
+            source_component=components[0],
+            operation='move',
+            component_display_names_after_operation=['HTML 21', 'HTML 22', 'HTML 11']
+        )
+
+    def test_undo_move_component_successfully(self):
+        """
+        Test if we can undo move a component successfully.
+
+        Given I am a staff user
+        And I go to unit page in first section
+        And I open the move modal
+        When I click on the move button
+        Then I see move operation successful message
+        And When I clicked on undo move link
+        Then I see that undo move operation is successful
+        """
+        unit_page = self.go_to_unit_page(unit_name='Test Unit 1')
+        components = unit_page.displayed_children
+        self.assertEqual(len(components), 2)
+
+        self.verify_move_opertions(
+            unit_page=unit_page,
+            source_component=components[0],
+            operation='undo_move',
+            component_display_names_after_operation=['HTML 11', 'HTML 12']
+        )
+
+    @ddt.data('publish', 'discard')
+    def test_publish_discard_changes_afer_move(self, operation):
+        """
+        Test if success banner is hidden when we  discard changes or publish the unit after a move operation.
+
+        Given I am a staff user
+        And I go to unit page in first section
+        And I open the move modal
+        And I navigate to unit in second section
+        And I see move button is enabled
+        When I click on the move button
+        Then I see move operation success message
+        And When I click on publish or discard changes button
+        Then I see move operation success message is hidden.
+        """
+        unit_page = self.go_to_unit_page(unit_name='Test Unit 1')
+        components = unit_page.displayed_children
+        self.assertEqual(len(components), 2)
+
+        components[0].open_move_modal()
+        self.move_modal_view.navigate_to_category(self.source_xblock_category, self.navigation_options)
+        self.assertEqual(self.move_modal_view.is_move_button_enabled, True)
+
+        # Verify unit is in published state before move operation
+        self.container.verify_publish_title(self.PUBLISHED_LIVE_STATUS)
+
+        self.move_modal_view.click_move_button()
+        self.container.verify_confirmation_message(
+            self.message_move.format(display_name=self.source_component_display_name)
+        )
+        self.assertEqual(len(unit_page.displayed_children), 1)
+
+        self.verify_state_change(unit_page, operation)
+
+    def test_content_experiment(self):
+        """
+        Test if we can move a component of content experiment successfully.
+
+        Given that I am a staff user
+        And I go to content experiment page
+        And I open the move dialogue modal
+        When I navigate to the unit in second section
+        Then I see move button is enabled
+        And when I click on the move button
+        Then I see move operation success message
+        And when I click on take me there link
+        Then I see moved component there
+        And when I undo move a component
+        Then I see that undo move operation success message
+        """
+        # Add content experiment support to course.
+        self.course_fixture.add_advanced_settings({
+            u'advanced_modules': {'value': ['split_test']},
+        })
+
+        # Create group configurations
+        # pylint: disable=protected-access
+        self.course_fixture._update_xblock(self.course_fixture._course_location, {
+            'metadata': {
+                u'user_partitions': [
+                    create_user_partition_json(
+                        0,
+                        'Test Group Configuration',
+                        'Description of the group configuration.',
+                        [Group('0', 'Group A'), Group('1', 'Group B')]
+                    ),
+                ],
+            },
+        })
+
+        # Add split test to unit_page1 and assign newly created group configuration to it
+        split_test = XBlockFixtureDesc('split_test', 'Test Content Experiment', metadata={'user_partition_id': 0})
+        self.course_fixture.create_xblock(self.unit_page1.locator, split_test)
+
+        # Visit content experiment container page.
+        unit_page = ContainerPage(self.browser, split_test.locator)
+        unit_page.visit()
+
+        group_a_locator = unit_page.displayed_children[0].locator
+
+        # Add some components to Group A.
+        self.course_fixture.create_xblock(
+            group_a_locator, XBlockFixtureDesc('html', 'HTML 311')
+        )
+        self.course_fixture.create_xblock(
+            group_a_locator, XBlockFixtureDesc('html', 'HTML 312')
+        )
+
+        # Go to group page to move it's component.
+        group_container_page = ContainerPage(self.browser, group_a_locator)
+        group_container_page.visit()
+
+        # Verify content experiment block has correct groups and components.
+        components = group_container_page.displayed_children
+        self.assertEqual(len(components), 2)
+
+        self.source_component_display_name = 'HTML 311'
+
+        # Verify undo move operation for content experiment.
+        self.verify_move_opertions(
+            unit_page=group_container_page,
+            source_component=components[0],
+            operation='undo_move',
+            component_display_names_after_operation=['HTML 311', 'HTML 312'],
+            should_verify_publish_title=False
+        )
+
+        # Verify move operation for content experiment.
+        self.verify_move_opertions(
+            unit_page=group_container_page,
+            source_component=components[0],
+            operation='move',
+            component_display_names_after_operation=['HTML 21', 'HTML 22', 'HTML 311'],
+            should_verify_publish_title=False
+        )
+
+    def test_a11y(self):
+        """
+        Verify move modal a11y.
+        """
+        unit_page = self.go_to_unit_page(unit_name='Test Unit 1')
+
+        unit_page.a11y_audit.config.set_scope(
+            include=[".modal-window.move-modal"]
+        )
+        unit_page.a11y_audit.config.set_rules({
+            'ignore': [
+                'color-contrast',  # TODO: AC-716
+                'link-href',  # TODO: AC-716
+            ]
+        })
+
+        unit_page.displayed_children[0].open_move_modal()
+
+        for category in ['section', 'subsection', 'component']:
+            self.move_modal_view.navigate_to_category(category, self.navigation_options)
+            unit_page.a11y_audit.check_for_accessibility_errors()

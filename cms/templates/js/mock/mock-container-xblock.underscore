@@ -44,16 +44,19 @@
                                                 <div class="header-actions">
                                                     <ul class="actions-list">
                                                         <li class="action-item action-edit">
-                                                            <a href="#" class="edit-button action-button"></a>
+                                                            <button class="edit-button action-button"></button>
                                                         </li>
                                                         <li class="action-item action-visibility">
-                                                            <a href="#" class="visibility-button action-button"></a>
+                                                            <button class="visibility-button action-button"></button>
                                                         </li>
                                                         <li class="action-item action-duplicate">
-                                                            <a href="#" class="duplicate-button action-button"></a>
+                                                            <button class="duplicate-button action-button"></button>
+                                                        </li>
+                                                        <li class="action-item action-move">
+                                                            <button data-tooltip="Move" class="move-button action-button"></button>
                                                         </li>
                                                         <li class="action-item action-delete">
-                                                            <a href="#" class="delete-button action-button"></a>
+                                                            <button class="delete-button action-button"></button>
                                                         </li>
                                                         <li class="action-item action-drag">
                                                             <span data-tooltip="Drag to reorder" class="drag-handle action"></span>
@@ -72,16 +75,19 @@
                                                 <div class="xblock-header-primary">
                                                     <ul class="actions-list">
                                                         <li class="action-item action-edit">
-                                                            <a href="#" class="edit-button action-button"></a>
+                                                            <button class="edit-button action-button"></button>
                                                         </li>
                                                         <li class="action-item action-visibility">
-                                                            <a href="#" class="visibility-button action-button"></a>
+                                                            <button class="visibility-button action-button"></button>
                                                         </li>
                                                         <li class="action-item action-duplicate">
-                                                            <a href="#" class="duplicate-button action-button"></a>
+                                                            <button class="duplicate-button action-button"></button>
+                                                        </li>
+                                                        <li class="action-item action-move">
+                                                            <button data-tooltip="Move" class="move-button action-button"></button>
                                                         </li>
                                                         <li class="action-item action-delete">
-                                                            <a href="#" class="delete-button action-button"></a>
+                                                            <button class="delete-button action-button"></button>
                                                         </li>
                                                         <li class="action-item action-drag">
                                                             <span data-tooltip="Drag to reorder" class="drag-handle action"></span>
@@ -100,16 +106,19 @@
                                                 <div class="header-actions">
                                                     <ul class="actions-list">
                                                         <li class="action-item action-edit">
-                                                            <a href="#" class="edit-button action-button"></a>
+                                                            <button class="edit-button action-button"></button>
                                                         </li>
                                                         <li class="action-item action-visibility">
-                                                            <a href="#" class="visibility-button action-button"></a>
+                                                            <button class="visibility-button action-button"></button>
                                                         </li>
                                                         <li class="action-item action-duplicate">
-                                                            <a href="#" class="duplicate-button action-button"></a>
+                                                            <button class="duplicate-button action-button"></button>
+                                                        </li>
+                                                        <li class="action-item action-move">
+                                                            <button data-tooltip="Move" class="move-button action-button"></button>
                                                         </li>
                                                         <li class="action-item action-delete">
-                                                            <a href="#" class="delete-button action-button"></a>
+                                                            <button class="delete-button action-button"></button>
                                                         </li>
                                                         <li class="action-item action-drag">
                                                             <span data-tooltip="Drag to reorder" class="drag-handle action"></span>
@@ -158,16 +167,19 @@
                                                 <div class="header-actions">
                                                     <ul class="actions-list">
                                                         <li class="action-item action-edit">
-                                                            <a href="#" class="edit-button action-button"></a>
+                                                            <button class="edit-button action-button"></button>
                                                         </li>
                                                         <li class="action-item action-visibility">
-                                                            <a href="#" class="visibility-button action-button"></a>
+                                                            <button class="visibility-button action-button"></button>
                                                         </li>
                                                         <li class="action-item action-duplicate">
-                                                            <a href="#" class="duplicate-button action-button"></a>
+                                                            <button class="duplicate-button action-button"></button>
+                                                        </li>
+                                                        <li class="action-item action-move">
+                                                            <button data-tooltip="Move" class="move-button action-button"></button>
                                                         </li>
                                                         <li class="action-item action-delete">
-                                                            <a href="#" class="delete-button action-button"></a>
+                                                            <button class="delete-button action-button"></button>
                                                         </li>
                                                         <li class="action-item action-drag">
                                                             <span data-tooltip="Drag to reorder" class="drag-handle action"></span>
@@ -186,16 +198,19 @@
                                                 <div class="header-actions">
                                                     <ul class="actions-list">
                                                         <li class="action-item action-edit">
-                                                            <a href="#" class="edit-button action-button"></a>
+                                                            <button class="edit-button action-button"></button>
                                                         </li>
                                                         <li class="action-item action-visibility">
-                                                            <a href="#" class="visibility-button action-button"></a>
+                                                            <button class="visibility-button action-button"></button>
                                                         </li>
                                                         <li class="action-item action-duplicate">
-                                                            <a href="#" class="duplicate-button action-button"></a>
+                                                            <button class="duplicate-button action-button"></button>
+                                                        </li>
+                                                        <li class="action-item action-move">
+                                                            <button data-tooltip="Move" class="move-button action-button"></button>
                                                         </li>
                                                         <li class="action-item action-delete">
-                                                            <a href="#" class="delete-button action-button"></a>
+                                                            <button class="delete-button action-button"></button>
                                                         </li>
                                                         <li class="action-item action-drag">
                                                             <span data-tooltip="Drag to reorder" class="drag-handle action"></span>
@@ -214,16 +229,19 @@
                                                 <div class="header-actions">
                                                     <ul class="actions-list">
                                                         <li class="action-item action-edit">
-                                                            <a href="#" class="edit-button action-button"></a>
+                                                            <button class="edit-button action-button"></button>
                                                         </li>
                                                         <li class="action-item action-visibility">
-                                                            <a href="#" class="visibility-button action-button"></a>
+                                                            <button class="visibility-button action-button"></button>
                                                         </li>
                                                         <li class="action-item action-duplicate">
-                                                            <a href="#" class="duplicate-button action-button"></a>
+                                                            <button class="duplicate-button action-button"></button>
+                                                        </li>
+                                                        <li class="action-item action-move">
+                                                            <button data-tooltip="Move" class="move-button action-button"></button>
                                                         </li>
                                                         <li class="action-item action-delete">
-                                                            <a href="#" class="delete-button action-button"></a>
+                                                            <button class="delete-button action-button"></button>
                                                         </li>
                                                         <li class="action-item action-drag">
                                                             <span data-tooltip="Drag to reorder" class="drag-handle action"></span>

@@ -1,0 +1,17 @@
+<nav class="breadcrumbs" aria-label="Course Outline breadcrumb">
+    <% _.each(breadcrumbs.slice(0, -1), function (breadcrumb, index, items) { %>
+        <ol class="bc-container bc-<%- index %>">
+            <li class="bc-container-content">
+                <button class="parent-nav-button" data-parent-index="<%- index %>">
+                    <%- breadcrumb %>
+                </button>
+                <span class="fa fa-angle-right breadcrumb-fa-icon" aria-hidden="true"></span>
+            </li>
+        </ol>
+    <% }) %>
+    <ol class="bc-container bc-<%- breadcrumbs.length - 1 %> last">
+        <li class="bc-container-content">
+            <span class="parent-displayname"><%- breadcrumbs[breadcrumbs.length - 1] %></span>
+        </li>
+    </ol>
+</nav>
