@@ -78,10 +78,7 @@ from openedx.core.djangolib.markup import HTML, Text
 <main id="main" aria-label="Content" tabindex="-1">
     <div class="container dashboard" id="dashboard-main">
       <div class="my-courses" id="my-courses">
-        <header class="wrapper-header-courses">
-          <h2 class="header-courses">${_("My Courses")}</h2>
-        </header>
-
+        <%include file="learner_dashboard/_dashboard_navigation_courses.html"/>
 
         % if len(course_enrollments) > 0:
           <ul class="listing-courses">
