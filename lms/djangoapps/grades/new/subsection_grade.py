@@ -4,16 +4,19 @@ SubsectionGrade Class
 from collections import OrderedDict
 from lazy import lazy
 from logging import getLogger
+
 from courseware.model_data import ScoresClient
-from lms.djangoapps.grades.scores import get_score, possibly_scored
-from lms.djangoapps.grades.models import BlockRecord, PersistentSubsectionGrade
-from lms.djangoapps.grades.config.models import PersistentGradesEnabledFlag
 from openedx.core.lib.grade_utils import is_score_higher
 from student.models import anonymous_id_for_user
 from submissions import api as submissions_api
 from xmodule import block_metadata_utils, graders
 from xmodule.graders import AggregatedScore
 
+from .utils import is_engaged
+from ..constants import AccessModeEnum
+from ..scores import get_score, possibly_scored
+from ..models import BlockRecord, PersistentSubsectionGrade
+from ..config.models import PersistentGradesEnabledFlag
 
 log = getLogger(__name__)
 
@@ -211,14 +214,22 @@ class SubsectionGradeFactory(object):
         self._cached_subsection_grades = None
         self._unsaved_subsection_grades = []
 
-    def create(self, subsection, read_only=False):
+    def create(self, subsection, mode=AccessModeEnum.read_write):
         """
         Returns the SubsectionGrade object for the student and subsection.
 
-        If read_only is True, doesn't save any updates to the grades.
+        If mode is read_only, doesn't save any updates to the grades.
         """
+        if mode == AccessModeEnum.read_write_if_engaged:
+            if is_engaged(self.student, self.course):
+                mode = AccessModeEnum.read_write
+            else:
+                mode = AccessModeEnum.read_only
+
         self._log_event(
-            log.debug, u"create, read_only: {0}, subsection: {1}".format(read_only, subsection.location), subsection,
+            log.debug,
+            u"create, read_only: {0}, subsection: {1}".format(mode == AccessModeEnum.read_only, subsection.location),
+            subsection,
         )
 
         subsection_grade = self._get_bulk_cached_grade(subsection)
@@ -227,7 +238,7 @@ class SubsectionGradeFactory(object):
                 self.student, self.course_structure, self._submissions_scores, self._csm_scores,
             )
             if PersistentGradesEnabledFlag.feature_enabled(self.course.id):
-                if read_only:
+                if mode == AccessModeEnum.read_only:
                     self._unsaved_subsection_grades.append(subsection_grade)
                 else:
                     grade_model = subsection_grade.create_model(self.student)
