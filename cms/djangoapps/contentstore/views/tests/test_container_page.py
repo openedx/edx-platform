@@ -12,11 +12,13 @@ from django.utils import http
 
 import contentstore.views.component as views
 from contentstore.views.tests.utils import StudioPageTestCase
+from contentstore.tests.test_libraries import LibraryTestCase
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.factories import ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
-class ContainerPageTestCase(StudioPageTestCase):
+class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
     """
     Unit tests for the container page.
     """
@@ -127,6 +129,44 @@ class ContainerPageTestCase(StudioPageTestCase):
         self.validate_preview_html(published_unit, self.container_view)
         self.validate_preview_html(published_child_container, self.container_view)
         self.validate_preview_html(published_child_vertical, self.reorderable_child_view)
+
+    def test_library_page_preview_html(self):
+        """
+        Verify that a library xblock's container (library page) preview returns the expected HTML.
+        """
+        # Add some content to library.
+        self._add_simple_content_block()
+        self.validate_preview_html(self.library, self.container_view, can_reorder=False, can_move=False)
+
+    def test_library_content_preview_html(self):
+        """
+        Verify that a library content block container page preview returns the expected HTML.
+        """
+        # Library content block is only supported in split courses.
+        with modulestore().default_store(ModuleStoreEnum.Type.split):
+            course = CourseFactory.create()
+
+        # Add some content to library
+        self._add_simple_content_block()
+
+        # Create a library content block
+        lc_block = self._add_library_content_block(course, self.lib_key)
+        self.assertEqual(len(lc_block.children), 0)
+
+        # Refresh children to be reflected in lc_block
+        lc_block = self._refresh_children(lc_block)
+        self.assertEqual(len(lc_block.children), 1)
+
+        self.validate_preview_html(
+            lc_block,
+            self.container_view,
+            can_add=False,
+            can_reorder=False,
+            can_move=False,
+            can_edit=True,
+            can_duplicate=False,
+            can_delete=False
+        )
 
     def test_draft_container_preview_html(self):
         """

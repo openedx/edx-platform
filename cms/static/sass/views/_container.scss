@@ -331,3 +331,115 @@
     }
   }
 }
+
+
+.move-xblock-modal {
+
+  button {
+    background: transparent;
+    border-color: transparent;
+    padding: 0;
+    border: none;
+  }
+
+  .breadcrumb-container {
+    margin-bottom: ($baseline/4);
+    border: 1px solid $btn-lms-border;
+    padding: ($baseline/2);
+    background: $color-background-alternate;
+
+    .breadcrumbs {
+
+      .bc-container {
+        @include font-size(14);
+        display: inline-block;
+
+        .breadcrumb-fa-icon {
+          padding: 0 ($baseline/4);
+
+          @include rtl {
+            @include transform(rotate(180deg));
+          }
+        }
+
+        &.last {
+          .parent-displayname {
+            @include font-size(18);
+          }
+        }
+      }
+
+      .bc-container:not(.last) {
+        button, .parent-displayname {
+          text-decoration: underline;
+          color: $ui-link-color;
+        }
+      }
+    }
+  }
+
+  .category-text {
+    @include margin-left($baseline/2);
+    @include font-size(14);
+    color: $black;
+  }
+
+  .xblock-items-container {
+    max-height: ($baseline*15);
+    overflow-y: auto;
+
+    .xblock-item {
+      & > * {
+        width: 100%;
+        color: $uxpl-blue-hover-active;
+      }
+
+      .component {
+        display: inline-block;
+        color: $black;
+        padding: ($baseline/4) ($baseline/2);
+      }
+
+      .xblock-displayname {
+        @include float(left);
+      }
+
+      .button-forward, .component {
+        border: none;
+      }
+
+      .button-forward {
+        padding: ($baseline/2);
+        .forward-sr-icon {
+          @include float(right);
+
+          @include rtl {
+            @include transform(rotate(180deg));
+          }
+        }
+
+        &:hover, &:focus {
+          background: $color-background-alternate;
+        }
+      }
+    }
+
+    .xblock-no-child-message {
+      @include text-align(center);
+      display: block;
+      padding: ($baseline*2);
+    }
+  }
+
+  .truncate {
+    max-width: 90%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .current-location {
+    @include float(left);
+    @include margin-left($baseline);
+  }
+}

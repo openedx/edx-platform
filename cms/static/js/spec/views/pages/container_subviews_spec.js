@@ -35,6 +35,9 @@ define(['jquery', 'underscore', 'underscore.string', 'edx-ui-toolkit/js/utils/sp
 
             afterEach(function() {
                 delete window.course;
+                if (containerPage !== undefined) {
+                    containerPage.remove();
+                }
             });
 
             defaultXBlockInfo = {

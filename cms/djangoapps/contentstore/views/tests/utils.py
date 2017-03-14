@@ -41,33 +41,48 @@ class StudioPageTestCase(CourseTestCase):
         resp_content = json.loads(resp.content)
         return resp_content['html']
 
-    def validate_preview_html(self, xblock, view_name, can_add=True):
+    def validate_preview_html(self, xblock, view_name, can_add=True, can_reorder=True, can_move=True,
+                              can_edit=True, can_duplicate=True, can_delete=True):
         """
         Verify that the specified xblock's preview has the expected HTML elements.
         """
         html = self.get_preview_html(xblock, view_name)
-        self.validate_html_for_add_buttons(html, can_add)
+        self.validate_html_for_action_button(
+            html,
+            '<div class="add-xblock-component new-component-item adding"></div>',
+            can_add
+        )
+        self.validate_html_for_action_button(
+            html,
+            '<span data-tooltip="Drag to reorder" class="drag-handle action"></span>',
+            can_reorder
+        )
+        self.validate_html_for_action_button(
+            html,
+            '<button data-tooltip="Move" class="btn-default move-button action-button">',
+            can_move
+        )
+        self.validate_html_for_action_button(
+            html,
+            'button class="btn-default edit-button action-button">',
+            can_edit
+        )
+        self.validate_html_for_action_button(
+            html,
+            '<button data-tooltip="Delete" class="btn-default delete-button action-button">',
+            can_duplicate
+        )
+        self.validate_html_for_action_button(
+            html,
+            '<button data-tooltip="Duplicate" class="btn-default duplicate-button action-button">',
+            can_delete
+        )
 
-        # Verify drag handles always appear.
-        drag_handle_html = '<span data-tooltip="Drag to reorder" class="drag-handle action"></span>'
-        self.assertIn(drag_handle_html, html)
-
-        # Verify that there are no action buttons for public blocks
-        expected_button_html = [
-            '<a href="#" class="edit-button action-button">',
-            '<a href="#" data-tooltip="Delete" class="delete-button action-button">',
-            '<a href="#" data-tooltip="Duplicate" class="duplicate-button action-button">'
-        ]
-        for button_html in expected_button_html:
-            self.assertIn(button_html, html)
-
-    def validate_html_for_add_buttons(self, html, can_add=True):
+    def validate_html_for_action_button(self, html, expected_html, can_action=True):
         """
-        Validate that the specified HTML has the appropriate add actions for the current publish state.
+        Validate that the specified HTML has specific action..
         """
-        # Verify that there are no add buttons for public blocks
-        add_button_html = '<div class="add-xblock-component new-component-item adding"></div>'
-        if can_add:
-            self.assertIn(add_button_html, html)
+        if can_action:
+            self.assertIn(expected_html, html)
         else:
-            self.assertNotIn(add_button_html, html)
+            self.assertNotIn(expected_html, html)
