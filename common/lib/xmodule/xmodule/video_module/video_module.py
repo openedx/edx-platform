@@ -216,7 +216,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         # stream.
         if self.edx_video_id and edxval_api:
             try:
-                val_profiles = ["youtube", "desktop_webm", "desktop_mp4"]
+                val_profiles = ["youtube", "desktop_webm", "desktop_mp4", "hls"]
 
                 # strip edx_video_id to prevent ValVideoNotFoundError error if unwanted spaces are there. TNL-5769
                 val_video_urls = edxval_api.get_urls_for_profiles(self.edx_video_id.strip(), val_profiles)
@@ -226,12 +226,13 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
                 # value will map to `None`
 
                 # add the non-youtube urls to the list of alternative sources
-                # use the last non-None non-youtube url as the link to download the video
+                # use the last non-None non-youtube non-hls url as the link to download the video
                 for url in [val_video_urls[p] for p in val_profiles if p != "youtube"]:
                     if url:
                         if url not in sources:
                             sources.append(url)
-                        if self.download_video:
+                        # don't include hls urls for download
+                        if self.download_video and not url.endswith('.m3u8'):
                             # function returns None when the url cannot be re-written
                             rewritten_link = rewrite_video_url(cdn_url, url)
                             if rewritten_link:
@@ -268,6 +269,10 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
                 download_video_link = self.source
             elif self.html5_sources:
                 download_video_link = self.html5_sources[0]
+
+            # don't give the option to download HLS video urls
+            if download_video_link and download_video_link.endswith('.m3u8'):
+                download_video_link = None
 
         track_url, transcript_language, sorted_languages = self.get_transcripts_for_student(self.get_transcripts_info())
 
