@@ -71,6 +71,8 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
 
             if course.last_accessed is not None:
                 self.assertIn('Resume Course', response_content)
+            else:
+                self.assertNotIn('Resume Course', response_content)
             for chapter in course.children:
                 self.assertIn(chapter.display_name, response_content)
                 for section in chapter.children:
