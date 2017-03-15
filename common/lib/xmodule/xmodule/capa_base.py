@@ -1160,6 +1160,7 @@ class CapaMixin(CapaFields):
                 }
 
         try:
+            self.lcp.context['attempt'] = self.attempts + 1
             correct_map = self.lcp.grade_answers(answers)
             self.attempts = self.attempts + 1
             self.lcp.done = True
@@ -1443,6 +1444,7 @@ class CapaMixin(CapaFields):
         event_info['orig_total'] = orig_score['total']
 
         try:
+            self.lcp.context['attempt'] = self.attempts
             correct_map = self.lcp.rescore_existing_answers()
 
         except (StudentInputError, ResponseError, LoncapaProblemError) as inst:
