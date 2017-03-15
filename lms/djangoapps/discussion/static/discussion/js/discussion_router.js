@@ -50,7 +50,7 @@
 
                     Backbone.history.start({
                         pushState: true,
-                        root: '/courses/' + this.courseId + '/discussion/forum/'
+                        root: '/courses/' + this.courseId + '/discussion/'
                     });
                 },
 
