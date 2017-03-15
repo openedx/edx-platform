@@ -154,7 +154,15 @@ def dashboard(request, course, ccx=None):
         context['schedule'] = json.dumps(schedule, indent=4)
         context['save_url'] = reverse(
             'save_ccx', kwargs={'course_id': ccx_locator})
-        context['ccx_members'] = CourseEnrollment.objects.filter(course_id=ccx_locator, is_active=True)
+        # Start: Added by Labster
+        # Hide internal users from coaches view.
+        is_staff = has_access(request.user, 'staff', course)
+        is_instructor = has_access(request.user, 'instructor', course)
+        ccx_members = CourseEnrollment.objects.filter(course_id=ccx_locator, is_active=True)
+        if not all([is_staff, is_instructor]):
+           ccx_members = ccx_members.exclude(user__courseaccessrole__role__in=('instructor', 'staff',))
+        context['ccx_members'] = ccx_members
+        # End: Added by Labster
         context['gradebook_url'] = reverse(
             'ccx_gradebook', kwargs={'course_id': ccx_locator})
         context['grades_csv_url'] = reverse(
