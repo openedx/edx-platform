@@ -19,7 +19,7 @@ class NoseTestSuiteRunner(django_nose.NoseTestSuiteRunner):
             if name == 'loaddata':
                 return 0
             else:
-                return real_call_command
+                return real_call_command(name, *args, **kwargs)
 
         django.core.management.call_command = suppress_loaddata_call_command
         return_value = super(NoseTestSuiteRunner, self).setup_databases()
