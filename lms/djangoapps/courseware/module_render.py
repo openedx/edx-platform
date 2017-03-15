@@ -199,6 +199,12 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
                 if is_section_active:
                     found_active_section = True
 
+                # get data for each unit in current subsection
+                units = [
+                    {'display_name': child.display_name, 'idx': index}
+                    for index, child in enumerate(section.get_children())
+                ]
+
                 section_context = {
                     'display_name': section.display_name_with_default_escaped,
                     'url_name': section.url_name,
@@ -206,6 +212,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
                     'due': section.due,
                     'active': is_section_active,
                     'graded': section.graded,
+                    'units': units
                 }
                 _add_timed_exam_info(user, course, section, section_context)
 

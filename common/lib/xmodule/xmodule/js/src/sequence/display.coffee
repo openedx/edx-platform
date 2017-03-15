@@ -153,6 +153,11 @@ class @Sequence
       @nextUrl  # boundary_url
     )
 
+    # KAUFFMAN - this is here and not in accordian.html because of unbinding the click events at the top of this f.
+    activeNavUnitId = @position - 1;
+    $('.accordion-units li').removeClass('active');
+    $('#accordion-unit-' + activeNavUnitId).addClass('active');
+
   render: (new_position) ->
     if @position != new_position
       if @position != undefined

@@ -1,0 +1,35 @@
+/*
+* courseware.html
+**/
+
+div.wrapper-course-modes {
+  height: 30px;
+
+
+  .fa-bars {
+    float: right;
+    font-size: 30px;
+    cursor: pointer;
+  }
+}
+
+/*
+* accordion.html
+**/
+
+div.accordion {
+  width: 100%;
+
+  &.retracted {
+    margin-left: -100%;
+  }
+  .accordion-units li {
+    cursor: pointer;
+    font-weight: 300;
+    padding-left: 30px;
+
+    &.active {
+      font-weight: 600;
+    }
+  }
+}
