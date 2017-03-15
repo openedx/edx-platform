@@ -158,11 +158,11 @@ class TestGenerateCourseBlocks(ModuleStoreTestCase):
             self.command.handle(all_courses=False)
 
     def test_no_course_mode(self):
-        with self.assertRaisesMessage(CommandError, 'Either --courses or --all_courses must be specified.'):
+        with self.assertRaisesMessage(CommandError, 'Must specify exactly one of --courses, --all_courses'):
             self.command.handle()
 
     def test_both_course_modes(self):
-        with self.assertRaisesMessage(CommandError, 'Both --courses and --all_courses cannot be specified.'):
+        with self.assertRaisesMessage(CommandError, 'Must specify exactly one of --courses, --all_courses'):
             self.command.handle(all_courses=True, courses=['some/course/key'])
 
     @ddt.data(
