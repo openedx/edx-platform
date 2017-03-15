@@ -151,6 +151,7 @@ class RenderXBlockTestMixin(object):
         ('html_block', ModuleStoreEnum.Type.split, 6),
     )
     @ddt.unpack
+    @patch.dict("django.conf.settings.FEATURES", {"ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE": True})
     def test_courseware_html(self, block_name, default_store, mongo_calls):
         """
         To verify that the removal of courseware chrome elements is working,
