@@ -1385,10 +1385,6 @@ discussion_js = (
     sorted(rooted_glob(COMMON_ROOT / 'static', 'common/js/discussion/**/*.js'))
 )
 
-discussion_forum_js = [
-    'js/discussion_forum.js',
-]
-
 discussion_vendor_js = [
     'js/vendor/edx_ui_toolkit_shim.js',
     'js/vendor/i18n_shim.js',
@@ -1634,7 +1630,7 @@ PIPELINE_CSS = {
 }
 
 
-separately_bundled_js = set(courseware_js + discussion_js + discussion_forum_js + notes_js + instructor_dash_js)
+separately_bundled_js = set(courseware_js + discussion_js + notes_js + instructor_dash_js)
 common_js = sorted(set(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/**/*.js')) - separately_bundled_js)
 xblock_runtime_js = [
     'common/js/xblock/core.js',
@@ -1698,10 +1694,6 @@ PIPELINE_JS = {
     'discussion_vendor': {
         'source_filenames': discussion_vendor_js,
         'output_filename': 'js/discussion_vendor.js',
-    },
-    'discussion_forum': {
-        'source_filenames': discussion_forum_js,
-        'output_filename': 'js/discussion_forum.js',
     },
     'notes': {
         'source_filenames': notes_js,

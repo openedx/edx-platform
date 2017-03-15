@@ -1,27 +1,36 @@
 <%!
 from json import dumps as json_dumps
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.js_utils import js_escaped_string
 %>
-<section class="discussion container" id="discussion-container"
+<section class="discussion discussion-board container" id="discussion-container"
        data-roles="${roles}"
-       data-course-id="${course_id}"
+       data-course-id="${course_id | n, js_escaped_string}"
+       data-course-name="${course.display_name_with_default | n, js_escaped_string}"
        data-user-info="${user_info}"
        data-threads="${threads}"
-       data-thread-pages="${thread_pages}"
+       data-thread-pages="${thread_pages| n, js_escaped_string}"
        data-content-info="${annotated_content_info}"
-       data-sort-preference="${sort_preference}"
+       data-sort-preference="${sort_preference | n, js_escaped_string}"
        data-flag-moderator="${flag_moderator}"
-       data-user-cohort-id="${user_cohort}"
+       data-user-cohort-id="${user_cohort | n, js_escaped_string}"
        data-course-settings="${course_settings}"
        data-user-create-comment="${json_dumps(can_create_comment)}"
        data-user-create-subcomment="${json_dumps(can_create_subcomment)}"
        data-read-only="false">
-<div class="discussion-body">
-  <div class="forum-nav"></div>
-  <div class="discussion-column">
-    <article class="new-post-article" style="display: none"></article>
-    <div class="forum-content"></div>
-  </div>
-</div>
+    <div class="page-content">
+        <div class="discussion-body layout layout-1t2t">
+            <aside class="forum-nav layout-col layout-col-a" role="complementary" aria-label="${_("Discussion thread list")}">
+                <%include file="_filter_dropdown.html" />
+                <div class="discussion-thread-list-container"></div>
+            </aside>
+
+            <main id="main" aria-label="Content" tabindex="-1" class="discussion-column layout-col layout-col-b">
+                <article class="new-post-article is-hidden" style="display: none" tabindex="-1" aria-label="${_("New topic form")}"></article>
+                <div class="forum-content"></div>
+            </main>
+        </div>
+    </div>
 </section>
 
 <%include file="_underscore_templates.html" />
