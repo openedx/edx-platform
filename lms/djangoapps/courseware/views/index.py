@@ -22,7 +22,8 @@ import logging
 import newrelic.agent
 import urllib
 
-from xblock.fragment import Fragment
+from lms.djangoapps.gating.api import get_entrance_exam_score_ratio, get_entrance_exam_usage_key
+from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
@@ -31,11 +32,12 @@ from shoppingcart.models import CourseRegistrationCode
 from student.models import CourseEnrollment
 from student.views import is_course_blocked
 from student.roles import GlobalStaff
+from survey.utils import must_answer_survey
 from util.enterprise_helpers import get_enterprise_consent_url
 from util.views import ensure_valid_course_key
+from xblock.fragment import Fragment
 from xmodule.modulestore.django import modulestore
 from xmodule.x_module import STUDENT_VIEW
-from survey.utils import must_answer_survey
 
 from ..access import has_access, _adjust_start_date_for_beta_testers
 from ..access_utils import in_preview_mode
@@ -43,9 +45,8 @@ from ..courses import get_studio_url, get_course_with_access
 from ..entrance_exams import (
     course_has_entrance_exam,
     get_entrance_exam_content,
-    get_entrance_exam_score,
     user_has_passed_entrance_exam,
-    user_must_complete_entrance_exam,
+    user_can_skip_entrance_exam,
 )
 from ..exceptions import Redirect
 from ..masquerade import setup_masquerade
@@ -276,10 +277,7 @@ class CoursewareIndex(View):
         """
         Check to see if an Entrance Exam is required for the user.
         """
-        if (
-                course_has_entrance_exam(self.course) and
-                user_must_complete_entrance_exam(self.request, self.effective_user, self.course)
-        ):
+        if not user_can_skip_entrance_exam(self.effective_user, self.course):
             exam_chapter = get_entrance_exam_content(self.effective_user, self.course)
             if exam_chapter and exam_chapter.get_children():
                 exam_section = exam_chapter.get_children()[0]
@@ -428,10 +426,7 @@ class CoursewareIndex(View):
         )
 
         # entrance exam data
-        if course_has_entrance_exam(self.course):
-            if getattr(self.chapter, 'is_entrance_exam', False):
-                courseware_context['entrance_exam_current_score'] = get_entrance_exam_score(self.request, self.course)
-                courseware_context['entrance_exam_passed'] = user_has_passed_entrance_exam(self.request, self.course)
+        self._add_entrance_exam_to_context(courseware_context)
 
         # staff masquerading data
         now = datetime.now(UTC())
@@ -468,6 +463,17 @@ class CoursewareIndex(View):
                         .display_name_with_default
 
         return courseware_context
+
+    def _add_entrance_exam_to_context(self, courseware_context):
+        """
+        Adds entrance exam related information to the given context.
+        """
+        if course_has_entrance_exam(self.course) and getattr(self.chapter, 'is_entrance_exam', False):
+            courseware_context['entrance_exam_passed'] = user_has_passed_entrance_exam(self.effective_user, self.course)
+            courseware_context['entrance_exam_current_score'] = get_entrance_exam_score_ratio(
+                CourseGradeFactory().create(self.effective_user, self.course),
+                get_entrance_exam_usage_key(self.course),
+            )
 
     def _create_section_context(self, previous_of_active_section, next_of_active_section):
         """

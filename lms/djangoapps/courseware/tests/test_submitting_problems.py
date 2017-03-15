@@ -296,13 +296,11 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
         """
         Returns SubsectionGrade for given url.
         """
-        # list of grade summaries for each section
-        sections_list = []
-        for chapter in self.get_course_grade().chapter_grades:
-            sections_list.extend(chapter['sections'])
-
-        # get the first section that matches the url (there should only be one)
-        return next(section for section in sections_list if section.url_name == hw_url_name)
+        for chapter in self.get_course_grade().chapter_grades.itervalues():
+            for section in chapter['sections']:
+                if section.url_name == hw_url_name:
+                    return section
+        return None
 
     def score_for_hw(self, hw_url_name):
         """
