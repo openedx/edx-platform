@@ -127,7 +127,7 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
         try:
             scheme = UserPartition.scheme_extensions[name].plugin
         except KeyError:
-            raise UserPartitionError("Unrecognized scheme {0}".format(name))
+            return None
         scheme.name = name
         return scheme
 
@@ -186,7 +186,8 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
         groups = [Group.from_json(g) for g in value["groups"]]
         scheme = UserPartition.get_scheme(scheme_id)
         if not scheme:
-            raise TypeError("UserPartition dict {0} has unrecognized scheme {1}".format(value, scheme_id))
+            active = False  # mark the partition inactive to exclude it from access checks
+            scheme = scheme_id  # use a non-None stub value for the scheme name
 
         return UserPartition(
             value["id"],
