@@ -11,7 +11,19 @@ class NoseTestSuiteRunner(django_nose.NoseTestSuiteRunner):
 
     def setup_databases(self):
         """ Setup databases and then flush to remove data added by migrations. """
+
+        import django.core.management
+        real_call_command = django.core.management.call_command
+
+        def suppress_loaddata_call_command(name, *args, **kwargs):
+            if name == 'loaddata':
+                return 0
+            else:
+                return real_call_command
+
+        django.core.management.call_command = suppress_loaddata_call_command
         return_value = super(NoseTestSuiteRunner, self).setup_databases()
+        django.core.management.call_command = real_call_command
 
         # Through Django 1.8, auto increment sequences are not reset when calling flush on a SQLite db.
         # So we do it ourselves.
