@@ -344,9 +344,9 @@ class GetItemTest(ItemTest):
         self.course.user_partitions = [
             UserPartition(
                 id=0,
-                name="Verification user partition",
-                scheme=UserPartition.get_scheme("verification"),
-                description="Verification user partition",
+                name="Random user partition",
+                scheme=UserPartition.get_scheme("random"),
+                description="Random user partition",
                 groups=[
                     Group(id=0, name="Group A"),
                     Group(id=1, name="Group B"),
@@ -366,8 +366,8 @@ class GetItemTest(ItemTest):
         self.assertEqual(result["user_partitions"], [
             {
                 "id": 0,
-                "name": "Verification user partition",
-                "scheme": "verification",
+                "name": "Random user partition",
+                "scheme": "random",
                 "groups": [
                     {
                         "id": 0,
