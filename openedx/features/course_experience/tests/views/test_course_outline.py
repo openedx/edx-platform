@@ -1,6 +1,7 @@
 """
 Tests for the Course Outline view and supporting views.
 """
+from mock import patch
 from django.core.urlresolvers import reverse
 
 from student.models import CourseEnrollment
@@ -26,6 +27,7 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
                 chapter = ItemFactory.create(category='chapter', parent_location=course.location)
                 section = ItemFactory.create(category='sequential', parent_location=chapter.location)
                 ItemFactory.create(category='vertical', parent_location=section.location)
+                course.last_accessed = section.url_name
 
             cls.courses.append(course)
 
@@ -36,6 +38,7 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
                 section2 = ItemFactory.create(category='sequential', parent_location=chapter.location)
                 ItemFactory.create(category='vertical', parent_location=section.location)
                 ItemFactory.create(category='vertical', parent_location=section2.location)
+                course.last_accessed = None
 
     @classmethod
     def setUpTestData(cls):
@@ -52,8 +55,10 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
         super(TestCourseOutlinePage, self).setUp()
         self.client.login(username=self.user.username, password=self.password)
 
-    def test_render(self):
+    @patch('openedx.features.course_experience.views.course_outline.get_last_accessed_courseware')
+    def test_render(self, patched_get_last_accessed):
         for course in self.courses:
+            patched_get_last_accessed.return_value = (None, course.last_accessed)
             url = reverse(
                 'edx.course_experience.course_home',
                 kwargs={
@@ -64,6 +69,8 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
             self.assertEqual(response.status_code, 200)
             response_content = response.content.decode("utf-8")
 
+            if course.last_accessed is not None:
+                self.assertIn('Resume Course', response_content)
             for chapter in course.children:
                 self.assertIn(chapter.display_name, response_content)
                 for section in chapter.children:
