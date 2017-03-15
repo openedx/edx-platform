@@ -353,7 +353,7 @@ from student.helpers import (
             <p class="message-copy">${Text(_('Your current verification will expire in {days} days. {start_link}Re-verify your identity now{end_link} using a webcam and a government-issued photo ID.')).format(
                 start_link=HTML('<a href="{href}">').format(href=reverse('verify_student_reverify')),
                 end_link=HTML('</a>'),
-                days=settings.VERIFY_STUDENT.get("EXPIRING_SOON_WINDOW")
+                days=expiring_soon_window
               )}
             </p>
           % endif

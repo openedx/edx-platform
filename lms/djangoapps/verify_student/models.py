@@ -202,7 +202,8 @@ class PhotoVerification(StatusModel):
         Returns the earliest allowed date given the settings
 
         """
-        days_good_for = settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
+        verify_student_config = StudentVerificationConfiguration.current()
+        days_good_for = verify_student_config.days_good_for if verify_student_config.enabled else 365
         return datetime.now(pytz.UTC) - timedelta(days=days_good_for)
 
     @classmethod
@@ -398,7 +399,8 @@ class PhotoVerification(StatusModel):
     @property
     def expiration_datetime(self):
         """Datetime that the verification will expire. """
-        days_good_for = settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
+        verify_student_config = StudentVerificationConfiguration.current()
+        days_good_for = verify_student_config.days_good_for if verify_student_config.enabled else 365
         return self.created_at + timedelta(days=days_good_for)
 
     def active_at_datetime(self, deadline):
@@ -974,9 +976,10 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         """
         Returns True if verification is expiring within EXPIRING_SOON_WINDOW.
         """
+        verify_student_config = StudentVerificationConfiguration.current()
+        expiring_soon_window = verify_student_config.expiring_soon_window if verify_student_config.enabled else 28
         if expiration_datetime:
-            if (expiration_datetime - datetime.now(pytz.UTC)).days <= settings.VERIFY_STUDENT.get(
-                    "EXPIRING_SOON_WINDOW"):
+            if (expiration_datetime - datetime.now(pytz.UTC)).days <= expiring_soon_window:
                 return True
 
         return False
@@ -1382,6 +1385,16 @@ class IcrvStatusEmailsConfiguration(ConfigurationModel):
     When enabled, ICRV status emails are sent.
     """
     pass
+
+
+class StudentVerificationConfiguration(ConfigurationModel):
+    """Student Verification Configuration"""
+    days_good_for = models.PositiveIntegerField(
+        default=365, help_text="How many days is a verification good for"
+    )
+    expiring_soon_window = models.PositiveIntegerField(
+        default=28, help_text="The window within which a verification is considered to be expiring soon"
+    )
 
 
 class SkippedReverification(models.Model):

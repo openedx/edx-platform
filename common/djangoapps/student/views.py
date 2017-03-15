@@ -59,7 +59,8 @@ from student.models import (
 from student.forms import AccountCreationForm, PasswordResetFormNoActive, get_registration_extension_form
 from student.tasks import send_activation_email
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification  # pylint: disable=import-error
+from lms.djangoapps.verify_student.models import (
+    SoftwareSecurePhotoVerification, StudentVerificationConfiguration)  # pylint: disable=import-error
 from bulk_email.models import Optout, BulkEmailFlag  # pylint: disable=import-error
 from certificates.models import (  # pylint: disable=import-error
     CertificateStatuses, GeneratedCertificate, certificate_status_for_student
@@ -635,6 +636,8 @@ def dashboard(request):
         settings.FEATURES.get('DISPLAY_COURSE_MODES_ON_DASHBOARD', True)
     )
 
+    verify_student_config = StudentVerificationConfiguration.current()
+
     # Let's filter out any courses in an "org" that has been declared to be
     # in a configuration
     org_filter_out_set = configuration_helpers.get_all_orgs()
@@ -837,6 +840,7 @@ def dashboard(request):
         'disable_courseware_js': True,
         'display_course_modes_on_dashboard': enable_verified_certificates and display_course_modes_on_dashboard,
         'display_sidebar_on_dashboard': display_sidebar_on_dashboard,
+        'expiring_soon_window': verify_student_config.expiring_soon_window if verify_student_config.enabled else 28,
     }
 
     ecommerce_service = EcommerceService()

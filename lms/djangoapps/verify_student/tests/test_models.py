@@ -26,7 +26,7 @@ from lms.djangoapps.verify_student.models import (
     SoftwareSecurePhotoVerification,
     VerificationException, VerificationCheckpoint,
     VerificationStatus, SkippedReverification,
-    VerificationDeadline
+    VerificationDeadline, StudentVerificationConfiguration
 )
 
 
@@ -49,7 +49,6 @@ iwIDAQAB
         "AWS_SECRET_KEY": "FAKESECRETKEY",
         "S3_BUCKET": "fake-bucket",
     },
-    "DAYS_GOOD_FOR": 10,
 }
 
 
@@ -373,6 +372,7 @@ class TestPhotoVerification(MockS3Mixin, ModuleStoreTestCase):
 
     def test_active_at_datetime(self):
         user = UserFactory.create()
+        verify_student_config = StudentVerificationConfiguration.objects.create(enabled=True, days_good_for=10)
         attempt = SoftwareSecurePhotoVerification.objects.create(user=user)
 
         # Not active before the created date
@@ -384,17 +384,18 @@ class TestPhotoVerification(MockS3Mixin, ModuleStoreTestCase):
         self.assertTrue(attempt.active_at_datetime(after_created))
 
         # Active immediately before expiration date
-        expiration = attempt.created_at + timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
+        expiration = attempt.created_at + timedelta(days=verify_student_config.days_good_for)
         before_expiration = expiration - timedelta(seconds=1)
         self.assertTrue(attempt.active_at_datetime(before_expiration))
 
         # Not active after the expiration date
-        attempt.created_at = attempt.created_at - timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
+        attempt.created_at = attempt.created_at - timedelta(days=verify_student_config.days_good_for)
         attempt.save()
         self.assertFalse(attempt.active_at_datetime(datetime.now(pytz.UTC) + timedelta(days=1)))
 
     def test_verification_for_datetime(self):
         user = UserFactory.create()
+        verify_student_config = StudentVerificationConfiguration.objects.create(enabled=True, days_good_for=10)
         now = datetime.now(pytz.UTC)
 
         # No attempts in the query set, so should return None
@@ -428,14 +429,14 @@ class TestPhotoVerification(MockS3Mixin, ModuleStoreTestCase):
         self.assertEqual(result, attempt)
 
         # Immediately before the expiration date, should get the attempt
-        expiration = attempt.created_at + timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
+        expiration = attempt.created_at + timedelta(days=verify_student_config.days_good_for)
         before_expiration = expiration - timedelta(seconds=1)
         query = SoftwareSecurePhotoVerification.objects.filter(user=user)
         result = SoftwareSecurePhotoVerification.verification_for_datetime(before_expiration, query)
         self.assertEqual(result, attempt)
 
         # Immediately after the expiration date, should not get the attempt
-        attempt.created_at = attempt.created_at - timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
+        attempt.created_at = attempt.created_at - timedelta(days=verify_student_config.days_good_for)
         attempt.save()
         after = datetime.now(pytz.UTC) + timedelta(days=1)
         query = SoftwareSecurePhotoVerification.objects.filter(user=user)
@@ -480,6 +481,7 @@ class TestPhotoVerification(MockS3Mixin, ModuleStoreTestCase):
         verification with field 'photo_id_key' set against a user.
         """
         user = UserFactory.create()
+        verify_student_config = StudentVerificationConfiguration.objects.create(enabled=True, days_good_for=10)
 
         # No initial verification for the user
         result = SoftwareSecurePhotoVerification.get_initial_verification(user=user)
@@ -507,14 +509,14 @@ class TestPhotoVerification(MockS3Mixin, ModuleStoreTestCase):
         self.assertEqual(second_result, first_result)
 
         # Test method 'get_initial_verification' returns None after expiration
-        expired_future = datetime.utcnow() + timedelta(days=(FAKE_SETTINGS['DAYS_GOOD_FOR'] + 1))
+        expired_future = datetime.utcnow() + timedelta(days=(verify_student_config.days_good_for + 1))
         with freeze_time(expired_future):
             third_result = SoftwareSecurePhotoVerification.get_initial_verification(user)
             self.assertIsNone(third_result)
 
         # Test method 'get_initial_verification' returns correct attempt after system expiration,
         # but within earliest allowed override.
-        expired_future = datetime.utcnow() + timedelta(days=(FAKE_SETTINGS['DAYS_GOOD_FOR'] + 1))
+        expired_future = datetime.utcnow() + timedelta(days=(verify_student_config.days_good_for + 1))
         earliest_allowed = datetime.utcnow() - timedelta(days=1)
         with freeze_time(expired_future):
             fourth_result = SoftwareSecurePhotoVerification.get_initial_verification(user, earliest_allowed)
