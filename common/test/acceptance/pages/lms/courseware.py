@@ -115,8 +115,17 @@ class CoursewarePage(CoursePage):
         Arguments:
             sequential_position (int): position in sequential bar
         """
+        def is_at_new_position():
+            """
+            Returns whether the specified tab has become active. It is defensive
+            against the case where the page is still being loaded.
+            """
+            active_tab = self._active_sequence_tab
+            return active_tab and int(active_tab.attrs('data-element')[0]) == sequential_position
+
         sequential_position_css = '#sequence-list #tab_{0}'.format(sequential_position - 1)
         self.q(css=sequential_position_css).first.click()
+        EmptyPromise(is_at_new_position, "Position navigation fulfilled").fulfill()
 
     @property
     def sequential_position(self):
