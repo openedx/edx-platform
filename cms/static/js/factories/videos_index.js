@@ -58,7 +58,7 @@ define([
                     sortField: previousUploads["sort_field"],
                     count: previousUploads["count"],
                     sortOder: previousUploads["sort_order"],
-                    searchKey: "abc"
+                    page: previousUploads["page"]
                 }),
                 encodingsDownloadUrl: encodingsDownloadUrl
             });
