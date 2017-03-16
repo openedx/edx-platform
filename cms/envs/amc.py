@@ -64,3 +64,4 @@ TIERS_EXPIRED_REDIRECT_URL = AMC_APP_URL + "/expired"
 TIERS_DATABASE_URL = ENV_TOKENS.get('TIERS_DATABASE_URL')
 DATABASES['tiers'] = dj_database_url.parse(TIERS_DATABASE_URL)
 
+DATABASE_ROUTERS += ['openedx.core.djangoapps.appsembler.sites.routers.TiersDbRouter']
