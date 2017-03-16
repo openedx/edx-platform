@@ -1,6 +1,19 @@
 @import 'lms/static/sass/lms-course';
 
-div.course-index{
+div.course-spinner {
+  display: inline-block;
+  width: 80%;
+  position: relative;
+  border: none;
+  box-shadow: none;
+
+  .fa {
+    position: absolute;
+    left: calc(50% - 16px);
+  }
+}
+
+div.course-index {
   display: inline-block;
   vertical-align: top;
   width: 17%;
@@ -20,7 +33,7 @@ body.view-in-course {
 
   div.course-wrapper {
     margin: 0 0 0 10px;
-    display: inline-block !important;
+    display: inline-block;
     max-width: 95%;
     width: 80%;
 

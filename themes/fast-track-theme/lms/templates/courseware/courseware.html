@@ -160,8 +160,17 @@ ${HTML(fragment.foot_html())}
 
     </div>
 % endif
+<div class="course-spinner">
+    <i class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
+</div>
 <div class="course-wrapper" role="presentation">
-
+        <script>
+            $('.course-wrapper').css('visibility', 'hidden');
+            $(document).ready(function(){
+                $('.course-wrapper').css('visibility', 'visible');
+                $('.course-spinner').css('display', 'none');
+            });
+        </script>
     <section class="course-content" id="course-content">
         <main id="main" aria-label="Content" tabindex="-1">
         % if getattr(course, 'entrance_exam_enabled') and \
