@@ -11,6 +11,7 @@ from lms.djangoapps.verify_student.models import (
     SkippedReverification,
     SoftwareSecurePhotoVerification,
     VerificationStatus,
+    StudentVerificationConfiguration,
 )
 
 
@@ -61,3 +62,4 @@ class SkippedReverificationAdmin(admin.ModelAdmin):
 
 
 admin.site.register(IcrvStatusEmailsConfiguration, ConfigurationModelAdmin)
+admin.site.register(StudentVerificationConfiguration, ConfigurationModelAdmin)
