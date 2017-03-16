@@ -29,7 +29,8 @@ define([
                 pageSize: options.pageSize,
                 totalRecords: options.count,
                 sortKey: options.sortField,
-                order: options.sort_order
+                order: options.sort_order,
+                currentPage: options.page
             };
         },
 

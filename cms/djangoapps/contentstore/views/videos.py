@@ -305,18 +305,7 @@ def _get_index_videos(course, request):
     """
     Returns the information about each video upload required for the video list
     """
-    params = { "paginated": True }
-
-    page = request.GET.get("page")
-    page_size = request.GET.get("page_size")
-    sort_field = request.GET.get("sort_field")
-    sort_order = request.GET.get("sort_order")
-
-    # Add parameter if it exists in request
-    if page: params["page"] = page
-    if page_size: params["page_size"] = page_size
-    if sort_field: params["sort_field"] = VideoSortField[sort_field]
-    if sort_order: params["sort_dir"] = SortDirection[sort_order]
+    params = _get_validated_params(request)
 
     videos_data = _get_videos(course, params)
     videos_data["results"] = list(
@@ -493,3 +482,35 @@ def is_status_update_request(request_data):
     Returns True if `request_data` contains status update else False.
     """
     return any('status' in update for update in request_data)
+
+def _get_validated_params(request):
+    """
+    Reads and returns valid parameters
+    """
+    params = { "paginated": True }
+
+    page = request.GET.get("page")
+    page_size = request.GET.get("page_size")
+    search_key = request.GET.get("search_key")
+    sort_field = request.GET.get("sort_field")
+    sort_dir = request.GET.get("sort_dir")
+
+    # Page must be an integer greater than 0
+    try:
+        if int(page) > 0: params["page"] = int(page)
+    except:
+        pass
+
+    # Page size must be an integer greater than 0
+    try:
+        if int(page_size) > 0: params["page_size"] = int(page_size)
+    except:
+        pass
+
+    if sort_field in VideoSortField:
+        params["sort_field"] = VideoSortField[sort_field]
+
+    if sort_dir in SortDirection:
+        params["sort_dir"] = SortDirection[sort_dir]
+
+    return params
