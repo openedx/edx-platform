@@ -1,4 +1,5 @@
 from .aws import *
+import dj_database_url
 
 APPSEMBLER_SECRET_KEY = AUTH_TOKENS.get("APPSEMBLER_SECRET_KEY")
 # the following ip should work for all dev setups....
@@ -102,4 +103,7 @@ SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
 TIERS_ORGANIZATION_MODEL = 'organizations.Organization'
 TIERS_EXPIRED_REDIRECT_URL = None
+
+TIERS_DATABASE_URL = ENV_TOKENS.get('TIERS_DATABASE_URL')
+DATABASES['tiers'] = dj_database_url.parse(TIERS_DATABASE_URL)
 

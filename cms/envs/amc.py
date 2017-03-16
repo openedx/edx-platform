@@ -1,4 +1,5 @@
 from .aws import *
+import dj_database_url
 
 APPSEMBLER_AMC_API_BASE = AUTH_TOKENS.get('APPSEMBLER_AMC_API_BASE')
 APPSEMBLER_FIRST_LOGIN_API = '/logged_into_edx'
@@ -59,4 +60,7 @@ SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
 TIERS_ORGANIZATION_MODEL = 'organizations.Organization'
 TIERS_EXPIRED_REDIRECT_URL = AMC_APP_URL + "/expired"
+
+TIERS_DATABASE_URL = ENV_TOKENS.get('TIERS_DATABASE_URL')
+DATABASES['tiers'] = dj_database_url.parse(TIERS_DATABASE_URL)
 
