@@ -5,8 +5,8 @@
         <%- gettext("Download available encodings (.csv)") %>
       </a>
     </div>
-    <div class="forum-search"></div>
     <div id="video-paging-header"></div>
+    <div class="forum-search"></div>
     <table class="assets-table">
         <thead>
             <tr>
