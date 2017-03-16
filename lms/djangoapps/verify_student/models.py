@@ -1396,6 +1396,9 @@ class StudentVerificationConfiguration(ConfigurationModel):
         default=28, help_text="The window within which a verification is considered to be expiring soon"
     )
 
+    def __unicode__(self):
+        return "Student Verification Configuration"
+
 
 class SkippedReverification(models.Model):
     """Model for tracking skipped Reverification of a user against a specific

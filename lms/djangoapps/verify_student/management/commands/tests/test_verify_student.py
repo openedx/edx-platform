@@ -20,7 +20,7 @@ from lms.djangoapps.verify_student.tests.test_models import (
 
 
 # Lots of patching to stub in our own settings, and HTTP posting
-@patch.dict(FAKE_SETTINGS)
+@patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
 @patch('lms.djangoapps.verify_student.models.requests.post', new=mock_software_secure_post)
 class TestVerifyStudentCommand(MockS3Mixin, TestCase):
     """
