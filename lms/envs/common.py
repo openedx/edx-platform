@@ -350,9 +350,6 @@ FEATURES = {
     # Whether an xBlock publishing a 'grade' event should be considered a 'progress' event as well
     'MARK_PROGRESS_ON_GRADING_EVENT': False,
 
-    # Broadcast score changes to the rest of the system
-    'SIGNAL_ON_SCORE_CHANGED': False,
-
     # Enable the edx-notifications subssytem
     'ENABLE_NOTIFICATIONS': False,
 
