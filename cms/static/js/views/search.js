@@ -16,7 +16,8 @@
          */
         var searchView = Backbone.View.extend({
             events: {
-                    'click .search-btn': 'searchKey',
+                    'click .search-button': 'searchKey',
+                    'click .cancel-button': 'cancelSearch'
             },
 
             initialize: function(options) {
@@ -29,10 +30,15 @@
             },
 
             searchKey: function() {
-                var searchKey = this.$('.search-input').val();
+                var searchKey = this.$('.search-field').val();
                 this.collection.setSearchKey(searchKey);
                 this.collection.setPage(1);
-                searchKey.val('');
+            },
+
+            cancelSearch: function() {
+                this.$('.search-field').val('');
+                this.collection.setSearchKey('');
+                this.collection.setPage(1);
             }
         });
 
