@@ -295,7 +295,8 @@ def get_group_display_name(user_partitions, xblock_display_name):
     """
     for user_partition in user_partitions:
         for group in user_partition['groups']:
-            if str(group['id']) in xblock_display_name:
+            # Temporary hack until TNL-6731 is addressed.
+            if group['id'] > 99 and str(group['id']) in xblock_display_name:
                 return group['name']
 
 
