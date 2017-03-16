@@ -497,6 +497,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                     break
 
         if metadata_was_changed_by_user:
+            self.edx_video_id = self.edx_video_id.strip()
             manage_video_subtitles_save(
                 self,
                 user,
