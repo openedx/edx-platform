@@ -70,7 +70,7 @@
                     .find('.video-player div')
                     .addClass('hidden')
                     .end()
-                    .find('.video-player .video-error.hls-video')
+                    .find('.video-player .video-hls-error')
                     .removeClass('is-hidden')
                     .end()
                     .addClass('is-initialized')

@@ -26,9 +26,9 @@ from openedx.core.djangolib.js_utils import js_escaped_string
           <div class="video-player">
               <div id="${id}"></div>
               <h4 class="hd hd-4 video-error is-hidden">${_('No playable video sources found.')}</h4>
-              <h4 class="hd hd-4 video-error hls-video is-hidden">
+              <h4 class="hd hd-4 video-hls-error is-hidden">
                   ${_('This browser can not play HLS videos. Try using a different browser, such as Google Chrome.')}
-                </h4>
+              </h4>
           </div>
           <div class="video-player-post"></div>
           <div class="closed-captions"></div>

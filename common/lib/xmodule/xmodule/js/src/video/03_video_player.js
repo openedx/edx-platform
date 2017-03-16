@@ -152,7 +152,8 @@ function(HTML5Video, HTML5HLSVideo, Resizer, HLS, _) {
         // Browser can play HLS videos if either `Media Source Extensions`
         // feature is supported or browser is safari (native HLS support)
         state.canPlayHLS = state.HLSVideoSources.length > 0 && (HLS.isSupported() || state.browserIsSafari);
-        state.HLSOnlySources = _.difference(state.config.sources, state.HLSVideoSources).length === 0;
+        state.HLSOnlySources = state.config.sources.length > 0 &&
+                               state.config.sources.length === state.HLSVideoSources.length;
 
         commonConfig = {
             playerVars: state.videoPlayer.playerVars,
