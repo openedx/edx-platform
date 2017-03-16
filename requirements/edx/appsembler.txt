@@ -6,4 +6,4 @@ requests==2.8.1
 django-anymail==0.6.1
 #django-tiers==0.0.1
 git+https://github.com/appsembler/django-tiers.git@master
-dj-database-url=0.4.2
+dj-database-url==0.4.2
