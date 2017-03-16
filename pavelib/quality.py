@@ -66,7 +66,7 @@ def find_fixme(options):
         sh(
             "{pythonpath_prefix} pylint --disable all --enable=fixme "
             "--output-format=parseable {apps} "
-            "| tee {report_dir}/pylint_fixme.report".format(
+            "> {report_dir}/pylint_fixme.report".format(
                 pythonpath_prefix=pythonpath_prefix,
                 apps=apps_list,
                 report_dir=report_dir
@@ -116,8 +116,8 @@ def run_pylint(options):
         )
 
         sh(
-            "{pythonpath_prefix} pylint {flags} --output-format=parseable {apps} | "
-            "tee {report_dir}/pylint.report".format(
+            "{pythonpath_prefix} pylint {flags} --output-format=parseable {apps} "
+            "> {report_dir}/pylint.report".format(
                 pythonpath_prefix=pythonpath_prefix,
                 flags=" ".join(flags),
                 apps=apps_list,
