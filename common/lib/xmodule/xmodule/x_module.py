@@ -1684,7 +1684,7 @@ class DiscussionService(object):
         from courseware.access import has_access
         from courseware.courses import get_course_with_access
         from django_comment_client.permissions import has_permission
-        from django_comment_client.forum.views import get_threads, make_course_settings
+        from lms.djangoapps.discussion.views import get_threads, make_course_settings
         import django_comment_client.utils as utils
         from openedx.core.djangoapps.course_groups.cohorts import (
             is_course_cohorted,
@@ -1704,7 +1704,7 @@ class DiscussionService(object):
         course = get_course_with_access(self.runtime.user, 'load', course_id, check_if_enrolled=True)
         user_cohort_id = get_cohort_id(user, course_id)
 
-        unsafethreads, query_params = get_threads(request, course)
+        unsafethreads, query_params = get_threads(request, course, user_info)
         threads = [utils.prepare_content(thread, course_id) for thread in unsafethreads]
         utils.add_courseware_context(threads, course, user)
 
