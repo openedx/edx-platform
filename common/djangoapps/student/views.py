@@ -1751,11 +1751,13 @@ def create_account_with_params(request, params):
     else:
         organization = request.site.organizations.first()
 
+    is_amc_admin = "registered_from_amc" in params
+
     if organization:
-        UserOrganizationMapping.objects.get_or_create(user=user, organization=organization, is_amc_admin=True)
+        UserOrganizationMapping.objects.get_or_create(user=user, organization=organization, is_amc_admin=is_amc_admin)
 
     # allow users registered from AMC to create courses
-    if "registered_from_amc" in params:
+    if is_amc_admin:
         from cms.djangoapps.course_creators.models import CourseCreator
         CourseCreator.objects.update_or_create(user=user, defaults={'state': CourseCreator.GRANTED})
         CourseCreatorRole().add_users(user)

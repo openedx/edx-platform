@@ -113,8 +113,9 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         view_name='courseenrollment-detail',
         lookup_field='username'
     )
+    organizations = serializers.SlugRelatedField(many=True, read_only=True, slug_field='name')
 
     class Meta(object):
         model = User
-        fields = ('id', 'username', 'email', 'name', 'course_enrollments')
+        fields = ('id', 'username', 'email', 'name', 'course_enrollments', 'organizations')
         lookup_field = 'username'
