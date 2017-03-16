@@ -18,6 +18,8 @@ from xmodule import block_metadata_utils
 
 from ..models import PersistentCourseGrade
 from .subsection_grade import SubsectionGradeFactory
+from .utils import is_engaged
+from ..constants import AccessModeEnum
 from ..transformer import GradesTransformer
 
 
@@ -98,7 +100,9 @@ class CourseGrade(object):
             children = self.course_structure.get_children(chapter_key)
             for subsection_key in children:
                 chapter_subsection_grades.append(
-                    self._subsection_grade_factory.create(self.course_structure[subsection_key], read_only=True)
+                    self._subsection_grade_factory.create(
+                        self.course_structure[subsection_key],
+                        mode=AccessModeEnum.read_only)
                 )
 
             chapter_grades.append({
@@ -146,19 +150,26 @@ class CourseGrade(object):
 
         return grade_summary
 
-    def compute_and_update(self, read_only=False):
+    def compute_and_update(self, mode=AccessModeEnum.read_write):
         """
         Computes the grade for the given student and course.
 
-        If read_only is True, doesn't save any updates to the grades.
+        If mode is read_only, doesn't save any updates to the grades.
         """
+
+        if mode == AccessModeEnum.read_write_if_engaged:
+            if is_engaged(self.student, self.course):
+                mode = AccessModeEnum.read_write
+            else:
+                mode = AccessModeEnum.read_only
+
         subsections_total = sum(len(chapter['sections']) for chapter in self.chapter_grades)
 
         total_graded_subsections = sum(len(x) for x in self.graded_subsections_by_format.itervalues())
         subsections_created = len(self._subsection_grade_factory._unsaved_subsection_grades)  # pylint: disable=protected-access
         subsections_read = subsections_total - subsections_created
         blocks_total = len(self.locations_to_scores)
-        if not read_only:
+        if mode == AccessModeEnum.read_write:
             self._subsection_grade_factory.bulk_create_unsaved()
             grading_policy_hash = self.get_grading_policy_hash(self.course.location, self.course_structure)
             PersistentCourseGrade.update_or_create_course_grade(
@@ -177,7 +188,7 @@ class CourseGrade(object):
             log.warning,
             u"compute_and_update, read_only: {0}, subsections read/created: {1}/{2}, blocks accessed: {3}, total "
             u"graded subsections: {4}".format(
-                read_only,
+                mode == AccessModeEnum.read_only,
                 subsections_read,
                 subsections_created,
                 blocks_total,
@@ -328,7 +339,7 @@ class CourseGradeFactory(object):
     """
     Factory class to create Course Grade objects
     """
-    def create(self, student, course, collected_block_structure=None, read_only=True):
+    def create(self, student, course, collected_block_structure=None, mode=AccessModeEnum.read_only):
         """
         Returns the CourseGrade object for the given student and course.
 
@@ -347,7 +358,7 @@ class CourseGradeFactory(object):
 
         return (
             self._get_saved_grade(student, course, course_structure) or
-            self._compute_and_update_grade(student, course, course_structure, read_only)
+            self._compute_and_update_grade(student, course, course_structure, mode=mode)
         )
 
     GradeResult = namedtuple('GradeResult', ['student', 'course_grade', 'err_msg'])
@@ -416,14 +427,14 @@ class CourseGradeFactory(object):
             course_structure
         )
 
-    def _compute_and_update_grade(self, student, course, course_structure, read_only=False):
+    def _compute_and_update_grade(self, student, course, course_structure, mode=AccessModeEnum.read_write):
         """
         Freshly computes and updates the grade for the student and course.
 
         If read_only is True, doesn't save any updates to the grades.
         """
         course_grade = CourseGrade(student, course, course_structure)
-        course_grade.compute_and_update(read_only)
+        course_grade.compute_and_update(mode)
         return course_grade
 
     def _user_has_access_to_course(self, course_structure):

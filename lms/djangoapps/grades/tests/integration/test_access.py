@@ -16,6 +16,7 @@ from student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 
 from ...new.subsection_grade import SubsectionGradeFactory
+from ...constants import AccessModeEnum
 
 
 class GradesAccessIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTestCase):
@@ -88,7 +89,7 @@ class GradesAccessIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreT
         # check initial subsection grade
         course_structure = get_course_blocks(self.request.user, self.course.location)
         subsection_grade_factory = SubsectionGradeFactory(self.request.user, self.course, course_structure)
-        grade = subsection_grade_factory.create(self.sequence, read_only=True)
+        grade = subsection_grade_factory.create(self.sequence, mode=AccessModeEnum.read_only)
         self.assertEqual(grade.graded_total.earned, 4.0)
         self.assertEqual(grade.graded_total.possible, 4.0)
 
@@ -105,6 +106,6 @@ class GradesAccessIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreT
 
         # make sure we can still get the subsection grade
         subsection_grade_factory = SubsectionGradeFactory(self.student, self.course, course_structure)
-        grade = subsection_grade_factory.create(self.sequence, read_only=True)
+        grade = subsection_grade_factory.create(self.sequence, mode=AccessModeEnum.read_only)
         self.assertEqual(grade.graded_total.earned, 4.0)
         self.assertEqual(grade.graded_total.possible, 4.0)

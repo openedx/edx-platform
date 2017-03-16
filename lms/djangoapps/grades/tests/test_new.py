@@ -25,6 +25,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.utils import TEST_DATA_DIR
 from xmodule.modulestore.xml_importer import import_course_from_xml
 
+from ..constants import AccessModeEnum
 from ..models import PersistentSubsectionGrade
 from ..new.course_grade import CourseGradeFactory
 from ..new.subsection_grade import SubsectionGrade, SubsectionGradeFactory
@@ -140,7 +141,7 @@ class TestCourseGradeFactory(GradeTestBase):
         grade_factory = CourseGradeFactory()
         # first, create a grade in the database
         with mock_get_score(1, 2):
-            grade_factory.create(self.request.user, self.course, read_only=False)
+            grade_factory.create(self.request.user, self.course, mode=AccessModeEnum.read_write)
 
         # retrieve the grade, ensuring it is as expected and take just one query
         with self.assertNumQueries(1):
@@ -587,7 +588,7 @@ class TestCourseGradeLogging(ProblemSubmissionTestMixin, SharedModuleStoreTestCa
         Creates a course grade and asserts that the associated logging
         matches the expected totals passed in to the function.
         """
-        factory.create(self.request.user, self.course, read_only=False)
+        factory.create(self.request.user, self.course, mode=AccessModeEnum.read_write)
         log_mock.assert_called_with(
             u"Persistent Grades: CourseGrade.{0}, course: {1}, user: {2}".format(
                 log_statement,
