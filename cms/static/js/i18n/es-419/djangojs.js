@@ -1976,7 +1976,7 @@
     "{browse_span_start}Browse teams in other topics{span_end} or {search_span_start}search teams{span_end} in this topic. If you still can't find a team to join, {create_span_start}create a new team in this topic{span_end}.": "Intente {browse_span_start}explorar equipos en otros temas{span_end} o {search_span_start}buscar  equipos{span_end} en este tema. S\u00ed a\u00fan no puede encontrar un equipo para unirse, {create_span_start}cree un nuevo equipo en este tema{span_end}.", 
     "{display_name} Settings": "Ajustes de configuraci\u00f3n para {display_name} ", 
     "{email} is already on the {container} team. Recheck the email address if you want to add a new member.": "{email} ya est\u00e1 en el equipo de {container}. Verifique nuevamente la direcic\u00f3n de correo si desea a\u00f1adir un nuevo miembro.", 
-    "{filename} exceeds maximum size of {maxFileSizeInGB} GB.": "El archivo {filename} excede el tama\u00f1o m\u00e1ximo de  {maxFileSizeInGBs} GB.", 
+    "{filename} exceeds maximum size of {maxFileSizeInGB} GB.": "El archivo {filename} excede el tama\u00f1o m\u00e1ximo de {maxFileSizeInGB} GB.", 
     "{filename} is not in a supported file format. Supported file formats are {supportedFileFormats}.": "{filename} no est\u00e1 en un formato de archivo soportado. Los formatos de archivo compatibles son {supportedFileFormats}.", 
     "{hours}:{minutes} (current UTC time)": "{hours}:{minutes} (hora UTC actual)", 
     "{label}: {status}": "{label}: {status}", 

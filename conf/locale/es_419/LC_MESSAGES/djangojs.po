@@ -66,6 +66,7 @@
 # Luis Ricardo Ruiz <luislicardo1307@gmail.com>, 2013
 # Natalia, 2013
 # Natalia, 2014
+# Ned Batchelder <ned@edx.org>, 2017
 # Cristian Salamea <ovnicraft@gmail.com>, 2013
 # palichis <palichis@solid-ec.org>, 2015
 # Pedro Guimarães Martins <pedrogmartins7@gmail.com>, 2014
@@ -5563,7 +5564,7 @@ msgstr ""
 #: cms/static/js/views/active_video_upload_list.js
 msgid "{filename} exceeds maximum size of {maxFileSizeInGB} GB."
 msgstr ""
-"El archivo {filename} excede el tamaño máximo de  {maxFileSizeInGBs} GB."
+"El archivo {filename} excede el tamaño máximo de {maxFileSizeInGB} GB."
 
 #: cms/static/js/views/active_video_upload_list.js
 msgid ": video upload complete."
