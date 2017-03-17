@@ -9,6 +9,7 @@ from opaque_keys import InvalidKeyError
 from pytz import UTC
 from rest_framework import status
 from rest_framework.test import APITestCase
+from urllib import urlencode
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
@@ -104,6 +105,8 @@ class CurrentGradeViewTest(SharedModuleStoreTestCase, APITestCase):
         cls.student = UserFactory(username='dummy', password=cls.password)
         cls.other_student = UserFactory(username='foo', password=cls.password)
         cls.other_user = UserFactory(username='bar', password=cls.password)
+        cls.staff = StaffFactory(course_key=cls.course.id, password=cls.password)
+        cls.global_staff = GlobalStaffFactory.create()
         date = datetime(2013, 1, 22, tzinfo=UTC)
         for user in (cls.student, cls.other_student, ):
             CourseEnrollmentFactory(
@@ -128,7 +131,10 @@ class CurrentGradeViewTest(SharedModuleStoreTestCase, APITestCase):
                 'course_id': self.course_key,
             }
         )
-        return "{0}?username={1}".format(base_url, username)
+        query_string = ''
+        if username:
+            query_string = '?' + urlencode(dict(username=username))
+        return base_url + query_string
 
     def test_anonymous(self):
         """
@@ -151,12 +157,17 @@ class CurrentGradeViewTest(SharedModuleStoreTestCase, APITestCase):
             resp = self.client.get(self.get_url(self.student.username))
             self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
+        # and again, with the username defaulting to the current user
+        with check_mongo_calls(3):
+            resp = self.client.get(self.get_url(None))
+            self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
     def test_nonexistent_user(self):
         """
         Test that a request for a nonexistent username returns an error.
         """
         resp = self.client.get(self.get_url('IDoNotExist'))
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
         self.assertIn('error_code', resp.data)  # pylint: disable=no-member
         self.assertEqual(resp.data['error_code'], 'user_mismatch')  # pylint: disable=no-member
 
@@ -167,7 +178,7 @@ class CurrentGradeViewTest(SharedModuleStoreTestCase, APITestCase):
         self.client.logout()
         self.client.login(username=self.other_student.username, password=self.password)
         resp = self.client.get(self.get_url(self.student.username))
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
         self.assertIn('error_code', resp.data)  # pylint: disable=no-member
         self.assertEqual(resp.data['error_code'], 'user_mismatch')  # pylint: disable=no-member
 
@@ -223,6 +234,40 @@ class CurrentGradeViewTest(SharedModuleStoreTestCase, APITestCase):
             resp.data['error_code'],  # pylint: disable=no-member
             'user_or_course_does_not_exist'
         )
+
+    @ddt.data(
+        'staff', 'global_staff'
+    )
+    def test_staff_can_see_student(self, staff_user):
+        """
+        Ensure that staff members can see her student's grades.
+        """
+        self.client.logout()
+        self.client.login(username=getattr(self, staff_user).username, password=self.password)
+        resp = self.client.get(self.get_url(self.student.username))
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        expected_data = [{
+            'username': self.student.username,
+            'letter_grade': None,
+            'percent': 0.0,
+            'course_key': str(self.course_key),
+            'passed': False
+        }]
+        self.assertEqual(resp.data, expected_data)  # pylint: disable=no-member
+
+    @ddt.data(
+        'staff', 'global_staff'
+    )
+    def test_staff_requests_nonexistent_user(self, staff_user):
+        """
+        Test that a staff request for a nonexistent username returns an error.
+        """
+        self.client.logout()
+        self.client.login(username=getattr(self, staff_user).username, password=self.password)
+        resp = self.client.get(self.get_url('IDoNotExist'))
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertIn('error_code', resp.data)  # pylint: disable=no-member
+        self.assertEqual(resp.data['error_code'], 'user_does_not_exist')  # pylint: disable=no-member
 
     def test_no_grade(self):
         """
