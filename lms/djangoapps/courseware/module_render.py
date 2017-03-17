@@ -33,7 +33,7 @@ from xblock.reference.plugins import FSService
 import static_replace
 from courseware.access import has_access, get_user_role
 from courseware.entrance_exams import (
-    user_must_complete_entrance_exam,
+    user_can_skip_entrance_exam,
     user_has_passed_entrance_exam
 )
 from courseware.masquerade import (
@@ -164,7 +164,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
         required_content = milestones_helpers.get_required_content(course, user)
 
         # The user may not actually have to complete the entrance exam, if one is required
-        if not user_must_complete_entrance_exam(request, user, course):
+        if user_can_skip_entrance_exam(user, course):
             required_content = [content for content in required_content if not content == course.entrance_exam_id]
 
         previous_of_active_section, next_of_active_section = None, None
@@ -990,7 +990,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
                         and course \
                         and getattr(course, 'entrance_exam_enabled', False) \
                         and getattr(instance, 'in_entrance_exam', False):
-                    ee_data = {'entrance_exam_passed': user_has_passed_entrance_exam(request, course)}
+                    ee_data = {'entrance_exam_passed': user_has_passed_entrance_exam(request.user, course)}
                     resp = append_data_to_webob_response(resp, ee_data)
 
         except NoSuchHandlerError:

@@ -2,14 +2,12 @@
 API for the gating djangoapp
 """
 from collections import defaultdict
-from django.test.client import RequestFactory
 import json
 import logging
 
-from lms.djangoapps.courseware.entrance_exams import get_entrance_exam_score
+from lms.djangoapps.courseware.entrance_exams import get_entrance_exam_content
 from openedx.core.lib.gating import api as gating_api
 from opaque_keys.edx.keys import UsageKey
-from xmodule.modulestore.django import modulestore
 from util import milestones_helpers
 
 
@@ -53,7 +51,7 @@ def _get_minimum_required_percentage(milestone):
             min_score = int(requirements.get('min_score'))
         except (ValueError, TypeError):
             log.warning(
-                'Failed to find minimum score for gating milestone %s, defaulting to 100',
+                u'Gating: Failed to find minimum score for gating milestone %s, defaulting to 100',
                 json.dumps(milestone)
             )
     return min_score
@@ -63,35 +61,56 @@ def _get_subsection_percentage(subsection_grade):
     """
     Returns the percentage value of the given subsection_grade.
     """
-    if subsection_grade.graded_total.possible:
-        return float(subsection_grade.graded_total.earned) / float(subsection_grade.graded_total.possible) * 100.0
-    else:
-        return 0
+    return _calculate_ratio(subsection_grade.graded_total.earned, subsection_grade.graded_total.possible) * 100.0
 
 
-def evaluate_entrance_exam(course, subsection_grade, user):
+def _calculate_ratio(earned, possible):
+    """
+    Returns the percentage of the given earned and possible values.
+    """
+    return float(earned) / float(possible) if possible else 0.0
+
+
+def evaluate_entrance_exam(course_grade, user):
     """
     Evaluates any entrance exam milestone relationships attached
-    to the given subsection. If the subsection_grade meets the
-    minimum score required, the dependent milestone will be marked
+    to the given course. If the course_grade meets the
+    minimum score required, the dependent milestones will be marked
     fulfilled for the user.
     """
+    course = course_grade.course
     if milestones_helpers.is_entrance_exams_enabled() and getattr(course, 'entrance_exam_enabled', False):
-        subsection = modulestore().get_item(subsection_grade.location)
-        in_entrance_exam = getattr(subsection, 'in_entrance_exam', False)
-        if in_entrance_exam:
-            # We don't have access to the true request object in this context, but we can use a mock
-            request = RequestFactory().request()
-            request.user = user
-            exam_pct = get_entrance_exam_score(request, course)
-            if exam_pct >= course.entrance_exam_minimum_score_pct:
-                exam_key = UsageKey.from_string(course.entrance_exam_id)
+        if get_entrance_exam_content(user, course):
+            exam_chapter_key = get_entrance_exam_usage_key(course)
+            exam_score_ratio = get_entrance_exam_score_ratio(course_grade, exam_chapter_key)
+            if exam_score_ratio >= course.entrance_exam_minimum_score_pct:
                 relationship_types = milestones_helpers.get_milestone_relationship_types()
                 content_milestones = milestones_helpers.get_course_content_milestones(
                     course.id,
-                    exam_key,
+                    exam_chapter_key,
                     relationship=relationship_types['FULFILLS']
                 )
-                # Mark each milestone dependent on the entrance exam as fulfilled by the user.
+                # Mark each entrance exam dependent milestone as fulfilled by the user.
                 for milestone in content_milestones:
-                    milestones_helpers.add_user_milestone({'id': request.user.id}, milestone)
+                    milestones_helpers.add_user_milestone({'id': user.id}, milestone)
+
+
+def get_entrance_exam_usage_key(course):
+    """
+    Returns the UsageKey of the entrance exam for the course.
+    """
+    return UsageKey.from_string(course.entrance_exam_id).replace(course_key=course.id)
+
+
+def get_entrance_exam_score_ratio(course_grade, exam_chapter_key):
+    """
+    Returns the score for the given chapter as a ratio of the
+    aggregated earned over the possible points, resulting in a
+    decimal value less than 1.
+    """
+    try:
+        earned, possible = course_grade.score_for_chapter(exam_chapter_key)
+    except KeyError:
+        earned, possible = 0.0, 0.0
+        log.warning(u'Gating: Unexpectedly failed to find chapter_grade for %s.', exam_chapter_key)
+    return _calculate_ratio(earned, possible)

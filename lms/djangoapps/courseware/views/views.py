@@ -101,7 +101,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.tabs import CourseTabList
 from xmodule.x_module import STUDENT_VIEW
-from ..entrance_exams import user_must_complete_entrance_exam
+from ..entrance_exams import user_can_skip_entrance_exam
 from ..module_render import get_module_for_descriptor, get_module, get_module_by_usage_id
 
 from web_fragments.fragment import Fragment
@@ -336,7 +336,7 @@ def course_info(request, course_id):
 
         # If the user needs to take an entrance exam to access this course, then we'll need
         # to send them to that specific course module before allowing them into other areas
-        if user_must_complete_entrance_exam(request, user, course):
+        if not user_can_skip_entrance_exam(user, course):
             return redirect(reverse('courseware', args=[unicode(course.id)]))
 
         # check to see if there is a required survey that must be taken before
@@ -857,7 +857,7 @@ def _progress(request, course_key, student_id):
     student = User.objects.prefetch_related("groups").get(id=student.id)
 
     course_grade = CourseGradeFactory().create(student, course)
-    courseware_summary = course_grade.chapter_grades
+    courseware_summary = course_grade.chapter_grades.values()
     grade_summary = course_grade.summary
 
     studio_url = get_studio_url(course, 'settings/grading')

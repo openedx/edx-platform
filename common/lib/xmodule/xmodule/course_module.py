@@ -675,6 +675,9 @@ class CourseFields(object):
         scope=Scope.settings,
     )
 
+    # Note: Although users enter the entrance exam minimum score
+    # as a percentage value, it is internally converted and stored
+    # as a decimal value less than 1.
     entrance_exam_minimum_score_pct = Float(
         display_name=_("Entrance Exam Minimum Score (%)"),
         help=_(
