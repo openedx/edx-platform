@@ -9,6 +9,7 @@ from path import Path as path
 from lxml import etree
 from mock import patch, MagicMock, Mock
 from nose.plugins.attrib import attr
+from uuid import uuid4
 
 from django.conf import settings
 from django.test import TestCase
@@ -1088,6 +1089,27 @@ class TestEditorSavedMethod(BaseTestXmodule):
         with patch('xmodule.video_module.video_module.manage_video_subtitles_save') as manage_video_subtitles_save:
             item.editor_saved(self.user, old_metadata, None)
             self.assertFalse(manage_video_subtitles_save.called)
+
+    @ddt.data(TEST_DATA_MONGO_MODULESTORE, TEST_DATA_SPLIT_MODULESTORE)
+    def test_editor_saved_with_unstripped_video_id(self, default_store):
+        """
+        Verify editor saved when video id contains spaces/tabs.
+        """
+        self.MODULESTORE = default_store
+        stripped_video_id = unicode(uuid4())
+        unstripped_video_id = u'{video_id}{tabs}'.format(video_id=stripped_video_id, tabs=u'\t\t\t')
+        self.metadata.update({
+            'edx_video_id': unstripped_video_id
+        })
+        self.initialize_module(metadata=self.metadata)
+        item = self.store.get_item(self.item_descriptor.location)
+        self.assertEqual(item.edx_video_id, unstripped_video_id)
+
+        # Now, modifying and saving the video module should strip the video id.
+        old_metadata = own_metadata(item)
+        item.display_name = u'New display name'
+        item.editor_saved(self.user, old_metadata, None)
+        self.assertEqual(item.edx_video_id, stripped_video_id)
 
 
 @ddt.ddt
