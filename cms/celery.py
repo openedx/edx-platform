@@ -33,4 +33,5 @@ class Router(AlternateEnvironmentRouter):
         """
         return {
             'openedx.core.djangoapps.content.block_structure.tasks.update_course_in_cache': 'lms',
+            'openedx.core.djangoapps.content.block_structure.tasks.update_course_in_cache_v2': 'lms',
         }
