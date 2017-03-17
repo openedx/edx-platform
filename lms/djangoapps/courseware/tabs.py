@@ -6,7 +6,7 @@ from django.conf import settings
 from django.utils.translation import ugettext as _, ugettext_noop
 
 from courseware.access import has_access
-from courseware.entrance_exams import user_must_complete_entrance_exam
+from courseware.entrance_exams import user_can_skip_entrance_exam
 from openedx.core.lib.course_tabs import CourseTabPluginManager
 from student.models import CourseEnrollment
 from xmodule.tabs import CourseTab, CourseTabList, key_checker
@@ -294,7 +294,7 @@ def get_course_tab_list(request, course):
     # If the user has to take an entrance exam, we'll need to hide away all but the
     # "Courseware" tab. The tab is then renamed as "Entrance Exam".
     course_tab_list = []
-    must_complete_ee = user_must_complete_entrance_exam(request, user, course)
+    must_complete_ee = not user_can_skip_entrance_exam(user, course)
     for tab in xmodule_tab_list:
         if must_complete_ee:
             # Hide all of the tabs except for 'Courseware'
