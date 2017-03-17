@@ -977,7 +977,10 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         Returns True if verification is expiring within EXPIRING_SOON_WINDOW.
         """
         verify_student_config = StudentVerificationConfiguration.current()
-        expiring_soon_window = verify_student_config.expiring_soon_window if verify_student_config.enabled else 28
+        if verify_student_config.enabled:
+            expiring_soon_window = verify_student_config.expiring_soon_window_in_days
+        else:
+            expiring_soon_window = 28
         if expiration_datetime:
             if (expiration_datetime - datetime.now(pytz.UTC)).days <= expiring_soon_window:
                 return True

@@ -2077,7 +2077,7 @@ class TestReverifyView(TestCase):
         EXPIRING_SOON_WINDOW(i.e here it is 10 days) or less days.
         """
 
-        StudentVerificationConfiguration.objects.create(enabled=True, days_good_for=5, expiring_soon_window=10)
+        StudentVerificationConfiguration.objects.create(enabled=True, days_good_for=5, expiring_soon_window_in_days=10)
         attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
         attempt.mark_ready()
         attempt.submit()

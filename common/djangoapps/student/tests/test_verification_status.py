@@ -199,7 +199,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
     def test_verification_will_expire_by_deadline(self):
         # Expiration date in the future
         self._setup_mode_and_enrollment(self.FUTURE, "verified")
-        StudentVerificationConfiguration.objects.create(enabled=True, days_good_for=5, expiring_soon_window=10)
+        StudentVerificationConfiguration.objects.create(enabled=True, days_good_for=5, expiring_soon_window_in_days=10)
 
         # Create a verification attempt that:
         # 1) Is current (submitted in the last year)
@@ -216,7 +216,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
     def test_reverification_submitted_with_current_approved_verificaiton(self):
         # Expiration date in the future
         self._setup_mode_and_enrollment(self.FUTURE, "verified")
-        StudentVerificationConfiguration.objects.create(enabled=True, days_good_for=5, expiring_soon_window=10)
+        StudentVerificationConfiguration.objects.create(enabled=True, days_good_for=5, expiring_soon_window_in_days=10)
 
         # Create a verification attempt that is approved but expiring soon
         attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)

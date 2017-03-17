@@ -636,8 +636,6 @@ def dashboard(request):
         settings.FEATURES.get('DISPLAY_COURSE_MODES_ON_DASHBOARD', True)
     )
 
-    verify_student_config = StudentVerificationConfiguration.current()
-
     # Let's filter out any courses in an "org" that has been declared to be
     # in a configuration
     org_filter_out_set = configuration_helpers.get_all_orgs()
