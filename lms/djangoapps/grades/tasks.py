@@ -25,7 +25,6 @@ from track.event_transaction_utils import (
 from util.date_utils import from_timestamp
 from xmodule.modulestore.django import modulestore
 
-from .config.models import PersistentGradesEnabledFlag
 from .constants import ScoreDatabaseTableEnum
 from .new.subsection_grade import SubsectionGradeFactory
 from .signals.signals import SUBSECTION_SCORE_CHANGED
@@ -91,9 +90,6 @@ def _recalculate_subsection_grade(self, **kwargs):
     """
     try:
         course_key = CourseLocator.from_string(kwargs['course_id'])
-        if not PersistentGradesEnabledFlag.feature_enabled(course_key):
-            return
-
         scored_block_usage_key = UsageKey.from_string(kwargs['usage_id']).replace(course_key=course_key)
 
         newrelic.agent.add_custom_parameter('course_id', unicode(course_key))

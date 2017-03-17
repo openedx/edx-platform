@@ -27,6 +27,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, chec
 
 from lms.djangoapps.grades.config.models import PersistentGradesEnabledFlag
 from lms.djangoapps.grades.constants import ScoreDatabaseTableEnum
+from lms.djangoapps.grades.models import PersistentCourseGrade, PersistentSubsectionGrade
 from lms.djangoapps.grades.signals.signals import PROBLEM_WEIGHTED_SCORE_CHANGED
 from lms.djangoapps.grades.tasks import recalculate_subsection_grade_v3, RECALCULATE_GRADE_DELAY
 
@@ -203,14 +204,34 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
             {self.sequential.location, accessible_seq.location},
         )
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_persistent_grades_not_enabled_on_course(self, default_store):
+    @ddt.data(
+        (ModuleStoreEnum.Type.mongo, 1, 9),
+        (ModuleStoreEnum.Type.split, 3, 8),
+    )
+    @ddt.unpack
+    def test_persistent_grades_not_enabled_on_course(self, default_store, num_mongo_queries, num_sql_queries):
         with self.store.default_store(default_store):
             self.set_up_course(enable_persistent_grades=False)
-            self.assertFalse(PersistentGradesEnabledFlag.feature_enabled(self.course.id))
-            with check_mongo_calls(0):
-                with self.assertNumQueries(0):
+            with check_mongo_calls(num_mongo_queries):
+                with self.assertNumQueries(num_sql_queries):
                     self._apply_recalculate_subsection_grade()
+            with self.assertRaises(PersistentCourseGrade.DoesNotExist):
+                PersistentCourseGrade.read_course_grade(self.user.id, self.course.id)
+            self.assertEqual(len(PersistentSubsectionGrade.bulk_read_grades(self.user.id, self.course.id)), 0)
+
+    @ddt.data(
+        (ModuleStoreEnum.Type.mongo, 1, 22),
+        (ModuleStoreEnum.Type.split, 3, 21),
+    )
+    @ddt.unpack
+    def test_persistent_grades_enabled_on_course(self, default_store, num_mongo_queries, num_sql_queries):
+        with self.store.default_store(default_store):
+            self.set_up_course(enable_persistent_grades=True)
+            with check_mongo_calls(num_mongo_queries):
+                with self.assertNumQueries(num_sql_queries):
+                    self._apply_recalculate_subsection_grade()
+            self.assertIsNotNone(PersistentCourseGrade.read_course_grade(self.user.id, self.course.id))
+            self.assertGreater(len(PersistentSubsectionGrade.bulk_read_grades(self.user.id, self.course.id)), 0)
 
     @patch('lms.djangoapps.grades.signals.signals.SUBSECTION_SCORE_CHANGED.send')
     @patch('lms.djangoapps.grades.new.subsection_grade.SubsectionGradeFactory.update')
