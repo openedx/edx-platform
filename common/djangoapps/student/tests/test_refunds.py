@@ -21,7 +21,7 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 # These imports refer to lms djangoapps.
 # Their testcases are only run under lms.
-from certificates.models import CertificateStatuses  # pylint: disable=import-error
+from certificates.models import CertificateStatuses, GeneratedCertificate  # pylint: disable=import-error
 from certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
 from openedx.core.djangoapps.commerce.utils import ECOMMERCE_DATE_FORMAT
 
@@ -106,10 +106,20 @@ class RefundableTest(SharedModuleStoreTestCase):
         )
 
         self.assertFalse(self.enrollment.refundable())
+        self.assertFalse(
+            self.enrollment.refundable(
+                user_already_has_certs_for=GeneratedCertificate.course_ids_with_certs_for_user(self.user)
+            )
+        )
 
         # Assert that can_refund overrides this and allows refund
         self.enrollment.can_refund = True
         self.assertTrue(self.enrollment.refundable())
+        self.assertTrue(
+            self.enrollment.refundable(
+                user_already_has_certs_for=GeneratedCertificate.course_ids_with_certs_for_user(self.user)
+            )
+        )
 
     def test_refundable_with_cutoff_date(self):
         """ Assert enrollment is refundable before cutoff and not refundable after."""

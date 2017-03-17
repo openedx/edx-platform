@@ -1,3 +1,4 @@
+<%page expression_filter="h"/>
 <%inherit file="base.html" />
 <%def name="online_help_token()">
 <% 
@@ -13,6 +14,7 @@ else:
   from openedx.core.djangolib.js_utils import (
       dump_js_escaped_json, js_escaped_string
   )
+  from openedx.core.djangolib.markup import HTML, Text
 %>
 <%block name="title">
 %if library:
@@ -44,11 +46,11 @@ else:
       <div class="introduction">
         ## Translators: ".tar.gz" is a file extension, and files with that extension are called "gzipped tar files": these terms should not be translated
         %if library:
-            <p>${_("Be sure you want to import a library before continuing. The contents of the imported library will replace the contents of the existing library. {em_start}You cannot undo a library import{em_end}. Before you proceed, we recommend that you export the current library, so that you have a backup copy of it.").format(em_start='<strong>', em_end="</strong>")}</p>
+            <p>${Text(_("Be sure you want to import a library before continuing. The contents of the imported library will replace the contents of the existing library. {em_start}You cannot undo a library import{em_end}. Before you proceed, we recommend that you export the current library, so that you have a backup copy of it.")).format(em_start=HTML('<strong>'), em_end=HTML("</strong>"))}</p>
             <p>${_("The library that you import must be in a .tar.gz file (that is, a .tar file compressed with GNU Zip). This .tar.gz file must contain a library.xml file. It may also contain other files.")}</p>
             <p>${_("The import process has five stages. During the first two stages, you must stay on this page. You can leave this page after the Unpacking stage has completed. We recommend, however, that you don't make important changes to your library until the import operation has completed.")}</p>
         %else:
-            <p>${_("Be sure you want to import a course before continuing. The contents of the imported course will replace the contents of the existing course. {em_start}You cannot undo a course import{em_end}. Before you proceed, we recommend that you export the current course, so that you have a backup copy of it.").format(em_start='<strong>', em_end="</strong>")}</p>
+            <p>${Text(_("Be sure you want to import a course before continuing. The contents of the imported course will replace the contents of the existing course. {em_start}You cannot undo a course import{em_end}. Before you proceed, we recommend that you export the current course, so that you have a backup copy of it.")).format(em_start=HTML('<strong>'), em_end=HTML("</strong>"))}</p>
             <p>${_("The course that you import must be in a .tar.gz file (that is, a .tar file compressed with GNU Zip). This .tar.gz file must contain a course.xml file. It may also contain other files.")}</p>
             <p>${_("The import process has five stages. During the first two stages, you must stay on this page. You can leave this page after the Unpacking stage has completed. We recommend, however, that you don't make important changes to your course until the import operation has completed.")}</p>
         %endif
@@ -118,7 +120,7 @@ else:
             <li class="item-progresspoint item-progresspoint-unpack is-started">
               <span class="deco status-visual">
                 <span class="icon fa fa-cog" aria-hidden="true"></span>
-                <span class="icon fa fa-warning" aria-hidden="true"v></span>
+                <span class="icon fa fa-warning" aria-hidden="true"></span>
               </span>
 
               <div class="status-detail">

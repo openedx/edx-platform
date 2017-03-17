@@ -412,7 +412,7 @@ class YouTubeVideoTest(VideoBaseTest):
         Then the video has rendered in "HTML5" mode
         """
         # configure youtube server
-        self.youtube_configuration['time_to_response'] = 2.0
+        self.youtube_configuration['time_to_response'] = 7.0
         self.metadata = self.metadata_for_mode('youtube_html5')
 
         self.navigate_to_video()

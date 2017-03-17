@@ -3,6 +3,7 @@ Reset persistent grades for learners.
 """
 from datetime import datetime
 import logging
+from pytz import utc
 from textwrap import dedent
 
 from django.core.management.base import BaseCommand, CommandError
@@ -58,12 +59,18 @@ class Command(BaseCommand):
         parser.add_argument(
             '--modified_start',
             dest='modified_start',
-            help='Starting range for modified date (inclusive): e.g. "2016-08-23 16:43"',
+            help='Starting range for modified date (inclusive): e.g. "2016-08-23 16:43"; expected in UTC.',
         )
         parser.add_argument(
             '--modified_end',
             dest='modified_end',
-            help='Ending range for modified date (inclusive): e.g. "2016-12-23 16:43"',
+            help='Ending range for modified date (inclusive): e.g. "2016-12-23 16:43"; expected in UTC.',
+        )
+        parser.add_argument(
+            '--db_table',
+            dest='db_table',
+            help='Specify "subsection" to reset subsection grades or "course" to reset course grades. If absent, both '
+                 'are reset.',
         )
 
     def handle(self, *args, **options):
@@ -73,14 +80,17 @@ class Command(BaseCommand):
 
         run_mode = get_mutually_exclusive_required_option(options, 'delete', 'dry_run')
         courses_mode = get_mutually_exclusive_required_option(options, 'courses', 'all_courses')
+        db_table = options.get('db_table')
+        if db_table not in {'subsection', 'course', None}:
+            raise CommandError('Invalid value for db_table. Valid options are "subsection" or "course" only.')
 
         if options.get('modified_start'):
-            modified_start = datetime.strptime(options['modified_start'], DATE_FORMAT)
+            modified_start = utc.localize(datetime.strptime(options['modified_start'], DATE_FORMAT))
 
         if options.get('modified_end'):
             if not modified_start:
                 raise CommandError('Optional value for modified_end provided without a value for modified_start.')
-            modified_end = datetime.strptime(options['modified_end'], DATE_FORMAT)
+            modified_end = utc.localize(datetime.strptime(options['modified_end'], DATE_FORMAT))
 
         if courses_mode == 'courses':
             course_keys = parse_course_keys(options['courses'])
@@ -89,8 +99,11 @@ class Command(BaseCommand):
 
         operation = self._query_grades if run_mode == 'dry_run' else self._delete_grades
 
-        operation(PersistentSubsectionGrade, course_keys, modified_start, modified_end)
-        operation(PersistentCourseGrade, course_keys, modified_start, modified_end)
+        if db_table == 'subsection' or db_table is None:
+            operation(PersistentSubsectionGrade, course_keys, modified_start, modified_end)
+
+        if db_table == 'course' or db_table is None:
+            operation(PersistentCourseGrade, course_keys, modified_start, modified_end)
 
         log.info("reset_grade: Finished in %s mode!", run_mode)
 

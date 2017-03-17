@@ -39,11 +39,9 @@ define(['backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helper
                 if (bookmarked) {
                     expect(view.$el).toHaveAttr('aria-pressed', 'true');
                     expect(view.$el).toHaveClass('bookmarked');
-                    expect(view.$el.find('.bookmark-sr').text()).toBe('Click to remove');
                 } else {
                     expect(view.$el).toHaveAttr('aria-pressed', 'false');
                     expect(view.$el).not.toHaveClass('bookmarked');
-                    expect(view.$el.find('.bookmark-sr').text()).toBe('Click to add');
                 }
                 expect(view.$el.data('bookmarkId')).toBe('bilbo,usage_1');
             };

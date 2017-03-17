@@ -214,9 +214,9 @@
                 view.$('.js-post-title').val('Test Title');
                 view.$('.js-post-body textarea').val('Test body');
                 view.$('.wmd-preview p').html('Test body');
-                view.$('.js-follow').prop('checked', false);
-                view.$('.js-anon').prop('checked', true);
-                view.$('.js-anon-peers').prop('checked', true);
+                view.$('input[name=follow]').prop('checked', false);
+                view.$('input[name=anonymous]').prop('checked', true);
+                view.$('input[name=anonymous_to_peers]').prop('checked', true);
                 if (mode === 'tab') {
                     view.$("a[data-discussion-id='2b3a858d0c884eb4b272dbbe3f2ffddd']").click();
                 }
@@ -227,9 +227,9 @@
                 expect($("input[id$='post-type-question']")).not.toBeChecked();
                 expect(view.$('.js-post-title').val()).toEqual('');
                 expect(view.$('.js-post-body textarea').val()).toEqual('');
-                expect(view.$('.js-follow')).toBeChecked();
-                expect(view.$('.js-anon')).not.toBeChecked();
-                expect(view.$('.js-anon-peers')).not.toBeChecked();
+                expect(view.$('input[name=follow]')).toBeChecked();
+                expect(view.$('input[name=anonymous]')).not.toBeChecked();
+                expect(view.$('input[name=anonymous_to_peers]')).not.toBeChecked();
                 if (mode === 'tab') {
                     return expect(view.$('.post-topic option:selected').text()).toEqual('General');
                 }
@@ -238,6 +238,66 @@
                 it('resets the form in ' + mode + ' mode', function() {
                     return checkPostCancelReset(mode, this.discussion, this.course_settings);
                 });
+            });
+        });
+        describe('default topic ', function() {
+            beforeEach(function() {
+                this.course_settings = new DiscussionCourseSettings({
+                    allow_anonymous_to_peers: true,
+                    allow_anonymous: true,
+                    category_map: {
+                        subcategories: {
+                            'Week 1': {
+                                subcategories: {},
+                                children: [
+                                    ['Topic-Level Student-Visible Label', 'entry']
+                                ],
+                                entries: {
+                                    'Topic-Level Student-Visible Label': {
+                                        sort_key: null,
+                                        is_cohorted: false,
+                                        id: '2b3a858d0c884eb4b272dbbe3f2ffddd'
+                                    }
+                                }
+                            }
+                        },
+                        children: [
+                            ['First topic', 'entry'],
+                            ['Week 1', 'subcategory']
+                        ],
+                        entries: {
+                            'First topic': {
+                                sort_key: 'First topic',
+                                is_cohorted: false,
+                                id: 'i4x-waqastest-waqastest-course-waqastest'
+                            }
+                        }
+                    }
+                });
+            });
+
+            it('should be the first topic if General is not found', function() {
+                var eventSpy, view;
+                view = new NewPostView({
+                    el: $('#fixture-element'),
+                    collection: this.discussion,
+                    course_settings: this.course_settings,
+                    mode: 'tab'
+                });
+                view.render();
+                eventSpy = jasmine.createSpy('eventSpy');
+                view.listenTo(view, 'newPost:cancel', eventSpy);
+                view.$('.post-errors').html("<li class='post-error'>Title can't be empty</li>");
+                view.$("label[for$='post-type-question']").click();
+                view.$('.js-post-title').val('Test Title');
+                view.$('.js-post-body textarea').val('Test body');
+                view.$('.wmd-preview p').html('Test body');
+                view.$('input[name=follow]').prop('checked', false);
+                view.$('input[name=anonymous]').prop('checked', true);
+                view.$('input[name=anonymous_to_peers]').prop('checked', true);
+                view.$("a[data-discussion-id='2b3a858d0c884eb4b272dbbe3f2ffddd']").click();
+                view.$('.cancel').click();
+                expect(view.$('.post-topic option:selected').text()).toEqual('First topic');
             });
         });
         it('posts to the correct URL', function() {

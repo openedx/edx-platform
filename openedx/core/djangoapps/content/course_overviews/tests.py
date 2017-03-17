@@ -52,6 +52,8 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
 
     COURSE_OVERVIEW_TABS = {'courseware', 'info', 'textbooks', 'discussion', 'wiki', 'progress'}
 
+    ENABLED_SIGNALS = ['course_deleted', 'course_published']
+
     def check_course_overview_against_course(self, course):
         """
         Compares a CourseOverview object against its corresponding
@@ -470,7 +472,7 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
 
     def test_get_all_courses_by_org(self):
         org_courses = []  # list of lists of courses
-        for index in range(2):
+        for index in range(3):
             org_courses.append([
                 CourseFactory.create(org='test_org_' + unicode(index), emit_signals=True)
                 for __ in range(3)
@@ -478,18 +480,18 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
 
         self.assertEqual(
             {c.id for c in CourseOverview.get_all_courses()},
-            {c.id for c in org_courses[0] + org_courses[1]},
+            {c.id for c in org_courses[0] + org_courses[1] + org_courses[2]},
         )
 
         self.assertEqual(
-            {c.id for c in CourseOverview.get_all_courses(org='test_org_1')},
-            {c.id for c in org_courses[1]},
+            {c.id for c in CourseOverview.get_all_courses(orgs=['test_org_1', 'test_org_2'])},
+            {c.id for c in org_courses[1] + org_courses[2]},
         )
 
         # Test case-insensitivity.
         self.assertEqual(
-            {c.id for c in CourseOverview.get_all_courses(org='TEST_ORG_1')},
-            {c.id for c in org_courses[1]},
+            {c.id for c in CourseOverview.get_all_courses(orgs=['TEST_ORG_1', 'TEST_ORG_2'])},
+            {c.id for c in org_courses[1] + org_courses[2]},
         )
 
     def test_get_all_courses_by_mobile_available(self):
@@ -512,6 +514,35 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
                 expected_courses,
                 "testing CourseOverview.get_all_courses with filter_={}".format(filter_),
             )
+
+    def test_get_from_ids_if_exists(self):
+        course_with_overview_1 = CourseFactory.create(emit_signals=True)
+        course_with_overview_2 = CourseFactory.create(emit_signals=True)
+        course_without_overview = CourseFactory.create(emit_signals=False)
+
+        courses = [course_with_overview_1, course_with_overview_2, course_without_overview]
+        course_ids_to_overviews = CourseOverview.get_from_ids_if_exists(
+            course.id for course in courses
+        )
+
+        # We should see the ones that have published CourseOverviews
+        # (when the signals were emitted), but not the one that didn't issue
+        # a publish signal.
+        self.assertEqual(len(course_ids_to_overviews), 2)
+        self.assertIn(course_with_overview_1.id, course_ids_to_overviews)
+        self.assertIn(course_with_overview_2.id, course_ids_to_overviews)
+        self.assertNotIn(course_without_overview.id, course_ids_to_overviews)
+
+        # But if we set a CourseOverview to be an old version, it shouldn't be
+        # returned by get_from_ids_if_exists()
+        overview_2 = course_ids_to_overviews[course_with_overview_2.id]
+        overview_2.version = CourseOverview.VERSION - 1
+        overview_2.save()
+        course_ids_to_overviews = CourseOverview.get_from_ids_if_exists(
+            course.id for course in courses
+        )
+        self.assertEqual(len(course_ids_to_overviews), 1)
+        self.assertIn(course_with_overview_1.id, course_ids_to_overviews)
 
 
 @attr(shard=3)

@@ -50,6 +50,10 @@ function(Backbone, _, str, ModuleUtils) {
              */
             'published_by': null,
             /**
+             * True if the xblock is a parentable xblock.
+             */
+            has_children: null,
+            /**
              * True if the xblock has changes.
              * Note: this is not always provided as a performance optimization. It is only provided for
              * verticals functioning as units.

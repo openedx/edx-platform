@@ -50,22 +50,24 @@ site_status_msg = get_site_status_msg(course_id)
 <header class="${"header-global slim" if course and not disable_courseware_header else "header-global-new"}" aria-label="Main" role="banner">
 % endif
   <div class="${"rwd" if responsive else ""} wrapper-header nav-container">
-    <h1 class="logo" itemscope="" itemtype="http://schema.org/Organization">
-      <a href="${marketing_link('ROOT')}" itemprop="url">
-        <%block name="navigation_logo">
-            <img src="${static.url("images/logo.png")}" alt="${_("{platform_name} Home Page").format(platform_name=static.get_platform_name())}" itemprop="logo" />
-        </%block>
-      </a>
+
+    <h1 class="hd logo-header">
+      <div class="logo">
+        <a href="${marketing_link('ROOT')}" itemprop="url">
+          <%block name="navigation_logo">
+              <img src="${static.url("images/logo.png")}" alt="${_("{platform_name} Home Page").format(platform_name=static.get_platform_name())}" itemprop="logo" />
+          </%block>
+        </a>
+      </div>
+
+      % if course and not disable_courseware_header:
+      <div class="course-header">
+        <span class="provider">${course.display_org_with_default}:</span>
+        <span class="course-number">${course.display_number_with_default}</span>
+        <span class="course-name">${course.display_name_with_default}</span>
+      </div>
+      % endif
     </h1>
-
-    % if course and not disable_courseware_header:
-    <h2 class="course-header">
-      <span class="provider">${course.display_org_with_default}:</span>
-      <span class="course-number">${course.display_number_with_default}</span>
-      <span class="course-name">${course.display_name_with_default}</span>
-    </h2>
-    % endif
-
 
     % if user.is_authenticated():
       % if not course or disable_courseware_header:
@@ -135,7 +137,7 @@ site_status_msg = get_site_status_msg(course_id)
               <div class="item nav-courseware-02">
                 <a class="btn-neutral btn-register" href="${reverse('course-specific-register', args=[course.id.to_deprecated_string()])}">${_("Register")}</a>
               </div>
-            % else:
+            % elif static.get_value('ALLOW_PUBLIC_ACCOUNT_CREATION', settings.FEATURES.get('ALLOW_PUBLIC_ACCOUNT_CREATION')):
               <div class="item nav-courseware-02">
                 <a class="btn-neutral btn-register" href="/register">${_("Register")}</a>
               </div>

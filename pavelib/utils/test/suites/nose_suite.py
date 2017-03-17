@@ -191,9 +191,6 @@ class SystemTestSuite(NoseTestSuite):
             default_test_id += " {system}/tests.py"
             default_test_id += " openedx/core/djangolib"
 
-        if self.root == 'cms':
-            default_test_id += " {system}/tests/*"
-
         return default_test_id.format(system=self.root)
 
 

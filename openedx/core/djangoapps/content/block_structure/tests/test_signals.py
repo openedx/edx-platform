@@ -3,15 +3,16 @@ Unit tests for the Course Blocks signals
 """
 import ddt
 from mock import patch
-from waffle.testutils import override_switch
 
+from opaque_keys.edx.locator import LibraryLocator, CourseLocator
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from ..api import get_block_structure_manager
-from ..signals import INVALIDATE_CACHE_ON_PUBLISH_SWITCH
-from .helpers import is_course_in_block_structure_cache
+from ..config import INVALIDATE_CACHE_ON_PUBLISH
+from ..signals import _listen_for_course_publish
+from .helpers import is_course_in_block_structure_cache, override_config_setting
 
 
 @ddt.ddt
@@ -19,6 +20,8 @@ class CourseBlocksSignalTest(ModuleStoreTestCase):
     """
     Tests for the Course Blocks signal
     """
+    ENABLED_SIGNALS = ['course_deleted', 'course_published']
+
     def setUp(self):
         super(CourseBlocksSignalTest, self).setUp()
         self.course = CourseFactory.create()
@@ -47,11 +50,11 @@ class CourseBlocksSignalTest(ModuleStoreTestCase):
         )
 
     @ddt.data(True, False)
-    @patch('openedx.core.lib.block_structure.manager.BlockStructureManager.clear')
+    @patch('openedx.core.djangoapps.content.block_structure.manager.BlockStructureManager.clear')
     def test_cache_invalidation(self, invalidate_cache_enabled, mock_bs_manager_clear):
         test_display_name = "Jedi 101"
 
-        with override_switch(INVALIDATE_CACHE_ON_PUBLISH_SWITCH, active=invalidate_cache_enabled):
+        with override_config_setting(INVALIDATE_CACHE_ON_PUBLISH, active=invalidate_cache_enabled):
             self.course.display_name = test_display_name
             self.store.update_item(self.course, self.user.id)
 
@@ -67,3 +70,13 @@ class CourseBlocksSignalTest(ModuleStoreTestCase):
             bs_manager.get_collected()
 
         self.assertFalse(is_course_in_block_structure_cache(self.course.id, self.store))
+
+    @ddt.data(
+        (CourseLocator(org='org', course='course', run='run'), True),
+        (LibraryLocator(org='org', course='course'), False),
+    )
+    @ddt.unpack
+    @patch('openedx.core.djangoapps.content.block_structure.tasks.update_course_in_cache.apply_async')
+    def test_update_only_for_courses(self, key, expect_update_called, mock_update):
+        _listen_for_course_publish(sender=None, course_key=key)
+        self.assertEqual(mock_update.called, expect_update_called)

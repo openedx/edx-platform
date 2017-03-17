@@ -74,7 +74,7 @@ from student.auth import has_course_author_access, has_studio_write_access, has_
 from student.roles import (
     CourseInstructorRole, CourseStaffRole, CourseCreatorRole, GlobalStaff, UserBasedRole
 )
-from util.course import get_lms_link_for_about_page
+from util.course import get_link_for_about_page
 from util.date_utils import get_default_time_display
 from util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
 from util.milestones_helpers import (
@@ -336,11 +336,16 @@ def _course_outline_json(request, course_module):
     """
     Returns a JSON representation of the course module and recursively all of its children.
     """
+    is_concise = request.GET.get('format') == 'concise'
+    include_children_predicate = lambda xblock: not xblock.category == 'vertical'
+    if is_concise:
+        include_children_predicate = lambda xblock: xblock.has_children
     return create_xblock_info(
         course_module,
         include_child_info=True,
-        course_outline=True,
-        include_children_predicate=lambda xblock: not xblock.category == 'vertical',
+        course_outline=False if is_concise else True,
+        include_children_predicate=include_children_predicate,
+        is_concise=is_concise,
         user=request.user
     )
 
@@ -535,16 +540,14 @@ def _deprecated_blocks_info(course_module, deprecated_block_types):
 
     Returns:
         Dict with following keys:
-        block_types (list): list containing types of all deprecated blocks
-        block_types_enabled (bool): True if any or all `deprecated_blocks` present in Advanced Module List else False
-        blocks (list): List of `deprecated_block_types` component names and their parent's url
+        deprecated_enabled_block_types (list): list containing all deprecated blocks types enabled on this course
+        blocks (list): List of `deprecated_enabled_block_types` instances and their parent's url
         advance_settings_url (str): URL to advance settings page
     """
     data = {
-        'block_types': deprecated_block_types,
-        'block_types_enabled': any(
-            block_type in course_module.advanced_modules for block_type in deprecated_block_types
-        ),
+        'deprecated_enabled_block_types': [
+            block_type for block_type in course_module.advanced_modules if block_type in deprecated_block_types
+        ],
         'blocks': [],
         'advance_settings_url': reverse_course_url('advanced_settings_handler', course_module.id)
     }
@@ -989,7 +992,7 @@ def settings_handler(request, course_key_string):
             settings_context = {
                 'context_course': course_module,
                 'course_locator': course_key,
-                'lms_link_for_about_page': get_lms_link_for_about_page(course_key),
+                'lms_link_for_about_page': get_link_for_about_page(course_module),
                 'course_image_url': course_image_url(course_module, 'course_image'),
                 'banner_image_url': course_image_url(course_module, 'banner_image'),
                 'video_thumbnail_image_url': course_image_url(course_module, 'video_thumbnail_image'),

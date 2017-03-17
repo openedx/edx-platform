@@ -14,7 +14,6 @@ from django.contrib.auth.models import User, AnonymousUser
 from django.core.urlresolvers import reverse
 from django.test import TestCase, override_settings
 from django.test.client import Client
-from edx_oauth2_provider.tests.factories import ClientFactory
 import httpretty
 from markupsafe import escape
 from mock import Mock, patch
@@ -30,11 +29,15 @@ from certificates.tests.factories import GeneratedCertificateFactory  # pylint: 
 from config_models.models import cache
 from course_modes.models import CourseMode
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from openedx.core.djangoapps.programs.models import ProgramsApiConfig
-from openedx.core.djangoapps.programs.tests import factories as programs_factories
+from openedx.core.djangoapps.catalog.tests.factories import (
+    generate_course_run_key,
+    ProgramFactory,
+    CourseFactory as CatalogCourseFactory,
+    CourseRunFactory,
+)
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 import shoppingcart  # pylint: disable=import-error
 from student.models import (
     anonymous_id_for_user, user_by_anonymous_id, CourseEnrollment,
@@ -226,6 +229,7 @@ class DashboardTest(ModuleStoreTestCase):
     """
     Tests for dashboard utility functions
     """
+    ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
         super(DashboardTest, self).setUp()
@@ -431,10 +435,11 @@ class DashboardTest(ModuleStoreTestCase):
         # If user has a certificate with valid linked-in config then Add Certificate to LinkedIn button
         # should be visible. and it has URL value with valid parameters.
         self.client.login(username="jack", password="test")
-        LinkedInAddToProfileConfiguration(
+
+        LinkedInAddToProfileConfiguration.objects.create(
             company_identifier='0_mC_o2MizqdtZEmkVXjH4eYwMj4DnkCWrZP_D9',
             enabled=True
-        ).save()
+        )
 
         CourseModeFactory.create(
             course_id=self.course.id,
@@ -471,6 +476,7 @@ class DashboardTest(ModuleStoreTestCase):
             u'pfCertificationUrl=www.edx.org&'
             u'source=o'
         ).format(platform=quote(settings.PLATFORM_NAME.encode('utf-8')))
+
         self.assertContains(response, escape(expected_url))
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -988,11 +994,10 @@ class AnonymousLookupTable(ModuleStoreTestCase):
 
 
 @attr(shard=3)
-@httpretty.activate
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
+@patch('openedx.core.djangoapps.programs.utils.get_programs')
 class RelatedProgramsTests(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
     """Tests verifying that related programs appear on the course dashboard."""
-    url = None
     maxDiff = None
     password = 'test'
     related_programs_preface = 'Related Programs'
@@ -1004,18 +1009,6 @@ class RelatedProgramsTests(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         cls.user = UserFactory()
         cls.course = CourseFactory()
         cls.enrollment = CourseEnrollmentFactory(user=cls.user, course_id=cls.course.id)  # pylint: disable=no-member
-        ClientFactory(name=ProgramsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
-
-        cls.organization = programs_factories.Organization()
-        run_mode = programs_factories.RunMode(course_key=unicode(cls.course.id))  # pylint: disable=no-member
-        course_code = programs_factories.CourseCode(run_modes=[run_mode])
-
-        cls.programs = [
-            programs_factories.Program(
-                organizations=[cls.organization],
-                course_codes=[course_code]
-            ) for __ in range(2)
-        ]
 
     def setUp(self):
         super(RelatedProgramsTests, self).setUp()
@@ -1025,14 +1018,9 @@ class RelatedProgramsTests(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         self.create_programs_config()
         self.client.login(username=self.user.username, password=self.password)
 
-    def mock_programs_api(self, data):
-        """Helper for mocking out Programs API URLs."""
-        self.assertTrue(httpretty.is_enabled(), msg='httpretty must be enabled to mock Programs API calls.')
-
-        url = ProgramsApiConfig.current().internal_api_url.strip('/') + '/programs/'
-        body = json.dumps({'results': data})
-
-        httpretty.register_uri(httpretty.GET, url, body=body, content_type='application/json')
+        course_run = CourseRunFactory(key=unicode(self.course.id))  # pylint: disable=no-member
+        course = CatalogCourseFactory(course_runs=[course_run])
+        self.programs = [ProgramFactory(courses=[course]) for __ in range(2)]
 
     def assert_related_programs(self, response, are_programs_present=True):
         """Assertion for verifying response contents."""
@@ -1045,42 +1033,40 @@ class RelatedProgramsTests(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
 
     def expected_link_text(self, program):
         """Construct expected dashboard link text."""
-        return u'{name} {category}'.format(name=program['name'], category=program['category'])
+        return u'{title} {type}'.format(title=program['title'], type=program['type'])
 
-    def test_related_programs_listed(self):
-        """Verify that related programs are listed when the programs API returns data."""
-        self.mock_programs_api(self.programs)
+    def test_related_programs_listed(self, mock_get_programs):
+        """Verify that related programs are listed when available."""
+        mock_get_programs.return_value = self.programs
 
         response = self.client.get(self.url)
         self.assert_related_programs(response)
 
-    def test_no_data_no_programs(self):
-        """Verify that related programs aren't listed if the programs API returns no data."""
-        self.mock_programs_api([])
+    def test_no_data_no_programs(self, mock_get_programs):
+        """Verify that related programs aren't listed when none are available."""
+        mock_get_programs.return_value = []
 
         response = self.client.get(self.url)
         self.assert_related_programs(response, are_programs_present=False)
 
-    def test_unrelated_program_not_listed(self):
+    def test_unrelated_program_not_listed(self, mock_get_programs):
         """Verify that unrelated programs don't appear in the listing."""
-        run_mode = programs_factories.RunMode(course_key='some/nonexistent/run')
-        course_code = programs_factories.CourseCode(run_modes=[run_mode])
+        nonexistent_course_run_id = generate_course_run_key()
 
-        unrelated_program = programs_factories.Program(
-            organizations=[self.organization],
-            course_codes=[course_code]
-        )
+        course_run = CourseRunFactory(key=nonexistent_course_run_id)
+        course = CatalogCourseFactory(course_runs=[course_run])
+        unrelated_program = ProgramFactory(courses=[course])
 
-        self.mock_programs_api(self.programs + [unrelated_program])
+        mock_get_programs.return_value = self.programs + [unrelated_program]
 
         response = self.client.get(self.url)
         self.assert_related_programs(response)
-        self.assertNotContains(response, unrelated_program['name'])
+        self.assertNotContains(response, unrelated_program['title'])
 
-    def test_program_title_unicode(self):
+    def test_program_title_unicode(self, mock_get_programs):
         """Verify that the dashboard can deal with programs whose titles contain Unicode."""
-        self.programs[0]['name'] = u'Bases matemáticas para estudiar ingeniería'
-        self.mock_programs_api(self.programs)
+        self.programs[0]['title'] = u'Bases matemáticas para estudiar ingeniería'
+        mock_get_programs.return_value = self.programs
 
         response = self.client.get(self.url)
         self.assert_related_programs(response)

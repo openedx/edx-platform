@@ -300,8 +300,8 @@ from student.helpers import (
         <ul>
           % for program in related_programs:
           <li>
-            <span class="category-icon ${program['category'].lower()}-icon" aria-hidden="true"></span>
-            <span><a href="${program['detail_url']}">${u'{name} {category}'.format(name=program['name'], category=program['category'])}</a></span>
+            <span class="category-icon ${program['type'].lower()}-icon" aria-hidden="true"></span>
+            <span><a href="${program['detail_url']}">${u'{title} {type}'.format(title=program['title'], type=program['type'])}</a></span>
           </li>
           % endfor
         </ul>
@@ -396,12 +396,6 @@ from student.helpers import (
             </div>
           </div>
         %endif
-
-        % if course_program_info and course_program_info.get('category'):
-          %for program_data in course_program_info.get('course_program_list', []):
-            <%include file = "_dashboard_program_info.html" args="program_data=program_data, enrollment_mode=enrollment.mode, category=course_program_info['category']" />
-          %endfor
-        % endif
 
         % if is_course_blocked:
           <p id="block-course-msg" class="course-block">

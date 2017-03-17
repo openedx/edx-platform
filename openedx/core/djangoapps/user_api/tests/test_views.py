@@ -19,6 +19,7 @@ from pytz import common_timezones_set, UTC
 from social.apps.django_app.default.models import UserSocialAuth
 
 from django_comment_common import models
+from openedx.core.djangoapps.site_configuration.helpers import get_value
 from openedx.core.lib.api.test_utils import ApiTestCase, TEST_API_KEY
 from openedx.core.lib.time_zone_utils import get_display_time_zone
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
@@ -950,6 +951,17 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                     "required": False,
                 }
             )
+            # social_auth_provider should be present
+            # with value `Google`(we are setting up google provider for this test).
+            self._assert_reg_field(
+                no_extra_fields_setting,
+                {
+                    "name": "social_auth_provider",
+                    "type": "hidden",
+                    "required": False,
+                    "defaultValue": "Google"
+                }
+            )
 
             # Email should be filled in
             self._assert_reg_field(
@@ -1023,43 +1035,6 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                     {"value": "none", "name": "No formal education"},
                     {"value": "other", "name": "Other education"},
                 ],
-            }
-        )
-
-    @mock.patch('util.enterprise_helpers.active_provider_requests_data_sharing')
-    @mock.patch('util.enterprise_helpers.active_provider_enforces_data_sharing')
-    @mock.patch('util.enterprise_helpers.get_enterprise_customer_for_request')
-    @mock.patch('util.enterprise_helpers.configuration_helpers')
-    def test_register_form_consent_field(self, config_helper, get_ec, mock_enforce, mock_request):
-        """
-        Test that if we have an EnterpriseCustomer active for the request, and that
-        EnterpriseCustomer is set to require data sharing consent, the correct
-        field is added to the form descriptor.
-        """
-        fake_ec = mock.MagicMock(
-            enforces_data_sharing_consent=mock.MagicMock(return_value=True),
-            requests_data_sharing_consent=True,
-        )
-        fake_ec.name = 'MegaCorp'
-        get_ec.return_value = fake_ec
-        config_helper.get_value.return_value = 'OpenEdX'
-        mock_request.return_value = True
-        mock_enforce.return_value = True
-        self._assert_reg_field(
-            dict(),
-            {
-                u"name": u"data_sharing_consent",
-                u"type": u"checkbox",
-                u"required": True,
-                u"label": (
-                    "I agree to allow OpenEdX to share data about my enrollment, "
-                    "completion and performance in all OpenEdX courses and programs "
-                    "where my enrollment is sponsored by MegaCorp."
-                ),
-                u"defaultValue": False,
-                u"errorMessages": {
-                    u'required': u'To link your account with MegaCorp, you are required to consent to data sharing.',
-                }
             }
         )
 
@@ -1774,6 +1749,24 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
 
         self.assertContains(response, 'Kosovo')
 
+    def test_create_account_not_allowed(self):
+        """
+        Test case to check user creation is forbidden when ALLOW_PUBLIC_ACCOUNT_CREATION feature flag is turned off
+        """
+        def _side_effect_for_get_value(value, default=None):
+            """
+            returns a side_effect with given return value for a given value
+            """
+            if value == 'ALLOW_PUBLIC_ACCOUNT_CREATION':
+                return False
+            else:
+                return get_value(value, default)
+
+        with mock.patch('openedx.core.djangoapps.site_configuration.helpers.get_value') as mock_get_value:
+            mock_get_value.side_effect = _side_effect_for_get_value
+            response = self.client.post(self.url, {"email": self.EMAIL, "username": self.USERNAME})
+            self.assertEqual(response.status_code, 403)
+
 
 @httpretty.activate
 @ddt.ddt
@@ -1802,6 +1795,7 @@ class ThirdPartyRegistrationTestMixin(ThirdPartyOAuthTestMixin, CacheIsolationTe
             "username": user.username if user else "test_username",
             "name": user.first_name if user else "test name",
             "email": user.email if user else "test@test.com",
+
         }
 
     def _assert_existing_user_error(self, response):
@@ -1822,6 +1816,15 @@ class ThirdPartyRegistrationTestMixin(ThirdPartyOAuthTestMixin, CacheIsolationTe
             {"access_token": [{"user_message": expected_error_message}]}
         )
         self.assertNotIn("partial_pipeline", self.client.session)
+
+    def _assert_third_party_session_expired_error(self, response, expected_error_message):
+        """Assert that given response is an error due to third party session expiry"""
+        self.assertEqual(response.status_code, 400)
+        response_json = json.loads(response.content)
+        self.assertEqual(
+            response_json,
+            {"session_expired": [{"user_message": expected_error_message}]}
+        )
 
     def _verify_user_existence(self, user_exists, social_link_exists, user_is_active=None, username=None):
         """Verifies whether the user object exists."""
@@ -1894,6 +1897,32 @@ class ThirdPartyRegistrationTestMixin(ThirdPartyOAuthTestMixin, CacheIsolationTe
         self._assert_access_token_error(
             response,
             "An access_token is required when passing value ({}) for provider.".format(self.BACKEND)
+        )
+        self._verify_user_existence(user_exists=False, social_link_exists=False)
+
+    def test_expired_pipeline(self):
+
+        """
+        Test that there is an error and account is not created
+        when request is made for account creation using third (Google, Facebook etc) party with pipeline
+        getting expired using browser (not mobile application).
+
+        NOTE: We are NOT using actual pipeline here so pipeline is always expired in this environment.
+        we don't have to explicitly expire pipeline.
+
+        """
+
+        data = self.data()
+        # provider is sent along request when request is made from mobile application
+        data.pop("provider")
+        # to identify that request is made using browser
+        data.update({"social_auth_provider": "Google"})
+        response = self.client.post(self.url, data)
+        # NO partial_pipeline in session means pipeline is expired
+        self.assertNotIn("partial_pipeline", self.client.session)
+        self._assert_third_party_session_expired_error(
+            response,
+            u"Registration using {provider} has timed out.".format(provider="Google")
         )
         self._verify_user_existence(user_exists=False, social_link_exists=False)
 

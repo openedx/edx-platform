@@ -9,14 +9,15 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db.utils import DatabaseError
 from logging import getLogger
+import newrelic.agent
 
+from celery_utils.logged_task import LoggedTask
+from celery_utils.persist_on_failure import PersistOnFailureTask
 from courseware.model_data import get_score
 from lms.djangoapps.course_blocks.api import get_course_blocks
-from openedx.core.djangoapps.celery_utils.persist_on_failure import PersistOnFailureTask
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import CourseLocator
 from submissions import api as sub_api
-from student.models import anonymous_id_for_user
 from track.event_transaction_utils import (
     set_event_transaction_type,
     set_event_transaction_id,
@@ -24,7 +25,6 @@ from track.event_transaction_utils import (
 from util.date_utils import from_timestamp
 from xmodule.modulestore.django import modulestore
 
-from .config.models import PersistentGradesEnabledFlag
 from .constants import ScoreDatabaseTableEnum
 from .new.subsection_grade import SubsectionGradeFactory
 from .signals.signals import SUBSECTION_SCORE_CHANGED
@@ -32,11 +32,31 @@ from .transformer import GradesTransformer
 
 log = getLogger(__name__)
 
-KNOWN_RETRY_ERRORS = (DatabaseError, ValidationError)  # Errors we expect occasionally, should be resolved on retry
+
+class DatabaseNotReadyError(IOError):
+    """
+    Subclass of IOError to indicate the database has not yet committed
+    the data we're trying to find.
+    """
+    pass
+
+
+KNOWN_RETRY_ERRORS = (  # Errors we expect occasionally, should be resolved on retry
+    DatabaseError,
+    ValidationError,
+    DatabaseNotReadyError
+)
 RECALCULATE_GRADE_DELAY = 2  # in seconds, to prevent excessive _has_db_updated failures. See TNL-6424.
 
 
-@task(bind=True, base=PersistOnFailureTask, default_retry_delay=30, routing_key=settings.RECALCULATE_GRADES_ROUTING_KEY)
+class _BaseTask(PersistOnFailureTask, LoggedTask):  # pylint: disable=abstract-method
+    """
+    Include persistence features, as well as logging of task invocation.
+    """
+    abstract = True
+
+
+@task(bind=True, base=_BaseTask, default_retry_delay=30, routing_key=settings.RECALCULATE_GRADES_ROUTING_KEY)
 def recalculate_subsection_grade_v3(self, **kwargs):
     """
     Latest version of the recalculate_subsection_grade task.  See docstring
@@ -70,10 +90,10 @@ def _recalculate_subsection_grade(self, **kwargs):
     """
     try:
         course_key = CourseLocator.from_string(kwargs['course_id'])
-        if not PersistentGradesEnabledFlag.feature_enabled(course_key):
-            return
-
         scored_block_usage_key = UsageKey.from_string(kwargs['usage_id']).replace(course_key=course_key)
+
+        newrelic.agent.add_custom_parameter('course_id', unicode(course_key))
+        newrelic.agent.add_custom_parameter('usage_id', unicode(scored_block_usage_key))
 
         # The request cache is not maintained on celery workers,
         # where this code runs. So we take the values from the
@@ -90,7 +110,7 @@ def _recalculate_subsection_grade(self, **kwargs):
         has_database_updated = _has_db_updated_with_new_score(self, scored_block_usage_key, **kwargs)
 
         if not has_database_updated:
-            raise _retry_recalculate_subsection_grade(self, **kwargs)
+            raise DatabaseNotReadyError
 
         _update_subsection_grades(
             course_key,
@@ -98,8 +118,6 @@ def _recalculate_subsection_grade(self, **kwargs):
             kwargs['only_if_higher'],
             kwargs['user_id'],
         )
-    except Retry:
-        raise
     except Exception as exc:   # pylint: disable=broad-except
         if not isinstance(exc, KNOWN_RETRY_ERRORS):
             log.info("tnl-6244 grades unexpected failure: {}. task id: {}. kwargs={}".format(

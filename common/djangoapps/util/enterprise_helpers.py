@@ -1,110 +1,155 @@
 """
 Helpers to access the enterprise app
 """
-from django.conf import settings
-from django.utils.translation import ugettext as _
 import logging
 
+from functools import wraps
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
+from django.shortcuts import redirect
+from django.utils.http import urlencode
+from edx_rest_api_client.client import EdxRestApiClient
 try:
-    from enterprise.models import EnterpriseCustomer
     from enterprise import utils as enterprise_utils
-    from enterprise.tpa_pipeline import (
-        active_provider_requests_data_sharing,
-        active_provider_enforces_data_sharing,
-        get_enterprise_customer_for_request,
-    )
-
+    from enterprise.utils import consent_necessary_for_course
 except ImportError:
     pass
-
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.lib.token_utils import JwtBuilder
+from slumber.exceptions import HttpClientError, HttpServerError
+
+
 ENTERPRISE_CUSTOMER_BRANDING_OVERRIDE_DETAILS = 'enterprise_customer_branding_override_details'
 LOGGER = logging.getLogger("edx.enterprise_helpers")
+
+
+class EnterpriseApiException(Exception):
+    """
+    Exception for errors while communicating with the Enterprise service API.
+    """
+    pass
+
+
+class EnterpriseApiClient(object):
+    """
+    Class for producing an Enterprise service API client.
+    """
+
+    def __init__(self):
+        """
+        Initialize an Enterprise service API client, authenticated using the Enterprise worker username.
+        """
+        self.user = User.objects.get(username=settings.ENTERPRISE_SERVICE_WORKER_USERNAME)
+        jwt = JwtBuilder(self.user).build_token([])
+        self.client = EdxRestApiClient(
+            configuration_helpers.get_value('ENTERPRISE_API_URL', settings.ENTERPRISE_API_URL),
+            jwt=jwt
+        )
+
+    def post_enterprise_course_enrollment(self, username, course_id, consent_granted):
+        """
+        Create an EnterpriseCourseEnrollment by using the corresponding serializer (for validation).
+        """
+        data = {
+            'username': username,
+            'course_id': course_id,
+            'consent_granted': consent_granted,
+        }
+        endpoint = getattr(self.client, 'enterprise-course-enrollment')  # pylint: disable=literal-used-as-attribute
+        try:
+            endpoint.post(data=data)
+        except (HttpClientError, HttpServerError):
+            message = (
+                "An error occured while posting EnterpriseCourseEnrollment for user {username} and "
+                "course run {course_id} (consent_granted value: {consent_granted})"
+            ).format(
+                username=username,
+                course_id=course_id,
+                consent_granted=consent_granted,
+            )
+            LOGGER.exception(message)
+            raise EnterpriseApiException(message)
+
+
+def data_sharing_consent_required(view_func):
+    """
+    Decorator which makes a view method redirect to the Data Sharing Consent form if:
+
+    * The wrapped method is passed request, course_id as the first two arguments.
+    * Enterprise integration is enabled
+    * Data sharing consent is required before accessing this course view.
+    * The request.user has not yet given data sharing consent for this course.
+
+    After granting consent, the user will be redirected back to the original request.path.
+
+    """
+    @wraps(view_func)
+    def inner(request, course_id, *args, **kwargs):
+        """
+        Redirect to the consent page if the request.user must consent to data sharing before viewing course_id.
+
+        Otherwise, just call the wrapped view function.
+        """
+        # Redirect to the consent URL, if consent is required.
+        consent_url = get_enterprise_consent_url(request, course_id)
+        if consent_url:
+            return redirect(consent_url)
+
+        # Otherwise, drop through to wrapped view
+        return view_func(request, course_id, *args, **kwargs)
+
+    return inner
 
 
 def enterprise_enabled():
     """
     Determines whether the Enterprise app is installed
     """
-    return 'enterprise' in settings.INSTALLED_APPS
+    return 'enterprise' in settings.INSTALLED_APPS and getattr(settings, 'ENABLE_ENTERPRISE_INTEGRATION', True)
 
 
-def data_sharing_consent_requested(request):
+def consent_needed_for_course(user, course_id):
     """
-    Determine if the EnterpriseCustomer for a given HTTP request
-    requests data sharing consent
-    """
-    if not enterprise_enabled():
-        return False
-    return active_provider_requests_data_sharing(request)
-
-
-def data_sharing_consent_required_at_login(request):
-    """
-    Determines if data sharing consent is required at
-    a given location
+    Wrap the enterprise app check to determine if the user needs to grant
+    data sharing permissions before accessing a course.
     """
     if not enterprise_enabled():
         return False
-    return active_provider_enforces_data_sharing(request, EnterpriseCustomer.AT_LOGIN)
+    return consent_necessary_for_course(user, course_id)
 
 
-def data_sharing_consent_requirement_at_login(request):
+def get_enterprise_consent_url(request, course_id, user=None, return_to=None):
     """
-    Returns either 'optional' or 'required' based on where we are.
+    Build a URL to redirect the user to the Enterprise app to provide data sharing
+    consent for a specific course ID.
+
+    Arguments:
+    * request: Request object
+    * course_id: Course key/identifier string.
+    * user: user to check for consent. If None, uses request.user
+    * return_to: url name label for the page to return to after consent is granted.
+                 If None, return to request.path instead.
     """
-    if not enterprise_enabled():
+    if user is None:
+        user = request.user
+
+    if not consent_needed_for_course(user, course_id):
         return None
-    if data_sharing_consent_required_at_login(request):
-        return 'required'
-    if data_sharing_consent_requested(request):
-        return 'optional'
-    return None
 
+    if return_to is None:
+        return_path = request.path
+    else:
+        return_path = reverse(return_to, args=(course_id,))
 
-def insert_enterprise_fields(request, form_desc):
-    """
-    Enterprise methods which modify the logistration form are called from this method.
-    """
-    if not enterprise_enabled():
-        return
-    add_data_sharing_consent_field(request, form_desc)
-
-
-def add_data_sharing_consent_field(request, form_desc):
-    """
-    Adds a checkbox field to be selected if the user consents to share data with
-    the EnterpriseCustomer attached to the SSO provider with which they're authenticating.
-    """
-    enterprise_customer = get_enterprise_customer_for_request(request)
-    required = data_sharing_consent_required_at_login(request)
-
-    if not data_sharing_consent_requested(request):
-        return
-
-    label = _(
-        "I agree to allow {platform_name} to share data about my enrollment, "
-        "completion and performance in all {platform_name} courses and programs "
-        "where my enrollment is sponsored by {ec_name}."
-    ).format(
-        platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
-        ec_name=enterprise_customer.name
-    )
-
-    error_msg = _(
-        "To link your account with {ec_name}, you are required to consent to data sharing."
-    ).format(
-        ec_name=enterprise_customer.name
-    )
-
-    form_desc.add_field(
-        "data_sharing_consent",
-        label=label,
-        field_type="checkbox",
-        default=False,
-        required=required,
-        error_messages={"required": error_msg},
-    )
+    url_params = {
+        'course_id': course_id,
+        'next': request.build_absolute_uri(return_path)
+    }
+    querystring = urlencode(url_params)
+    full_url = reverse('grant_data_sharing_permissions') + '?' + querystring
+    LOGGER.info('Redirecting to %s to complete data sharing consent', full_url)
+    return full_url
 
 
 def insert_enterprise_pipeline_elements(pipeline):
@@ -116,8 +161,7 @@ def insert_enterprise_pipeline_elements(pipeline):
         return
 
     additional_elements = (
-        'enterprise.tpa_pipeline.set_data_sharing_consent_record',
-        'enterprise.tpa_pipeline.verify_data_sharing_consent',
+        'enterprise.tpa_pipeline.handle_enterprise_logistration',
     )
     # Find the item we need to insert the data sharing consent elements before
     insert_point = pipeline.index('social.pipeline.social_auth.load_extra_data')

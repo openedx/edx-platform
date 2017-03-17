@@ -4,7 +4,10 @@ Visibility Transformer implementation.
 from datetime import datetime
 from pytz import utc
 
-from openedx.core.lib.block_structure.transformer import BlockStructureTransformer, FilteringTransformerMixin
+from openedx.core.djangoapps.content.block_structure.transformer import (
+    BlockStructureTransformer,
+    FilteringTransformerMixin,
+)
 from xmodule.seq_module import SequenceModule
 from .utils import collect_merged_boolean_field, collect_merged_date_field
 
@@ -25,7 +28,8 @@ class HiddenContentTransformer(FilteringTransformerMixin, BlockStructureTransfor
 
     Staff users are exempted from hidden content rules.
     """
-    VERSION = 2
+    WRITE_VERSION = 2
+    READ_VERSION = 2
     MERGED_DUE_DATE = 'merged_due_date'
     MERGED_HIDE_AFTER_DUE = 'merged_hide_after_due'
 

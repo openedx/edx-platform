@@ -898,16 +898,12 @@ div.problem .action {
   margin-top: $baseline;
   min-height: $baseline;
   width: 100%;
-  display: inline-block;
-
-  .problem-action-buttons-wrapper {
-
-    @media (min-width: $bp-screen-lg) {
-      @include text-align(right);
-      @include float(right);
-    }
-
-  }
+  display: flex;
+  display: -ms-flexbox;
+  -ms-flex-align: start;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
 
   .problem-action-button-wrapper {
     @include border-right(1px solid $light-gray1);
@@ -934,21 +930,24 @@ div.problem .action {
   }
 
   .submit-attempt-container {
-    display: table;
+    padding-bottom: $baseline;
+    flex-grow: 1;
 
     @media (max-width: $bp-screen-lg) {
       max-width: 100%;
-      padding-top: $baseline;
+      padding-bottom: $baseline;
     }
     .submit {
       @include margin-right($baseline / 2);
       @include float(left);
+      white-space: nowrap;
     }
   }
 
   .submission-feedback {
-    display: inline-block;
+    @include margin-right($baseline / 2);
     margin-top: $baseline / 2;
+    display: inline-block;
     color: $gray-d1;
     font-size: $medium-font-size;
     -webkit-font-smoothing: antialiased;
@@ -1026,6 +1025,7 @@ div.problem {
   }
 
   .notification {
+    @include float(left);
     margin-top: $baseline / 2;
     padding: ($baseline / 2.5) ($baseline / 2) ($baseline / 5) ($baseline / 2);
     line-height: $base-line-height;
@@ -1040,6 +1040,10 @@ div.problem {
 
     &.warning {
       @include notification-by-type($warning-color);
+    }
+
+    &.general {
+      @include notification-by-type($general-color-accent);
     }
 
     &.problem-hint {

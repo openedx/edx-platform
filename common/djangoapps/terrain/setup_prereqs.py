@@ -56,12 +56,19 @@ def stop_video_server(_total):
         video_server.shutdown()
 
 
-@before.each_scenario  # pylint: disable=no-member
-def process_requires_tags(scenario):
+@before.all  # pylint: disable=no-member
+def start_stub_servers():
     """
-    Process the scenario tags to make sure that any
-    requirements are met prior to that scenario
-    being executed.
+    Start all stub servers
+    """
+
+    for stub in SERVICES.keys():
+        start_stub(stub)
+
+
+@before.each_scenario  # pylint: disable=no-member
+def skip_youtube_if_not_available(scenario):
+    """
 
     Scenario tags must be named with this convention:
     @requires_stub_bar, where 'bar' is the name of the stub service to start
@@ -85,7 +92,7 @@ def process_requires_tags(scenario):
                     scenario.steps = []
                     return
 
-            start_stub(requires.group('server'))
+    return
 
 
 def start_stub(name):
@@ -124,11 +131,13 @@ def is_youtube_available(urls):
     return True
 
 
-@after.each_scenario  # pylint: disable=no-member
+@after.all  # pylint: disable=no-member
 def stop_stubs(_scenario):
     """
-    Shut down any stub services that were started up for the scenario.
+    Shut down any stub services.
     """
+    # close browser to ensure no open connections to the stub servers
+    world.browser.quit()
     for name in SERVICES.keys():
         stub_server = getattr(world, name, None)
         if stub_server is not None:

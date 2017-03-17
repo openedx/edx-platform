@@ -9,6 +9,7 @@ from path import Path as path
 from lxml import etree
 from mock import patch, MagicMock, Mock
 from nose.plugins.attrib import attr
+from uuid import uuid4
 
 from django.conf import settings
 from django.test import TestCase
@@ -854,6 +855,46 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
             )
 
+    @patch('xmodule.video_module.video_module.edxval_api.get_urls_for_profiles')
+    def test_get_html_hls(self, get_urls_for_profiles):
+        """
+        Verify that hls profile functionality works as expected.
+
+        * HLS source should be added into list of available sources
+        * HLS source should not be used for download URL If available from edxval
+        """
+        video_xml = '<video display_name="Video" download_video="true" edx_video_id="12345-67890">[]</video>'
+
+        get_urls_for_profiles.return_value = {
+            'desktop_webm': 'https://webm.com/dw.webm',
+            'hls': 'https://hls.com/hls.m3u8',
+            'youtube': 'https://yt.com/?v=v0TFmdO4ZP0',
+            'desktop_mp4': 'https://mp4.com/dm.mp4'
+        }
+
+        self.initialize_module(data=video_xml)
+        context = self.item_descriptor.render(STUDENT_VIEW).content
+
+        self.assertIn("'download_video_link': 'https://mp4.com/dm.mp4'", context)
+        self.assertIn('"streams": "1.00:https://yt.com/?v=v0TFmdO4ZP0"', context)
+        self.assertIn(
+            '"sources": ["https://webm.com/dw.webm", "https://mp4.com/dm.mp4", "https://hls.com/hls.m3u8"]', context
+        )
+
+    def test_get_html_hls_no_video_id(self):
+        """
+        Verify that `download_video_link` is set to None for HLS videos if no video id
+        """
+        video_xml = """
+        <video display_name="Video" download_video="true" source="https://hls.com/hls.m3u8">
+        ["https://hls.com/hls2.m3u8", "https://hls.com/hls3.m3u8"]
+        </video>
+        """
+
+        self.initialize_module(data=video_xml)
+        context = self.item_descriptor.render(STUDENT_VIEW).content
+        self.assertIn("'download_video_link': None", context)
+
 
 @attr(shard=1)
 class TestVideoCDNRewriting(BaseTestXmodule):
@@ -1048,6 +1089,27 @@ class TestEditorSavedMethod(BaseTestXmodule):
         with patch('xmodule.video_module.video_module.manage_video_subtitles_save') as manage_video_subtitles_save:
             item.editor_saved(self.user, old_metadata, None)
             self.assertFalse(manage_video_subtitles_save.called)
+
+    @ddt.data(TEST_DATA_MONGO_MODULESTORE, TEST_DATA_SPLIT_MODULESTORE)
+    def test_editor_saved_with_unstripped_video_id(self, default_store):
+        """
+        Verify editor saved when video id contains spaces/tabs.
+        """
+        self.MODULESTORE = default_store
+        stripped_video_id = unicode(uuid4())
+        unstripped_video_id = u'{video_id}{tabs}'.format(video_id=stripped_video_id, tabs=u'\t\t\t')
+        self.metadata.update({
+            'edx_video_id': unstripped_video_id
+        })
+        self.initialize_module(metadata=self.metadata)
+        item = self.store.get_item(self.item_descriptor.location)
+        self.assertEqual(item.edx_video_id, unstripped_video_id)
+
+        # Now, modifying and saving the video module should strip the video id.
+        old_metadata = own_metadata(item)
+        item.display_name = u'New display name'
+        item.editor_saved(self.user, old_metadata, None)
+        self.assertEqual(item.edx_video_id, stripped_video_id)
 
 
 @ddt.ddt
@@ -1246,6 +1308,12 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
         ]
         rendered_context = self.descriptor.get_context()
         self.assertListEqual(rendered_context['tabs'], correct_tabs)
+
+        # Assert that the Video ID field is present in basic tab metadata context.
+        self.assertEqual(
+            rendered_context['transcripts_basic_tab_metadata']['edx_video_id'],
+            self.descriptor.editable_metadata_fields['edx_video_id']
+        )
 
     def test_export_val_data(self):
         self.descriptor.edx_video_id = 'test_edx_video_id'

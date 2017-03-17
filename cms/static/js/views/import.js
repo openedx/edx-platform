@@ -2,8 +2,8 @@
  * Course import-related js.
  */
 define(
-    ['jquery', 'underscore', 'gettext', 'moment', 'jquery.cookie'],
-    function($, _, gettext, moment) {
+    ['jquery', 'underscore', 'gettext', 'moment', 'edx-ui-toolkit/js/utils/html-utils', 'jquery.cookie'],
+    function($, _, gettext, moment, HtmlUtils) {
         'use strict';
 
         /** ******** Private properties ****************************************/
@@ -81,7 +81,7 @@ define(
          */
         var initEventListeners = function() {
             $(window).on('beforeunload.import', function() {
-                if (current.stage <= STAGE.UNPACKING) {
+                if (current.stage < STAGE.UNPACKING) {
                     return gettext('Your import is in progress; navigating away will abort it.');
                 }
             });
@@ -127,10 +127,10 @@ define(
          */
         var updateFeedbackList = function(currStageMsg) {
             var $checkmark, $curr, $prev, $next;
-            var date, successUnix, time;
+            var date, stageMsg, successUnix, time;
 
             $checkmark = $dom.successStage.find('.icon');
-            currStageMsg = currStageMsg || '';
+            stageMsg = currStageMsg || '';
 
             function completeStage(stage) {
                 $(stage)
@@ -140,12 +140,17 @@ define(
 
             function errorStage(stage) {
                 if (!$(stage).hasClass('has-error')) {
+                    stageMsg = HtmlUtils.joinHtml(
+                        HtmlUtils.HTML('<p class="copy error">'),
+                        stageMsg,
+                        HtmlUtils.HTML('</p>')
+                    );
                     $(stage)
                         .removeClass('is-started')
                         .addClass('has-error')
                         .find('p.copy')
                         .hide()
-                        .after("<p class='copy error'>" + currStageMsg + '</p>');
+                        .after(HtmlUtils.ensureHtml(stageMsg).toString());
                 }
             }
 
@@ -181,7 +186,7 @@ define(
 
                 $dom.successStage
                         .find('.item-progresspoint-success-date')
-                        .html('(' + date + ' at ' + time + ' UTC)');
+                        .text('(' + date + ' at ' + time + ' UTC)');
 
                 break;
 

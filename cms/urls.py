@@ -96,6 +96,8 @@ urlpatterns += patterns(
     url(r'^import/{}$'.format(COURSELIKE_KEY_PATTERN), 'import_handler'),
     url(r'^import_status/{}/(?P<filename>.+)$'.format(COURSELIKE_KEY_PATTERN), 'import_status_handler'),
     url(r'^export/{}$'.format(COURSELIKE_KEY_PATTERN), 'export_handler'),
+    url(r'^export_output/{}$'.format(COURSELIKE_KEY_PATTERN), 'export_output_handler'),
+    url(r'^export_status/{}$'.format(COURSELIKE_KEY_PATTERN), 'export_status_handler'),
     url(r'^xblock/outline/{}$'.format(settings.USAGE_KEY_PATTERN), 'xblock_outline_handler'),
     url(r'^xblock/container/{}$'.format(settings.USAGE_KEY_PATTERN), 'xblock_container_handler'),
     url(r'^xblock/{}/(?P<view_name>[^/]+)$'.format(settings.USAGE_KEY_PATTERN), 'xblock_view_handler'),

@@ -135,6 +135,7 @@
       color: $gray-l1;
 
       .icon {
+        @include margin-right(0);
         vertical-align: middle;
       }
     }

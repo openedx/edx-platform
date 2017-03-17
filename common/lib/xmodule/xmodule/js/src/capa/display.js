@@ -174,6 +174,7 @@
             this.showButton.click(this.show);
             this.saveButton = this.$('.action .save');
             this.saveNotification = this.$('.notification-save');
+            this.showAnswerNotification = this.$('.notification-show-answer');
             this.saveButton.click(this.save);
             this.gentleAlertNotification = this.$('.notification-gentle-alert');
             this.submitNotification = this.$('.notification-submit');
@@ -509,7 +510,7 @@
                     ref = element.files;
                     for (loopI = 0, loopLen = ref.length; loopI < loopLen; loopI++) {
                         file = ref[loopI];
-                        if (allowedFiles.length !== 0 && indexOfHelper.call(allowedFiles, file.name < 0)) {
+                        if (allowedFiles.length !== 0 && indexOfHelper.call(allowedFiles, file.name) < 0) {
                             unallowedFileSubmitted = true;
                             errors.push(edx.StringUtils.interpolate(
                                 gettext('You submitted {filename}; only {allowedFiles} are allowed.'), {
@@ -727,8 +728,9 @@
                 }
                 that.el.find('.show').attr('disabled', 'disabled');
                 that.updateProgress(response);
-                window.SR.readText(gettext('Answers to this problem are now shown. Navigate through the problem to review it with answers inline.')); // eslint-disable-line max-len
-                that.scroll_to_problem_meta();
+                that.clear_all_notifications();
+                that.showAnswerNotification.show();
+                that.focus_on_notification('show-answer');
             });
         };
 
@@ -736,6 +738,8 @@
             this.submitNotification.remove();
             this.gentleAlertNotification.hide();
             this.saveNotification.hide();
+            this.showAnswerNotification.hide();
+
         };
 
         Problem.prototype.gentle_alert = function(msg) {
@@ -848,6 +852,7 @@
                     if (bind) {
                         $(textField).on('input', function() {
                             that.saveNotification.hide();
+                            that.showAnswerNotification.hide();
                             that.submitAnswersAndSubmitButton();
                         });
                     }
@@ -867,6 +872,7 @@
                         if (bind) {
                             $(checkboxOrRadio).on('click', function() {
                                 that.saveNotification.hide();
+                                that.showAnswerNotification.hide();
                                 that.submitAnswersAndSubmitButton();
                             });
                         }
@@ -884,6 +890,7 @@
                 if (bind) {
                     $(selectField).on('change', function() {
                         that.saveNotification.hide();
+                        that.showAnswerNotification.hide();
                         that.submitAnswersAndSubmitButton();
                     });
                 }

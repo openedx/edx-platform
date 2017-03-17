@@ -1103,13 +1103,17 @@ id=\"course-enrollment-end-time\" value=\"\" placeholder=\"HH:MM\" autocomplete=
     ]
 
     def setUp(self):
-        """ Initialize course used to test enrollment fields. """
+        """
+        Initialize course used to test enrollment fields.
+        """
         super(CourseEnrollmentEndFieldTest, self).setUp()
         self.course = CourseFactory.create(org='edX', number='dummy', display_name='Marketing Site Course')
         self.course_details_url = reverse_course_url('settings_handler', unicode(self.course.id))
 
     def _get_course_details_response(self, global_staff):
-        """ Return the course details page as either global or non-global staff"""
+        """
+        Return the course details page as either global or non-global staff
+        """
         user = UserFactory(is_staff=global_staff)
         CourseInstructorRole(self.course.id).add_users(user)
 
@@ -1118,7 +1122,8 @@ id=\"course-enrollment-end-time\" value=\"\" placeholder=\"HH:MM\" autocomplete=
         return self.client.get_html(self.course_details_url)
 
     def _verify_editable(self, response):
-        """ Verify that the response has expected editable fields.
+        """
+        Verify that the response has expected editable fields.
 
         Assert that all editable field content exists and no
         uneditable field content exists for enrollment end fields.
@@ -1131,7 +1136,8 @@ id=\"course-enrollment-end-time\" value=\"\" placeholder=\"HH:MM\" autocomplete=
             self.assertContains(response, element)
 
     def _verify_not_editable(self, response):
-        """ Verify that the response has expected non-editable fields.
+        """
+        Verify that the response has expected non-editable fields.
 
         Assert that all uneditable field content exists and no
         editable field content exists for enrollment end fields.
@@ -1145,7 +1151,8 @@ id=\"course-enrollment-end-time\" value=\"\" placeholder=\"HH:MM\" autocomplete=
 
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_MKTG_SITE': False})
     def test_course_details_with_disabled_setting_global_staff(self):
-        """ Test that user enrollment end date is editable in response.
+        """
+        Test that user enrollment end date is editable in response.
 
         Feature flag 'ENABLE_MKTG_SITE' is not enabled.
         User is global staff.
@@ -1154,7 +1161,8 @@ id=\"course-enrollment-end-time\" value=\"\" placeholder=\"HH:MM\" autocomplete=
 
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_MKTG_SITE': False})
     def test_course_details_with_disabled_setting_non_global_staff(self):
-        """ Test that user enrollment end date is editable in response.
+        """
+        Test that user enrollment end date is editable in response.
 
         Feature flag 'ENABLE_MKTG_SITE' is not enabled.
         User is non-global staff.
@@ -1164,7 +1172,8 @@ id=\"course-enrollment-end-time\" value=\"\" placeholder=\"HH:MM\" autocomplete=
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_MKTG_SITE': True})
     @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
     def test_course_details_with_enabled_setting_global_staff(self):
-        """ Test that user enrollment end date is editable in response.
+        """
+        Test that user enrollment end date is editable in response.
 
         Feature flag 'ENABLE_MKTG_SITE' is enabled.
         User is global staff.
@@ -1174,7 +1183,8 @@ id=\"course-enrollment-end-time\" value=\"\" placeholder=\"HH:MM\" autocomplete=
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_MKTG_SITE': True})
     @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
     def test_course_details_with_enabled_setting_non_global_staff(self):
-        """ Test that user enrollment end date is not editable in response.
+        """
+        Test that user enrollment end date is not editable in response.
 
         Feature flag 'ENABLE_MKTG_SITE' is enabled.
         User is non-global staff.

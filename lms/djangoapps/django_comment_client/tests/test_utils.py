@@ -210,6 +210,8 @@ class CachedDiscussionIdMapTestCase(ModuleStoreTestCase):
     """
     Tests that using the cache of discussion id mappings has the same behavior as searching through the course.
     """
+    ENABLED_SIGNALS = ['course_published']
+
     def setUp(self):
         super(CachedDiscussionIdMapTestCase, self).setUp()
 
@@ -1400,6 +1402,26 @@ class PermissionsTestCase(ModuleStoreTestCase):
                 'can_delete': True,
                 'can_openclose': True,
                 'can_vote': True,
+                'can_report': True
+            })
+
+    def test_get_ability_with_global_staff(self):
+        """
+        Tests that global staff has rights to report other user's post inspite
+        of enrolled in the course or not.
+        """
+        content = {'user_id': '1', 'type': 'thread'}
+
+        with mock.patch('django_comment_client.utils.check_permissions_by_view') as check_perm:
+            # check_permissions_by_view returns false because user is not enrolled in the course.
+            check_perm.return_value = False
+            global_staff = UserFactory(username='global_staff', email='global_staff@edx.org', is_staff=True)
+            self.assertEqual(utils.get_ability(None, content, global_staff), {
+                'editable': False,
+                'can_reply': False,
+                'can_delete': False,
+                'can_openclose': False,
+                'can_vote': False,
                 'can_report': True
             })
 

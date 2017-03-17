@@ -38,7 +38,9 @@ from common.test.acceptance.pages.studio.settings import SettingsPage
 from common.test.acceptance.pages.lms.login_and_register import CombinedLoginAndRegisterPage, ResetPasswordPage
 from common.test.acceptance.pages.lms.track_selection import TrackSelectionPage
 from common.test.acceptance.pages.lms.pay_and_verify import PaymentAndVerificationFlow, FakePaymentPage
-from common.test.acceptance.pages.lms.course_wiki import CourseWikiPage, CourseWikiEditPage
+from common.test.acceptance.pages.lms.course_wiki import (
+    CourseWikiPage, CourseWikiEditPage, CourseWikiHistoryPage, CourseWikiChildrenPage
+)
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc, CourseUpdateDesc
 
 
@@ -543,7 +545,6 @@ class PayAndVerifyTest(EventsTestMixin, UniqueCourseTest):
         self.assertEqual(enrollment_mode, 'verified')
 
 
-@attr(shard=1)
 class CourseWikiTest(UniqueCourseTest):
     """
     Tests that verify the course wiki.
@@ -580,6 +581,7 @@ class CourseWikiTest(UniqueCourseTest):
         self.course_wiki_page.open_editor()
         self.course_wiki_edit_page.wait_for_page()
 
+    @attr(shard=1)
     def test_edit_course_wiki(self):
         """
         Wiki page by default is editable for students.
@@ -595,6 +597,41 @@ class CourseWikiTest(UniqueCourseTest):
         self.course_wiki_edit_page.save_wiki_content()
         actual_content = unicode(self.course_wiki_page.q(css='.wiki-article p').text[0])
         self.assertEqual(content, actual_content)
+
+    @attr('a11y')
+    def test_view_a11y(self):
+        """
+        Verify the basic accessibility of the wiki page as initially displayed.
+        """
+        self.course_wiki_page.a11y_audit.check_for_accessibility_errors()
+
+    @attr('a11y')
+    def test_edit_a11y(self):
+        """
+        Verify the basic accessibility of edit wiki page.
+        """
+        self._open_editor()
+        self.course_wiki_edit_page.a11y_audit.check_for_accessibility_errors()
+
+    @attr('a11y')
+    def test_changes_a11y(self):
+        """
+        Verify the basic accessibility of changes wiki page.
+        """
+        self.course_wiki_page.show_history()
+        history_page = CourseWikiHistoryPage(self.browser, self.course_id, self.course_info)
+        history_page.wait_for_page()
+        history_page.a11y_audit.check_for_accessibility_errors()
+
+    @attr('a11y')
+    def test_children_a11y(self):
+        """
+        Verify the basic accessibility of changes wiki page.
+        """
+        self.course_wiki_page.show_children()
+        children_page = CourseWikiChildrenPage(self.browser, self.course_id, self.course_info)
+        children_page.wait_for_page()
+        children_page.a11y_audit.check_for_accessibility_errors()
 
 
 @attr(shard=1)

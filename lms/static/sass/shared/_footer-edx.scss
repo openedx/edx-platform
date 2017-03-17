@@ -35,7 +35,7 @@ footer#footer-edx-v3 {
 
   .site-nav,
   .legal-notices {
-    a {
+    li {
       @include font-size(14);
       @include line-height(14);
       @include margin-right(20px);
@@ -83,7 +83,9 @@ footer#footer-edx-v3 {
       width: 100%;
     }
   }
-  
+
+  .about-links,
+  .legal-links,
   .social-media-links,
   .mobile-app-links {
       @extend %ui-no-list;

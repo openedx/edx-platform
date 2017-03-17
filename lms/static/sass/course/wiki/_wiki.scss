@@ -1,5 +1,4 @@
-section.wiki {
-  padding-top: 25px;
+.wiki-wrapper section.wiki {
 
   .pull-left {
     float: left;
@@ -9,18 +8,20 @@ section.wiki {
     float: right;
   }
 
-  .wiki-wrapper {
-    @include clearfix();
-
-    > header {
-      height: 33px;
-      padding: 24px 0 26px;
-      border-bottom: 1px solid $gray-l3;
-      border-radius: 3px 3px 0 0;
-      background-color: $sidebar-color;
-    }
+  .form-search .input-prepend>label {
+    display: inline-block;
+    vertical-align: bottom;
   }
 
+  @include clearfix();
+
+  .breadcrumbs-header {
+    height: 33px;
+    padding: 24px 0 26px;
+    border-bottom: 1px solid $gray-l3;
+    border-radius: 3px 3px 0 0;
+    background-color: $sidebar-color;
+  }
 
 
   /*-----------------
@@ -126,12 +127,19 @@ section.wiki {
 
   -----------------*/
 
-  .article-wrapper {
-
-  }
-
   h1 {
     font-weight: bold;
+    letter-spacing: 0;
+  }
+
+  .entry-title {
+    padding-bottom: 8px;
+    margin-bottom: 22px;
+    border-bottom: 1px solid $light-gray;
+    font-size: 1.6em;
+    font-weight: bold;
+    color: $base-font-color;
+    text-transform: none;
     letter-spacing: 0;
   }
 
@@ -238,7 +246,7 @@ section.wiki {
 
       .label {
         font-size: 0.7em;
-        color: #aaa;
+        color: $uxpl-gray-base;
         text-transform: uppercase;
       }
 
@@ -261,8 +269,8 @@ section.wiki {
         line-height: 25px;
 
         &:hover, &:focus {
-          background-color: $gray-l6;
-          text-decoration: none;
+          color: $uxpl-blue-hover-active;
+          font-weight: bold;
         }
       }
     }
@@ -276,9 +284,11 @@ section.wiki {
     li {
       &.active {
         a {
-          color: $link-color;
+          color: $uxpl-blue-hover-active;
           font-weight: bold;
-          background-color: $gray-l4;
+          background-color: $light-gray1;
+          border-color: $uxpl-blue-hover-active;
+          border-left: 4px solid
         }
       }
     }
@@ -301,8 +311,8 @@ section.wiki {
       }
 
       &:hover, &:focus {
-        background-color: $gray-l6;
-        text-decoration: none;
+        color: $uxpl-blue-hover-active;
+        font-weight: bold;
       }
     }
   }
@@ -322,7 +332,7 @@ section.wiki {
     font-weight: bold;
     font-style: normal;
     text-transform: uppercase;
-    color: #aaa;
+    color: $uxpl-gray-base;
   }
 
   input {
@@ -380,7 +390,7 @@ section.wiki {
       left: 7px;
       font-family: $sans-serif;
       font-size: 0.75em;
-      color: #aaa;
+      color: $uxpl-gray-base;
       pointer-events: none;
     }
   }
@@ -422,7 +432,7 @@ section.wiki {
     }
 
     &.btn-primary {
-      @include button;
+      @include button(simple, $btn-default-color);
       font-size: 0.8em;
     }
 
@@ -606,7 +616,7 @@ section.wiki {
 
   .accordion small {
     font-size: 0.8em;
-    color: #aaa;
+    color: $uxpl-gray-base;
   }
 
   .accordion-toggle div {
@@ -747,22 +757,14 @@ section.wiki {
 
     + p {
       font-size: 0.9em;
-      color: #aaa;
+      color: $uxpl-gray-base;
     }
   }
 
   .filter-clear {
-    margin-right: ($baseline/2);
+    margin-left: ($baseline/2);
     margin-top: ($baseline/2);
     font-size: .9em;
-
-    a {
-      color: #aaa;
-
-      &:hover, &:focus {
-        color: #777;
-      }
-    }
   }
 
   .table.table-striped {
@@ -777,6 +779,12 @@ section.wiki {
 
     a.list-children {
       margin-left: 3px;
+    }
+
+    a {
+      &:hover, &:focus {
+        font-weight: bold;
+      }
     }
 
     tr:nth-child(even) {
@@ -831,7 +839,7 @@ section.wiki {
         float: right;
         font-size: 0.6em;
         line-height: 20px;
-        color: #aaa;
+        color: $uxpl-gray-base;
       }
     }
 

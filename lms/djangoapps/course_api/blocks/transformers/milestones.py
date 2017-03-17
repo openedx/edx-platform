@@ -4,7 +4,10 @@ Milestones Transformer
 
 from django.conf import settings
 
-from openedx.core.lib.block_structure.transformer import BlockStructureTransformer, FilteringTransformerMixin
+from openedx.core.djangoapps.content.block_structure.transformer import (
+    BlockStructureTransformer,
+    FilteringTransformerMixin,
+)
 from util import milestones_helpers
 
 
@@ -13,7 +16,8 @@ class MilestonesTransformer(FilteringTransformerMixin, BlockStructureTransformer
     Excludes all special exams (timed, proctored, practice proctored) from the student view.
     Excludes all blocks with unfulfilled milestones from the student view.
     """
-    VERSION = 1
+    WRITE_VERSION = 1
+    READ_VERSION = 1
 
     @classmethod
     def name(cls):

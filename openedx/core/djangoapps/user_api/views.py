@@ -4,9 +4,9 @@ import copy
 from opaque_keys import InvalidKeyError
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden
 from django.core.urlresolvers import reverse
-from django.core.exceptions import ImproperlyConfigured, NON_FIELD_ERRORS, ValidationError
+from django.core.exceptions import ImproperlyConfigured, NON_FIELD_ERRORS, ValidationError, PermissionDenied
 from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect, csrf_exempt
@@ -31,7 +31,6 @@ from student.cookies import set_logged_in_cookies
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.api.authentication import SessionAuthenticationAllowInactiveUser
 from util.json_request import JsonResponse
-from util.enterprise_helpers import insert_enterprise_fields
 from .preferences.api import get_country_time_zones, update_email_opt_in
 from .helpers import FormDescription, shim_student_view, require_post_params
 from .models import UserPreference, UserProfile
@@ -280,9 +279,6 @@ class RegistrationView(APIView):
                     required=self._is_field_required(field_name)
                 )
 
-        # Add any Enterprise fields if the app is enabled
-        insert_enterprise_fields(request, form_desc)
-
         return HttpResponse(form_desc.to_json(), content_type="application/json")
 
     @method_decorator(csrf_exempt)
@@ -302,6 +298,7 @@ class RegistrationView(APIView):
             HttpResponse: 400 if the request is not valid.
             HttpResponse: 409 if an account with the given username or email
                 address already exists
+            HttpResponse: 403 operation not allowed
         """
         data = request.POST.copy()
 
@@ -352,6 +349,8 @@ class RegistrationView(APIView):
                 for field, error_list in err.message_dict.items()
             }
             return JsonResponse(errors, status=400)
+        except PermissionDenied:
+            return HttpResponseForbidden(_("Account creation not allowed."))
 
         response = JsonResponse({"success": True})
         set_logged_in_cookies(request, response, user)
@@ -887,6 +886,14 @@ class RegistrationView(APIView):
                         label="",
                         instructions="",
                         restrictions={}
+                    )
+                    # used to identify that request is running third party social auth
+                    form_desc.add_field(
+                        "social_auth_provider",
+                        field_type="hidden",
+                        label="",
+                        default=current_provider.name if current_provider.name else "Third Party",
+                        required=False,
                     )
 
 

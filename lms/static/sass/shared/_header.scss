@@ -18,7 +18,11 @@
     max-width: grid-width(12);
   }
 
-  h1.logo {
+  .logo-header {
+    display: inline;
+  }
+
+  .logo {
     @include float(left);
     @include margin(-2px, 39px, 0, 0);
     position: relative;
@@ -163,6 +167,8 @@
       letter-spacing: 0;
 
       .user-image-frame {
+        margin: 0;
+        padding: 0;
         max-width: ($baseline*2);
         border-radius: 10%;
       }
@@ -386,7 +392,7 @@
     }
   }
 
-  h1.logo {
+  .logo {
     @include float(left);
     margin: -2px 39px 0 10px;
     position: relative;
@@ -420,8 +426,13 @@
     }
   }
 
+  .logo-header {
+    display: inline;
+  }
+
   .nav-account-management {
     margin: 0 auto;
+    display: inline;
   }
 
   .guest {

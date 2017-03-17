@@ -2,10 +2,11 @@
  * Subviews (usually small side panels) for XBlockContainerPage.
  */
 define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/components/utils/view_utils',
-    'js/views/utils/xblock_utils'],
-    function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils) {
-        var VisibilityState = XBlockViewUtils.VisibilityState,
-            disabledCss = 'is-disabled';
+    'js/views/utils/xblock_utils', 'js/views/utils/move_xblock_utils'],
+    function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils) {
+        'use strict';
+
+        var disabledCss = 'is-disabled';
 
         /**
          * A view that refreshes the view when certain values in the XBlockInfo have changed
@@ -132,6 +133,8 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/compo
                         return xblockInfo.save({publish: 'make_public'}, {patch: true});
                     }).always(function() {
                         xblockInfo.set('publish', null);
+                        // Hide any move notification if present.
+                        MoveXBlockUtils.hideMovedNotification();
                     }).done(function() {
                         xblockInfo.fetch();
                     });
@@ -151,6 +154,8 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/compo
                                 return xblockInfo.save({publish: 'discard_changes'}, {patch: true});
                             }).always(function() {
                                 xblockInfo.set('publish', null);
+                                // Hide any move notification if present.
+                                MoveXBlockUtils.hideMovedNotification();
                             }).done(function() {
                                 renderPage();
                             });

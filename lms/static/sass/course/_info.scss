@@ -1,3 +1,20 @@
+// Upgrade button
+$btn-upgrade-border-color:                $uxpl-green-base !default;
+$btn-upgrade-background:                  $uxpl-green-base !default;
+$btn-upgrade-color:                       #fcfcfc !default;
+$btn-upgrade-focus-color:                 $btn-upgrade-color !default;
+$btn-upgrade-focus-border-color:          rgb(0, 155, 0) !default;
+$btn-upgrade-focus-background:            rgb(0, 155, 0) !default;
+$btn-upgrade-active-border-color:         $uxpl-green-base !default;
+$btn-upgrade-active-background:           $uxpl-green-base !default;
+
+//// Notifications
+// Upgrade
+
+$notification-highlight-border-color:      $uxpl-green-base !default;
+$lms-border-color:                         $uxpl-gray-background !default;
+$notification-background:                  rgb(255, 255, 255) !default
+
 .home {
   @include clearfix();
   max-width: 1140px;
@@ -12,7 +29,7 @@
     .page-title {
       margin-bottom: 5px;
       color: $dark-gray1;
-      font-size: 24px;
+      text-transform: none;
     }
 
     .page-subtitle {
@@ -48,12 +65,109 @@ div.info-wrapper {
     width: 100%;
     display: block;
 
-    h1,h3 {
-      @include text-align(left);
-      @extend %t-strong;
-      @extend %t-title6;
-      margin-bottom: $baseline;
-      font-style: normal;
+    div.upgrade-banner {
+      // This banner uses the Pattern Library's defined variables
+      @include border-left(0px);
+
+      border: 1px solid $lms-border-color;
+      width: 100%;
+      display: table;
+
+      .notification-color-border {
+        width: 6px; //Value defined by UX team
+        min-height: 100%;
+        margin: 0;
+        display: table-cell;
+        background: $notification-highlight-border-color;
+      }
+
+      .notification-content {
+        display: inline-flex;
+        align-items: center;
+        align-content: flex-start;
+        flex-flow: row wrap;
+        background: $notification-background;
+        width: 100%;
+        padding: $baseline/2 0;
+        margin-bottom: 0;
+        justify-content: space-between;
+
+        .upgrade-icon {
+          margin: 0;
+          padding: $baseline/2 $baseline;
+          flex-flow: row nowrap;
+          align-items: center;
+          // flex: grow, shrink, base
+          // The 7 was the value that allowed the icon image to grow to the UX
+          // desired size.
+          flex: 7 1 50px;
+          // The following dimensions were added so that the
+          // icon will adjust as the notification is adjusted
+          // but will not be smaller or larger than UX requirements.
+          min-height: 50px;
+          min-width: 80px;
+          max-height: 90px;
+          max-width: 130px;
+
+          img {
+            min-height: 50px;
+            min-width: 80px;
+          }
+        }
+
+        .upgrade-msg {
+          flex: 5 1 60%; //This percentage was required to get the text
+                         // in the message to wrap when collapsed.
+          flex-direction: column;
+          margin: 0;
+          padding: $baseline/2 0;
+          .msg-title {
+            font-weight: font-weight(semi-bold);
+            font-size: font-size(large);
+            line-height: $base-line-height;
+            margin: 0;
+          }
+          .view-verified-info {
+            margin-top: $baseline/4;
+            font-weight: font-weight(normal);
+            font-size: font-size(base);
+          }
+
+          a:link, a:hover, a:visited, a:active {
+            text-decoration: underline !important;
+          }
+        }
+
+        .upgrade-banner-button {
+          @include margin(0, 0, 0, auto);
+          padding: $baseline/2 $baseline;
+        }
+
+        .btn-upgrade {
+          @extend %btn-shims;
+
+          border-color: $btn-upgrade-border-color;
+          background: $btn-upgrade-background;
+          color: $btn-upgrade-color;
+          // STATE: hover and focus
+          &:hover,
+          &.is-hovered,
+          &:focus,
+          &.is-focused {
+            border-color: $btn-upgrade-focus-border-color;
+            background-color: $btn-upgrade-focus-background;
+            color: $btn-upgrade-focus-color;
+          }
+
+          // STATE: is disabled
+          &:disabled,
+          &.is-disabled {
+            border-color: $btn-disabled-border-color;
+            background: $btn-brand-disabled-background;
+            color: $btn-upgrade-color;
+          }
+        }
+      }
     }
 
     > p {
@@ -194,7 +308,6 @@ div.info-wrapper {
       @extend %t-title6;
       margin-bottom: 0;
       padding: 12px 26px 20px 0;
-      font-style: normal;
     }
 
     ul {

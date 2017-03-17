@@ -8,6 +8,7 @@ from django.views.decorators.http import require_GET
 from django.core.exceptions import PermissionDenied
 from django.conf import settings
 from opaque_keys import InvalidKeyError
+from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from edxmako.shortcuts import render_to_response
 
@@ -19,7 +20,7 @@ from xblock.exceptions import NoSuchHandlerError
 from xblock.plugin import PluginMissingError
 from xblock.runtime import Mixologist
 
-from contentstore.utils import get_lms_link_for_item
+from contentstore.utils import get_lms_link_for_item, reverse_course_url, get_xblock_aside_instance
 from contentstore.views.helpers import get_parent_xblock, is_unit, xblock_type_display_name
 from contentstore.views.item import create_xblock_info, add_container_page_publishing_info, StudioEditModuleRuntime
 
@@ -164,6 +165,7 @@ def container_handler(request, usage_key_string):
                 'subsection': subsection,
                 'section': section,
                 'new_unit_category': 'vertical',
+                'outline_url': '{url}?format=concise'.format(url=reverse_course_url('course_handler', course.id)),
                 'ancestor_xblocks': ancestor_xblocks,
                 'component_templates': component_templates,
                 'xblock_info': xblock_info,
@@ -445,21 +447,27 @@ def component_handler(request, usage_key_string, handler, suffix=''):
     """
 
     usage_key = UsageKey.from_string(usage_key_string)
-
-    descriptor = modulestore().get_item(usage_key)
-    descriptor.xmodule_runtime = StudioEditModuleRuntime(request.user)
     # Let the module handle the AJAX
     req = django_to_webob_request(request)
 
-    try:
-        resp = descriptor.handle(handler, req, suffix)
+    asides = []
 
+    try:
+        if isinstance(usage_key, (AsideUsageKeyV1, AsideUsageKeyV2)):
+            descriptor = modulestore().get_item(usage_key.usage_key)
+            aside_instance = get_xblock_aside_instance(usage_key)
+            asides = [aside_instance] if aside_instance else []
+            resp = aside_instance.handle(handler, req, suffix)
+        else:
+            descriptor = modulestore().get_item(usage_key)
+            descriptor.xmodule_runtime = StudioEditModuleRuntime(request.user)
+            resp = descriptor.handle(handler, req, suffix)
     except NoSuchHandlerError:
         log.info("XBlock %s attempted to access missing handler %r", descriptor, handler, exc_info=True)
         raise Http404
 
     # unintentional update to handle any side effects of handle call
     # could potentially be updating actual course data or simply caching its values
-    modulestore().update_item(descriptor, request.user.id)
+    modulestore().update_item(descriptor, request.user.id, asides=asides)
 
     return webob_to_django_response(resp)

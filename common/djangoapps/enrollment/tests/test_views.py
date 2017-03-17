@@ -20,11 +20,13 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls_range
 from django.test.utils import override_settings
 import pytz
+import httpretty
 
 from course_modes.models import CourseMode
 from enrollment.views import EnrollmentUserThrottle
 from util.models import RateLimitConfiguration
 from util.testing import UrlResetMixin
+from util.tests.mixins.enterprise import EnterpriseServiceMockMixin
 from enrollment import api
 from enrollment.errors import CourseEnrollmentError
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -53,6 +55,7 @@ class EnrollmentTestMixin(object):
             enrollment_attributes=None,
             min_mongo_calls=0,
             max_mongo_calls=0,
+            enterprise_course_consent=None,
     ):
         """
         Enroll in the course and verify the response's status code. If the expected status is 200, also validates
@@ -78,6 +81,9 @@ class EnrollmentTestMixin(object):
 
         if email_opt_in is not None:
             data['email_opt_in'] = email_opt_in
+
+        if enterprise_course_consent is not None:
+            data['enterprise_course_consent'] = enterprise_course_consent
 
         extra = {}
         if as_server:
@@ -130,7 +136,7 @@ class EnrollmentTestMixin(object):
 @override_settings(EDX_API_KEY="i am a key")
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase):
+class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, EnterpriseServiceMockMixin):
     """
     Test user enrollment, especially with different course modes.
     """
@@ -142,6 +148,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase):
     OTHER_EMAIL = "jane@example.com"
 
     ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
+    ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
         """ Create a course and user, then log in. """
@@ -922,6 +929,73 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase):
         course_mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
         self.assertTrue(is_active)
         self.assertEqual(course_mode, CourseMode.DEFAULT_MODE_SLUG)
+
+    def test_enterprise_course_enrollment_invalid_consent(self):
+        """Verify that the enterprise_course_consent must be a boolean. """
+        CourseModeFactory.create(
+            course_id=self.course.id,
+            mode_slug=CourseMode.DEFAULT_MODE_SLUG,
+            mode_display_name=CourseMode.DEFAULT_MODE_SLUG,
+        )
+        self.assert_enrollment_status(
+            expected_status=status.HTTP_400_BAD_REQUEST,
+            enterprise_course_consent='invalid',
+            as_server=True,
+        )
+
+    @httpretty.activate
+    @override_settings(ENTERPRISE_SERVICE_WORKER_USERNAME='enterprise_worker')
+    def test_enterprise_course_enrollment_api_error(self):
+        """Verify that enterprise service errors are handled properly. """
+        UserFactory.create(
+            username='enterprise_worker',
+            email=self.EMAIL,
+            password=self.PASSWORD,
+        )
+        CourseModeFactory.create(
+            course_id=self.course.id,
+            mode_slug=CourseMode.DEFAULT_MODE_SLUG,
+            mode_display_name=CourseMode.DEFAULT_MODE_SLUG,
+        )
+        self.mock_enterprise_course_enrollment_post_api_failure()
+        self.assert_enrollment_status(
+            expected_status=status.HTTP_400_BAD_REQUEST,
+            enterprise_course_consent=True,
+            as_server=True,
+            username='enterprise_worker'
+        )
+        self.assertEqual(
+            httpretty.last_request().path,
+            '/enterprise/api/v1/enterprise-course-enrollment/',
+            'No request was made to the mocked enterprise-course-enrollment API'
+        )
+
+    @httpretty.activate
+    @override_settings(ENTERPRISE_SERVICE_WORKER_USERNAME='enterprise_worker')
+    def test_enterprise_course_enrollment_successful(self):
+        """Verify that the enrollment completes when the EnterpriseCourseEnrollment creation succeeds. """
+        UserFactory.create(
+            username='enterprise_worker',
+            email=self.EMAIL,
+            password=self.PASSWORD,
+        )
+        CourseModeFactory.create(
+            course_id=self.course.id,
+            mode_slug=CourseMode.DEFAULT_MODE_SLUG,
+            mode_display_name=CourseMode.DEFAULT_MODE_SLUG,
+        )
+        self.mock_enterprise_course_enrollment_post_api(username=self.user.username, course_id=unicode(self.course.id))
+        self.assert_enrollment_status(
+            expected_status=status.HTTP_200_OK,
+            enterprise_course_consent=True,
+            as_server=True,
+            username='enterprise_worker'
+        )
+        self.assertEqual(
+            httpretty.last_request().path,
+            '/enterprise/api/v1/enterprise-course-enrollment/',
+            'No request was made to the mocked enterprise-course-enrollment API'
+        )
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')

@@ -44,16 +44,13 @@
   @include border-radius(0, 0, $forum-border-radius, $forum-border-radius);
   box-sizing: border-box;
   border: 1px solid $forum-color-border;
-  border-top: none;
   width: 100%;
   background: $forum-color-background-light;
-  box-shadow: 0 1px 3px $shadow-l1 inset;
 }
 
 @mixin discussion-new-post-wmd-preview-container {
   @include discussion-wmd-preview-container;
   border-color: $forum-color-border;
-  box-shadow: 0 1px 3px $shadow-d1 inset;
 }
 
 @mixin discussion-wmd-preview-label {
@@ -86,17 +83,4 @@
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-}
-
-@mixin forum-user-label($color) {
-  @include margin-left($baseline/4);
-  @extend %t-weight5;
-  font-size: $forum-small-font-size;
-  vertical-align: middle;
-  border-radius: $forum-border-radius;
-  padding: 0 ($baseline/5);
-  background: $color;
-  font-style: normal;
-  color: white;
-  white-space: nowrap;
 }

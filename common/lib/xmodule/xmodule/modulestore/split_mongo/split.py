@@ -3199,6 +3199,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 new_block.definition,
                 destination_version,
                 raw=True,
+                asides=new_block.asides,
                 block_defaults=new_block.defaults
             )
             # Extend the block's new edit_info with any extra edit_info fields from the source (e.g. original_usage):
@@ -3255,11 +3256,12 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         :param definition_id: the pointer to the content scoped fields
         :param new_id: the structure's version id
         :param raw: true if this block already has all references serialized
+        :param asides: dict information related to the connected xblock asides
         """
         if not raw:
             block_fields = self._serialize_fields(category, block_fields)
         if not asides:
-            asides = []
+            asides = {}
         document = {
             'block_type': category,
             'definition': definition_id,

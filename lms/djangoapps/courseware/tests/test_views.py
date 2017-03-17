@@ -8,6 +8,7 @@ import ddt
 import json
 import itertools
 import unittest
+from uuid import uuid4
 from datetime import datetime, timedelta
 from HTMLParser import HTMLParser
 from nose.plugins.attrib import attr
@@ -53,6 +54,7 @@ from openedx.core.lib.gating import api as gating_api
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory, UserFactory, CourseEnrollmentFactory
+from util.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from util.tests.test_date_utils import fake_ugettext, fake_pgettext
 from util.url import reload_django_url_config
 from util.views import ensure_valid_course_key
@@ -61,8 +63,12 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
+from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory, CourseRunFactory
+from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.credit.api import set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
+from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 
 
 @attr(shard=1)
@@ -242,44 +248,45 @@ class ViewsTestCase(ModuleStoreTestCase):
     def setUp(self):
         super(ViewsTestCase, self).setUp()
         self.course = CourseFactory.create(display_name=u'teꜱᴛ course', run="Testing_course")
-        self.chapter = ItemFactory.create(
-            category='chapter',
-            parent_location=self.course.location,
-            display_name="Chapter 1",
-        )
-        self.section = ItemFactory.create(
-            category='sequential',
-            parent_location=self.chapter.location,
-            due=datetime(2013, 9, 18, 11, 30, 00),
-            display_name='Sequential 1',
-            format='Homework'
-        )
-        self.vertical = ItemFactory.create(
-            category='vertical',
-            parent_location=self.section.location,
-            display_name='Vertical 1',
-        )
-        self.problem = ItemFactory.create(
-            category='problem',
-            parent_location=self.vertical.location,
-            display_name='Problem 1',
-        )
+        with self.store.bulk_operations(self.course.id):
+            self.chapter = ItemFactory.create(
+                category='chapter',
+                parent_location=self.course.location,
+                display_name="Chapter 1",
+            )
+            self.section = ItemFactory.create(
+                category='sequential',
+                parent_location=self.chapter.location,
+                due=datetime(2013, 9, 18, 11, 30, 00),
+                display_name='Sequential 1',
+                format='Homework'
+            )
+            self.vertical = ItemFactory.create(
+                category='vertical',
+                parent_location=self.section.location,
+                display_name='Vertical 1',
+            )
+            self.problem = ItemFactory.create(
+                category='problem',
+                parent_location=self.vertical.location,
+                display_name='Problem 1',
+            )
 
-        self.section2 = ItemFactory.create(
-            category='sequential',
-            parent_location=self.chapter.location,
-            display_name='Sequential 2',
-        )
-        self.vertical2 = ItemFactory.create(
-            category='vertical',
-            parent_location=self.section2.location,
-            display_name='Vertical 2',
-        )
-        self.problem2 = ItemFactory.create(
-            category='problem',
-            parent_location=self.vertical2.location,
-            display_name='Problem 2',
-        )
+            self.section2 = ItemFactory.create(
+                category='sequential',
+                parent_location=self.chapter.location,
+                display_name='Sequential 2',
+            )
+            self.vertical2 = ItemFactory.create(
+                category='vertical',
+                parent_location=self.section2.location,
+                display_name='Vertical 2',
+            )
+            self.problem2 = ItemFactory.create(
+                category='problem',
+                parent_location=self.vertical2.location,
+                display_name='Problem 2',
+            )
 
         self.course_key = self.course.id
         self.password = '123456'
@@ -969,6 +976,47 @@ class ViewsTestCase(ModuleStoreTestCase):
             self.assertContains(response, test)
 
 
+@attr(shard=2)
+@patch('openedx.core.djangoapps.catalog.utils.get_edx_api_data')
+class TestProgramMarketingView(ProgramsApiConfigMixin, CatalogIntegrationMixin, SharedModuleStoreTestCase):
+    """Unit tests for the program marketing page."""
+    program_uuid = str(uuid4())
+    url = reverse('program_marketing_view', kwargs={'program_uuid': program_uuid})
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestProgramMarketingView, cls).setUpClass()
+
+        modulestore_course = CourseFactory()
+        course_run = CourseRunFactory(key=unicode(modulestore_course.id))  # pylint: disable=no-member
+        course = CatalogCourseFactory(course_runs=[course_run])
+
+        cls.data = ProgramFactory(uuid=cls.program_uuid, courses=[course])
+
+    def test_404_if_no_data(self, _mock_get_edx_api_data):
+        """
+        Verify that the page 404s if no program data is found.
+        """
+        self.create_programs_config()
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_200(self, mock_get_edx_api_data):
+        """
+        Verify the view returns a 200.
+        """
+        self.create_programs_config()
+
+        catalog_integration = self.create_catalog_integration()
+        UserFactory(username=catalog_integration.service_username)
+
+        mock_get_edx_api_data.return_value = self.data
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+
 @attr(shard=1)
 # setting TIME_ZONE_DISPLAYED_FOR_DEADLINES explicitly
 @override_settings(TIME_ZONE_DISPLAYED_FOR_DEADLINES="UTC")
@@ -989,15 +1037,16 @@ class BaseDueDateTests(ModuleStoreTestCase):
         :param course_kwargs: All kwargs are passed to through to the :class:`CourseFactory`
         """
         course = CourseFactory.create(**course_kwargs)
-        chapter = ItemFactory.create(category='chapter', parent_location=course.location)
-        section = ItemFactory.create(
-            category='sequential',
-            parent_location=chapter.location,
-            due=datetime(2013, 9, 18, 11, 30, 00),
-            format='homework'
-        )
-        vertical = ItemFactory.create(category='vertical', parent_location=section.location)
-        ItemFactory.create(category='problem', parent_location=vertical.location)
+        with self.store.bulk_operations(course.id):
+            chapter = ItemFactory.create(category='chapter', parent_location=course.location)
+            section = ItemFactory.create(
+                category='sequential',
+                parent_location=chapter.location,
+                due=datetime(2013, 9, 18, 11, 30, 00),
+                format='homework'
+            )
+            vertical = ItemFactory.create(category='vertical', parent_location=section.location)
+            ItemFactory.create(category='problem', parent_location=vertical.location)
 
         course = modulestore().get_course(course.id)
         self.assertIsNotNone(course.get_children()[0].get_children()[0].due)
@@ -1130,6 +1179,7 @@ class StartDateTests(ModuleStoreTestCase):
 
 # pylint: disable=protected-access, no-member
 @attr(shard=1)
+@override_settings(ENABLE_ENTERPRISE_INTEGRATION=False)
 @ddt.ddt
 class ProgressPageTests(ModuleStoreTestCase):
     """
@@ -1137,6 +1187,7 @@ class ProgressPageTests(ModuleStoreTestCase):
     """
 
     ENABLED_CACHES = ['default', 'mongo_modulestore_inheritance', 'loc_cache']
+    ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
         super(ProgressPageTests, self).setUp()
@@ -1147,18 +1198,17 @@ class ProgressPageTests(ModuleStoreTestCase):
 
     def setup_course(self, **options):
         """Create the test course."""
-        course = CourseFactory.create(
+        self.course = CourseFactory.create(
             start=datetime(2013, 9, 16, 7, 17, 28),
             grade_cutoffs={u'çü†øƒƒ': 0.75, 'Pass': 0.5},
             **options
         )
+        with self.store.bulk_operations(self.course.id):
+            self.chapter = ItemFactory.create(category='chapter', parent_location=self.course.location)
+            self.section = ItemFactory.create(category='sequential', parent_location=self.chapter.location)
+            self.vertical = ItemFactory.create(category='vertical', parent_location=self.section.location)
 
-        self.course = modulestore().get_course(course.id)
         CourseEnrollmentFactory(user=self.user, course_id=self.course.id, mode=CourseMode.HONOR)
-
-        self.chapter = ItemFactory.create(category='chapter', parent_location=self.course.location)
-        self.section = ItemFactory.create(category='sequential', parent_location=self.chapter.location)
-        self.vertical = ItemFactory.create(category='vertical', parent_location=self.section.location)
 
     def _get_progress_page(self, expected_status_code=200):
         """
@@ -1896,10 +1946,11 @@ class TestIndexView(ModuleStoreTestCase):
         user = UserFactory()
 
         course = CourseFactory.create()
-        chapter = ItemFactory.create(parent=course, category='chapter')
-        section = ItemFactory.create(parent=chapter, category='sequential', display_name="Sequence")
-        vertical = ItemFactory.create(parent=section, category='vertical', display_name="Vertical")
-        ItemFactory.create(parent=vertical, category='id_checker', display_name="ID Checker")
+        with self.store.bulk_operations(course.id):
+            chapter = ItemFactory.create(parent=course, category='chapter')
+            section = ItemFactory.create(parent=chapter, category='sequential', display_name="Sequence")
+            vertical = ItemFactory.create(parent=section, category='vertical', display_name="Vertical")
+            ItemFactory.create(parent=vertical, category='id_checker', display_name="ID Checker")
 
         CourseEnrollmentFactory(user=user, course_id=course.id)
 
@@ -1934,11 +1985,12 @@ class TestIndexViewWithVerticalPositions(ModuleStoreTestCase):
 
         # create course with 3 positions
         self.course = CourseFactory.create()
-        self.chapter = ItemFactory.create(parent=self.course, category='chapter')
-        self.section = ItemFactory.create(parent=self.chapter, category='sequential', display_name="Sequence")
-        ItemFactory.create(parent=self.section, category='vertical', display_name="Vertical1")
-        ItemFactory.create(parent=self.section, category='vertical', display_name="Vertical2")
-        ItemFactory.create(parent=self.section, category='vertical', display_name="Vertical3")
+        with self.store.bulk_operations(self.course.id):
+            self.chapter = ItemFactory.create(parent=self.course, category='chapter')
+            self.section = ItemFactory.create(parent=self.chapter, category='sequential', display_name="Sequence")
+            ItemFactory.create(parent=self.section, category='vertical', display_name="Vertical1")
+            ItemFactory.create(parent=self.section, category='vertical', display_name="Vertical2")
+            ItemFactory.create(parent=self.section, category='vertical', display_name="Vertical3")
 
         self.client.login(username=self.user, password='test')
         CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
@@ -1993,14 +2045,20 @@ class TestIndexViewWithGating(ModuleStoreTestCase, MilestonesTestCaseMixin):
 
         self.user = UserFactory()
         self.course = CourseFactory.create()
-        self.course.enable_subsection_gating = True
-        self.course.save()
-        self.store.update_item(self.course, 0)
-        self.chapter = ItemFactory.create(parent=self.course, category="chapter", display_name="Chapter")
-        self.open_seq = ItemFactory.create(parent=self.chapter, category='sequential', display_name="Open Sequential")
-        ItemFactory.create(parent=self.open_seq, category='problem', display_name="Problem 1")
-        self.gated_seq = ItemFactory.create(parent=self.chapter, category='sequential', display_name="Gated Sequential")
-        ItemFactory.create(parent=self.gated_seq, category='problem', display_name="Problem 2")
+        with self.store.bulk_operations(self.course.id):
+            self.course.enable_subsection_gating = True
+            self.course.save()
+            self.store.update_item(self.course, 0)
+            self.chapter = ItemFactory.create(parent=self.course, category="chapter", display_name="Chapter")
+            self.open_seq = ItemFactory.create(
+                parent=self.chapter, category='sequential', display_name="Open Sequential"
+            )
+            ItemFactory.create(parent=self.open_seq, category='problem', display_name="Problem 1")
+            self.gated_seq = ItemFactory.create(
+                parent=self.chapter, category='sequential', display_name="Gated Sequential"
+            )
+            ItemFactory.create(parent=self.gated_seq, category='problem', display_name="Problem 2")
+
         gating_api.add_prerequisite(self.course.id, self.open_seq.location)
         gating_api.set_required_content(self.course.id, self.gated_seq.location, self.open_seq.location, 100)
 
@@ -2031,7 +2089,6 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase):
     This class overrides the get_response method, which is used by
     the tests defined in RenderXBlockTestMixin.
     """
-
     def setUp(self):
         reload_django_url_config()
         super(TestRenderXBlock, self).setUp()
@@ -2059,7 +2116,6 @@ class TestRenderXBlockSelfPaced(TestRenderXBlock):
     Test rendering XBlocks for a self-paced course. Relies on the query
     count assertions in the tests defined by RenderXBlockMixin.
     """
-
     def setUp(self):
         super(TestRenderXBlockSelfPaced, self).setUp()
         SelfPacedConfiguration(enabled=True).save()
@@ -2146,3 +2202,28 @@ class TestIndexViewCrawlerStudentStateWrites(SharedModuleStoreTestCase):
         # Make sure we get back an actual 200, and aren't redirected because we
         # messed up the setup somehow (e.g. didn't enroll properly)
         self.assertEqual(response.status_code, 200)
+
+
+@attr(shard=1)
+class EnterpriseConsentTestCase(EnterpriseTestConsentRequired, ModuleStoreTestCase):
+    """
+    Ensure that the Enterprise Data Consent redirects are in place only when consent is required.
+    """
+    def setUp(self):
+        super(EnterpriseConsentTestCase, self).setUp()
+        self.user = UserFactory.create()
+        self.assertTrue(self.client.login(username=self.user.username, password='test'))
+        self.course = CourseFactory.create()
+        CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
+
+    def test_consent_required(self):
+        """
+        Test that enterprise data sharing consent is required when enabled for the various courseware views.
+        """
+        course_id = unicode(self.course.id)
+        for url in (
+                reverse("courseware", kwargs=dict(course_id=course_id)),
+                reverse("progress", kwargs=dict(course_id=course_id)),
+                reverse("student_progress", kwargs=dict(course_id=course_id, student_id=str(self.user.id))),
+        ):
+            self.verify_consent_required(self.client, url)

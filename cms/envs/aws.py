@@ -299,9 +299,16 @@ AWS_SECRET_ACCESS_KEY = AUTH_TOKENS["AWS_SECRET_ACCESS_KEY"]
 if AWS_SECRET_ACCESS_KEY == "":
     AWS_SECRET_ACCESS_KEY = None
 
+AWS_STORAGE_BUCKET_NAME = AUTH_TOKENS.get('AWS_STORAGE_BUCKET_NAME', 'edxuploads')
+
 # Disabling querystring auth instructs Boto to exclude the querystring parameters (e.g. signature, access key) it
 # normally appends to every returned URL.
 AWS_QUERYSTRING_AUTH = AUTH_TOKENS.get('AWS_QUERYSTRING_AUTH', True)
+
+AWS_DEFAULT_ACL = 'private'
+AWS_BUCKET_ACL = AWS_DEFAULT_ACL
+AWS_QUERYSTRING_EXPIRE = 7 * 24 * 60 * 60  # 7 days
+AWS_S3_CUSTOM_DOMAIN = AUTH_TOKENS.get('AWS_S3_CUSTOM_DOMAIN', 'edxuploads.s3.amazonaws.com')
 
 if AUTH_TOKENS.get('DEFAULT_FILE_STORAGE'):
     DEFAULT_FILE_STORAGE = AUTH_TOKENS.get('DEFAULT_FILE_STORAGE')
@@ -309,6 +316,15 @@ elif AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 else:
     DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+
+COURSE_IMPORT_EXPORT_BUCKET = ENV_TOKENS.get('COURSE_IMPORT_EXPORT_BUCKET', '')
+
+if COURSE_IMPORT_EXPORT_BUCKET:
+    COURSE_IMPORT_EXPORT_STORAGE = 'contentstore.storage.ImportExportS3Storage'
+else:
+    COURSE_IMPORT_EXPORT_STORAGE = DEFAULT_FILE_STORAGE
+
+USER_TASKS_ARTIFACT_STORAGE = COURSE_IMPORT_EXPORT_STORAGE
 
 DATABASES = AUTH_TOKENS['DATABASES']
 
@@ -362,6 +378,9 @@ BROKER_URL = "{0}://{1}:{2}@{3}/{4}".format(CELERY_BROKER_TRANSPORT,
                                             CELERY_BROKER_HOSTNAME,
                                             CELERY_BROKER_VHOST)
 BROKER_USE_SSL = ENV_TOKENS.get('CELERY_BROKER_USE_SSL', False)
+
+# Message expiry time in seconds
+CELERY_EVENT_QUEUE_TTL = ENV_TOKENS.get('CELERY_EVENT_QUEUE_TTL', None)
 
 # Allow CELERY_QUEUES to be overwritten by ENV_TOKENS,
 ENV_CELERY_QUEUES = ENV_TOKENS.get('CELERY_QUEUES', None)

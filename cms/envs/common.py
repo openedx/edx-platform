@@ -222,6 +222,9 @@ FEATURES = {
 
     # Set this to False to facilitate cleaning up invalid xml from your modulestore.
     'ENABLE_XBLOCK_XML_VALIDATION': True,
+
+    # Allow public account creation
+    'ALLOW_PUBLIC_ACCOUNT_CREATION': True,
 }
 
 ENABLE_JASMINE = False
@@ -552,6 +555,8 @@ LOCALE_PATHS = (REPO_ROOT + '/conf/locale',)  # edx-platform/conf/locale/
 # Messages
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
+COURSE_IMPORT_EXPORT_STORAGE = 'django.core.files.storage.FileSystemStorage'
+
 ##### EMBARGO #####
 EMBARGO_SITE_REDIRECT_URL = None
 
@@ -780,6 +785,8 @@ YOUTUBE = {
     # YouTube JavaScript API
     'API': 'https://www.youtube.com/iframe_api',
 
+    'TEST_TIMEOUT': 1500,
+
     # URL to get YouTube metadata
     'METADATA_URL': 'https://www.googleapis.com/youtube/v3/videos',
 
@@ -954,6 +961,12 @@ INSTALLED_APPS = (
 
     # management of user-triggered async tasks (course import/export, etc.)
     'user_tasks',
+
+    # CMS specific user task handling
+    'cms_user_tasks.apps.CmsUserTasksConfig',
+
+    # Unusual migrations
+    'database_fixups',
 )
 
 

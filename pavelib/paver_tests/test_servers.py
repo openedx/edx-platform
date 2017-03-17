@@ -141,7 +141,7 @@ class TestPaverServerTasks(PaverTestCase):
         """
         Test the "celery" task.
         """
-        settings = options.get("settings", "dev_with_worker")
+        settings = options.get("settings", "devstack_with_worker")
         call_task("pavelib.servers.celery", options=options)
         self.assertEquals(self.task_messages, [EXPECTED_CELERY_COMMAND.format(settings=settings)])
 
@@ -292,7 +292,7 @@ class TestPaverServerTasks(PaverTestCase):
                 port=8001,
             )
         )
-        expected_messages.append(EXPECTED_CELERY_COMMAND.format(settings="dev_with_worker"))
+        expected_messages.append(EXPECTED_CELERY_COMMAND.format(settings="devstack_with_worker"))
         self.assertEquals(self.task_messages, expected_messages)
 
     def expected_sass_commands(self, system=None, asset_settings=u"test_static_optimized"):

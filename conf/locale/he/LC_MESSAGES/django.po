@@ -41,7 +41,7 @@
 # e2f_HE c1 <e2f_HE_c1@outlook.com>, 2016
 # e2f he_r1 <e2f_he_r1@outlook.com>, 2016
 # Nadav Stark <nadav@yeda.org.il>, 2015
-# qualityalltext <quality@alltext.co.il>, 2016
+# qualityalltext <quality@alltext.co.il>, 2016-2017
 # Ron Rozen <Ronrozen@gmail.com>, 2016
 # Shay Nativ <shay@yeda.org.il>, 2015
 # Yoav Caspin <yoavc@pmo.gov.il>, 2016-2017
@@ -58,7 +58,7 @@
 # e2f he_r1 <e2f_he_r1@outlook.com>, 2016
 # Naaman nov <naaman.nov@gmail.com>, 2015
 # Nadav Stark <nadav@yeda.org.il>, 2015
-# qualityalltext <quality@alltext.co.il>, 2016
+# qualityalltext <quality@alltext.co.il>, 2016-2017
 # Ron Rozen <Ronrozen@gmail.com>, 2016
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
 # edX translation file
@@ -76,9 +76,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-01-05 17:03+0000\n"
-"PO-Revision-Date: 2016-10-30 14:15+0000\n"
-"Last-Translator: qualityalltext <quality@alltext.co.il>\n"
+"POT-Creation-Date: 2017-03-09 20:49+0000\n"
+"PO-Revision-Date: 2017-03-09 20:53+0000\n"
+"Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -451,6 +451,7 @@ msgid "Unauthorized email address."
 msgstr "כתובת דואר אלקטרוני אינה מאושרת."
 
 #: common/djangoapps/student/forms.py
+#, python-brace-format
 msgid ""
 "It looks like {email} belongs to an existing account. Try again with a "
 "different email address."
@@ -465,6 +466,7 @@ msgid "Did not find a group with name \"{}\" - skipping."
 msgstr "לא נמצאה קבוצה בשם \"{}\" - מדלג."
 
 #: common/djangoapps/student/management/commands/manage_group.py
+#, python-brace-format
 msgid "Invalid group name: \"{group_name}\". {messages}"
 msgstr "שם קבוצה אינו חוקי: {group_name}\". {messages}\""
 
@@ -477,10 +479,12 @@ msgid "Found existing group: \"{}\""
 msgstr "נמצאה קבוצה קיימת: \"{}\""
 
 #: common/djangoapps/student/management/commands/manage_group.py
+#, python-brace-format
 msgid "Adding {codenames} permissions to group \"{group}\""
 msgstr "הוספת הרשאות {codenames} לקבוצה \"{group}\""
 
 #: common/djangoapps/student/management/commands/manage_group.py
+#, python-brace-format
 msgid "Removing {codenames} permissions from group \"{group}\""
 msgstr "הסרת הרשאות {codenames} מהקבוצה \"{group}\""
 
@@ -493,6 +497,7 @@ msgstr ""
 "app_label:model_name:permission_codename."
 
 #: common/djangoapps/student/management/commands/manage_group.py
+#, python-brace-format
 msgid ""
 "Invalid permission codename: \"{codename}\".  No such permission exists for "
 "the model {module}.{model_name}."
@@ -501,6 +506,7 @@ msgstr ""
 "{module}.{model_name}."
 
 #: common/djangoapps/student/management/commands/manage_user.py
+#, python-brace-format
 msgid "Setting {attribute} for user \"{username}\" to \"{new_value}\""
 msgstr "הגדרת {attribute} עבור המשתמש \"{username}\" ל-\"{new_value}\""
 
@@ -541,14 +547,17 @@ msgid "Could not find a group named \"{}\" - skipping."
 msgstr "לא ניתן למצוא קבוצה בשם \"{}\" - מדלג."
 
 #: common/djangoapps/student/management/commands/manage_user.py
+#, python-brace-format
 msgid "Adding user \"{username}\" to groups {group_names}"
 msgstr "הוספת המשתמש \"{username}\" לקבוצות {group_names}"
 
 #: common/djangoapps/student/management/commands/manage_user.py
+#, python-brace-format
 msgid "Removing user \"{username}\" from groups {group_names}"
 msgstr "הסרת המשתמש \"{username}\" מהקבוצות {group_names}"
 
 #: common/djangoapps/student/middleware.py
+#, python-brace-format
 msgid ""
 "Your account has been disabled. If you believe this was done in error, "
 "please contact us at {support_email}"
@@ -611,14 +620,17 @@ msgid "Other education"
 msgstr ""
 
 #: common/djangoapps/student/models.py
+#, python-brace-format
 msgid "{platform_name} Honor Code Certificate for {course_name}"
 msgstr " תעודת{platform_name} על בסיס קוד אתי עבור {course_name} "
 
 #: common/djangoapps/student/models.py
+#, python-brace-format
 msgid "{platform_name} Verified Certificate for {course_name}"
 msgstr "תעודת {platform_name}  מאומתת עבור {course_name}"
 
 #: common/djangoapps/student/models.py
+#, python-brace-format
 msgid "{platform_name} Professional Certificate for {course_name}"
 msgstr "{platform_name} תעודה מקצועית עבור {course_name}"
 
@@ -640,6 +652,7 @@ msgstr ""
 "ישלח קוד מעקב ללינקדאין.  "
 
 #: common/djangoapps/student/models.py
+#, python-brace-format
 msgid "{platform_name} Certificate for {course_name}"
 msgstr "תעודת {platform_name} עבור {course_name}"
 
@@ -684,10 +697,12 @@ msgid "Value of this user attribute."
 msgstr "ערך מאפיין משתמש זה."
 
 #: common/djangoapps/student/views.py
+#, python-brace-format
 msgid "The course you are looking for does not start until {date}."
 msgstr "הקורס שאתה מחפש לא מתחיל עד {date}."
 
 #: common/djangoapps/student/views.py
+#, python-brace-format
 msgid "The course you are looking for is closed for enrollment as of {date}."
 msgstr "הקורס שאתה מחפש סגור להרשמה החל מ-{date}."
 
@@ -720,6 +735,7 @@ msgid "Enrollment action is invalid"
 msgstr "פעולת הרישום אינה חוקית"
 
 #: common/djangoapps/student/views.py
+#, python-brace-format
 msgid ""
 "You've successfully logged into your {provider_name} account, but this "
 "account isn't linked with an {platform_name} account yet."
@@ -728,6 +744,7 @@ msgstr ""
 "חשבון {platform_name}. "
 
 #: common/djangoapps/student/views.py
+#, python-brace-format
 msgid ""
 "Use your {platform_name} username and password to log into {platform_name} "
 "below, and then link your {platform_name} account with {provider_name} from "
@@ -738,6 +755,7 @@ msgstr ""
 "  "
 
 #: common/djangoapps/student/views.py
+#, python-brace-format
 msgid ""
 "If you don't have an {platform_name} account yet, click "
 "<strong>Register</strong> at the top of the page."
@@ -807,10 +825,12 @@ msgid "Unexpected account status"
 msgstr "מצב חשבון לא צפוי"
 
 #: common/djangoapps/student/views.py
+#, python-brace-format
 msgid "An account with the Public Username '{username}' already exists."
 msgstr "חשבון עם שם משתמש הציבורי '{username}' קיים כבר."
 
 #: common/djangoapps/student/views.py
+#, python-brace-format
 msgid "An account with the Email '{email}' already exists."
 msgstr "חשבון עם דואר אלקטרוני '{email}' קיים כבר."
 
@@ -831,6 +851,7 @@ msgid "Unknown error. Please e-mail us to let us know how it happened."
 msgstr "שגיאה לא ידועה. נא שלח לנו דואר אלקטרוני וספר איך זה קרה."
 
 #: common/djangoapps/student/views.py
+#, python-brace-format
 msgid ""
 "You are re-using a password that you have used recently. You must have {num}"
 " distinct password before reusing a previous password."
@@ -845,6 +866,7 @@ msgstr[1] ""
 "תמחזר סיסמה קודמת."
 
 #: common/djangoapps/student/views.py
+#, python-brace-format
 msgid ""
 "You are resetting passwords too frequently. Due to security policies, {num} "
 "day must elapse between password resets."
@@ -1294,6 +1316,7 @@ msgid "December"
 msgstr "דצמבר"
 
 #: common/djangoapps/util/enterprise_helpers.py
+#, python-brace-format
 msgid ""
 "I agree to allow {platform_name} to share data about my enrollment, "
 "completion and performance in all {platform_name} courses and programs where"
@@ -1301,12 +1324,14 @@ msgid ""
 msgstr ""
 
 #: common/djangoapps/util/enterprise_helpers.py
+#, python-brace-format
 msgid ""
 "To link your account with {ec_name}, you are required to consent to data "
 "sharing."
 msgstr ""
 
 #: common/djangoapps/util/file.py
+#, python-brace-format
 msgid "The file must end with the extension '{file_types}'."
 msgid_plural ""
 "The file must end with one of the following extensions: '{file_types}'."
@@ -1314,10 +1339,12 @@ msgstr[0] "הקובץ חייב להסתיים עם התוסף '{file_types}'."
 msgstr[1] "הקובץ חייב להסתיים באחד מהתוספים הבאים: '{file_types}'."
 
 #: common/djangoapps/util/file.py
+#, python-brace-format
 msgid "Maximum upload file size is {file_size} bytes."
 msgstr "גודל מרבי של הקובץ הוא {file_size} בתים."
 
 #: common/djangoapps/util/milestones_helpers.py
+#, python-brace-format
 msgid "Course {course_id} requires {prerequisite_course_id}"
 msgstr "קורס {course_id} מחייב {prerequisite_course_id}"
 
@@ -1326,42 +1353,52 @@ msgid "System defined milestone"
 msgstr "אבן דרך שהוגדרה בידי המערכת"
 
 #: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
 msgid "Invalid Length ({0})"
 msgstr "אורך לא תקין ({0})"
 
 #: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
 msgid "must be {0} characters or more"
 msgstr "חייב להיות {0} תווים או יותר "
 
 #: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
 msgid "must be {0} characters or fewer"
 msgstr "חייב להיות {0} תווים או פחות"
 
 #: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
 msgid "Must be more complex ({0})"
 msgstr "חייב להיות מסובך יותר ({0})"
 
 #: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
 msgid "must contain {0} or more uppercase characters"
 msgstr "חייב להכיל {0} אותיות גדולות או יותר "
 
 #: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
 msgid "must contain {0} or more lowercase characters"
 msgstr "חייב להכיל {0} או יותר אותיות קטנות"
 
 #: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
 msgid "must contain {0} or more digits"
 msgstr "חייב להכיל {0} מספרים או יותר "
 
 #: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
 msgid "must contain {0} or more punctuation characters"
 msgstr "חייב להכיל {0} או יותר סימני פיסוק "
 
 #: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
 msgid "must contain {0} or more non ascii characters"
 msgstr "חייב להכיל {0}תווי ASCII או יותר "
 
 #: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
 msgid "must contain {0} or more unique words"
 msgstr "חייב להכיל {0} מילים ייחודיות  או יותר"
 
@@ -1407,6 +1444,15 @@ msgid ""
 msgstr ""
 "תמיד ניתן ליצור בסטודיו שילובי XBlock/תבנית מופעלים בעזרת תמיכה מלאה או "
 "זמנית. שילובי XBlock/תבנית לא נתמכים דורשים את הסכמת מחבר הקורס."
+
+#: common/djangoapps/xblock_django/models.py
+msgid "Space-separated list of XBlocks which should not render."
+msgstr ""
+
+#: common/djangoapps/xblock_django/models.py
+msgid ""
+"Space-separated list of XBlock types whose creation to disable in Studio."
+msgstr ""
 
 #: common/djangoapps/xblock_django/models.py
 msgid "show deprecation messaging in Studio"
@@ -1490,6 +1536,7 @@ msgstr "בחר אפשרות"
 
 #. Translators: 'ChoiceGroup' is an input type and should not be translated.
 #: common/lib/capa/capa/inputtypes.py
+#, python-brace-format
 msgid "ChoiceGroup: unexpected tag {tag_name}"
 msgstr "בחירה מרובה: תגית לא צפויה {tag_name}"
 
@@ -1500,6 +1547,7 @@ msgstr "התשובה התקבלה."
 #. Translators: '<choice>' and '<compoundhint>' are tag names and should not
 #. be translated.
 #: common/lib/capa/capa/inputtypes.py
+#, python-brace-format
 msgid "Expected a <choice> or <compoundhint> tag; got {given_tag} instead"
 msgstr ""
 "צפויה לתגית <choice> או <compoundhint>; במקום זאת התקבלה תג {given_tag}"
@@ -1517,6 +1565,7 @@ msgid ""
 msgstr "תשובתך התקבלה. מיד לאחר קבלת ציון, תוחלף הודעה זו בהערותיו של הבודק."
 
 #: common/lib/capa/capa/inputtypes.py
+#, python-brace-format
 msgid "{programming_language} editor"
 msgstr "עורך {programming_language}"
 
@@ -1531,6 +1580,7 @@ msgid ""
 msgstr "התקבל. ברגע שתתקבל תגובה, תוחלף הודעה זו במשוב."
 
 #: common/lib/capa/capa/inputtypes.py
+#, python-brace-format
 msgid "No response from Xqueue within {xqueue_timeout} seconds. Aborted."
 msgstr "לא התקבלה תשובה מ- Xqueue במשך {xqueue_timeout} שניות. בוטל."
 
@@ -1547,6 +1597,7 @@ msgid "No formula specified."
 msgstr "לא פורטה נוסחה."
 
 #: common/lib/capa/capa/inputtypes.py
+#, python-brace-format
 msgid "Couldn't parse formula: {error_msg}"
 msgstr "אינו יכול לנתח את נוסחת: {error_msg}"
 
@@ -1559,16 +1610,19 @@ msgid "Sorry, couldn't parse formula"
 msgstr "מצטערים, לא ניתן לנתח נוסחה"
 
 #: common/lib/capa/capa/inputtypes.py
+#, python-brace-format
 msgid "{input_type}: unexpected tag {tag_name}"
 msgstr "{input_type}: תגית לא צפויה {tag_name}"
 
 #. Translators: a "tag" is an XML element, such as "<b>" in HTML
 #: common/lib/capa/capa/inputtypes.py
+#, python-brace-format
 msgid "Expected a {expected_tag} tag; got {given_tag} instead"
 msgstr "צפויה תגית {expected_tag}; במקום זאת התקבלה תגית {given_tag}"
 
 #. Translators: index here could be 1,2,3 and so on
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "Question {index}"
 msgstr "שאלה  {index}"
 
@@ -1585,6 +1639,7 @@ msgid "Answer"
 msgstr "תשובה"
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "Error {err} in evaluating hint function {hintfn}."
 msgstr "שגיאה {err} בהערכת פונקציית רמז {hintfn}."
 
@@ -1593,6 +1648,7 @@ msgid "(Source code line unavailable)"
 msgstr "(שורת קוד מקור אינה זמינה)"
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "See XML source line {sourcenum}."
 msgstr "ראה שורת XML מקור {sourcenum}."
 
@@ -1642,18 +1698,22 @@ msgid "There was a problem with the staff answer to this problem."
 msgstr "חלה בעיה בתשובת הצוות עבור בעיה זו."
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "Could not interpret '{student_answer}' as a number."
 msgstr "אינו יכול לפרש '{student_answer}' כמספר."
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "You may not use variables ({bad_variables}) in numerical problems."
 msgstr "אין להשתמש במשתנים ({bad_variables}) בבעיות מספריות."
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "factorial function evaluated outside its domain:'{student_answer}'"
 msgstr "פונקציית עצרת משוערכת מחוץ לתחום הגדרה: '{student_answer}'"
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "Invalid math syntax: '{student_answer}'"
 msgstr "תחביר מתמטי לא תקין: '{student_answer}'"
 
@@ -1708,6 +1768,7 @@ msgid "Custom Evaluated Script"
 msgstr "מלל הערכה מותאם אישית "
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "error getting student answer from {student_answers}"
 msgstr "שגיאה בקבלת תשובת סטודנט מ-{student_answers}"
 
@@ -1726,6 +1787,7 @@ msgstr "קלט סמלים מתמטיים"
 #. Translators: 'SymbolicResponse' is a problem type and should not be
 #. translated.
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "An error occurred with SymbolicResponse. The error was: {error_msg}"
 msgstr "אירעה שגיאה ב-SymbolicResponse. השגיאה היתה: {error_msg}"
 
@@ -1742,6 +1804,7 @@ msgid "Error: No grader has been set up for this problem."
 msgstr "שגיאה: לא הוגדר בודק עבור בעיה זו. "
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid ""
 "Unable to deliver your submission to grader (Reason: {error_msg}). Please "
 "try again later."
@@ -1762,10 +1825,12 @@ msgid "Math Expression Input"
 msgstr "שדה נוסחה מתמטית"
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "Invalid input: {bad_input} not permitted in answer."
 msgstr "הזנת נתונים לא חוקיים: {bad_input} לא מאושר בתשובה."
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid ""
 "factorial function not permitted in answer for this problem. Provided answer"
 " was: {bad_input}"
@@ -1774,10 +1839,12 @@ msgstr ""
 "{bad_input}"
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "Invalid input: Could not parse '{bad_input}' as a formula."
 msgstr "הזנת נתונים לא חוקים: לא ניתן לנתח '{bad_input}' כנוסחה."
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "Invalid input: Could not parse '{bad_input}' as a formula"
 msgstr "הזנת נתונים לא חוקיים: לא ניתן לנתח  '{bad_input}' כנוסחה. "
 
@@ -1788,6 +1855,7 @@ msgstr "בונה מעגלים סכמטי"
 #. Translators: 'SchematicResponse' is a problem type and should not be
 #. translated.
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "Error in evaluating SchematicResponse. The error was: {error_msg}"
 msgstr "שגיאה בהערכת SchematicResponse. השגיאה היתה: {error_msg}"
 
@@ -1796,11 +1864,13 @@ msgid "Image Mapped Input"
 msgstr "קלט ממופה תמונה"
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "error grading {image_input_id} (input={user_input})"
 msgstr "שגיאה בדירוג {image_input_id} (קלט={user_input})"
 
 #. Translators: {sr_coords} are the coordinates of a rectangle
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "Error in problem specification! Cannot parse rectangle in {sr_coords}"
 msgstr "שגיאה בפירוט הבעיה! לא ניתן לנתח מלבן ב{sr_coords}"
 
@@ -1813,6 +1883,7 @@ msgid "Checkboxes With Text Input"
 msgstr "תיבות סימון עם הזנת טקסט "
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "Answer not provided for {input_type}"
 msgstr "לא סופקו תשובות עבור {input_type}"
 
@@ -1821,6 +1892,7 @@ msgid "The Staff answer could not be interpreted as a number."
 msgstr "לא ניתן לפרש את תשובת הצוות כמספר."
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "Could not interpret '{given_answer}' as a number."
 msgstr "לא ניתן לפרש '{given_answer}' כמספר."
 
@@ -1838,7 +1910,7 @@ msgstr "מידע XML עבור הסברים"
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "Display name for this module"
-msgstr "שם תצוגה עבור מודול זה"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/annotatable_module.py
 msgid "Annotation"
@@ -1848,7 +1920,7 @@ msgstr "ביאור"
 #: common/lib/xmodule/xmodule/conditional_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "This name appears in the horizontal navigation at the top of the page."
-msgstr "שם זה מופיע בתפריט הניווט בחלק העליון של העמוד."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Blank Advanced Problem"
@@ -2086,6 +2158,7 @@ msgstr "אם שגיאה זו ממשיכה, אנא צור קשר עם צוות ה
 #. This string is being passed to translation only for possible reordering of
 #. the placeholders.
 #: common/lib/xmodule/xmodule/capa_base.py
+#, python-brace-format
 msgid ""
 "{previous_hints}<li><strong>{hint_number_prefix}</strong>{hint_text}</li>"
 msgstr ""
@@ -2095,27 +2168,32 @@ msgstr ""
 #. hints.
 #. This text is shown in bold before the accompanying hint text.
 #: common/lib/xmodule/xmodule/capa_base.py
+#, python-brace-format
 msgid "Hint ({hint_num} of {hints_count}): "
 msgstr "רמז ({hint_num} מתוך {hints_count}):"
 
 #: common/lib/xmodule/xmodule/capa_base.py
+#, python-brace-format
 msgid ""
 "Your answers were previously saved. Click '{button_name}' to grade them."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
+#, python-brace-format
 msgid "Incorrect ({progress} point)"
 msgid_plural "Incorrect ({progress} points)"
 msgstr[0] "(נקודה שגויה {progress})"
 msgstr[1] "({progress} נקודות שגויות)"
 
 #: common/lib/xmodule/xmodule/capa_base.py
+#, python-brace-format
 msgid "Correct ({progress} point)"
 msgid_plural "Correct ({progress} points)"
 msgstr[0] "(נקודה נכונה {progress})"
 msgstr[1] "({progress} נקודות נכונות)"
 
 #: common/lib/xmodule/xmodule/capa_base.py
+#, python-brace-format
 msgid "Partially correct ({progress} point)"
 msgid_plural "Partially correct ({progress} points)"
 msgstr[0] "נקודה נכונה חלקית ({progress})"
@@ -2136,10 +2214,12 @@ msgid "Problem must be reset before it can be submitted again."
 msgstr "על הבעיה להיות מאותחלת בטרם ניתן יהיה לשלוח אותה שוב."
 
 #: common/lib/xmodule/xmodule/capa_base.py
+#, python-brace-format
 msgid "You must wait at least {wait} seconds between submissions."
 msgstr "עליך להמתין לפחות {wait} שניות בין הגשות."
 
 #: common/lib/xmodule/xmodule/capa_base.py
+#, python-brace-format
 msgid ""
 "You must wait at least {wait_secs} between submissions. {remaining_secs} "
 "remaining."
@@ -2147,22 +2227,26 @@ msgstr "עליך להמתין לפחות {wait_secs} בין הגשות. נותר
 
 #. Translators: {msg} will be replaced with a problem's error message.
 #: common/lib/xmodule/xmodule/capa_base.py
+#, python-brace-format
 msgid "Error: {msg}"
 msgstr "שגיאה: {msg}"
 
 #: common/lib/xmodule/xmodule/capa_base.py
+#, python-brace-format
 msgid "{num_hour} hour"
 msgid_plural "{num_hour} hours"
 msgstr[0] "{num_hour} שעה"
 msgstr[1] "{num_hour} שעות"
 
 #: common/lib/xmodule/xmodule/capa_base.py
+#, python-brace-format
 msgid "{num_minute} minute"
 msgid_plural "{num_minute} minutes"
 msgstr[0] "{num_minute} דקה"
 msgstr[1] "{num_minute} דקות"
 
 #: common/lib/xmodule/xmodule/capa_base.py
+#, python-brace-format
 msgid "{num_second} second"
 msgid_plural "{num_second} seconds"
 msgstr[0] "{num_second} שניה"
@@ -2187,6 +2271,7 @@ msgid "Your answers have been saved."
 msgstr "תשובתך נשמרה."
 
 #: common/lib/xmodule/xmodule/capa_base.py
+#, python-brace-format
 msgid ""
 "Your answers have been saved but not graded. Click '{button_name}' to grade "
 "them."
@@ -2269,6 +2354,7 @@ msgid "Blocked Content Message"
 msgstr "הודעה על תוכן חסום"
 
 #: common/lib/xmodule/xmodule/conditional_module.py
+#, python-brace-format
 msgid ""
 "The message that is shown to learners when not all conditions are met to "
 "show the content of this conditional module. Include {link} in the text of "
@@ -2280,6 +2366,7 @@ msgstr ""
 "לדוגמה, 'עליך להשלים את {link} לפני שתוכל לגשת ליחידה זו'."
 
 #: common/lib/xmodule/xmodule/conditional_module.py
+#, python-brace-format
 msgid "You must complete {link} before you can access this unit."
 msgstr "עליך להשלים את {link} לפני שתוכל לגשת ליחידה זו."
 
@@ -3027,6 +3114,7 @@ msgid "Teams Configuration"
 msgstr "הגדרת תצורה של הצוותים"
 
 #: common/lib/xmodule/xmodule/course_module.py
+#, python-brace-format
 msgid ""
 "Specify the maximum team size and topics for teams inside the provided set "
 "of curly braces. Make sure that you enclose all of the sets of topic values "
@@ -3379,6 +3467,7 @@ msgstr "מרכיב זה מיושן. ישנו תוכן חדש בספריה."
 #. Translators: {refresh_icon} placeholder is substituted to "↻" (without
 #. double quotes)
 #: common/lib/xmodule/xmodule/library_content_module.py
+#, python-brace-format
 msgid "{refresh_icon} Update now."
 msgstr "{refresh_icon} עדכן עכשיו."
 
@@ -3413,12 +3502,14 @@ msgid "Select another problem type."
 msgstr "בחר סוג בעיה אחר."
 
 #: common/lib/xmodule/xmodule/library_content_module.py
+#, python-brace-format
 msgid "The specified library is configured to fetch {count} problem, "
 msgid_plural "The specified library is configured to fetch {count} problems, "
 msgstr[0] "הספריה שצוינה מוגדרת למשיכת בעיה {count}, "
 msgstr[1] "הספרייה שצוינה מוגדרת למשיכת {count}בעיות, "
 
 #: common/lib/xmodule/xmodule/library_content_module.py
+#, python-brace-format
 msgid "but there is only {actual} matching problem."
 msgid_plural "but there are only {actual} matching problems."
 msgstr[0] "אך יש רק בעיית התאמה {actual}."
@@ -3438,7 +3529,7 @@ msgstr "לא נבחרה ספריה"
 
 #: common/lib/xmodule/xmodule/library_root_xblock.py
 msgid "Enter the name of the library as it should appear in Studio."
-msgstr "הזן את שם הספריה כפי שצריכה להופיע בסטודיו."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/library_root_xblock.py
 msgid "Library Display Name"
@@ -3453,14 +3544,13 @@ msgid ""
 "Enter the name that students see for this component.  Analytics reports may "
 "also use the display name to identify this component."
 msgstr ""
-"הזן את השם שרואים הסטודנטים עבור רכיב זה. ניתן להשתמש בשם קמפוס כדי לזהות "
-"מרכיב זה בדוחות אנליטיקס. "
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "LTI ID"
 msgstr "מזהה LTI "
 
 #: common/lib/xmodule/xmodule/lti_module.py
+#, python-brace-format
 msgid ""
 "Enter the LTI ID for the external LTI provider.  This value must be the same"
 " LTI ID that you entered in the LTI Passports setting on the Advanced "
@@ -3476,6 +3566,7 @@ msgid "LTI URL"
 msgstr "כתובת URL של LTI"
 
 #: common/lib/xmodule/xmodule/lti_module.py
+#, python-brace-format
 msgid ""
 "Enter the URL of the external tool that this component launches. This "
 "setting is only used when Hide External Tool is set to False.<br />See "
@@ -3491,6 +3582,7 @@ msgid "Custom Parameters"
 msgstr "משתנים בהתאמה אישית"
 
 #: common/lib/xmodule/xmodule/lti_module.py
+#, python-brace-format
 msgid ""
 "Add the key/value pair for any custom parameters, such as the page your "
 "e-book should open to or the background color for this component.<br />See "
@@ -3615,6 +3707,7 @@ msgid ""
 msgstr "בחר כן לאפשר למערכות צד שלישי לשלוח ציונים לאחר תאריך היעד. "
 
 #: common/lib/xmodule/xmodule/lti_module.py
+#, python-brace-format
 msgid ""
 "Could not parse custom parameter: {custom_parameter}. Should be \"x=y\" "
 "string."
@@ -3623,6 +3716,7 @@ msgstr ""
 "\"x=y\"."
 
 #: common/lib/xmodule/xmodule/lti_module.py
+#, python-brace-format
 msgid ""
 "Could not parse LTI passport: {lti_passport}. Should be \"id:key:secret\" "
 "string."
@@ -3812,6 +3906,7 @@ msgid "Video Pre-Roll"
 msgstr "מודעה לפני סרטון וידאו"
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
+#, python-brace-format
 msgid ""
 "Identify a video, 5-10 seconds in length, to play before course videos. "
 "Enter the video ID from the Video Uploads page and one or more transcript "
@@ -3955,13 +4050,14 @@ msgstr "מבחן זה חסוי ללומד."
 
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid "subsection"
-msgstr "תת פרק"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/seq_module.py
+#, python-brace-format
 msgid ""
 "Because the due date has passed, this {subsection_format} is hidden from the"
 " learner."
-msgstr "מאחר שחלף כבר תאריך היעד, {subsection_format} חסוי ללומד."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid ""
@@ -3970,6 +4066,7 @@ msgid ""
 msgstr "תת-קטע זה אינו נעול ללומדים כאשר הם עומדים בדרישות הקדם."
 
 #: common/lib/xmodule/xmodule/split_test_module.py
+#, python-brace-format
 msgid "Group ID {group_id}"
 msgstr "מזהה קבוצה {group_id}"
 
@@ -3981,7 +4078,7 @@ msgstr "לא נבחר "
 msgid ""
 "This name is used for organizing your course content, but is not shown to "
 "students."
-msgstr "השימוש בשם זה הוא לארגון תוכן הקורס אך אינו גלוי לסטודנט."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid "Content Experiment"
@@ -4012,6 +4109,7 @@ msgid "Which child module students in a particular group_id should see"
 msgstr "איזה מודול מִשנֶה צריכים לראות הסטודנטים ב-group_id מסוים "
 
 #: common/lib/xmodule/xmodule/split_test_module.py
+#, python-brace-format
 msgid "{group_name} (inactive)"
 msgstr "{group_name} (לא פעילה)"
 
@@ -4096,6 +4194,7 @@ msgstr ""
 "markname;urltomark;baseline,markname2;urltomark2;baseline2"
 
 #: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
+#, python-brace-format
 msgid ""
 "Can't receive transcripts from Youtube for {youtube_id}. Status code: "
 "{status_code}."
@@ -4107,6 +4206,7 @@ msgid "We support only SubRip (*.srt) transcripts format."
 msgstr "אנו תומכים רק בפורמט תמליל SubRip (*.srt) "
 
 #: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
+#, python-brace-format
 msgid ""
 "Something wrong with SubRip transcripts file during parsing. Inner message "
 "is {error_message}"
@@ -4119,6 +4219,7 @@ msgid "Something wrong with SubRip transcripts file during parsing."
 msgstr "אירע שיבוש בקובץ התעתיקים SubRip במהלך הפיצול."
 
 #: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
+#, python-brace-format
 msgid "{exception_message}: Can't find uploaded transcripts: {user_filename}"
 msgstr ""
 "{exception_message}: לא ניתן למצוא את התעתיקים שהועלו: {user_filename}"
@@ -4132,6 +4233,7 @@ msgid "Basic"
 msgstr "בסיסי"
 
 #: common/lib/xmodule/xmodule/video_module/video_module.py
+#, python-brace-format
 msgid "There is no transcript file associated with the {lang} language."
 msgid_plural ""
 "There are no transcript files associated with the {lang} languages."
@@ -4155,7 +4257,6 @@ msgid ""
 "The name students see. This name appears in the course ribbon and as a "
 "header for the video."
 msgstr ""
-"השם שרואים הסטודנטים. שם זה מופיע ברצועת הקורס וככותרת עבור סרטון הווידאו."
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid "Component Display Name"
@@ -4444,7 +4545,7 @@ msgstr "כתובת URL של פוסטר"
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 msgid "The label for this word cloud on the course page."
-msgstr "התווית לענן מילים זה בעמוד הקורס."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 #: lms/templates/annotatable.html lms/templates/imageannotation.html
@@ -4504,6 +4605,7 @@ msgid "Top num_top_words words for word cloud."
 msgstr "מילות num_top_words מובילות עבור ענן המילים."
 
 #: lms/djangoapps/badges/events/course_complete.py
+#, python-brace-format
 msgid ""
 "Completed the course \"{course_name}\" ({course_mode}, {start_date} - "
 "{end_date})"
@@ -4511,6 +4613,7 @@ msgstr ""
 "השלים את הקורס \"{course_name}\" ({course_mode}, {start_date} - {end_date})"
 
 #: lms/djangoapps/badges/events/course_complete.py
+#, python-brace-format
 msgid "Completed the course \"{course_name}\" ({course_mode})"
 msgstr "השלים את הקורס \"{course_name}\" ({course_mode})"
 
@@ -4589,6 +4692,7 @@ msgstr "בדוק את תחביר הערך שלך."
 #. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
 #. Please do not translate any of these trademarks and company names.
 #: lms/djangoapps/branding/api.py
+#, python-brace-format
 msgid ""
 "© {org_name}.  All rights reserved except where noted.  EdX, Open edX and "
 "the edX and Open EdX logos are registered trademarks or trademarks of edX "
@@ -4609,6 +4713,7 @@ msgid "Powered by Open edX"
 msgstr "מופעל על ידי Open edX"
 
 #: lms/djangoapps/branding/api.py
+#, python-brace-format
 msgid "{platform_name} for Business"
 msgstr ""
 
@@ -4681,10 +4786,12 @@ msgid "Terms of Service"
 msgstr "תנאי שימוש"
 
 #: lms/djangoapps/branding/api.py
+#, python-brace-format
 msgid "Download the {platform_name} mobile app from the Apple App Store"
 msgstr "הורד את האפליקציה לנייד של {platform_name} מ-Apple App Store"
 
 #: lms/djangoapps/branding/api.py
+#, python-brace-format
 msgid "Download the {platform_name} mobile app from Google Play"
 msgstr "הורד את האפליקציה לנייד של {platform_name} מ-Google Play"
 
@@ -4701,6 +4808,7 @@ msgstr ""
 " גישה לקורס."
 
 #: lms/djangoapps/ccx/utils.py
+#, python-brace-format
 msgid "The course is full: the limit is {max_student_enrollments_allowed}"
 msgstr "הקורס מלא: המגבלה היא {max_student_enrollments_allowed}"
 
@@ -4838,30 +4946,37 @@ msgid "user is not given."
 msgstr "המשתמש אינו מקבל."
 
 #: lms/djangoapps/certificates/views/support.py
+#, python-brace-format
 msgid "user '{user}' does not exist"
 msgstr "המשתמש '{user}' אינו קיים"
 
 #: lms/djangoapps/certificates/views/support.py
+#, python-brace-format
 msgid "Course id '{course_id}' is not valid"
 msgstr "מזהה הקורס '{course_id}' אינו חוקי"
 
 #: lms/djangoapps/certificates/views/support.py
+#, python-brace-format
 msgid "The course does not exist against the given key '{course_key}'"
 msgstr "הקורס אינו קיים אל מול המפתח הנתון '{course_key}'"
 
 #: lms/djangoapps/certificates/views/support.py
+#, python-brace-format
 msgid "User {username} does not exist"
 msgstr "המשתמש {username} אינו קיים"
 
 #: lms/djangoapps/certificates/views/support.py
+#, python-brace-format
 msgid "{course_key} is not a valid course key"
 msgstr "{course_key} אינו מפתח קורס חוקי"
 
 #: lms/djangoapps/certificates/views/support.py
+#, python-brace-format
 msgid "The course {course_key} does not exist"
 msgstr "הקורס {course_key} אינו קיים"
 
 #: lms/djangoapps/certificates/views/support.py
+#, python-brace-format
 msgid "User {username} is not enrolled in the course {course_key}"
 msgstr "המשתמש {username} אינו רשום בקורס {course_key}"
 
@@ -4871,6 +4986,7 @@ msgstr "אירעה שגיאה לא צפויה בזמן יצירת תעודות �
 
 #. Translators:  This text describes the 'Honor' course certificate type.
 #: lms/djangoapps/certificates/views/webview.py
+#, python-brace-format
 msgid ""
 "An {cert_type} certificate signifies that a learner has agreed to abide by "
 "the honor code established by {platform_name} and has completed all of the "
@@ -4884,6 +5000,7 @@ msgstr ""
 #. verification offered by edX.  This type of verification is useful for
 #. professional education/certifications
 #: lms/djangoapps/certificates/views/webview.py
+#, python-brace-format
 msgid ""
 "A {cert_type} certificate signifies that a learner has agreed to abide by "
 "the honor code established by {platform_name} and has completed all of the "
@@ -4900,6 +5017,7 @@ msgstr ""
 #. courses related to each other in a meaningful way, such as a specific topic
 #. or theme, or even an organization
 #: lms/djangoapps/certificates/views/webview.py
+#, python-brace-format
 msgid ""
 "An {cert_type} certificate demonstrates a high level of achievement in a "
 "program of study, and includes verification of the student's identity."
@@ -4909,11 +5027,13 @@ msgstr ""
 
 #. Translators:  The format of the date includes the full name of the month
 #: lms/djangoapps/certificates/views/webview.py
+#, python-brace-format
 msgid "{month} {day}, {year}"
 msgstr "{month} {day}, {year}"
 
 #. Translators:  This text represents the verification of the certificate
 #: lms/djangoapps/certificates/views/webview.py
+#, python-brace-format
 msgid ""
 "This is a valid {platform_name} certificate for {user_name}, who "
 "participated in {partner_short_name} {course_number}"
@@ -4924,6 +5044,7 @@ msgstr ""
 #. Translators:  This text is bound to the HTML 'title' element of the page
 #. and appears in the browser title bar
 #: lms/djangoapps/certificates/views/webview.py
+#, python-brace-format
 msgid "{partner_short_name} {course_number} Certificate | {platform_name}"
 msgstr "{partner_short_name} {course_number} תעודה {platform_name}"
 
@@ -4932,6 +5053,7 @@ msgstr "{partner_short_name} {course_number} תעודה {platform_name}"
 #. screen.  The text describes the accomplishment represented by the
 #. certificate information displayed to the user
 #: lms/djangoapps/certificates/views/webview.py
+#, python-brace-format
 msgid ""
 "successfully completed, received a passing grade, and was awarded this "
 "{platform_name} {certificate_type} Certificate of Completion in "
@@ -4942,6 +5064,7 @@ msgstr ""
 #. Translators: This text describes the purpose (and therefore, value) of a
 #. course certificate
 #: lms/djangoapps/certificates/views/webview.py
+#, python-brace-format
 msgid ""
 "{platform_name} acknowledges achievements through certificates, which are "
 "awarded for course activities that {platform_name} students complete."
@@ -4978,6 +5101,7 @@ msgstr "אימות תעודות"
 #. Translators: Accomplishments describe the awards/certifications obtained by
 #. students on this platform
 #: lms/djangoapps/certificates/views/webview.py
+#, python-brace-format
 msgid "About {platform_name} Accomplishments"
 msgstr "אודות ההישגים של {platform_name}"
 
@@ -4994,16 +5118,19 @@ msgid "Certificate ID Number"
 msgstr "מספר מזהה של תעודה"
 
 #: lms/djangoapps/certificates/views/webview.py
+#, python-brace-format
 msgid "About {platform_name} Certificates"
 msgstr "אודות תעודות של {platform_name}"
 
 #: lms/djangoapps/certificates/views/webview.py
+#, python-brace-format
 msgid "How {platform_name} Validates Student Certificates"
 msgstr "כיצד {platform_name} מאמתת את תעודות הסטודנטים"
 
 #. Translators:  This text describes the validation mechanism for a
 #. certificate file (known as GPG security)
 #: lms/djangoapps/certificates/views/webview.py
+#, python-brace-format
 msgid ""
 "Certificates issued by {platform_name} are signed by a gpg key so that they "
 "can be validated independently by anyone with the {platform_name} public "
@@ -5021,37 +5148,45 @@ msgstr "אמת תעודה זו עבור עצמך"
 #. Translators:  This text describes (at a high level) the mission and charter
 #. the edX platform and organization
 #: lms/djangoapps/certificates/views/webview.py
+#, python-brace-format
 msgid "{platform_name} offers interactive online classes and MOOCs."
 msgstr "{platform_name} מציעה כיתות מקוונות אינטראקטיביות וקורסי MOOC."
 
 #: lms/djangoapps/certificates/views/webview.py
+#, python-brace-format
 msgid "About {platform_name}"
 msgstr "אודות {platform_name}"
 
 #: lms/djangoapps/certificates/views/webview.py
+#, python-brace-format
 msgid "Learn more about {platform_name}"
 msgstr "למד עוד אודות {platform_name} "
 
 #: lms/djangoapps/certificates/views/webview.py
+#, python-brace-format
 msgid "Learn with {platform_name}"
 msgstr "למד עם {platform_name}"
 
 #: lms/djangoapps/certificates/views/webview.py
+#, python-brace-format
 msgid "Work at {platform_name}"
 msgstr "עבוד ב{platform_name}"
 
 #: lms/djangoapps/certificates/views/webview.py
+#, python-brace-format
 msgid "Contact {platform_name}"
 msgstr "צור קשר עם {platform_name}"
 
 #. Translators:  This text appears near the top of the certficate and
 #. describes the guarantee provided by edX
 #: lms/djangoapps/certificates/views/webview.py
+#, python-brace-format
 msgid "{platform_name} acknowledges the following student accomplishment"
 msgstr "{platform_name} מכירה בהישגים של הסטודנט שלהלן "
 
 #. Translators:  This text represents the description of course
 #: lms/djangoapps/certificates/views/webview.py
+#, python-brace-format
 msgid ""
 "a course of study offered by {partner_short_name}, an online learning "
 "initiative of {partner_long_name}."
@@ -5061,25 +5196,30 @@ msgstr ""
 
 #. Translators:  This text represents the description of course
 #: lms/djangoapps/certificates/views/webview.py
+#, python-brace-format
 msgid "a course of study offered by {partner_short_name}."
 msgstr "קורס לימודים שמציע {partner_short_name}."
 
 #: lms/djangoapps/certificates/views/webview.py
+#, python-brace-format
 msgid "I completed the {course_title} course on {platform_name}."
 msgstr "השלמתי את הקורס {course_title} ב-{platform_name}."
 
 #: lms/djangoapps/certificates/views/webview.py
+#, python-brace-format
 msgid ""
 "I completed a course at {platform_name}. Take a look at my certificate."
 msgstr "השלמתי את הקורס ב-{platform_name}. בחן את התעודה שלי."
 
 #: lms/djangoapps/certificates/views/webview.py
+#, python-brace-format
 msgid "More Information About {user_name}'s Certificate:"
 msgstr "מידע נוסף אודות התעודה של {user_name}:"
 
 #. Translators: This line is displayed to a user who has completed a course
 #. and achieved a certification
 #: lms/djangoapps/certificates/views/webview.py
+#, python-brace-format
 msgid "{fullname}, you earned a certificate!"
 msgstr "{fullname}, זכית בתעודה!"
 
@@ -5096,6 +5236,7 @@ msgstr ""
 #. Translators: This line leads the reader to understand more about the
 #. certificate that a student has been awarded
 #: lms/djangoapps/certificates/views/webview.py
+#, python-brace-format
 msgid "More about {fullname}'s accomplishment"
 msgstr "מידע נוסף אודות ההישג של {fullname}"
 
@@ -5144,10 +5285,12 @@ msgid "problems"
 msgstr "בעיות"
 
 #: lms/djangoapps/commerce/api/v1/serializers.py
+#, python-brace-format
 msgid "{course_id} is not a valid course key."
 msgstr "{course_id} אינו מפתח קורס חוקי"
 
 #: lms/djangoapps/commerce/api/v1/serializers.py
+#, python-brace-format
 msgid "Course {course_id} does not exist."
 msgstr "הקורס {course_id} אינו קיים."
 
@@ -5180,6 +5323,7 @@ msgid "Path to order receipt page."
 msgstr "נתיב לעמוד הקבלה להזמנה."
 
 #: lms/djangoapps/commerce/signals.py
+#, python-brace-format
 msgid ""
 "A refund request has been initiated for {username} ({email}). To process "
 "this request, please visit the link(s) below."
@@ -5220,6 +5364,7 @@ msgid "Please wait a few minutes and then try again."
 msgstr "המתן כמה דקות ונסה שוב."
 
 #: lms/djangoapps/commerce/views.py
+#, python-brace-format
 msgid "For help, contact {payment_support_link}."
 msgstr "לקבלת עזרה, צור קשר עם {payment_support_link}."
 
@@ -5228,6 +5373,7 @@ msgid "An error occurred while creating your receipt."
 msgstr "אירעה שגיאה בעת יצירת הקבלה שלך."
 
 #: lms/djangoapps/commerce/views.py
+#, python-brace-format
 msgid ""
 "If your course does not appear on your dashboard, contact "
 "{payment_support_link}."
@@ -5242,6 +5388,7 @@ msgstr "Wiki"
 #. Translators: this string includes wiki markup.  Leave the ** and the _
 #. alone.
 #: lms/djangoapps/course_wiki/views.py
+#, python-brace-format
 msgid "This is the wiki for **{organization}**'s _{course_name}_."
 msgstr "זהו wiki עבור **{organization}** לקורס _{course_name}_."
 
@@ -5250,6 +5397,7 @@ msgid "Course page automatically created."
 msgstr "עמוד קורס נוצר באופן אוטומטי."
 
 #: lms/djangoapps/course_wiki/views.py
+#, python-brace-format
 msgid "Welcome to the {platform_name} Wiki"
 msgstr "ברוכים הבאים ל-wiki של  {platform_name}"
 
@@ -5283,10 +5431,12 @@ msgstr "אין לך גישה לקורס זה דרך המכשיר הנייד"
 #. and if today were December 5th, 2020, 'relative' would be "1
 #. month".
 #: lms/djangoapps/courseware/date_summary.py
+#, python-brace-format
 msgid "{relative} ago - {absolute}"
 msgstr "{relative} לפני - {absolute}"
 
 #: lms/djangoapps/courseware/date_summary.py
+#, python-brace-format
 msgid "in {relative} - {absolute}"
 msgstr "ב-{relative} - {absolute}"
 
@@ -5332,7 +5482,6 @@ msgid "Upgrade to Verified Certificate"
 msgstr "שדרג לתעודה מאומתת"
 
 #: lms/djangoapps/courseware/date_summary.py
-#: cms/templates/group_configurations.html
 msgid "Learn More"
 msgstr "למד עוד"
 
@@ -5363,6 +5512,7 @@ msgstr ""
 "מאומתת."
 
 #: lms/djangoapps/courseware/masquerade.py
+#, python-brace-format
 msgid ""
 "There is no user with the username or email address {user_name} enrolled in "
 "this course."
@@ -5404,6 +5554,7 @@ msgstr "ספרי לימוד"
 #. "$500.00"
 #: lms/djangoapps/courseware/views/views.py
 #: lms/templates/shoppingcart/shopping_cart.html
+#, python-brace-format
 msgid "{currency_symbol}{price}"
 msgstr "{currency_symbol}{price}"
 
@@ -5458,6 +5609,7 @@ msgid "Certificate unavailable"
 msgstr "התעודה אינה זמינה"
 
 #: lms/djangoapps/courseware/views/views.py
+#, python-brace-format
 msgid ""
 "You have not received a certificate because you do not have a current "
 "{platform_name} verified identity."
@@ -5472,10 +5624,12 @@ msgid "Invalid location."
 msgstr "מיקום לא חוקי."
 
 #: lms/djangoapps/courseware/views/views.py
+#, python-brace-format
 msgid "User {username} has never accessed problem {location}"
 msgstr "משתמש {username}  מעולם לא ניגש לבעיה {location} "
 
 #: lms/djangoapps/courseware/views/views.py
+#, python-brace-format
 msgid "You must be signed in to {platform_name} to create a certificate."
 msgstr "עליך להיות מחובר ל{platform_name} כדי ליצור תעודה."
 
@@ -5496,6 +5650,7 @@ msgid "Certificate is being created."
 msgstr "התעודה נוצרת."
 
 #: lms/djangoapps/courseware/views/views.py
+#, python-brace-format
 msgid ""
 "{platform_name} now offers financial assistance for learners who want to earn Verified Certificates but who may not be able to pay the Verified Certificate fee. Eligible learners may receive up to 90{percent_sign} off the Verified Certificate fee for a course.\n"
 "To apply for financial assistance, enroll in the audit track for a course that offers Verified Certificates, and then complete this application. Note that you must complete a separate application for each course you take.\n"
@@ -5556,6 +5711,7 @@ msgstr ""
 "של edX."
 
 #: lms/djangoapps/dashboard/git_import.py
+#, python-brace-format
 msgid ""
 "Path {0} doesn't exist, please create it, or configure a different path with"
 " GIT_REPO_DIR"
@@ -5612,6 +5768,7 @@ msgstr ""
 #. not log them in for some reason - maybe they don't have permission, or
 #. their password was wrong)
 #: lms/djangoapps/dashboard/sysadmin.py
+#, python-brace-format
 msgid "Failed in authenticating {username}, error {error}\n"
 msgstr "נכשל אימות {username}, שגיאה {error}\n"
 
@@ -5620,6 +5777,7 @@ msgstr "נכשל אימות {username}, שגיאה {error}\n"
 #. not log them in for some reason - maybe they don't have permission, or
 #. their password was wrong)
 #: lms/djangoapps/dashboard/sysadmin.py
+#, python-brace-format
 msgid "Failed in authenticating {username}\n"
 msgstr "האימות נכשל {username}\n"
 
@@ -5646,10 +5804,12 @@ msgstr "חובה לספק שם מלא"
 
 #. Translators: Domain is an email domain, such as "@gmail.com"
 #: lms/djangoapps/dashboard/sysadmin.py
+#, python-brace-format
 msgid "Email address must end in {domain}"
 msgstr "כתובת דואר אלקטרוני חייבת להסתיים ב-{domain}"
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#, python-brace-format
 msgid "Failed - email {email_addr} already exists as {external_id}"
 msgstr ""
 "כישלון - כתובת דואר אלקטרוני {email_addr} כבר קיימת כמזהה {external_id}"
@@ -5663,22 +5823,27 @@ msgid "email address required (not username)"
 msgstr "חובה להכניס כתובת דואר אלקטרוני (ולא שם משתמש)"
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#, python-brace-format
 msgid "Oops, failed to create user {user}, {error}"
 msgstr "אופס, נכשל ביצירת משתמש {user}, {error}"
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#, python-brace-format
 msgid "User {user} created successfully!"
 msgstr "משתמש, {user} נוצר בהצלחה!"
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#, python-brace-format
 msgid "Cannot find user with email address {email_addr}"
 msgstr "לא נמצא משתמש בעל כתובת דואר אלקטרוני {email_addr}"
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#, python-brace-format
 msgid "Cannot find user with username {username} - {error}"
 msgstr "לא ניתן למצוא משתמש בעל שם משתמש {username} - {error}"
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#, python-brace-format
 msgid "Deleted user {username}"
 msgstr "נמחק משתמש {username}"
 
@@ -5758,6 +5923,7 @@ msgid "Information about all courses"
 msgstr "מידע על כל הקורסים"
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#, python-brace-format
 msgid "Error - cannot get course with ID {0}<br/><pre>{1}</pre>"
 msgstr "שגיאה - לא ניתן לקבל קורס בעל מזהה {0}<br/><pre>{1}</pre>"
 
@@ -5904,6 +6070,7 @@ msgstr ""
 "תוכן, לדוגמה https://courses.edx.org."
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
+#, python-brace-format
 msgid "{platform_name} Staff"
 msgstr "{platform_name} צוות"
 
@@ -5926,6 +6093,7 @@ msgid "Credit Card - Individual"
 msgstr "כרטיס אשראי - אישי"
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
+#, python-brace-format
 msgid "manually enrolled by username: {username}"
 msgstr "נרשם באופן ידני על ידי שם המשתמש: {username}"
 
@@ -5942,10 +6110,12 @@ msgid "TBD"
 msgstr "יקבע בהמשך"
 
 #: lms/djangoapps/instructor/services.py
+#, python-brace-format
 msgid "Proctored Exam Review: {review_status}"
 msgstr "סקירת מבחן תחת פיקוח:  {review_status}"
 
 #: lms/djangoapps/instructor/services.py
+#, python-brace-format
 msgid ""
 "A proctored exam attempt for {exam_name} in {course_name} by username: "
 "{student_username} was reviewed as {review_status} by the proctored exam "
@@ -5973,6 +6143,7 @@ msgid "Could not read uploaded file."
 msgstr "לא ניתן לקרוא קובץ שהועלה."
 
 #: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
 msgid ""
 "Data in row #{row_num} must have exactly four columns: email, username, full"
 " name, and country"
@@ -5981,10 +6152,12 @@ msgstr ""
 "דואר אלקטרוני, שם משתמש, שם מלא ומדינה "
 
 #: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
 msgid "Invalid email {email_address}."
 msgstr "כתובת דואר אלקטרוני {email_address} אינה תקינה."
 
 #: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
 msgid ""
 "An account with email {email} exists but the provided username {username} is"
 " different. Enrolling anyway with {email}."
@@ -5997,10 +6170,12 @@ msgid "File is not attached."
 msgstr "קובץ אינו מצורף."
 
 #: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
 msgid "Username {user} already exists."
 msgstr "שם משתמש {user} קיים כבר."
 
 #: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
 msgid ""
 "Error '{error}' while sending email to new user (user email={email}). "
 "Without the email student would not be able to login. Please contact support"
@@ -6031,6 +6206,7 @@ msgstr ""
 "הסטטוס של המשימה. לאחר השלמתו, הדוח יהיה זמין להורדה בטבלה להלן."
 
 #: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
 msgid "Invoice number '{num}' does not exist."
 msgstr "חשבונית מספר '{num}' אינה קיימת."
 
@@ -6039,6 +6215,7 @@ msgid "The sale associated with this invoice has already been invalidated."
 msgstr "בוטלה המכירה המקושרת לחשבונית זו. "
 
 #: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
 msgid "Invoice number {0} has been invalidated."
 msgstr "חשבונית מספר {0} בוטלה. "
 
@@ -6047,6 +6224,7 @@ msgid "This invoice is already active."
 msgstr "חשבונית זו פעילה כבר."
 
 #: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
 msgid "The registration codes for invoice {0} have been re-activated."
 msgstr "קודי ההפעלה עבור חשבונית {0}  הופעלו מחדש."
 
@@ -6409,6 +6587,7 @@ msgstr ""
 "להלן. לאחר השלמתו, תוכל להוריד את הדוח."
 
 #: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
 msgid "Successfully changed due date for student {0} for {1} to {2}"
 msgstr "תאריך יעד שונה בהצלחה עבור סטודנט {0} מ {1} ל{2}"
 
@@ -6418,6 +6597,7 @@ msgid ""
 msgstr "הוסרה בהצלחה הארכה לא חוקית לתאריך היעד (ליחידה אין תאריך יעד) "
 
 #: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
 msgid "Successfully reset due date for student {0} for {1} to {2}"
 msgstr "תאריך יעד עבור סטודנט {0} אותחל בהצלחה מ{1} ל{2}"
 
@@ -6459,11 +6639,13 @@ msgstr ""
 "\"משימות בהמתנה\"."
 
 #: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
 msgid "Student (username/email={user}) already in certificate exception list."
 msgstr ""
 "סטודנט (שם משתמש/דואר אלקטרוני={user}) נמצא כבר ברשימת החריגים לתעודה."
 
 #: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
 msgid ""
 "Certificate exception (user={user}) does not exist in certificate white "
 "list. Please refresh the page and try again."
@@ -6488,11 +6670,13 @@ msgstr ""
 "הרשומה אינה בתבנית הנכונה. הוסף שם משתמש או כתובות דואר אלקטרוני חוקיים."
 
 #: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
 msgid ""
 "{user} does not exist in the LMS. Please check your spelling and retry."
 msgstr "{user}אינו קיים ב-LMS. בדוק את האיות ונסה שוב."
 
 #: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
 msgid ""
 "{user} is not enrolled in this course. Please check your spelling and retry."
 msgstr "{user} לא נרשם לקורס זה. בדוק את האיות ונסה שוב."
@@ -6506,20 +6690,24 @@ msgid "Certificate generation started for white listed students."
 msgstr "יצירת התעודה החלה לסטודנטים שברשימה הלבנה."
 
 #: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
 msgid "user \"{user}\" in row# {row}"
 msgstr "המשתמש \"{user}\" בשורה מס' {row}"
 
 #: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
 msgid "user \"{username}\" in row# {row}"
 msgstr "המשתמש \"{username}\" בשורה מס' {row}"
 
 #: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
 msgid ""
 "Certificate of {user} has already been invalidated. Please check your "
 "spelling and retry."
 msgstr "התעודה של {user} נפסלה כבר. בדוק את האיות ונסה שוב."
 
 #: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
 msgid ""
 "Certificate for student {user} is already invalid, kindly verify that "
 "certificate was generated for this student and then proceed."
@@ -6542,6 +6730,7 @@ msgstr ""
 "אנא מלא את שם המשתמש/דואר אלקטרוני ולאחר מכן לחץ על הלחצן \"פסילת תעודה\"."
 
 #: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
 msgid ""
 "The student {student} does not have certificate for the course {course}. "
 "Kindly verify student username/email and the selected course are correct and"
@@ -6555,18 +6744,22 @@ msgid "coupon id is None"
 msgstr "אין מזהה קופון"
 
 #: lms/djangoapps/instructor/views/coupons.py
+#, python-brace-format
 msgid "coupon with the coupon id ({coupon_id}) DoesNotExist"
 msgstr "קופון בעל מזהה הקופון ({coupon_id}) DoesNotExist"
 
 #: lms/djangoapps/instructor/views/coupons.py
+#, python-brace-format
 msgid "coupon with the coupon id ({coupon_id}) is already inactive"
 msgstr "קופון בעל מזהה הקופון ({coupon_id}) אינו פעיל יותר"
 
 #: lms/djangoapps/instructor/views/coupons.py
+#, python-brace-format
 msgid "coupon with the coupon id ({coupon_id}) updated successfully"
 msgstr "הקופון בעל מזהה הקופון ({coupon_id}) עודכן בהצלחה "
 
 #: lms/djangoapps/instructor/views/coupons.py
+#, python-brace-format
 msgid ""
 "The code ({code}) that you have tried to define is already in use as a "
 "registration code"
@@ -6585,10 +6778,12 @@ msgid "Please enter the date in this format i-e month/day/year"
 msgstr "אנא הזן את התאריך בפורמט הבא, לדוגמה: חודש/יום/שנה"
 
 #: lms/djangoapps/instructor/views/coupons.py
+#, python-brace-format
 msgid "coupon with the coupon code ({code}) added successfully"
 msgstr "קופון עם קוד קופון ({code}) נוסף בהצלחה"
 
 #: lms/djangoapps/instructor/views/coupons.py
+#, python-brace-format
 msgid "coupon with the coupon code ({code}) already exists for this course"
 msgstr "שובר עם קוד השובר ({code}) קיים כבר עבור קורס זה"
 
@@ -6597,6 +6792,7 @@ msgid "coupon id not found"
 msgstr "מזהה קופון לא נמצא"
 
 #: lms/djangoapps/instructor/views/coupons.py
+#, python-brace-format
 msgid "coupon with the coupon id ({coupon_id}) updated Successfully"
 msgstr "שובר בעל מזהה השובר ({coupon_id}) עודכן בהצלחה"
 
@@ -6605,6 +6801,7 @@ msgid "Instructor"
 msgstr "מדריך"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
+#, python-brace-format
 msgid ""
 "To gain insights into student enrollment and participation {link_start}visit"
 " {analytics_dashboard_name}, our new course analytics product{link_end}."
@@ -6631,6 +6828,7 @@ msgid "Please Enter the numeric value for the course price"
 msgstr "אנא הזן את הערך המספרי של מחיר הקורס "
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
+#, python-brace-format
 msgid "CourseMode with the mode slug({mode_slug}) DoesNotExist"
 msgstr "מצב קורס כאשר הסלאג ({mode_slug}) אינו קיים"
 
@@ -6643,6 +6841,7 @@ msgid "Course Info"
 msgstr "מידע על הקורס"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
+#, python-brace-format
 msgid "Enrollment data is now available in {dashboard_link}."
 msgstr "נתוני ההרשמה זמינים כעת ב-{dashboard_link}."
 
@@ -6681,12 +6880,14 @@ msgid "0 sent"
 msgstr "0 נשלח"
 
 #: lms/djangoapps/instructor/views/instructor_task_helpers.py
+#, python-brace-format
 msgid "{num_emails} sent"
 msgid_plural "{num_emails} sent"
 msgstr[0] "{num_emails} נשלחו"
 msgstr[1] "{num_emails} נשלחו"
 
 #: lms/djangoapps/instructor/views/instructor_task_helpers.py
+#, python-brace-format
 msgid "{num_emails} failed"
 msgid_plural "{num_emails} failed"
 msgstr[0] "{num_emails} נכשלו"
@@ -6701,6 +6902,7 @@ msgid "Incomplete"
 msgstr "לא הושלם"
 
 #: lms/djangoapps/instructor/views/registration_codes.py
+#, python-brace-format
 msgid ""
 "The enrollment code ({code}) was not found for the {course_name} course."
 msgstr "קוד ההרשמה ({code}) לא נמצא עבור הקורס {course_name}."
@@ -6718,10 +6920,12 @@ msgid "The enrollment code has been restored."
 msgstr "קוד הרשמה זה שוחזר."
 
 #: lms/djangoapps/instructor/views/registration_codes.py
+#, python-brace-format
 msgid "The redemption does not exist against enrollment code ({code})."
 msgstr "המימוש אינו קיים אל מול קוד ההרשמה ({code})."
 
 #: lms/djangoapps/instructor/views/tools.py
+#, python-brace-format
 msgid "Could not find student matching identifier: {student_identifier}"
 msgstr "לא ניתן לאתר סטודנט התואם למזהה: {student_identifier}"
 
@@ -6730,10 +6934,12 @@ msgid "Unable to parse date: "
 msgstr "לא ניתן לנתח תאריך:"
 
 #: lms/djangoapps/instructor/views/tools.py
+#, python-brace-format
 msgid "Couldn't find module for url: {0}"
 msgstr "לא יכולנו למצוא מודול עבור כתובת האתר: {0}"
 
 #: lms/djangoapps/instructor/views/tools.py
+#, python-brace-format
 msgid "Unit {0} has no due date to extend."
 msgstr "ליחידה {0} אין תאריך יעד להארכה."
 
@@ -6759,10 +6965,12 @@ msgid "Extended Due Date"
 msgstr "תאריך יעד לאחר הארכה"
 
 #: lms/djangoapps/instructor/views/tools.py
+#, python-brace-format
 msgid "Users with due date extensions for {0}"
 msgstr "משתמשים בעלי הארכות תאריך יעד עבור {0}"
 
 #: lms/djangoapps/instructor/views/tools.py
+#, python-brace-format
 msgid "Due date extensions for {0} {1} ({2})"
 msgstr "הארכות תאריך יעד עבור {0} {1} ({2})"
 
@@ -6911,10 +7119,12 @@ msgid "No status information available"
 msgstr "אין מידע זמין בנוגע לדוח סטטוס"
 
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "No task_output information found for instructor_task {0}"
 msgstr "לא נמצא מידע task_output עבור instructor_task {0}"
 
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "No parsable task_output information found for instructor_task {0}: {1}"
 msgstr "לא נמצא מידע הניתן לפיצול task_output עבור instructor_task {0}: {1}"
 
@@ -6927,6 +7137,7 @@ msgid "No message provided"
 msgstr "לא סופקה הודעה"
 
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Invalid task_output information found for instructor_task {0}: {1}"
 msgstr "נמצא מידע task_output לא חוקי עבור instructor_task {0}: {1}"
 
@@ -6935,36 +7146,42 @@ msgid "No progress status information available"
 msgstr "אין דוח סטטוס זמין על התקדמות"
 
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "No parsable task_input information found for instructor_task {0}: {1}"
 msgstr "לא נמצא מידע הניתן לפיצול של task_input עבור instructor_task {0}: {1}"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} and {succeeded} are counts.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Progress: {action} {succeeded} of {attempted} so far"
 msgstr "התקדמות: {action} {succeeded} מתוך {attempted} עד כה."
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {student} is a student identifier.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Unable to find submission to be {action} for student '{student}'"
 msgstr "לא ניתן למצוא הגשה ש{action} עבור הסטודנט '{student}'"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {student} is a student identifier.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Problem failed to be {action} for student '{student}'"
 msgstr "{action} הבעיה נכשלה עבור הסטודנט '{student}'"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {student} is a student identifier.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Problem successfully {action} for student '{student}'"
 msgstr "{action} הבעיה הצליחה עבור הסטודנט '{student}'"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {student} is a student identifier.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid ""
 "Unable to find entrance exam submission to be {action} for student "
 "'{student}'"
@@ -6973,70 +7190,82 @@ msgstr "לא ניתן למצוא הגשת מבחן כניסה ש{action} עבו�
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {student} is a student identifier.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Entrance exam successfully {action} for student '{student}'"
 msgstr "{action} מבחן הכניסה בהצלחה עבור הסטודנט '{student}'"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Unable to find any students with submissions to be {action}"
 msgstr "לא ניתן למצוא סטודנט עם הגשות ש{action}"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} is a count.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Problem failed to be {action} for any of {attempted} students"
 msgstr "{action} הבעיה נכשלה עבור כל הסטודנטים {attempted}"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} is a count.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Problem successfully {action} for {attempted} students"
 msgstr "{action} הבעיה הצליחה עבור הסטודנטים {attempted}"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {succeeded} and {attempted} are counts.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Problem {action} for {succeeded} of {attempted} students"
 msgstr "{action} הבעיה {succeeded} עבור הסטודנטים {attempted}"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Unable to find any recipients to be {action}"
 msgstr "לא ניתן למצוא אף נמען ש{action}"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} is a count.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Message failed to be {action} for any of {attempted} recipients "
 msgstr "{action} ההודעה נכשלה עבור כל אחד מהנמענים {attempted} "
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} is a count.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Message successfully {action} for {attempted} recipients"
 msgstr "{action} ההודעה הצליחה עבור הנמענים {attempted}"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {succeeded} and {attempted} are counts.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Message {action} for {succeeded} of {attempted} recipients"
 msgstr "{action} ההודעה {succeeded} עבור הנמענים {attempted}"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {succeeded} and {attempted} are counts.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Status: {action} {succeeded} of {attempted}"
 msgstr "סטטוס: {action} {succeeded} של {attempted}"
 
 #. Translators: {skipped} is a count.  This message is appended to task
 #. progress status messages.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid " (skipping {skipped})"
 msgstr "(מדלג {skipped})"
 
 #. Translators: {total} is a count.  This message is appended to task progress
 #. status messages.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid " (out of {total})"
 msgstr "(מתוך {total})"
 
@@ -7124,6 +7353,7 @@ msgid "Order Payment Confirmation"
 msgstr "אישור תשלום הזמנה"
 
 #: lms/djangoapps/shoppingcart/models.py
+#, python-brace-format
 msgid ""
 "Confirmation and Registration Codes for the following courses: "
 "{course_name_list}"
@@ -7176,19 +7406,23 @@ msgid "The price per item sold, including discounts."
 msgstr "המחיר לפריט שנמכר, כולל הנחות"
 
 #: lms/djangoapps/shoppingcart/models.py
+#, python-brace-format
 msgid "Registration for Course: {course_name}"
 msgstr "רישום לקורס: {course_name}"
 
 #: lms/djangoapps/shoppingcart/models.py
+#, python-brace-format
 msgid ""
 "Please visit your {link_start}dashboard{link_end} to see your new course."
 msgstr "בקר ב{link_start}לוח הבקרה{link_end} על מנת לראות את הקורס החדש שלך."
 
 #: lms/djangoapps/shoppingcart/models.py
+#, python-brace-format
 msgid "Enrollment codes for Course: {course_name}"
 msgstr "קודי הרשמה עבור קורס: {course_name}"
 
 #: lms/djangoapps/shoppingcart/models.py
+#, python-brace-format
 msgid "Mode {mode} does not exist for {course_id}"
 msgstr "המצב {mode} אינו קיים עבור {course_id}"
 
@@ -7196,6 +7430,7 @@ msgstr "המצב {mode} אינו קיים עבור {course_id}"
 #. particular mode (i.e. Honor Code Certificate, Verified Certificate, etc)
 #. by which a user could enroll in the given course.
 #: lms/djangoapps/shoppingcart/models.py
+#, python-brace-format
 msgid "{mode_name} for course {course}"
 msgstr "{mode_name} עבור קורס {course}"
 
@@ -7208,6 +7443,7 @@ msgstr ""
 "הקורס. "
 
 #: lms/djangoapps/shoppingcart/models.py
+#, python-brace-format
 msgid ""
 "If you haven't verified your identity yet, please start the verification "
 "process ({verification_url})."
@@ -7222,6 +7458,7 @@ msgstr ""
 "הקורס. "
 
 #: lms/djangoapps/shoppingcart/models.py
+#, python-brace-format
 msgid ""
 "{refund_reminder_msg}To receive your refund, contact {billing_email}. Please"
 " include your order number in your email. Please do NOT include your credit "
@@ -7231,6 +7468,7 @@ msgstr ""
 " מספר הזמנתך בהודעת הדואר האלקטרוני. אל תכלול את פרטי כרטיס האשראי שלך."
 
 #: lms/djangoapps/shoppingcart/models.py
+#, python-brace-format
 msgid ""
 "We greatly appreciate this generous contribution and your support of the "
 "{platform_name} mission.  This receipt was prepared to support charitable "
@@ -7242,18 +7480,22 @@ msgstr ""
 " בתמורה למתנה זו."
 
 #: lms/djangoapps/shoppingcart/models.py
+#, python-brace-format
 msgid "Could not find a course with the ID '{course_id}'"
 msgstr "לא ניתן למצוא קורס עם המזהה '{course_id}'"
 
 #: lms/djangoapps/shoppingcart/models.py
+#, python-brace-format
 msgid "Donation for {course}"
 msgstr "תרומה לקורס {course}"
 
 #: lms/djangoapps/shoppingcart/models.py
+#, python-brace-format
 msgid "Donation for {platform_name}"
 msgstr "תרומה עבור {platform_name}"
 
 #: lms/djangoapps/shoppingcart/pdf.py
+#, python-brace-format
 msgid "Page {page_number} of {page_count}"
 msgstr "עמוד {page_number} מתוך {page_count}"
 
@@ -7266,11 +7508,13 @@ msgid "Order"
 msgstr "סדר"
 
 #: lms/djangoapps/shoppingcart/pdf.py
+#, python-brace-format
 msgid "{id_label} # {item_id}"
 msgstr "{id_label} # {item_id}"
 
 #: lms/djangoapps/shoppingcart/pdf.py
 #: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+#, python-brace-format
 msgid "Date: {date}"
 msgstr "תאריך: {date}"
 
@@ -7326,10 +7570,12 @@ msgid "TERMS AND CONDITIONS"
 msgstr "תנאים והתניות"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#, python-brace-format
 msgid "The payment processor did not return a required parameter: {0}"
 msgstr "מעבד התשלום לא החזיר פרמטר רצוי: {0}"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#, python-brace-format
 msgid "The payment processor returned a badly-typed value {0} for param {1}."
 msgstr "מעבד התשלום החזיר ערך שהוקלד באופן לא תקין {0} עבור פרמטר {1}."
 
@@ -7340,12 +7586,14 @@ msgid ""
 msgstr "מעבד התשלום קיבל הזמנה שמספרה אינו במערכת שלנו."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#, python-brace-format
 msgid ""
 "The amount charged by the processor {0} {1} is different than the total cost"
 " of the order {2} {3}."
 msgstr "הסכום שהמעבד חייב {0} {1} שונה מסך עלות ההזמנה {2} {3}."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#, python-brace-format
 msgid ""
 "Sorry! Our payment processor did not accept your payment. The decision they "
 "returned was {decision_text}, and the reason was {reason_text}. You were not"
@@ -7357,6 +7605,7 @@ msgstr ""
 "תשלום אחר. לשאלות הקשורות לתשלום, צור איתנו קשר בכתובת {email}."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#, python-brace-format
 msgid ""
 "Sorry! Our payment processor sent us back a payment confirmation that had "
 "inconsistent data!We apologize that we cannot verify whether the charge went"
@@ -7370,6 +7619,7 @@ msgstr ""
 "הקשורות לתשלום, צור איתנו קשר בכתובת {email}."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#, python-brace-format
 msgid ""
 "Sorry! Due to an error your purchase was charged for a different amount than"
 " the order total! The specific error message is: {error_message}. Your "
@@ -7381,6 +7631,7 @@ msgstr ""
 "הקשורות ספציפית לתשלום צור איתנו קשר בכתובת {email}."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#, python-brace-format
 msgid ""
 "Sorry! Our payment processor sent us back a corrupted message regarding your"
 " charge, so we are unable to validate that the message actually came from "
@@ -7552,6 +7803,7 @@ msgid ""
 msgstr "המעבד דחה באופן כללי.  תיקון אפשרי: נסה שוב עם אמצעי תשלום אחר"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#, python-brace-format
 msgid ""
 "There is a problem with our CyberSource merchant configuration.  Please let "
 "us know at {0}"
@@ -7655,10 +7907,12 @@ msgid "UNKNOWN REASON"
 msgstr "סיבה לא ידועה"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+#, python-brace-format
 msgid "The payment processor did not return a required parameter: {parameter}"
 msgstr "מעבד התשלום לא החזיר פרמטר רצוי: {parameter}"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+#, python-brace-format
 msgid ""
 "The payment processor returned a badly-typed value {value} for parameter "
 "{parameter}."
@@ -7666,6 +7920,7 @@ msgstr ""
 "מעבד התשלום החזיר ערך שהוקלד באופן לא תקין {value} עבור פרמטר {parameter}."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+#, python-brace-format
 msgid ""
 "The amount charged by the processor {charged_amount} "
 "{charged_amount_currency} is different than the total cost of the order "
@@ -7675,6 +7930,7 @@ msgstr ""
 "ההזמנה {total_cost} {total_cost_currency}."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+#, python-brace-format
 msgid ""
 "Sorry! Our payment processor did not accept your payment.  The decision they"
 " returned was {decision}, and the reason was {reason}.  You were not "
@@ -7686,6 +7942,7 @@ msgstr ""
 " הקשורות לתשלום, צור איתנו קשר בכתובת {email}."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+#, python-brace-format
 msgid ""
 "Sorry! Our payment processor sent us back a payment confirmation that had "
 "inconsistent data! We apologize that we cannot verify whether the charge "
@@ -7699,6 +7956,7 @@ msgstr ""
 "לשאלות הקשורות לתשלום, צור איתנו קשר בכתובת {email}."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+#, python-brace-format
 msgid ""
 "Sorry! Due to an error your purchase was charged for a different amount than"
 " the order total! The specific error message is: {msg}. Your credit card has"
@@ -7710,6 +7968,7 @@ msgstr ""
 "לתשלום, צור איתנו קשר בכתובת {email}."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+#, python-brace-format
 msgid ""
 "Sorry! Our payment processor sent us back a corrupted message regarding your"
 " charge, so we are unable to validate that the message actually came from "
@@ -7725,6 +7984,7 @@ msgstr ""
 "בכתובת {email}."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+#, python-brace-format
 msgid ""
 "Sorry! Our payment processor sent us back a message saying that you have "
 "cancelled this transaction. The items in your shopping cart will exist for "
@@ -7736,6 +7996,7 @@ msgstr ""
 "בשוגג, צור איתנו קשר בנגוע לשאלות ספציפיות לתשלום בכתובת {email}."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+#, python-brace-format
 msgid ""
 "We're sorry, but this payment was declined. The items in your shopping cart "
 "have been saved. If you have any questions about this transaction, please "
@@ -7745,6 +8006,7 @@ msgstr ""
 "{email} במידה וישנן שאלות כלשהן בנוגע לעסקה. "
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+#, python-brace-format
 msgid ""
 "Sorry! Your payment could not be processed because an unexpected exception "
 "occurred. Please contact us at {email} for assistance."
@@ -7933,6 +8195,7 @@ msgid ""
 msgstr "המעבד דחה באופן כללי.  פעולה אפשרית: נסה שוב עם אמצעי תשלום אחר."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+#, python-brace-format
 msgid ""
 "There is a problem with the information in your CyberSource account.  Please"
 " let us know at {0}"
@@ -8159,10 +8422,12 @@ msgid "The course you requested does not exist."
 msgstr "הקורס שביקשת אינו קיים."
 
 #: lms/djangoapps/shoppingcart/views.py
+#, python-brace-format
 msgid "The course {course_id} is already in your cart."
 msgstr "הקורס {course_id} כבר בעגלת הקניות שלך."
 
 #: lms/djangoapps/shoppingcart/views.py
+#, python-brace-format
 msgid "You are already registered in course {course_id}."
 msgstr "הנך רשום כבר לקורס {course_id}. "
 
@@ -8171,18 +8436,22 @@ msgid "Course added to cart."
 msgstr "קורס התווסף לעגלת הקניות."
 
 #: lms/djangoapps/shoppingcart/views.py
+#, python-brace-format
 msgid "Discount does not exist against code '{code}'."
 msgstr "ההנחה אינה קיימת אל מול הקוד ({code})."
 
 #: lms/djangoapps/shoppingcart/views.py
+#, python-brace-format
 msgid "This enrollment code ({enrollment_code}) is no longer valid."
 msgstr "קוד הרשמה זה ({enrollment_code}) כבר אינו תקף."
 
 #: lms/djangoapps/shoppingcart/views.py
+#, python-brace-format
 msgid "This enrollment code ({enrollment_code}) is not valid."
 msgstr "קוד הרשמה זה ({enrollment_code}) אינו תקף."
 
 #: lms/djangoapps/shoppingcart/views.py
+#, python-brace-format
 msgid ""
 "Code '{registration_code}' is not valid for any course in the shopping cart."
 msgstr "הקוד '{registration_code}' אינו תקף לאף קורס בעגלת הקניות."
@@ -8249,18 +8518,22 @@ msgid "User not found"
 msgstr "משתמש לא נמצא"
 
 #: lms/djangoapps/support/views/refund.py
+#, python-brace-format
 msgid "Course {course_id} not past the refund window."
 msgstr "קורס {course_id} לא עבר את טווח הזמן להחזר."
 
 #: lms/djangoapps/support/views/refund.py
+#, python-brace-format
 msgid "No order found for {user} in course {course_id}"
 msgstr "לא נמצאה הזמנה עבור {user} בקורס {course_id}"
 
 #: lms/djangoapps/support/views/refund.py
+#, python-brace-format
 msgid "Unenrolled {user} from {course_id}"
 msgstr "בטל הרשמת {user} בקורס {course_id}"
 
 #: lms/djangoapps/support/views/refund.py
+#, python-brace-format
 msgid "Refunded {cost} for order id {order_id}"
 msgstr "הוחזר תשלום של {cost} עבור מזהה הזמנה {order_id}."
 
@@ -8274,6 +8547,7 @@ msgid "Teams"
 msgstr "צוותים"
 
 #: lms/djangoapps/teams/views.py
+#, python-brace-format
 msgid "The supplied course id {course_id} is not valid."
 msgstr "מזהה הקורס שסופק {course_id}אינו חוקי."
 
@@ -8286,6 +8560,7 @@ msgid "text_search and order_by cannot be provided together"
 msgstr "לא ניתן לספק text_search ו-order_by"
 
 #: lms/djangoapps/teams/views.py
+#, python-brace-format
 msgid "The supplied topic id {topic_id} is not valid"
 msgstr "מזהה הנושא שסופק {topic_id} אינו חוקי"
 
@@ -8298,10 +8573,12 @@ msgstr "שגיאה בעת התחברות ל-elasticsearch"
 #. 'name', indicating that the user wants to sort the
 #. list by lower case name.
 #: lms/djangoapps/teams/views.py
+#, python-brace-format
 msgid "The ordering {ordering} is not supported"
 msgstr "ההזמנה {ordering} אינה נתמכת"
 
 #: lms/djangoapps/teams/views.py
+#, python-brace-format
 msgid "The supplied course_id {course_id} is not valid."
 msgstr "מזהה הקורס שסופק {course_id}אינו חוקי."
 
@@ -8326,10 +8603,12 @@ msgid "This team is already full."
 msgstr "הצוות הזה כבר מלא."
 
 #: lms/djangoapps/teams/views.py
+#, python-brace-format
 msgid "The user {username} is already a member of a team in this course."
 msgstr "המשתמש {username} כבר חבר של צוות בקורס זה."
 
 #: lms/djangoapps/teams/views.py
+#, python-brace-format
 msgid ""
 "The user {username} is not enrolled in the course associated with this team."
 msgstr "המשתמש {username} אינו רשום בקורס המשויך לצוות זה."
@@ -8344,6 +8623,7 @@ msgid "The course key for the course we would like to be auto-cohorted."
 msgstr "מפתח הקורס עבור הקורס שברצוננו להפוך לקבוצת לימוד אוטומטית."
 
 #: lms/djangoapps/verify_student/models.py
+#, python-brace-format
 msgid "Your {platform_name} verification has expired."
 msgstr "אימות ל {platform_name} פג תוקף."
 
@@ -8445,6 +8725,7 @@ msgid "No profile found for user"
 msgstr "לא נמצא פרופיל למשתמש "
 
 #: lms/djangoapps/verify_student/views.py
+#, python-brace-format
 msgid "Name must be at least {min_length} characters long."
 msgstr "על השם להיות לפחות באורך של {min_length} אותיות."
 
@@ -8464,6 +8745,7 @@ msgid "Facebook"
 msgstr "פייסבוק"
 
 #: lms/envs/common.py
+#, python-brace-format
 msgid "Like {platform_name} on Facebook"
 msgstr "לחץ 'אהבתי' בפייסבוק ל-{platform_name} "
 
@@ -8475,6 +8757,7 @@ msgid "Twitter"
 msgstr "טוויטר"
 
 #: lms/envs/common.py
+#, python-brace-format
 msgid "Follow {platform_name} on Twitter"
 msgstr "עקוב אחר {platform_name} בטוויטר"
 
@@ -8485,6 +8768,7 @@ msgid "LinkedIn"
 msgstr "לינקדאין"
 
 #: lms/envs/common.py
+#, python-brace-format
 msgid "Follow {platform_name} on LinkedIn"
 msgstr "עקוב אחר {platform_name} בלינקדאין"
 
@@ -8495,6 +8779,7 @@ msgid "Google+"
 msgstr "גוגל+"
 
 #: lms/envs/common.py
+#, python-brace-format
 msgid "Follow {platform_name} on Google+"
 msgstr "עקוב אחר {platform_name} בגוגל+‎"
 
@@ -8517,6 +8802,7 @@ msgid "Reddit"
 msgstr "רדאיט"
 
 #: lms/envs/common.py
+#, python-brace-format
 msgid "Subscribe to the {platform_name} subreddit"
 msgstr "הירשם כמנוי ל-subreddit של {platform_name}"
 
@@ -8539,6 +8825,7 @@ msgid "Youtube"
 msgstr "יוטיוב"
 
 #: lms/envs/common.py
+#, python-brace-format
 msgid "Subscribe to the {platform_name} YouTube channel"
 msgstr "הירשם כמנוי של {platform_name} בערוץ יוטיוב"
 
@@ -9072,6 +9359,7 @@ msgid "Restoring to this revision will mark the article as deleted."
 msgstr "שחזור לעדכון זה ימחק את המאמר."
 
 #: openedx/core/djangoapps/api_admin/admin.py
+#, python-brace-format
 msgid ""
 "Once you have approved this request, go to {catalog_admin_url} to set up a "
 "catalog for this user."
@@ -9100,6 +9388,7 @@ msgid "The contact address of your company."
 msgstr "כתובת איש הקשר של החברה שלך."
 
 #: openedx/core/djangoapps/api_admin/forms.py
+#, python-brace-format
 msgid "The following users do not exist: {usernames}."
 msgstr "המשתמשים הבאים אינם קיימים: {usernames}."
 
@@ -9129,6 +9418,7 @@ msgid "The reason this user wants to access the API."
 msgstr "הסיבה שמשתמש זה רוצה לגשת ל-API."
 
 #: openedx/core/djangoapps/api_admin/models.py
+#, python-brace-format
 msgid "API access request from {company}"
 msgstr "בקשת גישה ל-API מ-{company}"
 
@@ -9140,6 +9430,7 @@ msgstr "בקשת גישה ל-API"
 #. of service.
 #. platform_name is the name of this Open edX installation.
 #: openedx/core/djangoapps/api_admin/widgets.py
+#, python-brace-format
 msgid ""
 "I, and my company, accept the {link_start}{platform_name} API Terms of "
 "Service{link_end}."
@@ -9160,14 +9451,17 @@ msgid "Parameter usage_id not provided."
 msgstr "הפרמטר usage_id לא סופק."
 
 #: openedx/core/djangoapps/bookmarks/views.py
+#, python-brace-format
 msgid "Invalid usage_id: {usage_id}."
 msgstr "usage_id לא חוקי: {usage_id}."
 
 #: openedx/core/djangoapps/bookmarks/views.py
+#, python-brace-format
 msgid "Block with usage_id: {usage_id} not found."
 msgstr "בלוק עם usage_id: {usage_id} לא נמצא."
 
 #: openedx/core/djangoapps/bookmarks/views.py
+#, python-brace-format
 msgid ""
 "You can create up to {max_num_bookmarks_per_course} bookmarks. You must "
 "remove some bookmarks before you can add new ones."
@@ -9176,6 +9470,7 @@ msgstr ""
 "סימניות לפני שתוכל להוסיף חדשות."
 
 #: openedx/core/djangoapps/bookmarks/views.py
+#, python-brace-format
 msgid "Bookmark with usage_id: {usage_id} does not exist."
 msgstr "סימון בסימניה עם usage_id: {usage_id} לא קיים."
 
@@ -9270,11 +9565,13 @@ msgid "Course Credit Eligibility"
 msgstr "כשירות לנקודות זכות בקורס"
 
 #: openedx/core/djangoapps/credit/email_utils.py
+#, python-brace-format
 msgid "You are eligible for credit from {providers_string}"
 msgstr "אתה כשיר לקבלת נקודות זכות מ-{providers_string}"
 
 #. Translators: The join of two university names (e.g., Harvard and MIT).
 #: openedx/core/djangoapps/credit/email_utils.py
+#, python-brace-format
 msgid "{first_provider} and {second_provider}"
 msgstr "{first_provider} וכן {second_provider}"
 
@@ -9282,14 +9579,17 @@ msgstr "{first_provider} וכן {second_provider}"
 #. formatting strings
 #. represents a comma-separated list of names (e.g., MIT, Harvard, Dartmouth).
 #: openedx/core/djangoapps/credit/email_utils.py
+#, python-brace-format
 msgid "{first_providers}, and {last_provider}"
 msgstr "{first_providers} וכן {last_provider}"
 
 #: openedx/core/djangoapps/credit/exceptions.py
+#, python-brace-format
 msgid "[{username}] is not eligible for credit for [{course_key}]."
 msgstr "[{username}] אינו כשיר לקבלת נקודות זכות עבור [{course_key}]."
 
 #: openedx/core/djangoapps/credit/exceptions.py
+#, python-brace-format
 msgid "[{course_key}] is not a valid course key."
 msgstr "[{course_key}] אינו מפתח קורס חוקי."
 
@@ -9393,6 +9693,7 @@ msgid "Language code not provided"
 msgstr "קוד השפה לא סופק"
 
 #: openedx/core/djangoapps/dark_lang/views.py
+#, python-brace-format
 msgid "Language set to language code: {preview_language_code}"
 msgstr "הגדרת השפה לקוד השפה: {preview_language_code}"
 
@@ -9401,6 +9702,7 @@ msgid "Language reset to the default language code"
 msgstr "איפוס השפה לקוד השפה המוגדר כברירת מחדל"
 
 #: openedx/core/djangoapps/dark_lang/views.py
+#, python-brace-format
 msgid "Language reset to user's preference: {preview_language_code}"
 msgstr "איפוס השפה להעדפת המשתמש: {preview_language_code}"
 
@@ -9447,14 +9749,17 @@ msgid "The country to which this rule applies."
 msgstr "מדינה שעבורה חל כלל זה."
 
 #: openedx/core/djangoapps/embargo/models.py
+#, python-brace-format
 msgid "Whitelist {country} for {course}"
 msgstr "רשימה לבנה {country} עבור {course} "
 
 #: openedx/core/djangoapps/embargo/models.py
+#, python-brace-format
 msgid "Blacklist {country} for {course}"
 msgstr "רשימה שחורה {country} עבור {course} "
 
 #: openedx/core/djangoapps/external_auth/views.py
+#, python-brace-format
 msgid ""
 "You have already created an account using an external login like WebAuth or "
 "Shibboleth. Please contact {tech_support_email} for support."
@@ -9474,14 +9779,17 @@ msgstr ""
 "נסה להתחבר שוב. (ייתכן שתצטרך להפעיל מחדש את הדפדפן שלך)."
 
 #: openedx/core/djangoapps/profile_images/images.py
+#, python-brace-format
 msgid "The file must be smaller than {image_max_size} in size."
 msgstr "על גודל הקובץ להיות קטן יותר מ-{image_max_size}."
 
 #: openedx/core/djangoapps/profile_images/images.py
+#, python-brace-format
 msgid "The file must be at least {image_min_size} in size."
 msgstr "על גודל הקובץ להיות לפחות {image_min_size}."
 
 #: openedx/core/djangoapps/profile_images/images.py
+#, python-brace-format
 msgid "The file must be one of the following types: {valid_file_types}."
 msgstr "הקובץ חייב להיות אחד מהסוגים הבאים: {valid_file_types}."
 
@@ -9575,22 +9883,27 @@ msgid "Enable course home page improvements."
 msgstr "אפשר שיפורים בעמוד הבית של הקורס."
 
 #: openedx/core/djangoapps/user_api/accounts/api.py
+#, python-brace-format
 msgid "The '{field_name}' field cannot be edited."
 msgstr "לא ניתן לערוך שדה '{field_name}'"
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
+#, python-brace-format
 msgid "Delete failed for user preference '{preference_key}'."
 msgstr "נכשלה מחיקת העדפות משתמש '{preference_key}'."
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
+#, python-brace-format
 msgid "Preference '{preference_key}' cannot be set to an empty value."
 msgstr "לא ניתן לקבוע ערך ריק להעדפה '{preference_key}'."
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
+#, python-brace-format
 msgid "Invalid user preference key '{preference_key}'."
 msgstr "מפתח העדפות משתמש אינו חוקי '{preference_key}'."
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
+#, python-brace-format
 msgid ""
 "Value '{preference_value}' is not valid for user preference "
 "'{preference_key}'."
@@ -9598,6 +9911,7 @@ msgstr ""
 "ערך '{preference_value}' אינו תקף עבור העדפת משתמש '{preference_key}'."
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
+#, python-brace-format
 msgid ""
 "Value '{preference_value}' not valid for preference '{preference_key}': Not "
 "in timezone set."
@@ -9606,10 +9920,12 @@ msgstr ""
 "בהגדרת אזור הזמן."
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
+#, python-brace-format
 msgid "Value '{preference_value}' is not a valid time zone selection."
 msgstr "ערך '{preference_value}' אינו בחירת אזור זמן חוקית."
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
+#, python-brace-format
 msgid "Save failed for user preference '{key}' with value '{value}'."
 msgstr "השמירה נכשלה עבור העדפת משתמש '{key}' בערך '{value}'."
 
@@ -9632,6 +9948,7 @@ msgstr "username@domain.com"
 #. Translators: These instructions appear on the password reset form,
 #. immediately below a field meant to hold the user's email address.
 #: openedx/core/djangoapps/user_api/views.py
+#, python-brace-format
 msgid "The email address you used to register with {platform_name}"
 msgstr "כתובת דואר אלקטרוני שהשתמשת בזמן רישום ל{platform_name}"
 
@@ -9656,6 +9973,7 @@ msgstr "זכור אותי"
 #. Translators: This message is shown to users who attempt to create a new
 #. account using an email address associated with an existing account.
 #: openedx/core/djangoapps/user_api/views.py
+#, python-brace-format
 msgid ""
 "It looks like {email_address} belongs to an existing account. Try again with"
 " a different email address."
@@ -9666,6 +9984,7 @@ msgstr ""
 #. Translators: This message is shown to users who attempt to create a new
 #. account using a username associated with an existing account.
 #: openedx/core/djangoapps/user_api/views.py
+#, python-brace-format
 msgid ""
 "It looks like {username} belongs to an existing account. Try again with a "
 "different username."
@@ -9702,6 +10021,7 @@ msgstr "שם משתמש ציבורי"
 #. immediately
 #. below a field meant to hold the user's public username.
 #: openedx/core/djangoapps/user_api/views.py
+#, python-brace-format
 msgid ""
 "The name that will identify you in your courses - {bold_start}(cannot be "
 "changed later){bold_end}"
@@ -9737,6 +10057,7 @@ msgstr "כתובת למשלוח דואר"
 #. Translators: This phrase appears above a field on the registration form
 #. meant to hold the user's reasons for registering with edX.
 #: openedx/core/djangoapps/user_api/views.py
+#, python-brace-format
 msgid "Tell us why you're interested in {platform_name}"
 msgstr "ספר לנו מדוע אתה מתעניין ב{platform_name}"
 
@@ -9776,6 +10097,7 @@ msgstr "סקור את תנאי השימוש והקוד האתי"
 #. Translators: "Terms of service" is a legal document users must agree to
 #. in order to register a new account.
 #: openedx/core/djangoapps/user_api/views.py
+#, python-brace-format
 msgid "I agree to the {platform_name} {terms_of_service}"
 msgstr "אני מסכים ל{platform_name} {terms_of_service}"
 
@@ -9784,6 +10106,7 @@ msgstr "אני מסכים ל{platform_name} {terms_of_service}"
 #. Translators: "Terms of service" is a legal document users must agree to
 #. in order to register a new account.
 #: openedx/core/djangoapps/user_api/views.py
+#, python-brace-format
 msgid "You must agree to the {platform_name} {terms_of_service}"
 msgstr "עליך להסכים ל{platform_name} {terms_of_service}"
 
@@ -9805,12 +10128,13 @@ msgid "%(min_score)s is not a valid grade percentage"
 msgstr "%(min_score)s אינו אחוז דירוג חוקי"
 
 #: openedx/core/lib/gating/api.py
+#, python-brace-format
 msgid "Gating milestone for {usage_key}"
 msgstr "קבלת אבן דרך עבור {usage_key}"
 
 #: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
 msgid "Display name for this component"
-msgstr "שם תצוגה עבור רכיב זה"
+msgstr ""
 
 #: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
 msgid "Category"
@@ -9874,6 +10198,7 @@ msgid "(Unnamed)"
 msgstr "(ללא שם)"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
+#, python-brace-format
 msgid ""
 "GIT_REPO_EXPORT_DIR not set or path {0} doesn't exist, please create it, or "
 "configure a different path with GIT_REPO_EXPORT_DIR"
@@ -9947,6 +10272,7 @@ msgid "Deleted group"
 msgstr "קבוצה שנמחקה"
 
 #: cms/djangoapps/contentstore/views/assets.py
+#, python-brace-format
 msgid ""
 "File {filename} exceeds maximum size of {size_mb} MB. Please follow the "
 "instructions here to upload a file elsewhere and link to it instead: "
@@ -9964,14 +10290,17 @@ msgid "must have name of the certificate"
 msgstr "חובה לרשום את שם התעודה"
 
 #: cms/djangoapps/contentstore/views/certificates.py
+#, python-brace-format
 msgid "Certificate dict {0} missing value key '{1}'"
 msgstr "במילון התעודה  {0} חסר מפתח ערך '{1}'"
 
 #: cms/djangoapps/contentstore/views/certificates.py
+#, python-brace-format
 msgid "PermissionDenied: Failed in authenticating {user}"
 msgstr "גישה נדחתה: האימות נכשל {user}"
 
 #: cms/djangoapps/contentstore/views/component.py
+#, python-brace-format
 msgid "{platform_name} Support Levels:"
 msgstr "{platform_name} רמות תמיכה:"
 
@@ -10015,6 +10344,7 @@ msgid ""
 msgstr "אנא שנו את הארגון או את מספר הקורס כך שיהיה יחודי."
 
 #: cms/djangoapps/contentstore/views/course.py
+#, python-brace-format
 msgid ""
 "Unable to create course '{name}'.\n"
 "\n"
@@ -10082,6 +10412,7 @@ msgid "File upload corrupted. Please try again"
 msgstr "העלאת הקובץ נפגמה. נסה שוב"
 
 #: cms/djangoapps/contentstore/views/import_export.py
+#, python-brace-format
 msgid "Could not find the {0} file in the package."
 msgstr "לא ניתן למצוא את הקובץ {0} בחבילה."
 
@@ -10090,14 +10421,17 @@ msgid "Invalid data"
 msgstr "נתונים לא חוקיים"
 
 #: cms/djangoapps/contentstore/views/item.py
+#, python-brace-format
 msgid "Invalid data ({details})"
 msgstr "נתונים לא חוקיים ({details})"
 
 #: cms/djangoapps/contentstore/views/item.py
+#, python-brace-format
 msgid "Duplicate of {0}"
 msgstr "העתקה של {0}"
 
 #: cms/djangoapps/contentstore/views/item.py
+#, python-brace-format
 msgid "Duplicate of '{0}'"
 msgstr "העתקה של '{0}'"
 
@@ -10105,6 +10439,7 @@ msgstr "העתקה של '{0}'"
 #. in many languages. This is used to avoid Transifex's misinterpreting of
 #. '% o'. The percent sign is also translatable as a standalone string.
 #: cms/djangoapps/contentstore/views/item.py
+#, python-brace-format
 msgid ""
 "Students must score {score}{pct_sign} or higher to access course materials."
 msgstr ""
@@ -10118,14 +10453,17 @@ msgid "%"
 msgstr "%"
 
 #: cms/djangoapps/contentstore/views/item.py
+#, python-brace-format
 msgid "{section_or_subsection} \"{display_name}\""
 msgstr "{section_or_subsection} \"{display_name}\""
 
 #: cms/djangoapps/contentstore/views/library.py
+#, python-brace-format
 msgid "Unable to create library - missing required field '{field}'"
 msgstr "לא ניתן ליצור ספריה - חסרים שדות חובה '{field}'"
 
 #: cms/djangoapps/contentstore/views/library.py
+#, python-brace-format
 msgid ""
 "Unable to create library '{name}'.\n"
 "\n"
@@ -10161,6 +10499,7 @@ msgid "Insufficient permissions"
 msgstr "הרשאות לא מספיקות"
 
 #: cms/djangoapps/contentstore/views/user.py
+#, python-brace-format
 msgid "Could not find user by email address '{email}'."
 msgstr "לא ניתן לאתר משתמש לפי כתובת דואר אלקטרוני '{email}'."
 
@@ -10169,6 +10508,7 @@ msgid "No `role` specified."
 msgstr "לא צויין 'תפקיד'."
 
 #: cms/djangoapps/contentstore/views/user.py
+#, python-brace-format
 msgid "User {email} has registered but has not yet activated his/her account."
 msgstr "משתמש {email} נרשם אך טרם הפעיל את החשבון."
 
@@ -10248,6 +10588,7 @@ msgstr "לא ידוע"
 #. containing URLs for video encodings for the named profile
 #. (e.g. desktop, mobile high quality, mobile low quality)
 #: cms/djangoapps/contentstore/views/videos.py
+#, python-brace-format
 msgid "{profile_name} URL"
 msgstr "{profile_name} כתובת URL "
 
@@ -10262,6 +10603,7 @@ msgstr "הוספת תאריך"
 #. Translators: This is the suggested filename when downloading the URL
 #. listing for videos uploaded through Studio
 #: cms/djangoapps/contentstore/views/videos.py
+#, python-brace-format
 msgid "{course}_video_urls"
 msgstr "{course}_video_urls"
 
@@ -10337,6 +10679,7 @@ msgid "Course is already in published state."
 msgstr "הקורס נמצא כבר בשלב הפרסום."
 
 #: cms/djangoapps/models/settings/course_metadata.py
+#, python-brace-format
 msgid "Incorrect format for field '{name}'. {detailed_message}"
 msgstr "פורמט לא תקין עבור שדה  '{name}'. {detailed_message}"
 
@@ -10623,7 +10966,7 @@ msgstr "התנתק"
 
 #: common/lib/capa/capa/templates/codeinput.html
 msgid "Code Editor"
-msgstr ""
+msgstr "עורך קוד"
 
 #: common/templates/license.html
 msgid "All Rights Reserved"
@@ -10655,35 +10998,35 @@ msgstr "חלק מהזכויות שמורות"
 
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Feedback Form"
-msgstr ""
+msgstr "טופס משוב"
 
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Email: {email}"
-msgstr ""
+msgstr "דואר אלקטרוני: {email}"
 
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Full Name: {realname}"
-msgstr ""
+msgstr "שם מלא: {realname} "
 
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Inquiry Type: {inquiry_type}"
-msgstr ""
+msgstr "סוג הודעה: {inquiry_type}"
 
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Message: {message}"
-msgstr ""
+msgstr "הודעה: {message} "
 
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Tags: {tags}"
-msgstr ""
+msgstr "תגיות: {tags}"
 
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Additional Info:"
-msgstr ""
+msgstr "מידע נוסף:"
 
 #: common/templates/emails/contact_us_feedback_email_subject.txt
 msgid "Feedback from user"
-msgstr ""
+msgstr "משוב משתמש"
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_board.html
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
@@ -10747,11 +11090,11 @@ msgstr "הסתר ביאור"
 
 #: lms/templates/bookmark_button.html
 msgid "Click to remove"
-msgstr "לחץ למחיקה"
+msgstr ""
 
 #: lms/templates/bookmark_button.html
 msgid "Click to add"
-msgstr "לחץ להוספה"
+msgstr ""
 
 #: lms/templates/bookmark_button.html lms/templates/seq_module.html
 msgid "Bookmarked"
@@ -10763,7 +11106,7 @@ msgstr "סמן עמוד זה"
 
 #: lms/templates/conditional_module.html
 msgid "You do not have access to this dependency module."
-msgstr ""
+msgstr "אין לך גישה ליחידת תפקוד תלויה זו."
 
 #: lms/templates/course.html
 msgid "LEARN MORE"
@@ -10775,7 +11118,7 @@ msgstr "מתחיל"
 
 #: lms/templates/course.html
 msgid "Starts: {date}"
-msgstr ""
+msgstr "מתחיל: {date}"
 
 #: lms/templates/courses_list.html
 msgid "View all Courses"
@@ -11047,6 +11390,9 @@ msgid ""
 "our {link_start}detailed FAQs{link_end} where most questions have already "
 "been answered."
 msgstr ""
+"תודה על ההודעה או המשוב שלך. בדרך כלל אנו מגיבים לבקשה תוך יום עסקים אחד, "
+"מיום שני עד יום שישי. בינתיים,  אנא בדוק את  {link_start}detailed "
+"FAQs{link_end} שלנו, שם רוב השאלות כבר נענו."
 
 #: lms/templates/help_modal.html
 msgid "problem"
@@ -11102,7 +11448,7 @@ msgstr "אנא נסה שוב מאוחר יותר"
 
 #: lms/templates/hidden_content.html
 msgid "The due date for this {subsection_format} has passed."
-msgstr "תאריך העיד עבור  {subsection_format} כבר חלף."
+msgstr ""
 
 #: lms/templates/hidden_content.html
 msgid ""
@@ -11110,9 +11456,6 @@ msgid ""
 "available.{line_break}If you have completed this {subsection_format}, your "
 "grade is available on the {link_start}progress page{link_end}."
 msgstr ""
-"כיוון שחלף תאריך היעד, {subsection_format} זה אינו זמין יותר.{line_break} אם"
-" ברצונך להשלים {subsection_format} זה, ציונך יהיה זמין ב{link_start} העמוד "
-"ההמשך {link_end}."
 
 #: lms/templates/imageannotation.html
 msgid "Note: only instructors may annotate."
@@ -11454,7 +11797,7 @@ msgstr "אפס את תשובתך"
 
 #: lms/templates/problem.html
 msgid "Submit your answer"
-msgstr "שלח את תושבתך"
+msgstr ""
 
 #: lms/templates/problem.html
 msgid "You have used {num_used} of {num_total} attempt"
@@ -13591,7 +13934,7 @@ msgstr "תאריך הגשה {date}"
 
 #: lms/templates/courseware/accordion.html
 msgid "{section_format} due {{date}}"
-msgstr ""
+msgstr "{section_format} ב- {{date}}"
 
 #: lms/templates/courseware/accordion.html
 msgid "This content is graded"
@@ -13797,8 +14140,6 @@ msgid ""
 "To access course materials, you must score {required_score}% or higher on "
 "this                 exam. Your current score is {current_score}%."
 msgstr ""
-"כדי לגשת לחומרי הקורס, עליך להשיג ציון של {required_score}במבחן זה. הציון "
-"שלך היום הוא {current_score}%."
 
 #: lms/templates/courseware/courseware.html
 msgid "Your score is {current_score}%. You have passed the entrance exam."
@@ -13864,7 +14205,7 @@ msgstr "תאריכים חשובים של הקורס"
 
 #: lms/templates/courseware/info.html
 msgid "Today is {date}"
-msgstr ""
+msgstr "היום {date}"
 
 #: lms/templates/courseware/news.html
 msgid "News - MITx 6.002x"
@@ -13915,6 +14256,8 @@ msgid ""
 "{student_name}, you have met the requirements for credit in this course. "
 "{a_start}Go to your dashboard{a_end} to purchase course credit."
 msgstr ""
+"{student_name}, עמדת בדרישות לקבלת נקודות זכות בקורס זה. {a_start} עבור אל "
+"לוח הבקרה שלך {a_end} על מנת לרכוש נקודות זכות לקורס."
 
 #: lms/templates/courseware/progress.html
 msgid "{student_name}, you have not yet met the requirements for credit."
@@ -13942,7 +14285,7 @@ msgstr "האימות נדחה"
 
 #: lms/templates/courseware/progress.html
 msgid "Completed by {date}"
-msgstr ""
+msgstr "הושלם ב- {date} "
 
 #: lms/templates/courseware/progress.html
 msgid "Upcoming"
@@ -14193,15 +14536,15 @@ msgstr "בקרוב"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Ended - {date}"
-msgstr ""
+msgstr "הסתיים -  {date}  "
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Started - {date}"
-msgstr ""
+msgstr "התחיל - {date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Starts - {date}"
-msgstr ""
+msgstr "מתחיל -  {date} "
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "View Archived Course"
@@ -14554,18 +14897,18 @@ msgstr "סנן:"
 #. Translators: This is a menu option for showing all forum threads unfiltered
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Show all"
-msgstr "הצג הכל"
+msgstr ""
 
 #. Translators: This is a menu option for showing only unread forum threads
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Unread"
-msgstr "לא נקרא"
+msgstr ""
 
 #. Translators: This is a menu option for showing only unanswered forum
 #. question threads
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Unanswered"
-msgstr "לא נענה"
+msgstr ""
 
 #. Translators: This is a menu option for showing only forum threads flagged
 #. for abuse
@@ -15622,7 +15965,7 @@ msgstr "תאריך סיום הקורס:"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "No end date set"
-msgstr ""
+msgstr "לא הוגדר תאריך סיום"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Has the course started?"
@@ -17865,10 +18208,6 @@ msgid ""
 " sanctions. Unfortunately, at this time {platform_name} must comply with "
 "export controls, and we cannot allow you to access this course."
 msgstr ""
-"המערכת שלנו מראה על כך שהנך מנסה לגשת לקורס {platform_name} זה מאזור הכפוף "
-"כיום למדינה או לסנקציות כלכליות ומסחריות מארה\"ב. למרבה הצער, בשלב זה "
-"{platform_name} חייבת לציית לחוקים ולתקנות הנוגעים לפיקוח על יצוא, ואין אנו "
-"יכולים לאפשר לך לגשת לקורס זה."
 
 #: lms/templates/static_templates/faq.html
 #: themes/red-theme/lms/templates/footer.html
@@ -18095,6 +18434,7 @@ msgid ""
 "The verification deadline for {course_name} was {{date}}. Verification is no"
 " longer available."
 msgstr ""
+"תאריך היעד לאימות עבור {course_name} היה {{date}}. האימות אינו זמין יותר."
 
 #: lms/templates/verify_student/missed_deadline.html
 msgid ""
@@ -18211,8 +18551,6 @@ msgid ""
 "the edX and Open EdX logos are registered trademarks or trademarks of edX "
 "Inc."
 msgstr ""
-"© 2016 edX Inc.‎ כל הזכויות שמורות, למעט כשמצוין אחרת‏. EdX‏, Open edX וסמלי"
-" הלוגו edX ו-Open EdX הם סימני מסחר רשומים או סימני מסחר של edX Inc.‎"
 
 #: themes/edx.org/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
@@ -18565,6 +18903,9 @@ msgid ""
 "Staff or Admin role selects {em_start}Activate{em_end}. Only course team "
 "members with these roles can edit or delete an activated certificate."
 msgstr ""
+"על מנת להתחיל בהנפקת תעודות הקורס, בוחר חבר בצוות הקורס המשמש בתפקיד איש סגל"
+" או מנהל ב{em_start}הפעל{em_end}. רק חברי צוות הקורס בעלי תפקידים אלה יכולים"
+" לערוך או למחוק תעודה מופעלת."
 
 #: cms/templates/certificates.html
 msgid ""
@@ -18705,8 +19046,6 @@ msgid ""
 "Use this ID when you create links to this unit from other course content. "
 "You enter the ID in the URL field."
 msgstr ""
-"השתמש במזהה זה כאשר אתה יוצר קישורים ליחידה זו מתוכן קורס אחר. עליך להזין את"
-" המזהה בכתובת ה-URL."
 
 #: cms/templates/container.html
 msgid "Location in Course Outline"
@@ -18797,8 +19136,6 @@ msgid ""
 "The unique number that identifies the new course within the organization.  "
 "(This number is often the same as the original course number.)"
 msgstr ""
-"המספר הייחודי המזהה את הקורס החדש בתוך הארגון.  (לרוב מספר זה זהה  למספר "
-"הקורס המקורי)."
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/settings.html
@@ -20052,7 +20389,7 @@ msgstr "ספריה חדשה"
 
 #: cms/templates/index.html
 msgid "New Program"
-msgstr "תכנית חדשה"
+msgstr ""
 
 #: cms/templates/index.html
 msgid "Please correct the highlighted fields below."
@@ -20340,15 +20677,15 @@ msgstr ""
 
 #: cms/templates/index.html
 msgid "You haven't created any programs yet."
-msgstr "לא יצרת עדיין שום תכניות."
+msgstr ""
 
 #: cms/templates/index.html
 msgid "Programs are groups of courses related to a common subject."
-msgstr "תכניות הן קבוצות של קורסים בעלי נושא משותף."
+msgstr ""
 
 #: cms/templates/index.html
 msgid "Create Your First Program"
-msgstr "צור את התוכנית הראשונה שלך"
+msgstr ""
 
 #: cms/templates/index.html
 msgid "New to {studio_name}?"
@@ -20634,7 +20971,7 @@ msgstr ""
 
 #: cms/templates/program_authoring.html cms/templates/widgets/header.html
 msgid "Program Administration"
-msgstr "מינהל התכנית"
+msgstr ""
 
 #: cms/templates/register.html cms/templates/widgets/header.html
 msgid "Sign Up"
@@ -20973,7 +21310,7 @@ msgstr "סקירת הקורס"
 
 #: cms/templates/settings.html
 msgid "HTML Code Editor"
-msgstr ""
+msgstr "עורך קוד HTML"
 
 #: cms/templates/settings.html
 msgid ""
@@ -21445,6 +21782,9 @@ msgid ""
 "format on this page, an automated process creates those additional formats "
 "and stores them for you."
 msgstr ""
+"על מנת שסרטון וידאו יוכל להתנגן במכשירים שונים, עליו להיות זמין במספר "
+"פורמטים. לאחר העלאת קובץ הווידאו המקורי בפורמט {file_formats} שבעמוד זה, "
+"תהליך אוטומטי ייצור פורמטים נוספים ויאחסן אותם עבורך."
 
 #: cms/templates/videos_index.html
 msgid "Maximum Video File Size"
@@ -21455,6 +21795,8 @@ msgid ""
 "The maximum size for each video file that you upload is {em_start}5 "
 "GB{em_end}. The upload process fails for larger files."
 msgstr ""
+"הגודל המקסימלי לכל קובץ וידאו שניתן להעלות הוא {em_start} 5 GB {em_end}. "
+"תהליך ההעלאה ייכשל עבור קבצים גדולים יותר."
 
 #: cms/templates/videos_index.html
 msgid "Monitoring files as they upload"
@@ -21509,6 +21851,13 @@ msgid ""
 " as soon as its status is {em_start}Ready{em_end}, although processing may "
 "not be complete for all encodings and all video hosting sites."
 msgstr ""
+"כאשר סטטוס הקובץ הוא {em_start}מוכן{em_end}, תוכל להוסיף את קובץ הווידאו "
+"לרכיב שבקורס שלך. העתק מזהה סרטון וידאו ייחודי. בחלון דפדפן אחר, בדף 'תרשים "
+"הקורס', צור או אתר רכיב וידאו כדי להפעיל את סרטון הווידאו הזה. ערוך את רכיב "
+"הווידאו כדי להדביק את המזהה בשדה ההגדרה המתקדמת {em_start}מזהה סרטון "
+"וידאו{em_end}. סרטון הווידאו יכול להיות מופעל במערכת ניהול הלמידה ברגע "
+"שהסטטוס שלו הוא {em_start}מוכן{em_end}, אף על פי שהעיבוד לא הושלם עבור כל "
+"הקידודים וכל אתרי האירוח של הווידאו."
 
 #: cms/templates/visibility_editor.html
 msgid "No content groups exist"
@@ -21954,7 +22303,7 @@ msgstr "מאמר פתוח לעריכה"
 
 #: wiki/forms.py
 msgid "Filter..."
-msgstr "מסנן..."
+msgstr ""
 
 #: wiki/core/plugins/base.py
 msgid "Settings for plugin"

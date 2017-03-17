@@ -43,6 +43,7 @@
 # pacha <patrick.chau@wanadoo.fr>, 2015
 # Philippe Chiu <philippe.chiu@gmail.com>, 2013
 # Philippe Chiu <philippe.chiu@gmail.com>, 2013
+# Pyrog <pyrog@laposte.net>, 2017
 # qcappart <quentin.c@swing.be>, 2014
 # qcappart <quentin.c@swing.be>, 2014
 # rafcha <raphael.chay@gmail.com>, 2014-2016
@@ -80,6 +81,7 @@
 # Françoise Docq, 2014
 # Gérard Vidal <Gerard.Vidal@ens-lyon.fr>, 2014-2015
 # Dosto92 <hakim.poubelle@gmail.com>, 2014
+# Harifetra Ramamonjy <harifetraram@gmail.com>, 2017
 # Julien Rolland <julien.rolland33@gmail.com>, 2013
 # Julien Colmonts <julien.colmonts@student.uclouvain.be>, 2014
 # Julien Rolland <julien.rolland33@gmail.com>, 2013
@@ -124,7 +126,7 @@
 # INARES <contact@inares.org>, 2015
 # Kévin SEVERIN <kevin.severin@laposte.net>, 2015
 # Laetitia Pfaender <l.pfaender@learning-tribes.com>, 2016
-# laurentFUN <laurent.at.fun@gmail.com>, 2016
+# laurentFUN <laurent.at.fun@gmail.com>, 2016-2017
 # laurentFUN <laurent.at.fun@gmail.com>, 2016
 # Linda B.A <siria242@gmail.com>, 2016
 # Marie-Andrée Coulombe <coulombe.ma@gmail.com>, 2014
@@ -163,8 +165,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-01-05 17:02+0000\n"
-"PO-Revision-Date: 2017-01-05 17:07+0000\n"
+"POT-Creation-Date: 2017-03-09 20:48+0000\n"
+"PO-Revision-Date: 2017-03-09 20:58+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: French (http://www.transifex.com/open-edx/edx-platform/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -183,8 +185,8 @@ msgstr ""
 #: cms/static/js/views/edit_textbook.js
 #: cms/static/js/views/list_item_editor.js
 #: cms/static/js/views/modals/edit_xblock.js cms/static/js/views/tabs.js
-#: cms/static/js/views/tabs.js.c cms/static/js/views/utils/xblock_utils.js
-#: lms/static/js/ccx/schedule.js lms/static/js/views/fields.js
+#: cms/static/js/views/utils/xblock_utils.js lms/static/js/ccx/schedule.js
+#: lms/static/js/views/fields.js
 msgid "Saving"
 msgstr "Enregistrement en cours"
 
@@ -307,7 +309,6 @@ msgid "Ok"
 msgstr "Ok"
 
 #: cms/static/js/views/manage_users_and_roles.js
-#: lms/static/coffee/src/instructor_dashboard/util.js
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Unknown"
 msgstr "Inconnu"
@@ -2216,8 +2217,10 @@ msgid "Loading posts list"
 msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
-msgid "No results found for {original_query}. "
-msgstr "Aucun résultat trouvé pour {original_query}."
+msgid ""
+"No results found for {original_query}. Showing results for "
+"{suggested_query}."
+msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "No posts matched your query."
@@ -2334,13 +2337,13 @@ msgstr "déposé sur la cible"
 
 #. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
+#, javascript-format
 msgid "%s ago"
 msgstr "il y a %s "
 
 #. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
+#, javascript-format
 msgid "%s from now"
 msgstr "depuis %s "
 
@@ -2353,7 +2356,7 @@ msgid "about a minute"
 msgstr "environ une minute"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
+#, javascript-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d minute"
@@ -2364,7 +2367,7 @@ msgid "about an hour"
 msgstr "environ une heure"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
+#, javascript-format
 msgid "about %d hour"
 msgid_plural "about %d hours"
 msgstr[0] "environ %d heure"
@@ -2375,7 +2378,7 @@ msgid "a day"
 msgstr "un jour"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
+#, javascript-format
 msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] "%d jour"
@@ -2386,7 +2389,7 @@ msgid "about a month"
 msgstr "environ un mois"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
+#, javascript-format
 msgid "%d month"
 msgid_plural "%d months"
 msgstr[0] "%d mois"
@@ -2397,7 +2400,7 @@ msgid "about a year"
 msgstr "environ un an"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
+#, javascript-format
 msgid "%d year"
 msgid_plural "%d years"
 msgstr[0] "%d an"
@@ -2823,9 +2826,9 @@ msgstr ""
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid ""
 "Your request could not be completed due to a server problem. Reload the page"
+" and try again. If the issue persists, click the Help tab to report the "
+"problem."
 msgstr ""
-"Votre demande n'a pas pu être complété en raison d'un problème de serveur. "
-"Rafraîchissez la page"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Team Search"
@@ -2947,785 +2950,6 @@ msgstr "Prévisualisation HTML de l'article"
 #: lms/static/coffee/src/customwmd.js
 msgid "Post body"
 msgstr "Corps du message"
-
-#: lms/static/coffee/src/instructor_dashboard/data_download.js
-#: lms/static/js/instructor_dashboard/data_download.js
-msgid "Loading data..."
-msgstr "Chargement des données..."
-
-#: lms/static/coffee/src/instructor_dashboard/data_download.js
-#: lms/static/js/instructor_dashboard/data_download.js
-msgid "Error getting issued certificates list."
-msgstr "Erreur lors de la récupération de la liste des certificats délivrés."
-
-#: lms/static/coffee/src/instructor_dashboard/data_download.js
-#: lms/static/js/instructor_dashboard/data_download.js
-msgid "Error generating proctored exam results. Please try again."
-msgstr ""
-"Erreur lors de la génération des résultats d'examens supervisés. Merci "
-"d'essayer à nouveau."
-
-#: lms/static/coffee/src/instructor_dashboard/data_download.js
-#: lms/static/js/instructor_dashboard/data_download.js
-msgid "Error generating survey results. Please try again."
-msgstr ""
-"Erreur lors de la génération des résultats d'enquête. Merci d'essayer à "
-"nouveau."
-
-#: lms/static/coffee/src/instructor_dashboard/data_download.js
-#: lms/static/js/instructor_dashboard/data_download.js
-msgid "Error generating student profile information. Please try again."
-msgstr ""
-"Erreur lors de la création des informations du profil étudiant. Merci "
-"d’essayer à nouveau."
-
-#: lms/static/coffee/src/instructor_dashboard/data_download.js
-#: lms/static/js/bookmarks/views/bookmarks_list.js
-#: lms/static/js/instructor_dashboard/data_download.js
-#: lms/templates/search/search_loading.underscore
-msgid "Loading"
-msgstr "Chargement"
-
-#: lms/static/coffee/src/instructor_dashboard/data_download.js
-#: lms/static/js/instructor_dashboard/data_download.js
-msgid "Error getting student list."
-msgstr "Erreur lors de la récupération de la liste des étudiants."
-
-#: lms/static/coffee/src/instructor_dashboard/data_download.js
-#: lms/static/js/instructor_dashboard/data_download.js
-msgid "Error generating list of students who may enroll. Please try again."
-msgstr ""
-"Erreur lors de la génération de la liste des étudiants pouvant s'inscrire. "
-"Merci d'essayer de nouveau."
-
-#: lms/static/coffee/src/instructor_dashboard/data_download.js
-#: lms/static/js/instructor_dashboard/data_download.js
-msgid "Error retrieving grading configuration."
-msgstr "Erreur lors de la récupération de la configuration de la notation."
-
-#: lms/static/coffee/src/instructor_dashboard/data_download.js
-#: lms/static/js/instructor_dashboard/data_download.js
-msgid "Error generating grades. Please try again."
-msgstr "Erreur lors de la génération des notes. Merci d’essayer à nouveau."
-
-#: lms/static/coffee/src/instructor_dashboard/data_download.js
-#: lms/static/js/instructor_dashboard/data_download.js
-msgid "Error generating problem grade report. Please try again."
-msgstr ""
-"Erreur lors de la génération du rapport des notes. Merci d’essayer à "
-"nouveau."
-
-#: lms/static/coffee/src/instructor_dashboard/data_download.js
-#: lms/static/js/instructor_dashboard/data_download.js
-msgid "Error generating ORA data report. Please try again."
-msgstr ""
-"Erreur lors de la génération du rapport de données ORA. Merci d’essayer à "
-"nouveau."
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-#: lms/static/js/student_account/views/account_settings_factory.js
-#: lms/static/js/student_profile/views/learner_profile_factory.js
-#: lms/templates/financial-assistance/financial_assessment_form.underscore
-msgid "Username"
-msgstr "Nom d'utilisateur"
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "Email"
-msgstr "Email"
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "Revoke access"
-msgstr "Retirer l'accès"
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "Enter username or email"
-msgstr "Veuillez saisir un nom d'utilisateur ou un email."
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "Please enter a username or email."
-msgstr "Veuillez saisir un nom d'utilisateur ou un email."
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "Error changing user's permissions."
-msgstr "Erreur lors du changement des permissions de l'utilisateur."
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid ""
-"Could not find a user with username or email address '<%- identifier %>'."
-msgstr ""
-"Impossible de trouver un utilisateur avec le nom d'utilisateur ou adresse "
-"email \"<%- identifier %>\"."
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid ""
-"Error: User '<%- username %>' has not yet activated their account. Users "
-"must create and activate their accounts before they can be assigned a role."
-msgstr ""
-"Erreur : L'utilisateur \"<%- username %>\" n'a pas encore activé son compte."
-" Les utilisateurs doivent créer et activer leurs comptes avant qu'ils ne "
-"puissent se voir attribuer un rôle."
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "Error: You cannot remove yourself from the Instructor group!"
-msgstr ""
-"Erreur : Vous ne pouvez pas vous supprimer vous-même du groupe des "
-"enseignants !"
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "Errors"
-msgstr "Erreurs"
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "The following errors were generated:"
-msgstr "Les erreurs suivantes ont été générées:"
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "Warnings"
-msgstr "Avertissements"
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "The following warnings were generated:"
-msgstr "Les avertissements suivants ont été générés:"
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-#: lms/static/js/views/fields.js
-msgid "Success"
-msgstr "Opération réussie"
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "All accounts were created successfully."
-msgstr "Tous les comptes ont été créés avec succès."
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "Error adding/removing users as beta testers."
-msgstr ""
-"Erreur lors de l'ajout/suppression d'utilisateurs en que tant que bêta-"
-"testeurs."
-
-#. Translators: A list of users appears after this sentence;
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "These users were successfully added as beta testers:"
-msgstr "Ces utilisateurs ont été ajoutés comme bêta-testeurs avec succès :"
-
-#. Translators: A list of users appears after this sentence;
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "These users were successfully removed as beta testers:"
-msgstr "Ces utilisateurs ont été supprimés des bêta-testeurs avec succès :"
-
-#. Translators: A list of users appears after this sentence;
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "These users were not added as beta testers:"
-msgstr "Ces utilisateurs n'ont pas été ajoutés comme bêta-testeurs :"
-
-#. Translators: A list of users appears after this sentence;
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "These users were not removed as beta testers:"
-msgstr ""
-"Ces utilisateurs n'ont pas pu être supprimés en tant que bêta-testeurs :"
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid ""
-"Users must create and activate their account before they can be promoted to "
-"beta tester."
-msgstr ""
-"Les utilisateurs doivent créer et activer leur compte avant de pouvoir "
-"devenir des bêta-testeurs."
-
-#. Translators: A list of identifiers (which are email addresses and/or
-#. usernames) appears after this sentence;
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "Could not find users associated with the following identifiers:"
-msgstr "Impossible de trouver des utilisateurs associés à ces identifiants :"
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "Reason field should not be left blank."
-msgstr "Le champ Raison ne doit pas être laissé vide."
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "Error enrolling/unenrolling users."
-msgstr "Erreur lors de l'inscription/désinscription d'utilisateurs."
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "The following email addresses and/or usernames are invalid:"
-msgstr ""
-"Les adresses email et/ou noms d'utilisateurs suivants sont invalides :"
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "Successfully enrolled and sent email to the following users:"
-msgstr ""
-"Inscriptions et envoi d'e-mail réussis pour les utilisateurs suivants :"
-
-#. Translators: A list of users appears after this sentence;
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "Successfully enrolled the following users:"
-msgstr "Inscription réussie pour les utilisateurs suivants :"
-
-#. Translators: A list of users appears after this sentence;
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid ""
-"Successfully sent enrollment emails to the following users. They will be "
-"allowed to enroll once they register:"
-msgstr ""
-"Envoi d'e-mails d'inscription réussi pour les utilisateurs suivants. Ils "
-"seront autorisés à s'inscrire au cours une fois qu'ils se seront enregistrés"
-" sur la plateforme : "
-
-#. Translators: A list of users appears after this sentence;
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "These users will be allowed to enroll once they register:"
-msgstr ""
-"Ces étudiants seront autorisés à s'inscrire une fois qu'il se seront "
-"enregistrés  sur la plateforme :"
-
-#. Translators: A list of users appears after this sentence;
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid ""
-"Successfully sent enrollment emails to the following users. They will be "
-"enrolled once they register:"
-msgstr ""
-"E-mails d'inscription envoyés avec succès aux utilisateurs suivants. Ils "
-"seront inscrits dès qu'ils se seront enregistrés sur la plateforme :"
-
-#. Translators: A list of users appears after this sentence;
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "These users will be enrolled once they register:"
-msgstr ""
-"Les utilisateurs suivants seront inscrits dès leur enregistrement sur la "
-"plate-forme :"
-
-#. Translators: A list of users appears after this sentence;
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid ""
-"Emails successfully sent. The following users are no longer enrolled in the "
-"course:"
-msgstr ""
-"Les e-mails ont été envoyés avec succès. Les utilisateurs suivants ont été "
-"désinscrits du cours :"
-
-#. Translators: A list of users appears after this sentence;
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "The following users are no longer enrolled in the course:"
-msgstr "Les utilisateurs suivants ont été désinscrits du cours :"
-
-#. Translators: A list of users appears after this sentence. This situation
-#. arises when a staff member tries to unenroll a user who is not currently
-#. enrolled in this course.;
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid ""
-"These users were not affiliated with the course so could not be unenrolled:"
-msgstr ""
-"Les utilisateurs suivants n'étant pas inscrits au cours, ils n’ont pas pu "
-"être désinscrits :"
-
-#: lms/static/coffee/src/instructor_dashboard/send_email.js
-#: lms/static/js/instructor_dashboard/send_email.js
-msgid "Your message must have a subject."
-msgstr "Votre message doit contenir un sujet."
-
-#: lms/static/coffee/src/instructor_dashboard/send_email.js
-#: lms/static/js/instructor_dashboard/send_email.js
-msgid "Your message cannot be blank."
-msgstr "Votre message ne peut pas être vide."
-
-#: lms/static/coffee/src/instructor_dashboard/send_email.js
-#: lms/static/js/instructor_dashboard/send_email.js
-msgid "Your message must have at least one target."
-msgstr "Votre message doit avoir au moins un destinataire."
-
-#: lms/static/coffee/src/instructor_dashboard/send_email.js
-#: lms/static/js/instructor_dashboard/send_email.js
-msgid ""
-"There are invalid keywords in your email. Check the following keywords and "
-"try again."
-msgstr ""
-"Votre email contient des mots-clefs invalides. Vérifiez les mots-clefs "
-"suivants et recommencez."
-
-#: lms/static/coffee/src/instructor_dashboard/send_email.js
-#: lms/static/js/instructor_dashboard/send_email.js
-msgid "Yourself"
-msgstr "Vous-même"
-
-#: lms/static/coffee/src/instructor_dashboard/send_email.js
-#: lms/static/js/instructor_dashboard/send_email.js
-msgid "Everyone who has staff privileges in this course"
-msgstr "Tous ceux qui ont un statut d'équipe pédagogique pour ce cours"
-
-#: lms/static/coffee/src/instructor_dashboard/send_email.js
-#: lms/static/js/instructor_dashboard/send_email.js
-msgid "All learners who are enrolled in this course"
-msgstr "Tous les apprenants qui sont inscrits à ce cours "
-
-#: lms/static/coffee/src/instructor_dashboard/send_email.js
-#: lms/static/js/instructor_dashboard/send_email.js
-msgid "All learners in the {cohort_name} cohort"
-msgstr "Tous les apprenants de la cohorte {cohort_name}"
-
-#: lms/static/coffee/src/instructor_dashboard/send_email.js
-#: lms/static/js/instructor_dashboard/send_email.js
-msgid ""
-"Your email message was successfully queued for sending. In courses with a "
-"large number of learners, email messages to learners might take up to an "
-"hour to be sent."
-msgstr ""
-"Votre email a été mis sur liste d'attente avec succès pour l'envoi. Pour les"
-" cours avec un grand nombre d'apprenants, l'envoi des emails peut prendre "
-"jusqu'à une heure. "
-
-#: lms/static/coffee/src/instructor_dashboard/send_email.js
-#: lms/static/js/instructor_dashboard/send_email.js
-msgid ""
-"You are sending an email message with the subject {subject} to the following"
-" recipients."
-msgstr ""
-"Vous allez envoyer un email ayant pour sujet {subject} aux destinataires "
-"suivants."
-
-#: lms/static/coffee/src/instructor_dashboard/send_email.js
-#: lms/static/js/instructor_dashboard/send_email.js
-msgid "Is this OK?"
-msgstr "Est-ce correct ?"
-
-#: lms/static/coffee/src/instructor_dashboard/send_email.js
-#: lms/static/js/instructor_dashboard/send_email.js
-msgid "Error sending email."
-msgstr "Erreur lors de l’envoi de l’e-mail."
-
-#: lms/static/coffee/src/instructor_dashboard/send_email.js
-#: lms/static/js/instructor_dashboard/send_email.js
-msgid "There is no email history for this course."
-msgstr "Il n'y a pas d'historique de courriel pour ce cours"
-
-#: lms/static/coffee/src/instructor_dashboard/send_email.js
-#: lms/static/js/instructor_dashboard/send_email.js
-msgid "There was an error obtaining email task history for this course."
-msgstr ""
-"Une erreur est survenue lors de l'obtention de l'historique des tâches de "
-"courriel pour ce cours."
-
-#: lms/static/coffee/src/instructor_dashboard/send_email.js
-#: lms/static/js/instructor_dashboard/send_email.js
-msgid "There was an error obtaining email content history for this course."
-msgstr ""
-"Il y a eu une erreur lors de l'obtention de l'historique du contenu des "
-"e-mails pour ce cours."
-
-#: lms/static/coffee/src/instructor_dashboard/send_email.js
-#: lms/static/js/instructor_dashboard/send_email.js
-msgid "Send to:"
-msgstr "Envoyez à :"
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/instructor_dashboard/student_admin.js
-msgid "Please enter a student email address or username."
-msgstr ""
-"Merci d’entrer le nom d’utilisateur ou l’adresse e-mail d’un étudiant."
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-msgid ""
-"Error getting student progress url for '<%= student_id %>'. Make sure that "
-"the student identifier is spelled correctly."
-msgstr ""
-"Erreur dans l'obtention de l'url de progression de l'étudiant <%= student_id"
-" %>'. Vérifiez qu'il n'y a pas d'erreur dans l'identifiant de l'étudiant. "
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/instructor_dashboard/student_admin.js
-msgid "Please enter a problem location."
-msgstr "Merci d'introduire la localisation d'un exercice."
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-msgid ""
-"Success! Problem attempts reset for problem '<%= problem_id %>' and student "
-"'<%= student_id %>'."
-msgstr ""
-"Action effectuée avec succès ! Réinitialisation des tentatives pour le "
-"l'exercice  '<%= problem_id %>' de l'étudiant '<%= student_id %>'."
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-msgid ""
-"Error resetting problem attempts for problem '<%= problem_id %>' and student"
-" '<%= student_id %>'. Make sure that the problem and student identifiers are"
-" complete and correct."
-msgstr ""
-"Erreur dans la réinitialisation des essais pour le problème '<%= problem_id "
-"%>' et l'étudiant '<%= student_id %>'. Vérifiez qu'il n'y a pas d'erreur "
-"dans les identifiants du problème et de l'étudiant. "
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-msgid ""
-"Delete student '<%= student_id %>'s state on problem '<%= problem_id %>'?"
-msgstr ""
-"Supprimer l'état de l'étudiant '<%= student_id %>' sur l'exercice '<%= "
-"problem_id %>'?"
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-msgid ""
-"Error deleting student '<%= student_id %>'s state on problem '<%= problem_id"
-" %>'. Make sure that the problem and student identifiers are complete and "
-"correct."
-msgstr ""
-"Erreur lors de la suppression de l'état de l'étudiant '<%= student_id %>' "
-"pour le problème '<%= problem_id %>'. Vérifiez qu'il n'y a pas d'erreur dans"
-" les identifiants du problème et de l'étudiant. "
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/instructor_dashboard/student_admin.js
-msgid "Module state successfully deleted."
-msgstr "Etat du module supprimé avec succès."
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-msgid ""
-"Started rescore problem task for problem '<%= problem_id %>' and student "
-"'<%= student_id %>'. Click the 'Show Background Task History for Student' "
-"button to see the status of the task."
-msgstr ""
-"Le recalcul du score de l'exercice '<%= problem_id %>' de l'étudiant '<%= "
-"student_id %>' a commencé. Cliquez sur le bouton 'Afficher l'historique des "
-"tâches de l'étudiant' pour voir l'état de la tâche."
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-msgid ""
-"Error starting a task to rescore problem '<%= problem_id %>' for student "
-"'<%= student_id %>'. Make sure that the the problem and student identifiers "
-"are complete and correct."
-msgstr ""
-"Erreur dans le recalcul du score du problème '<%= problem_id %>' pour "
-"l'étudiant '<%= student_id %>'. Vérifiez qu'il n'y a pas d'erreur dans les "
-"identifiants du problème et de l'étudiant. "
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-msgid ""
-"Error getting task history for problem '<%= problem_id %>' and student '<%= "
-"student_id %>'. Make sure that the problem and student identifiers are "
-"complete and correct."
-msgstr ""
-"Erreur dans la récupération de l'historique du problème '<%= problem_id %>' "
-"pour l'étudiant '<%= student_id %>'. Vérifiez qu'il n'y a pas d'erreur dans "
-"les identifiants du problème et de l'étudiant. "
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/instructor_dashboard/student_admin.js
-msgid "Entrance exam attempts is being reset for student '{student_id}'."
-msgstr ""
-"Le nombre d'examens d'entrée est réinitialisé pour l'étudiant "
-"'{student_id}'."
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/instructor_dashboard/student_admin.js
-msgid ""
-"Error resetting entrance exam attempts for student '{student_id}'. Make sure"
-" student identifier is correct."
-msgstr ""
-"Erreur lors de la réinitialisation du nombre d'examens d'entrée pour "
-"l'étudiant '{student_id}'. Assurez-vous que l'identifiant étudiant est "
-"correct."
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-msgid ""
-"Started entrance exam rescore task for student '{student_id}'. Click the "
-"'Show Background Task History for Student' button to see the status of the "
-"task."
-msgstr ""
-"Le recalcul du score de l'examen d'entrée de l'étudiant'{student_id}' a "
-"commencé. Cliquez sur le bouton 'Afficher l'historique des tâches de "
-"l'étudiant' pour voir l'état de la tâche."
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/instructor_dashboard/student_admin.js
-msgid ""
-"Error starting a task to rescore entrance exam for student '{student_id}'. "
-"Make sure that entrance exam has problems in it and student identifier is "
-"correct."
-msgstr ""
-"Erreur dans le démarrage de la tâche de recalcul du score de l'examen "
-"d'entrée pour l'étudiant  '{student_id}'. Assurez-vous que l'examen d'entrée"
-" comporte des exercices et que l'identifiant de l'étudiant est correct."
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/instructor_dashboard/student_admin.js
-msgid "Enter a student's username or email address."
-msgstr "Entrez un nom d'utilisateur et un email."
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/instructor_dashboard/student_admin.js
-msgid ""
-"Do you want to allow this student ('{student_id}') to skip the entrance "
-"exam?"
-msgstr "Voulez-vous dispenser l'étudiant ('{student_id}') d'examen d'entrée?"
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/instructor_dashboard/student_admin.js
-msgid ""
-"An error occurred. Make sure that the student's username or email address is"
-" correct and try again."
-msgstr ""
-"Une erreur est survenue. Assurez-vous que l'identifiant et le courriel de "
-"l'étudiant sont corrects et essayez de nouveau."
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/instructor_dashboard/student_admin.js
-msgid "Entrance exam state is being deleted for student '{student_id}'."
-msgstr ""
-"Effacement du status de l'examen d'entrée pour l'étudiant '{student_id}'."
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/instructor_dashboard/student_admin.js
-msgid ""
-"Error deleting entrance exam state for student '{student_id}'. Make sure "
-"student identifier is correct."
-msgstr ""
-"Erreur de suppression du status d'examen d'entrée pour l'étudiant "
-"'{student_id}'. Assurez-vous que l'identifiant étudiant est correct."
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/instructor_dashboard/student_admin.js
-msgid ""
-"Error getting entrance exam task history for student '{student_id}'. Make "
-"sure student identifier is correct."
-msgstr ""
-"Erreur d'obtention de l'historique d'examen d'entrée pour l'étudiant "
-"'{student_id}'. Assurez-vous que l'identifiant étudiant est correct."
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-msgid "Reset attempts for all students on problem '<%= problem_id %>'?"
-msgstr ""
-"Réinitialiser les tentatives de tous les étudiants pour l'exercice '<%= "
-"problem_id %>'?"
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-msgid ""
-"Successfully started task to reset attempts for problem '<%= problem_id %>'."
-" Click the 'Show Background Task History for Problem' button to see the "
-"status of the task."
-msgstr ""
-"Démarrage de la tâche consistant à réinitialiser les tentatives pour "
-"l'exercice '<%= problem_id %>' effectué avec succès. Cliquez sur le bouton "
-"'Montrer l'historique des tâches pour l'exercice' pour voir l'état de la "
-"tâche."
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-msgid ""
-"Error starting a task to reset attempts for all students on problem '<%= "
-"problem_id %>'. Make sure that the problem identifier is complete and "
-"correct."
-msgstr ""
-"Erreur dans la réinitialisation des essais de tous les étudiants pour le "
-"problème '<%= problem_id %>'. Vérifiez que l'identifiant du problème est "
-"complet et correct. "
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-msgid "Rescore problem '<%= problem_id %>' for all students?"
-msgstr ""
-"Recalculer le score de l'exercice '<%= problem_id %>' pour tous les "
-"étudiants ?"
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-msgid ""
-"Successfully started task to rescore problem '<%= problem_id %>' for all "
-"students. Click the 'Show Background Task History for Problem' button to see"
-" the status of the task."
-msgstr ""
-"Démarrage de la tâche consistant à recalculer le score de l'exercice '<%= "
-"problem_id %>' pour tous les étudiants effectué avec succès. Cliquez sur le "
-"bouton 'Montrer l'historique des tâches pour l'exercice' pour voir l'état de"
-" la tâche."
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-msgid ""
-"Error starting a task to rescore problem '<%= problem_id %>'. Make sure that"
-" the problem identifier is complete and correct."
-msgstr ""
-"Erreur dans le recalcul des scores du problèmes '<%= problem_id %>'. "
-"Vérifiez que l'identifiant du problème est complet et correct. "
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/instructor_dashboard/student_admin.js
-msgid "Error listing task history for this student and problem."
-msgstr ""
-"Erreur lors de l'affichage de l'historique des tâches pour cet étudiant et "
-"cet exercice."
-
-#. Translators: a "Task" is a background process such as grading students or
-#. sending email
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Task Type"
-msgstr "Type de tâche"
-
-#. Translators: a "Task" is a background process such as grading students or
-#. sending email
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Task inputs"
-msgstr "Données d'entrées de la tâche"
-
-#. Translators: a "Task" is a background process such as grading students or
-#. sending email
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Task ID"
-msgstr "Id de la tâche"
-
-#. Translators: a "Requester" is a username that requested a task such as
-#. sending email
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Requester"
-msgstr "Demandeur"
-
-#. Translators: A timestamp of when a task (eg, sending email) was submitted
-#. appears after this
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Submitted"
-msgstr "Soumis"
-
-#. Translators: The length of a task (eg, sending email) in seconds appears
-#. this
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Duration (sec)"
-msgstr "Durée (sec)"
-
-#. Translators: The state (eg, "In progress") of a task (eg, sending email)
-#. appears after this.
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "State"
-msgstr "État"
-
-#. Translators: a "Task" is a background process such as grading students or
-#. sending email
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Task Status"
-msgstr "État de la tâche"
-
-#. Translators: a "Task" is a background process such as grading students or
-#. sending email
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Task Progress"
-msgstr "Progression de la tâche"
-
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid ""
-"An error occurred retrieving your email. Please try again later, and contact"
-" technical support if the problem persists."
-msgstr ""
-"Une erreur est survenue lors de la récupération de votre courriel. S'il vous"
-" plaît réessayez plus tard, et contactez le support technique si le problème"
-" persiste."
-
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Subject"
-msgstr "Sujet"
-
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Sent By"
-msgstr "Envoyé par"
-
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Sent To"
-msgstr "Envoyé à"
-
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Time Sent"
-msgstr "Heure d'envoi"
-
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Number Sent"
-msgstr "Nombre envoyé"
-
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Copy Email To Editor"
-msgstr "Copier le courrier à l'éditeur"
-
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Subject:"
-msgstr "Sujet:"
-
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Sent By:"
-msgstr "Envoyé par :"
-
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Time Sent:"
-msgstr "Heure d'envoi :"
-
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Sent To:"
-msgstr "Envoyé à:"
-
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Message:"
-msgstr "Message :"
-
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "No tasks currently running."
-msgstr "Aucune tâche active en ce moment"
-
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "File Name"
-msgstr "Nom du fichier"
-
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid ""
-"Links are generated on demand and expire within 5 minutes due to the "
-"sensitive nature of student information."
-msgstr ""
-"Les liens sont générés sur demande et expirent dans les 5 minutes à cause de"
-" la nature sensible des informations concernant l'étudiant."
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Insert Hyperlink"
@@ -3888,8 +3112,11 @@ msgid "Heading"
 msgstr "Titre"
 
 #: lms/static/js/ajax-error.js
-msgid "You have been logged out of your edX account. "
-msgstr "Vous avez été déconnecté de votre compte edX"
+msgid ""
+"You have been logged out of your edX account. Click Okay to log in again "
+"now. Click Cancel to stay on this page (you must log in again to save your "
+"work)."
+msgstr ""
 
 #: lms/static/js/api_admin/views/catalog_preview.js
 msgid "Preview this query"
@@ -3903,7 +3130,7 @@ msgstr "Une erreur est survenue. Merci de réessayer de nouveau."
 
 #: lms/static/js/bookmarks/views/bookmark_button.js
 msgid "Click to add"
-msgstr "Cliquer pour ajouter"
+msgstr ""
 
 #: lms/static/js/bookmarks/views/bookmark_button.js
 msgid "Bookmark this page"
@@ -3911,7 +3138,13 @@ msgstr "Ajouter cette page aux favoris"
 
 #: lms/static/js/bookmarks/views/bookmark_button.js
 msgid "Click to remove"
-msgstr "Cliquer pour supprimer"
+msgstr ""
+
+#: lms/static/js/bookmarks/views/bookmarks_list.js
+#: lms/static/js/instructor_dashboard/data_download.js
+#: lms/templates/search/search_loading.underscore
+msgid "Loading"
+msgstr "Chargement"
 
 #: lms/static/js/ccx/schedule.js
 msgid "All subsections"
@@ -3921,8 +3154,7 @@ msgstr "Toutes les sous-sections"
 msgid "All units"
 msgstr "Toutes les unités"
 
-#: lms/static/js/ccx/schedule.js lms/static/js/ccx/schedule.js.c
-#: lms/templates/ccx/schedule.underscore
+#: lms/static/js/ccx/schedule.js lms/templates/ccx/schedule.underscore
 msgid "Click to change"
 msgstr "Cliquez pour changer"
 
@@ -3930,7 +3162,7 @@ msgstr "Cliquez pour changer"
 msgid "Select a chapter"
 msgstr "Sélectionner un chapitre"
 
-#: lms/static/js/ccx/schedule.js lms/static/js/ccx/schedule.js.c
+#: lms/static/js/ccx/schedule.js
 msgid "Save changes"
 msgstr "Enregistrer les modifications"
 
@@ -3951,11 +3183,16 @@ msgid "Enter Start Date and Time"
 msgstr "Entrez la date et heure de début"
 
 #: lms/static/js/certificates/models/certificate_exception.js
-#: lms/static/js/certificates/models/certificate_invalidation.js
-msgid "Student username/email field is required and can not be empty. "
+msgid ""
+"Student username/email field is required and can not be empty. Kindly fill "
+"in username/email and then press \"Add to Exception List\" button."
 msgstr ""
-"Le champ de nom d'utilisateur/email de l'étudiant est requis et ne peut pas "
-"être vide."
+
+#: lms/static/js/certificates/models/certificate_invalidation.js
+msgid ""
+"Student username/email field is required and can not be empty. Kindly fill "
+"in username/email and then press \"Invalidate Certificate\" button."
+msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid "Uploaded file issues. Click on \"+\" to view."
@@ -3970,18 +3207,16 @@ msgid " learner is successfully added to the exception list"
 msgstr "apprenant ajouté avec succès à la liste d'exception"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " records are not in correct format and not added to"
-msgstr "enregistrements ne sont pas dans le bon format et non ajoutés dans"
-
-#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " record is not in correct format and not added to the exception"
+msgid " records are not in correct format and not added to the exception list"
 msgstr ""
-"enregistrement ne sont pas dans le bon format et non ajoutés dans les "
-"exceptions"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learners do not exist in LMS and not added to the"
-msgstr "apprenants n'existant pas dans le LMS et non ajouté dans le"
+msgid " record is not in correct format and not added to the exception list"
+msgstr ""
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learners do not exist in LMS and not added to the exception list"
+msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learner does not exist in LMS and not added to the exception list"
@@ -3989,21 +3224,21 @@ msgstr ""
 "apprenant n'existant pas dans le LMS et non ajouté dans la liste d'exception"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learners are already white listed and not added to"
-msgstr "apprenants déjà existant dans la liste blanche et non ajouté dans"
-
-#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learner is already white listed and not added to the exception "
+msgid " learners are already white listed and not added to the exception list"
 msgstr ""
-"apprenant déjà existant dans la liste blanche et non ajouté à l'exception"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learners are not enrolled in course and not added to"
-msgstr "les apprenants sont non inscrits et non ajouté à"
+msgid " learner is already white listed and not added to the exception list"
+msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learner is not enrolled in course and not added to the exception"
-msgstr "l'apprenant est non inscrit au cours et non ajouté à l'exception"
+msgid ""
+" learners are not enrolled in course and not added to the exception list"
+msgstr ""
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learner is not enrolled in course and not added to the exception list"
+msgstr ""
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
 msgid ""
@@ -4087,14 +3322,14 @@ msgid "An error occurred. Please try again later."
 msgstr "Une erreur est survenue. Veuillez essayer de nouveau plus tard."
 
 #: lms/static/js/discovery/views/search_form.js
-#, c-format
+#, javascript-format
 msgid "Viewing %s course"
 msgid_plural "Viewing %s courses"
 msgstr[0] "Voir %s cours"
 msgstr[1] "Voir %s cours"
 
 #: lms/static/js/discovery/views/search_form.js
-#, c-format
+#, javascript-format
 msgid "We couldn't find any results for \"%s\"."
 msgstr "Nous ne trouvons pas de résultat pour \"%s\"."
 
@@ -4168,7 +3403,7 @@ msgstr "[aucun tag]"
 
 #: lms/static/js/financial-assistance/views/financial_assistance_form_view.js
 msgid "Unable to submit application"
-msgstr ""
+msgstr "Impossible de soumettre votre demande"
 
 #: lms/static/js/financial-assistance/views/financial_assistance_form_view.js
 #: lms/static/js/student_account/views/LoginView.js
@@ -4369,6 +3604,62 @@ msgid "Error while regenerating certificates. Please try again."
 msgstr ""
 "Erreur lors de la génération des certificats. Merci d'essayer à nouveau."
 
+#: lms/static/js/instructor_dashboard/data_download.js
+msgid "Loading data..."
+msgstr "Chargement des données..."
+
+#: lms/static/js/instructor_dashboard/data_download.js
+msgid "Error getting issued certificates list."
+msgstr "Erreur lors de la récupération de la liste des certificats délivrés."
+
+#: lms/static/js/instructor_dashboard/data_download.js
+msgid "Error generating proctored exam results. Please try again."
+msgstr ""
+"Erreur lors de la génération des résultats d'examens supervisés. Merci "
+"d'essayer à nouveau."
+
+#: lms/static/js/instructor_dashboard/data_download.js
+msgid "Error generating survey results. Please try again."
+msgstr ""
+"Erreur lors de la génération des résultats d'enquête. Merci d'essayer à "
+"nouveau."
+
+#: lms/static/js/instructor_dashboard/data_download.js
+msgid "Error generating student profile information. Please try again."
+msgstr ""
+"Erreur lors de la création des informations du profil étudiant. Merci "
+"d’essayer à nouveau."
+
+#: lms/static/js/instructor_dashboard/data_download.js
+msgid "Error getting student list."
+msgstr "Erreur lors de la récupération de la liste des étudiants."
+
+#: lms/static/js/instructor_dashboard/data_download.js
+msgid "Error generating list of students who may enroll. Please try again."
+msgstr ""
+"Erreur lors de la génération de la liste des étudiants pouvant s'inscrire. "
+"Merci d'essayer de nouveau."
+
+#: lms/static/js/instructor_dashboard/data_download.js
+msgid "Error retrieving grading configuration."
+msgstr "Erreur lors de la récupération de la configuration de la notation."
+
+#: lms/static/js/instructor_dashboard/data_download.js
+msgid "Error generating grades. Please try again."
+msgstr "Erreur lors de la génération des notes. Merci d’essayer à nouveau."
+
+#: lms/static/js/instructor_dashboard/data_download.js
+msgid "Error generating problem grade report. Please try again."
+msgstr ""
+"Erreur lors de la génération du rapport des notes. Merci d’essayer à "
+"nouveau."
+
+#: lms/static/js/instructor_dashboard/data_download.js
+msgid "Error generating ORA data report. Please try again."
+msgstr ""
+"Erreur lors de la génération du rapport de données ORA. Merci d’essayer à "
+"nouveau."
+
 #: lms/static/js/instructor_dashboard/ecommerce.js
 msgid ""
 "There was a problem creating the report. Select \"Create Executive Summary\""
@@ -4393,11 +3684,292 @@ msgstr "Restaurer le code d'inscription"
 msgid "Mark enrollment code as unused"
 msgstr "Marquer le code d'inscription comme non utilisé"
 
+#: lms/static/js/instructor_dashboard/membership.js
+#: lms/static/js/student_account/views/account_settings_factory.js
+#: lms/static/js/student_profile/views/learner_profile_factory.js
+#: lms/templates/financial-assistance/financial_assessment_form.underscore
+msgid "Username"
+msgstr "Nom d'utilisateur"
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "Email"
+msgstr "Email"
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "Revoke access"
+msgstr "Retirer l'accès"
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "Enter username or email"
+msgstr "Veuillez saisir un nom d'utilisateur ou un email."
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "Please enter a username or email."
+msgstr "Veuillez saisir un nom d'utilisateur ou un email."
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "Error changing user's permissions."
+msgstr "Erreur lors du changement des permissions de l'utilisateur."
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid ""
+"Could not find a user with username or email address '<%- identifier %>'."
+msgstr ""
+"Impossible de trouver un utilisateur avec le nom d'utilisateur ou adresse "
+"email \"<%- identifier %>\"."
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid ""
+"Error: User '<%- username %>' has not yet activated their account. Users "
+"must create and activate their accounts before they can be assigned a role."
+msgstr ""
+"Erreur : L'utilisateur \"<%- username %>\" n'a pas encore activé son compte."
+" Les utilisateurs doivent créer et activer leurs comptes avant qu'ils ne "
+"puissent se voir attribuer un rôle."
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "Error: You cannot remove yourself from the Instructor group!"
+msgstr ""
+"Erreur : Vous ne pouvez pas vous supprimer vous-même du groupe des "
+"enseignants !"
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "Errors"
+msgstr "Erreurs"
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "The following errors were generated:"
+msgstr "Les erreurs suivantes ont été générées:"
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "Warnings"
+msgstr "Avertissements"
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "The following warnings were generated:"
+msgstr "Les avertissements suivants ont été générés:"
+
+#: lms/static/js/instructor_dashboard/membership.js
+#: lms/static/js/views/fields.js
+msgid "Success"
+msgstr "Opération réussie"
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "All accounts were created successfully."
+msgstr "Tous les comptes ont été créés avec succès."
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "Error adding/removing users as beta testers."
+msgstr ""
+"Erreur lors de l'ajout/suppression d'utilisateurs en que tant que bêta-"
+"testeurs."
+
+#. Translators: A list of users appears after this sentence;
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "These users were successfully added as beta testers:"
+msgstr "Ces utilisateurs ont été ajoutés comme bêta-testeurs avec succès :"
+
+#. Translators: A list of users appears after this sentence;
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "These users were successfully removed as beta testers:"
+msgstr "Ces utilisateurs ont été supprimés des bêta-testeurs avec succès :"
+
+#. Translators: A list of users appears after this sentence;
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "These users were not added as beta testers:"
+msgstr "Ces utilisateurs n'ont pas été ajoutés comme bêta-testeurs :"
+
+#. Translators: A list of users appears after this sentence;
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "These users were not removed as beta testers:"
+msgstr ""
+"Ces utilisateurs n'ont pas pu être supprimés en tant que bêta-testeurs :"
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid ""
+"Users must create and activate their account before they can be promoted to "
+"beta tester."
+msgstr ""
+"Les utilisateurs doivent créer et activer leur compte avant de pouvoir "
+"devenir des bêta-testeurs."
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "Could not find users associated with the following identifiers:"
+msgstr "Impossible de trouver des utilisateurs associés à ces identifiants :"
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "Reason field should not be left blank."
+msgstr "Le champ Raison ne doit pas être laissé vide."
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "Error enrolling/unenrolling users."
+msgstr "Erreur lors de l'inscription/désinscription d'utilisateurs."
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "The following email addresses and/or usernames are invalid:"
+msgstr ""
+"Les adresses email et/ou noms d'utilisateurs suivants sont invalides :"
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "Successfully enrolled and sent email to the following users:"
+msgstr ""
+"Inscriptions et envoi d'e-mail réussis pour les utilisateurs suivants :"
+
+#. Translators: A list of users appears after this sentence;
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "Successfully enrolled the following users:"
+msgstr "Inscription réussie pour les utilisateurs suivants :"
+
+#. Translators: A list of users appears after this sentence;
+#: lms/static/js/instructor_dashboard/membership.js
+msgid ""
+"Successfully sent enrollment emails to the following users. They will be "
+"allowed to enroll once they register:"
+msgstr ""
+"Envoi d'e-mails d'inscription réussi pour les utilisateurs suivants. Ils "
+"seront autorisés à s'inscrire au cours une fois qu'ils se seront enregistrés"
+" sur la plateforme : "
+
+#. Translators: A list of users appears after this sentence;
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "These users will be allowed to enroll once they register:"
+msgstr ""
+"Ces étudiants seront autorisés à s'inscrire une fois qu'il se seront "
+"enregistrés  sur la plateforme :"
+
+#. Translators: A list of users appears after this sentence;
+#: lms/static/js/instructor_dashboard/membership.js
+msgid ""
+"Successfully sent enrollment emails to the following users. They will be "
+"enrolled once they register:"
+msgstr ""
+"E-mails d'inscription envoyés avec succès aux utilisateurs suivants. Ils "
+"seront inscrits dès qu'ils se seront enregistrés sur la plateforme :"
+
+#. Translators: A list of users appears after this sentence;
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "These users will be enrolled once they register:"
+msgstr ""
+"Les utilisateurs suivants seront inscrits dès leur enregistrement sur la "
+"plate-forme :"
+
+#. Translators: A list of users appears after this sentence;
+#: lms/static/js/instructor_dashboard/membership.js
+msgid ""
+"Emails successfully sent. The following users are no longer enrolled in the "
+"course:"
+msgstr ""
+"Les e-mails ont été envoyés avec succès. Les utilisateurs suivants ont été "
+"désinscrits du cours :"
+
+#. Translators: A list of users appears after this sentence;
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "The following users are no longer enrolled in the course:"
+msgstr "Les utilisateurs suivants ont été désinscrits du cours :"
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid ""
+"These users were not affiliated with the course so could not be unenrolled:"
+msgstr ""
+"Les utilisateurs suivants n'étant pas inscrits au cours, ils n’ont pas pu "
+"être désinscrits :"
+
+#: lms/static/js/instructor_dashboard/send_email.js
+msgid "Your message must have a subject."
+msgstr "Votre message doit contenir un sujet."
+
+#: lms/static/js/instructor_dashboard/send_email.js
+msgid "Your message cannot be blank."
+msgstr "Votre message ne peut pas être vide."
+
+#: lms/static/js/instructor_dashboard/send_email.js
+msgid "Your message must have at least one target."
+msgstr "Votre message doit avoir au moins un destinataire."
+
+#: lms/static/js/instructor_dashboard/send_email.js
+msgid ""
+"There are invalid keywords in your email. Check the following keywords and "
+"try again."
+msgstr ""
+"Votre email contient des mots-clefs invalides. Vérifiez les mots-clefs "
+"suivants et recommencez."
+
+#: lms/static/js/instructor_dashboard/send_email.js
+msgid "Yourself"
+msgstr "Vous-même"
+
+#: lms/static/js/instructor_dashboard/send_email.js
+msgid "Everyone who has staff privileges in this course"
+msgstr "Tous ceux qui ont un statut d'équipe pédagogique pour ce cours"
+
+#: lms/static/js/instructor_dashboard/send_email.js
+msgid "All learners who are enrolled in this course"
+msgstr "Tous les apprenants qui sont inscrits à ce cours "
+
+#: lms/static/js/instructor_dashboard/send_email.js
+msgid "All learners in the {cohort_name} cohort"
+msgstr "Tous les apprenants de la cohorte {cohort_name}"
+
+#: lms/static/js/instructor_dashboard/send_email.js
+msgid ""
+"Your email message was successfully queued for sending. In courses with a "
+"large number of learners, email messages to learners might take up to an "
+"hour to be sent."
+msgstr ""
+"Votre email a été mis sur liste d'attente avec succès pour l'envoi. Pour les"
+" cours avec un grand nombre d'apprenants, l'envoi des emails peut prendre "
+"jusqu'à une heure. "
+
+#: lms/static/js/instructor_dashboard/send_email.js
+msgid ""
+"You are sending an email message with the subject {subject} to the following"
+" recipients."
+msgstr ""
+"Vous allez envoyer un email ayant pour sujet {subject} aux destinataires "
+"suivants."
+
+#: lms/static/js/instructor_dashboard/send_email.js
+msgid "Is this OK?"
+msgstr "Est-ce correct ?"
+
+#: lms/static/js/instructor_dashboard/send_email.js
+msgid "Error sending email."
+msgstr "Erreur lors de l’envoi de l’e-mail."
+
+#: lms/static/js/instructor_dashboard/send_email.js
+msgid "There is no email history for this course."
+msgstr "Il n'y a pas d'historique de courriel pour ce cours"
+
+#: lms/static/js/instructor_dashboard/send_email.js
+msgid "There was an error obtaining email task history for this course."
+msgstr ""
+"Une erreur est survenue lors de l'obtention de l'historique des tâches de "
+"courriel pour ce cours."
+
+#: lms/static/js/instructor_dashboard/send_email.js
+msgid "There was an error obtaining email content history for this course."
+msgstr ""
+"Il y a eu une erreur lors de l'obtention de l'historique du contenu des "
+"e-mails pour ce cours."
+
+#: lms/static/js/instructor_dashboard/send_email.js
+msgid "Send to:"
+msgstr "Envoyez à :"
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid "Please enter a student email address or username."
+msgstr ""
+"Merci d’entrer le nom d’utilisateur ou l’adresse e-mail d’un étudiant."
+
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
 "Error getting student progress url for '<%- student_id %>'. Make sure that "
 "the student identifier is spelled correctly."
 msgstr ""
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid "Please enter a problem location."
+msgstr "Merci d'introduire la localisation d'un exercice."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -4425,11 +3997,69 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/instructor_dashboard/student_admin.js
+msgid "Module state successfully deleted."
+msgstr "Etat du module supprimé avec succès."
+
+#: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
 "Error getting task history for problem '<%- problem_id %>' and student '<%- "
 "student_id %>'. Make sure that the problem and student identifiers are "
 "complete and correct."
 msgstr ""
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid "Entrance exam attempts is being reset for student '{student_id}'."
+msgstr ""
+"Le nombre d'examens d'entrée est réinitialisé pour l'étudiant "
+"'{student_id}'."
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
+"Error resetting entrance exam attempts for student '{student_id}'. Make sure"
+" student identifier is correct."
+msgstr ""
+"Erreur lors de la réinitialisation du nombre d'examens d'entrée pour "
+"l'étudiant '{student_id}'. Assurez-vous que l'identifiant étudiant est "
+"correct."
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid "Enter a student's username or email address."
+msgstr "Entrez un nom d'utilisateur et un email."
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
+"Do you want to allow this student ('{student_id}') to skip the entrance "
+"exam?"
+msgstr "Voulez-vous dispenser l'étudiant ('{student_id}') d'examen d'entrée?"
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
+"An error occurred. Make sure that the student's username or email address is"
+" correct and try again."
+msgstr ""
+"Une erreur est survenue. Assurez-vous que l'identifiant et le courriel de "
+"l'étudiant sont corrects et essayez de nouveau."
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid "Entrance exam state is being deleted for student '{student_id}'."
+msgstr ""
+"Effacement du status de l'examen d'entrée pour l'étudiant '{student_id}'."
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
+"Error deleting entrance exam state for student '{student_id}'. Make sure "
+"student identifier is correct."
+msgstr ""
+"Erreur de suppression du status d'examen d'entrée pour l'étudiant "
+"'{student_id}'. Assurez-vous que l'identifiant étudiant est correct."
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
+"Error getting entrance exam task history for student '{student_id}'. Make "
+"sure student identifier is correct."
+msgstr ""
+"Erreur d'obtention de l'historique d'examen d'entrée pour l'étudiant "
+"'{student_id}'. Assurez-vous que l'identifiant étudiant est correct."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Reset attempts for all students on problem '<%- problem_id %>'?"
@@ -4447,6 +4077,12 @@ msgid ""
 "problem_id %>'. Make sure that the problem identifier is complete and "
 "correct."
 msgstr ""
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid "Error listing task history for this student and problem."
+msgstr ""
+"Erreur lors de l'affichage de l'historique des tâches pour cet étudiant et "
+"cet exercice."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -4469,6 +4105,16 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
+"Error starting a task to rescore entrance exam for student '{student_id}'. "
+"Make sure that entrance exam has problems in it and student identifier is "
+"correct."
+msgstr ""
+"Erreur dans le démarrage de la tâche de recalcul du score de l'examen "
+"d'entrée pour l'étudiant  '{student_id}'. Assurez-vous que l'examen d'entrée"
+" comporte des exercices et que l'identifiant de l'étudiant est correct."
+
+#: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Rescore problem '<%- problem_id %>' for all students?"
 msgstr ""
 
@@ -4484,8 +4130,131 @@ msgid ""
 " the problem identifier is complete and correct."
 msgstr ""
 
+#. Translators: a "Task" is a background process such as grading students or
+#. sending email
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Task Type"
+msgstr "Type de tâche"
+
+#. Translators: a "Task" is a background process such as grading students or
+#. sending email
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Task inputs"
+msgstr "Données d'entrées de la tâche"
+
+#. Translators: a "Task" is a background process such as grading students or
+#. sending email
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Task ID"
+msgstr "Id de la tâche"
+
+#. Translators: a "Requester" is a username that requested a task such as
+#. sending email
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Requester"
+msgstr "Demandeur"
+
+#. Translators: A timestamp of when a task (eg, sending email) was submitted
+#. appears after this
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Submitted"
+msgstr "Soumis"
+
+#. Translators: The length of a task (eg, sending email) in seconds appears
+#. this
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Duration (sec)"
+msgstr "Durée (sec)"
+
+#. Translators: The state (eg, "In progress") of a task (eg, sending email)
+#. appears after this.
+#: lms/static/js/instructor_dashboard/util.js
+msgid "State"
+msgstr "État"
+
+#. Translators: a "Task" is a background process such as grading students or
+#. sending email
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Task Status"
+msgstr "État de la tâche"
+
+#. Translators: a "Task" is a background process such as grading students or
+#. sending email
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Task Progress"
+msgstr "Progression de la tâche"
+
+#: lms/static/js/instructor_dashboard/util.js
+msgid ""
+"An error occurred retrieving your email. Please try again later, and contact"
+" technical support if the problem persists."
+msgstr ""
+"Une erreur est survenue lors de la récupération de votre courriel. S'il vous"
+" plaît réessayez plus tard, et contactez le support technique si le problème"
+" persiste."
+
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Subject"
+msgstr "Sujet"
+
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Sent By"
+msgstr "Envoyé par"
+
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Sent To"
+msgstr "Envoyé à"
+
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Time Sent"
+msgstr "Heure d'envoi"
+
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Number Sent"
+msgstr "Nombre envoyé"
+
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Copy Email To Editor"
+msgstr "Copier le courrier à l'éditeur"
+
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Subject:"
+msgstr "Sujet:"
+
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Sent By:"
+msgstr "Envoyé par :"
+
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Time Sent:"
+msgstr "Heure d'envoi :"
+
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Sent To:"
+msgstr "Envoyé à:"
+
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Message:"
+msgstr "Message :"
+
+#: lms/static/js/instructor_dashboard/util.js
+msgid "No tasks currently running."
+msgstr "Aucune tâche active en ce moment"
+
+#: lms/static/js/instructor_dashboard/util.js
+msgid "File Name"
+msgstr "Nom du fichier"
+
+#: lms/static/js/instructor_dashboard/util.js
+msgid ""
+"Links are generated on demand and expire within 5 minutes due to the "
+"sensitive nature of student information."
+msgstr ""
+"Les liens sont générés sur demande et expirent dans les 5 minutes à cause de"
+" la nature sensible des informations concernant l'étudiant."
+
 #: lms/static/js/search/base/views/search_results_view.js
-#, c-format
+#, javascript-format
 msgid "%s result"
 msgid_plural "%s results"
 msgstr[0] "%s résultat"
@@ -4576,14 +4345,14 @@ msgstr "Chargement de vos cours"
 #: lms/static/js/student_account/views/FormView.js
 #: lms/static/js/student_account/views/RegisterView.js
 msgid "An error occurred."
-msgstr ""
+msgstr "Une erreur est survenue."
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid "We couldn't sign you in."
-msgstr ""
+msgstr "Nous n'avons pas pu vous connecter."
 
 #: lms/static/js/student_account/views/LoginView.js
-#, c-format
+#, javascript-format
 msgid "An error occurred when signing you in to %s."
 msgstr ""
 
@@ -4597,7 +4366,10 @@ msgid ""
 "{paragraphStart}You entered {boldStart}{email}{boldEnd}. If this email "
 "address is associated with your {platform_name} account, we will send a "
 "message with password reset instructions to this email "
-"address.{paragraphEnd}"
+"address.{paragraphEnd}{paragraphStart}If you do not receive a password reset"
+" message, verify that you entered the correct email address, or check your "
+"spam folder.{paragraphEnd}{paragraphStart}If you need further assistance, "
+"{anchorStart}contact technical support{anchorEnd}.{paragraphEnd}"
 msgstr ""
 
 #: lms/static/js/student_account/views/LoginView.js
@@ -4611,22 +4383,25 @@ msgstr ""
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
 "You have successfully signed into %(currentProvider)s, but your "
-"%(currentProvider)s"
+"%(currentProvider)s account does not have a linked %(platformName)s account."
+" To link your accounts, sign in now using your %(platformName)s password."
 msgstr ""
 
 #: lms/static/js/student_account/views/RegisterView.js
 msgid "We couldn't create your account."
-msgstr ""
+msgstr "Nous n'avons pas pu créer votre compte."
 
 #: lms/static/js/student_account/views/RegisterView.js
 msgid "You've successfully signed into %(currentProvider)s."
-msgstr ""
+msgstr "Vous êtes connectés avec succès avec %(currentProvider)s."
 
 #: lms/static/js/student_account/views/RegisterView.js
 msgid ""
 "We just need a little more information before you start learning with "
 "%(platformName)s."
 msgstr ""
+"Nous avons juste besoin d'un peu plus d'informations avant que vous "
+"commenciez votre apprentissage avec %(platformName)s."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Basic Account Information"
@@ -5144,10 +4919,6 @@ msgstr ""
 "Vous ne pouvez pas voir le cours en tant qu'étudiant ou en tant que bêta "
 "testeur avant la date de publication du cours."
 
-#: lms/templates/class_dashboard/all_section_metrics.js
-msgid "Unable to retrieve data, please try again later."
-msgstr "Impossible de récupérer les données, merci de réessayer plus tard."
-
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
 msgid "%(num_students)s student opened Subsection"
 msgid_plural "%(num_students)s students opened Subsection"
@@ -5270,7 +5041,7 @@ msgid "Image must be in PNG format."
 msgstr "Les fichiers doivent être au format PNG."
 
 #: cms/static/js/collections/group.js
-#, c-format
+#, javascript-format
 msgid "Group %s"
 msgstr "Groupe %s"
 
@@ -5605,10 +5376,10 @@ msgid "This component has validation issues."
 msgstr "Ce composant a des problèmes de validation."
 
 #: cms/static/js/programs/models/course_model.js
+#: cms/templates/js/programs/course_details.underscore
 msgid "Course Code"
-msgstr "Code de cours"
+msgstr ""
 
-#: cms/static/js/programs/models/course_model.js
 #: cms/templates/js/certificate-details.underscore
 #: cms/templates/js/certificate-editor.underscore
 #: cms/templates/js/programs/course_details.underscore
@@ -5617,87 +5388,85 @@ msgstr "Titre du cours"
 
 #: cms/static/js/programs/models/program_model.js
 msgid "Please select a valid organization."
-msgstr "Veuillez sélectionner une organisation valide, s'il vous plaît."
+msgstr ""
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} is required"
-msgstr "{0} est obligatoire"
+msgstr ""
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be accepted"
-msgstr "{0} doit être accepté"
+msgstr ""
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be greater than or equal to {1}"
-msgstr "{0} doit être supérieur ou égal à {1}"
+msgstr ""
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be less than or equal to {1}"
-msgstr "{0} doit être inférieur ou égal à {1}"
+msgstr ""
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be between {1} and {2}"
-msgstr "{0} doit être entre {1} et {2}"
+msgstr ""
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be {1} characters"
-msgstr "{0} doit être {1} caractères"
+msgstr ""
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be at least {1} characters"
-msgstr "{0} doit être d'au moins {1} caractères"
+msgstr ""
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be at most {1} characters"
-msgstr "{0} doit être d'au plus {1} caractères"
+msgstr ""
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be between {1} and {2} characters"
-msgstr "{0} doit être entre {1} et {2} caractères"
+msgstr ""
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be one of: {1}"
-msgstr "{0} doit être l'un de : {1}"
+msgstr ""
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be the same as {1}"
-msgstr "{0} doit être identique à {1}"
+msgstr ""
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must only contain digits"
-msgstr "{0} doit seulement contenir des chiffres"
+msgstr ""
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be a number"
-msgstr "{0} doit être un nombre"
+msgstr ""
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be a valid email"
-msgstr "{0} doit être une adresse email valide"
+msgstr ""
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be a valid url"
-msgstr "{0} doit être une URL valide"
+msgstr ""
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} is invalid"
-msgstr "{0} est invalide"
+msgstr ""
 
 #: cms/static/js/programs/views/program_details_view.js
 msgid "confirm"
-msgstr "confirmer"
+msgstr ""
 
 #: cms/static/js/programs/views/program_details_view.js
 msgid "Publish this program?"
-msgstr "Publier ce programme ?"
+msgstr ""
 
 #: cms/static/js/programs/views/program_details_view.js
 msgid ""
 "After you publish this program, you cannot add or remove course codes or "
 "remove course runs."
 msgstr ""
-"Après la publication de ce programme, vous ne pouvez plus ajouter ou "
-"supprimer des codes de cours or supprimer des instances de cours."
 
 #: cms/static/js/programs/views/program_details_view.js
 #: cms/static/js/views/modals/course_outline_modals.js
@@ -5709,7 +5478,7 @@ msgstr "Publier"
 
 #: cms/static/js/programs/views/program_details_view.js
 msgid "Marketing Slug is required."
-msgstr "L'identifiant marketing est obligatoire."
+msgstr ""
 
 #: cms/static/js/views/active_video_upload.js cms/static/js/views/assets.js
 msgid "Your file could not be uploaded"
@@ -5728,7 +5497,9 @@ msgid "Upload failed for video {fileName}"
 msgstr ""
 
 #: cms/static/js/views/active_video_upload_list.js
-msgid "{filename} is not in a supported file format. "
+msgid ""
+"{filename} is not in a supported file format. Supported file formats are "
+"{supportedFileFormats}."
 msgstr ""
 
 #: cms/static/js/views/active_video_upload_list.js
@@ -5789,12 +5560,12 @@ msgstr ""
 msgid "Max file size exceeded"
 msgstr "Taille maximale de fichier dépassée"
 
-#: cms/static/js/views/assets.js cms/static/js/views/assets.js.c
+#: cms/static/js/views/assets.js
 #: cms/templates/js/asset-upload-modal.underscore
 msgid "Upload New File"
 msgstr "Téléverser un nouveau fichier"
 
-#: cms/static/js/views/assets.js cms/static/js/views/assets.js.c
+#: cms/static/js/views/assets.js
 msgid "Load Another File"
 msgstr "Envoyer un autre fichier"
 
@@ -6604,7 +6375,7 @@ msgstr "Tous les groupes"
 #: common/static/common/templates/discussion/new-post.underscore
 #: common/static/common/templates/discussion/thread-edit.underscore
 msgid "Add a clear and descriptive title to encourage participation."
-msgstr "Ajouter un titre clair et explicite pour encourager la participation."
+msgstr ""
 
 #: common/static/common/templates/discussion/new-post.underscore
 msgid "Your question or idea"
@@ -6784,8 +6555,6 @@ msgid ""
 "Questions raise issues that need answers. Discussions share ideas and start "
 "conversations."
 msgstr ""
-"Les Questions soulèvent des problèmes qui appellent une réponse. Les "
-"Discussions partagent des idées et lancent des conversations."
 
 #: common/static/common/templates/discussion/thread-type.underscore
 msgid "Question"
@@ -6809,7 +6578,7 @@ msgstr ""
 
 #: common/static/common/templates/discussion/topic.underscore
 msgid "Add your post to a relevant topic to help others find it."
-msgstr "Associer un sujet au post pour en faciliter la recherche."
+msgstr ""
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Discussion Home"
@@ -6831,7 +6600,7 @@ msgstr "Utilisez le menu 'Tous les sujets' pour trouver un sujet spécific"
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 #: lms/djangoapps/discussion/static/discussion/templates/search.underscore
 msgid "Search all posts"
-msgstr "Rechercher…"
+msgstr "Rechercher tous les messages"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Filter and sort topics"

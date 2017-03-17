@@ -17,6 +17,7 @@ class TestSubsectionGating(CourseTestCase):
     Tests for the subsection gating feature
     """
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+    ENABLED_SIGNALS = ['item_deleted']
 
     def setUp(self):
         """

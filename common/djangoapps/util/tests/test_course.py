@@ -1,36 +1,129 @@
 """
 Tests for course utils.
 """
-
-from django.test import TestCase, override_settings
+import ddt
 import mock
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from util.course import get_lms_link_for_about_page
+
+from django.conf import settings
+
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
+
+from util.course import get_link_for_about_page
 
 
-class LmsLinksTestCase(TestCase):
-    """ Tests for LMS links. """
+@ddt.ddt
+class TestCourseSharingLinks(ModuleStoreTestCase):
+    """
+    Tests for course sharing links.
+    """
+    def setUp(self):
+        super(TestCourseSharingLinks, self).setUp()
 
-    def test_about_page(self):
-        """ Get URL for about page, no marketing site """
-        with mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': False}):
-            self.assertEquals(self.get_about_page_link(), "http://localhost:8000/courses/mitX/101/test/about")
+        # create test mongo course
+        self.course = CourseFactory.create(
+            org='test_org',
+            number='test_number',
+            run='test_run',
+            default_store=ModuleStoreEnum.Type.split,
+            social_sharing_url='test_social_sharing_url',
+        )
 
-    @override_settings(MKTG_URLS={'ROOT': 'https://dummy-root'})
-    def test_about_page_marketing_site(self):
-        """ Get URL for about page, marketing root present. """
-        with mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
-            self.assertEquals(self.get_about_page_link(), "https://dummy-root/courses/mitX/101/test/about")
-        with mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': False}):
-            self.assertEquals(self.get_about_page_link(), "http://localhost:8000/courses/mitX/101/test/about")
+        # load this course into course overview and set it's marketing url
+        self.course_overview = CourseOverview.get_from_id(self.course.id)
+        self.course_overview.marketing_url = 'test_marketing_url'
+        self.course_overview.save()
 
-    @override_settings(MKTG_URLS={'ROOT': 'https://www.dummyhttps://x'})
-    def test_about_page_marketing_site_https__edge(self):
-        """ Get URL for about page """
-        with mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
-            self.assertEquals(self.get_about_page_link(), "https://www.dummyhttps://x/courses/mitX/101/test/about")
+    def get_course_sharing_link(self, enable_social_sharing, enable_mktg_site, use_overview=True):
+        """
+        Get course sharing link.
 
-    def get_about_page_link(self):
-        """ create mock course and return the about page link."""
-        course_key = SlashSeparatedCourseKey('mitX', '101', 'test')
-        return get_lms_link_for_about_page(course_key)
+        Arguments:
+            enable_social_sharing(Boolean): To indicate whether social sharing is enabled.
+            enable_mktg_site(Boolean): A feature flag to decide activation of marketing site.
+
+        Keyword Arguments:
+            use_overview: indicates whether course overview or course descriptor should get
+            past to get_link_for_about_page.
+
+        Returns course sharing url.
+        """
+        mock_settings = {
+            'FEATURES': {
+                'ENABLE_MKTG_SITE': enable_mktg_site
+            },
+            'SOCIAL_SHARING_SETTINGS': {
+                'CUSTOM_COURSE_URLS': enable_social_sharing
+            },
+        }
+
+        with mock.patch.multiple('django.conf.settings', **mock_settings):
+            course_sharing_link = get_link_for_about_page(
+                self.course_overview if use_overview else self.course
+            )
+
+        return course_sharing_link
+
+    @ddt.data(
+        (True, True, 'test_social_sharing_url'),
+        (False, True, 'test_marketing_url'),
+        (True, False, 'test_social_sharing_url'),
+        (False, False, '{}/courses/course-v1:test_org+test_number+test_run/about'.format(settings.LMS_ROOT_URL)),
+    )
+    @ddt.unpack
+    def test_sharing_link_with_settings(self, enable_social_sharing, enable_mktg_site, expected_course_sharing_link):
+        """
+        Verify the method gives correct course sharing url on settings manipulations.
+        """
+        actual_course_sharing_link = self.get_course_sharing_link(
+            enable_social_sharing=enable_social_sharing,
+            enable_mktg_site=enable_mktg_site,
+        )
+        self.assertEqual(actual_course_sharing_link, expected_course_sharing_link)
+
+    @ddt.data(
+        (['social_sharing_url'], 'test_marketing_url'),
+        (['marketing_url'], 'test_social_sharing_url'),
+        (
+            ['social_sharing_url', 'marketing_url'],
+            '{}/courses/course-v1:test_org+test_number+test_run/about'.format(settings.LMS_ROOT_URL)
+        ),
+    )
+    @ddt.unpack
+    def test_sharing_link_with_course_overview_attrs(self, overview_attrs, expected_course_sharing_link):
+        """
+        Verify the method gives correct course sharing url when:
+         1. Neither marketing url nor social sharing url is set.
+         2. Either marketing url or social sharing url is set.
+        """
+        for overview_attr in overview_attrs:
+            setattr(self.course_overview, overview_attr, None)
+            self.course_overview.save()
+
+        actual_course_sharing_link = self.get_course_sharing_link(
+            enable_social_sharing=True,
+            enable_mktg_site=True,
+        )
+        self.assertEqual(actual_course_sharing_link, expected_course_sharing_link)
+
+    @ddt.data(
+        (True, 'test_social_sharing_url'),
+        (
+            False,
+            '{}/courses/course-v1:test_org+test_number+test_run/about'.format(settings.LMS_ROOT_URL)
+        ),
+    )
+    @ddt.unpack
+    def test_sharing_link_with_course_descriptor(self, enable_social_sharing, expected_course_sharing_link):
+        """
+        Verify the method gives correct course sharing url on passing
+        course descriptor as a parameter.
+        """
+        actual_course_sharing_link = self.get_course_sharing_link(
+            enable_social_sharing=enable_social_sharing,
+            enable_mktg_site=True,
+            use_overview=False,
+        )
+        self.assertEqual(actual_course_sharing_link, expected_course_sharing_link)

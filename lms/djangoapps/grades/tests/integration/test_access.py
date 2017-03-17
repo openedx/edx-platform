@@ -22,6 +22,8 @@ class GradesAccessIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreT
     """
     Tests integration between grading and block access.
     """
+    ENABLED_SIGNALS = ['course_published']
+
     @classmethod
     def setUpClass(cls):
         super(GradesAccessIntegrationTest, cls).setUpClass()

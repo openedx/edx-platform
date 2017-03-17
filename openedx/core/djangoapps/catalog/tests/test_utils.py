@@ -1,44 +1,55 @@
 """Tests covering utilities for integrating with the catalog service."""
+# pylint: disable=missing-docstring
 import uuid
 import copy
 
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 import mock
-from opaque_keys.edx.keys import CourseKey
 
-from openedx.core.djangoapps.catalog import utils
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
-from openedx.core.djangoapps.catalog.tests import factories, mixins
-from student.tests.factories import UserFactory, AnonymousUserFactory
+from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory, ProgramFactory, ProgramTypeFactory
+from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
+from openedx.core.djangoapps.catalog.utils import (
+    get_programs,
+    get_program_types,
+    get_programs_with_type,
+    get_course_runs,
+)
+from openedx.core.djangolib.testing.utils import skip_unless_lms
+from student.tests.factories import UserFactory
+
 
 UTILS_MODULE = 'openedx.core.djangoapps.catalog.utils'
+User = get_user_model()  # pylint: disable=invalid-name
 
 
+@skip_unless_lms
 @mock.patch(UTILS_MODULE + '.get_edx_api_data')
-# ConfigurationModels use the cache. Make every cache get a miss.
-@mock.patch('config_models.models.cache.get', return_value=None)
-class TestGetPrograms(mixins.CatalogIntegrationMixin, TestCase):
+class TestGetPrograms(CatalogIntegrationMixin, TestCase):
     """Tests covering retrieval of programs from the catalog service."""
     def setUp(self):
         super(TestGetPrograms, self).setUp()
 
-        self.user = UserFactory()
         self.uuid = str(uuid.uuid4())
-        self.type = 'FooBar'
+        self.types = ['Foo', 'Bar', 'FooBar']
         self.catalog_integration = self.create_catalog_integration(cache_ttl=1)
 
-    def assert_contract(self, call_args, program_uuid=None, type=None):  # pylint: disable=redefined-builtin
+        UserFactory(username=self.catalog_integration.service_username)
+
+    def assert_contract(self, call_args, program_uuid=None, types=None):  # pylint: disable=redefined-builtin
         """Verify that API data retrieval utility is used correctly."""
         args, kwargs = call_args
 
-        for arg in (self.catalog_integration, self.user, 'programs'):
+        for arg in (self.catalog_integration, 'programs'):
             self.assertIn(arg, args)
 
         self.assertEqual(kwargs['resource_id'], program_uuid)
 
-        cache_key = '{base}.programs{type}'.format(
+        types_param = ','.join(types) if types and isinstance(types, list) else None
+        cache_key = '{base}.programs{types}'.format(
             base=self.catalog_integration.CACHE_KEY,
-            type='.' + type if type else ''
+            types='.' + types_param if types_param else ''
         )
         self.assertEqual(
             kwargs['cache_key'],
@@ -51,257 +62,188 @@ class TestGetPrograms(mixins.CatalogIntegrationMixin, TestCase):
             'marketable': 1,
             'exclude_utm': 1,
         }
-        if type:
-            querystring['type'] = type
+        if program_uuid:
+            querystring['use_full_course_serializer'] = 1
+        if types:
+            querystring['types'] = types_param
         self.assertEqual(kwargs['querystring'], querystring)
 
         return args, kwargs
 
-    def test_get_programs(self, _mock_cache, mock_get_catalog_data):
-        programs = [factories.Program() for __ in range(3)]
-        mock_get_catalog_data.return_value = programs
+    def test_get_programs(self, mock_get_edx_api_data):
+        programs = [ProgramFactory() for __ in range(3)]
+        mock_get_edx_api_data.return_value = programs
 
-        data = utils.get_programs(self.user)
+        data = get_programs()
 
-        self.assert_contract(mock_get_catalog_data.call_args)
+        self.assert_contract(mock_get_edx_api_data.call_args)
         self.assertEqual(data, programs)
 
-    def test_get_programs_anonymous_user(self, _mock_cache, mock_get_catalog_data):
-        programs = [factories.Program() for __ in range(3)]
-        mock_get_catalog_data.return_value = programs
+    def test_get_one_program(self, mock_get_edx_api_data):
+        program = ProgramFactory()
+        mock_get_edx_api_data.return_value = program
 
-        anonymous_user = AnonymousUserFactory()
+        data = get_programs(uuid=self.uuid)
 
-        # The user is an Anonymous user but the Catalog Service User has not been created yet.
-        data = utils.get_programs(anonymous_user)
-        # This should not return programs.
-        self.assertEqual(data, [])
-
-        UserFactory(username='lms_catalog_service_user')
-        # After creating the service user above,
-        data = utils.get_programs(anonymous_user)
-        # the programs should be returned successfully.
-        self.assertEqual(data, programs)
-
-    def test_get_program_types(self, _mock_cache, mock_get_catalog_data):
-        program_types = [factories.ProgramType() for __ in range(3)]
-        mock_get_catalog_data.return_value = program_types
-
-        # Creating Anonymous user but the Catalog Service User has not been created yet.
-        anonymous_user = AnonymousUserFactory()
-        data = utils.get_program_types(anonymous_user)
-        # This should not return programs.
-        self.assertEqual(data, [])
-
-        # Creating Catalog Service User user
-        UserFactory(username='lms_catalog_service_user')
-        data = utils.get_program_types(anonymous_user)
-        # the programs should be returned successfully.
-        self.assertEqual(data, program_types)
-
-        # Catalog integration is disabled now.
-        self.catalog_integration = self.create_catalog_integration(enabled=False)
-        data = utils.get_program_types(anonymous_user)
-        # This should not return programs.
-        self.assertEqual(data, [])
-
-    def test_get_programs_data(self, _mock_cache, mock_get_catalog_data):   # pylint: disable=unused-argument
-        programs = []
-        program_types = []
-        programs_data = []
-
-        for index in range(3):
-            # Creating the Programs and their corresponding program types.
-            type_name = "type_name_{postfix}".format(postfix=index)
-            program = factories.Program(type=type_name)
-            program_type = factories.ProgramType(name=type_name)
-
-            # Maintaining the programs, program types and program data(program+logo_image) lists.
-            programs.append(program)
-            program_types.append(program_type)
-            programs_data.append(copy.deepcopy(program))
-
-            # Adding the logo image in program data.
-            programs_data[-1]['logo_image'] = program_type["logo_image"]
-
-        with mock.patch("openedx.core.djangoapps.catalog.utils.get_programs") as patched_get_programs:
-            with mock.patch("openedx.core.djangoapps.catalog.utils.get_program_types") as patched_get_program_types:
-                # Mocked the "get_programs" and "get_program_types"
-                patched_get_programs.return_value = programs
-                patched_get_program_types.return_value = program_types
-
-                programs_data = utils.get_programs_data()
-                self.assertEqual(programs_data, programs)
-
-    def test_get_one_program(self, _mock_cache, mock_get_catalog_data):
-        program = factories.Program()
-        mock_get_catalog_data.return_value = program
-
-        data = utils.get_programs(self.user, uuid=self.uuid)
-
-        self.assert_contract(mock_get_catalog_data.call_args, program_uuid=self.uuid)
+        self.assert_contract(mock_get_edx_api_data.call_args, program_uuid=self.uuid)
         self.assertEqual(data, program)
 
-    def test_get_programs_by_type(self, _mock_cache, mock_get_catalog_data):
-        programs = [factories.Program() for __ in range(2)]
-        mock_get_catalog_data.return_value = programs
+    def test_get_programs_by_types(self, mock_get_edx_api_data):
+        programs = ProgramFactory.create_batch(2)
+        mock_get_edx_api_data.return_value = programs
 
-        data = utils.get_programs(self.user, type=self.type)
+        data = get_programs(types=self.types)
 
-        self.assert_contract(mock_get_catalog_data.call_args, type=self.type)
+        self.assert_contract(mock_get_edx_api_data.call_args, types=self.types)
         self.assertEqual(data, programs)
 
-    def test_programs_unavailable(self, _mock_cache, mock_get_catalog_data):
-        mock_get_catalog_data.return_value = []
+    def test_programs_unavailable(self, mock_get_edx_api_data):
+        mock_get_edx_api_data.return_value = []
 
-        data = utils.get_programs(self.user)
+        data = get_programs()
 
-        self.assert_contract(mock_get_catalog_data.call_args)
+        self.assert_contract(mock_get_edx_api_data.call_args)
         self.assertEqual(data, [])
 
-    def test_cache_disabled(self, _mock_cache, mock_get_catalog_data):
+    def test_cache_disabled(self, mock_get_edx_api_data):
         self.catalog_integration = self.create_catalog_integration(cache_ttl=0)
-        utils.get_programs(self.user)
-        self.assert_contract(mock_get_catalog_data.call_args)
+        get_programs()
+        self.assert_contract(mock_get_edx_api_data.call_args)
 
-    def test_config_missing(self, _mock_cache, _mock_get_catalog_data):
-        """Verify that no errors occur if this method is called when catalog config is missing."""
+    def test_config_missing(self, _mock_get_edx_api_data):
+        """
+        Verify that no errors occur if this method is called when catalog config
+        is missing.
+        """
         CatalogIntegration.objects.all().delete()
 
-        data = utils.get_programs(self.user)
+        data = get_programs()
         self.assertEqual(data, [])
 
+    def test_service_user_missing(self, _mock_get_edx_api_data):
+        """
+        Verify that no errors occur if this method is called when the catalog
+        service user is missing.
+        """
+        # Note: Deleting the service user would be ideal, but causes mysterious
+        # errors on Jenkins.
+        self.create_catalog_integration(service_username='nonexistent-user')
 
-class TestMungeCatalogProgram(TestCase):
-    """Tests covering querystring stripping."""
-    catalog_program = factories.Program()
+        data = get_programs()
+        self.assertEqual(data, [])
 
-    def test_munge_catalog_program(self):
-        munged = utils.munge_catalog_program(self.catalog_program)
-        expected = {
-            'id': self.catalog_program['uuid'],
-            'name': self.catalog_program['title'],
-            'subtitle': self.catalog_program['subtitle'],
-            'category': self.catalog_program['type'],
-            'marketing_slug': self.catalog_program['marketing_slug'],
-            'organizations': [
-                {
-                    'display_name': organization['name'],
-                    'key': organization['key']
-                } for organization in self.catalog_program['authoring_organizations']
-            ],
-            'course_codes': [
-                {
-                    'display_name': course['title'],
-                    'key': course['key'],
-                    'organization': {
-                        'display_name': course['owners'][0]['name'],
-                        'key': course['owners'][0]['key']
-                    },
-                    'run_modes': [
-                        {
-                            'course_key': run['key'],
-                            'run_key': CourseKey.from_string(run['key']).run,
-                            'mode_slug': 'verified'
-                        } for run in course['course_runs']
-                    ],
-                } for course in self.catalog_program['courses']
-            ],
-            'banner_image_urls': {
-                'w1440h480': self.catalog_program['banner_image']['large']['url'],
-                'w726h242': self.catalog_program['banner_image']['medium']['url'],
-                'w435h145': self.catalog_program['banner_image']['small']['url'],
-                'w348h116': self.catalog_program['banner_image']['x-small']['url'],
-            },
-        }
+    @mock.patch(UTILS_MODULE + '.get_programs')
+    @mock.patch(UTILS_MODULE + '.get_program_types')
+    def test_get_programs_with_type(self, mock_get_program_types, mock_get_programs, _mock_get_edx_api_data):
+        """Verify get_programs_with_type returns the expected list of programs."""
+        programs_with_program_type = []
+        programs = ProgramFactory.create_batch(2)
+        program_types = []
 
-        self.assertEqual(munged, expected)
+        for program in programs:
+            program_type = ProgramTypeFactory(name=program['type'])
+            program_types.append(program_type)
+
+            program_with_type = copy.deepcopy(program)
+            program_with_type['type'] = program_type
+            programs_with_program_type.append(program_with_type)
+
+        mock_get_programs.return_value = programs
+        mock_get_program_types.return_value = program_types
+
+        actual = get_programs_with_type()
+
+        self.assertEqual(actual, programs_with_program_type)
 
 
+@skip_unless_lms
 @mock.patch(UTILS_MODULE + '.get_edx_api_data')
-@mock.patch('config_models.models.cache.get', return_value=None)
-class TestGetCourseRun(mixins.CatalogIntegrationMixin, TestCase):
-    """Tests covering retrieval of course runs from the catalog service."""
+class TestGetProgramTypes(CatalogIntegrationMixin, TestCase):
+    """Tests covering retrieval of program types from the catalog service."""
+    def test_get_program_types(self, mock_get_edx_api_data):
+        """Verify get_program_types returns the expected list of program types."""
+        program_types = ProgramTypeFactory.create_batch(3)
+        mock_get_edx_api_data.return_value = program_types
+
+        # Catalog integration is disabled.
+        data = get_program_types()
+        self.assertEqual(data, [])
+
+        catalog_integration = self.create_catalog_integration()
+        UserFactory(username=catalog_integration.service_username)
+        data = get_program_types()
+        self.assertEqual(data, program_types)
+
+        program = program_types[0]
+        data = get_program_types(name=program['name'])
+        self.assertEqual(data, program)
+
+
+@skip_unless_lms
+@mock.patch(UTILS_MODULE + '.get_edx_api_data')
+class TestGetCourseRuns(CatalogIntegrationMixin, TestCase):
+    """
+    Tests covering retrieval of course runs from the catalog service.
+    """
     def setUp(self):
-        super(TestGetCourseRun, self).setUp()
+        super(TestGetCourseRuns, self).setUp()
 
-        self.user = UserFactory()
-        self.course_key = CourseKey.from_string('foo/bar/baz')
-        self.catalog_integration = self.create_catalog_integration()
+        self.catalog_integration = self.create_catalog_integration(cache_ttl=1)
+        self.user = UserFactory(username=self.catalog_integration.service_username)
 
-    def assert_contract(self, call_args):
-        """Verify that API data retrieval utility is used correctly."""
+    def assert_contract(self, call_args):  # pylint: disable=redefined-builtin
+        """
+        Verify that API data retrieval utility is used correctly.
+        """
         args, kwargs = call_args
 
         for arg in (self.catalog_integration, self.user, 'course_runs'):
             self.assertIn(arg, args)
 
-        self.assertEqual(kwargs['resource_id'], unicode(self.course_key))
         self.assertEqual(kwargs['api']._store['base_url'], self.catalog_integration.internal_api_url)  # pylint: disable=protected-access
+
+        querystring = {
+            'page_size': 20,
+            'exclude_utm': 1,
+        }
+
+        self.assertEqual(kwargs['querystring'], querystring)
 
         return args, kwargs
 
-    def test_get_course_run(self, _mock_cache, mock_get_catalog_data):
-        course_run = factories.CourseRun()
-        mock_get_catalog_data.return_value = course_run
-
-        data = utils.get_course_run(self.course_key, self.user)
-
-        self.assert_contract(mock_get_catalog_data.call_args)
-        self.assertEqual(data, course_run)
-
-    def test_course_run_unavailable(self, _mock_cache, mock_get_catalog_data):
-        mock_get_catalog_data.return_value = []
-
-        data = utils.get_course_run(self.course_key, self.user)
-
-        self.assert_contract(mock_get_catalog_data.call_args)
-        self.assertEqual(data, {})
-
-    def test_cache_disabled(self, _mock_cache, mock_get_catalog_data):
-        utils.get_course_run(self.course_key, self.user)
-
-        _, kwargs = self.assert_contract(mock_get_catalog_data.call_args)
-
-        self.assertIsNone(kwargs['cache_key'])
-
-    def test_cache_enabled(self, _mock_cache, mock_get_catalog_data):
-        catalog_integration = self.create_catalog_integration(cache_ttl=1)
-
-        utils.get_course_run(self.course_key, self.user)
-
-        _, kwargs = mock_get_catalog_data.call_args
-
-        self.assertEqual(kwargs['cache_key'], catalog_integration.CACHE_KEY)
-
-    def test_config_missing(self, _mock_cache, _mock_get_catalog_data):
-        """Verify that no errors occur if this method is called when catalog config is missing."""
+    def test_config_missing(self, mock_get_edx_api_data):
+        """
+        Verify that no errors occur when catalog config is missing.
+        """
         CatalogIntegration.objects.all().delete()
 
-        data = utils.get_course_run(self.course_key, self.user)
-        self.assertEqual(data, {})
+        data = get_course_runs()
+        self.assertFalse(mock_get_edx_api_data.called)
+        self.assertEqual(data, [])
 
+    @mock.patch(UTILS_MODULE + '.log.error')
+    def test_service_user_missing(self, mock_log_error, mock_get_edx_api_data):
+        """
+        Verify that no errors occur when the catalog service user is missing.
+        """
+        catalog_integration = self.create_catalog_integration(service_username='nonexistent-user')
 
-@mock.patch(UTILS_MODULE + '.get_course_run')
-class TestGetRunMarketingUrl(TestCase):
-    """Tests covering retrieval of course run marketing URLs."""
-    def setUp(self):
-        super(TestGetRunMarketingUrl, self).setUp()
+        data = get_course_runs()
+        mock_log_error.any_call(
+            'Catalog service user with username [%s] does not exist. Course runs will not be retrieved.',
+            catalog_integration.service_username,
+        )
+        self.assertFalse(mock_get_edx_api_data.called)
+        self.assertEqual(data, [])
 
-        self.course_key = CourseKey.from_string('foo/bar/baz')
-        self.user = UserFactory()
+    def test_get_course_runs(self, mock_get_edx_api_data):
+        """
+        Test retrieval of course runs.
+        """
+        catalog_course_runs = [CourseRunFactory() for __ in xrange(10)]
+        mock_get_edx_api_data.return_value = catalog_course_runs
 
-    def test_get_run_marketing_url(self, mock_get_course_run):
-        course_run = factories.CourseRun()
-        mock_get_course_run.return_value = course_run
-
-        url = utils.get_run_marketing_url(self.course_key, self.user)
-
-        self.assertEqual(url, course_run['marketing_url'])
-
-    def test_marketing_url_missing(self, mock_get_course_run):
-        mock_get_course_run.return_value = {}
-
-        url = utils.get_run_marketing_url(self.course_key, self.user)
-
-        self.assertEqual(url, None)
+        data = get_course_runs()
+        self.assertTrue(mock_get_edx_api_data.called)
+        self.assert_contract(mock_get_edx_api_data.call_args)
+        self.assertEqual(data, catalog_course_runs)

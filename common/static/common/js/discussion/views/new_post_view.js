@@ -132,13 +132,13 @@
                 var anonymous, anonymousToPeers, body, follow, group, threadType, title, topicId, url,
                     self = this;
                 event.preventDefault();
-                threadType = this.$('.post-type-input:checked').val();
+                threadType = this.$('.input-radio:checked').val();
                 title = this.$('.js-post-title').val();
                 body = this.$('.js-post-body').find('.wmd-input').val();
                 group = this.$('.js-group-select option:selected').attr('value');
-                anonymous = false || this.$('.js-anon').is(':checked');
-                anonymousToPeers = false || this.$('.js-anon-peers').is(':checked');
-                follow = false || this.$('.js-follow').is(':checked');
+                anonymous = false || this.$('input[name=anonymous]').is(':checked');
+                anonymousToPeers = false || this.$('input[name=anonymous_to_peers]').is(':checked');
+                follow = false || this.$('input[name=follow]').is(':checked');
                 topicId = this.isTabMode() ? this.topicView.getCurrentTopicId() : this.topicId;
                 url = DiscussionUtil.urlFor('create_thread', topicId);
                 return DiscussionUtil.safeAjax({
@@ -186,11 +186,13 @@
             };
 
             NewPostView.prototype.resetForm = function() {
+                var $general;
                 this.$('.forum-new-post-form')[0].reset();
                 DiscussionUtil.clearFormErrors(this.$('.post-errors'));
                 this.$('.wmd-preview p').html('');
                 if (this.isTabMode()) {
-                    this.topicView.setTopic(this.$('button.topic-title').first());
+                    $general = this.$('.post-topic option:contains(General)');
+                    this.topicView.setTopic($general || this.$('button.topic-title').first());
                 }
             };
 

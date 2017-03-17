@@ -1,7 +1,10 @@
 """
 Split Test Block Transformer
 """
-from openedx.core.lib.block_structure.transformer import BlockStructureTransformer, FilteringTransformerMixin
+from openedx.core.djangoapps.content.block_structure.transformer import (
+    BlockStructureTransformer,
+    FilteringTransformerMixin,
+)
 
 
 class SplitTestTransformer(FilteringTransformerMixin, BlockStructureTransformer):
@@ -19,7 +22,8 @@ class SplitTestTransformer(FilteringTransformerMixin, BlockStructureTransformer)
     to actually enforce the access using the 'user_partitions' and
     'group_access' fields.
     """
-    VERSION = 1
+    WRITE_VERSION = 1
+    READ_VERSION = 1
 
     @classmethod
     def name(cls):

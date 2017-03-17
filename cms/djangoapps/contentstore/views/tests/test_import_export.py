@@ -184,7 +184,7 @@ class ImportTestCase(CourseTestCase):
                     "name": self.bad_tar,
                     "course-data": [btar]
                 })
-        self.assertEquals(resp.status_code, 415)
+        self.assertEquals(resp.status_code, 200)
         # Check that `import_status` returns the appropriate stage (i.e., the
         # stage at which import failed).
         resp_status = self.client.get(
@@ -336,8 +336,16 @@ class ImportTestCase(CourseTestCase):
             with open(tarpath) as tar:
                 args = {"name": tarpath, "course-data": [tar]}
                 resp = self.client.post(self.url, args)
-            self.assertEquals(resp.status_code, 400)
-            self.assertIn("SuspiciousFileOperation", resp.content)
+            self.assertEquals(resp.status_code, 200)
+            resp = self.client.get(
+                reverse_course_url(
+                    'import_status_handler',
+                    self.course.id,
+                    kwargs={'filename': os.path.split(tarpath)[1]}
+                )
+            )
+            status = json.loads(resp.content)["ImportStatus"]
+            self.assertEqual(status, -1)
 
         try_tar(self._fifo_tar())
         try_tar(self._symlink_tar())
@@ -523,6 +531,7 @@ class ExportTestCase(CourseTestCase):
         """
         super(ExportTestCase, self).setUp()
         self.url = reverse_course_url('export_handler', self.course.id)
+        self.status_url = reverse_course_url('export_status_handler', self.course.id)
 
     def test_export_html(self):
         """
@@ -538,6 +547,21 @@ class ExportTestCase(CourseTestCase):
         """
         resp = self.client.get(self.url, HTTP_ACCEPT='application/json')
         self.assertEquals(resp.status_code, 406)
+
+    def test_export_async(self):
+        """
+        Get tar.gz file, using asynchronous background task
+        """
+        resp = self.client.post(self.url)
+        self.assertEquals(resp.status_code, 200)
+        resp = self.client.get(self.status_url)
+        result = json.loads(resp.content)
+        status = result['ExportStatus']
+        self.assertEquals(status, 3)
+        self.assertIn('ExportOutput', result)
+        output_url = result['ExportOutput']
+        resp = self.client.get(output_url)
+        self._verify_export_succeeded(resp)
 
     def test_export_targz(self):
         """
@@ -580,11 +604,16 @@ class ExportTestCase(CourseTestCase):
 
     def _verify_export_failure(self, expected_text):
         """ Export failure helper method. """
-        resp = self.client.get(self.url, HTTP_ACCEPT='application/x-tgz')
+        resp = self.client.post(self.url)
         self.assertEquals(resp.status_code, 200)
-        self.assertIsNone(resp.get('Content-Disposition'))
-        self.assertContains(resp, 'Unable to create xml for module')
-        self.assertContains(resp, expected_text)
+        resp = self.client.get(self.status_url)
+        self.assertEquals(resp.status_code, 200)
+        result = json.loads(resp.content)
+        self.assertNotIn('ExportOutput', result)
+        self.assertIn('ExportError', result)
+        error = result['ExportError']
+        self.assertIn('Unable to create xml for module', error['raw_error_msg'])
+        self.assertIn(expected_text, error['edit_unit_url'])
 
     def test_library_export(self):
         """
@@ -631,18 +660,52 @@ class ExportTestCase(CourseTestCase):
             data=xml_string
         )
 
-        self.test_export_targz_urlparam()
+        self.test_export_async()
 
     @ddt.data(
         '/export/non.1/existence_1/Run_1',  # For mongo
         '/export/course-v1:non1+existence1+Run1',  # For split
     )
-    def test_export_course_doest_not_exist(self, url):
+    def test_export_course_does_not_exist(self, url):
         """
-        Export failure if course is not exist
+        Export failure if course does not exist
         """
         resp = self.client.get_html(url)
         self.assertEquals(resp.status_code, 404)
+
+    def test_non_course_author(self):
+        """
+        Verify that users who aren't authors of the course are unable to export it
+        """
+        client, _ = self.create_non_staff_authed_user_client()
+        resp = client.get(self.url)
+        self.assertEqual(resp.status_code, 403)
+
+    def test_status_non_course_author(self):
+        """
+        Verify that users who aren't authors of the course are unable to see the status of export tasks
+        """
+        client, _ = self.create_non_staff_authed_user_client()
+        resp = client.get(self.status_url)
+        self.assertEqual(resp.status_code, 403)
+
+    def test_status_missing_record(self):
+        """
+        Attempting to get the status of an export task which isn't currently
+        represented in the database should yield a useful result
+        """
+        resp = self.client.get(self.status_url)
+        self.assertEqual(resp.status_code, 200)
+        result = json.loads(resp.content)
+        self.assertEqual(result['ExportStatus'], 0)
+
+    def test_output_non_course_author(self):
+        """
+        Verify that users who aren't authors of the course are unable to see the output of export tasks
+        """
+        client, _ = self.create_non_staff_authed_user_client()
+        resp = client.get(reverse_course_url('export_output_handler', self.course.id))
+        self.assertEqual(resp.status_code, 403)
 
 
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)

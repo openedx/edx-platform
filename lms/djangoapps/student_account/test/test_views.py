@@ -40,6 +40,7 @@ from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from openedx.core.djangoapps.user_api.accounts.api import activate_account, create_account
 from openedx.core.djangoapps.user_api.accounts import EMAIL_MAX_LENGTH
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
+from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import UserFactory
 from student_account.views import account_settings_context, get_user_orders
@@ -287,7 +288,7 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
     def setUp(self):
         super(StudentAccountLoginAndRegistrationTest, self).setUp()
 
-        # For these tests, three third party auth providers are enabled by default:
+        # Several third party auth providers are created for these tests:
         self.configure_google_provider(enabled=True, visible=True)
         self.configure_facebook_provider(enabled=True, visible=True)
         self.configure_dummy_provider(
@@ -296,6 +297,11 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
             icon_class='',
             icon_image=SimpleUploadedFile('icon.svg', '<svg><rect width="50" height="100"/></svg>'),
         )
+        self.hidden_enabled_provider = self.configure_linkedin_provider(
+            visible=False,
+            enabled=True,
+        )
+        self.hidden_disabled_provider = self.configure_azure_ad_provider()
 
     @ddt.data(
         ("signin_user", "login"),
@@ -335,7 +341,7 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         # The response should have a "Sign In" button with the URL
         # that preserves the querystring params
         with with_comprehensive_theme_context(theme):
-            response = self.client.get(reverse(url_name), params)
+            response = self.client.get(reverse(url_name), params, HTTP_ACCEPT="text/html")
 
         expected_url = '/login?{}'.format(self._finish_auth_url_param(params + [('next', '/dashboard')]))
         self.assertContains(response, expected_url)
@@ -351,7 +357,7 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
 
         # Verify that this parameter is also preserved
         with with_comprehensive_theme_context(theme):
-            response = self.client.get(reverse(url_name), params)
+            response = self.client.get(reverse(url_name), params, HTTP_ACCEPT="text/html")
 
         expected_url = '/login?{}'.format(self._finish_auth_url_param(params))
         self.assertContains(response, expected_url)
@@ -386,11 +392,11 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         if current_backend is not None:
             pipeline_target = "student_account.views.third_party_auth.pipeline"
             with simulate_running_pipeline(pipeline_target, current_backend):
-                response = self.client.get(reverse(url_name), params)
+                response = self.client.get(reverse(url_name), params, HTTP_ACCEPT="text/html")
 
         # Do NOT simulate a running pipeline
         else:
-            response = self.client.get(reverse(url_name), params)
+            response = self.client.get(reverse(url_name), params, HTTP_ACCEPT="text/html")
 
         # This relies on the THIRD_PARTY_AUTH configuration in the test settings
         expected_providers = [
@@ -423,8 +429,18 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
 
     def test_hinted_login(self):
         params = [("next", "/courses/something/?tpa_hint=oa2-google-oauth2")]
-        response = self.client.get(reverse('signin_user'), params)
+        response = self.client.get(reverse('signin_user'), params, HTTP_ACCEPT="text/html")
         self.assertContains(response, '"third_party_auth_hint": "oa2-google-oauth2"')
+
+        tpa_hint = self.hidden_enabled_provider.provider_id
+        params = [("next", "/courses/something/?tpa_hint={0}".format(tpa_hint))]
+        response = self.client.get(reverse('signin_user'), params, HTTP_ACCEPT="text/html")
+        self.assertContains(response, '"third_party_auth_hint": "{0}"'.format(tpa_hint))
+
+        tpa_hint = self.hidden_disabled_provider.provider_id
+        params = [("next", "/courses/something/?tpa_hint={0}".format(tpa_hint))]
+        response = self.client.get(reverse('signin_user'), params, HTTP_ACCEPT="text/html")
+        self.assertNotIn(response.content, tpa_hint)
 
     @override_settings(SITE_NAME=settings.MICROSITE_TEST_HOSTNAME)
     def test_microsite_uses_old_login_page(self):
@@ -580,7 +596,7 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase, ProgramsApiConf
         """
         Verify that tabs header will be shown while program listing is enabled.
         """
-        self.create_programs_config(program_listing_enabled=True)
+        self.create_programs_config()
         view_path = reverse('account_settings')
         response = self.client.get(path=view_path)
 
@@ -590,7 +606,7 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase, ProgramsApiConf
         """
         Verify that nav header will be shown while program listing is disabled.
         """
-        self.create_programs_config(program_listing_enabled=False)
+        self.create_programs_config(enabled=False)
         view_path = reverse('account_settings')
         response = self.client.get(path=view_path)
 
@@ -735,3 +751,30 @@ class MicrositeLogistrationTests(TestCase):
         self.assertEqual(resp.status_code, 200)
 
         self.assertNotIn('<div id="login-and-registration-container"', resp.content)
+
+
+class AccountCreationTestCaseWithSiteOverrides(SiteMixin, TestCase):
+    """
+    Test cases for Feature flag ALLOW_PUBLIC_ACCOUNT_CREATION which when
+    turned off disables the account creation options in lms
+    """
+
+    def setUp(self):
+        """Set up the tests"""
+        super(AccountCreationTestCaseWithSiteOverrides, self).setUp()
+
+        # Set the feature flag ALLOW_PUBLIC_ACCOUNT_CREATION to False
+        self.site_configuration_values = {
+            'ALLOW_PUBLIC_ACCOUNT_CREATION': False
+        }
+        self.site_domain = 'testserver1.com'
+        self.set_up_site(self.site_domain, self.site_configuration_values)
+
+    def test_register_option_login_page(self):
+        """
+        Navigate to the login page and check the Register option is hidden when
+        ALLOW_PUBLIC_ACCOUNT_CREATION flag is turned off
+        """
+        response = self.client.get(reverse('signin_user'))
+        self.assertNotIn('<a class="btn-neutral" href="/register?next=%2Fdashboard">Register</a>',
+                         response.content)

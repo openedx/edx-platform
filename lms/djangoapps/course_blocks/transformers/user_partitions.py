@@ -1,7 +1,10 @@
 """
 User Partitions Transformer
 """
-from openedx.core.lib.block_structure.transformer import BlockStructureTransformer, FilteringTransformerMixin
+from openedx.core.djangoapps.content.block_structure.transformer import (
+    BlockStructureTransformer,
+    FilteringTransformerMixin,
+)
 
 from .split_test import SplitTestTransformer
 from .utils import get_field_on_block
@@ -16,7 +19,8 @@ class UserPartitionTransformer(FilteringTransformerMixin, BlockStructureTransfor
 
     Staff users are *not* exempted from user partition pathways.
     """
-    VERSION = 1
+    WRITE_VERSION = 1
+    READ_VERSION = 1
 
     @classmethod
     def name(cls):

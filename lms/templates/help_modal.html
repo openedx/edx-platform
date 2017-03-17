@@ -18,7 +18,7 @@ from xmodule.tabs import CourseTabList
   <a href="#help-modal" rel="leanModal" role="button">${_("Support")}</a>
 </div>
 
-<section id="help-modal" class="modal" aria-hidden="true" role="dialog" tabindex="-1" aria-label="${_("{platform_name} Support").format(platform_name=static.get_platform_name())}">
+<div id="help-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" tabindex="-1" aria-labelledby="support-platform-name">
   <div class="inner-wrapper">
     ## TODO: find a way to refactor this
     <button class="close-modal" tabindex="0">
@@ -31,7 +31,7 @@ from xmodule.tabs import CourseTabList
     <div id="help_wrapper">
 
         <header>
-          <h2>
+          <h2 id="support-platform-name">
         ${Text(_('{platform_name} Support')).format(
             platform_name=HTML(u'<span class="edx">{}</span>').format(static.get_platform_name())
         )}
@@ -140,7 +140,7 @@ from xmodule.tabs import CourseTabList
         </p>
     </div>
   </div>
-</section>
+</div>
 
 <script type="text/javascript">
 $(document).ready(function() {

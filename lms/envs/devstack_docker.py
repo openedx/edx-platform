@@ -15,7 +15,7 @@ LMS_ROOT_URL = 'http://{}'.format(HOST)
 
 ECOMMERCE_PUBLIC_URL_ROOT = 'http://localhost:18130'
 ECOMMERCE_API_URL = 'http://edx.devstack.ecommerce:18130/api/v2'
-
+ENTERPRISE_API_URL = 'http://enterprise.example.com/enterprise/api/v1/'
 
 OAUTH_OIDC_ISSUER = '{}/oauth2'.format(LMS_ROOT_URL)
 
@@ -23,4 +23,11 @@ JWT_AUTH.update({
     'JWT_SECRET_KEY': 'lms-secret',
     'JWT_ISSUER': OAUTH_OIDC_ISSUER,
     'JWT_AUDIENCE': 'lms-key',
+})
+
+FEATURES.update({
+    'AUTOMATIC_AUTH_FOR_TESTING': True,
+    'ENABLE_COURSEWARE_SEARCH': False,
+    'ENABLE_COURSE_DISCOVERY': False,
+    'ENABLE_DASHBOARD_SEARCH': False,
 })

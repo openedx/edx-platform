@@ -13,44 +13,43 @@ import shutil
 from datetime import datetime
 import urllib
 
+from django.conf import settings
+from django.core.urlresolvers import reverse
+from django.test.utils import override_settings
 import ddt
 from freezegun import freeze_time
 from mock import Mock, patch, MagicMock
 from nose.plugins.attrib import attr
+from pytz import UTC
 import tempfile
 import unicodecsv
-from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from certificates.models import CertificateStatuses, GeneratedCertificate
 from certificates.tests.factories import GeneratedCertificateFactory, CertificateWhitelistFactory
 from course_modes.models import CourseMode
 from courseware.tests.factories import InstructorFactory
-from lms.djangoapps.instructor_task.tests.test_base import (
-    InstructorTaskCourseTestCase,
-    TestReportMixin,
-    InstructorTaskModuleTestCase
-)
+from instructor_analytics.basic import UNAVAILABLE
+from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
+from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup, CohortMembership
-from django.conf import settings
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from pytz import UTC
-
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
-from shoppingcart.models import Order, PaidCourseRegistration, CourseRegistrationCode, Invoice, \
+from openedx.core.djangoapps.util.testing import ContentGroupTestCase, TestConditionalContent
+from shoppingcart.models import (
+    Order, PaidCourseRegistration, CourseRegistrationCode, Invoice,
     CourseRegistrationCodeInvoiceItem, InvoiceTransaction, Coupon
-from student.tests.factories import UserFactory, CourseModeFactory
+)
 from student.models import CourseEnrollment, CourseEnrollmentAllowed, ManualEnrollmentAudit, ALLOWEDTOENROLL_TO_ENROLLED
-from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
+from student.tests.factories import CourseEnrollmentFactory, CourseModeFactory, UserFactory
+from survey.models import SurveyForm, SurveyAnswer
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import Group, UserPartition
-from lms.djangoapps.instructor_task.models import ReportStore
-from survey.models import SurveyForm, SurveyAnswer
-from lms.djangoapps.instructor_task.tasks_helper import (
+
+from ..models import ReportStore
+from ..tasks_helper import (
     cohort_students_and_upload,
     upload_problem_responses_csv,
     upload_grades_csv,
@@ -65,9 +64,12 @@ from lms.djangoapps.instructor_task.tasks_helper import (
     UPDATE_STATUS_FAILED,
     UPDATE_STATUS_SUCCEEDED,
 )
-from instructor_analytics.basic import UNAVAILABLE
-from openedx.core.djangoapps.util.testing import ContentGroupTestCase, TestConditionalContent
-from teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
+
+from lms.djangoapps.instructor_task.tests.test_base import (
+    InstructorTaskCourseTestCase,
+    TestReportMixin,
+    InstructorTaskModuleTestCase
+)
 
 
 class InstructorGradeReportTestCase(TestReportMixin, InstructorTaskCourseTestCase):
@@ -1773,7 +1775,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             'failed': 3,
             'skipped': 2
         }
-        with self.assertNumQueries(166):
+        with self.assertNumQueries(168):
             self.assertCertificatesGenerated(task_input, expected_results)
 
         expected_results = {

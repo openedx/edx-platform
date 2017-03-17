@@ -60,9 +60,9 @@ from openedx.core.djangolib.markup import HTML, Text
     <div class="container">
       <div class="home">
         <div class="page-header-main">
-            <h3 class="page-title">${_("Welcome to {org}'s {course_name}!").format(org=course.display_org_with_default, course_name=course.display_number_with_default)}
+            <h2 class="hd hd-2 page-title">${_("Welcome to {org}'s {course_name}!").format(org=course.display_org_with_default, course_name=course.display_number_with_default)}
               <div class="page-subtitle">${course.display_name_with_default}</div>
-            </h3>
+            </h2>
         </div>
         % if last_accessed_courseware_url:
           <div class="page-header-secondary">
@@ -81,7 +81,27 @@ from openedx.core.djangolib.markup import HTML, Text
             </div>
           % endif
 
-          <h4>${_("Course Updates and News")}</h4>
+          % if upgrade_link:
+            <div class="upgrade-banner">
+                <div class="notification-color-border"></div>
+                <div class="notification-content">
+                  <div class="upgrade-icon">
+                    <img src="${STATIC_URL}images/edx-verified-mini-cert.png">
+                  </div>
+                  <div class="upgrade-msg">
+                    <h3 class="msg-title">${_("Give yourself an additional incentive to complete")}</h3>
+                    <p class="view-verified-info">${_("Earn a verified certificate.")}
+                      <a href="https://www.edx.org/verified-certificate" target="_blank">${_("Learn More")}</a>
+                    </p>
+                  </div>
+                  <div class="upgrade-banner-button">
+                    <a href="${upgrade_link}" class="btn-upgrade">${_("Upgrade Now")}</a>
+                  </div>
+                </div>
+            </div>
+          % endif
+
+          <h3 class="hd hd-3">${_("Course Updates and News")}</h3>
           ${HTML(get_course_info_section(request, masquerade_user, course, 'updates'))}
 
           ## CourseTalk widget
@@ -95,7 +115,7 @@ from openedx.core.djangolib.markup import HTML, Text
         <section aria-label="${_('Handout Navigation')}" class="handouts">
 
           % if SelfPacedConfiguration.current().enable_course_home_improvements:
-                <h4 class="handouts-header">${_("Important Course Dates")}</h4>
+                <h3 class="hd hd-3 handouts-header">${_("Important Course Dates")}</h3>
                 ## Should be organized by date, last date appearing at the bottom
 
                 % for course_date in get_course_date_blocks(course, user):
@@ -103,13 +123,13 @@ from openedx.core.djangolib.markup import HTML, Text
                         <div class="date-summary date-summary-${course_date.css_class}">
                             % if course_date.title:
                                 % if course_date.title == 'current_datetime':
-                                    <h3 class="heading localized-datetime" data-datetime="${course_date.date}" data-string="${_(u'Today is {date}')}" data-timezone="${user_timezone}" data-language="${user_language}"></h3>
+                                    <span class="hd hd-4 heading localized-datetime" data-datetime="${course_date.date}" data-string="${_(u'Today is {date}')}" data-timezone="${user_timezone}" data-language="${user_language}"></span>
                                 % else:
-                                    <h3 class="heading">${course_date.title}</h3>
+                                    <span class="hd hd-4 heading">${course_date.title}</span>
                                 % endif
                             % endif
                             % if course_date.date and course_date.title != 'current_datetime':
-                                <h4 class="date localized-datetime" data-format="shortDate" data-datetime="${course_date.date}" data-timezone="${user_timezone}" data-language="${user_language}" data-string="${_(course_date.relative_datestring)}"></h4>
+                                <p class="hd hd-4 date localized-datetime" data-format="shortDate" data-datetime="${course_date.date}" data-timezone="${user_timezone}" data-language="${user_language}" data-string="${_(course_date.relative_datestring)}"></p>
                             % endif
                             % if course_date.description:
                               <p class="description">${course_date.description}</p>
@@ -123,16 +143,16 @@ from openedx.core.djangolib.markup import HTML, Text
                     </div>
                 % endfor
             % endif
-            <h4 class="handouts-header">${_(course.info_sidebar_name)}</h4>
+            <h3 class="hd hd-3  handouts-header">${_(course.info_sidebar_name)}</h3>
             ${HTML(get_course_info_section(request, masquerade_user, course, 'handouts'))}
         </section>
       % else:
         <section class="updates">
-          <h4 class="handouts-header">${_("Course Updates and News")}</h4>
+          <h3 class="hd hd-3 handouts-header">${_("Course Updates and News")}</h3>
           ${HTML(get_course_info_section(request, masquerade_user, course, 'guest_updates'))}
         </section>
         <section aria-label="${_('Handout Navigation')}" class="handouts">
-          <h4 class="handouts-header">${_("Course Handouts")}</h4>
+          <h3 class="hd hd-3 handouts-header">${_("Course Handouts")}</h3>
           ${HTML(get_course_info_section(request, masquerade_user, course, 'guest_handouts'))}
         </section>
       % endif <!-- if course authenticated -->

@@ -9,7 +9,6 @@ from courseware.access import has_access
 from courseware.entrance_exams import user_must_complete_entrance_exam
 from openedx.core.lib.course_tabs import CourseTabPluginManager
 from student.models import CourseEnrollment
-from student.roles import CourseStaffRole
 from xmodule.tabs import CourseTab, CourseTabList, key_checker
 
 

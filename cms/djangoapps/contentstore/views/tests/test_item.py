@@ -14,13 +14,15 @@ from django.test.client import RequestFactory
 from django.core.urlresolvers import reverse
 from contentstore.utils import reverse_usage_url, reverse_course_url
 
+from opaque_keys import InvalidKeyError
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from contentstore.views.component import (
     component_handler, get_component_templates
 )
 
 from contentstore.views.item import (
-    create_xblock_info, ALWAYS, VisibilityState, _xblock_type_and_display_name, add_container_page_publishing_info
+    create_xblock_info, _get_source_index, _get_module_info, ALWAYS, VisibilityState, _xblock_type_and_display_name,
+    add_container_page_publishing_info
 )
 from contentstore.tests.utils import CourseTestCase
 from student.tests.factories import UserFactory
@@ -384,6 +386,59 @@ class GetItemTest(ItemTest):
         ])
         self.assertEqual(result["group_access"], {})
 
+    @ddt.data('ancestorInfo', '')
+    def test_ancestor_info(self, field_type):
+        """
+        Test that we get correct ancestor info.
+
+        Arguments:
+            field_type (string): If field_type=ancestorInfo, fetch ancestor info of the XBlock otherwise not.
+        """
+
+        # Create a parent chapter
+        chap1 = self.create_xblock(parent_usage_key=self.course.location, display_name='chapter1', category='chapter')
+        chapter_usage_key = self.response_usage_key(chap1)
+
+        # create a sequential
+        seq1 = self.create_xblock(parent_usage_key=chapter_usage_key, display_name='seq1', category='sequential')
+        seq_usage_key = self.response_usage_key(seq1)
+
+        # create a vertical
+        vert1 = self.create_xblock(parent_usage_key=seq_usage_key, display_name='vertical1', category='vertical')
+        vert_usage_key = self.response_usage_key(vert1)
+
+        # create problem and an html component
+        problem1 = self.create_xblock(parent_usage_key=vert_usage_key, display_name='problem1', category='problem')
+        problem_usage_key = self.response_usage_key(problem1)
+
+        def assert_xblock_info(xblock, xblock_info):
+            """
+            Assert we have correct xblock info.
+
+            Arguments:
+                xblock (XBlock): An XBlock item.
+                xblock_info (dict): A dict containing xblock information.
+            """
+            self.assertEqual(unicode(xblock.location), xblock_info['id'])
+            self.assertEqual(xblock.display_name, xblock_info['display_name'])
+            self.assertEqual(xblock.category, xblock_info['category'])
+
+        for usage_key in (problem_usage_key, vert_usage_key, seq_usage_key, chapter_usage_key):
+            xblock = self.get_item_from_modulestore(usage_key)
+            url = reverse_usage_url('xblock_handler', usage_key) + '?fields={field_type}'.format(field_type=field_type)
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
+            response = json.loads(response.content)
+            if field_type == 'ancestorInfo':
+                self.assertIn('ancestors', response)
+                for ancestor_info in response['ancestors']:
+                    parent_xblock = xblock.get_parent()
+                    assert_xblock_info(parent_xblock, ancestor_info)
+                    xblock = parent_xblock
+            else:
+                self.assertNotIn('ancestors', response)
+                self.assertEqual(_get_module_info(xblock), response)
+
 
 @ddt.ddt
 class DeleteItem(ItemTest):
@@ -678,6 +733,416 @@ class TestDuplicateItem(ItemTest, DuplicateHelper):
 
         # Now send a custom display name for the duplicate.
         verify_name(self.seq_usage_key, self.chapter_usage_key, "customized name", display_name="customized name")
+
+
+@ddt.ddt
+class TestMoveItem(ItemTest):
+    """
+    Tests for move item.
+    """
+    def setUp(self):
+        """
+        Creates the test course structure to build course outline tree.
+        """
+        super(TestMoveItem, self).setUp()
+        self.setup_course()
+
+    def setup_course(self, default_store=None):
+        """
+        Helper method to create the course.
+        """
+        if not default_store:
+            default_store = self.store.default_modulestore.get_modulestore_type()
+
+        self.course = CourseFactory.create(default_store=default_store)
+
+        # Create group configurations
+        self.course.user_partitions = [
+            UserPartition(0, 'first_partition', 'Test Partition', [Group("0", 'alpha'), Group("1", 'beta')])
+        ]
+        self.store.update_item(self.course, self.user.id)
+
+        # Create a parent chapter
+        chap1 = self.create_xblock(parent_usage_key=self.course.location, display_name='chapter1', category='chapter')
+        self.chapter_usage_key = self.response_usage_key(chap1)
+
+        chap2 = self.create_xblock(parent_usage_key=self.course.location, display_name='chapter2', category='chapter')
+        self.chapter2_usage_key = self.response_usage_key(chap2)
+
+        # Create a sequential
+        seq1 = self.create_xblock(parent_usage_key=self.chapter_usage_key, display_name='seq1', category='sequential')
+        self.seq_usage_key = self.response_usage_key(seq1)
+
+        seq2 = self.create_xblock(parent_usage_key=self.chapter_usage_key, display_name='seq2', category='sequential')
+        self.seq2_usage_key = self.response_usage_key(seq2)
+
+        # Create a vertical
+        vert1 = self.create_xblock(parent_usage_key=self.seq_usage_key, display_name='vertical1', category='vertical')
+        self.vert_usage_key = self.response_usage_key(vert1)
+
+        vert2 = self.create_xblock(parent_usage_key=self.seq_usage_key, display_name='vertical2', category='vertical')
+        self.vert2_usage_key = self.response_usage_key(vert2)
+
+        # Create problem and an html component
+        problem1 = self.create_xblock(parent_usage_key=self.vert_usage_key, display_name='problem1', category='problem')
+        self.problem_usage_key = self.response_usage_key(problem1)
+
+        html1 = self.create_xblock(parent_usage_key=self.vert_usage_key, display_name='html1', category='html')
+        self.html_usage_key = self.response_usage_key(html1)
+
+        # Create a content experiment
+        resp = self.create_xblock(category='split_test', parent_usage_key=self.vert_usage_key)
+        self.split_test_usage_key = self.response_usage_key(resp)
+
+    def setup_and_verify_content_experiment(self, partition_id):
+        """
+        Helper method to set up group configurations to content experiment.
+
+        Arguments:
+            partition_id (int): User partition id.
+        """
+        split_test = self.get_item_from_modulestore(self.split_test_usage_key, verify_is_draft=True)
+
+        # Initially, no user_partition_id is set, and the split_test has no children.
+        self.assertEqual(split_test.user_partition_id, -1)
+        self.assertEqual(len(split_test.children), 0)
+
+        # Set group configuration
+        self.client.ajax_post(
+            reverse_usage_url("xblock_handler", self.split_test_usage_key),
+            data={'metadata': {'user_partition_id': str(partition_id)}}
+        )
+        split_test = self.get_item_from_modulestore(self.split_test_usage_key, verify_is_draft=True)
+        self.assertEqual(split_test.user_partition_id, partition_id)
+        self.assertEqual(len(split_test.children), len(self.course.user_partitions[partition_id].groups))
+        return split_test
+
+    def _move_component(self, source_usage_key, target_usage_key, target_index=None):
+        """
+        Helper method to send move request and returns the response.
+
+        Arguments:
+            source_usage_key (BlockUsageLocator): Locator of source item.
+            target_usage_key (BlockUsageLocator): Locator of target parent.
+            target_index (int): If provided, insert source item at the provided index location in target_usage_key item.
+
+        Returns:
+            resp (JsonResponse): Response after the move operation is complete.
+        """
+        data = {
+            'move_source_locator': unicode(source_usage_key),
+            'parent_locator': unicode(target_usage_key)
+        }
+        if target_index is not None:
+            data['target_index'] = target_index
+
+        return self.client.patch(
+            reverse('contentstore.views.xblock_handler'),
+            json.dumps(data),
+            content_type='application/json'
+        )
+
+    def assert_move_item(self, source_usage_key, target_usage_key, target_index=None):
+        """
+        Assert move component.
+
+        Arguments:
+            source_usage_key (BlockUsageLocator): Locator of source item.
+            target_usage_key (BlockUsageLocator): Locator of target parent.
+            target_index (int): If provided, insert source item at the provided index location in target_usage_key item.
+        """
+        parent_loc = self.store.get_parent_location(source_usage_key)
+        parent = self.get_item_from_modulestore(parent_loc)
+        source_index = _get_source_index(source_usage_key, parent)
+        expected_index = target_index if target_index is not None else source_index
+        response = self._move_component(source_usage_key, target_usage_key, target_index)
+        self.assertEqual(response.status_code, 200)
+        response = json.loads(response.content)
+        self.assertEqual(response['move_source_locator'], unicode(source_usage_key))
+        self.assertEqual(response['parent_locator'], unicode(target_usage_key))
+        self.assertEqual(response['source_index'], expected_index)
+        new_parent_loc = self.store.get_parent_location(source_usage_key)
+        self.assertEqual(new_parent_loc, target_usage_key)
+        self.assertNotEqual(parent_loc, new_parent_loc)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_move_component(self, store_type):
+        """
+        Test move component with different xblock types.
+
+        Arguments:
+            store_type (ModuleStoreEnum.Type): Type of modulestore to create test course in.
+        """
+        self.setup_course(default_store=store_type)
+        for source_usage_key, target_usage_key in [
+                (self.html_usage_key, self.vert2_usage_key),
+                (self.vert_usage_key, self.seq2_usage_key),
+                (self.seq_usage_key, self.chapter2_usage_key)
+        ]:
+            self.assert_move_item(source_usage_key, target_usage_key)
+
+    def test_move_source_index(self):
+        """
+        Test moving an item to a particular index.
+        """
+        parent = self.get_item_from_modulestore(self.vert_usage_key)
+        children = parent.get_children()
+        self.assertEqual(len(children), 3)
+
+        # Create a component within vert2.
+        resp = self.create_xblock(parent_usage_key=self.vert2_usage_key, display_name='html2', category='html')
+        html2_usage_key = self.response_usage_key(resp)
+
+        # Move html2_usage_key inside vert_usage_key at second position.
+        self.assert_move_item(html2_usage_key, self.vert_usage_key, 1)
+        parent = self.get_item_from_modulestore(self.vert_usage_key)
+        children = parent.get_children()
+        self.assertEqual(len(children), 4)
+        self.assertEqual(children[1].location, html2_usage_key)
+
+    def test_move_undo(self):
+        """
+        Test move a component and move it back (undo).
+        """
+        # Get the initial index of the component
+        parent = self.get_item_from_modulestore(self.vert_usage_key)
+        original_index = _get_source_index(self.html_usage_key, parent)
+
+        # Move component and verify that response contains initial index
+        response = self._move_component(self.html_usage_key, self.vert2_usage_key)
+        response = json.loads(response.content)
+        self.assertEquals(original_index, response['source_index'])
+
+        # Verify that new parent has the moved component at the last index.
+        parent = self.get_item_from_modulestore(self.vert2_usage_key)
+        self.assertEqual(self.html_usage_key, parent.children[-1])
+
+        # Verify original and new index is different now.
+        source_index = _get_source_index(self.html_usage_key, parent)
+        self.assertNotEquals(original_index, source_index)
+
+        # Undo Move to the original index, use the source index fetched from the response.
+        response = self._move_component(self.html_usage_key, self.vert_usage_key, response['source_index'])
+        response = json.loads(response.content)
+        self.assertEquals(original_index, response['source_index'])
+
+    def test_move_large_target_index(self):
+        """
+        Test moving an item at a large index would generate an error message.
+        """
+        parent = self.get_item_from_modulestore(self.vert2_usage_key)
+        parent_children_length = len(parent.children)
+        response = self._move_component(self.html_usage_key, self.vert2_usage_key, parent_children_length + 10)
+        self.assertEqual(response.status_code, 400)
+        response = json.loads(response.content)
+
+        expected_error = 'You can not move {usage_key} at an invalid index ({target_index}).'.format(
+            usage_key=self.html_usage_key,
+            target_index=parent_children_length + 10
+        )
+        self.assertEqual(expected_error, response['error'])
+        new_parent_loc = self.store.get_parent_location(self.html_usage_key)
+        self.assertEqual(new_parent_loc, self.vert_usage_key)
+
+    def test_invalid_move(self):
+        """
+        Test invalid move.
+        """
+        parent_loc = self.store.get_parent_location(self.html_usage_key)
+        response = self._move_component(self.html_usage_key, self.seq_usage_key)
+        self.assertEqual(response.status_code, 400)
+        response = json.loads(response.content)
+
+        expected_error = 'You can not move {source_type} into {target_type}.'.format(
+            source_type=self.html_usage_key.block_type,
+            target_type=self.seq_usage_key.block_type
+        )
+        self.assertEqual(expected_error, response['error'])
+        new_parent_loc = self.store.get_parent_location(self.html_usage_key)
+        self.assertEqual(new_parent_loc, parent_loc)
+
+    def test_move_current_parent(self):
+        """
+        Test that a component can not be moved to it's current parent.
+        """
+        parent_loc = self.store.get_parent_location(self.html_usage_key)
+        self.assertEqual(parent_loc, self.vert_usage_key)
+        response = self._move_component(self.html_usage_key, self.vert_usage_key)
+        self.assertEqual(response.status_code, 400)
+        response = json.loads(response.content)
+
+        self.assertEqual(response['error'], 'You can not move an item into the same parent.')
+        self.assertEqual(self.store.get_parent_location(self.html_usage_key), parent_loc)
+
+    def test_can_not_move_into_itself(self):
+        """
+        Test that a component can not be moved to itself.
+        """
+        library_content = self.create_xblock(
+            parent_usage_key=self.vert_usage_key, display_name='library content block', category='library_content'
+        )
+        library_content_usage_key = self.response_usage_key(library_content)
+        parent_loc = self.store.get_parent_location(library_content_usage_key)
+        self.assertEqual(parent_loc, self.vert_usage_key)
+        response = self._move_component(library_content_usage_key, library_content_usage_key)
+        self.assertEqual(response.status_code, 400)
+        response = json.loads(response.content)
+
+        self.assertEqual(response['error'], 'You can not move an item into itself.')
+        self.assertEqual(self.store.get_parent_location(self.html_usage_key), parent_loc)
+
+    def test_move_library_content(self):
+        """
+        Test that library content  can be moved to any other valid location.
+        """
+        library_content = self.create_xblock(
+            parent_usage_key=self.vert_usage_key, display_name='library content block', category='library_content'
+        )
+        library_content_usage_key = self.response_usage_key(library_content)
+        parent_loc = self.store.get_parent_location(library_content_usage_key)
+        self.assertEqual(parent_loc, self.vert_usage_key)
+        self.assert_move_item(library_content_usage_key, self.vert2_usage_key)
+
+    def test_move_into_library_content(self):
+        """
+        Test that a component can be moved into library content.
+        """
+        library_content = self.create_xblock(
+            parent_usage_key=self.vert_usage_key, display_name='library content block', category='library_content'
+        )
+        library_content_usage_key = self.response_usage_key(library_content)
+        self.assert_move_item(self.html_usage_key, library_content_usage_key)
+
+    def test_move_content_experiment(self):
+        """
+        Test that a content experiment can be moved.
+        """
+        self.setup_and_verify_content_experiment(0)
+
+        # Move content experiment
+        self.assert_move_item(self.split_test_usage_key, self.vert2_usage_key)
+
+    def test_move_content_experiment_components(self):
+        """
+        Test that component inside content experiment can be moved to any other valid location.
+        """
+        split_test = self.setup_and_verify_content_experiment(0)
+
+        # Add html component to Group A.
+        html1 = self.create_xblock(
+            parent_usage_key=split_test.children[0], display_name='html1', category='html'
+        )
+        html_usage_key = self.response_usage_key(html1)
+
+        # Move content experiment
+        self.assert_move_item(html_usage_key, self.vert2_usage_key)
+
+    def test_move_into_content_experiment_groups(self):
+        """
+        Test that a component can be moved to content experiment groups.
+        """
+        split_test = self.setup_and_verify_content_experiment(0)
+        self.assert_move_item(self.html_usage_key, split_test.children[0])
+
+    def test_can_not_move_into_content_experiment_level(self):
+        """
+        Test that a component can not be moved directly to content experiment level.
+        """
+        self.setup_and_verify_content_experiment(0)
+        response = self._move_component(self.html_usage_key, self.split_test_usage_key)
+        self.assertEqual(response.status_code, 400)
+        response = json.loads(response.content)
+
+        self.assertEqual(response['error'], 'You can not move an item directly into content experiment.')
+        self.assertEqual(self.store.get_parent_location(self.html_usage_key), self.vert_usage_key)
+
+    def test_can_not_move_content_experiment_into_its_children(self):
+        """
+        Test that a content experiment can not be moved inside any of it's children.
+        """
+        split_test = self.setup_and_verify_content_experiment(0)
+
+        # Try to move content experiment inside it's child groups.
+        for child_vert_usage_key in split_test.children:
+            response = self._move_component(self.split_test_usage_key, child_vert_usage_key)
+            self.assertEqual(response.status_code, 400)
+            response = json.loads(response.content)
+
+            self.assertEqual(response['error'], 'You can not move an item into it\'s child.')
+            self.assertEqual(self.store.get_parent_location(self.split_test_usage_key), self.vert_usage_key)
+
+        # Create content experiment inside group A and set it's group configuration.
+        resp = self.create_xblock(category='split_test', parent_usage_key=split_test.children[0])
+        child_split_test_usage_key = self.response_usage_key(resp)
+        self.client.ajax_post(
+            reverse_usage_url("xblock_handler", child_split_test_usage_key),
+            data={'metadata': {'user_partition_id': str(0)}}
+        )
+        child_split_test = self.get_item_from_modulestore(self.split_test_usage_key, verify_is_draft=True)
+
+        # Try to move content experiment further down the level to a child group A nested inside main group A.
+        response = self._move_component(self.split_test_usage_key, child_split_test.children[0])
+        self.assertEqual(response.status_code, 400)
+        response = json.loads(response.content)
+
+        self.assertEqual(response['error'], 'You can not move an item into it\'s child.')
+        self.assertEqual(self.store.get_parent_location(self.split_test_usage_key), self.vert_usage_key)
+
+    def test_move_invalid_source_index(self):
+        """
+        Test moving an item to an invalid index.
+        """
+        target_index = 'test_index'
+        parent_loc = self.store.get_parent_location(self.html_usage_key)
+        response = self._move_component(self.html_usage_key, self.vert2_usage_key, target_index)
+        self.assertEqual(response.status_code, 400)
+        response = json.loads(response.content)
+
+        error = 'You must provide target_index ({target_index}) as an integer.'.format(target_index=target_index)
+        self.assertEqual(response['error'], error)
+        new_parent_loc = self.store.get_parent_location(self.html_usage_key)
+        self.assertEqual(new_parent_loc, parent_loc)
+
+    def test_move_no_target_locator(self):
+        """
+        Test move an item without specifying the target location.
+        """
+        data = {'move_source_locator': unicode(self.html_usage_key)}
+        with self.assertRaises(InvalidKeyError):
+            self.client.patch(
+                reverse('contentstore.views.xblock_handler'),
+                json.dumps(data),
+                content_type='application/json'
+            )
+
+    def test_no_move_source_locator(self):
+        """
+        Test patch request without providing a move source locator.
+        """
+        response = self.client.patch(
+            reverse('contentstore.views.xblock_handler')
+        )
+        self.assertEqual(response.status_code, 400)
+        response = json.loads(response.content)
+        self.assertEqual(response['error'], 'Patch request did not recognise any parameters to handle.')
+
+    @patch('contentstore.views.item.log')
+    def test_move_logging(self, mock_logger):
+        """
+        Test logging when an item is successfully moved.
+
+        Arguments:
+            mock_logger (object):  A mock logger object.
+        """
+        insert_at = 0
+        self.assert_move_item(self.html_usage_key, self.vert2_usage_key, insert_at)
+        mock_logger.info.assert_called_with(
+            'MOVE: %s moved from %s to %s at %d index',
+            unicode(self.html_usage_key),
+            unicode(self.vert_usage_key),
+            unicode(self.vert2_usage_key),
+            insert_at
+        )
 
 
 class TestDuplicateItemWithAsides(ItemTest, DuplicateHelper):
@@ -1311,6 +1776,31 @@ class TestEditSplitModule(ItemTest):
         self.assertEqual(2, len(split_test.group_id_to_child))
         self.assertEqual(vertical_0.location, split_test.group_id_to_child['0'])
         self.assertEqual(vertical_1.location, split_test.group_id_to_child['1'])
+
+    def test_split_xblock_info_group_name(self):
+        """
+        Test that concise outline for split test component gives display name as group name.
+        """
+        split_test = self.get_item_from_modulestore(self.split_test_usage_key, verify_is_draft=True)
+        # Initially, no user_partition_id is set, and the split_test has no children.
+        self.assertEqual(split_test.user_partition_id, -1)
+        self.assertEqual(len(split_test.children), 0)
+        # Set the user_partition_id to 0.
+        split_test = self._update_partition_id(0)
+        # Verify that child verticals have been set to match the groups
+        self.assertEqual(len(split_test.children), 2)
+
+        # Get xblock outline
+        xblock_info = create_xblock_info(
+            split_test,
+            is_concise=True,
+            include_child_info=True,
+            include_children_predicate=lambda xblock: xblock.has_children,
+            course=self.course,
+            user=self.request.user
+        )
+        self.assertEqual(xblock_info['child_info']['children'][0]['display_name'], 'alpha')
+        self.assertEqual(xblock_info['child_info']['children'][1]['display_name'], 'beta')
 
     def test_change_user_partition_id(self):
         """

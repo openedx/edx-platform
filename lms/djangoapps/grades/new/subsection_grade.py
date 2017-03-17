@@ -8,7 +8,7 @@ from courseware.model_data import ScoresClient
 from lms.djangoapps.grades.scores import get_score, possibly_scored
 from lms.djangoapps.grades.models import BlockRecord, PersistentSubsectionGrade
 from lms.djangoapps.grades.config.models import PersistentGradesEnabledFlag
-from openedx.core.lib.grade_utils import is_score_higher
+from openedx.core.lib.grade_utils import is_score_higher_or_equal
 from student.models import anonymous_id_for_user
 from submissions import api as submissions_api
 from xmodule import block_metadata_utils, graders
@@ -247,34 +247,33 @@ class SubsectionGradeFactory(object):
         """
         # Save ourselves the extra queries if the course does not persist
         # subsection grades.
-        if not PersistentGradesEnabledFlag.feature_enabled(self.course.id):
-            return
-
         self._log_event(log.warning, u"update, subsection: {}".format(subsection.location), subsection)
 
         calculated_grade = SubsectionGrade(subsection).init_from_structure(
             self.student, self.course_structure, self._submissions_scores, self._csm_scores,
         )
 
-        if only_if_higher:
-            try:
-                grade_model = PersistentSubsectionGrade.read_grade(self.student.id, subsection.location)
-            except PersistentSubsectionGrade.DoesNotExist:
-                pass
-            else:
-                orig_subsection_grade = SubsectionGrade(subsection).init_from_model(
-                    self.student, grade_model, self.course_structure, self._submissions_scores, self._csm_scores,
-                )
-                if not is_score_higher(
-                        orig_subsection_grade.graded_total.earned,
-                        orig_subsection_grade.graded_total.possible,
-                        calculated_grade.graded_total.earned,
-                        calculated_grade.graded_total.possible,
-                ):
-                    return orig_subsection_grade
+        if PersistentGradesEnabledFlag.feature_enabled(self.course.id):
+            if only_if_higher:
+                try:
+                    grade_model = PersistentSubsectionGrade.read_grade(self.student.id, subsection.location)
+                except PersistentSubsectionGrade.DoesNotExist:
+                    pass
+                else:
+                    orig_subsection_grade = SubsectionGrade(subsection).init_from_model(
+                        self.student, grade_model, self.course_structure, self._submissions_scores, self._csm_scores,
+                    )
+                    if not is_score_higher_or_equal(
+                            orig_subsection_grade.graded_total.earned,
+                            orig_subsection_grade.graded_total.possible,
+                            calculated_grade.graded_total.earned,
+                            calculated_grade.graded_total.possible,
+                    ):
+                        return orig_subsection_grade
 
-        grade_model = calculated_grade.update_or_create_model(self.student)
-        self._update_saved_subsection_grade(subsection.location, grade_model)
+            grade_model = calculated_grade.update_or_create_model(self.student)
+            self._update_saved_subsection_grade(subsection.location, grade_model)
+
         return calculated_grade
 
     @lazy

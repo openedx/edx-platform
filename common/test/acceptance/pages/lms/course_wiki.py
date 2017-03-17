@@ -21,30 +21,42 @@ class CourseWikiPage(CoursePage):
 
     def open_editor(self):
         """
-        Replace content of a wiki article with new content
+        Display the editor for a wiki article.
         """
         edit_button = self.q(css='.fa-pencil')
         edit_button.click()
+
+    def show_history(self):
+        """
+        Show the change history for a wiki article.
+        """
+        edit_button = self.q(css='.fa-clock-o')
+        edit_button.click()
+
+    def show_children(self):
+        """
+        Show the children of a wiki article.
+        """
+        children_link = self.q(css='.see-children>a')
+        children_link.click()
 
     @property
     def article_name(self):
         """
         Return the name of the article
         """
-        return str(self.q(css='.main-article h1').text[0])
+        return str(self.q(css='.main-article .entry-title').text[0])
 
 
-class CourseWikiEditPage(CoursePage):
-    """
-    Editor page
-    """
+class CourseWikiSubviewPage(CoursePage):  # pylint: disable=abstract-method
+    """ Abstract base page for subviews within the wiki. """
 
     def __init__(self, browser, course_id, course_info):
         """
         Course ID is currently of the form "edx/999/2013_Spring"
         but this format could change.
         """
-        super(CourseWikiEditPage, self).__init__(browser, course_id)
+        super(CourseWikiSubviewPage, self).__init__(browser, course_id)
         self.course_id = course_id
         self.course_info = course_info
         self.article_name = "{org}.{course_number}.{course_run}".format(
@@ -52,6 +64,12 @@ class CourseWikiEditPage(CoursePage):
             course_number=self.course_info['number'],
             course_run=self.course_info['run']
         )
+
+
+class CourseWikiEditPage(CourseWikiSubviewPage):
+    """
+    Editor page
+    """
 
     @property
     def url_path(self):
@@ -79,3 +97,41 @@ class CourseWikiEditPage(CoursePage):
         """
         self.q(css='button[name="save"]').click()
         self.wait_for_element_presence('.alert-success', 'wait for the article to be saved')
+
+
+class CourseWikiHistoryPage(CourseWikiSubviewPage):
+    """
+    Course wiki change history page.
+    """
+
+    def is_browser_on_page(self):
+        """
+        Return if the browser is on the history page.
+        """
+        return self.q(css='section.history').present
+
+    @property
+    def url_path(self):
+        """
+        Construct a URL to the page within the course.
+        """
+        return "/wiki/" + self.article_name + "/_history"
+
+
+class CourseWikiChildrenPage(CourseWikiSubviewPage):
+    """
+    Course wiki "All Children" page.
+    """
+
+    def is_browser_on_page(self):
+        """
+        Return if the browser is on the wiki children page (which contains a search widget).
+        """
+        return self.q(css='.form-search').present
+
+    @property
+    def url_path(self):
+        """
+        Construct a URL to the page within the course.
+        """
+        return "/wiki/" + self.article_name + "/_dir"

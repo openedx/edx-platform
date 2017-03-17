@@ -1,35 +1,35 @@
 <div class="text-section">
-    <h3 id="program-<%- id %>" class="title hd-3"><%- gettext(name) %></h3>
+    <h3 id="program-<%- uuid %>" class="title hd-3"><%- gettext(title) %></h3>
     <div class="meta-info grid-container">
         <div class="organization col"><%- orgList %></div>
         <div class="category col col-last">
-            <span class="category-text"><%- gettext(category) %></span>
-            <span class="category-icon <%- category.toLowerCase() %>-icon" aria-hidden="true"></span>
+            <span class="category-text"><%- gettext(type) %></span>
+            <span class="category-icon <%- type.toLowerCase() %>-icon" aria-hidden="true"></span>
         </div>
     </div>
   <% if (progress) { %>  
     <p class="certificate-status">
-        <a href="<%- detailUrl %>" class="status-text secondary" aria-describedby="program-<%- id %>"><%= interpolate(
+        <a href="<%- detailUrl %>" class="status-text secondary" aria-describedby="program-<%- uuid %>"><%= interpolate(
             ngettext(
                 '%(count)s course is in progress.',
                 '%(count)s courses are in progress.',
-                progress.total.in_progress
+                progress.in_progress
             ),
-            {count: progress.total.in_progress}, true 
+            {count: progress.in_progress}, true 
         ) %></a>
 
-        <a href="<%- detailUrl %>" class="status-text secondary" aria-describedby="program-<%- id %>"><%= interpolate(
+        <a href="<%- detailUrl %>" class="status-text secondary" aria-describedby="program-<%- uuid %>"><%= interpolate(
             ngettext(
                 '%(count)s course has not been started.',
                 '%(count)s courses have not been started.',
-                progress.total.not_started
+                progress.not_started
             ),
-            {count: progress.total.not_started}, true 
+            {count: progress.not_started}, true 
         ) %></a>
 
-        <span id="status-<%- id %>" class="status-text"><%= interpolate(
+        <span id="status-<%- uuid %>" class="status-text"><%= interpolate(
             gettext('You have earned certificates in %(completed_courses)s of the %(total_courses)s courses so far.'),
-            {completed_courses: progress.total.completed, total_courses: progress.total.courses}, true
+            {completed_courses: progress.completed, total_courses: progress.total}, true
         ) %></span>
     </p>
   <% } %>
@@ -44,11 +44,11 @@
 <a href="<%- detailUrl %>" class="card-link">
     <div class="banner-image-container">
         <picture>
-            <source srcset="<%- smallBannerUrl %>" media="(max-width: <%- breakpoints.max.tiny %>)">
-            <source srcset="<%- mediumBannerUrl %>" media="(max-width: <%- breakpoints.max.small %>)">
-            <source srcset="<%- largeBannerUrl %>" media="(max-width: <%- breakpoints.max.medium %>)">
-            <source srcset="<%- smallBannerUrl %>" media="(max-width: <%- breakpoints.max.large %>)">
-            <img class="banner-image" srcset="<%- mediumBannerUrl %>" alt="<%= interpolate(gettext('%(programName)s Home Page.'), {programName: name}, true)%>">
+            <source srcset="<%- xsmallBannerUrl %>" media="(max-width: <%- breakpoints.max.xsmall %>)">
+            <source srcset="<%- smallBannerUrl %>" media="(max-width: <%- breakpoints.max.small %>)">
+            <source srcset="<%- mediumBannerUrl %>" media="(max-width: <%- breakpoints.max.medium %>)">
+            <source srcset="<%- xsmallBannerUrl %>" media="(max-width: <%- breakpoints.max.large %>)">
+            <img class="banner-image" srcset="<%- smallBannerUrl %>" alt="<%= interpolate(gettext('%(programName)s Home Page.'), {programName: title}, true)%>">
         </picture>
     </div>
 </a>

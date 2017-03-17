@@ -8,7 +8,7 @@ from bok_choy.promise import EmptyPromise, Promise
 from bok_choy.javascript import wait_for_js, js_defined
 from common.test.acceptance.tests.helpers import YouTubeStubConfig
 from common.test.acceptance.pages.lms.video.video import VideoPage
-from common.test.acceptance.pages.common.utils import wait_for_notification
+from common.test.acceptance.pages.common.utils import sync_on_notification
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 
@@ -55,6 +55,7 @@ DEFAULT_SETTINGS = [
     # basic
     [DISPLAY_NAME, 'Video', False],
     ['Default Video URL', 'https://www.youtube.com/watch?v=3_yD_cEKoCk, , ', False],
+    ['Video ID', '', False],
 
     # advanced
     [DISPLAY_NAME, 'Video', False],
@@ -160,7 +161,7 @@ class VideoComponentPage(VideoPage):
         """
         self.q(css=BUTTON_SELECTORS[button_name]).nth(index).click()
         if require_notification:
-            wait_for_notification(self)
+            sync_on_notification(self)
         self.wait_for_ajax()
 
     @staticmethod

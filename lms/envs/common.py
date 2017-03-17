@@ -38,7 +38,6 @@ from warnings import simplefilter
 from django.utils.translation import ugettext_lazy as _
 
 from .discussionsettings import *
-import dealer.git
 from xmodule.modulestore.modulestore_settings import update_module_store_settings
 from xmodule.modulestore.edit_info import EditInfoMixin
 from xmodule.mixin import LicenseMixin
@@ -61,6 +60,7 @@ DISCUSSION_SETTINGS = {
 }
 
 LMS_ROOT_URL = "http://localhost:8000"
+ENTERPRISE_API_URL = LMS_ROOT_URL + '/enterprise/api/v1/'
 
 # Features
 FEATURES = {
@@ -254,10 +254,6 @@ FEATURES = {
     # Set to True to change the course sorting behavior by their start dates, latest first.
     'ENABLE_COURSE_SORTING_BY_START_DATE': True,
 
-    # When set to True, a list of programs is displayed along with the list of courses
-    # when the user visits the homepage or the find courses page.
-    'DISPLAY_PROGRAMS_ON_MARKETING_PAGES': False,
-
     # Expose Mobile REST API. Note that if you use this, you must also set
     # ENABLE_OAUTH2_PROVIDER to True
     'ENABLE_MOBILE_REST_API': False,
@@ -368,6 +364,13 @@ FEATURES = {
 
     # Set this to False to facilitate cleaning up invalid xml from your modulestore.
     'ENABLE_XBLOCK_XML_VALIDATION': True,
+
+    # Allow public account creation
+    'ALLOW_PUBLIC_ACCOUNT_CREATION': True,
+
+    # Enable footer banner for cookie consent.
+    # See https://cookieconsent.insites.com/ for more.
+    'ENABLE_COOKIE_CONSENT': False,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -544,6 +547,9 @@ TEMPLATES = [
     }
 ]
 DEFAULT_TEMPLATE_ENGINE = TEMPLATES[0]
+
+# The template used to render a web fragment as a standalone page
+STANDALONE_FRAGMENT_VIEW_TEMPLATE = 'fragment-view-chromeless.html'
 
 ###############################################################################################
 
@@ -825,16 +831,6 @@ CONTACT_MAILING_ADDRESS = ''
 
 ADMINS = ()
 MANAGERS = ADMINS
-
-EDX_PLATFORM_REVISION = os.environ.get('EDX_PLATFORM_REVISION')
-
-if not EDX_PLATFORM_REVISION:
-    try:
-        # Get git revision of the current file
-        EDX_PLATFORM_REVISION = dealer.git.Backend(path=REPO_ROOT).revision
-    except TypeError:
-        # Not a git repository
-        EDX_PLATFORM_REVISION = 'unknown'
 
 # Static content
 STATIC_URL = '/static/'
@@ -1816,13 +1812,18 @@ BLOCK_STRUCTURES_SETTINGS = dict(
     # for a better chance at getting the latest changes when there
     # are secondary reads in sharded mongoDB clusters. See TNL-5041
     # for more info.
-    BLOCK_STRUCTURES_COURSE_PUBLISH_TASK_DELAY=30,
+    COURSE_PUBLISH_TASK_DELAY=30,
 
     # Delay, in seconds, between retry attempts if a task fails.
-    BLOCK_STRUCTURES_TASK_DEFAULT_RETRY_DELAY=30,
+    TASK_DEFAULT_RETRY_DELAY=30,
 
     # Maximum number of retries per task.
-    BLOCK_STRUCTURES_TASK_MAX_RETRIES=5,
+    TASK_MAX_RETRIES=5,
+
+    # Backend storage
+    # STORAGE_CLASS='storages.backends.s3boto.S3BotoStorage',
+    # STORAGE_KWARGS=dict(bucket='nim-beryl-test'),
+    # DIRECTORY_PREFIX='/modeltest/',
 )
 
 ################################ Bulk Email ###################################
@@ -1885,6 +1886,8 @@ YOUTUBE = {
     # YouTube JavaScript API
     'API': 'https://www.youtube.com/iframe_api',
 
+    'TEST_TIMEOUT': 1500,
+
     # URL to get YouTube metadata
     'METADATA_URL': 'https://www.googleapis.com/youtube/v3/videos/',
 
@@ -1935,6 +1938,10 @@ INSTALLED_APPS = (
     'edxmako',
     'pipeline',
     'static_replace',
+
+    # For user interface plugins
+    'web_fragments',
+    'openedx.core.djangoapps.plugin_api',
 
     # For content serving
     'openedx.core.djangoapps.contentserver',
@@ -2159,16 +2166,14 @@ INSTALLED_APPS = (
 
     # Customized celery tasks, including persisting failed tasks so they can
     # be retried
-    'openedx.core.djangoapps.celery_utils',
+    'celery_utils',
 
     # Ability to detect and special-case crawler behavior
     'openedx.core.djangoapps.crawlers',
-)
 
-# Migrations which are not in the standard module "migrations"
-MIGRATION_MODULES = {
-    'social.apps.django_app.default': 'social.apps.django_app.default.south_migrations'
-}
+    # Unusual migrations
+    'database_fixups',
+)
 
 ######################### CSRF #########################################
 
@@ -2682,8 +2687,10 @@ OPTIONAL_APPS = (
     # Organizations App (http://github.com/edx/edx-organizations)
     'organizations',
 
-    # Enterprise App (http://github.com/edx/edx-enterprise)
+    # Enterprise Apps (http://github.com/edx/edx-enterprise)
     'enterprise',
+    'integrated_channels.integrated_channel',
+    'integrated_channels.sap_success_factors',
     # Required by the Enterprise App
     'django_object_actions',  # https://github.com/crccheck/django-object-actions
 )

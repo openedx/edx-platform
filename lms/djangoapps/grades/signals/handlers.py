@@ -6,10 +6,11 @@ from logging import getLogger
 
 from django.dispatch import receiver
 from submissions.models import score_set, score_reset
+from xblock.scorable import ScorableXBlockMixin, Score
 
 from courseware.model_data import get_score, set_score
 from eventtracking import tracker
-from openedx.core.lib.grade_utils import is_score_higher
+from openedx.core.lib.grade_utils import is_score_higher_or_equal
 from student.models import user_by_anonymous_id
 from util.date_utils import to_timestamp
 from track.event_transaction_utils import (
@@ -57,6 +58,9 @@ def submissions_score_set_handler(sender, **kwargs):  # pylint: disable=unused-a
     user = user_by_anonymous_id(kwargs['anonymous_user_id'])
     if user is None:
         return
+    if points_possible == 0:
+        # This scenario is known to not succeed, see TNL-6559 for details.
+        return
 
     PROBLEM_WEIGHTED_SCORE_CHANGED.send(
         sender=None,
@@ -100,6 +104,7 @@ def submissions_score_reset_handler(sender, **kwargs):  # pylint: disable=unused
         course_id=course_id,
         usage_id=usage_id,
         modified=kwargs['created_at'],
+        score_deleted=True,
         score_db_table=ScoreDatabaseTableEnum.submissions,
     )
 
@@ -117,7 +122,7 @@ def score_published_handler(sender, block, user, raw_earned, raw_possible, only_
         if previous_score is not None:
             prev_raw_earned, prev_raw_possible = (previous_score.grade, previous_score.max_grade)
 
-            if not is_score_higher(prev_raw_earned, prev_raw_possible, raw_earned, raw_possible):
+            if not is_score_higher_or_equal(prev_raw_earned, prev_raw_possible, raw_earned, raw_possible):
                 update_score = False
                 log.warning(
                     u"Grades: Rescore is not higher than previous: "
@@ -127,7 +132,14 @@ def score_published_handler(sender, block, user, raw_earned, raw_possible, only_
                 )
 
     if update_score:
+        # Set the problem score in CSM.
         score_modified_time = set_score(user.id, block.location, raw_earned, raw_possible)
+
+        # Set the problem score on the xblock.
+        if isinstance(block, ScorableXBlockMixin):
+            block.set_score(Score(raw_earned=raw_earned, raw_possible=raw_possible))
+
+        # Fire a signal (consumed by enqueue_subsection_update, below)
         PROBLEM_RAW_SCORE_CHANGED.send(
             sender=None,
             raw_earned=raw_earned,

@@ -69,6 +69,7 @@
 
                     this.platformName = options.platform_name;
                     this.supportURL = options.support_link;
+                    this.createAccountOption = options.account_creation_allowed;
 
                 // The login view listens for 'sync' events from the reset model
                     this.resetModel = new PasswordResetModel({}, {
@@ -119,7 +120,8 @@
                             resetModel: this.resetModel,
                             thirdPartyAuth: this.thirdPartyAuth,
                             platformName: this.platformName,
-                            supportURL: this.supportURL
+                            supportURL: this.supportURL,
+                            createAccountOption: this.createAccountOption
                         });
 
                     // Listen for 'password-help' event to toggle sub-views

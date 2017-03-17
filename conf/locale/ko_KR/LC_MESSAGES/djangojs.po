@@ -62,8 +62,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-01-05 17:02+0000\n"
-"PO-Revision-Date: 2017-01-05 17:07+0000\n"
+"POT-Creation-Date: 2017-03-09 20:48+0000\n"
+"PO-Revision-Date: 2017-03-09 20:58+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/open-edx/edx-platform/language/ko_KR/)\n"
 "MIME-Version: 1.0\n"
@@ -82,8 +82,8 @@ msgstr ""
 #: cms/static/js/views/edit_textbook.js
 #: cms/static/js/views/list_item_editor.js
 #: cms/static/js/views/modals/edit_xblock.js cms/static/js/views/tabs.js
-#: cms/static/js/views/tabs.js.c cms/static/js/views/utils/xblock_utils.js
-#: lms/static/js/ccx/schedule.js lms/static/js/views/fields.js
+#: cms/static/js/views/utils/xblock_utils.js lms/static/js/ccx/schedule.js
+#: lms/static/js/views/fields.js
 msgid "Saving"
 msgstr "저장중"
 
@@ -175,7 +175,6 @@ msgid "Ok"
 msgstr "확인"
 
 #: cms/static/js/views/manage_users_and_roles.js
-#: lms/static/coffee/src/instructor_dashboard/util.js
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Unknown"
 msgstr "알 수 없음"
@@ -2013,7 +2012,9 @@ msgid "Loading posts list"
 msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
-msgid "No results found for {original_query}. "
+msgid ""
+"No results found for {original_query}. Showing results for "
+"{suggested_query}."
 msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
@@ -2126,13 +2127,13 @@ msgstr "목표점에 떨어트렸습니다."
 
 #. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
+#, javascript-format
 msgid "%s ago"
 msgstr "%s 전"
 
 #. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
+#, javascript-format
 msgid "%s from now"
 msgstr "지금으로 부터 %s 이후"
 
@@ -2145,7 +2146,7 @@ msgid "about a minute"
 msgstr "1분가량"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
+#, javascript-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d 분"
@@ -2155,7 +2156,7 @@ msgid "about an hour"
 msgstr "약 한 시간 정도"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
+#, javascript-format
 msgid "about %d hour"
 msgid_plural "about %d hours"
 msgstr[0] "약 %d 시간 정도"
@@ -2165,7 +2166,7 @@ msgid "a day"
 msgstr "하루"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
+#, javascript-format
 msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] "%d 일"
@@ -2175,7 +2176,7 @@ msgid "about a month"
 msgstr "약 1개월"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
+#, javascript-format
 msgid "%d month"
 msgid_plural "%d months"
 msgstr[0] "%d 개월"
@@ -2185,7 +2186,7 @@ msgid "about a year"
 msgstr "약 1년 "
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
+#, javascript-format
 msgid "%d year"
 msgid_plural "%d years"
 msgstr[0] "%d 년"
@@ -2575,6 +2576,8 @@ msgstr ""
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid ""
 "Your request could not be completed due to a server problem. Reload the page"
+" and try again. If the issue persists, click the Help tab to report the "
+"problem."
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
@@ -2685,691 +2688,6 @@ msgstr ""
 #: lms/static/coffee/src/customwmd.js
 msgid "Post body"
 msgstr "본문 게시글 올리기"
-
-#: lms/static/coffee/src/instructor_dashboard/data_download.js
-#: lms/static/js/instructor_dashboard/data_download.js
-msgid "Loading data..."
-msgstr ""
-
-#: lms/static/coffee/src/instructor_dashboard/data_download.js
-#: lms/static/js/instructor_dashboard/data_download.js
-msgid "Error getting issued certificates list."
-msgstr ""
-
-#: lms/static/coffee/src/instructor_dashboard/data_download.js
-#: lms/static/js/instructor_dashboard/data_download.js
-msgid "Error generating proctored exam results. Please try again."
-msgstr ""
-
-#: lms/static/coffee/src/instructor_dashboard/data_download.js
-#: lms/static/js/instructor_dashboard/data_download.js
-msgid "Error generating survey results. Please try again."
-msgstr ""
-
-#: lms/static/coffee/src/instructor_dashboard/data_download.js
-#: lms/static/js/instructor_dashboard/data_download.js
-msgid "Error generating student profile information. Please try again."
-msgstr "학습자 정보를 만드는 중 오류가 발생했습니다. 다시 시도하세요."
-
-#: lms/static/coffee/src/instructor_dashboard/data_download.js
-#: lms/static/js/bookmarks/views/bookmarks_list.js
-#: lms/static/js/instructor_dashboard/data_download.js
-#: lms/templates/search/search_loading.underscore
-msgid "Loading"
-msgstr "로딩"
-
-#: lms/static/coffee/src/instructor_dashboard/data_download.js
-#: lms/static/js/instructor_dashboard/data_download.js
-msgid "Error getting student list."
-msgstr "학습자 목록 가져오기 에러."
-
-#: lms/static/coffee/src/instructor_dashboard/data_download.js
-#: lms/static/js/instructor_dashboard/data_download.js
-msgid "Error generating list of students who may enroll. Please try again."
-msgstr "수강신청한 학습자 목록을 생성하는 중 오류가 발생했습니다. 다시 시도하세요."
-
-#: lms/static/coffee/src/instructor_dashboard/data_download.js
-#: lms/static/js/instructor_dashboard/data_download.js
-msgid "Error retrieving grading configuration."
-msgstr "성적설정 가져오기 에러"
-
-#: lms/static/coffee/src/instructor_dashboard/data_download.js
-#: lms/static/js/instructor_dashboard/data_download.js
-msgid "Error generating grades. Please try again."
-msgstr "성적 생성 중 오류가 발생했습니다. 다시 시도하세요."
-
-#: lms/static/coffee/src/instructor_dashboard/data_download.js
-#: lms/static/js/instructor_dashboard/data_download.js
-msgid "Error generating problem grade report. Please try again."
-msgstr "성적 보고서 생성 중 오류가 발생했습니다. 다시 시도하세요."
-
-#: lms/static/coffee/src/instructor_dashboard/data_download.js
-#: lms/static/js/instructor_dashboard/data_download.js
-msgid "Error generating ORA data report. Please try again."
-msgstr ""
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-#: lms/static/js/student_account/views/account_settings_factory.js
-#: lms/static/js/student_profile/views/learner_profile_factory.js
-msgid "Username"
-msgstr "아이디"
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "Email"
-msgstr "이메일"
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "Revoke access"
-msgstr "접근 권한 취소"
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "Enter username or email"
-msgstr "아이디 또는 이메일을 입력하세요"
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "Please enter a username or email."
-msgstr "아이디 또는 이메일을 입력하세요"
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "Error changing user's permissions."
-msgstr "이용자의 권한 변경 에러"
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid ""
-"Could not find a user with username or email address '<%- identifier %>'."
-msgstr ""
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid ""
-"Error: User '<%- username %>' has not yet activated their account. Users "
-"must create and activate their accounts before they can be assigned a role."
-msgstr ""
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "Error: You cannot remove yourself from the Instructor group!"
-msgstr "오류: 자신을 교수자 그룹에서 제거할 수 없습니다. "
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "Errors"
-msgstr "오류"
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "The following errors were generated:"
-msgstr "다음 오류가 발생했습니다."
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "Warnings"
-msgstr "경고!"
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "The following warnings were generated:"
-msgstr "다음 경고가 발생했습니다:"
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-#: lms/static/js/views/fields.js
-msgid "Success"
-msgstr "성공"
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "All accounts were created successfully."
-msgstr "모든 계정이 생성되었습니다."
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "Error adding/removing users as beta testers."
-msgstr "베타테스터 추가/삭제 중 오류 발생"
-
-#. Translators: A list of users appears after this sentence;
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "These users were successfully added as beta testers:"
-msgstr "이 이용자들이 성공적으로 베타테스터로 추가되었습니다."
-
-#. Translators: A list of users appears after this sentence;
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "These users were successfully removed as beta testers:"
-msgstr "이 이용자들이 성공적으로 베타테스터에서 삭제되었습니다."
-
-#. Translators: A list of users appears after this sentence;
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "These users were not added as beta testers:"
-msgstr "이 이용자들은  베타테스터로 추가되지 않았습니다."
-
-#. Translators: A list of users appears after this sentence;
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "These users were not removed as beta testers:"
-msgstr "이 이용자들은 베타테스터에서 삭제되지 않았습니다."
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid ""
-"Users must create and activate their account before they can be promoted to "
-"beta tester."
-msgstr "이용자는 베타테스터로 등록되기 전에 계정을 생성하고 활성화해야 합니다."
-
-#. Translators: A list of identifiers (which are email addresses and/or
-#. usernames) appears after this sentence;
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "Could not find users associated with the following identifiers:"
-msgstr "다음 식별자와 연관된 사용자를 찾을 수 없습니다."
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "Reason field should not be left blank."
-msgstr "이유를 입력하는 필드는 비워둘 수 없습니다."
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "Error enrolling/unenrolling users."
-msgstr "사용자 등록/삭제 시 발생한 오류"
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "The following email addresses and/or usernames are invalid:"
-msgstr "다음의 이메일 주소  또는 아이디는 유효하지 않습니다. "
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "Successfully enrolled and sent email to the following users:"
-msgstr "성공적으로 등록하고, 다음 이용자에게 이메일을 발송했습니다. "
-
-#. Translators: A list of users appears after this sentence;
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "Successfully enrolled the following users:"
-msgstr "다음 이용자들을 성공적으로 등록했습니다."
-
-#. Translators: A list of users appears after this sentence;
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid ""
-"Successfully sent enrollment emails to the following users. They will be "
-"allowed to enroll once they register:"
-msgstr "등록 이메일을 다음 이용자들에게  발송했습니다. "
-
-#. Translators: A list of users appears after this sentence;
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "These users will be allowed to enroll once they register:"
-msgstr "이 사용자들은 등록하면 바로 수강신청할 수 있습니다. "
-
-#. Translators: A list of users appears after this sentence;
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid ""
-"Successfully sent enrollment emails to the following users. They will be "
-"enrolled once they register:"
-msgstr "다음 사용자에게  성공적으로 등록 이메일을 발송했습니다. 가입신청하면 강좌에 등록이 될 것입니다: "
-
-#. Translators: A list of users appears after this sentence;
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "These users will be enrolled once they register:"
-msgstr "가입 신청하면 강좌에 등록이 될 것입니다: "
-
-#. Translators: A list of users appears after this sentence;
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid ""
-"Emails successfully sent. The following users are no longer enrolled in the "
-"course:"
-msgstr "이메일 전송완료. 다음 사용자들은 이 강좌에 더이상 등록되어 있지 않습니다:"
-
-#. Translators: A list of users appears after this sentence;
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid "The following users are no longer enrolled in the course:"
-msgstr "다음 사용자들은 이 강좌에 더이상 등록되어 있지 않습니다:"
-
-#. Translators: A list of users appears after this sentence. This situation
-#. arises when a staff member tries to unenroll a user who is not currently
-#. enrolled in this course.;
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/js/instructor_dashboard/membership.js
-msgid ""
-"These users were not affiliated with the course so could not be unenrolled:"
-msgstr "이 사용자들은 이 강좌와 관련없으므로 수강취소할 수 없습니다."
-
-#: lms/static/coffee/src/instructor_dashboard/send_email.js
-#: lms/static/js/instructor_dashboard/send_email.js
-msgid "Your message must have a subject."
-msgstr "제목을 입력해야 합니다."
-
-#: lms/static/coffee/src/instructor_dashboard/send_email.js
-#: lms/static/js/instructor_dashboard/send_email.js
-msgid "Your message cannot be blank."
-msgstr "내용을 입력해야 합니다."
-
-#: lms/static/coffee/src/instructor_dashboard/send_email.js
-#: lms/static/js/instructor_dashboard/send_email.js
-msgid "Your message must have at least one target."
-msgstr ""
-
-#: lms/static/coffee/src/instructor_dashboard/send_email.js
-#: lms/static/js/instructor_dashboard/send_email.js
-msgid ""
-"There are invalid keywords in your email. Check the following keywords and "
-"try again."
-msgstr ""
-
-#: lms/static/coffee/src/instructor_dashboard/send_email.js
-#: lms/static/js/instructor_dashboard/send_email.js
-msgid "Yourself"
-msgstr ""
-
-#: lms/static/coffee/src/instructor_dashboard/send_email.js
-#: lms/static/js/instructor_dashboard/send_email.js
-msgid "Everyone who has staff privileges in this course"
-msgstr ""
-
-#: lms/static/coffee/src/instructor_dashboard/send_email.js
-#: lms/static/js/instructor_dashboard/send_email.js
-msgid "All learners who are enrolled in this course"
-msgstr ""
-
-#: lms/static/coffee/src/instructor_dashboard/send_email.js
-#: lms/static/js/instructor_dashboard/send_email.js
-msgid "All learners in the {cohort_name} cohort"
-msgstr ""
-
-#: lms/static/coffee/src/instructor_dashboard/send_email.js
-#: lms/static/js/instructor_dashboard/send_email.js
-msgid ""
-"Your email message was successfully queued for sending. In courses with a "
-"large number of learners, email messages to learners might take up to an "
-"hour to be sent."
-msgstr ""
-
-#: lms/static/coffee/src/instructor_dashboard/send_email.js
-#: lms/static/js/instructor_dashboard/send_email.js
-msgid ""
-"You are sending an email message with the subject {subject} to the following"
-" recipients."
-msgstr ""
-
-#: lms/static/coffee/src/instructor_dashboard/send_email.js
-#: lms/static/js/instructor_dashboard/send_email.js
-msgid "Is this OK?"
-msgstr ""
-
-#: lms/static/coffee/src/instructor_dashboard/send_email.js
-#: lms/static/js/instructor_dashboard/send_email.js
-msgid "Error sending email."
-msgstr "메일 전송 오류"
-
-#: lms/static/coffee/src/instructor_dashboard/send_email.js
-#: lms/static/js/instructor_dashboard/send_email.js
-msgid "There is no email history for this course."
-msgstr "이 강좌에는 메일 전송 기록이 없습니다."
-
-#: lms/static/coffee/src/instructor_dashboard/send_email.js
-#: lms/static/js/instructor_dashboard/send_email.js
-msgid "There was an error obtaining email task history for this course."
-msgstr "이 강좌의 이메일 발송 기록 가져오기에 실패하였습니다."
-
-#: lms/static/coffee/src/instructor_dashboard/send_email.js
-#: lms/static/js/instructor_dashboard/send_email.js
-msgid "There was an error obtaining email content history for this course."
-msgstr "이 강좌의 메일 전송 기록을 가져오는데 오류가 발생했습니다."
-
-#: lms/static/coffee/src/instructor_dashboard/send_email.js
-#: lms/static/js/instructor_dashboard/send_email.js
-msgid "Send to:"
-msgstr ""
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/instructor_dashboard/student_admin.js
-msgid "Please enter a student email address or username."
-msgstr "학습자의 이메일 주소나 아이디를 입력하세요."
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-msgid ""
-"Error getting student progress url for '<%= student_id %>'. Make sure that "
-"the student identifier is spelled correctly."
-msgstr " '<%= student_id %>' 학습자 진도 가져오기 오류. 학습자 ID가 정확한지 확인하세요."
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/instructor_dashboard/student_admin.js
-msgid "Please enter a problem location."
-msgstr "문제 위치를 입력하세요."
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-msgid ""
-"Success! Problem attempts reset for problem '<%= problem_id %>' and student "
-"'<%= student_id %>'."
-msgstr "'<%= problem_id %>' 문제와  <%= student_id %>' 학습자가 초기화되었습니다."
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-msgid ""
-"Error resetting problem attempts for problem '<%= problem_id %>' and student"
-" '<%= student_id %>'. Make sure that the problem and student identifiers are"
-" complete and correct."
-msgstr ""
-" '<%= problem_id %>' 문제에서  '<%= student_id %>' 학습자의 상태 초기화 중 오류가 발생했습니다. 문제와"
-" 학습자의 ID가 정확한지 확인하세요."
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-msgid ""
-"Delete student '<%= student_id %>'s state on problem '<%= problem_id %>'?"
-msgstr "'<%= problem_id %>' 문제에서 '<%= student_id %>' 학습자의 상태를 삭제하시겠습니까?"
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-msgid ""
-"Error deleting student '<%= student_id %>'s state on problem '<%= problem_id"
-" %>'. Make sure that the problem and student identifiers are complete and "
-"correct."
-msgstr ""
-"'<%= problem_id %>' 문제에서 '<%= student_id %>' 학습자의 상태 삭제 중 오류가 발생했습니다. 문제와 "
-"학습자의 ID가 정확한지 확인하세요."
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/instructor_dashboard/student_admin.js
-msgid "Module state successfully deleted."
-msgstr "모듈 상태가 성공적으로 삭제되었습니다."
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-msgid ""
-"Started rescore problem task for problem '<%= problem_id %>' and student "
-"'<%= student_id %>'. Click the 'Show Background Task History for Student' "
-"button to see the status of the task."
-msgstr ""
-"'<%= problem_id %>' 문제와  '<%= student_id %>' 학습자에 대한 문제 재평가 작업을 시작했습니다. 작업의 "
-"진행 상황을 보기 위해 '학습자 백그라운드 작업 기록 보기' 버튼을 클릭하세요."
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-msgid ""
-"Error starting a task to rescore problem '<%= problem_id %>' for student "
-"'<%= student_id %>'. Make sure that the the problem and student identifiers "
-"are complete and correct."
-msgstr ""
-" '<%= student_id %>' 학습자의  '<%= problem_id %>'문제 재채점 작업 시작 중 오류가 발생했습니다. 문제와"
-" 학습자 ID가 정확한지 확인하세요."
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-msgid ""
-"Error getting task history for problem '<%= problem_id %>' and student '<%= "
-"student_id %>'. Make sure that the problem and student identifiers are "
-"complete and correct."
-msgstr ""
-"'<%= problem_id %>' 문제와  '<%= student_id %>' 학습자의 작업 기록을 가져오는 중 오류가 발생했습니다. "
-"문제와 학습자 ID가 정확한지 확인하세요."
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/instructor_dashboard/student_admin.js
-msgid "Entrance exam attempts is being reset for student '{student_id}'."
-msgstr "'{student_id}' 학습자가 시도한 사전 평가 횟수는 초기화됩니다."
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/instructor_dashboard/student_admin.js
-msgid ""
-"Error resetting entrance exam attempts for student '{student_id}'. Make sure"
-" student identifier is correct."
-msgstr " '{student_id}' 학습자의 사전 평가 초기화에 오류가 발생했습니다. 학습자 ID가 정확한지 확인하세요."
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-msgid ""
-"Started entrance exam rescore task for student '{student_id}'. Click the "
-"'Show Background Task History for Student' button to see the status of the "
-"task."
-msgstr ""
-"'{student_id}' 학습자 사전 평가 재채점을 시작했습니다. 작업의 진행 상황을 보기 위해 '학습자 백그라운드 작업 기록 보기' "
-"버튼을 클릭하세요."
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/instructor_dashboard/student_admin.js
-msgid ""
-"Error starting a task to rescore entrance exam for student '{student_id}'. "
-"Make sure that entrance exam has problems in it and student identifier is "
-"correct."
-msgstr ""
-" '{student_id}' 학습자의 사전 평가 재채점에 오류가 발생했습니다. 사전 평가에 문항이 있는지와 학습자 아이디가 정확한지 "
-"확인하세요."
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/instructor_dashboard/student_admin.js
-msgid "Enter a student's username or email address."
-msgstr "학습자의 아이디 또는 이메일 주소를 입력하세요."
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/instructor_dashboard/student_admin.js
-msgid ""
-"Do you want to allow this student ('{student_id}') to skip the entrance "
-"exam?"
-msgstr "학습자 ('{student_id}')의 사전 평가 면제를 허용하시겠습니까?"
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/instructor_dashboard/student_admin.js
-msgid ""
-"An error occurred. Make sure that the student's username or email address is"
-" correct and try again."
-msgstr "오류가 발생했습니다. 학습자의 아이디와 이메일 주소가 올바른지 확인하고 다시 시도해 주세요."
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/instructor_dashboard/student_admin.js
-msgid "Entrance exam state is being deleted for student '{student_id}'."
-msgstr "학습자 '{student_id}'의 사전 평가 상태는 삭제됩니다."
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/instructor_dashboard/student_admin.js
-msgid ""
-"Error deleting entrance exam state for student '{student_id}'. Make sure "
-"student identifier is correct."
-msgstr ""
-"학습자 '{student_id}'의 사전 평가 상태를 삭제하는 도중 오류가 발생했습니다.  학습자의 고유번호가 올바른지 확인하세요."
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/instructor_dashboard/student_admin.js
-msgid ""
-"Error getting entrance exam task history for student '{student_id}'. Make "
-"sure student identifier is correct."
-msgstr ""
-"학습자 '{student_id}'의 사전 평가의 과제이력을 삭제하는 도중 오류가 발생했습니다. 학습자의 고유번호가 올바른지 확인하세요."
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-msgid "Reset attempts for all students on problem '<%= problem_id %>'?"
-msgstr " '<%= problem_id %>'문제에 대한 모든 학습자의 시도를 초기화합니다."
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-msgid ""
-"Successfully started task to reset attempts for problem '<%= problem_id %>'."
-" Click the 'Show Background Task History for Problem' button to see the "
-"status of the task."
-msgstr ""
-"'<%= problem_id %>' 문제 재설정 작업을 시작했습니다. 작업의 진행 상황을 보기 위해 '학습자 백그라운드 작업 기록 보기'"
-" 버튼을 클릭하세요."
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-msgid ""
-"Error starting a task to reset attempts for all students on problem '<%= "
-"problem_id %>'. Make sure that the problem identifier is complete and "
-"correct."
-msgstr " '<%= problem_id %>' 문제의 초기화 작업 시작에 오류가 발생했습니다. 문제 ID가 정확한지 확인하세요."
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-msgid "Rescore problem '<%= problem_id %>' for all students?"
-msgstr "모든 학습자가 푼 문제 '<%= problem_id %>'을 재채점할까요?"
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-msgid ""
-"Successfully started task to rescore problem '<%= problem_id %>' for all "
-"students. Click the 'Show Background Task History for Problem' button to see"
-" the status of the task."
-msgstr ""
-"전체 학습자의 '<%= problem_id %>' 문제 재채점 작업을 시작했습니다. 작업의 진행 상황을 보기 위해 '학습자 백그라운드 "
-"작업 기록 보기' 버튼을 클릭하세요."
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-msgid ""
-"Error starting a task to rescore problem '<%= problem_id %>'. Make sure that"
-" the problem identifier is complete and correct."
-msgstr ""
-" '<%= problem_id %>' 문제를 재채점하는 작업 시작 중 오류가 발생했습니다. 문제 ID가 정확한지 확인하세요. "
-
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/js/instructor_dashboard/student_admin.js
-msgid "Error listing task history for this student and problem."
-msgstr "학습자 및 문제 대한 작업 오류 내역 표시에서 오류가 발생했습니다."
-
-#. Translators: a "Task" is a background process such as grading students or
-#. sending email
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Task Type"
-msgstr "작업 유형"
-
-#. Translators: a "Task" is a background process such as grading students or
-#. sending email
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Task inputs"
-msgstr "작업 입력"
-
-#. Translators: a "Task" is a background process such as grading students or
-#. sending email
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Task ID"
-msgstr "작업 ID"
-
-#. Translators: a "Requester" is a username that requested a task such as
-#. sending email
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Requester"
-msgstr "요청자"
-
-#. Translators: A timestamp of when a task (eg, sending email) was submitted
-#. appears after this
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Submitted"
-msgstr "제출했습니다."
-
-#. Translators: The length of a task (eg, sending email) in seconds appears
-#. this
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Duration (sec)"
-msgstr "기간(초)"
-
-#. Translators: The state (eg, "In progress") of a task (eg, sending email)
-#. appears after this.
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "State"
-msgstr "상태"
-
-#. Translators: a "Task" is a background process such as grading students or
-#. sending email
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Task Status"
-msgstr "작업 상태"
-
-#. Translators: a "Task" is a background process such as grading students or
-#. sending email
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Task Progress"
-msgstr "작업 진행상황"
-
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid ""
-"An error occurred retrieving your email. Please try again later, and contact"
-" technical support if the problem persists."
-msgstr "이메일을 검색하는 동안 오류가 발생했습니다. 나중에 다시 시도한 후, 문제가 지속되면 기술 지원팀에 연락주세요."
-
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Subject"
-msgstr "제목"
-
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Sent By"
-msgstr "보낸 사람"
-
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Sent To"
-msgstr ""
-
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Time Sent"
-msgstr "보낸 시간"
-
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Number Sent"
-msgstr "보낸 횟수"
-
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Copy Email To Editor"
-msgstr "편집기로 이메일 복사하기"
-
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Subject:"
-msgstr "제목:"
-
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Sent By:"
-msgstr "보내는 사람:"
-
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Time Sent:"
-msgstr "보낸 시간:"
-
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Sent To:"
-msgstr "받는사람:"
-
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Message:"
-msgstr "본문: "
-
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "No tasks currently running."
-msgstr "작업이 없습니다."
-
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid "File Name"
-msgstr "파일이름"
-
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/js/instructor_dashboard/util.js
-msgid ""
-"Links are generated on demand and expire within 5 minutes due to the "
-"sensitive nature of student information."
-msgstr "요청에 의해 생성된 링크는 학습자 정보 보호를 위해  5분 내에 소멸됩니다."
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Insert Hyperlink"
@@ -3522,8 +2840,11 @@ msgid "Heading"
 msgstr "제목"
 
 #: lms/static/js/ajax-error.js
-msgid "You have been logged out of your edX account. "
-msgstr "로그아웃 되었습니다."
+msgid ""
+"You have been logged out of your edX account. Click Okay to log in again "
+"now. Click Cancel to stay on this page (you must log in again to save your "
+"work)."
+msgstr ""
 
 #: lms/static/js/api_admin/views/catalog_preview.js
 msgid "Preview this query"
@@ -3547,6 +2868,12 @@ msgstr ""
 msgid "Click to remove"
 msgstr ""
 
+#: lms/static/js/bookmarks/views/bookmarks_list.js
+#: lms/static/js/instructor_dashboard/data_download.js
+#: lms/templates/search/search_loading.underscore
+msgid "Loading"
+msgstr "로딩"
+
 #: lms/static/js/ccx/schedule.js
 msgid "All subsections"
 msgstr "모든 소주제"
@@ -3555,8 +2882,7 @@ msgstr "모든 소주제"
 msgid "All units"
 msgstr "전체 학습활동"
 
-#: lms/static/js/ccx/schedule.js lms/static/js/ccx/schedule.js.c
-#: lms/templates/ccx/schedule.underscore
+#: lms/static/js/ccx/schedule.js lms/templates/ccx/schedule.underscore
 msgid "Click to change"
 msgstr ""
 
@@ -3564,7 +2890,7 @@ msgstr ""
 msgid "Select a chapter"
 msgstr "chapter 선택"
 
-#: lms/static/js/ccx/schedule.js lms/static/js/ccx/schedule.js.c
+#: lms/static/js/ccx/schedule.js
 msgid "Save changes"
 msgstr "변경사항 저장"
 
@@ -3585,8 +2911,15 @@ msgid "Enter Start Date and Time"
 msgstr ""
 
 #: lms/static/js/certificates/models/certificate_exception.js
+msgid ""
+"Student username/email field is required and can not be empty. Kindly fill "
+"in username/email and then press \"Add to Exception List\" button."
+msgstr ""
+
 #: lms/static/js/certificates/models/certificate_invalidation.js
-msgid "Student username/email field is required and can not be empty. "
+msgid ""
+"Student username/email field is required and can not be empty. Kindly fill "
+"in username/email and then press \"Invalidate Certificate\" button."
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
@@ -3602,15 +2935,15 @@ msgid " learner is successfully added to the exception list"
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " records are not in correct format and not added to"
+msgid " records are not in correct format and not added to the exception list"
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " record is not in correct format and not added to the exception"
+msgid " record is not in correct format and not added to the exception list"
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learners do not exist in LMS and not added to the"
+msgid " learners do not exist in LMS and not added to the exception list"
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
@@ -3618,19 +2951,20 @@ msgid " learner does not exist in LMS and not added to the exception list"
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learners are already white listed and not added to"
+msgid " learners are already white listed and not added to the exception list"
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learner is already white listed and not added to the exception "
+msgid " learner is already white listed and not added to the exception list"
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learners are not enrolled in course and not added to"
+msgid ""
+" learners are not enrolled in course and not added to the exception list"
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learner is not enrolled in course and not added to the exception"
+msgid " learner is not enrolled in course and not added to the exception list"
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
@@ -3702,13 +3036,13 @@ msgid "An error occurred. Please try again later."
 msgstr "오류가 발생했습니다. 잠시 후에 다시 시도하세요."
 
 #: lms/static/js/discovery/views/search_form.js
-#, c-format
+#, javascript-format
 msgid "Viewing %s course"
 msgid_plural "Viewing %s courses"
 msgstr[0] "%s 강좌 보기"
 
 #: lms/static/js/discovery/views/search_form.js
-#, c-format
+#, javascript-format
 msgid "We couldn't find any results for \"%s\"."
 msgstr "\"%s\"를 찾을 수 없습니다. "
 
@@ -3948,6 +3282,50 @@ msgstr ""
 msgid "Error while regenerating certificates. Please try again."
 msgstr ""
 
+#: lms/static/js/instructor_dashboard/data_download.js
+msgid "Loading data..."
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/data_download.js
+msgid "Error getting issued certificates list."
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/data_download.js
+msgid "Error generating proctored exam results. Please try again."
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/data_download.js
+msgid "Error generating survey results. Please try again."
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/data_download.js
+msgid "Error generating student profile information. Please try again."
+msgstr "학습자 정보를 만드는 중 오류가 발생했습니다. 다시 시도하세요."
+
+#: lms/static/js/instructor_dashboard/data_download.js
+msgid "Error getting student list."
+msgstr "학습자 목록 가져오기 에러."
+
+#: lms/static/js/instructor_dashboard/data_download.js
+msgid "Error generating list of students who may enroll. Please try again."
+msgstr "수강신청한 학습자 목록을 생성하는 중 오류가 발생했습니다. 다시 시도하세요."
+
+#: lms/static/js/instructor_dashboard/data_download.js
+msgid "Error retrieving grading configuration."
+msgstr "성적설정 가져오기 에러"
+
+#: lms/static/js/instructor_dashboard/data_download.js
+msgid "Error generating grades. Please try again."
+msgstr "성적 생성 중 오류가 발생했습니다. 다시 시도하세요."
+
+#: lms/static/js/instructor_dashboard/data_download.js
+msgid "Error generating problem grade report. Please try again."
+msgstr "성적 보고서 생성 중 오류가 발생했습니다. 다시 시도하세요."
+
+#: lms/static/js/instructor_dashboard/data_download.js
+msgid "Error generating ORA data report. Please try again."
+msgstr ""
+
 #: lms/static/js/instructor_dashboard/ecommerce.js
 msgid ""
 "There was a problem creating the report. Select \"Create Executive Summary\""
@@ -3970,11 +3348,252 @@ msgstr "수강신청 코드를 복구하세요."
 msgid "Mark enrollment code as unused"
 msgstr "사용되지 않은 수강 신청 코드를 표시하세요."
 
+#: lms/static/js/instructor_dashboard/membership.js
+#: lms/static/js/student_account/views/account_settings_factory.js
+#: lms/static/js/student_profile/views/learner_profile_factory.js
+msgid "Username"
+msgstr "아이디"
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "Email"
+msgstr "이메일"
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "Revoke access"
+msgstr "접근 권한 취소"
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "Enter username or email"
+msgstr "아이디 또는 이메일을 입력하세요"
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "Please enter a username or email."
+msgstr "아이디 또는 이메일을 입력하세요"
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "Error changing user's permissions."
+msgstr "이용자의 권한 변경 에러"
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid ""
+"Could not find a user with username or email address '<%- identifier %>'."
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid ""
+"Error: User '<%- username %>' has not yet activated their account. Users "
+"must create and activate their accounts before they can be assigned a role."
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "Error: You cannot remove yourself from the Instructor group!"
+msgstr "오류: 자신을 교수자 그룹에서 제거할 수 없습니다. "
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "Errors"
+msgstr "오류"
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "The following errors were generated:"
+msgstr "다음 오류가 발생했습니다."
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "Warnings"
+msgstr "경고!"
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "The following warnings were generated:"
+msgstr "다음 경고가 발생했습니다:"
+
+#: lms/static/js/instructor_dashboard/membership.js
+#: lms/static/js/views/fields.js
+msgid "Success"
+msgstr "성공"
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "All accounts were created successfully."
+msgstr "모든 계정이 생성되었습니다."
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "Error adding/removing users as beta testers."
+msgstr "베타테스터 추가/삭제 중 오류 발생"
+
+#. Translators: A list of users appears after this sentence;
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "These users were successfully added as beta testers:"
+msgstr "이 이용자들이 성공적으로 베타테스터로 추가되었습니다."
+
+#. Translators: A list of users appears after this sentence;
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "These users were successfully removed as beta testers:"
+msgstr "이 이용자들이 성공적으로 베타테스터에서 삭제되었습니다."
+
+#. Translators: A list of users appears after this sentence;
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "These users were not added as beta testers:"
+msgstr "이 이용자들은  베타테스터로 추가되지 않았습니다."
+
+#. Translators: A list of users appears after this sentence;
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "These users were not removed as beta testers:"
+msgstr "이 이용자들은 베타테스터에서 삭제되지 않았습니다."
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid ""
+"Users must create and activate their account before they can be promoted to "
+"beta tester."
+msgstr "이용자는 베타테스터로 등록되기 전에 계정을 생성하고 활성화해야 합니다."
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "Could not find users associated with the following identifiers:"
+msgstr "다음 식별자와 연관된 사용자를 찾을 수 없습니다."
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "Reason field should not be left blank."
+msgstr "이유를 입력하는 필드는 비워둘 수 없습니다."
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "Error enrolling/unenrolling users."
+msgstr "사용자 등록/삭제 시 발생한 오류"
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "The following email addresses and/or usernames are invalid:"
+msgstr "다음의 이메일 주소  또는 아이디는 유효하지 않습니다. "
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "Successfully enrolled and sent email to the following users:"
+msgstr "성공적으로 등록하고, 다음 이용자에게 이메일을 발송했습니다. "
+
+#. Translators: A list of users appears after this sentence;
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "Successfully enrolled the following users:"
+msgstr "다음 이용자들을 성공적으로 등록했습니다."
+
+#. Translators: A list of users appears after this sentence;
+#: lms/static/js/instructor_dashboard/membership.js
+msgid ""
+"Successfully sent enrollment emails to the following users. They will be "
+"allowed to enroll once they register:"
+msgstr "등록 이메일을 다음 이용자들에게  발송했습니다. "
+
+#. Translators: A list of users appears after this sentence;
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "These users will be allowed to enroll once they register:"
+msgstr "이 사용자들은 등록하면 바로 수강신청할 수 있습니다. "
+
+#. Translators: A list of users appears after this sentence;
+#: lms/static/js/instructor_dashboard/membership.js
+msgid ""
+"Successfully sent enrollment emails to the following users. They will be "
+"enrolled once they register:"
+msgstr "다음 사용자에게  성공적으로 등록 이메일을 발송했습니다. 가입신청하면 강좌에 등록이 될 것입니다: "
+
+#. Translators: A list of users appears after this sentence;
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "These users will be enrolled once they register:"
+msgstr "가입 신청하면 강좌에 등록이 될 것입니다: "
+
+#. Translators: A list of users appears after this sentence;
+#: lms/static/js/instructor_dashboard/membership.js
+msgid ""
+"Emails successfully sent. The following users are no longer enrolled in the "
+"course:"
+msgstr "이메일 전송완료. 다음 사용자들은 이 강좌에 더이상 등록되어 있지 않습니다:"
+
+#. Translators: A list of users appears after this sentence;
+#: lms/static/js/instructor_dashboard/membership.js
+msgid "The following users are no longer enrolled in the course:"
+msgstr "다음 사용자들은 이 강좌에 더이상 등록되어 있지 않습니다:"
+
+#: lms/static/js/instructor_dashboard/membership.js
+msgid ""
+"These users were not affiliated with the course so could not be unenrolled:"
+msgstr "이 사용자들은 이 강좌와 관련없으므로 수강취소할 수 없습니다."
+
+#: lms/static/js/instructor_dashboard/send_email.js
+msgid "Your message must have a subject."
+msgstr "제목을 입력해야 합니다."
+
+#: lms/static/js/instructor_dashboard/send_email.js
+msgid "Your message cannot be blank."
+msgstr "내용을 입력해야 합니다."
+
+#: lms/static/js/instructor_dashboard/send_email.js
+msgid "Your message must have at least one target."
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/send_email.js
+msgid ""
+"There are invalid keywords in your email. Check the following keywords and "
+"try again."
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/send_email.js
+msgid "Yourself"
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/send_email.js
+msgid "Everyone who has staff privileges in this course"
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/send_email.js
+msgid "All learners who are enrolled in this course"
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/send_email.js
+msgid "All learners in the {cohort_name} cohort"
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/send_email.js
+msgid ""
+"Your email message was successfully queued for sending. In courses with a "
+"large number of learners, email messages to learners might take up to an "
+"hour to be sent."
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/send_email.js
+msgid ""
+"You are sending an email message with the subject {subject} to the following"
+" recipients."
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/send_email.js
+msgid "Is this OK?"
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/send_email.js
+msgid "Error sending email."
+msgstr "메일 전송 오류"
+
+#: lms/static/js/instructor_dashboard/send_email.js
+msgid "There is no email history for this course."
+msgstr "이 강좌에는 메일 전송 기록이 없습니다."
+
+#: lms/static/js/instructor_dashboard/send_email.js
+msgid "There was an error obtaining email task history for this course."
+msgstr "이 강좌의 이메일 발송 기록 가져오기에 실패하였습니다."
+
+#: lms/static/js/instructor_dashboard/send_email.js
+msgid "There was an error obtaining email content history for this course."
+msgstr "이 강좌의 메일 전송 기록을 가져오는데 오류가 발생했습니다."
+
+#: lms/static/js/instructor_dashboard/send_email.js
+msgid "Send to:"
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid "Please enter a student email address or username."
+msgstr "학습자의 이메일 주소나 아이디를 입력하세요."
+
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
 "Error getting student progress url for '<%- student_id %>'. Make sure that "
 "the student identifier is spelled correctly."
 msgstr ""
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid "Please enter a problem location."
+msgstr "문제 위치를 입력하세요."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -4002,11 +3621,59 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/instructor_dashboard/student_admin.js
+msgid "Module state successfully deleted."
+msgstr "모듈 상태가 성공적으로 삭제되었습니다."
+
+#: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
 "Error getting task history for problem '<%- problem_id %>' and student '<%- "
 "student_id %>'. Make sure that the problem and student identifiers are "
 "complete and correct."
 msgstr ""
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid "Entrance exam attempts is being reset for student '{student_id}'."
+msgstr "'{student_id}' 학습자가 시도한 사전 평가 횟수는 초기화됩니다."
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
+"Error resetting entrance exam attempts for student '{student_id}'. Make sure"
+" student identifier is correct."
+msgstr " '{student_id}' 학습자의 사전 평가 초기화에 오류가 발생했습니다. 학습자 ID가 정확한지 확인하세요."
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid "Enter a student's username or email address."
+msgstr "학습자의 아이디 또는 이메일 주소를 입력하세요."
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
+"Do you want to allow this student ('{student_id}') to skip the entrance "
+"exam?"
+msgstr "학습자 ('{student_id}')의 사전 평가 면제를 허용하시겠습니까?"
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
+"An error occurred. Make sure that the student's username or email address is"
+" correct and try again."
+msgstr "오류가 발생했습니다. 학습자의 아이디와 이메일 주소가 올바른지 확인하고 다시 시도해 주세요."
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid "Entrance exam state is being deleted for student '{student_id}'."
+msgstr "학습자 '{student_id}'의 사전 평가 상태는 삭제됩니다."
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
+"Error deleting entrance exam state for student '{student_id}'. Make sure "
+"student identifier is correct."
+msgstr ""
+"학습자 '{student_id}'의 사전 평가 상태를 삭제하는 도중 오류가 발생했습니다.  학습자의 고유번호가 올바른지 확인하세요."
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
+"Error getting entrance exam task history for student '{student_id}'. Make "
+"sure student identifier is correct."
+msgstr ""
+"학습자 '{student_id}'의 사전 평가의 과제이력을 삭제하는 도중 오류가 발생했습니다. 학습자의 고유번호가 올바른지 확인하세요."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Reset attempts for all students on problem '<%- problem_id %>'?"
@@ -4024,6 +3691,10 @@ msgid ""
 "problem_id %>'. Make sure that the problem identifier is complete and "
 "correct."
 msgstr ""
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid "Error listing task history for this student and problem."
+msgstr "학습자 및 문제 대한 작업 오류 내역 표시에서 오류가 발생했습니다."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -4046,6 +3717,15 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
+"Error starting a task to rescore entrance exam for student '{student_id}'. "
+"Make sure that entrance exam has problems in it and student identifier is "
+"correct."
+msgstr ""
+" '{student_id}' 학습자의 사전 평가 재채점에 오류가 발생했습니다. 사전 평가에 문항이 있는지와 학습자 아이디가 정확한지 "
+"확인하세요."
+
+#: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Rescore problem '<%- problem_id %>' for all students?"
 msgstr ""
 
@@ -4061,8 +3741,126 @@ msgid ""
 " the problem identifier is complete and correct."
 msgstr ""
 
+#. Translators: a "Task" is a background process such as grading students or
+#. sending email
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Task Type"
+msgstr "작업 유형"
+
+#. Translators: a "Task" is a background process such as grading students or
+#. sending email
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Task inputs"
+msgstr "작업 입력"
+
+#. Translators: a "Task" is a background process such as grading students or
+#. sending email
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Task ID"
+msgstr "작업 ID"
+
+#. Translators: a "Requester" is a username that requested a task such as
+#. sending email
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Requester"
+msgstr "요청자"
+
+#. Translators: A timestamp of when a task (eg, sending email) was submitted
+#. appears after this
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Submitted"
+msgstr "제출했습니다."
+
+#. Translators: The length of a task (eg, sending email) in seconds appears
+#. this
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Duration (sec)"
+msgstr "기간(초)"
+
+#. Translators: The state (eg, "In progress") of a task (eg, sending email)
+#. appears after this.
+#: lms/static/js/instructor_dashboard/util.js
+msgid "State"
+msgstr "상태"
+
+#. Translators: a "Task" is a background process such as grading students or
+#. sending email
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Task Status"
+msgstr "작업 상태"
+
+#. Translators: a "Task" is a background process such as grading students or
+#. sending email
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Task Progress"
+msgstr "작업 진행상황"
+
+#: lms/static/js/instructor_dashboard/util.js
+msgid ""
+"An error occurred retrieving your email. Please try again later, and contact"
+" technical support if the problem persists."
+msgstr "이메일을 검색하는 동안 오류가 발생했습니다. 나중에 다시 시도한 후, 문제가 지속되면 기술 지원팀에 연락주세요."
+
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Subject"
+msgstr "제목"
+
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Sent By"
+msgstr "보낸 사람"
+
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Sent To"
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Time Sent"
+msgstr "보낸 시간"
+
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Number Sent"
+msgstr "보낸 횟수"
+
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Copy Email To Editor"
+msgstr "편집기로 이메일 복사하기"
+
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Subject:"
+msgstr "제목:"
+
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Sent By:"
+msgstr "보내는 사람:"
+
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Time Sent:"
+msgstr "보낸 시간:"
+
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Sent To:"
+msgstr "받는사람:"
+
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Message:"
+msgstr "본문: "
+
+#: lms/static/js/instructor_dashboard/util.js
+msgid "No tasks currently running."
+msgstr "작업이 없습니다."
+
+#: lms/static/js/instructor_dashboard/util.js
+msgid "File Name"
+msgstr "파일이름"
+
+#: lms/static/js/instructor_dashboard/util.js
+msgid ""
+"Links are generated on demand and expire within 5 minutes due to the "
+"sensitive nature of student information."
+msgstr "요청에 의해 생성된 링크는 학습자 정보 보호를 위해  5분 내에 소멸됩니다."
+
 #: lms/static/js/search/base/views/search_results_view.js
-#, c-format
+#, javascript-format
 msgid "%s result"
 msgid_plural "%s results"
 msgstr[0] "%s 결과"
@@ -4155,7 +3953,7 @@ msgid "We couldn't sign you in."
 msgstr ""
 
 #: lms/static/js/student_account/views/LoginView.js
-#, c-format
+#, javascript-format
 msgid "An error occurred when signing you in to %s."
 msgstr ""
 
@@ -4169,7 +3967,10 @@ msgid ""
 "{paragraphStart}You entered {boldStart}{email}{boldEnd}. If this email "
 "address is associated with your {platform_name} account, we will send a "
 "message with password reset instructions to this email "
-"address.{paragraphEnd}"
+"address.{paragraphEnd}{paragraphStart}If you do not receive a password reset"
+" message, verify that you entered the correct email address, or check your "
+"spam folder.{paragraphEnd}{paragraphStart}If you need further assistance, "
+"{anchorStart}contact technical support{anchorEnd}.{paragraphEnd}"
 msgstr ""
 
 #: lms/static/js/student_account/views/LoginView.js
@@ -4181,7 +3982,8 @@ msgstr ""
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
 "You have successfully signed into %(currentProvider)s, but your "
-"%(currentProvider)s"
+"%(currentProvider)s account does not have a linked %(platformName)s account."
+" To link your accounts, sign in now using your %(platformName)s password."
 msgstr ""
 
 #: lms/static/js/student_account/views/RegisterView.js
@@ -4669,10 +4471,6 @@ msgid ""
 "release date."
 msgstr ""
 
-#: lms/templates/class_dashboard/all_section_metrics.js
-msgid "Unable to retrieve data, please try again later."
-msgstr "데이터를 검색할 수 없습니다, 나중에 다시 시도하세요."
-
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
 msgid "%(num_students)s student opened Subsection"
 msgid_plural "%(num_students)s students opened Subsection"
@@ -4786,7 +4584,7 @@ msgid "Image must be in PNG format."
 msgstr ""
 
 #: cms/static/js/collections/group.js
-#, c-format
+#, javascript-format
 msgid "Group %s"
 msgstr ""
 
@@ -5204,7 +5002,9 @@ msgid "Upload failed for video {fileName}"
 msgstr ""
 
 #: cms/static/js/views/active_video_upload_list.js
-msgid "{filename} is not in a supported file format. "
+msgid ""
+"{filename} is not in a supported file format. Supported file formats are "
+"{supportedFileFormats}."
 msgstr ""
 
 #: cms/static/js/views/active_video_upload_list.js
@@ -5258,11 +5058,11 @@ msgstr ""
 msgid "Max file size exceeded"
 msgstr ""
 
-#: cms/static/js/views/assets.js cms/static/js/views/assets.js.c
+#: cms/static/js/views/assets.js
 msgid "Upload New File"
 msgstr "파일 업로드"
 
-#: cms/static/js/views/assets.js cms/static/js/views/assets.js.c
+#: cms/static/js/views/assets.js
 msgid "Load Another File"
 msgstr ""
 

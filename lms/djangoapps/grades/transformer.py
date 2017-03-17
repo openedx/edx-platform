@@ -2,17 +2,13 @@
 Grades Transformer
 """
 from base64 import b64encode
-from django.test.client import RequestFactory
 from functools import reduce as functools_reduce
 from hashlib import sha1
 from logging import getLogger
 import json
 
-from courseware.model_data import FieldDataCache
-import courseware.module_render
 from lms.djangoapps.course_blocks.transformers.utils import collect_unioned_set_field, get_field_on_block
-from openedx.core.lib.block_structure.transformer import BlockStructureTransformer
-from openedx.core.djangoapps.util.user_utils import SystemUser
+from openedx.core.djangoapps.content.block_structure.transformer import BlockStructureTransformer
 
 
 log = getLogger(__name__)
@@ -39,7 +35,8 @@ class GradesTransformer(BlockStructureTransformer):
 
         max_score: (numeric)
     """
-    VERSION = 4
+    WRITE_VERSION = 4
+    READ_VERSION = 4
     FIELDS_TO_COLLECT = [u'due', u'format', u'graded', u'has_score', u'weight', u'course_version', u'subtree_edited_on']
 
     EXPLICIT_GRADED_FIELD_NAME = 'explicit_graded'

@@ -1439,7 +1439,32 @@ class CourseEnrollment(models.Model):
 
     @classmethod
     def enrollments_for_user(cls, user):
-        return cls.objects.filter(user=user, is_active=1)
+        return cls.objects.filter(user=user, is_active=1).select_related('user')
+
+    @classmethod
+    def enrollments_for_user_with_overviews_preload(cls, user):  # pylint: disable=invalid-name
+        """
+        List of user's CourseEnrollments, CourseOverviews preloaded if possible.
+
+        We try to preload all CourseOverviews, which are usually lazily loaded
+        as the .course_overview property. This is to avoid making an extra
+        query for every enrollment when displaying something like the student
+        dashboard. If some of the CourseOverviews are not found, we make no
+        attempt to initialize them -- we just fall back to existing lazy-load
+        behavior. The goal is to optimize the most common case as simply as
+        possible, without changing any of the existing contracts.
+
+        The name of this method is long, but was the end result of hashing out a
+        number of alternatives, so pylint can stuff it (disable=invalid-name)
+        """
+        enrollments = list(cls.enrollments_for_user(user))
+        overviews = CourseOverview.get_from_ids_if_exists(
+            enrollment.course_id for enrollment in enrollments
+        )
+        for enrollment in enrollments:
+            enrollment._course_overview = overviews.get(enrollment.course_id)  # pylint: disable=protected-access
+
+        return enrollments
 
     @classmethod
     def enrollment_status_hash_cache_key(cls, user):
@@ -1506,10 +1531,26 @@ class CourseEnrollment(models.Model):
         """Changes this `CourseEnrollment` record's mode to `mode`.  Saves immediately."""
         self.update_enrollment(mode=mode)
 
-    def refundable(self):
+    def refundable(self, user_already_has_certs_for=None):
         """
-        For paid/verified certificates, students may receive a refund if they have
-        a verified certificate and the deadline for refunds has not yet passed.
+        For paid/verified certificates, students may always receive a refund if
+        this CourseEnrollment's `can_refund` attribute is not `None` (that
+        overrides all other rules).
+
+        If the `.can_refund` attribute is `None` or doesn't exist, then ALL of
+        the following must be true for this enrollment to be refundable:
+
+            * The user does not have a certificate issued for this course.
+            * We are not past the refund cutoff date
+            * There exists a 'verified' CourseMode for this course.
+
+        Arguments:
+            `user_already_has_certs_for` (set of `CourseKey`):
+                 An optional param that is a set of `CourseKeys` that the user
+                 has already been issued certificates in.
+
+        Returns:
+            bool: Whether is CourseEnrollment can be refunded.
         """
         # In order to support manual refunds past the deadline, set can_refund on this object.
         # On unenrolling, the "UNENROLL_DONE" signal calls CertificateItem.refund_cert_callback(),
@@ -1520,8 +1561,12 @@ class CourseEnrollment(models.Model):
             return True
 
         # If the student has already been given a certificate they should not be refunded
-        if GeneratedCertificate.certificate_for_student(self.user, self.course_id) is not None:
-            return False
+        if user_already_has_certs_for is not None:
+            if self.course_id in user_already_has_certs_for:
+                return False
+        else:
+            if GeneratedCertificate.certificate_for_student(self.user, self.course_id) is not None:
+                return False
 
         # If it is after the refundable cutoff date they should not be refunded.
         refund_cutoff_date = self.refund_cutoff_date()

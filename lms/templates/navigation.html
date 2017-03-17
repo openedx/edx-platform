@@ -41,7 +41,7 @@ site_status_msg = get_site_status_msg(course_id)
 % if site_status_msg:
 <div class="site-status">
   <div class="inner-wrapper">
-    <span class="white-error-icon"></span>
+    <span class="icon fa fa-warning"></span>
     <p>${site_status_msg}</p>
   </div>
 </div>
@@ -49,33 +49,37 @@ site_status_msg = get_site_status_msg(course_id)
 </%block>
   <header id="global-navigation" class="header-global ${"slim" if course else ""}" >
     <nav class="wrapper-header" aria-label="${_('Global')}">
-    <h1 class="logo">
-      <a href="${marketing_link('ROOT')}">
-        <%block name="navigation_logo">
-        <%
-        logo_url = get_enterprise_customer_logo_url(request)
-        logo_size = 'ec-logo-size'
-        if logo_url is None:
-            logo_url = branding_api.get_logo_url(is_secure)
-            logo_size = ''
-        %>
-            <img class="${logo_size}" src="${logo_url}" alt="${_("{platform_name} Home Page").format(platform_name=static.get_platform_name())}"/>
-        </%block>
-      </a>
-    </h1>
+      <h1 class="hd logo-header">
+        <div class="logo">
+          <a href="${marketing_link('ROOT')}">
+            <%block name="navigation_logo">
+            <%
+            logo_url = get_enterprise_customer_logo_url(request)
+            logo_size = 'ec-logo-size'
+            if logo_url is None:
+                logo_url = branding_api.get_logo_url(is_secure)
+                logo_size = ''
+            %>
+                <img class="${logo_size}" src="${logo_url}" alt="${_("{platform_name} Home Page").format(platform_name=static.get_platform_name())}"/>
+            </%block>
+          </a>
+        </div>
 
-    % if course:
-      <h2 class="course-header"><span class="provider">${course.display_org_with_default}:</span>
-        <span class="course-number">${course.display_number_with_default}</span>
-        <%
-        display_name = course.display_name_with_default
-        if settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
-          ccx = get_current_ccx(course.id)
-          if ccx:
-            display_name = ccx.display_name
-        %>
-        <span class="course-name">${display_name}</span></h2>
-      % endif
+        % if course:
+          <div class="course-header">
+            <span class="provider">${course.display_org_with_default}:</span>
+            <span class="course-number">${course.display_number_with_default}</span>
+            <%
+            display_name = course.display_name_with_default
+            if settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
+              ccx = get_current_ccx(course.id)
+              if ccx:
+                display_name = ccx.display_name
+            %>
+            <span class="course-name">${display_name}</span>
+          </div>
+          % endif
+      </h1>
 
       % if user.is_authenticated():
         <ol class="left nav-global list-inline authenticated">
@@ -150,7 +154,7 @@ site_status_msg = get_site_status_msg(course_id)
               <li class="item nav-global-04">
                 <a class="btn-neutral" href="${reverse('course-specific-register', args=[course.id.to_deprecated_string()])}">${_("Register")}</a>
               </li>
-            % else:
+            % elif static.get_value('ALLOW_PUBLIC_ACCOUNT_CREATION', settings.FEATURES.get('ALLOW_PUBLIC_ACCOUNT_CREATION')):
               <li class="item nav-global-04">
                 <a class="btn-neutral" href="/register${login_query()}">${_("Register")}</a>
               </li>

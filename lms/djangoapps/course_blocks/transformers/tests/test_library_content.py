@@ -5,7 +5,7 @@ Tests for ContentLibraryTransformer.
 from student.tests.factories import CourseEnrollmentFactory
 
 from openedx.core.djangoapps.content.block_structure.api import clear_course_from_cache
-from openedx.core.lib.block_structure.transformers import BlockStructureTransformers
+from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
 
 from ...api import get_course_blocks
 from ..library_content import ContentLibraryTransformer

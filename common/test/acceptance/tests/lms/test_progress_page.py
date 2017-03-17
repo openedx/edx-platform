@@ -5,9 +5,9 @@ progress page.
 """
 import ddt
 
-from bok_choy.javascript import js_defined
 from contextlib import contextmanager
 from nose.plugins.attrib import attr
+from flaky import flaky
 
 from ..helpers import (
     UniqueCourseTest, auto_auth, create_multiple_choice_problem, create_multiple_choice_xml, get_modal_alert
@@ -126,7 +126,6 @@ class ProgressPageBaseTest(UniqueCourseTest):
 
 @attr(shard=9)
 @ddt.ddt
-@js_defined('window.jQuery')
 class PersistentGradesTest(ProgressPageBaseTest):
     """
     Test that grades for completed assessments are persisted
@@ -145,6 +144,7 @@ class PersistentGradesTest(ProgressPageBaseTest):
         subsection = self.course_outline.section(self.SECTION_NAME).subsection(self.SUBSECTION_NAME)
         subsection.expand_subsection()
         subsection.add_unit()
+        self.course_outline.wait_for_ajax()
         subsection.publish()
 
     def _set_staff_lock_on_subsection(self, locked):

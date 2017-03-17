@@ -1,7 +1,10 @@
 """
 Visibility Transformer implementation.
 """
-from openedx.core.lib.block_structure.transformer import BlockStructureTransformer, FilteringTransformerMixin
+from openedx.core.djangoapps.content.block_structure.transformer import (
+    BlockStructureTransformer,
+    FilteringTransformerMixin,
+)
 from .utils import collect_merged_boolean_field
 
 
@@ -18,7 +21,8 @@ class VisibilityTransformer(FilteringTransformerMixin, BlockStructureTransformer
 
     Staff users are exempted from visibility rules.
     """
-    VERSION = 1
+    WRITE_VERSION = 1
+    READ_VERSION = 1
 
     MERGED_VISIBLE_TO_STAFF_ONLY = 'merged_visible_to_staff_only'
 

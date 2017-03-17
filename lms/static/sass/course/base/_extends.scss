@@ -28,25 +28,25 @@ h1.top-header {
 
 .light-button, a.light-button, // only used in askbot as classes
 .gray-button {
-  @include button(simple, $gray-l5);
+  @include simple($gray-l5);
   @extend .button-reset;
   font-size: em(13);
 }
 
 .blue-button {
-  @include button(simple, $blue);
+  @include simple($blue);
   @extend .button-reset;
   font-size: em(13);
 }
 
 .pink-button {
-  @include button(simple, $pink);
+  @include simple($pink);
   @extend .button-reset;
   font-size: em(13);
 }
 
 .content {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
   display: table-cell;
   padding: 2em 2.5em;
   vertical-align: top;
@@ -58,7 +58,7 @@ h1.top-header {
 }
 
 .sidebar {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
   display: table-cell;
   font-family: $sans-serif;
   font-size: 14px;
@@ -120,7 +120,7 @@ h1.top-header {
         display: block;
         line-height: lh();
         font-size: 1em;
-        @include box-sizing(border-box);
+        box-sizing: border-box;
         padding: lh(.25) lh(0.5) lh(.25) 0;
 
         &:hover, &:focus {

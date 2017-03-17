@@ -2,8 +2,9 @@
 Higher order functions built on the BlockStructureManager to interact with a django cache.
 """
 from django.core.cache import cache
-from openedx.core.lib.block_structure.manager import BlockStructureManager
 from xmodule.modulestore.django import modulestore
+
+from .manager import BlockStructureManager
 
 
 def get_course_in_cache(course_key):
@@ -25,7 +26,7 @@ def update_course_in_cache(course_key):
     block_structure.updated_collected function that updates the block
     structure in the cache for the given course_key.
     """
-    return get_block_structure_manager(course_key).update_collected()
+    return get_block_structure_manager(course_key).update_collected_if_needed()
 
 
 def clear_course_from_cache(course_key):

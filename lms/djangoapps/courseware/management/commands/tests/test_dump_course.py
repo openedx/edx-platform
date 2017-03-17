@@ -38,6 +38,7 @@ class CommandsTestBase(SharedModuleStoreTestCase):
     """
     __test__ = False
     url_name = '2012_Fall'
+    ENABLED_SIGNALS = ['course_published']
 
     @classmethod
     def setUpClass(cls):

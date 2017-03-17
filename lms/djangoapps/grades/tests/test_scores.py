@@ -11,7 +11,7 @@ from lms.djangoapps.grades.models import BlockRecord
 import lms.djangoapps.grades.scores as scores
 from lms.djangoapps.grades.transformer import GradesTransformer
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
-from openedx.core.lib.block_structure.block_structure import BlockData
+from openedx.core.djangoapps.content.block_structure.block_structure import BlockData
 from xmodule.graders import ProblemScore
 
 

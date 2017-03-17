@@ -214,7 +214,7 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
                 'lms.djangoapps.grades.new.subsection_grade.SubsectionGradeFactory._get_bulk_cached_grade',
                 wraps=self.subsection_grade_factory._get_bulk_cached_grade
             ) as mock_get_bulk_cached_grade:
-                with self.assertNumQueries(14):
+                with self.assertNumQueries(12):
                     grade_a = self.subsection_grade_factory.create(self.sequence)
                 self.assertTrue(mock_get_bulk_cached_grade.called)
                 self.assertTrue(mock_create_grade.called)
@@ -251,8 +251,8 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
                 self.assert_grade(grade, *expected_grade)
 
         verify_update_if_higher((1, 2), (1, 2))  # previous value was non-existent
-        verify_update_if_higher((2, 4), (1, 2))  # previous value was equivalent
-        verify_update_if_higher((1, 4), (1, 2))  # previous value was greater
+        verify_update_if_higher((2, 4), (2, 4))  # previous value was equivalent
+        verify_update_if_higher((1, 4), (2, 4))  # previous value was greater
         verify_update_if_higher((3, 4), (3, 4))  # previous value was less
 
     @patch.dict(settings.FEATURES, {'PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS': False})
