@@ -24,6 +24,13 @@ class VideoSourceRequestHandler(SimpleHTTPRequestHandler):
         path = '{}{}'.format(root_dir, path)
         return path.split('?')[0]
 
+    def end_headers(self):
+        """
+        This is required by hls.js to play hls videos.
+        """
+        self.send_header('Access-Control-Allow-Origin', '*')
+        SimpleHTTPRequestHandler.end_headers(self)
+
 
 class VideoSourceHttpService(StubHttpService):
     """
