@@ -7,3 +7,4 @@ django-anymail==0.6.1
 #django-tiers==0.0.1
 git+https://github.com/appsembler/django-tiers.git@master
 dj-database-url==0.4.2
+psycopg2==2.6.2
