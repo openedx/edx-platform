@@ -158,21 +158,23 @@ class CourseGrade(object):
         subsections_created = len(self._subsection_grade_factory._unsaved_subsection_grades)  # pylint: disable=protected-access
         subsections_read = subsections_total - subsections_created
         blocks_total = len(self.locations_to_scores)
-        if not read_only:
-            self._subsection_grade_factory.bulk_create_unsaved()
-            grading_policy_hash = self.get_grading_policy_hash(self.course.location, self.course_structure)
-            PersistentCourseGrade.update_or_create_course_grade(
-                user_id=self.student.id,
-                course_id=self.course.id,
-                course_version=self.course_version,
-                course_edited_timestamp=self.course_edited_timestamp,
-                grading_policy_hash=grading_policy_hash,
-                percent_grade=self.percent,
-                letter_grade=self.letter_grade or "",
-                passed=self.passed,
-            )
 
-        self._signal_listeners_when_grade_computed()
+        if not read_only:
+            if PersistentGradesEnabledFlag.feature_enabled(self.course.id):
+                self._subsection_grade_factory.bulk_create_unsaved()
+                grading_policy_hash = self.get_grading_policy_hash(self.course.location, self.course_structure)
+                PersistentCourseGrade.update_or_create_course_grade(
+                    user_id=self.student.id,
+                    course_id=self.course.id,
+                    course_version=self.course_version,
+                    course_edited_timestamp=self.course_edited_timestamp,
+                    grading_policy_hash=grading_policy_hash,
+                    percent_grade=self.percent,
+                    letter_grade=self.letter_grade or "",
+                    passed=self.passed,
+                )
+            self._signal_listeners_when_grade_computed()
+
         self._log_event(
             log.warning,
             u"compute_and_update, read_only: {0}, subsections read/created: {1}/{2}, blocks accessed: {3}, total "
