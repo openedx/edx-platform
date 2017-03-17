@@ -1,36 +1,33 @@
 """ API v0 views. """
 import logging
 
+from django.contrib.auth import get_user_model
 from django.http import Http404
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
-from rest_framework.authentication import SessionAuthentication
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.generics import GenericAPIView, ListAPIView
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from courseware.access import has_access
 from lms.djangoapps.ccx.utils import prep_course_for_grading
 from lms.djangoapps.courseware import courses
 from lms.djangoapps.grades.api.serializers import GradingPolicySerializer
 from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
-from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
+from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
+from student.roles import CourseStaffRole
 
 log = logging.getLogger(__name__)
+USER_MODEL = get_user_model()
 
 
+@view_auth_classes()
 class GradeViewMixin(DeveloperErrorViewMixin):
     """
     Mixin class for Grades related views.
     """
-    authentication_classes = (
-        OAuth2AuthenticationAllowInactiveUser,
-        SessionAuthentication,
-    )
-    permission_classes = (IsAuthenticated,)
-
     def _get_course(self, course_key_string, user, access_action):
         """
         Returns the course for the given course_key_string after
@@ -60,6 +57,48 @@ class GradeViewMixin(DeveloperErrorViewMixin):
                 error_code='user_or_course_does_not_exist'
             )
 
+    def _get_effective_user(self, request, course):
+        """
+        Returns the user object corresponding to the request's 'username' parameter,
+        or the current request.user if no 'username' was provided.
+
+        Verifies that the request.user has access to the requested users's grades.
+        Returns a 403 error response if access is denied, or a 404 error response if the user does not exist.
+        """
+
+        # Use the request user's if none provided.
+        if 'username' in request.GET:
+            username = request.GET.get('username')
+        else:
+            username = request.user.username
+
+        if request.user.username == username:
+            # Any user may request her own grades
+            return request.user
+
+        # Only a user with staff access may request grades for a user other than herself.
+        if not has_access(request.user, CourseStaffRole.ROLE, course):
+            log.info(
+                'User %s tried to access the grade for user %s.',
+                request.user.username,
+                username
+            )
+            return self.make_error_response(
+                status_code=status.HTTP_403_FORBIDDEN,
+                developer_message='The user requested does not match the logged in user.',
+                error_code='user_mismatch'
+            )
+
+        try:
+            return USER_MODEL.objects.get(username=username)
+
+        except USER_MODEL.DoesNotExist:
+            return self.make_error_response(
+                status_code=status.HTTP_404_NOT_FOUND,
+                developer_message='The user matching the requested username does not exist.',
+                error_code='user_does_not_exist'
+            )
+
     def perform_authentication(self, request):
         """
         Ensures that the user is authenticated (e.g. not an AnonymousUser), unless DEBUG mode is enabled.
@@ -73,8 +112,10 @@ class UserGradeView(GradeViewMixin, GenericAPIView):
     """
     **Use Case**
 
-        * Get the current course grades for users in a course.
-          Currently, getting the grade for only an individual user is supported.
+        * Get the current course grades for a user in a course.
+
+        The currently logged-in user may request her own grades, or a user with staff access to the course may request
+        any enrolled user's grades.
 
     **Example Request**
 
@@ -82,10 +123,11 @@ class UserGradeView(GradeViewMixin, GenericAPIView):
 
     **GET Parameters**
 
-        A GET request must include the following parameters.
+        A GET request may include the following parameters.
 
-        * course_id: A string representation of a Course ID.
-        * username: A string representation of a user's username.
+        * course_id: (required) A string representation of a Course ID.
+        * username: (optional) A string representation of a user's username.
+          Defaults to the currently logged-in user's username.
 
     **GET Response Values**
 
@@ -128,30 +170,22 @@ class UserGradeView(GradeViewMixin, GenericAPIView):
         Return:
             A JSON serialized representation of the requesting user's current grade status.
         """
-        username = request.GET.get('username')
-
-        # only the student can access her own grade status info
-        if request.user.username != username:
-            log.info(
-                'User %s tried to access the grade for user %s.',
-                request.user.username,
-                username
-            )
-            return self.make_error_response(
-                status_code=status.HTTP_404_NOT_FOUND,
-                developer_message='The user requested does not match the logged in user.',
-                error_code='user_mismatch'
-            )
 
         course = self._get_course(course_id, request.user, 'load')
         if isinstance(course, Response):
+            # Returns a 404 if course_id is invalid, or request.user is not enrolled in the course
             return course
 
-        prep_course_for_grading(course, request)
-        course_grade = CourseGradeFactory().create(request.user, course)
+        grade_user = self._get_effective_user(request, course)
+        if isinstance(grade_user, Response):
+            # Returns a 403 if the request.user can't access grades for the requested user,
+            # or a 404 if the requested user does not exist.
+            return grade_user
 
+        prep_course_for_grading(course, request)
+        course_grade = CourseGradeFactory().create(grade_user, course)
         return Response([{
-            'username': username,
+            'username': grade_user.username,
             'course_key': course_id,
             'passed': course_grade.passed,
             'percent': course_grade.percent,
