@@ -165,5 +165,5 @@ class TestGetBlocksQueryCounts(SharedModuleStoreTestCase):
             self._get_blocks(
                 course,
                 expected_mongo_queries,
-                expected_sql_queries=9 if with_storage_backing else 3,
+                expected_sql_queries=11 if with_storage_backing else 3,
             )

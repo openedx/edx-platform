@@ -3,6 +3,7 @@ Unit tests for Block Structure models.
 """
 # pylint: disable=protected-access
 import ddt
+from django.core.exceptions import SuspiciousOperation
 from django.test import TestCase
 from django.utils.timezone import now
 from itertools import product
@@ -13,7 +14,7 @@ from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
 
 from ..config import PRUNE_OLD_VERSIONS
 from ..exceptions import BlockStructureNotFound
-from ..models import BlockStructureModel
+from ..models import BlockStructureModel, _storage_error_handling
 from .helpers import override_config_setting
 
 
@@ -72,7 +73,7 @@ class BlockStructureModelTestCase(TestCase):
         bsm, created = BlockStructureModel.update_or_create(serialized_data, **self.params)
         if mock_log:
             self.assertEqual("Created" if expect_created else "Updated", mock_log.info.call_args[0][1])
-            self.assertEqual(len(serialized_data), mock_log.info.call_args[0][3])
+            self.assertEqual(len(serialized_data), mock_log.info.call_args[0][6])
         self._assert_bsm_fields(bsm, serialized_data)
         if expect_created is not None:
             self.assertEqual(created, expect_created)
@@ -93,7 +94,7 @@ class BlockStructureModelTestCase(TestCase):
         # get entry
         found_bsm = BlockStructureModel.get(self.usage_key)
         self._assert_bsm_fields(found_bsm, serialized_data)
-        self.assertIn("BlockStructure: Read data from store;", mock_log.info.call_args[0][0])
+        self.assertIn("Read", mock_log.info.call_args[0][1])
 
         # update entry
         self.params.update(dict(data_version='new version'))
@@ -144,3 +145,18 @@ class BlockStructureModelTestCase(TestCase):
             with override_config_setting(PRUNE_OLD_VERSIONS, active=True):
                 self._verify_update_or_create_call('data')
                 self._assert_file_count_equal(min(prune_keep_count, num_prior_edits + 1))
+
+    @ddt.data(
+        (IOError, BlockStructureNotFound, True),
+        (IOError, IOError, False),
+        (SuspiciousOperation, BlockStructureNotFound, True),
+        (SuspiciousOperation, SuspiciousOperation, False),
+        (OSError, OSError, True),
+        (OSError, OSError, False),
+    )
+    @ddt.unpack
+    def test_error_handling(self, error_raised_in_operation, expected_error_raised, is_read_operation):
+        bs_model, _ = BlockStructureModel.update_or_create('test data', **self.params)
+        with self.assertRaises(expected_error_raised):
+            with _storage_error_handling(bs_model, 'operation', is_read_operation):
+                raise error_raised_in_operation
