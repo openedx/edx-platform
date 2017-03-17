@@ -3,7 +3,7 @@ Information about the release line of this Open edX code.
 """
 
 # The release line: an Open edX release name ("ficus"), or "master".
-RELEASE_LINE = "master"
+RELEASE_LINE = "ficus"
 
 
 def doc_version():
