@@ -1392,7 +1392,7 @@ class StudentVerificationConfiguration(ConfigurationModel):
     days_good_for = models.PositiveIntegerField(
         default=365, help_text="How many days is a verification good for"
     )
-    expiring_soon_window = models.PositiveIntegerField(
+    expiring_soon_window_in_days = models.PositiveIntegerField(
         default=28, help_text="The window within which a verification is considered to be expiring soon"
     )
 

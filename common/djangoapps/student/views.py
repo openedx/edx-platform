@@ -840,7 +840,6 @@ def dashboard(request):
         'disable_courseware_js': True,
         'display_course_modes_on_dashboard': enable_verified_certificates and display_course_modes_on_dashboard,
         'display_sidebar_on_dashboard': display_sidebar_on_dashboard,
-        'expiring_soon_window': verify_student_config.expiring_soon_window if verify_student_config.enabled else 28,
     }
 
     ecommerce_service = EcommerceService()
