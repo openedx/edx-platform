@@ -85,6 +85,7 @@ def add_mimetypes():
     mimetypes.add_type('application/x-font-ttf', '.ttf')
     mimetypes.add_type('application/font-woff', '.woff')
 
+
 def disable_solutions_apps_signals():
     """
     Disables signals receivers in solutions apps

@@ -514,7 +514,7 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
             raw_earned=event['value'],
             raw_possible=event['max_value'],
             only_if_higher=event.get('only_if_higher'),
-            )
+        )
 
         # we can treat a grading event as a indication that a user
         # "completed" an xBlock
