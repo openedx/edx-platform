@@ -2965,6 +2965,7 @@ def add_certificate_exception(course_key, student, certificate_exception):
             'notes': certificate_exception.get('notes', '')
         }
     )
+    log.info(u'%s has been added to the whitelist in course %s', student.username, course_key)
 
     generated_certificate = GeneratedCertificate.eligible_certificates.filter(
         user=student,
@@ -3016,6 +3017,7 @@ def remove_certificate_exception(course_key, student):
     except ObjectDoesNotExist:
         # Certificate has not been generated yet, so just remove the certificate exception from white list
         pass
+    log.info(u'%s has been removed from the whitelist in course %s', student.username, course_key)
     certificate_exception.delete()
 
 
