@@ -107,20 +107,20 @@ class TestGenerateCourseBlocks(ModuleStoreTestCase):
             command_options['routing_key'] = routing_key
 
         with patch(
-            'lms.djangoapps.course_blocks.management.commands.generate_course_blocks.tasks'
+            'openedx.core.djangoapps.content.block_structure.management.commands.generate_course_blocks.tasks'
         ) as mock_tasks:
             with patch(
-                'lms.djangoapps.course_blocks.management.commands.generate_course_blocks.api'
+                'openedx.core.djangoapps.content.block_structure.management.commands.generate_course_blocks.api'
             ) as mock_api:
 
                 self.command.handle(**command_options)
 
                 self.assertEqual(
-                    mock_tasks.update_course_in_cache.apply_async.call_count,
+                    mock_tasks.update_course_in_cache_v2.apply_async.call_count,
                     self.num_courses if enqueue_task and force_update else 0,
                 )
                 self.assertEqual(
-                    mock_tasks.get_course_in_cache.apply_async.call_count,
+                    mock_tasks.get_course_in_cache_v2.apply_async.call_count,
                     self.num_courses if enqueue_task and not force_update else 0,
                 )
 
@@ -134,14 +134,17 @@ class TestGenerateCourseBlocks(ModuleStoreTestCase):
                 )
 
                 if enqueue_task:
-                    task_action = mock_tasks.update_course_in_cache if force_update else mock_tasks.get_course_in_cache
+                    if force_update:
+                        task_action = mock_tasks.update_course_in_cache_v2
+                    else:
+                        task_action = mock_tasks.get_course_in_cache_v2
                     task_options = task_action.apply_async.call_args[1]
                     if routing_key:
                         self.assertEquals(task_options['routing_key'], routing_key)
                     else:
                         self.assertNotIn('routing_key', task_options)
 
-    @patch('lms.djangoapps.course_blocks.management.commands.generate_course_blocks.log')
+    @patch('openedx.core.djangoapps.content.block_structure.management.commands.generate_course_blocks.log')
     def test_not_found_key(self, mock_log):
         self.command.handle(courses=['fake/course/id'])
         self.assertTrue(mock_log.exception.called)
