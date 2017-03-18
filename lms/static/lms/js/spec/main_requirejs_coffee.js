@@ -38,8 +38,10 @@
             'draggabilly': 'xmodule_js/common_static/js/vendor/draggabilly',
             'edx-ui-toolkit': 'edx-ui-toolkit'
         },
-        'moment': {
-            exports: 'moment'
+        shim: {
+            moment: {
+                exports: 'moment'
+            }
         }
     });
 }).call(this, RequireJS.requirejs, RequireJS.define);
