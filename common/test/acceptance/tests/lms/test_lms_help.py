@@ -28,16 +28,6 @@ class TestCohortHelp(ContainerBase):
         self.instructor_dashboard_page.visit()
         self.cohort_management = self.instructor_dashboard_page.select_cohort_management()
 
-    def get_url_with_changed_domain(self, url):
-        """
-        Replaces .org with .io in the url
-        Arguments:
-            url (str): The url to perform replace operation on.
-        Returns:
-        str: The updated url
-        """
-        return url.replace('.org/', '.io/')
-
     def verify_help_link(self, href):
         """
         Verifies that help link is correct
@@ -51,7 +41,7 @@ class TestCohortHelp(ContainerBase):
         actual_link = self.cohort_management.get_cohort_help_element_and_click_help()
 
         assert_link(self, expected_link, actual_link)
-        assert_opened_help_link_is_correct(self, self.get_url_with_changed_domain(href))
+        assert_opened_help_link_is_correct(self, href)
 
     def test_manual_cohort_help(self):
         """
@@ -68,7 +58,7 @@ class TestCohortHelp(ContainerBase):
         self.cohort_management.add_cohort('cohort_name')
 
         href = (
-            'http://edx.readthedocs.org/projects/edx-partner-course-staff/en/{}/'
+            'http://edx.readthedocs.io/projects/edx-partner-course-staff/en/{}/'
             'course_features/cohorts/cohort_config.html#assign-learners-to-cohorts-manually'
         ).format(doc_version())
 
@@ -90,7 +80,7 @@ class TestCohortHelp(ContainerBase):
         self.cohort_management.add_cohort('cohort_name', assignment_type='random')
 
         href = (
-            'http://edx.readthedocs.org/projects/edx-partner-course-staff/en/{}/'
+            'http://edx.readthedocs.io/projects/edx-partner-course-staff/en/{}/'
             'course_features/cohorts/cohorts_overview.html#all-automated-assignment'
         ).format(doc_version())
 
