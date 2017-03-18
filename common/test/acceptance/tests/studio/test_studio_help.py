@@ -584,8 +584,10 @@ class NewProgramHelpTest(ProgramsConfigMixin, AcceptanceTest):
         And help url should end with 'index.html'
         """
         self.program_page.click_new_program_button()
-        href = 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course' \
-               '/en/latest/index.html'
+        href = (
+            'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course'
+            '/en/{}/index.html'
+        ).format(doc_version())
 
         # Assert that help link is correct.
         assert_nav_help_link(
