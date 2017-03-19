@@ -493,6 +493,7 @@ def _get_validated_params(request):
     search_key = request.GET.get("search_key")
     sort_field = request.GET.get("sort_field")
     sort_dir = request.GET.get("sort_dir")
+    search_key = request.GET.get("search_key")
 
     # Page must be an integer greater than 0
     try:
@@ -511,5 +512,8 @@ def _get_validated_params(request):
 
     if sort_dir in SortDirection:
         params["sort_dir"] = SortDirection[sort_dir]
+
+    if search_key:
+        params["search_key"] = search_key
 
     return params
