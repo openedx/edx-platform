@@ -40,11 +40,23 @@
                         "display": "block",
                         "position": "fixed",
                         "opacity": 0,
-                        "z-index": 11000,
-                        "left": 50 + "%",
-                        "margin-left": -(modal_width / 2) + "px",
-                        "top": o.top + "px"
+                        "z-index": 11000
                     });
+
+                    $.fn.center= function () {
+                         $(modal_id).position({
+                            my: "center",
+                            at: "center",
+                            of: window
+                        });
+                    };
+
+                    $(modal_id).center();
+
+                    $(window).resize(function() {
+                        $(modal_id).center();
+                    });
+
                     $(modal_id).fadeTo(200, 1);
                     e.preventDefault()
                 })
