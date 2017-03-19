@@ -311,12 +311,14 @@ def _get_index_videos(course, request):
     page_size = request.GET.get("page_size")
     sort_field = request.GET.get("sort_field")
     sort_order = request.GET.get("sort_order")
+    search_key = request.GET.get("search_key")
 
     # Add parameter if it exists in request
     if page: params["page"] = page
     if page_size: params["page_size"] = page_size
     if sort_field: params["sort_field"] = VideoSortField[sort_field]
     if sort_order: params["sort_dir"] = SortDirection[sort_order]
+    if search_key: params["search_key"] = search_key
 
     videos_data = _get_videos(course, params)
     videos_data["results"] = list(
