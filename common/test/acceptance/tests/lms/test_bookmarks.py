@@ -187,7 +187,7 @@ class BookmarksTest(BookmarksTestMixin):
         self.courseware_page.click_bookmark_unit_button()
         self.assertEqual(self.courseware_page.bookmark_icon_visible, bookmark_icon_state)
         self.assertEqual(self.courseware_page.bookmark_button_state, bookmark_button_state)
-        self.bookmarks_page.click_bookmarks_button()
+        self.courseware_page.click_bookmarks_button()
         self.assertEqual(self.bookmarks_page.count(), bookmarked_count)
 
     def _verify_pagination_info(
@@ -213,9 +213,8 @@ class BookmarksTest(BookmarksTestMixin):
         """
         Navigates and verifies the bookmarks list page.
         """
-        self.bookmarks_page.click_bookmarks_button()
+        self.courseware_page.click_bookmarks_button()
         self.assertTrue(self.bookmarks_page.results_present())
-        self.assertEqual(self.bookmarks_page.results_header_text(), 'My Bookmarks')
 
     def _verify_breadcrumbs(self, num_units, modified_name=None):
         """
@@ -271,7 +270,8 @@ class BookmarksTest(BookmarksTestMixin):
             self.course_home_page.outline.go_to_section('TestSection{}'.format(index), 'TestSubsection{}'.format(index))
 
             self._toggle_bookmark_and_verify(True, 'bookmarked', 1)
-            self.bookmarks_page.click_bookmarks_button(False)
+            self.course_home_page.visit()
+            self.course_home_page.outline.go_to_section('TestSection{}'.format(index), 'TestSubsection{}'.format(index))
             self._toggle_bookmark_and_verify(False, '', 0)
 
     def test_empty_bookmarks_list(self):
@@ -286,14 +286,10 @@ class BookmarksTest(BookmarksTestMixin):
         And empty bookmarks list content is correct
         """
         self._test_setup()
-        self.assertTrue(self.bookmarks_page.bookmarks_button_visible())
-        self.bookmarks_page.click_bookmarks_button()
-        self.assertEqual(self.bookmarks_page.results_header_text(), 'My Bookmarks')
-        self.assertEqual(self.bookmarks_page.empty_header_text(), 'You have not bookmarked any courseware pages yet.')
+        self.courseware_page.click_bookmarks_button()
 
-        empty_list_text = ("Use bookmarks to help you easily return to courseware pages. To bookmark a page, "
-                           "select Bookmark in the upper right corner of that page. To see a list of all your "
-                           "bookmarks, select Bookmarks in the upper left corner of any courseware page.")
+        empty_list_text = ("Use bookmarks to help you easily return to courseware pages. "
+                           "To bookmark a page, click on \"Bookmark this page\" beneath the unit title.")
         self.assertEqual(self.bookmarks_page.empty_list_text(), empty_list_text)
 
     def test_bookmarks_list(self):
@@ -333,7 +329,7 @@ class BookmarksTest(BookmarksTestMixin):
             self.courseware_page.wait_for_page()
             self.assertIn(self.courseware_page.active_usage_id(), xblock_usage_ids)
             self.courseware_page.visit().wait_for_page()
-            self.bookmarks_page.click_bookmarks_button()
+            self.courseware_page.click_bookmarks_button()
 
     def test_bookmark_shows_updated_breadcrumb_after_publish(self):
         """
@@ -445,7 +441,7 @@ class BookmarksTest(BookmarksTestMixin):
         self._test_setup(num_chapters=2)
         self._bookmark_units(num_units=2)
 
-        self.bookmarks_page.click_bookmarks_button()
+        self.courseware_page.click_bookmarks_button()
         self.assertTrue(self.bookmarks_page.results_present())
         self._verify_pagination_info(
             bookmark_count_on_current_page=2,
@@ -476,7 +472,7 @@ class BookmarksTest(BookmarksTestMixin):
         self._test_setup(num_chapters=12)
         self._bookmark_units(num_units=12)
 
-        self.bookmarks_page.click_bookmarks_button()
+        self.courseware_page.click_bookmarks_button()
         self.assertTrue(self.bookmarks_page.results_present())
 
         self._verify_pagination_info(
@@ -519,7 +515,7 @@ class BookmarksTest(BookmarksTestMixin):
         self._test_setup(num_chapters=12)
         self._bookmark_units(num_units=12)
 
-        self.bookmarks_page.click_bookmarks_button()
+        self.courseware_page.click_bookmarks_button()
         self.assertTrue(self.bookmarks_page.results_present())
 
         self.bookmarks_page.press_next_page_button()
@@ -559,7 +555,7 @@ class BookmarksTest(BookmarksTestMixin):
         self._test_setup(num_chapters=11)
         self._bookmark_units(num_units=11)
 
-        self.bookmarks_page.click_bookmarks_button()
+        self.courseware_page.click_bookmarks_button()
         self.assertTrue(self.bookmarks_page.results_present())
         self.assertEqual(self.bookmarks_page.get_total_pages, 2)
 
@@ -589,7 +585,7 @@ class BookmarksTest(BookmarksTestMixin):
         self._test_setup(num_chapters=11)
         self._bookmark_units(num_units=11)
 
-        self.bookmarks_page.click_bookmarks_button()
+        self.courseware_page.click_bookmarks_button()
         self.assertTrue(self.bookmarks_page.results_present())
         self.assertEqual(self.bookmarks_page.get_total_pages, 2)
 
@@ -628,7 +624,7 @@ class BookmarksTest(BookmarksTestMixin):
             }
         ]
         self._bookmark_units(num_units=1)
-        self.bookmarks_page.click_bookmarks_button()
+        self.courseware_page.click_bookmarks_button()
 
         self._verify_pagination_info(
             bookmark_count_on_current_page=1,
