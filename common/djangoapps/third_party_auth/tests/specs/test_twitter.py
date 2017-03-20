@@ -20,7 +20,7 @@ class TwitterIntegrationTest(base.Oauth2IntegrationTest):
 
         # To test an OAuth1 provider, we need to patch an additional method:
         patcher = patch(
-            'social.backends.twitter.TwitterOAuth.unauthorized_token',
+            'social_core.backends.twitter.TwitterOAuth.unauthorized_token',
             create=True,
             return_value="unauth_token"
         )

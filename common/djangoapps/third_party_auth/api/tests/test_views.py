@@ -14,7 +14,7 @@ from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
 from rest_framework.test import APITestCase
 from django.conf import settings
 from django.test.utils import override_settings
-from social.apps.django_app.default.models import UserSocialAuth
+from social_django.models import UserSocialAuth
 
 from student.tests.factories import UserFactory
 from third_party_auth.api.permissions import ThirdPartyAuthProviderApiPermission

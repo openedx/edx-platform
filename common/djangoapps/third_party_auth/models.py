@@ -16,12 +16,12 @@ import json
 import logging
 from provider.utils import long_token
 from provider.oauth2.models import Client
-from social.backends.base import BaseAuth
-from social.backends.oauth import OAuthAuth
-from social.backends.saml import SAMLAuth, SAMLIdentityProvider
+from social_core.backends.base import BaseAuth
+from social_core.backends.oauth import OAuthAuth
+from social_core.backends.saml import SAMLAuth, SAMLIdentityProvider
+from social_core.exceptions import SocialAuthBaseException
+from social_core.utils import module_member
 from .lti import LTIAuthBackend, LTI_PARAMS_KEY
-from social.exceptions import SocialAuthBaseException
-from social.utils import module_member
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import get_current_request
 

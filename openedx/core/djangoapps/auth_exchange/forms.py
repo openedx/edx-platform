@@ -10,8 +10,8 @@ from provider.oauth2.forms import ScopeChoiceField, ScopeMixin
 from provider.oauth2.models import Client
 from oauth2_provider.models import Application
 from requests import HTTPError
-from social.backends import oauth as social_oauth
-from social.exceptions import AuthException
+from social_core.backends import oauth as social_oauth
+from social_core.exceptions import AuthException
 
 from third_party_auth import pipeline
 
@@ -98,7 +98,8 @@ class AccessTokenExchangeForm(ScopeMixin, OAuthForm):
             self.cleaned_data["user"] = user
         else:
             # Ensure user does not re-enter the pipeline
-            self.request.social_strategy.clean_partial_pipeline()
+            partial_token = self.request.social_strategy.session_get('partial_pipeline_token')
+            self.request.social_strategy.clean_partial_pipeline(partial_token)
             raise OAuthValidationError(
                 {
                     "error": "invalid_grant",

@@ -2,7 +2,7 @@
 Test utilities for OAuth access token exchange
 """
 
-from social.apps.django_app.default.models import UserSocialAuth
+from social_django.models import UserSocialAuth
 from third_party_auth.tests.utils import ThirdPartyOAuthTestMixin
 
 

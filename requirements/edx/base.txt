@@ -90,7 +90,6 @@ python-memcached==1.48
 django-memcached-hashring==0.1.2
 python-openid==2.2.5
 python-dateutil==2.1
-python-social-auth==0.2.21
 pytz==2016.7
 pysrt==0.4.7
 PyYAML==3.10
@@ -101,6 +100,7 @@ scipy==0.14.0
 Shapely==1.2.16
 singledispatch==3.4.0.2
 six>=1.10.0,<2.0.0
+social-auth-app-django==1.1.0
 sorl-thumbnail==12.3
 sortedcontainers==0.9.2
 stevedore==1.10.0

@@ -4,6 +4,9 @@ Unit tests for third_party_auth LTI auth providers
 
 import unittest
 from oauthlib.common import Request
+from social_core.tests.models import TestStorage
+from social_core.tests.strategy import TestStrategy
+
 from third_party_auth.lti import LTIAuthBackend, LTI_PARAMS_KEY
 from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin
 
@@ -13,8 +16,12 @@ class UnitTestLTI(unittest.TestCase, ThirdPartyAuthTestMixin):
     Unit tests for third_party_auth LTI auth providers
     """
 
+    def setUp(self):
+        super(UnitTestLTI, self).setUp()
+        self.strategy = TestStrategy(TestStorage)
+
     def test_get_user_details_missing_keys(self):
-        lti = LTIAuthBackend()
+        lti = LTIAuthBackend(self.strategy)
         details = lti.get_user_details({LTI_PARAMS_KEY: {
             'lis_person_name_full': 'Full name'
         }})
@@ -23,7 +30,7 @@ class UnitTestLTI(unittest.TestCase, ThirdPartyAuthTestMixin):
         })
 
     def test_get_user_details_extra_keys(self):
-        lti = LTIAuthBackend()
+        lti = LTIAuthBackend(self.strategy)
         details = lti.get_user_details({LTI_PARAMS_KEY: {
             'lis_person_name_full': 'Full name',
             'lis_person_name_given': 'Given',
@@ -39,7 +46,7 @@ class UnitTestLTI(unittest.TestCase, ThirdPartyAuthTestMixin):
         })
 
     def test_get_user_id(self):
-        lti = LTIAuthBackend()
+        lti = LTIAuthBackend(self.strategy)
         user_id = lti.get_user_id(None, {LTI_PARAMS_KEY: {
             'oauth_consumer_key': 'consumer',
             'user_id': 'user'
