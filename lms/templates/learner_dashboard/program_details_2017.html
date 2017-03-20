@@ -12,8 +12,8 @@ from openedx.core.djangolib.js_utils import (
 %>
 
 <%block name="js_extra">
-<%static:require_module module_name="js/learner_dashboard/program_details_factory" class_name="ProgramDetailsFactory">
-ProgramDetailsFactory({
+<%static:require_module module_name="js/learner_dashboard/program_details_factory_2017" class_name="ProgramDetailsFactory2017">
+ProgramDetailsFactory2017({
     programData: ${program_data | n, dump_js_escaped_json},
     urls: ${urls | n, dump_js_escaped_json},
     userPreferences: ${user_preferences | n, dump_js_escaped_json},
