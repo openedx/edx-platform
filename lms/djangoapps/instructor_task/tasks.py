@@ -75,11 +75,7 @@ def rescore_problem(entry_id, xmodule_instance_args):
     action_name = ugettext_noop('rescored')
     update_fcn = partial(rescore_problem_module_state, xmodule_instance_args)
 
-    def filter_fcn(modules_to_update):
-        """Filter that matches problems which are marked as being done"""
-        return modules_to_update.filter(state__contains='"done": true')
-
-    visit_fcn = partial(perform_module_state_update, update_fcn, filter_fcn)
+    visit_fcn = partial(perform_module_state_update, update_fcn, None)
     return run_main_task(entry_id, visit_fcn, action_name)
 
 
