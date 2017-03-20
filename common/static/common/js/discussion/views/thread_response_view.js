@@ -59,6 +59,7 @@
             };
 
             ThreadResponseView.prototype.initialize = function(options) {
+                this.startHeader = options.startHeader;
                 this.collapseComments = options.collapseComments;
                 this.createShowView();
                 this.readOnly = $('.discussion-module').data('read-only');
@@ -155,7 +156,8 @@
                     self = this;
                 comment.set('thread', this.model.get('thread'));
                 view = new ResponseCommentView({
-                    model: comment
+                    model: comment,
+                    startHeader: this.startHeader
                 });
                 view.render();
                 if (this.readOnly) {
@@ -246,7 +248,8 @@
                     this.editView.model = this.model;
                 } else {
                     this.editView = new ThreadResponseEditView({
-                        model: this.model
+                        model: this.model,
+                        startHeader: this.startHeader
                     });
                     this.editView.bind('response:update', this.update);
                     return this.editView.bind('response:cancel_edit', this.cancelEdit);
