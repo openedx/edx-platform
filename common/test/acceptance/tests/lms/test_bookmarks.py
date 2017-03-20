@@ -25,6 +25,40 @@ class BookmarksTestMixin(EventsTestMixin, UniqueCourseTest):
     USERNAME = "STUDENT"
     EMAIL = "student@example.com"
 
+    def setUp(self):
+        super(BookmarksTestMixin, self).setUp()
+
+        self.studio_course_outline_page = StudioCourseOutlinePage(
+            self.browser,
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        )
+
+        self.courseware_page = CoursewarePage(self.browser, self.course_id)
+        self.course_home_page = CourseHomePage(self.browser, self.course_id)
+        self.bookmarks_page = BookmarksPage(self.browser, self.course_id)
+
+        # Get session to be used for bookmarking units
+        self.session = requests.Session()
+        params = {'username': self.USERNAME, 'email': self.EMAIL, 'course_id': self.course_id}
+        response = self.session.get(BASE_URL + "/auto_auth", params=params)
+        self.assertTrue(response.ok, "Failed to get session")
+
+    def setup_test(self, num_chapters=2):
+        """
+        Setup test settings.
+
+        Arguments:
+            num_chapters: number of chapters to create in course
+        """
+        self.create_course_fixture(num_chapters)
+
+        # Auto-auth register for the course.
+        LmsAutoAuthPage(self.browser, username=self.USERNAME, email=self.EMAIL, course_id=self.course_id).visit()
+
+        self.courseware_page.visit()
+
     def create_course_fixture(self, num_chapters):
         """
         Create course fixture
@@ -59,50 +93,6 @@ class BookmarksTestMixin(EventsTestMixin, UniqueCourseTest):
         actual_events = self.wait_for_events(event_filter={'event_type': event_type}, number_of_matches=1)
         self.assert_events_match(event_data, actual_events)
 
-
-@attr(shard=8)
-class BookmarksTest(BookmarksTestMixin):
-    """
-    Tests to verify bookmarks functionality.
-    """
-
-    def setUp(self):
-        """
-        Initialize test setup.
-        """
-        super(BookmarksTest, self).setUp()
-
-        self.studio_course_outline_page = StudioCourseOutlinePage(
-            self.browser,
-            self.course_info['org'],
-            self.course_info['number'],
-            self.course_info['run']
-        )
-
-        self.courseware_page = CoursewarePage(self.browser, self.course_id)
-        self.course_home_page = CourseHomePage(self.browser, self.course_id)
-        self.bookmarks_page = BookmarksPage(self.browser, self.course_id)
-
-        # Get session to be used for bookmarking units
-        self.session = requests.Session()
-        params = {'username': self.USERNAME, 'email': self.EMAIL, 'course_id': self.course_id}
-        response = self.session.get(BASE_URL + "/auto_auth", params=params)
-        self.assertTrue(response.ok, "Failed to get session")
-
-    def _test_setup(self, num_chapters=2):
-        """
-        Setup test settings.
-
-        Arguments:
-            num_chapters: number of chapters to create in course
-        """
-        self.create_course_fixture(num_chapters)
-
-        # Auto-auth register for the course.
-        LmsAutoAuthPage(self.browser, username=self.USERNAME, email=self.EMAIL, course_id=self.course_id).visit()
-
-        self.courseware_page.visit()
-
     def _bookmark_unit(self, location):
         """
         Bookmark a unit
@@ -124,7 +114,7 @@ class BookmarksTest(BookmarksTestMixin):
         )
         self.assertTrue(response.ok, "Failed to bookmark unit")
 
-    def _bookmark_units(self, num_units):
+    def bookmark_units(self, num_units):
         """
         Bookmark first `num_units` units
 
@@ -134,6 +124,19 @@ class BookmarksTest(BookmarksTestMixin):
         xblocks = self.course_fixture.get_nested_xblocks(category="vertical")
         for index in range(num_units):
             self._bookmark_unit(xblocks[index].locator)
+
+
+@attr(shard=8)
+class BookmarksTest(BookmarksTestMixin):
+    """
+    Tests to verify bookmarks functionality.
+    """
+
+    def setUp(self):
+        """
+        Initialize test setup.
+        """
+        super(BookmarksTest, self).setUp()
 
     def _breadcrumb(self, num_units, modified_name=None):
         """
@@ -264,7 +267,7 @@ class BookmarksTest(BookmarksTestMixin):
             Then I click again on the bookmark button
             And I should see a unit un-bookmarked
         """
-        self._test_setup()
+        self.setup_test()
         for index in range(2):
             self.course_home_page.visit()
             self.course_home_page.outline.go_to_section('TestSection{}'.format(index), 'TestSubsection{}'.format(index))
@@ -285,7 +288,7 @@ class BookmarksTest(BookmarksTestMixin):
         Then I should see an empty bookmarks list
         And empty bookmarks list content is correct
         """
-        self._test_setup()
+        self.setup_test()
         self.courseware_page.click_bookmarks_button()
 
         empty_list_text = ("Use bookmarks to help you easily return to courseware pages. "
@@ -305,8 +308,8 @@ class BookmarksTest(BookmarksTestMixin):
         When I click on bookmarked link
         Then I can navigate to correct bookmarked unit
         """
-        self._test_setup()
-        self._bookmark_units(2)
+        self.setup_test()
+        self.bookmark_units(2)
 
         self._navigate_to_bookmarks_list()
         self._verify_breadcrumbs(num_units=2)
@@ -347,8 +350,8 @@ class BookmarksTest(BookmarksTestMixin):
         Then I can see the breadcrumb trail
         with updated display_name.
         """
-        self._test_setup(num_chapters=1)
-        self._bookmark_units(num_units=1)
+        self.setup_test(num_chapters=1)
+        self.bookmark_units(num_units=1)
 
         self._navigate_to_bookmarks_list()
         self._verify_breadcrumbs(num_units=1)
@@ -385,8 +388,8 @@ class BookmarksTest(BookmarksTestMixin):
         When I click on deleted bookmark
         Then I should navigated to 404 page
         """
-        self._test_setup(num_chapters=1)
-        self._bookmark_units(1)
+        self.setup_test(num_chapters=1)
+        self.bookmark_units(1)
         self._delete_section(0)
 
         self._navigate_to_bookmarks_list()
@@ -414,8 +417,8 @@ class BookmarksTest(BookmarksTestMixin):
         And I should see a bookmarked list
         And bookmark list contains 10 bookmarked items
         """
-        self._test_setup(11)
-        self._bookmark_units(11)
+        self.setup_test(11)
+        self.bookmark_units(11)
         self._navigate_to_bookmarks_list()
 
         self._verify_pagination_info(
@@ -438,8 +441,8 @@ class BookmarksTest(BookmarksTestMixin):
         And I should see paging header and footer with correct data
         And previous and next buttons are disabled
         """
-        self._test_setup(num_chapters=2)
-        self._bookmark_units(num_units=2)
+        self.setup_test(num_chapters=2)
+        self.bookmark_units(num_units=2)
 
         self.courseware_page.click_bookmarks_button()
         self.assertTrue(self.bookmarks_page.results_present())
@@ -469,8 +472,8 @@ class BookmarksTest(BookmarksTestMixin):
         And I should see a bookmarked list with 2 items
         And I should see paging header and footer with correct info
         """
-        self._test_setup(num_chapters=12)
-        self._bookmark_units(num_units=12)
+        self.setup_test(num_chapters=12)
+        self.bookmark_units(num_units=12)
 
         self.courseware_page.click_bookmarks_button()
         self.assertTrue(self.bookmarks_page.results_present())
@@ -512,8 +515,8 @@ class BookmarksTest(BookmarksTestMixin):
         And I should be navigated to first page
         And I should see paging header and footer with correct info
         """
-        self._test_setup(num_chapters=12)
-        self._bookmark_units(num_units=12)
+        self.setup_test(num_chapters=12)
+        self.bookmark_units(num_units=12)
 
         self.courseware_page.click_bookmarks_button()
         self.assertTrue(self.bookmarks_page.results_present())
@@ -552,8 +555,8 @@ class BookmarksTest(BookmarksTestMixin):
         Then I enter 2 in the page number input
         And I should be navigated to page 2
         """
-        self._test_setup(num_chapters=11)
-        self._bookmark_units(num_units=11)
+        self.setup_test(num_chapters=11)
+        self.bookmark_units(num_units=11)
 
         self.courseware_page.click_bookmarks_button()
         self.assertTrue(self.bookmarks_page.results_present())
@@ -582,8 +585,8 @@ class BookmarksTest(BookmarksTestMixin):
         Then I enter 3 in the page number input
         And I should stay at page 1
         """
-        self._test_setup(num_chapters=11)
-        self._bookmark_units(num_units=11)
+        self.setup_test(num_chapters=11)
+        self.bookmark_units(num_units=11)
 
         self.courseware_page.click_bookmarks_button()
         self.assertTrue(self.bookmarks_page.results_present())
@@ -609,7 +612,7 @@ class BookmarksTest(BookmarksTestMixin):
         When I click on bookmarked unit
         Then `edx.course.bookmark.accessed` event is emitted
         """
-        self._test_setup(num_chapters=1)
+        self.setup_test(num_chapters=1)
         self.reset_event_tracking()
 
         # create expected event data
@@ -623,7 +626,7 @@ class BookmarksTest(BookmarksTestMixin):
                 }
             }
         ]
-        self._bookmark_units(num_units=1)
+        self.bookmark_units(num_units=1)
         self.courseware_page.click_bookmarks_button()
 
         self._verify_pagination_info(
@@ -637,3 +640,18 @@ class BookmarksTest(BookmarksTestMixin):
 
         self.bookmarks_page.click_bookmarked_block(0)
         self.verify_event_data('edx.bookmark.accessed', event_data)
+
+
+@attr('a11y')
+class BookmarksA11yTests(BookmarksTestMixin):
+    """
+    Tests for checking the a11y of the bookmarks page.
+    """
+    def test_view_a11y(self):
+        """
+        Verify the basic accessibility of the bookmarks page while paginated.
+        """
+        self.setup_test(num_chapters=11)
+        self.bookmark_units(num_units=11)
+        self.courseware_page.click_bookmarks_button()
+        self.bookmarks_page.a11y_audit.check_for_accessibility_errors()
