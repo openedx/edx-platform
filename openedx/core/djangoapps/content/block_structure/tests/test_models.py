@@ -14,7 +14,7 @@ from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
 
 from ..config import PRUNE_OLD_VERSIONS
 from ..exceptions import BlockStructureNotFound
-from ..models import BlockStructureModel, _storage_error_handling
+from ..models import BlockStructureModel, _directory_name, _storage_error_handling
 from .helpers import override_config_setting
 
 
@@ -44,7 +44,7 @@ class BlockStructureModelTestCase(TestCase):
             self.assertEqual(field_value, getattr(bsm, field_name))
 
         self.assertEqual(bsm.get_serialized_data(), expected_serialized_data)
-        self.assertIn(unicode(self.usage_key), bsm.data.name)
+        self.assertIn(_directory_name(self.usage_key), bsm.data.name)
 
     def _assert_file_count_equal(self, expected_count):
         """
@@ -160,3 +160,17 @@ class BlockStructureModelTestCase(TestCase):
         with self.assertRaises(expected_error_raised):
             with _storage_error_handling(bs_model, 'operation', is_read_operation):
                 raise error_raised_in_operation
+
+    @patch('openedx.core.djangoapps.content.block_structure.models.log')
+    def test_old_mongo_keys(self, mock_log):
+        self.course_key = CourseLocator('org2', 'course2', unicode(uuid4()), deprecated=True)
+        self.usage_key = BlockUsageLocator(course_key=self.course_key, block_type='course', block_id='course')
+        serialized_data = 'test data for old course'
+        self.params['data_usage_key'] = self.usage_key
+
+        with patch('xmodule.modulestore.mixed.MixedModuleStore.fill_in_run') as mock_fill_in_run:
+            mock_fill_in_run.return_value = self.usage_key.course_key
+            self._verify_update_or_create_call(serialized_data, mock_log, expect_created=True)
+            found_bsm = BlockStructureModel.get(self.usage_key)
+
+        self._assert_bsm_fields(found_bsm, serialized_data)
