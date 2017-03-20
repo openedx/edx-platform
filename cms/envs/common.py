@@ -81,6 +81,9 @@ from lms.envs.common import (
 
     JWT_AUTH,
 
+    USERNAME_REGEX_PARTIAL,
+    USERNAME_PATTERN,
+
     # django-debug-toolbar
     DEBUG_TOOLBAR_PATCH_SETTINGS,
     BLOCK_STRUCTURES_SETTINGS,
@@ -1285,8 +1288,6 @@ OAUTH_OIDC_ISSUER = 'https://www.example.com/oauth2'
 
 # 5 minute expiration time for JWT id tokens issued for external API requests.
 OAUTH_ID_TOKEN_EXPIRATION = 5 * 60
-
-USERNAME_PATTERN = r'(?P<username>[\w.@+-]+)'
 
 # Partner support link for CMS footer
 PARTNER_SUPPORT_EMAIL = ''
