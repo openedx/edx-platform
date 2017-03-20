@@ -23,6 +23,12 @@
                     this.courseSettings = options.courseSettings;
                     this.discussionBoardView = options.discussionBoardView;
                     this.newPostView = options.newPostView;
+                    if (options.startHeader !== undefined) {
+                        this.startHeader = options.startHeader;
+                    } else {
+                        this.startHeader = 2; // Start the header levels at H<startHeader>
+                    }
+
                 },
 
                 start: function() {
@@ -95,6 +101,7 @@
                         el: $('.forum-content'),
                         model: this.thread,
                         mode: 'tab',
+                        startHeader: this.startHeader,
                         courseSettings: this.courseSettings
                     });
                     this.main.render();
