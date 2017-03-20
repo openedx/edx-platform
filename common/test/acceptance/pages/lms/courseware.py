@@ -310,6 +310,12 @@ class CoursewarePage(CoursePage):
         self.q(css='.bookmark-button').first.click()
         EmptyPromise(lambda: self.bookmark_button_state != previous_state, "Bookmark button toggled").fulfill()
 
+    def click_bookmarks_button(self, wait_for_results=True):
+        """ Click on Bookmarks button """
+        self.q(css='.bookmarks-list-button').first.click()
+        if wait_for_results:
+            EmptyPromise(lambda: self.q(css='#my-bookmarks').present, "Bookmarks results present").fulfill()
+
 
 class CoursewareSequentialTabPage(CoursePage):
     """
