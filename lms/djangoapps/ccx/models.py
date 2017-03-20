@@ -29,6 +29,7 @@ class CustomCourseForEdX(models.Model):
     # if not empty, this field contains a json serialized list of
     # the master course modules
     structure_json = models.TextField(verbose_name='Structure JSON', blank=True, null=True)
+    original_ccx_id = models.IntegerField(verbose_name='ID of original CCX course entry', blank=True, null=True)
 
     class Meta(object):
         app_label = 'ccx'

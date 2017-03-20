@@ -110,6 +110,8 @@ from opaque_keys import InvalidKeyError
 from openedx.core.djangoapps.course_groups.cohorts import is_course_cohorted
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
+from lms.djangoapps.ccx.models import CustomCourseForEdX
+
 log = logging.getLogger(__name__)
 
 
@@ -880,8 +882,27 @@ def modify_access(request, course_id):
 
     if action == 'allow':
         allow_access(course, user, rolename)
+
+        # add CCX table entry
+        if rolename == 'ccx_coach' and hasattr(course.id, 'ccx'):
+            ccx_name = CustomCourseForEdX.objects.get(pk=course.id.ccx).display_name
+            CustomCourseForEdX(
+                course_id=course.id,
+                coach_id=user.id,
+                display_name=ccx_name,
+                original_ccx_id=course.id.ccx
+            ).save()
+
     elif action == 'revoke':
         revoke_access(course, user, rolename)
+
+        # delete CCX entry
+        if rolename == 'ccx_coach' and hasattr(course.id, 'ccx'):
+            CustomCourseForEdX.get(
+                course_id=course.id,
+                coach_id=user.id,
+                original_ccx_id=course.id.ccx
+            ).delete()
     else:
         return HttpResponseBadRequest(strip_tags(
             "unrecognized action '{}'".format(action)

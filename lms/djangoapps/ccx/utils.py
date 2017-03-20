@@ -174,11 +174,19 @@ def get_ccx_by_ccx_id(course, coach, ccx_id):
      ccx (CustomCourseForEdX): Instance of CCX.
     """
     try:
-        ccx = CustomCourseForEdX.objects.get(
-            id=ccx_id,
-            course_id=course.id,
-            coach=coach
-        )
+        if hasattr(course.id, 'ccx'):
+            ccx = CustomCourseForEdX.objects.get(
+                original_ccx_id=course.id.ccx,
+                coach=coach
+            )
+        else:
+            ccx = CustomCourseForEdX.objects.get(
+                # leave this commented out so we know what's up if things blow up in our face
+                # id=ccx_id,
+                course_id=course.id,
+                coach=coach,
+                original_ccx_id=ccx_id
+            )
     except CustomCourseForEdX.DoesNotExist:
         return None
 
@@ -312,6 +320,26 @@ def assign_coach_role_to_ccx(ccx_locator, user, master_course_id):
             # assign user role coach on ccx
             with ccx_course(ccx_locator) as course:
                 allow_access(course, user, "ccx_coach", send_email=False)
+
+
+def assign_instructor_role_to_ccx(ccx_locator, user, master_course_id):
+    """
+    Check if user has ccx_coach role on master course then assign him coach role on ccx only
+    if role is not already assigned. Because of this coach can open dashboard from master course
+    as well as ccx.
+    :param ccx_locator: CCX key
+    :param user: User to whom we want to assign role.
+    :param master_course_id: Master course key
+    """
+    coach_role_on_master_course = CourseCcxCoachRole(master_course_id)
+    # check if user has coach role on master course
+    if coach_role_on_master_course.has_user(user):
+        # Check if user has coach role on ccx.
+        role = CourseCcxCoachRole(ccx_locator)
+        if not role.has_user(user):
+            # assign user role instructor on ccx
+            with ccx_course(ccx_locator) as course:
+                allow_access(course, user, 'instructor', send_email=False)
 
 
 def is_email(identifier):

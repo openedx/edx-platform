@@ -582,9 +582,8 @@ def dashboard(request):
         # use unwrapped _grade method to prevent triggering grade update signal
         course_enrollment.course_progress = grades._grade(user, course, False)
         # author
-        if "ccx" in str(course_id):
-            ccx_id = int(course.id.ccx)
-            ccx = CustomCourseForEdX.objects.get(pk=ccx_id)
+        if hasattr(course.id, 'ccx'):
+            ccx = CustomCourseForEdX.objects.get(pk=course.id.ccx)
             author = ccx.coach
         else:
             author = User.objects.get(pk=course.published_by)
