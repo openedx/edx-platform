@@ -536,6 +536,15 @@ def rescore_problem_module_state(xmodule_instance_args, module_descriptor, stude
             msg = "Specified problem does not support rescoring."
             raise UpdateProblemModuleStateError(msg)
 
+        # TODO: Remove the first part of this if-else with TNL-6594
+        # We check here to see if the problem has any submissions. If it does not, we don't want to rescore it
+        if hasattr(instance, "done"):
+            if not instance.done:
+                return UPDATE_STATUS_SKIPPED
+        else:
+            if instance.has_submitted_answer():
+                return UPDATE_STATUS_SKIPPED
+
         # Set the tracking info before this call, because it makes downstream
         # calls that create events.  We retrieve and store the id here because
         # the request cache will be erased during downstream calls.
