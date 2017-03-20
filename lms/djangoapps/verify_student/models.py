@@ -203,7 +203,11 @@ class PhotoVerification(StatusModel):
 
         """
         verify_student_config = StudentVerificationConfiguration.current()
-        days_good_for = verify_student_config.days_good_for if verify_student_config.enabled else 365
+        if verify_student_config.enabled:
+            days_good_for = verify_student_config.days_good_for
+        else:
+            days_good_for = settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
+
         return datetime.now(pytz.UTC) - timedelta(days=days_good_for)
 
     @classmethod
@@ -400,7 +404,11 @@ class PhotoVerification(StatusModel):
     def expiration_datetime(self):
         """Datetime that the verification will expire. """
         verify_student_config = StudentVerificationConfiguration.current()
-        days_good_for = verify_student_config.days_good_for if verify_student_config.enabled else 365
+        if verify_student_config.enabled:
+            days_good_for = verify_student_config.days_good_for
+        else:
+            days_good_for = settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
+
         return self.created_at + timedelta(days=days_good_for)
 
     def active_at_datetime(self, deadline):
@@ -980,7 +988,8 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         if verify_student_config.enabled:
             expiring_soon_window = verify_student_config.expiring_soon_window_in_days
         else:
-            expiring_soon_window = 28
+            expiring_soon_window = settings.VERIFY_STUDENT.get("EXPIRING_SOON_WINDOW")
+
         if expiration_datetime:
             if (expiration_datetime - datetime.now(pytz.UTC)).days <= expiring_soon_window:
                 return True

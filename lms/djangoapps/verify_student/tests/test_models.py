@@ -6,6 +6,7 @@ import boto
 import ddt
 from django.conf import settings
 from django.db import IntegrityError
+from django.test.utils import override_settings
 from freezegun import freeze_time
 import mock
 from mock import patch
@@ -392,6 +393,14 @@ class TestPhotoVerification(MockS3Mixin, ModuleStoreTestCase):
         attempt.created_at = attempt.created_at - timedelta(days=verify_student_config.days_good_for)
         attempt.save()
         self.assertFalse(attempt.active_at_datetime(datetime.now(pytz.UTC) + timedelta(days=1)))
+
+    @override_settings(VERIFY_STUDENT={"DAYS_GOOD_FOR": 5, "EXPIRING_SOON_WINDOW": 10})
+    def test_verification_using_settings(self):
+        user = UserFactory.create()
+        attempt = SoftwareSecurePhotoVerification.objects.create(user=user)
+        expiration = attempt.created_at + timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
+        before_expiration = expiration - timedelta(seconds=1)
+        self.assertTrue(attempt.active_at_datetime(before_expiration))
 
     def test_verification_for_datetime(self):
         user = UserFactory.create()
