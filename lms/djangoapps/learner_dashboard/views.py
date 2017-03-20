@@ -1,4 +1,5 @@
 """Learner dashboard views"""
+import waffle
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.http import Http404
@@ -73,4 +74,7 @@ def program_details(request, program_uuid):
         'user_preferences': get_user_preferences(request.user)
     }
 
-    return render_to_response('learner_dashboard/program_details.html', context)
+    if waffle.switch_is_active('new_program_progress'):
+        return render_to_response('learner_dashboard/program_details_2017.html', context)
+    else:
+        return render_to_response('learner_dashboard/program_details.html', context)
