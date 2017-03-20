@@ -1,21 +1,16 @@
 {
   "presets": [
-    ["env", {
-      "targets": {
-        "browsers": [
-          "last 2 versions",
-          "IE >= 11"
-        ]
-      },
-      "useBuiltIns": true,
-      "modules": false,
-      "exclude": [
-        "transform-regenerator"
-      ]
-    }],
-    "react"
-  ],
-  "plugins": [
-    "transform-object-rest-spread"
+    [
+      "env",
+      {
+        "targets": {
+          "browsers": [
+            "last 2 versions",
+            "IE >= 11"
+          ]
+        },
+        "modules": "commonjs"
+      }
+    ]
   ]
 }
