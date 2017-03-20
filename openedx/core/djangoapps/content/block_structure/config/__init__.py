@@ -2,10 +2,15 @@
 This module contains various configuration settings via
 waffle switches for the Block Structure framework.
 """
+import logging
+
 from openedx.core.djangolib.waffle_utils import is_switch_enabled
-from request_cache.middleware import request_cached
+from request_cache.middleware import request_cached, RequestCache, func_call_cache_key
 
 from .models import BlockStructureConfiguration
+
+
+log = logging.getLogger(__name__)
 
 
 INVALIDATE_CACHE_ON_PUBLISH = u'invalidate_cache_on_publish'
@@ -21,6 +26,19 @@ def is_enabled(setting_name):
     """
     bs_waffle_name = _bs_waffle_switch_name(setting_name)
     return is_switch_enabled(bs_waffle_name)
+
+
+def enable_for_current_request(setting_name):
+    """
+    Enables the given block_structure setting for the
+    duration of the current request.
+    """
+    cache_key = func_call_cache_key(
+        is_switch_enabled.request_cached_contained_func,
+        _bs_waffle_switch_name(setting_name),
+    )
+    RequestCache.get_request_cache().data[cache_key] = True
+    log.warning(u'BlockStructure: Config %s is enabled for current request.', setting_name)
 
 
 @request_cached
