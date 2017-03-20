@@ -7,7 +7,7 @@ from django.core.management.base import BaseCommand
 from xmodule.modulestore.django import modulestore
 
 import openedx.core.djangoapps.content.block_structure.api as api
-from openedx.core.djangoapps.content.block_structure.config import _bs_waffle_switch_name, STORAGE_BACKING_FOR_CACHE
+from openedx.core.djangoapps.content.block_structure.config import STORAGE_BACKING_FOR_CACHE, enable_for_current_request
 import openedx.core.djangoapps.content.block_structure.tasks as tasks
 import openedx.core.djangoapps.content.block_structure.store as store
 from openedx.core.lib.command_utils import (
@@ -15,8 +15,6 @@ from openedx.core.lib.command_utils import (
     validate_dependent_option,
     parse_course_keys,
 )
-from request_cache.middleware import RequestCache, func_call_cache_key
-from openedx.core.djangolib.waffle_utils import is_switch_enabled
 
 
 log = logging.getLogger(__name__)
@@ -100,9 +98,9 @@ class Command(BaseCommand):
 
         self._set_log_levels(options)
 
-        log.critical(u'STARTED generating Course Blocks for %d courses.', len(course_keys))
+        log.critical(u'BlockStructure: STARTED generating Course Blocks for %d courses.', len(course_keys))
         self._generate_course_blocks(options, course_keys)
-        log.critical(u'FINISHED generating Course Blocks for %d courses.', len(course_keys))
+        log.critical(u'BlockStructure: FINISHED generating Course Blocks for %d courses.', len(course_keys))
 
     def _set_log_levels(self, options):
         """
@@ -129,16 +127,14 @@ class Command(BaseCommand):
         Generates course blocks for the given course_keys per the given options.
         """
         if options.get('with_storage'):
-            self._enable_storage()
+            enable_for_current_request(STORAGE_BACKING_FOR_CACHE)
 
         for course_key in course_keys:
             try:
-                log.info(u'STARTED generating Course Blocks for course: %s.', course_key)
                 self._generate_for_course(options, course_key)
-                log.info(u'FINISHED generating Course Blocks for course: %s.', course_key)
             except Exception as ex:  # pylint: disable=broad-except
                 log.exception(
-                    u'An error occurred while generating course blocks for %s: %s',
+                    u'BlockStructure: An error occurred while generating course blocks for %s: %s',
                     unicode(course_key),
                     ex.message,
                 )
@@ -148,20 +144,15 @@ class Command(BaseCommand):
         Generates course blocks for the given course_key per the given options.
         """
         if options.get('enqueue_task'):
-            action = tasks.update_course_in_cache if options.get('force_update') else tasks.get_course_in_cache
+            action = tasks.update_course_in_cache_v2 if options.get('force_update') else tasks.get_course_in_cache_v2
             task_options = {'routing_key': options['routing_key']} if options.get('routing_key') else {}
-            action.apply_async([unicode(course_key)], **task_options)
+            result = action.apply_async(
+                kwargs=dict(course_id=unicode(course_key), with_storage=options.get('with_storage')),
+                **task_options
+            )
+            log.info(u'BlockStructure: ENQUEUED generating for course: %s, task_id: %s.', course_key, result.id)
         else:
+            log.info(u'BlockStructure: STARTED generating for course: %s.', course_key)
             action = api.update_course_in_cache if options.get('force_update') else api.get_course_in_cache
             action(course_key)
-
-    def _enable_storage(self):
-        """
-        Enables storage backing by setting the waffle's cached value to True.
-        """
-        cache_key = func_call_cache_key(
-            is_switch_enabled.request_cached_contained_func,
-            _bs_waffle_switch_name(STORAGE_BACKING_FOR_CACHE),
-        )
-        RequestCache.get_request_cache().data[cache_key] = True
-        log.warning(u'STORAGE_BACKING_FOR_CACHE is enabled.')
+            log.info(u'BlockStructure: FINISHED generating for course: %s.', course_key)
