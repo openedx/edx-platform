@@ -22,10 +22,14 @@
 
             initialize: function(options) {
                 this.template = HtmlUtils.template(searchTemplate);
+                this.render();
             },
 
             render: function() {
                 HtmlUtils.setHtml(this.$el, this.template());
+                this.$searchField = this.$el.find('.search-field');
+                this.$searchButton = this.$el.find('.search-button');
+                this.$cancelButton = this.$el.find('.cancel-button');
                 return this;
             },
 
@@ -33,12 +37,18 @@
                 var searchKey = this.$('.search-field').val();
                 this.collection.setSearchKey(searchKey);
                 this.collection.setPage(1);
+                this.$searchField.addClass('is-active');
+                this.$searchButton.hide();
+                this.$cancelButton.show();
             },
 
             cancelSearch: function() {
                 this.$('.search-field').val('');
                 this.collection.setSearchKey('');
                 this.collection.setPage(1);
+                this.$searchField.removeClass('is-active');
+                this.$searchButton.show();
+                this.$cancelButton.hide();
             }
         });
 

@@ -1,6 +1,6 @@
-<div id="videos-search-bar" class="search-bar videos-search-bar" role="search" aria-label="Video">
+<div id="search-bar" class="search-bar videos-search-bar">
   <div class="search-field-wrapper">
-    <input id="search-input" type="text" class="search-field"/>
+    <input type="text" class="search-field"/>
     <button class="search-button"><%- gettext("Search") %></button>
     <button class="cancel-button" title="<%- gettext("Clear Search") %>">
       <span class="icon fa fa-remove" aria-hidden="true"></span>

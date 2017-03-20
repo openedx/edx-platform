@@ -31,6 +31,7 @@ define([
                 this.pagingView.registerSortableColumn('js-video-name-col', gettext('Name'), 'client_video_id', 'asc');
                 this.pagingView.registerSortableColumn('js-video-duration-col', gettext('Duration'), 'duration', 'asc');
                 this.pagingView.setInitialSortColumn('js-video-date-col')
+
             },
 
             PreviousVideoUploadPagingView: PagingView.extend({
@@ -39,6 +40,9 @@ define([
                     this.encodingsDownloadUrl = options.encodingsDownloadUrl;
                     this.videoHandlerUrl = options.videoHandlerUrl;
                     this.template = options.template;
+                    this.$el.html(this.template({encodingsDownloadUrl: this.encodingsDownloadUrl}));
+                    this.searchView = new SearchView({el: this.$el.find('.forum-search'), collection: this.collection});
+
                 },
 
                 renderPageItems: function() {
@@ -52,18 +56,17 @@ define([
 
                     var $el = this.$el,
                     $tabBody;
-                    $el.html(this.template({encodingsDownloadUrl: this.encodingsDownloadUrl}));
                     $tabBody = $el.find('.js-table-body');
+                    $tabBody.html('');
+
                     _.each(this.itemViews, function(view) {
                         $tabBody.append(view.render().$el);
                     });
                     this.pagingHeader = new PagingHeader({view: this, el: $el.find('#video-paging-header')});
                     this.pagingFooter = new PagingFooter({collection: this.collection, el: $el.find('#video-paging-footer')});
-                    this.searchView = new SearchView({el: this.$el.find('.forum-search'), collection: this.collection});
 
                     this.pagingHeader.render();
                     this.pagingFooter.render();
-                    this.searchView.render();
                 }
 
             }),
