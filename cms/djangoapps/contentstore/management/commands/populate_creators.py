@@ -7,7 +7,7 @@ from course_creators.views import add_user_with_status_granted, add_user_with_st
 from django.core.management.base import BaseCommand
 
 from django.contrib.auth.models import User
-from django.db.utils import IntegrityError
+from django.db import IntegrityError, transaction
 from student.roles import CourseInstructorRole, CourseStaffRole
 
 #------------ to run: ./manage.py cms populate_creators --settings=dev
@@ -26,9 +26,10 @@ class Command(BaseCommand):
         username = 'populate_creators_command'
         email = 'grant+creator+access@edx.org'
         try:
-            admin = User.objects.create_user(username, email, 'foo')
-            admin.is_staff = True
-            admin.save()
+            with transaction.atomic():
+                admin = User.objects.create_user(username, email, 'foo')
+                admin.is_staff = True
+                admin.save()
         except IntegrityError:
             # If the script did not complete the last time it was run,
             # the admin user will already exist.

@@ -8,7 +8,7 @@ from eventtracking import tracker
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django_countries import countries
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_noop
 
@@ -266,9 +266,10 @@ def update_email_opt_in(user, org, opt_in):
     # Update the preference and save it
     preference.value = str(opt_in)
     try:
-        preference.save()
-        if hasattr(settings, 'LMS_SEGMENT_KEY') and settings.LMS_SEGMENT_KEY:
-            _track_update_email_opt_in(user.id, org, opt_in)
+        with transaction.atomic():
+            preference.save()
+            if hasattr(settings, 'LMS_SEGMENT_KEY') and settings.LMS_SEGMENT_KEY:
+                _track_update_email_opt_in(user.id, org, opt_in)
     except IntegrityError as err:
         log.warn(u"Could not update organization wide preference due to IntegrityError: {}".format(err.message))
 
