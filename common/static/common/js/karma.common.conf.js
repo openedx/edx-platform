@@ -40,6 +40,9 @@
 var path = require('path');
 var _ = require('underscore');
 var appRoot = path.join(__dirname, '../../../../');
+var webpackConfig = require(path.join(appRoot, 'webpack.config.js'));
+
+delete webpackConfig.entry;
 
 // Files which are needed by all lms/cms suites.
 var commonFiles = {
@@ -177,13 +180,15 @@ var defaultNormalizeFunc = function(appRoot, pattern) {
     return pattern;
 };
 
-var normalizePathsForCoverage = function(files, normalizeFunc) {
+var normalizePathsForCoverage = function(files, normalizeFunc, preprocessors) {
     var normalizeFn = normalizeFunc || defaultNormalizeFunc,
+        normalizedFile,
         filesForCoverage = {};
 
     files.forEach(function(file) {
         if (!file.ignoreCoverage) {
-            filesForCoverage[normalizeFn(appRoot, file.pattern)] = ['coverage'];
+            normalizedFile = normalizeFn(appRoot, file.pattern);
+            filesForCoverage[normalizedFile] = ['coverage'].concat(preprocessors[normalizedFile] || []);
         }
     });
 
@@ -191,29 +196,16 @@ var normalizePathsForCoverage = function(files, normalizeFunc) {
 };
 
 /**
- * Sets nocache on each file in the list.
- * @param {Object} files
- * @param {Bool} enable
- * @return {Object}
- */
-var setNocache = function(files, enable) {
-    files.forEach(function(f) {
-        if (_.isObject(f)) {
-            f.nocache = enable;
-        }
-    });
-    return files;
-};
-
-/**
  * Sets defaults for each file pattern.
+ * RequireJS files are excluded by default.
+ * Webpack files are included by default.
  * @param {Object} files
  * @return {Object}
  */
 var setDefaults = function(files) {
     return files.map(function(f) {
         var file = _.isObject(f) ? f : {pattern: f};
-        if (!file.included) {
+        if (!file.included && !file.webpack) {
             f.included = false;
         }
         return file;
@@ -281,6 +273,8 @@ var getBaseConfig = function(config, useRequireJs) {
             'karma-chrome-launcher',
             'karma-firefox-launcher',
             'karma-spec-reporter',
+            'karma-webpack',
+            'karma-sourcemap-loader',
             customPlugin
         ],
 
@@ -349,7 +343,9 @@ var getBaseConfig = function(config, useRequireJs) {
 
         client: {
             captureConsole: false
-        }
+        },
+
+        webpack: webpackConfig
     };
 };
 
@@ -382,11 +378,6 @@ var configure = function(config, options) {
     // We set it to false by default because RequireJS should be used instead.
     files = setDefaults(files);
 
-    // With nocache=true, Karma always serves the latest files from disk.
-    // However, that prevents coverage tracking from working.
-    // So we only set it if coverage tracking is off.
-    setNocache(files, !config.coverage);
-
     var filesForCoverage = _.flatten(
         _.map(
             ['sourceFiles', 'specFiles'],
@@ -399,7 +390,7 @@ var configure = function(config, options) {
     var preprocessors = _.extend(
         {},
         options.preprocessors,
-        normalizePathsForCoverage(filesForCoverage, options.normalizePathsForCoverageFunc)
+        normalizePathsForCoverage(filesForCoverage, options.normalizePathsForCoverageFunc, options.preprocessors)
     );
 
     config.set(_.extend(baseConfig, {

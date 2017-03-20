@@ -28,7 +28,6 @@ var options = {
     sourceFiles: [
         {pattern: 'coffee/src/**/!(*spec).js'},
         {pattern: 'course_bookmarks/**/!(*spec).js'},
-        {pattern: 'course_experience/js/**/!(*spec).js'},
         {pattern: 'discussion/js/**/!(*spec).js'},
         {pattern: 'js/**/!(*spec|djangojs).js'},
         {pattern: 'lms/js/**/!(*spec).js'},
@@ -37,7 +36,8 @@ var options = {
     ],
 
     specFiles: [
-        {pattern: '../**/*spec.js'}
+        {pattern: '../**/*spec.js'},
+        {pattern: 'course_experience/js/**/*_spec.js', webpack: true}
     ],
 
     fixtureFiles: [
@@ -49,8 +49,16 @@ var options = {
 
     runFiles: [
         {pattern: 'lms/js/spec/main.js', included: true}
-    ]
+    ],
+
+    preprocessors: {}
 };
+
+options.specFiles
+    .filter(function(file) { return file.webpack; })
+    .forEach(function(file) {
+        options.preprocessors[file.pattern] = ['webpack', 'sourcemap'];
+    });
 
 module.exports = function(config) {
     configModule.configure(config, options);
