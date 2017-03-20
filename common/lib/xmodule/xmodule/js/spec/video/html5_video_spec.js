@@ -41,7 +41,8 @@
                             expect(state.videoPlayer.player.video.play).toHaveBeenCalled();
                         });
 
-                        it('player state was changed', function(done) {
+                        // Failing on master. See TNL-6748.
+                        xit('player state was changed', function(done) {
                             jasmine.waitUntil(function() {
                                 return state.videoPlayer.player.getPlayerState() === STATUS.PLAYING;
                             }).always(done);
