@@ -11,7 +11,7 @@ from django.db import models, transaction
 from logging import getLogger
 
 from model_utils.models import TimeStampedModel
-from openedx.core.djangoapps.xmodule_django.models import UsageKeyField
+from openedx.core.djangoapps.xmodule_django.models import UsageKeyWithRunField
 from openedx.core.storage import get_storage
 
 from . import config
@@ -33,9 +33,12 @@ def _directory_name(data_usage_key):
     Returns the directory name for the given
     data_usage_key.
     """
+    # replace any '/' in the usage key so they aren't interpreted
+    # as folder separators.
+    encoded_usage_key = unicode(data_usage_key).replace('/', '_')
     return '{}{}'.format(
         settings.BLOCK_STRUCTURES_SETTINGS.get('DIRECTORY_PREFIX', ''),
-        unicode(data_usage_key),
+        encoded_usage_key,
     )
 
 
@@ -133,7 +136,7 @@ class BlockStructureModel(TimeStampedModel):
     class Meta(object):
         db_table = 'block_structure'
 
-    data_usage_key = UsageKeyField(
+    data_usage_key = UsageKeyWithRunField(
         u'Identifier of the data being collected.',
         blank=False,
         max_length=255,
