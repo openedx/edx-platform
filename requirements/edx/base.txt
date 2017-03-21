@@ -54,7 +54,9 @@ edx-django-oauth2-provider==1.1.4
 edx-django-sites-extensions==2.1.1
 edx-enterprise==0.27.6
 edx-oauth2-provider==1.2.0
-edx-opaque-keys==0.4.0
+
+#edx-opaque-keys==0.4.0
+
 edx-organizations==0.4.3
 edx-rest-api-client==1.7.1
 edx-search==0.1.2
