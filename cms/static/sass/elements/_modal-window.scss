@@ -585,8 +585,11 @@
     }
     .list-fields {
       .field-message {
+        @extend %t-copy-sub2;
         color: $gray-d1;
-        font-size: ($baseline/2);
+      }
+      label {
+        @extend %t-title7;
       }
       .field {
         display: inline-block;
@@ -595,7 +598,6 @@
         margin-bottom: ($baseline/4);
 
         label {
-          @extend %t-copy-sub1;
           @extend %t-strong;
           @include transition(color $tmg-f3 ease-in-out 0s);
           margin: 0 0 ($baseline/4) 0;
