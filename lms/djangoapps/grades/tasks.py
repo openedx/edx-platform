@@ -3,7 +3,6 @@ This module contains tasks for asynchronous execution of grade updates.
 """
 
 from celery import task
-from celery.exceptions import Retry
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
@@ -54,6 +53,14 @@ class _BaseTask(PersistOnFailureTask, LoggedTask):  # pylint: disable=abstract-m
     Include persistence features, as well as logging of task invocation.
     """
     abstract = True
+
+
+@task
+def compute_grades_for_course(course_key, offset, batch_size):  # pylint: disable=unused-argument
+    """
+    TODO: TNL-6690: Fill this task in and remove pylint disables
+    """
+    pass
 
 
 @task(bind=True, base=_BaseTask, default_retry_delay=30, routing_key=settings.RECALCULATE_GRADES_ROUTING_KEY)

@@ -302,17 +302,17 @@ class TestResetGrades(TestCase):
             self.command.handle(delete=True, all_courses=True, db_table="not course or subsection")
 
     def test_no_run_mode(self):
-        with self.assertRaisesMessage(CommandError, 'Either --delete or --dry_run must be specified.'):
+        with self.assertRaisesMessage(CommandError, 'Must specify exactly one of --delete, --dry_run'):
             self.command.handle(all_courses=True)
 
     def test_both_run_modes(self):
-        with self.assertRaisesMessage(CommandError, 'Both --delete and --dry_run cannot be specified.'):
+        with self.assertRaisesMessage(CommandError, 'Must specify exactly one of --delete, --dry_run'):
             self.command.handle(all_courses=True, dry_run=True, delete=True)
 
     def test_no_course_mode(self):
-        with self.assertRaisesMessage(CommandError, 'Either --courses or --all_courses must be specified.'):
+        with self.assertRaisesMessage(CommandError, 'Must specify exactly one of --courses, --all_courses'):
             self.command.handle(dry_run=True)
 
     def test_both_course_modes(self):
-        with self.assertRaisesMessage(CommandError, 'Both --courses and --all_courses cannot be specified.'):
+        with self.assertRaisesMessage(CommandError, 'Must specify exactly one of --courses, --all_courses'):
             self.command.handle(dry_run=True, all_courses=True, courses=['some/course/key'])
