@@ -1401,15 +1401,14 @@ class IcrvStatusEmailsConfiguration(ConfigurationModel):
 
 class StudentVerificationConfiguration(ConfigurationModel):
     """Student Verification Configuration"""
+    # pylint: disable=model-missing-unicode
+
     days_good_for = models.PositiveIntegerField(
         default=365, help_text="Days for which a verification is valid."
     )
     expiring_soon_window = models.PositiveIntegerField(
         default=28, help_text="The window in days within which a verification is considered to be expiring soon."
     )
-
-    def __unicode__(self):
-        return "Student Verification Configuration"
 
 
 class SkippedReverification(models.Model):
