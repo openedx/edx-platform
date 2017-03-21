@@ -8,10 +8,12 @@ from bok_choy.page_object import PageObject
 from common.test.acceptance.pages.lms.fields import FieldsMixin
 from bok_choy.promise import EmptyPromise
 from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage
+from common.test.acceptance.tests.helpers import select_option_by_value
 from selenium.webdriver import ActionChains
 
 
 PROFILE_VISIBILITY_SELECTOR = '#u-field-select-account_privacy option[value="{}"]'
+PROFILE_VISIBILITY_INPUT = '#u-field-select-account_privacy'
 FIELD_ICONS = {
     'country': 'fa-map-marker',
     'language_proficiencies': 'fa-comment',
@@ -146,7 +148,8 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         self.wait_for_element_visibility('select#u-field-select-account_privacy', 'Privacy dropdown is visible')
 
         if privacy != self.privacy:
-            self.q(css=PROFILE_VISIBILITY_SELECTOR.format(privacy)).first.click()
+            query = self.q(css=PROFILE_VISIBILITY_INPUT)
+            select_option_by_value(query, privacy, focus_out=True)
             EmptyPromise(lambda: privacy == self.privacy, 'Privacy is set to {}'.format(privacy)).fulfill()
             self.wait_for_ajax()
 
