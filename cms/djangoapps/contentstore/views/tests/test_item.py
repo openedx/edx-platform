@@ -827,7 +827,7 @@ class TestMoveItem(ItemTest):
         )
         split_test = self.get_item_from_modulestore(self.split_test_usage_key, verify_is_draft=True)
         self.assertEqual(split_test.user_partition_id, partition_id)
-        self.assertEqual(len(split_test.children), len(self.course.user_partitions[partition_id].groups))
+        self.assertEqual(len(split_test.children), len(self.course.user_partitions[partition_id].groups()))
         return split_test
 
     def _move_component(self, source_usage_key, target_usage_key, target_index=None):

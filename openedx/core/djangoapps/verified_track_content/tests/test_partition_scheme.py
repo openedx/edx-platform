@@ -27,14 +27,14 @@ class EnrollmentTrackUserPartitionTest(SharedModuleStoreTestCase):
 
     def test_only_default_mode(self):
         self.assertEqual(len(self.course.user_partitions), 1)
-        groups = self.course.user_partitions[0].groups
+        groups = self.course.user_partitions[0].groups()
         self.assertEqual(1, len(groups))
         self.assertEqual("Audit", groups[0].name)
 
     def test_using_verified_track_cohort(self):
         VerifiedTrackCohortedCourse.objects.create(course_key=self.course.id, enabled=True).save()
         self.assertEqual(len(self.course.user_partitions), 1)
-        groups = self.course.user_partitions[0].groups
+        groups = self.course.user_partitions[0].groups()
         self.assertEqual(0, len(groups))
 
     def test_multiple_groups(self):
@@ -48,7 +48,7 @@ class EnrollmentTrackUserPartitionTest(SharedModuleStoreTestCase):
         create_mode(self.course, CourseMode.CREDIT_MODE, "Credit Mode", min_price=2)
 
         self.assertEqual(len(self.course.user_partitions), 1)
-        groups = self.course.user_partitions[0].groups
+        groups = self.course.user_partitions[0].groups()
         self.assertEqual(3, len(groups))
         self.assertIsNotNone(self.get_group_by_name("Audit Enrollment Track"))
         self.assertIsNotNone(self.get_group_by_name("Verified Enrollment Track"))
@@ -57,7 +57,7 @@ class EnrollmentTrackUserPartitionTest(SharedModuleStoreTestCase):
     def test_to_json(self):
         create_mode(self.course, CourseMode.VERIFIED, "Verified Enrollment Track", min_price=1)
         user_partition = self.course.user_partitions[0]
-        self.assertEqual(1, len(user_partition.groups))
+        self.assertEqual(1, len(user_partition.groups()))
         self.assertIsNotNone(self.get_group_by_name("Verified Enrollment Track"))
 
         json = user_partition.to_json()
@@ -65,7 +65,7 @@ class EnrollmentTrackUserPartitionTest(SharedModuleStoreTestCase):
         recreated_user_partition = EnrollmentTrackUserPartition.from_json(json)
         self.assertEqual(user_partition, recreated_user_partition)
 
-        groups = recreated_user_partition.groups
+        groups = recreated_user_partition.groups()
         self.assertEqual(1, len(groups))
         self.assertEqual("Verified Enrollment Track", groups[0].name)
 
@@ -74,7 +74,7 @@ class EnrollmentTrackUserPartitionTest(SharedModuleStoreTestCase):
         Return the group in the EnrollmentTrackUserPartition with the given name.
         If no such group exists, returns `None`.
         """
-        for group in self.course.user_partitions[0].groups:
+        for group in self.course.user_partitions[0].groups():
             if group.name == name:
                 return group
         return None
@@ -104,7 +104,7 @@ class EnrollmentTrackPartitionSchemeTest(SharedModuleStoreTestCase):
         self.assertEqual(type(user_partition), EnrollmentTrackUserPartition)
         self.assertEqual(user_partition.name, "partition")
 
-        groups = user_partition.groups
+        groups = user_partition.groups()
         self.assertEqual(1, len(groups))
         self.assertEqual("Audit", groups[0].name)
 

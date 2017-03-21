@@ -87,9 +87,9 @@ class CreateVerificationPartitionTest(ModuleStoreTestCase):
         self.assertEqual(partition.parameters["location"], unicode(self.icrv.location))
 
         # Check that the groups for the partition were created correctly
-        self.assertEqual(len(partition.groups), 2)
+        self.assertEqual(len(partition.groups()), 2)
         self.assertItemsEqual(
-            [g.id for g in partition.groups],
+            [g.id for g in partition.groups()],
             [
                 VerificationPartitionScheme.ALLOW,
                 VerificationPartitionScheme.DENY,

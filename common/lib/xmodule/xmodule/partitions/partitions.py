@@ -94,7 +94,7 @@ class Group(namedtuple("Group", "id name")):
 USER_PARTITION_SCHEME_NAMESPACE = 'openedx.user_partition_scheme'
 
 
-class UserPartition(namedtuple("UserPartition", "id name description groups scheme parameters active")):
+class UserPartition(namedtuple("UserPartition", "id name description static_groups scheme parameters active")):
     """A named way to partition users into groups, primarily intended for
     running experiments. It is expected that each user will be in at most one
     group in a partition.
@@ -142,6 +142,21 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
         scheme.name = name
         return scheme
 
+    def groups(self, **kwargs):  # pylint: disable=unused-argument
+        """
+        Return the groups associated with this UserPartition instance.
+
+        Args:
+            **kwargs: optional arguments. The course_id will be passed in this for
+            UserPartitions that need access to that information. But the default implementation
+            of this method is to simply return the static groups as defined during creation.
+
+        Returns:
+            The groups associated with this UserPartition.
+
+        """
+        return self.static_groups
+
     def to_json(self):
         """
         'Serialize' to a json-serializable representation.
@@ -155,7 +170,7 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
             "scheme": self.scheme.name,
             "description": self.description,
             "parameters": self.parameters,
-            "groups": [g.to_json() for g in self.groups],
+            "groups": [g.to_json() for g in self.groups()],
             "active": bool(self.active),
             "version": UserPartition.VERSION
         }
@@ -230,7 +245,7 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
             NoSuchUserPartitionGroupError: The specified group could not be found.
 
         """
-        for group in self.groups:
+        for group in self.groups():
             if group.id == group_id:
                 return group
 

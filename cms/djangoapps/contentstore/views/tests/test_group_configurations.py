@@ -150,7 +150,7 @@ class GroupConfigurationsBaseTestCase(object):
         Returns a tuple that contains removed group configuration ID and group IDs.
         """
         configuration_id = content.pop("id")
-        group_ids = [group.pop("id") for group in content["groups"]]
+        group_ids = [group.pop("id") for group in content['groups']]
 
         return (configuration_id, group_ids)
 
@@ -289,9 +289,9 @@ class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurations
         user_partitions = self._get_non_enrollment_track_partitions()
         self.assertEqual(len(user_partitions), 1)
         self.assertEqual(user_partitions[0].name, u'Test name')
-        self.assertEqual(len(user_partitions[0].groups), 2)
-        self.assertEqual(user_partitions[0].groups[0].name, u'Group A')
-        self.assertEqual(user_partitions[0].groups[1].name, u'Group B')
+        self.assertEqual(len(user_partitions[0].groups()), 2)
+        self.assertEqual(user_partitions[0].groups()[0].name, u'Group A')
+        self.assertEqual(user_partitions[0].groups()[1].name, u'Group B')
         self.assertEqual(user_partitions[0].parameters, {})
 
     def test_lazily_creates_cohort_configuration(self):
@@ -355,9 +355,9 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
         user_partitions = self._get_non_enrollment_track_partitions()
         self.assertEqual(len(user_partitions), 1)
         self.assertEqual(user_partitions[0].name, u'Test name')
-        self.assertEqual(len(user_partitions[0].groups), 2)
-        self.assertEqual(user_partitions[0].groups[0].name, u'Group A')
-        self.assertEqual(user_partitions[0].groups[1].name, u'Group B')
+        self.assertEqual(len(user_partitions[0].groups()), 2)
+        self.assertEqual(user_partitions[0].groups()[0].name, u'Group A')
+        self.assertEqual(user_partitions[0].groups()[1].name, u'Group B')
         self.assertEqual(user_partitions[0].parameters, {})
 
     def test_can_edit_content_group(self):
@@ -397,9 +397,9 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
 
         self.assertEqual(len(user_partititons), 1)
         self.assertEqual(user_partititons[0].name, u'New Test name')
-        self.assertEqual(len(user_partititons[0].groups), 2)
-        self.assertEqual(user_partititons[0].groups[0].name, u'New Group Name')
-        self.assertEqual(user_partititons[0].groups[1].name, u'Group C')
+        self.assertEqual(len(user_partititons[0].groups()), 2)
+        self.assertEqual(user_partititons[0].groups()[0].name, u'New Group Name')
+        self.assertEqual(user_partititons[0].groups()[1].name, u'Group C')
         self.assertEqual(user_partititons[0].parameters, {})
 
     def test_can_delete_content_group(self):
@@ -422,8 +422,8 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
         user_partitions = self._get_non_enrollment_track_partitions()
         self.assertEqual(len(user_partitions), 1)
         self.assertEqual(user_partitions[0].name, 'Name 0')
-        self.assertEqual(len(user_partitions[0].groups), 2)
-        self.assertEqual(user_partitions[0].groups[1].name, 'Group C')
+        self.assertEqual(len(user_partitions[0].groups()), 2)
+        self.assertEqual(user_partitions[0].groups()[1].name, 'Group C')
 
     def test_cannot_delete_used_content_group(self):
         """
@@ -446,8 +446,8 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
         # Verify that user_partitions and groups are still the same.
         user_partititons = self._get_non_enrollment_track_partitions()
         self.assertEqual(len(user_partititons), 1)
-        self.assertEqual(len(user_partititons[0].groups), 3)
-        self.assertEqual(user_partititons[0].groups[1].name, 'Group B')
+        self.assertEqual(len(user_partititons[0].groups()), 3)
+        self.assertEqual(user_partititons[0].groups()[1].name, 'Group B')
 
     def test_cannot_delete_non_existent_content_group(self):
         """
@@ -465,7 +465,7 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
         # Verify that user_partitions is still the same.
         user_partititons = self.course.user_partitions
         self.assertEqual(len(user_partititons), 1)
-        self.assertEqual(len(user_partititons[0].groups), 3)
+        self.assertEqual(len(user_partititons[0].groups()), 3)
 
     def test_can_create_new_group_configuration_if_it_does_not_exist(self):
         """
@@ -500,9 +500,9 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
         user_partitions = self._get_non_enrollment_track_partitions()
         self.assertEqual(len(user_partitions), 1)
         self.assertEqual(user_partitions[0].name, u'Test name')
-        self.assertEqual(len(user_partitions[0].groups), 2)
-        self.assertEqual(user_partitions[0].groups[0].name, u'Group A')
-        self.assertEqual(user_partitions[0].groups[1].name, u'Group B')
+        self.assertEqual(len(user_partitions[0].groups()), 2)
+        self.assertEqual(user_partitions[0].groups()[0].name, u'Group A')
+        self.assertEqual(user_partitions[0].groups()[1].name, u'Group B')
         self.assertEqual(user_partitions[0].parameters, {})
 
     def test_can_edit_group_configuration(self):
@@ -543,9 +543,9 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
 
         self.assertEqual(len(user_partititons), 1)
         self.assertEqual(user_partititons[0].name, u'New Test name')
-        self.assertEqual(len(user_partititons[0].groups), 2)
-        self.assertEqual(user_partititons[0].groups[0].name, u'New Group Name')
-        self.assertEqual(user_partititons[0].groups[1].name, u'Group C')
+        self.assertEqual(len(user_partititons[0].groups()), 2)
+        self.assertEqual(user_partititons[0].groups()[0].name, u'New Group Name')
+        self.assertEqual(user_partititons[0].groups()[1].name, u'Group C')
         self.assertEqual(user_partititons[0].parameters, {})
 
     def test_can_delete_group_configuration(self):

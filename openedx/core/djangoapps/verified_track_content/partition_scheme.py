@@ -41,8 +41,7 @@ class EnrollmentTrackUserPartition(UserPartition):
     Extends UserPartition to support dynamic groups pulled from the current course Enrollment tracks.
     """
 
-    @property
-    def groups(self):
+    def groups(self, **kwargs):  # pylint: disable=unused-argument
         """
         Return the groups (based on CourseModes) for the course associated with this
         EnrollmentTrackUserPartition instance.

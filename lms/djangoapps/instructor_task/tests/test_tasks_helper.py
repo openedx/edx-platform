@@ -196,7 +196,7 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
             }
         )
 
-        _groups = [group.name for group in self.course.user_partitions[0].groups]
+        _groups = [group.name for group in self.course.user_partitions[0].groups()]
         self.assertEqual(_groups, user_groups)
 
     def test_cohort_scheme_partition(self):
@@ -254,7 +254,7 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
         CourseUserGroupPartitionGroup(
             course_user_group=cohort_a,
             partition_id=cohort_scheme_partition.id,
-            group_id=cohort_scheme_partition.groups[0].id
+            group_id=cohort_scheme_partition.groups()[0].id
         ).save()
 
         # Verify that we see user_a and user_b in their respective
@@ -824,12 +824,12 @@ class TestProblemReportCohortedContent(TestReportMixin, ContentGroupTestCase, In
         self.define_option_problem(
             u"Problem0",
             parent=vertical,
-            group_access={self.course.user_partitions[0].id: [self.course.user_partitions[0].groups[0].id]}
+            group_access={self.course.user_partitions[0].id: [self.course.user_partitions[0].groups()[0].id]}
         )
         self.define_option_problem(
             u"Problem1",
             parent=vertical,
-            group_access={self.course.user_partitions[0].id: [self.course.user_partitions[0].groups[1].id]}
+            group_access={self.course.user_partitions[0].id: [self.course.user_partitions[0].groups()[1].id]}
         )
 
     def _format_user_grade(self, header_row, user, grade):

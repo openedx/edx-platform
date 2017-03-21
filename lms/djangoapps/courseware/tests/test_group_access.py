@@ -152,8 +152,8 @@ class GroupAccessTestCase(ModuleStoreTestCase):
         self.set_user_group(self.gray_worm, self.color_partition, self.gray_group)
         # delete the gray/worm groups from the partitions now so we can test scenarios
         # for user whose group is missing.
-        self.animal_partition.groups.pop()
-        self.color_partition.groups.pop()
+        self.animal_partition.groups().pop()
+        self.color_partition.groups().pop()
 
         # add a staff user, whose access will be unconditional in spite of group access.
         self.staff = StaffFactory.create(course_key=self.course.id)

@@ -102,7 +102,7 @@ def _other_partitions(verified_partitions, exclude_partitions, course_key):
                 description=partition.description,
                 scheme=partition.scheme,
                 parameters=partition.parameters,
-                groups=partition.groups,
+                groups=partition.groups(),
                 active=False,
             )
         )

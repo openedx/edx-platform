@@ -71,7 +71,7 @@ is_staff_locked = ancestor_has_staff_lock(xblock)
                                     <h4 class="visibility-controls-title modal-subsection-title sr">${_('Content Groups')}</h4>
                                     <div class="list-fields list-checkbox">
                                     % for partition in enrollment_mode_partitions:
-                                        % for group in partition["groups"]:
+                                        % for group in partition.groups:
                                             <div class="field field-checkbox field-visibility-enrollment-mode ${'was-removed' if group["deleted"] else ''}">
                                                 <input type="checkbox"
                                                     id="visibility-content-group-${partition["id"]}-${group["id"]}"
@@ -101,7 +101,7 @@ is_staff_locked = ancestor_has_staff_lock(xblock)
                             <h4 class="visibility-controls-title modal-subsection-title sr">${_('Content Groups')}</h4>
                             <div class="list-fields list-checkbox">
                             % for partition in cohort_partitions:
-                                % for group in partition["groups"]:
+                                % for group in partition.groups:
                                     <div class="field field-checkbox field-visibility-content-group ${'was-removed' if group["deleted"] else ''}">
                                         <input type="checkbox"
                                             id="visibility-content-group-${partition["id"]}-${group["id"]}"

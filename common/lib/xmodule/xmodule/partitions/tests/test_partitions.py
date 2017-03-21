@@ -99,7 +99,7 @@ class MockUserPartitionScheme(object):
         """
         if self.current_group:
             return self.current_group
-        groups = user_partition.groups
+        groups = user_partition.groups()
         if not groups or len(groups) == 0:
             return None
         return groups[0]
@@ -170,7 +170,7 @@ class TestUserPartition(PartitionTestCase):
         self.assertEqual(user_partition.id, self.TEST_ID)
         self.assertEqual(user_partition.name, self.TEST_NAME)
         self.assertEqual(user_partition.description, self.TEST_DESCRIPTION)
-        self.assertEqual(user_partition.groups, self.TEST_GROUPS)
+        self.assertEqual(user_partition.groups(), self.TEST_GROUPS)
         self.assertEquals(user_partition.scheme.name, self.TEST_SCHEME_NAME)
         self.assertEquals(user_partition.parameters, self.TEST_PARAMETERS)
 
@@ -215,7 +215,7 @@ class TestUserPartition(PartitionTestCase):
         self.assertEqual(user_partition.description, self.TEST_DESCRIPTION)
         self.assertEqual(user_partition.parameters, self.TEST_PARAMETERS)
 
-        for act_group in user_partition.groups:
+        for act_group in user_partition.groups():
             self.assertIn(act_group.id, [0, 1])
             exp_group = self.TEST_GROUPS[act_group.id]
             self.assertEqual(exp_group.id, act_group.id)
@@ -436,7 +436,7 @@ class TestPartitionService(PartitionTestCase):
     def test_get_user_group_id_for_partition(self):
         # assign the first group to be returned
         user_partition_id = self.user_partition.id
-        groups = self.user_partition.groups
+        groups = self.user_partition.groups()
         self.user_partition.scheme.current_group = groups[0]
 
         # get a group assigned to the user
@@ -464,7 +464,7 @@ class TestPartitionService(PartitionTestCase):
         ps_uncached = self._create_service(username)
 
         # Set the group we expect users to be placed into
-        first_group = self.user_partition.groups[0]
+        first_group = self.user_partition.groups()[0]
         self.user_partition.scheme.current_group = first_group
 
         # Make sure our partition services all return the right thing, but skip
@@ -476,7 +476,7 @@ class TestPartitionService(PartitionTestCase):
             )
 
         # Now select a new target group
-        second_group = self.user_partition.groups[1]
+        second_group = self.user_partition.groups()[1]
         self.user_partition.scheme.current_group = second_group
 
         # Both of the shared cache entries should return the old value, even
@@ -505,7 +505,7 @@ class TestPartitionService(PartitionTestCase):
         """
         Test that a partition group is assigned to a user.
         """
-        groups = self.user_partition.groups
+        groups = self.user_partition.groups()
 
         # assign first group and verify that it is returned for the user
         self.user_partition.scheme.current_group = groups[0]

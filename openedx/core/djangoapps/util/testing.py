@@ -70,26 +70,26 @@ class ContentGroupTestCase(ModuleStoreTestCase):
         CourseUserGroupPartitionGroup.objects.create(
             course_user_group=alpha_cohort,
             partition_id=self.course.user_partitions[0].id,
-            group_id=self.course.user_partitions[0].groups[0].id
+            group_id=self.course.user_partitions[0].groups()[0].id
         )
         CourseUserGroupPartitionGroup.objects.create(
             course_user_group=beta_cohort,
             partition_id=self.course.user_partitions[0].id,
-            group_id=self.course.user_partitions[0].groups[1].id
+            group_id=self.course.user_partitions[0].groups()[1].id
         )
         self.alpha_module = ItemFactory.create(
             parent_location=self.course.location,
             category='discussion',
             discussion_id='alpha_group_discussion',
             discussion_target='Visible to Alpha',
-            group_access={self.course.user_partitions[0].id: [self.course.user_partitions[0].groups[0].id]}
+            group_access={self.course.user_partitions[0].id: [self.course.user_partitions[0].groups()[0].id]}
         )
         self.beta_module = ItemFactory.create(
             parent_location=self.course.location,
             category='discussion',
             discussion_id='beta_group_discussion',
             discussion_target='Visible to Beta',
-            group_access={self.course.user_partitions[0].id: [self.course.user_partitions[0].groups[1].id]}
+            group_access={self.course.user_partitions[0].id: [self.course.user_partitions[0].groups()[1].id]}
         )
         self.global_module = ItemFactory.create(
             parent_location=self.course.location,
