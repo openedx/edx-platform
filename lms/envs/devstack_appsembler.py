@@ -2,6 +2,7 @@
 
 from .devstack import *
 from .appsembler import *
+import dj_database_url
 
 APPSEMBLER_SECRET_KEY = "secret_key"
 # the following ip should work for all dev setups....
@@ -68,3 +69,17 @@ INTERCOM_APP_ID = AUTH_TOKENS.get("INTERCOM_APP_ID")
 INTERCOM_APP_SECRET = AUTH_TOKENS.get("INTERCOM_APP_SECRET")
 
 EDX_API_KEY = "test"
+
+INSTALLED_APPS += ('tiers',)
+MIDDLEWARE_CLASSES += ('organizations.middleware.OrganizationMiddleware', 'tiers.middleware.TierMiddleware',)
+
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
+
+TIERS_ORGANIZATION_MODEL = 'organizations.Organization'
+TIERS_EXPIRED_REDIRECT_URL = None
+
+TIERS_DATABASE_URL = AUTH_TOKENS.get('TIERS_DATABASE_URL')
+DATABASES['tiers'] = dj_database_url.parse(TIERS_DATABASE_URL)
+
+DATABASE_ROUTERS += ['openedx.core.djangoapps.appsembler.sites.routers.TiersDbRouter']
+
