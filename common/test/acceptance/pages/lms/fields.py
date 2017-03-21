@@ -192,7 +192,7 @@ class FieldsMixin(object):
 
         return self.q(css='.u-field-{} .u-field-value .u-field-value-readonly'.format(field_id)).text[0]
 
-    def value_for_dropdown_field(self, field_id, value=None):
+    def value_for_dropdown_field(self, field_id, value=None, focus_out=False):
         """
         Get or set the value in a dropdown field.
         """
@@ -205,7 +205,7 @@ class FieldsMixin(object):
             return None
 
         if value is not None:
-            select_option_by_text(query, value)
+            select_option_by_text(query, value, focus_out)
 
         if self.mode_for_field(field_id) == 'edit':
             return get_selected_option_text(query)
