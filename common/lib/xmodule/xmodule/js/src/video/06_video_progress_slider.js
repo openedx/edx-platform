@@ -12,7 +12,9 @@ mind, or whether to act, and in acting, to live."
 [],
 function() {
     var template = [
-        '<div class="slider" title="', gettext('Video position'), '"></div>'
+        '<div class="slider" role="application" title="',
+        gettext('Video position. Press space to toggle playback'),
+        '"></div>'
     ].join('');
 
     // VideoProgressSlider() function - what this module "exports".
@@ -35,6 +37,8 @@ function() {
     //
     //     Functions which will be accessible via 'state' object. When called,
     //     these functions will get the 'state' object as a context.
+
+    /* eslint-disable no-use-before-define */
     function _makeFunctionsPublic(state) {
         var methodsDict = {
             destroy: destroy,
@@ -45,7 +49,8 @@ function() {
             updatePlayTime: updatePlayTime,
             updateStartEndTimeRegion: updateStartEndTimeRegion,
             notifyThroughHandleEnd: notifyThroughHandleEnd,
-            getTimeDescription: getTimeDescription
+            getTimeDescription: getTimeDescription,
+            focusSlider: focusSlider
         };
 
         state.bindTo(methodsDict, state.videoProgressSlider, state);
@@ -56,6 +61,12 @@ function() {
         this.el.off('destroy', this.videoProgressSlider.destroy);
         delete this.videoProgressSlider;
     }
+
+    function bindHandlers(state) {
+        state.videoProgressSlider.el.on('keypress', sliderToggle.bind(state));
+        state.el.on('destroy', state.videoProgressSlider.destroy);
+    }
+    /* eslint-enable no-use-before-define */
 
     // function _renderElements(state)
     //
@@ -69,6 +80,7 @@ function() {
         state.el.find('.video-controls').prepend(state.videoProgressSlider.el);
         state.videoProgressSlider.buildSlider();
         _buildHandle(state);
+        bindHandlers(state);
     }
 
     function _buildHandle(state) {
@@ -77,7 +89,10 @@ function() {
 
         // ARIA
         // We just want the knob to be selectable with keyboard
-        state.videoProgressSlider.el.attr('tabindex', -1);
+        state.videoProgressSlider.el.attr({
+            tabindex: -1
+        });
+
         // Let screen readers know that this div, representing the slider
         // handle, behaves as a slider named 'video position'.
         state.videoProgressSlider.handle.attr({
@@ -89,10 +104,8 @@ function() {
             'aria-valuemin': '0',
             'aria-valuenow': state.videoPlayer.currentTime,
             'tabindex': '0',
-            'aria-label': gettext('Video position')
+            'aria-label': gettext('Video position. Press space to toggle playback')
         });
-
-        state.el.on('destroy', state.videoProgressSlider.destroy);
     }
 
     // ***************************************************************
@@ -103,8 +116,11 @@ function() {
     // ***************************************************************
 
     function buildSlider() {
-        this.videoProgressSlider.el
-            .append('<div class="ui-slider-handle progress-handle"></div>');
+        var sliderContents = edx.HtmlUtils.joinHtml(
+            edx.HtmlUtils.HTML('<div class="ui-slider-handle progress-handle"></div>')
+        );
+
+        this.videoProgressSlider.el.append(sliderContents.text);
 
         this.videoProgressSlider.slider = this.videoProgressSlider.el
             .slider({
@@ -327,6 +343,22 @@ function() {
         }
 
         return i18n(seconds, 'second');
+    }
+
+    // Shift focus to the progress slider container element.
+    function focusSlider() {
+        this.videoProgressSlider.handle.attr(
+            'aria-valuetext', getTimeDescription(this.videoPlayer.currentTime)
+        );
+        this.videoProgressSlider.el.trigger('focus');
+    }
+
+    // Toggle video playback when the spacebar is pushed.
+    function sliderToggle(e) {
+        if (e.which === 32) {
+            e.preventDefault();
+            this.videoCommands.execute('togglePlayback');
+        }
     }
 });
 }(RequireJS.requirejs, RequireJS.require, RequireJS.define));
