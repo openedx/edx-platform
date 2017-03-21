@@ -25,6 +25,7 @@ from common.test.acceptance.pages.common.logout import LogoutPage
 from common.test.acceptance.pages.lms import BASE_URL
 from common.test.acceptance.pages.lms.account_settings import AccountSettingsPage
 from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.lms.bookmarks import BookmarksPage
 from common.test.acceptance.pages.lms.create_mode import ModeCreationPage
 from common.test.acceptance.pages.lms.course_home import CourseHomePage
 from common.test.acceptance.pages.lms.course_info import CourseInfoPage
@@ -852,6 +853,12 @@ class HighLevelTabTest(UniqueCourseTest):
         # Navigate to a particular section other than the default landing section.
         self.course_home_page.outline.go_to_section('Test Section 2', 'Test Subsection 3')
         self.assertTrue(self.courseware_page.nav.is_on_section('Test Section 2', 'Test Subsection 3'))
+
+        # Verify that we can navigate to the bookmarks page
+        self.course_home_page.visit()
+        self.course_home_page.click_bookmarks_button()
+        bookmarks_page = BookmarksPage(self.browser, self.course_id)
+        self.assertTrue(bookmarks_page.is_browser_on_page())
 
     @attr('a11y')
     def test_course_home_a11y(self):

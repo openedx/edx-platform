@@ -46,7 +46,7 @@
         </h3>
         <div  class="bookmarks-empty-detail">
             <span class="bookmarks-empty-detail-title">
-                <%- gettext('Use bookmarks to help you easily return to courseware pages. To bookmark a page, click on "Bookmark this page" beneath the unit title.') %>
+                <%- gettext('Use bookmarks to help you easily return to courseware pages. To bookmark a page, click "Bookmark this page" under the page title.') %>
             </span>
         </div>
     </div>

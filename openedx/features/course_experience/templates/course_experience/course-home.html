@@ -40,10 +40,10 @@ ${HTML(outline_fragment.foot_html())}
     <header class="page-header has-secondary">
         <div class="page-header-secondary">
             <div class="form-actions">
-                <a class="btn" href="${reverse('courseware', kwargs={'course_id': unicode(course.id.to_deprecated_string())})}">
+                <a class="btn action-resume-course" href="${reverse('courseware', kwargs={'course_id': unicode(course.id.to_deprecated_string())})}">
                     ${_("Resume Course")}
                 </a>
-                <a class="btn" href="${reverse('openedx.course_bookmarks.home', args=[course.id])}">
+                <a class="btn action-show-bookmarks" href="${reverse('openedx.course_bookmarks.home', args=[course.id])}">
                     ${_("Bookmarks")}
                 </a>
             </div>
