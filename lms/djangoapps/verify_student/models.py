@@ -206,7 +206,7 @@ class PhotoVerification(StatusModel):
         if verify_student_config.enabled:
             days_good_for = verify_student_config.days_good_for
         else:
-            days_good_for = settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
+            days_good_for = settings.VERIFY_STUDENT['DAYS_GOOD_FOR']
 
         return datetime.now(pytz.UTC) - timedelta(days=days_good_for)
 
@@ -407,7 +407,7 @@ class PhotoVerification(StatusModel):
         if verify_student_config.enabled:
             days_good_for = verify_student_config.days_good_for
         else:
-            days_good_for = settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
+            days_good_for = settings.VERIFY_STUDENT['DAYS_GOOD_FOR']
 
         return self.created_at + timedelta(days=days_good_for)
 
@@ -986,9 +986,9 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         """
         verify_student_config = StudentVerificationConfiguration.current()
         if verify_student_config.enabled:
-            expiring_soon_window = verify_student_config.expiring_soon_window_in_days
+            expiring_soon_window = verify_student_config.expiring_soon_window
         else:
-            expiring_soon_window = settings.VERIFY_STUDENT.get("EXPIRING_SOON_WINDOW")
+            expiring_soon_window = settings.VERIFY_STUDENT.get('EXPIRING_SOON_WINDOW')
 
         if expiration_datetime:
             if (expiration_datetime - datetime.now(pytz.UTC)).days <= expiring_soon_window:
@@ -1402,10 +1402,10 @@ class IcrvStatusEmailsConfiguration(ConfigurationModel):
 class StudentVerificationConfiguration(ConfigurationModel):
     """Student Verification Configuration"""
     days_good_for = models.PositiveIntegerField(
-        default=365, help_text="How many days is a verification good for"
+        default=365, help_text="Days for which a verification is valid."
     )
-    expiring_soon_window_in_days = models.PositiveIntegerField(
-        default=28, help_text="The window within which a verification is considered to be expiring soon"
+    expiring_soon_window = models.PositiveIntegerField(
+        default=28, help_text="The window in days within which a verification is considered to be expiring soon."
     )
 
     def __unicode__(self):
