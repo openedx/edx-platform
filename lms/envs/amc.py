@@ -104,7 +104,7 @@ SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 TIERS_ORGANIZATION_MODEL = 'organizations.Organization'
 TIERS_EXPIRED_REDIRECT_URL = None
 
-TIERS_DATABASE_URL = ENV_TOKENS.get('TIERS_DATABASE_URL')
+TIERS_DATABASE_URL = AUTH_TOKENS.get('TIERS_DATABASE_URL')
 DATABASES['tiers'] = dj_database_url.parse(TIERS_DATABASE_URL)
 
 DATABASE_ROUTERS += ['openedx.core.djangoapps.appsembler.sites.routers.TiersDbRouter']
