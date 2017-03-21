@@ -1536,16 +1536,7 @@ def financial_assistance_request(request):
 def financial_assistance_form(request):
     """Render the financial assistance application form page."""
     user = request.user
-    enrolled_courses = [
-        {'name': enrollment.course_overview.display_name, 'value': unicode(enrollment.course_id)}
-        for enrollment in CourseEnrollment.enrollments_for_user(user).order_by('-created')
-
-        if enrollment.mode != CourseMode.VERIFIED and CourseMode.objects.filter(
-            Q(_expiration_datetime__isnull=True) | Q(_expiration_datetime__gt=datetime.now(UTC())),
-            course_id=enrollment.course_id,
-            mode_slug=CourseMode.VERIFIED
-        ).exists()
-    ]
+    enrolled_courses = get_financial_aid_courses(user)
     incomes = ['Less than $5,000', '$5,000 - $10,000', '$10,000 - $15,000', '$15,000 - $20,000', '$20,000 - $25,000']
     annual_incomes = [
         {'name': _(income), 'value': income} for income in incomes  # pylint: disable=translation-of-non-string
@@ -1642,3 +1633,25 @@ def financial_assistance_form(request):
             }
         ],
     })
+
+
+def get_financial_aid_courses(user):
+    """ Retrieve the courses eligible for financial assistance. """
+    financial_aid_courses = []
+    for enrollment in CourseEnrollment.enrollments_for_user(user).order_by('-created'):
+
+        if enrollment.mode != CourseMode.VERIFIED and \
+                enrollment.course_overview.eligible_for_financial_aid and \
+                CourseMode.objects.filter(
+                    Q(_expiration_datetime__isnull=True) | Q(_expiration_datetime__gt=datetime.now(UTC())),
+                    course_id=enrollment.course_id,
+                    mode_slug=CourseMode.VERIFIED).exists():
+
+            financial_aid_courses.append(
+                {
+                    'name': enrollment.course_overview.display_name,
+                    'value': unicode(enrollment.course_id)
+                }
+            )
+
+    return financial_aid_courses

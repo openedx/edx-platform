@@ -98,6 +98,7 @@ class CourseOverview(TimeStampedModel):
     effort = TextField(null=True)
     self_paced = BooleanField(default=False)
     marketing_url = TextField(null=True)
+    eligible_for_financial_aid = BooleanField(default=True)
 
     @classmethod
     def _create_from_course(cls, course):

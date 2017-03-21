@@ -29,7 +29,8 @@ class TestSyncCourseRunsCommand(ModuleStoreTestCase):
         # create a catalog course run with the same course id.
         self.catalog_course_run = CourseRunFactory(
             key=unicode(self.course.id),
-            marketing_url='test_marketing_url'
+            marketing_url='test_marketing_url',
+            eligible_for_financial_aid=False
         )
 
     def get_course_overview_marketing_url(self, course_id):
@@ -38,18 +39,25 @@ class TestSyncCourseRunsCommand(ModuleStoreTestCase):
         """
         return CourseOverview.objects.get(id=course_id).marketing_url
 
-    def test_marketing_url_on_sync(self, mock_catalog_course_runs):
+    def test_course_run_sync(self, mock_catalog_course_runs):
         """
-        Verify the updated marketing url on execution of the management command.
+        Verify on executing management command course overview data is updated
+        with course run data from course discovery.
         """
         mock_catalog_course_runs.return_value = [self.catalog_course_run]
         earlier_marketing_url = self.get_course_overview_marketing_url(self.course.id)
+        course_overview = CourseOverview.objects.get(id=self.course.id)
+        earlier_eligible_for_financial_aid = course_overview.eligible_for_financial_aid
 
         call_command('sync_course_runs')
+        course_overview.refresh_from_db()
         updated_marketing_url = self.get_course_overview_marketing_url(self.course.id)
+        updated_eligible_for_financial_aid = course_overview.eligible_for_financial_aid
         # Assert that the Marketing URL has changed.
         self.assertNotEqual(earlier_marketing_url, updated_marketing_url)
+        self.assertNotEqual(earlier_eligible_for_financial_aid, updated_eligible_for_financial_aid)
         self.assertEqual(updated_marketing_url, 'test_marketing_url')
+        self.assertEqual(updated_eligible_for_financial_aid, False)
 
     @mock.patch(COMMAND_MODULE + '.log.info')
     def test_course_overview_does_not_exist(self, mock_log_info, mock_catalog_course_runs):

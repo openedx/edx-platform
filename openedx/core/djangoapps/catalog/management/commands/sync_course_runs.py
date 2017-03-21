@@ -35,7 +35,9 @@ class Command(BaseCommand):
         course_metadata_updated = 0
 
         for course_run in course_runs:
+            is_course_metadata_updated = False
             marketing_url = course_run['marketing_url']
+            eligible_for_financial_aid = course_run['eligible_for_financial_aid']
             course_key = CourseKey.from_string(course_run['key'])
             try:
                 course_overview = CourseOverview.objects.get(id=course_key)
@@ -50,6 +52,14 @@ class Command(BaseCommand):
             # Check whether course overview's marketing url is outdated - this saves a db hit.
             if course_overview.marketing_url != marketing_url:
                 course_overview.marketing_url = marketing_url
+                is_course_metadata_updated = True
+
+            # Check whether course overview's eligible for financial aid is outdated
+            if course_overview.eligible_for_financial_aid != eligible_for_financial_aid:
+                course_overview.eligible_for_financial_aid = eligible_for_financial_aid
+                is_course_metadata_updated = True
+
+            if is_course_metadata_updated:
                 course_overview.save()
                 course_metadata_updated += 1
 
