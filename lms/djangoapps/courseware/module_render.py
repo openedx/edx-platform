@@ -150,6 +150,15 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
     field_data_cache must include data from the course module and 2 levels of its descendants
     '''
 
+    # get who has seen which block
+    from django.db import connection
+    with connection.cursor() as cursor:
+        cursor.execute(
+            "SELECT module_id, grade FROM courseware_studentmodule WHERE course_id = %s AND student_id = %s;",
+            [course.id, user.id]
+        )
+        view_data = dict(cursor.fetchall())
+
     with modulestore().bulk_operations(course.id):
         course_module = get_module_for_descriptor(
             user, request, course, field_data_cache, course.id, course=course
@@ -200,10 +209,27 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
                     found_active_section = True
 
                 # get data for each unit in current subsection
-                units = [
-                    {'display_name': child.display_name, 'idx': index}
-                    for index, child in enumerate(section.get_children())
-                ]
+                units = list()
+
+                if is_section_active:
+                    for index, child in enumerate(section.get_children()):
+                        viewed = False
+                        grade = None
+
+                        for grandchild in child.children:
+                            # TODO: check if ALL children that can be graded are graded
+                            # TODO: viewed means nothing since whole subsection is downloaded at once
+                            if view_data.get(unicode(grandchild), False) is not False:
+                                viewed = True
+                                grade = view_data[unicode(grandchild)]
+
+                        units.append({
+                            'idx': index,
+                            'display_name': child.display_name,
+                            'location': unicode(child.location),
+                            'viewed': unicode(viewed),
+                            'grade': unicode(grade)
+                        })
 
                 section_context = {
                     'display_name': section.display_name_with_default_escaped,
@@ -212,6 +238,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
                     'due': section.due,
                     'active': is_section_active,
                     'graded': section.graded,
+                    'viewed': view_data.get(unicode(section.location), False) is not False,
                     'units': units
                 }
                 _add_timed_exam_info(user, course, section, section_context)
@@ -234,7 +261,8 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
                 'display_id': display_id,
                 'url_name': chapter.url_name,
                 'sections': sections,
-                'active': chapter.url_name == active_chapter
+                'active': chapter.url_name == active_chapter,
+                'viewed': view_data.get(unicode(chapter.location), False) is not False
             })
         return {
             'chapters': toc_chapters,
