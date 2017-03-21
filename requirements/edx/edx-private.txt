@@ -35,3 +35,6 @@ ubcpi-xblock==0.6.2
 # Vector Drawing and ActiveTable XBlocks (Davidson)
 -e git+https://github.com/open-craft/xblock-vectordraw.git@v0.2.1#egg=xblock-vectordraw==0.2.1
 -e git+https://github.com/open-craft/xblock-activetable.git@1786a2c8fc06ca3ecfac1972464048982bd486ff#egg=xblock-activetable
+
+# McKinsey Academy Diagnostic Feedback Xblock
+git+https://github.com/mckinseyacademy/xblock-diagnosticfeedback.git@v0.2.1#egg=xblock-diagnostic-feedback==0.2.1
