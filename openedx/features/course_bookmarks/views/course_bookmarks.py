@@ -23,7 +23,7 @@ from xmodule.modulestore.django import modulestore
 
 class CourseBookmarksView(View):
     """
-    The home page for a course.
+    View showing the user's bookmarks for a course.
     """
     @method_decorator(login_required)
     @method_decorator(ensure_csrf_cookie)
@@ -31,7 +31,7 @@ class CourseBookmarksView(View):
     @method_decorator(ensure_valid_course_key)
     def get(self, request, course_id):
         """
-        Displays the home page for the specified course.
+        Displays the user's bookmarks for the specified course.
 
         Arguments:
             request: HTTP request
@@ -43,14 +43,14 @@ class CourseBookmarksView(View):
         course_url = reverse(course_url_name, kwargs={'course_id': unicode(course.id)})
 
         # Render the bookmarks list as a fragment
-        outline_fragment = CourseBookmarksFragmentView().render_to_fragment(request, course_id=course_id)
+        bookmarks_fragment = CourseBookmarksFragmentView().render_to_fragment(request, course_id=course_id)
 
-        # Render the entire unified course view
+        # Render the course bookmarks page
         context = {
             'csrf': csrf(request)['csrf_token'],
             'course': course,
             'course_url': course_url,
-            'outline_fragment': outline_fragment,
+            'bookmarks_fragment': bookmarks_fragment,
             'disable_courseware_js': True,
             'uses_pattern_library': True,
         }
@@ -63,7 +63,7 @@ class CourseBookmarksFragmentView(EdxFragmentView):
     """
     def render_to_fragment(self, request, course_id=None, **kwargs):
         """
-        Renders the course outline as a fragment.
+        Renders the user's course bookmarks as a fragment.
         """
         course_key = CourseKey.from_string(course_id)
         course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
