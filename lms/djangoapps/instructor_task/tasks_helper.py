@@ -820,6 +820,17 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
             course_grade.letter_grade,
             student.id in whitelisted_user_ids
         )
+        if certificate_info[0] == 'Y':
+            TASK_LOG.info(u'Student is marked eligible_for_certificate in grade report (user=%s, course_id=%s,'
+                          u' user_is_whitelisted=%s, grade=%s, grade_percent=%s gradecutoffs=%s, allow_certificate=%s)',
+                          student,
+                          course_id,
+                          student.id in whitelisted_user_ids,
+                          course_grade.letter_grade,
+                          course_grade.percent,
+                          course_grade.course.grade_cutoffs,
+                          student.profile.allow_certificate
+                          )
 
         grade_results = []
         for assignment_type, assignment_info in graded_assignments.iteritems():
