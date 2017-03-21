@@ -49,9 +49,10 @@ from courseware.user_state_client import DjangoXBlockUserStateClient
 from courseware.views.index import render_accordion
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
 from milestones.tests.utils import MilestonesTestCaseMixin
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.lib.gating import api as gating_api
-from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory, UserFactory, CourseEnrollmentFactory
 from util.tests.mixins.enterprise import EnterpriseTestConsentRequired
@@ -808,44 +809,64 @@ class ViewsTestCase(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn('Financial Assistance Application', response.content)
 
-    def test_financial_assistance_form(self):
-        non_verified_course = CourseFactory.create().id
-        verified_course_verified_track = CourseFactory.create().id
-        verified_course_audit_track = CourseFactory.create().id
-        verified_course_deadline_passed = CourseFactory.create().id
-        unenrolled_course = CourseFactory.create().id
+    @ddt.data(([CourseMode.AUDIT, CourseMode.VERIFIED], CourseMode.AUDIT, True, datetime.now(UTC) - timedelta(days=1)),
+              ([CourseMode.AUDIT, CourseMode.VERIFIED], CourseMode.VERIFIED, True, None),
+              ([CourseMode.AUDIT, CourseMode.VERIFIED], CourseMode.AUDIT, False, None),
+              ([CourseMode.AUDIT], CourseMode.AUDIT, False, None))
+    @ddt.unpack
+    def test_financial_assistance_form_course_exclusion(
+            self, course_modes, enrollment_mode, eligible_for_aid, expiration):
+        """Verify that learner cannot get the financial aid for the courses having one of the
+        following attributes:
+        1. User is enrolled in the verified mode.
+        2. Course is expired.
+        3. Course does not provide financial assistance.
+        4. Course does not have verified mode.
+        """
+        # Create course
+        course = CourseFactory.create()
 
-        enrollments = (
-            (non_verified_course, CourseMode.AUDIT, None),
-            (verified_course_verified_track, CourseMode.VERIFIED, None),
-            (verified_course_audit_track, CourseMode.AUDIT, None),
-            (verified_course_deadline_passed, CourseMode.AUDIT, datetime.now(UTC) - timedelta(days=1))
-        )
-        for course, mode, expiration in enrollments:
-            CourseModeFactory.create(mode_slug=CourseMode.AUDIT, course_id=course)
-            if course != non_verified_course:
-                CourseModeFactory.create(
-                    mode_slug=CourseMode.VERIFIED,
-                    course_id=course,
-                    expiration_datetime=expiration
-                )
-            CourseEnrollmentFactory(course_id=course, user=self.user, mode=mode)
+        # Create Course Modes
+        for mode in course_modes:
+            CourseModeFactory.create(mode_slug=mode, course_id=course.id, expiration_datetime=expiration)
+
+        # Enroll user in the course
+        CourseEnrollmentFactory(course_id=course.id, user=self.user, mode=enrollment_mode)
+        # load course into course overview
+        CourseOverview.get_from_id(course.id)
+
+        # add whether course is eligible for financial aid or not
+        course_overview = CourseOverview.objects.get(id=course.id)
+        course_overview.eligible_for_financial_aid = eligible_for_aid
+        course_overview.save()
 
         url = reverse('financial_assistance_form')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        # Ensure that the user can only apply for assistance in
-        # courses which have a verified mode which hasn't expired yet,
-        # where the user is not already enrolled in verified mode
-        self.assertIn(str(verified_course_audit_track), response.content)
-        for course in (
-                non_verified_course,
-                verified_course_verified_track,
-                verified_course_deadline_passed,
-                unenrolled_course
-        ):
-            self.assertNotIn(str(course), response.content)
+        self.assertNotIn(str(course.id), response.content)
+
+    def test_financial_assistance_form(self):
+        """Verify that learner can get the financial aid for the course in which
+        he/she is enrolled in audit mode whereas the course provide verified mode.
+        """
+        # Create course
+        course = CourseFactory.create().id
+
+        # Create Course Modes
+        CourseModeFactory.create(mode_slug=CourseMode.AUDIT, course_id=course)
+        CourseModeFactory.create(mode_slug=CourseMode.VERIFIED, course_id=course)
+
+        # Enroll user in the course
+        CourseEnrollmentFactory(course_id=course, user=self.user, mode=CourseMode.AUDIT)
+        # load course into course overview
+        CourseOverview.get_from_id(course)
+
+        url = reverse('financial_assistance_form')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        self.assertIn(str(course), response.content)
 
     def _submit_financial_assistance_form(self, data):
         """Submit a financial assistance request."""
