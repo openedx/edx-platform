@@ -369,11 +369,11 @@ def get_user_partition_info(xblock, schemes=None, course=None):
 
         # Exclude disabled partitions, partitions with no groups defined
         # Also filter by scheme name if there's a filter defined.
-        if p.active and p.groups and (schemes is None or p.scheme.name in schemes):
+        if p.active and p.groups() and (schemes is None or p.scheme.name in schemes):
 
             # First, add groups defined by the partition
             groups = []
-            for g in p.groups:
+            for g in p.groups():
 
                 # Falsey group access for a partition mean that all groups
                 # are selected.  In the UI, though, we don't show the particular
@@ -387,7 +387,7 @@ def get_user_partition_info(xblock, schemes=None, course=None):
                 })
 
             # Next, add any groups set on the XBlock that have been deleted
-            all_groups = set(g.id for g in p.groups)
+            all_groups = set(g.id for g in p.groups())
             missing_group_ids = selected_groups - all_groups
             for gid in missing_group_ids:
                 groups.append({
