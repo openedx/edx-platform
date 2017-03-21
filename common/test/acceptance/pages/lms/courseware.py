@@ -7,6 +7,7 @@ from bok_choy.promise import EmptyPromise
 import re
 from selenium.webdriver.common.action_chains import ActionChains
 
+from common.test.acceptance.pages.lms.bookmarks import BookmarksPage
 from common.test.acceptance.pages.lms.course_page import CoursePage
 
 
@@ -310,11 +311,12 @@ class CoursewarePage(CoursePage):
         self.q(css='.bookmark-button').first.click()
         EmptyPromise(lambda: self.bookmark_button_state != previous_state, "Bookmark button toggled").fulfill()
 
-    def click_bookmarks_button(self, wait_for_results=True):
+    # TODO: TNL-6546: Remove this helper function
+    def click_bookmarks_button(self):
         """ Click on Bookmarks button """
         self.q(css='.bookmarks-list-button').first.click()
-        if wait_for_results:
-            EmptyPromise(lambda: self.q(css='#my-bookmarks').present, "Bookmarks results present").fulfill()
+        bookmarks_page = BookmarksPage(self.browser, self.course_id)
+        bookmarks_page.visit()
 
 
 class CoursewareSequentialTabPage(CoursePage):
