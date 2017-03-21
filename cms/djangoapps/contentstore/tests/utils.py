@@ -299,14 +299,8 @@ class CourseTestCase(ProceduralCourseTestMixin, ModuleStoreTestCase):
                 store = self.store._get_modulestore_for_courselike(course2_id)  # pylint: disable=protected-access
                 new_name = 'course' if isinstance(store, SplitMongoModuleStore) else course2_item_loc.run
                 course2_item_loc = course2_item_loc.replace(name=new_name)
-                course2_item = self.store.get_item(course2_item_loc)
-                # The EnrollmentTrackuserPartition stores the course_id, which will vary split vs. old mongo.
-                # Also at least one test calls this comparison method with a purposefully different course.
-                # Clear stored course_id so that own_metadata call below does not fail.
-                course1_item.user_partitions[0].parameters['course_id'] = None
-                course2_item.user_partitions[0].parameters['course_id'] = None
-            else:
-                course2_item = self.store.get_item(course2_item_loc)
+            course2_item = self.store.get_item(course2_item_loc)
+
             # compare published state
             self.assertEqual(
                 self.store.has_published_version(course1_item),

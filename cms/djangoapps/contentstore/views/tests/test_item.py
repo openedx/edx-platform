@@ -8,6 +8,7 @@ from pytz import UTC
 from pyquery import PyQuery
 from webob import Response
 
+from django.conf import settings
 from django.http import Http404
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -44,6 +45,7 @@ from xblock_django.user_service import DjangoXBlockUserService
 from opaque_keys.edx.keys import UsageKey, CourseKey
 from opaque_keys.edx.locations import Location
 from xmodule.partitions.partitions import Group, UserPartition
+from xmodule.partitions.partitions_service import ENROLLMENT_TRACK_PARTITION_ID
 
 
 class AsideTest(XBlockAside):
@@ -365,12 +367,12 @@ class GetItemTest(ItemTest):
         result = json.loads(resp.content)
         self.assertEqual(result["user_partitions"], [
             {
-                "id": 0,
+                "id": ENROLLMENT_TRACK_PARTITION_ID,
                 "name": "Enrollment Track Partition",
                 "scheme": "enrollment_track",
                 "groups": [
                     {
-                        "id": 1,
+                        "id": settings.COURSE_ENROLLMENT_MODES["audit"],
                         "name": "Audit",
                         "selected": False,
                         "deleted": False,

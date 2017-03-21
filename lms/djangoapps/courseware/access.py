@@ -466,12 +466,6 @@ def _has_group_access(descriptor, user, course_key):
     This function returns a boolean indicating whether or not `user` has
     sufficient group memberships to "load" a block (the `descriptor`)
     """
-    if len(descriptor.user_partitions) == len(get_split_user_partitions(descriptor.user_partitions)):
-        # Short-circuit the process, since there are no defined user partitions that are not
-        # user_partitions used by the split_test module. The split_test module handles its own access
-        # via updating the children of the split_test module.
-        return ACCESS_GRANTED
-
     # Allow staff and instructors roles group access, as they are not masquerading as a student.
     if get_user_role(user, course_key) in ['staff', 'instructor']:
         return ACCESS_GRANTED

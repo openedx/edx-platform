@@ -9,6 +9,7 @@ from util.db import generate_int_id, MYSQL_MAX_INT
 from django.utils.translation import ugettext as _
 from contentstore.utils import reverse_usage_url
 from xmodule.partitions.partitions import UserPartition
+from xmodule.partitions.partitions_service import get_course_user_partitions
 from xmodule.split_test_module import get_split_user_partitions
 from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_user_partition
 
@@ -84,7 +85,7 @@ class GroupConfiguration(object):
         """
         Assign ids for the group_configuration's groups.
         """
-        used_ids = [g.id for p in self.course.user_partitions for g in p.groups]
+        used_ids = [g.id for p in get_course_user_partitions(self.course) for g in p.groups]
         # Assign ids to every group in configuration.
         for group in self.configuration.get('groups', []):
             if group.get('id') is None:
@@ -96,7 +97,7 @@ class GroupConfiguration(object):
         """
         Return a list of IDs that already in use.
         """
-        return set([p.id for p in course.user_partitions])
+        return set([p.id for p in get_course_user_partitions(course)])
 
     def get_user_partition(self):
         """

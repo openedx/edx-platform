@@ -14,6 +14,7 @@ from django_comment_common.utils import seed_permissions_roles
 
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
+from xmodule.partitions.partitions_service import get_course_user_partitions
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -295,9 +296,10 @@ def get_group_display_name(user_partitions, xblock_display_name):
         group name (String): Group name of the matching group.
     """
     for user_partition in user_partitions:
-        for group in user_partition['groups']:
-            if str(group['id']) in xblock_display_name:
-                return group['name']
+        if user_partition['scheme'] == 'random':
+            for group in user_partition['groups']:
+                if _(u'Group ID {group_id}').format(group_id=group['id']) == xblock_display_name:
+                    return group['name']
 
 
 def get_user_partition_info(xblock, schemes=None, course=None):
@@ -373,7 +375,7 @@ def get_user_partition_info(xblock, schemes=None, course=None):
         schemes = set(schemes)
 
     partitions = []
-    for p in sorted(course.user_partitions, key=lambda p: p.name):
+    for p in sorted(get_course_user_partitions(course), key=lambda p: p.name):
 
         # Exclude disabled partitions, partitions with no groups defined
         # Also filter by scheme name if there's a filter defined.
@@ -408,7 +410,7 @@ def get_user_partition_info(xblock, schemes=None, course=None):
             # Put together the entire partition dictionary
             partitions.append({
                 "id": p.id,
-                "name": p.name,
+                "name": unicode(p.name),  # Convert into a string in case ugettext_lazy was used
                 "scheme": p.scheme.name,
                 "groups": groups,
             })

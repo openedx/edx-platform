@@ -14,7 +14,7 @@ from opaque_keys import InvalidKeyError
 
 from util.date_utils import get_time_display
 from xmodule.modulestore.django import modulestore
-from course_modes.models import CourseMode, CourseModeExpirationConfig, EnrollmentMode
+from course_modes.models import CourseMode, CourseModeExpirationConfig
 
 # Technically, we shouldn't be doing this, since verify_student is defined
 # in LMS, and course_modes is defined in common.
@@ -28,28 +28,13 @@ from course_modes.models import CourseMode, CourseModeExpirationConfig, Enrollme
 # the verification deadline table won't exist.
 from lms.djangoapps.verify_student import models as verification_models
 
-
-COURSE_MODE_SLUG_CHOICES = []
-try:
-    COURSE_MODE_SLUG_CHOICES = [(mode.mode_slug, mode.mode_slug) for mode in EnrollmentMode.objects.all()]
-except:  # pylint: disable=bare-except
-    pass
-
-if not COURSE_MODE_SLUG_CHOICES:
-    # The entries in this table are populated in a migration file, and migration files do not
-    # run as part of unit tests. Therefore, for tests hard-code the choices.
-    COURSE_MODE_SLUG_CHOICES = (
-        [(CourseMode.DEFAULT_MODE_SLUG, CourseMode.DEFAULT_MODE_SLUG)] +
-        [(mode_slug, mode_slug) for mode_slug in CourseMode.VERIFIED_MODES] +
-        [(CourseMode.NO_ID_PROFESSIONAL_MODE, CourseMode.NO_ID_PROFESSIONAL_MODE)] +
-        [(mode_slug, mode_slug) for mode_slug in CourseMode.CREDIT_MODES] +
-        # need to keep legacy modes around for awhile
-        [(CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG, CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG)]
-    )
+COURSE_MODE_SLUG_CHOICES = [(mode_slug, mode_slug) for mode_slug in settings.COURSE_ENROLLMENT_MODES]
 
 
 class CourseModeForm(forms.ModelForm):
-    """ CourseModeForm """
+    """
+    Admin form for adding a course mode.
+    """
 
     class Meta(object):
         model = CourseMode
@@ -227,24 +212,5 @@ class CourseModeExpirationConfigAdmin(admin.ModelAdmin):
     class Meta(object):
         model = CourseModeExpirationConfig
 
-
-class EnrollmentModeAdmin(admin.ModelAdmin):
-    """Read-only interface for the enrollment mode configuration. """
-
-    readonly_fields = ('mode_slug',)
-
-    class Meta(object):
-        model = EnrollmentMode
-
-    def has_add_permission(self, request):
-        """ Don't allow adding via the admin table at this time-- this should be done in a migration file. """
-        return False
-
-    def has_delete_permission(self, request, obj=None):
-        """ Don't allow deleting via the admin table, as the mode slugs must match expected values in code. """
-        return False
-
-
 admin.site.register(CourseMode, CourseModeAdmin)
 admin.site.register(CourseModeExpirationConfig, CourseModeExpirationConfigAdmin)
-admin.site.register(EnrollmentMode, EnrollmentModeAdmin)

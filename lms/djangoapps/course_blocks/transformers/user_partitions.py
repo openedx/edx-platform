@@ -5,6 +5,7 @@ from openedx.core.djangoapps.content.block_structure.transformer import (
     BlockStructureTransformer,
     FilteringTransformerMixin,
 )
+from xmodule.partitions.partitions_service import get_course_user_partitions
 
 from .split_test import SplitTestTransformer
 from .utils import get_field_on_block
@@ -48,7 +49,7 @@ class UserPartitionTransformer(FilteringTransformerMixin, BlockStructureTransfor
         root_block = block_structure.get_xblock(block_structure.root_block_usage_key)
         user_partitions = [
             user_partition
-            for user_partition in getattr(root_block, 'user_partitions', [])
+            for user_partition in get_course_user_partitions(root_block)
             if user_partition.active
         ]
         block_structure.set_transformer_data(cls, 'user_partitions', user_partitions)

@@ -2,21 +2,10 @@
 
 from collections import namedtuple
 from stevedore.extension import ExtensionManager
-from xblock.fields import List
 
 # We use ``id`` in this file as the IDs of our Groups and UserPartitions,
 # which Pylint disapproves of.
 # pylint: disable=redefined-builtin
-
-
-class UserPartitionList(List):
-    """Special List class for listing UserPartitions"""
-    def from_json(self, values):
-        return [UserPartition.from_json(v) for v in values]
-
-    def to_json(self, values):
-        return [user_partition.to_json()
-                for user_partition in values]
 
 
 class UserPartitionError(Exception):
@@ -235,7 +224,7 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
                 return group
 
         raise NoSuchUserPartitionGroupError(
-            "could not find a Group with ID [{group_id}] in UserPartition [{partition_id}]".format(
+            "Could not find a Group with ID [{group_id}] in UserPartition [{partition_id}].".format(
                 group_id=group_id, partition_id=self.id
             )
         )

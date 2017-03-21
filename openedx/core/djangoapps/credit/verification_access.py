@@ -141,7 +141,7 @@ def _set_verification_partitions(course_key, icrv_blocks):
         log.error("Could not find course %s", course_key)
         return []
 
-    verified_partitions = course.get_user_partitions_for_scheme(scheme)
+    verified_partitions = [p for p in course.user_partitions if p.scheme == scheme]
     partition_id_for_location = {
         p.parameters["location"]: p.id
         for p in verified_partitions
