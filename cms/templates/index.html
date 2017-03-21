@@ -168,7 +168,7 @@
             <li class="wrapper-course has-status" data-course-key="${course_info['course_key'] | h}">
               <div class="course-item course-rerun is-processing">
                 <div class="course-details" href="#">
-                  <h3 class="course-title">${course_info['display_name']}</h3>
+                  <h3 class="course-title">${course_info['display_name'] | h}</h3>
 
                   <div class="course-metadata">
                     <span class="course-org metadata-item">
@@ -210,7 +210,7 @@
             <li class="wrapper-course has-status" data-course-key="${course_info['course_key'] | h}">
               <div class="course-item course-rerun has-error">
                 <div class="course-details" href="#">
-                  <h3 class="course-title">${course_info['display_name']}</h3>
+                  <h3 class="course-title">${course_info['display_name'] | h}</h3>
 
                   <div class="course-metadata">
                     <span class="course-org metadata-item">
@@ -267,7 +267,7 @@
           %for course_info in sorted(courses, key=lambda s: s['display_name'].lower() if s['display_name'] is not None else ''):
           <li class="course-item" data-course-key="${course_info['course_key'] | h}">
             <a class="course-link" href="${course_info['url']}">
-              <h3 class="course-title">${course_info['display_name']}</h3>
+              <h3 class="course-title">${course_info['display_name'] | h}</h3>
 
               <div class="course-metadata">
                 <span class="course-org metadata-item">
@@ -419,7 +419,7 @@
           %for library_info in sorted(libraries, key=lambda s: s['display_name'].lower() if s['display_name'] is not None else ''):
           <li class="course-item">
             <a class="library-link" href="${library_info['url']}">
-              <h3 class="course-title">${library_info['display_name']}</h3>
+              <h3 class="course-title">${library_info['display_name'] | h}</h3>
 
               <div class="course-metadata">
                 <span class="course-org metadata-item">

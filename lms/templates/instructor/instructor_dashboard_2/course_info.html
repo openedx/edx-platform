@@ -55,7 +55,7 @@
 
     <li class="field text is-not-editable" id="field-course-display-name">
       <label for="course-display-name">${_("Course Display Name:")}</label>
-      <b>${ section_data['course_display_name'] }</b>
+      <b>${ section_data['course_display_name'] | h}</b>
     </li>
 
     <li class="field text is-not-editable" id="field-course-started">

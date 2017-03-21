@@ -11,11 +11,12 @@ from survey.models import SurveyForm
 
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.utils import XssTestMixin
 from courseware.tests.helpers import LoginEnrollmentTestCase
 
 
 @attr('shard_1')
-class SurveyViewsTests(LoginEnrollmentTestCase, ModuleStoreTestCase):
+class SurveyViewsTests(LoginEnrollmentTestCase, ModuleStoreTestCase, XssTestMixin):
     """
     All tests for the views.py file
     """
@@ -39,6 +40,7 @@ class SurveyViewsTests(LoginEnrollmentTestCase, ModuleStoreTestCase):
         })
 
         self.course = CourseFactory.create(
+            display_name='<script>alert("XSS")</script>',
             course_survey_required=True,
             course_survey_name=self.test_survey_name
         )
@@ -172,3 +174,13 @@ class SurveyViewsTests(LoginEnrollmentTestCase, ModuleStoreTestCase):
             resp,
             reverse('info', kwargs={'course_id': unicode(self.course_without_survey.id)})
         )
+
+    def test_survey_xss(self):
+        """Test that course display names are correctly HTML-escaped."""
+        response = self.client.get(
+            reverse(
+                'course_survey',
+                kwargs={'course_id': unicode(self.course.id)}
+            )
+        )
+        self.assert_xss(response, '<script>alert("XSS")</script>')

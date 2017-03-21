@@ -2,6 +2,7 @@
 Helper classes and methods for running modulestore tests without Django.
 """
 from importlib import import_module
+from markupsafe import escape
 from opaque_keys.edx.keys import UsageKey
 from unittest import TestCase
 from xblock.fields import XBlockMixin
@@ -173,3 +174,25 @@ class ProceduralCourseTestMixin(object):
                 descend(child, stack[1:])
 
         descend(self.course, ['chapter', 'sequential', 'vertical', 'problem'])
+
+
+class XssTestMixin(object):
+    """
+    Mixin for testing XSS vulnerabilities.
+    """
+
+    def assert_xss(self, response, xss_content):
+        """Assert that `xss_content` is not present in the content of
+        `response`, and that its escaped version is present. Uses the
+        same `markupsafe.escape` function as Mako templates.
+
+        Args:
+          response (Response): The HTTP response
+          xss_content (str): The Javascript code to check for.
+
+        Returns:
+          None
+
+        """
+        self.assertContains(response, escape(xss_content))
+        self.assertNotContains(response, xss_content)

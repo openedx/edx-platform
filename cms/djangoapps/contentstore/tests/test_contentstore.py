@@ -36,7 +36,8 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import own_metadata
 from opaque_keys.edx.keys import UsageKey, CourseKey
 from opaque_keys.edx.locations import AssetLocation, CourseLocator
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory, check_mongo_calls
+from xmodule.modulestore.tests.utils import XssTestMixin
 from xmodule.modulestore.xml_exporter import export_course_to_xml
 from xmodule.modulestore.xml_importer import import_course_from_xml, perform_xlint
 
@@ -981,7 +982,7 @@ class MiscCourseTests(ContentStoreTestCase):
 
 
 @ddt.ddt
-class ContentStoreTest(ContentStoreTestCase):
+class ContentStoreTest(ContentStoreTestCase, XssTestMixin):
     """
     Tests for the CMS ContentStore application.
     """
@@ -1270,6 +1271,22 @@ class ContentStoreTest(ContentStoreTestCase):
             status_code=200,
             html=True
         )
+
+    def test_course_index_view_xss(self):
+        """Test that the index page correctly escapes course names with script
+        tags."""
+        CourseFactory.create(
+            display_name='<script>alert("course XSS")</script>'
+        )
+
+        LibraryFactory.create(display_name='<script>alert("library XSS")</script>')
+
+        resp = self.client.get_html('/home/')
+        for xss in ('course', 'library'):
+            html = '<script>alert("{name} XSS")</script>'.format(
+                name=xss
+            )
+            self.assert_xss(resp, html)
 
     def test_course_overview_view_with_course(self):
         """Test viewing the course overview page with an existing course"""
