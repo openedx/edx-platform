@@ -57,6 +57,80 @@ class EnterpriseServiceMockMixin(object):
             status=500
         )
 
+    def mock_enterprise_learner_api(
+            self,
+            catalog_id=1,
+            entitlement_id=1,
+            learner_id=1,
+            enterprise_customer_uuid='cf246b88-d5f6-4908-a522-fc307e0b0c59'
+    ):
+        """
+        Helper function to register enterprise learner API endpoint.
+        """
+        enterprise_learner_api_response = {
+            'count': 1,
+            'num_pages': 1,
+            'current_page': 1,
+            'results': [
+                {
+                    'id': learner_id,
+                    'enterprise_customer': {
+                        'uuid': enterprise_customer_uuid,
+                        'name': 'TestShib',
+                        'catalog': catalog_id,
+                        'active': True,
+                        'site': {
+                            'domain': 'example.com',
+                            'name': 'example.com'
+                        },
+                        'enable_data_sharing_consent': True,
+                        'enforce_data_sharing_consent': 'at_login',
+                        'enterprise_customer_users': [
+                            1
+                        ],
+                        'branding_configuration': {
+                            'enterprise_customer': enterprise_customer_uuid,
+                            'logo': 'https://open.edx.org/sites/all/themes/edx_open/logo.png'
+                        },
+                        'enterprise_customer_entitlements': [
+                            {
+                                'enterprise_customer': enterprise_customer_uuid,
+                                'entitlement_id': entitlement_id
+                            }
+                        ]
+                    },
+                    'user_id': 5,
+                    'user': {
+                        'username': 'verified',
+                        'first_name': '',
+                        'last_name': '',
+                        'email': 'verified@example.com',
+                        'is_staff': True,
+                        'is_active': True,
+                        'date_joined': '2016-09-01T19:18:26.026495Z'
+                    },
+                    'data_sharing_consent': [
+                        {
+                            'user': 1,
+                            'state': 'enabled',
+                            'enabled': True
+                        }
+                    ]
+                }
+            ],
+            'next': None,
+            'start': 0,
+            'previous': None
+        }
+        enterprise_learner_api_response_json = json.dumps(enterprise_learner_api_response)
+
+        httpretty.register_uri(
+            method=httpretty.GET,
+            uri=self.get_enterprise_url('enterprise-learner'),
+            body=enterprise_learner_api_response_json,
+            content_type='application/json'
+        )
+
 
 class EnterpriseTestConsentRequired(object):
     """
