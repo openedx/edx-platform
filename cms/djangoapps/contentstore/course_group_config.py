@@ -84,7 +84,7 @@ class GroupConfiguration(object):
         """
         Assign ids for the group_configuration's groups.
         """
-        used_ids = [g.id for p in self.course.user_partitions for g in p.groups]
+        used_ids = [g.id for p in self.course.user_partitions for g in p.groups()]
         # Assign ids to every group in configuration.
         for group in self.configuration.get('groups', []):
             if group.get('id') is None:

@@ -53,6 +53,7 @@ from class_dashboard.dashboard_data import get_section_display_name, get_array_s
 from .tools import get_units_with_due_date, title_or_url
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.verified_track_content.models import VerifiedTrackCohortedCourse
 
 from openedx.core.djangolib.markup import HTML, Text
 
@@ -635,7 +636,6 @@ def _section_send_email(course, access):
     if is_course_cohorted(course_key):
         cohorts = get_course_cohorts(course)
     course_modes = []
-    from verified_track_content.models import VerifiedTrackCohortedCourse
     if not VerifiedTrackCohortedCourse.is_verified_track_cohort_enabled(course_key):
         course_modes = CourseMode.modes_for_course(course_key, include_expired=True, only_selectable=False)
     email_editor = fragment.content

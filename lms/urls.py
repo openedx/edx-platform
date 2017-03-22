@@ -553,7 +553,7 @@ urlpatterns += (
         r'^courses/{}/verified_track_content/settings'.format(
             settings.COURSE_KEY_PATTERN,
         ),
-        'verified_track_content.views.cohorting_settings',
+        'openedx.core.djangoapps.verified_track_content.views.cohorting_settings',
         name='verified_track_cohorting',
     ),
     url(

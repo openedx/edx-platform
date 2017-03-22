@@ -301,9 +301,9 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         """
         Test that a user masquerading as a member of a group sees appropriate content in preview mode.
         """
-        partition_id = 0
-        group_0_id = 0
-        group_1_id = 1
+        partition_id = 100
+        group_0_id = 101
+        group_1_id = 102
         user_partition = UserPartition(
             partition_id, 'Test User Partition', '',
             [Group(group_0_id, 'Group 1'), Group(group_1_id, 'Group 2')],

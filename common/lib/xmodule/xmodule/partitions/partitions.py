@@ -2,10 +2,21 @@
 
 from collections import namedtuple
 from stevedore.extension import ExtensionManager
+from xblock.fields import List
 
 # We use ``id`` in this file as the IDs of our Groups and UserPartitions,
 # which Pylint disapproves of.
 # pylint: disable=redefined-builtin
+
+
+class UserPartitionList(List):
+    """Special List class for listing UserPartitions"""
+    def from_json(self, values):
+        return [UserPartition.from_json(v) for v in values]
+
+    def to_json(self, values):
+        return [user_partition.to_json()
+                for user_partition in values]
 
 
 class UserPartitionError(Exception):
@@ -83,7 +94,7 @@ class Group(namedtuple("Group", "id name")):
 USER_PARTITION_SCHEME_NAMESPACE = 'openedx.user_partition_scheme'
 
 
-class UserPartition(namedtuple("UserPartition", "id name description groups scheme parameters active")):
+class UserPartition(namedtuple("UserPartition", "id name description static_groups scheme parameters active")):
     """A named way to partition users into groups, primarily intended for
     running experiments. It is expected that each user will be in at most one
     group in a partition.
@@ -127,9 +138,24 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
         try:
             scheme = UserPartition.scheme_extensions[name].plugin
         except KeyError:
-            raise UserPartitionError("Unrecognized scheme {0}".format(name))
+            raise UserPartitionError("Unrecognized scheme '{0}'".format(name))
         scheme.name = name
         return scheme
+
+    def groups(self, **kwargs):  # pylint: disable=unused-argument
+        """
+        Return the groups associated with this UserPartition instance.
+
+        Args:
+            **kwargs: optional arguments. The course_id will be passed in this for
+            UserPartitions that need access to that information. But the default implementation
+            of this method is to simply return the static groups as defined during creation.
+
+        Returns:
+            The groups associated with this UserPartition.
+
+        """
+        return self.static_groups
 
     def to_json(self):
         """
@@ -144,7 +170,7 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
             "scheme": self.scheme.name,
             "description": self.description,
             "parameters": self.parameters,
-            "groups": [g.to_json() for g in self.groups],
+            "groups": [g.to_json() for g in self.groups()],
             "active": bool(self.active),
             "version": UserPartition.VERSION
         }
@@ -188,15 +214,25 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
         if not scheme:
             raise TypeError("UserPartition dict {0} has unrecognized scheme {1}".format(value, scheme_id))
 
-        return UserPartition(
-            value["id"],
-            value["name"],
-            value["description"],
-            groups,
-            scheme,
-            parameters,
-            active,
-        )
+        if hasattr(scheme, "create_user_partition"):
+            return scheme.create_user_partition(
+                value["id"],
+                value["name"],
+                value["description"],
+                groups,
+                parameters,
+                active,
+            )
+        else:
+            return UserPartition(
+                value["id"],
+                value["name"],
+                value["description"],
+                groups,
+                scheme,
+                parameters,
+                active,
+            )
 
     def get_group(self, group_id):
         """
@@ -209,10 +245,12 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
             NoSuchUserPartitionGroupError: The specified group could not be found.
 
         """
-        for group in self.groups:
+        for group in self.groups():
             if group.id == group_id:
                 return group
 
         raise NoSuchUserPartitionGroupError(
-            "could not find a Group with ID [{}] in UserPartition [{}]".format(group_id, self.id)
+            "could not find a Group with ID [{group_id}] in UserPartition [{partition_id}]".format(
+                group_id=group_id, partition_id=self.id
+            )
         )

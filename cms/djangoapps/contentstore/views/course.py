@@ -1482,10 +1482,10 @@ def remove_content_or_experiment_group(request, store, course, configuration, gr
                 status=400
             )
 
-        matching_groups = [group for group in configuration.groups if group.id == group_id]
+        matching_groups = [group for group in configuration.groups() if group.id == group_id]
         if matching_groups:
-            group_index = configuration.groups.index(matching_groups[0])
-            configuration.groups.pop(group_index)
+            group_index = configuration.groups().index(matching_groups[0])
+            configuration.groups().pop(group_index)
         else:
             return JsonResponse(status=404)
 

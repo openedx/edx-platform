@@ -42,14 +42,14 @@ class RandomUserPartitionScheme(object):
                 )
 
         if group is None and assign:
-            if not user_partition.groups:
+            if not user_partition.groups():
                 raise UserPartitionError('Cannot assign user to an empty user partition')
 
             # pylint: disable=fixme
             # TODO: had a discussion in arch council about making randomization more
             # deterministic (e.g. some hash).  Could do that, but need to be careful not
             # to introduce correlation between users or bias in generation.
-            group = cls.RANDOM.choice(user_partition.groups)
+            group = cls.RANDOM.choice(user_partition.groups())
 
             # persist the value as a course tag
             course_tag_api.set_course_tag(user, course_key, partition_key, group.id)

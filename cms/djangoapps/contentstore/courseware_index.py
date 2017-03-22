@@ -190,7 +190,7 @@ class SearchIndexerBase(object):
                 split_partition = item.get_selected_partition()
                 for split_test_child in item.get_children():
                     if split_partition:
-                        for group in split_partition.groups:
+                        for group in split_partition.groups():
                             group_id = unicode(group.id)
                             child_location = item.group_id_to_child.get(group_id, None)
                             if child_location == split_test_child.location:

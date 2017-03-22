@@ -403,13 +403,13 @@ class GetCourseTopicsTest(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
         for user, group_idx in [(self.user, 0), (beta_tester, 1)]:
             cohort = CohortFactory.create(
                 course_id=self.course.id,
-                name=self.partition.groups[group_idx].name,
+                name=self.partition.groups()[group_idx].name,
                 users=[user]
             )
             CourseUserGroupPartitionGroup.objects.create(
                 course_user_group=cohort,
                 partition_id=self.partition.id,
-                group_id=self.partition.groups[group_idx].id
+                group_id=self.partition.groups()[group_idx].id
             )
 
         with self.store.bulk_operations(self.course.id, emit_signals=False):
@@ -418,13 +418,13 @@ class GetCourseTopicsTest(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
                 "courseware-2",
                 "First",
                 "Cohort A",
-                group_access={self.partition.id: [self.partition.groups[0].id]}
+                group_access={self.partition.id: [self.partition.groups()[0].id]}
             )
             self.make_discussion_xblock(
                 "courseware-3",
                 "First",
                 "Cohort B",
-                group_access={self.partition.id: [self.partition.groups[1].id]}
+                group_access={self.partition.id: [self.partition.groups()[1].id]}
             )
             self.make_discussion_xblock("courseware-4", "Second", "Staff Only", visible_to_staff_only=True)
             self.make_discussion_xblock(

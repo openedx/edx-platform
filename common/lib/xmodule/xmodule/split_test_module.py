@@ -13,7 +13,7 @@ from xmodule.seq_module import SequenceDescriptor
 from xmodule.studio_editable import StudioEditableModule, StudioEditableDescriptor
 from xmodule.x_module import XModule, module_attr, STUDENT_VIEW
 from xmodule.validation import StudioValidation, StudioValidationMessage
-from xmodule.modulestore.inheritance import UserPartitionList
+from xmodule.partitions.partitions import UserPartitionList
 
 from lxml import etree
 
@@ -349,7 +349,7 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
         """
         user_partition = self.descriptor.get_selected_partition()
         if user_partition:
-            for group in user_partition.groups:
+            for group in user_partition.groups():
                 group_id = unicode(group.id)
                 child_location = self.group_id_to_child.get(group_id, None)
                 if child_location == vertical.location:
@@ -452,7 +452,7 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
             selected_partition = self.get_selected_partition()
             if selected_partition is not None:
                 self.group_id_mapping = {}  # pylint: disable=attribute-defined-outside-init
-                for group in selected_partition.groups:
+                for group in selected_partition.groups():
                     self._create_vertical_for_group(group, user.id)
                 # Don't need to call update_item in the modulestore because the caller of this method will do it.
         else:
@@ -521,7 +521,7 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
 
         # Compute the active children in the order specified by the user partition
         active_children = []
-        for group in user_partition.groups:
+        for group in user_partition.groups():
             group_id = unicode(group.id)
             child_location = self.group_id_to_child.get(group_id, None)
             child = get_child_descriptor(child_location)
@@ -598,7 +598,7 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
                     )
                 else:
                     [active_children, inactive_children] = self.active_and_inactive_children()
-                    if len(active_children) < len(user_partition.groups):
+                    if len(active_children) < len(user_partition.groups()):
                         split_validation.add(
                             StudioValidationMessage(
                                 StudioValidationMessage.ERROR,
@@ -648,7 +648,7 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
         user_partition = self.get_selected_partition()
 
         changed = False
-        for group in user_partition.groups:
+        for group in user_partition.groups():
             str_group_id = unicode(group.id)
             if str_group_id not in self.group_id_to_child:
                 user_id = self.runtime.service(self, 'user').get_current_user().opt_attrs['edx-platform.user_id']

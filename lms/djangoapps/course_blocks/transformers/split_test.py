@@ -62,7 +62,7 @@ class SplitTestTransformer(FilteringTransformerMixin, BlockStructureTransformer)
             # group_id_to_child field on the split_test module.
             child_to_group = {
                 xblock.group_id_to_child.get(unicode(group.id), None): group.id
-                for group in partition_for_this_block.groups
+                for group in partition_for_this_block.groups()
             }
 
             # Set group access for each child using its group_access

@@ -362,8 +362,8 @@ class TestMasqueradedGroup(StaffMasqueradeTestCase):
         Verify that the staff user can masquerade as being in all groups
         as well as no group.
         """
-        self._verify_masquerade_for_group(self.user_partition.groups[0])
-        self._verify_masquerade_for_group(self.user_partition.groups[1])
+        self._verify_masquerade_for_group(self.user_partition.groups()[0])
+        self._verify_masquerade_for_group(self.user_partition.groups()[1])
         self._verify_masquerade_for_group(None)
 
     @skip_unless_lms
@@ -388,7 +388,7 @@ class TestMasqueradedGroup(StaffMasqueradeTestCase):
         CourseUserGroupPartitionGroup(
             course_user_group=cohort,
             partition_id=self.user_partition.id,
-            group_id=self.user_partition.groups[0].id
+            group_id=self.user_partition.groups()[0].id
         ).save()
 
         # When the staff user is masquerading as being in a None group

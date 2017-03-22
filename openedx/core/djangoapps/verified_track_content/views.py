@@ -6,9 +6,9 @@ from util.json_request import expect_json, JsonResponse
 from django.contrib.auth.decorators import login_required
 
 from opaque_keys.edx.keys import CourseKey
-from courseware.courses import get_course_with_access
+from lms.djangoapps.courseware.courses import get_course_with_access
 
-from verified_track_content.models import VerifiedTrackCohortedCourse
+from openedx.core.djangoapps.verified_track_content.models import VerifiedTrackCohortedCourse
 
 
 @expect_json
