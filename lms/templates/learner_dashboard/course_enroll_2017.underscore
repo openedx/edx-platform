@@ -1,0 +1,42 @@
+<% if (!is_enrolled) { %>
+    <% if (enrollable_course_runs.length > 0) { %>
+        <% if (enrollable_course_runs.length > 1) { %>
+            <div class="run-select-container">
+                <label class="select-choice" for="select-<%- course_key %>-run">
+                    <%- gettext('Choose a course run:') %>
+                </label>
+                <select id="select-<%- course_key %>-run" class="run-select field-input input-select" autocomplete="off">
+                    <% _.each (enrollable_course_runs, function(courseRun) { %>
+                        <option
+                            value="<%- courseRun.key %>"
+                            <% if (key === courseRun.key) { %>
+                                selected="selected"
+                            <% }%>
+                        >
+                            <%- courseRun.dateString %>
+                        </option>
+                    <% }); %>
+                </select>
+            </div>
+        <% } %>
+        <div class="enroll-button">
+            <button type="button" class="btn-brand btn cta-primary">
+                <%- gettext('Enroll Now') %>
+            </button>
+        </div>
+    <% } else if (upcoming_course_runs.length > 0) {%>
+        <div class="no-action-message">
+            <%- gettext('Coming Soon') %>
+        </div>
+        <div class="enrollment-opens">
+            <%- gettext('Enrollment Opens on') %>
+            <span class="enrollment-open-date">
+                <%- upcoming_course_runs[0].enrollment_open_date %>
+            </span>
+        </div>
+    <% } else { %>
+        <div class="no-action-message">
+            <%- gettext('Not Currently Available') %>
+        </div>
+    <% } %>
+<% } %>
