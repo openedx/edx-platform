@@ -4,9 +4,11 @@ Online Contextual Help.
 """
 
 import ConfigParser
-from django.conf import settings
 import logging
 
+from django.conf import settings
+
+from openedx.core.release import doc_version
 
 log = logging.getLogger(__name__)
 
@@ -76,7 +78,7 @@ def common_doc_url(request, config_file_object):  # pylint: disable=unused-argum
             return "{url_base}/{language}/{version}/{page_path}".format(
                 url_base=doc_base_url,
                 language=get_config_value_with_default("locales", settings.LANGUAGE_CODE),
-                version=config_file_object.get("help_settings", "version"),
+                version=doc_version(),
                 page_path=get_config_value_with_default("pages", page_token),
             )
 
@@ -102,7 +104,7 @@ def common_doc_url(request, config_file_object):  # pylint: disable=unused-argum
             # Construct and return the URL for the PDF link.
             return "{pdf_base}/{version}/{pdf_file}".format(
                 pdf_base=pdf_base_url,
-                version=config_file_object.get("help_settings", "version"),
+                version=doc_version(),
                 pdf_file=config_file_object.get("pdf_settings", "pdf_file"),
             )
 
