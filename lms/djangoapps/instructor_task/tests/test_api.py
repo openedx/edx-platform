@@ -127,11 +127,12 @@ class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
         problem_url_name = 'x' * 255
         self.define_option_problem(problem_url_name)
         location = InstructorTaskModuleTestCase.problem_location(problem_url_name)
-        with self.assertRaises(ValueError):
-            if student is not None:
-                task_function(self.create_task_request(self.instructor), location, student)
-            else:
-                task_function(self.create_task_request(self.instructor), location)
+        # creating the task with more than 255 characters raises ValueError first as this limit
+        # is removed this will not raise ValueError anymore.
+        if student is not None:
+            self.assertIsNotNone(task_function(self.create_task_request(self.instructor), location, student))
+        else:
+            self.assertIsNotNone(task_function(self.create_task_request(self.instructor), location))
 
     def test_submit_rescore_all_with_long_url(self):
         self._test_submit_with_long_url(submit_rescore_problem_for_all_students)
