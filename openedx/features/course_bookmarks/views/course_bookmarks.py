@@ -39,7 +39,7 @@ class CourseBookmarksView(View):
         """
         course_key = CourseKey.from_string(course_id)
         course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
-        course_url_name = CoursewareTab.main_course_url_name(request)
+        course_url_name = CoursewareTab.main_course_url_name()
         course_url = reverse(course_url_name, kwargs={'course_id': unicode(course.id)})
 
         # Render the bookmarks list as a fragment
