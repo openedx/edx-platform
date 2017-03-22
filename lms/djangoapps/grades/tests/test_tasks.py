@@ -11,10 +11,11 @@ from django.db.utils import IntegrityError
 import itertools
 from mock import patch, MagicMock
 import pytz
+import six
 from util.date_utils import to_timestamp
 
 from openedx.core.djangoapps.content.block_structure.exceptions import BlockStructureNotFound
-from student.models import anonymous_id_for_user
+from student.models import CourseEnrollment, anonymous_id_for_user
 from student.tests.factories import UserFactory
 from track.event_transaction_utils import (
     create_new_event_transaction_id,
@@ -29,22 +30,17 @@ from lms.djangoapps.grades.config.models import PersistentGradesEnabledFlag
 from lms.djangoapps.grades.constants import ScoreDatabaseTableEnum
 from lms.djangoapps.grades.models import PersistentCourseGrade, PersistentSubsectionGrade
 from lms.djangoapps.grades.signals.signals import PROBLEM_WEIGHTED_SCORE_CHANGED
-from lms.djangoapps.grades.tasks import recalculate_subsection_grade_v3, RECALCULATE_GRADE_DELAY
+from lms.djangoapps.grades.tasks import (
+    compute_grades_for_course,
+    recalculate_subsection_grade_v3,
+    RECALCULATE_GRADE_DELAY
+)
 
 
-@patch.dict(settings.FEATURES, {'PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS': False})
-@ddt.ddt
-class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
+class HasCourseWithProblemsMixin(object):
     """
-    Ensures that the recalculate subsection grade task functions as expected when run.
+    Mixin to provide tests with a sample course with graded subsections
     """
-    ENABLED_SIGNALS = ['course_published', 'pre_publish']
-
-    def setUp(self):
-        super(RecalculateSubsectionGradeTest, self).setUp()
-        self.user = UserFactory()
-        PersistentGradesEnabledFlag.objects.create(enabled_for_all_courses=True, enabled=True)
-
     def set_up_course(self, enable_persistent_grades=True, create_multiple_subsections=False):
         """
         Configures the course for this test.
@@ -99,6 +95,20 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
         # this call caches the anonymous id on the user object, saving 4 queries in all happy path tests
         _ = anonymous_id_for_user(self.user, self.course.id)
         # pylint: enable=attribute-defined-outside-init,no-member
+
+
+@patch.dict(settings.FEATURES, {'PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS': False})
+@ddt.ddt
+class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTestCase):
+    """
+    Ensures that the recalculate subsection grade task functions as expected when run.
+    """
+    ENABLED_SIGNALS = ['course_published', 'pre_publish']
+
+    def setUp(self):
+        super(RecalculateSubsectionGradeTest, self).setUp()
+        self.user = UserFactory()
+        PersistentGradesEnabledFlag.objects.create(enabled_for_all_courses=True, enabled=True)
 
     @contextmanager
     def mock_get_score(self, score=MagicMock(grade=1.0, max_grade=2.0)):
@@ -363,3 +373,47 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
         Verifies the task was not retried.
         """
         self.assertFalse(mock_retry.called)
+
+
+@ddt.ddt
+class ComputeGradesForCourseTest(HasCourseWithProblemsMixin, ModuleStoreTestCase):
+    """
+    Test compute_grades_for_course task.
+    """
+
+    ENABLED_SIGNALS = ['course_published', 'pre_publish']
+
+    def setUp(self):
+        super(ComputeGradesForCourseTest, self).setUp()
+        self.users = [UserFactory.create() for _ in xrange(12)]
+        self.set_up_course()
+        for user in self.users:
+            CourseEnrollment.enroll(user, self.course.id)
+
+    @ddt.data(*xrange(0, 12, 3))
+    def test_behavior(self, batch_size):
+        result = compute_grades_for_course.delay(
+            course_key=six.text_type(self.course.id),
+            batch_size=batch_size,
+            offset=4
+        )
+        self.assertTrue(result.successful)
+        self.assertEqual(
+            PersistentCourseGrade.objects.filter(course_id=self.course.id).count(),
+            min(batch_size, 8)  # No more than 8 due to offset
+        )
+        self.assertEqual(
+            PersistentSubsectionGrade.objects.filter(course_id=self.course.id).count(),
+            min(batch_size, 8)  # No more than 8 due to offset
+        )
+
+    @ddt.data(*xrange(1, 12, 3))
+    def test_database_calls(self, batch_size):
+        per_user_queries = 16 * min(batch_size, 6)  # No more than 6 due to offset
+        with self.assertNumQueries(3 + 16 * min(batch_size, 6)):
+            with check_mongo_calls(1):
+                compute_grades_for_course.delay(
+                    course_key=six.text_type(self.course.id),
+                    batch_size=batch_size,
+                    offset=6,
+                )
