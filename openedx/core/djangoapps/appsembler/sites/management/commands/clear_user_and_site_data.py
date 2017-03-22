@@ -4,6 +4,7 @@ from django.core.management.base import BaseCommand
 from django.contrib.sites.models import Site
 
 from cms.djangoapps.course_creators.models import CourseCreator
+import lms.lib.comment_client as cc
 from organizations.models import Organization
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from student.roles import CourseAccessRole
@@ -32,4 +33,8 @@ class Command(BaseCommand):
             site.delete()
 
         # remove any leftover users that weren't a part of a organization
-        User.objects.exclude(is_superuser=True).delete()
+        users_to_remove = User.objects.exclude(is_superuser=True)
+        for user in users_to_remove:
+            comments_user = cc.User.from_django_user(user)
+            comments_user.delete()
+            user.delete()

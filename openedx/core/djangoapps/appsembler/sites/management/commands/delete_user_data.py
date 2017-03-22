@@ -4,6 +4,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.contrib.sites.models import Site
 
 from cms.djangoapps.course_creators.models import CourseCreator
+import lms.lib.comment_client as cc
 from organizations.models import Organization
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from student.roles import CourseAccessRole
@@ -26,6 +27,9 @@ class Command(BaseCommand):
             # delete course creator permissions
             CourseCreator.objects.filter(user=user).delete()
             CourseAccessRole.objects.filter(user=user).delete()
+
+            comments_user = cc.User.from_django_user(user)
+            comments_user.delete()
 
             # remove organizations and microsites
             for org in user.organizations.all():
