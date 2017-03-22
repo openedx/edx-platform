@@ -31,6 +31,8 @@ class Command(BaseCommand):
             for org in user.organizations.all():
                 try:
                     site = Site.objects.get(name=org.name)
+                    if hasattr(site, 'configuration'):
+                        site.configuration.delete()
                     site.delete()
                 except Site.DoesNotExist:
                     pass

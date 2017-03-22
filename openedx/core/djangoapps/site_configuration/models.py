@@ -133,6 +133,10 @@ class SiteConfiguration(models.Model):
         """
         return org in cls.get_all_orgs()
 
+    def delete(self, using=None):
+        self.delete_css_override()
+        super(SiteConfiguration, self).delete(using=using)
+
     def compile_microsite_sass(self):
         css_output = compile_sass('main.scss', custom_branding=self._sass_var_override)
         domain_without_port_number = self.site.domain.split(':')[0]
@@ -175,6 +179,14 @@ class SiteConfiguration(models.Model):
             if var_name in entries:
                 new_value = (var_name, [entries[var_name], entries[var_name]])
                 self.sass_variables[index] = new_value
+
+    def delete_css_override(self):
+        css_file = self.values.get('css_overrides_file')
+        try:
+            os.remove(os.path.join(settings.COMPREHENSIVE_THEME_DIRS[0], css_file))
+            os.remove(os.path.join(settings.STATIC_ROOT, css_file))
+        except OSError:
+            logger.warning("Can't delete CSS file {}".format(css_file))
 
     def _formatted_sass_variables(self):
         return " ".join(["{}: {};".format(var, val[0]) for var, val in self.sass_variables])
