@@ -8,7 +8,7 @@ from django.core.urlresolvers import reverse
 
     <div class="footer-content-primary">
       <div class="colophon">
-        <p>&copy; ${settings.COPYRIGHT_YEAR} <a data-rel="edx.org" href="${marketing_link('ROOT')}" rel="external">${settings.PLATFORM_NAME}</a>.</p>
+        <p>&copy; ${settings.COPYRIGHT_YEAR} <a data-rel="edx.org" href="${settings.LMS_ROOT_URL}" rel="external">${settings.PLATFORM_NAME}</a>.</p>
       </div>
 
       % if is_any_marketing_link_set(['TOS', 'PRIVACY']):
