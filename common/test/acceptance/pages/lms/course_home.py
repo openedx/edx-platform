@@ -40,6 +40,11 @@ class CourseOutlinePage(PageObject):
 
     url = None
 
+    SECTION_SELECTOR = '.outline-item.section:nth-of-type({0})'
+    SECTION_TITLES_SELECTOR = '.section-name span'
+    SUBSECTION_SELECTOR = SECTION_SELECTOR + ' .subsection:nth-of-type({1}) .outline-item'
+    SUBSECTION_TITLES_SELECTOR = SECTION_SELECTOR + ' .subsection a span:first-child'
+
     def __init__(self, browser, parent_page):
         super(CourseOutlinePage, self).__init__(browser)
         self.parent_page = parent_page
@@ -105,9 +110,7 @@ class CourseOutlinePage(PageObject):
             return
 
         # Convert list indices (start at zero) to CSS indices (start at 1)
-        subsection_css = (
-            ".outline-item.section:nth-of-type({0}) .subsection:nth-of-type({1}) .outline-item"
-        ).format(section_index + 1, subsection_index + 1)
+        subsection_css = self.SUBSECTION_SELECTOR.format(section_index + 1, subsection_index + 1)
 
         # Click the subsection and ensure that the page finishes reloading
         self.q(css=subsection_css).first.click()
@@ -123,25 +126,15 @@ class CourseOutlinePage(PageObject):
         """
         Return a list of all section titles on the page.
         """
-        section_css = '.section-name span'
-        return self.q(css=section_css).map(lambda el: el.text.strip()).results
+        return self.q(css=self.SECTION_TITLES_SELECTOR).map(lambda el: el.text.strip()).results
 
     def _subsection_titles(self, section_index):
         """
         Return a list of all subsection titles on the page
         for the section at index `section_index` (starts at 1).
         """
-        # Retrieve the subsection title for the section
-        # Add one to the list index to get the CSS index, which starts at one
-        subsection_css = (
-            # TODO: TNL-6387: Will need to switch to this selector for subsections
-            # ".outline-item.section:nth-of-type({0}) .subsection span:nth-of-type(1)"
-            ".outline-item.section:nth-of-type({0}) .subsection a"
-        ).format(section_index)
-
-        return self.q(
-            css=subsection_css
-        ).map(
+        subsection_css = self.SUBSECTION_TITLES_SELECTOR.format(section_index)
+        return self.q(css=subsection_css).map(
             lambda el: el.get_attribute('innerHTML').strip()
         ).results
 
