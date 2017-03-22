@@ -36,7 +36,11 @@ from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_
             },
             % endfor
         ];
-    CohortsFactory(contentGroups, "${get_studio_url(course, 'group_configurations') | n, js_escaped_string}");
+    CohortsFactory({
+        contentGroups: contentGroups,
+        docPrefixUrl: "${get_online_help_info()['doc_prefix_url'] | n, js_escaped_string}",
+        studioGroupConfigurationsUrl: "${get_studio_url(course, 'group_configurations') | n, js_escaped_string}"
+    });
 </%static:require_module>
 </%block>
 <div class="cohort-state-message"></div>

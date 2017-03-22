@@ -36,8 +36,12 @@ def common_doc_url(request, config_file_object):  # pylint: disable=unused-argum
 
         Returns:
             A dict mapping the following items
-                * "doc_url" - a string with the url corresponding to the online help location for the given page_token.
-                * "pdf_url" - a string with the url corresponding to the location of the PDF help file.
+                * "doc_url" - a string with the url corresponding to the online
+                    help location for the given page_token.
+                * "doc_prefix_url" - a string with the url for the book, ready
+                    to have a page reference concatenated to it.
+                * "pdf_url" - a string with the url corresponding to the
+                    location of the PDF help file.
         """
 
         def get_config_value_with_default(section_name, option, default_option="default"):
@@ -56,12 +60,12 @@ def common_doc_url(request, config_file_object):  # pylint: disable=unused-argum
                               section_name, option)
             return config_file_object.get(section_name, default_option)
 
-        def get_doc_url():
+        def get_doc_prefix_url():
             """
             Returns:
-                The URL for the documentation
-            """
+                The prefix of the URL for documentation.
 
+            """
             # Read an optional configuration property that sets the base
             # URL of documentation links. By default, DOC_LINK_BASE_URL
             # is null, this test determines whether it is set to a non-null
@@ -75,10 +79,19 @@ def common_doc_url(request, config_file_object):  # pylint: disable=unused-argum
                 doc_base_url = config_file_object.get("help_settings", "url_base")
 
             # Construct and return the URL for the documentation link.
-            return "{url_base}/{language}/{version}/{page_path}".format(
+            return "{url_base}/{language}/{version}".format(
                 url_base=doc_base_url,
                 language=get_config_value_with_default("locales", settings.LANGUAGE_CODE),
                 version=doc_version(),
+            )
+
+        def get_doc_url():
+            """
+            Returns:
+                The URL for the documentation
+            """
+            return "{prefix}/{page_path}".format(
+                prefix=get_doc_prefix_url(),
                 page_path=get_config_value_with_default("pages", page_token),
             )
 
@@ -110,6 +123,7 @@ def common_doc_url(request, config_file_object):  # pylint: disable=unused-argum
 
         return {
             "doc_url": get_doc_url(),
+            "doc_prefix_url": get_doc_prefix_url(),
             "pdf_url": get_pdf_url(),
         }
 

@@ -168,6 +168,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                         uploadCohortsCsvUrl: MOCK_UPLOAD_COHORTS_CSV_URL,
                         studioAdvancedSettingsUrl: MOCK_STUDIO_ADVANCED_SETTINGS_URL,
                         studioGroupConfigurationsUrl: MOCK_STUDIO_GROUP_CONFIGURATIONS_URL,
+                        docPrefixUrl: 'http://edx.readthedocs.io/some-book',
                         verifiedTrackCohortingUrl: MOCK_VERIFIED_TRACK_COHORTING_URL
                     }
                 });

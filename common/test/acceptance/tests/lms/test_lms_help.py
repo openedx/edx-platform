@@ -68,7 +68,7 @@ class TestCohortHelp(ContainerBase):
         self.cohort_management.add_cohort('cohort_name')
 
         href = (
-            'http://edx.readthedocs.org/projects/edx-partner-course-staff/en/{}/'
+            'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/{}/'
             'course_features/cohorts/cohort_config.html#assign-learners-to-cohorts-manually'
         ).format(doc_version())
 
@@ -90,7 +90,7 @@ class TestCohortHelp(ContainerBase):
         self.cohort_management.add_cohort('cohort_name', assignment_type='random')
 
         href = (
-            'http://edx.readthedocs.org/projects/edx-partner-course-staff/en/{}/'
+            'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/{}/'
             'course_features/cohorts/cohorts_overview.html#all-automated-assignment'
         ).format(doc_version())
 
@@ -125,7 +125,7 @@ class InstructorDashboardHelp(BaseInstructorDashboardTest):
         Then I see help about the instructor dashboard in a new tab
         """
         href = (
-            'http://edx.readthedocs.io/projects/edx-guide-for-students/en/{}/SFD_instructor_dash_help.html'
+            'http://edx.readthedocs.io/projects/open-edx-learner-guide/en/{}/SFD_instructor_dash_help.html'
         ).format(doc_version())
         self.instructor_dashboard_page.click_help()
         assert_opened_help_link_is_correct(self, href)
