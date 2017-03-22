@@ -368,7 +368,7 @@ class CourseGradeFactory(object):
 
     GradeResult = namedtuple('GradeResult', ['student', 'course_grade', 'err_msg'])
 
-    def iter(self, course, students):
+    def iter(self, course, students, read_only=True):
         """
         Given a course and an iterable of students (User), yield a GradeResult
         for every student enrolled in the course.  GradeResult is a named tuple of:
@@ -388,7 +388,7 @@ class CourseGradeFactory(object):
         for student in students:
             with dog_stats_api.timer('lms.grades.CourseGradeFactory.iter', tags=[u'action:{}'.format(course.id)]):
                 try:
-                    course_grade = CourseGradeFactory().create(student, course, collected_block_structure)
+                    course_grade = CourseGradeFactory().create(student, course, collected_block_structure, read_only=read_only)
                     yield self.GradeResult(student, course_grade, "")
 
                 except Exception as exc:  # pylint: disable=broad-except
