@@ -936,7 +936,10 @@ def _allow_donation(course_modes, course_id, enrollment):
             flat_unexpired_modes,
             flat_all_modes
         )
-    donations_enabled = DonationConfiguration.current().enabled
+    donations_enabled = configuration_helpers.get_value(
+        'ENABLE_DONATIONS',
+        DonationConfiguration.current().enabled
+    )
     return (
         donations_enabled and
         enrollment.mode in course_modes[course_id] and
