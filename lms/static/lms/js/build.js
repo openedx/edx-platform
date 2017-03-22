@@ -18,6 +18,7 @@
          * done.
          */
         modules: getModulesList([
+            'course_experience/js/course_outline_factory',
             'discussion/js/discussion_board_factory',
             'discussion/js/discussion_profile_page_factory',
             'js/api_admin/catalog_preview_factory',

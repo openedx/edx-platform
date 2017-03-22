@@ -2,14 +2,17 @@
 This module is essentially a broker to xmodule/tabs.py -- it was originally introduced to
 perform some LMS-specific tab display gymnastics for the Entrance Exams feature
 """
+import waffle
+
 from django.conf import settings
 from django.utils.translation import ugettext as _, ugettext_noop
 
 from courseware.access import has_access
 from courseware.entrance_exams import user_can_skip_entrance_exam
 from openedx.core.lib.course_tabs import CourseTabPluginManager
+from request_cache.middleware import RequestCache
 from student.models import CourseEnrollment
-from xmodule.tabs import CourseTab, CourseTabList, key_checker
+from xmodule.tabs import CourseTab, CourseTabList, key_checker, link_reverse_func
 
 
 class EnrolledTab(CourseTab):
@@ -33,6 +36,17 @@ class CoursewareTab(EnrolledTab):
     view_name = 'courseware'
     is_movable = False
     is_default = False
+
+    @property
+    def link_func(self):
+        """
+        Returns a function that computes the URL for this tab.
+        """
+        request = RequestCache.get_current_request()
+        if waffle.flag_is_active(request, 'unified_course_view'):
+            return link_reverse_func('edx.course_experience.course_home')
+        else:
+            return link_reverse_func('courseware')
 
 
 class CourseInfoTab(CourseTab):
