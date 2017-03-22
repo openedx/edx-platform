@@ -5,25 +5,26 @@
     'use strict';
 
     function VisibilityEditorView(runtime, element) {
+
         this.getGroupAccess = function() {
             var groupAccess = {},
-                checkboxValues,
                 partitionId,
-                groupId,
+                groupId;
 
-                // This constant MUST match the group ID
-                // defined by VerificationPartitionScheme on the backend!
-                ALLOW_GROUP_ID = 1;
+            // Get the selected user partition (only allowed to select one).
+            partitionId = parseInt(element.find('.partition-visibility select').val(), 10);
 
-            if (element.find('.visibility-level-all').prop('checked')) {
+            // "All Learners and Staff" is selected (or "Choose one", which is only shown when
+            // current visibility is "All Learners and Staff" at the time the dialog is opened).
+            if (partitionId === -1) {
                 return {};
             }
 
-            // Cohort partitions (user is allowed to select more than one)
-            element.find('.field-visibility-content-group input:checked').each(function(index, input) {
-                checkboxValues = $(input).val().split('-');
-                partitionId = parseInt(checkboxValues[0], 10);
-                groupId = parseInt(checkboxValues[1], 10);
+            // Otherwise get the checked groups within the selected partition.
+            element.find(
+                '.partition-group-visibility-' + partitionId + ' input:checked'
+            ).each(function(index, input) {
+                groupId = parseInt($(input).val(), 10);
 
                 if (groupAccess.hasOwnProperty(partitionId)) {
                     groupAccess[partitionId].push(groupId);
@@ -32,38 +33,25 @@
                 }
             });
 
-            // Verification partitions (user can select exactly one)
-            if (element.find('#verification-access-checkbox').prop('checked')) {
-                partitionId = parseInt($('#verification-access-dropdown').val(), 10);
-                groupAccess[partitionId] = [ALLOW_GROUP_ID];
-            }
-
             return groupAccess;
         };
 
-        // When selecting "all students and staff", uncheck the specific groups
-        element.find('.field-visibility-level input').change(function(event) {
-            if ($(event.target).hasClass('visibility-level-all')) {
-                element.find('.field-visibility-content-group input, .field-visibility-verification input')
-                    .prop('checked', false);
+        element.find('.partition-visibility select').change(function(event) {
+            var partitionId;
+
+            // Hide all the partition group options.
+            element.find('.partition-group-control').addClass('is-hidden');
+
+            // If a partition is selected, display its groups.
+            partitionId = parseInt($(event.target).val(), 10);
+            if (partitionId >= 0) {
+                element.find('.partition-group-control-' + partitionId).removeClass('is-hidden');
             }
         });
-
-        // When selecting a specific group, deselect "all students and staff" and
-        // select "specific content groups" instead.`
-        element.find('.field-visibility-content-group input, .field-visibility-verification input')
-            .change(function() {
-                element.find('.visibility-level-all').prop('checked', false);
-                element.find('.visibility-level-specific').prop('checked', true);
-            });
     }
 
     VisibilityEditorView.prototype.collectFieldData = function collectFieldData() {
-        return {
-            metadata: {
-                'group_access': this.getGroupAccess()
-            }
-        };
+        return {metadata: {group_access: this.getGroupAccess()}};
     };
 
     function initializeVisibilityEditor(runtime, element) {

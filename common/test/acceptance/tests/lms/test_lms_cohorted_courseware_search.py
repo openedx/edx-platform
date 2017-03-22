@@ -174,22 +174,18 @@ class CoursewareSearchCohortTest(ContainerBase):
         """
         container_page = self.go_to_unit_page()
 
-        def set_visibility(html_block_index, content_group, second_content_group=None):
+        def set_visibility(html_block_index, groups):
             """
             Set visibility on html blocks to specified groups.
             """
             html_block = container_page.xblocks[html_block_index]
             html_block.edit_visibility()
-            if second_content_group:
-                ComponentVisibilityEditorView(self.browser, html_block.locator).select_option(
-                    second_content_group, save=False
-                )
-            ComponentVisibilityEditorView(self.browser, html_block.locator).select_option(content_group)
+            visibility_dialog = ComponentVisibilityEditorView(self.browser, html_block.locator)
+            visibility_dialog.select_groups_in_partition_scheme(visibility_dialog.CONTENT_GROUP_PARTITION, groups)
 
-        set_visibility(1, self.content_group_a)
-        set_visibility(2, self.content_group_b)
-        set_visibility(3, self.content_group_a, self.content_group_b)
-        set_visibility(4, 'All Students and Staff')  # Does not work without this
+        set_visibility(1, [self.content_group_a])
+        set_visibility(2, [self.content_group_b])
+        set_visibility(3, [self.content_group_a, self.content_group_b])
 
         container_page.publish_action.click()
 

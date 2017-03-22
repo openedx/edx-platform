@@ -15,6 +15,9 @@ from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPa
 # more information can be found here: https://openedx.atlassian.net/browse/PLAT-902
 _ = lambda text: text
 
+INVALID_USER_PARTITION_VALIDATION = _(u"This component's visibility settings refer to deleted or invalid group configurations.")
+INVALID_USER_PARTITION_GROUP_VALIDATION = _(u"This component's visibility settings refer to deleted or invalid groups.")
+
 
 class GroupAccessDict(Dict):
     """Special Dict class for serializing the group_access field"""
@@ -165,14 +168,14 @@ class LmsBlockMixin(XBlockMixin):
             validation.add(
                 ValidationMessage(
                     ValidationMessage.ERROR,
-                    _(u"This component refers to deleted or invalid content group configurations.")
+                    INVALID_USER_PARTITION_VALIDATION
                 )
             )
         if has_invalid_groups:
             validation.add(
                 ValidationMessage(
                     ValidationMessage.ERROR,
-                    _(u"This component refers to deleted or invalid content groups.")
+                    INVALID_USER_PARTITION_GROUP_VALIDATION
                 )
             )
         return validation
