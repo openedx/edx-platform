@@ -430,29 +430,34 @@ def get_visibility_partition_info(xblock):
     Returns: dict
 
     """
-    user_partitions = get_user_partition_info(xblock, schemes=["verification", "cohort"])
+    user_partitions = get_user_partition_info(xblock, schemes=["verification", "enrollment_track", "cohort"])
     cohort_partitions = []
     verification_partitions = []
-    has_selected_groups = False
+    enrollment_mode_partitions = []
+    has_selected_content_groups = False
+    has_selected_enrollment_modes = False
     selected_verified_partition_id = None
 
     # Pre-process the partitions to make it easier to display the UI
     for p in user_partitions:
-        has_selected = any(g["selected"] for g in p["groups"])
-        has_selected_groups = has_selected_groups or has_selected
-
         if p["scheme"] == "cohort":
             cohort_partitions.append(p)
+            has_selected_content_groups = any(g["selected"] for g in p["groups"])
         elif p["scheme"] == "verification":
             verification_partitions.append(p)
-            if has_selected:
-                selected_verified_partition_id = p["id"]
+            # if has_selected:
+            #     selected_verified_partition_id = p["id"]
+        elif p["scheme"] == "enrollment_track":
+            enrollment_mode_partitions.append(p)
+            has_selected_enrollment_modes = any(g["selected"] for g in p["groups"])
 
     return {
         "user_partitions": user_partitions,
         "cohort_partitions": cohort_partitions,
+        "enrollment_mode_partitions": enrollment_mode_partitions,
         "verification_partitions": verification_partitions,
-        "has_selected_groups": has_selected_groups,
+        "has_selected_content_groups": has_selected_content_groups,
+        "has_selected_enrollment_modes": has_selected_enrollment_modes,
         "selected_verified_partition_id": selected_verified_partition_id,
     }
 
