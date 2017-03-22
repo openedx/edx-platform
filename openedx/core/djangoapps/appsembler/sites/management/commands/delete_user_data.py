@@ -20,7 +20,8 @@ class Command(BaseCommand):
             try:
                 user = User.objects.get(email=email)
             except:
-                raise CommandError('User "" does not exist'.format(email))
+                print('User "{0}" does not exist'.format(email))
+                return
 
             # delete course creator permissions
             CourseCreator.objects.filter(user=user).delete()

@@ -20,7 +20,7 @@ class Command(BaseCommand):
 
         # remove organizations and users
         for org in Organization.objects.all():
-            org.users.all().delete()
+            org.users.exclude(is_superuser=True).delete()
             org.delete()
 
         # remove sites and site configurations
