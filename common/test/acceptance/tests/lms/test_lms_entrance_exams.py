@@ -43,7 +43,7 @@ class EntranceExamTest(UniqueCourseTest):
         ).install()
 
         entrance_exam_subsection = None
-        outline = course_fixture.course_outline
+        outline = course_fixture.studio_course_outline_as_json
         for child in outline['child_info']['children']:
             if child.get('display_name') == "Entrance Exam":
                 entrance_exam_subsection = child['child_info']['children'][0]

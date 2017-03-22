@@ -679,6 +679,7 @@
     });
 
     testFiles = [
+        'course_experience/js/spec/course_outline_factory_spec.js',
         'discussion/js/spec/discussion_board_factory_spec.js',
         'discussion/js/spec/discussion_profile_page_factory_spec.js',
         'discussion/js/spec/discussion_board_view_spec.js',

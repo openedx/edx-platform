@@ -268,7 +268,17 @@
                 this.updatePageTitle();
                 sequenceLinks = this.content_container.find('a.seqnav');
                 sequenceLinks.click(this.goto);
-                this.path.text(this.el.find('.nav-item.active').data('path'));
+
+                edx.HtmlUtils.setHtml(
+                    this.path,
+                    edx.HtmlUtils.template($('#sequence-breadcrumbs-tpl').text())({
+                        courseId: this.el.parent().data('course-id'),
+                        blockId: this.id,
+                        pathText: this.el.find('.nav-item.active').data('path'),
+                        unifiedCourseView: this.path.data('unified-course-view')
+                    })
+                );
+
                 this.sr_container.focus();
             }
         };

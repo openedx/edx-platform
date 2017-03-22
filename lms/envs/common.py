@@ -2173,6 +2173,9 @@ INSTALLED_APPS = (
 
     # Unusual migrations
     'database_fixups',
+
+    # Features
+    'openedx.features.course_experience',
 )
 
 ######################### CSRF #########################################

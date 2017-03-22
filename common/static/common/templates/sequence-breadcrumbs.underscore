@@ -1,0 +1,9 @@
+<% if (unifiedCourseView) { %>
+    <a href="<%- '/courses/' + courseId + '/course/#' + blockId %>">
+        <span class="fa fa-arrow-circle-left" aria-hidden="true" aria-describedby="outline-description"></span>
+        <span class="sr-only" id="outline-description"><%- gettext('Return to course outline') %></span>
+        <b><%- gettext('Outline') %></b>
+    </a>
+    <span> > </span>
+<% } %>
+<span class="position"><%- pathText %></span>

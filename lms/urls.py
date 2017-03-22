@@ -601,9 +601,18 @@ urlpatterns += (
         name='edxnotes_endpoints',
     ),
 
+    # Branding API
     url(
         r'^api/branding/v1/',
         include('branding.api_urls')
+    ),
+
+    # Course experience
+    url(
+        r'^courses/{}/course/'.format(
+            settings.COURSE_ID_PATTERN,
+        ),
+        include('openedx.features.course_experience.urls'),
     ),
 )
 
