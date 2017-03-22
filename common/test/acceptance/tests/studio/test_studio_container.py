@@ -3,10 +3,15 @@ Acceptance tests for Studio related to the container page.
 The container page is used both for displaying units, and
 for displaying containers within units.
 """
+import datetime
+import ddt
 from nose.plugins.attrib import attr
 from unittest import skip
 
+from base_studio_test import ContainerBase
+
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
+from common.test.acceptance.pages.lms.create_mode import ModeCreationPage
 from common.test.acceptance.pages.studio.component_editor import ComponentEditorView, ComponentVisibilityEditorView
 from common.test.acceptance.pages.studio.container import ContainerPage
 from common.test.acceptance.pages.studio.html_component_editor import HtmlComponentEditorView
@@ -16,10 +21,9 @@ from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.staff_view import StaffCoursewarePage
 from common.test.acceptance.tests.helpers import create_user_partition_json
 
-import datetime
-import ddt
-from base_studio_test import ContainerBase
-from xmodule.partitions.partitions import Group
+from xmodule.partitions.partitions import (
+    Group, ENROLLMENT_TRACK_PARTITION_ID, MINIMUM_STATIC_PARTITION_ID
+)
 
 
 class NestedVerticalTest(ContainerBase):
@@ -313,31 +317,32 @@ class EditContainerTest(NestedVerticalTest):
         self.assertEqual(component.student_content, "modified content")
 
 
-@attr(shard=3)
-class EditVisibilityModalTest(ContainerBase):
-    """
-    Tests of the visibility settings modal for components on the unit
-    page.
-    """
-    VISIBILITY_LABEL_ALL = 'All Students and Staff'
-    VISIBILITY_LABEL_SPECIFIC = 'Specific Content Groups'
-    MISSING_GROUP_LABEL = 'Deleted Content Group\nContent group no longer exists. Please choose another or allow access to All Students and staff'
+class BaseGroupConfigurationsTest(ContainerBase):
+    ALL_LEARNERS_AND_STAFF = ComponentVisibilityEditorView.ALL_LEARNERS_AND_STAFF
+    CHOOSE_ONE = "Choose one"
+    CONTENT_GROUP_PARTITION = ComponentVisibilityEditorView.CONTENT_GROUP_PARTITION
+    ENROLLMENT_TRACK_PARTITION = ComponentVisibilityEditorView.ENROLLMENT_TRACK_PARTITION
+    MISSING_GROUP_LABEL = 'Deleted Group\nThis group no longer exists. Choose another group or make this component visible to All Learners and Staff.'
     VALIDATION_ERROR_LABEL = 'This component has validation issues.'
-    VALIDATION_ERROR_MESSAGE = 'Error:\nThis component refers to deleted or invalid content groups.'
-    GROUP_VISIBILITY_MESSAGE = 'Some content in this unit is visible only to particular content groups'
+    VALIDATION_ERROR_MESSAGE = "Error:\nThis component's visibility settings refer to deleted or invalid groups."
+    GROUP_VISIBILITY_MESSAGE = 'Some content in this unit is visible only to specific groups of learners.'
 
     def setUp(self):
-        super(EditVisibilityModalTest, self).setUp()
+        super(BaseGroupConfigurationsTest, self).setUp()
 
         # Set up a cohort-schemed user partition
+        self.id_base = MINIMUM_STATIC_PARTITION_ID
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
                 u"user_partitions": [
                     create_user_partition_json(
-                        0,
-                        'Configuration Dogs, Cats',
+                        self.id_base,
+                        self.CONTENT_GROUP_PARTITION,
                         'Content Group Partition',
-                        [Group("0", 'Dogs'), Group("1", 'Cats')],
+                        [
+                            Group(self.id_base + 1, 'Dogs'),
+                            Group(self.id_base + 2, 'Cats')
+                        ],
                         scheme="cohort"
                     )
                 ],
@@ -368,37 +373,44 @@ class EditVisibilityModalTest(ContainerBase):
         component.edit_visibility()
         return ComponentVisibilityEditorView(self.browser, component.locator)
 
-    def verify_selected_labels(self, visibility_editor, expected_labels):
+    def verify_current_groups_message(self, visibility_editor, expected_current_groups):
         """
-        Verify that a visibility editor's selected labels match the
-        expected ones.
+        Check that the current visibility is displayed at the top of the dialog.
         """
-        # If anything other than 'All Students and Staff', is selected,
-        # 'Specific Content Groups' should be selected as well.
-        if expected_labels != [self.VISIBILITY_LABEL_ALL]:
-            expected_labels.append(self.VISIBILITY_LABEL_SPECIFIC)
-        self.assertItemsEqual(expected_labels, [option.text for option in visibility_editor.selected_options])
+        self.assertEqual(
+            "Currently visible to: {groups}".format(groups=expected_current_groups),
+            visibility_editor.current_groups_message
+        )
 
-    def select_and_verify_saved(self, component, labels, expected_labels=None):
+    def verify_selected_partition_scheme(self, visibility_editor, expected_scheme):
+        """
+        Check that the expected partition scheme is selected.
+        """
+        self.assertItemsEqual(expected_scheme, visibility_editor.selected_partition_scheme)
+
+    def verify_selected_groups(self, visibility_editor, expected_groups):
+        """
+        Check the expected partition groups.
+        """
+        self.assertItemsEqual(expected_groups, [group.text for group in visibility_editor.selected_groups])
+
+    def select_and_verify_saved(self, component, partition_label, groups=[]):
         """
         Edit the visibility of an xblock on the container page and
-        verify that the edit persists.  If provided, verify that
-        `expected_labels` are selected after save, otherwise expect
-        that `labels` are selected after save.  Note that `labels`
+        verify that the edit persists. Note that `groups`
         are labels which should be clicked, but not necessarily checked.
         """
-        if expected_labels is None:
-            expected_labels = labels
-
         # Make initial edit(s) and save
         visibility_editor = self.edit_component_visibility(component)
-        for label in labels:
-            visibility_editor.select_option(label, save=False)
-        visibility_editor.save()
+        visibility_editor.select_groups_in_partition_scheme(partition_label, groups)
 
-        # Re-open the modal and inspect its selected inputs
+        # Re-open the modal and inspect its selected inputs. If no groups were selected,
+        # "All Learners" should be selected partitions scheme, and we show "Choose one" in the select.
+        if not groups:
+            partition_label = self.CHOOSE_ONE
         visibility_editor = self.edit_component_visibility(component)
-        self.verify_selected_labels(visibility_editor, expected_labels)
+        self.verify_selected_partition_scheme(visibility_editor, partition_label)
+        self.verify_selected_groups(visibility_editor, groups)
         visibility_editor.save()
 
     def verify_component_validation_error(self, component):
@@ -436,15 +448,22 @@ class EditVisibilityModalTest(ContainerBase):
         verify that there are no missing group messages in the modal
         and that there is no validation error on the component.
         """
-        for option in visibility_editor.selected_options:
+        for option in visibility_editor.all_group_options:
             if option.text == self.MISSING_GROUP_LABEL:
                 option.click()
         visibility_editor.save()
         visibility_editor = self.edit_component_visibility(component)
-        self.assertNotIn(self.MISSING_GROUP_LABEL, [item.text for item in visibility_editor.all_options])
+        self.assertNotIn(self.MISSING_GROUP_LABEL, [item.text for item in visibility_editor.all_group_options])
         visibility_editor.cancel()
         self.assertFalse(component.has_validation_error)
 
+
+@attr(shard=3)
+class ContentGroupVisibilityModalTest(BaseGroupConfigurationsTest):
+    """
+    Tests of the visibility settings modal for components on the unit
+    page (content groups).
+    """
     def test_default_selection(self):
         """
         Scenario: The component visibility modal selects visible to all by default.
@@ -454,7 +473,10 @@ class EditVisibilityModalTest(ContainerBase):
             Then the default visibility selection should be 'All Students and Staff'
             And the container page should not display the content visibility warning
         """
-        self.verify_selected_labels(self.edit_component_visibility(self.html_component), [self.VISIBILITY_LABEL_ALL])
+        visibility_dialog = self.edit_component_visibility(self.html_component)
+        self.verify_current_groups_message(visibility_dialog, self.ALL_LEARNERS_AND_STAFF)
+        self.verify_selected_partition_scheme(visibility_dialog, self.CHOOSE_ONE)
+        visibility_dialog.cancel()
         self.verify_visibility_set(self.html_component, False)
 
     def test_reset_to_all_students_and_staff(self):
@@ -472,9 +494,9 @@ class EditVisibilityModalTest(ContainerBase):
             Then the visibility selection should be 'All Students and Staff'
             And the container page should not display the content visibility warning
         """
-        self.select_and_verify_saved(self.html_component, ['Dogs'])
+        self.select_and_verify_saved(self.html_component, self.CONTENT_GROUP_PARTITION, ['Dogs'])
         self.verify_visibility_set(self.html_component, True)
-        self.select_and_verify_saved(self.html_component, [self.VISIBILITY_LABEL_ALL])
+        self.select_and_verify_saved(self.html_component, self.ALL_LEARNERS_AND_STAFF)
         self.verify_visibility_set(self.html_component, False)
 
     def test_select_single_content_group(self):
@@ -488,7 +510,7 @@ class EditVisibilityModalTest(ContainerBase):
             Then the visibility selection should be 'Dogs' and 'Specific Content Groups'
             And the container page should display the content visibility warning
         """
-        self.select_and_verify_saved(self.html_component, ['Dogs'])
+        self.select_and_verify_saved(self.html_component, self.CONTENT_GROUP_PARTITION, ['Dogs'])
         self.verify_visibility_set(self.html_component, True)
 
     def test_select_multiple_content_groups(self):
@@ -502,7 +524,7 @@ class EditVisibilityModalTest(ContainerBase):
             Then the visibility selection should be 'Dogs', 'Cats', and 'Specific Content Groups'
             And the container page should display the content visibility warning
         """
-        self.select_and_verify_saved(self.html_component, ['Dogs', 'Cats'])
+        self.select_and_verify_saved(self.html_component, self.CONTENT_GROUP_PARTITION, ['Dogs', 'Cats'])
         self.verify_visibility_set(self.html_component, True)
 
     def test_select_zero_content_groups(self):
@@ -518,7 +540,7 @@ class EditVisibilityModalTest(ContainerBase):
             And the container page should not display the content visibility warning
         """
         self.select_and_verify_saved(
-            self.html_component, [self.VISIBILITY_LABEL_SPECIFIC], expected_labels=[self.VISIBILITY_LABEL_ALL]
+            self.html_component, self.CONTENT_GROUP_PARTITION
         )
         self.verify_visibility_set(self.html_component, False)
 
@@ -539,11 +561,14 @@ class EditVisibilityModalTest(ContainerBase):
             And I should not see any validation errors on the component
             And the container page should not display the content visibility warning
         """
-        self.update_component(self.html_component, {'group_access': {0: [2, 3]}})
-        self.verify_component_validation_error(self.html_component)
-        visibility_editor = self.edit_component_visibility(self.html_component)
-        self.verify_selected_labels(visibility_editor, [self.MISSING_GROUP_LABEL] * 2)
-        self.remove_missing_groups(visibility_editor, self.html_component)
+        self.update_component(
+            self.html_component,
+            {'group_access': {self.id_base: [self.id_base + 3, self.id_base + 4]}}
+        )
+        self._verify_and_remove_missing_content_groups(
+            "Deleted Group, Deleted Group",
+            [self.MISSING_GROUP_LABEL] * 2
+        )
         self.verify_visibility_set(self.html_component, False)
 
     def test_found_and_missing_groups(self):
@@ -563,14 +588,83 @@ class EditVisibilityModalTest(ContainerBase):
             And I should not see any validation errors on the component
             And the container page should display the content visibility warning
         """
-        self.update_component(self.html_component, {'group_access': {0: [0, 1, 2, 3]}})
+        self.update_component(
+            self.html_component,
+            {'group_access': {self.id_base: [self.id_base + 1, self.id_base + 2, self.id_base + 3, self.id_base + 4]}}
+        )
+
+        self._verify_and_remove_missing_content_groups(
+            'Dogs, Cats, Deleted Group, Deleted Group',
+            ['Dogs', 'Cats'] + [self.MISSING_GROUP_LABEL] * 2
+        )
+
+        visibility_editor = self.edit_component_visibility(self.html_component)
+        self.verify_selected_partition_scheme(visibility_editor, self.CONTENT_GROUP_PARTITION)
+        expected_groups = ['Dogs', 'Cats']
+        self.verify_current_groups_message(visibility_editor, ", ".join(expected_groups))
+        self.verify_selected_groups(visibility_editor, expected_groups)
+        self.verify_visibility_set(self.html_component, True)
+
+    def _verify_and_remove_missing_content_groups(self, current_groups_message, all_group_labels):
         self.verify_component_validation_error(self.html_component)
         visibility_editor = self.edit_component_visibility(self.html_component)
-        self.verify_selected_labels(visibility_editor, ['Dogs', 'Cats'] + [self.MISSING_GROUP_LABEL] * 2)
+        self.verify_selected_partition_scheme(visibility_editor, self.CONTENT_GROUP_PARTITION)
+        self.verify_current_groups_message(visibility_editor, current_groups_message)
+        self.verify_selected_groups(visibility_editor, all_group_labels)
         self.remove_missing_groups(visibility_editor, self.html_component)
+
+
+@attr(shard=3)
+class EnrollmentTrackVisibilityModalTest(BaseGroupConfigurationsTest):
+    """
+    Tests of the visibility settings modal for components on the unit
+    page (enrollment tracks).
+    """
+    AUDIT_TRACK = "Audit Track"
+    VERIFIED_TRACK = "Verified Track"
+
+    def setUp(self):
+        super(EnrollmentTrackVisibilityModalTest, self).setUp()
+
+        # Add an audit mode to the course
+        ModeCreationPage(self.browser, self.course_id, mode_slug=u'audit', mode_display_name=self.AUDIT_TRACK).visit()
+
+        # Add a verified mode to the course
+        ModeCreationPage(
+            self.browser, self.course_id, mode_slug=u'verified',
+            mode_display_name=self.VERIFIED_TRACK, min_price=10
+        ).visit()
+
+        self.container_page = self.go_to_unit_page()
+        self.html_component = self.container_page.xblocks[1]
+
+        # Initially set visibility to Verified track.
+        self.update_component(
+            self.html_component,
+            {'group_access': {ENROLLMENT_TRACK_PARTITION_ID: [2]}}  # "2" is Verified
+        )
+
+    def test_setting_enrollment_tracks(self):
+        """
+        Test that enrollment track groups can be selected.
+        """
+        # Open dialog with "Verified" already selected.
         visibility_editor = self.edit_component_visibility(self.html_component)
-        self.verify_selected_labels(visibility_editor, ['Dogs', 'Cats'])
-        self.verify_visibility_set(self.html_component, True)
+        self.verify_current_groups_message(visibility_editor, self.VERIFIED_TRACK)
+        self.verify_selected_partition_scheme(
+            visibility_editor,
+            self.ENROLLMENT_TRACK_PARTITION
+        )
+        self.verify_selected_groups(visibility_editor, [self.VERIFIED_TRACK])
+        visibility_editor.cancel()
+
+        # Select "All Learners and Staff". The helper method saves the change,
+        # then reopens the dialog to verify that it was persisted.
+        self.select_and_verify_saved(self.html_component, self.ALL_LEARNERS_AND_STAFF)
+
+        # Select "Audit" enrollment track. The helper method saves the change,
+        # then reopens the dialog to verify that it was persisted.
+        self.select_and_verify_saved(self.html_component, self.ENROLLMENT_TRACK_PARTITION, [self.AUDIT_TRACK])
 
 
 @attr(shard=1)

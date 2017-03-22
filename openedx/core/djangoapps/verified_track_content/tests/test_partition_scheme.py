@@ -12,8 +12,7 @@ from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.partitions.partitions import UserPartition
-from xmodule.partitions.partitions_service import MINIMUM_STATIC_PARTITION_ID
+from xmodule.partitions.partitions import UserPartition, MINIMUM_STATIC_PARTITION_ID
 
 
 class EnrollmentTrackUserPartitionTest(SharedModuleStoreTestCase):
@@ -160,7 +159,7 @@ def create_enrollment_track_partition(course):
     enrollment_track_scheme = UserPartition.get_scheme("enrollment_track")
     partition = enrollment_track_scheme.create_user_partition(
         id=1,
-        name="TestEnrollment Track Partition",
+        name="Test Enrollment Track Partition",
         description="Test partition for segmenting users by enrollment track",
         parameters={"course_id": unicode(course.id)}
     )

@@ -1,6 +1,8 @@
 // studio - elements - modal-window
 // ========================
 
+@import 'edx-pattern-library-shims/base/variables';
+
 // start with the view/body
 [class*="view-"] {
 
@@ -482,59 +484,59 @@
   // MODAL TYPE: component - visibility modal
   .xblock-visibility_view {
 
-    .visibility-controls-secondary {
-      max-height: 100%;
-      overflow-y: auto;
-      @include margin(($baseline*0.75), 0, 0, $baseline);
+    // We don't wish the dialog to resize for the common case of 2 groups.
+    min-height: 190px;
+
+    .visibility-header {
+      padding-bottom: $baseline;
+      margin-bottom: 0;
+      color: $gray-d3;
     }
 
-    .visibility-controls-group {
-      @extend %wipe-last-child;
-      margin-bottom: $baseline;
+    .current-visibility-title {
+      font-weight: font-weight(semi-bold);
+
+      .icon {
+        @include margin-right($baseline/8);
+      }
+    }
+
+    .group-select-title {
+      font-weight: font-weight(semi-bold);
+      font-size: inherit;
+    }
+
+    .partition-visibility {
+        padding-top: $baseline;
     }
 
     // UI: form fields
-    .list-fields {
+    .partition-group-control {
+
+      padding-top: ($baseline/2);
 
       .field {
-        @extend %wipe-last-child;
-        margin-bottom: ($baseline/4);
-
-        label {
-          @extend %t-copy-sub1;
-        }
-      }
-
-      // UI: radio and checkbox inputs
-      .field-radio, .field-checkbox {
+        margin-top: ($baseline/4);
 
         label {
           @include margin-left($baseline/4);
+          font-size: inherit;
         }
       }
     }
 
-    .field-visibility-verification {
-      .note {
-        @extend %t-copy-sub2;
-        @extend %t-regular;
-        margin: 14px 0 0 24px;
-        display: block;
-      }
-    }
-
-    // CASE: content group has been removed
-    .field-visibility-content-group.was-removed {
+    // CASE: content or enrollment group has been removed
+    .partition-group-visibility.was-removed {
 
       .input-checkbox:checked ~ label {
-        color: $color-error;
+        color: $error-color;
       }
 
       .note {
         @extend %t-copy-sub2;
         @extend %t-regular;
         display: block;
-        color: $color-error;
+        color: $error-color;
       }
     }
 
@@ -698,7 +700,7 @@
     }
 
     // UI: staff lock section
-    .edit-staff-lock, .edit-settings-timed-examination, .edit-verification-access {
+    .edit-staff-lock, .edit-settings-timed-examination {
 
       .checkbox-cosmetic .input-checkbox {
         @extend %cont-text-sr;
@@ -727,13 +729,6 @@
         @extend %t-regular;
         margin: 14px 0 0 21px;
         display: block;
-      }
-    }
-
-    .verification-access {
-      .checkbox-cosmetic .label {
-        @include float(left);
-        margin: 2px 6px 0 0;
       }
     }
 
