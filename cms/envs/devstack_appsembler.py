@@ -9,13 +9,8 @@ INSTALLED_APPS += (
     'openedx.core.djangoapps.appsembler.sites',
 )
 
-# needed to show only users and appsembler courses
-FEATURES["ENABLE_COURSE_DISCOVERY"] = True
-FEATURES["ENABLE_COMPREHENSIVE_THEMING"] = True
-FEATURES["ORGANIZATIONS_APP"] = True
 OAUTH_ENFORCE_SECURE = False
 
-APPSEMBLER_SECRET_KEY = "secret_key"
 AMC_APP_URL = ENV_TOKENS.get('AMC_APP_URL')
 
 # disable caching in dev environment
@@ -23,8 +18,6 @@ for cache_key in CACHES.keys():
     CACHES[cache_key]['BACKEND'] = 'django.core.cache.backends.dummy.DummyCache'
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
-
-MICROSITE_BACKEND = 'microsite_configuration.backends.database.DatabaseMicrositeBackend'
 
 DEFAULT_TEMPLATE_ENGINE['OPTIONS']['context_processors'] += ('openedx.core.djangoapps.appsembler.intercom_integration.context_processors.intercom',)
 

@@ -40,7 +40,6 @@ ELASTIC_FIELD_MAPPINGS = {
 SENTRY_DSN = AUTH_TOKENS.get('SENTRY_DSN', False)
 
 if SENTRY_DSN:
-
     # Set your DSN value
     RAVEN_CONFIG = {
         'environment': FEATURES['ENVIRONMENT'],  # This should be moved somewhere more sensible
