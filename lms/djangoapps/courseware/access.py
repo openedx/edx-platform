@@ -878,12 +878,18 @@ def get_user_role(user, course_key):
     """
     role = get_masquerade_role(user, course_key)
 
-
     # Check if user is a coach on this ccx.
-    ccx_coach_role = False # Added by labster
+    ccx_coach_role = False  # Added by labster
     if isinstance(course_key, CCXLocator):
         try:
-            ccx_coach_role = has_ccx_coach_role(user, course_key)
+            ccx = CustomCourseForEdX.objects.get(pk=course_key.ccx)
+            if CourseCcxCoachRole(ccx.course_id).has_user(user):
+                list_ccx = CustomCourseForEdX.objects.filter(
+                    course_id=course_key.to_course_locator(),
+                    coach=user
+                )
+                if list_ccx.exists():
+                    ccx_coach_role = str(list_ccx[0].id) == str(course_key.ccx)
         except CCXLocatorValidationException as err:
             pass  # Added by labster
 
