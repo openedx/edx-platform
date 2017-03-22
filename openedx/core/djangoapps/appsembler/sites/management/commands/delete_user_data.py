@@ -1,3 +1,5 @@
+import logging
+
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
@@ -8,6 +10,9 @@ import lms.lib.comment_client as cc
 from organizations.models import Organization
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from student.roles import CourseAccessRole
+
+
+log = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
@@ -28,8 +33,13 @@ class Command(BaseCommand):
             CourseCreator.objects.filter(user=user).delete()
             CourseAccessRole.objects.filter(user=user).delete()
 
-            comments_user = cc.User.from_django_user(user)
-            comments_user.delete()
+            try:
+                comments_user = cc.User.from_django_user(user)
+                comments_user.delete()
+            except Exception as e:
+                log.error("Failed to delete cs_comments_service user {0}. Error {1}".format(
+                    user,
+                    str(e)))
 
             # remove organizations and microsites
             for org in user.organizations.all():
