@@ -36,6 +36,7 @@
             NewPostView.prototype.initialize = function(options) {
                 var _ref;
                 this.mode = options.mode || 'inline';
+                this.startHeader = options.startHeader;
                 if ((_ref = this.mode) !== 'tab' && _ref !== 'inline') {
                     throw new Error('invalid mode: ' + this.mode);
                 }
@@ -45,12 +46,14 @@
             };
 
             NewPostView.prototype.render = function() {
-                var context, threadTypeTemplate;
+                var context,
+                    threadTypeTemplate;
                 context = _.clone(this.course_settings.attributes);
                 _.extend(context, {
                     cohort_options: this.getCohortOptions(),
                     is_commentable_cohorted: this.is_commentable_cohorted,
                     mode: this.mode,
+                    startHeader: this.startHeader,
                     form_id: this.mode + (this.topicId ? '-' + this.topicId : '')
                 });
                 this.$el.html(_.template($('#new-post-template').html())(context));

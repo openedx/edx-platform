@@ -17,7 +17,13 @@ from django.shortcuts import render_to_response
 from django.template.loader import render_to_string
 from django.utils.translation import get_language_bidi
 from django.views.decorators.http import require_GET
-import newrelic.agent
+
+log = logging.getLogger("edx.discussions")
+try:
+    import newrelic.agent
+except ImportError:
+    newrelic = None  # pylint: disable=invalid-name
+
 from rest_framework import status
 
 from web_fragments.fragment import Fragment
@@ -51,13 +57,27 @@ from util.enterprise_helpers import data_sharing_consent_required
 
 from opaque_keys.edx.keys import CourseKey
 
+from contextlib import contextmanager
+
 THREADS_PER_PAGE = 20
 INLINE_THREADS_PER_PAGE = 20
 PAGES_NEARBY_DELTA = 2
-log = logging.getLogger("edx.discussions")
 
 
-@newrelic.agent.function_trace()
+@contextmanager
+def newrelic_function_trace(function_name):
+    """
+    A wrapper context manager newrelic.agent.FunctionTrace to no-op if the
+    newrelic package is not installed
+    """
+    if newrelic:
+        nr_transaction = newrelic.agent.current_transaction()
+        with newrelic.agent.FunctionTrace(nr_transaction, function_name):
+            yield
+    else:
+        yield
+
+
 def make_course_settings(course, user):
     """
     Generate a JSON-serializable model for course settings, which will be used to initialize a
@@ -72,7 +92,6 @@ def make_course_settings(course, user):
     }
 
 
-@newrelic.agent.function_trace()
 def get_threads(request, course, user_info, discussion_id=None, per_page=THREADS_PER_PAGE):
     """
     This may raise an appropriate subclass of cc.utils.CommentClientError
@@ -186,7 +205,6 @@ def inline_discussion(request, course_key, discussion_id):
     """
     Renders JSON for DiscussionModules
     """
-    nr_transaction = newrelic.agent.current_transaction()
 
     course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
     cc_user = cc.User.from_django_user(request.user)
@@ -197,12 +215,14 @@ def inline_discussion(request, course_key, discussion_id):
     except ValueError:
         return HttpResponseServerError("Invalid group_id")
 
-    with newrelic.agent.FunctionTrace(nr_transaction, "get_metadata_for_threads"):
+    with newrelic_function_trace("get_metadata_for_threads"):
         annotated_content_info = utils.get_metadata_for_threads(course_key, threads, request.user, user_info)
+
     is_staff = has_permission(request.user, 'openclose_thread', course.id)
     threads = [utils.prepare_content(thread, course_key, is_staff) for thread in threads]
-    with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
+    with newrelic_function_trace("add_courseware_context"):
         add_courseware_context(threads, course, request.user)
+
     return utils.JsonResponse({
         'is_commentable_cohorted': is_commentable_cohorted(course_key, discussion_id),
         'discussion_data': threads,
@@ -222,8 +242,6 @@ def forum_form_discussion(request, course_key):
     """
     Renders the main Discussion page, potentially filtered by a search query
     """
-    nr_transaction = newrelic.agent.current_transaction()
-
     course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
     if request.is_ajax():
         user = cc.User.from_django_user(request.user)
@@ -238,10 +256,10 @@ def forum_form_discussion(request, course_key):
         except ValueError:
             return HttpResponseServerError("Invalid group_id")
 
-        with newrelic.agent.FunctionTrace(nr_transaction, "get_metadata_for_threads"):
+        with newrelic_function_trace("get_metadata_for_threads"):
             annotated_content_info = utils.get_metadata_for_threads(course_key, threads, request.user, user_info)
 
-        with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
+        with newrelic_function_trace("add_courseware_context"):
             add_courseware_context(threads, course, request.user)
 
         return utils.JsonResponse({
@@ -269,8 +287,6 @@ def single_thread(request, course_key, discussion_id, thread_id):
 
     Depending on the HTTP headers, we'll adjust our response accordingly.
     """
-    nr_transaction = newrelic.agent.current_transaction()
-
     course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
 
     if request.is_ajax():
@@ -282,7 +298,7 @@ def single_thread(request, course_key, discussion_id, thread_id):
         if not thread:
             raise Http404
 
-        with newrelic.agent.FunctionTrace(nr_transaction, "get_annotated_content_infos"):
+        with newrelic_function_trace("get_annotated_content_infos"):
             annotated_content_info = utils.get_annotated_content_infos(
                 course_key,
                 thread,
@@ -291,7 +307,7 @@ def single_thread(request, course_key, discussion_id, thread_id):
             )
 
         content = utils.prepare_content(thread.to_dict(), course_key, is_staff)
-        with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
+        with newrelic_function_trace("add_courseware_context"):
             add_courseware_context([content], course, request.user)
 
         return utils.JsonResponse({
@@ -376,7 +392,6 @@ def _create_discussion_board_context(request, course_key, discussion_id=None, th
     """
     Returns the template context for rendering the discussion board.
     """
-    nr_transaction = newrelic.agent.current_transaction()
     context = _create_base_discussion_view_context(request, course_key)
     course = context['course']
     course_settings = context['course_settings']
@@ -405,13 +420,13 @@ def _create_discussion_board_context(request, course_key, discussion_id=None, th
     is_staff = has_permission(user, 'openclose_thread', course.id)
     threads = [utils.prepare_content(thread, course_key, is_staff) for thread in threads]
 
-    with newrelic.agent.FunctionTrace(nr_transaction, "get_metadata_for_threads"):
+    with newrelic_function_trace("get_metadata_for_threads"):
         annotated_content_info = utils.get_metadata_for_threads(course_key, threads, user, user_info)
 
-    with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
+    with newrelic_function_trace("add_courseware_context"):
         add_courseware_context(threads, course, user)
 
-    with newrelic.agent.FunctionTrace(nr_transaction, "get_cohort_info"):
+    with newrelic_function_trace("get_cohort_info"):
         user_cohort_id = get_cohort_id(user, course_key)
 
     context.update({
@@ -439,9 +454,6 @@ def user_profile(request, course_key, user_id):
     Renders a response to display the user profile page (shown after clicking
     on a post author's username).
     """
-
-    nr_transaction = newrelic.agent.current_transaction()
-
     user = cc.User.from_django_user(request.user)
     course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
 
@@ -470,13 +482,13 @@ def user_profile(request, course_key, user_id):
         query_params['page'] = page
         query_params['num_pages'] = num_pages
 
-        with newrelic.agent.FunctionTrace(nr_transaction, "get_metadata_for_threads"):
+        with newrelic_function_trace("get_metadata_for_threads"):
             user_info = cc.User.from_django_user(request.user).to_dict()
             annotated_content_info = utils.get_metadata_for_threads(course_key, threads, request.user, user_info)
 
         is_staff = has_permission(request.user, 'openclose_thread', course.id)
         threads = [utils.prepare_content(thread, course_key, is_staff) for thread in threads]
-        with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
+        with newrelic_function_trace("add_courseware_context"):
             add_courseware_context(threads, course, request.user)
         if request.is_ajax():
             return utils.JsonResponse({
@@ -490,7 +502,7 @@ def user_profile(request, course_key, user_id):
                 course_id=course.id
             ).order_by("name").values_list("name", flat=True).distinct()
 
-            with newrelic.agent.FunctionTrace(nr_transaction, "get_cohort_info"):
+            with newrelic_function_trace("get_cohort_info"):
                 user_cohort_id = get_cohort_id(request.user, course_key)
 
             context = _create_base_discussion_view_context(request, course_key)
@@ -518,9 +530,6 @@ def followed_threads(request, course_key, user_id):
     """
     Ajax-only endpoint retrieving the threads followed by a specific user.
     """
-
-    nr_transaction = newrelic.agent.current_transaction()
-
     course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
     try:
         profiled_user = cc.User(id=user_id, course_id=course_key)
@@ -561,7 +570,7 @@ def followed_threads(request, course_key, user_id):
         query_params['num_pages'] = paginated_results.num_pages
         user_info = cc.User.from_django_user(request.user).to_dict()
 
-        with newrelic.agent.FunctionTrace(nr_transaction, "get_metadata_for_threads"):
+        with newrelic_function_trace("get_metadata_for_threads"):
             annotated_content_info = utils.get_metadata_for_threads(
                 course_key,
                 paginated_results.collection,

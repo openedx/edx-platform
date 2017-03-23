@@ -11,7 +11,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 from ..api import get_block_structure_manager
 from ..config import INVALIDATE_CACHE_ON_PUBLISH
-from ..signals import _listen_for_course_publish
+from ..signals import _update_block_structure_on_course_publish
 from .helpers import is_course_in_block_structure_cache, override_config_setting
 
 
@@ -76,7 +76,7 @@ class CourseBlocksSignalTest(ModuleStoreTestCase):
         (LibraryLocator(org='org', course='course'), False),
     )
     @ddt.unpack
-    @patch('openedx.core.djangoapps.content.block_structure.tasks.update_course_in_cache.apply_async')
+    @patch('openedx.core.djangoapps.content.block_structure.tasks.update_course_in_cache_v2.apply_async')
     def test_update_only_for_courses(self, key, expect_update_called, mock_update):
-        _listen_for_course_publish(sender=None, course_key=key)
+        _update_block_structure_on_course_publish(sender=None, course_key=key)
         self.assertEqual(mock_update.called, expect_update_called)

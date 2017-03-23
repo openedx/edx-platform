@@ -226,10 +226,13 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
         Test behaviour of a dropdown field.
         """
         self.assertEqual(self.account_settings_page.title_for_field(field_id), title)
-        self.assertEqual(self.account_settings_page.value_for_dropdown_field(field_id), initial_value)
+        self.assertEqual(self.account_settings_page.value_for_dropdown_field(field_id, focus_out=True), initial_value)
 
         for new_value in new_values:
-            self.assertEqual(self.account_settings_page.value_for_dropdown_field(field_id, new_value), new_value)
+            self.assertEqual(
+                self.account_settings_page.value_for_dropdown_field(field_id, new_value, focus_out=True),
+                new_value
+            )
             # An XHR request is made when changing the field
             self.account_settings_page.wait_for_ajax()
             if reloads_on_save:
@@ -237,7 +240,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
             else:
                 self.browser.refresh()
                 self.account_settings_page.wait_for_page()
-            self.assertEqual(self.account_settings_page.value_for_dropdown_field(field_id), new_value)
+            self.assertEqual(self.account_settings_page.value_for_dropdown_field(field_id, focus_out=True), new_value)
 
     def _test_link_field(self, field_id, title, link_title, field_type, success_message):
         """
@@ -387,7 +390,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
         Test behaviour of "Year of Birth" field.
         """
         # Note that when we clear the year_of_birth here we're firing an event.
-        self.assertEqual(self.account_settings_page.value_for_dropdown_field('year_of_birth', ''), '')
+        self.assertEqual(self.account_settings_page.value_for_dropdown_field('year_of_birth', '', focus_out=True), '')
 
         expected_events = [
             self.expected_settings_changed_event('year_of_birth', None, 1980),

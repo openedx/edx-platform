@@ -105,55 +105,81 @@
   .hd-3 {
     color: palette(grayscale, dark);
     min-height: ($baseline*3);
-    line-height: 1;
+    line-height: 1.15;
   }
 
-  .certificate-status {
-    margin-bottom: 0;
+  .status-text {
+    display: flex;
+    margin-bottom: 5px;
 
-    .status-text {
-      font-size: font-size(x-small);
-      color: palette(grayscale, dark);
-      line-height: 1;
+    .number-status {
+      text-align: center;
+      width: 100%;
+      float: left;
+      padding: {
+        left: 5px;
+        right: 5px;
+        bottom: 8px;
+      }
+      margin-top: -8px;
+      font-size: 1em;
+      font-family: $f-sans-serif;
     }
 
-    .secondary {
-      @extend %hide-until-focus;
+    .number-circle {
+      padding-top: 1px;
+      border-radius: 50%;
+      margin-left: auto;
+      margin-right: auto;
+      width: 23px;
+      height: 23px;
+      color: white;
+      text-align: center;
+      font-size: 0.9375em;
+      font-family: $f-sans-serif;
+      font-weight: bold;
     }
 
-    .status-text {
-      &:focus,
-      &:active {
-        position: relative;
-        top: 4px;
-        width: auto;
-        height: auto;
-        margin: 0;
-        text-decoration: none;
+    .completed {
+      background: $blue;
+    }
 
-        & ~ .status-text {
-          @extend %hide-until-focus;
+    .enrolled {
+      background: $green;
+    }
+
+    .not-enrolled {
+      background: palette(grayscale, dark);
+    }
+  }
+
+  .progress-container {
+    max-width: inherit;
+
+    .progress-bar {
+      height: 5px;
+      display: flex;
+      width: 100%;
+
+      .item {
+        width: 100%;
+        margin-right: 2px;
+        height: 5px;
+
+        &.completed {
+          background: $blue;
+        }
+        &.enrolled {
+          background: $green;
+        }
+        &.not-enrolled {
+          background: lightgray;
+        }
+        &.not-enrolled:last-of-type {
+          margin-right: 0;
         }
       }
     }
   }
 
-  .progress {
-    height: 5px;
-    background: palette(grayscale, back);
-
-    .bar {
-      @include float(left);
-      height: 100%;
-      position: relative;
-
-      &.complete {
-        background: palette(success, accent);
-      }
-
-      &.in-progress {
-        background: palette(warning, accent);
-      }
-    }
-  }
 }

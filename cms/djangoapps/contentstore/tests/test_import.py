@@ -41,7 +41,7 @@ class ContentStoreImportTest(SignalDisconnectTestMixin, ModuleStoreTestCase):
         self.client.login(username=self.user.username, password=self.user_password)
 
         # block_structure.update_course_in_cache cannot succeed in tests, as it needs to be run async on an lms worker
-        self.task_patcher = patch('openedx.core.djangoapps.content.block_structure.tasks.update_course_in_cache')
+        self.task_patcher = patch('openedx.core.djangoapps.content.block_structure.tasks.update_course_in_cache_v2')
         self._mock_lms_task = self.task_patcher.start()
 
     def tearDown(self):

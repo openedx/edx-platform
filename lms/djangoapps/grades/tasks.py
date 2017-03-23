@@ -3,13 +3,17 @@ This module contains tasks for asynchronous execution of grade updates.
 """
 
 from celery import task
-from celery.exceptions import Retry
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db.utils import DatabaseError
 from logging import getLogger
-import newrelic.agent
+
+log = getLogger(__name__)
+try:
+    import newrelic.agent
+except ImportError:
+    newrelic = None  # pylint: disable=invalid-name
 
 from celery_utils.logged_task import LoggedTask
 from celery_utils.persist_on_failure import PersistOnFailureTask
@@ -29,8 +33,6 @@ from .constants import ScoreDatabaseTableEnum
 from .new.subsection_grade import SubsectionGradeFactory
 from .signals.signals import SUBSECTION_SCORE_CHANGED
 from .transformer import GradesTransformer
-
-log = getLogger(__name__)
 
 
 class DatabaseNotReadyError(IOError):
@@ -54,6 +56,14 @@ class _BaseTask(PersistOnFailureTask, LoggedTask):  # pylint: disable=abstract-m
     Include persistence features, as well as logging of task invocation.
     """
     abstract = True
+
+
+@task
+def compute_grades_for_course(course_key, offset, batch_size):  # pylint: disable=unused-argument
+    """
+    TODO: TNL-6690: Fill this task in and remove pylint disables
+    """
+    pass
 
 
 @task(bind=True, base=_BaseTask, default_retry_delay=30, routing_key=settings.RECALCULATE_GRADES_ROUTING_KEY)
@@ -92,8 +102,9 @@ def _recalculate_subsection_grade(self, **kwargs):
         course_key = CourseLocator.from_string(kwargs['course_id'])
         scored_block_usage_key = UsageKey.from_string(kwargs['usage_id']).replace(course_key=course_key)
 
-        newrelic.agent.add_custom_parameter('course_id', unicode(course_key))
-        newrelic.agent.add_custom_parameter('usage_id', unicode(scored_block_usage_key))
+        if newrelic:
+            newrelic.agent.add_custom_parameter('course_id', unicode(course_key))
+            newrelic.agent.add_custom_parameter('usage_id', unicode(scored_block_usage_key))
 
         # The request cache is not maintained on celery workers,
         # where this code runs. So we take the values from the

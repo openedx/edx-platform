@@ -8,7 +8,6 @@ import logging
 from collections import OrderedDict
 from functools import partial
 
-import newrelic.agent
 from capa.xqueue_interface import XQueueInterface
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -33,7 +32,7 @@ from xblock.reference.plugins import FSService
 import static_replace
 from courseware.access import has_access, get_user_role
 from courseware.entrance_exams import (
-    user_must_complete_entrance_exam,
+    user_can_skip_entrance_exam,
     user_has_passed_entrance_exam
 )
 from courseware.masquerade import (
@@ -82,6 +81,10 @@ from .field_overrides import OverrideFieldData
 
 log = logging.getLogger(__name__)
 
+try:
+    import newrelic.agent
+except ImportError:
+    newrelic = None  # pylint: disable=invalid-name
 
 if settings.XQUEUE_INTERFACE.get('basic_auth') is not None:
     REQUESTS_AUTH = HTTPBasicAuth(*settings.XQUEUE_INTERFACE['basic_auth'])
@@ -164,7 +167,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
         required_content = milestones_helpers.get_required_content(course, user)
 
         # The user may not actually have to complete the entrance exam, if one is required
-        if not user_must_complete_entrance_exam(request, user, course):
+        if user_can_skip_entrance_exam(user, course):
             required_content = [content for content in required_content if not content == course.entrance_exam_id]
 
         previous_of_active_section, next_of_active_section = None, None
@@ -967,9 +970,10 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
     except InvalidKeyError:
         raise Http404
 
-    # Gather metrics for New Relic so we can slice data in New Relic Insights
-    newrelic.agent.add_custom_parameter('course_id', unicode(course_key))
-    newrelic.agent.add_custom_parameter('org', unicode(course_key.org))
+    if newrelic:
+        # Gather metrics for New Relic so we can slice data in New Relic Insights
+        newrelic.agent.add_custom_parameter('course_id', unicode(course_key))
+        newrelic.agent.add_custom_parameter('org', unicode(course_key.org))
 
     with modulestore().bulk_operations(course_key):
         instance, tracking_context = get_module_by_usage_id(request, course_id, usage_id, course=course)
@@ -979,7 +983,8 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
         # "handler" in those cases is always just "xmodule_handler".
         nr_tx_name = "{}.{}".format(instance.__class__.__name__, handler)
         nr_tx_name += "/{}".format(suffix) if (suffix and handler == "xmodule_handler") else ""
-        newrelic.agent.set_transaction_name(nr_tx_name, group="Python/XBlock/Handler")
+        if newrelic:
+            newrelic.agent.set_transaction_name(nr_tx_name, group="Python/XBlock/Handler")
 
         tracking_context_name = 'module_callback_handler'
         req = django_to_webob_request(request)
@@ -990,7 +995,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
                         and course \
                         and getattr(course, 'entrance_exam_enabled', False) \
                         and getattr(instance, 'in_entrance_exam', False):
-                    ee_data = {'entrance_exam_passed': user_has_passed_entrance_exam(request, course)}
+                    ee_data = {'entrance_exam_passed': user_has_passed_entrance_exam(request.user, course)}
                     resp = append_data_to_webob_response(resp, ee_data)
 
         except NoSuchHandlerError:
