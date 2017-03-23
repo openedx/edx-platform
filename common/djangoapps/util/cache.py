@@ -61,6 +61,11 @@ def cache_if_anonymous(*get_parameters):
                 # Use the cache. The same view accessed through different domain names may
                 # return different things, so include the domain name in the key.
                 domain = str(request.META.get('HTTP_HOST')) + '.'
+                # This is used to clear the cache for old SiteConfigrations.
+                # Once a SiteConfiguration is saved it will create a new SiteConfigurationHistory
+                # row. We use this to break the cache since we need to load the new resources. We rely on
+                # memcached to reap the old entries from it's datastore once they are expired
+                version = request.site.configuration_histories.count() or 1
                 cache_key = domain + "cache_if_anonymous." + get_language() + '.' + request.path
 
                 # Include the values of GET parameters in the cache key.
@@ -73,10 +78,10 @@ def cache_if_anonymous(*get_parameters):
                             get_parameter: unicode(parameter_value).encode('utf-8')
                         })
 
-                response = cache.get(cache_key)  # pylint: disable=maybe-no-member
+                response = cache.get(cache_key, version=version)  # pylint: disable=maybe-no-member
                 if not response:
                     response = view_func(request, *args, **kwargs)
-                    cache.set(cache_key, response, 60 * 3)  # pylint: disable=maybe-no-member
+                    cache.set(cache_key, response, 60 * 3, version=version)  # pylint: disable=maybe-no-member
 
                 return response
 
