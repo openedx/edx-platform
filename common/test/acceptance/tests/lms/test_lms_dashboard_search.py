@@ -9,7 +9,7 @@ from common.test.acceptance.pages.common.logout import LogoutPage
 from common.test.acceptance.pages.common.utils import click_css
 from common.test.acceptance.pages.studio.utils import add_html_component, type_in_codemirror
 from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
-from common.test.acceptance.pages.studio.overview import CourseOutlinePage
+from common.test.acceptance.pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
 from common.test.acceptance.pages.studio.container import ContainerPage
 from common.test.acceptance.pages.lms.dashboard_search import DashboardSearchPage
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
@@ -60,10 +60,10 @@ class DashboardSearchTest(AcceptanceTest):
         }
 
         # generate course fixtures and outline pages
-        self.course_outlines = {}
+        self.studio_course_outlines = {}
         self.course_fixtures = {}
         for key, course_info in self.courses.iteritems():
-            course_outline = CourseOutlinePage(
+            studio_course_outline = StudioCourseOutlinePage(
                 self.browser,
                 course_info['org'],
                 course_info['number'],
@@ -89,7 +89,7 @@ class DashboardSearchTest(AcceptanceTest):
                 )
             ).install()
 
-            self.course_outlines[key] = course_outline
+            self.studio_course_outlines[key] = studio_course_outline
             self.course_fixtures[key] = course_fix
 
     def tearDown(self):
@@ -106,13 +106,13 @@ class DashboardSearchTest(AcceptanceTest):
         LogoutPage(self.browser).visit()
         AutoAuthPage(self.browser, username=username, email=email, staff=staff).visit()
 
-    def _studio_add_content(self, course_outline, html_content):
+    def _studio_add_content(self, studio_course_outline, html_content):
         """
         Add content to first section on studio course page.
         """
         # create a unit in course outline
-        course_outline.visit()
-        subsection = course_outline.section_at(0).subsection_at(0)
+        studio_course_outline.visit()
+        subsection = studio_course_outline.section_at(0).subsection_at(0)
         subsection.expand_subsection()
         subsection.add_unit()
 
@@ -126,12 +126,12 @@ class DashboardSearchTest(AcceptanceTest):
         type_in_codemirror(unit_page, 0, html_content)
         click_css(unit_page, '.action-save', 0)
 
-    def _studio_publish_content(self, course_outline):
+    def _studio_publish_content(self, studio_course_outline):
         """
         Publish content in first section on studio course page.
         """
-        course_outline.visit()
-        subsection = course_outline.section_at(0).subsection_at(0)
+        studio_course_outline.visit()
+        subsection = studio_course_outline.section_at(0).subsection_at(0)
         subsection.expand_subsection()
         unit = subsection.unit_at(0)
         unit.publish()
@@ -167,9 +167,9 @@ class DashboardSearchTest(AcceptanceTest):
 
         # Create content in studio without publishing.
         self._auto_auth(self.STAFF_USERNAME, self.STAFF_EMAIL, True)
-        self._studio_add_content(self.course_outlines['A'], html_content)
-        self._studio_add_content(self.course_outlines['B'], html_content)
-        self._studio_add_content(self.course_outlines['C'], html_content)
+        self._studio_add_content(self.studio_course_outlines['A'], html_content)
+        self._studio_add_content(self.studio_course_outlines['B'], html_content)
+        self._studio_add_content(self.studio_course_outlines['C'], html_content)
 
         # Do a search, there should be no results shown.
         self._auto_auth(self.USERNAME, self.EMAIL, False)
@@ -179,9 +179,9 @@ class DashboardSearchTest(AcceptanceTest):
 
         # Publish in studio to trigger indexing.
         self._auto_auth(self.STAFF_USERNAME, self.STAFF_EMAIL, True)
-        self._studio_publish_content(self.course_outlines['A'])
-        self._studio_publish_content(self.course_outlines['B'])
-        self._studio_publish_content(self.course_outlines['C'])
+        self._studio_publish_content(self.studio_course_outlines['A'])
+        self._studio_publish_content(self.studio_course_outlines['B'])
+        self._studio_publish_content(self.studio_course_outlines['C'])
 
         # Do the search again, this time we expect results from courses A & B, but not C
         self._auto_auth(self.USERNAME, self.EMAIL, False)

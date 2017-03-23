@@ -8,9 +8,9 @@ import requests
 from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage as StudioAutoAuthPage
 from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage as LmsAutoAuthPage
 from common.test.acceptance.pages.lms.bookmarks import BookmarksPage
+from common.test.acceptance.pages.lms.course_home import CourseHomePage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
-from common.test.acceptance.pages.lms.course_nav import CourseNavPage
-from common.test.acceptance.pages.studio.overview import CourseOutlinePage
+from common.test.acceptance.pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
 from common.test.acceptance.pages.common.logout import LogoutPage
 from common.test.acceptance.pages.common import BASE_URL
 
@@ -24,6 +24,40 @@ class BookmarksTestMixin(EventsTestMixin, UniqueCourseTest):
     """
     USERNAME = "STUDENT"
     EMAIL = "student@example.com"
+
+    def setUp(self):
+        super(BookmarksTestMixin, self).setUp()
+
+        self.studio_course_outline_page = StudioCourseOutlinePage(
+            self.browser,
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        )
+
+        self.courseware_page = CoursewarePage(self.browser, self.course_id)
+        self.course_home_page = CourseHomePage(self.browser, self.course_id)
+        self.bookmarks_page = BookmarksPage(self.browser, self.course_id)
+
+        # Get session to be used for bookmarking units
+        self.session = requests.Session()
+        params = {'username': self.USERNAME, 'email': self.EMAIL, 'course_id': self.course_id}
+        response = self.session.get(BASE_URL + "/auto_auth", params=params)
+        self.assertTrue(response.ok, "Failed to get session")
+
+    def setup_test(self, num_chapters=2):
+        """
+        Setup test settings.
+
+        Arguments:
+            num_chapters: number of chapters to create in course
+        """
+        self.create_course_fixture(num_chapters)
+
+        # Auto-auth register for the course.
+        LmsAutoAuthPage(self.browser, username=self.USERNAME, email=self.EMAIL, course_id=self.course_id).visit()
+
+        self.courseware_page.visit()
 
     def create_course_fixture(self, num_chapters):
         """
@@ -59,50 +93,6 @@ class BookmarksTestMixin(EventsTestMixin, UniqueCourseTest):
         actual_events = self.wait_for_events(event_filter={'event_type': event_type}, number_of_matches=1)
         self.assert_events_match(event_data, actual_events)
 
-
-@attr(shard=8)
-class BookmarksTest(BookmarksTestMixin):
-    """
-    Tests to verify bookmarks functionality.
-    """
-
-    def setUp(self):
-        """
-        Initialize test setup.
-        """
-        super(BookmarksTest, self).setUp()
-
-        self.course_outline_page = CourseOutlinePage(
-            self.browser,
-            self.course_info['org'],
-            self.course_info['number'],
-            self.course_info['run']
-        )
-
-        self.courseware_page = CoursewarePage(self.browser, self.course_id)
-        self.bookmarks_page = BookmarksPage(self.browser, self.course_id)
-        self.course_nav = CourseNavPage(self.browser)
-
-        # Get session to be used for bookmarking units
-        self.session = requests.Session()
-        params = {'username': self.USERNAME, 'email': self.EMAIL, 'course_id': self.course_id}
-        response = self.session.get(BASE_URL + "/auto_auth", params=params)
-        self.assertTrue(response.ok, "Failed to get session")
-
-    def _test_setup(self, num_chapters=2):
-        """
-        Setup test settings.
-
-        Arguments:
-            num_chapters: number of chapters to create in course
-        """
-        self.create_course_fixture(num_chapters)
-
-        # Auto-auth register for the course.
-        LmsAutoAuthPage(self.browser, username=self.USERNAME, email=self.EMAIL, course_id=self.course_id).visit()
-
-        self.courseware_page.visit()
-
     def _bookmark_unit(self, location):
         """
         Bookmark a unit
@@ -124,7 +114,7 @@ class BookmarksTest(BookmarksTestMixin):
         )
         self.assertTrue(response.ok, "Failed to bookmark unit")
 
-    def _bookmark_units(self, num_units):
+    def bookmark_units(self, num_units):
         """
         Bookmark first `num_units` units
 
@@ -134,6 +124,19 @@ class BookmarksTest(BookmarksTestMixin):
         xblocks = self.course_fixture.get_nested_xblocks(category="vertical")
         for index in range(num_units):
             self._bookmark_unit(xblocks[index].locator)
+
+
+@attr(shard=8)
+class BookmarksTest(BookmarksTestMixin):
+    """
+    Tests to verify bookmarks functionality.
+    """
+
+    def setUp(self):
+        """
+        Initialize test setup.
+        """
+        super(BookmarksTest, self).setUp()
 
     def _breadcrumb(self, num_units, modified_name=None):
         """
@@ -166,10 +169,10 @@ class BookmarksTest(BookmarksTestMixin):
         ).visit()
 
         # Visit course outline page in studio.
-        self.course_outline_page.visit()
-        self.course_outline_page.wait_for_page()
+        self.studio_course_outline_page.visit()
+        self.studio_course_outline_page.wait_for_page()
 
-        self.course_outline_page.section_at(index).delete()
+        self.studio_course_outline_page.section_at(index).delete()
 
         # Logout and login as a student.
         LogoutPage(self.browser).visit()
@@ -187,7 +190,7 @@ class BookmarksTest(BookmarksTestMixin):
         self.courseware_page.click_bookmark_unit_button()
         self.assertEqual(self.courseware_page.bookmark_icon_visible, bookmark_icon_state)
         self.assertEqual(self.courseware_page.bookmark_button_state, bookmark_button_state)
-        self.bookmarks_page.click_bookmarks_button()
+        self.bookmarks_page.visit()
         self.assertEqual(self.bookmarks_page.count(), bookmarked_count)
 
     def _verify_pagination_info(
@@ -209,14 +212,6 @@ class BookmarksTest(BookmarksTestMixin):
         self.assertEqual(self.bookmarks_page.get_current_page_number(), current_page_number)
         self.assertEqual(self.bookmarks_page.get_total_pages, total_pages)
 
-    def _navigate_to_bookmarks_list(self):
-        """
-        Navigates and verifies the bookmarks list page.
-        """
-        self.bookmarks_page.click_bookmarks_button()
-        self.assertTrue(self.bookmarks_page.results_present())
-        self.assertEqual(self.bookmarks_page.results_header_text(), 'My Bookmarks')
-
     def _verify_breadcrumbs(self, num_units, modified_name=None):
         """
         Verifies the breadcrumb trail.
@@ -232,11 +227,11 @@ class BookmarksTest(BookmarksTestMixin):
         """
         Update and publish the block/unit display name.
         """
-        self.course_outline_page.visit()
-        self.course_outline_page.wait_for_page()
+        self.studio_course_outline_page.visit()
+        self.studio_course_outline_page.wait_for_page()
 
-        self.course_outline_page.expand_all_subsections()
-        section = self.course_outline_page.section_at(0)
+        self.studio_course_outline_page.expand_all_subsections()
+        section = self.studio_course_outline_page.section_at(0)
         container_page = section.subsection_at(0).unit_at(0).go_to()
 
         self.course_fixture._update_xblock(container_page.locator, {  # pylint: disable=protected-access
@@ -265,34 +260,41 @@ class BookmarksTest(BookmarksTestMixin):
             Then I click again on the bookmark button
             And I should see a unit un-bookmarked
         """
-        self._test_setup()
+        self.setup_test()
         for index in range(2):
-            self.course_nav.go_to_section('TestSection{}'.format(index), 'TestSubsection{}'.format(index))
+            self.course_home_page.visit()
+            self.course_home_page.outline.go_to_section('TestSection{}'.format(index), 'TestSubsection{}'.format(index))
 
             self._toggle_bookmark_and_verify(True, 'bookmarked', 1)
-            self.bookmarks_page.click_bookmarks_button(False)
+            self.course_home_page.visit()
+            self.course_home_page.outline.go_to_section('TestSection{}'.format(index), 'TestSubsection{}'.format(index))
             self._toggle_bookmark_and_verify(False, '', 0)
+
+    # TODO: TNL-6546: Remove this test
+    def test_courseware_bookmarks_button(self):
+        """
+        Scenario: (Temporarily) test that the courseware's "Bookmarks" button works.
+        """
+        self.setup_test()
+        self.bookmark_units(2)
+        self.courseware_page.visit()
+        self.courseware_page.click_bookmarks_button()
+        self.assertTrue(self.bookmarks_page.is_browser_on_page())
 
     def test_empty_bookmarks_list(self):
         """
         Scenario: An empty bookmarks list is shown if there are no bookmarked units.
 
         Given that I am a registered user
-        And I visit my courseware page
-        And I can see the Bookmarks button
-        When I click on Bookmarks button
+        And I visit my bookmarks page
         Then I should see an empty bookmarks list
         And empty bookmarks list content is correct
         """
-        self._test_setup()
-        self.assertTrue(self.bookmarks_page.bookmarks_button_visible())
-        self.bookmarks_page.click_bookmarks_button()
-        self.assertEqual(self.bookmarks_page.results_header_text(), 'My Bookmarks')
-        self.assertEqual(self.bookmarks_page.empty_header_text(), 'You have not bookmarked any courseware pages yet.')
-
-        empty_list_text = ("Use bookmarks to help you easily return to courseware pages. To bookmark a page, "
-                           "select Bookmark in the upper right corner of that page. To see a list of all your "
-                           "bookmarks, select Bookmarks in the upper left corner of any courseware page.")
+        self.setup_test()
+        self.bookmarks_page.visit()
+        empty_list_text = (
+            'Use bookmarks to help you easily return to courseware pages. '
+            'To bookmark a page, click "Bookmark this page" under the page title.')
         self.assertEqual(self.bookmarks_page.empty_list_text(), empty_list_text)
 
     def test_bookmarks_list(self):
@@ -300,18 +302,16 @@ class BookmarksTest(BookmarksTestMixin):
         Scenario: A bookmarks list is shown if there are bookmarked units.
 
         Given that I am a registered user
-        And I visit my courseware page
         And I have bookmarked 2 units
-        When I click on Bookmarks button
+        And I visit my bookmarks page
         Then I should see a bookmarked list with 2 bookmark links
         And breadcrumb trail is correct for a bookmark
         When I click on bookmarked link
         Then I can navigate to correct bookmarked unit
         """
-        self._test_setup()
-        self._bookmark_units(2)
-
-        self._navigate_to_bookmarks_list()
+        self.setup_test()
+        self.bookmark_units(2)
+        self.bookmarks_page.visit()
         self._verify_breadcrumbs(num_units=2)
 
         self._verify_pagination_info(
@@ -328,11 +328,10 @@ class BookmarksTest(BookmarksTestMixin):
         xblock_usage_ids = [xblock.locator for xblock in xblocks]
         # Verify link navigation
         for index in range(2):
+            self.bookmarks_page.visit()
             self.bookmarks_page.click_bookmarked_block(index)
             self.courseware_page.wait_for_page()
             self.assertIn(self.courseware_page.active_usage_id(), xblock_usage_ids)
-            self.courseware_page.visit().wait_for_page()
-            self.bookmarks_page.click_bookmarks_button()
 
     def test_bookmark_shows_updated_breadcrumb_after_publish(self):
         """
@@ -344,16 +343,14 @@ class BookmarksTest(BookmarksTestMixin):
         Then I visit unit page in studio
         Then I change unit display_name
         And I publish the changes
-        Then I visit my courseware page
-        And I visit bookmarks list page
+        Then I visit my bookmarks page
         When I see the bookmark
-        Then I can see the breadcrumb trail
-        with updated display_name.
+        Then I can see the breadcrumb trail has the updated display_name.
         """
-        self._test_setup(num_chapters=1)
-        self._bookmark_units(num_units=1)
+        self.setup_test(num_chapters=1)
+        self.bookmark_units(num_units=1)
 
-        self._navigate_to_bookmarks_list()
+        self.bookmarks_page.visit()
         self._verify_breadcrumbs(num_units=1)
 
         LogoutPage(self.browser).visit()
@@ -370,9 +367,8 @@ class BookmarksTest(BookmarksTestMixin):
 
         LogoutPage(self.browser).visit()
         LmsAutoAuthPage(self.browser, username=self.USERNAME, email=self.EMAIL, course_id=self.course_id).visit()
-        self.courseware_page.visit()
 
-        self._navigate_to_bookmarks_list()
+        self.bookmarks_page.visit()
         self._verify_breadcrumbs(num_units=1, modified_name=modified_name)
 
     def test_unreachable_bookmark(self):
@@ -380,19 +376,18 @@ class BookmarksTest(BookmarksTestMixin):
         Scenario: We should get a HTTP 404 for an unreachable bookmark.
 
         Given that I am a registered user
-        And I visit my courseware page
         And I have bookmarked 2 units
-        Then I delete a bookmarked unit
-        Then I click on Bookmarks button
-        And I should see a bookmarked list
-        When I click on deleted bookmark
+        And I delete a bookmarked unit
+        And I visit my bookmarks page
+        Then I should see a bookmarked list
+        When I click on the deleted bookmark
         Then I should navigated to 404 page
         """
-        self._test_setup(num_chapters=1)
-        self._bookmark_units(1)
+        self.setup_test(num_chapters=1)
+        self.bookmark_units(1)
         self._delete_section(0)
 
-        self._navigate_to_bookmarks_list()
+        self.bookmarks_page.visit()
 
         self._verify_pagination_info(
             bookmark_count_on_current_page=1,
@@ -411,15 +406,14 @@ class BookmarksTest(BookmarksTestMixin):
         Scenario: We can't get bookmarks more than default page size.
 
         Given that I am a registered user
-        And I visit my courseware page
         And I have bookmarked all the 11 units available
-        Then I click on Bookmarks button
-        And I should see a bookmarked list
-        And bookmark list contains 10 bookmarked items
+        And I visit my bookmarks page
+        Then I should see a bookmarked list
+        And the bookmark list should contain 10 bookmarked items
         """
-        self._test_setup(11)
-        self._bookmark_units(11)
-        self._navigate_to_bookmarks_list()
+        self.setup_test(11)
+        self.bookmark_units(11)
+        self.bookmarks_page.visit()
 
         self._verify_pagination_info(
             bookmark_count_on_current_page=10,
@@ -434,17 +428,15 @@ class BookmarksTest(BookmarksTestMixin):
         """
         Scenario: Bookmarks list pagination is working as expected for single page
         Given that I am a registered user
-        And I visit my courseware page
         And I have bookmarked all the 2 units available
-        Then I click on Bookmarks button
-        And I should see a bookmarked list with 2 bookmarked items
+        And I visit my bookmarks page
+        Then I should see a bookmarked list with 2 bookmarked items
         And I should see paging header and footer with correct data
         And previous and next buttons are disabled
         """
-        self._test_setup(num_chapters=2)
-        self._bookmark_units(num_units=2)
-
-        self.bookmarks_page.click_bookmarks_button()
+        self.setup_test(num_chapters=2)
+        self.bookmark_units(num_units=2)
+        self.bookmarks_page.visit()
         self.assertTrue(self.bookmarks_page.results_present())
         self._verify_pagination_info(
             bookmark_count_on_current_page=2,
@@ -460,11 +452,10 @@ class BookmarksTest(BookmarksTestMixin):
         Scenario: Next button is working as expected for bookmarks list pagination
 
         Given that I am a registered user
-        And I visit my courseware page
         And I have bookmarked all the 12 units available
+        And I visit my bookmarks page
 
-        Then I click on Bookmarks button
-        And I should see a bookmarked list of 10 items
+        Then I should see a bookmarked list of 10 items
         And I should see paging header and footer with correct info
 
         Then I click on next page button in footer
@@ -472,10 +463,10 @@ class BookmarksTest(BookmarksTestMixin):
         And I should see a bookmarked list with 2 items
         And I should see paging header and footer with correct info
         """
-        self._test_setup(num_chapters=12)
-        self._bookmark_units(num_units=12)
+        self.setup_test(num_chapters=12)
+        self.bookmark_units(num_units=12)
 
-        self.bookmarks_page.click_bookmarks_button()
+        self.bookmarks_page.visit()
         self.assertTrue(self.bookmarks_page.results_present())
 
         self._verify_pagination_info(
@@ -502,9 +493,8 @@ class BookmarksTest(BookmarksTestMixin):
         Scenario: Previous button is working as expected for bookmarks list pagination
 
         Given that I am a registered user
-        And I visit my courseware page
         And I have bookmarked all the 12 units available
-        And I click on Bookmarks button
+        And I visit my bookmarks page
 
         Then I click on next page button in footer
         And I should be navigated to second page
@@ -515,10 +505,10 @@ class BookmarksTest(BookmarksTestMixin):
         And I should be navigated to first page
         And I should see paging header and footer with correct info
         """
-        self._test_setup(num_chapters=12)
-        self._bookmark_units(num_units=12)
+        self.setup_test(num_chapters=12)
+        self.bookmark_units(num_units=12)
 
-        self.bookmarks_page.click_bookmarks_button()
+        self.bookmarks_page.visit()
         self.assertTrue(self.bookmarks_page.results_present())
 
         self.bookmarks_page.press_next_page_button()
@@ -546,19 +536,17 @@ class BookmarksTest(BookmarksTestMixin):
         Scenario: Bookmarks list pagination works as expected for valid page number
 
         Given that I am a registered user
-        And I visit my courseware page
         And I have bookmarked all the 12 units available
-
-        Then I click on Bookmarks button
-        And I should see a bookmarked list
+        And I visit my bookmarks page
+        Then I should see a bookmarked list
         And I should see total page value is 2
         Then I enter 2 in the page number input
         And I should be navigated to page 2
         """
-        self._test_setup(num_chapters=11)
-        self._bookmark_units(num_units=11)
+        self.setup_test(num_chapters=11)
+        self.bookmark_units(num_units=11)
 
-        self.bookmarks_page.click_bookmarks_button()
+        self.bookmarks_page.visit()
         self.assertTrue(self.bookmarks_page.results_present())
         self.assertEqual(self.bookmarks_page.get_total_pages, 2)
 
@@ -577,18 +565,17 @@ class BookmarksTest(BookmarksTestMixin):
         Scenario: Bookmarks list pagination works as expected for invalid page number
 
         Given that I am a registered user
-        And I visit my courseware page
         And I have bookmarked all the 11 units available
-        Then I click on Bookmarks button
-        And I should see a bookmarked list
+        And I visit my bookmarks page
+        Then I should see a bookmarked list
         And I should see total page value is 2
         Then I enter 3 in the page number input
         And I should stay at page 1
         """
-        self._test_setup(num_chapters=11)
-        self._bookmark_units(num_units=11)
+        self.setup_test(num_chapters=11)
+        self.bookmark_units(num_units=11)
 
-        self.bookmarks_page.click_bookmarks_button()
+        self.bookmarks_page.visit()
         self.assertTrue(self.bookmarks_page.results_present())
         self.assertEqual(self.bookmarks_page.get_total_pages, 2)
 
@@ -612,7 +599,7 @@ class BookmarksTest(BookmarksTestMixin):
         When I click on bookmarked unit
         Then `edx.course.bookmark.accessed` event is emitted
         """
-        self._test_setup(num_chapters=1)
+        self.setup_test(num_chapters=1)
         self.reset_event_tracking()
 
         # create expected event data
@@ -626,8 +613,8 @@ class BookmarksTest(BookmarksTestMixin):
                 }
             }
         ]
-        self._bookmark_units(num_units=1)
-        self.bookmarks_page.click_bookmarks_button()
+        self.bookmark_units(num_units=1)
+        self.bookmarks_page.visit()
 
         self._verify_pagination_info(
             bookmark_count_on_current_page=1,
@@ -640,3 +627,18 @@ class BookmarksTest(BookmarksTestMixin):
 
         self.bookmarks_page.click_bookmarked_block(0)
         self.verify_event_data('edx.bookmark.accessed', event_data)
+
+
+@attr('a11y')
+class BookmarksA11yTests(BookmarksTestMixin):
+    """
+    Tests for checking the a11y of the bookmarks page.
+    """
+    def test_view_a11y(self):
+        """
+        Verify the basic accessibility of the bookmarks page while paginated.
+        """
+        self.setup_test(num_chapters=11)
+        self.bookmark_units(num_units=11)
+        self.bookmarks_page.visit()
+        self.bookmarks_page.a11y_audit.check_for_accessibility_errors()

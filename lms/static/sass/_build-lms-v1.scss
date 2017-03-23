@@ -62,9 +62,11 @@
 @import 'views/support';
 @import 'views/oauth2';
 @import "views/financial-assistance";
-@import 'views/bookmarks';
 @import 'course/auto-cert';
 @import 'views/api-access';
+
+// features
+@import 'features/bookmarks-v1';
 
 // search
 @import 'search/search';

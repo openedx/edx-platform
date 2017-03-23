@@ -1,0 +1,50 @@
+.course-outline {
+  color: $lms-gray;
+
+  .block-tree {
+    margin: 0;
+    list-style-type: none;
+
+    .section {
+      margin: 0 (-1 * $baseline);
+      width: calc(100% + (2 * $baseline));
+      padding: 0 ($baseline * 2);
+
+      &:not(:first-child) {
+        border-top: 1px solid $lms-border-color;
+
+        .section-name {
+          margin-top: $baseline;
+        }
+      }
+
+      .section-name {
+        @include margin(0, 0, ($baseline / 2), ($baseline / 2));
+        padding: 0;
+        font-weight: bold;
+      }
+
+      .outline-item {
+        @include padding-left(0);
+      }
+
+      ol.outline-item {
+        margin: 0 0 ($baseline / 2) 0;
+
+        .subsection {
+          list-style-type: none;
+
+          a.outline-item {
+            display: block;
+            padding: ($baseline / 2);
+
+            &:hover {
+              background-color: palette(primary, x-back);
+              text-decoration: none;
+            }
+          }
+        }
+      }
+    }
+  }
+}

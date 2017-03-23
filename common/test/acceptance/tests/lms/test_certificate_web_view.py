@@ -7,10 +7,11 @@ from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureD
 from common.test.acceptance.fixtures.certificates import CertificateConfigFixture
 from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.certificate_page import CertificatePage
+from common.test.acceptance.pages.lms.course_home import CourseHomePage
 from common.test.acceptance.pages.lms.course_info import CourseInfoPage
-from common.test.acceptance.pages.lms.tab_nav import TabNavPage
-from common.test.acceptance.pages.lms.course_nav import CourseNavPage
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.progress import ProgressPage
+from common.test.acceptance.pages.lms.tab_nav import TabNavPage
 
 
 @attr(shard=5)
@@ -154,7 +155,8 @@ class CertificateProgressPageTest(UniqueCourseTest):
 
         self.course_info_page = CourseInfoPage(self.browser, self.course_id)
         self.progress_page = ProgressPage(self.browser, self.course_id)
-        self.course_nav = CourseNavPage(self.browser)
+        self.courseware_page = CoursewarePage(self.browser, self.course_id)
+        self.course_home_page = CourseHomePage(self.browser, self.course_id)
         self.tab_nav = TabNavPage(self.browser)
 
     def log_in_as_unique_user(self):
@@ -205,38 +207,42 @@ class CertificateProgressPageTest(UniqueCourseTest):
 
         Problems were added in the setUp
         """
-        self.course_info_page.visit()
-        self.tab_nav.go_to_tab('Course')
+        # self.course_info_page.visit()
+        # self.tab_nav.go_to_tab('Course')
+        #
+        # # TODO: TNL-6546: Remove extra visit call.
+        self.course_home_page.visit()
 
         # Navigate to Test Subsection in Test Section Section
-        self.course_nav.go_to_section('Test Section', 'Test Subsection')
+        self.course_home_page.outline.go_to_section('Test Section', 'Test Subsection')
 
         # Navigate to Test Problem 1
-        self.course_nav.go_to_vertical('Test Problem 1')
+        self.courseware_page.nav.go_to_vertical('Test Problem 1')
 
         # Select correct value for from select menu
-        self.course_nav.q(css='select option[value="{}"]'.format('blue')).first.click()
+        self.courseware_page.q(css='select option[value="{}"]'.format('blue')).first.click()
 
         # Select correct radio button for the answer
-        self.course_nav.q(css='fieldset div.field:nth-child(4) input').nth(0).click()
+        self.courseware_page.q(css='fieldset div.field:nth-child(4) input').nth(0).click()
 
         # Select correct radio buttons for the answer
-        self.course_nav.q(css='fieldset div.field:nth-child(2) input').nth(1).click()
-        self.course_nav.q(css='fieldset div.field:nth-child(4) input').nth(1).click()
+        self.courseware_page.q(css='fieldset div.field:nth-child(2) input').nth(1).click()
+        self.courseware_page.q(css='fieldset div.field:nth-child(4) input').nth(1).click()
 
         # Submit the answer
-        self.course_nav.q(css='button.submit').click()
-        self.course_nav.wait_for_ajax()
+        self.courseware_page.q(css='button.submit').click()
+        self.courseware_page.wait_for_ajax()
 
         # Navigate to the 'Test Subsection 2' of 'Test Section 2'
-        self.course_nav.go_to_section('Test Section 2', 'Test Subsection 2')
+        self.course_home_page.visit()
+        self.course_home_page.outline.go_to_section('Test Section 2', 'Test Subsection 2')
 
         # Navigate to Test Problem 2
-        self.course_nav.go_to_vertical('Test Problem 2')
+        self.courseware_page.nav.go_to_vertical('Test Problem 2')
 
         # Fill in the answer of the problem
-        self.course_nav.q(css='input[id^=input_][id$=_2_1]').fill('A*x^2 + sqrt(y)')
+        self.courseware_page.q(css='input[id^=input_][id$=_2_1]').fill('A*x^2 + sqrt(y)')
 
         # Submit the answer
-        self.course_nav.q(css='button.submit').click()
-        self.course_nav.wait_for_ajax()
+        self.courseware_page.q(css='button.submit').click()
+        self.courseware_page.wait_for_ajax()
