@@ -181,11 +181,12 @@ class SiteConfiguration(models.Model):
 
     def delete_css_override(self):
         css_file = self.values.get('css_overrides_file')
-        try:
-            os.remove(os.path.join(settings.COMPREHENSIVE_THEME_DIRS[0], css_file))
-            os.remove(os.path.join(settings.STATIC_ROOT, css_file))
-        except OSError:
-            logger.warning("Can't delete CSS file {}".format(css_file))
+        if css_file:
+            try:
+                os.remove(os.path.join(settings.COMPREHENSIVE_THEME_DIRS[0], css_file))
+                os.remove(os.path.join(settings.STATIC_ROOT, css_file))
+            except OSError:
+                logger.warning("Can't delete CSS file {}".format(css_file))
 
     def _formatted_sass_variables(self):
         return " ".join(["{}: {};".format(var, val[0]) for var, val in self.sass_variables])
