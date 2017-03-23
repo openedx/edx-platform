@@ -3,7 +3,10 @@
     define(['jquery', 'js/groups/views/cohorts', 'js/groups/collections/cohort', 'js/groups/models/course_cohort_settings',
             'js/groups/models/cohort_discussions', 'js/groups/models/content_group'],
         function($, CohortsView, CohortCollection, CourseCohortSettingsModel, DiscussionTopicsSettingsModel, ContentGroupModel) {
-            return function(contentGroups, studioGroupConfigurationsUrl) {
+            return function(options) {
+                var contentGroups = options.contentGroups,
+                    docPrefixUrl = options.docPrefixUrl,
+                    studioGroupConfigurationsUrl = options.studioGroupConfigurationsUrl;
                 var contentGroupModels = $.map(contentGroups, function(group) {
                     return new ContentGroupModel({
                         id: group.id,
@@ -32,6 +35,7 @@
                         uploadCohortsCsvUrl: cohortManagementElement.data('upload_cohorts_csv_url'),
                         verifiedTrackCohortingUrl: cohortManagementElement.data('verified_track_cohorting_url'),
                         studioGroupConfigurationsUrl: studioGroupConfigurationsUrl,
+                        docPrefixUrl: docPrefixUrl,
                         isCcxEnabled: cohortManagementElement.data('is_ccx_enabled')
                     }
                 });
@@ -46,4 +50,3 @@
             };
         });
 }).call(this, define || RequireJS.define);
-

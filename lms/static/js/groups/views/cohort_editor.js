@@ -42,7 +42,8 @@
 
                 renderGroupHeader: function() {
                     this.$('.cohort-management-group-header').html(this.groupHeaderTemplate({
-                        cohort: this.model
+                        cohort: this.model,
+                        docPrefixUrl: this.context.docPrefixUrl
                     }));
                 },
 
