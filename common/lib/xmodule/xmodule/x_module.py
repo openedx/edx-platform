@@ -264,6 +264,12 @@ class XModuleFields(object):
         default=None
     )
 
+    display_description = String(
+        display_name="Display Description",
+        scope=Scope.settings,
+        default=None
+    )
+
 
 class XModuleMixin(XModuleFields, XBlock):
     """

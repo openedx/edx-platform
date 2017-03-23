@@ -14,8 +14,8 @@
  *  - edit_display_name - true if the shown xblock's display name should be in inline edit mode
  */
 define(["jquery", "underscore", "gettext", "js/views/baseview", "common/js/components/utils/view_utils",
-        "js/views/utils/xblock_utils", "js/views/xblock_string_field_editor"],
-    function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, XBlockStringFieldEditor) {
+        "js/views/utils/xblock_utils", "js/views/xblock_string_field_editor", "js/views/xblock_description_field_editor"],
+    function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, XBlockStringFieldEditor, XBlockStringFieldDescriptionEditor) {
 
         var XBlockOutlineView = BaseView.extend({
             // takes XBlockInfo as a model
@@ -43,7 +43,8 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "common/js/compo
             render: function() {
                 this.renderTemplate();
                 this.addButtonActions(this.$el);
-                this.addNameEditor();
+                this.addEditor('.wrapper-xblock-field', XBlockStringFieldEditor);
+                this.addEditor('.wrapper-xblock-description-field', XBlockStringFieldDescriptionEditor);
 
                 // For cases in which we need to suppress the header controls during rendering, we'll
                 // need to add the current model's id/locator to the set of expanded locators
@@ -131,15 +132,15 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "common/js/compo
                 this.getListElement().append(childView.$el);
             },
 
-            addNameEditor: function() {
+            addEditor: function(className, XblockFieldEditor) {
                 var self = this,
-                    xblockField = this.$('.wrapper-xblock-field'),
+                    xblockField = this.$(className),
                     XBlockOutlineFieldEditor, nameEditor;
                 if (xblockField.length > 0) {
                     // Make a subclass of the standard xblock string field editor which refreshes
                     // the entire section that this view is contained in. This is necessary as
                     // changing the name could have caused the section to change state.
-                    XBlockOutlineFieldEditor = XBlockStringFieldEditor.extend({
+                    XBlockOutlineFieldEditor = XblockFieldEditor.extend({
                         refresh: function() {
                             self.refresh();
                         }

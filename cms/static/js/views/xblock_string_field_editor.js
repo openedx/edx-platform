@@ -9,7 +9,8 @@ define(["js/views/baseview", "js/views/utils/xblock_utils"],
     function (BaseView, XBlockViewUtils) {
 
         var XBlockStringFieldEditor = BaseView.extend({
-            events: {
+
+            originalEvents: {
                 'click .xblock-field-value-edit': 'showInput',
                 'click button[name=submit]': 'onClickSubmit',
                 'click button[name=cancel]': 'onClickCancel',
@@ -19,8 +20,14 @@ define(["js/views/baseview", "js/views/utils/xblock_utils"],
                 'keyup .xblock-field-input': 'handleKeyUp'
             },
 
-            // takes XBlockInfo as a model
+            // allow event overrides in subclass, ex. in XBlockStringFieldDescriptionEditor
+            additionalEvents: {},
 
+            events: function() {
+                return _.extend({}, this.originalEvents, this.additionalEvents);
+            },
+
+            // takes XBlockInfo as a model
             initialize: function() {
                 BaseView.prototype.initialize.call(this);
                 this.fieldName = this.$el.data('field');

@@ -11,3 +11,41 @@ html, body {
     font-family: Roboto, sans-serif !important;
   }
 }
+
+/**
+*   COURSE DISPLAY
+**/
+
+// Inline edit description field for section
+
+.incontext-editor.is-editable.is-editing .incontext-editor-form {
+  display: block;
+}
+
+form.form-description {
+  width: 100%;
+
+  textarea {
+    height: 100px;
+    width: 99.3%;
+    resize: none;
+    overflow-x: auto;
+    font-size: 14px;
+  }
+}
+
+.wrapper-xblock-description-field.incontext-editor.is-editable {
+  .incontext-editor-value {
+    vertical-align: bottom;
+    white-space: initial;
+    margin-bottom: 5px;
+    max-width: 95%;
+  }
+  span.section-description {
+    font-weight: 300;
+    &.empty:after {
+      content: "No description";
+      font-style: italic;
+    }
+  }
+}

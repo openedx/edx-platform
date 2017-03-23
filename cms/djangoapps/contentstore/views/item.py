@@ -960,6 +960,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     xblock_info = {
         "id": unicode(xblock.location),
         "display_name": xblock.display_name_with_default,
+        "display_description": xblock.display_description,
         "category": xblock.category,
         "edited_on": get_default_time_display(xblock.subtree_edited_on) if xblock.subtree_edited_on else None,
         "published": published,

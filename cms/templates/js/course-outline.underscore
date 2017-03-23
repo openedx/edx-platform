@@ -131,6 +131,15 @@ if (is_proctored_exam) {
             </ul>
         </div>
     </div>
+    <% if (xblockInfo.isChapter()) { %>
+        <span class="wrapper-<%- xblockType %>-description wrapper-xblock-description-field incontext-editor is-editable" data-field-description="display_description" data-field-display-description="<%- gettext("Display Description") %>">
+            <span class="<%- xblockType %>-description xblock-field-value incontext-editor-value
+                <%  if( xblockInfo.get('display_description') === null ) { %> empty <% } %>
+            ">
+                <%- xblockInfo.get('display_description') %>
+            </span>
+        </span>
+    <% } %>
     <div class="<%- xblockType %>-status">
         <% if (!xblockInfo.isVertical()) { %>
             <% if (xblockInfo.get('explanatory_message') !=null) { %>

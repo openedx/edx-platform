@@ -34,6 +34,7 @@ class BlockSerializer(serializers.Serializer):
     type = serializers.CharField(source='block_type')
     parent = serializers.CharField(required=False)
     display_name = serializers.CharField()
+    display_description = serializers.CharField()
     graded = serializers.BooleanField(default=False)
     format = serializers.CharField()
     children = serializers.CharField()
