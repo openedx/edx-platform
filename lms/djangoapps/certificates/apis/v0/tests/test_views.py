@@ -4,6 +4,8 @@ Tests for the Certificate REST APIs.
 from datetime import datetime, timedelta
 
 from django.core.urlresolvers import reverse
+from django.utils import timezone
+from freezegun import freeze_time
 from oauth2_provider import models as dot_models
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -22,6 +24,8 @@ class CertificatesRestApiTest(SharedModuleStoreTestCase, APITestCase):
     """
     Test for the Certificates REST APIs
     """
+    now = timezone.now()
+
     @classmethod
     def setUpClass(cls):
         super(CertificatesRestApiTest, cls).setUpClass()
@@ -31,6 +35,7 @@ class CertificatesRestApiTest(SharedModuleStoreTestCase, APITestCase):
             display_name='Verified Course'
         )
 
+    @freeze_time(now)
     def setUp(self):
         super(CertificatesRestApiTest, self).setUp()
 
@@ -175,9 +180,11 @@ class CertificatesRestApiTest(SharedModuleStoreTestCase, APITestCase):
             {
                 'username': self.student.username,
                 'status': CertificateStatuses.downloadable,
+                'is_passing': True,
                 'grade': '0.88',
                 'download_url': 'www.google.com',
                 'certificate_type': CourseMode.VERIFIED,
                 'course_id': unicode(self.course.id),
+                'created_date': self.now,
             }
         )

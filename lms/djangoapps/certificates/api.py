@@ -63,6 +63,7 @@ def format_certificate_for_user(username, cert):
         "grade": cert.grade,
         "created": cert.created_date,
         "modified": cert.modified_date,
+        "is_passing": is_passing_status(cert.status),
 
         # NOTE: the download URL is not currently being set for webview certificates.
         # In the future, we can update this to construct a URL to the webview certificate
