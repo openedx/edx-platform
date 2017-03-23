@@ -73,6 +73,12 @@ from openedx.core.djangolib.markup import HTML, Text
             ${enrollment_message | n,  decode.utf8}
         </div>
     %endif
+
+    %if enterprise_message:
+        <div class="dashboard-banner">
+            ${ enterprise_message | n, decode.utf8 }
+        </div>
+    %endif
 </div>
 
 <main id="main" aria-label="Content" tabindex="-1">
