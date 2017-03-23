@@ -114,18 +114,13 @@ define([
             expect(view.reLoadBannerImage).not.toThrow(message);
         });
 
-        it('should calculate the correct percentages for progress bars', function() {
-            expect(view.$('.complete').css('width')).toEqual('40%');
-            expect(view.$('.in-progress').css('width')).toEqual('20%');
+        it('should show the right number of progress bar segments', function() {
+            expect(view.$('.progress-bar .completed').length).toEqual(4);
+            expect(view.$('.progress-bar .enrolled').length).toEqual(2);
         });
 
-        it('should display the correct completed courses message', function() {
-            var programProgress = _.findWhere(userProgress, {uuid: 'a87e5eac-3c93-45a1-a8e1-4c79ca8401c8'}),
-                completed = programProgress.completed,
-                total = completed + programProgress.in_progress + programProgress.not_started;
-
-            expect(view.$('.certificate-status .status-text').not('.secondary').html())
-                .toEqual('You have earned certificates in ' + completed + ' of the ' + total + ' courses so far.');
+        it('should display the correct course status numbers', function() {
+            expect(view.$('.number-circle').text()).toEqual('424');
         });
 
         it('should render cards if there is no progressData', function() {

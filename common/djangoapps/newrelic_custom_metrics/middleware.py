@@ -6,7 +6,14 @@ This middleware will only call on the newrelic agent if there are any metrics
 to report for this request, so it will not incur any processing overhead for
 request handlers which do not record custom metrics.
 """
-import newrelic.agent
+import logging
+log = logging.getLogger(__name__)
+try:
+    import newrelic.agent
+except ImportError:
+    log.warning("Unable to load NewRelic agent module")
+    newrelic = None  # pylint: disable=invalid-name
+
 import request_cache
 
 REQUEST_CACHE_KEY = 'newrelic_custom_metrics'
@@ -40,6 +47,8 @@ class NewRelicCustomMetrics(object):
         """
         Report the collected custom metrics to New Relic.
         """
+        if not newrelic:
+            return
         metrics_cache = cls._get_metrics_cache()
         for metric_name, metric_value in metrics_cache.iteritems():
             newrelic.agent.add_custom_parameter(metric_name, metric_value)

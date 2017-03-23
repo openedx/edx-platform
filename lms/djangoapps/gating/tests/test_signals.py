@@ -1,14 +1,14 @@
 """
 Unit tests for gating.signals module
 """
-from mock import patch
+from mock import patch, Mock
 
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.django import modulestore
 
-from gating.signals import handle_score_changed
+from gating.signals import evaluate_subsection_gated_milestones
 
 
 class TestHandleScoreChanged(ModuleStoreTestCase):
@@ -19,32 +19,26 @@ class TestHandleScoreChanged(ModuleStoreTestCase):
         super(TestHandleScoreChanged, self).setUp()
         self.course = CourseFactory.create(org='TestX', number='TS01', run='2016_Q1')
         self.user = UserFactory.create()
-        self.test_usage_key = self.course.location
+        self.subsection_grade = Mock()
 
-    @patch('gating.signals.gating_api.evaluate_prerequisite')
-    def test_gating_enabled(self, mock_evaluate):
-        """ Test evaluate_prerequisite is called when course.enable_subsection_gating is True """
+    @patch('lms.djangoapps.gating.api.gating_api.get_gating_milestone')
+    def test_gating_enabled(self, mock_gating_milestone):
         self.course.enable_subsection_gating = True
         modulestore().update_item(self.course, 0)
-        handle_score_changed(
+        evaluate_subsection_gated_milestones(
             sender=None,
-            points_possible=1,
-            points_earned=1,
-            user_id=self.user.id,
-            course_id=unicode(self.course.id),
-            usage_id=unicode(self.test_usage_key)
+            user=self.user,
+            course=self.course,
+            subsection_grade=self.subsection_grade,
         )
-        mock_evaluate.assert_called_with(self.course, self.course, self.user.id)  # pylint: disable=no-member
+        self.assertTrue(mock_gating_milestone.called)
 
-    @patch('gating.signals.gating_api.evaluate_prerequisite')
-    def test_gating_disabled(self, mock_evaluate):
-        """ Test evaluate_prerequisite is not called when course.enable_subsection_gating is False """
-        handle_score_changed(
+    @patch('lms.djangoapps.gating.api.gating_api.get_gating_milestone')
+    def test_gating_disabled(self, mock_gating_milestone):
+        evaluate_subsection_gated_milestones(
             sender=None,
-            points_possible=1,
-            points_earned=1,
-            user_id=self.user.id,
-            course_id=unicode(self.course.id),
-            usage_id=unicode(self.test_usage_key)
+            user=self.user,
+            course=self.course,
+            subsection_grade=self.subsection_grade,
         )
-        mock_evaluate.assert_not_called()
+        self.assertFalse(mock_gating_milestone.called)

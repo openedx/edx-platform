@@ -26,6 +26,8 @@ from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.embargo import api as embargo_api
 from student.models import CourseEnrollment
 from util.db import outer_atomic
+from util import enterprise_helpers as enterprise_api
+from util import organizations_helpers as organization_api
 
 
 class ChooseModeView(View):
@@ -148,6 +150,20 @@ class ChooseModeView(View):
             "responsive": True,
             "nav_hidden": True,
         }
+
+        enterprise_learner_data = enterprise_api.get_enterprise_learner_data(site=request.site, user=request.user)
+        if enterprise_learner_data:
+            context["show_enterprise_context"] = True
+            context["partner_names"] = partner_name = course.display_organization \
+                if course.display_organization else course.org
+            context["enterprise_name"] = enterprise_learner_data[0]['enterprise_customer']['name']
+            context["username"] = request.user.username
+            organizations = organization_api.get_course_organizations(course_id=course.id)
+            if organizations:
+                context["partner_names"] = ' and '.join([
+                    org.get('name', partner_name) for org in organizations
+                ])
+
         if "verified" in modes:
             verified_mode = modes["verified"]
             context["suggested_prices"] = [

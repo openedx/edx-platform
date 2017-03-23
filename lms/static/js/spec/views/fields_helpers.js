@@ -184,6 +184,7 @@ define(['backbone',
             }
 
             view.$(data.valueInputSelector).val(data.validValue).change();
+            view.$(data.valueInputSelector).focusout();
             // When the value in the field is changed
             expect(view.fieldValue()).toBe(data.validValue);
             expectMessageContains(view, view.indicators.inProgress);
@@ -203,6 +204,7 @@ define(['backbone',
             }
 
             view.$(data.valueInputSelector).val(data.invalidValue1).change();
+            view.$(data.valueInputSelector).focusout();
             request_data[data.valueAttribute] = data.invalidValue1;
             AjaxHelpers.expectJsonRequest(
                 requests, 'PATCH', url, request_data
@@ -214,6 +216,7 @@ define(['backbone',
             expect(view.el).toHaveClass('mode-edit');
 
             view.$(data.valueInputSelector).val(data.invalidValue2).change();
+            view.$(data.valueInputSelector).focusout();
             request_data[data.valueAttribute] = data.invalidValue2;
             AjaxHelpers.expectJsonRequest(
                 requests, 'PATCH', url, request_data
@@ -225,6 +228,7 @@ define(['backbone',
             expect(view.el).toHaveClass('mode-edit');
 
             view.$(data.valueInputSelector).val('').change();
+            view.$(data.valueInputSelector).focusout();
             // When the value in the field is changed
             expect(view.fieldValue()).toBe(data.defaultValue);
             request_data[data.valueAttribute] = data.defaultValue;

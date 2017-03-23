@@ -1,5 +1,5 @@
 <div class="edit-post-form">
-    <h1><%- gettext("Editing response") %></h1>
+    <h<%- startHeader %>><%- gettext("Editing response") %></h<%- startHeader %>>
     <ul class="edit-post-form-errors"></ul>
     <div class="form-row">
         <div class="edit-post-body" name="body" data-id="<%- id %>"><%- body %></div>

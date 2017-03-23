@@ -904,7 +904,15 @@ DOC_LINK_BASE_URL = ENV_TOKENS.get('DOC_LINK_BASE_URL', DOC_LINK_BASE_URL)
 
 ############## Settings for the Enterprise App ######################
 
+# Publicly-accessible enrollment URL, for use on the client side.
+ENTERPRISE_PUBLIC_ENROLLMENT_API_URL = ENV_TOKENS.get(
+    'ENTERPRISE_PUBLIC_ENROLLMENT_API_URL',
+    (LMS_ROOT_URL or '') + '/api/enrollment/v1/'
+)
+
+# Enrollment URL used on the server-side.
+# If not overridden in ENV_TOKENS, then fallback to the value set in env/common.py
 ENTERPRISE_ENROLLMENT_API_URL = ENV_TOKENS.get(
     'ENTERPRISE_ENROLLMENT_API_URL',
-    (LMS_ROOT_URL or '') + '/api/enrollment/v1/'
+    ENTERPRISE_ENROLLMENT_API_URL
 )

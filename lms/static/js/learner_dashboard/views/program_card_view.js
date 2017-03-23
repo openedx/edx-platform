@@ -54,11 +54,6 @@
                  },
 
                  postRender: function() {
-                    // Add describedby to parent only if progess is present
-                     if (this.progressModel) {
-                         this.$el.attr('aria-describedby', 'status-' + this.model.get('uuid'));
-                     }
-
                      if (navigator.userAgent.indexOf('MSIE') !== -1 ||
                         navigator.appVersion.indexOf('Trident/') > 0) {
                         /* Microsoft Internet Explorer detected in. */

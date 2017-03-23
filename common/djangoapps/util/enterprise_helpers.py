@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
 from django.utils.http import urlencode
+from django.core.cache import cache
 from edx_rest_api_client.client import EdxRestApiClient
 try:
     from enterprise import utils as enterprise_utils
@@ -18,6 +19,8 @@ except ImportError:
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.token_utils import JwtBuilder
 from slumber.exceptions import HttpClientError, HttpServerError
+import hashlib
+import six
 
 
 ENTERPRISE_CUSTOMER_BRANDING_OVERRIDE_DETAILS = 'enterprise_customer_branding_override_details'
@@ -70,6 +73,108 @@ class EnterpriseApiClient(object):
             )
             LOGGER.exception(message)
             raise EnterpriseApiException(message)
+
+    def fetch_enterprise_learner_data(self, site, user):
+        """
+        Fetch information related to enterprise from the Enterprise Service.
+
+        Example:
+            fetch_enterprise_learner_data(site, user)
+
+        Argument:
+            site: (Site) site instance
+            user: (User) django auth user
+
+        Returns:
+            dict: {
+                "enterprise_api_response_for_learner": {
+                    "count": 1,
+                    "num_pages": 1,
+                    "current_page": 1,
+                    "results": [
+                        {
+                            "enterprise_customer": {
+                                "uuid": "cf246b88-d5f6-4908-a522-fc307e0b0c59",
+                                "name": "TestShib",
+                                "catalog": 2,
+                                "active": true,
+                                "site": {
+                                    "domain": "example.com",
+                                    "name": "example.com"
+                                },
+                                "enable_data_sharing_consent": true,
+                                "enforce_data_sharing_consent": "at_login",
+                                "enterprise_customer_users": [
+                                    1
+                                ],
+                                "branding_configuration": {
+                                    "enterprise_customer": "cf246b88-d5f6-4908-a522-fc307e0b0c59",
+                                    "logo": "https://open.edx.org/sites/all/themes/edx_open/logo.png"
+                                },
+                                "enterprise_customer_entitlements": [
+                                    {
+                                        "enterprise_customer": "cf246b88-d5f6-4908-a522-fc307e0b0c59",
+                                        "entitlement_id": 69
+                                    }
+                                ]
+                            },
+                            "user_id": 5,
+                            "user": {
+                                "username": "staff",
+                                "first_name": "",
+                                "last_name": "",
+                                "email": "staff@example.com",
+                                "is_staff": true,
+                                "is_active": true,
+                                "date_joined": "2016-09-01T19:18:26.026495Z"
+                            },
+                            "data_sharing_consent": [
+                                {
+                                    "user": 1,
+                                    "state": "enabled",
+                                    "enabled": true
+                                }
+                            ]
+                        }
+                    ],
+                    "next": null,
+                    "start": 0,
+                    "previous": null
+                }
+            }
+
+        Raises:
+            ConnectionError: requests exception "ConnectionError", raised if if ecommerce is unable to connect
+                to enterprise api server.
+            SlumberBaseException: base slumber exception "SlumberBaseException", raised if API response contains
+                http error status like 4xx, 5xx etc.
+            Timeout: requests exception "Timeout", raised if enterprise API is taking too long for returning
+                a response. This exception is raised for both connection timeout and read timeout.
+
+        """
+        api_resource_name = 'enterprise-learner'
+
+        cache_key = get_cache_key(
+            site_domain=site.domain,
+            resource=api_resource_name,
+            username=user.username
+        )
+
+        response = cache.get(cache_key)
+        if not response:
+            try:
+                endpoint = getattr(self.client, api_resource_name)
+                querystring = {'username': user.username}
+                response = endpoint().get(**querystring)
+                cache.set(cache_key, response, settings.ENTERPRISE_API_CACHE_TIMEOUT)
+            except (HttpClientError, HttpServerError):
+                message = ("An error occurred while getting EnterpriseLearner data for user {username}".format(
+                    username=user.username
+                ))
+                LOGGER.exception(message)
+                return None
+
+        return response
 
 
 def data_sharing_consent_required(view_func):
@@ -225,3 +330,39 @@ def get_enterprise_branding_filter_param(request):
 
     """
     return request.session.get(ENTERPRISE_CUSTOMER_BRANDING_OVERRIDE_DETAILS, None)
+
+
+def get_cache_key(**kwargs):
+    """
+    Get MD5 encoded cache key for given arguments.
+
+    Here is the format of key before MD5 encryption.
+        key1:value1__key2:value2 ...
+
+    Example:
+        >>> get_cache_key(site_domain="example.com", resource="enterprise-learner")
+        # Here is key format for above call
+        # "site_domain:example.com__resource:enterprise-learner"
+        a54349175618ff1659dee0978e3149ca
+
+    Arguments:
+        **kwargs: Key word arguments that need to be present in cache key.
+
+    Returns:
+         An MD5 encoded key uniquely identified by the key word arguments.
+    """
+    key = '__'.join(['{}:{}'.format(item, value) for item, value in six.iteritems(kwargs)])
+
+    return hashlib.md5(key).hexdigest()
+
+
+def get_enterprise_learner_data(site, user):
+    """
+    Client API operation adapter/wrapper
+    """
+    if not enterprise_enabled():
+        return None
+
+    enterprise_learner_data = EnterpriseApiClient().fetch_enterprise_learner_data(site=site, user=user)
+    if enterprise_learner_data:
+        return enterprise_learner_data['results']

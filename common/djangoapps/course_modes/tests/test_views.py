@@ -6,6 +6,7 @@ from datetime import datetime
 import unittest
 import decimal
 import ddt
+import httpretty
 import freezegun
 from mock import patch
 from nose.plugins.attrib import attr
@@ -25,12 +26,14 @@ from student.models import CourseEnrollment
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
+from util.tests.mixins.enterprise import EnterpriseServiceMockMixin
+from util import organizations_helpers as organizations_api
 
 
 @attr(shard=3)
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
+class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase, EnterpriseServiceMockMixin):
     """
     Course Mode View tests
     """
@@ -44,6 +47,7 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
         self.client.login(username=self.user.username, password="edx")
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @httpretty.activate
     @ddt.data(
         # is_active?, enrollment_mode, redirect?
         (True, 'verified', True),
@@ -68,6 +72,14 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
                 course_id=self.course.id,
                 user=self.user
             )
+
+        self.mock_enterprise_learner_api()
+        # Create a service user and log in.
+        UserFactory.create(
+            username='enterprise_worker',
+            email="bob@example.com",
+            password="edx",
+        )
 
         # Configure whether we're upgrading or not
         url = reverse('course_modes_choose', args=[unicode(self.course.id)])
@@ -118,10 +130,19 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
         self.assertRedirects(response, 'http://testserver/test_basket/?sku=TEST', fetch_redirect_response=False)
         ecomm_test_utils.update_commerce_config(enabled=False)
 
+    @httpretty.activate
     def test_no_enrollment(self):
         # Create the course modes
         for mode in ('audit', 'honor', 'verified'):
             CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)
+
+        self.mock_enterprise_learner_api()
+        # Create a service user and log in.
+        UserFactory.create(
+            username='enterprise_worker',
+            email="bob@example.com",
+            password="edx",
+        )
 
         # User visits the track selection page directly without ever enrolling
         url = reverse('course_modes_choose', args=[unicode(self.course.id)])
@@ -129,6 +150,81 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
 
         self.assertEquals(response.status_code, 200)
 
+    @httpretty.activate
+    def test_enterprise_learner_context(self):
+        """
+        Test: Track selection page should show the enterprise context message if user belongs to the Enterprise.
+        """
+        # Create the course modes
+        for mode in ('audit', 'honor', 'verified'):
+            CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)
+
+        self.mock_enterprise_learner_api()
+        # Create a service user and log in.
+        UserFactory.create(
+            username='enterprise_worker',
+            email="bob@example.com",
+            password="edx",
+        )
+
+        # User visits the track selection page directly without ever enrolling
+        url = reverse('course_modes_choose', args=[unicode(self.course.id)])
+        response = self.client.get(url)
+        self.assertEquals(response.status_code, 200)
+        self.assertContains(
+            response,
+            'Welcome, {username}! You are about to enroll in {course_name}, from {partner_names}, '
+            'sponsored by TestShib. Please select your enrollment information below.'.format(
+                username=self.user.username,
+                course_name=self.course.display_name_with_default_escaped,
+                partner_names=self.course.org
+            )
+        )
+
+    @httpretty.activate
+    def test_enterprise_learner_context_with_multiple_organizations(self):
+        """
+        Test: Track selection page should show the enterprise context message with multiple organization names
+        if user belongs to the Enterprise.
+        """
+        # Create the course modes
+        for mode in ('audit', 'honor', 'verified'):
+            CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)
+
+        self.mock_enterprise_learner_api()
+        # Create a service user and log in.
+        UserFactory.create(
+            username='enterprise_worker',
+            email="bob@example.com",
+            password="edx",
+        )
+
+        # Creating organization
+        for i in xrange(2):
+            test_organization_data = {
+                'name': 'test organization ' + str(i),
+                'short_name': 'test_organization_' + str(i),
+                'description': 'Test Organization Description',
+                'active': True,
+                'logo': '/logo_test1.png/'
+            }
+            test_org = organizations_api.add_organization(organization_data=test_organization_data)
+            organizations_api.add_organization_course(organization_data=test_org, course_id=unicode(self.course.id))
+
+        # User visits the track selection page directly without ever enrolling
+        url = reverse('course_modes_choose', args=[unicode(self.course.id)])
+        response = self.client.get(url)
+        self.assertEquals(response.status_code, 200)
+        self.assertContains(
+            response,
+            'Welcome, {username}! You are about to enroll in {course_name}, from test organization 0 and '
+            'test organization 1, sponsored by TestShib. Please select your enrollment information below.'.format(
+                username=self.user.username,
+                course_name=self.course.display_name_with_default_escaped
+            )
+        )
+
+    @httpretty.activate
     @ddt.data(
         '',
         '1,,2',
@@ -155,6 +251,14 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
             user=self.user
         )
 
+        self.mock_enterprise_learner_api()
+        # Create a service user and log in.
+        UserFactory.create(
+            username='enterprise_worker',
+            email="bob@example.com",
+            password="edx",
+        )
+
         # Verify that the prices render correctly
         response = self.client.get(
             reverse('course_modes_choose', args=[unicode(self.course.id)]),
@@ -165,6 +269,7 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
         # TODO: Fix it so that response.templates works w/ mako templates, and then assert
         # that the right template rendered
 
+    @httpretty.activate
     @ddt.data(
         (['honor', 'verified', 'credit'], True),
         (['honor', 'verified'], False),
@@ -174,6 +279,14 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
         # Create the course modes
         for mode in available_modes:
             CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)
+
+        self.mock_enterprise_learner_api()
+        # Create a service user and log in.
+        UserFactory.create(
+            username='enterprise_worker',
+            email="bob@example.com",
+            password="edx",
+        )
 
         # Check whether credit upsell is shown on the page
         # This should *only* be shown when a credit mode is available
@@ -375,10 +488,19 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     @with_comprehensive_theme("edx.org")
+    @httpretty.activate
     def test_hide_nav(self):
         # Create the course modes
         for mode in ["honor", "verified"]:
             CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)
+
+        self.mock_enterprise_learner_api()
+        # Create a service user and log in.
+        UserFactory.create(
+            username='enterprise_worker',
+            email="bob@example.com",
+            password="edx",
+        )
 
         # Load the track selection page
         url = reverse('course_modes_choose', args=[unicode(self.course.id)])
@@ -406,7 +528,7 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class TrackSelectionEmbargoTest(UrlResetMixin, ModuleStoreTestCase):
+class TrackSelectionEmbargoTest(UrlResetMixin, ModuleStoreTestCase, EnterpriseServiceMockMixin):
     """Test embargo restrictions on the track selection page. """
 
     URLCONF_MODULES = ['openedx.core.djangoapps.embargo']
@@ -433,6 +555,15 @@ class TrackSelectionEmbargoTest(UrlResetMixin, ModuleStoreTestCase):
             response = self.client.get(self.url)
             self.assertRedirects(response, redirect_url)
 
+    @httpretty.activate
     def test_embargo_allow(self):
+
+        self.mock_enterprise_learner_api()
+        # Create a service user and log in.
+        UserFactory.create(
+            username='enterprise_worker',
+            email="bob@example.com",
+            password="edx",
+        )
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)

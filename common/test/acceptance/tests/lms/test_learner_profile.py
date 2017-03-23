@@ -44,8 +44,8 @@ class LearnerProfileTestMixin(EventsTestMixin):
         """
         Fill in the public profile fields of a user.
         """
-        profile_page.value_for_dropdown_field('language_proficiencies', 'English')
-        profile_page.value_for_dropdown_field('country', 'United Arab Emirates')
+        profile_page.value_for_dropdown_field('language_proficiencies', 'English', focus_out=True)
+        profile_page.value_for_dropdown_field('country', 'United Arab Emirates', focus_out=True)
         profile_page.set_value_for_textarea_field('bio', 'Nothing Special')
         # Waits here for text to appear/save on bio field
         profile_page.wait_for_ajax()
@@ -91,7 +91,7 @@ class LearnerProfileTestMixin(EventsTestMixin):
         account_settings_page.visit()
         account_settings_page.wait_for_page()
         self.assertEqual(
-            account_settings_page.value_for_dropdown_field('year_of_birth', str(birth_year)),
+            account_settings_page.value_for_dropdown_field('year_of_birth', str(birth_year), focus_out=True),
             str(birth_year)
         )
 
@@ -322,7 +322,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, AcceptanceTest):
         """
         Test behaviour of a dropdown field.
         """
-        profile_page.value_for_dropdown_field(field_id, new_value)
+        profile_page.value_for_dropdown_field(field_id, new_value, focus_out=True)
         self.assertEqual(profile_page.get_non_editable_mode_value(field_id), displayed_value)
         self.assertTrue(profile_page.mode_for_field(field_id), mode)
 
