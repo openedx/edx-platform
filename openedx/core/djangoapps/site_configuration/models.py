@@ -140,16 +140,15 @@ class SiteConfiguration(models.Model):
     def compile_microsite_sass(self):
         css_output = compile_sass('main.scss', custom_branding=self._sass_var_override)
         domain_without_port_number = self.site.domain.split(':')[0]
-        output_path = os.path.join(settings.COMPREHENSIVE_THEME_DIRS[0], 'customer_themes', '{}.css'.format(
+        if settings.DEBUG:
+            theme_folder = settings.COMPREHENSIVE_THEME_DIRS[0]
+        else:
+            theme_folder = settings.STATIC_ROOT
+        theme_file = os.path.join(theme_folder, 'customer_themes', '{}.css'.format(
             domain_without_port_number))
-        collected_output_path = os.path.join(settings.STATIC_ROOT, 'customer_themes', '{}.css'.format(
-            domain_without_port_number))
-        with open(output_path, 'w') as f:
+        with open(theme_file, 'w') as f:
             f.write(css_output.encode('utf-8'))
-            os.chmod(output_path, 0777)
-        with open(collected_output_path, 'w') as f:
-            f.write(css_output.encode('utf-8'))
-            os.chmod(collected_output_path, 0777)
+            os.chmod(theme_file, 0777)
 
     def collect_css_file(self):
         path = self.values.get('css_overrides_file')
