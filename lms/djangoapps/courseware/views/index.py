@@ -46,6 +46,7 @@ from util.enterprise_helpers import get_enterprise_consent_url
 from util.views import ensure_valid_course_key
 from xmodule.modulestore.django import modulestore
 from xmodule.x_module import STUDENT_VIEW
+from survey.utils import must_answer_survey
 from web_fragments.fragment import Fragment
 
 from ..access import has_access, _adjust_start_date_for_beta_testers
