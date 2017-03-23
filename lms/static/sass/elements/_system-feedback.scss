@@ -118,6 +118,20 @@
     }
   }
 
+  &.urgency-info {
+    background: $msg-bg;
+    .msg {
+      color: $white;
+    }
+    .msg-icon {
+      font-size: 2.5em;
+      padding: 20px;
+    }
+    .msg-content {
+      max-width: 80%;
+    }
+  }
+
   &.alert {
     border-top: 3px solid $alert-color;
   }

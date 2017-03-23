@@ -6,13 +6,16 @@ import logging
 from functools import wraps
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
 from django.utils.http import urlencode
-from django.core.cache import cache
+from django.utils.translation import ugettext as _
+from edxmako.shortcuts import render_to_string
 from edx_rest_api_client.client import EdxRestApiClient
 try:
     from enterprise import utils as enterprise_utils
+    from enterprise.models import EnterpriseCourseEnrollment
     from enterprise.utils import consent_necessary_for_course
 except ImportError:
     pass
@@ -23,6 +26,7 @@ import hashlib
 import six
 
 
+CONSENT_FAILED_PARAMETER = 'consent_failed'
 ENTERPRISE_CUSTOMER_BRANDING_OVERRIDE_DETAILS = 'enterprise_customer_branding_override_details'
 LOGGER = logging.getLogger("edx.enterprise_helpers")
 
@@ -249,7 +253,14 @@ def get_enterprise_consent_url(request, course_id, user=None, return_to=None):
 
     url_params = {
         'course_id': course_id,
-        'next': request.build_absolute_uri(return_path)
+        'next': request.build_absolute_uri(return_path),
+        'failure_url': request.build_absolute_uri(
+            reverse('dashboard') + '?' + urlencode(
+                {
+                    CONSENT_FAILED_PARAMETER: course_id
+                }
+            )
+        ),
     }
     querystring = urlencode(url_params)
     full_url = reverse('grant_data_sharing_permissions') + '?' + querystring
@@ -366,3 +377,68 @@ def get_enterprise_learner_data(site, user):
     enterprise_learner_data = EnterpriseApiClient().fetch_enterprise_learner_data(site=site, user=user)
     if enterprise_learner_data:
         return enterprise_learner_data['results']
+
+
+def get_dashboard_consent_notification(request, user, course_enrollments):
+    """
+    If relevant to the request at hand, create a banner on the dashboard indicating consent failed.
+
+    Args:
+        request: The WSGIRequest object produced by the user browsing to the Dashboard page.
+        user: The logged-in user
+        course_enrollments: A list of the courses to be rendered on the Dashboard page.
+
+    Returns:
+        str: Either an empty string, or a string containing the HTML code for the notification banner.
+    """
+    enrollment = None
+    enterprise_enrollment = None
+    course_id = request.GET.get(CONSENT_FAILED_PARAMETER)
+
+    if course_id:
+        for course_enrollment in course_enrollments:
+            if str(course_enrollment.course_id) == course_id:
+                enrollment = course_enrollment
+                break
+
+        try:
+            enterprise_enrollment = EnterpriseCourseEnrollment.objects.get(
+                course_id=course_id,
+                enterprise_customer_user__user_id=user.id,
+            )
+        except EnterpriseCourseEnrollment.DoesNotExist:
+            pass
+
+    if enterprise_enrollment and enrollment:
+        enterprise_customer = enterprise_enrollment.enterprise_customer_user.enterprise_customer
+        contact_info = getattr(enterprise_customer, 'contact_email', None)
+
+        if contact_info is None:
+            message_template = _(
+                'If you have concerns about sharing your data, please contact your administrator '
+                'at {enterprise_customer_name}.'
+            )
+        else:
+            message_template = _(
+                'If you have concerns about sharing your data, please contact your administrator '
+                'at {enterprise_customer_name} at {contact_info}.'
+            )
+
+        message = message_template.format(
+            enterprise_customer_name=enterprise_customer.name,
+            contact_info=contact_info,
+        )
+        title = _(
+            'Enrollment in {course_name} was not complete.'
+        ).format(
+            course_name=enrollment.course_overview.display_name,
+        )
+
+        return render_to_string(
+            'util/enterprise_consent_declined_notification.html',
+            {
+                'title': title,
+                'message': message,
+            }
+        )
+    return ''
