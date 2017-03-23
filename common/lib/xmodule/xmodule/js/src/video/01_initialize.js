@@ -337,7 +337,7 @@ function(VideoPlayer, i18n, moment, _) {
         state.controlHideTimeout = null;
         state.captionState = 'invisible';
         state.captionHideTimeout = null;
-        state.HLSVideoSources = [];
+        state.HLSVideoSources = extractHLSVideoSources(state);
     }
 
     function _initializeModules(state, i18n) {
@@ -573,8 +573,6 @@ function(VideoPlayer, i18n, moment, _) {
         _setConfigurations(this);
 
         if (!(_parseYouTubeIDs(this))) {
-            // Extract hls video sources
-            this.HLSVideoSources = extractHLSVideoSources(this);
             // If we do not have YouTube ID's, try parsing HTML5 video sources.
             if (!_prepareHTML5Video(this)) {
                 __dfd__.reject();

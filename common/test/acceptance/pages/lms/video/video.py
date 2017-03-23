@@ -33,7 +33,7 @@ CSS_CLASS_NAMES = {
     'captions_rendered': '.video.is-captions-rendered',
     'captions': '.subtitles',
     'captions_text': '.subtitles li span',
-    'captions_text_getter': '.subtitles li span[role="link"][data-index="1"]',
+    'captions_text_getter': '.subtitles li span[role="link"][data-index="{}"]',
     'closed_captions': '.closed-captions',
     'error_message': '.video .video-player .video-error',
     'video_container': '.video',
@@ -46,11 +46,13 @@ CSS_CLASS_NAMES = {
     'captions_lang_list': '.langs-list li',
     'video_speed': '.speeds .value',
     'poster': '.poster',
+    'active_caption_text': '.subtitles-menu > li.current span',
 }
 
 VIDEO_MODES = {
     'html5': '.video video',
-    'youtube': '.video iframe'
+    'youtube': '.video iframe',
+    'hls': '.video video',
 }
 
 VIDEO_MENUS = {
@@ -204,7 +206,7 @@ class VideoPage(PageObject):
         Check that if video is rendered in `mode`.
 
         Arguments:
-            mode (str): Video mode, `html5` or `youtube`.
+            mode (str): Video mode, one of `html5`, `youtube`, `hls`.
 
         Returns:
             bool: Tells if video is rendered in `mode`.
@@ -222,9 +224,24 @@ class VideoPage(PageObject):
 
             """
             is_present = self.q(css=selector).present
+            # There is no way to get actual HLS video URL. Becuase in hls video
+            # src attribute is not set to original url. https://github.com/video-dev/hls.js/issues/1052
+            # http://www.streambox.fr/playlists/x36xhzz/x36xhzz.m3u8 becomes
+            # "blob:https://studio-hlsvideo.sandbox.edx.org/0e2e72e0-904e-d946-9ce0-06c542894cda"
+            if mode == 'hls':
+                href_src = self.q(css=selector).attrs('src')[0]
+                is_present = href_src.startswith('blob:') or href_src.startswith('mediasource:')
             return is_present, is_present
 
         return Promise(_is_element_present, 'Video Rendering Failed in {0} mode.'.format(mode)).fulfill()
+
+    @property
+    def video_download_url(self):
+        """
+        Return video download url or None
+        """
+        browser_query = self.q(css='.wrapper-download-video .btn-link.video-sources')
+        return browser_query.attrs('href')[0] if browser_query.visible else None
 
     @property
     def is_autoplay_enabled(self):
@@ -409,14 +426,24 @@ class VideoPage(PageObject):
 
         return ' '.join(subs)
 
-    def click_first_line_in_transcript(self):
+    def click_transcript_line(self, line_no):
         """
         Clicks a line in the transcript updating the current caption.
+
+        Arguments:
+            line_no (int): line number to be clicked
         """
 
         self.wait_for_captions()
-        captions_selector = self.q(css=CSS_CLASS_NAMES['captions_text_getter'])
+        captions_selector = self.q(css=CSS_CLASS_NAMES['captions_text_getter'].format(line_no))
         captions_selector.click()
+
+    @property
+    def active_caption_text(self):
+        """
+        Return active caption text.
+        """
+        return self.q(css=CSS_CLASS_NAMES['active_caption_text']).text[0]
 
     @property
     def speed(self):
