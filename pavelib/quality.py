@@ -5,13 +5,20 @@ from paver.easy import sh, task, cmdopts, needs, BuildFailure
 import json
 import os
 import re
+from string import join
 
 from openedx.core.djangolib.markup import HTML
 
 from .utils.envs import Env
 from .utils.timer import timed
 
-ALL_SYSTEMS = 'lms,cms,common,openedx,pavelib'
+ALL_SYSTEMS = [
+    'cms',
+    'common',
+    'lms',
+    'openedx',
+    'pavelib',
+]
 
 
 def top_python_dirs(dirname):
@@ -45,7 +52,7 @@ def find_fixme(options):
     Run pylint on system code, only looking for fixme items.
     """
     num_fixme = 0
-    systems = getattr(options, 'system', ALL_SYSTEMS).split(',')
+    systems = getattr(options, 'system', '').split(',') or ALL_SYSTEMS
 
     for system in systems:
         # Directory to put the pylint report in.
@@ -93,7 +100,7 @@ def run_pylint(options):
     num_violations = 0
     violations_limit = int(getattr(options, 'limit', -1))
     errors = getattr(options, 'errors', False)
-    systems = getattr(options, 'system', ALL_SYSTEMS).split(',')
+    systems = getattr(options, 'system', '').split(',') or ALL_SYSTEMS
 
     # Make sure the metrics subdirectory exists
     Env.METRICS_DIR.makedirs_p()
@@ -234,7 +241,7 @@ def run_complexity():
     Uses radon to examine cyclomatic complexity.
     For additional details on radon, see http://radon.readthedocs.org/
     """
-    system_string = 'cms/ lms/ common/ openedx/'
+    system_string = join(ALL_SYSTEMS, '/ ') + '/'
     complexity_report_dir = (Env.REPORT_DIR / "complexity")
     complexity_report = complexity_report_dir / "python_complexity.log"
 
