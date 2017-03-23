@@ -100,6 +100,9 @@ class CourseOverview(TimeStampedModel):
     marketing_url = TextField(null=True)
     eligible_for_financial_aid = BooleanField(default=True)
 
+    # Sort key used to override the order of courses returned by the API.
+    sort_key = IntegerField(default=0)
+
     @classmethod
     def _create_from_course(cls, course):
         """
