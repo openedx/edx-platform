@@ -5,7 +5,6 @@ End-to-end tests for the LMS.
 
 import json
 from datetime import datetime, timedelta
-from unittest import skip
 
 import ddt
 from flaky import flaky
@@ -441,7 +440,7 @@ class CoursewareMultipleVerticalsTest(CoursewareMultipleVerticalsTestBase):
     Test courseware with multiple verticals
     """
 
-    @skip('Disable temporarily to get course bookmarks out')
+    @flaky  # PLAT-1198; should be fixed, but verify that failures stop before removing
     def test_navigation_buttons(self):
         self.courseware_page.visit()
 
