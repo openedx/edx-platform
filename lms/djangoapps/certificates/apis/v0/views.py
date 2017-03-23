@@ -8,11 +8,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from lms.djangoapps.certificates.api import get_certificate_for_user
+from edx_rest_framework_extensions.authentication import JwtAuthentication
 from openedx.core.lib.api import (
     authentication,
     permissions,
 )
-
 
 log = logging.getLogger(__name__)
 
@@ -48,7 +48,11 @@ class CertificatesDetailView(GenericAPIView):
             * certificate_type: A string representation of the certificate type.
                 Can be honor|verified|professional
 
+            * created_date: Date/time the certificate was created, in ISO-8661 format.
+
             * status: A string representation of the certificate status.
+
+            * is_passing: True if the certificate has a passing status, False if not.
 
             * download_url: A string representation of the certificate url.
 
@@ -60,7 +64,9 @@ class CertificatesDetailView(GenericAPIView):
                 "username": "bob",
                 "course_id": "edX/DemoX/Demo_Course",
                 "certificate_type": "verified",
+                "created_date": "2015-12-03T13:14:28+0000",
                 "status": "downloadable",
+                "is_passing": true,
                 "download_url": "http://www.example.com/cert.pdf",
                 "grade": "0.98"
             }
@@ -69,6 +75,7 @@ class CertificatesDetailView(GenericAPIView):
     authentication_classes = (
         authentication.OAuth2AuthenticationAllowInactiveUser,
         authentication.SessionAuthenticationAllowInactiveUser,
+        JwtAuthentication,
     )
     permission_classes = (
         IsAuthenticated,
@@ -107,7 +114,9 @@ class CertificatesDetailView(GenericAPIView):
                 "username": user_cert.get('username'),
                 "course_id": unicode(user_cert.get('course_key')),
                 "certificate_type": user_cert.get('type'),
+                "created_date": user_cert.get('created'),
                 "status": user_cert.get('status'),
+                "is_passing": user_cert.get('is_passing'),
                 "download_url": user_cert.get('download_url'),
                 "grade": user_cert.get('grade')
             }
