@@ -30,6 +30,18 @@ class CourseOutlineFragmentView(EdxFragmentView):
         for i in range(len(children)):
             child_id = block['children'][i]
             child_detail = self.populate_children(all_blocks[child_id], all_blocks, course_position)
+
+            # Fake data; remove
+            child_detail = dict(child_detail, **{
+                'format': "",
+                'proctoring': {
+                    'status': 'eligible',
+                    'suggested_icon': 'fa-pencil-square-o',
+                    'in_completed_state': True,
+                    'short_description': "Exam details go here"
+                }
+            })
+
             block['children'][i] = child_detail
             block['children'][i]['current'] = course_position == child_detail['block_id']
 

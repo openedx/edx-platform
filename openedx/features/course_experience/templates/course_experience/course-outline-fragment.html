@@ -39,14 +39,80 @@ from django.utils.translation import ugettext as _
                                 href="${ subsection['lms_web_url'] }"
                                 id="${ subsection['id'] }"
                             >
-                                <span>${ subsection['display_name'] }</span>
-                                <span class="sr-only">${ _("This is your last visited course section.") }</span>
-                                % if subsection['current']:
-                                    <span class="resume-right">
-                                        <b>${ _("Resume Course") }</b>
-                                        <span class="icon fa fa-arrow-circle-right" aria-hidden="true"></span>
-                                    </span>
-                                %endif
+                                <div class="subsection-text">
+                                    ## Subsection title
+                                    <span>${ subsection['display_name'] }</span>
+
+                                    <div class="details">
+                                        ## There are behavior differences between rendering of subsections which have
+                                        ## proctoring/timed examinations and those that do not.
+                                        ##
+                                        ## Proctoring exposes a exam status message field as well as a status icon
+                                        <%
+                                            if subsection.get('due') is None:
+                                                data_string = subsection['format']
+                                            else:
+                                                if 'proctoring' in subsection:
+                                                    data_string = _('due {date}')
+                                                else:
+                                                    data_string = _("{subsection_format} due {{date}}").format(subsection_format=subsection['format'])
+                                        %>
+                                        % if subsection['format'] or due_date or 'proctoring' in subsection:
+                                        <span class="subtitle">
+                                            % if 'proctoring' in subsection:
+                                                ## Display the proctored exam status icon and status message
+                                                <span
+                                                    class="menu-icon icon fa ${subsection['proctoring'].get('suggested_icon', 'fa-pencil-square-o')} ${subsection['proctoring'].get('status', 'eligible')}"
+                                                    aria-hidden="true"
+                                                ></span>
+                                                <span class="subtitle-name">
+                                                    ${subsection['proctoring'].get('short_description', '')}
+                                                </span>
+
+                                                ## completed proctored exam statuses should not show the due date
+                                                ## since the exam has already been submitted by the user
+                                                % if not section['proctoring'].get('in_completed_state', False):
+                                                    <span
+                                                        class="localized-datetime subtitle-name"
+                                                        data-datetime="${subsection['due']}"
+                                                        data-string="${data_string}"
+                                                        data-timezone="${user_timezone}"
+                                                        data-language="${user_language}"
+                                                    ></span>
+                                                % endif
+                                            % else:
+                                                ## non-proctored section, we just show the exam format and the due date
+                                                ## this is the standard case in edx-platform
+                                                <span
+                                                    class="localized-datetime subtitle-name"
+                                                    data-datetime="${subsection['due']}"
+                                                    data-string="${data_string}"
+                                                    data-timezone="${user_timezone}"
+                                                    data-language="${user_language}"
+                                                ></span>
+
+                                                % if 'graded' in subsection and subsection['graded']:
+                                                    <span
+                                                        class="menu-icon icon fa fa-pencil-square-o"
+                                                        aria-hidden="true"
+                                                    ></span>
+                                                    <span class="sr">${_("This content is graded")}</span>
+                                                % endif
+                                            % endif
+                                        </span>
+                                        % endif
+                                    </div> <!-- /details -->
+                                </div> <!-- /subsection-text -->
+                                <div class="subsection-actions">
+                                    ## Resume button (if last visited section)
+                                    % if subsection['current']:
+                                        <span class="sr-only">${ _("This is your last visited course section.") }</span>
+                                        <span class="resume-right">
+                                            <b>${ _("Resume Course") }</b>
+                                            <span class="icon fa fa-arrow-circle-right" aria-hidden="true"></span>
+                                        </span>
+                                    %endif
+                                </div>
                             </a>
                         </li>
                     % endfor
