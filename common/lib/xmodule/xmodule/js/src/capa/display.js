@@ -872,6 +872,7 @@
                         if (bind) {
                             $(checkboxOrRadio).on('click', function() {
                                 that.saveNotification.hide();
+                                that.el.find('.show').removeAttr('disabled');
                                 that.showAnswerNotification.hide();
                                 that.submitAnswersAndSubmitButton();
                             });
@@ -953,6 +954,7 @@
                             id: 'status_' + id
                         });
                     }
+                    $element.find('label').find('span.status.correct').remove();
                     return $element.find('label').removeAttr('class');
                 });
             },
