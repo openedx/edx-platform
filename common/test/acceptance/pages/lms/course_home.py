@@ -16,6 +16,8 @@ class CourseHomePage(CoursePage):
 
     url_path = "course/"
 
+    HEADER_RESUME_COURSE_SELECTOR = '.page-header .action-resume-course'
+
     def is_browser_on_page(self):
         return self.q(css='.course-outline').present
 
@@ -32,6 +34,14 @@ class CourseHomePage(CoursePage):
         bookmarks_page = BookmarksPage(self.browser, self.course_id)
         bookmarks_page.visit()
 
+    def resume_course_from_header(self):
+        """
+        Navigate to courseware using Resume Course button in the header.
+        """
+        self.q(css=self.HEADER_RESUME_COURSE_SELECTOR).first.click()
+        courseware_page = CoursewarePage(self.browser, self.course_id)
+        courseware_page.wait_for_page()
+
 
 class CourseOutlinePage(PageObject):
     """
@@ -44,11 +54,11 @@ class CourseOutlinePage(PageObject):
     SECTION_TITLES_SELECTOR = '.section-name span'
     SUBSECTION_SELECTOR = SECTION_SELECTOR + ' .subsection:nth-of-type({1}) .outline-item'
     SUBSECTION_TITLES_SELECTOR = SECTION_SELECTOR + ' .subsection a span:first-child'
+    OUTLINE_RESUME_COURSE_SELECTOR = '.outline-item .resume-right'
 
     def __init__(self, browser, parent_page):
         super(CourseOutlinePage, self).__init__(browser)
         self.parent_page = parent_page
-        self.courseware_page = CoursewarePage(self.browser, self.parent_page.course_id)
 
     def is_browser_on_page(self):
         return self.parent_page.is_browser_on_page
@@ -114,13 +124,16 @@ class CourseOutlinePage(PageObject):
 
         # Click the subsection and ensure that the page finishes reloading
         self.q(css=subsection_css).first.click()
-        self.courseware_page.wait_for_page()
-
-        # TODO: TNL-6546: Remove this if/visit_unified_course_view
-        if self.parent_page.unified_course_view:
-            self.courseware_page.nav.visit_unified_course_view()
 
         self._wait_for_course_section(section_title, subsection_title)
+
+    def resume_course_from_outline(self):
+        """
+        Navigate to courseware using Resume Course button in the header.
+        """
+        self.q(css=self.OUTLINE_RESUME_COURSE_SELECTOR).first.click()
+        courseware_page = CoursewarePage(self.browser, self.parent_page.course_id)
+        courseware_page.wait_for_page()
 
     def _section_titles(self):
         """
@@ -142,7 +155,14 @@ class CourseOutlinePage(PageObject):
         """
         Ensures the user navigates to the course content page with the correct section and subsection.
         """
+        courseware_page = CoursewarePage(self.browser, self.parent_page.course_id)
+        courseware_page.wait_for_page()
+
+        # TODO: TNL-6546: Remove this if/visit_unified_course_view
+        if self.parent_page.unified_course_view:
+            courseware_page.nav.visit_unified_course_view()
+
         self.wait_for(
-            promise_check_func=lambda: self.courseware_page.nav.is_on_section(section_title, subsection_title),
+            promise_check_func=lambda: courseware_page.nav.is_on_section(section_title, subsection_title),
             description="Waiting for course page with section '{0}' and subsection '{1}'".format(section_title, subsection_title)
         )
