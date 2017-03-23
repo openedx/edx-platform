@@ -37,16 +37,24 @@ class CoursewareTab(EnrolledTab):
     is_movable = False
     is_default = False
 
+    @staticmethod
+    def main_course_url_name(request):
+        """
+        Returns the main course URL for the current user.
+        """
+        if waffle.flag_is_active(request, 'unified_course_view'):
+            return 'edx.course_experience.course_home'
+        else:
+            return 'courseware'
+
     @property
     def link_func(self):
         """
         Returns a function that computes the URL for this tab.
         """
         request = RequestCache.get_current_request()
-        if waffle.flag_is_active(request, 'unified_course_view'):
-            return link_reverse_func('edx.course_experience.course_home')
-        else:
-            return link_reverse_func('courseware')
+        url_name = self.main_course_url_name(request)
+        return link_reverse_func(url_name)
 
 
 class CourseInfoTab(CourseTab):

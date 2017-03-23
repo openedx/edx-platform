@@ -1,11 +1,12 @@
-(function(define, undefined) {
+(function(define) {
     'use strict';
-    define(['gettext', 'jquery', 'underscore', 'backbone', 'logger', 'moment', 'edx-ui-toolkit/js/utils/html-utils',
-            'common/js/components/views/paging_header', 'common/js/components/views/paging_footer',
-            'text!templates/bookmarks/bookmarks-list.underscore'
-        ],
+    define([
+        'gettext', 'jquery', 'underscore', 'backbone', 'logger', 'moment', 'edx-ui-toolkit/js/utils/html-utils',
+        'common/js/components/views/paging_header', 'common/js/components/views/paging_footer',
+        'text!course_bookmarks/templates/bookmarks-list.underscore'
+    ],
         function(gettext, $, _, Backbone, Logger, _moment, HtmlUtils,
-                  PagingHeaderView, PagingFooterView, BookmarksListTemplate) {
+                 PagingHeaderView, PagingFooterView, bookmarksListTemplate) {
             var moment = _moment || window.moment;
 
             return Backbone.View.extend({
@@ -15,7 +16,7 @@
                 coursewareResultsWrapperEl: '.courseware-results-wrapper',
 
                 errorIcon: '<span class="fa fa-fw fa-exclamation-triangle message-error" aria-hidden="true"></span>',
-                loadingIcon: '<span class="fa fa-fw fa-spinner fa-pulse message-in-progress" aria-hidden="true"></span>',
+                loadingIcon: '<span class="fa fa-fw fa-spinner fa-pulse message-in-progress" aria-hidden="true"></span>',  // eslint-disable-line max-len
 
                 errorMessage: gettext('An error has occurred. Please try again.'),
                 loadingMessage: gettext('Loading'),
@@ -27,7 +28,7 @@
                 },
 
                 initialize: function(options) {
-                    this.template = HtmlUtils.template(BookmarksListTemplate);
+                    this.template = HtmlUtils.template(bookmarksListTemplate);
                     this.loadingMessageView = options.loadingMessageView;
                     this.errorMessageView = options.errorMessageView;
                     this.langCode = $(this.el).data('langCode');
@@ -65,47 +66,39 @@
                 },
 
                 visitBookmark: function(event) {
-                    var bookmarkedComponent = $(event.currentTarget);
-                    var bookmark_id = bookmarkedComponent.data('bookmarkId');
-                    var component_usage_id = bookmarkedComponent.data('usageId');
-                    var component_type = bookmarkedComponent.data('componentType');
+                    var $bookmarkedComponent = $(event.currentTarget),
+                        bookmarkId = $bookmarkedComponent.data('bookmarkId'),
+                        componentUsageId = $bookmarkedComponent.data('usageId'),
+                        componentType = $bookmarkedComponent.data('componentType');
                     Logger.log(
-                    'edx.bookmark.accessed',
+                        'edx.bookmark.accessed',
                         {
-                            bookmark_id: bookmark_id,
-                            component_type: component_type,
-                            component_usage_id: component_usage_id
+                            bookmark_id: bookmarkId,
+                            component_type: componentType,
+                            component_usage_id: componentUsageId
                         }
-                ).always(function() {
-                    window.location.href = event.currentTarget.pathname;
-                });
+                    ).always(function() {
+                        window.location.href = event.currentTarget.pathname;
+                    });
                 },
 
-            /**
-             * Convert ISO 8601 formatted date into human friendly format. e.g, `2014-05-23T14:00:00Z` to `May 23, 2014`
-             * @param {String} isoDate - ISO 8601 formatted date string.
-             */
+                /**
+                 * Convert ISO 8601 formatted date into human friendly format.
+                 *
+                 * e.g, `2014-05-23T14:00:00Z` to `May 23, 2014`
+                 *
+                 * @param {String} isoDate - ISO 8601 formatted date string.
+                 */
                 humanFriendlyDate: function(isoDate) {
                     moment.locale(this.langCode);
                     return moment(isoDate).format('LL');
                 },
 
-                areBookmarksVisible: function() {
-                    return this.$('#my-bookmarks').is(':visible');
-                },
-
-                hideBookmarks: function() {
-                    this.$el.hide();
-                    $(this.coursewareResultsWrapperEl).hide();
-                    $(this.coursewareContentEl).css('display', 'table-cell');
-                },
-
                 showBookmarksContainer: function() {
                     $(this.coursewareContentEl).hide();
-                // Empty el if it's not empty to get the clean state.
+                    // Empty el if it's not empty to get the clean state.
                     this.$el.html('');
                     this.$el.show();
-                    $(this.coursewareResultsWrapperEl).css('display', 'table-cell');
                 },
 
                 showLoadingMessage: function() {
