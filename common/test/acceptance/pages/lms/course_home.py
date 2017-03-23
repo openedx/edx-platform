@@ -4,6 +4,7 @@ LMS Course Home page object
 
 from bok_choy.page_object import PageObject
 
+from common.test.acceptance.pages.lms.bookmarks import BookmarksPage
 from common.test.acceptance.pages.lms.course_page import CoursePage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 
@@ -24,6 +25,12 @@ class CourseHomePage(CoursePage):
         self.outline = CourseOutlinePage(browser, self)
         # TODO: TNL-6546: Remove the following
         self.unified_course_view = False
+
+    def click_bookmarks_button(self):
+        """ Click on Bookmarks button """
+        self.q(css='.bookmarks-list-button').first.click()
+        bookmarks_page = BookmarksPage(self.browser, self.course_id)
+        bookmarks_page.visit()
 
 
 class CourseOutlinePage(PageObject):

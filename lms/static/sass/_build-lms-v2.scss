@@ -19,7 +19,10 @@
 @import 'shared-v2/modal';
 @import 'shared-v2/help-tab';
 
+// Elements
 @import 'notifications';
+@import 'elements-v2/pagination';
 
-// course outline
-@import 'shared-v2/course-outline';
+// Features
+@import 'features/bookmarks';
+@import 'features/course-outline';

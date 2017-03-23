@@ -3,7 +3,7 @@
     define([
         'backbone',
         'edx-ui-toolkit/js/pagination/paging-collection',
-        'js/bookmarks/models/bookmark'
+        'course_bookmarks/js/models/bookmark'
     ], function(Backbone, PagingCollection, BookmarkModel) {
         return PagingCollection.extend({
             model: BookmarkModel,
@@ -24,5 +24,5 @@
             }
         });
     });
-})(define || RequireJS.define);
+}(define || RequireJS.define));
 
