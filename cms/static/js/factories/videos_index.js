@@ -1,7 +1,9 @@
 define([
     'jquery', 'backbone', 'js/views/active_video_upload_list',
-    'js/views/previous_video_upload_list', 'js/views/active_video_upload'
-], function($, Backbone, ActiveVideoUploadListView, PreviousVideoUploadListView, ActiveVideoUpload) {
+    'js/views/previous_video_upload_list', 'js/views/active_video_upload',
+    'js/collections/video'
+], function($, Backbone, ActiveVideoUploadListView, PreviousVideoUploadListView,
+    ActiveVideoUpload, VideoPagingCollection) {
     'use strict';
     var VideosIndexFactory = function(
         $contentWrapper,
@@ -26,7 +28,13 @@ define([
                         dataType: 'json',
                         type: 'GET'
                     }).done(function(responseData) {
-                        var updatedCollection = new Backbone.Collection(responseData.videos).filter(function(video) {
+                        var updatedCollection = new VideoPagingCollection(responseData.results, {
+                            url: videoHandlerUrl,
+                            pageSize: responseData.page_size,
+                            sortField: responseData.sort_field,
+                            count: responseData.count,
+                            sortOrder: responseData.sort_oder
+                        }).filter(function(video) {
                                 // Include videos that are not in the active video upload list,
                                 // or that are marked as Upload Complete
                                 var isActive = activeVideos.where({videoId: video.get('edx_video_id')});
@@ -44,7 +52,14 @@ define([
             }),
             previousView = new PreviousVideoUploadListView({
                 videoHandlerUrl: videoHandlerUrl,
-                collection: new Backbone.Collection(previousUploads),
+                collection: new VideoPagingCollection(previousUploads["results"], {
+                    url: videoHandlerUrl,
+                    pageSize: previousUploads["page_size"],
+                    sortField: previousUploads["sort_field"],
+                    count: previousUploads["count"],
+                    sortOder: previousUploads["sort_order"],
+                    page: previousUploads["page"]
+                }),
                 encodingsDownloadUrl: encodingsDownloadUrl
             });
         $contentWrapper.append(activeView.render().$el);

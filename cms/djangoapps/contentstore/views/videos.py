@@ -134,9 +134,9 @@ def videos_handler(request, course_key_string, edx_video_id=None):
 
     if request.method == "GET":
         if "application/json" in request.META.get("HTTP_ACCEPT", ""):
-            return videos_index_json(course)
+            return videos_index_json(course, request)
         else:
-            return videos_index_html(course)
+            return videos_index_html(course, request)
     elif request.method == "DELETE":
         remove_video_for_course(course_key_string, edx_video_id)
         return JsonResponse()
@@ -171,7 +171,7 @@ def video_encodings_download(request, course_key_string):
 
     profile_whitelist = VideoUploadConfig.get_profile_whitelist()
 
-    videos = list(_get_videos(course))
+    videos = _get_videos(course, {"paginated": False})
     name_col = _("Name")
     duration_col = _("Duration")
     added_col = _("Date Added")
@@ -285,33 +285,41 @@ def convert_video_status(video):
     return status
 
 
-def _get_videos(course):
+def _get_videos(course, params):
     """
     Retrieves the list of videos from VAL corresponding to this course.
     """
-    videos = list(get_videos_for_course(course.id, VideoSortField.created, SortDirection.desc))
+    videos = get_videos_for_course(course.id, **params)
 
-    # convert VAL's status to studio's Video Upload feature status.
-    for video in videos:
-        video["status"] = convert_video_status(video)
-
+    if "paginated" in params and params["paginated"]:
+        # convert VAL's status to studio's Video Upload feature status.
+        for video in videos["results"]:
+            video["status"] = convert_video_status(video)
+    else:
+        for video in videos:
+            video["status"] = convert_video_status(video)
     return videos
 
 
-def _get_index_videos(course):
+def _get_index_videos(course, request):
     """
     Returns the information about each video upload required for the video list
     """
-    return list(
+    params = _get_validated_params(request)
+
+    videos_data = _get_videos(course, params)
+    videos_data["results"] = list(
         {
             attr: video[attr]
             for attr in ["edx_video_id", "client_video_id", "created", "duration", "status"]
         }
-        for video in _get_videos(course)
+        for video in videos_data["results"]
     )
 
+    return videos_data
 
-def videos_index_html(course):
+
+def videos_index_html(course, request):
     """
     Returns an HTML page to display previous video uploads and allow new ones
     """
@@ -321,7 +329,7 @@ def videos_index_html(course):
             "context_course": course,
             "video_handler_url": reverse_course_url("videos_handler", unicode(course.id)),
             "encodings_download_url": reverse_course_url("video_encodings_download", unicode(course.id)),
-            "previous_uploads": _get_index_videos(course),
+            "previous_uploads": _get_index_videos(course, request),
             "concurrent_upload_limit": settings.VIDEO_UPLOAD_PIPELINE.get("CONCURRENT_UPLOAD_LIMIT", 0),
             "video_supported_file_formats": VIDEO_SUPPORTED_FILE_FORMATS.keys(),
             "video_upload_max_file_size": VIDEO_UPLOAD_MAX_FILE_SIZE_GB
@@ -329,11 +337,17 @@ def videos_index_html(course):
     )
 
 
-def videos_index_json(course):
+def videos_index_json(course, request):
     """
     Returns JSON in the following format:
     {
-        "videos": [{
+        "count": <total number of records>,
+        "sort_field": <sort field>,
+        "sort_order": <sort direction>,
+        "page": <current page numver>,
+        "num_page": <total number of pages>,
+        "page_size": <size of each page>,
+        "results": [{
             "edx_video_id": "aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa",
             "client_video_id": "video.mp4",
             "created": "1970-01-01T00:00:00Z",
@@ -342,7 +356,7 @@ def videos_index_json(course):
         }]
     }
     """
-    return JsonResponse({"videos": _get_index_videos(course)}, status=200)
+    return JsonResponse(_get_index_videos(course, request), status=200)
 
 
 def videos_post(course, request):
@@ -468,3 +482,35 @@ def is_status_update_request(request_data):
     Returns True if `request_data` contains status update else False.
     """
     return any('status' in update for update in request_data)
+
+def _get_validated_params(request):
+    """
+    Reads and returns valid parameters
+    """
+    params = { "paginated": True }
+
+    page = request.GET.get("page")
+    page_size = request.GET.get("page_size")
+    search_key = request.GET.get("search_key")
+    sort_field = request.GET.get("sort_field")
+    sort_dir = request.GET.get("sort_dir")
+
+    # Page must be an integer greater than 0
+    try:
+        if int(page) > 0: params["page"] = int(page)
+    except:
+        pass
+
+    # Page size must be an integer greater than 0
+    try:
+        if int(page_size) > 0: params["page_size"] = int(page_size)
+    except:
+        pass
+
+    if sort_field in VideoSortField:
+        params["sort_field"] = VideoSortField[sort_field]
+
+    if sort_dir in SortDirection:
+        params["sort_dir"] = SortDirection[sort_dir]
+
+    return params

@@ -1,7 +1,9 @@
 define(
     ['jquery', 'underscore', 'backbone', 'js/views/previous_video_upload_list',
-     'common/js/spec_helpers/template_helpers', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'],
-    function($, _, Backbone, PreviousVideoUploadListView, TemplateHelpers, AjaxHelpers) {
+     'common/js/spec_helpers/template_helpers', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+     'js/collections/video'],
+    function($, _, Backbone, PreviousVideoUploadListView, TemplateHelpers, AjaxHelpers,
+        VideoPagingCollection) {
         'use strict';
         describe('PreviousVideoUploadListView', function() {
             var videoHandlerUrl = '/videos/course-v1:org.0+course_0+Run_0',
@@ -13,7 +15,7 @@ define(
                         edx_video_id: 'dummy_id',
                         status: 'uploading'
                     };
-                    var collection = new Backbone.Collection(
+                    var collection = new VideoPagingCollection(
                         _.map(
                             _.range(numModels),
                             function(num, index) {
@@ -21,7 +23,13 @@ define(
                                     _.extend({}, modelData, {edx_video_id: 'dummy_id_' + index})
                                 );
                             }
-                        )
+                        ), {
+                            url: videoHandlerUrl,
+                            pageSize: 10,
+                            sortField: "Name",
+                            totalCount: numModels,
+                            sortDir: "asc"
+                        }
                     );
                     var view = new PreviousVideoUploadListView({
                         collection: collection,
@@ -98,6 +106,120 @@ define(
             it('does nothing upon click on Cancel button', function() {
                 // Verify that nothing changes when we click on Cancel button on confirmation popup
                 verifyVideosInfo(this, false);
+            });
+
+            describe('PagingPreviousVideoUploadListView', function() {
+
+                var videoView, collection;
+                beforeEach(function() {
+                    collection = new VideoPagingCollection([
+                            {
+                                'client_video_id': 'foo.mp4',
+                                'duration': 42,
+                                'created': '2014-11-25T23:13:05',
+                                'edx_video_id': 'dummy_id_1',
+                                'status': 'uploading'
+                            },
+                            {
+                                'client_video_id': 'foo.mp4',
+                                'duration': 42,
+                                'created': '2014-11-25T23:13:05',
+                                'edx_video_id': 'dummy_id_2',
+                                'status': 'uploading'
+                            }
+                        ],
+                        {
+                            url: videoHandlerUrl,
+                            pageSize: 2,
+                            sortField: 'Name',
+                            totalCount: 3,
+                            sortDir: 'asc'
+                        }
+                    );
+                    videoView = new PreviousVideoUploadListView({
+                        collection: collection,
+                        videoHandlerUrl: videoHandlerUrl
+                    });
+
+                    videoView.render();
+                });
+
+                var firstPageResults = {
+                        sort: 'uploadDate',
+                        end: 1,
+                        results: [
+                            {
+                                'client_video_id': 'foo.mp4',
+                                'duration': 42,
+                                'created': '2014-11-25T23:13:05',
+                                'edx_video_id': 'dummy_id_1',
+                                'status': 'uploading'
+                            },
+                            {
+                                'client_video_id': 'foo.mp4',
+                                'duration': 42,
+                                'created': '2014-11-25T23:13:05',
+                                'edx_video_id': 'dummy_id_2',
+                                'status': 'uploading'
+                            }
+                        ],
+                        pageSize: 2,
+                        totalCount: 3,
+                        start: 0,
+                        page: 0
+                    }, secondPageResults = {
+                        sort: 'uploadDate',
+                        end: 2,
+                        results: [
+                            {
+                                'client_video_id': 'foo.mp4',
+                                'duration': 42,
+                                'created': '2014-11-25T23:13:05',
+                                'edx_video_id': 'dummy_id_3',
+                                'status': 'uploading'
+                            }
+                        ],
+                        pageSize: 2,
+                        totalCount: 3,
+                        start: 2,
+                        page: 1
+                    };
+
+                it('can move forward a page using the next page button', function() {
+                    var requests = AjaxHelpers.requests(this);
+                    expect(videoView.pagingView.pagingFooter).toBeDefined();
+                    expect(videoView.pagingView.pagingFooter.$('button.next-page-link'))
+                        .not.toHaveClass('is-disabled');
+                    videoView.pagingView.pagingFooter.$('button.next-page-link').click();
+                    AjaxHelpers.respondWithJson(requests, secondPageResults);
+                    expect(videoView.pagingView.pagingFooter.$('button.next-page-link'))
+                        .toHaveClass('is-disabled');
+                });
+
+                it('can move back a page using the previous page button', function() {
+                    var requests = AjaxHelpers.requests(this);
+                    videoView.pagingView.setPage(2);
+                    AjaxHelpers.respondWithJson(requests, secondPageResults);
+                    expect(videoView.pagingView.pagingFooter).toBeDefined();
+                    expect(videoView.pagingView.pagingFooter.$('button.previous-page-link'))
+                        .not.toHaveClass('is-disabled');
+                    videoView.pagingView.pagingFooter.$('button.previous-page-link').click();
+                    AjaxHelpers.respondWithJson(requests, firstPageResults);
+                    expect(videoView.pagingView.pagingFooter.$('button.previous-page-link'))
+                        .toHaveClass('is-disabled');
+                });
+
+                it('can set the current page using the page number input', function() {
+                    var requests = AjaxHelpers.requests(this);
+                    videoView.pagingView.setPage(1);
+                    AjaxHelpers.respondWithJson(requests, firstPageResults);
+                    videoView.pagingView.pagingFooter.$('#page-number-input').val('2');
+                    videoView.pagingView.pagingFooter.$('#page-number-input').trigger('change');
+                    AjaxHelpers.respondWithJson(requests, secondPageResults);
+                    expect(videoView.collection.getPageNumber()).toBe(2);
+                    expect(videoView.pagingView.pagingFooter.$('button.previous-page-link'))
+                        .not.toHaveClass('is-disabled');
+                });
             });
         });
     }

@@ -177,11 +177,17 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
     def test_get_json(self):
         response = self.client.get_json(self.url)
         self.assertEqual(response.status_code, 200)
-        response_videos = json.loads(response.content)["videos"]
+        response_videos_data = json.loads(response.content)
+        response_videos = response_videos_data["results"]
         self.assertEqual(len(response_videos), len(self.previous_uploads))
+        self.assertEqual(response_videos_data["sort_order"], "asc")
+        self.assertEqual(response_videos_data["count"], 20)
+        self.assertEqual(response_videos_data["page"], 1)
+        self.assertEqual(response_videos_data["num_pages"], 1)
+        self.assertEqual(response_videos_data["page_size"], 20)
+        self.assertEqual(response_videos_data["sort_field"], "created")
         for i, response_video in enumerate(response_videos):
-            # Videos should be returned by creation date descending
-            original_video = self.previous_uploads[-(i + 1)]
+            original_video = self.previous_uploads[i]
             self.assertEqual(
                 set(response_video.keys()),
                 set(["edx_video_id", "client_video_id", "created", "duration", "status"])
@@ -414,7 +420,8 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
         """
         response = self.client.get_json(url)
         self.assertEqual(response.status_code, 200)
-        response_videos = json.loads(response.content)["videos"]
+        response_videos_data = json.loads(response.content)
+        response_videos = response_videos_data["results"]
         self.assertEqual(len(response_videos), len(self.previous_uploads) - deleted_videos)
 
         if deleted_videos:
@@ -480,7 +487,8 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
         """
         response = self.client.get_json(url)
         self.assertEqual(response.status_code, 200)
-        videos = json.loads(response.content)["videos"]
+        videos_data = json.loads(response.content)
+        videos = videos_data["results"]
         for video in videos:
             if video['edx_video_id'] == edx_video_id:
                 return self.assertEqual(video['status'], status)
@@ -556,8 +564,7 @@ class VideoUrlsCsvTestCase(VideoUploadTestMixin, CourseTestCase):
             response_video = {
                 key.decode("utf-8"): value.decode("utf-8") for key, value in row.items()
             }
-            # Videos should be returned by creation date descending
-            original_video = self.previous_uploads[-(i + 1)]
+            original_video = self.previous_uploads[i]
             self.assertEqual(response_video["Name"], original_video["client_video_id"])
             self.assertEqual(response_video["Duration"], str(original_video["duration"]))
             dateutil.parser.parse(response_video["Date Added"])
