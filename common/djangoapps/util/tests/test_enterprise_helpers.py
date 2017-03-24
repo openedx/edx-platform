@@ -13,7 +13,9 @@ from util.enterprise_helpers import (
     insert_enterprise_pipeline_elements,
     data_sharing_consent_required,
     set_enterprise_branding_filter_param,
+    get_dashboard_consent_notification,
     get_enterprise_branding_filter_param,
+    get_enterprise_consent_url,
     get_enterprise_customer_logo_url
 )
 
@@ -192,3 +194,144 @@ class TestEnterpriseHelpers(unittest.TestCase):
         mock_get_consent_url.assert_called_once()
         mock_enterprise_enabled.assert_called_once()
         mock_consent_necessary.assert_called_once()
+
+    @mock.patch('util.enterprise_helpers.consent_needed_for_course')
+    def test_get_enterprise_consent_url(self, needed_for_course_mock):
+        """
+        Verify that get_enterprise_consent_url correctly builds URLs.
+        """
+        needed_for_course_mock.return_value = True
+
+        request_mock = mock.MagicMock(
+            user=None,
+            build_absolute_uri=lambda x: 'http://localhost:8000' + x  # Don't do it like this in prod. Ever.
+        )
+
+        course_id = 'course-v1:edX+DemoX+Demo_Course'
+        return_to = 'info'
+
+        expected_url = (
+            '/enterprise/grant_data_sharing_permissions?course_id=course-v1%3AedX%2BDemoX%2BDemo_'
+            'Course&failure_url=http%3A%2F%2Flocalhost%3A8000%2Fdashboard%3Fconsent_failed%3Dcou'
+            'rse-v1%253AedX%252BDemoX%252BDemo_Course&next=http%3A%2F%2Flocalhost%3A8000%2Fcours'
+            'es%2Fcourse-v1%3AedX%2BDemoX%2BDemo_Course%2Finfo'
+        )
+        actual_url = get_enterprise_consent_url(request_mock, course_id, return_to=return_to)
+        self.assertEqual(actual_url, expected_url)
+
+    def test_get_dashboard_consent_notification_no_param(self):
+        """
+        Test that the output of the consent notification renderer meets expectations.
+        """
+        request = mock.MagicMock(
+            GET={}
+        )
+        notification_string = get_dashboard_consent_notification(
+            request, None, None
+        )
+        self.assertEqual(notification_string, '')
+
+    def test_get_dashboard_consent_notification_no_enrollments(self):
+        request = mock.MagicMock(
+            GET={'consent_failed': 'course-v1:edX+DemoX+Demo_Course'}
+        )
+        enrollments = []
+        user = mock.MagicMock(id=1)
+        notification_string = get_dashboard_consent_notification(
+            request, user, enrollments,
+        )
+        self.assertEqual(notification_string, '')
+
+    def test_get_dashboard_consent_notification_no_matching_enrollments(self):
+        request = mock.MagicMock(
+            GET={'consent_failed': 'course-v1:edX+DemoX+Demo_Course'}
+        )
+        enrollments = [mock.MagicMock(course_id='other_course_id')]
+        user = mock.MagicMock(id=1)
+        notification_string = get_dashboard_consent_notification(
+            request, user, enrollments,
+        )
+        self.assertEqual(notification_string, '')
+
+    def test_get_dashboard_consent_notification_no_matching_ece(self):
+        request = mock.MagicMock(
+            GET={'consent_failed': 'course-v1:edX+DemoX+Demo_Course'}
+        )
+        enrollments = [mock.MagicMock(course_id='course-v1:edX+DemoX+Demo_Course')]
+        user = mock.MagicMock(id=1)
+        notification_string = get_dashboard_consent_notification(
+            request, user, enrollments,
+        )
+        self.assertEqual(notification_string, '')
+
+    @mock.patch('util.enterprise_helpers.EnterpriseCourseEnrollment')
+    def test_get_dashboard_consent_notification_no_contact_info(self, ece_mock):
+        mock_get_ece = ece_mock.objects.get
+        ece_mock.DoesNotExist = Exception
+        mock_ece = mock_get_ece.return_value
+        mock_ece.enterprise_customer_user = mock.MagicMock(
+            enterprise_customer=mock.MagicMock(
+                contact_email=None
+            )
+        )
+        mock_ec = mock_ece.enterprise_customer_user.enterprise_customer
+        mock_ec.name = 'Veridian Dynamics'
+
+        request = mock.MagicMock(
+            GET={'consent_failed': 'course-v1:edX+DemoX+Demo_Course'}
+        )
+        enrollments = [
+            mock.MagicMock(
+                course_id='course-v1:edX+DemoX+Demo_Course',
+                course_overview=mock.MagicMock(
+                    display_name='edX Demo Course',
+                )
+            ),
+        ]
+        user = mock.MagicMock(id=1)
+        notification_string = get_dashboard_consent_notification(
+            request, user, enrollments,
+        )
+        expected_message = (
+            'If you have concerns about sharing your data, please contact your '
+            'administrator at Veridian Dynamics.'
+        )
+        self.assertIn(expected_message, notification_string)
+        expected_header = 'Enrollment in edX Demo Course was not complete.'
+        self.assertIn(expected_header, notification_string)
+
+    @mock.patch('util.enterprise_helpers.EnterpriseCourseEnrollment')
+    def test_get_dashboard_consent_notification_contact_info(self, ece_mock):
+        mock_get_ece = ece_mock.objects.get
+        ece_mock.DoesNotExist = Exception
+        mock_ece = mock_get_ece.return_value
+        mock_ece.enterprise_customer_user = mock.MagicMock(
+            enterprise_customer=mock.MagicMock(
+                contact_email='v.palmer@veridiandynamics.com'
+            )
+        )
+        mock_ec = mock_ece.enterprise_customer_user.enterprise_customer
+        mock_ec.name = 'Veridian Dynamics'
+
+        request = mock.MagicMock(
+            GET={'consent_failed': 'course-v1:edX+DemoX+Demo_Course'}
+        )
+        enrollments = [
+            mock.MagicMock(
+                course_id='course-v1:edX+DemoX+Demo_Course',
+                course_overview=mock.MagicMock(
+                    display_name='edX Demo Course',
+                )
+            ),
+        ]
+        user = mock.MagicMock(id=1)
+        notification_string = get_dashboard_consent_notification(
+            request, user, enrollments,
+        )
+        expected_message = (
+            'If you have concerns about sharing your data, please contact your '
+            'administrator at Veridian Dynamics at v.palmer@veridiandynamics.com.'
+        )
+        self.assertIn(expected_message, notification_string)
+        expected_header = 'Enrollment in edX Demo Course was not complete.'
+        self.assertIn(expected_header, notification_string)
