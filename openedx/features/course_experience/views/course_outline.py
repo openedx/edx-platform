@@ -9,12 +9,12 @@ from courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.views.views import get_last_accessed_courseware
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from opaque_keys.edx.keys import CourseKey
+from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from web_fragments.fragment import Fragment
-from web_fragments.views import FragmentView
 from xmodule.modulestore.django import modulestore
 
 
-class CourseOutlineFragmentView(FragmentView):
+class CourseOutlineFragmentView(EdxFragmentView):
     """
     Course outline fragment to be shown in the unified course view.
     """
@@ -35,7 +35,7 @@ class CourseOutlineFragmentView(FragmentView):
 
         return block
 
-    def render_to_fragment(self, request, course_id=None, **kwargs):
+    def render_to_fragment(self, request, course_id=None, page_context=None, **kwargs):
         """
         Renders the course outline as a fragment.
         """

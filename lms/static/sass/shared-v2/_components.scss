@@ -92,3 +92,60 @@
         }
     }
 }
+
+.wrapper-preview-menu {
+  @include clearfix();
+  @include box-sizing(border-box);
+  margin: 0 auto 0;
+  padding: ($baseline*0.75);
+  background-color: $lms-preview-menu-color;
+
+  @media print {
+    display: none;
+  }
+
+  .preview-menu {
+    max-width: $lms-max-width;
+    width: auto;
+    margin: 0 auto;
+  }
+
+  .preview-actions {
+    @include margin-left(0);
+    display: inline-block;
+    margin-bottom: 0;
+
+    .action-preview {
+      display: inline-block;
+
+      .action-preview-label {
+        @include margin-right($baseline/2);
+        display: inline-block;
+        margin-bottom: 0;
+        vertical-align: middle;
+      }
+
+      .action-preview-select {
+        @include margin-right($baseline);
+      }
+
+      .action-preview-username-container {
+        display: none;
+
+        .action-preview-username {
+          vertical-align: middle;
+          height: 25px;
+        }
+      }
+    }
+  }
+
+  .preview-specific-student-notice {
+    margin-top: ($baseline/2);
+    font-size: 90%;
+
+    > p {
+      margin-bottom: 0;
+    }
+  }
+}

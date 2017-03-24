@@ -1,11 +1,8 @@
 // LMS layouts
 
 .content-wrapper {
-    max-width: 1180px;
-    padding: {
-        top: $baseline/2;
-        bottom: $baseline*2;
-    }
+    max-width: $lms-max-width;
+    padding-bottom: $baseline*2;
 
     .container {
         @include clearfix();
