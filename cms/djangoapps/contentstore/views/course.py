@@ -51,6 +51,7 @@ from course_action_state.managers import CourseActionStateItemNotFoundError
 from course_action_state.models import CourseRerunState, CourseRerunUIStateManager
 from course_creators.views import add_user_with_status_unrequested, get_course_creator_status
 from edxmako.shortcuts import render_to_response
+from milestones import api as milestones_api
 from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
 from models.settings.encoder import CourseSettingsEncoder
@@ -73,6 +74,7 @@ from util.milestones_helpers import (
     is_entrance_exams_enabled,
     is_prerequisite_courses_enabled,
     is_valid_course_key,
+    remove_prerequisite_course,
     set_prerequisite_courses
 )
 from util.organizations_helpers import add_organization_course, get_organization_by_short_name, organizations_enabled
@@ -1075,6 +1077,11 @@ def settings_handler(request, course_key_string):
                         if not all(is_valid_course_key(course_key) for course_key in prerequisite_course_keys):
                             return JsonResponseBadRequest({"error": _("Invalid prerequisite course key")})
                         set_prerequisite_courses(course_key, prerequisite_course_keys)
+                    else:
+                        # None is chosen, so remove the course prerequisites
+                        course_milestones = milestones_api.get_course_milestones(course_key=course_key, relationship="requires")
+                        for milestone in course_milestones:
+                            remove_prerequisite_course(course_key, milestone)
 
                 # If the entrance exams feature has been enabled, we'll need to check for some
                 # feature-specific settings and handle them accordingly
