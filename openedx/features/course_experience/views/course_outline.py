@@ -6,6 +6,7 @@ from django.core.context_processors import csrf
 from django.template.loader import render_to_string
 
 from courseware.courses import get_course_with_access
+from lms.djangoapps.courseware.views.views import get_last_accessed_courseware
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
@@ -18,7 +19,7 @@ class CourseOutlineFragmentView(FragmentView):
     Course outline fragment to be shown in the unified course view.
     """
 
-    def populate_children(self, block, all_blocks):
+    def populate_children(self, block, all_blocks, course_position):
         """
         For a passed block, replace each id in its children array with the full representation of that child,
         which will be looked up by id in the passed all_blocks dict.
@@ -28,8 +29,9 @@ class CourseOutlineFragmentView(FragmentView):
 
         for i in range(len(children)):
             child_id = block['children'][i]
-            child_detail = self.populate_children(all_blocks[child_id], all_blocks)
+            child_detail = self.populate_children(all_blocks[child_id], all_blocks, course_position)
             block['children'][i] = child_detail
+            block['children'][i]['current'] = course_position == child_detail['block_id']
 
         return block
 
@@ -39,6 +41,7 @@ class CourseOutlineFragmentView(FragmentView):
         """
         course_key = CourseKey.from_string(course_id)
         course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
+        _, course_position = get_last_accessed_courseware(course, request, request.user)
         course_usage_key = modulestore().make_course_usage_key(course_key)
         all_blocks = get_blocks(
             request,
@@ -55,7 +58,7 @@ class CourseOutlineFragmentView(FragmentView):
             'csrf': csrf(request)['csrf_token'],
             'course': course,
             # Recurse through the block tree, fleshing out each child object
-            'blocks': self.populate_children(course_block_tree, all_blocks['blocks'])
+            'blocks': self.populate_children(course_block_tree, all_blocks['blocks'], course_position)
         }
         html = render_to_string('course_experience/course-outline-fragment.html', context)
         return Fragment(html)
