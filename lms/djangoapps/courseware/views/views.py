@@ -392,7 +392,7 @@ def course_info(request, course_id):
         # Get the URL of the user's last position in order to display the 'where you were last' message
         context['last_accessed_courseware_url'] = None
         if SelfPacedConfiguration.current().enable_course_home_improvements:
-            context['last_accessed_courseware_url'] = get_last_accessed_courseware(course, request, user)
+            context['last_accessed_courseware_url'], _ = get_last_accessed_courseware(course, request, user)
 
         now = datetime.now(UTC())
         effective_start = _adjust_start_date_for_beta_testers(user, course, course_key)
@@ -427,8 +427,8 @@ def course_info(request, course_id):
 
 def get_last_accessed_courseware(course, request, user):
     """
-    Return the courseware module URL that the user last accessed,
-    or None if it cannot be found.
+    Returns a tuple containing the courseware module (URL, id) that the user last accessed,
+    or (None, None) if it cannot be found.
     """
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
         course.id, request.user, course, depth=2
@@ -445,8 +445,8 @@ def get_last_accessed_courseware(course, request, user):
                 'chapter': chapter_module.url_name,
                 'section': section_module.url_name
             })
-            return url
-    return None
+            return (url, section_module.url_name)
+    return (None, None)
 
 
 class StaticCourseTabView(FragmentView):

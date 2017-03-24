@@ -860,6 +860,16 @@ class HighLevelTabTest(UniqueCourseTest):
         bookmarks_page = BookmarksPage(self.browser, self.course_id)
         self.assertTrue(bookmarks_page.is_browser_on_page())
 
+        # Test "Resume Course" button from header
+        self.course_home_page.visit()
+        self.course_home_page.resume_course_from_header()
+        self.assertTrue(self.courseware_page.nav.is_on_section('Test Section 2', 'Test Subsection 3'))
+
+        # Test "Resume Course" button from within outline
+        self.course_home_page.visit()
+        self.course_home_page.outline.resume_course_from_outline()
+        self.assertTrue(self.courseware_page.nav.is_on_section('Test Section 2', 'Test Subsection 3'))
+
     @attr('a11y')
     def test_course_home_a11y(self):
         self.course_home_page.visit()
