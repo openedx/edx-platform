@@ -39,10 +39,10 @@ from django.utils.translation import ugettext as _
                                 id="${ subsection['id'] }"
                             >
                                 <span>${ subsection['display_name'] }</span>
-                                <span class="sr-only">This is your last visited course section.</span>
+                                <span class="sr-only">${ _("This is your last visited course section.") }</span>
                                 % if subsection['current']:
                                     <span class="resume-right">
-                                        <b>Resume Course</b>
+                                        <b>${ _("Resume Course") }</b>
                                         <span class="icon fa fa-arrow-circle-right" aria-hidden="true"></span>
                                     </span>
                                 %endif
