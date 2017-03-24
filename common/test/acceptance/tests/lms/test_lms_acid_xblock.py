@@ -7,8 +7,7 @@ from unittest import expectedFailure
 
 from common.test.acceptance.tests.helpers import UniqueCourseTest
 from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
-from common.test.acceptance.pages.lms.course_info import CourseInfoPage
-from common.test.acceptance.pages.lms.tab_nav import TabNavPage
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.xblock.acid import AcidView
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 
@@ -30,8 +29,7 @@ class XBlockAcidBase(UniqueCourseTest):
 
         AutoAuthPage(self.browser, course_id=self.course_id).visit()
 
-        self.course_info_page = CourseInfoPage(self.browser, self.course_id)
-        self.tab_nav = TabNavPage(self.browser)
+        self.courseware_page = CoursewarePage(self.browser, self.course_id)
 
     def validate_acid_block_view(self, acid_block):
         """
@@ -73,10 +71,7 @@ class XBlockAcidNoChildTest(XBlockAcidBase):
         """
         Verify that all expected acid block tests pass in the lms.
         """
-
-        self.course_info_page.visit()
-        self.tab_nav.go_to_tab('Course')
-
+        self.courseware_page.visit()
         acid_block = AcidView(self.browser, '.xblock-student_view[data-block-type=acid]')
         self.validate_acid_block_view(acid_block)
 
@@ -117,10 +112,7 @@ class XBlockAcidChildTest(XBlockAcidBase):
         """
         Verify that all expected acid block tests pass in the lms.
         """
-
-        self.course_info_page.visit()
-        self.tab_nav.go_to_tab('Course')
-
+        self.courseware_page.visit()
         acid_parent_block = AcidView(self.browser, '.xblock-student_view[data-block-type=acid_parent]')
         self.validate_acid_parent_block_view(acid_parent_block)
 
@@ -157,10 +149,7 @@ class XBlockAcidAsideTest(XBlockAcidBase):
         """
         Verify that all expected acid block tests pass in the lms.
         """
-
-        self.course_info_page.visit()
-        self.tab_nav.go_to_tab('Course')
-
+        self.courseware_page.visit()
         acid_aside = AcidView(self.browser, '.xblock_asides-v1-student_view[data-block-type=acid_aside]')
         self.validate_acid_aside_view(acid_aside)
 
