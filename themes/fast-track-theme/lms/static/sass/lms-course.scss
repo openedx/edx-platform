@@ -25,8 +25,14 @@ div.course-index {
   }
 }
 
-body.view-in-course {
+// accordion - side bar for course display
+.accordion {
+  p.chapter-description {
+    font-weight: 300;
+  }
+}
 
+body.view-in-course {
   .container {
     padding: 0;
   }

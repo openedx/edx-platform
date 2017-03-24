@@ -258,6 +258,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
 
             toc_chapters.append({
                 'display_name': chapter.display_name_with_default_escaped,
+                'display_description': chapter.display_description,
                 'display_id': display_id,
                 'url_name': chapter.url_name,
                 'sections': sections,
