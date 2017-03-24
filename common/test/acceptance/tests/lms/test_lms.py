@@ -1040,8 +1040,7 @@ class TooltipTest(UniqueCourseTest):
         """
         Verify that tooltips are displayed when you hover over the sequence nav bar.
         """
-        self.course_info_page.visit()
-        self.tab_nav.go_to_tab('Course')
+        self.courseware_page.visit()
 
         self.courseware_page.verify_tooltips_displayed()
 
@@ -1189,8 +1188,7 @@ class ProblemExecutionTest(UniqueCourseTest):
 
     def test_python_execution_in_problem(self):
         # Navigate to the problem page
-        self.course_info_page.visit()
-        self.tab_nav.go_to_tab('Course')
+        self.courseware_page.visit()
         self.courseware_page.nav.go_to_section('Test Section', 'Test Subsection')
 
         problem_page = ProblemPage(self.browser)

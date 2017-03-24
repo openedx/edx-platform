@@ -52,7 +52,7 @@ class VideoBaseTest(UniqueCourseTest):
 
         self.video = VideoPage(self.browser)
         self.tab_nav = TabNavPage(self.browser)
-        self.courseware = CoursewarePage(self.browser, self.course_id)
+        self.courseware_page = CoursewarePage(self.browser, self.course_id)
         self.course_info_page = CourseInfoPage(self.browser, self.course_id)
         self.auth_page = AutoAuthPage(self.browser, course_id=self.course_id)
 
@@ -135,8 +135,7 @@ class VideoBaseTest(UniqueCourseTest):
         """ Register for the course and navigate to the video unit """
         self.auth_page.visit()
         self.user_info = self.auth_page.user_info
-        self.course_info_page.visit()
-        self.tab_nav.go_to_tab('Course')
+        self.courseware_page.visit()
 
     def _navigate_to_courseware_video_and_render(self):
         """ Wait for the video player to render """
@@ -194,7 +193,7 @@ class VideoBaseTest(UniqueCourseTest):
         """
         Navigate to sequential specified by `video_display_name`
         """
-        self.courseware.go_to_sequential_position(position)
+        self.courseware_page.go_to_sequential_position(position)
         self.video.wait_for_video_player_render()
 
 
@@ -529,7 +528,7 @@ class YouTubeVideoTest(VideoBaseTest):
         self.assertTrue(self.video.downloaded_transcript_contains_text(file_type, search_text))
 
         # open vertical containing video "C"
-        self.courseware.nav.go_to_vertical('Test Vertical-2')
+        self.courseware_page.nav.go_to_vertical('Test Vertical-2')
 
         # menu "download_transcript" doesn't exist
         self.assertFalse(self.video.is_menu_present('download_transcript'))
@@ -676,17 +675,17 @@ class YouTubeVideoTest(VideoBaseTest):
         self.navigate_to_video()
 
         # select the "2.0" speed on video "A"
-        self.courseware.nav.go_to_vertical('Test Vertical-0')
+        self.courseware_page.nav.go_to_vertical('Test Vertical-0')
         self.video.wait_for_video_player_render()
         self.video.speed = '2.0'
 
         # select the "0.50" speed on video "B"
-        self.courseware.nav.go_to_vertical('Test Vertical-1')
+        self.courseware_page.nav.go_to_vertical('Test Vertical-1')
         self.video.wait_for_video_player_render()
         self.video.speed = '0.50'
 
         # open video "C"
-        self.courseware.nav.go_to_vertical('Test Vertical-2')
+        self.courseware_page.nav.go_to_vertical('Test Vertical-2')
         self.video.wait_for_video_player_render()
 
         # Since the playback speed was set to .5 in "B", this video will also be impacted
@@ -695,7 +694,7 @@ class YouTubeVideoTest(VideoBaseTest):
         self.video.verify_speed_changed('0.75x')
 
         # go to the vertical containing video "A"
-        self.courseware.nav.go_to_vertical('Test Vertical-0')
+        self.courseware_page.nav.go_to_vertical('Test Vertical-0')
 
         # Video "A" should still play at speed 2.0 because it was explicitly set to that.
         self.assertEqual(self.video.speed, '2.0x')
@@ -704,7 +703,7 @@ class YouTubeVideoTest(VideoBaseTest):
         self.video.reload_page()
 
         # go to the vertical containing video "A"
-        self.courseware.nav.go_to_vertical('Test Vertical-0')
+        self.courseware_page.nav.go_to_vertical('Test Vertical-0')
 
         # check if video "A" should start playing at speed "2.0"
         self.assertEqual(self.video.speed, '2.0x')
@@ -713,13 +712,13 @@ class YouTubeVideoTest(VideoBaseTest):
         self.video.speed = '1.0'
 
         # go to the vertical containing "B"
-        self.courseware.nav.go_to_vertical('Test Vertical-1')
+        self.courseware_page.nav.go_to_vertical('Test Vertical-1')
 
         # Video "B" should still play at speed .5 because it was explicitly set to that.
         self.assertEqual(self.video.speed, '0.50x')
 
         # go to the vertical containing video "C"
-        self.courseware.nav.go_to_vertical('Test Vertical-2')
+        self.courseware_page.nav.go_to_vertical('Test Vertical-2')
 
         # The change of speed for Video "A" should  impact Video "C" because it still has
         # not been explicitly set to a speed.
@@ -912,13 +911,13 @@ class YouTubeVideoTest(VideoBaseTest):
         execute_video_steps(['A'])
 
         # go to second sequential position
-        self.courseware.go_to_sequential_position(2)
+        self.courseware_page.go_to_sequential_position(2)
 
         execute_video_steps(tab2_video_names)
 
         # go back to first sequential position
         # we are again playing tab 1 videos to ensure that switching didn't broke some video functionality.
-        self.courseware.go_to_sequential_position(1)
+        self.courseware_page.go_to_sequential_position(1)
         execute_video_steps(tab1_video_names)
 
         self.video.browser.refresh()
