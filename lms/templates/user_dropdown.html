@@ -4,7 +4,7 @@
 
 ## This template should not use the target student's details when masquerading, see TNL-4895
 <%
-self.real_user = real_user if real_user != UNDEFINED else user
+self.real_user = getattr(user, 'real_user', user)
 %>
 
 <%!

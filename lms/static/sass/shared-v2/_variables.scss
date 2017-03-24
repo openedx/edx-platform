@@ -1,11 +1,14 @@
 // LMS variables
 
+$lms-max-width: 1180px;
+
 $lms-gray: palette(grayscale, base);
 $lms-background-color: palette(grayscale, x-back);
 $lms-container-background-color: $white;
 $lms-border-color: palette(grayscale, back);
 $lms-label-color: palette(grayscale, black);
 $lms-active-color: palette(primary, base);
+$lms-preview-menu-color: #c8c8c8;
 
 $white-transparent: rgba(255, 255, 255, 0);
 $white-opacity-40: rgba(255, 255, 255, 0.4);
