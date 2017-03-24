@@ -270,17 +270,6 @@ class BookmarksTest(BookmarksTestMixin):
             self.course_home_page.outline.go_to_section('TestSection{}'.format(index), 'TestSubsection{}'.format(index))
             self._toggle_bookmark_and_verify(False, '', 0)
 
-    # TODO: TNL-6546: Remove this test
-    def test_courseware_bookmarks_button(self):
-        """
-        Scenario: (Temporarily) test that the courseware's "Bookmarks" button works.
-        """
-        self.setup_test()
-        self.bookmark_units(2)
-        self.courseware_page.visit()
-        self.courseware_page.click_bookmarks_button()
-        self.assertTrue(self.bookmarks_page.is_browser_on_page())
-
     def test_empty_bookmarks_list(self):
         """
         Scenario: An empty bookmarks list is shown if there are no bookmarked units.

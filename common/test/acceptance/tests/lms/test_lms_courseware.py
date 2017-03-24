@@ -556,58 +556,6 @@ class CoursewareMultipleVerticalsTest(CoursewareMultipleVerticalsTestBase):
             sequence_ui_events
         )
 
-    # TODO: TNL-6546: Delete this whole test if these events are going away(?)
-    def test_outline_selected_events(self):
-        self.courseware_page.visit()
-
-        self.courseware_page.nav.go_to_section('Test Section 1', 'Test Subsection 1,2')
-
-        self.courseware_page.nav.go_to_section('Test Section 2', 'Test Subsection 2,1')
-
-        # test UI events emitted by navigating via the course outline
-        filter_selected_events = lambda event: event.get('name', '') == 'edx.ui.lms.outline.selected'
-        selected_events = self.wait_for_events(event_filter=filter_selected_events, timeout=2)
-
-        # note: target_url is tested in unit tests, as the url changes here with every test (it includes GUIDs).
-        self.assert_events_match(
-            [
-                {
-                    'event_type': 'edx.ui.lms.outline.selected',
-                    'name': 'edx.ui.lms.outline.selected',
-                    'event': {
-                        'target_name': 'Test Subsection 1,2 ',
-                        'widget_placement': 'accordion',
-                    }
-                },
-                {
-                    'event_type': 'edx.ui.lms.outline.selected',
-                    'name': 'edx.ui.lms.outline.selected',
-                    'event': {
-                        'target_name': 'Test Subsection 2,1 ',
-                        'widget_placement': 'accordion',
-
-                    }
-                },
-            ],
-            selected_events
-        )
-
-    # TODO: Delete as part of TNL-6546 / LEARNER-71
-    def test_link_clicked_events(self):
-        """
-        Given that I am a user in the courseware
-        When I navigate via the left-hand nav
-        Then a link clicked event is logged
-        """
-        self.courseware_page.visit()
-
-        self.courseware_page.nav.go_to_section('Test Section 1', 'Test Subsection 1,2')
-        self.courseware_page.nav.go_to_section('Test Section 2', 'Test Subsection 2,1')
-
-        filter_link_clicked = lambda event: event.get('name', '') == 'edx.ui.lms.link_clicked'
-        link_clicked_events = self.wait_for_events(event_filter=filter_link_clicked, timeout=2)
-        self.assertEqual(len(link_clicked_events), 2)
-
     def assert_navigation_state(
             self, section_title, subsection_title, subsection_position, next_enabled, prev_enabled
     ):
