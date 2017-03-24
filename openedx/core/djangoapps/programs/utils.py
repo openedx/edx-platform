@@ -58,7 +58,7 @@ class ProgramProgressMeter(object):
     Keyword Arguments:
         enrollments (list): List of the user's enrollments.
     """
-    def __init__(self, user, enrollments=None):
+    def __init__(self, user, enrollments=None, partner=None):
         self.user = user
 
         self.enrollments = enrollments or list(CourseEnrollment.enrollments_for_user(self.user))
@@ -67,7 +67,7 @@ class ProgramProgressMeter(object):
         # enrollment.course_id is really a CourseKey (╯ಠ_ಠ）╯︵ ┻━┻
         self.course_run_ids = [unicode(e.course_id) for e in self.enrollments]
 
-        self.programs = attach_program_detail_url(get_programs())
+        self.programs = attach_program_detail_url(get_programs(partner=partner))
 
     def invert_programs(self):
         """Intersect programs and enrollments.

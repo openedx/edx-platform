@@ -15,6 +15,7 @@ from openedx.core.djangoapps.programs.utils import (
     ProgramProgressMeter,
     ProgramDataExtender,
 )
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
 
 
@@ -26,7 +27,7 @@ def program_listing(request):
     if not programs_config.enabled:
         raise Http404
 
-    meter = ProgramProgressMeter(request.user)
+    meter = ProgramProgressMeter(request.user, partner=configuration_helpers.get_value('PARTNER_SHORT_CODE'))
 
     context = {
         'credentials': get_programs_credentials(request.user),

@@ -25,7 +25,7 @@ def create_catalog_api_client(user, catalog_integration):
     return EdxRestApiClient(catalog_integration.internal_api_url, jwt=jwt)
 
 
-def get_programs(uuid=None, types=None):  # pylint: disable=redefined-builtin
+def get_programs(uuid=None, types=None, partner=None):  # pylint: disable=redefined-builtin
     """Retrieve marketable programs from the catalog service.
 
     Keyword Arguments:
@@ -33,6 +33,7 @@ def get_programs(uuid=None, types=None):  # pylint: disable=redefined-builtin
         types (list of string): List of program type names used to filter programs by type
                                 (e.g., ["MicroMasters"] will only return MicroMasters programs,
                                 ["MicroMasters", "XSeries"] will return MicroMasters and XSeries programs).
+        partner (string): Partner short code used to filter programs
 
     Returns:
         list of dict, representing programs.
@@ -48,8 +49,9 @@ def get_programs(uuid=None, types=None):  # pylint: disable=redefined-builtin
         api = create_catalog_api_client(user, catalog_integration)
         types_param = ','.join(types) if types else None
 
-        cache_key = '{base}.programs{types}'.format(
+        cache_key = '{base}.programs{partner}{types}'.format(
             base=catalog_integration.CACHE_KEY,
+            partner='.' + partner if partner else '',
             types='.' + types_param if types_param else ''
         )
 
@@ -59,6 +61,8 @@ def get_programs(uuid=None, types=None):  # pylint: disable=redefined-builtin
         }
         if uuid:
             querystring['use_full_course_serializer'] = 1
+        if partner:
+            querystring['partner_short_code'] = partner
         if types_param:
             querystring['types'] = types_param
 
