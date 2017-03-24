@@ -102,6 +102,7 @@ from util.milestones_helpers import (
 )
 
 from util.password_policy_validators import validate_password_strength
+from util.enterprise_helpers import get_dashboard_consent_notification
 import third_party_auth
 from third_party_auth import pipeline, provider
 from student.helpers import (
@@ -684,6 +685,8 @@ def dashboard(request):
             {'email': user.email, 'platform_name': platform_name}
         )
 
+    enterprise_message = get_dashboard_consent_notification(request, user, course_enrollments)
+
     # Global staff can see what courses errored on their dashboard
     staff_access = False
     errored_courses = {}
@@ -804,6 +807,7 @@ def dashboard(request):
     display_sidebar_on_dashboard = len(order_history_list) or verification_status in valid_verification_statuses
 
     context = {
+        'enterprise_message': enterprise_message,
         'enrollment_message': enrollment_message,
         'redirect_message': redirect_message,
         'course_enrollments': course_enrollments,
