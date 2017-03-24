@@ -377,16 +377,15 @@ class ProctoredExamTest(UniqueCourseTest):
         self.assertFalse(self.studio_course_outline.exam_review_rules_field_visible())
 
 
-@attr(shard=9)
-class CoursewareMultipleVerticalsTest(UniqueCourseTest, EventsTestMixin):
+class CoursewareMultipleVerticalsTestBase(UniqueCourseTest, EventsTestMixin):
     """
-    Test courseware with multiple verticals
+    Base class with setup for testing courseware with multiple verticals
     """
     USERNAME = "STUDENT_TESTER"
     EMAIL = "student101@example.com"
 
     def setUp(self):
-        super(CoursewareMultipleVerticalsTest, self).setUp()
+        super(CoursewareMultipleVerticalsTestBase, self).setUp()
 
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
         self.course_home_page = CourseHomePage(self.browser, self.course_id)
@@ -434,6 +433,13 @@ class CoursewareMultipleVerticalsTest(UniqueCourseTest, EventsTestMixin):
         # Auto-auth register for the course.
         AutoAuthPage(self.browser, username=self.USERNAME, email=self.EMAIL,
                      course_id=self.course_id, staff=False).visit()
+
+
+@attr(shard=9)
+class CoursewareMultipleVerticalsTest(CoursewareMultipleVerticalsTestBase):
+    """
+    Test courseware with multiple verticals
+    """
 
     @skip('Disable temporarily to get course bookmarks out')
     def test_navigation_buttons(self):
@@ -661,7 +667,13 @@ class CoursewareMultipleVerticalsTest(UniqueCourseTest, EventsTestMixin):
         ).visit()
         self.assertIn('html 2 dummy body', html2_page.get_selected_tab_content())
 
-    @attr('a11y')
+
+@attr('a11y')
+class CoursewareMultipleVerticalsA11YTest(CoursewareMultipleVerticalsTestBase):
+    """
+    Test a11y for courseware with multiple verticals
+    """
+
     def test_courseware_a11y(self):
         """
         Run accessibility audit for the problem type.

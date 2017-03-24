@@ -957,6 +957,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         response = self.client.get(reverse('info', args=[course_id]), HTTP_REFERER='foo')
         self.assertEqual(response.status_code, 200)
 
+    # TODO: TNL-6387: Remove test
     def test_accordion(self):
         """
         This needs a response_context, which is not included in the render_accordion's main method
