@@ -102,9 +102,7 @@ class ChooseModeView(View):
             return redirect(redirect_url)
 
         # If there isn't a verified mode available, then there's nothing
-        # to do on this page.  The user has almost certainly been auto-registered
-        # in the "honor" track by this point, so we send the user
-        # to the dashboard.
+        # to do on this page.  Send the user to the dashboard.
         if not CourseMode.has_verified_mode(modes):
             return redirect(reverse('dashboard'))
 
@@ -218,9 +216,12 @@ class ChooseModeView(View):
             return HttpResponseBadRequest(_("Enrollment mode not supported"))
 
         if requested_mode == 'audit':
-            # The user will have already been enrolled in the audit mode at this
-            # point, so we just redirect them to the dashboard, thereby avoiding
-            # hitting the database a second time attempting to enroll them.
+            # If the learner has arrived at this screen via the traditional enrollment workflow,
+            # then they should already be enrolled in an audit mode for the course, assuming one has
+            # been configured.  However, alternative enrollment workflows have been introduced into the
+            # system, such as third-party discovery.  These workflows result in learners arriving
+            # directly at this screen, and they will not necessarily be pre-enrolled in the audit mode.
+            CourseEnrollment.enroll(request.user, course_key, CourseMode.AUDIT)
             return redirect(reverse('dashboard'))
 
         if requested_mode == 'honor':
