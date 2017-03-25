@@ -319,6 +319,7 @@ AUTHENTICATION_BACKENDS = (
 
 LMS_BASE = None
 LMS_ROOT_URL = "http://localhost:8000"
+ENTERPRISE_API_URL = LMS_ROOT_URL + '/enterprise/api/v1/'
 
 # These are standard regexes for pulling out info like course_ids, usage_ids, etc.
 # They are used so that URLs with deprecated-format strings still work.
@@ -1250,3 +1251,7 @@ RETRY_ACTIVATION_EMAIL_TIMEOUT = 0.5
 
 # How long until database records about the outcome of a task and its artifacts get deleted?
 USER_TASKS_MAX_AGE = timedelta(days=7)
+
+############## Settings for the Enterprise App ######################
+
+ENTERPRISE_ENROLLMENT_API_URL = LMS_ROOT_URL + "/api/enrollment/v1/"
