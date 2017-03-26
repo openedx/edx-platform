@@ -7,11 +7,9 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from uuid import uuid4
 
 from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
-from openedx.core.djangolib.testing.waffle_utils import override_switch
 
 from ..api import get_cache
 from ..block_structure import BlockStructureBlockData
-from ..config import _bs_waffle_switch_name
 from ..exceptions import BlockStructureNotFound
 from ..models import BlockStructureModel
 from ..store import BlockStructureStore
@@ -41,18 +39,6 @@ def is_course_in_block_structure_storage(course_key, store):
         return True
     except BlockStructureNotFound:
         return False
-
-
-class override_config_setting(override_switch):  # pylint:disable=invalid-name
-    """
-    Subclasses override_switch to use the block structure
-    name-spaced switch names.
-    """
-    def __init__(self, name, active):
-        super(override_config_setting, self).__init__(
-            _bs_waffle_switch_name(name),
-            active
-        )
 
 
 class MockXBlock(object):

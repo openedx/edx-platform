@@ -6,7 +6,7 @@ from nose.plugins.attrib import attr
 from unittest import TestCase
 
 from ..block_structure import BlockStructureBlockData
-from ..config import RAISE_ERROR_WHEN_NOT_FOUND, STORAGE_BACKING_FOR_CACHE
+from ..config import RAISE_ERROR_WHEN_NOT_FOUND, STORAGE_BACKING_FOR_CACHE, waffle
 from ..exceptions import UsageKeyNotInBlockStructure, BlockStructureNotFound
 from ..manager import BlockStructureManager
 from ..transformers import BlockStructureTransformers
@@ -14,7 +14,6 @@ from .helpers import (
     MockModulestoreFactory, MockCache, MockTransformer,
     ChildrenMapTestMixin, UsageKeyFactoryMixin,
     mock_registered_transformers,
-    override_config_setting,
 )
 
 
@@ -173,14 +172,14 @@ class TestBlockStructureManager(UsageKeyFactoryMixin, ChildrenMapTestMixin, Test
         self.assertEquals(TestTransformer1.collect_call_count, 1)
 
     def test_get_collected_error_raised(self):
-        with override_config_setting(RAISE_ERROR_WHEN_NOT_FOUND, active=True):
+        with waffle().override(RAISE_ERROR_WHEN_NOT_FOUND, active=True):
             with mock_registered_transformers(self.registered_transformers):
                 with self.assertRaises(BlockStructureNotFound):
                     self.bs_manager.get_collected()
 
     @ddt.data(True, False)
     def test_update_collected_if_needed(self, with_storage_backing):
-        with override_config_setting(STORAGE_BACKING_FOR_CACHE, active=with_storage_backing):
+        with waffle().override(STORAGE_BACKING_FOR_CACHE, active=with_storage_backing):
             with mock_registered_transformers(self.registered_transformers):
                 self.assertEquals(TestTransformer1.collect_call_count, 0)
 

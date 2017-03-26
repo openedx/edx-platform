@@ -254,4 +254,4 @@ def _is_storage_backing_enabled():
     """
     Returns whether storage backing for Block Structures is enabled.
     """
-    return config.is_enabled(config.STORAGE_BACKING_FOR_CACHE)
+    return config.waffle().is_enabled(config.STORAGE_BACKING_FOR_CACHE)
