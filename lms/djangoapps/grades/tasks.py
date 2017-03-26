@@ -31,8 +31,8 @@ from util.date_utils import from_timestamp
 from xmodule.modulestore.django import modulestore
 
 from .constants import ScoreDatabaseTableEnum
-from .new.subsection_grade import SubsectionGradeFactory
-from .new.course_grade import CourseGradeFactory
+from .new.subsection_grade_factory import SubsectionGradeFactory
+from .new.course_grade_factory import CourseGradeFactory
 from .signals.signals import SUBSECTION_SCORE_CHANGED
 from .transformer import GradesTransformer
 
@@ -73,11 +73,7 @@ def compute_grades_for_course(course_key, offset, batch_size):
     course = courses.get_course_by_id(CourseKey.from_string(course_key))
     enrollments = CourseEnrollment.objects.filter(course_id=course.id).order_by('created')
     student_iter = (enrollment.user for enrollment in enrollments[offset:offset + batch_size])
-    list(CourseGradeFactory().iter(
-        course,
-        students=student_iter,
-        read_only=False,
-    ))
+    list(CourseGradeFactory().iter(course, students=student_iter, force_update=True))
 
 
 @task(bind=True, base=_BaseTask, default_retry_delay=30, routing_key=settings.RECALCULATE_GRADES_ROUTING_KEY)
@@ -182,7 +178,7 @@ def _has_db_updated_with_new_score(self, scored_block_usage_key, **kwargs):
 
     if not db_is_updated:
         log.info(
-            u"Persistent Grades: tasks._has_database_updated_with_new_score is False. Task ID: {}. Kwargs: {}. Found "
+            u"Grades: tasks._has_database_updated_with_new_score is False. Task ID: {}. Kwargs: {}. Found "
             u"modified time: {}".format(
                 self.request.id,
                 kwargs,

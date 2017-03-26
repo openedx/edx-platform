@@ -26,7 +26,7 @@ from .signals import (
     SCORE_PUBLISHED,
 )
 from ..constants import ScoreDatabaseTableEnum
-from ..new.course_grade import CourseGradeFactory
+from ..new.course_grade_factory import CourseGradeFactory
 from ..scores import weighted_score
 from ..tasks import recalculate_subsection_grade_v3, RECALCULATE_GRADE_DELAY
 
@@ -238,7 +238,7 @@ def recalculate_course_grade(sender, course, course_structure, user, **kwargs): 
     """
     Updates a saved course grade.
     """
-    CourseGradeFactory().update(user, course, course_structure)
+    CourseGradeFactory().update(user, course=course, course_structure=course_structure)
 
 
 def _emit_problem_submitted_event(kwargs):

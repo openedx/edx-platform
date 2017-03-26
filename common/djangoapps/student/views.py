@@ -68,7 +68,7 @@ from certificates.api import (  # pylint: disable=import-error
     get_certificate_url,
     has_html_certificates_enabled,
 )
-from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
+from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
 
 from xmodule.modulestore.django import modulestore
 from opaque_keys import InvalidKeyError
@@ -423,7 +423,7 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
                 )
 
     if status in {'generating', 'ready', 'notpassing', 'restricted', 'auditing', 'unverified'}:
-        persisted_grade = CourseGradeFactory().get_persisted(user, course_overview)
+        persisted_grade = CourseGradeFactory().read(user, course=course_overview)
         if persisted_grade is not None:
             status_dict['grade'] = unicode(persisted_grade.percent)
         elif 'grade' in cert_status:
