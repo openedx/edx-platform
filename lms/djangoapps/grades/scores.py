@@ -5,7 +5,6 @@ from logging import getLogger
 
 from openedx.core.lib.cache_utils import memoized
 from xblock.core import XBlock
-from xmodule.block_metadata_utils import display_name_with_default_escaped
 from xmodule.graders import ProblemScore
 from .transformer import GradesTransformer
 

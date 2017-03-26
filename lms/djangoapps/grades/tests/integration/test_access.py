@@ -15,7 +15,7 @@ from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 
-from ...new.subsection_grade import SubsectionGradeFactory
+from ...new.subsection_grade_factory import SubsectionGradeFactory
 
 
 class GradesAccessIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTestCase):

@@ -14,7 +14,7 @@ class ProgressPage(CoursePage):
     def is_browser_on_page(self):
         is_present = (
             self.q(css='.course-info').present and
-            self.q(css='#grade-detail-graph').present
+            self.q(css='.grade-detail-graph').present
         )
         return is_present
 
@@ -115,7 +115,7 @@ class ProgressPage(CoursePage):
         Return the CSS index of the chapter with `title`.
         Returns `None` if it cannot find such a chapter.
         """
-        chapter_css = '.chapters section .hd'
+        chapter_css = '.chapters>section h3'
         chapter_titles = self.q(css=chapter_css).map(lambda el: el.text.lower().strip()).results
 
         try:

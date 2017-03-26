@@ -7,7 +7,7 @@ from django.core.management.base import BaseCommand, CommandError
 import os
 from lms.djangoapps.courseware import courses
 from lms.djangoapps.certificates.models import GeneratedCertificate
-from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
+from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey

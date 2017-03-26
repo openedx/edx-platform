@@ -5,8 +5,7 @@ from abc import ABCMeta
 from contextlib import contextmanager
 import logging
 
-from waffle.models import Switch
-from waffle.utils import get_setting as waffle_setting
+from waffle.testutils import override_switch as waffle_override_switch
 from waffle import switch_is_active
 
 from request_cache import get_cache as get_request_cache
@@ -80,6 +79,18 @@ class WaffleSwitchPlus(WafflePlus):
         namespaced_switch_name = self._namespaced_setting_name(switch_name)
         self._cached_switches[namespaced_switch_name] = active
         log.info(u"%sSwitch '%s' set to %s for request.", self.log_prefix, namespaced_switch_name, active)
+
+    @contextmanager
+    def override_in_model(self, switch_name, active=True):
+        """
+        Overrides the active value for the given switch for the duration of this
+        contextmanager.
+        Note: The value is overridden in the request cache AND in the model.
+        """
+        with self.override(switch_name, active):
+            namespaced_switch_name = self._namespaced_setting_name(switch_name)
+            with waffle_override_switch(namespaced_switch_name, active):
+                yield
 
     @property
     def _cached_switches(self):

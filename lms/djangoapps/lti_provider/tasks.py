@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.dispatch import receiver
 import logging
 
-from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
+from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.grades.signals.signals import PROBLEM_WEIGHTED_SCORE_CHANGED
 from lms import CELERY_APP
 from lti_provider.models import GradedAssignment

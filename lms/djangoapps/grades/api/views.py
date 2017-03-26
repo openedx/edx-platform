@@ -14,7 +14,7 @@ from courseware.access import has_access
 from lms.djangoapps.ccx.utils import prep_course_for_grading
 from lms.djangoapps.courseware import courses
 from lms.djangoapps.grades.api.serializers import GradingPolicySerializer
-from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
+from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from student.roles import CourseStaffRole
