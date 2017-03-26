@@ -7,7 +7,7 @@ from django.core.management.base import BaseCommand
 from xmodule.modulestore.django import modulestore
 
 import openedx.core.djangoapps.content.block_structure.api as api
-from openedx.core.djangoapps.content.block_structure.config import STORAGE_BACKING_FOR_CACHE, enable_for_current_request
+from openedx.core.djangoapps.content.block_structure.config import STORAGE_BACKING_FOR_CACHE, waffle
 import openedx.core.djangoapps.content.block_structure.tasks as tasks
 import openedx.core.djangoapps.content.block_structure.store as store
 from openedx.core.lib.command_utils import (
@@ -127,7 +127,7 @@ class Command(BaseCommand):
         Generates course blocks for the given course_keys per the given options.
         """
         if options.get('with_storage'):
-            enable_for_current_request(STORAGE_BACKING_FOR_CACHE)
+            waffle().override_for_request(STORAGE_BACKING_FOR_CACHE)
 
         for course_key in course_keys:
             try:

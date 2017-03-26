@@ -196,6 +196,8 @@ simplefilter('ignore')
 CELERY_ALWAYS_EAGER = True
 CELERY_RESULT_BACKEND = 'djcelery.backends.cache:CacheBackend'
 
+CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION = False
+
 ########################### Server Ports ###################################
 
 # These ports are carefully chosen so that if the browser needs to

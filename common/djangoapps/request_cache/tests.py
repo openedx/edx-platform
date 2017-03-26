@@ -4,6 +4,7 @@ Tests for the request cache.
 from celery.task import task
 from django.conf import settings
 from django.test import TestCase
+from django.test.utils import override_settings
 from mock import Mock
 
 from request_cache import get_request_or_stub
@@ -31,6 +32,7 @@ class TestRequestCache(TestCase):
         cache = {"course_cache": "blah blah blah"}
         modulestore().request_cache.data.update(cache)
 
+    @override_settings(CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION=True)
     def test_clear_cache_celery(self):
         """ Test that the request cache is cleared after a task is run. """
         self._dummy_task.apply(args=(self,)).get()

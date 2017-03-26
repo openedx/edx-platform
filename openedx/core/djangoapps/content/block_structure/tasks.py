@@ -13,7 +13,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from openedx.core.djangoapps.content.block_structure import api
-from openedx.core.djangoapps.content.block_structure.config import STORAGE_BACKING_FOR_CACHE, enable_for_current_request
+from openedx.core.djangoapps.content.block_structure.config import STORAGE_BACKING_FOR_CACHE, waffle
 
 log = logging.getLogger('edx.celery.task')
 
@@ -59,7 +59,7 @@ def _update_course_in_cache(self, **kwargs):
     Updates the course blocks (mongo -> BlockStructure) for the specified course.
     """
     if kwargs.get('with_storage'):
-        enable_for_current_request(STORAGE_BACKING_FOR_CACHE)
+        waffle().override_for_request(STORAGE_BACKING_FOR_CACHE)
     _call_and_retry_if_needed(self, api.update_course_in_cache, **kwargs)
 
 
@@ -88,7 +88,7 @@ def _get_course_in_cache(self, **kwargs):
     Gets the course blocks for the specified course, updating the cache if needed.
     """
     if kwargs.get('with_storage'):
-        enable_for_current_request(STORAGE_BACKING_FOR_CACHE)
+        waffle().override_for_request(STORAGE_BACKING_FOR_CACHE)
     _call_and_retry_if_needed(self, api.get_course_in_cache, **kwargs)
 
 
