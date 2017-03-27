@@ -38,6 +38,7 @@ from student.models import CourseEnrollment
 from shoppingcart.models import Coupon, PaidCourseRegistration, CourseRegCodeItem
 from course_modes.models import CourseMode, CourseModesArchive
 from student.roles import CourseFinanceAdminRole, CourseSalesAdminRole
+from lms.djangoapps.courseware.module_render import get_module_by_usage_id
 from certificates.models import (
     CertificateGenerationConfiguration,
     CertificateWhitelist,
@@ -189,6 +190,10 @@ def instructor_dashboard_2(request, course_id):
     certs_enabled = CertificateGenerationConfiguration.current().enabled and not hasattr(course_key, 'ccx')
     if certs_enabled and access['admin']:
         sections.append(_section_certificates(course))
+
+    openassessment_blocks = modulestore().get_items(course_key, qualifiers={'category': 'openassessment'})
+    if len(openassessment_blocks) > 0:
+        sections.append(_section_open_response_assessment(request, course, openassessment_blocks, access))
 
     disable_buttons = not _is_small_course(course_key)
 
@@ -694,6 +699,48 @@ def _section_metrics(course, access):
         'get_students_opened_subsection_url': reverse('get_students_opened_subsection'),
         'get_students_problem_grades_url': reverse('get_students_problem_grades'),
         'post_metrics_data_csv_url': reverse('post_metrics_data_csv'),
+    }
+    return section_data
+
+
+def _section_open_response_assessment(request, course, openassessment_blocks, access):
+    """Provide data for the corresponding dashboard section """
+    course_key = course.id
+
+    ora_items = []
+    parents = {}
+
+    for block in openassessment_blocks:
+        block_parent_id = unicode(block.parent)
+        result_item_id = unicode(block.location)
+        if block_parent_id not in parents:
+            parents[block_parent_id] = modulestore().get_item(block.parent)
+
+        ora_items.append({
+            'id': result_item_id,
+            'name': block.display_name,
+            'parent_id': block_parent_id,
+            'parent_name': parents[block_parent_id].display_name,
+            'staff_assessment': 'staff-assessment' in block.assessment_steps,
+            'url_base': reverse('xblock_view', args=[course.id, block.location, 'student_view']),
+            'url_grade_available_responses': reverse('xblock_view', args=[course.id, block.location,
+                                                                          'grade_available_responses_view']),
+        })
+
+    openassessment_block = openassessment_blocks[0]
+    block, __ = get_module_by_usage_id(
+        request, unicode(course_key), unicode(openassessment_block.location),
+        disable_staff_debug_info=True, course=course
+    )
+    section_data = {
+        'fragment': block.render('ora_blocks_listing_view', context={
+            'ora_items': ora_items,
+            'ora_item_view_enabled': settings.FEATURES.get('ENABLE_XBLOCK_VIEW_ENDPOINT', False)
+        }),
+        'section_key': 'open_response_assessment',
+        'section_display_name': _('Open Responses'),
+        'access': access,
+        'course_id': unicode(course_key),
     }
     return section_data
 
