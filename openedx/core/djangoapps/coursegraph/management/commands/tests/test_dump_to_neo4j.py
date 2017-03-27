@@ -31,6 +31,26 @@ class TestDumpToNeo4jCommandBase(SharedModuleStoreTestCase):
     """
     @classmethod
     def setUpClass(cls):
+        """
+        Creates two courses; one that's just a course module, and one that
+        looks like:
+                        course
+                           |
+                        chapter
+                           |
+                        sequential
+                           |
+                        vertical
+                        / |  \  \
+                       /  |   \  ----------
+                      /   |    \           \
+                     /    |     ---         \
+                    /     |        \         \
+                html -> problem -> video -> video2
+
+        The side-pointing arrows (->) are PRECEDES relationships; the more
+        vertical lines are PARENT_OF relationships.
+        """
         super(TestDumpToNeo4jCommandBase, cls).setUpClass()
         cls.course = CourseFactory.create()
         cls.chapter = ItemFactory.create(parent=cls.course, category='chapter')
@@ -51,7 +71,7 @@ class TestDumpToNeo4jCommandBase(SharedModuleStoreTestCase):
         Replaces the py2neo Graph object with a MockGraph; similarly replaces
         NodeSelector with MockNodeSelector.
 
-        Args:
+        Arguments:
             mock_selector_class: a mocked NodeSelector class
             mock_graph_class: a mocked Graph class
             transaction_errors: a bool for whether we should get errors
@@ -71,7 +91,7 @@ class TestDumpToNeo4jCommandBase(SharedModuleStoreTestCase):
         """
         Asserts that we have the expected number of courses, commits, and
         rollbacks after we dump the modulestore to neo4j
-        Args:
+        Arguments:
             mock_graph: a MockGraph backend
             number_of_courses: number of courses we expect to find
             number_commits: number of commits we expect against the graph
@@ -203,7 +223,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
     def setUpClass(cls):
         """Any ModuleStore course/content operations can go here."""
         super(TestModuleStoreSerializer, cls).setUpClass()
-        cls.mss = ModuleStoreSerializer()
+        cls.mss = ModuleStoreSerializer.create()
 
     def test_serialize_item(self):
         """
@@ -228,7 +248,81 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         """
         nodes, relationships = self.mss.serialize_course(self.course.id)
         self.assertEqual(len(nodes), 9)
-        self.assertEqual(len(relationships), 7)
+        # the course has 7 "PARENT_OF" relationships and 3 "PRECEDES"
+        self.assertEqual(len(relationships), 10)
+
+    @staticmethod
+    def _extract_relationship_pairs(relationships, relationship_type):
+        """
+        Extracts a list of XBlock location tuples from a list of Relationships.
+
+        Arguments:
+            relationships: list of py2neo `Relationship` objects
+            relationship_type: the type of relationship to filter `relationships`
+              by.
+        Returns:
+            List of tuples of the locations of of the relationships'
+              constituent nodes.
+        """
+        relationship_pairs = [
+            tuple([node["location"] for node in rel.nodes()])
+            for rel in relationships if rel.type() == relationship_type
+        ]
+        return relationship_pairs
+
+    @staticmethod
+    def _extract_location_pair(xblock1, xblock2):
+        """
+        Returns a tuple of locations from two XBlocks.
+
+        Arguments:
+            xblock1: an xblock
+            xblock2: also an xblock
+
+        Returns:
+            A tuple of the string representations of those XBlocks' locations.
+        """
+        return (unicode(xblock1.location), unicode(xblock2.location))
+
+    def assertBlockPairIsRelationship(self, xblock1, xblock2, relationships, relationship_type):
+        """
+        Helper assertion that a pair of xblocks have a certain kind of
+        relationship with one another.
+        """
+        relationship_pairs = self._extract_relationship_pairs(relationships, relationship_type)
+        location_pair = self._extract_location_pair(xblock1, xblock2)
+        self.assertIn(location_pair, relationship_pairs)
+
+    def assertBlockPairIsNotRelationship(self, xblock1, xblock2, relationships, relationship_type):
+        """
+        The opposite of `assertBlockPairIsRelationship`: asserts that a pair
+        of xblocks do NOT have a certain kind of relationship.
+        """
+        relationship_pairs = self._extract_relationship_pairs(relationships, relationship_type)
+        location_pair = self._extract_location_pair(xblock1, xblock2)
+        self.assertNotIn(location_pair, relationship_pairs)
+
+    def test_precedes_relationship(self):
+        """
+        Tests that two nodes that should have a precedes relationship have it.
+        """
+        __, relationships = self.mss.serialize_course(self.course.id)
+        self.assertBlockPairIsRelationship(self.video, self.video2, relationships, "PRECEDES")
+        self.assertBlockPairIsNotRelationship(self.video2, self.video, relationships, "PRECEDES")
+        self.assertBlockPairIsNotRelationship(self.vertical, self.video, relationships, "PRECEDES")
+        self.assertBlockPairIsNotRelationship(self.html, self.video, relationships, "PRECEDES")
+
+    def test_parent_relationship(self):
+        """
+        Test that two nodes that should have a parent_of relationship have it.
+        """
+        __, relationships = self.mss.serialize_course(self.course.id)
+        self.assertBlockPairIsRelationship(self.vertical, self.video, relationships, "PARENT_OF")
+        self.assertBlockPairIsRelationship(self.vertical, self.html, relationships, "PARENT_OF")
+        self.assertBlockPairIsRelationship(self.course, self.chapter, relationships, "PARENT_OF")
+        self.assertBlockPairIsNotRelationship(self.course, self.video, relationships, "PARENT_OF")
+        self.assertBlockPairIsNotRelationship(self.video, self.vertical, relationships, "PARENT_OF")
+        self.assertBlockPairIsNotRelationship(self.video, self.html, relationships, "PARENT_OF")
 
     def test_nodes_have_indices(self):
         """
@@ -277,7 +371,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         mock_graph = MockGraph()
         mock_selector_class.return_value = MockNodeSelector(mock_graph)
 
-        successful, unsuccessful = self.mss.dump_courses_to_neo4j(mock_graph)
+        submitted, skipped = self.mss.dump_courses_to_neo4j(mock_graph)
 
         self.assertCourseDump(
             mock_graph,
@@ -290,9 +384,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         # 2 nodes and no relationships from the second
 
         self.assertEqual(len(mock_graph.nodes), 11)
-
-        self.assertEqual(len(unsuccessful), 0)
-        self.assertItemsEqual(successful, self.course_strings)
+        self.assertItemsEqual(submitted, self.course_strings)
 
     @mock.patch('openedx.core.djangoapps.coursegraph.management.commands.dump_to_neo4j.NodeSelector')
     def test_dump_to_neo4j_rollback(self, mock_selector_class):
@@ -303,7 +395,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         mock_graph = MockGraph(transaction_errors=True)
         mock_selector_class.return_value = MockNodeSelector(mock_graph)
 
-        successful, unsuccessful = self.mss.dump_courses_to_neo4j(mock_graph)
+        submitted, skipped = self.mss.dump_courses_to_neo4j(mock_graph)
 
         self.assertCourseDump(
             mock_graph,
@@ -312,8 +404,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
             number_rollbacks=2,
         )
 
-        self.assertEqual(len(successful), 0)
-        self.assertItemsEqual(unsuccessful, self.course_strings)
+        self.assertItemsEqual(submitted, self.course_strings)
 
     @mock.patch('openedx.core.djangoapps.coursegraph.management.commands.dump_to_neo4j.NodeSelector')
     @ddt.data((True, 2), (False, 0))
@@ -333,10 +424,10 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
 
         # when run the second time, only dump courses if the cache override
         # is enabled
-        successful, unsuccessful = self.mss.dump_courses_to_neo4j(
+        submitted, __ = self.mss.dump_courses_to_neo4j(
             mock_graph, override_cache=override_cache
         )
-        self.assertEqual(len(successful + unsuccessful), expected_number_courses)
+        self.assertEqual(len(submitted), expected_number_courses)
 
     @mock.patch('openedx.core.djangoapps.coursegraph.management.commands.dump_to_neo4j.NodeSelector')
     def test_dump_to_neo4j_published(self, mock_selector_class):
@@ -348,17 +439,16 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         mock_selector_class.return_value = MockNodeSelector(mock_graph)
 
         # run once to warm the cache
-        successful, unsuccessful = self.mss.dump_courses_to_neo4j(mock_graph)
-        self.assertEqual(len(successful + unsuccessful), len(self.course_strings))
+        submitted, skipped = self.mss.dump_courses_to_neo4j(mock_graph)
+        self.assertEqual(len(submitted), len(self.course_strings))
 
         # simulate one of the courses being published
         listen_for_course_publish(None, self.course.id)
 
         # make sure only the published course was dumped
-        successful, unsuccessful = self.mss.dump_courses_to_neo4j(mock_graph)
-        self.assertEqual(len(unsuccessful), 0)
-        self.assertEqual(len(successful), 1)
-        self.assertEqual(successful[0], unicode(self.course.id))
+        submitted, __ = self.mss.dump_courses_to_neo4j(mock_graph)
+        self.assertEqual(len(submitted), 1)
+        self.assertEqual(submitted[0], unicode(self.course.id))
 
     @ddt.data(
         (six.text_type(datetime(2016, 3, 30)), six.text_type(datetime(2016, 3, 31)), True),
@@ -373,7 +463,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         Tests whether a course should be dumped given the last time it was
         dumped and the last time it was published.
         """
-        mss = ModuleStoreSerializer()
+        mss = ModuleStoreSerializer.create()
         mss.get_command_last_run = lambda course_key, graph: last_command_run
         mss.get_course_last_published = lambda course_key: last_course_published
         mock_course_key = mock.Mock
