@@ -116,7 +116,8 @@ class CourseMetadata(object):
         """
         result = {}
         for field in descriptor.fields.values():
-            if field.scope != Scope.settings:
+            # temp bug fix: display_description not implemented for course
+            if field.scope != Scope.settings or field.name == 'display_description':
                 continue
             result[field.name] = {
                 'value': field.read_json(descriptor),
