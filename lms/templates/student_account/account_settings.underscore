@@ -12,7 +12,7 @@
     </div>
     <div class="account-settings-sections">
         <% _.each(accountSettingsTabs, function(tab) { %>
-            <div id="<%- tab.name %>-tabpanel" class="account-settings-tabpanels <% if (!tab.class) { %> hidden <% } %>" aria-label="<%- tab.label %>" role="tabpanel"></div>
+            <div id="<%- tab.name %>-tabpanel" class="account-settings-tab <% if (!tab.class) { %> hidden <% } %>" aria-label="<%- tab.label %>" role="tabpanel"></div>
         <% }); %>
     </div>
 </div>
