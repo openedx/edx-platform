@@ -90,7 +90,8 @@ def _get_cohort_representation(cohort, course):
     return {
         'name': cohort.name,
         'id': cohort.id,
-        'user_count': cohort.users.count(),
+        'user_count': cohort.users.filter(courseenrollment__course_id=course.location.course_key,
+                                          courseenrollment__is_active=1).count(),
         'assignment_type': assignment_type,
         'user_partition_id': partition_id,
         'group_id': group_id,

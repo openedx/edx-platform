@@ -838,6 +838,7 @@ class AddUsersToCohortTestCase(CohortViewsTestCase):
         else:
             response = add_users_to_cohort(request, unicode(course.id), cohort.id)
             self.assertEqual(response.status_code, 200)
+
             return json.loads(response.content)
 
     def verify_added_users_to_cohort(self, response_dict, cohort, course, expected_added, expected_changed,
@@ -993,22 +994,37 @@ class AddUsersToCohortTestCase(CohortViewsTestCase):
             expected_unknown=usernames
         )
 
+    def check_user_count(self, expected_count, cohort):
+        """
+        Check that the expected number of users are present in the user_count returned by the view handler
+        """
+        cohort_listed = False
+        for c in self.get_handler(self.course)['cohorts']:
+            if c['name'] == cohort.name:
+                cohort_listed = True
+                self.assertEqual(expected_count, c['user_count'])
+        self.assertTrue(cohort_listed)
+
     def test_all(self):
         """
         Test all adding conditions together.
         """
         unknowns = ["unknown_user{}".format(i) for i in range(3)]
+        new_users = self.cohortless_users + self.cohort1_users + self.cohort2_users + self.cohort3_users
         response_dict = self.request_add_users_to_cohort(
             ",".join(
                 unknowns +
                 [
                     user.username
-                    for user in self.cohortless_users + self.cohort1_users + self.cohort2_users + self.cohort3_users
+                    for user in new_users
                 ]
             ),
             self.cohort1,
             self.course
         )
+
+        self.check_user_count(expected_count=len(new_users), cohort=self.cohort1)
+
         self.verify_added_users_to_cohort(
             response_dict,
             self.cohort1,
@@ -1077,14 +1093,19 @@ class AddUsersToCohortTestCase(CohortViewsTestCase):
         """
         Verify that users can be added to a cohort of a course they're not
         enrolled in.  This feature is currently used to pre-cohort users that
-        are expected to enroll in a course.
+        are expected to enroll in a course. Also tests that adding unenrolled
+        users does not alter the number of "active" users in the user_count.
         """
+        start_count = self.cohort1.users.count()
         unenrolled_usernames = [user.username for user in self.unenrolled_users]
         response_dict = self.request_add_users_to_cohort(
             ",".join(unenrolled_usernames),
             self.cohort1,
             self.course
         )
+
+        self.check_user_count(expected_count=start_count, cohort=self.cohort1)
+
         self.verify_added_users_to_cohort(
             response_dict,
             self.cohort1,
