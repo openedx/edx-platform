@@ -1315,3 +1315,6 @@ COURSE_CATALOG_API_URL = None
 
 # Queue to use for updating persistent grades
 RECALCULATE_GRADES_ROUTING_KEY = LOW_PRIORITY_QUEUE
+
+############## Settings for CourseGraph ############################
+COURSEGRAPH_JOB_QUEUE = LOW_PRIORITY_QUEUE
