@@ -33,16 +33,25 @@ class ModuleStoreSerializer(object):
     one graph per course.
     """
 
-    def __init__(self, courses=None, skip=None):
+    def __init__(self, course_keys):
+        self.course_keys = course_keys
+
+    @classmethod
+    def create(cls, courses=None, skip=None):
         """
         Sets the object's course_keys attribute from the `courses` parameter.
         If that parameter isn't furnished, loads all course_keys from the
         modulestore.
+
         Filters out course_keys in the `skip` parameter, if provided.
-        Args:
+
+        Arguments:
             courses: A list of string serializations of course keys.
                 For example, ["course-v1:org+course+run"].
             skip: Also a list of string serializations of course keys.
+
+        Returns:
+            a ModulestoreSerializer instance
         """
         if courses:
             course_keys = [CourseKey.from_string(course.strip()) for course in courses]
@@ -51,14 +60,14 @@ class ModuleStoreSerializer(object):
                 course.id for course in modulestore().get_course_summaries()
             ]
         if skip is not None:
-            skip_keys = [CourseKey.from_string(course.strip()) for course in skip]
+            skip_keys = set([CourseKey.from_string(course.strip()) for course in skip])
             course_keys = [course_key for course_key in course_keys if course_key not in skip_keys]
-        self.course_keys = course_keys
+        return cls(course_keys)
 
     @staticmethod
     def serialize_item(item):
         """
-        Args:
+        Arguments:
             item: an XBlock
 
         Returns:
@@ -100,7 +109,7 @@ class ModuleStoreSerializer(object):
     def serialize_course(self, course_id):
         """
         Serializes a course into py2neo Nodes and Relationships
-        Args:
+        Arguments:
             course_id: CourseKey of the course we want to serialize
 
         Returns:
@@ -125,6 +134,7 @@ class ModuleStoreSerializer(object):
         # create relationships
         relationships = []
         for item in items:
+            previous_child_node = None
             for index, child_loc in enumerate(item.get_children()):
                 parent_node = location_to_node.get(item.location)
                 child_node = location_to_node.get(child_loc.location)
@@ -133,13 +143,20 @@ class ModuleStoreSerializer(object):
                     relationship = Relationship(parent_node, "PARENT_OF", child_node)
                     relationships.append(relationship)
 
+                    if previous_child_node:
+                        ordering_relationship = Relationship(
+                            previous_child_node, "PRECEDES", child_node
+                        )
+                        relationships.append(ordering_relationship)
+                    previous_child_node = child_node
+
         nodes = location_to_node.values()
         return nodes, relationships
 
     @staticmethod
     def coerce_types(value):
         """
-        Args:
+        Arguments:
             value: the value of an xblock's field
 
         Returns: either the value, a text version of the value, or, if the
@@ -159,7 +176,7 @@ class ModuleStoreSerializer(object):
     @staticmethod
     def add_to_transaction(neo4j_entities, transaction):
         """
-        Args:
+        Arguments:
             neo4j_entities: a list of Nodes or Relationships
             transaction: a neo4j transaction
         """
@@ -170,7 +187,7 @@ class ModuleStoreSerializer(object):
     def get_command_last_run(course_key, graph):
         """
         This information is stored on the course node of a course in neo4j
-        Args:
+        Arguments:
             course_key: a CourseKey
             graph: a py2neo Graph
 
@@ -195,7 +212,7 @@ class ModuleStoreSerializer(object):
         """
         We use the CourseStructure table to get when this course was last
         published.
-        Args:
+        Arguments:
             course_key: a CourseKey
 
         Returns: The datetime the course was last published at, converted into
@@ -214,7 +231,7 @@ class ModuleStoreSerializer(object):
         """
         Only dump the course if it's been changed since the last time it's been
         dumped.
-        Args:
+        Arguments:
             course_key: a CourseKey object.
             graph: a py2neo Graph object.
 
@@ -240,11 +257,50 @@ class ModuleStoreSerializer(object):
         # before the course's last published event
         return last_this_command_was_run < course_last_published_date
 
+    def dump_course_to_neo4j(self, course_key, graph):
+        """
+        Serializes a course and writes it to neo4j.
+
+        Arguments:
+            course_key: course key for the course to be exported
+            graph: py2neo graph object
+        """
+
+        nodes, relationships = self.serialize_course(course_key)
+        log.info(
+            "%d nodes and %d relationships in %s",
+            len(nodes),
+            len(relationships),
+            course_key,
+        )
+
+        transaction = graph.begin()
+        course_string = six.text_type(course_key)
+        try:
+            # first, delete existing course
+            transaction.run(
+                "MATCH (n:item) WHERE n.course_key='{}' DETACH DELETE n".format(
+                    course_string
+                )
+            )
+
+            # now, re-add it
+            self.add_to_transaction(nodes, transaction)
+            self.add_to_transaction(relationships, transaction)
+            transaction.commit()
+
+        except Exception:  # pylint: disable=broad-except
+            log.exception(
+                "Error trying to dump course %s to neo4j, rolling back",
+                course_string
+            )
+            transaction.rollback()
+
     def dump_courses_to_neo4j(self, graph, override_cache=False):
         """
         Method that iterates through a list of courses in a modulestore,
-        serializes them, then writes them to neo4j
-        Args:
+        serializes them, then submits tasks to write them to neo4j.
+        Arguments:
             graph: py2neo graph object
             override_cache: serialize the courses even if they'be been recently
                 serialized
@@ -255,8 +311,8 @@ class ModuleStoreSerializer(object):
 
         total_number_of_courses = len(self.course_keys)
 
-        successful_courses = []
-        unsuccessful_courses = []
+        submitted_courses = []
+        skipped_courses = []
 
         for index, course_key in enumerate(self.course_keys):
             # first, clear the request cache to prevent memory leaks
@@ -271,43 +327,13 @@ class ModuleStoreSerializer(object):
 
             if not (override_cache or self.should_dump_course(course_key, graph)):
                 log.info("skipping dumping %s, since it hasn't changed", course_key)
-                continue
-
-            nodes, relationships = self.serialize_course(course_key)
-            log.info(
-                "%d nodes and %d relationships in %s",
-                len(nodes),
-                len(relationships),
-                course_key,
-            )
-
-            transaction = graph.begin()
-            course_string = six.text_type(course_key)
-            try:
-                # first, delete existing course
-                transaction.run(
-                    "MATCH (n:item) WHERE n.course_key='{}' DETACH DELETE n".format(
-                        course_string
-                    )
-                )
-
-                # now, re-add it
-                self.add_to_transaction(nodes, transaction)
-                self.add_to_transaction(relationships, transaction)
-                transaction.commit()
-
-            except Exception:  # pylint: disable=broad-except
-                log.exception(
-                    "Error trying to dump course %s to neo4j, rolling back",
-                    course_string
-                )
-                transaction.rollback()
-                unsuccessful_courses.append(course_string)
+                skipped_courses.append(unicode(course_key))
 
             else:
-                successful_courses.append(course_string)
+                self.dump_course_to_neo4j(course_key, graph)
+                submitted_courses.append(unicode(course_key))
 
-        return successful_courses, unsuccessful_courses
+        return submitted_courses, skipped_courses
 
 
 class Command(BaseCommand):
@@ -374,28 +400,24 @@ class Command(BaseCommand):
             secure=secure,
         )
 
-        mss = ModuleStoreSerializer(options['courses'], options['skip'])
+        mss = ModuleStoreSerializer.create(options['courses'], options['skip'])
 
-        successful_courses, unsuccessful_courses = mss.dump_courses_to_neo4j(
+        submitted_courses, skipped_courses = mss.dump_courses_to_neo4j(
             graph, override_cache=options['override']
         )
 
-        if not successful_courses and not unsuccessful_courses:
+        log.info(
+            "%d courses submitted for export to neo4j. %d courses skipped.",
+            len(submitted_courses),
+            len(skipped_courses),
+        )
+
+        if not submitted_courses:
             print("No courses exported to neo4j at all!")
             return
 
-        if successful_courses:
+        if submitted_courses:
             print(
-                "These courses exported to neo4j successfully:\n\t" +
-                "\n\t".join(successful_courses)
+                "These courses were submitted for export to neo4j successfully:\n\t" +
+                "\n\t".join(submitted_courses)
             )
-        else:
-            print("No courses exported to neo4j successfully.")
-
-        if unsuccessful_courses:
-            print(
-                "These courses did not export to neo4j successfully:\n\t" +
-                "\n\t".join(unsuccessful_courses)
-            )
-        else:
-            print("All courses exported to neo4j successfully.")
