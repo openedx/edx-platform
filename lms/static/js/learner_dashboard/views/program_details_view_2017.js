@@ -34,6 +34,7 @@
                      this.options = options;
                      this.programModel = new Backbone.Model(this.options.programData);
                      this.courseData = new Backbone.Model(this.options.courseData);
+                     this.certificateCollection = new Backbone.Collection(this.options.certificateData);
                      this.completedCourseCollection = new CourseCardCollection(
                         this.courseData.get('completed') || [],
                         this.options.userPreferences
@@ -61,7 +62,7 @@
                              remainingCount: remainingCount,
                              completedCount: completedCount
                          };
-                     data = $.extend(data, this.options.programData);
+                     data = $.extend(data, this.programModel.toJSON());
                      HtmlUtils.setHtml(this.$el, this.tpl(data));
                      this.postRender();
                  },
@@ -99,10 +100,12 @@
                          }).render();
                      }
 
-                     new SidebarView({
-                         el: '.sidebar',
-                         context: this.options
-                     }).render();
+                     this.sidebarView = new SidebarView({
+                         el: '.js-program-sidebar',
+                         model: this.programModel,
+                         courseModel: this.courseData,
+                         certificateCollection: this.certificateCollection
+                     });
                  }
              });
          }
