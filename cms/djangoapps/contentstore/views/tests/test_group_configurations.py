@@ -894,20 +894,18 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
     def test_can_handle_multiple_partitions(self):
         # Create the user partitions
         self.course.user_partitions = [
-            UserPartition(
+            UserPartition.get_scheme("cohort").create_user_partition(
                 id=0,
                 name='Cohort user partition',
-                scheme=UserPartition.get_scheme('cohort'),
                 description='Cohorted user partition',
                 groups=[
                     Group(id=0, name="Group A"),
                     Group(id=1, name="Group B"),
                 ],
             ),
-            UserPartition(
+            UserPartition.get_scheme("random").create_user_partition(
                 id=1,
                 name='Random user partition',
-                scheme=UserPartition.get_scheme('random'),
                 description='Random user partition',
                 groups=[
                     Group(id=0, name="Group A"),

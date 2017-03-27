@@ -17,6 +17,7 @@ from xmodule import course_metadata_utils
 from xmodule.course_metadata_utils import DEFAULT_START_DATE
 from xmodule.graders import grader_from_conf
 from xmodule.mixin import LicenseMixin
+from xmodule.partitions.partitions import UserPartition, UserPartitionError
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.tabs import CourseTabList, InvalidTabsException
 from .fields import Date
@@ -905,6 +906,25 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
 
         self._grading_policy = {}
         self.set_grading_policy(self.grading_policy)
+
+        try:
+            verification_track_scheme = UserPartition.get_scheme("enrollment_track")
+            if len(self.get_user_partitions_for_scheme(verification_track_scheme)) == 0:
+                used_ids = set(p.id for p in self.user_partitions)
+                max_id = 1 if len(used_ids) == 0 else max(used_ids)
+                self.user_partitions.append(
+                    verification_track_scheme.create_user_partition(
+                        id=max_id+1,
+                        name=_(u"Enrollment Track Partition"),
+                        description=_(u"Partition for segmenting users by enrollment track"),
+                        parameters={"course_id": unicode(self.id)}
+                     )
+                )
+
+        except UserPartitionError:
+            log.warning(
+                "No 'enrollment_track' scheme registered, EnrollmentTrackUserPartition will not be created."
+            )
 
         if self.discussion_topics == {}:
             self.discussion_topics = {_('General'): {'id': self.location.html_id()}}

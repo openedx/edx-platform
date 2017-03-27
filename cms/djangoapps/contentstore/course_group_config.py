@@ -347,12 +347,12 @@ class GroupConfiguration(object):
         """
         content_group_configuration = get_cohorted_user_partition(course)
         if content_group_configuration is None:
-            content_group_configuration = UserPartition(
+            scheme = UserPartition.get_scheme(COHORT_SCHEME)
+            content_group_configuration = scheme.create_user_partition(
                 id=generate_int_id(MINIMUM_GROUP_ID, MYSQL_MAX_INT, GroupConfiguration.get_used_ids(course)),
                 name=CONTENT_GROUP_CONFIGURATION_NAME,
                 description=CONTENT_GROUP_CONFIGURATION_DESCRIPTION,
-                groups=[],
-                scheme_id=COHORT_SCHEME
+                groups=[]
             )
             return content_group_configuration.to_json()
 

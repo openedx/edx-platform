@@ -127,7 +127,7 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
         try:
             scheme = UserPartition.scheme_extensions[name].plugin
         except KeyError:
-            raise UserPartitionError("Unrecognized scheme {0}".format(name))
+            raise UserPartitionError("Unrecognized scheme '{0}'".format(name))
         scheme.name = name
         return scheme
 
@@ -188,12 +188,11 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
         if not scheme:
             raise TypeError("UserPartition dict {0} has unrecognized scheme {1}".format(value, scheme_id))
 
-        return UserPartition(
+        return scheme.create_user_partition(
             value["id"],
             value["name"],
             value["description"],
             groups,
-            scheme,
             parameters,
             active,
         )
@@ -216,3 +215,17 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
         raise NoSuchUserPartitionGroupError(
             "could not find a Group with ID [{}] in UserPartition [{}]".format(group_id, self.id)
         )
+
+
+# TODO: add test coverage, documentation
+class UserPartitionScheme(object):
+
+    supports_editable_groups = True
+
+    @classmethod
+    def create_user_partition(cls, id, name, description, groups, parameters=None, active=True):
+        return UserPartition(id, name, description, groups, cls, parameters, active)
+
+    @classmethod
+    def get_group_for_user(cls, course_key, user, user_partition, track_function=None):
+        raise NotImplementedError()

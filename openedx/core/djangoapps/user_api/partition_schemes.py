@@ -5,12 +5,12 @@ import logging
 import random
 import course_tag.api as course_tag_api
 
-from xmodule.partitions.partitions import UserPartitionError, NoSuchUserPartitionGroupError
+from xmodule.partitions.partitions import UserPartitionScheme, UserPartitionError, NoSuchUserPartitionGroupError
 
 log = logging.getLogger(__name__)
 
 
-class RandomUserPartitionScheme(object):
+class RandomUserPartitionScheme(UserPartitionScheme):
     """
     This scheme randomly assigns users into the partition's groups.
     """

@@ -345,31 +345,28 @@ class GroupVisibilityTest(CourseTestCase):
 
         # Add partitions to the course
         self.course.user_partitions = [
-            UserPartition(
+            UserPartition.get_scheme("random").create_user_partition(
                 id=0,
                 name="Partition 0",
                 description="Partition 0",
-                scheme=UserPartition.get_scheme("random"),
                 groups=[
                     Group(id=0, name="Group A"),
                     Group(id=1, name="Group B"),
                 ],
             ),
-            UserPartition(
+            UserPartition.get_scheme("random").create_user_partition(
                 id=1,
                 name="Partition 1",
                 description="Partition 1",
-                scheme=UserPartition.get_scheme("random"),
                 groups=[
                     Group(id=0, name="Group C"),
                     Group(id=1, name="Group D"),
                 ],
             ),
-            UserPartition(
+            UserPartition.get_scheme("random").create_user_partition(
                 id=2,
                 name="Partition 2",
                 description="Partition 2",
-                scheme=UserPartition.get_scheme("random"),
                 groups=[
                     Group(id=0, name="Group E"),
                     Group(id=1, name="Group F"),
@@ -435,20 +432,18 @@ class GetUserPartitionInfoTest(ModuleStoreTestCase):
 
         # Set up some default partitions
         self._set_partitions([
-            UserPartition(
+            UserPartition.get_scheme("cohort").create_user_partition(
                 id=0,
                 name="Cohort user partition",
-                scheme=UserPartition.get_scheme("cohort"),
                 description="Cohorted user partition",
                 groups=[
                     Group(id=0, name="Group A"),
                     Group(id=1, name="Group B"),
                 ],
             ),
-            UserPartition(
+            UserPartition.get_scheme("random").create_user_partition(
                 id=1,
                 name="Random user partition",
-                scheme=UserPartition.get_scheme("random"),
                 description="Random user partition",
                 groups=[
                     Group(id=0, name="Group C"),
@@ -523,20 +518,18 @@ class GetUserPartitionInfoTest(ModuleStoreTestCase):
     def test_exclude_inactive_partitions(self):
         # Include an inactive verification scheme
         self._set_partitions([
-            UserPartition(
+            UserPartition.get_scheme("cohort").create_user_partition(
                 id=0,
                 name="Cohort user partition",
-                scheme=UserPartition.get_scheme("cohort"),
                 description="Cohorted user partition",
                 groups=[
                     Group(id=0, name="Group A"),
                     Group(id=1, name="Group B"),
                 ],
             ),
-            UserPartition(
+            UserPartition.get_scheme("verification").create_user_partition(
                 id=1,
                 name="Verification user partition",
-                scheme=UserPartition.get_scheme("verification"),
                 description="Verification user partition",
                 groups=[
                     Group(id=0, name="Group C"),
@@ -553,17 +546,15 @@ class GetUserPartitionInfoTest(ModuleStoreTestCase):
     def test_exclude_partitions_with_no_groups(self):
         # The cohort partition has no groups defined
         self._set_partitions([
-            UserPartition(
+            UserPartition.get_scheme("cohort").create_user_partition(
                 id=0,
                 name="Cohort user partition",
-                scheme=UserPartition.get_scheme("cohort"),
                 description="Cohorted user partition",
                 groups=[],
             ),
-            UserPartition(
+            UserPartition.get_scheme("verification").create_user_partition(
                 id=1,
                 name="Verification user partition",
-                scheme=UserPartition.get_scheme("verification"),
                 description="Verification user partition",
                 groups=[
                     Group(id=0, name="Group C"),

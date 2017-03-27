@@ -9,7 +9,8 @@ from mock import Mock
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from stevedore.extension import Extension, ExtensionManager
 from xmodule.partitions.partitions import (
-    Group, UserPartition, UserPartitionError, NoSuchUserPartitionGroupError, USER_PARTITION_SCHEME_NAMESPACE
+    Group, UserPartition, UserPartitionScheme, UserPartitionError,
+    NoSuchUserPartitionGroupError, USER_PARTITION_SCHEME_NAMESPACE
 )
 from xmodule.partitions.partitions_service import PartitionService
 
@@ -84,7 +85,7 @@ class TestGroup(TestCase):
         self.assertNotIn("programmer", group.to_json())
 
 
-class MockUserPartitionScheme(object):
+class MockUserPartitionScheme(UserPartitionScheme):
     """
     Mock user partition scheme
     """
@@ -103,6 +104,13 @@ class MockUserPartitionScheme(object):
         if not groups or len(groups) == 0:
             return None
         return groups[0]
+
+    def create_user_partition(self, id, name, description, groups, parameters=None, active=True):
+        """
+        Override the classmethod definition because the scheme name is being stored as
+        an instance variable instead of a class variable (and the test cases depend on that).
+        """
+        return UserPartition(id, name, description, groups, self, parameters, active)
 
 
 class PartitionTestCase(TestCase):

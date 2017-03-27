@@ -96,11 +96,10 @@ def _other_partitions(verified_partitions, exclude_partitions, course_key):
     for pid in other_partition_ids:
         partition = partition_by_id[pid]
         results.append(
-            UserPartition(
+            partition.scheme.create_user_partition(
                 id=partition.id,
                 name=partition.name,
                 description=partition.description,
-                scheme=partition.scheme,
                 parameters=partition.parameters,
                 groups=partition.groups,
                 active=False,
@@ -150,14 +149,13 @@ def _set_verification_partitions(course_key, icrv_blocks):
 
     partitions = []
     for block in icrv_blocks:
-        partition = UserPartition(
+        partition = scheme.create_user_partition(
             id=partition_id_for_location.get(
                 unicode(block.location),
                 _unique_partition_id(course)
             ),
             name=block.related_assessment,
             description=u"Verification checkpoint at {}".format(block.related_assessment),
-            scheme=scheme,
             parameters={"location": unicode(block.location)},
             groups=[
                 Group(scheme.ALLOW, "Completed verification at {}".format(block.related_assessment)),
