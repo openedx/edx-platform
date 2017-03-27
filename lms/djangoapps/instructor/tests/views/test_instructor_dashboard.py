@@ -321,6 +321,30 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         # Max number of student per page is one.  Patched setting MAX_STUDENTS_PER_PAGE_GRADE_BOOK = 1
         self.assertEqual(len(response.mako_context['students']), 1)  # pylint: disable=no-member
 
+    def test_open_response_assessment_page(self):
+        """
+        Test that Open Responses is available only if course contains at least one ORA block
+        """
+        ora_section = (
+            '<li class="nav-item">'
+            '<button type="button" class="btn-link" data-section="open_response_assessment">'
+            'Open Responses'
+            '</button>'
+            '</li>'
+        )
+
+        response = self.client.get(self.url)
+        self.assertNotIn(ora_section, response.content)
+
+        course = ItemFactory.create(
+            parent_location=self.course.location,
+            category="course",
+            display_name="Test course",
+        )
+        ItemFactory.create(parent_location=course.location, category="openassessment")
+        response = self.client.get(self.url)
+        self.assertIn(ora_section, response.content)
+
 
 @ddt.ddt
 class TestInstructorDashboardPerformance(ModuleStoreTestCase, LoginEnrollmentTestCase, XssTestMixin):
