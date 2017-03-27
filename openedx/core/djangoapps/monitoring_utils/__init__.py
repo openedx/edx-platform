@@ -22,6 +22,11 @@ TODO: supply additional public functions for storing strings and booleans.
 """
 
 from . import middleware
+try:
+    import newrelic.agent
+except ImportError:
+    newrelic = None  # pylint: disable=invalid-name
+
 
 def accumulate(name, value):
     """
@@ -53,3 +58,40 @@ def increment(name):
     middleware should automatically aggregate this metric.
     """
     accumulate(name, 1)
+
+
+def set_custom_metrics_for_course_key(course_key):
+    """
+    Set monitoring custom metrics related to a course key.
+
+    This is not cached, and only support reporting to New Relic Insights.
+
+    """
+    if not newrelic:
+        return
+    newrelic.agent.add_custom_parameter('course_id', unicode(course_key))
+    newrelic.agent.add_custom_parameter('org', unicode(course_key.org))
+
+
+def set_custom_metric(key, value):
+    """
+    Set monitoring custom metric.
+
+    This is not cached, and only support reporting to New Relic Insights.
+
+    """
+    if not newrelic:
+        return
+    newrelic.agent.add_custom_parameter(key, value)
+
+
+def set_monitoring_transaction_name(name, group=None, priority=None):
+    """
+    Sets the transaction name for monitoring.
+
+    This is not cached, and only support reporting to New Relic.
+
+    """
+    if not newrelic:
+        return
+    newrelic.agent.set_transaction_name(name, group, priority)

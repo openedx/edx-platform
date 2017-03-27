@@ -87,8 +87,9 @@ from openedx.core.djangoapps.credit.api import (
 )
 from openedx.core.djangoapps.programs.utils import ProgramMarketingDataExtender
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from shoppingcart.utils import is_shopping_cart_enabled
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
+from openedx.core.djangoapps.monitoring_utils import set_custom_metrics_for_course_key
+from shoppingcart.utils import is_shopping_cart_enabled
 from student.models import UserTestGroup, CourseEnrollment
 from student.roles import GlobalStaff
 from util.cache import cache, cache_if_anonymous
@@ -502,6 +503,7 @@ class CourseTabView(EdxFragmentView):
         course = get_course_with_access(request.user, 'load', course_key)
         tab = CourseTabList.get_tab_by_type(course.tabs, tab_type)
         page_context = self.create_page_context(request, course=course, tab=tab, **kwargs)
+        set_custom_metrics_for_course_key(course_key)
         return super(CourseTabView, self).get(request, course=course, page_context=page_context, **kwargs)
 
     def create_page_context(self, request, course=None, tab=None, **kwargs):
