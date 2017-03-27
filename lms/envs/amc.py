@@ -25,14 +25,6 @@ INTERCOM_APP_ID = AUTH_TOKENS.get("INTERCOM_APP_ID")
 INTERCOM_APP_SECRET = AUTH_TOKENS.get("INTERCOM_APP_SECRET")
 
 
-# # disable caching in dev environment
-# for cache_key in CACHES.keys():
-#     CACHES[cache_key]['BACKEND'] = 'django.core.cache.backends.dummy.DummyCache'
-#
-# SESSION_ENGINE = 'django.contrib.sessions.backends.db'
-#
-# STATICFILES_STORAGE = 'openedx.core.storage.DevelopmentStorage'
-
 CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ALLOW_HEADERS = (

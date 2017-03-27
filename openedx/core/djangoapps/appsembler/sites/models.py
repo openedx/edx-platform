@@ -1,10 +1,12 @@
 """ Django Sites framework models overrides """
 
-from django.core.cache import cache
+from django.core.cache import caches
 from django.http.request import split_domain_port
 from django.contrib.sites.models import Site, SiteManager, SITE_CACHE
 from django.core.exceptions import ImproperlyConfigured
 import django
+
+cache = caches['general']
 
 
 def _cache_key_for_site_id(site_id):
@@ -57,15 +59,16 @@ def patched_clear_site_cache(sender, **kwargs):
     Clears the cache (if primed) each time a site is saved or deleted
     """
     instance = kwargs['instance']
-    key_id = _cache_key_for_site_id(instance.pk)
-    key_host = _cache_key_for_site_host(instance.domain)
+    site = instance.site
+    key_id = _cache_key_for_site_id(site.pk)
+    key_host = _cache_key_for_site_host(site.domain)
     cache.delete_many([key_id, key_host])
     try:
-        del SITE_CACHE[instance.pk]
+        del SITE_CACHE[site.pk]
     except KeyError:
         pass
     try:
-        del SITE_CACHE[instance.domain]
+        del SITE_CACHE[site.domain]
     except KeyError:
         pass
 

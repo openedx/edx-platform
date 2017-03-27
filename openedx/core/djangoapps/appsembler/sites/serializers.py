@@ -25,8 +25,6 @@ class SiteConfigurationSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         object = super(SiteConfigurationSerializer, self).update(instance, validated_data)
-        # TODO: make this per-site, not scalable in production
-        Site.objects.clear_cache()
         return object
 
 
