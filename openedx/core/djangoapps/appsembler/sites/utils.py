@@ -19,7 +19,9 @@ def get_initial_sass_variables():
     This method loads the SASS variables file from the currently active theme. It is used as a default value
     for the sass_variables field on new Microsite objects.
     """
-    return get_full_branding_list()
+    values = get_branding_values_from_file()
+    labels = get_branding_labels_from_file()
+    return [(val[0], (val[1], lab[1])) for val, lab in izip(values, labels)]
 
 
 def get_branding_values_from_file():
@@ -64,12 +66,6 @@ def compile_sass(sass_file, custom_branding=None):
     else:
         css_output = ""
     return css_output
-
-
-def get_full_branding_list():
-    values = get_branding_values_from_file()
-    labels = get_branding_labels_from_file()
-    return [(val[0], (val[1], lab[1])) for val, lab in izip(values, labels)]
 
 
 def sass_to_dict(sass_input):

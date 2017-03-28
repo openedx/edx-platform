@@ -6,3 +6,6 @@ COMPREHENSIVE_THEME_DIRS = [
     REPO_ROOT / "common/test/appsembler",
 ]
 DEFAULT_SITE_THEME = "appsembler-theme"
+
+import logging
+logging.disable(logging.WARNING)
