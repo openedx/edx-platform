@@ -401,7 +401,9 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
     # Disable the score change signal to prevent other components from being
     # pulled into tests.
     @mock.patch('lms.djangoapps.grades.signals.handlers.PROBLEM_WEIGHTED_SCORE_CHANGED.send')
-    def test_delete_submission_scores(self, _mock_signal):
+    @mock.patch('lms.djangoapps.grades.signals.handlers.submissions_score_set_handler')
+    @mock.patch('lms.djangoapps.grades.signals.handlers.submissions_score_reset_handler')
+    def test_delete_submission_scores(self, _mock_send_signal, mock_set_receiver, mock_reset_receiver):
         user = UserFactory()
         problem_location = self.course_key.make_usage_key('dummy', 'module')
 
@@ -429,6 +431,10 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
             requesting_user=user,
             delete_module=True,
         )
+
+        # Make sure our grades signal receivers handled the reset properly
+        mock_set_receiver.assert_not_called()
+        mock_reset_receiver.assert_called_once()
 
         # Verify that the student's scores have been reset in the submissions API
         score = sub_api.get_score(student_item)
