@@ -2,16 +2,22 @@
 Milestones Transformer
 """
 
+import logging
 from django.conf import settings
 
 from openedx.core.djangoapps.content.block_structure.transformer import (
     BlockStructureTransformer,
     FilteringTransformerMixin,
 )
+from edx_proctoring.exceptions import ProctoredExamNotFoundException
+from edx_proctoring.api import get_attempt_status_summary
+from student.models import EntranceExamConfiguration
 from util import milestones_helpers
 
+log = logging.getLogger(__name__)
 
-class MilestonesTransformer(FilteringTransformerMixin, BlockStructureTransformer):
+
+class MilestonesTransformer(BlockStructureTransformer):
     """
     Excludes all special exams (timed, proctored, practice proctored) from the student view.
     Excludes all blocks with unfulfilled milestones from the student view.
@@ -22,6 +28,9 @@ class MilestonesTransformer(FilteringTransformerMixin, BlockStructureTransformer
     @classmethod
     def name(cls):
         return "milestones"
+
+    def __init__(self, can_view_special_exams=True):
+        self.can_view_special_exams = can_view_special_exams
 
     @classmethod
     def collect(cls, block_structure):
@@ -35,22 +44,79 @@ class MilestonesTransformer(FilteringTransformerMixin, BlockStructureTransformer
         block_structure.request_xblock_fields('is_proctored_enabled')
         block_structure.request_xblock_fields('is_practice_exam')
         block_structure.request_xblock_fields('is_timed_exam')
+        block_structure.request_xblock_fields('entrance_exam_id')
 
-    def transform_block_filters(self, usage_info, block_structure):
-        if usage_info.has_staff_access:
-            return [block_structure.create_universal_filter()]
+    def transform(self, usage_info, block_structure):
+        """
+        Modify block structure according to the behavior of milestones and special exams.
+        """
+
+        def add_special_exam_info(block_key):
+            """
+            Adds special exam information to course blocks.
+            """
+            if self.is_special_exam(block_key, block_structure):
+
+                #
+                # call into edx_proctoring subsystem
+                # to get relevant proctoring information regarding this
+                # level of the courseware
+                #
+                # This will return None, if (user, course_id, content_id)
+                # is not applicable
+                #
+                timed_exam_attempt_context = None
+                try:
+                    timed_exam_attempt_context = get_attempt_status_summary(
+                        usage_info.user.id,
+                        unicode(block_key.course_key),
+                        unicode(block_key)
+                    )
+                except ProctoredExamNotFoundException as ex:
+                    log.exception(ex)
+
+                if timed_exam_attempt_context:
+                    # yes, user has proctoring context about
+                    # this level of the courseware
+                    # so add to the accordion data context
+                    block_structure.set_transformer_block_field(
+                        block_key,
+                        self,
+                        'special_exam',
+                        timed_exam_attempt_context,
+                    )
+
+        root_key = block_structure.root_block_usage_key
+        course_key = root_key.course_key
+        user_can_skip = EntranceExamConfiguration.user_can_skip_entrance_exam(usage_info.user, course_key)
+        exam_id = block_structure.get_xblock_field(root_key, 'entrance_exam_id')
+        required_content = milestones_helpers.get_required_content(course_key, usage_info.user)
+        if user_can_skip:
+            required_content = [content for content in required_content if not content == exam_id]
 
         def user_gated_from_block(block_key):
             """
             Checks whether the user is gated from accessing this block, first via special exams,
             then via a general milestones check.
             """
-            return (
-                settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and
-                self.is_special_exam(block_key, block_structure)
-            ) or self.has_pending_milestones_for_user(block_key, usage_info)
+            if usage_info.has_staff_access:
+                return False
+            elif self.has_pending_milestones_for_user(block_key, usage_info):
+                return True
+            elif required_content:
+                if block_key.block_type == 'chapter' and unicode(block_key) not in required_content:
+                    return True
+            elif (settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and
+                  (self.is_special_exam(block_key, block_structure) and
+                   not self.can_view_special_exams)):
+                return True
+            return False
 
-        return [block_structure.create_removal_filter(user_gated_from_block)]
+        for block_key in block_structure.topological_traversal():
+            if user_gated_from_block(block_key):
+                block_structure.remove_block(block_key, False)
+            else:
+                add_special_exam_info(block_key)
 
     @staticmethod
     def is_special_exam(block_key, block_structure):

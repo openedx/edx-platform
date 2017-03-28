@@ -162,7 +162,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
 
         # Check for content which needs to be completed
         # before the rest of the content is made available
-        required_content = milestones_helpers.get_required_content(course, user)
+        required_content = milestones_helpers.get_required_content(course.id, user)
 
         # The user may not actually have to complete the entrance exam, if one is required
         if user_can_skip_entrance_exam(user, course):
