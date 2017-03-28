@@ -6,13 +6,14 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import logging
 
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 import six
 
 from openedx.core.lib.command_utils import (
     get_mutually_exclusive_required_option,
     parse_course_keys,
 )
+from lms.djangoapps.grades.config.models import ComputeGradesSetting
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
 
@@ -44,6 +45,12 @@ class Command(BaseCommand):
         parser.add_argument(
             '--all_courses',
             help='Compute grades for all courses.',
+            action='store_true',
+            default=False,
+        )
+        parser.add_argument(
+            '--from_settings',
+            help='Compute grades with settings set via Django admin',
             action='store_true',
             default=False,
         )
@@ -84,10 +91,11 @@ class Command(BaseCommand):
             # created, the most recent enrollments may not get processed.
             # This is an acceptable limitation for our known use cases.
             task_options = {'routing_key': options['routing_key']} if options.get('routing_key') else {}
+            batch_size = self._latest_settings().batch_size if options.get('from_settings') else options['batch_size']
             kwargs = {
                 'course_key': six.text_type(course_key),
                 'offset': offset,
-                'batch_size': options['batch_size'],
+                'batch_size': batch_size,
             }
             result = tasks.compute_grades_for_course.apply_async(
                 kwargs=kwargs,
@@ -103,11 +111,14 @@ class Command(BaseCommand):
         """
         Return a list of courses that need scores computed.
         """
-        courses_mode = get_mutually_exclusive_required_option(options, 'courses', 'all_courses')
+
+        courses_mode = get_mutually_exclusive_required_option(options, 'courses', 'all_courses', 'from_settings')
         if courses_mode == 'all_courses':
             course_keys = [course.id for course in modulestore().get_course_summaries()]
-        else:
+        elif courses_mode == 'courses':
             course_keys = parse_course_keys(options['courses'])
+        else:
+            course_keys = parse_course_keys(self._latest_settings().course_ids.split())
         return course_keys
 
     def _set_log_level(self, options):
@@ -120,3 +131,6 @@ class Command(BaseCommand):
         elif options.get('verbosity') >= 1:
             log_level = logging.INFO
         log.setLevel(log_level)
+
+    def _latest_settings(self):
+        return ComputeGradesSetting.objects.order_by('-id')[0]

@@ -4,7 +4,7 @@ controlling persistent grades.
 """
 from config_models.models import ConfigurationModel
 from django.conf import settings
-from django.db.models import BooleanField
+from django.db.models import BooleanField, IntegerField, TextField
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from request_cache.middleware import request_cached
 
@@ -71,3 +71,17 @@ class CoursePersistentGradesFlag(ConfigurationModel):
             not_en = ""
         # pylint: disable=no-member
         return u"Course '{}': Persistent Grades {}Enabled".format(self.course_id.to_deprecated_string(), not_en)
+
+
+class ComputeGradesSetting(ConfigurationModel):
+    """
+    ...
+    """
+    class Meta(object):
+        app_label = "grades"
+
+    batch_size = IntegerField(default=100)
+    course_ids = TextField(
+        blank=False,
+        help_text="Whitespace-separated list of course keys for which to compute grades."
+    )
