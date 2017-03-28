@@ -122,8 +122,7 @@ ${HTML(fragment.foot_html())}
     </script>
     <div class="course-index">
       <div class="wrapper-course-modes">
-        <%doc> Do not remove this comment for now </%doc>
-        <%doc>  <div class="courseware-bookmarks-button" data-bookmarks-api-url="${bookmarks_api_url}">
+        <div class="courseware-bookmarks-button" data-bookmarks-api-url="${bookmarks_api_url}">
               <button type="button" class="bookmarks-list-button is-inactive" aria-pressed="false">
                   ${_('Bookmarks')}
               </button>
@@ -144,7 +143,7 @@ ${HTML(fragment.foot_html())}
                 </div>
               </form>
             </div>
-          % endif</%doc>
+          % endif
           <i id="toggle-sidebar-icon" class="fa fa-bars" aria-hidden="true" onclick="toggleSidebar()"></i>
       </div>
 

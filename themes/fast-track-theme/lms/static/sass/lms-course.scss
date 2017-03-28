@@ -1,5 +1,14 @@
 @import 'lms/static/sass/lms-course';
 
+// Marin clumsy override until we get the design
+.courseware-bookmarks-button {
+    position: absolute;
+    top: 72px;
+    left: 700px;
+    width: 150px;
+}
+
+
 div.course-spinner {
   display: inline-block;
   width: 80%;
