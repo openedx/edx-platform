@@ -8,6 +8,7 @@ from django.conf.urls import patterns, url
 from ..profile_images.views import ProfileImageView
 from .accounts.views import AccountViewSet
 from .preferences.views import PreferencesView, PreferencesDetailView
+from .permissions.views import PermissionsView
 
 
 ACCOUNT_LIST = AccountViewSet.as_view({
@@ -37,5 +38,10 @@ urlpatterns = patterns(
         r'^v1/preferences/{}/(?P<preference_key>[a-zA-Z0-9_]+)$'.format(settings.USERNAME_PATTERN),
         PreferencesDetailView.as_view(),
         name="preferences_detail_api"
+    ),
+    url(
+        r'^v1/is_staff$',
+        PermissionsView.as_view(),
+        name="permissions_api"
     ),
 )
