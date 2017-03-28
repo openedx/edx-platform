@@ -19,8 +19,10 @@ from celery_utils.logged_task import LoggedTask
 from celery_utils.persist_on_failure import PersistOnFailureTask
 from courseware.model_data import get_score
 from lms.djangoapps.course_blocks.api import get_course_blocks
-from opaque_keys.edx.keys import UsageKey
+from lms.djangoapps.courseware import courses
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import CourseLocator
+from student.models import CourseEnrollment
 from submissions import api as sub_api
 from track.event_transaction_utils import (
     set_event_transaction_type,
@@ -31,6 +33,7 @@ from xmodule.modulestore.django import modulestore
 
 from .constants import ScoreDatabaseTableEnum
 from .new.subsection_grade import SubsectionGradeFactory
+from .new.course_grade import CourseGradeFactory
 from .signals.signals import SUBSECTION_SCORE_CHANGED
 from .transformer import GradesTransformer
 
@@ -58,12 +61,24 @@ class _BaseTask(PersistOnFailureTask, LoggedTask):  # pylint: disable=abstract-m
     abstract = True
 
 
-@task
-def compute_grades_for_course(course_key, offset, batch_size):  # pylint: disable=unused-argument
+@task(base=_BaseTask)
+def compute_grades_for_course(course_key, offset, batch_size):
     """
-    TODO: TNL-6690: Fill this task in and remove pylint disables
+    Compute grades for a set of students in the specified course.
+
+    The set of students will be determined by the order of enrollment date, and
+    limited to at most <batch_size> students, starting from the specified
+    offset.
     """
-    pass
+
+    course = courses.get_course_by_id(CourseKey.from_string(course_key))
+    enrollments = CourseEnrollment.objects.filter(course_id=course.id).order_by('created')
+    student_iter = (enrollment.user for enrollment in enrollments[offset:offset + batch_size])
+    list(CourseGradeFactory().iter(
+        course,
+        students=student_iter,
+        read_only=False,
+    ))
 
 
 @task(bind=True, base=_BaseTask, default_retry_delay=30, routing_key=settings.RECALCULATE_GRADES_ROUTING_KEY)
@@ -136,7 +151,7 @@ def _recalculate_subsection_grade(self, **kwargs):
                 self.request.id,
                 kwargs,
             ))
-        raise _retry_recalculate_subsection_grade(self, exc=exc, **kwargs)
+        raise self.retry(kwargs=kwargs, exc=exc)
 
 
 def _has_db_updated_with_new_score(self, scored_block_usage_key, **kwargs):
@@ -218,11 +233,3 @@ def _update_subsection_grades(
                     user=student,
                     subsection_grade=subsection_grade,
                 )
-
-
-def _retry_recalculate_subsection_grade(self, exc=None, **kwargs):
-    """
-    Calls retry for the recalculate_subsection_grade task with the
-    given inputs.
-    """
-    self.retry(kwargs=kwargs, exc=exc)
