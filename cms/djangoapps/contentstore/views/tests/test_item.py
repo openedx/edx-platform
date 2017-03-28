@@ -349,9 +349,9 @@ class GetItemTest(ItemTest):
         self.course.user_partitions = [
             UserPartition(
                 id=100,  # See note above.
-                name="Verification user partition",
-                scheme=UserPartition.get_scheme("verification"),
-                description="Verification user partition",
+                name="Random user partition",
+                scheme=UserPartition.get_scheme("random"),
+                description="Random user partition",
                 groups=[
                     Group(id=101, name="Group A"),  # See note above.
                     Group(id=102, name="Group B"),  # See note above.
@@ -384,8 +384,8 @@ class GetItemTest(ItemTest):
             },
             {
                 "id": 100,
-                "name": "Verification user partition",
-                "scheme": "verification",
+                "name": "Random user partition",
+                "scheme": "random",
                 "groups": [
                     {
                         "id": 101,

@@ -430,35 +430,36 @@ def get_visibility_partition_info(xblock):
     Returns: dict
 
     """
-    user_partitions = get_user_partition_info(xblock, schemes=["verification", "enrollment_track", "cohort"])
-    cohort_partitions = []
-    verification_partitions = []
-    enrollment_mode_partitions = []
-    has_selected_content_groups = False
-    has_selected_enrollment_modes = False
-    selected_verified_partition_id = None
+    # TODO: add unit tests for this method.
 
-    # Pre-process the partitions to make it easier to display the UI
-    for p in user_partitions:
-        if p["scheme"] == "cohort":
-            cohort_partitions.append(p)
-            has_selected_content_groups = any(g["selected"] for g in p["groups"])
-        elif p["scheme"] == "verification":
-            verification_partitions.append(p)
-            # if has_selected:
-            #     selected_verified_partition_id = p["id"]
-        elif p["scheme"] == "enrollment_track":
-            enrollment_mode_partitions.append(p)
-            has_selected_enrollment_modes = any(g["selected"] for g in p["groups"])
+    def has_selected_group(partition):
+        return any(group["selected"] for group in partition["groups"])
+
+    selectable_partitions = []
+    # We wish to display enrollment partitions before cohort partitions.
+    enrollment_user_partitions = get_user_partition_info(xblock, schemes=["enrollment_track"])
+
+    # For enrollment partitions, we only show them if there is a selected group or
+    # or if the number of groups > 1.
+    for partition in enrollment_user_partitions:
+        if len(partition["groups"]) > 1 or has_selected_group(partition):
+            selectable_partitions.append(partition)
+
+    # Now add the cohort user partitions.
+    selectable_partitions = selectable_partitions + get_user_partition_info(xblock, schemes=["cohort"])
+
+    # Find the first partition with a selected group. That will be the one initially enabled in the dialog
+    # (if the course has only been added in Studio, only one partition should have a selected group).
+    selected_partition_index = -1
+
+    for index, partition in enumerate(selectable_partitions):
+        if has_selected_group(partition):
+            selected_partition_index = index
+            break
 
     return {
-        "user_partitions": user_partitions,
-        "cohort_partitions": cohort_partitions,
-        "enrollment_mode_partitions": enrollment_mode_partitions,
-        "verification_partitions": verification_partitions,
-        "has_selected_content_groups": has_selected_content_groups,
-        "has_selected_enrollment_modes": has_selected_enrollment_modes,
-        "selected_verified_partition_id": selected_verified_partition_id,
+        "selectable_partitions": selectable_partitions,
+        "selected_partition_index": selected_partition_index,
     }
 
 
