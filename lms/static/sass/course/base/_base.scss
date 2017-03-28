@@ -39,7 +39,7 @@ body {
   background-color: $course-bg-color;
 }
 
-body, h1, h2, h3, h4, h5, h6, p, label {
+body, h1, h2, h3, h4, h5, h6, p, p a:link, p a:visited, a, label {
   @include text-align(left);
   font-family: $sans-serif;
 }
@@ -51,10 +51,6 @@ main {
 
 table {
   table-layout: fixed;
-}
-
-.xblock table {
-  table-layout: auto
 }
 
 a {

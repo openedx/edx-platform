@@ -387,6 +387,11 @@ html.video-fullscreen {
     }
     p {
       margin-bottom: lh();
+
+      &:empty {
+        display: none;
+        margin-bottom: 0;
+      }
     }
 
     .sequential-status-message {
