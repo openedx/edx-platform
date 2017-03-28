@@ -229,8 +229,16 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             rendered_child = child.render(STUDENT_VIEW, context)
             fragment.add_frag_resources(rendered_child)
 
+            xblocks = [
+                {
+                    "id": str(xblock.scope_ids.usage_id),
+                    "display_name": str(xblock.display_name)
+                } for xblock in child.get_children()
+            ]
+
             childinfo = {
                 'content': rendered_child.content,
+                'xblocks': json.dumps(xblocks),
                 'page_title': getattr(child, 'tooltip_title', ''),
                 'progress_status': Progress.to_js_status_str(progress),
                 'progress_detail': Progress.to_js_detail_str(progress),

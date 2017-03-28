@@ -128,6 +128,40 @@ class @Sequence
       @setButtonLabel(button_class, button_label)
       @enableButton(button_class, button_action)
 
+  # close the dropdown if the user clicks outside of it
+  window.onclick = (event) ->
+    if !event.target.matches('.dropbtn')
+      $dropdowns = @el.find('.dropdown-content')
+      i = 0
+      while i < $dropdowns.length
+        $openDropdown = $dropdowns[i]
+        if $openDropdown.hasClass('show')
+          $openDropdown.removeClass('show')
+        i++
+
+  # scroll to every xblock when selected in dropdown and change the label on button
+  handleOnClickDropdownItem = ->
+    $('#xblocks-dropdown-items a').click ->
+      # update dropdown button text
+      display_name = $(this).text()
+      $('.dropbtn span.xblock-name').text(display_name)
+
+      id = $(this).attr('id')
+      $xblock_div = $('[data-usage-id="' + id + '"]')
+      $('html, body').animate { scrollTop: $xblock_div.offset().top }, 1200
+
+  # populate dropdown menu with xblocks for active unit (display_name and id).
+  populateDropdownMenu = ->
+    active_tab_id = $('#sequence-list button.active').attr('id')
+    xblocks = $('[aria-labelledby="' + active_tab_id + '"]').data('xblocks')
+    $dropdownItems = $('#xblocks-dropdown-items').empty()
+
+    $('.dropbtn span.xblock-name').text(xblocks[0]['display_name']) # show first xblock's display name on dropdown button
+
+    $.each xblocks, (index, xblock_obj) ->
+      $dropdownItems.append '<a id="' + xblock_obj['id'] + '">' + xblock_obj['display_name'] + '</a>'
+    handleOnClickDropdownItem()
+
   toggleArrows: =>
     @$('.sequence-nav-button').unbind('click')
 
@@ -157,6 +191,8 @@ class @Sequence
     activeNavUnitId = @position - 1;
     $('.accordion-units li').removeClass('active');
     $('#accordion-unit-' + activeNavUnitId).addClass('active');
+
+    populateDropdownMenu()
 
   render: (new_position) ->
     if @position != new_position
@@ -195,7 +231,7 @@ class @Sequence
       sequence_links = @content_container.find('a.seqnav')
       sequence_links.click @goto
 
-      @el.find('.path').text(@el.find('.nav-item.active').data('path'))
+      @el.find('.path span.path-content').text(@el.find('.nav-item.active').data('path') + ' > ')
 
       @sr_container.focus()
 
