@@ -27,6 +27,7 @@ from django.utils.translation import ugettext as _
                 </div>
                 <ol class="outline-item focusable" role="group" tabindex="0">
                     % for subsection in section.get('children') or []:
+                    ${ subsection.get('special_exam', '') }
                         <li
                             class="subsection ${ 'current' if subsection['current'] else '' }"
                             role="treeitem"

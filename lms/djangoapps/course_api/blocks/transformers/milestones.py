@@ -45,10 +45,11 @@ class MilestonesTransformer(FilteringTransformerMixin, BlockStructureTransformer
             Checks whether the user is gated from accessing this block, first via special exams,
             then via a general milestones check.
             """
-            return (
-                settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and
-                self.is_special_exam(block_key, block_structure)
-            ) or self.has_pending_milestones_for_user(block_key, usage_info)
+            return self.has_pending_milestones_for_user(block_key, usage_info)
+            #return (
+            #    settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and
+            #    self.is_special_exam(block_key, block_structure)
+            #) or self.has_pending_milestones_for_user(block_key, usage_info)
 
         return [block_structure.create_removal_filter(user_gated_from_block)]
 

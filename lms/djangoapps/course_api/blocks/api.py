@@ -8,6 +8,7 @@ from openedx.core.djangoapps.content.block_structure.transformers import BlockSt
 
 from .transformers.blocks_api import BlocksAPITransformer
 from .transformers.milestones import MilestonesTransformer
+from .transformers.special_exams import SpecialExamsTransformer
 from .serializers import BlockSerializer, BlockDictSerializer
 
 
@@ -53,6 +54,7 @@ def get_blocks(
     transformers = BlockStructureTransformers()
     if user is not None:
         transformers += COURSE_BLOCK_ACCESS_TRANSFORMERS + [MilestonesTransformer(), HiddenContentTransformer()]
+        transformers += [SpecialExamsTransformer()]
     transformers += [
         BlocksAPITransformer(
             block_counts,
