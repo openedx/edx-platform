@@ -22,7 +22,7 @@ COHORT_SCHEME = "cohort"
 # translated since they are not visible to users.
 CONTENT_GROUP_CONFIGURATION_DESCRIPTION = 'The groups in this configuration can be mapped to cohort groups in the LMS.'
 
-CONTENT_GROUP_CONFIGURATION_NAME = 'Content Group Configuration'
+CONTENT_GROUP_CONFIGURATION_NAME = 'Content Group'
 
 log = logging.getLogger(__name__)
 

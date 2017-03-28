@@ -514,17 +514,8 @@
       }
     }
 
-    .field-visibility-verification {
-      .note {
-        @extend %t-copy-sub2;
-        @extend %t-regular;
-        margin: 14px 0 0 24px;
-        display: block;
-      }
-    }
-
-    // CASE: content group has been removed
-    .field-visibility-content-group.was-removed {
+    // CASE: content or enrollment group has been removed
+    .partition-group-visibility.was-removed {
 
       .input-checkbox:checked ~ label {
         color: $color-error;
@@ -698,7 +689,7 @@
     }
 
     // UI: staff lock section
-    .edit-staff-lock, .edit-settings-timed-examination, .edit-verification-access {
+    .edit-staff-lock, .edit-settings-timed-examination {
 
       .checkbox-cosmetic .input-checkbox {
         @extend %cont-text-sr;
@@ -727,13 +718,6 @@
         @extend %t-regular;
         margin: 14px 0 0 21px;
         display: block;
-      }
-    }
-
-    .verification-access {
-      .checkbox-cosmetic .label {
-        @include float(left);
-        margin: 2px 6px 0 0;
       }
     }
 

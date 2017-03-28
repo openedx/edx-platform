@@ -320,10 +320,10 @@ class EditVisibilityModalTest(ContainerBase):
     page.
     """
     VISIBILITY_LABEL_ALL = 'All Students and Staff'
-    VISIBILITY_LABEL_SPECIFIC = 'Specific Content Groups'
-    MISSING_GROUP_LABEL = 'Deleted Content Group\nContent group no longer exists. Please choose another or allow access to All Students and staff'
+    VISIBILITY_LABEL_SPECIFIC = 'Content Group'
+    MISSING_GROUP_LABEL = 'Deleted Group\nThis group no longer exists. Please choose another or allow access to All Students and staff,'
     VALIDATION_ERROR_LABEL = 'This component has validation issues.'
-    VALIDATION_ERROR_MESSAGE = 'Error:\nThis component refers to deleted or invalid content groups.'
+    VALIDATION_ERROR_MESSAGE = 'Error:\nThis component refers to deleted or invalid user partition groups.'
     GROUP_VISIBILITY_MESSAGE = 'Some content in this unit is visible only to particular content groups'
 
     def setUp(self):
@@ -571,6 +571,10 @@ class EditVisibilityModalTest(ContainerBase):
         visibility_editor = self.edit_component_visibility(self.html_component)
         self.verify_selected_labels(visibility_editor, ['Dogs', 'Cats'])
         self.verify_visibility_set(self.html_component, True)
+
+        # TODO: write tests cases around selecting groups/user partitions (clearing other selections).
+        # Include the enrollment track user partition in those tests.
+        # See ModeCreationPage for adding course modes.
 
 
 @attr(shard=1)

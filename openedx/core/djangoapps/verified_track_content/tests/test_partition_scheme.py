@@ -160,7 +160,7 @@ def create_enrollment_track_partition(course):
     enrollment_track_scheme = UserPartition.get_scheme("enrollment_track")
     partition = enrollment_track_scheme.create_user_partition(
         id=1,
-        name="TestEnrollment Track Partition",
+        name="Test Enrollment Track Partition",
         description="Test partition for segmenting users by enrollment track",
         parameters={"course_id": unicode(course.id)}
     )
