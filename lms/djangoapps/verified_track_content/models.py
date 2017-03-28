@@ -88,6 +88,9 @@ class VerifiedTrackCohortedCourse(models.Model):
     """
     Tracks which courses have verified track auto-cohorting enabled.
     """
+    class Meta(object):
+        app_label = "verified_track_content"
+
     course_key = CourseKeyField(
         max_length=255, db_index=True, unique=True,
         help_text=ugettext_lazy(u"The course key for the course we would like to be auto-cohorted.")

@@ -11,7 +11,6 @@ import itertools
 import ddt
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator
 import pytz
 
@@ -28,7 +27,7 @@ class CourseModeModelTest(TestCase):
 
     def setUp(self):
         super(CourseModeModelTest, self).setUp()
-        self.course_key = SlashSeparatedCourseKey('Test', 'TestCourse', 'TestCourseRun')
+        self.course_key = CourseLocator('Test', 'TestCourse', 'TestCourseRun')
         CourseMode.objects.all().delete()
 
     def create_mode(
@@ -68,7 +67,7 @@ class CourseModeModelTest(TestCase):
         """
         # shouldn't be able to find a corresponding course
         modes = CourseMode.modes_for_course(self.course_key)
-        self.assertEqual([CourseMode.DEFAULT_MODE], modes)
+        self.assertEqual([CourseMode.default_mode(self.course_key)], modes)
 
     def test_nodes_for_course_single(self):
         """
@@ -77,7 +76,7 @@ class CourseModeModelTest(TestCase):
 
         self.create_mode('verified', 'Verified Certificate', 10)
         modes = CourseMode.modes_for_course(self.course_key)
-        mode = Mode(u'verified', u'Verified Certificate', 10, '', 'usd', None, None, None, None)
+        mode = Mode(u'verified', u'Verified Certificate', 10, '', 'usd', None, None, None, None, self.course_key)
         self.assertEqual([mode], modes)
 
         modes_dict = CourseMode.modes_for_course_dict(self.course_key)
@@ -89,8 +88,8 @@ class CourseModeModelTest(TestCase):
         """
         Finding the modes when there's multiple modes
         """
-        mode1 = Mode(u'honor', u'Honor Code Certificate', 0, '', 'usd', None, None, None, None)
-        mode2 = Mode(u'verified', u'Verified Certificate', 10, '', 'usd', None, None, None, None)
+        mode1 = Mode(u'honor', u'Honor Code Certificate', 0, '', 'usd', None, None, None, None, self.course_key)
+        mode2 = Mode(u'verified', u'Verified Certificate', 10, '', 'usd', None, None, None, None, self.course_key)
         set_modes = [mode1, mode2]
         for mode in set_modes:
             self.create_mode(mode.slug, mode.name, mode.min_price, mode.suggested_prices)
@@ -109,9 +108,9 @@ class CourseModeModelTest(TestCase):
         self.assertEqual(0, CourseMode.min_course_price_for_currency(self.course_key, 'usd'))
 
         # create some modes
-        mode1 = Mode(u'honor', u'Honor Code Certificate', 10, '', 'usd', None, None, None, None)
-        mode2 = Mode(u'verified', u'Verified Certificate', 20, '', 'usd', None, None, None, None)
-        mode3 = Mode(u'honor', u'Honor Code Certificate', 80, '', 'cny', None, None, None, None)
+        mode1 = Mode(u'honor', u'Honor Code Certificate', 10, '', 'usd', None, None, None, None, self.course_key)
+        mode2 = Mode(u'verified', u'Verified Certificate', 20, '', 'usd', None, None, None, None, self.course_key)
+        mode3 = Mode(u'honor', u'Honor Code Certificate', 80, '', 'cny', None, None, None, None, self.course_key)
         set_modes = [mode1, mode2, mode3]
         for mode in set_modes:
             self.create_mode(mode.slug, mode.name, mode.min_price, mode.suggested_prices, mode.currency)
@@ -124,9 +123,9 @@ class CourseModeModelTest(TestCase):
         expired_mode.expiration_datetime = datetime.now(pytz.UTC) + timedelta(days=-1)
         expired_mode.save()
         modes = CourseMode.modes_for_course(self.course_key)
-        self.assertEqual([CourseMode.DEFAULT_MODE], modes)
+        self.assertEqual([CourseMode.default_mode(self.course_key)], modes)
 
-        mode1 = Mode(u'honor', u'Honor Code Certificate', 0, '', 'usd', None, None, None, None)
+        mode1 = Mode(u'honor', u'Honor Code Certificate', 0, '', 'usd', None, None, None, None, self.course_key)
         self.create_mode(mode1.slug, mode1.name, mode1.min_price, mode1.suggested_prices)
         modes = CourseMode.modes_for_course(self.course_key)
         self.assertEqual([mode1], modes)
@@ -143,13 +142,15 @@ class CourseModeModelTest(TestCase):
             expiration_datetime,
             None,
             None,
-            None
+            None,
+            self.course_key,
         )
         modes = CourseMode.modes_for_course(self.course_key)
         self.assertEqual([expired_mode_value, mode1], modes)
 
-        modes = CourseMode.modes_for_course(SlashSeparatedCourseKey('TestOrg', 'TestCourse', 'TestRun'))
-        self.assertEqual([CourseMode.DEFAULT_MODE], modes)
+        course_key = CourseLocator('TestOrg', 'TestCourse', 'TestRun')
+        modes = CourseMode.modes_for_course(course_key)
+        self.assertEqual([CourseMode.default_mode(course_key)], modes)
 
     def test_verified_mode_for_course(self):
         self.create_mode('verified', 'Verified Certificate', 10)
@@ -259,7 +260,7 @@ class CourseModeModelTest(TestCase):
 
         # Check that we get a default mode for when no course mode is available
         self.assertEqual(len(all_modes[other_course_key]), 1)
-        self.assertEqual(all_modes[other_course_key][0], CourseMode.DEFAULT_MODE)
+        self.assertEqual(all_modes[other_course_key][0], CourseMode.default_mode(other_course_key))
 
     @ddt.data('', 'no-id-professional', 'professional', 'verified')
     def test_course_has_professional_mode(self, mode):
