@@ -9,6 +9,7 @@ import ddt
 from django.test import TestCase
 from mock import patch, MagicMock
 import pytz
+from submissions.models import score_set, score_reset
 from util.date_utils import to_timestamp
 
 from ..constants import ScoreDatabaseTableEnum
@@ -16,8 +17,10 @@ from ..signals.handlers import (
     enqueue_subsection_update,
     submissions_score_set_handler,
     submissions_score_reset_handler,
+    disconnect_submissions_signal_receiver,
     problem_raw_score_changed_handler,
 )
+from ..signals.signals import PROBLEM_RAW_SCORE_CHANGED
 
 UUID_REGEX = re.compile(ur'%(hex)s{8}-%(hex)s{4}-%(hex)s{4}-%(hex)s{4}-%(hex)s{12}' % {'hex': u'[0-9a-f]'})
 
@@ -214,3 +217,37 @@ class ScoreChangedSignalRelayTest(TestCase):
                 u'usage_id:block-v1:block-key, user_id:1. Task [*UUID*]'
             ).format(time=FROZEN_NOW_DATETIME)
         )
+
+    @ddt.data(
+        [score_set, 'lms.djangoapps.grades.signals.handlers.submissions_score_set_handler', SUBMISSION_SET_KWARGS],
+        [score_reset, 'lms.djangoapps.grades.signals.handlers.submissions_score_reset_handler', SUBMISSION_RESET_KWARGS]
+    )
+    @ddt.unpack
+    def test_disconnect_manager(self, signal, handler, kwargs):
+        """
+        Tests to confirm the disconnect_submissions_signal_receiver context manager is working correctly.
+        """
+        handler_mock = self.setup_patch(handler, None)
+
+        # Receiver connected before we start
+        signal.send(None, **kwargs)
+        handler_mock.assert_called_once()
+        handler_mock.reset_mock()
+
+        # Disconnect is functioning
+        with disconnect_submissions_signal_receiver(signal):
+            signal.send(None, **kwargs)
+            handler_mock.assert_not_called()
+            handler_mock.reset_mock()
+
+        # And we reconnect properly afterwards
+        signal.send(None, **kwargs)
+        handler_mock.assert_called_once()
+
+    def test_disconnect_manager_bad_arg(self):
+        """
+        Tests that the disconnect context manager errors when given an invalid signal.
+        """
+        with self.assertRaises(ValueError):
+            with disconnect_submissions_signal_receiver(PROBLEM_RAW_SCORE_CHANGED):
+                pass
