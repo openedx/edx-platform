@@ -1409,6 +1409,9 @@ class MoveComponentTest(ContainerBase):
             should_verify_publish_title=False
         )
 
+    # Ideally this test should be decorated with @attr('a11y') so that it should run in a11y jenkins job
+    # But for some reason it always fails in a11y jenkins job and passes always locally on devstack as well
+    # as in bokchoy jenkins job. Due to this reason, test is marked to run under bokchoy jenkins job.
     def test_a11y(self):
         """
         Verify move modal a11y.
