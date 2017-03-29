@@ -131,7 +131,7 @@ class @Sequence
   # close the dropdown if the user clicks outside of it
   window.onclick = (event) ->
     if !event.target.matches('.dropbtn')
-      $dropdowns = @el.find('.dropdown-content')
+      $dropdowns = $('.dropbtn .dropdown-content')
       i = 0
       while i < $dropdowns.length
         $openDropdown = $dropdowns[i]
