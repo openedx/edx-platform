@@ -3081,3 +3081,7 @@ COURSE_ENROLLMENT_MODES = {
     "credit": 5,
     "honor": 6,
 }
+
+############## Settings for the Discovery App ######################
+
+COURSES_API_CACHE_TIMEOUT = 3600  # Value is in seconds
