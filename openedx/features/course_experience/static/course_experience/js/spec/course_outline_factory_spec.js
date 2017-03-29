@@ -1,9 +1,10 @@
 define([
     'jquery',
+    'logger',
     'edx-ui-toolkit/js/utils/constants',
     'course_experience/js/course_outline_factory'
 ],
-    function($, constants, CourseOutlineFactory) {
+    function($, Logger, constants, CourseOutlineFactory) {
         'use strict';
 
         describe('Course outline factory', function() {
@@ -78,6 +79,25 @@ define([
                         triggerKeyListener(current, destination, constants.keyCodes.up);
 
                         expect(destination.focus).toHaveBeenCalled();
+                    });
+                });
+            });
+
+            describe('eventing', function() {
+                beforeEach(function() {
+                    loadFixtures('course_experience/fixtures/course-outline-fragment.html');
+                    CourseOutlineFactory('.block-tree');
+                    spyOn(Logger, 'log');
+                });
+
+                it('sends an event when an outline section is clicked', function() {
+                    $('a.focusable:contains("Homework - Labs and Demos")').click();
+
+                    expect(Logger.log).toHaveBeenCalledWith('edx.ui.lms.link_clicked', {
+                        target_url: window.location.origin +
+                            '/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type' +
+                            '@sequential+block@graded_simulations',
+                        current_url: window.location.toString()
                     });
                 });
             });

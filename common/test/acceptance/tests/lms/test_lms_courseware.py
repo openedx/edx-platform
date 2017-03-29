@@ -592,6 +592,7 @@ class CoursewareMultipleVerticalsTest(CoursewareMultipleVerticalsTestBase):
             selected_events
         )
 
+    # TODO: Delete as part of TNL-6546 / LEARNER-71
     def test_link_clicked_events(self):
         """
         Given that I am a user in the courseware
