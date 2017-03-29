@@ -49,6 +49,7 @@ class CourseBookmarksView(View):
         context = {
             'csrf': csrf(request)['csrf_token'],
             'course': course,
+            'supports_preview_menu': True,
             'course_url': course_url,
             'bookmarks_fragment': bookmarks_fragment,
             'disable_courseware_js': True,

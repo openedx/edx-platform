@@ -36,6 +36,7 @@ class CoursewareTab(EnrolledTab):
     view_name = 'courseware'
     is_movable = False
     is_default = False
+    supports_preview_menu = True
 
     @staticmethod
     def main_course_url_name(request):

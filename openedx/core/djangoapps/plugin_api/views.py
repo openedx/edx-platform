@@ -91,6 +91,5 @@ class EdxFragmentView(FragmentView):
             'disable_header': True,
             'disable_footer': True,
             'disable_window_wrap': True,
-            'disable_preview_menu': True,
         }
         return render_to_response(settings.STANDALONE_FRAGMENT_VIEW_TEMPLATE, context)
