@@ -14,6 +14,7 @@ from openedx.core.djangoapps.programs.utils import (
     get_program_marketing_url,
     ProgramProgressMeter,
     ProgramDataExtender,
+    get_certificates,
 )
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
 
@@ -76,12 +77,15 @@ def program_details(request, program_uuid):
     }
 
     if waffle.switch_is_active('new_program_progress'):
-        course_progress = meter.progress(programs=[program_data], count_only=False)[0]
+        course_data = meter.progress(programs=[program_data], count_only=False)[0]
+        certificate_data = get_certificates(request.user, program_data)
+
         program_data.pop('courses')
 
         context.update({
             'program_data': program_data,
-            'course_progress': course_progress,
+            'course_data': course_data,
+            'certificate_data': certificate_data,
         })
 
         return render_to_response('learner_dashboard/program_details_2017.html', context)

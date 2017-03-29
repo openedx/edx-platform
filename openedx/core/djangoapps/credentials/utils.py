@@ -10,25 +10,35 @@ from openedx.core.lib.edx_api_utils import get_edx_api_data
 log = logging.getLogger(__name__)
 
 
-def get_user_credentials(user):
-    """Given a user, get credentials earned from the Credentials service.
+def get_credentials(user, program_uuid=None):
+    """
+    Given a user, get credentials earned from the credentials service.
+
     Arguments:
         user (User): The user to authenticate as when requesting credentials.
+
+    Keyword Arguments:
+        program_uuid (str): UUID of the program whose credential to retrieve.
+
     Returns:
         list of dict, representing credentials returned by the Credentials
         service.
     """
     credential_configuration = CredentialsApiConfig.current()
-    user_query = {'status': 'awarded', 'username': user.username}
+
+    querystring = {'username': user.username, 'status': 'awarded'}
+
+    if program_uuid:
+        querystring['program_uuid'] = program_uuid
+
     # Bypass caching for staff users, who may be generating credentials and
     # want to see them displayed immediately.
     use_cache = credential_configuration.is_cache_enabled and not user.is_staff
     cache_key = credential_configuration.CACHE_KEY + '.' + user.username if use_cache else None
 
-    credentials = get_edx_api_data(
-        credential_configuration, user, 'credentials', querystring=user_query, cache_key=cache_key
+    return get_edx_api_data(
+        credential_configuration, user, 'credentials', querystring=querystring, cache_key=cache_key
     )
-    return credentials
 
 
 def get_programs_for_credentials(programs_credentials):
@@ -69,7 +79,7 @@ def get_user_program_credentials(user):
         log.debug('Display of certificates for programs is disabled.')
         return programs_credentials_data
 
-    credentials = get_user_credentials(user)
+    credentials = get_credentials(user)
     if not credentials:
         log.info('No credential earned by the given user.')
         return programs_credentials_data
