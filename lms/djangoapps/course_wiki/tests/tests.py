@@ -2,7 +2,7 @@ from django.core.urlresolvers import reverse
 from nose.plugins.attrib import attr
 
 from courseware.tests.tests import LoginEnrollmentTestCase
-from util.tests.mixins.enterprise import EnterpriseTestConsentRequired
+from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

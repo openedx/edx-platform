@@ -10,7 +10,7 @@ from courseware.courses import get_course_with_access, get_course_overview_with_
 from courseware.access import has_access
 from student.models import CourseEnrollment
 from util.request import course_id_from_url
-from util.enterprise_helpers import get_enterprise_consent_url
+from openedx.features.enterprise_support.api import get_enterprise_consent_url
 
 
 class WikiAccessMiddleware(object):

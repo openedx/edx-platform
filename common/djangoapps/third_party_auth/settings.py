@@ -10,7 +10,7 @@ If true, it:
     b) calls apply_settings(), passing in the Django settings
 """
 
-from util.enterprise_helpers import insert_enterprise_pipeline_elements
+from openedx.features.enterprise_support.api import insert_enterprise_pipeline_elements
 
 _FIELDS_STORED_IN_SESSION = ['auth_entry', 'next']
 _MIDDLEWARE_CLASSES = (

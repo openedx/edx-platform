@@ -60,7 +60,7 @@ class CourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
         resp = self.client.get(url)
         self.assertNotIn("You are not currently enrolled in this course", resp.content)
 
-    @mock.patch('courseware.views.views.get_enterprise_consent_url')
+    @mock.patch('openedx.features.enterprise_support.api.get_enterprise_consent_url')
     def test_redirection_missing_enterprise_consent(self, mock_get_url):
         """
         Verify that users viewing the course info who are enrolled, but have not provided

@@ -103,7 +103,6 @@ from util.milestones_helpers import (
 )
 
 from util.password_policy_validators import validate_password_strength
-from util.enterprise_helpers import get_dashboard_consent_notification
 import third_party_auth
 from third_party_auth import pipeline, provider
 from student.helpers import (
@@ -117,6 +116,7 @@ from student.models import anonymous_id_for_user, UserAttribute, EnrollStatusCha
 from shoppingcart.models import DonationConfiguration, CourseRegistrationCode
 
 from openedx.core.djangoapps.embargo import api as embargo_api
+from openedx.features.enterprise_support.api import get_dashboard_consent_notification
 
 import analytics
 from eventtracking import tracker

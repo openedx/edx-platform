@@ -197,7 +197,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
             )
         )
 
-    @patch('courseware.views.index.get_enterprise_consent_url')
+    @patch('openedx.features.enterprise_support.api.get_enterprise_consent_url')
     def test_redirection_missing_enterprise_consent(self, mock_get_url):
         """
         Verify that enrolled students are redirected to the Enterprise consent

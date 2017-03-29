@@ -16,7 +16,7 @@ from courseware.courses import get_course_by_id
 from course_wiki.utils import course_wiki_slug
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from util.enterprise_helpers import data_sharing_consent_required
+from openedx.features.enterprise_support.api import data_sharing_consent_required
 
 log = logging.getLogger(__name__)
 
