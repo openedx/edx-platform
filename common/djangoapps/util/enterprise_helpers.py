@@ -20,6 +20,10 @@ try:
 except ImportError:
     pass
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from slumber.exceptions import SlumberBaseException
+from requests.exceptions import ConnectionError, Timeout
+from openedx.core.djangoapps.api_admin.utils import course_discovery_api_client
+
 from openedx.core.lib.token_utils import JwtBuilder
 from slumber.exceptions import HttpClientError, HttpServerError
 import hashlib
@@ -442,3 +446,41 @@ def get_dashboard_consent_notification(request, user, course_enrollments):
             }
         )
     return ''
+
+
+def is_course_in_enterprise_catalog(site, course_id, user, enterprise_catalog_id):
+    """
+    Verify that the provided course id exists in the site base list of course
+    run keys from the provided enterprise course catalog.
+
+    Arguments:
+        course_id (str): The course ID.
+        site: (django.contrib.sites.Site) site instance
+        enterprise_catalog_id (Int): Course catalog id of enterprise
+
+    Returns:
+        Boolean
+
+    """
+    cache_key = get_cache_key(
+        site_domain=site.domain,
+        resource='catalogs.contains',
+        course_id=course_id,
+        catalog_id=enterprise_catalog_id
+    )
+    response = cache.get(cache_key)
+    if not response:
+        try:
+            # GET: /api/v1/catalogs/{catalog_id}/contains?course_run_id={course_run_ids}
+            response = course_discovery_api_client(user=user).catalogs(enterprise_catalog_id).contains.get(
+                course_run_id=course_id
+            )
+            cache.set(cache_key, response, settings.COURSES_API_CACHE_TIMEOUT)
+        except (ConnectionError, SlumberBaseException, Timeout):
+            LOGGER.exception('Unable to connect to Course Catalog service for catalog contains endpoint.')
+            return False
+
+    try:
+        return response['courses'][course_id]
+    except KeyError:
+        return False

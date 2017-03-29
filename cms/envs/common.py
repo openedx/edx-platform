@@ -1263,3 +1263,7 @@ USER_TASKS_MAX_AGE = timedelta(days=7)
 ############## Settings for the Enterprise App ######################
 
 ENTERPRISE_ENROLLMENT_API_URL = LMS_ROOT_URL + "/api/enrollment/v1/"
+
+############## Settings for the Discovery App ######################
+
+COURSE_CATALOG_API_URL = None
