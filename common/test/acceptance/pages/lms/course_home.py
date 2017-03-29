@@ -4,9 +4,10 @@ LMS Course Home page object
 
 from bok_choy.page_object import PageObject
 
-from common.test.acceptance.pages.lms.bookmarks import BookmarksPage
-from common.test.acceptance.pages.lms.course_page import CoursePage
-from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from .bookmarks import BookmarksPage
+from .course_page import CoursePage
+from .courseware import CoursewarePage
+from .staff_view import StaffPreviewPage
 
 
 class CourseHomePage(CoursePage):
@@ -25,6 +26,7 @@ class CourseHomePage(CoursePage):
         super(CourseHomePage, self).__init__(browser, course_id)
         self.course_id = course_id
         self.outline = CourseOutlinePage(browser, self)
+        self.preview = StaffPreviewPage(browser, self)
         # TODO: TNL-6546: Remove the following
         self.unified_course_view = False
 
@@ -94,6 +96,31 @@ class CourseOutlinePage(PageObject):
 
         return outline_dict
 
+    @property
+    def num_sections(self):
+        """
+        Return the number of sections
+        """
+        return len(self.q(css=self.SECTION_TITLES_SELECTOR))
+
+    @property
+    def num_subsections(self, section_title=None):
+        """
+        Return the number of subsections.
+
+        Arguments:
+            section_title: The section for which to return the number of
+                subsections. If None, default to the first section.
+        """
+        if section_title:
+            section_index = self._section_title_to_index(section_title)
+            if not section_index:
+                return
+        else:
+            section_index = 1
+
+        return len(self.q(css=self.SUBSECTION_TITLES_SELECTOR.format(section_index)))
+
     def go_to_section(self, section_title, subsection_title):
         """
         Go to the section in the courseware.
@@ -103,15 +130,10 @@ class CourseOutlinePage(PageObject):
         Example:
             go_to_section("Week 1", "Lesson 1")
         """
-
-        # Get the section by index
-        try:
-            section_index = self._section_titles().index(section_title)
-        except ValueError:
-            self.warning("Could not find section '{0}'".format(section_title))
+        section_index = self._section_title_to_index(section_title)
+        if section_index is None:
             return
 
-        # Get the subsection by index
         try:
             subsection_index = self._subsection_titles(section_index + 1).index(subsection_title)
         except ValueError:
@@ -126,6 +148,17 @@ class CourseOutlinePage(PageObject):
         self.q(css=subsection_css).first.click()
 
         self._wait_for_course_section(section_title, subsection_title)
+
+    def _section_title_to_index(self, section_title):
+        """
+        Get the section title index given the section title.
+        """
+        try:
+            section_index = self._section_titles().index(section_title)
+        except ValueError:
+            self.warning("Could not find section '{0}'".format(section_title))
+
+        return section_index
 
     def resume_course_from_outline(self):
         """

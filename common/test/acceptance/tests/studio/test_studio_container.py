@@ -13,7 +13,7 @@ from common.test.acceptance.pages.studio.html_component_editor import HtmlCompon
 from common.test.acceptance.pages.studio.move_xblock import MoveModalView
 from common.test.acceptance.pages.studio.utils import add_discussion, drag
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
-from common.test.acceptance.pages.lms.staff_view import StaffPage
+from common.test.acceptance.pages.lms.staff_view import StaffCoursewarePage
 from common.test.acceptance.tests.helpers import create_user_partition_json
 
 import datetime
@@ -972,9 +972,9 @@ class UnitPublishingTest(ContainerBase):
 
     def _verify_and_return_staff_page(self):
         """
-        Verifies that the browser is on the staff page and returns a StaffPage.
+        Verifies that the browser is on the staff page and returns a StaffCoursewarePage.
         """
-        page = StaffPage(self.browser, self.course_id)
+        page = StaffCoursewarePage(self.browser, self.course_id)
         page.wait_for_page()
         return page
 
