@@ -22,7 +22,11 @@ from openedx.core.djangoapps.catalog.tests.factories import (
 )
 from openedx.core.djangoapps.programs.tests.factories import ProgressFactory
 from openedx.core.djangoapps.programs.utils import (
-    DEFAULT_ENROLLMENT_START_DATE, ProgramProgressMeter, ProgramDataExtender, ProgramMarketingDataExtender
+    DEFAULT_ENROLLMENT_START_DATE,
+    ProgramProgressMeter,
+    ProgramDataExtender,
+    ProgramMarketingDataExtender,
+    get_certificates,
 )
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
@@ -589,6 +593,85 @@ class TestProgramDataExtender(ModuleStoreTestCase):
         ) if is_uuid_available else None
 
         self._assert_supplemented(data, certificate_url=expected_url)
+
+
+@skip_unless_lms
+@mock.patch(UTILS_MODULE + '.get_credentials')
+class TestGetCertificates(TestCase):
+    """
+    Tests of the function used to get certificates associated with a program.
+    """
+    def setUp(self):
+        super(TestGetCertificates, self).setUp()
+
+        self.user = UserFactory()
+        self.program = ProgramFactory()
+        self.course_certificate_url = 'fake-course-certificate-url'
+        self.program_certificate_url = 'fake-program-certificate-url'
+
+    def test_get_certificates(self, mock_get_credentials):
+        """
+        Verify course and program certificates are found when present. Only one
+        course run certificate should be returned for each course when the user
+        has earned certificates in multiple runs of the same course.
+        """
+        expected = []
+        for course in self.program['courses']:
+            # Give all course runs a certificate URL, but only expect one to come
+            # back. This verifies the break in the function under test that ensures
+            # only one certificate per course comes back.
+            for index, course_run in enumerate(course['course_runs']):
+                course_run['certificate_url'] = self.course_certificate_url
+
+                if index == 0:
+                    expected.append({
+                        'type': 'course',
+                        'title': course_run['title'],
+                        'url': self.course_certificate_url,
+                    })
+
+        expected.append({
+            'type': 'program',
+            'title': self.program['title'],
+            'url': self.program_certificate_url,
+        })
+
+        mock_get_credentials.return_value = [{
+            'certificate_url': self.program_certificate_url
+        }]
+
+        certificates = get_certificates(self.user, self.program)
+        self.assertEqual(certificates, expected)
+
+    def test_course_run_certificates_missing(self, mock_get_credentials):
+        """
+        Verify an empty list is returned when course run certificates are missing,
+        and that no attempt is made to retrieve program certificates.
+        """
+        certificates = get_certificates(self.user, self.program)
+        self.assertEqual(certificates, [])
+        self.assertFalse(mock_get_credentials.called)
+
+    def test_program_certificate_missing(self, mock_get_credentials):
+        """
+        Verify that the function can handle a missing program certificate.
+        """
+        expected = []
+        for course in self.program['courses']:
+            for index, course_run in enumerate(course['course_runs']):
+                course_run['certificate_url'] = self.course_certificate_url
+
+                if index == 0:
+                    expected.append({
+                        'type': 'course',
+                        'title': course_run['title'],
+                        'url': self.course_certificate_url,
+                    })
+
+        mock_get_credentials.return_value = []
+
+        certificates = get_certificates(self.user, self.program)
+        self.assertEqual(certificates, expected)
 
 
 @ddt.ddt

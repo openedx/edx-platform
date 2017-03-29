@@ -12,7 +12,7 @@ from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin, CredentialsDataMixin
 from openedx.core.djangoapps.credentials.utils import (
-    get_user_credentials,
+    get_credentials,
     get_user_program_credentials,
     get_programs_credentials,
     get_programs_for_credentials
@@ -57,25 +57,25 @@ class TestCredentialsRetrieval(CredentialsApiConfigMixin, CredentialsDataMixin, 
         ]
 
     @httpretty.activate
-    def test_get_user_credentials(self):
+    def test_get_credentials(self):
         """Verify user credentials data can be retrieve."""
         self.create_credentials_config()
         self.mock_credentials_api(self.user)
 
-        actual = get_user_credentials(self.user)
+        actual = get_credentials(self.user)
         self.assertEqual(actual, self.CREDENTIALS_API_RESPONSE['results'])
 
     @httpretty.activate
-    def test_get_user_credentials_caching(self):
+    def test_get_credentials_caching(self):
         """Verify that when enabled, the cache is used for non-staff users."""
         self.create_credentials_config(cache_ttl=1)
         self.mock_credentials_api(self.user)
 
         # Warm up the cache.
-        get_user_credentials(self.user)
+        get_credentials(self.user)
 
         # Hit the cache.
-        get_user_credentials(self.user)
+        get_credentials(self.user)
 
         # Verify only one request was made.
         self.assertEqual(len(httpretty.httpretty.latest_requests), 1)
@@ -84,7 +84,7 @@ class TestCredentialsRetrieval(CredentialsApiConfigMixin, CredentialsDataMixin, 
 
         # Hit the Credentials API twice.
         for _ in range(2):
-            get_user_credentials(staff_user)
+            get_credentials(staff_user)
 
         # Verify that three requests have been made (one for student, two for staff).
         self.assertEqual(len(httpretty.httpretty.latest_requests), 3)
