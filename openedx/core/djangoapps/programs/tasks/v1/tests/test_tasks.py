@@ -69,19 +69,19 @@ class GetAwardedCertificateProgramsTestCase(TestCase):
         result.update(**kwargs)
         return result
 
-    @mock.patch(TASKS_MODULE + '.get_user_credentials')
-    def test_get_certified_programs(self, mock_get_user_credentials):
+    @mock.patch(TASKS_MODULE + '.get_credentials')
+    def test_get_certified_programs(self, mock_get_credentials):
         """
         Ensure the API is called and results handled correctly.
         """
         student = UserFactory(username='test-username')
-        mock_get_user_credentials.return_value = [
+        mock_get_credentials.return_value = [
             self.make_credential_result(status='awarded', credential={'program_uuid': 1}),
             self.make_credential_result(status='awarded', credential={'course_id': 2}),
         ]
 
         result = tasks.get_certified_programs(student)
-        self.assertEqual(mock_get_user_credentials.call_args[0], (student, ))
+        self.assertEqual(mock_get_credentials.call_args[0], (student, ))
         self.assertEqual(result, [1])
 
 

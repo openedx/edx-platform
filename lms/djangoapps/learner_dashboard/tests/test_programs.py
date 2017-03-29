@@ -184,9 +184,9 @@ class TestProgramListing(ProgramsApiConfigMixin, CredentialsApiConfigMixin, Shar
             expected_url = reverse('program_details_view', kwargs={'program_uuid': expected_program['uuid']})
             self.assertEqual(actual_program['detail_url'], expected_url)
 
-    @mock.patch(CREDENTIALS_UTILS_MODULE + '.get_user_credentials')
+    @mock.patch(CREDENTIALS_UTILS_MODULE + '.get_credentials')
     @mock.patch(CREDENTIALS_UTILS_MODULE + '.get_programs')
-    def test_certificates_listed(self, mock_get_programs, mock_get_user_credentials, __):
+    def test_certificates_listed(self, mock_get_programs, mock_get_credentials, __):
         """
         Verify that the response contains accurate certificate data when certificates are available.
         """
@@ -209,7 +209,7 @@ class TestProgramListing(ProgramsApiConfigMixin, CredentialsApiConfigMixin, Shar
         )
 
         credentials_data = sorted([first_credential, second_credential], key=self.credential_sort_key)
-        mock_get_user_credentials.return_value = credentials_data
+        mock_get_credentials.return_value = credentials_data
 
         response = self.client.get(self.url)
         actual = self.load_serialized_data(response, 'certificatesData')

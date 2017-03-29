@@ -18,6 +18,7 @@ from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.access import has_access
 from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.credentials.utils import get_credentials
 from student.models import CourseEnrollment
 from util.date_utils import strftime_localized
 from xmodule.modulestore.django import modulestore
@@ -216,7 +217,7 @@ class ProgramProgressMeter(object):
 
         return any(reshape(course_run) in self.completed_course_runs for course_run in course['course_runs'])
 
-    @property
+    @cached_property
     def completed_course_runs(self):
         """
         Determine which course runs have been completed by the user.
@@ -343,6 +344,51 @@ class ProgramDataExtender(object):
                 run_mode['upgrade_url'] = None
         else:
             run_mode['upgrade_url'] = None
+
+
+def get_certificates(user, extended_program):
+    """
+    Find certificates a user has earned related to a given program.
+
+    Arguments:
+        user (User): The user whose enrollments to inspect.
+        extended_program (dict): The program for which to locate certificates.
+            This is expected to be an "extended" program whose course runs already
+            have certificate URLs attached.
+
+    Returns:
+        list: Contains dicts representing course run and program certificates the
+            given user has earned which are associated with the given program.
+    """
+    certificates = []
+
+    for course in extended_program['courses']:
+        for course_run in course['course_runs']:
+            url = course_run.get('certificate_url')
+            if url:
+                certificates.append({
+                    'type': 'course',
+                    'title': course_run['title'],
+                    'url': url,
+                })
+
+                # We only want one certificate per course to be returned.
+                break
+
+    # A user can only have earned a program certificate if they've earned certificates
+    # in associated course runs. If they haven't earned any course run certificates,
+    # they can't have earned a program certificate, and we can save a network call
+    # to the credentials service.
+    if certificates:
+        program_credentials = get_credentials(user, program_uuid=extended_program['uuid'])
+        if program_credentials:
+            certificates.append({
+                'type': 'program',
+                'title': extended_program['title'],
+                'url': program_credentials[0]['certificate_url'],
+            })
+
+    return certificates
 
 
 # pylint: disable=missing-docstring
