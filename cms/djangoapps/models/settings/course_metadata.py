@@ -93,6 +93,9 @@ class CourseMetadata(object):
             filtered_list.append('enable_ccx')
             filtered_list.append('ccx_connector')
 
+        # Do not show description. We don't want to enable enabling that option either (for now).
+        filtered_list.append('display_description')
+
         return filtered_list
 
     @classmethod
@@ -116,8 +119,7 @@ class CourseMetadata(object):
         """
         result = {}
         for field in descriptor.fields.values():
-            # temp bug fix: display_description not implemented for course
-            if field.scope != Scope.settings or field.name == 'display_description':
+            if field.scope != Scope.settings:
                 continue
             result[field.name] = {
                 'value': field.read_json(descriptor),
