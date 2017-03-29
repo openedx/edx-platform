@@ -51,6 +51,7 @@ import survey.views
 from certificates import api as certs_api
 from certificates.models import CertificateStatuses
 from openedx.core.djangoapps.models.course_details import CourseDetails
+from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from commerce.utils import EcommerceService
 from enrollment.api import add_enrollment
 from course_modes.models import CourseMode
@@ -383,10 +384,11 @@ def course_info(request, course_id):
             'course': course,
             'staff_access': staff_access,
             'masquerade': masquerade,
+            'supports_preview_menu': True,
             'studio_url': studio_url,
             'show_enroll_banner': show_enroll_banner,
             'url_to_enroll': url_to_enroll,
-            'upgrade_link': upgrade_link
+            'upgrade_link': upgrade_link,
         }
 
         # Get the URL of the user's last position in order to display the 'where you were last' message
@@ -449,7 +451,7 @@ def get_last_accessed_courseware(course, request, user):
     return (None, None)
 
 
-class StaticCourseTabView(FragmentView):
+class StaticCourseTabView(EdxFragmentView):
     """
     View that displays a static course tab with a given name.
     """
@@ -486,7 +488,7 @@ class StaticCourseTabView(FragmentView):
         })
 
 
-class CourseTabView(FragmentView):
+class CourseTabView(EdxFragmentView):
     """
     View that displays a course tab page.
     """
@@ -499,29 +501,46 @@ class CourseTabView(FragmentView):
         course_key = CourseKey.from_string(course_id)
         course = get_course_with_access(request.user, 'load', course_key)
         tab = CourseTabList.get_tab_by_type(course.tabs, tab_type)
-        return super(CourseTabView, self).get(request, course=course, tab=tab, **kwargs)
+        page_context = self.create_page_context(request, course=course, tab=tab, **kwargs)
+        return super(CourseTabView, self).get(request, course=course, page_context=page_context, **kwargs)
 
-    def render_to_fragment(self, request, course=None, tab=None, **kwargs):
+    def create_page_context(self, request, course=None, tab=None, **kwargs):
+        """
+        Creates the context for the fragment's template.
+        """
+        staff_access = has_access(request.user, 'staff', course)
+        supports_preview_menu = tab.get('supports_preview_menu', False)
+        if supports_preview_menu:
+            masquerade, masquerade_user = setup_masquerade(request, course.id, staff_access, reset_masquerade_data=True)
+            request.user = masquerade_user
+        else:
+            masquerade = None
+        return {
+            'course': course,
+            'tab': tab,
+            'active_page': tab.get('type', None),
+            'staff_access': staff_access,
+            'masquerade': masquerade,
+            'supports_preview_menu': supports_preview_menu,
+            'uses_pattern_library': True,
+            'disable_courseware_js': True,
+        }
+
+    def render_to_fragment(self, request, course=None, page_context=None, **kwargs):
         """
         Renders the course tab to a fragment.
         """
+        tab = page_context['tab']
         return tab.render_to_fragment(request, course, **kwargs)
 
-    def render_to_standalone_html(self, request, fragment, course=None, tab=None, **kwargs):
+    def render_to_standalone_html(self, request, fragment, course=None, tab=None, page_context=None, **kwargs):
         """
         Renders this course tab's fragment to HTML for a standalone page.
         """
-        return render_to_string(
-            'courseware/tab-view.html',
-            {
-                'course': course,
-                'active_page': tab['type'],
-                'tab': tab,
-                'fragment': fragment,
-                'uses_pattern_library': True,
-                'disable_courseware_js': True,
-            },
-        )
+        if not page_context:
+            page_context = self.create_page_context(request, course=course, tab=tab, **kwargs)
+        page_context['fragment'] = fragment
+        return render_to_string('courseware/tab-view.html', page_context)
 
 
 @ensure_csrf_cookie
@@ -871,11 +890,12 @@ def _progress(request, course_key, student_id):
         'studio_url': studio_url,
         'grade_summary': grade_summary,
         'staff_access': staff_access,
+        'masquerade': masquerade,
+        'supports_preview_menu': True,
         'student': student,
         'passed': is_course_passed(course, grade_summary),
         'credit_course_requirements': _credit_course_requirements(course_key, student),
         'certificate_data': _get_cert_data(student, course, course_key, is_active, enrollment_mode),
-        'masquerade': masquerade
     }
 
     with outer_atomic():
@@ -1397,7 +1417,6 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
             'disable_header': True,
             'disable_footer': True,
             'disable_window_wrap': True,
-            'disable_preview_menu': True,
             'staff_access': bool(has_access(request.user, 'staff', course)),
             'xqa_server': settings.FEATURES.get('XQA_SERVER', 'http://your_xqa_server.com'),
         }

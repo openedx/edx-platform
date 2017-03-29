@@ -395,7 +395,7 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
 
     def test_masquerade_as_specific_student_progress(self):
         """
-        Test masquesrading as a specific user for progress page.
+        Test masquerading as a specific user for progress page.
         """
         # Give the student some correct answers, check their progress page
         self.login_student()
