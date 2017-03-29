@@ -16,9 +16,9 @@ from rest_framework.status import (
 )
 
 from lms.djangoapps.courseware.courses import get_course_by_id
-from lms.djangoapps.instructor.access import list_with_level
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from student.models import anonymous_id_for_user
+from student.roles import CourseInstructorRole
 from .models import CCXCon
 
 log = logging.getLogger(__name__)
@@ -122,7 +122,7 @@ def course_info_to_ccxcon(course_key):
     )
 
     # get the entire list of instructors
-    course_instructors = list_with_level(course, 'instructor')
+    course_instructors = CourseInstructorRole(course.id).users_with_role()
     # get anonymous ids for each of them
     course_instructors_ids = [anonymous_id_for_user(user, course_key) for user in course_instructors]
     # extract the course details
