@@ -1742,7 +1742,8 @@ def create_account_with_params(request, params):
     # APPSEMBLER SPECIFIC
     organization_name = params.get('organization')
     organization = None
-    # organization name is passed during AMC signup, otherwise it's a regular signup on a microsite
+    # organization name is passed during signup when invited through AMC,
+    # otherwise it's a regular signup on a microsite
     if organization_name:
         try:
             organization = Organization.objects.get(name=organization_name)

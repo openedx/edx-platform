@@ -13,6 +13,7 @@ from django.utils.translation import ugettext as _
 from django_comment_common.models import assign_default_role
 from django_comment_common.utils import seed_permissions_roles
 
+from openedx.core.djangoapps.appsembler.sites.utils import get_lms_link_from_course_key
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 
 from xmodule.modulestore import ModuleStoreEnum
@@ -98,7 +99,7 @@ def get_lms_link_for_item(location, preview=False):
         lms_base = settings.LMS_BASE
 
     return u"//{lms_base}/courses/{course_key}/jump_to/{location}".format(
-        lms_base=lms_base,
+        lms_base=get_lms_link_from_course_key(lms_base, location.course_key),
         course_key=location.course_key.to_deprecated_string(),
         location=location.to_deprecated_string(),
     )
@@ -135,7 +136,7 @@ def get_lms_link_for_about_page(course_key):
         return None
 
     return u"//{about_base_url}/courses/{course_key}/about".format(
-        about_base_url=about_base,
+        about_base_url=get_lms_link_from_course_key(about_base, course_key),
         course_key=course_key.to_deprecated_string()
     )
 
@@ -151,7 +152,7 @@ def get_lms_link_for_certificate_web_view(user_id, course_key, mode):
         return None
 
     return u"//{certificate_web_base}/certificates/user/{user_id}/course/{course_id}?preview={mode}".format(
-        certificate_web_base=settings.LMS_BASE,
+        certificate_web_base=get_lms_link_from_course_key(settings.LMS_BASE, course_key),
         user_id=user_id,
         course_id=unicode(course_key),
         mode=mode

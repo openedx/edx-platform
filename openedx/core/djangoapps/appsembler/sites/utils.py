@@ -14,6 +14,13 @@ from organizations.models import UserOrganizationMapping, Organization
 from openedx.core.djangoapps.theming.models import SiteTheme
 
 
+def get_lms_link_from_course_key(base_lms_url, course_key):
+    """
+    Returns the microsite-aware LMS link based on the organization the course
+    belongs to.
+    """
+    return "{}.{}".format(course_key.org, base_lms_url)
+
 def get_initial_sass_variables():
     """
     This method loads the SASS variables file from the currently active theme. It is used as a default value
