@@ -264,7 +264,7 @@
         return state;
     };
 
-    jasmine.initializeHLSPlayer = function(fixture, params) {
+    jasmine.initializeHLSPlayer = function(params) {
         return jasmine.initializePlayer('video_hls.html', params);
     };
 

@@ -205,7 +205,7 @@
                 .and.returnValue(null);
         });
 
-        describe('non-hls encoding', function() {
+        describe('html5 encoding only', function() {
             beforeEach(function(done) {
                 this.code = 'html5';
                 state = jasmine.initializePlayer('video_html5.html');
@@ -216,7 +216,7 @@
 
         describe('hls encoding', function() {
             beforeEach(function(done) {
-                this.code = 'HLS';
+                this.code = 'hls';
                 state = jasmine.initializeHLSPlayer();
                 done();
             });

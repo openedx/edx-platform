@@ -278,7 +278,12 @@ function(VideoPlayer, i18n, moment, _) {
         return false;
     }
 
-    // Return Array of available HLS video source urls.
+    /**
+     * Extract HLS video URLs from available video URLs.
+     *
+     * @param {object} state The object containg the state (properties, methods, modules) of the Video player.
+     * @returns Array of available HLS video source urls.
+     */
     function extractHLSVideoSources(state) {
         return _.filter(state.config.sources, function(source) {
             return /\.m3u8$/.test(source);

@@ -61,8 +61,7 @@ function(_) {
         function Player(el, config) {
             var errorMessage, lastSource, sourceList;
 
-            // Create HTML markup for individual sources of the HTML5 <video>
-            // element.
+            // Create HTML markup for individual sources of the HTML5 <video> element.
             sourceList = $.map(config.videoSources, function(source) {
                 return [
                     '<source ',
@@ -166,12 +165,13 @@ function(_) {
             return this.logs;
         };
 
-        Player.prototype.showErrorMessage = function() {
+        Player.prototype.showErrorMessage = function(event, css) {
+            var cssSelecter = css || '.video-player .video-error';
             this.el
                 .find('.video-player div')
                     .addClass('hidden')
                 .end()
-                .find('.video-player .video-error')
+                .find(cssSelecter)
                     .removeClass('is-hidden')
                 .end()
                     .addClass('is-initialized')

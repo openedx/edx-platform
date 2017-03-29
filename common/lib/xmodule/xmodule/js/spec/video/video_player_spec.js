@@ -975,6 +975,10 @@ function(VideoPlayer, HLS) {
                 state = jasmine.initializeHLSPlayer();
             });
 
+            it('does not show error message if hls is supported', function() {
+                expect($('.video-hls-error')).toHaveClass('is-hidden');
+            });
+
             it('can extract hls video sources correctly', function() {
                 expect(state.HLSVideoSources).toEqual(['/base/fixtures/hls/hls.m3u8']);
                 expect(state.videoPlayer.player.hls).toBeDefined();
@@ -991,6 +995,17 @@ function(VideoPlayer, HLS) {
                 it('can use native hls playback support', function() {
                     expect(state.videoPlayer.player.hls).toBeUndefined();
                 });
+            });
+        });
+
+        describe('HLS Video Errors', function() {
+            beforeEach(function() {
+                spyOn(HLS, 'isSupported').and.returnValue(false);
+                state = jasmine.initializeHLSPlayer({sources: ['/base/fixtures/hls/hls.m3u8']});
+            });
+
+            it('shows error message if hls is not supported', function() {
+                expect($('.video-hls-error')).not.toHaveClass('is-hidden');
             });
         });
     });

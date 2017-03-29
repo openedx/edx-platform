@@ -103,7 +103,11 @@ function(HTML5Video, HTML5HLSVideo, Resizer, HLS, _) {
     //     have to do repeated jQuery element selects.
     // eslint-disable-next-line no-underscore-dangle
     function _initialize(state) {
-        var youTubeId, player, userAgent, commonConfig, eventToBeTriggered = 'loadedmetadata';
+        var youTubeId,
+            player,
+            userAgent,
+            commonPlayerConfig,
+            eventToBeTriggered = 'loadedmetadata';
 
         // The function is called just once to apply pre-defined configurations
         // by student before video starts playing. Waits until the video's
@@ -155,7 +159,7 @@ function(HTML5Video, HTML5HLSVideo, Resizer, HLS, _) {
         state.HLSOnlySources = state.config.sources.length > 0 &&
                                state.config.sources.length === state.HLSVideoSources.length;
 
-        commonConfig = {
+        commonPlayerConfig = {
             playerVars: state.videoPlayer.playerVars,
             videoSources: state.config.sources,
             browserIsSafari: state.browserIsSafari,
@@ -170,7 +174,7 @@ function(HTML5Video, HTML5HLSVideo, Resizer, HLS, _) {
             if (state.canPlayHLS || state.HLSOnlySources) {
                 state.videoPlayer.player = new HTML5HLSVideo.Player(
                     state.el,
-                    _.extend({}, commonConfig, {
+                    _.extend({}, commonPlayerConfig, {
                         videoSources: state.HLSVideoSources,
                         canPlayHLS: state.canPlayHLS,
                         HLSOnlySources: state.HLSOnlySources
@@ -180,7 +184,7 @@ function(HTML5Video, HTML5HLSVideo, Resizer, HLS, _) {
                 // to which correct video dimensions were not calculated
                 eventToBeTriggered = state.browserIsSafari ? 'loadeddata' : eventToBeTriggered;
             } else {
-                state.videoPlayer.player = new HTML5Video.Player(state.el, commonConfig);
+                state.videoPlayer.player = new HTML5Video.Player(state.el, commonPlayerConfig);
             }
             player = state.videoEl = state.videoPlayer.player.videoEl;
             player[0].addEventListener(eventToBeTriggered, state.videoPlayer.onLoadMetadataHtml5, false);
