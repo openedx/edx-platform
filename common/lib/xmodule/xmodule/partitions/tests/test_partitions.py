@@ -12,7 +12,7 @@ from xmodule.partitions.partitions import (
     Group, UserPartition, UserPartitionError, NoSuchUserPartitionGroupError, USER_PARTITION_SCHEME_NAMESPACE
 )
 from xmodule.partitions.partitions_service import (
-    PartitionService, get_course_user_partitions, ENROLLMENT_TRACK_PARTITION_ID, FEATURES
+    PartitionService, get_all_partitions_for_course, ENROLLMENT_TRACK_PARTITION_ID, FEATURES
 )
 
 
@@ -541,19 +541,26 @@ class TestPartitionService(PartitionServiceBaseClass):
 
 class TestGetCourseUserPartitions(PartitionServiceBaseClass):
     """
-    Test the helper method get_course_user_partitions.
+    Test the helper method get_all_partitions_for_course.
     """
 
     def setUp(self):
         super(TestGetCourseUserPartitions, self).setUp()
         # django.conf.settings is not available when nosetests are run
-        FEATURES['ENABLE_ENROLLMENT_TRACK_USER_PARTITION'] = True
+        TestGetCourseUserPartitions._enable_enrollment_track_partition(True)
+
+    @staticmethod
+    def _enable_enrollment_track_partition(enable):
+        """
+        Enable or disable the feature flag for the enrollment track user partition.
+        """
+        FEATURES['ENABLE_ENROLLMENT_TRACK_USER_PARTITION'] = enable
 
     def test_enrollment_track_partition_added(self):
         """
         Test that the dynamic enrollment track scheme is added if there is no conflict with the user partition ID.
         """
-        all_partitions = get_course_user_partitions(self.course)
+        all_partitions = get_all_partitions_for_course(self.course)
         self.assertEqual(2, len(all_partitions))
         self.assertEqual(self.TEST_SCHEME_NAME, all_partitions[0].scheme.name)
         enrollment_track_partition = all_partitions[1]
@@ -574,7 +581,7 @@ class TestGetCourseUserPartitions(PartitionServiceBaseClass):
             self.TEST_PARAMETERS,
         )
         self.course.user_partitions = [self.user_partition]
-        all_partitions = get_course_user_partitions(self.course)
+        all_partitions = get_all_partitions_for_course(self.course)
         self.assertEqual(1, len(all_partitions))
         self.assertEqual(self.TEST_SCHEME_NAME, all_partitions[0].scheme.name)
 
@@ -582,7 +589,7 @@ class TestGetCourseUserPartitions(PartitionServiceBaseClass):
         """
         Test that the dynamic enrollment track scheme is NOT added if the settings FEATURE flag is disabled.
         """
-        FEATURES['ENABLE_ENROLLMENT_TRACK_USER_PARTITION'] = False
-        all_partitions = get_course_user_partitions(self.course)
+        TestGetCourseUserPartitions._enable_enrollment_track_partition(False)
+        all_partitions = get_all_partitions_for_course(self.course)
         self.assertEqual(1, len(all_partitions))
         self.assertEqual(self.TEST_SCHEME_NAME, all_partitions[0].scheme.name)

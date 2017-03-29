@@ -14,7 +14,7 @@ from django_comment_common.utils import seed_permissions_roles
 
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
-from xmodule.partitions.partitions_service import get_course_user_partitions
+from xmodule.partitions.partitions_service import get_all_partitions_for_course
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -375,7 +375,7 @@ def get_user_partition_info(xblock, schemes=None, course=None):
         schemes = set(schemes)
 
     partitions = []
-    for p in sorted(get_course_user_partitions(course), key=lambda p: p.name):
+    for p in sorted(get_all_partitions_for_course(course), key=lambda p: p.name):
 
         # Exclude disabled partitions, partitions with no groups defined
         # Also filter by scheme name if there's a filter defined.

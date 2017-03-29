@@ -26,7 +26,7 @@ ENROLLMENT_TRACK_PARTITION_ID = 50
 FEATURES = getattr(settings, 'FEATURES', {})
 
 
-def get_course_user_partitions(course):
+def get_all_partitions_for_course(course):
     """
     A method that returns all `UserPartitions` associated with a course, as a List.
     This will include the ones defined in course.user_partitions, but it may also
@@ -101,7 +101,7 @@ class PartitionService(object):
         """
         Return the set of partitions assigned to self._course_id
         """
-        return get_course_user_partitions(self.get_course())
+        return get_all_partitions_for_course(self.get_course())
 
     def get_user_group_id_for_partition(self, user, user_partition_id):
         """

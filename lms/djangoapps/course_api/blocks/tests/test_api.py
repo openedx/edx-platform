@@ -158,11 +158,11 @@ class TestGetBlocksQueryCounts(SharedModuleStoreTestCase):
     @ddt.unpack
     def test_query_counts_uncached(self, store_type_tuple, with_storage_backing):
         store_type, expected_mongo_queries = store_type_tuple
-        with override_config_setting(STORAGE_BACKING_FOR_CACHE, active=with_storage_backing):
+        with waffle().override(STORAGE_BACKING_FOR_CACHE, active=with_storage_backing):
             course = self._create_course(store_type)
             clear_course_from_cache(course.id)
             self._get_blocks(
                 course,
                 expected_mongo_queries,
-                expected_sql_queries=11 if with_storage_backing else 3,
+                expected_sql_queries=13 if with_storage_backing else 5,
             )

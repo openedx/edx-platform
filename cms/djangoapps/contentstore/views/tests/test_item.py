@@ -343,15 +343,18 @@ class GetItemTest(ItemTest):
         )
 
     def test_get_user_partitions_and_groups(self):
+        # Note about UserPartition and UserPartition Group IDs: these should be >= 100 to match
+        # the fact that Studio assigns unused ideas in the range of [100, MAX_INT]. The IDs
+        # should not conflict with dynamic partition IDs, which are < 100.
         self.course.user_partitions = [
             UserPartition(
-                id=100,
+                id=100,  # See note above.
                 name="Verification user partition",
                 scheme=UserPartition.get_scheme("verification"),
                 description="Verification user partition",
                 groups=[
-                    Group(id=101, name="Group A"),
-                    Group(id=102, name="Group B"),
+                    Group(id=101, name="Group A"),  # See note above.
+                    Group(id=102, name="Group B"),  # See note above.
                 ],
             ),
         ]

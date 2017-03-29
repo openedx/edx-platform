@@ -5,10 +5,10 @@ from __future__ import absolute_import
 
 from django.conf import settings
 
+from xmodule.partitions.partitions import UserPartition
 from xblock.fields import Scope, Boolean, String, Float, XBlockMixin, Dict, Integer, List
 from xblock.runtime import KeyValueStore, KvsFieldData
 from xmodule.fields import Date, Timedelta
-from xmodule.partitions.partitions import UserPartition
 from ..course_metadata_utils import DEFAULT_START_DATE
 
 
