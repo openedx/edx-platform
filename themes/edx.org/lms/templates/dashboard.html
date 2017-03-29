@@ -75,6 +75,12 @@ from openedx.core.djangoapps.theming import helpers as theming_helpers
             ${enrollment_message | n, decode.utf8}
         </section>
     %endif
+
+    %if enterprise_message:
+        <div class="dashboard-banner">
+            ${ enterprise_message | n, decode.utf8 }
+        </div>
+    %endif
 </div>
 
 <section class="container dashboard" id="dashboard-main">
