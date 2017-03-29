@@ -7,7 +7,7 @@ h1 {
     color: $baseFontColor;
     font: normal 2em/1.4em $sans-serif;
     letter-spacing: 1px;
-    margin: 0 0 1.416em 0;
+    @include margin: (0, 0, 1.416em, 0);
   }
 
 h2 {
@@ -19,7 +19,7 @@ h2 {
 }
 
 h3, h4, h5, h6 {
-  margin: 0 0 ($baseline/2) 0;
+  @include margin(0, 0, ($baseline/2), 0);
   font-weight: 600;
 }
 
@@ -72,7 +72,7 @@ blockquote {
 
 ol, ul {
   margin: 1em 0;
-  padding: 0 0 0 1em;
+  @include padding(0, 0, 0, 1em);
   color: $baseFontColor;
 
   li {
