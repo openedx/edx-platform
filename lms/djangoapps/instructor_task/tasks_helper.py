@@ -30,6 +30,7 @@ from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from pytz import UTC
 from track import contexts
 from xmodule.modulestore.django import modulestore
+from xmodule.partitions.partitions_service import PartitionService
 from xmodule.split_test_module import get_split_user_partitions
 
 from certificates.api import generate_user_certificates
@@ -59,7 +60,6 @@ from shoppingcart.models import (
 )
 from openassessment.data import OraAggregateData
 from lms.djangoapps.instructor_task.models import ReportStore, InstructorTask, PROGRESS
-from lms.djangoapps.lms_xblock.runtime import LmsPartitionService
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from opaque_keys.edx.keys import UsageKey
@@ -806,7 +806,7 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
 
         group_configs_group_names = []
         for partition in experiment_partitions:
-            group = LmsPartitionService(student, course_id).get_group(partition, assign=False)
+            group = PartitionService(course_id).get_group(student, partition, assign=False)
             group_configs_group_names.append(group.name if group else '')
 
         team_name = []

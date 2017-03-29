@@ -9,7 +9,7 @@ from xmodule.modulestore.django import modulestore
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from verified_track_content.models import VerifiedTrackCohortedCourse
+from openedx.core.djangoapps.verified_track_content.models import VerifiedTrackCohortedCourse
 
 
 class VerifiedTrackCourseForm(forms.ModelForm):

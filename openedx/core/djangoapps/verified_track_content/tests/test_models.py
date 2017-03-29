@@ -1,6 +1,9 @@
 """
 Tests for Verified Track Cohorting models
 """
+# pylint: disable=attribute-defined-outside-init
+# pylint: disable=no-member
+
 from django.test import TestCase
 import mock
 from mock import patch
@@ -12,11 +15,12 @@ from student.models import CourseMode
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from verified_track_content.models import VerifiedTrackCohortedCourse, DEFAULT_VERIFIED_COHORT_NAME
-from verified_track_content.tasks import sync_cohort_with_mode
+from ..models import VerifiedTrackCohortedCourse, DEFAULT_VERIFIED_COHORT_NAME
+from ..tasks import sync_cohort_with_mode
 from openedx.core.djangoapps.course_groups.cohorts import (
     set_course_cohort_settings, add_cohort, CourseCohort, DEFAULT_COHORT_NAME
 )
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
 class TestVerifiedTrackCohortedCourse(TestCase):
@@ -48,13 +52,13 @@ class TestVerifiedTrackCohortedCourse(TestCase):
         self.assertEqual(unicode(config), "Course: {}, enabled: True".format(self.SAMPLE_COURSE))
 
     def test_verified_cohort_name(self):
-        COHORT_NAME = 'verified cohort'
+        cohort_name = 'verified cohort'
         course_key = CourseKey.from_string(self.SAMPLE_COURSE)
         config = VerifiedTrackCohortedCourse.objects.create(
-            course_key=course_key, enabled=True, verified_cohort_name=COHORT_NAME
+            course_key=course_key, enabled=True, verified_cohort_name=cohort_name
         )
         config.save()
-        self.assertEqual(VerifiedTrackCohortedCourse.verified_cohort_name_for_course(course_key), COHORT_NAME)
+        self.assertEqual(VerifiedTrackCohortedCourse.verified_cohort_name_for_course(course_key), cohort_name)
 
     def test_unset_verified_cohort_name(self):
         fake_course_id = 'fake/course/key'
@@ -62,6 +66,7 @@ class TestVerifiedTrackCohortedCourse(TestCase):
         self.assertEqual(VerifiedTrackCohortedCourse.verified_cohort_name_for_course(course_key), None)
 
 
+@skip_unless_lms
 class TestMoveToVerified(SharedModuleStoreTestCase):
     """ Tests for the post-save listener. """
 
@@ -82,12 +87,15 @@ class TestMoveToVerified(SharedModuleStoreTestCase):
         self.addCleanup(celery_task_patcher.stop)
 
     def _enable_cohorting(self):
+        """ Turn on cohorting in the course. """
         set_course_cohort_settings(self.course.id, is_cohorted=True)
 
     def _create_verified_cohort(self, name=DEFAULT_VERIFIED_COHORT_NAME):
+        """ Create a verified cohort. """
         add_cohort(self.course.id, name, CourseCohort.MANUAL)
 
     def _create_named_random_cohort(self, name):
+        """ Create a random cohort with the supplied name. """
         return add_cohort(self.course.id, name, CourseCohort.RANDOM)
 
     def _enable_verified_track_cohorting(self, cohort_name=None):
@@ -101,6 +109,7 @@ class TestMoveToVerified(SharedModuleStoreTestCase):
         config.save()
 
     def _enroll_in_course(self):
+        """ Enroll self.user in self.course. """
         self.enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user)
 
     def _upgrade_to_verified(self):
@@ -108,6 +117,7 @@ class TestMoveToVerified(SharedModuleStoreTestCase):
         self.enrollment.update_enrollment(mode=CourseMode.VERIFIED)
 
     def _verify_no_automatic_cohorting(self):
+        """ Check that upgrading self.user to verified does not move them into a cohort. """
         self._enroll_in_course()
         self.assertIsNone(get_cohort(self.user, self.course.id, assign=False))
         self._upgrade_to_verified()
@@ -115,13 +125,15 @@ class TestMoveToVerified(SharedModuleStoreTestCase):
         self.assertEqual(0, self.mocked_celery_task.call_count)
 
     def _unenroll(self):
+        """ Unenroll self.user from self.course. """
         self.enrollment.unenroll(self.user, self.course.id)
 
     def _reenroll(self):
+        """ Re-enroll the learner into mode AUDIT. """
         self.enrollment.activate()
         self.enrollment.change_mode(CourseMode.AUDIT)
 
-    @mock.patch('verified_track_content.models.log.error')
+    @mock.patch('openedx.core.djangoapps.verified_track_content.models.log.error')
     def test_automatic_cohorting_disabled(self, error_logger):
         """
         If the VerifiedTrackCohortedCourse feature is disabled for a course, enrollment mode changes do not move
@@ -136,7 +148,7 @@ class TestMoveToVerified(SharedModuleStoreTestCase):
         # No logging occurs if feature is disabled for course.
         self.assertFalse(error_logger.called)
 
-    @mock.patch('verified_track_content.models.log.error')
+    @mock.patch('openedx.core.djangoapps.verified_track_content.models.log.error')
     def test_cohorting_enabled_course_not_cohorted(self, error_logger):
         """
         If the VerifiedTrackCohortedCourse feature is enabled for a course, but the course is not cohorted,
@@ -149,7 +161,7 @@ class TestMoveToVerified(SharedModuleStoreTestCase):
         self.assertTrue(error_logger.called)
         self.assertIn("course is not cohorted", error_logger.call_args[0][0])
 
-    @mock.patch('verified_track_content.models.log.error')
+    @mock.patch('openedx.core.djangoapps.verified_track_content.models.log.error')
     def test_cohorting_enabled_missing_verified_cohort(self, error_logger):
         """
         If the VerifiedTrackCohortedCourse feature is enabled for a course and the course is cohorted,

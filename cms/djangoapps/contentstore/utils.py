@@ -14,6 +14,7 @@ from django_comment_common.utils import seed_permissions_roles
 
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
+from xmodule.partitions.partitions_service import get_all_partitions_for_course
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -295,9 +296,10 @@ def get_group_display_name(user_partitions, xblock_display_name):
         group name (String): Group name of the matching group.
     """
     for user_partition in user_partitions:
-        for group in user_partition['groups']:
-            if str(group['id']) in xblock_display_name:
-                return group['name']
+        if user_partition['scheme'] == 'random':
+            for group in user_partition['groups']:
+                if _(u'Group ID {group_id}').format(group_id=group['id']) == xblock_display_name:
+                    return group['name']
 
 
 def get_user_partition_info(xblock, schemes=None, course=None):
@@ -373,7 +375,7 @@ def get_user_partition_info(xblock, schemes=None, course=None):
         schemes = set(schemes)
 
     partitions = []
-    for p in sorted(course.user_partitions, key=lambda p: p.name):
+    for p in sorted(get_all_partitions_for_course(course), key=lambda p: p.name):
 
         # Exclude disabled partitions, partitions with no groups defined
         # Also filter by scheme name if there's a filter defined.
@@ -408,7 +410,7 @@ def get_user_partition_info(xblock, schemes=None, course=None):
             # Put together the entire partition dictionary
             partitions.append({
                 "id": p.id,
-                "name": p.name,
+                "name": unicode(p.name),  # Convert into a string in case ugettext_lazy was used
                 "scheme": p.scheme.name,
                 "groups": groups,
             })
@@ -428,30 +430,36 @@ def get_visibility_partition_info(xblock):
     Returns: dict
 
     """
-    user_partitions = get_user_partition_info(xblock, schemes=["verification", "cohort"])
-    cohort_partitions = []
-    verification_partitions = []
-    has_selected_groups = False
-    selected_verified_partition_id = None
+    # TODO: add unit tests for this method.
 
-    # Pre-process the partitions to make it easier to display the UI
-    for p in user_partitions:
-        has_selected = any(g["selected"] for g in p["groups"])
-        has_selected_groups = has_selected_groups or has_selected
+    def has_selected_group(partition):
+        return any(group["selected"] for group in partition["groups"])
 
-        if p["scheme"] == "cohort":
-            cohort_partitions.append(p)
-        elif p["scheme"] == "verification":
-            verification_partitions.append(p)
-            if has_selected:
-                selected_verified_partition_id = p["id"]
+    selectable_partitions = []
+    # We wish to display enrollment partitions before cohort partitions.
+    enrollment_user_partitions = get_user_partition_info(xblock, schemes=["enrollment_track"])
+
+    # For enrollment partitions, we only show them if there is a selected group or
+    # or if the number of groups > 1.
+    for partition in enrollment_user_partitions:
+        if len(partition["groups"]) > 1 or has_selected_group(partition):
+            selectable_partitions.append(partition)
+
+    # Now add the cohort user partitions.
+    selectable_partitions = selectable_partitions + get_user_partition_info(xblock, schemes=["cohort"])
+
+    # Find the first partition with a selected group. That will be the one initially enabled in the dialog
+    # (if the course has only been added in Studio, only one partition should have a selected group).
+    selected_partition_index = -1
+
+    for index, partition in enumerate(selectable_partitions):
+        if has_selected_group(partition):
+            selected_partition_index = index
+            break
 
     return {
-        "user_partitions": user_partitions,
-        "cohort_partitions": cohort_partitions,
-        "verification_partitions": verification_partitions,
-        "has_selected_groups": has_selected_groups,
-        "selected_verified_partition_id": selected_verified_partition_id,
+        "selectable_partitions": selectable_partitions,
+        "selected_partition_index": selected_partition_index,
     }
 
 

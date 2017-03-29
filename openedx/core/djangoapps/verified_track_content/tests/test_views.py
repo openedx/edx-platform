@@ -5,22 +5,21 @@ Tests for verified track content views.
 import json
 
 from nose.plugins.attrib import attr
-from unittest import skipUnless
 
 from django.http import Http404
 from django.test.client import RequestFactory
-from django.conf import settings
 
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory, AdminFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from verified_track_content.models import VerifiedTrackCohortedCourse
-from verified_track_content.views import cohorting_settings
+from ..models import VerifiedTrackCohortedCourse
+from ..views import cohorting_settings
 
 
 @attr(shard=2)
-@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Tests only valid in LMS')
+@skip_unless_lms
 class CohortingSettingsTestCase(SharedModuleStoreTestCase):
     """
     Tests the `cohort_discussion_topics` view.
@@ -65,6 +64,7 @@ class CohortingSettingsTestCase(SharedModuleStoreTestCase):
         self._verify_cohort_settings_response(expected_response)
 
     def _verify_cohort_settings_response(self, expected_response):
+        """ Verify that the response was successful and matches the expected JSON payload. """
         request = RequestFactory().get("dummy_url")
         request.user = AdminFactory()
         response = cohorting_settings(request, unicode(self.course.id))

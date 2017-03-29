@@ -8,7 +8,7 @@ import ddt
 from mock import patch
 
 from contentstore.utils import reverse_course_url, reverse_usage_url
-from contentstore.course_group_config import GroupConfiguration
+from contentstore.course_group_config import GroupConfiguration, CONTENT_GROUP_CONFIGURATION_NAME
 from contentstore.tests.utils import CourseTestCase
 from xmodule.partitions.partitions import Group, UserPartition
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -240,7 +240,7 @@ class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurations
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'First name')
         self.assertContains(response, 'Group C')
-        self.assertContains(response, 'Content Group Configuration')
+        self.assertContains(response, CONTENT_GROUP_CONFIGURATION_NAME)
 
     def test_unsupported_http_accept_header(self):
         """
