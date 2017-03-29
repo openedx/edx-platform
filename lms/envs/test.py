@@ -333,6 +333,8 @@ GIT_REPO_DIR = TEST_ROOT / "course_repos"
 CELERY_ALWAYS_EAGER = True
 CELERY_RESULT_BACKEND = 'djcelery.backends.cache:CacheBackend'
 
+CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION = False
+
 ######################### MARKETING SITE ###############################
 
 MKTG_URL_LINK_MAP = {

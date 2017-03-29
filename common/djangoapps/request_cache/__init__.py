@@ -25,7 +25,8 @@ def clear_request_cache(**kwargs):  # pylint: disable=unused-argument
     Once a celery task completes, clear the request cache to
     prevent memory leaks.
     """
-    middleware.RequestCache.clear_request_cache()
+    if getattr(settings, 'CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION', True):
+        middleware.RequestCache.clear_request_cache()
 
 
 def get_cache(name):
