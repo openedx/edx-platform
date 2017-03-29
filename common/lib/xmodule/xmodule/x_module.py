@@ -266,6 +266,7 @@ class XModuleFields(object):
 
     display_description = String(
         display_name="Display Description",
+        help="Description",
         scope=Scope.settings,
         default=None
     )
