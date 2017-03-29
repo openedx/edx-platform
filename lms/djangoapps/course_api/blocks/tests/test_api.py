@@ -7,8 +7,7 @@ from django.test.client import RequestFactory
 from itertools import product
 
 from openedx.core.djangoapps.content.block_structure.api import clear_course_from_cache
-from openedx.core.djangoapps.content.block_structure.config import STORAGE_BACKING_FOR_CACHE
-from openedx.core.djangoapps.content.block_structure.tests.helpers import override_config_setting
+from openedx.core.djangoapps.content.block_structure.config import STORAGE_BACKING_FOR_CACHE, waffle
 
 from student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
@@ -142,12 +141,12 @@ class TestGetBlocksQueryCounts(SharedModuleStoreTestCase):
     )
     @ddt.unpack
     def test_query_counts_cached(self, store_type, with_storage_backing):
-        with override_config_setting(STORAGE_BACKING_FOR_CACHE, active=with_storage_backing):
+        with waffle().override(STORAGE_BACKING_FOR_CACHE, active=with_storage_backing):
             course = self._create_course(store_type)
             self._get_blocks(
                 course,
                 expected_mongo_queries=0,
-                expected_sql_queries=4 if with_storage_backing else 3,
+                expected_sql_queries=3 if with_storage_backing else 2,
             )
 
     @ddt.data(
@@ -159,7 +158,7 @@ class TestGetBlocksQueryCounts(SharedModuleStoreTestCase):
     @ddt.unpack
     def test_query_counts_uncached(self, store_type_tuple, with_storage_backing):
         store_type, expected_mongo_queries = store_type_tuple
-        with override_config_setting(STORAGE_BACKING_FOR_CACHE, active=with_storage_backing):
+        with waffle().override(STORAGE_BACKING_FOR_CACHE, active=with_storage_backing):
             course = self._create_course(store_type)
             clear_course_from_cache(course.id)
             self._get_blocks(
