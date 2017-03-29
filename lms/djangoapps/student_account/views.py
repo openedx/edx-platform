@@ -34,6 +34,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
 from openedx.core.djangoapps.user_api.accounts.api import request_password_change
 from openedx.core.djangoapps.user_api.errors import UserNotFound
+from openedx.features.enterprise_support.api import set_enterprise_branding_filter_param
 from openedx.core.lib.time_zone_utils import TIME_ZONE_CHOICES
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from student.models import UserProfile
@@ -47,7 +48,6 @@ from third_party_auth import pipeline
 from third_party_auth.decorators import xframe_allow_whitelisted
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 from util.date_utils import strftime_localized
-from util.enterprise_helpers import set_enterprise_branding_filter_param
 
 AUDIT_LOG = logging.getLogger("audit")
 log = logging.getLogger(__name__)

@@ -147,8 +147,8 @@ class EnterpriseTestConsentRequired(object):
         * url: URL to test
         * status_code: expected status code of URL when no data sharing consent is required.
         """
-        with mock.patch('util.enterprise_helpers.enterprise_enabled', return_value=True):
-            with mock.patch('util.enterprise_helpers.consent_necessary_for_course') as mock_consent_necessary:
+        with mock.patch('openedx.features.enterprise_support.api.enterprise_enabled', return_value=True):
+            with mock.patch('openedx.features.enterprise_support.api.consent_necessary_for_course') as mock_consent_necessary:  # pylint: disable=line-too-long
                 # Ensure that when consent is necessary, the user is redirected to the consent page.
                 mock_consent_necessary.return_value = True
                 response = client.get(url)

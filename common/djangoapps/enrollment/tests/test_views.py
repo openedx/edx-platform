@@ -26,7 +26,7 @@ from course_modes.models import CourseMode
 from enrollment.views import EnrollmentUserThrottle
 from util.models import RateLimitConfiguration
 from util.testing import UrlResetMixin
-from util.tests.mixins.enterprise import EnterpriseServiceMockMixin
+from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
 from enrollment import api
 from enrollment.errors import CourseEnrollmentError
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview

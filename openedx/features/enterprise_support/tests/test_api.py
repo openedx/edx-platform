@@ -1,14 +1,14 @@
 """
-Test the enterprise app helpers
+Test the enterprise support APIs.
 """
+import mock
 import unittest
 
 from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.test.utils import override_settings
-import mock
 
-from util.enterprise_helpers import (
+from openedx.features.enterprise_support.api import (
     enterprise_enabled,
     insert_enterprise_pipeline_elements,
     data_sharing_consent_required,
@@ -21,9 +21,9 @@ from util.enterprise_helpers import (
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class TestEnterpriseHelpers(unittest.TestCase):
+class TestEnterpriseApi(unittest.TestCase):
     """
-    Test enterprise app helpers
+    Test enterprise support APIs.
     """
 
     @override_settings(ENABLE_ENTERPRISE_INTEGRATION=False)
@@ -101,7 +101,10 @@ class TestEnterpriseHelpers(unittest.TestCase):
             self.assertEqual(logo_url, None)
 
     @override_settings(ENABLE_ENTERPRISE_INTEGRATION=True)
-    @mock.patch('util.enterprise_helpers.get_enterprise_branding_filter_param', mock.Mock(return_value=None))
+    @mock.patch(
+        'openedx.features.enterprise_support.api.get_enterprise_branding_filter_param',
+        mock.Mock(return_value=None)
+    )
     def test_get_enterprise_customer_logo_url_return_none_when_param_missing(self):
         """
         Test get_enterprise_customer_logo_url return 'None' when filter parameters are missing.
@@ -142,8 +145,8 @@ class TestEnterpriseHelpers(unittest.TestCase):
         else:
             self.assertEqual(response, (args, kwargs))
 
-    @mock.patch('util.enterprise_helpers.enterprise_enabled')
-    @mock.patch('util.enterprise_helpers.consent_necessary_for_course')
+    @mock.patch('openedx.features.enterprise_support.api.enterprise_enabled')
+    @mock.patch('openedx.features.enterprise_support.api.consent_necessary_for_course')
     def test_data_consent_required_enterprise_disabled(self,
                                                        mock_consent_necessary,
                                                        mock_enterprise_enabled):
@@ -158,8 +161,8 @@ class TestEnterpriseHelpers(unittest.TestCase):
         mock_enterprise_enabled.assert_called_once()
         mock_consent_necessary.assert_not_called()
 
-    @mock.patch('util.enterprise_helpers.enterprise_enabled')
-    @mock.patch('util.enterprise_helpers.consent_necessary_for_course')
+    @mock.patch('openedx.features.enterprise_support.api.enterprise_enabled')
+    @mock.patch('openedx.features.enterprise_support.api.consent_necessary_for_course')
     def test_no_course_data_consent_required(self,
                                              mock_consent_necessary,
                                              mock_enterprise_enabled):
@@ -176,9 +179,9 @@ class TestEnterpriseHelpers(unittest.TestCase):
         mock_enterprise_enabled.assert_called_once()
         mock_consent_necessary.assert_called_once()
 
-    @mock.patch('util.enterprise_helpers.enterprise_enabled')
-    @mock.patch('util.enterprise_helpers.consent_necessary_for_course')
-    @mock.patch('util.enterprise_helpers.get_enterprise_consent_url')
+    @mock.patch('openedx.features.enterprise_support.api.enterprise_enabled')
+    @mock.patch('openedx.features.enterprise_support.api.consent_necessary_for_course')
+    @mock.patch('openedx.features.enterprise_support.api.get_enterprise_consent_url')
     def test_data_consent_required(self, mock_get_consent_url, mock_consent_necessary, mock_enterprise_enabled):
         """
         Verify that the wrapped function returns a redirect to the consent URL when enterprise integration is enabled,
@@ -195,7 +198,7 @@ class TestEnterpriseHelpers(unittest.TestCase):
         mock_enterprise_enabled.assert_called_once()
         mock_consent_necessary.assert_called_once()
 
-    @mock.patch('util.enterprise_helpers.consent_needed_for_course')
+    @mock.patch('openedx.features.enterprise_support.api.consent_needed_for_course')
     def test_get_enterprise_consent_url(self, needed_for_course_mock):
         """
         Verify that get_enterprise_consent_url correctly builds URLs.
@@ -264,7 +267,7 @@ class TestEnterpriseHelpers(unittest.TestCase):
         )
         self.assertEqual(notification_string, '')
 
-    @mock.patch('util.enterprise_helpers.EnterpriseCourseEnrollment')
+    @mock.patch('openedx.features.enterprise_support.api.EnterpriseCourseEnrollment')
     def test_get_dashboard_consent_notification_no_contact_info(self, ece_mock):
         mock_get_ece = ece_mock.objects.get
         ece_mock.DoesNotExist = Exception
@@ -300,7 +303,7 @@ class TestEnterpriseHelpers(unittest.TestCase):
         expected_header = 'Enrollment in edX Demo Course was not complete.'
         self.assertIn(expected_header, notification_string)
 
-    @mock.patch('util.enterprise_helpers.EnterpriseCourseEnrollment')
+    @mock.patch('openedx.features.enterprise_support.api.EnterpriseCourseEnrollment')
     def test_get_dashboard_consent_notification_contact_info(self, ece_mock):
         mock_get_ece = ece_mock.objects.get
         ece_mock.DoesNotExist = Exception

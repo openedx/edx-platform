@@ -22,11 +22,11 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from course_modes.models import CourseMode, Mode
 from course_modes.tests.factories import CourseModeFactory
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
+from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
 from student.models import CourseEnrollment
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
-from util.tests.mixins.enterprise import EnterpriseServiceMockMixin
 from util.tests.mixins.discovery import CourseCatalogServiceMockMixin
 from util import organizations_helpers as organizations_api
 
