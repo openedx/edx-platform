@@ -1,8 +1,8 @@
 (function(undefined) {
     'use strict';
-    var multiDescribe, state, oldOTBD;
+    var describeInfo, state, oldOTBD;
 
-    multiDescribe = new jasmine.MultiDescribe('', function() {
+    describeInfo = new jasmine.DescribeInfo('', function() {
         var Logger = window.Logger;
 
         beforeEach(function() {
@@ -211,7 +211,7 @@
                 state = jasmine.initializePlayer('video_html5.html');
                 done();
             });
-            jasmine.getEnv().describe(multiDescribe.description, multiDescribe.specDefinitions);
+            jasmine.getEnv().describe(describeInfo.description, describeInfo.specDefinitions);
         });
 
         describe('hls encoding', function() {
@@ -220,7 +220,7 @@
                 state = jasmine.initializeHLSPlayer();
                 done();
             });
-            jasmine.getEnv().describe(multiDescribe.description, multiDescribe.specDefinitions);
+            jasmine.getEnv().describe(describeInfo.description, describeInfo.specDefinitions);
         });
     });
 }).call(this);

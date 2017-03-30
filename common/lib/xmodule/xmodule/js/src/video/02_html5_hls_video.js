@@ -15,8 +15,7 @@
              * Initialize HLS video player.
              *
              * @param {jQuery} el  Reference to video player container element
-             * @param {Object} config  Cntains common config for video player
-             * @returns
+             * @param {Object} config  Contains common config for video player
              */
             function Player(el, config) {
                 var self = this;

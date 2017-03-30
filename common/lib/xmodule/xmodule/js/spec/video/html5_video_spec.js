@@ -4,7 +4,7 @@
         var state,
             oldOTBD,
             playbackRates = [0.75, 1.0, 1.25, 1.5],
-            multiDescribe;
+            describeInfo;
 
         beforeEach(function() {
             oldOTBD = window.onTouchBasedDevice;
@@ -20,7 +20,7 @@
             window.onTouchBasedDevice = oldOTBD;
         });
 
-        multiDescribe = new jasmine.MultiDescribe('on non-Touch devices ', function() {
+        describeInfo = new jasmine.DescribeInfo('on non-Touch devices ', function() {
             beforeEach(function() {
                 state.videoPlayer.player.config.events.onReady = jasmine.createSpy('onReady');
             });
@@ -327,7 +327,7 @@
                 state = jasmine.initializePlayer('video_html5.html');
                 done();
             });
-            jasmine.getEnv().describe(multiDescribe.description, multiDescribe.specDefinitions);
+            jasmine.getEnv().describe(describeInfo.description, describeInfo.specDefinitions);
         });
 
         describe('hls encoding', function() {
@@ -335,7 +335,7 @@
                 state = jasmine.initializeHLSPlayer();
                 done();
             });
-            jasmine.getEnv().describe(multiDescribe.description, multiDescribe.specDefinitions);
+            jasmine.getEnv().describe(describeInfo.description, describeInfo.specDefinitions);
         });
 
         it('native controls are used on  iPhone', function() {

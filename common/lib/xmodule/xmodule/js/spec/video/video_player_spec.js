@@ -1006,6 +1006,9 @@ function(VideoPlayer, HLS) {
 
             it('shows error message if hls is not supported', function() {
                 expect($('.video-hls-error')).not.toHaveClass('is-hidden');
+                expect($('.video-hls-error').text().trim()).toEqual(
+                    'Your browser does not support this video format. Try using a different browser.'
+                );
             });
         });
     });

@@ -273,7 +273,7 @@
         return jasmine.initializePlayer('video.html', params);
     };
 
-    jasmine.MultiDescribe = function(description, specDefinitions) {
+    jasmine.DescribeInfo = function(description, specDefinitions) {
         this.description = description;
         this.specDefinitions = specDefinitions;
     };
