@@ -29,7 +29,7 @@ from cms.lib.xblock.authoring_mixin import VISIBILITY_VIEW
 from contentstore.utils import (
     find_release_date_source, find_staff_lock_source, is_currently_visible_to_students,
     ancestor_has_staff_lock, has_children_visible_to_specific_content_groups,
-    get_user_partition_info, get_group_display_name,
+    get_user_partition_info, get_split_group_display_name,
 )
 from contentstore.views.helpers import is_unit, xblock_studio_url, xblock_primary_child_category, \
     xblock_type_display_name, get_parent_xblock, create_xblock, usage_key_with_run
@@ -1125,7 +1125,6 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
             # a percent value out of 100, e.g. "58%" means "58/100".
             pct_sign=_('%'))
 
-    user_partitions = get_user_partition_info(xblock, course=course)
     xblock_info = {
         'id': unicode(xblock.location),
         'display_name': xblock.display_name_with_default,
@@ -1136,9 +1135,10 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         if child_info and len(child_info.get('children', [])) > 0:
             xblock_info['child_info'] = child_info
         # Groups are labelled with their internal ids, rather than with the group name. Replace id with display name.
-        group_display_name = get_group_display_name(user_partitions, xblock_info['display_name'])
+        group_display_name = get_split_group_display_name(xblock, course)
         xblock_info['display_name'] = group_display_name if group_display_name else xblock_info['display_name']
     else:
+        user_partitions = get_user_partition_info(xblock, course=course)
         xblock_info.update({
             'edited_on': get_default_time_display(xblock.subtree_edited_on) if xblock.subtree_edited_on else None,
             'published': published,

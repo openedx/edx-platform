@@ -283,20 +283,20 @@ def reverse_usage_url(handler_name, usage_key, kwargs=None):
     return reverse_url(handler_name, 'usage_key_string', usage_key, kwargs)
 
 
-def get_group_display_name(user_partitions, xblock_display_name):
+def get_split_group_display_name(xblock, course):
     """
-    Get the group name if matching group xblock is found.
+    Returns group name if an xblock is found in user partition groups that are suitable for the split_test module.
 
     Arguments:
-        user_partitions (Dict): Locator of source item.
-        xblock_display_name (String): Display name of group xblock.
+        xblock (XBlock): The courseware component.
+        course (XBlock): The course descriptor.
 
     Returns:
-        group name (String): Group name of the matching group.
+        group name (String): Group name of the matching group xblock.
     """
-    for user_partition in user_partitions:
+    for user_partition in get_user_partition_info(xblock, schemes=['random'], course=course):
         for group in user_partition['groups']:
-            if str(group['id']) in xblock_display_name:
+            if 'Group ID {group_id}'.format(group_id=group['id']) == xblock.display_name_with_default:
                 return group['name']
 
 
