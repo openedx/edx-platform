@@ -181,7 +181,7 @@ class TestCourseGradeFactory(GradeTestBase):
         with self.assertNumQueries(12), mock_get_score(1, 2):
             _assert_create(expected_pass=True)
 
-        with self.assertNumQueries(14), mock_get_score(1, 2):
+        with self.assertNumQueries(15), mock_get_score(1, 2):
             grade_factory.update(self.request.user, self.course)
 
         with self.assertNumQueries(1):
@@ -294,7 +294,7 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
                 self.assertFalse(mock_create_grade.called)
 
         self.assertEqual(grade_a.url_name, grade_b.url_name)
-        grade_b.all_total.attempted = False  # TODO TNL-5930
+        grade_b.all_total.first_attempted = None
         self.assertEqual(grade_a.all_total, grade_b.all_total)
 
     def test_update(self):
@@ -360,7 +360,7 @@ class ZeroGradeTest(GradeTestBase):
             for section in chapter_grades[chapter]['sections']:
                 for score in section.locations_to_scores.itervalues():
                     self.assertEqual(score.earned, 0)
-                    self.assertEqual(score.attempted, False)
+                    self.assertEqual(score.first_attempted, None)
                 self.assertEqual(section.all_total.earned, 0)
 
 
@@ -403,7 +403,7 @@ class SubsectionGradeTest(GradeTestBase):
         )
 
         self.assertEqual(input_grade.url_name, loaded_grade.url_name)
-        loaded_grade.all_total.attempted = False  # TODO TNL-5930
+        loaded_grade.all_total.first_attempted = None
         self.assertEqual(input_grade.all_total, loaded_grade.all_total)
 
 
@@ -471,7 +471,7 @@ class TestMultipleProblemTypesSubsectionScores(SharedModuleStoreTestCase):
             # Configure one block to return no possible score, the rest to return 3.0 earned / 7.0 possible
             block_count = self.SCORED_BLOCK_COUNT - 1
             mock_score.side_effect = itertools.chain(
-                [(earned_per_block, None, earned_per_block, None, True)],
+                [(earned_per_block, None, earned_per_block, None, datetime.datetime(2000, 1, 1))],
                 itertools.repeat(mock_score.return_value)
             )
             score = subsection_factory.update(self.seq1)
