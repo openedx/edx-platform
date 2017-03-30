@@ -36,22 +36,22 @@ class StaffPreviewPage(PageObject):
     @property
     def staff_view_mode(self):
         """
-        Return the currently chosen view mode, e.g. "Staff", "Student" or a content group.
+        Return the currently chosen view mode, e.g. "Staff", "Learner" or a content group.
         """
         return self.q(css=self.VIEW_MODE_OPTIONS_CSS).filter(lambda el: el.is_selected()).first.text[0]
 
     def set_staff_view_mode(self, view_mode):
         """
-        Set the current view mode, e.g. "Staff", "Student" or a content group.
+        Set the current view mode, e.g. "Staff", "Learner" or a content group.
         """
         self.q(css=self.VIEW_MODE_OPTIONS_CSS).filter(lambda el: el.text.strip() == view_mode).first.click()
         self.wait_for_ajax()
 
     def set_staff_view_mode_specific_student(self, username_or_email):
         """
-        Set the current preview mode to "Specific Student" with the given username or email
+        Set the current preview mode to "Specific learner" with the given username or email
         """
-        required_mode = "Specific student"
+        required_mode = "Specific learner"
         if self.staff_view_mode != required_mode:
             self.q(css=self.VIEW_MODE_OPTIONS_CSS).filter(lambda el: el.text == required_mode).first.click()
         # Use a script here because .clear() + .send_keys() triggers unwanted behavior if a username is already set
