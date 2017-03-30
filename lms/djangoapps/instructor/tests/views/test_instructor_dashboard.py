@@ -336,14 +336,27 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         response = self.client.get(self.url)
         self.assertNotIn(ora_section, response.content)
 
-        course = ItemFactory.create(
-            parent_location=self.course.location,
-            category="course",
-            display_name="Test course",
-        )
-        ItemFactory.create(parent_location=course.location, category="openassessment")
+        ItemFactory.create(parent_location=self.course.location, category="openassessment")
         response = self.client.get(self.url)
         self.assertIn(ora_section, response.content)
+
+    def test_open_response_assessment_page_orphan(self):
+        """
+        Tests that the open responses tab loads if the course contains an
+        orphaned openassessment block
+        """
+        # create non-orphaned openassessment block
+        ItemFactory.create(
+            parent_location=self.course.location,
+            category="openassessment",
+        )
+        # create orphan
+        self.store.create_item(
+            self.user.id, self.course.id, 'openassessment', "orphan"
+        )
+        response = self.client.get(self.url)
+        # assert we don't get a 500 error
+        self.assertEqual(200, response.status_code)
 
 
 @ddt.ddt
