@@ -5,7 +5,11 @@ from django.contrib import admin
 
 from config_models.admin import ConfigurationModelAdmin, KeyedConfigurationModelAdmin
 
-from lms.djangoapps.grades.config.models import CoursePersistentGradesFlag, PersistentGradesEnabledFlag
+from lms.djangoapps.grades.config.models import (
+    CoursePersistentGradesFlag,
+    PersistentGradesEnabledFlag,
+    ComputeGradesSetting,
+)
 from lms.djangoapps.grades.config.forms import CoursePersistentGradesAdminForm
 
 
@@ -25,3 +29,4 @@ class CoursePersistentGradesAdmin(KeyedConfigurationModelAdmin):
 
 admin.site.register(CoursePersistentGradesFlag, CoursePersistentGradesAdmin)
 admin.site.register(PersistentGradesEnabledFlag, ConfigurationModelAdmin)
+admin.site.register(ComputeGradesSetting, ConfigurationModelAdmin)
