@@ -17,6 +17,8 @@ from util.json_request import expect_json, JsonResponse
 from opaque_keys.edx.keys import CourseKey
 from xblock.fragment import Fragment
 from xblock.runtime import KeyValueStore
+from xmodule.partitions.partitions import NoSuchUserPartitionGroupError
+
 
 log = logging.getLogger(__name__)
 
@@ -170,16 +172,20 @@ def is_masquerading_as_specific_student(user, course_key):  # pylint: disable=in
     return bool(course_masquerade and course_masquerade.user_name)
 
 
-def get_masquerading_group_info(user, course_key):
+def get_masquerading_user_group(course_key, user, user_partition):
     """
-    If the user is masquerading as belonging to a group, then this method returns
-    two values: the id of the group, and the id of the user partition that the group
-    belongs to. If the user is not masquerading as a group, then None is returned.
+    If the current user is masquerading as a generic learner in a specific group, return that group.
+    If the user is not masquerading as a group, then None is returned.
     """
     course_masquerade = get_course_masquerade(user, course_key)
-    if not course_masquerade:
-        return None, None
-    return course_masquerade.group_id, course_masquerade.user_partition_id
+    if course_masquerade:
+        if course_masquerade.user_partition_id == user_partition.id and course_masquerade.group_id is not None:
+            try:
+                return user_partition.get_group(course_masquerade.group_id)
+            except NoSuchUserPartitionGroupError:
+                return None
+    # The user is masquerading as a generic student or not masquerading as a group return None
+    return None
 
 
 # Sentinel object to mark deleted objects in the session cache

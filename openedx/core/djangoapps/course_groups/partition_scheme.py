@@ -5,8 +5,8 @@ import logging
 
 from courseware.masquerade import (  # pylint: disable=import-error
     get_course_masquerade,
-    get_masquerading_group_info,
-    is_masquerading_as_specific_student,
+    get_masquerading_user_group,
+    is_masquerading_as_specific_student
 )
 from xmodule.partitions.partitions import NoSuchUserPartitionGroupError
 
@@ -45,14 +45,7 @@ class CohortPartitionScheme(object):
         # user is masquerading as a generic student in a specific group, then
         # return that group.
         if get_course_masquerade(user, course_key) and not is_masquerading_as_specific_student(user, course_key):
-            group_id, user_partition_id = get_masquerading_group_info(user, course_key)
-            if user_partition_id == user_partition.id and group_id is not None:
-                try:
-                    return user_partition.get_group(group_id)
-                except NoSuchUserPartitionGroupError:
-                    return None
-            # The user is masquerading as a generic student. We can't show any particular group.
-            return None
+            return get_masquerading_user_group(course_key, user, user_partition)
 
         cohort = get_cohort(user, course_key, use_cached=use_cached)
         if cohort is None:

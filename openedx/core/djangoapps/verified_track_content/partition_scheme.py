@@ -5,8 +5,8 @@ from django.conf import settings
 
 from courseware.masquerade import (
     get_course_masquerade,
-    get_masquerading_group_info,
-    is_masquerading_as_specific_student,
+    get_masquerading_user_group,
+    is_masquerading_as_specific_student
 )
 from course_modes.models import CourseMode
 from student.models import CourseEnrollment
@@ -79,24 +79,13 @@ class EnrollmentTrackPartitionScheme(object):
         if is_course_using_cohort_instead(course_key):
             return None
 
-        # NOTE: masquerade code was copied from CohortPartitionScheme, and it may need
-        # some changes (or if not, code should be refactored out and shared).
-        # This work will be done in a future story TNL-6739.
-
         # First, check if we have to deal with masquerading.
         # If the current user is masquerading as a specific student, use the
         # same logic as normal to return that student's group. If the current
         # user is masquerading as a generic student in a specific group, then
         # return that group.
         if get_course_masquerade(user, course_key) and not is_masquerading_as_specific_student(user, course_key):
-            group_id, user_partition_id = get_masquerading_group_info(user, course_key)
-            if user_partition_id == user_partition.id and group_id is not None:
-                try:
-                    return user_partition.get_group(group_id)
-                except NoSuchUserPartitionGroupError:
-                    return None
-            # The user is masquerading as a generic student. We can't show any particular group.
-            return None
+            return get_masquerading_user_group(course_key, user, user_partition)
 
         mode_slug, is_active = CourseEnrollment.enrollment_mode_for_user(user, course_key)
         if mode_slug and is_active:
