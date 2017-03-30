@@ -5,6 +5,7 @@ Namespace that defines fields common to all blocks used in the LMS
 #from django.utils.translation import ugettext_noop as _
 from lazy import lazy
 
+from xblock.core import XBlock
 from xblock.fields import Boolean, Scope, String, XBlockMixin, Dict
 from xblock.validation import ValidationMessage
 from xmodule.modulestore.inheritance import UserPartitionList
@@ -26,6 +27,7 @@ class GroupAccessDict(Dict):
             return {unicode(k): access_dict[k] for k in access_dict}
 
 
+@XBlock.needs('partitions')
 class LmsBlockMixin(XBlockMixin):
     """
     Mixin that defines fields common to all blocks used in the LMS
@@ -128,10 +130,10 @@ class LmsBlockMixin(XBlockMixin):
 
     def _get_user_partition(self, user_partition_id):
         """
-        Returns the user partition with the specified id.  Raises
-        `NoSuchUserPartitionError` if the lookup fails.
+        Returns the user partition with the specified id. Note that this method can return
+        an inactive user partition. Raises `NoSuchUserPartitionError` if the lookup fails.
         """
-        for user_partition in self.user_partitions:
+        for user_partition in self.runtime.service(self, 'partitions').course_partitions:
             if user_partition.id == user_partition_id:
                 return user_partition
 

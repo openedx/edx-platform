@@ -93,6 +93,8 @@ FEATURES['LICENSING'] = True
 FEATURES['ENABLE_MOBILE_REST_API'] = True  # Enable video bumper in Studio
 FEATURES['ENABLE_VIDEO_BUMPER'] = True  # Enable video bumper in Studio settings
 
+FEATURES['ENABLE_ENROLLMENT_TRACK_USER_PARTITION'] = True
+
 # Enable partner support link in Studio footer
 PARTNER_SUPPORT_EMAIL = 'partner-support@example.com'
 
