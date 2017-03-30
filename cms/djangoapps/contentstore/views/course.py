@@ -30,6 +30,7 @@ from .library import LIBRARIES_ENABLED, get_library_creator_status
 from ccx_keys.locator import CCXLocator
 from contentstore.course_group_config import (
     COHORT_SCHEME,
+    ENROLLMENT_SCHEME,
     GroupConfiguration,
     GroupConfigurationsValidationError,
     RANDOM_SCHEME,
@@ -98,7 +99,6 @@ from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError
 from xmodule.tabs import CourseTab, CourseTabList, InvalidTabsException
-
 
 log = logging.getLogger(__name__)
 
@@ -1473,7 +1473,7 @@ def remove_content_or_experiment_group(request, store, course, configuration, gr
             return JsonResponse(status=404)
 
         group_id = int(group_id)
-        usages = GroupConfiguration.get_content_groups_usage_info(store, course)
+        usages = GroupConfiguration.get_partitions_usage_info(store, course)
         used = group_id in usages
 
         if used:
@@ -1521,7 +1521,24 @@ def group_configurations_list_handler(request, course_key_string):
             else:
                 experiment_group_configurations = None
 
-            content_group_configuration = GroupConfiguration.get_or_create_content_group(store, course)
+            all_partitions = GroupConfiguration.get_all_user_partition_details(store, course)
+            should_show_enrollment_track = False
+            group_schemes = []
+            for partition in all_partitions:
+                group_schemes.append(partition['scheme'])
+                if partition['scheme'] == ENROLLMENT_SCHEME:
+                    enrollment_track_configuration = partition
+                    should_show_enrollment_track = len(enrollment_track_configuration['groups']) > 1
+
+                    # Remove the enrollment track partition and add it to the front of the list if it should be shown.
+                    all_partitions.remove(partition)
+                    if should_show_enrollment_track:
+                        all_partitions.insert(0, partition)
+
+            # Add empty content group if there is no COHORT User Partition in the list.
+            # This will add ability to add new groups in the view.
+            if COHORT_SCHEME not in group_schemes:
+                all_partitions.append(GroupConfiguration.get_or_create_content_group(store, course))
 
             return render_to_response('group_configurations.html', {
                 'context_course': course,
@@ -1529,7 +1546,8 @@ def group_configurations_list_handler(request, course_key_string):
                 'course_outline_url': course_outline_url,
                 'experiment_group_configurations': experiment_group_configurations,
                 'should_show_experiment_groups': should_show_experiment_groups,
-                'content_group_configuration': content_group_configuration
+                'all_group_configurations': all_partitions,
+                'should_show_enrollment_track': should_show_enrollment_track
             })
         elif "application/json" in request.META.get('HTTP_ACCEPT'):
             if request.method == 'POST':

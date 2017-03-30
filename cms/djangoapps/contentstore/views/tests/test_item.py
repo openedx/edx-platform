@@ -372,7 +372,7 @@ class GetItemTest(ItemTest):
         self.assertEqual(result["user_partitions"], [
             {
                 "id": ENROLLMENT_TRACK_PARTITION_ID,
-                "name": "Enrollment Tracks",
+                "name": "Enrollment Track Groups",
                 "scheme": "enrollment_track",
                 "groups": [
                     {

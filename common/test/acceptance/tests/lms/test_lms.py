@@ -38,8 +38,8 @@ from common.test.acceptance.pages.lms.pay_and_verify import PaymentAndVerificati
 from common.test.acceptance.pages.lms.progress import ProgressPage
 from common.test.acceptance.pages.lms.problem import ProblemPage
 from common.test.acceptance.pages.lms.tab_nav import TabNavPage
-from common.test.acceptance.pages.lms.track_selection import TrackSelectionPage
 from common.test.acceptance.pages.lms.video.video import VideoPage
+from common.test.acceptance.pages.common.utils import enroll_user_track
 from common.test.acceptance.pages.studio.settings import SettingsPage
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc, CourseUpdateDesc
 
@@ -417,7 +417,6 @@ class PayAndVerifyTest(EventsTestMixin, UniqueCourseTest):
         """
         super(PayAndVerifyTest, self).setUp()
 
-        self.track_selection_page = TrackSelectionPage(self.browser, self.course_id)
         self.payment_and_verification_flow = PaymentAndVerificationFlow(self.browser, self.course_id)
         self.immediate_verification_page = PaymentAndVerificationFlow(self.browser, self.course_id, entry_point='verify-now')
         self.upgrade_page = PaymentAndVerificationFlow(self.browser, self.course_id, entry_point='upgrade')
@@ -443,17 +442,7 @@ class PayAndVerifyTest(EventsTestMixin, UniqueCourseTest):
         # Create a user and log them in
         student_id = AutoAuthPage(self.browser).visit().get_user_id()
 
-        # Navigate to the track selection page
-        self.track_selection_page.visit()
-
-        # Enter the payment and verification flow by choosing to enroll as verified
-        self.track_selection_page.enroll('verified')
-
-        # Proceed to the fake payment page
-        self.payment_and_verification_flow.proceed_to_payment()
-
-        # Submit payment
-        self.fake_payment_page.submit_payment()
+        enroll_user_track(self.browser, self.course_id, 'verified')
 
         # Proceed to verification
         self.payment_and_verification_flow.immediate_verification()
@@ -480,17 +469,7 @@ class PayAndVerifyTest(EventsTestMixin, UniqueCourseTest):
         # Create a user and log them in
         student_id = AutoAuthPage(self.browser).visit().get_user_id()
 
-        # Navigate to the track selection page
-        self.track_selection_page.visit()
-
-        # Enter the payment and verification flow by choosing to enroll as verified
-        self.track_selection_page.enroll('verified')
-
-        # Proceed to the fake payment page
-        self.payment_and_verification_flow.proceed_to_payment()
-
-        # Submit payment
-        self.fake_payment_page.submit_payment()
+        enroll_user_track(self.browser, self.course_id, 'verified')
 
         # Navigate to the dashboard
         self.dashboard_page.visit()

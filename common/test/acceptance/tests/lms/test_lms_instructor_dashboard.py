@@ -19,9 +19,9 @@ from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDash
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.lms.dashboard import DashboardPage
 from common.test.acceptance.pages.lms.problem import ProblemPage
-from common.test.acceptance.pages.lms.track_selection import TrackSelectionPage
-from common.test.acceptance.pages.lms.pay_and_verify import PaymentAndVerificationFlow, FakePaymentPage
+from common.test.acceptance.pages.lms.pay_and_verify import PaymentAndVerificationFlow
 from common.test.acceptance.pages.lms.login_and_register import CombinedLoginAndRegisterPage
+from common.test.acceptance.pages.common.utils import enroll_user_track
 from common.test.acceptance.tests.helpers import disable_animations
 from common.test.acceptance.fixtures.certificates import CertificateConfigFixture
 
@@ -247,13 +247,6 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
             )
         ).install()
 
-        self.track_selection_page = TrackSelectionPage(self.browser, self.course_id)
-        self.payment_and_verification_flow = PaymentAndVerificationFlow(self.browser, self.course_id)
-        self.immediate_verification_page = PaymentAndVerificationFlow(
-            self.browser, self.course_id, entry_point='verify-now'
-        )
-        self.upgrade_page = PaymentAndVerificationFlow(self.browser, self.course_id, entry_point='upgrade')
-        self.fake_payment_page = FakePaymentPage(self.browser, self.course_id)
         self.dashboard_page = DashboardPage(self.browser)
         self.problem_page = ProblemPage(self.browser)
 
@@ -279,19 +272,7 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         """
 
         self._auto_auth(self.USERNAME, self.EMAIL, False)
-
-        # the track selection page cannot be visited. see the other tests to see if any prereq is there.
-        # Navigate to the track selection page
-        self.track_selection_page.visit()
-
-        # Enter the payment and verification flow by choosing to enroll as verified
-        self.track_selection_page.enroll('verified')
-
-        # Proceed to the fake payment page
-        self.payment_and_verification_flow.proceed_to_payment()
-
-        # Submit payment
-        self.fake_payment_page.submit_payment()
+        enroll_user_track(self.browser, self.course_id, 'verified')
 
     def _create_a_proctored_exam_and_attempt(self):
         """
