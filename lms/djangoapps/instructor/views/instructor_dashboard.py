@@ -534,7 +534,6 @@ def _section_student_admin(course, access):
         'section_display_name': _('Student Admin'),
         'access': access,
         'is_small_course': is_small_course,
-        'get_student_progress_url_url': reverse('get_student_progress_url', kwargs={'course_id': unicode(course_key)}),
         'enrollment_url': reverse('students_update_enrollment', kwargs={'course_id': unicode(course_key)}),
         'reset_student_attempts_url': reverse('reset_student_attempts', kwargs={'course_id': unicode(course_key)}),
         'reset_student_attempts_for_entrance_exam_url': reverse(

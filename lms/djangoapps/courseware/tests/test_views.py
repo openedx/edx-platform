@@ -1221,90 +1221,20 @@ class ProgressPageTests(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, expected_status_code)
         return resp
 
-    def _get_student_progress_page(self, expected_status_code=200):
-        """
-        Gets the progress page for the user in the course.
-        """
-        resp = self.client.get(
-            reverse('student_progress', args=[unicode(self.course.id), self.user.id])
-        )
-        self.assertEqual(resp.status_code, expected_status_code)
-        return resp
-
     @ddt.data('"><script>alert(1)</script>', '<script>alert(1)</script>', '</script><script>alert(1)</script>')
     def test_progress_page_xss_prevent(self, malicious_code):
         """
         Test that XSS attack is prevented
         """
-        resp = self._get_student_progress_page()
+        resp = self._get_progress_page()
         # Test that malicious code does not appear in html
         self.assertNotIn(malicious_code, resp.content)
+
+    # TODO: add some more tests to replace the ones I just removed, TNL-6652
 
     def test_pure_ungraded_xblock(self):
         ItemFactory.create(category='acid', parent_location=self.vertical.location)
         self._get_progress_page()
-
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_student_progress_with_valid_and_invalid_id(self, default_store):
-        """
-         Check that invalid 'student_id' raises Http404 for both old mongo and
-         split mongo courses.
-        """
-
-        # Create new course with respect to 'default_store'
-        # Enroll student into course
-        self.course = CourseFactory.create(default_store=default_store)
-        CourseEnrollmentFactory(user=self.user, course_id=self.course.id, mode=CourseMode.HONOR)
-
-        # Invalid Student Ids (Integer and Non-int)
-        invalid_student_ids = [
-            991021,
-            'azU3N_8$',
-        ]
-        for invalid_id in invalid_student_ids:
-
-            resp = self.client.get(
-                reverse('student_progress', args=[unicode(self.course.id), invalid_id])
-            )
-            self.assertEquals(resp.status_code, 404)
-
-        # Assert that valid 'student_id' returns 200 status
-        self._get_student_progress_page()
-
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_unenrolled_student_progress_for_credit_course(self, default_store):
-        """
-         Test that student progress page does not break while checking for an unenrolled student.
-
-         Scenario: When instructor checks the progress of a student who is not enrolled in credit course.
-         It should return 200 response.
-        """
-        # Create a new course, a user which will not be enrolled in course, admin user for staff access
-        course = CourseFactory.create(default_store=default_store)
-        not_enrolled_user = UserFactory.create()
-        admin = AdminFactory.create()
-        self.assertTrue(self.client.login(username=admin.username, password='test'))
-
-        # Create and enable Credit course
-        CreditCourse.objects.create(course_key=course.id, enabled=True)
-
-        # Configure a credit provider for the course
-        CreditProvider.objects.create(
-            provider_id="ASU",
-            enable_integration=True,
-            provider_url="https://credit.example.com/request"
-        )
-
-        requirements = [{
-            "namespace": "grade",
-            "name": "grade",
-            "display_name": "Grade",
-            "criteria": {"min_grade": 0.52},
-        }]
-        # Add a single credit requirement (final grade)
-        set_credit_requirements(course.id, requirements)
-
-        self._get_student_progress_page()
 
     def test_non_ascii_grade_cutoffs(self):
         self._get_progress_page()

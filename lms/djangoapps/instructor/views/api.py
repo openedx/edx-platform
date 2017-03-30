@@ -1875,36 +1875,6 @@ def get_anon_ids(request, course_id):  # pylint: disable=unused-argument
     return csv_response(course_id.to_deprecated_string().replace('/', '-') + '-anon-ids.csv', header, rows)
 
 
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@common_exceptions_400
-@require_level('staff')
-@require_post_params(
-    unique_student_identifier="email or username of student for whom to get progress url"
-)
-def get_student_progress_url(request, course_id):
-    """
-    Get the progress url of a student.
-    Limited to staff access.
-
-    Takes query parameter unique_student_identifier and if the student exists
-    returns e.g. {
-        'progress_url': '/../...'
-    }
-    """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    user = get_student_from_identifier(request.POST.get('unique_student_identifier'))
-
-    progress_url = reverse('student_progress', kwargs={'course_id': course_id.to_deprecated_string(), 'student_id': user.id})
-
-    response_payload = {
-        'course_id': course_id.to_deprecated_string(),
-        'progress_url': progress_url,
-    }
-    return JsonResponse(response_payload)
-
-
 @transaction.non_atomic_requests
 @require_POST
 @ensure_csrf_cookie
