@@ -46,6 +46,13 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase, EnterpriseServiceMo
         self.user = UserFactory.create(username="Bob", email="bob@example.com", password="edx")
         self.client.login(username=self.user.username, password="edx")
 
+        # Create a service user, because the track selection page depends on it
+        UserFactory.create(
+            username='enterprise_worker',
+            email="enterprise_worker@example.com",
+            password="edx",
+        )
+
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     @httpretty.activate
     @ddt.data(
@@ -74,12 +81,6 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase, EnterpriseServiceMo
             )
 
         self.mock_enterprise_learner_api()
-        # Create a service user and log in.
-        UserFactory.create(
-            username='enterprise_worker',
-            email="bob@example.com",
-            password="edx",
-        )
 
         # Configure whether we're upgrading or not
         url = reverse('course_modes_choose', args=[unicode(self.course.id)])
@@ -137,12 +138,6 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase, EnterpriseServiceMo
             CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)
 
         self.mock_enterprise_learner_api()
-        # Create a service user and log in.
-        UserFactory.create(
-            username='enterprise_worker',
-            email="bob@example.com",
-            password="edx",
-        )
 
         # User visits the track selection page directly without ever enrolling
         url = reverse('course_modes_choose', args=[unicode(self.course.id)])
@@ -160,12 +155,6 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase, EnterpriseServiceMo
             CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)
 
         self.mock_enterprise_learner_api()
-        # Create a service user and log in.
-        UserFactory.create(
-            username='enterprise_worker',
-            email="bob@example.com",
-            password="edx",
-        )
 
         # User visits the track selection page directly without ever enrolling
         url = reverse('course_modes_choose', args=[unicode(self.course.id)])
@@ -192,12 +181,6 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase, EnterpriseServiceMo
             CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)
 
         self.mock_enterprise_learner_api()
-        # Create a service user and log in.
-        UserFactory.create(
-            username='enterprise_worker',
-            email="bob@example.com",
-            password="edx",
-        )
 
         # Creating organization
         for i in xrange(2):
@@ -252,12 +235,6 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase, EnterpriseServiceMo
         )
 
         self.mock_enterprise_learner_api()
-        # Create a service user and log in.
-        UserFactory.create(
-            username='enterprise_worker',
-            email="bob@example.com",
-            password="edx",
-        )
 
         # Verify that the prices render correctly
         response = self.client.get(
@@ -281,12 +258,6 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase, EnterpriseServiceMo
             CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)
 
         self.mock_enterprise_learner_api()
-        # Create a service user and log in.
-        UserFactory.create(
-            username='enterprise_worker',
-            email="bob@example.com",
-            password="edx",
-        )
 
         # Check whether credit upsell is shown on the page
         # This should *only* be shown when a credit mode is available
@@ -328,13 +299,14 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase, EnterpriseServiceMo
     # Mapping of course modes to the POST parameters sent
     # when the user chooses that mode.
     POST_PARAMS_FOR_COURSE_MODE = {
-        'audit': {},
+        'audit': {'audit_mode': True},
         'honor': {'honor_mode': True},
         'verified': {'verified_mode': True, 'contribution': '1.23'},
         'unsupported': {'unsupported_mode': True},
     }
 
     @ddt.data(
+        ('audit', 'dashboard'),
         ('honor', 'dashboard'),
         ('verified', 'start-flow'),
     )
@@ -361,6 +333,41 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase, EnterpriseServiceMo
             self.fail("Must provide a valid redirect URL name")
 
         self.assertRedirects(response, redirect_url)
+
+    def test_choose_mode_audit_enroll_on_post(self):
+        audit_mode = 'audit'
+        # Create the course modes
+        for mode in (audit_mode, 'verified'):
+            min_price = 0 if mode in [audit_mode] else 1
+            CourseModeFactory.create(mode_slug=mode, course_id=self.course.id, min_price=min_price)
+
+        # Assert learner is not enrolled in Audit track pre-POST
+        mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
+        self.assertIsNone(mode)
+        self.assertIsNone(is_active)
+
+        # Choose the audit mode (POST request)
+        choose_track_url = reverse('course_modes_choose', args=[unicode(self.course.id)])
+        self.client.post(choose_track_url, self.POST_PARAMS_FOR_COURSE_MODE[audit_mode])
+
+        # Assert learner is enrolled in Audit track post-POST
+        mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
+        self.assertEqual(mode, audit_mode)
+        self.assertTrue(is_active)
+
+        # Unenroll learner from Audit track and confirm the enrollment record is now 'inactive'
+        CourseEnrollment.unenroll(self.user, self.course.id)
+        mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
+        self.assertEqual(mode, audit_mode)
+        self.assertFalse(is_active)
+
+        # Choose the audit mode again
+        self.client.post(choose_track_url, self.POST_PARAMS_FOR_COURSE_MODE[audit_mode])
+
+        # Assert learner is again enrolled in Audit track post-POST-POST
+        mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
+        self.assertEqual(mode, audit_mode)
+        self.assertTrue(is_active)
 
     def test_remember_donation_for_course(self):
         # Create the course modes
@@ -495,12 +502,6 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase, EnterpriseServiceMo
             CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)
 
         self.mock_enterprise_learner_api()
-        # Create a service user and log in.
-        UserFactory.create(
-            username='enterprise_worker',
-            email="bob@example.com",
-            password="edx",
-        )
 
         # Load the track selection page
         url = reverse('course_modes_choose', args=[unicode(self.course.id)])
@@ -546,6 +547,13 @@ class TrackSelectionEmbargoTest(UrlResetMixin, ModuleStoreTestCase, EnterpriseSe
         self.user = UserFactory.create(username="Bob", email="bob@example.com", password="edx")
         self.client.login(username=self.user.username, password="edx")
 
+        # Create a service user
+        UserFactory.create(
+            username='enterprise_worker',
+            email="enterprise_worker@example.com",
+            password="edx",
+        )
+
         # Construct the URL for the track selection page
         self.url = reverse('course_modes_choose', args=[unicode(self.course.id)])
 
@@ -559,11 +567,5 @@ class TrackSelectionEmbargoTest(UrlResetMixin, ModuleStoreTestCase, EnterpriseSe
     def test_embargo_allow(self):
 
         self.mock_enterprise_learner_api()
-        # Create a service user and log in.
-        UserFactory.create(
-            username='enterprise_worker',
-            email="bob@example.com",
-            password="edx",
-        )
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
