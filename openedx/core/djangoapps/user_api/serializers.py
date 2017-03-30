@@ -20,9 +20,13 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 
     def get_name(self, user):
         """
-        Return the name attribute from the user profile object
+        Return the name attribute from the user profile object if profile exists else none
         """
-        profile = UserProfile.objects.get(user=user)
+        try:
+            profile = UserProfile.objects.get(user=user)
+        except UserProfile.DoesNotExist:
+            return None
+
         return profile.name
 
     def get_preferences(self, user):
