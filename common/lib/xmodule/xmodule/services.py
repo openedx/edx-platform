@@ -1,6 +1,9 @@
 """
 Module contains various XModule/XBlock services
 """
+import inspect
+
+from config_models.models import ConfigurationModel
 from django.conf import settings
 
 
@@ -61,3 +64,32 @@ class SettingsService(object):
         xblock_settings_bucket = getattr(block, self.xblock_settings_bucket_selector, block.unmixed_class.__name__)
         xblock_settings = settings.XBLOCK_SETTINGS if hasattr(settings, "XBLOCK_SETTINGS") else {}
         return xblock_settings.get(xblock_settings_bucket, actual_default)
+
+
+# TODO: ConfigurationService and its usage will be removed as a part of EDUCATOR-121
+# reference: https://openedx.atlassian.net/browse/EDUCATOR-121
+class ConfigurationService(object):
+    """
+    An XBlock service to talk with the Configuration Models. This service should provide
+    a pathway to Configuration Model which is designed to configure the corresponding XBlock.
+    """
+    def __init__(self, configuration_model):
+        """
+        Class initializer, this exposes configuration model to XBlock.
+
+        Arguments:
+            configuration_model (ConfigurationModel): configurations for an XBlock
+
+        Raises:
+            exception (ValueError): when configuration_model is not a subclass of
+            ConfigurationModel.
+        """
+        if not (inspect.isclass(configuration_model) and issubclass(configuration_model, ConfigurationModel)):
+            raise ValueError(
+                "Expected ConfigurationModel got {0} of type {1}".format(
+                    configuration_model,
+                    type(configuration_model)
+                )
+            )
+
+        self.configuration = configuration_model
