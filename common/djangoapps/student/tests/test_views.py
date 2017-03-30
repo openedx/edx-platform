@@ -18,7 +18,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 from student.cookies import get_user_info_cookie_data
 from student.helpers import DISABLE_UNENROLL_CERT_STATES
-from student.models import CourseEnrollment, LogoutViewConfiguration
+from student.models import CourseEnrollment, LogoutViewConfiguration, UserProfile
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 
 PASSWORD = 'test'
@@ -221,3 +221,11 @@ class StudentDashboardTests(TestCase):
         self.client.get(self.path)
         actual = self.client.cookies[settings.EDXMKTG_USER_INFO_COOKIE_NAME].value
         self.assertEqual(actual, expected)
+
+    def test_redirect_account_settings(self):
+        """
+        Verify if user does not have profile he/she is redirected to account_settings.
+        """
+        UserProfile.objects.get(user=self.user).delete()
+        response = self.client.get(self.path)
+        self.assertRedirects(response, reverse('account_settings'))
