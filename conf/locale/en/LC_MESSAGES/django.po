@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-03-16 12:17+0000\n"
-"PO-Revision-Date: 2017-03-16 12:17:54.661887\n"
+"POT-Creation-Date: 2017-03-30 10:54+0000\n"
+"PO-Revision-Date: 2017-03-30 10:54:39.757057\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -288,7 +288,7 @@ msgstr ""
 
 #: common/djangoapps/django_comment_common/models.py
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-#: lms/templates/courseware/course_navigation.html
+#: lms/templates/preview_menu.html
 msgid "Student"
 msgstr ""
 
@@ -1223,6 +1223,25 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "December"
+msgstr ""
+
+#: common/djangoapps/util/enterprise_helpers.py
+#, python-brace-format
+msgid ""
+"If you have concerns about sharing your data, please contact your "
+"administrator at {enterprise_customer_name}."
+msgstr ""
+
+#: common/djangoapps/util/enterprise_helpers.py
+#, python-brace-format
+msgid ""
+"If you have concerns about sharing your data, please contact your "
+"administrator at {enterprise_customer_name} at {contact_info}."
+msgstr ""
+
+#: common/djangoapps/util/enterprise_helpers.py
+#, python-brace-format
+msgid "Enrollment in {course_name} was not complete."
 msgstr ""
 
 #: common/djangoapps/util/file.py
@@ -5605,7 +5624,7 @@ msgid "Course Staff"
 msgstr ""
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-#: lms/templates/courseware/course_navigation.html
+#: lms/templates/preview_menu.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Staff"
 msgstr ""
@@ -6337,6 +6356,10 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Metrics"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
+msgid "Open Responses"
 msgstr ""
 
 #. Translators: number sent refers to the number of emails sent
@@ -9582,6 +9605,43 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/views/item.py
 #, python-brace-format
+msgid "You can not move {source_type} into {target_parent_type}."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/item.py
+msgid "You can not move an item into the same parent."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/item.py
+msgid "You can not move an item into itself."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/item.py
+msgid "You can not move an item into it's child."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/item.py
+msgid "You can not move an item directly into content experiment."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/item.py
+#, python-brace-format
+msgid "{source_usage_key} not found in {parent_usage_key}."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/item.py
+#, python-brace-format
+msgid ""
+"You can not move {source_usage_key} at an invalid index ({target_index})."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/item.py
+#, python-brace-format
+msgid "You must provide target_index ({target_index}) as an integer."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/item.py
+#, python-brace-format
 msgid "Duplicate of {0}"
 msgstr ""
 
@@ -10258,10 +10318,6 @@ msgid "Dashboard"
 msgstr ""
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
-msgid "My Courses"
-msgstr ""
-
-#: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "You are not enrolled in any courses yet."
 msgstr ""
 
@@ -10894,6 +10950,34 @@ msgstr ""
 #: lms/templates/notes.html lms/templates/textannotation.html
 #: lms/templates/videoannotation.html
 msgid "You do not have any notes."
+msgstr ""
+
+#: lms/templates/preview_menu.html
+msgid "Course View"
+msgstr ""
+
+#: lms/templates/preview_menu.html
+msgid "View this course as:"
+msgstr ""
+
+#: lms/templates/preview_menu.html
+msgid "Specific student"
+msgstr ""
+
+#: lms/templates/preview_menu.html
+msgid "Student in {content_group}"
+msgstr ""
+
+#: lms/templates/preview_menu.html
+msgid "Username or email:"
+msgstr ""
+
+#: lms/templates/preview_menu.html
+msgid "Set preview mode"
+msgstr ""
+
+#: lms/templates/preview_menu.html
+msgid "You are now viewing the course as {i_start}{user_name}{i_end}."
 msgstr ""
 
 #: lms/templates/problem.html
@@ -12668,6 +12752,13 @@ msgid "Sorry, there was an error when trying to enroll you"
 msgstr ""
 
 #: lms/templates/course_modes/choose.html
+msgid ""
+"Welcome, {username}! You are about to enroll in {course_name}, from "
+"{partner_names}, sponsored by {enterprise_name}. Please select your "
+"enrollment information below."
+msgstr ""
+
+#: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid "Congratulations!  You are now enrolled in {course_name}"
 msgstr ""
@@ -12905,34 +12996,6 @@ msgstr ""
 #: lms/templates/courseware/course_about_sidebar_header.html
 #: themes/stanford-style/lms/templates/courseware/course_about_sidebar_header.html
 msgid "Email someone to say you've enrolled in this course"
-msgstr ""
-
-#: lms/templates/courseware/course_navigation.html
-msgid "Course View"
-msgstr ""
-
-#: lms/templates/courseware/course_navigation.html
-msgid "View this course as:"
-msgstr ""
-
-#: lms/templates/courseware/course_navigation.html
-msgid "Specific student"
-msgstr ""
-
-#: lms/templates/courseware/course_navigation.html
-msgid "Student in {content_group}"
-msgstr ""
-
-#: lms/templates/courseware/course_navigation.html
-msgid "Username or email:"
-msgstr ""
-
-#: lms/templates/courseware/course_navigation.html
-msgid "Set preview mode"
-msgstr ""
-
-#: lms/templates/courseware/course_navigation.html
-msgid "You are now viewing the course as {i_start}{user_name}{i_end}."
 msgstr ""
 
 #: lms/templates/courseware/course_navigation.html
@@ -16007,7 +16070,13 @@ msgstr ""
 msgid "Show the status for the tasks that you submitted for this problem."
 msgstr ""
 
+#: lms/templates/learner_dashboard/_dashboard_navigation_courses.html
+#: themes/edx.org/lms/templates/dashboard.html
+msgid "My Courses"
+msgstr ""
+
 #: lms/templates/learner_dashboard/program_details.html
+#: lms/templates/learner_dashboard/program_details_2017.html
 msgid "Program Details"
 msgstr ""
 
@@ -17453,6 +17522,10 @@ msgstr ""
 msgid "Duplicate this component"
 msgstr ""
 
+#: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
+msgid "Move"
+msgstr ""
+
 #: cms/templates/component.html
 msgid "Delete this component"
 msgstr ""
@@ -18058,6 +18131,60 @@ msgid "Export Course Content"
 msgstr ""
 
 #: cms/templates/export.html
+msgid "Library Export Status"
+msgstr ""
+
+#: cms/templates/export.html
+msgid "Course Export Status"
+msgstr ""
+
+#: cms/templates/export.html
+msgid "Preparing"
+msgstr ""
+
+#: cms/templates/export.html
+msgid "Preparing to start the export"
+msgstr ""
+
+#: cms/templates/export.html
+msgid "Exporting"
+msgstr ""
+
+#: cms/templates/export.html
+msgid ""
+"Creating the export data files (You can now leave this page safely, but "
+"avoid making drastic changes to content until this export is complete)"
+msgstr ""
+
+#: cms/templates/export.html
+msgid "Compressing"
+msgstr ""
+
+#: cms/templates/export.html
+msgid "Compressing the exported data and preparing it for download"
+msgstr ""
+
+#: cms/templates/export.html cms/templates/import.html
+msgid "Success"
+msgstr ""
+
+#: cms/templates/export.html
+msgid "Your exported library can now be downloaded"
+msgstr ""
+
+#: cms/templates/export.html
+msgid "Your exported course can now be downloaded"
+msgstr ""
+
+#: cms/templates/export.html
+msgid "Download Exported Library"
+msgstr ""
+
+#: cms/templates/export.html
+msgid "Download Exported Course"
+msgstr ""
+
+#: cms/templates/export.html
 msgid "Data {em_start}exported with{em_end} your course:"
 msgstr ""
 
@@ -18614,10 +18741,6 @@ msgstr ""
 msgid ""
 "Integrating your imported content into this course. This process might take "
 "longer with larger courses."
-msgstr ""
-
-#: cms/templates/import.html
-msgid "Success"
 msgstr ""
 
 #: cms/templates/import.html

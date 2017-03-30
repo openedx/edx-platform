@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-03-16 12:16+0000\n"
-"PO-Revision-Date: 2017-03-16 12:17:55.102840\n"
+"POT-Creation-Date: 2017-03-30 10:52+0000\n"
+"PO-Revision-Date: 2017-03-30 10:54:40.500506\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -79,9 +79,8 @@ msgstr "يثمثفث"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/certificates/views/signatory_editor.js
-#: cms/static/js/factories/export.js cms/static/js/views/asset.js
-#: cms/static/js/views/course_info_update.js
-#: cms/static/js/views/manage_users_and_roles.js
+#: cms/static/js/views/asset.js cms/static/js/views/course_info_update.js
+#: cms/static/js/views/export.js cms/static/js/views/manage_users_and_roles.js
 #: cms/static/js/views/modals/base_modal.js
 #: cms/static/js/views/modals/course_outline_modals.js
 #: cms/static/js/views/show_textbook.js cms/static/js/views/tabs.js
@@ -369,14 +368,6 @@ msgstr "{label}: {status}"
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "This problem has been reset."
 msgstr "فاهس حقخزمثو اشس زثثر قثسثف."
-
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid ""
-"Answers to this problem are now shown. Navigate through the problem to "
-"review it with answers inline."
-msgstr ""
-"شرسصثقس فخ فاهس حقخزمثو شقث رخص ساخصر. رشدهلشفث فاقخعلا فاث حقخزمثو فخ "
-"قثدهثص هف صهفا شرسصثقس هرمهرث."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "unsubmitted"
@@ -1573,9 +1564,9 @@ msgstr "دثقفهذشم سحشذث"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: lms/templates/bookmarks/bookmarks-list.underscore
 #: lms/templates/search/course_search_item.underscore
 #: lms/templates/search/dashboard_search_item.underscore
+#: openedx/features/course_bookmarks/static/course_bookmarks/templates/bookmarks-list.underscore
 msgid "View"
 msgstr "دهثص"
 
@@ -1688,7 +1679,6 @@ msgstr ""
 "سثضعثرذثوخيعمث. حمثشسث ذخرفشذف فاث ذخعقسث سفشبب."
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
-#: lms/static/js/bookmarks/views/bookmark_button.js
 msgid "Bookmarked"
 msgstr "زخخنوشقنثي"
 
@@ -2991,22 +2981,6 @@ msgstr ""
 msgid "Preview this query"
 msgstr "حقثدهثص فاهس ضعثقغ"
 
-#: lms/static/js/bookmarks/views/bookmark_button.js
-#: lms/static/js/bookmarks/views/bookmarks_list.js
-#: lms/static/js/verify_student/views/make_payment_step_view.js
-msgid "An error has occurred. Please try again."
-msgstr "شر ثققخق اشس خذذعققثي. حمثشسث فقغ شلشهر."
-
-#: lms/static/js/bookmarks/views/bookmark_button.js
-msgid "Bookmark this page"
-msgstr "زخخنوشقن فاهس حشلث"
-
-#: lms/static/js/bookmarks/views/bookmarks_list.js
-#: lms/static/js/instructor_dashboard/data_download.js
-#: lms/templates/search/search_loading.underscore
-msgid "Loading"
-msgstr "مخشيهرل"
-
 #: lms/static/js/ccx/schedule.js
 msgid "All subsections"
 msgstr "شمم سعزسثذفهخرس"
@@ -3474,6 +3448,12 @@ msgstr "ثققخق لثرثقشفهرل سعقدثغ قثسعمفس. حمثشس�
 #: lms/static/js/instructor_dashboard/data_download.js
 msgid "Error generating student profile information. Please try again."
 msgstr "ثققخق لثرثقشفهرل سفعيثرف حقخبهمث هربخقوشفهخر. حمثشسث فقغ شلشهر."
+
+#: lms/static/js/instructor_dashboard/data_download.js
+#: cms/templates/js/move-xblock-modal.underscore
+#: lms/templates/search/search_loading.underscore
+msgid "Loading"
+msgstr "مخشيهرل"
 
 #: lms/static/js/instructor_dashboard/data_download.js
 msgid "Error getting student list."
@@ -4632,6 +4612,10 @@ msgid "Try the transaction again in a few minutes."
 msgstr "فقغ فاث فقشرسشذفهخر شلشهر هر ش بثص وهرعفثس."
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
+msgid "An error has occurred. Please try again."
+msgstr "شر ثققخق اشس خذذعققثي. حمثشسث فقغ شلشهر."
+
+#: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Could not submit order"
 msgstr "ذخعمي رخف سعزوهف خقيثق"
 
@@ -4907,64 +4891,8 @@ msgid "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 msgstr "شزذيثبلاهتنمورخحضقسفعدصطغظ"
 
 #: cms/static/js/factories/export.js
-msgid "There has been an error while exporting."
-msgstr "فاثقث اشس زثثر شر ثققخق صاهمث ثطحخقفهرل."
-
-#: cms/static/js/factories/export.js
-msgid ""
-"There has been a failure to export to XML at least one component. It is "
-"recommended that you go to the edit page and repair the error before "
-"attempting another export. Please check that all components on the page are "
-"valid and do not display any error messages."
-msgstr ""
-"فاثقث اشس زثثر ش بشهمعقث فخ ثطحخقف فخ طوم شف مثشسف خرث ذخوحخرثرف. هف هس "
-"قثذخووثريثي فاشف غخع لخ فخ فاث ثيهف حشلث شري قثحشهق فاث ثققخق زثبخقث "
-"شففثوحفهرل شرخفاثق ثطحخقف. حمثشسث ذاثذن فاشف شمم ذخوحخرثرفس خر فاث حشلث شقث "
-"دشمهي شري يخ رخف يهسحمشغ شرغ ثققخق وثسسشلثس."
-
-#: cms/static/js/factories/export.js
-msgid "Correct failed component"
-msgstr "ذخققثذف بشهمثي ذخوحخرثرف"
-
-#: cms/static/js/factories/export.js
-msgid "Return to Export"
-msgstr "قثفعقر فخ ثطحخقف"
-
-#: cms/static/js/factories/export.js
-msgid ""
-"Your library could not be exported to XML. There is not enough information "
-"to identify the failed component. Inspect your library to identify any "
-"problematic components and try again."
-msgstr ""
-"غخعق مهزقشقغ ذخعمي رخف زث ثطحخقفثي فخ طوم. فاثقث هس رخف ثرخعلا هربخقوشفهخر "
-"فخ هيثرفهبغ فاث بشهمثي ذخوحخرثرف. هرسحثذف غخعق مهزقشقغ فخ هيثرفهبغ شرغ "
-"حقخزمثوشفهذ ذخوحخرثرفس شري فقغ شلشهر."
-
-#: cms/static/js/factories/export.js
-msgid "Take me to the main library page"
-msgstr "فشنث وث فخ فاث وشهر مهزقشقغ حشلث"
-
-#: cms/static/js/factories/export.js
-msgid ""
-"Your course could not be exported to XML. There is not enough information to"
-" identify the failed component. Inspect your course to identify any "
-"problematic components and try again."
-msgstr ""
-"غخعق ذخعقسث ذخعمي رخف زث ثطحخقفثي فخ طوم. فاثقث هس رخف ثرخعلا هربخقوشفهخر فخ"
-" هيثرفهبغ فاث بشهمثي ذخوحخرثرف. هرسحثذف غخعق ذخعقسث فخ هيثرفهبغ شرغ "
-"حقخزمثوشفهذ ذخوحخرثرفس شري فقغ شلشهر."
-
-#: cms/static/js/factories/export.js
-msgid "Take me to the main course page"
-msgstr "فشنث وث فخ فاث وشهر ذخعقسث حشلث"
-
-#: cms/static/js/factories/export.js
-msgid "The raw error message is:"
-msgstr "فاث قشص ثققخق وثسسشلث هس:"
-
-#: cms/static/js/factories/export.js
-msgid "There has been an error with your export."
-msgstr "فاثقث اشس زثثر شر ثققخق صهفا غخعق ثطحخقف."
+msgid "Your export has failed."
+msgstr "غخعق ثطحخقف اشس بشهمثي."
 
 #: cms/static/js/factories/import.js
 msgid "There was an error while importing the new library to our database."
@@ -5351,6 +5279,66 @@ msgstr "عحمخشي ش رثص حيب فخ “<%= name %>”"
 msgid "Please select a PDF file to upload."
 msgstr "حمثشسث سثمثذف ش حيب بهمث فخ عحمخشي."
 
+#: cms/static/js/views/export.js
+msgid "There has been an error while exporting."
+msgstr "فاثقث اشس زثثر شر ثققخق صاهمث ثطحخقفهرل."
+
+#: cms/static/js/views/export.js
+msgid ""
+"There has been a failure to export to XML at least one component. It is "
+"recommended that you go to the edit page and repair the error before "
+"attempting another export. Please check that all components on the page are "
+"valid and do not display any error messages."
+msgstr ""
+"فاثقث اشس زثثر ش بشهمعقث فخ ثطحخقف فخ طوم شف مثشسف خرث ذخوحخرثرف. هف هس "
+"قثذخووثريثي فاشف غخع لخ فخ فاث ثيهف حشلث شري قثحشهق فاث ثققخق زثبخقث "
+"شففثوحفهرل شرخفاثق ثطحخقف. حمثشسث ذاثذن فاشف شمم ذخوحخرثرفس خر فاث حشلث شقث "
+"دشمهي شري يخ رخف يهسحمشغ شرغ ثققخق وثسسشلثس."
+
+#: cms/static/js/views/export.js
+msgid "Correct failed component"
+msgstr "ذخققثذف بشهمثي ذخوحخرثرف"
+
+#: cms/static/js/views/export.js
+msgid "Return to Export"
+msgstr "قثفعقر فخ ثطحخقف"
+
+#: cms/static/js/views/export.js
+msgid ""
+"Your library could not be exported to XML. There is not enough information "
+"to identify the failed component. Inspect your library to identify any "
+"problematic components and try again."
+msgstr ""
+"غخعق مهزقشقغ ذخعمي رخف زث ثطحخقفثي فخ طوم. فاثقث هس رخف ثرخعلا هربخقوشفهخر "
+"فخ هيثرفهبغ فاث بشهمثي ذخوحخرثرف. هرسحثذف غخعق مهزقشقغ فخ هيثرفهبغ شرغ "
+"حقخزمثوشفهذ ذخوحخرثرفس شري فقغ شلشهر."
+
+#: cms/static/js/views/export.js
+msgid "Take me to the main library page"
+msgstr "فشنث وث فخ فاث وشهر مهزقشقغ حشلث"
+
+#: cms/static/js/views/export.js
+msgid ""
+"Your course could not be exported to XML. There is not enough information to"
+" identify the failed component. Inspect your course to identify any "
+"problematic components and try again."
+msgstr ""
+"غخعق ذخعقسث ذخعمي رخف زث ثطحخقفثي فخ طوم. فاثقث هس رخف ثرخعلا هربخقوشفهخر فخ"
+" هيثرفهبغ فاث بشهمثي ذخوحخرثرف. هرسحثذف غخعق ذخعقسث فخ هيثرفهبغ شرغ "
+"حقخزمثوشفهذ ذخوحخرثرفس شري فقغ شلشهر."
+
+#: cms/static/js/views/export.js
+msgid "Take me to the main course page"
+msgstr "فشنث وث فخ فاث وشهر ذخعقسث حشلث"
+
+#: cms/static/js/views/export.js
+msgid "The raw error message is:"
+msgstr "فاث قشص ثققخق وثسسشلث هس:"
+
+#: cms/static/js/views/export.js
+msgid "There has been an error with your export."
+msgstr "فاثقث اشس زثثر شر ثققخق صهفا غخعق ثطحخقف."
+
 #. Translators: 'count' is number of groups that the group
 #. configuration contains.
 #: cms/static/js/views/group_configuration_details.js
@@ -5562,6 +5550,18 @@ msgstr "ثيهفهرل: %(title)s"
 msgid "Component"
 msgstr "ذخوحخرثرف"
 
+#: cms/static/js/views/modals/move_xblock_modal.js
+msgid "Move"
+msgstr "وخدث"
+
+#: cms/static/js/views/modals/move_xblock_modal.js
+msgid "Choose a location to move your component to"
+msgstr "ذاخخسث ش مخذشفهخر فخ وخدث غخعق ذخوحخرثرف فخ"
+
+#: cms/static/js/views/modals/move_xblock_modal.js
+msgid "Move: {displayName}"
+msgstr "وخدث: {displayName}"
+
 #: cms/static/js/views/modals/validation_error_modal.js
 msgid "Validation Error While Saving"
 msgstr "دشمهيشفهخر ثققخق صاهمث سشدهرل"
@@ -5573,6 +5573,37 @@ msgstr "عريخ ذاشرلثس"
 #: cms/static/js/views/modals/validation_error_modal.js
 msgid "Change Manually"
 msgstr "ذاشرلث وشرعشممغ"
+
+#: cms/static/js/views/move_xblock_list.js
+msgid "Sections"
+msgstr "سثذفهخرس"
+
+#: cms/static/js/views/move_xblock_list.js
+msgid "Subsections"
+msgstr "سعزسثذفهخرس"
+
+#: cms/static/js/views/move_xblock_list.js
+msgid "Units"
+msgstr "عرهفس"
+
+#: cms/static/js/views/move_xblock_list.js
+msgid "Components"
+msgstr "ذخوحخرثرفس"
+
+#: cms/static/js/views/move_xblock_list.js
+#: cms/templates/js/group-configuration-editor.underscore
+msgid "Groups"
+msgstr "لقخعحس"
+
+#: cms/static/js/views/move_xblock_list.js
+msgid "This {parentCategory} has no {childCategory}"
+msgstr "فاهس {parentCategory} اشس رخ {childCategory}"
+
+#: cms/static/js/views/move_xblock_list.js
+#: cms/templates/js/content-group-details.underscore
+#: cms/templates/js/group-configuration-details.underscore
+msgid "Course Outline"
+msgstr "ذخعقسث خعفمهرث"
 
 #: cms/static/js/views/paged_container.js
 msgid "Date added"
@@ -5819,9 +5850,37 @@ msgstr ""
 "فاث ذخوزهرثي مثرلفا خب فاث خقلشرهظشفهخر شري مهزقشقغ ذخيث بهثميس ذشررخف زث "
 "وخقث فاشر <%=limit%> ذاشقشذفثقس."
 
+#: cms/static/js/views/utils/move_xblock_utils.js
+msgid "Success! \"{displayName}\" has been moved."
+msgstr "سعذذثسس! \"{displayName}\" اشس زثثر وخدثي."
+
+#: cms/static/js/views/utils/move_xblock_utils.js
+msgid ""
+"Move cancelled. \"{sourceDisplayName}\" has been moved back to its original "
+"location."
+msgstr ""
+"وخدث ذشرذثممثي. \"{sourceDisplayName}\" اشس زثثر وخدثي زشذن فخ هفس خقهلهرشم "
+"مخذشفهخر."
+
+#: cms/static/js/views/utils/move_xblock_utils.js
+msgid "Undo move"
+msgstr "عريخ وخدث"
+
+#: cms/static/js/views/utils/move_xblock_utils.js
+msgid "Take me to the new location"
+msgstr "فشنث وث فخ فاث رثص مخذشفهخر"
+
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Duplicating"
 msgstr "يعحمهذشفهرل"
+
+#: cms/static/js/views/utils/xblock_utils.js
+msgid "Undo moving"
+msgstr "عريخ وخدهرل"
+
+#: cms/static/js/views/utils/xblock_utils.js
+msgid "Moving"
+msgstr "وخدهرل"
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Deleting this {xblock_type} is permanent and cannot be undone."
@@ -6003,6 +6062,14 @@ msgstr "ظخخو هر"
 #: common/static/common/templates/image-modal.underscore
 msgid "Zoom Out"
 msgstr "ظخخو خعف"
+
+#: common/static/common/templates/sequence-breadcrumbs.underscore
+msgid "Return to course outline"
+msgstr "قثفعقر فخ ذخعقسث خعفمهرث"
+
+#: common/static/common/templates/sequence-breadcrumbs.underscore
+msgid "Outline"
+msgstr "خعفمهرث"
 
 #: common/static/common/templates/components/paging-footer.underscore
 #, python-format
@@ -6616,30 +6683,6 @@ msgstr ""
 #: lms/templates/api_admin/catalog-results.underscore
 msgid "This catalog's courses:"
 msgstr "فاهس ذشفشمخل'س ذخعقسثس:"
-
-#: lms/templates/bookmarks/bookmarks-list.underscore
-msgid "My Bookmarks"
-msgstr "وغ زخخنوشقنس"
-
-#: lms/templates/bookmarks/bookmarks-list.underscore
-msgid "Bookmarked on"
-msgstr "زخخنوشقنثي خر"
-
-#: lms/templates/bookmarks/bookmarks-list.underscore
-msgid "You have not bookmarked any courseware pages yet."
-msgstr "غخع اشدث رخف زخخنوشقنثي شرغ ذخعقسثصشقث حشلثس غثف."
-
-#: lms/templates/bookmarks/bookmarks-list.underscore
-msgid ""
-"Use bookmarks to help you easily return to courseware pages. To bookmark a "
-"page, select Bookmark in the upper right corner of that page. To see a list "
-"of all your bookmarks, select Bookmarks in the upper left corner of any "
-"courseware page."
-msgstr ""
-"عسث زخخنوشقنس فخ اثمح غخع ثشسهمغ قثفعقر فخ ذخعقسثصشقث حشلثس. فخ زخخنوشقن ش "
-"حشلث, سثمثذف زخخنوشقن هر فاث عححثق قهلاف ذخقرثق خب فاشف حشلث. فخ سثث ش مهسف "
-"خب شمم غخعق زخخنوشقنس, سثمثذف زخخنوشقنس هر فاث عححثق مثبف ذخقرثق خب شرغ "
-"ذخعقسثصشقث حشلث."
 
 #: lms/templates/ccx/schedule.underscore
 msgid "Expand All"
@@ -7286,6 +7329,7 @@ msgid "View Archived Course"
 msgstr "دهثص شقذاهدثي ذخعقسث"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
+#: lms/templates/learner_dashboard/program_card.underscore
 msgid "Not Enrolled"
 msgstr "رخف ثرقخممثي"
 
@@ -7343,13 +7387,19 @@ msgid "Explore New Programs"
 msgstr "ثطحمخقث رثص حقخلقشوس"
 
 #: lms/templates/learner_dashboard/program_card.underscore
-#, python-format
-msgid ""
-"You have earned certificates in %(completed_courses)s of the "
-"%(total_courses)s courses so far."
-msgstr ""
-"غخع اشدث ثشقرثي ذثقفهبهذشفثس هر %(completed_courses)s خب فاث "
-"%(total_courses)s ذخعقسثس سخ بشق."
+#: lms/templates/verify_student/enrollment_confirmation_step.underscore
+msgid "Course"
+msgid_plural "Courses"
+msgstr[0] "ذخعقسث"
+msgstr[1] "ذخعقسثس"
+
+#: lms/templates/learner_dashboard/program_card.underscore
+msgid "Completed"
+msgstr "ذخوحمثفثي"
+
+#: lms/templates/learner_dashboard/program_card.underscore
+msgid "Enrolled"
+msgstr "ثرقخممثي"
 
 #: lms/templates/learner_dashboard/program_card.underscore
 #, python-format
@@ -7634,10 +7684,6 @@ msgstr "غخع شقث رخص ثرقخممثي شس ش دثقهبهثي سفعي�
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "A list of courses you have just enrolled in as a verified student"
 msgstr "ش مهسف خب ذخعقسثس غخع اشدث تعسف ثرقخممثي هر شس ش دثقهبهثي سفعيثرف"
-
-#: lms/templates/verify_student/enrollment_confirmation_step.underscore
-msgid "Course"
-msgstr "ذخعقسث"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Explore your course!"
@@ -8182,6 +8228,22 @@ msgstr "قثفشنث حاخفخ"
 msgid "Take Photo"
 msgstr "فشنث حاخفخ"
 
+#: openedx/features/course_bookmarks/static/course_bookmarks/templates/bookmarks-list.underscore
+msgid "Bookmarked on"
+msgstr "زخخنوشقنثي خر"
+
+#: openedx/features/course_bookmarks/static/course_bookmarks/templates/bookmarks-list.underscore
+msgid "You have not bookmarked any courseware pages yet"
+msgstr "غخع اشدث رخف زخخنوشقنثي شرغ ذخعقسثصشقث حشلثس غثف"
+
+#: openedx/features/course_bookmarks/static/course_bookmarks/templates/bookmarks-list.underscore
+msgid ""
+"Use bookmarks to help you easily return to courseware pages. To bookmark a "
+"page, click \"Bookmark this page\" under the page title."
+msgstr ""
+"عسث زخخنوشقنس فخ اثمح غخع ثشسهمغ قثفعقر فخ ذخعقسثصشقث حشلثس. فخ زخخنوشقن ش "
+"حشلث, ذمهذن \"زخخنوشقن فاهس حشلث\" عريثق فاث حشلث فهفمث."
+
 #: cms/templates/js/access-editor.underscore
 msgid "Limit Access"
 msgstr "مهوهف شذذثسس"
@@ -8455,11 +8517,6 @@ msgid ""
 msgstr ""
 "فاهس ذخرفثرف لقخعح هس رخف هر عسث. شيي ش ذخرفثرف لقخعح فخ شرغ عرهف بقخو فاث "
 "{linkStart}ذخعقسث خعفمهرث{linkEnd}."
-
-#: cms/templates/js/content-group-details.underscore
-#: cms/templates/js/group-configuration-details.underscore
-msgid "Course Outline"
-msgstr "ذخعقسث خعفمهرث"
 
 #: cms/templates/js/content-group-editor.underscore
 msgid "Content Group Name"
@@ -8932,10 +8989,6 @@ msgid "Group information"
 msgstr "لقخعح هربخقوشفهخر"
 
 #: cms/templates/js/group-configuration-editor.underscore
-msgid "Groups"
-msgstr "لقخعحس"
-
-#: cms/templates/js/group-configuration-editor.underscore
 msgid ""
 "Name of the groups that students will be assigned to, for example, Control, "
 "Video, Problems. You must have two or more groups."
@@ -9029,6 +9082,22 @@ msgstr "ذخوحخرثرف مخذشفهخر هي"
 #: cms/templates/js/video/metadata-translations-item.underscore
 msgid "Download"
 msgstr "يخصرمخشي"
+
+#: cms/templates/js/move-xblock-list.underscore
+msgid "{categoryText} in {parentDisplayname}"
+msgstr "{categoryText} هر {parentDisplayname}"
+
+#: cms/templates/js/move-xblock-list.underscore
+msgid "Current location"
+msgstr "ذعققثرف مخذشفهخر"
+
+#: cms/templates/js/move-xblock-list.underscore
+msgid "View child items"
+msgstr "دهثص ذاهمي هفثوس"
+
+#: cms/templates/js/move-xblock-list.underscore
+msgid "Currently selected"
+msgstr "ذعققثرفمغ سثمثذفثي"
 
 #: cms/templates/js/no-textbooks.underscore
 msgid "You haven't added any textbooks to this course yet."

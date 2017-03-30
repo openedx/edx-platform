@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-03-16 12:16+0000\n"
-"PO-Revision-Date: 2017-03-16 12:17:55.102840\n"
+"POT-Creation-Date: 2017-03-30 10:52+0000\n"
+"PO-Revision-Date: 2017-03-30 10:54:40.500506\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -79,9 +79,8 @@ msgstr "Délété Ⱡ'σяєм ιρѕυ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/certificates/views/signatory_editor.js
-#: cms/static/js/factories/export.js cms/static/js/views/asset.js
-#: cms/static/js/views/course_info_update.js
-#: cms/static/js/views/manage_users_and_roles.js
+#: cms/static/js/views/asset.js cms/static/js/views/course_info_update.js
+#: cms/static/js/views/export.js cms/static/js/views/manage_users_and_roles.js
 #: cms/static/js/views/modals/base_modal.js
 #: cms/static/js/views/modals/course_outline_modals.js
 #: cms/static/js/views/show_textbook.js cms/static/js/views/tabs.js
@@ -401,14 +400,6 @@ msgstr "{label}: {status} Ⱡ'σяєм ιρѕυм ∂#"
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "This problem has been reset."
 msgstr "Thïs prößlém häs ßéén rését. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
-
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid ""
-"Answers to this problem are now shown. Navigate through the problem to "
-"review it with answers inline."
-msgstr ""
-"Ànswérs tö thïs prößlém äré nöw shöwn. Nävïgäté thröügh thé prößlém tö "
-"révïéw ït wïth änswérs ïnlïné. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "unsubmitted"
@@ -1607,9 +1598,9 @@ msgstr "Vértïçäl späçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: lms/templates/bookmarks/bookmarks-list.underscore
 #: lms/templates/search/course_search_item.underscore
 #: lms/templates/search/dashboard_search_item.underscore
+#: openedx/features/course_bookmarks/static/course_bookmarks/templates/bookmarks-list.underscore
 msgid "View"
 msgstr "Vïéw Ⱡ'σяєм ι#"
 
@@ -1724,7 +1715,6 @@ msgstr ""
 "SéqüénçéMödülé. Pléäsé çöntäçt thé çöürsé stäff. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
-#: lms/static/js/bookmarks/views/bookmark_button.js
 msgid "Bookmarked"
 msgstr "Böökmärkéd Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
@@ -3191,24 +3181,6 @@ msgstr ""
 msgid "Preview this query"
 msgstr "Prévïéw thïs qüérý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
-#: lms/static/js/bookmarks/views/bookmark_button.js
-#: lms/static/js/bookmarks/views/bookmarks_list.js
-#: lms/static/js/verify_student/views/make_payment_step_view.js
-msgid "An error has occurred. Please try again."
-msgstr ""
-"Àn érrör häs öççürréd. Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
-
-#: lms/static/js/bookmarks/views/bookmark_button.js
-msgid "Bookmark this page"
-msgstr "Böökmärk thïs pägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
-
-#: lms/static/js/bookmarks/views/bookmarks_list.js
-#: lms/static/js/instructor_dashboard/data_download.js
-#: lms/templates/search/search_loading.underscore
-msgid "Loading"
-msgstr "Löädïng Ⱡ'σяєм ιρѕυм #"
-
 #: lms/static/js/ccx/schedule.js
 msgid "All subsections"
 msgstr "Àll süßséçtïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
@@ -3801,6 +3773,12 @@ msgid "Error generating student profile information. Please try again."
 msgstr ""
 "Érrör générätïng stüdént pröfïlé ïnförmätïön. Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм"
 " ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/static/js/instructor_dashboard/data_download.js
+#: cms/templates/js/move-xblock-modal.underscore
+#: lms/templates/search/search_loading.underscore
+msgid "Loading"
+msgstr "Löädïng Ⱡ'σяєм ιρѕυм #"
 
 #: lms/static/js/instructor_dashboard/data_download.js
 msgid "Error getting student list."
@@ -5162,6 +5140,12 @@ msgstr ""
 "¢σηѕє¢тєтυя #"
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
+msgid "An error has occurred. Please try again."
+msgstr ""
+"Àn érrör häs öççürréd. Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
+#: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Could not submit order"
 msgstr "Çöüld nöt süßmït ördér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
@@ -5480,83 +5464,8 @@ msgid "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 msgstr "ÀBÇDÉFGHÌJKLMNÖPQRSTÛVWXÝZ Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: cms/static/js/factories/export.js
-msgid "There has been an error while exporting."
-msgstr ""
-"Théré häs ßéén än érrör whïlé éxpörtïng. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
-
-#: cms/static/js/factories/export.js
-msgid ""
-"There has been a failure to export to XML at least one component. It is "
-"recommended that you go to the edit page and repair the error before "
-"attempting another export. Please check that all components on the page are "
-"valid and do not display any error messages."
-msgstr ""
-"Théré häs ßéén ä fäïlüré tö éxpört tö XML ät léäst öné çömpönént. Ìt ïs "
-"réçömméndéd thät ýöü gö tö thé édït pägé änd répäïr thé érrör ßéföré "
-"ättémptïng änöthér éxpört. Pléäsé çhéçk thät äll çömpönénts ön thé pägé äré "
-"välïd änd dö nöt dïspläý äný érrör méssägés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт "
-"∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση "
-"υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє "
-"∂σł#"
-
-#: cms/static/js/factories/export.js
-msgid "Correct failed component"
-msgstr "Çörréçt fäïléd çömpönént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
-
-#: cms/static/js/factories/export.js
-msgid "Return to Export"
-msgstr "Rétürn tö Éxpört Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#: cms/static/js/factories/export.js
-msgid ""
-"Your library could not be exported to XML. There is not enough information "
-"to identify the failed component. Inspect your library to identify any "
-"problematic components and try again."
-msgstr ""
-"Ýöür lïßrärý çöüld nöt ßé éxpörtéd tö XML. Théré ïs nöt énöügh ïnförmätïön "
-"tö ïdéntïfý thé fäïléd çömpönént. Ìnspéçt ýöür lïßrärý tö ïdéntïfý äný "
-"prößlémätïç çömpönénts änd trý ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт "
-"∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση "
-"υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє "
-"∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα"
-" ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕ#"
-
-#: cms/static/js/factories/export.js
-msgid "Take me to the main library page"
-msgstr ""
-"Täké mé tö thé mäïn lïßrärý pägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
-
-#: cms/static/js/factories/export.js
-msgid ""
-"Your course could not be exported to XML. There is not enough information to"
-" identify the failed component. Inspect your course to identify any "
-"problematic components and try again."
-msgstr ""
-"Ýöür çöürsé çöüld nöt ßé éxpörtéd tö XML. Théré ïs nöt énöügh ïnförmätïön tö"
-" ïdéntïfý thé fäïléd çömpönént. Ìnspéçt ýöür çöürsé tö ïdéntïfý äný "
-"prößlémätïç çömpönénts änd trý ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт "
-"∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση "
-"υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє "
-"∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα"
-" ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт#"
-
-#: cms/static/js/factories/export.js
-msgid "Take me to the main course page"
-msgstr "Täké mé tö thé mäïn çöürsé pägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: cms/static/js/factories/export.js
-msgid "The raw error message is:"
-msgstr "Thé räw érrör méssägé ïs: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: cms/static/js/factories/export.js
-msgid "There has been an error with your export."
-msgstr ""
-"Théré häs ßéén än érrör wïth ýöür éxpört. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
+msgid "Your export has failed."
+msgstr "Ýöür éxpört häs fäïléd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: cms/static/js/factories/import.js
 msgid "There was an error while importing the new library to our database."
@@ -6010,6 +5919,85 @@ msgid "Please select a PDF file to upload."
 msgstr ""
 "Pléäsé séléçt ä PDF fïlé tö üplöäd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
+#: cms/static/js/views/export.js
+msgid "There has been an error while exporting."
+msgstr ""
+"Théré häs ßéén än érrör whïlé éxpörtïng. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
+#: cms/static/js/views/export.js
+msgid ""
+"There has been a failure to export to XML at least one component. It is "
+"recommended that you go to the edit page and repair the error before "
+"attempting another export. Please check that all components on the page are "
+"valid and do not display any error messages."
+msgstr ""
+"Théré häs ßéén ä fäïlüré tö éxpört tö XML ät léäst öné çömpönént. Ìt ïs "
+"réçömméndéd thät ýöü gö tö thé édït pägé änd répäïr thé érrör ßéföré "
+"ättémptïng änöthér éxpört. Pléäsé çhéçk thät äll çömpönénts ön thé pägé äré "
+"välïd änd dö nöt dïspläý äný érrör méssägés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт "
+"∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση "
+"υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє "
+"∂σł#"
+
+#: cms/static/js/views/export.js
+msgid "Correct failed component"
+msgstr "Çörréçt fäïléd çömpönént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: cms/static/js/views/export.js
+msgid "Return to Export"
+msgstr "Rétürn tö Éxpört Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: cms/static/js/views/export.js
+msgid ""
+"Your library could not be exported to XML. There is not enough information "
+"to identify the failed component. Inspect your library to identify any "
+"problematic components and try again."
+msgstr ""
+"Ýöür lïßrärý çöüld nöt ßé éxpörtéd tö XML. Théré ïs nöt énöügh ïnförmätïön "
+"tö ïdéntïfý thé fäïléd çömpönént. Ìnspéçt ýöür lïßrärý tö ïdéntïfý äný "
+"prößlémätïç çömpönénts änd trý ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт "
+"∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση "
+"υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє "
+"∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα"
+" ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕ#"
+
+#: cms/static/js/views/export.js
+msgid "Take me to the main library page"
+msgstr ""
+"Täké mé tö thé mäïn lïßrärý pägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: cms/static/js/views/export.js
+msgid ""
+"Your course could not be exported to XML. There is not enough information to"
+" identify the failed component. Inspect your course to identify any "
+"problematic components and try again."
+msgstr ""
+"Ýöür çöürsé çöüld nöt ßé éxpörtéd tö XML. Théré ïs nöt énöügh ïnförmätïön tö"
+" ïdéntïfý thé fäïléd çömpönént. Ìnspéçt ýöür çöürsé tö ïdéntïfý äný "
+"prößlémätïç çömpönénts änd trý ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт "
+"∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση "
+"υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє "
+"∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα"
+" ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт#"
+
+#: cms/static/js/views/export.js
+msgid "Take me to the main course page"
+msgstr "Täké mé tö thé mäïn çöürsé pägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: cms/static/js/views/export.js
+msgid "The raw error message is:"
+msgstr "Thé räw érrör méssägé ïs: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: cms/static/js/views/export.js
+msgid "There has been an error with your export."
+msgstr ""
+"Théré häs ßéén än érrör wïth ýöür éxpört. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
 #. Translators: 'count' is number of groups that the group
 #. configuration contains.
 #: cms/static/js/views/group_configuration_details.js
@@ -6264,6 +6252,20 @@ msgstr "Édïtïng: %(title)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 msgid "Component"
 msgstr "Çömpönént Ⱡ'σяєм ιρѕυм ∂σł#"
 
+#: cms/static/js/views/modals/move_xblock_modal.js
+msgid "Move"
+msgstr "Mövé Ⱡ'σяєм ι#"
+
+#: cms/static/js/views/modals/move_xblock_modal.js
+msgid "Choose a location to move your component to"
+msgstr ""
+"Çhöösé ä löçätïön tö mövé ýöür çömpönént tö Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: cms/static/js/views/modals/move_xblock_modal.js
+msgid "Move: {displayName}"
+msgstr "Mövé: {displayName} Ⱡ'σяєм ιρѕυм ∂σł#"
+
 #: cms/static/js/views/modals/validation_error_modal.js
 msgid "Validation Error While Saving"
 msgstr "Välïdätïön Érrör Whïlé Sävïng Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
@@ -6275,6 +6277,38 @@ msgstr "Ûndö Çhängés Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 #: cms/static/js/views/modals/validation_error_modal.js
 msgid "Change Manually"
 msgstr "Çhängé Mänüällý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: cms/static/js/views/move_xblock_list.js
+msgid "Sections"
+msgstr "Séçtïöns Ⱡ'σяєм ιρѕυм ∂#"
+
+#: cms/static/js/views/move_xblock_list.js
+msgid "Subsections"
+msgstr "Süßséçtïöns Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: cms/static/js/views/move_xblock_list.js
+msgid "Units"
+msgstr "Ûnïts Ⱡ'σяєм ιρѕ#"
+
+#: cms/static/js/views/move_xblock_list.js
+msgid "Components"
+msgstr "Çömpönénts Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: cms/static/js/views/move_xblock_list.js
+#: cms/templates/js/group-configuration-editor.underscore
+msgid "Groups"
+msgstr "Gröüps Ⱡ'σяєм ιρѕυ#"
+
+#: cms/static/js/views/move_xblock_list.js
+msgid "This {parentCategory} has no {childCategory}"
+msgstr ""
+"Thïs {parentCategory} häs nö {childCategory} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: cms/static/js/views/move_xblock_list.js
+#: cms/templates/js/content-group-details.underscore
+#: cms/templates/js/group-configuration-details.underscore
+msgid "Course Outline"
+msgstr "Çöürsé Öütlïné Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: cms/static/js/views/paged_container.js
 msgid "Date added"
@@ -6554,9 +6588,39 @@ msgstr ""
 "Thé çömßïnéd léngth öf thé örgänïzätïön änd lïßrärý çödé fïélds çännöt ßé "
 "möré thän <%=limit%> çhäräçtérs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
+#: cms/static/js/views/utils/move_xblock_utils.js
+msgid "Success! \"{displayName}\" has been moved."
+msgstr ""
+"Süççéss! \"{displayName}\" häs ßéén mövéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢т#"
+
+#: cms/static/js/views/utils/move_xblock_utils.js
+msgid ""
+"Move cancelled. \"{sourceDisplayName}\" has been moved back to its original "
+"location."
+msgstr ""
+"Mövé çänçélléd. \"{sourceDisplayName}\" häs ßéén mövéd ßäçk tö ïts örïgïnäl "
+"löçätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#: cms/static/js/views/utils/move_xblock_utils.js
+msgid "Undo move"
+msgstr "Ûndö mövé Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: cms/static/js/views/utils/move_xblock_utils.js
+msgid "Take me to the new location"
+msgstr "Täké mé tö thé néw löçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Duplicating"
 msgstr "Düplïçätïng Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: cms/static/js/views/utils/xblock_utils.js
+msgid "Undo moving"
+msgstr "Ûndö mövïng Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: cms/static/js/views/utils/xblock_utils.js
+msgid "Moving"
+msgstr "Mövïng Ⱡ'σяєм ιρѕυ#"
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Deleting this {xblock_type} is permanent and cannot be undone."
@@ -6751,6 +6815,14 @@ msgstr "Zööm Ìn Ⱡ'σяєм ιρѕυм #"
 #: common/static/common/templates/image-modal.underscore
 msgid "Zoom Out"
 msgstr "Zööm Öüt Ⱡ'σяєм ιρѕυм ∂#"
+
+#: common/static/common/templates/sequence-breadcrumbs.underscore
+msgid "Return to course outline"
+msgstr "Rétürn tö çöürsé öütlïné Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: common/static/common/templates/sequence-breadcrumbs.underscore
+msgid "Outline"
+msgstr "Öütlïné Ⱡ'σяєм ιρѕυм #"
 
 #: common/static/common/templates/components/paging-footer.underscore
 #, python-format
@@ -7392,36 +7464,6 @@ msgstr ""
 #: lms/templates/api_admin/catalog-results.underscore
 msgid "This catalog's courses:"
 msgstr "Thïs çätälög's çöürsés: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
-
-#: lms/templates/bookmarks/bookmarks-list.underscore
-msgid "My Bookmarks"
-msgstr "Mý Böökmärks Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: lms/templates/bookmarks/bookmarks-list.underscore
-msgid "Bookmarked on"
-msgstr "Böökmärkéd ön Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
-#: lms/templates/bookmarks/bookmarks-list.underscore
-msgid "You have not bookmarked any courseware pages yet."
-msgstr ""
-"Ýöü hävé nöt ßöökmärkéd äný çöürséwäré pägés ýét. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/bookmarks/bookmarks-list.underscore
-msgid ""
-"Use bookmarks to help you easily return to courseware pages. To bookmark a "
-"page, select Bookmark in the upper right corner of that page. To see a list "
-"of all your bookmarks, select Bookmarks in the upper left corner of any "
-"courseware page."
-msgstr ""
-"Ûsé ßöökmärks tö hélp ýöü éäsïlý rétürn tö çöürséwäré pägés. Tö ßöökmärk ä "
-"pägé, séléçt Böökmärk ïn thé üppér rïght çörnér öf thät pägé. Tö séé ä lïst "
-"öf äll ýöür ßöökmärks, séléçt Böökmärks ïn thé üppér léft çörnér öf äný "
-"çöürséwäré pägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, "
-"ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм "
-"α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ "
-"єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє"
-" νєłιт єѕ#"
 
 #: lms/templates/ccx/schedule.underscore
 msgid "Expand All"
@@ -8118,6 +8160,7 @@ msgid "View Archived Course"
 msgstr "Vïéw Àrçhïvéd Çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
+#: lms/templates/learner_dashboard/program_card.underscore
 msgid "Not Enrolled"
 msgstr "Nöt Énrölléd Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
@@ -8177,14 +8220,19 @@ msgid "Explore New Programs"
 msgstr "Éxplöré Néw Prögräms Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/learner_dashboard/program_card.underscore
-#, python-format
-msgid ""
-"You have earned certificates in %(completed_courses)s of the "
-"%(total_courses)s courses so far."
-msgstr ""
-"Ýöü hävé éärnéd çértïfïçätés ïn %(completed_courses)s öf thé "
-"%(total_courses)s çöürsés sö fär. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
-"α#"
+#: lms/templates/verify_student/enrollment_confirmation_step.underscore
+msgid "Course"
+msgid_plural "Courses"
+msgstr[0] "Çöürsé Ⱡ'σяєм ιρѕυ#"
+msgstr[1] "Çöürsés Ⱡ'σяєм ιρѕυм #"
+
+#: lms/templates/learner_dashboard/program_card.underscore
+msgid "Completed"
+msgstr "Çömplétéd Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: lms/templates/learner_dashboard/program_card.underscore
+msgid "Enrolled"
+msgstr "Énrölléd Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/templates/learner_dashboard/program_card.underscore
 #, python-format
@@ -8508,10 +8556,6 @@ msgid "A list of courses you have just enrolled in as a verified student"
 msgstr ""
 "À lïst öf çöürsés ýöü hävé jüst énrölléd ïn äs ä vérïfïéd stüdént Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/verify_student/enrollment_confirmation_step.underscore
-msgid "Course"
-msgstr "Çöürsé Ⱡ'σяєм ιρѕυ#"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Explore your course!"
@@ -9156,6 +9200,24 @@ msgstr "Rétäké Phötö Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 msgid "Take Photo"
 msgstr "Täké Phötö Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
+#: openedx/features/course_bookmarks/static/course_bookmarks/templates/bookmarks-list.underscore
+msgid "Bookmarked on"
+msgstr "Böökmärkéd ön Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: openedx/features/course_bookmarks/static/course_bookmarks/templates/bookmarks-list.underscore
+msgid "You have not bookmarked any courseware pages yet"
+msgstr ""
+"Ýöü hävé nöt ßöökmärkéd äný çöürséwäré pägés ýét Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
+#: openedx/features/course_bookmarks/static/course_bookmarks/templates/bookmarks-list.underscore
+msgid ""
+"Use bookmarks to help you easily return to courseware pages. To bookmark a "
+"page, click \"Bookmark this page\" under the page title."
+msgstr ""
+"Ûsé ßöökmärks tö hélp ýöü éäsïlý rétürn tö çöürséwäré pägés. Tö ßöökmärk ä "
+"pägé, çlïçk \"Böökmärk thïs pägé\" ündér thé pägé tïtlé. Ⱡ'σ#"
+
 #: cms/templates/js/access-editor.underscore
 msgid "Limit Access"
 msgstr "Lïmït Àççéss Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
@@ -9445,11 +9507,6 @@ msgid ""
 msgstr ""
 "Thïs çöntént gröüp ïs nöt ïn üsé. Àdd ä çöntént gröüp tö äný ünït fröm thé "
 "{linkStart}Çöürsé Öütlïné{linkEnd}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: cms/templates/js/content-group-details.underscore
-#: cms/templates/js/group-configuration-details.underscore
-msgid "Course Outline"
-msgstr "Çöürsé Öütlïné Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: cms/templates/js/content-group-editor.underscore
 msgid "Content Group Name"
@@ -9981,10 +10038,6 @@ msgid "Group information"
 msgstr "Gröüp ïnförmätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: cms/templates/js/group-configuration-editor.underscore
-msgid "Groups"
-msgstr "Gröüps Ⱡ'σяєм ιρѕυ#"
-
-#: cms/templates/js/group-configuration-editor.underscore
 msgid ""
 "Name of the groups that students will be assigned to, for example, Control, "
 "Video, Problems. You must have two or more groups."
@@ -10088,6 +10141,22 @@ msgstr "Çömpönént Löçätïön ÌD Ⱡ'σяєм ιρѕυм ∂σłσя ѕι
 #: cms/templates/js/video/metadata-translations-item.underscore
 msgid "Download"
 msgstr "Döwnlöäd Ⱡ'σяєм ιρѕυм ∂#"
+
+#: cms/templates/js/move-xblock-list.underscore
+msgid "{categoryText} in {parentDisplayname}"
+msgstr "{categoryText} ïn {parentDisplayname} Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: cms/templates/js/move-xblock-list.underscore
+msgid "Current location"
+msgstr "Çürrént löçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: cms/templates/js/move-xblock-list.underscore
+msgid "View child items"
+msgstr "Vïéw çhïld ïtéms Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: cms/templates/js/move-xblock-list.underscore
+msgid "Currently selected"
+msgstr "Çürréntlý séléçtéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: cms/templates/js/no-textbooks.underscore
 msgid "You haven't added any textbooks to this course yet."
