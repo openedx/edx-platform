@@ -406,31 +406,3 @@ class GroupAccessTestCase(ModuleStoreTestCase):
         self.check_access(self.blue_dog, block_accessed, False)
         self.check_access(self.gray_worm, block_accessed, False)
         self.ensure_staff_access(block_accessed)
-
-    def test_group_access_short_circuits(self):
-        """
-        Test that the group_access check short-circuits if there are no user_partitions defined
-        except user_partitions in use by the split_test module.
-        """
-        # Initially, "red_cat" user can't view the vertical.
-        self.set_group_access(self.chapter_location, {self.animal_partition.id: [self.dog_group.id]})
-        self.check_access(self.red_cat, self.vertical_location, False)
-
-        # Change the vertical's user_partitions value to the empty list. Now red_cat can view the vertical.
-        self.set_user_partitions(self.vertical_location, [])
-        self.check_access(self.red_cat, self.vertical_location, True)
-
-        # Change the vertical's user_partitions value to include only "split_test" partitions.
-        split_test_partition = UserPartition(
-            199,
-            'split_test partition',
-            'nothing to look at here',
-            [Group(2, 'random group')],
-            scheme=UserPartition.get_scheme("random"),
-        )
-        self.set_user_partitions(self.vertical_location, [split_test_partition])
-        self.check_access(self.red_cat, self.vertical_location, True)
-
-        # Finally, add back in a cohort user_partition
-        self.set_user_partitions(self.vertical_location, [split_test_partition, self.animal_partition])
-        self.check_access(self.red_cat, self.vertical_location, False)

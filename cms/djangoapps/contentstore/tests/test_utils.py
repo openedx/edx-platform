@@ -493,12 +493,12 @@ class GetUserPartitionInfoTest(ModuleStoreTestCase):
                 ]
             }
         ]
-        self.assertEqual(self._get_partition_info(), expected)
+        self.assertEqual(self._get_partition_info(schemes=["cohort", "random"]), expected)
 
         # Update group access and expect that now one group is marked as selected.
         self._set_group_access({0: [1]})
         expected[0]["groups"][1]["selected"] = True
-        self.assertEqual(self._get_partition_info(), expected)
+        self.assertEqual(self._get_partition_info(schemes=["cohort", "random"]), expected)
 
     def test_deleted_groups(self):
         # Select a group that is not defined in the partition
@@ -546,7 +546,7 @@ class GetUserPartitionInfoTest(ModuleStoreTestCase):
         ])
 
         # Expect that the inactive scheme is excluded from the results
-        partitions = self._get_partition_info()
+        partitions = self._get_partition_info(schemes=["cohort", "verification"])
         self.assertEqual(len(partitions), 1)
         self.assertEqual(partitions[0]["scheme"], "cohort")
 
@@ -572,7 +572,7 @@ class GetUserPartitionInfoTest(ModuleStoreTestCase):
         ])
 
         # Expect that the partition with no groups is excluded from the results
-        partitions = self._get_partition_info()
+        partitions = self._get_partition_info(schemes=["cohort", "verification"])
         self.assertEqual(len(partitions), 1)
         self.assertEqual(partitions[0]["scheme"], "verification")
 

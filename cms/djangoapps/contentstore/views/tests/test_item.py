@@ -8,6 +8,7 @@ from pytz import UTC
 from pyquery import PyQuery
 from webob import Response
 
+from django.conf import settings
 from django.http import Http404
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -44,6 +45,7 @@ from xblock_django.user_service import DjangoXBlockUserService
 from opaque_keys.edx.keys import UsageKey, CourseKey
 from opaque_keys.edx.locations import Location
 from xmodule.partitions.partitions import Group, UserPartition
+from xmodule.partitions.partitions_service import ENROLLMENT_TRACK_PARTITION_ID, MINIMUM_STATIC_PARTITION_ID
 
 
 class AsideTest(XBlockAside):
@@ -341,15 +343,17 @@ class GetItemTest(ItemTest):
         )
 
     def test_get_user_partitions_and_groups(self):
+        # Note about UserPartition and UserPartition Group IDs: these must not conflict with IDs used
+        # by dynamic user partitions.
         self.course.user_partitions = [
             UserPartition(
-                id=0,
+                id=MINIMUM_STATIC_PARTITION_ID,
                 name="Verification user partition",
                 scheme=UserPartition.get_scheme("verification"),
                 description="Verification user partition",
                 groups=[
-                    Group(id=0, name="Group A"),
-                    Group(id=1, name="Group B"),
+                    Group(id=MINIMUM_STATIC_PARTITION_ID + 1, name="Group A"),  # See note above.
+                    Group(id=MINIMUM_STATIC_PARTITION_ID + 2, name="Group B"),  # See note above.
                 ],
             ),
         ]
@@ -365,18 +369,31 @@ class GetItemTest(ItemTest):
         result = json.loads(resp.content)
         self.assertEqual(result["user_partitions"], [
             {
-                "id": 0,
+                "id": ENROLLMENT_TRACK_PARTITION_ID,
+                "name": "Enrollment Track Partition",
+                "scheme": "enrollment_track",
+                "groups": [
+                    {
+                        "id": settings.COURSE_ENROLLMENT_MODES["audit"],
+                        "name": "Audit",
+                        "selected": False,
+                        "deleted": False,
+                    }
+                ]
+            },
+            {
+                "id": MINIMUM_STATIC_PARTITION_ID,
                 "name": "Verification user partition",
                 "scheme": "verification",
                 "groups": [
                     {
-                        "id": 0,
+                        "id": MINIMUM_STATIC_PARTITION_ID + 1,
                         "name": "Group A",
                         "selected": False,
                         "deleted": False,
                     },
                     {
-                        "id": 1,
+                        "id": MINIMUM_STATIC_PARTITION_ID + 2,
                         "name": "Group B",
                         "selected": False,
                         "deleted": False,
@@ -1704,15 +1721,30 @@ class TestEditSplitModule(ItemTest):
     def setUp(self):
         super(TestEditSplitModule, self).setUp()
         self.user = UserFactory()
+
+        self.first_user_partition_group_1 = Group(unicode(MINIMUM_STATIC_PARTITION_ID + 1), 'alpha')
+        self.first_user_partition_group_2 = Group(unicode(MINIMUM_STATIC_PARTITION_ID + 2), 'beta')
+        self.first_user_partition = UserPartition(
+            MINIMUM_STATIC_PARTITION_ID, 'first_partition', 'First Partition',
+            [self.first_user_partition_group_1, self.first_user_partition_group_2]
+        )
+
+        # There is a test point below (test_create_groups) that purposefully wants the group IDs
+        # of the 2 partitions to overlap (which is not something that normally happens).
+        self.second_user_partition_group_1 = Group(unicode(MINIMUM_STATIC_PARTITION_ID + 1), 'Group 1')
+        self.second_user_partition_group_2 = Group(unicode(MINIMUM_STATIC_PARTITION_ID + 2), 'Group 2')
+        self.second_user_partition_group_3 = Group(unicode(MINIMUM_STATIC_PARTITION_ID + 3), 'Group 3')
+        self.second_user_partition = UserPartition(
+            MINIMUM_STATIC_PARTITION_ID + 10, 'second_partition', 'Second Partition',
+            [
+                self.second_user_partition_group_1,
+                self.second_user_partition_group_2,
+                self.second_user_partition_group_3
+            ]
+        )
         self.course.user_partitions = [
-            UserPartition(
-                0, 'first_partition', 'First Partition',
-                [Group("0", 'alpha'), Group("1", 'beta')]
-            ),
-            UserPartition(
-                1, 'second_partition', 'Second Partition',
-                [Group("0", 'Group 0'), Group("1", 'Group 1'), Group("2", 'Group 2')]
-            )
+            self.first_user_partition,
+            self.second_user_partition
         ]
         self.store.update_item(self.course, self.user.id)
         root_usage_key = self._create_vertical()
@@ -1760,8 +1792,8 @@ class TestEditSplitModule(ItemTest):
         self.assertEqual(-1, split_test.user_partition_id)
         self.assertEqual(0, len(split_test.children))
 
-        # Set the user_partition_id to 0.
-        split_test = self._update_partition_id(0)
+        # Set the user_partition_id to match the first user_partition.
+        split_test = self._update_partition_id(self.first_user_partition.id)
 
         # Verify that child verticals have been set to match the groups
         self.assertEqual(2, len(split_test.children))
@@ -1769,13 +1801,13 @@ class TestEditSplitModule(ItemTest):
         vertical_1 = self.get_item_from_modulestore(split_test.children[1], verify_is_draft=True)
         self.assertEqual("vertical", vertical_0.category)
         self.assertEqual("vertical", vertical_1.category)
-        self.assertEqual("Group ID 0", vertical_0.display_name)
-        self.assertEqual("Group ID 1", vertical_1.display_name)
+        self.assertEqual("Group ID " + unicode(MINIMUM_STATIC_PARTITION_ID + 1), vertical_0.display_name)
+        self.assertEqual("Group ID " + unicode(MINIMUM_STATIC_PARTITION_ID + 2), vertical_1.display_name)
 
         # Verify that the group_id_to_child mapping is correct.
         self.assertEqual(2, len(split_test.group_id_to_child))
-        self.assertEqual(vertical_0.location, split_test.group_id_to_child['0'])
-        self.assertEqual(vertical_1.location, split_test.group_id_to_child['1'])
+        self.assertEqual(vertical_0.location, split_test.group_id_to_child[str(self.first_user_partition_group_1.id)])
+        self.assertEqual(vertical_1.location, split_test.group_id_to_child[str(self.first_user_partition_group_2.id)])
 
     def test_split_xblock_info_group_name(self):
         """
@@ -1785,8 +1817,8 @@ class TestEditSplitModule(ItemTest):
         # Initially, no user_partition_id is set, and the split_test has no children.
         self.assertEqual(split_test.user_partition_id, -1)
         self.assertEqual(len(split_test.children), 0)
-        # Set the user_partition_id to 0.
-        split_test = self._update_partition_id(0)
+        # Set the user_partition_id to match the first user_partition.
+        split_test = self._update_partition_id(self.first_user_partition.id)
         # Verify that child verticals have been set to match the groups
         self.assertEqual(len(split_test.children), 2)
 
@@ -1808,13 +1840,13 @@ class TestEditSplitModule(ItemTest):
         group configuration.
         """
         # Set to first group configuration.
-        split_test = self._update_partition_id(0)
+        split_test = self._update_partition_id(self.first_user_partition.id)
         self.assertEqual(2, len(split_test.children))
         initial_vertical_0_location = split_test.children[0]
         initial_vertical_1_location = split_test.children[1]
 
         # Set to second group configuration
-        split_test = self._update_partition_id(1)
+        split_test = self._update_partition_id(self.second_user_partition.id)
         # We don't remove existing children.
         self.assertEqual(5, len(split_test.children))
         self.assertEqual(initial_vertical_0_location, split_test.children[0])
@@ -1825,9 +1857,9 @@ class TestEditSplitModule(ItemTest):
 
         # Verify that the group_id_to child mapping is correct.
         self.assertEqual(3, len(split_test.group_id_to_child))
-        self.assertEqual(vertical_0.location, split_test.group_id_to_child['0'])
-        self.assertEqual(vertical_1.location, split_test.group_id_to_child['1'])
-        self.assertEqual(vertical_2.location, split_test.group_id_to_child['2'])
+        self.assertEqual(vertical_0.location, split_test.group_id_to_child[str(self.second_user_partition_group_1.id)])
+        self.assertEqual(vertical_1.location, split_test.group_id_to_child[str(self.second_user_partition_group_2.id)])
+        self.assertEqual(vertical_2.location, split_test.group_id_to_child[str(self.second_user_partition_group_3.id)])
         self.assertNotEqual(initial_vertical_0_location, vertical_0.location)
         self.assertNotEqual(initial_vertical_1_location, vertical_1.location)
 
@@ -1836,12 +1868,12 @@ class TestEditSplitModule(ItemTest):
         Test that nothing happens when the user_partition_id is set to the same value twice.
         """
         # Set to first group configuration.
-        split_test = self._update_partition_id(0)
+        split_test = self._update_partition_id(self.first_user_partition.id)
         self.assertEqual(2, len(split_test.children))
         initial_group_id_to_child = split_test.group_id_to_child
 
         # Set again to first group configuration.
-        split_test = self._update_partition_id(0)
+        split_test = self._update_partition_id(self.first_user_partition.id)
         self.assertEqual(2, len(split_test.children))
         self.assertEqual(initial_group_id_to_child, split_test.group_id_to_child)
 
@@ -1852,7 +1884,7 @@ class TestEditSplitModule(ItemTest):
         The user_partition_id will be updated, but children and group_id_to_child map will not change.
         """
         # Set to first group configuration.
-        split_test = self._update_partition_id(0)
+        split_test = self._update_partition_id(self.first_user_partition.id)
         self.assertEqual(2, len(split_test.children))
         initial_group_id_to_child = split_test.group_id_to_child
 
@@ -1869,13 +1901,14 @@ class TestEditSplitModule(ItemTest):
         TODO: move tests that can go over to common after the mixed modulestore work is done.  # pylint: disable=fixme
         """
         # Set to first group configuration.
-        split_test = self._update_partition_id(0)
+        split_test = self._update_partition_id(self.first_user_partition.id)
 
         # Add a group to the first group configuration.
+        new_group_id = "1002"
         split_test.user_partitions = [
             UserPartition(
-                0, 'first_partition', 'First Partition',
-                [Group("0", 'alpha'), Group("1", 'beta'), Group("2", 'pie')]
+                self.first_user_partition.id, 'first_partition', 'First Partition',
+                [self.first_user_partition_group_1, self.first_user_partition_group_2, Group(new_group_id, 'pie')]
             )
         ]
         self.store.update_item(split_test, self.user.id)
@@ -1896,7 +1929,7 @@ class TestEditSplitModule(ItemTest):
         split_test = self._assert_children(3)
         self.assertNotEqual(group_id_to_child, split_test.group_id_to_child)
         group_id_to_child = split_test.group_id_to_child
-        self.assertEqual(split_test.children[2], group_id_to_child["2"])
+        self.assertEqual(split_test.children[2], group_id_to_child[new_group_id])
 
         # Call add_missing_groups again -- it should be a no-op.
         split_test.add_missing_groups(self.request)

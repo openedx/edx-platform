@@ -146,6 +146,8 @@ FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
 # Open up endpoint for faking Software Secure responses
 FEATURES['ENABLE_SOFTWARE_SECURE_FAKE'] = True
 
+FEATURES['ENABLE_ENROLLMENT_TRACK_USER_PARTITION'] = True
+
 ########################### Entrance Exams #################################
 FEATURES['ENTRANCE_EXAMS'] = True
 

@@ -154,10 +154,10 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
             self.assertEquals(mock_block_structure_create.call_count, 1)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 1, 24, True),
-        (ModuleStoreEnum.Type.mongo, 1, 21, False),
-        (ModuleStoreEnum.Type.split, 3, 23, True),
-        (ModuleStoreEnum.Type.split, 3, 20, False),
+        (ModuleStoreEnum.Type.mongo, 1, 26, True),
+        (ModuleStoreEnum.Type.mongo, 1, 23, False),
+        (ModuleStoreEnum.Type.split, 3, 25, True),
+        (ModuleStoreEnum.Type.split, 3, 22, False),
     )
     @ddt.unpack
     def test_query_counts(self, default_store, num_mongo_calls, num_sql_calls, create_multiple_subsections):
@@ -169,8 +169,8 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
                     self._apply_recalculate_subsection_grade()
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 1, 24),
-        (ModuleStoreEnum.Type.split, 3, 23),
+        (ModuleStoreEnum.Type.mongo, 1, 26),
+        (ModuleStoreEnum.Type.split, 3, 25),
     )
     @ddt.unpack
     def test_query_counts_dont_change_with_more_content(self, default_store, num_mongo_calls, num_sql_calls):
@@ -215,8 +215,8 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
         )
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 1, 9),
-        (ModuleStoreEnum.Type.split, 3, 8),
+        (ModuleStoreEnum.Type.mongo, 1, 11),
+        (ModuleStoreEnum.Type.split, 3, 10),
     )
     @ddt.unpack
     def test_persistent_grades_not_enabled_on_course(self, default_store, num_mongo_queries, num_sql_queries):
@@ -230,8 +230,8 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
             self.assertEqual(len(PersistentSubsectionGrade.bulk_read_grades(self.user.id, self.course.id)), 0)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 1, 22),
-        (ModuleStoreEnum.Type.split, 3, 21),
+        (ModuleStoreEnum.Type.mongo, 1, 24),
+        (ModuleStoreEnum.Type.split, 3, 23),
     )
     @ddt.unpack
     def test_persistent_grades_enabled_on_course(self, default_store, num_mongo_queries, num_sql_queries):
@@ -409,8 +409,8 @@ class ComputeGradesForCourseTest(HasCourseWithProblemsMixin, ModuleStoreTestCase
 
     @ddt.data(*xrange(1, 12, 3))
     def test_database_calls(self, batch_size):
-        per_user_queries = 16 * min(batch_size, 6)  # No more than 6 due to offset
-        with self.assertNumQueries(3 + 16 * min(batch_size, 6)):
+        per_user_queries = 18 * min(batch_size, 6)  # No more than 6 due to offset
+        with self.assertNumQueries(3 + per_user_queries):
             with check_mongo_calls(1):
                 compute_grades_for_course.delay(
                     course_key=six.text_type(self.course.id),
