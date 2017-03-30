@@ -16,6 +16,7 @@ from student.models import CourseEnrollment
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
+from lms.djangoapps.grades.config.models import ComputeGradesSetting
 from lms.djangoapps.grades.management.commands import compute_grades
 
 
@@ -58,6 +59,18 @@ class TestComputeGrades(SharedModuleStoreTestCase):
     def test_selecting_invalid_course(self):
         with self.assertRaises(CommandError):
             self.command._get_course_keys({'courses': [self.course_keys[0], self.course_keys[1], 'badcoursekey']})
+
+    def test_from_settings(self):
+        ComputeGradesSetting.objects.create(course_ids=" ".join(self.course_keys))
+        courses = self.command._get_course_keys({'from_settings': True})
+        self.assertEqual(
+            sorted(six.text_type(course) for course in courses),
+            self.course_keys,
+        )
+        # test that --from_settings always uses the latest setting
+        ComputeGradesSetting.objects.create(course_ids='badcoursekey')
+        with self.assertRaises(CommandError):
+            self.command._get_course_keys({'from_settings': True})
 
     @patch('lms.djangoapps.grades.tasks.compute_grades_for_course')
     def test_tasks_fired(self, mock_task):
