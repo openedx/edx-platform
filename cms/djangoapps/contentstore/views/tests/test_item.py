@@ -348,9 +348,9 @@ class GetItemTest(ItemTest):
         self.course.user_partitions = [
             UserPartition(
                 id=MINIMUM_STATIC_PARTITION_ID,
-                name="Verification user partition",
-                scheme=UserPartition.get_scheme("verification"),
-                description="Verification user partition",
+                name="Random user partition",
+                scheme=UserPartition.get_scheme("random"),
+                description="Random user partition",
                 groups=[
                     Group(id=MINIMUM_STATIC_PARTITION_ID + 1, name="Group A"),  # See note above.
                     Group(id=MINIMUM_STATIC_PARTITION_ID + 2, name="Group B"),  # See note above.
@@ -370,7 +370,7 @@ class GetItemTest(ItemTest):
         self.assertEqual(result["user_partitions"], [
             {
                 "id": ENROLLMENT_TRACK_PARTITION_ID,
-                "name": "Enrollment Track Partition",
+                "name": "Enrollment Track",
                 "scheme": "enrollment_track",
                 "groups": [
                     {
@@ -383,8 +383,8 @@ class GetItemTest(ItemTest):
             },
             {
                 "id": MINIMUM_STATIC_PARTITION_ID,
-                "name": "Verification user partition",
-                "scheme": "verification",
+                "name": "Random user partition",
+                "scheme": "random",
                 "groups": [
                     {
                         "id": MINIMUM_STATIC_PARTITION_ID + 1,
