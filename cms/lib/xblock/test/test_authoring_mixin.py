@@ -22,7 +22,7 @@ class AuthoringMixinTestCase(ModuleStoreTestCase):
     NO_CONTENT_ENROLLMENT_TRACK_ENABLED = "specific groups of learners based either on their enrollment track, or by content groups that you create"
     NO_CONTENT_ENROLLMENT_TRACK_DISABLED = "specific groups of learners based on content groups that you create"
     CONTENT_GROUPS_TITLE = "Content Groups"
-    ENROLLMENT_GROUPS_TITLE = "Enrollment Tracks"
+    ENROLLMENT_GROUPS_TITLE = "Enrollment Track Groups"
     STAFF_LOCKED = 'The unit that contains this component is hidden from learners'
 
     FEATURES_WITH_ENROLLMENT_TRACK_DISABLED = settings.FEATURES.copy()
