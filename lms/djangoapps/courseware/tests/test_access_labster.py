@@ -40,7 +40,6 @@ class UserRoleTestCase(SharedModuleStoreTestCase):
         ccx.save()
 
         ccx_locator = CCXLocator.from_course_locator(course.id, unicode(ccx.id))
-        self.make_coach(coach, ccx_locator)
         CourseEnrollment.enroll(coach, ccx_locator)
 
         return ccx_locator
@@ -60,6 +59,10 @@ class UserRoleTestCase(SharedModuleStoreTestCase):
         # Create ccx
         self.ccx_locator = self.make_ccx(self.coach, self.course, "Test CCX")
         self.ccx_locator2 = self.make_ccx(self.coach2, self.course2, "Test CCX2")
+
+        # assign role to coach
+        self.make_coach(self.coach, self.course.id)
+        self.make_coach(self.coach2, self.course2.id)
 
     def test_user_role_instructor(self):
         """
