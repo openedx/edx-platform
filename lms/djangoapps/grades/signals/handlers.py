@@ -1,7 +1,7 @@
 """
 Grades related signals.
 """
-
+from contextlib import contextmanager
 from logging import getLogger
 
 from django.dispatch import receiver
@@ -107,6 +107,25 @@ def submissions_score_reset_handler(sender, **kwargs):  # pylint: disable=unused
         score_deleted=True,
         score_db_table=ScoreDatabaseTableEnum.submissions,
     )
+
+
+@contextmanager
+def disconnect_submissions_signal_receiver(signal):
+    """
+    Context manager to be used for temporarily disconnecting edx-submission's set or reset signal.
+    """
+    if signal == score_set:
+        handler = submissions_score_set_handler
+    else:
+        if signal != score_reset:
+            raise ValueError("This context manager only deal with score_set and score_reset signals.")
+        handler = submissions_score_reset_handler
+
+    signal.disconnect(handler)
+    try:
+        yield
+    finally:
+        signal.connect(handler)
 
 
 @receiver(SCORE_PUBLISHED)
