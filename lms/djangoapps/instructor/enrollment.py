@@ -16,12 +16,14 @@ from django.utils.translation import override as override_language
 from eventtracking import tracker
 import pytz
 
+from lms.djangoapps.grades.signals.handlers import disconnect_submissions_signal_receiver
 from lms.djangoapps.grades.signals.signals import PROBLEM_RAW_SCORE_CHANGED
 from lms.djangoapps.grades.constants import ScoreDatabaseTableEnum
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.models import UserPreference
 from submissions import api as sub_api  # installed from the edx-submissions repository
+from submissions.models import score_set
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
@@ -245,12 +247,13 @@ def reset_student_attempts(course_id, student, module_state_key, requesting_user
             # Inform these blocks of the reset and allow them to handle their data.
             clear_student_state = getattr(block, "clear_student_state", None)
             if callable(clear_student_state):
-                clear_student_state(
-                    user_id=user_id,
-                    course_id=unicode(course_id),
-                    item_id=unicode(module_state_key),
-                    requesting_user_id=requesting_user_id
-                )
+                with disconnect_submissions_signal_receiver(score_set):
+                    clear_student_state(
+                        user_id=user_id,
+                        course_id=unicode(course_id),
+                        item_id=unicode(module_state_key),
+                        requesting_user_id=requesting_user_id
+                    )
                 submission_cleared = True
     except ItemNotFoundError:
         block = None
@@ -290,12 +293,13 @@ def reset_student_attempts(course_id, student, module_state_key, requesting_user
                 'event_transaction_type': unicode(grade_update_root_type),
             }
         )
-        _fire_score_changed_for_block(
-            course_id,
-            student,
-            block,
-            module_state_key,
-        )
+        if not submission_cleared:
+            _fire_score_changed_for_block(
+                course_id,
+                student,
+                block,
+                module_state_key,
+            )
     else:
         _reset_module_attempts(module_to_reset)
 
