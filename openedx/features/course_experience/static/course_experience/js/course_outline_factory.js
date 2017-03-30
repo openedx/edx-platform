@@ -3,9 +3,10 @@
 
     define([
         'jquery',
+        'logger',
         'edx-ui-toolkit/js/utils/constants'
     ],
-        function($, constants) {
+        function($, Logger, constants) {
             return function(root) {
                 // In the future this factory could instantiate a Backbone view or React component that handles events
                 $(root).keydown(function(event) {
@@ -22,6 +23,16 @@
                         $focusable.eq(Math.max(currentFocusIndex - 1, 0)).focus();
                         break;
                     }
+                });
+
+                $('a:not([href^="#"])').click(function(event) {
+                    Logger.log(
+                        'edx.ui.lms.link_clicked',
+                        {
+                            current_url: window.location.href,
+                            target_url: event.currentTarget.href
+                        }
+                    );
                 });
             };
         }
