@@ -34,7 +34,7 @@ define([
         },
 
         createDetailsView: function() {
-            return new ContentGroupDetailsView({model: this.model, canEdit: true});
+            return new ContentGroupDetailsView({model: this.model, canEdit: false});
         }
     });
 

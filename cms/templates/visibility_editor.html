@@ -6,8 +6,10 @@ from contentstore.utils import ancestor_has_staff_lock, get_visibility_partition
 partition_info = get_visibility_partition_info(xblock)
 user_partitions = partition_info["user_partitions"]
 cohort_partitions = partition_info["cohort_partitions"]
+enrollment_mode_partitions = partition_info["enrollment_mode_partitions"]
 verification_partitions = partition_info["verification_partitions"]
-has_selected_groups = partition_info["has_selected_groups"]
+has_selected_content_groups = partition_info["has_selected_content_groups"]
+has_selected_enrollment_modes = partition_info["has_selected_enrollment_modes"]
 selected_verified_partition_id = partition_info["selected_verified_partition_id"]
 
 is_staff_locked = ancestor_has_staff_lock(xblock)
@@ -54,18 +56,46 @@ is_staff_locked = ancestor_has_staff_lock(xblock)
                 <section class="visibility-controls-primary">
                     <div class="list-fields list-radio">
                         <div class="field field-radio field-visibility-level">
-                            <input type="radio" id="visibility-level-all" name="visibility-level" value="" class="input input-radio visibility-level-all" ${'checked="checked"' if not has_selected_groups else ''} />
+                            <input type="radio" id="visibility-level-all" name="visibility-level" value="" class="input input-radio visibility-level-all" ${'checked="checked"' if not (has_selected_enrollment_modes and has_selected_content_groups) else ''} />
                             <label for="visibility-level-all" class="label">${_('All Students and Staff')}</label>
                         </div>
 
                         <div class="field field-radio field-visibility-level">
-                            <input type="radio" id="visibility-level-specific" name="visibility-level" value="" class="input input-radio visibility-level-specific"  ${'checked="checked"' if has_selected_groups else ''} />
+                            <input type="radio" id="visibility-level-enrollment" name="visibility-level" value="" class="input input-radio visibility-level-enrollment-mode"  ${'checked="checked"' if has_selected_enrollment_modes else ''} />
+                            <label for="visibility-level-enrollment" class="label">${_('Specific Enrollment Tracks')}</label>
+                        </div>
+
+                        <div class="wrapper-visibility-specific">
+                            <section class="visibility-controls-secondary">
+                                <div class="visibility-controls-group">
+                                    <h4 class="visibility-controls-title modal-subsection-title sr">${_('Content Groups')}</h4>
+                                    <div class="list-fields list-checkbox">
+                                    % for partition in enrollment_mode_partitions:
+                                        % for group in partition["groups"]:
+                                            <div class="field field-checkbox field-visibility-enrollment-mode ${'was-removed' if group["deleted"] else ''}">
+                                                <input type="checkbox"
+                                                    id="visibility-content-group-${partition["id"]}-${group["id"]}"
+                                                    name="visibility-content-group"
+                                                    value="${partition["id"]}-${group["id"]}"
+                                                    class="input input-checkbox"
+                                                    ${'checked="checked"' if group["selected"] else ''}
+                                                />
+                                                <label for="visibility-content-group-${partition["id"]}-${group["id"]}" class="label">${group["name"] | h}</label>
+                                            </div>
+                                        % endfor
+                                    % endfor
+
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+
+                        <div class="field field-radio field-visibility-level">
+                            <input type="radio" id="visibility-level-specific" name="visibility-level" value="" class="input input-radio visibility-level-specific"  ${'checked="checked"' if has_selected_content_groups else ''} />
                             <label for="visibility-level-specific" class="label">${_('Specific Content Groups')}</label>
                         </div>
-                    </div>
-                </section>
 
-                <div class="wrapper-visibility-specific">
+                        <div class="wrapper-visibility-specific">
                     <section class="visibility-controls-secondary">
                         <div class="visibility-controls-group">
                             <h4 class="visibility-controls-title modal-subsection-title sr">${_('Content Groups')}</h4>
@@ -129,9 +159,14 @@ is_staff_locked = ancestor_has_staff_lock(xblock)
                                 </div>
                             % endif
                             </div>
-                        </div>
+                         </div>
                     </section>
                 </div>
+                    </div>
+                </section>
+
+
+
             </div>
         </div>
     </form>

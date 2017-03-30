@@ -99,6 +99,9 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError
 from xmodule.tabs import CourseTab, CourseTabList, InvalidTabsException
 
+from xmodule.partitions.partitions import UserPartition
+from verified_track_content.enrollment_mode_user_partition import EnrollmentModeUserPartition
+
 
 log = logging.getLogger(__name__)
 
@@ -1522,12 +1525,14 @@ def group_configurations_list_handler(request, course_key_string):
                 experiment_group_configurations = None
 
             content_group_configuration = GroupConfiguration.get_or_create_content_group(store, course)
+            enrollment_configuration = GroupConfiguration.get_enrollment_mode_partition(course)
 
             return render_to_response('group_configurations.html', {
                 'context_course': course,
                 'group_configuration_url': group_configuration_url,
                 'course_outline_url': course_outline_url,
                 'experiment_group_configurations': experiment_group_configurations,
+                'enrollment_configuration': enrollment_configuration,
                 'should_show_experiment_groups': should_show_experiment_groups,
                 'content_group_configuration': content_group_configuration
             })
@@ -1587,6 +1592,21 @@ def group_configurations_detail_handler(request, course_key_string, group_config
                 course.user_partitions[index] = new_configuration
             else:
                 course.user_partitions.append(new_configuration)
+
+            # Temporary hack to add an enrollment user partition.
+            enrollment_scheme_id = "enrollment_mode"
+            scheme = UserPartition.get_scheme(enrollment_scheme_id)
+            enrollment_partitions = course.get_user_partitions_for_scheme(scheme)
+            if len(enrollment_partitions) == 0:
+                partition = scheme.create_user_partition(
+                    id=919191,  # TODO: what should this ID be?
+                    name="Enrollment Mode Partition",
+                    description=u"Partition for segmenting users by enrollment mode",
+                    parameters={"course_id": unicode(course_key)}
+                )
+                course.user_partitions.append(partition)
+
+            # Resume original code
             store.update_item(course, request.user.id)
             configuration = GroupConfiguration.update_usage_info(store, course, new_configuration)
             return JsonResponse(configuration, status=201)
