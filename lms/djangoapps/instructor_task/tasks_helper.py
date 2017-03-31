@@ -829,15 +829,16 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
             course_grade.letter_grade,
             student.id in whitelisted_user_ids
         )
-        if certificate_info[0] == 'Y' and course_grade.letter_grade is None and student.id not in whitelisted_user_ids:
+        if certificate_info[0] == 'Y':
             TASK_LOG.info(
-                u'Student is marked eligible_for_certificate despite failing the course '
-                u'(user=%s, course_id=%s, grade_percent=%s gradecutoffs=%s, allow_certificate=%s)',
+                u'Student is marked eligible_for_certificate'
+                u'(user=%s, course_id=%s, grade_percent=%s gradecutoffs=%s, allow_certificate=%s, is_whitelisted=%s)',
                 student,
                 course_id,
                 course_grade.percent,
                 course_grade.course.grade_cutoffs,
-                student.profile.allow_certificate
+                student.profile.allow_certificate,
+                student.id in whitelisted_user_ids
             )
 
         grade_results = []
