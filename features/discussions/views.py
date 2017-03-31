@@ -412,7 +412,7 @@ def _create_discussion_board_context(request, course_key, discussion_id=None, th
             if "pinned" not in thread:
                 thread["pinned"] = False
         thread_pages = 1
-        root_url = reverse('forum_form_discussion', args=[unicode(course.id)])
+        root_url = reverse('edx.discussions.forum_form_discussion', args=[unicode(course.id)])
     else:
         threads, query_params = get_threads(request, course, user_info)   # This might process a search query
         thread_pages = query_params['num_pages']
@@ -519,7 +519,7 @@ def user_profile(request, course_key, user_id):
                 'learner_profile_page_url': reverse('learner_profile', kwargs={'username': django_user.username}),
             })
 
-            return render_to_response('discussion/discussion_profile_page.html', context)
+            return render_to_response('discussions/discussion_profile_page.html', context)
     except User.DoesNotExist:
         raise Http404
 
@@ -599,7 +599,7 @@ def followed_threads(request, course_key, user_id):
                 #                'content': content,
             }
 
-            return render_to_response('discussion/user_profile.html', context)
+            return render_to_response('discussions/user_profile.html', context)
     except User.DoesNotExist:
         raise Http404
 
@@ -629,18 +629,18 @@ class DiscussionBoardFragmentView(EdxFragmentView):
                 discussion_id=discussion_id,
                 thread_id=thread_id,
             )
-            html = render_to_string('discussion/discussion_board_fragment.html', context)
-            inline_js = render_to_string('discussion/discussion_board_js.template', context)
+            html = render_to_string('discussions/discussion_board_fragment.html', context)
+            inline_js = render_to_string('discussions/discussion_board_js.template', context)
 
             fragment = Fragment(html)
             self.add_fragment_resource_urls(fragment)
             fragment.add_javascript(inline_js)
             if not settings.REQUIRE_DEBUG:
-                fragment.add_javascript_url(staticfiles_storage.url('discussion/js/discussion_board_factory.js'))
+                fragment.add_javascript_url(staticfiles_storage.url('discussions/js/discussion_board_factory.js'))
             return fragment
         except cc.utils.CommentClientMaintenanceError:
             log.warning('Forum is in maintenance mode')
-            html = render_to_response('discussion/maintenance_fragment.html', {
+            html = render_to_response('discussions/maintenance_fragment.html', {
                 'disable_courseware_js': True,
                 'uses_pattern_library': True,
             })

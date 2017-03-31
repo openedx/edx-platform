@@ -29,7 +29,7 @@ var options = {
         {pattern: 'coffee/src/**/!(*spec).js'},
         {pattern: 'course_bookmarks/**/!(*spec).js'},
         {pattern: 'course_experience/js/**/!(*spec).js'},
-        {pattern: 'discussion/js/**/!(*spec).js'},
+        {pattern: 'discussions/js/**/!(*spec).js'},
         {pattern: 'js/**/!(*spec|djangojs).js'},
         {pattern: 'lms/js/**/!(*spec).js'},
         {pattern: 'support/js/**/!(*spec).js'},

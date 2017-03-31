@@ -679,7 +679,7 @@ if settings.FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
             r'^courses/{}/discussion/forum/'.format(
                 settings.COURSE_ID_PATTERN,
             ),
-            include('discussion.urls')
+            include('features.discussions.urls')
         ),
         url(
             r'^notification_prefs/enable/',

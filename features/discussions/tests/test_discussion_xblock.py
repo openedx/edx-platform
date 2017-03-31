@@ -10,11 +10,11 @@ from unittest import TestCase
 
 from safe_lxml import etree
 
-from openedx.core.lib.xblock_builtin.xblock_discussion.xblock_discussion import DiscussionXBlock
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds, UNIQUE_ID, NO_CACHE_VALUE
 from xblock.runtime import Runtime
 
+from features.discussions.discussion_xblock import DiscussionXBlock
 
 AttributePair = namedtuple("AttributePair", ["name", "value"])
 
@@ -50,7 +50,7 @@ class DiscussionXBlockImportExportTests(TestCase):
     """
     Import and export tests
     """
-    DISCUSSION_XBLOCK_LOCATION = "openedx.core.lib.xblock_builtin.xblock_discussion.xblock_discussion.DiscussionXBlock"
+    DISCUSSION_XBLOCK_LOCATION = "features.discussions.discussion_xblock.discussion_xblock.DiscussionXBlock"
 
     def setUp(self):
         """

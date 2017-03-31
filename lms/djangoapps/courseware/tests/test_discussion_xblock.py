@@ -1,9 +1,9 @@
 """
-Tests for the discussion xblock.
+Tests for the discussion XBlock.
 
-Most of the tests are in common/xblock/xblock_discussion, here are only
-tests for functionalities that require django API, and lms specific
-functionalities.
+Most of the tests are in features/discussions/discussion_xblock, here are only
+tests for functionality that requires the Django API, and LMS specific
+functionality.
 """
 
 import uuid
@@ -23,7 +23,7 @@ from xmodule.modulestore.tests.factories import ToyCourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from lms.djangoapps.courseware.tests import XModuleRenderingTestBase
 
-from xblock_discussion import DiscussionXBlock, loader
+from features.discussions.discussion_xblock import DiscussionXBlock, loader
 
 
 @ddt.ddt

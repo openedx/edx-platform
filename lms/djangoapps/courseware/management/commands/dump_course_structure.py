@@ -25,7 +25,7 @@ from django.core.management.base import BaseCommand, CommandError
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.inheritance import own_metadata, compute_inherited_metadata
 
-from xblock_discussion import DiscussionXBlock
+from features.discussions.discussion_xblock import DiscussionXBlock
 from xblock.fields import Scope
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey

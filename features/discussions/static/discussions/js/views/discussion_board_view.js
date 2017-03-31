@@ -9,9 +9,9 @@
         'edx-ui-toolkit/js/utils/constants',
         'common/js/discussion/utils',
         'common/js/discussion/views/discussion_thread_list_view',
-        'discussion/js/views/discussion_fake_breadcrumbs',
-        'discussion/js/views/discussion_search_view',
-        'text!discussion/templates/discussion-home.underscore'
+        'discussions/js/views/discussion_fake_breadcrumbs',
+        'discussions/js/views/discussion_search_view',
+        'text!discussions/templates/discussion-home.underscore'
     ],
     function(_, Backbone, HtmlUtils, Constants, DiscussionUtil,
         DiscussionThreadListView, DiscussionFakeBreadcrumbs, DiscussionSearchView, discussionHomeTemplate) {

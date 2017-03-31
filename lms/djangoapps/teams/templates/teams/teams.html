@@ -19,7 +19,7 @@ from openedx.core.djangolib.js_utils import (
 <%static:css group='style-course-vendor'/>
 <%static:css group='style-course'/>
 <%static:css group='style-inline-discussion'/>
-<%include file="../discussion/_js_head_dependencies.html" />
+<%include file="../discussions/_js_head_dependencies.html" />
 </%block>
 
 <%include file="/courseware/course_navigation.html" args="active_page='teams'" />
@@ -35,7 +35,7 @@ from openedx.core.djangolib.js_utils import (
 
 <%block name="js_extra">
 
-<%include file="../discussion/_js_body_dependencies.html" />
+<%include file="../discussions/_js_body_dependencies.html" />
 
 <%static:require_module module_name="teams/js/teams_tab_factory" class_name="TeamsTabFactory">
     TeamsTabFactory({
@@ -57,5 +57,5 @@ from openedx.core.djangolib.js_utils import (
 </%static:require_module>
 </%block>
 
-<%include file="../discussion/_underscore_templates.html" />
-<%include file="../discussion/_thread_list_template.html" />
+<%include file="../discussions/_underscore_templates.html" />
+<%include file="../discussions/_thread_list_template.html" />

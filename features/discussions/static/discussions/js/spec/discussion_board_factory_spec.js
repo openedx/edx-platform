@@ -4,8 +4,8 @@ define(
         'backbone',
         'common/js/spec_helpers/page_helpers',
         'common/js/spec_helpers/discussion_spec_helper',
-        'discussion/js/discussion_board_factory',
-        'discussion/js/views/discussion_board_view'
+        'discussions/js/discussion_board_factory',
+        'discussions/js/views/discussion_board_view'
     ],
     function($, Backbone, PageHelpers, DiscussionSpecHelper, DiscussionBoardFactory, DiscussionBoardView) {
         'use strict';
