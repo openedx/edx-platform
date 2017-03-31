@@ -10,7 +10,7 @@ from common.test.acceptance.tests.helpers import UniqueCourseTest, create_user_p
 from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage
-from common.test.acceptance.pages.lms.staff_view import StaffPage
+from common.test.acceptance.pages.lms.staff_view import StaffCoursewarePage
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from bok_choy.promise import EmptyPromise
 from xmodule.partitions.partitions import Group
@@ -50,7 +50,7 @@ class StaffViewTest(UniqueCourseTest):
         Open staff page with assertion
         """
         self.courseware_page.visit()
-        staff_page = StaffPage(self.browser, self.course_id)
+        staff_page = StaffCoursewarePage(self.browser, self.course_id)
         self.assertEqual(staff_page.staff_view_mode, 'Staff')
         return staff_page
 

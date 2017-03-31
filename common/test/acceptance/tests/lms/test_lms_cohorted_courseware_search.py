@@ -9,7 +9,7 @@ from common.test.acceptance.tests.helpers import remove_file
 from common.test.acceptance.pages.common.logout import LogoutPage
 from common.test.acceptance.pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
 from common.test.acceptance.pages.lms.courseware_search import CoursewareSearchPage
-from common.test.acceptance.pages.lms.staff_view import StaffPage
+from common.test.acceptance.pages.lms.staff_view import StaffCoursewarePage
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 
 from nose.plugins.attrib import attr
@@ -110,7 +110,7 @@ class CoursewareSearchCohortTest(ContainerBase):
         Open staff page with assertion
         """
         self.courseware_search_page.visit()
-        staff_page = StaffPage(self.browser, self.course_id)
+        staff_page = StaffCoursewarePage(self.browser, self.course_id)
         self.assertEqual(staff_page.staff_view_mode, 'Staff')
         return staff_page
 
