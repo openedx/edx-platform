@@ -192,7 +192,13 @@ def instructor_dashboard_2(request, course_id):
     if certs_enabled and access['admin']:
         sections.append(_section_certificates(course))
 
-    openassessment_blocks = modulestore().get_items(course_key, qualifiers={'category': 'openassessment'})
+    openassessment_blocks = modulestore().get_items(
+        course_key, qualifiers={'category': 'openassessment'}
+    )
+    # filter out orphaned openassessment blocks
+    openassessment_blocks = [
+        block for block in openassessment_blocks if block.parent is not None
+    ]
     if len(openassessment_blocks) > 0:
         sections.append(_section_open_response_assessment(request, course, openassessment_blocks, access))
 
