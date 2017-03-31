@@ -27,13 +27,14 @@ from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from util.tests.mixins.enterprise import EnterpriseServiceMockMixin
+from util.tests.mixins.discovery import CourseCatalogServiceMockMixin
 from util import organizations_helpers as organizations_api
 
 
 @attr(shard=3)
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase, EnterpriseServiceMockMixin):
+class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase, EnterpriseServiceMockMixin, CourseCatalogServiceMockMixin):
     """
     Course Mode View tests
     """
@@ -156,6 +157,10 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase, EnterpriseServiceMo
 
         self.mock_enterprise_learner_api()
 
+        self.mock_course_discovery_api_for_catalog_contains(
+            catalog_id=1, course_run_ids=[str(self.course.id)]
+        )
+
         # User visits the track selection page directly without ever enrolling
         url = reverse('course_modes_choose', args=[unicode(self.course.id)])
         response = self.client.get(url)
@@ -181,6 +186,9 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase, EnterpriseServiceMo
             CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)
 
         self.mock_enterprise_learner_api()
+        self.mock_course_discovery_api_for_catalog_contains(
+            catalog_id=1, course_run_ids=[str(self.course.id)]
+        )
 
         # Creating organization
         for i in xrange(2):
