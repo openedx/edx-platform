@@ -119,6 +119,16 @@ class IsMasterCourseStaffInstructor(permissions.BasePermission):
         return False
 
 
+class IsStaff(permissions.BasePermission):
+    """
+    Permission that checks to see if the request user has is_staff access.
+    """
+
+    def has_permission(self, request, view):
+        if request.user.is_staff:
+            return True
+
+
 class IsUserInUrlOrStaff(IsUserInUrl):
     """
     Permission that checks to see if the request user matches the user in the URL or has is_staff access.

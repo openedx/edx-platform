@@ -392,6 +392,9 @@ FEATURES = {
     # Whether to check the "Notify users by email" checkbox in the batch enrollment form
     # in the instructor dashboard.
     'BATCH_ENROLLMENT_NOTIFY_USERS_DEFAULT': True,
+
+    # Whether the bulk enrollment view is enabled.
+    'ENABLE_BULK_ENROLLMENT_VIEW': False,
 }
 
 # Settings for the course reviews tool template and identification key, set either to None to disable course reviews
@@ -2109,6 +2112,9 @@ INSTALLED_APPS = (
 
     # Enrollment API
     'enrollment',
+
+    # Bulk Enrollment API
+    'bulk_enroll',
 
     # Student Identity Verification
     'lms.djangoapps.verify_student',
