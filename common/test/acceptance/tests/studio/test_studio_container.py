@@ -1130,7 +1130,6 @@ class ProblemCategoryTabsTest(ContainerBase):
         self.assertEqual(page.get_category_tab_components('problem', 1), expected_components)
 
 
-@attr(shard=1)
 @ddt.ddt
 class MoveComponentTest(ContainerBase):
     """
@@ -1409,6 +1408,7 @@ class MoveComponentTest(ContainerBase):
             should_verify_publish_title=False
         )
 
+    @attr('a11y')
     def test_a11y(self):
         """
         Verify move modal a11y.
