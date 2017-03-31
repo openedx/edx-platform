@@ -88,6 +88,7 @@ class CourseRunFactory(DictFactoryBase):
     image = ImageFactory()
     key = factory.LazyFunction(generate_course_run_key)
     marketing_url = factory.Faker('url')
+    eligible_for_financial_aid = True
     seats = factory.LazyFunction(partial(generate_instances, SeatFactory))
     pacing_type = 'self_paced'
     short_description = factory.Faker('sentence')
