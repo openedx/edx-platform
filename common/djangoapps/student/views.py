@@ -89,6 +89,7 @@ from openedx.core.djangoapps.external_auth.login_and_register import (
     login as external_auth_login,
     register as external_auth_register
 )
+from openedx.core.djangoapps import monitoring_utils
 
 import track.views
 
@@ -119,8 +120,6 @@ from openedx.core.djangoapps.embargo import api as embargo_api
 
 import analytics
 from eventtracking import tracker
-
-import newrelic_custom_metrics
 
 # Note that this lives in LMS, so this dependency should be refactored.
 from notification_prefs.views import enable_notifications
@@ -654,7 +653,7 @@ def dashboard(request):
 
     # Record how many courses there are so that we can get a better
     # understanding of usage patterns on prod.
-    newrelic_custom_metrics.accumulate('num_courses', len(course_enrollments))
+    monitoring_utils.accumulate('num_courses', len(course_enrollments))
 
     # sort the enrollment pairs by the enrollment date
     course_enrollments.sort(key=lambda x: x.created, reverse=True)
