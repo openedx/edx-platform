@@ -88,20 +88,19 @@
                         '<span class="icon fa fa-quote-left" aria-hidden="true"></span>',
                         '</button>',
                         '<div class="lang menu-container" role="application">',
-                        '<p class="sr instructions" id="lang-instructions"></p>',
+                        '<p class="sr instructions" id="lang-instructions-{courseId}"></p>',
                         '<button class="control language-menu" aria-disabled="false"',
-                        'aria-describedby="lang-instructions" ',
+                        'aria-describedby="lang-instructions-{courseId}" ',
                         'title="{langTitle}">',
                         '<span class="icon fa fa-caret-left" aria-hidden="true"></span>',
                         '</button>',
                         '</div>',
                         '</div>'
-                    ].join(''),
-                        {
-                            langTitle: gettext('Open language menu')
-                        }
-                    )
-
+                    ].join('')),
+                    {
+                        langTitle: gettext('Open language menu'),
+                        courseId: this.state.id
+                    }
                 );
 
                 var subtitlesHtml = HtmlUtils.interpolateHtml(
@@ -109,7 +108,7 @@
                     [
                         '<div class="subtitles" role="region" id="transcript-{courseId}">',
                         '<h3 id="transcript-label-{courseId}" class="transcript-title sr"></h3>',
-                        '<ol id="transcript-captions" class="subtitles-menu" lang="{courseLang}"></ol>',
+                        '<ol id="transcript-captions-{courseId}" class="subtitles-menu" lang="{courseLang}"></ol>',
                         '</div>'
                     ].join('')),
                     {
