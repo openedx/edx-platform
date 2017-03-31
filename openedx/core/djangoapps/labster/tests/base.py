@@ -6,10 +6,12 @@ from datetime import datetime, timedelta
 import mock
 from django.test.utils import override_settings
 from django.utils.timezone import UTC
+from django.conf import settings
 
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
 from ccx.tests.factories import CcxFactory
+from ccx.overrides import override_field_for_ccx
 from ccx_keys.locator import CCXLocator
 from student.roles import CourseCcxCoachRole
 from student.tests.factories import UserFactory, AdminFactory
@@ -58,7 +60,6 @@ class CCXCourseTestBase(ModuleStoreTestCase):
 
         self.addCleanup(RequestCache.clear_request_cache)
 
-
     def inject_field_overrides(self):
         """
         Apparently the test harness doesn't use LmsFieldStorage, and I'm
@@ -92,8 +93,10 @@ class CCXCourseTestBase(ModuleStoreTestCase):
         role = CourseCcxCoachRole(self.course.id)
         role.add_users(self.user)
 
-    def make_ccx(self):
+    def make_ccx(self, max_students_allowed=settings.CCX_MAX_STUDENTS_ALLOWED):
         """
         Create ccx.
         """
-        return CcxFactory(course_id=self.course.id, coach=self.user)
+        ccx = CcxFactory(course_id=self.course.id, coach=self.user)
+        override_field_for_ccx(ccx, self.course, 'max_student_enrollments_allowed', max_students_allowed)
+        return ccx

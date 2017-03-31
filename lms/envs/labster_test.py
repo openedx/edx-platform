@@ -7,8 +7,10 @@ LABSTER_FEATURES = {
 }
 
 LABSTER_APPS = (
+    'rest_framework.authtoken',
     'labster_course_license',
     'labster_vouchers',
+    'labster_enroll',
 )
 
 INSTALLED_APPS += LABSTER_APPS
