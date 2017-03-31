@@ -44,7 +44,7 @@
 
                     expect(timeControl).toHaveAttrs({
                         'role': 'slider',
-                        'aria-label': 'Video position',
+                        'aria-label': 'Video position. Press space to toggle playback',
                         'aria-disabled': 'false'
                     });
 

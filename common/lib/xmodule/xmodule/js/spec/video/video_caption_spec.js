@@ -986,9 +986,11 @@
                     videoWrapperHeight = $('.video-wrapper').height();
                     progressSliderHeight = state.el.find('.slider').height();
                     controlHeight = state.el.find('.video-controls').height();
-                    shouldBeHeight = videoWrapperHeight -
+                    shouldBeHeight = parseInt((
+                        videoWrapperHeight -
                         0.5 * progressSliderHeight -
-                        controlHeight;
+                        controlHeight
+                    ), 10);
 
                     expect(realHeight).toBe(shouldBeHeight);
                 });
