@@ -24,7 +24,6 @@ from opaque_keys.edx.locator import CourseLocator
 from pymongo import MongoClient, ASCENDING
 from openedx.core.lib.tests.assertions.events import assert_event_matches, is_matching_event, EventMatchTolerates
 from xmodule.partitions.partitions import UserPartition
-from xmodule.partitions.tests.test_partitions import MockUserPartitionScheme
 from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.select import Select
@@ -831,8 +830,12 @@ def create_user_partition_json(partition_id, name, description, groups, scheme="
     """
     Helper method to create user partition JSON. If scheme is not supplied, "random" is used.
     """
+    # All that is persisted about a scheme is its name.
+    class MockScheme(object):
+        name = scheme
+
     return UserPartition(
-        partition_id, name, description, groups, MockUserPartitionScheme(scheme)
+        partition_id, name, description, groups, MockScheme()
     ).to_json()
 
 
