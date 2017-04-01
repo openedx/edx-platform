@@ -20,13 +20,13 @@ from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticati
 from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cross_domain
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
+from openedx.features.enterprise_support.api import enterprise_enabled, EnterpriseApiClient, EnterpriseApiException
 from openedx.core.lib.api.authentication import (
     SessionAuthenticationAllowInactiveUser, OAuth2AuthenticationAllowInactiveUser,
 )
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission, ApiKeyHeaderPermissionIsAuthenticated
 from openedx.core.lib.exceptions import CourseNotFoundError
 from openedx.core.lib.log_utils import audit_log
-from util.enterprise_helpers import enterprise_enabled, EnterpriseApiClient, EnterpriseApiException
 from enrollment import api
 from enrollment.errors import (
     CourseEnrollmentError,

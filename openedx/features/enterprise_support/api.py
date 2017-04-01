@@ -1,17 +1,21 @@
 """
-Helpers to access the enterprise app
+APIs providing support for enterprise functionality.
 """
-import logging
-
 from functools import wraps
+import hashlib
+import logging
+import six
+
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
+from django.template.loader import render_to_string
 from django.utils.http import urlencode
 from django.utils.translation import ugettext as _
-from edxmako.shortcuts import render_to_string
+from slumber.exceptions import HttpClientError, HttpServerError
+
 from edx_rest_api_client.client import EdxRestApiClient
 try:
     from enterprise import utils as enterprise_utils
@@ -25,9 +29,6 @@ from requests.exceptions import ConnectionError, Timeout
 from openedx.core.djangoapps.api_admin.utils import course_discovery_api_client
 
 from openedx.core.lib.token_utils import JwtBuilder
-from slumber.exceptions import HttpClientError, HttpServerError
-import hashlib
-import six
 
 
 CONSENT_FAILED_PARAMETER = 'consent_failed'
@@ -207,6 +208,12 @@ def data_sharing_consent_required(view_func):
         # Redirect to the consent URL, if consent is required.
         consent_url = get_enterprise_consent_url(request, course_id)
         if consent_url:
+            real_user = getattr(request.user, 'real_user', request.user)
+            LOGGER.warning(
+                u'User %s cannot access the course %s because they have not granted consent',
+                real_user,
+                course_id,
+            )
             return redirect(consent_url)
 
         # Otherwise, drop through to wrapped view
@@ -439,7 +446,7 @@ def get_dashboard_consent_notification(request, user, course_enrollments):
         )
 
         return render_to_string(
-            'util/enterprise_consent_declined_notification.html',
+            'enterprise_support/enterprise_consent_declined_notification.html',
             {
                 'title': title,
                 'message': message,

@@ -32,13 +32,12 @@ from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.monitoring_utils import set_custom_metrics_for_course_key
+from openedx.features.enterprise_support.api import data_sharing_consent_required
 from request_cache.middleware import RequestCache
 from shoppingcart.models import CourseRegistrationCode
 from student.models import CourseEnrollment
 from student.views import is_course_blocked
 from student.roles import GlobalStaff
-from survey.utils import must_answer_survey
-from util.enterprise_helpers import get_enterprise_consent_url
 from util.views import ensure_valid_course_key
 from xmodule.modulestore.django import modulestore
 from xmodule.x_module import STUDENT_VIEW
@@ -73,6 +72,7 @@ class CoursewareIndex(View):
     @method_decorator(ensure_csrf_cookie)
     @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True))
     @method_decorator(ensure_valid_course_key)
+    @method_decorator(data_sharing_consent_required)
     def get(self, request, course_id, chapter=None, section=None, position=None):
         """
         Displays courseware accordion and associated content.  If course, chapter,
@@ -194,22 +194,6 @@ class CoursewareIndex(View):
         self._redirect_if_needed_to_register()
         self._redirect_if_needed_for_prereqs()
         self._redirect_if_needed_for_course_survey()
-        self._redirect_if_data_sharing_consent_needed()
-
-    def _redirect_if_data_sharing_consent_needed(self):
-        """
-        Determine if the user needs to provide data sharing consent before accessing
-        the course, and redirect the user to provide consent if needed.
-        """
-        course_id = unicode(self.course_key)
-        consent_url = get_enterprise_consent_url(self.request, course_id, user=self.real_user, return_to='courseware')
-        if consent_url:
-            log.warning(
-                u'User %s cannot access the course %s because they have not granted consent',
-                self.real_user,
-                course_id,
-            )
-            raise Redirect(consent_url)
 
     def _redirect_if_needed_to_pay_for_course(self):
         """
