@@ -2,8 +2,9 @@
 
 from third_party_auth import provider, settings
 from third_party_auth.tests import testutil
-from util.enterprise_helpers import enterprise_enabled
 import unittest
+
+from openedx.features.enterprise_support.api import enterprise_enabled
 
 
 _ORIGINAL_AUTHENTICATION_BACKENDS = ('first_authentication_backend',)

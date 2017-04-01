@@ -20,14 +20,13 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.django import modulestore
 
 from lms.djangoapps.commerce.utils import EcommerceService
-from openedx.core.djangoapps.api_admin.utils import course_discovery_api_client
 from course_modes.models import CourseMode
 from courseware.access import has_access
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.embargo import api as embargo_api
+from openedx.features.enterprise_support import api as enterprise_api
 from student.models import CourseEnrollment
 from util.db import outer_atomic
-from util import enterprise_helpers as enterprise_api
 from util import organizations_helpers as organization_api
 
 

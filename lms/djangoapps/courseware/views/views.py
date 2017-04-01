@@ -89,13 +89,13 @@ from openedx.core.djangoapps.programs.utils import ProgramMarketingDataExtender
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.monitoring_utils import set_custom_metrics_for_course_key
+from openedx.features.enterprise_support.api import data_sharing_consent_required
 from shoppingcart.utils import is_shopping_cart_enabled
 from student.models import UserTestGroup, CourseEnrollment
 from student.roles import GlobalStaff
 from util.cache import cache, cache_if_anonymous
 from util.date_utils import strftime_localized
 from util.db import outer_atomic
-from util.enterprise_helpers import get_enterprise_consent_url
 from util.milestones_helpers import get_prerequisite_courses_display
 from util.views import _record_feedback_in_zendesk
 from util.views import ensure_valid_course_key, ensure_valid_usage_key
@@ -107,7 +107,6 @@ from ..entrance_exams import user_can_skip_entrance_exam
 from ..module_render import get_module_for_descriptor, get_module, get_module_by_usage_id
 
 from web_fragments.fragment import Fragment
-from web_fragments.views import FragmentView
 
 log = logging.getLogger("edx.courseware")
 
@@ -291,6 +290,7 @@ def jump_to(_request, course_id, location):
 
 @ensure_csrf_cookie
 @ensure_valid_course_key
+@data_sharing_consent_required
 def course_info(request, course_id):
     """
     Display the course's info.html, or 404 if there is no such course.
@@ -329,12 +329,6 @@ def course_info(request, course_id):
             # self registration. Because only CCX coach can register/enroll a student. If un-enrolled user try
             # to access CCX redirect him to dashboard.
             return redirect(reverse('dashboard'))
-
-        # If the user is sponsored by an enterprise customer, and we still need to get data
-        # sharing consent, redirect to do that first.
-        consent_url = get_enterprise_consent_url(request, course_id, user=user, return_to='info')
-        if consent_url:
-            return redirect(consent_url)
 
         # If the user needs to take an entrance exam to access this course, then we'll need
         # to send them to that specific course module before allowing them into other areas
@@ -495,6 +489,7 @@ class CourseTabView(EdxFragmentView):
     """
     @method_decorator(ensure_csrf_cookie)
     @method_decorator(ensure_valid_course_key)
+    @method_decorator(data_sharing_consent_required)
     def get(self, request, course_id, tab_type, **kwargs):
         """
         Displays a course tab page that contains a web fragment.
@@ -811,6 +806,7 @@ def program_marketing(request, program_uuid):
 @login_required
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @ensure_valid_course_key
+@data_sharing_consent_required
 def progress(request, course_id, student_id=None):
     """ Display the progress page. """
     course_key = CourseKey.from_string(course_id)
@@ -837,12 +833,6 @@ def _progress(request, course_key, student_id):
 
     course = get_course_with_access(request.user, 'load', course_key, depth=None, check_if_enrolled=True)
     prep_course_for_grading(course, request)
-
-    # If the user is sponsored by an enterprise customer, and we still need to get data
-    # sharing consent, redirect to do that first.
-    consent_url = get_enterprise_consent_url(request, unicode(course.id), return_to='progress')
-    if consent_url:
-        return redirect(consent_url)
 
     # check to see if there is a required survey that must be taken before
     # the user can access the course.

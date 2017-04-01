@@ -23,8 +23,8 @@ from django_comment_client.utils import strip_none
 from lms.djangoapps.discussion import views
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from util.testing import UrlResetMixin
-from util.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
+from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
@@ -363,14 +363,12 @@ class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
         (ModuleStoreEnum.Type.split, False, 1, 3, 3, 12, 1),
         (ModuleStoreEnum.Type.split, False, 50, 3, 3, 12, 1),
 
-        # Enabling Enterprise integration increases the number of (cached and uncached) SQL queries by 1,
-        # because the presence of the user's consent for the course must be checked.
-        # But there should be no effect on the number of mongo queries made.
-        (ModuleStoreEnum.Type.mongo, True, 1, 5, 3, 14, 2),
-        (ModuleStoreEnum.Type.mongo, True, 50, 5, 3, 14, 2),
+        # Enabling Enterprise integration should have no effect on the number of mongo queries made.
+        (ModuleStoreEnum.Type.mongo, True, 1, 5, 3, 13, 1),
+        (ModuleStoreEnum.Type.mongo, True, 50, 5, 3, 13, 1),
         # split mongo: 3 queries, regardless of thread response size.
-        (ModuleStoreEnum.Type.split, True, 1, 3, 3, 13, 2),
-        (ModuleStoreEnum.Type.split, True, 50, 3, 3, 13, 2),
+        (ModuleStoreEnum.Type.split, True, 1, 3, 3, 12, 1),
+        (ModuleStoreEnum.Type.split, True, 50, 3, 3, 12, 1),
     )
     @ddt.unpack
     def test_number_of_mongo_queries(
@@ -1616,8 +1614,6 @@ class EnterpriseConsentTestCase(EnterpriseTestConsentRequired, ForumsEnableMixin
         for url in (
                 reverse('discussion.views.forum_form_discussion',
                         kwargs=dict(course_id=course_id)),
-                reverse('discussion.views.inline_discussion',
-                        kwargs=dict(course_id=course_id, discussion_id=self.discussion_id)),
                 reverse('discussion.views.single_thread',
                         kwargs=dict(course_id=course_id, discussion_id=self.discussion_id, thread_id=thread_id)),
         ):

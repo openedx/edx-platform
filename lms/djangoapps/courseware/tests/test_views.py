@@ -41,21 +41,25 @@ from commerce.models import CommerceConfiguration
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.model_data import set_score
-from courseware.module_render import toc_for_course
 from courseware.testutils import RenderXBlockTestMixin
 from courseware.tests.factories import StudentModuleFactory, GlobalStaffFactory
 from courseware.url_helpers import get_redirect_url
 from courseware.user_state_client import DjangoXBlockUserStateClient
-from courseware.views.index import render_accordion
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
 from milestones.tests.utils import MilestonesTestCaseMixin
+from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
+from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory, CourseRunFactory
+from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
+from openedx.core.djangoapps.credit.api import set_credit_requirements
+from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
+from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.lib.gating import api as gating_api
+from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory, UserFactory, CourseEnrollmentFactory
-from util.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from util.tests.test_date_utils import fake_ugettext, fake_pgettext
 from util.url import reload_django_url_config
 from util.views import ensure_valid_course_key
@@ -64,12 +68,6 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
-from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
-from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory, CourseRunFactory
-from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
-from openedx.core.djangoapps.credit.api import set_credit_requirements
-from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
-from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 
 
 @attr(shard=1)
