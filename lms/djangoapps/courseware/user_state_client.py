@@ -12,6 +12,7 @@ try:
 except ImportError:
     import json
 
+import newrelic_custom_metrics
 import dogstats_wrapper as dog_stats_api
 from django.contrib.auth.models import User
 from django.db import transaction
@@ -19,7 +20,6 @@ from django.db.utils import IntegrityError
 from xblock.fields import Scope
 from courseware.models import StudentModule, BaseStudentModuleHistory
 from edx_user_state_client.interface import XBlockUserStateClient, XBlockUserState
-from openedx.core.djangoapps import monitoring_utils
 
 log = logging.getLogger(__name__)
 
@@ -136,7 +136,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         """
         Accumulate arbitrary NR stats (not specific to block types).
         """
-        monitoring_utils.accumulate(
+        newrelic_custom_metrics.accumulate(
             self._nr_metric_name(function_name, stat_name),
             value
         )
@@ -151,11 +151,11 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         """
         Accumulate NR stats related to block types.
         """
-        monitoring_utils.accumulate(
+        newrelic_custom_metrics.accumulate(
             self._nr_metric_name(function_name, stat_name),
             value,
         )
-        monitoring_utils.accumulate(
+        newrelic_custom_metrics.accumulate(
             self._nr_metric_name(function_name, stat_name, block_type=block_type),
             value,
         )

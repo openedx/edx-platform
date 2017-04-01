@@ -1,28 +1,27 @@
 """
-Tests for monitoring custom metrics.
+Tests for newrelic custom metrics.
 """
 from django.test import TestCase
 from mock import patch, call
 
-from openedx.core.djangoapps import monitoring_utils
-from openedx.core.djangoapps.monitoring_utils.middleware import MonitoringCustomMetrics
+import newrelic_custom_metrics
 
 
-class TestMonitoringCustomMetrics(TestCase):
+class TestNewRelicCustomMetrics(TestCase):
     """
-    Test the monitoring_utils middleware and helpers
+    Test the newrelic_custom_metrics middleware and helpers
     """
 
     @patch('newrelic.agent')
-    def test_custom_metrics_with_new_relic(self, mock_newrelic_agent):
+    def test_cache_normal_contents(self, mock_newrelic_agent):
         """
-        Test normal usage of collecting custom metrics and reporting to New Relic
+        Test normal usage of collecting and reporting custom New Relic metrics
         """
-        monitoring_utils.accumulate('hello', 10)
-        monitoring_utils.accumulate('world', 10)
-        monitoring_utils.accumulate('world', 10)
-        monitoring_utils.increment('foo')
-        monitoring_utils.increment('foo')
+        newrelic_custom_metrics.accumulate('hello', 10)
+        newrelic_custom_metrics.accumulate('world', 10)
+        newrelic_custom_metrics.accumulate('world', 10)
+        newrelic_custom_metrics.increment('foo')
+        newrelic_custom_metrics.increment('foo')
 
         # based on the metric data above, we expect the following calls to newrelic:
         nr_agent_calls_expected = [
@@ -32,7 +31,7 @@ class TestMonitoringCustomMetrics(TestCase):
         ]
 
         # fake a response to trigger metrics reporting
-        MonitoringCustomMetrics().process_response(
+        newrelic_custom_metrics.middleware.NewRelicCustomMetrics().process_response(
             'fake request',
             'fake response',
         )
