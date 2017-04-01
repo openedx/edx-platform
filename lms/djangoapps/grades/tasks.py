@@ -10,6 +10,10 @@ from django.db.utils import DatabaseError
 from logging import getLogger
 
 log = getLogger(__name__)
+try:
+    import newrelic.agent
+except ImportError:
+    newrelic = None  # pylint: disable=invalid-name
 
 from celery_utils.logged_task import LoggedTask
 from celery_utils.persist_on_failure import PersistOnFailureTask
@@ -18,9 +22,6 @@ from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware import courses
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import CourseLocator
-from openedx.core.djangoapps.monitoring_utils import (
-    set_custom_metrics_for_course_key, set_custom_metric
-)
 from student.models import CourseEnrollment
 from submissions import api as sub_api
 from track.event_transaction_utils import (
@@ -116,8 +117,9 @@ def _recalculate_subsection_grade(self, **kwargs):
         course_key = CourseLocator.from_string(kwargs['course_id'])
         scored_block_usage_key = UsageKey.from_string(kwargs['usage_id']).replace(course_key=course_key)
 
-        set_custom_metrics_for_course_key(course_key)
-        set_custom_metric('usage_id', unicode(scored_block_usage_key))
+        if newrelic:
+            newrelic.agent.add_custom_parameter('course_id', unicode(course_key))
+            newrelic.agent.add_custom_parameter('usage_id', unicode(scored_block_usage_key))
 
         # The request cache is not maintained on celery workers,
         # where this code runs. So we take the values from the

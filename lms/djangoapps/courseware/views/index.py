@@ -22,6 +22,11 @@ import logging
 
 log = logging.getLogger("edx.courseware.views.index")
 
+try:
+    import newrelic.agent
+except ImportError:
+    newrelic = None  # pylint: disable=invalid-name
+
 import urllib
 import waffle
 
@@ -31,7 +36,6 @@ from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
-from openedx.core.djangoapps.monitoring_utils import set_custom_metrics_for_course_key
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 from request_cache.middleware import RequestCache
 from shoppingcart.models import CourseRegistrationCode
@@ -103,7 +107,7 @@ class CoursewareIndex(View):
         self.url = request.path
 
         try:
-            set_custom_metrics_for_course_key(self.course_key)
+            self._init_new_relic()
             self._clean_position()
             with modulestore().bulk_operations(self.course_key):
                 self.course = get_course_with_access(request.user, 'load', self.course_key, depth=CONTENT_DEPTH)
@@ -175,6 +179,15 @@ class CoursewareIndex(View):
                     },
                 )
             )
+
+    def _init_new_relic(self):
+        """
+        Initialize metrics for New Relic so we can slice data in New Relic Insights
+        """
+        if not newrelic:
+            return
+        newrelic.agent.add_custom_parameter('course_id', unicode(self.course_key))
+        newrelic.agent.add_custom_parameter('org', unicode(self.course_key.org))
 
     def _clean_position(self):
         """
