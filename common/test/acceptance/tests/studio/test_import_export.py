@@ -15,7 +15,7 @@ from common.test.acceptance.pages.studio.import_export import (
 from common.test.acceptance.pages.studio.library import LibraryEditPage
 from common.test.acceptance.pages.studio.overview import CourseOutlinePage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
-from common.test.acceptance.pages.lms.staff_view import StaffCoursewarePage
+from common.test.acceptance.pages.lms.staff_view import StaffPage
 
 
 class ExportTestMixin(object):
@@ -302,7 +302,7 @@ class TestEntranceExamCourseImport(ImportTestMixin, StudioCourseTest):
         self.landing_page.view_live()
         courseware = CoursewarePage(self.browser, self.course_id)
         courseware.wait_for_page()
-        StaffCoursewarePage(self.browser, self.course_id).set_staff_view_mode('Student')
+        StaffPage(self.browser, self.course_id).set_staff_view_mode('Student')
         self.assertEqual(courseware.num_sections, 1)
         self.assertIn(
             "To access course materials, you must score", courseware.entrance_exam_message_selector.text[0]

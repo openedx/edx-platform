@@ -18,8 +18,6 @@ class CoursewarePage(CoursePage):
 
     url_path = "courseware/"
     xblock_component_selector = '.vert .xblock'
-
-    # TODO: TNL-6546: Remove sidebar selectors
     section_selector = '.chapter'
     subsection_selector = '.chapter-content-container a'
 
