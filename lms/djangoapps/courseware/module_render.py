@@ -183,6 +183,10 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
         previous_of_active_section, next_of_active_section = None, None
         last_processed_section, last_processed_chapter = None, None
         found_active_section = False
+
+        # create BookmarksService object for logged user
+        bookmarks_service = BookmarksService(user=user)
+        
         for chapter in chapters:
             # Only show required content, if there is required content
             # chapter.hide_from_toc is read-only (bool)
@@ -223,12 +227,14 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
                                 viewed = True
                                 grade = view_data[unicode(grandchild)]
 
+                        is_bookmarked = bookmarks_service.is_bookmarked(usage_key=child.scope_ids.usage_id)
                         units.append({
                             'idx': index,
                             'display_name': child.display_name,
                             'location': unicode(child.location),
                             'viewed': unicode(viewed),
-                            'grade': unicode(grade)
+                            'grade': unicode(grade),
+                            'is_bookmarked': is_bookmarked
                         })
 
                 section_context = {

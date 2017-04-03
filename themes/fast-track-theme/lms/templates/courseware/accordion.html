@@ -103,6 +103,10 @@ else:
                                 <i class="fa fa-graduation-cap"></i>
                             % endif
 
+                            %if unit['is_bookmarked']:
+                                <i class="fa fa-bookmark"></i>
+                            %endif
+
                             ${unit['display_name']}
                         </li>
                     % endfor
