@@ -133,4 +133,4 @@ class Command(BaseCommand):
         log.setLevel(log_level)
 
     def _latest_settings(self):
-        return ComputeGradesSetting.objects.order_by('-id')[0]
+        return ComputeGradesSetting.current()
