@@ -293,15 +293,15 @@
                 
                 .u-field-message {
                     position: relative;
-                    padding: 24px 0 0 ($baseline*5);
+                    @include padding(24px, 0, 0, $baseline*5);
 
                     .u-field-message-notification {
+                        @include left(0);
+                        @include padding(38px, 0, 0, $baseline*5);
                         position: absolute;
-                        left: 0;
                         top: 0;
                         bottom: 0;
                         margin: auto;
-                        padding: 38px 0 0 ($baseline*5);
                     }
                 }
 
