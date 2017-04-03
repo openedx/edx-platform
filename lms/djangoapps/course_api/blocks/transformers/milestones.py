@@ -8,6 +8,7 @@ from openedx.core.djangoapps.content.block_structure.transformer import (
     BlockStructureTransformer,
     FilteringTransformerMixin,
 )
+from student.models import EntranceExamConfiguration
 from util import milestones_helpers
 
 
@@ -35,16 +36,22 @@ class MilestonesTransformer(FilteringTransformerMixin, BlockStructureTransformer
         block_structure.request_xblock_fields('is_proctored_enabled')
         block_structure.request_xblock_fields('is_practice_exam')
         block_structure.request_xblock_fields('is_timed_exam')
+        block_structure.request_xblock_fields('entrance_exam_id')
 
     def transform_block_filters(self, usage_info, block_structure):
         if usage_info.has_staff_access:
             return [block_structure.create_universal_filter()]
 
+        course_key = block_structure.root_block_usage_key.course_key
+        user_can_skip = EntranceExamConfiguration.user_can_skip_entrance_exam(usage_info.user, course_key)
+        exam_id = block_structure.get_xblock_field(course_key, 'entrance_exam_id')
         def user_gated_from_block(block_key):
             """
             Checks whether the user is gated from accessing this block, first via special exams,
             then via a general milestones check.
             """
+            if user_can_skip and block_key == exam_id:
+                return False
             return self.has_pending_milestones_for_user(block_key, usage_info)
             #return (
             #    settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and
