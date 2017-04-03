@@ -347,6 +347,9 @@ class SAMLProviderConfig(ProviderConfig):
     attr_email = models.CharField(
         max_length=128, blank=True, verbose_name="Email Attribute",
         help_text="URN of SAML attribute containing the user's email address[es]. Leave blank for default.")
+    automatic_refresh_enabled = models.BooleanField(
+        default=True, verbose_name="Enable automatic metadata refresh",
+        help_text="When checked, the SAML provider's metadata will be included in the automatic refresh job, if configured.")
     debug_mode = models.BooleanField(
         default=False, verbose_name="Debug Mode",
         help_text=(
