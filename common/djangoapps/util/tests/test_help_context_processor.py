@@ -38,7 +38,7 @@ class HelpContextProcessorTest(TestCase):
         self.assertEqual(self._get_doc_url(), doc.format(doc_version()))
 
         # Provide a known page_token.
-        doc = "http://edx.readthedocs.io/projects/open-edx-learner-guide/en/{}/sfd_dashboard_profile/index.html"
+        doc = "http://edx.readthedocs.io/projects/open-edx-learner-guide/en/{}/SFD_dashboard_profile_SectionHead.html"
         self.assertEqual(self._get_doc_url('profile'), doc.format(doc_version()))
 
         # Use settings.DOC_LINK_BASE_URL to override default base_url.
