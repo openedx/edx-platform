@@ -86,11 +86,19 @@ class TestSaveSubsToStore(SharedModuleStoreTestCase):
 
     def clear_subs_content(self):
         """Remove, if subtitles content exists."""
-        try:
-            content = contentstore().find(self.content_location)
-            contentstore().delete(content.location)
-        except NotFoundError:
-            pass
+        for content_location in [self.content_location, self.content_copied_location]:
+            try:
+                content = contentstore().find(content_location)
+                contentstore().delete(content.location)
+            except NotFoundError:
+                pass
+
+    @classmethod
+    def sub_id_to_location(cls, sub_id):
+        """
+        A helper to compute a static file location from a subtitle id.
+        """
+        return StaticContent.compute_location(cls.course.id, u'subs_{0}.srt.sjson'.format(sub_id))
 
     @classmethod
     def setUpClass(cls):
@@ -110,21 +118,30 @@ class TestSaveSubsToStore(SharedModuleStoreTestCase):
             ]
         }
 
-        cls.subs_id = str(uuid4())
-        filename = 'subs_{0}.srt.sjson'.format(cls.subs_id)
-        cls.content_location = StaticContent.compute_location(cls.course.id, filename)
+        # Prefix it to ensure that unicode filenames are allowed
+        cls.subs_id = u'uniçøde_{}'.format(uuid4())
+        cls.subs_copied_id = u'cøpy_{}'.format(uuid4())
+
+        cls.content_location = cls.sub_id_to_location(cls.subs_id)
+        cls.content_copied_location = cls.sub_id_to_location(cls.subs_copied_id)
 
         # incorrect subs
         cls.unjsonable_subs = {1}  # set can't be serialized
 
         cls.unjsonable_subs_id = str(uuid4())
-        filename_unjsonable = 'subs_{0}.srt.sjson'.format(cls.unjsonable_subs_id)
-        cls.content_location_unjsonable = StaticContent.compute_location(cls.course.id, filename_unjsonable)
+        cls.content_location_unjsonable = cls.sub_id_to_location(cls.unjsonable_subs_id)
 
     def setUp(self):
         super(TestSaveSubsToStore, self).setUp()
         self.addCleanup(self.clear_subs_content)
         self.clear_subs_content()
+
+    def test_save_unicode_filename(self):
+        # Mock a video item
+        item = Mock(location=Mock(course_key=self.course.id))
+        transcripts_utils.save_subs_to_store(self.subs, self.subs_id, self.course)
+        transcripts_utils.copy_or_rename_transcript(self.subs_copied_id, self.subs_id, item)
+        self.assertTrue(contentstore().find(self.content_copied_location))
 
     def test_save_subs_to_store(self):
         with self.assertRaises(NotFoundError):
