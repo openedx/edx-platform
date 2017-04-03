@@ -20,7 +20,11 @@ from openedx.core.djangolib.markup import HTML
         <div class="page-header-secondary">
             <div class="form-actions">
                 <a class="btn action-resume-course" href="${reverse('courseware', kwargs={'course_id': unicode(course.id.to_deprecated_string())})}">
-                    ${_("Resume Course")}
+                    % if has_visited_course:
+                        ${_("Resume Course")}
+                    % else:
+                        ${_("Start Course")}
+                    % endif
                 </a>
                 <a class="btn action-show-bookmarks" href="${reverse('openedx.course_bookmarks.home', args=[course.id])}">
                     ${_("Bookmarks")}

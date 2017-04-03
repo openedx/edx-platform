@@ -9,7 +9,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 
-from courseware.courses import get_course_with_access
+from courseware.courses import get_course_with_access, get_last_accessed_courseware
 from lms.djangoapps.courseware.views.views import CourseTabView
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
@@ -53,11 +53,15 @@ class CourseHomeFragmentView(EdxFragmentView):
         # Render the outline as a fragment
         outline_fragment = CourseOutlineFragmentView().render_to_fragment(request, course_id=course_id, **kwargs)
 
+        # Get the last accessed courseware
+        last_accessed_url, __ = get_last_accessed_courseware(course, request, request.user)
+
         # Render the course home fragment
         context = {
             'csrf': csrf(request)['csrf_token'],
             'course': course,
             'outline_fragment': outline_fragment,
+            'has_visited_course': last_accessed_url is not None,
             'disable_courseware_js': True,
             'uses_pattern_library': True,
         }

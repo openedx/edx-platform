@@ -120,7 +120,7 @@ class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTe
     def test_anonymous_user_visiting_course_with_survey(self):
         """
         Verifies that anonymous user going to the courseware info with an unanswered survey is not
-        redirected to survery and info page renders without server error.
+        redirected to survey and info page renders without server error.
         """
         self.logout()
         resp = self.client.get(

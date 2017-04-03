@@ -22,8 +22,8 @@ from provider.oauth2.models import Client
 
 from edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
 from edxnotes.plugins import EdxNotesTab
-from courseware.views.views import get_current_child
 from courseware.access import has_access
+from courseware.courses import get_current_child
 from openedx.core.lib.token_utils import JwtBuilder
 from student.models import anonymous_id_for_user
 from util.date_utils import get_default_time_display
