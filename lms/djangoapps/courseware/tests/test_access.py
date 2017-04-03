@@ -478,6 +478,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
     @ddt.data(None, YESTERDAY, TOMORROW)
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     @patch('courseware.access_utils.get_current_request_hostname', Mock(return_value='preview.localhost'))
+    @patch('courseware.access_utils.get_current_request_port', Mock(return_value='8003'))
     def test__has_access_descriptor_in_preview_mode(self, start):
         """
         Tests that descriptor has access in preview mode.
@@ -864,3 +865,10 @@ class CourseOverviewAccessTestCase(ModuleStoreTestCase):
         course_overview = CourseOverview.get_from_id(course.id)
         with self.assertNumQueries(num_queries):
             bool(access.has_access(user, action, course_overview, course_key=course.id))
+
+    @patch.dict('django.conf.settings.FEATURES', {'PREVIEW_LMS_BASE': None})
+    def test_mode_with_no_preview_lms_base_defined(self):
+        """
+        Check that preview mode is disabled when no PREVIEW_LMS_BASE is defined
+        """
+        self.assertFalse(access.in_preview_mode())
