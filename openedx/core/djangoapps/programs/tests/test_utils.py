@@ -53,7 +53,7 @@ class TestProgramProgressMeter(TestCase):
 
     def _assert_progress(self, meter, *progresses):
         """Variadic helper used to verify progress calculations."""
-        self.assertEqual(meter.progress, list(progresses))
+        self.assertEqual(meter.progress(), list(progresses))
 
     def _attach_detail_url(self, programs):
         """Add expected detail URLs to a list of program dicts."""
@@ -112,6 +112,39 @@ class TestProgramProgressMeter(TestCase):
             ProgressFactory(uuid=program['uuid'], in_progress=1)
         )
         self.assertEqual(meter.completed_programs, [])
+
+    def test_course_progress(self, mock_get_programs):
+        """
+        Verify that the progress meter can represent progress in terms of
+        serialized courses.
+        """
+        course_run_key = generate_course_run_key()
+        data = [
+            ProgramFactory(
+                courses=[
+                    CourseFactory(course_runs=[
+                        CourseRunFactory(key=course_run_key),
+                    ]),
+                ]
+            )
+        ]
+        mock_get_programs.return_value = data
+
+        self._create_enrollments(course_run_key)
+
+        meter = ProgramProgressMeter(self.user)
+
+        program = data[0]
+        expected = [
+            ProgressFactory(
+                uuid=program['uuid'],
+                completed=[],
+                in_progress=[program['courses'][0]],
+                not_started=[]
+            )
+        ]
+
+        self.assertEqual(meter.progress(count_only=False), expected)
 
     def test_mutiple_program_engagement(self, mock_get_programs):
         """

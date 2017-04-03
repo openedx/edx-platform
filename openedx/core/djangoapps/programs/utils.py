@@ -57,8 +57,11 @@ class ProgramProgressMeter(object):
 
     Keyword Arguments:
         enrollments (list): List of the user's enrollments.
+        uuid (str): UUID identifying a specific program. If provided, the meter
+            will only inspect this one program, not all programs the user may be
+            engaged with.
     """
-    def __init__(self, user, enrollments=None):
+    def __init__(self, user, enrollments=None, uuid=None):
         self.user = user
 
         self.enrollments = enrollments or list(CourseEnrollment.enrollments_for_user(self.user))
@@ -67,7 +70,10 @@ class ProgramProgressMeter(object):
         # enrollment.course_id is really a CourseKey (╯ಠ_ಠ）╯︵ ┻━┻
         self.course_run_ids = [unicode(e.course_id) for e in self.enrollments]
 
-        self.programs = attach_program_detail_url(get_programs())
+        if uuid:
+            self.programs = [get_programs(uuid=uuid)]
+        else:
+            self.programs = attach_program_detail_url(get_programs())
 
     def invert_programs(self):
         """Intersect programs and enrollments.
@@ -119,31 +125,39 @@ class ProgramProgressMeter(object):
 
         return programs
 
-    @property
-    def progress(self):
+    def progress(self, programs=None, count_only=True):
         """Gauge a user's progress towards program completion.
+
+        Keyword Arguments:
+            programs (list): Specific list of programs to check the user's progress
+                against. If left unspecified, self.engaged_programs will be used.
+
+            count_only (bool): Whether or not to return counts of completed, in
+                progress, and unstarted courses instead of serialized representations
+                of the courses.
 
         Returns:
             list of dict, each containing information about a user's progress
                 towards completing a program.
         """
         progress = []
-        for program in self.engaged_programs:
-            completed, in_progress, not_started = 0, 0, 0
+        programs = programs or self.engaged_programs
+        for program in programs:
+            completed, in_progress, not_started = [], [], []
 
             for course in program['courses']:
                 if self._is_course_complete(course):
-                    completed += 1
+                    completed.append(course)
                 elif self._is_course_in_progress(course):
-                    in_progress += 1
+                    in_progress.append(course)
                 else:
-                    not_started += 1
+                    not_started.append(course)
 
             progress.append({
                 'uuid': program['uuid'],
-                'completed': completed,
-                'in_progress': in_progress,
-                'not_started': not_started,
+                'completed': len(completed) if count_only else completed,
+                'in_progress': len(in_progress) if count_only else in_progress,
+                'not_started': len(not_started) if count_only else not_started,
             })
 
         return progress
