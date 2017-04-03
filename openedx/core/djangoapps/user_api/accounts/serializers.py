@@ -5,6 +5,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.utils.translation import ungettext, ugettext
 
 from lms.djangoapps.badges.utils import badges_enabled
 from . import (
@@ -154,9 +155,11 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
     def validate_name(self, new_name):
         """ Enforce minimum length for name. """
         if len(new_name) < NAME_MIN_LENGTH:
-            raise serializers.ValidationError(
-                "The name field must be at least {} characters long.".format(NAME_MIN_LENGTH)
-            )
+            raise serializers.ValidationError(ungettext(
+                "The name field must be at least {count} character long.",
+                "The name field must be at least {count} characters long.",
+                NAME_MIN_LENGTH
+            ).format(count=NAME_MIN_LENGTH))
         return new_name
 
     def validate_language_proficiencies(self, value):
@@ -164,7 +167,9 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
         language_proficiencies = [language for language in value]
         unique_language_proficiencies = set(language["code"] for language in language_proficiencies)
         if len(language_proficiencies) != len(unique_language_proficiencies):
-            raise serializers.ValidationError("The language_proficiencies field must consist of unique languages")
+            raise serializers.ValidationError(
+                ugettext("The language_proficiencies field must consist of unique languages")
+            )
         return value
 
     def transform_gender(self, user_profile, value):  # pylint: disable=unused-argument
