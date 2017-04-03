@@ -33,27 +33,42 @@ def fetch_saml_metadata():
     It's OK to run this whether or not SAML is enabled.
 
     Return value:
-        tuple(num_changed, num_failed, num_total, failure_messages)
-        num_changed: Number of providers that are either new or whose metadata has changed
+        tuple(num_skipped, num_attempted, num_updated, num_failed, failure_messages)
+        num_total: Total number of providers found in the database
+        num_skipped: Number of providers skipped for various reasons (see L52)
+        num_attempted: Number of providers whose metadata was fetched
+        num_updated: Number of providers that are either new or whose metadata has changed
         num_failed: Number of providers that could not be updated
-        num_total: Total number of providers whose metadata was fetched
         failure_messages: List of error messages for the providers that could not be updated
     """
-    num_changed = 0
-    failure_messages = []
 
     # First make a list of all the metadata XML URLs:
+    saml_providers = SAMLProviderConfig.key_values('idp_slug', flat=True)
+    num_total = len(saml_providers)
+    num_skipped = 0
     url_map = {}
-    for idp_slug in SAMLProviderConfig.key_values('idp_slug', flat=True):
+    for idp_slug in saml_providers:
         config = SAMLProviderConfig.current(idp_slug)
-        if not config.enabled or not SAMLConfiguration.is_enabled(config.site):
+
+        # Skip SAML provider configurations which do not qualify for fetching
+        if any([
+            not config.enabled,
+            not config.automatic_refresh_enabled,
+            not SAMLConfiguration.is_enabled(config.site)
+        ]):
+            num_skipped += 1
             continue
+
         url = config.metadata_source
         if url not in url_map:
             url_map[url] = []
         if config.entity_id not in url_map[url]:
             url_map[url].append(config.entity_id)
-    # Now fetch the metadata:
+
+    # Now attempt to fetch the metadata for the remaining SAML providers:
+    num_attempted = len(url_map)
+    num_updated = 0
+    failure_messages = []  # We return the length of this array for num_failed
     for url, entity_ids in url_map.items():
         try:
             log.info("Fetching %s", url)
@@ -75,7 +90,7 @@ def fetch_saml_metadata():
                 changed = _update_data(entity_id, public_key, sso_url, expires_at)
                 if changed:
                     log.info(u"→ Created new record for SAMLProviderData")
-                    num_changed += 1
+                    num_updated += 1
                 else:
                     log.info(u"→ Updated existing SAMLProviderData. Nothing has changed.")
         except (exceptions.SSLError, exceptions.HTTPError, exceptions.RequestException, MetadataParseError) as error:
@@ -109,7 +124,8 @@ def fetch_saml_metadata():
                 )
             )
 
-    return num_changed, len(failure_messages), len(url_map), failure_messages
+    # Return counts for total, skipped, attempted, updated, and failed, along with any failure messages
+    return num_total, num_skipped, num_attempted, num_updated, len(failure_messages), failure_messages
 
 
 def _parse_metadata_xml(xml, entity_id):
