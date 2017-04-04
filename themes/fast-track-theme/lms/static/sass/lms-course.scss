@@ -1,6 +1,9 @@
 @import 'lms/static/sass/lms-course';
 @import './course/navigation';
 
+$prev-next-color: silver;
+$prev-next-color-light: #d6d6d6;
+
 // Marin clumsy override until we get the design
 .courseware-bookmarks-button {
     position: absolute;
@@ -60,6 +63,39 @@ body.view-in-course {
 
       .wrapper-course-modes {
         border: none;
+      }
+    }
+
+    // previews and next arrows / buttons
+    .xmodule_display.xmodule_SequenceModule nav.sequence-bottom {
+      position: absolute;
+      width: inherit;
+      left: 0;
+      right: 0;
+      top: 50%;
+      cursor: pointer;
+
+      color: $prev-next-color;
+      .fa {
+        padding-top: 14px;
+        font-size: 10px;
+        &.fa-arrow-right {
+          padding-left: 2px;
+        }
+      }
+
+      div.arrow-text {
+        font-size: 12px;
+        font-weight: 600;
+        color: $prev-next-color-light;
+        text-decoration: underline;
+        text-transform: uppercase;
+
+        -webkit-transform: rotate(-90deg);
+        -moz-transform: rotate(-90deg);
+        -ms-transform: rotate(-90deg);
+        -o-transform: rotate(-90deg);
+        filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
       }
     }
   }
