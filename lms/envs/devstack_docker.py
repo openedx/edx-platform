@@ -31,3 +31,30 @@ FEATURES.update({
     'ENABLE_COURSE_DISCOVERY': False,
     'ENABLE_DASHBOARD_SEARCH': False,
 })
+
+ENABLE_MKTG_SITE = os.environ.get('ENABLE_MARKETING_SITE', False)
+MARKETING_SITE_ROOT = os.environ.get('MARKETING_SITE_ROOT', 'http://localhost:8080')
+
+MKTG_URLS = {
+    'ABOUT': '/about-us',
+    'ACCESSIBILITY': '/accessibility',
+    'BLOG': '/blog',
+    'CAREERS': '/careers',
+    'CONTACT': '/contact',
+    'COURSES': '/course',
+    'DONATE': '/donate',
+    'ENTERPRISE': '/enterprise',
+    'FAQ': '/student-faq',
+    'HONOR': '/edx-terms-service',
+    'HOW_IT_WORKS': '/how-it-works',
+    'MEDIA_KIT': '/media-kit',
+    'NEWS': '/news-announcements',
+    'PRESS': '/press',
+    'PRIVACY': '/edx-privacy-policy',
+    'ROOT': MARKETING_SITE_ROOT,
+    'SCHOOLS': '/schools-partners',
+    'SITE_MAP': '/sitemap',
+    'TOS': '/edx-terms-service',
+    'TOS_AND_HONOR': '/edx-terms-service',
+    'WHAT_IS_VERIFIED_CERT': '/verified-certificate',
+}
