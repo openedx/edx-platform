@@ -444,29 +444,55 @@ def account_settings_context(request):
         # it will be broken if exception raised
         user_orders = []
 
+    fields = {
+        'country': {
+            'options': list(countries),
+        }, 'gender': {
+            'options': [(choice[0], _(choice[1])) for choice in UserProfile.GENDER_CHOICES],  # pylint: disable=translation-of-non-string
+        }, 'language': {
+            'options': released_languages(),
+        }, 'level_of_education': {
+            'options': [(choice[0], _(choice[1])) for choice in UserProfile.LEVEL_OF_EDUCATION_CHOICES],  # pylint: disable=translation-of-non-string
+        }, 'password': {
+            'url': reverse('password_reset'),
+        }, 'year_of_birth': {
+            'options': year_of_birth_options,
+        }, 'preferred_language': {
+            'required': True,
+            'options': all_languages(),
+        }, 'time_zone': {
+            'required': True,
+            'options': TIME_ZONE_CHOICES,
+        }
+    }
+
+    for name, value in settings.REGISTRATION_EXTRA_FIELDS.iteritems():
+        if name not in fields:
+            # Unknown field for this page, mainly `city` is used in the configuration.
+            continue
+
+        if value == 'required':
+            fields[name]['required'] = True
+        elif value == 'optional':
+            fields[name]['required'] = False
+        elif value != 'hidden':  # The hidden setting is ineffective.
+            raise ValueError(
+                u'Invalid registration settings was found: ({name}={value}) in `REGISTRATION_EXTRA_FIELDS`.'.format(
+                    name=name,
+                    value=value,
+                )
+            )
+
+    for name, field in fields.iteritems():
+        if 'required' not in field:
+            # Allow some brevity in the configuration, set all other fields to be optioanl.
+            field['required'] = False
+
     context = {
         'auth': {},
         'duplicate_provider': None,
         'nav_hidden': True,
-        'fields': {
-            'country': {
-                'options': list(countries),
-            }, 'gender': {
-                'options': [(choice[0], _(choice[1])) for choice in UserProfile.GENDER_CHOICES],  # pylint: disable=translation-of-non-string
-            }, 'language': {
-                'options': released_languages(),
-            }, 'level_of_education': {
-                'options': [(choice[0], _(choice[1])) for choice in UserProfile.LEVEL_OF_EDUCATION_CHOICES],  # pylint: disable=translation-of-non-string
-            }, 'password': {
-                'url': reverse('password_reset'),
-            }, 'year_of_birth': {
-                'options': year_of_birth_options,
-            }, 'preferred_language': {
-                'options': all_languages(),
-            }, 'time_zone': {
-                'options': TIME_ZONE_CHOICES,
-            }
-        },
+        'fields': fields,
         'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
         'user_accounts_api_url': reverse("accounts_api", kwargs={'username': user.username}),
         'user_preferences_api_url': reverse('preferences_api', kwargs={'username': user.username}),
