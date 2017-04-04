@@ -13,6 +13,7 @@ with open(CONFIG_ROOT / "bdu.auth.json") as env_file:
 
 ### BDU Labs ##################################################################
 BDU_LABS_ROOT_URL = BDU_ENV_TOKENS.get('BDU_LABS_ROOT_URL')
+BDU_LABS_OAUTH_CLIENT_NAME = BDU_ENV_TOKENS.get('BDU_LABS_OAUTH_CLIENT_NAME')
 
 # BDU Labs API
 BDU_LABS_API_URL = BDU_ENV_TOKENS.get('BDU_LABS_API_URL')
