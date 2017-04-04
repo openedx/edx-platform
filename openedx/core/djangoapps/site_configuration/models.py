@@ -179,9 +179,9 @@ class SiteConfiguration(models.Model):
     def _get_initial_microsite_values(self):
         domain_without_port_number = self.site.domain.split(':')[0]
         if settings.DEBUG:
-            css_overrides_file = "customer_themes/{}.css".format(domain_without_port_number),
+            css_overrides_file = "customer_themes/{}.css".format(domain_without_port_number)
         else:
-            css_overrides_file = "{}.css".format(domain_without_port_number),
+            css_overrides_file = "{}.css".format(domain_without_port_number)
         return {
             'platform_name': self.site.name,
             'css_overrides_file': css_overrides_file,
