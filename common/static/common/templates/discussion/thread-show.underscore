@@ -69,7 +69,7 @@
             %>
         <% } %>
         <div class="group-visibility-label">
-            <% if (obj.group_name) { %>
+            <% if (obj.group_name && is_commentable_cohorted) { %>
                 <%-
                 interpolate(
                     gettext('This post is visible only to %(group_name)s.'),
