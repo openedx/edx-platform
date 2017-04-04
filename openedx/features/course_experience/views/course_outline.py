@@ -33,13 +33,8 @@ class CourseOutlineFragmentView(EdxFragmentView):
 
             # Fake data; remove
             child_detail = dict(child_detail, **{
-                'format': "",
-                'proctoring': {
-                    'status': 'eligible',
-                    'suggested_icon': 'fa-pencil-square-o',
-                    'in_completed_state': True,
-                    'short_description': "Exam details go here"
-                }
+                "format": "",
+                "due": ""
             })
 
             block['children'][i] = child_detail

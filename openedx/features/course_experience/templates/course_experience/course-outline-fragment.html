@@ -27,7 +27,6 @@ from django.utils.translation import ugettext as _
                 </div>
                 <ol class="outline-item focusable" role="group" tabindex="0">
                     % for subsection in section.get('children') or []:
-                    ${ subsection.get('special_exam', '') }
                         <li
                             class="subsection ${ 'current' if subsection['current'] else '' }"
                             role="treeitem"
@@ -45,33 +44,33 @@ from django.utils.translation import ugettext as _
 
                                     <div class="details">
                                         ## There are behavior differences between rendering of subsections which have
-                                        ## proctoring/timed examinations and those that do not.
+                                        ## special_exam/timed examinations and those that do not.
                                         ##
                                         ## Proctoring exposes a exam status message field as well as a status icon
                                         <%
                                             if subsection.get('due') is None:
                                                 data_string = subsection['format']
                                             else:
-                                                if 'proctoring' in subsection:
+                                                if 'special_exam' in subsection:
                                                     data_string = _('due {date}')
                                                 else:
                                                     data_string = _("{subsection_format} due {{date}}").format(subsection_format=subsection['format'])
                                         %>
-                                        % if subsection['format'] or due_date or 'proctoring' in subsection:
+                                        % if subsection['format'] or due_date or 'special_exam' in subsection:
                                         <span class="subtitle">
-                                            % if 'proctoring' in subsection:
+                                            % if 'special_exam' in subsection:
                                                 ## Display the proctored exam status icon and status message
                                                 <span
-                                                    class="menu-icon icon fa ${subsection['proctoring'].get('suggested_icon', 'fa-pencil-square-o')} ${subsection['proctoring'].get('status', 'eligible')}"
+                                                    class="menu-icon icon fa ${subsection['special_exam'].get('suggested_icon', 'fa-pencil-square-o')} ${subsection['special_exam'].get('status', 'eligible')}"
                                                     aria-hidden="true"
                                                 ></span>
                                                 <span class="subtitle-name">
-                                                    ${subsection['proctoring'].get('short_description', '')}
+                                                    ${subsection['special_exam'].get('short_description', '')}
                                                 </span>
 
                                                 ## completed proctored exam statuses should not show the due date
                                                 ## since the exam has already been submitted by the user
-                                                % if not section['proctoring'].get('in_completed_state', False):
+                                                % if not subsection['special_exam'].get('in_completed_state', False):
                                                     <span
                                                         class="localized-datetime subtitle-name"
                                                         data-datetime="${subsection['due']}"
