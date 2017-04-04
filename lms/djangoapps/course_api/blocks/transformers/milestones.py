@@ -8,11 +8,12 @@ from openedx.core.djangoapps.content.block_structure.transformer import (
     BlockStructureTransformer,
     FilteringTransformerMixin,
 )
+from edx_proctoring.api import get_attempt_status_summary
 from student.models import EntranceExamConfiguration
 from util import milestones_helpers
 
 
-class MilestonesTransformer(FilteringTransformerMixin, BlockStructureTransformer):
+class MilestonesTransformer(BlockStructureTransformer):
     """
     Excludes all special exams (timed, proctored, practice proctored) from the student view.
     Excludes all blocks with unfulfilled milestones from the student view.
@@ -38,27 +39,67 @@ class MilestonesTransformer(FilteringTransformerMixin, BlockStructureTransformer
         block_structure.request_xblock_fields('is_timed_exam')
         block_structure.request_xblock_fields('entrance_exam_id')
 
-    def transform_block_filters(self, usage_info, block_structure):
-        if usage_info.has_staff_access:
-            return [block_structure.create_universal_filter()]
+    def transform(self, usage_info, block_structure):
+        """
+        Modify block structure according to the behavior of milestones and special exams.
+        """
+
+        def add_special_exam_info(block_key):
+            """
+            Adds special exam information to course blocks.
+            """
+            if self.is_special_exam(block_key, block_structure):
+
+                #
+                # call into edx_proctoring subsystem
+                # to get relevant proctoring information regarding this
+                # level of the courseware
+                #
+                # This will return None, if (user, course_id, content_id)
+                # is not applicable
+                #
+                timed_exam_attempt_context = None
+                timed_exam_attempt_context = get_attempt_status_summary(
+                    usage_info.user.id,
+                    unicode(block_key.course_key),
+                    unicode(block_key)
+                )
+
+                if timed_exam_attempt_context:
+                    # yes, user has proctoring context about
+                    # this level of the courseware
+                    # so add to the accordion data context
+                    block_structure.set_transformer_block_field(
+                        block_key,
+                        self,
+                        'special_exam',
+                        timed_exam_attempt_context,
+                    )
 
         course_key = block_structure.root_block_usage_key.course_key
         user_can_skip = EntranceExamConfiguration.user_can_skip_entrance_exam(usage_info.user, course_key)
         exam_id = block_structure.get_xblock_field(course_key, 'entrance_exam_id')
+
         def user_gated_from_block(block_key):
             """
             Checks whether the user is gated from accessing this block, first via special exams,
             then via a general milestones check.
             """
-            if user_can_skip and block_key == exam_id:
+            if usage_info.has_staff_access:
                 return False
+            elif user_can_skip and block_key == exam_id:
+                return False
+
             return self.has_pending_milestones_for_user(block_key, usage_info)
             #return (
             #    settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and
             #    self.is_special_exam(block_key, block_structure)
             #) or self.has_pending_milestones_for_user(block_key, usage_info)
 
-        return [block_structure.create_removal_filter(user_gated_from_block)]
+        for block_key in block_structure.post_order_traversal():
+            if user_gated_from_block(block_key):
+                block_structure.remove_block(block_key, False)
+            add_special_exam_info(block_key)
 
     @staticmethod
     def is_special_exam(block_key, block_structure):
