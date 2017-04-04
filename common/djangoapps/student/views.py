@@ -88,8 +88,6 @@ from openedx.core.djangoapps.external_auth.login_and_register import (
     register as external_auth_register
 )
 
-from lang_pref import LANGUAGE_KEY
-
 import track.views
 
 import dogstats_wrapper as dog_stats_api
