@@ -8,8 +8,17 @@ function DiscussionCourseBlock(runtime, element) {
     if (Backbone.History.started) {
         Backbone.history.stop();
     }
-    function defineDiscussionClasses(define) {
+    function defineDiscussionClasses() {
         'use strict';
+        window.RequireJS = window.RequireJS || {};
+        RequireJS.requirejs = RequireJS.requirejs || window.requirejs;
+        RequireJS.require = RequireJS.require || window.require;
+        RequireJS.define = RequireJS.define || window.define;
+
+        window.require = undefined;
+        window.define = undefined;
+        window.requirejs = undefined;
+
         var discussionClasses = [
             ['Content', 'common/js/discussion/content'],
             ['Discussion', 'common/js/discussion/discussion'],
@@ -25,7 +34,7 @@ function DiscussionCourseBlock(runtime, element) {
         ];
 
         discussionClasses.forEach(function(discussionClass) {
-            define(
+            RequireJS.define(
                 discussionClass[1],
                 [],
                 function() {
@@ -46,8 +55,8 @@ function DiscussionCourseBlock(runtime, element) {
 
                 var requireConfigScript = document.createElement("script");
                 requireConfigScript.onload = function() {
-                    defineDiscussionClasses(define);
-                    initializeDiscussionBoardFactory(require)
+                    defineDiscussionClasses();
+                    initializeDiscussionBoardFactory()
                 };
                 requireConfigScript.src = "/static/lms/js/require-config.js";
                 document.body.appendChild(requireConfigScript);
@@ -56,13 +65,13 @@ function DiscussionCourseBlock(runtime, element) {
             document.body.appendChild(vendorScript);
 
         } else {
-            defineDiscussionClasses(RequireJS.define);
-            initializeDiscussionBoardFactory(RequireJS.require);
+            defineDiscussionClasses();
+            initializeDiscussionBoardFactory();
         }
     };
 
-    function initializeDiscussionBoardFactory(require) {
-        require(
+    function initializeDiscussionBoardFactory() {
+        RequireJS.require(
             ['discussion/js/discussion_board_factory'],
             function (DiscussionBoardFactory) {
                 DiscussionBoardFactory({
