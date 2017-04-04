@@ -270,12 +270,13 @@ class DiscussionNavigationTest(BaseDiscussionTestCase):
             css=".forum-nav-browse-menu-item[data-discussion-id='{}']".format(self.discussion_id)
         )
         self.assertTrue(topic_button.visible)
+
         topic_button.click()
 
         # Verify the thread's topic has been pushed to breadcrumbs
         breadcrumbs = self.thread_page.q(css=".breadcrumbs .nav-item")
-        self.assertEqual(len(breadcrumbs), 2)
-        self.assertEqual(breadcrumbs[1].text, "Test Discussion Topic")
+        self.assertEqual(len(breadcrumbs), 3)
+        self.assertEqual(breadcrumbs[2].text, "Topic-Level Student-Visible Label")
 
     def test_breadcrumbs_back_to_all_topics(self):
         topic_button = self.thread_page.q(
