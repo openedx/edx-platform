@@ -1,11 +1,12 @@
 """Tests covering utilities for integrating with the catalog service."""
 # pylint: disable=missing-docstring
-import uuid
 import copy
+import uuid
 
+import mock
 from django.contrib.auth import get_user_model
 from django.test import TestCase
-import mock
+from waffle.models import Switch
 
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory, ProgramFactory, ProgramTypeFactory
@@ -18,7 +19,6 @@ from openedx.core.djangoapps.catalog.utils import (
 )
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory
-
 
 UTILS_MODULE = 'openedx.core.djangoapps.catalog.utils'
 User = get_user_model()  # pylint: disable=invalid-name
@@ -37,7 +37,7 @@ class TestGetPrograms(CatalogIntegrationMixin, TestCase):
 
         UserFactory(username=self.catalog_integration.service_username)
 
-    def assert_contract(self, call_args, program_uuid=None, types=None):  # pylint: disable=redefined-builtin
+    def assert_contract(self, call_args, program_uuid=None, types=None, expected_querystring=None):
         """Verify that API data retrieval utility is used correctly."""
         args, kwargs = call_args
 
@@ -58,25 +58,44 @@ class TestGetPrograms(CatalogIntegrationMixin, TestCase):
 
         self.assertEqual(kwargs['api']._store['base_url'], self.catalog_integration.internal_api_url)  # pylint: disable=protected-access
 
-        querystring = {
-            'marketable': 1,
-            'exclude_utm': 1,
-        }
-        if program_uuid:
-            querystring['use_full_course_serializer'] = 1
-        if types:
-            querystring['types'] = types_param
+        if expected_querystring:
+            querystring = expected_querystring
+        else:
+            querystring = {
+                'marketable': 1,
+                'exclude_utm': 1,
+            }
+            if program_uuid:
+                querystring['use_full_course_serializer'] = 1
+            if types:
+                querystring['types'] = types_param
+
         self.assertEqual(kwargs['querystring'], querystring)
 
         return args, kwargs
 
     def test_get_programs(self, mock_get_edx_api_data):
-        programs = [ProgramFactory() for __ in range(3)]
+        programs = ProgramFactory.create_batch(3)
         mock_get_edx_api_data.return_value = programs
 
         data = get_programs()
 
         self.assert_contract(mock_get_edx_api_data.call_args)
+        self.assertEqual(data, programs)
+
+    def test_get_programs_with_status_filtering(self, mock_get_edx_api_data):
+        """ The function should request active and retired programs when the Waffle switch is enabled. """
+        programs = ProgramFactory.create_batch(3)
+        mock_get_edx_api_data.return_value = programs
+
+        Switch.objects.get_or_create(name='display_retired_programs_on_learner_dashboard', defaults={'active': True})
+        data = get_programs()
+
+        expected_querystring = {
+            'exclude_utm': 1,
+            'status': ('active', 'retired',)
+        }
+        self.assert_contract(mock_get_edx_api_data.call_args, expected_querystring=expected_querystring)
         self.assertEqual(data, programs)
 
     def test_get_one_program(self, mock_get_edx_api_data):
@@ -240,7 +259,7 @@ class TestGetCourseRuns(CatalogIntegrationMixin, TestCase):
         """
         Test retrieval of course runs.
         """
-        catalog_course_runs = [CourseRunFactory() for __ in xrange(10)]
+        catalog_course_runs = CourseRunFactory.create_batch(10)
         mock_get_edx_api_data.return_value = catalog_course_runs
 
         data = get_course_runs()
