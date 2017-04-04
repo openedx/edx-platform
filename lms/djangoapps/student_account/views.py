@@ -473,9 +473,10 @@ def account_settings_context(request):
 
         if value == 'required':
             fields[name]['required'] = True
-        elif value == 'optional':
+        elif value == 'optional' or value == ['hidden']:
+            # The hidden setting is ineffective, to retain backward compatible behaviour
             fields[name]['required'] = False
-        elif value != 'hidden':  # The hidden setting is ineffective.
+        else:
             raise ValueError(
                 u'Invalid registration settings was found: ({name}={value}) in `REGISTRATION_EXTRA_FIELDS`.'.format(
                     name=name,

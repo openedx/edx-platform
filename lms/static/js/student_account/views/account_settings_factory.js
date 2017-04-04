@@ -193,17 +193,12 @@
             getUserField = function(list, search) {
                 return _.find(list, function(field) {
                     return field.view.options.valueAttribute === search;
-                });
+                }).view;
             };
-            userFields = _.find(aboutSectionsData, function(section) {
-                return section.title === gettext('Basic Account Information');
-            }).fields;
-            timeZoneDropdownField = getUserField(userFields, 'time_zone');
-            countryDropdownField = getUserField(userFields, 'country');
 
-            if (timeZoneDropdownField && countryDropdownField) {
-                timeZoneDropdownField.view.listenToCountryView(countryDropdownField.view);
-            }
+            timeZoneDropdownField = getUserField(allAccountFields, 'time_zone');
+            countryDropdownField = getUserField(allAccountFields, 'country');
+            timeZoneDropdownField.listenToCountryView(countryDropdownField);
 
             accountsSectionData = [
                 {
