@@ -440,6 +440,7 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         result = _get_course_email_context(self.course)
         self.assertIn('course_title', result)
         self.assertIn('course_root', result)
+        self.assertIn('course_language', result)
         self.assertIn('course_url', result)
         self.assertIn('course_image_url', result)
         self.assertIn('course_end_date', result)
