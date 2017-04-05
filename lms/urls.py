@@ -107,6 +107,7 @@ urlpatterns = (
 
 urlpatterns += (
     url(r'^dashboard/', include('learner_dashboard.urls')),
+    url(r'^xseries/', include('program_marketing.urls', namespace='xseries')),
 )
 
 # TODO: This needs to move to a separate urls.py once the student_account and
