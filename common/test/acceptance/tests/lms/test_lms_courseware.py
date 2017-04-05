@@ -624,11 +624,10 @@ class CoursewareMultipleVerticalsTest(CoursewareMultipleVerticalsTestBase):
         self.course_home_page.visit()
 
         self.course_home_page.outline.go_to_section('Test Section 1', 'Test Subsection 1,1')
-        subsection_url = self.courseware_page.nav.active_subsection_url
+        subsection_url = self.browser.current_url
         url_part_list = subsection_url.split('/')
-        self.assertEqual(len(url_part_list), 9)
 
-        course_id = url_part_list[4]
+        course_id = url_part_list[-5]
         chapter_id = url_part_list[-3]
         subsection_id = url_part_list[-2]
         problem1_page = CoursewareSequentialTabPage(

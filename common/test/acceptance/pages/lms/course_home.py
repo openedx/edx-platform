@@ -2,6 +2,7 @@
 LMS Course Home page object
 """
 
+from collections import OrderedDict
 from bok_choy.page_object import PageObject
 
 from .bookmarks import BookmarksPage
@@ -81,7 +82,7 @@ class CourseOutlinePage(PageObject):
         You can use these titles in `go_to_section` to navigate to the section.
         """
         # Dict to store the result
-        outline_dict = dict()
+        outline_dict = OrderedDict()
 
         section_titles = self._section_titles()
 
@@ -89,7 +90,7 @@ class CourseOutlinePage(PageObject):
         for sec_index, sec_title in enumerate(section_titles):
 
             if len(section_titles) < 1:
-                self.warning("Could not find subsections for '{0}'".format(sec_title))
+                raise ValueError("Could not find subsections for '{0}'".format(sec_title))
             else:
                 # Add one to convert list index (starts at 0) to CSS index (starts at 1)
                 outline_dict[sec_title] = self._subsection_titles(sec_index + 1)
@@ -123,7 +124,7 @@ class CourseOutlinePage(PageObject):
 
     def go_to_section(self, section_title, subsection_title):
         """
-        Go to the section in the courseware.
+        Go to the section/subsection in the courseware.
         Every section must have at least one subsection, so specify
         both the section and subsection title.
 
@@ -132,14 +133,14 @@ class CourseOutlinePage(PageObject):
         """
         section_index = self._section_title_to_index(section_title)
         if section_index is None:
-            return
+            raise ValueError("Could not find section '{0}'".format(section_title))
 
         try:
             subsection_index = self._subsection_titles(section_index + 1).index(subsection_title)
         except ValueError:
-            msg = "Could not find subsection '{0}' in section '{1}'".format(subsection_title, section_title)
-            self.warning(msg)
-            return
+            raise ValueError("Could not find subsection '{0}' in section '{1}'".format(
+                subsection_title, section_title
+            ))
 
         # Convert list indices (start at zero) to CSS indices (start at 1)
         subsection_css = self.SUBSECTION_SELECTOR.format(section_index + 1, subsection_index + 1)
@@ -149,6 +150,30 @@ class CourseOutlinePage(PageObject):
 
         self._wait_for_course_section(section_title, subsection_title)
 
+    def go_to_section_by_index(self, section_index, subsection_index):
+        """
+        Go to the section/subsection in the courseware.
+        Every section must have at least one subsection, so specify both the
+        section and subsection indices.
+
+        Arguments:
+            section_index: A 0-based index of the section to navigate to.
+            subsection_index: A 0-based index of the subsection to navigate to.
+
+        """
+        try:
+            section_title = self._section_titles()[section_index]
+        except IndexError:
+            raise ValueError("Section index '{0}' is out of range.".format(section_index))
+        try:
+            subsection_title = self._subsection_titles(section_index + 1)[subsection_index]
+        except IndexError:
+            raise ValueError("Subsection index '{0}' in section index '{1}' is out of range.".format(
+                subsection_index, section_index
+            ))
+
+        self.go_to_section(section_title, subsection_title)
+
     def _section_title_to_index(self, section_title):
         """
         Get the section title index given the section title.
@@ -156,7 +181,7 @@ class CourseOutlinePage(PageObject):
         try:
             section_index = self._section_titles().index(section_title)
         except ValueError:
-            self.warning("Could not find section '{0}'".format(section_title))
+            raise ValueError("Could not find section '{0}'".format(section_title))
 
         return section_index
 
