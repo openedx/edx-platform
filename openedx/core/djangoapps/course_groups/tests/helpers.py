@@ -58,7 +58,7 @@ class CourseCohortSettingsFactory(DjangoModelFactory):
     course_id = SlashSeparatedCourseKey("dummy", "dummy", "dummy")
     cohorted_discussions = json.dumps([])
     # pylint: disable=invalid-name
-    always_cohort_inline_discussions = True
+    always_cohort_inline_discussions = False
 
 
 def topic_name_to_id(course, name):
@@ -141,7 +141,7 @@ def config_course_cohorts(
         manual_cohorts=[],
         discussion_topics=[],
         cohorted_discussions=[],
-        always_cohort_inline_discussions=True
+        always_cohort_inline_discussions=False
 ):
     """
     Set discussions and configure cohorts for a course.

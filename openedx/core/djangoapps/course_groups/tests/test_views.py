@@ -189,7 +189,7 @@ class CourseCohortSettingsHandlerTestCase(CohortViewsTestCase):
         """
         return {
             'is_cohorted': True,
-            'always_cohort_inline_discussions': True,
+            'always_cohort_inline_discussions': False,
             'cohorted_inline_discussions': [],
             'cohorted_course_wide_discussions': [],
             'id': 1
@@ -247,7 +247,7 @@ class CourseCohortSettingsHandlerTestCase(CohortViewsTestCase):
 
         self.assertEqual(response, expected_response)
 
-        expected_response['always_cohort_inline_discussions'] = False
+        expected_response['always_cohort_inline_discussions'] = True
         response = self.patch_handler(self.course, data=expected_response, handler=course_cohort_settings_handler)
 
         self.assertEqual(response, expected_response)
