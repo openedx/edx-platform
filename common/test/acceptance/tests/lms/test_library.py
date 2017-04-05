@@ -10,6 +10,7 @@ from common.test.acceptance.tests.helpers import UniqueCourseTest, TestWithSearc
 from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
 from common.test.acceptance.pages.studio.library import StudioLibraryContentEditor, StudioLibraryContainerXBlockWrapper
+from common.test.acceptance.pages.lms.course_home import CourseHomePage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.library import LibraryContentXBlockWrapper
 from common.test.acceptance.pages.common.logout import LogoutPage
@@ -128,7 +129,9 @@ class LibraryContentTestBase(UniqueCourseTest):
         self.courseware_page.visit()
         paragraphs = self.courseware_page.q(css='.course-content p').results
         if not paragraphs:
-            self.courseware_page.q(css='.menu-item a').results[0].click()
+            course_home_page = CourseHomePage(self.browser, self.course_id)
+            course_home_page.visit()
+            course_home_page.outline.go_to_section_by_index(0, 0)
         block_id = block_id if block_id is not None else self.lib_block.locator
         #pylint: disable=attribute-defined-outside-init
         self.library_content_page = LibraryContentXBlockWrapper(self.browser, block_id)

@@ -580,7 +580,7 @@ class CourseNavPage(PageObject):
         """
         return self.REMOVE_SPAN_TAG_RE.search(element.get_attribute('innerHTML')).groups()[0].strip()
 
-    # TODO: TNL-6546: Remove from here and move to course_home.py:CourseOutlinePage
+    # TODO: TNL-6546: Remove. This is no longer needed.
     @property
     def active_subsection_url(self):
         """
