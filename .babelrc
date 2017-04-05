@@ -9,7 +9,7 @@
             "IE >= 11"
           ]
         },
-        "modules": "commonjs"
+        "modules": false
       }
     ]
   ]

@@ -170,7 +170,8 @@ function junitSettings(config) {
  * @param {String} pattern
  * @return {String}
  */
-var defaultNormalizeFunc = function(appRoot, pattern) {
+// I'd like to change fix the no-shadow violation on the next line, but it would break this shared conf's API.
+function defaultNormalizeFunc(appRoot, pattern) {  // eslint-disable-line no-shadow
     if (pattern.match(/^common\/js/)) {
         pattern = path.join(appRoot, '/common/static/' + pattern);
     } else if (pattern.match(/^xmodule_js\/common_static/)) {
@@ -178,9 +179,9 @@ var defaultNormalizeFunc = function(appRoot, pattern) {
             pattern.replace(/^xmodule_js\/common_static\//, ''));
     }
     return pattern;
-};
+}
 
-var normalizePathsForCoverage = function(files, normalizeFunc, preprocessors) {
+function normalizePathsForCoverage(files, normalizeFunc, preprocessors) {
     var normalizeFn = normalizeFunc || defaultNormalizeFunc,
         normalizedFile,
         filesForCoverage = {};
@@ -193,7 +194,7 @@ var normalizePathsForCoverage = function(files, normalizeFunc, preprocessors) {
     });
 
     return filesForCoverage;
-};
+}
 
 /**
  * Sets defaults for each file pattern.
@@ -202,7 +203,7 @@ var normalizePathsForCoverage = function(files, normalizeFunc, preprocessors) {
  * @param {Object} files
  * @return {Object}
  */
-var setDefaults = function(files) {
+function setDefaults(files) {
     return files.map(function(f) {
         var file = _.isObject(f) ? f : {pattern: f};
         if (!file.included && !file.webpack) {
@@ -210,9 +211,9 @@ var setDefaults = function(files) {
         }
         return file;
     });
-};
+}
 
-var getBaseConfig = function(config, useRequireJs) {
+function getBaseConfig(config, useRequireJs) {
     var getFrameworkFiles = function() {
         var files = [
             'node_modules/jquery/dist/jquery.js',
@@ -347,9 +348,9 @@ var getBaseConfig = function(config, useRequireJs) {
 
         webpack: webpackConfig
     };
-};
+}
 
-var configure = function(config, options) {
+function configure(config, options) {
     var useRequireJs = options.useRequireJs === undefined ? true : useRequireJs,
         baseConfig = getBaseConfig(config, useRequireJs);
 
@@ -397,7 +398,7 @@ var configure = function(config, options) {
         files: files,
         preprocessors: preprocessors
     }));
-};
+}
 
 module.exports = {
     configure: configure,
