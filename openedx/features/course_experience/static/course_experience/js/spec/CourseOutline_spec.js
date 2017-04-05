@@ -1,50 +1,64 @@
-import * as constants from "edx-ui-toolkit/js/utils/constants";
-import log from 'logger';
-import { CourseOutline } from "../CourseOutline";
+/* globals Logger, loadFixtures */
+
+// import constants from 'edx-ui-toolkit/src/js/utils/constants';
+
+import { CourseOutline } from '../CourseOutline';
 
 describe('Course outline factory', () => {
+  let outline;  // eslint-disable-line no-unused-vars
+
+  // Our block IDs are invalid DOM selectors unless we first escape `:`, `+` and `@`
+  const escapeIds = idObj => Object.assign({}, ...Object.keys(idObj).map(key => ({
+    [key]: idObj[key]
+      .replace(/@/g, '\\@')
+      .replace(/:/, '\\:')
+      .replace(/\+/g, '\\+'),
+  })));
+
+  const outlineIds = escapeIds({
+    homeworkLabsAndDemos: 'a#block-v1:edX+DemoX+Demo_Course+type@sequential+block@graded_simulations',
+    homeworkEssays: 'a#block-v1:edX+DemoX+Demo_Course+type@sequential+block@175e76c4951144a29d46211361266e0e',
+    lesson3BeSocial: 'a#block-v1:edX+DemoX+Demo_Course+type@sequential+block@48ecb924d7fe4b66a230137626bfa93e',
+    exampleWeek3BeSocial: 'li#block-v1:edX+DemoX+Demo_Course+type@chapter+block@social_integration',
+  });
+
   describe('keyboard listener', () => {
-    const triggerKeyListener = (current, destination, keyCode) => {
+    const triggerKeyListener = (current, destination, key) => {
       current.focus();
       spyOn(destination, 'focus');
 
-      $('.block-tree').trigger(
-        $.Event('keydown', {
-          keyCode,
-          target: current,
-        }),
-      );
+      current.dispatchEvent(new KeyboardEvent('keydown', { key }));
     };
 
     beforeEach(() => {
       loadFixtures('course_experience/fixtures/course-outline-fragment.html');
-      new CourseOutline('.block-tree');
+      outline = new CourseOutline();
     });
 
     describe('when the down arrow is pressed', () => {
       it('moves focus from a subsection to the next subsection in the outline', () => {
-        const current = $('a.focusable:contains("Homework - Labs and Demos")')[0];
-        const destination = $('a.focusable:contains("Homework - Essays")')[0];
+        const current = document.querySelector(outlineIds.homeworkLabsAndDemos);
+        const destination = document.querySelector(outlineIds.homeworkEssays);
 
-        triggerKeyListener(current, destination, constants.keyCodes.down);
+        triggerKeyListener(current, destination, 'ArrowDown');  // @TODO: Get these from the UI Toolkit
 
         expect(destination.focus).toHaveBeenCalled();
       });
 
-      it('moves focus to the section list if at a section boundary', () => {
-        const current = $('li.focusable:contains("Example Week 3: Be Social")')[0];
-        const destination = $('ol.focusable:contains("Lesson 3 - Be Social")')[0];
+      it('moves focus to the subsection list if at the top of a section', () => {
+        const current = document.querySelector(outlineIds.exampleWeek3BeSocial);
+        const destination = document.querySelector(`${outlineIds.exampleWeek3BeSocial} > ol`);
 
-        triggerKeyListener(current, destination, constants.keyCodes.down);
+        triggerKeyListener(current, destination, 'ArrowDown');  // @TODO: Get these from the UI Toolkit
 
         expect(destination.focus).toHaveBeenCalled();
       });
 
       it('moves focus to the next section if on the last subsection', () => {
-        const current = $('a.focusable:contains("Homework - Essays")')[0];
-        const destination = $('li.focusable:contains("Example Week 3: Be Social")')[0];
+        const current = document.querySelector(outlineIds.homeworkEssays);
+        const destination = document.querySelector(outlineIds.exampleWeek3BeSocial);
 
-        triggerKeyListener(current, destination, constants.keyCodes.down);
+        triggerKeyListener(current, destination, 'ArrowDown');  // @TODO: Get these from the UI Toolkit
 
         expect(destination.focus).toHaveBeenCalled();
       });
@@ -52,53 +66,48 @@ describe('Course outline factory', () => {
 
     describe('when the up arrow is pressed', () => {
       it('moves focus from a subsection to the previous subsection in the outline', () => {
-        const current = $('a.focusable:contains("Homework - Essays")')[0];
-        const destination = $('a.focusable:contains("Homework - Labs and Demos")')[0];
+        const current = document.querySelector(outlineIds.homeworkEssays);
+        const destination = document.querySelector(outlineIds.homeworkLabsAndDemos);
 
-        triggerKeyListener(current, destination, constants.keyCodes.up);
+        triggerKeyListener(current, destination, 'ArrowUp');  // @TODO: Get these from the UI Toolkit
 
         expect(destination.focus).toHaveBeenCalled();
       });
 
-      it('moves focus to the section group if at the first subsection', () => {
-        const current = $('a.focusable:contains("Lesson 3 - Be Social")')[0];
-        const destination = $('ol.focusable:contains("Lesson 3 - Be Social")')[0];
+      it('moves focus to the section list if at the first subsection', () => {
+        const current = document.querySelector(outlineIds.lesson3BeSocial);
+        const destination = document.querySelector(`${outlineIds.exampleWeek3BeSocial} > ol`);
 
-        triggerKeyListener(current, destination, constants.keyCodes.up);
+        triggerKeyListener(current, destination, 'ArrowUp');  // @TODO: Get these from the UI Toolkit
 
         expect(destination.focus).toHaveBeenCalled();
       });
 
       it('moves focus last subsection of the previous section if at a section boundary', () => {
-        const current = $('li.focusable:contains("Example Week 3: Be Social")')[0];
-        const destination = $('a.focusable:contains("Homework - Essays")')[0];
+        const current = document.querySelector(outlineIds.exampleWeek3BeSocial);
+        const destination = document.querySelector(outlineIds.homeworkEssays);
 
-        triggerKeyListener(current, destination, constants.keyCodes.up);
+        triggerKeyListener(current, destination, 'ArrowUp');  // @TODO: Get these from the UI Toolkit
 
         expect(destination.focus).toHaveBeenCalled();
       });
     });
   });
 
-  describe("eventing", function() {
-    beforeEach(function() {
-      loadFixtures("course_experience/fixtures/course-outline-fragment.html");
-      CourseOutlineFactory(".block-tree");
-      spyOn(Logger, "log");
+  describe('eventing', () => {
+    beforeEach(() => {
+      loadFixtures('course_experience/fixtures/course-outline-fragment.html');
+      outline = new CourseOutline();
+      spyOn(Logger, 'log');
     });
 
-    it("sends an event when an outline section is clicked", function() {
-      $('a.focusable:contains("Homework - Labs and Demos")').click();
+    it('sends an event when an outline section is clicked', () => {
+      document.querySelector(outlineIds.homeworkLabsAndDemos).dispatchEvent(new Event('click'));
 
-      expect(Logger.log).toHaveBeenCalledWith("edx.ui.lms.link_clicked", {
-        target_url: (
-          window.location.origin +
-            "/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type" +
-            "@sequential+block@graded_simulations"
-        ),
-        current_url: window.location.toString()
+      expect(Logger.log).toHaveBeenCalledWith('edx.ui.lms.link_clicked', {
+        target_url: `${window.location.origin}/courses/course-v1:edX+DemoX+Demo_Course/jump_to/block-v1:edX+DemoX+Demo_Course+type@sequential+block@graded_simulations`,
+        current_url: window.location.toString(),
       });
     });
   });
-
 });
