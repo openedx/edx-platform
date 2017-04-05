@@ -205,11 +205,11 @@ class IndexQueryTestCase(ModuleStoreTestCase):
     NUM_PROBLEMS = 20
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 10),
-        (ModuleStoreEnum.Type.split, 4),
+        (ModuleStoreEnum.Type.mongo, 10, 147),
+        (ModuleStoreEnum.Type.split, 4, 147),
     )
     @ddt.unpack
-    def test_index_query_counts(self, store_type, expected_query_count):
+    def test_index_query_counts(self, store_type, expected_mongo_query_count, expected_mysql_query_count):
         with self.store.default_store(store_type):
             course = CourseFactory.create()
             with self.store.bulk_operations(course.id):
@@ -224,17 +224,18 @@ class IndexQueryTestCase(ModuleStoreTestCase):
         self.client.login(username=self.user.username, password=password)
         CourseEnrollment.enroll(self.user, course.id)
 
-        with check_mongo_calls(expected_query_count):
-            url = reverse(
-                'courseware_section',
-                kwargs={
-                    'course_id': unicode(course.id),
-                    'chapter': unicode(chapter.location.name),
-                    'section': unicode(section.location.name),
-                }
-            )
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, 200)
+        with self.assertNumQueries(expected_mysql_query_count):
+            with check_mongo_calls(expected_mongo_query_count):
+                url = reverse(
+                    'courseware_section',
+                    kwargs={
+                        'course_id': unicode(course.id),
+                        'chapter': unicode(chapter.location.name),
+                        'section': unicode(section.location.name),
+                    }
+                )
+                response = self.client.get(url)
+                self.assertEqual(response.status_code, 200)
 
 
 @attr(shard=2)
