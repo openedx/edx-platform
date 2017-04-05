@@ -3,7 +3,7 @@
 locales:
     - en  # English - Source Language
     # - am  # Amharic
-    - ar  # Arabic
+    # - ar  # Arabic
     # - az  # Azerbaijani
     # - bg_BG  # Bulgarian (Bulgaria)
     # - bn_BD  # Bengali (Bangladesh)
@@ -36,8 +36,8 @@ locales:
     - fr  # French
     # - gl  # Galician
     # - gu  # Gujarati
-    - he  # Hebrew
-    - hi  # Hindi
+    # - he  # Hebrew
+    # - hi  # Hindi
     # - hr  # Croatian
     # - hu  # Hungarian
     # - hy_AM  # Armenian (Armenia)
@@ -47,7 +47,7 @@ locales:
     # - kk_KZ  # Kazakh (Kazakhstan)
     # - km_KH  # Khmer (Cambodia)
     # - kn  # Kannada
-    - ko_KR  # Korean (Korea)
+    # - ko_KR  # Korean (Korea)
     # - lt_LT  # Lithuanian (Lithuania)
     # - ml  # Malayalam
     # - mn  # Mongolian
@@ -58,7 +58,7 @@ locales:
     # - nl_NL  # Dutch (Netherlands)
     # - or  # Oriya
     # - pl  # Polish
-    - pt_BR  # Portuguese (Brazil)
+    # - pt_BR  # Portuguese (Brazil)
     # - pt_PT  # Portuguese (Portugal)
     # - ro  # Romanian
     - ru  # Russian
