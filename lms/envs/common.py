@@ -387,6 +387,9 @@ FEATURES = {
 
     # Whether to display account activation notification on dashboard.
     'DISPLAY_ACCOUNT_ACTIVATION_MESSAGE_ON_SIDEBAR': False,
+
+    # Allow users to change their email address.
+    'ALLOW_EMAIL_ADDRESS_CHANGE': True,
 }
 
 # Ignore static asset files on import which match this pattern
