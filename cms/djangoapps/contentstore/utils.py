@@ -401,7 +401,7 @@ def get_user_partition_info(xblock, schemes=None, course=None):
             for gid in missing_group_ids:
                 groups.append({
                     "id": gid,
-                    "name": _("Deleted group"),
+                    "name": _("Deleted Group"),
                     "selected": True,
                     "deleted": True,
                 })
@@ -429,30 +429,45 @@ def get_visibility_partition_info(xblock):
     Returns: dict
 
     """
-    user_partitions = get_user_partition_info(xblock, schemes=["verification", "cohort"])
-    cohort_partitions = []
-    verification_partitions = []
-    has_selected_groups = False
-    selected_verified_partition_id = None
+    selectable_partitions = []
+    # We wish to display enrollment partitions before cohort partitions.
+    enrollment_user_partitions = get_user_partition_info(xblock, schemes=["enrollment_track"])
 
-    # Pre-process the partitions to make it easier to display the UI
-    for p in user_partitions:
-        has_selected = any(g["selected"] for g in p["groups"])
-        has_selected_groups = has_selected_groups or has_selected
+    # For enrollment partitions, we only show them if there is a selected group or
+    # or if the number of groups > 1.
+    for partition in enrollment_user_partitions:
+        if len(partition["groups"]) > 1 or any(group["selected"] for group in partition["groups"]):
+            selectable_partitions.append(partition)
 
-        if p["scheme"] == "cohort":
-            cohort_partitions.append(p)
-        elif p["scheme"] == "verification":
-            verification_partitions.append(p)
-            if has_selected:
-                selected_verified_partition_id = p["id"]
+    # Now add the cohort user partitions.
+    selectable_partitions = selectable_partitions + get_user_partition_info(xblock, schemes=["cohort"])
+
+    # Find the first partition with a selected group. That will be the one initially enabled in the dialog
+    # (if the course has only been added in Studio, only one partition should have a selected group).
+    selected_partition_index = -1
+
+    # At the same time, build up all the selected groups as they are displayed in the dialog title.
+    selected_groups_label = ''
+
+    for index, partition in enumerate(selectable_partitions):
+        for group in partition["groups"]:
+            if group["selected"]:
+                if len(selected_groups_label) == 0:
+                    selected_groups_label = group['name']
+                else:
+                    # Translators: This is building up a list of groups. It is marked for translation because of the
+                    # comma, which is used as a separator between each group.
+                    selected_groups_label = _('{previous_groups}, {current_group}').format(
+                        previous_groups=selected_groups_label,
+                        current_group=group['name']
+                    )
+                if selected_partition_index == -1:
+                    selected_partition_index = index
 
     return {
-        "user_partitions": user_partitions,
-        "cohort_partitions": cohort_partitions,
-        "verification_partitions": verification_partitions,
-        "has_selected_groups": has_selected_groups,
-        "selected_verified_partition_id": selected_verified_partition_id,
+        "selectable_partitions": selectable_partitions,
+        "selected_partition_index": selected_partition_index,
+        "selected_groups_label": selected_groups_label,
     }
 
 

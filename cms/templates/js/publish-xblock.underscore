@@ -86,7 +86,7 @@ var visibleToStaffOnly = visibilityState === 'staff_only';
             <% if (hasContentGroupComponents) { %>
                 <p class="note-visibility">
                     <span class="icon fa fa-eye" aria-hidden="true"></span>
-                    <span class="note-copy"><%- gettext("Some content in this unit is visible only to particular content groups") %></span>
+                    <span class="note-copy"><%- gettext("Some content in this unit is visible only to specific groups of learners.") %></span>
                 </p>
             <% } %>
         <ul class="actions-inline">

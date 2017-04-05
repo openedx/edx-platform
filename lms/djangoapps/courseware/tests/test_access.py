@@ -44,8 +44,7 @@ from xmodule.course_module import (
     CATALOG_VISIBILITY_NONE,
 )
 from xmodule.error_module import ErrorDescriptor
-from xmodule.partitions.partitions import Group, UserPartition
-from xmodule.partitions.partitions_service import MINIMUM_STATIC_PARTITION_ID
+from xmodule.partitions.partitions import Group, UserPartition, MINIMUM_STATIC_PARTITION_ID
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory

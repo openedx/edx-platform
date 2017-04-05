@@ -256,19 +256,6 @@ function(Backbone, _, str, ModuleUtils) {
         */
         isEditableOnCourseOutline: function() {
             return this.isSequential() || this.isChapter() || this.isVertical();
-        },
-
-       /*
-        * Check whether any verification checkpoints are defined in the course.
-        * Verification checkpoints are defined if there exists a user partition
-        * that uses the verification partition scheme.
-        */
-        hasVerifiedCheckpoints: function() {
-            var partitions = this.get('user_partitions') || [];
-
-            return Boolean(_.find(partitions, function(p) {
-                return p.scheme === 'verification';
-            }));
         }
     });
     return XBlockInfo;

@@ -1,6 +1,7 @@
 from bok_choy.page_object import PageObject
 from selenium.webdriver.common.keys import Keys
 from common.test.acceptance.pages.common.utils import click_css
+from common.test.acceptance.tests.helpers import select_option_by_text, get_selected_option_text
 from selenium.webdriver.support.ui import Select
 
 
@@ -108,43 +109,83 @@ class ComponentVisibilityEditorView(BaseComponentEditorView):
     """
     A :class:`.PageObject` representing the rendered view of a component visibility editor.
     """
-    OPTION_SELECTOR = '.modal-section-content .field'
+    OPTION_SELECTOR = '.partition-group-control .field'
+    ALL_LEARNERS_AND_STAFF = 'All Learners and Staff'
+    CONTENT_GROUP_PARTITION = 'Content Groups'
+    ENROLLMENT_TRACK_PARTITION = "Enrollment Tracks"
 
     @property
-    def all_options(self):
+    def all_group_options(self):
         """
-        Return all visibility options.
+        Return all partition groups.
         """
         return self.q(css=self._bounded_selector(self.OPTION_SELECTOR)).results
 
     @property
-    def selected_options(self):
+    def current_groups_message(self):
         """
-        Return all selected visibility options.
+        This returns the message shown at the top of the visibility dialog about the
+        current visibility state (at the time that the dialog was opened).
+        For example, "Current visible to: All Learners and Staff".
+        """
+        return self.q(css=self._bounded_selector('.visibility-header'))[0].text
+
+    @property
+    def selected_partition_scheme(self):
+        """
+        Return the selected partition scheme (or "All Learners and Staff"
+        if no partitioning is selected).
+        """
+        selector = self.q(css=self._bounded_selector('.partition-visibility select'))
+        return get_selected_option_text(selector)
+
+    def select_partition_scheme(self, partition_name):
+        """
+        Sets the selected partition scheme to the one with the
+        matching name.
+        """
+        selector = self.q(css=self._bounded_selector('.partition-visibility select'))
+        select_option_by_text(selector, partition_name, focus_out=True)
+
+    @property
+    def selected_groups(self):
+        """
+        Return all selected partition groups. If none are selected,
+        returns an empty array.
         """
         results = []
-        for option in self.all_options:
-            button = option.find_element_by_css_selector('input.input')
-            if button.is_selected():
+        for option in self.all_group_options:
+            checkbox = option.find_element_by_css_selector('input')
+            if checkbox.is_selected():
                 results.append(option)
         return results
 
-    def select_option(self, label_text, save=True):
+    def select_group(self, group_name, save=True):
         """
-        Click the first option which has a label matching `label_text`.
+        Select the first group which has a label matching `group_name`.
 
         Arguments:
-            label_text (str): Text of a label accompanying the input
-                which should be clicked.
+            group_name (str): The name of the group.
             save (boolean): Whether the "save" button should be clicked
                 afterwards.
         Returns:
-            bool: Whether the label was found and clicked.
+            bool: Whether a group with the provided name was found and clicked.
         """
-        for option in self.all_options:
-            if label_text in option.text:
-                option.click()
+        for option in self.all_group_options:
+            if group_name in option.text:
+                checkbox = option.find_element_by_css_selector('input')
+                checkbox.click()
                 if save:
                     self.save()
                 return True
         return False
+
+    def select_groups_in_partition_scheme(self, partition_name, group_names):
+        """
+        Select groups in the provided partition scheme. The "save"
+        button is clicked afterwards.
+        """
+        self.select_partition_scheme(partition_name)
+        for label in group_names:
+            self.select_group(label, save=False)
+        self.save()

@@ -8,6 +8,16 @@ from stevedore.extension import ExtensionManager
 # pylint: disable=redefined-builtin
 
 
+# UserPartition IDs must be unique. The Cohort and Random UserPartitions (when they are
+# created via Studio) choose an unused ID in the range of 100 (historical) to MAX_INT. Therefore the
+# dynamic UserPartitionIDs must be under 100, and they have to be hard-coded to ensure
+# they are always the same whenever the dynamic partition is added (since the UserPartition
+# ID is stored in the xblock group_access dict).
+ENROLLMENT_TRACK_PARTITION_ID = 50
+
+MINIMUM_STATIC_PARTITION_ID = 100
+
+
 class UserPartitionError(Exception):
     """
     Base Exception for when an error was found regarding user partitions.

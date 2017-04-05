@@ -13,8 +13,7 @@ from xmodule.tests import get_test_system
 from xmodule.x_module import AUTHOR_VIEW, STUDENT_VIEW
 from xmodule.validation import StudioValidationMessage
 from xmodule.split_test_module import SplitTestDescriptor, SplitTestFields, get_split_user_partitions
-from xmodule.partitions.partitions import Group, UserPartition
-from xmodule.partitions.partitions_service import MINIMUM_STATIC_PARTITION_ID
+from xmodule.partitions.partitions import Group, UserPartition, MINIMUM_STATIC_PARTITION_ID
 
 
 class SplitTestModuleFactory(xml.XmlImportFactory):
