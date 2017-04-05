@@ -25,6 +25,9 @@ class MilestonesTransformer(BlockStructureTransformer):
     def name(cls):
         return "milestones"
 
+    def __init__(self, can_view_special_exams=True):
+        self.can_view_special_exams = can_view_special_exams
+
     @classmethod
     def collect(cls, block_structure):
         """
@@ -89,12 +92,13 @@ class MilestonesTransformer(BlockStructureTransformer):
                 return False
             elif user_can_skip and block_key == exam_id:
                 return False
-
-            return self.has_pending_milestones_for_user(block_key, usage_info)
-            #return (
-            #    settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and
-            #    self.is_special_exam(block_key, block_structure)
-            #) or self.has_pending_milestones_for_user(block_key, usage_info)
+            elif self.has_pending_milestones_for_user(block_key, usage_info):
+                return True
+            elif (settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and
+                  self.is_special_exam(block_key, block_structure) and
+                  not self.can_view_special_exams):
+                return True
+            return False
 
         for block_key in block_structure.post_order_traversal():
             if user_gated_from_block(block_key):
