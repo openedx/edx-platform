@@ -686,15 +686,15 @@ class CohortManagementSection(PageObject):
 
     def always_inline_discussion_selected(self):
         """
-        Returns the checked always_cohort_inline_discussions radio button.
+        Returns true if always_cohort_inline_discussions radio button is selected.
         """
-        return self.q(css=self._bounded_selector(".check-all-inline-discussions:checked"))
+        return len(self.q(css=self._bounded_selector(".check-all-inline-discussions:checked"))) > 0
 
     def cohort_some_inline_discussion_selected(self):
         """
-        Returns the checked some_cohort_inline_discussions radio button.
+        Returns true if some_cohort_inline_discussions radio button is selected.
         """
-        return self.q(css=self._bounded_selector(".check-cohort-inline-discussions:checked"))
+        return len(self.q(css=self._bounded_selector(".check-cohort-inline-discussions:checked"))) > 0
 
     def select_cohort_some_inline_discussion(self):
         """

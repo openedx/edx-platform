@@ -76,7 +76,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                     is_cohorted: isCohorted || false,
                     cohorted_inline_discussions: cohortedInlineDiscussions || [],
                     cohorted_course_wide_discussions: cohortedCourseWideDiscussions || [],
-                    always_cohort_inline_discussions: alwaysCohortInlineDiscussions || true
+                    always_cohort_inline_discussions: alwaysCohortInlineDiscussions || false
                 };
             };
 
