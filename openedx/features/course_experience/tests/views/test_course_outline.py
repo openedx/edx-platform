@@ -13,19 +13,9 @@ from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
+from .test_course_home import course_home_url
+
 TEST_PASSWORD = 'test'
-
-
-def course_home_url(course):
-    """
-    Returns the URL for the course's home page
-    """
-    return reverse(
-        'edx.course_experience.course_home',
-        kwargs={
-            'course_id': unicode(course.id),
-        }
-    )
 
 
 class TestCourseOutlinePage(SharedModuleStoreTestCase):
