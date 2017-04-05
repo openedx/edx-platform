@@ -18,7 +18,7 @@ from common.test.acceptance.pages.studio.html_component_editor import HtmlCompon
 from common.test.acceptance.pages.studio.move_xblock import MoveModalView
 from common.test.acceptance.pages.studio.utils import add_discussion, drag
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
-from common.test.acceptance.pages.lms.staff_view import StaffCoursewarePage
+from common.test.acceptance.pages.lms.staff_view import StaffPage
 from common.test.acceptance.tests.helpers import create_user_partition_json
 
 from xmodule.partitions.partitions import (
@@ -1066,9 +1066,9 @@ class UnitPublishingTest(ContainerBase):
 
     def _verify_and_return_staff_page(self):
         """
-        Verifies that the browser is on the staff page and returns a StaffCoursewarePage.
+        Verifies that the browser is on the staff page and returns a StaffPage.
         """
-        page = StaffCoursewarePage(self.browser, self.course_id)
+        page = StaffPage(self.browser, self.course_id)
         page.wait_for_page()
         return page
 
@@ -1503,9 +1503,6 @@ class MoveComponentTest(ContainerBase):
             should_verify_publish_title=False
         )
 
-    # Ideally this test should be decorated with @attr('a11y') so that it should run in a11y jenkins job
-    # But for some reason it always fails in a11y jenkins job and passes always locally on devstack as well
-    # as in bokchoy jenkins job. Due to this reason, test is marked to run under bokchoy jenkins job.
     def test_a11y(self):
         """
         Verify move modal a11y.

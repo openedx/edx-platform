@@ -7,9 +7,9 @@ from textwrap import dedent
 from common.test.acceptance.tests.helpers import UniqueCourseTest
 from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
-from common.test.acceptance.pages.lms.course_home import CourseHomePage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.problem import ProblemPage
+from common.test.acceptance.pages.lms.staff_view import StaffPage
 from common.test.acceptance.pages.common.logout import LogoutPage
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 
@@ -28,7 +28,6 @@ class GatingTest(UniqueCourseTest):
         super(GatingTest, self).setUp()
 
         self.logout_page = LogoutPage(self.browser)
-        self.course_home_page = CourseHomePage(self.browser, self.course_id)
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
         self.studio_course_outline = StudioCourseOutlinePage(
             self.browser,
@@ -159,14 +158,13 @@ class GatingTest(UniqueCourseTest):
 
         self._auto_auth(self.STUDENT_USERNAME, self.STUDENT_EMAIL, False)
 
-        self.course_home_page.visit()
-        self.assertEqual(self.course_home_page.outline.num_subsections, 1)
+        self.courseware_page.visit()
+        self.assertEqual(self.courseware_page.num_subsections, 1)
 
         # Fulfill prerequisite and verify that gated subsection is shown
-        self.courseware_page.visit()
         self._fulfill_prerequisite()
-        self.course_home_page.visit()
-        self.assertEqual(self.course_home_page.outline.num_subsections, 2)
+        self.courseware_page.visit()
+        self.assertEqual(self.courseware_page.num_subsections, 2)
 
     def test_gated_subsection_in_lms_for_staff(self):
         """
@@ -189,29 +187,27 @@ class GatingTest(UniqueCourseTest):
 
         self._auto_auth(self.STAFF_USERNAME, self.STAFF_EMAIL, True)
 
-        self.course_home_page.visit()
-        self.assertEqual(self.course_home_page.preview.staff_view_mode, 'Staff')
-        self.assertEqual(self.course_home_page.outline.num_subsections, 2)
+        self.courseware_page.visit()
+        staff_page = StaffPage(self.browser, self.course_id)
+        self.assertEqual(staff_page.staff_view_mode, 'Staff')
+        self.assertEqual(self.courseware_page.num_subsections, 2)
 
         # Click on gated section and check for banner
-        self.course_home_page.outline.go_to_section('Test Section 1', 'Test Subsection 2')
+        self.courseware_page.q(css='.chapter-content-container a').nth(1).click()
         self.courseware_page.wait_for_page()
         self.assertTrue(self.courseware_page.has_banner())
 
-        self.course_home_page.visit()
-        self.course_home_page.outline.go_to_section('Test Section 1', 'Test Subsection 1')
+        self.courseware_page.q(css='.chapter-content-container a').nth(0).click()
         self.courseware_page.wait_for_page()
 
-        self.course_home_page.visit()
-        self.course_home_page.preview.set_staff_view_mode('Student')
-        self.assertEqual(self.course_home_page.outline.num_subsections, 1)
-        self.course_home_page.outline.go_to_section('Test Section 1', 'Test Subsection 1')
-        self.courseware_page.wait_for_page()
+        staff_page.set_staff_view_mode('Student')
+
+        self.assertEqual(self.courseware_page.num_subsections, 1)
         self.assertFalse(self.courseware_page.has_banner())
 
-        self.course_home_page.visit()
-        self.course_home_page.preview.set_staff_view_mode_specific_student(self.STUDENT_USERNAME)
-        self.assertEqual(self.course_home_page.outline.num_subsections, 2)
-        self.course_home_page.outline.go_to_section('Test Section 1', 'Test Subsection 2')
+        staff_page.set_staff_view_mode_specific_student(self.STUDENT_USERNAME)
+
+        self.assertEqual(self.courseware_page.num_subsections, 2)
+        self.courseware_page.q(css='.chapter-content-container a').nth(1).click()
         self.courseware_page.wait_for_page()
         self.assertFalse(self.courseware_page.has_banner())

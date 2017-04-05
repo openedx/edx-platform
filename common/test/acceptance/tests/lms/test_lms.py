@@ -957,7 +957,6 @@ class VisibleToStaffOnlyTest(UniqueCourseTest):
             )
         ).install()
 
-        self.course_home_page = CourseHomePage(self.browser, self.course_id)
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
 
     def test_visible_to_staff(self):
@@ -970,21 +969,16 @@ class VisibleToStaffOnlyTest(UniqueCourseTest):
         AutoAuthPage(self.browser, username="STAFF_TESTER", email="johndoe_staff@example.com",
                      course_id=self.course_id, staff=True).visit()
 
-        self.course_home_page.visit()
-        self.assertEqual(3, len(self.course_home_page.outline.sections['Test Section']))
+        self.courseware_page.visit()
+        self.assertEqual(3, len(self.courseware_page.nav.sections['Test Section']))
 
-        self.course_home_page.outline.go_to_section("Test Section", "Subsection With Locked Unit")
-        self.courseware_page.wait_for_page()
+        self.courseware_page.nav.go_to_section("Test Section", "Subsection With Locked Unit")
         self.assertEqual([u'Locked Unit', u'Unlocked Unit'], self.courseware_page.nav.sequence_items)
 
-        self.course_home_page.visit()
-        self.course_home_page.outline.go_to_section("Test Section", "Unlocked Subsection")
-        self.courseware_page.wait_for_page()
+        self.courseware_page.nav.go_to_section("Test Section", "Unlocked Subsection")
         self.assertEqual([u'Test Unit'], self.courseware_page.nav.sequence_items)
 
-        self.course_home_page.visit()
-        self.course_home_page.outline.go_to_section("Test Section", "Locked Subsection")
-        self.courseware_page.wait_for_page()
+        self.courseware_page.nav.go_to_section("Test Section", "Locked Subsection")
         self.assertEqual([u'Test Unit'], self.courseware_page.nav.sequence_items)
 
     def test_visible_to_student(self):
@@ -997,16 +991,13 @@ class VisibleToStaffOnlyTest(UniqueCourseTest):
         AutoAuthPage(self.browser, username="STUDENT_TESTER", email="johndoe_student@example.com",
                      course_id=self.course_id, staff=False).visit()
 
-        self.course_home_page.visit()
-        self.assertEqual(2, len(self.course_home_page.outline.sections['Test Section']))
+        self.courseware_page.visit()
+        self.assertEqual(2, len(self.courseware_page.nav.sections['Test Section']))
 
-        self.course_home_page.outline.go_to_section("Test Section", "Subsection With Locked Unit")
-        self.courseware_page.wait_for_page()
+        self.courseware_page.nav.go_to_section("Test Section", "Subsection With Locked Unit")
         self.assertEqual([u'Unlocked Unit'], self.courseware_page.nav.sequence_items)
 
-        self.course_home_page.visit()
-        self.course_home_page.outline.go_to_section("Test Section", "Unlocked Subsection")
-        self.courseware_page.wait_for_page()
+        self.courseware_page.nav.go_to_section("Test Section", "Unlocked Subsection")
         self.assertEqual([u'Test Unit'], self.courseware_page.nav.sequence_items)
 
 
@@ -1151,7 +1142,8 @@ class ProblemExecutionTest(UniqueCourseTest):
         """
         super(ProblemExecutionTest, self).setUp()
 
-        self.course_home_page = CourseHomePage(self.browser, self.course_id)
+        self.course_info_page = CourseInfoPage(self.browser, self.course_id)
+        self.courseware_page = CoursewarePage(self.browser, self.course_id)
         self.tab_nav = TabNavPage(self.browser)
 
         # Install a course with sections and problems.
@@ -1196,8 +1188,8 @@ class ProblemExecutionTest(UniqueCourseTest):
 
     def test_python_execution_in_problem(self):
         # Navigate to the problem page
-        self.course_home_page.visit()
-        self.course_home_page.outline.go_to_section('Test Section', 'Test Subsection')
+        self.courseware_page.visit()
+        self.courseware_page.nav.go_to_section('Test Section', 'Test Subsection')
 
         problem_page = ProblemPage(self.browser)
         self.assertEqual(problem_page.problem_name.upper(), 'PYTHON PROBLEM')

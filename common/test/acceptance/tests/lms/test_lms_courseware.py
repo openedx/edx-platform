@@ -20,7 +20,7 @@ from ...pages.lms.dashboard import DashboardPage
 from ...pages.lms.pay_and_verify import PaymentAndVerificationFlow, FakePaymentPage, FakeSoftwareSecureVerificationPage
 from ...pages.lms.problem import ProblemPage
 from ...pages.lms.progress import ProgressPage
-from ...pages.lms.staff_view import StaffCoursewarePage
+from ...pages.lms.staff_view import StaffPage
 from ...pages.lms.track_selection import TrackSelectionPage
 from ...pages.studio.auto_auth import AutoAuthPage
 from ...pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
@@ -333,7 +333,7 @@ class ProctoredExamTest(UniqueCourseTest):
         LogoutPage(self.browser).visit()
         auto_auth(self.browser, "STAFF_TESTER", "staff101@example.com", True, self.course_id)
         self.courseware_page.visit()
-        staff_page = StaffCoursewarePage(self.browser, self.course_id)
+        staff_page = StaffPage(self.browser, self.course_id)
         self.assertEqual(staff_page.staff_view_mode, 'Staff')
 
         staff_page.set_staff_view_mode_specific_student(self.USERNAME)
@@ -592,7 +592,6 @@ class CoursewareMultipleVerticalsTest(CoursewareMultipleVerticalsTestBase):
             selected_events
         )
 
-    # TODO: Delete as part of TNL-6546 / LEARNER-71
     def test_link_clicked_events(self):
         """
         Given that I am a user in the courseware
