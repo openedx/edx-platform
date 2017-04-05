@@ -45,8 +45,9 @@ from xblock.exceptions import NoSuchHandlerError
 from xblock_django.user_service import DjangoXBlockUserService
 from opaque_keys.edx.keys import UsageKey, CourseKey
 from opaque_keys.edx.locations import Location
-from xmodule.partitions.partitions import Group, UserPartition
-from xmodule.partitions.partitions_service import ENROLLMENT_TRACK_PARTITION_ID, MINIMUM_STATIC_PARTITION_ID
+from xmodule.partitions.partitions import (
+    Group, UserPartition, ENROLLMENT_TRACK_PARTITION_ID, MINIMUM_STATIC_PARTITION_ID
+)
 
 
 class AsideTest(XBlockAside):
@@ -349,9 +350,9 @@ class GetItemTest(ItemTest):
         self.course.user_partitions = [
             UserPartition(
                 id=MINIMUM_STATIC_PARTITION_ID,
-                name="Verification user partition",
-                scheme=UserPartition.get_scheme("verification"),
-                description="Verification user partition",
+                name="Random user partition",
+                scheme=UserPartition.get_scheme("random"),
+                description="Random user partition",
                 groups=[
                     Group(id=MINIMUM_STATIC_PARTITION_ID + 1, name="Group A"),  # See note above.
                     Group(id=MINIMUM_STATIC_PARTITION_ID + 2, name="Group B"),  # See note above.
@@ -371,7 +372,7 @@ class GetItemTest(ItemTest):
         self.assertEqual(result["user_partitions"], [
             {
                 "id": ENROLLMENT_TRACK_PARTITION_ID,
-                "name": "Enrollment Track Partition",
+                "name": "Enrollment Tracks",
                 "scheme": "enrollment_track",
                 "groups": [
                     {
@@ -384,8 +385,8 @@ class GetItemTest(ItemTest):
             },
             {
                 "id": MINIMUM_STATIC_PARTITION_ID,
-                "name": "Verification user partition",
-                "scheme": "verification",
+                "name": "Random user partition",
+                "scheme": "random",
                 "groups": [
                     {
                         "id": MINIMUM_STATIC_PARTITION_ID + 1,

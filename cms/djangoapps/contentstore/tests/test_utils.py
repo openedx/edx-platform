@@ -510,7 +510,7 @@ class GetUserPartitionInfoTest(ModuleStoreTestCase):
         self.assertEqual(len(groups), 3)
         self.assertEqual(groups[2], {
             "id": 3,
-            "name": "Deleted group",
+            "name": "Deleted Group",
             "selected": True,
             "deleted": True
         })
