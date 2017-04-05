@@ -8,6 +8,7 @@ from mock import patch, Mock
 from nose.plugins.attrib import attr
 import os
 from unittest import skipIf
+import ddt
 
 from django.conf import settings
 from django.core import mail
@@ -133,9 +134,10 @@ class EmailSendFromDashboardTestCase(SharedModuleStoreTestCase):
         BulkEmailFlag.objects.all().delete()
 
 
-@attr(shard=1)
-@patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
-class TestLocalizedFromAddress(EmailSendFromDashboardTestCase):
+class SendEmailWithMockedUgettextMixin(object):
+    """
+    Mock uggetext for EmailSendFromDashboardTestCase.
+    """
     def send_email(self):
         """
         Sends a dummy email to check the `from_addr` translation.
@@ -165,11 +167,20 @@ class TestLocalizedFromAddress(EmailSendFromDashboardTestCase):
 
         return mail.outbox[0]
 
+
+@attr(shard=1)
+@patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
+@ddt.ddt
+class LocalizedFromAddressPlatformLangTestCase(SendEmailWithMockedUgettextMixin, EmailSendFromDashboardTestCase):
+    """
+    Tests to ensure that the bulk email has the "From" address localized according to LANGUAGE_CODE.
+    """
     @override_settings(LANGUAGE_CODE='en')
     def test_english_platform(self):
         """
         Ensures that the source-code language (English) works well.
         """
+        self.assertIsNone(self.course.language)  # Sanity check
         message = self.send_email()
         self.assertRegexpMatches(message.from_email, '.*Course Staff.*')
 
@@ -178,8 +189,42 @@ class TestLocalizedFromAddress(EmailSendFromDashboardTestCase):
         """
         Tests the fake Esperanto language to ensure proper gettext calls.
         """
+        self.assertIsNone(self.course.language)  # Sanity check
         message = self.send_email()
         self.assertRegexpMatches(message.from_email, '@EO .* Course Staff@')
+
+
+@attr(shard=1)
+@patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
+@ddt.ddt
+class LocalizedFromAddressCourseLangTestCase(SendEmailWithMockedUgettextMixin, EmailSendFromDashboardTestCase):
+    """
+    Test if the bulk email "From" address uses the course.language if present instead of LANGUAGE_CODE.
+
+    This is similiar to LocalizedFromAddressTestCase but creating a different test case to allow
+    changing the class-wide course object.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        Creates a different course.
+        """
+        super(LocalizedFromAddressCourseLangTestCase, cls).setUpClass()
+        course_title = u"ẗëṡẗ ｲэ"
+        cls.course = CourseFactory.create(
+            display_name=course_title,
+            language='ar',
+            default_store=ModuleStoreEnum.Type.split
+        )
+
+    @override_settings(LANGUAGE_CODE='eo')
+    def test_esperanto_platform_arabic_course(self):
+        """
+        The course language should override the platform's.
+        """
+        message = self.send_email()
+        self.assertRegexpMatches(message.from_email, '@AR .* Course Staff@')
 
 
 @attr(shard=1)
@@ -444,7 +489,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         instructor = InstructorFactory(course_key=course.id)
 
         unexpected_from_addr = _get_source_address(
-            course.id, course.display_name, truncate=False
+            course.id, course.display_name, course_language=None, truncate=False
         )
         __, encoded_unexpected_from_addr = forbid_multi_line_headers(
             "from", unexpected_from_addr, 'utf-8'

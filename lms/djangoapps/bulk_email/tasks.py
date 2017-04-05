@@ -110,6 +110,7 @@ def _get_course_email_context(course):
     email_context = {
         'course_title': course_title,
         'course_root': course_root,
+        'course_language': course.language,
         'course_url': course_url,
         'course_image_url': image_url,
         'course_end_date': course_end_date,
@@ -351,7 +352,7 @@ def _filter_optouts_from_recipients(to_list, course_id):
     return to_list, num_optout
 
 
-def _get_source_address(course_id, course_title, truncate=True):
+def _get_source_address(course_id, course_title, course_language, truncate=True):
     """
     Calculates an email address to be used as the 'from-address' for sent emails.
 
@@ -374,7 +375,12 @@ def _get_source_address(course_id, course_title, truncate=True):
     # character appears.
     course_name = re.sub(r"[^\w.-]", '_', course_id.course)
 
-    with override_language(settings.LANGUAGE_CODE):
+    # Use course.language if present
+    language = course_language if course_language else settings.LANGUAGE_CODE
+    with override_language(language):
+        # RFC2821 requires the byte order of the email address to be the name then email
+        #   e.g. "John Doe <email@example.com>"
+        # Although the display will be flipped in RTL languages, the byte order is still the same.
         from_addr_format = u'{name} {email}'.format(
             # Translators: Bulk email from address e.g. ("Physics 101" Course Staff)
             name=_('"{course_title}" Course Staff'),
@@ -481,10 +487,11 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
         subtask_status.increment(skipped=num_optout)
 
     course_title = global_email_context['course_title']
+    course_language = global_email_context['course_language']
 
     # use the email from address in the CourseEmail, if it is present, otherwise compute it
     from_addr = course_email.from_addr if course_email.from_addr else \
-        _get_source_address(course_email.course_id, course_title)
+        _get_source_address(course_email.course_id, course_title, course_language)
 
     # use the CourseEmailTemplate that was associated with the CourseEmail
     course_email_template = course_email.get_template()
