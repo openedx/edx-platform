@@ -9,6 +9,7 @@ define(['underscore'], function(_) {
     var FIND_COURSES_URL = '/courses';
     var PASSWORD_RESET_SUPPORT_LINK = 'https://support.edx.org/hc/en-us/articles/206212088-What-if-I-did-not-receive-a-password-reset-message-'; // eslint-disable-line max-len
     var PLATFORM_NAME = 'edX';
+    var CONTACT_EMAIL = 'info@example.com';
     var PROFILE_IMAGE = {
         image_url_large: '/media/profile-images/image.jpg',
         has_image: true
@@ -160,6 +161,7 @@ define(['underscore'], function(_) {
         IMAGE_REMOVE_API_URL: IMAGE_REMOVE_API_URL,
         PASSWORD_RESET_SUPPORT_LINK: PASSWORD_RESET_SUPPORT_LINK,
         PLATFORM_NAME: PLATFORM_NAME,
+        CONTACT_EMAIL: CONTACT_EMAIL,
         PROFILE_IMAGE: PROFILE_IMAGE,
         FIELD_OPTIONS: FIELD_OPTIONS,
         TIME_ZONE_RESPONSE: TIME_ZONE_RESPONSE,

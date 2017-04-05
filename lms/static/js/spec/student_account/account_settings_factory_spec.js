@@ -22,7 +22,10 @@ define(['backbone',
                     Helpers.PASSWORD_RESET_SUPPORT_LINK,
                     Helpers.USER_ACCOUNTS_API_URL,
                     Helpers.USER_PREFERENCES_API_URL,
-                    Helpers.PLATFORM_NAME
+                    1,
+                    Helpers.PLATFORM_NAME,
+                    Helpers.CONTACT_EMAIL,
+                    true
                 );
                 return context.accountSettingsView;
             };

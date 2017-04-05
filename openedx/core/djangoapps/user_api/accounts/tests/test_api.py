@@ -193,6 +193,16 @@ class TestAccountApi(UserSettingsEventTestMixin, TestCase):
         account_settings = get_account_settings(self.default_request)[0]
         self.assertEqual("Mickey Mouse", account_settings["name"])
 
+    @patch.dict(settings.FEATURES, dict(ALLOW_EMAIL_ADDRESS_CHANGE=False))
+    def test_email_changes_disabled(self):
+        """
+        Test that email address changes are rejected when ALLOW_EMAIL_ADDRESS_CHANGE is not set.
+        """
+        disabled_update = {"email": "valid@example.com"}
+        with self.assertRaises(AccountUpdateError) as context_manager:
+            update_account_settings(self.user, disabled_update)
+        self.assertIn("Email address changes have been disabled", context_manager.exception.developer_message)
+
     @patch('openedx.core.djangoapps.user_api.accounts.serializers.AccountUserSerializer.save')
     def test_serializer_save_fails(self, serializer_save):
         """

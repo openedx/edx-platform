@@ -231,6 +231,8 @@ def update_account_settings(requesting_user, update, username=None):
 
     # And try to send the email change request if necessary.
     if changing_email:
+        if not settings.FEATURES['ALLOW_EMAIL_ADDRESS_CHANGE']:
+            raise AccountUpdateError(u"Email address changes have been disabled by the site operators.")
         try:
             student_views.do_email_change_request(existing_user, new_email)
         except ValueError as err:
