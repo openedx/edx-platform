@@ -31,6 +31,7 @@ from xblock_django.models import XBlockConfiguration, XBlockStudioConfiguration,
 from xmodule.capa_module import CapaDescriptor
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
 from xmodule.modulestore.tests.factories import ItemFactory, LibraryFactory, check_mongo_calls, CourseFactory
 from xmodule.x_module import STUDIO_VIEW, STUDENT_VIEW
@@ -878,9 +879,19 @@ class TestMoveItem(ItemTest):
         self.assertEqual(response['move_source_locator'], unicode(source_usage_key))
         self.assertEqual(response['parent_locator'], unicode(target_usage_key))
         self.assertEqual(response['source_index'], expected_index)
+
+        # Verify parent referance has been changed now.
         new_parent_loc = self.store.get_parent_location(source_usage_key)
+        source_item = self.get_item_from_modulestore(source_usage_key)
+        self.assertEqual(source_item.parent, new_parent_loc)
         self.assertEqual(new_parent_loc, target_usage_key)
         self.assertNotEqual(parent_loc, new_parent_loc)
+
+        # Assert item is present in children list of target parent and not source parent
+        target_parent = self.get_item_from_modulestore(target_usage_key)
+        source_parent = self.get_item_from_modulestore(parent_loc)
+        self.assertIn(source_usage_key, target_parent.children)
+        self.assertNotIn(source_usage_key, source_parent.children)
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_move_component(self, store_type):
@@ -988,7 +999,7 @@ class TestMoveItem(ItemTest):
         self.assertEqual(response.status_code, 400)
         response = json.loads(response.content)
 
-        self.assertEqual(response['error'], 'You can not move an item into the same parent.')
+        self.assertEqual(response['error'], 'Item is already present in target location.')
         self.assertEqual(self.store.get_parent_location(self.html_usage_key), parent_loc)
 
     def test_can_not_move_into_itself(self):
@@ -1160,6 +1171,80 @@ class TestMoveItem(ItemTest):
             unicode(self.vert2_usage_key),
             insert_at
         )
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_move_and_discard_changes(self, store_type):
+        """
+        Verifies that discard changes operation brings moved component back to source location and removes the component
+        from target location.
+
+        Arguments:
+            store_type (ModuleStoreEnum.Type): Type of modulestore to create test course in.
+        """
+        self.setup_course(default_store=store_type)
+
+        old_parent_loc = self.store.get_parent_location(self.html_usage_key)
+
+        # Check that old_parent_loc is not yet published.
+        self.assertFalse(self.store.has_item(old_parent_loc, revision=ModuleStoreEnum.RevisionOption.published_only))
+
+        # Publish old_parent_loc unit
+        self.client.ajax_post(
+            reverse_usage_url("xblock_handler", old_parent_loc),
+            data={'publish': 'make_public'}
+        )
+
+        # Check that old_parent_loc is now published.
+        self.assertTrue(self.store.has_item(old_parent_loc, revision=ModuleStoreEnum.RevisionOption.published_only))
+        self.assertFalse(self.store.has_changes(self.store.get_item(old_parent_loc)))
+
+        # Move component html_usage_key in vert2_usage_key
+        self.assert_move_item(self.html_usage_key, self.vert2_usage_key)
+
+        # Check old_parent_loc becomes in draft mode now.
+        self.assertTrue(self.store.has_changes(self.store.get_item(old_parent_loc)))
+
+        # Now discard changes in old_parent_loc
+        self.client.ajax_post(
+            reverse_usage_url("xblock_handler", old_parent_loc),
+            data={'publish': 'discard_changes'}
+        )
+
+        # Check that old_parent_loc now is reverted to publish. Changes discarded, html_usage_key moved back.
+        self.assertTrue(self.store.has_item(old_parent_loc, revision=ModuleStoreEnum.RevisionOption.published_only))
+        self.assertFalse(self.store.has_changes(self.store.get_item(old_parent_loc)))
+
+        # Now source item should be back in the old parent.
+        source_item = self.get_item_from_modulestore(self.html_usage_key)
+        self.assertEqual(source_item.parent, old_parent_loc)
+        self.assertEqual(self.store.get_parent_location(self.html_usage_key), source_item.parent)
+
+        # Also, check that item is not present in target parent but in source parent
+        target_parent = self.get_item_from_modulestore(self.vert2_usage_key)
+        source_parent = self.get_item_from_modulestore(old_parent_loc)
+        self.assertIn(self.html_usage_key, source_parent.children)
+        self.assertNotIn(self.html_usage_key, target_parent.children)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_move_item_not_found(self, store_type=ModuleStoreEnum.Type.mongo):
+        """
+        Test that an item not found exception raised when an item is not found when getting the item.
+
+        Arguments:
+            store_type (ModuleStoreEnum.Type): Type of modulestore to create test course in.
+        """
+        self.setup_course(default_store=store_type)
+
+        data = {
+            'move_source_locator': unicode(self.usage_key.course_key.make_usage_key('html', 'html_test')),
+            'parent_locator': unicode(self.vert2_usage_key)
+        }
+        with self.assertRaises(ItemNotFoundError):
+            self.client.patch(
+                reverse('contentstore.views.xblock_handler'),
+                json.dumps(data),
+                content_type='application/json'
+            )
 
 
 class TestDuplicateItemWithAsides(ItemTest, DuplicateHelper):
