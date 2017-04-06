@@ -1,0 +1,14 @@
+// ------------------------------
+// LMS: Shared Build Compile
+// Version 3 - Bootstrap styling
+
+
+// Bootstrap
+@import 'bootstrap/scss/bootstrap';
+@import 'edx-bootstrap-theme';
+
+// Extensions
+@import 'shared-v3/variables';
+
+// Features
+@import 'features/bookmarks';

@@ -2,5 +2,7 @@
 // Version 3 styling (Bootstrap)
 // ====================
 
-@import 'bootstrap/scss/bootstrap';
-@import 'edx-bootstrap-theme';
+@import 'vendor/bi-app/bi-app-ltr'; // set the layout for left-to-right languages
+
+// Load the shared build
+@import 'build-lms-v3';
