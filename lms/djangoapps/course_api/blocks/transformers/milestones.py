@@ -2,15 +2,19 @@
 Milestones Transformer
 """
 
+import logging
 from django.conf import settings
 
 from openedx.core.djangoapps.content.block_structure.transformer import (
     BlockStructureTransformer,
     FilteringTransformerMixin,
 )
+from edx_proctoring.exceptions import ProctoredExamNotFoundException
 from edx_proctoring.api import get_attempt_status_summary
 from student.models import EntranceExamConfiguration
 from util import milestones_helpers
+
+log = logging.getLogger(__name__)
 
 
 class MilestonesTransformer(BlockStructureTransformer):
@@ -62,11 +66,14 @@ class MilestonesTransformer(BlockStructureTransformer):
                 # is not applicable
                 #
                 timed_exam_attempt_context = None
-                timed_exam_attempt_context = get_attempt_status_summary(
-                    usage_info.user.id,
-                    unicode(block_key.course_key),
-                    unicode(block_key)
-                )
+                try:
+                    timed_exam_attempt_context = get_attempt_status_summary(
+                        usage_info.user.id,
+                        unicode(block_key.course_key),
+                        unicode(block_key)
+                    )
+                except ProctoredExamNotFoundException as ex:
+                    log.exception(ex)
 
                 if timed_exam_attempt_context:
                     # yes, user has proctoring context about
@@ -95,15 +102,16 @@ class MilestonesTransformer(BlockStructureTransformer):
             elif self.has_pending_milestones_for_user(block_key, usage_info):
                 return True
             elif (settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and
-                  self.is_special_exam(block_key, block_structure) and
-                  not self.can_view_special_exams):
+                  (self.is_special_exam(block_key, block_structure) and
+                   not self.can_view_special_exams)):
                 return True
             return False
 
-        for block_key in block_structure.post_order_traversal():
+        for block_key in block_structure.topological_traversal():
             if user_gated_from_block(block_key):
                 block_structure.remove_block(block_key, False)
-            add_special_exam_info(block_key)
+            else:
+                add_special_exam_info(block_key)
 
     @staticmethod
     def is_special_exam(block_key, block_structure):

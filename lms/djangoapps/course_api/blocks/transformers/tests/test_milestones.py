@@ -9,6 +9,7 @@ from gating import api as lms_gating_api
 from lms.djangoapps.course_blocks.transformers.tests.helpers import CourseStructureTestCase
 from milestones.tests.utils import MilestonesTestCaseMixin
 from openedx.core.lib.gating import api as gating_api
+from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
 from student.tests.factories import CourseEnrollmentFactory
 
 from ..milestones import MilestonesTransformer
@@ -37,6 +38,8 @@ class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseM
 
         # Enroll user in course.
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id, is_active=True)
+
+        self.transformers = BlockStructureTransformers([self.TRANSFORMER_CLASS_TO_TEST(False)])
 
     def setup_gated_section(self, gated_block, gating_block):
         """
