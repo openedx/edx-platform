@@ -4,6 +4,7 @@ from third_party_auth import pipeline, provider
 from django.utils.translation import ugettext as _
 from django_countries import countries
 from student.models import UserProfile
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 %>
 
 <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
@@ -72,6 +73,13 @@ from student.models import UserProfile
 <div class="group group-form group-form-requiredinformation">
   <h2 class="sr">${_('Required Information')}</h2>
 
+  <%
+  name_instruction = configuration_helpers.get_value(
+    "name_instruction",
+    u"Your legal name, used for any certificates you earn."
+  )
+  %>
+
   % if has_extauth_info is UNDEFINED:
 
   <ol class="list-input">
@@ -83,7 +91,7 @@ from student.models import UserProfile
     <li class="field required text" id="field-name">
       <label for="name">${_('Full Name')}</label>
       <input id="name" type="text" name="name" value="${name}" placeholder="${_('example: Jane Doe')}" required aria-required="true" aria-describedby="name-tip" />
-      <span class="tip tip-input" id="name-tip">${_("Your legal name, used for any certificates you earn.")}</span>
+      <span class="tip tip-input" id="name-tip">${_(name_instruction)}</span>
     </li>
     <li class="field required text" id="field-username">
       <label for="username">${_('Public Username')}</label>
@@ -137,7 +145,7 @@ from student.models import UserProfile
     <li class="field required text" id="field-name">
       <label for="name">${_('Full Name')}</label>
       <input id="name" type="text" name="name" value="" placeholder="$_('example: Jane Doe')}" aria-describedby="name-tip" />
-      <span class="tip tip-input" id="name-tip">${_("Your legal name, used for any certificates you earn.")}</span>
+      <span class="tip tip-input" id="name-tip">${_(name_instruction)}</span>
     </li>
 
     % endif
