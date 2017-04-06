@@ -23,7 +23,9 @@ from openedx.core.djangolib.markup import HTML
         data-cohorted="${str(entries[entry]['is_cohorted']).lower()}"
         role="option"
     >
+         % if entry:
         <span class="forum-nav-browse-title">${entry}</span>
+         %endif
     </li>
 </%def>
 

@@ -147,7 +147,7 @@ def get_discussion_id_map_entry(xblock):
         xblock.discussion_id,
         {
             "location": xblock.location,
-            "title": xblock.discussion_category.split("/")[-1].strip() + " / " + xblock.discussion_target
+            "title": xblock.discussion_category.split("/")[-1].strip() + (" / " + xblock.discussion_target if xblock.discussion_target else "")
         }
     )
 

@@ -178,6 +178,22 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
         assertThreadCorrect(threads[0], self.discussion1, "Chapter / Discussion 1")
         assertThreadCorrect(threads[1], self.discussion2, "Subsection / Discussion 2")
 
+    def test_empty_discussion_subcategory_title(self):
+        """
+        Test that for empty subcategory inline discussion modules,
+        the divider " / " is not rendered on a post or inline discussion topic label.
+        """
+        discussion = ItemFactory.create(
+            parent_location=self.course.location,
+            category="discussion",
+            discussion_id="discussion",
+            discussion_category="Chapter",
+            discussion_target=""  # discussion-subcategory
+        )
+        thread = {"commentable_id": discussion.discussion_id}
+        utils.add_courseware_context([thread], self.course, self.user)
+        self.assertNotIn('/', thread.get("courseware_title"))
+
     @ddt.data((ModuleStoreEnum.Type.mongo, 2), (ModuleStoreEnum.Type.split, 1))
     @ddt.unpack
     def test_get_accessible_discussion_xblocks(self, modulestore_type, expected_discussion_xblocks):
