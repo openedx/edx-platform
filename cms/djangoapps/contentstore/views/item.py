@@ -51,6 +51,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from xmodule.modulestore.inheritance import own_metadata
+from xmodule.services import SettingsService
 from xmodule.tabs import CourseTabList
 from xmodule.x_module import PREVIEW_VIEWS, STUDIO_VIEW, STUDENT_VIEW, DEPRECATION_VSCOMPAT_EVENT
 
@@ -266,6 +267,8 @@ class StudioEditModuleRuntime(object):
                 return DjangoXBlockUserService(self._user)
             if service_name == "studio_user_permissions":
                 return StudioPermissionsService(self._user)
+            if service_name == "settings":
+                return SettingsService()
         return None
 
 
