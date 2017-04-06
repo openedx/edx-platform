@@ -495,11 +495,12 @@ class CourseTabView(EdxFragmentView):
         Displays a course tab page that contains a web fragment.
         """
         course_key = CourseKey.from_string(course_id)
-        course = get_course_with_access(request.user, 'load', course_key)
-        tab = CourseTabList.get_tab_by_type(course.tabs, tab_type)
-        page_context = self.create_page_context(request, course=course, tab=tab, **kwargs)
-        set_custom_metrics_for_course_key(course_key)
-        return super(CourseTabView, self).get(request, course=course, page_context=page_context, **kwargs)
+        with modulestore().bulk_operations(course_key):
+            course = get_course_with_access(request.user, 'load', course_key)
+            tab = CourseTabList.get_tab_by_type(course.tabs, tab_type)
+            page_context = self.create_page_context(request, course=course, tab=tab, **kwargs)
+            set_custom_metrics_for_course_key(course_key)
+            return super(CourseTabView, self).get(request, course=course, page_context=page_context, **kwargs)
 
     def create_page_context(self, request, course=None, tab=None, **kwargs):
         """
