@@ -1233,7 +1233,7 @@ class EntranceExamTest(UniqueCourseTest):
             self.course_info['run'], self.course_info['display_name']
         ).install()
 
-        self.courseware_page = CoursewarePage(self.browser, self.course_id)
+        self.course_home_page = CourseHomePage(self.browser, self.course_id)
         self.settings_page = SettingsPage(
             self.browser,
             self.course_info['org'],
@@ -1246,18 +1246,53 @@ class EntranceExamTest(UniqueCourseTest):
 
     def test_entrance_exam_section(self):
         """
+         Scenario: Any course that is enabled for an entrance exam, should have 
+         entrance exam section in the course outline.
+            Given that I visit the course outline
+            And entrance exams are not yet enabled
+            Then I should not see an "Entrance Exam" section
+            When I log in as staff
+            And enable entrance exams
+            And I visit the course outline again as student
+            Then there should be an "Entrance Exam" chapter.'
+        """
+        # visit the course outline and make sure there is no "Entrance Exam" section.
+        self.course_home_page.visit()
+        self.assertFalse('Entrance Exam' in self.course_home_page.outline.sections.keys())
+
+        # Logout and login as a staff.
+        LogoutPage(self.browser).visit()
+        AutoAuthPage(self.browser, course_id=self.course_id, staff=True).visit()
+
+        # visit course settings page and set/enabled entrance exam for that course.
+        self.settings_page.visit()
+        self.settings_page.entrance_exam_field.click()
+        self.settings_page.save_changes()
+
+        # Logout and login as a student.
+        LogoutPage(self.browser).visit()
+        AutoAuthPage(self.browser, course_id=self.course_id, staff=False).visit()
+
+        # visit the course outline and make sure there is an "Entrance Exam" section.
+        self.course_home_page.visit()
+        self.assertTrue('Entrance Exam' in self.course_home_page.outline.sections.keys())
+
+    # TODO: TNL-6546: Remove test
+    def test_entrance_exam_section_2(self):
+        """
          Scenario: Any course that is enabled for an entrance exam, should have entrance exam chapter at course
          page.
             Given that I am on the course page
             When I view the course that has an entrance exam
             Then there should be an "Entrance Exam" chapter.'
         """
+        courseware_page = CoursewarePage(self.browser, self.course_id)
         entrance_exam_link_selector = '.accordion .course-navigation .chapter .group-heading'
         # visit course page and make sure there is not entrance exam chapter.
-        self.courseware_page.visit()
-        self.courseware_page.wait_for_page()
+        courseware_page.visit()
+        courseware_page.wait_for_page()
         self.assertFalse(element_has_text(
-            page=self.courseware_page,
+            page=courseware_page,
             css_selector=entrance_exam_link_selector,
             text='Entrance Exam'
         ))
@@ -1276,10 +1311,10 @@ class EntranceExamTest(UniqueCourseTest):
         AutoAuthPage(self.browser, course_id=self.course_id, staff=False).visit()
 
         # visit course info page and make sure there is an "Entrance Exam" section.
-        self.courseware_page.visit()
-        self.courseware_page.wait_for_page()
+        courseware_page.visit()
+        courseware_page.wait_for_page()
         self.assertTrue(element_has_text(
-            page=self.courseware_page,
+            page=courseware_page,
             css_selector=entrance_exam_link_selector,
             text='Entrance Exam'
         ))

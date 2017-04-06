@@ -314,9 +314,7 @@ class TestEntranceExamCourseImport(ImportTestMixin, StudioCourseTest):
 
         courseware = CoursewarePage(self.browser, self.course_id)
         courseware.visit()
-        courseware.wait_for_page()
-        StaffCoursewarePage(self.browser, self.course_id).set_staff_view_mode('Learner')
-        self.assertEqual(courseware.num_sections, 1)
+        StaffCoursewarePage(self.browser, self.course_id).set_staff_view_mode('Student')
         self.assertIn(
             "To access course materials, you must score", courseware.entrance_exam_message_selector.text[0]
         )
