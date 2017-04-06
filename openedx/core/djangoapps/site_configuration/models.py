@@ -145,8 +145,13 @@ class SiteConfiguration(models.Model):
         else:
             theme_folder = os.path.join(settings.STATIC_ROOT, '..', 'customer_themes')
         theme_file = os.path.join(theme_folder, '{}.css'.format(domain_without_port_number))
+
+        new_file = not os.path.exists(theme_file)
         with open(theme_file, 'w') as f:
             f.write(css_output.encode('utf-8'))
+
+        # only try once, it caused errors if we tried to reapply permissions
+        if new_file:
             os.chmod(theme_file, 0777)
 
     def set_sass_variables(self, entries):
