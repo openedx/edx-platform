@@ -493,6 +493,7 @@ TEMPLATES = [
         'APP_DIRS': False,
         # Instead, look for template source files in these dirs.
         'DIRS': [
+            REPO_ROOT,
             PROJECT_ROOT / "templates",
             COMMON_ROOT / 'templates',
             COMMON_ROOT / 'lib' / 'capa' / 'capa' / 'templates',

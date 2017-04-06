@@ -1,0 +1,125 @@
+<%namespace name='static' file='../static_content.html'/>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<link rel="stylesheet" href="/static/philu/css/lms-main-v2.css"/>
+
+<div class="full-bg">
+    <div class="container">
+        <div class="philanthropy-logo-text">
+            <img class="brand-logo" src="/static/philu/images/philanthropy-logo-text.png" width="300"/>
+            <h6>Philanthropy University</h6>
+        </div>
+        <div class="authentications">
+            <div class="authentications-header" style="display: none;">
+                <a class="back-to-login" href="#!"><i class="fa fa-angle-left" aria-hidden="true"></i></a>
+                <h3>Password Reset</h3>
+            </div>
+            <div class="authentications-body">
+                <h3 class="authentications-header-text">Sign In</h3>
+                <p class="sub-text" style="display: none">Enter your registered email address. You will receive instructions for resetting your password in a few minutes</p>
+                <form id="login" class="authentications-form">
+                    <div class="form-group">
+                        <label for="emailAddress">Email address</label>
+                        <input type="email" class="form-control" id="emailAddress" placeholder="Email Address"/>
+                        <span class="required">*</span>
+                        <div class="validation-popover" style="display: none">
+                            <h3 class="popover-title">Warning</h3>
+                            <div class="popover-content">
+                                Error description mention here.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" class="form-control" id="password" placeholder="Password"/>
+                        <span class="required">*</span>
+                    </div>
+                    <button type="submit" class="btn btn-block btn-submit btn-primary" disabled="disabled">Sign In</button>
+                    <div class="forgot-password">
+                        <a href="#!">Forgot Password?</a>
+                    </div>
+                </form>
+                <form id="forgot-password" class="authentications-form" style="display: none">
+                    <div class="form-group">
+                        <label for="emailAddress1">Email address</label>
+                        <input type="email" class="form-control" id="emailAddress1" placeholder="Email Address"/>
+                        <span class="required">*</span>
+                    </div>
+                    <button type="submit" class="btn btn-block btn-submit" disabled="disabled">Send</button>
+                </form>
+                <form id="register" class="authentications-form" style="display: none">
+                    <div class="form-group">
+                        <label for="firstName">First Name</label>
+                        <input type="text" class="form-control" id="firstName" placeholder="First Name"/>
+                        <span class="required">*</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">Last Name</label>
+                        <input type="text" class="form-control" id="lastName" placeholder="Last Name"/>
+                        <span class="required">*</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="emailAddress">Email address</label>
+                        <input type="email" class="form-control" id="emailAddress" placeholder="Email Address"/>
+                        <span class="required">*</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="emailAddress">Confirm Email address</label>
+                        <input type="email" class="form-control" id="emailAddress" placeholder="Confirm Email Address"/>
+                        <span class="required">*</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" class="form-control" id="password" placeholder="Password"/>
+                        <span class="required">*</span>
+                    </div>
+                    <p class="text-small">Min 8 characters with lower, uppercase and digits</p>
+                    <button type="submit" class="btn btn-block btn-submit btn-primary" disabled="disabled">Sign Up</button>
+                    <div class="terms-of-service-link">
+                        By signing up you agree to our
+                        <a href="#!">Terms of Service</a>
+                    </div>
+                </form>
+            </div>
+            <div class="authentications-footer">
+                Sign in with
+                <a href="#!" class="icon-facebook">
+                    <i class="fa fa-facebook-square" aria-hidden="true"></i>
+                </a>
+                <a href="#!" class="icon-googlePlus">
+                    <i class="fa fa-google-plus-square" aria-hidden="true"></i>
+                </a>
+            </div>
+            <div class="authentications-switch-link">
+                <a href="#!">Create a New Account</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="${static.url('js/bootstrap.min.js')}"></script>
+<script type="text/javascript">
+    $('input').focus(function () {
+        $(this).siblings('label').css('opacity', '1');
+    });
+    $('input').focusout(function () {
+        $(this).siblings('label').css('opacity', '0');
+    });
+</script>
+<script type="text/javascript">
+    $('.forgot-password a').on('click', function (e) {
+        $('form#login, .authentications-header-text, .sub-text, .authentications-switch-link').hide();
+        $('form#forgot-password, .authentications-header').animate({height: 'toggle'}, 'slow');
+    });
+
+    $('.back-to-login').on('click', function (e) {
+        $('form#login, .authentications-header-text, .authentications-switch-link').animate({height: 'toggle'}, 'slow');
+        $('form#forgot-password, .authentications-header, .sub-text').hide();
+    });
+
+    $('.authentications-switch-link a').on('click', function (e) {
+        $('form#login, .sub-text').hide();
+        $('form#register').animate({height: 'toggle'}, 'slow');
+        $(this).text('Sign in with an Existing Account');
+        $('.authentications-header-text').text('Sign Up');
+    });
+</script>

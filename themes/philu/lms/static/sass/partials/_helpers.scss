@@ -1,0 +1,133 @@
+//
+// Clearfix
+%clearfix {
+    *zoom: 1;
+    clear: both;
+
+    &:before,
+    &:after {
+        content: '';
+        display: table;
+    }
+
+    &:after {
+        clear: both;
+    }
+}
+
+@-webkit-keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        -webkit-transform: translateY(0);
+        transform: translateY(0)
+    }
+    40% {
+        -webkit-transform: translateY(-15px);
+        transform: translateY(-15px)
+    }
+    60% {
+        -webkit-transform: translateY(-10px);
+        transform: translateY(-10px)
+    }
+}
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        -webkit-transform: translateY(0);
+        transform: translateY(0)
+    }
+    40% {
+        -webkit-transform: translateY(-15px);
+        transform: translateY(-15px)
+    }
+    60% {
+        -webkit-transform: translateY(-10px);
+        transform: translateY(-10px)
+    }
+}
+
+
+$d-width: 100px;
+$d-height: 100px;
+%diagonal-bg {
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+
+    &:before {
+        content: '';
+        display: block;
+        background: transparent;
+        position: absolute;
+        z-index: -1;
+        right: -($d-width*4);
+        top: -($d-height*4);
+        @include transition(.5s);
+        width: 0;
+        height: 0;
+        border-top: ($d-height*8) solid $teal;
+        border-left: ($d-width*8) solid transparent;
+    }
+
+    &:hover {
+        &:before {
+            right: 0;
+            top: 0;
+        }
+    }
+}
+
+.slide-bg-teal {
+    @extend %diagonal-bg;
+    &:before {
+        border-top-color: $teal;
+    }
+}
+
+.slide-bg-dark-blue {
+    @extend %diagonal-bg;
+    &:before {
+        border-top-color: $blue-dark;
+    }
+}
+
+.slide-bg-orange {
+    @extend %diagonal-bg;
+    &:before {
+        border-top-color: $orange;
+    }
+}
+
+.slide-bg-red {
+    @extend %diagonal-bg;
+    &:before {
+        border-top-color: $red;
+    }
+}
+
+.slide-bg-gray {
+    @extend %diagonal-bg;
+    &:before {
+        border-top-color: $gray-light;
+    }
+}
+
+.uppercase {
+    text-transform: uppercase;
+}
+
+.col-centered {
+    float: none;
+    margin: auto;
+}
+
+.border-bottom {
+    border-bottom: 1px solid #dcdcdc;
+}
+
+.mb0 {
+    margin-bottom: 0 !important;
+}
+
+.mt20 {
+    margin-top: 20px !important;
+}
+

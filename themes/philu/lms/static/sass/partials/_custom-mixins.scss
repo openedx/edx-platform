@@ -1,0 +1,51 @@
+//
+// Mixins
+
+//example: @include transition(.3s);
+@mixin transition($time: 0.3 default) {
+    -webkit-transition: all $time ease;
+    -moz-transition: all $time ease;
+    -ms-transition: all $time ease;
+    -o-transition: all $time ease;
+    transition: all $time ease;
+}
+
+// generic transform
+@mixin transform($transforms) {
+    -moz-transform: $transforms;
+    -o-transform: $transforms;
+    -ms-transform: $transforms;
+    -webkit-transform: $transforms;
+    transform: $transforms;
+}
+
+// rotate
+@mixin rotate($deg) {
+    @include transform(rotate(#{$deg}deg));
+}
+
+// scale
+@mixin scale($scale) {
+    @include transform(scale($scale));
+}
+
+// translate
+@mixin translate($x, $y) {
+    @include transform(translate($x, $y));
+}
+
+// skew
+@mixin skew($x, $y) {
+    @include transform(skew(#{$x}deg, #{$y}deg));
+}
+
+// Font rem / px
+//@function calculateRem($size) {
+//    $remSize: $size / 16px;
+//    @return #{$remSize}rem;
+//}
+//
+//@mixin fontSize($size) {
+//    font-size: $size; //Fallback in px
+//    font-size: calculateRem($size);
+//}
