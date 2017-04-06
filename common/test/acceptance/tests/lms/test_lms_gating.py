@@ -203,7 +203,7 @@ class GatingTest(UniqueCourseTest):
         self.courseware_page.wait_for_page()
 
         self.course_home_page.visit()
-        self.course_home_page.preview.set_staff_view_mode('Student')
+        self.course_home_page.preview.set_staff_view_mode('Learner')
         self.assertEqual(self.course_home_page.outline.num_subsections, 1)
         self.course_home_page.outline.go_to_section('Test Section 1', 'Test Subsection 1')
         self.courseware_page.wait_for_page()
