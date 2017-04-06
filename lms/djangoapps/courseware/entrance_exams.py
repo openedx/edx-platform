@@ -59,7 +59,7 @@ def get_entrance_exam_content(user, course):
     """
     Get the entrance exam content information (ie, chapter module)
     """
-    required_content = get_required_content(course, user)
+    required_content = get_required_content(course.id, user)
 
     exam_module = None
     for content in required_content:

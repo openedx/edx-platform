@@ -86,9 +86,13 @@ class MilestonesTransformer(BlockStructureTransformer):
                         timed_exam_attempt_context,
                     )
 
-        course_key = block_structure.root_block_usage_key.course_key
+        root_key = block_structure.root_block_usage_key
+        course_key = root_key.course_key
         user_can_skip = EntranceExamConfiguration.user_can_skip_entrance_exam(usage_info.user, course_key)
-        exam_id = block_structure.get_xblock_field(course_key, 'entrance_exam_id')
+        exam_id = block_structure.get_xblock_field(root_key, 'entrance_exam_id')
+        required_content = milestones_helpers.get_required_content(course_key, usage_info.user)
+        if user_can_skip:
+            required_content = [content for content in required_content if not content == exam_id]
 
         def user_gated_from_block(block_key):
             """
@@ -97,10 +101,11 @@ class MilestonesTransformer(BlockStructureTransformer):
             """
             if usage_info.has_staff_access:
                 return False
-            elif user_can_skip and block_key == exam_id:
-                return False
             elif self.has_pending_milestones_for_user(block_key, usage_info):
                 return True
+            elif required_content:
+                if block_key.block_type == 'chapter' and unicode(block_key) not in required_content:
+                    return True
             elif (settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and
                   (self.is_special_exam(block_key, block_structure) and
                    not self.can_view_special_exams)):
