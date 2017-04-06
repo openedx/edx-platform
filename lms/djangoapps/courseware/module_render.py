@@ -52,9 +52,6 @@ from openedx.core.djangoapps.bookmarks.services import BookmarksService
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.credit.services import CreditService
 from openedx.core.djangoapps.util.user_utils import SystemUser
-from openedx.core.djangoapps.monitoring_utils import (
-    set_custom_metrics_for_course_key, set_monitoring_transaction_name
-)
 from openedx.core.lib.xblock_utils import (
     replace_course_urls,
     replace_jump_to_id_urls,
@@ -83,6 +80,11 @@ from xmodule.x_module import XModuleDescriptor
 from .field_overrides import OverrideFieldData
 
 log = logging.getLogger(__name__)
+
+try:
+    import newrelic.agent
+except ImportError:
+    newrelic = None  # pylint: disable=invalid-name
 
 if settings.XQUEUE_INTERFACE.get('basic_auth') is not None:
     REQUESTS_AUTH = HTTPBasicAuth(*settings.XQUEUE_INTERFACE['basic_auth'])
@@ -968,7 +970,10 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
     except InvalidKeyError:
         raise Http404
 
-    set_custom_metrics_for_course_key(course_key)
+    if newrelic:
+        # Gather metrics for New Relic so we can slice data in New Relic Insights
+        newrelic.agent.add_custom_parameter('course_id', unicode(course_key))
+        newrelic.agent.add_custom_parameter('org', unicode(course_key.org))
 
     with modulestore().bulk_operations(course_key):
         instance, tracking_context = get_module_by_usage_id(request, course_id, usage_id, course=course)
@@ -978,7 +983,8 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
         # "handler" in those cases is always just "xmodule_handler".
         nr_tx_name = "{}.{}".format(instance.__class__.__name__, handler)
         nr_tx_name += "/{}".format(suffix) if (suffix and handler == "xmodule_handler") else ""
-        set_monitoring_transaction_name(nr_tx_name, group="Python/XBlock/Handler")
+        if newrelic:
+            newrelic.agent.set_transaction_name(nr_tx_name, group="Python/XBlock/Handler")
 
         tracking_context_name = 'module_callback_handler'
         req = django_to_webob_request(request)

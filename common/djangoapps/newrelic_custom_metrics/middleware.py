@@ -1,13 +1,10 @@
 """
-Middleware for handling the storage, aggregation, and reporting of custom
-metrics for monitoring.
-
-At this time, the custom metrics can only reported to New Relic.
+Middleware for handling the storage, aggregation, and reporing of custom New
+Relic metrics.
 
 This middleware will only call on the newrelic agent if there are any metrics
 to report for this request, so it will not incur any processing overhead for
 request handlers which do not record custom metrics.
-
 """
 import logging
 log = logging.getLogger(__name__)
@@ -19,10 +16,10 @@ except ImportError:
 
 import request_cache
 
-REQUEST_CACHE_KEY = 'monitoring_custom_metrics'
+REQUEST_CACHE_KEY = 'newrelic_custom_metrics'
 
 
-class MonitoringCustomMetrics(object):
+class NewRelicCustomMetrics(object):
     """
     The middleware class.  Make sure to add below the request cache in
     MIDDLEWARE_CLASSES.
