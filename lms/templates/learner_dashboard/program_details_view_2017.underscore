@@ -1,0 +1,64 @@
+<header class="js-program-header program-header full-width-banner"></header>
+<div class="program-details-content">
+    <div class="js-program-progress-view"></div>
+    <div class="program-heading">
+            <% if (inProgressCount === totalCount) { %>
+                <h3 class="program-heading-title"><%- gettext('Congratulations!') %></h3>
+                <div class="program-heading-message">
+                    <div><%- interpolate(gettext(
+                        'You have successfully completed all the requirements for the %(title)s %(type)s.'),
+                        { title: title, type: type }, true) %>
+                    </div>
+                </div>
+            <% } else { %>
+                <h3 class="program-heading-title"><%- gettext('Your Program Journey') %></h3>
+                <div class="program-heading-message">
+                    <div>
+                        <%- interpolate(gettext(
+                        'Track and plan your progress through the %(count)s courses in this program.'),
+                        { count: totalCount }, true) %>
+                    </div>
+                    <div><%- gettext('To complete the program, you must earn a verified certificate for each course.') %></div>
+                </div>
+            <% } %>
+    </div>
+    <div class="course-list-headings">
+        <% if (inProgressCount) { %>
+            <div class="in-progress-group">
+                <h4 class="course-list-heading">
+                    <span class="status"><%- gettext('COURSES IN PROGRESS') %></span>
+                    <span class="count"><%- inProgressCount %></span>
+                </h4>
+                <div class="divider"></div>
+                <div class="course-list js-course-list-in-progress row"></div>
+            </div>
+        <% } %>
+        <% if (remainingCount) { %>
+            <div class="remaining-group">
+                <h4 class="course-list-heading">
+                    <span class="status"><%- gettext('REMAINING COURSES') %></span>
+                    <span class="count"><%- remainingCount %></span>
+                </h4>
+                <div class="divider"></div>
+                <div class="course-list js-course-list-remaining row"></div>
+            </div>
+        <% } %>
+        <div class="completed-group">
+            <h4 class="course-list-heading">
+                <span class="status"><%- gettext('COMPLETED COURSES') %></span>
+                <span class="count"><%- completedCount %></span>
+            </h4>
+            <div class="divider"></div>
+            <% if (completedCount) { %>
+                <div class="course-list js-course-list-completed row"></div>
+            <% } else { %>
+                <div class="motivating-section">
+                    <p class='motivating-heading'><%- gettext("As you complete courses, you will see them listed here.") %></p>
+                    <p class='motivating-message'><%- gettext('Complete courses on your schedule to ensure you stand out in your field!') %></p>
+                </div>
+            <% } %>
+        </div>  
+    </div>
+    
+    <aside class="js-course-sidebar"></aside>
+</div>
