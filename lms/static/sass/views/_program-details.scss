@@ -76,3 +76,425 @@
         padding: 0 $full-width-banner-margin/4;
     }
 }
+
+// CSS for April 2017 version of Program Details Page
+
+.program-details {
+    .window-wrap {
+        background-color: $white;
+    }
+}
+.program-details-wrapper {
+
+    .program-details-header {
+        background-color: $light-gray4;
+        display: flex;
+        color: black;
+        font-family: 'Open Sans';
+        font-weight: normal;
+        flex-wrap: wrap;
+        padding-top: 40px;
+        padding-bottom: 35px;
+        margin-left: 10px;
+        margin-right: 10px;
+
+        @media(min-width: $bp-screen-md) {
+            margin-left: 30px;
+            margin-right: 80px;
+        }
+
+        .hd-1 {
+            font-size: 1.5em;
+            @media(min-width: $bp-screen-md) {            
+                font-size: 2.375em;
+            }
+        }
+
+        .program-details-icon {
+            margin-left: 3px;
+            margin-top: 10px;
+            height: auto;
+
+            /* IE11 CSS styles */
+            @media(min-width: $bp-screen-md) and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+                height: 50px;
+            }
+        }
+
+        .micromasters {
+            fill: $micromasters-color;
+            width: 200px;
+            @media(min-width: $bp-screen-md) {            
+                width: 250px;
+            }
+        }
+
+        .xseries {
+            fill: xseries-color;
+            width: 150px;
+            @media(min-width: $bp-screen-md) {            
+                width: 200px;
+            }
+        }
+
+        .professional.certificate {
+            fill: $professional-certificate-color;
+            width: 250px;
+            @media(min-width: $bp-screen-md) {            
+                width: 300px;
+            }
+        }
+
+        .meta-info {
+            margin: 0;
+            @media(min-width: $bp-screen-md) {
+                width: 70%;
+            }
+            @media(min-width: $bp-screen-lg) {
+                width: 75%;
+            }
+
+            .program-title {
+                font-weight: normal;
+                font-size: 2em;
+            }
+        }
+
+        .authoring-organizations {
+            text-align: center;
+
+            display: flex;
+            @media(min-width: $bp-screen-md) {
+                display: block;
+            }
+
+            .heading {
+                font-family: "Open Sans";
+                font-weight: bold;
+                color: palette(primary, dark);
+                font-size: 0.9375em;
+
+                margin-top: auto;
+                margin-bottom: auto;
+                @media(min-width: $bp-screen-md) {
+                    margin: 10px 0 0 0;
+                }
+
+            }
+
+            @media(min-width: $bp-screen-md) {
+                margin: initial;
+                width: 30%;
+
+                .orgs .org-logo {
+                    width: 46.5%;
+                    margin-left: 2.5%;
+                    height: auto;
+                }
+            }
+
+            @media(min-width: $bp-screen-lg) {
+                width: 25%;
+            }
+        }
+
+    }
+
+    .program-details-content {
+        @media(min-width: $bp-screen-md) {
+            margin-left: 30px;
+        }
+        margin-left: 10px;
+    }
+    .course-list-heading {
+        font-family: "Open Sans";
+        font-weight: bold;
+        color: palette(primary, dark);
+        font-size: 0.9375em;
+        line-height: normal;
+        margin-top: 10px;
+        margin-bottom: 0;
+
+        .status {
+            margin-right: 7px;
+        }
+    }
+
+    .course-list > div:nth-of-type(even) {
+        background-color: $zebra-stripe-color;
+    }
+
+    .course-list-headings {
+        width: 700px;
+
+        .divider {
+            margin-left: 0;
+            margin-bottom: 20px;
+            background-color: $divider-color;
+            margin-top: 5px;
+            height: 3px;
+            width: 315px;
+            @media(min-width: $bp-screen-sm) {
+                width: 550px;
+            }
+            @media(min-width: $bp-screen-md) {
+                width: 700px;
+            }
+            border: none;
+        }
+
+        .motivating-section {
+            font-size: 0.9375em;
+            margin-left: 15px;
+            width: 310px;
+            @media(min-width: $bp-screen-sm) {
+                width: auto;
+            }
+
+            .motivating-heading {
+                margin-bottom: 0px;
+                font-weight: 600;
+            }
+
+            .motivating-message {
+                color: #414141;
+            }
+
+        }
+    }
+
+    .program-heading {
+        @media(min-width: $bp-screen-md) {
+            width: 70%;
+        }
+        width: 90%;
+        margin-top: 40px;
+        margin-bottom: 40px;
+
+        .program-heading-title {
+            font-family: "Open Sans";
+            font-weight: 600;
+            font-size: 1.3em;
+            color: palette(grayscale, base);
+            margin-bottom: 5px;
+            line-height: normal;
+        }
+
+        .program-heading-message {
+            font-weight: 300;
+        }
+    }
+
+    .course-enroll-view {
+        .enroll-button {
+            width: 100%;
+
+            @media(min-width: $bp-screen-sm) {
+                width: initial;
+                margin-bottom: 0;
+                margin-top: 17px;
+            }
+
+            @media(min-width: $bp-screen-md) {
+                width: initial;
+                margin-top: 0px;
+                margin-bottom: 0;
+            }
+
+            button {
+                background-color: palette(primary, dark);
+                height: 37px;
+                width: 128px;
+                border-radius: 0;
+                padding: 0;
+                margin-bottom: 5px;
+                margin-top: 7px;
+                font-size: 0.9375em;
+
+                /* IE11 CSS styles */
+                @media(min-width: $bp-screen-md) and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+                    float: right;
+                }
+            }
+        }
+        .select-choice {
+            font-family: "Open Sans";
+            font-weight: bold;
+            font-size: 0.9375em;
+            color: palette(grayscale, base);
+            margin-top: 6px;
+            margin-right: 2px;
+            display: block;
+
+            @media(min-width: $bp-screen-md) {
+                display: inline;
+            }
+
+        }
+        .run-select-container {
+            @media(min-width: $bp-screen-md) {
+                margin-top: 8px;
+                display: flex;
+                flex-wrap: wrap;
+            }
+        }
+        .run-select {
+            width: 95%;
+            @media(min-width: $bp-screen-sm) {
+                width: 300px;
+            }
+            height: 34px;
+            padding: 0;
+            margin-right: 10px;
+        }
+    }
+   
+    .program-course-card {
+        @media(min-width: $bp-screen-md) {
+            width: 100%;
+        }
+
+        margin-bottom: 10px;
+
+        @media(min-width: $bp-screen-md) {
+            height: 100px;
+        }
+
+        .section {
+            display: flex;
+            justify-content: space-between;
+            margin-right: 40px;
+            margin-left: 15px;
+
+            @media(min-width: $bp-screen-md) {
+                margin-left: 20px;
+            }
+
+            @media(min-width: $bp-screen-md) {
+                flex-wrap: wrap;
+            }
+
+        }
+
+        .course-details {
+            float: none;
+
+            .course-title { 
+                font-size: 1em;
+                color: palette(primary, base);
+                font-weight: 600;
+                text-decoration: underline;
+                margin: 0;
+            }
+
+            .run-period {
+                color: palette(grayscale, base);
+                font-size: 0.9375em;
+            }
+
+            .course-text .enrolled {
+                color: palette(grayscale, base);
+            }
+        }
+
+        .course-meta-container {
+            display: flex;
+            flex-direction: column;
+
+            @media(min-width: $bp-screen-md) {
+                width: 100%;
+            }
+        }
+
+        .course-actions {
+            display: flex;
+            flex-direction: column;
+
+            .course-enroll-view {
+                display: flex;
+                justify-content: space-between;
+                flex-wrap: wrap;
+            }
+        }
+
+        .upgrade-message {
+            flex-wrap: wrap;
+
+            .upgrade-button {
+                background: palette(success, text);
+                border-color: palette(success, text);
+                height: 37px;
+                width: 128px;
+                border-radius: 0;
+                padding: 0;
+                text-align: center;
+                font-size: 0.9375em;
+                
+                /* IE11 CSS styles */
+                @media(min-width: $bp-screen-md) and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+                    float: right;
+                }
+            }
+
+            .action {
+                width: 100%;
+                margin: 5px 0;
+
+                @media(min-width: $bp-screen-sm) {
+                    width: initial;
+                }
+                @media(min-width: $bp-screen-md) {
+                    margin-top: -25px;
+                }
+            }
+
+            .certificate-status{
+                padding-top: 0px;
+
+                width: initial;
+                @media(min-width: $bp-screen-sm) {
+                    width: 300px;
+                }
+                @media(min-width: $bp-screen-md) {
+                    width: initial;
+                }
+
+                .card-msg {
+                    font-family: "Open Sans";
+                    font-weight: bold;
+                    font-size: 0.9375em;
+                    color: palette(grayscale, base);
+                    display: block;
+                    @media(min-width: $bp-screen-sm) {
+                        display: inline;
+                    }
+                }
+
+                .price {
+                    color: palette(success, text);
+                    font-weight: bold;
+                }
+            }
+
+        }
+
+        .certificate-status {
+            .fa-check-circle {
+                color: palette(success, text);
+            }
+
+            .card-msg {
+                font-family: "Open Sans";
+                font-weight: bold;
+                font-size: 0.9375em;
+                color: palette(grayscale, base);
+            }
+
+            .certificate-status-msg {
+                color: palette(grayscale, base);
+                font-size: 0.9375em;
+            }
+        }
+
+    }
+}
