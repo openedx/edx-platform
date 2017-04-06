@@ -1454,6 +1454,18 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/lms-main-v2-rtl.css',
     },
+    'style-main-v3': {
+        'source_filenames': [
+            'css/lms-main-v3.css',
+        ],
+        'output_filename': 'css/lms-main-v3.css',
+    },
+    'style-main-v3-rtl': {
+        'source_filenames': [
+            'css/lms-main-v3-rtl.css',
+        ],
+        'output_filename': 'css/lms-main-v3-rtl.css',
+    },
     'style-course-vendor': {
         'source_filenames': [
             'js/vendor/CodeMirror/codemirror.css',
