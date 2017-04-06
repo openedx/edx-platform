@@ -274,7 +274,7 @@ class CoursewareSearchCohortTest(ContainerBase):
         Test staff user can search just student public content if selected from preview menu.
         """
         self._auto_auth(self.staff_user["username"], self.staff_user["email"], False)
-        self._goto_staff_page().set_staff_view_mode('Student')
+        self._goto_staff_page().set_staff_view_mode('Learner')
         self.courseware_search_page.search_for_term(self.visible_to_all_html)
         assert self.visible_to_all_html in self.courseware_search_page.search_results.html[0]
         self.courseware_search_page.clear_search()
@@ -292,7 +292,7 @@ class CoursewareSearchCohortTest(ContainerBase):
         Test staff user can search cohort and public content if selected from preview menu.
         """
         self._auto_auth(self.staff_user["username"], self.staff_user["email"], False)
-        self._goto_staff_page().set_staff_view_mode('Student in ' + self.content_group_a)
+        self._goto_staff_page().set_staff_view_mode('Learner in ' + self.content_group_a)
         self.courseware_search_page.search_for_term(self.visible_to_all_html)
         assert self.visible_to_all_html in self.courseware_search_page.search_results.html[0]
         self.courseware_search_page.clear_search()

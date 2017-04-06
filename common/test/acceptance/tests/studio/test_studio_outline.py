@@ -743,7 +743,7 @@ class StaffLockTest(CourseOutlineTest):
         course_home_page = CourseHomePage(self.browser, self.course_id)
         course_home_page.visit()
         self.assertEqual(course_home_page.outline.num_sections, 2)
-        course_home_page.preview.set_staff_view_mode('Student')
+        course_home_page.preview.set_staff_view_mode('Learner')
         self.assertEqual(course_home_page.outline.num_sections, 1)
 
     def test_locked_subsections_do_not_appear_in_lms(self):
@@ -764,7 +764,7 @@ class StaffLockTest(CourseOutlineTest):
         course_home_page = CourseHomePage(self.browser, self.course_id)
         course_home_page.visit()
         self.assertEqual(course_home_page.outline.num_subsections, 2)
-        course_home_page.preview.set_staff_view_mode('Student')
+        course_home_page.preview.set_staff_view_mode('Learner')
         self.assertEqual(course_home_page.outline.num_subsections, 1)
 
     def test_toggling_staff_lock_on_section_does_not_publish_draft_units(self):
