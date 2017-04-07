@@ -107,27 +107,29 @@ def create_course_enrollment(username, course_id, mode, is_active):
 
     """
     course_key = CourseKey.from_string(course_id)
+    site_course_org_filter = configuration_helpers.get_value('course_org_filter')
+    if site_course_org_filter == course_key.org or not site_course_org_filter:
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            msg = u"Not user with username '{username}' found.".format(username=username)
+            log.warn(msg)
+            raise UserNotFoundError(msg)
 
-    try:
-        user = User.objects.get(username=username)
-    except User.DoesNotExist:
-        msg = u"Not user with username '{username}' found.".format(username=username)
-        log.warn(msg)
-        raise UserNotFoundError(msg)
-
-    try:
-        enrollment = CourseEnrollment.enroll(user, course_key, check_access=True)
-        return _update_enrollment(enrollment, is_active=is_active, mode=mode)
-    except NonExistentCourseError as err:
-        raise CourseNotFoundError(err.message)
-    except EnrollmentClosedError as err:
-        raise CourseEnrollmentClosedError(err.message)
-    except CourseFullError as err:
-        raise CourseEnrollmentFullError(err.message)
-    except AlreadyEnrolledError as err:
-        enrollment = get_course_enrollment(username, course_id)
-        raise CourseEnrollmentExistsError(err.message, enrollment)
-
+        try:
+            enrollment = CourseEnrollment.enroll(user, course_key, check_access=True)
+            return _update_enrollment(enrollment, is_active=is_active, mode=mode)
+        except NonExistentCourseError as err:
+            raise CourseNotFoundError(err.message)
+        except EnrollmentClosedError as err:
+            raise CourseEnrollmentClosedError(err.message)
+        except CourseFullError as err:
+            raise CourseEnrollmentFullError(err.message)
+        except AlreadyEnrolledError as err:
+            enrollment = get_course_enrollment(username, course_id)
+            raise CourseEnrollmentExistsError(err.message, enrollment)
+    else:
+        return NonExistentCourseError
 
 def update_course_enrollment(username, course_id, mode=None, is_active=None):
     """Modify a course enrollment for a user.
