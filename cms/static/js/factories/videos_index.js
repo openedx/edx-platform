@@ -5,8 +5,10 @@ define([
     'use strict';
     var VideosIndexFactory = function(
         $contentWrapper,
+        videoImageUploadURL,
         videoHandlerUrl,
         encodingsDownloadUrl,
+        defaultVideoImageURL,
         concurrentUploadLimit,
         uploadButton,
         previousUploads,
@@ -34,6 +36,8 @@ define([
                                        isActive[0].get('status') === ActiveVideoUpload.STATUS_COMPLETE;
                             }),
                             updatedView = new PreviousVideoUploadListView({
+                                videoImageUploadURL: videoImageUploadURL,
+                                defaultVideoImageURL: defaultVideoImageURL,
                                 videoHandlerUrl: videoHandlerUrl,
                                 collection: updatedCollection,
                                 encodingsDownloadUrl: encodingsDownloadUrl
@@ -43,6 +47,8 @@ define([
                 }
             }),
             previousView = new PreviousVideoUploadListView({
+                videoImageUploadURL: videoImageUploadURL,
+                defaultVideoImageURL: defaultVideoImageURL,
                 videoHandlerUrl: videoHandlerUrl,
                 collection: new Backbone.Collection(previousUploads),
                 encodingsDownloadUrl: encodingsDownloadUrl
