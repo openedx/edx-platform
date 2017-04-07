@@ -8,12 +8,12 @@
     <table class="assets-table">
         <thead>
             <tr>
-                <th><%- gettext("Name") %></th>
-                <th><%- gettext("Duration") %></th>
-                <th><%- gettext("Date Added") %></th>
-                <th><%- gettext("Video ID") %></th>
-                <th><%- gettext("Status") %></th>
-                <th><%- gettext("Action") %></th>
+                <th scope="col"><%- gettext("Thumbnail") %></th>
+                <th scope="col"><%- gettext("Name") %></th>
+                <th scope="col"><%- gettext("Date Added") %></th>
+                <th scope="col"><%- gettext("Video ID") %></th>
+                <th scope="col"><%- gettext("Status") %></th>
+                <th scope="col"><%- gettext("Action") %></th>
             </tr>
         </thead>
         <tbody class="js-table-body"></tbody>

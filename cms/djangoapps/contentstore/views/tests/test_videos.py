@@ -210,6 +210,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertRegexpMatches(response["Content-Type"], "^text/html(;.*)?$")
+        self.assertIn(_get_default_video_image_url(), response.content)
         # Crude check for presence of data in returned HTML
         for video in self.previous_uploads:
             self.assertIn(video["edx_video_id"], response.content)
@@ -586,12 +587,11 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
         response = json.loads(response.content)
         self.assertEqual(response['error'], 'No file provided for video image')
 
-    def test_default_video_image(self):
+    def test_no_video_image(self):
         """
-        Test default video image.
+        Test image url is set to None if no video image.
         """
         edx_video_id = 'test1'
-        default_video_image_url = _get_default_video_image_url()
         get_videos_url = reverse_course_url('videos_handler', self.course.id)
         video_image_upload_url = self.get_url_for_course_key(self.course.id, {'edx_video_id': edx_video_id})
         with make_image_file() as image_file:
@@ -606,7 +606,7 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
             if response_video['edx_video_id'] == edx_video_id:
                 self.assertEqual(response_video['course_video_image_url'], val_image_url)
             else:
-                self.assertEqual(response_video['course_video_image_url'], default_video_image_url)
+                self.assertEqual(response_video['course_video_image_url'], None)
 
 
 @patch.dict("django.conf.settings.FEATURES", {"ENABLE_VIDEO_UPLOAD_PIPELINE": True})
