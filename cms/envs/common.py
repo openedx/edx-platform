@@ -1339,4 +1339,4 @@ RECALCULATE_GRADES_ROUTING_KEY = LOW_PRIORITY_QUEUE
 COURSEGRAPH_JOB_QUEUE = LOW_PRIORITY_QUEUE
 ###################### VIDEO IMAGE STORAGE ######################
 
-VIDEO_IMAGE_DEFAULT_FILENAME = 'default_video_image.png'
+VIDEO_IMAGE_DEFAULT_FILENAME = 'images/video-images/default_video_image.png'
