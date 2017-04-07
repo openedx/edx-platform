@@ -19,6 +19,7 @@ from watchdog.events import PatternMatchingEventHandler
 from .utils.envs import Env
 from .utils.cmd import cmd, django_cmd
 from .utils.timer import timed
+from .utils.process import run_background_process
 
 from openedx.core.djangoapps.theming.paver_helpers import get_theme_paths
 
@@ -703,6 +704,16 @@ def execute_compile_sass(args):
         )
 
 
+@task
+@no_help
+def execute_webpack():
+    sh(cmd("$(npm bin)/webpack"))
+
+
+def execute_webpack_watch():
+    run_background_process("$(npm bin)/webpack --watch --watch-poll=200")
+
+
 def get_parsed_option(command_opts, opt_key, default=None):
     """
     Extract user command option and parse it.
@@ -769,6 +780,11 @@ def watch_assets(options):
 
     print("Starting asset watcher...")
     observer.start()
+
+    # We only want Webpack to re-run on changes to its own entry points, not all JS files, so we use its own watcher
+    # instead of subclassing from Watchdog like the other watchers do
+    execute_webpack_watch()
+
     if not getattr(options, 'background', False):
         # when running as a separate process, the main thread needs to loop
         # in order to allow for shutdown by contrl-c
@@ -829,6 +845,7 @@ def update_assets(args):
     process_xmodule_assets()
     process_npm_assets()
     compile_coffeescript()
+    execute_webpack()
 
     # Compile sass for themes and system
     execute_compile_sass(args)
