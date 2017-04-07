@@ -322,9 +322,14 @@ class TestRescoreInstructorTask(TestInstructorTasks):
         getattr(mock_instance, rescore_method).return_value = rescore_result
         delattr(mock_instance, other_method)
 
-        input_state = json.dumps({'done': True})
+        if rescore_method == 'rescore':
+            del mock_instance.done
+            mock_instance.has_submitted_answer.return_value = True
+        else:
+            mock_instance.done = True
+
         num_students = 10
-        self._create_students_with_state(num_students, input_state)
+        self._create_students_with_state(num_students)
         task_entry = self._create_input_entry()
         with patch('lms.djangoapps.instructor_task.tasks_helper.get_module_for_descriptor_internal') as mock_get_module:
             mock_get_module.return_value = mock_instance
