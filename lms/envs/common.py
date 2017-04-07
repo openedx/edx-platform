@@ -2574,7 +2574,7 @@ VIDEO_IMAGE_SETTINGS = dict(
         location=MEDIA_ROOT,
         base_url=MEDIA_URL,
     ),
-    DIRECTORY_PREFIX='videoimage/',
+    DIRECTORY_PREFIX='video-images/',
 )
 
 

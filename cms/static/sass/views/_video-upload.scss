@@ -163,4 +163,120 @@
       @extend %actions-list;
     }
   }
+
+  $thumbnail-width: ($baseline*7.5);
+  $thumbnail-height: ($baseline*5);
+
+  .thumbnail-wrapper {
+    position: relative;
+    max-width: $thumbnail-width;
+    max-height: $thumbnail-height;
+
+    img {
+      width: $thumbnail-width;
+      height: $thumbnail-height;
+    }
+
+    * {
+      cursor: pointer;
+    }
+
+    &.upload,
+    &.requirements {
+      border: 1px dashed $gray-l3;
+    }
+
+    &.requirements {
+      .video-duration {
+        opacity: 0;
+      }
+    }
+
+    &.edit {
+      background: black;
+
+      &:hover,
+      &:focus,
+      &.focused {
+        img, .video-duration {
+          @include transition(all 0.3s linear);
+          opacity: 0.5;
+        }
+      }
+    }
+
+    &.error,
+    &.progress {
+      background: white;
+
+      img {
+        @include transition(all 0.5s linear);
+        opacity: 0.15;
+      }
+
+      .action-icon {
+        display: block;
+      }
+    }
+
+    &.error .thumbnail-action {
+      color: $red;
+    }
+
+    &.upload .thumbnail-action {
+        color: $blue;
+    }
+
+    &.progress .thumbnail-action {
+      .action-icon {
+        @include font-size(20);
+      }
+    }
+
+    &.edit .thumbnail-action {
+      background-color: white;
+      padding: ($baseline/4);
+      border-radius: ($baseline/5);
+    }
+
+    .thumbnail-action {
+      @include font-size(14);
+    }
+
+    .thumbnail-overlay > :not(.upload-image-input) {
+      position: absolute;
+      text-align: center;
+      top: 50%;
+      left: 5px;;
+      right: 5px;
+      @include transform(translateY(-50%));
+    }
+
+    .upload-image-input {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      opacity: 0;
+      z-index: 6;
+      width: $thumbnail-width;
+      height: $thumbnail-height;
+    }
+
+    .video-duration {
+      position: absolute;
+      text-align: center;
+      bottom: 1px;
+      @include right(1px);
+      width: auto;
+      min-width: 25%;
+      color: white;
+      padding: ($baseline/10) ($baseline/5);
+      background-color: black;
+    }
+
+    &.focused {
+        box-shadow: 0 0 ($baseline/5) 1px $blue;
+    }
+  }
 }
