@@ -541,8 +541,7 @@ def rescore_problem_module_state(xmodule_instance_args, module_descriptor, stude
         if hasattr(instance, "done"):
             if not instance.done:
                 return UPDATE_STATUS_SKIPPED
-        else:
-            if instance.has_submitted_answer():
+        elif not instance.has_submitted_answer():
                 return UPDATE_STATUS_SKIPPED
 
         # Set the tracking info before this call, because it makes downstream
