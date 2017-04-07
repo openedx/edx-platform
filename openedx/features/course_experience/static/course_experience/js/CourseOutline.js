@@ -22,7 +22,7 @@ export class CourseOutline {  // eslint-disable-line import/prefer-default-expor
       }
     }));
 
-    document.querySelectorAll('a:not([href^="#"])')
+    [...document.querySelectorAll('a:not([href^="#"])')]
       .forEach(link => link.addEventListener('click', (event) => {
         Logger.log(
           'edx.ui.lms.link_clicked',

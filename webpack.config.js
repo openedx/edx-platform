@@ -45,6 +45,10 @@ var wpconfig = {
 
     resolve: {
         extensions: ['.js', '.json']
+    },
+
+    watchOptions: {
+        poll: true
     }
 };
 
