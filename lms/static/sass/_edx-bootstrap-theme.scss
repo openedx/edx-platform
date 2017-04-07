@@ -1,0 +1,149 @@
+//== edX Bootstrap theme for Bootstrap v4
+// Contains only variables that override ones in bootstrap-sass's _variables.scss.
+// If you add a new override, add it in the same section and order as it appears in _variables.scss,
+// and preserve any documentation about the value that file contains.
+
+// Table of Contents
+//
+// Colors
+// Forms
+
+
+// Colors
+//
+// Grayscale and brand colors for use across Bootstrap.
+
+// Start with assigning color names to specific hex values.
+$red:    rgb(178, 6, 16);
+$yellow: rgb(255, 192, 31);
+$green:  rgb(0, 129, 0);
+$blue:   rgb(0, 117, 180);
+$pink:   rgb(194, 56, 125);
+$white:  rgb(255, 255, 255);
+
+// Create grayscale
+$gray-dark:                 rgb(17, 17, 17);
+$gray:                      rgb(65, 65, 65);
+$gray-light:                rgb(160, 160, 160);
+$gray-lighter:              rgb(217, 217, 217);
+$gray-lightest:             rgb(245, 245, 245);
+
+// Reassign color vars to semantic color scheme
+$brand-primary:             $blue;
+$brand-success:             $green;
+$brand-info:                $pink;
+$brand-warning:             $yellow;
+$brand-danger:              $red;
+$brand-inverse:             $gray-dark;
+$brand-background:          $white;
+
+
+// Fonts
+//
+// Font, line-height, and color for body text, headings, and more.
+
+$font-family-sans-serif: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+$font-family-base:       $font-family-sans-serif;
+$font-size-base:         14px;
+$font-color:             $gray-dark;
+
+// Components
+//
+// Define common padding and border radius sizes and more.
+
+$border-radius:          3px;
+$border-radius-lg:       5px;
+$border-radius-sm:       2px;
+
+$transition-base:        unset;
+
+
+// Buttons
+//
+// For each of Bootstrap's buttons, define text, background and border color.
+
+$btn-padding-x:                  1rem !default;
+$btn-padding-y:                  .5rem !default;
+$btn-line-height:                1.25 !default;
+$btn-font-weight:                $font-weight-normal !default;
+$btn-box-shadow:                 none;
+$btn-focus-box-shadow:           none;
+$btn-active-box-shadow:          none;
+
+$btn-primary-bg:                 $brand-primary;
+$btn-primary-border:             $btn-primary-bg;
+
+$btn-secondary-color:            $gray-dark;
+
+$btn-info-bg:                    $brand-info;
+$btn-info-border:                $btn-info-bg;
+
+$btn-success-bg:                 $brand-success;
+$btn-success-border:             $btn-success-bg;
+
+$btn-warning-bg:                 $brand-warning;
+$btn-warning-border:             $btn-warning-bg;
+
+$btn-danger-bg:                  $brand-danger;
+$btn-danger-border:              $btn-danger-bg;
+
+$btn-link-disabled-color:        $gray-light;
+
+// Allows for customizing button radius independently from global border radius
+$btn-border-radius:              $border-radius;
+$btn-border-radius-lg:           $border-radius-lg;
+$btn-border-radius-sm:           $border-radius-sm;
+
+$btn-transition:                 $transition-base;
+
+
+// Forms
+
+$input-border-radius:            0;
+$input-border-radius-lg:         0;
+$input-border-radius-sm:         0;
+
+
+// Form states and alerts
+//
+// Define colors for form feedback states and, by default, alerts.
+
+$state-success-text:             $green;
+$state-success-bg:               $body-bg;
+$state-success-border:           $green;
+
+$state-info-text:                $blue;
+$state-info-bg:                  $body-bg;
+$state-info-border:              $blue;
+
+$state-warning-text:             $yellow;
+$state-warning-bg:               $body-bg;
+$mark-bg:                        $yellow;
+$state-warning-border:           $yellow;
+
+$state-danger-text:              $red;
+$state-danger-bg:                $body-bg;
+$state-danger-border:            $red;
+
+
+// Alerts
+//
+// Define alert colors, border radius, and padding.
+
+$alert-border-radius:         0;
+
+$alert-success-bg:            $body-bg;
+$alert-success-text:          $body-color;
+$alert-success-border:        $state-success-border;
+
+$alert-info-bg:               $body-bg;
+$alert-info-text:             $body-color;
+$alert-info-border:           $state-info-border;
+
+$alert-warning-bg:            $body-bg;
+$alert-warning-text:          $body-color;
+$alert-warning-border:        $state-warning-border;
+
+$alert-danger-bg:             $body-bg;
+$alert-danger-text:           $body-color;
+$alert-danger-border:         $state-danger-border;
