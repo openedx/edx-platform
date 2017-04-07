@@ -20,6 +20,7 @@ from social.backends.base import BaseAuth
 from social.backends.oauth import OAuthAuth
 from social.backends.saml import SAMLAuth, SAMLIdentityProvider
 from .lti import LTIAuthBackend, LTI_PARAMS_KEY
+from .saml import STANDARD_SAML_PROVIDER_KEY, get_saml_idp_choices, get_saml_idp_class
 from social.exceptions import SocialAuthBaseException
 from social.utils import module_member
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -350,6 +351,14 @@ class SAMLProviderConfig(ProviderConfig):
     automatic_refresh_enabled = models.BooleanField(
         default=True, verbose_name="Enable automatic metadata refresh",
         help_text="When checked, the SAML provider's metadata will be included in the automatic refresh job, if configured.")
+    identity_provider_type = models.CharField(
+        max_length=128, blank=False, verbose_name="Identity Provider Type", default=STANDARD_SAML_PROVIDER_KEY,
+        choices=get_saml_idp_choices(), help_text=(
+            "Some SAML providers require special behavior. For example, SAP SuccessFactors SAML providers require an "
+            "additional API call to retrieve user metadata not provided in the SAML response. Select the provider type "
+            "which best matches your use case. If in doubt, choose the Standard SAML Provider type."
+        )
+    )
     debug_mode = models.BooleanField(
         default=False, verbose_name="Debug Mode",
         help_text=(
@@ -362,7 +371,9 @@ class SAMLProviderConfig(ProviderConfig):
         help_text=(
             'For advanced use cases, enter a JSON object with addtional configuration. '
             'The tpa-saml backend supports only {"requiredEntitlements": ["urn:..."]} '
-            'which can be used to require the presence of a specific eduPersonEntitlement.'
+            'which can be used to require the presence of a specific eduPersonEntitlement. '
+            'Custom provider types, as selected in the "Identity Provider Type" field, may make '
+            'use of the information stored in this field for configuration.'
         ))
 
     def clean(self):
@@ -423,7 +434,8 @@ class SAMLProviderConfig(ProviderConfig):
             raise AuthNotConfigured(provider_name=self.name)
         conf['x509cert'] = data.public_key
         conf['url'] = data.sso_url
-        return SAMLIdentityProvider(self.idp_slug, **conf)
+        idp_class = get_saml_idp_class(self.identity_provider_type)
+        return idp_class(self.idp_slug, **conf)
 
 
 class SAMLConfiguration(ConfigurationModel):
