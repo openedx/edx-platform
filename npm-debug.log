@@ -1,0 +1,225 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/bin/node', '/usr/bin/npm', 'install' ]
+2 info using npm@1.4.28
+3 info using node@v0.10.37
+4 verbose node symlink /usr/bin/node
+5 warn package.json edx@0.1.0 No repository field.
+6 verbose readDependencies using package.json deps
+7 verbose install where, deps [ '/edx/app/edxapp/edx-platform',
+7 verbose install   [ 'backbone',
+7 verbose install     'backbone.paginator',
+7 verbose install     'coffee-script',
+7 verbose install     'edx-pattern-library',
+7 verbose install     'edx-ui-toolkit',
+7 verbose install     'jquery',
+7 verbose install     'jquery-migrate',
+7 verbose install     'jquery.scrollto',
+7 verbose install     'moment',
+7 verbose install     'moment-timezone',
+7 verbose install     'picturefill',
+7 verbose install     'requirejs',
+7 verbose install     'uglify-js',
+7 verbose install     'underscore',
+7 verbose install     'underscore.string',
+7 verbose install     'edx-custom-a11y-rules',
+7 verbose install     'eslint',
+7 verbose install     'eslint-config-edx',
+7 verbose install     'jasmine-core',
+7 verbose install     'jasmine-jquery',
+7 verbose install     'karma',
+7 verbose install     'karma-chrome-launcher',
+7 verbose install     'karma-coverage',
+7 verbose install     'karma-firefox-launcher',
+7 verbose install     'karma-jasmine',
+7 verbose install     'karma-jasmine-html-reporter',
+7 verbose install     'karma-junit-reporter',
+7 verbose install     'karma-requirejs',
+7 verbose install     'karma-spec-reporter',
+7 verbose install     'pa11y',
+7 verbose install     'pa11y-reporter-json-oldnode',
+7 verbose install     'plato',
+7 verbose install     'sinon',
+7 verbose install     'squirejs' ] ]
+8 info preinstall edx@0.1.0
+9 warn package.json squirejs@0.1.0 No repository field.
+10 verbose readDependencies using package.json deps
+11 verbose already installed skipping backbone@~1.3.2 /edx/app/edxapp/edx-platform
+12 verbose already installed skipping backbone.paginator@~2.0.3 /edx/app/edxapp/edx-platform
+13 verbose already installed skipping coffee-script@1.6.1 /edx/app/edxapp/edx-platform
+14 verbose already installed skipping edx-pattern-library@0.18.0 /edx/app/edxapp/edx-platform
+15 verbose already installed skipping edx-ui-toolkit@1.5.1 /edx/app/edxapp/edx-platform
+16 verbose already installed skipping jquery@~2.2.0 /edx/app/edxapp/edx-platform
+17 verbose already installed skipping jquery-migrate@^1.4.1 /edx/app/edxapp/edx-platform
+18 verbose already installed skipping jquery.scrollto@~2.1.2 /edx/app/edxapp/edx-platform
+19 verbose already installed skipping moment@^2.15.1 /edx/app/edxapp/edx-platform
+20 verbose already installed skipping moment-timezone@~0.5.5 /edx/app/edxapp/edx-platform
+21 verbose already installed skipping picturefill@~3.0.2 /edx/app/edxapp/edx-platform
+22 verbose already installed skipping requirejs@~2.3.2 /edx/app/edxapp/edx-platform
+23 verbose already installed skipping uglify-js@2.7.0 /edx/app/edxapp/edx-platform
+24 verbose already installed skipping underscore@~1.8.3 /edx/app/edxapp/edx-platform
+25 verbose already installed skipping underscore.string@~3.3.4 /edx/app/edxapp/edx-platform
+26 verbose already installed skipping edx-custom-a11y-rules@0.1.3 /edx/app/edxapp/edx-platform
+27 verbose already installed skipping eslint@^2.13.1 /edx/app/edxapp/edx-platform
+28 verbose already installed skipping eslint-config-edx@^1.2.1 /edx/app/edxapp/edx-platform
+29 verbose already installed skipping jasmine-core@^2.4.1 /edx/app/edxapp/edx-platform
+30 verbose already installed skipping jasmine-jquery@^2.1.1 /edx/app/edxapp/edx-platform
+31 verbose already installed skipping karma@^0.13.22 /edx/app/edxapp/edx-platform
+32 verbose already installed skipping karma-chrome-launcher@^0.2.3 /edx/app/edxapp/edx-platform
+33 verbose already installed skipping karma-coverage@^0.5.5 /edx/app/edxapp/edx-platform
+34 verbose already installed skipping karma-firefox-launcher@^0.1.7 /edx/app/edxapp/edx-platform
+35 verbose already installed skipping karma-jasmine@^0.3.8 /edx/app/edxapp/edx-platform
+36 verbose already installed skipping karma-jasmine-html-reporter@^0.2.0 /edx/app/edxapp/edx-platform
+37 verbose already installed skipping karma-junit-reporter@^0.4.1 /edx/app/edxapp/edx-platform
+38 verbose already installed skipping karma-requirejs@^0.2.6 /edx/app/edxapp/edx-platform
+39 verbose already installed skipping karma-spec-reporter@^0.0.20 /edx/app/edxapp/edx-platform
+40 verbose already installed skipping pa11y@4.0.1 /edx/app/edxapp/edx-platform
+41 verbose already installed skipping pa11y-reporter-json-oldnode@1.0.0 /edx/app/edxapp/edx-platform
+42 verbose already installed skipping plato@1.2.2 /edx/app/edxapp/edx-platform
+43 verbose already installed skipping sinon@1.17.3 || >1.17.4 /edx/app/edxapp/edx-platform
+44 verbose already installed skipping squirejs@^0.1.0 /edx/app/edxapp/edx-platform
+45 silly resolved []
+46 info build /edx/app/edxapp/edx-platform
+47 verbose linkStuff [ false, false, false, '/edx/app/edxapp' ]
+48 info linkStuff edx@0.1.0
+49 verbose linkBins edx@0.1.0
+50 verbose linkMans edx@0.1.0
+51 verbose rebuildBundles edx@0.1.0
+52 verbose rebuildBundles [ '.bin',
+52 verbose rebuildBundles   'backbone',
+52 verbose rebuildBundles   'backbone-validation',
+52 verbose rebuildBundles   'backbone.paginator',
+52 verbose rebuildBundles   'coffee-script',
+52 verbose rebuildBundles   'edx-custom-a11y-rules',
+52 verbose rebuildBundles   'edx-pattern-library',
+52 verbose rebuildBundles   'edx-ui-toolkit',
+52 verbose rebuildBundles   'eslint',
+52 verbose rebuildBundles   'eslint-config-edx',
+52 verbose rebuildBundles   'eslint-config-edx-es5',
+52 verbose rebuildBundles   'eslint-plugin-dollar-sign',
+52 verbose rebuildBundles   'eslint-plugin-import',
+52 verbose rebuildBundles   'font-awesome',
+52 verbose rebuildBundles   'jasmine-core',
+52 verbose rebuildBundles   'jasmine-jquery',
+52 verbose rebuildBundles   'jquery',
+52 verbose rebuildBundles   'jquery-migrate',
+52 verbose rebuildBundles   'jquery.scrollto',
+52 verbose rebuildBundles   'karma',
+52 verbose rebuildBundles   'karma-chrome-launcher',
+52 verbose rebuildBundles   'karma-coverage',
+52 verbose rebuildBundles   'karma-firefox-launcher',
+52 verbose rebuildBundles   'karma-jasmine',
+52 verbose rebuildBundles   'karma-jasmine-html-reporter',
+52 verbose rebuildBundles   'karma-junit-reporter',
+52 verbose rebuildBundles   'karma-requirejs',
+52 verbose rebuildBundles   'karma-spec-reporter',
+52 verbose rebuildBundles   'moment',
+52 verbose rebuildBundles   'moment-timezone',
+52 verbose rebuildBundles   'pa11y',
+52 verbose rebuildBundles   'pa11y-reporter-json-oldnode',
+52 verbose rebuildBundles   'picturefill',
+52 verbose rebuildBundles   'plato',
+52 verbose rebuildBundles   'requirejs',
+52 verbose rebuildBundles   'sinon',
+52 verbose rebuildBundles   'squirejs',
+52 verbose rebuildBundles   'uglify-js',
+52 verbose rebuildBundles   'underscore',
+52 verbose rebuildBundles   'underscore.string' ]
+53 verbose rebuild bundle /edx/app/edxapp/edx-platform/node_modules/backbone-validation
+54 info build /edx/app/edxapp/edx-platform/node_modules/backbone-validation
+55 info preinstall backbone-validation@0.11.5
+56 verbose linkStuff [ false,
+56 verbose linkStuff   false,
+56 verbose linkStuff   false,
+56 verbose linkStuff   '/edx/app/edxapp/edx-platform/node_modules' ]
+57 info linkStuff backbone-validation@0.11.5
+58 verbose linkBins backbone-validation@0.11.5
+59 verbose linkMans backbone-validation@0.11.5
+60 verbose rebuildBundles backbone-validation@0.11.5
+61 info install backbone-validation@0.11.5
+62 info postinstall backbone-validation@0.11.5
+63 verbose rebuild bundle /edx/app/edxapp/edx-platform/node_modules/eslint-config-edx-es5
+64 info build /edx/app/edxapp/edx-platform/node_modules/eslint-config-edx-es5
+65 info preinstall eslint-config-edx-es5@2.0.0
+66 verbose linkStuff [ false,
+66 verbose linkStuff   false,
+66 verbose linkStuff   false,
+66 verbose linkStuff   '/edx/app/edxapp/edx-platform/node_modules' ]
+67 info linkStuff eslint-config-edx-es5@2.0.0
+68 verbose linkBins eslint-config-edx-es5@2.0.0
+69 verbose linkMans eslint-config-edx-es5@2.0.0
+70 verbose rebuildBundles eslint-config-edx-es5@2.0.0
+71 verbose rebuildBundles [ '.bin',
+71 verbose rebuildBundles   'eslint',
+71 verbose rebuildBundles   'eslint-config-airbnb-base',
+71 verbose rebuildBundles   'eslint-plugin-dollar-sign' ]
+72 info install eslint-config-edx-es5@2.0.0
+73 info postinstall eslint-config-edx-es5@2.0.0
+74 verbose rebuild bundle /edx/app/edxapp/edx-platform/node_modules/eslint-plugin-dollar-sign
+75 info build /edx/app/edxapp/edx-platform/node_modules/eslint-plugin-dollar-sign
+76 info preinstall eslint-plugin-dollar-sign@0.0.5
+77 verbose linkStuff [ false,
+77 verbose linkStuff   false,
+77 verbose linkStuff   false,
+77 verbose linkStuff   '/edx/app/edxapp/edx-platform/node_modules' ]
+78 info linkStuff eslint-plugin-dollar-sign@0.0.5
+79 verbose linkBins eslint-plugin-dollar-sign@0.0.5
+80 verbose linkMans eslint-plugin-dollar-sign@0.0.5
+81 verbose rebuildBundles eslint-plugin-dollar-sign@0.0.5
+82 info install eslint-plugin-dollar-sign@0.0.5
+83 info postinstall eslint-plugin-dollar-sign@0.0.5
+84 verbose rebuild bundle /edx/app/edxapp/edx-platform/node_modules/eslint-plugin-import
+85 info build /edx/app/edxapp/edx-platform/node_modules/eslint-plugin-import
+86 info preinstall eslint-plugin-import@1.16.0
+87 verbose linkStuff [ false,
+87 verbose linkStuff   false,
+87 verbose linkStuff   false,
+87 verbose linkStuff   '/edx/app/edxapp/edx-platform/node_modules' ]
+88 info linkStuff eslint-plugin-import@1.16.0
+89 verbose linkBins eslint-plugin-import@1.16.0
+90 verbose linkMans eslint-plugin-import@1.16.0
+91 verbose rebuildBundles eslint-plugin-import@1.16.0
+92 verbose rebuildBundles [ 'builtin-modules',
+92 verbose rebuildBundles   'contains-path',
+92 verbose rebuildBundles   'debug',
+92 verbose rebuildBundles   'doctrine',
+92 verbose rebuildBundles   'es6-map',
+92 verbose rebuildBundles   'es6-set',
+92 verbose rebuildBundles   'eslint-import-resolver-node',
+92 verbose rebuildBundles   'has',
+92 verbose rebuildBundles   'lodash.cond',
+92 verbose rebuildBundles   'lodash.endswith',
+92 verbose rebuildBundles   'lodash.find',
+92 verbose rebuildBundles   'lodash.findindex',
+92 verbose rebuildBundles   'minimatch',
+92 verbose rebuildBundles   'object-assign',
+92 verbose rebuildBundles   'pkg-dir',
+92 verbose rebuildBundles   'pkg-up' ]
+93 info install eslint-plugin-import@1.16.0
+94 info postinstall eslint-plugin-import@1.16.0
+95 verbose rebuild bundle /edx/app/edxapp/edx-platform/node_modules/font-awesome
+96 info build /edx/app/edxapp/edx-platform/node_modules/font-awesome
+97 info preinstall font-awesome@4.7.0
+98 verbose linkStuff [ false,
+98 verbose linkStuff   false,
+98 verbose linkStuff   false,
+98 verbose linkStuff   '/edx/app/edxapp/edx-platform/node_modules' ]
+99 info linkStuff font-awesome@4.7.0
+100 verbose linkBins font-awesome@4.7.0
+101 verbose linkMans font-awesome@4.7.0
+102 verbose rebuildBundles font-awesome@4.7.0
+103 info install font-awesome@4.7.0
+104 info postinstall font-awesome@4.7.0
+105 info install edx@0.1.0
+106 info postinstall edx@0.1.0
+107 info prepublish edx@0.1.0
+108 error peerinvalid The package eslint does not satisfy its siblings' peerDependencies requirements!
+108 error peerinvalid Peer eslint-config-airbnb-base@3.0.1 wants eslint@^2.9.0
+108 error peerinvalid Peer eslint-plugin-dollar-sign@1.0.0 wants eslint@>=1.0.0
+108 error peerinvalid Peer eslint-plugin-import@1.16.0 wants eslint@2.x - 3.x
+109 error System Linux 3.2.0-23-generic
+110 error command "/usr/bin/node" "/usr/bin/npm" "install"
+111 error cwd /edx/app/edxapp/edx-platform
+112 error node -v v0.10.37
+113 error npm -v 1.4.28
+114 error code EPEERINVALID
+115 verbose exit [ 1, true ]

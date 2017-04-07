@@ -360,10 +360,16 @@ class CourseMode(models.Model):
             Mode
 
         """
+        import logging
+        log = logging.getLogger(__name__)
+
         if modes is None:
             modes = cls.modes_for_course(course_id)
 
         matched = [m for m in modes if m.slug == mode_slug]
+        log.info("course_id = %s, \nmode_slug = %s modes = %s, \nmatched_status = %s, \n",
+                 course_id, mode_slug, modes, matched)
+
         if matched:
             return matched[0]
         else:
