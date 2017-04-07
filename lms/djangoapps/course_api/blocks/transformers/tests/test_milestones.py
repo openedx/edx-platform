@@ -186,6 +186,30 @@ class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseM
         self.setup_gated_section(self.blocks['H'], self.blocks['A'])
         self.get_blocks_and_check_against_expected(self.staff, expected_blocks)
 
+    def test_can_view_special(self):
+        """
+        When the block structure transformers are set to allow users to view special exams,
+        ensure that we can see the special exams and not any of the otherwise gated blocks.
+        """
+        self.transformers = BlockStructureTransformers([self.TRANSFORMER_CLASS_TO_TEST(True)])
+        self.course.enable_subsection_gating = True
+        self.setup_gated_section(self.blocks['H'], self.blocks['A'])
+        expected_blocks = (
+            'course', 'A', 'B', 'C', 'ProctoredExam', 'D', 'E', 'PracticeExam', 'F', 'G', 'TimedExam', 'J', 'K'
+        )
+        self.get_blocks_and_check_against_expected(self.user, expected_blocks)
+        # clear the request cache to simulate a new request
+        self.clear_caches()
+
+        # this call triggers reevaluation of prerequisites fulfilled by the gating block.
+        with patch('gating.api._get_subsection_percentage', Mock(return_value=100)):
+            lms_gating_api.evaluate_prerequisite(
+                self.course,
+                Mock(location=self.blocks['A'].location),
+                self.user,
+            )
+        self.get_blocks_and_check_against_expected(self.user, self.ALL_BLOCKS)
+
     def get_blocks_and_check_against_expected(self, user, expected_blocks):
         """
         Calls the course API as the specified user and checks the
