@@ -1246,7 +1246,7 @@ class EntranceExamTest(UniqueCourseTest):
 
     def test_entrance_exam_section(self):
         """
-         Scenario: Any course that is enabled for an entrance exam, should have 
+         Scenario: Any course that is enabled for an entrance exam, should have
          entrance exam section in the course outline.
             Given that I visit the course outline
             And entrance exams are not yet enabled
