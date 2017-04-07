@@ -258,6 +258,7 @@
         'js/spec/utils/module_spec',
         'js/spec/views/active_video_upload_list_spec',
         'js/spec/views/previous_video_upload_spec',
+        'js/spec/views/video_thumbnail_spec',
         'js/spec/views/previous_video_upload_list_spec',
         'js/spec/views/assets_spec',
         'js/spec/views/baseview_spec',
