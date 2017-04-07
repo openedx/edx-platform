@@ -17,7 +17,8 @@ from status.status import get_site_status_msg
 <%block name="navigation_top" />
 
 ## Add UI Toolkit components if using the Pattern Library
-% if uses_pattern_library:
+## (and temporarily if using Bootstrap)
+% if uses_pattern_library or uses_bootstrap:
     <%block name="js_extra">
     <%static:require_module module_name="js/header_factory" class_name="HeaderFactory">
     HeaderFactory();

@@ -3,12 +3,12 @@
 $baseline: 20px !default;
 $lms-max-width: 1180px;
 
-$lms-gray: palette(grayscale, base);
-$lms-background-color: palette(grayscale, x-back);
+$lms-gray: $gray;
+$lms-background-color: $gray-lightest;
 $lms-container-background-color: $white;
-$lms-border-color: palette(grayscale, back);
-$lms-label-color: palette(grayscale, black);
-$lms-active-color: palette(primary, base);
+$lms-border-color: $gray-light;
+$lms-label-color: $font-color;
+$lms-active-color: $brand-primary;
 $lms-preview-menu-color: #c8c8c8;
 
 $white-transparent: rgba(255, 255, 255, 0);
@@ -22,7 +22,7 @@ $light-grey-solid: rgba(200,200,200, 1);
 
 // Icons
 $lms-dark-icon-color: $white;
-$lms-dark-icon-background-color: palette(grayscale, black);
+$lms-dark-icon-background-color: $gray-dark;
 
 $site-status-color: rgb(182,37,103);
 

@@ -78,6 +78,11 @@ from pipeline_mako import render_require_js_path_overrides
     <%static:js group='base_application'/>
   % endif
 
+  % if uses_bootstrap:
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+  % endif
+
   <script>
     window.baseUrl = "${settings.STATIC_URL}";
     (function (require) {
@@ -130,7 +135,7 @@ from pipeline_mako import render_require_js_path_overrides
 % if not disable_window_wrap:
   <div class="window-wrap" dir="${static.dir_rtl()}">
 % endif
-    <a class="nav-skip" href="#main">${_("Skip to main content")}</a>
+    <a class="nav-skip sr-only sr-only-focusable" href="#main">${_("Skip to main content")}</a>
 
     % if not disable_header:
         <%include file="${static.get_template_path('header.html')}" args="online_help_token=online_help_token" />

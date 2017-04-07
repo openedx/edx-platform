@@ -1,0 +1,131 @@
+// LMS header styles
+
+.header-global {
+    border-bottom: 1px solid $gray-light;
+    box-shadow: 0 1px 5px 0 $shadow-l1;
+    background: $brand-background;
+    font-size: 18px;
+
+    .wrapper-header {
+        margin: 0 auto;
+        padding: 10px 10px 0;
+        width: 100%;
+        max-width: $lms-max-width;
+        font-size: 18px;
+
+        .logo-header {
+            display: inline;
+        }
+
+        .logo {
+            @include margin-right(10px);
+            display: inline;
+            margin-top: 4px;
+            margin-bottom: 0;
+        }
+
+        .course-header {
+            @include margin(12px, 10px, 0px, 10px);
+            display: inline;
+            font-size: 1rem;
+            font-weight: 400;
+            color: $lms-label-color;
+            .provider {
+                font-weight: bold;
+            }
+        }
+
+        .wrapper-user-menu {
+            margin-top: 4px;
+            width: auto;
+        }
+
+        .dropdown-menu {
+            @include text-align(left);
+            top: inherit;
+        }
+
+        .user-menu {
+            display: inline;
+        }
+
+        .list-inline {
+            &.nav-global {
+                margin-top: 12px;
+                margin-bottom: 0;
+            }
+
+            &.nav-courseware {
+                margin-top: 5px;
+            }
+
+            .item {
+                font-weight: font-weight(semi-bold);
+                text-transform: uppercase;
+
+                &.active {
+                    a {
+                        text-decoration: none;
+                        color: $link-color;
+                    }
+                }
+            }
+        }
+
+        .tab-nav-item{
+            display: flex;
+            margin: 0;
+            justify-content: center;
+
+            .tab-nav-link{
+                font-size: font-size(base);
+                font-weight: font-weight(semi-bold);
+                color: palette(grayscale, dark);
+                padding: 5px 25px 23px;
+                display: inline-block;
+
+                &:active,
+                &:focus,
+                &:hover {
+                    border-bottom: 4px solid $lms-border-color;
+                }
+            }
+
+            .active{
+            }
+        }
+    }
+
+    // Style the courseware's slim version of the header
+    &.slim {
+        .wrapper-header {
+            .logo img {
+                margin-top: 4px;
+                height: 30px;
+            }
+
+            .course-header {
+                margin-top: 10px;
+            }
+
+            .list-inline.nav-global {
+                margin-top: 10px;
+            }
+
+            .wrapper-user-menu {
+                margin-top: 0;
+            }
+        }
+    }
+}
+
+.doc-link {
+    @include margin(($baseline*0.75), ($baseline*0.75), ($baseline*0.75), ($baseline*0.75));
+    font-size: 14px;
+    font-weight: bold;
+    color: $font-color;
+
+    &:visited {
+        color: $font-color;
+    }
+}

@@ -7,8 +7,13 @@
 @import 'bootstrap/scss/bootstrap';
 @import 'edx-bootstrap-theme';
 
-// Extensions
+// Base
 @import 'shared-v3/variables';
+@import 'shared-v3/base';
+@import 'shared-v3/layouts';
+
+// Elements
+@import 'shared-v3/header';
 
 // Features
 @import 'features/bookmarks';
