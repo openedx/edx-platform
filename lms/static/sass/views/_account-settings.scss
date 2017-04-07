@@ -183,12 +183,6 @@
                         padding: 11px 14px;
                         line-height: normal;
                     }
-
-                    // This should only apply for the email field if email address
-                    // changes are disabled, so we explicitly specify "span".
-                    #u-field-value-username, span#u-field-value-email {
-                        padding-top: ($baseline/2);
-                    }
                 }
 
                 .u-field-order {
@@ -323,6 +317,10 @@
                     border-bottom: none;
                     margin-bottom: ($baseline*2);
                 }
+            }
+
+            .u-field-readonly .u-field-value {
+                padding-top: ($baseline/2);
             }
 
             .u-field-orderHistory {
