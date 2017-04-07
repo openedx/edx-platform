@@ -1305,4 +1305,4 @@ COURSE_CATALOG_API_URL = None
 
 ###################### VIDEO IMAGE STORAGE ######################
 
-VIDEO_IMAGE_DEFAULT_FILENAME = 'default_video_image.png'
+VIDEO_IMAGE_DEFAULT_FILENAME = 'images/video-images/default_video_image.png'

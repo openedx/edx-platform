@@ -333,7 +333,6 @@ def _get_index_videos(course):
     Returns the information about each video upload required for the video list
     """
     course_id = unicode(course.id)
-    default_video_image_url = _get_default_video_image_url()
     attrs = ['edx_video_id', 'client_video_id', 'created', 'duration', 'status', 'courses']
 
     def _get_values(video):
@@ -344,8 +343,7 @@ def _get_index_videos(course):
         for attr in attrs:
             if attr == 'courses':
                 course = filter(lambda c: course_id in c, video['courses'])
-                (__, image_url), = course[0].items()
-                values['course_video_image_url'] = image_url or default_video_image_url
+                (__, values['course_video_image_url']), = course[0].items()
             else:
                 values[attr] = video[attr]
 
@@ -367,6 +365,7 @@ def videos_index_html(course):
             'image_upload_url': reverse_course_url('video_images_handler', unicode(course.id)),
             'video_handler_url': reverse_course_url('videos_handler', unicode(course.id)),
             'encodings_download_url': reverse_course_url('video_encodings_download', unicode(course.id)),
+            'default_video_image_url': _get_default_video_image_url(),
             'previous_uploads': _get_index_videos(course),
             'concurrent_upload_limit': settings.VIDEO_UPLOAD_PIPELINE.get('CONCURRENT_UPLOAD_LIMIT', 0),
             'video_supported_file_formats': VIDEO_SUPPORTED_FILE_FORMATS.keys(),

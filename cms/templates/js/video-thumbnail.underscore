@@ -1,0 +1,21 @@
+<div class="thumbnail-wrapper <%- action === 'upload' ? 'upload' : '' %>" tabindex="-1">
+    <img src="<%- thumbnailURL %>" alt="<%- imageAltText %>">
+    <div class="thumbnail-overlay">
+        <input id="thumb-<%- videoId %>" class="upload-image-input" type="file" name="file" accept=".bmp, .jpg, .jpeg, .png, .gif"/>
+        <label for="thumb-<%- videoId %>" class="thumbnail-action">
+            <span class="action-icon" aria-hidden="true"><%- actionInfo.icon %></span>
+            <span class="action-text-sr sr"></span>
+            <span class="action-text"><%- actionInfo.text %></span>
+        </label>
+
+        <span class="requirements-text-sr sr">
+            <%- gettext('Recommended image resolution is 1280x720 pixels and format must be one of .jpg, .png or .gif') %>
+        </span>
+    </div>
+    <% if(duration) { %>
+        <div class="video-duration">
+            <span class="duration-text-human sr"><%- duration.humanize %></span>
+            <span class="duration-text-machine" aria-hidden="true"><%- duration.machine %></span>
+        </div>
+    <% } %>
+</div>
