@@ -25,7 +25,6 @@ from common.test.acceptance.pages.common.logout import LogoutPage
 from common.test.acceptance.pages.lms import BASE_URL
 from common.test.acceptance.pages.lms.account_settings import AccountSettingsPage
 from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
-from common.test.acceptance.pages.lms.bookmarks import BookmarksPage
 from common.test.acceptance.pages.lms.create_mode import ModeCreationPage
 from common.test.acceptance.pages.lms.course_home import CourseHomePage
 from common.test.acceptance.pages.lms.course_info import CourseInfoPage
@@ -635,6 +634,7 @@ class CourseWikiTest(UniqueCourseTest):
         children_page.a11y_audit.check_for_accessibility_errors()
 
 
+@attr(shard=1)
 class HighLevelTabTest(UniqueCourseTest):
     """
     Tests that verify each of the high-level tabs available within a course.
@@ -688,7 +688,6 @@ class HighLevelTabTest(UniqueCourseTest):
         # Auto-auth register for the course
         AutoAuthPage(self.browser, course_id=self.course_id).visit()
 
-    @attr(shard=1)
     def test_course_info(self):
         """
         Navigate to the course info page.
@@ -706,7 +705,6 @@ class HighLevelTabTest(UniqueCourseTest):
         self.assertEqual(len(handout_links), 1)
         self.assertIn('demoPDF.pdf', handout_links[0])
 
-    @attr(shard=1)
     def test_progress(self):
         """
         Navigate to the progress page.
@@ -724,7 +722,6 @@ class HighLevelTabTest(UniqueCourseTest):
         actual_scores = self.progress_page.scores(CHAPTER, SECTION)
         self.assertEqual(actual_scores, EXPECTED_SCORES)
 
-    @attr(shard=1)
     def test_static_tab(self):
         """
         Navigate to a static tab (course content)
@@ -734,7 +731,6 @@ class HighLevelTabTest(UniqueCourseTest):
         self.tab_nav.go_to_tab('Test Static Tab')
         self.assertTrue(self.tab_nav.is_on_tab('Test Static Tab'))
 
-    @attr(shard=1)
     def test_static_tab_with_mathjax(self):
         """
         Navigate to a static tab (course content)
@@ -747,7 +743,6 @@ class HighLevelTabTest(UniqueCourseTest):
         # Verify that Mathjax has rendered
         self.tab_nav.mathjax_has_rendered()
 
-    @attr(shard=1)
     def test_wiki_tab_first_time(self):
         """
         Navigate to the course wiki tab. When the wiki is accessed for
@@ -769,7 +764,6 @@ class HighLevelTabTest(UniqueCourseTest):
         self.assertEqual(expected_article_name, course_wiki.article_name)
 
     # TODO: TNL-6546: This whole function will be able to go away, replaced by test_course_home below.
-    @attr(shard=1)
     def test_courseware_nav(self):
         """
         Navigate to a particular unit in the course.
@@ -805,13 +799,9 @@ class HighLevelTabTest(UniqueCourseTest):
         self.courseware_page.nav.go_to_section('Test Section 2', 'Test Subsection 3')
         self.assertTrue(self.courseware_page.nav.is_on_section('Test Section 2', 'Test Subsection 3'))
 
-    @attr(shard=1)
-    def test_course_home(self):
+    def test_course_home_tab(self):
         """
         Navigate to the course home page using the tab.
-
-        Includes smoke test of course outline, courseware page, and breadcrumbs.
-
         """
         # TODO: TNL-6546: Use tab navigation and remove course_home_page.visit().
         #self.course_info_page.visit()
@@ -824,56 +814,6 @@ class HighLevelTabTest(UniqueCourseTest):
 
         # Check that the tab lands on the course home page.
         self.assertTrue(self.course_home_page.is_browser_on_page())
-
-        # Check that the course navigation appears correctly
-        EXPECTED_SECTIONS = {
-            'Test Section': ['Test Subsection'],
-            'Test Section 2': ['Test Subsection 2', 'Test Subsection 3']
-        }
-
-        actual_sections = self.course_home_page.outline.sections
-        for section, subsections in EXPECTED_SECTIONS.iteritems():
-            self.assertIn(section, actual_sections)
-            self.assertEqual(actual_sections[section], EXPECTED_SECTIONS[section])
-
-        # Navigate to a particular section
-        self.course_home_page.outline.go_to_section('Test Section', 'Test Subsection')
-
-        # Check the sequence items on the courseware page
-        EXPECTED_ITEMS = ['Test Problem 1', 'Test Problem 2', 'Test HTML']
-
-        actual_items = self.courseware_page.nav.sequence_items
-        self.assertEqual(len(actual_items), len(EXPECTED_ITEMS))
-        for expected in EXPECTED_ITEMS:
-            self.assertIn(expected, actual_items)
-
-        # Use outline breadcrumb to get back to course home page.
-        self.courseware_page.nav.go_to_outline()
-
-        # Navigate to a particular section other than the default landing section.
-        self.course_home_page.outline.go_to_section('Test Section 2', 'Test Subsection 3')
-        self.assertTrue(self.courseware_page.nav.is_on_section('Test Section 2', 'Test Subsection 3'))
-
-        # Verify that we can navigate to the bookmarks page
-        self.course_home_page.visit()
-        self.course_home_page.click_bookmarks_button()
-        bookmarks_page = BookmarksPage(self.browser, self.course_id)
-        self.assertTrue(bookmarks_page.is_browser_on_page())
-
-        # Test "Resume Course" button from header
-        self.course_home_page.visit()
-        self.course_home_page.resume_course_from_header()
-        self.assertTrue(self.courseware_page.nav.is_on_section('Test Section 2', 'Test Subsection 3'))
-
-        # Test "Resume Course" button from within outline
-        self.course_home_page.visit()
-        self.course_home_page.outline.resume_course_from_outline()
-        self.assertTrue(self.courseware_page.nav.is_on_section('Test Section 2', 'Test Subsection 3'))
-
-    @attr('a11y')
-    def test_course_home_a11y(self):
-        self.course_home_page.visit()
-        self.course_home_page.a11y_audit.check_for_accessibility_errors()
 
 
 @attr(shard=1)
