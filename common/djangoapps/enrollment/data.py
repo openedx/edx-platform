@@ -110,7 +110,7 @@ def create_course_enrollment(username, course_id, mode, is_active):
     course_key = CourseKey.from_string(course_id)
     current_course_org = course_id.split(':')[1].split('+')[0]
     site_course_org_filter = configuration_helpers.get_value('course_org_filter')
-    if site_course_org_filter == site_course_org_filter or not site_course_org_filter:
+    if site_course_org_filter == current_course_org or not site_course_org_filter:
         try:
             user = User.objects.get(username=username)
         except User.DoesNotExist:
