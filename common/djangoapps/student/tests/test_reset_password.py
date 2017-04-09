@@ -301,3 +301,21 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         self.assertEquals(confirm_kwargs['extra_context']['platform_name'], 'Fake University')
         self.user = User.objects.get(pk=self.user.pk)
         self.assertTrue(self.user.is_active)
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
+    @patch('django.core.mail.send_mail')
+    @ddt.data('Crazy Awesome Site', 'edX')
+    def test_reset_password_email_subject(self, platform_name, send_email):
+        """
+        Tests that the right platform name is included in
+        the reset password email subject
+        """
+        with patch("django.conf.settings.PLATFORM_NAME", platform_name):
+            req = self.request_factory.post(
+                '/password_reset/', {'email': self.user.email}
+            )
+            req.user = self.user
+            password_reset(req)
+            subj, _, _, _ = send_email.call_args[0]
+
+            self.assertIn(platform_name, subj)
