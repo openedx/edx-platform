@@ -186,7 +186,7 @@ class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseM
         self.setup_gated_section(self.blocks['H'], self.blocks['A'])
         self.get_blocks_and_check_against_expected(self.staff, expected_blocks)
 
-    def test_can_view_special(self):
+    def test_special_exams(self):
         """
         When the block structure transformers are set to allow users to view special exams,
         ensure that we can see the special exams and not any of the otherwise gated blocks.

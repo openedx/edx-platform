@@ -134,16 +134,6 @@ class CourseHomeA11yTest(CourseHomeBaseTest):
 
         self.logout_page = LogoutPage(self.browser)
 
-        self.studio_course_outline = StudioCourseOutlinePage(
-            self.browser,
-            self.course_info['org'],
-            self.course_info['number'],
-            self.course_info['run']
-        )
-
-        # adds graded assignments to course home for testing course outline a11y
-        self._set_policy_for_subsection("Homework", 0)
-
     def test_course_home_a11y(self):
         """
         Test the accessibility of the course home page with course outline.
@@ -152,18 +142,6 @@ class CourseHomeA11yTest(CourseHomeBaseTest):
             course_home_page = CourseHomePage(self.browser, self.course_id)
             course_home_page.visit()
             course_home_page.a11y_audit.check_for_accessibility_errors()
-
-    def _set_policy_for_subsection(self, policy, section=0):
-        """
-        Set the grading policy for the first subsection in the specified section.
-        If a section index is not provided, 0 is assumed.
-        """
-        with self._logged_in_session(staff=True):
-            self.studio_course_outline.visit()
-            modal = self.studio_course_outline.section_at(section).subsection_at(
-                0).edit()
-            modal.policy = policy
-            modal.save()
 
     @contextmanager
     def _logged_in_session(self, staff=False):
