@@ -479,7 +479,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
 
     def test_inline_with_always_cohort_inline_discussion_flag(self):
         self.create_discussion("Chapter", "Discussion")
-        set_course_cohort_settings(course_key=self.course.id, is_cohorted=True)
+        set_course_cohort_settings(course_key=self.course.id, is_cohorted=True, always_cohort_inline_discussions=True)
 
         self.assert_category_map_equals(
             {
@@ -503,7 +503,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
 
     def test_inline_without_always_cohort_inline_discussion_flag(self):
         self.create_discussion("Chapter", "Discussion")
-        set_course_cohort_settings(course_key=self.course.id, is_cohorted=True, always_cohort_inline_discussions=False)
+        set_course_cohort_settings(course_key=self.course.id, is_cohorted=True)
 
         self.assert_category_map_equals(
             {
@@ -656,8 +656,8 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         set_course_cohort_settings(course_key=self.course.id, is_cohorted=False)
         check_cohorted(False)
 
-        # explicitly enabled cohorting
-        set_course_cohort_settings(course_key=self.course.id, is_cohorted=True)
+        # explicitly enabled cohorting with inline discusssions also cohorted.
+        set_course_cohort_settings(course_key=self.course.id, is_cohorted=True, always_cohort_inline_discussions=True)
         check_cohorted(True)
 
     def test_tree_with_duplicate_targets(self):
@@ -1074,17 +1074,17 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
                         'entries': {
                             'Visible to Alpha': {
                                 'sort_key': None,
-                                'is_cohorted': True,
+                                'is_cohorted': False,
                                 'id': 'alpha_group_discussion'
                             },
                             'Visible to Beta': {
                                 'sort_key': None,
-                                'is_cohorted': True,
+                                'is_cohorted': False,
                                 'id': 'beta_group_discussion'
                             },
                             'Visible to Everyone': {
                                 'sort_key': None,
-                                'is_cohorted': True,
+                                'is_cohorted': False,
                                 'id': 'global_group_discussion'
                             }
                         }
@@ -1119,12 +1119,12 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
                         'entries': {
                             'Visible to Alpha': {
                                 'sort_key': None,
-                                'is_cohorted': True,
+                                'is_cohorted': False,
                                 'id': 'alpha_group_discussion'
                             },
                             'Visible to Everyone': {
                                 'sort_key': None,
-                                'is_cohorted': True,
+                                'is_cohorted': False,
                                 'id': 'global_group_discussion'
                             }
                         }
@@ -1159,12 +1159,12 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
                         'entries': {
                             'Visible to Beta': {
                                 'sort_key': None,
-                                'is_cohorted': True,
+                                'is_cohorted': False,
                                 'id': 'beta_group_discussion'
                             },
                             'Visible to Everyone': {
                                 'sort_key': None,
-                                'is_cohorted': True,
+                                'is_cohorted': False,
                                 'id': 'global_group_discussion'
                             }
                         }
@@ -1198,7 +1198,7 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
                         'entries': {
                             'Visible to Everyone': {
                                 'sort_key': None,
-                                'is_cohorted': True,
+                                'is_cohorted': False,
                                 'id': 'global_group_discussion'
                             }
                         }
@@ -1349,9 +1349,9 @@ class IsCommentableCohortedTestCase(ModuleStoreTestCase):
             discussion_topics=["General", "Feedback"],
             cohorted_discussions=["Feedback", "random_inline"]
         )
-        self.assertTrue(
+        self.assertFalse(
             utils.is_commentable_cohorted(course.id, to_id("random")),
-            "By default, Non-top-level discussion is always cohorted in cohorted courses."
+            "By default, Non-top-level discussions are not cohorted in a cohorted courses."
         )
 
         # if always_cohort_inline_discussions is set to False, non-top-level discussion are always
@@ -1381,10 +1381,11 @@ class IsCommentableCohortedTestCase(ModuleStoreTestCase):
         course = modulestore().get_course(self.toy_course_key)
         self.assertFalse(cohorts.is_course_cohorted(course.id))
 
-        config_course_cohorts(course, is_cohorted=True)
+        config_course_cohorts(course, is_cohorted=True, always_cohort_inline_discussions=True)
         team = CourseTeamFactory(course_id=course.id)
 
         # Verify that team discussions are not cohorted, but other discussions are
+        # if "always cohort inline discussions" is set to true.
         self.assertFalse(utils.is_commentable_cohorted(course.id, team.discussion_topic_id))
         self.assertTrue(utils.is_commentable_cohorted(course.id, "random"))
 
