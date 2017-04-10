@@ -51,26 +51,26 @@ from django.utils.translation import ugettext as _
                                             if subsection.get('due') is None:
                                                 data_string = subsection.get('format')
                                             else:
-                                                if 'special_exam' in subsection:
+                                                if 'special_exam_info' in subsection:
                                                     data_string = _('due {date}')
                                                 else:
                                                     data_string = _("{subsection_format} due {{date}}").format(subsection_format=subsection.get('format'))
                                         %>
-                                        % if subsection.get('format') or 'special_exam' in subsection:
+                                        % if subsection.get('format') or 'special_exam_info' in subsection:
                                         <span class="subtitle">
                                             % if 'special_exam' in subsection:
                                                 ## Display the proctored exam status icon and status message
                                                 <span
-                                                    class="menu-icon icon fa ${subsection['special_exam'].get('suggested_icon', 'fa-pencil-square-o')} ${subsection['special_exam'].get('status', 'eligible')}"
+                                                    class="menu-icon icon fa ${subsection['special_exam_info'].get('suggested_icon', 'fa-pencil-square-o')} ${subsection['special_exam_info'].get('status', 'eligible')}"
                                                     aria-hidden="true"
                                                 ></span>
                                                 <span class="subtitle-name">
-                                                    ${subsection['special_exam'].get('short_description', '')}
+                                                    ${subsection['special_exam_info'].get('short_description', '')}
                                                 </span>
 
                                                 ## completed proctored exam statuses should not show the due date
                                                 ## since the exam has already been submitted by the user
-                                                % if not subsection['special_exam'].get('in_completed_state', False):
+                                                % if not subsection['special_exam_info'].get('in_completed_state', False):
                                                     <span
                                                         class="localized-datetime subtitle-name"
                                                         data-datetime="${subsection.get('due')}"
