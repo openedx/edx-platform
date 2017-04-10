@@ -14,6 +14,7 @@ from openedx.core.djangoapps.lang_pref import api as language_api
 EN = language_api.Language('en', 'English')
 ES_419 = language_api.Language('es-419', u'Español (Latinoamérica)')
 
+
 @ddt.ddt
 class LanguageApiTest(TestCase):
     """
