@@ -47,6 +47,22 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
                 ItemFactory.create(category='vertical', parent_location=section2.location)
                 course.last_accessed = None
 
+            cls.courses.append(course)
+
+            course = CourseFactory.create()
+            with cls.store.bulk_operations(course.id):
+                chapter = ItemFactory.create(category='chapter', parent_location=course.location)
+                section = ItemFactory.create(
+                    category='sequential',
+                    parent_location=chapter.location,
+                    due=datetime.datetime.now(),
+                    graded=True,
+                    format='Homework',
+                )
+                ItemFactory.create(category='vertical', parent_location=section.location)
+                course.last_accessed = section.url_name
+            cls.courses.append(course)
+
     @classmethod
     def setUpTestData(cls):
         """Set up and enroll our fake user in the course."""
@@ -70,14 +86,14 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
             self.assertEqual(response.status_code, 200)
             response_content = response.content.decode("utf-8")
 
-            if course.last_accessed is not None:
-                self.assertIn('Resume Course', response_content)
-            else:
-                self.assertNotIn('Resume Course', response_content)
+            self.assertIn('Resume Course', response_content)
             for chapter in course.children:
                 self.assertIn(chapter.display_name, response_content)
                 for section in chapter.children:
                     self.assertIn(section.display_name, response_content)
+                    if section.graded:
+                        self.assertIn(section.due, response_content)
+                        self.assertIn(section.format, response_content)
                     for vertical in section.children:
                         self.assertNotIn(vertical.display_name, response_content)
 

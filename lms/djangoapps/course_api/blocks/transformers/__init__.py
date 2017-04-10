@@ -45,7 +45,7 @@ SUPPORTED_FIELDS = [
     # 'student_view_multi_device'
     SupportedFieldType(StudentViewTransformer.STUDENT_VIEW_MULTI_DEVICE, StudentViewTransformer),
 
-    SupportedFieldType('special_exam', MilestonesTransformer),
+    SupportedFieldType('special_exam_info', MilestonesTransformer),
 
     # set the block_field_name to None so the entire data for the transformer is serialized
     SupportedFieldType(None, BlockCountsTransformer, BlockCountsTransformer.BLOCK_COUNTS),
