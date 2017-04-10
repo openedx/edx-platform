@@ -52,7 +52,7 @@ edx-lint==0.4.3
 astroid==1.3.8
 edx-django-oauth2-provider==1.1.4
 edx-django-sites-extensions==2.1.1
-edx-enterprise==0.32.0
+edx-enterprise==0.32.1
 edx-oauth2-provider==1.2.0
 edx-opaque-keys==0.4.0
 edx-organizations==0.4.3
