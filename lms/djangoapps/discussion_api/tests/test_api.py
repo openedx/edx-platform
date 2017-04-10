@@ -84,6 +84,24 @@ def _discussion_disabled_course_for(user):
     return course_with_disabled_forums
 
 
+def _create_course_and_cohort_with_user_role(course_is_cohorted, user, role_name):
+    """
+    Creates a course with the value of `course_is_cohorted`, plus `always_cohort_inline_discussions`
+    set to True (which is no longer the default value). Then 1) enrolls the user in that course,
+    2) creates a cohort that the user is placed in, and 3) adds the user to the given role.
+
+    Returns: a tuple of the created course and the created cohort
+    """
+    cohort_course = CourseFactory.create(
+        cohort_config={"cohorted": course_is_cohorted, "always_cohort_inline_discussions": True}
+    )
+    CourseEnrollmentFactory.create(user=user, course_id=cohort_course.id)
+    cohort = CohortFactory.create(course_id=cohort_course.id, users=[user])
+    role = Role.objects.create(name=role_name, course_id=cohort_course.id)
+    role.users = [user]
+    return [cohort_course, cohort]
+
+
 @attr(shard=2)
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase):
@@ -1857,11 +1875,7 @@ class CreateCommentTest(
     )
     @ddt.unpack
     def test_group_access(self, role_name, course_is_cohorted, thread_group_state):
-        cohort_course = CourseFactory.create(cohort_config={"cohorted": course_is_cohorted})
-        CourseEnrollmentFactory.create(user=self.user, course_id=cohort_course.id)
-        cohort = CohortFactory.create(course_id=cohort_course.id, users=[self.user])
-        role = Role.objects.create(name=role_name, course_id=cohort_course.id)
-        role.users = [self.user]
+        cohort_course, cohort = _create_course_and_cohort_with_user_role(course_is_cohorted, self.user, role_name)
         self.register_get_thread_response(make_minimal_cs_thread({
             "id": "cohort_thread",
             "course_id": unicode(cohort_course.id),
@@ -2017,11 +2031,7 @@ class UpdateThreadTest(
     )
     @ddt.unpack
     def test_group_access(self, role_name, course_is_cohorted, thread_group_state):
-        cohort_course = CourseFactory.create(cohort_config={"cohorted": course_is_cohorted})
-        CourseEnrollmentFactory.create(user=self.user, course_id=cohort_course.id)
-        cohort = CohortFactory.create(course_id=cohort_course.id, users=[self.user])
-        role = Role.objects.create(name=role_name, course_id=cohort_course.id)
-        role.users = [self.user]
+        cohort_course, cohort = _create_course_and_cohort_with_user_role(course_is_cohorted, self.user, role_name)
         self.register_thread({
             "course_id": unicode(cohort_course.id),
             "group_id": (
@@ -2419,11 +2429,7 @@ class UpdateCommentTest(
     )
     @ddt.unpack
     def test_group_access(self, role_name, course_is_cohorted, thread_group_state):
-        cohort_course = CourseFactory.create(cohort_config={"cohorted": course_is_cohorted})
-        CourseEnrollmentFactory.create(user=self.user, course_id=cohort_course.id)
-        cohort = CohortFactory.create(course_id=cohort_course.id, users=[self.user])
-        role = Role.objects.create(name=role_name, course_id=cohort_course.id)
-        role.users = [self.user]
+        cohort_course, cohort = _create_course_and_cohort_with_user_role(course_is_cohorted, self.user, role_name)
         self.register_get_thread_response(make_minimal_cs_thread())
         self.register_comment(
             {"thread_id": "test_thread"},
@@ -2798,11 +2804,7 @@ class DeleteThreadTest(
         the student role is the author and the thread is not in a cohort,
         the student role is the author and the thread is in the author's cohort.
         """
-        cohort_course = CourseFactory.create(cohort_config={"cohorted": course_is_cohorted})
-        CourseEnrollmentFactory.create(user=self.user, course_id=cohort_course.id)
-        cohort = CohortFactory.create(course_id=cohort_course.id, users=[self.user])
-        role = Role.objects.create(name=role_name, course_id=cohort_course.id)
-        role.users = [self.user]
+        cohort_course, cohort = _create_course_and_cohort_with_user_role(course_is_cohorted, self.user, role_name)
         self.register_thread({
             "course_id": unicode(cohort_course.id),
             "group_id": (
@@ -2955,11 +2957,7 @@ class DeleteCommentTest(
         the student role is the author and the comment is not in a cohort,
         the student role is the author and the comment is in the author's cohort.
         """
-        cohort_course = CourseFactory.create(cohort_config={"cohorted": course_is_cohorted})
-        CourseEnrollmentFactory.create(user=self.user, course_id=cohort_course.id)
-        cohort = CohortFactory.create(course_id=cohort_course.id, users=[self.user])
-        role = Role.objects.create(name=role_name, course_id=cohort_course.id)
-        role.users = [self.user]
+        cohort_course, cohort = _create_course_and_cohort_with_user_role(course_is_cohorted, self.user, role_name)
         self.register_comment_and_thread(
             overrides={"thread_id": "test_thread"},
             thread_overrides={
@@ -3084,11 +3082,7 @@ class RetrieveThreadTest(
         the student role is the author and the thread is not in a cohort,
         the student role is the author and the thread is in the author's cohort.
         """
-        cohort_course = CourseFactory.create(cohort_config={"cohorted": course_is_cohorted})
-        CourseEnrollmentFactory.create(user=self.user, course_id=cohort_course.id)
-        cohort = CohortFactory.create(course_id=cohort_course.id, users=[self.user])
-        role = Role.objects.create(name=role_name, course_id=cohort_course.id)
-        role.users = [self.user]
+        cohort_course, cohort = _create_course_and_cohort_with_user_role(course_is_cohorted, self.user, role_name)
         self.register_thread({
             "course_id": unicode(cohort_course.id),
             "group_id": (

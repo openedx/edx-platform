@@ -681,7 +681,7 @@ class TestCohorts(ModuleStoreTestCase):
 
         self.assertFalse(course_cohort_settings.is_cohorted)
         self.assertEqual(course_cohort_settings.cohorted_discussions, [])
-        self.assertTrue(course_cohort_settings.always_cohort_inline_discussions)
+        self.assertFalse(course_cohort_settings.always_cohort_inline_discussions)
 
     def test_update_course_cohort_settings(self):
         """
@@ -694,14 +694,14 @@ class TestCohorts(ModuleStoreTestCase):
             course.id,
             is_cohorted=False,
             cohorted_discussions=['topic a id', 'topic b id'],
-            always_cohort_inline_discussions=False
+            always_cohort_inline_discussions=True
         )
 
         course_cohort_settings = cohorts.get_course_cohort_settings(course.id)
 
         self.assertFalse(course_cohort_settings.is_cohorted)
         self.assertEqual(course_cohort_settings.cohorted_discussions, ['topic a id', 'topic b id'])
-        self.assertFalse(course_cohort_settings.always_cohort_inline_discussions)
+        self.assertTrue(course_cohort_settings.always_cohort_inline_discussions)
 
     def test_update_course_cohort_settings_with_invalid_data_type(self):
         """
