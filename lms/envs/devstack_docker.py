@@ -9,13 +9,13 @@ LOGGING['handlers']['local'] = LOGGING['handlers']['tracking'] = {
 
 LOGGING['loggers']['tracking']['handlers'] = ['console']
 
-HOST = 'edx.devstack.edxapp:18000'
+HOST = 'edx.devstack.lms:18000'
 SITE_NAME = HOST
 LMS_ROOT_URL = 'http://{}'.format(HOST)
 
 ECOMMERCE_PUBLIC_URL_ROOT = 'http://localhost:18130'
 ECOMMERCE_API_URL = 'http://edx.devstack.ecommerce:18130/api/v2'
-ENTERPRISE_API_URL = 'http://enterprise.example.com/enterprise/api/v1/'
+ENTERPRISE_API_URL = '{}/enterprise/api/v1/'.format(LMS_ROOT_URL)
 
 OAUTH_OIDC_ISSUER = '{}/oauth2'.format(LMS_ROOT_URL)
 
