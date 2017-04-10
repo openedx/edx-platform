@@ -49,14 +49,14 @@ from django.utils.translation import ugettext as _
                                         ## Proctoring exposes a exam status message field as well as a status icon
                                         <%
                                             if subsection.get('due') is None:
-                                                data_string = subsection['format']
+                                                data_string = subsection.get('format')
                                             else:
                                                 if 'special_exam' in subsection:
                                                     data_string = _('due {date}')
                                                 else:
-                                                    data_string = _("{subsection_format} due {{date}}").format(subsection_format=subsection['format'])
+                                                    data_string = _("{subsection_format} due {{date}}").format(subsection_format=subsection.get('format'))
                                         %>
-                                        % if subsection['format'] or due_date or 'special_exam' in subsection:
+                                        % if subsection.get('format') or 'special_exam' in subsection:
                                         <span class="subtitle">
                                             % if 'special_exam' in subsection:
                                                 ## Display the proctored exam status icon and status message
@@ -73,7 +73,7 @@ from django.utils.translation import ugettext as _
                                                 % if not subsection['special_exam'].get('in_completed_state', False):
                                                     <span
                                                         class="localized-datetime subtitle-name"
-                                                        data-datetime="${subsection['due']}"
+                                                        data-datetime="${subsection.get('due')}"
                                                         data-string="${data_string}"
                                                         data-timezone="${user_timezone}"
                                                         data-language="${user_language}"
@@ -84,7 +84,7 @@ from django.utils.translation import ugettext as _
                                                 ## this is the standard case in edx-platform
                                                 <span
                                                     class="localized-datetime subtitle-name"
-                                                    data-datetime="${subsection['due']}"
+                                                    data-datetime="${subsection.get('due')}"
                                                     data-string="${data_string}"
                                                     data-timezone="${user_timezone}"
                                                     data-language="${user_language}"
@@ -120,3 +120,7 @@ from django.utils.translation import ugettext as _
         % endfor
     </ol>
 </div>
+
+<%static:require_module_async module_name="js/dateutil_factory" class_name="DateUtilFactory">
+    DateUtilFactory.transform('.localized-datetime');
+</%static:require_module_async>
