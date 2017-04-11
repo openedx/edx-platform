@@ -1451,7 +1451,7 @@ class ProgressPageTests(ModuleStoreTestCase):
     @ddt.unpack
     def test_progress_queries(self, enable_waffle, initial, subsequent):
         self.setup_course()
-        with grades_waffle().override_in_model(ASSUME_ZERO_GRADE_IF_ABSENT, active=enable_waffle):
+        with grades_waffle().override(ASSUME_ZERO_GRADE_IF_ABSENT, active=enable_waffle):
             with self.assertNumQueries(initial), check_mongo_calls(1):
                 self._get_progress_page()
 

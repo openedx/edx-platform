@@ -61,12 +61,13 @@ class WaffleSwitchPlus(WafflePlus):
         """
         Overrides the active value for the given switch for the duration of this
         contextmanager.
-        Note: The value is overridden in the request cache, not in the model.
+        Note: The value is overridden in the request cache AND in the model.
         """
         previous_active = self.is_enabled(switch_name)
         try:
             self.override_for_request(switch_name, active)
-            yield
+            with self.override_in_model(switch_name, active):
+                yield
         finally:
             self.override_for_request(switch_name, previous_active)
 
@@ -85,12 +86,12 @@ class WaffleSwitchPlus(WafflePlus):
         """
         Overrides the active value for the given switch for the duration of this
         contextmanager.
-        Note: The value is overridden in the request cache AND in the model.
+        Note: The value is overridden in the model, not the request cache.
         """
-        with self.override(switch_name, active):
-            namespaced_switch_name = self._namespaced_setting_name(switch_name)
-            with waffle_override_switch(namespaced_switch_name, active):
-                yield
+        namespaced_switch_name = self._namespaced_setting_name(switch_name)
+        with waffle_override_switch(namespaced_switch_name, active):
+            log.info(u"%sSwitch '%s' set to %s in model.", self.log_prefix, namespaced_switch_name, active)
+            yield
 
     @property
     def _cached_switches(self):
