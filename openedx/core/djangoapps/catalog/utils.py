@@ -56,13 +56,8 @@ def get_programs(uuid=None, types=None):  # pylint: disable=redefined-builtin
 
         querystring = {
             'exclude_utm': 1,
+            'status': ('active', 'retired',),
         }
-
-        # TODO ECOM-7650: Remove this after https://github.com/edx/course-discovery/pull/805 is merged and released.
-        if waffle.switch_is_active('display_retired_programs_on_learner_dashboard'):
-            querystring['status'] = ('active', 'retired',)
-        else:
-            querystring['marketable'] = 1
 
         if uuid:
             querystring['use_full_course_serializer'] = 1
