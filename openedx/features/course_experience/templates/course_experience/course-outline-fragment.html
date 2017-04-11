@@ -12,7 +12,7 @@ from django.utils.translation import ugettext as _
     CourseOutlineFactory('.block-tree');
 </%static:require_module_async>
 
-<div class="course-outline" id="main" tabindex="-1">
+<main role="main" class="course-outline" id="main" tabindex="-1">
     <ol class="block-tree" role="tree">
         % for section in blocks.get('children') or []:
             <li
@@ -23,7 +23,7 @@ from django.utils.translation import ugettext as _
                 tabindex="0"
             >
                 <div class="section-name">
-                    <span>${ section['display_name'] }</span>
+                    <h3>${ section['display_name'] }</h3>
                 </div>
                 <ol class="outline-item focusable" role="group" tabindex="0">
                     % for subsection in section.get('children') or []:
@@ -120,7 +120,7 @@ from django.utils.translation import ugettext as _
             </li>
         % endfor
     </ol>
-</div>
+</main>
 
 <%static:require_module_async module_name="js/dateutil_factory" class_name="DateUtilFactory">
     DateUtilFactory.transform('.localized-datetime');
