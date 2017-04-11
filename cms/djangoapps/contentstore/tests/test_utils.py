@@ -391,8 +391,8 @@ class GroupVisibilityTest(CourseTestCase):
         def verify_all_components_visible_to_all():  # pylint: disable=invalid-name
             """ Verifies when group_access has not been set on anything. """
             for item in (self.sequential, self.vertical, self.html, self.problem):
-                self.assertFalse(utils.has_children_visible_to_specific_content_groups(item))
-                self.assertFalse(utils.is_visible_to_specific_content_groups(item))
+                self.assertFalse(utils.has_children_visible_to_specific_partition_groups(item))
+                self.assertFalse(utils.is_visible_to_specific_partition_groups(item))
 
         verify_all_components_visible_to_all()
 
@@ -409,16 +409,16 @@ class GroupVisibilityTest(CourseTestCase):
         self.set_group_access(self.vertical, {1: []})
         self.set_group_access(self.problem, {2: [3, 4]})
 
-        # Note that "has_children_visible_to_specific_content_groups" only checks immediate children.
-        self.assertFalse(utils.has_children_visible_to_specific_content_groups(self.sequential))
-        self.assertTrue(utils.has_children_visible_to_specific_content_groups(self.vertical))
-        self.assertFalse(utils.has_children_visible_to_specific_content_groups(self.html))
-        self.assertFalse(utils.has_children_visible_to_specific_content_groups(self.problem))
+        # Note that "has_children_visible_to_specific_partition_groups" only checks immediate children.
+        self.assertFalse(utils.has_children_visible_to_specific_partition_groups(self.sequential))
+        self.assertTrue(utils.has_children_visible_to_specific_partition_groups(self.vertical))
+        self.assertFalse(utils.has_children_visible_to_specific_partition_groups(self.html))
+        self.assertFalse(utils.has_children_visible_to_specific_partition_groups(self.problem))
 
-        self.assertTrue(utils.is_visible_to_specific_content_groups(self.sequential))
-        self.assertFalse(utils.is_visible_to_specific_content_groups(self.vertical))
-        self.assertFalse(utils.is_visible_to_specific_content_groups(self.html))
-        self.assertTrue(utils.is_visible_to_specific_content_groups(self.problem))
+        self.assertTrue(utils.is_visible_to_specific_partition_groups(self.sequential))
+        self.assertFalse(utils.is_visible_to_specific_partition_groups(self.vertical))
+        self.assertFalse(utils.is_visible_to_specific_partition_groups(self.html))
+        self.assertTrue(utils.is_visible_to_specific_partition_groups(self.problem))
 
 
 class GetUserPartitionInfoTest(ModuleStoreTestCase):
