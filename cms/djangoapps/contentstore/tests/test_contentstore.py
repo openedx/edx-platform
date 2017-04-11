@@ -1964,7 +1964,7 @@ class RerunCourseTest(ContentStoreTestCase):
         create_video(
             dict(
                 edx_video_id="tree-hugger",
-                courses=[source_course.id],
+                courses=[unicode(source_course.id)],
                 status='test',
                 duration=2,
                 encoded_videos=[]

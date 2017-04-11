@@ -17,7 +17,7 @@ import datetime
 from uuid import uuid4
 
 from lxml import etree
-from mock import ANY, Mock, patch
+from mock import ANY, Mock, patch, MagicMock
 import ddt
 
 from django.conf import settings
@@ -672,7 +672,7 @@ class VideoExportTestCase(VideoDescriptorTestBase):
         """
         Test that we write the correct XML on export.
         """
-        def mock_val_export(edx_video_id):
+        def mock_val_export(edx_video_id, course_id):
             """Mock edxval.api.export_to_xml"""
             return etree.Element(
                 'video_asset',
@@ -694,6 +694,7 @@ class VideoExportTestCase(VideoDescriptorTestBase):
         self.descriptor.download_video = True
         self.descriptor.transcripts = {'ua': 'ukrainian_translation.srt', 'ge': 'german_translation.srt'}
         self.descriptor.edx_video_id = 'test_edx_video_id'
+        self.descriptor.runtime.course_id = MagicMock()
 
         xml = self.descriptor.definition_to_xml(None)  # We don't use the `resource_fs` parameter
         parser = etree.XMLParser(remove_blank_text=True)
@@ -717,6 +718,7 @@ class VideoExportTestCase(VideoDescriptorTestBase):
         mock_val_api.ValVideoNotFoundError = _MockValVideoNotFoundError
         mock_val_api.export_to_xml = Mock(side_effect=mock_val_api.ValVideoNotFoundError)
         self.descriptor.edx_video_id = 'test_edx_video_id'
+        self.descriptor.runtime.course_id = MagicMock()
 
         xml = self.descriptor.definition_to_xml(None)
         parser = etree.XMLParser(remove_blank_text=True)

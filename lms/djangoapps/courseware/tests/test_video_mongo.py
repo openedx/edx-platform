@@ -1185,7 +1185,7 @@ class TestVideoDescriptorStudentViewJson(TestCase):
             'duration': self.TEST_DURATION,
             'status': 'dummy',
             'encoded_videos': [self.TEST_ENCODED_VIDEO],
-            'courses': [self.video.location.course_key] if associate_course_in_val else [],
+            'courses': [unicode(self.video.location.course_key)] if associate_course_in_val else [],
         })
         self.val_video = get_video_info(self.TEST_EDX_VIDEO_ID)  # pylint: disable=attribute-defined-outside-init
 
@@ -1315,6 +1315,7 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
     def setUp(self):
         super(VideoDescriptorTest, self).setUp()
         self.descriptor.runtime.handler_url = MagicMock()
+        self.descriptor.runtime.course_id = MagicMock()
 
     def test_get_context(self):
         """"
@@ -1362,7 +1363,7 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
         actual = self.descriptor.definition_to_xml(resource_fs=None)
         expected_str = """
             <video download_video="false" url_name="SampleProblem">
-                <video_asset client_video_id="test_client_video_id" duration="111.0">
+                <video_asset client_video_id="test_client_video_id" duration="111.0" image="">
                     <encoded_video profile="mobile" url="http://example.com/video" file_size="222" bitrate="333"/>
                 </video_asset>
             </video>
@@ -1398,7 +1399,7 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
         self.assertEqual(video_data['client_video_id'], 'test_client_video_id')
         self.assertEqual(video_data['duration'], 111)
         self.assertEqual(video_data['status'], 'imported')
-        self.assertEqual(video_data['courses'], [id_generator.target_course_id])
+        self.assertEqual(video_data['courses'], [{id_generator.target_course_id: None}])
         self.assertEqual(video_data['encoded_videos'][0]['profile'], 'mobile')
         self.assertEqual(video_data['encoded_videos'][0]['url'], 'http://example.com/video')
         self.assertEqual(video_data['encoded_videos'][0]['file_size'], 222)

@@ -645,7 +645,10 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
 
         if self.edx_video_id and edxval_api:
             try:
-                xml.append(edxval_api.export_to_xml(self.edx_video_id))
+                xml.append(edxval_api.export_to_xml(
+                    self.edx_video_id,
+                    unicode(self.runtime.course_id.for_branch(None)))
+                )
             except edxval_api.ValVideoNotFoundError:
                 pass
 

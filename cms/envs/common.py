@@ -98,6 +98,8 @@ from lms.envs.common import (
     CONTACT_EMAIL,
 
     DISABLE_ACCOUNT_ACTIVATION_REQUIREMENT_SWITCH,
+    # Video Image settings
+    VIDEO_IMAGE_SETTINGS,
 )
 from path import Path as path
 from warnings import simplefilter
@@ -1300,3 +1302,7 @@ ENTERPRISE_API_CACHE_TIMEOUT = 3600  # Value is in seconds
 ############## Settings for the Discovery App ######################
 
 COURSE_CATALOG_API_URL = None
+
+###################### VIDEO IMAGE STORAGE ######################
+
+VIDEO_IMAGE_DEFAULT_FILENAME = 'default_video_image.png'
