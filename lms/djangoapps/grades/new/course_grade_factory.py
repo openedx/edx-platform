@@ -153,9 +153,9 @@ class CourseGradeFactory(object):
         course_grade.update()
 
         should_persist = (
-            not read_only and  # TODO(TNL-6786) Remove the read_only boolean once all grades are back-filled.
+            (not read_only) and  # TODO(TNL-6786) Remove the read_only boolean once all grades are back-filled.
             should_persist_grades(course_data.course_key) and
-            not waffle().is_enabled(WRITE_ONLY_IF_ENGAGED) or course_grade.attempted
+            (not waffle().is_enabled(WRITE_ONLY_IF_ENGAGED) or course_grade.attempted)
         )
         if should_persist:
             course_grade._subsection_grade_factory.bulk_create_unsaved()
