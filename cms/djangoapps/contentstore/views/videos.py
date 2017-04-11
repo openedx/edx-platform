@@ -1,6 +1,11 @@
 """
 Views related to the video upload feature
 """
+from contextlib import closing
+from datetime import datetime, timedelta
+import logging
+
+from boto import s3
 import csv
 import logging
 from datetime import datetime, timedelta
@@ -10,17 +15,19 @@ import rfc6266
 from boto import s3
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.contrib.staticfiles.storage import staticfiles_storage
 from django.http import HttpResponse, HttpResponseNotFound
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_noop
-from django.views.decorators.http import require_GET, require_http_methods
+from django.views.decorators.http import require_GET, require_POST, require_http_methods
 from edxval.api import (
     SortDirection,
     VideoSortField,
     create_video,
     get_videos_for_course,
     remove_video_for_course,
-    update_video_status
+    update_video_status,
+    update_video_image
 )
 from opaque_keys.edx.keys import CourseKey
 
@@ -31,7 +38,8 @@ from util.json_request import JsonResponse, expect_json
 
 from .course import get_course_and_check_access
 
-__all__ = ["videos_handler", "video_encodings_download"]
+
+__all__ = ['videos_handler', 'video_encodings_download', 'video_images_handler']
 
 LOGGER = logging.getLogger(__name__)
 
@@ -143,6 +151,26 @@ def videos_handler(request, course_key_string, edx_video_id=None):
             return send_video_status_update(request.json)
 
         return videos_post(course, request)
+
+
+@expect_json
+@login_required
+@require_POST
+def video_images_handler(request, course_key_string, edx_video_id=None):
+    if 'file' not in request.FILES:
+        return JsonResponse({"error": _(u'No file provided for video image')}, status=400)
+
+    image_file = request.FILES['file']
+    file_name = request.FILES['file'].name
+
+    # TODO: Image file validation
+    with closing(image_file):
+        image_url = update_video_image(edx_video_id, course_key_string, image_file, file_name)
+        LOGGER.info(
+            'VIDEOS: Video image uploaded for edx_video_id [%s] in course [%s]', edx_video_id, course_key_string
+        )
+
+    return JsonResponse({'image_url': image_url})
 
 
 @login_required
@@ -296,17 +324,39 @@ def _get_videos(course):
     return videos
 
 
+def _get_default_video_image_url():
+    """
+    Returns default video image url
+    """
+    return staticfiles_storage.url(settings.VIDEO_IMAGE_DEFAULT_FILENAME)
+
+
 def _get_index_videos(course):
     """
     Returns the information about each video upload required for the video list
     """
-    return list(
-        {
-            attr: video[attr]
-            for attr in ["edx_video_id", "client_video_id", "created", "duration", "status"]
-        }
-        for video in _get_videos(course)
-    )
+    course_id = unicode(course.id)
+    default_video_image_url = _get_default_video_image_url()
+    attrs = ['edx_video_id', 'client_video_id', 'created', 'duration', 'status', 'courses']
+
+    def _get_values(video):
+        """
+        Get data for predefined video attributes.
+        """
+        values = {}
+        for attr in attrs:
+            if attr == 'courses':
+                course = filter(lambda c: course_id in c, video['courses'])
+                (__, image_url), = course[0].items()
+                values['course_video_image_url'] = image_url or default_video_image_url
+            else:
+                values[attr] = video[attr]
+
+        return values
+
+    return [
+        _get_values(video) for video in _get_videos(course)
+    ]
 
 
 def videos_index_html(course):
@@ -314,15 +364,16 @@ def videos_index_html(course):
     Returns an HTML page to display previous video uploads and allow new ones
     """
     return render_to_response(
-        "videos_index.html",
+        'videos_index.html',
         {
-            "context_course": course,
-            "video_handler_url": reverse_course_url("videos_handler", unicode(course.id)),
-            "encodings_download_url": reverse_course_url("video_encodings_download", unicode(course.id)),
-            "previous_uploads": _get_index_videos(course),
-            "concurrent_upload_limit": settings.VIDEO_UPLOAD_PIPELINE.get("CONCURRENT_UPLOAD_LIMIT", 0),
-            "video_supported_file_formats": VIDEO_SUPPORTED_FILE_FORMATS.keys(),
-            "video_upload_max_file_size": VIDEO_UPLOAD_MAX_FILE_SIZE_GB
+            'context_course': course,
+            'image_upload_url': reverse_course_url('video_images_handler', unicode(course.id)),
+            'video_handler_url': reverse_course_url('videos_handler', unicode(course.id)),
+            'encodings_download_url': reverse_course_url('video_encodings_download', unicode(course.id)),
+            'previous_uploads': _get_index_videos(course),
+            'concurrent_upload_limit': settings.VIDEO_UPLOAD_PIPELINE.get('CONCURRENT_UPLOAD_LIMIT', 0),
+            'video_supported_file_formats': VIDEO_SUPPORTED_FILE_FORMATS.keys(),
+            'video_upload_max_file_size': VIDEO_UPLOAD_MAX_FILE_SIZE_GB
         }
     )
 
@@ -331,12 +382,13 @@ def videos_index_json(course):
     """
     Returns JSON in the following format:
     {
-        "videos": [{
-            "edx_video_id": "aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa",
-            "client_video_id": "video.mp4",
-            "created": "1970-01-01T00:00:00Z",
-            "duration": 42.5,
-            "status": "upload"
+        'videos': [{
+            'edx_video_id': 'aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa',
+            'client_video_id': 'video.mp4',
+            'created': '1970-01-01T00:00:00Z',
+            'duration': 42.5,
+            'status': 'upload',
+            'course_video_image_url': 'https://video/images/1234.jpg'
         }]
     }
     """
@@ -364,29 +416,29 @@ def videos_post(course, request):
     The returned array corresponds exactly to the input array.
     """
     error = None
-    if "files" not in request.json:
+    if 'files' not in request.json:
         error = "Request object is not JSON or does not contain 'files'"
     elif any(
-            "file_name" not in file or "content_type" not in file
-            for file in request.json["files"]
+            'file_name' not in file or 'content_type' not in file
+            for file in request.json['files']
     ):
         error = "Request 'files' entry does not contain 'file_name' and 'content_type'"
     elif any(
             file['content_type'] not in VIDEO_SUPPORTED_FILE_FORMATS.values()
-            for file in request.json["files"]
+            for file in request.json['files']
     ):
         error = "Request 'files' entry contain unsupported content_type"
 
     if error:
-        return JsonResponse({"error": error}, status=400)
+        return JsonResponse({'error': error}, status=400)
 
     bucket = storage_service_bucket()
-    course_video_upload_token = course.video_upload_pipeline["course_video_upload_token"]
-    req_files = request.json["files"]
+    course_video_upload_token = course.video_upload_pipeline['course_video_upload_token']
+    req_files = request.json['files']
     resp_files = []
 
     for req_file in req_files:
-        file_name = req_file["file_name"]
+        file_name = req_file['file_name']
 
         try:
             file_name.encode('ascii')
@@ -397,30 +449,30 @@ def videos_post(course, request):
         edx_video_id = unicode(uuid4())
         key = storage_service_key(bucket, file_name=edx_video_id)
         for metadata_name, value in [
-                ("course_video_upload_token", course_video_upload_token),
-                ("client_video_id", file_name),
-                ("course_key", unicode(course.id)),
+                ('course_video_upload_token', course_video_upload_token),
+                ('client_video_id', file_name),
+                ('course_key', unicode(course.id)),
         ]:
             key.set_metadata(metadata_name, value)
         upload_url = key.generate_url(
             KEY_EXPIRATION_IN_SECONDS,
-            "PUT",
-            headers={"Content-Type": req_file["content_type"]}
+            'PUT',
+            headers={'Content-Type': req_file['content_type']}
         )
 
         # persist edx_video_id in VAL
         create_video({
-            "edx_video_id": edx_video_id,
-            "status": "upload",
-            "client_video_id": file_name,
-            "duration": 0,
-            "encoded_videos": [],
-            "courses": [course.id]
+            'edx_video_id': edx_video_id,
+            'status': 'upload',
+            'client_video_id': file_name,
+            'duration': 0,
+            'encoded_videos': [],
+            'courses': [unicode(course.id)]
         })
 
-        resp_files.append({"file_name": file_name, "upload_url": upload_url, "edx_video_id": edx_video_id})
+        resp_files.append({'file_name': file_name, 'upload_url': upload_url, 'edx_video_id': edx_video_id})
 
-    return JsonResponse({"files": resp_files}, status=200)
+    return JsonResponse({'files': resp_files}, status=200)
 
 
 def storage_service_bucket():

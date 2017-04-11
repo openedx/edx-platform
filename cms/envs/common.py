@@ -99,6 +99,8 @@ from lms.envs.common import (
     CONTACT_EMAIL,
 
     DISABLE_ACCOUNT_ACTIVATION_REQUIREMENT_SWITCH,
+    # Video Image settings
+    VIDEO_IMAGE_SETTINGS,
 )
 from path import Path as path
 from warnings import simplefilter
@@ -1314,3 +1316,6 @@ COURSE_CATALOG_API_URL = None
 
 # Queue to use for updating persistent grades
 RECALCULATE_GRADES_ROUTING_KEY = LOW_PRIORITY_QUEUE
+###################### VIDEO IMAGE STORAGE ######################
+
+VIDEO_IMAGE_DEFAULT_FILENAME = 'default_video_image.png'

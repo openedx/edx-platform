@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.conf.urls import include, patterns, url
+from django.conf.urls.static import static
 # There is a course creators admin table.
 from ratelimitbackend import admin
 
@@ -112,6 +113,7 @@ urlpatterns += patterns(
     url(r'^textbooks/{}$'.format(settings.COURSE_KEY_PATTERN), 'textbooks_list_handler'),
     url(r'^textbooks/{}/(?P<textbook_id>\d[^/]*)$'.format(settings.COURSE_KEY_PATTERN), 'textbooks_detail_handler'),
     url(r'^videos/{}(?:/(?P<edx_video_id>[-\w]+))?$'.format(settings.COURSE_KEY_PATTERN), 'videos_handler'),
+    url(r'^video_images/{}(?:/(?P<edx_video_id>[-\w]+))?$'.format(settings.COURSE_KEY_PATTERN), 'video_images_handler'),
     url(r'^video_encodings_download/{}$'.format(settings.COURSE_KEY_PATTERN), 'video_encodings_download'),
     url(r'^group_configurations/{}$'.format(settings.COURSE_KEY_PATTERN), 'group_configurations_list_handler'),
     url(r'^group_configurations/{}/(?P<group_configuration_id>\d+)(/)?(?P<group_id>\d+)?$'.format(
@@ -188,6 +190,11 @@ if settings.DEBUG:
         urlpatterns += dev_urlpatterns
     except ImportError:
         pass
+
+    urlpatterns += static(
+        settings.VIDEO_IMAGE_SETTINGS['STORAGE_KWARGS']['base_url'],
+        document_root=settings.VIDEO_IMAGE_SETTINGS['STORAGE_KWARGS']['location']
+    )
 
 if 'debug_toolbar' in settings.INSTALLED_APPS:
     import debug_toolbar
