@@ -18,6 +18,23 @@ class LanguagePreferenceMiddleware(object):
     whenever they are logged in.
     """
 
+    def _use_browser_lang(self, request, system_released_languages):
+        preferred_language = request.META.get('HTTP_ACCEPT_LANGUAGE', '')
+        lang_headers = [seq[0] for seq in parse_accept_lang_header(preferred_language)]
+
+        prefixes = [prefix.split("-")[0] for prefix in system_released_languages]
+        # Setting the session language to the browser language, if it is supported.
+        for browser_lang in lang_headers:
+            if browser_lang in system_released_languages:
+                pass
+            elif browser_lang in prefixes:
+                browser_lang = system_released_languages[prefixes.index(browser_lang)]
+            else:
+                continue
+            if request.session.get(LANGUAGE_SESSION_KEY, None) is None:
+                request.session[LANGUAGE_SESSION_KEY] = unicode(browser_lang)
+            break
+
     def process_request(self, request):
         """
         If a user's UserPreference contains a language preference, use the user's preference.
@@ -35,19 +52,7 @@ class LanguagePreferenceMiddleware(object):
                     request.session[LANGUAGE_SESSION_KEY] = user_pref
                 else:
                     delete_user_preference(request.user, LANGUAGE_KEY)
+            else:
+                self._use_browser_lang(request, system_released_languages)
         else:
-            preferred_language = request.META.get('HTTP_ACCEPT_LANGUAGE', '')
-            lang_headers = [seq[0] for seq in parse_accept_lang_header(preferred_language)]
-
-            prefixes = [prefix.split("-")[0] for prefix in system_released_languages]
-            # Setting the session language to the browser language, if it is supported.
-            for browser_lang in lang_headers:
-                if browser_lang in system_released_languages:
-                    pass
-                elif browser_lang in prefixes:
-                    browser_lang = system_released_languages[prefixes.index(browser_lang)]
-                else:
-                    continue
-                if request.session.get(LANGUAGE_SESSION_KEY, None) is None:
-                    request.session[LANGUAGE_SESSION_KEY] = unicode(browser_lang)
-                break
+            self._use_browser_lang(request, system_released_languages)

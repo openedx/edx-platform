@@ -10,6 +10,8 @@ from collections import defaultdict
 from urlparse import urljoin, urlsplit, parse_qs, urlunsplit
 
 from django.views.generic import TemplateView
+from django.utils.translation import LANGUAGE_SESSION_KEY
+
 from pytz import UTC
 from requests import HTTPError
 from ipware.ip import get_ip
@@ -2678,6 +2680,7 @@ class LogoutView(TemplateView):
 
         # Clear the cookie used by the edx.org marketing site
         delete_logged_in_cookies(response)
+        request.session[LANGUAGE_SESSION_KEY] = None
 
         return response
 
