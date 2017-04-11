@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-03-30 10:52+0000\n"
-"PO-Revision-Date: 2017-03-30 10:54:40.500506\n"
+"POT-Creation-Date: 2017-04-11 15:04+0000\n"
+"PO-Revision-Date: 2017-04-11 15:06:29.691078\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -1783,12 +1783,16 @@ msgid "on"
 msgstr "خر"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
-msgid "Video position"
-msgstr "دهيثخ حخسهفهخر"
+msgid "Video position. Press space to toggle playback"
+msgstr "دهيثخ حخسهفهخر. حقثسس سحشذث فخ فخللمث حمشغزشذن"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "Video ended"
 msgstr "دهيثخ ثريثي"
+
+#: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
+msgid "Video position"
+msgstr "دهيثخ حخسهفهخر"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s hour"
@@ -4081,6 +4085,11 @@ msgid ""
 msgstr ""
 "مهرنس شقث لثرثقشفثي خر يثوشري شري ثطحهقث صهفاهر 5 وهرعفثس يعث فخ فاث "
 "سثرسهفهدث رشفعقث خب سفعيثرف هربخقوشفهخر."
+
+#: lms/static/js/learner_dashboard/views/program_details_view_2017.js
+#: lms/templates/learner_dashboard/program_card.underscore
+msgid "Enrolled"
+msgstr "ثرقخممثي"
 
 #: lms/static/js/search/base/views/search_results_view.js
 #, javascript-format
@@ -6868,11 +6877,13 @@ msgid "LEARN MORE"
 msgstr "مثشقر وخقث"
 
 #: lms/templates/discovery/course_card.underscore
+#: lms/templates/discovery/course_card_2017.underscore
 #, python-format
 msgid "Starts: %(start_date)s"
 msgstr "سفشقفس: %(start_date)s"
 
 #: lms/templates/discovery/course_card.underscore
+#: lms/templates/discovery/course_card_2017.underscore
 msgid "Starts"
 msgstr "سفشقفس"
 
@@ -7311,6 +7322,15 @@ msgstr "ذخرلقشفعمشفهخرس! غخع اشدث ثشقرثي ش ذثقف
 msgid "View Certificate"
 msgstr "دهثص ذثقفهبهذشفث"
 
+#: lms/templates/learner_dashboard/certificate_status_2017.underscore
+#: lms/templates/learner_dashboard/upgrade_message_2017.underscore
+msgid "Certificate Status:"
+msgstr "ذثقفهبهذشفث سفشفعس:"
+
+#: lms/templates/learner_dashboard/certificate_status_2017.underscore
+msgid "Certificate Purchased"
+msgstr "ذثقفهبهذشفث حعقذاشسثي"
+
 #: lms/templates/learner_dashboard/course_card.underscore
 #, python-format
 msgid "%(courseName)s Home Page."
@@ -7351,20 +7371,28 @@ msgid "Starts %(start)s"
 msgstr "سفشقفس %(start)s"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
+#: lms/templates/learner_dashboard/course_enroll_2017.underscore
 msgid "Enroll Now"
 msgstr "ثرقخمم رخص"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
+#: lms/templates/learner_dashboard/course_enroll_2017.underscore
 msgid "Coming Soon"
 msgstr "ذخوهرل سخخر"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
+#: lms/templates/learner_dashboard/course_enroll_2017.underscore
 msgid "Enrollment Opens on"
 msgstr "ثرقخمموثرف خحثرس خر"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
+#: lms/templates/learner_dashboard/course_enroll_2017.underscore
 msgid "Not Currently Available"
 msgstr "رخف ذعققثرفمغ شدشهمشزمث"
+
+#: lms/templates/learner_dashboard/course_enroll_2017.underscore
+msgid "Choose a course run:"
+msgstr "ذاخخسث ش ذخعقسث قعر:"
 
 #: lms/templates/learner_dashboard/empty_programs_list.underscore
 msgid "You are not enrolled in any programs yet."
@@ -7398,15 +7426,50 @@ msgid "Completed"
 msgstr "ذخوحمثفثي"
 
 #: lms/templates/learner_dashboard/program_card.underscore
-msgid "Enrolled"
-msgstr "ثرقخممثي"
-
-#: lms/templates/learner_dashboard/program_card.underscore
 #, python-format
 msgid "%(programName)s Home Page."
 msgstr "%(programName)s اخوث حشلث."
 
+#: lms/templates/learner_dashboard/program_details_view_2017.underscore
+msgid "Congratulations!"
+msgstr "ذخرلقشفعمشفهخرس!"
+
+#: lms/templates/learner_dashboard/program_details_view_2017.underscore
+msgid "Your Program Journey"
+msgstr "غخعق حقخلقشو تخعقرثغ"
+
+#: lms/templates/learner_dashboard/program_details_view_2017.underscore
+msgid ""
+"To complete the program, you must earn a verified certificate for each "
+"course."
+msgstr ""
+"فخ ذخوحمثفث فاث حقخلقشو, غخع وعسف ثشقر ش دثقهبهثي ذثقفهبهذشفث بخق ثشذا "
+"ذخعقسث."
+
+#: lms/templates/learner_dashboard/program_details_view_2017.underscore
+msgid "COURSES IN PROGRESS"
+msgstr "ذخعقسثس هر حقخلقثسس"
+
+#: lms/templates/learner_dashboard/program_details_view_2017.underscore
+msgid "REMAINING COURSES"
+msgstr "قثوشهرهرل ذخعقسثس"
+
+#: lms/templates/learner_dashboard/program_details_view_2017.underscore
+msgid "COMPLETED COURSES"
+msgstr "ذخوحمثفثي ذخعقسثس"
+
+#: lms/templates/learner_dashboard/program_details_view_2017.underscore
+msgid "As you complete courses, you will see them listed here."
+msgstr "شس غخع ذخوحمثفث ذخعقسثس, غخع صهمم سثث فاثو مهسفثي اثقث."
+
+#: lms/templates/learner_dashboard/program_details_view_2017.underscore
+msgid ""
+"Complete courses on your schedule to ensure you stand out in your field!"
+msgstr ""
+"ذخوحمثفث ذخعقسثس خر غخعق سذاثيعمث فخ ثرسعقث غخع سفشري خعف هر غخعق بهثمي!"
+
 #: lms/templates/learner_dashboard/program_header_view.underscore
+#: lms/templates/learner_dashboard/program_header_view_2017.underscore
 msgid "{organization}\\'s logo"
 msgstr "{organization}\\'س مخلخ"
 
@@ -7433,6 +7496,14 @@ msgstr ""
 #: lms/templates/learner_dashboard/upgrade_message.underscore
 msgid "Upgrade Now"
 msgstr "عحلقشيث رخص"
+
+#: lms/templates/learner_dashboard/upgrade_message_2017.underscore
+msgid "Needs verified certificate "
+msgstr "رثثيس دثقهبهثي ذثقفهبهذشفث "
+
+#: lms/templates/learner_dashboard/upgrade_message_2017.underscore
+msgid "Buy Certificate"
+msgstr "زعغ ذثقفهبهذشفث"
 
 #: lms/templates/search/course_search_results.underscore
 #: lms/templates/search/dashboard_search_results.underscore
@@ -9206,9 +9277,10 @@ msgid "Staff and Learners"
 msgstr "سفشبب شري مثشقرثقس"
 
 #: cms/templates/js/publish-xblock.underscore
-msgid "Some content in this unit is visible only to particular content groups"
+msgid ""
+"Some content in this unit is visible only to specific groups of learners."
 msgstr ""
-"سخوث ذخرفثرف هر فاهس عرهف هس دهسهزمث خرمغ فخ حشقفهذعمشق ذخرفثرف لقخعحس"
+"سخوث ذخرفثرف هر فاهس عرهف هس دهسهزمث خرمغ فخ سحثذهبهذ لقخعحس خب مثشقرثقس."
 
 #: cms/templates/js/publish-xblock.underscore
 #: cms/templates/js/staff-lock-editor.underscore

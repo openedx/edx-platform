@@ -63,9 +63,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-03-16 12:30+0000\n"
-"PO-Revision-Date: 2017-03-30 08:14+0000\n"
-"Last-Translator: Ned Batchelder <ned@edx.org>\n"
+"POT-Creation-Date: 2017-04-11 14:17+0000\n"
+"PO-Revision-Date: 2017-04-11 14:32+0000\n"
+"Last-Translator: Anthony Mangano <amangano@edx.org>\n"
 "Language-Team: Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -83,8 +83,8 @@ msgstr ""
 #: cms/static/js/views/edit_textbook.js
 #: cms/static/js/views/list_item_editor.js
 #: cms/static/js/views/modals/edit_xblock.js cms/static/js/views/tabs.js
-#: cms/static/js/views/utils/xblock_utils.js lms/static/js/ccx/schedule.js
-#: lms/static/js/views/fields.js
+#: cms/static/js/views/tabs.js.c cms/static/js/views/utils/xblock_utils.js
+#: lms/static/js/ccx/schedule.js lms/static/js/views/fields.js
 msgid "Saving"
 msgstr "שומר"
 
@@ -116,9 +116,8 @@ msgstr "מחק"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/certificates/views/signatory_editor.js
-#: cms/static/js/factories/export.js cms/static/js/views/asset.js
-#: cms/static/js/views/course_info_update.js
-#: cms/static/js/views/manage_users_and_roles.js
+#: cms/static/js/views/asset.js cms/static/js/views/course_info_update.js
+#: cms/static/js/views/export.js cms/static/js/views/manage_users_and_roles.js
 #: cms/static/js/views/modals/base_modal.js
 #: cms/static/js/views/modals/course_outline_modals.js
 #: cms/static/js/views/show_textbook.js cms/static/js/views/tabs.js
@@ -404,14 +403,6 @@ msgstr "{label}: {status}"
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "This problem has been reset."
 msgstr "הבעיה לא אותחלה."
-
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid ""
-"Answers to this problem are now shown. Navigate through the problem to "
-"review it with answers inline."
-msgstr ""
-"התשובות לבעיה זו מוצגות כעת. נווט דרך הבעיה כדי להציג אותה יחד עם כל "
-"התשובות."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "unsubmitted"
@@ -1607,9 +1598,9 @@ msgstr "מרווח אנכי"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: lms/templates/bookmarks/bookmarks-list.underscore
 #: lms/templates/search/course_search_item.underscore
 #: lms/templates/search/dashboard_search_item.underscore
+#: openedx/features/course_bookmarks/static/course_bookmarks/templates/bookmarks-list.underscore
 msgid "View"
 msgstr "הצג"
 
@@ -1722,7 +1713,6 @@ msgstr ""
 "צוות הקורס."
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
-#: lms/static/js/bookmarks/views/bookmark_button.js
 msgid "Bookmarked"
 msgstr "מסומן בסימניה"
 
@@ -1826,12 +1816,16 @@ msgid "on"
 msgstr "פועל"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
-msgid "Video position"
-msgstr "מיקום סרטון הווידאו"
+msgid "Video position. Press space to toggle playback"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "Video ended"
 msgstr "סרטון הווידאו הסתיים"
+
+#: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
+msgid "Video position"
+msgstr "מיקום סרטון הווידאו"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s hour"
@@ -2106,9 +2100,7 @@ msgid "Loading posts list"
 msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
-msgid ""
-"No results found for {original_query}. Showing results for "
-"{suggested_query}."
+msgid "No results found for {original_query}. "
 msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
@@ -2226,13 +2218,13 @@ msgstr "שוחרר על המטרה"
 
 #. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
 #: common/static/js/src/jquery.timeago.locale.js
-#, javascript-format
+#, c-format
 msgid "%s ago"
 msgstr "לפני %s"
 
 #. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
 #: common/static/js/src/jquery.timeago.locale.js
-#, javascript-format
+#, c-format
 msgid "%s from now"
 msgstr "%s מעכשיו"
 
@@ -2245,7 +2237,7 @@ msgid "about a minute"
 msgstr "בערך דקה"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, javascript-format
+#, c-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "דקה %d"
@@ -2256,7 +2248,7 @@ msgid "about an hour"
 msgstr "בערך שעה"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, javascript-format
+#, c-format
 msgid "about %d hour"
 msgid_plural "about %d hours"
 msgstr[0] "כשעה %d"
@@ -2267,7 +2259,7 @@ msgid "a day"
 msgstr "יום"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, javascript-format
+#, c-format
 msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] "יום %d"
@@ -2278,7 +2270,7 @@ msgid "about a month"
 msgstr "בערך חודש אחד"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, javascript-format
+#, c-format
 msgid "%d month"
 msgid_plural "%d months"
 msgstr[0] "חודש %d"
@@ -2289,7 +2281,7 @@ msgid "about a year"
 msgstr "כשנה"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, javascript-format
+#, c-format
 msgid "%d year"
 msgid_plural "%d years"
 msgstr[0] "שנה %d"
@@ -2702,8 +2694,6 @@ msgstr "לא ניתן להשלים את בקשתך. טען מחדש את הדף 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid ""
 "Your request could not be completed due to a server problem. Reload the page"
-" and try again. If the issue persists, click the Help tab to report the "
-"problem."
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
@@ -2980,31 +2970,12 @@ msgid "Heading"
 msgstr "כותרת עליונה"
 
 #: lms/static/js/ajax-error.js
-msgid ""
-"You have been logged out of your edX account. Click Okay to log in again "
-"now. Click Cancel to stay on this page (you must log in again to save your "
-"work)."
+msgid "You have been logged out of your edX account. "
 msgstr ""
 
 #: lms/static/js/api_admin/views/catalog_preview.js
 msgid "Preview this query"
 msgstr "תצוגה מקדימה לשאילתא זו"
-
-#: lms/static/js/bookmarks/views/bookmark_button.js
-#: lms/static/js/bookmarks/views/bookmarks_list.js
-#: lms/static/js/verify_student/views/make_payment_step_view.js
-msgid "An error has occurred. Please try again."
-msgstr "אירעה שגיאה. אנא נסה שוב."
-
-#: lms/static/js/bookmarks/views/bookmark_button.js
-msgid "Bookmark this page"
-msgstr "סמן עמוד זה"
-
-#: lms/static/js/bookmarks/views/bookmarks_list.js
-#: lms/static/js/instructor_dashboard/data_download.js
-#: lms/templates/search/search_loading.underscore
-msgid "Loading"
-msgstr "טוען"
 
 #: lms/static/js/ccx/schedule.js
 msgid "All subsections"
@@ -3014,7 +2985,8 @@ msgstr "כל תתי הקטעים"
 msgid "All units"
 msgstr "כל היחידות"
 
-#: lms/static/js/ccx/schedule.js lms/templates/ccx/schedule.underscore
+#: lms/static/js/ccx/schedule.js lms/static/js/ccx/schedule.js.c
+#: lms/templates/ccx/schedule.underscore
 msgid "Click to change"
 msgstr "לחץ לשינוי"
 
@@ -3022,7 +2994,7 @@ msgstr "לחץ לשינוי"
 msgid "Select a chapter"
 msgstr "בחר פרק"
 
-#: lms/static/js/ccx/schedule.js
+#: lms/static/js/ccx/schedule.js lms/static/js/ccx/schedule.js.c
 msgid "Save changes"
 msgstr "שמור שינויים"
 
@@ -3043,15 +3015,8 @@ msgid "Enter Start Date and Time"
 msgstr "הזן תאריך התחלה ושעה"
 
 #: lms/static/js/certificates/models/certificate_exception.js
-msgid ""
-"Student username/email field is required and can not be empty. Kindly fill "
-"in username/email and then press \"Add to Exception List\" button."
-msgstr ""
-
 #: lms/static/js/certificates/models/certificate_invalidation.js
-msgid ""
-"Student username/email field is required and can not be empty. Kindly fill "
-"in username/email and then press \"Invalidate Certificate\" button."
+msgid "Student username/email field is required and can not be empty. "
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
@@ -3067,15 +3032,15 @@ msgid " learner is successfully added to the exception list"
 msgstr " הלומד נוסף בהצלחה לרשימת החריגים"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " records are not in correct format and not added to the exception list"
+msgid " records are not in correct format and not added to"
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " record is not in correct format and not added to the exception list"
+msgid " record is not in correct format and not added to the exception"
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learners do not exist in LMS and not added to the exception list"
+msgid " learners do not exist in LMS and not added to the"
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
@@ -3083,20 +3048,19 @@ msgid " learner does not exist in LMS and not added to the exception list"
 msgstr " הלומד אינו קיים ב-LMS ולא נוסף לרשימת החריגים"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learners are already white listed and not added to the exception list"
+msgid " learners are already white listed and not added to"
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learner is already white listed and not added to the exception list"
+msgid " learner is already white listed and not added to the exception "
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid ""
-" learners are not enrolled in course and not added to the exception list"
+msgid " learners are not enrolled in course and not added to"
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learner is not enrolled in course and not added to the exception list"
+msgid " learner is not enrolled in course and not added to the exception"
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
@@ -3173,14 +3137,14 @@ msgid "An error occurred. Please try again later."
 msgstr "אירעה שגיאה. אנא נסה שוב מאוחר יותר."
 
 #: lms/static/js/discovery/views/search_form.js
-#, javascript-format
+#, c-format
 msgid "Viewing %s course"
 msgid_plural "Viewing %s courses"
 msgstr[0] "מציג קורס %s"
 msgstr[1] "מציג %s קורסים"
 
 #: lms/static/js/discovery/views/search_form.js
-#, javascript-format
+#, c-format
 msgid "We couldn't find any results for \"%s\"."
 msgstr "לא נמצאה אף תוצאה עבור \"%s\"."
 
@@ -3455,6 +3419,12 @@ msgstr "אירעה שגיאה בעת יצירת תוצאות סקר. נא נסה
 #: lms/static/js/instructor_dashboard/data_download.js
 msgid "Error generating student profile information. Please try again."
 msgstr "שגיאת בזמן יצירת פרופיל סטודנט. נא נסה שוב."
+
+#: lms/static/js/instructor_dashboard/data_download.js
+#: cms/templates/js/move-xblock-modal.underscore
+#: lms/templates/search/search_loading.underscore
+msgid "Loading"
+msgstr "טוען"
 
 #: lms/static/js/instructor_dashboard/data_download.js
 msgid "Error getting student list."
@@ -4068,8 +4038,13 @@ msgid ""
 msgstr ""
 "קישורים נוצרים לפי דרישה ותוקפם פג לאחר 5 דקות בגלל רגישות מידע על הסטודנט."
 
+#: lms/static/js/learner_dashboard/views/program_details_view_2017.js
+#: lms/templates/learner_dashboard/program_card.underscore
+msgid "Enrolled"
+msgstr ""
+
 #: lms/static/js/search/base/views/search_results_view.js
-#, javascript-format
+#, c-format
 msgid "%s result"
 msgid_plural "%s results"
 msgstr[0] "תוצאה %s"
@@ -4165,7 +4140,7 @@ msgid "We couldn't sign you in."
 msgstr "לא ניתן לחבר אותך."
 
 #: lms/static/js/student_account/views/LoginView.js
-#, javascript-format
+#, c-format
 msgid "An error occurred when signing you in to %s."
 msgstr ""
 
@@ -4179,10 +4154,7 @@ msgid ""
 "{paragraphStart}You entered {boldStart}{email}{boldEnd}. If this email "
 "address is associated with your {platform_name} account, we will send a "
 "message with password reset instructions to this email "
-"address.{paragraphEnd}{paragraphStart}If you do not receive a password reset"
-" message, verify that you entered the correct email address, or check your "
-"spam folder.{paragraphEnd}{paragraphStart}If you need further assistance, "
-"{anchorStart}contact technical support{anchorEnd}.{paragraphEnd}"
+"address.{paragraphEnd}"
 msgstr ""
 
 #: lms/static/js/student_account/views/LoginView.js
@@ -4194,8 +4166,7 @@ msgstr "אירעה שגיאה. נסה לרענן את הדף או בדוק את 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
 "You have successfully signed into %(currentProvider)s, but your "
-"%(currentProvider)s account does not have a linked %(platformName)s account."
-" To link your accounts, sign in now using your %(platformName)s password."
+"%(currentProvider)s"
 msgstr ""
 
 #: lms/static/js/student_account/views/RegisterView.js
@@ -4569,6 +4540,10 @@ msgid "Try the transaction again in a few minutes."
 msgstr "נסה לבצע את ההעברה שוב בעוד מספר דקות."
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
+msgid "An error has occurred. Please try again."
+msgstr "אירעה שגיאה. אנא נסה שוב."
+
+#: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Could not submit order"
 msgstr "לא ניתן לשלוח את ההזמנה"
 
@@ -4704,6 +4679,10 @@ msgstr ""
 "אינך יכול לצפות בקורס זה כסטודנט או משתמש בגרסת הבטא לפני תאריך ההשקה של "
 "הקורס."
 
+#: lms/templates/class_dashboard/all_section_metrics.js
+msgid "Unable to retrieve data, please try again later."
+msgstr ""
+
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
 msgid "%(num_students)s student opened Subsection"
 msgid_plural "%(num_students)s students opened Subsection"
@@ -4823,7 +4802,7 @@ msgid "Image must be in PNG format."
 msgstr "התמונה חייבת להיות בתבנית PNG."
 
 #: cms/static/js/collections/group.js
-#, javascript-format
+#, c-format
 msgid "Group %s"
 msgstr "קבוצה %s"
 
@@ -4835,61 +4814,8 @@ msgid "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 msgstr "אבגדהוזחטיכלמנסעפצקרשת"
 
 #: cms/static/js/factories/export.js
-msgid "There has been an error while exporting."
-msgstr "אירעה שגיאה במהלך הייצוא."
-
-#: cms/static/js/factories/export.js
-msgid ""
-"There has been a failure to export to XML at least one component. It is "
-"recommended that you go to the edit page and repair the error before "
-"attempting another export. Please check that all components on the page are "
-"valid and do not display any error messages."
+msgid "Your export has failed."
 msgstr ""
-"יצוא של רכיב אחד לפחות ל-XML, נכשל. מומלץ לגשת לעמוד העריכה ולתקן את השגיאה "
-"לפני ביצוע יצוא נוסף. אנא בדוק את חוקיות כל הרכיבים בעמוד וכי הם אינם מציגים"
-" הודעות שגיאה.  "
-
-#: cms/static/js/factories/export.js
-msgid "Correct failed component"
-msgstr "תקן רכיב כושל"
-
-#: cms/static/js/factories/export.js
-msgid "Return to Export"
-msgstr "חזור לייצוא"
-
-#: cms/static/js/factories/export.js
-msgid ""
-"Your library could not be exported to XML. There is not enough information "
-"to identify the failed component. Inspect your library to identify any "
-"problematic components and try again."
-msgstr ""
-"לא ניתן לייצא את ספרייתך לקובץ XML. אין מידע  במידה מספקת לזיהוי הרכיב "
-"הכושל. בדוק את ספרייתך, זהה רכיבים בעיתיים ולאחר מכן נסה שוב. "
-
-#: cms/static/js/factories/export.js
-msgid "Take me to the main library page"
-msgstr "עבור לעמוד הספריה הראשי"
-
-#: cms/static/js/factories/export.js
-msgid ""
-"Your course could not be exported to XML. There is not enough information to"
-" identify the failed component. Inspect your course to identify any "
-"problematic components and try again."
-msgstr ""
-"לא ניתן לייצא את הקורס ל-XML. אין מידע במידה מספקת על מנת לזהות את הרכיב "
-"הכושל. בדוק את הקורס שלך על מנת לזהות רכיבים בעייתים ונסה שוב. "
-
-#: cms/static/js/factories/export.js
-msgid "Take me to the main course page"
-msgstr "עבור לעמוד הקורס הראשי"
-
-#: cms/static/js/factories/export.js
-msgid "The raw error message is:"
-msgstr "הודעת השגיאה היא:"
-
-#: cms/static/js/factories/export.js
-msgid "There has been an error with your export."
-msgstr "אירעה שגיאה בייצוא שלך. "
 
 #: cms/static/js/factories/import.js
 msgid "There was an error while importing the new library to our database."
@@ -5147,9 +5073,7 @@ msgid "Upload failed for video {fileName}"
 msgstr ""
 
 #: cms/static/js/views/active_video_upload_list.js
-msgid ""
-"{filename} is not in a supported file format. Supported file formats are "
-"{supportedFileFormats}."
+msgid "{filename} is not in a supported file format. "
 msgstr ""
 
 #: cms/static/js/views/active_video_upload_list.js
@@ -5208,12 +5132,12 @@ msgstr ""
 msgid "Max file size exceeded"
 msgstr "הגודל המקסימלי של הקובץ חרג יתר על המידה"
 
-#: cms/static/js/views/assets.js
+#: cms/static/js/views/assets.js cms/static/js/views/assets.js.c
 #: cms/templates/js/asset-upload-modal.underscore
 msgid "Upload New File"
 msgstr "העלה קובץ חדש"
 
-#: cms/static/js/views/assets.js
+#: cms/static/js/views/assets.js cms/static/js/views/assets.js.c
 msgid "Load Another File"
 msgstr "טען קובץ אחר"
 
@@ -5270,6 +5194,50 @@ msgstr "העלה קובץ PDF חדש ל“<%= name %>”"
 #: cms/static/js/views/edit_chapter.js
 msgid "Please select a PDF file to upload."
 msgstr "אנא בחר קובץ PDF להעלאה."
+
+#: cms/static/js/views/export.js
+msgid "There has been an error while exporting."
+msgstr "אירעה שגיאה במהלך הייצוא."
+
+#: cms/static/js/views/export.js
+msgid "There has been a failure to export to XML at least one component. "
+msgstr ""
+
+#: cms/static/js/views/export.js
+msgid "Correct failed component"
+msgstr "תקן רכיב כושל"
+
+#: cms/static/js/views/export.js
+msgid "Return to Export"
+msgstr "חזור לייצוא"
+
+#: cms/static/js/views/export.js
+msgid ""
+"Your library could not be exported to XML. There is not enough information "
+"to "
+msgstr ""
+
+#: cms/static/js/views/export.js
+msgid "Take me to the main library page"
+msgstr "עבור לעמוד הספריה הראשי"
+
+#: cms/static/js/views/export.js
+msgid ""
+"Your course could not be exported to XML. There is not enough information to"
+" "
+msgstr ""
+
+#: cms/static/js/views/export.js
+msgid "Take me to the main course page"
+msgstr "עבור לעמוד הקורס הראשי"
+
+#: cms/static/js/views/export.js
+msgid "The raw error message is:"
+msgstr "הודעת השגיאה היא:"
+
+#: cms/static/js/views/export.js
+msgid "There has been an error with your export."
+msgstr "אירעה שגיאה בייצוא שלך. "
 
 #. Translators: 'count' is number of groups that the group
 #. configuration contains.
@@ -5477,6 +5445,18 @@ msgstr "עורך: %(title)s"
 msgid "Component"
 msgstr "רכיב"
 
+#: cms/static/js/views/modals/move_xblock_modal.js
+msgid "Move"
+msgstr ""
+
+#: cms/static/js/views/modals/move_xblock_modal.js
+msgid "Choose a location to move your component to"
+msgstr ""
+
+#: cms/static/js/views/modals/move_xblock_modal.js
+msgid "Move: {displayName}"
+msgstr ""
+
 #: cms/static/js/views/modals/validation_error_modal.js
 msgid "Validation Error While Saving"
 msgstr "טעות אימות במהלך שמירה"
@@ -5488,6 +5468,35 @@ msgstr "בטל שינויים"
 #: cms/static/js/views/modals/validation_error_modal.js
 msgid "Change Manually"
 msgstr "שנה ידנית"
+
+#: cms/static/js/views/move_xblock_list.js
+msgid "Sections"
+msgstr ""
+
+#: cms/static/js/views/move_xblock_list.js
+msgid "Subsections"
+msgstr ""
+
+#: cms/static/js/views/move_xblock_list.js
+msgid "Units"
+msgstr ""
+
+#: cms/static/js/views/move_xblock_list.js
+msgid "Components"
+msgstr ""
+
+#: cms/templates/js/group-configuration-editor.underscore
+msgid "Groups"
+msgstr "קבוצות"
+
+#: cms/static/js/views/move_xblock_list.js
+msgid "This {parentCategory} has no {childCategory}"
+msgstr ""
+
+#: cms/templates/js/content-group-details.underscore
+#: cms/templates/js/group-configuration-details.underscore
+msgid "Course Outline"
+msgstr "מתווה קורס"
 
 #: cms/static/js/views/paged_container.js
 msgid "Date added"
@@ -5730,9 +5739,35 @@ msgstr ""
 "האורך המשולב של שדות הארגון וקוד הספרייה אינו יכול לעלות על <%=limit%> "
 "תווים."
 
+#: cms/static/js/views/utils/move_xblock_utils.js
+msgid "Success! \"{displayName}\" has been moved."
+msgstr ""
+
+#: cms/static/js/views/utils/move_xblock_utils.js
+msgid ""
+"Move cancelled. \"{sourceDisplayName}\" has been moved back to its original "
+"location."
+msgstr ""
+
+#: cms/static/js/views/utils/move_xblock_utils.js
+msgid "Undo move"
+msgstr ""
+
+#: cms/static/js/views/utils/move_xblock_utils.js
+msgid "Take me to the new location"
+msgstr ""
+
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Duplicating"
 msgstr "משכפל"
+
+#: cms/static/js/views/utils/xblock_utils.js
+msgid "Undo moving"
+msgstr ""
+
+#: cms/static/js/views/utils/xblock_utils.js
+msgid "Moving"
+msgstr ""
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Deleting this {xblock_type} is permanent and cannot be undone."
@@ -5910,6 +5945,14 @@ msgstr "התקרב"
 #: common/static/common/templates/image-modal.underscore
 msgid "Zoom Out"
 msgstr "התרחק"
+
+#: common/static/common/templates/sequence-breadcrumbs.underscore
+msgid "Return to course outline"
+msgstr ""
+
+#: common/static/common/templates/sequence-breadcrumbs.underscore
+msgid "Outline"
+msgstr ""
 
 #: common/static/common/templates/components/paging-footer.underscore
 #, python-format
@@ -6521,30 +6564,6 @@ msgstr ""
 msgid "This catalog's courses:"
 msgstr "הקורסים בקטלוג זה:"
 
-#: lms/templates/bookmarks/bookmarks-list.underscore
-msgid "My Bookmarks"
-msgstr "הסימניות שלי"
-
-#: lms/templates/bookmarks/bookmarks-list.underscore
-msgid "Bookmarked on"
-msgstr "הסימניה מופעלת"
-
-#: lms/templates/bookmarks/bookmarks-list.underscore
-msgid "You have not bookmarked any courseware pages yet."
-msgstr "עדיין לא סימנת בסימניה אף עמוד של תוכנת המחשב של הקורס."
-
-#: lms/templates/bookmarks/bookmarks-list.underscore
-msgid ""
-"Use bookmarks to help you easily return to courseware pages. To bookmark a "
-"page, select Bookmark in the upper right corner of that page. To see a list "
-"of all your bookmarks, select Bookmarks in the upper left corner of any "
-"courseware page."
-msgstr ""
-"השתמש בסימניות על מנת לסייע לך לחזור בקלות לעמודי תוכנת הקורס. כדי לסמן "
-"בסימניה עמוד, בחר 'סימניה' בפינה הימנית העליונה של עמוד זה. כדי לראות רשימה "
-"של כל הסימניות, בחר 'סימניות' בפינה השמאלית העליונה של כל אחד מעמודי תוכנת "
-"המחשב של הקורס."
-
 #: lms/templates/ccx/schedule.underscore
 msgid "Expand All"
 msgstr "הרחב הכל"
@@ -6727,11 +6746,13 @@ msgid "LEARN MORE"
 msgstr "למידע נוסף"
 
 #: lms/templates/discovery/course_card.underscore
+#: lms/templates/discovery/course_card_2017.underscore
 #, python-format
 msgid "Starts: %(start_date)s"
 msgstr "מתחיל: %(start_date)s"
 
 #: lms/templates/discovery/course_card.underscore
+#: lms/templates/discovery/course_card_2017.underscore
 msgid "Starts"
 msgstr "מתחיל"
 
@@ -7163,6 +7184,15 @@ msgstr "ברכות! הרווחת תעודה עבור קורס זה."
 msgid "View Certificate"
 msgstr "הצג תעודה"
 
+#: lms/templates/learner_dashboard/certificate_status_2017.underscore
+#: lms/templates/learner_dashboard/upgrade_message_2017.underscore
+msgid "Certificate Status:"
+msgstr ""
+
+#: lms/templates/learner_dashboard/certificate_status_2017.underscore
+msgid "Certificate Purchased"
+msgstr ""
+
 #: lms/templates/learner_dashboard/course_card.underscore
 #, python-format
 msgid "%(courseName)s Home Page."
@@ -7181,6 +7211,7 @@ msgid "View Archived Course"
 msgstr "צפה בארכיון הקורס"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
+#: lms/templates/learner_dashboard/program_card.underscore
 msgid "Not Enrolled"
 msgstr ""
 
@@ -7202,20 +7233,28 @@ msgid "Starts %(start)s"
 msgstr "מתחיל ב-%(start)s"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
+#: lms/templates/learner_dashboard/course_enroll_2017.underscore
 msgid "Enroll Now"
 msgstr "להרשמה"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
+#: lms/templates/learner_dashboard/course_enroll_2017.underscore
 msgid "Coming Soon"
 msgstr "בקרוב"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
+#: lms/templates/learner_dashboard/course_enroll_2017.underscore
 msgid "Enrollment Opens on"
 msgstr "הרישום נפתח ב"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
+#: lms/templates/learner_dashboard/course_enroll_2017.underscore
 msgid "Not Currently Available"
 msgstr "לא זמין כרגע"
+
+#: lms/templates/learner_dashboard/course_enroll_2017.underscore
+msgid "Choose a course run:"
+msgstr ""
 
 #: lms/templates/learner_dashboard/empty_programs_list.underscore
 msgid "You are not enrolled in any programs yet."
@@ -7236,19 +7275,58 @@ msgid "Explore New Programs"
 msgstr "בחן תכניות חדשות"
 
 #: lms/templates/learner_dashboard/program_card.underscore
-#, python-format
-msgid ""
-"You have earned certificates in %(completed_courses)s of the "
-"%(total_courses)s courses so far."
+#: lms/templates/verify_student/enrollment_confirmation_step.underscore
+msgid "Course"
+msgid_plural "Courses"
+msgstr[0] ""
+msgstr[1] ""
+
+#: lms/templates/learner_dashboard/program_card.underscore
+msgid "Completed"
 msgstr ""
-"עד כה השגת תעודות ב-%(completed_courses)s קורסים מתוך %(total_courses)s."
 
 #: lms/templates/learner_dashboard/program_card.underscore
 #, python-format
 msgid "%(programName)s Home Page."
 msgstr "עמוד הבית של %(programName)s"
 
+#: lms/templates/learner_dashboard/program_details_view_2017.underscore
+msgid "Congratulations!"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_view_2017.underscore
+msgid "Your Program Journey"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_view_2017.underscore
+msgid ""
+"To complete the program, you must earn a verified certificate for each "
+"course."
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_view_2017.underscore
+msgid "COURSES IN PROGRESS"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_view_2017.underscore
+msgid "REMAINING COURSES"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_view_2017.underscore
+msgid "COMPLETED COURSES"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_view_2017.underscore
+msgid "As you complete courses, you will see them listed here."
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_view_2017.underscore
+msgid ""
+"Complete courses on your schedule to ensure you stand out in your field!"
+msgstr ""
+
 #: lms/templates/learner_dashboard/program_header_view.underscore
+#: lms/templates/learner_dashboard/program_header_view_2017.underscore
 msgid "{organization}\\'s logo"
 msgstr "הסמל של {organization}"
 
@@ -7273,6 +7351,14 @@ msgstr "אתה צריך תעודה בקורס זה כדי לקבל תעודת ת
 #: lms/templates/learner_dashboard/upgrade_message.underscore
 msgid "Upgrade Now"
 msgstr "שדרג עכשיו"
+
+#: lms/templates/learner_dashboard/upgrade_message_2017.underscore
+msgid "Needs verified certificate "
+msgstr ""
+
+#: lms/templates/learner_dashboard/upgrade_message_2017.underscore
+msgid "Buy Certificate"
+msgstr ""
 
 #: lms/templates/search/course_search_results.underscore
 #: lms/templates/search/dashboard_search_results.underscore
@@ -7522,10 +7608,6 @@ msgstr "אתה רשום כעת כסטודנט עם זהות מאומתת עבו�
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "A list of courses you have just enrolled in as a verified student"
 msgstr "רשימת קורסים להם נרשמת כסטודנט בעל זהות מאומתת. "
-
-#: lms/templates/verify_student/enrollment_confirmation_step.underscore
-msgid "Course"
-msgstr "קורס"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Explore your course!"
@@ -8054,6 +8136,20 @@ msgstr "צלם שוב תמונה"
 msgid "Take Photo"
 msgstr "צלם תמונה"
 
+#: openedx/features/course_bookmarks/static/course_bookmarks/templates/bookmarks-list.underscore
+msgid "Bookmarked on"
+msgstr "הסימניה מופעלת"
+
+#: openedx/features/course_bookmarks/static/course_bookmarks/templates/bookmarks-list.underscore
+msgid "You have not bookmarked any courseware pages yet"
+msgstr ""
+
+#: openedx/features/course_bookmarks/static/course_bookmarks/templates/bookmarks-list.underscore
+msgid ""
+"Use bookmarks to help you easily return to courseware pages. To bookmark a "
+"page, click \"Bookmark this page\" under the page title."
+msgstr ""
+
 #: cms/templates/js/access-editor.underscore
 msgid "Limit Access"
 msgstr "גישה מוגבלת"
@@ -8326,11 +8422,6 @@ msgid ""
 msgstr ""
 "קבוצת תוכן זו אינה בשימוש. הוסף קבוצת תוכן לכל יחידה מ{linkStart}תרשים "
 "הקורס{linkEnd}."
-
-#: cms/templates/js/content-group-details.underscore
-#: cms/templates/js/group-configuration-details.underscore
-msgid "Course Outline"
-msgstr "מתווה קורס"
 
 #: cms/templates/js/content-group-editor.underscore
 msgid "Content Group Name"
@@ -8788,10 +8879,6 @@ msgid "Group information"
 msgstr "מידע על הקבוצה"
 
 #: cms/templates/js/group-configuration-editor.underscore
-msgid "Groups"
-msgstr "קבוצות"
-
-#: cms/templates/js/group-configuration-editor.underscore
 msgid ""
 "Name of the groups that students will be assigned to, for example, Control, "
 "Video, Problems. You must have two or more groups."
@@ -8883,6 +8970,22 @@ msgstr "מזהה מיקום רכיב"
 #: cms/templates/js/video/metadata-translations-item.underscore
 msgid "Download"
 msgstr "הורד"
+
+#: cms/templates/js/move-xblock-list.underscore
+msgid "{categoryText} in {parentDisplayname}"
+msgstr ""
+
+#: cms/templates/js/move-xblock-list.underscore
+msgid "Current location"
+msgstr ""
+
+#: cms/templates/js/move-xblock-list.underscore
+msgid "View child items"
+msgstr ""
+
+#: cms/templates/js/move-xblock-list.underscore
+msgid "Currently selected"
+msgstr ""
 
 #: cms/templates/js/no-textbooks.underscore
 msgid "You haven't added any textbooks to this course yet."
@@ -8991,8 +9094,9 @@ msgid "Staff and Learners"
 msgstr "צוות ולומדים"
 
 #: cms/templates/js/publish-xblock.underscore
-msgid "Some content in this unit is visible only to particular content groups"
-msgstr "חלק מהתוכן ביחידה זו גלוי רק עבור קבוצות תוכן מסוימות"
+msgid ""
+"Some content in this unit is visible only to specific groups of learners."
+msgstr ""
 
 #: cms/templates/js/publish-xblock.underscore
 #: cms/templates/js/staff-lock-editor.underscore
