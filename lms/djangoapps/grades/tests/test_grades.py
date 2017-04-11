@@ -19,8 +19,8 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 from .utils import answer_problem
-from ..new.course_grade import CourseGradeFactory
-from ..new.subsection_grade import SubsectionGradeFactory
+from ..new.course_grade_factory import CourseGradeFactory
+from ..new.subsection_grade_factory import SubsectionGradeFactory
 
 
 @attr(shard=1)
@@ -78,7 +78,7 @@ class TestGradeIteration(SharedModuleStoreTestCase):
             self.assertIsNone(course_grade.letter_grade)
             self.assertEqual(course_grade.percent, 0.0)
 
-    @patch('lms.djangoapps.grades.new.course_grade.CourseGradeFactory.create')
+    @patch('lms.djangoapps.grades.new.course_grade_factory.CourseGradeFactory.create')
     def test_grading_exception(self, mock_course_grade):
         """Test that we correctly capture exception messages that bubble up from
         grading. Note that we only see errors at this level if the grading

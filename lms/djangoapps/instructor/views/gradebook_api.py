@@ -14,7 +14,7 @@ from opaque_keys.edx.keys import CourseKey
 from edxmako.shortcuts import render_to_response
 from courseware.courses import get_course_with_access
 from lms.djangoapps.instructor.views.api import require_level
-from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
+from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
 from xmodule.modulestore.django import modulestore
 
 

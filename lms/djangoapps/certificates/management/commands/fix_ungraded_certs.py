@@ -7,7 +7,7 @@ from optparse import make_option
 
 from certificates.models import GeneratedCertificate
 from courseware import courses
-from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
+from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
 
 
 log = logging.getLogger(__name__)
