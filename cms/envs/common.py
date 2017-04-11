@@ -103,6 +103,8 @@ from lms.envs.common import (
     CONTACT_EMAIL,
 
     DISABLE_ACCOUNT_ACTIVATION_REQUIREMENT_SWITCH,
+    # Video Image settings
+    VIDEO_IMAGE_SETTINGS,
 )
 from path import Path as path
 from warnings import simplefilter
@@ -1344,3 +1346,7 @@ PROFILE_IMAGE_SIZES_MAP = {
     'medium': 50,
     'small': 30
 }
+
+###################### VIDEO IMAGE STORAGE ######################
+
+VIDEO_IMAGE_DEFAULT_FILENAME = 'default_video_image.png'
