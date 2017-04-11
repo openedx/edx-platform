@@ -704,14 +704,17 @@ def execute_compile_sass(args):
         )
 
 
-@task
-@no_help
-def execute_webpack():
-    sh(cmd("$(npm bin)/webpack"))
+def execute_webpack(prod):
+    sh(cmd("NODE_ENV={node_env} STATIC_ROOT={static_root} $(npm bin)/webpack".format(
+        node_env="production" if prod else "development",
+        static_root=Env.get_django_setting("STATIC_ROOT", "lms")
+    )))
 
 
 def execute_webpack_watch():
-    run_background_process("$(npm bin)/webpack --watch --watch-poll=200")
+    run_background_process("STATIC_ROOT={static_root} $(npm bin)/webpack --watch --watch-poll=200".format(
+        static_root=Env.get_django_setting("STATIC_ROOT", "lms")
+    ))
 
 
 def get_parsed_option(command_opts, opt_key, default=None):
@@ -845,7 +848,7 @@ def update_assets(args):
     process_xmodule_assets()
     process_npm_assets()
     compile_coffeescript()
-    execute_webpack()
+    execute_webpack(prod=(args.settings != "devstack"))
 
     # Compile sass for themes and system
     execute_compile_sass(args)

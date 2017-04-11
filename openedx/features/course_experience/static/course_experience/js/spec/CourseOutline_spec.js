@@ -1,10 +1,10 @@
 /* globals Logger, loadFixtures */
 
-// import constants from 'edx-ui-toolkit/src/js/utils/constants';
+import { keys } from 'edx-ui-toolkit/src/js/utils/constants';
 
 import { CourseOutline } from '../CourseOutline';
 
-describe('Course outline factory', () => {
+describe('Course Outline factory', () => {
   let outline;  // eslint-disable-line no-unused-vars
 
   // Our block IDs are invalid DOM selectors unless we first escape `:`, `+` and `@`
@@ -40,7 +40,7 @@ describe('Course outline factory', () => {
         const current = document.querySelector(outlineIds.homeworkLabsAndDemos);
         const destination = document.querySelector(outlineIds.homeworkEssays);
 
-        triggerKeyListener(current, destination, 'ArrowDown');  // @TODO: Get these from the UI Toolkit
+        triggerKeyListener(current, destination, keys.down);
 
         expect(destination.focus).toHaveBeenCalled();
       });
@@ -49,7 +49,7 @@ describe('Course outline factory', () => {
         const current = document.querySelector(outlineIds.exampleWeek3BeSocial);
         const destination = document.querySelector(`${outlineIds.exampleWeek3BeSocial} > ol`);
 
-        triggerKeyListener(current, destination, 'ArrowDown');  // @TODO: Get these from the UI Toolkit
+        triggerKeyListener(current, destination, keys.down);
 
         expect(destination.focus).toHaveBeenCalled();
       });
@@ -58,7 +58,7 @@ describe('Course outline factory', () => {
         const current = document.querySelector(outlineIds.homeworkEssays);
         const destination = document.querySelector(outlineIds.exampleWeek3BeSocial);
 
-        triggerKeyListener(current, destination, 'ArrowDown');  // @TODO: Get these from the UI Toolkit
+        triggerKeyListener(current, destination, keys.down);
 
         expect(destination.focus).toHaveBeenCalled();
       });
@@ -69,7 +69,7 @@ describe('Course outline factory', () => {
         const current = document.querySelector(outlineIds.homeworkEssays);
         const destination = document.querySelector(outlineIds.homeworkLabsAndDemos);
 
-        triggerKeyListener(current, destination, 'ArrowUp');  // @TODO: Get these from the UI Toolkit
+        triggerKeyListener(current, destination, keys.up);
 
         expect(destination.focus).toHaveBeenCalled();
       });
@@ -78,7 +78,7 @@ describe('Course outline factory', () => {
         const current = document.querySelector(outlineIds.lesson3BeSocial);
         const destination = document.querySelector(`${outlineIds.exampleWeek3BeSocial} > ol`);
 
-        triggerKeyListener(current, destination, 'ArrowUp');  // @TODO: Get these from the UI Toolkit
+        triggerKeyListener(current, destination, keys.up);
 
         expect(destination.focus).toHaveBeenCalled();
       });
@@ -87,7 +87,7 @@ describe('Course outline factory', () => {
         const current = document.querySelector(outlineIds.exampleWeek3BeSocial);
         const destination = document.querySelector(outlineIds.homeworkEssays);
 
-        triggerKeyListener(current, destination, 'ArrowUp');  // @TODO: Get these from the UI Toolkit
+        triggerKeyListener(current, destination, keys.up);
 
         expect(destination.focus).toHaveBeenCalled();
       });

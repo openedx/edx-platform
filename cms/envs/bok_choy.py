@@ -27,9 +27,6 @@ from .aws import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
 ######################### Testing overrides ####################################
 
-# Needed for the reset database management command
-INSTALLED_APPS += ('django_extensions',)
-
 # Redirect to the test_root folder within the repo
 TEST_ROOT = REPO_ROOT / "test_root"
 GITHUB_REPO_ROOT = (TEST_ROOT / "data").abspath()
