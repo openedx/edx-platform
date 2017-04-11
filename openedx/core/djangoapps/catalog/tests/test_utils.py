@@ -37,7 +37,7 @@ class TestGetPrograms(CatalogIntegrationMixin, TestCase):
 
         UserFactory(username=self.catalog_integration.service_username)
 
-    def assert_contract(self, call_args, program_uuid=None, types=None, expected_querystring=None):
+    def assert_contract(self, call_args, program_uuid=None, types=None):
         """Verify that API data retrieval utility is used correctly."""
         args, kwargs = call_args
 
@@ -58,17 +58,14 @@ class TestGetPrograms(CatalogIntegrationMixin, TestCase):
 
         self.assertEqual(kwargs['api']._store['base_url'], self.catalog_integration.internal_api_url)  # pylint: disable=protected-access
 
-        if expected_querystring:
-            querystring = expected_querystring
-        else:
-            querystring = {
-                'marketable': 1,
-                'exclude_utm': 1,
-            }
-            if program_uuid:
-                querystring['use_full_course_serializer'] = 1
-            if types:
-                querystring['types'] = types_param
+        querystring = {
+            'exclude_utm': 1,
+            'status': ('active', 'retired',),
+        }
+        if program_uuid:
+            querystring['use_full_course_serializer'] = 1
+        if types:
+            querystring['types'] = types_param
 
         self.assertEqual(kwargs['querystring'], querystring)
 
@@ -81,21 +78,6 @@ class TestGetPrograms(CatalogIntegrationMixin, TestCase):
         data = get_programs()
 
         self.assert_contract(mock_get_edx_api_data.call_args)
-        self.assertEqual(data, programs)
-
-    def test_get_programs_with_status_filtering(self, mock_get_edx_api_data):
-        """ The function should request active and retired programs when the Waffle switch is enabled. """
-        programs = ProgramFactory.create_batch(3)
-        mock_get_edx_api_data.return_value = programs
-
-        Switch.objects.get_or_create(name='display_retired_programs_on_learner_dashboard', defaults={'active': True})
-        data = get_programs()
-
-        expected_querystring = {
-            'exclude_utm': 1,
-            'status': ('active', 'retired',)
-        }
-        self.assert_contract(mock_get_edx_api_data.call_args, expected_querystring=expected_querystring)
         self.assertEqual(data, programs)
 
     def test_get_one_program(self, mock_get_edx_api_data):
