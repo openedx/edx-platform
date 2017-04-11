@@ -1757,10 +1757,9 @@ REQUIRE_JS_PATH_OVERRIDES = {
 WEBPACK_LOADER = {
     'DEFAULT': {
         'BUNDLE_DIR_NAME': 'bundles/',
-        'STATS_FILE': os.path.join(REPO_ROOT, 'webpack-stats.json'),
+        'STATS_FILE': os.path.join(STATIC_ROOT, 'webpack-stats.json')
     }
 }
-
 
 ########################## DJANGO DEBUG TOOLBAR ###############################
 
@@ -2037,6 +2036,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',  # only used in DEBUG mode
     'django_nose',
     'debug',
+    'django_extensions',
 
     # Discussion forums
     'django_comment_client',

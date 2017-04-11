@@ -170,7 +170,7 @@ function junitSettings(config) {
  * @param {String} pattern
  * @return {String}
  */
-// I'd like to change fix the no-shadow violation on the next line, but it would break this shared conf's API.
+// I'd like to fix the no-shadow violation on the next line, but it would break this shared conf's API.
 function defaultNormalizeFunc(appRoot, pattern) {  // eslint-disable-line no-shadow
     if (pattern.match(/^common\/js/)) {
         pattern = path.join(appRoot, '/common/static/' + pattern);
