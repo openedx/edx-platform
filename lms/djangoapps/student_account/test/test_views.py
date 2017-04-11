@@ -35,6 +35,7 @@ from commerce.models import CommerceConfiguration
 from commerce.tests import factories
 from commerce.tests.mocks import mock_get_orders
 from course_modes.models import CourseMode
+from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from openedx.core.djangoapps.user_api.accounts.api import activate_account, create_account
@@ -520,6 +521,26 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         return urlencode({
             'next': '/account/finish_auth?{}'.format(urlencode(params))
         })
+
+    def test_english_by_default(self):
+        response = self.client.get(reverse('signin_user'), [], HTTP_ACCEPT="text/html")
+
+        self.assertEqual(response['Content-Language'], 'en')
+
+    def test_unsupported_language(self):
+        response = self.client.get(reverse('signin_user'), [], HTTP_ACCEPT="text/html", HTTP_ACCEPT_LANGUAGE="ts-zx")
+
+        self.assertEqual(response['Content-Language'], 'en')
+
+    def test_browser_language(self):
+        response = self.client.get(reverse('signin_user'), [], HTTP_ACCEPT="text/html", HTTP_ACCEPT_LANGUAGE="es")
+
+        self.assertEqual(response['Content-Language'], 'es-419')
+
+    def test_browser_language_dialent(self):
+        response = self.client.get(reverse('signin_user'), [], HTTP_ACCEPT="text/html", HTTP_ACCEPT_LANGUAGE="es-es")
+
+        self.assertEqual(response['Content-Language'], 'es-es')
 
 
 class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase, ProgramsApiConfigMixin):
