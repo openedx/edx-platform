@@ -101,7 +101,7 @@ class Command(BaseCommand):
                 kwargs=kwargs,
                 options=task_options,
             )
-            log.info("Persistent grades: Created {task_name}[{task_id}] with arguments {kwargs}".format(
+            log.info("Grades: Created {task_name}[{task_id}] with arguments {kwargs}".format(
                 task_name=tasks.compute_grades_for_course.name,
                 task_id=result.task_id,
                 kwargs=kwargs,

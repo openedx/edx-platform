@@ -40,7 +40,7 @@ from lms.djangoapps.instructor_task.tests.test_base import (
     OPTION_2,
 )
 from capa.responsetypes import StudentInputError
-from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
+from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
 from openedx.core.lib.url_utils import quote_slashes
 
 

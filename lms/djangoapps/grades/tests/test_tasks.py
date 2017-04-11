@@ -154,10 +154,10 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
             self.assertEquals(mock_block_structure_create.call_count, 1)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 1, 26, True),
-        (ModuleStoreEnum.Type.mongo, 1, 23, False),
-        (ModuleStoreEnum.Type.split, 3, 25, True),
-        (ModuleStoreEnum.Type.split, 3, 22, False),
+        (ModuleStoreEnum.Type.mongo, 1, 28, True),
+        (ModuleStoreEnum.Type.mongo, 1, 24, False),
+        (ModuleStoreEnum.Type.split, 3, 27, True),
+        (ModuleStoreEnum.Type.split, 3, 23, False),
     )
     @ddt.unpack
     def test_query_counts(self, default_store, num_mongo_calls, num_sql_calls, create_multiple_subsections):
@@ -169,8 +169,8 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
                     self._apply_recalculate_subsection_grade()
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 1, 26),
-        (ModuleStoreEnum.Type.split, 3, 25),
+        (ModuleStoreEnum.Type.mongo, 1, 28),
+        (ModuleStoreEnum.Type.split, 3, 27),
     )
     @ddt.unpack
     def test_query_counts_dont_change_with_more_content(self, default_store, num_mongo_calls, num_sql_calls):
@@ -230,8 +230,8 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
             self.assertEqual(len(PersistentSubsectionGrade.bulk_read_grades(self.user.id, self.course.id)), 0)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 1, 24),
-        (ModuleStoreEnum.Type.split, 3, 23),
+        (ModuleStoreEnum.Type.mongo, 1, 25),
+        (ModuleStoreEnum.Type.split, 3, 24),
     )
     @ddt.unpack
     def test_persistent_grades_enabled_on_course(self, default_store, num_mongo_queries, num_sql_queries):
@@ -244,7 +244,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
             self.assertGreater(len(PersistentSubsectionGrade.bulk_read_grades(self.user.id, self.course.id)), 0)
 
     @patch('lms.djangoapps.grades.signals.signals.SUBSECTION_SCORE_CHANGED.send')
-    @patch('lms.djangoapps.grades.new.subsection_grade.SubsectionGradeFactory.update')
+    @patch('lms.djangoapps.grades.new.subsection_grade_factory.SubsectionGradeFactory.update')
     def test_retry_first_time_only(self, mock_update, mock_course_signal):
         """
         Ensures that a task retry completes after a one-time failure.
@@ -255,7 +255,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
         self.assertEquals(mock_course_signal.call_count, 1)
 
     @patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade_v3.retry')
-    @patch('lms.djangoapps.grades.new.subsection_grade.SubsectionGradeFactory.update')
+    @patch('lms.djangoapps.grades.new.subsection_grade_factory.SubsectionGradeFactory.update')
     def test_retry_on_integrity_error(self, mock_update, mock_retry):
         """
         Ensures that tasks will be retried if IntegrityErrors are encountered.
@@ -287,7 +287,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
 
         self._assert_retry_called(mock_retry)
         self.assertIn(
-            u"Persistent Grades: tasks._has_database_updated_with_new_score is False.",
+            u"Grades: tasks._has_database_updated_with_new_score is False.",
             mock_log.info.call_args_list[0][0][0]
         )
 
@@ -319,13 +319,13 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
         else:
             self._assert_retry_called(mock_retry)
             self.assertIn(
-                u"Persistent Grades: tasks._has_database_updated_with_new_score is False.",
+                u"Grades: tasks._has_database_updated_with_new_score is False.",
                 mock_log.info.call_args_list[0][0][0]
             )
 
     @patch('lms.djangoapps.grades.tasks.log')
     @patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade_v3.retry')
-    @patch('lms.djangoapps.grades.new.subsection_grade.SubsectionGradeFactory.update')
+    @patch('lms.djangoapps.grades.new.subsection_grade_factory.SubsectionGradeFactory.update')
     def test_log_unknown_error(self, mock_update, mock_retry, mock_log):
         """
         Ensures that unknown errors are logged before a retry.
@@ -338,7 +338,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
 
     @patch('lms.djangoapps.grades.tasks.log')
     @patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade_v3.retry')
-    @patch('lms.djangoapps.grades.new.subsection_grade.SubsectionGradeFactory.update')
+    @patch('lms.djangoapps.grades.new.subsection_grade_factory.SubsectionGradeFactory.update')
     def test_no_log_known_error(self, mock_update, mock_retry, mock_log):
         """
         Ensures that known errors are not logged before a retry.
@@ -395,7 +395,7 @@ class ComputeGradesForCourseTest(HasCourseWithProblemsMixin, ModuleStoreTestCase
         result = compute_grades_for_course.delay(
             course_key=six.text_type(self.course.id),
             batch_size=batch_size,
-            offset=4
+            offset=4,
         )
         self.assertTrue(result.successful)
         self.assertEqual(
@@ -409,8 +409,8 @@ class ComputeGradesForCourseTest(HasCourseWithProblemsMixin, ModuleStoreTestCase
 
     @ddt.data(*xrange(1, 12, 3))
     def test_database_calls(self, batch_size):
-        per_user_queries = 18 * min(batch_size, 6)  # No more than 6 due to offset
-        with self.assertNumQueries(3 + per_user_queries):
+        per_user_queries = 17 * min(batch_size, 6)  # No more than 6 due to offset
+        with self.assertNumQueries(5 + per_user_queries):
             with check_mongo_calls(1):
                 compute_grades_for_course.delay(
                     course_key=six.text_type(self.course.id),

@@ -33,7 +33,7 @@ from courseware.field_overrides import disable_overrides
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, assign_role
 from django_comment_common.utils import seed_permissions_roles
 from edxmako.shortcuts import render_to_response
-from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
+from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
 from opaque_keys.edx.keys import CourseKey
 from ccx_keys.locator import CCXLocator
 from student.roles import CourseCcxCoachRole

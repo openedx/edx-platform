@@ -26,7 +26,7 @@ import urllib
 import waffle
 
 from lms.djangoapps.gating.api import get_entrance_exam_score_ratio, get_entrance_exam_usage_key
-from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
+from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference

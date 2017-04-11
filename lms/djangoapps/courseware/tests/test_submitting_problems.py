@@ -22,7 +22,7 @@ from capa.tests.response_xml_factory import (
 from course_modes.models import CourseMode
 from courseware.models import StudentModule, BaseStudentModuleHistory
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
+from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
 from openedx.core.djangoapps.credit.api import (
     set_credit_requirements, get_credit_requirement_status
 )

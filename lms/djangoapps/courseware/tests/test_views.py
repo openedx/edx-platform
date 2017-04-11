@@ -46,6 +46,7 @@ from courseware.tests.factories import StudentModuleFactory, GlobalStaffFactory
 from courseware.url_helpers import get_redirect_url
 from courseware.user_state_client import DjangoXBlockUserStateClient
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
+from lms.djangoapps.grades.config.waffle import waffle as grades_waffle, ASSUME_ZERO_GRADE_IF_ABSENT
 from milestones.tests.utils import MilestonesTestCaseMixin
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
 from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory, CourseRunFactory
@@ -1440,18 +1441,24 @@ class ProgressPageTests(ModuleStoreTestCase):
         """Test that query counts remain the same for self-paced and instructor-paced courses."""
         SelfPacedConfiguration(enabled=self_paced_enabled).save()
         self.setup_course(self_paced=self_paced)
-        with self.assertNumQueries(41), check_mongo_calls(4):
+        with self.assertNumQueries(42), check_mongo_calls(1):
             self._get_progress_page()
 
-    def test_progress_queries(self):
+    @ddt.data(
+        (False, 42, 28),
+        (True, 35, 24)
+    )
+    @ddt.unpack
+    def test_progress_queries(self, enable_waffle, initial, subsequent):
         self.setup_course()
-        with self.assertNumQueries(41), check_mongo_calls(4):
-            self._get_progress_page()
-
-        # subsequent accesses to the progress page require fewer queries.
-        for _ in range(2):
-            with self.assertNumQueries(27), check_mongo_calls(4):
+        with grades_waffle().override_in_model(ASSUME_ZERO_GRADE_IF_ABSENT, active=enable_waffle):
+            with self.assertNumQueries(initial), check_mongo_calls(1):
                 self._get_progress_page()
+
+            # subsequent accesses to the progress page require fewer queries.
+            for _ in range(2):
+                with self.assertNumQueries(subsequent), check_mongo_calls(1):
+                    self._get_progress_page()
 
     @patch(
         'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
