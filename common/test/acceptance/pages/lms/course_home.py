@@ -54,7 +54,7 @@ class CourseOutlinePage(PageObject):
     url = None
 
     SECTION_SELECTOR = '.outline-item.section:nth-of-type({0})'
-    SECTION_TITLES_SELECTOR = '.section-name span'
+    SECTION_TITLES_SELECTOR = '.section-name h3'
     SUBSECTION_SELECTOR = SECTION_SELECTOR + ' .subsection:nth-of-type({1}) .outline-item'
     SUBSECTION_TITLES_SELECTOR = SECTION_SELECTOR + ' .subsection .subsection-title'
     OUTLINE_RESUME_COURSE_SELECTOR = '.outline-item .resume-right'
