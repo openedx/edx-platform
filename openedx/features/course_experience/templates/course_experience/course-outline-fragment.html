@@ -44,9 +44,9 @@ from django.utils.translation import ugettext as _
 
                                     <div class="details">
                                         ## There are behavior differences between rendering of subsections which have
-                                        ## special_exam/timed examinations and those that do not.
+                                        ## exams (timed, graded, etc) and those that do not.
                                         ##
-                                        ## Proctoring exposes a exam status message field as well as a status icon
+                                        ## Exam subsections expose exam status message field as well as a status icon
                                         <%
                                             if subsection.get('due') is None:
                                                 data_string = subsection.get('format')
@@ -59,7 +59,7 @@ from django.utils.translation import ugettext as _
                                         % if subsection.get('format') or 'special_exam_info' in subsection:
                                         <span class="subtitle">
                                             % if 'special_exam' in subsection:
-                                                ## Display the proctored exam status icon and status message
+                                                ## Display the exam status icon and status message
                                                 <span
                                                     class="menu-icon icon fa ${subsection['special_exam_info'].get('suggested_icon', 'fa-pencil-square-o')} ${subsection['special_exam_info'].get('status', 'eligible')}"
                                                     aria-hidden="true"
@@ -68,7 +68,7 @@ from django.utils.translation import ugettext as _
                                                     ${subsection['special_exam_info'].get('short_description', '')}
                                                 </span>
 
-                                                ## completed proctored exam statuses should not show the due date
+                                                ## completed exam statuses should not show the due date
                                                 ## since the exam has already been submitted by the user
                                                 % if not subsection['special_exam_info'].get('in_completed_state', False):
                                                     <span
@@ -80,7 +80,7 @@ from django.utils.translation import ugettext as _
                                                     ></span>
                                                 % endif
                                             % else:
-                                                ## non-proctored section, we just show the exam format and the due date
+                                                ## non-graded section, we just show the exam format and the due date
                                                 ## this is the standard case in edx-platform
                                                 <span
                                                     class="localized-datetime subtitle-name"
