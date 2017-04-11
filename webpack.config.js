@@ -1,3 +1,7 @@
+/* eslint-env node */
+
+'use strict';
+
 var path = require('path');
 var webpack = require('webpack');
 var BundleTracker = require('webpack-bundle-tracker');
@@ -13,7 +17,7 @@ var wpconfig = {
 
     output: {
         path: path.resolve(__dirname, 'common/static/bundles'),
-        filename: '[name]-[hash].js',
+        filename: isProd ? '[name].[chunkhash].js' : '[name].js',
         libraryTarget: 'window'
     },
 
@@ -29,7 +33,8 @@ var wpconfig = {
             debug: !isProd
         }),
         new BundleTracker({
-            filename: './webpack-stats.json'
+            path: process.env.STATIC_ROOT,
+            filename: 'webpack-stats.json'
         })
     ],
 
