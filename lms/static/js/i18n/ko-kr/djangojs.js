@@ -165,7 +165,6 @@
     "Could not submit photos": "\uc0ac\uc9c4\uc744 \uc81c\ucd9c \ud560 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4.", 
     "Country": "\uad6d\uac00", 
     "Country or Region": "\uad6d\uac00", 
-    "Course": "\uac15\uc88c", 
     "Create a new account": "\uac00\uc785\ud558\uae30", 
     "Create an account": "\uac00\uc785\ud558\uae30", 
     "Create an account using": "\uacc4\uc815 \uc5f0\ub3d9\ud558\uae30", 
