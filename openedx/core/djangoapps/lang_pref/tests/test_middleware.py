@@ -4,6 +4,7 @@ Tests for lang_pref middleware.
 
 import mock
 
+import ddt
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.contrib.sessions.middleware import SessionMiddleware
@@ -16,6 +17,7 @@ from student.tests.factories import UserFactory
 from student.tests.factories import AnonymousUserFactory
 
 
+@ddt.ddt
 class TestUserPreferenceMiddleware(TestCase):
     """
     Tests to make sure user preferences are getting properly set in the middleware.
@@ -66,15 +68,17 @@ class TestUserPreferenceMiddleware(TestCase):
 
     @mock.patch(
         'openedx.core.djangoapps.lang_pref.middleware.released_languages',
-        mock.Mock(return_value=[('eo', 'dummy Esperanto'), ('ar', 'arabic')])
+        mock.Mock(return_value=[('eo', 'dummy Esperanto'), ('ar', 'arabic'), ('eu-es', 'euskara (Espainia)')])
     )
-    def test_supported_browser_language_in_session(self):
+    @ddt.data('ar;q=1.0', 'eu;q=1.0', 'es-419;q=1.0')
+    def test_browser_language_in_session_for_unauthenticated_user(self, accept_language):
         """
-        test: browser language should be set in user session if it is supported by system for unauthenticated user.
+        test: browser language should not be set in user session for unauthenticated user.
         """
+        self.request.META['HTTP_ACCEPT_LANGUAGE'] = accept_language  # pylint: disable=no-member
         self.request.user = self.anonymous_user
         self.middleware.process_request(self.request)
-        self.assertEqual(self.request.session[LANGUAGE_SESSION_KEY], 'ar')   # pylint: disable=no-member
+        self.assertNotIn(LANGUAGE_SESSION_KEY, self.request.session)   # pylint: disable=no-member
 
     @mock.patch(
         'openedx.core.djangoapps.lang_pref.middleware.released_languages',
@@ -100,30 +104,3 @@ class TestUserPreferenceMiddleware(TestCase):
         set_user_preference(self.user, LANGUAGE_KEY, 'eo')
         self.middleware.process_request(self.request)
         self.assertEqual(get_user_preference(self.request.user, LANGUAGE_KEY), None)
-
-    @mock.patch(
-        'openedx.core.djangoapps.lang_pref.middleware.released_languages',
-        mock.Mock(return_value=[('eu-es', 'euskara (Espainia)'), ('en', 'english')])
-    )
-    def test_supported_browser_language_prefix_in_session(self):
-        """
-        test: browser language should be set in user session if it's prefix is supported by system for
-        unathenticated users
-        """
-        self.request.META['HTTP_ACCEPT_LANGUAGE'] = 'eu;q=1.0'  # pylint: disable=no-member
-        self.request.user = self.anonymous_user
-        self.middleware.process_request(self.request)
-        self.assertEqual(self.request.session.get(LANGUAGE_SESSION_KEY), 'eu-es')  # pylint: disable=no-member
-
-    @mock.patch(
-        'openedx.core.djangoapps.lang_pref.middleware.released_languages',
-        mock.Mock(return_value=[('en', 'english')])
-    )
-    def test_unsupported_browser_language_prefix(self):
-        """
-        test: browser language should not be set in user session if it's prefix is not supported by system.
-        """
-        self.request.META['HTTP_ACCEPT_LANGUAGE'] = 'eu;q=1.0'  # pylint: disable=no-member
-        self.request.user = self.anonymous_user
-        self.middleware.process_request(self.request)
-        self.assertNotEqual(self.request.session.get(LANGUAGE_SESSION_KEY), 'eu-es')   # pylint: disable=no-member

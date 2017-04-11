@@ -119,6 +119,7 @@ class SystemTestSuite(NoseTestSuite):
 
         self.processes = kwargs.get('processes', None)
         self.randomize = kwargs.get('randomize', None)
+        self.settings = kwargs.get('settings', 'test')
 
         if self.processes is None:
             # Don't use multiprocessing by default
@@ -148,7 +149,7 @@ class SystemTestSuite(NoseTestSuite):
             '--verbosity={}'.format(self.verbosity),
             self.test_id,
         ] + self.test_options_flags + [
-            '--settings=test',
+            '--settings', self.settings,
             self.extra_args,
             '--xunitmp-file={}'.format(self.report_dir / "nosetests.xml"),
             '--with-database-isolation',
