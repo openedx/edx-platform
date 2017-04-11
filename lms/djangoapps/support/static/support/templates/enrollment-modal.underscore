@@ -21,6 +21,10 @@
     <label class="sr" for="enrollment-reason-other"><%- gettext("Explain if other.") %></label>
     <input class="enrollment-reason-other" id="enrollment-reason-other" type="text" placeholder="<%- gettext('Explain if other.') %>" />
   </div>
+  <div class="enrolment-regenerate-cert-note">
+    <span>Note: </span>
+    <span>This would also invalidate user certificate if it exists. After updating user enrolment, you may want to generate user certificate as well.</span>
+  </div>
   <button class="enrollment-change-submit"><%- gettext("Submit enrollment change") %></button>
   <button class="enrollment-change-cancel"><%- gettext("Cancel") %></button>
 </form>

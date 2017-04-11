@@ -12,6 +12,7 @@ from rest_framework.generics import GenericAPIView
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
+from certificates import api as cert_api
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response
 from enrollment.api import get_enrollments, update_enrollment
@@ -111,6 +112,11 @@ class EnrollmentSupportListView(GenericAPIView):
                     reason=reason,
                     enrollment=enrollment
                 )
+                # Invalidate user certificate after enrolment has changed.
+                user_certificate = cert_api.get_certificate_for_user(user, course_key, format=False)
+                if user_certificate:
+                    # Invalidate if certificate exists.
+                    user_certificate.invalidate()
                 return JsonResponse(ManualEnrollmentSerializer(instance=manual_enrollment).data)
         except CourseModeNotFoundError as err:
             return HttpResponseBadRequest(err.message)
