@@ -1,16 +1,6 @@
 #!/usr/bin/env bash
 set -e
 
-###############################################################################
-#
-# Usage:
-#   To run just tests, without pa11ycrawler:
-#       ./scripts/accessibility-tests.sh
-#
-#   To run tests, followed by pa11ycrawler:
-#       RUN_PA11YCRAWLER=1 ./scripts/accessibility-tests.sh
-#
-###############################################################################
 
 echo "Setting up for accessibility tests..."
 source scripts/jenkins-common.sh
@@ -21,17 +11,11 @@ SELENIUM_BROWSER=phantomjs paver test_a11y --with-xunitmp
 echo "Generating coverage report..."
 paver a11y_coverage
 
-# Force the following if statement to always be true
-RUN_PA11YCRAWLER=1
+# The settings that we use are installed with the pa11ycrawler module
+export SCRAPY_SETTINGS_MODULE='pa11ycrawler.settings'
 
-if [ "$RUN_PA11YCRAWLER" = "1" ]
-then
-    # The settings that we use are installed with the pa11ycrawler module
-    export SCRAPY_SETTINGS_MODULE='pa11ycrawler.settings'
+echo "Running pa11ycrawler against test course..."
+paver pa11ycrawler --fasttest --skip-clean --fetch-course --with-html
 
-    echo "Running pa11ycrawler against test course..."
-    paver pa11ycrawler --fasttest --skip-clean --fetch-course --with-html
-
-    echo "Generating coverage report..."
-    paver pa11ycrawler_coverage
-fi
+echo "Generating pa11ycrawler coverage report..."
+paver pa11ycrawler_coverage
