@@ -1570,6 +1570,9 @@ class CourseEnrollment(models.Model):
 
         # If it is after the refundable cutoff date they should not be refunded.
         refund_cutoff_date = self.refund_cutoff_date()
+        log.info("refund_cutoff_date = %s,  \n",
+                 refund_cutoff_date,)
+        
         if refund_cutoff_date and datetime.now(UTC) > refund_cutoff_date:
             return False
 
