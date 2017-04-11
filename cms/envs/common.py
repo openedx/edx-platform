@@ -859,6 +859,7 @@ INSTALLED_APPS = (
 
     # Maintenance tools
     'maintenance',
+    'django_extensions',
 
     # Tracking
     'track',
