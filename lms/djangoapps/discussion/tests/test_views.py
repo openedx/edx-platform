@@ -34,12 +34,12 @@ from xmodule.modulestore.tests.django_utils import (
 )
 from xmodule.modulestore.tests.factories import check_mongo_calls, CourseFactory, ItemFactory
 
-from courseware.courses import UserNotEnrolled
 from nose.tools import assert_true
 from mock import patch, Mock, ANY, call
 
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 
+from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
 
 log = logging.getLogger(__name__)
@@ -1574,7 +1574,7 @@ class EnrollmentTestCase(ForumsEnableMixin, ModuleStoreTestCase):
         mock_request.side_effect = make_mock_request_impl(course=self.course, text='dummy')
         request = RequestFactory().get('dummy_url')
         request.user = self.student
-        with self.assertRaises(UserNotEnrolled):
+        with self.assertRaises(CourseAccessRedirect):
             views.forum_form_discussion(request, course_id=self.course.id.to_deprecated_string())
 
 

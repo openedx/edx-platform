@@ -5,8 +5,7 @@ Views to show a course outline.
 from django.core.context_processors import csrf
 from django.template.loader import render_to_string
 
-from courseware.courses import get_course_with_access
-from lms.djangoapps.courseware.views.views import get_last_accessed_courseware
+from courseware.courses import get_course_with_access, get_last_accessed_courseware
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView

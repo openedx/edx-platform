@@ -21,6 +21,7 @@ from courseware.courses import (
     get_course_info_section,
     get_course_overview_with_access,
     get_course_with_access,
+    get_current_child,
 )
 from courseware.module_render import get_module_for_descriptor
 from courseware.model_data import FieldDataCache
@@ -159,6 +160,23 @@ class CoursesTest(ModuleStoreTestCase):
                 expected_courses,
                 "testing get_courses with filter_={}".format(filter_),
             )
+
+    def test_get_current_child(self):
+        mock_xmodule = mock.MagicMock()
+        self.assertIsNone(get_current_child(mock_xmodule))
+
+        mock_xmodule.position = -1
+        mock_xmodule.get_display_items.return_value = ['one', 'two', 'three']
+        self.assertEqual(get_current_child(mock_xmodule), 'one')
+
+        mock_xmodule.position = 2
+        self.assertEqual(get_current_child(mock_xmodule), 'two')
+        self.assertEqual(get_current_child(mock_xmodule, requested_child='first'), 'one')
+        self.assertEqual(get_current_child(mock_xmodule, requested_child='last'), 'three')
+
+        mock_xmodule.position = 3
+        mock_xmodule.get_display_items.return_value = []
+        self.assertIsNone(get_current_child(mock_xmodule))
 
 
 @attr(shard=1)
