@@ -177,6 +177,8 @@ class SurveyAnswer(TimeStampedModel):
         Returns whether a user has any answers for a given SurveyForm for a course
         This can be used to determine if a user has taken a CourseSurvey.
         """
+        if user.is_anonymous():
+            return False
         return SurveyAnswer.objects.filter(form=form, user=user).exists()
 
     @classmethod
