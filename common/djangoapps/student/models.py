@@ -1563,7 +1563,7 @@ class CourseEnrollment(models.Model):
         # If the student has already been given a certificate they should not be refunded
         if user_already_has_certs_for is not None:
             if self.course_id in user_already_has_certs_for:
-                  log.info("course id is in the certificates, %s,  \n", self.course_id)
+                log.info("course id is in the certificates, %s,  \n", self.course_id)
                 return False
         else:
             if GeneratedCertificate.certificate_for_student(self.user, self.course_id) is not None:
