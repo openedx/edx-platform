@@ -9,6 +9,7 @@
         'js/learner_dashboard/models/course_enroll_model',
         'js/learner_dashboard/views/upgrade_message_view_2017',
         'js/learner_dashboard/views/certificate_status_view_2017',
+        'js/learner_dashboard/views/expired_notification_view',
         'js/learner_dashboard/views/course_enroll_view_2017',
         'text!../../../templates/learner_dashboard/course_card_2017.underscore'
     ],
@@ -21,6 +22,7 @@
              EnrollModel,
              UpgradeMessageView,
              CertificateStatusView,
+             ExpiredNotificationView,
              CourseEnrollView,
              pageTpl
          ) {
@@ -50,7 +52,8 @@
 
                  postRender: function() {
                      var $upgradeMessage = this.$('.upgrade-message'),
-                         $certStatus = this.$('.certificate-status');
+                         $certStatus = this.$('.certificate-status'),
+                         $expiredNotification = this.$('.expired-notification');
 
                      this.enrollView = new CourseEnrollView({
                          $parentEl: this.$('.course-actions'),
@@ -77,6 +80,13 @@
                         // Styles are applied to these elements which will be visible if they're empty.
                          $upgradeMessage.remove();
                          $certStatus.remove();
+                     }
+
+                     if (this.model.get('expired')) {
+                         this.expiredNotification = new ExpiredNotificationView({
+                             $el: $expiredNotification,
+                             model: this.model
+                         });
                      }
                  }
              });
