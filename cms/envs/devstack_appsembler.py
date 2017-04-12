@@ -11,8 +11,6 @@ INSTALLED_APPS += (
 
 OAUTH_ENFORCE_SECURE = False
 
-AMC_APP_URL = ENV_TOKENS.get('AMC_APP_URL')
-
 # disable caching in dev environment
 for cache_key in CACHES.keys():
     CACHES[cache_key]['BACKEND'] = 'django.core.cache.backends.dummy.DummyCache'
@@ -30,7 +28,7 @@ MIDDLEWARE_CLASSES += ('organizations.middleware.OrganizationMiddleware', 'tiers
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
 TIERS_ORGANIZATION_MODEL = 'organizations.Organization'
-TIERS_EXPIRED_REDIRECT_URL = AMC_APP_URL + "/expired"
+TIERS_EXPIRED_REDIRECT_URL = None
 
 TIERS_DATABASE_URL = AUTH_TOKENS.get('TIERS_DATABASE_URL')
 DATABASES['tiers'] = dj_database_url.parse(TIERS_DATABASE_URL)
