@@ -49,6 +49,7 @@ from django.utils.translation import ugettext as _
                                         ## Exam subsections expose exam status message field as well as a status icon
                                         <%
                                             if subsection.get('due') is None:
+                                                # examples: Homework, Lab, etc.
                                                 data_string = subsection.get('format')
                                             else:
                                                 if 'special_exam_info' in subsection:
