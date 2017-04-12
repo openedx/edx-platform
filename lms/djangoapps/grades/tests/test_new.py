@@ -25,12 +25,13 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.utils import TEST_DATA_DIR
 from xmodule.modulestore.xml_importer import import_course_from_xml
 
-from ..config.waffle import waffle, ASSUME_ZERO_GRADE_IF_ABSENT
+from ..config.waffle import waffle, ASSUME_ZERO_GRADE_IF_ABSENT, WRITE_ONLY_IF_ENGAGED
 from ..models import PersistentSubsectionGrade
 from ..new.course_data import CourseData
 from ..new.course_grade_factory import CourseGradeFactory
 from ..new.course_grade import ZeroCourseGrade, CourseGrade
-from ..new.subsection_grade_factory import SubsectionGrade, SubsectionGradeFactory
+from ..new.subsection_grade_factory import SubsectionGradeFactory
+from ..new.subsection_grade import ZeroSubsectionGrade, SubsectionGrade
 from .utils import mock_get_score, mock_get_submissions_score
 
 
@@ -42,52 +43,63 @@ class GradeTestBase(SharedModuleStoreTestCase):
     def setUpClass(cls):
         super(GradeTestBase, cls).setUpClass()
         cls.course = CourseFactory.create()
-        cls.chapter = ItemFactory.create(
-            parent=cls.course,
-            category="chapter",
-            display_name="Test Chapter"
-        )
-        cls.sequence = ItemFactory.create(
-            parent=cls.chapter,
-            category='sequential',
-            display_name="Test Sequential 1",
-            graded=True,
-            format="Homework"
-        )
-        cls.vertical = ItemFactory.create(
-            parent=cls.sequence,
-            category='vertical',
-            display_name='Test Vertical 1'
-        )
-        problem_xml = MultipleChoiceResponseXMLFactory().build_xml(
-            question_text='The correct answer is Choice 3',
-            choices=[False, False, True, False],
-            choice_names=['choice_0', 'choice_1', 'choice_2', 'choice_3']
-        )
-        cls.problem = ItemFactory.create(
-            parent=cls.vertical,
-            category="problem",
-            display_name="Test Problem",
-            data=problem_xml
-        )
+        with cls.store.bulk_operations(cls.course.id):
+            cls.chapter = ItemFactory.create(
+                parent=cls.course,
+                category="chapter",
+                display_name="Test Chapter"
+            )
+            cls.sequence = ItemFactory.create(
+                parent=cls.chapter,
+                category='sequential',
+                display_name="Test Sequential 1",
+                graded=True,
+                format="Homework"
+            )
+            cls.vertical = ItemFactory.create(
+                parent=cls.sequence,
+                category='vertical',
+                display_name='Test Vertical 1'
+            )
+            problem_xml = MultipleChoiceResponseXMLFactory().build_xml(
+                question_text='The correct answer is Choice 3',
+                choices=[False, False, True, False],
+                choice_names=['choice_0', 'choice_1', 'choice_2', 'choice_3']
+            )
+            cls.problem = ItemFactory.create(
+                parent=cls.vertical,
+                category="problem",
+                display_name="Test Problem",
+                data=problem_xml
+            )
+            cls.sequence2 = ItemFactory.create(
+                parent=cls.chapter,
+                category='sequential',
+                display_name="Test Sequential 2",
+                graded=True,
+                format="Homework"
+            )
+            cls.problem2 = ItemFactory.create(
+                parent=cls.sequence2,
+                category="problem",
+                display_name="Test Problem",
+                data=problem_xml
+            )
 
     def setUp(self):
         super(GradeTestBase, self).setUp()
         self.request = get_mock_request(UserFactory())
         self.client.login(username=self.request.user.username, password="test")
+        self._update_grading_policy()
         self.course_structure = get_course_blocks(self.request.user, self.course.location)
         self.subsection_grade_factory = SubsectionGradeFactory(self.request.user, self.course, self.course_structure)
         CourseEnrollment.enroll(self.request.user, self.course.id)
 
-
-@ddt.ddt
-class TestCourseGradeFactory(GradeTestBase):
-    """
-    Test that CourseGrades are calculated properly
-    """
-    def setUp(self):
-        super(TestCourseGradeFactory, self).setUp()
-        grading_policy = {
+    def _update_grading_policy(self, passing=0.5):
+        """
+        Updates the course's grading policy.
+        """
+        self.grading_policy = {
             "GRADER": [
                 {
                     "type": "Homework",
@@ -98,10 +110,27 @@ class TestCourseGradeFactory(GradeTestBase):
                 },
             ],
             "GRADE_CUTOFFS": {
-                "Pass": 0.5,
+                "Pass": passing,
             },
         }
-        self.course.set_grading_policy(grading_policy)
+        self.course.set_grading_policy(self.grading_policy)
+        self.store.update_item(self.course, 0)
+
+
+@ddt.ddt
+class TestCourseGradeFactory(GradeTestBase):
+    """
+    Test that CourseGrades are calculated properly
+    """
+    def _assert_zero_grade(self, course_grade, expected_grade_class):
+        """
+        Asserts whether the given course_grade is as expected with
+        zero values.
+        """
+        self.assertIsInstance(course_grade, expected_grade_class)
+        self.assertIsNone(course_grade.letter_grade)
+        self.assertEqual(course_grade.percent, 0.0)
+        self.assertIsNotNone(course_grade.chapter_grades)
 
     def test_course_grade_no_access(self):
         """
@@ -138,60 +167,76 @@ class TestCourseGradeFactory(GradeTestBase):
                 grade_factory.create(self.request.user, self.course)
         self.assertEqual(mock_read_grade.called, feature_flag and course_setting)
 
-    def test_course_grade_creation(self):
+    def test_create(self):
         grade_factory = CourseGradeFactory()
-        with mock_get_score(1, 2):
+
+        def _assert_create(expected_pass):
+            """
+            Creates the grade, ensuring it is as expected.
+            """
             course_grade = grade_factory.create(self.request.user, self.course)
-        self.assertEqual(course_grade.letter_grade, u'Pass')
-        self.assertEqual(course_grade.percent, 0.5)
+            self.assertEqual(course_grade.letter_grade, u'Pass' if expected_pass else None)
+            self.assertEqual(course_grade.percent, 0.5)
+
+        with self.assertNumQueries(12), mock_get_score(1, 2):
+            _assert_create(expected_pass=True)
+
+        with self.assertNumQueries(14), mock_get_score(1, 2):
+            grade_factory.update(self.request.user, self.course)
+
+        with self.assertNumQueries(1):
+            _assert_create(expected_pass=True)
+
+        self._update_grading_policy(passing=0.9)
+
+        with self.assertNumQueries(8):
+            _assert_create(expected_pass=False)
 
     @ddt.data(True, False)
-    def test_zero_course_grade(self, assume_zero_enabled):
+    def test_create_zero(self, assume_zero_enabled):
         with waffle().override(ASSUME_ZERO_GRADE_IF_ABSENT, active=assume_zero_enabled):
             grade_factory = CourseGradeFactory()
-            with mock_get_score(0, 2):
-                course_grade = grade_factory.create(self.request.user, self.course)
+            course_grade = grade_factory.create(self.request.user, self.course)
+            self._assert_zero_grade(course_grade, ZeroCourseGrade if assume_zero_enabled else CourseGrade)
 
-            self.assertIsInstance(course_grade, ZeroCourseGrade if assume_zero_enabled else CourseGrade)
-            self.assertIsNone(course_grade.letter_grade)
-            self.assertEqual(course_grade.percent, 0.0)
-            self.assertIsNotNone(course_grade.chapter_grades)
+    def test_create_zero_subs_grade_for_nonzero_course_grade(self):
+        with waffle().override(ASSUME_ZERO_GRADE_IF_ABSENT), waffle().override(WRITE_ONLY_IF_ENGAGED):
+            subsection = self.course_structure[self.sequence.location]
+            with mock_get_score(1, 2):
+                self.subsection_grade_factory.update(subsection)
+            course_grade = CourseGradeFactory().update(self.request.user, self.course)
+            subsection1_grade = course_grade.subsection_grades[self.sequence.location]
+            subsection2_grade = course_grade.subsection_grades[self.sequence2.location]
+            self.assertIsInstance(subsection1_grade, SubsectionGrade)
+            self.assertIsInstance(subsection2_grade, ZeroSubsectionGrade)
 
-    def test_get_persisted(self):
+    def test_read(self):
         grade_factory = CourseGradeFactory()
-        # first, create a grade in the database
         with mock_get_score(1, 2):
             grade_factory.update(self.request.user, self.course)
 
-        # retrieve the grade, ensuring it is as expected and take just one query
-        with self.assertNumQueries(1):
-            course_grade = grade_factory.read(self.request.user, self.course)
-        self.assertEqual(course_grade.letter_grade, u'Pass')
-        self.assertEqual(course_grade.percent, 0.5)
+        def _assert_read():
+            """
+            Reads the grade, ensuring it is as expected and requires just one query
+            """
+            with self.assertNumQueries(1):
+                course_grade = grade_factory.read(self.request.user, self.course)
+            self.assertEqual(course_grade.letter_grade, u'Pass')
+            self.assertEqual(course_grade.percent, 0.5)
 
-        # update the grading policy
-        new_grading_policy = {
-            "GRADER": [
-                {
-                    "type": "Homework",
-                    "min_count": 1,
-                    "drop_count": 0,
-                    "short_label": "HW",
-                    "weight": 1.0,
-                },
-            ],
-            "GRADE_CUTOFFS": {
-                "Pass": 0.9,
-            },
-        }
-        self.course.set_grading_policy(new_grading_policy)
+        _assert_read()
+        self._update_grading_policy(passing=0.9)
+        _assert_read()
 
-        # ensure the grade can still be retrieved via read
-        # despite its outdated grading policy
-        with self.assertNumQueries(1):
-            course_grade = grade_factory.read(self.request.user, self.course)
-        self.assertEqual(course_grade.letter_grade, u'Pass')
-        self.assertEqual(course_grade.percent, 0.5)
+    @ddt.data(True, False)
+    def test_read_zero(self, assume_zero_enabled):
+        with waffle().override(ASSUME_ZERO_GRADE_IF_ABSENT, active=assume_zero_enabled):
+            grade_factory = CourseGradeFactory()
+            course_grade = grade_factory.read(self.request.user, course_key=self.course.id)
+            if assume_zero_enabled:
+                self._assert_zero_grade(course_grade, ZeroCourseGrade)
+            else:
+                self.assertIsNone(course_grade)
 
 
 @ddt.ddt
@@ -305,7 +350,6 @@ class ZeroGradeTest(GradeTestBase):
     Tests ZeroCourseGrade (and, implicitly, ZeroSubsectionGrade)
     functionality.
     """
-
     def test_zero(self):
         """
         Creates a ZeroCourseGrade and ensures it's empty.
@@ -450,22 +494,23 @@ class TestVariedMetadata(ProblemSubmissionTestMixin, ModuleStoreTestCase):
     def setUp(self):
         super(TestVariedMetadata, self).setUp()
         self.course = CourseFactory.create()
-        self.chapter = ItemFactory.create(
-            parent=self.course,
-            category="chapter",
-            display_name="Test Chapter"
-        )
-        self.sequence = ItemFactory.create(
-            parent=self.chapter,
-            category='sequential',
-            display_name="Test Sequential 1",
-            graded=True
-        )
-        self.vertical = ItemFactory.create(
-            parent=self.sequence,
-            category='vertical',
-            display_name='Test Vertical 1'
-        )
+        with self.store.bulk_operations(self.course.id):
+            self.chapter = ItemFactory.create(
+                parent=self.course,
+                category="chapter",
+                display_name="Test Chapter"
+            )
+            self.sequence = ItemFactory.create(
+                parent=self.chapter,
+                category='sequential',
+                display_name="Test Sequential 1",
+                graded=True
+            )
+            self.vertical = ItemFactory.create(
+                parent=self.sequence,
+                category='vertical',
+                display_name='Test Vertical 1'
+            )
         self.problem_xml = u'''
             <problem url_name="capa-optionresponse">
               <optionresponse>
@@ -551,67 +596,68 @@ class TestCourseGradeLogging(ProblemSubmissionTestMixin, SharedModuleStoreTestCa
     def setUp(self):
         super(TestCourseGradeLogging, self).setUp()
         self.course = CourseFactory.create()
-        self.chapter = ItemFactory.create(
-            parent=self.course,
-            category="chapter",
-            display_name="Test Chapter"
-        )
-        self.sequence = ItemFactory.create(
-            parent=self.chapter,
-            category='sequential',
-            display_name="Test Sequential 1",
-            graded=True
-        )
-        self.sequence_2 = ItemFactory.create(
-            parent=self.chapter,
-            category='sequential',
-            display_name="Test Sequential 2",
-            graded=True
-        )
-        self.sequence_3 = ItemFactory.create(
-            parent=self.chapter,
-            category='sequential',
-            display_name="Test Sequential 3",
-            graded=False
-        )
-        self.vertical = ItemFactory.create(
-            parent=self.sequence,
-            category='vertical',
-            display_name='Test Vertical 1'
-        )
-        self.vertical_2 = ItemFactory.create(
-            parent=self.sequence_2,
-            category='vertical',
-            display_name='Test Vertical 2'
-        )
-        self.vertical_3 = ItemFactory.create(
-            parent=self.sequence_3,
-            category='vertical',
-            display_name='Test Vertical 3'
-        )
-        problem_xml = MultipleChoiceResponseXMLFactory().build_xml(
-            question_text='The correct answer is Choice 2',
-            choices=[False, False, True, False],
-            choice_names=['choice_0', 'choice_1', 'choice_2', 'choice_3']
-        )
-        self.problem = ItemFactory.create(
-            parent=self.vertical,
-            category="problem",
-            display_name="test_problem_1",
-            data=problem_xml
-        )
-        self.problem_2 = ItemFactory.create(
-            parent=self.vertical_2,
-            category="problem",
-            display_name="test_problem_2",
-            data=problem_xml
-        )
-        self.problem_3 = ItemFactory.create(
-            parent=self.vertical_3,
-            category="problem",
-            display_name="test_problem_3",
-            data=problem_xml
-        )
+        with self.store.bulk_operations(self.course.id):
+            self.chapter = ItemFactory.create(
+                parent=self.course,
+                category="chapter",
+                display_name="Test Chapter"
+            )
+            self.sequence = ItemFactory.create(
+                parent=self.chapter,
+                category='sequential',
+                display_name="Test Sequential 1",
+                graded=True
+            )
+            self.sequence_2 = ItemFactory.create(
+                parent=self.chapter,
+                category='sequential',
+                display_name="Test Sequential 2",
+                graded=True
+            )
+            self.sequence_3 = ItemFactory.create(
+                parent=self.chapter,
+                category='sequential',
+                display_name="Test Sequential 3",
+                graded=False
+            )
+            self.vertical = ItemFactory.create(
+                parent=self.sequence,
+                category='vertical',
+                display_name='Test Vertical 1'
+            )
+            self.vertical_2 = ItemFactory.create(
+                parent=self.sequence_2,
+                category='vertical',
+                display_name='Test Vertical 2'
+            )
+            self.vertical_3 = ItemFactory.create(
+                parent=self.sequence_3,
+                category='vertical',
+                display_name='Test Vertical 3'
+            )
+            problem_xml = MultipleChoiceResponseXMLFactory().build_xml(
+                question_text='The correct answer is Choice 2',
+                choices=[False, False, True, False],
+                choice_names=['choice_0', 'choice_1', 'choice_2', 'choice_3']
+            )
+            self.problem = ItemFactory.create(
+                parent=self.vertical,
+                category="problem",
+                display_name="test_problem_1",
+                data=problem_xml
+            )
+            self.problem_2 = ItemFactory.create(
+                parent=self.vertical_2,
+                category="problem",
+                display_name="test_problem_2",
+                data=problem_xml
+            )
+            self.problem_3 = ItemFactory.create(
+                parent=self.vertical_3,
+                category="problem",
+                display_name="test_problem_3",
+                data=problem_xml
+            )
         self.request = get_mock_request(UserFactory())
         self.client.login(username=self.request.user.username, password="test")
         self.course_structure = get_course_blocks(self.request.user, self.course.location)
