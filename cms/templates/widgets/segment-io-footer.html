@@ -1,7 +1,7 @@
 <%page expression_filter="h"/>
 <%! from openedx.core.djangolib.js_utils import js_escaped_string %>
 
-% if settings.CMS_SEGMENT_KEY:
+% if segment_key:
     <!-- begin segment footer -->
     <script type="text/javascript">
     % if user.is_authenticated():
