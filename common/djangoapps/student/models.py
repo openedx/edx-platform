@@ -1563,21 +1563,25 @@ class CourseEnrollment(models.Model):
         # If the student has already been given a certificate they should not be refunded
         if user_already_has_certs_for is not None:
             if self.course_id in user_already_has_certs_for:
+                  log.info("course id is in the certificates, %s,  \n", self.course_id)
                 return False
         else:
             if GeneratedCertificate.certificate_for_student(self.user, self.course_id) is not None:
+                log.info("course id and user id is in the generated certificates, %s,  \n")
                 return False
 
         # If it is after the refundable cutoff date they should not be refunded.
         refund_cutoff_date = self.refund_cutoff_date()
         log.info("refund_cutoff_date = %s,  \n",
                  refund_cutoff_date,)
-        
+
         if refund_cutoff_date and datetime.now(UTC) > refund_cutoff_date:
+            log.info("refund_cutoff_date and datetime.now(UTC) > refund_cutoff_date is True \n")
             return False
 
         course_mode = CourseMode.mode_for_course(self.course_id, 'verified')
         if course_mode is None:
+            log.info("course_mode is None is True \n")
             return False
         else:
             return True
