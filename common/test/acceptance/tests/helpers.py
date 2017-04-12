@@ -25,6 +25,7 @@ from pymongo import MongoClient, ASCENDING
 from openedx.core.lib.tests.assertions.events import assert_event_matches, is_matching_event, EventMatchTolerates
 from xmodule.partitions.partitions import UserPartition
 from selenium.common.exceptions import StaleElementReferenceException
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.ui import WebDriverWait
@@ -709,6 +710,8 @@ class AcceptanceTest(WebAppTest):
     """
 
     def __init__(self, *args, **kwargs):
+        # Hack until we upgrade Firefox and install geckodriver in devstack and Jenkins
+        DesiredCapabilities.FIREFOX['marionette'] = False
         super(AcceptanceTest, self).__init__(*args, **kwargs)
 
         # Use long messages so that failures show actual and expected values
