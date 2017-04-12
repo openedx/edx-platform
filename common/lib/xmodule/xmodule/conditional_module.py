@@ -368,7 +368,6 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor, StudioEditabl
             ConditionalDescriptor.is_proctored_enabled,
             ConditionalDescriptor.is_time_limited,
             ConditionalDescriptor.default_time_limit_minutes,
-            ConditionalDescriptor.show_tag_list,
             ConditionalDescriptor.exam_review_rules,
         ])
         return non_editable_fields
