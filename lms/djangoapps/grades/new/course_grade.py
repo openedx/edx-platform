@@ -65,6 +65,18 @@ class CourseGradeBase(object):
         }
 
     @lazy
+    def subsection_grades(self):
+        """
+        Returns an ordered dictionary of subsection grades,
+        keyed by subsection location.
+        """
+        subsection_grades = defaultdict(OrderedDict)
+        for chapter in self.chapter_grades.itervalues():
+            for subsection_grade in chapter['sections']:
+                subsection_grades[subsection_grade.location] = subsection_grade
+        return subsection_grades
+
+    @lazy
     def locations_to_scores(self):
         """
         Returns a dict of problem scores keyed by their locations.
