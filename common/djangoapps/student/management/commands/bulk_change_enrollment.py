@@ -111,15 +111,15 @@ class Command(BaseCommand):
             commit (bool): required to make the change to the database. Otherwise
                                      just a count will be displayed.
         """
+        unicode_course_key = unicode(course_key)
         if CourseMode.mode_for_course(course_key, to_mode) is None:
-            raise CommandError('The given mode to move users into ({}) does not exist.'.format(to_mode))
-
-        course_key_str = unicode(course_key)
+            logger.info('Mode ({}) does not exist for course ({}).'.format(to_mode, unicode_course_key))
+            return
 
         course_enrollments = CourseEnrollment.objects.filter(course_id=course_key, mode=from_mode)
         logger.info(
             'Moving %d users from %s to %s in course %s.',
-            course_enrollments.count(), from_mode, to_mode, course_key_str
+            course_enrollments.count(), from_mode, to_mode, unicode_course_key
         )
         if commit:
             # call `change_mode` which will change the mode and also emit tracking event
@@ -127,4 +127,4 @@ class Command(BaseCommand):
                 with transaction.atomic():
                     enrollment.change_mode(mode=to_mode)
 
-            logger.info('Finished moving users from %s to %s in course %s.', from_mode, to_mode, course_key_str)
+            logger.info('Finished moving users from %s to %s in course %s.', from_mode, to_mode, unicode_course_key)
