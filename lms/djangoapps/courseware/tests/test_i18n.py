@@ -2,6 +2,7 @@
 Tests i18n in courseware
 """
 
+import json
 import re
 
 from django.conf import settings
@@ -14,7 +15,6 @@ from nose.plugins.attrib import attr
 
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
-from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from student.models import UserProfile
 from student.tests.factories import UserFactory
 
@@ -175,6 +175,15 @@ class I18nLangPrefTests(BaseI18nTestCase):
         UserProfile.objects.create(user=self.user)
         self.user_login()
 
+    def set_lang_preference(self, language):
+        """Sets the user's language preference, allowing the LangPref middleware to operate to set the preference cookie."""
+        response = self.client.patch(
+            reverse('preferences_api', args=[self.user.username]),
+            json.dumps({LANGUAGE_KEY: language}),
+            content_type="application/merge-patch+json"
+        )
+        self.assertEqual(response.status_code, 204)
+
     def test_lang_preference(self):
         # Regression test; LOC-87
         self.release_languages('ar, es-419')
@@ -184,13 +193,13 @@ class I18nLangPrefTests(BaseI18nTestCase):
         self.assert_tag_has_attr(response.content, "html", "lang", self.site_lang)
 
         # Set user language preference
-        set_user_preference(self.user, LANGUAGE_KEY, 'ar')
+        self.set_lang_preference('ar')
         # and verify we now get an ar response
         response = self.client.get(self.url)
         self.assert_tag_has_attr(response.content, "html", "lang", 'ar')
 
         # Verify that switching language preference gives the right language
-        set_user_preference(self.user, LANGUAGE_KEY, 'es-419')
+        self.set_lang_preference('es-419')
         response = self.client.get(self.url)
         self.assert_tag_has_attr(response.content, "html", "lang", 'es-419')
 
@@ -199,7 +208,7 @@ class I18nLangPrefTests(BaseI18nTestCase):
         self.release_languages('ar, es-419')
 
         # Set user language preference
-        set_user_preference(self.user, LANGUAGE_KEY, 'ar')
+        self.set_lang_preference('ar')
         # Verify preview-lang takes precedence
         self.client.post(self.preview_language_url, {'preview_lang': 'eo', 'set_language': 'set_language'})
         response = self.client.get(self.url)
