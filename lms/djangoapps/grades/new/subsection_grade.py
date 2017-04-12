@@ -35,11 +35,17 @@ class SubsectionGradeBase(object):
         self.all_total = None  # aggregated grade for all problems, regardless of whether they are graded
 
     @property
-    def scores(self):
+    def attempted(self):
         """
-        List of all problem scores in the subsection.
+        Returns whether any problem in this subsection
+        was attempted by the student.
         """
-        return self.locations_to_scores.values()
+
+        assert self.all_total is not None, (
+            "SubsectionGrade not fully populated yet.  Call init_from_structure or init_from_model "
+            "before use."
+        )
+        return self.all_total.attempted
 
 
 class ZeroSubsectionGrade(SubsectionGradeBase):
@@ -54,9 +60,9 @@ class ZeroSubsectionGrade(SubsectionGradeBase):
         self.course_data = course_data
 
     @lazy
-    def locations_to_scores(self):
+    def problem_scores(self):
         """
-        Overrides the locations_to_scores member variable in order
+        Overrides the problem_scores member variable in order
         to return empty scores for all scorable problems in the
         course.
         """
@@ -79,7 +85,7 @@ class SubsectionGrade(SubsectionGradeBase):
     """
     def __init__(self, subsection):
         super(SubsectionGrade, self).__init__(subsection)
-        self.locations_to_scores = OrderedDict()  # dict of problem locations to ProblemScore
+        self.problem_scores = OrderedDict()  # dict of problem locations to ProblemScore
 
     def init_from_structure(self, student, course_structure, submissions_scores, csm_scores):
         """
@@ -91,7 +97,7 @@ class SubsectionGrade(SubsectionGradeBase):
         ):
             self._compute_block_score(descendant_key, course_structure, submissions_scores, csm_scores)
 
-        self.all_total, self.graded_total = graders.aggregate_scores(self.scores)
+        self.all_total, self.graded_total = graders.aggregate_scores(self.problem_scores.values())
         self._log_event(log.debug, u"init_from_structure", student)
         return self
 
@@ -180,7 +186,7 @@ class SubsectionGrade(SubsectionGradeBase):
                     block,
                 )
                 if problem_score:
-                    self.locations_to_scores[block_key] = problem_score
+                    self.problem_scores[block_key] = problem_score
 
     def _persisted_model_params(self, student):
         """
@@ -208,7 +214,7 @@ class SubsectionGrade(SubsectionGradeBase):
         return [
             BlockRecord(location, score.weight, score.raw_possible, score.graded)
             for location, score in
-            self.locations_to_scores.iteritems()
+            self.problem_scores.iteritems()
         ]
 
     def _log_event(self, log_func, log_statement, student):

@@ -313,7 +313,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
         Returns list of scores for the given homework:
             [<points on problem_1>, <points on problem_2>, ..., <points on problem_n>]
         """
-        return [s.earned for s in self.hw_grade(hw_url_name).scores]
+        return [s.earned for s in self.hw_grade(hw_url_name).problem_scores.values()]
 
 
 class TestCourseGrades(TestSubmittingProblems):
@@ -337,7 +337,7 @@ class TestCourseGrades(TestSubmittingProblems):
         Verifies the problem score and the homework grade are as expected.
         """
         hw_grade = self.hw_grade('homework')
-        problem_score = hw_grade.scores[0]
+        problem_score = hw_grade.problem_scores.values()[0]
         self.assertEquals((problem_score.earned, problem_score.possible), expected_problem_score)
         self.assertEquals((hw_grade.graded_total.earned, hw_grade.graded_total.possible), expected_hw_grade)
 

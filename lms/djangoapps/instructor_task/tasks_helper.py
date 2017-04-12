@@ -1027,7 +1027,7 @@ def upload_problem_grade_report(_xmodule_instance_args, _entry_id, course_id, _t
         earned_possible_values = []
         for block_location in graded_scorable_blocks:
             try:
-                problem_score = course_grade.locations_to_scores[block_location]
+                problem_score = course_grade.problem_scores[block_location]
             except KeyError:
                 earned_possible_values.append([u'Not Available', u'Not Available'])
             else:
