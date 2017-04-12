@@ -377,6 +377,9 @@ FEATURES = {
     # Enable one click program purchase
     # See LEARNER-493
     'ENABLE_ONE_CLICK_PROGRAM_PURCHASE': False,
+
+    # Whether to display account activation notification on dashboard.
+    'DISPLAY_ACCOUNT_ACTIVATION_MESSAGE_ON_SIDEBAR': False,
 }
 
 # Ignore static asset files on import which match this pattern

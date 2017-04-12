@@ -1,0 +1,34 @@
+<%page expression_filter="h"/>
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
+%>
+<div class="profile-sidebar" role="region" aria-label="Account Activation Info">
+  <header class="profile">
+    <h2 class="account-activation-title sr">${_("Account Activation Info")}: </h2>
+  </header>
+  <div class="user-info">
+    <ul>
+      <li class="status status-verification warning" role="alert" aria-labelledby="title status-title" tabindex="1">
+        <span class="title status-title">
+          <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+          ${_("Activate your account!")}
+        </span>
+        <p class="status-note">${Text(_(
+          "Check your {email_start}{email}{email_end} inbox for an account activation link from edX. "
+          "If you need help, contact {link_start}edX Support{link_end}."
+        )).format(
+          email_start=HTML("<strong>"),
+          email_end=HTML("</strong>"),
+          email=email,
+          link_start=HTML("<a target='_blank' href='https://support.edx.org/hc/en-us/articles/227340127-Why-haven-t-I-received-my-activation-email-'>"),
+          link_end=HTML("</a>"),
+        )}
+        </p>
+        ## TODO: Add resend activation email functionality.
+        ## TODO: Implementation of this is part of ENT-353.
+        ## <a class="btn btn-neutral"><i class="fa fa-envelope-o"></i> Resend Activation Email </a>
+      </li>
+    </ul>
+  </div>
+</div>
