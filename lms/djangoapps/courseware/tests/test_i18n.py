@@ -15,7 +15,6 @@ from nose.plugins.attrib import attr
 
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
-from student.models import UserProfile
 from student.tests.factories import UserFactory
 
 
@@ -61,8 +60,7 @@ class BaseI18nTestCase(TestCase):
         """
         # Create one user and save it to the database
         email = 'test@edx.org'
-        self.user = UserFactory.build(username='test', email=email, password=self.pwd)
-        self.user.save()
+        self.user = UserFactory.create(username='test', email=email, password=self.pwd)
 
     def user_login(self):
         """
@@ -119,7 +117,6 @@ class I18nRegressionTests(BaseI18nTestCase):
 
     def test_unreleased_lang_resolution(self):
         # Regression test; LOC-85
-        UserProfile.objects.create(user=self.user)
         self.release_languages('fa')
         self.user_login()
 
@@ -136,7 +133,6 @@ class I18nRegressionTests(BaseI18nTestCase):
         self.assert_tag_has_attr(response.content, "html", "lang", "fa-ir")
 
     def test_preview_lang(self):
-        UserProfile.objects.create(user=self.user)
         self.user_login()
 
         # Regression test; LOC-87
@@ -172,7 +168,6 @@ class I18nLangPrefTests(BaseI18nTestCase):
     """
     def setUp(self):
         super(I18nLangPrefTests, self).setUp()
-        UserProfile.objects.create(user=self.user)
         self.user_login()
 
     def set_lang_preference(self, language):
