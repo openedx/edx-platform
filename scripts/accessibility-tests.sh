@@ -6,7 +6,7 @@ echo "Setting up for accessibility tests..."
 source scripts/jenkins-common.sh
 
 echo "Running explicit accessibility tests..."
-SELENIUM_BROWSER=phantomjs paver test_a11y
+SELENIUM_BROWSER=firefox paver test_a11y --with-xunitmp
 
 echo "Generating coverage report..."
 paver a11y_coverage
