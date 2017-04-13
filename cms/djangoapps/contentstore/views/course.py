@@ -292,7 +292,13 @@ def course_rerun_handler(request, course_key_string):
         raise PermissionDenied()
     course_key = CourseKey.from_string(course_key_string)
     with modulestore().bulk_operations(course_key):
+
         course_module = get_course_and_check_access(course_key, request.user, depth=3)
+
+        """
+        The task runner for Robot Grading should go here
+        """
+
         if request.method == 'GET':
             return render_to_response('course-create-rerun.html', {
                 'source_course_key': course_key,

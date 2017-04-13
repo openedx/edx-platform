@@ -31,6 +31,7 @@ define(['domReady', 'jquery', 'underscore', 'js/views/utils/create_course_utils'
             var org = $newCourseForm.find('.rerun-course-org').val();
             var number = $newCourseForm.find('.rerun-course-number').val();
             var run = $newCourseForm.find('.rerun-course-run').val();
+            var robot_grade = $newCourseForm.find('.robot-grading').val();
 
             course_info = {
                 source_course_key: source_course_key,

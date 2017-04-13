@@ -110,6 +110,18 @@ from openedx.core.djangolib.js_utils import js_escaped_string
                         <span class="tip tip-error is-hidden"></span>
                       </div>
                     </li>
+                      <li class="row">
+                        <div class="column field check" id="field-course-run">
+                        <label for="rerun-course-run">${_("Use Previous Course Run for Robot Grading?")}</label>
+                        <input class="rerun-course-robot" id="rerun-course-robot" type="radio" name="rerun-course-robot" aria-required="true" />
+                        <span class="tip">
+                          ${_("If you wish to use the previous course run to fully automate essay grading on this run, check the box. We will use the previous responses and staff grades to train an AI to grade for you.")}
+                          <strong class="tip-note" class="tip-note">${_("Note: Staff graded assessments only.")}</strong>
+                        </span>
+                        <span class="tip tip-error is-hidden"></span>
+                      </div>
+
+                      </li>
                   </ol>
 
                   <input type="hidden" value="${allow_unicode_course_id}" class="allow-unicode-course-id" /> <!-- TODO: need to add support for allow_unicode_course_id in real view's template -->
