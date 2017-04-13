@@ -129,7 +129,7 @@ class CoursewareTest(UniqueCourseTest):
 @ddt.ddt
 class ProctoredExamTest(UniqueCourseTest):
     """
-    Test courseware.
+    Tests for proctored exams.
     """
     USERNAME = "STUDENT_TESTER"
     EMAIL = "student101@example.com"

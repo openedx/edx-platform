@@ -56,7 +56,7 @@ class CourseOutlinePage(PageObject):
     SECTION_SELECTOR = '.outline-item.section:nth-of-type({0})'
     SECTION_TITLES_SELECTOR = '.section-name span'
     SUBSECTION_SELECTOR = SECTION_SELECTOR + ' .subsection:nth-of-type({1}) .outline-item'
-    SUBSECTION_TITLES_SELECTOR = SECTION_SELECTOR + ' .subsection a span:first-child'
+    SUBSECTION_TITLES_SELECTOR = SECTION_SELECTOR + ' .subsection .subsection-title'
     OUTLINE_RESUME_COURSE_SELECTOR = '.outline-item .resume-right'
 
     def __init__(self, browser, parent_page):
