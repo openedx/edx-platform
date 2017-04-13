@@ -16,7 +16,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
     var CourseOutlineXBlockModal, SettingsXBlockModal, PublishXBlockModal, AbstractEditor, BaseDateEditor,
         ReleaseDateEditor, DueDateEditor, GradingEditor, PublishEditor, AbstractVisibilityEditor,
         StaffLockEditor, UnitAccessEditor, ContentVisibilityEditor, TimedExaminationPreferenceEditor,
-        AccessEditor, ShowCorrectnessEditor;
+        AccessEditor, ShowCorrectnessEditor, CopyToOtherCourseXBlockModal;
 
     CourseOutlineXBlockModal = BaseModal.extend({
         events: _.extend({}, BaseModal.prototype.events, {
@@ -67,13 +67,17 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             return this.template(this.getContext());
         },
 
-        save: function(event) {
+        getWaitingMessage: function() {
+            return gettext('Saving');
+        },
+
+        save: function(event, waitingMessage) {
             event.preventDefault();
             var requestData = this.getRequestData();
             if (!_.isEqual(requestData, {metadata: {}})) {
                 XBlockViewUtils.updateXBlockFields(this.model, requestData, {
                     success: this.options.onSave
-                });
+                }, this.getWaitingMessage());
             }
             this.hide();
         },
@@ -170,6 +174,72 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             this.$('.modal-section .settings-tab-button[data-tab="' + tab + '"]').addClass('active');
             this.$('.modal-section .settings-tab').hide();
             this.$('.modal-section .' + tab).show();
+        }
+    });
+
+
+    CopyToOtherCourseXBlockModal = CourseOutlineXBlockModal.extend({
+        events : _.extend({}, CourseOutlineXBlockModal.prototype.events, {
+            'click .action-copy': 'save'
+        }),
+
+        initialize: function() {
+            CourseOutlineXBlockModal.prototype.initialize.call(this);
+            this.courseList = null;
+        },
+
+        getTitle: function () {
+            return interpolate(
+                gettext('Copy %(display_name)s to other course'),
+                { display_name: this.model.get('display_name') }, true
+            );
+        },
+
+        getWaitingMessage: function() {
+            return gettext('Copying');
+        },
+
+        addActionButtons: function() {
+            this.addActionButton('copy', gettext('Copy'), true);
+            this.addActionButton('cancel', gettext('Cancel'));
+        },
+
+        getIntroductionMessage: function () {
+            return interpolate(
+                gettext('Please choose the course where to copy the selected %(item)s'),
+                { item: this.options.xblockType }, true
+            );
+        },
+
+        initializeEditors: function () {
+            if (!this.courseList) {
+                var self = this;
+                $.ajax({
+                    url: '/course_listing',
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(data) {
+                        var windowTemplate = self.loadTemplate('copy-to-other-course');
+                        data.sort(function(a, b){
+                            if(a.display_name < b.display_name) return -1;
+                            if(a.display_name > b.display_name) return 1;
+                            return 0;
+                        });
+                        self.courseList = data;
+                        self.$('.modal-section').html(windowTemplate({courses: data}));
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        self.$('.modal-section').html(gettext("Course list can't be loaded from server"));
+                    }
+                });
+            } else {
+                self.$('.modal-section').html(windowTemplate({courses: this.courseList}));
+            }
+        },
+
+        getRequestData: function () {
+            var requestData = {'copy_to_course': this.$('.copy-to-course').val()};
+            return $.extend.apply(this, [true, {}].concat(requestData));
         }
     });
 
@@ -850,6 +920,8 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 return this.getEditModal(xblockInfo, options);
             } else if (type === 'publish') {
                 return this.getPublishModal(xblockInfo, options);
+            } else if (type === 'copy-to-other-course') {
+                return this.getCopyToOtherCourseModal(xblockInfo, options);
             }
         },
 
@@ -863,6 +935,10 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             };
             if (xblockInfo.isVertical()) {
                 editors = [StaffLockEditor, UnitAccessEditor];
+
+                if (xblockInfo.hasVerifiedCheckpoints()) {
+                    editors.push(VerificationAccessEditor);
+                }
             } else {
                 tabs = [
                     {
@@ -916,6 +992,12 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         getPublishModal: function(xblockInfo, options) {
             return new PublishXBlockModal($.extend({
                 editors: [PublishEditor],
+                model: xblockInfo
+            }, options));
+        },
+
+        getCopyToOtherCourseModal: function (xblockInfo, options) {
+            return new CopyToOtherCourseXBlockModal($.extend({
                 model: xblockInfo
             }, options));
         }

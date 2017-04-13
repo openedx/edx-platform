@@ -133,6 +133,14 @@ if (is_proctored_exam) {
                         </a>
                     </li>
                 <% } %>
+                <% if (xblockInfo.isChapter()) { %>
+                    <li class="action-item action-copy-to-other-course">
+                        <a href="#" data-tooltip="<%- gettext('Copy to other course') %>" class="copy-to-other-course-button action-button">
+                            <span class="icon fa fa-share-square-o" aria-hidden="true"></span>
+                            <span class="sr action-button-text"><%- gettext('Copy to other course') %></span>
+                      </a>
+                    </li>
+                <% } %>
                 <% if (xblockInfo.isEditableOnCourseOutline()) { %>
                     <li class="action-item action-configure">
                         <a href="#" data-tooltip="<%- gettext('Configure') %>" class="configure-button action-button">
