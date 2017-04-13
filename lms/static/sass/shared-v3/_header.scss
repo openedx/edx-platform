@@ -1,10 +1,19 @@
 // LMS header styles
 
 .header-global {
+    position: fixed;
+    top: 0;
+    z-index: 999;
+    width: 100%;
+    height: $lms-header-height;
     border-bottom: 1px solid $gray-light;
     box-shadow: 0 1px 5px 0 $shadow-l1;
     background: $brand-background;
     font-size: 18px;
+
+    @include media-breakpoint-up(md) {
+        position: relative;
+    }
 
     .wrapper-header {
         margin: 0 auto;
@@ -18,18 +27,43 @@
         }
 
         .logo {
-            @include margin-right(10px);
             display: inline;
+            margin-left: calc(50% - 30px);
             margin-top: 4px;
             margin-bottom: 0;
+
+            @include media-breakpoint-up(md) {
+                margin-left: 0;
+                margin-right: 10px;
+            }
+        }
+
+        .main-menu-nav {
+            .mobile-menu-button {
+                position: absolute;
+                top: 18px;
+            }
+
+            .modal {
+                top: 53px;
+
+                .show {
+                    display: block;
+                }
+            }
         }
 
         .course-header {
             @include margin(12px, 10px, 0px, 10px);
-            display: inline;
+            display: none;  // TODO: should this be read to screen readers?
             font-size: 1rem;
             font-weight: 400;
             color: $lms-label-color;
+
+            @include media-breakpoint-up(md) {
+                display: inline;
+            }
+
             .provider {
                 font-weight: bold;
             }
@@ -51,8 +85,13 @@
 
         .list-inline {
             &.nav-global {
+                display: none;
                 margin-top: 12px;
                 margin-bottom: 0;
+
+                @include media-breakpoint-up(md) {
+                    display: inline;
+                }
             }
 
             &.nav-courseware {
@@ -113,7 +152,12 @@
             }
 
             .wrapper-user-menu {
+                display: none;
                 margin-top: 0;
+
+                @include media-breakpoint-up(md) {
+                    display: inline;
+                }
             }
         }
     }
@@ -121,9 +165,14 @@
 
 .doc-link {
     @include margin(($baseline*0.75), ($baseline*0.75), ($baseline*0.75), ($baseline*0.75));
+    display: none;
     font-size: 14px;
     font-weight: bold;
     color: $font-color;
+
+    @include media-breakpoint-up(md) {
+        display: inline;
+    }
 
     &:visited {
         color: $font-color;

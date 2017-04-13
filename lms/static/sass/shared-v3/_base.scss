@@ -21,3 +21,19 @@
 .sr {
     @extend .sr-only;
 }
+
+// Shows elements only for desktop-size pages
+.desktop-only {
+    display: none;
+
+    @include media-breakpoint-up(md) {
+        display: initial;
+    }
+}
+
+// Shows elements only for mobile-size pages
+.mobile-only {
+    @include media-breakpoint-up(md) {
+        display: none;
+    }
+}

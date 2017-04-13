@@ -70,6 +70,10 @@ site_status_msg = get_site_status_msg(course_id)
       % endif
     </h1>
 
+    % if uses_bootstrap:
+      <%include file="mobile_menu.html"/>
+    % endif
+
     % if user.is_authenticated():
       % if not course or disable_courseware_header:
         % if not nav_hidden or show_program_listing:

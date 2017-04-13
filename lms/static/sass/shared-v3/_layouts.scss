@@ -4,6 +4,11 @@
     max-width: $lms-max-width;
     padding-bottom: $baseline*2;
     margin: 0 auto;
+    margin-top: $lms-header-height;
+
+    @include media-breakpoint-up(md) {
+        margin-top: 0;
+    }
 
     .main-container {
         border: 1px solid $lms-border-color;
