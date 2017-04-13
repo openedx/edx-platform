@@ -19,40 +19,12 @@ class CoursewarePage(CoursePage):
     url_path = "courseware/"
     xblock_component_selector = '.vert .xblock'
 
-    # TODO: TNL-6546: Remove sidebar selectors
-    section_selector = '.chapter'
-    subsection_selector = '.chapter-content-container a'
-
     def __init__(self, browser, course_id):
         super(CoursewarePage, self).__init__(browser, course_id)
         self.nav = CourseNavPage(browser, self)
 
     def is_browser_on_page(self):
         return self.q(css='.course-content').present
-
-    # TODO: TNL-6546: Remove and find callers
-    @property
-    def chapter_count_in_navigation(self):
-        """
-        Returns count of chapters available on LHS navigation.
-        """
-        return len(self.q(css='nav.course-navigation a.chapter'))
-
-    # TODO: TNL-6546: Remove and find callers.
-    @property
-    def num_sections(self):
-        """
-        Return the number of sections in the sidebar on the page
-        """
-        return len(self.q(css=self.section_selector))
-
-    # TODO: TNL-6546: Remove and find callers.
-    @property
-    def num_subsections(self):
-        """
-        Return the number of subsections in the sidebar on the page, including in collapsed sections
-        """
-        return len(self.q(css=self.subsection_selector))
 
     @property
     def xblock_components(self):
@@ -430,11 +402,3 @@ class CourseNavPage(PageObject):
         Clean HTML of sequence titles, stripping out span tags and returning the first line.
         """
         return self.REMOVE_SPAN_TAG_RE.search(element.get_attribute('innerHTML')).groups()[0].strip()
-
-    # TODO: TNL-6546: Remove. This is no longer needed.
-    @property
-    def active_subsection_url(self):
-        """
-        return the url of the active subsection in the left nav
-        """
-        return self.q(css='.chapter-content-container .menu-item.active a').attrs('href')[0]
