@@ -97,6 +97,18 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
         from .models import SAMLConfiguration
         return SAMLConfiguration.current(Site.objects.get_current(get_current_request()))
 
+    def generate_saml_config(self, idp=None):
+        """
+        Add code here to add the following details to the base config:
+        We don't have to set the binding; python-saml will take care of that.
+
+            {
+                "SingleLogoutService": {
+                    "url": "whatever"
+                }
+            }
+        """
+        return super(SAMLAuthBackend, self).generate_saml_config(idp=idp)
 
 class SapSuccessFactorsIdentityProvider(SAMLIdentityProvider):
     """
