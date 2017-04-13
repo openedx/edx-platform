@@ -1,12 +1,37 @@
 ## mako
+<%namespace name='static' file='static_content.html'/>
 
+<%!
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+%>
+
+<nav class="navbar navbar-toggleable-md navbar-light mobile-only">
+    <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <a class="navbar-brand logo" href="${marketing_link('ROOT')}">
+        <img class="d-inline-block align-top" src="${static.url("images/logo.png")}" alt="${_("{platform_name} Home Page").format(platform_name=static.get_platform_name())}" itemprop="logo" />
+    </a>
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+        <div class="list-group">
+            <a class="list-group-item list-group-item-action" href="https://edx.readthedocs.io/projects/edx-guide-for-students/en/latest/index.html" target="_blank" class="doc-link">Help</a>
+            <a class="list-group-item list-group-item-action" href="/dashboard" role="menuitem" class="action dropdown-menuitem">Dashboard</a>
+            <a class="list-group-item list-group-item-action" href="/u/staff" role="menuitem" class="action dropdown-menuitem">Profile</a>
+            <a class="list-group-item list-group-item-action" href="/account/settings" role="menuitem" class="action dropdown-menuitem">Account</a>
+            <a class="list-group-item list-group-item-action" href="/logout" role="menuitem" class="dropdown-menuitem">Sign Out</a>
+        </div>
+    </div>
+</nav>
+
+<!--
 <div id="primary-menu-bar" class="nav mobile-only">
     <div class="main-menu-nav" aria-label="Main">
         <button class="js-mobile-menu-button mobile-menu-button ai-hamburger-menu open" aria-pressed="true" aria-expanded="true">
             <span class="icon fa fa-bars" aria-hidden="true"></span>
         </button>
 
-        <div class="modal fade show" style="display:block">
+        <div class="modal fade" style="display:block">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-body">
@@ -23,3 +48,4 @@
         </div>
     </div>
 </div>
+-->

@@ -34,7 +34,7 @@ include_special_exams = settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and
     tab_list = get_course_tab_list(request, course)
     %>
     % if uses_bootstrap:
-        <select class="mobile-only">
+        <select class="select-course-material mobile-only">
             % for tab in tab_list:
                 <%
                 tab_is_active = tab.tab_id in (active_page, default_tab)
@@ -46,7 +46,7 @@ include_special_exams = settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and
         </select>
     % endif
     <nav class="${active_page} wrapper-course-material desktop-only" aria-label="${_('Course Material')}">
-        <div class="course-material container">
+        <div class="course-material ${'container' if uses_bootstrap else ''}">
             <%
             tabs_tmpl = static.get_template_path('/courseware/tabs.html')
             %>

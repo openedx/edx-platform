@@ -18,22 +18,22 @@
     .wrapper-header {
         margin: 0 auto;
         padding: 10px 10px 0;
-        width: 100%;
         font-size: 18px;
 
         .logo-header {
-            display: inline;
+            display: none;
+
+            @include media-breakpoint-up(md) {
+                display: inline;
+            }
         }
 
         .logo {
             display: inline;
-            margin-left: calc(50% - 30px);
-            margin-top: 4px;
             margin-bottom: 0;
 
             @include media-breakpoint-up(md) {
-                margin-left: 0;
-                margin-right: 10px;
+                margin: 4px 10px 0 0;
             }
         }
 

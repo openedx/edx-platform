@@ -1,5 +1,13 @@
 // Bootstrap component style overrides
 
+// Select
+select.mobile-only {
+    width: 100%;
+    height: 30px;
+    font-size: $font-size-lg;
+    line-height: $line-height-lg;
+}
+
 // Tabs
 .nav-tabs {
     .nav-link {

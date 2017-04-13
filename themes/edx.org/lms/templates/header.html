@@ -50,7 +50,7 @@ site_status_msg = get_site_status_msg(course_id)
 % else:
 <header class="${"header-global slim" if course and not disable_courseware_header else "header-global-new"}" aria-label="Main" role="banner">
 % endif
-  <div class="${"rwd" if responsive else ""} wrapper-header nav-container">
+  <div class="${"rwd" if responsive else ""} wrapper-header nav-container ${'container' if uses_bootstrap else ''}">
 
     <h1 class="hd logo-header">
       <div class="logo">
