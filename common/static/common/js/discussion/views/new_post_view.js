@@ -43,6 +43,7 @@
                 this.course_settings = options.course_settings;
                 this.is_commentable_cohorted = options.is_commentable_cohorted;
                 this.topicId = options.topicId;
+                this.discussionBoardView = options.discussionBoardView;
             };
 
             NewPostView.prototype.render = function() {
@@ -161,8 +162,17 @@
                     },
                     error: DiscussionUtil.formErrorHandler(this.$('.post-errors')),
                     success: function(response) {
-                        var thread;
+                        var thread, discussionBreadcrumbsModel;
                         thread = new Thread(response.content);
+                        // Update the breadcrumbs and discussion Id(s) related to current topic
+                        if (self.discussionBoardView) {
+                            discussionBreadcrumbsModel = self.discussionBoardView.breadcrumbs.model;
+                            if (discussionBreadcrumbsModel.get('contents').length) {
+                                discussionBreadcrumbsModel.set('contents', self.topicView.topicText.split('/'));
+                            }
+                            self.discussionBoardView.discussionThreadListView.discussionIds =
+                                self.topicView.currentTopicId;
+                        }
                         self.$el.addClass('is-hidden');
                         self.resetForm();
                         self.trigger('newPost:createPost');
