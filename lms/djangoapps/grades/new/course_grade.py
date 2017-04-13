@@ -59,10 +59,10 @@ class CourseGradeBase(object):
         subsection grades, display name, and url name.
         """
         course_structure = self.course_data.structure
-        return {
-            chapter_key: self._get_chapter_grade_info(course_structure[chapter_key], course_structure)
-            for chapter_key in course_structure.get_children(self.course_data.location)
-        }
+        grades = OrderedDict()
+        for chapter_key in course_structure.get_children(self.course_data.location):
+            grades[chapter_key] = self._get_chapter_grade_info(course_structure[chapter_key], course_structure)
+        return grades
 
     @lazy
     def subsection_grades(self):
