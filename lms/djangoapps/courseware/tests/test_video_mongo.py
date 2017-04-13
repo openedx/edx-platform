@@ -855,6 +855,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
             )
 
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_HLS_VIDEO_PROFILE': True})
     @patch('xmodule.video_module.video_module.edxval_api.get_urls_for_profiles')
     def test_get_html_hls(self, get_urls_for_profiles):
         """
@@ -881,6 +882,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             '"sources": ["https://webm.com/dw.webm", "https://mp4.com/dm.mp4", "https://hls.com/hls.m3u8"]', context
         )
 
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_HLS_VIDEO_PROFILE': True})
     def test_get_html_hls_no_video_id(self):
         """
         Verify that `download_video_link` is set to None for HLS videos if no video id

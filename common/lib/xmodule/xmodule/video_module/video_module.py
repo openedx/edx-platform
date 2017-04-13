@@ -217,7 +217,10 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         # stream.
         if self.edx_video_id and edxval_api:
             try:
-                val_profiles = ["youtube", "desktop_webm", "desktop_mp4", "hls"]
+                val_profiles = ["youtube", "desktop_webm", "desktop_mp4"]
+
+                if settings.FEATURES.get('ENABLE_HLS_VIDEO_PROFILE', False):
+                    val_profiles.append('hls')
 
                 # strip edx_video_id to prevent ValVideoNotFoundError error if unwanted spaces are there. TNL-5769
                 val_video_urls = edxval_api.get_urls_for_profiles(self.edx_video_id.strip(), val_profiles)

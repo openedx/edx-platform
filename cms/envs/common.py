@@ -230,6 +230,9 @@ FEATURES = {
 
     # Whether or not the dynamic EnrollmentTrackUserPartition should be registered.
     'ENABLE_ENROLLMENT_TRACK_USER_PARTITION': False,
+
+    # Fetch `hls` profile from edx-val or not
+    'ENABLE_HLS_VIDEO_PROFILE': False,
 }
 
 ENABLE_JASMINE = False
