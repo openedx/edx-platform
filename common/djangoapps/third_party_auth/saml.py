@@ -110,6 +110,7 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
         """
         return super(SAMLAuthBackend, self).generate_saml_config(idp=idp)
 
+
 class SapSuccessFactorsIdentityProvider(SAMLIdentityProvider):
     """
     Customized version of SAMLIdentityProvider that knows how to retrieve user details

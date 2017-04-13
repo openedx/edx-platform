@@ -3,11 +3,11 @@
 from django.conf.urls import include, patterns, url
 
 from .views import (
-	inactive_user_view,
-	saml_logout_view,
-	saml_metadata_view,
-	lti_login_and_complete_view,
-	post_to_custom_auth_form
+    inactive_user_view,
+    saml_logout_view,
+    saml_metadata_view,
+    lti_login_and_complete_view,
+    post_to_custom_auth_form
 )
 
 urlpatterns = patterns(

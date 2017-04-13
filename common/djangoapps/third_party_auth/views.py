@@ -9,6 +9,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseServerError, Http404, HttpResponseNotAllowed
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import View
 
 import social
 from social.apps.django_app.views import complete
@@ -21,6 +22,31 @@ from .models import SAMLConfiguration
 
 URL_NAMESPACE = getattr(settings, setting_name('URL_NAMESPACE'), None) or 'social'
 log = logging.getLogger(__name__)
+
+
+class SamlSingleLogoutView(View):
+    """
+    View handles requests to log out a user linked to a SAML SSO session.
+    """
+
+    def get(self, request):
+        """
+        Handles requests of the 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect' type
+        """
+        pass
+
+    def post(self, request):
+        """
+        Handles requests of the 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST' type
+        """
+        pass
+
+    def get_thing(self):
+        pass
+
+    def current_user_matches_logout_request(self, request):
+        pass
+
 
 def inactive_user_view(request):
     """
