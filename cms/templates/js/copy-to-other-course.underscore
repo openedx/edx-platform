@@ -1,0 +1,6 @@
+<select name="copy-to-course" class="copy-to-course">
+    <% _.each(courses, function(course) { %>
+    <option value="<%- course.course_key %>"><%- course.display_name %></option>
+    <% }); %>
+</select>
+
