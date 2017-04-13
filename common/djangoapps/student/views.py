@@ -31,7 +31,7 @@ from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbid
 from django.shortcuts import redirect
 from django.utils.encoding import force_bytes, force_text
 from django.utils.translation import ungettext
-from django.utils.http import base36_to_int, urlsafe_base64_encode, urlencode
+from django.utils.http import base36_to_int, is_safe_url, urlsafe_base64_encode, urlencode
 from django.utils.translation import ugettext as _, get_language
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.http import require_POST, require_GET
@@ -2672,7 +2672,21 @@ class LogoutView(TemplateView):
     template_name = 'logout.html'
 
     # Keep track of the page to which the user should ultimately be redirected.
-    target = reverse_lazy('cas-logout') if settings.FEATURES.get('AUTH_USE_CAS') else '/'
+    default_target = reverse_lazy('cas-logout') if settings.FEATURES.get('AUTH_USE_CAS') else '/'
+
+    @property
+    def target(self):
+        """
+        If a redirect_url is specified in the querystring for this request, and the value is a url
+        with the same host, the view will redirect to this page after rendering the template.
+        If it is not specified, we will use the default target url.
+        """
+        target_url = self.request.GET.get('redirect_url')
+
+        if target_url and is_safe_url(target_url, self.request.META.get('HTTP_HOST')):
+            return target_url
+        else:
+            return self.default_target
 
     def dispatch(self, request, *args, **kwargs):  # pylint: disable=missing-docstring
         # We do not log here, because we have a handler registered to perform logging on successful logouts.
