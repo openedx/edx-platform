@@ -182,6 +182,8 @@ def check_verify_status_by_course(user, course_enrollments):
                 now = datetime.now(UTC)
                 if deadline is not None and deadline > now:
                     days_until_deadline = (deadline - now).days
+                elif status == VERIFY_STATUS_NEED_TO_REVERIFY:
+                    days_until_deadline = (expiration_datetime - now).days
 
                 status_by_course[enrollment.course_id] = {
                     'status': status,

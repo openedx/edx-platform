@@ -52,7 +52,7 @@ from lms.djangoapps.verify_student.views import (
 from lms.djangoapps.verify_student.models import (
     VerificationDeadline, SoftwareSecurePhotoVerification,
     VerificationCheckpoint, VerificationStatus,
-    IcrvStatusEmailsConfiguration,
+    IcrvStatusEmailsConfiguration, StudentVerificationConfiguration
 )
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -876,6 +876,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
     def _set_verification_status(self, status):
         """Set the user's photo verification status. """
         attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
+        verify_student_config = StudentVerificationConfiguration.objects.create(enabled=True)
 
         if status in ["submitted", "approved", "expired", "denied", "error"]:
             attempt.mark_ready()
@@ -889,7 +890,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
             attempt.system_error("Error!")
 
         if status == "expired":
-            days_good_for = settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
+            days_good_for = verify_student_config.days_good_for
             attempt.created_at = datetime.now(pytz.UTC) - timedelta(days=(days_good_for + 1))
             attempt.save()
 
@@ -2029,11 +2030,12 @@ class TestReverifyView(TestCase):
     def test_reverify_view_can_reverify_expired(self):
         # User has a verification attempt, but it's expired
         attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
+        verify_student_config = StudentVerificationConfiguration.objects.create(enabled=True)
         attempt.mark_ready()
         attempt.submit()
         attempt.approve()
 
-        days_good_for = settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
+        days_good_for = verify_student_config.days_good_for
         attempt.created_at = datetime.now(pytz.UTC) - timedelta(days=(days_good_for + 1))
         attempt.save()
 
@@ -2067,7 +2069,6 @@ class TestReverifyView(TestCase):
         # Cannot reverify because the user is already verified.
         self._assert_cannot_reverify()
 
-    @override_settings(VERIFY_STUDENT={"DAYS_GOOD_FOR": 5, "EXPIRING_SOON_WINDOW": 10})
     def test_reverify_view_can_reverify_approved_expired_soon(self):
         """
         Verify that learner can submit photos if verification is set to expired soon.
@@ -2076,6 +2077,7 @@ class TestReverifyView(TestCase):
         EXPIRING_SOON_WINDOW(i.e here it is 10 days) or less days.
         """
 
+        StudentVerificationConfiguration.objects.create(enabled=True, days_good_for=5, expiring_soon_window=10)
         attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
         attempt.mark_ready()
         attempt.submit()

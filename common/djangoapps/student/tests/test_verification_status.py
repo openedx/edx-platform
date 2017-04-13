@@ -23,7 +23,9 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from course_modes.tests.factories import CourseModeFactory
-from lms.djangoapps.verify_student.models import VerificationDeadline, SoftwareSecurePhotoVerification
+from lms.djangoapps.verify_student.models import (
+    VerificationDeadline, SoftwareSecurePhotoVerification, StudentVerificationConfiguration
+)
 from util.testing import UrlResetMixin
 
 
@@ -194,10 +196,10 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         # messaging relating to verification
         self._assert_course_verification_status(None)
 
-    @override_settings(VERIFY_STUDENT={"DAYS_GOOD_FOR": 5, "EXPIRING_SOON_WINDOW": 10})
     def test_verification_will_expire_by_deadline(self):
         # Expiration date in the future
         self._setup_mode_and_enrollment(self.FUTURE, "verified")
+        StudentVerificationConfiguration.objects.create(enabled=True, days_good_for=5, expiring_soon_window=10)
 
         # Create a verification attempt that:
         # 1) Is current (submitted in the last year)
@@ -211,10 +213,10 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         # Verify that learner can submit photos if verification is set to expire soon.
         self._assert_course_verification_status(VERIFY_STATUS_NEED_TO_REVERIFY)
 
-    @override_settings(VERIFY_STUDENT={"DAYS_GOOD_FOR": 5, "EXPIRING_SOON_WINDOW": 10})
     def test_reverification_submitted_with_current_approved_verificaiton(self):
         # Expiration date in the future
         self._setup_mode_and_enrollment(self.FUTURE, "verified")
+        StudentVerificationConfiguration.objects.create(enabled=True, days_good_for=5, expiring_soon_window=10)
 
         # Create a verification attempt that is approved but expiring soon
         attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
