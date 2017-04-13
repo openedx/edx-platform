@@ -37,7 +37,6 @@ def common_doc_url(request, config_file_object):  # pylint: disable=unused-argum
         Returns:
             A dict mapping the following items
                 * "doc_url" - a string with the url corresponding to the online help location for the given page_token.
-                * "pdf_url" - a string with the url corresponding to the location of the PDF help file.
         """
 
         def get_config_value_with_default(section_name, option, default_option="default"):
@@ -82,35 +81,8 @@ def common_doc_url(request, config_file_object):  # pylint: disable=unused-argum
                 page_path=get_config_value_with_default("pages", page_token),
             )
 
-        def get_pdf_url():
-            """
-            Returns:
-                The URL for the PDF document using the pdf_settings and the
-                help_settings (version) in the configuration
-            """
-
-            # Read an optional configuration property that sets the base
-            # URL of pdf links. By default, DOC_LINK_BASE_URL
-            # is null, this test determines whether it is set to a non-null
-            # value. If it is set, this funtion will use its string value
-            # as the base of documentation link URLs. If it is not set, the
-            # function reads the base of the documentation link URLs from
-            # the .ini configuration file, lms_config.ini or cms_config.ini.
-            if settings.DOC_LINK_BASE_URL:
-                pdf_base_url = settings.DOC_LINK_BASE_URL
-            else:
-                pdf_base_url = config_file_object.get("pdf_settings", "pdf_base")
-
-            # Construct and return the URL for the PDF link.
-            return "{pdf_base}/{version}/{pdf_file}".format(
-                pdf_base=pdf_base_url,
-                version=doc_version(),
-                pdf_file=config_file_object.get("pdf_settings", "pdf_file"),
-            )
-
         return {
             "doc_url": get_doc_url(),
-            "pdf_url": get_pdf_url(),
         }
 
     return {'get_online_help_info': get_online_help_info}
