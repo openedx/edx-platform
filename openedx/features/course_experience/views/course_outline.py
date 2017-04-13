@@ -29,6 +29,7 @@ class CourseOutlineFragmentView(EdxFragmentView):
         for i in range(len(children)):
             child_id = block['children'][i]
             child_detail = self.populate_children(all_blocks[child_id], all_blocks, course_position)
+
             block['children'][i] = child_detail
             block['children'][i]['current'] = course_position == child_detail['block_id']
 
@@ -47,7 +48,7 @@ class CourseOutlineFragmentView(EdxFragmentView):
             course_usage_key,
             user=request.user,
             nav_depth=3,
-            requested_fields=['children', 'display_name', 'type'],
+            requested_fields=['children', 'display_name', 'type', 'due', 'graded', 'special_exam_info', 'format'],
             block_types_filter=['course', 'chapter', 'sequential']
         )
 

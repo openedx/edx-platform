@@ -52,7 +52,7 @@ setup(
             "visibility = lms.djangoapps.course_blocks.transformers.visibility:VisibilityTransformer",
             "hidden_content = lms.djangoapps.course_blocks.transformers.hidden_content:HiddenContentTransformer",
             "course_blocks_api = lms.djangoapps.course_api.blocks.transformers.blocks_api:BlocksAPITransformer",
-            "milestones = lms.djangoapps.course_api.blocks.transformers.milestones:MilestonesTransformer",
+            "milestones = lms.djangoapps.course_api.blocks.transformers.milestones:MilestonesAndSpecialExamsTransformer",
             "grades = lms.djangoapps.grades.transformer:GradesTransformer",
         ],
     }
