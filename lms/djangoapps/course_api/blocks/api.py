@@ -7,7 +7,7 @@ from lms.djangoapps.course_blocks.transformers.hidden_content import HiddenConte
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
 
 from .transformers.blocks_api import BlocksAPITransformer
-from .transformers.milestones import MilestonesTransformer
+from .transformers.milestones import MilestonesAndSpecialExamsTransformer
 from .serializers import BlockSerializer, BlockDictSerializer
 
 
@@ -56,7 +56,7 @@ def get_blocks(
         include_special_exams = True
     if user is not None:
         transformers += COURSE_BLOCK_ACCESS_TRANSFORMERS
-        transformers += [MilestonesTransformer(include_special_exams), HiddenContentTransformer()]
+        transformers += [MilestonesAndSpecialExamsTransformer(include_special_exams), HiddenContentTransformer()]
     transformers += [
         BlocksAPITransformer(
             block_counts,

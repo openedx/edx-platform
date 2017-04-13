@@ -17,7 +17,7 @@ from util import milestones_helpers
 log = logging.getLogger(__name__)
 
 
-class MilestonesTransformer(BlockStructureTransformer):
+class MilestonesAndSpecialExamsTransformer(BlockStructureTransformer):
     """
     A transformer that handles both milestones and special (timed) exams.
 
@@ -106,6 +106,8 @@ class MilestonesTransformer(BlockStructureTransformer):
             usage_info.user.id
         ))
 
+    # TODO: As part of a cleanup effort, this transformer should be split into
+    # MilestonesTransformer and SpecialExamsTransformer, which are completely independent.
     def add_special_exam_info(self, block_key, block_structure, usage_info):
         """
         For special exams, add the special exam information to the course blocks.
