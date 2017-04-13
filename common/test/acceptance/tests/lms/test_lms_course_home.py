@@ -7,11 +7,9 @@ from nose.plugins.attrib import attr
 
 from ..helpers import auto_auth, load_data_str, UniqueCourseTest
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
-from ...pages.common.logout import LogoutPage
 from ...pages.lms.bookmarks import BookmarksPage
 from ...pages.lms.course_home import CourseHomePage
 from ...pages.lms.courseware import CoursewarePage
-from ...pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
 
 
 class CourseHomeBaseTest(UniqueCourseTest):
@@ -132,29 +130,10 @@ class CourseHomeA11yTest(CourseHomeBaseTest):
     def setUp(self):
         super(CourseHomeA11yTest, self).setUp()
 
-        self.logout_page = LogoutPage(self.browser)
-
     def test_course_home_a11y(self):
         """
         Test the accessibility of the course home page with course outline.
         """
-        with self._logged_in_session():
-            course_home_page = CourseHomePage(self.browser, self.course_id)
-            course_home_page.visit()
-            course_home_page.a11y_audit.check_for_accessibility_errors()
-
-    @contextmanager
-    def _logged_in_session(self, staff=False):
-        """
-        Ensure that the user is logged in and out appropriately at the beginning
-        and end of the current test.
-        """
-        self.logout_page.visit()
-        try:
-            if staff:
-                auto_auth(self.browser, "STAFF_TESTER", "staff101@example.com", True, self.course_id)
-            else:
-                auto_auth(self.browser, self.USERNAME, self.EMAIL, False, self.course_id)
-            yield
-        finally:
-            self.logout_page.visit()
+        course_home_page = CourseHomePage(self.browser, self.course_id)
+        course_home_page.visit()
+        course_home_page.a11y_audit.check_for_accessibility_errors()
