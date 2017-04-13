@@ -1,6 +1,7 @@
 """
 Test Help links in LMS
 """
+
 import json
 
 from common.test.acceptance.tests.lms.test_lms_instructor_dashboard import BaseInstructorDashboardTest
@@ -11,10 +12,9 @@ from common.test.acceptance.fixtures.course import CourseFixture
 
 from common.test.acceptance.tests.helpers import (
     assert_link,
-    assert_opened_help_link_is_correct
+    assert_opened_help_link_is_correct,
+    url_for_help,
 )
-
-from openedx.core.release import doc_version
 
 
 class TestCohortHelp(ContainerBase):
@@ -34,13 +34,8 @@ class TestCohortHelp(ContainerBase):
         Arguments:
             href (str): Help url
         """
-        expected_link = {
-            'href': href,
-            'text': 'What does this mean?'
-        }
         actual_link = self.cohort_management.get_cohort_help_element_and_click_help()
-
-        assert_link(self, expected_link, actual_link)
+        self.assertEqual(actual_link.text, "What does this mean?")
         assert_opened_help_link_is_correct(self, href)
 
     def test_manual_cohort_help(self):
@@ -57,11 +52,10 @@ class TestCohortHelp(ContainerBase):
         """
         self.cohort_management.add_cohort('cohort_name')
 
-        href = (
-            'http://edx.readthedocs.io/projects/edx-partner-course-staff/en/{}/'
-            'course_features/cohorts/cohort_config.html#assign-learners-to-cohorts-manually'
-        ).format(doc_version())
-
+        href = url_for_help(
+            'course_author',
+            '/course_features/cohorts/cohort_config.html#assign-learners-to-cohorts-manually',
+        )
         self.verify_help_link(href)
 
     def test_automatic_cohort_help(self):
@@ -79,11 +73,10 @@ class TestCohortHelp(ContainerBase):
 
         self.cohort_management.add_cohort('cohort_name', assignment_type='random')
 
-        href = (
-            'http://edx.readthedocs.io/projects/edx-partner-course-staff/en/{}/'
-            'course_features/cohorts/cohorts_overview.html#all-automated-assignment'
-        ).format(doc_version())
-
+        href = url_for_help(
+            'course_author',
+            '/course_features/cohorts/cohorts_overview.html#all-automated-assignment',
+        )
         self.verify_help_link(href)
 
     def enable_cohorting(self, course_fixture):
@@ -114,8 +107,6 @@ class InstructorDashboardHelp(BaseInstructorDashboardTest):
         When I click "Help"
         Then I see help about the instructor dashboard in a new tab
         """
-        href = (
-            'http://edx.readthedocs.io/projects/edx-guide-for-students/en/{}/SFD_instructor_dash_help.html'
-        ).format(doc_version())
+        href = url_for_help('learner', '/SFD_instructor_dash_help.html')
         self.instructor_dashboard_page.click_help()
         assert_opened_help_link_is_correct(self, href)
