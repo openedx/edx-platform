@@ -64,3 +64,5 @@ TIERS_DATABASE_URL = AUTH_TOKENS.get('TIERS_DATABASE_URL')
 DATABASES['tiers'] = dj_database_url.parse(TIERS_DATABASE_URL)
 
 DATABASE_ROUTERS += ['openedx.core.djangoapps.appsembler.sites.routers.TiersDbRouter']
+
+XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5

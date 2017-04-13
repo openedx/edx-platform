@@ -106,9 +106,12 @@ class RegistrationSerializer(serializers.Serializer):
             site_configuration.save()
 
         # clone course
-        source_course_locator = CourseLocator._from_deprecated_string(settings.COURSE_TO_CLONE)
+        source_course_locator = CourseLocator.from_string(settings.COURSE_TO_CLONE)
         destination_course_locator = CourseLocator(organization.name, 'My first course', '2017')
-        clone_course.delay(unicode(source_course_locator), unicode(destination_course_locator), user.id)
+        clone_course.apply_async(
+            (unicode(source_course_locator), unicode(destination_course_locator), user.id),
+            queue="edx.core.cms.high"
+        )
         return {
             'site': site,
             'organization': organization,

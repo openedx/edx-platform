@@ -5,6 +5,7 @@ from .appsembler import *
 import dj_database_url
 
 INSTALLED_APPS += (
+    'django_extensions',
     'appsembler',
     'openedx.core.djangoapps.appsembler.sites',
 )
@@ -34,3 +35,22 @@ TIERS_DATABASE_URL = AUTH_TOKENS.get('TIERS_DATABASE_URL')
 DATABASES['tiers'] = dj_database_url.parse(TIERS_DATABASE_URL)
 
 DATABASE_ROUTERS += ['openedx.core.djangoapps.appsembler.sites.routers.TiersDbRouter']
+
+COURSE_TO_CLONE = "course-v1:Appsembler+CC101+2017"
+
+
+CELERY_ALWAYS_EAGER = True
+XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5
+
+ALTERNATE_QUEUE_ENVS = ['lms']
+ALTERNATE_QUEUES = [
+    DEFAULT_PRIORITY_QUEUE.replace(QUEUE_VARIANT, alternate + '.')
+    for alternate in ALTERNATE_QUEUE_ENVS
+]
+CELERY_QUEUES.update(
+    {
+        alternate: {}
+        for alternate in ALTERNATE_QUEUES
+        if alternate not in CELERY_QUEUES.keys()
+    }
+)

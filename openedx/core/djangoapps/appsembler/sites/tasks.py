@@ -5,11 +5,8 @@ import logging
 from celery.task import task
 from celery.utils.log import get_task_logger
 
-from cms.djangoapps.contentstore.tasks import deserialize_fields
-
 from django.contrib.auth.models import User
 
-from contentstore.utils import initialize_permissions
 from opaque_keys.edx.keys import CourseKey
 
 from student.roles import CourseInstructorRole, CourseStaffRole
@@ -27,12 +24,14 @@ def clone_course(source_course_key_string, destination_course_key_string, user_i
     """
     # import here, at top level this import prevents the celery workers from starting up correctly
     from edxval.api import copy_course_videos
+    from contentstore.utils import initialize_permissions
+    from contentstore.courseware_index import SearchIndexingError
+    from contentstore.views.course import reindex_course_and_check_access
 
     try:
         # deserialize the payload
         source_course_key = CourseKey.from_string(source_course_key_string)
         destination_course_key = CourseKey.from_string(destination_course_key_string)
-        fields = deserialize_fields(fields) if fields else None
 
         # use the split modulestore as the store for the rerun course,
         # as the Mongo modulestore doesn't support multiple runs of the same course.
@@ -61,6 +60,10 @@ def clone_course(source_course_key_string, destination_course_key_string, user_i
         # do NOT delete the original course, only update the status
         logging.exception(u'Course Clone Error')
         return "duplicate course"
+
+    except SearchIndexingError as search_err:
+        logging.exception(u'Course Clone index Error')
+        return "index error"
 
     # catch all exceptions so we can update the state and properly cleanup the course.
     except Exception as exc:  # pylint: disable=broad-except

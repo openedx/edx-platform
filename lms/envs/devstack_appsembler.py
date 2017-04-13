@@ -47,7 +47,10 @@ INTERCOM_APP_SECRET = AUTH_TOKENS.get("INTERCOM_APP_SECRET")
 EDX_API_KEY = "test"
 
 INSTALLED_APPS += ('tiers',)
-MIDDLEWARE_CLASSES += ('organizations.middleware.OrganizationMiddleware', 'tiers.middleware.TierMiddleware',)
+MIDDLEWARE_CLASSES += (
+    'organizations.middleware.OrganizationMiddleware',
+#    'tiers.middleware.TierMiddleware',
+)
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
@@ -60,3 +63,18 @@ DATABASES['tiers'] = dj_database_url.parse(TIERS_DATABASE_URL)
 DATABASE_ROUTERS += ['openedx.core.djangoapps.appsembler.sites.routers.TiersDbRouter']
 
 COURSE_TO_CLONE = "course-v1:Appsembler+CC101+2017"
+
+CELERY_ALWAYS_EAGER = True
+
+ALTERNATE_QUEUE_ENVS = ['cms']
+ALTERNATE_QUEUES = [
+    DEFAULT_PRIORITY_QUEUE.replace(QUEUE_VARIANT, alternate + '.')
+    for alternate in ALTERNATE_QUEUE_ENVS
+]
+CELERY_QUEUES.update(
+    {
+        alternate: {}
+        for alternate in ALTERNATE_QUEUES
+        if alternate not in CELERY_QUEUES.keys()
+    }
+)
