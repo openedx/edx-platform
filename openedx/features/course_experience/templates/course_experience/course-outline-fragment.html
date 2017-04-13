@@ -42,25 +42,29 @@ from django.utils.translation import ugettext as _
                                     ## Subsection title
                                     <span class="subsection-title">${ subsection['display_name'] }</span>
 
+                                    <%
+                                        # assignment_type could be 'Homework', 'Lab', etc., or empty
+                                        assignment_type = subsection.get('format')
+
+                                        if 'special_exam_info' in subsection:
+                                            assignment_description = None
+                                        else:
+                                            assignment_description = assignment_type
+
+                                        if subsection.get('due') is None:
+                                            due_description = None
+                                        else:
+                                            due_description = _('due {date}')
+
+                                        # Use a ' ' to join the non-empty assignment and due descriptions
+                                        data_string = ' '.join(filter(None, [assignment_description, due_description]))
+                                    %>
+                                    % if assignment_type or 'special_exam_info' in subsection:
                                     <div class="details">
-                                        ## There are behavior differences between rendering of subsections which have
-                                        ## exams (timed, graded, etc) and those that do not.
-                                        ##
-                                        ## Exam subsections expose exam status message field as well as a status icon
-                                        <%
-                                            if subsection.get('due') is None:
-                                                # examples: Homework, Lab, etc.
-                                                data_string = subsection.get('format')
-                                            else:
-                                                if 'special_exam_info' in subsection:
-                                                    data_string = _('due {date}')
-                                                else:
-                                                    data_string = _("{subsection_format} due {{date}}").format(subsection_format=subsection.get('format'))
-                                        %>
-                                        % if subsection.get('format') or 'special_exam_info' in subsection:
+                                        ## Add additional details for assignments and special exams (time, proctored).
                                         <span class="subtitle">
                                             % if 'special_exam' in subsection:
-                                                ## Display the exam status icon and status message
+                                                ## Display the exam status icon and status message.
                                                 <span
                                                     class="menu-icon icon fa ${subsection['special_exam_info'].get('suggested_icon', 'fa-pencil-square-o')} ${subsection['special_exam_info'].get('status', 'eligible')}"
                                                     aria-hidden="true"
@@ -81,8 +85,7 @@ from django.utils.translation import ugettext as _
                                                     ></span>
                                                 % endif
                                             % else:
-                                                ## non-graded section, we just show the exam format and the due date
-                                                ## this is the standard case in edx-platform
+                                                ## Display the assignment type and due date.
                                                 <span
                                                     class="localized-datetime subtitle-name"
                                                     data-datetime="${subsection.get('due')}"
@@ -92,6 +95,7 @@ from django.utils.translation import ugettext as _
                                                 ></span>
 
                                                 % if 'graded' in subsection and subsection['graded']:
+                                                    ## For graded assignments, display an icon.
                                                     <span
                                                         class="menu-icon icon fa fa-pencil-square-o"
                                                         aria-hidden="true"
@@ -100,8 +104,8 @@ from django.utils.translation import ugettext as _
                                                 % endif
                                             % endif
                                         </span>
-                                        % endif
                                     </div> <!-- /details -->
+                                    % endif
                                 </div> <!-- /subsection-text -->
                                 <div class="subsection-actions">
                                     ## Resume button (if last visited section)
