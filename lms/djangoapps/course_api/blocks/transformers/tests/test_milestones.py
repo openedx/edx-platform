@@ -12,7 +12,7 @@ from openedx.core.lib.gating import api as gating_api
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
 from student.tests.factories import CourseEnrollmentFactory
 
-from ..milestones import MilestonesTransformer
+from ..milestones import MilestonesAndSpecialExamsTransformer
 from ...api import get_course_blocks
 
 
@@ -23,7 +23,7 @@ class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseM
     """
     Test behavior of ProctoredExamTransformer
     """
-    TRANSFORMER_CLASS_TO_TEST = MilestonesTransformer
+    TRANSFORMER_CLASS_TO_TEST = MilestonesAndSpecialExamsTransformer
 
     def setUp(self):
         """
