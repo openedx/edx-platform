@@ -1,15 +1,15 @@
 // LMS variables
 
 $baseline: 20px !default;
-$lms-max-width: 1180px;
 
 $lms-header-height: 64px;
 
+$header-bg: $white;
 $lms-gray: $gray;
 $lms-background-color: $gray-lightest;
 $lms-container-background-color: $white;
-$lms-border-color: $gray-light;
-$lms-label-color: $font-color;
+$lms-border-color: $gray-lighter;
+$lms-label-color: $body-color;
 $lms-active-color: $brand-primary;
 $lms-preview-menu-color: #c8c8c8;
 

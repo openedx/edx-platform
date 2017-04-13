@@ -46,14 +46,27 @@ include_special_exams = settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and
         </select>
     % endif
     <nav class="${active_page} wrapper-course-material desktop-only" aria-label="${_('Course Material')}">
-        <div class="course-material">
+        <div class="course-material container">
             <%
             tabs_tmpl = static.get_template_path('/courseware/tabs.html')
             %>
-            <ol class="tabs course-tabs">
-                <%include file="${tabs_tmpl}" args="tab_list=tab_list,active_page=active_page,default_tab=default_tab,tab_image=tab_image" />
-                <%block name="extratabs" />
-            </ol>
+            % if uses_bootstrap:
+                <ul class="nav nav-tabs">
+                    % for tab in tab_list:
+                        <%
+                        tab_is_active = tab.tab_id in (active_page, default_tab)
+                        %>
+                        <li class="nav-item">
+                            <a class="nav-link ${"active" if tab_is_active else ""}" href="${tab.link_func(course, reverse)}">${_(tab.name)}</a>
+                        </li>
+                    % endfor
+                </ul>
+            % else:
+                <ol class="tabs course-tabs">
+                    <%include file="${tabs_tmpl}" args="tab_list=tab_list,active_page=active_page,default_tab=default_tab,tab_image=tab_image" />
+                    <%block name="extratabs" />
+                </ol>
+            % endif
         </div>
     </nav>
 %endif

@@ -8,7 +8,7 @@
     height: $lms-header-height;
     border-bottom: 1px solid $gray-light;
     box-shadow: 0 1px 5px 0 $shadow-l1;
-    background: $brand-background;
+    background: $header-bg;
     font-size: 18px;
 
     @include media-breakpoint-up(md) {
@@ -19,7 +19,6 @@
         margin: 0 auto;
         padding: 10px 10px 0;
         width: 100%;
-        max-width: $lms-max-width;
         font-size: 18px;
 
         .logo-header {
@@ -72,6 +71,7 @@
         .wrapper-user-menu {
             margin-top: 4px;
             width: auto;
+            float: right;
         }
 
         .dropdown-menu {
@@ -165,16 +165,17 @@
 
 .doc-link {
     @include margin(($baseline*0.75), ($baseline*0.75), ($baseline*0.75), ($baseline*0.75));
+    float: right;
     display: none;
     font-size: 14px;
     font-weight: bold;
-    color: $font-color;
+    color: $body-color;
 
     @include media-breakpoint-up(md) {
         display: inline;
     }
 
     &:visited {
-        color: $font-color;
+        color: $body-color;
     }
 }

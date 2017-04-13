@@ -1,8 +1,8 @@
 <nav class="pagination pagination-full bottom" aria-label="<%= paginationLabel %>">
-    <div class="nav-item previous"><button class="btn-link nav-link previous-page-link"><span class="icon fa fa-angle-left" aria-hidden="true"></span> <span class="nav-label"><%= gettext("Previous") %></span></button></div>
+    <div class="nav-item previous"><button class="btn-link nav-link previous-page-link"><span class="icon fa fa-angle-left" aria-hidden="true"></span> <span class="nav-label sr-only"><%= gettext("Previous") %></span></button></div>
     <div class="nav-item page">
         <div class="pagination-form">
-            <label class="page-number-label" for="page-number-input"><%= interpolate(
+            <label class="page-number-label sr-only" for="page-number-input"><%= interpolate(
                     gettext("Page number out of %(total_pages)s"),
                     {total_pages: total_pages},
                     true
@@ -16,5 +16,5 @@
         <span class="page-divider" aria-hidden="true">/</span>
         <span class="total-pages"><%= total_pages %></span>
     </div>
-    <div class="nav-item next"><button class="btn-link nav-link next-page-link"><span class="nav-label"><%= gettext("Next") %></span> <span class="icon fa fa-angle-right" aria-hidden="true"></span></button></div>
+    <div class="nav-item next"><button class="btn-link nav-link next-page-link"><span class="nav-label sr-only"><%= gettext("Next") %></span> <span class="icon fa fa-angle-right" aria-hidden="true"></span></button></div>
 </nav>

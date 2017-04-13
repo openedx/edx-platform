@@ -1,0 +1,21 @@
+// Bootstrap component style overrides
+
+// Tabs
+.nav-tabs {
+    .nav-link {
+        color: $body-color;
+    }
+
+    .nav-link {
+        border-color: transparent;
+        border-width: 0 0 4px;
+
+        @include hover-focus {
+            border-color: $brand-primary;
+        }
+
+        &.active {
+            border-color: $brand-primary;
+        }
+    }
+}

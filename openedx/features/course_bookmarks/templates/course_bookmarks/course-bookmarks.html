@@ -35,20 +35,13 @@ ${HTML(bookmarks_fragment.foot_html())}
 </%block>
 
 <%block name="content">
-<div class="course-view main-container" id="course-container">
+<div class="course-view container main-container" id="course-container">
     <header class="page-header has-secondary">
         ## Breadcrumb navigation
         <div class="page-header-main">
-            <nav aria-label="${_('My Bookmarks')}" class="sr-is-focusable" tabindex="-1">
-                <div class="has-breadcrumbs">
-                    <div class="breadcrumbs">
-                        <span class="nav-item">
-                            <a href="${course_url}">Course</a>
-                        </span>
-                        <span class="icon fa fa-angle-right" aria-hidden="true"></span>
-                        <span class="nav-item">${_('My Bookmarks')}</span>
-                    </div>
-                </div>
+            <nav class="breadcrumb" aria-label="${_('My Bookmarks')}" class="sr-is-focusable" tabindex="-1">
+                <a class="breadcrumb-item" href="${course_url}">Course</a>
+                <span class="breadcrumb-item active">${_('My Bookmarks')}</span>
             </nav>
         </div>
     </header>

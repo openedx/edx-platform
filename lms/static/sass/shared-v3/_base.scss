@@ -27,7 +27,7 @@
     display: none;
 
     @include media-breakpoint-up(md) {
-        display: initial;
+        display: unset;
     }
 }
 
