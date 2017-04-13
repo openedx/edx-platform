@@ -720,6 +720,7 @@ def _create_or_rerun_course(request):
         org = request.json.get('org')
         course = request.json.get('number', request.json.get('course'))
         display_name = request.json.get('display_name')
+        robot = request.json.get('robot')
         # force the start date for reruns and allow us to override start via the client
         start = request.json.get('start', CourseFields.start.default)
         run = request.json.get('run')
@@ -732,7 +733,7 @@ def _create_or_rerun_course(request):
                     status=400
                 )
 
-        fields = {'start': start}
+        fields = {'start': start, 'robot': robot}
         if display_name is not None:
             fields['display_name'] = display_name
 
@@ -853,6 +854,10 @@ def _rerun_course(request, org, number, run, fields):
     fields['advertised_start'] = None
 
     # Rerun the course as a new celery task
+    """
+    Fire Robot HERE
+
+    """
     json_fields = json.dumps(fields, cls=EdxJSONEncoder)
     rerun_course.delay(unicode(source_course_key), unicode(destination_course_key), request.user.id, json_fields)
 
