@@ -85,7 +85,7 @@ class MilestonesTransformer(BlockStructureTransformer):
     @staticmethod
     def is_special_exam(block_key, block_structure):
         """
-        Test whether the block is a special exam. 
+        Test whether the block is a special exam.
         """
         return (
             block_structure.get_xblock_field(block_key, 'is_proctored_enabled') or
@@ -135,9 +135,9 @@ class MilestonesTransformer(BlockStructureTransformer):
     def get_required_content(usage_info, block_structure):
         """
         Get the required content for the course.
-         
+
         This takes into account if the user can skip the entrance exam.
-         
+
         """
         course_key = block_structure.root_block_usage_key.course_key
         user_can_skip_entrance_exam = EntranceExamConfiguration.user_can_skip_entrance_exam(usage_info.user, course_key)
