@@ -163,7 +163,8 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         self.assertIn(twitter_url, twitter_widget.attrs('onclick')[0])
 
         facebook_widget = self.dashboard_page.get_course_social_sharing_widget('facebook')
-        facebook_url = "https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fcustom%2Fcourse%2Furl"
+        facebook_url = ('https://www.facebook.com/sharer/sharer.php?'
+                        'u=http%3A%2F%2Fcustom%2Fcourse%2Furl&quote=I%27m+taking')
         self.assertEqual(facebook_widget.attrs('title')[0], 'Share on Facebook')
         self.assertEqual(facebook_widget.attrs('data-tooltip')[0], 'Share on Facebook')
         self.assertEqual(facebook_widget.attrs('aria-haspopup')[0], 'true')
