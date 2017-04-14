@@ -109,19 +109,19 @@ from student.helpers import (
                     course_date = course_overview.end
                 elif course_overview.has_started():
                     container_string = _("Started - {date}")
-                    course_date = course_overview.start
+                    course_date = course_overview.dashboard_start_display
                 elif course_overview.starts_within(days=5):
                     container_string = _("Starts - {date}")
-                    course_date = course_overview.start
+                    course_date = course_overview.dashboard_start_display
                     format = 'defaultFormat'
                 else: ## hasn't started yet
                     container_string = _("Starts - {date}")
-                    course_date = course_overview.start
+                    course_date = course_overview.dashboard_start_display
                 endif
             endif
           %>
 
-                % if isinstance(course_date, str):
+                % if isinstance(course_date, basestring):
                     <span class="info-date-block" data-tooltip="Hi">${_(container_string).format(date=course_date)}</span>
                 % elif course_date is not None:
                     <%
