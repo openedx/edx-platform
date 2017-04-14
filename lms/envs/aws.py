@@ -920,3 +920,7 @@ ENTERPRISE_ENROLLMENT_API_URL = ENV_TOKENS.get(
 
 # Discovery App config
 COURSES_API_CACHE_TIMEOUT = ENV_TOKENS.get('COURSES_API_CACHE_TIMEOUT', COURSES_API_CACHE_TIMEOUT)
+
+##################### Sentry settings #####################
+
+RAVEN_CONFIG = ENV_TOKENS.get('RAVEN_CONFIG', {})
