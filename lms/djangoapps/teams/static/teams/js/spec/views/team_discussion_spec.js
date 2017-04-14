@@ -22,7 +22,6 @@ define([
             discussionView = new TeamDiscussionView({
                 el: '.discussion-module'
             });
-            discussionView.render();
             AjaxHelpers.expectRequest(
                 requests, 'GET',
                 interpolate(
