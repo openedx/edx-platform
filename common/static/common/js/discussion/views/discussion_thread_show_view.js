@@ -31,6 +31,7 @@
                 DiscussionThreadShowView.__super__.initialize.call(this);
                 this.mode = options.mode || 'inline';
                 this.startHeader = options.startHeader;
+                this.is_commentable_cohorted = options.is_commentable_cohorted;
                 if ((_ref = this.mode) !== 'tab' && _ref !== 'inline') {
                     throw new Error('invalid mode: ' + this.mode);
                 }
@@ -41,6 +42,7 @@
                     mode: this.mode,
                     startHeader: this.startHeader,
                     flagged: this.model.isFlagged(),
+                    is_commentable_cohorted: this.is_commentable_cohorted,
                     author_display: this.getAuthorDisplay(),
                     cid: this.model.cid,
                     readOnly: $('.discussion-module').data('read-only')
