@@ -1,8 +1,11 @@
+from django.conf import settings
 from django.contrib.sites.models import Site
+from opaque_keys.edx.locator import CourseLocator
 from rest_framework import serializers
 from organizations import api as organizations_api
 from organizations.models import Organization
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
+from openedx.core.djangoapps.appsembler.sites.tasks import clone_course
 from .utils import sass_to_dict, dict_to_sass, bootstrap_site
 
 
@@ -101,6 +104,14 @@ class RegistrationSerializer(serializers.Serializer):
                 '$accent-font-name': '"Delius Unicase"',
             })
             site_configuration.save()
+
+        # clone course
+        source_course_locator = CourseLocator.from_string(settings.COURSE_TO_CLONE)
+        destination_course_locator = CourseLocator(organization.name, 'My first course', '2017')
+        clone_course.apply_async(
+            (unicode(source_course_locator), unicode(destination_course_locator), user.id),
+            queue="edx.core.cms.high"
+        )
         return {
             'site': site,
             'organization': organization,
