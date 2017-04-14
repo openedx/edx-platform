@@ -9,6 +9,9 @@ from config_models.models import ConfigurationModel
 
 class CrawlersConfig(ConfigurationModel):
     """Configuration for the crawlers django app."""
+    class Meta(object):
+        app_label = "crawlers"
+
     known_user_agents = models.TextField(
         blank=True,
         help_text="A comma-separated list of known crawler user agents.",
