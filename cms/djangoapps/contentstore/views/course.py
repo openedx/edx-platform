@@ -733,7 +733,9 @@ def _create_or_rerun_course(request):
                     status=400
                 )
 
-        fields = {'start': start, 'robot': robot}
+        fields = {'start': start}
+        if robot is not None:
+            fields['robot'] = robot
         if display_name is not None:
             fields['display_name'] = display_name
 
