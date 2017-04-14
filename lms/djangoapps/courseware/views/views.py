@@ -520,7 +520,7 @@ class CourseTabView(EdxFragmentView):
             'staff_access': staff_access,
             'masquerade': masquerade,
             'supports_preview_menu': supports_preview_menu,
-            'uses_pattern_library': True,
+            'uses_bootstrap': True,
             'disable_courseware_js': True,
         }
 

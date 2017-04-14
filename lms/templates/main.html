@@ -63,7 +63,7 @@ from pipeline_mako import render_require_js_path_overrides
   <%static:css group='style-vendor'/>
   <%static:css group='${self.attr.main_css}'/>
 
-  % if not (uses_pattern_library or uses_bootstrap):
+  % if not uses_pattern_library:
     % if disable_courseware_js:
       <%static:js group='base_vendor'/>
       <%static:js group='base_application'/>
@@ -142,7 +142,7 @@ from pipeline_mako import render_require_js_path_overrides
         <%include file="/preview_menu.html" />
     % endif
 
-    <div class="content-wrapper" id="content">
+    <div class="content-wrapper container main-container" id="content">
       ${self.body()}
       <%block name="bodyextra"/>
     </div>

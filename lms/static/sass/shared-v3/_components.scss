@@ -3,18 +3,17 @@
 // Select
 select.mobile-only {
     width: 100%;
-    height: 30px;
+    height: 3rem;
     font-size: $font-size-lg;
     line-height: $line-height-lg;
+    background-color: transparent;
+    border: none;
 }
 
 // Tabs
-.nav-tabs {
+.nav {
     .nav-link {
-        color: $body-color;
-    }
-
-    .nav-link {
+        border-style: solid;
         border-color: transparent;
         border-width: 0 0 4px;
 

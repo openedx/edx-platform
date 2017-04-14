@@ -33,13 +33,27 @@ include_special_exams = settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and
     <%
     tab_list = get_course_tab_list(request, course)
     %>
-    <nav class="${active_page} wrapper-course-material desktop-only" aria-label="${_('Course Material')}">
-        <div class="course-material ${'container' if uses_bootstrap else ''}">
+    <nav class="${active_page} wrapper-course-material" aria-label="${_('Course Material')}">
+        % if uses_bootstrap:
+            <div class="wrapper-select-course-material mobile-only">
+                <select class="select-course-material mobile-only" onchange="if (this.value) { window.location.href=this.value; }">
+                    % for tab in tab_list:
+                        <%
+                        tab_is_active = tab.tab_id in (active_page, default_tab)
+                        %>
+                        <option value="${tab.link_func(course, reverse)}" ${"selected=selected" if tab_is_active else ""}>
+                            ${_(tab.name)}
+                        </option>
+                    % endfor
+                </select>
+            </div>
+        % endif
+        <div class="course-material desktop-only">
             <%
             tabs_tmpl = static.get_template_path('/courseware/tabs.html')
             %>
             % if uses_bootstrap:
-                <ul class="nav nav-tabs">
+                <ul class="nav">
                     % for tab in tab_list:
                         <%
                         tab_is_active = tab.tab_id in (active_page, default_tab)

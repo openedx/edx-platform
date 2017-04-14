@@ -1,3 +1,5 @@
+<%! main_css = "style-main-v3" %>
+
 <%page expression_filter="h"/>
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
@@ -57,10 +59,15 @@ from openedx.features.course_experience import UNIFIED_COURSE_VIEW_FLAG
 
 <%block name="headextra">
 <%static:css group='style-course-vendor'/>
-<%static:css group='style-course'/>
+% if uses_bootstrap:
+    <%static:css group='style-course-v3'/>
+% else:
+    <%static:css group='style-course'/>
+% endif
+
 ## Utility: Notes
 % if is_edxnotes_enabled(course):
-<%static:css group='style-student-notes'/>
+    <%static:css group='style-student-notes'/>
 % endif
 
 <script type="text/javascript" src="${static.url('js/jquery.autocomplete.js')}"></script>
@@ -111,7 +118,7 @@ ${HTML(fragment.foot_html())}
   <%include file="/courseware/course_navigation.html" args="active_page='courseware'" />
 % endif
 
-<div class="container">
+<div class="container main-container">
   <div class="course-wrapper" role="presentation">
 
 % if disable_accordion is UNDEFINED or not disable_accordion:

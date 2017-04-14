@@ -19,7 +19,7 @@ from openedx.features.course_experience import UNIFIED_COURSE_EXPERIENCE_FLAG
 %>
 
 <%block name="content">
-<div class="course-view container" id="course-container">
+<div class="course-view container main-container" id="course-container">
     <header class="page-header has-secondary">
         <div class="page-header-main">
             <nav aria-label="${_('Course Outline')}" class="sr-is-focusable" tabindex="-1">
@@ -29,22 +29,22 @@ from openedx.features.course_experience import UNIFIED_COURSE_EXPERIENCE_FLAG
         <div class="page-header-secondary">
             % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
                 <div class="page-header-search">
-                    <form class="search-form" role="search">
+                    <form class="form-inline search-form" role="search">
                         <label class="field-label sr-only" for="search" id="search-hint">${_('Search the course')}</label>
                         <input
-                                class="field-input input-text search-input"
-                                type="search"
-                                name="search"
-                                id="search"
-                                placeholder="${_('Search the course')}"
-                        />
-                        <button class="btn btn-small search-btn" type="button">${_('Search')}</button>
+                            class="field-input input-text search-input"
+                            type="search"
+                            name="search"
+                            id="search"
+                            placeholder="${_('Search the course')}"
+                            />
+                        <button class="btn btn-secondary search-btn" type="button">${_('Search')}</button>
                     </form>
                 </div>
             % endif
             <div class="form-actions">
                 % if resume_course_url:
-                    <a class="btn btn-brand action-resume-course" href="${resume_course_url}">
+                    <a class="btn btn-secondary action-resume-course" href="${resume_course_url}">
                         % if has_visited_course:
                             ${_("Resume Course")}
                         % else:

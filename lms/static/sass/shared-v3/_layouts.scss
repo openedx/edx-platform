@@ -4,6 +4,10 @@
     margin: 0 auto;
     margin-top: $lms-header-height;
 
+    &.container {
+        padding: 0;
+    }
+
     @include media-breakpoint-up(md) {
         margin-top: 0;
         padding: $baseline*2 0;
@@ -24,6 +28,17 @@
             margin-bottom: ($baseline/4);
             text-transform: none;
             color: $black;
+        }
+
+        .page-header-search {
+            .search-form {
+                display: inline-flex;
+
+                .search-input {
+                    height: 2.2rem;
+                    padding: 0.625rem;
+                }
+            }
         }
 
         .page-description {
