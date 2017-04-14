@@ -1084,6 +1084,9 @@ OPTIONAL_APPS = (
 
     # Organizations App (http://github.com/edx/edx-organizations)
     'organizations',
+
+    # Enterprise App (http://github.com/edx/edx-enterprise)
+    'enterprise',
 )
 
 
@@ -1263,6 +1266,8 @@ USER_TASKS_MAX_AGE = timedelta(days=7)
 ############## Settings for the Enterprise App ######################
 
 ENTERPRISE_ENROLLMENT_API_URL = LMS_ROOT_URL + "/api/enrollment/v1/"
+ENTERPRISE_SERVICE_WORKER_USERNAME = 'enterprise_worker'
+ENTERPRISE_API_CACHE_TIMEOUT = 3600  # Value is in seconds
 
 ############## Settings for the Discovery App ######################
 
