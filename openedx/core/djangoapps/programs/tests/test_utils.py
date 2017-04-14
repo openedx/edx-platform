@@ -416,6 +416,30 @@ class TestProgramProgressMeter(TestCase):
         meter = ProgramProgressMeter(self.user)
         self.assertEqual(meter.completed_programs, program_uuids)
 
+    @mock.patch(UTILS_MODULE + '.ProgramProgressMeter.completed_course_runs', new_callable=mock.PropertyMock)
+    def test_completed_programs_no_id_professional(self, mock_completed_course_runs, mock_get_programs):
+        """ Verify the method treats no-id-professional enrollments as professional enrollments. """
+        course_runs = CourseRunFactory.create_batch(2, type='no-id-professional')
+        program = ProgramFactory(courses=[CourseFactory(course_runs=course_runs)])
+        mock_get_programs.return_value = [program]
+
+        # Verify that no programs are complete.
+        meter = ProgramProgressMeter(self.user)
+        self.assertEqual(meter.completed_programs, [])
+
+        # Complete all programs.
+        for course_run in course_runs:
+            CourseEnrollmentFactory(user=self.user, course_id=course_run['key'], mode='no-id-professional')
+
+        mock_completed_course_runs.return_value = [
+            {'course_run_id': course_run['key'], 'type': MODES.professional}
+            for course_run in course_runs
+        ]
+
+        # Verify that all programs are complete.
+        meter = ProgramProgressMeter(self.user)
+        self.assertEqual(meter.completed_programs, [program['uuid']])
+
     @mock.patch(UTILS_MODULE + '.certificate_api.get_certificates_for_user')
     def test_completed_course_runs(self, mock_get_certificates_for_user, _mock_get_programs):
         """
