@@ -257,6 +257,12 @@ class ProgramProgressMeter(object):
             Modify the structure of a course run dict to facilitate comparison
             with course run certificates.
             """
+            course_run_type = course_run['type']
+
+            # Treat no-id-professional enrollments as professional
+            if course_run_type == CourseMode.NO_ID_PROFESSIONAL_MODE:
+                course_run_type = CourseMode.PROFESSIONAL
+
             return {
                 'course_run_id': course_run['key'],
                 # A course run's type is assumed to indicate which mode must be
@@ -266,7 +272,7 @@ class ProgramProgressMeter(object):
                 # count towards completion of a course in a program). This may change
                 # in the future to make use of the more rigid set of "applicable seat
                 # types" associated with each program type in the catalog.
-                'type': course_run['type'],
+                'type': course_run_type,
             }
 
         return any(reshape(course_run) in self.completed_course_runs for course_run in course['course_runs'])
