@@ -2,6 +2,8 @@
 Module for code that should run during LMS startup
 """
 
+import logging
+
 import django
 from django.conf import settings
 
@@ -9,8 +11,10 @@ from django.conf import settings
 
 settings.INSTALLED_APPS  # pylint: disable=pointless-statement
 
+import help_tokens
+
 from openedx.core.lib.django_startup import autostartup
-import logging
+from openedx.core.release import doc_version
 import analytics
 from openedx.core.djangoapps.monkey_patch import django_db_models_options
 
@@ -81,6 +85,8 @@ def run():
 
     # validate configurations on startup
     validate_lms_config(settings)
+
+    settings.HELP_TOKENS_VERSION = "en/" + doc_version()
 
 
 def add_mimetypes():

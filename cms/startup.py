@@ -8,10 +8,13 @@ from django.conf import settings
 
 settings.INSTALLED_APPS  # pylint: disable=pointless-statement
 
+import help_tokens
+
 from openedx.core.lib.django_startup import autostartup
 import django
 from openedx.core.djangoapps.monkey_patch import django_db_models_options
 from openedx.core.lib.xblock_utils import xblock_local_resource_url
+from openedx.core.release import doc_version
 
 import xmodule.x_module
 import cms.lib.xblock.runtime
@@ -47,6 +50,8 @@ def run():
 
     # validate configurations on startup
     validate_cms_config(settings)
+
+    settings.HELP_TOKENS_VERSION = "en/" + doc_version()
 
 
 def add_mimetypes():
