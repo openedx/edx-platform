@@ -89,6 +89,7 @@ git+https://github.com/edx/xblock-utils.git@v1.0.4#egg=xblock-utils==1.0.4
 git+https://github.com/edx/edx-user-state-client.git@1.0.1#egg=edx-user-state-client==1.0.1
 git+https://github.com/edx/xblock-lti-consumer.git@v1.1.2#egg=lti_consumer-xblock==1.1.2
 git+https://github.com/edx/edx-proctoring.git@0.18.0#egg=edx-proctoring==0.18.0
+git+https://github.com/nedbat/help-tokens.git#egg=help-tokens==0.0
 
 # Third Party XBlocks
 git+https://github.com/open-craft/xblock-poll@v1.2.6#egg=xblock-poll==1.2.6
