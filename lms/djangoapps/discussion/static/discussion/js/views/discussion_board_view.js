@@ -52,7 +52,7 @@
                     el: this.$('.forum-search')
                 }).render();
                 this.renderBreadcrumbs();
-                $(window).bind('load scroll resize', this.updateSidebar);
+                $(window).bind('load scroll resize', _.bind(this.updateSidebar, this));
                 this.showBrowseMenu(true);
                 return this;
             },
