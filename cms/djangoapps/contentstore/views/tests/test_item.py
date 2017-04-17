@@ -1241,10 +1241,10 @@ class TestMoveItem(ItemTest):
             'parent_locator': unicode(self.vert2_usage_key)
         }
         response = self.client.patch(
-                reverse('contentstore.views.xblock_handler'),
-                json.dumps(data),
-                content_type='application/json'
-            )
+            reverse('contentstore.views.xblock_handler'),
+            json.dumps(data),
+            content_type='application/json'
+        )
         self.assertEqual(response.status_code, 400)
         response = json.loads(response.content)
         error = "{source_usage_key} not found.".format(source_usage_key=data['move_source_locator'])
