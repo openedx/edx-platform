@@ -714,7 +714,11 @@ def _move_item(source_usage_key, target_parent_usage_key, user, target_index=Non
 
     store = modulestore()
     with store.bulk_operations(source_usage_key.course_key):
-        source_item = store.get_item(source_usage_key)
+        if store.has_item(source_usage_key):
+            source_item = store.get_item(source_usage_key)
+        else:
+            error = _("{source_usage_key} not found.").format(source_usage_key=unicode(source_usage_key))
+            return JsonResponse({'error': error}, status=400)
         source_parent = source_item.get_parent()
         target_parent = store.get_item(target_parent_usage_key)
         source_type = source_item.category
