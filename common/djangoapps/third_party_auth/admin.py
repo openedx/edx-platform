@@ -33,7 +33,7 @@ class OAuth2ProviderConfigAdmin(KeyedConfigurationModelAdmin):
     def get_list_display(self, request):
         """ Don't show every single field in the admin change list """
         return (
-            'name', 'enabled', 'site', 'backend_name', 'secondary', 'skip_registration_form',
+            'name', 'enabled', 'provider_slug', 'site', 'backend_name', 'secondary', 'skip_registration_form',
             'skip_email_verification', 'change_date', 'changed_by', 'edit_link',
         )
 

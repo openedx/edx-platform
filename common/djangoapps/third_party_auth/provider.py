@@ -22,9 +22,10 @@ class Registry(object):
         Helper method that returns a generator used to iterate over all providers
         of the current site.
         """
-        for backend_name in _PSA_OAUTH2_BACKENDS:
-            provider = OAuth2ProviderConfig.current(backend_name)
-            if provider.enabled_for_current_site:
+        oauth2_slugs = OAuth2ProviderConfig.key_values('provider_slug', flat=True)
+        for oauth2_slug in oauth2_slugs:
+            provider = OAuth2ProviderConfig.current(oauth2_slug)
+            if provider.enabled_for_current_site and provider.backend_name in _PSA_OAUTH2_BACKENDS:
                 yield provider
         if SAMLConfiguration.is_enabled(Site.objects.get_current(get_current_request())):
             idp_slugs = SAMLProviderConfig.key_values('idp_slug', flat=True)
@@ -103,9 +104,11 @@ class Registry(object):
             Instances of ProviderConfig.
         """
         if backend_name in _PSA_OAUTH2_BACKENDS:
-            provider = OAuth2ProviderConfig.current(backend_name)
-            if provider.enabled_for_current_site:
-                yield provider
+            oauth2_slugs = OAuth2ProviderConfig.key_values('provider_slug', flat=True)
+            for oauth2_slug in oauth2_slugs:
+                provider = OAuth2ProviderConfig.current(oauth2_slug)
+                if provider.backend_name == backend_name and provider.enabled_for_current_site:
+                    yield provider
         elif backend_name in _PSA_SAML_BACKENDS and SAMLConfiguration.is_enabled(
                 Site.objects.get_current(get_current_request())):
             idp_names = SAMLProviderConfig.key_values('idp_slug', flat=True)

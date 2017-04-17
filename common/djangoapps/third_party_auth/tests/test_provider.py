@@ -148,6 +148,24 @@ class RegistryTest(testutil.TestCase):
         google_provider = self.configure_google_provider(enabled=True)
         self.assertEqual(google_provider.id, provider.Registry.get(google_provider.provider_id).id)
 
+    def test_oauth2_provider_keyed_by_provider_slug(self):
+        """
+        Regression test to ensure that the Registry properly fetches OAuth2ProviderConfigs that have a provider_slug
+        which doesn't match any of the possible backend_names.
+        """
+        google_provider = self.configure_google_provider(enabled=True, provider_slug='custom_slug')
+        self.assertIn(google_provider, provider.Registry._enabled_providers())
+        self.assertIn(google_provider, provider.Registry.get_enabled_by_backend_name('google-oauth2'))
+
+    def test_oauth2_enabled_only_for_supplied_backend(self):
+        """
+        Test to ensure that Registry.get_enabled_by_backend_name doesn't return OAuth2 providers with incorrect
+        backend_names.
+        """
+        facebook_provider = self.configure_facebook_provider(enabled=True)
+        self.configure_google_provider(enabled=True)
+        self.assertNotIn(facebook_provider, provider.Registry.get_enabled_by_backend_name('google-oauth2'))
+
     def test_get_returns_none_if_provider_not_enabled(self):
         linkedin_provider_id = "oa2-linkedin-oauth2"
         # At this point there should be no configuration entries at all so no providers should be enabled
