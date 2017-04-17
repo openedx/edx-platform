@@ -57,6 +57,7 @@
                     el: $('.new-post-article'),
                     collection: discussion,
                     course_settings: courseSettings,
+                    discussionBoardView: discussionBoardView,
                     mode: 'tab',
                     startHeader: 2
                 });
