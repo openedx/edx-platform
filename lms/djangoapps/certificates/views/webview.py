@@ -5,6 +5,7 @@ Certificate HTML webview.
 import logging
 import urllib
 from datetime import datetime
+import pytz
 from uuid import uuid4
 
 from django.conf import settings
@@ -153,7 +154,7 @@ def _update_context_with_basic_info(context, course_id, platform_name, configura
     # Translators:  'All rights reserved' is a legal term used in copyrighting to protect published content
     reserved = _("All rights reserved")
     context['copyright_text'] = u'&copy; {year} {platform_name}. {reserved}.'.format(
-        year=settings.COPYRIGHT_YEAR,
+        year=datetime.now(pytz.timezone(settings.TIME_ZONE)).year,
         platform_name=platform_name,
         reserved=reserved
     )
