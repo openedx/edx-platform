@@ -374,6 +374,10 @@ FEATURES = {
 
     # Whether or not the dynamic EnrollmentTrackUserPartition should be registered.
     'ENABLE_ENROLLMENT_TRACK_USER_PARTITION': False,
+
+    # Enable one click program purchase
+    # See LEARNER-493
+    'ENABLE_ONE_CLICK_PROGRAM_PURCHASE': False,
 }
 
 # Ignore static asset files on import which match this pattern
