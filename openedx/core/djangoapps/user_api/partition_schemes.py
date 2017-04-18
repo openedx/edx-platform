@@ -10,6 +10,20 @@ from xmodule.partitions.partitions import UserPartitionError, NoSuchUserPartitio
 log = logging.getLogger(__name__)
 
 
+class NotImplementedPartitionScheme(object):
+    """
+    This "scheme" allows previously-defined schemes to be purged, while giving existing
+    course data definitions a safe entry point to load.
+    """
+
+    @classmethod
+    def get_group_for_user(cls, course_key, user, user_partition, assign=True, track_function=None):
+        """
+        Dummy method, will fail hard if anyone tries to use this scheme.
+        """
+        raise NotImplementedError()
+
+
 class RandomUserPartitionScheme(object):
     """
     This scheme randomly assigns users into the partition's groups.
