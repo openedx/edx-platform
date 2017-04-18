@@ -90,6 +90,7 @@ class Status(object):
             'incomplete': _('incomplete'),
             'unanswered': _('unanswered'),
             'unsubmitted': _('unanswered'),
+            'submitted': _('submitted'),
             'queued': _('processing'),
         }
         tooltips = {
@@ -197,7 +198,7 @@ class InputTypeBase(object):
                                     (what the student entered last time)
                       * 'id' -- the id of this input, typically
                                 "{problem-location}_{response-num}_{input-num}"
-                      * 'status' (answered, unanswered, unsubmitted)
+                      * 'status' (submitted, unanswered, unsubmitted)
                       * 'input_state' -- dictionary containing any inputtype-specific state
                                         that has been preserved
                       * 'feedback' (dictionary containing keys for hints, errors, or other

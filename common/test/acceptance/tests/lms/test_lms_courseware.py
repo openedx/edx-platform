@@ -900,7 +900,7 @@ class SubsectionHiddenAfterDueDateTest(UniqueCourseTest):
         self.studio_course_outline.visit()
         self.studio_course_outline.open_subsection_settings_dialog()
 
-        self.studio_course_outline.select_advanced_tab('hide_after_due_date')
+        self.studio_course_outline.select_visibility_tab()
         self.studio_course_outline.make_subsection_hidden_after_due_date()
 
         self.logout_page.visit()
