@@ -331,7 +331,6 @@ def get_user_orders(user):
     """
     no_data = []
     user_orders = []
-    allowed_course_modes = ['professional', 'verified', 'credit']
     commerce_configuration = CommerceConfiguration.current()
     user_query = {'username': user.username}
 
@@ -344,26 +343,25 @@ def get_user_orders(user):
 
     for order in commerce_user_orders:
         if order['status'].lower() == 'complete':
-            for line in order['lines']:
-                product = line.get('product')
-                if product:
-                    for attribute in product['attribute_values']:
-                        if attribute['name'] == 'certificate_type' and attribute['value'] in allowed_course_modes:
-                            try:
-                                date_placed = datetime.strptime(order['date_placed'], "%Y-%m-%dT%H:%M:%SZ")
-                                order_data = {
-                                    'number': order['number'],
-                                    'price': order['total_excl_tax'],
-                                    'title': order['lines'][0]['title'],
-                                    'order_date': strftime_localized(
-                                        date_placed.replace(tzinfo=pytz.UTC), 'SHORT_DATE'
-                                    ),
-                                    'receipt_url': EcommerceService().get_receipt_page_url(order['number'])
-                                }
-                                user_orders.append(order_data)
-                            except KeyError:
-                                log.exception('Invalid order structure: %r', order)
-                                return no_data
+            date_placed = datetime.strptime(order['date_placed'], "%Y-%m-%dT%H:%M:%SZ")
+            order_data = {
+                'number': order['number'],
+                'price': order['total_excl_tax'],
+                'order_date': strftime_localized(date_placed, 'SHORT_DATE'),
+                'receipt_url': EcommerceService().get_receipt_page_url(order['number']),
+                'lines': order['lines'],
+            }
+
+            # If the order lines contain a product that is not a Seat
+            # we do not want to display the Order Details button. It
+            # will break the receipt page if used.
+            for order_line in order['lines']:
+                product = order_line.get('product')
+
+                if product and product.get('product_class') != 'Seat':
+                    order_data['receipt_url'] = ''
+                    break
+            user_orders.append(order_data)
 
     return user_orders
 
