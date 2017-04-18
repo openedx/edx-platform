@@ -2079,3 +2079,11 @@ class MdlToEdx(models.Model):
     visited = models.BooleanField(default=False)
     timesent = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
     mdl_user_id = models.IntegerField(blank=True, unique=True)
+
+class UserBDUProfile(models.Model):
+
+    class Meta(object):
+        db_table = 'auth_userbduprofile'
+
+    user = models.OneToOneField(User)
+    ambassador = models.CharField(blank=True, max_length=255)
