@@ -388,9 +388,15 @@ class CoursewareIndex(View):
             if self.section.position and self.section.has_children:
                 display_items = self.section.get_display_items()
                 if display_items:
-                    courseware_context['sequence_title'] = display_items[self.section.position - 1] \
-                        .display_name_with_default
-
+                    try:
+                        courseware_context['sequence_title'] = display_items[self.section.position - 1] \
+                            .display_name_with_default
+                    except IndexError:
+                        log.info("Course section {} with position {} and total section display items: {}".format(
+                            self.section.display_name_with_default,
+                            self.section.position,
+                            len(display_items),
+                        ))
         return courseware_context
 
     def _add_entrance_exam_to_context(self, courseware_context):
