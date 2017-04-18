@@ -58,3 +58,5 @@ MKTG_URLS = {
     'TOS_AND_HONOR': '/edx-terms-service',
     'WHAT_IS_VERIFIED_CERT': '/verified-certificate',
 }
+
+CREDENTIALS_SERVICE_USERNAME = 'credentials_worker'
