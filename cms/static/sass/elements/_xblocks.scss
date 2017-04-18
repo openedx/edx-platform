@@ -13,6 +13,8 @@
 // * +Editing - Xblocks
 // * +Case - Special Xblock Type Overrides
 
+@import 'edx-pattern-library-shims/base/variables';
+
 
 // +Layout - Xblocks
 // ====================
@@ -37,23 +39,29 @@
     min-height: ($baseline*2.5);
     background-color: $gray-l6;
     padding: ($baseline/2) ($baseline/2) ($baseline/2) ($baseline);
+    display: flex;
+    align-items: center;
 
     .header-details {
       @extend %cont-truncated;
-      display: inline-block;
       width: 50%;
       vertical-align: middle;
 
       .xblock-display-name {
-        display: inline-block;
-        vertical-align: middle;
+        @extend %t-copy-lead1;
+        font-weight: font-weight(semi-bold);
+      }
+
+      .xblock-group-visibility-label {
+        @extend %t-copy-sub1;
+        white-space: normal;
+        font-weight: font-weight(semi-bold);
+        color: $gray;
       }
     }
 
     .header-actions {
-      display: inline-block;
       width: 49%;
-      vertical-align: middle;
       @include text-align(right);
     }
   }

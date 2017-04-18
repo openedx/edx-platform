@@ -1452,6 +1452,19 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
 
             // Note: most tests for units can be found in Bok Choy
             describe('Unit', function() {
+                var getUnitStatus = function(options) {
+                    mockCourseJSON = createMockCourseJSON({}, [
+                        createMockSectionJSON({}, [
+                            createMockSubsectionJSON({}, [
+                                createMockVerticalJSON(options)
+                            ])
+                        ])
+                    ]);
+                    createCourseOutlinePage(this, mockCourseJSON);
+                    expandItemsAndVerifyState('subsection');
+                    return getItemsOfType('unit').find('.unit-status .status-message');
+                };
+
                 it('can be deleted', function() {
                     var promptSpy = EditHelpers.createPromptSpy();
                     createCourseOutlinePage(this, mockCourseJSON);
@@ -1471,6 +1484,27 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
                     expandItemsAndVerifyState('subsection');
                     unitAnchor = getItemsOfType('unit').find('.unit-title a');
                     expect(unitAnchor.attr('href')).toBe('/container/mock-unit');
+                });
+
+                it('shows partition group information', function() {
+                    var messages = getUnitStatus({has_partition_group_components: true});
+                    expect(messages.length).toBe(1);
+                    expect(messages).toContainText(
+                        'Some content in this unit is visible only to specific groups of learners'
+                    );
+                });
+
+                it('does not show partition group information if visible to all', function() {
+                    var messages = getUnitStatus({});
+                    expect(messages.length).toBe(0);
+                });
+
+                it('does not show partition group information if staff locked', function() {
+                    var messages = getUnitStatus(
+                        {has_partition_group_components: true, staff_only_message: true}
+                    );
+                    expect(messages.length).toBe(1);
+                    expect(messages).toContainText('Contains staff only content');
                 });
 
                 verifyTypePublishable('unit', function(options) {

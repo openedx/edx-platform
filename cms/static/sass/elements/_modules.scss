@@ -499,13 +499,13 @@ $outline-indent-width: $baseline;
     }
 
     // status - message
-    .status-message {
+    .status-messages {
       margin-top: ($baseline/2);
       border-top: 1px solid $gray-l4;
       padding-top: ($baseline/4);
 
       .icon {
-        margin-right: ($baseline/4);
+        @include margin-right($baseline/4);
       }
     }
 
