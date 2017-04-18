@@ -916,6 +916,12 @@ ENTERPRISE_ENROLLMENT_API_URL = ENV_TOKENS.get(
     ENTERPRISE_ENROLLMENT_API_URL
 )
 
+# Enterprise logo image size limit in KB's
+ENTERPRISE_CUSTOMER_LOGO_IMAGE_SIZE = ENV_TOKENS.get(
+    'ENTERPRISE_CUSTOMER_LOGO_IMAGE_SIZE',
+    ENTERPRISE_CUSTOMER_LOGO_IMAGE_SIZE
+)
+
 
 ############## ENTERPRISE SERVICE API CLIENT CONFIGURATION ######################
 # The LMS communicates with the Enterprise service via the EdxRestApiClient class
