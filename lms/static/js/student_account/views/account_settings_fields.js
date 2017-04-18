@@ -325,12 +325,12 @@
 
                 render: function() {
                     HtmlUtils.setHtml(this.$el, this.template({
-                        title: this.options.title,
                         totalPrice: this.options.totalPrice,
                         orderId: this.options.orderId,
                         orderDate: this.options.orderDate,
                         receiptUrl: this.options.receiptUrl,
-                        valueAttribute: this.options.valueAttribute
+                        valueAttribute: this.options.valueAttribute,
+                        lines: this.options.lines
                     }));
                     this.delegateEvents();
                     return this;

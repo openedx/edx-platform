@@ -39,11 +39,10 @@ class EcommerceService(object):
             Receipt page for the specified Order.
         """
         ecommerce_receipt_page_url = configuration_helpers.get_value('ECOMMERCE_RECEIPT_PAGE_URL')
+
         if ecommerce_receipt_page_url:
-            receipt_page_url = self.get_absolute_ecommerce_url(ecommerce_receipt_page_url)
-        else:
-            receipt_page_url = self.config.receipt_page
-        return receipt_page_url + order_number
+            return self.get_absolute_ecommerce_url(ecommerce_receipt_page_url + order_number)
+        return self.config.receipt_page + order_number
 
     def is_enabled(self, user):
         """
