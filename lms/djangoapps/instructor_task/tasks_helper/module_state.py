@@ -10,6 +10,7 @@ from time import time
 from eventtracking import tracker
 from opaque_keys.edx.keys import UsageKey
 from xmodule.modulestore.django import modulestore
+from capa.responsetypes import StudentInputError, ResponseError, LoncapaProblemError
 from courseware.courses import get_course_by_id, get_problems_in_section
 from courseware.models import StudentModule
 from courseware.model_data import DjangoKeyValueStore, FieldDataCache
@@ -174,38 +175,28 @@ def rescore_problem_module_state(xmodule_instance_args, module_descriptor, stude
             TASK_LOG.warning(msg)
             return UPDATE_STATUS_FAILED
 
-        # TODO: (TNL-6594)  Remove this switch once rescore_problem support
-        # once CAPA uses ScorableXBlockMixin.
-        for method in ['rescore', 'rescore_problem']:
-            rescore_method = getattr(instance, method, None)
-            if rescore_method is not None:
-                break
-        else:  # for-else: Neither method exists on the block.
+        if not hasattr(instance, 'rescore'):
             # This should not happen, since it should be already checked in the
             # caller, but check here to be sure.
             msg = "Specified problem does not support rescoring."
             raise UpdateProblemModuleStateError(msg)
 
-        # TODO: Remove the first part of this if-else with TNL-6594
         # We check here to see if the problem has any submissions. If it does not, we don't want to rescore it
-        if hasattr(instance, "done"):
-            if not instance.done:
-                return UPDATE_STATUS_SKIPPED
-        elif not instance.has_submitted_answer():
-                return UPDATE_STATUS_SKIPPED
+        if not instance.has_submitted_answer():
+            return UPDATE_STATUS_SKIPPED
 
         # Set the tracking info before this call, because it makes downstream
         # calls that create events.  We retrieve and store the id here because
         # the request cache will be erased during downstream calls.
-        event_transaction_id = create_new_event_transaction_id()
+        create_new_event_transaction_id()
         set_event_transaction_type(GRADES_RESCORE_EVENT_TYPE)
 
-        result = rescore_method(only_if_higher=task_input['only_if_higher'])
-        instance.save()
-
-        if result is None or result.get(u'success') in {u'correct', u'incorrect'}:
-            TASK_LOG.debug(
-                u"successfully processed rescore call for course %(course)s, problem %(loc)s "
+        # specific events from CAPA are not propagated up the stack. Do we want this?
+        try:
+            instance.rescore(only_if_higher=task_input['only_if_higher'])
+        except (LoncapaProblemError, StudentInputError, ResponseError):
+            TASK_LOG.warning(
+                u"error processing rescore call for course %(course)s, problem %(loc)s "
                 u"and student %(student)s",
                 dict(
                     course=course_id,
@@ -213,44 +204,20 @@ def rescore_problem_module_state(xmodule_instance_args, module_descriptor, stude
                     student=student
                 )
             )
-
-            if result is not None:  # Only for CAPA. This will get moved to the grade handler.
-                new_weighted_earned, new_weighted_possible = weighted_score(
-                    result['new_raw_earned'] if result else None,
-                    result['new_raw_possible'] if result else None,
-                    module_descriptor.weight,
-                )
-
-                # TODO: remove this context manager after completion of AN-6134
-                context = course_context_from_course_id(course_id)
-                with tracker.get_tracker().context(GRADES_RESCORE_EVENT_TYPE, context):
-                    tracker.emit(
-                        unicode(GRADES_RESCORE_EVENT_TYPE),
-                        {
-                            'course_id': unicode(course_id),
-                            'user_id': unicode(student.id),
-                            'problem_id': unicode(usage_key),
-                            'new_weighted_earned': new_weighted_earned,
-                            'new_weighted_possible': new_weighted_possible,
-                            'only_if_higher': task_input['only_if_higher'],
-                            'instructor_id': unicode(xmodule_instance_args['request_info']['user_id']),
-                            'event_transaction_id': unicode(event_transaction_id),
-                            'event_transaction_type': unicode(GRADES_RESCORE_EVENT_TYPE),
-                        }
-                    )
-            return UPDATE_STATUS_SUCCEEDED
-        else:
-            TASK_LOG.warning(
-                u"error processing rescore call for course %(course)s, problem %(loc)s "
-                u"and student %(student)s: %(msg)s",
-                dict(
-                    msg=result.get('success', result),
-                    course=course_id,
-                    loc=usage_key,
-                    student=student
-                )
-            )
             return UPDATE_STATUS_FAILED
+
+        instance.save()
+        TASK_LOG.debug(
+            u"successfully processed rescore call for course %(course)s, problem %(loc)s "
+            u"and student %(student)s",
+            dict(
+                course=course_id,
+                loc=usage_key,
+                student=student
+            )
+        )
+
+        return UPDATE_STATUS_SUCCEEDED
 
 
 @outer_atomic
