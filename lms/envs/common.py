@@ -3086,6 +3086,7 @@ ENTERPRISE_PUBLIC_ENROLLMENT_API_URL = ENTERPRISE_ENROLLMENT_API_URL
 ENTERPRISE_API_URL = LMS_ROOT_URL + '/enterprise/api/v1/'
 ENTERPRISE_SERVICE_WORKER_USERNAME = 'enterprise_worker'
 ENTERPRISE_API_CACHE_TIMEOUT = 3600  # Value is in seconds
+ENTERPRISE_CUSTOMER_LOGO_IMAGE_SIZE = 512   # Enterprise logo image size limit in KB's
 
 ############## Settings for Course Enrollment Modes ######################
 COURSE_ENROLLMENT_MODES = {
