@@ -160,10 +160,9 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
             }
         )
 
-    @patch('lms.djangoapps.instructor_task.tasks_helper.module_state.tracker')
     @patch('lms.djangoapps.grades.signals.handlers.tracker')
     @patch('lms.djangoapps.grades.models.tracker')
-    def test_rescoring_events(self, models_tracker, handlers_tracker, instructor_task_tracker):
+    def test_rescoring_events(self, models_tracker, handlers_tracker):
         # submit answer
         self.submit_question_answer('p1', {'2_1': 'choice_choice_3'})
         models_tracker.reset_mock()
@@ -187,11 +186,8 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
         )
         # check logging to make sure id's are tracked correctly across
         # events
-        event_transaction_id = instructor_task_tracker.emit.mock_calls[0][1][1]['event_transaction_id']
-        self.assertEqual(
-            instructor_task_tracker.get_tracker().context.call_args[0],
-            ('edx.grades.problem.rescored', {'course_id': unicode(self.course.id), 'org_id': unicode(self.course.org)})
-        )
+        event_transaction_id = handlers_tracker.emit.mock_calls[0][1][1]['event_transaction_id']
+
         # make sure the id is propagated throughout the event flow
         for call in models_tracker.emit.mock_calls:
             self.assertEqual(event_transaction_id, call[1][1]['event_transaction_id'])
@@ -206,7 +202,7 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
 
         handlers_tracker.assert_not_called()
 
-        instructor_task_tracker.emit.assert_called_with(
+        handlers_tracker.emit.assert_called_with(
             unicode(RESCORE_TYPE),
             {
                 'course_id': unicode(self.course.id),
