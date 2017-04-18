@@ -90,7 +90,10 @@ python-memcached==1.48
 django-memcached-hashring==0.1.2
 python-openid==2.2.5
 python-dateutil==2.1
-python-social-auth==0.2.21
+# We need to be able to set a maximum session length on our third-party auth providers;
+# our goal is to upstream these changes and return to the canonical version ASAP.
+# python-social-auth==0.2.21
+git+https://github.com/edx/python-social-auth@758985102cee98f440fae44ed99617b7cfef3473#egg=python-social-auth==0.2.21.edx.a
 pytz==2016.7
 pysrt==0.4.7
 PyYAML==3.10
