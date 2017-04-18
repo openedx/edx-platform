@@ -504,19 +504,27 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
             uuid=self.data['uuid']
         )
         program_instructors = cache.get(cache_key)
+        is_learner_eligible_for_one_click_purchase = self.data['is_program_eligible_for_one_click_purchase']
 
         for course in self.data['courses']:
             self._execute('_collect_course', course)
             if not program_instructors:
                 for course_run in course['course_runs']:
                     self._execute('_collect_instructors', course_run)
+            if is_learner_eligible_for_one_click_purchase:
+                is_learner_eligible_for_one_click_purchase = not any(
+                    course_run['is_enrolled'] for course_run in course['course_runs']
+                )
 
         if not program_instructors:
             # We cache the program instructors list to avoid repeated modulestore queries
             program_instructors = self.instructors.values()
             cache.set(cache_key, program_instructors, 3600)
 
-        self.data['instructors'] = program_instructors
+        self.data.update({
+            'instructors': program_instructors,
+            'is_learner_eligible_for_one_click_purchase': is_learner_eligible_for_one_click_purchase,
+        })
 
     @classmethod
     def _handlers(cls, prefix):
