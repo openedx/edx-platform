@@ -2085,4 +2085,5 @@ class UserBDUProfile(models.Model):
     class Meta(object):
         db_table = 'auth_userbduprofile'
 
+    user = models.OneToOneField(User)
     ambassador = models.CharField(blank=True, max_length=255)
