@@ -196,20 +196,15 @@ def send_beta_role_email(action, user, email_params):
     `user` is the User affected
     `email_params` parameters used while parsing email templates (a `dict`).
     """
-    if action == 'add':
-        email_params['message'] = 'add_beta_tester'
+    if action in ('add', 'remove'):
+        email_params['message'] = '%s_beta_tester' % action
         email_params['email_address'] = user.email
         email_params['full_name'] = user.profile.name
-
-    elif action == 'remove':
-        email_params['message'] = 'remove_beta_tester'
-        email_params['email_address'] = user.email
-        email_params['full_name'] = user.profile.name
-
     else:
         raise ValueError("Unexpected action received '{}' - expected 'add' or 'remove'".format(action))
-
-    send_mail_to_student(user.email, email_params, language=get_user_email_language(user))
+    trying_to_add_inactive_user = not user.is_active and action == 'add'
+    if not trying_to_add_inactive_user:
+        send_mail_to_student(user.email, email_params, language=get_user_email_language(user))
 
 
 def reset_student_attempts(course_id, student, module_state_key, requesting_user, delete_module=False):
