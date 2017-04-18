@@ -15,3 +15,5 @@ FEATURES.update({
     'ENABLE_COURSEWARE_INDEX': False,
     'ENABLE_LIBRARY_INDEX': False,
 })
+
+CREDENTIALS_SERVICE_USERNAME = 'credentials_worker'
