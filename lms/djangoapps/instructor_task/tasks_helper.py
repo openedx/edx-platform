@@ -524,25 +524,16 @@ def rescore_problem_module_state(xmodule_instance_args, module_descriptor, stude
             TASK_LOG.warning(msg)
             return UPDATE_STATUS_FAILED
 
-        # TODO: (TNL-6594)  Remove this switch once rescore_problem support
-        # once CAPA uses ScorableXBlockMixin.
-        for method in ['rescore', 'rescore_problem']:
-            rescore_method = getattr(instance, method, None)
-            if rescore_method is not None:
-                break
-        else:  # for-else: Neither method exists on the block.
+        if not hasattr(instance, 'rescore'):
             # This should not happen, since it should be already checked in the
             # caller, but check here to be sure.
+            print("Instance: {}".format(instance))
             msg = "Specified problem does not support rescoring."
             raise UpdateProblemModuleStateError(msg)
 
-        # TODO: Remove the first part of this if-else with TNL-6594
         # We check here to see if the problem has any submissions. If it does not, we don't want to rescore it
-        if hasattr(instance, "done"):
-            if not instance.done:
-                return UPDATE_STATUS_SKIPPED
-        elif not instance.has_submitted_answer():
-                return UPDATE_STATUS_SKIPPED
+        if not instance.has_submitted_answer():
+            return UPDATE_STATUS_SKIPPED
 
         # Set the tracking info before this call, because it makes downstream
         # calls that create events.  We retrieve and store the id here because
@@ -550,7 +541,7 @@ def rescore_problem_module_state(xmodule_instance_args, module_descriptor, stude
         event_transaction_id = create_new_event_transaction_id()
         set_event_transaction_type(GRADES_RESCORE_EVENT_TYPE)
 
-        result = rescore_method(only_if_higher=task_input['only_if_higher'])
+        result = instance.rescore(only_if_higher=task_input['only_if_higher'])
         instance.save()
 
         if result is None or result.get(u'success') in {u'correct', u'incorrect'}:

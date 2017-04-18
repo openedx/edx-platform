@@ -304,26 +304,25 @@ class LoncapaProblem(object):
             maxscore += responder.get_max_score()
         return maxscore
 
-    def get_score(self):
+    def calculate_score(self, correct_map=None):
         """
         Compute score for this problem.  The score is the number of points awarded.
         Returns a dictionary {'score': integer, from 0 to get_max_score(),
                               'total': get_max_score()}.
+
+        Takes an optional correctness map for use in the rescore workflow.
         """
+        if correct_map is None:
+            correct_map = self.correct_map
         correct = 0
-        for key in self.correct_map:
+        for key in correct_map:
             try:
-                correct += self.correct_map.get_npoints(key)
+                correct += correct_map.get_npoints(key)
             except Exception:
-                log.error('key=%s, correct_map = %s', key, self.correct_map)
+                log.error('key=%s, correct_map = %s', key, correct_map)
                 raise
 
-        if (not self.student_answers) or len(self.student_answers) == 0:
-            return {'score': 0,
-                    'total': self.get_max_score()}
-        else:
-            return {'score': correct,
-                    'total': self.get_max_score()}
+        return {'score': correct, 'total': self.get_max_score()}
 
     def update_score(self, score_msg, queuekey):
         """
@@ -397,7 +396,9 @@ class LoncapaProblem(object):
 
         # if answers include File objects, convert them to filenames.
         self.student_answers = convert_files_to_filenames(answers)
-        return self._grade_answers(answers)
+        new_cmap = self.get_grade_from_current_answers(answers)
+        self.correct_map = new_cmap
+        return self.correct_map
 
     def supports_rescoring(self):
         """
@@ -418,16 +419,10 @@ class LoncapaProblem(object):
         """
         return all('filesubmission' not in responder.allowed_inputfields for responder in self.responders.values())
 
-    def rescore_existing_answers(self):
+    def get_grade_from_current_answers(self, student_answers):
         """
-        Rescore student responses.  Called by capa_module.rescore_problem.
-        """
-        return self._grade_answers(None)
-
-    def _grade_answers(self, student_answers):
-        """
-        Internal grading call used for checking new 'student_answers' and also
-        rescoring existing student_answers.
+        Gets the grade for the currently-saved problem state, but does not save it
+        to the block.
 
         For new student_answers being graded, `student_answers` is a dict of all the
         entries from request.POST, but with the first part of each key removed
@@ -462,7 +457,6 @@ class LoncapaProblem(object):
                 results = responder.evaluate_answers(self.student_answers, oldcmap)
             newcmap.update(results)
 
-        self.correct_map = newcmap
         return newcmap
 
     def get_question_answers(self):
