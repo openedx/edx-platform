@@ -760,6 +760,7 @@ def bulk_beta_modify_access(request, course_id):
             error = False
             user_does_not_exist = False
             user = get_student_from_identifier(identifier)
+            user_active = user.is_active
 
             if action == 'add':
                 allow_access(course, user, rolename)
@@ -772,6 +773,7 @@ def bulk_beta_modify_access(request, course_id):
         except User.DoesNotExist:
             error = True
             user_does_not_exist = True
+            user_active = None
         # catch and log any unexpected exceptions
         # so that one error doesn't cause a 500.
         except Exception as exc:  # pylint: disable=broad-except
@@ -793,7 +795,8 @@ def bulk_beta_modify_access(request, course_id):
             results.append({
                 'identifier': identifier,
                 'error': error,
-                'userDoesNotExist': user_does_not_exist
+                'userDoesNotExist': user_does_not_exist,
+                'is_active': user_active
             })
 
     response_payload = {
