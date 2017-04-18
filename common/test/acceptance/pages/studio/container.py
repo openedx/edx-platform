@@ -524,6 +524,15 @@ class XBlockWrapper(PageObject):
         """
         return self.q(css=self._bounded_selector('.move-button')).is_present()
 
+    @property
+    def get_partition_group_message(self):
+        """
+        Returns the message about user partition group visibility, shown under the display name
+        (if not present, returns None).
+        """
+        message = self.q(css=self._bounded_selector('.xblock-group-visibility-label'))
+        return None if len(message) == 0 else message.first.text[0]
+
     def go_to_container(self):
         """
         Open the container page linked to by this xblock, and return

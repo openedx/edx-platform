@@ -644,10 +644,22 @@ class EnrollmentTrackVisibilityModalTest(BaseGroupConfigurationsTest):
             {'group_access': {ENROLLMENT_TRACK_PARTITION_ID: [2]}}  # "2" is Verified
         )
 
+    def verify_component_group_visibility_messsage(self, component, expected_groups):
+        """
+        Verifies that the group visibility message below the component display name is correct.
+        """
+        if not expected_groups:
+            self.assertIsNone(component.get_partition_group_message)
+        else:
+            self.assertEqual("Visible to: " + expected_groups, component.get_partition_group_message)
+
     def test_setting_enrollment_tracks(self):
         """
         Test that enrollment track groups can be selected.
         """
+        # Verify that the "Verified" Group is shown on the unit page (under the unit display name).
+        self.verify_component_group_visibility_messsage(self.html_component, "Verified Track")
+
         # Open dialog with "Verified" already selected.
         visibility_editor = self.edit_component_visibility(self.html_component)
         self.verify_current_groups_message(visibility_editor, self.VERIFIED_TRACK)
@@ -661,10 +673,12 @@ class EnrollmentTrackVisibilityModalTest(BaseGroupConfigurationsTest):
         # Select "All Learners and Staff". The helper method saves the change,
         # then reopens the dialog to verify that it was persisted.
         self.select_and_verify_saved(self.html_component, self.ALL_LEARNERS_AND_STAFF)
+        self.verify_component_group_visibility_messsage(self.html_component, None)
 
         # Select "Audit" enrollment track. The helper method saves the change,
         # then reopens the dialog to verify that it was persisted.
         self.select_and_verify_saved(self.html_component, self.ENROLLMENT_TRACK_PARTITION, [self.AUDIT_TRACK])
+        self.verify_component_group_visibility_messsage(self.html_component, "Audit Track")
 
 
 @attr(shard=1)
