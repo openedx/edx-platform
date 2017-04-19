@@ -17,6 +17,7 @@ from lms.djangoapps.grades.config.models import ComputeGradesSetting
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
 
+from ...config.waffle import waffle, ESTIMATE_FIRST_ATTEMPTED
 from ... import tasks
 
 
@@ -71,8 +72,15 @@ class Command(BaseCommand):
             default=0,
             type=int,
         )
+        parser.add_argument(
+            '--no_estimate_first_attempted',
+            help='Use score data to estimate first_attempted timestamp.',
+            action='store_false',
+            dest='estimate_first_attempted',
+        )
 
     def handle(self, *args, **options):
+
         self._set_log_level(options)
 
         for course_key in self._get_course_keys(options):
@@ -96,8 +104,9 @@ class Command(BaseCommand):
                 'course_key': six.text_type(course_key),
                 'offset': offset,
                 'batch_size': batch_size,
+                'estimate_first_attempted': options['estimate_first_attempted']
             }
-            result = tasks.compute_grades_for_course.apply_async(
+            result = tasks.compute_grades_for_course_v2.apply_async(
                 kwargs=kwargs,
                 options=task_options,
             )
