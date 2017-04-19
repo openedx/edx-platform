@@ -296,6 +296,9 @@ class CourseMode(models.Model):
             found_course_modes = found_course_modes.filter(
                 Q(_expiration_datetime__isnull=True) | Q(_expiration_datetime__gte=now)
             )
+            import logging
+            log = logging.getLogger(__name__)
+            log.info("found_course_modes: %s", found_course_modes)
 
         # Credit course modes are currently not shown on the track selection page;
         # they're available only when students complete a course.  For this reason,
