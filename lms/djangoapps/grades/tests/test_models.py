@@ -14,8 +14,10 @@ from django.test import TestCase
 from django.utils.timezone import now
 from freezegun import freeze_time
 from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
+import pytz
 from track.event_transaction_utils import get_event_transaction_id, get_event_transaction_type
 
+from lms.djangoapps.grades.config import waffle
 from lms.djangoapps.grades.models import (
     BlockRecord,
     BlockRecordList,
@@ -212,7 +214,7 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
             "earned_graded": 6.0,
             "possible_graded": 8.0,
             "visible_blocks": self.block_records,
-            "attempted": True,
+            "first_attempted": datetime(2000, 1, 1, 12, 30, 45, tzinfo=pytz.UTC),
         }
 
     def test_create(self):
@@ -242,8 +244,8 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
         ("possible_all", IntegrityError),
         ("earned_graded", IntegrityError),
         ("possible_graded", IntegrityError),
+        ("first_attempted", KeyError),
         ("visible_blocks", KeyError),
-        ("attempted", KeyError),
     )
     @ddt.unpack
     def test_non_optional_fields(self, field, error):
@@ -262,12 +264,21 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
             self.assertEqual(created_grade.id, updated_grade.id)
             self.assertEqual(created_grade.earned_all, 6)
 
-    def test_update_or_create_attempted(self):
-        grade = PersistentSubsectionGrade.update_or_create_grade(**self.params)
-        self.assertIsInstance(grade.first_attempted, datetime)
+    @ddt.unpack
+    @ddt.data(
+        (True, datetime(2000, 1, 1, 12, 30, 45, tzinfo=pytz.UTC)),
+        (False, None),  # Use as now().  Freeze time needs this calculation to happen at test time.
+    )
+    @freeze_time(now())
+    def test_update_or_create_attempted(self, is_active, expected_first_attempted):
+        if expected_first_attempted is None:
+            expected_first_attempted = now()
+        with waffle.waffle().override(waffle.ESTIMATE_FIRST_ATTEMPTED, active=is_active):
+            grade = PersistentSubsectionGrade.update_or_create_grade(**self.params)
+            self.assertEqual(grade.first_attempted, expected_first_attempted)
 
     def test_unattempted(self):
-        self.params['attempted'] = False
+        self.params['first_attempted'] = None
         self.params['earned_all'] = 0.0
         self.params['earned_graded'] = 0.0
         grade = PersistentSubsectionGrade.create_grade(**self.params)
@@ -283,7 +294,7 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
 
     def test_unattempted_save_does_not_remove_attempt(self):
         PersistentSubsectionGrade.create_grade(**self.params)
-        self.params['attempted'] = False
+        self.params['first_attempted'] = None
         grade = PersistentSubsectionGrade.update_or_create_grade(**self.params)
         self.assertIsInstance(grade.first_attempted, datetime)
         self.assertEqual(grade.earned_all, 6.0)

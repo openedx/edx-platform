@@ -848,7 +848,7 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
                 except KeyError:
                     grade_results.append([u'Not Available'])
                 else:
-                    if subsection_grade.graded_total.attempted:
+                    if subsection_grade.graded_total.first_attempted is not None:
                         grade_results.append(
                             [subsection_grade.graded_total.earned / subsection_grade.graded_total.possible]
                         )
@@ -1028,7 +1028,7 @@ def upload_problem_grade_report(_xmodule_instance_args, _entry_id, course_id, _t
             except KeyError:
                 earned_possible_values.append([u'Not Available', u'Not Available'])
             else:
-                if problem_score.attempted:
+                if problem_score.first_attempted:
                     earned_possible_values.append([problem_score.earned, problem_score.possible])
                 else:
                     earned_possible_values.append([u'Not Attempted', problem_score.possible])
