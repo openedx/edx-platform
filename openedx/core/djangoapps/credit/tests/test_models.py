@@ -61,9 +61,9 @@ class CreditEligibilityModelTests(TestCase):
         self.assertEqual(created, True)
 
         requirement = {
-            "namespace": "reverification",
-            "name": "i4x://edX/DemoX/edx-reverification-block/assessment_uuid",
-            "display_name": "Assessment 1",
+            "namespace": "new_grade",
+            "name": "new_grade",
+            "display_name": "New Grade",
             "criteria": {},
         }
         credit_req, created = CreditRequirement.add_or_update_course_requirement(credit_course, requirement, 1)
