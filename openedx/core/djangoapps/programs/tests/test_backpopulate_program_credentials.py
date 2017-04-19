@@ -1,10 +1,11 @@
 """Tests for the backpopulate_program_credentials management command."""
 import ddt
+import mock
 from django.core.management import call_command
 from django.test import TestCase
-import mock
 
 from certificates.models import CertificateStatuses  # pylint: disable=import-error
+from course_modes.models import CourseMode
 from lms.djangoapps.certificates.api import MODES
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from openedx.core.djangoapps.catalog.tests.factories import (
@@ -17,7 +18,6 @@ from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory
-
 
 COMMAND_MODULE = 'openedx.core.djangoapps.programs.management.commands.backpopulate_program_credentials'
 
@@ -80,6 +80,37 @@ class BackpopulateProgramCredentialsTests(CatalogIntegrationMixin, CredentialsAp
             mock_task.assert_called_once_with(self.alice.username)
         else:
             mock_task.assert_not_called()
+
+    def test_handle_professional(self, mock_task, mock_get_programs):
+        """ Verify the task can handle both professional and no-id-professional modes. """
+        mock_get_programs.return_value = [
+            ProgramFactory(
+                courses=[
+                    CourseFactory(course_runs=[
+                        CourseRunFactory(key=self.course_run_key, type='professional'),
+                    ]),
+                ]
+            ),
+        ]
+
+        GeneratedCertificateFactory(
+            user=self.alice,
+            course_id=self.course_run_key,
+            mode=CourseMode.PROFESSIONAL,
+            status=CertificateStatuses.downloadable,
+        )
+
+        GeneratedCertificateFactory(
+            user=self.bob,
+            course_id=self.course_run_key,
+            mode=CourseMode.NO_ID_PROFESSIONAL_MODE,
+            status=CertificateStatuses.downloadable,
+        )
+
+        call_command('backpopulate_program_credentials', commit=True)
+
+        # The task should be called for both users since professional and no-id-professional are equivalent.
+        mock_task.assert_has_calls([mock.call(self.alice.username), mock.call(self.bob.username)])
 
     @ddt.data(
         [
@@ -258,6 +289,7 @@ class BackpopulateProgramCredentialsTests(CatalogIntegrationMixin, CredentialsAp
     @mock.patch(COMMAND_MODULE + '.logger.exception')
     def test_handle_enqueue_failure(self, mock_log, mock_task, mock_get_programs):
         """Verify that failure to enqueue a task doesn't halt execution."""
+
         def side_effect(username):
             """Simulate failure to enqueue a task."""
             if username == self.alice.username:
