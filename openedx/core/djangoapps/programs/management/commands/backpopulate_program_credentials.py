@@ -8,6 +8,7 @@ from django.db.models import Q
 from opaque_keys.edx.keys import CourseKey
 
 from certificates.models import GeneratedCertificate, CertificateStatuses  # pylint: disable=import-error
+from course_modes.models import CourseMode
 from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.programs.tasks.v1.tasks import award_program_certificates
 
@@ -99,6 +100,11 @@ class Command(BaseCommand):
             lambda x, y: x | y,
             [Q(course_id=course_run.key, mode=course_run.type) for course_run in self.course_runs]
         )
+
+        # Account for the fact that no-id-professional and professional are equivalent
+        for course_run in self.course_runs:
+            if course_run.type == CourseMode.PROFESSIONAL:
+                course_run_query |= Q(course_id=course_run.key, mode=CourseMode.NO_ID_PROFESSIONAL_MODE)
 
         query = status_query & course_run_query
 
