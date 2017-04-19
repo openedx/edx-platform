@@ -24,10 +24,13 @@ class CourseGradeBase(object):
         self.passed = passed
 
     def __unicode__(self):
-        return u'Course Grade: percent: %s, letter_grade: %s, passed: %s'.format(
-            unicode(self.percent), self.letter_grade, self.passed,
+        return u'Course Grade: percent: {}, letter_grade: {}, passed: {}'.format(
+            unicode(self.percent),
+            self.letter_grade,
+            self.passed,
         )
 
+    @property
     def attempted(self):
         """
         Returns whether at least one problem was attempted
@@ -210,7 +213,7 @@ class CourseGrade(CourseGradeBase):
         """
         for chapter in self.chapter_grades.itervalues():
             for subsection_grade in chapter['sections']:
-                if subsection_grade.attempted:
+                if subsection_grade.all_total.first_attempted:
                     return True
         return False
 

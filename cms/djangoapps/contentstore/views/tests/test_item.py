@@ -2258,7 +2258,7 @@ class TestComponentTemplates(CourseTestCase):
 
         def verify_openassessment_present(support_level):
             """ Helper method to verify that openassessment template is present """
-            openassessment = get_xblock_problem('Peer Assessment')
+            openassessment = get_xblock_problem('Open Response Assessment')
             self.assertIsNotNone(openassessment)
             self.assertEqual(openassessment.get('category'), 'openassessment')
             self.assertEqual(openassessment.get('support_level'), support_level)
