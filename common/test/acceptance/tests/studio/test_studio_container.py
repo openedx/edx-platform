@@ -319,7 +319,7 @@ class EditContainerTest(NestedVerticalTest):
 
 class BaseGroupConfigurationsTest(ContainerBase):
     ALL_LEARNERS_AND_STAFF = ComponentVisibilityEditorView.ALL_LEARNERS_AND_STAFF
-    CHOOSE_ONE = "Choose one"
+    CHOOSE_ONE = "Select a group type"
     CONTENT_GROUP_PARTITION = ComponentVisibilityEditorView.CONTENT_GROUP_PARTITION
     ENROLLMENT_TRACK_PARTITION = ComponentVisibilityEditorView.ENROLLMENT_TRACK_PARTITION
     MISSING_GROUP_LABEL = 'Deleted Group\nThis group no longer exists. Choose another group or make this component visible to All Learners and Staff.'
@@ -405,7 +405,7 @@ class BaseGroupConfigurationsTest(ContainerBase):
         visibility_editor.select_groups_in_partition_scheme(partition_label, groups)
 
         # Re-open the modal and inspect its selected inputs. If no groups were selected,
-        # "All Learners" should be selected partitions scheme, and we show "Choose one" in the select.
+        # "All Learners" should be selected partitions scheme, and we show "Select a group type" in the select.
         if not groups:
             partition_label = self.CHOOSE_ONE
         visibility_editor = self.edit_component_visibility(component)
