@@ -14,7 +14,7 @@
             // Get the selected user partition (only allowed to select one).
             partitionId = parseInt(element.find('.partition-visibility select').val(), 10);
 
-            // "All Learners and Staff" is selected (or "Choose one", which is only shown when
+            // "All Learners and Staff" is selected (or "Select a group type", which is only shown when
             // current visibility is "All Learners and Staff" at the time the dialog is opened).
             if (partitionId === -1) {
                 return {};
