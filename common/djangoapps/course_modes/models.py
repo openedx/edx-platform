@@ -287,17 +287,19 @@ class CourseMode(models.Model):
             list of `Mode` tuples
 
         """
+        import logging
+        log = logging.getLogger(__name__)
         now = datetime.now(pytz.UTC)
 
         found_course_modes = cls.objects.filter(course_id=course_id)
 
         # Filter out expired course modes if include_expired is not set
+        log.info("found_course_modes: %s", found_course_modes)
         if not include_expired:
             found_course_modes = found_course_modes.filter(
                 Q(_expiration_datetime__isnull=True) | Q(_expiration_datetime__gte=now)
             )
-            import logging
-            log = logging.getLogger(__name__)
+
             log.info("found_course_modes: %s", found_course_modes)
 
         # Credit course modes are currently not shown on the track selection page;
