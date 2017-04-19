@@ -486,6 +486,13 @@ class TestCourseEnrollmentSerializer(MobileAPITestCase, MilestonesTestCaseMixin)
         self.assertEqual(serialized['course']['number'], self.course.id.course)
         self.assertEqual(serialized['course']['org'], self.course.id.org)
 
+        # Assert utm parameters
+        expected_utm_parameters = {
+            'twitter': 'utm_campaign=social-sharing&utm_medium=social-post&utm_source=twitter',
+            'facebook': 'utm_campaign=social-sharing&utm_medium=social-post&utm_source=facebook'
+        }
+        self.assertEqual(serialized['course']['course_sharing_utm_parameters'], expected_utm_parameters)
+
     def test_with_display_overrides(self):
         self.course.display_coursenumber = "overridden_number"
         self.course.display_organization = "overridden_org"
