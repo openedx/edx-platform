@@ -2,29 +2,17 @@
 
 from .devstack import *
 from .appsembler import *
+import dj_database_url
 
-APPSEMBLER_SECRET_KEY = "secret_key"
-# the following ip should work for all dev setups....
-APPSEMBLER_AMC_API_BASE = 'http://10.0.2.2:8080/api'
-APPSEMBLER_FIRST_LOGIN_API = '/logged_into_edx'
-
-FEATURES["ENABLE_SYSADMIN_DASHBOARD"] = True
-
-# needed to show only users and appsembler courses
-FEATURES["ENABLE_COURSE_DISCOVERY"] = True
-FEATURES["ENABLE_COMPREHENSIVE_THEMING"] = True
-FEATURES["ORGANIZATIONS_APP"] = True
 OAUTH_ENFORCE_SECURE = False
 
 # disable caching in dev environment
 for cache_key in CACHES.keys():
-    CACHES[cache_key]['BACKEND'] = 'django.core.cache.backends.dummy.DummyCache'
+    # CACHES[cache_key]['BACKEND'] = 'django.core.cache.backends.dummy.DummyCache'
+    CACHES[cache_key]['BACKEND'] = 'django.core.cache.backends.db.DatabaseCache'
+    CACHES[cache_key]['LOCATION'] = 'cache_{}'.format(cache_key)
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
-
-#DEFAULT_TEMPLATE_ENGINE['OPTIONS']['context_processors'] += ('openedx.core.djangoapps.appsembler.intercom_integration.context_processors.intercom',)
-
-MICROSITE_BACKEND = 'microsite_configuration.backends.database.DatabaseMicrositeBackend'
 
 INSTALLED_APPS += (
     'django_extensions',
@@ -44,19 +32,8 @@ CORS_ALLOW_HEADERS = (
 )
 DEBUG_TOOLBAR_PATCH_SETTINGS = False
 
-SITE_ID = 1
+#SITE_ID = 1
 
-# MIDDLEWARE_CLASSES = (
-#     'db_multitenant.middleware.MultiTenantMiddleware',
-#     ) + MIDDLEWARE_CLASSES
-#
-# SOUTH_DATABASE_ADAPTERS = {
-#     'default': 'south.db.mysql'
-# }
-#
-# MULTITENANT_MAPPER_CLASS = 'microsite_configuration.mapper.SimpleTenantMapper'
-
-#DATABASES['default']['ENGINE'] = 'db_multitenant.db.backends.mysql'
 AUTHENTICATION_BACKENDS = (
     'organizations.backends.DefaultSiteBackend',
     'organizations.backends.SiteMemberBackend',
@@ -67,3 +44,36 @@ INTERCOM_APP_ID = AUTH_TOKENS.get("INTERCOM_APP_ID")
 INTERCOM_APP_SECRET = AUTH_TOKENS.get("INTERCOM_APP_SECRET")
 
 EDX_API_KEY = "test"
+
+INSTALLED_APPS += ('tiers',)
+MIDDLEWARE_CLASSES += (
+    'organizations.middleware.OrganizationMiddleware',
+#    'tiers.middleware.TierMiddleware',
+)
+
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
+
+TIERS_ORGANIZATION_MODEL = 'organizations.Organization'
+TIERS_EXPIRED_REDIRECT_URL = None
+
+TIERS_DATABASE_URL = AUTH_TOKENS.get('TIERS_DATABASE_URL')
+DATABASES['tiers'] = dj_database_url.parse(TIERS_DATABASE_URL)
+
+DATABASE_ROUTERS += ['openedx.core.djangoapps.appsembler.sites.routers.TiersDbRouter']
+
+COURSE_TO_CLONE = "course-v1:Appsembler+CC101+2017"
+
+CELERY_ALWAYS_EAGER = True
+
+ALTERNATE_QUEUE_ENVS = ['cms']
+ALTERNATE_QUEUES = [
+    DEFAULT_PRIORITY_QUEUE.replace(QUEUE_VARIANT, alternate + '.')
+    for alternate in ALTERNATE_QUEUE_ENVS
+]
+CELERY_QUEUES.update(
+    {
+        alternate: {}
+        for alternate in ALTERNATE_QUEUES
+        if alternate not in CELERY_QUEUES.keys()
+    }
+)

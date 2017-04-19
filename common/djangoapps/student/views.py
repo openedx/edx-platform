@@ -1815,7 +1815,8 @@ def create_account_with_params(request, params):
     # APPSEMBLER SPECIFIC
     organization_name = params.get('organization')
     organization = None
-    # organization name is passed during AMC signup, otherwise it's a regular signup on a microsite
+    # organization name is passed during signup when invited through AMC,
+    # otherwise it's a regular signup on a microsite
     if organization_name:
         try:
             organization = Organization.objects.get(name=organization_name)
@@ -1824,11 +1825,13 @@ def create_account_with_params(request, params):
     elif hasattr(request, 'site'):
         organization = request.site.organizations.first()
 
+    is_amc_admin = "registered_from_amc" in params
+
     if organization:
-        UserOrganizationMapping.objects.get_or_create(user=user, organization=organization, is_amc_admin=True)
+        UserOrganizationMapping.objects.get_or_create(user=user, organization=organization, is_amc_admin=is_amc_admin)
 
     # allow users registered from AMC to create courses
-    if "registered_from_amc" in params:
+    if is_amc_admin:
         from cms.djangoapps.course_creators.models import CourseCreator
         CourseCreator.objects.update_or_create(user=user, defaults={'state': CourseCreator.GRANTED})
         CourseCreatorRole().add_users(user)
@@ -2113,6 +2116,11 @@ def auto_auth(request):
     age_limit = settings.PARENTAL_CONSENT_AGE_LIMIT
     profile.year_of_birth = (year - age_limit) - 1
     profile.save()
+
+    organization = Organization.objects.filter(name=request.GET.get('organization_name'))[0]
+    UserOrganizationMapping.objects.create(
+        user=user,
+        organization=organization)
 
     # Enroll the user in a course
     if course_key is not None:

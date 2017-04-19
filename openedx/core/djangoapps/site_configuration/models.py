@@ -50,7 +50,7 @@ class SiteConfiguration(models.Model):
     def save(self, **kwargs):
         # When creating a new object, save default microsite values. Not implemented as a default method on the field
         # because it depends on other fields that should be already filled.
-        if not self.id and not self.values:
+        if not self.id:
             self.values = self._get_initial_microsite_values()
 
         # fix for a bug with some pages requiring uppercase platform_name variable
@@ -133,47 +133,26 @@ class SiteConfiguration(models.Model):
         """
         return org in cls.get_all_orgs()
 
+    def delete(self, using=None):
+        self.delete_css_override()
+        super(SiteConfiguration, self).delete(using=using)
+
     def compile_microsite_sass(self):
         css_output = compile_sass('main.scss', custom_branding=self._sass_var_override)
         domain_without_port_number = self.site.domain.split(':')[0]
-
         if settings.DEBUG:
-            from openedx.core.djangoapps.theming.helpers import get_theme_base_dir
-            theme_dir = get_theme_base_dir(settings.DEFAULT_SITE_THEME)
-            output_path = os.path.join(theme_dir, 'customer_themes')
-            if not os.path.exists(output_path):
-                os.makedirs(output_path)
-            output_file_path = os.path.join(output_path, '{}.css'.format(domain_without_port_number))
-            with open(output_file_path, 'w') as f:
-                f.write(css_output.encode('utf-8'))
-                os.chmod(output_path, 0777)
-
-        collected_output_path = os.path.join(settings.STATIC_ROOT, 'customer_themes')
-        if not os.path.exists(collected_output_path):
-            os.makedirs(collected_output_path)
-        collected_output_file_path = os.path.join(collected_output_path, '{}.css'.format(domain_without_port_number))
-        with open(collected_output_file_path, 'w') as f:
-            f.write(css_output.encode('utf-8'))
-            os.chmod(collected_output_path, 0777)
-
-    def collect_css_file(self):
-        path = self.values.get('css_overrides_file')
-        storage = staticfiles_storage
-        file_storage = FileSystemStorage(settings.MICROSITE_ROOT_DIR)
-        if getattr(file_storage, 'prefix', None):
-            prefixed_path = os.path.join(file_storage.prefix, path)
+            theme_folder = os.path.join(settings.COMPREHENSIVE_THEME_DIRS[0], 'customer_themes')
         else:
-            prefixed_path = path
-        found_files = collections.OrderedDict()
-        found_files[prefixed_path] = (file_storage, path)
+            theme_folder = os.path.join(settings.STATIC_ROOT, '..', 'customer_themes')
+        theme_file = os.path.join(theme_folder, '{}.css'.format(domain_without_port_number))
 
-        with file_storage.open(path) as source_file:
-            storage.save(prefixed_path, source_file)
-        if hasattr(storage, 'post_process'):
-            processor = storage.post_process(found_files)
-            for original_path, processed_path, processed in processor:
-                if isinstance(processed, Exception):
-                    raise processed
+        new_file = not os.path.exists(theme_file)
+        with open(theme_file, 'w') as f:
+            f.write(css_output.encode('utf-8'))
+
+        # only try once, it caused errors if we tried to reapply permissions
+        if new_file:
+            os.chmod(theme_file, 0777)
 
     def set_sass_variables(self, entries):
         """
@@ -185,6 +164,17 @@ class SiteConfiguration(models.Model):
                 new_value = (var_name, [entries[var_name], entries[var_name]])
                 self.sass_variables[index] = new_value
 
+    def delete_css_override(self):
+        css_file = self.values.get('css_overrides_file')
+        if css_file:
+            try:
+                if settings.DEBUG:
+                    os.remove(os.path.join(settings.COMPREHENSIVE_THEME_DIRS[0], css_file))
+                else:
+                    os.remove(os.path.join(settings.STATIC_ROOT, '..', 'customer_themes', css_file))
+            except OSError:
+                logger.warning("Can't delete CSS file {}".format(css_file))
+
     def _formatted_sass_variables(self):
         return " ".join(["{}: {};".format(var, val[0]) for var, val in self.sass_variables])
 
@@ -195,9 +185,13 @@ class SiteConfiguration(models.Model):
 
     def _get_initial_microsite_values(self):
         domain_without_port_number = self.site.domain.split(':')[0]
+        if settings.DEBUG:
+            css_overrides_file = "customer_themes/{}.css".format(domain_without_port_number)
+        else:
+            css_overrides_file = "{}.css".format(domain_without_port_number)
         return {
             'platform_name': self.site.name,
-            'css_overrides_file': "customer_themes/{}.css".format(domain_without_port_number),
+            'css_overrides_file': css_overrides_file,
             'ENABLE_COMBINED_LOGIN_REGISTRATION': True,
         }
 

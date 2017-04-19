@@ -1,4 +1,5 @@
 from .aws import *
+import dj_database_url
 
 APPSEMBLER_AMC_API_BASE = AUTH_TOKENS.get('APPSEMBLER_AMC_API_BASE')
 APPSEMBLER_FIRST_LOGIN_API = '/logged_into_edx'
@@ -39,7 +40,6 @@ ELASTIC_FIELD_MAPPINGS = {
 SENTRY_DSN = AUTH_TOKENS.get('SENTRY_DSN', False)
 
 if SENTRY_DSN:
-
     # Set your DSN value
     RAVEN_CONFIG = {
         'environment': FEATURES['ENVIRONMENT'],  # This should be moved somewhere more sensible
@@ -51,3 +51,18 @@ if SENTRY_DSN:
     }
 
     INSTALLED_APPS += ('raven.contrib.django.raven_compat',)
+
+INSTALLED_APPS += ('tiers',)
+MIDDLEWARE_CLASSES += ('organizations.middleware.OrganizationMiddleware', 'tiers.middleware.TierMiddleware',)
+
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
+
+TIERS_ORGANIZATION_MODEL = 'organizations.Organization'
+TIERS_EXPIRED_REDIRECT_URL = AMC_APP_URL + "/expired"
+
+TIERS_DATABASE_URL = AUTH_TOKENS.get('TIERS_DATABASE_URL')
+DATABASES['tiers'] = dj_database_url.parse(TIERS_DATABASE_URL)
+
+DATABASE_ROUTERS += ['openedx.core.djangoapps.appsembler.sites.routers.TiersDbRouter']
+
+XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5

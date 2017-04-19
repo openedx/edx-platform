@@ -1,14 +1,8 @@
 from .aws import *
+import dj_database_url
 
-APPSEMBLER_SECRET_KEY = AUTH_TOKENS.get("APPSEMBLER_SECRET_KEY")
-# the following ip should work for all dev setups....
 APPSEMBLER_AMC_API_BASE = AUTH_TOKENS.get('APPSEMBLER_AMC_API_BASE')
 APPSEMBLER_FIRST_LOGIN_API = '/logged_into_edx'
-
-# needed to show only users and appsembler courses
-#FEATURES["ENABLE_COURSE_DISCOVERY"] = False
-FEATURES["ORGANIZATIONS_APP"] = True
-FEATURES["ENABLE_COMPREHENSIVE_THEMING"] = True
 
 AMC_APP_URL = ENV_TOKENS.get('AMC_APP_URL')
 
@@ -31,16 +25,6 @@ INTERCOM_APP_ID = AUTH_TOKENS.get("INTERCOM_APP_ID")
 INTERCOM_APP_SECRET = AUTH_TOKENS.get("INTERCOM_APP_SECRET")
 
 
-# disable caching in dev environment
-for cache_key in CACHES.keys():
-    CACHES[cache_key]['BACKEND'] = 'django.core.cache.backends.dummy.DummyCache'
-
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'
-
-MICROSITE_BACKEND = 'microsite_configuration.backends.database.DatabaseMicrositeBackend'
-
-STATICFILES_STORAGE = 'openedx.core.storage.DevelopmentStorage'
-
 CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ALLOW_HEADERS = (
@@ -52,10 +36,6 @@ CORS_ALLOW_HEADERS = (
     'x-csrftoken',
     'cache-control'
 )
-
-FEATURES['ENABLE_COURSEWARE_SEARCH'] = True
-FEATURES['ENABLE_DASHBOARD_SEARCH'] = True
-FEATURES['ENABLE_COURSE_DISCOVERY'] = True
 
 SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"
 SEARCH_INITIALIZER = "lms.lib.courseware_search.lms_search_initializer.LmsSearchInitializer"
@@ -78,7 +58,6 @@ AUTHENTICATION_BACKENDS = (
 SENTRY_DSN = AUTH_TOKENS.get('SENTRY_DSN', False)
 
 if SENTRY_DSN:
-
     # Set your DSN value
     RAVEN_CONFIG = {
         'environment': FEATURES['ENVIRONMENT'],  # This should be moved somewhere more sensible
@@ -93,4 +72,17 @@ if SENTRY_DSN:
 
 # This is used in the appsembler_sites.middleware.RedirectMiddleware to exclude certain paths
 # from the redirect mechanics.
-MAIN_SITE_REDIRECT_WHITELIST = ['api', 'admin', 'oauth']
+MAIN_SITE_REDIRECT_WHITELIST = ['api', 'admin', 'oauth', 'status']
+
+INSTALLED_APPS += ('tiers',)
+MIDDLEWARE_CLASSES += ('organizations.middleware.OrganizationMiddleware', 'tiers.middleware.TierMiddleware',)
+
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
+
+TIERS_ORGANIZATION_MODEL = 'organizations.Organization'
+TIERS_EXPIRED_REDIRECT_URL = None
+
+TIERS_DATABASE_URL = AUTH_TOKENS.get('TIERS_DATABASE_URL')
+DATABASES['tiers'] = dj_database_url.parse(TIERS_DATABASE_URL)
+
+DATABASE_ROUTERS += ['openedx.core.djangoapps.appsembler.sites.routers.TiersDbRouter']
