@@ -423,16 +423,22 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
                 )
 
     if status in {'generating', 'ready', 'notpassing', 'restricted', 'auditing', 'unverified'}:
+        cert_grade_percent = -1
+        persisted_grade_percent = -1
         persisted_grade = CourseGradeFactory().read(user, course=course_overview)
         if persisted_grade is not None:
-            status_dict['grade'] = unicode(persisted_grade.percent)
-        elif 'grade' in cert_status:
-            status_dict['grade'] = cert_status['grade']
-        else:
+            persisted_grade_percent = persisted_grade.percent
+
+        if 'grade' in cert_status:
+            cert_grade_percent = float(cert_status['grade'])
+
+        if cert_grade_percent == -1 and persisted_grade_percent == -1:
             # Note: as of 11/20/2012, we know there are students in this state-- cs169.1x,
             # who need to be regraded (we weren't tracking 'notpassing' at first).
             # We can add a log.warning here once we think it shouldn't happen.
             return default_info
+
+        status_dict['grade'] = unicode(max(cert_grade_percent, persisted_grade_percent))
 
     return status_dict
 
