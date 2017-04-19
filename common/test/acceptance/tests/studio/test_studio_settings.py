@@ -17,9 +17,10 @@ from common.test.acceptance.pages.studio.settings import SettingsPage
 from common.test.acceptance.pages.studio.settings_advanced import AdvancedSettingsPage
 from common.test.acceptance.pages.studio.settings_group_configurations import GroupConfigurationsPage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
-from common.test.acceptance.pages.studio.utils import get_input_value
+from common.test.acceptance.pages.studio.utils import get_input_value, type_in_codemirror
 from textwrap import dedent
 from xmodule.partitions.partitions import Group
+import json
 
 
 @attr(shard=8)
@@ -236,6 +237,9 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
     """
     Tests for validation feature in Studio's advanced settings tab
     """
+    course_name_key = 'Course Display Name'
+    course_name_value = 'Test Name'
+
     def setUp(self):
         super(AdvancedSettingsValidationTest, self).setUp()
         self.advanced_settings = AdvancedSettingsPage(
@@ -250,6 +254,124 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
 
         # Before every test, make sure to visit the page first
         self.advanced_settings.visit()
+
+    def test_course_author_sees_default_advanced_settings(self):
+        """
+        Test that advanced settings have the default settings
+        """
+        anonymous_discussion_setting = self.advanced_settings.get('Allow Anonymous Discussion Posts')
+        timed_exam_settings = self.advanced_settings.get('Enable Timed Exams')
+        self.assertEqual(
+            [anonymous_discussion_setting, timed_exam_settings],
+            ['true', 'false']
+        )
+
+    def test_keys_appear_alphabetically(self):
+        """
+        Test that advanced settings have all the keys in alphabetic order
+        """
+
+        key_names = self.advanced_settings.get_key_names()
+        self.assertEqual(key_names, sorted(key_names))
+
+    def test_cancel_editing_key_value(self):
+        """
+        Test that advanced settings does not save the key value, if cancel
+        is clicked from notification bar
+        """
+
+        course_display_name = self.advanced_settings.get(self.course_name_key)
+        type_in_codemirror(self.advanced_settings, 16, self.course_name_value)
+        self.advanced_settings.cancel()
+        self.advanced_settings.refresh_and_wait_for_load()
+        self.assertEqual(
+            self.advanced_settings.get(self.course_name_key),
+            course_display_name,
+            'Wrong input for Course Display Name must not change its value'
+        )
+
+    def test_editing_key_value(self):
+        """
+        Test that advanced settings successfully edits and saves a field
+        """
+
+        self.advanced_settings.set(self.course_name_key, self.course_name_value)
+        self.assertEqual(
+            self.advanced_settings.get(self.course_name_key),
+            '"Test Name"',
+            'Course Display Name must be same as saved'
+        )
+
+    def test_confirmation_is_shown_on_save(self):
+        """
+        Test that advanced settings shows confirmation after editing a field successfully
+        """
+
+        self.advanced_settings.set('Maximum Attempts', 5)
+        confirmation_message = self.advanced_settings.get_confirmation_message()
+        self.assertEqual(
+            confirmation_message,
+            'Your policy changes have been saved.',
+            'Settings must be saved successfully in order to have confirmation message'
+        )
+
+    def test_deprecated_settings_invisible_by_default(self):
+        """
+        Test that advanced settings does not have deprecated settings by default
+        """
+
+        button_text = self.advanced_settings.get_deprecated_settings_button_text()
+        self.assertEqual(button_text, 'Show Deprecated Settings')
+        self.assertFalse(self.advanced_settings.check_deprecated_settings_presence())
+
+    def test_deprecated_settings_can_be_toggled(self):
+        """
+        Test that advanced settings can toggle deprecated settings
+        """
+
+        self.advanced_settings.click_deprecated_settings_button()
+        button_text = self.advanced_settings.get_deprecated_settings_button_text()
+        self.assertEqual(
+            button_text,
+            'Hide Deprecated Settings',
+            "Button text should change to 'Show Deprecated Settings' after the click"
+        )
+        self.assertTrue(self.advanced_settings.check_deprecated_settings_presence())
+        self.advanced_settings.click_deprecated_settings_button()
+        self.assertFalse(self.advanced_settings.check_deprecated_settings_presence())
+        self.assertEqual(
+            self.advanced_settings.get_deprecated_settings_button_text(),
+            'Show Deprecated Settings',
+            "Button text should change to 'Hide Deprecated Settings' after the click"
+        )
+
+    def test_multi_line_input(self):
+        """
+        Test that advanced settings correctly shows the multi-line input
+        """
+
+        inputs = {
+            "key": "value",
+            "key_2": "value_2"
+        }
+        json_input = json.dumps(inputs)
+        self.advanced_settings.set('Discussion Topic Mapping', json_input)
+        self.assertEqual(
+            self.advanced_settings.get('Discussion Topic Mapping'),
+            '{\n    "key": "value",\n    "key_2": "value_2"\n}'
+        )
+
+    def test_automatic_quoting_of_non_json_value(self):
+        """
+        Test that advanced settings automatically quotes the field input
+        upon saving
+        """
+
+        self.advanced_settings.set(self.course_name_key, self.course_name_value)
+        self.assertEqual(
+            self.advanced_settings.get(self.course_name_key),
+            '"Test Name"'
+        )
 
     def test_modal_shows_one_validation_error(self):
         """
