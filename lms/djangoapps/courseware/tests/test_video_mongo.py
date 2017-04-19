@@ -177,6 +177,7 @@ class TestVideoNonYouTube(TestVideo):
 
 
 @attr(shard=1)
+@ddt.ddt
 class TestGetHtmlMethod(BaseTestXmodule):
     '''
     Make sure that `get_html` works correctly.
@@ -855,7 +856,33 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
             )
 
-    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_HLS_VIDEO_PROFILE': True})
+    @ddt.data(
+        (True, ['youtube', 'desktop_webm', 'desktop_mp4', 'hls']),
+        (False, ['youtube', 'desktop_webm', 'desktop_mp4'])
+    )
+    @ddt.unpack
+    def test_get_html_on_toggling_hls_feature(self, hls_feature_enabled, expected_val_profiles):
+        """
+        Verify val profiles on toggling HLS Playback feature.
+        """
+        with patch('xmodule.video_module.video_module.edxval_api.get_urls_for_profiles') as get_urls_for_profiles:
+            get_urls_for_profiles.return_value = {
+                'desktop_webm': 'https://webm.com/dw.webm',
+                'hls': 'https://hls.com/hls.m3u8',
+                'youtube': 'https://yt.com/?v=v0TFmdO4ZP0',
+                'desktop_mp4': 'https://mp4.com/dm.mp4'
+            }
+            with patch('xmodule.video_module.video_module.HLSPlaybackEnabledFlag.feature_enabled') as feature_enabled:
+                feature_enabled.return_value = hls_feature_enabled
+                video_xml = '<video display_name="Video" download_video="true" edx_video_id="12345-67890">[]</video>'
+                self.initialize_module(data=video_xml)
+                self.item_descriptor.render(STUDENT_VIEW)
+                get_urls_for_profiles.assert_called_with(
+                    self.item_descriptor.edx_video_id,
+                    expected_val_profiles,
+                )
+
+    @patch('xmodule.video_module.video_module.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
     @patch('xmodule.video_module.video_module.edxval_api.get_urls_for_profiles')
     def test_get_html_hls(self, get_urls_for_profiles):
         """
@@ -882,7 +909,6 @@ class TestGetHtmlMethod(BaseTestXmodule):
             '"sources": ["https://webm.com/dw.webm", "https://mp4.com/dm.mp4", "https://hls.com/hls.m3u8"]', context
         )
 
-    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_HLS_VIDEO_PROFILE': True})
     def test_get_html_hls_no_video_id(self):
         """
         Verify that `download_video_link` is set to None for HLS videos if no video id
