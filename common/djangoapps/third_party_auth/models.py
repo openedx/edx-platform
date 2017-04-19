@@ -148,6 +148,18 @@ class ProviderConfig(ConfigurationModel):
             "URL query parameter mapping to this provider is included in the request."
         )
     )
+    max_session_length = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        default=None,
+        verbose_name='Max session length (seconds)',
+        help_text=_(
+            "If this option is set, then users logging in using this SSO provider will have "
+            "their session length limited to no longer than this value. If set to 0 (zero), "
+            "the session will expire upon the user closing their browser. If left blank, the "
+            "Django platform session default length will be used."
+        )
+    )
     prefix = None  # used for provider_id. Set to a string value in subclass
     backend_name = None  # Set to a field or fixed value in subclass
     accepts_logins = True  # Whether to display a sign-in button when the provider is enabled
