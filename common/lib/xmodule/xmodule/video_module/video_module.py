@@ -24,6 +24,7 @@ from pkg_resources import resource_string
 from django.conf import settings
 
 from openedx.core.lib.cache_utils import memoize_in_request_cache
+from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag
 from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.runtime import KvsFieldData
@@ -219,7 +220,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             try:
                 val_profiles = ["youtube", "desktop_webm", "desktop_mp4"]
 
-                if settings.FEATURES.get('ENABLE_HLS_VIDEO_PROFILE', False):
+                if HLSPlaybackEnabledFlag.feature_enabled(self.course_id):
                     val_profiles.append('hls')
 
                 # strip edx_video_id to prevent ValVideoNotFoundError error if unwanted spaces are there. TNL-5769
