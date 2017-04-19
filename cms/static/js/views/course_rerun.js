@@ -31,13 +31,15 @@ define(['domReady', 'jquery', 'underscore', 'js/views/utils/create_course_utils'
             var org = $newCourseForm.find('.rerun-course-org').val();
             var number = $newCourseForm.find('.rerun-course-number').val();
             var run = $newCourseForm.find('.rerun-course-run').val();
+            var robot = $newCourseForm.find('.rerun-course-robot').val();
 
             course_info = {
                 source_course_key: source_course_key,
                 org: org,
                 number: number,
                 display_name: display_name,
-                run: run
+                run: run,
+                robot: robot
             };
 
             analytics.track('Reran a Course', course_info);

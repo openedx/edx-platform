@@ -292,7 +292,9 @@ def course_rerun_handler(request, course_key_string):
         raise PermissionDenied()
     course_key = CourseKey.from_string(course_key_string)
     with modulestore().bulk_operations(course_key):
+
         course_module = get_course_and_check_access(course_key, request.user, depth=3)
+
         if request.method == 'GET':
             return render_to_response('course-create-rerun.html', {
                 'source_course_key': course_key,
@@ -718,6 +720,7 @@ def _create_or_rerun_course(request):
         org = request.json.get('org')
         course = request.json.get('number', request.json.get('course'))
         display_name = request.json.get('display_name')
+        robot = request.json.get('robot')
         # force the start date for reruns and allow us to override start via the client
         start = request.json.get('start', CourseFields.start.default)
         run = request.json.get('run')
@@ -731,6 +734,8 @@ def _create_or_rerun_course(request):
                 )
 
         fields = {'start': start}
+        if robot is not None:
+            fields['robot'] = robot
         if display_name is not None:
             fields['display_name'] = display_name
 
@@ -851,6 +856,10 @@ def _rerun_course(request, org, number, run, fields):
     fields['advertised_start'] = None
 
     # Rerun the course as a new celery task
+    """
+    Fire Robot HERE
+
+    """
     json_fields = json.dumps(fields, cls=EdxJSONEncoder)
     rerun_course.delay(unicode(source_course_key), unicode(destination_course_key), request.user.id, json_fields)
 
