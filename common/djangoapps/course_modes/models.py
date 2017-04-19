@@ -300,7 +300,7 @@ class CourseMode(models.Model):
         #         Q(_expiration_datetime__isnull=True) | Q(_expiration_datetime__gte=now)
         #     )
 
-            log.info("found_course_modes 2nd: %s", found_course_modes)
+        log.info("found_course_modes 2nd: %s", found_course_modes)
 
         # Credit course modes are currently not shown on the track selection page;
         # they're available only when students complete a course.  For this reason,
