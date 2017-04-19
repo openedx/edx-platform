@@ -66,3 +66,5 @@ DATABASES['tiers'] = dj_database_url.parse(TIERS_DATABASE_URL)
 DATABASE_ROUTERS += ['openedx.core.djangoapps.appsembler.sites.routers.TiersDbRouter']
 
 XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5
+
+CLONE_COURSE_FOR_NEW_SIGNUPS = False 

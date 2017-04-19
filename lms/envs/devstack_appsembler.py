@@ -77,3 +77,5 @@ CELERY_QUEUES.update(
         if alternate not in CELERY_QUEUES.keys()
     }
 )
+
+CLONE_COURSE_FOR_NEW_SIGNUPS = False
