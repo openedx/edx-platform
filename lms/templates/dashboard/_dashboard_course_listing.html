@@ -19,7 +19,7 @@ from student.helpers import (
   VERIFY_STATUS_NEED_TO_REVERIFY,
   DISABLE_UNENROLL_CERT_STATES,
 )
-from util.course import get_link_for_about_page
+from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_params
 %>
 
 <%
@@ -151,13 +151,15 @@ from util.course import get_link_for_about_page
               % if share_settings:
                 <%
                   share_url = get_link_for_about_page(course_overview)
+                  encoded_utm_parameters = get_encoded_course_sharing_utm_params()
                   share_window_name = 'shareWindow'
                   share_window_config = 'toolbar=no, location=no, status=no, menubar=no, scrollbars=yes, resizable=yes, width=640, height=480'
                 %>
                 % if share_settings.get('DASHBOARD_FACEBOOK', False):
                   <%
+                      facebook_share_url = "{url}?{utm_params}".format(url=share_url, utm_params=encoded_utm_parameters['facebook'])
                       share_text = _("I'm taking {course_name} online with edX.org. Check it out!").format(course_name=course_overview.display_name_with_default)
-                      query_params = urllib.urlencode((('u', share_url), ('quote', share_text.encode('utf-8')),))
+                      query_params = urllib.urlencode((('u', facebook_share_url), ('quote', share_text.encode('utf-8')),))
                       facebook_url = 'https://www.facebook.com/sharer/sharer.php?{query}'.format(query=query_params)
                   %>
                     <a
@@ -176,9 +178,10 @@ from util.course import get_link_for_about_page
                 % endif
                 % if share_settings.get('DASHBOARD_TWITTER', False):
                   <%
+                      twitter_share_url = "{url}?{utm_params}".format(url=share_url, utm_params=encoded_utm_parameters['twitter'])
                       default_share_text = _("I'm taking {course_name} online with @edxonline. Check it out!").format(course_name=course_overview.display_name_with_default)
                       share_text = urllib.quote_plus(share_settings.get('DASHBOARD_TWITTER_TEXT', default_share_text.encode('utf-8')))
-                      twitter_url = 'https://twitter.com/intent/tweet?text=' + share_text + '%20' + urllib.quote_plus(share_url)
+                      twitter_url = 'https://twitter.com/intent/tweet?text=' + share_text + '%20' + urllib.quote_plus(twitter_share_url)
                   %>
                     <a
                       data-tooltip="${_('Share on Twitter')}"

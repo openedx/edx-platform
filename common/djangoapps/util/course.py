@@ -2,9 +2,34 @@
 Utility methods related to course
 """
 import logging
+import urllib
+
 from django.conf import settings
 
 log = logging.getLogger(__name__)
+
+COURSE_SHARING_UTM_PARAMETERS = {
+    'facebook': {
+        'utm_medium': 'social-post',
+        'utm_campaign': 'social-sharing',
+        'utm_source': 'facebook',
+    },
+    'twitter': {
+        'utm_medium': 'social-post',
+        'utm_campaign': 'social-sharing',
+        'utm_source': 'twitter',
+    },
+}
+
+
+def get_encoded_course_sharing_utm_params():
+    """
+    Returns encoded Course Sharing UTM Parameters.
+    """
+    return {
+        utm_source: urllib.urlencode(utm_params)
+        for utm_source, utm_params in COURSE_SHARING_UTM_PARAMETERS.iteritems()
+    }
 
 
 def get_link_for_about_page(course):
