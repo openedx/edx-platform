@@ -309,6 +309,7 @@ class CourseMode(models.Model):
         if only_selectable:
             found_course_modes = found_course_modes.exclude(mode_slug__in=cls.CREDIT_MODES)
 
+        log.info("found_course_modes: %s", found_course_modes)
         modes = ([mode.to_tuple() for mode in found_course_modes])
         if not modes:
             modes = [cls.DEFAULT_MODE]
