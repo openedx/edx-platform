@@ -18,17 +18,14 @@ from email.utils import formatdate
 import pytz
 import requests
 import uuid
-from lazy import lazy
-from opaque_keys.edx.keys import UsageKey
 
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.core.cache import cache
 from django.core.files.base import ContentFile
 from django.dispatch import receiver
-from django.db import models, transaction
+from django.db import models
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext as _, ugettext_lazy
 
@@ -42,10 +39,9 @@ from lms.djangoapps.verify_student.ssencrypt import (
     random_aes_key, encrypt_and_encode,
     generate_signed_message, rsa_encrypt
 )
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangolib.model_mixins import DeprecatedModelMixin
 
 log = logging.getLogger(__name__)
 
@@ -1103,12 +1099,9 @@ def invalidate_deadline_caches(sender, **kwargs):  # pylint: disable=unused-argu
     cache.delete(VerificationDeadline.ALL_DEADLINES_CACHE_KEY)
 
 
-class VerificationCheckpoint(models.Model):
-    """Represents a point at which a user is asked to re-verify his/her
-    identity.
-
-    Each checkpoint is uniquely identified by a
-    (course_id, checkpoint_location) tuple.
+class VerificationCheckpoint(DeprecatedModelMixin, models.Model):  # pylint: disable=model-missing-unicode
+    """
+    DEPRECATED - do not use. To be removed in a future Open edX release (Hawthorn).
     """
     course_id = CourseKeyField(max_length=255, db_index=True)
     checkpoint_location = models.CharField(max_length=255)
@@ -1118,86 +1111,10 @@ class VerificationCheckpoint(models.Model):
         app_label = "verify_student"
         unique_together = ('course_id', 'checkpoint_location')
 
-    def __unicode__(self):
-        """
-        Unicode representation of the checkpoint.
-        """
-        return u"{checkpoint} in {course}".format(
-            checkpoint=self.checkpoint_name,
-            course=self.course_id
-        )
 
-    @lazy
-    def checkpoint_name(self):
-        """Lazy method for getting checkpoint name of reverification block.
-
-        Return location of the checkpoint if no related assessment found in
-        database.
-        """
-        checkpoint_key = UsageKey.from_string(self.checkpoint_location)
-        try:
-            checkpoint_name = modulestore().get_item(checkpoint_key).related_assessment
-        except ItemNotFoundError:
-            log.warning(
-                u"Verification checkpoint block with location '%s' and course id '%s' "
-                u"not found in database.", self.checkpoint_location, unicode(self.course_id)
-            )
-            checkpoint_name = self.checkpoint_location
-
-        return checkpoint_name
-
-    def add_verification_attempt(self, verification_attempt):
-        """Add the verification attempt in M2M relation of photo_verification.
-
-        Arguments:
-            verification_attempt(object): SoftwareSecurePhotoVerification object
-
-        Returns:
-            None
-        """
-        self.photo_verification.add(verification_attempt)   # pylint: disable=no-member
-
-    def get_user_latest_status(self, user_id):
-        """Get the status of the latest checkpoint attempt of the given user.
-
-        Args:
-            user_id(str): Id of user
-
-        Returns:
-            VerificationStatus object if found any else None
-        """
-        try:
-            return self.checkpoint_status.filter(user_id=user_id).latest()
-        except ObjectDoesNotExist:
-            return None
-
-    @classmethod
-    def get_or_create_verification_checkpoint(cls, course_id, checkpoint_location):
-        """
-        Get or create the verification checkpoint for given 'course_id' and
-        checkpoint name.
-
-        Arguments:
-            course_id (CourseKey): CourseKey
-            checkpoint_location (str): Verification checkpoint location
-
-        Raises:
-            IntegrityError if create fails due to concurrent create.
-
-        Returns:
-            VerificationCheckpoint object if exists otherwise None
-        """
-        with transaction.atomic():
-            checkpoint, __ = cls.objects.get_or_create(course_id=course_id, checkpoint_location=checkpoint_location)
-            return checkpoint
-
-
-class VerificationStatus(models.Model):
-    """This model is an append-only table that represents user status changes
-    during the verification process.
-
-    A verification status represents a user’s progress through the verification
-    process for a particular checkpoint.
+class VerificationStatus(DeprecatedModelMixin, models.Model):  # pylint: disable=model-missing-unicode
+    """
+    DEPRECATED - do not use. To be removed in a future Open edX release (Hawthorn).
     """
     SUBMITTED_STATUS = "submitted"
     APPROVED_STATUS = "approved"
@@ -1224,172 +1141,24 @@ class VerificationStatus(models.Model):
         verbose_name = "Verification Status"
         verbose_name_plural = "Verification Statuses"
 
-    @classmethod
-    def add_verification_status(cls, checkpoint, user, status):
-        """Create new verification status object.
 
-        Arguments:
-            checkpoint(VerificationCheckpoint): VerificationCheckpoint object
-            user(User): user object
-            status(str): Status from VERIFICATION_STATUS_CHOICES
-
-        Returns:
-            None
-        """
-        cls.objects.create(checkpoint=checkpoint, user=user, status=status)
-
-    @classmethod
-    def add_status_from_checkpoints(cls, checkpoints, user, status):
-        """Create new verification status objects for a user against the given
-        checkpoints.
-
-        Arguments:
-            checkpoints(list): list of VerificationCheckpoint objects
-            user(User): user object
-            status(str): Status from VERIFICATION_STATUS_CHOICES
-
-        Returns:
-            None
-        """
-        for checkpoint in checkpoints:
-            cls.objects.create(checkpoint=checkpoint, user=user, status=status)
-
-    @classmethod
-    def get_user_status_at_checkpoint(cls, user, course_key, location):
-        """
-        Get the user's latest status at the checkpoint.
-
-        Arguments:
-            user (User): The user whose status we are retrieving.
-            course_key (CourseKey): The identifier for the course.
-            location (UsageKey): The location of the checkpoint in the course.
-
-        Returns:
-            unicode or None
-
-        """
-        try:
-            return cls.objects.filter(
-                user=user,
-                checkpoint__course_id=course_key,
-                checkpoint__checkpoint_location=unicode(location),
-            ).latest().status
-        except cls.DoesNotExist:
-            return None
-
-    @classmethod
-    def get_user_attempts(cls, user_id, course_key, checkpoint_location):
-        """
-        Get re-verification attempts against a user for a given 'checkpoint'
-        and 'course_id'.
-
-        Arguments:
-            user_id (str): User Id string
-            course_key (str): A CourseKey of a course
-            checkpoint_location (str): Verification checkpoint location
-
-        Returns:
-            Count of re-verification attempts
-        """
-
-        return cls.objects.filter(
-            user_id=user_id,
-            checkpoint__course_id=course_key,
-            checkpoint__checkpoint_location=checkpoint_location,
-            status=cls.SUBMITTED_STATUS
-        ).count()
-
-    @classmethod
-    def get_location_id(cls, photo_verification):
-        """Get the location ID of reverification XBlock.
-
-        Args:
-            photo_verification(object): SoftwareSecurePhotoVerification object
-
-        Return:
-            Location Id of XBlock if any else empty string
-        """
-        try:
-            verification_status = cls.objects.filter(checkpoint__photo_verification=photo_verification).latest()
-            return verification_status.checkpoint.checkpoint_location
-        except cls.DoesNotExist:
-            return ""
-
-    @classmethod
-    def get_all_checkpoints(cls, user_id, course_key):
-        """Return dict of all the checkpoints with their status.
-        Args:
-            user_id(int): Id of user.
-            course_key(unicode): Unicode of course key
-
-        Returns:
-            dict: {checkpoint:status}
-        """
-        all_checks_points = cls.objects.filter(
-            user_id=user_id, checkpoint__course_id=course_key
-        )
-        check_points = {}
-        for check in all_checks_points:
-            check_points[check.checkpoint.checkpoint_location] = check.status
-
-        return check_points
-
-    @classmethod
-    def cache_key_name(cls, user_id, course_key):
-        """Return the name of the key to use to cache the current configuration
-        Args:
-            user_id(int): Id of user.
-            course_key(unicode): Unicode of course key
-
-        Returns:
-            Unicode cache key
-        """
-        return u"verification.{}.{}".format(user_id, unicode(course_key))
-
-
-@receiver(models.signals.post_save, sender=VerificationStatus)
-@receiver(models.signals.post_delete, sender=VerificationStatus)
-def invalidate_verification_status_cache(sender, instance, **kwargs):  # pylint: disable=unused-argument, invalid-name
-    """Invalidate the cache of VerificationStatus model. """
-
-    cache_key = VerificationStatus.cache_key_name(
-        instance.user.id,
-        unicode(instance.checkpoint.course_id)
-    )
-    cache.delete(cache_key)
-
-
-# DEPRECATED: this feature has been permanently enabled.
-# Once the application code has been updated in production,
-# this table can be safely deleted.
-class InCourseReverificationConfiguration(ConfigurationModel):
-    """Configure in-course re-verification.
-
-    Enable or disable in-course re-verification feature.
-    When this flag is disabled, the "in-course re-verification" feature
-    will be disabled.
-
-    When the flag is enabled, the "in-course re-verification" feature
-    will be enabled.
+class InCourseReverificationConfiguration(DeprecatedModelMixin, ConfigurationModel):  # pylint: disable=model-missing-unicode
+    """
+    DEPRECATED - do not use. To be removed in a future Open edX release (Hawthorn).
     """
     pass
 
 
-class IcrvStatusEmailsConfiguration(ConfigurationModel):
-    """Toggle in-course reverification (ICRV) status emails
-
-    Disabled by default. When disabled, ICRV status emails will not be sent.
-    When enabled, ICRV status emails are sent.
+class IcrvStatusEmailsConfiguration(DeprecatedModelMixin, ConfigurationModel):  # pylint: disable=model-missing-unicode
+    """
+    DEPRECATED - do not use. To be removed in a future Open edX release (Hawthorn).
     """
     pass
 
 
-class SkippedReverification(models.Model):
-    """Model for tracking skipped Reverification of a user against a specific
-    course.
-
-    If a user skipped a Reverification checkpoint for a specific course then in
-    future that user cannot see the reverification link.
+class SkippedReverification(DeprecatedModelMixin, models.Model):  # pylint: disable=model-missing-unicode
+    """
+    DEPRECATED - do not use. To be removed in a future Open edX release (Hawthorn).
     """
     user = models.ForeignKey(User)
     course_id = CourseKeyField(max_length=255, db_index=True)
@@ -1399,57 +1168,3 @@ class SkippedReverification(models.Model):
     class Meta(object):
         app_label = "verify_student"
         unique_together = (('user', 'course_id'),)
-
-    @classmethod
-    @transaction.atomic
-    def add_skipped_reverification_attempt(cls, checkpoint, user_id, course_id):
-        """Create skipped reverification object.
-
-        Arguments:
-            checkpoint(VerificationCheckpoint): VerificationCheckpoint object
-            user_id(str): User Id of currently logged in user
-            course_id(CourseKey): CourseKey
-
-        Returns:
-            None
-        """
-        cls.objects.create(checkpoint=checkpoint, user_id=user_id, course_id=course_id)
-
-    @classmethod
-    def check_user_skipped_reverification_exists(cls, user_id, course_id):
-        """Check existence of a user's skipped re-verification attempt for a
-        specific course.
-
-        Arguments:
-            user_id(str): user id
-            course_id(CourseKey): CourseKey
-
-        Returns:
-            Boolean
-        """
-        has_skipped = cls.objects.filter(user_id=user_id, course_id=course_id).exists()
-        return has_skipped
-
-    @classmethod
-    def cache_key_name(cls, user_id, course_key):
-        """Return the name of the key to use to cache the current configuration
-        Arguments:
-            user(User): user object
-            course_key(CourseKey): CourseKey
-
-        Returns:
-            string: cache key name
-        """
-        return u"skipped_reverification.{}.{}".format(user_id, unicode(course_key))
-
-
-@receiver(models.signals.post_save, sender=SkippedReverification)
-@receiver(models.signals.post_delete, sender=SkippedReverification)
-def invalidate_skipped_verification_cache(sender, instance, **kwargs):  # pylint: disable=unused-argument, invalid-name
-    """Invalidate the cache of skipped verification model. """
-
-    cache_key = SkippedReverification.cache_key_name(
-        instance.user.id,
-        unicode(instance.course_id)
-    )
-    cache.delete(cache_key)
