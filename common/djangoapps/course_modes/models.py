@@ -294,13 +294,13 @@ class CourseMode(models.Model):
         found_course_modes = cls.objects.filter(course_id=course_id)
 
         # Filter out expired course modes if include_expired is not set
-        log.info("found_course_modes: %s", found_course_modes)
+        log.info("found_course_modes 1st: %s", found_course_modes)
         if not include_expired:
             found_course_modes = found_course_modes.filter(
                 Q(_expiration_datetime__isnull=True) | Q(_expiration_datetime__gte=now)
             )
 
-            log.info("found_course_modes: %s", found_course_modes)
+            log.info("found_course_modes 2nd: %s", found_course_modes)
 
         # Credit course modes are currently not shown on the track selection page;
         # they're available only when students complete a course.  For this reason,
@@ -309,7 +309,7 @@ class CourseMode(models.Model):
         if only_selectable:
             found_course_modes = found_course_modes.exclude(mode_slug__in=cls.CREDIT_MODES)
 
-        log.info("found_course_modes: %s", found_course_modes)
+        log.info("found_course_modes 3rd: %s", found_course_modes)
         modes = ([mode.to_tuple() for mode in found_course_modes])
         if not modes:
             modes = [cls.DEFAULT_MODE]
