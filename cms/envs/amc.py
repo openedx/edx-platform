@@ -75,5 +75,6 @@ DATABASE_ROUTERS += ['openedx.core.djangoapps.appsembler.sites.routers.TiersDbRo
 
 XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5
 
+CLONE_COURSE_FOR_NEW_SIGNUPS = False 
 HIJACK_ALLOW_GET_REQUESTS = True
 HIJACK_LOGOUT_REDIRECT_URL = '/admin/auth/user'

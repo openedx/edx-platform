@@ -95,5 +95,6 @@ DATABASES['tiers'] = dj_database_url.parse(TIERS_DATABASE_URL)
 
 DATABASE_ROUTERS += ['openedx.core.djangoapps.appsembler.sites.routers.TiersDbRouter']
 
+CLONE_COURSE_FOR_NEW_SIGNUPS = False
 HIJACK_ALLOW_GET_REQUESTS = True
 HIJACK_LOGOUT_REDIRECT_URL = '/admin/auth/user'
