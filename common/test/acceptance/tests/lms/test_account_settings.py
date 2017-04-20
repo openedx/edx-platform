@@ -489,15 +489,25 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
         # verify that we are on correct tab
         self.assertTrue(self.account_settings_page.is_order_history_tab_visible)
 
-        expected_order_data = {
-            'title': 'Test Course',
+        expected_order_data_first_row = {
+            'number': 'Order Number:\nEdx-123',
             'date': 'Date Placed:\nApr 21, 2016',
-            'price': 'Cost:\n$100.0',
-            'number': 'Order Number:\nEdx-123'
+            'price': 'Cost:\n$100.00',
         }
-        for field_name, value in expected_order_data.iteritems():
+        expected_order_data_second_row = {
+            'number': 'Product Name:\nTest Course',
+            'date': 'Date Placed:\nApr 21, 2016',
+            'price': 'Cost:\n$100.00',
+        }
+
+        for field_name, value in expected_order_data_first_row.iteritems():
             self.assertEqual(
-                self.account_settings_page.get_value_of_order_history_row_item('order-Edx-123', field_name), value
+                self.account_settings_page.get_value_of_order_history_row_item('order-Edx-123', field_name)[0], value
+            )
+
+        for field_name, value in expected_order_data_second_row.iteritems():
+            self.assertEqual(
+                self.account_settings_page.get_value_of_order_history_row_item('order-Edx-123', field_name)[1], value
             )
 
         self.assertTrue(self.account_settings_page.order_button_is_visible('order-Edx-123'))
