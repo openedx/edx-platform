@@ -38,18 +38,14 @@ class StubEcommerceServiceHandler(StubHttpRequestHandler):  # pylint: disable=mi
                 {
                     'status': 'Complete',
                     'number': 'Edx-123',
-                    'total_excl_tax': '100.0',
+                    'total_excl_tax': '100.00',
                     'date_placed': '2016-04-21T23:14:23Z',
                     'lines': [
                         {
                             'title': 'Test Course',
+                            'line_price_excl_tax': '100.00',
                             'product': {
-                                'attribute_values': [
-                                    {
-                                        'name': 'certificate_type',
-                                        'value': 'verified'
-                                    }
-                                ]
+                                'product_class': 'Seat'
                             }
                         }
                     ],
