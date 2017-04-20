@@ -694,6 +694,7 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
         'milestones': milestones_helpers.get_service(),
         'credit': CreditService(),
         'bookmarks': BookmarksService(user=user),
+        'courseware_parent_info': CoursewareParentInfoService(),
     }
 
     if settings.FEATURES.get('ENABLE_NOTIFICATIONS', False):
