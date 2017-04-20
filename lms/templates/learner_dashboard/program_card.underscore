@@ -23,7 +23,7 @@
             <span class="sr-only">
                 <%- ngettext('Course', 'Courses', progress.in_progress) %>
             </span>
-            <%- gettext('Enrolled') %>
+            <%- gettext('In Progress') %>
         </div>
 
         <div class="number-status">
@@ -31,7 +31,7 @@
             <span class="sr-only">
                 <%- ngettext('Course', 'Courses', progress.not_started) %>
             </span>
-            <%- gettext('Not Enrolled') %>
+            <%- gettext('Remaining') %>
         </div>
     </div>
 <% } %>
