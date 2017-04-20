@@ -24,7 +24,10 @@ INTERCOM_APP_ID = AUTH_TOKENS.get("INTERCOM_APP_ID")
 INTERCOM_APP_SECRET = AUTH_TOKENS.get("INTERCOM_APP_SECRET")
 
 INSTALLED_APPS += ('tiers',)
-MIDDLEWARE_CLASSES += ('organizations.middleware.OrganizationMiddleware', 'tiers.middleware.TierMiddleware',)
+MIDDLEWARE_CLASSES += (
+    'organizations.middleware.OrganizationMiddleware',
+    'tiers.middleware.TierMiddleware',
+)
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
