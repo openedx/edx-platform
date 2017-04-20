@@ -298,6 +298,7 @@ class CourseMode(models.Model):
 
         # Filter out expired course modes if include_expired is not set
         log.info("found_course_modes 1st: %s", found_course_modes)
+        log.info("inlude exprie 2: %s", include_expired)
         if not include_expired:
             found_course_modes = found_course_modes.filter(
                 Q(_expiration_datetime__isnull=True) | Q(_expiration_datetime__gte=now)
@@ -371,7 +372,7 @@ class CourseMode(models.Model):
         """
         import logging
         log = logging.getLogger(__name__)
-
+        log.info("inlude exprie 1: %s", include_expired)
         if modes is None:
             modes = cls.modes_for_course(course_id, include_expired=include_expired)
 
