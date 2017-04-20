@@ -2153,6 +2153,9 @@ INSTALLED_APPS = (
     # Verified Track Content Cohorting (Beta feature that will hopefully be removed)
     'openedx.core.djangoapps.verified_track_content',
 
+    # Video module configs (This will be moved to Video once it becomes an XBlock)
+    'openedx.core.djangoapps.video_config',
+
     # Learner's dashboard
     'learner_dashboard',
 
