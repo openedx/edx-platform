@@ -1599,6 +1599,7 @@ def get_financial_aid_courses(user):
     for enrollment in CourseEnrollment.enrollments_for_user(user).order_by('-created'):
 
         if enrollment.mode != CourseMode.VERIFIED and \
+                enrollment.course_overview and \
                 enrollment.course_overview.eligible_for_financial_aid and \
                 CourseMode.objects.filter(
                     Q(_expiration_datetime__isnull=True) | Q(_expiration_datetime__gt=datetime.now(UTC())),
