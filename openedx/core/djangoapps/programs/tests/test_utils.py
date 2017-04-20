@@ -65,6 +65,23 @@ class TestProgramProgressMeter(TestCase):
         for program in programs:
             program['detail_url'] = reverse('program_details_view', kwargs={'program_uuid': program['uuid']})
 
+    def _make_certificate_result(self, **kwargs):
+        """Helper to create dummy results from the certificates API."""
+        result = {
+            'username': 'dummy-username',
+            'course_key': 'dummy-course',
+            'type': 'dummy-type',
+            'status': 'dummy-status',
+            'download_url': 'http://www.example.com/cert.pdf',
+            'grade': '0.98',
+            'created': '2015-07-31T00:00:00Z',
+            'modified': '2015-07-31T00:00:00Z',
+        }
+
+        result.update(**kwargs)
+
+        return result
+
     def test_no_enrollments(self, mock_get_programs):
         """Verify behavior when programs exist, but no relevant enrollments do."""
         data = [ProgramFactory()]
@@ -416,54 +433,15 @@ class TestProgramProgressMeter(TestCase):
         meter = ProgramProgressMeter(self.user)
         self.assertEqual(meter.completed_programs, program_uuids)
 
-    @mock.patch(UTILS_MODULE + '.ProgramProgressMeter.completed_course_runs', new_callable=mock.PropertyMock)
-    def test_completed_programs_no_id_professional(self, mock_completed_course_runs, mock_get_programs):
-        """ Verify the method treats no-id-professional enrollments as professional enrollments. """
-        course_runs = CourseRunFactory.create_batch(2, type='no-id-professional')
-        program = ProgramFactory(courses=[CourseFactory(course_runs=course_runs)])
-        mock_get_programs.return_value = [program]
-
-        # Verify that no programs are complete.
-        meter = ProgramProgressMeter(self.user)
-        self.assertEqual(meter.completed_programs, [])
-
-        # Complete all programs.
-        for course_run in course_runs:
-            CourseEnrollmentFactory(user=self.user, course_id=course_run['key'], mode='no-id-professional')
-
-        mock_completed_course_runs.return_value = [
-            {'course_run_id': course_run['key'], 'type': MODES.professional}
-            for course_run in course_runs
-        ]
-
-        # Verify that all programs are complete.
-        meter = ProgramProgressMeter(self.user)
-        self.assertEqual(meter.completed_programs, [program['uuid']])
-
     @mock.patch(UTILS_MODULE + '.certificate_api.get_certificates_for_user')
     def test_completed_course_runs(self, mock_get_certificates_for_user, _mock_get_programs):
         """
         Verify that the method can find course run certificates when not mocked out.
         """
-        def make_certificate_result(**kwargs):
-            """Helper to create dummy results from the certificates API."""
-            result = {
-                'username': 'dummy-username',
-                'course_key': 'dummy-course',
-                'type': 'dummy-type',
-                'status': 'dummy-status',
-                'download_url': 'http://www.example.com/cert.pdf',
-                'grade': '0.98',
-                'created': '2015-07-31T00:00:00Z',
-                'modified': '2015-07-31T00:00:00Z',
-            }
-            result.update(**kwargs)
-            return result
-
         mock_get_certificates_for_user.return_value = [
-            make_certificate_result(status='downloadable', type='verified', course_key='downloadable-course'),
-            make_certificate_result(status='generating', type='honor', course_key='generating-course'),
-            make_certificate_result(status='unknown', course_key='unknown-course'),
+            self._make_certificate_result(status='downloadable', type='verified', course_key='downloadable-course'),
+            self._make_certificate_result(status='generating', type='honor', course_key='generating-course'),
+            self._make_certificate_result(status='unknown', course_key='unknown-course'),
         ]
 
         meter = ProgramProgressMeter(self.user)
@@ -475,6 +453,32 @@ class TestProgramProgressMeter(TestCase):
             ]
         )
         mock_get_certificates_for_user.assert_called_with(self.user.username)
+
+    @mock.patch(UTILS_MODULE + '.certificate_api.get_certificates_for_user')
+    def test_program_completion_with_no_id_professional(self, mock_get_certificates_for_user, mock_get_programs):
+        """
+        Verify that 'no-id-professional' certificates are treated as if they were
+        'professional' certificates when determining program completion.
+        """
+        # Create serialized course runs like the ones we expect to receive from
+        # the discovery service's API. These runs are of type 'professional'.
+        course_runs = CourseRunFactory.create_batch(2, type='professional')
+        program = ProgramFactory(courses=[CourseFactory(course_runs=course_runs)])
+        mock_get_programs.return_value = [program]
+
+        # Verify that the test program is not complete.
+        meter = ProgramProgressMeter(self.user)
+        self.assertEqual(meter.completed_programs, [])
+
+        # Grant a 'no-id-professional' certificate for one of the course runs,
+        # thereby completing the program.
+        mock_get_certificates_for_user.return_value = [
+            self._make_certificate_result(status='downloadable', type='no-id-professional', course_key=course_runs[0]['key'])
+        ]
+
+        # Verify that the program is complete.
+        meter = ProgramProgressMeter(self.user)
+        self.assertEqual(meter.completed_programs, [program['uuid']])
 
 
 @ddt.ddt
