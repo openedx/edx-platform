@@ -31,3 +31,17 @@ class ProgramDetailsPage(PageObject):
 
     def is_browser_on_page(self):
         return self.q(css='.js-program-details-wrapper').present
+
+
+class ProgramMarketingPage(PageObject):
+    """Program marketing page."""
+    program_uuid = str(uuid4())
+    url = '{base}/programs/{program_uuid}/about'.format(base=BASE_URL, program_uuid=program_uuid)
+
+    def is_browser_on_page(self):
+        return self.q(css='#program-details-page').present
+
+    @property
+    def are_course_cards_present(self):
+        """Check whether course cards are present."""
+        return self.q(css='.course-card').present

@@ -814,7 +814,7 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
             courses=[self._create_course(self.course_price) for __ in range(self.number_of_courses)]
         )
 
-    def _create_course(self, course_price, is_enrolled=False):
+    def _create_course(self, course_price):
         """
         Creates the course in mongo and update it with the instructor data.
         Also creates catalog course with respect to course run.
@@ -829,7 +829,6 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
         course = self.update_course(course, self.user.id)
 
         course_run = CourseRunFactory(
-            is_enrolled=is_enrolled,
             key=unicode(course.id),
             seats=[SeatFactory(price=course_price)]
         )
@@ -879,7 +878,9 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
         data = ProgramMarketingDataExtender(program, self.user).extend()
         self.assertFalse(data['is_learner_eligible_for_one_click_purchase'])
 
-        courses.append(self._create_course(self.course_price, is_enrolled=True))
+        course = self._create_course(self.course_price)
+        courses.append(course)
+        CourseEnrollmentFactory(user=self.user, course_id=course['course_runs'][0]['key'])
         program2 = ProgramFactory(
             courses=courses,
             is_program_eligible_for_one_click_purchase=True

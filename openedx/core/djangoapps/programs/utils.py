@@ -496,33 +496,32 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
         self.data['number_of_courses'] = 0
         self.data['full_program_price'] = 0
 
+        self.ecommerce_service = EcommerceService()
+
     def _extend_program(self):
         """Aggregates data from the program data structure."""
         cache_key = 'program.instructors.{uuid}'.format(
             uuid=self.data['uuid']
         )
         program_instructors = cache.get(cache_key)
-        is_learner_eligible_for_one_click_purchase = self.data['is_program_eligible_for_one_click_purchase']
 
         for course in self.data['courses']:
             self._execute('_collect_course', course)
             if not program_instructors:
                 for course_run in course['course_runs']:
                     self._execute('_collect_instructors', course_run)
-            if is_learner_eligible_for_one_click_purchase:
-                is_learner_eligible_for_one_click_purchase = not any(
-                    course_run['is_enrolled'] for course_run in course['course_runs']
-                )
 
         if not program_instructors:
             # We cache the program instructors list to avoid repeated modulestore queries
             program_instructors = self.instructors.values()
             cache.set(cache_key, program_instructors, 3600)
 
-        self.data.update({
-            'instructors': program_instructors,
-            'is_learner_eligible_for_one_click_purchase': is_learner_eligible_for_one_click_purchase,
-        })
+        self.data['instructors'] = program_instructors
+
+    def extend(self):
+        self.data.update(super(ProgramMarketingDataExtender, self).extend())
+        self._collect_one_click_purchase_eligibility_data()
+        return self.data
 
     @classmethod
     def _handlers(cls, prefix):
@@ -577,3 +576,27 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
             self.instructors.update(
                 {instructor.get('name'): instructor for instructor in course_instructors.get('instructors', [])}
             )
+
+    def _collect_one_click_purchase_eligibility_data(self):
+        applicable_seat_types = self.data['applicable_seat_types']
+        is_learner_eligible_for_one_click_purchase = self.data['is_program_eligible_for_one_click_purchase']
+        skus = []
+
+        if is_learner_eligible_for_one_click_purchase:
+            for course in self.data['courses']:
+                is_learner_eligible_for_one_click_purchase = not any(
+                    course_run['is_enrolled'] for course_run in course['course_runs']
+                )
+                if is_learner_eligible_for_one_click_purchase:
+                    for course_run in course['course_runs']:
+                        for seat in course_run['seats']:
+                            if seat['type'] in applicable_seat_types:
+                                skus.append(seat['sku'])
+                else:
+                    skus = []
+                    break
+
+        self.data.update({
+            'basket_page_url': self.ecommerce_service.checkout_page_url(*skus) if skus else '#courses',
+            'is_learner_eligible_for_one_click_purchase': is_learner_eligible_for_one_click_purchase,
+        })

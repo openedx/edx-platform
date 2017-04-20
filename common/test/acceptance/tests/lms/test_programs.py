@@ -6,7 +6,7 @@ from common.test.acceptance.fixtures.course import CourseFixture
 from common.test.acceptance.fixtures.programs import ProgramsConfigMixin
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.catalog import CacheProgramsPage
-from common.test.acceptance.pages.lms.programs import ProgramDetailsPage, ProgramListingPage
+from common.test.acceptance.pages.lms.programs import ProgramDetailsPage, ProgramListingPage, ProgramMarketingPage
 from common.test.acceptance.tests.helpers import UniqueCourseTest
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory, CourseRunFactory, ProgramFactory
 
@@ -100,6 +100,30 @@ class ProgramListingPageTest(ProgramPageBase):
 
         self.assertTrue(self.listing_page.is_sidebar_present)
         self.assertTrue(self.listing_page.are_cards_present)
+
+
+class ProgramMarketingPageTest(ProgramPageBase):
+    """Verify user-facing behavior of the program marketing page."""
+    def setUp(self):
+        super(ProgramMarketingPageTest, self).setUp()
+
+        self.marketing_page = ProgramMarketingPage(self.browser)
+
+        self.program = self.create_program()
+        self.program['uuid'] = self.marketing_page.program_uuid
+
+    def test_program_course_cards(self):
+        """
+        Verify that course cards appear when a user visits the marketing page.
+        """
+        self.auth()
+
+        self.stub_catalog_api(programs=[self.program])
+        self.cache_programs()
+
+        self.marketing_page.visit()
+
+        self.assertTrue(self.marketing_page.are_course_cards_present)
 
 
 @attr('a11y')

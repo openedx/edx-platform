@@ -795,7 +795,7 @@ def program_marketing(request, program_uuid):
         raise Http404
 
     return render_to_response('courseware/program_marketing.html', {
-        'program': ProgramMarketingDataExtender(program_data, request.user).extend()
+        'program': ProgramMarketingDataExtender(program_data, request.user).extend(),
     })
 
 
