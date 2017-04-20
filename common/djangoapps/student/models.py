@@ -1579,7 +1579,7 @@ class CourseEnrollment(models.Model):
             log.info("refund_cutoff_date and datetime.now(UTC) > refund_cutoff_date is True \n")
             return False
 
-        course_mode = CourseMode.mode_for_course(self.course_id, 'verified')
+        course_mode = CourseMode.mode_for_course(self.course_id, 'verified', include_expired=True)
         if course_mode is None:
             log.info("course_mode is None is True \n")
             return False

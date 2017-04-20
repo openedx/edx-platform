@@ -349,7 +349,7 @@ class CourseMode(models.Model):
         return {mode.slug: mode for mode in modes}
 
     @classmethod
-    def mode_for_course(cls, course_id, mode_slug, modes=None):
+    def mode_for_course(cls, course_id, mode_slug, modes=None, include_expired=False):
         """Returns the mode for the course corresponding to mode_slug.
 
         Returns only non-expired modes.
@@ -373,7 +373,7 @@ class CourseMode(models.Model):
         log = logging.getLogger(__name__)
 
         if modes is None:
-            modes = cls.modes_for_course(course_id)
+            modes = cls.modes_for_course(course_id, include_expired=include_expired)
 
         matched = [m for m in modes if m.slug == mode_slug]
         log.info("course_id = %s, \nmode_slug = %s modes = %s, \nmatched_status = %s, \n",
