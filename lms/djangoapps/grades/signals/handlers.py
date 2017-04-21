@@ -2,6 +2,7 @@
 Grades related signals.
 """
 from contextlib import contextmanager
+from crum import get_current_user
 from logging import getLogger
 
 from django.dispatch import receiver
@@ -32,6 +33,8 @@ from ..tasks import recalculate_subsection_grade_v3, RECALCULATE_GRADE_DELAY
 
 log = getLogger(__name__)
 
+# define values to be used in grading events
+GRADES_RESCORE_EVENT_TYPE = 'edx.grades.problem.rescored'
 PROBLEM_SUBMITTED_EVENT_TYPE = 'edx.grades.problem.submitted'
 
 
@@ -209,7 +212,7 @@ def enqueue_subsection_update(sender, **kwargs):  # pylint: disable=unused-argum
     Handles the PROBLEM_WEIGHTED_SCORE_CHANGED signal by
     enqueueing a subsection update operation to occur asynchronously.
     """
-    _emit_problem_submitted_event(kwargs)
+    _emit_event(kwargs)
     result = recalculate_subsection_grade_v3.apply_async(
         kwargs=dict(
             user_id=kwargs['user_id'],
@@ -241,7 +244,7 @@ def recalculate_course_grade(sender, course, course_structure, user, **kwargs): 
     CourseGradeFactory().update(user, course=course, course_structure=course_structure)
 
 
-def _emit_problem_submitted_event(kwargs):
+def _emit_event(kwargs):
     """
     Emits a problem submitted event only if
     there is no current event transaction type,
@@ -265,5 +268,26 @@ def _emit_problem_submitted_event(kwargs):
                 'event_transaction_type': unicode(PROBLEM_SUBMITTED_EVENT_TYPE),
                 'weighted_earned': kwargs.get('weighted_earned'),
                 'weighted_possible': kwargs.get('weighted_possible'),
+            }
+        )
+
+    if root_type == 'edx.grades.problem.rescored':
+        current_user = get_current_user()
+        if current_user is not None and hasattr(current_user, 'id'):
+            instructor_id = unicode(current_user.id)
+        else:
+            instructor_id = None
+        tracker.emit(
+            unicode(GRADES_RESCORE_EVENT_TYPE),
+            {
+                'course_id': unicode(kwargs['course_id']),
+                'user_id': unicode(kwargs['user_id']),
+                'problem_id': unicode(kwargs['usage_id']),
+                'new_weighted_earned': kwargs.get('weighted_earned'),
+                'new_weighted_possible': kwargs.get('weighted_possible'),
+                'only_if_higher': kwargs.get('only_if_higher'),
+                'instructor_id': instructor_id,
+                'event_transaction_id': unicode(get_event_transaction_id()),
+                'event_transaction_type': unicode(GRADES_RESCORE_EVENT_TYPE),
             }
         )

@@ -18,6 +18,7 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
 from openedx.core.djangoapps.util.testing import TestConditionalContent
+from openedx.core.djangolib.testing.utils import get_mock_request
 from capa.tests.response_xml_factory import (CodeResponseXMLFactory,
                                              CustomResponseXMLFactory)
 from xmodule.modulestore.tests.factories import ItemFactory
@@ -88,6 +89,7 @@ class TestRescoringTask(TestIntegrationTask):
         self.user3 = self.create_student('u3')
         self.user4 = self.create_student('u4')
         self.users = [self.user1, self.user2, self.user3, self.user4]
+        # get_mock_request(self.create_instructor())
         self.logout()
 
         # set up test user for performing test operations

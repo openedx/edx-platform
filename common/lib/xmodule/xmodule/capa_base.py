@@ -1459,7 +1459,6 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
 
         return input_metadata
 
-
     def save_problem(self, data):
         """
         Save the passed in answers.
