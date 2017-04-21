@@ -141,11 +141,12 @@ class CourseGrade(object):
 
         return grade_summary
 
-    def compute_and_update(self, read_only=False):
+    def compute_and_update(self, read_only=False, fire_signal=True):
         """
         Computes the grade for the given student and course.
 
         If read_only is True, doesn't save any updates to the grades.
+        if fire_signal is False, COURSE_GRADE_CHANGED signal is not fired
         """
         subsections_total = sum(len(chapter['sections']) for chapter in self.chapter_grades)
 
@@ -167,7 +168,8 @@ class CourseGrade(object):
                 passed=self.passed,
             )
 
-        self._signal_listeners_when_grade_computed()
+        if fire_signal:
+            self._signal_listeners_when_grade_computed()
         self._log_event(
             log.warning,
             u"compute_and_update, read_only: {0}, subsections read/created: {1}/{2}, blocks accessed: {3}, total "
@@ -323,12 +325,13 @@ class CourseGradeFactory(object):
     """
     Factory class to create Course Grade objects
     """
-    def create(self, student, course, read_only=True):
+    def create(self, student, course, read_only=True, fire_signal=True):
         """
         Returns the CourseGrade object for the given student and course.
 
         If read_only is True, doesn't save any updates to the grades.
         Raises a PermissionDenied if the user does not have course access.
+        If fire_signal is False, COURSE_GRADE_CHANGED signal is not fired.
         """
         course_structure = get_course_blocks(student, course.location)
         # if user does not have access to this course, throw an exception
@@ -336,7 +339,7 @@ class CourseGradeFactory(object):
             raise PermissionDenied("User does not have access to this course")
         return (
             self._get_saved_grade(student, course, course_structure) or
-            self._compute_and_update_grade(student, course, course_structure, read_only)
+            self._compute_and_update_grade(student, course, course_structure, read_only, fire_signal)
         )
 
     GradeResult = namedtuple('GradeResult', ['student', 'course_grade', 'err_msg'])
@@ -399,14 +402,14 @@ class CourseGradeFactory(object):
             course_structure
         )
 
-    def _compute_and_update_grade(self, student, course, course_structure, read_only=False):
+    def _compute_and_update_grade(self, student, course, course_structure, read_only=False, fire_signal=True):
         """
         Freshly computes and updates the grade for the student and course.
 
         If read_only is True, doesn't save any updates to the grades.
         """
         course_grade = CourseGrade(student, course, course_structure)
-        course_grade.compute_and_update(read_only)
+        course_grade.compute_and_update(read_only, fire_signal)
         return course_grade
 
     def _user_has_access_to_course(self, course_structure):
