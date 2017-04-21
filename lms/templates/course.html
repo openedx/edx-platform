@@ -22,13 +22,15 @@ from django.core.urlresolvers import reverse
       <%
       if course.start is not None:
           course_date_string = course.start.strftime('%Y-%m-%dT%H:%M:%S%z')
+          course_date_string_format = course.start.strftime('%d %b. %Y')
       else:
           course_date_string = ''
       %>
       % if course.advertised_start is not None:
           <div class="course-date" aria-hidden="true">${_("Starts")}: ${course.advertised_start}</div>
       % else:
-          <div class="course-date localized_datetime" aria-hidden="true" data-format="shortDate" data-datetime="${course_date_string}" data-string="${_("Starts: {date}")}"></div>
+          <div class="course-date localized_datetime" aria-hidden="true" data-format="shortDate">${_("Course starts: ")}${course_date_string_format}</div>
+          <div style="display:none" class="course-date localized_datetime" aria-hidden="true" data-format="shortDate" data-datetime="${course_date_string}" data-string="${_("Starts: {date}")}"></div>
       % endif
     </div>
     <div class="sr">
