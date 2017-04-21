@@ -11,6 +11,9 @@ from django.conf import settings
 from django.utils.translation.trans_real import parse_accept_lang_header
 from django.utils.translation import LANGUAGE_SESSION_KEY
 
+import locale
+from django.utils import translation
+
 from openedx.core.djangoapps.dark_lang import DARK_LANGUAGE_KEY
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.user_api.preferences.api import (
@@ -130,3 +133,22 @@ class DarkLangMiddleware(object):
 
         # Set the session key to the requested preview lang
         request.session[LANGUAGE_SESSION_KEY] = preview_lang
+
+
+class DarkLangMiddlewareSetLocaleAdditional(object):
+    """
+    Additional Middleware for dark-launching languages.
+    """
+    def process_request(self, request):
+        """
+        Prevent user from requesting un-released languages except by using the preview-lang query string.
+        """
+        if not DarkLangConfig.current().enabled:
+            return
+
+        language = translation.get_language_from_request(request)
+        try:
+            locale.setlocale(locale.LC_ALL, settings.LOCALESET_FROM_REQUEST.get(language))
+        except:
+            pass
+
