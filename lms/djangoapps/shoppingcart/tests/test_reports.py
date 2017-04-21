@@ -7,6 +7,7 @@ import datetime
 import pytz
 import StringIO
 from textwrap import dedent
+from mock import patch
 
 from django.conf import settings
 
@@ -26,9 +27,10 @@ class ReportTypeTests(ModuleStoreTestCase):
     """
     FIVE_MINS = datetime.timedelta(minutes=5)
 
-    def setUp(self):
+    @patch('student.models.CourseEnrollment.refund_cutoff_date')
+    def setUp(self, cutoff_date):
         super(ReportTypeTests, self).setUp()
-
+        cutoff_date.return_value = datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=1)
         # Need to make a *lot* of users for this one
         self.first_verified_user = UserFactory.create(profile__name="John Doe")
         self.second_verified_user = UserFactory.create(profile__name="Jane Deer")
