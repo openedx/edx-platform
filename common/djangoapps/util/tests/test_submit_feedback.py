@@ -7,8 +7,11 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from smtplib import SMTPException
 from student.tests.factories import UserFactory
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
+from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
 from util import views
 from zendesk import ZendeskError
+import httpretty
 import json
 import mock
 from ddt import ddt, data, unpack
@@ -17,7 +20,11 @@ from student.tests.test_configuration_overrides import fake_get_value
 from student.tests.factories import CourseEnrollmentFactory
 
 TEST_SUPPORT_EMAIL = "support@example.com"
-TEST_ZENDESK_CUSTOM_FIELD_CONFIG = {"course_id": 1234, "enrollment_mode": 5678}
+TEST_ZENDESK_CUSTOM_FIELD_CONFIG = {
+    "course_id": 1234,
+    "enrollment_mode": 5678,
+    'enterprise_customer_name': 'enterprise_customer_name'
+}
 TEST_REQUEST_HEADERS = {
     "HTTP_REFERER": "test_referer",
     "HTTP_USER_AGENT": "test_user_agent",
@@ -44,11 +51,12 @@ def fake_support_backend_values(name, default=None):  # pylint: disable=unused-a
     ZENDESK_URL="dummy",
     ZENDESK_USER="dummy",
     ZENDESK_API_KEY="dummy",
-    ZENDESK_CUSTOM_FIELDS={}
+    ZENDESK_CUSTOM_FIELDS={},
+    ENABLE_ENTERPRISE_INTEGRATION=False
 )
 @mock.patch("util.views.dog_stats_api")
 @mock.patch("util.views._ZendeskApi", autospec=True)
-class SubmitFeedbackTest(TestCase):
+class SubmitFeedbackTest(EnterpriseServiceMockMixin, TestCase):
     """
     Class to test the submit_feedback function in views.
     """
@@ -72,6 +80,13 @@ class SubmitFeedbackTest(TestCase):
         # This does not contain issue_type nor course_id to ensure that they are optional
         self._auth_fields = {"subject": "a subject", "details": "some details"}
 
+        # Create a service user, because the track selection page depends on it
+        UserFactory.create(
+            username='enterprise_worker',
+            email="enterprise_worker@example.com",
+            password="edx",
+        )
+
     def _build_and_run_request(self, user, fields):
         """
         Generate a request and invoke the view, returning the response.
@@ -87,6 +102,7 @@ class SubmitFeedbackTest(TestCase):
             REMOTE_ADDR=TEST_REQUEST_HEADERS["REMOTE_ADDR"],
             SERVER_NAME=TEST_REQUEST_HEADERS["SERVER_NAME"],
         )
+        req.site = SiteFactory.create()
         req.user = user
         return views.submit_feedback(req)
 
@@ -437,6 +453,69 @@ class SubmitFeedbackTest(TestCase):
 
         ticket_update = self._build_zendesk_ticket_update(TEST_REQUEST_HEADERS, user.username)
 
+        self._test_success(user, fields)
+        self._assert_zendesk_called(zendesk_mock_instance, ticket_id, ticket, ticket_update)
+        self._assert_datadog_called(datadog_mock, datadog_tags)
+
+    @httpretty.activate
+    @data(
+        ("course-v1:testOrg+testCourseNumber+testCourseRun", True),
+        ("course-v1:testOrg+testCourseNumber+testCourseRun", False),
+    )
+    @unpack
+    @override_settings(ZENDESK_CUSTOM_FIELDS=TEST_ZENDESK_CUSTOM_FIELD_CONFIG, ENABLE_ENTERPRISE_INTEGRATION=True)
+    def test_valid_request_auth_user_with_enterprise_info(self, course_id, enrolled, zendesk_mock_class, datadog_mock):
+        """
+        Test a valid request from an authenticated user with enterprise tags.
+        """
+        self.mock_enterprise_learner_api()
+        zendesk_mock_instance = zendesk_mock_class.return_value
+        user = self._auth_user
+
+        fields = self._auth_fields.copy()
+        if course_id is not None:
+            fields["course_id"] = course_id
+
+        ticket_id = 42
+        zendesk_mock_instance.create_ticket.return_value = ticket_id
+
+        zendesk_tags = ["enterprise_learner", "LMS"]
+        datadog_tags = ['learner_type:enterprise_learner']
+        zendesk_custom_fields = []
+
+        if course_id:
+            zendesk_tags.insert(0, course_id)
+            datadog_tags.insert(0, "course_id:{}".format(course_id))
+            zendesk_custom_fields.append({"id": TEST_ZENDESK_CUSTOM_FIELD_CONFIG["course_id"], "value": course_id})
+            if enrolled is not None:
+                enrollment = CourseEnrollmentFactory.create(
+                    user=user,
+                    course_id=course_id,
+                    is_active=enrolled
+                )
+                if enrollment.is_active:
+                    zendesk_custom_fields.append(
+                        {"id": TEST_ZENDESK_CUSTOM_FIELD_CONFIG["enrollment_mode"], "value": enrollment.mode}
+                    )
+
+        zendesk_custom_fields.append(
+            {
+                "id": TEST_ZENDESK_CUSTOM_FIELD_CONFIG["enterprise_customer_name"],
+                "value": 'TestShib'
+            }
+        )
+
+        ticket = self._build_zendesk_ticket(
+            recipient=TEST_SUPPORT_EMAIL,
+            name=user.profile.name,
+            email=user.email,
+            subject=fields["subject"],
+            details=fields["details"],
+            tags=zendesk_tags,
+            custom_fields=zendesk_custom_fields
+        )
+
+        ticket_update = self._build_zendesk_ticket_update(TEST_REQUEST_HEADERS, user.username)
         self._test_success(user, fields)
         self._assert_zendesk_called(zendesk_mock_instance, ticket_id, ticket, ticket_update)
         self._assert_datadog_called(datadog_mock, datadog_tags)
