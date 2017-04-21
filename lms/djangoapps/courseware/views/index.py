@@ -392,11 +392,16 @@ class CoursewareIndex(View):
                         courseware_context['sequence_title'] = display_items[self.section.position - 1] \
                             .display_name_with_default
                     except IndexError:
-                        log.info("Course section {} with position {} and total section display items: {}".format(
+                        log.exception(
+                            "IndexError loading courseware for user %s, course %s, section %s, position %d. Total items: %d. URL: %s",
+                            self.real_user.username,
+                            self.course.id,
                             self.section.display_name_with_default,
                             self.section.position,
                             len(display_items),
-                        ))
+                            self.url,
+                        )
+                        raise
         return courseware_context
 
     def _add_entrance_exam_to_context(self, courseware_context):
