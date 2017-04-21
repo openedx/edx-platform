@@ -1557,6 +1557,7 @@ class CourseEnrollment(models.Model):
         # which calls this method to determine whether to refund the order.
         # This can't be set directly because refunds currently happen as a side-effect of unenrolling.
         # (side-effects are bad)
+
         if getattr(self, 'can_refund', None) is not None:
             return True
 
@@ -1570,10 +1571,13 @@ class CourseEnrollment(models.Model):
 
         # If it is after the refundable cutoff date they should not be refunded.
         refund_cutoff_date = self.refund_cutoff_date()
-        if refund_cutoff_date and datetime.now(UTC) > refund_cutoff_date:
+        # `refund_cuttoff_date` will be `None` if there is no order. If there is no order return `False`.
+        if refund_cutoff_date is None:
+            return False
+        if datetime.now(UTC) > refund_cutoff_date:
             return False
 
-        course_mode = CourseMode.mode_for_course(self.course_id, 'verified')
+        course_mode = CourseMode.mode_for_course(self.course_id, 'verified', include_expired=True)
         if course_mode is None:
             return False
         else:
