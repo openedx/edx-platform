@@ -287,24 +287,16 @@ class CourseMode(models.Model):
             list of `Mode` tuples
 
         """
-        import logging
-        log = logging.getLogger(__name__)
+
         now = datetime.now(pytz.UTC)
 
         found_course_modes = cls.objects.filter(course_id=course_id)
-        for course in found_course_modes:
-            log.info('AyubKhan4u log: \ncourse.mode_slug: %s + course._expiration: %s',
-                     course.mode_slug, course._expiration_datetime)
 
         # Filter out expired course modes if include_expired is not set
-        log.info("found_course_modes 1st: %s", found_course_modes)
-        log.info("inlude exprie 2: %s", include_expired)
         if not include_expired:
             found_course_modes = found_course_modes.filter(
                 Q(_expiration_datetime__isnull=True) | Q(_expiration_datetime__gte=now)
             )
-
-        log.info("found_course_modes 2nd: %s", found_course_modes)
 
         # Credit course modes are currently not shown on the track selection page;
         # they're available only when students complete a course.  For this reason,
@@ -313,7 +305,6 @@ class CourseMode(models.Model):
         if only_selectable:
             found_course_modes = found_course_modes.exclude(mode_slug__in=cls.CREDIT_MODES)
 
-        log.info("found_course_modes 3rd: %s", found_course_modes)
         modes = ([mode.to_tuple() for mode in found_course_modes])
         if not modes:
             modes = [cls.DEFAULT_MODE]
@@ -370,15 +361,10 @@ class CourseMode(models.Model):
             Mode
 
         """
-        import logging
-        log = logging.getLogger(__name__)
-        log.info("inlude exprie 1: %s", include_expired)
         if modes is None:
             modes = cls.modes_for_course(course_id, include_expired=include_expired)
 
         matched = [m for m in modes if m.slug == mode_slug]
-        log.info("course_id = %s, \nmode_slug = %s modes = %s, \nmatched_status = %s, \n",
-                 course_id, mode_slug, modes, matched)
 
         if matched:
             return matched[0]
