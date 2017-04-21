@@ -3,6 +3,7 @@ Unit tests for contentstore.views.library
 
 More important high-level tests are in contentstore/tests/test_libraries.py
 """
+from django.conf import settings
 from contentstore.tests.utils import AjaxEnabledTestClient, parse_json
 from contentstore.utils import reverse_course_url, reverse_library_url
 from contentstore.tests.utils import CourseTestCase
@@ -250,6 +251,24 @@ class UnitTestLibraries(CourseTestCase):
         self.assertIn('problem', templates)
         self.assertNotIn('discussion', templates)
         self.assertNotIn('advanced', templates)
+
+    def test_advanced_problem_types(self):
+        """
+        Verify that advanced problem types are not provided in problem component for libraries.
+        """
+        lib = LibraryFactory.create()
+        lib.save()
+
+        problem_type_templates = next(
+            (component['templates'] for component in get_component_templates(lib, library=True) if component['type'] == 'problem'),
+            []
+        )
+        # Each problem template has a category which shows whether problem is a 'problem'
+        # or which of the advanced problem type (e.g drag-and-drop-v2).
+        problem_type_categories = [problem_template['category'] for problem_template in problem_type_templates]
+
+        for advance_problem_type in settings.ADVANCED_PROBLEM_TYPES:
+            self.assertNotIn(advance_problem_type['component'], problem_type_categories)
 
     def test_manage_library_users(self):
         """

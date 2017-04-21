@@ -308,8 +308,9 @@ def get_component_templates(courselike, library=False):
                             )
                         )
 
-        # Add any advanced problem types. Note that these are different xblocks being stored as Advanced Problems.
-        if category == 'problem':
+        # Add any advanced problem types. Note that these are different xblocks being stored as Advanced Problems,
+        # currently not supported in libraries .
+        if category == 'problem' and not library:
             disabled_block_names = [block.name for block in disabled_xblocks()]
             advanced_problem_types = [advanced_problem_type for advanced_problem_type in ADVANCED_PROBLEM_TYPES
                                       if advanced_problem_type['component'] not in disabled_block_names]
