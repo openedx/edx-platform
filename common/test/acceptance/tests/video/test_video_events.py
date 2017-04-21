@@ -2,7 +2,9 @@
 
 import datetime
 import json
+from mock import patch
 from nose.plugins.attrib import attr
+import os
 import ddt
 
 from common.test.acceptance.tests.helpers import EventsTestMixin
@@ -147,6 +149,45 @@ class VideoEventsTest(VideoEventsTestMixin):
             'name': 'load_video',
         }
         assert_events_equal(static_fields_pattern, load_video_event)
+
+
+class VideoHLSEventsTest(VideoEventsTestMixin):
+    """
+    Test video player event emission for HLS video
+    """
+
+    def test_event_data_for_hls(self):
+        """
+        Scenario: Video component with HLS video emits events correctly
+
+        Given the course has a Video component with Youtube, HTML5 and HLS sources available.
+        And I play the video
+        And the video starts playing
+        And I watch 3 seconds of it
+        When I pause and seek the video
+        And I play the video to the end
+        Then I verify that all expected events are triggered
+        And triggered events have correct data
+        """
+        video_events = ('load_video', 'play_video', 'pause_video', 'seek_video')
+
+        def is_video_event(event):
+            """
+            Filter out anything other than the video events of interest
+            """
+            return event['event_type'] in video_events
+
+        captured_events = []
+        with self.capture_events(is_video_event, captured_events=captured_events):
+            self.metadata = self.metadata_for_mode('hls')
+            self.navigate_to_video()
+            self.video.click_player_button('play')
+            self.video.wait_for_position('0:03')
+            self.video.click_player_button('pause')
+            self.video.seek('0:08')
+
+        expected_events = [{'name': event, 'event': {'code': 'hls'}} for event in video_events]
+        self.assert_events_match(expected_events, captured_events)
 
 
 @attr(shard=8)

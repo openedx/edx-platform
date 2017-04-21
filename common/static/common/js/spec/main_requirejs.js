@@ -39,7 +39,8 @@
             'backbone-super': 'js/vendor/backbone-super',
             'jasmine-imagediff': 'js/vendor/jasmine-imagediff',
             'URI': 'js/vendor/URI.min',
-            'draggabilly': 'js/vendor/draggabilly'
+            'draggabilly': 'js/vendor/draggabilly',
+            'hls': 'common/js/vendor/hls'
         },
         shim: {
             'gettext': {

@@ -2,8 +2,8 @@
     'use strict';
 
     require(
-['video/03_video_player.js'],
-function(VideoPlayer) {
+['video/03_video_player.js', 'hls'],
+function(VideoPlayer, HLS) {
     describe('VideoPlayer', function() {
         var state, oldOTBD, empty_arguments;
 
@@ -967,6 +967,48 @@ function(VideoPlayer) {
                 state.videoPlayer.isPlaying.and.returnValue(false);
                 VideoPlayer.prototype.setPlaybackRate.call(state, '1.0');
                 expect(state.videoPlayer.player.setPlaybackRate).toHaveBeenCalledWith('1.0');
+            });
+        });
+
+        describe('HLS Video', function() {
+            beforeEach(function() {
+                state = jasmine.initializeHLSPlayer();
+            });
+
+            it('does not show error message if hls is supported', function() {
+                expect($('.video-hls-error')).toHaveClass('is-hidden');
+            });
+
+            it('can extract hls video sources correctly', function() {
+                expect(state.HLSVideoSources).toEqual(['/base/fixtures/hls/hls.m3u8']);
+                expect(state.videoPlayer.player.hls).toBeDefined();
+            });
+
+            describe('on safari', function() {
+                beforeEach(function() {
+                    spyOn(HLS, 'isSupported').and.returnValue(false);
+                    state = jasmine.initializeHLSPlayer();
+                    state.canPlayHLS = true;
+                    state.browserIsSafari = true;
+                });
+
+                it('can use native hls playback support', function() {
+                    expect(state.videoPlayer.player.hls).toBeUndefined();
+                });
+            });
+        });
+
+        describe('HLS Video Errors', function() {
+            beforeEach(function() {
+                spyOn(HLS, 'isSupported').and.returnValue(false);
+                state = jasmine.initializeHLSPlayer({sources: ['/base/fixtures/hls/hls.m3u8']});
+            });
+
+            it('shows error message if hls is not supported', function() {
+                expect($('.video-hls-error')).not.toHaveClass('is-hidden');
+                expect($('.video-hls-error').text().trim()).toEqual(
+                    'Your browser does not support this video format. Try using a different browser.'
+                );
             });
         });
     });
