@@ -11,6 +11,7 @@ import mock
 from nose.plugins.attrib import attr
 from pytz import utc
 
+from course_modes.models import CourseMode
 from lms.djangoapps.certificates.api import MODES
 from lms.djangoapps.commerce.tests.test_utils import update_commerce_config
 from openedx.core.djangoapps.catalog.tests.factories import (
@@ -136,6 +137,42 @@ class TestProgramProgressMeter(TestCase):
         mock_get_programs.return_value = data
 
         self._create_enrollments(course_run_key)
+
+        meter = ProgramProgressMeter(self.user)
+
+        program = data[0]
+        expected = [
+            ProgressFactory(
+                uuid=program['uuid'],
+                completed=[],
+                in_progress=[program['courses'][0]],
+                not_started=[]
+            )
+        ]
+
+        self.assertEqual(meter.progress(count_only=False), expected)
+
+    def test_no_id_professional_in_progress(self, mock_get_programs):
+        """
+        Verify that the progress meter treats no-id-professional enrollments
+        as professional.
+        """
+        course_run_key = generate_course_run_key()
+        data = [
+            ProgramFactory(
+                courses=[
+                    CourseFactory(course_runs=[
+                        CourseRunFactory(key=course_run_key, type=CourseMode.PROFESSIONAL),
+                    ]),
+                ]
+            )
+        ]
+        mock_get_programs.return_value = data
+
+        CourseEnrollmentFactory(
+            user=self.user, course_id=course_run_key,
+            mode=CourseMode.NO_ID_PROFESSIONAL_MODE
+        )
 
         meter = ProgramProgressMeter(self.user)
 
