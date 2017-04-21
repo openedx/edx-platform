@@ -75,7 +75,10 @@ class ProgramProgressMeter(object):
         for enrollment in self.enrollments:
             # enrollment.course_id is really a CourseKey (╯ಠ_ಠ）╯︵ ┻━┻
             enrollment_id = unicode(enrollment.course_id)
-            self.enrolled_run_modes[enrollment_id] = enrollment.mode
+            mode = enrollment.mode
+            if mode == CourseMode.NO_ID_PROFESSIONAL_MODE:
+                mode = CourseMode.PROFESSIONAL
+            self.enrolled_run_modes[enrollment_id] = mode
             # We can't use dict.keys() for this because the course run ids need to be ordered
             self.course_run_ids.append(enrollment_id)
 
