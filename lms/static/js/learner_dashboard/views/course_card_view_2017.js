@@ -53,7 +53,8 @@
                  postRender: function() {
                      var $upgradeMessage = this.$('.upgrade-message'),
                          $certStatus = this.$('.certificate-status'),
-                         $expiredNotification = this.$('.expired-notification');
+                         $expiredNotification = this.$('.expired-notification'),
+                         expired = this.model.get('expired');
 
                      this.enrollView = new CourseEnrollView({
                          $parentEl: this.$('.course-actions'),
@@ -62,14 +63,14 @@
                          enrollModel: this.enrollModel
                      });
 
-                     if (this.model.get('upgrade_url')) {
+                     if (this.model.get('upgrade_url') && !(expired === true)) {
                          this.upgradeMessage = new UpgradeMessageView({
                              $el: $upgradeMessage,
                              model: this.model
                          });
 
                          $certStatus.remove();
-                     } else if (this.model.get('certificate_url')) {
+                     } else if (this.model.get('certificate_url') && !(expired === true)) {
                          this.certificateStatus = new CertificateStatusView({
                              $el: $certStatus,
                              model: this.model
@@ -82,7 +83,7 @@
                          $certStatus.remove();
                      }
 
-                     if (this.model.get('expired')) {
+                     if (expired) {
                          this.expiredNotification = new ExpiredNotificationView({
                              $el: $expiredNotification,
                              model: this.model
