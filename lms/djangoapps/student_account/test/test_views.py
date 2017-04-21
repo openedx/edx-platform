@@ -645,7 +645,7 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase, ProgramsApiConf
                 'number': order['number'],
                 'price': order['total_excl_tax'],
                 'order_date': 'Jan 01, 2016',
-                'receipt_url': '/commerce/checkout/receipt/?orderNum=' + order['number'],
+                'receipt_url': '/checkout/receipt/?order_number=' + order['number'],
                 'lines': order['lines'],
             }
             self.assertEqual(order_detail[i], expected)

@@ -6,6 +6,8 @@ from django.conf import settings
 from commerce.models import CommerceConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
+RECEIPT_PAGE_URL = '/checkout/receipt/?order_number='
+
 
 class EcommerceService(object):
     """ Helper class for ecommerce service integration. """
@@ -38,11 +40,8 @@ class EcommerceService(object):
         Returns:
             Receipt page for the specified Order.
         """
-        ecommerce_receipt_page_url = configuration_helpers.get_value('ECOMMERCE_RECEIPT_PAGE_URL')
 
-        if ecommerce_receipt_page_url:
-            return self.get_absolute_ecommerce_url(ecommerce_receipt_page_url + order_number)
-        return self.config.receipt_page + order_number
+        return self.get_absolute_ecommerce_url(RECEIPT_PAGE_URL + order_number)
 
     def is_enabled(self, user):
         """
