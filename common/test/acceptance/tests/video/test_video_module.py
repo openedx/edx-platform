@@ -35,6 +35,10 @@ HTML5_SOURCES_INCORRECT = [
     'http://localhost:{0}/gizmo.mp99'.format(VIDEO_SOURCE_PORT),
 ]
 
+HLS_SOURCES = [
+    'http://localhost:{0}/hls/history.m3u8'.format(VIDEO_SOURCE_PORT),
+]
+
 
 @skipIf(is_youtube_available() is False, 'YouTube is not available!')
 class VideoBaseTest(UniqueCourseTest):
@@ -155,13 +159,16 @@ class VideoBaseTest(UniqueCourseTest):
         :return: dict
         """
         metadata = {}
+        youtube_ids = {
+            'youtube_id_1_0': '',
+            'youtube_id_0_75': '',
+            'youtube_id_1_25': '',
+            'youtube_id_1_5': '',
+        }
 
         if player_mode == 'html5':
+            metadata.update(youtube_ids)
             metadata.update({
-                'youtube_id_1_0': '',
-                'youtube_id_0_75': '',
-                'youtube_id_1_25': '',
-                'youtube_id_1_5': '',
                 'html5_sources': HTML5_SOURCES
             })
 
@@ -176,12 +183,21 @@ class VideoBaseTest(UniqueCourseTest):
             })
 
         if player_mode == 'html5_unsupported_video':
+            metadata.update(youtube_ids)
             metadata.update({
-                'youtube_id_1_0': '',
-                'youtube_id_0_75': '',
-                'youtube_id_1_25': '',
-                'youtube_id_1_5': '',
                 'html5_sources': HTML5_SOURCES_INCORRECT
+            })
+
+        if player_mode == 'hls':
+            metadata.update(youtube_ids)
+            metadata.update({
+                'html5_sources': HLS_SOURCES,
+            })
+
+        if player_mode == 'html5_and_hls':
+            metadata.update(youtube_ids)
+            metadata.update({
+                'html5_sources': HTML5_SOURCES + HLS_SOURCES,
             })
 
         if additional_data:
@@ -611,12 +627,12 @@ class YouTubeVideoTest(VideoBaseTest):
         self.video.click_player_button('pause')
 
         self.video.select_language('en')
-        self.video.click_first_line_in_transcript()
+        self.video.click_transcript_line(line_no=1)
         self._verify_closed_caption_text('Welcome to edX.')
 
         self.video.select_language('zh')
         unicode_text = "我们今天要讲的题目是".decode('utf-8')
-        self.video.click_first_line_in_transcript()
+        self.video.click_transcript_line(line_no=1)
         self._verify_closed_caption_text(unicode_text)
 
     def test_multiple_videos_in_sequentials_load_and_work(self):
@@ -1264,3 +1280,196 @@ class LMSVideoModuleA11yTest(VideoBaseTest):
             include=["div.video"]
         )
         self.video.a11y_audit.check_for_accessibility_errors()
+
+
+@attr(shard=4)
+class VideoPlayOrderTest(VideoBaseTest):
+    """
+    Test video play order with multiple videos
+
+    Priority of video formats is:
+        * Youtube
+        * HLS
+        * HTML5
+    """
+
+    def setUp(self):
+        super(VideoPlayOrderTest, self).setUp()
+
+    def test_play_youtube_video(self):
+        """
+        Scenario: Correct video is played when we have different video formats.
+
+        Given the course has a Video component with Youtube, HTML5 and HLS sources available.
+        When I view the Video component
+        Then it should play the Youtube video
+        """
+        additional_data = {'youtube_id_1_0': 'b7xgknqkQk8'}
+        self.metadata = self.metadata_for_mode('html5_and_hls', additional_data=additional_data)
+        self.navigate_to_video()
+
+        # Verify that the video is youtube
+        self.assertTrue(self.video.is_video_rendered('youtube'))
+
+    def test_play_html5_hls_video(self):
+        """
+        Scenario: HLS video is played when we have HTML5 and HLS video formats only.
+
+        Given the course has a Video component with HTML5 and HLS sources available.
+        When I view the Video component
+        Then it should play the HLS video
+        """
+        self.metadata = self.metadata_for_mode('html5_and_hls')
+        self.navigate_to_video()
+
+        # Verify that the video is hls
+        self.assertTrue(self.video.is_video_rendered('hls'))
+
+
+@attr(shard=4)
+class HLSVideoTest(VideoBaseTest):
+    """
+    Tests related to HLS video
+    """
+
+    def test_video_play_pause(self):
+        """
+        Scenario: Video play and pause is working as expected for hls video
+
+        Given the course has a Video component with only HLS source available.
+        When I view the Video component
+        Then I can see play and pause are working as expected
+        """
+        self.metadata = self.metadata_for_mode('hls')
+        self.navigate_to_video()
+
+        self.video.click_player_button('play')
+        self.assertEqual(self.video.state, 'playing')
+        self.video.click_player_button('pause')
+        self.assertEqual(self.video.state, 'pause')
+
+    def test_video_seek(self):
+        """
+        Scenario: Video seek is working as expected for hls video
+
+        Given the course has a Video component with only HLS source available.
+        When I view the Video component
+        Then I can seek the video as expected
+        """
+        self.metadata = self.metadata_for_mode('hls')
+        self.navigate_to_video()
+
+        self.video.click_player_button('play')
+        self.video.wait_for_position('0:02')
+        self.video.click_player_button('pause')
+        self.video.seek('0:05')
+        self.assertEqual(self.video.position, '0:05')
+
+    def test_video_position_save_state(self):
+        """
+        Scenario: Video position save state functionality is working as expected for hls video
+
+        Given the course has a Video component with only HLS source available.
+        When I view the Video component
+        Then I can see video save state is working as expected
+        """
+        self.metadata = self.metadata_for_mode('hls')
+        self.navigate_to_video()
+
+        self.video.click_player_button('play')
+        self.video.wait_for_position('0:04')
+        self.video.click_player_button('pause')
+        self.assertEqual(self.video.position, '0:04')
+        self.video.reload_page()
+        self.assertEqual(self.video.duration, '0:09')
+        self.assertEqual(self.video.position, '0:04')
+        self.video.click_player_button('play')
+        self.assertGreaterEqual(self.video.seconds, 4)
+
+    def test_video_download_link(self):
+        """
+        Scenario: Correct video url is selected for download
+
+        Given the course has a Video component with Youtube, HTML5 and HLS sources available.
+        When I view the Video component
+        Then HTML5 video download url is available
+        """
+        self.metadata = self.metadata_for_mode('html5_and_hls', additional_data={'download_video': True})
+        self.navigate_to_video()
+
+        # Verify that the video download url is correct
+        self.assertEqual(self.video.video_download_url, HTML5_SOURCES[0])
+
+    def test_no_video_download_link_for_hls(self):
+        """
+        Scenario: Video download url is not shown for hls videos
+
+        Given the course has a Video component with only HLS sources available.
+        When I view the Video component
+        Then there is no video download url shown
+        """
+        additional_data = {'download_video': True}
+        self.metadata = self.metadata_for_mode('hls', additional_data=additional_data)
+        self.navigate_to_video()
+
+        # Verify that the video download url is not shown
+        self.assertEqual(self.video.video_download_url, None)
+
+    def test_hls_video_with_youtube_blocked(self):
+        """
+        Scenario: HLS video is rendered when the YouTube API is blocked
+        Given the YouTube API is blocked
+        And the course has a Video component with Youtube, HTML5 and HLS sources available
+        Then the HLS video is rendered
+        """
+        # configure youtube server
+        self.youtube_configuration.update({
+            'youtube_api_blocked': True,
+        })
+
+        self.metadata = self.metadata_for_mode('html5_and_hls', additional_data={'youtube_id_1_0': 'b7xgknqkQk8'})
+        self.navigate_to_video()
+        self.assertTrue(self.video.is_video_rendered('hls'))
+
+    def test_hls_video_with_youtube_delayed_response_time(self):
+        """
+        Scenario: HLS video is rendered when the YouTube API response time is slow
+        Given the YouTube server response time is greater than 1.5 seconds
+        And the course has a Video component with Youtube, HTML5 and HLS sources available
+        Then the HLS video is rendered
+        """
+        # configure youtube server
+        self.youtube_configuration.update({
+            'time_to_response': 7.0,
+        })
+
+        self.metadata = self.metadata_for_mode('html5_and_hls', additional_data={'youtube_id_1_0': 'b7xgknqkQk8'})
+        self.navigate_to_video()
+        self.assertTrue(self.video.is_video_rendered('hls'))
+
+    def test_hls_video_with_transcript(self):
+        """
+        Scenario: Transcript work as expected for an HLS video
+
+        Given the course has a Video component with "HLS" video only
+        And I have defined a transcript for the video
+        Then I see the correct text in the captions for transcript
+        Then I click on a caption line
+        And video position should be updated accordingly
+        Then I change video position
+        And video caption should be updated accordingly
+        """
+        data = {'transcripts': {'zh': 'transcript.srt'}}
+        self.metadata = self.metadata_for_mode('hls', additional_data=data)
+        self.assets.append('transcript.srt')
+        self.navigate_to_video()
+
+        self.assertIn("Hi, edX welcomes you0.", self.video.captions_text)
+
+        for line_no in range(5):
+            self.video.click_transcript_line(line_no=line_no)
+            self.video.wait_for_position('0:0{}'.format(line_no))
+
+        for line_no in range(5):
+            self.video.seek('0:0{}'.format(line_no))
+            self.assertEqual(self.video.active_caption_text, 'Hi, edX welcomes you{}.'.format(line_no))

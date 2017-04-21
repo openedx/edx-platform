@@ -934,6 +934,9 @@ INSTALLED_APPS = (
     # Self-paced course configuration
     'openedx.core.djangoapps.self_paced',
 
+    # Video module configs (This will be moved to Video once it becomes an XBlock)
+    'openedx.core.djangoapps.video_config',
+
     # django-oauth2-provider (deprecated)
     'provider',
     'provider.oauth2',
