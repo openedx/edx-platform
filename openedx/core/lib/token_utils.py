@@ -93,6 +93,8 @@ class JwtBuilder(object):
 
         payload.update({
             'name': name,
+            'family_name': self.user.last_name,
+            'given_name': self.user.first_name,
             'administrator': self.user.is_staff,
         })
 
