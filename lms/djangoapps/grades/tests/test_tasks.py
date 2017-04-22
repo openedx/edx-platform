@@ -226,7 +226,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
                 with self.assertNumQueries(num_sql_queries):
                     self._apply_recalculate_subsection_grade()
             with self.assertRaises(PersistentCourseGrade.DoesNotExist):
-                PersistentCourseGrade.read_course_grade(self.user.id, self.course.id)
+                PersistentCourseGrade.read(self.user.id, self.course.id)
             self.assertEqual(len(PersistentSubsectionGrade.bulk_read_grades(self.user.id, self.course.id)), 0)
 
     @ddt.data(
@@ -240,7 +240,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
             with check_mongo_calls(num_mongo_queries):
                 with self.assertNumQueries(num_sql_queries):
                     self._apply_recalculate_subsection_grade()
-            self.assertIsNotNone(PersistentCourseGrade.read_course_grade(self.user.id, self.course.id))
+            self.assertIsNotNone(PersistentCourseGrade.read(self.user.id, self.course.id))
             self.assertGreater(len(PersistentSubsectionGrade.bulk_read_grades(self.user.id, self.course.id)), 0)
 
     @patch('lms.djangoapps.grades.signals.signals.SUBSECTION_SCORE_CHANGED.send')

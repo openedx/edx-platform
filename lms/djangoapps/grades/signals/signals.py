@@ -78,3 +78,8 @@ SUBSECTION_SCORE_CHANGED = Signal(
         'subsection_grade',  # SubsectionGrade object
     ]
 )
+
+
+# Signal that indicates that a user's grade for a course has been updated.
+# This is a downstream signal of SUBSECTION_SCORE_CHANGED.
+from openedx.core.djangoapps.signals.signals import COURSE_GRADE_CHANGED
