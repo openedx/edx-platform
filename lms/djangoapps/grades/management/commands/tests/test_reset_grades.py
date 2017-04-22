@@ -88,7 +88,7 @@ class TestResetGrades(TestCase):
             for user_id in self.user_ids:
                 course_grade_params['user_id'] = user_id
                 course_grade_params['course_id'] = course_key
-                PersistentCourseGrade.update_or_create_course_grade(**course_grade_params)
+                PersistentCourseGrade.update_or_create(**course_grade_params)
                 for subsection_key in self.subsection_keys_by_course[course_key]:
                     subsection_grade_params['user_id'] = user_id
                     subsection_grade_params['usage_key'] = subsection_key
@@ -100,7 +100,7 @@ class TestResetGrades(TestCase):
         """
         for course_key in course_keys:
             if db_table == "course" or db_table is None:
-                self.assertIsNotNone(PersistentCourseGrade.read_course_grade(self.user_ids[0], course_key))
+                self.assertIsNotNone(PersistentCourseGrade.read(self.user_ids[0], course_key))
             if db_table == "subsection" or db_table is None:
                 for subsection_key in self.subsection_keys_by_course[course_key]:
                     self.assertIsNotNone(PersistentSubsectionGrade.read_grade(self.user_ids[0], subsection_key))
@@ -112,7 +112,7 @@ class TestResetGrades(TestCase):
         for course_key in course_keys:
             if db_table == "course" or db_table is None:
                 with self.assertRaises(PersistentCourseGrade.DoesNotExist):
-                    PersistentCourseGrade.read_course_grade(self.user_ids[0], course_key)
+                    PersistentCourseGrade.read(self.user_ids[0], course_key)
 
             if db_table == "subsection" or db_table is None:
                 for subsection_key in self.subsection_keys_by_course[course_key]:
