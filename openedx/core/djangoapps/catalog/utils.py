@@ -2,7 +2,6 @@
 import copy
 import logging
 
-import waffle
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from edx_rest_api_client.client import EdxRestApiClient
@@ -10,7 +9,6 @@ from edx_rest_api_client.client import EdxRestApiClient
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from openedx.core.lib.token_utils import JwtBuilder
-
 
 log = logging.getLogger(__name__)
 
@@ -67,11 +65,10 @@ def get_programs(uuid=None, types=None):  # pylint: disable=redefined-builtin
 
         return get_edx_api_data(
             catalog_integration,
-            user,
             'programs',
+            api=api,
             resource_id=uuid,
             cache_key=cache_key if catalog_integration.is_cache_enabled else None,
-            api=api,
             querystring=querystring,
         )
     else:
@@ -98,13 +95,8 @@ def get_program_types(name=None):
         api = create_catalog_api_client(user, catalog_integration)
         cache_key = '{base}.program_types'.format(base=catalog_integration.CACHE_KEY)
 
-        data = get_edx_api_data(
-            catalog_integration,
-            user,
-            'program_types',
-            cache_key=cache_key if catalog_integration.is_cache_enabled else None,
-            api=api
-        )
+        data = get_edx_api_data(catalog_integration, 'program_types', api=api,
+                                cache_key=cache_key if catalog_integration.is_cache_enabled else None)
 
         # Filter by name if a name was provided
         if name:
@@ -169,12 +161,6 @@ def get_course_runs():
             'exclude_utm': 1,
         }
 
-        course_runs = get_edx_api_data(
-            catalog_integration,
-            user,
-            'course_runs',
-            api=api,
-            querystring=querystring,
-        )
+        course_runs = get_edx_api_data(catalog_integration, 'course_runs', api=api, querystring=querystring)
 
     return course_runs
