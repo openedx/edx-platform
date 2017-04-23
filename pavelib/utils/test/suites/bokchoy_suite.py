@@ -106,7 +106,7 @@ def get_test_course(options):
     options.imports_dir = DEMO_COURSE_IMPORT_DIR
 
     options.imports_dir.makedirs_p()
-    zipped_course = options.imports_dir + 'demo_course.tar.gz'
+    zipped_course = options.imports_dir + 'crawler_course.tar.gz'
 
     msg = colorize('green', "Fetching the test course from github...")
     print msg

@@ -24,13 +24,18 @@ paver a11y_coverage
 # Force the following if statement to always be true
 RUN_PA11YCRAWLER=1
 
+if [ "$PA11YCRAWLER_ARGS" == "" ]
+then
+    export PA11YCRAWLER_ARGS=' --fetch-course'
+fi
+
 if [ "$RUN_PA11YCRAWLER" = "1" ]
 then
     # The settings that we use are installed with the pa11ycrawler module
     export SCRAPY_SETTINGS_MODULE='pa11ycrawler.settings'
 
     echo "Running pa11ycrawler against test course..."
-    paver pa11ycrawler --fasttest --skip-clean --fetch-course --with-html
+    paver pa11ycrawler --fasttest --skip-clean --with-html $PA11YCRAWLER_ARGS
 
     echo "Generating coverage report..."
     paver pa11ycrawler_coverage
