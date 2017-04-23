@@ -338,7 +338,7 @@ def get_user_orders(user):
     cache_key = commerce_configuration.CACHE_KEY + '.' + str(user.id) if use_cache else None
     api = ecommerce_api_client(user)
     commerce_user_orders = get_edx_api_data(
-        commerce_configuration, user, 'orders', api=api, querystring=user_query, cache_key=cache_key
+        commerce_configuration, 'orders', api=api, querystring=user_query, cache_key=cache_key
     )
 
     for order in commerce_user_orders:
