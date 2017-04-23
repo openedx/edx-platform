@@ -14,15 +14,14 @@ from openedx.core.lib.token_utils import JwtBuilder
 log = logging.getLogger(__name__)
 
 
-def get_edx_api_data(api_config, user, resource, api=None, resource_id=None,
-                     querystring=None, cache_key=None, many=True, traverse_pagination=True):
+def get_edx_api_data(api_config, resource, api, resource_id=None, querystring=None, cache_key=None, many=True,
+                     traverse_pagination=True):
     """GET data from an edX REST API.
 
     DRY utility for handling caching and pagination.
 
     Arguments:
         api_config (ConfigurationModel): The configuration model governing interaction with the API.
-        user (User): The user to authenticate as when requesting data.
         resource (str): Name of the API resource being requested.
 
     Keyword Arguments:
@@ -51,27 +50,6 @@ def get_edx_api_data(api_config, user, resource, api=None, resource_id=None,
         cached = cache.get(cache_key)
         if cached:
             return cached
-
-    try:
-        if not api:
-            # TODO: Use the system's JWT_AUDIENCE and JWT_SECRET_KEY instead of client ID and name.
-            client_name = api_config.OAUTH2_CLIENT_NAME
-
-            try:
-                client = Client.objects.get(name=client_name)
-            except Client.DoesNotExist:
-                raise ImproperlyConfigured(
-                    'OAuth2 Client with name [{}] does not exist.'.format(client_name)
-                )
-
-            scopes = ['email', 'profile']
-            expires_in = settings.OAUTH_ID_TOKEN_EXPIRATION
-            jwt = JwtBuilder(user, secret=client.client_secret).build_token(scopes, expires_in, aud=client.client_id)
-
-            api = EdxRestApiClient(api_config.internal_api_url, jwt=jwt)
-    except:  # pylint: disable=bare-except
-        log.exception('Failed to initialize the %s API client.', api_config.API_NAME)
-        return no_data
 
     try:
         endpoint = getattr(api, resource)

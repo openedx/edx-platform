@@ -198,7 +198,7 @@ class TestGetCourseRuns(CatalogIntegrationMixin, TestCase):
         """
         args, kwargs = call_args
 
-        for arg in (self.catalog_integration, self.user, 'course_runs'):
+        for arg in (self.catalog_integration, 'course_runs'):
             self.assertIn(arg, args)
 
         self.assertEqual(kwargs['api']._store['base_url'], self.catalog_integration.internal_api_url)  # pylint: disable=protected-access
