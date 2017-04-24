@@ -15,7 +15,6 @@ class CommerceConfiguration(ConfigurationModel):
 
     API_NAME = 'commerce'
     CACHE_KEY = 'commerce.api.data'
-    DEFAULT_RECEIPT_PAGE_URL = '/commerce/checkout/receipt/?orderNum='
 
     checkout_on_ecommerce_service = models.BooleanField(
         default=False,
@@ -33,11 +32,6 @@ class CommerceConfiguration(ConfigurationModel):
         help_text=_(
             'Specified in seconds. Enable caching by setting this to a value greater than 0.'
         )
-    )
-    receipt_page = models.CharField(
-        max_length=255,
-        default=DEFAULT_RECEIPT_PAGE_URL,
-        help_text=_('Path to order receipt page.')
     )
     enable_automatic_refund_approval = models.BooleanField(
         default=True,
