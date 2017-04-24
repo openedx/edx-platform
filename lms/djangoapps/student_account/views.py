@@ -351,16 +351,6 @@ def get_user_orders(user):
                 'receipt_url': EcommerceService().get_receipt_page_url(order['number']),
                 'lines': order['lines'],
             }
-
-            # If the order lines contain a product that is not a Seat
-            # we do not want to display the Order Details button. It
-            # will break the receipt page if used.
-            for order_line in order['lines']:
-                product = order_line.get('product')
-
-                if product and product.get('product_class') != 'Seat':
-                    order_data['receipt_url'] = ''
-                    break
             user_orders.append(order_data)
 
     return user_orders
