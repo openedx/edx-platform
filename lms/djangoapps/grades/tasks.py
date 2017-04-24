@@ -115,6 +115,16 @@ def recalculate_subsection_grade_v3(self, **kwargs):
     _recalculate_subsection_grade(self, **kwargs)
 
 
+@task()
+def add(x, y):
+    return x + y
+
+
+@task
+def tsum(x):
+    return sum(x)
+
+
 def _recalculate_subsection_grade(self, **kwargs):
     """
     Updates a saved subsection grade.
