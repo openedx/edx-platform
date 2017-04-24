@@ -278,7 +278,7 @@ def get_course_info_section(request, user, course, section_key):
     html = ''
     if info_module is not None:
         try:
-            html = info_module.render(STUDENT_VIEW).content
+            html = info_module.render(STUDENT_VIEW).content.strip()
         except Exception:  # pylint: disable=broad-except
             html = render_to_string('courseware/error-message.html', None)
             log.exception(
