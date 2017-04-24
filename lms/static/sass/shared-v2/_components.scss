@@ -150,6 +150,13 @@
   }
 }
 
+.section {
+    .icon {
+        width: 20px;
+        text-align: center;
+    }
+}
+
 .section:not(:first-child) {
     margin-top: $baseline;
 }
