@@ -14,7 +14,7 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from django.utils.translation import LANGUAGE_SESSION_KEY
 from django.utils.translation.trans_real import parse_accept_lang_header
 
-from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY, LANGUAGE_COOKIE, COOKIE_DURATION
+from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY, COOKIE_DURATION
 from openedx.core.djangoapps.lang_pref.middleware import LanguagePreferenceMiddleware
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference, get_user_preference, delete_user_preference
 from student.tests.factories import UserFactory
@@ -65,14 +65,14 @@ class TestUserPreferenceMiddleware(TestCase):
 
         if lang_pref_out:
             response.set_cookie.assert_called_with(
-                LANGUAGE_COOKIE,
+                settings.LANGUAGE_COOKIE,
                 value=lang_pref_out,
                 domain=settings.SESSION_COOKIE_DOMAIN,
                 max_age=COOKIE_DURATION,
             )
         else:
             response.delete_cookie.assert_called_with(
-                LANGUAGE_COOKIE,
+                settings.LANGUAGE_COOKIE,
                 domain=settings.SESSION_COOKIE_DOMAIN,
             )
 
@@ -85,7 +85,7 @@ class TestUserPreferenceMiddleware(TestCase):
     @ddt.unpack
     @mock.patch('openedx.core.djangoapps.lang_pref.middleware.set_user_preference')
     def test_preference_cookie_changes_setting(self, lang_cookie, lang_pref_in, mock_set_user_preference):
-        self.request.COOKIES[LANGUAGE_COOKIE] = lang_cookie
+        self.request.COOKIES[settings.LANGUAGE_COOKIE] = lang_cookie
 
         if lang_pref_in:
             set_user_preference(self.user, LANGUAGE_KEY, lang_pref_in)
@@ -120,7 +120,7 @@ class TestUserPreferenceMiddleware(TestCase):
         if not logged_in:
             self.request.user = self.anonymous_user
         if lang_cookie:
-            self.request.COOKIES[LANGUAGE_COOKIE] = lang_cookie
+            self.request.COOKIES[settings.LANGUAGE_COOKIE] = lang_cookie
         if lang_session:
             self.request.session[LANGUAGE_SESSION_KEY] = lang_session
         if accept_lang_in:
