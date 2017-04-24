@@ -10,6 +10,7 @@ from django.utils.translation import ugettext as _, ugettext_noop
 from courseware.access import has_access
 from courseware.entrance_exams import user_can_skip_entrance_exam
 from openedx.core.lib.course_tabs import CourseTabPluginManager
+from openedx.features.course_experience import UNIFIED_COURSE_VIEW_FLAG
 from request_cache.middleware import RequestCache
 from student.models import CourseEnrollment
 from xmodule.tabs import CourseTab, CourseTabList, key_checker, link_reverse_func
@@ -43,7 +44,7 @@ class CoursewareTab(EnrolledTab):
         """
         Returns the main course URL for the current user.
         """
-        if waffle.flag_is_active(request, 'unified_course_view'):
+        if waffle.flag_is_active(request, UNIFIED_COURSE_VIEW_FLAG):
             return 'edx.course_experience.course_home'
         else:
             return 'courseware'
