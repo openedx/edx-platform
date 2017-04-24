@@ -1,5 +1,5 @@
 /**
- * This class defines a simple display view for a content group.
+ * This class defines a simple display view for a partition group.
  * It is expected to be backed by a Group model.
  */
 define([
@@ -8,7 +8,7 @@ define([
 ], function(BaseView, _, gettext, str, StringUtils, HtmlUtils) {
     'use strict';
 
-    var ContentGroupDetailsView = BaseView.extend({
+    var PartitionGroupDetailsView = BaseView.extend({
         tagName: 'div',
         events: {
             'click .edit': 'editGroup',
@@ -21,17 +21,18 @@ define([
 
             return [
                 'collection',
-                'content-group-details',
-                'content-group-details-' + index
+                'partition-group-details',
+                'partition-group-details-' + index
             ].join(' ');
         },
 
         editGroup: function() {
-            this.model.set({'editing': true});
+            this.model.set({editing: true});
         },
 
         initialize: function() {
-            this.template = this.loadTemplate('content-group-details');
+            this.template = this.loadTemplate('partition-group-details');
+            this.restrictEditing = this.options.restrictEditing || false;
             this.listenTo(this.model, 'change', this.render);
         },
 
@@ -41,9 +42,10 @@ define([
                 courseOutlineUrl: this.model.collection.parents[0].outlineUrl,
                 index: this.model.collection.indexOf(this.model),
                 showContentGroupUsages: showContentGroupUsages || false,
-                HtmlUtils: HtmlUtils
+                HtmlUtils: HtmlUtils,
+                restrictEditing: this.restrictEditing
             });
-            this.$el.html(this.template(attrs));
+            HtmlUtils.setHtml(this.$el, HtmlUtils.HTML(this.template(attrs)));
             return this;
         },
 
@@ -78,5 +80,5 @@ define([
         }
     });
 
-    return ContentGroupDetailsView;
+    return PartitionGroupDetailsView;
 });

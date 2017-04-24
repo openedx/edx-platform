@@ -173,6 +173,7 @@ class TemplateTestCase(unittest.TestCase):
         cases = [
             ('correct', 'correct'),
             ('unsubmitted', 'unanswered'),
+            ('submitted', 'submitted'),
             ('incorrect', 'incorrect'),
             ('incomplete', 'incorrect')
         ]

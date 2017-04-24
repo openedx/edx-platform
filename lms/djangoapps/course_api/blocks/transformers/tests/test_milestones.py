@@ -9,9 +9,10 @@ from gating import api as lms_gating_api
 from lms.djangoapps.course_blocks.transformers.tests.helpers import CourseStructureTestCase
 from milestones.tests.utils import MilestonesTestCaseMixin
 from openedx.core.lib.gating import api as gating_api
+from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
 from student.tests.factories import CourseEnrollmentFactory
 
-from ..milestones import MilestonesTransformer
+from ..milestones import MilestonesAndSpecialExamsTransformer
 from ...api import get_course_blocks
 
 
@@ -22,7 +23,7 @@ class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseM
     """
     Test behavior of ProctoredExamTransformer
     """
-    TRANSFORMER_CLASS_TO_TEST = MilestonesTransformer
+    TRANSFORMER_CLASS_TO_TEST = MilestonesAndSpecialExamsTransformer
 
     def setUp(self):
         """
@@ -37,6 +38,8 @@ class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseM
 
         # Enroll user in course.
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id, is_active=True)
+
+        self.transformers = BlockStructureTransformers([self.TRANSFORMER_CLASS_TO_TEST(False)])
 
     def setup_gated_section(self, gated_block, gating_block):
         """
@@ -157,7 +160,7 @@ class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseM
         self.course.enable_subsection_gating = True
         self.setup_gated_section(self.blocks[gated_block_ref], self.blocks[gating_block_ref])
 
-        with self.assertNumQueries(6):
+        with self.assertNumQueries(8):
             self.get_blocks_and_check_against_expected(self.user, expected_blocks_before_completion)
 
         # clear the request cache to simulate a new request
@@ -171,7 +174,7 @@ class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseM
                 self.user,
             )
 
-        with self.assertNumQueries(6):
+        with self.assertNumQueries(8):
             self.get_blocks_and_check_against_expected(self.user, self.ALL_BLOCKS_EXCEPT_SPECIAL)
 
     def test_staff_access(self):
@@ -182,6 +185,30 @@ class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseM
         expected_blocks = self.ALL_BLOCKS
         self.setup_gated_section(self.blocks['H'], self.blocks['A'])
         self.get_blocks_and_check_against_expected(self.staff, expected_blocks)
+
+    def test_special_exams(self):
+        """
+        When the block structure transformers are set to allow users to view special exams,
+        ensure that we can see the special exams and not any of the otherwise gated blocks.
+        """
+        self.transformers = BlockStructureTransformers([self.TRANSFORMER_CLASS_TO_TEST(True)])
+        self.course.enable_subsection_gating = True
+        self.setup_gated_section(self.blocks['H'], self.blocks['A'])
+        expected_blocks = (
+            'course', 'A', 'B', 'C', 'ProctoredExam', 'D', 'E', 'PracticeExam', 'F', 'G', 'TimedExam', 'J', 'K'
+        )
+        self.get_blocks_and_check_against_expected(self.user, expected_blocks)
+        # clear the request cache to simulate a new request
+        self.clear_caches()
+
+        # this call triggers reevaluation of prerequisites fulfilled by the gating block.
+        with patch('gating.api._get_subsection_percentage', Mock(return_value=100)):
+            lms_gating_api.evaluate_prerequisite(
+                self.course,
+                Mock(location=self.blocks['A'].location),
+                self.user,
+            )
+        self.get_blocks_and_check_against_expected(self.user, self.ALL_BLOCKS)
 
     def get_blocks_and_check_against_expected(self, user, expected_blocks):
         """

@@ -270,12 +270,13 @@ class DiscussionNavigationTest(BaseDiscussionTestCase):
             css=".forum-nav-browse-menu-item[data-discussion-id='{}']".format(self.discussion_id)
         )
         self.assertTrue(topic_button.visible)
+
         topic_button.click()
 
         # Verify the thread's topic has been pushed to breadcrumbs
         breadcrumbs = self.thread_page.q(css=".breadcrumbs .nav-item")
-        self.assertEqual(len(breadcrumbs), 2)
-        self.assertEqual(breadcrumbs[1].text, "Test Discussion Topic")
+        self.assertEqual(len(breadcrumbs), 3)
+        self.assertEqual(breadcrumbs[2].text, "Topic-Level Student-Visible Label")
 
     def test_breadcrumbs_back_to_all_topics(self):
         topic_button = self.thread_page.q(
@@ -295,6 +296,22 @@ class DiscussionNavigationTest(BaseDiscussionTestCase):
         # Verify that clicking the first breadcrumb clears your search
         self.thread_page.q(css=".breadcrumbs .nav-item")[0].click()
         self.assertEqual(self.thread_page.q(css=".search-input").text[0], "")
+
+    def test_navigation_and_sorting(self):
+        """
+        Test that after adding the post, user sorting preference is changing properly
+        and recently added post is shown.
+        """
+        topic_button = self.thread_page.q(
+            css=".forum-nav-browse-menu-item[data-discussion-id='{}']".format(self.discussion_id)
+        )
+        self.assertTrue(topic_button.visible)
+        topic_button.click()
+        sort_page = DiscussionSortPreferencePage(self.browser, self.course_id)
+        for sort_type in ["votes", "comments", "activity"]:
+            sort_page.change_sort_preference(sort_type)
+            # Verify that recently added post titled "dummy thread title" is shown in each sorting preference
+            self.assertEqual(self.thread_page.q(css=".forum-nav-thread-title").text[0], 'dummy thread title')
 
 
 @attr(shard=2)

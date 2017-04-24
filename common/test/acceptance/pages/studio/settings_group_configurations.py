@@ -91,6 +91,17 @@ class GroupConfigurationsPage(CoursePage):
         """
         return self.q(css=self.experiment_groups_css).present or self.q(css=".experiment-groups-doc").present
 
+    @property
+    def enrollment_track_section_present(self):
+        return self.q(css='.wrapper-groups.content-groups.enrollment_track').present
+
+    @property
+    def enrollment_track_edit_present(self):
+        return self.q(css='.wrapper-groups.content-groups.enrollment_track .action.action-edit').present
+
+    def get_enrollment_groups(self):
+        return self.q(css='.wrapper-groups.content-groups.enrollment_track .collection-details .title').text
+
 
 class GroupConfiguration(object):
     """

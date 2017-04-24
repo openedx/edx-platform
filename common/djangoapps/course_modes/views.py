@@ -28,6 +28,7 @@ from openedx.features.enterprise_support import api as enterprise_api
 from student.models import CourseEnrollment
 from util.db import outer_atomic
 from util import organizations_helpers as organization_api
+from third_party_auth.decorators import tpa_hint_ends_existing_session
 
 
 class ChooseModeView(View):
@@ -52,6 +53,7 @@ class ChooseModeView(View):
         """
         return super(ChooseModeView, self).dispatch(*args, **kwargs)
 
+    @method_decorator(tpa_hint_ends_existing_session)
     @method_decorator(login_required)
     @method_decorator(transaction.atomic)
     def get(self, request, course_id, error=None):
@@ -199,6 +201,7 @@ class ChooseModeView(View):
 
         return render_to_response("course_modes/choose.html", context)
 
+    @method_decorator(tpa_hint_ends_existing_session)
     @method_decorator(transaction.non_atomic_requests)
     @method_decorator(login_required)
     @method_decorator(outer_atomic(read_committed=True))

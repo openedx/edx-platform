@@ -24,10 +24,13 @@ class CourseGradeBase(object):
         self.passed = passed
 
     def __unicode__(self):
-        return u'Course Grade: percent: %s, letter_grade: %s, passed: %s'.format(
-            unicode(self.percent), self.letter_grade, self.passed,
+        return u'Course Grade: percent: {}, letter_grade: {}, passed: {}'.format(
+            unicode(self.percent),
+            self.letter_grade,
+            self.passed,
         )
 
+    @property
     def attempted(self):
         """
         Returns whether at least one problem was attempted
@@ -59,10 +62,22 @@ class CourseGradeBase(object):
         subsection grades, display name, and url name.
         """
         course_structure = self.course_data.structure
-        return {
-            chapter_key: self._get_chapter_grade_info(course_structure[chapter_key], course_structure)
-            for chapter_key in course_structure.get_children(self.course_data.location)
-        }
+        grades = OrderedDict()
+        for chapter_key in course_structure.get_children(self.course_data.location):
+            grades[chapter_key] = self._get_chapter_grade_info(course_structure[chapter_key], course_structure)
+        return grades
+
+    @lazy
+    def subsection_grades(self):
+        """
+        Returns an ordered dictionary of subsection grades,
+        keyed by subsection location.
+        """
+        subsection_grades = defaultdict(OrderedDict)
+        for chapter in self.chapter_grades.itervalues():
+            for subsection_grade in chapter['sections']:
+                subsection_grades[subsection_grade.location] = subsection_grade
+        return subsection_grades
 
     @lazy
     def locations_to_scores(self):
@@ -198,7 +213,7 @@ class CourseGrade(CourseGradeBase):
         """
         for chapter in self.chapter_grades.itervalues():
             for subsection_grade in chapter['sections']:
-                if subsection_grade.attempted:
+                if subsection_grade.all_total.first_attempted:
                     return True
         return False
 

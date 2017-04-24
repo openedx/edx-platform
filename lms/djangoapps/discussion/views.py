@@ -438,6 +438,7 @@ def _create_discussion_board_context(request, course_key, discussion_id=None, th
         'sort_preference': cc_user.default_sort_key,
         'category_map': course_settings["category_map"],
         'course_settings': course_settings,
+        'is_commentable_cohorted': is_commentable_cohorted(course_key, discussion_id)
     })
     return context
 

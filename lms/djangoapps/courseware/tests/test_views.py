@@ -432,46 +432,6 @@ class ViewsTestCase(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/courses/{}/about'.format(unicode(self.course_key)))
 
-    def test_courseware_redirection(self):
-        """
-        Tests that a global staff member is redirected to the staff enrollment page.
-
-        Un-enrolled Staff user should be redirected to the staff enrollment page accessing courseware,
-        user chooses to enroll in the course. User is enrolled and redirected to the requested url.
-
-        Scenario:
-            1. Un-enrolled staff tries to access any course vertical (courseware url).
-            2. User is redirected to the staff enrollment page.
-            3. User chooses to enroll in the course.
-            4. User is enrolled in the course and redirected to the requested courseware url.
-        """
-        self._create_global_staff_user()
-        courseware_url, enroll_url = self._create_url_for_enroll_staff()
-
-        # Accessing the courseware url in which not enrolled & redirected to staff enrollment page
-        response = self.client.get(courseware_url, follow=True)
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(302, response.redirect_chain[0])
-        self.assertEqual(len(response.redirect_chain), 1)
-        self.assertRedirects(response, enroll_url)
-
-        # Accessing the enroll staff url and verify the correct url
-        response = self.client.get(enroll_url)
-        self.assertEqual(response.status_code, 200)
-        response_content = response.content
-        self.assertIn('Enroll', response_content)
-        self.assertIn("dont_enroll", response_content)
-
-        # Post the valid data to enroll the staff in the course
-        response = self.client.post(enroll_url, data={'enroll': "Enroll"}, follow=True)
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(302, response.redirect_chain[0])
-        self.assertEqual(len(response.redirect_chain), 1)
-        self.assertRedirects(response, courseware_url)
-
-        # Verify staff has been enrolled to the given course
-        self.assertTrue(CourseEnrollment.is_enrolled(self.global_staff, self.course.id))
-
     @unittest.skipUnless(settings.FEATURES.get('ENABLE_SHOPPING_CART'), "Shopping Cart not enabled in settings")
     @patch.dict(settings.FEATURES, {'ENABLE_PAID_COURSE_REGISTRATION': True})
     def test_course_about_in_cart(self):
@@ -556,23 +516,6 @@ class ViewsTestCase(ModuleStoreTestCase):
         mock_user = MagicMock()
         mock_user.is_authenticated.return_value = False
         self.assertEqual(views.user_groups(mock_user), [])
-
-    def test_get_current_child(self):
-        mock_xmodule = MagicMock()
-        self.assertIsNone(views.get_current_child(mock_xmodule))
-
-        mock_xmodule.position = -1
-        mock_xmodule.get_display_items.return_value = ['one', 'two', 'three']
-        self.assertEqual(views.get_current_child(mock_xmodule), 'one')
-
-        mock_xmodule.position = 2
-        self.assertEqual(views.get_current_child(mock_xmodule), 'two')
-        self.assertEqual(views.get_current_child(mock_xmodule, requested_child='first'), 'one')
-        self.assertEqual(views.get_current_child(mock_xmodule, requested_child='last'), 'three')
-
-        mock_xmodule.position = 3
-        mock_xmodule.get_display_items.return_value = []
-        self.assertIsNone(views.get_current_child(mock_xmodule))
 
     def test_get_redirect_url(self):
         self.assertIn(
@@ -845,6 +788,30 @@ class ViewsTestCase(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
 
         self.assertNotIn(str(course.id), response.content)
+
+    @patch.object(CourseOverview, 'load_from_module_store', return_value=None)
+    def test_financial_assistance_form_missing_course_overview(self, _mock_course_overview):
+        """
+        Verify that learners can not get financial aid for the courses with no
+        course overview.
+        """
+        # Create course
+        course = CourseFactory.create().id
+
+        # Create Course Modes
+        CourseModeFactory.create(mode_slug=CourseMode.AUDIT, course_id=course)
+        CourseModeFactory.create(mode_slug=CourseMode.VERIFIED, course_id=course)
+
+        # Enroll user in the course
+        enrollment = CourseEnrollmentFactory(course_id=course, user=self.user, mode=CourseMode.AUDIT)
+
+        self.assertEqual(enrollment.course_overview, None)
+
+        url = reverse('financial_assistance_form')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        self.assertNotIn(str(course), response.content)
 
     def test_financial_assistance_form(self):
         """Verify that learner can get the financial aid for the course in which
@@ -1451,7 +1418,7 @@ class ProgressPageTests(ModuleStoreTestCase):
     @ddt.unpack
     def test_progress_queries(self, enable_waffle, initial, subsequent):
         self.setup_course()
-        with grades_waffle().override_in_model(ASSUME_ZERO_GRADE_IF_ABSENT, active=enable_waffle):
+        with grades_waffle().override(ASSUME_ZERO_GRADE_IF_ABSENT, active=enable_waffle):
             with self.assertNumQueries(initial), check_mongo_calls(1):
                 self._get_progress_page()
 

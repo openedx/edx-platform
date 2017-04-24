@@ -177,11 +177,6 @@ EDXMKTG_USER_INFO_COOKIE_NAME = ENV_TOKENS.get('EDXMKTG_USER_INFO_COOKIE_NAME', 
 
 LMS_ROOT_URL = ENV_TOKENS.get('LMS_ROOT_URL')
 
-DEFAULT_ENTERPRISE_API_URL = None
-if LMS_ROOT_URL is not None:
-    DEFAULT_ENTERPRISE_API_URL = LMS_ROOT_URL + '/enterprise/api/v1/'
-ENTERPRISE_API_URL = ENV_TOKENS.get('ENTERPRISE_API_URL', DEFAULT_ENTERPRISE_API_URL)
-
 ENV_FEATURES = ENV_TOKENS.get('FEATURES', {})
 for feature, value in ENV_FEATURES.items():
     FEATURES[feature] = value
@@ -902,7 +897,12 @@ AFFILIATE_COOKIE_NAME = ENV_TOKENS.get('AFFILIATE_COOKIE_NAME', AFFILIATE_COOKIE
 
 DOC_LINK_BASE_URL = ENV_TOKENS.get('DOC_LINK_BASE_URL', DOC_LINK_BASE_URL)
 
-############## Settings for the Enterprise App ######################
+
+############## OPEN EDX ENTERPRISE SERVICE CONFIGURATION ######################
+# The Open edX Enterprise service is currently hosted via the LMS container/process.
+# However, for all intents and purposes this service is treated as a standalone IDA.
+# These configuration settings are specific to the Enterprise service and you should
+# not find references to them within the edx-platform project.
 
 # Publicly-accessible enrollment URL, for use on the client side.
 ENTERPRISE_PUBLIC_ENROLLMENT_API_URL = ENV_TOKENS.get(
@@ -911,12 +911,41 @@ ENTERPRISE_PUBLIC_ENROLLMENT_API_URL = ENV_TOKENS.get(
 )
 
 # Enrollment URL used on the server-side.
-# If not overridden in ENV_TOKENS, then fallback to the value set in env/common.py
 ENTERPRISE_ENROLLMENT_API_URL = ENV_TOKENS.get(
     'ENTERPRISE_ENROLLMENT_API_URL',
     ENTERPRISE_ENROLLMENT_API_URL
 )
 
+# Enterprise logo image size limit in KB's
+ENTERPRISE_CUSTOMER_LOGO_IMAGE_SIZE = ENV_TOKENS.get(
+    'ENTERPRISE_CUSTOMER_LOGO_IMAGE_SIZE',
+    ENTERPRISE_CUSTOMER_LOGO_IMAGE_SIZE
+)
 
-# Discovery App config
+
+############## ENTERPRISE SERVICE API CLIENT CONFIGURATION ######################
+# The LMS communicates with the Enterprise service via the EdxRestApiClient class
+# The below environmental settings are utilized by the LMS when interacting with
+# the service, and override the default parameters which are defined in common.py
+
+DEFAULT_ENTERPRISE_API_URL = None
+if LMS_ROOT_URL is not None:
+    DEFAULT_ENTERPRISE_API_URL = LMS_ROOT_URL + '/enterprise/api/v1/'
+ENTERPRISE_API_URL = ENV_TOKENS.get('ENTERPRISE_API_URL', DEFAULT_ENTERPRISE_API_URL)
+
+ENTERPRISE_SERVICE_WORKER_USERNAME = ENV_TOKENS.get(
+    'ENTERPRISE_SERVICE_WORKER_USERNAME',
+    ENTERPRISE_SERVICE_WORKER_USERNAME
+)
+ENTERPRISE_API_CACHE_TIMEOUT = ENV_TOKENS.get(
+    'ENTERPRISE_API_CACHE_TIMEOUT',
+    ENTERPRISE_API_CACHE_TIMEOUT
+)
+
+
+############## CATALOG/DISCOVERY SERVICE API CLIENT CONFIGURATION ######################
+# The LMS communicates with the Catalog service via the EdxRestApiClient class
+# The below environmental settings are utilized by the LMS when interacting with
+# the service, and override the default parameters which are defined in common.py
+
 COURSES_API_CACHE_TIMEOUT = ENV_TOKENS.get('COURSES_API_CACHE_TIMEOUT', COURSES_API_CACHE_TIMEOUT)

@@ -828,17 +828,20 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
             course_grade.letter_grade,
             student.id in whitelisted_user_ids
         )
-        if certificate_info[0] == 'Y':
-            TASK_LOG.info(
-                u'Student is marked eligible_for_certificate'
-                u'(user=%s, course_id=%s, grade_percent=%s gradecutoffs=%s, allow_certificate=%s, is_whitelisted=%s)',
-                student,
-                course_id,
-                course_grade.percent,
-                course.grade_cutoffs,
-                student.profile.allow_certificate,
-                student.id in whitelisted_user_ids
-            )
+
+        TASK_LOG.info(
+            u'Student certificate eligibility: %s '
+            u'(user=%s, course_id=%s, grade_percent=%s letter_grade=%s gradecutoffs=%s, allow_certificate=%s, '
+            u'is_whitelisted=%s)',
+            certificate_info[0],
+            student,
+            course_id,
+            course_grade.percent,
+            course_grade.letter_grade,
+            course.grade_cutoffs,
+            student.profile.allow_certificate,
+            student.id in whitelisted_user_ids
+        )
 
         grade_results = []
         for assignment_type, assignment_info in graded_assignments.iteritems():
@@ -848,7 +851,7 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
                 except KeyError:
                     grade_results.append([u'Not Available'])
                 else:
-                    if subsection_grade.graded_total.attempted:
+                    if subsection_grade.graded_total.first_attempted is not None:
                         grade_results.append(
                             [subsection_grade.graded_total.earned / subsection_grade.graded_total.possible]
                         )
@@ -1028,7 +1031,7 @@ def upload_problem_grade_report(_xmodule_instance_args, _entry_id, course_id, _t
             except KeyError:
                 earned_possible_values.append([u'Not Available', u'Not Available'])
             else:
-                if problem_score.attempted:
+                if problem_score.first_attempted:
                     earned_possible_values.append([problem_score.earned, problem_score.possible])
                 else:
                     earned_possible_values.append([u'Not Attempted', problem_score.possible])

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Helper functions for working with Programs."""
 from collections import defaultdict
+from copy import deepcopy
 import datetime
 from urlparse import urljoin
 
@@ -69,8 +70,17 @@ class ProgramProgressMeter(object):
         self.enrollments = enrollments or list(CourseEnrollment.enrollments_for_user(self.user))
         self.enrollments.sort(key=lambda e: e.created, reverse=True)
 
-        # enrollment.course_id is really a CourseKey (╯ಠ_ಠ）╯︵ ┻━┻
-        self.course_run_ids = [unicode(e.course_id) for e in self.enrollments]
+        self.enrolled_run_modes = {}
+        self.course_run_ids = []
+        for enrollment in self.enrollments:
+            # enrollment.course_id is really a CourseKey (╯ಠ_ಠ）╯︵ ┻━┻
+            enrollment_id = unicode(enrollment.course_id)
+            mode = enrollment.mode
+            if mode == CourseMode.NO_ID_PROFESSIONAL_MODE:
+                mode = CourseMode.PROFESSIONAL
+            self.enrolled_run_modes[enrollment_id] = mode
+            # We can't use dict.keys() for this because the course run ids need to be ordered
+            self.course_run_ids.append(enrollment_id)
 
         if uuid:
             self.programs = [get_programs(uuid=uuid)]
@@ -127,6 +137,44 @@ class ProgramProgressMeter(object):
 
         return programs
 
+    def _is_course_in_progress(self, now, course):
+        """Check if course qualifies as in progress as part of the program.
+
+        A course is considered to be in progress if a user is enrolled in a run
+        of the correct mode or a run of the correct mode is still available for enrollment.
+
+        Arguments:
+            now (datetime): datetime for now
+            course (dict): Containing nested course runs.
+
+        Returns:
+            bool, indicating whether the course is in progress.
+        """
+        # Part 1: Check if any of the seats you are enrolled in qualify this course as in progress
+        enrolled_runs = [run for run in course['course_runs'] if run['key'] in self.course_run_ids]
+        # Check if the user is enrolled in the required mode for the run
+        runs_with_required_mode = [
+            run for run in enrolled_runs
+            if run['type'] == self.enrolled_run_modes[run['key']]
+        ]
+        if runs_with_required_mode:
+            # Check if the runs you are enrolled in with the right mode are not failed
+            not_failed_runs = [run for run in runs_with_required_mode if run not in self.failed_course_runs]
+            if not_failed_runs:
+                return True
+        # Part 2: Check if any of the seats you are not enrolled in
+        # in the runs you are enrolled in qualify this course as in progress
+        upgrade_deadlines = []
+        for run in enrolled_runs:
+            for seat in run['seats']:
+                if seat['type'] == run['type'] and run['type'] != self.enrolled_run_modes[run['key']]:
+                    upgrade_deadlines.append(seat['upgrade_deadline'])
+
+        course_still_upgradeable = any(
+            (deadline is not None) and (parse(deadline) > now) for deadline in upgrade_deadlines
+        )
+        return course_still_upgradeable
+
     def progress(self, programs=None, count_only=True):
         """Gauge a user's progress towards program completion.
 
@@ -142,21 +190,29 @@ class ProgramProgressMeter(object):
             list of dict, each containing information about a user's progress
                 towards completing a program.
         """
+        now = datetime.datetime.now(utc)
+
         progress = []
         programs = programs or self.engaged_programs
         for program in programs:
+            program_copy = deepcopy(program)
             completed, in_progress, not_started = [], [], []
 
-            for course in program['courses']:
+            for course in program_copy['courses']:
                 if self._is_course_complete(course):
                     completed.append(course)
-                elif self._is_course_in_progress(course):
-                    in_progress.append(course)
+                elif self._is_course_enrolled(course):
+                    course_in_progress = self._is_course_in_progress(now, course)
+                    if course_in_progress:
+                        in_progress.append(course)
+                    else:
+                        course['expired'] = not course_in_progress
+                        not_started.append(course)
                 else:
                     not_started.append(course)
 
             progress.append({
-                'uuid': program['uuid'],
+                'uuid': program_copy['uuid'],
                 'completed': len(completed) if count_only else completed,
                 'in_progress': len(in_progress) if count_only else in_progress,
                 'not_started': len(not_started) if count_only else not_started,
@@ -226,17 +282,52 @@ class ProgramProgressMeter(object):
         Returns:
             list of dicts, each representing a course run certificate
         """
+        return self.course_runs_with_state['completed']
+
+    @cached_property
+    def failed_course_runs(self):
+        """
+        Determine which course runs have been failed by the user.
+
+        Returns:
+            list of dicts, each a course run ID
+        """
+        return [run['course_run_id'] for run in self.course_runs_with_state['failed']]
+
+    @cached_property
+    def course_runs_with_state(self):
+        """
+        Determine which course runs have been completed and failed by the user.
+
+        Returns:
+            dict with a list of completed and failed runs
+        """
         course_run_certificates = certificate_api.get_certificates_for_user(self.user.username)
-        return [
-            {'course_run_id': unicode(certificate['course_key']), 'type': certificate['type']}
-            for certificate in course_run_certificates
-            if certificate_api.is_passing_status(certificate['status'])
-        ]
 
-    def _is_course_in_progress(self, course):
-        """Check if a user is in the process of completing a course.
+        completed_runs, failed_runs = [], []
+        for certificate in course_run_certificates:
+            certificate_type = certificate['type']
 
-        A user is considered to be in the process of completing a course if
+            # Treat "no-id-professional" certificates as "professional" certificates
+            if certificate_type == CourseMode.NO_ID_PROFESSIONAL_MODE:
+                certificate_type = CourseMode.PROFESSIONAL
+
+            course_data = {
+                'course_run_id': unicode(certificate['course_key']),
+                'type': certificate_type
+            }
+
+            if certificate_api.is_passing_status(certificate['status']):
+                completed_runs.append(course_data)
+            else:
+                failed_runs.append(course_data)
+
+        return {'completed': completed_runs, 'failed': failed_runs}
+
+    def _is_course_enrolled(self, course):
+        """Check if a user is enrolled in a course.
+
+        A user is considered to be enrolled in a course if
         they're enrolled in any of the nested course runs.
 
         Arguments:
@@ -419,19 +510,27 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
             uuid=self.data['uuid']
         )
         program_instructors = cache.get(cache_key)
+        is_learner_eligible_for_one_click_purchase = self.data['is_program_eligible_for_one_click_purchase']
 
         for course in self.data['courses']:
             self._execute('_collect_course', course)
             if not program_instructors:
                 for course_run in course['course_runs']:
                     self._execute('_collect_instructors', course_run)
+            if is_learner_eligible_for_one_click_purchase:
+                is_learner_eligible_for_one_click_purchase = not any(
+                    course_run['is_enrolled'] for course_run in course['course_runs']
+                )
 
         if not program_instructors:
             # We cache the program instructors list to avoid repeated modulestore queries
             program_instructors = self.instructors.values()
             cache.set(cache_key, program_instructors, 3600)
 
-        self.data['instructors'] = program_instructors
+        self.data.update({
+            'instructors': program_instructors,
+            'is_learner_eligible_for_one_click_purchase': is_learner_eligible_for_one_click_purchase,
+        })
 
     @classmethod
     def _handlers(cls, prefix):

@@ -5,8 +5,7 @@ Views to show a course outline.
 from django.core.context_processors import csrf
 from django.template.loader import render_to_string
 
-from courseware.courses import get_course_with_access
-from lms.djangoapps.courseware.views.views import get_last_accessed_courseware
+from courseware.courses import get_course_with_access, get_last_accessed_courseware
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
@@ -30,6 +29,7 @@ class CourseOutlineFragmentView(EdxFragmentView):
         for i in range(len(children)):
             child_id = block['children'][i]
             child_detail = self.populate_children(all_blocks[child_id], all_blocks, course_position)
+
             block['children'][i] = child_detail
             block['children'][i]['current'] = course_position == child_detail['block_id']
 
@@ -48,7 +48,7 @@ class CourseOutlineFragmentView(EdxFragmentView):
             course_usage_key,
             user=request.user,
             nav_depth=3,
-            requested_fields=['children', 'display_name', 'type'],
+            requested_fields=['children', 'display_name', 'type', 'due', 'graded', 'special_exam_info', 'format'],
             block_types_filter=['course', 'chapter', 'sequential']
         )
 

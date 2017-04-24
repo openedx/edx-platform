@@ -112,7 +112,7 @@ class ComponentVisibilityEditorView(BaseComponentEditorView):
     OPTION_SELECTOR = '.partition-group-control .field'
     ALL_LEARNERS_AND_STAFF = 'All Learners and Staff'
     CONTENT_GROUP_PARTITION = 'Content Groups'
-    ENROLLMENT_TRACK_PARTITION = "Enrollment Tracks"
+    ENROLLMENT_TRACK_PARTITION = "Enrollment Track Groups"
 
     @property
     def all_group_options(self):

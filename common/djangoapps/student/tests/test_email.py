@@ -214,6 +214,16 @@ class ReactivationEmailTests(EmailTestMixin, TestCase):
 
         self.assertFalse(response_data['success'])
 
+    def test_reactivation_for_no_user_profile(self, email_user):
+        """
+        Test that trying to send a reactivation email to a user without
+        user profile fails without throwing 500 error.
+        """
+        user = UserFactory.build(username='test_user', email='test_user@test.com')
+        user.save()
+        response_data = self.reactivation_email(user)
+        self.assertFalse(response_data['success'])
+
     def test_reactivation_email_success(self, email_user):
         response_data = self.reactivation_email(self.user)
 

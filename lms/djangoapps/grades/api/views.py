@@ -13,9 +13,9 @@ from rest_framework.response import Response
 from courseware.access import has_access
 from lms.djangoapps.ccx.utils import prep_course_for_grading
 from lms.djangoapps.courseware import courses
+from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.grades.api.serializers import GradingPolicySerializer
 from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
-from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from student.roles import CourseStaffRole
 
@@ -47,15 +47,17 @@ class GradeViewMixin(DeveloperErrorViewMixin):
                 user,
                 access_action,
                 course_key,
-                check_if_enrolled=True
+                check_if_enrolled=True,
             )
         except Http404:
             log.info('Course with ID "%s" not found', course_key_string)
-            return self.make_error_response(
-                status_code=status.HTTP_404_NOT_FOUND,
-                developer_message='The user, the course or both do not exist.',
-                error_code='user_or_course_does_not_exist'
-            )
+        except CourseAccessRedirect:
+            log.info('User %s does not have access to course with ID "%s"', user.username, course_key_string)
+        return self.make_error_response(
+            status_code=status.HTTP_404_NOT_FOUND,
+            developer_message='The user, the course or both do not exist.',
+            error_code='user_or_course_does_not_exist',
+        )
 
     def _get_effective_user(self, request, course):
         """

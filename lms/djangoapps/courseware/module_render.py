@@ -47,7 +47,7 @@ from lms.djangoapps.grades.signals.signals import SCORE_PUBLISHED
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem
-from lms.djangoapps.verify_student.services import VerificationService, ReverificationService
+from lms.djangoapps.verify_student.services import VerificationService
 from openedx.core.djangoapps.bookmarks.services import BookmarksService
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.credit.services import CreditService
@@ -162,7 +162,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
 
         # Check for content which needs to be completed
         # before the rest of the content is made available
-        required_content = milestones_helpers.get_required_content(course, user)
+        required_content = milestones_helpers.get_required_content(course.id, user)
 
         # The user may not actually have to complete the entrance exam, if one is required
         if user_can_skip_entrance_exam(user, course):
@@ -680,7 +680,6 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
             'field-data': field_data,
             'user': DjangoXBlockUserService(user, user_is_staff=user_is_staff),
             'verification': VerificationService(),
-            'reverification': ReverificationService(),
             'proctoring': ProctoringService(),
             'milestones': milestones_helpers.get_service(),
             'credit': CreditService(),

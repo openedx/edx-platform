@@ -74,7 +74,7 @@ def _create_enrollment_track_partition(course):
 
     partition = enrollment_track_scheme.create_user_partition(
         id=ENROLLMENT_TRACK_PARTITION_ID,
-        name=_(u"Enrollment Tracks"),
+        name=_(u"Enrollment Track Groups"),
         description=_(u"Partition for segmenting users by enrollment track"),
         parameters={"course_id": unicode(course.id)}
     )
