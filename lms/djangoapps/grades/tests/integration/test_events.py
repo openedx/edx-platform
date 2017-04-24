@@ -160,7 +160,7 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
             }
         )
 
-    @patch('lms.djangoapps.instructor_task.tasks_helper.tracker')
+    @patch('lms.djangoapps.instructor_task.tasks_helper.module_state.tracker')
     @patch('lms.djangoapps.grades.signals.handlers.tracker')
     @patch('lms.djangoapps.grades.models.tracker')
     def test_rescoring_events(self, models_tracker, handlers_tracker, instructor_task_tracker):
