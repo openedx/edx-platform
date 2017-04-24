@@ -685,9 +685,22 @@ def dashboard(request):
 
     course_optouts = Optout.objects.filter(user=user).values_list('course_id', flat=True)
 
-    message = ""
-    if not user.is_active:
-        message = render_to_string(
+    sidebar_account_activation_message = ''
+    banner_account_activation_message = ''
+    display_account_activation_message_on_sidebar = configuration_helpers.get_value(
+        'DISPLAY_ACCOUNT_ACTIVATION_MESSAGE_ON_SIDEBAR',
+        settings.FEATURES.get('DISPLAY_ACCOUNT_ACTIVATION_MESSAGE_ON_SIDEBAR', False)
+    )
+
+    # Display activation message in sidebar if DISPLAY_ACCOUNT_ACTIVATION_MESSAGE_ON_SIDEBAR
+    # flag is active. Otherwise display existing message at the top.
+    if display_account_activation_message_on_sidebar and not user.is_active:
+        sidebar_account_activation_message = render_to_string(
+            'registration/account_activation_sidebar_notice.html',
+            {'email': user.email}
+        )
+    elif not user.is_active:
+        banner_account_activation_message = render_to_string(
             'registration/activate_account_notice.html',
             {'email': user.email, 'platform_name': platform_name}
         )
@@ -819,7 +832,8 @@ def dashboard(request):
         'redirect_message': redirect_message,
         'course_enrollments': course_enrollments,
         'course_optouts': course_optouts,
-        'message': message,
+        'banner_account_activation_message': banner_account_activation_message,
+        'sidebar_account_activation_message': sidebar_account_activation_message,
         'staff_access': staff_access,
         'errored_courses': errored_courses,
         'show_courseware_links_for': show_courseware_links_for,
