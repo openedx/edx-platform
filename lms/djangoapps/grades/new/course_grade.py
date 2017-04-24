@@ -80,15 +80,15 @@ class CourseGradeBase(object):
         return subsection_grades
 
     @lazy
-    def locations_to_scores(self):
+    def problem_scores(self):
         """
         Returns a dict of problem scores keyed by their locations.
         """
-        locations_to_scores = {}
+        problem_scores = {}
         for chapter in self.chapter_grades.itervalues():
             for subsection_grade in chapter['sections']:
-                locations_to_scores.update(subsection_grade.locations_to_scores)
-        return locations_to_scores
+                problem_scores.update(subsection_grade.problem_scores)
+        return problem_scores
 
     def score_for_chapter(self, chapter_key):
         """
@@ -112,8 +112,8 @@ class CourseGradeBase(object):
         composite module (a vertical or section ) the scores will be the sums of
         all scored problems that are children of the chosen location.
         """
-        if location in self.locations_to_scores:
-            score = self.locations_to_scores[location]
+        if location in self.problem_scores:
+            score = self.problem_scores[location]
             return score.earned, score.possible
         children = self.course_data.structure.get_children(location)
         earned, possible = 0.0, 0.0

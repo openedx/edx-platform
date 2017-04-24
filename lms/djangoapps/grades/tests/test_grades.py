@@ -203,7 +203,7 @@ class TestWeightedProblems(SharedModuleStoreTestCase):
 
         # verify all problem grades
         for problem in self.problems:
-            problem_score = subsection_grade.locations_to_scores[problem.location]
+            problem_score = subsection_grade.problem_scores[problem.location]
             self.assertEqual(type(expected_score.first_attempted), type(problem_score.first_attempted))
             expected_score.first_attempted = problem_score.first_attempted
             self.assertEquals(problem_score, expected_score)
