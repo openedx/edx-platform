@@ -1442,6 +1442,8 @@ class DefaultStatesContentTest(CourseOutlineTest):
 
     __test__ = True
 
+    # TODO: TNL-6546: Removing unified_course_view_flag
+    # This test will need to be rewritten to point to the new course home page.
     def test_view_live(self):
         """
         Scenario: View Live version from course outline

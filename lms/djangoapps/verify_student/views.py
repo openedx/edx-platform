@@ -29,7 +29,6 @@ from opaque_keys.edx.keys import CourseKey
 
 from commerce.utils import EcommerceService
 from course_modes.models import CourseMode
-from courseware.url_helpers import get_redirect_url
 from edx_rest_api_client.exceptions import SlumberBaseException
 from edxmako.shortcuts import render_to_response, render_to_string
 from openedx.core.djangoapps.embargo import api as embargo_api
