@@ -34,13 +34,8 @@ class TestCohortHelp(ContainerBase):
         Arguments:
             href (str): Help url
         """
-        expected_link = {
-            'href': href,
-            'text': 'What does this mean?'
-        }
         actual_link = self.cohort_management.get_cohort_help_element_and_click_help()
-
-        assert_link(self, expected_link, actual_link)
+        self.assertEqual(actual_link.text, "What does this mean?")
         assert_opened_help_link_is_correct(self, href)
 
     def test_manual_cohort_help(self):
