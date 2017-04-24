@@ -19,40 +19,12 @@ class CoursewarePage(CoursePage):
     url_path = "courseware/"
     xblock_component_selector = '.vert .xblock'
 
-    # TODO: TNL-6546: Remove sidebar selectors
-    section_selector = '.chapter'
-    subsection_selector = '.chapter-content-container a'
-
     def __init__(self, browser, course_id):
         super(CoursewarePage, self).__init__(browser, course_id)
         self.nav = CourseNavPage(browser, self)
 
     def is_browser_on_page(self):
         return self.q(css='.course-content').present
-
-    # TODO: TNL-6546: Remove and find callers
-    @property
-    def chapter_count_in_navigation(self):
-        """
-        Returns count of chapters available on LHS navigation.
-        """
-        return len(self.q(css='nav.course-navigation a.chapter'))
-
-    # TODO: TNL-6546: Remove and find callers.
-    @property
-    def num_sections(self):
-        """
-        Return the number of sections in the sidebar on the page
-        """
-        return len(self.q(css=self.section_selector))
-
-    # TODO: TNL-6546: Remove and find callers.
-    @property
-    def num_subsections(self):
-        """
-        Return the number of subsections in the sidebar on the page, including in collapsed sections
-        """
-        return len(self.q(css=self.subsection_selector))
 
     @property
     def xblock_components(self):
@@ -320,13 +292,6 @@ class CoursewarePage(CoursePage):
         self.q(css='.bookmark-button').first.click()
         EmptyPromise(lambda: self.bookmark_button_state != previous_state, "Bookmark button toggled").fulfill()
 
-    # TODO: TNL-6546: Remove this helper function
-    def click_bookmarks_button(self):
-        """ Click on Bookmarks button """
-        self.q(css='.bookmarks-list-button').first.click()
-        bookmarks_page = BookmarksPage(self.browser, self.course_id)
-        bookmarks_page.visit()
-
 
 class CoursewareSequentialTabPage(CoursePage):
     """
@@ -358,43 +323,9 @@ class CourseNavPage(PageObject):
     def __init__(self, browser, parent_page):
         super(CourseNavPage, self).__init__(browser)
         self.parent_page = parent_page
-        # TODO: TNL-6546: Remove the following
-        self.unified_course_view = False
 
     def is_browser_on_page(self):
         return self.parent_page.is_browser_on_page
-
-    # TODO: TNL-6546: Remove method, outline no longer on courseware page
-    @property
-    def sections(self):
-        """
-        Return a dictionary representation of sections and subsections.
-
-        Example:
-
-            {
-                'Introduction': ['Course Overview'],
-                'Week 1': ['Lesson 1', 'Lesson 2', 'Homework']
-                'Final Exam': ['Final Exam']
-            }
-
-        You can use these titles in `go_to_section` to navigate to the section.
-        """
-        # Dict to store the result
-        nav_dict = dict()
-
-        section_titles = self._section_titles()
-
-        # Get the section titles for each chapter
-        for sec_index, sec_title in enumerate(section_titles):
-
-            if len(section_titles) < 1:
-                self.warning("Could not find subsections for '{0}'".format(sec_title))
-            else:
-                # Add one to convert list index (starts at 0) to CSS index (starts at 1)
-                nav_dict[sec_title] = self._subsection_titles(sec_index + 1)
-
-        return nav_dict
 
     @property
     def sequence_items(self):
@@ -407,50 +338,6 @@ class CourseNavPage(PageObject):
         """
         seq_css = 'ol#sequence-list>li>.nav-item>.sequence-tooltip'
         return self.q(css=seq_css).map(self._clean_seq_titles).results
-
-    # TODO: TNL-6546: Remove method, outline no longer on courseware page
-    def go_to_section(self, section_title, subsection_title):
-        """
-        Go to the section in the courseware.
-        Every section must have at least one subsection, so specify
-        both the section and subsection title.
-
-        Example:
-            go_to_section("Week 1", "Lesson 1")
-        """
-
-        # For test stability, disable JQuery animations (opening / closing menus)
-        self.browser.execute_script("jQuery.fx.off = true;")
-
-        # Get the section by index
-        try:
-            sec_index = self._section_titles().index(section_title)
-        except ValueError:
-            self.warning("Could not find section '{0}'".format(section_title))
-            return
-
-        # Click the section to ensure it's open (no harm in clicking twice if it's already open)
-        # Add one to convert from list index to CSS index
-        section_css = '.course-navigation .chapter:nth-of-type({0})'.format(sec_index + 1)
-        self.q(css=section_css).first.click()
-
-        # Get the subsection by index
-        try:
-            subsec_index = self._subsection_titles(sec_index + 1).index(subsection_title)
-        except ValueError:
-            msg = "Could not find subsection '{0}' in section '{1}'".format(subsection_title, section_title)
-            self.warning(msg)
-            return
-
-        # Convert list indices (start at zero) to CSS indices (start at 1)
-        subsection_css = (
-            ".course-navigation .chapter-content-container:nth-of-type({0}) "
-            ".menu-item:nth-of-type({1})"
-        ).format(sec_index + 1, subsec_index + 1)
-
-        # Click the subsection and ensure that the page finishes reloading
-        self.q(css=subsection_css).first.click()
-        self._on_section_promise(section_title, subsection_title).fulfill()
 
     def go_to_vertical(self, vertical_title):
         """
@@ -478,48 +365,6 @@ class CourseNavPage(PageObject):
             # Click triggers an ajax event
             self.wait_for_ajax()
 
-    # TODO: TNL-6546: Remove method, outline no longer on courseware page
-    def _section_titles(self):
-        """
-        Return a list of all section titles on the page.
-        """
-        chapter_css = '.course-navigation .chapter .group-heading'
-        return self.q(css=chapter_css).map(lambda el: el.text.strip()).results
-
-    # TODO: TNL-6546: Remove method, outline no longer on courseware page
-    def _subsection_titles(self, section_index):
-        """
-        Return a list of all subsection titles on the page
-        for the section at index `section_index` (starts at 1).
-        """
-        # Retrieve the subsection title for the section
-        # Add one to the list index to get the CSS index, which starts at one
-        subsection_css = (
-            ".course-navigation .chapter-content-container:nth-of-type({0}) "
-            ".menu-item a p:nth-of-type(1)"
-        ).format(section_index)
-
-        # If the element is visible, we can get its text directly
-        # Otherwise, we need to get the HTML
-        # It *would* make sense to always get the HTML, but unfortunately
-        # the open tab has some child <span> tags that we don't want.
-        return self.q(
-            css=subsection_css
-        ).map(
-            lambda el: el.text.strip().split('\n')[0] if el.is_displayed() else el.get_attribute('innerHTML').strip()
-        ).results
-
-    # TODO: TNL-6546: Remove method, outline no longer on courseware page
-    def _on_section_promise(self, section_title, subsection_title):
-        """
-        Return a `Promise` that is fulfilled when the user is on
-        the correct section and subsection.
-        """
-        desc = "currently at section '{0}' and subsection '{1}'".format(section_title, subsection_title)
-        return EmptyPromise(
-            lambda: self.is_on_section(section_title, subsection_title), desc
-        )
-
     def go_to_outline(self):
         """
         Navigates using breadcrumb to the course outline on the course home page.
@@ -541,36 +386,13 @@ class CourseNavPage(PageObject):
         with the specified titles.
 
         """
-        # TODO: TNL-6546: Remove if/else; always use unified_course_view version (if)
-        if self.unified_course_view:
-            # breadcrumb location of form: "SECTION_TITLE > SUBSECTION_TITLE > SEQUENTIAL_TITLE"
-            bread_crumb_current = self.q(css='.position').text
-            if len(bread_crumb_current) != 1:
-                self.warning("Could not find the current bread crumb with section and subsection.")
-                return False
+        # breadcrumb location of form: "SECTION_TITLE > SUBSECTION_TITLE > SEQUENTIAL_TITLE"
+        bread_crumb_current = self.q(css='.position').text
+        if len(bread_crumb_current) != 1:
+            self.warning("Could not find the current bread crumb with section and subsection.")
+            return False
 
-            return bread_crumb_current[0].strip().startswith(section_title + ' > ' + subsection_title + ' > ')
-
-        else:
-            # This assumes that the currently expanded section is the one we're on
-            # That's true right after we click the section/subsection, but not true in general
-            # (the user could go to a section, then expand another tab).
-            current_section_list = self.q(css='.course-navigation .chapter.is-open .group-heading').text
-            current_subsection_list = self.q(css='.course-navigation .chapter-content-container .menu-item.active a p').text
-
-            if len(current_section_list) == 0:
-                self.warning("Could not find the current section")
-                return False
-
-            elif len(current_subsection_list) == 0:
-                self.warning("Could not find current subsection")
-                return False
-
-            else:
-                return (
-                    current_section_list[0].strip() == section_title and
-                    current_subsection_list[0].strip().split('\n')[0] == subsection_title
-                )
+        return bread_crumb_current[0].strip().startswith(section_title + ' > ' + subsection_title + ' > ')
 
     # Regular expression to remove HTML span tags from a string
     REMOVE_SPAN_TAG_RE = re.compile(r'</span>(.+)<span')
@@ -580,20 +402,3 @@ class CourseNavPage(PageObject):
         Clean HTML of sequence titles, stripping out span tags and returning the first line.
         """
         return self.REMOVE_SPAN_TAG_RE.search(element.get_attribute('innerHTML')).groups()[0].strip()
-
-    # TODO: TNL-6546: Remove. This is no longer needed.
-    @property
-    def active_subsection_url(self):
-        """
-        return the url of the active subsection in the left nav
-        """
-        return self.q(css='.chapter-content-container .menu-item.active a').attrs('href')[0]
-
-    # TODO: TNL-6546: Remove all references to self.unified_course_view
-    # TODO: TNL-6546: Remove the following function
-    def visit_unified_course_view(self):
-        # use unified_course_view version of the nav
-        self.unified_course_view = True
-        # reload the same page with the unified course view
-        self.browser.get(self.browser.current_url + "&unified_course_view=1")
-        self.wait_for_page()

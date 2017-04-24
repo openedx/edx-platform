@@ -742,54 +742,12 @@ class HighLevelTabTest(UniqueCourseTest):
         )
         self.assertEqual(expected_article_name, course_wiki.article_name)
 
-    # TODO: TNL-6546: This whole function will be able to go away, replaced by test_course_home below.
-    def test_courseware_nav(self):
-        """
-        Navigate to a particular unit in the course.
-        """
-        # Navigate to the course page from the info page
-        self.course_info_page.visit()
-        self.tab_nav.go_to_tab('Course')
-
-        # Check that the course navigation appears correctly
-        EXPECTED_SECTIONS = {
-            'Test Section': ['Test Subsection'],
-            'Test Section 2': ['Test Subsection 2', 'Test Subsection 3']
-        }
-
-        actual_sections = self.courseware_page.nav.sections
-
-        for section, subsections in EXPECTED_SECTIONS.iteritems():
-            self.assertIn(section, actual_sections)
-            self.assertEqual(actual_sections[section], EXPECTED_SECTIONS[section])
-
-        # Navigate to a particular section
-        self.courseware_page.nav.go_to_section('Test Section', 'Test Subsection')
-
-        # Check the sequence items
-        EXPECTED_ITEMS = ['Test Problem 1', 'Test Problem 2', 'Test HTML']
-
-        actual_items = self.courseware_page.nav.sequence_items
-        self.assertEqual(len(actual_items), len(EXPECTED_ITEMS))
-        for expected in EXPECTED_ITEMS:
-            self.assertIn(expected, actual_items)
-
-        # Navigate to a particular section other than the default landing section.
-        self.courseware_page.nav.go_to_section('Test Section 2', 'Test Subsection 3')
-        self.assertTrue(self.courseware_page.nav.is_on_section('Test Section 2', 'Test Subsection 3'))
-
     def test_course_home_tab(self):
         """
         Navigate to the course home page using the tab.
         """
-        # TODO: TNL-6546: Use tab navigation and remove course_home_page.visit().
-        #self.course_info_page.visit()
-        #self.tab_nav.go_to_tab('Course')
-        self.course_home_page.visit()
-
-        # TODO: TNL-6546: Remove unified_course_view.
-        self.course_home_page.unified_course_view = True
-        self.courseware_page.nav.unified_course_view = True
+        self.course_info_page.visit()
+        self.tab_nav.go_to_tab('Course')
 
         # Check that the tab lands on the course home page.
         self.assertTrue(self.course_home_page.is_browser_on_page())
@@ -1195,48 +1153,6 @@ class EntranceExamTest(UniqueCourseTest):
         # visit the course outline and make sure there is an "Entrance Exam" section.
         self.course_home_page.visit()
         self.assertTrue('Entrance Exam' in self.course_home_page.outline.sections.keys())
-
-    # TODO: TNL-6546: Remove test
-    def test_entrance_exam_section_2(self):
-        """
-         Scenario: Any course that is enabled for an entrance exam, should have entrance exam chapter at course
-         page.
-            Given that I am on the course page
-            When I view the course that has an entrance exam
-            Then there should be an "Entrance Exam" chapter.'
-        """
-        courseware_page = CoursewarePage(self.browser, self.course_id)
-        entrance_exam_link_selector = '.accordion .course-navigation .chapter .group-heading'
-        # visit course page and make sure there is not entrance exam chapter.
-        courseware_page.visit()
-        courseware_page.wait_for_page()
-        self.assertFalse(element_has_text(
-            page=courseware_page,
-            css_selector=entrance_exam_link_selector,
-            text='Entrance Exam'
-        ))
-
-        # Logout and login as a staff.
-        LogoutPage(self.browser).visit()
-        AutoAuthPage(self.browser, course_id=self.course_id, staff=True).visit()
-
-        # visit course settings page and set/enabled entrance exam for that course.
-        self.settings_page.visit()
-        self.settings_page.entrance_exam_field.click()
-        self.settings_page.save_changes()
-
-        # Logout and login as a student.
-        LogoutPage(self.browser).visit()
-        AutoAuthPage(self.browser, course_id=self.course_id, staff=False).visit()
-
-        # visit course info page and make sure there is an "Entrance Exam" section.
-        courseware_page.visit()
-        courseware_page.wait_for_page()
-        self.assertTrue(element_has_text(
-            page=courseware_page,
-            css_selector=entrance_exam_link_selector,
-            text='Entrance Exam'
-        ))
 
 
 @attr(shard=1)

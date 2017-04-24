@@ -207,10 +207,6 @@ class CertificateProgressPageTest(UniqueCourseTest):
 
         Problems were added in the setUp
         """
-        # self.course_info_page.visit()
-        # self.tab_nav.go_to_tab('Course')
-        #
-        # # TODO: TNL-6546: Remove extra visit call.
         self.course_home_page.visit()
 
         # Navigate to Test Subsection in Test Section Section

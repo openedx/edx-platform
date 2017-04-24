@@ -68,10 +68,6 @@ class CourseHomeTest(CourseHomeBaseTest):
         """
         self.course_home_page.visit()
 
-        # TODO: TNL-6546: Remove unified_course_view.
-        self.course_home_page.unified_course_view = True
-        self.courseware_page.nav.unified_course_view = True
-
         # Check that the tab lands on the course home page.
         self.assertTrue(self.course_home_page.is_browser_on_page())
 
