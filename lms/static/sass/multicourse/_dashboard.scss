@@ -1227,6 +1227,35 @@
       border-bottom-color: $m-gray-l4;
     }
   }
+
+  // Warning for status verification
+  &.warning {
+     border-top: 3px solid #ffc01f !important;
+
+    .status-title {
+      font-weight: 400 !important;
+
+      .fa {
+        color: #ffc01f;
+      }
+    }
+
+    .btn {
+      font-size: 16px;
+      line-height: 25.16px;
+      padding: 10px 10px;
+      border: 1px solid #0079bc;
+      color: #0079bc;
+      text-decoration: none;
+      display: block;
+    }
+    .btn:hover {
+      cursor: pointer;
+      color: #fff;
+      background-color: #0079bc;
+    }
+
+  }
 }
 
 // status - verification
