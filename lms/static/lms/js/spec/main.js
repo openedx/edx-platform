@@ -743,6 +743,7 @@
         'js/spec/learner_dashboard/program_card_view_spec.js',
         'js/spec/learner_dashboard/sidebar_view_spec.js',
         'js/spec/learner_dashboard/program_details_header_spec.js',
+        'js/spec/learner_dashboard/program_details_sidebar_view_spec.js',
         'js/spec/learner_dashboard/course_card_view_spec.js',
         'js/spec/learner_dashboard/course_enroll_view_spec.js',
         'js/spec/learner_dashboard/course_enroll_view_spec_2017.js',
