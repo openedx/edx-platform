@@ -9,7 +9,7 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils.translation import LANGUAGE_SESSION_KEY
 
-from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY, LANGUAGE_COOKIE, COOKIE_DURATION
+from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY, COOKIE_DURATION
 
 
 @ensure_csrf_cookie
@@ -24,7 +24,7 @@ def update_session_language(request):
         if request.session.get(LANGUAGE_SESSION_KEY, None) != language:
             request.session[LANGUAGE_SESSION_KEY] = unicode(language)
         response.set_cookie(
-            LANGUAGE_COOKIE,
+            settings.LANGUAGE_COOKIE,
             language,
             domain=settings.SESSION_COOKIE_DOMAIN,
             max_age=COOKIE_DURATION

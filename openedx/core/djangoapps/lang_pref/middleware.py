@@ -7,7 +7,7 @@ from django.utils.translation import LANGUAGE_SESSION_KEY
 from django.utils.translation.trans_real import parse_accept_lang_header
 
 from openedx.core.djangoapps.lang_pref import (
-    LANGUAGE_KEY, LANGUAGE_COOKIE, LANGUAGE_HEADER, COOKIE_DURATION
+    LANGUAGE_KEY, LANGUAGE_HEADER, COOKIE_DURATION
 )
 from openedx.core.djangoapps.user_api.preferences.api import (
     get_user_preference, delete_user_preference, set_user_preference
@@ -28,7 +28,7 @@ class LanguagePreferenceMiddleware(object):
         If a user's UserPreference contains a language preference, use the user's preference.
         Save the current language preference cookie as the user's preferred language.
         """
-        cookie_lang = request.COOKIES.get(LANGUAGE_COOKIE, None)
+        cookie_lang = request.COOKIES.get(settings.LANGUAGE_COOKIE, None)
         if cookie_lang:
             if request.user.is_authenticated():
                 set_user_preference(request.user, LANGUAGE_KEY, cookie_lang)
@@ -57,14 +57,14 @@ class LanguagePreferenceMiddleware(object):
                 # Set it in the LANGUAGE_COOKIE
                 if user_pref:
                     response.set_cookie(
-                        LANGUAGE_COOKIE,
+                        settings.LANGUAGE_COOKIE,
                         value=user_pref,
                         domain=settings.SESSION_COOKIE_DOMAIN,
                         max_age=COOKIE_DURATION,
                     )
                 else:
                     response.delete_cookie(
-                        LANGUAGE_COOKIE,
+                        settings.LANGUAGE_COOKIE,
                         domain=settings.SESSION_COOKIE_DOMAIN
                     )
 
