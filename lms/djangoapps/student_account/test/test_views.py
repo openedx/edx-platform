@@ -697,24 +697,6 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase, ProgramsApiConf
 
         self.assertEqual(len(order_detail), 1)
 
-    def test_order_history_with_coupon(self):
-        """
-        Verify that get_order_details returns empty receipt_url for coupon product.
-        """
-        response = {
-            'results': [
-                factories.OrderFactory(
-                    lines=[
-                        factories.OrderLineFactory(product=factories.ProductFactory(product_class='Coupon'))
-                    ]
-                )
-            ]
-        }
-        with mock_get_orders(response=response):
-            order_detail = get_user_orders(self.user)
-
-        self.assertEqual(order_detail[0]['receipt_url'], '')
-
 
 @override_settings(SITE_NAME=settings.MICROSITE_LOGISTRATION_HOSTNAME)
 class MicrositeLogistrationTests(TestCase):

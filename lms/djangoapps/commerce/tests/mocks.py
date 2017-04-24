@@ -180,7 +180,12 @@ class mock_get_orders(mock_ecommerce_api_endpoint):
                         )])
                     ),
                 ]
-            )
+            ),
+            factories.OrderFactory(
+                lines=[
+                    factories.OrderLineFactory(product=factories.ProductFactory(product_class='Coupon'))
+                ]
+            ),
         ]
     }
     method = httpretty.GET
