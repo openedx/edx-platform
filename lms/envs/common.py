@@ -3076,7 +3076,6 @@ REDIRECT_CACHE_KEY_PREFIX = 'redirects'
 
 ############## Settings for LMS Context Sensitive Help ##############
 
-DOC_LINK_BASE_URL = None
 HELP_TOKENS_INI_FILE = REPO_ROOT / "docs" / "lms_config.ini"
 HELP_TOKENS_BOOKS = {
     'learner': 'http://edx.readthedocs.io/projects/open-edx-learner-guide',
