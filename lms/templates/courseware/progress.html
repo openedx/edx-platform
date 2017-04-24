@@ -179,10 +179,10 @@ from django.utils.http import urlquote_plus
                                                 <em class="localized-datetime" data-datetime="${section.due}" data-string="${_('due {date}')}" data-timezone="${user_timezone}" data-language="${user_language}"></em>
                                             %endif
                                         </p>
-                                        %if len(section.scores) > 0:
+                                        %if len(section.problem_scores.values()) > 0:
                                         <dl class="scores">
                                             <dt class="hd hd-6">${ _("Problem Scores: ") if section.graded else _("Practice Scores: ")}</dt>
-                                            %for score in section.scores:
+                                            %for score in section.problem_scores.values():
                                             <dd>${"{0:.3n}/{1:.3n}".format(float(score.earned),float(score.possible))}</dd>
                                             %endfor
                                         </dl>
