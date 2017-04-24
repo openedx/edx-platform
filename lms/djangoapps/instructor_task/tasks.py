@@ -27,25 +27,33 @@ from django.utils.translation import ugettext_noop
 
 from celery import task
 from bulk_email.tasks import perform_delegate_email_batches
-from lms.djangoapps.instructor_task.tasks_helper import (
-    run_main_task,
-    BaseInstructorTask,
+from lms.djangoapps.instructor_task.tasks_base import BaseInstructorTask
+from lms.djangoapps.instructor_task.tasks_helper.runner import run_main_task
+from lms.djangoapps.instructor_task.tasks_helper.certs import (
+    generate_students_certificates,
+)
+from lms.djangoapps.instructor_task.tasks_helper.enrollments import (
+    upload_enrollment_report,
+    upload_may_enroll_csv,
+    upload_exec_summary_report,
+    upload_students_csv,
+)
+from lms.djangoapps.instructor_task.tasks_helper.grades import (
+    generate_course_grade_report,
+    generate_problem_grade_report,
+    upload_problem_responses_csv,
+)
+from lms.djangoapps.instructor_task.tasks_helper.misc import (
+    cohort_students_and_upload,
+    upload_course_survey_report,
+    upload_proctored_exam_results_report,
+    upload_ora2_data,
+)
+from lms.djangoapps.instructor_task.tasks_helper.module_state import (
     perform_module_state_update,
     rescore_problem_module_state,
     reset_attempts_module_state,
     delete_problem_module_state,
-    upload_problem_responses_csv,
-    upload_grades_csv,
-    upload_problem_grade_report,
-    upload_students_csv,
-    cohort_students_and_upload,
-    upload_enrollment_report,
-    upload_may_enroll_csv,
-    upload_exec_summary_report,
-    upload_course_survey_report,
-    generate_students_certificates,
-    upload_proctored_exam_results_report,
-    upload_ora2_data,
 )
 
 
@@ -168,7 +176,7 @@ def calculate_grades_csv(entry_id, xmodule_instance_args):
         xmodule_instance_args.get('task_id'), entry_id, action_name
     )
 
-    task_fn = partial(upload_grades_csv, xmodule_instance_args)
+    task_fn = partial(generate_course_grade_report, xmodule_instance_args)
     return run_main_task(entry_id, task_fn, action_name)
 
 
@@ -185,7 +193,7 @@ def calculate_problem_grade_report(entry_id, xmodule_instance_args):
         xmodule_instance_args.get('task_id'), entry_id, action_name
     )
 
-    task_fn = partial(upload_problem_grade_report, xmodule_instance_args)
+    task_fn = partial(generate_problem_grade_report, xmodule_instance_args)
     return run_main_task(entry_id, task_fn, action_name)
 
 
