@@ -99,7 +99,7 @@ def perf_report_bokchoy(options, passthrough_options):
     run_bokchoy(options.perf_report_bokchoy, passthrough_options)
 
 
-@needs('pavelib.prereqs.install_prereqs', 'get_test_course', 'load_courses')
+@needs('pavelib.prereqs.install_prereqs', 'get_test_course')
 @cmdopts(
     BOKCHOY_OPTS + [PA11Y_SINGLE_URL, PA11Y_HTML, PA11Y_COURSE_KEY, PA11Y_FETCH_COURSE],
     share_with=['get_test_course', 'prepare_bokchoy_run', 'load_courses']
@@ -124,12 +124,9 @@ def pa11ycrawler(options, passthrough_options):
         'should_fetch_course',
         not options.get('fasttest')
     )
-    if not options.pa11ycrawler.course_key:
+    course_key = getattr(options.pa11ycrawler, 'course_key', None)
+    if not course_key:
         options.pa11ycrawler.course_key = getattr(options, 'course-key', "course-v1:edX+Test101+course")
-
-    print '$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$'
-    print options.pa11ycrawler.course_key
-    print '$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$'
     test_suite = Pa11yCrawler('pa11ycrawler', passthrough_options=passthrough_options, **options.pa11ycrawler)
     test_suite.run()
 
