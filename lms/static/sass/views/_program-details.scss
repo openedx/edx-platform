@@ -47,8 +47,8 @@
     }
 
     .crumb {
+        @include float(left);
         position: relative;
-        float: left;
         font-size: font-size(x-small);
         line-height: line-height(x-small);
         color: palette(grayscale, dark);
@@ -78,14 +78,18 @@
 }
 
 // CSS for April 2017 version of Program Details Page
-
 .program-details {
     .window-wrap {
         background-color: $white;
     }
-}
-.program-details-wrapper {
 
+    .wrapper-footer {
+        @include clearfix();
+        clear: both;
+    }
+}
+
+.program-details-wrapper {
     .program-details-header {
         background-color: $light-gray4;
         display: flex;
@@ -93,14 +97,20 @@
         font-family: 'Open Sans';
         font-weight: normal;
         flex-wrap: wrap;
-        padding-top: 40px;
-        padding-bottom: 35px;
-        margin-left: 10px;
-        margin-right: 10px;
+        padding: 40px 10px 35px;
 
         @media(min-width: $bp-screen-md) {
-            margin-left: 30px;
-            margin-right: 80px;
+            padding: {
+                left: 30px;
+                right: 30px;
+            }
+        }
+
+        @media(min-width: $lms-max-width) {
+            padding: {
+                left: calc(((100% - 1180px) / 2) + 30px);
+                right: calc(((100% - 1180px) / 2) + 30px);
+            }
         }
 
         .hd-1 {
@@ -111,9 +121,13 @@
         }
 
         .program-details-icon {
-            margin-left: 3px;
+            @include margin-left(3px);
             margin-top: 10px;
             height: auto;
+
+            svg {
+                width: inherit;
+            }
 
             /* IE11 CSS styles */
             @media(min-width: $bp-screen-md) and (-ms-high-contrast: none), (-ms-high-contrast: active) {
@@ -147,6 +161,7 @@
 
         .meta-info {
             margin: 0;
+            display: block;
             @media(min-width: $bp-screen-md) {
                 width: 70%;
             }
@@ -177,7 +192,7 @@
                 margin-top: auto;
                 margin-bottom: auto;
                 @media(min-width: $bp-screen-md) {
-                    margin: 10px 0 0 0;
+                    @include margin-right(10px 0 0 0);
                 }
 
             }
@@ -187,8 +202,8 @@
                 width: 30%;
 
                 .orgs .org-logo {
+                    @include margin-left(2.5%);
                     width: 46.5%;
-                    margin-left: 2.5%;
                     height: auto;
                 }
             }
@@ -197,26 +212,49 @@
                 width: 25%;
             }
         }
-
     }
 
     .program-details-content {
+        width: 100%;
+        margin-bottom: 30px;
+        padding: 30px 10px;
+
         @media(min-width: $bp-screen-md) {
-            margin-left: 30px;
+            @include float(left);
+            padding: {
+                left: 30px;
+                right: 30px;
+            }
+            width: calc( 100% - 330px );
+            position: relative;
         }
-        margin-left: 10px;
+
+        @media(min-width: $bp-screen-lg) {
+            width: calc( 100% - 510px );
+            max-width: 700px;
+        }
+
+        @media(min-width: $lms-max-width) {
+            @include margin-left(calc((100% - 1180px) / 2));
+        }
     }
+
     .course-list-heading {
         font-family: "Open Sans";
         font-weight: bold;
+        text-transform: uppercase;
         color: palette(primary, dark);
         font-size: 0.9375em;
         line-height: normal;
-        margin-top: 10px;
-        margin-bottom: 0;
+        padding-bottom: 5px;
+        border-bottom: 3px solid $divider-color;
+        margin: {
+            top: 10px;
+            bottom: 20px;
+        }
 
         .status {
-            margin-right: 7px;
+            @include margin-right(7px);
         }
     }
 
@@ -225,27 +263,9 @@
     }
 
     .course-list-headings {
-        width: 700px;
-
-        .divider {
-            margin-left: 0;
-            margin-bottom: 20px;
-            background-color: $divider-color;
-            margin-top: 5px;
-            height: 3px;
-            width: 315px;
-            @media(min-width: $bp-screen-sm) {
-                width: 550px;
-            }
-            @media(min-width: $bp-screen-md) {
-                width: 700px;
-            }
-            border: none;
-        }
-
         .motivating-section {
+            @include margin-left(15px);
             font-size: 0.9375em;
-            margin-left: 15px;
             width: 310px;
             @media(min-width: $bp-screen-sm) {
                 width: auto;
@@ -264,11 +284,7 @@
     }
 
     .program-heading {
-        @media(min-width: $bp-screen-md) {
-            width: 70%;
-        }
-        width: 90%;
-        margin-top: 40px;
+        width: 100%;
         margin-bottom: 40px;
 
         .program-heading-title {
@@ -313,17 +329,17 @@
 
                 /* IE11 CSS styles */
                 @media(min-width: $bp-screen-md) and (-ms-high-contrast: none), (-ms-high-contrast: active) {
-                    float: right;
+                    @include float(right);
                 }
             }
         }
         .select-choice {
+            @include margin-right(2px);
             font-family: "Open Sans";
             font-weight: bold;
             font-size: 0.9375em;
             color: palette(grayscale, base);
             margin-top: 6px;
-            margin-right: 2px;
             display: block;
 
             @media(min-width: $bp-screen-md) {
@@ -339,36 +355,28 @@
             }
         }
         .run-select {
+            @include margin-right(10px);
             width: 95%;
             @media(min-width: $bp-screen-sm) {
                 width: 300px;
             }
             height: 34px;
             padding: 0;
-            margin-right: 10px;
         }
     }
    
     .program-course-card {
-        @media(min-width: $bp-screen-md) {
-            width: 100%;
-        }
-
+        width: 100%;
+        padding: 15px;
         margin-bottom: 10px;
 
         @media(min-width: $bp-screen-md) {
-            height: 100px;
+            height: auto;
         }
 
         .section {
             display: flex;
             justify-content: space-between;
-            margin-right: 40px;
-            margin-left: 15px;
-
-            @media(min-width: $bp-screen-md) {
-                margin-left: 20px;
-            }
 
             @media(min-width: $bp-screen-md) {
                 flex-wrap: wrap;
@@ -400,9 +408,12 @@
         .course-meta-container {
             display: flex;
             flex-direction: column;
+            flex-wrap: wrap;
 
             @media(min-width: $bp-screen-md) {
                 width: 100%;
+                flex-direction: row;
+                justify-content: space-between;
             }
         }
 
@@ -417,6 +428,10 @@
             }
         }
 
+        .course-certificate {
+            width: 100%;
+        }
+
         .upgrade-message {
             flex-wrap: wrap;
 
@@ -426,13 +441,13 @@
                 height: 37px;
                 width: 128px;
                 border-radius: 0;
-                padding: 0;
+                padding: 7px 0 0 0;
                 text-align: center;
                 font-size: 0.9375em;
                 
                 /* IE11 CSS styles */
                 @media(min-width: $bp-screen-md) and (-ms-high-contrast: none), (-ms-high-contrast: active) {
-                    float: right;
+                    @include float(right);
                 }
             }
 
@@ -495,6 +510,140 @@
                 font-size: 0.9375em;
             }
         }
+    }
+}
 
+.program-sidebar {
+    padding: 30px 10px;
+
+    @media(min-width: $bp-screen-md) {
+        @include float(right);
+        width: 300px;
+        padding-right: 30px;
+        position: relative;
+    }
+
+    @media(min-width: $bp-screen-lg) {
+        width: 450px;
+
+        .program-progress {
+            @include margin-left(50px);
+        }
+    }
+
+    @media(min-width: $lms-max-width) {
+        @include margin-right(calc((100% - 1180px) / 2));
+    }
+}
+
+.certificate-heading {
+    margin-bottom: 10px;
+
+    @media(min-width: $bp-screen-md) {
+        @include margin-right(30px);
+    }
+
+    @media(min-width: $bp-screen-lg) {
+        @include margin-left(10px);
+        @include margin-right(0);
+    }
+}
+
+.program-cert-link {
+    display: inline-block;
+
+    &:active,
+    &:focus,
+    &:hover {
+        .program-cert {
+            border-color: $blue-d1;
+        }
+    }
+}
+
+.program-cert {
+    width: 100%;
+    border: 1px solid $divider-color;
+
+    @media(min-width: $bp-screen-md) {
+        width: calc(100% - 30px);
+    }
+
+    @media(min-width: $bp-screen-lg) {
+        width: 100%;
+    }
+}
+
+.certificate-list {
+    @include margin(0, 0, 0, 10px);
+    list-style: none;
+
+    .certificate {
+        display: flex;
+        flex-direction: row;
+        padding: 5px 0 10px;
+    }
+
+    .certificate-link {
+        @include margin-left(20px);
+        color: $black;
+        font: {
+            size: 1.1em;
+            weight: 600;
+        }
+
+        @media(min-width: $bp-screen-md) {
+            font-size: 0.9em;
+        }
+
+        @media(min-width: $bp-screen-lg) {
+            font-size: 1.1em;
+        }
+
+        &:active,
+        &:focus,
+        &:hover {
+            .sample-cert {
+                border-color: $blue-d1;
+            }
+        }
+    }
+    
+    .sample-cert {
+        width: 120px;
+        border: 3px solid $gray-l3;
+        border-radius: 5px;
+
+        .expired-notification {
+            display: inline-block;
+            padding-top: 5px;
+            width: 300px;
+
+            @media(min-width: $bp-screen-sm) {
+                padding-top: 10px;
+                width: 500px;
+            }
+            @media(min-width: $bp-screen-md) {
+                width: initial;
+            }
+        }
+
+        .expired-icon {
+            @include float(left);
+            color: palette(primary, dark);
+        }
+
+        .expired-text {
+            overflow: hidden;
+            padding-left: 10px;
+        }
+
+        @media(min-width: $bp-screen-md) {
+            width: 100px;
+        }
+
+        @media(min-width: $bp-screen-lg) {
+            width: 120px;
+        }
     }
 }

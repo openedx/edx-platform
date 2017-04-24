@@ -3,6 +3,7 @@ Bok choy acceptance and a11y tests for problem types in the LMS
 
 See also lettuce tests in lms/djangoapps/courseware/features/problems.feature
 """
+import ddt
 import random
 import textwrap
 
@@ -84,12 +85,14 @@ class ProblemTypeTestBase(ProblemsTest, EventsTestMixin):
 
     problem_name = None
     problem_type = None
+    problem_points = 1
     factory = None
     factory_kwargs = {}
     status_indicators = {
         'correct': ['span.correct'],
         'incorrect': ['span.incorrect'],
         'unanswered': ['span.unanswered'],
+        'submitted': ['span.submitted'],
     }
 
     def setUp(self):
@@ -99,6 +102,10 @@ class ProblemTypeTestBase(ProblemsTest, EventsTestMixin):
         super(ProblemTypeTestBase, self).setUp()
         self.courseware_page.visit()
         self.problem_page = ProblemPage(self.browser)
+
+    def get_sequential(self):
+        """ Allow any class in the inheritance chain to customize subsection metadata."""
+        return XBlockFixtureDesc('sequential', 'Test Subsection', metadata=getattr(self, 'sequential_metadata', {}))
 
     def get_problem(self):
         """
@@ -117,7 +124,7 @@ class ProblemTypeTestBase(ProblemsTest, EventsTestMixin):
         Waits for the expected status indicator.
 
         Args:
-            status: one of ("correct", "incorrect", "unanswered)
+            status: one of ("correct", "incorrect", "unanswered", "submitted")
         """
         msg = "Wait for status to be {}".format(status)
         selector = ', '.join(self.status_indicators[status])
@@ -381,12 +388,83 @@ class ProblemTypeTestMixin(ProblemTypeA11yTestMixin):
         self.problem_page.wait_partial_notification()
 
 
-class AnnotationProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
+@ddt.ddt
+class ProblemNeverShowCorrectnessMixin(object):
     """
-    TestCase Class for Annotation Problem Type
+    Tests the effect of adding `show_correctness: never` to the sequence metadata
+    for subclasses of ProblemTypeTestMixin.
+    """
+    sequential_metadata = {'show_correctness': 'never'}
+
+    @attr(shard=7)
+    @ddt.data('correct', 'incorrect', 'partially-correct')
+    def test_answer_says_submitted(self, correctness):
+        """
+        Scenario: I can answer a problem <Correctness>ly
+        Given External graders respond "<Correctness>"
+        And I am viewing a "<ProblemType>" problem
+        in a subsection with show_correctness set to "never"
+        Then I should see a score of "N point(s) possible (ungraded, results hidden)"
+        When I answer a "<ProblemType>" problem "<Correctness>ly"
+        And the "<ProblemType>" problem displays only a "submitted" notification.
+        And I should see a score of "N point(s) possible (ungraded, results hidden)"
+        And a "problem_check" server event is emitted
+        And a "problem_check" browser event is emitted
+        """
+
+        # Not all problems have partially correct solutions configured
+        if correctness == 'partially-correct' and not self.partially_correct:
+            raise SkipTest("Test incompatible with the current problem type")
+
+        # Problem progress text depends on points possible
+        possible = 'possible (ungraded, results hidden)'
+        if self.problem_points == 1:
+            problem_progress = '1 point {}'.format(possible)
+        else:
+            problem_progress = '{} points {}'.format(self.problem_points, possible)
+
+        # Make sure we're looking at the right problem
+        self.problem_page.wait_for(
+            lambda: self.problem_page.problem_name == self.problem_name,
+            "Make sure the correct problem is on the page"
+        )
+
+        # Learner can see that score will be hidden prior to submitting answer
+        self.assertEqual(self.problem_page.problem_progress_graded_value, problem_progress)
+
+        # Answer the problem correctly
+        self.answer_problem(correctness=correctness)
+        self.problem_page.click_submit()
+        self.wait_for_status('submitted')
+        self.problem_page.wait_submitted_notification()
+
+        # Score is still hidden after submitting answer
+        self.assertEqual(self.problem_page.problem_progress_graded_value, problem_progress)
+
+        # Check for corresponding tracking event
+        expected_events = [
+            {
+                'event_source': 'server',
+                'event_type': 'problem_check',
+                'username': self.username,
+            }, {
+                'event_source': 'browser',
+                'event_type': 'problem_check',
+                'username': self.username,
+            },
+        ]
+
+        for event in expected_events:
+            self.wait_for_events(event_filter=event, number_of_matches=1)
+
+
+class AnnotationProblemTypeBase(ProblemTypeTestBase):
+    """
+    ProblemTypeTestBase specialization for Annotation Problem Type
     """
     problem_name = 'ANNOTATION TEST PROBLEM'
     problem_type = 'annotationresponse'
+    problem_points = 2
 
     factory = AnnotationResponseXMLFactory()
     partially_correct = True
@@ -411,13 +489,14 @@ class AnnotationProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         'incorrect': ['span.incorrect'],
         'partially-correct': ['span.partially-correct'],
         'unanswered': ['span.unanswered'],
+        'submitted': ['span.submitted'],
     }
 
     def setUp(self, *args, **kwargs):
         """
-        Additional setup for AnnotationProblemTypeTest
+        Additional setup for AnnotationProblemTypeBase
         """
-        super(AnnotationProblemTypeTest, self).setUp(*args, **kwargs)
+        super(AnnotationProblemTypeBase, self).setUp(*args, **kwargs)
 
         self.problem_page.a11y_audit.config.set_rules({
             "ignore": [
@@ -443,9 +522,23 @@ class AnnotationProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         ).nth(choice).click()
 
 
-class CheckboxProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
+class AnnotationProblemTypeTest(AnnotationProblemTypeBase, ProblemTypeTestMixin):
     """
-    TestCase Class for Checkbox Problem Type
+    Standard tests for the Annotation Problem Type
+    """
+    pass
+
+
+class AnnotationProblemTypeNeverShowCorrectnessTest(AnnotationProblemTypeBase, ProblemNeverShowCorrectnessMixin):
+    """
+    Ensure that correctness can be withheld for Annotation Problem Type problems.
+    """
+    pass
+
+
+class CheckboxProblemTypeBase(ProblemTypeTestBase):
+    """
+    ProblemTypeTestBase specialization Checkbox Problem Type
     """
     problem_name = 'CHECKBOX TEST PROBLEM'
     problem_type = 'checkbox'
@@ -462,12 +555,6 @@ class CheckboxProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         'explanation_text': 'This is explanation text'
     }
 
-    def setUp(self, *args, **kwargs):
-        """
-        Additional setup for CheckboxProblemTypeTest
-        """
-        super(CheckboxProblemTypeTest, self).setUp(*args, **kwargs)
-
     def answer_problem(self, correctness):
         """
         Answer checkbox problem.
@@ -481,6 +568,11 @@ class CheckboxProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
             self.problem_page.click_choice("choice_1")
             self.problem_page.click_choice("choice_3")
 
+
+class CheckboxProblemTypeTest(CheckboxProblemTypeBase, ProblemTypeTestMixin):
+    """
+    Standard tests for the Checkbox Problem Type
+    """
     @attr(shard=7)
     def test_can_show_answer(self):
         """
@@ -498,9 +590,16 @@ class CheckboxProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         self.problem_page.wait_for_show_answer_notification()
 
 
-class MultipleChoiceProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
+class CheckboxProblemTypeNeverShowCorrectnessTest(CheckboxProblemTypeBase, ProblemNeverShowCorrectnessMixin):
     """
-    TestCase Class for Multiple Choice Problem Type
+    Ensure that correctness can be withheld for Checkbox Problem Type problems.
+    """
+    pass
+
+
+class MultipleChoiceProblemTypeBase(ProblemTypeTestBase):
+    """
+    ProblemTypeTestBase specialization Multiple Choice Problem Type
     """
     problem_name = 'MULTIPLE CHOICE TEST PROBLEM'
     problem_type = 'multiple choice'
@@ -518,13 +617,8 @@ class MultipleChoiceProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         'correct': ['label.choicegroup_correct'],
         'incorrect': ['label.choicegroup_incorrect', 'span.incorrect'],
         'unanswered': ['span.unanswered'],
+        'submitted': ['label.choicegroup_submitted', 'span.submitted'],
     }
-
-    def setUp(self, *args, **kwargs):
-        """
-        Additional setup for MultipleChoiceProblemTypeTest
-        """
-        super(MultipleChoiceProblemTypeTest, self).setUp(*args, **kwargs)
 
     def answer_problem(self, correctness):
         """
@@ -535,6 +629,11 @@ class MultipleChoiceProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         else:
             self.problem_page.click_choice("choice_choice_2")
 
+
+class MultipleChoiceProblemTypeTest(MultipleChoiceProblemTypeBase, ProblemTypeTestMixin):
+    """
+    Standard tests for the Multiple Choice Problem Type
+    """
     @attr(shard=7)
     def test_can_show_answer(self):
         """
@@ -565,9 +664,17 @@ class MultipleChoiceProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         self.problem_page.wait_for_show_answer_notification()
 
 
-class RadioProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
+class MultipleChoiceProblemTypeNeverShowCorrectnessTest(MultipleChoiceProblemTypeBase,
+                                                        ProblemNeverShowCorrectnessMixin):
     """
-    TestCase Class for Radio Problem Type
+    Ensure that correctness can be withheld for Multiple Choice Problem Type problems.
+    """
+    pass
+
+
+class RadioProblemTypeBase(ProblemTypeTestBase):
+    """
+    ProblemTypeTestBase specialization for Radio Problem Type
     """
     problem_name = 'RADIO TEST PROBLEM'
     problem_type = 'radio'
@@ -586,13 +693,8 @@ class RadioProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         'correct': ['label.choicegroup_correct'],
         'incorrect': ['label.choicegroup_incorrect', 'span.incorrect'],
         'unanswered': ['span.unanswered'],
+        'submitted': ['label.choicegroup_submitted', 'span.submitted'],
     }
-
-    def setUp(self, *args, **kwargs):
-        """
-        Additional setup for RadioProblemTypeTest
-        """
-        super(RadioProblemTypeTest, self).setUp(*args, **kwargs)
 
     def answer_problem(self, correctness):
         """
@@ -604,9 +706,23 @@ class RadioProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
             self.problem_page.click_choice("choice_1")
 
 
-class DropDownProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
+class RadioProblemTypeTest(RadioProblemTypeBase, ProblemTypeTestMixin):
     """
-    TestCase Class for Drop Down Problem Type
+    Standard tests for the Multiple Radio Problem Type
+    """
+    pass
+
+
+class RadioProblemTypeNeverShowCorrectnessTest(RadioProblemTypeBase, ProblemNeverShowCorrectnessMixin):
+    """
+    Ensure that correctness can be withheld for Radio Problem Type problems.
+    """
+    pass
+
+
+class DropDownProblemTypeBase(ProblemTypeTestBase):
+    """
+    ProblemTypeTestBase specialization for Drop Down Problem Type
     """
     problem_name = 'DROP DOWN TEST PROBLEM'
     problem_type = 'drop down'
@@ -621,12 +737,6 @@ class DropDownProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         'correct_option': 'Option 2'
     }
 
-    def setUp(self, *args, **kwargs):
-        """
-        Additional setup for DropDownProblemTypeTest
-        """
-        super(DropDownProblemTypeTest, self).setUp(*args, **kwargs)
-
     def answer_problem(self, correctness):
         """
         Answer drop down problem.
@@ -637,9 +747,23 @@ class DropDownProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         select_option_by_text(selector_element, answer)
 
 
-class StringProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
+class DropDownProblemTypeTest(DropDownProblemTypeBase, ProblemTypeTestMixin):
     """
-    TestCase Class for String Problem Type
+    Standard tests for the Multiple Radio Problem Type
+    """
+    pass
+
+
+class DropDownProblemTypeNeverShowCorrectnessTest(DropDownProblemTypeBase, ProblemNeverShowCorrectnessMixin):
+    """
+    Ensure that correctness can be withheld for Drop Down Problem Type problems.
+    """
+    pass
+
+
+class StringProblemTypeBase(ProblemTypeTestBase):
+    """
+    ProblemTypeTestBase specialization for String Problem Type
     """
     problem_name = 'STRING TEST PROBLEM'
     problem_type = 'string'
@@ -658,13 +782,8 @@ class StringProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         'correct': ['div.correct'],
         'incorrect': ['div.incorrect'],
         'unanswered': ['div.unanswered', 'div.unsubmitted'],
+        'submitted': ['span.submitted'],
     }
-
-    def setUp(self, *args, **kwargs):
-        """
-        Additional setup for StringProblemTypeTest
-        """
-        super(StringProblemTypeTest, self).setUp(*args, **kwargs)
 
     def answer_problem(self, correctness):
         """
@@ -674,9 +793,23 @@ class StringProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         self.problem_page.fill_answer(textvalue)
 
 
-class NumericalProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
+class StringProblemTypeTest(StringProblemTypeBase, ProblemTypeTestMixin):
     """
-    TestCase Class for Numerical Problem Type
+    Standard tests for the String Problem Type
+    """
+    pass
+
+
+class StringProblemTypeNeverShowCorrectnessTest(StringProblemTypeBase, ProblemNeverShowCorrectnessMixin):
+    """
+    Ensure that correctness can be withheld for String Problem Type problems.
+    """
+    pass
+
+
+class NumericalProblemTypeBase(ProblemTypeTestBase):
+    """
+    ProblemTypeTestBase specialization for Numerical Problem Type
     """
     problem_name = 'NUMERICAL TEST PROBLEM'
     problem_type = 'numerical'
@@ -695,13 +828,8 @@ class NumericalProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         'correct': ['div.correct'],
         'incorrect': ['div.incorrect'],
         'unanswered': ['div.unanswered', 'div.unsubmitted'],
+        'submitted': ['div.submitted'],
     }
-
-    def setUp(self, *args, **kwargs):
-        """
-        Additional setup for NumericalProblemTypeTest
-        """
-        super(NumericalProblemTypeTest, self).setUp(*args, **kwargs)
 
     def answer_problem(self, correctness):
         """
@@ -716,6 +844,11 @@ class NumericalProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
             textvalue = str(random.randint(-2, 2))
         self.problem_page.fill_answer(textvalue)
 
+
+class NumericalProblemTypeTest(NumericalProblemTypeBase, ProblemTypeTestMixin):
+    """
+    Standard tests for the Numerical Problem Type
+    """
     def test_error_input_gentle_alert(self):
         """
         Scenario: I can answer a problem with erroneous input and will see a gentle alert
@@ -741,9 +874,16 @@ class NumericalProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         self.problem_page.wait_for_focus_on_problem_meta()
 
 
-class FormulaProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
+class NumericalProblemTypeNeverShowCorrectnessTest(NumericalProblemTypeBase, ProblemNeverShowCorrectnessMixin):
     """
-    TestCase Class for Formula Problem Type
+    Ensure that correctness can be withheld for Numerical Problem Type problems.
+    """
+    pass
+
+
+class FormulaProblemTypeBase(ProblemTypeTestBase):
+    """
+    ProblemTypeTestBase specialization for Formula Problem Type
     """
     problem_name = 'FORMULA TEST PROBLEM'
     problem_type = 'formula'
@@ -764,13 +904,8 @@ class FormulaProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         'correct': ['div.correct'],
         'incorrect': ['div.incorrect'],
         'unanswered': ['div.unanswered', 'div.unsubmitted'],
+        'submitted': ['div.submitted'],
     }
-
-    def setUp(self, *args, **kwargs):
-        """
-        Additional setup for FormulaProblemTypeTest
-        """
-        super(FormulaProblemTypeTest, self).setUp(*args, **kwargs)
 
     def answer_problem(self, correctness):
         """
@@ -780,12 +915,27 @@ class FormulaProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         self.problem_page.fill_answer(textvalue)
 
 
-class ScriptProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
+class FormulaProblemTypeTest(FormulaProblemTypeBase, ProblemTypeTestMixin):
     """
-    TestCase Class for Script Problem Type
+    Standard tests for the Formula Problem Type
+    """
+    pass
+
+
+class FormulaProblemTypeNeverShowCorrectnessTest(FormulaProblemTypeBase, ProblemNeverShowCorrectnessMixin):
+    """
+    Ensure that correctness can be withheld for Formula Problem Type problems.
+    """
+    pass
+
+
+class ScriptProblemTypeBase(ProblemTypeTestBase):
+    """
+    ProblemTypeTestBase specialization for Script Problem Type
     """
     problem_name = 'SCRIPT TEST PROBLEM'
     problem_type = 'script'
+    problem_points = 2
     partially_correct = False
 
     factory = CustomResponseXMLFactory()
@@ -811,13 +961,8 @@ class ScriptProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         'correct': ['div.correct'],
         'incorrect': ['div.incorrect'],
         'unanswered': ['div.unanswered', 'div.unsubmitted'],
+        'submitted': ['div.submitted'],
     }
-
-    def setUp(self, *args, **kwargs):
-        """
-        Additional setup for ScriptProblemTypeTest
-        """
-        super(ScriptProblemTypeTest, self).setUp(*args, **kwargs)
 
     def answer_problem(self, correctness):
         """
@@ -834,6 +979,20 @@ class ScriptProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
 
         self.problem_page.fill_answer(first_addend, input_num=0)
         self.problem_page.fill_answer(second_addend, input_num=1)
+
+
+class ScriptProblemTypeTest(ScriptProblemTypeBase, ProblemTypeTestMixin):
+    """
+    Standard tests for the Script Problem Type
+    """
+    pass
+
+
+class ScriptProblemTypeNeverShowCorrectnessTest(ScriptProblemTypeBase, ProblemNeverShowCorrectnessMixin):
+    """
+    Ensure that correctness can be withheld for Script Problem Type problems.
+    """
+    pass
 
 
 class JSInputTypeTest(ProblemTypeTestBase, ProblemTypeA11yTestMixin):
@@ -859,9 +1018,9 @@ class JSInputTypeTest(ProblemTypeTestBase, ProblemTypeA11yTestMixin):
         raise NotImplementedError()
 
 
-class CodeProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
+class CodeProblemTypeBase(ProblemTypeTestBase):
     """
-    TestCase Class for Code Problem Type
+    ProblemTypeTestBase specialization for Code Problem Type
     """
     problem_name = 'CODE TEST PROBLEM'
     problem_type = 'code'
@@ -879,6 +1038,7 @@ class CodeProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         'correct': ['.grader-status .correct ~ .debug'],
         'incorrect': ['.grader-status .incorrect ~ .debug'],
         'unanswered': ['.grader-status .unanswered ~ .debug'],
+        'submitted': ['.grader-status .submitted ~ .debug'],
     }
 
     def answer_problem(self, correctness):
@@ -895,6 +1055,11 @@ class CodeProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         # (configured in the problem XML above)
         pass
 
+
+class CodeProblemTypeTest(CodeProblemTypeBase, ProblemTypeTestMixin):
+    """
+    Standard tests for the Code Problem Type
+    """
     def test_answer_incorrectly(self):
         """
         Overridden for script test because the testing grader always responds
@@ -924,7 +1089,14 @@ class CodeProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         pass
 
 
-class ChoiceTextProbelmTypeTestBase(ProblemTypeTestBase):
+class CodeProblemTypeNeverShowCorrectnessTest(CodeProblemTypeBase, ProblemNeverShowCorrectnessMixin):
+    """
+    Ensure that correctness can be withheld for Code Problem Type problems.
+    """
+    pass
+
+
+class ChoiceTextProblemTypeTestBase(ProblemTypeTestBase):
     """
     Base class for "Choice + Text" Problem Types.
     (e.g. RadioText, CheckboxText)
@@ -961,9 +1133,9 @@ class ChoiceTextProbelmTypeTestBase(ProblemTypeTestBase):
         self._fill_input_text(input_value, choice)
 
 
-class RadioTextProblemTypeTest(ChoiceTextProbelmTypeTestBase, ProblemTypeTestMixin):
+class RadioTextProblemTypeBase(ChoiceTextProblemTypeTestBase):
     """
-    TestCase Class for Radio Text Problem Type
+    ProblemTypeTestBase specialization for Radio Text Problem Type
     """
     problem_name = 'RADIO TEXT TEST PROBLEM'
     problem_type = 'radio_text'
@@ -986,13 +1158,14 @@ class RadioTextProblemTypeTest(ChoiceTextProbelmTypeTestBase, ProblemTypeTestMix
         'correct': ['section.choicetextgroup_correct'],
         'incorrect': ['section.choicetextgroup_incorrect', 'span.incorrect'],
         'unanswered': ['span.unanswered'],
+        'submitted': ['section.choicetextgroup_submitted', 'span.submitted'],
     }
 
     def setUp(self, *args, **kwargs):
         """
-        Additional setup for RadioTextProblemTypeTest
+        Additional setup for RadioTextProblemTypeBase
         """
-        super(RadioTextProblemTypeTest, self).setUp(*args, **kwargs)
+        super(RadioTextProblemTypeBase, self).setUp(*args, **kwargs)
 
         self.problem_page.a11y_audit.config.set_rules({
             "ignore": [
@@ -1003,9 +1176,23 @@ class RadioTextProblemTypeTest(ChoiceTextProbelmTypeTestBase, ProblemTypeTestMix
         })
 
 
-class CheckboxTextProblemTypeTest(ChoiceTextProbelmTypeTestBase, ProblemTypeTestMixin):
+class RadioTextProblemTypeTest(RadioTextProblemTypeBase, ProblemTypeTestMixin):
     """
-    TestCase Class for Checkbox Text Problem Type
+    Standard tests for the Radio Text Problem Type
+    """
+    pass
+
+
+class RadioTextProblemTypeNeverShowCorrectnessTest(RadioTextProblemTypeBase, ProblemNeverShowCorrectnessMixin):
+    """
+    Ensure that correctness can be withheld for Radio + Text Problem Type problems.
+    """
+    pass
+
+
+class CheckboxTextProblemTypeBase(ChoiceTextProblemTypeTestBase):
+    """
+    ProblemTypeTestBase specialization for Checkbox Text Problem Type
     """
     problem_name = 'CHECKBOX TEXT TEST PROBLEM'
     problem_type = 'checkbox_text'
@@ -1025,9 +1212,9 @@ class CheckboxTextProblemTypeTest(ChoiceTextProbelmTypeTestBase, ProblemTypeTest
 
     def setUp(self, *args, **kwargs):
         """
-        Additional setup for CheckboxTextProblemTypeTest
+        Additional setup for CheckboxTextProblemTypeBase
         """
-        super(CheckboxTextProblemTypeTest, self).setUp(*args, **kwargs)
+        super(CheckboxTextProblemTypeBase, self).setUp(*args, **kwargs)
 
         self.problem_page.a11y_audit.config.set_rules({
             "ignore": [
@@ -1038,9 +1225,23 @@ class CheckboxTextProblemTypeTest(ChoiceTextProbelmTypeTestBase, ProblemTypeTest
         })
 
 
-class ImageProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
+class CheckboxTextProblemTypeTest(CheckboxTextProblemTypeBase, ProblemTypeTestMixin):
     """
-    TestCase Class for Image Problem Type
+    Standard tests for the Checkbox Text Problem Type
+    """
+    pass
+
+
+class CheckboxTextProblemTypeNeverShowCorrectnessTest(CheckboxTextProblemTypeBase, ProblemNeverShowCorrectnessMixin):
+    """
+    Ensure that correctness can be withheld for Checkbox + Text Problem Type problems.
+    """
+    pass
+
+
+class ImageProblemTypeBase(ProblemTypeTestBase):
+    """
+    ProblemTypeTestBase specialization for Image Problem Type
     """
     problem_name = 'IMAGE TEST PROBLEM'
     problem_type = 'image'
@@ -1071,9 +1272,23 @@ class ImageProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         chain.perform()
 
 
-class SymbolicProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
+class ImageProblemTypeTest(ImageProblemTypeBase, ProblemTypeTestMixin):
     """
-    TestCase Class for Symbolic Problem Type
+    Standard tests for the Image Problem Type
+    """
+    pass
+
+
+class ImageProblemTypeNeverShowCorrectnessTest(ImageProblemTypeBase, ProblemNeverShowCorrectnessMixin):
+    """
+    Ensure that correctness can be withheld for Image Problem Type problems.
+    """
+    pass
+
+
+class SymbolicProblemTypeBase(ProblemTypeTestBase):
+    """
+    ProblemTypeTestBase specialization  for Symbolic Problem Type
     """
     problem_name = 'SYMBOLIC TEST PROBLEM'
     problem_type = 'symbolicresponse'
@@ -1090,6 +1305,7 @@ class SymbolicProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         'correct': ['div.capa_inputtype div.correct'],
         'incorrect': ['div.capa_inputtype div.incorrect'],
         'unanswered': ['div.capa_inputtype div.unanswered'],
+        'submitted': ['div.capa_inputtype div.submitted'],
     }
 
     def answer_problem(self, correctness):
@@ -1098,3 +1314,17 @@ class SymbolicProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         """
         choice = "2*x+3*y" if correctness == 'correct' else "3*a+4*b"
         self.problem_page.fill_answer(choice)
+
+
+class SymbolicProblemTypeTest(SymbolicProblemTypeBase, ProblemTypeTestMixin):
+    """
+    Standard tests for the Symbolic Problem Type
+    """
+    pass
+
+
+class SymbolicProblemTypeNeverShowCorrectnessTest(SymbolicProblemTypeBase, ProblemNeverShowCorrectnessMixin):
+    """
+    Ensure that correctness can be withheld for Symbolic Problem Type problems.
+    """
+    pass

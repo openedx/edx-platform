@@ -3,12 +3,8 @@ This file contains all entrance exam related utils/logic.
 """
 
 from courseware.access import has_access
-from courseware.model_data import FieldDataCache, ScoresClient
-from opaque_keys.edx.keys import UsageKey
-from opaque_keys.edx.locator import BlockUsageLocator
 from student.models import EntranceExamConfiguration
 from util.milestones_helpers import get_required_content, is_entrance_exams_enabled
-from util.module_utils import yield_dynamic_descriptor_descendants
 from xmodule.modulestore.django import modulestore
 
 
@@ -59,7 +55,7 @@ def get_entrance_exam_content(user, course):
     """
     Get the entrance exam content information (ie, chapter module)
     """
-    required_content = get_required_content(course, user)
+    required_content = get_required_content(course.id, user)
 
     exam_module = None
     for content in required_content:

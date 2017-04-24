@@ -5,6 +5,7 @@
 
 <%!
 import json
+from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.template.defaultfilters import escapejs
 from django.core.urlresolvers import reverse
@@ -17,28 +18,39 @@ from openedx.core.djangolib.markup import HTML
 <%block name="content">
 <div class="course-view container" id="course-container">
     <header class="page-header has-secondary">
+        <div class="page-header-main">
+            <nav aria-label="${_('Course Outline')}" class="sr-is-focusable" tabindex="-1">
+                <h2 class="hd hd-2 page-title">${_('Course Outline')}</h2>
+            </nav>
+        </div>
         <div class="page-header-secondary">
             <div class="form-actions">
-                <a class="btn action-resume-course" href="${reverse('courseware', kwargs={'course_id': unicode(course.id.to_deprecated_string())})}">
-                    ${_("Resume Course")}
-                </a>
                 <a class="btn action-show-bookmarks" href="${reverse('openedx.course_bookmarks.home', args=[course.id])}">
                     ${_("Bookmarks")}
                 </a>
+                <a class="btn btn-brand action-resume-course" href="${reverse('courseware', kwargs={'course_id': unicode(course.id.to_deprecated_string())})}">
+                    % if has_visited_course:
+                        ${_("Resume Course")}
+                    % else:
+                        ${_("Start Course")}
+                    % endif
+                </a>
             </div>
-            <div class="page-header-search">
-                <form class="search-form" role="search">
-                    <label class="field-label sr-only" for="search" id="search-hint">${_('Search the course')}</label>
-                    <input
-                            class="field-input input-text search-input"
-                            type="search"
-                            name="search"
-                            id="search"
-                            placeholder="${_('Search the course')}'"
-                    />
-                    <button class="btn btn-small search-btn" type="button">${_('Search')}</button>
-                </form>
-            </div>
+            % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
+                <div class="page-header-search">
+                    <form class="search-form" role="search">
+                        <label class="field-label sr-only" for="search" id="search-hint">${_('Search the course')}</label>
+                        <input
+                                class="field-input input-text search-input"
+                                type="search"
+                                name="search"
+                                id="search"
+                                placeholder="${_('Search the course')}"
+                        />
+                        <button class="btn btn-small search-btn" type="button">${_('Search')}</button>
+                    </form>
+                </div>
+            % endif
         </div>
     </header>
     <div class="page-content">

@@ -32,7 +32,7 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
         try:
             return self._config.get_setting(name)
         except KeyError:
-            return self.strategy.setting(name, default)
+            return self.strategy.setting(name, default, backend=self)
 
     def auth_url(self):
         """

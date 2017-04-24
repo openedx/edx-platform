@@ -157,6 +157,12 @@
                         $label = $form.find('label[for=' + $el.attr('id') + ']');
                         key = $el.attr('name') || false;
 
+                        // Due to a bug in firefox, whitespaces in email type field are not removed.
+                        // TODO: Remove this code once firefox bug is resolved.
+                        if (key === 'email') {
+                            $el.val($el.val().trim());
+                        }
+
                         if (key) {
                             test = this.validate(elements[i]);
                             if (test.isValid) {

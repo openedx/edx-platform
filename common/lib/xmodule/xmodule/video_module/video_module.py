@@ -24,6 +24,7 @@ from pkg_resources import resource_string
 from django.conf import settings
 
 from openedx.core.lib.cache_utils import memoize_in_request_cache
+from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag
 from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.runtime import KvsFieldData
@@ -124,6 +125,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             resource_string(module, 'js/src/video/01_initialize.js'),
             resource_string(module, 'js/src/video/025_focus_grabber.js'),
             resource_string(module, 'js/src/video/02_html5_video.js'),
+            resource_string(module, 'js/src/video/02_html5_hls_video.js'),
             resource_string(module, 'js/src/video/03_video_player.js'),
             resource_string(module, 'js/src/video/035_video_accessible_menu.js'),
             resource_string(module, 'js/src/video/04_video_control.js'),
@@ -216,7 +218,10 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         # stream.
         if self.edx_video_id and edxval_api:
             try:
-                val_profiles = ["youtube", "desktop_webm", "desktop_mp4", "hls"]
+                val_profiles = ["youtube", "desktop_webm", "desktop_mp4"]
+
+                if HLSPlaybackEnabledFlag.feature_enabled(self.course_id):
+                    val_profiles.append('hls')
 
                 # strip edx_video_id to prevent ValVideoNotFoundError error if unwanted spaces are there. TNL-5769
                 val_video_urls = edxval_api.get_urls_for_profiles(self.edx_video_id.strip(), val_profiles)

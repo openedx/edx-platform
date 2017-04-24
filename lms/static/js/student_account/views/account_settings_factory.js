@@ -229,12 +229,12 @@
                         }
                         return {
                             'view': new AccountSettingsFieldViews.OrderHistoryFieldView({
-                                title: order.title,
                                 totalPrice: order.price,
                                 orderId: order.number,
                                 orderDate: order.order_date,
                                 receiptUrl: order.receipt_url,
-                                valueAttribute: 'order-' + orderNumber
+                                valueAttribute: 'order-' + orderNumber,
+                                lines: order.lines
                             })
                         };
                     })

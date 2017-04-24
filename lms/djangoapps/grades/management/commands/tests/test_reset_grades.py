@@ -81,7 +81,7 @@ class TestResetGrades(TestCase):
             "earned_graded": 6.0,
             "possible_graded": 8.0,
             "visible_blocks": MagicMock(),
-            "attempted": True,
+            "first_attempted": datetime.now(),
         }
 
         for course_key in courses_keys:

@@ -13,6 +13,7 @@ from tempfile import NamedTemporaryFile, mkdtemp
 
 from celery.task import task
 from celery.utils.log import get_task_logger
+from organizations.models import OrganizationCourse
 from path import Path as path
 from pytz import UTC
 from six import iteritems, text_type
@@ -37,6 +38,7 @@ from course_action_state.models import CourseRerunState
 from models.settings.course_metadata import CourseMetadata
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
+from openedx.core.djangoapps.embargo.models import RestrictedCourse, CountryAccessRule
 from openedx.core.lib.extract_tar import safetar_extractall
 from student.auth import has_course_author_access
 from xmodule.contentstore.django import contentstore
@@ -52,6 +54,28 @@ from xmodule.modulestore.xml_importer import import_course_from_xml, import_libr
 LOGGER = get_task_logger(__name__)
 FILE_READ_CHUNK = 1024  # bytes
 FULL_COURSE_REINDEX_THRESHOLD = 1
+
+
+def clone_instance(instance, field_values):
+    """ Clones a Django model instance.
+
+    The specified fields are replaced with new values.
+
+    Arguments:
+        instance (Model): Instance of a Django model.
+        field_values (dict): Map of field names to new values.
+
+    Returns:
+        Model: New instance.
+    """
+    instance.pk = None
+
+    for field, value in iteritems(field_values):
+        setattr(instance, field, value)
+
+    instance.save()
+
+    return instance
 
 
 @task()
@@ -82,6 +106,21 @@ def rerun_course(source_course_key_string, destination_course_key_string, user_i
 
         # call edxval to attach videos to the rerun
         copy_course_videos(source_course_key, destination_course_key)
+
+        # Copy OrganizationCourse
+        organization_course = OrganizationCourse.objects.filter(course_id=source_course_key_string).first()
+
+        if organization_course:
+            clone_instance(organization_course, {'course_id': destination_course_key_string})
+
+        # Copy RestrictedCourse
+        restricted_course = RestrictedCourse.objects.filter(course_key=source_course_key).first()
+
+        if restricted_course:
+            country_access_rules = CountryAccessRule.objects.filter(restricted_course=restricted_course)
+            new_restricted_course = clone_instance(restricted_course, {'course_key': destination_course_key})
+            for country_access_rule in country_access_rules:
+                clone_instance(country_access_rule, {'restricted_course': new_restricted_course})
 
         return "succeeded"
 

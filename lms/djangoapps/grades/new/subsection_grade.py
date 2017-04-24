@@ -41,28 +41,16 @@ class SubsectionGradeBase(object):
         """
         return self.locations_to_scores.values()
 
-    @property
-    def attempted(self):
-        """
-        Returns whether any problem in this subsection
-        was attempted by the student.
-        """
-
-        assert self.all_total is not None, (
-            "SubsectionGrade not fully populated yet.  Call init_from_structure or init_from_model "
-            "before use."
-        )
-        return self.all_total.attempted
-
 
 class ZeroSubsectionGrade(SubsectionGradeBase):
     """
     Class for Subsection Grades with Zero values.
     """
+
     def __init__(self, subsection, course_data):
         super(ZeroSubsectionGrade, self).__init__(subsection)
-        self.graded_total = AggregatedScore(tw_earned=0, tw_possible=None, graded=False, attempted=False)
-        self.all_total = AggregatedScore(tw_earned=0, tw_possible=None, graded=self.graded, attempted=False)
+        self.graded_total = AggregatedScore(tw_earned=0, tw_possible=None, graded=False, first_attempted=None)
+        self.all_total = AggregatedScore(tw_earned=0, tw_possible=None, graded=self.graded, first_attempted=None)
         self.course_data = course_data
 
     @lazy
@@ -118,13 +106,13 @@ class SubsectionGrade(SubsectionGradeBase):
             tw_earned=model.earned_graded,
             tw_possible=model.possible_graded,
             graded=True,
-            attempted=model.first_attempted is not None,
+            first_attempted=model.first_attempted,
         )
         self.all_total = AggregatedScore(
             tw_earned=model.earned_all,
             tw_possible=model.possible_all,
             graded=False,
-            attempted=model.first_attempted is not None,
+            first_attempted=model.first_attempted,
         )
         self._log_event(log.debug, u"init_from_model", student)
         return self
@@ -162,7 +150,7 @@ class SubsectionGrade(SubsectionGradeBase):
         Returns whether the SubsectionGrade's model should be
         persisted based on settings and attempted status.
         """
-        return not waffle().is_enabled(WRITE_ONLY_IF_ENGAGED) or self.attempted
+        return not waffle().is_enabled(WRITE_ONLY_IF_ENGAGED) or self.all_total.first_attempted is not None
 
     def _compute_block_score(
             self,
@@ -209,7 +197,7 @@ class SubsectionGrade(SubsectionGradeBase):
             earned_graded=self.graded_total.earned,
             possible_graded=self.graded_total.possible,
             visible_blocks=self._get_visible_blocks,
-            attempted=self.attempted
+            first_attempted=self.all_total.first_attempted,
         )
 
     @property

@@ -13,6 +13,8 @@ class ProgramsApiConfig(ConfigurationModel):
 
     A rename to ProgramsConfig would be more accurate, but costly in terms of developer time.
     """
+    class Meta(object):
+        app_label = "programs"
 
     marketing_path = models.CharField(
         max_length=255,

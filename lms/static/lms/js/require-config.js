@@ -108,7 +108,8 @@
             'handlebars': 'js/vendor/ova/catch/js/handlebars-1.1.2',
             'tinymce': 'js/vendor/tinymce/js/tinymce/tinymce.full.min',
             'jquery.tinymce': 'js/vendor/tinymce/js/tinymce/jquery.tinymce.min',
-            'picturefill': 'common/js/vendor/picturefill'
+            'picturefill': 'common/js/vendor/picturefill',
+            'hls': 'common/js/vendor/hls'
             // end of files needed by OVA
         },
         shim: {
@@ -224,6 +225,9 @@
             // global namespace instead of being registered in require.
             'draggabilly': {
                 exports: 'Draggabilly'
+            },
+            'hls': {
+                exports: 'Hls'
             }
         }
     });

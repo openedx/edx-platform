@@ -30,6 +30,7 @@ from track.event_transaction_utils import (
 from util.date_utils import from_timestamp
 from xmodule.modulestore.django import modulestore
 
+from .config.waffle import waffle, ESTIMATE_FIRST_ATTEMPTED
 from .constants import ScoreDatabaseTableEnum
 from .new.subsection_grade_factory import SubsectionGradeFactory
 from .new.course_grade_factory import CourseGradeFactory
@@ -61,7 +62,36 @@ class _BaseTask(PersistOnFailureTask, LoggedTask):  # pylint: disable=abstract-m
 
 
 @task(base=_BaseTask)
-def compute_grades_for_course(course_key, offset, batch_size):
+def compute_grades_for_course_v2(course_key, offset, batch_size, **kwargs):
+    """
+    Compute grades for a set of students in the specified course.
+
+    The set of students will be determined by the order of enrollment date, and
+    limited to at most <batch_size> students, starting from the specified
+    offset.
+
+    TODO: Roll this back into compute_grades_for_course once all workers have
+    the version with **kwargs.
+
+    Sets the ESTIMATE_FIRST_ATTEMPTED flag, then calls the original task as a
+    synchronous function.
+
+    estimate_first_attempted:
+        controls whether to unconditionally set the ESTIMATE_FIRST_ATTEMPTED
+        waffle switch.  If false or not provided, use the global value of
+        the ESTIMATE_FIRST_ATTEMPTED waffle switch.
+    """
+    course_key = kwargs.pop('course_key')
+    offset = kwargs.pop('offset')
+    batch_size = kwargs.pop('batch_size')
+    estimate_first_attempted = kwargs.pop('estimate_first_attempted', False)
+    if estimate_first_attempted:
+        waffle().override_for_request(ESTIMATE_FIRST_ATTEMPTED, True)
+    return compute_grades_for_course(course_key, offset, batch_size)
+
+
+@task(base=_BaseTask)
+def compute_grades_for_course(course_key, offset, batch_size, **kwargs):  # pylint: disable=unused-argument
     """
     Compute grades for a set of students in the specified course.
 

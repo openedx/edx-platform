@@ -21,7 +21,11 @@
       .section-name {
         @include margin(0, 0, ($baseline / 2), ($baseline / 2));
         padding: 0;
-        font-weight: bold;
+
+        h3 {
+          font-weight: bold;
+          margin: 0;
+        }
       }
 
       .outline-item {
@@ -35,17 +39,39 @@
           list-style-type: none;
 
           a.outline-item {
-            display: block;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             padding: ($baseline / 2);
+
+            .subsection-title {
+              margin: 0;
+            }
 
             &:hover {
               background-color: palette(primary, x-back);
-              text-decoration: none;
+              border-radius: $btn-border-radius;
+            }
+
+            .subsection-text {
+              .details {
+                font-size: $body-font-size;
+                color: $lms-gray;
+                font-style: italic;
+              }
+            }
+
+            .subsection-actions {
+              .resume-right {
+                position: relative;
+                top: calc(50% - (#{$baseline} / 2));
+              }
             }
           }
 
           &.current {
             border: 1px solid $lms-active-color;
+            border-radius: $btn-border-radius;
 
             .resume-right {
               @include float(right);

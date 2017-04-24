@@ -62,9 +62,10 @@ from openedx.core.djangolib.markup import HTML, Text
 </%block>
 
 <div class="dashboard-notifications" tabindex="-1">
-    %if message:
+
+    %if banner_account_activation_message:
         <div class="dashboard-banner">
-            ${message | n, decode.utf8}
+            ${banner_account_activation_message | n, decode.utf8}
         </div>
     %endif
 
@@ -136,6 +137,12 @@ from openedx.core.djangolib.markup import HTML, Text
           </div>
         % endif
     </div>
+
+      %if sidebar_account_activation_message:
+        <div class="sidebar-notification">
+          ${sidebar_account_activation_message | n, decode.utf8}
+        </div>
+      %endif
 
       % if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
         <div id="dashboard-search-bar" class="search-bar dashboard-search-bar" role="search" aria-label="Dashboard">

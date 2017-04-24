@@ -613,6 +613,15 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
     def setUp(self):
         super(GroupConfigurationsUsageInfoTestCase, self).setUp()
 
+    def _get_user_partition(self, scheme):
+        """
+        Returns the first user partition with the specified scheme.
+        """
+        for group in GroupConfiguration.get_all_user_partition_details(self.store, self.course):
+            if group['scheme'] == scheme:
+                return group
+        return None
+
     def _get_expected_content_group(self, usage_for_group):
         """
         Returns the expected configuration with particular usage.
@@ -637,7 +646,7 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
         Test that right data structure will be created if content group is not used.
         """
         self._add_user_partitions(scheme_id='cohort')
-        actual = GroupConfiguration.get_or_create_content_group(self.store, self.course)
+        actual = self._get_user_partition('cohort')
         expected = self._get_expected_content_group(usage_for_group=[])
         self.assertEqual(actual, expected)
 
@@ -650,7 +659,7 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
             cid=0, group_id=1, name_suffix='0', special_characters=u"JOSÉ ANDRÉS"
         )
 
-        actual = GroupConfiguration.get_or_create_content_group(self.store, self.course)
+        actual = self._get_user_partition('cohort')
         expected = self._get_expected_content_group(
             usage_for_group=[
                 {
@@ -669,7 +678,7 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
         self._add_user_partitions(count=1, scheme_id='cohort')
         vertical, __ = self._create_problem_with_content_group(cid=0, group_id=1, name_suffix='0')
 
-        actual = GroupConfiguration.get_or_create_content_group(self.store, self.course)
+        actual = self._get_user_partition('cohort')
 
         expected = self._get_expected_content_group(usage_for_group=[
             {
@@ -706,7 +715,7 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
             expected = self._get_expected_content_group(usage_for_group=[])
 
         # Get the actual content group information
-        actual = GroupConfiguration.get_or_create_content_group(self.store, self.course)
+        actual = self._get_user_partition('cohort')
 
         # Assert that actual content group information is same as expected one.
         self.assertEqual(actual, expected)
@@ -720,7 +729,7 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
         vertical, __ = self._create_problem_with_content_group(cid=0, group_id=1, name_suffix='0')
         vertical1, __ = self._create_problem_with_content_group(cid=0, group_id=1, name_suffix='1')
 
-        actual = GroupConfiguration.get_or_create_content_group(self.store, self.course)
+        actual = self._get_user_partition('cohort')
 
         expected = self._get_expected_content_group(usage_for_group=[
             {
@@ -927,7 +936,7 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
 
         # This used to cause an exception since the code assumed that
         # only one partition would be available.
-        actual = GroupConfiguration.get_content_groups_usage_info(self.store, self.course)
+        actual = GroupConfiguration.get_partitions_usage_info(self.store, self.course)
         self.assertEqual(actual.keys(), [0])
 
         actual = GroupConfiguration.get_content_groups_items_usage_info(self.store, self.course)

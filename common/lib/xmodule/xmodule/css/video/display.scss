@@ -250,7 +250,7 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
         }
       }
 
-      .video-error {
+      .video-error, .video-hls-error {
         padding: ($baseline / 5);
         background: black;
         color: white !important; // the pattern library headings shim is more scoped
