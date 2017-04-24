@@ -52,8 +52,16 @@ if SENTRY_DSN:
 
     INSTALLED_APPS += ('raven.contrib.django.raven_compat',)
 
-INSTALLED_APPS += ('tiers',)
-MIDDLEWARE_CLASSES += ('organizations.middleware.OrganizationMiddleware', 'tiers.middleware.TierMiddleware',)
+INSTALLED_APPS += (
+    'hijack',
+    'compat',
+    'hijack_admin',
+    'tiers',
+)
+MIDDLEWARE_CLASSES += (
+    'organizations.middleware.OrganizationMiddleware',
+    'tiers.middleware.TierMiddleware',
+)
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
@@ -66,3 +74,6 @@ DATABASES['tiers'] = dj_database_url.parse(TIERS_DATABASE_URL)
 DATABASE_ROUTERS += ['openedx.core.djangoapps.appsembler.sites.routers.TiersDbRouter']
 
 XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5
+
+HIJACK_ALLOW_GET_REQUESTS = True
+HIJACK_LOGOUT_REDIRECT_URL = '/admin/auth/user'

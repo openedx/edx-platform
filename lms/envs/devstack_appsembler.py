@@ -44,7 +44,12 @@ INTERCOM_APP_SECRET = AUTH_TOKENS.get("INTERCOM_APP_SECRET")
 
 EDX_API_KEY = "test"
 
-INSTALLED_APPS += ('tiers',)
+INSTALLED_APPS += (
+    'hijack',
+    'compat',
+    'hijack_admin',
+    'tiers',
+)
 MIDDLEWARE_CLASSES += (
     'organizations.middleware.OrganizationMiddleware',
 #    'tiers.middleware.TierMiddleware',
@@ -80,3 +85,6 @@ CELERY_QUEUES.update(
         if alternate not in CELERY_QUEUES.keys()
     }
 )
+
+HIJACK_ALLOW_GET_REQUESTS = True
+HIJACK_LOGOUT_REDIRECT_URL = '/admin/auth/user'

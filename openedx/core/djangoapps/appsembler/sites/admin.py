@@ -1,3 +1,13 @@
-from django.contrib import admin
+from django.contrib.auth.models import User
+from hijack_admin.admin import HijackUserAdminMixin
+from ratelimitbackend import admin
+from student.admin import UserAdmin
 
-# Register your models here.
+
+class HijackableUserAdmin(UserAdmin, HijackUserAdminMixin):
+    list_display = UserAdmin.list_display + (
+        'hijack_field',
+    )
+
+admin.site.unregister(User)
+admin.site.register(User, HijackableUserAdmin)

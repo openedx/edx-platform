@@ -212,3 +212,7 @@ urlpatterns += (
     url(r'^404$', handler404),
     url(r'^500$', handler500),
 )
+
+urlpatterns += (
+    url(r'^hijack/', include('hijack.urls')),
+)
