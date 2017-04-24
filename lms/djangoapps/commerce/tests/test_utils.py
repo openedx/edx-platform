@@ -11,11 +11,16 @@ from openedx.core.lib.log_utils import audit_log
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from student.tests.factories import UserFactory
 
+TEST_SITE_CONFIGURATION = {
+    'ECOMMERCE_RECEIPT_PAGE_URL': '/checkout/receipt/?order_number='
+}
 
-def update_commerce_config(enabled=False, checkout_page='/test_basket/'):
+
+def update_commerce_config(enabled=False, checkout_page='/test_basket/', receipt_page='/checkout/receipt/'):
     """ Enable / Disable CommerceConfiguration model """
     CommerceConfiguration.objects.create(
         checkout_on_ecommerce_service=enabled,
+        receipt_page=receipt_page,
         single_course_checkout_page=checkout_page,
     )
 
@@ -78,7 +83,7 @@ class EcommerceServiceTests(TestCase):
         """Verify that the proper Receipt page URL is returned."""
         order_number = 'ORDER1'
         url = EcommerceService().get_receipt_page_url(order_number)
-        expected_url = 'http://ecommerce_url/checkout/receipt/?order_number={}'.format(order_number)
+        expected_url = '/checkout/receipt/{}'.format(order_number)
         self.assertEqual(url, expected_url)
 
     @override_settings(ECOMMERCE_PUBLIC_URL_ROOT='http://ecommerce_url')
@@ -87,3 +92,19 @@ class EcommerceServiceTests(TestCase):
         url = EcommerceService().checkout_page_url(self.SKU)
         expected_url = 'http://ecommerce_url/test_basket/?sku={}'.format(self.SKU)
         self.assertEqual(url, expected_url)
+
+    @override_settings(ECOMMERCE_PUBLIC_URL_ROOT='http://ecommerce_url')
+    @with_site_configuration(configuration=TEST_SITE_CONFIGURATION)
+    def test_get_receipt_page_url_with_site_configuration(self):
+        order_number = 'ORDER1'
+        config = CommerceConfiguration.current()
+        config.use_ecommerce_receipt_page = True
+        config.save()
+
+        receipt_page_url = EcommerceService().get_receipt_page_url(order_number)
+        expected_url = '{ecommerce_root}{receipt_page_url}{order_number}'.format(
+            ecommerce_root=settings.ECOMMERCE_PUBLIC_URL_ROOT,
+            order_number=order_number,
+            receipt_page_url=TEST_SITE_CONFIGURATION['ECOMMERCE_RECEIPT_PAGE_URL']
+        )
+        self.assertEqual(receipt_page_url, expected_url)
