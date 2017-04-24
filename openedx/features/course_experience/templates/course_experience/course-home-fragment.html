@@ -65,15 +65,23 @@ from openedx.features.course_experience import UNIFIED_COURSE_EXPERIENCE_FLAG
                     ${HTML(outline_fragment.body_html())}
                 </main>
                 <aside class="layout-col layout-col-a">
-                    <h3 class="hd-6">Course Tools</h3>
-                    <ul class="list-unstyled">
-                        <li>
-                            <a class="action-show-bookmarks" href="${reverse('openedx.course_bookmarks.home', args=[course.id])}">
-                                <span class="icon fa fa-bookmark" aria-hidden="true"></span>
-                                ${_("Bookmarks")}
-                            </a>
-                        </li>
-                    </ul>
+                    <div class="section section-tools">
+                        <h3 class="hd-6">${_("Course Tools")}</h3>
+                        <ul class="list-unstyled">
+                            <li>
+                                <a class="action-show-bookmarks" href="${reverse('openedx.course_bookmarks.home', args=[course.id])}">
+                                    <span class="icon fa fa-bookmark" aria-hidden="true"></span>
+                                    ${_("Bookmarks")}
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    % if handouts_html:
+                        <div class="section section-handouts">
+                            <h3 class="hd-6">${_("Course Handouts")}</h3>
+                            ${HTML(handouts_html)}
+                        </div>
+                    % endif
                 </aside>
             </div>
         % else:
