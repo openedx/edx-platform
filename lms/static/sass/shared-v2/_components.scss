@@ -149,3 +149,7 @@
     }
   }
 }
+
+.section:not(:first-child) {
+    margin-top: $baseline;
+}
