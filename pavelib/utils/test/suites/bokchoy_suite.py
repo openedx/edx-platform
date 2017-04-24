@@ -71,15 +71,16 @@ def load_courses(options):
     `test_root/courses/test-example-course/`, options.imports_dir should be
     `test_root/courses/`.
     """
-    if 'imports_dir' in options:
-        msg = colorize('green', "Importing courses from {}...".format(options.imports_dir))
+    imports_dir = options.get('imports_dir')
+    if imports_dir:
+        msg = colorize('green', "Importing courses from {}...".format(imports_dir))
         print msg
 
         sh(
             "DEFAULT_STORE={default_store}"
             " ./manage.py cms --settings=bok_choy import {import_dir}".format(
                 default_store=options.default_store,
-                import_dir=options.imports_dir
+                import_dir=imports_dir
             )
         )
     else:
