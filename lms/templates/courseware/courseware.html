@@ -12,6 +12,7 @@ from django.utils.translation import ugettext as _
 from edxnotes.helpers import is_feature_enabled as is_edxnotes_enabled
 from openedx.core.djangolib.js_utils import js_escaped_string
 from openedx.core.djangolib.markup import HTML
+from openedx.features.course_experience import UNIFIED_COURSE_VIEW_FLAG
 %>
 <%
   include_special_exams = settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and (course.enable_proctored_exams or course.enable_timed_exams)
@@ -157,7 +158,7 @@ ${HTML(fragment.foot_html())}
         <main id="main" tabindex="-1" aria-label="Content">
             <div
               class="path"
-              data-unified-course-view="${'true' if waffle.flag_is_active(request, 'unified_course_view') else 'false'}"
+              data-unified-course-view="${'true' if waffle.flag_is_active(request, UNIFIED_COURSE_VIEW_FLAG) else 'false'}"
             ></div>
             % if getattr(course, 'entrance_exam_enabled') and \
                getattr(course, 'entrance_exam_minimum_score_pct') and \

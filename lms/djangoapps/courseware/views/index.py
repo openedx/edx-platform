@@ -33,6 +33,7 @@ from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.monitoring_utils import set_custom_metrics_for_course_key
 from openedx.features.enterprise_support.api import data_sharing_consent_required
+from openedx.features.course_experience import UNIFIED_COURSE_VIEW_FLAG
 from request_cache.middleware import RequestCache
 from shoppingcart.models import CourseRegistrationCode
 from student.views import is_course_blocked
@@ -338,7 +339,7 @@ class CoursewareIndex(View):
             'disable_optimizely': True,
             'section_title': None,
             'sequence_title': None,
-            'disable_accordion': waffle.flag_is_active(request, 'unified_course_view')
+            'disable_accordion': waffle.flag_is_active(request, UNIFIED_COURSE_VIEW_FLAG),
         }
         table_of_contents = toc_for_course(
             self.effective_user,

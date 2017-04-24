@@ -5,6 +5,8 @@
 
 <%!
 import json
+import waffle
+
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.template.defaultfilters import escapejs
@@ -13,6 +15,7 @@ from django.core.urlresolvers import reverse
 from django_comment_client.permissions import has_permission
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 from openedx.core.djangolib.markup import HTML
+from openedx.features.course_experience import UNIFIED_COURSE_EXPERIENCE_FLAG
 %>
 
 <%block name="content">
@@ -25,9 +28,11 @@ from openedx.core.djangolib.markup import HTML
         </div>
         <div class="page-header-secondary">
             <div class="form-actions">
-                <a class="btn action-show-bookmarks" href="${reverse('openedx.course_bookmarks.home', args=[course.id])}">
-                    ${_("Bookmarks")}
-                </a>
+                % if not waffle.flag_is_active(request, UNIFIED_COURSE_EXPERIENCE_FLAG):
+                    <a class="btn action-show-bookmarks" href="${reverse('openedx.course_bookmarks.home', args=[course.id])}">
+                        ${_("Bookmarks")}
+                    </a>
+                % endif
                 <a class="btn btn-brand action-resume-course" href="${reverse('courseware', kwargs={'course_id': unicode(course.id.to_deprecated_string())})}">
                     % if has_visited_course:
                         ${_("Resume Course")}
@@ -54,7 +59,26 @@ from openedx.core.djangolib.markup import HTML
         </div>
     </header>
     <div class="page-content">
-        ${HTML(outline_fragment.body_html())}
+        % if waffle.flag_is_active(request, UNIFIED_COURSE_EXPERIENCE_FLAG):
+            <div class="layout layout-1q3q">
+                <main class="layout-col layout-col-b">
+                    ${HTML(outline_fragment.body_html())}
+                </main>
+                <aside class="layout-col layout-col-a">
+                    <h3 class="hd-6">Course Tools</h3>
+                    <ul class="list-unstyled">
+                        <li>
+                            <a class="action-show-bookmarks" href="${reverse('openedx.course_bookmarks.home', args=[course.id])}">
+                                <span class="icon fa fa-bookmark" aria-hidden="true"></span>
+                                ${_("Bookmarks")}
+                            </a>
+                        </li>
+                    </ul>
+                </aside>
+            </div>
+        % else:
+            ${HTML(outline_fragment.body_html())}
+        % endif
     </div>
 </div>
 </%block>
