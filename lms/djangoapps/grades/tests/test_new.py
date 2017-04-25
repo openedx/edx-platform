@@ -163,7 +163,7 @@ class TestCourseGradeFactory(GradeTestBase):
             course_id=self.course.id,
             enabled_for_course=course_setting
         ):
-            with patch('lms.djangoapps.grades.models.PersistentCourseGrade.read_course_grade') as mock_read_grade:
+            with patch('lms.djangoapps.grades.models.PersistentCourseGrade.read') as mock_read_grade:
                 grade_factory.create(self.request.user, self.course)
         self.assertEqual(mock_read_grade.called, feature_flag and course_setting)
 

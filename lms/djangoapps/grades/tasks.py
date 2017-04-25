@@ -32,24 +32,17 @@ from xmodule.modulestore.django import modulestore
 
 from .config.waffle import waffle, ESTIMATE_FIRST_ATTEMPTED
 from .constants import ScoreDatabaseTableEnum
+from .exceptions import DatabaseNotReadyError
 from .new.subsection_grade_factory import SubsectionGradeFactory
 from .new.course_grade_factory import CourseGradeFactory
 from .signals.signals import SUBSECTION_SCORE_CHANGED
 from .transformer import GradesTransformer
 
 
-class DatabaseNotReadyError(IOError):
-    """
-    Subclass of IOError to indicate the database has not yet committed
-    the data we're trying to find.
-    """
-    pass
-
-
 KNOWN_RETRY_ERRORS = (  # Errors we expect occasionally, should be resolved on retry
     DatabaseError,
     ValidationError,
-    DatabaseNotReadyError
+    DatabaseNotReadyError,
 )
 RECALCULATE_GRADE_DELAY = 2  # in seconds, to prevent excessive _has_db_updated failures. See TNL-6424.
 
@@ -219,12 +212,7 @@ def _has_db_updated_with_new_score(self, scored_block_usage_key, **kwargs):
     return db_is_updated
 
 
-def _update_subsection_grades(
-        course_key,
-        scored_block_usage_key,
-        only_if_higher,
-        user_id,
-):
+def _update_subsection_grades(course_key, scored_block_usage_key, only_if_higher, user_id):
     """
     A helper function to update subsection grades in the database
     for each subsection containing the given block, and to signal

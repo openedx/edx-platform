@@ -536,7 +536,7 @@ class PersistentCourseGrade(DeleteGradesMixin, TimeStampedModel):
         ])
 
     @classmethod
-    def read_course_grade(cls, user_id, course_id):
+    def read(cls, user_id, course_id):
         """
         Reads a grade from database
 
@@ -549,7 +549,7 @@ class PersistentCourseGrade(DeleteGradesMixin, TimeStampedModel):
         return cls.objects.get(user_id=user_id, course_id=course_id)
 
     @classmethod
-    def update_or_create_course_grade(cls, user_id, course_id, **kwargs):
+    def update_or_create(cls, user_id, course_id, **kwargs):
         """
         Creates a course grade in the database.
         Returns a PersistedCourseGrade object.
