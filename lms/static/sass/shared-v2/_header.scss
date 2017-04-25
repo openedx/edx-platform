@@ -19,7 +19,7 @@
         margin: 0 auto;
         padding: 10px 10px 0;
         width: 100%;
-        max-width: 1180px;
+        max-width: $lms-max-width;
 
         .left {
             @include float(left);

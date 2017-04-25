@@ -268,7 +268,17 @@
                 this.updatePageTitle();
                 sequenceLinks = this.content_container.find('a.seqnav');
                 sequenceLinks.click(this.goto);
-                this.path.text(this.el.find('.nav-item.active').data('path'));
+
+                edx.HtmlUtils.setHtml(
+                    this.path,
+                    edx.HtmlUtils.template($('#sequence-breadcrumbs-tpl').text())({
+                        courseId: this.el.parent().data('course-id'),
+                        blockId: this.id,
+                        pathText: this.el.find('.nav-item.active').data('path'),
+                        unifiedCourseView: this.path.data('unified-course-view')
+                    })
+                );
+
                 this.sr_container.focus();
             }
         };
@@ -329,7 +339,7 @@
 
         // `direction` can be 'previous' or 'next'
         Sequence.prototype._change_sequential = function(direction, event) {
-            var analyticsEventName, isBottomNav, newPosition, offset, widgetPlacement;
+            var analyticsEventName, isBottomNav, newPosition, offset, targetUrl, widgetPlacement;
 
             // silently abort if direction is invalid.
             if (direction !== 'previous' && direction !== 'next') {
@@ -345,19 +355,27 @@
                 widgetPlacement = 'top';
             }
 
+            if ((direction === 'next') && (this.position >= this.contents.length)) {
+                targetUrl = this.nextUrl;
+            } else if ((direction === 'previous') && (this.position === 1)) {
+                targetUrl = this.prevUrl;
+            }
+
             // Formerly known as seq_next and seq_prev
             Logger.log(analyticsEventName, {
                 id: this.id,
                 current_tab: this.position,
                 tab_count: this.num_contents,
                 widget_placement: widgetPlacement
+            }).always(function() {
+                if (targetUrl) {
+                    // Wait to load the new page until we've attempted to log the event
+                    window.location.href = targetUrl;
+                }
             });
 
-            if ((direction === 'next') && (this.position >= this.contents.length)) {
-                window.location.href = this.nextUrl;
-            } else if ((direction === 'previous') && (this.position === 1)) {
-                window.location.href = this.prevUrl;
-            } else {
+            // If we're staying on the page, no need to wait for the event logging to finish
+            if (!targetUrl) {
                 // If the bottom nav is used, scroll to the top of the page on change.
                 if (isBottomNav) {
                     $.scrollTo(0, 150);

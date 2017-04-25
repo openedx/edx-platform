@@ -4,6 +4,9 @@ Utility methods common to Studio and the LMS.
 from bok_choy.promise import BrokenPromise
 from common.test.acceptance.tests.helpers import disable_animations
 from selenium.webdriver.common.action_chains import ActionChains
+from common.test.acceptance.pages.lms.pay_and_verify import PaymentAndVerificationFlow, FakePaymentPage
+from common.test.acceptance.pages.lms.track_selection import TrackSelectionPage
+from common.test.acceptance.pages.lms.create_mode import ModeCreationPage
 
 
 def sync_on_notification(page, style='default', wait_for_hide=False):
@@ -100,3 +103,44 @@ def hover(browser, element):
     Hover over an element.
     """
     ActionChains(browser).move_to_element(element).perform()
+
+
+def enroll_user_track(browser, course_id, track):
+    """
+    Utility method to enroll a user in the audit or verified user track.  Creates and connects to the
+    necessary pages. Selects the track and handles payment for verified.
+    Supported tracks are 'verified' or 'audit'.
+    """
+    payment_and_verification_flow = PaymentAndVerificationFlow(browser, course_id)
+    fake_payment_page = FakePaymentPage(browser, course_id)
+    track_selection = TrackSelectionPage(browser, course_id)
+
+    # Select track and process payment
+    track_selection.visit()
+    track_selection.enroll(track)
+    if track == 'verified':
+        payment_and_verification_flow.proceed_to_payment()
+        fake_payment_page.submit_payment()
+
+
+def add_enrollment_course_modes(browser, course_id, tracks):
+    """
+    Add the specified array of tracks to the given course.
+    Supported tracks are `verified` and `audit` (all others will be ignored),
+    and display names assigned are `Verified` and `Audit`, respectively.
+    """
+    for track in tracks:
+        if track == 'audit':
+            # Add an audit mode to the course
+            ModeCreationPage(
+                browser,
+                course_id, mode_slug='audit',
+                mode_display_name='Audit'
+            ).visit()
+
+        elif track == 'verified':
+            # Add a verified mode to the course
+            ModeCreationPage(
+                browser, course_id, mode_slug='verified',
+                mode_display_name='Verified', min_price=10
+            ).visit()

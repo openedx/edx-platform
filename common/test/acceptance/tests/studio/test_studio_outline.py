@@ -12,9 +12,9 @@ from nose.plugins.attrib import attr
 from common.test.acceptance.pages.studio.settings_advanced import AdvancedSettingsPage
 from common.test.acceptance.pages.studio.overview import CourseOutlinePage, ContainerPage, ExpandCollapseLinkState
 from common.test.acceptance.pages.studio.utils import add_discussion, drag, verify_ordering
+from common.test.acceptance.pages.lms.course_home import CourseHomePage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
-from common.test.acceptance.pages.lms.course_nav import CourseNavPage
-from common.test.acceptance.pages.lms.staff_view import StaffPage
+from common.test.acceptance.pages.lms.staff_view import StaffCoursewarePage
 from common.test.acceptance.fixtures.config import ConfigModelFixture
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 
@@ -730,19 +730,21 @@ class StaffLockTest(CourseOutlineTest):
             Given I have a course with two sections
             When I enable explicit staff lock on one section
             And I click the View Live button to switch to staff view
-            Then I see two sections in the sidebar
+            And I visit the course home with the outline
+            Then I see two sections in the outline
             And when I switch the view mode to student view
-            Then I see one section in the sidebar
+            Then I see one section in the outline
         """
         self.course_outline_page.visit()
         self.course_outline_page.add_section_from_top_button()
         self.course_outline_page.section_at(1).set_staff_lock(True)
         self.course_outline_page.view_live()
-        courseware = CoursewarePage(self.browser, self.course_id)
-        courseware.wait_for_page()
-        self.assertEqual(courseware.num_sections, 2)
-        StaffPage(self.browser, self.course_id).set_staff_view_mode('Student')
-        self.assertEqual(courseware.num_sections, 1)
+
+        course_home_page = CourseHomePage(self.browser, self.course_id)
+        course_home_page.visit()
+        self.assertEqual(course_home_page.outline.num_sections, 2)
+        course_home_page.preview.set_staff_view_mode('Learner')
+        self.assertEqual(course_home_page.outline.num_sections, 1)
 
     def test_locked_subsections_do_not_appear_in_lms(self):
         """
@@ -750,18 +752,20 @@ class StaffLockTest(CourseOutlineTest):
             Given I have a course with two subsections
             When I enable explicit staff lock on one subsection
             And I click the View Live button to switch to staff view
-            Then I see two subsections in the sidebar
+            And I visit the course home with the outline
+            Then I see two subsections in the outline
             And when I switch the view mode to student view
-            Then I see one section in the sidebar
+            Then I see one subsection in the outline
         """
         self.course_outline_page.visit()
         self.course_outline_page.section_at(0).subsection_at(1).set_staff_lock(True)
         self.course_outline_page.view_live()
-        courseware = CoursewarePage(self.browser, self.course_id)
-        courseware.wait_for_page()
-        self.assertEqual(courseware.num_subsections, 2)
-        StaffPage(self.browser, self.course_id).set_staff_view_mode('Student')
-        self.assertEqual(courseware.num_subsections, 1)
+
+        course_home_page = CourseHomePage(self.browser, self.course_id)
+        course_home_page.visit()
+        self.assertEqual(course_home_page.outline.num_subsections, 2)
+        course_home_page.preview.set_staff_view_mode('Learner')
+        self.assertEqual(course_home_page.outline.num_subsections, 1)
 
     def test_toggling_staff_lock_on_section_does_not_publish_draft_units(self):
         """
@@ -1438,6 +1442,8 @@ class DefaultStatesContentTest(CourseOutlineTest):
 
     __test__ = True
 
+    # TODO: TNL-6546: Removing unified_course_view_flag
+    # This test will need to be rewritten to point to the new course home page.
     def test_view_live(self):
         """
         Scenario: View Live version from course outline
@@ -1490,7 +1496,7 @@ class PublishSectionTest(CourseOutlineTest):
         The first subsection has 2 units, and the second subsection has one unit.
         """
         self.courseware = CoursewarePage(self.browser, self.course_id)
-        self.course_nav = CourseNavPage(self.browser)
+        self.course_home_page = CourseHomePage(self.browser, self.course_id)
         course_fixture.add_children(
             XBlockFixtureDesc('chapter', SECTION_NAME).add_children(
                 XBlockFixtureDesc('sequential', SUBSECTION_NAME).add_children(
@@ -1578,7 +1584,8 @@ class PublishSectionTest(CourseOutlineTest):
         self.assertEqual(1, self.courseware.num_xblock_components)
         self.courseware.go_to_sequential_position(2)
         self.assertEqual(1, self.courseware.num_xblock_components)
-        self.course_nav.go_to_section(SECTION_NAME, 'Test Subsection 2')
+        self.course_home_page.visit()
+        self.course_home_page.outline.go_to_section(SECTION_NAME, 'Test Subsection 2')
         self.assertEqual(1, self.courseware.num_xblock_components)
 
     def _add_unpublished_content(self):

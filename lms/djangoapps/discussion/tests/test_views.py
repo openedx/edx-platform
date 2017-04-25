@@ -24,6 +24,7 @@ from lms.djangoapps.discussion import views
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from util.testing import UrlResetMixin
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
+from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
@@ -33,12 +34,12 @@ from xmodule.modulestore.tests.django_utils import (
 )
 from xmodule.modulestore.tests.factories import check_mongo_calls, CourseFactory, ItemFactory
 
-from courseware.courses import UserNotEnrolled
 from nose.tools import assert_true
 from mock import patch, Mock, ANY, call
 
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 
+from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
 
 log = logging.getLogger(__name__)
@@ -356,16 +357,24 @@ class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
         # course is outside the context manager that is verifying the number of queries,
         # and with split mongo, that method ends up querying disabled_xblocks (which is then
         # cached and hence not queried as part of call_single_thread).
-        (ModuleStoreEnum.Type.mongo, 1, 5, 3, 13, 1),
-        (ModuleStoreEnum.Type.mongo, 50, 5, 3, 13, 1),
+        (ModuleStoreEnum.Type.mongo, False, 1, 5, 3, 13, 1),
+        (ModuleStoreEnum.Type.mongo, False, 50, 5, 3, 13, 1),
         # split mongo: 3 queries, regardless of thread response size.
-        (ModuleStoreEnum.Type.split, 1, 3, 3, 12, 1),
-        (ModuleStoreEnum.Type.split, 50, 3, 3, 12, 1),
+        (ModuleStoreEnum.Type.split, False, 1, 3, 3, 12, 1),
+        (ModuleStoreEnum.Type.split, False, 50, 3, 3, 12, 1),
+
+        # Enabling Enterprise integration should have no effect on the number of mongo queries made.
+        (ModuleStoreEnum.Type.mongo, True, 1, 5, 3, 13, 1),
+        (ModuleStoreEnum.Type.mongo, True, 50, 5, 3, 13, 1),
+        # split mongo: 3 queries, regardless of thread response size.
+        (ModuleStoreEnum.Type.split, True, 1, 3, 3, 12, 1),
+        (ModuleStoreEnum.Type.split, True, 50, 3, 3, 12, 1),
     )
     @ddt.unpack
     def test_number_of_mongo_queries(
             self,
             default_store,
+            enterprise_enabled,
             num_thread_responses,
             num_uncached_mongo_calls,
             num_cached_mongo_calls,
@@ -393,12 +402,13 @@ class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
             """
             Call single_thread and assert that it returns what we expect.
             """
-            response = views.single_thread(
-                request,
-                course.id.to_deprecated_string(),
-                "dummy_discussion_id",
-                test_thread_id
-            )
+            with override_settings(ENABLE_ENTERPRISE_INTEGRATION=enterprise_enabled):
+                response = views.single_thread(
+                    request,
+                    course.id.to_deprecated_string(),
+                    "dummy_discussion_id",
+                    test_thread_id
+                )
             self.assertEquals(response.status_code, 200)
             self.assertEquals(len(json.loads(response.content)["content"]["children"]), num_thread_responses)
 
@@ -1564,5 +1574,47 @@ class EnrollmentTestCase(ForumsEnableMixin, ModuleStoreTestCase):
         mock_request.side_effect = make_mock_request_impl(course=self.course, text='dummy')
         request = RequestFactory().get('dummy_url')
         request.user = self.student
-        with self.assertRaises(UserNotEnrolled):
+        with self.assertRaises(CourseAccessRedirect):
             views.forum_form_discussion(request, course_id=self.course.id.to_deprecated_string())
+
+
+@patch('requests.request', autospec=True)
+class EnterpriseConsentTestCase(EnterpriseTestConsentRequired, ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase):
+    """
+    Ensure that the Enterprise Data Consent redirects are in place only when consent is required.
+    """
+    CREATE_USER = False
+
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def setUp(self):
+        # Invoke UrlResetMixin setUp
+        super(EnterpriseConsentTestCase, self).setUp()
+
+        username = "foo"
+        password = "bar"
+
+        self.discussion_id = 'dummy_discussion_id'
+        self.course = CourseFactory.create(discussion_topics={'dummy discussion': {'id': self.discussion_id}})
+        self.student = UserFactory.create(username=username, password=password)
+        CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)
+        self.assertTrue(
+            self.client.login(username=username, password=password)
+        )
+
+        self.addCleanup(translation.deactivate)
+
+    def test_consent_required(self, mock_request):
+        """
+        Test that enterprise data sharing consent is required when enabled for the various discussion views.
+        """
+        thread_id = 'dummy'
+        course_id = unicode(self.course.id)
+        mock_request.side_effect = make_mock_request_impl(course=self.course, text='dummy', thread_id=thread_id)
+
+        for url in (
+                reverse('discussion.views.forum_form_discussion',
+                        kwargs=dict(course_id=course_id)),
+                reverse('discussion.views.single_thread',
+                        kwargs=dict(course_id=course_id, discussion_id=self.discussion_id, thread_id=thread_id)),
+        ):
+            self.verify_consent_required(self.client, url)

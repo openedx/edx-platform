@@ -2,13 +2,14 @@
  * XBlockContainerPage is used to display Studio's container page for an xblock which has children.
  * This page allows the user to understand and manipulate the xblock and its children.
  */
-define(['jquery', 'underscore', 'gettext', 'js/views/pages/base_page', 'common/js/components/utils/view_utils',
-        'js/views/container', 'js/views/xblock', 'js/views/components/add_xblock', 'js/views/modals/edit_xblock',
+define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page',
+        'common/js/components/utils/view_utils', 'js/views/container', 'js/views/xblock',
+        'js/views/components/add_xblock', 'js/views/modals/edit_xblock', 'js/views/modals/move_xblock_modal',
         'js/models/xblock_info', 'js/views/xblock_string_field_editor', 'js/views/pages/container_subviews',
         'js/views/unit_outline', 'js/views/utils/xblock_utils'],
-    function($, _, gettext, BasePage, ViewUtils, ContainerView, XBlockView, AddXBlockComponent,
-              EditXBlockModal, XBlockInfo, XBlockStringFieldEditor, ContainerSubviews, UnitOutlineView,
-              XBlockUtils) {
+    function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView, AddXBlockComponent,
+              EditXBlockModal, MoveXBlockModal, XBlockInfo, XBlockStringFieldEditor, ContainerSubviews,
+              UnitOutlineView, XBlockUtils) {
         'use strict';
         var XBlockContainerPage = BasePage.extend({
             // takes XBlockInfo as a model
@@ -17,6 +18,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/pages/base_page', 'common/j
                 'click .edit-button': 'editXBlock',
                 'click .visibility-button': 'editVisibilitySettings',
                 'click .duplicate-button': 'duplicateXBlock',
+                'click .move-button': 'showMoveXBlockModal',
                 'click .delete-button': 'deleteXBlock',
                 'click .new-component-button': 'scrollToNewComponentButtons'
             },
@@ -80,6 +82,8 @@ define(['jquery', 'underscore', 'gettext', 'js/views/pages/base_page', 'common/j
                     });
                     this.unitOutlineView.render();
                 }
+
+                this.listenTo(Backbone, 'move:onXBlockMoved', this.onXBlockMoved);
             },
 
             getViewParameters: function() {
@@ -191,6 +195,20 @@ define(['jquery', 'underscore', 'gettext', 'js/views/pages/base_page', 'common/j
                 this.duplicateComponent(this.findXBlockElement(event.target));
             },
 
+            showMoveXBlockModal: function(event) {
+                var xblockElement = this.findXBlockElement(event.target),
+                    parentXBlockElement = xblockElement.parents('.studio-xblock-wrapper'),
+                    modal = new MoveXBlockModal({
+                        sourceXBlockInfo: XBlockUtils.findXBlockInfo(xblockElement, this.model),
+                        sourceParentXBlockInfo: XBlockUtils.findXBlockInfo(parentXBlockElement, this.model),
+                        XBlockURLRoot: this.getURLRoot(),
+                        outlineURL: this.options.outlineURL
+                    });
+
+                event.preventDefault();
+                modal.show();
+            },
+
             deleteXBlock: function(event) {
                 event.preventDefault();
                 this.deleteComponent(this.findXBlockElement(event.target));
@@ -265,6 +283,13 @@ define(['jquery', 'underscore', 'gettext', 'js/views/pages/base_page', 'common/j
                 xblockView.acknowledgeXBlockDeletion(parent.data('locator'));
 
                 // Update publish and last modified information from the server.
+                this.model.fetch();
+            },
+
+            /*
+            After move operation is complete, updates the xblock information from server .
+             */
+            onXBlockMoved: function() {
                 this.model.fetch();
             },
 

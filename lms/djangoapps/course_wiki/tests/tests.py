@@ -2,6 +2,7 @@ from django.core.urlresolvers import reverse
 from nose.plugins.attrib import attr
 
 from courseware.tests.tests import LoginEnrollmentTestCase
+from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -9,7 +10,7 @@ from mock import patch
 
 
 @attr(shard=1)
-class WikiRedirectTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
+class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Tests for wiki course redirection.
     """
@@ -196,3 +197,25 @@ class WikiRedirectTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
 
         resp = self.client.get(course_wiki_page, follow=True, HTTP_REFERER=referer)
         self.assertEqual(resp.status_code, 200)
+
+    @patch.dict("django.conf.settings.FEATURES", {'ALLOW_WIKI_ROOT_ACCESS': True})
+    def test_consent_required(self):
+        """
+        Test that enterprise data sharing consent is required when enabled for the various courseware views.
+        """
+        # Public wikis can be accessed by non-enrolled users, and so direct access is not gated by the consent page
+        course = CourseFactory.create()
+        course.allow_public_wiki_access = False
+        course.save()
+
+        # However, for private wikis, enrolled users must pass through the consent gate
+        # (Unenrolled users are redirected to course/about)
+        course_id = unicode(course.id)
+        self.login(self.student, self.password)
+        self.enroll(course)
+
+        for (url, status_code) in (
+                (reverse('course_wiki', kwargs={'course_id': course_id}), 302),
+                ('/courses/{}/wiki/'.format(course_id), 200),
+        ):
+            self.verify_consent_required(self.client, url, status_code)

@@ -1,4 +1,5 @@
 """Learner dashboard views"""
+import waffle
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.http import Http404
@@ -13,6 +14,7 @@ from openedx.core.djangoapps.programs.utils import (
     get_program_marketing_url,
     ProgramProgressMeter,
     ProgramDataExtender,
+    get_certificates,
 )
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
 
@@ -33,7 +35,7 @@ def program_listing(request):
         'marketing_url': get_program_marketing_url(programs_config),
         'nav_hidden': True,
         'programs': meter.engaged_programs,
-        'progress': meter.progress,
+        'progress': meter.progress(),
         'show_program_listing': programs_config.enabled,
         'uses_pattern_library': True,
     }
@@ -49,7 +51,9 @@ def program_details(request, program_uuid):
     if not programs_config.enabled:
         raise Http404
 
-    program_data = get_programs(uuid=program_uuid)
+    meter = ProgramProgressMeter(request.user, uuid=program_uuid)
+    program_data = meter.programs[0]
+
     if not program_data:
         raise Http404
 
@@ -64,7 +68,6 @@ def program_details(request, program_uuid):
     }
 
     context = {
-        'program_data': program_data,
         'urls': urls,
         'show_program_listing': programs_config.enabled,
         'nav_hidden': True,
@@ -73,4 +76,20 @@ def program_details(request, program_uuid):
         'user_preferences': get_user_preferences(request.user)
     }
 
-    return render_to_response('learner_dashboard/program_details.html', context)
+    if waffle.switch_is_active('new_program_progress'):
+        course_data = meter.progress(programs=[program_data], count_only=False)[0]
+        certificate_data = get_certificates(request.user, program_data)
+
+        program_data.pop('courses')
+
+        context.update({
+            'program_data': program_data,
+            'course_data': course_data,
+            'certificate_data': certificate_data,
+        })
+
+        return render_to_response('learner_dashboard/program_details_2017.html', context)
+    else:
+        context.update({'program_data': program_data})
+
+        return render_to_response('learner_dashboard/program_details.html', context)

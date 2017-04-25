@@ -83,6 +83,7 @@ from xmodule.modulestore import (
 
 from ..exceptions import ItemNotFoundError
 from .caching_descriptor_system import CachingDescriptorSystem
+from xmodule.partitions.partitions_service import PartitionService
 from xmodule.modulestore.split_mongo.mongo_connection import MongoConnection, DuplicateKeyError
 from xmodule.modulestore.split_mongo import BlockKey, CourseEnvelope
 from xmodule.modulestore.store_utilities import DETACHED_XBLOCK_TYPES
@@ -3359,6 +3360,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         Create the proper runtime for this course
         """
+        services = self.services
+        services["partitions"] = PartitionService(course_entry.course_key)
+
         return CachingDescriptorSystem(
             modulestore=self,
             course_entry=course_entry,
@@ -3370,7 +3374,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             mixins=self.xblock_mixins,
             select=self.xblock_select,
             disabled_xblock_types=self.disabled_xblock_types,
-            services=self.services,
+            services=services,
         )
 
     def ensure_indexes(self):

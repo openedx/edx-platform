@@ -60,7 +60,6 @@ DISCUSSION_SETTINGS = {
 }
 
 LMS_ROOT_URL = "http://localhost:8000"
-ENTERPRISE_API_URL = LMS_ROOT_URL + '/enterprise/api/v1/'
 
 # Features
 FEATURES = {
@@ -371,6 +370,16 @@ FEATURES = {
     # Enable footer banner for cookie consent.
     # See https://cookieconsent.insites.com/ for more.
     'ENABLE_COOKIE_CONSENT': False,
+
+    # Whether or not the dynamic EnrollmentTrackUserPartition should be registered.
+    'ENABLE_ENROLLMENT_TRACK_USER_PARTITION': False,
+
+    # Enable one click program purchase
+    # See LEARNER-493
+    'ENABLE_ONE_CLICK_PROGRAM_PURCHASE': False,
+
+    # Whether to display account activation notification on dashboard.
+    'DISPLAY_ACCOUNT_ACTIVATION_MESSAGE_ON_SIDEBAR': False,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -854,6 +863,8 @@ LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
 # these languages display right to left
 LANGUAGES_BIDI = ("he", "ar", "fa", "ur", "fa-ir", "rtl")
 
+LANGUAGE_COOKIE = "openedx-language-preference"
+
 # Sourced from http://www.localeplanet.com/icu/ and wikipedia
 LANGUAGES = (
     ('en', u'English'),
@@ -1106,7 +1117,7 @@ MIDDLEWARE_CLASSES = (
     'crum.CurrentRequestUserMiddleware',
 
     'request_cache.middleware.RequestCache',
-    'newrelic_custom_metrics.middleware.NewRelicCustomMetrics',
+    'openedx.core.djangoapps.monitoring_utils.middleware.MonitoringCustomMetrics',
 
     'mobile_api.middleware.AppVersionUpgrade',
     'openedx.core.djangoapps.header_control.middleware.HeaderControlMiddleware',
@@ -1177,7 +1188,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     # to redirected unenrolled students to the course info page
-    'courseware.middleware.RedirectUnenrolledMiddleware',
+    'courseware.middleware.RedirectMiddleware',
 
     'course_wiki.middleware.WikiAccessMiddleware',
 
@@ -1724,7 +1735,7 @@ REQUIRE_ENVIRONMENT = "node"
 # but you don't want to include those dependencies in the JS bundle for the page,
 # then you need to add the js urls in this list.
 REQUIRE_JS_PATH_OVERRIDES = {
-    'js/bookmarks/views/bookmark_button': 'js/bookmarks/views/bookmark_button.js',
+    'course_bookmarks/js/views/bookmark_button': 'course_bookmarks/js/views/bookmark_button.js',
     'js/views/message_banner': 'js/views/message_banner.js',
     'moment': 'common/js/vendor/moment-with-locales.js',
     'moment-timezone': 'common/js/vendor/moment-timezone-with-data.js',
@@ -1737,7 +1748,8 @@ REQUIRE_JS_PATH_OVERRIDES = {
     'js/student_profile/views/learner_profile_factory': 'js/student_profile/views/learner_profile_factory.js',
     'js/courseware/courseware_factory': 'js/courseware/courseware_factory.js',
     'js/groups/views/cohorts_dashboard_factory': 'js/groups/views/cohorts_dashboard_factory.js',
-    'draggabilly': 'js/vendor/draggabilly.js'
+    'draggabilly': 'js/vendor/draggabilly.js',
+    'hls': 'common/js/vendor/hls.js'
 }
 
 ########################## DJANGO DEBUG TOOLBAR ###############################
@@ -2146,8 +2158,11 @@ INSTALLED_APPS = (
     # API access administration
     'openedx.core.djangoapps.api_admin',
 
-    # Verified Track Content Cohorting
-    'verified_track_content',
+    # Verified Track Content Cohorting (Beta feature that will hopefully be removed)
+    'openedx.core.djangoapps.verified_track_content',
+
+    # Video module configs (This will be moved to Video once it becomes an XBlock)
+    'openedx.core.djangoapps.video_config',
 
     # Learner's dashboard
     'learner_dashboard',
@@ -2173,12 +2188,12 @@ INSTALLED_APPS = (
 
     # Unusual migrations
     'database_fixups',
-)
 
-# Migrations which are not in the standard module "migrations"
-MIGRATION_MODULES = {
-    'social.apps.django_app.default': 'social.apps.django_app.default.south_migrations'
-}
+    # Features
+    'openedx.features.course_bookmarks',
+    'openedx.features.course_experience',
+    'openedx.features.enterprise_support',
+)
 
 ######################### CSRF #########################################
 
@@ -2192,6 +2207,9 @@ CSRF_COOKIE_SECURE = False
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'openedx.core.lib.api.paginators.DefaultPagination',
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    ),
     'PAGE_SIZE': 10,
     'URL_FORMAT_OVERRIDE': None,
     'DEFAULT_THROTTLE_RATES': {
@@ -2842,7 +2860,6 @@ ECOMMERCE_PUBLIC_URL_ROOT = None
 ECOMMERCE_API_URL = None
 ECOMMERCE_API_TIMEOUT = 5
 ECOMMERCE_SERVICE_WORKER_USERNAME = 'ecommerce_worker'
-ENTERPRISE_SERVICE_WORKER_USERNAME = 'enterprise_worker'
 
 COURSE_CATALOG_API_URL = None
 
@@ -3061,6 +3078,35 @@ REDIRECT_CACHE_KEY_PREFIX = 'redirects'
 
 DOC_LINK_BASE_URL = None
 
-############## Settings for the Enterprise App ######################
+############## OPEN EDX ENTERPRISE SERVICE CONFIGURATION ######################
+# The Open edX Enterprise service is currently hosted via the LMS container/process.
+# However, for all intents and purposes this service is treated as a standalone IDA.
+# These configuration settings are specific to the Enterprise service and you should
+# not find references to them within the edx-platform project.
 
 ENTERPRISE_ENROLLMENT_API_URL = LMS_ROOT_URL + "/api/enrollment/v1/"
+ENTERPRISE_PUBLIC_ENROLLMENT_API_URL = ENTERPRISE_ENROLLMENT_API_URL
+
+############## ENTERPRISE SERVICE API CLIENT CONFIGURATION ######################
+# The LMS communicates with the Enterprise service via the EdxRestApiClient class
+# These default settings are utilized by the LMS when interacting with the service,
+# and are overridden by the configuration parameter accessors defined in aws.py
+
+ENTERPRISE_API_URL = LMS_ROOT_URL + '/enterprise/api/v1/'
+ENTERPRISE_SERVICE_WORKER_USERNAME = 'enterprise_worker'
+ENTERPRISE_API_CACHE_TIMEOUT = 3600  # Value is in seconds
+ENTERPRISE_CUSTOMER_LOGO_IMAGE_SIZE = 512   # Enterprise logo image size limit in KB's
+
+############## Settings for Course Enrollment Modes ######################
+COURSE_ENROLLMENT_MODES = {
+    "audit": 1,
+    "verified": 2,
+    "professional": 3,
+    "no-id-professional": 4,
+    "credit": 5,
+    "honor": 6,
+}
+
+############## Settings for the Discovery App ######################
+
+COURSES_API_CACHE_TIMEOUT = 3600  # Value is in seconds

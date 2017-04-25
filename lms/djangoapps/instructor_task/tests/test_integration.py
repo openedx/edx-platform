@@ -32,7 +32,7 @@ from lms.djangoapps.instructor_task.api import (
     submit_delete_problem_state_for_all_students
 )
 from lms.djangoapps.instructor_task.models import InstructorTask
-from lms.djangoapps.instructor_task.tasks_helper import upload_grades_csv
+from lms.djangoapps.instructor_task.tasks_helper.grades import generate_course_grade_report
 from lms.djangoapps.instructor_task.tests.test_base import (
     InstructorTaskModuleTestCase,
     TestReportMixin,
@@ -40,7 +40,7 @@ from lms.djangoapps.instructor_task.tests.test_base import (
     OPTION_2,
 )
 from capa.responsetypes import StudentInputError
-from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
+from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
 from openedx.core.lib.url_utils import quote_slashes
 
 
@@ -224,13 +224,49 @@ class TestRescoringTask(TestIntegrationTask):
     @ddt.data(
         RescoreTestData(edit=dict(), new_expected_scores=(2, 1, 1, 0), new_expected_max=2),
         RescoreTestData(edit=dict(correct_answer=OPTION_2), new_expected_scores=(2, 1, 1, 2), new_expected_max=2),
-        RescoreTestData(edit=dict(num_inputs=2), new_expected_scores=(2, 1, 1, 0), new_expected_max=2),
     )
     @ddt.unpack
     def test_rescoring_if_higher(self, problem_edit, new_expected_scores, new_expected_max):
         self.verify_rescore_results(
             problem_edit, new_expected_scores, new_expected_max, rescore_if_higher=True,
         )
+
+    def test_rescoring_if_higher_scores_equal(self):
+        """
+        Specifically tests rescore when the previous and new raw scores are equal. In this case, the scores should
+        be updated.
+        """
+        problem_edit = dict(num_inputs=2)  # this change to the problem means the problem will now have a max score of 4
+        unchanged_max = 2
+        new_max = 4
+        problem_url_name = 'H1P1'
+        self.define_option_problem(problem_url_name)
+        location = InstructorTaskModuleTestCase.problem_location(problem_url_name)
+        descriptor = self.module_store.get_item(location)
+
+        # first store answers for each of the separate users:
+        self.submit_student_answer('u1', problem_url_name, [OPTION_1, OPTION_1])
+        self.submit_student_answer('u2', problem_url_name, [OPTION_2, OPTION_2])
+
+        # verify each user's grade
+        self.check_state(self.user1, descriptor, 2, 2)  # user 1 has a 2/2
+        self.check_state(self.user2, descriptor, 0, 2)  # user 2 has a 0/2
+
+        # update the data in the problem definition so the answer changes.
+        self.redefine_option_problem(problem_url_name, **problem_edit)
+
+        # confirm that simply rendering the problem again does not change the grade
+        self.render_problem('u1', problem_url_name)
+        self.check_state(self.user1, descriptor, 2, 2)
+        self.check_state(self.user2, descriptor, 0, 2)
+
+        # rescore the problem for all students
+        self.submit_rescore_all_student_answers('instructor', problem_url_name, True)
+
+        # user 1's score would go down, so it remains 2/2. user 2's score was 0/2, which is equivalent to the new score
+        # of 0/4, so user 2's score changes to 0/4.
+        self.check_state(self.user1, descriptor, 2, unchanged_max)
+        self.check_state(self.user2, descriptor, 0, new_max)
 
     def test_rescoring_failure(self):
         """Simulate a failure in rescoring a problem"""
@@ -536,10 +572,10 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
     def verify_csv_task_success(self, task_result):
         """
         Verify that all students were successfully graded by
-        `upload_grades_csv`.
+        `generate_course_grade_report`.
 
         Arguments:
-            task_result (dict): Return value of `upload_grades_csv`.
+            task_result (dict): Return value of `generate_course_grade_report`.
         """
         self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, task_result)
 
@@ -599,8 +635,8 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
         self.submit_student_answer(self.student_a.username, problem_a_url, [OPTION_1, OPTION_1])
         self.submit_student_answer(self.student_b.username, problem_b_url, [OPTION_1, OPTION_2])
 
-        with patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task'):
-            result = upload_grades_csv(None, None, self.course.id, None, 'graded')
+        with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
+            result = generate_course_grade_report(None, None, self.course.id, None, 'graded')
             self.verify_csv_task_success(result)
             self.verify_grades_in_csv(
                 [
@@ -632,8 +668,8 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
 
         self.submit_student_answer(self.student_a.username, problem_a_url, [OPTION_1, OPTION_1])
 
-        with patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task'):
-            result = upload_grades_csv(None, None, self.course.id, None, 'graded')
+        with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
+            result = generate_course_grade_report(None, None, self.course.id, None, 'graded')
             self.verify_csv_task_success(result)
             self.verify_grades_in_csv(
                 [

@@ -3,12 +3,16 @@
 <%namespace name='static' file='/static_content.html'/>
 <%def name="online_help_token()"><% return "courseware" %></%def>
 <%!
-from django.utils.translation import ugettext as _
+import waffle
+
 from django.conf import settings
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
 
 from edxnotes.helpers import is_feature_enabled as is_edxnotes_enabled
-from openedx.core.djangolib.markup import HTML
 from openedx.core.djangolib.js_utils import js_escaped_string
+from openedx.core.djangolib.markup import HTML
+from openedx.features.course_experience import UNIFIED_COURSE_VIEW_FLAG
 %>
 <%
   include_special_exams = settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and (course.enable_proctored_exams or course.enable_timed_exams)
@@ -27,7 +31,7 @@ from openedx.core.djangolib.js_utils import js_escaped_string
 
 <%block name="header_extras">
 
-% for template_name in ["image-modal"]:
+% for template_name in ["image-modal", "sequence-breadcrumbs"]:
 <script type="text/template" id="${template_name}-tpl">
     <%static:include path="common/templates/${template_name}.underscore" />
 </script>
@@ -115,10 +119,10 @@ ${HTML(fragment.foot_html())}
 
       <div class="wrapper-course-modes">
 
-          <div class="courseware-bookmarks-button" data-bookmarks-api-url="${bookmarks_api_url}">
-              <button type="button" class="bookmarks-list-button is-inactive" aria-pressed="false">
+          <div class="courseware-bookmarks-button">
+              <a class="bookmarks-list-button" href="${reverse('openedx.course_bookmarks.home', args=[course.id])}">
                   ${_('Bookmarks')}
-              </button>
+              </a>
           </div>
 
           % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
@@ -152,7 +156,10 @@ ${HTML(fragment.foot_html())}
 % endif
     <section class="course-content" id="course-content">
         <main id="main" tabindex="-1" aria-label="Content">
-            <div class="path"></div>
+            <div
+              class="path"
+              data-unified-course-view="${'true' if waffle.flag_is_active(request, UNIFIED_COURSE_VIEW_FLAG) else 'false'}"
+            ></div>
             % if getattr(course, 'entrance_exam_enabled') and \
                getattr(course, 'entrance_exam_minimum_score_pct') and \
                entrance_exam_current_score is not UNDEFINED:

@@ -5,7 +5,7 @@ from openedx.core.djangolib.markup import HTML
 %>
 
 <%namespace name='static' file='static_content.html'/>
-<h3 class="hd hd-2 problem-header" id="${ short_id }-problem-title" aria-describedby="${ id }-problem-progress" tabindex="-1">
+<h3 class="hd hd-3 problem-header" id="${ short_id }-problem-title" aria-describedby="${ id }-problem-progress" tabindex="-1">
   ${ problem['name'] }
 </h3>
 
@@ -98,6 +98,15 @@ from openedx.core.djangolib.markup import HTML
                 notification_message=answer_notification_message"
             />
         % endif
+        % if 'submitted' == answer_notification_type:
+            <%include file="problem_notifications.html" args="
+                notification_type='general',
+                notification_icon='fa-info-circle',
+                notification_name='submit',
+                is_hidden=False,
+                notification_message=answer_notification_message"
+            />
+        % endif
     % endif
     <%include file="problem_notifications.html" args="
       notification_type='warning',
@@ -105,5 +114,12 @@ from openedx.core.djangolib.markup import HTML
       notification_name='save',
       notification_message=save_message,
       is_hidden=not has_saved_answers"
+    />
+    <%include file="problem_notifications.html" args="
+      notification_type='general',
+      notification_icon='fa-info-circle',
+      notification_name='show-answer',
+      notification_message=_('Answers are displayed within the problem'),
+      is_hidden=True"
     />
 </div>

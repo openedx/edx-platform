@@ -8,7 +8,6 @@ import logging
 from collections import OrderedDict
 from functools import partial
 
-import newrelic.agent
 from capa.xqueue_interface import XQueueInterface
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -33,7 +32,7 @@ from xblock.reference.plugins import FSService
 import static_replace
 from courseware.access import has_access, get_user_role
 from courseware.entrance_exams import (
-    user_must_complete_entrance_exam,
+    user_can_skip_entrance_exam,
     user_has_passed_entrance_exam
 )
 from courseware.masquerade import (
@@ -48,11 +47,14 @@ from lms.djangoapps.grades.signals.signals import SCORE_PUBLISHED
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem
-from lms.djangoapps.verify_student.services import VerificationService, ReverificationService
+from lms.djangoapps.verify_student.services import VerificationService
 from openedx.core.djangoapps.bookmarks.services import BookmarksService
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.credit.services import CreditService
 from openedx.core.djangoapps.util.user_utils import SystemUser
+from openedx.core.djangoapps.monitoring_utils import (
+    set_custom_metrics_for_course_key, set_monitoring_transaction_name
+)
 from openedx.core.lib.xblock_utils import (
     replace_course_urls,
     replace_jump_to_id_urls,
@@ -81,7 +83,6 @@ from xmodule.x_module import XModuleDescriptor
 from .field_overrides import OverrideFieldData
 
 log = logging.getLogger(__name__)
-
 
 if settings.XQUEUE_INTERFACE.get('basic_auth') is not None:
     REQUESTS_AUTH = HTTPBasicAuth(*settings.XQUEUE_INTERFACE['basic_auth'])
@@ -161,10 +162,10 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
 
         # Check for content which needs to be completed
         # before the rest of the content is made available
-        required_content = milestones_helpers.get_required_content(course, user)
+        required_content = milestones_helpers.get_required_content(course.id, user)
 
         # The user may not actually have to complete the entrance exam, if one is required
-        if not user_must_complete_entrance_exam(request, user, course):
+        if user_can_skip_entrance_exam(user, course):
             required_content = [content for content in required_content if not content == course.entrance_exam_id]
 
         previous_of_active_section, next_of_active_section = None, None
@@ -679,7 +680,6 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
             'field-data': field_data,
             'user': DjangoXBlockUserService(user, user_is_staff=user_is_staff),
             'verification': VerificationService(),
-            'reverification': ReverificationService(),
             'proctoring': ProctoringService(),
             'milestones': milestones_helpers.get_service(),
             'credit': CreditService(),
@@ -967,9 +967,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
     except InvalidKeyError:
         raise Http404
 
-    # Gather metrics for New Relic so we can slice data in New Relic Insights
-    newrelic.agent.add_custom_parameter('course_id', unicode(course_key))
-    newrelic.agent.add_custom_parameter('org', unicode(course_key.org))
+    set_custom_metrics_for_course_key(course_key)
 
     with modulestore().bulk_operations(course_key):
         instance, tracking_context = get_module_by_usage_id(request, course_id, usage_id, course=course)
@@ -979,7 +977,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
         # "handler" in those cases is always just "xmodule_handler".
         nr_tx_name = "{}.{}".format(instance.__class__.__name__, handler)
         nr_tx_name += "/{}".format(suffix) if (suffix and handler == "xmodule_handler") else ""
-        newrelic.agent.set_transaction_name(nr_tx_name, group="Python/XBlock/Handler")
+        set_monitoring_transaction_name(nr_tx_name, group="Python/XBlock/Handler")
 
         tracking_context_name = 'module_callback_handler'
         req = django_to_webob_request(request)
@@ -990,7 +988,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
                         and course \
                         and getattr(course, 'entrance_exam_enabled', False) \
                         and getattr(instance, 'in_entrance_exam', False):
-                    ee_data = {'entrance_exam_passed': user_has_passed_entrance_exam(request, course)}
+                    ee_data = {'entrance_exam_passed': user_has_passed_entrance_exam(request.user, course)}
                     resp = append_data_to_webob_response(resp, ee_data)
 
         except NoSuchHandlerError:

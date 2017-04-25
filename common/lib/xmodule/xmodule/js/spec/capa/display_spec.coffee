@@ -138,6 +138,28 @@ describe 'Problem', ->
       it 'shows 0 points possible for the detail', ->
         testProgessData(@problem, 0, 0, 1, "False", "0 points possible (ungraded)")
 
+    describe 'with a score of null (show_correctness == false)', ->
+      it 'reports the number of points possible and graded, results hidden', ->
+        testProgessData(@problem, null, 1, 0, "True", "1 point possible (graded, results hidden)")
+
+      it 'reports the number of points possible (plural) and graded, results hidden', ->
+        testProgessData(@problem, null, 2, 0, "True", "2 points possible (graded, results hidden)")
+
+      it 'reports the number of points possible and ungraded, results hidden', ->
+        testProgessData(@problem, null, 1, 0, "False", "1 point possible (ungraded, results hidden)")
+
+      it 'displays ungraded if number of points possible is 0, results hidden', ->
+        testProgessData(@problem, null, 0, 0, "False", "0 points possible (ungraded, results hidden)")
+
+      it 'displays ungraded if number of points possible is 0, even if graded value is True, results hidden', ->
+        testProgessData(@problem, null, 0, 0, "True", "0 points possible (ungraded, results hidden)")
+
+      it 'reports the correct score with status none and >0 attempts, results hidden', ->
+        testProgessData(@problem, null, 1, 1, "True", "1 point possible (graded, results hidden)")
+
+      it 'reports the correct score with >1 weight, status none, and >0 attempts, results hidden', ->
+        testProgessData(@problem, null, 2, 2, "True", "2 points possible (graded, results hidden)")
+
   describe 'render', ->
     beforeEach ->
       @problem = new Problem($('.xblock-student_view'))
@@ -258,6 +280,7 @@ describe 'Problem', ->
       expect(@problem.submitButton).not.toHaveAttr('disabled')
 
   describe 'submit button on problems', ->
+
     beforeEach ->
       @problem = new Problem($('.xblock-student_view'))
       @submitDisabled = (disabled) =>
@@ -274,15 +297,11 @@ describe 'Problem', ->
         @submitDisabled true
 
     describe 'some advanced tests for submit button', ->
+      radioButtonProblemHtml = readFixtures('radiobutton_problem.html')
+      checkboxProblemHtml = readFixtures('checkbox_problem.html')
+
       it 'should become enabled after a checkbox is checked', ->
-        html = '''
-        <div class="choicegroup">
-        <label for="input_1_1_1"><input type="checkbox" name="input_1_1" id="input_1_1_1" value="1"> One</label>
-        <label for="input_1_1_2"><input type="checkbox" name="input_1_1" id="input_1_1_2" value="2"> Two</label>
-        <label for="input_1_1_3"><input type="checkbox" name="input_1_1" id="input_1_1_3" value="3"> Three</label>
-        </div>
-        '''
-        $('#input_example_1').replaceWith(html)
+        $('#input_example_1').replaceWith(checkboxProblemHtml)
         @problem.submitAnswersAndSubmitButton true
         @submitDisabled true
         $('#input_1_1_1').click()
@@ -291,14 +310,7 @@ describe 'Problem', ->
         @submitDisabled true
 
       it 'should become enabled after a radiobutton is checked', ->
-        html = '''
-        <div class="choicegroup">
-        <label for="input_1_1_1"><input type="radio" name="input_1_1" id="input_1_1_1" value="1"> One</label>
-        <label for="input_1_1_2"><input type="radio" name="input_1_1" id="input_1_1_2" value="2"> Two</label>
-        <label for="input_1_1_3"><input type="radio" name="input_1_1" id="input_1_1_3" value="3"> Three</label>
-        </div>
-        '''
-        $('#input_example_1').replaceWith(html)
+        $('#input_example_1').replaceWith(radioButtonProblemHtml)
         @problem.submitAnswersAndSubmitButton true
         @submitDisabled true
         $('#input_1_1_1').attr('checked', true).trigger('click')
@@ -325,14 +337,7 @@ describe 'Problem', ->
         @submitDisabled true
 
       it 'should become enabled after a radiobutton is checked and a value is entered into the text box', ->
-        html = '''
-        <div class="choicegroup">
-        <label for="input_1_1_1"><input type="radio" name="input_1_1" id="input_1_1_1" value="1"> One</label>
-        <label for="input_1_1_2"><input type="radio" name="input_1_1" id="input_1_1_2" value="2"> Two</label>
-        <label for="input_1_1_3"><input type="radio" name="input_1_1" id="input_1_1_3" value="3"> Three</label>
-        </div>
-        '''
-        $(html).insertAfter('#input_example_1')
+        $(radioButtonProblemHtml).insertAfter('#input_example_1')
         @problem.submitAnswersAndSubmitButton true
         @submitDisabled true
         $('#input_1_1_1').attr('checked', true).trigger('click')
@@ -438,24 +443,10 @@ describe 'Problem', ->
         expect($('#answer_1_1')).toHaveHtml 'One'
         expect($('#answer_1_2')).toHaveHtml 'Two'
 
-      it 'sends a message to the window SR element', ->
-        spyOn($, 'postWithPrefix').and.callFake (url, callback) -> callback(answers: {})
-        @problem.show()
-        expect(window.SR.readText).toHaveBeenCalledWith 'Answers to this problem are now shown. Navigate through the problem to review it with answers inline.'
-
       it 'disables the show answer button', ->
         spyOn($, 'postWithPrefix').and.callFake (url, callback) -> callback(answers: {})
         @problem.show()
         expect(@problem.el.find('.show').attr('disabled')).toEqual('disabled')
-
-      it 'sends a SR message when answer is present', ->
-
-        spyOn($, 'postWithPrefix').and.callFake (url, callback) ->
-          callback answers:
-            '1_1': 'answers'
-        @problem.show()
-
-        expect(window.SR.readText).toHaveBeenCalledWith 'Answers to this problem are now shown. Navigate through the problem to review it with answers inline.'
 
       describe 'radio text question', ->
         radio_text_xml='''
@@ -816,3 +807,40 @@ describe 'Problem', ->
 
       # verify that codemirror textarea has correct `aria-describedby` attribute value
       expect($(CodeMirrorTextArea).attr('aria-describedby')).toEqual('cm-editor-exit-message-101 status_101')
+
+
+  describe 'show answer button', ->
+
+    radioButtonProblemHtml = readFixtures('radiobutton_problem.html')
+    checkboxProblemHtml = readFixtures('checkbox_problem.html')
+
+    beforeEach ->
+      @problem = new Problem($('.xblock-student_view'))
+
+      @checkAssertionsAfterClickingAnotherOption = =>
+        # verify that 'show answer button is no longer disabled'
+        expect(@problem.el.find('.show').attr('disabled')).not.toEqual('disabled')
+
+        # verify that displayed answer disappears
+        expect(@problem.el.find('div.choicegroup')).not.toHaveClass('choicegroup_correct')
+
+        # verify that radio/checkbox label has no span having class '.status.correct'
+        expect(@problem.el.find('div.choicegroup')).not.toHaveAttr('span.status.correct')
+
+    it 'should become enabled after a radiobutton is selected', ->
+      $('#input_example_1').replaceWith(radioButtonProblemHtml)
+      # assume that 'ShowAnswer' button is clicked,
+      # clicking make it disabled.
+      @problem.el.find('.show').attr('disabled', 'disabled')
+      # bind click event to input fields
+      @problem.submitAnswersAndSubmitButton true
+      # selects option 2
+      $('#input_1_1_2').attr('checked', true).trigger('click')
+      @checkAssertionsAfterClickingAnotherOption()
+
+    it 'should become enabled after a checkbox is selected', ->
+      $('#input_example_1').replaceWith(checkboxProblemHtml)
+      @problem.el.find('.show').attr('disabled', 'disabled')
+      @problem.submitAnswersAndSubmitButton true
+      $('#input_1_1_2').click()
+      @checkAssertionsAfterClickingAnotherOption()

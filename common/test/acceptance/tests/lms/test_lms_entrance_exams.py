@@ -6,6 +6,7 @@ from textwrap import dedent
 
 from common.test.acceptance.tests.helpers import UniqueCourseTest
 from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.lms.course_home import CourseHomePage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.problem import ProblemPage
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
@@ -43,7 +44,7 @@ class EntranceExamTest(UniqueCourseTest):
         ).install()
 
         entrance_exam_subsection = None
-        outline = course_fixture.course_outline
+        outline = course_fixture.studio_course_outline_as_json
         for child in outline['child_info']['children']:
             if child.get('display_name') == "Entrance Exam":
                 entrance_exam_subsection = child['child_info']['children'][0]
@@ -92,6 +93,8 @@ class EntranceExamPassTest(EntranceExamTest):
         When I pass entrance exam
         Then I can see complete TOC of course
         And I can see message indicating my pass status
+        When I switch to course home page
+        Then I see 2 sections
         """
         self.courseware_page.visit()
         problem_page = ProblemPage(self.browser)
@@ -102,4 +105,29 @@ class EntranceExamPassTest(EntranceExamTest):
         problem_page.click_submit()
         self.courseware_page.wait_for_page()
         self.assertTrue(self.courseware_page.has_passed_message())
-        self.assertEqual(self.courseware_page.chapter_count_in_navigation, 2)
+
+        course_home_page = CourseHomePage(self.browser, self.course_id)
+        course_home_page.visit()
+        self.assertEqual(course_home_page.outline.num_sections, 2)
+
+    # TODO: TNL-6546: Delete test using outline on courseware
+    def test_course_is_unblocked_as_soon_as_student_passes_entrance_exam_2(self):
+        """
+        Scenario: Ensure that entrance exam status message is updated and courseware is unblocked as soon as
+        student passes entrance exam.
+        Given I have a course with entrance exam as pre-requisite
+        When I pass entrance exam
+        Then I can see complete TOC of course
+        And I can see message indicating my pass status
+        """
+        self.courseware_page.visit()
+        problem_page = ProblemPage(self.browser)
+        self.assertEqual(problem_page.wait_for_page().problem_name,
+                         'HEIGHT OF EIFFEL TOWER')
+        self.assertTrue(self.courseware_page.has_entrance_exam_message())
+        self.assertFalse(self.courseware_page.has_passed_message())
+        problem_page.click_choice('choice_1')
+        problem_page.click_submit()
+        self.courseware_page.wait_for_page()
+        self.assertTrue(self.courseware_page.has_passed_message())
+        self.assertEqual(self.courseware_page.num_sections, 2)

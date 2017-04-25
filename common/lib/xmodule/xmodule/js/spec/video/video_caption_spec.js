@@ -68,7 +68,8 @@
                     expect($('.video')).toContainElement('.closed-captions');
                 });
 
-                it('fetch the transcript in HTML5 mode', function(done) {
+                // flaky test, see LEARNER-689
+                xit('fetch the transcript in HTML5 mode', function(done) {
                     state = jasmine.initializePlayer();
 
                     jasmine.waitUntil(function() {
@@ -986,9 +987,11 @@
                     videoWrapperHeight = $('.video-wrapper').height();
                     progressSliderHeight = state.el.find('.slider').height();
                     controlHeight = state.el.find('.video-controls').height();
-                    shouldBeHeight = videoWrapperHeight -
+                    shouldBeHeight = parseInt((
+                        videoWrapperHeight -
                         0.5 * progressSliderHeight -
-                        controlHeight;
+                        controlHeight
+                    ), 10);
 
                     expect(realHeight).toBe(shouldBeHeight);
                 });

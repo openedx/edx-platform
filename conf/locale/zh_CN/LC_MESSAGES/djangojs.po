@@ -4,6 +4,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# alisan617, 2017
 # shuchuanchen <am15501@163.com>, 2014
 # BertZou <turingcat@gmail.com>, 2015
 # bnw, 2014
@@ -33,7 +34,8 @@
 # Jianfei Wang <me@thinxer.com>, 2013
 # jiangnan.hugo <jiangnan.hugo@gmail.com>, 2014
 # jiangnan.hugo <jiangnan.hugo@gmail.com>, 2014
-# jsgang <jsgang9@gmail.com>, 2014-2016
+# jsgang <jsgang9@gmail.com>, 2014-2017
+# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2017
 # daisybellamy <linmiaoqiqi@hotmail.com>, 2014
 # 刘洋 <liuyang2011@tsinghua.edu.cn>, 2013
 # Luyi Zheng <luyi.zheng@mail.mcgill.ca>, 2016
@@ -94,6 +96,7 @@
 # Jerome Huang <canni3269@gmail.com>, 2014
 # Jianfei Wang <me@thinxer.com>, 2013
 # jsgang <jsgang9@gmail.com>, 2014-2016
+# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2017
 # 刘洋 <liuyang2011@tsinghua.edu.cn>, 2013
 # Na Liu <nanamadier@gmail.com>, 2014
 # pku9104038 <pku9104038@hotmail.com>, 2014
@@ -129,6 +132,8 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# alisan617, 2017
+# alisan617, 2017
 # Bill <power_free@126.com>, 2015
 # Changyue Wang <peterwang.dut@gmail.com>, 2015
 # CharlotteDing <kikyoru@hotmail.com>, 2015
@@ -157,12 +162,13 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# alisan617, 2017
 # BertZou <turingcat@gmail.com>, 2015
 # Changyue Wang <peterwang.dut@gmail.com>, 2015
 # Dustin Yu <dustintt123@hotmail.com>, 2015
 # GoodLuck <1833447072@qq.com>, 2014
 # Jiazhen Tan <jessie12@live.cn>, 2016
-# jsgang <jsgang9@gmail.com>, 2015-2016
+# jsgang <jsgang9@gmail.com>, 2015-2017
 # LIU NIAN <lauraqq@gmail.com>, 2015
 # peipeixiang <inactive+peipeixiang@transifex.com>, 2015
 # peipeixiang <inactive+peipeixiang@transifex.com>, 2015
@@ -181,9 +187,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-02-23 18:56+0000\n"
-"PO-Revision-Date: 2017-02-20 06:24+0000\n"
-"Last-Translator: Ned Batchelder <ned@edx.org>\n"
+"POT-Creation-Date: 2017-04-11 14:17+0000\n"
+"PO-Revision-Date: 2017-04-11 14:32+0000\n"
+"Last-Translator: Anthony Mangano <amangano@edx.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -201,8 +207,8 @@ msgstr ""
 #: cms/static/js/views/edit_textbook.js
 #: cms/static/js/views/list_item_editor.js
 #: cms/static/js/views/modals/edit_xblock.js cms/static/js/views/tabs.js
-#: cms/static/js/views/utils/xblock_utils.js lms/static/js/ccx/schedule.js
-#: lms/static/js/views/fields.js
+#: cms/static/js/views/tabs.js.c cms/static/js/views/utils/xblock_utils.js
+#: lms/static/js/ccx/schedule.js lms/static/js/views/fields.js
 msgid "Saving"
 msgstr "正在保存"
 
@@ -234,9 +240,8 @@ msgstr "删除"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/certificates/views/signatory_editor.js
-#: cms/static/js/factories/export.js cms/static/js/views/asset.js
-#: cms/static/js/views/course_info_update.js
-#: cms/static/js/views/manage_users_and_roles.js
+#: cms/static/js/views/asset.js cms/static/js/views/course_info_update.js
+#: cms/static/js/views/export.js cms/static/js/views/manage_users_and_roles.js
 #: cms/static/js/views/modals/base_modal.js
 #: cms/static/js/views/modals/course_outline_modals.js
 #: cms/static/js/views/show_textbook.js cms/static/js/views/tabs.js
@@ -510,12 +515,6 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "This problem has been reset."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid ""
-"Answers to this problem are now shown. Navigate through the problem to "
-"review it with answers inline."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
@@ -1693,9 +1692,9 @@ msgstr "垂直间距"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: lms/templates/bookmarks/bookmarks-list.underscore
 #: lms/templates/search/course_search_item.underscore
 #: lms/templates/search/dashboard_search_item.underscore
+#: openedx/features/course_bookmarks/static/course_bookmarks/templates/bookmarks-list.underscore
 msgid "View"
 msgstr "视图"
 
@@ -1804,7 +1803,6 @@ msgid ""
 msgstr "序列错误！ 无法导航到当前序列模块中的%(tab_name)s，请联系课程工作人员。"
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
-#: lms/static/js/bookmarks/views/bookmark_button.js
 msgid "Bookmarked"
 msgstr "已收藏"
 
@@ -1908,12 +1906,16 @@ msgid "on"
 msgstr "开启"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
-msgid "Video position"
-msgstr "视频位置"
+msgid "Video position. Press space to toggle playback"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "Video ended"
 msgstr "视频结束"
+
+#: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
+msgid "Video position"
+msgstr "视频位置"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s hour"
@@ -2174,9 +2176,7 @@ msgid "Loading posts list"
 msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
-msgid ""
-"No results found for {original_query}. Showing results for "
-"{suggested_query}."
+msgid "No results found for {original_query}. "
 msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
@@ -2291,13 +2291,13 @@ msgstr "在目标上放下"
 
 #. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
 #: common/static/js/src/jquery.timeago.locale.js
-#, javascript-format
+#, c-format
 msgid "%s ago"
 msgstr "%s 以前"
 
 #. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
 #: common/static/js/src/jquery.timeago.locale.js
-#, javascript-format
+#, c-format
 msgid "%s from now"
 msgstr "距现在:%s"
 
@@ -2310,7 +2310,7 @@ msgid "about a minute"
 msgstr "大约一分钟"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, javascript-format
+#, c-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d 分钟"
@@ -2320,7 +2320,7 @@ msgid "about an hour"
 msgstr "大约一小时"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, javascript-format
+#, c-format
 msgid "about %d hour"
 msgid_plural "about %d hours"
 msgstr[0] "大约 %d 小时"
@@ -2330,7 +2330,7 @@ msgid "a day"
 msgstr "一天"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, javascript-format
+#, c-format
 msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] "%d 天"
@@ -2340,7 +2340,7 @@ msgid "about a month"
 msgstr "大约一个月"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, javascript-format
+#, c-format
 msgid "%d month"
 msgid_plural "%d months"
 msgstr[0] "%d 个月"
@@ -2350,7 +2350,7 @@ msgid "about a year"
 msgstr "大约一年"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, javascript-format
+#, c-format
 msgid "%d year"
 msgid_plural "%d years"
 msgstr[0] "%d 年"
@@ -2740,8 +2740,6 @@ msgstr "您的请求无法完成。刷新页面，然后重试。"
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid ""
 "Your request could not be completed due to a server problem. Reload the page"
-" and try again. If the issue persists, click the Help tab to report the "
-"problem."
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
@@ -3006,31 +3004,12 @@ msgid "Heading"
 msgstr "标题"
 
 #: lms/static/js/ajax-error.js
-msgid ""
-"You have been logged out of your edX account. Click Okay to log in again "
-"now. Click Cancel to stay on this page (you must log in again to save your "
-"work)."
+msgid "You have been logged out of your edX account. "
 msgstr ""
 
 #: lms/static/js/api_admin/views/catalog_preview.js
 msgid "Preview this query"
 msgstr "预览该查询"
-
-#: lms/static/js/bookmarks/views/bookmark_button.js
-#: lms/static/js/bookmarks/views/bookmarks_list.js
-#: lms/static/js/verify_student/views/make_payment_step_view.js
-msgid "An error has occurred. Please try again."
-msgstr "发生了一个未知错误，请重试。"
-
-#: lms/static/js/bookmarks/views/bookmark_button.js
-msgid "Bookmark this page"
-msgstr ""
-
-#: lms/static/js/bookmarks/views/bookmarks_list.js
-#: lms/static/js/instructor_dashboard/data_download.js
-#: lms/templates/search/search_loading.underscore
-msgid "Loading"
-msgstr "正在加载"
 
 #: lms/static/js/ccx/schedule.js
 msgid "All subsections"
@@ -3040,7 +3019,8 @@ msgstr "所有节"
 msgid "All units"
 msgstr "所有单元"
 
-#: lms/static/js/ccx/schedule.js lms/templates/ccx/schedule.underscore
+#: lms/static/js/ccx/schedule.js lms/static/js/ccx/schedule.js.c
+#: lms/templates/ccx/schedule.underscore
 msgid "Click to change"
 msgstr "点击更改"
 
@@ -3048,7 +3028,7 @@ msgstr "点击更改"
 msgid "Select a chapter"
 msgstr "选择一章"
 
-#: lms/static/js/ccx/schedule.js
+#: lms/static/js/ccx/schedule.js lms/static/js/ccx/schedule.js.c
 msgid "Save changes"
 msgstr "保存修改"
 
@@ -3069,15 +3049,8 @@ msgid "Enter Start Date and Time"
 msgstr "输入开始日期与时间"
 
 #: lms/static/js/certificates/models/certificate_exception.js
-msgid ""
-"Student username/email field is required and can not be empty. Kindly fill "
-"in username/email and then press \"Add to Exception List\" button."
-msgstr ""
-
 #: lms/static/js/certificates/models/certificate_invalidation.js
-msgid ""
-"Student username/email field is required and can not be empty. Kindly fill "
-"in username/email and then press \"Invalidate Certificate\" button."
+msgid "Student username/email field is required and can not be empty. "
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
@@ -3093,15 +3066,15 @@ msgid " learner is successfully added to the exception list"
 msgstr "学习者已经成功地加入到例外列表"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " records are not in correct format and not added to the exception list"
+msgid " records are not in correct format and not added to"
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " record is not in correct format and not added to the exception list"
+msgid " record is not in correct format and not added to the exception"
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learners do not exist in LMS and not added to the exception list"
+msgid " learners do not exist in LMS and not added to the"
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
@@ -3109,20 +3082,19 @@ msgid " learner does not exist in LMS and not added to the exception list"
 msgstr "学习者不存在系统中，将不加到例外列表中"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learners are already white listed and not added to the exception list"
+msgid " learners are already white listed and not added to"
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learner is already white listed and not added to the exception list"
+msgid " learner is already white listed and not added to the exception "
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid ""
-" learners are not enrolled in course and not added to the exception list"
+msgid " learners are not enrolled in course and not added to"
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learner is not enrolled in course and not added to the exception list"
+msgid " learner is not enrolled in course and not added to the exception"
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
@@ -3196,13 +3168,13 @@ msgid "An error occurred. Please try again later."
 msgstr "出现了一个错误，请稍后重试。"
 
 #: lms/static/js/discovery/views/search_form.js
-#, javascript-format
+#, c-format
 msgid "Viewing %s course"
 msgid_plural "Viewing %s courses"
 msgstr[0] "查看 %s 个课程"
 
 #: lms/static/js/discovery/views/search_form.js
-#, javascript-format
+#, c-format
 msgid "We couldn't find any results for \"%s\"."
 msgstr "我们找不到有关“%s”的任何结果。"
 
@@ -3465,6 +3437,12 @@ msgstr "产生调查结果时发生错误。 请再试一次。"
 #: lms/static/js/instructor_dashboard/data_download.js
 msgid "Error generating student profile information. Please try again."
 msgstr "生成学生档案信息时发生错误，请重试。"
+
+#: lms/static/js/instructor_dashboard/data_download.js
+#: cms/templates/js/move-xblock-modal.underscore
+#: lms/templates/search/search_loading.underscore
+msgid "Loading"
+msgstr "正在加载"
 
 #: lms/static/js/instructor_dashboard/data_download.js
 msgid "Error getting student list."
@@ -4024,8 +4002,13 @@ msgid ""
 "sensitive nature of student information."
 msgstr "由于包含涉及学生的敏感信息，生成的链接将在5分钟后失效。"
 
+#: lms/static/js/learner_dashboard/views/program_details_view_2017.js
+#: lms/templates/learner_dashboard/program_card.underscore
+msgid "Enrolled"
+msgstr ""
+
 #: lms/static/js/search/base/views/search_results_view.js
-#, javascript-format
+#, c-format
 msgid "%s result"
 msgid_plural "%s results"
 msgstr[0] "%s 个结果"
@@ -4118,7 +4101,7 @@ msgid "We couldn't sign you in."
 msgstr ""
 
 #: lms/static/js/student_account/views/LoginView.js
-#, javascript-format
+#, c-format
 msgid "An error occurred when signing you in to %s."
 msgstr ""
 
@@ -4131,10 +4114,7 @@ msgid ""
 "{paragraphStart}You entered {boldStart}{email}{boldEnd}. If this email "
 "address is associated with your {platform_name} account, we will send a "
 "message with password reset instructions to this email "
-"address.{paragraphEnd}{paragraphStart}If you do not receive a password reset"
-" message, verify that you entered the correct email address, or check your "
-"spam folder.{paragraphEnd}{paragraphStart}If you need further assistance, "
-"{anchorStart}contact technical support{anchorEnd}.{paragraphEnd}"
+"address.{paragraphEnd}"
 msgstr ""
 
 #: lms/static/js/student_account/views/LoginView.js
@@ -4146,8 +4126,7 @@ msgstr "发生错误。请尝试刷新页面，或检查您的网络连接情况
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
 "You have successfully signed into %(currentProvider)s, but your "
-"%(currentProvider)s account does not have a linked %(platformName)s account."
-" To link your accounts, sign in now using your %(platformName)s password."
+"%(currentProvider)s"
 msgstr ""
 
 #: lms/static/js/student_account/views/RegisterView.js
@@ -4499,6 +4478,10 @@ msgid "Try the transaction again in a few minutes."
 msgstr "请等待几分钟后再尝试。"
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
+msgid "An error has occurred. Please try again."
+msgstr "发生了一个未知错误，请重试。"
+
+#: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Could not submit order"
 msgstr "订单提交失败"
 
@@ -4632,6 +4615,10 @@ msgid ""
 "release date."
 msgstr "在此课程公开之前，您无法以学生或测试者身份查看该课程。"
 
+#: lms/templates/class_dashboard/all_section_metrics.js
+msgid "Unable to retrieve data, please try again later."
+msgstr ""
+
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
 msgid "%(num_students)s student opened Subsection"
 msgid_plural "%(num_students)s students opened Subsection"
@@ -4745,7 +4732,7 @@ msgid "Image must be in PNG format."
 msgstr ""
 
 #: cms/static/js/collections/group.js
-#, javascript-format
+#, c-format
 msgid "Group %s"
 msgstr "%s组"
 
@@ -4757,55 +4744,8 @@ msgid "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 msgstr ""
 
 #: cms/static/js/factories/export.js
-msgid "There has been an error while exporting."
-msgstr "导出时出错了。"
-
-#: cms/static/js/factories/export.js
-msgid ""
-"There has been a failure to export to XML at least one component. It is "
-"recommended that you go to the edit page and repair the error before "
-"attempting another export. Please check that all components on the page are "
-"valid and do not display any error messages."
+msgid "Your export has failed."
 msgstr ""
-"至少有一个组件在导出到XML时失败了。在尝试重新导出之前，建议您先去编辑页面并修复错误。请检查并确认这个页面上的所有的组件都有效，而且没有显示任何错误信息。"
-
-#: cms/static/js/factories/export.js
-msgid "Correct failed component"
-msgstr "纠正失败的组件"
-
-#: cms/static/js/factories/export.js
-msgid "Return to Export"
-msgstr "返回至导出页面"
-
-#: cms/static/js/factories/export.js
-msgid ""
-"Your library could not be exported to XML. There is not enough information "
-"to identify the failed component. Inspect your library to identify any "
-"problematic components and try again."
-msgstr "您的知识库无法导出至XML。暂时没有足够的信息来定位失败的组件，请检查您的知识库以定位任何可能有问题的组件，然后重试。"
-
-#: cms/static/js/factories/export.js
-msgid "Take me to the main library page"
-msgstr "跳转至知识库主页"
-
-#: cms/static/js/factories/export.js
-msgid ""
-"Your course could not be exported to XML. There is not enough information to"
-" identify the failed component. Inspect your course to identify any "
-"problematic components and try again."
-msgstr "您的课程无法导出至XML。暂时没有足够的信息来定位失败的组件，请检查您的课程以定位任何可能有问题的组件，然后重试。"
-
-#: cms/static/js/factories/export.js
-msgid "Take me to the main course page"
-msgstr "跳转至课程主页"
-
-#: cms/static/js/factories/export.js
-msgid "The raw error message is:"
-msgstr "原始的错误信息是："
-
-#: cms/static/js/factories/export.js
-msgid "There has been an error with your export."
-msgstr "导出时发生了错误。"
 
 #: cms/static/js/factories/import.js
 msgid "There was an error while importing the new library to our database."
@@ -5059,9 +4999,7 @@ msgid "Upload failed for video {fileName}"
 msgstr ""
 
 #: cms/static/js/views/active_video_upload_list.js
-msgid ""
-"{filename} is not in a supported file format. Supported file formats are "
-"{supportedFileFormats}."
+msgid "{filename} is not in a supported file format. "
 msgstr ""
 
 #: cms/static/js/views/active_video_upload_list.js
@@ -5118,11 +5056,11 @@ msgstr "请按照这里（{maxFileSizeRedirectUrl}）的说明上传文件到别
 msgid "Max file size exceeded"
 msgstr "文件大小超出限制"
 
-#: cms/static/js/views/assets.js
+#: cms/static/js/views/assets.js cms/static/js/views/assets.js.c
 msgid "Upload New File"
 msgstr "上传新文件"
 
-#: cms/static/js/views/assets.js
+#: cms/static/js/views/assets.js cms/static/js/views/assets.js.c
 msgid "Load Another File"
 msgstr "加载其他文件"
 
@@ -5178,6 +5116,50 @@ msgstr "上传一个新的PDF文件至“<%= name %>”"
 #: cms/static/js/views/edit_chapter.js
 msgid "Please select a PDF file to upload."
 msgstr "请选择上传一个PDF文件。"
+
+#: cms/static/js/views/export.js
+msgid "There has been an error while exporting."
+msgstr "导出时出错了。"
+
+#: cms/static/js/views/export.js
+msgid "There has been a failure to export to XML at least one component. "
+msgstr ""
+
+#: cms/static/js/views/export.js
+msgid "Correct failed component"
+msgstr "纠正失败的组件"
+
+#: cms/static/js/views/export.js
+msgid "Return to Export"
+msgstr "返回至导出页面"
+
+#: cms/static/js/views/export.js
+msgid ""
+"Your library could not be exported to XML. There is not enough information "
+"to "
+msgstr ""
+
+#: cms/static/js/views/export.js
+msgid "Take me to the main library page"
+msgstr "跳转至知识库主页"
+
+#: cms/static/js/views/export.js
+msgid ""
+"Your course could not be exported to XML. There is not enough information to"
+" "
+msgstr ""
+
+#: cms/static/js/views/export.js
+msgid "Take me to the main course page"
+msgstr "跳转至课程主页"
+
+#: cms/static/js/views/export.js
+msgid "The raw error message is:"
+msgstr "原始的错误信息是："
+
+#: cms/static/js/views/export.js
+msgid "There has been an error with your export."
+msgstr "导出时发生了错误。"
 
 #. Translators: 'count' is number of groups that the group
 #. configuration contains.
@@ -5372,6 +5354,18 @@ msgstr "编辑：%(title)s"
 msgid "Component"
 msgstr "组件"
 
+#: cms/static/js/views/modals/move_xblock_modal.js
+msgid "Move"
+msgstr ""
+
+#: cms/static/js/views/modals/move_xblock_modal.js
+msgid "Choose a location to move your component to"
+msgstr ""
+
+#: cms/static/js/views/modals/move_xblock_modal.js
+msgid "Move: {displayName}"
+msgstr ""
+
 #: cms/static/js/views/modals/validation_error_modal.js
 msgid "Validation Error While Saving"
 msgstr "在保存过程中出现验证错误"
@@ -5383,6 +5377,37 @@ msgstr "撤销更改"
 #: cms/static/js/views/modals/validation_error_modal.js
 msgid "Change Manually"
 msgstr "手动更改"
+
+#: cms/static/js/views/move_xblock_list.js
+msgid "Sections"
+msgstr ""
+
+#: cms/static/js/views/move_xblock_list.js
+msgid "Subsections"
+msgstr ""
+
+#: cms/static/js/views/move_xblock_list.js
+msgid "Units"
+msgstr ""
+
+#: cms/static/js/views/move_xblock_list.js
+msgid "Components"
+msgstr ""
+
+#: cms/static/js/views/move_xblock_list.js
+#: cms/templates/js/group-configuration-editor.underscore
+msgid "Groups"
+msgstr ""
+
+#: cms/static/js/views/move_xblock_list.js
+msgid "This {parentCategory} has no {childCategory}"
+msgstr ""
+
+#: cms/static/js/views/move_xblock_list.js
+#: cms/templates/js/content-group-details.underscore
+#: cms/templates/js/group-configuration-details.underscore
+msgid "Course Outline"
+msgstr ""
 
 #: cms/static/js/views/paged_container.js
 msgid "Date added"
@@ -5599,9 +5624,35 @@ msgid ""
 "more than <%=limit%> characters."
 msgstr "机构和知识库编号字段合在一起不能超过 <%=limit%> 个字符"
 
+#: cms/static/js/views/utils/move_xblock_utils.js
+msgid "Success! \"{displayName}\" has been moved."
+msgstr ""
+
+#: cms/static/js/views/utils/move_xblock_utils.js
+msgid ""
+"Move cancelled. \"{sourceDisplayName}\" has been moved back to its original "
+"location."
+msgstr ""
+
+#: cms/static/js/views/utils/move_xblock_utils.js
+msgid "Undo move"
+msgstr ""
+
+#: cms/static/js/views/utils/move_xblock_utils.js
+msgid "Take me to the new location"
+msgstr ""
+
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Duplicating"
 msgstr "正在复制"
+
+#: cms/static/js/views/utils/xblock_utils.js
+msgid "Undo moving"
+msgstr ""
+
+#: cms/static/js/views/utils/xblock_utils.js
+msgid "Moving"
+msgstr ""
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Deleting this {xblock_type} is permanent and cannot be undone."
@@ -5778,6 +5829,14 @@ msgstr "放大"
 #: common/static/common/templates/image-modal.underscore
 msgid "Zoom Out"
 msgstr "缩小"
+
+#: common/static/common/templates/sequence-breadcrumbs.underscore
+msgid "Return to course outline"
+msgstr ""
+
+#: common/static/common/templates/sequence-breadcrumbs.underscore
+msgid "Outline"
+msgstr ""
 
 #: common/static/common/templates/components/paging-footer.underscore
 #, python-format
@@ -6377,27 +6436,6 @@ msgstr "在获取这个目录的预览结果时发生错误。请检查您的指
 msgid "This catalog's courses:"
 msgstr "此目录下的课程："
 
-#: lms/templates/bookmarks/bookmarks-list.underscore
-msgid "My Bookmarks"
-msgstr "我的书签"
-
-#: lms/templates/bookmarks/bookmarks-list.underscore
-msgid "Bookmarked on"
-msgstr "标记书签"
-
-#: lms/templates/bookmarks/bookmarks-list.underscore
-msgid "You have not bookmarked any courseware pages yet."
-msgstr "你尚未在任何课件页面上标记书签。"
-
-#: lms/templates/bookmarks/bookmarks-list.underscore
-msgid ""
-"Use bookmarks to help you easily return to courseware pages. To bookmark a "
-"page, select Bookmark in the upper right corner of that page. To see a list "
-"of all your bookmarks, select Bookmarks in the upper left corner of any "
-"courseware page."
-msgstr ""
-"使用书签可帮助你轻松返回至课件页面。要给某个页面标记书签，请选择该页面右上角的“书签”。要查看你的所有书签的列表，请选择任何课件页面左上角的“书签”。"
-
 #: lms/templates/ccx/schedule.underscore
 msgid "Expand All"
 msgstr "展开全部"
@@ -6570,11 +6608,13 @@ msgid "LEARN MORE"
 msgstr "了解更多"
 
 #: lms/templates/discovery/course_card.underscore
+#: lms/templates/discovery/course_card_2017.underscore
 #, python-format
 msgid "Starts: %(start_date)s"
 msgstr "开始于：%(start_date)s"
 
 #: lms/templates/discovery/course_card.underscore
+#: lms/templates/discovery/course_card_2017.underscore
 msgid "Starts"
 msgstr "开始"
 
@@ -6984,6 +7024,15 @@ msgstr "恭喜！您已经获得了这门课程的证书。"
 msgid "View Certificate"
 msgstr ""
 
+#: lms/templates/learner_dashboard/certificate_status_2017.underscore
+#: lms/templates/learner_dashboard/upgrade_message_2017.underscore
+msgid "Certificate Status:"
+msgstr ""
+
+#: lms/templates/learner_dashboard/certificate_status_2017.underscore
+msgid "Certificate Purchased"
+msgstr ""
+
 #: lms/templates/learner_dashboard/course_card.underscore
 #, python-format
 msgid "%(courseName)s Home Page."
@@ -7002,6 +7051,7 @@ msgid "View Archived Course"
 msgstr ""
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
+#: lms/templates/learner_dashboard/program_card.underscore
 msgid "Not Enrolled"
 msgstr ""
 
@@ -7023,19 +7073,27 @@ msgid "Starts %(start)s"
 msgstr "开始于%(start)s"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
+#: lms/templates/learner_dashboard/course_enroll_2017.underscore
 msgid "Enroll Now"
 msgstr "现在选课"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
+#: lms/templates/learner_dashboard/course_enroll_2017.underscore
 msgid "Coming Soon"
 msgstr ""
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
+#: lms/templates/learner_dashboard/course_enroll_2017.underscore
 msgid "Enrollment Opens on"
 msgstr ""
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
+#: lms/templates/learner_dashboard/course_enroll_2017.underscore
 msgid "Not Currently Available"
+msgstr ""
+
+#: lms/templates/learner_dashboard/course_enroll_2017.underscore
+msgid "Choose a course run:"
 msgstr ""
 
 #: lms/templates/learner_dashboard/empty_programs_list.underscore
@@ -7057,18 +7115,57 @@ msgid "Explore New Programs"
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_card.underscore
-#, python-format
-msgid ""
-"You have earned certificates in %(completed_courses)s of the "
-"%(total_courses)s courses so far."
-msgstr "在 %(total_courses)s 个课程中，您到目前为止已获得 %(completed_courses)s 个课程的证书。"
+#: lms/templates/verify_student/enrollment_confirmation_step.underscore
+msgid "Course"
+msgid_plural "Courses"
+msgstr[0] ""
+
+#: lms/templates/learner_dashboard/program_card.underscore
+msgid "Completed"
+msgstr ""
 
 #: lms/templates/learner_dashboard/program_card.underscore
 #, python-format
 msgid "%(programName)s Home Page."
 msgstr ""
 
+#: lms/templates/learner_dashboard/program_details_view_2017.underscore
+msgid "Congratulations!"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_view_2017.underscore
+msgid "Your Program Journey"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_view_2017.underscore
+msgid ""
+"To complete the program, you must earn a verified certificate for each "
+"course."
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_view_2017.underscore
+msgid "COURSES IN PROGRESS"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_view_2017.underscore
+msgid "REMAINING COURSES"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_view_2017.underscore
+msgid "COMPLETED COURSES"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_view_2017.underscore
+msgid "As you complete courses, you will see them listed here."
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_view_2017.underscore
+msgid ""
+"Complete courses on your schedule to ensure you stand out in your field!"
+msgstr ""
+
 #: lms/templates/learner_dashboard/program_header_view.underscore
+#: lms/templates/learner_dashboard/program_header_view_2017.underscore
 msgid "{organization}\\'s logo"
 msgstr "{organization}\\'s 的标识"
 
@@ -7092,6 +7189,14 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/upgrade_message.underscore
 msgid "Upgrade Now"
+msgstr ""
+
+#: lms/templates/learner_dashboard/upgrade_message_2017.underscore
+msgid "Needs verified certificate "
+msgstr ""
+
+#: lms/templates/learner_dashboard/upgrade_message_2017.underscore
+msgid "Buy Certificate"
 msgstr ""
 
 #: lms/templates/search/course_search_results.underscore
@@ -7334,10 +7439,6 @@ msgstr "您已经已认证学生的身份选择了课程："
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "A list of courses you have just enrolled in as a verified student"
 msgstr "你以认证学生的身份选修的课程列表"
-
-#: lms/templates/verify_student/enrollment_confirmation_step.underscore
-msgid "Course"
-msgstr "课程"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Explore your course!"
@@ -7822,6 +7923,20 @@ msgstr "重新拍照"
 msgid "Take Photo"
 msgstr "拍照"
 
+#: openedx/features/course_bookmarks/static/course_bookmarks/templates/bookmarks-list.underscore
+msgid "Bookmarked on"
+msgstr "标记书签"
+
+#: openedx/features/course_bookmarks/static/course_bookmarks/templates/bookmarks-list.underscore
+msgid "You have not bookmarked any courseware pages yet"
+msgstr ""
+
+#: openedx/features/course_bookmarks/static/course_bookmarks/templates/bookmarks-list.underscore
+msgid ""
+"Use bookmarks to help you easily return to courseware pages. To bookmark a "
+"page, click \"Bookmark this page\" under the page title."
+msgstr ""
+
 #: cms/templates/js/access-editor.underscore
 msgid "Limit Access"
 msgstr ""
@@ -8082,11 +8197,6 @@ msgstr ""
 msgid ""
 "This content group is not in use. Add a content group to any unit from the "
 "{linkStart}Course Outline{linkEnd}."
-msgstr ""
-
-#: cms/templates/js/content-group-details.underscore
-#: cms/templates/js/group-configuration-details.underscore
-msgid "Course Outline"
 msgstr ""
 
 #: cms/templates/js/content-group-editor.underscore
@@ -8533,10 +8643,6 @@ msgid "Group information"
 msgstr ""
 
 #: cms/templates/js/group-configuration-editor.underscore
-msgid "Groups"
-msgstr ""
-
-#: cms/templates/js/group-configuration-editor.underscore
 msgid ""
 "Name of the groups that students will be assigned to, for example, Control, "
 "Video, Problems. You must have two or more groups."
@@ -8623,6 +8729,22 @@ msgstr ""
 #: cms/templates/js/metadata-file-uploader-item.underscore
 #: cms/templates/js/video/metadata-translations-item.underscore
 msgid "Download"
+msgstr ""
+
+#: cms/templates/js/move-xblock-list.underscore
+msgid "{categoryText} in {parentDisplayname}"
+msgstr ""
+
+#: cms/templates/js/move-xblock-list.underscore
+msgid "Current location"
+msgstr ""
+
+#: cms/templates/js/move-xblock-list.underscore
+msgid "View child items"
+msgstr ""
+
+#: cms/templates/js/move-xblock-list.underscore
+msgid "Currently selected"
 msgstr ""
 
 #: cms/templates/js/no-textbooks.underscore
@@ -8732,7 +8854,8 @@ msgid "Staff and Learners"
 msgstr ""
 
 #: cms/templates/js/publish-xblock.underscore
-msgid "Some content in this unit is visible only to particular content groups"
+msgid ""
+"Some content in this unit is visible only to specific groups of learners."
 msgstr ""
 
 #: cms/templates/js/publish-xblock.underscore

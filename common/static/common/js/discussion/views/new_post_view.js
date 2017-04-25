@@ -36,21 +36,25 @@
             NewPostView.prototype.initialize = function(options) {
                 var _ref;
                 this.mode = options.mode || 'inline';
+                this.startHeader = options.startHeader;
                 if ((_ref = this.mode) !== 'tab' && _ref !== 'inline') {
                     throw new Error('invalid mode: ' + this.mode);
                 }
                 this.course_settings = options.course_settings;
                 this.is_commentable_cohorted = options.is_commentable_cohorted;
                 this.topicId = options.topicId;
+                this.discussionBoardView = options.discussionBoardView;
             };
 
             NewPostView.prototype.render = function() {
-                var context, threadTypeTemplate;
+                var context,
+                    threadTypeTemplate;
                 context = _.clone(this.course_settings.attributes);
                 _.extend(context, {
                     cohort_options: this.getCohortOptions(),
                     is_commentable_cohorted: this.is_commentable_cohorted,
                     mode: this.mode,
+                    startHeader: this.startHeader,
                     form_id: this.mode + (this.topicId ? '-' + this.topicId : '')
                 });
                 this.$el.html(_.template($('#new-post-template').html())(context));
@@ -158,8 +162,17 @@
                     },
                     error: DiscussionUtil.formErrorHandler(this.$('.post-errors')),
                     success: function(response) {
-                        var thread;
+                        var thread, discussionBreadcrumbsModel;
                         thread = new Thread(response.content);
+                        // Update the breadcrumbs and discussion Id(s) related to current topic
+                        if (self.discussionBoardView) {
+                            discussionBreadcrumbsModel = self.discussionBoardView.breadcrumbs.model;
+                            if (discussionBreadcrumbsModel.get('contents').length) {
+                                discussionBreadcrumbsModel.set('contents', self.topicView.topicText.split('/'));
+                            }
+                            self.discussionBoardView.discussionThreadListView.discussionIds =
+                                self.topicView.currentTopicId;
+                        }
                         self.$el.addClass('is-hidden');
                         self.resetForm();
                         self.trigger('newPost:createPost');

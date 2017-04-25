@@ -174,6 +174,7 @@
             this.showButton.click(this.show);
             this.saveButton = this.$('.action .save');
             this.saveNotification = this.$('.notification-save');
+            this.showAnswerNotification = this.$('.notification-show-answer');
             this.saveButton.click(this.save);
             this.gentleAlertNotification = this.$('.notification-gentle-alert');
             this.submitNotification = this.$('.notification-submit');
@@ -213,11 +214,36 @@
             attemptsUsed = this.el.data('attempts-used');
             graded = this.el.data('graded');
 
+            // The problem is ungraded if it's explicitly marked as such, or if the total possible score is 0
+            if (graded === 'True' && totalScore !== 0) {
+                graded = true;
+            } else {
+                graded = false;
+            }
+
             if (curScore === undefined || totalScore === undefined) {
-                progress = '';
+                // Render an empty string.
+                progressTemplate = '';
+            } else if (curScore === null || curScore === 'None') {
+                // Render 'x point(s) possible (un/graded, results hidden)' if no current score provided.
+                if (graded) {
+                    progressTemplate = ngettext(
+                        // Translators: %(num_points)s is the number of points possible (examples: 1, 3, 10).;
+                        '%(num_points)s point possible (graded, results hidden)',
+                        '%(num_points)s points possible (graded, results hidden)',
+                        totalScore
+                    );
+                } else {
+                    progressTemplate = ngettext(
+                        // Translators: %(num_points)s is the number of points possible (examples: 1, 3, 10).;
+                        '%(num_points)s point possible (ungraded, results hidden)',
+                        '%(num_points)s points possible (ungraded, results hidden)',
+                        totalScore
+                    );
+                }
             } else if (attemptsUsed === 0 || totalScore === 0) {
                 // Render 'x point(s) possible' if student has not yet attempted question
-                if (graded === 'True' && totalScore !== 0) {
+                if (graded) {
                     progressTemplate = ngettext(
                         // Translators: %(num_points)s is the number of points possible (examples: 1, 3, 10).;
                         '%(num_points)s point possible (graded)', '%(num_points)s points possible (graded)',
@@ -230,10 +256,9 @@
                         totalScore
                     );
                 }
-                progress = interpolate(progressTemplate, {num_points: totalScore}, true);
             } else {
                 // Render 'x/y point(s)' if student has attempted question
-                if (graded === 'True' && totalScore !== 0) {
+                if (graded) {
                     progressTemplate = ngettext(
                         // This comment needs to be on one line to be properly scraped for the translators.
                         // Translators: %(earned)s is the number of points earned. %(possible)s is the total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of points will always be at least 1. We pluralize based on the total number of points (example: 0/1 point; 1/2 points);
@@ -248,13 +273,14 @@
                         totalScore
                     );
                 }
-                progress = interpolate(
-                    progressTemplate, {
-                        earned: curScore,
-                        possible: totalScore
-                    }, true
-                );
             }
+            progress = interpolate(
+                progressTemplate, {
+                    earned: curScore,
+                    num_points: totalScore,
+                    possible: totalScore
+                }, true
+            );
             return this.$('.problem-progress').text(progress);
         };
 
@@ -572,6 +598,7 @@
                     complete: this.enableSubmitButtonAfterResponse,
                     success: function(response) {
                         switch (response.success) {
+                        case 'submitted':
                         case 'incorrect':
                         case 'correct':
                             that.render(response.contents);
@@ -598,6 +625,7 @@
             Logger.log('problem_check', this.answers);
             return $.postWithPrefix('' + this.url + '/problem_check', this.answers, function(response) {
                 switch (response.success) {
+                case 'submitted':
                 case 'incorrect':
                 case 'correct':
                     window.SR.readTexts(that.get_sr_status(response.contents));
@@ -727,8 +755,9 @@
                 }
                 that.el.find('.show').attr('disabled', 'disabled');
                 that.updateProgress(response);
-                window.SR.readText(gettext('Answers to this problem are now shown. Navigate through the problem to review it with answers inline.')); // eslint-disable-line max-len
-                that.scroll_to_problem_meta();
+                that.clear_all_notifications();
+                that.showAnswerNotification.show();
+                that.focus_on_notification('show-answer');
             });
         };
 
@@ -736,6 +765,8 @@
             this.submitNotification.remove();
             this.gentleAlertNotification.hide();
             this.saveNotification.hide();
+            this.showAnswerNotification.hide();
+
         };
 
         Problem.prototype.gentle_alert = function(msg) {
@@ -848,6 +879,7 @@
                     if (bind) {
                         $(textField).on('input', function() {
                             that.saveNotification.hide();
+                            that.showAnswerNotification.hide();
                             that.submitAnswersAndSubmitButton();
                         });
                     }
@@ -867,6 +899,8 @@
                         if (bind) {
                             $(checkboxOrRadio).on('click', function() {
                                 that.saveNotification.hide();
+                                that.el.find('.show').removeAttr('disabled');
+                                that.showAnswerNotification.hide();
                                 that.submitAnswersAndSubmitButton();
                             });
                         }
@@ -884,6 +918,7 @@
                 if (bind) {
                     $(selectField).on('change', function() {
                         that.saveNotification.hide();
+                        that.showAnswerNotification.hide();
                         that.submitAnswersAndSubmitButton();
                     });
                 }
@@ -946,6 +981,7 @@
                             id: 'status_' + id
                         });
                     }
+                    $element.find('label').find('span.status.correct').remove();
                     return $element.find('label').removeAttr('class');
                 });
             },

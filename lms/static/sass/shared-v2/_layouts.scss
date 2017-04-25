@@ -1,11 +1,8 @@
 // LMS layouts
 
 .content-wrapper {
-    max-width: 1180px;
-    padding: {
-        top: $baseline/2;
-        bottom: $baseline*2;
-    }
+    max-width: $lms-max-width;
+    padding-bottom: $baseline*2;
 
     .container {
         @include clearfix();
@@ -44,16 +41,6 @@
 
                 .form-actions {
                     display: inline-block;
-                }
-
-                .form-actions > * {
-                    @include margin-left($baseline/2);
-                    vertical-align: middle;
-                    height: 34px;
-                }
-
-                .form-actions > button {
-                    height: 34px;
                 }
 
                 .form-actions > *:first-child {

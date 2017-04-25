@@ -60,9 +60,8 @@ class CourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
         resp = self.client.get(url)
         self.assertNotIn("You are not currently enrolled in this course", resp.content)
 
-    @mock.patch('courseware.views.views.get_course_specific_consent_url')
-    @mock.patch('courseware.views.views.consent_needed_for_course')
-    def test_redirection_missing_enterprise_consent(self, mock_consent_needed, mock_get_url):
+    @mock.patch('openedx.features.enterprise_support.api.get_enterprise_consent_url')
+    def test_redirection_missing_enterprise_consent(self, mock_get_url):
         """
         Verify that users viewing the course info who are enrolled, but have not provided
         data sharing consent, are first redirected to a consent page, and then, once they've
@@ -70,7 +69,6 @@ class CourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
         """
         self.setup_user()
         self.enroll(self.course)
-        mock_consent_needed.return_value = True
         mock_get_url.return_value = reverse('dashboard')
         url = reverse('info', args=[self.course.id.to_deprecated_string()])
 
@@ -80,8 +78,8 @@ class CourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
             response,
             reverse('dashboard')
         )
-        mock_consent_needed.assert_called_once_with(self.user, unicode(self.course.id))
-        mock_consent_needed.return_value = False
+        mock_get_url.assert_called_once()
+        mock_get_url.return_value = None
         response = self.client.get(url)
         self.assertNotIn("You are not currently enrolled in this course", response.content)
 
@@ -369,7 +367,7 @@ class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
         self.assertEqual(resp.status_code, 200)
 
     def test_num_queries_instructor_paced(self):
-        self.fetch_course_info_with_queries(self.instructor_paced_course, 21, 4)
+        self.fetch_course_info_with_queries(self.instructor_paced_course, 24, 4)
 
     def test_num_queries_self_paced(self):
-        self.fetch_course_info_with_queries(self.self_paced_course, 21, 4)
+        self.fetch_course_info_with_queries(self.self_paced_course, 24, 4)

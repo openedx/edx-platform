@@ -7,39 +7,48 @@
             <span class="category-icon <%- type.toLowerCase() %>-icon" aria-hidden="true"></span>
         </div>
     </div>
-  <% if (progress) { %>  
-    <p class="certificate-status">
-        <a href="<%- detailUrl %>" class="status-text secondary" aria-describedby="program-<%- uuid %>"><%= interpolate(
-            ngettext(
-                '%(count)s course is in progress.',
-                '%(count)s courses are in progress.',
-                progress.in_progress
-            ),
-            {count: progress.in_progress}, true 
-        ) %></a>
-
-        <a href="<%- detailUrl %>" class="status-text secondary" aria-describedby="program-<%- uuid %>"><%= interpolate(
-            ngettext(
-                '%(count)s course has not been started.',
-                '%(count)s courses have not been started.',
-                progress.not_started
-            ),
-            {count: progress.not_started}, true 
-        ) %></a>
-
-        <span id="status-<%- uuid %>" class="status-text"><%= interpolate(
-            gettext('You have earned certificates in %(completed_courses)s of the %(total_courses)s courses so far.'),
-            {completed_courses: progress.completed, total_courses: progress.total}, true
-        ) %></span>
-    </p>
-  <% } %>
 </div>
 <% if (progress) { %>
-<div class="progress">
-    <div class="bar complete" style="width:<%- progress.percentage.completed %>;"></div>
-    <div class="bar in-progress" style="width:<%- progress.percentage.in_progress %>;"></div>
-    <div class="bar not-started"></div>
-</div>
+    <div class="status-text">
+        <div class="number-status">
+            <div class="number-circle completed"><%- progress.completed %></div>
+            <span class="sr-only">
+                <%- ngettext('Course', 'Courses', progress.completed) %>
+            </span>
+            <%- gettext('Completed') %>
+        </div>
+
+        <div class="number-status">
+            <div class="number-circle enrolled"><%- progress.in_progress %></div>
+            <span class="sr-only">
+                <%- ngettext('Course', 'Courses', progress.in_progress) %>
+            </span>
+            <%- gettext('In Progress') %>
+        </div>
+
+        <div class="number-status">
+            <div class="number-circle not-enrolled"><%- progress.not_started %></div>
+            <span class="sr-only">
+                <%- ngettext('Course', 'Courses', progress.not_started) %>
+            </span>
+            <%- gettext('Remaining') %>
+        </div>
+    </div>
+<% } %>
+<% if (progress) { %>
+    <div class="progress-container">
+      <div class="progress-bar">
+        <% _.times(progress.completed, function() { %>
+            <div class="item completed"></div>
+        <% }) %>
+        <% _.times(progress.in_progress, function() { %>
+            <div class="item enrolled"></div>
+        <% }) %>
+        <% _.times(progress.not_started, function() { %>
+            <div class="item not-enrolled"></div>
+        <% }) %>
+      </div>
+    </div>
 <% } %>
 <a href="<%- detailUrl %>" class="card-link">
     <div class="banner-image-container">

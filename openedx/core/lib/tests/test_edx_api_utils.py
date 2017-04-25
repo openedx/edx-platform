@@ -65,7 +65,7 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
         )
 
         with mock.patch('openedx.core.lib.edx_api_utils.EdxRestApiClient.__init__') as mock_init:
-            actual_collection = get_edx_api_data(catalog_integration, self.user, 'programs', api=api)
+            actual_collection = get_edx_api_data(catalog_integration, 'programs', api=api)
 
             # Verify that the helper function didn't initialize its own client.
             self.assertFalse(mock_init.called)
@@ -96,10 +96,38 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
 
         self._mock_catalog_api(responses)
 
-        actual_collection = get_edx_api_data(catalog_integration, self.user, 'programs', api=api)
+        actual_collection = get_edx_api_data(catalog_integration, 'programs', api=api)
         self.assertEqual(actual_collection, expected_collection)
 
         self._assert_num_requests(len(expected_collection))
+
+    def test_get_paginated_data_do_not_traverse_pagination(self):
+        """
+        Verify that pagination is not traversed if traverse_pagination=False is passed as argument.
+        """
+        catalog_integration = self.create_catalog_integration()
+        api = create_catalog_api_client(self.user, catalog_integration)
+
+        url = CatalogIntegration.current().internal_api_url.strip('/') + '/programs/?page={}'
+        responses = [
+            {
+                'next': url.format(2),
+                'results': ['some'],
+            },
+            {
+                'next': url.format(None),
+                'results': ['test'],
+            },
+        ]
+        expected_response = responses[0]
+
+        self._mock_catalog_api(
+            [httpretty.Response(body=json.dumps(body), content_type='application/json') for body in responses]
+        )
+
+        actual_collection = get_edx_api_data(catalog_integration, 'programs', api=api, traverse_pagination=False)
+        self.assertEqual(actual_collection, expected_response)
+        self._assert_num_requests(1)
 
     def test_get_specific_resource(self):
         """Verify that a specific resource can be retrieved."""
@@ -119,7 +147,7 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
             url=url
         )
 
-        actual_resource = get_edx_api_data(catalog_integration, self.user, 'programs', api=api, resource_id=resource_id)
+        actual_resource = get_edx_api_data(catalog_integration, 'programs', api=api, resource_id=resource_id)
         self.assertEqual(actual_resource, expected_resource)
 
         self._assert_num_requests(1)
@@ -148,7 +176,7 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
             url=url
         )
 
-        actual_resource = get_edx_api_data(catalog_integration, self.user, 'programs', api=api, resource_id=resource_id)
+        actual_resource = get_edx_api_data(catalog_integration, 'programs', api=api, resource_id=resource_id)
         self.assertEqual(actual_resource, expected_resource)
 
         self._assert_num_requests(1)
@@ -184,17 +212,15 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
         cache_key = CatalogIntegration.current().CACHE_KEY
 
         # Warm up the cache.
-        get_edx_api_data(catalog_integration, self.user, 'programs', api=api, cache_key=cache_key)
-        get_edx_api_data(
-            catalog_integration, self.user, 'programs', api=api, resource_id=resource_id, cache_key=cache_key
-        )
+        get_edx_api_data(catalog_integration, 'programs', api=api, cache_key=cache_key)
+        get_edx_api_data(catalog_integration, 'programs', api=api, resource_id=resource_id, cache_key=cache_key)
 
         # Hit the cache.
-        actual_collection = get_edx_api_data(catalog_integration, self.user, 'programs', api=api, cache_key=cache_key)
+        actual_collection = get_edx_api_data(catalog_integration, 'programs', api=api, cache_key=cache_key)
         self.assertEqual(actual_collection, expected_collection)
 
         actual_resource = get_edx_api_data(
-            catalog_integration, self.user, 'programs', api=api, resource_id=resource_id, cache_key=cache_key
+            catalog_integration, 'programs', api=api, resource_id=resource_id, cache_key=cache_key
         )
         self.assertEqual(actual_resource, expected_resource)
 
@@ -206,22 +232,9 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
         """Verify that no data is retrieved if the provided config model is disabled."""
         catalog_integration = self.create_catalog_integration(enabled=False)
 
-        actual = get_edx_api_data(catalog_integration, self.user, 'programs')
+        actual = get_edx_api_data(catalog_integration, 'programs', api=None)
 
         self.assertTrue(mock_warning.called)
-        self.assertEqual(actual, [])
-
-    @mock.patch('edx_rest_api_client.client.EdxRestApiClient.__init__')
-    @mock.patch(UTILITY_MODULE + '.log.exception')
-    def test_client_initialization_failure(self, mock_exception, mock_init):
-        """Verify that an exception is logged when the API client fails to initialize."""
-        mock_init.side_effect = Exception
-
-        catalog_integration = self.create_catalog_integration()
-
-        actual = get_edx_api_data(catalog_integration, self.user, 'programs')
-
-        self.assertTrue(mock_exception.called)
         self.assertEqual(actual, [])
 
     @mock.patch(UTILITY_MODULE + '.log.exception')
@@ -234,7 +247,7 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
             [httpretty.Response(body='clunk', content_type='application/json', status_code=500)]
         )
 
-        actual = get_edx_api_data(catalog_integration, self.user, 'programs', api=api)
+        actual = get_edx_api_data(catalog_integration, 'programs', api=api)
 
         self.assertTrue(mock_exception.called)
         self.assertEqual(actual, [])
@@ -246,31 +259,13 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
 
         actual = get_edx_api_data(
             catalog_integration,
-            self.user,
             'programs',
+            api=None,
             resource_id=100,
-            many=False,
+            many=False
         )
 
         self.assertTrue(mock_warning.called)
-        self.assertEqual(actual, {})
-
-    @mock.patch('edx_rest_api_client.client.EdxRestApiClient.__init__')
-    @mock.patch(UTILITY_MODULE + '.log.exception')
-    def test_client_initialization_failure_with_id(self, mock_exception, mock_init):
-        """Verify that an exception is logged when the API client fails to initialize."""
-        mock_init.side_effect = Exception
-
-        catalog_integration = self.create_catalog_integration()
-
-        actual = get_edx_api_data(
-            catalog_integration,
-            self.user,
-            'programs',
-            resource_id=100,
-            many=False,
-        )
-        self.assertTrue(mock_exception.called)
         self.assertEqual(actual, {})
 
     @mock.patch(UTILITY_MODULE + '.log.exception')
@@ -285,21 +280,10 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
 
         actual = get_edx_api_data(
             catalog_integration,
-            self.user,
             'programs',
             api=api,
             resource_id=100,
-            many=False,
+            many=False
         )
         self.assertTrue(mock_exception.called)
         self.assertEqual(actual, {})
-
-    def test_api_client_not_provided(self):
-        """Verify that an API client doesn't need to be provided."""
-        ClientFactory(name=CredentialsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
-
-        credentials_api_config = self.create_credentials_config()
-
-        with mock.patch('openedx.core.lib.edx_api_utils.EdxRestApiClient.__init__') as mock_init:
-            get_edx_api_data(credentials_api_config, self.user, 'credentials')
-            self.assertTrue(mock_init.called)

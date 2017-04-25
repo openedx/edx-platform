@@ -80,6 +80,7 @@
                 this.mode = options.mode || 'inline';
                 this.context = options.context || 'course';
                 this.options = _.extend({}, options);
+                this.startHeader = options.startHeader;
                 if ((_ref = this.mode) !== 'tab' && _ref !== 'inline') {
                     throw new Error('invalid mode: ' + this.mode);
                 }
@@ -91,6 +92,7 @@
                         self.model = collection.get(id);
                     }
                 });
+                this.is_commentable_cohorted = options.is_commentable_cohorted;
                 this.createShowView();
                 this.responses = new Comments();
                 this.loadedResponses = false;
@@ -116,7 +118,8 @@
             };
 
             DiscussionThreadView.prototype.renderTemplate = function() {
-                var container, templateData;
+                var container,
+                    templateData;
                 this.template = _.template($('#thread-template').html());
                 container = $('#discussion-container');
                 if (!container.length) {
@@ -124,6 +127,7 @@
                 }
                 templateData = _.extend(this.model.toJSON(), {
                     readOnly: this.readOnly,
+                    startHeader: this.startHeader + 1, // this is a child so headers should be increased
                     can_create_comment: container.data('user-create-comment')
                 });
                 return this.template(templateData);
@@ -299,7 +303,8 @@
                 var view;
                 response.set('thread', this.model);
                 view = new ThreadResponseView($.extend({
-                    model: response
+                    model: response,
+                    startHeader: this.startHeader + 1 // this is a child so headers should be increased
                 }, options));
                 view.on('comment:add', this.addComment);
                 view.on('comment:endorse', this.endorseThread);
@@ -396,6 +401,7 @@
                     model: this.model,
                     mode: this.mode,
                     context: this.context,
+                    startHeader: this.startHeader,
                     course_settings: this.options.courseSettings
                 });
                 this.editView.bind('thread:updated thread:cancel_edit', this.closeEditView);
@@ -415,7 +421,9 @@
             DiscussionThreadView.prototype.createShowView = function() {
                 this.showView = new DiscussionThreadShowView({
                     model: this.model,
-                    mode: this.mode
+                    mode: this.mode,
+                    startHeader: this.startHeader,
+                    is_commentable_cohorted: this.is_commentable_cohorted
                 });
                 this.showView.bind('thread:_delete', this._delete);
                 return this.showView.bind('thread:edit', this.edit);

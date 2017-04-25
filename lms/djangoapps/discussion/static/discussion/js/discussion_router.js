@@ -23,6 +23,12 @@
                     this.courseSettings = options.courseSettings;
                     this.discussionBoardView = options.discussionBoardView;
                     this.newPostView = options.newPostView;
+                    if (options.startHeader !== undefined) {
+                        this.startHeader = options.startHeader;
+                    } else {
+                        this.startHeader = 2; // Start the header levels at H<startHeader>
+                    }
+
                 },
 
                 start: function() {
@@ -95,7 +101,9 @@
                         el: $('.forum-content'),
                         model: this.thread,
                         mode: 'tab',
-                        courseSettings: this.courseSettings
+                        startHeader: this.startHeader,
+                        courseSettings: this.courseSettings,
+                        is_commentable_cohorted: this.discussion.is_commentable_cohorted
                     });
                     this.main.render();
                     this.main.on('thread:responses:rendered', function() {

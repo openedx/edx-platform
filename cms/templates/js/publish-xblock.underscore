@@ -26,16 +26,30 @@ var visibleToStaffOnly = visibilityState === 'staff_only';
 
     <div class="wrapper-last-draft bar-mod-content">
         <p class="copy meta">
-            <% if (hasChanges && editedOn && editedBy) {
-                var message = gettext("Draft saved on %(last_saved_date)s by %(edit_username)s") %>
-                <%= interpolate(_.escape(message), {
-                    last_saved_date: '<span class="date">' + _.escape(editedOn) + '</span>',
-                    edit_username: '<span class="user">' + _.escape(editedBy) + '</span>' }, true) %>
-            <% } else if (publishedOn && publishedBy) {
-                var message = gettext("Last published %(last_published_date)s by %(publish_username)s"); %>
-                <%= interpolate(_.escape(message), {
-                    last_published_date: '<span class="date">' + _.escape(publishedOn) + '</span>',
-                    publish_username: '<span class="user">' + _.escape(publishedBy) + '</span>' }, true) %>
+            <% if (hasChanges && editedOn && editedBy) { %>
+                <%= HtmlUtils.interpolateHtml(
+                        gettext("Draft saved on {lastSavedStart}{editedOn}{lastSavedEnd} by {editedByStart}{editedBy}{editedByEnd}"),
+                        {
+                            lastSavedStart: HtmlUtils.HTML('<span class="date">'),
+                            editedOn: editedOn,
+                            lastSavedEnd: HtmlUtils.HTML('</span>'),
+                            editedByStart: HtmlUtils.HTML('<span class="user">'),
+                            editedBy: editedBy,
+                            editedByEnd: HtmlUtils.HTML('</span>')
+                        }
+                    ) %>
+            <% } else if (publishedOn && publishedBy) { %>
+                <%= HtmlUtils.interpolateHtml(
+                        gettext("Last published {lastPublishedStart}{publishedOn}{lastPublishedEnd} by {publishedByStart}{publishedBy}{publishedByEnd}"),
+                        {
+                            lastPublishedStart: HtmlUtils.HTML('<span class="date">'),
+                            publishedOn: publishedOn,
+                            lastPublishedEnd: HtmlUtils.HTML('</span>'),
+                            publishedByStart: HtmlUtils.HTML('<span class="user">'),
+                            publishedBy: publishedBy,
+                            publishedByEnd: HtmlUtils.HTML('</span>')
+                        }
+                    ) %>
             <% } else { %>
                 <%- gettext("Previously published") %>
             <% } %>
@@ -83,10 +97,10 @@ var visibleToStaffOnly = visibilityState === 'staff_only';
         <% } else { %>
             <p class="visbility-copy copy"><%- gettext("Staff and Learners") %></p>
         <% } %>
-            <% if (hasContentGroupComponents) { %>
+            <% if (hasPartitionGroupComponents) { %>
                 <p class="note-visibility">
                     <span class="icon fa fa-eye" aria-hidden="true"></span>
-                    <span class="note-copy"><%- gettext("Some content in this unit is visible only to particular content groups") %></span>
+                    <span class="note-copy"><%- gettext("Some content in this unit is visible only to specific groups of learners.") %></span>
                 </p>
             <% } %>
         <ul class="actions-inline">

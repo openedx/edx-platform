@@ -3,7 +3,6 @@ Test Help links in LMS
 """
 import json
 
-
 from common.test.acceptance.tests.lms.test_lms_instructor_dashboard import BaseInstructorDashboardTest
 from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage
 from common.test.acceptance.tests.studio.base_studio_test import ContainerBase
@@ -14,6 +13,8 @@ from common.test.acceptance.tests.helpers import (
     assert_link,
     assert_opened_help_link_is_correct
 )
+
+from openedx.core.release import doc_version
 
 
 class TestCohortHelp(ContainerBase):
@@ -26,16 +27,6 @@ class TestCohortHelp(ContainerBase):
         self.instructor_dashboard_page = InstructorDashboardPage(self.browser, self.course_id)
         self.instructor_dashboard_page.visit()
         self.cohort_management = self.instructor_dashboard_page.select_cohort_management()
-
-    def get_url_with_changed_domain(self, url):
-        """
-        Replaces .org with .io in the url
-        Arguments:
-            url (str): The url to perform replace operation on.
-        Returns:
-        str: The updated url
-        """
-        return url.replace('.org/', '.io/')
 
     def verify_help_link(self, href):
         """
@@ -50,7 +41,7 @@ class TestCohortHelp(ContainerBase):
         actual_link = self.cohort_management.get_cohort_help_element_and_click_help()
 
         assert_link(self, expected_link, actual_link)
-        assert_opened_help_link_is_correct(self, self.get_url_with_changed_domain(href))
+        assert_opened_help_link_is_correct(self, href)
 
     def test_manual_cohort_help(self):
         """
@@ -66,8 +57,10 @@ class TestCohortHelp(ContainerBase):
         """
         self.cohort_management.add_cohort('cohort_name')
 
-        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/' \
-               'course_features/cohorts/cohort_config.html#assign-learners-to-cohorts-manually'
+        href = (
+            'http://edx.readthedocs.io/projects/edx-partner-course-staff/en/{}/'
+            'course_features/cohorts/cohort_config.html#assign-learners-to-cohorts-manually'
+        ).format(doc_version())
 
         self.verify_help_link(href)
 
@@ -86,8 +79,10 @@ class TestCohortHelp(ContainerBase):
 
         self.cohort_management.add_cohort('cohort_name', assignment_type='random')
 
-        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/' \
-               'course_features/cohorts/cohorts_overview.html#all-automated-assignment'
+        href = (
+            'http://edx.readthedocs.io/projects/edx-partner-course-staff/en/{}/'
+            'course_features/cohorts/cohorts_overview.html#all-automated-assignment'
+        ).format(doc_version())
 
         self.verify_help_link(href)
 
@@ -119,6 +114,8 @@ class InstructorDashboardHelp(BaseInstructorDashboardTest):
         When I click "Help"
         Then I see help about the instructor dashboard in a new tab
         """
-        href = 'http://edx.readthedocs.io/projects/edx-guide-for-students/en/latest/SFD_instructor_dash_help.html'
+        href = (
+            'http://edx.readthedocs.io/projects/edx-guide-for-students/en/{}/SFD_instructor_dash_help.html'
+        ).format(doc_version())
         self.instructor_dashboard_page.click_help()
         assert_opened_help_link_is_correct(self, href)

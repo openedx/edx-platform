@@ -196,6 +196,8 @@ simplefilter('ignore')
 CELERY_ALWAYS_EAGER = True
 CELERY_RESULT_BACKEND = 'djcelery.backends.cache:CacheBackend'
 
+CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION = False
+
 ########################### Server Ports ###################################
 
 # These ports are carefully chosen so that if the browser needs to
@@ -318,6 +320,7 @@ FEATURES['ENABLE_COURSEWARE_INDEX'] = True
 FEATURES['ENABLE_LIBRARY_INDEX'] = True
 SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
 
+FEATURES['ENABLE_ENROLLMENT_TRACK_USER_PARTITION'] = True
 
 # teams feature
 FEATURES['ENABLE_TEAMS'] = True

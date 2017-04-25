@@ -3,20 +3,25 @@ This module contains tasks for asynchronous execution of grade updates.
 """
 
 from celery import task
-from celery.exceptions import Retry
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db.utils import DatabaseError
 from logging import getLogger
-import newrelic.agent
+
+log = getLogger(__name__)
 
 from celery_utils.logged_task import LoggedTask
 from celery_utils.persist_on_failure import PersistOnFailureTask
 from courseware.model_data import get_score
 from lms.djangoapps.course_blocks.api import get_course_blocks
-from opaque_keys.edx.keys import UsageKey
+from lms.djangoapps.courseware import courses
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import CourseLocator
+from openedx.core.djangoapps.monitoring_utils import (
+    set_custom_metrics_for_course_key, set_custom_metric
+)
+from student.models import CourseEnrollment
 from submissions import api as sub_api
 from track.event_transaction_utils import (
     set_event_transaction_type,
@@ -25,27 +30,19 @@ from track.event_transaction_utils import (
 from util.date_utils import from_timestamp
 from xmodule.modulestore.django import modulestore
 
-from .config.models import PersistentGradesEnabledFlag
+from .config.waffle import waffle, ESTIMATE_FIRST_ATTEMPTED
 from .constants import ScoreDatabaseTableEnum
-from .new.subsection_grade import SubsectionGradeFactory
+from .exceptions import DatabaseNotReadyError
+from .new.subsection_grade_factory import SubsectionGradeFactory
+from .new.course_grade_factory import CourseGradeFactory
 from .signals.signals import SUBSECTION_SCORE_CHANGED
 from .transformer import GradesTransformer
-
-log = getLogger(__name__)
-
-
-class DatabaseNotReadyError(IOError):
-    """
-    Subclass of IOError to indicate the database has not yet committed
-    the data we're trying to find.
-    """
-    pass
 
 
 KNOWN_RETRY_ERRORS = (  # Errors we expect occasionally, should be resolved on retry
     DatabaseError,
     ValidationError,
-    DatabaseNotReadyError
+    DatabaseNotReadyError,
 )
 RECALCULATE_GRADE_DELAY = 2  # in seconds, to prevent excessive _has_db_updated failures. See TNL-6424.
 
@@ -55,6 +52,51 @@ class _BaseTask(PersistOnFailureTask, LoggedTask):  # pylint: disable=abstract-m
     Include persistence features, as well as logging of task invocation.
     """
     abstract = True
+
+
+@task(base=_BaseTask)
+def compute_grades_for_course_v2(course_key, offset, batch_size, **kwargs):
+    """
+    Compute grades for a set of students in the specified course.
+
+    The set of students will be determined by the order of enrollment date, and
+    limited to at most <batch_size> students, starting from the specified
+    offset.
+
+    TODO: Roll this back into compute_grades_for_course once all workers have
+    the version with **kwargs.
+
+    Sets the ESTIMATE_FIRST_ATTEMPTED flag, then calls the original task as a
+    synchronous function.
+
+    estimate_first_attempted:
+        controls whether to unconditionally set the ESTIMATE_FIRST_ATTEMPTED
+        waffle switch.  If false or not provided, use the global value of
+        the ESTIMATE_FIRST_ATTEMPTED waffle switch.
+    """
+    course_key = kwargs.pop('course_key')
+    offset = kwargs.pop('offset')
+    batch_size = kwargs.pop('batch_size')
+    estimate_first_attempted = kwargs.pop('estimate_first_attempted', False)
+    if estimate_first_attempted:
+        waffle().override_for_request(ESTIMATE_FIRST_ATTEMPTED, True)
+    return compute_grades_for_course(course_key, offset, batch_size)
+
+
+@task(base=_BaseTask)
+def compute_grades_for_course(course_key, offset, batch_size, **kwargs):  # pylint: disable=unused-argument
+    """
+    Compute grades for a set of students in the specified course.
+
+    The set of students will be determined by the order of enrollment date, and
+    limited to at most <batch_size> students, starting from the specified
+    offset.
+    """
+
+    course = courses.get_course_by_id(CourseKey.from_string(course_key))
+    enrollments = CourseEnrollment.objects.filter(course_id=course.id).order_by('created')
+    student_iter = (enrollment.user for enrollment in enrollments[offset:offset + batch_size])
+    list(CourseGradeFactory().iter(course, students=student_iter, force_update=True))
 
 
 @task(bind=True, base=_BaseTask, default_retry_delay=30, routing_key=settings.RECALCULATE_GRADES_ROUTING_KEY)
@@ -91,13 +133,10 @@ def _recalculate_subsection_grade(self, **kwargs):
     """
     try:
         course_key = CourseLocator.from_string(kwargs['course_id'])
-        if not PersistentGradesEnabledFlag.feature_enabled(course_key):
-            return
-
         scored_block_usage_key = UsageKey.from_string(kwargs['usage_id']).replace(course_key=course_key)
 
-        newrelic.agent.add_custom_parameter('course_id', unicode(course_key))
-        newrelic.agent.add_custom_parameter('usage_id', unicode(scored_block_usage_key))
+        set_custom_metrics_for_course_key(course_key)
+        set_custom_metric('usage_id', unicode(scored_block_usage_key))
 
         # The request cache is not maintained on celery workers,
         # where this code runs. So we take the values from the
@@ -129,7 +168,7 @@ def _recalculate_subsection_grade(self, **kwargs):
                 self.request.id,
                 kwargs,
             ))
-        raise _retry_recalculate_subsection_grade(self, exc=exc, **kwargs)
+        raise self.retry(kwargs=kwargs, exc=exc)
 
 
 def _has_db_updated_with_new_score(self, scored_block_usage_key, **kwargs):
@@ -162,7 +201,7 @@ def _has_db_updated_with_new_score(self, scored_block_usage_key, **kwargs):
 
     if not db_is_updated:
         log.info(
-            u"Persistent Grades: tasks._has_database_updated_with_new_score is False. Task ID: {}. Kwargs: {}. Found "
+            u"Grades: tasks._has_database_updated_with_new_score is False. Task ID: {}. Kwargs: {}. Found "
             u"modified time: {}".format(
                 self.request.id,
                 kwargs,
@@ -173,12 +212,7 @@ def _has_db_updated_with_new_score(self, scored_block_usage_key, **kwargs):
     return db_is_updated
 
 
-def _update_subsection_grades(
-        course_key,
-        scored_block_usage_key,
-        only_if_higher,
-        user_id,
-):
+def _update_subsection_grades(course_key, scored_block_usage_key, only_if_higher, user_id):
     """
     A helper function to update subsection grades in the database
     for each subsection containing the given block, and to signal
@@ -211,11 +245,3 @@ def _update_subsection_grades(
                     user=student,
                     subsection_grade=subsection_grade,
                 )
-
-
-def _retry_recalculate_subsection_grade(self, exc=None, **kwargs):
-    """
-    Calls retry for the recalculate_subsection_grade task with the
-    given inputs.
-    """
-    self.retry(kwargs=kwargs, exc=exc)

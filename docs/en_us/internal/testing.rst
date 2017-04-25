@@ -505,7 +505,7 @@ relative to the ``common/test/acceptance/tests`` directory. This is an example f
 
 ::
 
-    paver test_a11y -t test_lms_dashboard.py:LmsDashboardA11yTest.test_dashboard_course_listings_a11y
+    paver test_a11y -t lms/test_lms_dashboard.py:LmsDashboardA11yTest.test_dashboard_course_listings_a11y
 
 **Coverage**:
 

@@ -178,6 +178,8 @@ class RenderXBlockTestMixin(object):
     @ddt.unpack
     def test_success_enrolled_staff(self, default_store, mongo_calls):
         with self.store.default_store(default_store):
+            if default_store is ModuleStoreEnum.Type.mongo:
+                mongo_calls = self.get_success_enrolled_staff_mongo_count()
             self.setup_course(default_store)
             self.setup_user(admin=True, enroll=True, login=True)
 
@@ -196,6 +198,13 @@ class RenderXBlockTestMixin(object):
             #   (5) definition - edx_notes decorator (original_get_html)
             with check_mongo_calls(mongo_calls):
                 self.verify_response()
+
+    def get_success_enrolled_staff_mongo_count(self):
+        """
+        Helper method used by test_success_enrolled_staff because one test
+        class using this mixin has an increased number of mongo (only) queries.
+        """
+        return 5
 
     def test_success_unenrolled_staff(self):
         self.setup_course()

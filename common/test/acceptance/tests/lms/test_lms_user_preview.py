@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Tests the "preview" selector in the LMS that allows changing between Staff, Student, and Content Groups.
+Tests the "preview" selector in the LMS that allows changing between Staff, Learner, and Content Groups.
 """
 
 
@@ -10,10 +10,10 @@ from common.test.acceptance.tests.helpers import UniqueCourseTest, create_user_p
 from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage
-from common.test.acceptance.pages.lms.staff_view import StaffPage
+from common.test.acceptance.pages.lms.staff_view import StaffCoursewarePage
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from bok_choy.promise import EmptyPromise
-from xmodule.partitions.partitions import Group
+from xmodule.partitions.partitions import (Group, ENROLLMENT_TRACK_PARTITION_ID, MINIMUM_STATIC_PARTITION_ID)
 from textwrap import dedent
 
 
@@ -50,7 +50,7 @@ class StaffViewTest(UniqueCourseTest):
         Open staff page with assertion
         """
         self.courseware_page.visit()
-        staff_page = StaffPage(self.browser, self.course_id)
+        staff_page = StaffCoursewarePage(self.browser, self.course_id)
         self.assertEqual(staff_page.staff_view_mode, 'Staff')
         return staff_page
 
@@ -98,8 +98,8 @@ class StaffViewToggleTest(CourseWithoutContentGroupsTest):
 
         course_page = self._goto_staff_page()
         self.assertTrue(course_page.has_tab('Instructor'))
-        course_page.set_staff_view_mode('Student')
-        self.assertEqual(course_page.staff_view_mode, 'Student')
+        course_page.set_staff_view_mode('Learner')
+        self.assertEqual(course_page.staff_view_mode, 'Learner')
         self.assertFalse(course_page.has_tab('Instructor'))
 
 
@@ -256,10 +256,13 @@ class CourseWithContentGroupsTest(StaffViewTest):
             "metadata": {
                 u"user_partitions": [
                     create_user_partition_json(
-                        0,
+                        MINIMUM_STATIC_PARTITION_ID,
                         'Configuration alpha,beta',
                         'Content Group Partition',
-                        [Group("0", 'alpha'), Group("1", 'beta')],
+                        [
+                            Group(MINIMUM_STATIC_PARTITION_ID + 1, 'alpha'),
+                            Group(MINIMUM_STATIC_PARTITION_ID + 2, 'beta')
+                        ],
                         scheme="cohort"
                     )
                 ],
@@ -285,6 +288,7 @@ class CourseWithContentGroupsTest(StaffViewTest):
 
         self.alpha_text = "VISIBLE TO ALPHA"
         self.beta_text = "VISIBLE TO BETA"
+        self.audit_text = "VISIBLE TO AUDIT"
         self.everyone_text = "VISIBLE TO EVERYONE"
 
         course_fixture.add_children(
@@ -292,12 +296,29 @@ class CourseWithContentGroupsTest(StaffViewTest):
                 XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
                     XBlockFixtureDesc('vertical', 'Test Unit').add_children(
                         XBlockFixtureDesc(
-                            'problem', self.alpha_text, data=problem_data, metadata={"group_access": {0: [0]}}
+                            'problem',
+                            self.alpha_text,
+                            data=problem_data,
+                            metadata={"group_access": {MINIMUM_STATIC_PARTITION_ID: [MINIMUM_STATIC_PARTITION_ID + 1]}}
                         ),
                         XBlockFixtureDesc(
-                            'problem', self.beta_text, data=problem_data, metadata={"group_access": {0: [1]}}
+                            'problem',
+                            self.beta_text,
+                            data=problem_data,
+                            metadata={"group_access": {MINIMUM_STATIC_PARTITION_ID: [MINIMUM_STATIC_PARTITION_ID + 2]}}
                         ),
-                        XBlockFixtureDesc('problem', self.everyone_text, data=problem_data)
+                        XBlockFixtureDesc(
+                            'problem',
+                            self.audit_text,
+                            data=problem_data,
+                            # Below 1 is the hardcoded group ID for "Audit"
+                            metadata={"group_access": {ENROLLMENT_TRACK_PARTITION_ID: [1]}}
+                        ),
+                        XBlockFixtureDesc(
+                            'problem',
+                            self.everyone_text,
+                            data=problem_data
+                        )
                     )
                 )
             )
@@ -313,54 +334,72 @@ class CourseWithContentGroupsTest(StaffViewTest):
         Then I see all the problems, regardless of their group_access property
         """
         course_page = self._goto_staff_page()
-        verify_expected_problem_visibility(self, course_page, [self.alpha_text, self.beta_text, self.everyone_text])
+        verify_expected_problem_visibility(
+            self,
+            course_page,
+            [self.alpha_text, self.beta_text, self.audit_text, self.everyone_text]
+        )
 
     @attr(shard=3)
     def test_student_not_in_content_group(self):
         """
-        Scenario: When previewing as a student, only content visible to all is shown
+        Scenario: When previewing as a learner, only content visible to all is shown
         Given I have a course with a cohort user partition
         And problems that are associated with specific groups in the user partition
         When I view the courseware in the LMS with staff access
-        And I change to previewing as a Student
+        And I change to previewing as a Learner
         Then I see only problems visible to all users
         """
         course_page = self._goto_staff_page()
-        course_page.set_staff_view_mode('Student')
+        course_page.set_staff_view_mode('Learner')
         verify_expected_problem_visibility(self, course_page, [self.everyone_text])
 
     @attr(shard=3)
     def test_as_student_in_alpha(self):
         """
-        Scenario: When previewing as a student in group alpha, only content visible to alpha is shown
+        Scenario: When previewing as a learner in group alpha, only content visible to alpha is shown
         Given I have a course with a cohort user partition
         And problems that are associated with specific groups in the user partition
         When I view the courseware in the LMS with staff access
-        And I change to previewing as a Student in group alpha
+        And I change to previewing as a Learner in group alpha
         Then I see only problems visible to group alpha
         """
         course_page = self._goto_staff_page()
-        course_page.set_staff_view_mode('Student in alpha')
+        course_page.set_staff_view_mode('Learner in alpha')
         verify_expected_problem_visibility(self, course_page, [self.alpha_text, self.everyone_text])
 
     @attr(shard=3)
     def test_as_student_in_beta(self):
         """
-        Scenario: When previewing as a student in group beta, only content visible to beta is shown
+        Scenario: When previewing as a learner in group beta, only content visible to beta is shown
         Given I have a course with a cohort user partition
         And problems that are associated with specific groups in the user partition
         When I view the courseware in the LMS with staff access
-        And I change to previewing as a Student in group beta
+        And I change to previewing as a Learner in group beta
         Then I see only problems visible to group beta
         """
         course_page = self._goto_staff_page()
-        course_page.set_staff_view_mode('Student in beta')
+        course_page.set_staff_view_mode('Learner in beta')
         verify_expected_problem_visibility(self, course_page, [self.beta_text, self.everyone_text])
+
+    @attr(shard=3)
+    def test_as_student_in_audit(self):
+        """
+        Scenario: When previewing as a learner in the audit enrollment track, only content visible to audit is shown
+        Given I have a course with an enrollment_track user partition
+        And problems that are associated with specific groups in the user partition
+        When I view the courseware in the LMS with staff access
+        And I change to previewing as a Learner in audit enrollment track
+        Then I see only problems visible to audit enrollment track
+        """
+        course_page = self._goto_staff_page()
+        course_page.set_staff_view_mode('Learner in Audit')
+        verify_expected_problem_visibility(self, course_page, [self.audit_text, self.everyone_text])
 
     def create_cohorts_and_assign_students(self, student_a_username, student_b_username):
         """
         Adds 2 manual cohorts, linked to content groups, to the course.
-        Each cohort is assigned one student.
+        Each cohort is assigned one learner.
         """
         instructor_dashboard_page = InstructorDashboardPage(self.browser, self.course_id)
         instructor_dashboard_page.visit()
@@ -368,7 +407,7 @@ class CourseWithContentGroupsTest(StaffViewTest):
         cohort_management_page.is_cohorted = True
 
         def add_cohort_with_student(cohort_name, content_group, student):
-            """ Create cohort and assign student to it. """
+            """ Create cohort and assign learner to it. """
             cohort_management_page.add_cohort(cohort_name, content_group=content_group)
             cohort_management_page.add_students_to_selected_cohort([student])
         add_cohort_with_student("Cohort Alpha", "alpha", student_a_username)
@@ -383,14 +422,14 @@ class CourseWithContentGroupsTest(StaffViewTest):
         AutoAuthPage(self.browser, username=student_b_username, course_id=self.course_id, no_login=True).visit()
         self.create_cohorts_and_assign_students(student_a_username, student_b_username)
 
-        # Masquerade as student in alpha cohort:
+        # Masquerade as learner in alpha cohort:
         course_page = self._goto_staff_page()
         course_page.set_staff_view_mode_specific_student(student_a_username)
-        verify_expected_problem_visibility(self, course_page, [self.alpha_text, self.everyone_text])
+        verify_expected_problem_visibility(self, course_page, [self.alpha_text, self.audit_text, self.everyone_text])
 
-        # Masquerade as student in beta cohort:
+        # Masquerade as learner in beta cohort:
         course_page.set_staff_view_mode_specific_student(student_b_username)
-        verify_expected_problem_visibility(self, course_page, [self.beta_text, self.everyone_text])
+        verify_expected_problem_visibility(self, course_page, [self.beta_text, self.audit_text, self.everyone_text])
 
     @attr('a11y')
     def test_course_page(self):

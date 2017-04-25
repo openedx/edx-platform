@@ -675,6 +675,9 @@ class CourseFields(object):
         scope=Scope.settings,
     )
 
+    # Note: Although users enter the entrance exam minimum score
+    # as a percentage value, it is internally converted and stored
+    # as a decimal value less than 1.
     entrance_exam_minimum_score_pct = Float(
         display_name=_("Entrance Exam Minimum Score (%)"),
         help=_(
@@ -1154,16 +1157,19 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
     def always_cohort_inline_discussions(self):
         """
         This allow to change the default behavior of inline discussions cohorting. By
-        setting this to False, all inline discussions are non-cohorted unless their
-        ids are specified in cohorted_discussions.
+        setting this to 'True', all inline discussions are cohorted. The default value is
+        now `False`, meaning that inline discussions are not cohorted unless their discussion IDs
+        are specifically listed as cohorted.
 
-        Note: No longer used. See openedx.core.djangoapps.course_groups.models.CourseCohortSettings.
+        Note: No longer used except to get the initial value when cohorts are first enabled on a course
+        (and for migrating old courses). See openedx.core.djangoapps.course_groups.models.CourseCohortSettings.
         """
         config = self.cohort_config
         if config is None:
-            return True
+            # This value sets the default for newly created courses.
+            return False
 
-        return bool(config.get("always_cohort_inline_discussions", True))
+        return bool(config.get("always_cohort_inline_discussions", False))
 
     @property
     def is_newish(self):
@@ -1337,23 +1343,6 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         Returns the topics that have been configured for teams for this course, else None.
         """
         return self.teams_configuration.get('topics', None)
-
-    def get_user_partitions_for_scheme(self, scheme):
-        """
-        Retrieve all user partitions defined in the course for a particular
-        partition scheme.
-
-        Arguments:
-            scheme (object): The user partition scheme.
-
-        Returns:
-            list of `UserPartition`
-
-        """
-        return [
-            p for p in self.user_partitions
-            if p.scheme == scheme
-        ]
 
     def set_user_partitions_for_scheme(self, partitions, scheme):
         """

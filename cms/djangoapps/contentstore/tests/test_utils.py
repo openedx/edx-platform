@@ -391,8 +391,8 @@ class GroupVisibilityTest(CourseTestCase):
         def verify_all_components_visible_to_all():  # pylint: disable=invalid-name
             """ Verifies when group_access has not been set on anything. """
             for item in (self.sequential, self.vertical, self.html, self.problem):
-                self.assertFalse(utils.has_children_visible_to_specific_content_groups(item))
-                self.assertFalse(utils.is_visible_to_specific_content_groups(item))
+                self.assertFalse(utils.has_children_visible_to_specific_partition_groups(item))
+                self.assertFalse(utils.is_visible_to_specific_partition_groups(item))
 
         verify_all_components_visible_to_all()
 
@@ -409,16 +409,16 @@ class GroupVisibilityTest(CourseTestCase):
         self.set_group_access(self.vertical, {1: []})
         self.set_group_access(self.problem, {2: [3, 4]})
 
-        # Note that "has_children_visible_to_specific_content_groups" only checks immediate children.
-        self.assertFalse(utils.has_children_visible_to_specific_content_groups(self.sequential))
-        self.assertTrue(utils.has_children_visible_to_specific_content_groups(self.vertical))
-        self.assertFalse(utils.has_children_visible_to_specific_content_groups(self.html))
-        self.assertFalse(utils.has_children_visible_to_specific_content_groups(self.problem))
+        # Note that "has_children_visible_to_specific_partition_groups" only checks immediate children.
+        self.assertFalse(utils.has_children_visible_to_specific_partition_groups(self.sequential))
+        self.assertTrue(utils.has_children_visible_to_specific_partition_groups(self.vertical))
+        self.assertFalse(utils.has_children_visible_to_specific_partition_groups(self.html))
+        self.assertFalse(utils.has_children_visible_to_specific_partition_groups(self.problem))
 
-        self.assertTrue(utils.is_visible_to_specific_content_groups(self.sequential))
-        self.assertFalse(utils.is_visible_to_specific_content_groups(self.vertical))
-        self.assertFalse(utils.is_visible_to_specific_content_groups(self.html))
-        self.assertTrue(utils.is_visible_to_specific_content_groups(self.problem))
+        self.assertTrue(utils.is_visible_to_specific_partition_groups(self.sequential))
+        self.assertFalse(utils.is_visible_to_specific_partition_groups(self.vertical))
+        self.assertFalse(utils.is_visible_to_specific_partition_groups(self.html))
+        self.assertTrue(utils.is_visible_to_specific_partition_groups(self.problem))
 
 
 class GetUserPartitionInfoTest(ModuleStoreTestCase):
@@ -493,12 +493,12 @@ class GetUserPartitionInfoTest(ModuleStoreTestCase):
                 ]
             }
         ]
-        self.assertEqual(self._get_partition_info(), expected)
+        self.assertEqual(self._get_partition_info(schemes=["cohort", "random"]), expected)
 
         # Update group access and expect that now one group is marked as selected.
         self._set_group_access({0: [1]})
         expected[0]["groups"][1]["selected"] = True
-        self.assertEqual(self._get_partition_info(), expected)
+        self.assertEqual(self._get_partition_info(schemes=["cohort", "random"]), expected)
 
     def test_deleted_groups(self):
         # Select a group that is not defined in the partition
@@ -510,7 +510,7 @@ class GetUserPartitionInfoTest(ModuleStoreTestCase):
         self.assertEqual(len(groups), 3)
         self.assertEqual(groups[2], {
             "id": 3,
-            "name": "Deleted group",
+            "name": "Deleted Group",
             "selected": True,
             "deleted": True
         })
@@ -535,9 +535,9 @@ class GetUserPartitionInfoTest(ModuleStoreTestCase):
             ),
             UserPartition(
                 id=1,
-                name="Verification user partition",
-                scheme=UserPartition.get_scheme("verification"),
-                description="Verification user partition",
+                name="Completely random user partition",
+                scheme=UserPartition.get_scheme("random"),
+                description="Random user partition",
                 groups=[
                     Group(id=0, name="Group C"),
                 ],
@@ -546,7 +546,7 @@ class GetUserPartitionInfoTest(ModuleStoreTestCase):
         ])
 
         # Expect that the inactive scheme is excluded from the results
-        partitions = self._get_partition_info()
+        partitions = self._get_partition_info(schemes=["cohort", "verification"])
         self.assertEqual(len(partitions), 1)
         self.assertEqual(partitions[0]["scheme"], "cohort")
 
@@ -562,9 +562,9 @@ class GetUserPartitionInfoTest(ModuleStoreTestCase):
             ),
             UserPartition(
                 id=1,
-                name="Verification user partition",
-                scheme=UserPartition.get_scheme("verification"),
-                description="Verification user partition",
+                name="Completely random user partition",
+                scheme=UserPartition.get_scheme("random"),
+                description="Random user partition",
                 groups=[
                     Group(id=0, name="Group C"),
                 ],
@@ -572,9 +572,9 @@ class GetUserPartitionInfoTest(ModuleStoreTestCase):
         ])
 
         # Expect that the partition with no groups is excluded from the results
-        partitions = self._get_partition_info()
+        partitions = self._get_partition_info(schemes=["cohort", "random"])
         self.assertEqual(len(partitions), 1)
-        self.assertEqual(partitions[0]["scheme"], "verification")
+        self.assertEqual(partitions[0]["scheme"], "random")
 
     def _set_partitions(self, partitions):
         """Set the user partitions of the course descriptor. """

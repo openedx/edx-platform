@@ -120,7 +120,8 @@ class CapaModule(CapaMixin, XModule):
         after = self.get_progress()
         after_attempts = self.attempts
         progress_changed = (after != before) or (after_attempts != before_attempts)
-        curr_score, total_possible = (after.frac() if after else (0, 0))
+        curr_score, total_possible = self.get_display_progress()
+
         result.update({
             'progress_changed': progress_changed,
             'current_score': curr_score,
@@ -215,6 +216,7 @@ class CapaDescriptor(CapaFields, RawDescriptor):
             CapaDescriptor.force_save_button,
             CapaDescriptor.markdown,
             CapaDescriptor.use_latex_compiler,
+            CapaDescriptor.show_correctness,
         ])
         return non_editable_fields
 

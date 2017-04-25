@@ -200,6 +200,15 @@ class ProblemPage(PageObject):
         self.wait_for(lambda: self.q(css='.notification.warning.notification-gentle-alert').focused,
                       'Waiting for the focus to be on the gentle alert notification')
 
+    def wait_for_show_answer_notification(self):
+        """
+        Wait for the show answer Notification to be present
+        """
+        self.wait_for_element_visibility('.notification.general.notification-show-answer',
+                                         'Waiting for Show Answer notification to be visible')
+        self.wait_for(lambda: self.q(css='.notification.general.notification-show-answer').focused,
+                      'Waiting for the focus to be on the show answer notification')
+
     def is_gentle_alert_notification_visible(self):
         """
         Is the Gentle Alert Notification visible?
@@ -308,6 +317,14 @@ class ProblemPage(PageObject):
         self.wait_for_element_visibility('.fa-asterisk', "Waiting for asterisk notification icon")
         self.wait_for_focus_on_submit_notification()
 
+    def wait_submitted_notification(self):
+        """
+        Check for visibility of the "answer received" general notification and icon.
+        """
+        msg = "Wait for submitted notification to be visible"
+        self.wait_for_element_visibility('.notification.general.notification-submit', msg)
+        self.wait_for_focus_on_submit_notification()
+
     def click_hint(self):
         """
         Click the Hint button.
@@ -409,14 +426,16 @@ class ProblemPage(PageObject):
         solution_selector = '.solution-span div.detailed-solution'
         return self.q(css=solution_selector).is_present()
 
-    def is_correct_choice_highlighted(self, correct_choices):
+    def is_choice_highlighted(self, choice, choices_list):
         """
-        Check if correct answer/choice highlighted for choice group.
+        Check if the given answer/choice is highlighted for choice group.
         """
-        correct_status_xpath = '//fieldset/div[contains(@class, "field")][{0}]/label[contains(@class, "choicegroup_correct")]/span[contains(@class, "status correct")]'  # pylint: disable=line-too-long
+        choice_status_xpath = ('//fieldset/div[contains(@class, "field")][{{0}}]'
+                               '/label[contains(@class, "choicegroup_{choice}")]'
+                               '/span[contains(@class, "status {choice}")]'.format(choice=choice))
         any_status_xpath = '//fieldset/div[contains(@class, "field")][{0}]/label/span'
-        for choice in correct_choices:
-            if not self.q(xpath=correct_status_xpath.format(choice)).is_present():
+        for choice in choices_list:
+            if not self.q(xpath=choice_status_xpath.format(choice)).is_present():
                 return False
 
             # Check that there is only a single status span, as there were some bugs with multiple
@@ -425,6 +444,18 @@ class ProblemPage(PageObject):
                 return False
 
         return True
+
+    def is_correct_choice_highlighted(self, correct_choices):
+        """
+        Check if correct answer/choice highlighted for choice group.
+        """
+        return self.is_choice_highlighted('correct', correct_choices)
+
+    def is_submitted_choice_highlighted(self, correct_choices):
+        """
+        Check if submitted answer/choice highlighted for choice group.
+        """
+        return self.is_choice_highlighted('submitted', correct_choices)
 
     @property
     def problem_question(self):

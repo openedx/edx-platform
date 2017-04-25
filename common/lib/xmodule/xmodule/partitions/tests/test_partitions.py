@@ -6,12 +6,15 @@ Test the partitions and partitions service
 from unittest import TestCase
 from mock import Mock
 
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locator import CourseLocator
 from stevedore.extension import Extension, ExtensionManager
 from xmodule.partitions.partitions import (
-    Group, UserPartition, UserPartitionError, NoSuchUserPartitionGroupError, USER_PARTITION_SCHEME_NAMESPACE
+    Group, UserPartition, UserPartitionError, NoSuchUserPartitionGroupError,
+    USER_PARTITION_SCHEME_NAMESPACE, ENROLLMENT_TRACK_PARTITION_ID
 )
-from xmodule.partitions.partitions_service import PartitionService
+from xmodule.partitions.partitions_service import (
+    PartitionService, get_all_partitions_for_course, FEATURES
+)
 
 
 class TestGroup(TestCase):
@@ -105,6 +108,15 @@ class MockUserPartitionScheme(object):
         return groups[0]
 
 
+class MockEnrollmentTrackUserPartitionScheme(MockUserPartitionScheme):
+
+    def create_user_partition(self, id, name, description, groups=None, parameters=None, active=True):  # pylint: disable=redefined-builtin, invalid-name, unused-argument
+        """
+        The EnrollmentTrackPartitionScheme provides this method to return a subclass of UserPartition.
+        """
+        return UserPartition(id, name, description, groups, self, parameters, active)
+
+
 class PartitionTestCase(TestCase):
     """Base class for test cases that require partitions"""
     TEST_ID = 0
@@ -113,18 +125,23 @@ class PartitionTestCase(TestCase):
     TEST_PARAMETERS = {"location": "block-v1:edX+DemoX+Demo+type@block@uuid"}
     TEST_GROUPS = [Group(0, 'Group 1'), Group(1, 'Group 2')]
     TEST_SCHEME_NAME = "mock"
+    ENROLLMENT_TRACK_SCHEME_NAME = "enrollment_track"
 
     def setUp(self):
         super(PartitionTestCase, self).setUp()
         # Set up two user partition schemes: mock and random
         self.non_random_scheme = MockUserPartitionScheme(self.TEST_SCHEME_NAME)
         self.random_scheme = MockUserPartitionScheme("random")
+        self.enrollment_track_scheme = MockEnrollmentTrackUserPartitionScheme(self.ENROLLMENT_TRACK_SCHEME_NAME)
         extensions = [
             Extension(
                 self.non_random_scheme.name, USER_PARTITION_SCHEME_NAMESPACE, self.non_random_scheme, None
             ),
             Extension(
                 self.random_scheme.name, USER_PARTITION_SCHEME_NAMESPACE, self.random_scheme, None
+            ),
+            Extension(
+                self.enrollment_track_scheme.name, USER_PARTITION_SCHEME_NAMESPACE, self.enrollment_track_scheme, None
             ),
         ]
         UserPartition.scheme_extensions = ExtensionManager.make_test_instance(
@@ -394,45 +411,50 @@ class TestUserPartition(PartitionTestCase):
         self.assertEqual(partition.name, self.TEST_NAME)
 
 
-class StaticPartitionService(PartitionService):
+class MockPartitionService(PartitionService):
     """
     Mock PartitionService for testing.
     """
-    def __init__(self, partitions, **kwargs):
-        super(StaticPartitionService, self).__init__(**kwargs)
-        self._partitions = partitions
+    def __init__(self, course, **kwargs):
+        super(MockPartitionService, self).__init__(**kwargs)
+        self._course = course
 
-    @property
-    def course_partitions(self):
-        return self._partitions
+    def get_course(self):
+        return self._course
 
 
-class TestPartitionService(PartitionTestCase):
+class PartitionServiceBaseClass(PartitionTestCase):
     """
-    Test getting a user's group out of a partition
+    Base test class for testing the PartitionService.
     """
 
     def setUp(self):
-        super(TestPartitionService, self).setUp()
-        self.course = Mock(id=SlashSeparatedCourseKey('org_0', 'course_0', 'run_0'))
+        super(PartitionServiceBaseClass, self).setUp()
+        self.course = Mock(id=CourseLocator('org_0', 'course_0', 'run_0'))
         self.partition_service = self._create_service("ma")
 
     def _create_service(self, username, cache=None):
-        """Convenience method to generate a StaticPartitionService for a user."""
+        """Convenience method to generate a MockPartitionService for a user."""
         # Derive a "user_id" from the username, just so we don't have to add an
         # extra param to this method. Just has to be unique per user.
         user_id = abs(hash(username))
+        self.user = Mock(
+            username=username, email='{}@edx.org'.format(username), is_staff=False, is_active=True, id=user_id
+        )
+        self.course.user_partitions = [self.user_partition]
 
-        return StaticPartitionService(
-            [self.user_partition],
-            user=Mock(
-                username=username, email='{}@edx.org'.format(username), is_staff=False, is_active=True, id=user_id
-            ),
+        return MockPartitionService(
+            self.course,
             course_id=self.course.id,
             track_function=Mock(),
             cache=cache
         )
 
+
+class TestPartitionService(PartitionServiceBaseClass):
+    """
+    Test getting a user's group out of a partition
+    """
     def test_get_user_group_id_for_partition(self):
         # assign the first group to be returned
         user_partition_id = self.user_partition.id
@@ -440,12 +462,12 @@ class TestPartitionService(PartitionTestCase):
         self.user_partition.scheme.current_group = groups[0]
 
         # get a group assigned to the user
-        group1_id = self.partition_service.get_user_group_id_for_partition(user_partition_id)
+        group1_id = self.partition_service.get_user_group_id_for_partition(self.user, user_partition_id)
         self.assertEqual(group1_id, groups[0].id)
 
         # switch to the second group and verify that it is returned for the user
         self.user_partition.scheme.current_group = groups[1]
-        group2_id = self.partition_service.get_user_group_id_for_partition(user_partition_id)
+        group2_id = self.partition_service.get_user_group_id_for_partition(self.user, user_partition_id)
         self.assertEqual(group2_id, groups[1].id)
 
     def test_caching(self):
@@ -453,14 +475,14 @@ class TestPartitionService(PartitionTestCase):
         user_partition_id = self.user_partition.id
         shared_cache = {}
 
-        # Two StaticPartitionService objects that share the same cache:
+        # Two MockPartitionService objects that share the same cache:
         ps_shared_cache_1 = self._create_service(username, shared_cache)
         ps_shared_cache_2 = self._create_service(username, shared_cache)
 
-        # A StaticPartitionService with its own local cache
+        # A MockPartitionService with its own local cache
         ps_diff_cache = self._create_service(username, {})
 
-        # A StaticPartitionService that never uses caching.
+        # A MockPartitionService that never uses caching.
         ps_uncached = self._create_service(username)
 
         # Set the group we expect users to be placed into
@@ -472,7 +494,7 @@ class TestPartitionService(PartitionTestCase):
         for part_svc in [ps_shared_cache_1, ps_diff_cache, ps_uncached]:
             self.assertEqual(
                 first_group.id,
-                part_svc.get_user_group_id_for_partition(user_partition_id)
+                part_svc.get_user_group_id_for_partition(self.user, user_partition_id)
             )
 
         # Now select a new target group
@@ -485,20 +507,20 @@ class TestPartitionService(PartitionTestCase):
         for part_svc in [ps_shared_cache_1, ps_shared_cache_2, ps_diff_cache]:
             self.assertEqual(
                 first_group.id,
-                part_svc.get_user_group_id_for_partition(user_partition_id)
+                part_svc.get_user_group_id_for_partition(self.user, user_partition_id)
             )
 
         # Our uncached service should be accurate.
         self.assertEqual(
             second_group.id,
-            ps_uncached.get_user_group_id_for_partition(user_partition_id)
+            ps_uncached.get_user_group_id_for_partition(self.user, user_partition_id)
         )
 
         # And a newly created service should see the right thing
         ps_new_cache = self._create_service(username, {})
         self.assertEqual(
             second_group.id,
-            ps_new_cache.get_user_group_id_for_partition(user_partition_id)
+            ps_new_cache.get_user_group_id_for_partition(self.user, user_partition_id)
         )
 
     def test_get_group(self):
@@ -509,10 +531,90 @@ class TestPartitionService(PartitionTestCase):
 
         # assign first group and verify that it is returned for the user
         self.user_partition.scheme.current_group = groups[0]
-        group1 = self.partition_service.get_group(self.user_partition)
+        group1 = self.partition_service.get_group(self.user, self.user_partition)
         self.assertEqual(group1, groups[0])
 
         # switch to the second group and verify that it is returned for the user
         self.user_partition.scheme.current_group = groups[1]
-        group2 = self.partition_service.get_group(self.user_partition)
+        group2 = self.partition_service.get_group(self.user, self.user_partition)
         self.assertEqual(group2, groups[1])
+
+
+class TestGetCourseUserPartitions(PartitionServiceBaseClass):
+    """
+    Test the helper method get_all_partitions_for_course.
+    """
+
+    def setUp(self):
+        super(TestGetCourseUserPartitions, self).setUp()
+        # django.conf.settings is not available when nosetests are run
+        TestGetCourseUserPartitions._enable_enrollment_track_partition(True)
+
+    @staticmethod
+    def _enable_enrollment_track_partition(enable):
+        """
+        Enable or disable the feature flag for the enrollment track user partition.
+        """
+        FEATURES['ENABLE_ENROLLMENT_TRACK_USER_PARTITION'] = enable
+
+    def test_enrollment_track_partition_added(self):
+        """
+        Test that the dynamic enrollment track scheme is added if there is no conflict with the user partition ID.
+        """
+        all_partitions = get_all_partitions_for_course(self.course)
+        self.assertEqual(2, len(all_partitions))
+        self.assertEqual(self.TEST_SCHEME_NAME, all_partitions[0].scheme.name)
+        enrollment_track_partition = all_partitions[1]
+        self.assertEqual(self.ENROLLMENT_TRACK_SCHEME_NAME, enrollment_track_partition.scheme.name)
+        self.assertEqual(unicode(self.course.id), enrollment_track_partition.parameters['course_id'])
+        self.assertEqual(ENROLLMENT_TRACK_PARTITION_ID, enrollment_track_partition.id)
+
+    def test_enrollment_track_partition_not_added_if_conflict(self):
+        """
+        Test that the dynamic enrollment track scheme is NOT added if a UserPartition exists with that ID.
+        """
+        self.user_partition = UserPartition(
+            ENROLLMENT_TRACK_PARTITION_ID,
+            self.TEST_NAME,
+            self.TEST_DESCRIPTION,
+            self.TEST_GROUPS,
+            self.non_random_scheme,
+            self.TEST_PARAMETERS,
+        )
+        self.course.user_partitions = [self.user_partition]
+        all_partitions = get_all_partitions_for_course(self.course)
+        self.assertEqual(1, len(all_partitions))
+        self.assertEqual(self.TEST_SCHEME_NAME, all_partitions[0].scheme.name)
+
+    def test_enrollment_track_partition_not_added_if_disabled(self):
+        """
+        Test that the dynamic enrollment track scheme is NOT added if the settings FEATURE flag is disabled.
+        """
+        TestGetCourseUserPartitions._enable_enrollment_track_partition(False)
+        all_partitions = get_all_partitions_for_course(self.course)
+        self.assertEqual(1, len(all_partitions))
+        self.assertEqual(self.TEST_SCHEME_NAME, all_partitions[0].scheme.name)
+
+    def test_filter_inactive_user_partitions(self):
+        """
+        Tests supplying the `active_only` parameter.
+        """
+        self.user_partition = UserPartition(
+            self.TEST_ID,
+            self.TEST_NAME,
+            self.TEST_DESCRIPTION,
+            self.TEST_GROUPS,
+            self.non_random_scheme,
+            self.TEST_PARAMETERS,
+            active=False
+        )
+        self.course.user_partitions = [self.user_partition]
+
+        all_partitions = get_all_partitions_for_course(self.course, active_only=True)
+        self.assertEqual(1, len(all_partitions))
+        self.assertEqual(self.ENROLLMENT_TRACK_SCHEME_NAME, all_partitions[0].scheme.name)
+
+        all_partitions = get_all_partitions_for_course(self.course, active_only=False)
+        self.assertEqual(2, len(all_partitions))
+        self.assertEqual(self.TEST_SCHEME_NAME, all_partitions[0].scheme.name)
+        self.assertEqual(self.ENROLLMENT_TRACK_SCHEME_NAME, all_partitions[1].scheme.name)

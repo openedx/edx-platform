@@ -73,6 +73,18 @@ class GradesTransformer(BlockStructureTransformer):
         pass
 
     @classmethod
+    def grading_policy_hash(cls, course):
+        """
+        Returns the grading policy hash for the given course.
+        """
+        ordered_policy = json.dumps(
+            course.grading_policy,
+            separators=(',', ':'),  # Remove spaces from separators for more compact representation
+            sort_keys=True,
+        )
+        return b64encode(sha1(ordered_policy).digest())
+
+    @classmethod
     def _collect_explicit_graded(cls, block_structure):
         """
         Collect the 'explicit_graded' field for every block.
@@ -137,27 +149,13 @@ class GradesTransformer(BlockStructureTransformer):
         Collect a hash of the course's grading policy, storing it as a
         `transformer_block_field` associated with the `GradesTransformer`.
         """
-        def _hash_grading_policy(policy):
-            """
-            Creates a hash from the course grading policy.
-            The keys are sorted in order to make the hash
-            agnostic to the ordering of the policy coming in.
-            """
-            ordered_policy = json.dumps(
-                policy,
-                separators=(',', ':'),  # Remove spaces from separators for more compact representation
-                sort_keys=True,
-            )
-            return b64encode(sha1(ordered_policy).digest())
-
         course_location = block_structure.root_block_usage_key
         course_block = block_structure.get_xblock(course_location)
-        grading_policy = course_block.grading_policy
         block_structure.set_transformer_block_field(
             course_block.location,
             cls,
             "grading_policy_hash",
-            _hash_grading_policy(grading_policy)
+            cls.grading_policy_hash(course_block),
         )
 
     @staticmethod

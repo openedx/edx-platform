@@ -23,6 +23,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from edxmako.shortcuts import render_to_response, render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.features.enterprise_support import api as enterprise_api
 import track.views
 from student.roles import GlobalStaff
 from student.models import CourseEnrollment
@@ -223,7 +224,7 @@ class _ZendeskApi(object):
         return None
 
 
-def _get_zendesk_custom_field_context(request):
+def _get_zendesk_custom_field_context(request, **kwargs):
     """
     Construct a dictionary of data that can be stored in Zendesk custom fields.
     """
@@ -240,6 +241,11 @@ def _get_zendesk_custom_field_context(request):
     enrollment = CourseEnrollment.get_enrollment(request.user, CourseKey.from_string(course_id))
     if enrollment and enrollment.is_active:
         context["enrollment_mode"] = enrollment.mode
+
+    enterprise_learner_data = kwargs.get('learner_data', None)
+    if enterprise_learner_data:
+        enterprise_customer_name = enterprise_learner_data[0]['enterprise_customer']['name']
+        context["enterprise_customer_name"] = enterprise_customer_name
 
     return context
 
@@ -434,6 +440,12 @@ def submit_feedback(request):
 
     success = False
     context = get_feedback_form_context(request)
+
+    #Update the tag info with 'enterprise_learner' if the user belongs to an enterprise customer.
+    enterprise_learner_data = enterprise_api.get_enterprise_learner_data(site=request.site, user=request.user)
+    if enterprise_learner_data:
+        context["tags"]["learner_type"] = "enterprise_learner"
+
     support_backend = configuration_helpers.get_value('CONTACT_FORM_SUBMISSION_BACKEND', SUPPORT_BACKEND_ZENDESK)
 
     if support_backend == SUPPORT_BACKEND_EMAIL:
@@ -456,7 +468,7 @@ def submit_feedback(request):
 
         custom_fields = None
         if settings.ZENDESK_CUSTOM_FIELDS:
-            custom_field_context = _get_zendesk_custom_field_context(request)
+            custom_field_context = _get_zendesk_custom_field_context(request, learner_data=enterprise_learner_data)
             custom_fields = _format_zendesk_custom_fields(custom_field_context)
 
         success = _record_feedback_in_zendesk(

@@ -78,6 +78,8 @@ FEATURES['ENABLE_COMBINED_LOGIN_REGISTRATION'] = True
 # Enable the milestones app in tests to be consistent with it being enabled in production
 FEATURES['MILESTONES_APP'] = True
 
+FEATURES['ENABLE_ENROLLMENT_TRACK_USER_PARTITION'] = True
+
 # Need wiki for courseware views to work. TODO (vshnayder): shouldn't need it.
 WIKI_ENABLED = True
 
@@ -332,6 +334,8 @@ GIT_REPO_DIR = TEST_ROOT / "course_repos"
 
 CELERY_ALWAYS_EAGER = True
 CELERY_RESULT_BACKEND = 'djcelery.backends.cache:CacheBackend'
+
+CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION = False
 
 ######################### MARKETING SITE ###############################
 

@@ -86,7 +86,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         # The student progress tab is not accessible to a student
         # before launch, so the instructor view-as-student feature
-        # should return a 403.
+        # should return a 404.
         # TODO (vshnayder): If this is not the behavior we want, will need
         # to make access checking smarter and understand both the effective
         # user (the student), and the requesting user (the prof)
@@ -97,7 +97,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
                 'student_id': self.enrolled_user.id,
             }
         )
-        self.assert_request_status_code(403, url)
+        self.assert_request_status_code(404, url)
 
         # The courseware url should redirect, not 200
         url = self._reverse_urls(['courseware'], course)[0]
@@ -197,28 +197,28 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
             )
         )
 
-    @patch('courseware.views.index.get_course_specific_consent_url')
-    @patch('courseware.views.index.consent_needed_for_course')
-    def test_redirection_missing_enterprise_consent(self, mock_consent_needed, mock_get_url):
+    @patch('openedx.features.enterprise_support.api.get_enterprise_consent_url')
+    def test_redirection_missing_enterprise_consent(self, mock_get_url):
         """
         Verify that enrolled students are redirected to the Enterprise consent
         URL if a linked Enterprise Customer requires data sharing consent
         and it has not yet been provided.
         """
-        mock_consent_needed.return_value = True
         mock_get_url.return_value = reverse('dashboard')
         self.login(self.enrolled_user)
-        response = self.client.get(
-            reverse(
-                'courseware',
-                kwargs={'course_id': self.course.id.to_deprecated_string()}
-            )
+        url = reverse(
+            'courseware',
+            kwargs={'course_id': self.course.id.to_deprecated_string()}
         )
+        response = self.client.get(url)
         self.assertRedirects(
             response,
             reverse('dashboard')
         )
-        mock_consent_needed.assert_called_once_with(self.enrolled_user, unicode(self.course.id))
+        mock_get_url.assert_called_once()
+        mock_get_url.return_value = None
+        response = self.client.get(url)
+        self.assertNotIn("You are not currently enrolled in this course", response.content)
 
     def test_instructor_page_access_nonstaff(self):
         """

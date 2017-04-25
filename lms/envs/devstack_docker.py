@@ -9,13 +9,13 @@ LOGGING['handlers']['local'] = LOGGING['handlers']['tracking'] = {
 
 LOGGING['loggers']['tracking']['handlers'] = ['console']
 
-HOST = 'edx.devstack.edxapp:18000'
+HOST = 'edx.devstack.lms:18000'
 SITE_NAME = HOST
 LMS_ROOT_URL = 'http://{}'.format(HOST)
 
 ECOMMERCE_PUBLIC_URL_ROOT = 'http://localhost:18130'
 ECOMMERCE_API_URL = 'http://edx.devstack.ecommerce:18130/api/v2'
-ENTERPRISE_API_URL = 'http://enterprise.example.com/enterprise/api/v1/'
+ENTERPRISE_API_URL = '{}/enterprise/api/v1/'.format(LMS_ROOT_URL)
 
 OAUTH_OIDC_ISSUER = '{}/oauth2'.format(LMS_ROOT_URL)
 
@@ -30,4 +30,34 @@ FEATURES.update({
     'ENABLE_COURSEWARE_SEARCH': False,
     'ENABLE_COURSE_DISCOVERY': False,
     'ENABLE_DASHBOARD_SEARCH': False,
+    'SHOW_LANGUAGE_SELECTOR': True
 })
+
+ENABLE_MKTG_SITE = os.environ.get('ENABLE_MARKETING_SITE', False)
+MARKETING_SITE_ROOT = os.environ.get('MARKETING_SITE_ROOT', 'http://localhost:8080')
+
+MKTG_URLS = {
+    'ABOUT': '/about-us',
+    'ACCESSIBILITY': '/accessibility',
+    'BLOG': '/blog',
+    'CAREERS': '/careers',
+    'CONTACT': '/contact',
+    'COURSES': '/course',
+    'DONATE': '/donate',
+    'ENTERPRISE': '/enterprise',
+    'FAQ': '/student-faq',
+    'HONOR': '/edx-terms-service',
+    'HOW_IT_WORKS': '/how-it-works',
+    'MEDIA_KIT': '/media-kit',
+    'NEWS': '/news-announcements',
+    'PRESS': '/press',
+    'PRIVACY': '/edx-privacy-policy',
+    'ROOT': MARKETING_SITE_ROOT,
+    'SCHOOLS': '/schools-partners',
+    'SITE_MAP': '/sitemap',
+    'TOS': '/edx-terms-service',
+    'TOS_AND_HONOR': '/edx-terms-service',
+    'WHAT_IS_VERIFIED_CERT': '/verified-certificate',
+}
+
+CREDENTIALS_SERVICE_USERNAME = 'credentials_worker'

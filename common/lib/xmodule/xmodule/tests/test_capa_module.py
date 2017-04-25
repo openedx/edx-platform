@@ -8,6 +8,7 @@ Tests of the Capa XModule
 import datetime
 import json
 import random
+import requests
 import os
 import textwrap
 import unittest
@@ -242,11 +243,67 @@ class CapaModuleTest(unittest.TestCase):
         problem = CapaFactory.create()
         self.assertFalse(problem.answer_available())
 
+    @ddt.data(
+        (requests.exceptions.ReadTimeout, (1, 'failed to read from the server')),
+        (requests.exceptions.ConnectionError, (1, 'cannot connect to server')),
+    )
+    @ddt.unpack
+    def test_xqueue_request_exception(self, exception, result):
+        """
+        Makes sure that platform will raise appropriate exception in case of
+        connect/read timeout(s) to request to xqueue
+        """
+        xqueue_interface = XQueueInterface("http://example.com/xqueue", Mock())
+        with patch.object(xqueue_interface.session, 'post', side_effect=exception):
+            # pylint: disable = protected-access
+            response = xqueue_interface._http_post('http://some/fake/url', {})
+            self.assertEqual(response, result)
+
     def test_showanswer_attempted(self):
         problem = CapaFactory.create(showanswer='attempted')
         self.assertFalse(problem.answer_available())
         problem.attempts = 1
         self.assertTrue(problem.answer_available())
+
+    @ddt.data(
+        # If show_correctness=always, Answer is visible after attempted
+        ({
+            'showanswer': 'attempted',
+            'max_attempts': '1',
+            'show_correctness': 'always',
+        }, True),
+        # If show_correctness=never, Answer is never visible
+        ({
+            'showanswer': 'attempted',
+            'max_attempts': '1',
+            'show_correctness': 'never',
+        }, False),
+        # If show_correctness=past_due, answer is not visible before due date
+        ({
+            'showanswer': 'attempted',
+            'show_correctness': 'past_due',
+            'max_attempts': '1',
+            'due': 'tomorrow_str',
+        }, False),
+        # If show_correctness=past_due, answer is visible after due date
+        ({
+            'showanswer': 'attempted',
+            'show_correctness': 'past_due',
+            'max_attempts': '1',
+            'due': 'yesterday_str',
+        }, True),
+    )
+    @ddt.unpack
+    def test_showanswer_hide_correctness(self, problem_data, answer_available):
+        """
+        Ensure that the answer will not be shown when correctness is being hidden.
+        """
+        if 'due' in problem_data:
+            problem_data['due'] = getattr(self, problem_data['due'])
+        problem = CapaFactory.create(**problem_data)
+        self.assertFalse(problem.answer_available())
+        problem.attempts = 1
+        self.assertEqual(problem.answer_available(), answer_available)
 
     def test_showanswer_closed(self):
 
@@ -396,6 +453,73 @@ class CapaModuleTest(unittest.TestCase):
                                             due=self.yesterday_str,
                                             graceperiod=self.two_day_delta_str)
         self.assertTrue(still_in_grace.answer_available())
+
+    @ddt.data('', 'other-value')
+    def test_show_correctness_other(self, show_correctness):
+        """
+        Test that correctness is visible if show_correctness is not set to one of the values
+        from SHOW_CORRECTNESS constant.
+        """
+        problem = CapaFactory.create(show_correctness=show_correctness)
+        self.assertTrue(problem.correctness_available())
+
+    def test_show_correctness_default(self):
+        """
+        Test that correctness is visible by default.
+        """
+        problem = CapaFactory.create()
+        self.assertTrue(problem.correctness_available())
+
+    def test_show_correctness_never(self):
+        """
+        Test that correctness is hidden when show_correctness turned off.
+        """
+        problem = CapaFactory.create(show_correctness='never')
+        self.assertFalse(problem.correctness_available())
+
+    @ddt.data(
+        # Correctness not visible if due date in the future, even after using up all attempts
+        ({
+            'show_correctness': 'past_due',
+            'max_attempts': '1',
+            'attempts': '1',
+            'due': 'tomorrow_str',
+        }, False),
+        # Correctness visible if due date in the past
+        ({
+            'show_correctness': 'past_due',
+            'max_attempts': '1',
+            'attempts': '0',
+            'due': 'yesterday_str',
+        }, True),
+        # Correctness not visible if due date in the future
+        ({
+            'show_correctness': 'past_due',
+            'max_attempts': '1',
+            'attempts': '0',
+            'due': 'tomorrow_str',
+        }, False),
+        # Correctness not visible because grace period hasn't expired,
+        # even after using up all attempts
+        ({
+            'show_correctness': 'past_due',
+            'max_attempts': '1',
+            'attempts': '1',
+            'due': 'yesterday_str',
+            'graceperiod': 'two_day_delta_str',
+        }, False),
+    )
+    @ddt.unpack
+    def test_show_correctness_past_due(self, problem_data, expected_result):
+        """
+        Test that with show_correctness="past_due", correctness will only be visible
+        after the problem is closed for everyone--e.g. after due date + grace period.
+        """
+        problem_data['due'] = getattr(self, problem_data['due'])
+        if 'graceperiod' in problem_data:
+            problem_data['graceperiod'] = getattr(self, problem_data['graceperiod'])
+        problem = CapaFactory.create(**problem_data)
+        self.assertEqual(problem.correctness_available(), expected_result)
 
     def test_closed(self):
 
@@ -796,6 +920,36 @@ class CapaModuleTest(unittest.TestCase):
 
             # Expect that the number of attempts is NOT incremented
             self.assertEqual(module.attempts, 1)
+
+    @ddt.data(
+        ("never", True, None, 'submitted'),
+        ("never", False, None, 'submitted'),
+        ("past_due", True, None, 'submitted'),
+        ("past_due", False, None, 'submitted'),
+        ("always", True, 1, 'correct'),
+        ("always", False, 0, 'incorrect'),
+    )
+    @ddt.unpack
+    def test_handle_ajax_show_correctness(self, show_correctness, is_correct, expected_score, expected_success):
+        module = CapaFactory.create(show_correctness=show_correctness,
+                                    due=self.tomorrow_str,
+                                    correct=is_correct)
+
+        # Simulate marking the input correct/incorrect
+        with patch('capa.correctmap.CorrectMap.is_correct') as mock_is_correct:
+            mock_is_correct.return_value = is_correct
+
+            # Check the problem
+            get_request_dict = {CapaFactory.input_key(): '0'}
+            json_result = module.handle_ajax('problem_check', get_request_dict)
+            result = json.loads(json_result)
+
+        # Expect that the AJAX result withholds correctness and score
+        self.assertEqual(result['current_score'], expected_score)
+        self.assertEqual(result['success'], expected_success)
+
+        # Expect that the number of attempts is incremented by 1
+        self.assertEqual(module.attempts, 1)
 
     def test_reset_problem(self):
         module = CapaFactory.create(done=True)
@@ -1566,6 +1720,27 @@ class CapaModuleTest(unittest.TestCase):
         other_module.weight = 1
         other_module.get_progress()
         mock_progress.assert_called_with(1, 1)
+
+    @ddt.data(
+        ("never", True, None),
+        ("never", False, None),
+        ("past_due", True, None),
+        ("past_due", False, None),
+        ("always", True, 1),
+        ("always", False, 0),
+    )
+    @ddt.unpack
+    def test_get_display_progress_show_correctness(self, show_correctness, is_correct, expected_score):
+        """
+        Check that score and total are calculated correctly for the progress fraction.
+        """
+        module = CapaFactory.create(correct=is_correct,
+                                    show_correctness=show_correctness,
+                                    due=self.tomorrow_str)
+        module.weight = 1
+        score, total = module.get_display_progress()
+        self.assertEqual(score, expected_score)
+        self.assertEqual(total, 1)
 
     def test_get_html(self):
         """

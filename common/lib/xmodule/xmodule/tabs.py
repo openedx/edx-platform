@@ -72,6 +72,9 @@ class CourseTab(object):
     # True if this tab should be displayed only for instructors
     course_staff_only = False
 
+    # True if this tab supports showing staff users a preview menu
+    supports_preview_menu = False
+
     def __init__(self, tab_dict):
         """
         Initializes class members with values passed in by subclasses.

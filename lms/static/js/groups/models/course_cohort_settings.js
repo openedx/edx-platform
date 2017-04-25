@@ -7,7 +7,7 @@
                 is_cohorted: false,
                 cohorted_inline_discussions: [],
                 cohorted_course_wide_discussions: [],
-                always_cohort_inline_discussions: true
+                always_cohort_inline_discussions: false
             }
         });
         return CourseCohortSettingsModel;

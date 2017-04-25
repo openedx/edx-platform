@@ -72,6 +72,7 @@
             'ieshim': 'js/src/ie_shim',
             'tooltip_manager': 'js/src/tooltip_manager',
             'draggabilly': 'js/vendor/draggabilly',
+            'hls': 'common/js/vendor/hls',
 
             // Files needed for Annotations feature
             'annotator': 'js/vendor/ova/annotator-full',
@@ -96,7 +97,7 @@
             // end of Annotation tool files
 
             // externally hosted files
-            mathjax: '//cdn.mathjax.org/mathjax/2.7-latest/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured',  // eslint-disable-line max-len
+            mathjax: '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured',  // eslint-disable-line max-len
             'youtube': [
                 // youtube URL does not end in '.js'. We add '?noext' to the path so
                 // that require.js adds the '.js' to the query component of the URL,

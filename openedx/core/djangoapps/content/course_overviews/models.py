@@ -98,6 +98,7 @@ class CourseOverview(TimeStampedModel):
     effort = TextField(null=True)
     self_paced = BooleanField(default=False)
     marketing_url = TextField(null=True)
+    eligible_for_financial_aid = BooleanField(default=True)
 
     @classmethod
     def _create_from_course(cls, course):
@@ -359,6 +360,13 @@ class CourseOverview(TimeStampedModel):
         longer escaped.
         """
         return block_metadata_utils.display_name_with_default_escaped(self)
+
+    @property
+    def dashboard_start_display(self):
+        """
+         Return start date to diplay on learner's dashboard, preferably `Course Advertised Start`
+        """
+        return self.advertised_start or self.start
 
     def has_started(self):
         """

@@ -143,12 +143,15 @@ $error-color: rgb(203, 7, 18) !default;
 $success-color: rgb(0, 155, 0) !default;
 $warning-color: rgb(255, 192, 31) !default;
 $warning-color-accent: rgb(255, 252, 221) !default;
+$general-color: $uxpl-blue-base !default;;
+$general-color-accent: $uxpl-blue-base !default
 
 
 // CAPA correctness color to be consistent with Alert styles above
 $correct: $success-color !default;
 $partially-correct: $success-color !default;
 $incorrect: $error-color !default;
+$submitted: $general-color !default;
 
 
 // BUTTONS

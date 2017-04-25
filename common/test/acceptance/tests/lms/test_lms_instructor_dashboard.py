@@ -12,16 +12,16 @@ from flaky import flaky
 from common.test.acceptance.tests.helpers import UniqueCourseTest, get_modal_alert, EventsTestMixin
 from common.test.acceptance.pages.common.logout import LogoutPage
 from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
-from common.test.acceptance.pages.studio.overview import CourseOutlinePage
+from common.test.acceptance.pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
 from common.test.acceptance.pages.lms.create_mode import ModeCreationPage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage, EntranceExamAdmin
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.lms.dashboard import DashboardPage
 from common.test.acceptance.pages.lms.problem import ProblemPage
-from common.test.acceptance.pages.lms.track_selection import TrackSelectionPage
-from common.test.acceptance.pages.lms.pay_and_verify import PaymentAndVerificationFlow, FakePaymentPage
+from common.test.acceptance.pages.lms.pay_and_verify import PaymentAndVerificationFlow
 from common.test.acceptance.pages.lms.login_and_register import CombinedLoginAndRegisterPage
+from common.test.acceptance.pages.common.utils import enroll_user_track
 from common.test.acceptance.tests.helpers import disable_animations
 from common.test.acceptance.fixtures.certificates import CertificateConfigFixture
 
@@ -227,7 +227,7 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
 
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
 
-        self.course_outline = CourseOutlinePage(
+        self.studio_course_outline = StudioCourseOutlinePage(
             self.browser,
             self.course_info['org'],
             self.course_info['number'],
@@ -247,13 +247,6 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
             )
         ).install()
 
-        self.track_selection_page = TrackSelectionPage(self.browser, self.course_id)
-        self.payment_and_verification_flow = PaymentAndVerificationFlow(self.browser, self.course_id)
-        self.immediate_verification_page = PaymentAndVerificationFlow(
-            self.browser, self.course_id, entry_point='verify-now'
-        )
-        self.upgrade_page = PaymentAndVerificationFlow(self.browser, self.course_id, entry_point='upgrade')
-        self.fake_payment_page = FakePaymentPage(self.browser, self.course_id)
         self.dashboard_page = DashboardPage(self.browser)
         self.problem_page = ProblemPage(self.browser)
 
@@ -279,19 +272,7 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         """
 
         self._auto_auth(self.USERNAME, self.EMAIL, False)
-
-        # the track selection page cannot be visited. see the other tests to see if any prereq is there.
-        # Navigate to the track selection page
-        self.track_selection_page.visit()
-
-        # Enter the payment and verification flow by choosing to enroll as verified
-        self.track_selection_page.enroll('verified')
-
-        # Proceed to the fake payment page
-        self.payment_and_verification_flow.proceed_to_payment()
-
-        # Submit payment
-        self.fake_payment_page.submit_payment()
+        enroll_user_track(self.browser, self.course_id, 'verified')
 
     def _create_a_proctored_exam_and_attempt(self):
         """
@@ -301,15 +282,15 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         # Visit the course outline page in studio
         LogoutPage(self.browser).visit()
         self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
-        self.course_outline.visit()
+        self.studio_course_outline.visit()
 
         # open the exam settings to make it a proctored exam.
-        self.course_outline.open_subsection_settings_dialog()
+        self.studio_course_outline.open_subsection_settings_dialog()
 
         # select advanced settings tab
-        self.course_outline.select_advanced_tab()
+        self.studio_course_outline.select_advanced_tab()
 
-        self.course_outline.make_exam_proctored()
+        self.studio_course_outline.make_exam_proctored()
 
         # login as a verified student and visit the courseware.
         LogoutPage(self.browser).visit()
@@ -327,15 +308,15 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         # Visit the course outline page in studio
         LogoutPage(self.browser).visit()
         self._auto_auth("STAFF_TESTER", "staff101@example.com", True)
-        self.course_outline.visit()
+        self.studio_course_outline.visit()
 
         # open the exam settings to make it a proctored exam.
-        self.course_outline.open_subsection_settings_dialog()
+        self.studio_course_outline.open_subsection_settings_dialog()
 
         # select advanced settings tab
-        self.course_outline.select_advanced_tab()
+        self.studio_course_outline.select_advanced_tab()
 
-        self.course_outline.make_exam_timed()
+        self.studio_course_outline.make_exam_timed()
 
         # login as a verified student and visit the courseware.
         LogoutPage(self.browser).visit()

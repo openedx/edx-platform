@@ -1,0 +1,127 @@
+## mako
+
+<%page expression_filter="h"/>
+
+<%namespace name='static' file='../static_content.html'/>
+
+<%!
+from django.utils.translation import ugettext as _
+%>
+
+<%static:require_module_async module_name="course_experience/js/course_outline_factory" class_name="CourseOutlineFactory">
+    CourseOutlineFactory('.block-tree');
+</%static:require_module_async>
+
+<main role="main" class="course-outline" id="main" tabindex="-1">
+    <ol class="block-tree" role="tree">
+        % for section in blocks.get('children') or []:
+            <li
+                aria-expanded="true"
+                class="outline-item focusable section"
+                id="${ section['id'] }"
+                role="treeitem"
+                tabindex="0"
+            >
+                <div class="section-name">
+                    <h3>${ section['display_name'] }</h3>
+                </div>
+                <ol class="outline-item focusable" role="group" tabindex="0">
+                    % for subsection in section.get('children') or []:
+                        <li
+                            class="subsection ${ 'current' if subsection['current'] else '' }"
+                            role="treeitem"
+                            tabindex="-1"
+                            aria-expanded="true"
+                        >
+                            <a
+                                class="outline-item focusable"
+                                href="${ subsection['lms_web_url'] }"
+                                id="${ subsection['id'] }"
+                            >
+                                <div class="subsection-text">
+                                    ## Subsection title
+                                    <span class="subsection-title">${ subsection['display_name'] }</span>
+
+                                    <div class="details">
+                                        ## There are behavior differences between rendering of subsections which have
+                                        ## exams (timed, graded, etc) and those that do not.
+                                        ##
+                                        ## Exam subsections expose exam status message field as well as a status icon
+                                        <%
+                                            if subsection.get('due') is None:
+                                                # examples: Homework, Lab, etc.
+                                                data_string = subsection.get('format')
+                                            else:
+                                                if 'special_exam_info' in subsection:
+                                                    data_string = _('due {date}')
+                                                else:
+                                                    data_string = _("{subsection_format} due {{date}}").format(subsection_format=subsection.get('format'))
+                                        %>
+                                        % if subsection.get('format') or 'special_exam_info' in subsection:
+                                        <span class="subtitle">
+                                            % if 'special_exam' in subsection:
+                                                ## Display the exam status icon and status message
+                                                <span
+                                                    class="menu-icon icon fa ${subsection['special_exam_info'].get('suggested_icon', 'fa-pencil-square-o')} ${subsection['special_exam_info'].get('status', 'eligible')}"
+                                                    aria-hidden="true"
+                                                ></span>
+                                                <span class="subtitle-name">
+                                                    ${subsection['special_exam_info'].get('short_description', '')}
+                                                </span>
+
+                                                ## completed exam statuses should not show the due date
+                                                ## since the exam has already been submitted by the user
+                                                % if not subsection['special_exam_info'].get('in_completed_state', False):
+                                                    <span
+                                                        class="localized-datetime subtitle-name"
+                                                        data-datetime="${subsection.get('due')}"
+                                                        data-string="${data_string}"
+                                                        data-timezone="${user_timezone}"
+                                                        data-language="${user_language}"
+                                                    ></span>
+                                                % endif
+                                            % else:
+                                                ## non-graded section, we just show the exam format and the due date
+                                                ## this is the standard case in edx-platform
+                                                <span
+                                                    class="localized-datetime subtitle-name"
+                                                    data-datetime="${subsection.get('due')}"
+                                                    data-string="${data_string}"
+                                                    data-timezone="${user_timezone}"
+                                                    data-language="${user_language}"
+                                                ></span>
+
+                                                % if 'graded' in subsection and subsection['graded']:
+                                                    <span
+                                                        class="menu-icon icon fa fa-pencil-square-o"
+                                                        aria-hidden="true"
+                                                    ></span>
+                                                    <span class="sr">${_("This content is graded")}</span>
+                                                % endif
+                                            % endif
+                                        </span>
+                                        % endif
+                                    </div> <!-- /details -->
+                                </div> <!-- /subsection-text -->
+                                <div class="subsection-actions">
+                                    ## Resume button (if last visited section)
+                                    % if subsection['current']:
+                                        <span class="sr-only">${ _("This is your last visited course section.") }</span>
+                                        <span class="resume-right">
+                                            <b>${ _("Resume Course") }</b>
+                                            <span class="icon fa fa-arrow-circle-right" aria-hidden="true"></span>
+                                        </span>
+                                    %endif
+                                </div>
+                            </a>
+                        </li>
+                    % endfor
+                </ol>
+            </li>
+        % endfor
+    </ol>
+</main>
+
+<%static:require_module_async module_name="js/dateutil_factory" class_name="DateUtilFactory">
+    DateUtilFactory.transform('.localized-datetime');
+</%static:require_module_async>

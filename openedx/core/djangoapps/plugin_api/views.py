@@ -45,21 +45,18 @@ class EdxFragmentView(FragmentView):
         else:
             return settings.PIPELINE_JS[group]['source_filenames']
 
-    @abstractmethod
     def vendor_js_dependencies(self):
         """
         Returns list of the vendor JS files that this view depends on.
         """
         return []
 
-    @abstractmethod
     def js_dependencies(self):
         """
         Returns list of the JavaScript files that this view depends on.
         """
         return []
 
-    @abstractmethod
     def css_dependencies(self):
         """
         Returns list of the CSS files that this view depends on.
@@ -94,6 +91,5 @@ class EdxFragmentView(FragmentView):
             'disable_header': True,
             'disable_footer': True,
             'disable_window_wrap': True,
-            'disable_preview_menu': True,
         }
         return render_to_response(settings.STANDALONE_FRAGMENT_VIEW_TEMPLATE, context)

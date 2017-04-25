@@ -3,6 +3,7 @@ Unit tests for Block Structure models.
 """
 # pylint: disable=protected-access
 import ddt
+from django.core.exceptions import SuspiciousOperation
 from django.test import TestCase
 from django.utils.timezone import now
 from itertools import product
@@ -11,10 +12,9 @@ from uuid import uuid4
 
 from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
 
-from ..config import PRUNE_OLD_VERSIONS
+from ..config import PRUNE_OLD_VERSIONS, waffle
 from ..exceptions import BlockStructureNotFound
-from ..models import BlockStructureModel
-from .helpers import override_config_setting
+from ..models import BlockStructureModel, _directory_name, _storage_error_handling
 
 
 @ddt.ddt
@@ -30,7 +30,7 @@ class BlockStructureModelTestCase(TestCase):
         self.params = self._create_bsm_params()
 
     def tearDown(self):
-        with override_config_setting(PRUNE_OLD_VERSIONS, active=True):
+        with waffle().override(PRUNE_OLD_VERSIONS, active=True):
             BlockStructureModel._prune_files(self.usage_key, num_to_keep=0)
         super(BlockStructureModelTestCase, self).tearDown()
 
@@ -43,7 +43,7 @@ class BlockStructureModelTestCase(TestCase):
             self.assertEqual(field_value, getattr(bsm, field_name))
 
         self.assertEqual(bsm.get_serialized_data(), expected_serialized_data)
-        self.assertIn(unicode(self.usage_key), bsm.data.name)
+        self.assertIn(_directory_name(self.usage_key), bsm.data.name)
 
     def _assert_file_count_equal(self, expected_count):
         """
@@ -72,7 +72,7 @@ class BlockStructureModelTestCase(TestCase):
         bsm, created = BlockStructureModel.update_or_create(serialized_data, **self.params)
         if mock_log:
             self.assertEqual("Created" if expect_created else "Updated", mock_log.info.call_args[0][1])
-            self.assertEqual(len(serialized_data), mock_log.info.call_args[0][3])
+            self.assertEqual(len(serialized_data), mock_log.info.call_args[0][6])
         self._assert_bsm_fields(bsm, serialized_data)
         if expect_created is not None:
             self.assertEqual(created, expect_created)
@@ -93,7 +93,7 @@ class BlockStructureModelTestCase(TestCase):
         # get entry
         found_bsm = BlockStructureModel.get(self.usage_key)
         self._assert_bsm_fields(found_bsm, serialized_data)
-        self.assertIn("BlockStructure: Read data from store;", mock_log.info.call_args[0][0])
+        self.assertIn("Read", mock_log.info.call_args[0][1])
 
         # update entry
         self.params.update(dict(data_version='new version'))
@@ -104,24 +104,24 @@ class BlockStructureModelTestCase(TestCase):
         # old files not pruned
         self._assert_file_count_equal(2)
 
-    @override_config_setting(PRUNE_OLD_VERSIONS, active=True)
     @patch('openedx.core.djangoapps.content.block_structure.config.num_versions_to_keep', Mock(return_value=1))
     def test_prune_files(self):
-        self._verify_update_or_create_call('test data', expect_created=True)
-        self._verify_update_or_create_call('updated data', expect_created=False)
-        self._assert_file_count_equal(1)
+        with waffle().override(PRUNE_OLD_VERSIONS, active=True):
+            self._verify_update_or_create_call('test data', expect_created=True)
+            self._verify_update_or_create_call('updated data', expect_created=False)
+            self._assert_file_count_equal(1)
 
-    @override_config_setting(PRUNE_OLD_VERSIONS, active=True)
     @patch('openedx.core.djangoapps.content.block_structure.config.num_versions_to_keep', Mock(return_value=1))
     @patch('openedx.core.djangoapps.content.block_structure.models.BlockStructureModel._delete_files')
     @patch('openedx.core.djangoapps.content.block_structure.models.log')
     def test_prune_exception(self, mock_log, mock_delete):
-        mock_delete.side_effect = Exception
-        self._verify_update_or_create_call('test data', expect_created=True)
-        self._verify_update_or_create_call('updated data', expect_created=False)
+        with waffle().override(PRUNE_OLD_VERSIONS, active=True):
+            mock_delete.side_effect = Exception
+            self._verify_update_or_create_call('test data', expect_created=True)
+            self._verify_update_or_create_call('updated data', expect_created=False)
 
-        self.assertIn('BlockStructure: Exception when deleting old files', mock_log.exception.call_args[0][0])
-        self._assert_file_count_equal(2)  # old files not pruned
+            self.assertIn('BlockStructure: Exception when deleting old files', mock_log.exception.call_args[0][0])
+            self._assert_file_count_equal(2)  # old files not pruned
 
     @ddt.data(
         *product(
@@ -141,6 +141,35 @@ class BlockStructureModelTestCase(TestCase):
             if num_prior_edits:
                 self._assert_file_count_equal(num_prior_edits)
 
-            with override_config_setting(PRUNE_OLD_VERSIONS, active=True):
+            with waffle().override(PRUNE_OLD_VERSIONS, active=True):
                 self._verify_update_or_create_call('data')
                 self._assert_file_count_equal(min(prune_keep_count, num_prior_edits + 1))
+
+    @ddt.data(
+        (IOError, BlockStructureNotFound, True),
+        (IOError, IOError, False),
+        (SuspiciousOperation, BlockStructureNotFound, True),
+        (SuspiciousOperation, SuspiciousOperation, False),
+        (OSError, OSError, True),
+        (OSError, OSError, False),
+    )
+    @ddt.unpack
+    def test_error_handling(self, error_raised_in_operation, expected_error_raised, is_read_operation):
+        bs_model, _ = BlockStructureModel.update_or_create('test data', **self.params)
+        with self.assertRaises(expected_error_raised):
+            with _storage_error_handling(bs_model, 'operation', is_read_operation):
+                raise error_raised_in_operation
+
+    @patch('openedx.core.djangoapps.content.block_structure.models.log')
+    def test_old_mongo_keys(self, mock_log):
+        self.course_key = CourseLocator('org2', 'course2', unicode(uuid4()), deprecated=True)
+        self.usage_key = BlockUsageLocator(course_key=self.course_key, block_type='course', block_id='course')
+        serialized_data = 'test data for old course'
+        self.params['data_usage_key'] = self.usage_key
+
+        with patch('xmodule.modulestore.mixed.MixedModuleStore.fill_in_run') as mock_fill_in_run:
+            mock_fill_in_run.return_value = self.usage_key.course_key
+            self._verify_update_or_create_call(serialized_data, mock_log, expect_created=True)
+            found_bsm = BlockStructureModel.get(self.usage_key)
+
+        self._assert_bsm_fields(found_bsm, serialized_data)

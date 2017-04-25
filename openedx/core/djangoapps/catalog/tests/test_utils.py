@@ -1,11 +1,12 @@
 """Tests covering utilities for integrating with the catalog service."""
 # pylint: disable=missing-docstring
-import uuid
 import copy
+import uuid
 
+import mock
 from django.contrib.auth import get_user_model
 from django.test import TestCase
-import mock
+from waffle.models import Switch
 
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory, ProgramFactory, ProgramTypeFactory
@@ -18,7 +19,6 @@ from openedx.core.djangoapps.catalog.utils import (
 )
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory
-
 
 UTILS_MODULE = 'openedx.core.djangoapps.catalog.utils'
 User = get_user_model()  # pylint: disable=invalid-name
@@ -37,7 +37,7 @@ class TestGetPrograms(CatalogIntegrationMixin, TestCase):
 
         UserFactory(username=self.catalog_integration.service_username)
 
-    def assert_contract(self, call_args, program_uuid=None, types=None):  # pylint: disable=redefined-builtin
+    def assert_contract(self, call_args, program_uuid=None, types=None):
         """Verify that API data retrieval utility is used correctly."""
         args, kwargs = call_args
 
@@ -59,19 +59,20 @@ class TestGetPrograms(CatalogIntegrationMixin, TestCase):
         self.assertEqual(kwargs['api']._store['base_url'], self.catalog_integration.internal_api_url)  # pylint: disable=protected-access
 
         querystring = {
-            'marketable': 1,
             'exclude_utm': 1,
+            'status': ('active', 'retired',),
         }
         if program_uuid:
             querystring['use_full_course_serializer'] = 1
         if types:
             querystring['types'] = types_param
+
         self.assertEqual(kwargs['querystring'], querystring)
 
         return args, kwargs
 
     def test_get_programs(self, mock_get_edx_api_data):
-        programs = [ProgramFactory() for __ in range(3)]
+        programs = ProgramFactory.create_batch(3)
         mock_get_edx_api_data.return_value = programs
 
         data = get_programs()
@@ -197,7 +198,7 @@ class TestGetCourseRuns(CatalogIntegrationMixin, TestCase):
         """
         args, kwargs = call_args
 
-        for arg in (self.catalog_integration, self.user, 'course_runs'):
+        for arg in (self.catalog_integration, 'course_runs'):
             self.assertIn(arg, args)
 
         self.assertEqual(kwargs['api']._store['base_url'], self.catalog_integration.internal_api_url)  # pylint: disable=protected-access
@@ -240,7 +241,7 @@ class TestGetCourseRuns(CatalogIntegrationMixin, TestCase):
         """
         Test retrieval of course runs.
         """
-        catalog_course_runs = [CourseRunFactory() for __ in xrange(10)]
+        catalog_course_runs = CourseRunFactory.create_batch(10)
         mock_get_edx_api_data.return_value = catalog_course_runs
 
         data = get_course_runs()

@@ -11,13 +11,13 @@ from django.conf.urls.static import static
 from courseware.views.views import CourseTabView, EnrollStaffView, StaticCourseTabView
 from config_models.views import ConfigurationModelCurrentAPIView
 from courseware.views.index import CoursewareIndex
+from django_comment_common.models import ForumsConfig
 from openedx.core.djangoapps.auth_exchange.views import LoginWithAccessTokenView
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
-from django_comment_common.models import ForumsConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from util.enterprise_helpers import enterprise_enabled
+from openedx.features.enterprise_support.api import enterprise_enabled
 
 # Uncomment the next two lines to enable the admin:
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
@@ -553,7 +553,7 @@ urlpatterns += (
         r'^courses/{}/verified_track_content/settings'.format(
             settings.COURSE_KEY_PATTERN,
         ),
-        'verified_track_content.views.cohorting_settings',
+        'openedx.core.djangoapps.verified_track_content.views.cohorting_settings',
         name='verified_track_cohorting',
     ),
     url(
@@ -601,9 +601,26 @@ urlpatterns += (
         name='edxnotes_endpoints',
     ),
 
+    # Branding API
     url(
         r'^api/branding/v1/',
         include('branding.api_urls')
+    ),
+
+    # Course experience
+    url(
+        r'^courses/{}/course/'.format(
+            settings.COURSE_ID_PATTERN,
+        ),
+        include('openedx.features.course_experience.urls'),
+    ),
+
+    # Course bookmarks
+    url(
+        r'^courses/{}/bookmarks/'.format(
+            settings.COURSE_ID_PATTERN,
+        ),
+        include('openedx.features.course_bookmarks.urls'),
     ),
 )
 

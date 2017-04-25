@@ -9,22 +9,11 @@ LOGGING['handlers']['local'] = LOGGING['handlers']['tracking'] = {
 
 LOGGING['loggers']['tracking']['handlers'] = ['console']
 
-HOST = 'edx.devstack.edxapp:18000'
-SITE_NAME = HOST
-LMS_ROOT_URL = 'http://{}'.format(HOST)
-
-# This is the public-facing host used for previews
-LMS_BASE = 'localhost:18000'
-
-OAUTH_OIDC_ISSUER = '{}/oauth2'.format(LMS_ROOT_URL)
-
-JWT_AUTH.update({
-    'JWT_SECRET_KEY': 'lms-secret',
-    'JWT_ISSUER': OAUTH_OIDC_ISSUER,
-    'JWT_AUDIENCE': 'lms-key',
-})
+LMS_ROOT_URL = 'http://edx.devstack.lms:18000'
 
 FEATURES.update({
     'ENABLE_COURSEWARE_INDEX': False,
     'ENABLE_LIBRARY_INDEX': False,
 })
+
+CREDENTIALS_SERVICE_USERNAME = 'credentials_worker'

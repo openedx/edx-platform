@@ -17,7 +17,7 @@ from courseware.masquerade import (
     MasqueradingKeyValueStore,
     handle_ajax,
     setup_masquerade,
-    get_masquerading_group_info
+    get_masquerading_user_group
 )
 from courseware.tests.factories import StaffFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase, masquerade_as_group_member
@@ -395,7 +395,7 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
 
     def test_masquerade_as_specific_student_progress(self):
         """
-        Test masquesrading as a specific user for progress page.
+        Test masquerading as a specific user for progress page.
         """
         # Give the student some correct answers, check their progress page
         self.login_student()
@@ -435,22 +435,20 @@ class TestGetMasqueradingGroupId(StaffMasqueradeTestCase):
         modulestore().update_item(self.course, self.test_user.id)
 
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
-    def test_group_masquerade(self):
+    def test_get_masquerade_group(self):
         """
-        Tests that a staff member can masquerade as being in a particular group.
+        Tests that a staff member can masquerade as being in a group in a user partition
         """
-        # Verify that there is no masquerading group initially
-        group_id, user_partition_id = get_masquerading_group_info(self.test_user, self.course.id)
-        self.assertIsNone(group_id)
-        self.assertIsNone(user_partition_id)
+        # Verify there is no masquerading group initially
+        group = get_masquerading_user_group(self.course.id, self.test_user, self.user_partition)
+        self.assertIsNone(group)
 
         # Install a masquerading group
         self.ensure_masquerade_as_group_member(0, 1)
 
         # Verify that the masquerading group is returned
-        group_id, user_partition_id = get_masquerading_group_info(self.test_user, self.course.id)
-        self.assertEqual(group_id, 1)
-        self.assertEqual(user_partition_id, 0)
+        group = get_masquerading_user_group(self.course.id, self.test_user, self.user_partition)
+        self.assertEqual(group.id, 1)
 
 
 class ReadOnlyKeyValueStore(DictKeyValueStore):

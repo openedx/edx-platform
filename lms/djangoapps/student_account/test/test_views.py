@@ -35,6 +35,7 @@ from commerce.models import CommerceConfiguration
 from commerce.tests import factories
 from commerce.tests.mocks import mock_get_orders
 from course_modes.models import CourseMode
+from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from openedx.core.djangoapps.user_api.accounts.api import activate_account, create_account
@@ -521,6 +522,26 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
             'next': '/account/finish_auth?{}'.format(urlencode(params))
         })
 
+    def test_english_by_default(self):
+        response = self.client.get(reverse('signin_user'), [], HTTP_ACCEPT="text/html")
+
+        self.assertEqual(response['Content-Language'], 'en')
+
+    def test_unsupported_language(self):
+        response = self.client.get(reverse('signin_user'), [], HTTP_ACCEPT="text/html", HTTP_ACCEPT_LANGUAGE="ts-zx")
+
+        self.assertEqual(response['Content-Language'], 'en')
+
+    def test_browser_language(self):
+        response = self.client.get(reverse('signin_user'), [], HTTP_ACCEPT="text/html", HTTP_ACCEPT_LANGUAGE="es")
+
+        self.assertEqual(response['Content-Language'], 'es-419')
+
+    def test_browser_language_dialent(self):
+        response = self.client.get(reverse('signin_user'), [], HTTP_ACCEPT="text/html", HTTP_ACCEPT_LANGUAGE="es-es")
+
+        self.assertEqual(response['Content-Language'], 'es-es')
+
 
 class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase, ProgramsApiConfigMixin):
     """ Tests for the account settings view. """
@@ -613,20 +634,21 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase, ProgramsApiConf
         self.assertContains(response, '<li class="item nav-global-01">')
 
     def test_commerce_order_detail(self):
+        """
+        Verify that get_user_orders returns the correct order data.
+        """
         with mock_get_orders():
             order_detail = get_user_orders(self.user)
 
-        user_order = mock_get_orders.default_response['results'][0]
-        expected = [
-            {
-                'number': user_order['number'],
-                'price': user_order['total_excl_tax'],
-                'title': user_order['lines'][0]['title'],
+        for i, order in enumerate(mock_get_orders.default_response['results']):
+            expected = {
+                'number': order['number'],
+                'price': order['total_excl_tax'],
                 'order_date': 'Jan 01, 2016',
-                'receipt_url': '/commerce/checkout/receipt/?orderNum=' + user_order['number']
+                'receipt_url': '/checkout/receipt/?order_number=' + order['number'],
+                'lines': order['lines'],
             }
-        ]
-        self.assertEqual(order_detail, expected)
+            self.assertEqual(order_detail[i], expected)
 
     def test_commerce_order_detail_exception(self):
         with mock_get_orders(exception=exceptions.HttpNotFoundError):
@@ -642,26 +664,6 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase, ProgramsApiConf
                     lines=[
                         factories.OrderLineFactory(
                             product=factories.ProductFactory(attribute_values=[factories.ProductAttributeFactory()])
-                        )
-                    ]
-                )
-            ]
-        }
-        with mock_get_orders(response=response):
-            order_detail = get_user_orders(self.user)
-
-        self.assertEqual(order_detail, [])
-
-    def test_honor_course_order_detail(self):
-        response = {
-            'results': [
-                factories.OrderFactory(
-                    lines=[
-                        factories.OrderLineFactory(
-                            product=factories.ProductFactory(attribute_values=[factories.ProductAttributeFactory(
-                                name='certificate_type',
-                                value='honor'
-                            )])
                         )
                     ]
                 )

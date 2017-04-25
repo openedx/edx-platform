@@ -1,15 +1,16 @@
 """
 Grades related signals.
 """
-
+from contextlib import contextmanager
 from logging import getLogger
 
 from django.dispatch import receiver
 from submissions.models import score_set, score_reset
+from xblock.scorable import ScorableXBlockMixin, Score
 
 from courseware.model_data import get_score, set_score
 from eventtracking import tracker
-from openedx.core.lib.grade_utils import is_score_higher
+from openedx.core.lib.grade_utils import is_score_higher_or_equal
 from student.models import user_by_anonymous_id
 from util.date_utils import to_timestamp
 from track.event_transaction_utils import (
@@ -25,7 +26,7 @@ from .signals import (
     SCORE_PUBLISHED,
 )
 from ..constants import ScoreDatabaseTableEnum
-from ..new.course_grade import CourseGradeFactory
+from ..new.course_grade_factory import CourseGradeFactory
 from ..scores import weighted_score
 from ..tasks import recalculate_subsection_grade_v3, RECALCULATE_GRADE_DELAY
 
@@ -108,6 +109,25 @@ def submissions_score_reset_handler(sender, **kwargs):  # pylint: disable=unused
     )
 
 
+@contextmanager
+def disconnect_submissions_signal_receiver(signal):
+    """
+    Context manager to be used for temporarily disconnecting edx-submission's set or reset signal.
+    """
+    if signal == score_set:
+        handler = submissions_score_set_handler
+    else:
+        if signal != score_reset:
+            raise ValueError("This context manager only deal with score_set and score_reset signals.")
+        handler = submissions_score_reset_handler
+
+    signal.disconnect(handler)
+    try:
+        yield
+    finally:
+        signal.connect(handler)
+
+
 @receiver(SCORE_PUBLISHED)
 def score_published_handler(sender, block, user, raw_earned, raw_possible, only_if_higher, **kwargs):  # pylint: disable=unused-argument
     """
@@ -121,7 +141,7 @@ def score_published_handler(sender, block, user, raw_earned, raw_possible, only_
         if previous_score is not None:
             prev_raw_earned, prev_raw_possible = (previous_score.grade, previous_score.max_grade)
 
-            if not is_score_higher(prev_raw_earned, prev_raw_possible, raw_earned, raw_possible):
+            if not is_score_higher_or_equal(prev_raw_earned, prev_raw_possible, raw_earned, raw_possible):
                 update_score = False
                 log.warning(
                     u"Grades: Rescore is not higher than previous: "
@@ -131,7 +151,14 @@ def score_published_handler(sender, block, user, raw_earned, raw_possible, only_
                 )
 
     if update_score:
+        # Set the problem score in CSM.
         score_modified_time = set_score(user.id, block.location, raw_earned, raw_possible)
+
+        # Set the problem score on the xblock.
+        if isinstance(block, ScorableXBlockMixin):
+            block.set_score(Score(raw_earned=raw_earned, raw_possible=raw_possible))
+
+        # Fire a signal (consumed by enqueue_subsection_update, below)
         PROBLEM_RAW_SCORE_CHANGED.send(
             sender=None,
             raw_earned=raw_earned,
@@ -211,7 +238,7 @@ def recalculate_course_grade(sender, course, course_structure, user, **kwargs): 
     """
     Updates a saved course grade.
     """
-    CourseGradeFactory().update(user, course, course_structure)
+    CourseGradeFactory().update(user, course=course, course_structure=course_structure)
 
 
 def _emit_problem_submitted_event(kwargs):

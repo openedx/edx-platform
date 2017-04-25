@@ -62,9 +62,10 @@ from openedx.core.djangolib.markup import HTML, Text
 </%block>
 
 <div class="dashboard-notifications" tabindex="-1">
-    %if message:
+
+    %if banner_account_activation_message:
         <div class="dashboard-banner">
-            ${message | n, decode.utf8}
+            ${banner_account_activation_message | n, decode.utf8}
         </div>
     %endif
 
@@ -73,15 +74,18 @@ from openedx.core.djangolib.markup import HTML, Text
             ${enrollment_message | n,  decode.utf8}
         </div>
     %endif
+
+    %if enterprise_message:
+        <div class="dashboard-banner">
+            ${ enterprise_message | n, decode.utf8 }
+        </div>
+    %endif
 </div>
 
 <main id="main" aria-label="Content" tabindex="-1">
     <div class="container dashboard" id="dashboard-main">
       <div class="my-courses" id="my-courses">
-        <header class="wrapper-header-courses">
-          <h2 class="header-courses">${_("My Courses")}</h2>
-        </header>
-
+        <%include file="learner_dashboard/_dashboard_navigation_courses.html"/>
 
         % if len(course_enrollments) > 0:
           <ul class="listing-courses">
@@ -133,6 +137,12 @@ from openedx.core.djangolib.markup import HTML, Text
           </div>
         % endif
     </div>
+
+      %if sidebar_account_activation_message:
+        <div class="sidebar-notification">
+          ${sidebar_account_activation_message | n, decode.utf8}
+        </div>
+      %endif
 
       % if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
         <div id="dashboard-search-bar" class="search-bar dashboard-search-bar" role="search" aria-label="Dashboard">

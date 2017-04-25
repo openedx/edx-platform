@@ -8,8 +8,9 @@ import textwrap
 from nose.plugins.attrib import attr
 from common.test.acceptance.tests.helpers import UniqueCourseTest, TestWithSearchIndexMixin
 from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
-from common.test.acceptance.pages.studio.overview import CourseOutlinePage
+from common.test.acceptance.pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
 from common.test.acceptance.pages.studio.library import StudioLibraryContentEditor, StudioLibraryContainerXBlockWrapper
+from common.test.acceptance.pages.lms.course_home import CourseHomePage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.library import LibraryContentXBlockWrapper
 from common.test.acceptance.pages.common.logout import LogoutPage
@@ -44,7 +45,7 @@ class LibraryContentTestBase(UniqueCourseTest):
 
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
 
-        self.course_outline = CourseOutlinePage(
+        self.studio_course_outline = StudioCourseOutlinePage(
             self.browser,
             self.course_info['org'],
             self.course_info['number'],
@@ -116,9 +117,9 @@ class LibraryContentTestBase(UniqueCourseTest):
         if change_login:
             LogoutPage(self.browser).visit()
             self._auto_auth(self.STAFF_USERNAME, self.STAFF_EMAIL, True)
-        self.course_outline.visit()
+        self.studio_course_outline.visit()
 
-        subsection = self.course_outline.section(SECTION_NAME).subsection(SUBSECTION_NAME)
+        subsection = self.studio_course_outline.section(SECTION_NAME).subsection(SUBSECTION_NAME)
         return subsection.expand_subsection().unit(UNIT_NAME).go_to()
 
     def _goto_library_block_page(self, block_id=None):
@@ -128,7 +129,9 @@ class LibraryContentTestBase(UniqueCourseTest):
         self.courseware_page.visit()
         paragraphs = self.courseware_page.q(css='.course-content p').results
         if not paragraphs:
-            self.courseware_page.q(css='.menu-item a').results[0].click()
+            course_home_page = CourseHomePage(self.browser, self.course_id)
+            course_home_page.visit()
+            course_home_page.outline.go_to_section_by_index(0, 0)
         block_id = block_id if block_id is not None else self.lib_block.locator
         #pylint: disable=attribute-defined-outside-init
         self.library_content_page = LibraryContentXBlockWrapper(self.browser, block_id)

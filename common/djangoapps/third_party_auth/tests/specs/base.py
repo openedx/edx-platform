@@ -144,7 +144,7 @@ class IntegrationTestMixin(object):
         """
         raise NotImplementedError
 
-    def _test_return_login(self, user_is_activated=True):
+    def _test_return_login(self, user_is_activated=True, previous_session_timed_out=False):
         """ Test logging in to an account that is already linked. """
         # Make sure we're not logged in:
         dashboard_response = self.client.get(reverse('dashboard'))
@@ -156,12 +156,14 @@ class IntegrationTestMixin(object):
         # The user should be redirected to the provider:
         self.assertEqual(try_login_response.status_code, 302)
         login_response = self.do_provider_login(try_login_response['Location'])
-        # There will be one weird redirect required to set the login cookie:
-        self.assertEqual(login_response.status_code, 302)
-        self.assertEqual(login_response['Location'], self.url_prefix + self.complete_url)
-        # And then we should be redirected to the dashboard:
-        login_response = self.client.get(login_response['Location'])
-        self.assertEqual(login_response.status_code, 302)
+        # If the previous session was manually logged out, there will be one weird redirect
+        # required to set the login cookie (it sticks around if the main session times out):
+        if not previous_session_timed_out:
+            self.assertEqual(login_response.status_code, 302)
+            self.assertEqual(login_response['Location'], self.url_prefix + self.complete_url)
+            # And then we should be redirected to the dashboard:
+            login_response = self.client.get(login_response['Location'])
+            self.assertEqual(login_response.status_code, 302)
         if user_is_activated:
             url_expected = reverse('dashboard')
         else:
@@ -413,8 +415,10 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
     def assert_redirect_to_dashboard_looks_correct(self, response):
         """Asserts a response would redirect to /dashboard."""
         self.assertEqual(302, response.status_code)
+        # NOTE: Ideally we should use assertRedirects(), however it errors out due to the hostname, testserver,
+        # not being properly set. This may be an issue with the call made by PSA, but we are not certain.
         # pylint: disable=protected-access
-        self.assertEqual(auth_settings._SOCIAL_AUTH_LOGIN_REDIRECT_URL, response.get('Location'))
+        self.assertTrue(response.get('Location').endswith(django_settings.SOCIAL_AUTH_LOGIN_REDIRECT_URL))
 
     def assert_redirect_to_login_looks_correct(self, response):
         """Asserts a response would redirect to /login."""

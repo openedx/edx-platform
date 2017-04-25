@@ -2,115 +2,115 @@
 API for the gating djangoapp
 """
 from collections import defaultdict
-from django.contrib.auth.models import User
-from django.test.client import RequestFactory
 import json
 import logging
 
+from lms.djangoapps.courseware.entrance_exams import get_entrance_exam_content
 from openedx.core.lib.gating import api as gating_api
 from opaque_keys.edx.keys import UsageKey
-from lms.djangoapps.courseware.entrance_exams import get_entrance_exam_score
-from lms.djangoapps.grades.module_grades import get_module_score
 from util import milestones_helpers
 
 
 log = logging.getLogger(__name__)
 
 
-def _get_xblock_parent(xblock, category=None):
-    """
-    Returns the parent of the given XBlock. If an optional category is supplied,
-    traverses the ancestors of the XBlock and returns the first with the
-    given category.
-
-    Arguments:
-        xblock (XBlock): Get the parent of this XBlock
-        category (str): Find an ancestor with this category (e.g. sequential)
-    """
-    parent = xblock.get_parent()
-    if parent and category:
-        if parent.category == category:
-            return parent
-        else:
-            return _get_xblock_parent(parent, category)
-    return parent
-
-
 @gating_api.gating_enabled(default=False)
-def evaluate_prerequisite(course, block, user_id):
+def evaluate_prerequisite(course, subsection_grade, user):
     """
-    Finds the parent subsection of the content in the course and evaluates
-    any milestone relationships attached to that subsection. If the calculated
-    grade of the prerequisite subsection meets the minimum score required by
-    dependent subsections, the related milestone will be fulfilled for the user.
-
-    Arguments:
-        course (CourseModule): The course
-        prereq_content_key (UsageKey): The prerequisite content usage key
-        user_id (int): ID of User for which evaluation should occur
-
-    Returns:
-        None
+    Evaluates any gating milestone relationships attached to the given
+    subsection. If the subsection_grade meets the minimum score required
+    by dependent subsections, the related milestone will be marked
+    fulfilled for the user.
     """
-    sequential = _get_xblock_parent(block, 'sequential')
-    if sequential:
-        prereq_milestone = gating_api.get_gating_milestone(
-            course.id,
-            sequential.location.for_branch(None),
-            'fulfills'
-        )
-        if prereq_milestone:
-            gated_content_milestones = defaultdict(list)
-            for milestone in gating_api.find_gating_milestones(course.id, None, 'requires'):
-                gated_content_milestones[milestone['id']].append(milestone)
+    prereq_milestone = gating_api.get_gating_milestone(course.id, subsection_grade.location, 'fulfills')
+    if prereq_milestone:
+        gated_content_milestones = defaultdict(list)
+        for milestone in gating_api.find_gating_milestones(course.id, content_key=None, relationship='requires'):
+            gated_content_milestones[milestone['id']].append(milestone)
 
-            gated_content = gated_content_milestones.get(prereq_milestone['id'])
-            if gated_content:
-                user = User.objects.get(id=user_id)
-                score = get_module_score(user, course, sequential) * 100
-                for milestone in gated_content:
-                    # Default minimum score to 100
-                    min_score = 100
-                    requirements = milestone.get('requirements')
-                    if requirements:
-                        try:
-                            min_score = int(requirements.get('min_score'))
-                        except (ValueError, TypeError):
-                            log.warning(
-                                'Failed to find minimum score for gating milestone %s, defaulting to 100',
-                                json.dumps(milestone)
-                            )
-
-                    if score >= min_score:
-                        milestones_helpers.add_user_milestone({'id': user_id}, prereq_milestone)
-                    else:
-                        milestones_helpers.remove_user_milestone({'id': user_id}, prereq_milestone)
+        gated_content = gated_content_milestones.get(prereq_milestone['id'])
+        if gated_content:
+            for milestone in gated_content:
+                min_percentage = _get_minimum_required_percentage(milestone)
+                subsection_percentage = _get_subsection_percentage(subsection_grade)
+                if subsection_percentage >= min_percentage:
+                    milestones_helpers.add_user_milestone({'id': user.id}, prereq_milestone)
+                else:
+                    milestones_helpers.remove_user_milestone({'id': user.id}, prereq_milestone)
 
 
-def evaluate_entrance_exam(course, block, user_id):
+def _get_minimum_required_percentage(milestone):
     """
-    Update milestone fulfillments for the specified content module
+    Returns the minimum percentage requirement for the given milestone.
     """
-    # Fulfillment Use Case: Entrance Exam
-    # If this module is part of an entrance exam, we'll need to see if the student
-    # has reached the point at which they can collect the associated milestone
-    if milestones_helpers.is_entrance_exams_enabled():
-        entrance_exam_enabled = getattr(course, 'entrance_exam_enabled', False)
-        in_entrance_exam = getattr(block, 'in_entrance_exam', False)
-        if entrance_exam_enabled and in_entrance_exam:
-            # We don't have access to the true request object in this context, but we can use a mock
-            request = RequestFactory().request()
-            request.user = User.objects.get(id=user_id)
-            exam_pct = get_entrance_exam_score(request, course)
-            if exam_pct >= course.entrance_exam_minimum_score_pct:
-                exam_key = UsageKey.from_string(course.entrance_exam_id)
+    # Default minimum score to 100
+    min_score = 100
+    requirements = milestone.get('requirements')
+    if requirements:
+        try:
+            min_score = int(requirements.get('min_score'))
+        except (ValueError, TypeError):
+            log.warning(
+                u'Gating: Failed to find minimum score for gating milestone %s, defaulting to 100',
+                json.dumps(milestone)
+            )
+    return min_score
+
+
+def _get_subsection_percentage(subsection_grade):
+    """
+    Returns the percentage value of the given subsection_grade.
+    """
+    return _calculate_ratio(subsection_grade.graded_total.earned, subsection_grade.graded_total.possible) * 100.0
+
+
+def _calculate_ratio(earned, possible):
+    """
+    Returns the percentage of the given earned and possible values.
+    """
+    return float(earned) / float(possible) if possible else 0.0
+
+
+def evaluate_entrance_exam(course_grade, user):
+    """
+    Evaluates any entrance exam milestone relationships attached
+    to the given course. If the course_grade meets the
+    minimum score required, the dependent milestones will be marked
+    fulfilled for the user.
+    """
+    course = course_grade.course_data.course
+    if milestones_helpers.is_entrance_exams_enabled() and getattr(course, 'entrance_exam_enabled', False):
+        if get_entrance_exam_content(user, course):
+            exam_chapter_key = get_entrance_exam_usage_key(course)
+            exam_score_ratio = get_entrance_exam_score_ratio(course_grade, exam_chapter_key)
+            if exam_score_ratio >= course.entrance_exam_minimum_score_pct:
                 relationship_types = milestones_helpers.get_milestone_relationship_types()
                 content_milestones = milestones_helpers.get_course_content_milestones(
                     course.id,
-                    exam_key,
+                    exam_chapter_key,
                     relationship=relationship_types['FULFILLS']
                 )
-                # Add each milestone to the user's set...
-                user = {'id': request.user.id}
+                # Mark each entrance exam dependent milestone as fulfilled by the user.
                 for milestone in content_milestones:
-                    milestones_helpers.add_user_milestone(user, milestone)
+                    milestones_helpers.add_user_milestone({'id': user.id}, milestone)
+
+
+def get_entrance_exam_usage_key(course):
+    """
+    Returns the UsageKey of the entrance exam for the course.
+    """
+    return UsageKey.from_string(course.entrance_exam_id).replace(course_key=course.id)
+
+
+def get_entrance_exam_score_ratio(course_grade, exam_chapter_key):
+    """
+    Returns the score for the given chapter as a ratio of the
+    aggregated earned over the possible points, resulting in a
+    decimal value less than 1.
+    """
+    try:
+        earned, possible = course_grade.score_for_chapter(exam_chapter_key)
+    except KeyError:
+        earned, possible = 0.0, 0.0
+        log.warning(u'Gating: Unexpectedly failed to find chapter_grade for %s.', exam_chapter_key)
+    return _calculate_ratio(earned, possible)

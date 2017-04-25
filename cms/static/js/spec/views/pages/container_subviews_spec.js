@@ -35,6 +35,9 @@ define(['jquery', 'underscore', 'underscore.string', 'edx-ui-toolkit/js/utils/sp
 
             afterEach(function() {
                 delete window.course;
+                if (containerPage !== undefined) {
+                    containerPage.remove();
+                }
             });
 
             defaultXBlockInfo = {
@@ -106,15 +109,15 @@ define(['jquery', 'underscore', 'underscore.string', 'edx-ui-toolkit/js/utils/sp
                     expect(containerPage.$(viewPublishedCss)).toHaveClass(disabledCss);
                 });
 
-                it('updates when has_content_group_components attribute changes', function() {
+                it('updates when has_partition_group_components attribute changes', function() {
                     renderContainerPage(this, mockContainerXBlockHtml);
-                    fetch({has_content_group_components: false});
+                    fetch({has_partition_group_components: false});
                     expect(containerPage.$(visibilityNoteCss).length).toBe(0);
 
-                    fetch({has_content_group_components: true});
+                    fetch({has_partition_group_components: true});
                     expect(containerPage.$(visibilityNoteCss).length).toBe(1);
 
-                    fetch({has_content_group_components: false});
+                    fetch({has_partition_group_components: false});
                     expect(containerPage.$(visibilityNoteCss).length).toBe(0);
                 });
             });

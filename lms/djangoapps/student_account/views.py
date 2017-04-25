@@ -34,6 +34,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
 from openedx.core.djangoapps.user_api.accounts.api import request_password_change
 from openedx.core.djangoapps.user_api.errors import UserNotFound
+from openedx.features.enterprise_support.api import set_enterprise_branding_filter_param
 from openedx.core.lib.time_zone_utils import TIME_ZONE_CHOICES
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from student.models import UserProfile
@@ -47,7 +48,6 @@ from third_party_auth import pipeline
 from third_party_auth.decorators import xframe_allow_whitelisted
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 from util.date_utils import strftime_localized
-from util.enterprise_helpers import set_enterprise_branding_filter_param
 
 AUDIT_LOG = logging.getLogger("audit")
 log = logging.getLogger(__name__)
@@ -331,7 +331,6 @@ def get_user_orders(user):
     """
     no_data = []
     user_orders = []
-    allowed_course_modes = ['professional', 'verified', 'credit']
     commerce_configuration = CommerceConfiguration.current()
     user_query = {'username': user.username}
 
@@ -339,31 +338,20 @@ def get_user_orders(user):
     cache_key = commerce_configuration.CACHE_KEY + '.' + str(user.id) if use_cache else None
     api = ecommerce_api_client(user)
     commerce_user_orders = get_edx_api_data(
-        commerce_configuration, user, 'orders', api=api, querystring=user_query, cache_key=cache_key
+        commerce_configuration, 'orders', api=api, querystring=user_query, cache_key=cache_key
     )
 
     for order in commerce_user_orders:
         if order['status'].lower() == 'complete':
-            for line in order['lines']:
-                product = line.get('product')
-                if product:
-                    for attribute in product['attribute_values']:
-                        if attribute['name'] == 'certificate_type' and attribute['value'] in allowed_course_modes:
-                            try:
-                                date_placed = datetime.strptime(order['date_placed'], "%Y-%m-%dT%H:%M:%SZ")
-                                order_data = {
-                                    'number': order['number'],
-                                    'price': order['total_excl_tax'],
-                                    'title': order['lines'][0]['title'],
-                                    'order_date': strftime_localized(
-                                        date_placed.replace(tzinfo=pytz.UTC), 'SHORT_DATE'
-                                    ),
-                                    'receipt_url': EcommerceService().get_receipt_page_url(order['number'])
-                                }
-                                user_orders.append(order_data)
-                            except KeyError:
-                                log.exception('Invalid order structure: %r', order)
-                                return no_data
+            date_placed = datetime.strptime(order['date_placed'], "%Y-%m-%dT%H:%M:%SZ")
+            order_data = {
+                'number': order['number'],
+                'price': order['total_excl_tax'],
+                'order_date': strftime_localized(date_placed, 'SHORT_DATE'),
+                'receipt_url': EcommerceService().get_receipt_page_url(order['number']),
+                'lines': order['lines'],
+            }
+            user_orders.append(order_data)
 
     return user_orders
 

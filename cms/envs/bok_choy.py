@@ -48,6 +48,9 @@ update_module_store_settings(
     default_store=os.environ.get('DEFAULT_STORE', 'draft'),
 )
 
+# Needed to enable licensing on video modules
+XBLOCK_SETTINGS.update({'VideoDescriptor': {'licensing_enabled': True}})
+
 ############################ STATIC FILES #############################
 
 # Enable debug so that static assets are served by Django
@@ -92,6 +95,8 @@ FEATURES['LICENSING'] = True
 
 FEATURES['ENABLE_MOBILE_REST_API'] = True  # Enable video bumper in Studio
 FEATURES['ENABLE_VIDEO_BUMPER'] = True  # Enable video bumper in Studio settings
+
+FEATURES['ENABLE_ENROLLMENT_TRACK_USER_PARTITION'] = True
 
 # Enable partner support link in Studio footer
 PARTNER_SUPPORT_EMAIL = 'partner-support@example.com'

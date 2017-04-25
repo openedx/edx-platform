@@ -446,8 +446,6 @@ html.video-fullscreen {
           }
 
           h2 {
-            @include float(right);
-            @include text-align(right);
             @include border-right(0);
             @include padding-right(0);
             margin: 12px 0 0;

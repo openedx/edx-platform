@@ -2,8 +2,8 @@
     'use strict';
 
     require(
-['video/03_video_player.js'],
-function(VideoPlayer) {
+['video/03_video_player.js', 'hls'],
+function(VideoPlayer, HLS) {
     describe('VideoPlayer', function() {
         var state, oldOTBD, empty_arguments;
 
@@ -436,7 +436,7 @@ function(VideoPlayer) {
                     state.speed = '2.0';
                     state.videoPlayer.onPlay();
                     expect(state.videoPlayer.setPlaybackRate)
-                        .toHaveBeenCalledWith('2.0', true);
+                        .toHaveBeenCalledWith('2.0');
                     state.videoPlayer.onPlay();
                     expect(state.videoPlayer.setPlaybackRate.calls.count())
                         .toEqual(1);
@@ -943,9 +943,8 @@ function(VideoPlayer) {
                 state.isHtml5Mode.and.returnValue(false);
                 state.videoPlayer.isPlaying.and.returnValue(true);
                 VideoPlayer.prototype.setPlaybackRate.call(state, '0.75');
-                expect(state.videoPlayer.updatePlayTime).toHaveBeenCalledWith(60);
-                expect(state.videoPlayer.player.loadVideoById)
-                    .toHaveBeenCalledWith('videoId', 60);
+                expect(state.videoPlayer.player.setPlaybackRate)
+                    .toHaveBeenCalledWith('0.75');
             });
 
             it('in Flash mode and video not started', function() {
@@ -953,15 +952,7 @@ function(VideoPlayer) {
                 state.isHtml5Mode.and.returnValue(false);
                 state.videoPlayer.isPlaying.and.returnValue(false);
                 VideoPlayer.prototype.setPlaybackRate.call(state, '0.75');
-                expect(state.videoPlayer.updatePlayTime).toHaveBeenCalledWith(60);
-                expect(state.videoPlayer.seekTo).toHaveBeenCalledWith(60);
-                expect(state.trigger).toHaveBeenCalledWith(
-                    'videoProgressSlider.updateStartEndTimeRegion',
-                    {
-                        duration: 60
-                    });
-                expect(state.videoPlayer.player.cueVideoById)
-                    .toHaveBeenCalledWith('videoId', 60);
+                expect(state.videoPlayer.player.setPlaybackRate).toHaveBeenCalledWith('0.75');
             });
 
             it('in HTML5 mode', function() {
@@ -975,9 +966,49 @@ function(VideoPlayer) {
 
                 state.videoPlayer.isPlaying.and.returnValue(false);
                 VideoPlayer.prototype.setPlaybackRate.call(state, '1.0');
-                expect(state.videoPlayer.updatePlayTime).toHaveBeenCalledWith(60);
-                expect(state.videoPlayer.player.cueVideoById)
-                    .toHaveBeenCalledWith('videoId', 60);
+                expect(state.videoPlayer.player.setPlaybackRate).toHaveBeenCalledWith('1.0');
+            });
+        });
+
+        describe('HLS Video', function() {
+            beforeEach(function() {
+                state = jasmine.initializeHLSPlayer();
+            });
+
+            it('does not show error message if hls is supported', function() {
+                expect($('.video-hls-error')).toHaveClass('is-hidden');
+            });
+
+            it('can extract hls video sources correctly', function() {
+                expect(state.HLSVideoSources).toEqual(['/base/fixtures/hls/hls.m3u8']);
+                expect(state.videoPlayer.player.hls).toBeDefined();
+            });
+
+            describe('on safari', function() {
+                beforeEach(function() {
+                    spyOn(HLS, 'isSupported').and.returnValue(false);
+                    state = jasmine.initializeHLSPlayer();
+                    state.canPlayHLS = true;
+                    state.browserIsSafari = true;
+                });
+
+                it('can use native hls playback support', function() {
+                    expect(state.videoPlayer.player.hls).toBeUndefined();
+                });
+            });
+        });
+
+        describe('HLS Video Errors', function() {
+            beforeEach(function() {
+                spyOn(HLS, 'isSupported').and.returnValue(false);
+                state = jasmine.initializeHLSPlayer({sources: ['/base/fixtures/hls/hls.m3u8']});
+            });
+
+            it('shows error message if hls is not supported', function() {
+                expect($('.video-hls-error')).not.toHaveClass('is-hidden');
+                expect($('.video-hls-error').text().trim()).toEqual(
+                    'Your browser does not support this video format. Try using a different browser.'
+                );
             });
         });
     });
