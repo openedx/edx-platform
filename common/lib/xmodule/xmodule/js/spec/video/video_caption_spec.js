@@ -68,7 +68,8 @@
                     expect($('.video')).toContainElement('.closed-captions');
                 });
 
-                it('fetch the transcript in HTML5 mode', function(done) {
+                // flaky test, see LEARNER-689
+                xit('fetch the transcript in HTML5 mode', function(done) {
                     state = jasmine.initializePlayer();
 
                     jasmine.waitUntil(function() {
