@@ -7,6 +7,7 @@ import logging
 import random
 import string  # pylint: disable=deprecated-module
 
+import dateutil.parser
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
@@ -719,7 +720,18 @@ def _create_or_rerun_course(request):
         course = request.json.get('number', request.json.get('course'))
         display_name = request.json.get('display_name')
         # force the start date for reruns and allow us to override start via the client
-        start = request.json.get('start', CourseFields.start.default)
+
+        if 'start' in request.json:
+            try:
+                start = dateutil.parser.parse(request.json['start'])
+            except ValueError:
+                return JsonResponse({'error': _('Date not recognized.')}, status=400)
+        else:
+            # Maybe take this out and make it mandatory?
+            start = CourseFields.start.default
+
+        import pudb; pu.db;
+
         run = request.json.get('run')
 
         # allow/disable unicode characters in course_id according to settings
@@ -848,7 +860,7 @@ def _rerun_course(request, org, number, run, fields):
     CourseRerunState.objects.initiated(source_course_key, destination_course_key, request.user, fields['display_name'])
 
     # Clear the fields that must be reset for the rerun
-    fields['advertised_start'] = None
+    fields['advertised_start'] = fields.get('start')
 
     # Rerun the course as a new celery task
     json_fields = json.dumps(fields, cls=EdxJSONEncoder)

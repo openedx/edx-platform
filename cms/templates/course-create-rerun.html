@@ -110,6 +110,20 @@ from openedx.core.djangolib.js_utils import js_escaped_string
                         <span class="tip tip-error is-hidden"></span>
                       </div>
                     </li>
+
+                    <!-- New Start Date -->
+                    <li class="row">
+                      <div class="column field text" id="field-start">
+                        <label class="rerun-start-label" for="rerun-start">${_("New Start Date")}</label>
+                        <input class="rerun-start" id="rerun-start" type="datetime-local" name="rerun-start" value=""/>
+                        <span class="tip">
+                          ${_("The date and time the new course will start. All assignment start and end times will be updated to be offset from this new start.)")}
+                        </span>
+                        <span class="tip tip-error is-hidden"></span>
+                      </div>
+                    </li>
+                    <!-- End Date Munging -->
+
                   </ol>
 
                   <input type="hidden" value="${allow_unicode_course_id}" class="allow-unicode-course-id" /> <!-- TODO: need to add support for allow_unicode_course_id in real view's template -->
