@@ -428,7 +428,10 @@ def assert_opened_help_link_is_correct(test, url):
     test.browser.switch_to_window(test.browser.window_handles[-1])
     # Assert that url in the browser is the same.
     test.assertEqual(url, test.browser.current_url)
-    test.assertNotIn('Maze Found', test.browser.title)
+    # Check that the URL loads. Can't do this in the browser because it might
+    # be loading a "Maze Found" missing content page.
+    response = requests.get(url)
+    test.assertEqual(response.status_code, 200, "URL {!r} returned {}".format(url, response.status_code))
 
 
 class EventsTestMixin(TestCase):
