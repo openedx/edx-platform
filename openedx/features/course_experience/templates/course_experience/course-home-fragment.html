@@ -50,17 +50,19 @@ from openedx.features.course_experience import UNIFIED_COURSE_EXPERIENCE_FLAG
             % endif
             <div class="form-actions">
                 % if not waffle.flag_is_active(request, UNIFIED_COURSE_EXPERIENCE_FLAG):
-                    <a class="btn action-show-bookmarks" href="${reverse('openedx.course_bookmarks.home', args=[course.id])}">
+                    <a class="btn action-show-bookmarks" href="${reverse('openedx.course_bookmarks.home', args=[course_key])}">
                         ${_("Bookmarks")}
                     </a>
                 % endif
-                <a class="btn btn-brand action-resume-course" href="${reverse('courseware', kwargs={'course_id': unicode(course.id.to_deprecated_string())})}">
-                    % if has_visited_course:
-                        ${_("Resume Course")}
-                    % else:
-                        ${_("Start Course")}
-                    % endif
-                </a>
+                % if resume_course_url:
+                    <a class="btn btn-brand action-resume-course" href="${resume_course_url}">
+                        % if has_visited_course:
+                            ${_("Resume Course")}
+                        % else:
+                            ${_("Start Course")}
+                        % endif
+                    </a>
+                % endif
             </div>
         </div>
     </header>
@@ -75,7 +77,7 @@ from openedx.features.course_experience import UNIFIED_COURSE_EXPERIENCE_FLAG
                         <h3 class="hd-6">${_("Course Tools")}</h3>
                         <ul class="list-unstyled">
                             <li>
-                                <a class="action-show-bookmarks" href="${reverse('openedx.course_bookmarks.home', args=[course.id])}">
+                                <a class="action-show-bookmarks" href="${reverse('openedx.course_bookmarks.home', args=[course_key])}">
                                     <span class="icon fa fa-bookmark" aria-hidden="true"></span>
                                     ${_("Bookmarks")}
                                 </a>
