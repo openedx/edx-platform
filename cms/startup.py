@@ -48,10 +48,12 @@ def run():
     xmodule.x_module.descriptor_global_handler_url = cms.lib.xblock.runtime.handler_url
     xmodule.x_module.descriptor_global_local_resource_url = xblock_local_resource_url
 
+    # Set the version of docs that help-tokens will go to.
+    settings.HELP_TOKENS_LANGUAGE_CODE = settings.LANGUAGE_CODE
+    settings.HELP_TOKENS_VERSION = doc_version()
+
     # validate configurations on startup
     validate_cms_config(settings)
-
-    settings.HELP_TOKENS_VERSION = "en/" + doc_version()
 
 
 def add_mimetypes():
