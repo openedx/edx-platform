@@ -14,6 +14,7 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 INSTALLED_APPS += (
     'django_extensions',
+    'appsembler',
     'openedx.core.djangoapps.appsembler.sites',
 )
 
@@ -43,11 +44,20 @@ INTERCOM_APP_SECRET = AUTH_TOKENS.get("INTERCOM_APP_SECRET")
 
 EDX_API_KEY = "test"
 
-INSTALLED_APPS += ('tiers',)
+INSTALLED_APPS += (
+    'hijack',
+    'compat',
+    'hijack_admin',
+    'tiers',
+)
 MIDDLEWARE_CLASSES += (
     'organizations.middleware.OrganizationMiddleware',
 #    'tiers.middleware.TierMiddleware',
 )
+
+COURSE_CATALOG_VISIBILITY_PERMISSION = 'see_in_catalog'
+COURSE_ABOUT_VISIBILITY_PERMISSION = 'see_about_page'
+SEARCH_SKIP_ENROLLMENT_START_DATE_FILTERING = True
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
@@ -77,3 +87,5 @@ CELERY_QUEUES.update(
 )
 
 CLONE_COURSE_FOR_NEW_SIGNUPS = False
+HIJACK_ALLOW_GET_REQUESTS = True
+HIJACK_LOGOUT_REDIRECT_URL = '/admin/auth/user'

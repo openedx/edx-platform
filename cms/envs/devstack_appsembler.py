@@ -6,6 +6,7 @@ import dj_database_url
 
 INSTALLED_APPS += (
     'django_extensions',
+    'appsembler',
     'openedx.core.djangoapps.appsembler.sites',
 )
 
@@ -22,7 +23,12 @@ DEFAULT_TEMPLATE_ENGINE['OPTIONS']['context_processors'] += ('openedx.core.djang
 INTERCOM_APP_ID = AUTH_TOKENS.get("INTERCOM_APP_ID")
 INTERCOM_APP_SECRET = AUTH_TOKENS.get("INTERCOM_APP_SECRET")
 
-INSTALLED_APPS += ('tiers',)
+INSTALLED_APPS += (
+    'hijack',
+    'compat',
+    'hijack_admin',
+    'tiers',
+)
 MIDDLEWARE_CLASSES += (
     'organizations.middleware.OrganizationMiddleware',
     'tiers.middleware.TierMiddleware',
@@ -58,3 +64,5 @@ CELERY_QUEUES.update(
 )
 
 CLONE_COURSE_FOR_NEW_SIGNUPS = False
+HIJACK_ALLOW_GET_REQUESTS = True
+HIJACK_LOGOUT_REDIRECT_URL = '/admin/auth/user'

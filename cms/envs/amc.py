@@ -52,8 +52,16 @@ if SENTRY_DSN:
 
     INSTALLED_APPS += ('raven.contrib.django.raven_compat',)
 
-INSTALLED_APPS += ('tiers',)
-MIDDLEWARE_CLASSES += ('organizations.middleware.OrganizationMiddleware', 'tiers.middleware.TierMiddleware',)
+INSTALLED_APPS += (
+    'hijack',
+    'compat',
+    'hijack_admin',
+    'tiers',
+)
+MIDDLEWARE_CLASSES += (
+    'organizations.middleware.OrganizationMiddleware',
+    'tiers.middleware.TierMiddleware',
+)
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
@@ -68,3 +76,5 @@ DATABASE_ROUTERS += ['openedx.core.djangoapps.appsembler.sites.routers.TiersDbRo
 XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5
 
 CLONE_COURSE_FOR_NEW_SIGNUPS = False 
+HIJACK_ALLOW_GET_REQUESTS = True
+HIJACK_LOGOUT_REDIRECT_URL = '/admin/auth/user'

@@ -74,8 +74,16 @@ if SENTRY_DSN:
 # from the redirect mechanics.
 MAIN_SITE_REDIRECT_WHITELIST = ['api', 'admin', 'oauth', 'status']
 
-INSTALLED_APPS += ('tiers',)
-MIDDLEWARE_CLASSES += ('organizations.middleware.OrganizationMiddleware', 'tiers.middleware.TierMiddleware',)
+INSTALLED_APPS += (
+    'hijack',
+    'compat',
+    'hijack_admin',
+    'tiers',
+)
+MIDDLEWARE_CLASSES += (
+    'organizations.middleware.OrganizationMiddleware',
+    'tiers.middleware.TierMiddleware',
+)
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
@@ -88,3 +96,5 @@ DATABASES['tiers'] = dj_database_url.parse(TIERS_DATABASE_URL)
 DATABASE_ROUTERS += ['openedx.core.djangoapps.appsembler.sites.routers.TiersDbRouter']
 
 CLONE_COURSE_FOR_NEW_SIGNUPS = False
+HIJACK_ALLOW_GET_REQUESTS = True
+HIJACK_LOGOUT_REDIRECT_URL = '/admin/auth/user'
