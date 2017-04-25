@@ -8,6 +8,7 @@ from django.core.exceptions import ImproperlyConfigured
 from edx_rest_api_client.client import EdxRestApiClient
 from provider.oauth2.models import Client
 
+from openedx.core.lib.cache_utils import zpickle, zunpickle
 from openedx.core.lib.token_utils import JwtBuilder
 
 
@@ -46,10 +47,11 @@ def get_edx_api_data(api_config, resource, api, resource_id=None, querystring=No
 
     if cache_key:
         cache_key = '{}.{}'.format(cache_key, resource_id) if resource_id is not None else cache_key
+        cache_key += '.zpickled'
 
         cached = cache.get(cache_key)
         if cached:
-            return cached
+            return zunpickle(cached)
 
     try:
         endpoint = getattr(api, resource)
@@ -67,7 +69,8 @@ def get_edx_api_data(api_config, resource, api, resource_id=None, querystring=No
         return no_data
 
     if cache_key:
-        cache.set(cache_key, results, api_config.cache_ttl)
+        zdata = zpickle(results)
+        cache.set(cache_key, zdata, api_config.cache_ttl)
 
     return results
 
