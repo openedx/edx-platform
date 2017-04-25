@@ -3,10 +3,10 @@ Tests for the Course Outline view and supporting views.
 """
 import datetime
 import ddt
-from mock import patch
 import json
 
 from django.core.urlresolvers import reverse
+from pyquery import PyQuery as pq
 
 from courseware.tests.factories import StaffFactory
 from student.models import CourseEnrollment
@@ -37,9 +37,10 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
             with cls.store.bulk_operations(course.id):
                 chapter = ItemFactory.create(category='chapter', parent_location=course.location)
                 section = ItemFactory.create(category='sequential', parent_location=chapter.location)
-                ItemFactory.create(category='vertical', parent_location=section.location)
-                course.last_accessed = section.url_name
-
+                vertical = ItemFactory.create(category='vertical', parent_location=section.location)
+            course.children = [chapter]
+            chapter.children = [section]
+            section.children = [vertical]
             cls.courses.append(course)
 
             course = CourseFactory.create()
@@ -47,10 +48,12 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
                 chapter = ItemFactory.create(category='chapter', parent_location=course.location)
                 section = ItemFactory.create(category='sequential', parent_location=chapter.location)
                 section2 = ItemFactory.create(category='sequential', parent_location=chapter.location)
-                ItemFactory.create(category='vertical', parent_location=section.location)
-                ItemFactory.create(category='vertical', parent_location=section2.location)
-                course.last_accessed = None
-
+                vertical = ItemFactory.create(category='vertical', parent_location=section.location)
+                vertical2 = ItemFactory.create(category='vertical', parent_location=section2.location)
+            course.children = [chapter]
+            chapter.children = [section, section2]
+            section.children = [vertical]
+            section2.children = [vertical2]
             cls.courses.append(course)
 
             course = CourseFactory.create()
@@ -63,8 +66,10 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
                     graded=True,
                     format='Homework',
                 )
-                ItemFactory.create(category='vertical', parent_location=section.location)
-                course.last_accessed = section.url_name
+                vertical = ItemFactory.create(category='vertical', parent_location=section.location)
+            course.children = [chapter]
+            chapter.children = [section]
+            section.children = [vertical]
             cls.courses.append(course)
 
     @classmethod
@@ -81,25 +86,78 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
         super(TestCourseOutlinePage, self).setUp()
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
 
-    @patch('openedx.features.course_experience.views.course_outline.get_last_accessed_courseware')
-    def test_render(self, patched_get_last_accessed):
+    def test_outline_details(self):
         for course in self.courses:
-            patched_get_last_accessed.return_value = (None, course.last_accessed)
+
             url = course_home_url(course)
             response = self.client.get(url)
             self.assertEqual(response.status_code, 200)
             response_content = response.content.decode("utf-8")
 
-            self.assertIn('Resume Course', response_content)
+            self.assertTrue(course.children)
             for chapter in course.children:
                 self.assertIn(chapter.display_name, response_content)
+                self.assertTrue(chapter.children)
                 for section in chapter.children:
                     self.assertIn(section.display_name, response_content)
                     if section.graded:
-                        self.assertIn(section.due, response_content)
+                        self.assertIn(section.due.strftime('%Y-%m-%d %H:%M:%S'), response_content)
                         self.assertIn(section.format, response_content)
+                    self.assertTrue(section.children)
                     for vertical in section.children:
                         self.assertNotIn(vertical.display_name, response_content)
+
+    def test_start_course(self):
+        """
+        Tests that the start course button appears when the course has never been accessed.
+
+        Technically, this is a course home test, and not a course outline test, but checking the counts of
+        start/resume course should be done together to not get a false positive.
+
+        """
+        course = self.courses[0]
+
+        response = self.client.get(course_home_url(course))
+        self.assertEqual(response.status_code, 200)
+
+        self.assertContains(response, 'Start Course', count=1)
+        self.assertContains(response, 'Resume Course', count=0)
+
+        content = pq(response.content)
+        self.assertTrue(content('.action-resume-course').attr('href').endswith('/course/' + course.url_name))
+
+    def test_resume_course(self):
+        """
+        Tests that two resume course buttons appear when the course has been accessed.
+
+        Technically, this is a mix of a course home and course outline test, but checking the counts of start/resume
+        course should be done together to not get a false positive.
+
+        """
+        course = self.courses[0]
+
+        # first navigate to a section to make it the last accessed
+        chapter = course.children[0]
+        section = chapter.children[0]
+        last_accessed_url = reverse(
+            'courseware_section',
+            kwargs={
+                'course_id': course.id.to_deprecated_string(),
+                'chapter': chapter.url_name,
+                'section': section.url_name,
+            }
+        )
+        self.assertEqual(200, self.client.get(last_accessed_url).status_code)
+
+        # check resume course buttons
+        response = self.client.get(course_home_url(course))
+        self.assertEqual(response.status_code, 200)
+
+        self.assertContains(response, 'Start Course', count=0)
+        self.assertContains(response, 'Resume Course', count=2)
+
+        content = pq(response.content)
+        self.assertTrue(content('.action-resume-course').attr('href').endswith('/sequential/' + section.url_name))
 
 
 class TestCourseOutlinePreview(SharedModuleStoreTestCase):
