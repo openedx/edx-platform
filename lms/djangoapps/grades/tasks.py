@@ -115,15 +115,24 @@ def recalculate_subsection_grade_v3(self, **kwargs):
     _recalculate_subsection_grade(self, **kwargs)
 
 
+import time
+from celery import group
 @task()
 def add(x, y):
+    time.sleep(4)
     return x + y
 
 
 @task
 def tsum(x):
+    time.sleep(8)
     return sum(x)
 
+
+@task
+def do_stuff():
+    thing = group(add.s(i, i) for i in xrange(10))
+    thing.apply_async()
 
 def _recalculate_subsection_grade(self, **kwargs):
     """
