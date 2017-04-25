@@ -74,6 +74,12 @@ from openedx.features.course_experience import UNIFIED_COURSE_EXPERIENCE_FLAG
                                     ${_("Bookmarks")}
                                 </a>
                             </li>
+                            <li>
+                                <a class="action-show-bookmarks" href="${reverse('openedx.course_experience.course_updates', args=[course.id])}">
+                                    <span class="icon fa fa-newspaper-o" aria-hidden="true"></span>
+                                    ${_("Updates")}
+                                </a>
+                            </li>
                         </ul>
                     </div>
                     % if handouts_html:
