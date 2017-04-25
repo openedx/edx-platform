@@ -25,7 +25,7 @@ LOGFIELDS = [
     'event_source',
     'event_type',
     'event',
-    'agent',
+    # 'agent',
     'page',
     'time',
     'host',
@@ -41,7 +41,7 @@ class TrackingLog(models.Model):
     event_source = models.CharField(max_length=32)
     event_type = models.CharField(max_length=512, blank=True)
     event = models.TextField(blank=True)
-    agent = models.CharField(max_length=256, blank=True)
+    # agent = models.CharField(max_length=256, blank=True)
     page = models.CharField(max_length=512, blank=True, null=True)
     time = models.DateTimeField('event time')
     host = models.CharField(max_length=64, blank=True)
