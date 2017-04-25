@@ -45,7 +45,7 @@ class CoursewareTab(EnrolledTab):
         Returns the main course URL for the current user.
         """
         if waffle.flag_is_active(request, UNIFIED_COURSE_VIEW_FLAG):
-            return 'edx.course_experience.course_home'
+            return 'openedx.course_experience.course_home'
         else:
             return 'courseware'
 
