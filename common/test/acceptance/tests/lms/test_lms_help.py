@@ -53,7 +53,7 @@ class TestCohortHelp(ContainerBase):
         self.cohort_management.add_cohort('cohort_name')
 
         href = (
-            'http://edx.readthedocs.io/projects/edx-partner-course-staff/en/{}/'
+            'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/{}/'
             'course_features/cohorts/cohort_config.html#assign-learners-to-cohorts-manually'
         ).format(doc_version())
 
@@ -75,7 +75,7 @@ class TestCohortHelp(ContainerBase):
         self.cohort_management.add_cohort('cohort_name', assignment_type='random')
 
         href = (
-            'http://edx.readthedocs.io/projects/edx-partner-course-staff/en/{}/'
+            'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/{}/'
             'course_features/cohorts/cohorts_overview.html#all-automated-assignment'
         ).format(doc_version())
 
