@@ -8,6 +8,7 @@ import mock
 import ddt
 from django.conf import settings
 from django.test import TestCase
+from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
 from django.http import HttpResponse
 from django.contrib.sessions.middleware import SessionMiddleware
@@ -143,6 +144,23 @@ class TestUserPreferenceMiddleware(TestCase):
             self.assertEqual(accept_lang_result, accept_lang_out)
 
         self.assertEquals(self.request.session.get(LANGUAGE_SESSION_KEY), lang_session)
+
+    @ddt.data(None, 'es', 'en')
+    def test_logout_preserves_cookie(self, lang_cookie):
+        if lang_cookie:
+            self.client.cookies[settings.LANGUAGE_COOKIE] = lang_cookie
+        elif settings.LANGUAGE_COOKIE in self.client.cookies:
+            del self.client.cookies[settings.LANGUAGE_COOKIE]
+        # Use an actual call to the logout endpoint, because the logout function
+        # explicitly clears all cookies
+        self.client.get(reverse('logout'))
+        if lang_cookie:
+            self.assertEqual(
+                self.client.cookies[settings.LANGUAGE_COOKIE].value,
+                lang_cookie
+            )
+        else:
+            self.assertNotIn(settings.LANGUAGE_COOKIE, self.client.cookies)
 
     def test_process_response_no_user_noop(self):
         del self.request.user
