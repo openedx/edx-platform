@@ -101,19 +101,19 @@ class TestComputeGrades(SharedModuleStoreTestCase):
             mock_task.apply_async.call_args_list,
             [
                 ({
-                    'options': {'routing_key': 'key'},
+                    'routing_key': 'key',
                     'kwargs': _kwargs(self.course_keys[0], 0)
                 },),
                 ({
-                    'options': {'routing_key': 'key'},
+                    'routing_key': 'key',
                     'kwargs': _kwargs(self.course_keys[0], 2)
                 },),
                 ({
-                    'options': {'routing_key': 'key'},
+                    'routing_key': 'key',
                     'kwargs': _kwargs(self.course_keys[3], 0)
                 },),
                 ({
-                    'options': {'routing_key': 'key'},
+                    'routing_key': 'key',
                     'kwargs': _kwargs(self.course_keys[3], 2)
                 },),
             ],
