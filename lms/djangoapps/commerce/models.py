@@ -15,7 +15,7 @@ class CommerceConfiguration(ConfigurationModel):
 
     API_NAME = 'commerce'
     CACHE_KEY = 'commerce.api.data'
-    DEFAULT_RECEIPT_PAGE_URL = '/commerce/checkout/receipt/?orderNum='
+    DEFAULT_RECEIPT_PAGE_URL = '/checkout/receipt/?order_number='
 
     checkout_on_ecommerce_service = models.BooleanField(
         default=False,
@@ -34,6 +34,8 @@ class CommerceConfiguration(ConfigurationModel):
             'Specified in seconds. Enable caching by setting this to a value greater than 0.'
         )
     )
+    # receipt_page no longer used but remains in the model until we can purge old data.
+    # removing this will casue 500 errors when trying to access the Django admin.
     receipt_page = models.CharField(
         max_length=255,
         default=DEFAULT_RECEIPT_PAGE_URL,
