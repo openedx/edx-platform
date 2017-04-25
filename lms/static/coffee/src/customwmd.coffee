@@ -157,7 +157,7 @@ if Markdown?
               $('#file-upload').unbind('change').change(startUploadHandler)
             console.log error
           else
-            $(input).attr('value', fileURL)
+            $(input).val(fileURL)
         error: (data, status, e) ->
           alert(e)
           if startUploadHandler
