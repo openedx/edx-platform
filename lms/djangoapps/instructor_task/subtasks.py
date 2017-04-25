@@ -14,8 +14,11 @@ import dogstats_wrapper as dog_stats_api
 from django.db import transaction, DatabaseError
 from django.core.cache import cache
 
-from lms.djangoapps.instructor_task.models import InstructorTask, PROGRESS, QUEUING
 from util.db import outer_atomic
+
+from .exceptions import DuplicateTaskException
+from .models import InstructorTask, PROGRESS, QUEUING
+
 
 TASK_LOG = logging.getLogger('edx.celery.task')
 
@@ -24,11 +27,6 @@ SUBTASK_LOCK_EXPIRE = 60 * 10  # Lock expires in 10 minutes
 # Number of times to retry if a subtask update encounters a lock on the InstructorTask.
 # (These are recursive retries, so don't make this number too large.)
 MAX_DATABASE_LOCK_RETRIES = 5
-
-
-class DuplicateTaskException(Exception):
-    """Exception indicating that a task already exists or has already completed."""
-    pass
 
 
 def _get_number_of_subtasks(total_num_items, items_per_task):
