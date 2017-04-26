@@ -1,6 +1,7 @@
 """
 Test helper functions and base classes.
 """
+
 import inspect
 import json
 import unittest
@@ -13,6 +14,7 @@ import urlparse
 from contextlib import contextmanager
 from datetime import datetime
 from path import Path as path
+
 from bok_choy.javascript import js_defined
 from bok_choy.web_app_test import WebAppTest
 from bok_choy.promise import EmptyPromise, Promise
@@ -32,6 +34,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from unittest import TestCase
 
+from openedx.core.release import doc_version, RELEASE_LINE
 
 from common.test.acceptance.pages.common import BASE_URL
 
@@ -432,6 +435,27 @@ def assert_opened_help_link_is_correct(test, url):
     # be loading a "Maze Found" missing content page.
     response = requests.get(url)
     test.assertEqual(response.status_code, 200, "URL {!r} returned {}".format(url, response.status_code))
+
+
+EDX_BOOKS = {
+    'course_author': 'edx-partner-course-staff',
+    'learner': 'edx-guide-for-students',
+}
+
+OPEN_BOOKS = {
+    'course_author': 'open-edx-building-and-running-a-course',
+    'learner': 'open-edx-learner-guide',
+}
+
+
+def url_for_help(book_slug, path):
+    """
+    Create a full help URL given a book slug and a path component.
+    """
+    # Emulate the switch between books that happens in envs/bokchoy.py
+    books = EDX_BOOKS if RELEASE_LINE == "master" else OPEN_BOOKS
+    url = 'http://edx.readthedocs.io/projects/{}/en/{}{}'.format(books[book_slug], doc_version(), path)
+    return url
 
 
 class EventsTestMixin(TestCase):

@@ -29,26 +29,18 @@ from common.test.acceptance.pages.studio.users import CourseTeamPage
 from common.test.acceptance.tests.helpers import (
     AcceptanceTest,
     assert_nav_help_link,
-    assert_side_bar_help_link
+    assert_side_bar_help_link,
+    url_for_help,
 )
 from common.test.acceptance.pages.studio.import_export import ExportLibraryPage, ImportLibraryPage
 from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
-
-from openedx.core.release import doc_version
-
-DOCUMENTATION_URL_TEMPLATE = (
-    'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/{doc_version}{path}'
-)
 
 
 def _get_expected_documentation_url(path):
     """
     Returns the expected URL for the building and running a course documentation.
     """
-    return DOCUMENTATION_URL_TEMPLATE.format(
-        doc_version=doc_version(),
-        path=path,
-    )
+    return url_for_help('course_author', path)
 
 
 @attr(shard=10)

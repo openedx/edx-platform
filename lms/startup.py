@@ -11,8 +11,6 @@ from django.conf import settings
 
 settings.INSTALLED_APPS  # pylint: disable=pointless-statement
 
-import help_tokens
-
 from openedx.core.lib.django_startup import autostartup
 from openedx.core.release import doc_version
 import analytics

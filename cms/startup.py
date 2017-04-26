@@ -8,8 +8,6 @@ from django.conf import settings
 
 settings.INSTALLED_APPS  # pylint: disable=pointless-statement
 
-import help_tokens
-
 from openedx.core.lib.django_startup import autostartup
 import django
 from openedx.core.djangoapps.monkey_patch import django_db_models_options
