@@ -2419,6 +2419,7 @@ XDOMAIN_PROXY_CACHE_TIMEOUT = 60 * 15
 # - 'hidden': to not display the field
 
 REGISTRATION_EXTRA_FIELDS = {
+    'confirm_email': 'hidden',
     'level_of_education': 'optional',
     'gender': 'optional',
     'year_of_birth': 'optional',
@@ -2429,6 +2430,28 @@ REGISTRATION_EXTRA_FIELDS = {
     'city': 'hidden',
     'country': 'hidden',
 }
+
+REGISTRATION_FIELD_ORDER = [
+    "email",
+    "confirm_email",
+    "name",
+    "username",
+    "password",
+    "first_name",
+    "last_name",
+    "city",
+    "state",
+    "country",
+    "gender",
+    "year_of_birth",
+    "level_of_education",
+    "company",
+    "title",
+    "mailing_address",
+    "goals",
+    "honor_code",
+    "terms_of_service",
+]
 
 # Optional setting to restrict registration / account creation to only emails
 # that match a regex in this list. Set to None to allow any email (default).
