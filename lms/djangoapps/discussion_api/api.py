@@ -43,12 +43,11 @@ from django_comment_common.signals import (
     comment_voted,
     comment_deleted,
 )
-from django_comment_client.utils import get_accessible_discussion_xblocks, is_commentable_cohorted
+from django_comment_client.utils import get_accessible_discussion_xblocks, is_commentable_divided, get_group_id_for_user
 from lms.djangoapps.discussion_api.pagination import DiscussionAPIPagination
 from lms.lib.comment_client.comment import Comment
 from lms.lib.comment_client.thread import Thread
 from lms.lib.comment_client.utils import CommentClientRequestError
-from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id
 from openedx.core.lib.exceptions import CourseNotFoundError, PageNotFoundError, DiscussionNotFoundError
 
 
@@ -113,10 +112,10 @@ def _get_thread_and_context(request, thread_id, retrieve_kwargs=None):
         if (
                 not context["is_requester_privileged"] and
                 cc_thread["group_id"] and
-                is_commentable_cohorted(course.id, cc_thread["commentable_id"])
+                is_commentable_divided(course.id, cc_thread["commentable_id"])
         ):
-            requester_cohort = get_cohort_id(request.user, course.id)
-            if requester_cohort is not None and cc_thread["group_id"] != requester_cohort:
+            requester_group_id = get_group_id_for_user(request.user, course.id)
+            if requester_group_id is not None and cc_thread["group_id"] != requester_group_id:
                 raise ThreadNotFoundError("Thread not found.")
         return cc_thread, context
     except CommentClientRequestError:
@@ -547,7 +546,7 @@ def get_thread_list(
         "user_id": unicode(request.user.id),
         "group_id": (
             None if context["is_requester_privileged"] else
-            get_cohort_id(request.user, course.id)
+            get_group_id_for_user(request.user, course.id)
         ),
         "page": page,
         "per_page": page_size,
@@ -831,10 +830,10 @@ def create_thread(request, thread_data):
     _check_initializable_thread_fields(thread_data, context)
     if (
             "group_id" not in thread_data and
-            is_commentable_cohorted(course_key, thread_data.get("topic_id"))
+            is_commentable_divided(course_key, thread_data.get("topic_id"))
     ):
         thread_data = thread_data.copy()
-        thread_data["group_id"] = get_cohort_id(user, course_key)
+        thread_data["group_id"] = get_group_id_for_user(user, course_key)
     serializer = ThreadSerializer(data=thread_data, context=context)
     actions_form = ThreadActionsForm(thread_data)
     if not (serializer.is_valid() and actions_form.is_valid()):

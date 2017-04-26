@@ -31,7 +31,7 @@
                 DiscussionThreadShowView.__super__.initialize.call(this);
                 this.mode = options.mode || 'inline';
                 this.startHeader = options.startHeader;
-                this.is_commentable_cohorted = options.is_commentable_cohorted;
+                this.is_commentable_divided = options.is_commentable_divided;
                 if ((_ref = this.mode) !== 'tab' && _ref !== 'inline') {
                     throw new Error('invalid mode: ' + this.mode);
                 }
@@ -42,7 +42,7 @@
                     mode: this.mode,
                     startHeader: this.startHeader,
                     flagged: this.model.isFlagged(),
-                    is_commentable_cohorted: this.is_commentable_cohorted,
+                    is_commentable_divided: this.is_commentable_divided,
                     author_display: this.getAuthorDisplay(),
                     cid: this.model.cid,
                     readOnly: $('.discussion-module').data('read-only')
