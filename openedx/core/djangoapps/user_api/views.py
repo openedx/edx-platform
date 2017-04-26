@@ -1002,7 +1002,7 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     """
     authentication_classes = (authentication.SessionAuthentication,)
     permission_classes = (ApiKeyHeaderPermission,)
-    queryset = User.objects.all().prefetch_related("preferences").select_related("profile")
+    queryset = User.objects.all().prefetch_related("preferences")
     serializer_class = UserSerializer
     paginate_by = 10
     paginate_by_param = "page_size"
@@ -1028,7 +1028,7 @@ class ForumRoleUsersListView(generics.ListAPIView):
             raise ParseError('course_id must be specified')
         course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id_string)
         role = Role.objects.get_or_create(course_id=course_id, name=name)[0]
-        users = role.users.prefetch_related("preferences").select_related("profile").all()
+        users = role.users.all()
         return users
 
 
@@ -1057,7 +1057,7 @@ class PreferenceUsersListView(generics.ListAPIView):
     paginate_by_param = "page_size"
 
     def get_queryset(self):
-        return User.objects.filter(preferences__key=self.kwargs["pref_key"]).prefetch_related("preferences").select_related("profile")
+        return User.objects.filter(preferences__key=self.kwargs["pref_key"]).prefetch_related("preferences")
 
 
 class UpdateEmailOptInPreference(APIView):
