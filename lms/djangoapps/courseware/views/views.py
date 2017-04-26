@@ -97,6 +97,7 @@ from openedx.features.course_experience import (
     UNIFIED_COURSE_VIEW_FLAG,
 )
 from openedx.features.enterprise_support.api import data_sharing_consent_required
+from openedx.features.course_experience.views.course_dates import CourseDatesFragmentView
 from shoppingcart.utils import is_shopping_cart_enabled
 from student.models import UserTestGroup, CourseEnrollment
 from survey.utils import must_answer_survey
@@ -330,6 +331,12 @@ def course_info(request, course_id):
         store_upgrade_cookie = False
         upgrade_cookie_name = 'show_upgrade_notification'
         upgrade_link = None
+
+        # Construct the dates fragment
+        dates_fragment = None
+        if SelfPacedConfiguration.current().enable_course_home_improvements:
+            dates_fragment = CourseDatesFragmentView().render_to_fragment(request, course_id=course_id)
+
         if request.user.is_authenticated():
             show_upgrade_notification = False
             if request.GET.get('upgrade', 'false') == 'true':
@@ -357,6 +364,7 @@ def course_info(request, course_id):
             'supports_preview_menu': True,
             'studio_url': get_studio_url(course, 'course_info'),
             'show_enroll_banner': show_enroll_banner,
+            'dates_fragment': dates_fragment,
             'url_to_enroll': url_to_enroll,
             'upgrade_link': upgrade_link,
         }

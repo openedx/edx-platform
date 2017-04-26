@@ -706,32 +706,32 @@ class ViewsTestCase(ModuleStoreTestCase):
               ('Canada/Yukon', -8),  # UTC - 8
               ('Europe/Moscow', 4))  # UTC + 3 + 1 for daylight savings
     @ddt.unpack
-    @freeze_time('2012-01-01')
     def test_submission_history_timezone(self, timezone, hour_diff):
-        with (override_settings(TIME_ZONE=timezone)):
-            course = CourseFactory.create()
-            course_key = course.id
-            client = Client()
-            admin = AdminFactory.create()
-            self.assertTrue(client.login(username=admin.username, password='test'))
-            state_client = DjangoXBlockUserStateClient(admin)
-            usage_key = course_key.make_usage_key('problem', 'test-history')
-            state_client.set(
-                username=admin.username,
-                block_key=usage_key,
-                state={'field_a': 'x', 'field_b': 'y'}
-            )
-            url = reverse('submission_history', kwargs={
-                'course_id': unicode(course_key),
-                'student_username': admin.username,
-                'location': unicode(usage_key),
-            })
-            response = client.get(url)
-            response_content = HTMLParser().unescape(response.content)
-            expected_time = datetime.now() + timedelta(hours=hour_diff)
-            expected_tz = expected_time.strftime('%Z')
-            self.assertIn(expected_tz, response_content)
-            self.assertIn(str(expected_time), response_content)
+        with freeze_time('2012-01-01'):
+            with (override_settings(TIME_ZONE=timezone)):
+                course = CourseFactory.create()
+                course_key = course.id
+                client = Client()
+                admin = AdminFactory.create()
+                self.assertTrue(client.login(username=admin.username, password='test'))
+                state_client = DjangoXBlockUserStateClient(admin)
+                usage_key = course_key.make_usage_key('problem', 'test-history')
+                state_client.set(
+                    username=admin.username,
+                    block_key=usage_key,
+                    state={'field_a': 'x', 'field_b': 'y'}
+                )
+                url = reverse('submission_history', kwargs={
+                    'course_id': unicode(course_key),
+                    'student_username': admin.username,
+                    'location': unicode(usage_key),
+                })
+                response = client.get(url)
+                response_content = HTMLParser().unescape(response.content)
+                expected_time = datetime.now() + timedelta(hours=hour_diff)
+                expected_tz = expected_time.strftime('%Z')
+                self.assertIn(expected_tz, response_content)
+                self.assertIn(str(expected_time), response_content)
 
     def _email_opt_in_checkbox(self, response, org_name_string=None):
         """Check if the email opt-in checkbox appears in the response content."""
