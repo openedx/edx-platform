@@ -194,6 +194,12 @@ class MembershipPage(PageObject):
         """
         return MembershipPageAutoEnrollSection(self.browser)
 
+    def batch_beta_tester_addition(self):
+        """
+        Returns the MembershipPageBetaTesterSection page object.
+        """
+        return MembershipPageBetaTesterSection(self.browser)
+
 
 class SpecialExamsPage(PageObject):
     """
@@ -878,6 +884,44 @@ class MembershipPageAutoEnrollSection(PageObject):
         notification_selector = '{} .request-response'.format(self.batch_enrollment_selector)
         self.wait_for_element_visibility(notification_selector, 'Notification div is visible')
         return self.q(css="{} h3".format(notification_selector)).text
+
+
+class MembershipPageBetaTesterSection(PageObject):
+    """
+    Beta tester section of the Membership tab of the Instructor dashboard.
+    """
+    url = None
+
+    batch_beta_tester_heading_selector = '#heading-batch-beta-testers'
+    batch_beta_tester_selector = '.batch-beta-testers'
+
+    def is_browser_on_page(self):
+        return self.q(css=self.batch_beta_tester_heading_selector).present
+
+    def fill_batch_beta_tester_addition_text_box(self, username):
+        """
+        Fill in the form with the provided username and submit it.
+        """
+        username_selector = "{} textarea".format(self.batch_beta_tester_selector)
+        enrollment_button = "{} .enrollment-button[data-action='add']".format(self.batch_beta_tester_selector)
+
+        # Fill the username  after the username selector is visible.
+        self.wait_for_element_visibility(username_selector, 'username field is visible')
+        self.q(css=username_selector).fill(username)
+
+        # Verify enrollment button is present before clicking
+        self.wait_for_element_visibility(enrollment_button, 'Add beta testers button')
+        self.q(css=enrollment_button).click()
+
+    def get_notification_text(self):
+        """
+        Check notification div is visible and have message.
+        """
+        notification_selector = '{} .request-response'.format(self.batch_beta_tester_selector)
+        self.wait_for_element_visibility(notification_selector, 'Notification div is visible')
+        notification_header_text = self.q(css="{} h3".format(notification_selector)).text
+        notification_username = self.q(css="{} li".format(notification_selector)).text
+        return notification_header_text, notification_username
 
 
 class SpecialExamsPageAllowanceSection(PageObject):

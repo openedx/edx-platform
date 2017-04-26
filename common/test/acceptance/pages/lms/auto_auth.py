@@ -18,7 +18,7 @@ class AutoAuthPage(PageObject):
     CONTENT_REGEX = r'.+? user (?P<username>\S+) \((?P<email>.+?)\) with password \S+ and user_id (?P<user_id>\d+)$'
 
     def __init__(self, browser, username=None, email=None, password=None, full_name=None, staff=None, course_id=None,
-                 enrollment_mode=None, roles=None):
+                 enrollment_mode=None, roles=None, is_active=None):
         """
         Auto-auth is an end-point for HTTP GET requests.
         By default, it will create accounts with random user credentials,
@@ -61,6 +61,9 @@ class AutoAuthPage(PageObject):
 
         if roles is not None:
             self._params['roles'] = roles
+
+        if is_active is not None:
+            self._params['is_active'] = "true" if is_active else "false"
 
     @property
     def url(self):

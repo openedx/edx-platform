@@ -1774,7 +1774,8 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
                 {
                     "identifier": identifier,
                     "error": False,
-                    "userDoesNotExist": False
+                    "userDoesNotExist": False,
+                    "is_active": True
                 }
             ]
         }
@@ -1825,7 +1826,8 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
                 {
                     "identifier": self.notenrolled_student.email,
                     "error": False,
-                    "userDoesNotExist": False
+                    "userDoesNotExist": False,
+                    "is_active": True
                 }
             ]
         }
@@ -1872,7 +1874,8 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
                 {
                     "identifier": self.notenrolled_student.email,
                     "error": False,
-                    "userDoesNotExist": False
+                    "userDoesNotExist": False,
+                    "is_active": True
                 }
             ]
         }
@@ -1935,7 +1938,8 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
                 {
                     "identifier": self.notregistered_email,
                     "error": True,
-                    "userDoesNotExist": True
+                    "userDoesNotExist": True,
+                    "is_active": None
                 }
             ]
         }
@@ -1965,7 +1969,8 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
                 {
                     "identifier": self.beta_tester.email,
                     "error": False,
-                    "userDoesNotExist": False
+                    "userDoesNotExist": False,
+                    "is_active": True
                 }
             ]
         }
@@ -1995,7 +2000,8 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
                 {
                     "identifier": self.beta_tester.email,
                     "error": False,
-                    "userDoesNotExist": False
+                    "userDoesNotExist": False,
+                    "is_active": True
                 }
             ]
         }
