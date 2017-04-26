@@ -23,24 +23,16 @@ from openedx.features.course_experience import UNIFIED_COURSE_EXPERIENCE_FLAG
     <header class="page-header has-secondary">
         <div class="page-header-main">
             <nav aria-label="${_('Course Outline')}" class="sr-is-focusable" tabindex="-1">
-                <h2 class="hd hd-2 page-title">${_('Course Outline')}</h2>
+                % if waffle.flag_is_active(request, UNIFIED_COURSE_EXPERIENCE_FLAG):
+                    <h2 class="hd hd-3 page-title">
+                        ${_("{course_name}").format(org=course.display_org_with_default, course_name=course.display_name_with_default)}
+                    </h2>
+                % else:
+                    <h2 class="hd hd-2 page-title">${_('Course Outline')}</h2>
+                % endif
             </nav>
         </div>
         <div class="page-header-secondary">
-            <div class="form-actions">
-                % if not waffle.flag_is_active(request, UNIFIED_COURSE_EXPERIENCE_FLAG):
-                    <a class="btn action-show-bookmarks" href="${reverse('openedx.course_bookmarks.home', args=[course.id])}">
-                        ${_("Bookmarks")}
-                    </a>
-                % endif
-                <a class="btn btn-brand action-resume-course" href="${reverse('courseware', kwargs={'course_id': unicode(course.id.to_deprecated_string())})}">
-                    % if has_visited_course:
-                        ${_("Resume Course")}
-                    % else:
-                        ${_("Start Course")}
-                    % endif
-                </a>
-            </div>
             % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
                 <div class="page-header-search">
                     <form class="search-form" role="search">
@@ -56,6 +48,20 @@ from openedx.features.course_experience import UNIFIED_COURSE_EXPERIENCE_FLAG
                     </form>
                 </div>
             % endif
+            <div class="form-actions">
+                % if not waffle.flag_is_active(request, UNIFIED_COURSE_EXPERIENCE_FLAG):
+                    <a class="btn action-show-bookmarks" href="${reverse('openedx.course_bookmarks.home', args=[course.id])}">
+                        ${_("Bookmarks")}
+                    </a>
+                % endif
+                <a class="btn btn-brand action-resume-course" href="${reverse('courseware', kwargs={'course_id': unicode(course.id.to_deprecated_string())})}">
+                    % if has_visited_course:
+                        ${_("Resume Course")}
+                    % else:
+                        ${_("Start Course")}
+                    % endif
+                </a>
+            </div>
         </div>
     </header>
     <div class="page-content">
