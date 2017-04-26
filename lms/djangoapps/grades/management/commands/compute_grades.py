@@ -106,10 +106,7 @@ class Command(BaseCommand):
                 'batch_size': batch_size,
                 'estimate_first_attempted': options['estimate_first_attempted']
             }
-            result = tasks.compute_grades_for_course_v2.apply_async(
-                kwargs=kwargs,
-                options=task_options,
-            )
+            result = tasks.compute_grades_for_course_v2.apply_async(kwargs=kwargs, **task_options)
             log.info("Grades: Created {task_name}[{task_id}] with arguments {kwargs}".format(
                 task_name=tasks.compute_grades_for_course.name,
                 task_id=result.task_id,
