@@ -229,6 +229,7 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
           including any access errors.
 
           * course_about: The URL to the course about page.
+          * course_sharing_utm_parameters: Encoded UTM parameters to be included in course sharing url
           * course_handouts: The URI to get data for course handouts.
           * course_image: The path to the course image.
           * course_updates: The URI to get data for course updates.
