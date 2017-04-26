@@ -17,6 +17,7 @@ from util.views import ensure_valid_course_key
 from web_fragments.fragment import Fragment
 
 from .course_outline import CourseOutlineFragmentView
+from .course_dates import CourseDatesFragmentView
 from ..utils import get_course_outline_block_tree
 
 
@@ -92,6 +93,9 @@ class CourseHomeFragmentView(EdxFragmentView):
         # Get resume course information
         has_visited_course, resume_course_url = self._get_resume_course_info(request, course_id)
 
+        # Render the course dates as a fragment
+        dates_fragment = CourseDatesFragmentView().render_to_fragment(request, course_id=course_id, **kwargs)
+
         # Get the handouts
         # TODO: Use get_course_overview_with_access and blocks api
         course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
@@ -101,10 +105,12 @@ class CourseHomeFragmentView(EdxFragmentView):
         context = {
             'csrf': csrf(request)['csrf_token'],
             'course_key': course_key,
+            'course': course,
             'outline_fragment': outline_fragment,
             'handouts_html': handouts_html,
             'has_visited_course': has_visited_course,
             'resume_course_url': resume_course_url,
+            'dates_fragment': dates_fragment,
             'disable_courseware_js': True,
             'uses_pattern_library': True,
         }

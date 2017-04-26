@@ -326,8 +326,10 @@ class CertificateGetTests(SharedModuleStoreTestCase):
     now = timezone.now()
 
     @classmethod
-    @freeze_time(now)
     def setUpClass(cls):
+        cls.freezer = freeze_time(cls.now)
+        cls.freezer.start()
+
         super(CertificateGetTests, cls).setUpClass()
         cls.student = UserFactory()
         cls.student_no_cert = UserFactory()
@@ -364,6 +366,10 @@ class CertificateGetTests(SharedModuleStoreTestCase):
             grade="0.99",
             verify_uuid=cls.uuid,
         )
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.freezer.stop()
 
     def test_get_certificate_for_user(self):
         """

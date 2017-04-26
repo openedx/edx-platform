@@ -87,3 +87,63 @@
     }
   }
 }
+
+// date summary
+.date-summary-container {
+  .date-summary {
+    @include clearfix;
+    padding: 10px;
+    @include border-left(3px solid $gray-l3);
+
+    .heading {
+      @extend %t-title7;
+      color: $gray-d2;
+    }
+
+    .description {
+      margin-top: $baseline/2;
+      margin-bottom: $baseline/2;
+      display: inline-block;
+      color: $gray-d1;
+      @extend %t-title8;
+    }
+
+    .date-summary-link {
+      @extend %t-title8;
+      font-weight: $font-semibold;
+      a {
+        color: $link-color;
+        font-weight: normal;
+      }
+    }
+
+    .date {
+      color: $gray-d1;
+      @extend %t-title9;
+    }
+
+    &-todays-date {
+      @include border-left(3px solid $blue);
+
+      .heading {
+        @extend %t-title8;
+      }
+    }
+
+    &-verified-upgrade-deadline {
+      @include border-left(3px solid $green);
+    }
+
+    &-verification-deadline-passed {
+      @include border-left(3px solid $red);
+    }
+
+    &-verification-deadline-retry {
+      @include border-left(3px solid $red);
+    }
+
+    &-verification-deadline-upcoming {
+      @include border-left(3px solid $orange);
+    }
+  }
+}

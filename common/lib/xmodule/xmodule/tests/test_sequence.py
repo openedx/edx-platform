@@ -139,42 +139,42 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         self.assertIn("seq_module.html", html)
         self.assertIn("'banner_text': None", html)
 
-    @freeze_time(COURSE_END_DATE)
     def test_hidden_content_past_due(self):
-        progress_url = 'http://test_progress_link'
-        html = self._get_rendered_student_view(
-            self.sequence_4_1,
-            extra_context=dict(progress_url=progress_url),
-        )
-        self.assertIn("hidden_content.html", html)
-        self.assertIn(progress_url, html)
+        with freeze_time(COURSE_END_DATE):
+            progress_url = 'http://test_progress_link'
+            html = self._get_rendered_student_view(
+                self.sequence_4_1,
+                extra_context=dict(progress_url=progress_url),
+            )
+            self.assertIn("hidden_content.html", html)
+            self.assertIn(progress_url, html)
 
-    @freeze_time(COURSE_END_DATE)
     def test_masquerade_hidden_content_past_due(self):
-        html = self._get_rendered_student_view(
-            self.sequence_4_1,
-            extra_context=dict(specific_masquerade=True),
-        )
-        self.assertIn("seq_module.html", html)
-        self.assertIn(
-            "'banner_text': 'Because the due date has passed, "
-            "this assignment is hidden from the learner.'",
-            html
-        )
+        with freeze_time(COURSE_END_DATE):
+            html = self._get_rendered_student_view(
+                self.sequence_4_1,
+                extra_context=dict(specific_masquerade=True),
+            )
+            self.assertIn("seq_module.html", html)
+            self.assertIn(
+                "'banner_text': 'Because the due date has passed, "
+                "this assignment is hidden from the learner.'",
+                html
+            )
 
-    @freeze_time(PAST_DUE_BEFORE_END_DATE)
     def test_hidden_content_self_paced_past_due_before_end(self):
-        html = self._get_rendered_student_view(self.sequence_4_1, self_paced=True)
-        self.assertIn("seq_module.html", html)
-        self.assertIn("'banner_text': None", html)
+        with freeze_time(PAST_DUE_BEFORE_END_DATE):
+            html = self._get_rendered_student_view(self.sequence_4_1, self_paced=True)
+            self.assertIn("seq_module.html", html)
+            self.assertIn("'banner_text': None", html)
 
-    @freeze_time(COURSE_END_DATE + timedelta(days=7))
     def test_hidden_content_self_paced_past_end(self):
-        progress_url = 'http://test_progress_link'
-        html = self._get_rendered_student_view(
-            self.sequence_4_1,
-            extra_context=dict(progress_url=progress_url),
-            self_paced=True,
-        )
-        self.assertIn("hidden_content.html", html)
-        self.assertIn(progress_url, html)
+        with freeze_time(COURSE_END_DATE + timedelta(days=7)):
+            progress_url = 'http://test_progress_link'
+            html = self._get_rendered_student_view(
+                self.sequence_4_1,
+                extra_context=dict(progress_url=progress_url),
+                self_paced=True,
+            )
+            self.assertIn("hidden_content.html", html)
+            self.assertIn(progress_url, html)
