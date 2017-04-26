@@ -2,6 +2,7 @@
 Tests for the Course Outline view and supporting views.
 """
 import datetime
+import ddt
 from mock import patch
 import json
 
@@ -12,10 +13,13 @@ from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.course_module import DEFAULT_START_DATE
 
 from .test_course_home import course_home_url
 
 TEST_PASSWORD = 'test'
+FUTURE_DAY = datetime.datetime.now() + datetime.timedelta(days=30)
+PAST_DAY = datetime.datetime.now() - datetime.timedelta(days=30)
 
 
 class TestCourseOutlinePage(SharedModuleStoreTestCase):
@@ -160,3 +164,25 @@ class TestCourseOutlinePreview(SharedModuleStoreTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, 'Future Chapter')
+
+
+@ddt.ddt
+class TestEmptyCourseOutlinePage(SharedModuleStoreTestCase):
+    """
+    Test the new course outline view.
+    """
+    @ddt.data(
+        (FUTURE_DAY, 'This course has not started yet, and will launch on'),
+        (PAST_DAY, "We're still working on course content."),
+        (DEFAULT_START_DATE, 'This course has not started yet.'),
+    )
+    @ddt.unpack
+    def test_empty_course_rendering(self, start_date, expected_text):
+        course = CourseFactory.create(start=start_date)
+        test_user = UserFactory(password=TEST_PASSWORD)
+        CourseEnrollment.enroll(test_user, course.id)
+        self.client.login(username=test_user.username, password=TEST_PASSWORD)
+        url = course_home_url(course)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, expected_text)

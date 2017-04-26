@@ -1,3 +1,10 @@
+// Course sidebar
+.course-sidebar {
+  @include margin-left(0);
+  @include padding-left($baseline);
+}
+
+// Course outline
 .course-outline {
   color: $lms-gray;
 
