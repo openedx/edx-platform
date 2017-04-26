@@ -59,7 +59,11 @@ class CourseGrade(object):
         """
         locations_to_scores = {}
         for chapter in self.chapter_grades:
+            self._log_event(log.info, u"chapter grades has a chapter: {0}".format(chapter))
             for subsection_grade in chapter['sections']:
+                self._log_event(log.info, u"subsection_grade: {0}, {1}".format(
+                    subsection_grade, subsection_grade.locations_to_scores
+                ))
                 locations_to_scores.update(subsection_grade.locations_to_scores)
         return locations_to_scores
 
@@ -88,10 +92,12 @@ class CourseGrade(object):
         """
         chapter_grades = []
         for chapter_key in self.course_structure.get_children(self.course.location):
+            self._log_event(log.info, u"chapter key in course struct: {0}".format(chapter_key))
             chapter = self.course_structure[chapter_key]
             chapter_subsection_grades = []
             children = self.course_structure.get_children(chapter_key)
             for subsection_key in children:
+                self._log_event(log.info, u"subsection_key key in course struct: {0}".format(subsection_key))
                 chapter_subsection_grades.append(
                     self._subsection_grade_factory.create(self.course_structure[subsection_key], read_only=True)
                 )
@@ -141,7 +147,7 @@ class CourseGrade(object):
 
         return grade_summary
 
-    def compute_and_update(self, read_only=False):
+    def compute_and_update(self, read_only=False, fire_signal=True):
         """
         Computes the grade for the given student and course.
 
@@ -166,8 +172,8 @@ class CourseGrade(object):
                 letter_grade=self.letter_grade or "",
                 passed=self.passed,
             )
-
-        self._signal_listeners_when_grade_computed()
+        if fire_signal:
+            self._signal_listeners_when_grade_computed()
         self._log_event(
             log.warning,
             u"compute_and_update, read_only: {0}, subsections read/created: {1}/{2}, blocks accessed: {3}, total "
@@ -323,7 +329,7 @@ class CourseGradeFactory(object):
     """
     Factory class to create Course Grade objects
     """
-    def create(self, student, course, read_only=True):
+    def create(self, student, course, read_only=True, fire_signal=True):
         """
         Returns the CourseGrade object for the given student and course.
 
@@ -336,7 +342,7 @@ class CourseGradeFactory(object):
             raise PermissionDenied("User does not have access to this course")
         return (
             self._get_saved_grade(student, course, course_structure) or
-            self._compute_and_update_grade(student, course, course_structure, read_only)
+            self._compute_and_update_grade(student, course, course_structure, read_only, fire_signal)
         )
 
     GradeResult = namedtuple('GradeResult', ['student', 'course_grade', 'err_msg'])
@@ -399,14 +405,14 @@ class CourseGradeFactory(object):
             course_structure
         )
 
-    def _compute_and_update_grade(self, student, course, course_structure, read_only=False):
+    def _compute_and_update_grade(self, student, course, course_structure, read_only=False, fire_signal=True):
         """
         Freshly computes and updates the grade for the student and course.
 
         If read_only is True, doesn't save any updates to the grades.
         """
         course_grade = CourseGrade(student, course, course_structure)
-        course_grade.compute_and_update(read_only)
+        course_grade.compute_and_update(read_only, fire_signal)
         return course_grade
 
     def _user_has_access_to_course(self, course_structure):
