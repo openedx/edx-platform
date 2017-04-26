@@ -170,3 +170,44 @@ class TestUserPreferenceMiddleware(TestCase):
 
         self.assertIs(result, response)
         self.assertEqual(response.mock_calls, [])
+
+    def test_preference_update_noop(self):
+        self.request.COOKIES[settings.LANGUAGE_COOKIE] = 'es'
+
+        # No preference yet, should write to the database
+
+        self.assertEqual(get_user_preference(self.user, LANGUAGE_KEY), None)
+
+        with self.assertNumQueries(5):
+            self.middleware.process_request(self.request)
+
+        self.assertEqual(get_user_preference(self.user, LANGUAGE_KEY), 'es')
+
+        response = mock.Mock(spec=HttpResponse)
+
+        with self.assertNumQueries(1):
+            self.middleware.process_response(self.request, response)
+
+        # Preference is the same as the cookie, shouldn't write to the database
+
+        with self.assertNumQueries(3):
+            self.middleware.process_request(self.request)
+
+        self.assertEqual(get_user_preference(self.user, LANGUAGE_KEY), 'es')
+
+        response = mock.Mock(spec=HttpResponse)
+
+        with self.assertNumQueries(1):
+            self.middleware.process_response(self.request, response)
+
+        # Cookie changed, should write to the database again
+
+        self.request.COOKIES[settings.LANGUAGE_COOKIE] = 'en'
+
+        with self.assertNumQueries(5):
+            self.middleware.process_request(self.request)
+
+        self.assertEqual(get_user_preference(self.user, LANGUAGE_KEY), 'en')
+
+        with self.assertNumQueries(1):
+            self.middleware.process_response(self.request, response)
