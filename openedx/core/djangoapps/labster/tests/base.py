@@ -85,15 +85,20 @@ class CCXCourseTestBase(ModuleStoreTestCase):
             for i, k in enumerate(consumer_keys)
         ]
 
-    def make_coach(self):
+    def make_coach(self, course_id=None, user=None):
         """
         Create coach user.
         """
-        role = CourseCcxCoachRole(self.course.id)
-        role.add_users(self.user)
+        role = CourseCcxCoachRole(self.course.id if not course_id else course_id)
+        role.add_users(self.user if not user else user)
 
-    def make_ccx(self):
+    def make_ccx(self, course_id=None, user=None, max_students_allowed=settings.CCX_MAX_STUDENTS_ALLOWED):
         """
         Create ccx.
         """
-        return CcxFactory(course_id=self.course.id, coach=self.user)
+        ccx = CcxFactory(
+            course_id=self.course.id if not course_id else course_id,
+            coach=self.user if not user else user
+        )
+        override_field_for_ccx(ccx, self.course, 'max_student_enrollments_allowed', max_students_allowed)
+        return ccx
