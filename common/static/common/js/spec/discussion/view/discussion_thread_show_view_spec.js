@@ -173,23 +173,23 @@
             });
         });
         describe('cohorting', function() {
-            it('renders correctly for an uncohorted thread', function() {
+            it('renders correctly for a unified thread', function() {
                 this.view.render();
                 return expect(this.view.$('.group-visibility-label').text().trim())
                     .toEqual('This post is visible to everyone.');
             });
-            it('renders correctly for a cohorted thread', function() {
+            it('renders correctly for a divided thread', function() {
                 this.thread.set('group_id', '1');
                 this.thread.set('group_name', 'Mock Cohort');
-                this.view.is_commentable_cohorted = true;
+                this.view.is_commentable_divided = true;
                 this.view.render();
                 return expect(this.view.$('.group-visibility-label').text().trim())
                     .toEqual('This post is visible only to Mock Cohort.');
             });
-            it('renders correctly for a grouped uncohorted thread', function() {
+            it('renders correctly for a grouped unified thread', function() {
                 this.thread.set('group_id', '1');
                 this.thread.set('group_name', 'Mock Cohort');
-                this.view.is_commentable_cohorted = false;
+                this.view.is_commentable_divided = false;
                 this.view.render();
                 return expect(this.view.$('.group-visibility-label').text().trim())
                     .toEqual('This post is visible to everyone.');

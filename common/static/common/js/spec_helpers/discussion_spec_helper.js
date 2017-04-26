@@ -58,11 +58,11 @@
                         children: [['Test Topic', 'entry'], ['Other Topic', 'entry']],
                         entries: {
                             'Test Topic': {
-                                is_cohorted: true,
+                                is_divided: true,
                                 id: 'test_topic'
                             },
                             'Other Topic': {
-                                is_cohorted: true,
+                                is_divided: true,
                                 id: 'other_topic'
                             }
                         }

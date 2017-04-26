@@ -435,7 +435,7 @@ def cohort_discussion_topics(request, course_key_string):
         >>>                   "entries": {
         >>>                       "General": {
         >>>                           "sort_key": "General",
-        >>>                           "is_cohorted": True,
+        >>>                           "is_divided": True,
         >>>                           "id": "i4x-edx-eiorguegnru-course-foobarbaz"
         >>>                       }
         >>>                   }
@@ -452,12 +452,12 @@ def cohort_discussion_topics(request, course_key_string):
         >>>                           "entries": {
         >>>                               "Working with Videos": {
         >>>                                   "sort_key": None,
-        >>>                                   "is_cohorted": False,
+        >>>                                   "is_divided": False,
         >>>                                   "id": "d9f970a42067413cbb633f81cfb12604"
         >>>                               },
         >>>                               "Videos on edX": {
         >>>                                   "sort_key": None,
-        >>>                                   "is_cohorted": False,
+        >>>                                   "is_divided": False,
         >>>                                   "id": "98d8feb5971041a085512ae22b398613"
         >>>                               }
         >>>                           }
@@ -472,7 +472,7 @@ def cohort_discussion_topics(request, course_key_string):
 
     discussion_topics = {}
     discussion_category_map = get_discussion_category_map(
-        course, request.user, cohorted_if_in_list=True, exclude_unstarted=False
+        course, request.user, divided_only_if_explicit=True, exclude_unstarted=False
     )
 
     # We extract the data for the course wide discussions from the category map.

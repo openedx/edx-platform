@@ -390,12 +390,14 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
             **kwargs
         )
 
-    def assert_category_map_equals(self, expected, cohorted_if_in_list=False, exclude_unstarted=True):  # pylint: disable=arguments-differ
+    def assert_category_map_equals(self, expected, divided_only_if_explicit=False, exclude_unstarted=True):  # pylint: disable=arguments-differ
         """
         Asserts the expected map with the map returned by get_discussion_category_map method.
         """
         self.assertEqual(
-            utils.get_discussion_category_map(self.course, self.instructor, cohorted_if_in_list, exclude_unstarted),
+            utils.get_discussion_category_map(
+                self.course, self.instructor, divided_only_if_explicit, exclude_unstarted
+            ),
             expected
         )
 
@@ -413,9 +415,9 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
             self.assert_category_map_equals(
                 {
                     "entries": {
-                        "Topic A": {"id": "Topic_A", "sort_key": "Topic A", "is_cohorted": "Topic_A" in expected_ids},
-                        "Topic B": {"id": "Topic_B", "sort_key": "Topic B", "is_cohorted": "Topic_B" in expected_ids},
-                        "Topic C": {"id": "Topic_C", "sort_key": "Topic C", "is_cohorted": "Topic_C" in expected_ids},
+                        "Topic A": {"id": "Topic_A", "sort_key": "Topic A", "is_divided": "Topic_A" in expected_ids},
+                        "Topic B": {"id": "Topic_B", "sort_key": "Topic B", "is_divided": "Topic_B" in expected_ids},
+                        "Topic C": {"id": "Topic_C", "sort_key": "Topic C", "is_divided": "Topic_C" in expected_ids},
                     },
                     "subcategories": {},
                     "children": [("Topic A", TYPE_ENTRY), ("Topic B", TYPE_ENTRY), ("Topic C", TYPE_ENTRY)]
@@ -466,7 +468,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                             "Discussion": {
                                 "id": "discussion1",
                                 "sort_key": None,
-                                "is_cohorted": False,
+                                "is_divided": False,
                             }
                         },
                         "subcategories": {},
@@ -490,7 +492,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                             "Discussion": {
                                 "id": "discussion1",
                                 "sort_key": None,
-                                "is_cohorted": True,
+                                "is_divided": True,
                             }
                         },
                         "subcategories": {},
@@ -514,7 +516,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                             "Discussion": {
                                 "id": "discussion1",
                                 "sort_key": None,
-                                "is_cohorted": False,
+                                "is_divided": False,
                             }
                         },
                         "subcategories": {},
@@ -523,7 +525,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                 },
                 "children": [("Chapter", TYPE_SUBCATEGORY)]
             },
-            cohorted_if_in_list=True
+            divided_only_if_explicit=True
         )
 
     def test_get_unstarted_discussion_xblocks(self):
@@ -540,7 +542,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                             "Discussion 1": {
                                 "id": "discussion1",
                                 "sort_key": None,
-                                "is_cohorted": False,
+                                "is_divided": False,
                                 "start_date": later
                             }
                         },
@@ -552,7 +554,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                 },
                 "children": [("Chapter 1", TYPE_SUBCATEGORY)]
             },
-            cohorted_if_in_list=True,
+            divided_only_if_explicit=True,
             exclude_unstarted=False
         )
 
@@ -564,7 +566,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         self.create_discussion("Chapter 2 / Section 1 / Subsection 2", "Discussion")
         self.create_discussion("Chapter 3 / Section 1", "Discussion")
 
-        def check_cohorted(is_cohorted):
+        def check_cohorted(is_divided):
 
             self.assert_category_map_equals(
                 {
@@ -575,12 +577,12 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                                 "Discussion 1": {
                                     "id": "discussion1",
                                     "sort_key": None,
-                                    "is_cohorted": is_cohorted,
+                                    "is_divided": is_divided,
                                 },
                                 "Discussion 2": {
                                     "id": "discussion2",
                                     "sort_key": None,
-                                    "is_cohorted": is_cohorted,
+                                    "is_divided": is_divided,
                                 }
                             },
                             "subcategories": {},
@@ -591,7 +593,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                                 "Discussion": {
                                     "id": "discussion3",
                                     "sort_key": None,
-                                    "is_cohorted": is_cohorted,
+                                    "is_divided": is_divided,
                                 }
                             },
                             "subcategories": {
@@ -603,7 +605,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                                                 "Discussion": {
                                                     "id": "discussion4",
                                                     "sort_key": None,
-                                                    "is_cohorted": is_cohorted,
+                                                    "is_divided": is_divided,
                                                 }
                                             },
                                             "subcategories": {},
@@ -614,7 +616,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                                                 "Discussion": {
                                                     "id": "discussion5",
                                                     "sort_key": None,
-                                                    "is_cohorted": is_cohorted,
+                                                    "is_divided": is_divided,
                                                 }
                                             },
                                             "subcategories": {},
@@ -634,7 +636,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                                         "Discussion": {
                                             "id": "discussion6",
                                             "sort_key": None,
-                                            "is_cohorted": is_cohorted,
+                                            "is_divided": is_divided,
                                         }
                                     },
                                     "subcategories": {},
@@ -704,7 +706,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                             "Discussion 1": {
                                 "id": "discussion1",
                                 "sort_key": None,
-                                "is_cohorted": False,
+                                "is_divided": False,
                             }
                         },
                         "subcategories": {},
@@ -715,7 +717,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                             "Discussion": {
                                 "id": "discussion3",
                                 "sort_key": None,
-                                "is_cohorted": False,
+                                "is_divided": False,
                             }
                         },
                         "subcategories": {},
@@ -749,12 +751,12 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                             "Discussion 1": {
                                 "id": "discussion1",
                                 "sort_key": None,
-                                "is_cohorted": False,
+                                "is_divided": False,
                             },
                             "Discussion 2": {
                                 "id": "discussion2",
                                 "sort_key": None,
-                                "is_cohorted": False,
+                                "is_divided": False,
                             }
                         },
                         "subcategories": {},
@@ -765,7 +767,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                             "Discussion": {
                                 "id": "discussion3",
                                 "sort_key": None,
-                                "is_cohorted": False,
+                                "is_divided": False,
                             }
                         },
                         "subcategories": {
@@ -777,7 +779,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                                             "Discussion": {
                                                 "id": "discussion4",
                                                 "sort_key": None,
-                                                "is_cohorted": False,
+                                                "is_divided": False,
                                             }
                                         },
                                         "subcategories": {},
@@ -788,7 +790,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                                             "Discussion": {
                                                 "id": "discussion5",
                                                 "sort_key": None,
-                                                "is_cohorted": False,
+                                                "is_divided": False,
                                             }
                                         },
                                         "subcategories": {},
@@ -808,7 +810,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                                     "Discussion": {
                                         "id": "discussion6",
                                         "sort_key": None,
-                                        "is_cohorted": False,
+                                        "is_divided": False,
                                     }
                                 },
                                 "subcategories": {},
@@ -839,27 +841,27 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                             "Discussion 1": {
                                 "id": "discussion1",
                                 "sort_key": "D",
-                                "is_cohorted": False,
+                                "is_divided": False,
                             },
                             "Discussion 2": {
                                 "id": "discussion2",
                                 "sort_key": "A",
-                                "is_cohorted": False,
+                                "is_divided": False,
                             },
                             "Discussion 3": {
                                 "id": "discussion3",
                                 "sort_key": "E",
-                                "is_cohorted": False,
+                                "is_divided": False,
                             },
                             "Discussion 4": {
                                 "id": "discussion4",
                                 "sort_key": "C",
-                                "is_cohorted": False,
+                                "is_divided": False,
                             },
                             "Discussion 5": {
                                 "id": "discussion5",
                                 "sort_key": "B",
-                                "is_cohorted": False,
+                                "is_divided": False,
                             }
                         },
                         "subcategories": {},
@@ -885,9 +887,9 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         self.assert_category_map_equals(
             {
                 "entries": {
-                    "Topic A": {"id": "Topic_A", "sort_key": "B", "is_cohorted": False},
-                    "Topic B": {"id": "Topic_B", "sort_key": "C", "is_cohorted": False},
-                    "Topic C": {"id": "Topic_C", "sort_key": "A", "is_cohorted": False},
+                    "Topic A": {"id": "Topic_A", "sort_key": "B", "is_divided": False},
+                    "Topic B": {"id": "Topic_B", "sort_key": "C", "is_divided": False},
+                    "Topic C": {"id": "Topic_C", "sort_key": "A", "is_divided": False},
                 },
                 "subcategories": {},
                 "children": [("Topic C", TYPE_ENTRY), ("Topic A", TYPE_ENTRY), ("Topic B", TYPE_ENTRY)]
@@ -912,27 +914,27 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                             "Discussion D": {
                                 "id": "discussion1",
                                 "sort_key": "Discussion D",
-                                "is_cohorted": False,
+                                "is_divided": False,
                             },
                             "Discussion A": {
                                 "id": "discussion2",
                                 "sort_key": "Discussion A",
-                                "is_cohorted": False,
+                                "is_divided": False,
                             },
                             "Discussion E": {
                                 "id": "discussion3",
                                 "sort_key": "Discussion E",
-                                "is_cohorted": False,
+                                "is_divided": False,
                             },
                             "Discussion C": {
                                 "id": "discussion4",
                                 "sort_key": "Discussion C",
-                                "is_cohorted": False,
+                                "is_divided": False,
                             },
                             "Discussion B": {
                                 "id": "discussion5",
                                 "sort_key": "Discussion B",
-                                "is_cohorted": False,
+                                "is_divided": False,
                             }
                         },
                         "subcategories": {},
@@ -965,12 +967,12 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                             "Discussion 1": {
                                 "id": "discussion3",
                                 "sort_key": None,
-                                "is_cohorted": False,
+                                "is_divided": False,
                             },
                             "Discussion 2": {
                                 "id": "discussion5",
                                 "sort_key": None,
-                                "is_cohorted": False,
+                                "is_divided": False,
                             }
                         },
                         "subcategories": {},
@@ -981,12 +983,12 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                             "Discussion 1": {
                                 "id": "discussion4",
                                 "sort_key": None,
-                                "is_cohorted": False,
+                                "is_divided": False,
                             },
                             "Discussion 2": {
                                 "id": "discussion1",
                                 "sort_key": None,
-                                "is_cohorted": False,
+                                "is_divided": False,
                             }
                         },
                         "subcategories": {},
@@ -997,7 +999,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                             "Discussion": {
                                 "id": "discussion2",
                                 "sort_key": None,
-                                "is_cohorted": False,
+                                "is_divided": False,
                             }
                         },
                         "subcategories": {},
@@ -1074,17 +1076,17 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
                         'entries': {
                             'Visible to Alpha': {
                                 'sort_key': None,
-                                'is_cohorted': False,
+                                'is_divided': False,
                                 'id': 'alpha_group_discussion'
                             },
                             'Visible to Beta': {
                                 'sort_key': None,
-                                'is_cohorted': False,
+                                'is_divided': False,
                                 'id': 'beta_group_discussion'
                             },
                             'Visible to Everyone': {
                                 'sort_key': None,
-                                'is_cohorted': False,
+                                'is_divided': False,
                                 'id': 'global_group_discussion'
                             }
                         }
@@ -1094,7 +1096,7 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
                 'entries': {
                     'General': {
                         'sort_key': 'General',
-                        'is_cohorted': False,
+                        'is_divided': False,
                         'id': 'i4x-org-number-course-run'
                     }
                 }
@@ -1119,12 +1121,12 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
                         'entries': {
                             'Visible to Alpha': {
                                 'sort_key': None,
-                                'is_cohorted': False,
+                                'is_divided': False,
                                 'id': 'alpha_group_discussion'
                             },
                             'Visible to Everyone': {
                                 'sort_key': None,
-                                'is_cohorted': False,
+                                'is_divided': False,
                                 'id': 'global_group_discussion'
                             }
                         }
@@ -1134,7 +1136,7 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
                 'entries': {
                     'General': {
                         'sort_key': 'General',
-                        'is_cohorted': False,
+                        'is_divided': False,
                         'id': 'i4x-org-number-course-run'
                     }
                 }
@@ -1159,12 +1161,12 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
                         'entries': {
                             'Visible to Beta': {
                                 'sort_key': None,
-                                'is_cohorted': False,
+                                'is_divided': False,
                                 'id': 'beta_group_discussion'
                             },
                             'Visible to Everyone': {
                                 'sort_key': None,
-                                'is_cohorted': False,
+                                'is_divided': False,
                                 'id': 'global_group_discussion'
                             }
                         }
@@ -1174,7 +1176,7 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
                 'entries': {
                     'General': {
                         'sort_key': 'General',
-                        'is_cohorted': False,
+                        'is_divided': False,
                         'id': 'i4x-org-number-course-run'
                     }
                 }
@@ -1198,7 +1200,7 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
                         'entries': {
                             'Visible to Everyone': {
                                 'sort_key': None,
-                                'is_cohorted': False,
+                                'is_divided': False,
                                 'id': 'global_group_discussion'
                             }
                         }
@@ -1208,7 +1210,7 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
                 'entries': {
                     'General': {
                         'sort_key': 'General',
-                        'is_cohorted': False,
+                        'is_divided': False,
                         'id': 'i4x-org-number-course-run'
                     }
                 }
@@ -1273,9 +1275,9 @@ class DiscussionTabTestCase(ModuleStoreTestCase):
             self.assertFalse(self.discussion_tab_present(self.enrolled_user))
 
 
-class IsCommentableCohortedTestCase(ModuleStoreTestCase):
+class IsCommentableDividedTestCase(ModuleStoreTestCase):
     """
-    Test the is_commentable_cohorted function.
+    Test the is_commentable_divided function.
     """
 
     MODULESTORE = TEST_DATA_MIXED_MODULESTORE
@@ -1284,10 +1286,10 @@ class IsCommentableCohortedTestCase(ModuleStoreTestCase):
         """
         Make sure that course is reloaded every time--clear out the modulestore.
         """
-        super(IsCommentableCohortedTestCase, self).setUp()
+        super(IsCommentableDividedTestCase, self).setUp()
         self.toy_course_key = ToyCourseFactory.create().id
 
-    def test_is_commentable_cohorted(self):
+    def test_is_commentable_divided(self):
         course = modulestore().get_course(self.toy_course_key)
         self.assertFalse(cohorts.is_course_cohorted(course.id))
 
@@ -1297,7 +1299,7 @@ class IsCommentableCohortedTestCase(ModuleStoreTestCase):
 
         # no topics
         self.assertFalse(
-            utils.is_commentable_cohorted(course.id, to_id("General")),
+            utils.is_commentable_divided(course.id, to_id("General")),
             "Course doesn't even have a 'General' topic"
         )
 
@@ -1305,7 +1307,7 @@ class IsCommentableCohortedTestCase(ModuleStoreTestCase):
         config_course_cohorts(course, is_cohorted=False, discussion_topics=["General", "Feedback"])
 
         self.assertFalse(
-            utils.is_commentable_cohorted(course.id, to_id("General")),
+            utils.is_commentable_divided(course.id, to_id("General")),
             "Course isn't cohorted"
         )
 
@@ -1314,7 +1316,7 @@ class IsCommentableCohortedTestCase(ModuleStoreTestCase):
 
         self.assertTrue(cohorts.is_course_cohorted(course.id))
         self.assertFalse(
-            utils.is_commentable_cohorted(course.id, to_id("General")),
+            utils.is_commentable_divided(course.id, to_id("General")),
             "Course is cohorted, but 'General' isn't."
         )
 
@@ -1328,15 +1330,15 @@ class IsCommentableCohortedTestCase(ModuleStoreTestCase):
 
         self.assertTrue(cohorts.is_course_cohorted(course.id))
         self.assertFalse(
-            utils.is_commentable_cohorted(course.id, to_id("General")),
+            utils.is_commentable_divided(course.id, to_id("General")),
             "Course is cohorted, but 'General' isn't."
         )
         self.assertTrue(
-            utils.is_commentable_cohorted(course.id, to_id("Feedback")),
+            utils.is_commentable_divided(course.id, to_id("Feedback")),
             "Feedback was listed as cohorted.  Should be."
         )
 
-    def test_is_commentable_cohorted_inline_discussion(self):
+    def test_is_commentable_divided_inline_discussion(self):
         course = modulestore().get_course(self.toy_course_key)
         self.assertFalse(cohorts.is_course_cohorted(course.id))
 
@@ -1350,7 +1352,7 @@ class IsCommentableCohortedTestCase(ModuleStoreTestCase):
             cohorted_discussions=["Feedback", "random_inline"]
         )
         self.assertFalse(
-            utils.is_commentable_cohorted(course.id, to_id("random")),
+            utils.is_commentable_divided(course.id, to_id("random")),
             "By default, Non-top-level discussions are not cohorted in a cohorted courses."
         )
 
@@ -1364,20 +1366,20 @@ class IsCommentableCohortedTestCase(ModuleStoreTestCase):
             always_cohort_inline_discussions=False
         )
         self.assertFalse(
-            utils.is_commentable_cohorted(course.id, to_id("random")),
+            utils.is_commentable_divided(course.id, to_id("random")),
             "Non-top-level discussion is not cohorted if always_cohort_inline_discussions is False."
         )
         self.assertTrue(
-            utils.is_commentable_cohorted(course.id, to_id("random_inline")),
+            utils.is_commentable_divided(course.id, to_id("random_inline")),
             "If always_cohort_inline_discussions set to False, Non-top-level discussion is "
             "cohorted if explicitly set in cohorted_discussions."
         )
         self.assertTrue(
-            utils.is_commentable_cohorted(course.id, to_id("Feedback")),
+            utils.is_commentable_divided(course.id, to_id("Feedback")),
             "If always_cohort_inline_discussions set to False, top-level discussion are not affected."
         )
 
-    def test_is_commentable_cohorted_team(self):
+    def test_is_commentable_divided_team(self):
         course = modulestore().get_course(self.toy_course_key)
         self.assertFalse(cohorts.is_course_cohorted(course.id))
 
@@ -1386,8 +1388,8 @@ class IsCommentableCohortedTestCase(ModuleStoreTestCase):
 
         # Verify that team discussions are not cohorted, but other discussions are
         # if "always cohort inline discussions" is set to true.
-        self.assertFalse(utils.is_commentable_cohorted(course.id, team.discussion_topic_id))
-        self.assertTrue(utils.is_commentable_cohorted(course.id, "random"))
+        self.assertFalse(utils.is_commentable_divided(course.id, team.discussion_topic_id))
+        self.assertTrue(utils.is_commentable_divided(course.id, "random"))
 
 
 class PermissionsTestCase(ModuleStoreTestCase):

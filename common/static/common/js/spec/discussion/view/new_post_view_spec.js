@@ -38,15 +38,15 @@
                         children: [['Topic', 'entry'], ['General', 'entry'], ['Not Cohorted', 'entry']],
                         entries: {
                             Topic: {
-                                is_cohorted: true,
+                                is_divided: true,
                                 id: 'topic'
                             },
                             General: {
-                                is_cohorted: true,
+                                is_divided: true,
                                 id: 'general'
                             },
                             'Not Cohorted': {
-                                is_cohorted: false,
+                                is_divided: false,
                                 id: 'not-cohorted'
                             }
                         }
@@ -145,20 +145,20 @@
             });
             it('disables the cohort menu if it is set false', function() {
                 DiscussionSpecHelper.makeModerator();
-                this.view.is_commentable_cohorted = false;
+                this.view.is_commentable_divided = false;
                 return checkVisibility(this.view, true, true, true);
             });
             it('enables the cohort menu if it is set true', function() {
                 DiscussionSpecHelper.makeModerator();
-                this.view.is_commentable_cohorted = true;
+                this.view.is_commentable_divided = true;
                 return checkVisibility(this.view, true, false, true);
             });
             it('is not visible to students when set false', function() {
-                this.view.is_commentable_cohorted = false;
+                this.view.is_commentable_divided = false;
                 return checkVisibility(this.view, false, false, true);
             });
             it('is not visible to students when set true', function() {
-                this.view.is_commentable_cohorted = true;
+                this.view.is_commentable_divided = true;
                 return checkVisibility(this.view, false, false, true);
             });
         });
@@ -166,33 +166,33 @@
             var checkPostCancelReset;
             beforeEach(function() {
                 this.course_settings = new DiscussionCourseSettings({
-                    'allow_anonymous_to_peers': true,
-                    'allow_anonymous': true,
-                    'category_map': {
-                        'subcategories': {
+                    allow_anonymous_to_peers: true,
+                    allow_anonymous: true,
+                    category_map: {
+                        subcategories: {
                             'Week 1': {
-                                'subcategories': {},
-                                'children': [ // eslint-disable-line quote-props
+                                subcategories: {},
+                                children: [
                                     ['Topic-Level Student-Visible Label', 'entry']
                                 ],
-                                'entries': {
+                                entries: {
                                     'Topic-Level Student-Visible Label': {
-                                        'sort_key': null,
-                                        'is_cohorted': false,
-                                        'id': '2b3a858d0c884eb4b272dbbe3f2ffddd'
+                                        sort_key: null,
+                                        is_divided: false,
+                                        id: '2b3a858d0c884eb4b272dbbe3f2ffddd'
                                     }
                                 }
                             }
                         },
-                        'children': [ // eslint-disable-line quote-props
+                        children: [
                             ['General', 'entry'],
                             ['Week 1', 'subcategory']
                         ],
-                        'entries': {
-                            'General': {
-                                'sort_key': 'General',
-                                'is_cohorted': false,
-                                'id': 'i4x-waqastest-waqastest-course-waqastest'
+                        entries: {
+                            General: {
+                                sort_key: 'General',
+                                is_divided: false,
+                                id: 'i4x-waqastest-waqastest-course-waqastest'
                             }
                         }
                     }
@@ -255,7 +255,7 @@
                                 entries: {
                                     'Topic-Level Student-Visible Label': {
                                         sort_key: null,
-                                        is_cohorted: false,
+                                        is_divided: false,
                                         id: '2b3a858d0c884eb4b272dbbe3f2ffddd'
                                     }
                                 }
@@ -268,7 +268,7 @@
                         entries: {
                             'First topic': {
                                 sort_key: 'First topic',
-                                is_cohorted: false,
+                                is_divided: false,
                                 id: 'i4x-waqastest-waqastest-course-waqastest'
                             }
                         }
