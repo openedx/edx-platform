@@ -55,7 +55,7 @@ class _BaseTask(PersistOnFailureTask, LoggedTask):  # pylint: disable=abstract-m
 
 
 @task(base=_BaseTask)
-def compute_grades_for_course_v2(course_key, offset, batch_size, **kwargs):
+def compute_grades_for_course_v2(**kwargs):
     """
     Compute grades for a set of students in the specified course.
 
