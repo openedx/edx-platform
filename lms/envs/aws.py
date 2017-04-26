@@ -108,7 +108,19 @@ CELERY_ROUTES = "{}celery.Router".format(QUEUE_VARIANT)
 if os.environ.get('QUEUE') == 'high_mem':
     CELERYD_MAX_TASKS_PER_CHILD = 1
 
-CELERYBEAT_SCHEDULE = {}  # For scheduling tasks, entries can be added to this dict
+# For scheduling tasks, entries can be added to this dict.
+CELERYBEAT_SCHEDULE = {
+    """
+    'count_data' is the celery periodic task that gathers information about the 
+    students amount, geographical coordinates of the platform, courses amount and
+    makes a POST request with the data to the appropriate service.
+    """
+
+    'count_data': {
+    'task': 'openedx.core.djangoapps.edx_global_analytics.tasks.count_data',
+    'schedule': 30, # number in seconds.
+    }
+}
 
 ########################## NON-SECURE ENV CONFIG ##############################
 # Things like server locations, ports, etc.

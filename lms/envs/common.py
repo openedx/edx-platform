@@ -2163,6 +2163,9 @@ INSTALLED_APPS = (
 
     # Unusual migrations
     'database_fixups',
+
+    # global-statistics application
+    'openedx.core.djangoapps.edx_global_analytics',
 )
 
 # Migrations which are not in the standard module "migrations"
