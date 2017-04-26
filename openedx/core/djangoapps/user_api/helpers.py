@@ -6,7 +6,6 @@ from collections import defaultdict
 from functools import wraps
 import logging
 import json
-import traceback
 
 from django import forms
 from django.core.serializers.json import DjangoJSONEncoder
@@ -66,19 +65,16 @@ def intercept_errors(api_error, ignore_errors=None):
                         LOGGER.warning(msg)
                         raise
 
-                caller = traceback.format_stack(limit=2)[0]
-
                 # Otherwise, log the error and raise the API-specific error
                 msg = (
                     u"An unexpected error occurred when calling '{func_name}' "
-                    u"with arguments '{args}' and keyword arguments '{kwargs}' from {caller}: "
+                    u"with arguments '{args}' and keyword arguments '{kwargs}': "
                     u"{exception}"
                 ).format(
                     func_name=func.func_name,
                     args=args,
                     kwargs=kwargs,
-                    exception=ex.developer_message if hasattr(ex, 'developer_message') else repr(ex),
-                    caller=caller.strip()
+                    exception=ex.developer_message if hasattr(ex, 'developer_message') else repr(ex)
                 )
                 LOGGER.exception(msg)
                 raise api_error(msg)
