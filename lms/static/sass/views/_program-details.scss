@@ -510,6 +510,30 @@
                 font-size: 0.9375em;
             }
         }
+
+        .expired-notification {
+            display: inline-block;
+            padding-top: 5px;
+            width: 300px;
+
+            @media(min-width: $bp-screen-sm) {
+                padding-top: 10px;
+                width: 500px;
+            }
+            @media(min-width: $bp-screen-md) {
+                width: initial;
+            }
+        }
+
+        .expired-icon {
+            @include float(left);
+            color: palette(primary, dark);
+        }
+
+        .expired-text {
+            overflow: hidden;
+            padding-left: 10px;
+        }
     }
 }
 
@@ -613,30 +637,6 @@
         width: 120px;
         border: 3px solid $gray-l3;
         border-radius: 5px;
-
-        .expired-notification {
-            display: inline-block;
-            padding-top: 5px;
-            width: 300px;
-
-            @media(min-width: $bp-screen-sm) {
-                padding-top: 10px;
-                width: 500px;
-            }
-            @media(min-width: $bp-screen-md) {
-                width: initial;
-            }
-        }
-
-        .expired-icon {
-            @include float(left);
-            color: palette(primary, dark);
-        }
-
-        .expired-text {
-            overflow: hidden;
-            padding-left: 10px;
-        }
 
         @media(min-width: $bp-screen-md) {
             width: 100px;
