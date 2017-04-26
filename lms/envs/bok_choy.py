@@ -225,7 +225,7 @@ ECOMMERCE_API_URL = 'http://localhost:8043/api/v2/'
 LMS_ROOT_URL = "http://localhost:8000"
 HELP_TOKENS_BOOKS = {
     'learner': 'http://edx.readthedocs.io/projects/edx-guide-for-students',
-    'course_author': 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course',
+    'course_author': 'http://edx.readthedocs.io/projects/edx-partner-course-staff',
 }
 
 # TODO: TNL-6546: Remove this waffle and flag code.
