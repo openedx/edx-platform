@@ -6,6 +6,7 @@ from celery.utils.log import get_task_logger  # pylint: disable=no-name-in-modul
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured
+from edx_rest_api_client import exceptions
 from edx_rest_api_client.client import EdxRestApiClient
 from provider.oauth2.models import Client
 
@@ -196,6 +197,11 @@ def award_program_certificates(self, username):
             try:
                 award_program_certificate(credentials_client, username, program_uuid)
                 LOGGER.info('Awarded certificate for program %s to user %s', program_uuid, username)
+            except exceptions.HttpNotFoundError:
+                LOGGER.exception(
+                    'Certificate for program %s not configured, unable to award certificate to %s',
+                    program_uuid, username
+                )
             except Exception:  # pylint: disable=broad-except
                 # keep trying to award other certs, but retry the whole task to fix any missing entries
                 LOGGER.exception('Failed to award certificate for program %s to user %s', program_uuid, username)
