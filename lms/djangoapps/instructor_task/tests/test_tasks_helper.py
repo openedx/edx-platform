@@ -59,14 +59,13 @@ from lms.djangoapps.instructor_task.tasks_helper.enrollments import (
     upload_students_csv,
 )
 from lms.djangoapps.instructor_task.tasks_helper.grades import (
-    generate_course_grade_report,
-    generate_problem_grade_report,
-    upload_problem_responses_csv,
+    CourseGradeReport,
+    ProblemGradeReport,
+    ProblemResponses,
 )
 from lms.djangoapps.instructor_task.tasks_helper.misc import (
     cohort_students_and_upload,
     upload_course_survey_report,
-    upload_proctored_exam_results_report,
     upload_ora2_data,
 )
 from ..tasks_helper.utils import (
@@ -89,7 +88,7 @@ class InstructorGradeReportTestCase(TestReportMixin, InstructorTaskCourseTestCas
         Verify cell data in the grades CSV for a particular user.
         """
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
-            result = generate_course_grade_report(None, None, course_id, None, 'graded')
+            result = CourseGradeReport.generate(None, None, course_id, None, 'graded')
             self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
             report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
             report_csv_filename = report_store.links_for(course_id)[0][0]
@@ -121,7 +120,7 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
         self.current_task.update_state = Mock()
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task') as mock_current_task:
             mock_current_task.return_value = self.current_task
-            result = generate_course_grade_report(None, None, self.course.id, None, 'graded')
+            result = CourseGradeReport.generate(None, None, self.course.id, None, 'graded')
         num_students = len(emails)
         self.assertDictContainsSubset({'attempted': num_students, 'succeeded': num_students, 'failed': 0}, result)
 
@@ -135,7 +134,7 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
         mock_grades_iter.return_value = [
             (self.create_student('username', 'student@example.com'), None, 'Cannot grade student')
         ]
-        result = generate_course_grade_report(None, None, self.course.id, None, 'graded')
+        result = CourseGradeReport.generate(None, None, self.course.id, None, 'graded')
         self.assertDictContainsSubset({'attempted': 1, 'succeeded': 0, 'failed': 1}, result)
 
         report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
@@ -319,7 +318,7 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
                 '',
             )
         ]
-        result = generate_course_grade_report(None, None, self.course.id, None, 'graded')
+        result = CourseGradeReport.generate(None, None, self.course.id, None, 'graded')
         self.assertDictContainsSubset({'attempted': 1, 'succeeded': 1, 'failed': 0}, result)
 
 
@@ -378,7 +377,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskCourseTestCase):
                     {'username': 'user1', 'state': u'state1'},
                     {'username': 'user2', 'state': u'state2'},
                 ]
-                result = upload_problem_responses_csv(None, None, self.course.id, task_input, 'calculated')
+                result = ProblemResponses.generate(None, None, self.course.id, task_input, 'calculated')
         report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
         links = report_store.links_for(self.course.id)
 
@@ -609,7 +608,7 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         Verify that we see no grade information for a course with no graded
         problems.
         """
-        result = generate_problem_grade_report(None, None, self.course.id, None, 'graded')
+        result = ProblemGradeReport.generate(None, None, self.course.id, None, 'graded')
         self.assertDictContainsSubset({'action_name': 'graded', 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         self.verify_rows_in_csv([
             dict(zip(
@@ -633,7 +632,7 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         self.define_option_problem(u'Problem1', parent=vertical)
 
         self.submit_student_answer(self.student_1.username, u'Problem1', ['Option 1'])
-        result = generate_problem_grade_report(None, None, self.course.id, None, 'graded')
+        result = ProblemGradeReport.generate(None, None, self.course.id, None, 'graded')
         self.assertDictContainsSubset({'action_name': 'graded', 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         problem_name = u'Homework 1: Subsection - Problem1'
         header_row = self.csv_header_row + [problem_name + ' (Earned)', problem_name + ' (Possible)']
@@ -670,7 +669,7 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         mock_grades_iter.return_value = [
             (student, None, error_message)
         ]
-        result = generate_problem_grade_report(None, None, self.course.id, None, 'graded')
+        result = ProblemGradeReport.generate(None, None, self.course.id, None, 'graded')
         self.assertDictContainsSubset({'attempted': 1, 'succeeded': 0, 'failed': 1}, result)
 
         report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
@@ -720,7 +719,7 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
         self.submit_student_answer(self.student_b.username, self.problem_b_url, [self.OPTION_1, self.OPTION_2])
 
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
-            result = generate_problem_grade_report(None, None, self.course.id, None, 'graded')
+            result = ProblemGradeReport.generate(None, None, self.course.id, None, 'graded')
             self.assertDictContainsSubset(
                 {'action_name': 'graded', 'attempted': 2, 'succeeded': 2, 'failed': 0}, result
             )
@@ -812,7 +811,7 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
             header_row += [problem + ' (Earned)', problem + ' (Possible)']
 
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
-            generate_problem_grade_report(None, None, self.course.id, None, 'graded')
+            ProblemGradeReport.generate(None, None, self.course.id, None, 'graded')
         self.assertEquals(self.get_csv_row_with_headers(), header_row)
 
 
@@ -868,7 +867,7 @@ class TestProblemReportCohortedContent(TestReportMixin, ContentGroupTestCase, In
         self.submit_student_answer(self.beta_user.username, u'Problem1', ['Option 1', 'Option 2'])
 
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
-            result = generate_problem_grade_report(None, None, self.course.id, None, 'graded')
+            result = ProblemGradeReport.generate(None, None, self.course.id, None, 'graded')
             self.assertDictContainsSubset(
                 {'action_name': 'graded', 'attempted': 4, 'succeeded': 4, 'failed': 0}, result
             )
@@ -1579,7 +1578,7 @@ class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         self.submit_student_answer(self.student.username, u'Problem1', ['Option 1'])
 
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
-            result = generate_course_grade_report(None, None, self.course.id, None, 'graded')
+            result = CourseGradeReport.generate(None, None, self.course.id, None, 'graded')
             self.assertDictContainsSubset(
                 {'action_name': 'graded', 'attempted': 1, 'succeeded': 1, 'failed': 0},
                 result,
@@ -1654,7 +1653,7 @@ class TestGradeReportEnrollmentAndCertificateInfo(TestReportMixin, InstructorTas
         Verify grade report data.
         """
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
-            generate_course_grade_report(None, None, self.course.id, None, 'graded')
+            CourseGradeReport.generate(None, None, self.course.id, None, 'graded')
             report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
             report_csv_filename = report_store.links_for(self.course.id)[0][0]
             report_path = report_store.path_to(self.course.id, report_csv_filename)

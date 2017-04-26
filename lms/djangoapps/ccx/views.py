@@ -564,7 +564,7 @@ def ccx_grades_csv(request, course, ccx=None):
             courseenrollment__course_id=ccx_key,
             courseenrollment__is_active=1
         ).order_by('username').select_related("profile")
-        grades = CourseGradeFactory().iter(course, enrolled_students)
+        grades = CourseGradeFactory().iter(enrolled_students, course)
 
         header = None
         rows = []
