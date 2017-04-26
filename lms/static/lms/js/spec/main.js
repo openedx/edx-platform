@@ -56,7 +56,7 @@
             'squire': 'common/js/vendor/Squire',
             'jasmine-imagediff': 'xmodule_js/common_static/js/vendor/jasmine-imagediff',
             'domReady': 'xmodule_js/common_static/js/vendor/domReady',
-            mathjax: '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured',  // eslint-disable-line max-len
+            mathjax: '//cdn.mathjax.org/mathjax/2.7-latest/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured',  // eslint-disable-line max-len
             'youtube': '//www.youtube.com/player_api?noext',
             'coffee/src/ajax_prefix': 'xmodule_js/common_static/coffee/src/ajax_prefix',
             'js/instructor_dashboard/student_admin': 'js/instructor_dashboard/student_admin',
@@ -687,7 +687,6 @@
         'js/spec/commerce/receipt_view_spec.js',
         'js/spec/components/card/card_spec.js',
         'js/spec/components/header/header_spec.js',
-        'js/spec/course_sharing/course_sharing_events_spec.js',
         'js/spec/courseware/course_home_events_spec.js',
         'js/spec/courseware/link_clicked_events_spec.js',
         'js/spec/courseware/updates_visibility_spec.js',
@@ -743,10 +742,10 @@
         'js/spec/learner_dashboard/program_card_view_spec.js',
         'js/spec/learner_dashboard/sidebar_view_spec.js',
         'js/spec/learner_dashboard/program_details_header_spec.js',
-        'js/spec/learner_dashboard/program_details_sidebar_view_spec.js',
         'js/spec/learner_dashboard/course_card_view_spec.js',
         'js/spec/learner_dashboard/course_enroll_view_spec.js',
         'js/spec/learner_dashboard/course_enroll_view_spec_2017.js',
+        'js/spec/learner_dashboard/program_details_view_spec.js',
         'js/spec/markdown_editor_spec.js',
         'js/spec/dateutil_factory_spec.js',
         'js/spec/navigation_spec.js',
