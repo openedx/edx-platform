@@ -73,11 +73,6 @@ from django.core.urlresolvers import reverse
             <input type="text" id="labster-license" name="license" value="${license_code}"
               placeholder="${_('Enter your license')}" style="width:50%" />
           </p>
-          <p>
-            <label class="inline-label" for="labster-update">${_("Update Course:")}</label>
-            <input type="checkbox" id="labster-update" name="update" checked />
-            <span class="hint">${_("Hides all unlicensed simulations. If the section/subsection do not contain any licensed simulations, it hides the entire section/subsection.")}</span>
-          </p>
           <p><button type="submit">${_("Apply")}</button></p>
         </form>
       %endif

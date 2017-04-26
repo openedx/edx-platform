@@ -2,8 +2,10 @@
 Labster Course tasks.
 """
 from cms import CELERY_APP
+from celery.utils.log import get_task_logger
 from django.conf import settings
 
+from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from ccx_keys.locator import CCXLocator
 from search.search_engine_base import SearchEngine
@@ -11,10 +13,14 @@ from student.roles import CourseCcxCoachRole
 from student.models import CourseEnrollment
 
 from lms.djangoapps.ccx.models import CustomCourseForEdX, CcxFieldOverride
-from lms.djangoapps.labster_course_license.models import CourseLicense
 from lms.djangoapps.instructor.enrollment import unenroll_email
-
 from cms.djangoapps.contentstore.courseware_index import CoursewareSearchIndexer, CourseAboutSearchIndexer
+
+from labster_course_license.models import CourseLicense
+from labster_course_license.utils import update_course_access_structure
+
+
+log = get_task_logger(__name__)
 
 
 @CELERY_APP.task
@@ -45,3 +51,20 @@ def course_delete(course_key_string):
             CoursewareSearchIndexer.remove_deleted_items(searcher, course_key, [])
             searcher.remove(CourseAboutSearchIndexer.DISCOVERY_DOCUMENT_TYPE, [course_key_string])
     return "succeeded"
+
+
+@CELERY_APP.task
+def update_course_access(course_id):
+    """
+    Updates master course access structure.
+    Args:
+        course_id(str): A string representation of course identifier
+    Returns:
+        None
+    """
+    try:
+        course_key = CourseKey.from_string(course_id)
+        update_course_access_structure(course_key)
+        log.info("Course %s blocks structure was updated successfully.", course_id)
+    except InvalidKeyError as ex:
+        log.error("Course %s error: %s", course_id, ex)

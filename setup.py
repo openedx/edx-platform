@@ -39,7 +39,7 @@ setup(
             "wiki = lms.djangoapps.course_wiki.tab:WikiTab",
 
             "labster_wiki = lms.djangoapps.labster_wiki.tab:LabsterWikiTab",
-            "course_license = lms.djangoapps.labster_course_license.tabs:LicenseCourseTab",
+            "course_license = labster_course_license.tabs:LicenseCourseTab",
         ],
         "openedx.user_partition_scheme": [
             "random = openedx.core.djangoapps.user_api.partition_schemes:RandomUserPartitionScheme",
