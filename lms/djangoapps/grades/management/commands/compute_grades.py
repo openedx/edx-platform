@@ -94,12 +94,12 @@ class Command(BaseCommand):
         enrollment_count = CourseEnrollment.objects.filter(course_id=course_key).count()
         if enrollment_count == 0:
             log.warning("No enrollments found for {}".format(course_key))
-        for offset in six.moves.range(options['start_index'], enrollment_count, options['batch_size']):
+        batch_size = self._latest_settings().batch_size if options.get('from_settings') else options['batch_size']
+        for offset in six.moves.range(options['start_index'], enrollment_count, batch_size):
             # If the number of enrollments increases after the tasks are
             # created, the most recent enrollments may not get processed.
             # This is an acceptable limitation for our known use cases.
             task_options = {'routing_key': options['routing_key']} if options.get('routing_key') else {}
-            batch_size = self._latest_settings().batch_size if options.get('from_settings') else options['batch_size']
             kwargs = {
                 'course_key': six.text_type(course_key),
                 'offset': offset,
