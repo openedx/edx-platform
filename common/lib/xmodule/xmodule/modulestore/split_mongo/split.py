@@ -1812,8 +1812,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         if source_index is None:
             raise ItemNotFoundError("Cannot find a course at {0}. Aborting".format(source_course_id))
 
-        import pudb; pu.db;
-
         with self.bulk_operations(dest_course_id):
             new_course = self.create_course(
                 dest_course_id.org, dest_course_id.course, dest_course_id.run,
@@ -1899,8 +1897,11 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         if index is not None:
             raise DuplicateCourseError(locator, index)
 
+        import pudb; pu.db;
+
         partitioned_fields = self.partition_fields_by_scope(root_category, fields)
         block_fields = partitioned_fields[Scope.settings]
+
         if Scope.children in partitioned_fields:
             block_fields.update(partitioned_fields[Scope.children])
         definition_fields = self._serialize_fields(root_category, partitioned_fields.get(Scope.content, {}))
@@ -1929,9 +1930,27 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
         elif block_fields or definition_fields:  # pointing to existing course w/ some overrides
             # just get the draft_version structure
+
             draft_version = CourseLocator(version_guid=versions_dict[master_branch])
             draft_structure = self._lookup_course(draft_version).structure
             draft_structure = self.version_structure(locator, draft_structure, user_id)
+
+            # This is the point where we're editing the draft structure before creating a new course.
+            # So we'll want look for all dates (start, end, due, beta, etc.) and move them by the
+            # difference between the original start datetime and the new requested startdate time.
+            #
+            # A few notes:
+            #
+            #  * Whether we choose local or UTC time? One is more intuitive, but it would suck if
+            #    they did this only to have to manually change all the assignment times by a few
+            #    hours to align to what it was last run.
+            #  * ORA2 has an extra datetime differentiating the submission vs. assessment periods.
+            #    It sucks to special case this, but it might be necessary. I don't think the current
+            #    code really handles it at any rate.
+            #  * By the time the block field data gets passed in here (block_fields), it's already
+            #    got the new datetimes for start -- to get the original course start (to calculate
+            #    the offset), we might have to pass it in explicitly.
+
             new_id = draft_structure['_id']
             root_block = draft_structure['blocks'][draft_structure['root']]
             if block_fields is not None:
