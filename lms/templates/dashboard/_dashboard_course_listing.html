@@ -147,57 +147,61 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
                   <a class="enter-course-blocked" data-course-key="${enrollment.course_id}">${_('View Course')}<span class="sr">&nbsp;${course_overview.display_name_with_default}</span></a>
                 % endif
               % endif
+            % endif
 
-              % if share_settings:
-                <%
-                  share_url = get_link_for_about_page(course_overview)
-                  encoded_utm_parameters = get_encoded_course_sharing_utm_params()
-                  share_window_name = 'shareWindow'
-                  share_window_config = 'toolbar=no, location=no, status=no, menubar=no, scrollbars=yes, resizable=yes, width=640, height=480'
-                %>
-                % if share_settings.get('DASHBOARD_FACEBOOK', False):
-                  <%
-                      facebook_share_url = "{url}?{utm_params}".format(url=share_url, utm_params=encoded_utm_parameters['facebook'])
-                      share_text = _("I'm taking {course_name} online with edX.org. Check it out!").format(course_name=course_overview.display_name_with_default)
-                      query_params = urllib.urlencode((('u', facebook_share_url), ('quote', share_text.encode('utf-8')),))
-                      facebook_url = 'https://www.facebook.com/sharer/sharer.php?{query}'.format(query=query_params)
-                  %>
-                    <a
-                      data-tooltip="${_('Share on Facebook')}"
-                      class="action action-facebook"
-                      aria-haspopup="true"
-                      aria-expanded="false"
-                      href="${facebook_url}"
-                      target="_blank"
-                      title="${_('Share on Facebook')}"
-                      data-course-id="${course_overview.id}"
-                      onclick="window.open('${facebook_url}', '${share_window_name}', '${share_window_config}'); return false;">
-                      <span class="sr">${_('Facebook')}</span>
-                      <span class="fa fa-facebook" aria-hidden="true"></span>
-                    </a>
+            % if show_courseware_link or course_overview.has_social_sharing_url() or course_overview.has_marketing_url():
+
+                % if share_settings:
+                    <%
+                      share_url = get_link_for_about_page(course_overview)
+                      encoded_utm_parameters = get_encoded_course_sharing_utm_params()
+                      share_window_name = 'shareWindow'
+                      share_window_config = 'toolbar=no, location=no, status=no, menubar=no, scrollbars=yes, resizable=yes, width=640, height=480'
+                    %>
+                    % if share_settings.get('DASHBOARD_FACEBOOK', False):
+                        <%
+                          facebook_share_url = "{url}?{utm_params}".format(url=share_url.encode('utf-8'), utm_params=encoded_utm_parameters['facebook'])
+                          share_text = _("I'm taking {course_name} online with edX.org. Check it out!").format(course_name=course_overview.display_name_with_default)
+                          query_params = urllib.urlencode((('u', facebook_share_url), ('quote', share_text.encode('utf-8')),))
+                          facebook_url = 'https://www.facebook.com/sharer/sharer.php?{query}'.format(query=query_params)
+                        %>
+                        <a
+                          data-tooltip="${_('Share on Facebook')}"
+                          class="action action-facebook"
+                          aria-haspopup="true"
+                          aria-expanded="false"
+                          href="${facebook_url}"
+                          target="_blank"
+                          title="${_('Share on Facebook')}"
+                          data-course-id="${course_overview.id}"
+                          onclick="window.open('${facebook_url}', '${share_window_name}', '${share_window_config}'); return false;">
+                          <span class="sr">${_('Facebook')}</span>
+                          <span class="fa fa-facebook" aria-hidden="true"></span>
+                        </a>
+                    % endif
+                    % if share_settings.get('DASHBOARD_TWITTER', False):
+                        <%
+                          twitter_share_url = "{url}?{utm_params}".format(url=share_url.encode('utf-8'), utm_params=encoded_utm_parameters['twitter'])
+                          default_share_text = _("I'm taking {course_name} online with @edxonline. Check it out!").format(course_name=course_overview.display_name_with_default)
+                          share_text = urllib.quote_plus(share_settings.get('DASHBOARD_TWITTER_TEXT', default_share_text.encode('utf-8')))
+                          twitter_url = 'https://twitter.com/intent/tweet?text=' + share_text + '%20' + urllib.quote_plus(twitter_share_url)
+                        %>
+                        <a
+                          data-tooltip="${_('Share on Twitter')}"
+                          class="action action-twitter"
+                          aria-haspopup="true"
+                          aria-expanded="false"
+                          href="${twitter_url}"
+                          target="_blank"
+                          title="${_('Share on Twitter')}"
+                          data-course-id="${course_overview.id}"
+                          onclick="window.open('${twitter_url}', '${share_window_name}', '${share_window_config}'); return false;">
+                          <span class="sr">${_('Twitter')}</span>
+                          <span class="fa fa-twitter" aria-hidden="true"></span>
+                        </a>
+                    % endif
                 % endif
-                % if share_settings.get('DASHBOARD_TWITTER', False):
-                  <%
-                      twitter_share_url = "{url}?{utm_params}".format(url=share_url, utm_params=encoded_utm_parameters['twitter'])
-                      default_share_text = _("I'm taking {course_name} online with @edxonline. Check it out!").format(course_name=course_overview.display_name_with_default)
-                      share_text = urllib.quote_plus(share_settings.get('DASHBOARD_TWITTER_TEXT', default_share_text.encode('utf-8')))
-                      twitter_url = 'https://twitter.com/intent/tweet?text=' + share_text + '%20' + urllib.quote_plus(twitter_share_url)
-                  %>
-                    <a
-                      data-tooltip="${_('Share on Twitter')}"
-                      class="action action-twitter"
-                      aria-haspopup="true"
-                      aria-expanded="false"
-                      href="${twitter_url}"
-                      target="_blank"
-                      title="${_('Share on Twitter')}"
-                      data-course-id="${course_overview.id}"
-                      onclick="window.open('${twitter_url}', '${share_window_name}', '${share_window_config}'); return false;">
-                      <span class="sr">${_('Twitter')}</span>
-                      <span class="fa fa-twitter" aria-hidden="true"></span>
-                    </a>
-                % endif
-              % endif
+
             % endif
             <div class="wrapper-action-more" data-course-key="${enrollment.course_id}">
               <button type="button" class="action action-more" id="actions-dropdown-link-${dashboard_index}" aria-haspopup="true" aria-expanded="false" aria-controls="actions-dropdown-${dashboard_index}" data-course-number="${course_overview.number}" data-course-name="${course_overview.display_name_with_default}" data-dashboard-index="${dashboard_index}">
