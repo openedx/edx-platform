@@ -43,15 +43,15 @@ class EnrollmentTrackUserPartitionTest(SharedModuleStoreTestCase):
             self.course, CourseMode.VERIFIED, "Verified Enrollment Track", min_price=1,
             expiration_datetime=datetime.now(pytz.UTC) + timedelta(days=-1)
         )
-        # Note that the credit mode is not selectable-- this is intentional.
+        # Note that the credit mode is not selectable-- this is intentional so we
+        # can test that it is filtered out.
         create_mode(self.course, CourseMode.CREDIT_MODE, "Credit Mode", min_price=2)
 
         partition = create_enrollment_track_partition(self.course)
         groups = partition.groups
-        self.assertEqual(3, len(groups))
+        self.assertEqual(2, len(groups))
         self.assertIsNotNone(self.get_group_by_name(partition, "Audit Enrollment Track"))
         self.assertIsNotNone(self.get_group_by_name(partition, "Verified Enrollment Track"))
-        self.assertIsNotNone(self.get_group_by_name(partition, "Credit Mode"))
 
     def test_to_json_supported(self):
         user_partition_json = create_enrollment_track_partition(self.course).to_json()
@@ -138,7 +138,13 @@ class EnrollmentTrackPartitionSchemeTest(SharedModuleStoreTestCase):
     def test_enrolled_in_non_selectable(self):
         create_mode(self.course, CourseMode.CREDIT_MODE, "Credit Enrollment Track", min_price=1)
         CourseEnrollment.enroll(self.student, self.course.id, mode=CourseMode.CREDIT_MODE)
-        self.assertEqual("Credit Enrollment Track", self._get_user_group().name)
+
+        # The default mode is returned because Credit mode is filtered out, and no verified mode exists.
+        self.assertEqual("Audit", self._get_user_group().name)
+
+        # Now create a verified mode and check that it is returned for the learner enrolled in Credit.
+        create_mode(self.course, CourseMode.VERIFIED, "Verified Enrollment Track", min_price=1)
+        self.assertEqual("Verified Enrollment Track", self._get_user_group().name)
 
     def test_using_verified_track_cohort(self):
         VerifiedTrackCohortedCourse.objects.create(course_key=self.course.id, enabled=True).save()
