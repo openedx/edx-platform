@@ -185,12 +185,33 @@ class CourseCohortsSettings(models.Model):
     @property
     def cohorted_discussions(self):
         """Jsonify the cohorted_discussions"""
-        return json.loads(self._cohorted_discussions)
+
+        segmented_discussions = self.segmented_discussions.all()
+        if segmented_discussions:
+            return list(
+                map(lambda segmented_discussion: segmented_discussion.discussion_id, segmented_discussions)
+            )
+        else:
+            return json.loads(self._cohorted_discussions)
 
     @cohorted_discussions.setter
     def cohorted_discussions(self, value):
         """Un-Jsonify the cohorted_discussions"""
         self._cohorted_discussions = json.dumps(value)
+
+
+class CourseSegmentedDiscussion(models.Model):
+    """
+    This model represents the partitioned_discussions (formerly cohorted_discussions) of a Course's Cohort Settings
+    """
+
+    course_cohorts_settings = models.ForeignKey(CourseCohortsSettings, related_name='segmented_discussions')
+    discussion_id = models.TextField()  # Needs to be greater than 20 and for the ID
+
+    COHORT = 'cohort'
+    ENROLLMENT_TRACK = 'enrollment_track'
+    ASSIGNMENT_TYPE_CHOICES = ((COHORT, 'Cohort'), (ENROLLMENT_TRACK, 'Enrollment Track'))
+    segmentation_scheme = models.CharField(max_length=20, choices=ASSIGNMENT_TYPE_CHOICES)
 
 
 class CourseCohort(models.Model):

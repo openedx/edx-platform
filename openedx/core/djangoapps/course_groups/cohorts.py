@@ -22,7 +22,8 @@ from .models import (
     CourseCohort,
     CourseCohortsSettings,
     CourseUserGroupPartitionGroup,
-    CohortMembership
+    CohortMembership,
+    CourseSegmentedDiscussion
 )
 
 
@@ -488,11 +489,32 @@ def set_course_cohort_settings(course_key, **kwargs):
     """
     fields = {'is_cohorted': bool, 'always_cohort_inline_discussions': bool, 'cohorted_discussions': list}
     course_cohort_settings = get_course_cohort_settings(course_key)
+
     for field, field_type in fields.items():
         if field in kwargs:
             if not isinstance(kwargs[field], field_type):
                 raise ValueError("Incorrect field type for `{}`. Type must be `{}`".format(field, field_type.__name__))
-            setattr(course_cohort_settings, field, kwargs[field])
+            if field == 'cohorted_discussions':
+                segmented_discussions = course_cohort_settings.segmented_discussions.all()
+                # Get just the IDs from all of the segmented_discussions for easy set comparisons
+                segmented_discussion_ids = list(
+                    map(lambda segmented_discussion: segmented_discussion.discussion_id, segmented_discussions)
+                )
+
+                segmented_discussion_ids_to_create = set(kwargs[field]) - set(segmented_discussion_ids)
+                segmented_discussions_to_create = list(map(lambda segmented_discussion_id: CourseSegmentedDiscussion(
+                    course_cohorts_settings=course_cohort_settings,
+                    discussion_id=segmented_discussion_id,
+                    segmentation_scheme='cohort'
+                ), segmented_discussion_ids_to_create))
+                CourseSegmentedDiscussion.objects.bulk_create(segmented_discussions_to_create)
+
+                segmented_discussion_ids_to_delete = set(segmented_discussion_ids) - set(kwargs[field])
+                CourseSegmentedDiscussion.objects.filter(
+                    discussion_id__in=segmented_discussion_ids_to_delete).delete()
+                pass
+            else:
+                setattr(course_cohort_settings, field, kwargs[field])
     course_cohort_settings.save()
     return course_cohort_settings
 
