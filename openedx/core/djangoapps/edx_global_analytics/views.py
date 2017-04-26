@@ -27,10 +27,9 @@ class ReceiveTokenView(View):
 
         try:
             received_data = self.request.POST
-            secret_token = str(received_data.get('reverse_token'))
-            token_object = TokenStorage.objects.get(pk=1)
-            token_object.secret_token = secret_token
-            token_object.save()
+            secret_token = str(received_data.get('secret_token'))
+            TokenStorage.objects.update_or_create(
+                pk=1, defaults={"secret_token": secret_token})
             return HttpResponse(status=200)
         except ValueError:
             raise Http404()

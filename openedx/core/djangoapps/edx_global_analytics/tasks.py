@@ -10,6 +10,7 @@ from celery.task import task
 
 from django.conf import settings
 from django.contrib.sites.models import Site
+from django.core.exceptions import ObjectDoesNotExist
 from xmodule.modulestore.django import modulestore
 from student.models import UserProfile
 from .models import TokenStorage
@@ -27,18 +28,14 @@ def count_data():
     olga_settings = settings.ENV_TOKENS.get('OPENEDX_LEARNERS_GLOBAL_ANALYTICS')
 
     # Get IP address of the platform and convert it to latitude, longitude.
-    check_ip_url = 'http://freegeoip.net/json'
-    ip_data = requests.get(check_ip_url)
+    ip_data = requests.get('http://freegeoip.net/json')
     ip_data_json = json.loads(ip_data.text)
-    platform_latitude = olga_settings.get("PLATFORM_LATITUDE")
-    platform_longitude = olga_settings.get("PLATFORM_LONGITUDE")
+    platform_latitude, platform_longitude = olga_settings.get("PLATFORM_LATITUDE"), olga_settings.get("PLATFORM_LONGITUDE")
    
     if platform_latitude and platform_longitude:
-        latitude = platform_latitude
-        longitude = platform_longitude
+        latitude, longitude = platform_latitude, platform_longitude
     else:
-        latitude = ip_data_json['latitude']
-        longitude = ip_data_json['longitude']
+        latitude, longitude = ip_data_json['latitude'], ip_data_json['longitude']
 
     # Get students amount within current platform.
     students_amount = UserProfile.objects.count()
@@ -47,15 +44,20 @@ def count_data():
     courses_amount = len(modulestore().get_courses())
 
     # Secret token to authorize our platform on remote server.
-    secret_token, created = TokenStorage.objects.get_or_create(pk=1)
+    try:
+        token_object = TokenStorage.objects.get(pk=1)
+        secret_token = token_object.secret_token
+    except ObjectDoesNotExist:
+        secret_token = ""
 
     # Current edx-platform URL
     platform_url = "https://" + settings.SITE_NAME
 
     # Predefined in the server settings url to send collected data to.
-    # For production or local development.
+    # For production development.
     if olga_settings.get('OLGA_PERIODIC_TASK_POST_URL'):
         post_url = olga_settings.get('OLGA_PERIODIC_TASK_POST_URL')
+    # For local development.
     else:
         post_url = olga_settings.get('OLGA_PERIODIC_TASK_POST_URL_LOCAL')
 
@@ -73,6 +75,6 @@ def count_data():
             'latitude': latitude,
             'longitude': longitude,
             'platform_url': platform_url,
-            'secret_token': secret_token.secret_token,
+            'secret_token': secret_token,
             'site': site
             })
