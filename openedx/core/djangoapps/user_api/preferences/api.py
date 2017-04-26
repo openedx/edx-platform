@@ -142,7 +142,9 @@ def update_user_preferences(requesting_user, update, user=None):
         if preference_value is not None:
             try:
                 serializer = serializers[preference_key]
-                serializer.save()
+
+                if serializer.instance is None or serializer.instance.value != serializer.validated_data['value']:
+                    serializer.save()
             except Exception as error:
                 raise _create_preference_update_error(preference_key, preference_value, error)
         else:
@@ -177,10 +179,11 @@ def set_user_preference(requesting_user, preference_key, preference_value, usern
     existing_user = _get_authorized_user(requesting_user, username)
     serializer = create_user_preference_serializer(existing_user, preference_key, preference_value)
     validate_user_preference_serializer(serializer, preference_key, preference_value)
-    try:
-        serializer.save()
-    except Exception as error:
-        raise _create_preference_update_error(preference_key, preference_value, error)
+    if serializer.instance is None or serializer.instance.value != serializer.validated_data['value']:
+        try:
+            serializer.save()
+        except Exception as error:
+            raise _create_preference_update_error(preference_key, preference_value, error)
 
 
 @intercept_errors(UserAPIInternalError, ignore_errors=[UserAPIRequestError])
@@ -353,13 +356,13 @@ def create_user_preference_serializer(user, preference_key, preference_value):
     except ObjectDoesNotExist:
         existing_user_preference = None
     new_data = {
-        "user": user.id,
         "key": preference_key,
         "value": preference_value,
     }
     if existing_user_preference:
-        serializer = RawUserPreferenceSerializer(existing_user_preference, data=new_data)
+        serializer = RawUserPreferenceSerializer(existing_user_preference, data=new_data, partial=True)
     else:
+        new_data['user'] = user.id
         serializer = RawUserPreferenceSerializer(data=new_data)
     return serializer
 
