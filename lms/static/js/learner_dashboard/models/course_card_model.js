@@ -164,7 +164,7 @@
                         } else if (end && endDate < now) {
                             dateString += ' - Ended ' + end;
                         }
-                    } else if (pacingType === 'instructor_paced') {
+                    } else {
                         if (start && end) {
                             dateString = start + ' - ' + end;
                         } else if (start) {
