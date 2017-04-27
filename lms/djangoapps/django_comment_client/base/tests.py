@@ -1155,9 +1155,6 @@ class CreateThreadUnicodeTestCase(
         cls.student = UserFactory.create()
         CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
 
-    def setUp(self):
-        super(CreateThreadUnicodeTestCase, self).setUp()
-
     @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request,):
         """
@@ -1199,9 +1196,6 @@ class UpdateThreadUnicodeTestCase(
         seed_permissions_roles(cls.course.id)
         cls.student = UserFactory.create()
         CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
-
-    def setUp(self):
-        super(UpdateThreadUnicodeTestCase, self).setUp()
 
     @patch('django_comment_client.utils.get_discussion_categories_ids', return_value=["test_commentable"])
     @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
@@ -1245,9 +1239,6 @@ class CreateCommentUnicodeTestCase(
         seed_permissions_roles(cls.course.id)
         cls.student = UserFactory.create()
         CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
-
-    def setUp(self):
-        super(CreateCommentUnicodeTestCase, self).setUp()
 
     @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request):
@@ -1297,9 +1288,6 @@ class UpdateCommentUnicodeTestCase(
         cls.student = UserFactory.create()
         CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
 
-    def setUp(self):
-        super(UpdateCommentUnicodeTestCase, self).setUp()
-
     @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request):
         self._set_mock_request_data(mock_request, {
@@ -1340,9 +1328,6 @@ class CreateSubCommentUnicodeTestCase(
         seed_permissions_roles(cls.course.id)
         cls.student = UserFactory.create()
         CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
-
-    def setUp(self):
-        super(CreateSubCommentUnicodeTestCase, self).setUp()
 
     @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request):
@@ -1667,9 +1652,6 @@ class ForumEventTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockReque
         cls.student.roles.add(Role.objects.get(name="Student", course_id=cls.course.id))
         CourseAccessRoleFactory(course_id=cls.course.id, user=cls.student, role='Wizard')
 
-    def setUp(self):
-        super(ForumEventTestCase, self).setUp()
-
     @patch('eventtracking.tracker.emit')
     @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
     def test_thread_event(self, __, mock_emit):
@@ -1851,9 +1833,6 @@ class UsersEndpointTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockRe
         cls.enrollment = CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
         cls.other_user = UserFactory.create(username="other")
         CourseEnrollmentFactory(user=cls.other_user, course_id=cls.course.id)
-
-    def setUp(self):
-        super(UsersEndpointTestCase, self).setUp()
 
     def set_post_counts(self, mock_request, threads_count=1, comments_count=1):
         """

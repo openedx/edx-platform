@@ -88,9 +88,6 @@ class BlockRecordTest(GradesModelTestCase):
     """
     Test the BlockRecord model.
     """
-    def setUp(self):
-        super(BlockRecordTest, self).setUp()
-
     def test_creation(self):
         """
         Tests creation of a BlockRecord.

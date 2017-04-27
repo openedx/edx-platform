@@ -22,9 +22,6 @@ class TestMicrosites(DatabaseMicrositeTestCase):
     Run through some Microsite logic
     """
 
-    def setUp(self):
-        super(TestMicrosites, self).setUp()
-
     @ddt.data(*MICROSITE_BACKENDS)
     def test_get_value_for_org_when_microsite_has_no_org(self, site_backend):
         """

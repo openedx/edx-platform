@@ -370,12 +370,6 @@ class XBlockTestCase(XBlockStudentTestCaseMixin,
             raise unittest.SkipTest('Test only valid in lms')
         super(XBlockTestCase, cls).setUpClass()
 
-    def setUp(self):
-        """
-        Call setups of all parents
-        """
-        super(XBlockTestCase, self).setUp()
-
     def get_handler_url(self, handler, xblock_name=None):
         """
         Get url for the specified xblock handler

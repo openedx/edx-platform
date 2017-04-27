@@ -40,10 +40,7 @@ class DatabaseMicrositeBackendTests(DatabaseMicrositeTestCase):
     """
     def setUp(self):
         super(DatabaseMicrositeBackendTests, self).setUp()
-
-    def tearDown(self):
-        super(DatabaseMicrositeBackendTests, self).tearDown()
-        microsite.clear()
+        self.addCleanup(microsite.clear)
 
     def test_get_value(self):
         """

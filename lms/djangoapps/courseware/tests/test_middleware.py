@@ -22,9 +22,6 @@ class CoursewareMiddlewareTestCase(SharedModuleStoreTestCase):
         super(CoursewareMiddlewareTestCase, cls).setUpClass()
         cls.course = CourseFactory.create()
 
-    def setUp(self):
-        super(CoursewareMiddlewareTestCase, self).setUp()
-
     def test_process_404(self):
         """A 404 should not trigger anything"""
         request = RequestFactory().get("dummy_url")

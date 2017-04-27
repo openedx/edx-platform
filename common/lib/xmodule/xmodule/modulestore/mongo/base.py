@@ -341,9 +341,6 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         key = UsageKey.from_string(ref_string)
         return key.replace(run=self.modulestore.fill_in_run(key.course_key).run)
 
-    def __setattr__(self, name, value):
-        return super(CachingDescriptorSystem, self).__setattr__(name, value)
-
     def _convert_reference_fields_to_keys(self, class_, course_key, jsonfields):
         """
         Find all fields of type reference and convert the payload into UsageKeys

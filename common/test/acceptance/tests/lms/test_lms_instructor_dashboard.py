@@ -1239,9 +1239,6 @@ class EcommerceTest(BaseInstructorDashboardTest):
     """
     Bok Choy tests for the "E-Commerce" tab.
     """
-    def setUp(self):
-        super(EcommerceTest, self).setUp()
-
     def setup_course(self, course_number):
         """
         Sets up the course
