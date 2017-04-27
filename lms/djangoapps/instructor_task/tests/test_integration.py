@@ -32,7 +32,7 @@ from lms.djangoapps.instructor_task.api import (
     submit_delete_problem_state_for_all_students
 )
 from lms.djangoapps.instructor_task.models import InstructorTask
-from lms.djangoapps.instructor_task.tasks_helper.grades import generate_course_grade_report
+from lms.djangoapps.instructor_task.tasks_helper.grades import CourseGradeReport
 from lms.djangoapps.instructor_task.tests.test_base import (
     InstructorTaskModuleTestCase,
     TestReportMixin,
@@ -572,10 +572,10 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
     def verify_csv_task_success(self, task_result):
         """
         Verify that all students were successfully graded by
-        `generate_course_grade_report`.
+        `CourseGradeReport`.
 
         Arguments:
-            task_result (dict): Return value of `generate_course_grade_report`.
+            task_result (dict): Return value of `CourseGradeReport.generate`.
         """
         self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, task_result)
 
@@ -636,7 +636,7 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
         self.submit_student_answer(self.student_b.username, problem_b_url, [OPTION_1, OPTION_2])
 
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
-            result = generate_course_grade_report(None, None, self.course.id, None, 'graded')
+            result = CourseGradeReport.generate(None, None, self.course.id, None, 'graded')
             self.verify_csv_task_success(result)
             self.verify_grades_in_csv(
                 [
@@ -669,7 +669,7 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
         self.submit_student_answer(self.student_a.username, problem_a_url, [OPTION_1, OPTION_1])
 
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
-            result = generate_course_grade_report(None, None, self.course.id, None, 'graded')
+            result = CourseGradeReport.generate(None, None, self.course.id, None, 'graded')
             self.verify_csv_task_success(result)
             self.verify_grades_in_csv(
                 [
