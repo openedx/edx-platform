@@ -159,7 +159,6 @@ class ChooseModeView(View):
             is_course_in_enterprise_catalog = enterprise_api.is_course_in_enterprise_catalog(
                 site=request.site,
                 course_id=course_id,
-                user=request.user,
                 enterprise_catalog_id=enterprise_learner_data[0]['enterprise_customer']['catalog']
             )
 
