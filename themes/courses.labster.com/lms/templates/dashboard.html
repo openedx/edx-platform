@@ -107,7 +107,7 @@ from openedx.core.djangolib.markup import HTML, Text
 <%! from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers %>
           <div class="empty-dashboard-message">
             <p>${_("You are not enrolled in any courses yet. If you have been enrolled in a course by your teacher, please make sure you have activated your account and write {support_email} if the problem persists. If you would like to purchase access to {platform_name}, please click on the button below: \"Explore Courses\" button with link to our catalog").format(
-              support_email=settings.CONTACT_EMAIL,
+              support_email='<a href="mailto:{}">{}</a>'.format(settings.CONTACT_EMAIL, settings.CONTACT_EMAIL),
               platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
             )}</p>
 
