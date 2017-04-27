@@ -26,7 +26,7 @@ def get_redirect_url(course_key, usage_key, unified_course_view=False):
         Redirect url string
     """
     if usage_key.block_type == 'course' and unified_course_view:
-        return reverse('edx.course_experience.course_home', args=[unicode(course_key)])
+        return reverse('openedx.course_experience.course_home', args=[unicode(course_key)])
 
     (
         course_key, chapter, section, vertical_unused,
