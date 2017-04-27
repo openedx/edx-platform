@@ -33,9 +33,6 @@ define([
             };
 
         beforeEach(function() {
-            // Stub analytics tracking
-            window.analytics = jasmine.createSpyObj('analytics', ['track']);
-
             // NOTE: This data is redefined prior to each test case so that tests
             // can't break each other by modifying data copied by reference.
             singleCourseRunList = [{
@@ -163,6 +160,22 @@ define([
             expect(view.$('.run-select option').length).toBe(2);
         });
 
+        it('should switch course run context if an option is selected from the dropdown', function() {
+            setupView(multiCourseRunList);
+
+            spyOn(courseCardModel, 'updateCourseRun').and.callThrough();
+
+            expect(view.$('.run-select').val()).toEqual(multiCourseRunList[0].key);
+
+            view.$('.run-select').val(multiCourseRunList[1].key);
+            view.$('.run-select').trigger('change');
+
+            expect(view.$('.run-select').val()).toEqual(multiCourseRunList[1].key);
+            expect(courseCardModel.updateCourseRun)
+                .toHaveBeenCalledWith(multiCourseRunList[1].key);
+            expect(courseCardModel.get('course_key')).toEqual(course.key);
+        });
+
         it('should enroll learner when enroll button is clicked with one course run available', function() {
             setupView(singleCourseRunList);
 
@@ -273,15 +286,6 @@ define([
 
             expect(view.redirect).toHaveBeenCalledWith(
                 response.responseJSON.user_message_url
-            );
-        });
-
-        it('sends analytics event when enrollment succeeds', function() {
-            setupView(singleCourseRunList, urls);
-            spyOn(view, 'redirect');
-            view.enrollSuccess();
-            expect(window.analytics.track).toHaveBeenCalledWith(
-                'edx.bi.user.program-details.enrollment'
             );
         });
     });
