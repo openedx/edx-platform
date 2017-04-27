@@ -64,7 +64,7 @@ class CourseHomeTest(CourseHomeBaseTest):
 
     def test_course_home(self):
         """
-        Smoke test of course outline, breadcrumbs to and from cours outline, and bookmarks.
+        Smoke test of course outline, breadcrumbs to and from course outline, and bookmarks.
         """
         self.course_home_page.visit()
 
