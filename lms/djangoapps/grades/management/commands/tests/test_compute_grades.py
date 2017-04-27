@@ -17,9 +17,14 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from lms.djangoapps.grades.config.models import ComputeGradesSetting
-from openedx.core.djangolib.waffle_utils import WaffleSwitchPlus
-from lms.djangoapps.grades.config.waffle import ESTIMATE_FIRST_ATTEMPTED
 from lms.djangoapps.grades.management.commands import compute_grades
+
+
+def _sorted_by_batch(calls):
+    """
+    Return the list of calls sorted by course_key and batch.
+    """
+    return sorted(calls, key=lambda x: (x[1]['kwargs']['course_key'], x[1]['kwargs']['offset']))
 
 
 @ddt.ddt
@@ -98,7 +103,7 @@ class TestComputeGrades(SharedModuleStoreTestCase):
             'estimate_first_attempted': estimate_first_attempted
         }
         self.assertEqual(
-            mock_task.apply_async.call_args_list,
+            _sorted_by_batch(mock_task.apply_async.call_args_list),
             [
                 ({
                     'routing_key': 'key',
@@ -124,7 +129,7 @@ class TestComputeGrades(SharedModuleStoreTestCase):
         ComputeGradesSetting.objects.create(course_ids=self.course_keys[1], batch_size=2)
         call_command('compute_grades', '--from_settings')
         self.assertEqual(
-            mock_task.apply_async.call_args_list,
+            _sorted_by_batch(mock_task.apply_async.call_args_list),
             [
                 ({
                     'kwargs': {
