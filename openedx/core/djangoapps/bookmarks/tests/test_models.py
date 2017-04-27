@@ -431,9 +431,6 @@ class XBlockCacheModelTest(ModuleStoreTestCase):
         [unicode(SECTION2_USAGE_KEY), 'Section 2'],
     ]
 
-    def setUp(self):
-        super(XBlockCacheModelTest, self).setUp()
-
     def assert_xblock_cache_data(self, xblock_cache, data):
         """
         Assert that the XBlockCache object values match.

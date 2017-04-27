@@ -181,9 +181,6 @@ class ZeroCourseGrade(CourseGradeBase):
     Course Grade class for Zero-value grades when no problems were
     attempted in the course.
     """
-    def __init__(self, user, course_data):
-        super(ZeroCourseGrade, self).__init__(user, course_data)
-
     def _get_subsection_grade(self, subsection):
         return ZeroSubsectionGrade(subsection, self.course_data)
 

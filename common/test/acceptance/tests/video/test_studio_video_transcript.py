@@ -28,9 +28,6 @@ class VideoTranscriptTest(CMSVideoBaseTest):
     CMS Video Transcript Test Class
     """
 
-    def setUp(self):
-        super(VideoTranscriptTest, self).setUp()
-
     def _create_video_component(self, subtitles=False, subtitle_id='3_yD_cEKoCk'):
         """
         Create a video component and navigate to unit page

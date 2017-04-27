@@ -630,9 +630,6 @@ class GenerateExampleCertificatesTest(TestCase):
 
     COURSE_KEY = CourseLocator(org='test', course='test', run='test')
 
-    def setUp(self):
-        super(GenerateExampleCertificatesTest, self).setUp()
-
     def test_generate_example_certs(self):
         # Generate certificates for the course
         CourseModeFactory.create(course_id=self.COURSE_KEY, mode_slug=CourseMode.HONOR)
@@ -717,9 +714,6 @@ class CertificatesBrandingTest(TestCase):
     """Test certificates branding. """
 
     COURSE_KEY = CourseLocator(org='test', course='test', run='test')
-
-    def setUp(self):
-        super(CertificatesBrandingTest, self).setUp()
 
     @set_microsite(settings.MICROSITE_CONFIGURATION['test_site']['domain_prefix'])
     def test_certificate_header_data(self):

@@ -172,12 +172,6 @@ class LtiLaunchTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCa
     """
     SUCCESS_ENROLLED_STAFF_MONGO_COUNT = 9
 
-    def setUp(self):
-        """
-        Set up tests
-        """
-        super(LtiLaunchTestRender, self).setUp()
-
     def get_response(self, usage_key, url_encoded_params=None):
         """
         Overridable method to get the response from the endpoint that is being tested.

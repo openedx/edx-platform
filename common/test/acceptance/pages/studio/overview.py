@@ -1109,9 +1109,6 @@ class SubsectionOutlineModal(CourseOutlineModal):
     Subclass to handle a few special cases with subsection modals.
     """
 
-    def __init__(self, page):
-        super(SubsectionOutlineModal, self).__init__(page)
-
     @property
     def is_explicitly_locked(self):
         """

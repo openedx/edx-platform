@@ -169,10 +169,6 @@ class TestLTIModuleListing(SharedModuleStoreTestCase):
             publish_item=False,
         )
 
-    def setUp(self):
-        """Create course, 2 chapters, 2 sections"""
-        super(TestLTIModuleListing, self).setUp()
-
     def expected_handler_url(self, handler):
         """convenience method to get the reversed handler urls"""
         return "https://{}{}".format(settings.SITE_NAME, reverse(

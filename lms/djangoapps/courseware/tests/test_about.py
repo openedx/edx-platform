@@ -257,12 +257,6 @@ class AboutWithCappedEnrollmentsTestCase(LoginEnrollmentTestCase, SharedModuleSt
             data="OOGIE BLOOGIE", display_name="overview"
         )
 
-    def setUp(self):
-        """
-        Set up the tests
-        """
-        super(AboutWithCappedEnrollmentsTestCase, self).setUp()
-
     def test_enrollment_cap(self):
         """
         This test will make sure that enrollment caps are enforced
@@ -310,9 +304,6 @@ class AboutWithInvitationOnly(SharedModuleStoreTestCase):
             display_name="overview"
         )
 
-    def setUp(self):
-        super(AboutWithInvitationOnly, self).setUp()
-
     def test_invitation_only(self):
         """
         Test for user not logged in, invitation only course.
@@ -359,9 +350,6 @@ class AboutTestCaseShibCourse(LoginEnrollmentTestCase, SharedModuleStoreTestCase
             category="about", parent_location=cls.course.location,
             data="OOGIE BLOOGIE", display_name="overview"
         )
-
-    def setUp(self):
-        super(AboutTestCaseShibCourse, self).setUp()
 
     def test_logged_in_shib_course(self):
         """

@@ -236,9 +236,6 @@ class CanonicalContentTest(SharedModuleStoreTestCase):
     set, CDN not set, etc.
     """
 
-    def setUp(self):
-        super(CanonicalContentTest, self).setUp()
-
     @classmethod
     def setUpClass(cls):
         cls.courses = {}

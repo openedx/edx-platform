@@ -131,9 +131,6 @@ class MixedWithOptionsTestCase(MixedSplitTestCase):
     INDEX_NAME = None
     DOCUMENT_TYPE = None
 
-    def setUp(self):
-        super(MixedWithOptionsTestCase, self).setUp()
-
     def setup_course_base(self, store):
         """ base version of setup_course_base is a no-op """
         pass

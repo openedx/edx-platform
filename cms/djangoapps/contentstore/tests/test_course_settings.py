@@ -86,9 +86,6 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
     """
     Tests for modifying content on the first course settings page (course dates, overview, etc.).
     """
-    def setUp(self):
-        super(CourseDetailsViewTest, self).setUp()
-
     def alter_field(self, url, details, field, val):
         """
         Change the one field to the given value and then invoke the update post to see if it worked.
