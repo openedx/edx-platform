@@ -1,3 +1,0 @@
-{% load i18n %}{% autoescape off %}
-{% blocktrans %}{{ platform_name }} Account Information{% endblocktrans %}
-{% endautoescape %}
