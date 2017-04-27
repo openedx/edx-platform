@@ -501,6 +501,8 @@ def set_course_cohort_settings(course_key, **kwargs):
                     map(lambda segmented_discussion: segmented_discussion.discussion_id, segmented_discussions)
                 )
 
+                # Get the set difference of IDs that have been received and what currently exist
+                # New IDs need to be bulk inserted into the CourseSegmentedDiscussion table
                 segmented_discussion_ids_to_create = set(kwargs[field]) - set(segmented_discussion_ids)
                 segmented_discussions_to_create = list(map(lambda segmented_discussion_id: CourseSegmentedDiscussion(
                     course_cohorts_settings=course_cohort_settings,
@@ -509,6 +511,8 @@ def set_course_cohort_settings(course_key, **kwargs):
                 ), segmented_discussion_ids_to_create))
                 CourseSegmentedDiscussion.objects.bulk_create(segmented_discussions_to_create)
 
+                # Get the set difference between the list of IDs we have, and all desired IDs that have been received
+                # IDs that exist in the DB but have not been received need to be deleted from the table
                 segmented_discussion_ids_to_delete = set(segmented_discussion_ids) - set(kwargs[field])
                 CourseSegmentedDiscussion.objects.filter(
                     discussion_id__in=segmented_discussion_ids_to_delete).delete()
