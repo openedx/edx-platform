@@ -635,3 +635,16 @@ section.tos {
 body .login-register .nav-btn {
   height: auto;
 }
+
+.dashboard {
+  .empty-dashboard-message{
+    p {
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    a:hover, a:focus {
+      color: #fff;
+    }
+  }
+}
