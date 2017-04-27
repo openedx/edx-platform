@@ -12,3 +12,6 @@ clean:
 	-git clean -fdX
 	tar xf $(PRIVATE_FILES)
 	rm $(PRIVATE_FILES)
+
+not_really_clean:
+	rm $(PRIVATE_FILES)
