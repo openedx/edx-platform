@@ -29,12 +29,13 @@ from util.testing import UrlResetMixin
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from util.tests.mixins.discovery import CourseCatalogServiceMockMixin
 from util import organizations_helpers as organizations_api
+from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 
 
 @attr(shard=3)
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase, EnterpriseServiceMockMixin, CourseCatalogServiceMockMixin):
+class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTestCase, EnterpriseServiceMockMixin, CourseCatalogServiceMockMixin):
     """
     Course Mode View tests
     """
@@ -155,6 +156,9 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase, EnterpriseServiceMo
         for mode in ('audit', 'honor', 'verified'):
             CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)
 
+        catalog_integration = self.create_catalog_integration()
+        UserFactory(username=catalog_integration.service_username)
+
         self.mock_enterprise_learner_api()
 
         self.mock_course_discovery_api_for_catalog_contains(
@@ -185,6 +189,8 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase, EnterpriseServiceMo
         for mode in ('audit', 'honor', 'verified'):
             CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)
 
+        catalog_integration = self.create_catalog_integration()
+        UserFactory(username=catalog_integration.service_username)
         self.mock_enterprise_learner_api()
         self.mock_course_discovery_api_for_catalog_contains(
             catalog_id=1, course_run_ids=[str(self.course.id)]
