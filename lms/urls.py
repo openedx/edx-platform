@@ -48,9 +48,6 @@ urlpatterns = (
 
     url(r'^password_reset/$', 'student.views.password_reset', name='password_reset'),
 
-    url(r'^details_reset_confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$', 'student.views.details_reset_confirm_wrapper',
-        name='details_reset_confirm'),
-    url(r'^access_new_account$', 'student.views.details_reset_confirm', name="reset_details"),
     url(r'^reload_login', 'student.views.reload_login', name='reload_login'),
     ## Obsolete Django views for password resets
     ## TODO: Replace with Mako-ized views
