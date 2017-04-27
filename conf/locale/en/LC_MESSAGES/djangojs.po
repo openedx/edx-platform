@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-04-11 15:04+0000\n"
-"PO-Revision-Date: 2017-04-11 15:06:29.691078\n"
+"POT-Creation-Date: 2017-04-27 12:10+0000\n"
+"PO-Revision-Date: 2017-04-27 12:11:15.755069\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -58,7 +58,6 @@ msgstr ""
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 #: cms/templates/js/certificate-details.underscore
 #: cms/templates/js/certificate-editor.underscore
-#: cms/templates/js/content-group-details.underscore
 #: cms/templates/js/content-group-editor.underscore
 #: cms/templates/js/course-instructor-details.underscore
 #: cms/templates/js/course-outline.underscore
@@ -67,6 +66,7 @@ msgstr ""
 #: cms/templates/js/course_info_update.underscore
 #: cms/templates/js/group-configuration-details.underscore
 #: cms/templates/js/group-configuration-editor.underscore
+#: cms/templates/js/partition-group-details.underscore
 #: cms/templates/js/show-textbook.underscore
 #: cms/templates/js/signatory-editor.underscore
 #: cms/templates/js/xblock-outline.underscore
@@ -286,6 +286,22 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Reply to Annotation"
 msgstr ""
+
+#. Translators: %(num_points)s is the number of points possible (examples: 1,
+#. 3, 10).;
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "%(num_points)s point possible (graded, results hidden)"
+msgid_plural "%(num_points)s points possible (graded, results hidden)"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Translators: %(num_points)s is the number of points possible (examples: 1,
+#. 3, 10).;
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "%(num_points)s point possible (ungraded, results hidden)"
+msgid_plural "%(num_points)s points possible (ungraded, results hidden)"
+msgstr[0] ""
+msgstr[1] ""
 
 #. Translators: %(num_points)s is the number of points possible (examples: 1,
 #. 3, 10).;
@@ -728,10 +744,10 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: cms/templates/js/certificate-details.underscore
-#: cms/templates/js/content-group-details.underscore
 #: cms/templates/js/course_info_handouts.underscore
 #: cms/templates/js/course_info_update.underscore
 #: cms/templates/js/group-configuration-details.underscore
+#: cms/templates/js/partition-group-details.underscore
 #: cms/templates/js/show-textbook.underscore
 #: cms/templates/js/signatory-details.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
@@ -1725,11 +1741,6 @@ msgstr ""
 #. Translators: Volume level equals 100%.
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Maximum"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
-msgid ""
-"VideoPlayer: Element corresponding to the given selector was not found."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
@@ -3457,6 +3468,12 @@ msgstr ""
 msgid "These users were successfully added as beta testers:"
 msgstr ""
 
+#: lms/static/js/instructor_dashboard/membership.js
+msgid ""
+"These users could not be added as beta testers because their accounts are "
+"not yet activated:"
+msgstr ""
+
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "These users were successfully removed as beta testers:"
@@ -3893,8 +3910,15 @@ msgid ""
 "sensitive nature of student information."
 msgstr ""
 
+#: lms/static/js/learner_dashboard/views/program_details_sidebar_view.js
+msgid "{type} Progress"
+msgstr ""
+
+#: lms/static/js/learner_dashboard/views/program_details_sidebar_view.js
+msgid "Earned Certificates"
+msgstr ""
+
 #: lms/static/js/learner_dashboard/views/program_details_view_2017.js
-#: lms/templates/learner_dashboard/program_card.underscore
 msgid "Enrolled"
 msgstr ""
 
@@ -4442,6 +4466,7 @@ msgid "Validation Error"
 msgstr ""
 
 #: lms/static/js/views/fields.js
+#: lms/templates/learner_dashboard/program_card.underscore
 msgid "In Progress"
 msgstr ""
 
@@ -4964,35 +4989,6 @@ msgstr ""
 msgid "Adding"
 msgstr ""
 
-#: cms/static/js/views/content_group_details.js
-#: cms/static/js/views/group_configuration_details.js
-msgid "Not in Use"
-msgstr ""
-
-#. Translators: 'count' is number of units that the group
-#. configuration is used in.
-#: cms/static/js/views/content_group_details.js
-#: cms/static/js/views/group_configuration_details.js
-msgid "Used in {count} unit"
-msgid_plural "Used in {count} units"
-msgstr[0] ""
-msgstr[1] ""
-
-#. Translators: This refers to a content group that can be linked to a student
-#. cohort.
-#: cms/static/js/views/content_group_item.js
-#: cms/static/js/views/content_group_list.js
-msgid "content group"
-msgstr ""
-
-#: cms/static/js/views/content_group_list.js
-msgid "Add your first content group"
-msgstr ""
-
-#: cms/static/js/views/content_group_list.js
-msgid "You have not created any content groups yet."
-msgstr ""
-
 #: cms/static/js/views/course_info_update.js
 msgid "Are you sure you want to delete this update?"
 msgstr ""
@@ -5068,6 +5064,20 @@ msgstr ""
 #: cms/static/js/views/group_configuration_details.js
 msgid "Contains {count} group"
 msgid_plural "Contains {count} groups"
+msgstr[0] ""
+msgstr[1] ""
+
+#: cms/static/js/views/group_configuration_details.js
+#: cms/static/js/views/partition_group_details.js
+msgid "Not in Use"
+msgstr ""
+
+#. Translators: 'count' is number of units that the group
+#. configuration is used in.
+#: cms/static/js/views/group_configuration_details.js
+#: cms/static/js/views/partition_group_details.js
+msgid "Used in {count} unit"
+msgid_plural "Used in {count} units"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -5250,6 +5260,10 @@ msgstr ""
 msgid "Basic"
 msgstr ""
 
+#: cms/static/js/views/modals/course_outline_modals.js
+msgid "Visibility"
+msgstr ""
+
 #. Translators: "title" is the name of the current component being edited.
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Editing: %(title)s"
@@ -5309,8 +5323,8 @@ msgid "This {parentCategory} has no {childCategory}"
 msgstr ""
 
 #: cms/static/js/views/move_xblock_list.js
-#: cms/templates/js/content-group-details.underscore
 #: cms/templates/js/group-configuration-details.underscore
+#: cms/templates/js/partition-group-details.underscore
 msgid "Course Outline"
 msgstr ""
 
@@ -5423,6 +5437,21 @@ msgstr ""
 #. "Showing 0-9 out of 25 total".
 #: cms/static/js/views/paging_header.js
 msgid "{totalItems} total"
+msgstr ""
+
+#. Translators: This refers to a content group that can be linked to a student
+#. cohort.
+#: cms/static/js/views/partition_group_item.js
+#: cms/static/js/views/partition_group_list.js
+msgid "content group"
+msgstr ""
+
+#: cms/static/js/views/partition_group_list.js
+msgid "Add your first content group"
+msgstr ""
+
+#: cms/static/js/views/partition_group_list.js
+msgid "You have not created any content groups yet."
 msgstr ""
 
 #. Translators: This is listed as the duration for a video
@@ -6000,7 +6029,12 @@ msgstr ""
 
 #: common/static/common/templates/discussion/thread-show.underscore
 #, python-format
-msgid "%(post_type)s posted %(time_ago)s by %(author)s"
+msgid "discussion posted %(time_ago)s by %(author)s"
+msgstr ""
+
+#: common/static/common/templates/discussion/thread-show.underscore
+#, python-format
+msgid "question posted %(time_ago)s by %(author)s"
 msgstr ""
 
 #: common/static/common/templates/discussion/thread-show.underscore
@@ -6560,7 +6594,27 @@ msgid "Click to edit"
 msgstr ""
 
 #: lms/templates/fields/field_order_history.underscore
+msgid "Order Number"
+msgstr ""
+
+#: lms/templates/fields/field_order_history.underscore
+msgid "Date Placed"
+msgstr ""
+
+#: lms/templates/fields/field_order_history.underscore
+msgid "Cost"
+msgstr ""
+
+#: lms/templates/fields/field_order_history.underscore
 msgid "Order Details"
+msgstr ""
+
+#: lms/templates/fields/field_order_history.underscore
+msgid "for"
+msgstr ""
+
+#: lms/templates/fields/field_order_history.underscore
+msgid "Product Name"
 msgstr ""
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
@@ -6957,7 +7011,6 @@ msgid "View Archived Course"
 msgstr ""
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
-#: lms/templates/learner_dashboard/program_card.underscore
 msgid "Not Enrolled"
 msgstr ""
 
@@ -7032,8 +7085,21 @@ msgid "Completed"
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_card.underscore
+msgid "Remaining"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_card.underscore
 #, python-format
 msgid "%(programName)s Home Page."
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid "Your {program} Certificate"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+#, python-format
+msgid "Open the certificate you earned for the %(title)s program."
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_view_2017.underscore
@@ -7987,8 +8053,8 @@ msgid "Lock/unlock file"
 msgstr ""
 
 #: cms/templates/js/certificate-details.underscore
-#: cms/templates/js/content-group-details.underscore
 #: cms/templates/js/group-configuration-details.underscore
+#: cms/templates/js/partition-group-details.underscore
 msgid "ID"
 msgstr ""
 
@@ -8084,21 +8150,6 @@ msgid ""
 "changes you will change the student experience."
 msgstr ""
 
-#: cms/templates/js/content-group-details.underscore
-#: cms/templates/js/content-group-editor.underscore
-msgid "Cannot delete when in use by a unit"
-msgstr ""
-
-#: cms/templates/js/content-group-details.underscore
-msgid "This content group is used in:"
-msgstr ""
-
-#: cms/templates/js/content-group-details.underscore
-msgid ""
-"This content group is not in use. Add a content group to any unit from the "
-"{linkStart}Course Outline{linkEnd}."
-msgstr ""
-
 #: cms/templates/js/content-group-editor.underscore
 msgid "Content Group Name"
 msgstr ""
@@ -8113,6 +8164,11 @@ msgstr ""
 
 #: cms/templates/js/content-group-editor.underscore
 msgid "This content group is used in one or more units."
+msgstr ""
+
+#: cms/templates/js/content-group-editor.underscore
+#: cms/templates/js/partition-group-details.underscore
+msgid "Cannot delete when in use by a unit"
 msgstr ""
 
 #: cms/templates/js/content-visibility-editor.underscore
@@ -8247,6 +8303,11 @@ msgstr ""
 
 #: cms/templates/js/course-outline.underscore
 msgid "Unpublished changes to content that will release in the future"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
+msgid ""
+"Some content in this unit is visible only to specific groups of learners"
 msgstr ""
 
 #: cms/templates/js/course-outline.underscore
@@ -8655,6 +8716,16 @@ msgstr ""
 msgid "Add your first textbook"
 msgstr ""
 
+#: cms/templates/js/partition-group-details.underscore
+msgid "This group controls visibility of:"
+msgstr ""
+
+#: cms/templates/js/partition-group-details.underscore
+msgid ""
+"Use this group to control a component's visibility in the {linkStart}Course "
+"Outline{linkEnd}."
+msgstr ""
+
 #: cms/templates/js/previous-video-upload-list.underscore
 msgid "Previous Uploads"
 msgstr ""
@@ -8684,7 +8755,6 @@ msgid "Never published"
 msgstr ""
 
 #: cms/templates/js/publish-history.underscore
-#: cms/templates/js/publish-xblock.underscore
 #, python-format
 msgid "Last published %(last_published_date)s by %(publish_username)s"
 msgstr ""
@@ -8723,8 +8793,15 @@ msgid "Publishing Status"
 msgstr ""
 
 #: cms/templates/js/publish-xblock.underscore
-#, python-format
-msgid "Draft saved on %(last_saved_date)s by %(edit_username)s"
+msgid ""
+"Draft saved on {lastSavedStart}{editedOn}{lastSavedEnd} by "
+"{editedByStart}{editedBy}{editedByEnd}"
+msgstr ""
+
+#: cms/templates/js/publish-xblock.underscore
+msgid ""
+"Last published {lastPublishedStart}{publishedOn}{lastPublishedEnd} by "
+"{publishedByStart}{publishedBy}{publishedByEnd}"
 msgstr ""
 
 #: cms/templates/js/publish-xblock.underscore
@@ -8781,6 +8858,60 @@ msgstr ""
 
 #: cms/templates/js/release-date-editor.underscore
 msgid "Clear Release Date/Time"
+msgstr ""
+
+#: cms/templates/js/show-correctness-editor.underscore
+msgid "Assessment Results Visibility"
+msgstr ""
+
+#: cms/templates/js/show-correctness-editor.underscore
+msgid "Always show assessment results"
+msgstr ""
+
+#: cms/templates/js/show-correctness-editor.underscore
+msgid ""
+"When learners submit an answer to an assessment, they immediately see "
+"whether the answer is correct or incorrect, and the score received."
+msgstr ""
+
+#: cms/templates/js/show-correctness-editor.underscore
+msgid "Never show assessment results"
+msgstr ""
+
+#: cms/templates/js/show-correctness-editor.underscore
+msgid ""
+"Learners never see whether their answers to assessments are correct or "
+"incorrect, nor the score received."
+msgstr ""
+
+#: cms/templates/js/show-correctness-editor.underscore
+msgid "Show assessment results when subsection is past due"
+msgstr ""
+
+#: cms/templates/js/show-correctness-editor.underscore
+msgid ""
+"Learners do not see whether their answers to assessments were correct or "
+"incorrect, nor the score received, until after the course end date has "
+"passed."
+msgstr ""
+
+#: cms/templates/js/show-correctness-editor.underscore
+msgid ""
+"If the course does not have an end date, learners always see their scores "
+"when they submit answers to assessments."
+msgstr ""
+
+#: cms/templates/js/show-correctness-editor.underscore
+msgid ""
+"Learners do not see whether their answers to assessments were correct or "
+"incorrect, nor the score received, until after the due date for the "
+"subsection has passed."
+msgstr ""
+
+#: cms/templates/js/show-correctness-editor.underscore
+msgid ""
+"If the subsection does not have a due date, learners always see their scores"
+" when they submit answers to assessments."
 msgstr ""
 
 #: cms/templates/js/show-textbook.underscore
