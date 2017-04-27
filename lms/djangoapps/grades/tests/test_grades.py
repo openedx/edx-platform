@@ -60,7 +60,7 @@ class TestGradeIteration(SharedModuleStoreTestCase):
         If we don't pass in any students, it should return a zero-length
         iterator, but it shouldn't error.
         """
-        grade_results = list(CourseGradeFactory().iter(self.course, []))
+        grade_results = list(CourseGradeFactory().iter([], self.course))
         self.assertEqual(grade_results, [])
 
     def test_all_empty_grades(self):
@@ -130,7 +130,7 @@ class TestGradeIteration(SharedModuleStoreTestCase):
         students_to_course_grades = {}
         students_to_errors = {}
 
-        for student, course_grade, err_msg in CourseGradeFactory().iter(course, students):
+        for student, course_grade, err_msg in CourseGradeFactory().iter(students, course):
             students_to_course_grades[student] = course_grade
             if err_msg:
                 students_to_errors[student] = err_msg

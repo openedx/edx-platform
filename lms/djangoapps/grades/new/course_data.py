@@ -1,4 +1,5 @@
 from lms.djangoapps.course_blocks.api import get_course_blocks
+from openedx.core.djangoapps.content.block_structure.api import get_block_structure_manager
 from xmodule.modulestore.django import modulestore
 from ..transformer import GradesTransformer
 
@@ -55,6 +56,12 @@ class CourseData(object):
                 collected_block_structure=self._collected_block_structure,
             )
         return self._structure
+
+    @property
+    def collected_structure(self):
+        if not self._collected_block_structure:
+            self._collected_block_structure = get_block_structure_manager(self.course_key).get_collected()
+        return self._collected_block_structure
 
     @property
     def course(self):

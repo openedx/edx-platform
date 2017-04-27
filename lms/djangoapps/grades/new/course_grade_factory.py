@@ -2,7 +2,6 @@ from collections import namedtuple
 import dogstats_wrapper as dog_stats_api
 from logging import getLogger
 
-from openedx.core.djangoapps.content.block_structure.api import get_block_structure_manager
 from openedx.core.djangoapps.signals.signals import COURSE_GRADE_CHANGED
 
 from ..config import assume_zero_if_absent, should_persist_grades
@@ -77,7 +76,15 @@ class CourseGradeFactory(object):
         course_data = CourseData(user, course, collected_block_structure, course_structure, course_key)
         return self._update(user, course_data, read_only=False)
 
-    def iter(self, course, students, force_update=False):
+    def iter(
+            self,
+            users,
+            course=None,
+            collected_block_structure=None,
+            course_structure=None,
+            course_key=None,
+            force_update=False,
+    ):
         """
         Given a course and an iterable of students (User), yield a GradeResult
         for every student enrolled in the course.  GradeResult is a named tuple of:
@@ -92,25 +99,27 @@ class CourseGradeFactory(object):
         #    compute the grade for all students.
         # 2. Optimization: the collected course_structure is not
         #    retrieved from the data store multiple times.
-
-        collected_block_structure = get_block_structure_manager(course.id).get_collected()
-        for student in students:
-            with dog_stats_api.timer('lms.grades.CourseGradeFactory.iter', tags=[u'action:{}'.format(course.id)]):
+        course_data = CourseData(None, course, collected_block_structure, course_structure, course_key)
+        for user in users:
+            with dog_stats_api.timer(
+                    'lms.grades.CourseGradeFactory.iter',
+                    tags=[u'action:{}'.format(course_data.course_key)]
+            ):
                 try:
-                    operation = CourseGradeFactory().update if force_update else CourseGradeFactory().create
-                    course_grade = operation(student, course, collected_block_structure)
-                    yield self.GradeResult(student, course_grade, "")
+                    method = CourseGradeFactory().update if force_update else CourseGradeFactory().create
+                    course_grade = method(user, course, course_data.collected_structure, course_structure, course_key)
+                    yield self.GradeResult(user, course_grade, "")
 
                 except Exception as exc:  # pylint: disable=broad-except
                     # Keep marching on even if this student couldn't be graded for
                     # some reason, but log it for future reference.
                     log.exception(
                         'Cannot grade student %s in course %s because of exception: %s',
-                        student.id,
-                        course.id,
+                        user.id,
+                        course_data.course_key,
                         exc.message
                     )
-                    yield self.GradeResult(student, None, exc.message)
+                    yield self.GradeResult(user, None, exc.message)
 
     @staticmethod
     def _create_zero(user, course_data):

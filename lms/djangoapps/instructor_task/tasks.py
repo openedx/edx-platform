@@ -39,9 +39,9 @@ from lms.djangoapps.instructor_task.tasks_helper.enrollments import (
     upload_students_csv,
 )
 from lms.djangoapps.instructor_task.tasks_helper.grades import (
-    generate_course_grade_report,
-    generate_problem_grade_report,
-    upload_problem_responses_csv,
+    CourseGradeReport,
+    ProblemGradeReport,
+    ProblemResponses,
 )
 from lms.djangoapps.instructor_task.tasks_helper.misc import (
     cohort_students_and_upload,
@@ -160,7 +160,7 @@ def calculate_problem_responses_csv(entry_id, xmodule_instance_args):
     """
     # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
     action_name = ugettext_noop('generated')
-    task_fn = partial(upload_problem_responses_csv, xmodule_instance_args)
+    task_fn = partial(ProblemResponses.generate, xmodule_instance_args)
     return run_main_task(entry_id, task_fn, action_name)
 
 
@@ -176,7 +176,7 @@ def calculate_grades_csv(entry_id, xmodule_instance_args):
         xmodule_instance_args.get('task_id'), entry_id, action_name
     )
 
-    task_fn = partial(generate_course_grade_report, xmodule_instance_args)
+    task_fn = partial(CourseGradeReport.generate, xmodule_instance_args)
     return run_main_task(entry_id, task_fn, action_name)
 
 
@@ -193,7 +193,7 @@ def calculate_problem_grade_report(entry_id, xmodule_instance_args):
         xmodule_instance_args.get('task_id'), entry_id, action_name
     )
 
-    task_fn = partial(generate_problem_grade_report, xmodule_instance_args)
+    task_fn = partial(ProblemGradeReport.generate, xmodule_instance_args)
     return run_main_task(entry_id, task_fn, action_name)
 
 
