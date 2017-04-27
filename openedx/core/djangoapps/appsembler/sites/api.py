@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
-from django.core.files.storage import DefaultStorage
+from django.core.files.storage import DefaultStorage, get_storage_class
 from django.db import transaction
 from rest_framework import generics, views, viewsets
 from rest_framework import status
@@ -70,7 +70,14 @@ class FileUploadView(views.APIView):
         return Response({'file_path': file_path}, status=201)
 
     def handle_uploaded_file(self, content, filename):
-        storage = DefaultStorage()
+        kwargs = {}
+        # passing these settings to the FileSystemStorage causes an exception
+        if not settings.DEBUG:
+            kwargs = {
+                'location': "customer_files",
+                'file_overwrite': False
+            }
+        storage = get_storage_class()(**kwargs)
         name = storage.save(filename, content)
         return storage.url(name)
 
