@@ -6,7 +6,8 @@ import collections
 import os
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.core.files.storage import FileSystemStorage
+from django.contrib.staticfiles.templatetags.staticfiles import static
+from django.core.files.storage import FileSystemStorage, get_storage_class
 from django.db import models
 from django.contrib.sites.models import Site
 from django.db.models.signals import post_save
@@ -14,6 +15,8 @@ from django.dispatch import receiver
 
 from django_extensions.db.models import TimeStampedModel
 from jsonfield.fields import JSONField
+
+from storages.backends.s3boto import S3BotoStorage
 
 from openedx.core.djangoapps.appsembler.sites.utils import get_initial_sass_variables, get_initial_page_elements, \
     compile_sass
@@ -139,20 +142,28 @@ class SiteConfiguration(models.Model):
 
     def compile_microsite_sass(self):
         css_output = compile_sass('main.scss', custom_branding=self._sass_var_override)
-        domain_without_port_number = self.site.domain.split(':')[0]
+        file_name = self.get_value('css_overrides_file')
         if settings.DEBUG:
             theme_folder = os.path.join(settings.COMPREHENSIVE_THEME_DIRS[0], 'customer_themes')
+            theme_file = os.path.join(theme_folder, '{}.css'.format(file_name))
+            with open(theme_file, 'w') as f:
+                f.write(css_output.encode('utf-8'))
         else:
-            theme_folder = os.path.join(settings.STATIC_ROOT, '..', 'customer_themes')
-        theme_file = os.path.join(theme_folder, '{}.css'.format(domain_without_port_number))
+            storage = S3BotoStorage(
+                location="customer_themes",
+            )
+            with storage.open(file_name, 'w') as f:
+                f.write(css_output.encode('utf-8'))
 
-        new_file = not os.path.exists(theme_file)
-        with open(theme_file, 'w') as f:
-            f.write(css_output.encode('utf-8'))
-
-        # only try once, it caused errors if we tried to reapply permissions
-        if new_file:
-            os.chmod(theme_file, 0777)
+    def get_css_url(self):
+        if settings.DEBUG:
+            return static("customer_themes/{}".format(self.get_value('css_overrides_file')))
+        else:
+            kwargs = {
+                'location': "customer_themes",
+            }
+            storage = get_storage_class()(**kwargs)
+            return storage.url(self.get_value('css_overrides_file'))
 
     def set_sass_variables(self, entries):
         """
