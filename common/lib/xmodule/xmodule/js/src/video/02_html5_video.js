@@ -61,17 +61,6 @@ function(_) {
         function Player(el, config) {
             var errorMessage, lastSource, sourceList;
 
-            // A simple test to see that the 'config' is a normal object.
-            if ($.isPlainObject(config) === false) {
-                return;
-            }
-
-            // We should have at least one video source. Otherwise there is no
-            // point to continue.
-            if (!config.videoSources && !config.videoSources.length) {
-                return;
-            }
-
             // Create HTML markup for individual sources of the HTML5 <video> element.
             sourceList = $.map(config.videoSources, function(source) {
                 return [
@@ -87,9 +76,7 @@ function(_) {
             });
 
             // do common initialization independent of player type
-            if (this.init(el, config) === false) {
-                return;
-            }
+            this.init(el, config);
 
             // Create HTML markup for the <video> element, populating it with
             // sources from previous step. Set playback not supported error message.
@@ -261,27 +248,7 @@ function(_) {
 
             this.config = config;
             this.logs = [];
-
-            // Initially we assume that el is a DOM element. If jQuery selector
-            // fails to select something, we assume that el is an ID of a DOM
-            // element. We try to select by ID. If jQuery fails this time, we
-            // return. Nothing breaks because the player 'onReady' event will
-            // never be fired.
             this.el = $(el);
-
-            if (this.el.length === 0) {
-                this.el = $('#' + el);
-
-                if (this.el.length === 0) {
-                    errorMessage = gettext('VideoPlayer: Element corresponding to the given selector was not found.');
-                    if (window.console && console.log) {
-                        console.log(errorMessage);
-                    } else {
-                        throw new Error(errorMessage);
-                    }
-                    return false;
-                }
-            }
 
             // Because of problems with creating video element via jquery
             // (http://bugs.jquery.com/ticket/9174) we create it using native JS.
@@ -346,8 +313,6 @@ function(_) {
 
             // Place the <video> element on the page.
             this.videoEl.appendTo(el.find('.video-player > div:first-child'));
-
-            return true;
         };
 
         return Player;
