@@ -31,7 +31,7 @@ from lms.djangoapps.grades.constants import ScoreDatabaseTableEnum
 from lms.djangoapps.grades.models import PersistentCourseGrade, PersistentSubsectionGrade
 from lms.djangoapps.grades.signals.signals import PROBLEM_WEIGHTED_SCORE_CHANGED
 from lms.djangoapps.grades.tasks import (
-    compute_grades_for_course,
+    compute_grades_for_course_v2,
     recalculate_subsection_grade_v3,
     RECALCULATE_GRADE_DELAY
 )
@@ -378,7 +378,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
 @ddt.ddt
 class ComputeGradesForCourseTest(HasCourseWithProblemsMixin, ModuleStoreTestCase):
     """
-    Test compute_grades_for_course task.
+    Test compute_grades_for_course_v2 task.
     """
 
     ENABLED_SIGNALS = ['course_published', 'pre_publish']
@@ -392,7 +392,7 @@ class ComputeGradesForCourseTest(HasCourseWithProblemsMixin, ModuleStoreTestCase
 
     @ddt.data(*xrange(0, 12, 3))
     def test_behavior(self, batch_size):
-        result = compute_grades_for_course.delay(
+        result = compute_grades_for_course_v2.delay(
             course_key=six.text_type(self.course.id),
             batch_size=batch_size,
             offset=4,
@@ -412,7 +412,7 @@ class ComputeGradesForCourseTest(HasCourseWithProblemsMixin, ModuleStoreTestCase
         per_user_queries = 17 * min(batch_size, 6)  # No more than 6 due to offset
         with self.assertNumQueries(5 + per_user_queries):
             with check_mongo_calls(1):
-                compute_grades_for_course.delay(
+                compute_grades_for_course_v2.delay(
                     course_key=six.text_type(self.course.id),
                     batch_size=batch_size,
                     offset=6,

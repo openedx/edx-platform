@@ -118,3 +118,29 @@ class TestComputeGrades(SharedModuleStoreTestCase):
                 },),
             ],
         )
+
+    @patch('lms.djangoapps.grades.tasks.compute_grades_for_course_v2')
+    def test_tasks_fired_from_settings(self, mock_task):
+        ComputeGradesSetting.objects.create(course_ids=self.course_keys[1], batch_size=2)
+        call_command('compute_grades', '--from_settings')
+        self.assertEqual(
+            mock_task.apply_async.call_args_list,
+            [
+                ({
+                    'kwargs': {
+                        'course_key': self.course_keys[1],
+                        'batch_size': 2,
+                        'offset': 0,
+                        'estimate_first_attempted': True
+                    },
+                },),
+                ({
+                    'kwargs': {
+                        'course_key': self.course_keys[1],
+                        'batch_size': 2,
+                        'offset': 2,
+                        'estimate_first_attempted': True
+                    },
+                },),
+            ],
+        )
