@@ -43,7 +43,8 @@ var options = {
     fixtureFiles: [
         {pattern: '../**/fixtures/**/*.html'},
         {pattern: '../**/templates/**/*.html'},
-        {pattern: '../**/*.underscore'}
+        {pattern: '../**/*.underscore'},
+        {pattern: '../**/*.svg'}
     ],
 
     runFiles: [

@@ -26,6 +26,7 @@
                         year_of_birth: 2014,
                         mailing_address: '141 Portland',
                         goals: 'To boldly learn what no letter of the alphabet has learned before',
+                        confirm_email: 'xsy@edx.org',
                         honor_code: true
                     },
                     THIRD_PARTY_AUTH = {
@@ -57,6 +58,16 @@
                                 label: 'Email',
                                 defaultValue: '',
                                 type: 'email',
+                                required: true,
+                                instructions: 'Enter your email.',
+                                restrictions: {}
+                            },
+                            {
+                                placeholder: '',
+                                name: 'confirm_email',
+                                label: 'Confirm Email',
+                                defaultValue: '',
+                                type: 'text',
                                 required: true,
                                 instructions: 'Enter your email.',
                                 restrictions: {}
@@ -203,6 +214,7 @@
 
                 // Simulate manual entry of registration form data
                     $('#register-email').val(USER_DATA.email);
+                    $('#register-confirm_email').val(USER_DATA.email);
                     $('#register-name').val(USER_DATA.name);
                     $('#register-username').val(USER_DATA.username);
                     $('#register-password').val(USER_DATA.password);

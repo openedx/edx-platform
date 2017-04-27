@@ -30,6 +30,7 @@ class CoursewarePage(CoursePage):
     def is_browser_on_page(self):
         return self.q(css='.course-content').present
 
+    # TODO: TNL-6546: Remove and find callers
     @property
     def chapter_count_in_navigation(self):
         """

@@ -5,18 +5,23 @@ from __future__ import absolute_import, division, print_function
 
 import copy
 import json
-import mock
 from uuid import uuid4
 
+import mock
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.test.utils import override_settings
-
+from opaque_keys.edx.locator import CourseLocator
+from organizations.models import OrganizationCourse
+from organizations.tests.factories import OrganizationFactory
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
+from xmodule.modulestore.django import modulestore
 
-from contentstore.tasks import export_olx
+from contentstore.tasks import export_olx, rerun_course
 from contentstore.tests.test_libraries import LibraryTestCase
 from contentstore.tests.utils import CourseTestCase
+from course_action_state.models import CourseRerunState
+from openedx.core.djangoapps.embargo.models import RestrictedCourse, CountryAccessRule, Country
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
@@ -99,10 +104,60 @@ class ExportLibraryTestCase(LibraryTestCase):
         Verify that a routine library export task succeeds
         """
         key = str(self.lib_key)
-        result = export_olx.delay(self.user.id, key, u'en')   # pylint: disable=no-member
+        result = export_olx.delay(self.user.id, key, u'en')  # pylint: disable=no-member
         status = UserTaskStatus.objects.get(task_id=result.id)
         self.assertEqual(status.state, UserTaskStatus.SUCCEEDED)
         artifacts = UserTaskArtifact.objects.filter(status=status)
         self.assertEqual(len(artifacts), 1)
         output = artifacts[0]
         self.assertEqual(output.name, 'Output')
+
+
+@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
+class RerunCourseTaskTestCase(CourseTestCase):
+    def _rerun_course(self, old_course_key, new_course_key):
+        CourseRerunState.objects.initiated(old_course_key, new_course_key, self.user, 'Test Re-run')
+        rerun_course(str(old_course_key), str(new_course_key), self.user.id)
+
+    def test_success(self):
+        """ The task should clone the OrganizationCourse and RestrictedCourse data. """
+        old_course_key = self.course.id
+        new_course_key = CourseLocator(org=old_course_key.org, course=old_course_key.course, run='rerun')
+
+        old_course_id = str(old_course_key)
+        new_course_id = str(new_course_key)
+
+        organization = OrganizationFactory()
+        OrganizationCourse.objects.create(course_id=old_course_id, organization=organization)
+
+        restricted_course = RestrictedCourse.objects.create(course_key=self.course.id)
+        restricted_country = Country.objects.create(country='US')
+
+        CountryAccessRule.objects.create(
+            rule_type=CountryAccessRule.BLACKLIST_RULE,
+            restricted_course=restricted_course,
+            country=restricted_country
+        )
+
+        # Run the task!
+        self._rerun_course(old_course_key, new_course_key)
+
+        # Verify the new course run exists
+        course = modulestore().get_course(new_course_key)
+        self.assertIsNotNone(course)
+
+        # Verify the OrganizationCourse is cloned
+        self.assertEqual(OrganizationCourse.objects.count(), 2)
+        # This will raise an error if the OrganizationCourse object was not cloned
+        OrganizationCourse.objects.get(course_id=new_course_id, organization=organization)
+
+        # Verify the RestrictedCourse and related objects are cloned
+        self.assertEqual(RestrictedCourse.objects.count(), 2)
+        restricted_course = RestrictedCourse.objects.get(course_key=new_course_key)
+
+        self.assertEqual(CountryAccessRule.objects.count(), 2)
+        CountryAccessRule.objects.get(
+            rule_type=CountryAccessRule.BLACKLIST_RULE,
+            restricted_course=restricted_course,
+            country=restricted_country
+        )

@@ -11,6 +11,7 @@ import mock
 from nose.plugins.attrib import attr
 from pytz import utc
 
+from course_modes.models import CourseMode
 from lms.djangoapps.certificates.api import MODES
 from lms.djangoapps.commerce.tests.test_utils import update_commerce_config
 from openedx.core.djangoapps.catalog.tests.factories import (
@@ -40,6 +41,7 @@ CERTIFICATES_API_MODULE = 'lms.djangoapps.certificates.api'
 ECOMMERCE_URL_ROOT = 'https://example-ecommerce.com'
 
 
+@ddt.ddt
 @attr(shard=2)
 @skip_unless_lms
 @mock.patch(UTILS_MODULE + '.get_programs')
@@ -53,7 +55,7 @@ class TestProgramProgressMeter(TestCase):
     def _create_enrollments(self, *course_run_ids):
         """Variadic helper used to create course run enrollments."""
         for course_run_id in course_run_ids:
-            CourseEnrollmentFactory(user=self.user, course_id=course_run_id)
+            CourseEnrollmentFactory(user=self.user, course_id=course_run_id, mode='verified')
 
     def _assert_progress(self, meter, *progresses):
         """Variadic helper used to verify progress calculations."""
@@ -63,6 +65,23 @@ class TestProgramProgressMeter(TestCase):
         """Add expected detail URLs to a list of program dicts."""
         for program in programs:
             program['detail_url'] = reverse('program_details_view', kwargs={'program_uuid': program['uuid']})
+
+    def _make_certificate_result(self, **kwargs):
+        """Helper to create dummy results from the certificates API."""
+        result = {
+            'username': 'dummy-username',
+            'course_key': 'dummy-course',
+            'type': 'dummy-type',
+            'status': 'dummy-status',
+            'download_url': 'http://www.example.com/cert.pdf',
+            'grade': '0.98',
+            'created': '2015-07-31T00:00:00Z',
+            'modified': '2015-07-31T00:00:00Z',
+        }
+
+        result.update(**kwargs)
+
+        return result
 
     def test_no_enrollments(self, mock_get_programs):
         """Verify behavior when programs exist, but no relevant enrollments do."""
@@ -149,6 +168,82 @@ class TestProgramProgressMeter(TestCase):
         ]
 
         self.assertEqual(meter.progress(count_only=False), expected)
+
+    def test_no_id_professional_in_progress(self, mock_get_programs):
+        """
+        Verify that the progress meter treats no-id-professional enrollments
+        as professional.
+        """
+        course_run_key = generate_course_run_key()
+        data = [
+            ProgramFactory(
+                courses=[
+                    CourseFactory(course_runs=[
+                        CourseRunFactory(key=course_run_key, type=CourseMode.PROFESSIONAL),
+                    ]),
+                ]
+            )
+        ]
+        mock_get_programs.return_value = data
+
+        CourseEnrollmentFactory(
+            user=self.user, course_id=course_run_key,
+            mode=CourseMode.NO_ID_PROFESSIONAL_MODE
+        )
+
+        meter = ProgramProgressMeter(self.user)
+
+        program = data[0]
+        expected = [
+            ProgressFactory(
+                uuid=program['uuid'],
+                completed=[],
+                in_progress=[program['courses'][0]],
+                not_started=[]
+            )
+        ]
+
+        self.assertEqual(meter.progress(count_only=False), expected)
+
+    @ddt.data(1, -1)
+    def test_in_progress_course_upgrade_deadline_check(self, modifier, mock_get_programs):
+        """
+        Verify that if the user's enrollment is not of the same type as the course run,
+        the course will only count as in progress if there is another available seat with
+        the right type, where the upgrade deadline has not expired.
+        """
+        course_run_key = generate_course_run_key()
+        now = datetime.datetime.now(utc)
+        date_modifier = modifier * datetime.timedelta(days=1)
+        seat_with_upgrade_deadline = SeatFactory(type='test', upgrade_deadline=str(now + date_modifier))
+        enrolled_seat = SeatFactory(type='verified')
+        seats = [seat_with_upgrade_deadline, enrolled_seat]
+
+        data = [
+            ProgramFactory(
+                courses=[
+                    CourseFactory(course_runs=[
+                        CourseRunFactory(key=course_run_key, type='test', seats=seats),
+                    ]),
+                ]
+            )
+        ]
+        mock_get_programs.return_value = data
+
+        self._create_enrollments(course_run_key)
+
+        meter = ProgramProgressMeter(self.user)
+
+        program = data[0]
+        expected = [
+            ProgressFactory(
+                uuid=program['uuid'],
+                completed=0,
+                in_progress=1 if modifier == 1 else 0,
+                not_started=1 if modifier == -1 else 0
+            )
+        ]
+        self.assertEqual(meter.progress(count_only=True), expected)
 
     def test_mutiple_program_engagement(self, mock_get_programs):
         """
@@ -380,25 +475,10 @@ class TestProgramProgressMeter(TestCase):
         """
         Verify that the method can find course run certificates when not mocked out.
         """
-        def make_certificate_result(**kwargs):
-            """Helper to create dummy results from the certificates API."""
-            result = {
-                'username': 'dummy-username',
-                'course_key': 'dummy-course',
-                'type': 'dummy-type',
-                'status': 'dummy-status',
-                'download_url': 'http://www.example.com/cert.pdf',
-                'grade': '0.98',
-                'created': '2015-07-31T00:00:00Z',
-                'modified': '2015-07-31T00:00:00Z',
-            }
-            result.update(**kwargs)
-            return result
-
         mock_get_certificates_for_user.return_value = [
-            make_certificate_result(status='downloadable', type='verified', course_key='downloadable-course'),
-            make_certificate_result(status='generating', type='honor', course_key='generating-course'),
-            make_certificate_result(status='unknown', course_key='unknown-course'),
+            self._make_certificate_result(status='downloadable', type='verified', course_key='downloadable-course'),
+            self._make_certificate_result(status='generating', type='honor', course_key='generating-course'),
+            self._make_certificate_result(status='unknown', course_key='unknown-course'),
         ]
 
         meter = ProgramProgressMeter(self.user)
@@ -410,6 +490,32 @@ class TestProgramProgressMeter(TestCase):
             ]
         )
         mock_get_certificates_for_user.assert_called_with(self.user.username)
+
+    @mock.patch(UTILS_MODULE + '.certificate_api.get_certificates_for_user')
+    def test_program_completion_with_no_id_professional(self, mock_get_certificates_for_user, mock_get_programs):
+        """
+        Verify that 'no-id-professional' certificates are treated as if they were
+        'professional' certificates when determining program completion.
+        """
+        # Create serialized course runs like the ones we expect to receive from
+        # the discovery service's API. These runs are of type 'professional'.
+        course_runs = CourseRunFactory.create_batch(2, type='professional')
+        program = ProgramFactory(courses=[CourseFactory(course_runs=course_runs)])
+        mock_get_programs.return_value = [program]
+
+        # Verify that the test program is not complete.
+        meter = ProgramProgressMeter(self.user)
+        self.assertEqual(meter.completed_programs, [])
+
+        # Grant a 'no-id-professional' certificate for one of the course runs,
+        # thereby completing the program.
+        mock_get_certificates_for_user.return_value = [
+            self._make_certificate_result(status='downloadable', type='no-id-professional', course_key=course_runs[0]['key'])
+        ]
+
+        # Verify that the program is complete.
+        meter = ProgramProgressMeter(self.user)
+        self.assertEqual(meter.completed_programs, [program['uuid']])
 
 
 @ddt.ddt
@@ -701,7 +807,7 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
             courses=[self._create_course(self.course_price) for __ in range(self.number_of_courses)]
         )
 
-    def _create_course(self, course_price):
+    def _create_course(self, course_price, is_enrolled=False):
         """
         Creates the course in mongo and update it with the instructor data.
         Also creates catalog course with respect to course run.
@@ -716,6 +822,7 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
         course = self.update_course(course, self.user.id)
 
         course_run = CourseRunFactory(
+            is_enrolled=is_enrolled,
             key=unicode(course.id),
             seats=[SeatFactory(price=course_price)]
         )
@@ -746,3 +853,29 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
         data = ProgramMarketingDataExtender(self.program, self.user).extend()
 
         self.assertEqual(data['courses'][0]['course_runs'][0]['can_enroll'], can_enroll)
+
+    def test_learner_eligibility_for_one_click_purchase(self):
+        """
+        Learner should be eligible for one click purchase if:
+        - program is eligible for one click purchase
+        - learner is not enrolled in any of the course runs associated with the program
+        """
+        data = ProgramMarketingDataExtender(self.program, self.user).extend()
+        self.assertTrue(data['is_learner_eligible_for_one_click_purchase'])
+
+        courses = [self._create_course(self.course_price)]
+
+        program = ProgramFactory(
+            courses=courses,
+            is_program_eligible_for_one_click_purchase=False
+        )
+        data = ProgramMarketingDataExtender(program, self.user).extend()
+        self.assertFalse(data['is_learner_eligible_for_one_click_purchase'])
+
+        courses.append(self._create_course(self.course_price, is_enrolled=True))
+        program2 = ProgramFactory(
+            courses=courses,
+            is_program_eligible_for_one_click_purchase=True
+        )
+        data = ProgramMarketingDataExtender(program2, self.user).extend()
+        self.assertFalse(data['is_learner_eligible_for_one_click_purchase'])

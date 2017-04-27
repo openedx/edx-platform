@@ -24,10 +24,13 @@ class CourseGradeBase(object):
         self.passed = passed
 
     def __unicode__(self):
-        return u'Course Grade: percent: %s, letter_grade: %s, passed: %s'.format(
-            unicode(self.percent), self.letter_grade, self.passed,
+        return u'Course Grade: percent: {}, letter_grade: {}, passed: {}'.format(
+            unicode(self.percent),
+            self.letter_grade,
+            self.passed,
         )
 
+    @property
     def attempted(self):
         """
         Returns whether at least one problem was attempted
@@ -59,21 +62,33 @@ class CourseGradeBase(object):
         subsection grades, display name, and url name.
         """
         course_structure = self.course_data.structure
-        return {
-            chapter_key: self._get_chapter_grade_info(course_structure[chapter_key], course_structure)
-            for chapter_key in course_structure.get_children(self.course_data.location)
-        }
+        grades = OrderedDict()
+        for chapter_key in course_structure.get_children(self.course_data.location):
+            grades[chapter_key] = self._get_chapter_grade_info(course_structure[chapter_key], course_structure)
+        return grades
 
     @lazy
-    def locations_to_scores(self):
+    def subsection_grades(self):
+        """
+        Returns an ordered dictionary of subsection grades,
+        keyed by subsection location.
+        """
+        subsection_grades = defaultdict(OrderedDict)
+        for chapter in self.chapter_grades.itervalues():
+            for subsection_grade in chapter['sections']:
+                subsection_grades[subsection_grade.location] = subsection_grade
+        return subsection_grades
+
+    @lazy
+    def problem_scores(self):
         """
         Returns a dict of problem scores keyed by their locations.
         """
-        locations_to_scores = {}
+        problem_scores = {}
         for chapter in self.chapter_grades.itervalues():
             for subsection_grade in chapter['sections']:
-                locations_to_scores.update(subsection_grade.locations_to_scores)
-        return locations_to_scores
+                problem_scores.update(subsection_grade.problem_scores)
+        return problem_scores
 
     def score_for_chapter(self, chapter_key):
         """
@@ -97,8 +112,8 @@ class CourseGradeBase(object):
         composite module (a vertical or section ) the scores will be the sums of
         all scored problems that are children of the chosen location.
         """
-        if location in self.locations_to_scores:
-            score = self.locations_to_scores[location]
+        if location in self.problem_scores:
+            score = self.problem_scores[location]
             return score.earned, score.possible
         children = self.course_data.structure.get_children(location)
         earned, possible = 0.0, 0.0
@@ -198,7 +213,7 @@ class CourseGrade(CourseGradeBase):
         """
         for chapter in self.chapter_grades.itervalues():
             for subsection_grade in chapter['sections']:
-                if subsection_grade.attempted:
+                if subsection_grade.all_total.first_attempted:
                     return True
         return False
 

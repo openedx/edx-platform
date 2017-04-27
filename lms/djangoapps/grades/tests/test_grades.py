@@ -2,8 +2,10 @@
 Test grade calculation.
 """
 
-import ddt
+import datetime
 import itertools
+
+import ddt
 from mock import patch
 from nose.plugins.attrib import attr
 
@@ -201,7 +203,9 @@ class TestWeightedProblems(SharedModuleStoreTestCase):
 
         # verify all problem grades
         for problem in self.problems:
-            problem_score = subsection_grade.locations_to_scores[problem.location]
+            problem_score = subsection_grade.problem_scores[problem.location]
+            self.assertEqual(type(expected_score.first_attempted), type(problem_score.first_attempted))
+            expected_score.first_attempted = problem_score.first_attempted
             self.assertEquals(problem_score, expected_score)
 
         # verify subsection grades
@@ -235,7 +239,7 @@ class TestWeightedProblems(SharedModuleStoreTestCase):
             weighted_possible=expected_w_possible,
             weight=weight,
             graded=expected_graded,
-            attempted=True,
+            first_attempted=datetime.datetime(2010, 1, 1),
         )
         self._verify_grades(raw_earned, raw_possible, weight, expected_score)
 

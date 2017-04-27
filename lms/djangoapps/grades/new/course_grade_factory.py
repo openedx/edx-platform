@@ -105,8 +105,7 @@ class CourseGradeFactory(object):
                     # Keep marching on even if this student couldn't be graded for
                     # some reason, but log it for future reference.
                     log.exception(
-                        'Cannot grade student %s (%s) in course %s because of exception: %s',
-                        student.username,
+                        'Cannot grade student %s in course %s because of exception: %s',
                         student.id,
                         course.id,
                         exc.message
@@ -130,7 +129,7 @@ class CourseGradeFactory(object):
         if not should_persist_grades(course_data.course_key):
             raise PersistentCourseGrade.DoesNotExist
 
-        persistent_grade = PersistentCourseGrade.read_course_grade(user.id, course_data.course_key)
+        persistent_grade = PersistentCourseGrade.read(user.id, course_data.course_key)
         course_grade = CourseGrade(
             user,
             course_data,
@@ -153,13 +152,13 @@ class CourseGradeFactory(object):
         course_grade.update()
 
         should_persist = (
-            not read_only and  # TODO(TNL-6786) Remove the read_only boolean once all grades are back-filled.
+            (not read_only) and  # TODO(TNL-6786) Remove the read_only boolean once all grades are back-filled.
             should_persist_grades(course_data.course_key) and
-            not waffle().is_enabled(WRITE_ONLY_IF_ENGAGED) or course_grade.attempted
+            (not waffle().is_enabled(WRITE_ONLY_IF_ENGAGED) or course_grade.attempted)
         )
         if should_persist:
             course_grade._subsection_grade_factory.bulk_create_unsaved()
-            PersistentCourseGrade.update_or_create_course_grade(
+            PersistentCourseGrade.update_or_create(
                 user_id=user.id,
                 course_id=course_data.course_key,
                 course_version=course_data.version,

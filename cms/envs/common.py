@@ -934,6 +934,9 @@ INSTALLED_APPS = (
     # Self-paced course configuration
     'openedx.core.djangoapps.self_paced',
 
+    # Video module configs (This will be moved to Video once it becomes an XBlock)
+    'openedx.core.djangoapps.video_config',
+
     # django-oauth2-provider (deprecated)
     'provider',
     'provider.oauth2',
@@ -1084,6 +1087,9 @@ OPTIONAL_APPS = (
 
     # Organizations App (http://github.com/edx/edx-organizations)
     'organizations',
+
+    # Enterprise App (http://github.com/edx/edx-enterprise)
+    'enterprise',
 )
 
 
@@ -1263,6 +1269,8 @@ USER_TASKS_MAX_AGE = timedelta(days=7)
 ############## Settings for the Enterprise App ######################
 
 ENTERPRISE_ENROLLMENT_API_URL = LMS_ROOT_URL + "/api/enrollment/v1/"
+ENTERPRISE_SERVICE_WORKER_USERNAME = 'enterprise_worker'
+ENTERPRISE_API_CACHE_TIMEOUT = 3600  # Value is in seconds
 
 ############## Settings for the Discovery App ######################
 

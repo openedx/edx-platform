@@ -64,10 +64,11 @@ from openedx.core.djangoapps.theming import helpers as theming_helpers
 </%block>
 
 <div class="dashboard-notifications" tabindex="-1">
-    %if message:
-        <section class="dashboard-banner">
-            ${message | n, decode.utf8}
-        </section>
+
+    %if banner_account_activation_message:
+        <div class="dashboard-banner">
+            ${banner_account_activation_message | n, decode.utf8}
+        </div>
     %endif
 
     %if enrollment_message:
@@ -141,6 +142,12 @@ from openedx.core.djangoapps.theming import helpers as theming_helpers
     % endif
   </section>
 </main>
+
+  %if sidebar_account_activation_message:
+    <div class="sidebar-notification">
+      ${sidebar_account_activation_message | n, decode.utf8}
+    </div>
+  %endif
 
   % if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
     <div id="dashboard-search-bar" class="search-bar dashboard-search-bar" role="search" aria-label="Dashboard">

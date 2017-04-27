@@ -17,6 +17,7 @@ from lms.djangoapps.grades.config.models import ComputeGradesSetting
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
 
+from ...config.waffle import waffle, ESTIMATE_FIRST_ATTEMPTED
 from ... import tasks
 
 
@@ -71,8 +72,15 @@ class Command(BaseCommand):
             default=0,
             type=int,
         )
+        parser.add_argument(
+            '--no_estimate_first_attempted',
+            help='Use score data to estimate first_attempted timestamp.',
+            action='store_false',
+            dest='estimate_first_attempted',
+        )
 
     def handle(self, *args, **options):
+
         self._set_log_level(options)
 
         for course_key in self._get_course_keys(options):
@@ -86,21 +94,19 @@ class Command(BaseCommand):
         enrollment_count = CourseEnrollment.objects.filter(course_id=course_key).count()
         if enrollment_count == 0:
             log.warning("No enrollments found for {}".format(course_key))
-        for offset in six.moves.range(options['start_index'], enrollment_count, options['batch_size']):
+        batch_size = self._latest_settings().batch_size if options.get('from_settings') else options['batch_size']
+        for offset in six.moves.range(options['start_index'], enrollment_count, batch_size):
             # If the number of enrollments increases after the tasks are
             # created, the most recent enrollments may not get processed.
             # This is an acceptable limitation for our known use cases.
             task_options = {'routing_key': options['routing_key']} if options.get('routing_key') else {}
-            batch_size = self._latest_settings().batch_size if options.get('from_settings') else options['batch_size']
             kwargs = {
                 'course_key': six.text_type(course_key),
                 'offset': offset,
                 'batch_size': batch_size,
+                'estimate_first_attempted': options['estimate_first_attempted']
             }
-            result = tasks.compute_grades_for_course.apply_async(
-                kwargs=kwargs,
-                options=task_options,
-            )
+            result = tasks.compute_grades_for_course_v2.apply_async(kwargs=kwargs, **task_options)
             log.info("Grades: Created {task_name}[{task_id}] with arguments {kwargs}".format(
                 task_name=tasks.compute_grades_for_course.name,
                 task_id=result.task_id,

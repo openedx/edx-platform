@@ -361,6 +361,13 @@ class CourseOverview(TimeStampedModel):
         """
         return block_metadata_utils.display_name_with_default_escaped(self)
 
+    @property
+    def dashboard_start_display(self):
+        """
+         Return start date to diplay on learner's dashboard, preferably `Course Advertised Start`
+        """
+        return self.advertised_start or self.start
+
     def has_started(self):
         """
         Returns whether the the course has started.

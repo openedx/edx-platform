@@ -2,6 +2,7 @@
 Tests for the Course Outline view and supporting views.
 """
 import datetime
+import ddt
 from mock import patch
 import json
 
@@ -12,10 +13,13 @@ from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.course_module import DEFAULT_START_DATE
 
 from .test_course_home import course_home_url
 
 TEST_PASSWORD = 'test'
+FUTURE_DAY = datetime.datetime.now() + datetime.timedelta(days=30)
+PAST_DAY = datetime.datetime.now() - datetime.timedelta(days=30)
 
 
 class TestCourseOutlinePage(SharedModuleStoreTestCase):
@@ -47,6 +51,22 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
                 ItemFactory.create(category='vertical', parent_location=section2.location)
                 course.last_accessed = None
 
+            cls.courses.append(course)
+
+            course = CourseFactory.create()
+            with cls.store.bulk_operations(course.id):
+                chapter = ItemFactory.create(category='chapter', parent_location=course.location)
+                section = ItemFactory.create(
+                    category='sequential',
+                    parent_location=chapter.location,
+                    due=datetime.datetime.now(),
+                    graded=True,
+                    format='Homework',
+                )
+                ItemFactory.create(category='vertical', parent_location=section.location)
+                course.last_accessed = section.url_name
+            cls.courses.append(course)
+
     @classmethod
     def setUpTestData(cls):
         """Set up and enroll our fake user in the course."""
@@ -70,14 +90,14 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
             self.assertEqual(response.status_code, 200)
             response_content = response.content.decode("utf-8")
 
-            if course.last_accessed is not None:
-                self.assertIn('Resume Course', response_content)
-            else:
-                self.assertNotIn('Resume Course', response_content)
+            self.assertIn('Resume Course', response_content)
             for chapter in course.children:
                 self.assertIn(chapter.display_name, response_content)
                 for section in chapter.children:
                     self.assertIn(section.display_name, response_content)
+                    if section.graded:
+                        self.assertIn(section.due, response_content)
+                        self.assertIn(section.format, response_content)
                     for vertical in section.children:
                         self.assertNotIn(vertical.display_name, response_content)
 
@@ -144,3 +164,25 @@ class TestCourseOutlinePreview(SharedModuleStoreTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, 'Future Chapter')
+
+
+@ddt.ddt
+class TestEmptyCourseOutlinePage(SharedModuleStoreTestCase):
+    """
+    Test the new course outline view.
+    """
+    @ddt.data(
+        (FUTURE_DAY, 'This course has not started yet, and will launch on'),
+        (PAST_DAY, "We're still working on course content."),
+        (DEFAULT_START_DATE, 'This course has not started yet.'),
+    )
+    @ddt.unpack
+    def test_empty_course_rendering(self, start_date, expected_text):
+        course = CourseFactory.create(start=start_date)
+        test_user = UserFactory(password=TEST_PASSWORD)
+        CourseEnrollment.enroll(test_user, course.id)
+        self.client.login(username=test_user.username, password=TEST_PASSWORD)
+        url = course_home_url(course)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, expected_text)

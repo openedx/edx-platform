@@ -18,7 +18,6 @@ from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from util.views import ensure_valid_course_key
 from web_fragments.fragment import Fragment
-from xmodule.modulestore.django import modulestore
 
 
 class CourseBookmarksView(View):

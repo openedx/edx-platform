@@ -82,15 +82,16 @@ class SeatFactory(DictFactoryBase):
 
 
 class CourseRunFactory(DictFactoryBase):
+    eligible_for_financial_aid = True
     end = factory.LazyFunction(generate_zulu_datetime)
     enrollment_end = factory.LazyFunction(generate_zulu_datetime)
     enrollment_start = factory.LazyFunction(generate_zulu_datetime)
     image = ImageFactory()
+    is_enrolled = False
     key = factory.LazyFunction(generate_course_run_key)
     marketing_url = factory.Faker('url')
-    eligible_for_financial_aid = True
-    seats = factory.LazyFunction(partial(generate_instances, SeatFactory))
     pacing_type = 'self_paced'
+    seats = factory.LazyFunction(partial(generate_instances, SeatFactory))
     short_description = factory.Faker('sentence')
     start = factory.LazyFunction(generate_zulu_datetime)
     title = factory.Faker('catch_phrase')
@@ -112,6 +113,7 @@ class ProgramFactory(DictFactoryBase):
     banner_image = factory.LazyFunction(generate_sized_stdimage)
     card_image_url = factory.Faker('image_url')
     courses = factory.LazyFunction(partial(generate_instances, CourseFactory))
+    is_program_eligible_for_one_click_purchase = True
     marketing_slug = factory.Faker('slug')
     marketing_url = factory.Faker('url')
     status = 'active'

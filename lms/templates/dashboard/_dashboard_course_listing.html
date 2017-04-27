@@ -8,7 +8,7 @@ from django.utils.translation import ungettext
 from django.core.urlresolvers import reverse
 from course_modes.models import CourseMode
 from course_modes.helpers import enrollment_mode_display
-from openedx.core.djangolib.js_utils import dump_js_escaped_json
+from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 from openedx.core.djangolib.markup import HTML, Text
 from student.helpers import (
   VERIFY_STATUS_NEED_TO_VERIFY,
@@ -19,6 +19,7 @@ from student.helpers import (
   VERIFY_STATUS_NEED_TO_REVERIFY,
   DISABLE_UNENROLL_CERT_STATES,
 )
+from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_params
 %>
 
 <%
@@ -109,19 +110,19 @@ from student.helpers import (
                     course_date = course_overview.end
                 elif course_overview.has_started():
                     container_string = _("Started - {date}")
-                    course_date = course_overview.start
+                    course_date = course_overview.dashboard_start_display
                 elif course_overview.starts_within(days=5):
                     container_string = _("Starts - {date}")
-                    course_date = course_overview.start
+                    course_date = course_overview.dashboard_start_display
                     format = 'defaultFormat'
                 else: ## hasn't started yet
                     container_string = _("Starts - {date}")
-                    course_date = course_overview.start
+                    course_date = course_overview.dashboard_start_display
                 endif
             endif
           %>
 
-                % if isinstance(course_date, str):
+                % if isinstance(course_date, basestring):
                     <span class="info-date-block" data-tooltip="Hi">${_(container_string).format(date=course_date)}</span>
                 % elif course_date is not None:
                     <%
@@ -149,18 +150,18 @@ from student.helpers import (
 
               % if share_settings:
                 <%
-                  if share_settings.get("CUSTOM_COURSE_URLS", False):
-                    if course_overview.social_sharing_url:
-                      share_url = urllib.quote_plus(course_overview.social_sharing_url)
-                    else:
-                      share_url = ''
-                  else:
-                    share_url = urllib.quote_plus(request.build_absolute_uri(reverse('about_course', args=[unicode(course_overview.id)])))
+                  share_url = get_link_for_about_page(course_overview)
+                  encoded_utm_parameters = get_encoded_course_sharing_utm_params()
                   share_window_name = 'shareWindow'
                   share_window_config = 'toolbar=no, location=no, status=no, menubar=no, scrollbars=yes, resizable=yes, width=640, height=480'
                 %>
-                % if share_url and share_settings.get('DASHBOARD_FACEBOOK', False):
-                  <% facebook_url = 'https://www.facebook.com/sharer/sharer.php?u=' + share_url %>
+                % if share_settings.get('DASHBOARD_FACEBOOK', False):
+                  <%
+                      facebook_share_url = "{url}?{utm_params}".format(url=share_url, utm_params=encoded_utm_parameters['facebook'])
+                      share_text = _("I'm taking {course_name} online with edX.org. Check it out!").format(course_name=course_overview.display_name_with_default)
+                      query_params = urllib.urlencode((('u', facebook_share_url), ('quote', share_text.encode('utf-8')),))
+                      facebook_url = 'https://www.facebook.com/sharer/sharer.php?{query}'.format(query=query_params)
+                  %>
                     <a
                       data-tooltip="${_('Share on Facebook')}"
                       class="action action-facebook"
@@ -169,15 +170,19 @@ from student.helpers import (
                       href="${facebook_url}"
                       target="_blank"
                       title="${_('Share on Facebook')}"
+                      data-course-id="${course_overview.id}"
                       onclick="window.open('${facebook_url}', '${share_window_name}', '${share_window_config}'); return false;">
                       <span class="sr">${_('Facebook')}</span>
                       <span class="fa fa-facebook" aria-hidden="true"></span>
                     </a>
                 % endif
-                % if share_url and share_settings.get('DASHBOARD_TWITTER', False):
-                  <% share_text_default = _("I'm learning on {platform_name}:").format(platform_name=settings.PLATFORM_NAME) %>
-                  <% share_text = urllib.quote_plus(share_settings.get('DASHBOARD_TWITTER_TEXT', share_text_default)) %>
-                  <% twitter_url = 'https://twitter.com/intent/tweet?text=' + share_text + '%20' + share_url %>
+                % if share_settings.get('DASHBOARD_TWITTER', False):
+                  <%
+                      twitter_share_url = "{url}?{utm_params}".format(url=share_url, utm_params=encoded_utm_parameters['twitter'])
+                      default_share_text = _("I'm taking {course_name} online with @edxonline. Check it out!").format(course_name=course_overview.display_name_with_default)
+                      share_text = urllib.quote_plus(share_settings.get('DASHBOARD_TWITTER_TEXT', default_share_text.encode('utf-8')))
+                      twitter_url = 'https://twitter.com/intent/tweet?text=' + share_text + '%20' + urllib.quote_plus(twitter_share_url)
+                  %>
                     <a
                       data-tooltip="${_('Share on Twitter')}"
                       class="action action-twitter"
@@ -186,6 +191,7 @@ from student.helpers import (
                       href="${twitter_url}"
                       target="_blank"
                       title="${_('Share on Twitter')}"
+                      data-course-id="${course_overview.id}"
                       onclick="window.open('${twitter_url}', '${share_window_name}', '${share_window_config}'); return false;">
                       <span class="sr">${_('Twitter')}</span>
                       <span class="fa fa-twitter" aria-hidden="true"></span>
@@ -449,6 +455,12 @@ from student.helpers import (
                }
            });
 </script>
+
+% if share_settings.get('DASHBOARD_FACEBOOK', False) and share_settings.get('DASHBOARD_TWITTER', False):
+    <%static:require_module_async module_name="js/course_sharing/course_sharing_events" class_name="CourseSharingEvents">
+        CourseSharingEvents("${course_overview.id | n, js_escaped_string}");
+    </%static:require_module_async>
+%endif
 
 <%static:require_module_async module_name="js/dateutil_factory" class_name="DateUtilFactory">
     DateUtilFactory.transform(iterationKey=".localized-datetime");

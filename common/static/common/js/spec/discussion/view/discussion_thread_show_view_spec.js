@@ -181,9 +181,18 @@
             it('renders correctly for a cohorted thread', function() {
                 this.thread.set('group_id', '1');
                 this.thread.set('group_name', 'Mock Cohort');
+                this.view.is_commentable_cohorted = true;
                 this.view.render();
                 return expect(this.view.$('.group-visibility-label').text().trim())
                     .toEqual('This post is visible only to Mock Cohort.');
+            });
+            it('renders correctly for a grouped uncohorted thread', function() {
+                this.thread.set('group_id', '1');
+                this.thread.set('group_name', 'Mock Cohort');
+                this.view.is_commentable_cohorted = false;
+                this.view.render();
+                return expect(this.view.$('.group-visibility-label').text().trim())
+                    .toEqual('This post is visible to everyone.');
             });
         });
     });

@@ -2,16 +2,20 @@
 """
 Integration tests for submitting problem responses and getting grades.
 """
-import ddt
+
+# pylint: disable=attribute-defined-outside-init
+
 import json
 import os
 from textwrap import dedent
 
+import ddt
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.client import RequestFactory
+from django.utils.timezone import now
 from mock import patch
 from nose.plugins.attrib import attr
 
@@ -309,7 +313,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
         Returns list of scores for the given homework:
             [<points on problem_1>, <points on problem_2>, ..., <points on problem_n>]
         """
-        return [s.earned for s in self.hw_grade(hw_url_name).scores]
+        return [s.earned for s in self.hw_grade(hw_url_name).problem_scores.values()]
 
 
 class TestCourseGrades(TestSubmittingProblems):
@@ -333,7 +337,7 @@ class TestCourseGrades(TestSubmittingProblems):
         Verifies the problem score and the homework grade are as expected.
         """
         hw_grade = self.hw_grade('homework')
-        problem_score = hw_grade.scores[0]
+        problem_score = hw_grade.problem_scores.values()[0]
         self.assertEquals((problem_score.earned, problem_score.possible), expected_problem_score)
         self.assertEquals((hw_grade.graded_total.earned, hw_grade.graded_total.possible), expected_hw_grade)
 
@@ -386,7 +390,6 @@ class TestCourseGrader(TestSubmittingProblems):
         """
         Set up a simple course for testing weighted grading functionality.
         """
-        # pylint: disable=attribute-defined-outside-init
 
         self.set_weighted_policy(hw_weight, final_weight)
 
@@ -449,12 +452,13 @@ class TestCourseGrader(TestSubmittingProblems):
         self.hw3_names = ['h3p1', 'h3p2']
 
         self.homework1 = self.add_graded_section_to_course('homework1')
+        self.homework2 = self.add_graded_section_to_course('homework2')
+        self.homework3 = self.add_graded_section_to_course('homework3')
+
         self.add_dropdown_to_section(self.homework1.location, self.hw1_names[0], 1)
         self.add_dropdown_to_section(self.homework1.location, self.hw1_names[1], 1)
-        self.homework2 = self.add_graded_section_to_course('homework2')
         self.add_dropdown_to_section(self.homework2.location, self.hw2_names[0], 1)
         self.add_dropdown_to_section(self.homework2.location, self.hw2_names[1], 1)
-        self.homework3 = self.add_graded_section_to_course('homework3')
         self.add_dropdown_to_section(self.homework3.location, self.hw3_names[0], 1)
         self.add_dropdown_to_section(self.homework3.location, self.hw3_names[1], 1)
 
@@ -619,7 +623,11 @@ class TestCourseGrader(TestSubmittingProblems):
 
         with patch('submissions.api.get_scores') as mock_get_scores:
             mock_get_scores.return_value = {
-                self.problem_location('p3').to_deprecated_string(): (1, 1)
+                self.problem_location('p3').to_deprecated_string(): {
+                    'points_earned': 1,
+                    'points_possible': 1,
+                    'created_at': now(),
+                },
             }
             self.get_course_grade()
 

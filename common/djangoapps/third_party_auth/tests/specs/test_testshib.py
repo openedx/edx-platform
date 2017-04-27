@@ -1,11 +1,14 @@
 """
 Third_party_auth integration tests using a mock version of the TestShib provider
 """
+import datetime
 import ddt
 import unittest
 import httpretty
 import json
+import time
 from mock import patch
+from freezegun import freeze_time
 from social.apps.django_app.default.models import UserSocialAuth
 from unittest import skip
 
@@ -90,6 +93,7 @@ class SamlIntegrationTestUtilities(object):
         kwargs.setdefault('metadata_source', TESTSHIB_METADATA_URL)
         kwargs.setdefault('icon_class', 'fa-university')
         kwargs.setdefault('attr_email', 'urn:oid:1.3.6.1.4.1.5923.1.1.1.6')  # eduPersonPrincipalName
+        kwargs.setdefault('max_session_length', None)
         self.configure_saml_provider(**kwargs)
 
         if fetch_metadata:
@@ -206,6 +210,26 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
         self.assertEqual(num_updated, 1)
         self.assertEqual(num_failed, 0)
         self.assertEqual(len(failure_messages), 0)
+
+    def test_login_with_testshib_provider_short_session_length(self):
+        """
+        Test that when we have a TPA provider which as an explicit maximum
+        session length set, waiting for longer than that between requests
+        results in us being logged out.
+        """
+        # Configure the provider with a 10-second timeout
+        self._configure_testshib_provider(max_session_length=10)
+
+        now = datetime.datetime.utcnow()
+        with freeze_time(now):
+            # Test the login flow, adding the user in the process
+            super(TestShibIntegrationTest, self).test_login()
+
+        # Wait 30 seconds; longer than the manually-set 10-second timeout
+        later = now + datetime.timedelta(seconds=30)
+        with freeze_time(later):
+            # Test returning as a logged in user; this method verifies that we're logged out first.
+            self._test_return_login(previous_session_timed_out=True)
 
 
 @unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, 'third_party_auth not enabled')

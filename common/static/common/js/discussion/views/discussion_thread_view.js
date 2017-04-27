@@ -92,7 +92,7 @@
                         self.model = collection.get(id);
                     }
                 });
-
+                this.is_commentable_cohorted = options.is_commentable_cohorted;
                 this.createShowView();
                 this.responses = new Comments();
                 this.loadedResponses = false;
@@ -422,7 +422,8 @@
                 this.showView = new DiscussionThreadShowView({
                     model: this.model,
                     mode: this.mode,
-                    startHeader: this.startHeader
+                    startHeader: this.startHeader,
+                    is_commentable_cohorted: this.is_commentable_cohorted
                 });
                 this.showView.bind('thread:_delete', this._delete);
                 return this.showView.bind('thread:edit', this.edit);

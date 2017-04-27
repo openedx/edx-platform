@@ -18,7 +18,7 @@ def course_home_url(course):
     Returns the URL for the course's home page
     """
     return reverse(
-        'edx.course_experience.course_home',
+        'openedx.course_experience.course_home',
         kwargs={
             'course_id': unicode(course.id),
         }

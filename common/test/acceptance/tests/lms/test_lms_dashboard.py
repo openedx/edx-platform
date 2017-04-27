@@ -153,7 +153,8 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         Validate the behavior of the social sharing feature
         """
         twitter_widget = self.dashboard_page.get_course_social_sharing_widget('twitter')
-        twitter_url = "https://twitter.com/intent/tweet?text=Testing+feature%3A%20http%3A%2F%2Fcustom%2Fcourse%2Furl"
+        twitter_url = ("https://twitter.com/intent/tweet?text=Testing+feature%3A%20http%3A%2F%2Fcustom%2Fcourse%2Furl"
+                       "%3Futm_campaign%3Dsocial-sharing%26utm_medium%3Dsocial-post%26utm_source%3Dtwitter")
         self.assertEqual(twitter_widget.attrs('title')[0], 'Share on Twitter')
         self.assertEqual(twitter_widget.attrs('data-tooltip')[0], 'Share on Twitter')
         self.assertEqual(twitter_widget.attrs('aria-haspopup')[0], 'true')
@@ -163,7 +164,9 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         self.assertIn(twitter_url, twitter_widget.attrs('onclick')[0])
 
         facebook_widget = self.dashboard_page.get_course_social_sharing_widget('facebook')
-        facebook_url = "https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fcustom%2Fcourse%2Furl"
+        facebook_url = ("https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fcustom%2Fcourse%2Furl%3F"
+                        "utm_campaign%3Dsocial-sharing%26utm_medium%3Dsocial-post%26utm_source%3Dfacebook&"
+                        "quote=I%27m+taking+Test")
         self.assertEqual(facebook_widget.attrs('title')[0], 'Share on Facebook')
         self.assertEqual(facebook_widget.attrs('data-tooltip')[0], 'Share on Facebook')
         self.assertEqual(facebook_widget.attrs('aria-haspopup')[0], 'true')
@@ -303,6 +306,39 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
 
         # Test that proper course date with 'starts' message is displayed if a course is about to start in future,
         # and course starts within 5 days
+        self.assertEqual(course_date, expected_course_date)
+
+    def test_advertised_start_date(self):
+
+        """
+        Scenario:
+            Course Date should be advertised start date
+            if the course on student dashboard has `Course Advertised Start` set.
+
+        As a Student,
+        Given that I have enrolled to a course
+        And the course has `Course Advertised Start` set.
+        When I visit dashboard page
+        Then the advertised start date should be displayed rather course start date"
+        """
+        course_start_date = self.now + datetime.timedelta(days=2)
+        course_advertised_start = "Winter 2018"
+
+        self.course_fixture.add_course_details({
+            'start_date': course_start_date,
+        })
+        self.course_fixture.configure_course()
+
+        self.course_fixture.add_advanced_settings({
+            u"advertised_start": {u"value": course_advertised_start}
+        })
+        self.course_fixture._add_advanced_settings()
+
+        expected_course_date = "Starts - {start_date}".format(start_date=course_advertised_start)
+
+        self.dashboard_page.visit()
+        course_date = self.dashboard_page.get_course_date()
+
         self.assertEqual(course_date, expected_course_date)
 
     def test_profile_img_alt_empty(self):

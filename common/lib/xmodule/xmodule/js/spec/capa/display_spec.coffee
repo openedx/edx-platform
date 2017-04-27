@@ -138,6 +138,28 @@ describe 'Problem', ->
       it 'shows 0 points possible for the detail', ->
         testProgessData(@problem, 0, 0, 1, "False", "0 points possible (ungraded)")
 
+    describe 'with a score of null (show_correctness == false)', ->
+      it 'reports the number of points possible and graded, results hidden', ->
+        testProgessData(@problem, null, 1, 0, "True", "1 point possible (graded, results hidden)")
+
+      it 'reports the number of points possible (plural) and graded, results hidden', ->
+        testProgessData(@problem, null, 2, 0, "True", "2 points possible (graded, results hidden)")
+
+      it 'reports the number of points possible and ungraded, results hidden', ->
+        testProgessData(@problem, null, 1, 0, "False", "1 point possible (ungraded, results hidden)")
+
+      it 'displays ungraded if number of points possible is 0, results hidden', ->
+        testProgessData(@problem, null, 0, 0, "False", "0 points possible (ungraded, results hidden)")
+
+      it 'displays ungraded if number of points possible is 0, even if graded value is True, results hidden', ->
+        testProgessData(@problem, null, 0, 0, "True", "0 points possible (ungraded, results hidden)")
+
+      it 'reports the correct score with status none and >0 attempts, results hidden', ->
+        testProgessData(@problem, null, 1, 1, "True", "1 point possible (graded, results hidden)")
+
+      it 'reports the correct score with >1 weight, status none, and >0 attempts, results hidden', ->
+        testProgessData(@problem, null, 2, 2, "True", "2 points possible (graded, results hidden)")
+
   describe 'render', ->
     beforeEach ->
       @problem = new Problem($('.xblock-student_view'))

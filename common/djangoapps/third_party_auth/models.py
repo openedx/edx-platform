@@ -140,6 +140,26 @@ class ProviderConfig(ConfigurationModel):
             "authentication using the correct link is still possible."
         ),
     )
+    drop_existing_session = models.BooleanField(
+        default=False,
+        help_text=_(
+            "Whether to drop an existing session when accessing a view decorated with "
+            "third_party_auth.decorators.tpa_hint_ends_existing_session when a tpa_hint "
+            "URL query parameter mapping to this provider is included in the request."
+        )
+    )
+    max_session_length = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        default=None,
+        verbose_name='Max session length (seconds)',
+        help_text=_(
+            "If this option is set, then users logging in using this SSO provider will have "
+            "their session length limited to no longer than this value. If set to 0 (zero), "
+            "the session will expire upon the user closing their browser. If left blank, the "
+            "Django platform session default length will be used."
+        )
+    )
     prefix = None  # used for provider_id. Set to a string value in subclass
     backend_name = None  # Set to a field or fixed value in subclass
     accepts_logins = True  # Whether to display a sign-in button when the provider is enabled

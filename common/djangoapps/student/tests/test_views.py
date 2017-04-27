@@ -18,7 +18,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 from student.cookies import get_user_info_cookie_data
 from student.helpers import DISABLE_UNENROLL_CERT_STATES
-from student.models import CourseEnrollment, LogoutViewConfiguration
+from student.models import CourseEnrollment, LogoutViewConfiguration, UserProfile
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 
 PASSWORD = 'test'
@@ -157,22 +157,36 @@ class LogoutTests(TestCase):
         self.client.post(reverse('oauth2:capture'), data, follow=True)
         self.assertListEqual(self.client.session[AUTHORIZED_CLIENTS_SESSION_KEY], [oauth_client.client_id])
 
-    def assert_logout_redirects(self):
+    def assert_logout_redirects_to_root(self):
         """ Verify logging out redirects the user to the homepage. """
         response = self.client.get(reverse('logout'))
         self.assertRedirects(response, '/', fetch_redirect_response=False)
 
-    def test_switch(self):
+    def assert_logout_redirects_with_target(self):
+        """ Verify logging out with a redirect_url query param redirects the user to the target. """
+        url = '{}?{}'.format(reverse('logout'), 'redirect_url=/courses')
+        response = self.client.get(url)
+        self.assertRedirects(response, '/courses', fetch_redirect_response=False)
+
+    def test_switch_default(self):
         """ Verify the IDA logout functionality is disabled if the associated switch is disabled. """
         LogoutViewConfiguration.objects.create(enabled=False)
         oauth_client = self.create_oauth_client()
         self.authenticate_with_oauth(oauth_client)
-        self.assert_logout_redirects()
+        self.assert_logout_redirects_to_root()
+
+    def test_switch_with_redirect_url(self):
+        """ Verify the IDA logout functionality is disabled if the associated switch is disabled. """
+        LogoutViewConfiguration.objects.create(enabled=False)
+        oauth_client = self.create_oauth_client()
+        self.authenticate_with_oauth(oauth_client)
+        self.assert_logout_redirects_with_target()
 
     def test_without_session_value(self):
         """ Verify logout works even if the session does not contain an entry with
         the authenticated OpenID Connect clients."""
-        self.assert_logout_redirects()
+        self.assert_logout_redirects_to_root()
+        self.assert_logout_redirects_with_target()
 
     def test_client_logout(self):
         """ Verify the context includes a list of the logout URIs of the authenticated OpenID Connect clients.
@@ -221,3 +235,11 @@ class StudentDashboardTests(TestCase):
         self.client.get(self.path)
         actual = self.client.cookies[settings.EDXMKTG_USER_INFO_COOKIE_NAME].value
         self.assertEqual(actual, expected)
+
+    def test_redirect_account_settings(self):
+        """
+        Verify if user does not have profile he/she is redirected to account_settings.
+        """
+        UserProfile.objects.get(user=self.user).delete()
+        response = self.client.get(self.path)
+        self.assertRedirects(response, reverse('account_settings'))

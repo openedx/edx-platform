@@ -1,4 +1,9 @@
-"""Grading tests"""
+"""
+Grading tests
+"""
+
+from datetime import datetime
+
 import ddt
 import unittest
 
@@ -13,8 +18,8 @@ class GradesheetTest(unittest.TestCase):
 
     def test_weighted_grading(self):
         scores = []
-        agg_fields = dict(attempted=False)
-        prob_fields = dict(raw_earned=0, raw_possible=0, weight=0, attempted=False)
+        agg_fields = dict(first_attempted=None)
+        prob_fields = dict(raw_earned=0, raw_possible=0, weight=0, first_attempted=None)
 
         # No scores
         all_total, graded_total = aggregate_scores(scores)
@@ -40,8 +45,9 @@ class GradesheetTest(unittest.TestCase):
         )
 
         # (0/5 non-graded) + (3/5 graded) = 3/10 total, 3/5 graded
-        prob_fields['attempted'] = True
-        agg_fields['attempted'] = True
+        now = datetime.now()
+        prob_fields['first_attempted'] = now
+        agg_fields['first_attempted'] = now
         scores.append(ProblemScore(weighted_earned=3, weighted_possible=5, graded=True, **prob_fields))
         all_total, graded_total = aggregate_scores(scores)
         self.assertAlmostEqual(
@@ -89,7 +95,7 @@ class GraderTest(unittest.TestCase):
             self.graded_total = graded_total
             self.display_name = display_name
 
-    common_fields = dict(graded=True, attempted=True)
+    common_fields = dict(graded=True, first_attempted=datetime.now())
     test_gradesheet = {
         'Homework': {
             'hw1': MockGrade(AggregatedScore(tw_earned=2, tw_possible=20.0, **common_fields), display_name='hw1'),

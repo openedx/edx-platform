@@ -72,6 +72,7 @@
             'ieshim': 'js/src/ie_shim',
             'tooltip_manager': 'js/src/tooltip_manager',
             'draggabilly': 'js/vendor/draggabilly',
+            'hls': 'common/js/vendor/hls',
 
             // Files needed for Annotations feature
             'annotator': 'js/vendor/ova/annotator-full',

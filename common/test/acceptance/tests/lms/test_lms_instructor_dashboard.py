@@ -19,9 +19,9 @@ from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDash
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.lms.dashboard import DashboardPage
 from common.test.acceptance.pages.lms.problem import ProblemPage
-from common.test.acceptance.pages.lms.track_selection import TrackSelectionPage
-from common.test.acceptance.pages.lms.pay_and_verify import PaymentAndVerificationFlow, FakePaymentPage
+from common.test.acceptance.pages.lms.pay_and_verify import PaymentAndVerificationFlow
 from common.test.acceptance.pages.lms.login_and_register import CombinedLoginAndRegisterPage
+from common.test.acceptance.pages.common.utils import enroll_user_track
 from common.test.acceptance.tests.helpers import disable_animations
 from common.test.acceptance.fixtures.certificates import CertificateConfigFixture
 
@@ -213,6 +213,55 @@ class AutoEnrollmentWithCSVTest(BaseInstructorDashboardTest):
         self.auto_enroll_section.a11y_audit.check_for_accessibility_errors()
 
 
+class BatchBetaTestersTest(BaseInstructorDashboardTest):
+    """
+    End-to-end tests for Batch beta testers functionality.
+    """
+
+    def setUp(self):
+        super(BatchBetaTestersTest, self).setUp()
+        self.username = "test_{uuid}".format(uuid=self.unique_id[0:6])
+        self.email = "{user}@example.com".format(user=self.username)
+        AutoAuthPage(self.browser, username=self.username, email=self.email, is_active=False).visit()
+        self.course_fixture = CourseFixture(**self.course_info).install()
+        self.instructor_username = self.log_in_as_instructor()
+        instructor_dashboard_page = self.visit_instructor_dashboard()
+        self.batch_beta_tester_section = instructor_dashboard_page.select_membership().batch_beta_tester_addition()
+        self.inactive_user_message = 'These users could not be added as beta testers ' \
+                                     'because their accounts are not yet activated:'
+
+    def test_enroll_inactive_beta_tester(self):
+        """
+        Scenario: On the Membership tab of the Instructor Dashboard, Batch Beta tester div is visible.
+            Given that I am on the Membership tab on the Instructor Dashboard
+            Then I enter the username and add it into beta testers.
+            Then I see the inactive user is not added in beta testers.
+        """
+        self.batch_beta_tester_section.fill_batch_beta_tester_addition_text_box(self.username)
+        header_text, username = self.batch_beta_tester_section.get_notification_text()
+        self.assertIn(self.inactive_user_message, header_text[0])
+        self.assertEqual(self.username, username[0])
+
+    def test_enroll_active_and_inactive_beta_tester(self):
+        """
+        Scenario: On the Membership tab of the Instructor Dashboard, Batch Beta tester div is visible.
+            Given that I am on the Membership tab on the Instructor Dashboard
+            Then I enter the active and inactive usernames and add it into beta testers.
+            Then I see the different messages related to active and inactive users.
+        """
+        active_and_inactive_username = self.username + ',' + self.instructor_username[0]
+        self.batch_beta_tester_section.fill_batch_beta_tester_addition_text_box(active_and_inactive_username)
+        header_text, username = self.batch_beta_tester_section.get_notification_text()
+
+        # Verify that Inactive username and message.
+        self.assertIn(self.inactive_user_message, header_text[1])
+        self.assertEqual(self.username, username[1])
+
+        # Verify that active username and message.
+        self.assertIn('These users were successfully added as beta testers:', header_text[0])
+        self.assertEqual(self.instructor_username[0], username[0])
+
+
 @attr(shard=10)
 class ProctoredExamsTest(BaseInstructorDashboardTest):
     """
@@ -247,13 +296,6 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
             )
         ).install()
 
-        self.track_selection_page = TrackSelectionPage(self.browser, self.course_id)
-        self.payment_and_verification_flow = PaymentAndVerificationFlow(self.browser, self.course_id)
-        self.immediate_verification_page = PaymentAndVerificationFlow(
-            self.browser, self.course_id, entry_point='verify-now'
-        )
-        self.upgrade_page = PaymentAndVerificationFlow(self.browser, self.course_id, entry_point='upgrade')
-        self.fake_payment_page = FakePaymentPage(self.browser, self.course_id)
         self.dashboard_page = DashboardPage(self.browser)
         self.problem_page = ProblemPage(self.browser)
 
@@ -279,19 +321,7 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         """
 
         self._auto_auth(self.USERNAME, self.EMAIL, False)
-
-        # the track selection page cannot be visited. see the other tests to see if any prereq is there.
-        # Navigate to the track selection page
-        self.track_selection_page.visit()
-
-        # Enter the payment and verification flow by choosing to enroll as verified
-        self.track_selection_page.enroll('verified')
-
-        # Proceed to the fake payment page
-        self.payment_and_verification_flow.proceed_to_payment()
-
-        # Submit payment
-        self.fake_payment_page.submit_payment()
+        enroll_user_track(self.browser, self.course_id, 'verified')
 
     def _create_a_proctored_exam_and_attempt(self):
         """

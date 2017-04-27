@@ -30,7 +30,8 @@ class EnrollmentTrackUserPartition(UserPartition):
     def groups(self):
         """
         Return the groups (based on CourseModes) for the course associated with this
-        EnrollmentTrackUserPartition instance.
+        EnrollmentTrackUserPartition instance. Note that only groups based on selectable
+        CourseModes are returned (which means that Credit will never be returned).
 
         If a course is using the Verified Track Cohorting pilot feature, this method
         returns an empty array regardless of registered CourseModes.
@@ -42,20 +43,14 @@ class EnrollmentTrackUserPartition(UserPartition):
 
         return [
             Group(ENROLLMENT_GROUP_IDS[mode.slug], unicode(mode.name))
-            for mode in CourseMode.modes_for_course(course_key, include_expired=True, only_selectable=False)
+            for mode in CourseMode.modes_for_course(course_key, include_expired=True)
         ]
-
-    def to_json(self):
-        """
-        Because this partition is dynamic, to_json and from_json are not supported.
-
-        Calling this method will raise a TypeError.
-        """
-        raise TypeError("Because EnrollmentTrackUserPartition is a dynamic partition, 'to_json' is not supported.")
 
     def from_json(self):
         """
-        Because this partition is dynamic, to_json and from_json are not supported.
+        Because this partition is dynamic, `from_json` is not supported.
+        `to_json` is supported, but shouldn't be used to persist this partition
+        within the course itself (used by Studio for sending data to front-end code)
 
         Calling this method will raise a TypeError.
         """
@@ -71,7 +66,8 @@ class EnrollmentTrackPartitionScheme(object):
     def get_group_for_user(cls, course_key, user, user_partition, **kwargs):  # pylint: disable=unused-argument
         """
         Returns the Group from the specified user partition to which the user
-        is assigned, via enrollment mode.
+        is assigned, via enrollment mode. If a user is in a Credit mode, the Verified or
+        Professional mode for the course is returned instead.
 
         If a course is using the Verified Track Cohorting pilot feature, this method
         returns None regardless of the user's enrollment mode.
@@ -94,6 +90,8 @@ class EnrollmentTrackPartitionScheme(object):
                 mode_slug,
                 modes=CourseMode.modes_for_course(course_key, include_expired=True, only_selectable=False),
             )
+            if course_mode and CourseMode.is_credit_mode(course_mode):
+                course_mode = CourseMode.verified_mode_for_course(course_key)
             if not course_mode:
                 course_mode = CourseMode.DEFAULT_MODE
             return Group(ENROLLMENT_GROUP_IDS[course_mode.slug], unicode(course_mode.name))
@@ -116,7 +114,7 @@ class EnrollmentTrackPartitionScheme(object):
         Any group access rule referencing inactive partitions will be ignored
         when performing access checks.
         """
-        return EnrollmentTrackUserPartition(id, name, description, [], cls, parameters, active)
+        return EnrollmentTrackUserPartition(id, unicode(name), unicode(description), [], cls, parameters, active)
 
 
 def is_course_using_cohort_instead(course_key):
