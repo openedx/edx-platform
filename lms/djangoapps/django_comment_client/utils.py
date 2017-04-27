@@ -312,6 +312,8 @@ def get_discussion_category_map(course, user, divided_only_if_explicit=False, ex
 
     course_cohort_settings = get_course_cohort_settings(course.id)
 
+    divided_discussions = course_cohort_settings.cohorted_discussions
+
     for xblock in xblocks:
         discussion_id = xblock.discussion_id
         title = xblock.discussion_target
@@ -363,7 +365,7 @@ def get_discussion_category_map(course, user, divided_only_if_explicit=False, ex
         for entry in entries:
             is_entry_divided = (
                 course_cohort_settings.is_cohorted and (
-                    divide_all_inline_discussions or entry["id"] in course_cohort_settings.cohorted_discussions
+                    divide_all_inline_discussions or entry["id"] in divided_discussions
                 )
             )
 
@@ -386,9 +388,7 @@ def get_discussion_category_map(course, user, divided_only_if_explicit=False, ex
             "id": entry["id"],
             "sort_key": entry.get("sort_key", topic),
             "start_date": datetime.now(UTC()),
-            "is_divided": (
-                course_cohort_settings.is_cohorted and entry["id"] in course_cohort_settings.cohorted_discussions
-            )
+            "is_divided": (course_cohort_settings.is_cohorted and entry["id"] in divided_discussions)
         }
 
     _sort_map_entries(category_map, course.discussion_sort_alpha)
