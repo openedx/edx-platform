@@ -65,16 +65,19 @@ def count_data():
     # Data volume depends on server settings.
     statistics_level = olga_settings.get("STATISTICS_LEVEL")
     
-    # Site domain name
-    site = Site.objects.get_current()
-
+    # Platform name.
+    if settings.PLATFORM_NAME:
+        platform_name = settings.PLATFORM_NAME
+    else:
+        platform_name = Site.objects.get_current()
+ 
     if statistics_level == 1:
         data_to_send = requests.post(post_url, data={
             'courses_amount': courses_amount,
             'students_amount': students_amount,
             'latitude': latitude,
             'longitude': longitude,
+            'platform_name': platform_name,
             'platform_url': platform_url,
-            'secret_token': secret_token,
-            'site': site
+            'secret_token': secret_token
             })
