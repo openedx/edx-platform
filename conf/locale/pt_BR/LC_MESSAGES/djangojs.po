@@ -72,6 +72,7 @@
 # Alexander Rodrigo Ferreira <dr.alexander.ferreira@hotmail.com>, 2015
 # Álex Filipe <alexfilipe@outlook.com>, 2014
 # Allan Melo, 2015
+# Anderson Franca <anderson.frca@gmail.com>, 2017
 # Andrei Bosco Bezerra Torres <andreibosco@gmail.com>, 2013
 # Angela Amaro <angelasimei@gmail.com>, 2016
 # Antonio Henrique Dianin <antoniohdianin@hotmail.com>, 2015
@@ -90,7 +91,7 @@
 # Fabio Eis <fabio@fabioeis.com>, 2016
 # Fernando Nunes <fernubr@gmail.com>, 2015
 # Francisco Cantarutti <francisco.cantarutti@sisqualis.com.br>, 2014
-# Guilherme Batista Ferreira <guilherme@uft.edu.br>, 2015
+# Guilherme Ferreira <guilherme@uft.edu.br>, 2015
 # Gustavo Henrique de Almeida Gonçalves <gustavo@faprender.org>, 2015
 # Henrique Santos <henriquesantos.pro@gmail.com>, 2017
 # Igor Carnerio <igor.ribeiro.carneiro@gmail.com>, 2016
@@ -125,6 +126,7 @@
 # Translators:
 # Alan Ribeiro Mól <alan3df@gmail.com>, 2015
 # Ana Paula D'Almeida <paulladalmeida@gmail.com>, 2015
+# Anderson Franca <anderson.frca@gmail.com>, 2017
 # Andrea Z. Bitencourt <azbitencourt@gmail.com>, 2015
 # Angela Amaro <angelasimei@gmail.com>, 2016
 # Bruno Sette <inactive+BrunoSette@transifex.com>, 2015
@@ -191,7 +193,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-04-11 14:17+0000\n"
+"POT-Creation-Date: 2017-04-11 15:16+0000\n"
 "PO-Revision-Date: 2017-04-11 14:32+0000\n"
 "Last-Translator: Anthony Mangano <amangano@edx.org>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"
@@ -211,8 +213,8 @@ msgstr ""
 #: cms/static/js/views/edit_textbook.js
 #: cms/static/js/views/list_item_editor.js
 #: cms/static/js/views/modals/edit_xblock.js cms/static/js/views/tabs.js
-#: cms/static/js/views/tabs.js.c cms/static/js/views/utils/xblock_utils.js
-#: lms/static/js/ccx/schedule.js lms/static/js/views/fields.js
+#: cms/static/js/views/utils/xblock_utils.js lms/static/js/ccx/schedule.js
+#: lms/static/js/views/fields.js
 msgid "Saving"
 msgstr "Salvando"
 
@@ -2216,7 +2218,9 @@ msgid "Loading posts list"
 msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
-msgid "No results found for {original_query}. "
+msgid ""
+"No results found for {original_query}. Showing results for "
+"{suggested_query}."
 msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
@@ -2335,13 +2339,13 @@ msgstr "solta no destino"
 
 #. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
+#, javascript-format
 msgid "%s ago"
 msgstr "%s atrás"
 
 #. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
+#, javascript-format
 msgid "%s from now"
 msgstr "%s a partir de agora"
 
@@ -2354,7 +2358,7 @@ msgid "about a minute"
 msgstr "aproximadamente um minuto"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
+#, javascript-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d minuto"
@@ -2365,7 +2369,7 @@ msgid "about an hour"
 msgstr "aproximadamente uma hora"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
+#, javascript-format
 msgid "about %d hour"
 msgid_plural "about %d hours"
 msgstr[0] "aproximadamente %d hora"
@@ -2376,7 +2380,7 @@ msgid "a day"
 msgstr "um dia"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
+#, javascript-format
 msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] "%d dia"
@@ -2387,7 +2391,7 @@ msgid "about a month"
 msgstr "aproximadamente um mês"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
+#, javascript-format
 msgid "%d month"
 msgid_plural "%d months"
 msgstr[0] "%d mês"
@@ -2398,7 +2402,7 @@ msgid "about a year"
 msgstr "aproximadamente um ano"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
+#, javascript-format
 msgid "%d year"
 msgid_plural "%d years"
 msgstr[0] "%d ano"
@@ -2817,6 +2821,8 @@ msgstr ""
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid ""
 "Your request could not be completed due to a server problem. Reload the page"
+" and try again. If the issue persists, click the Help tab to report the "
+"problem."
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
@@ -3090,7 +3096,10 @@ msgid "Heading"
 msgstr "Cabeçalho"
 
 #: lms/static/js/ajax-error.js
-msgid "You have been logged out of your edX account. "
+msgid ""
+"You have been logged out of your edX account. Click Okay to log in again "
+"now. Click Cancel to stay on this page (you must log in again to save your "
+"work)."
 msgstr ""
 
 #: lms/static/js/api_admin/views/catalog_preview.js
@@ -3105,8 +3114,7 @@ msgstr "Todas as subseções"
 msgid "All units"
 msgstr "Todas as unidades"
 
-#: lms/static/js/ccx/schedule.js lms/static/js/ccx/schedule.js.c
-#: lms/templates/ccx/schedule.underscore
+#: lms/static/js/ccx/schedule.js lms/templates/ccx/schedule.underscore
 msgid "Click to change"
 msgstr "Clique para alterar"
 
@@ -3114,7 +3122,7 @@ msgstr "Clique para alterar"
 msgid "Select a chapter"
 msgstr "Selecione um capítulo"
 
-#: lms/static/js/ccx/schedule.js lms/static/js/ccx/schedule.js.c
+#: lms/static/js/ccx/schedule.js
 msgid "Save changes"
 msgstr "Salvar alterações"
 
@@ -3135,8 +3143,15 @@ msgid "Enter Start Date and Time"
 msgstr "Informe a data e o horário de início"
 
 #: lms/static/js/certificates/models/certificate_exception.js
+msgid ""
+"Student username/email field is required and can not be empty. Kindly fill "
+"in username/email and then press \"Add to Exception List\" button."
+msgstr ""
+
 #: lms/static/js/certificates/models/certificate_invalidation.js
-msgid "Student username/email field is required and can not be empty. "
+msgid ""
+"Student username/email field is required and can not be empty. Kindly fill "
+"in username/email and then press \"Invalidate Certificate\" button."
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
@@ -3152,15 +3167,15 @@ msgid " learner is successfully added to the exception list"
 msgstr "aluno é adicionado com sucesso na lista de exceção"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " records are not in correct format and not added to"
+msgid " records are not in correct format and not added to the exception list"
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " record is not in correct format and not added to the exception"
+msgid " record is not in correct format and not added to the exception list"
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learners do not exist in LMS and not added to the"
+msgid " learners do not exist in LMS and not added to the exception list"
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
@@ -3168,19 +3183,20 @@ msgid " learner does not exist in LMS and not added to the exception list"
 msgstr "aluno não existe no LMS e não está adicionado na lista de exceção"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learners are already white listed and not added to"
+msgid " learners are already white listed and not added to the exception list"
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learner is already white listed and not added to the exception "
+msgid " learner is already white listed and not added to the exception list"
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learners are not enrolled in course and not added to"
+msgid ""
+" learners are not enrolled in course and not added to the exception list"
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learner is not enrolled in course and not added to the exception"
+msgid " learner is not enrolled in course and not added to the exception list"
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
@@ -3254,14 +3270,14 @@ msgid "An error occurred. Please try again later."
 msgstr "Ocorreu um erro. Por favor, tente novamente mais tarde."
 
 #: lms/static/js/discovery/views/search_form.js
-#, c-format
+#, javascript-format
 msgid "Viewing %s course"
 msgid_plural "Viewing %s courses"
 msgstr[0] "Visualizando %s curso"
 msgstr[1] "Visualizando %s cursos"
 
 #: lms/static/js/discovery/views/search_form.js
-#, c-format
+#, javascript-format
 msgid "We couldn't find any results for \"%s\"."
 msgstr "Não foi possível encontrar resultados para \"%s\"."
 
@@ -4154,7 +4170,7 @@ msgid "Enrolled"
 msgstr ""
 
 #: lms/static/js/search/base/views/search_results_view.js
-#, c-format
+#, javascript-format
 msgid "%s result"
 msgid_plural "%s results"
 msgstr[0] "%s resultado"
@@ -4250,7 +4266,7 @@ msgid "We couldn't sign you in."
 msgstr ""
 
 #: lms/static/js/student_account/views/LoginView.js
-#, c-format
+#, javascript-format
 msgid "An error occurred when signing you in to %s."
 msgstr ""
 
@@ -4263,7 +4279,10 @@ msgid ""
 "{paragraphStart}You entered {boldStart}{email}{boldEnd}. If this email "
 "address is associated with your {platform_name} account, we will send a "
 "message with password reset instructions to this email "
-"address.{paragraphEnd}"
+"address.{paragraphEnd}{paragraphStart}If you do not receive a password reset"
+" message, verify that you entered the correct email address, or check your "
+"spam folder.{paragraphEnd}{paragraphStart}If you need further assistance, "
+"{anchorStart}contact technical support{anchorEnd}.{paragraphEnd}"
 msgstr ""
 
 #: lms/static/js/student_account/views/LoginView.js
@@ -4277,7 +4296,8 @@ msgstr ""
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
 "You have successfully signed into %(currentProvider)s, but your "
-"%(currentProvider)s"
+"%(currentProvider)s account does not have a linked %(platformName)s account."
+" To link your accounts, sign in now using your %(platformName)s password."
 msgstr ""
 
 #: lms/static/js/student_account/views/RegisterView.js
@@ -4796,10 +4816,6 @@ msgid ""
 "release date."
 msgstr ""
 
-#: lms/templates/class_dashboard/all_section_metrics.js
-msgid "Unable to retrieve data, please try again later."
-msgstr ""
-
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
 msgid "%(num_students)s student opened Subsection"
 msgid_plural "%(num_students)s students opened Subsection"
@@ -4921,7 +4937,7 @@ msgid "Image must be in PNG format."
 msgstr "A imagem deve estar no formato PNG."
 
 #: cms/static/js/collections/group.js
-#, c-format
+#, javascript-format
 msgid "Group %s"
 msgstr "Grupo %s"
 
@@ -5204,7 +5220,9 @@ msgid "Upload failed for video {fileName}"
 msgstr ""
 
 #: cms/static/js/views/active_video_upload_list.js
-msgid "{filename} is not in a supported file format. "
+msgid ""
+"{filename} is not in a supported file format. Supported file formats are "
+"{supportedFileFormats}."
 msgstr ""
 
 #: cms/static/js/views/active_video_upload_list.js
@@ -5264,12 +5282,12 @@ msgstr ""
 msgid "Max file size exceeded"
 msgstr "Tamanho máximo de arquivo excedido."
 
-#: cms/static/js/views/assets.js cms/static/js/views/assets.js.c
+#: cms/static/js/views/assets.js
 #: cms/templates/js/asset-upload-modal.underscore
 msgid "Upload New File"
 msgstr "Subir um Novo Arquivo"
 
-#: cms/static/js/views/assets.js cms/static/js/views/assets.js.c
+#: cms/static/js/views/assets.js
 msgid "Load Another File"
 msgstr "Carregar outro arquivo"
 
@@ -5332,7 +5350,11 @@ msgid "There has been an error while exporting."
 msgstr "Ocorreu um erro na exportação."
 
 #: cms/static/js/views/export.js
-msgid "There has been a failure to export to XML at least one component. "
+msgid ""
+"There has been a failure to export to XML at least one component. It is "
+"recommended that you go to the edit page and repair the error before "
+"attempting another export. Please check that all components on the page are "
+"valid and do not display any error messages."
 msgstr ""
 
 #: cms/static/js/views/export.js
@@ -5346,7 +5368,8 @@ msgstr "Retornar para Exportar"
 #: cms/static/js/views/export.js
 msgid ""
 "Your library could not be exported to XML. There is not enough information "
-"to "
+"to identify the failed component. Inspect your library to identify any "
+"problematic components and try again."
 msgstr ""
 
 #: cms/static/js/views/export.js
@@ -5356,7 +5379,8 @@ msgstr "Me leve à página principal da biblioteca"
 #: cms/static/js/views/export.js
 msgid ""
 "Your course could not be exported to XML. There is not enough information to"
-" "
+" identify the failed component. Inspect your course to identify any "
+"problematic components and try again."
 msgstr ""
 
 #: cms/static/js/views/export.js
