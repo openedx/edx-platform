@@ -64,9 +64,6 @@ echo "npm version is `npm --version`"
 echo "--> Cleaning npm cache"
 npm cache clean
 
-echo "setting variables that paver will use to get Django Settings"
-export EDX_PLATFORM_SETTINGS=test_static_optimized
-
 # Log any paver or ansible command timing
 TIMESTAMP=$(date +%s)
 export PAVER_TIMER_LOG="test_root/log/timing.paver.$TIMESTAMP.log"
