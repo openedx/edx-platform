@@ -94,9 +94,6 @@ class ActivationEmailTests(TestCase):
         "This email message was automatically sent by edx.org"
     ]
 
-    def setUp(self):
-        super(ActivationEmailTests, self).setUp()
-
     def test_activation_email(self):
         self._create_account()
         self._assert_activation_email(self.ACTIVATION_SUBJECT, self.OPENEDX_FRAGMENTS)

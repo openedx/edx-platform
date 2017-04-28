@@ -2039,12 +2039,6 @@ class TestPublish(SplitModuleTest):
     """
     Test the publishing api
     """
-    def setUp(self):
-        super(TestPublish, self).setUp()
-
-    def tearDown(self):
-        SplitModuleTest.tearDown(self)
-
     @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
     def test_publish_safe(self, _from_json):
         """

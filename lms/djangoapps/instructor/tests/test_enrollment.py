@@ -733,9 +733,6 @@ class TestGetEmailParams(SharedModuleStoreTestCase):
         cls.course_about_url = cls.course_url + 'about'
         cls.registration_url = u'https://{}/register'.format(site)
 
-    def setUp(self):
-        super(TestGetEmailParams, self).setUp()
-
     def test_normal_params(self):
         # For a normal site, what do we expect to get for the URLs?
         # Also make sure `auto_enroll` is properly passed through.

@@ -132,12 +132,6 @@ class BookmarksTest(BookmarksTestMixin):
     Tests to verify bookmarks functionality.
     """
 
-    def setUp(self):
-        """
-        Initialize test setup.
-        """
-        super(BookmarksTest, self).setUp()
-
     def _breadcrumb(self, num_units, modified_name=None):
         """
         Creates breadcrumbs for the first `num_units`

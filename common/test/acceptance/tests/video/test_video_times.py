@@ -7,9 +7,6 @@ from common.test.acceptance.tests.video.test_video_module import VideoBaseTest
 class VideoTimesTest(VideoBaseTest):
     """ Test Video Player Times """
 
-    def setUp(self):
-        super(VideoTimesTest, self).setUp()
-
     def test_video_start_time(self):
         """
         Scenario: Start time works for Youtube video

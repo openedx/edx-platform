@@ -210,12 +210,6 @@ class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurations
     """
     Test cases for group_configurations_list_handler.
     """
-    def setUp(self):
-        """
-        Set up GroupConfigurationsListHandlerTestCase.
-        """
-        super(GroupConfigurationsListHandlerTestCase, self).setUp()
-
     def _url(self):
         """
         Return url for the handler.
@@ -609,10 +603,6 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
     """
     Tests for usage information of configurations and content groups.
     """
-
-    def setUp(self):
-        super(GroupConfigurationsUsageInfoTestCase, self).setUp()
-
     def _get_user_partition(self, scheme):
         """
         Returns the first user partition with the specified scheme.
@@ -947,9 +937,6 @@ class GroupConfigurationsValidationTestCase(CourseTestCase, HelperMethods):
     """
     Tests for validation in Group Configurations.
     """
-    def setUp(self):
-        super(GroupConfigurationsValidationTestCase, self).setUp()
-
     @patch('xmodule.split_test_module.SplitTestDescriptor.validate_split_test')
     def verify_validation_add_usage_info(self, expected_result, mocked_message, mocked_validation_messages):
         """

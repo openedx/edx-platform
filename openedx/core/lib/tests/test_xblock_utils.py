@@ -53,9 +53,6 @@ class TestXblockUtils(SharedModuleStoreTestCase):
             run='2015'
         )
 
-    def setUp(self):
-        super(TestXblockUtils, self).setUp()
-
     def create_fragment(self, content=None):
         """
         Create a fragment.
