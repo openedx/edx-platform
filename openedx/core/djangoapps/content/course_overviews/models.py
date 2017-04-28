@@ -5,6 +5,7 @@ import json
 import logging
 from urlparse import urlparse, urlunparse
 
+from django.conf import settings
 from django.db import models, transaction
 from django.db.models.fields import BooleanField, DateTimeField, DecimalField, TextField, FloatField, IntegerField
 from django.db.utils import IntegrityError
@@ -387,6 +388,19 @@ class CourseOverview(TimeStampedModel):
         Returns whether the course has ended.
         """
         return course_metadata_utils.has_course_ended(self.end)
+
+    def has_marketing_url(self):
+        """
+        Returns whether the course has marketing url.
+        """
+        return settings.FEATURES.get('ENABLE_MKTG_SITE') and bool(self.marketing_url)
+
+    def has_social_sharing_url(self):
+        """
+        Returns whether the course has social sharing url.
+        """
+        is_social_sharing_enabled = getattr(settings, 'SOCIAL_SHARING_SETTINGS', {}).get('CUSTOM_COURSE_URLS')
+        return is_social_sharing_enabled and bool(self.social_sharing_url)
 
     def starts_within(self, days):
         """
