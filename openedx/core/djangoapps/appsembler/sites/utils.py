@@ -108,7 +108,6 @@ def bootstrap_site(site, organization_slug=None, user_email=None):
     # don't use create because we need to call save() to set some values automatically
     site_config = SiteConfiguration(site=site, enabled=True)
     site_config.save()
-    SiteTheme.objects.create(site=site, theme_dir_name=settings.DEFAULT_SITE_THEME)
     site.configuration_id = site_config.id
     # temp workarounds while old staging is still up and running
     if organization_slug:
