@@ -41,7 +41,7 @@
                             return subCategoryTemplate({
                                 name: name,
                                 id: entry.id,
-                                is_cohorted: entry.is_cohorted,
+                                is_divided: entry.is_divided,
                                 type: 'course-wide'
                             });
                         }));

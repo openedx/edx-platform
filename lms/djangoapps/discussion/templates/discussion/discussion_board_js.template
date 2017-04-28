@@ -57,7 +57,7 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_str
                 contentInfo: ${annotated_content_info | n, dump_js_escaped_json},
                 courseName: '${course.display_name_with_default | n, js_escaped_string}',
                 courseSettings: ${course_settings | n, dump_js_escaped_json},
-                isCommentableCohorted: ${is_commentable_cohorted | n, dump_js_escaped_json}
+                isCommentableDivided: ${is_commentable_divided | n, dump_js_escaped_json}
             });
         });
     });

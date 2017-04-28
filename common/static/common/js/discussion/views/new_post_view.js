@@ -41,7 +41,7 @@
                     throw new Error('invalid mode: ' + this.mode);
                 }
                 this.course_settings = options.course_settings;
-                this.is_commentable_cohorted = options.is_commentable_cohorted;
+                this.is_commentable_divided = options.is_commentable_divided;
                 this.topicId = options.topicId;
                 this.discussionBoardView = options.discussionBoardView;
             };
@@ -52,7 +52,7 @@
                 context = _.clone(this.course_settings.attributes);
                 _.extend(context, {
                     cohort_options: this.getCohortOptions(),
-                    is_commentable_cohorted: this.is_commentable_cohorted,
+                    is_commentable_divided: this.is_commentable_divided,
                     mode: this.mode,
                     startHeader: this.startHeader,
                     form_id: this.mode + (this.topicId ? '-' + this.topicId : '')
@@ -85,14 +85,14 @@
             };
 
             NewPostView.prototype.getCohortOptions = function() {
-                var userCohortId;
+                var userGroupId;
                 if (this.course_settings.get('is_cohorted') && DiscussionUtil.isPrivilegedUser()) {
-                    userCohortId = $('#discussion-container').data('user-cohort-id');
+                    userGroupId = $('#discussion-container').data('user-group-id');
                     return _.map(this.course_settings.get('cohorts'), function(cohort) {
                         return {
                             value: cohort.id,
                             text: cohort.name,
-                            selected: cohort.id === userCohortId
+                            selected: cohort.id === userGroupId
                         };
                     });
                 } else {

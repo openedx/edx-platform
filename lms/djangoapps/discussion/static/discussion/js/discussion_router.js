@@ -103,7 +103,7 @@
                         mode: 'tab',
                         startHeader: this.startHeader,
                         courseSettings: this.courseSettings,
-                        is_commentable_cohorted: this.discussion.is_commentable_cohorted
+                        is_commentable_divided: this.discussion.is_commentable_divided
                     });
                     this.main.render();
                     this.main.on('thread:responses:rendered', function() {
