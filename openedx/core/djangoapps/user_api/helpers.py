@@ -78,7 +78,7 @@ def intercept_errors(api_error, ignore_errors=None):
                     args=args,
                     kwargs=kwargs,
                     exception=ex.developer_message if hasattr(ex, 'developer_message') else repr(ex),
-                    caller=caller.strip()
+                    caller=caller.strip(),
                 )
                 LOGGER.exception(msg)
                 raise api_error(msg)
