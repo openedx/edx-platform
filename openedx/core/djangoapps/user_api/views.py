@@ -396,11 +396,16 @@ class RegistrationView(APIView):
         # a field on the registration form meant to hold the user's email address.
         email_placeholder = _(u"username@domain.com")
 
+        # Translators: These instructions appear on the registration form, immediately
+        # below a field meant to hold the user's email address.
+        email_instructions = _(u"This is what you will use to login.")
+
         form_desc.add_field(
             "email",
             field_type="email",
             label=email_label,
             placeholder=email_placeholder,
+            instructions=email_instructions,
             restrictions={
                 "min_length": EMAIL_MIN_LENGTH,
                 "max_length": EMAIL_MAX_LENGTH,
@@ -421,7 +426,7 @@ class RegistrationView(APIView):
         # Translators: This label appears above a field on the registration form
         # meant to confirm the user's email address.
         email_label = _(u"Confirm Email")
-        error_msg = _(u"Please confirm your email.")
+        error_msg = _(u"Please confirm your email address.")
 
         form_desc.add_field(
             "confirm_email",
@@ -444,15 +449,15 @@ class RegistrationView(APIView):
         """
         # Translators: This label appears above a field on the registration form
         # meant to hold the user's full name.
-        name_label = _(u"Full name")
+        name_label = _(u"Full Name")
 
         # Translators: This example name is used as a placeholder in
         # a field on the registration form meant to hold the user's name.
-        name_placeholder = _(u"Jane Doe")
+        name_placeholder = _(u"Jane Q. Learner")
 
         # Translators: These instructions appear on the registration form, immediately
         # below a field meant to hold the user's full name.
-        name_instructions = _(u"Your legal name, used for any certificates you earn.")
+        name_instructions = _(u"This name will be used on any certificates that you earn.")
 
         form_desc.add_field(
             "name",
@@ -477,18 +482,18 @@ class RegistrationView(APIView):
         """
         # Translators: This label appears above a field on the registration form
         # meant to hold the user's public username.
-        username_label = _(u"Public username")
+        username_label = _(u"Public Username")
 
         username_instructions = _(
             # Translators: These instructions appear on the registration form, immediately
             # below a field meant to hold the user's public username.
-            u"The name that will identify you in your courses - "
-            u"{bold_start}(cannot be changed later){bold_end}"
-        ).format(bold_start=u'<strong>', bold_end=u'</strong>')
+            u"The name that will identify you in your courses. "
+            u"It cannot be changed later."
+        )
 
         # Translators: This example username is used as a placeholder in
         # a field on the registration form meant to hold the user's username.
-        username_placeholder = _(u"JaneDoe")
+        username_placeholder = _(u"Jane_Q_Learner")
 
         form_desc.add_field(
             "username",

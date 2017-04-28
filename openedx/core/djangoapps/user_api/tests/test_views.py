@@ -822,6 +822,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 u"required": True,
                 u"label": u"Email",
                 u"placeholder": u"username@domain.com",
+                u"instructions": u"This is what you will use to login.",
                 u"restrictions": {
                     "min_length": EMAIL_MIN_LENGTH,
                     "max_length": EMAIL_MAX_LENGTH
@@ -835,9 +836,9 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 u"name": u"name",
                 u"type": u"text",
                 u"required": True,
-                u"label": u"Full name",
-                u"placeholder": u"Jane Doe",
-                u"instructions": u"Your legal name, used for any certificates you earn.",
+                u"label": u"Full Name",
+                u"placeholder": u"Jane Q. Learner",
+                u"instructions": u"This name will be used on any certificates that you earn.",
                 u"restrictions": {
                     "max_length": 255
                 },
@@ -850,9 +851,10 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 u"name": u"username",
                 u"type": u"text",
                 u"required": True,
-                u"label": u"Public username",
-                u"placeholder": u"JaneDoe",
-                u"instructions": u"The name that will identify you in your courses - <strong>(cannot be changed later)</strong>",  # pylint: disable=line-too-long
+                u"label": u"Public Username",
+                u"placeholder": u"Jane_Q_Learner",
+                u"instructions": u"The name that will identify you in your courses. "
+                                 u"It cannot be changed later.",
                 u"restrictions": {
                     "min_length": USERNAME_MIN_LENGTH,
                     "max_length": USERNAME_MAX_LENGTH
@@ -890,6 +892,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 u"required": True,
                 u"label": u"Email",
                 u"placeholder": u"username@domain.com",
+                u"instructions": u"This is what you will use to login.",
                 u"restrictions": {
                     "min_length": EMAIL_MIN_LENGTH,
                     "max_length": EMAIL_MAX_LENGTH
@@ -973,6 +976,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                     u"required": True,
                     u"label": u"Email",
                     u"placeholder": u"username@domain.com",
+                    u"instructions": u"This is what you will use to login.",
                     u"restrictions": {
                         "min_length": EMAIL_MIN_LENGTH,
                         "max_length": EMAIL_MAX_LENGTH
@@ -980,7 +984,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 }
             )
 
-            # Full name should be filled in
+            # Full Name should be filled in
             self._assert_reg_field(
                 no_extra_fields_setting,
                 {
@@ -988,9 +992,9 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                     u"defaultValue": u"Bob",
                     u"type": u"text",
                     u"required": True,
-                    u"label": u"Full name",
-                    u"placeholder": u"Jane Doe",
-                    u"instructions": u"Your legal name, used for any certificates you earn.",
+                    u"label": u"Full Name",
+                    u"placeholder": u"Jane Q. Learner",
+                    u"instructions": u"This name will be used on any certificates that you earn.",
                     u"restrictions": {
                         "max_length": NAME_MAX_LENGTH,
                     }
@@ -1005,9 +1009,10 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                     u"defaultValue": u"Bob123",
                     u"type": u"text",
                     u"required": True,
-                    u"label": u"Public username",
-                    u"placeholder": u"JaneDoe",
-                    u"instructions": u"The name that will identify you in your courses - <strong>(cannot be changed later)</strong>",  # pylint: disable=line-too-long
+                    u"label": u"Public Username",
+                    u"placeholder": u"Jane_Q_Learner",
+                    u"instructions": u"The name that will identify you in your courses. "
+                                     u"It cannot be changed later.",
                     u"restrictions": {
                         "min_length": USERNAME_MIN_LENGTH,
                         "max_length": USERNAME_MAX_LENGTH
@@ -1197,7 +1202,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 "required": True,
                 "label": "Confirm Email",
                 "errorMessages": {
-                    "required": "Please confirm your email.",
+                    "required": "Please confirm your email address.",
                 }
             }
         )

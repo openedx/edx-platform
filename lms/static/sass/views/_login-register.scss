@@ -10,13 +10,29 @@
     background: $white;
     min-height: 100%;
     width: 100%;
+    padding-left: ($baseline/2);
+    padding-right: ($baseline/2);
     $third-party-button-height: ($baseline*1.75);
 
     h2 {
-        @extend %t-title5;
+        @extend %t-title4;
+        margin-top: $baseline;
+        letter-spacing: normal;
+        font-family: $sans-serif;
+        color: $uxpl-blue-hover-active;
+    }
+
+    h3 {
+        @extend %t-title6;
+        @extend %t-light;
         margin: 0;
         letter-spacing: normal;
         font-family: $sans-serif;
+        color: $gray-d4;
+    }
+
+    a, label {
+        @extend %expand-clickable-area;
     }
 
     .instructions {
@@ -68,27 +84,22 @@
         }
     }
 
-    form,
-    .wrapper-other-login {
-        border: 1px solid $gray-l4;
-        border-radius: ($baseline/4);
-        padding: 0 ($baseline*1.25) $baseline ($baseline*1.25);
-    }
-
     .section-title {
         position: relative;
-        margin: 20px 0 10px;
+        margin: $baseline 0 ($baseline/2);
 
         &.lines {
-            margin-bottom: 20px;
+            margin-bottom: $baseline;
+            margin-top: $baseline;
+            text-align: center;
 
             &:after {
                 position: absolute;
                 left: 0;
-                top: 12px;
+                top: ($baseline/2);
                 width: 100%;
                 height: 1px;
-                background: $gray-l4;
+                background: $gray-l3;
                 content: '';
                 z-index: 5;
             }
@@ -125,18 +136,13 @@
     .form-type,
     .toggle-form {
         @include box-sizing(border-box);
-        max-width: 650px;
+        max-width: 600px;
         min-width: 250px;
         margin: 0 auto;
-        padding: {
-            left: $baseline; // Don't want to override any top or bottom (CR)
-            right: $baseline; // Don't want to override any top or bottom (CR)
-            bottom: ($baseline/2);
-        }
     }
 
     .toggle-form {
-        text-align: center // Centers the text and buttons
+        @extend %t-action1;
     }
 
     .note {
@@ -149,7 +155,8 @@
 
     /** The forms **/
     .form-wrapper {
-        padding-top: ($baseline + 5);
+        padding-top: $baseline;
+        padding-bottom: $baseline;
 
         form {
             @include clearfix();
@@ -161,22 +168,8 @@
         }
     }
 
-    .login-form {
-        margin-bottom: $baseline;
-
-        &:focus {
-            outline: none;
-        }
-    }
-
-    .password-reset-form {
-        padding-bottom: ($baseline + 5);
-
-        &:focus {
-            outline: none;
-        }
-    }
-
+    .login-form,
+    .password-reset-form,
     .register-form {
         &:focus {
             outline: none;
@@ -204,7 +197,7 @@
         clear: both;
         position: relative;
         width: 100%;
-        margin: ($baseline/2) 0 ($baseline/4) 0;
+        margin: ($baseline/2) 0 0 0;
 
         &.select-year_of_birth {
             @include margin-left(15px);
@@ -219,6 +212,7 @@
         /** FROM _accounts.scss - start **/
         label,
         input,
+        select,
         textarea {
             height: auto;
             line-height: 1.5em;
@@ -235,7 +229,8 @@
 
         label {
             display: block;
-            margin: 0 0 6px 0;
+            margin: 0;
+            color: $black;
 
             &.inline {
                 display: inline;
@@ -244,13 +239,12 @@
             &.error {
                 color: $red;
             }
-            
+
             &[for="register-data_sharing_consent"],
             &[for="register-honor_code"],
             &[for="register-terms_of_service"] {
                 display: inline-block;
                 margin: 5px 5px 0 0;
-                width: 90%;
                 vertical-align: top;
             }
 
@@ -275,7 +269,7 @@
             text-decoration: none;
             text-shadow: none;
             font-family: $sans-serif;
-            
+
             &:hover,
             &:focus {
                 text-decoration: underline;
@@ -286,6 +280,7 @@
         select,
         textarea {
             display: block;
+            height: 32px;
             width: 100%;
             margin: 0 0 ($baseline/4);
             padding: 0 ($baseline/2);
@@ -301,39 +296,42 @@
             &.checkbox {
                 display: inline;
                 width: auto;
+                height: auto;
                 margin-right: ($baseline/4);
+
+                & + label {
+                    display: inline;
+                }
             }
 
             &.error {
                 border-color: tint($red,50%);
             }
-        }
-
-        input {
-            height: 32px;
         }
 
         textarea {
             resize: none;
-
-            &.long {
-                height: ($baseline*5);
-            }
+            height: ($baseline*5);
         }
 
         select {
-            width: 100%;
+            background: transparent;
+            opacity: 0.85;
+            border: none;
+            outline: solid 1px $gray-l3;
+            cursor: pointer;
 
-            &.error {
-                border-color: tint($red,50%);
+            &:active, &:focus {
+                outline: auto;
             }
         }
 
+        .tip, .label-optional {
+            @extend %t-copy-sub1;
+            color: $gray-d2;
+        }
         .tip {
-            @extend %t-copy-sub2;
             display: block;
-            margin: 0 0 ($baseline/2) 0;
-            color: $base-font-color;
         }
         /** FROM _accounts.scss - end **/
     }
@@ -356,12 +354,11 @@
 
     .action-primary {
         @extend %btn-primary-blue;
-        width: 100%;
-        margin-top: 1em;
-        padding: ($baseline/2);
+        padding: 1ex 1em;
         text-transform: none;
         font-weight: 600;
         letter-spacing: normal;
+        margin-top: $baseline;
 
         .icon {
             @extend %sso-icon;
@@ -377,7 +374,7 @@
 
         position: relative;
         margin-right: ($baseline/4);
-        margin-bottom: $baseline;
+        margin-bottom: ($baseline/4);
         border-color: $lightGrey1;
         width: $baseline*6.5;
         height: $third-party-button-height;
@@ -426,10 +423,6 @@
                 border: 1px solid #A5382B;
                 color: $white;
             }
-
-            &:hover {
-                box-shadow: 0 2px 1px 0 #8D3024;
-            }
         }
 
         &.button-oa2-facebook {
@@ -444,10 +437,6 @@
                 background-color: $facebook-blue;
                 border: 1px solid #263A62;
                 color: $white;
-            }
-
-            &:hover {
-                box-shadow: 0 2px 1px 0 #30487C;
             }
         }
 
@@ -464,10 +453,6 @@
                 border: 1px solid #06527D;
                 color: $white;
             }
-
-            &:hover {
-                box-shadow: 0 2px 1px 0 #005D8E;
-            }
         }
 
         &.button-oa2-azuread-oauth2 {
@@ -482,10 +467,6 @@
                 background-color: $microsoft-blue;
                 border: 1px solid $microsoft-blue;
                 color: $white;
-            }
-
-            &:hover {
-                box-shadow: 0 2px 1px 0 darken($microsoft-blue, 10%);
             }
         }
 

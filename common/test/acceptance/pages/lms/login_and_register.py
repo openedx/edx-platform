@@ -220,7 +220,7 @@ class CombinedLoginAndRegisterPage(PageObject):
         if favorite_movie:
             self.q(css="#register-favorite_movie").fill(favorite_movie)
         if terms_of_service:
-            self.q(css="#register-honor_code").click()
+            self.q(css="label[for='register-honor_code']").click()
 
         # Submit it
         self.q(css=".register-button").click()
