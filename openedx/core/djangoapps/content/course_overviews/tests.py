@@ -11,6 +11,7 @@ from nose.plugins.attrib import attr
 import pytz
 
 from django.conf import settings
+from django.db.utils import IntegrityError
 from django.test.utils import override_settings
 from django.utils import timezone
 from PIL import Image
@@ -41,7 +42,7 @@ from .models import CourseOverview, CourseOverviewImageSet, CourseOverviewImageC
 @ddt.ddt
 class CourseOverviewTestCase(ModuleStoreTestCase):
     """
-    Tests for CourseOverviewDescriptor model.
+    Tests for CourseOverview model.
     """
 
     TODAY = timezone.now()
@@ -62,7 +63,7 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
         Specifically, given a course, test that data within the following three
         objects match each other:
          - the CourseDescriptor itself
-         - a CourseOverview that was newly constructed from _create_from_course
+         - a CourseOverview that was newly constructed from _create_or_update
          - a CourseOverview that was loaded from the MySQL database
 
         Arguments:
@@ -83,7 +84,7 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
             return math.floor((date_time - epoch).total_seconds())
 
         # Load the CourseOverview from the cache twice. The first load will be a cache miss (because the cache
-        # is empty) so the course will be newly created with CourseOverviewDescriptor.create_from_course. The second
+        # is empty) so the course will be newly created with CourseOverview._create_or_update. The second
         # load will be a cache hit, so the course will be loaded from the cache.
         course_overview_cache_miss = CourseOverview.get_from_id(course.id)
         course_overview_cache_hit = CourseOverview.get_from_id(course.id)
@@ -345,7 +346,7 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
         course._grading_policy['GRADE_CUTOFFS'] = {}  # pylint: disable=protected-access
         with self.assertRaises(ValueError):
             __ = course.lowest_passing_grade
-        course_overview = CourseOverview._create_from_course(course)  # pylint: disable=protected-access
+        course_overview = CourseOverview._create_or_update(course)  # pylint: disable=protected-access
         self.assertEqual(course_overview.lowest_passing_grade, None)
 
     @ddt.data((ModuleStoreEnum.Type.mongo, 4, 4), (ModuleStoreEnum.Type.split, 3, 4))
@@ -920,9 +921,9 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
         CourseOverviewImageSet.objects.create(course_overview=overview)
 
         # Now do it the normal way -- this will cause an IntegrityError to be
-        # thrown and suppressed in create_for_course()
+        # thrown and suppressed in create_or_update()
         self.set_config(True)
-        CourseOverviewImageSet.create_for_course(overview)
+        CourseOverviewImageSet.create_or_update(overview)
         self.assertTrue(hasattr(overview, 'image_set'))
 
         # The following is actually very important for this test because
@@ -965,3 +966,41 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
                 }
             )
             return course_overview
+
+
+@attr(shard=3)
+@ddt.ddt
+class CourseOverviewTabTestCase(ModuleStoreTestCase):
+    """
+    Tests for CourseOverviewTab model.
+    """
+
+    ENABLED_SIGNALS = ['course_published']
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_tabs_deletion_rollback_on_integrity_error(self, modulestore_type):
+        """
+        Tests that course_overview tabs deletion is correctly rolled back if an Exception
+        occurs while updating the course_overview.
+        """
+        course = CourseFactory.create(default_store=modulestore_type)
+        course_overview = CourseOverview.get_from_id(course.id)
+        expected_tabs = {tab.tab_id for tab in course_overview.tabs.all()}
+
+        with mock.patch(
+            'openedx.core.djangoapps.content.course_overviews.models.CourseOverviewTab.objects.bulk_create'
+        ) as course_overview_tabs_bulk_create:
+            course_overview_tabs_bulk_create.side_effect = IntegrityError
+
+            # Update display name on the course descriptor
+            # This fires a course_published signal, which should be caught in signals.py,
+            # which should in turn load CourseOverview from modulestore.
+            course.display_name = u'Updated display name'
+            with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
+                self.store.update_item(course, ModuleStoreEnum.UserID.test)
+
+            # Asserts that the tabs deletion is properly rolled back to a save point and
+            # the course overview is not updated.
+            actual_tabs = {tab.tab_id for tab in course_overview.tabs.all()}
+            self.assertEqual(actual_tabs, expected_tabs)
+            self.assertNotEqual(course_overview.display_name, course.display_name)
