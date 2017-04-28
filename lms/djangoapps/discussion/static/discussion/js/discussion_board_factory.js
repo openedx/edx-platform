@@ -21,7 +21,7 @@
                     sortPreference = options.sortPreference,
                     threads = options.threads,
                     threadPages = options.threadPages,
-                    isCommentableCohorted = options.isCommentableCohorted,
+                    isCommentableDivided = options.isCommentableDivided,
                     contentInfo = options.contentInfo,
                     user = new DiscussionUser(userInfo),
                     discussion,
@@ -41,7 +41,7 @@
 
                 // Create a discussion model
                 discussion = new Discussion(threads, {pages: threadPages, sort: sortPreference,
-                    is_commentable_cohorted: isCommentableCohorted});
+                    is_commentable_divided: isCommentableDivided});
                 courseSettings = new DiscussionCourseSettings(options.courseSettings);
 
                 // Create the discussion board view

@@ -96,29 +96,29 @@
         describe('renderComments', function() {
             beforeEach(function() {
                 this.course_settings = new DiscussionCourseSettings({
-                    'category_map': {
-                        'children': [ // eslint-disable-line quote-props
+                    category_map: {
+                        children: [
                             ['Topic', 'entry'],
                             ['General', 'entry'],
                             ['Basic Question', 'entry']
                         ],
-                        'entries': {
-                            'Topic': {
-                                'is_cohorted': true,
-                                'id': 'topic'
+                        entries: {
+                            Topic: {
+                                is_divided: true,
+                                id: 'topic'
                             },
-                            'General': {
-                                'sort_key': 'General',
-                                'is_cohorted': false,
-                                'id': '6.00.1x_General'
+                            General: {
+                                sort_key: 'General',
+                                is_divided: false,
+                                id: '6.00.1x_General'
                             },
                             'Basic Question': {
-                                'is_cohorted': false,
-                                'id': "6>00'1x\"Basic_Question"
+                                is_divided: false,
+                                id: "6>00'1x\"Basic_Question"
                             }
                         }
                     },
-                    'is_cohorted': true
+                    is_cohorted: true
                 });
             });
 

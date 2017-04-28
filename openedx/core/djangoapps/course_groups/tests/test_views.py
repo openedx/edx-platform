@@ -1255,7 +1255,7 @@ class CourseCohortDiscussionTopicsTestCase(CohortViewsTestCase):
                 'entries': {
                     'Topic B': {
                         'sort_key': 'A',
-                        'is_cohorted': True,
+                        'is_divided': True,
                         'id': topic_name_to_id(self.course, "Topic B"),
                         'start_date': response['course_wide_discussions']['entries']['Topic B']['start_date']
                     }
@@ -1269,7 +1269,7 @@ class CourseCohortDiscussionTopicsTestCase(CohortViewsTestCase):
                         'entries': {
                             'Discussion': {
                                 'sort_key': None,
-                                'is_cohorted': True,
+                                'is_divided': True,
                                 'id': topic_name_to_id(self.course, "Topic A"),
                                 'start_date': start_date
                             }

@@ -258,7 +258,7 @@ def _sort_map_entries(category_map, sort_alpha):
     category_map["children"] = [(x[0], x[2]) for x in sorted(things, key=lambda x: x[1]["sort_key"])]
 
 
-def get_discussion_category_map(course, user, cohorted_if_in_list=False, exclude_unstarted=True):
+def get_discussion_category_map(course, user, divided_only_if_explicit=False, exclude_unstarted=True):
     """
     Transform the list of this course's discussion xblocks into a recursive dictionary structure.  This is used
     to render the discussion category map in the discussion tab sidebar for a given user.
@@ -266,15 +266,15 @@ def get_discussion_category_map(course, user, cohorted_if_in_list=False, exclude
     Args:
         course: Course for which to get the ids.
         user:  User to check for access.
-        cohorted_if_in_list (bool): If True, inline topics are marked is_cohorted only if they are
-            in course_cohort_settings.discussion_topics.
+        divided_only_if_explicit (bool): If True, inline topics are marked is_divided only if they are
+            explicitly listed in course_cohort_settings.discussion_topics.
 
     Example:
         >>> example = {
         >>>               "entries": {
         >>>                   "General": {
         >>>                       "sort_key": "General",
-        >>>                       "is_cohorted": True,
+        >>>                       "is_divided": True,
         >>>                       "id": "i4x-edx-eiorguegnru-course-foobarbaz"
         >>>                   }
         >>>               },
@@ -292,12 +292,12 @@ def get_discussion_category_map(course, user, cohorted_if_in_list=False, exclude
         >>>                       "entries": {
         >>>                           "Working with Videos": {
         >>>                               "sort_key": None,
-        >>>                               "is_cohorted": False,
+        >>>                               "is_divided": False,
         >>>                               "id": "d9f970a42067413cbb633f81cfb12604"
         >>>                           },
         >>>                           "Videos on edX": {
         >>>                               "sort_key": None,
-        >>>                               "is_cohorted": False,
+        >>>                               "is_divided": False,
         >>>                               "id": "98d8feb5971041a085512ae22b398613"
         >>>                           }
         >>>                       }
@@ -356,14 +356,14 @@ def get_discussion_category_map(course, user, cohorted_if_in_list=False, exclude
             if node[level]["start_date"] > category_start_date:
                 node[level]["start_date"] = category_start_date
 
-        always_cohort_inline_discussions = (  # pylint: disable=invalid-name
-            not cohorted_if_in_list and course_cohort_settings.always_cohort_inline_discussions
+        divide_all_inline_discussions = (  # pylint: disable=invalid-name
+            not divided_only_if_explicit and course_cohort_settings.always_cohort_inline_discussions
         )
         dupe_counters = defaultdict(lambda: 0)  # counts the number of times we see each title
         for entry in entries:
-            is_entry_cohorted = (
+            is_entry_divided = (
                 course_cohort_settings.is_cohorted and (
-                    always_cohort_inline_discussions or entry["id"] in course_cohort_settings.cohorted_discussions
+                    divide_all_inline_discussions or entry["id"] in course_cohort_settings.cohorted_discussions
                 )
             )
 
@@ -376,7 +376,7 @@ def get_discussion_category_map(course, user, cohorted_if_in_list=False, exclude
             node[level]["entries"][title] = {"id": entry["id"],
                                              "sort_key": entry["sort_key"],
                                              "start_date": entry["start_date"],
-                                             "is_cohorted": is_entry_cohorted}
+                                             "is_divided": is_entry_divided}
 
     # TODO.  BUG! : course location is not unique across multiple course runs!
     # (I think Kevin already noticed this)  Need to send course_id with requests, store it
@@ -386,8 +386,9 @@ def get_discussion_category_map(course, user, cohorted_if_in_list=False, exclude
             "id": entry["id"],
             "sort_key": entry.get("sort_key", topic),
             "start_date": datetime.now(UTC()),
-            "is_cohorted": (course_cohort_settings.is_cohorted and
-                            entry["id"] in course_cohort_settings.cohorted_discussions)
+            "is_divided": (
+                course_cohort_settings.is_cohorted and entry["id"] in course_cohort_settings.cohorted_discussions
+            )
         }
 
     _sort_map_entries(category_map, course.discussion_sort_alpha)
@@ -740,7 +741,7 @@ def get_group_id_for_comments_service(request, course_key, commentable_id=None):
     Raises:
         ValueError if the requested group_id is invalid
     """
-    if commentable_id is None or is_commentable_cohorted(course_key, commentable_id):
+    if commentable_id is None or is_commentable_divided(course_key, commentable_id):
         if request.method == "GET":
             requested_group_id = request.GET.get('group_id')
         elif request.method == "POST":
@@ -755,12 +756,20 @@ def get_group_id_for_comments_service(request, course_key, commentable_id=None):
                 raise ValueError
         else:
             # regular users always query with their own id.
-            group_id = get_cohort_id(request.user, course_key)
+            group_id = get_group_id_for_user(request.user, course_key)
         return group_id
     else:
         # Never pass a group_id to the comments service for a non-cohorted
         # commentable
         return None
+
+
+def get_group_id_for_user(user, course_key):
+    """
+    This method will be modified to consider Enrollment Tracks.
+    Currently pass-through to get_cohort_id.
+    """
+    return get_cohort_id(user, course_key)
 
 
 def is_comment_too_deep(parent):
@@ -777,14 +786,15 @@ def is_comment_too_deep(parent):
     )
 
 
-def is_commentable_cohorted(course_key, commentable_id):
+def is_commentable_divided(course_key, commentable_id):
     """
     Args:
         course_key: CourseKey
         commentable_id: string
 
     Returns:
-        Bool: is this commentable cohorted?
+        Bool: is this commentable divided, meaning that learners are divided into
+        groups (either Cohorts or Enrollment Tracks) and only see posts within their group?
 
     Raises:
         Http404 if the course doesn't exist.
@@ -807,7 +817,7 @@ def is_commentable_cohorted(course_key, commentable_id):
         # inline discussions are cohorted by default
         ans = True
 
-    log.debug(u"is_commentable_cohorted(%s, %s) = {%s}", course_key, commentable_id, ans)
+    log.debug(u"is_commentable_divided(%s, %s) = {%s}", course_key, commentable_id, ans)
     return ans
 
 
