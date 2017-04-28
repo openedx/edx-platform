@@ -7,6 +7,7 @@ from celery.exceptions import MaxRetriesExceededError
 import ddt
 from django.conf import settings
 from django.test import override_settings, TestCase
+from edx_rest_api_client import exceptions
 from edx_rest_api_client.client import EdxRestApiClient
 from edx_oauth2_provider.tests.factories import ClientFactory
 import httpretty
@@ -299,3 +300,19 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         tasks.award_program_certificates.delay(self.student.username).get()
         self.assertEqual(mock_get_certified_programs.call_count, 2)
         self.assertEqual(mock_award_program_certificate.call_count, 1)
+
+    def test_no_retry_on_credentials_api_not_found_errors(
+            self,
+            mock_get_completed_programs,
+            mock_get_certified_programs,
+            mock_award_program_certificate,
+    ):
+        mock_get_completed_programs.return_value = [1, 2]
+        mock_get_certified_programs.side_effect = [[], [2]]
+        mock_award_program_certificate.side_effect = self._make_side_effect(
+            [exceptions.HttpNotFoundError(), None]
+        )
+
+        tasks.award_program_certificates.delay(self.student.username).get()
+
+        self.assertEqual(mock_award_program_certificate.call_count, 2)
