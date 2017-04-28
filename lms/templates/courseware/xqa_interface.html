@@ -5,26 +5,26 @@
 <script type="text/javascript">
 
 function setup_debug(element_id, edit_link, staff_context){
-    var staffDebugTrigger = $('#' + element_id + '_trig'),
-        xqaLogTrigger = $('#' + element_id + '_xqa_log'),
-        historyTrigger = $("#" + element_id + "_history_trig"),
-        debugModalSelector = '#' + element_id + '_debug',
-        historyModalSelector = '#' + element_id + '_history',
-        xqaModalSelector = '#' + element_id + '_xqa-modal',
+    var staffDebugTrigger = $('#trig_' + element_id),
+        xqaLogTrigger = $('#xqa_log_' + element_id),
+        historyTrigger = $("#history_trig_" + element_id),
+        debugModalSelector = '#debug_' + element_id,
+        historyModalSelector = '#history_' + element_id,
+        xqaModalSelector = '#xqa-modal_' + element_id,
         leanOverlaySelector = $('#lean_overlay');
 
     staffDebugTrigger.leanModal();
     xqaLogTrigger.leanModal();
-    $('#' + element_id + '_xqa_form').submit(function () {sendlog(element_id, edit_link, staff_context);});
+    $('#xqa_form_' + element_id).submit(function () {sendlog(element_id, edit_link, staff_context);});
 
     historyTrigger.leanModal();
 
     $('#' + element_id + '_history_form').submit(
         function () {
-            var username = $("#" + element_id + "_history_student_username").val();
-            var location = $("#" + element_id + "_history_location").val();
+            var username = $("#history_student_username_" + element_id).val();
+            var location = $("#history_location_" + element_id).val();
 
-            $("#" + element_id + "_history_text").load('/courses/' + "${unicode(course.id) | u}" +
+            $("#history_text_" + element_id).load('/courses/' + "${unicode(course.id) | u}" +
                 "/submission_history/" + username + "/" + location);
             return false;
         }
@@ -66,8 +66,8 @@ function sendlog(element_id, edit_link, staff_context){
             'return' : 'query',
             format : 'html',
             email : staff_context.user.email,
-            tag:$('#' + element_id + '_xqa_tag').val(),
-            entry: $('#' + element_id + '_xqa_entry').val()
+            tag:$('#xqa_tag_' + element_id).val(),
+            entry: $('#xqa_entry_' + element_id).val()
         };
 
     $.ajax({
@@ -81,7 +81,7 @@ function sendlog(element_id, edit_link, staff_context){
             xhr.setRequestHeader ("Authorization", "Basic eHFhOmFnYXJ3YWw="); },
         timeout : 1000,
         success: function(result) {
-                $('#' + element_id + '_xqa_log_data').html(result);
+                $('#xqa_log_data_' + element_id).html(result);
         },
         error: function() {
             alert('Error: cannot connect to XQA server. Check the value of the XQA_SERVER setting.');
@@ -108,7 +108,7 @@ function getlog(element_id, staff_context){
         dataType: 'jsonp',
         timeout : 1000,
         success: function(result) {
-            $('#' + element_id + '_xqa_log_data').html(result);
+            $('#xqa_log_data_' + element_id).html(result);
         },
         error: function() {
             alert('Error: cannot connect to XQA server. Check the value of the XQA_SERVER setting.');

@@ -214,4 +214,4 @@ web-fragments==0.2.2
 xblock==0.5.0
 
 # Third Party XBlocks
-edx-sga==0.6.2
+edx-sga==0.6.3
