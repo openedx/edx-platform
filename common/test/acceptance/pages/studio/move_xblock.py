@@ -10,13 +10,6 @@ class MoveModalView(PageObject):
     A base class for move xblock
     """
 
-    def __init__(self, browser):
-        """
-        Arguments:
-            browser (selenium.webdriver): The Selenium-controlled browser that this page is loaded in.
-        """
-        super(MoveModalView, self).__init__(browser)
-
     def is_browser_on_page(self):
         return self.q(css='.modal-window.move-modal').present
 

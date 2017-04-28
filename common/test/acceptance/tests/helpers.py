@@ -723,12 +723,6 @@ class UniqueCourseTest(AcceptanceTest):
     Test that provides a unique course ID.
     """
 
-    def __init__(self, *args, **kwargs):
-        """
-        Create a unique course ID.
-        """
-        super(UniqueCourseTest, self).__init__(*args, **kwargs)
-
     def setUp(self):
         super(UniqueCourseTest, self).setUp()
 

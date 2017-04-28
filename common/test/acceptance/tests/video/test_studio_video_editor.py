@@ -13,9 +13,6 @@ class VideoEditorTest(CMSVideoBaseTest):
     CMS Video Editor Test Class
     """
 
-    def setUp(self):
-        super(VideoEditorTest, self).setUp()
-
     def _create_video_component(self, subtitles=False):
         """
         Create a video component and navigate to unit page

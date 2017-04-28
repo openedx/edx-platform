@@ -71,9 +71,6 @@ class ResetPasswordPage(PageObject):
     """
     url = BASE_URL + "/login#forgot-password-modal"
 
-    def __init__(self, browser):
-        super(ResetPasswordPage, self).__init__(browser)
-
     def is_browser_on_page(self):
         return (
             self.q(css="#login-anchor").is_present() and

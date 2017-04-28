@@ -41,12 +41,6 @@ class CapaModule(CapaMixin, XModule):
     js_module_name = "Problem"
     css = {'scss': [resource_string(__name__, 'css/capa/display.scss')]}
 
-    def __init__(self, *args, **kwargs):
-        """
-        Accepts the same arguments as xmodule.x_module:XModule.__init__
-        """
-        super(CapaModule, self).__init__(*args, **kwargs)
-
     def author_view(self, context):
         """
         Renders the Studio preview view.

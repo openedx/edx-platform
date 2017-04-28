@@ -214,8 +214,7 @@ class OrgRole(RoleBase):
     """
     A named role in a particular org independent of course
     """
-    def __init__(self, role, org):
-        super(OrgRole, self).__init__(role, org)
+    pass
 
 
 @register_access_role

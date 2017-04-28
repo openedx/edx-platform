@@ -127,9 +127,6 @@ class CourseHomeA11yTest(CourseHomeBaseTest):
     Tests the accessibility of the course home page with course outline.
     """
 
-    def setUp(self):
-        super(CourseHomeA11yTest, self).setUp()
-
     def test_course_home_a11y(self):
         """
         Test the accessibility of the course home page with course outline.

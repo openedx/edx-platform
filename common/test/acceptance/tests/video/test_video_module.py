@@ -218,9 +218,6 @@ class VideoBaseTest(UniqueCourseTest):
 class YouTubeVideoTest(VideoBaseTest):
     """ Test YouTube Video Player """
 
-    def setUp(self):
-        super(YouTubeVideoTest, self).setUp()
-
     def test_youtube_video_rendering_wo_html5_sources(self):
         """
         Scenario: Video component is rendered in the LMS in Youtube mode without HTML5 sources
@@ -944,9 +941,6 @@ class YouTubeVideoTest(VideoBaseTest):
 class YouTubeHtml5VideoTest(VideoBaseTest):
     """ Test YouTube HTML5 Video Player """
 
-    def setUp(self):
-        super(YouTubeHtml5VideoTest, self).setUp()
-
     @flaky  # TODO fix this, see TNL-1642
     def test_youtube_video_rendering_with_unsupported_sources(self):
         """
@@ -965,9 +959,6 @@ class YouTubeHtml5VideoTest(VideoBaseTest):
 @attr(shard=4)
 class Html5VideoTest(VideoBaseTest):
     """ Test HTML5 Video Player """
-
-    def setUp(self):
-        super(Html5VideoTest, self).setUp()
 
     def test_autoplay_disabled_for_video_component(self):
         """
@@ -1154,9 +1145,6 @@ class Html5VideoTest(VideoBaseTest):
 class YouTubeQualityTest(VideoBaseTest):
     """ Test YouTube Video Quality Button """
 
-    def setUp(self):
-        super(YouTubeQualityTest, self).setUp()
-
     @skip_if_browser('firefox')
     def test_quality_button_visibility(self):
         """
@@ -1204,9 +1192,6 @@ class DragAndDropTest(VideoBaseTest):
     """
     Tests draggability of closed captions within videos.
     """
-    def setUp(self):
-        super(DragAndDropTest, self).setUp()
-
     def test_if_captions_are_draggable(self):
         """
         Loads transcripts so that closed-captioning is available.
