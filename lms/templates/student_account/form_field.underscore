@@ -1,12 +1,13 @@
 <div class="form-field <%=type%>-<%= name %>">
     <% if ( type !== 'checkbox' ) { %>
         <label for="<%= form %>-<%= name %>">
-            <%= label %>
-            <% if ( required && requiredStr ) { %> <%= requiredStr %></label><% } %>
+            <span class="label-text"><%= label %></span>
+            <% if ( required && requiredStr && (type !== 'hidden') ) { %><span class="label-required"><%= requiredStr %></span><% } %>
+            <% if ( !required && optionalStr && (type !== 'hidden') ) { %><span class="label-optional"><%= optionalStr %></span><% } %>
         </label>
         <% if (supplementalLink && supplementalText) { %>
             <div class="supplemental-link">
-                <a href="<%- supplementalLink %>"><%- supplementalText %></a>
+                <a href="<%- supplementalLink %>" target="_blank"><%- supplementalText %></a>
             </div>
         <% } %>
     <% } %>
@@ -31,7 +32,7 @@
         <% if ( instructions ) { %> <span class="tip tip-input" id="<%= form %>-<%= name %>-desc"><%= instructions %></span><% } %>
         <% if (supplementalLink && supplementalText) { %>
             <div class="supplemental-link">
-                <a href="<%- supplementalLink %>"><%- supplementalText %></a>
+                <a href="<%- supplementalLink %>" target="_blank"><%- supplementalText %></a>
             </div>
         <% } %>
     <% } else if ( type === 'textarea' ) { %>
@@ -53,10 +54,17 @@
             <% if ( instructions ) { %> <span class="tip tip-input" id="<%= form %>-<%= name %>-desc"><%= instructions %></span><% } %>
             <% if (supplementalLink && supplementalText) { %>
                 <div class="supplemental-link">
-                    <a href="<%- supplementalLink %>"><%- supplementalText %></a>
+                    <a href="<%- supplementalLink %>" target="_blank"><%- supplementalText %></a>
                 </div>
             <% } %>
     <% } else { %>
+        <% if ( type === 'checkbox' ) { %>
+            <% if (supplementalLink && supplementalText) { %>
+                <div class="supplemental-link">
+                    <a href="<%- supplementalLink %>" target="_blank"><%- supplementalText %></a>
+                </div>
+            <% } %>
+        <% } %>
         <input id="<%= form %>-<%= name %>"
            type="<%= type %>"
            name="<%= name %>"
@@ -75,16 +83,12 @@
         />
         <% if ( type === 'checkbox' ) { %>
             <label for="<%= form %>-<%= name %>">
-                <%= label %>
-                <% if ( required && requiredStr ) { %> <%= requiredStr %><% } %>
+                <span class="label-text"><%= label %></span>
+                <% if ( required && requiredStr ) { %><span class="label-required"><%= requiredStr %></span><% } %>
+                <% if ( !required && optionalStr ) { %><span class="label-optional"><%= optionalStr %></span><% } %>
             </label>
         <% } %>
         <% if ( instructions ) { %> <span class="tip tip-input" id="<%= form %>-<%= name %>-desc"><%= instructions %></span><% } %>
-        <% if (supplementalLink && supplementalText) { %>
-            <div class="supplemental-link">
-                <a href="<%- supplementalLink %>"><%- supplementalText %></a>
-            </div>
-        <% } %>
     <% } %>
 
     <% if( form === 'login' && name === 'password' ) { %>
