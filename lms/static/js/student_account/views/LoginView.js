@@ -20,6 +20,7 @@
                 },
                 formType: 'login',
                 requiredStr: '',
+                optionalStr: '',
                 submitButton: '.js-login',
                 formSuccessTpl: formSuccessTpl,
                 formStatusTpl: formStatusTpl,

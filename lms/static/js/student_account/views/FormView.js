@@ -35,7 +35,13 @@
                 fields: [],
 
             // String to append to required label fields
-                requiredStr: '*',
+                requiredStr: '',
+
+            /*
+            Translators: This string is appended to optional field labels on the student login, registration, and
+            profile forms.
+            */
+                optionalStr: gettext('(optional)'),
 
                 submitButton: '',
 
@@ -94,6 +100,7 @@
                         html.push(_.template(fieldTpl)($.extend(data[i], {
                             form: this.formType,
                             requiredStr: this.requiredStr,
+                            optionalStr: this.optionalStr,
                             supplementalText: data[i].supplementalText || '',
                             supplementalLink: data[i].supplementalLink || ''
                         })));
