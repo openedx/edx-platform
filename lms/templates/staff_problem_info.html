@@ -11,49 +11,49 @@ ${block_content}
   <div>
       <a href="${edit_link}">Edit</a>
       % if xqa_key:
-          / <a href="#${element_id}_xqa-modal" onclick="javascript:getlog('${element_id}', {
+          / <a href="#xqa-modal_${element_id}" onclick="javascript:getlog('${element_id}', {
           'location': '${location | h}',
           'xqa_key': '${xqa_key | h}',
           'category': '${category | h}',
           'user': '${user | h}'
-       })" id="${element_id}_xqa_log">QA</a>
+       })" id="xqa_log_${element_id}">QA</a>
       % endif
   </div>
 %  endif
 %  if not disable_staff_debug_info:
 <div class="wrap-instructor-info">
-  <a class="instructor-info-action" href="#${element_id}_debug" id="${element_id}_trig">${_("Staff Debug Info")}</a>
+  <a class="instructor-info-action" href="#debug_${element_id}" id="trig_${element_id}">${_("Staff Debug Info")}</a>
 
   %  if settings.FEATURES.get('ENABLE_STUDENT_HISTORY_VIEW') and \
     location.category == 'problem':
-    <a class="instructor-info-action" href="#${element_id}_history" id="${element_id}_history_trig">${_("Submission history")}</a>
+    <a class="instructor-info-action" href="#history_${element_id}" id="history_trig_${element_id}" tabindex="-1">${_("Submission history")}</a>
   %  endif
 </div>
 %  endif
 
-<div aria-hidden="true" role="dialog" tabindex="-1" id="${element_id}_xqa-modal" class="modal xqa-modal">
+<div aria-hidden="true" role="dialog" tabindex="-1" id="xqa-modal_${element_id}" class="modal xqa-modal">
   <div class="inner-wrapper">
     <header>
       <h2>${_("{platform_name} Content Quality Assessment").format(platform_name=settings.PLATFORM_NAME)}</h2>
     </header>
 
-    <form id="${element_id}_xqa_form" class="xqa_form">
-      <label for="${element_id}_xqa_entry">${_("Comment")}</label>
-      <input tabindex="0" id="${element_id}_xqa_entry" type="text" placeholder="${_('comment')}">
-      <label for="${element_id}_xqa_tag">${_("Tag")}</label>
+    <form id="xqa_form_${element_id}" class="xqa_form">
+      <label for="xqa_entry_${element_id}">${_("Comment")}</label>
+      <input tabindex="0" id="xqa_entry_${element_id}" type="text" placeholder="${_('comment')}">
+      <label for="xqa_tag_${element_id}">${_("Tag")}</label>
       <span style="color:black;vertical-align: -10pt">${_('Optional tag (eg "done" or "broken"):') + '&nbsp; '}      </span>
-      <input id="${element_id}_xqa_tag" type="text" placeholder="${_('tag')}" style="width:80px;display:inline">
+      <input id="xqa_tag_${element_id}" type="text" placeholder="${_('tag')}" style="width:80px;display:inline">
       <div class="submit">
         <button name="submit" type="submit">${_('Add comment')}</button>
       </div>
       <hr>
-      <div id="${element_id}_xqa_log_data"></div>
+      <div id="xqa_log_data_${element_id}"></div>
     </form>
 
   </div>
 </div>
 
-<div aria-hidden="true" role="dialog" tabindex="-1" class="modal staff-modal" id="${element_id}_debug" >
+<div aria-hidden="true" role="dialog" tabindex="-1" class="modal staff-modal" id="debug_${element_id}">
   <div class="inner-wrapper">
     <header>
       <h2>${_('Staff Debug')}</h2>
@@ -110,26 +110,26 @@ ${block_content}
   </div>
 </div>
 
-<div aria-hidden="true" role="dialog" tabindex="-1" class="modal history-modal" id="${element_id}_history">
+<div aria-hidden="true" role="dialog" tabindex="-1" class="modal history-modal" id="history_${element_id}">
   <div class="inner-wrapper">
     <header>
       <h2>${_("Submission History Viewer")}</h2>
     </header>
-    <form id="${element_id}_history_form">
-      <label for="${element_id}_history_student_username">${_("User:")}</label>
-      <input tabindex="0" id="${element_id}_history_student_username" type="text" placeholder=""/>
-      <input type="hidden" id="${element_id}_history_location" value="${location | h}"/>
+    <form id="history_form_${element_id}">
+      <label for="history_student_username_${element_id}">${_("User:")}</label>
+      <input tabindex="0" id="history_student_username_${element_id}" type="text" placeholder=""/>
+      <input type="hidden" id="history_location_${element_id}" value="${location | h}"/>
       <div class="submit">
         <button name="submit" type="submit">${_("View History")}</button>
       </div>
     </form>
 
-    <div id="${element_id}_history_text" class="staff_info" style="display:block">
+    <div id="history_text_${element_id}" class="staff_info" style="display:block">
     </div>
   </div>
 </div>
 
-<div id="${element_id}_setup"></div>
+<div id="setup_${element_id}"></div>
 
 <script type="text/javascript">
 // assumes courseware.html's loaded this method.
