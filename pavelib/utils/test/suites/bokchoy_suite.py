@@ -2,7 +2,6 @@
 Class used for defining and running Bok Choy acceptance test suite
 """
 from time import sleep
-from urllib import urlencode
 from textwrap import dedent
 
 from common.test.acceptance.fixtures.course import CourseFixture, FixtureError
@@ -213,6 +212,11 @@ class BokChoyTestSuite(TestSuite):
         self.har_dir.makedirs_p()
         self.report_dir.makedirs_p()
         test_utils.clean_reports_dir()  # pylint: disable=no-value-for-parameter
+
+        # Set the environment so that webpack understands where to compile its resources.
+        # This setting is expected in other environments, so we are setting it for the
+        # bok-choy test run.
+        os.environ['EDX_PLATFORM_SETTINGS'] = 'test_static_optimized'
 
         if not (self.fasttest or self.skip_clean or self.testsonly):
             test_utils.clean_test_files()
