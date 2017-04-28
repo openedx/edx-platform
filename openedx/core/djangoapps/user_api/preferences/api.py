@@ -20,7 +20,7 @@ from ..errors import (
     UserAPIInternalError, UserAPIRequestError, UserNotFound, UserNotAuthorized,
     PreferenceValidationError, PreferenceUpdateError, CountryCodeError
 )
-from ..helpers import intercept_errors
+from ..helpers import intercept_errors, serializer_is_dirty
 from ..models import UserOrgTag, UserPreference
 from ..serializers import UserSerializer, RawUserPreferenceSerializer
 
@@ -143,7 +143,7 @@ def update_user_preferences(requesting_user, update, user=None):
             try:
                 serializer = serializers[preference_key]
 
-                if serializer.instance is None or serializer.instance.value != serializer.validated_data['value']:
+                if serializer_is_dirty(serializer):
                     serializer.save()
             except Exception as error:
                 raise _create_preference_update_error(preference_key, preference_value, error)
@@ -179,7 +179,8 @@ def set_user_preference(requesting_user, preference_key, preference_value, usern
     existing_user = _get_authorized_user(requesting_user, username)
     serializer = create_user_preference_serializer(existing_user, preference_key, preference_value)
     validate_user_preference_serializer(serializer, preference_key, preference_value)
-    if serializer.instance is None or serializer.instance.value != serializer.validated_data['value']:
+
+    if serializer_is_dirty(serializer):
         try:
             serializer.save()
         except Exception as error:

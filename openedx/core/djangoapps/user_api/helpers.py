@@ -506,3 +506,13 @@ def shim_student_view(view_func, check_logged_in=False):
         return response
 
     return _inner
+
+
+def serializer_is_dirty(preference_serializer):
+    """
+    Return True if saving the supplied (Raw)UserPreferenceSerializer would change the database.
+    """
+    return (
+        preference_serializer.instance is None or
+        preference_serializer.instance.value != preference_serializer.validated_data['value']
+    )
