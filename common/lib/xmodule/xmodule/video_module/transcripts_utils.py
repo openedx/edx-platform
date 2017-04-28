@@ -78,20 +78,20 @@ def save_to_store(content, name, mime_type, location):
     return content_location
 
 
-def save_subs_to_store(subs, subs_id, item, language='en'):
+def save_subs_to_store(subs, subs_id, location, language='en'):
     """
     Save transcripts into `StaticContent`.
 
-    Args:
-    `subs_id`: str, subtitles id
-    `item`: video module instance
-    `language`: two chars str ('uk'), language of translation of transcripts
+    Arguments:
+        subs_id (String): subtitles id
+        location (UsageLocator): locator for video module instance
+        language (String): two chars str ('uk'), language of translation of transcripts
 
     Returns: location of saved subtitles.
     """
     filedata = json.dumps(subs, indent=2)
-    filename = subs_filename(subs_id, language)
-    return save_to_store(filedata, filename, 'application/json', item.location)
+    filename = subs_filename(subs_id, location, language)
+    return save_to_store(filedata, filename, 'application/json', location)
 
 
 def youtube_video_transcript_name(youtube_text_api):
@@ -185,7 +185,7 @@ def download_youtube_subs(youtube_id, video_descriptor, settings):
     _ = i18n.ugettext
 
     subs = get_transcripts_from_youtube(youtube_id, settings, i18n)
-    save_subs_to_store(subs, youtube_id, video_descriptor)
+    save_subs_to_store(subs, youtube_id, video_descriptor.location)
 
     log.info("Transcripts for youtube_id %s for 1.0 speed are downloaded and saved.", youtube_id)
 
@@ -194,7 +194,7 @@ def remove_subs_from_store(subs_id, item, lang='en'):
     """
     Remove from store, if transcripts content exists.
     """
-    filename = subs_filename(subs_id, lang)
+    filename = subs_filename(subs_id, item.location, lang)
     Transcript.delete_asset(item.location, filename)
 
 
@@ -241,7 +241,7 @@ def generate_subs_from_source(speed_subs, subs_type, subs_filedata, item, langua
         save_subs_to_store(
             generate_subs(speed, 1, subs),
             subs_id,
-            item,
+            item.location,
             language
         )
 
@@ -283,10 +283,8 @@ def copy_or_rename_transcript(new_name, old_name, item, delete_old=False, user=N
     If `old_name` is not found in storage, raises `NotFoundError`.
     If `delete_old` is True, removes `old_name` files from storage.
     """
-    filename = 'subs_{0}.srt.sjson'.format(old_name)
-    content_location = StaticContent.compute_location(item.location.course_key, filename)
-    transcripts = contentstore().find(content_location).data
-    save_subs_to_store(json.loads(transcripts), new_name, item)
+    transcripts_data = Transcript.asset(item.location, old_name).data
+    save_subs_to_store(json.loads(transcripts_data), new_name, item.location)
     item.sub = new_name
     item.save_with_metadata(user)
     if delete_old:
@@ -402,14 +400,35 @@ def youtube_speed_dict(item):
     return youtube_ids
 
 
-def subs_filename(subs_id, lang='en'):
+def subs_filename(subs_id, location, lang='en'):
     """
     Generate proper filename for storage.
     """
     if lang == 'en':
-        return u'subs_{0}.srt.sjson'.format(subs_id)
+        filename = u'subs_{subs_id}_{block_id}.srt.sjson'.format(
+            subs_id=subs_id,
+            block_id=location.block_id,
+        )
     else:
-        return u'{0}_subs_{1}.srt.sjson'.format(lang, subs_id)
+        filename = u'{lang}_subs_{subs_id}_{block_id}.srt.sjson'.format(
+            lang=lang,
+            subs_id=subs_id,
+            block_id=location.block_id,
+        )
+
+    return filename
+
+
+def deprecated_subs_filename(subs_id, lang='en'):
+    """
+    Generate deprecated filename.
+    """
+    if lang == 'en':
+        filename = u'subs_{subs_id}.srt.sjson'.format(subs_id=subs_id)
+    else:
+        filename = u'{lang}_subs_{subs_id}.srt.sjson'.format(lang=lang, subs_id=subs_id)
+
+    return filename
 
 
 def generate_sjson_for_all_speeds(item, user_filename, result_subs_dict, lang):
@@ -517,8 +536,24 @@ class Transcript(object):
 
         `location` is module location.
         """
-        asset_filename = subs_filename(subs_id, lang) if not filename else filename
-        return Transcript.get_asset(location, asset_filename)
+        if filename:
+            transcripts = Transcript.get_asset(location, filename)
+        else:
+            asset_filename = subs_filename(subs_id, location, lang)
+            try:
+                transcripts = Transcript.get_asset(location, asset_filename)
+            except NotFoundError:
+                # Get transcripts with deprecated file name
+                deprecated_asset_filename = deprecated_subs_filename(subs_id, lang)
+                transcripts_data = Transcript.get_asset(location, deprecated_asset_filename).data
+                # Save transcripts to store with new filename format
+                save_subs_to_store(json.loads(transcripts_data), subs_id, location)
+                # Delete deprecated transcript assets
+                Transcript.delete_asset(location, deprecated_asset_filename)
+                # Get this saved transcript
+                transcripts = Transcript.get_asset(location, asset_filename)
+
+        return transcripts
 
     @staticmethod
     def get_asset(location, filename):

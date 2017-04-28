@@ -192,7 +192,7 @@ class VideoStudentViewHandlers(object):
                     status=307,
                     location='/static/{0}/{1}'.format(
                         asset_path,
-                        subs_filename(transcript_name, self.transcript_language)
+                        subs_filename(transcript_name, self.descriptor.location, self.transcript_language)
                     )
                 )
         return response

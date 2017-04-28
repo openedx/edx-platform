@@ -35,6 +35,7 @@ from xmodule.video_module.transcripts_utils import (
     copy_or_rename_transcript,
     manage_video_subtitles_save,
     GetTranscriptsFromYouTubeException,
+    Transcript,
     TranscriptsRequestValidationException,
     youtube_video_transcript_name,
 )
@@ -165,10 +166,8 @@ def download_transcripts(request):
         log.debug('transcripts are supported only for video" modules.')
         raise Http404
 
-    filename = 'subs_{0}.srt.sjson'.format(subs_id)
-    content_location = StaticContent.compute_location(item.location.course_key, filename)
     try:
-        sjson_transcripts = contentstore().find(content_location)
+        sjson_transcripts = Transcript.asset(item.location, subs_id)
         log.debug("Downloading subs for %s id", subs_id)
         str_subs = generate_srt_from_sjson(json.loads(sjson_transcripts.data), speed=1.0)
         if not str_subs:
@@ -227,12 +226,11 @@ def check_transcripts(request):
 
     transcripts_presence['status'] = 'Success'
 
-    filename = 'subs_{0}.srt.sjson'.format(item.sub)
-    content_location = StaticContent.compute_location(item.location.course_key, filename)
     try:
-        local_transcripts = contentstore().find(content_location).data
+        local_transcripts = Transcript.asset(item.location, item.sub).data
         transcripts_presence['current_item_subs'] = item.sub
     except NotFoundError:
+
         pass
 
     # Check for youtube transcripts presence
@@ -241,10 +239,8 @@ def check_transcripts(request):
         transcripts_presence['is_youtube_mode'] = True
 
         # youtube local
-        filename = 'subs_{0}.srt.sjson'.format(youtube_id)
-        content_location = StaticContent.compute_location(item.location.course_key, filename)
         try:
-            local_transcripts = contentstore().find(content_location).data
+            local_transcripts = Transcript.asset(item.location, youtube_id).data
             transcripts_presence['youtube_local'] = True
         except NotFoundError:
             log.debug("Can't find transcripts in storage for youtube id: %s", youtube_id)
@@ -275,10 +271,9 @@ def check_transcripts(request):
     # Check for html5 local transcripts presence
     html5_subs = []
     for html5_id in videos['html5']:
-        filename = 'subs_{0}.srt.sjson'.format(html5_id)
-        content_location = StaticContent.compute_location(item.location.course_key, filename)
         try:
-            html5_subs.append(contentstore().find(content_location).data)
+            transcripts_data = Transcript.asset(item.location, html5_id).data
+            html5_subs.append(transcripts_data)
             transcripts_presence['html5_local'].append(html5_id)
         except NotFoundError:
             log.debug("Can't find transcripts in storage for non-youtube video_id: %s", html5_id)
