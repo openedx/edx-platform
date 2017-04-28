@@ -1,6 +1,7 @@
 """
 Acceptance test suite
 """
+from os import environ
 from paver.easy import sh, call_task, task
 from pavelib.utils.test import utils as test_utils
 from pavelib.utils.test.suites.suite import TestSuite
@@ -123,6 +124,11 @@ class AcceptanceTestSuite(TestSuite):
         super(AcceptanceTestSuite, self).__init__(*args, **kwargs)
         self.root = 'acceptance'
         self.fasttest = kwargs.get('fasttest', False)
+
+        # Set the environment so that webpack understands where to compile its resources.
+        # This setting is expected in other environments, so we are setting it for the
+        # bok-choy test run.
+        environ['EDX_PLATFORM_SETTINGS'] = 'test_static_optimized'
 
         if kwargs.get('system'):
             systems = [kwargs['system']]

@@ -65,6 +65,9 @@ STATICFILES_DIRS = [
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 MEDIA_ROOT = TEST_ROOT / "uploads"
 
+# Webpack loader must use webpack output setting
+WEBPACK_LOADER['DEFAULT']['STATS_FILE'] = TEST_ROOT / "staticfiles" / "lms" / "webpack-stats.json"
+
 # Don't use compression during tests
 PIPELINE_JS_COMPRESSOR = None
 
