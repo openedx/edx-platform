@@ -26,7 +26,7 @@ ${block_content}
 
   %  if settings.FEATURES.get('ENABLE_STUDENT_HISTORY_VIEW') and \
     location.category == 'problem':
-    <a class="instructor-info-action" href="#history_${element_id}" id="history_trig_${element_id}" tabindex="-1">${_("Submission history")}</a>
+    <a class="instructor-info-action" href="#history_${element_id}" id="history_trig_${element_id}">${_("Submission history")}</a>
   %  endif
 </div>
 %  endif
