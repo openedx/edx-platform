@@ -9,10 +9,10 @@
 <div class="choicegroup capa_inputtype" id="inputtype_${id}">
     <fieldset ${describedby_html}>
       % if response_data['label']:
-        <legend id="${id}-legend" class="response-fieldset-legend field-group-hd">${response_data['label']}</legend>
+        <legend id="legend-${id}" class="response-fieldset-legend field-group-hd">${response_data['label']}</legend>
       % endif
       % for description_id, description_text in response_data['descriptions'].items():
-        <p class="question-description" id="${description_id}">${description_text}</p>
+        <p class="question-description" id="desc-${description_id}">${description_text}</p>
       % endfor
         % for choice_id, choice_label in choices:
           <div class="field">
@@ -20,7 +20,7 @@
               label_class = 'response-label field-label label-inline'
             %>
 
-            <label id="${id}-${choice_id}-label"
+            <label id="label-${id}-${choice_id}"
                 ## If the student has selected this choice...
                 % if is_radio_input(choice_id):
 
@@ -62,6 +62,6 @@
     <div class="capa_alert">${submitted_message}</div>
     %endif
     % if msg:
-    <span class="message" aria-describedby="${id}-legend" tabindex="-1">${HTML(msg)}</span>
+    <span class="message" aria-describedby="legend-${id}" tabindex="-1">${HTML(msg)}</span>
     % endif
 </div>
