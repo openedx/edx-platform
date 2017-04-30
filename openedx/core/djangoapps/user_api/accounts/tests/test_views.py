@@ -454,7 +454,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         ("country", "GB", "XY", u'"XY" is not a valid choice.'),
         ("year_of_birth", 2009, "not_an_int", u"A valid integer is required."),
         ("name", "bob", "z" * 256, u"Ensure this value has at most 255 characters (it has 256)."),
-        ("name", u"ȻħȺɍłɇs", "z   ", "The name field must be at least 2 characters long."),
+        ("name", u"ȻħȺɍłɇs", "z   ", u"The name field must be at least 2 characters long."),
         ("goals", "Smell the roses"),
         ("mailing_address", "Sesame Street"),
         # Note that we store the raw data, so it is up to client to escape the HTML.
@@ -686,7 +686,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         ),
         (
             [{u"code": u"kw"}, {u"code": u"el"}, {u"code": u"kw"}],
-            ['The language_proficiencies field must consist of unique languages']
+            [u'The language_proficiencies field must consist of unique languages']
         ),
     )
     @ddt.unpack

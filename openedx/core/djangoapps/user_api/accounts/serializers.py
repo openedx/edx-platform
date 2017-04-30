@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
+from django.utils.translation import ungettext, ugettext as _
 
 from lms.djangoapps.badges.utils import badges_enabled
 from . import (
@@ -182,9 +183,11 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
     def validate_name(self, new_name):
         """ Enforce minimum length for name. """
         if len(new_name) < NAME_MIN_LENGTH:
-            raise serializers.ValidationError(
-                "The name field must be at least {} characters long.".format(NAME_MIN_LENGTH)
-            )
+            raise serializers.ValidationError(ungettext(
+                "The name field must be at least {count} character long.",
+                "The name field must be at least {count} characters long.",
+                NAME_MIN_LENGTH
+            ).format(count=NAME_MIN_LENGTH))
         return new_name
 
     def validate_language_proficiencies(self, value):
@@ -192,8 +195,24 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
         language_proficiencies = [language for language in value]
         unique_language_proficiencies = set(language["code"] for language in language_proficiencies)
         if len(language_proficiencies) != len(unique_language_proficiencies):
-            raise serializers.ValidationError("The language_proficiencies field must consist of unique languages")
+            raise serializers.ValidationError(
+                _("The language_proficiencies field must consist of unique languages")
+            )
         return value
+
+    def validate(self, attrs):
+        extra_fields = settings.REGISTRATION_EXTRA_FIELDS
+        validation_errors = {}
+
+        for field, option in extra_fields.iteritems():
+            if field in attrs:
+                if 'required' == option and not attrs[field]:
+                    validation_errors[field] = _("This field is required.")
+
+        if validation_errors:
+            raise serializers.ValidationError(validation_errors)
+
+        return attrs
 
     def transform_gender(self, user_profile, value):  # pylint: disable=unused-argument
         """ Converts empty string to None, to indicate not set. Replaced by to_representation in version 3. """
