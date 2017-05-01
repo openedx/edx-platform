@@ -818,7 +818,8 @@ class CapaModuleTest(unittest.TestCase):
                 result = module.submit_problem(get_request_dict)
 
             # Expect an AJAX alert message in 'success'
-            expected_msg = 'Error: test error'
+            expected_msg = 'test error'
+
             self.assertEqual(expected_msg, result['success'])
 
             # Expect that the number of attempts is NOT incremented
@@ -886,7 +887,8 @@ class CapaModuleTest(unittest.TestCase):
                 result = module.submit_problem(get_request_dict)
 
             # Expect an AJAX alert message in 'success'
-            expected_msg = u'Error: ȧƈƈḗƞŧḗḓ ŧḗẋŧ ƒǿř ŧḗşŧīƞɠ'
+            expected_msg = u'ȧƈƈḗƞŧḗḓ ŧḗẋŧ ƒǿř ŧḗşŧīƞɠ'
+
             self.assertEqual(expected_msg, result['success'])
 
             # Expect that the number of attempts is NOT incremented
