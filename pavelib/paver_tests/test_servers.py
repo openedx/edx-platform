@@ -42,7 +42,7 @@ EXPECTED_INDEX_COURSE_COMMAND = (
     u"python manage.py {system} --settings={settings} reindex_course --setup"
 )
 EXPECTED_PRINT_SETTINGS_COMMAND = (
-    u"python manage.py {system} --settings=aws print_settings STATIC_ROOT --format=value 2>/dev/null"
+    u"python manage.py {system} --settings={settings} print_settings STATIC_ROOT --format=value 2>/dev/null"
 )
 EXPECTED_WEBPACK_COMMAND = (
     u"NODE_ENV={node_env} STATIC_ROOT={static_root} $(npm bin)/webpack"
@@ -240,7 +240,10 @@ class TestPaverServerTasks(PaverTestCase):
             expected_messages.append(u"xmodule_assets common/static/xmodule")
             expected_messages.append(u"install npm_assets")
             expected_messages.append(EXPECTED_COFFEE_COMMAND.format(platform_root=self.platform_root))
-            expected_messages.append(EXPECTED_PRINT_SETTINGS_COMMAND.format(system="lms"))
+            expected_messages.append(EXPECTED_PRINT_SETTINGS_COMMAND.format(
+                system="lms",
+                settings=expected_asset_settings
+            ))
             expected_messages.append(EXPECTED_WEBPACK_COMMAND.format(
                 node_env="production" if expected_asset_settings != "devstack" else "development",
                 static_root=None
@@ -282,7 +285,7 @@ class TestPaverServerTasks(PaverTestCase):
             expected_messages.append(u"xmodule_assets common/static/xmodule")
             expected_messages.append(u"install npm_assets")
             expected_messages.append(EXPECTED_COFFEE_COMMAND.format(platform_root=self.platform_root))
-            expected_messages.append(EXPECTED_PRINT_SETTINGS_COMMAND.format(system="lms"))
+            expected_messages.append(EXPECTED_PRINT_SETTINGS_COMMAND.format(system="lms", settings=expected_asset_settings))
             expected_messages.append(EXPECTED_WEBPACK_COMMAND.format(
                 node_env="production" if expected_asset_settings != "devstack" else "development",
                 static_root=None
