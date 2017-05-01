@@ -625,6 +625,12 @@ urlpatterns += (
         ),
         include('openedx.features.course_bookmarks.urls'),
     ),
+
+    # New account settings
+    url(
+        r'^account/settings/new/',
+        include('openedx.features.account_settings.urls'),
+    ),
 )
 
 if settings.FEATURES["ENABLE_TEAMS"]:
