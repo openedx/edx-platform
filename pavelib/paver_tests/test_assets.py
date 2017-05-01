@@ -167,17 +167,19 @@ class TestPaverWatchAssetTasks(TestCase):
         """
         with patch('pavelib.assets.SassWatcher.register') as mock_register:
             with patch('pavelib.assets.PollingObserver.start'):
-                call_task(
-                    'pavelib.assets.watch_assets',
-                    options={"background": True},
-                )
-                self.assertEqual(mock_register.call_count, 2)
+                with patch('pavelib.assets.execute_webpack_watch') as mock_webpack:
+                    call_task(
+                        'pavelib.assets.watch_assets',
+                        options={"background": True},
+                    )
+                    self.assertEqual(mock_register.call_count, 2)
+                    self.assertEqual(mock_webpack.call_count, 1)
 
-                sass_watcher_args = mock_register.call_args_list[0][0]
+                    sass_watcher_args = mock_register.call_args_list[0][0]
 
-                self.assertIsInstance(sass_watcher_args[0], PollingObserver)
-                self.assertIsInstance(sass_watcher_args[1], list)
-                self.assertItemsEqual(sass_watcher_args[1], self.expected_sass_directories)
+                    self.assertIsInstance(sass_watcher_args[0], PollingObserver)
+                    self.assertIsInstance(sass_watcher_args[1], list)
+                    self.assertItemsEqual(sass_watcher_args[1], self.expected_sass_directories)
 
     def test_watch_theme_assets(self):
         """
@@ -192,17 +194,19 @@ class TestPaverWatchAssetTasks(TestCase):
 
         with patch('pavelib.assets.SassWatcher.register') as mock_register:
             with patch('pavelib.assets.PollingObserver.start'):
-                call_task(
-                    'pavelib.assets.watch_assets',
-                    options={"background": True, "theme_dirs": [TEST_THEME.dirname()],
-                             "themes": [TEST_THEME.basename()]},
-                )
-                self.assertEqual(mock_register.call_count, 2)
+                with patch('pavelib.assets.execute_webpack_watch') as mock_webpack:
+                    call_task(
+                        'pavelib.assets.watch_assets',
+                        options={"background": True, "theme_dirs": [TEST_THEME.dirname()],
+                                 "themes": [TEST_THEME.basename()]},
+                    )
+                    self.assertEqual(mock_register.call_count, 2)
+                    self.assertEqual(mock_webpack.call_count, 1)
 
-                sass_watcher_args = mock_register.call_args_list[0][0]
-                self.assertIsInstance(sass_watcher_args[0], PollingObserver)
-                self.assertIsInstance(sass_watcher_args[1], list)
-                self.assertItemsEqual(sass_watcher_args[1], self.expected_sass_directories)
+                    sass_watcher_args = mock_register.call_args_list[0][0]
+                    self.assertIsInstance(sass_watcher_args[0], PollingObserver)
+                    self.assertIsInstance(sass_watcher_args[1], list)
+                    self.assertItemsEqual(sass_watcher_args[1], self.expected_sass_directories)
 
 
 @ddt.ddt
