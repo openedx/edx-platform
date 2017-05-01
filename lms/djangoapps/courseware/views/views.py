@@ -91,11 +91,15 @@ from openedx.core.djangoapps.programs.utils import ProgramMarketingDataExtender
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.monitoring_utils import set_custom_metrics_for_course_key
+from openedx.features.course_experience import (
+    course_home_url_name,
+    UNIFIED_COURSE_EXPERIENCE_FLAG,
+    UNIFIED_COURSE_VIEW_FLAG,
+)
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 from shoppingcart.models import CourseRegistrationCode
 from shoppingcart.utils import is_shopping_cart_enabled
 from student.models import UserTestGroup, CourseEnrollment
-from student.roles import GlobalStaff
 from survey.utils import must_answer_survey
 from util.cache import cache, cache_if_anonymous
 from util.date_utils import strftime_localized
@@ -226,7 +230,7 @@ def jump_to(request, course_id, location):
     except InvalidKeyError:
         raise Http404(u"Invalid course_key or usage_key")
     try:
-        unified_course_view = waffle.flag_is_active(request, 'unified_course_view')
+        unified_course_view = waffle.flag_is_active(request, UNIFIED_COURSE_VIEW_FLAG)
         redirect_url = get_redirect_url(course_key, usage_key, unified_course_view=unified_course_view)
     except ItemNotFoundError:
         raise Http404(u"No data at this location: {0}".format(usage_key))
@@ -245,6 +249,10 @@ def course_info(request, course_id):
 
     Assumes the course_id is in a valid format.
     """
+    # If the unified course experience is enabled, redirect to the "Course" tab
+    if waffle.flag_is_active(request, UNIFIED_COURSE_EXPERIENCE_FLAG):
+        return redirect(reverse(course_home_url_name(request), args=[course_id]))
+
     course_key = CourseKey.from_string(course_id)
     with modulestore().bulk_operations(course_key):
         course = get_course_by_id(course_key, depth=2)
@@ -636,7 +644,7 @@ def course_about(request, course_id):
         modes = CourseMode.modes_for_course_dict(course_key)
 
         if configuration_helpers.get_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
-            return redirect(reverse('info', args=[course.id.to_deprecated_string()]))
+            return redirect(reverse(course_home_url_name(request), args=[unicode(course.id)]))
 
         registered = registered_for_course(course, request.user)
 
@@ -644,7 +652,7 @@ def course_about(request, course_id):
         studio_url = get_studio_url(course, 'settings/details')
 
         if has_access(request.user, 'load', course):
-            course_target = reverse('info', args=[course.id.to_deprecated_string()])
+            course_target = reverse(course_home_url_name(request), args=[course.id.to_deprecated_string()])
         else:
             course_target = reverse('about_course', args=[course.id.to_deprecated_string()])
 
@@ -1208,7 +1216,7 @@ def course_survey(request, course_id):
     course_key = CourseKey.from_string(course_id)
     course = get_course_with_access(request.user, 'load', course_key)
 
-    redirect_url = reverse('info', args=[course_id])
+    redirect_url = reverse(course_home_url_name(request), args=[course_id])
 
     # if there is no Survey associated with this course,
     # then redirect to the course instead

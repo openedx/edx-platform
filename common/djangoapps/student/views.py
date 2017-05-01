@@ -116,6 +116,7 @@ from student.models import anonymous_id_for_user, UserAttribute, EnrollStatusCha
 from shoppingcart.models import DonationConfiguration, CourseRegistrationCode
 
 from openedx.core.djangoapps.embargo import api as embargo_api
+from openedx.features.course_experience import course_home_url_name
 from openedx.features.enterprise_support.api import get_dashboard_consent_notification
 
 import analytics
@@ -2194,12 +2195,12 @@ def auto_auth(request):
         # Redirect to specific page if specified
         if redirect_to:
             redirect_url = redirect_to
-        # Redirect to course info page if course_id is known
+        # Redirect to course home page if course_id is known
         elif course_id:
             try:
-                # redirect to course info page in LMS
+                # redirect to course home page in LMS
                 redirect_url = reverse(
-                    'info',
+                    course_home_url_name(request),
                     kwargs={'course_id': course_id}
                 )
             except NoReverseMatch:
