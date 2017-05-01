@@ -27,7 +27,7 @@ from openedx.core.djangoapps.content.course_structures.models import CourseStruc
 from openedx.core.djangoapps.course_groups.cohorts import (
     get_course_cohort_settings, get_cohort_by_id, get_cohort_id, is_course_cohorted
 )
-from openedx.core.djangoapps.course_groups.models import CourseUserGroup
+from openedx.core.djangoapps.course_groups.models import CourseUserGroup, CourseSegmentedDiscussion
 from request_cache.middleware import request_cached
 from student.roles import GlobalStaff
 
@@ -652,7 +652,7 @@ def add_courseware_context(content_list, course, user, id_map=None):
             content.update({"courseware_url": url, "courseware_title": title})
 
 
-def prepare_content(content, course_key, is_staff=False, course_is_cohorted=None):
+def prepare_content(content, course_key, is_staff=False):
     """
     This function is used to pre-process thread and comment models in various
     ways before adding them to the HTTP response.  This includes fixing empty
@@ -666,7 +666,6 @@ def prepare_content(content, course_key, is_staff=False, course_is_cohorted=None
         content (dict): A thread or comment.
         course_key (CourseKey): The course key of the course.
         is_staff (bool): Whether the user is a staff member.
-        course_is_cohorted (bool): Whether the course is cohorted.
     """
     fields = [
         'id', 'title', 'body', 'course_id', 'anonymous', 'anonymous_to_peers',
@@ -707,21 +706,22 @@ def prepare_content(content, course_key, is_staff=False, course_is_cohorted=None
         else:
             del endorsement["user_id"]
 
-    if course_is_cohorted is None:
-        course_is_cohorted = is_course_cohorted(course_key)
-
     for child_content_key in ["children", "endorsed_responses", "non_endorsed_responses"]:
         if child_content_key in content:
             children = [
-                prepare_content(child, course_key, is_staff, course_is_cohorted=course_is_cohorted)
+                prepare_content(child, course_key, is_staff)
                 for child in content[child_content_key]
             ]
             content[child_content_key] = children
 
-    if course_is_cohorted:
+    division_scheme = get_commentable_division_scheme(course_key, content.get('commentable_id'))
+    if division_scheme:
         # Augment the specified thread info to include the group name if a group id is present.
         if content.get('group_id') is not None:
-            content['group_name'] = get_cohort_by_id(course_key, content.get('group_id')).name
+            content['group_name'] = get_group_name(
+                course_key, content.get('group_id'),
+                division_scheme
+            )
     else:
         # Remove any cohort information that might remain if the course had previously been cohorted.
         content.pop('group_id', None)
@@ -741,22 +741,22 @@ def get_group_id_for_comments_service(request, course_key, commentable_id=None):
     Raises:
         ValueError if the requested group_id is invalid
     """
-    if commentable_id is None or is_commentable_divided(course_key, commentable_id):
+    commentable_division_scheme = None if not commentable_id else \
+        get_commentable_division_scheme(course_key, commentable_id)
+    if commentable_id is None or commentable_division_scheme:
         if request.method == "GET":
             requested_group_id = request.GET.get('group_id')
         elif request.method == "POST":
             requested_group_id = request.POST.get('group_id')
-        if has_permission(request.user, "see_all_cohorts", course_key):
+        if has_permission(request.user, "see_all_cohorts", course_key):  # TODO: "see_all_cohorts"
             if not requested_group_id:
                 return None
-            try:
-                group_id = int(requested_group_id)
-                get_cohort_by_id(course_key, group_id)
-            except CourseUserGroup.DoesNotExist:
-                raise ValueError
+
+            group_id = int(requested_group_id)
+            verify_group_exists(course_key, group_id, commentable_division_scheme)
         else:
             # regular users always query with their own id.
-            group_id = get_group_id_for_user(request.user, course_key)
+            group_id = get_group_id_for_user(request.user, course_key, division_scheme=commentable_division_scheme)
         return group_id
     else:
         # Never pass a group_id to the comments service for a non-cohorted
@@ -764,12 +764,19 @@ def get_group_id_for_comments_service(request, course_key, commentable_id=None):
         return None
 
 
-def get_group_id_for_user(user, course_key):
+def get_group_id_for_user(user, course_key, division_scheme=CourseSegmentedDiscussion.COHORT):
     """
     This method will be modified to consider Enrollment Tracks.
     Currently pass-through to get_cohort_id.
     """
     return get_cohort_id(user, course_key)
+
+
+def get_group_name(course_key, group_id, division_scheme=CourseSegmentedDiscussion.COHORT):
+    try:
+        return get_cohort_by_id(course_key, group_id).name
+    except CourseUserGroup.DoesNotExist:
+        return "Non-cohort group ID '{}'".format(group_id)
 
 
 def is_comment_too_deep(parent):
@@ -784,6 +791,49 @@ def is_comment_too_deep(parent):
             (parent and parent["depth"] >= MAX_COMMENT_DEPTH)
         )
     )
+
+
+def get_course_segmented_discussions(course_key):
+    course_cohort_settings = get_course_cohort_settings(course_key)  # TODO: shouldn't need to go through this
+    # return course_cohort_settings.segmented_discussions  This doesn't work because it doesn't incorporate old ones
+    return course_cohort_settings.cohorted_discussions
+
+
+def always_divide_inline_discussions(course_key):
+    course_cohort_settings = get_course_cohort_settings(course_key)  # TODO: shouldn't need to go through this
+    return course_cohort_settings.always_cohort_inline_discussions
+
+
+def get_commentable_division_scheme(course_key, commentable_id):
+    course = courses.get_course_by_id(course_key)
+    course_segmented_discussions = get_course_segmented_discussions(course_key)
+
+    if get_team(commentable_id):
+        # Team threads cannot be divided
+        division_scheme = None
+    elif (
+        commentable_id in course.top_level_discussion_topic_ids or
+        not always_divide_inline_discussions(course_key)
+    ):
+        if commentable_id in course_segmented_discussions:
+            division_scheme = CourseSegmentedDiscussion.COHORT
+        else:
+            division_scheme = None
+        # TODO: when we get a query set representation, this is how we can filter.
+        # discussion_set = course_segmented_discussions.filter(discussion_id=commentable_id)
+        # if len(discussion_set) == 0:
+        #     division_scheme = None
+        # else:
+        #     division_scheme = discussion_set.first().segmentation_scheme
+    else:
+        # log.debug(u"is_commentable_divided(%s, %s) = {%s}", course_key, commentable_id, ans)
+        # Need to return the default division scheme, which we don't currently have a reference to
+        division_scheme = CourseSegmentedDiscussion.COHORT
+
+    if division_scheme == CourseSegmentedDiscussion.COHORT and not get_course_cohort_settings(course_key).is_cohorted:
+        division_scheme = None
+
+    return division_scheme
 
 
 def is_commentable_divided(course_key, commentable_id):
@@ -801,8 +851,9 @@ def is_commentable_divided(course_key, commentable_id):
     """
     course = courses.get_course_by_id(course_key)
     course_cohort_settings = get_course_cohort_settings(course_key)
+    commentable_division_scheme = get_commentable_division_scheme(course_key, commentable_id)
 
-    if not course_cohort_settings.is_cohorted or get_team(commentable_id):
+    if commentable_division_scheme is None or get_team(commentable_id):
         # this is the easy case :)
         ans = False
     elif (
@@ -820,6 +871,12 @@ def is_commentable_divided(course_key, commentable_id):
     log.debug(u"is_commentable_divided(%s, %s) = {%s}", course_key, commentable_id, ans)
     return ans
 
+def verify_group_exists(course_key, group_id, division_scheme):
+    if division_scheme == CourseSegmentedDiscussion.COHORT:
+        try:
+            get_cohort_by_id(course_key, group_id)
+        except CourseUserGroup.DoesNotExist:
+            raise ValueError
 
 def is_discussion_enabled(course_id):
     """
