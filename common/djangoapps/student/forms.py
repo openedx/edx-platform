@@ -240,9 +240,16 @@ class AccountCreationForm(forms.Form):
     def clean_email(self):
         """ Enforce email restrictions (if applicable) """
         email = self.cleaned_data["email"]
-        if settings.REGISTRATION_EMAIL_PATTERNS_ALLOWED is not None:
+
+        # check individual site configuration for
+        # allowed patterns, default to global settings
+        allowed_patterns = configuration_helpers.get_value(
+            "REGISTRATION_EMAIL_PATTERNS_ALLOWED",
+            settings.REGISTRATION_EMAIL_PATTERNS_ALLOWED
+        )
+
+        if allowed_patterns is not None:
             # This Open edX instance has restrictions on what email addresses are allowed.
-            allowed_patterns = settings.REGISTRATION_EMAIL_PATTERNS_ALLOWED
             # We append a '$' to the regexs to prevent the common mistake of using a
             # pattern like '.*@edx\\.org' which would match 'bob@edx.org.badguy.com'
             if not any(re.match(pattern + "$", email) for pattern in allowed_patterns):
