@@ -31,6 +31,11 @@ class PythonTestSuite(TestSuite):
         if not (self.fasttest or self.skip_clean):
             test_utils.clean_test_files()
 
+        # Set the environment so that webpack understands where to compile its resources.
+        # This setting is expected in other environments, so we are setting it for the
+        # bok-choy test run.
+        os.environ['EDX_PLATFORM_SETTINGS'] = 'test_static_optimized'
+
     @property
     def _default_subsuites(self):
         """
