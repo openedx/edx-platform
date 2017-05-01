@@ -704,16 +704,16 @@ def execute_compile_sass(args):
         )
 
 
-def execute_webpack(prod):
+def execute_webpack(prod, settings=None):
     sh(cmd("NODE_ENV={node_env} STATIC_ROOT={static_root} $(npm bin)/webpack".format(
         node_env="production" if prod else "development",
-        static_root=Env.get_django_setting("STATIC_ROOT", "lms")
+        static_root=Env.get_django_setting("STATIC_ROOT", "lms", settings=settings)
     )))
 
 
-def execute_webpack_watch():
+def execute_webpack_watch(settings=None):
     run_background_process("STATIC_ROOT={static_root} $(npm bin)/webpack --watch --watch-poll=200".format(
-        static_root=Env.get_django_setting("STATIC_ROOT", "lms")
+        static_root=Env.get_django_setting("STATIC_ROOT", "lms", settings=settings)
     ))
 
 
@@ -786,7 +786,7 @@ def watch_assets(options):
 
     # We only want Webpack to re-run on changes to its own entry points, not all JS files, so we use its own watcher
     # instead of subclassing from Watchdog like the other watchers do
-    execute_webpack_watch()
+    execute_webpack_watch(settings='devstack')
 
     if not getattr(options, 'background', False):
         # when running as a separate process, the main thread needs to loop
@@ -848,7 +848,7 @@ def update_assets(args):
     process_xmodule_assets()
     process_npm_assets()
     compile_coffeescript()
-    execute_webpack(prod=(args.settings != "devstack"))
+    execute_webpack(prod=(args.settings != "devstack"), settings=args.settings)
 
     # Compile sass for themes and system
     execute_compile_sass(args)
