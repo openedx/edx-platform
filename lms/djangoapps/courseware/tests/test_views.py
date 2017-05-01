@@ -206,8 +206,8 @@ class IndexQueryTestCase(ModuleStoreTestCase):
     NUM_PROBLEMS = 20
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 10, 147),
-        (ModuleStoreEnum.Type.split, 4, 147),
+        (ModuleStoreEnum.Type.mongo, 10, 141),
+        (ModuleStoreEnum.Type.split, 4, 141),
     )
     @ddt.unpack
     def test_index_query_counts(self, store_type, expected_mongo_query_count, expected_mysql_query_count):
@@ -1408,12 +1408,12 @@ class ProgressPageTests(ModuleStoreTestCase):
         """Test that query counts remain the same for self-paced and instructor-paced courses."""
         SelfPacedConfiguration(enabled=self_paced_enabled).save()
         self.setup_course(self_paced=self_paced)
-        with self.assertNumQueries(42), check_mongo_calls(1):
+        with self.assertNumQueries(39), check_mongo_calls(1):
             self._get_progress_page()
 
     @ddt.data(
-        (False, 42, 28),
-        (True, 35, 24)
+        (False, 39, 25),
+        (True, 32, 21)
     )
     @ddt.unpack
     def test_progress_queries(self, enable_waffle, initial, subsequent):
