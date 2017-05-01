@@ -108,7 +108,7 @@ class ThreadActionGroupIdTestCase(
                 "group_id": self.student_cohort.id,
                 "closed": False,
                 "type": "thread",
-                "commentable_id": "non_team_dummy_id"
+                "commentable_id": "cohorted_topic"
             }
         )
         mock_request.return_value.status_code = 200
@@ -377,8 +377,8 @@ class ViewsQueryCountTestCase(
         return inner
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 3, 4, 31),
-        (ModuleStoreEnum.Type.split, 3, 13, 31),
+        (ModuleStoreEnum.Type.mongo, 3, 5, 33),
+        (ModuleStoreEnum.Type.split, 3, 16, 33),
     )
     @ddt.unpack
     @count_queries
@@ -386,8 +386,8 @@ class ViewsQueryCountTestCase(
         self.create_thread_helper(mock_request)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 3, 3, 27),
-        (ModuleStoreEnum.Type.split, 3, 10, 27),
+        (ModuleStoreEnum.Type.mongo, 3, 4, 29),
+        (ModuleStoreEnum.Type.split, 3, 13, 29),
     )
     @ddt.unpack
     @count_queries
