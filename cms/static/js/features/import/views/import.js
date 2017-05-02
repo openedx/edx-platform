@@ -11,18 +11,18 @@ define(
         var COOKIE_NAME = 'lastimportupload';
 
         var STAGE = {
-            'UPLOADING': 0,
-            'UNPACKING': 1,
-            'VERIFYING': 2,
-            'UPDATING': 3,
-            'SUCCESS': 4
+            UPLOADING: 0,
+            UNPACKING: 1,
+            VERIFYING: 2,
+            UPDATING: 3,
+            SUCCESS: 4
         };
 
         var STATE = {
-            'READY': 1,
-            'IN_PROGRESS': 2,
-            'SUCCESS': 3,
-            'ERROR': 4
+            READY: 1,
+            IN_PROGRESS: 2,
+            SUCCESS: 3,
+            ERROR: 4
         };
 
         var current = {stage: 0, state: STATE.READY};
@@ -34,6 +34,8 @@ define(
             successStage: $('.item-progresspoint-success'),
             wrapper: $('div.wrapper-status')
         };
+
+        var CourseImport;
 
         /** ******** Private functions *****************************************/
 
@@ -55,32 +57,11 @@ define(
         };
 
         /**
-         * Sets the Import in the "error" status.
-         *
-         * Immediately stops any further polling from the server.
-         * Displays the error message at the list element that corresponds
-         * to the stage where the error occurred.
-         *
-         * @param {string} msg Error message to display.
-         * @param {int} [stage=current.stage] Stage of import process at which error occurred.
-         */
-        var error = function(msg, stage) {
-            current.stage = Math.abs(stage || current.stage); // Could be negative
-            current.state = STATE.ERROR;
-
-            destroyEventListeners();
-            clearTimeout(timeout.id);
-            updateFeedbackList(msg);
-
-            deferred.resolve();
-        };
-
-        /**
          * Initializes the event listeners
          *
          */
         var initEventListeners = function() {
-            $(window).on('beforeunload.import', function() {
+            $(window).on('beforeunload.import', function() {  // eslint-disable-line consistent-return
                 if (current.stage < STAGE.UNPACKING) {
                     return gettext('Your import is in progress; navigating away will abort it.');
                 }
@@ -98,25 +79,6 @@ define(
                 date: moment().valueOf(),
                 completed: completed || false
             }), {path: window.location.pathname});
-        };
-
-        /**
-         * Sets the Import on the "success" status
-         *
-         * If it wasn't already, marks the stored import as "completed",
-         * and updates its date timestamp
-         */
-        var success = function() {
-            current.state = STATE.SUCCESS;
-
-            if (CourseImport.storedImport().completed !== true) {
-                storeImport(true);
-            }
-
-            destroyEventListeners();
-            updateFeedbackList();
-
-            deferred.resolve();
         };
 
         /**
@@ -158,8 +120,11 @@ define(
                 $(stage)
                     .removeClass('is-complete is-started has-error')
                     .addClass('is-not-started')
-                    .find('p.error').remove().end()
-                    .find('p.copy').show();
+                    .find('p.error')
+                    .remove()
+                    .end()
+                    .find('p.copy')
+                    .show();
             }
 
             switch (current.state) {
@@ -201,6 +166,9 @@ define(
                 errorStage($curr);
 
                 break;
+
+            default:
+                break;
             }
 
             if (current.state === STATE.SUCCESS) {
@@ -210,9 +178,49 @@ define(
             }
         };
 
+        /**
+         * Sets the Import in the "error" status.
+         *
+         * Immediately stops any further polling from the server.
+         * Displays the error message at the list element that corresponds
+         * to the stage where the error occurred.
+         *
+         * @param {string} msg Error message to display.
+         * @param {int} [stage=current.stage] Stage of import process at which error occurred.
+         */
+        var error = function(msg, stage) {
+            current.stage = Math.abs(stage || current.stage); // Could be negative
+            current.state = STATE.ERROR;
+
+            destroyEventListeners();
+            clearTimeout(timeout.id);
+            updateFeedbackList(msg);
+
+            deferred.resolve();
+        };
+
+        /**
+         * Sets the Import on the "success" status
+         *
+         * If it wasn't already, marks the stored import as "completed",
+         * and updates its date timestamp
+         */
+        var success = function() {
+            current.state = STATE.SUCCESS;
+
+            if (CourseImport.storedImport().completed !== true) {
+                storeImport(true);
+            }
+
+            destroyEventListeners();
+            updateFeedbackList();
+
+            deferred.resolve();
+        };
+
         /** ******** Public functions ******************************************/
 
-        var CourseImport = {
+        CourseImport = {
 
             /**
              * Cancels the import and sets the Object to the error state

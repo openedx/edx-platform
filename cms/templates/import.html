@@ -239,13 +239,8 @@ else:
   %endif
   </section>
 </div>
+<%static:webpack entry="Import">
+  Import('${import_status_url | n, js_escaped_string}', ${library | n, dump_js_escaped_json});
+</%static:webpack>
 </%block>
 
-<%block name="requirejs">
-  require(["js/factories/import"], function(ImportFactory) {
-      ImportFactory(
-          "${import_status_url | n, js_escaped_string}",
-          ${library | n, dump_js_escaped_json}
-      );
-  });
-</%block>
