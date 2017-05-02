@@ -64,6 +64,8 @@ STATICFILES_DIRS = [
     (TEST_ROOT / "staticfiles" / "cms").abspath(),
 ]
 
+WEBPACK_LOADER['DEFAULT']['STATS_FILE'] = TEST_ROOT / "staticfiles" / "cms" / "webpack-stats.json"
+
 # Silence noisy logs
 import logging
 LOG_OVERRIDES = [

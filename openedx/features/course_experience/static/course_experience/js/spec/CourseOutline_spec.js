@@ -1,6 +1,6 @@
 /* globals Logger, loadFixtures */
 
-import { keys } from 'edx-ui-toolkit/src/js/utils/constants';
+import { keys } from 'edx-ui-toolkit/js/utils/constants';
 
 import { CourseOutline } from '../CourseOutline';
 

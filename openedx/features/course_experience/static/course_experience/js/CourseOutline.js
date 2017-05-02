@@ -1,6 +1,6 @@
 /* globals Logger */
 
-import { keys } from 'edx-ui-toolkit/src/js/utils/constants';
+import { keys } from 'edx-ui-toolkit/js/utils/constants';
 
 // @TODO: Figure out how to make webpack handle default exports when libraryTarget: 'window'
 export class CourseOutline {  // eslint-disable-line import/prefer-default-export
