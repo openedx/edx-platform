@@ -1181,49 +1181,6 @@
     }
   }
 
-  // cohort discussions interface.
-  .cohort-discussions-nav {
-
-    .cohort-course-wide-discussions-form {
-
-      .form-actions {
-        padding-top: ($baseline/2);
-      }
-    }
-
-    .category-title,
-    .topic-name,
-    .all-inline-discussions,
-    .always_cohort_inline_discussions,
-    .cohort_inline_discussions {
-      padding-left: ($baseline/2);
-    }
-
-    .always_cohort_inline_discussions,
-    .cohort_inline_discussions {
-      padding-top: ($baseline/2);
-    }
-
-    .category-item,
-    .subcategory-item {
-      padding-top: ($baseline/2);
-    }
-
-    .cohorted-text {
-      color: $uxpl-blue-base;
-    }
-
-    .discussions-wrapper {
-      @extend %ui-no-list;
-      padding: 0 ($baseline/2);
-
-      .subcategories {
-        padding: 0 ($baseline*1.5);
-      }
-    }
-  }
-
-
   .wrapper-tabs { // This applies to the tab-like interface that toggles between the student management and the group settings
     @extend %ui-no-list;
     @extend %ui-depth1;
@@ -1277,6 +1234,77 @@
         margin-top: $baseline;
       }
     }
+  }
+}
+
+// view - discussions management
+// --------------------
+.instructor-dashboard-wrapper-2 section.idash-section#discussions_management {
+
+  .form-submit {
+    @include idashbutton($uxpl-blue-base);
+    @include font-size(14);
+    @include line-height(14);
+    margin-right: ($baseline/2);
+    margin-bottom: 0;
+    text-shadow: none;
+  }
+
+  .discussions-management-supplemental {
+    @extend %t-copy-sub1;
+    margin-top: $baseline;
+    padding: ($baseline/2) $baseline;
+    background: $gray-l6;
+    border-radius: ($baseline/10);
+  }
+
+  // cohort discussions interface.
+  .discussions-nav {
+
+    .cohort-course-wide-discussions-form {
+
+      .form-actions {
+        padding-top: ($baseline/2);
+      }
+    }
+
+    .category-title,
+    .topic-name,
+    .all-inline-discussions,
+    .always_divide_inline_discussions,
+    .divide_inline_discussions {
+      padding-left: ($baseline/2);
+    }
+
+    .always_divide_inline_discussions,
+    .divide_inline_discussions {
+      padding-top: ($baseline/2);
+    }
+
+    .category-item,
+    .subcategory-item {
+      padding-top: ($baseline/2);
+    }
+
+    .divided-discussion-text{
+      color: $uxpl-blue-base;
+    }
+
+    .discussions-wrapper {
+      @extend %ui-no-list;
+      padding: 0 ($baseline/2);
+
+      .subcategories {
+        padding: 0 ($baseline*1.5);
+      }
+    }
+  }
+  .wrapper-tabs {
+    @extend %ui-no-list;
+    @extend %ui-depth1;
+    position: relative;
+    top: 1px;
+    padding: 0 $baseline;
   }
 }
 
