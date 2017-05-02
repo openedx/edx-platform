@@ -1,6 +1,6 @@
 <h3 class="hd hd-3 subsection-title"><%- gettext('Specify whether discussion topics are divided by cohort') %></h3>
 <form action="" method="post" id="cohort-course-wide-discussions-form" class="cohort-course-wide-discussions-form">
-    <div class="wrapper cohort-management-supplemental">
+    <div class="wrapper discussions-management-supplemental">
         <div class="form-fields">
             <div class="form-field">
                 <div class="course-wide-discussion-topics">

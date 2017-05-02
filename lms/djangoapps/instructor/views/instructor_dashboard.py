@@ -125,6 +125,7 @@ def instructor_dashboard_2(request, course_id):
         _section_course_info(course, access),
         _section_membership(course, access, is_white_label),
         _section_cohort_management(course, access),
+        _section_discussions_management(course, access),
         _section_student_admin(course, access),
         _section_data_download(course, access),
     ]
@@ -513,9 +514,23 @@ def _section_cohort_management(course, access):
         ),
         'cohorts_url': reverse('cohorts', kwargs={'course_key_string': unicode(course_key)}),
         'upload_cohorts_csv_url': reverse('add_users_to_cohorts', kwargs={'course_id': unicode(course_key)}),
-        'discussion_topics_url': reverse('cohort_discussion_topics', kwargs={'course_key_string': unicode(course_key)}),
         'verified_track_cohorting_url': reverse(
             'verified_track_cohorting', kwargs={'course_key_string': unicode(course_key)}
+        ),
+    }
+    return section_data
+
+
+def _section_discussions_management(course, access):
+    """ Provide data for the corresponding discussion management section """
+    course_key = course.id
+    section_data = {
+        'section_key': 'discussions_management',
+        'section_display_name': _('Discussions'),
+        'discussion_topics_url': reverse('discussion_topics', kwargs={'course_key_string': unicode(course_key)}),
+        'course_discussion_settings': reverse(
+            'course_discussions_settings',
+            kwargs={'course_key_string': unicode(course_key)}
         ),
     }
     return section_data

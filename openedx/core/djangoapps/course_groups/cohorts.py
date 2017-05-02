@@ -122,6 +122,16 @@ def is_course_cohorted(course_key):
     return _get_course_cohort_settings(course_key).is_cohorted
 
 
+def get_course_cohort_id(course_key):
+    """
+    Given a course key, return the int id for the cohort settings.
+
+    Raises:
+        Http404 if the course doesn't exist.
+    """
+    return _get_course_cohort_settings(course_key).id
+
+
 def set_course_cohorted(course_key, cohorted):
     """
     Given a course course and a boolean, sets whether or not the course is cohorted.
