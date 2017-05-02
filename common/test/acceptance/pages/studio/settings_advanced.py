@@ -51,15 +51,26 @@ class AdvancedSettingsPage(CoursePage):
 
     def click_deprecated_settings_button(self):
         """
-            Clicks deprecated settings button
+            Show deprecated Settings
         """
-        self.q(css=DEPRECATED_SETTINGS_BUTTON_SELECTOR).click()
+        if self.get_deprecated_settings_button_text() == 'Show Deprecated Settings':
+            self.q(css=DEPRECATED_SETTINGS_BUTTON_SELECTOR).click()
+            self.wait_for_element_presence(
+                DEPRECATED_SETTINGS_SELECTOR,
+                'Deprecated Settings are not present'
+            )
+        else:
+            self.q(css=DEPRECATED_SETTINGS_BUTTON_SELECTOR).click()
+            self.wait_for_element_absence(
+                DEPRECATED_SETTINGS_SELECTOR,
+                'Deprecated Settings are present'
+            )
 
     def check_deprecated_settings_presence(self):
         """
-            Returns true if deprecated settings are present
+            Returns true if deprecated settings are visible
         """
-        return self.q(css=DEPRECATED_SETTINGS_SELECTOR).present
+        return self.q(css=DEPRECATED_SETTINGS_SELECTOR).visible
 
     def get_confirmation_message(self):
         """
