@@ -7,15 +7,15 @@
                 <div class="inline-discussion-topics">
                     <h4 class="hd hd-4 subsection-title"><%- gettext('Content-Specific Discussion Topics') %></h4>
                     <p><%- gettext('Specify whether content-specific discussion topics are divided by cohort.') %></p>
-                    <div class="always_cohort_inline_discussions">
+                    <div class="always_divide_inline_discussions">
                         <label>
-                            <input type="radio" name="inline" class="check-all-inline-discussions" <%- alwaysCohortInlineDiscussions ? 'checked="checked"' : '' %>/>
+                            <input type="radio" name="inline" class="check-all-inline-discussions" <%- alwaysDivideInlineDiscussions ? 'checked="checked"' : '' %>/>
                             <span class="all-inline-discussions"><%- gettext('Always cohort content-specific discussion topics') %></span>
                         </label>
                     </div>
-                    <div class="cohort_inline_discussions">
+                    <div class="divide_inline_discussions">
                         <label>
-                            <input type="radio" name="inline" class="check-cohort-inline-discussions" <%- alwaysCohortInlineDiscussions ? '' : 'checked="checked"' %>/>
+                            <input type="radio" name="inline" class="check-cohort-inline-discussions" <%- alwaysDivideInlineDiscussions ? '' : 'checked="checked"' %>/>
                             <span class="all-inline-discussions"><%- gettext('Cohort selected content-specific discussion topics') %></span>
                         </label>
                     </div>

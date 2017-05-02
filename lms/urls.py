@@ -504,6 +504,15 @@ urlpatterns += (
         include(COURSE_URLS)
     ),
 
+    # Discussions Management
+    url(
+        r'^courses/{}/discussions/settings$'.format(
+            settings.COURSE_KEY_PATTERN,
+        ),
+        'openedx.core.djangoapps.course_groups.views.course_discussions_settings_handler',
+        name='course_discussions_settings',
+    ),
+
     # Cohorts management
     url(
         r'^courses/{}/cohorts/settings$'.format(

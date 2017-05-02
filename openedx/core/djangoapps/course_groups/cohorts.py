@@ -119,7 +119,7 @@ def is_course_cohorted(course_key):
     Raises:
        Http404 if the course doesn't exist.
     """
-    return _get_course_cohort_settings(course_key).is_cohorted
+    return get_course_cohort_settings(course_key).is_cohorted
 
 
 def set_course_cohorted(course_key, cohorted):
@@ -131,7 +131,7 @@ def set_course_cohorted(course_key, cohorted):
     """
     if not isinstance(cohorted, bool):
         raise ValueError("Cohorted must be a boolean")
-    course_cohort_settings = _get_course_cohort_settings(course_key)
+    course_cohort_settings = get_course_cohort_settings(course_key)
     course_cohort_settings.is_cohorted = cohorted
     course_cohort_settings.save()
 
@@ -502,7 +502,7 @@ def is_last_random_cohort(user_group):
 
 
 @request_cached
-def _get_course_cohort_settings(course_key):
+def get_course_cohort_settings(course_key):
     """
     Return cohort settings for a course. NOTE that the only non-deprecated fields in
     CourseCohortSettings are `course_id` and  `is_cohorted`. Other fields should only be used for

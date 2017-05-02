@@ -125,6 +125,7 @@ def instructor_dashboard_2(request, course_id):
         _section_course_info(course, access),
         _section_membership(course, access, is_white_label),
         _section_cohort_management(course, access),
+        _section_discussions_management(course, access, (not is_course_cohorted(course_key))),
         _section_student_admin(course, access),
         _section_data_download(course, access),
     ]
@@ -517,6 +518,31 @@ def _section_cohort_management(course, access):
         'verified_track_cohorting_url': reverse(
             'verified_track_cohorting', kwargs={'course_key_string': unicode(course_key)}
         ),
+    }
+    return section_data
+
+
+def _section_discussions_management(course, access, is_hidden=False):
+    """ Provide data for the corresponding cohort management section """
+    course_key = course.id
+    ccx_enabled = hasattr(course_key, 'ccx')
+    section_data = {
+        'section_key': 'discussions_management',
+        'section_display_name': _('Discussions'),
+        'access': access,
+        'is_hidden': is_hidden,
+        'ccx_is_enabled': ccx_enabled,
+        'course_cohort_settings_url': reverse(
+            'course_cohort_settings',
+            kwargs={'course_key_string': unicode(course_key)}
+        ),
+        'cohorts_url': reverse('cohorts', kwargs={'course_key_string': unicode(course_key)}),
+        'discussion_topics_url': reverse('cohort_discussion_topics', kwargs={'course_key_string': unicode(course_key)}),
+        'course_discussion_settings': reverse(
+            'course_discussions_settings',
+            kwargs={'course_key_string': unicode(course_key)}
+        ),
+
     }
     return section_data
 
