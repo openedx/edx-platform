@@ -307,30 +307,21 @@ class TestRescoreInstructorTask(TestInstructorTasks):
             action_name='rescored'
         )
 
-    @ddt.data(
-        ('rescore', None),
-        ('rescore_problem', {'success': 'correct', 'new_raw_earned': 1, 'new_raw_possible': 1})
-    )
-    @ddt.unpack
-    def test_rescoring_success(self, rescore_method, rescore_result):
+    def test_rescoring_success(self):
         """
         Tests rescores a problem in a course, for all students succeeds.
         """
         mock_instance = MagicMock()
-        other_method = ({'rescore', 'rescore_problem'} - {rescore_method}).pop()
-        getattr(mock_instance, rescore_method).return_value = rescore_result
-        delattr(mock_instance, other_method)
-
-        if rescore_method == 'rescore':
-            del mock_instance.done
-            mock_instance.has_submitted_answer.return_value = True
-        else:
-            mock_instance.done = True
+        getattr(mock_instance, 'rescore').return_value = None
+        mock_instance.has_submitted_answer.return_value = True
+        del mock_instance.done  # old CAPA code used to use this value so we delete it here to be sure
 
         num_students = 10
         self._create_students_with_state(num_students)
         task_entry = self._create_input_entry()
-        with patch('lms.djangoapps.instructor_task.tasks_helper.module_state.get_module_for_descriptor_internal') as mock_get_module:
+        with patch(
+                'lms.djangoapps.instructor_task.tasks_helper.module_state.get_module_for_descriptor_internal'
+        ) as mock_get_module:
             mock_get_module.return_value = mock_instance
             self._run_task_with_mock_celery(rescore_problem, task_entry.id, task_entry.task_id)
 
@@ -341,56 +332,6 @@ class TestRescoreInstructorTask(TestInstructorTasks):
             succeeded=num_students,
             skipped=0,
             failed=0,
-            action_name='rescored'
-        )
-
-    def test_rescoring_bad_result(self):
-        """
-        Tests and confirm that rescoring does not succeed if "success" key is not an expected value.
-        """
-        input_state = json.dumps({'done': True})
-        num_students = 10
-        self._create_students_with_state(num_students, input_state)
-        task_entry = self._create_input_entry()
-        mock_instance = Mock()
-        mock_instance.rescore_problem = Mock(return_value={'success': 'bogus'})
-        del mock_instance.rescore
-        with patch('lms.djangoapps.instructor_task.tasks_helper.module_state.get_module_for_descriptor_internal') as mock_get_module:
-            mock_get_module.return_value = mock_instance
-            self._run_task_with_mock_celery(rescore_problem, task_entry.id, task_entry.task_id)
-
-        self.assert_task_output(
-            output=self.get_task_output(task_entry.id),
-            total=num_students,
-            attempted=num_students,
-            succeeded=0,
-            skipped=0,
-            failed=num_students,
-            action_name='rescored'
-        )
-
-    def test_rescoring_missing_result(self):
-        """
-        Tests and confirm that rescoring does not succeed if "success" key is not returned.
-        """
-        input_state = json.dumps({'done': True})
-        num_students = 10
-        self._create_students_with_state(num_students, input_state)
-        task_entry = self._create_input_entry()
-        mock_instance = Mock()
-        mock_instance.rescore_problem = Mock(return_value={'bogus': 'value'})
-        del mock_instance.rescore
-        with patch('lms.djangoapps.instructor_task.tasks_helper.module_state.get_module_for_descriptor_internal') as mock_get_module:
-            mock_get_module.return_value = mock_instance
-            self._run_task_with_mock_celery(rescore_problem, task_entry.id, task_entry.task_id)
-
-        self.assert_task_output(
-            output=self.get_task_output(task_entry.id),
-            total=num_students,
-            attempted=num_students,
-            succeeded=0,
-            skipped=0,
-            failed=num_students,
             action_name='rescored'
         )
 
