@@ -1236,6 +1236,39 @@ def change_enrollment(request, check_access=True):
         return HttpResponseBadRequest(_("Enrollment action is invalid"))
 
 
+def _generate_not_activated_message(user):
+    """
+    Generates the message displayed on the sign-in screen when a learner attempts to access the
+    system with an inactive account.
+
+    Arguments:
+        user (User): User object for the learner attempting to sign in.
+    """
+
+    support_url = configuration_helpers.get_value(
+        'SUPPORT_SITE_LINK',
+        settings.SUPPORT_SITE_LINK
+    )
+
+    platform_name = configuration_helpers.get_value(
+        'PLATFORM_NAME',
+        settings.PLATFORM_NAME
+    )
+
+    not_activated_msg_template = _('In order to sign in, you need to activate your account.<br /><br />'
+                                   'We just sent an activation link to <strong>{email}</strong>.  If '
+                                   'you do not receive an email, check your spam folders or '
+                                   '<a href="{support_url}">contact {platform} Support</a>.')
+
+    not_activated_message = not_activated_msg_template.format(
+        email=user.email,
+        support_url=support_url,
+        platform=platform_name
+    )
+
+    return not_activated_message
+
+
 # Need different levels of logging
 @ensure_csrf_cookie
 def login_user(request, error=""):  # pylint: disable=too-many-statements,unused-argument
@@ -1456,11 +1489,10 @@ def login_user(request, error=""):  # pylint: disable=too-many-statements,unused
         AUDIT_LOG.warning(u"Login failed - Account not active for user {0}, resending activation".format(username))
 
     reactivation_email_for_user(user)
-    not_activated_msg = _("Before you sign in, you need to activate your account. We have sent you an "
-                          "email message with instructions for activating your account.")
+
     return JsonResponse({
         "success": False,
-        "value": not_activated_msg,
+        "value": _generate_not_activated_message(user),
     })  # TODO: this should be status code 400  # pylint: disable=fixme
 
 

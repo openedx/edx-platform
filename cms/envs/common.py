@@ -90,7 +90,10 @@ from lms.envs.common import (
     FILE_UPLOAD_STORAGE_PREFIX,
 
     COURSE_ENROLLMENT_MODES,
+
     HELP_TOKENS_BOOKS,
+
+    SUPPORT_SITE_LINK,
 )
 from path import Path as path
 from warnings import simplefilter
