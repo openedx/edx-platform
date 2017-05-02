@@ -185,6 +185,15 @@ class ContainerPage(PageObject, HelpMixin):
         self.wait_for_ajax()
 
     @property
+    def get_xblock_name(self):
+        """
+        Get titles of  x-block present on the page.
+        Returns:
+            list: A list of X-block titles
+        """
+        return self.q(css='.wrapper-xblock .level-element .header-details').text
+
+    @property
     def is_staff_locked(self):
         """ Returns True if staff lock is currently enabled, False otherwise """
         for attr in self.q(css='a.action-staff-lock>.fa').attrs('class'):
@@ -320,7 +329,6 @@ class ContainerPage(PageObject, HelpMixin):
             category_type=category_type
         )
         return self.q(css=css).html
-
 
 class XBlockWrapper(PageObject):
     """
@@ -513,6 +521,12 @@ class XBlockWrapper(PageObject):
         script = "$(arguments[0]).val(arguments[1]).change();"
         self.browser.execute_script(script, selector, field_value)
 
+    def get_inner_html(self):
+        """
+        Gets inner html of an HTML component
+        """
+        return self.q(css='.xmodule_HtmlModule').attrs('innerHTML')[0].replace('\n', '')
+
     def reset_field_val(self, field_display_name):
         """
         If editing, reset the value of a field to its default.
@@ -580,7 +594,6 @@ class XBlockWrapper(PageObject):
         """
         return self.q(css=self._bounded_selector('span.message-text a')).first.text[0]
 
-
 def _click_edit(page_object, button_css, view_css, bounded_selector=lambda(x): x):
     """
     Click on the first editing button found and wait for the Studio editor to be present.
@@ -592,3 +605,4 @@ def _click_edit(page_object, button_css, view_css, bounded_selector=lambda(x): x
     ).fulfill()
 
     return page_object
+
