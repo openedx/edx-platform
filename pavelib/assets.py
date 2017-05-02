@@ -705,16 +705,26 @@ def execute_compile_sass(args):
 
 
 def execute_webpack(prod, settings=None):
-    sh(cmd("NODE_ENV={node_env} STATIC_ROOT={static_root} $(npm bin)/webpack".format(
-        node_env="production" if prod else "development",
-        static_root=Env.get_django_setting("STATIC_ROOT", "lms", settings=settings)
-    )))
+    sh(
+        cmd(
+            "NODE_ENV={node_env} STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms} $(npm bin)/webpack"
+                .format(
+                    node_env="production" if prod else "development",
+                    static_root_lms=Env.get_django_setting("STATIC_ROOT", "lms", settings=settings),
+                    static_root_cms=Env.get_django_setting("STATIC_ROOT", "cms", settings=settings)
+                )
+        )
+    )
 
 
 def execute_webpack_watch(settings=None):
-    run_background_process("STATIC_ROOT={static_root} $(npm bin)/webpack --watch --watch-poll=200".format(
-        static_root=Env.get_django_setting("STATIC_ROOT", "lms", settings=settings)
-    ))
+    run_background_process(
+        "STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms} $(npm bin)/webpack --watch --watch-poll=200"
+            .format(
+                static_root_lms=Env.get_django_setting("STATIC_ROOT", "lms", settings=settings),
+                static_root_cms=Env.get_django_setting("STATIC_ROOT", "cms", settings=settings)
+            )
+    )
 
 
 def get_parsed_option(command_opts, opt_key, default=None):
