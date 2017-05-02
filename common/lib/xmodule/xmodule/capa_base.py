@@ -25,8 +25,9 @@ from capa.responsetypes import StudentInputError, ResponseError, LoncapaProblemE
 from capa.util import convert_files_to_filenames, get_inner_html_from_xpath
 from xblock.fields import Boolean, Dict, Float, Integer, Scope, String, XMLString
 from xblock.scorable import ScorableXBlockMixin, Score
-from xmodule.capa_base_constants import RANDOMIZATION, SHOWANSWER, SHOW_CORRECTNESS
+from xmodule.capa_base_constants import RANDOMIZATION, SHOWANSWER
 from xmodule.exceptions import NotFoundError
+from xmodule.graders import ShowCorrectness
 from .fields import Date, Timedelta
 from .progress import Progress
 
@@ -120,11 +121,11 @@ class CapaFields(object):
         help=_("Defines when to show whether a learner's answer to the problem is correct. "
                "Configured on the subsection."),
         scope=Scope.settings,
-        default=SHOW_CORRECTNESS.ALWAYS,
+        default=ShowCorrectness.ALWAYS,
         values=[
-            {"display_name": _("Always"), "value": SHOW_CORRECTNESS.ALWAYS},
-            {"display_name": _("Never"), "value": SHOW_CORRECTNESS.NEVER},
-            {"display_name": _("Past Due"), "value": SHOW_CORRECTNESS.PAST_DUE},
+            {"display_name": _("Always"), "value": ShowCorrectness.ALWAYS},
+            {"display_name": _("Never"), "value": ShowCorrectness.NEVER},
+            {"display_name": _("Past Due"), "value": ShowCorrectness.PAST_DUE},
         ],
     )
     showanswer = String(
@@ -921,17 +922,11 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
 
         Limits access to the correct/incorrect flags, messages, and problem score.
         """
-        if self.show_correctness == SHOW_CORRECTNESS.NEVER:
-            return False
-        elif self.runtime.user_is_staff:
-            # This is after the 'never' check because admins can see correctness
-            # unless the problem explicitly prevents it
-            return True
-        elif self.show_correctness == SHOW_CORRECTNESS.PAST_DUE:
-            return self.is_past_due()
-
-        # else: self.show_correctness == SHOW_CORRECTNESS.ALWAYS
-        return True
+        return ShowCorrectness.correctness_available(
+            show_correctness=self.show_correctness,
+            due_date=self.close_date,
+            has_staff_access=self.runtime.user_is_staff,
+        )
 
     def update_score(self, data):
         """

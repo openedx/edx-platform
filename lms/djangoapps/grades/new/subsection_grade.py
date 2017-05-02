@@ -7,7 +7,7 @@ from logging import getLogger
 from lms.djangoapps.grades.scores import get_score, possibly_scored
 from lms.djangoapps.grades.models import BlockRecord, PersistentSubsectionGrade
 from xmodule import block_metadata_utils, graders
-from xmodule.graders import AggregatedScore
+from xmodule.graders import AggregatedScore, ShowCorrectness
 
 from ..config.waffle import waffle, WRITE_ONLY_IF_ENGAGED
 
@@ -27,6 +27,7 @@ class SubsectionGradeBase(object):
         self.format = getattr(subsection, 'format', '')
         self.due = getattr(subsection, 'due', None)
         self.graded = getattr(subsection, 'graded', False)
+        self.show_correctness = getattr(subsection, 'show_correctness', '')
 
         self.course_version = getattr(subsection, 'course_version', None)
         self.subtree_edited_timestamp = getattr(subsection, 'subtree_edited_on', None)
@@ -46,6 +47,12 @@ class SubsectionGradeBase(object):
             "before use."
         )
         return self.all_total.attempted
+
+    def show_grades(self, has_staff_access):
+        """
+        Returns whether subsection scores are currently available to users with or without staff access.
+        """
+        return ShowCorrectness.correctness_available(self.show_correctness, self.due, has_staff_access)
 
 
 class ZeroSubsectionGrade(SubsectionGradeBase):
@@ -224,7 +231,7 @@ class SubsectionGrade(SubsectionGradeBase):
         log_func(
             u"Grades: SG.{}, subsection: {}, course: {}, "
             u"version: {}, edit: {}, user: {},"
-            u"total: {}/{}, graded: {}/{}".format(
+            u"total: {}/{}, graded: {}/{}, show_correctness: {}".format(
                 log_statement,
                 self.location,
                 self.location.course_key,
@@ -235,5 +242,6 @@ class SubsectionGrade(SubsectionGradeBase):
                 self.all_total.possible,
                 self.graded_total.earned,
                 self.graded_total.possible,
+                self.show_correctness,
             )
         )
