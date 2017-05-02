@@ -41,7 +41,6 @@
             'js/factories/export',
             'js/factories/group_configurations',
             'js/certificates/factories/certificates_page_factory',
-            'js/factories/import',
             'js/factories/index',
             'js/factories/library',
             'js/factories/login',
