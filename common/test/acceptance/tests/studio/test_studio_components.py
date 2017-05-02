@@ -6,9 +6,10 @@ from nose.plugins.attrib import attr
 
 from common.test.acceptance.tests.studio.base_studio_test import ContainerBase
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
-from common.test.acceptance.pages.studio.container import ContainerPage
+from common.test.acceptance.pages.studio.container import ContainerPage, XBlockWrapper
 from common.test.acceptance.pages.studio.utils import add_component, add_components
 from common.test.acceptance.pages.studio.settings_advanced import AdvancedSettingsPage
+from common.test.acceptance.pages.studio.html_component_editor import HtmlComponentEditorView
 
 
 @attr(shard=9)
@@ -150,7 +151,7 @@ class ComponentTest(ContainerBase):
         # Add latex component
         add_component(container_page, 'html', component, is_advanced_problem=False)
         problem = container_page.xblocks[1]
-        # Asset that component has been added.
+        # Assert that component has been added.
         self.assertEqual(problem.name, component)
 
     def test_common_problem_component(self):
