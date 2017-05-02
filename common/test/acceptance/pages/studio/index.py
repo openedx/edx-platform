@@ -270,6 +270,12 @@ class DashboardPage(PageObject, HelpMixin):
         )
         return self.q(css='#settings-language-value')
 
+    def get_length_error_text(self):
+        """
+        Gets the length error text
+        """
+        return self.q(css='#course_creation_error>p').text[0]
+
 
 class HomePage(DashboardPage):
     """
