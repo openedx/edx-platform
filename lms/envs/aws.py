@@ -953,3 +953,7 @@ ENTERPRISE_API_CACHE_TIMEOUT = ENV_TOKENS.get(
 # the service, and override the default parameters which are defined in common.py
 
 COURSES_API_CACHE_TIMEOUT = ENV_TOKENS.get('COURSES_API_CACHE_TIMEOUT', COURSES_API_CACHE_TIMEOUT)
+
+##################### Sentry settings #####################
+
+RAVEN_CONFIG = ENV_TOKENS.get('RAVEN_CONFIG', {})

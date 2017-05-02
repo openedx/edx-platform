@@ -132,6 +132,9 @@ pdfminer==20140328
 # Used for development operation
 watchdog==0.8.3
 
+# Library to send info to Sentry
+raven==6.0.0
+
 # Metrics gathering and monitoring
 dogapi==1.2.1
 newrelic==2.78.0.57

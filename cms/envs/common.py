@@ -982,6 +982,9 @@ INSTALLED_APPS = (
 
     # Unusual migrations
     'database_fixups',
+
+    # sentry
+    'raven.contrib.django.raven_compat',
 )
 
 

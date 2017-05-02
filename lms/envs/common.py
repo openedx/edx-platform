@@ -2204,6 +2204,9 @@ INSTALLED_APPS = (
     'openedx.features.course_bookmarks',
     'openedx.features.course_experience',
     'openedx.features.enterprise_support',
+
+    # sentry
+    'raven.contrib.django.raven_compat',
 )
 
 ######################### CSRF #########################################
