@@ -100,6 +100,17 @@ def _get_xmodule_instance_args(request, task_id):
     return xmodule_instance_args
 
 
+def _supports_rescore(descriptor):
+    """
+    Helper method to determine whether a given item supports rescoring.
+    In order to accommodate both XModules and XBlocks, we have to check
+    the descriptor itself then fall back on its module class.
+    """
+    return hasattr(descriptor, 'rescore') or (
+        hasattr(descriptor, 'module_class') and hasattr(descriptor.module_class, 'rescore')
+    )
+
+
 def _update_instructor_task(instructor_task, task_result):
     """
     Updates and possibly saves a InstructorTask entry based on a task Result.
@@ -246,10 +257,7 @@ def check_arguments_for_rescoring(usage_key):
     corresponding module doesn't support rescoring calls.
     """
     descriptor = modulestore().get_item(usage_key)
-    # TODO: Clean this up as part of TNL-6594 when CAPA uses the ScorableXBlockMixin
-    if (
-            not hasattr(descriptor, 'module_class') or not hasattr(descriptor.module_class, 'rescore_problem')
-    ) and not hasattr(descriptor, 'rescore'):
+    if not _supports_rescore(descriptor):
         msg = "Specified module does not support rescoring."
         raise NotImplementedError(msg)
 
@@ -264,8 +272,7 @@ def check_entrance_exam_problems_for_rescoring(exam_key):  # pylint: disable=inv
     any of the problem in entrance exam doesn't support re-scoring calls.
     """
     problems = get_problems_in_section(exam_key).values()
-    if any(not hasattr(problem, 'module_class') or not hasattr(problem.module_class, 'rescore_problem')
-           for problem in problems):
+    if any(not _supports_rescore(problem) for problem in problems):
         msg = _("Not all problems in entrance exam support re-scoring.")
         raise NotImplementedError(msg)
 
