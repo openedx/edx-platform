@@ -76,11 +76,16 @@ class CohortTestMixin(object):
 
     def enable_cohorting(self, course_fixture):
         """
-        enables cohorting for the current course fixture.
+        enables cohorts and always_divide_inline_discussions for the current course fixture.
         """
         url = LMS_BASE_URL + "/courses/" + course_fixture._course_key + '/cohorts/settings'  # pylint: disable=protected-access
-        data = json.dumps({'always_cohort_inline_discussions': True})
+        discussions_url = LMS_BASE_URL + "/courses/" + course_fixture._course_key + '/discussions/settings'  # pylint: disable=protected-access
+
+        data = json.dumps({'is_cohorted': True})
+        discussions_data = json.dumps({'always_divide_inline_discussions': True})
+
         response = course_fixture.session.patch(url, data=data, headers=course_fixture.headers)
+        course_fixture.session.patch(discussions_url, data=discussions_data, headers=course_fixture.headers)
 
     def disable_cohorting(self, course_fixture):
         """

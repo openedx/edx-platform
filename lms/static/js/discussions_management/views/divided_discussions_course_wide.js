@@ -1,21 +1,21 @@
 (function(define) {
     'use strict';
-    define(['jquery', 'underscore', 'backbone', 'gettext', 'js/groups/views/cohort_discussions',
+    define(['jquery', 'underscore', 'backbone', 'gettext', 'js/discussions_management/views/divided_discussions',
         'edx-ui-toolkit/js/utils/html-utils'],
-            function($, _, Backbone, gettext, CohortDiscussionConfigurationView, HtmlUtils) {
-                var CourseWideDiscussionsView = CohortDiscussionConfigurationView.extend({
+            function($, _, Backbone, gettext, DividedDiscussionConfigurationView, HtmlUtils) {
+                var CourseWideDiscussionsView = DividedDiscussionConfigurationView.extend({
                     events: {
                         'change .check-discussion-subcategory-course-wide': 'discussionCategoryStateChanged',
                         'click .cohort-course-wide-discussions-form .action-save': 'saveCourseWideDiscussionsForm'
                     },
 
                     initialize: function(options) {
-                        this.template = HtmlUtils.template($('#cohort-discussions-course-wide-tpl').text());
-                        this.cohortSettings = options.cohortSettings;
+                        this.template = HtmlUtils.template($('#divided-discussions-course-wide-tpl').text());
+                        this.discussionSettings = options.discussionSettings;
                     },
 
                     render: function() {
-                        HtmlUtils.setHtml(this.$('.cohort-course-wide-discussions-nav'), this.template({
+                        HtmlUtils.setHtml(this.$('.course-wide-discussions-nav'), this.template({
                             courseWideTopicsHtml: this.getCourseWideDiscussionsHtml(
                                 this.model.get('course_wide_discussions')
                             )
@@ -56,25 +56,27 @@
                     },
 
                     /**
-                     * Sends the cohorted_course_wide_discussions to the server and renders the view.
+                     * Sends the courseWideDividedDiscussions to the server and renders the view.
                      */
                     saveCourseWideDiscussionsForm: function(event) {
-                        event.preventDefault();
-
                         var self = this,
-                            courseWideCohortedDiscussions = self.getCohortedDiscussions(
+                            courseWideDividedDiscussions = self.getDividedDiscussions(
                                 '.check-discussion-subcategory-course-wide:checked'
                             ),
-                            fieldData = {cohorted_course_wide_discussions: courseWideCohortedDiscussions};
+                            fieldData = {divided_course_wide_discussions: courseWideDividedDiscussions};
+
+                        event.preventDefault();
 
                         self.saveForm(self.$('.course-wide-discussion-topics'), fieldData)
                         .done(function() {
                             self.model.fetch()
                                 .done(function() {
                                     self.render();
-                                    self.showMessage(gettext('Your changes have been saved.'), self.$('.course-wide-discussion-topics'));
+                                    self.showMessage(gettext('Your changes have been saved.'),
+                                                     self.$('.course-wide-discussion-topics')
+                                    );
                                 }).fail(function() {
-                                    var errorMessage = gettext("We've encountered an error. Refresh your browser and then try again.");
+                                    var errorMessage = gettext("We've encountered an error. Refresh your browser and then try again."); // eslint-disable-line max-len
                                     self.showMessage(errorMessage, self.$('.course-wide-discussion-topics'), 'error');
                                 });
                         });
