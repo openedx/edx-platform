@@ -3,6 +3,7 @@ Acceptance Tests for Course Information
 """
 from common.test.acceptance.pages.studio.course_info import CourseUpdatesPage
 from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest
+from common.test.acceptance.pages.studio.utils import type_in_codemirror
 
 from ...pages.studio.auto_auth import AutoAuthPage
 from ...pages.studio.index import DashboardPage
@@ -25,6 +26,12 @@ class UsersCanAddUpdatesTest(StudioCourseTest):
         self.course_updates_page.click_new_update_button()
         self.course_updates_page.submit_update(message)
         self.assertTrue(self.course_updates_page.is_first_update_message(message))
+
+    def _create_handout(self, handout_message):
+        self.course_updates_page.visit()
+        self.assertTrue(self.course_updates_page.is_edit_handout_button_present())
+        self.course_updates_page.click_edit_handout_button()
+        self.course_updates_page.submit_handout(handout_message)
 
     def setUp(self, is_staff=False, test_xss=True):
         super(UsersCanAddUpdatesTest, self).setUp()
@@ -144,3 +151,67 @@ class UsersCanAddUpdatesTest(StudioCourseTest):
         self.assertTrue(self.course_updates_page.first_update_contains_html("modified.jpg"))
         self.course_updates_page.visit()
         self.assertTrue(self.course_updates_page.first_update_contains_html("modified.jpg"))
+
+    def test_handout_message_present(self):
+        """
+        Scenario: Users can add handouts
+            Given I have opened a new course in Studio
+            And I go to the course updates page
+            When I add a new handout with the text "Hello"
+            Then I should see the handout "Hello"
+            And I see a "saving" notification
+        """
+        self._create_handout('Hello')
+        self.assertTrue(self.course_updates_page.is_first_handout('Hello'))
+
+    def test_bad_html_handout_cannot_be_saved(self):
+        """
+        Scenario: Users cannot hadnout with bad html
+            Given I have opened a new course in Studio
+            And I go to the course updates page
+            And I add a new handout with text '<p><a href=>[LINK TEXT]</a></p>'
+            Then I see the handout error text
+            And edit handout with text '<p><a href="https://www.google.com.pk/">home</a></p>'
+            Then I should see the saved handout
+            And I see a "saving" notification
+        """
+        self.course_updates_page.visit()
+        self.assertTrue(self.course_updates_page.is_edit_handout_button_present())
+        self.course_updates_page.click_edit_handout_button()
+        type_in_codemirror(self.course_updates_page, 0, '<p><a href=>[LINK TEXT]</a></p>')
+        self.course_updates_page.click_save_handout_button()
+        self.assertEqual(
+            self.course_updates_page.get_handout_error_text(),
+            'There is invalid code in your content. Please check to make sure it is valid HTML.'
+        )
+        self.assertTrue(self.course_updates_page.check_save_handout_button_enabled())
+        type_in_codemirror(self.course_updates_page, 0, '<p><a href="https://www.google.com.pk/">home</a></p>')
+        self.assertFalse(self.course_updates_page.check_save_handout_button_enabled())
+        self.course_updates_page.click_new_handout_save_button()
+        self.assertEqual(
+            self.course_updates_page.get_new_handout_link(),
+            'https://www.google.com.pk/'
+        )
+        self.course_updates_page.refresh_and_wait_for_load()
+        self.assertEqual(self.course_updates_page.get_new_handout_link(), 'https://www.google.com.pk/')
+
+    def test_static_links_are_rewritten(self):
+        """
+        Scenario: Static links are rewritten when previewing a course handout
+            Given I have opened a new course in Studio
+            And I go to the course updates page
+            When I add a new handout with the text "<ol><img src="/static/my_img.jpg"/></ol>"
+            Then I should see the asset handout to "my_img.jpg"
+            And I change the handout from "/static/my_img.jpg" to "<img src='/static/modified.jpg'/>"
+            Then I should see the asset handout to "modified.jpg"
+            And when I reload the page
+            Then I should see the asset handout to "modified.jpg"
+        """
+        self._create_handout('<ol><img src="/static/my_img.jpg"/></ol>')
+        image_source = self.course_updates_page.get_image_src()
+        self.assertIn('my_img.jpg', image_source)
+        self.course_updates_page.click_edit_handout_button()
+        self.course_updates_page.submit_handout('<img src="/static/modified.jpg"/>')
+        self.course_updates_page.refresh_and_wait_for_load()
+        modified_image_source = self.course_updates_page.get_image_src()
+        self.assertIn('modified.jpg', modified_image_source)
