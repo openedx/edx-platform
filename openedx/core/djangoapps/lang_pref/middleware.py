@@ -44,6 +44,10 @@ class LanguagePreferenceMiddleware(object):
                 accept_header = cookie_lang
             request.META[LANGUAGE_HEADER] = accept_header
 
+            # Allow the new cookie setting to update the language in the user's session
+            if LANGUAGE_SESSION_KEY in request.session and request.session[LANGUAGE_SESSION_KEY] != cookie_lang:
+                del request.session[LANGUAGE_SESSION_KEY]
+
     def process_response(self, request, response):
         # If the user is logged in, check for their language preference
         if getattr(request, 'user', None) and request.user.is_authenticated():
