@@ -182,7 +182,11 @@ class SiteConfiguration(models.Model):
                 if settings.DEBUG:
                     os.remove(os.path.join(settings.COMPREHENSIVE_THEME_DIRS[0], css_file))
                 else:
-                    os.remove(os.path.join(settings.STATIC_ROOT, '..', 'customer_themes', css_file))
+                    kwargs = {
+                        'location': "customer_themes",
+                    }
+                    storage = get_storage_class()(**kwargs)
+                    storage.delete(self.get_value('css_overrides_file'))
             except OSError:
                 logger.warning("Can't delete CSS file {}".format(css_file))
 
