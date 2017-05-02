@@ -83,7 +83,8 @@
         background-color: $white;
     }
 
-    .footer-content-wrapper {
+    .wrapper-footer,
+    footer#footer-edx-v3 {
         @include clearfix();
         clear: both;
     }
