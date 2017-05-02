@@ -365,7 +365,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         self.assertEqual(200, response.status_code)  # Yes, it's a 200 even though it's a failure.
         payload = json.loads(response.content)
         self.assertFalse(payload.get('success'))
-        self.assertIn('Before you sign in, you need to activate your account', payload.get('value'))
+        self.assertIn('In order to sign in, you need to activate your account.', payload.get('value'))
 
     def assert_json_failure_response_is_missing_social_auth(self, response):
         """Asserts failure on /login for missing social auth looks right."""
