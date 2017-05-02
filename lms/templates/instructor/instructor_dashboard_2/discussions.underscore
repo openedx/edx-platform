@@ -1,0 +1,5 @@
+<!-- Discussion Topics. -->
+<div class="discussions-nav" id="discussions-management" tabindex="-1">
+    <div class="course-wide-discussions-nav"></div>
+    <div class="inline-discussions-nav"></div>
+</div>
