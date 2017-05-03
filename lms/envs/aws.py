@@ -951,6 +951,25 @@ ENTERPRISE_API_CACHE_TIMEOUT = ENV_TOKENS.get(
     ENTERPRISE_API_CACHE_TIMEOUT
 )
 
+############## ENTERPRISE SERVICE LMS CONFIGURATION ##################################
+# The LMS has some features embedded that are related to the Enterprise service, but
+# which are not provided by the Enterprise service. These settings override the
+# base values for the parameters as defined in common.py
+
+ENTERPRISE_PLATFORM_WELCOME_TEMPLATE = ENV_TOKENS.get(
+    'ENTERPRISE_PLATFORM_WELCOME_TEMPLATE',
+    ENTERPRISE_PLATFORM_WELCOME_TEMPLATE
+)
+ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE = ENV_TOKENS.get(
+    'ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE',
+    ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE
+)
+ENTERPRISE_EXCLUDED_REGISTRATION_FIELDS = set(
+    ENV_TOKENS.get(
+        'ENTERPRISE_EXCLUDED_REGISTRATION_FIELDS',
+        ENTERPRISE_EXCLUDED_REGISTRATION_FIELDS
+    )
+)
 
 ############## CATALOG/DISCOVERY SERVICE API CLIENT CONFIGURATION ######################
 # The LMS communicates with the Catalog service via the EdxRestApiClient class

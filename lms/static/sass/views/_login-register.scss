@@ -3,16 +3,50 @@
 @import '../base/grid-settings';
 @import "neat/neat"; // lib - Neat
 
-.login-register {
+@media (min-width: 768px) {
+    .enterprise-content {
+        width: 20%;
+        float: left;
+        height: 100%;
+        padding-left: $baseline;
+        padding-right: $baseline;
+    }
+
+    .login-register.border-left {
+        border-left: 1px solid #d9d9d9;
+        padding-left: ($baseline*1.5);
+        padding-right: $baseline;
+    }
+}
+
+@media (max-width: 767px) {
+    .enterprise-content {
+        margin: auto auto;
+        display: block;
+        padding-left: ($baseline/2);
+        padding-right: ($baseline/2);
+
+        img.enterprise-logo {
+            display: none;
+        }
+    }
+}
+
+.window-wrap {
+    background: $white;
+}
+
+.login-register-content {
     @include box-sizing(border-box);
     @include outer-container;
-    $grid-columns: 12;
-    background: $white;
-    min-height: 100%;
     width: 100%;
-    padding-left: ($baseline/2);
-    padding-right: ($baseline/2);
-    $third-party-button-height: ($baseline*1.75);
+    justify-content: center;
+    margin-top: $baseline;
+    background: $white;
+    display: flex;
+    flex-wrap: wrap;
+    -webkit-flex-wrap: wrap;
+    -moz-flex-wrap: wrap;
 
     h2 {
         @extend %t-title4;
@@ -34,6 +68,21 @@
     a, label {
         @extend %expand-clickable-area;
     }
+
+    a {
+        text-decoration: underline;
+    }
+}
+
+.login-register {
+    $grid-columns: 12;
+    background: $white;
+    min-height: 100%;
+    padding-left: ($baseline/2);
+    padding-right: ($baseline/2);
+    $third-party-button-height: ($baseline*1.75);
+    display: inline-block;
+    max-width: 500px;
 
     .instructions {
         @extend %t-copy-base;
@@ -586,4 +635,27 @@
 
 .supplemental-link {
     margin: 1rem 0;
+}
+
+.enterprise-content {
+    display: inline-block;
+    text-align: left;
+    vertical-align: top;
+    max-width: 500px;
+
+    .centered-div {
+        margin: 0 auto;
+        margin-right: 0px;
+        float: right;
+    }
+
+    img {
+        height: 100px;
+    }
+
+    h2 {
+        font-size: 16px;
+        line-height: 1.5;
+        color: $gray-d2;
+    }
 }

@@ -18,7 +18,7 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 from django_countries import countries
-from edxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response, render_to_string
 import pytz
 
 from commerce.models import CommerceConfiguration
@@ -34,7 +34,10 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
 from openedx.core.djangoapps.user_api.accounts.api import request_password_change
 from openedx.core.djangoapps.user_api.errors import UserNotFound
-from openedx.features.enterprise_support.api import set_enterprise_branding_filter_param
+from openedx.features.enterprise_support.api import (
+    enterprise_customer_for_request,
+    set_enterprise_branding_filter_param
+)
 from openedx.core.lib.time_zone_utils import TIME_ZONE_CHOICES
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from student.models import UserProfile
@@ -144,6 +147,8 @@ def login_and_registration_form(request, initial_mode="login"):
         ),
     }
 
+    context = update_context_for_enterprise(request, context)
+
     return render_to_response('student_account/login_and_register.html', context)
 
 
@@ -197,6 +202,89 @@ def password_change_request_handler(request):
         return HttpResponseBadRequest(_("No email address provided."))
 
 
+def update_context_for_enterprise(request, context):
+    """
+    Take the processed context produced by the view, determine if it's relevant
+    to a particular Enterprise Customer, and update it to include that customer's
+    enterprise metadata.
+    """
+
+    context = context.copy()
+
+    sidebar_context = enterprise_sidebar_context(request)
+
+    if sidebar_context:
+        context['data']['registration_form_desc']['fields'] = enterprise_fields_only(
+            context['data']['registration_form_desc']
+        )
+        context.update(sidebar_context)
+        context['enable_enterprise_sidebar'] = True
+    else:
+        context['enable_enterprise_sidebar'] = False
+
+    return context
+
+
+def enterprise_fields_only(fields):
+    """
+    Take the received field definition, and exclude those fields that we don't want
+    to require if the user is going to be a member of an Enterprise Customer.
+    """
+    enterprise_exclusions = configuration_helpers.get_value(
+        'ENTERPRISE_EXCLUDED_REGISTRATION_FIELDS',
+        settings.ENTERPRISE_EXCLUDED_REGISTRATION_FIELDS
+    )
+    return [field for field in fields['fields'] if field['name'] not in enterprise_exclusions]
+
+
+def enterprise_sidebar_context(request):
+    """
+    Given the current request, render the HTML of a sidebar for the current
+    logistration view that depicts Enterprise-related information.
+    """
+    enterprise_customer = enterprise_customer_for_request(request)
+
+    if not enterprise_customer:
+        return {}
+
+    platform_name = configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
+
+    if enterprise_customer.branding_configuration.logo:
+        enterprise_logo_url = enterprise_customer.branding_configuration.logo.url
+    else:
+        enterprise_logo_url = ''
+
+    if getattr(enterprise_customer.branding_configuration, 'welcome_message', None):
+        branded_welcome_template = enterprise_customer.branding_configuration.welcome_message
+    else:
+        branded_welcome_template = configuration_helpers.get_value(
+            'ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE',
+            settings.ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE
+        )
+
+    branded_welcome_string = branded_welcome_template.format(
+        start_bold=u'<b>',
+        end_bold=u'</b>',
+        enterprise_name=enterprise_customer.name,
+        platform_name=platform_name
+    )
+
+    platform_welcome_template = configuration_helpers.get_value(
+        'ENTERPRISE_PLATFORM_WELCOME_TEMPLATE',
+        settings.ENTERPRISE_PLATFORM_WELCOME_TEMPLATE
+    )
+    platform_welcome_string = platform_welcome_template.format(platform_name=platform_name)
+
+    context = {
+        'enterprise_name': enterprise_customer.name,
+        'enterprise_logo_url': enterprise_logo_url,
+        'enterprise_branded_welcome_string': branded_welcome_string,
+        'platform_welcome_string': platform_welcome_string,
+    }
+
+    return context
+
+
 def _third_party_auth_context(request, redirect_to, tpa_hint=None):
     """Context for third party auth providers and the currently running pipeline.
 
@@ -221,24 +309,25 @@ def _third_party_auth_context(request, redirect_to, tpa_hint=None):
     }
 
     if third_party_auth.is_enabled():
-        for enabled in third_party_auth.provider.Registry.displayed_for_login(tpa_hint=tpa_hint):
-            info = {
-                "id": enabled.provider_id,
-                "name": enabled.name,
-                "iconClass": enabled.icon_class or None,
-                "iconImage": enabled.icon_image.url if enabled.icon_image else None,
-                "loginUrl": pipeline.get_login_url(
-                    enabled.provider_id,
-                    pipeline.AUTH_ENTRY_LOGIN,
-                    redirect_url=redirect_to,
-                ),
-                "registerUrl": pipeline.get_login_url(
-                    enabled.provider_id,
-                    pipeline.AUTH_ENTRY_REGISTER,
-                    redirect_url=redirect_to,
-                ),
-            }
-            context["providers" if not enabled.secondary else "secondaryProviders"].append(info)
+        if not enterprise_customer_for_request(request):
+            for enabled in third_party_auth.provider.Registry.displayed_for_login(tpa_hint=tpa_hint):
+                info = {
+                    "id": enabled.provider_id,
+                    "name": enabled.name,
+                    "iconClass": enabled.icon_class or None,
+                    "iconImage": enabled.icon_image.url if enabled.icon_image else None,
+                    "loginUrl": pipeline.get_login_url(
+                        enabled.provider_id,
+                        pipeline.AUTH_ENTRY_LOGIN,
+                        redirect_url=redirect_to,
+                    ),
+                    "registerUrl": pipeline.get_login_url(
+                        enabled.provider_id,
+                        pipeline.AUTH_ENTRY_REGISTER,
+                        redirect_url=redirect_to,
+                    ),
+                }
+                context["providers" if not enabled.secondary else "secondaryProviders"].append(info)
 
         running_pipeline = pipeline.get(request)
         if running_pipeline is not None:

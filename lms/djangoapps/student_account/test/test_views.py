@@ -367,20 +367,38 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
     @ddt.data("signin_user", "register_user")
     def test_third_party_auth_disabled(self, url_name):
         response = self.client.get(reverse(url_name))
-        self._assert_third_party_auth_data(response, None, None, [])
+        self._assert_third_party_auth_data(response, None, None, [], None)
 
+    @mock.patch('student_account.views.enterprise_customer_for_request')
     @ddt.data(
-        ("signin_user", None, None),
-        ("register_user", None, None),
-        ("signin_user", "google-oauth2", "Google"),
-        ("register_user", "google-oauth2", "Google"),
-        ("signin_user", "facebook", "Facebook"),
-        ("register_user", "facebook", "Facebook"),
-        ("signin_user", "dummy", "Dummy"),
-        ("register_user", "dummy", "Dummy"),
+        ("signin_user", None, None, None),
+        ("register_user", None, None, None),
+        ("signin_user", "google-oauth2", "Google", None),
+        ("register_user", "google-oauth2", "Google", None),
+        ("signin_user", "facebook", "Facebook", None),
+        ("register_user", "facebook", "Facebook", None),
+        ("signin_user", "dummy", "Dummy", None),
+        ("register_user", "dummy", "Dummy", None),
+        (
+            "signin_user",
+            "google-oauth2",
+            "Google",
+            {
+                'name': 'FakeName',
+                'logo': 'https://host.com/logo.jpg',
+                'welcome_msg': 'No message'
+            }
+        )
     )
     @ddt.unpack
-    def test_third_party_auth(self, url_name, current_backend, current_provider):
+    def test_third_party_auth(
+            self,
+            url_name,
+            current_backend,
+            current_provider,
+            expected_enterprise_customer_mock_attrs,
+            enterprise_customer_mock
+    ):
         params = [
             ('course_id', 'course-v1:Org+Course+Run'),
             ('enrollment_action', 'enroll'),
@@ -388,6 +406,21 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
             ('email_opt_in', 'true'),
             ('next', '/custom/final/destination'),
         ]
+
+        if expected_enterprise_customer_mock_attrs:
+            expected_ec = mock.MagicMock(
+                branding_configuration=mock.MagicMock(
+                    logo=mock.MagicMock(
+                        url=expected_enterprise_customer_mock_attrs['logo']
+                    ),
+                    welcome_message=expected_enterprise_customer_mock_attrs['welcome_msg']
+                )
+            )
+            expected_ec.name = expected_enterprise_customer_mock_attrs['name']
+        else:
+            expected_ec = None
+
+        enterprise_customer_mock.return_value = expected_ec
 
         # Simulate a running pipeline
         if current_backend is not None:
@@ -426,7 +459,13 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
                 "registerUrl": self._third_party_login_url("google-oauth2", "register", params)
             },
         ]
-        self._assert_third_party_auth_data(response, current_backend, current_provider, expected_providers)
+        self._assert_third_party_auth_data(
+            response,
+            current_backend,
+            current_provider,
+            expected_providers,
+            expected_ec
+        )
 
     def test_hinted_login(self):
         params = [("next", "/courses/something/?tpa_hint=oa2-google-oauth2")]
@@ -454,6 +493,59 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
             'auth/login/google-oauth2/?auth_entry=login&next=%2Fcourses%2Fsomething%2F%3Ftpa_hint%3Doa2-google-oauth2',
             target_status_code=302
         )
+
+    @mock.patch('student_account.views.enterprise_customer_for_request')
+    @ddt.data(
+        ('signin_user', False, None, None, None),
+        ('register_user', False, None, None, None),
+        ('signin_user', True, 'Fake EC', 'http://logo.com/logo.jpg', u'{enterprise_name} - {platform_name}'),
+        ('register_user', True, 'Fake EC', 'http://logo.com/logo.jpg', u'{enterprise_name} - {platform_name}'),
+        ('signin_user', True, 'Fake EC', None, u'{enterprise_name} - {platform_name}'),
+        ('register_user', True, 'Fake EC', None, u'{enterprise_name} - {platform_name}'),
+        ('signin_user', True, 'Fake EC', 'http://logo.com/logo.jpg', None),
+        ('register_user', True, 'Fake EC', 'http://logo.com/logo.jpg', None),
+        ('signin_user', True, 'Fake EC', None, None),
+        ('register_user', True, 'Fake EC', None, None),
+    )
+    @ddt.unpack
+    def test_enterprise_register(self, url_name, ec_present, ec_name, logo_url, welcome_message, mock_get_ec):
+        """
+        Verify that when an EnterpriseCustomer is received on the login and register views,
+        the appropriate sidebar is rendered.
+        """
+        if ec_present:
+            mock_ec = mock_get_ec.return_value
+            mock_ec.name = ec_name
+            if logo_url:
+                mock_ec.branding_configuration.logo.url = logo_url
+            else:
+                mock_ec.branding_configuration.logo = None
+            if welcome_message:
+                mock_ec.branding_configuration.welcome_message = welcome_message
+            else:
+                del mock_ec.branding_configuration.welcome_message
+        else:
+            mock_get_ec.return_value = None
+
+        response = self.client.get(reverse(url_name), HTTP_ACCEPT="text/html")
+
+        enterprise_sidebar_div_id = u'enterprise-content-container'
+
+        if not ec_present:
+            self.assertNotContains(response, text=enterprise_sidebar_div_id)
+        else:
+            self.assertContains(response, text=enterprise_sidebar_div_id)
+            if not welcome_message:
+                welcome_message = settings.ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE
+            expected_message = welcome_message.format(
+                start_bold=u'<b>',
+                end_bold=u'</b>',
+                enterprise_name=ec_name,
+                platform_name=settings.PLATFORM_NAME
+            )
+            self.assertContains(response, expected_message)
+            if logo_url:
+                self.assertContains(response, logo_url)
 
     @override_settings(SITE_NAME=settings.MICROSITE_TEST_HOSTNAME)
     def test_microsite_uses_old_login_page(self):
@@ -494,7 +586,7 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
 
         self.assertEqual(resp['X-Frame-Options'], 'ALLOW')
 
-    def _assert_third_party_auth_data(self, response, current_backend, current_provider, providers):
+    def _assert_third_party_auth_data(self, response, current_backend, current_provider, providers, expected_ec):
         """Verify that third party auth info is rendered correctly in a DOM data attribute. """
         finish_auth_url = None
         if current_backend:
@@ -507,6 +599,9 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
             "finishAuthUrl": finish_auth_url,
             "errorMessage": None,
         }
+        if expected_ec is not None:
+            # If we set an EnterpriseCustomer, third-party auth providers ought to be hidden.
+            auth_info['providers'] = []
         auth_info = dump_js_escaped_json(auth_info)
 
         expected_data = '"third_party_auth": {auth_info}'.format(
