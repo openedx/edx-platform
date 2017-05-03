@@ -6,7 +6,7 @@ import mock
 from student.tests.factories import UserFactory, RegistrationFactory, PendingEmailChangeFactory
 from student.views import (
     reactivation_email_for_user, do_email_change_request, confirm_email_change,
-    validate_new_email, SETTING_CHANGE_INITIATED
+    validate_new_email, SETTING_CHANGE_INITIATED, generate_activation_email_context
 )
 from student.models import UserProfile, PendingEmailChange, Registration
 from third_party_auth.views import inactive_user_view
@@ -72,16 +72,16 @@ class EmailTestMixin(object):
 class ActivationEmailTests(TestCase):
     """Test sending of the activation email. """
 
-    ACTIVATION_SUBJECT = u"Activate Your {} Account".format(settings.PLATFORM_NAME)
+    ACTIVATION_SUBJECT = u"Action Required: Activate your {} account".format(settings.PLATFORM_NAME)
 
     # Text fragments we expect in the body of an email
     # sent from an OpenEdX installation.
     OPENEDX_FRAGMENTS = [
-        u"Thank you for creating an account with {platform}!".format(platform=settings.PLATFORM_NAME),
+        u"high-quality {platform} courses".format(platform=settings.PLATFORM_NAME),
         "http://edx.org/activate/",
         (
-            "Check the help section of the "
-            u"{platform} website".format(platform=settings.PLATFORM_NAME)
+            "please use our web form at "
+            u"{support_url} ".format(support_url=settings.SUPPORT_SITE_LINK)
         )
     ]
 
@@ -170,10 +170,7 @@ class ReactivationEmailTests(EmailTestMixin, TestCase):
 
     def assertReactivateEmailSent(self, email_user):
         """Assert that the correct reactivation email has been sent"""
-        context = {
-            'name': self.user.profile.name,
-            'key': self.registration.activation_key
-        }
+        context = generate_activation_email_context(self.user, self.registration)
 
         self.assertEmailUser(
             email_user,

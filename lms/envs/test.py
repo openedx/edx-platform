@@ -443,6 +443,7 @@ MICROSITE_CONFIGURATION = {
         "platform_name": "Test Site",
         "logo_image_url": "test_site/images/header-logo.png",
         "email_from_address": "test_site@edx.org",
+        "ACTIVATION_EMAIL_FROM_ADDRESS": "test_activate@edx.org",
         "payment_support_email": "test_site@edx.org",
         "ENABLE_MKTG_SITE": False,
         "SITE_NAME": "test_site.localhost",
@@ -474,6 +475,7 @@ MICROSITE_CONFIGURATION = {
         "platform_name": "Test logistration",
         "logo_image_url": "test_site/images/header-logo.png",
         "email_from_address": "test_site@edx.org",
+        "ACTIVATION_EMAIL_FROM_ADDRESS": "test_activate@edx.org",
         "payment_support_email": "test_site@edx.org",
         "ENABLE_MKTG_SITE": False,
         "ENABLE_COMBINED_LOGIN_REGISTRATION": True,
@@ -596,3 +598,5 @@ LMS_ROOT_URL = "http://localhost:8000"
 
 ECOMMERCE_API_URL = 'https://ecommerce.example.com/api/v2/'
 ENTERPRISE_API_URL = 'http://enterprise.example.com/enterprise/api/v1/'
+
+ACTIVATION_EMAIL_FROM_ADDRESS = 'test_activate@edx.org'

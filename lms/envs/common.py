@@ -838,6 +838,9 @@ FINANCE_EMAIL = ''
 # Platform mailing address
 CONTACT_MAILING_ADDRESS = ''
 
+# Account activation email sender address
+ACTIVATION_EMAIL_FROM_ADDRESS = ''
+
 ADMINS = ()
 MANAGERS = ADMINS
 

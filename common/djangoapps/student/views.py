@@ -583,6 +583,24 @@ def is_course_blocked(request, redeemed_registration_codes, course_key):
     return blocked
 
 
+def generate_activation_email_context(user, registration):
+    """
+    Constructs a dictionary for use in activation email contexts
+
+    Arguments:
+        user (User): Currently logged-in user
+        registration (Registration): Registration object for the currently logged-in user
+    """
+    return {
+        'name': user.profile.name,
+        'key': registration.activation_key,
+        'lms_url': configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL),
+        'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
+        'support_url': configuration_helpers.get_value('SUPPORT_SITE_LINK', settings.SUPPORT_SITE_LINK),
+        'support_email': configuration_helpers.get_value('CONTACT_EMAIL', settings.CONTACT_EMAIL),
+    }
+
+
 def compose_and_send_activation_email(user, profile, user_registration=None):
     """
     Construct all the required params and send the activation email
@@ -596,10 +614,7 @@ def compose_and_send_activation_email(user, profile, user_registration=None):
     dest_addr = user.email
     if user_registration is None:
         user_registration = Registration.objects.get(user=user)
-    context = {
-        'name': profile.name,
-        'key': user_registration.activation_key,
-    }
+    context = generate_activation_email_context(user, user_registration)
     subject = render_to_string('emails/activation_email_subject.txt', context)
     # Email subject *must not* contain newlines
     subject = ''.join(subject.splitlines())
@@ -2484,7 +2499,7 @@ def password_reset_confirm_wrapper(request, uidb36=None, token=None):
 
 def reactivation_email_for_user(user):
     try:
-        reg = Registration.objects.get(user=user)
+        registration = Registration.objects.get(user=user)
     except Registration.DoesNotExist:
         return JsonResponse({
             "success": False,
@@ -2492,10 +2507,7 @@ def reactivation_email_for_user(user):
         })  # TODO: this should be status code 400  # pylint: disable=fixme
 
     try:
-        context = {
-            'name': user.profile.name,
-            'key': reg.activation_key,
-        }
+        context = generate_activation_email_context(user, registration)
     except ObjectDoesNotExist:
         log.error(
             u'Unable to send reactivation email due to unavailable profile for the user "%s"',
@@ -2511,6 +2523,7 @@ def reactivation_email_for_user(user):
     subject = ''.join(subject.splitlines())
     message = render_to_string('emails/activation_email.txt', context)
     from_address = configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
+    from_address = configuration_helpers.get_value('ACTIVATION_EMAIL_FROM_ADDRESS', from_address)
 
     try:
         user.email_user(subject, message, from_address)
