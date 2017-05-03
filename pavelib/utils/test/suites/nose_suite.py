@@ -190,7 +190,8 @@ class SystemTestSuite(NoseTestSuite):
 
         if self.root == 'lms':
             default_test_id += " {system}/tests.py"
-            default_test_id += " openedx/core/djangolib"
+            default_test_id += " openedx/core/djangolib/*"
+            default_test_id += " openedx/features/*"
 
         return default_test_id.format(system=self.root)
 
