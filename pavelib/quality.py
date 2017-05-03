@@ -74,7 +74,7 @@ def find_fixme(options):
     print "Number of pylint fixmes: " + str(num_fixme)
 
 
-def _get_pylint_violations(systems=ALL_SYSTEMS.split(','), errors_only=False):
+def _get_pylint_violations(systems=ALL_SYSTEMS.split(','), errors_only=False, clean=True):
     """
     Runs pylint. Returns a tuple of (number_of_violations, list_of_violations)
     where list_of_violations is a list of all pylint violations found, separated
@@ -97,19 +97,20 @@ def _get_pylint_violations(systems=ALL_SYSTEMS.split(','), errors_only=False):
 
         apps_list = ' '.join(top_python_dirs(system))
 
-        sh(
-            "pylint {flags} --output-format=parseable {apps} "
-            "> {report_dir}/pylint.report".format(
-                flags=" ".join(flags),
-                apps=apps_list,
-                report_dir=report_dir
-            ),
-            ignore_error=True,
-        )
+        system_report = report_dir / 'pylint.report'
+        if clean or not system_report.exists():
+            sh(
+                "pylint {flags} --output-format=parseable {apps} "
+                "> {report_dir}/pylint.report".format(
+                    flags=" ".join(flags),
+                    apps=apps_list,
+                    report_dir=report_dir
+                ),
+                ignore_error=True,
+            )
 
-        report = "{report_dir}/pylint.report".format(report_dir=report_dir)
-        num_violations += _count_pylint_violations(report)
-        with open(report) as report_contents:
+        num_violations += _count_pylint_violations(system_report)
+        with open(system_report) as report_contents:
             violations_list.extend(report_contents)
 
     # Print number of violations to log
@@ -203,24 +204,25 @@ def _count_pylint_violations(report_file):
     return num_violations_report
 
 
-def _get_pep8_violations():
+def _get_pep8_violations(clean=True):
     """
     Runs pep8. Returns a tuple of (number_of_violations, violations_string)
     where violations_string is a string of all pep8 violations found, separated
     by new lines.
     """
     report_dir = (Env.REPORT_DIR / 'pep8')
-    report_dir.rmtree(ignore_errors=True)
+    if clean:
+        report_dir.rmtree(ignore_errors=True)
     report_dir.makedirs_p()
+    report = report_dir / 'pep8.report'
 
     # Make sure the metrics subdirectory exists
     Env.METRICS_DIR.makedirs_p()
 
-    sh('pep8 . | tee {report_dir}/pep8.report -a'.format(report_dir=report_dir))
+    if not report.exists():
+        sh('pep8 . | tee {} -a'.format(report))
 
-    violations_list = _pep8_violations(
-        "{report_dir}/pep8.report".format(report_dir=report_dir)
-    )
+    violations_list = _pep8_violations(report)
 
     return (len(violations_list), violations_list)
 
@@ -737,7 +739,7 @@ def run_quality(options):
         return ''.join(lines)
 
     # Run pep8 directly since we have 0 violations on master
-    (count, violations_list) = _get_pep8_violations()
+    (count, violations_list) = _get_pep8_violations(clean=False)
 
     # Print number of violations to log
     print _lint_output('pep8', count, violations_list)
@@ -753,7 +755,7 @@ def run_quality(options):
     # If pylint reports exist, use those
     # Otherwise, `diff-quality` will call pylint itself
 
-    (count, violations_list) = _get_pylint_violations()
+    (count, violations_list) = _get_pylint_violations(clean=False)
 
     # Print number of violations to log
     print _lint_output('pylint', count, violations_list, limit=6100)
