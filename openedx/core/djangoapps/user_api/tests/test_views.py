@@ -1625,10 +1625,10 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         self.assertEqual(sent_email.to, [self.EMAIL])
         self.assertEqual(
             sent_email.subject,
-            u"Activate Your {platform} Account".format(platform=settings.PLATFORM_NAME)
+            u"Action Required: Activate your {platform} account".format(platform=settings.PLATFORM_NAME)
         )
         self.assertIn(
-            u"you need to activate your {platform} account".format(platform=settings.PLATFORM_NAME),
+            u"high-quality {platform} courses".format(platform=settings.PLATFORM_NAME),
             sent_email.body
         )
 
