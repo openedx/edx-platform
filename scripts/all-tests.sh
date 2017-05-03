@@ -12,7 +12,7 @@ set -e
 
 # Violations thresholds for failing the build
 export LOWER_PYLINT_THRESHOLD=1000
-export UPPER_PYLINT_THRESHOLD=5335
+export UPPER_PYLINT_THRESHOLD=6200
 export ESLINT_THRESHOLD=9134
 export STYLELINT_THRESHOLD=973
 
