@@ -45,13 +45,14 @@ class VideoStudentViewHandlers(object):
         Update values of xfields, that were changed by student.
         """
         accepted_keys = [
-            'speed', 'saved_video_position', 'transcript_language',
+            'speed', 'auto_advance', 'saved_video_position', 'transcript_language',
             'transcript_download_format', 'youtube_is_available',
             'bumper_last_view_date', 'bumper_do_not_show_again'
         ]
 
         conversions = {
             'speed': json.loads,
+            'auto_advance': json.loads,
             'saved_video_position': RelativeTime.isotime_to_timedelta,
             'youtube_is_available': json.loads,
         }

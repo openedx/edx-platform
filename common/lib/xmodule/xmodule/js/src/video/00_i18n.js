@@ -18,6 +18,7 @@ function() {
         'Exit full browser': gettext('Exit full browser'),
         'Fill browser': gettext('Fill browser'),
         'Speed': gettext('Speed'),
+        'Auto-advance': gettext('Auto-advance'),
         'Volume': gettext('Volume'),
         // Translators: Volume level equals 0%.
         'Muted': gettext('Muted'),
