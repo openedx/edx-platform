@@ -1238,7 +1238,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
             # without a stack trace
             else:
                 # Translators: {msg} will be replaced with a problem's error message.
-                msg = _(u"Error: {msg}").format(msg=inst.message)
+                msg = inst.message
 
             return {'success': msg}
 
