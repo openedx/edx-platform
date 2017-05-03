@@ -29,6 +29,7 @@ from requests.exceptions import ConnectionError, Timeout
 from openedx.core.djangoapps.api_admin.utils import course_discovery_api_client
 
 from openedx.core.lib.token_utils import JwtBuilder
+from openedx.core.djangoapps.catalog.models import CatalogIntegration
 
 
 CONSENT_FAILED_PARAMETER = 'consent_failed'
@@ -455,7 +456,7 @@ def get_dashboard_consent_notification(request, user, course_enrollments):
     return ''
 
 
-def is_course_in_enterprise_catalog(site, course_id, user, enterprise_catalog_id):
+def is_course_in_enterprise_catalog(site, course_id, enterprise_catalog_id):
     """
     Verify that the provided course id exists in the site base list of course
     run keys from the provided enterprise course catalog.
@@ -477,6 +478,17 @@ def is_course_in_enterprise_catalog(site, course_id, user, enterprise_catalog_id
     )
     response = cache.get(cache_key)
     if not response:
+        catalog_integration = CatalogIntegration.current()
+        if not catalog_integration.enabled:
+            LOGGER.error("Catalog integration is not enabled.")
+            return False
+
+        try:
+            user = User.objects.get(username=catalog_integration.service_username)
+        except User.DoesNotExist:
+            LOGGER.exception("Catalog service user '%s' does not exist.", catalog_integration.service_username)
+            return False
+
         try:
             # GET: /api/v1/catalogs/{catalog_id}/contains?course_run_id={course_run_ids}
             response = course_discovery_api_client(user=user).catalogs(enterprise_catalog_id).contains.get(
