@@ -96,14 +96,16 @@ class CourseHomeFragmentView(EdxFragmentView):
         # Render the course dates as a fragment
         dates_fragment = CourseDatesFragmentView().render_to_fragment(request, course_id=course_id, **kwargs)
 
-        # Get the handouts
         # TODO: Use get_course_overview_with_access and blocks api
         course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
+
+        # Get the handouts
         handouts_html = get_course_info_section(request, request.user, course, 'handouts')
 
         # Render the course home fragment
         context = {
             'csrf': csrf(request)['csrf_token'],
+            'course': course,
             'course_key': course_key,
             'course': course,
             'outline_fragment': outline_fragment,
