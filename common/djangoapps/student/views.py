@@ -1830,12 +1830,6 @@ def create_account_with_params(request, params):
     if organization:
         UserOrganizationMapping.objects.get_or_create(user=user, organization=organization, is_amc_admin=is_amc_admin)
 
-    # allow users registered from AMC to create courses
-    if is_amc_admin:
-        from cms.djangoapps.course_creators.models import CourseCreator
-        CourseCreator.objects.update_or_create(user=user, defaults={'state': CourseCreator.GRANTED})
-        CourseCreatorRole().add_users(user)
-
     # APPSEMBLER SPECIFIC END
 
     # Don't send email if we are:
@@ -1892,6 +1886,14 @@ def create_account_with_params(request, params):
     new_user = authenticate(username=user.username, password=params['password'])
     login(request, new_user)
     request.session.set_expiry(0)
+
+    # APPSEMBLER SPECIFIC
+    # allow users registered from AMC to create courses
+    if is_amc_admin:
+        from cms.djangoapps.course_creators.models import CourseCreator
+        CourseCreator.objects.update_or_create(user=user, defaults={'state': CourseCreator.GRANTED})
+        CourseCreatorRole().add_users(user)
+    # APPSEMBLER SPECIFIC END
 
     try:
         record_registration_attributions(request, new_user)
