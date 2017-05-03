@@ -518,28 +518,3 @@ def get_current_child(xmodule, min_depth=None, requested_child=None):
                 child = _get_default_child_module(children)
 
     return child
-
-
-def get_last_accessed_courseware(course, request, user):
-    """
-    Returns a tuple containing the courseware module (URL, id) that the user last accessed,
-    or (None, None) if it cannot be found.
-    """
-    # TODO: convert this method to use the Course Blocks API
-    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-        course.id, request.user, course, depth=2
-    )
-    course_module = get_module_for_descriptor(
-        user, request, course, field_data_cache, course.id, course=course
-    )
-    chapter_module = get_current_child(course_module)
-    if chapter_module is not None:
-        section_module = get_current_child(chapter_module)
-        if section_module is not None:
-            url = reverse('courseware_section', kwargs={
-                'course_id': unicode(course.id),
-                'chapter': chapter_module.url_name,
-                'section': section_module.url_name
-            })
-            return (url, section_module.url_name)
-    return (None, None)
