@@ -66,7 +66,7 @@ from courseware.courses import (
     get_course_by_id,
     get_course_overview_with_access,
     get_course_with_access,
-    get_last_accessed_courseware,
+    get_current_child,
     get_permission_for_course_about,
     get_studio_url,
     sort_by_announcement,
@@ -97,7 +97,6 @@ from openedx.features.course_experience import (
     UNIFIED_COURSE_VIEW_FLAG,
 )
 from openedx.features.enterprise_support.api import data_sharing_consent_required
-from shoppingcart.models import CourseRegistrationCode
 from shoppingcart.utils import is_shopping_cart_enabled
 from student.models import UserTestGroup, CourseEnrollment
 from survey.utils import must_answer_survey
@@ -249,6 +248,28 @@ def course_info(request, course_id):
 
     Assumes the course_id is in a valid format.
     """
+    def get_last_accessed_courseware(course, request, user):
+        """
+        Returns the courseware module URL that the user last accessed, or None if it cannot be found.
+        """
+        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+            course.id, request.user, course, depth=2
+        )
+        course_module = get_module_for_descriptor(
+            user, request, course, field_data_cache, course.id, course=course
+        )
+        chapter_module = get_current_child(course_module)
+        if chapter_module is not None:
+            section_module = get_current_child(chapter_module)
+            if section_module is not None:
+                url = reverse('courseware_section', kwargs={
+                    'course_id': unicode(course.id),
+                    'chapter': chapter_module.url_name,
+                    'section': section_module.url_name
+                })
+                return url
+        return None
+
     # If the unified course experience is enabled, redirect to the "Course" tab
     if waffle.flag_is_active(request, UNIFIED_COURSE_EXPERIENCE_FLAG):
         return redirect(reverse(course_home_url_name(request), args=[course_id]))
@@ -343,7 +364,7 @@ def course_info(request, course_id):
         # Get the URL of the user's last position in order to display the 'where you were last' message
         context['last_accessed_courseware_url'] = None
         if SelfPacedConfiguration.current().enable_course_home_improvements:
-            context['last_accessed_courseware_url'], _ = get_last_accessed_courseware(course, request, user)
+            context['last_accessed_courseware_url'] = get_last_accessed_courseware(course, request, user)
 
         now = datetime.now(UTC())
         effective_start = _adjust_start_date_for_beta_testers(user, course, course_key)
