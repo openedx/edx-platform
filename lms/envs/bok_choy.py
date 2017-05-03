@@ -14,6 +14,8 @@ import os
 from path import Path as path
 from tempfile import mkdtemp
 
+from openedx.core.release import RELEASE_LINE
+
 CONFIG_ROOT = path(__file__).abspath().dirname()
 TEST_ROOT = CONFIG_ROOT.dirname().dirname() / "test_root"
 
@@ -223,7 +225,12 @@ BADGING_BACKEND = 'lms.djangoapps.badges.backends.tests.dummy_backend.DummyBacke
 ECOMMERCE_API_URL = 'http://localhost:8043/api/v2/'
 
 LMS_ROOT_URL = "http://localhost:8000"
-DOC_LINK_BASE_URL = 'http://edx.readthedocs.io/projects/edx-guide-for-students'
+if RELEASE_LINE == "master":
+    # On master, acceptance tests use edX books, not the default Open edX books.
+    HELP_TOKENS_BOOKS = {
+        'learner': 'http://edx.readthedocs.io/projects/edx-guide-for-students',
+        'course_author': 'http://edx.readthedocs.io/projects/edx-partner-course-staff',
+    }
 
 # TODO: TNL-6546: Remove this waffle and flag code.
 from django.db.utils import ProgrammingError
