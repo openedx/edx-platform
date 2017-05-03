@@ -37,33 +37,35 @@ class HelpContextProcessorTest(TestCase):
     def test_get_doc_url(self):
         # Test default values.
         self.assertEqual(
-            "http://edx.readthedocs.io/projects/open-edx-learner-guide/en/latest/index.html",
+            "http://edx.readthedocs.io/projects/open-edx-learner-guide/en/open-release-ficus.master/index.html",
             HelpContextProcessorTest._get_doc_url()
         )
 
         # Provide a known page_token.
         self.assertEqual(
-            "http://edx.readthedocs.io/projects/open-edx-learner-guide/en/latest/sfd_dashboard_profile/index.html",
+            "http://edx.readthedocs.io/projects/open-edx-learner-guide/" +
+            "en/open-release-ficus.master/sfd_dashboard_profile/index.html",
             HelpContextProcessorTest._get_doc_url('profile')
         )
 
         # Use settings.DOC_LINK_BASE_URL to override default base_url.
         with patch('django.conf.settings.DOC_LINK_BASE_URL', 'settings_base_url'):
             self.assertEqual(
-                "settings_base_url/en/latest/SFD_instructor_dash_help.html",
+                "settings_base_url/en/open-release-ficus.master/SFD_instructor_dash_help.html",
                 HelpContextProcessorTest._get_doc_url('instructor')
             )
 
     def test_get_pdf_url(self):
         # Test default values.
         self.assertEqual(
-            "https://media.readthedocs.org/pdf/open-edx-learner-guide/latest/open-edx-learner-guide.pdf",
+            "https://media.readthedocs.org/pdf/open-edx-learner-guide/" +
+            "open-release-ficus.master/open-edx-learner-guide.pdf",
             HelpContextProcessorTest._get_pdf_url()
         )
 
         # Use settings.DOC_LINK_BASE_URL to override default base_url.
         with patch('django.conf.settings.DOC_LINK_BASE_URL', 'settings_base_url'):
             self.assertEqual(
-                "settings_base_url/latest/open-edx-learner-guide.pdf",
+                "settings_base_url/open-release-ficus.master/open-edx-learner-guide.pdf",
                 HelpContextProcessorTest._get_pdf_url()
             )

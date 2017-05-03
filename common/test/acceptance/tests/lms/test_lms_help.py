@@ -66,7 +66,8 @@ class TestCohortHelp(ContainerBase):
         """
         self.cohort_management.add_cohort('cohort_name')
 
-        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/' \
+        href = 'http://edx.readthedocs.org/projects/open-edx-building-and-running-a-course/en/' \
+               'open-release-ficus.master/' \
                'course_features/cohorts/cohort_config.html#assign-learners-to-cohorts-manually'
 
         self.verify_help_link(href)
@@ -86,7 +87,8 @@ class TestCohortHelp(ContainerBase):
 
         self.cohort_management.add_cohort('cohort_name', assignment_type='random')
 
-        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/' \
+        href = 'http://edx.readthedocs.org/projects/open-edx-building-and-running-a-course/en/' \
+               'open-release-ficus.master/' \
                'course_features/cohorts/cohorts_overview.html#all-automated-assignment'
 
         self.verify_help_link(href)
@@ -119,6 +121,7 @@ class InstructorDashboardHelp(BaseInstructorDashboardTest):
         When I click "Help"
         Then I see help about the instructor dashboard in a new tab
         """
-        href = 'http://edx.readthedocs.io/projects/edx-guide-for-students/en/latest/SFD_instructor_dash_help.html'
+        href = 'http://edx.readthedocs.io/projects/open-edx-learner-guide/en/' \
+               'open-release-ficus.master/SFD_instructor_dash_help.html'
         self.instructor_dashboard_page.click_help()
         assert_opened_help_link_is_correct(self, href)
