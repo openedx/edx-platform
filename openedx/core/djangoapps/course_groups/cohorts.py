@@ -137,7 +137,6 @@ def get_cohorted_commentables(course_key):
     """
 
     course_cohort_settings = get_course_cohort_settings(course_key)
-    # course_discussion_settings =
 
     if not course_cohort_settings.is_cohorted:
         # this is the easy case :)
