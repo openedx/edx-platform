@@ -105,25 +105,30 @@ class TestUserPreferenceMiddleware(TestCase):
         for logged_in in (True, False)
         for test_def in [
             # (LANGUAGE_COOKIE, LANGUAGE_SESSION_KEY, Accept-Language In, Accept-Language Out)
-            (None, None, None, None),
-            (None, 'eo', None, None),
-            (None, 'eo', 'en', 'en'),
-            (None, None, 'en', 'en'),
-            ('en', None, None, 'en'),
-            ('en', None, 'eo', 'en;q=1.0,eo'),
-            ('en', None, 'en', 'en'),
-            ('en', 'eo', 'en', 'en'),
-            ('en', 'eo', 'eo', 'en;q=1.0,eo')
+            (None, None, None, None, None),
+            (None, 'eo', None, None, 'eo'),
+            (None, 'en', None, None, 'en'),
+            (None, 'eo', 'en', 'en', 'eo'),
+            (None, None, 'en', 'en', None),
+            ('en', None, None, 'en', None),
+            ('en', 'en', None, 'en', 'en'),
+            ('en', None, 'eo', 'en;q=1.0,eo', None),
+            ('en', None, 'en', 'en', None),
+            ('en', 'eo', 'en', 'en', None),
+            ('en', 'eo', 'eo', 'en;q=1.0,eo', None)
         ]
     ))
     @ddt.unpack
-    def test_preference_cookie_overrides_browser(self, logged_in, lang_cookie, lang_session, accept_lang_in, accept_lang_out):
+    def test_preference_cookie_overrides_browser(
+            self, logged_in, lang_cookie, lang_session_in, accept_lang_in, accept_lang_out,
+            lang_session_out,
+    ):
         if not logged_in:
             self.request.user = self.anonymous_user
         if lang_cookie:
             self.request.COOKIES[settings.LANGUAGE_COOKIE] = lang_cookie
-        if lang_session:
-            self.request.session[LANGUAGE_SESSION_KEY] = lang_session
+        if lang_session_in:
+            self.request.session[LANGUAGE_SESSION_KEY] = lang_session_in
         if accept_lang_in:
             self.request.META['HTTP_ACCEPT_LANGUAGE'] = accept_lang_in
         else:
@@ -143,7 +148,7 @@ class TestUserPreferenceMiddleware(TestCase):
         else:
             self.assertEqual(accept_lang_result, accept_lang_out)
 
-        self.assertEquals(self.request.session.get(LANGUAGE_SESSION_KEY), lang_session)
+        self.assertEquals(self.request.session.get(LANGUAGE_SESSION_KEY), lang_session_out)
 
     @ddt.data(None, 'es', 'en')
     def test_logout_preserves_cookie(self, lang_cookie):
