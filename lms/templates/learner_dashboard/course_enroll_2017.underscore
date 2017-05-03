@@ -1,12 +1,4 @@
-<% if (is_enrolled && (typeof expired === 'undefined' || expired === false)) { %>
-    <a href="<%- course_url %>" class="view-course-button btn-brand btn cta-primary">
-        <% if (is_course_ended) { %>
-            <%- gettext('View Archived Course') %>
-        <% } else { %>
-            <%- gettext('View Course') %>
-        <% } %>
-    </a>
-<% } else { %>
+<% if (!is_enrolled) { %>
     <% if (enrollable_course_runs.length > 0) { %>
         <% if (enrollable_course_runs.length > 1) { %>
             <div class="run-select-container">
