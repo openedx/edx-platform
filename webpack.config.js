@@ -12,7 +12,8 @@ var wpconfig = {
     context: __dirname,
 
     entry: {
-        CourseOutline: './openedx/features/course_experience/static/course_experience/js/CourseOutline.js'
+        CourseOutline: './openedx/features/course_experience/static/course_experience/js/CourseOutline.js',
+        AccountSettings: './openedx/features/account_settings/static/account_settings/js/AccountSettings.js'
     },
 
     output: {
