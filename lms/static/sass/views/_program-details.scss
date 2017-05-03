@@ -303,28 +303,6 @@
     }
 
     .course-enroll-view {
-
-        .view-course-button {
-            background: palette(primary, dark);
-            border-color: palette(primary, dark);
-            height: 37px;
-            padding: 7px 18.5px 0 18.5px;
-            width: auto;
-            border-radius: 0;
-            text-align: center;
-            font-size: 0.9375em;
-            margin-top: 5px;
-
-            /* IE11 CSS styles */
-            @media(min-width: $bp-screen-md) and (-ms-high-contrast: none), (-ms-high-contrast: active) {
-                @include float(right);
-            }
-
-            @media(min-width: $bp-screen-lg) {
-                margin-top: 0px;
-            }
-        }
-
         .enroll-button {
             width: 100%;
 
@@ -405,10 +383,6 @@
                 flex-wrap: wrap;
             }
 
-        }
-
-        .section:not(:first-child) {
-            margin-top: 0;
         }
 
         .course-details {
