@@ -21,6 +21,7 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from courseware.courses import get_course_with_access
 from edxmako.shortcuts import render_to_response
+from django_comment_common.models import CourseDiscussionSettings
 
 from . import cohorts
 from lms.djangoapps.django_comment_client.utils import get_discussion_category_map, get_discussion_categories_ids
@@ -102,19 +103,29 @@ def get_cohorted_discussions(course, course_settings):
     """
     Returns the course-wide and inline cohorted discussion ids separately.
     """
-    cohorted_course_wide_discussions = []
-    cohorted_inline_discussions = []
+    divided_course_wide_discussions = []
+    divided_inline_discussions = []
 
     course_wide_discussions = [topic['id'] for __, topic in course.discussion_topics.items()]
     all_discussions = get_discussion_categories_ids(course, None, include_all=True)
 
-    for cohorted_discussion_id in course_settings.cohorted_discussions:
-        if cohorted_discussion_id in course_wide_discussions:
-            cohorted_course_wide_discussions.append(cohorted_discussion_id)
-        elif cohorted_discussion_id in all_discussions:
-            cohorted_inline_discussions.append(cohorted_discussion_id)
+    course_discussion_settings, created = CourseDiscussionSettings.objects.get_or_create(course_id=course.id)
+    divided_discussions = course_discussion_settings.divided_discussions.all()
 
-    return cohorted_course_wide_discussions, cohorted_inline_discussions
+    # Get just the IDs from all of the divided_discussions for easy set comparisons
+    divided_discussion_ids = list(
+        map(lambda divided_discussion: divided_discussion.discussion_id, divided_discussions)
+    )
+    if not divided_discussion_ids:
+        divided_discussion_ids = course_settings.cohorted_discussions
+
+    for divided_discussion_id in divided_discussion_ids:
+        if divided_discussion_id in course_wide_discussions:
+            divided_course_wide_discussions.append(divided_discussion_id)
+        elif divided_discussion_id in all_discussions:
+            divided_inline_discussions.append(divided_discussion_id)
+
+    return divided_course_wide_discussions, divided_inline_discussions
 
 
 @require_http_methods(("GET", "PATCH"))

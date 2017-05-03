@@ -164,3 +164,28 @@ class ForumsConfig(ConfigurationModel):
     def __unicode__(self):
         """Simple representation so the admin screen looks less ugly."""
         return u"ForumsConfig: timeout={}".format(self.connection_timeout)
+
+
+class CourseDiscussionSettings(models.Model):
+    course_id = CourseKeyField(
+        unique=True,
+        max_length=255,
+        db_index=True,
+        help_text="Which course are these settings associated with?",
+    )
+    always_divide_inline_discussions = models.BooleanField(default=False)
+
+    COHORT = 'cohort'
+    ENROLLMENT_TRACK = 'enrollment_track'
+    ASSIGNMENT_TYPE_CHOICES = ((None, 'None'), (COHORT, 'Cohort'), (ENROLLMENT_TRACK, 'Enrollment Track'))
+    inline_discussion_division_scheme = models.CharField(max_length=20, choices=ASSIGNMENT_TYPE_CHOICES, default=None)
+
+
+class DividedDiscussion(models.Model):
+    course_discussion_settings = models.ForeignKey(CourseDiscussionSettings, related_name='divided_discussions')
+    discussion_id = models.TextField()
+
+    COHORT = 'cohort'
+    ENROLLMENT_TRACK = 'enrollment_track'
+    ASSIGNMENT_TYPE_CHOICES = ((COHORT, 'Cohort'), (ENROLLMENT_TRACK, 'Enrollment Track'))
+    division_scheme = models.CharField(max_length=20, choices=ASSIGNMENT_TYPE_CHOICES)

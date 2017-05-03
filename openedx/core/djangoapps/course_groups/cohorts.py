@@ -16,14 +16,14 @@ from courseware import courses
 from eventtracking import tracker
 from request_cache.middleware import RequestCache, request_cached
 from student.models import get_user_by_username_or_email
+from django_comment_common.models import CourseDiscussionSettings, DividedDiscussion
 
 from .models import (
     CourseUserGroup,
     CourseCohort,
     CourseCohortsSettings,
     CourseUserGroupPartitionGroup,
-    CohortMembership,
-    CourseSegmentedDiscussion
+    CohortMembership
 )
 
 
@@ -137,12 +137,17 @@ def get_cohorted_commentables(course_key):
     """
 
     course_cohort_settings = get_course_cohort_settings(course_key)
+    # course_discussion_settings =
 
     if not course_cohort_settings.is_cohorted:
         # this is the easy case :)
         ans = set()
     else:
-        ans = set(course_cohort_settings.cohorted_discussions)
+        divided_discussion_ids = get_divided_discussion_ids(course_key)
+        if divided_discussion_ids:
+            ans = divided_discussion_ids
+        else:
+            ans = set(course_cohort_settings.cohorted_discussions)
 
     return ans
 
@@ -264,6 +269,27 @@ def migrate_cohort_settings(course):
     return cohort_settings
 
 
+def migrate_discussion_settings(course, course_cohort_settings=None):
+    """
+    Migrate all the cohorted discussions for this course to course discussion settings and divided discussions
+    """
+
+    course_discussion_settings, created = CourseDiscussionSettings.objects.get_or_create(course_id=course.id)
+    if course_cohort_settings:
+        divided_discussion_ids = course_cohort_settings.cohorted_discussions
+    else:
+        divided_discussion_ids = course_cohort_settings
+    if created:
+        divided_discussions_to_create = list(map(lambda divided_discussion_id: DividedDiscussion(
+            course_discussion_settings=course_discussion_settings,
+            discussion_id=divided_discussion_id,
+            division_scheme='cohort'
+        ), divided_discussion_ids))
+        DividedDiscussion.objects.bulk_create(divided_discussions_to_create)
+
+    return course_discussion_settings
+
+
 def get_course_cohorts(course, assignment_type=None):
     """
     Get a list of all the cohorts in the given course. This will include auto cohorts,
@@ -278,7 +304,9 @@ def get_course_cohorts(course, assignment_type=None):
         not check whether the course is cohorted.
     """
     # Migrate cohort settings for this course
-    migrate_cohort_settings(course)
+    course_cohort_settings = migrate_cohort_settings(course)
+    # Migrate the cohorted discussions for this course
+    migrate_discussion_settings(course, course_cohort_settings)
 
     query_set = CourseUserGroup.objects.filter(
         course_id=course.location.course_key,
@@ -489,34 +517,36 @@ def set_course_cohort_settings(course_key, **kwargs):
     """
     fields = {'is_cohorted': bool, 'always_cohort_inline_discussions': bool, 'cohorted_discussions': list}
     course_cohort_settings = get_course_cohort_settings(course_key)
+    course_discussion_settings = get_course_discussion_settings(course_key)
 
     for field, field_type in fields.items():
         if field in kwargs:
             if not isinstance(kwargs[field], field_type):
                 raise ValueError("Incorrect field type for `{}`. Type must be `{}`".format(field, field_type.__name__))
             if field == 'cohorted_discussions':
-                segmented_discussions = course_cohort_settings.segmented_discussions.all()
-                # Get just the IDs from all of the segmented_discussions for easy set comparisons
-                segmented_discussion_ids = list(
-                    map(lambda segmented_discussion: segmented_discussion.discussion_id, segmented_discussions)
-                )
+                divided_discussions = course_discussion_settings.divided_discussions.all()
+
+                # Get just the IDs from all of the divided_discussions for easy set comparisons
+                divided_discussion_ids = get_discussion_ids_from_divided_discussions(divided_discussions)
+                # If there aren't any discussion ids, use the legacy cohort IDs
+                if not divided_discussion_ids:
+                    divided_discussion_ids = course_cohort_settings.cohorted_discussions
 
                 # Get the set difference of IDs that have been received and what currently exist
-                # New IDs need to be bulk inserted into the CourseSegmentedDiscussion table
-                segmented_discussion_ids_to_create = set(kwargs[field]) - set(segmented_discussion_ids)
-                segmented_discussions_to_create = list(map(lambda segmented_discussion_id: CourseSegmentedDiscussion(
-                    course_cohorts_settings=course_cohort_settings,
-                    discussion_id=segmented_discussion_id,
-                    segmentation_scheme='cohort'
-                ), segmented_discussion_ids_to_create))
-                CourseSegmentedDiscussion.objects.bulk_create(segmented_discussions_to_create)
+                # New IDs need to be bulk inserted into the CourseDividedDiscussion table
+                divided_discussion_ids_to_create = set(kwargs[field]) - set(divided_discussion_ids)
+                divided_discussions_to_create = list(map(lambda divided_discussion_id: DividedDiscussion(
+                    course_discussion_settings=course_discussion_settings,
+                    discussion_id=divided_discussion_id,
+                    division_scheme='cohort'
+                ), divided_discussion_ids_to_create))
+                DividedDiscussion.objects.bulk_create(divided_discussions_to_create)
 
                 # Get the set difference between the list of IDs we have, and all desired IDs that have been received
                 # IDs that exist in the DB but have not been received need to be deleted from the table
-                segmented_discussion_ids_to_delete = set(segmented_discussion_ids) - set(kwargs[field])
-                CourseSegmentedDiscussion.objects.filter(
-                    discussion_id__in=segmented_discussion_ids_to_delete).delete()
-                pass
+                divided_discussion_ids_to_delete = set(divided_discussion_ids) - set(kwargs[field])
+                DividedDiscussion.objects.filter(
+                    discussion_id__in=divided_discussion_ids_to_delete).delete()
             else:
                 setattr(course_cohort_settings, field, kwargs[field])
     course_cohort_settings.save()
@@ -542,4 +572,28 @@ def get_course_cohort_settings(course_key):
     except CourseCohortsSettings.DoesNotExist:
         course = courses.get_course_by_id(course_key)
         course_cohort_settings = migrate_cohort_settings(course)
+        course_discussion_settings = migrate_discussion_settings(course, course_cohort_settings)
+
     return course_cohort_settings
+
+
+def get_course_discussion_settings(course_key):
+    try:
+        course_discussion_settings = CourseDiscussionSettings.objects.get(course_id=course_key)
+    except CourseDiscussionSettings.DoesNotExist:
+        course = courses.get_course_by_id(course_key)
+        course_discussion_settings = migrate_discussion_settings(course)
+    return course_discussion_settings
+
+
+def get_divided_discussion_ids(course_key):
+    course_discussion_settings = get_course_discussion_settings(course_key)
+    divided_discussions = course_discussion_settings.divided_discussions.all()
+    return get_discussion_ids_from_divided_discussions(divided_discussions)
+
+
+def get_discussion_ids_from_divided_discussions(divided_discussions):
+    divided_discussion_ids = list(
+        map(lambda divided_discussion: divided_discussion.discussion_id, divided_discussions)
+    )
+    return divided_discussion_ids

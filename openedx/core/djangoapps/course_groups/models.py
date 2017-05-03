@@ -186,13 +186,13 @@ class CourseCohortsSettings(models.Model):
     def cohorted_discussions(self):
         """Jsonify the cohorted_discussions"""
 
-        segmented_discussions = self.segmented_discussions.all()
-        if segmented_discussions:
-            return list(
-                map(lambda segmented_discussion: segmented_discussion.discussion_id, segmented_discussions)
-            )
-        else:
-            return json.loads(self._cohorted_discussions)
+        # segmented_discussions = self.segmented_discussions.all()
+        # if segmented_discussions:
+        #     return list(
+        #         map(lambda segmented_discussion: segmented_discussion.discussion_id, segmented_discussions)
+        #     )
+        # else:
+        return json.loads(self._cohorted_discussions)
 
     @cohorted_discussions.setter
     def cohorted_discussions(self, value):
