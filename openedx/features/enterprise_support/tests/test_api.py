@@ -10,6 +10,7 @@ from django.test.utils import override_settings
 
 from openedx.features.enterprise_support.api import (
     enterprise_enabled,
+    enterprise_customer_for_request,
     insert_enterprise_pipeline_elements,
     data_sharing_consent_required,
     set_enterprise_branding_filter_param,
@@ -116,6 +117,48 @@ class TestEnterpriseApi(unittest.TestCase):
         with mock.patch('enterprise.utils.get_enterprise_branding_info_by_provider_id', return_value=branding_info):
             logo_url = get_enterprise_customer_logo_url(request)
             self.assertEqual(logo_url, None)
+
+    @override_settings(ENABLE_ENTERPRISE_INTEGRATION=True)
+    @mock.patch('openedx.features.enterprise_support.api.get_enterprise_customer_for_request')
+    @mock.patch('openedx.features.enterprise_support.api.EnterpriseCustomer')
+    def test_enterprise_customer_for_request(self, ec_class_mock, get_ec_pipeline_mock):
+        """
+        Test that the correct EnterpriseCustomer, if any, is returned.
+        """
+        def get_ec_mock(**kwargs):
+            by_provider_id_kw = 'enterprise_customer_identity_provider__provider_id'
+            provider_id = kwargs.get(by_provider_id_kw, '')
+            uuid = kwargs.get('uuid', '')
+            if uuid == 'real-uuid' or provider_id == 'real-provider-id':
+                return 'this-is-actually-an-enterprise-customer'
+            elif uuid == 'not-a-uuid':
+                raise ValueError
+            else:
+                raise Exception
+
+        ec_class_mock.DoesNotExist = Exception
+        ec_class_mock.objects.get.side_effect = get_ec_mock
+
+        get_ec_pipeline_mock.return_value = None
+
+        request = mock.MagicMock()
+        request.GET.get.return_value = 'real-uuid'
+        self.assertEqual(enterprise_customer_for_request(request), 'this-is-actually-an-enterprise-customer')
+        request.GET.get.return_value = 'not-a-uuid'
+        self.assertEqual(enterprise_customer_for_request(request), None)
+        request.GET.get.return_value = 'fake-uuid'
+        self.assertEqual(enterprise_customer_for_request(request), None)
+        request.GET.get.return_value = None
+        self.assertEqual(
+            enterprise_customer_for_request(request, tpa_hint='real-provider-id'),
+            'this-is-actually-an-enterprise-customer'
+        )
+        self.assertEqual(enterprise_customer_for_request(request, tpa_hint='fake-provider-id'), None)
+        self.assertEqual(enterprise_customer_for_request(request, tpa_hint=None), None)
+
+        get_ec_pipeline_mock.return_value = 'also-a-real-enterprise'
+
+        self.assertEqual(enterprise_customer_for_request(request), 'also-a-real-enterprise')
 
     def check_data_sharing_consent(self, consent_required=False, consent_url=None):
         """
