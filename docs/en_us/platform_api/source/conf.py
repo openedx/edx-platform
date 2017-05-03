@@ -214,6 +214,7 @@ sys.path.append(root / "common/djangoapps")
 sys.path.append(root / "lms/djangoapps")
 sys.path.append(root / "lms/envs")
 sys.path.append(root / "openedx/core/djangoapps")
+sys.path.append(root / "openedx/features")
 
 sys.path.insert(
     0,
