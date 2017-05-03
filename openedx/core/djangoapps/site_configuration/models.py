@@ -145,7 +145,7 @@ class SiteConfiguration(models.Model):
         file_name = self.get_value('css_overrides_file')
         if settings.DEBUG:
             theme_folder = os.path.join(settings.COMPREHENSIVE_THEME_DIRS[0], 'customer_themes')
-            theme_file = os.path.join(theme_folder, '{}.css'.format(file_name))
+            theme_file = os.path.join(theme_folder, file_name)
             with open(theme_file, 'w') as f:
                 f.write(css_output.encode('utf-8'))
         else:
@@ -200,13 +200,9 @@ class SiteConfiguration(models.Model):
 
     def _get_initial_microsite_values(self):
         domain_without_port_number = self.site.domain.split(':')[0]
-        if settings.DEBUG:
-            css_overrides_file = "customer_themes/{}.css".format(domain_without_port_number)
-        else:
-            css_overrides_file = "{}.css".format(domain_without_port_number)
         return {
             'platform_name': self.site.name,
-            'css_overrides_file': css_overrides_file,
+            'css_overrides_file': "{}.css".format(domain_without_port_number),
             'ENABLE_COMBINED_LOGIN_REGISTRATION': True,
         }
 
