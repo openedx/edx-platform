@@ -23,9 +23,7 @@ from openedx.features.course_experience import UNIFIED_COURSE_EXPERIENCE_FLAG
     <header class="page-header has-secondary">
         <div class="page-header-main">
             <nav aria-label="${_('Course Outline')}" class="sr-is-focusable" tabindex="-1">
-                <h2 class="hd hd-3 page-title">
-                    ${_("{course_name}").format(org=course.display_org_with_default, course_name=course.display_name_with_default)}
-                </h2>
+                <h2 class="hd hd-3 page-title">${course.display_name_with_default}</h2>
             </nav>
         </div>
         <div class="page-header-secondary">
