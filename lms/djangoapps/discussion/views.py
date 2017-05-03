@@ -116,9 +116,10 @@ def get_threads(request, course, user_info, discussion_id=None, per_page=THREADS
         'text': '',
         'course_id': unicode(course.id),
         'user_id': request.user.id,
-        'context': ThreadContext.COURSE,
-        'group_id': get_group_id_for_comments_service(request, course.id, discussion_id),  # may raise ValueError
+        'context': ThreadContext.COURSE
     }
+    if discussion_id:
+        default_query_params.update({'group_id': get_group_id_for_comments_service(request, course.id, discussion_id)})
 
     # If provided with a discussion id, filter by discussion id in the
     # comments_service.
@@ -164,7 +165,7 @@ def get_threads(request, course, user_info, discussion_id=None, per_page=THREADS
     threads = paginated_results.collection
 
     # If not provided with a discussion id, filter threads by commentable ids
-    # which are accessible to the current user.
+    # which are accessible to the current user. WE SHOULD CHECK GROUP_IDS here and filter out, correct?
     if discussion_id is None:
         discussion_category_ids = set(utils.get_discussion_categories_ids(course, request.user))
         threads = [
@@ -466,15 +467,16 @@ def user_profile(request, course_key, user_id):
             'per_page': THREADS_PER_PAGE,   # more than threads_per_page to show more activities
         }
 
-        try:
-            group_id = get_group_id_for_comments_service(request, course_key)
-        except ValueError:
-            return HttpResponseServerError("Invalid group_id")
-        if group_id is not None:
-            query_params['group_id'] = group_id
-            profiled_user = cc.User(id=user_id, course_id=course_key, group_id=group_id)
-        else:
-            profiled_user = cc.User(id=user_id, course_id=course_key)
+        # try:
+        #     group_id = get_group_id_for_comments_service(request, course_key)
+        # except ValueError:
+        #     return HttpResponseServerError("Invalid group_id")
+        # if group_id is not None:
+        #     query_params['group_id'] = group_id
+        #     profiled_user = cc.User(id=user_id, course_id=course_key, group_id=group_id)
+        # else:
+
+        profiled_user = cc.User(id=user_id, course_id=course_key)
 
         threads, page, num_pages = profiled_user.active_threads(query_params)
         query_params['page'] = page
@@ -554,12 +556,12 @@ def followed_threads(request, course_key, user_id):
             )
         )
 
-        try:
-            group_id = get_group_id_for_comments_service(request, course_key)
-        except ValueError:
-            return HttpResponseServerError("Invalid group_id")
-        if group_id is not None:
-            query_params['group_id'] = group_id
+        # try:
+        #     group_id = get_group_id_for_comments_service(request, course_key)
+        # except ValueError:
+        #     return HttpResponseServerError("Invalid group_id")
+        # if group_id is not None:
+        #     query_params['group_id'] = group_id
 
         paginated_results = profiled_user.subscribed_threads(query_params)
         print "\n \n \n paginated results \n \n \n "
@@ -574,6 +576,8 @@ def followed_threads(request, course_key, user_id):
                 paginated_results.collection,
                 request.user, user_info
             )
+
+        # TODO: iterate through paginated_results.collection and remove any threads that request.user should not have access to.
         if request.is_ajax():
             is_staff = has_permission(request.user, 'openclose_thread', course.id)
             return utils.JsonResponse({

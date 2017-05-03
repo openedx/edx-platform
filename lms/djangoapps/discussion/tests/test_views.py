@@ -820,7 +820,9 @@ class ForumFormDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdT
         kwargs = {}
         if group_id:
             kwargs['group_id'] = group_id
-        mock_request.side_effect = make_mock_request_impl(self.course, "dummy content", **kwargs)
+        mock_request.side_effect = make_mock_request_impl(
+            self.course, "dummy content", commentable_id=commentable_id, **kwargs
+        )
 
         request_data = {}
         if pass_group_id:
@@ -1023,15 +1025,15 @@ class UserProfileDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupI
 class FollowedThreadsDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdTestMixin):
     cs_endpoint = "/subscribed_threads"
 
-    def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True):
+    def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=False):
         kwargs = {}
         if group_id:
             kwargs['group_id'] = group_id
-        mock_request.side_effect = make_mock_request_impl(self.course, "dummy content", **kwargs)
+        mock_request.side_effect = make_mock_request_impl(
+            self.course, "dummy content", commentable_id=commentable_id, **kwargs
+        )
 
         request_data = {}
-        if pass_group_id:
-            request_data["group_id"] = group_id
         request = RequestFactory().get(
             "dummy_url",
             data=request_data,
@@ -1044,6 +1046,17 @@ class FollowedThreadsDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGr
             user.id
         )
 
+    def test_no_group_info_in_ajax_response_if_not_divided(self, mock_request):
+        response = self.call_view(
+            mock_request,
+            "dummy_thread_id",
+            self.student,
+            self.student_cohort.id
+        )
+        self._assert_json_response_no_group_info(
+            response, lambda d: d['discussion_data'][0]
+        )
+
     def test_group_info_in_ajax_response(self, mock_request):
         response = self.call_view(
             mock_request,
@@ -1054,6 +1067,10 @@ class FollowedThreadsDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGr
         self._assert_json_response_contains_group_info(
             response, lambda d: d['discussion_data'][0]
         )
+
+    def test_cohorted_topic_moderator_with_invalid_group_id(self, mock_request):
+        # Followed Threads doesn't accept group_id as a URL parameter.
+        pass
 
 
 @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
