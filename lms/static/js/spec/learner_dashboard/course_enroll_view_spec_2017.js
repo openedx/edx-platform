@@ -143,7 +143,7 @@ define([
             singleCourseRunList[0].is_enrolled = true;
 
             setupView(singleCourseRunList);
-            expect(view.$el.html().trim()).toEqual('');
+            expect(view.$('.view-course-button').text().trim()).toEqual('View Course');
             expect(view.$('.run-select').length).toBe(0);
         });
 
