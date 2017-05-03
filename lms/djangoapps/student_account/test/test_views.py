@@ -290,7 +290,7 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         super(StudentAccountLoginAndRegistrationTest, self).setUp()
 
         # Several third party auth providers are created for these tests:
-        self.configure_google_provider(enabled=True, visible=True)
+        self.google_provider = self.configure_google_provider(enabled=True, visible=True)
         self.configure_facebook_provider(enabled=True, visible=True)
         self.configure_dummy_provider(
             visible=True,
@@ -442,6 +442,18 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         params = [("next", "/courses/something/?tpa_hint={0}".format(tpa_hint))]
         response = self.client.get(reverse('signin_user'), params, HTTP_ACCEPT="text/html")
         self.assertNotIn(response.content, tpa_hint)
+
+    def test_hinted_login_dialog_disabled(self):
+        """Test that the dialog doesn't show up for hinted logins when disabled. """
+        self.google_provider.skip_hinted_login_dialog = True
+        self.google_provider.save()
+        params = [("next", "/courses/something/?tpa_hint=oa2-google-oauth2")]
+        response = self.client.get(reverse('signin_user'), params, HTTP_ACCEPT="text/html")
+        self.assertRedirects(
+            response,
+            'auth/login/google-oauth2/?auth_entry=login&next=%2Fcourses%2Fsomething%2F%3Ftpa_hint%3Doa2-google-oauth2',
+            target_status_code=302
+        )
 
     @override_settings(SITE_NAME=settings.MICROSITE_TEST_HOSTNAME)
     def test_microsite_uses_old_login_page(self):
