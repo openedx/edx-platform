@@ -101,6 +101,9 @@ urlpatterns = (
     # URLs for managing dark launches of languages
     url(r'^update_lang/', include('openedx.core.djangoapps.dark_lang.urls', namespace='dark_lang')),
 
+    # For redirecting to help pages.
+    url(r'^help_token/', include('help_tokens.urls')),
+
     # URLs for API access management
     url(r'^api-admin/', include('openedx.core.djangoapps.api_admin.urls', namespace='api_admin')),
 )

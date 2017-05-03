@@ -13,6 +13,7 @@ from the same directory.
 import os
 from path import Path as path
 
+from openedx.core.release import RELEASE_LINE
 
 ########################## Prod-like settings ###################################
 # These should be as close as possible to the settings we use in production.
@@ -124,6 +125,12 @@ MOCK_SEARCH_BACKING_FILE = (
 SECRET_KEY = "very_secret_bok_choy_key"
 
 LMS_ROOT_URL = "http://localhost:8000"
+if RELEASE_LINE == "master":
+    # On master, acceptance tests use edX books, not the default Open edX books.
+    HELP_TOKENS_BOOKS = {
+        'learner': 'http://edx.readthedocs.io/projects/edx-guide-for-students',
+        'course_author': 'http://edx.readthedocs.io/projects/edx-partner-course-staff',
+    }
 
 #####################################################################
 # Lastly, see if the developer has any local overrides.
