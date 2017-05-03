@@ -89,7 +89,7 @@ class DiscussionCourseXBlock(XBlock):
         context = discussion_service.get_course_template_context()
         context['enable_new_post_btn'] = True
 
-        fragment.add_content(self.runtime.render_template('discussion/_discussion_course.html', context))
+        fragment.add_content(self.runtime.render_template('discussion/_course_discussion_section.html', context))
 
         fragment.initialize_js('DiscussionCourseBlock')
 
