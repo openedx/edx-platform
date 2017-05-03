@@ -281,7 +281,7 @@
           vertical-align: bottom;
         }
 
-        &.action-duplicate {
+        &.action-duplicate, &.action-move {
           display: none;
         }
       }
