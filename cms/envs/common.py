@@ -89,7 +89,8 @@ from lms.envs.common import (
     FILE_UPLOAD_STORAGE_BUCKET_NAME,
     FILE_UPLOAD_STORAGE_PREFIX,
 
-    COURSE_ENROLLMENT_MODES
+    COURSE_ENROLLMENT_MODES,
+    HELP_TOKENS_BOOKS,
 )
 from path import Path as path
 from warnings import simplefilter
@@ -300,7 +301,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',  # this is required for admin
                 'django.template.context_processors.csrf',
                 'dealer.contrib.django.staff.context_processor',  # access git revision
-                'contentstore.context_processors.doc_url',
+                'help_tokens.context_processor',
             ),
             # Change 'debug' in your environment settings files - not here.
             'debug': False
@@ -1248,7 +1249,7 @@ AFFILIATE_COOKIE_NAME = 'affiliate_id'
 
 ############## Settings for Studio Context Sensitive Help ##############
 
-DOC_LINK_BASE_URL = None
+HELP_TOKENS_INI_FILE = REPO_ROOT / "docs" / "cms_config.ini"
 
 # Theme directory locale paths
 COMPREHENSIVE_THEME_LOCALE_PATHS = []
