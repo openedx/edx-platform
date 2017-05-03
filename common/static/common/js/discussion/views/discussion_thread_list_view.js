@@ -166,6 +166,7 @@
                 active = $currentElement.has('.forum-nav-thread-link.is-active').length !== 0;
                 $currentElement.replaceWith($content);
                 this.showMetadataAccordingToSort();
+                this.$('span.timeago').timeago();
                 if (this.supportsActiveThread && active) {
                     this.setActiveThread(threadId);
                 }
@@ -225,6 +226,7 @@
                 if (this.hideRefineBar) {
                     this.$('.forum-nav-refine-bar').addClass('is-hidden');
                 }
+                this.$('span.timeago').timeago();
                 this.trigger('threads:rendered');
             };
 

@@ -42,6 +42,6 @@ if (typeof MathJax === 'undefined') {
             });
         };
     };
-    vendorScript.src = 'https://cdn.mathjax.org/mathjax/2.7-latest/MathJax.js?config=TeX-MML-AM_SVG';
+    vendorScript.src = '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured',  // eslint-disable-line max-len
     document.body.appendChild(vendorScript);
 }
