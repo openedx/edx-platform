@@ -67,6 +67,7 @@ SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
 TIERS_ORGANIZATION_MODEL = 'organizations.Organization'
 TIERS_EXPIRED_REDIRECT_URL = AMC_APP_URL + "/expired"
+TIERS_ORGANIZATION_TIER_GETTER_NAME = 'get_tier_for_org'
 
 TIERS_DATABASE_URL = AUTH_TOKENS.get('TIERS_DATABASE_URL')
 DATABASES['tiers'] = dj_database_url.parse(TIERS_DATABASE_URL)
@@ -75,6 +76,6 @@ DATABASE_ROUTERS += ['openedx.core.djangoapps.appsembler.sites.routers.TiersDbRo
 
 XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5
 
-CLONE_COURSE_FOR_NEW_SIGNUPS = False 
+CLONE_COURSE_FOR_NEW_SIGNUPS = False
 HIJACK_ALLOW_GET_REQUESTS = True
 HIJACK_LOGOUT_REDIRECT_URL = '/admin/auth/user'
