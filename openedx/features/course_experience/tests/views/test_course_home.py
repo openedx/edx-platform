@@ -65,7 +65,7 @@ class TestCourseHomePage(SharedModuleStoreTestCase):
         get_course_in_cache(self.course.id)
 
         # Fetch the view and verify the query counts
-        with self.assertNumQueries(36):
+        with self.assertNumQueries(35):
             with check_mongo_calls(3):
                 url = course_home_url(self.course)
                 self.client.get(url)

@@ -8,7 +8,7 @@ source =
     common/lib/capa
     common/lib/xmodule
     lms
-    openedx/core/djangoapps
+    openedx
     pavelib
 
 omit =
