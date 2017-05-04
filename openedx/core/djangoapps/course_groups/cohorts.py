@@ -344,7 +344,7 @@ def get_cohort_by_id(course_key, cohort_id):
         course_id=course_key,
         group_type=CourseUserGroup.COHORT,
         id=cohort_id
-    )
+    )\
 
 
 def add_cohort(course_key, name, assignment_type):
@@ -546,10 +546,13 @@ def set_course_cohort_settings(course_key, **kwargs):
                 divided_discussion_ids_to_delete = set(divided_discussion_ids) - set(kwargs[field])
                 DividedDiscussion.objects.filter(
                     discussion_id__in=divided_discussion_ids_to_delete).delete()
-            else:
+            elif field == 'is_cohorted':
                 setattr(course_cohort_settings, field, kwargs[field])
-    course_cohort_settings.save()
-    return course_cohort_settings
+                course_cohort_settings.save()
+            else:
+                setattr(course_discussion_settings, field, kwargs[field])
+    course_discussion_settings.save()
+    return course_cohort_settings, course_discussion_settings
 
 
 @request_cached
