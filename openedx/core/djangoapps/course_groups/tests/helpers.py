@@ -10,7 +10,9 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
 
-from ..cohorts import set_course_cohort_settings
+from ..cohorts import set_course_cohorted
+from django_comment_common.models import CourseDiscussionSettings
+from django_comment_common.utils import set_course_discussion_settings
 from ..models import CourseUserGroup, CourseCohort, CourseCohortsSettings, CohortMembership
 
 
@@ -140,8 +142,8 @@ def config_course_cohorts(
         auto_cohorts=[],
         manual_cohorts=[],
         discussion_topics=[],
-        cohorted_discussions=[],
-        always_cohort_inline_discussions=False
+        divided_discussions=[],
+        always_divide_inline_discussions=False
 ):
     """
     Set discussions and configure cohorts for a course.
@@ -153,10 +155,10 @@ def config_course_cohorts(
         manual_cohorts (list): Names of manual cohorts to create.
         discussion_topics (list): Discussion topic names. Picks ids and
             sort_keys automatically.
-        cohorted_discussions: Discussion topics to cohort. Converts the
+        divided_discussions: Discussion topics to divide. Converts the
             list to use the same ids as discussion topic names.
-        always_cohort_inline_discussions (bool): Whether inline discussions
-            should be cohorted by default.
+        always_divide_inline_discussions (bool): Whether inline discussions
+            should be divided by default.
 
     Returns:
         Nothing -- modifies course in place.
@@ -165,11 +167,12 @@ def config_course_cohorts(
         """Convert name to id."""
         return topic_name_to_id(course, name)
 
-    set_course_cohort_settings(
+    set_course_cohorted(course.id, is_cohorted)
+    set_course_discussion_settings(
         course.id,
-        is_cohorted=is_cohorted,
-        cohorted_discussions=[to_id(name) for name in cohorted_discussions],
-        always_cohort_inline_discussions=always_cohort_inline_discussions
+        divided_discussions=[to_id(name) for name in divided_discussions],
+        always_divide_inline_discussions=always_divide_inline_discussions,
+        division_scheme=CourseDiscussionSettings.COHORT,
     )
 
     for cohort_name in auto_cohorts:

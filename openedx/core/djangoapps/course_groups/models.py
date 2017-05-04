@@ -167,6 +167,7 @@ class CourseUserGroupPartitionGroup(models.Model):
 class CourseCohortsSettings(models.Model):
     """
     This model represents cohort settings for courses.
+    The only non-deprecated fields are `is_cohorted` and `course_id`.
     """
     is_cohorted = models.BooleanField(default=False)
 
@@ -183,16 +184,23 @@ class CourseCohortsSettings(models.Model):
     # in reality the default value at the time that cohorting is enabled for a course comes from
     # course_module.always_cohort_inline_discussions (via `migrate_cohort_settings`).
     # pylint: disable=invalid-name
+    # DEPRECATED-- DO NOT USE: Instead use `CourseDiscussionSettings.always_divide_inline_discussions`
+    # via `get_course_discussion_settings` or `set_course_discussion_settings`.
     always_cohort_inline_discussions = models.BooleanField(default=False)
 
     @property
     def cohorted_discussions(self):
-        """Jsonify the cohorted_discussions"""
+        """
+        DEPRECATED-- DO NOT USE. Instead use `CourseDiscussionSettings.divided_discussions`
+        via `get_course_discussion_settings`.
+        """
         return json.loads(self._cohorted_discussions)
 
     @cohorted_discussions.setter
     def cohorted_discussions(self, value):
-        """Un-Jsonify the cohorted_discussions"""
+        """
+        DEPRECATED-- DO NOT USE. Instead use `CourseDiscussionSettings` via `set_course_discussion_settings`.
+        """
         self._cohorted_discussions = json.dumps(value)
 
 
