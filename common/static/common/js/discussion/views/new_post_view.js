@@ -51,7 +51,7 @@
                     threadTypeTemplate;
                 context = _.clone(this.course_settings.attributes);
                 _.extend(context, {
-                    cohort_options: this.getCohortOptions(),
+                    group_options: this.getGroupOptions(),
                     is_commentable_divided: this.is_commentable_divided,
                     mode: this.mode,
                     startHeader: this.startHeader,
@@ -84,15 +84,15 @@
                 return this.mode === 'tab';
             };
 
-            NewPostView.prototype.getCohortOptions = function() {
+            NewPostView.prototype.getGroupOptions = function() {
                 var userGroupId;
-                if (this.course_settings.get('is_cohorted') && DiscussionUtil.isPrivilegedUser()) {
+                if (this.course_settings.get('is_discussion_division_enabled') && DiscussionUtil.isPrivilegedUser()) {
                     userGroupId = $('#discussion-container').data('user-group-id');
-                    return _.map(this.course_settings.get('cohorts'), function(cohort) {
+                    return _.map(this.course_settings.get('groups'), function(group) {
                         return {
-                            value: cohort.id,
-                            text: cohort.name,
-                            selected: cohort.id === userGroupId
+                            value: group.id,
+                            text: group.name,
+                            selected: group.id === userGroupId
                         };
                     });
                 } else {
@@ -112,7 +112,7 @@
             };
 
             NewPostView.prototype.toggleGroupDropdown = function($target) {
-                if ($target.data('cohorted')) {
+                if ($target.data('divided')) {
                     $('.js-group-select').prop('disabled', false);
                     return $('.group-selector-wrapper').removeClass('disabled');
                 } else {
