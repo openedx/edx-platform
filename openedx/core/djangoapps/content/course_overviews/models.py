@@ -226,16 +226,12 @@ class CourseOverview(TimeStampedModel):
                         ])
                         CourseOverviewImageSet.create_or_update(course_overview, course)
 
-                except IntegrityError:
-                    # There is a rare race condition that will occur if
-                    # CourseOverview.get_from_id is called while a
-                    # another identical overview is already in the process
-                    # of being created.
-                    # One of the overviews will be saved normally, while the
-                    # other one will cause an IntegrityError because it tries
-                    # to save a duplicate.
-                    # (see: https://openedx.atlassian.net/browse/TNL-2854).
-                    pass
+                except Exception:  # pylint: disable=broad-except
+                    log.exception(
+                        "CourseOverview for course %s failed!",
+                        course_id,
+                    )
+
                 return course_overview
             elif course is not None:
                 raise IOError(
