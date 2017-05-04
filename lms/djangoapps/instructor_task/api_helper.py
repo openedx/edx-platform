@@ -255,10 +255,14 @@ def check_arguments_for_rescoring(usage_key):
     in).  An ItemNotFoundException is raised if the corresponding module
     descriptor doesn't exist.  NotImplementedError is raised if the
     corresponding module doesn't support rescoring calls.
+
+    Note: the string returned here is surfaced as the error
+    message on the instructor dashboard when a rescore is
+    submitted for a non-rescorable block.
     """
     descriptor = modulestore().get_item(usage_key)
     if not _supports_rescore(descriptor):
-        msg = "Specified module does not support rescoring."
+        msg = _("This component cannot be rescored.")
         raise NotImplementedError(msg)
 
 
