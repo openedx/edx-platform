@@ -4,10 +4,12 @@ adding users, removing users, and listing members
 """
 
 from abc import ABCMeta, abstractmethod
+from collections import defaultdict
 
 from django.contrib.auth.models import User
 import logging
 
+from request_cache import get_cache
 from student.models import CourseAccessRole
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
@@ -34,14 +36,38 @@ def register_access_role(cls):
     return cls
 
 
+class BulkRoleCache(object):
+    CACHE_NAMESPACE = u"student.roles.BulkRoleCache"
+    CACHE_KEY = u'roles_by_user'
+
+    @classmethod
+    def prefetch(cls, users):
+        roles_by_user = defaultdict(set)
+        get_cache(cls.CACHE_NAMESPACE)[cls.CACHE_KEY] = roles_by_user
+
+        for role in CourseAccessRole.objects.filter(user__in=users).select_related('user__id'):
+            roles_by_user[role.user.id].add(role)
+
+        users_without_roles = filter(lambda u: u.id not in roles_by_user, users)
+        for user in users_without_roles:
+            roles_by_user[user.id] = set()
+
+    @classmethod
+    def get_user_roles(cls, user):
+        return get_cache(cls.CACHE_NAMESPACE)[cls.CACHE_KEY][user.id]
+
+
 class RoleCache(object):
     """
     A cache of the CourseAccessRoles held by a particular user
     """
     def __init__(self, user):
-        self._roles = set(
-            CourseAccessRole.objects.filter(user=user).all()
-        )
+        try:
+            self._roles = BulkRoleCache.get_user_roles(user)
+        except KeyError:
+            self._roles = set(
+                CourseAccessRole.objects.filter(user=user).all()
+            )
 
     def has_role(self, role, course_id, org):
         """

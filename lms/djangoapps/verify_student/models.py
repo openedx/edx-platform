@@ -210,12 +210,19 @@ class PhotoVerification(StatusModel):
 
         This will check for the user's *initial* verification.
         """
+        return cls.verified_query(earliest_allowed_date).filter(user=user).exists()
+
+    @classmethod
+    def verified_query(cls, earliest_allowed_date=None):
+        """
+        Return a query set for all records with 'approved' state
+        that are still valid according to the earliest_allowed_date
+        value or policy settings.
+        """
         return cls.objects.filter(
-            user=user,
             status="approved",
-            created_at__gte=(earliest_allowed_date
-                             or cls._earliest_allowed_date())
-        ).exists()
+            created_at__gte=(earliest_allowed_date or cls._earliest_allowed_date()),
+        )
 
     @classmethod
     def verification_valid_or_pending(cls, user, earliest_allowed_date=None, queryset=None):
@@ -951,14 +958,15 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         return response
 
     @classmethod
-    def verification_status_for_user(cls, user, course_id, user_enrollment_mode):
+    def verification_status_for_user(cls, user, course_id, user_enrollment_mode, user_is_verified=None):
         """
         Returns the verification status for use in grade report.
         """
         if user_enrollment_mode not in CourseMode.VERIFIED_MODES:
             return 'N/A'
 
-        user_is_verified = cls.user_is_verified(user)
+        if user_is_verified is None:
+            user_is_verified = cls.user_is_verified(user)
 
         if not user_is_verified:
             return 'Not ID Verified'

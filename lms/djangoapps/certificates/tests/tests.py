@@ -54,11 +54,11 @@ class CertificatesModelTest(ModuleStoreTestCase, MilestonesTestCaseMixin):
         Verify that certificate_info_for_user works.
         """
         student = UserFactory()
-        course = CourseFactory.create(org='edx', number='verified', display_name='Verified Course')
+        _ = CourseFactory.create(org='edx', number='verified', display_name='Verified Course')
         student.profile.allow_certificate = allow_certificate
         student.profile.save()
 
-        certificate_info = certificate_info_for_user(student, course.id, grade, whitelisted)
+        certificate_info = certificate_info_for_user(student, grade, whitelisted, user_certificate=None)
         self.assertEqual(certificate_info, output)
 
     @unpack
@@ -81,14 +81,13 @@ class CertificatesModelTest(ModuleStoreTestCase, MilestonesTestCaseMixin):
         student.profile.allow_certificate = allow_certificate
         student.profile.save()
 
-        GeneratedCertificateFactory.create(
+        certificate = GeneratedCertificateFactory.create(
             user=student,
             course_id=course.id,
             status=CertificateStatuses.downloadable,
             mode='honor'
         )
-
-        certificate_info = certificate_info_for_user(student, course.id, grade, whitelisted)
+        certificate_info = certificate_info_for_user(student, grade, whitelisted, certificate)
         self.assertEqual(certificate_info, output)
 
     def test_course_ids_with_certs_for_user(self):
