@@ -15,14 +15,18 @@ from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
 from common.test.acceptance.pages.lms.create_mode import ModeCreationPage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
-from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage, EntranceExamAdmin
+from common.test.acceptance.pages.lms.instructor_dashboard import (
+    InstructorDashboardPage,
+    EntranceExamAdmin,
+    StudentSpecificAdmin,
+)
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.lms.dashboard import DashboardPage
 from common.test.acceptance.pages.lms.problem import ProblemPage
 from common.test.acceptance.pages.lms.pay_and_verify import PaymentAndVerificationFlow
 from common.test.acceptance.pages.lms.login_and_register import CombinedLoginAndRegisterPage
 from common.test.acceptance.pages.common.utils import enroll_user_track
-from common.test.acceptance.tests.helpers import disable_animations
+from common.test.acceptance.tests.helpers import disable_animations, create_multiple_choice_problem
 from common.test.acceptance.fixtures.certificates import CertificateConfigFixture
 
 
@@ -1338,3 +1342,50 @@ class EcommerceTest(BaseInstructorDashboardTest):
 
         # Log in and visit E-commerce section under Instructor dashboard
         self.assertNotIn(u'Coupon Code List', self.visit_ecommerce_section().get_sections_header_values())
+
+
+class StudentAdminTest(BaseInstructorDashboardTest):
+    SECTION_NAME = 'Test Section 1'
+    SUBSECTION_NAME = 'Test Subsection 1'
+    UNIT_NAME = 'Test Unit 1'
+    PROBLEM_NAME = 'Test Problem 1'
+
+    def setUp(self):
+        super(StudentAdminTest, self).setUp()
+        self.course_fix = CourseFixture(
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run'],
+            self.course_info['display_name']
+        )
+
+        self.problem = create_multiple_choice_problem(self.PROBLEM_NAME)
+        self.vertical = XBlockFixtureDesc('vertical', "Lab Unit")
+        self.course_fix.add_children(
+            XBlockFixtureDesc('chapter', self.SECTION_NAME).add_children(
+                XBlockFixtureDesc('sequential', self.SUBSECTION_NAME).add_children(
+                    self.vertical.add_children(self.problem)
+                )
+            ),
+        ).install()
+
+        self.username, _ = self.log_in_as_instructor()
+        self.instructor_dashboard_page = self.visit_instructor_dashboard()
+
+    def test_rescore_nonrescorable(self):
+        student_admin_section = self.instructor_dashboard_page.select_student_admin(StudentSpecificAdmin)
+        student_admin_section.set_student_email_or_username(self.username)
+
+        # not a rescorable block
+        student_admin_section.set_problem_location(self.vertical.locator)
+        getattr(student_admin_section, 'rescore_button').click()
+        self.assertTrue(self.instructor_dashboard_page.is_rescore_unsupported_message_visible())
+
+    def test_rescore_rescorable(self):
+        student_admin_section = self.instructor_dashboard_page.select_student_admin(StudentSpecificAdmin)
+        student_admin_section.set_student_email_or_username(self.username)
+        student_admin_section.set_problem_location(self.problem.locator)
+        getattr(student_admin_section, 'rescore_button').click()
+        alert = get_modal_alert(student_admin_section.browser)
+        alert.dismiss()
+        self.assertFalse(self.instructor_dashboard_page.is_rescore_unsupported_message_visible())

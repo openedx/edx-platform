@@ -2118,18 +2118,24 @@ def rescore_problem(request, course_id):
 
     if student:
         response_payload['student'] = student_identifier
-        lms.djangoapps.instructor_task.api.submit_rescore_problem_for_student(
-            request,
-            module_state_key,
-            student,
-            only_if_higher,
-        )
+        try:
+            lms.djangoapps.instructor_task.api.submit_rescore_problem_for_student(
+                request,
+                module_state_key,
+                student,
+                only_if_higher,
+            )
+        except NotImplementedError as exc:
+            return HttpResponseBadRequest(exc.message)
     elif all_students:
-        lms.djangoapps.instructor_task.api.submit_rescore_problem_for_all_students(
-            request,
-            module_state_key,
-            only_if_higher,
-        )
+        try:
+            lms.djangoapps.instructor_task.api.submit_rescore_problem_for_all_students(
+                request,
+                module_state_key,
+                only_if_higher,
+            )
+        except NotImplementedError as exc:
+            return HttpResponseBadRequest(exc.message)
     else:
         return HttpResponseBadRequest()
 
