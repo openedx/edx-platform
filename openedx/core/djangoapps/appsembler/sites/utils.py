@@ -148,8 +148,7 @@ def get_initial_page_elements():
                     "element-type": "layout-single-col",
                     "element-path": "page-builder/layouts/_single-col.html",
                     "options": {
-                        "layout-bg-image": static(
-                            "{}/images/example-assets/default_hero_image.png".format(settings.DEFAULT_SITE_THEME)),
+                        "layout-bg-image": "/static/edx-theme-codebase/images/example-assets/default_hero_image.png".format(settings.DEFAULT_SITE_THEME),
                         "bg-color": "#fff",
                         "margin-right": "marg-r-0",
                         "margin-bottom": "marg-b-0",
@@ -304,9 +303,7 @@ def get_initial_page_elements():
                                     "margin-left": "marg-l-auto",
                                     "image-alt-text": "Click around!",
                                     "margin-bottom": "marg-b-0",
-                                    "image-file": static(
-                                        "{}/images/example-assets/laptop-mockup--01_6J4dpdp.png".format(
-                                            settings.DEFAULT_SITE_THEME)),
+                                    "image-file": "/static/edx-theme-codebase/images/example-assets/laptop-mockup--01_6J4dpdp.png".format(settings.DEFAULT_SITE_THEME),
                                     "margin-top": "marg-t-0",
                                     "margin-right": "marg-r-auto",
                                     "link-url": "",
@@ -401,9 +398,7 @@ def get_initial_page_elements():
                                                             "margin-left": "marg-l-auto",
                                                             "image-alt-text": "Corporate Learning",
                                                             "margin-bottom": "marg-b-20",
-                                                            "image-file": static(
-                                                                "{}/images/example-assets/icon__corporate-learning_bwTWIFu.svg".format(
-                                                                    settings.DEFAULT_SITE_THEME)),
+                                                            "image-file": "/static/edx-theme-codebase/images/example-assets/icon__corporate-learning_bwTWIFu.svg".format(settings.DEFAULT_SITE_THEME),
                                                             "margin-top": "marg-t-0",
                                                             "margin-right": "marg-r-auto",
                                                             "link-url": "",
@@ -434,9 +429,7 @@ def get_initial_page_elements():
                                                             "margin-left": "marg-l-auto",
                                                             "image-alt-text": "Higher Education",
                                                             "margin-bottom": "marg-b-20",
-                                                            "image-file": static(
-                                                                "{}/images/example-assets/icon__higher-education_DxImyGx.svg".format(
-                                                                    settings.DEFAULT_SITE_THEME)),
+                                                            "image-file": "/static/edx-theme-codebase/images/example-assets/icon__higher-education_DxImyGx.svg".format(settings.DEFAULT_SITE_THEME),
                                                             "margin-top": "marg-t-0",
                                                             "margin-right": "marg-r-auto",
                                                             "link-url": "",
@@ -491,9 +484,7 @@ def get_initial_page_elements():
                                                             "margin-left": "marg-l-auto",
                                                             "image-alt-text": "Continuing education",
                                                             "margin-bottom": "marg-b-20",
-                                                            "image-file": static(
-                                                                "{}/images/example-assets/icon__continuing-education_dFMr53s.svg".format(
-                                                                    settings.DEFAULT_SITE_THEME)),
+                                                            "image-file": "/static/edx-theme-codebase/images/example-assets/icon__continuing-education_dFMr53s.svg".format(settings.DEFAULT_SITE_THEME),
                                                             "margin-top": "marg-t-0",
                                                             "margin-right": "marg-r-auto",
                                                             "link-url": "",
@@ -524,9 +515,7 @@ def get_initial_page_elements():
                                                             "margin-left": "marg-l-auto",
                                                             "image-alt-text": "Professional development",
                                                             "margin-bottom": "marg-b-20",
-                                                            "image-file": static(
-                                                                "{}/images/example-assets/icon__professional-development_wRweLjm.svg".format(
-                                                                    settings.DEFAULT_SITE_THEME)),
+                                                            "image-file": "/static/edx-theme-codebase/images/example-assets/icon__professional-development_wRweLjm.svg".format(settings.DEFAULT_SITE_THEME),
                                                             "margin-top": "marg-t-0",
                                                             "margin-right": "marg-r-auto",
                                                             "link-url": "",
