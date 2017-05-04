@@ -18,7 +18,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from ..models import VerifiedTrackCohortedCourse, DEFAULT_VERIFIED_COHORT_NAME
 from ..tasks import sync_cohort_with_mode
 from openedx.core.djangoapps.course_groups.cohorts import (
-    set_course_cohort_settings, add_cohort, CourseCohort, DEFAULT_COHORT_NAME
+    set_course_cohorted, add_cohort, CourseCohort, DEFAULT_COHORT_NAME
 )
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 
@@ -88,7 +88,7 @@ class TestMoveToVerified(SharedModuleStoreTestCase):
 
     def _enable_cohorting(self):
         """ Turn on cohorting in the course. """
-        set_course_cohort_settings(self.course.id, is_cohorted=True)
+        set_course_cohorted(self.course.id, True)
 
     def _create_verified_cohort(self, name=DEFAULT_VERIFIED_COHORT_NAME):
         """ Create a verified cohort. """

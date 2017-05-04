@@ -32,8 +32,8 @@
                 this.retrieveFollowed = function() {
                     return DiscussionThreadListView.prototype.retrieveFollowed.apply(self, arguments);
                 };
-                this.chooseCohort = function() {
-                    return DiscussionThreadListView.prototype.chooseCohort.apply(self, arguments);
+                this.chooseGroup = function() {
+                    return DiscussionThreadListView.prototype.chooseGroup.apply(self, arguments);
                 };
                 this.chooseFilter = function() {
                     return DiscussionThreadListView.prototype.chooseFilter.apply(self, arguments);
@@ -85,7 +85,7 @@
                 'click .forum-nav-thread-link': 'threadSelected',
                 'click .forum-nav-load-more-link': 'loadMorePages',
                 'change .forum-nav-filter-main-control': 'chooseFilter',
-                'change .forum-nav-filter-cohort-control': 'chooseCohort'
+                'change .forum-nav-filter-cohort-control': 'chooseGroup'
             };
 
             DiscussionThreadListView.prototype.initialize = function(options) {
@@ -194,7 +194,7 @@
                 edx.HtmlUtils.append(
                     this.$el,
                     this.template({
-                        isCohorted: this.courseSettings.get('is_cohorted'),
+                        isDiscussionDivisionEnabled: this.courseSettings.get('is_discussion_division_enabled'),
                         isPrivilegedUser: DiscussionUtil.isPrivilegedUser()
                     })
                 );
@@ -404,7 +404,7 @@
                         return $(elem).data('discussion-id');
                     }).get();
                     this.retrieveDiscussions(discussionIds);
-                    return this.$('.forum-nav-filter-cohort').toggle($item.data('cohorted') === true);
+                    return this.$('.forum-nav-filter-cohort').toggle($item.data('divided') === true);
                 }
             };
 
@@ -413,7 +413,7 @@
                 return this.retrieveFirstPage();
             };
 
-            DiscussionThreadListView.prototype.chooseCohort = function() {
+            DiscussionThreadListView.prototype.chooseGroup = function() {
                 this.group_id = this.$('.forum-nav-filter-cohort-control :selected').val();
                 return this.retrieveFirstPage();
             };
