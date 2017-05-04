@@ -1,3 +1,4 @@
+import json
 import logging
 
 from django.conf import settings
@@ -164,3 +165,30 @@ class ForumsConfig(ConfigurationModel):
     def __unicode__(self):
         """Simple representation so the admin screen looks less ugly."""
         return u"ForumsConfig: timeout={}".format(self.connection_timeout)
+
+
+class CourseDiscussionSettings(models.Model):
+    course_id = CourseKeyField(
+        unique=True,
+        max_length=255,
+        db_index=True,
+        help_text="Which course are these settings associated with?",
+    )
+    always_divide_inline_discussions = models.BooleanField(default=False)
+    _divided_discussions = models.TextField(db_column='divided_discussions', null=True, blank=True)  # JSON list
+
+    COHORT = 'cohort'
+    ENROLLMENT_TRACK = 'enrollment_track'
+    NONE = 'none'
+    ASSIGNMENT_TYPE_CHOICES = ((NONE, 'None'), (COHORT, 'Cohort'), (ENROLLMENT_TRACK, 'Enrollment Track'))
+    division_scheme = models.CharField(max_length=20, choices=ASSIGNMENT_TYPE_CHOICES, default=NONE)
+
+    @property
+    def divided_discussions(self):
+        """Jsonify the divided_discussions"""
+        return json.loads(self._divided_discussions)
+
+    @divided_discussions.setter
+    def divided_discussions(self, value):
+        """Un-Jsonify the divided_discussions"""
+        self._divided_discussions = json.dumps(value)

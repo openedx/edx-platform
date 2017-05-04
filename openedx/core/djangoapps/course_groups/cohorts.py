@@ -119,7 +119,21 @@ def is_course_cohorted(course_key):
     Raises:
        Http404 if the course doesn't exist.
     """
-    return get_course_cohort_settings(course_key).is_cohorted
+    return _get_course_cohort_settings(course_key).is_cohorted
+
+
+def set_course_cohorted(course_key, cohorted):
+    """
+    Given a course course and a boolean, sets whether or not the course is cohorted.
+
+    Raises:
+        Value error if `cohorted` is not a boolean
+    """
+    if not isinstance(cohorted, bool):
+        raise ValueError("Cohorted must be a boolean")
+    course_cohort_settings = _get_course_cohort_settings(course_key)
+    course_cohort_settings.is_cohorted = cohorted
+    course_cohort_settings.save()
 
 
 def get_cohort_id(user, course_key, use_cached=False):
@@ -129,22 +143,6 @@ def get_cohort_id(user, course_key, use_cached=False):
     """
     cohort = get_cohort(user, course_key, use_cached=use_cached)
     return None if cohort is None else cohort.id
-
-
-def get_cohorted_commentables(course_key):
-    """
-    Given a course_key return a set of strings representing cohorted commentables.
-    """
-
-    course_cohort_settings = get_course_cohort_settings(course_key)
-
-    if not course_cohort_settings.is_cohorted:
-        # this is the easy case :)
-        ans = set()
-    else:
-        ans = set(course_cohort_settings.cohorted_discussions)
-
-    return ans
 
 
 COHORT_CACHE_NAMESPACE = u"cohorts.get_cohort"
@@ -214,8 +212,7 @@ def get_cohort(user, course_key, assign=True, use_cached=False):
 
     # First check whether the course is cohorted (users shouldn't be in a cohort
     # in non-cohorted courses, but settings can change after course starts)
-    course_cohort_settings = get_course_cohort_settings(course_key)
-    if not course_cohort_settings.is_cohorted:
+    if not is_course_cohorted(course_key):
         return cache.setdefault(cache_key, None)
 
     # If course is cohorted, check if the user already has a cohort.
@@ -278,11 +275,7 @@ def migrate_cohort_settings(course):
     """
     cohort_settings, created = CourseCohortsSettings.objects.get_or_create(
         course_id=course.id,
-        defaults={
-            'is_cohorted': course.is_cohorted,
-            'cohorted_discussions': list(course.cohorted_discussions),
-            'always_cohort_inline_discussions': course.always_cohort_inline_discussions
-        }
+        defaults=_get_cohort_settings_from_modulestore(course)
     )
 
     # Add the new and update the existing cohorts
@@ -508,43 +501,20 @@ def is_last_random_cohort(user_group):
     return len(random_cohorts) == 1 and random_cohorts[0].name == user_group.name
 
 
-def set_course_cohort_settings(course_key, **kwargs):
-    """
-    Set cohort settings for a course.
-
-    Arguments:
-        course_key: CourseKey
-        is_cohorted (bool): If the course should be cohorted.
-        always_cohort_inline_discussions (bool): If inline discussions should always be cohorted.
-        cohorted_discussions (list): List of discussion ids.
-
-    Returns:
-        A CourseCohortSettings object.
-
-    Raises:
-        Http404 if course_key is invalid.
-    """
-    fields = {'is_cohorted': bool, 'always_cohort_inline_discussions': bool, 'cohorted_discussions': list}
-    course_cohort_settings = get_course_cohort_settings(course_key)
-    for field, field_type in fields.items():
-        if field in kwargs:
-            if not isinstance(kwargs[field], field_type):
-                raise ValueError("Incorrect field type for `{}`. Type must be `{}`".format(field, field_type.__name__))
-            setattr(course_cohort_settings, field, kwargs[field])
-    course_cohort_settings.save()
-    return course_cohort_settings
-
-
 @request_cached
-def get_course_cohort_settings(course_key):
+def _get_course_cohort_settings(course_key):
     """
-    Return cohort settings for a course.
+    Return cohort settings for a course. NOTE that the only non-deprecated fields in
+    CourseCohortSettings are `course_id` and  `is_cohorted`. Other fields should only be used for
+    migration purposes.
 
     Arguments:
         course_key: CourseKey
 
     Returns:
-        A CourseCohortSettings object.
+        A CourseCohortSettings object. NOTE that the only non-deprecated field in
+        CourseCohortSettings are `course_id` and  `is_cohorted`. Other fields should only be used
+        for migration purposes.
 
     Raises:
         Http404 if course_key is invalid.
@@ -555,3 +525,25 @@ def get_course_cohort_settings(course_key):
         course = courses.get_course_by_id(course_key)
         course_cohort_settings = migrate_cohort_settings(course)
     return course_cohort_settings
+
+
+def get_legacy_discussion_settings(course_key):
+
+    try:
+        course_cohort_settings = CourseCohortsSettings.objects.get(course_id=course_key)
+        return {
+            'is_cohorted': course_cohort_settings.is_cohorted,
+            'cohorted_discussions': course_cohort_settings.cohorted_discussions,
+            'always_cohort_inline_discussions': course_cohort_settings.always_cohort_inline_discussions
+        }
+    except CourseCohortsSettings.DoesNotExist:
+        course = courses.get_course_by_id(course_key)
+        return _get_cohort_settings_from_modulestore(course)
+
+
+def _get_cohort_settings_from_modulestore(course):
+    return {
+        'is_cohorted': course.is_cohorted,
+        'cohorted_discussions': list(course.cohorted_discussions),
+        'always_cohort_inline_discussions': course.always_cohort_inline_discussions
+    }
