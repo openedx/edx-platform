@@ -47,4 +47,4 @@ ADD . /code/
 # We wait to install local requirments because they rely on the codebase
 RUN pip install -r requirements/edx/local.txt
 
-RUN paver update_assets --settings=$DJANGO_SETTINGS_MODULE
+RUN paver update_assets --settings devstack_docker
