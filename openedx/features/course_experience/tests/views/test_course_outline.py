@@ -4,6 +4,7 @@ Tests for the Course Outline view and supporting views.
 import datetime
 import ddt
 import json
+from markupsafe import escape
 
 from django.core.urlresolvers import reverse
 from pyquery import PyQuery as pq
@@ -243,4 +244,4 @@ class TestEmptyCourseOutlinePage(SharedModuleStoreTestCase):
         url = course_home_url(course)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, expected_text)
+        self.assertContains(response, escape(expected_text))
