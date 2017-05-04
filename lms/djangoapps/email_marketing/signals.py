@@ -64,10 +64,14 @@ def add_email_marketing_cookies(sender, response=None, user=None,
             post_parms.get('cookies', ''),
             user.email
         )
+        time_before_call = datetime.datetime.now()
+
         sailthru_response = \
             sailthru_client.api_post("user", post_parms)
+
     except SailthruClientError as exc:
         log.error("Exception attempting to obtain cookie from Sailthru: %s", unicode(exc))
+
         return response
 
     if sailthru_response.is_ok():
@@ -81,12 +85,14 @@ def add_email_marketing_cookies(sender, response=None, user=None,
                 domain=settings.SESSION_COOKIE_DOMAIN,
                 path='/',
             )
+            _log_sailthru_api_call_time(time_before_call)
         else:
             log.error("No cookie returned attempting to obtain cookie from Sailthru for %s", user.email)
     else:
         error = sailthru_response.get_error()
         # generally invalid email address
         log.info("Error attempting to obtain cookie from Sailthru: %s", error.get_message())
+
     return response
 
 
@@ -191,3 +197,17 @@ def _get_current_site():
         return
 
     return {'id': request.site.id, 'domain': request.site.domain, 'name': request.site.name}
+
+
+def _log_sailthru_api_call_time(time_before_call):
+    """
+    Logs Sailthru api synchronous call time
+    """
+
+    time_after_call = datetime.datetime.now()
+    delta_sailthru_api_call_time = time_after_call - time_before_call
+
+    log.info("Started at %s and ended at %s, time spent:%s milliseconds",
+             time_before_call.isoformat(' '),
+             time_after_call.isoformat(' '),
+             delta_sailthru_api_call_time.microseconds / 1000)
