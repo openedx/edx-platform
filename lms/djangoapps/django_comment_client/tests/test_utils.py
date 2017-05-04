@@ -17,13 +17,16 @@ from django_comment_client.tests.unicode import UnicodeTestMixin
 from django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
 import django_comment_client.utils as utils
 from lms.lib.comment_client.utils import perform_request, CommentClientMaintenanceError
-from django_comment_common.models import ForumsConfig
+from django_comment_common.models import ForumsConfig, CourseDiscussionSettings
+from django_comment_common.utils import get_course_discussion_settings, set_course_discussion_settings
 
+from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
 from courseware.tests.factories import InstructorFactory
 from courseware.tabs import get_course_tab_list
 from openedx.core.djangoapps.course_groups import cohorts
-from openedx.core.djangoapps.course_groups.cohorts import set_course_cohort_settings
-from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts, topic_name_to_id
+from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
+from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts, topic_name_to_id, CohortFactory
 from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentFactory
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
@@ -374,7 +377,6 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         )
         # Courses get a default discussion topic on creation, so remove it
         self.course.discussion_topics = {}
-        self.course.save()
         self.discussion_num = 0
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.maxDiff = None  # pylint: disable=invalid-name
@@ -426,34 +428,31 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
 
         check_cohorted_topics([])  # default (empty) cohort config
 
-        set_course_cohort_settings(course_key=self.course.id, is_cohorted=False, cohorted_discussions=[])
+        set_discussion_division_settings(self.course.id, enable_cohorts=False)
         check_cohorted_topics([])
 
-        set_course_cohort_settings(course_key=self.course.id, is_cohorted=True, cohorted_discussions=[])
+        set_discussion_division_settings(self.course.id, enable_cohorts=True)
         check_cohorted_topics([])
 
-        set_course_cohort_settings(
-            course_key=self.course.id,
-            is_cohorted=True,
-            cohorted_discussions=["Topic_B", "Topic_C"],
-            always_cohort_inline_discussions=False,
+        set_discussion_division_settings(
+            self.course.id,
+            enable_cohorts=True,
+            divided_discussions=["Topic_B", "Topic_C"]
         )
         check_cohorted_topics(["Topic_B", "Topic_C"])
 
-        set_course_cohort_settings(
-            course_key=self.course.id,
-            is_cohorted=True,
-            cohorted_discussions=["Topic_A", "Some_Other_Topic"],
-            always_cohort_inline_discussions=False,
+        set_discussion_division_settings(
+            self.course.id,
+            enable_cohorts=True,
+            divided_discussions=["Topic_A", "Some_Other_Topic"]
         )
         check_cohorted_topics(["Topic_A"])
 
         # unlikely case, but make sure it works.
-        set_course_cohort_settings(
-            course_key=self.course.id,
-            is_cohorted=False,
-            cohorted_discussions=["Topic_A"],
-            always_cohort_inline_discussions=False,
+        set_discussion_division_settings(
+            self.course.id,
+            enable_cohorts=False,
+            divided_discussions=["Topic_A"]
         )
         check_cohorted_topics([])
 
@@ -481,7 +480,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
 
     def test_inline_with_always_cohort_inline_discussion_flag(self):
         self.create_discussion("Chapter", "Discussion")
-        set_course_cohort_settings(course_key=self.course.id, is_cohorted=True, always_cohort_inline_discussions=True)
+        set_discussion_division_settings(self.course.id, enable_cohorts=True, always_divide_inline_discussions=True)
 
         self.assert_category_map_equals(
             {
@@ -505,7 +504,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
 
     def test_inline_without_always_cohort_inline_discussion_flag(self):
         self.create_discussion("Chapter", "Discussion")
-        set_course_cohort_settings(course_key=self.course.id, is_cohorted=True)
+        set_discussion_division_settings(self.course.id, enable_cohorts=True)
 
         self.assert_category_map_equals(
             {
@@ -566,7 +565,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         self.create_discussion("Chapter 2 / Section 1 / Subsection 2", "Discussion")
         self.create_discussion("Chapter 3 / Section 1", "Discussion")
 
-        def check_cohorted(is_divided):
+        def check_divided(is_divided):
 
             self.assert_category_map_equals(
                 {
@@ -652,15 +651,15 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
             )
 
         # empty / default config
-        check_cohorted(False)
+        check_divided(False)
 
         # explicitly disabled cohorting
-        set_course_cohort_settings(course_key=self.course.id, is_cohorted=False)
-        check_cohorted(False)
+        set_discussion_division_settings(self.course.id, enable_cohorts=False)
+        check_divided(False)
 
-        # explicitly enabled cohorting with inline discusssions also cohorted.
-        set_course_cohort_settings(course_key=self.course.id, is_cohorted=True, always_cohort_inline_discussions=True)
-        check_cohorted(True)
+        # explicitly enable courses divided by Cohort with inline discusssions also divided.
+        set_discussion_division_settings(self.course.id, enable_cohorts=True, always_divide_inline_discussions=True)
+        check_divided(True)
 
     def test_tree_with_duplicate_targets(self):
         self.create_discussion("Chapter 1", "Discussion A")
@@ -730,7 +729,6 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
 
     def test_self_paced_start_date_filter(self):
         self.course.self_paced = True
-        self.course.save()
 
         now = datetime.datetime.now()
         later = datetime.datetime.max
@@ -898,7 +896,6 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
 
     def test_sort_alpha(self):
         self.course.discussion_sort_alpha = True
-        self.course.save()
         self.create_discussion("Chapter", "Discussion D")
         self.create_discussion("Chapter", "Discussion A")
         self.create_discussion("Chapter", "Discussion E")
@@ -1325,7 +1322,7 @@ class IsCommentableDividedTestCase(ModuleStoreTestCase):
             course,
             is_cohorted=True,
             discussion_topics=["General", "Feedback"],
-            cohorted_discussions=["Feedback"]
+            divided_discussions=["Feedback"]
         )
 
         self.assertTrue(cohorts.is_course_cohorted(course.id))
@@ -1349,7 +1346,7 @@ class IsCommentableDividedTestCase(ModuleStoreTestCase):
             course,
             is_cohorted=True,
             discussion_topics=["General", "Feedback"],
-            cohorted_discussions=["Feedback", "random_inline"]
+            divided_discussions=["Feedback", "random_inline"]
         )
         self.assertFalse(
             utils.is_commentable_divided(course.id, to_id("random")),
@@ -1362,8 +1359,8 @@ class IsCommentableDividedTestCase(ModuleStoreTestCase):
             course,
             is_cohorted=True,
             discussion_topics=["General", "Feedback"],
-            cohorted_discussions=["Feedback", "random_inline"],
-            always_cohort_inline_discussions=False
+            divided_discussions=["Feedback", "random_inline"],
+            always_divide_inline_discussions=False
         )
         self.assertFalse(
             utils.is_commentable_divided(course.id, to_id("random")),
@@ -1383,13 +1380,212 @@ class IsCommentableDividedTestCase(ModuleStoreTestCase):
         course = modulestore().get_course(self.toy_course_key)
         self.assertFalse(cohorts.is_course_cohorted(course.id))
 
-        config_course_cohorts(course, is_cohorted=True, always_cohort_inline_discussions=True)
+        config_course_cohorts(course, is_cohorted=True, always_divide_inline_discussions=True)
         team = CourseTeamFactory(course_id=course.id)
 
         # Verify that team discussions are not cohorted, but other discussions are
         # if "always cohort inline discussions" is set to true.
         self.assertFalse(utils.is_commentable_divided(course.id, team.discussion_topic_id))
         self.assertTrue(utils.is_commentable_divided(course.id, "random"))
+
+    def test_is_commentable_divided_cohorts(self):
+        course = modulestore().get_course(self.toy_course_key)
+        set_discussion_division_settings(
+            course.id,
+            enable_cohorts=True,
+            divided_discussions=[],
+            always_divide_inline_discussions=True,
+            division_scheme=CourseDiscussionSettings.NONE,
+        )
+
+        # Although Cohorts are enabled, discussion division is explicitly disabled.
+        self.assertFalse(utils.is_commentable_divided(course.id, "random"))
+
+        # Now set the discussion division scheme.
+        set_discussion_division_settings(
+            course.id,
+            enable_cohorts=True,
+            divided_discussions=[],
+            always_divide_inline_discussions=True,
+            division_scheme=CourseDiscussionSettings.COHORT,
+        )
+        self.assertTrue(utils.is_commentable_divided(course.id, "random"))
+
+    def test_is_commentable_divided_enrollment_track(self):
+        course = modulestore().get_course(self.toy_course_key)
+        set_discussion_division_settings(
+            course.id,
+            divided_discussions=[],
+            always_divide_inline_discussions=True,
+            division_scheme=CourseDiscussionSettings.ENROLLMENT_TRACK,
+        )
+
+        # Although division scheme is set to ENROLLMENT_TRACK, divided returns
+        # False because there is only a single enrollment mode.
+        self.assertFalse(utils.is_commentable_divided(course.id, "random"))
+
+        # Now create 2 explicit course modes.
+        CourseModeFactory.create(course_id=course.id, mode_slug=CourseMode.AUDIT)
+        CourseModeFactory.create(course_id=course.id, mode_slug=CourseMode.VERIFIED)
+        self.assertTrue(utils.is_commentable_divided(course.id, "random"))
+
+
+@attr(shard=1)
+class GroupIdForUserTestCase(ModuleStoreTestCase):
+    """ Test the get_group_id_for_user method. """
+
+    def setUp(self):
+        super(GroupIdForUserTestCase, self).setUp()
+        self.course = CourseFactory.create()
+        CourseModeFactory.create(course_id=self.course.id, mode_slug=CourseMode.AUDIT)
+        CourseModeFactory.create(course_id=self.course.id, mode_slug=CourseMode.VERIFIED)
+        self.test_user = UserFactory.create()
+        CourseEnrollmentFactory.create(
+            mode=CourseMode.VERIFIED, user=self.test_user, course_id=self.course.id
+        )
+        self.test_cohort = CohortFactory(
+            course_id=self.course.id,
+            name='Test Cohort',
+            users=[self.test_user]
+        )
+
+    def test_discussion_division_disabled(self):
+        course_discussion_settings = get_course_discussion_settings(self.course.id)
+        self.assertEqual(CourseDiscussionSettings.NONE, course_discussion_settings.division_scheme)
+        self.assertIsNone(utils.get_group_id_for_user(self.test_user, course_discussion_settings))
+
+    def test_discussion_division_by_cohort(self):
+        set_discussion_division_settings(
+            self.course.id, enable_cohorts=True, division_scheme=CourseDiscussionSettings.COHORT
+        )
+        course_discussion_settings = get_course_discussion_settings(self.course.id)
+        self.assertEqual(CourseDiscussionSettings.COHORT, course_discussion_settings.division_scheme)
+        self.assertEqual(
+            self.test_cohort.id,
+            utils.get_group_id_for_user(self.test_user, course_discussion_settings)
+        )
+
+    def test_discussion_division_by_enrollment_track(self):
+        set_discussion_division_settings(
+            self.course.id, division_scheme=CourseDiscussionSettings.ENROLLMENT_TRACK
+        )
+        course_discussion_settings = get_course_discussion_settings(self.course.id)
+        self.assertEqual(CourseDiscussionSettings.ENROLLMENT_TRACK, course_discussion_settings.division_scheme)
+        self.assertEqual(
+            -2,  # Verified has group ID 2, and we negate that value to ensure unique IDs
+            utils.get_group_id_for_user(self.test_user, course_discussion_settings)
+        )
+
+
+@attr(shard=1)
+class CourseDiscussionDivisionEnabledTestCase(ModuleStoreTestCase):
+    """ Test the course_discussion_division_enabled method. """
+
+    def setUp(self):
+        super(CourseDiscussionDivisionEnabledTestCase, self).setUp()
+        self.course = CourseFactory.create()
+        CourseModeFactory.create(course_id=self.course.id, mode_slug=CourseMode.AUDIT)
+        self.test_cohort = CohortFactory(
+            course_id=self.course.id,
+            name='Test Cohort',
+            users=[]
+        )
+
+    def test_discussion_division_disabled(self):
+        course_discussion_settings = get_course_discussion_settings(self.course.id)
+        self.assertFalse(utils.course_discussion_division_enabled(course_discussion_settings))
+
+    def test_discussion_division_by_cohort(self):
+        set_discussion_division_settings(
+            self.course.id, enable_cohorts=False, division_scheme=CourseDiscussionSettings.COHORT
+        )
+        # Because cohorts are disabled, discussion division is not enabled.
+        self.assertFalse(utils.course_discussion_division_enabled(get_course_discussion_settings(self.course.id)))
+        # Now enable cohorts, which will cause discussions to be divided.
+        set_discussion_division_settings(
+            self.course.id, enable_cohorts=True, division_scheme=CourseDiscussionSettings.COHORT
+        )
+        self.assertTrue(utils.course_discussion_division_enabled(get_course_discussion_settings(self.course.id)))
+
+    def test_discussion_division_by_enrollment_track(self):
+        set_discussion_division_settings(
+            self.course.id, division_scheme=CourseDiscussionSettings.ENROLLMENT_TRACK
+        )
+        # Only a single enrollment track exists, so discussion division is not enabled.
+        self.assertFalse(utils.course_discussion_division_enabled(get_course_discussion_settings(self.course.id)))
+
+        # Now create a second CourseMode, which will cause discussions to be divided.
+        CourseModeFactory.create(course_id=self.course.id, mode_slug=CourseMode.VERIFIED)
+        self.assertTrue(utils.course_discussion_division_enabled(get_course_discussion_settings(self.course.id)))
+
+
+@attr(shard=1)
+class GroupNameTestCase(ModuleStoreTestCase):
+    """ Test the get_group_name and get_group_names_by_id methods. """
+
+    def setUp(self):
+        super(GroupNameTestCase, self).setUp()
+        self.course = CourseFactory.create()
+        CourseModeFactory.create(course_id=self.course.id, mode_slug=CourseMode.AUDIT)
+        CourseModeFactory.create(course_id=self.course.id, mode_slug=CourseMode.VERIFIED)
+        self.test_cohort_1 = CohortFactory(
+            course_id=self.course.id,
+            name='Cohort 1',
+            users=[]
+        )
+        self.test_cohort_2 = CohortFactory(
+            course_id=self.course.id,
+            name='Cohort 2',
+            users=[]
+        )
+
+    def test_discussion_division_disabled(self):
+        course_discussion_settings = get_course_discussion_settings(self.course.id)
+        self.assertEqual({}, utils.get_group_names_by_id(course_discussion_settings))
+        self.assertIsNone(utils.get_group_name(-1000, course_discussion_settings))
+
+    def test_discussion_division_by_cohort(self):
+        set_discussion_division_settings(
+            self.course.id, enable_cohorts=True, division_scheme=CourseDiscussionSettings.COHORT
+        )
+        course_discussion_settings = get_course_discussion_settings(self.course.id)
+        self.assertEqual(
+            {
+                self.test_cohort_1.id: self.test_cohort_1.name,
+                self.test_cohort_2.id: self.test_cohort_2.name
+            },
+            utils.get_group_names_by_id(course_discussion_settings)
+        )
+        self.assertEqual(
+            self.test_cohort_2.name,
+            utils.get_group_name(self.test_cohort_2.id, course_discussion_settings)
+        )
+        # Test also with a group_id that doesn't exist.
+        self.assertIsNone(
+            utils.get_group_name(-1000, course_discussion_settings)
+        )
+
+    def test_discussion_division_by_enrollment_track(self):
+        set_discussion_division_settings(
+            self.course.id, division_scheme=CourseDiscussionSettings.ENROLLMENT_TRACK
+        )
+        course_discussion_settings = get_course_discussion_settings(self.course.id)
+        self.assertEqual(
+            {
+                -1: "audit course",
+                -2: "verified course"
+            },
+            utils.get_group_names_by_id(course_discussion_settings)
+        )
+
+        self.assertEqual(
+            "verified course",
+            utils.get_group_name(-2, course_discussion_settings)
+        )
+        # Test also with a group_id that doesn't exist.
+        self.assertIsNone(
+            utils.get_group_name(-1000, course_discussion_settings)
+        )
 
 
 class PermissionsTestCase(ModuleStoreTestCase):
@@ -1497,3 +1693,21 @@ class ClientConfigurationTestCase(TestCase):
 
         result = perform_request('GET', 'http://www.google.com')
         self.assertEqual(result, {})
+
+
+def set_discussion_division_settings(
+        course_key, enable_cohorts=False, always_divide_inline_discussions=False,
+        divided_discussions=[], division_scheme=CourseDiscussionSettings.COHORT
+):
+    """
+    Convenience method for setting cohort enablement and discussion settings.
+    COHORT is the default division_scheme, as no other schemes were supported at
+    the time that the unit tests were originally written.
+    """
+    set_course_discussion_settings(
+        course_key=course_key,
+        divided_discussions=divided_discussions,
+        division_scheme=division_scheme,
+        always_divide_inline_discussions=always_divide_inline_discussions,
+    )
+    set_course_cohorted(course_key, enable_cohorts)

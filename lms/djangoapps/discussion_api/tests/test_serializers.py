@@ -28,6 +28,8 @@ from lms.lib.comment_client.comment import Comment
 from lms.lib.comment_client.thread import Thread
 from student.tests.factories import UserFactory
 from util.testing import UrlResetMixin
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
@@ -209,6 +211,8 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTe
         self.assertEqual(serialized["pinned"], False)
 
     def test_group(self):
+        self.course.cohort_config = {"cohorted": True}
+        modulestore().update_item(self.course, ModuleStoreEnum.UserID.test)
         cohort = CohortFactory.create(course_id=self.course.id)
         serialized = self.serialize(self.make_cs_content({"group_id": cohort.id}))
         self.assertEqual(serialized["group_id"], cohort.id)

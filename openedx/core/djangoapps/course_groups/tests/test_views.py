@@ -125,7 +125,7 @@ class CohortViewsTestCase(ModuleStoreTestCase):
             self.course,
             is_cohorted=True,
             discussion_topics=discussion_topics,
-            cohorted_discussions=cohorted_discussions
+            divided_discussions=cohorted_discussions
         )
         return cohorted_inline_discussions, cohorted_course_wide_discussions
 
@@ -317,12 +317,23 @@ class CourseCohortSettingsHandlerTestCase(CohortViewsTestCase):
 
         response = self.patch_handler(
             self.course,
+            data={'always_cohort_inline_discussions': ''},
+            expected_response_code=400,
+            handler=course_cohort_settings_handler
+        )
+        self.assertEqual(
+            "Incorrect field type for `{}`. Type must be `{}`".format('always_divide_inline_discussions', bool.__name__),
+            response.get("error")
+        )
+
+        response = self.patch_handler(
+            self.course,
             data={'is_cohorted': ''},
             expected_response_code=400,
             handler=course_cohort_settings_handler
         )
         self.assertEqual(
-            "Incorrect field type for `{}`. Type must be `{}`".format('is_cohorted', bool.__name__),
+            "Cohorted must be a boolean",
             response.get("error")
         )
 

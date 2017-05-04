@@ -125,6 +125,7 @@ def make_mock_thread_data(
         group_id=None,
         group_name=None,
         commentable_id=None,
+        is_commentable_divided=None,
 ):
     data_commentable_id = (
         commentable_id or course.discussion_topics.get('General', {}).get('id') or "dummy_commentable_id"
@@ -145,6 +146,8 @@ def make_mock_thread_data(
     }
     if group_id is not None:
         thread_data['group_name'] = group_name
+    if is_commentable_divided is not None:
+        thread_data['is_commentable_divided'] = is_commentable_divided
     if num_children is not None:
         thread_data["children"] = [{
             "id": "dummy_comment_id_{}".format(i),
@@ -429,7 +432,10 @@ class SingleCohortedThreadTestCase(CohortedTestCase):
         self.mock_text = "dummy content"
         self.mock_thread_id = "test_thread_id"
         mock_request.side_effect = make_mock_request_impl(
-            course=self.course, text=self.mock_text, thread_id=self.mock_thread_id, group_id=self.student_cohort.id
+            course=self.course, text=self.mock_text,
+            thread_id=self.mock_thread_id,
+            group_id=self.student_cohort.id,
+            commentable_id="cohorted_topic",
         )
 
     def test_ajax(self, mock_request):
@@ -453,11 +459,13 @@ class SingleCohortedThreadTestCase(CohortedTestCase):
             response_data["content"],
             make_mock_thread_data(
                 course=self.course,
+                commentable_id="cohorted_topic",
                 text=self.mock_text,
                 thread_id=self.mock_thread_id,
                 num_children=1,
                 group_id=self.student_cohort.id,
-                group_name=self.student_cohort.name
+                group_name=self.student_cohort.name,
+                is_commentable_divided=True,
             )
         )
 

@@ -21,14 +21,14 @@
                     %endif
                 </select>
             ## safe-lint: disable=python-parse-error,python-wrap-html
-            </label>${"<% if (isCohorted && isPrivilegedUser) { %>" | n, decode.utf8}<label class="forum-nav-filter-cohort">
-                ## Translators: This labels a cohort menu in forum navigation
-                <span class="sr">${_("Cohort:")}</span>
+            </label>${"<% if (isDiscussionDivisionEnabled && isPrivilegedUser) { %>" | n, decode.utf8}<label class="forum-nav-filter-cohort">
+                ## Translators: This labels a group menu in forum navigation
+                <span class="sr">${_("Group:")}</span>
                 <select class="forum-nav-filter-cohort-control">
-                    <option value="">${_("in all cohorts")}</option>
-                        ## cohorts is not iterable sometimes because inline discussions xmodule doesn't pass it
-                        %for c in (cohorts or []):
-                            <option value="${c['id']}">${c['name']}</option>
+                    <option value="">${_("in all groups")}</option>
+                        ## groups is not iterable sometimes because inline discussions xmodule doesn't pass it
+                        %for group in (groups or []):
+                            <option value="${group['id']}">${group['name']}</option>
                         %endfor
                 </select>
             ## safe-lint: disable=python-parse-error,python-wrap-html

@@ -30,17 +30,14 @@ from web_fragments.fragment import Fragment
 
 from courseware.courses import get_course_with_access
 from courseware.views.views import CourseTabView
-from openedx.core.djangoapps.course_groups.cohorts import (
-    is_course_cohorted,
-    get_course_cohorts,
-)
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 
 from courseware.access import has_access
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
 
-from django_comment_common.utils import ThreadContext
+from django_comment_common.utils import ThreadContext, get_course_discussion_settings
+
 from django_comment_client.permissions import has_permission, get_team
 from django_comment_client.utils import (
     merge_dict,
@@ -48,6 +45,8 @@ from django_comment_client.utils import (
     strip_none,
     add_courseware_context,
     get_group_id_for_comments_service,
+    course_discussion_division_enabled,
+    get_group_names_by_id,
     is_commentable_divided,
     get_group_id_for_user,
 )
@@ -83,11 +82,15 @@ def make_course_settings(course, user):
     Generate a JSON-serializable model for course settings, which will be used to initialize a
     DiscussionCourseSettings object on the client.
     """
+    course_discussion_settings = get_course_discussion_settings(course.id)
+    group_names_by_id = get_group_names_by_id(course_discussion_settings)
     return {
-        'is_cohorted': is_course_cohorted(course.id),
+        'is_discussion_division_enabled': course_discussion_division_enabled(course_discussion_settings),
         'allow_anonymous': course.allow_anonymous,
         'allow_anonymous_to_peers': course.allow_anonymous_to_peers,
-        'cohorts': [{"id": str(g.id), "name": g.name} for g in get_course_cohorts(course)],
+        'groups': [
+            {"id": str(group_id), "name": group_name} for group_id, group_name in group_names_by_id.iteritems()
+        ],
         'category_map': utils.get_discussion_category_map(course, user)
     }
 
@@ -346,10 +349,11 @@ def _find_thread(request, course, discussion_id, thread_id):
     if thread_context == "course" and not utils.discussion_category_id_access(course, request.user, discussion_id):
         return None
 
-    # verify that the thread belongs to the requesting student's cohort
+    # verify that the thread belongs to the requesting student's group
     is_moderator = has_permission(request.user, "see_all_cohorts", course.id)
-    if is_commentable_divided(course.id, discussion_id) and not is_moderator:
-        user_group_id = get_group_id_for_user(request.user, course.id)
+    course_discussion_settings = get_course_discussion_settings(course.id)
+    if is_commentable_divided(course.id, discussion_id, course_discussion_settings) and not is_moderator:
+        user_group_id = get_group_id_for_user(request.user, course_discussion_settings)
         if getattr(thread, "group_id", None) is not None and user_group_id != thread.group_id:
             return None
 
@@ -424,7 +428,8 @@ def _create_discussion_board_context(request, course_key, discussion_id=None, th
         add_courseware_context(threads, course, user)
 
     with newrelic_function_trace("get_cohort_info"):
-        user_group_id = get_group_id_for_user(user, course_key)
+        course_discussion_settings = get_course_discussion_settings(course_key)
+        user_group_id = get_group_id_for_user(user, course_discussion_settings)
 
     context.update({
         'root_url': root_url,
@@ -434,12 +439,12 @@ def _create_discussion_board_context(request, course_key, discussion_id=None, th
         'thread_pages': thread_pages,
         'annotated_content_info': annotated_content_info,
         'is_moderator': has_permission(user, "see_all_cohorts", course_key),
-        'cohorts': course_settings["cohorts"],  # still needed to render _thread_list_template
+        'groups': course_settings["groups"],  # still needed to render _thread_list_template
         'user_group_id': user_group_id,  # read from container in NewPostView
         'sort_preference': cc_user.default_sort_key,
         'category_map': course_settings["category_map"],
         'course_settings': course_settings,
-        'is_commentable_divided': is_commentable_divided(course_key, discussion_id)
+        'is_commentable_divided': is_commentable_divided(course_key, discussion_id, course_discussion_settings)
     })
     return context
 
@@ -501,7 +506,8 @@ def user_profile(request, course_key, user_id):
             ).order_by("name").values_list("name", flat=True).distinct()
 
             with newrelic_function_trace("get_cohort_info"):
-                user_group_id = get_group_id_for_user(request.user, course_key)
+                course_discussion_settings = get_course_discussion_settings(course_key)
+                user_group_id = get_group_id_for_user(request.user, course_discussion_settings)
 
             context = _create_base_discussion_view_context(request, course_key)
             context.update({
