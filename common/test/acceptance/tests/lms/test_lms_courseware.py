@@ -238,6 +238,7 @@ class ProctoredExamTest(UniqueCourseTest):
         self.studio_course_outline.open_subsection_settings_dialog()
         self.assertTrue(self.studio_course_outline.proctoring_items_are_displayed())
 
+    @flaky  # TODO fix this, see TNL-6906
     def test_proctored_exam_flow(self):
         """
         Given that I am a staff member on the exam settings section
