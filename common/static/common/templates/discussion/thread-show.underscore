@@ -52,6 +52,7 @@
 
     <div class="post-body"><%- body %></div>
     <div class="post-context">
+        <div class="related-to-label">
         <% if (mode === "tab" && obj.courseware_url) { %>
             <%
             var courseware_title_linked = interpolate(
@@ -68,6 +69,7 @@
             )
             %>
         <% } %>
+        </div>
         <div class="group-visibility-label">
             <% if (obj.group_name) { %>
                 <%-
