@@ -1,4 +1,5 @@
 *
+!.docker/config
 !.docker/node_modules
 !.docker/wheelhouse
 !.tx

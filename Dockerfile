@@ -5,6 +5,9 @@ ENV NO_PYTHON_UNINSTALL 1
 ENV PIP_USE_WHEEL 1
 ENV PIP_FIND_LINKS /wheelhouse
 
+# Inform edxapp where to read configuration
+ENV CONFIG_ROOT /config
+
 WORKDIR /code
 
 # Install OS libs
@@ -47,4 +50,9 @@ ADD . /code/
 # We wait to install local requirments because they rely on the codebase
 RUN pip install -r requirements/edx/local.txt
 
-RUN paver update_assets --settings devstack_docker
+# We delay adding the configuration for as long as possible so changes here won't bust
+# the Docker cache. This configuration is only needed for Django management commands, which
+# we run to update assets.
+COPY .docker/config /config/
+
+RUN NO_PREREQ_INSTALL=1 paver update_assets --settings devstack_docker
