@@ -104,7 +104,8 @@ class TestUserPreferenceMiddleware(TestCase):
         (logged_in, ) + test_def
         for logged_in in (True, False)
         for test_def in [
-            # (LANGUAGE_COOKIE, LANGUAGE_SESSION_KEY, Accept-Language In, Accept-Language Out)
+            # (LANGUAGE_COOKIE, LANGUAGE_SESSION_KEY, Accept-Language In,
+            #  Accept-Language Out, Session Lang Out)
             (None, None, None, None, None),
             (None, 'eo', None, None, 'eo'),
             (None, 'en', None, None, 'en'),
