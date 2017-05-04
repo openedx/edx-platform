@@ -103,8 +103,9 @@ def json_to_sass(json_input):
     return dict_to_sass(sass_dict)
 
 
-def bootstrap_site(site, organization_slug=None, user_email=None):
+def bootstrap_site(site, org_data=None, user_email=None):
     from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
+    organization_slug = org_data.get('name')
     # don't use create because we need to call save() to set some values automatically
     site_config = SiteConfiguration(site=site, enabled=True)
     site_config.save()
@@ -113,7 +114,8 @@ def bootstrap_site(site, organization_slug=None, user_email=None):
     if organization_slug:
         organization_data = add_organization({
             'name': organization_slug,
-            'short_name': organization_slug
+            'short_name': organization_slug,
+            'edx_uuid': org_data.get('edx_uuid')
         })
         organization = Organization.objects.get(id=organization_data.get('id'))
         organization.sites.add(site)
