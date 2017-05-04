@@ -1,5 +1,9 @@
+# docker build . -t edxops/edxapp:devstack
 FROM clintonb/edx-base:python-2.7-slim
 ENV DJANGO_SETTINGS_MODULE devstack_docker
+ENV NO_PYTHON_UNINSTALL 1
+ENV PIP_USE_WHEEL 1
+ENV PIP_FIND_LINKS /wheelhouse
 
 WORKDIR /code
 
@@ -7,28 +11,40 @@ WORKDIR /code
 RUN apt-get update && \
     apt-get install -y \
         apparmor-utils \
+        gfortran \
+        graphviz \
+        graphviz-dev \
         # Iceweasel is the Debian name for Firefox
         iceweasel \
         ipython \
         libfreetype6-dev \
+        libgeos-dev \
+        liblapack-dev \
+        libpng12-dev \
+        libxml2-dev \
+        libxmlsec1-dev \
+        libxslt1-dev \
         pkg-config \
         ntp \
         s3cmd \
+        swig \
         xvfb
 
-
-COPY Makefile /code/
-COPY requirements.txt /code/
 COPY package.json /code/
-COPY pavelib/ /code/pavelib/
 COPY requirements/ /code/requirements/
+COPY .docker/wheelhouse/ /wheelhouse/
+COPY .docker/node_modules/ /code/node_modules/
 
-RUN make requirements
-RUN make production-requirements
+RUN npm install
+RUN pip install -r requirements/edx/pre.txt
+RUN pip install -r requirements/edx/base.txt
+RUN pip install -r requirements/edx/paver.txt
+RUN pip install -r requirements/edx/post.txt
+RUN pip install -r requirements/edx/github.txt
 
 ADD . /code/
 
-RUN make static
+# We wait to install local requirments because they rely on the codebase
+RUN pip install -r requirements/edx/local.txt
 
-# TODO
-# TODO Write YAML config
+RUN paver update_assets --settings=$DJANGO_SETTINGS_MODULE

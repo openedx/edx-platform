@@ -1,14 +1,17 @@
 *
+!.docker/node_modules
+!.docker/wheelhouse
 !.tx
 !cms
 !common
+!conf
 !docs
 !lms
 !openedx
 !pavelib
-!requirements
+!requirements/edx
+!screenshots
 !scripts
-!static
 !themes
 !vendor_extra
 !.babelrc
@@ -22,7 +25,6 @@
 !pavement.py
 !pylintrc
 !pylintrc_tweaks
-!pytest.ini
 !README.rst
 !setup.cfg
 !setup.py
