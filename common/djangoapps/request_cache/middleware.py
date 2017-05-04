@@ -2,6 +2,7 @@
 An implementation of a RequestCache. This cache is reset at the beginning
 and end of every request.
 """
+from django.utils.encoding import force_text
 
 import crum
 import threading
@@ -108,7 +109,7 @@ def func_call_cache_key(func, *args, **kwargs):
     the function's name, and a stringified list of arguments
     and a query string-style stringified list of keyword arguments.
     """
-    converted_args = map(str, args)
-    converted_kwargs = map(str, reduce(list.__add__, map(list, sorted(kwargs.iteritems())), []))
+    converted_args = map(force_text, args)
+    converted_kwargs = map(force_text, reduce(list.__add__, map(list, sorted(kwargs.iteritems())), []))
     cache_keys = [func.__module__, func.func_name] + converted_args + converted_kwargs
-    return '.'.join(cache_keys)
+    return u'.'.join(cache_keys)

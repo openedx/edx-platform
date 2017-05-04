@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Tests for django comment client views."""
 from contextlib import contextmanager
 import logging
@@ -1165,7 +1166,8 @@ class CreateThreadUnicodeTestCase(
         request.user = self.student
         request.view_name = "create_thread"
         response = views.create_thread(
-            request, course_id=unicode(self.course.id), commentable_id="non_team_dummy_id"
+            # The commentable ID contains a username, the Unicode char below ensures it works fine
+            request, course_id=unicode(self.course.id), commentable_id=u"non_tåem_dummy_id"
         )
 
         self.assertEqual(response.status_code, 200)
