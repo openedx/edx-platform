@@ -83,10 +83,10 @@ function run_paver_quality {
     mkdir -p test_root/log/
     LOG_PREFIX=test_root/log/$QUALITY_TASK
     paver $QUALITY_TASK $* 2> $LOG_PREFIX.err.log > $LOG_PREFIX.out.log || {
-        echo "STDOUT:";
-        cat $LOG_PREFIX.out.log;
-        echo "STDERR:";
-        cat $LOG_PREFIX.err.log;
+        echo "STDOUT (last 100 lines of $LOG_PREFIX.out.log):";
+        tail -n 100 $LOG_PREFIX.out.log;
+        echo "STDERR (last 100 lines of $LOG_PREFIX.err.log):";
+        tail -n 100 $LOG_PREFIX.err.log;
         return 1;
     }
     return 0;
