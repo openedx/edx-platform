@@ -15,7 +15,7 @@
     .section {
       margin: 0 (-1 * $baseline);
       width: calc(100% + (2 * $baseline));
-      padding: 0 ($baseline * 2);
+      padding: 0 ($baseline);
 
       &:not(:first-child) {
         .section-name {
@@ -29,6 +29,7 @@
 
         h3 {
           font-weight: bold;
+          font-size: 1.1rem;
           margin: 0;
         }
       }
@@ -38,10 +39,15 @@
       }
 
       ol.outline-item {
+        padding-bottom: $baseline;
+        border-bottom: 1px solid $light-grey-solid;
         margin: 0 0 ($baseline / 2) 0;
+        
 
         .subsection {
           list-style-type: none;
+          border: 1px solid transparent;
+          border-radius: 3px;
 
           a.outline-item {
             display: flex;
@@ -53,16 +59,16 @@
               margin: 0;
             }
 
-            &:hover {
+            &:hover, &:focus {
               background-color: palette(primary, x-back);
               border-radius: $btn-border-radius;
+              text-decoration: none;
             }
 
             .subsection-text {
               .details {
                 font-size: $body-font-size;
                 color: $lms-gray;
-                font-style: italic;
               }
             }
 
@@ -81,6 +87,10 @@
             .resume-right {
               @include float(right);
             }
+          }
+
+          &:hover {
+            border: 1px solid $lms-active-color;
           }
         }
       }
