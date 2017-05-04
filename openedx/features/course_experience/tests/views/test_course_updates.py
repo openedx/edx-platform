@@ -84,7 +84,7 @@ class TestCourseUpdatesPage(SharedModuleStoreTestCase):
 
     def test_queries(self):
         # Fetch the view and verify that the query counts haven't changed
-        with self.assertNumQueries(34):
+        with self.assertNumQueries(32):
             with check_mongo_calls(4):
                 url = course_updates_url(self.course)
                 self.client.get(url)
