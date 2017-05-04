@@ -17,7 +17,6 @@ from openedx.core.lib.api.authentication import (
     OAuth2AuthenticationAllowInactiveUser,
 )
 
-from tiers.models import Tier
 from organizations.models import Organization
 
 from .permissions import AMCAdminPermission
@@ -95,32 +94,4 @@ class UsernameAvailabilityView(APIView):
         except User.DoesNotExist:
             return Response(None, status=status.HTTP_404_NOT_FOUND)
 
-
-class TierCreateUpdateView(views.APIView):
-    permission_classes = (ApiKeyHeaderPermission,)
-
-    def post(self, request):
-        params = request.data
-        # TODO: Fix this. We should add a unique constraint on the Organiztion model
-        # with some field that will be the same in both systems
-        org = Organization.objects.filter(name=params['organization_name']).first()
-        if org is None:
-            return Response(None, status=status.HTTP_404_NOT_FOUND)
-
-        try:
-            with transaction.atomic():
-                Tier.objects.get(organization=org).delete()
-                self._create_tier(org, params)
-        except Tier.DoesNotExist:
-            self._create_tier(org, params)
-
-        return Response(None, status=status.HTTP_200_OK)
-
-    def _create_tier(self, org, params):
-        Tier.objects.create(
-            name=params['tier_name'],
-            organization=org,
-            tier_enforcement_exempt=params['tier_enforcement_exempt'],
-            tier_enforcement_grace_period=params['tier_enforcement_grace_period'],
-            tier_expires_at=params['tier_expires_at'])
 
