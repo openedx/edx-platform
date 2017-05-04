@@ -40,14 +40,14 @@ rm -rf $NODE_ENV_DIR
 # Occasionally, the command to install node hangs. We need to catch that and retry.
 # Note that this will retry even if the command itself fails.
 WAIT_COUNT=0
-until timeout 30s $NODE_INSTALL_COMMAND || [ $WAIT_COUNT -eq 2 ]; do
+until timeout 180s $NODE_INSTALL_COMMAND || [ $WAIT_COUNT -eq 1 ]; do
     echo "re-trying to install node version..."
     sleep 2
     WAIT_COUNT=$((WAIT_COUNT+1))
 done
 
 # If we tried the max number of times, we need to quit.
-if [ $WAIT_COUNT -eq 2 ]; then
+if [ $WAIT_COUNT -eq 1 ]; then
     echo "Node environment installation command was not successful. Exiting."
     exit 1
 fi
