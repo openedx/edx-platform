@@ -121,6 +121,7 @@ log = logging.getLogger("edx.courseware")
 # Only display the requirements on learner dashboard for
 # credit and verified modes.
 REQUIREMENTS_DISPLAY_MODES = CourseMode.CREDIT_MODES + [CourseMode.VERIFIED]
+UPGRADE_COOKIE_NAME = "show_upgrade_notification"
 
 CertData = namedtuple("CertData", ["cert_status", "title", "msg", "download_url", "cert_web_view_url"])
 
@@ -327,24 +328,7 @@ def course_info(request, course_id):
         if settings.FEATURES.get('ENABLE_MKTG_SITE'):
             url_to_enroll = marketing_link('COURSES')
 
-        store_upgrade_cookie = False
-        upgrade_cookie_name = 'show_upgrade_notification'
-        upgrade_link = None
-        if request.user.is_authenticated():
-            show_upgrade_notification = False
-            if request.GET.get('upgrade', 'false') == 'true':
-                store_upgrade_cookie = True
-                show_upgrade_notification = True
-            elif upgrade_cookie_name in request.COOKIES and course_id in request.COOKIES[upgrade_cookie_name]:
-                show_upgrade_notification = True
-
-            if show_upgrade_notification:
-                upgrade_data = VerifiedUpgradeDeadlineDate(course, user)
-                if upgrade_data.is_enabled:
-                    upgrade_link = upgrade_data.link
-                else:
-                    # The upgrade is not enabled so the cookie does not need to be stored
-                    store_upgrade_cookie = False
+        upgrade_link, store_upgrade_cookie = _get_upgrade_link(request, user, course, course_id)
 
         context = {
             'request': request,
@@ -378,21 +362,7 @@ def course_info(request, course_id):
 
         response = render_to_response('courseware/info.html', context)
         if store_upgrade_cookie:
-            if upgrade_cookie_name in request.COOKIES and str(course_id) not in request.COOKIES[upgrade_cookie_name]:
-                cookie_value = '%s,%s' % (course_id, request.COOKIES[upgrade_cookie_name])
-            elif upgrade_cookie_name in request.COOKIES and str(course_id) in request.COOKIES[upgrade_cookie_name]:
-                cookie_value = request.COOKIES[upgrade_cookie_name]
-            else:
-                cookie_value = course_id
-
-            if cookie_value is not None:
-                response.set_cookie(
-                    upgrade_cookie_name,
-                    cookie_value,
-                    max_age=10 * 24 * 60 * 60,  # set for 10 days
-                    domain=settings.SESSION_COOKIE_DOMAIN,
-                    httponly=True  # no use case for accessing from JavaScript
-                )
+            _store_upgrade_cookie(response, request, course_id)
 
         return response
 
@@ -873,6 +843,8 @@ def _progress(request, course_key, student_id):
     # checking certificate generation configuration
     enrollment_mode, is_active = CourseEnrollment.enrollment_mode_for_user(student, course_key)
 
+    upgrade_link, store_upgrade_cookie = _get_upgrade_link(request, student, course, unicode(course.id))
+
     context = {
         'course': course,
         'courseware_summary': courseware_summary,
@@ -885,12 +857,56 @@ def _progress(request, course_key, student_id):
         'passed': is_course_passed(course, grade_summary),
         'credit_course_requirements': _credit_course_requirements(course_key, student),
         'certificate_data': _get_cert_data(student, course, course_key, is_active, enrollment_mode),
+        'upgrade_available': enrollment_mode == CourseMode.AUDIT and upgrade_link,
+        'upgrade_link': upgrade_link,
     }
 
     with outer_atomic():
         response = render_to_response('courseware/progress.html', context)
+    if store_upgrade_cookie:
+        _store_upgrade_cookie(response, request, unicode(course.id))
 
     return response
+
+
+def _get_upgrade_link(request, user, course, course_id):
+    upgrade_link = None
+    store_upgrade_cookie = False
+    if request.user.is_authenticated():
+        show_upgrade_notification = False
+        if request.GET.get('upgrade', 'false') == 'true':
+            store_upgrade_cookie = True
+            show_upgrade_notification = True
+        elif UPGRADE_COOKIE_NAME in request.COOKIES and course_id in request.COOKIES[UPGRADE_COOKIE_NAME]:
+            show_upgrade_notification = True
+
+        if show_upgrade_notification:
+            upgrade_data = VerifiedUpgradeDeadlineDate(course, user)
+            if upgrade_data.is_enabled:
+                upgrade_link = upgrade_data.link
+            else:
+                # The upgrade is not enabled so the cookie does not need to be stored
+                store_upgrade_cookie = False
+
+    return upgrade_link, store_upgrade_cookie
+
+
+def _store_upgrade_cookie(response, request, course_id):
+    if UPGRADE_COOKIE_NAME in request.COOKIES and str(course_id) not in request.COOKIES[UPGRADE_COOKIE_NAME]:
+        cookie_value = '%s,%s' % (course_id, request.COOKIES[UPGRADE_COOKIE_NAME])
+    elif UPGRADE_COOKIE_NAME in request.COOKIES and str(course_id) in request.COOKIES[UPGRADE_COOKIE_NAME]:
+        cookie_value = request.COOKIES[UPGRADE_COOKIE_NAME]
+    else:
+        cookie_value = course_id
+
+    if cookie_value is not None:
+        response.set_cookie(
+            UPGRADE_COOKIE_NAME,
+            cookie_value,
+            max_age=10 * 24 * 60 * 60,  # set for 10 days
+            domain=settings.SESSION_COOKIE_DOMAIN,
+            httponly=True  # no use case for accessing from JavaScript
+        )
 
 
 def _get_cert_data(student, course, course_key, is_active, enrollment_mode):
