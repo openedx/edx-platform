@@ -2,7 +2,7 @@
 Test cases for tabs.
 """
 
-import waffle
+from waffle.testutils import override_flag
 
 from django.core.urlresolvers import reverse
 from django.http import Http404
@@ -781,10 +781,9 @@ class CourseInfoTabTestCase(TabTestCase):
         tabs = get_course_tab_list(self.request, self.course)
         self.assertEqual(tabs[0].type, 'course_info')
 
-    @patch('waffle.flag_is_active')
-    def test_default_tab_for_new_course_experience(self, patched_flag_is_active):
+    @override_flag(UNIFIED_COURSE_EXPERIENCE_FLAG, active=True)
+    def test_default_tab_for_new_course_experience(self):
         # Verify that the unified course experience hides the course info tab
-        patched_flag_is_active.return_value = True
         tabs = get_course_tab_list(self.request, self.course)
         self.assertEqual(tabs[0].type, 'courseware')
 
