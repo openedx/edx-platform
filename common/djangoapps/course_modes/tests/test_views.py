@@ -527,19 +527,19 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         self.assertNotContains(response, "Schools & Partners")
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-    @freezegun.freeze_time('2015-01-02')
     def test_course_closed(self):
-        for mode in ["honor", "verified"]:
-            CourseModeFactory(mode_slug=mode, course_id=self.course.id)
+        with freezegun.freeze_time('2015-01-02'):
+            for mode in ["honor", "verified"]:
+                CourseModeFactory(mode_slug=mode, course_id=self.course.id)
 
-        self.course.enrollment_end = datetime(2015, 01, 01)
-        modulestore().update_item(self.course, self.user.id)
+            self.course.enrollment_end = datetime(2015, 01, 01)
+            modulestore().update_item(self.course, self.user.id)
 
-        url = reverse('course_modes_choose', args=[unicode(self.course.id)])
-        response = self.client.get(url)
-        # URL-encoded version of 1/1/15, 12:00 AM
-        redirect_url = reverse('dashboard') + '?course_closed=1%2F1%2F15%2C+12%3A00+AM'
-        self.assertRedirects(response, redirect_url)
+            url = reverse('course_modes_choose', args=[unicode(self.course.id)])
+            response = self.client.get(url)
+            # URL-encoded version of 1/1/15, 12:00 AM
+            redirect_url = reverse('dashboard') + '?course_closed=1%2F1%2F15%2C+12%3A00+AM'
+            self.assertRedirects(response, redirect_url)
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')

@@ -266,13 +266,13 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
         (True, datetime(2000, 1, 1, 12, 30, 45, tzinfo=pytz.UTC)),
         (False, None),  # Use as now().  Freeze time needs this calculation to happen at test time.
     )
-    @freeze_time(now())
     def test_update_or_create_attempted(self, is_active, expected_first_attempted):
-        if expected_first_attempted is None:
-            expected_first_attempted = now()
-        with waffle.waffle().override(waffle.ESTIMATE_FIRST_ATTEMPTED, active=is_active):
-            grade = PersistentSubsectionGrade.update_or_create_grade(**self.params)
-            self.assertEqual(grade.first_attempted, expected_first_attempted)
+        with freeze_time(now()):
+            if expected_first_attempted is None:
+                expected_first_attempted = now()
+            with waffle.waffle().override(waffle.ESTIMATE_FIRST_ATTEMPTED, active=is_active):
+                grade = PersistentSubsectionGrade.update_or_create_grade(**self.params)
+                self.assertEqual(grade.first_attempted, expected_first_attempted)
 
     def test_unattempted(self):
         self.params['first_attempted'] = None
@@ -407,10 +407,10 @@ class PersistentCourseGradesTest(GradesModelTestCase):
         self.assertEqual(grade.letter_grade, u'')
         self.assertEqual(grade.passed_timestamp, passed_timestamp)
 
-    @freeze_time(now())
     def test_passed_timestamp_is_now(self):
-        grade = PersistentCourseGrade.update_or_create(**self.params)
-        self.assertEqual(now(), grade.passed_timestamp)
+        with freeze_time(now()):
+            grade = PersistentCourseGrade.update_or_create(**self.params)
+            self.assertEqual(now(), grade.passed_timestamp)
 
     def test_create_and_read_grade(self):
         created_grade = PersistentCourseGrade.update_or_create(**self.params)

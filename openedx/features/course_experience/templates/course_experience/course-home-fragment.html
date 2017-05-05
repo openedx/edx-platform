@@ -90,6 +90,9 @@ from openedx.features.course_experience import UNIFIED_COURSE_EXPERIENCE_FLAG
                             </li>
                         </ul>
                     </div>
+                    <div class="section section-dates">
+                        ${HTML(dates_fragment.body_html())}
+                    </div>
                     % if handouts_html:
                         <div class="section section-handouts">
                             <h3 class="hd-6">${_("Course Handouts")}</h3>
