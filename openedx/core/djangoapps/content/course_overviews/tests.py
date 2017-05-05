@@ -552,11 +552,27 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
     """
     Course thumbnail generation tests.
     """
+    ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
         """Create an active CourseOverviewImageConfig with non-default values."""
         self.set_config(True)
         super(CourseOverviewImageSetTestCase, self).setUp()
+
+    def _create_course_image(self, course, image_name):
+        """
+        Creates a course image in contentstore.
+        """
+        # Create a source image...
+        image = Image.new('RGB', (800, 400), 'blue')
+        image_buff = StringIO()
+        image.save(image_buff, format='PNG')
+        image_buff.seek(0)
+
+        # Save the image to the contentstore...
+        course_image_asset_key = StaticContent.compute_location(course.id, course.course_image)
+        course_image_content = StaticContent(course_image_asset_key, image_name, 'image/png', image_buff)
+        contentstore().save(course_image_content)
 
     def set_config(self, enabled):
         """
@@ -921,9 +937,9 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
         CourseOverviewImageSet.objects.create(course_overview=overview)
 
         # Now do it the normal way -- this will cause an IntegrityError to be
-        # thrown and suppressed in create_or_update()
+        # thrown and suppressed in create()
         self.set_config(True)
-        CourseOverviewImageSet.create_or_update(overview)
+        CourseOverviewImageSet.create(overview)
         self.assertTrue(hasattr(overview, 'image_set'))
 
         # The following is actually very important for this test because
@@ -936,6 +952,47 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
         # transaction. So we don't really care about setting the config -- it's
         # just a convenient way to cause a database write operation to happen.
         self.set_config(False)
+
+    def test_successful_image_update(self):
+        """
+        Test the successful image set re-creation on updating
+        the course overview.
+        """
+        # Get current course overview image config
+        config = CourseOverviewImageConfig.current()
+
+        # Image names
+        course_image = 'src_course_image.png'
+        updated_course_image = 'src_course_image1.png'
+
+        # Setup course with course image.
+        course = CourseFactory.create(course_image=course_image)
+        self._create_course_image(course, course_image)
+
+        # Create course overview with image set.
+        overview = CourseOverview.get_from_id(course.id)
+        self.assertTrue(hasattr(overview, 'image_set'))
+
+        # Make sure the thumbnail names come out as expected...
+        image_urls = overview.image_urls
+        self.assertTrue(image_urls['raw'].endswith('src_course_image.png'))
+        self.assertTrue(image_urls['small'].endswith('src_course_image-png-{}x{}.jpg'.format(*config.small)))
+        self.assertTrue(image_urls['large'].endswith('src_course_image-png-{}x{}.jpg'.format(*config.large)))
+
+        # Update course image on the course descriptor This fires a
+        # course_published signal, this will be caught in signals.py,
+        # which should in turn load CourseOverview from modulestore.
+        course.course_image = 'src_course_image1.png'
+        # create updated course image in contentstore too.
+        self._create_course_image(course, updated_course_image)
+        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
+            self.store.update_item(course, ModuleStoreEnum.UserID.test)
+
+        # Get latest course overview and make sure the thumbnail names are correctly updated..
+        image_urls = CourseOverview.objects.get(id=overview.id).image_urls
+        self.assertTrue(image_urls['raw'].endswith('src_course_image1.png'))
+        self.assertTrue(image_urls['small'].endswith('src_course_image1-png-{}x{}.jpg'.format(*config.small)))
+        self.assertTrue(image_urls['large'].endswith('src_course_image1-png-{}x{}.jpg'.format(*config.large)))
 
     def _assert_image_urls_all_default(self, modulestore_type, raw_course_image_name, expected_url=None):
         """
