@@ -220,6 +220,8 @@ class CourseOverview(TimeStampedModel):
                         course_overview.save()
                         # Remove and recreate all the course tabs
                         CourseOverviewTab.objects.filter(course_overview=course_overview).delete()
+                        # Remove and recreate course images
+                        CourseOverviewImageSet.objects.filter(course_overview=course_overview).delete()
                         CourseOverviewTab.objects.bulk_create([
                             CourseOverviewTab(tab_id=tab.tab_id, course_overview=course_overview)
                             for tab in course.tabs
