@@ -302,6 +302,12 @@ class GeneratedCertificate(models.Model):
         else:
             return query.values('status').annotate(count=Count('status'))
 
+    def __repr__(self):
+        return "<GeneratedCertificate: {course_id}, user={user}>".format(
+            course_id=self.course_id,
+            user=self.user
+        )
+
     def invalidate(self):
         """
         Invalidate Generated Certificate by  marking it 'unavailable'.
