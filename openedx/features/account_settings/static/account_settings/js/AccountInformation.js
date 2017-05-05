@@ -87,7 +87,7 @@ class AccountInformation extends React.Component {
           You can also specify additional information and see your linked
           social accounts on this page.
         </p>
-        <form onSubmit={this.handleSubmit}>
+        <form onSubmit={this.handleSubmit} className="py-4">
           <h3>Basic Account Information</h3>
           <TextInput
             className="py-2 my-2"
@@ -144,7 +144,7 @@ class AccountInformation extends React.Component {
           />
           {successMessage}
         </form>
-        <form onSubmit={this.handleSubmit}>
+        <form onSubmit={this.handleSubmit} className="py-4">
           <h3>Additional Information</h3>
           <SelectInput
             className="py-2 my-2"
