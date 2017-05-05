@@ -482,11 +482,9 @@
                 width: 100%;
                 margin: 5px 0;
 
-                @media(min-width: $bp-screen-sm) {
-                    width: initial;
-                }
                 @media(min-width: $bp-screen-md) {
-                    margin-top: -25px;
+                    margin-left: auto;
+                    width: initial;
                 }
             }
 
