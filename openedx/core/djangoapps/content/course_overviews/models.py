@@ -220,13 +220,13 @@ class CourseOverview(TimeStampedModel):
                         course_overview.save()
                         # Remove and recreate all the course tabs
                         CourseOverviewTab.objects.filter(course_overview=course_overview).delete()
-                        # Remove and recreate course images
-                        CourseOverviewImageSet.objects.filter(course_overview=course_overview).delete()
                         CourseOverviewTab.objects.bulk_create([
                             CourseOverviewTab(tab_id=tab.tab_id, course_overview=course_overview)
                             for tab in course.tabs
                         ])
-                        CourseOverviewImageSet.create_or_update(course_overview, course)
+                        # Remove and recreate course images
+                        CourseOverviewImageSet.objects.filter(course_overview=course_overview).delete()
+                        CourseOverviewImageSet.create(course_overview, course)
 
                 except IntegrityError:
                     # There is a rare race condition that will occur if
@@ -290,7 +290,7 @@ class CourseOverview(TimeStampedModel):
         # they were never generated, or because they were flushed out after
         # a change to CourseOverviewImageConfig.
         if course_overview and not hasattr(course_overview, 'image_set'):
-            CourseOverviewImageSet.create_or_update(course_overview)
+            CourseOverviewImageSet.create(course_overview)
 
         return course_overview or cls.load_from_module_store(course_id)
 
@@ -727,9 +727,9 @@ class CourseOverviewImageSet(TimeStampedModel):
     large_url = models.TextField(blank=True, default="")
 
     @classmethod
-    def create_or_update(cls, course_overview, course=None):
+    def create(cls, course_overview, course=None):
         """
-        Create or update thumbnail images for this CourseOverview.
+        Create thumbnail images for this CourseOverview.
 
         This will save the CourseOverviewImageSet before it returns.
         """
@@ -747,10 +747,7 @@ class CourseOverviewImageSet(TimeStampedModel):
         if not course:
             course = modulestore().get_course(course_overview.id)
 
-        if hasattr(course_overview, 'image_set'):
-            image_set = course_overview.image_set
-        else:
-            image_set = cls(course_overview=course_overview)
+        image_set = cls(course_overview=course_overview)
 
         if course.course_image:
             # Try to create a thumbnails of the course image. If this fails for any
