@@ -175,7 +175,7 @@ class CourseDiscussionSettings(models.Model):
         help_text="Which course are these settings associated with?",
     )
     always_divide_inline_discussions = models.BooleanField(default=False)
-    _divided_discussions = models.TextField(db_column='cohorted_discussions', null=True, blank=True)  # JSON list
+    _divided_discussions = models.TextField(db_column='divided_discussions', null=True, blank=True)  # JSON list
 
     COHORT = 'cohort'
     ENROLLMENT_TRACK = 'enrollment_track'
@@ -184,10 +184,10 @@ class CourseDiscussionSettings(models.Model):
 
     @property
     def divided_discussions(self):
-        """Jsonify the cohorted_discussions"""
+        """Jsonify the divided_discussions"""
         return json.loads(self._divided_discussions)
 
     @divided_discussions.setter
     def divided_discussions(self, value):
-        """Un-Jsonify the cohorted_discussions"""
+        """Un-Jsonify the divided_discussions"""
         self._divided_discussions = json.dumps(value)

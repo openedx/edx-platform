@@ -77,7 +77,7 @@ def _get_course_settings_representation(course, course_cohort_settings, course_d
         'is_cohorted': course_cohort_settings.is_cohorted,
         'cohorted_inline_discussions': cohorted_inline_discussions,
         'cohorted_course_wide_discussions': cohorted_course_wide_discussions,
-        'always_cohort_inline_discussions': course_cohort_settings.always_cohort_inline_discussions,
+        'always_cohort_inline_discussions': course_discussion_settings.always_divide_inline_discussions,
     }
 
 
