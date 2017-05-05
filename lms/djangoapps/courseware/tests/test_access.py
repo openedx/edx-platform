@@ -199,44 +199,41 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
 
     def test_has_staff_access_to_preview_mode(self):
         """
-        Tests users have right access to content in preview mode.
+        Test that preview mode is only accessible by staff users.
         """
         course_key = self.course.id
-        usage_key = self.course.scope_ids.usage_id
-        chapter = ItemFactory.create(category="chapter", parent_location=self.course.location)
-        overview = CourseOverview.get_from_id(course_key)
-        test_system = get_test_system()
-
-        ccx = CcxFactory(course_id=course_key)
-        ccx_locator = CCXLocator.from_course_locator(course_key, ccx.id)
-
-        error_descriptor = ErrorDescriptor.from_xml(
-            u"<problem>ABC \N{SNOWMAN}</problem>",
-            test_system,
-            CourseLocationManager(course_key),
-            "error msg"
-        )
-        # Enroll student to the course
         CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
 
-        modules = [
-            self.course,
-            overview,
-            chapter,
-            ccx_locator,
-            error_descriptor,
-            course_key,
-            usage_key,
-        ]
-        # Course key is not None
-        self.assertTrue(
-            bool(access.has_staff_access_to_preview_mode(self.global_staff, obj=self.course, course_key=course_key))
-        )
-
         for user in [self.global_staff, self.course_staff, self.course_instructor]:
-            for obj in modules:
-                self.assertTrue(bool(access.has_staff_access_to_preview_mode(user, obj=obj)))
-                self.assertFalse(bool(access.has_staff_access_to_preview_mode(self.student, obj=obj)))
+            self.assertTrue(access.has_staff_access_to_preview_mode(user, course_key))
+
+        self.assertFalse(access.has_staff_access_to_preview_mode(self.student, course_key))
+
+        # we don't want to restrict a staff user, masquerading as student,
+        # to access preview mode.
+
+        # Note that self.student now have access to preview mode,
+        # `is_masquerading_as_student == True` means user is staff and is
+        # masquerading as a student.
+        with patch('courseware.access.is_masquerading_as_student') as mock_masquerade:
+            mock_masquerade.return_value = True
+            for user in [self.global_staff, self.course_staff, self.course_instructor, self.student]:
+                self.assertTrue(access.has_staff_access_to_preview_mode(user, course_key))
+
+    def test_administrative_accesses_to_course_for_user(self):
+        """
+        Test types of admin accesses to a course
+        """
+        course_key = self.course.id
+
+        # `administrative_accesses_to_course_for_user` returns accesses in tuple as
+        # (`global_staff`, `course_staff`, `course_instructor`).
+        # Order matters here, for example `True` at first index in tuple essentially means
+        # given user is a global staff.
+        for count, user in enumerate([self.global_staff, self.course_staff, self.course_instructor]):
+            self.assertTrue(access.administrative_accesses_to_course_for_user(user, course_key)[count])
+
+        self.assertFalse(any(access.administrative_accesses_to_course_for_user(self.student, course_key)))
 
     def test_student_has_access(self):
         """
@@ -264,15 +261,6 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
             for obj in modules:
                 self.assertFalse(bool(access.has_access(self.student, 'load', obj, course_key=self.course.id)))
 
-    def test_string_has_staff_access_to_preview_mode(self):
-        """
-        Tests different users has right access to string content in preview mode.
-        """
-        self.assertTrue(bool(access.has_staff_access_to_preview_mode(self.global_staff, obj='global')))
-        self.assertFalse(bool(access.has_staff_access_to_preview_mode(self.course_staff, obj='global')))
-        self.assertFalse(bool(access.has_staff_access_to_preview_mode(self.course_instructor, obj='global')))
-        self.assertFalse(bool(access.has_staff_access_to_preview_mode(self.student, obj='global')))
-
     @patch('courseware.access.in_preview_mode', Mock(return_value=True))
     def test_has_access_with_preview_mode(self):
         """
@@ -286,17 +274,17 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         self.assertFalse(bool(access.has_access(self.student, 'staff', self.course, course_key=self.course.id)))
         self.assertFalse(bool(access.has_access(self.student, 'load', self.course, course_key=self.course.id)))
 
-        # User should be able to preview when masquerade.
+        # When masquerading is true, user should not be able to access staff content
         with patch('courseware.access.is_masquerading_as_student') as mock_masquerade:
             mock_masquerade.return_value = True
-            self.assertTrue(
+            self.assertFalse(
                 bool(access.has_access(self.global_staff, 'staff', self.course, course_key=self.course.id))
             )
             self.assertFalse(
                 bool(access.has_access(self.student, 'staff', self.course, course_key=self.course.id))
             )
 
-    @patch('courseware.access.in_preview_mode', Mock(return_value=True))
+    @patch('courseware.access_utils.in_preview_mode', Mock(return_value=True))
     def test_has_access_in_preview_mode_with_group(self):
         """
         Test that a user masquerading as a member of a group sees appropriate content in preview mode.
@@ -851,7 +839,10 @@ class CourseOverviewAccessTestCase(ModuleStoreTestCase):
             user = getattr(self, user_attr_name)
             user = User.objects.get(id=user.id)
 
-        if user_attr_name == 'user_staff' and action == 'see_exists' and course_attr_name == 'course_not_started':
+        if (user_attr_name == 'user_staff' and
+            action == 'see_exists' and
+            course_attr_name in
+                ['course_default', 'course_not_started']):
             # checks staff role
             num_queries = 1
         elif user_attr_name == 'user_normal' and action == 'see_exists' and course_attr_name != 'course_started':

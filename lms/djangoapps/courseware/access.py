@@ -136,8 +136,9 @@ def has_access(user, action, obj, course_key=None):
     if not user:
         user = AnonymousUser()
 
-    if in_preview_mode():
-        if not bool(has_staff_access_to_preview_mode(user=user, obj=obj, course_key=course_key)):
+    # Preview mode is only accessible by staff.
+    if in_preview_mode() and course_key:
+        if not has_staff_access_to_preview_mode(user, course_key):
             return ACCESS_DENIED
 
     # delegate the work to type-specific functions.
@@ -173,51 +174,14 @@ def has_access(user, action, obj, course_key=None):
                     .format(type(obj)))
 
 
-# ================ Implementation helpers ================================
-
-def has_staff_access_to_preview_mode(user, obj, course_key=None):
+def has_staff_access_to_preview_mode(user, course_key):
     """
-    Returns whether user has staff access to specified modules or not.
-
-    Arguments:
-
-        user: a Django user object.
-
-        obj: The object to check access for.
-
-        course_key: A course_key specifying which course this access is for.
-
-    Returns an AccessResponse object.
+    Checks if given user can access course in preview mode.
+    A user can access a course in preview mode only if User has staff access to course.
     """
-    if course_key is None:
-        if isinstance(obj, CourseDescriptor) or isinstance(obj, CourseOverview):
-            course_key = obj.id
+    has_admin_access_to_course = any(administrative_accesses_to_course_for_user(user, course_key))
 
-        elif isinstance(obj, ErrorDescriptor):
-            course_key = obj.location.course_key
-
-        elif isinstance(obj, XModule):
-            course_key = obj.descriptor.course_key
-
-        elif isinstance(obj, XBlock):
-            course_key = obj.location.course_key
-
-        elif isinstance(obj, CCXLocator):
-            course_key = obj.to_course_locator()
-
-        elif isinstance(obj, CourseKey):
-            course_key = obj
-
-        elif isinstance(obj, UsageKey):
-            course_key = obj.course_key
-
-    if course_key is None:
-        if GlobalStaff().has_user(user):
-            return ACCESS_GRANTED
-        else:
-            return ACCESS_DENIED
-
-    return _has_access_to_course(user, 'staff', course_key=course_key)
+    return has_admin_access_to_course or is_masquerading_as_student(user, course_key)
 
 
 def _can_access_descriptor_with_start_date(user, descriptor, course_key):  # pylint: disable=invalid-name
@@ -733,10 +697,12 @@ def _has_access_to_course(user, access_level, course_key):
         debug("Deny: no user or anon user")
         return ACCESS_DENIED
 
-    if not in_preview_mode() and is_masquerading_as_student(user, course_key):
+    if is_masquerading_as_student(user, course_key):
         return ACCESS_DENIED
 
-    if GlobalStaff().has_user(user):
+    global_staff, staff_access, instructor_access = administrative_accesses_to_course_for_user(user, course_key)
+
+    if global_staff:
         debug("Allow: user.is_staff")
         return ACCESS_GRANTED
 
@@ -745,18 +711,9 @@ def _has_access_to_course(user, access_level, course_key):
         debug("Deny: unknown access level")
         return ACCESS_DENIED
 
-    staff_access = (
-        CourseStaffRole(course_key).has_user(user) or
-        OrgStaffRole(course_key.org).has_user(user)
-    )
     if staff_access and access_level == 'staff':
         debug("Allow: user has course staff access")
         return ACCESS_GRANTED
-
-    instructor_access = (
-        CourseInstructorRole(course_key).has_user(user) or
-        OrgInstructorRole(course_key.org).has_user(user)
-    )
 
     if instructor_access and access_level in ('staff', 'instructor'):
         debug("Allow: user has course instructor access")
@@ -764,6 +721,25 @@ def _has_access_to_course(user, access_level, course_key):
 
     debug("Deny: user did not have correct access")
     return ACCESS_DENIED
+
+
+def administrative_accesses_to_course_for_user(user, course_key):
+    """
+    Returns types of access a user have for given course.
+    """
+    global_staff = GlobalStaff().has_user(user)
+
+    staff_access = (
+        CourseStaffRole(course_key).has_user(user) or
+        OrgStaffRole(course_key.org).has_user(user)
+    )
+
+    instructor_access = (
+        CourseInstructorRole(course_key).has_user(user) or
+        OrgInstructorRole(course_key.org).has_user(user)
+    )
+
+    return global_staff, staff_access, instructor_access
 
 
 def _has_instructor_access_to_descriptor(user, descriptor, course_key):  # pylint: disable=invalid-name
