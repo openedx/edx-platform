@@ -117,6 +117,14 @@ class ProviderConfig(ConfigurationModel):
             'The Site that this provider configuration belongs to.'
         ),
     )
+    skip_hinted_login_dialog = models.BooleanField(
+        default=False,
+        help_text=_(
+            "If this option is enabled, users that visit a \"TPA hinted\" URL for this provider "
+            "(e.g. a URL ending with `?tpa_hint=[provider_name]`) will be forwarded directly to "
+            "the login URL of the provider instead of being first prompted with a login dialog."
+        ),
+    )
     skip_registration_form = models.BooleanField(
         default=False,
         help_text=_(
