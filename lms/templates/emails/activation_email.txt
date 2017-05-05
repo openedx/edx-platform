@@ -4,9 +4,9 @@ ${_("You're almost there! Use the link to activate your account to access engagi
 "you have activated it.").format(platform_name=platform_name)}
 
 % if is_secure:
-https://${ site }/activate/${ key }
+https://${ request.site }/activate/${ key }
 % else:
-http://${ site }/activate/${ key }
+http://${ request.site }/activate/${ key }
 % endif
 
 ${_("Enjoy learning with {platform_name}.").format(platform_name=platform_name)}
