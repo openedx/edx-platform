@@ -11,7 +11,7 @@
         var user_inputs = {};
         $(all_inputs).each(function(index, elt) {
             var node = $(elt);
-            var name = node.attr('id');
+            var name = node.attr('id').split('ctinput_')[0];
             var val = node.val();
             var radio_value = node.attr('value');
             var type = node.attr('type');
