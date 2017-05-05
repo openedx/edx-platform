@@ -369,6 +369,7 @@ class CertificateGetTests(SharedModuleStoreTestCase):
 
     @classmethod
     def tearDownClass(cls):
+        super(CertificateGetTests, cls).tearDownClass()
         cls.freezer.stop()
 
     def test_get_certificate_for_user(self):
