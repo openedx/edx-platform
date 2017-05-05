@@ -35,8 +35,11 @@ class CertificatesRestApiTest(SharedModuleStoreTestCase, APITestCase):
             display_name='Verified Course'
         )
 
-    @freeze_time(now)
     def setUp(self):
+        freezer = freeze_time(self.now)
+        freezer.start()
+        self.addCleanup(freezer.stop)
+
         super(CertificatesRestApiTest, self).setUp()
 
         self.student = UserFactory.create(password=USER_PASSWORD)
