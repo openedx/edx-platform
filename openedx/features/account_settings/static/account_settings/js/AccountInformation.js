@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
+import * as EmailValidator from 'email-validator';
 import { TabInterface, TextInput, SelectInput } from 'excalibur';
 
 import { patch } from './xhr';
@@ -9,6 +10,7 @@ class AccountInformation extends React.Component {
     super(props);
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.validateEmail = this.validateEmail.bind(this);
     this.state = {
       formData: {},
       changeSuccess: false
@@ -55,6 +57,14 @@ class AccountInformation extends React.Component {
       .then(response => {
         console.log(response);
       });
+  }
+
+  validateEmail(value) {
+    console.log('validating');
+    return {
+      isValid: EmailValidator.validate(value),
+      validationMessage: 'Please enter a valid email address'
+    };
   }
 
   render() {
@@ -108,6 +118,7 @@ class AccountInformation extends React.Component {
             onChange={this.handleChange}
             description={`The email address you use to sign in. Communications from
             ${platformName} and your courses are sent to this address.`}
+            validator={this.validateEmail}
           />
           <SelectInput
             className="py-2 my-2"

@@ -12,6 +12,7 @@
     "coffee-script": "1.6.1",
     "edx-pattern-library": "0.18.1",
     "edx-ui-toolkit": "1.5.2",
+    "email-validator": "^1.0.7",
     "excalibur": "arizzitano/excalibur",
     "hls.js": "0.7.2",
     "jquery": "~2.2.0",

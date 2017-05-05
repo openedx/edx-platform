@@ -83,10 +83,12 @@ class AccountSettingsPage extends React.Component {
               {...this.props}
               {...this.state}
             />,
-            <div key="1">
+            <div key="1" className="py-3">
               <p>You can link your social media accounts to simplify signing in to {platformName}.</p>
             </div>,
-            <div key="2">THIRD PANEL</div>,
+            <div key="2" className="py-3">
+              <p>This page contains information about orders you have placed with {platformName}.</p>
+            </div>,
           ]}
         />
       </div>
