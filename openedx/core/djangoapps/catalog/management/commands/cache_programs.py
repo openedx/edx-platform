@@ -51,8 +51,7 @@ class Command(BaseCommand):
             raise
 
         total = len(uuids)
-        logger.info('Caching UUIDs for {total} programs.'.format(total=total))
-        cache.set(PROGRAM_UUIDS_CACHE_KEY, uuids, None)
+        logger.info('Received {total} UUIDs.'.format(total=total))
 
         programs = {}
         failure = False
@@ -73,12 +72,8 @@ class Command(BaseCommand):
         logger.info('Caching details for {successful} programs.'.format(successful=successful))
         cache.set_many(programs, None)
 
-        logger.info(
-            'Program caching complete. Successfully cached {successful} of {total} programs.'.format(
-                successful=successful,
-                total=total
-            )
-        )
+        logger.info('Caching UUIDs for {total} programs.'.format(total=total))
+        cache.set(PROGRAM_UUIDS_CACHE_KEY, uuids, None)
 
         if failure:
             # This will fail a Jenkins job running this command, letting site
