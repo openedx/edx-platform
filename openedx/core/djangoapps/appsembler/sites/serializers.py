@@ -52,7 +52,7 @@ class SiteSerializer(serializers.ModelSerializer):
 class OrganizationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Organization
-        fields = ('id', 'name', 'short_name')
+        fields = ('id', 'name', 'short_name', 'edx_uuid')
 
     def create(self, validated_data):
         return organizations_api.add_organization(**validated_data)
