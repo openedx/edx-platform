@@ -1,6 +1,9 @@
 """
 Tests for the course home page.
 """
+
+from waffle.testutils import override_flag
+
 from django.core.urlresolvers import reverse
 
 from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
@@ -9,6 +12,8 @@ from student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+
+from openedx.features.course_experience import UNIFIED_COURSE_EXPERIENCE_FLAG
 
 TEST_PASSWORD = 'test'
 
@@ -36,7 +41,7 @@ class TestCourseHomePage(SharedModuleStoreTestCase):
         # pylint: disable=super-method-not-called
         with super(TestCourseHomePage, cls).setUpClassAndTestData():
             with cls.store.default_store(ModuleStoreEnum.Type.split):
-                cls.course = CourseFactory.create()
+                cls.course = CourseFactory.create(org='edX', number='test', display_name='Test Course')
                 with cls.store.bulk_operations(cls.course.id):
                     chapter = ItemFactory.create(category='chapter', parent_location=cls.course.location)
                     section = ItemFactory.create(category='sequential', parent_location=chapter.location)
@@ -57,6 +62,15 @@ class TestCourseHomePage(SharedModuleStoreTestCase):
         super(TestCourseHomePage, self).setUp()
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
 
+    @override_flag(UNIFIED_COURSE_EXPERIENCE_FLAG, active=True)
+    def test_unified_page(self):
+        """
+        Verify the rendering of the unified page.
+        """
+        url = course_home_url(self.course)
+        response = self.client.get(url)
+        self.assertContains(response, '<h2 class="hd hd-3 page-title">Test Course</h2>')
+
     def test_queries(self):
         """
         Verify that the view's query count doesn't regress.
@@ -65,7 +79,7 @@ class TestCourseHomePage(SharedModuleStoreTestCase):
         get_course_in_cache(self.course.id)
 
         # Fetch the view and verify the query counts
-        with self.assertNumQueries(37):
+        with self.assertNumQueries(35):
             with check_mongo_calls(3):
                 url = course_home_url(self.course)
                 self.client.get(url)
