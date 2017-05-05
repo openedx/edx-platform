@@ -25,7 +25,7 @@ from courseware import courses
 from courseware.access import has_access
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from openedx.core.djangoapps.course_groups.cohorts import (
-    get_course_cohort_settings, get_cohort_by_id, get_cohort_id, is_course_cohorted
+    get_course_settings, get_cohort_by_id, get_cohort_id, is_course_cohorted
 )
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from request_cache.middleware import request_cached
@@ -310,7 +310,7 @@ def get_discussion_category_map(course, user, divided_only_if_explicit=False, ex
 
     xblocks = get_accessible_discussion_xblocks(course, user)
 
-    course_cohort_settings = get_course_cohort_settings(course.id)
+    course_cohort_settings, course_discussion_settings = get_course_settings(course.id)
 
     for xblock in xblocks:
         discussion_id = xblock.discussion_id
@@ -800,7 +800,7 @@ def is_commentable_divided(course_key, commentable_id):
         Http404 if the course doesn't exist.
     """
     course = courses.get_course_by_id(course_key)
-    course_cohort_settings = get_course_cohort_settings(course_key)
+    course_cohort_settings, course_discussion_settings = get_course_settings(course_key)
 
     if not course_cohort_settings.is_cohorted or get_team(commentable_id):
         # this is the easy case :)
@@ -812,7 +812,7 @@ def is_commentable_divided(course_key, commentable_id):
         # top level discussions have to be manually configured as cohorted
         # (default is not).
         # Same thing for inline discussions if the default is explicitly set to False in settings
-        ans = commentable_id in course_cohort_settings.cohorted_discussions
+        ans = commentable_id in course_discussion_settings.cohorted_discussions
     else:
         # inline discussions are cohorted by default
         ans = True

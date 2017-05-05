@@ -10,7 +10,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
 
-from ..cohorts import set_course_cohort_settings
+from ..cohorts import set_course_settings
 from ..models import CourseUserGroup, CourseCohort, CourseCohortsSettings, CohortMembership
 
 
@@ -165,7 +165,7 @@ def config_course_cohorts(
         """Convert name to id."""
         return topic_name_to_id(course, name)
 
-    set_course_cohort_settings(
+    set_course_settings(
         course.id,
         is_cohorted=is_cohorted,
         cohorted_discussions=[to_id(name) for name in cohorted_discussions],
