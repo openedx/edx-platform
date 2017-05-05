@@ -21,10 +21,12 @@
       <span class="icon fa <%= icon_class %>" aria-hidden="true"></span>
     </div><div class="forum-nav-thread-wrapper-1">
       <span class="forum-nav-thread-title"><%- title %></span>
-      <div class="posted-details">
-        <%- gettext("discussion posted") %> <span class="timeago" title="<%- created_at %>"><%- created_at %></span> by
-        <span class="username"><%- username %></span>
-      </div>
+      <% if(typeof(username) !== "undefined" && typeof(created_at) !== "undefined") { %>
+        <div class="posted-details">
+          <%- gettext("discussion posted") %> <span class="timeago" title="<%- created_at %>"><%- created_at %></span> by
+          <span class="username"><%- username %></span>
+        </div>
+      <% } %>
       <% if (showThreadPreview){ %>
         <div class="thread-preview-body"><%- threadPreview %></div>
       <% } %>
