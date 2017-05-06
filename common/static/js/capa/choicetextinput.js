@@ -10,12 +10,12 @@
         var all_inputs = $('input.ctinput', parent);
         var user_inputs = {};
         $(all_inputs).each(function(index, elt) {
-            var node = $(elt);
-            var name = node.attr('id').replace('ctinput_', '');
-            var val = node.val();
-            var radio_value = node.attr('value');
-            var type = node.attr('type');
-            var is_checked = node.attr('checked');
+            var $node = $(elt);
+            var name = $node.attr('id').replace('ctinput_', '');
+            var val = $node.val();
+            var radio_value = $node.attr('value');
+            var type = $node.attr('type');
+            var is_checked = $node.attr('checked');
             if (type === 'radio' || type === 'checkbox') {
                 if (is_checked === 'checked' || is_checked === 'true') {
                     user_inputs[name] = radio_value;
