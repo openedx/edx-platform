@@ -17,7 +17,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import Resolver404, resolve, reverse
 from nose.plugins.attrib import attr
-from oauth2_provider import models as dot_models
+from oauth2_provider.models import get_application_model, AccessToken
 from opaque_keys.edx.keys import CourseKey
 from provider.constants import CONFIDENTIAL
 from provider.oauth2.models import Client, Grant
@@ -72,7 +72,6 @@ class CcxRestApiTest(CcxTestCase, APITestCase):
         instructor = UserFactory()
         allow_access(self.course, instructor, 'instructor')
 
-        # FIXME: Testing for multiple authentication types in multiple test cases is overkill. Stop it!
         self.auth, self.auth_header_oauth2_provider = self.prepare_auth_token(app_user)
 
         self.course.enable_ccx = True
@@ -90,8 +89,9 @@ class CcxRestApiTest(CcxTestCase, APITestCase):
             'client_id': app_client.client_id,
             'client_secret': app_client.client_secret
         }
-        token_resp = self.client.post(reverse('oauth2:access_token'), data=token_data, format='multipart')
-        self.assertEqual(token_resp.status_code, status.HTTP_200_OK)
+        token_resp = self.client.post(reverse('oauth2:access_token'), data=token_data)
+        assert token_resp.status_code == status.HTTP_200_OK
+
         token_resp_json = json.loads(token_resp.content)
         return '{token_type} {token}'.format(
             token_type=token_resp_json['token_type'],
@@ -118,7 +118,7 @@ class CcxRestApiTest(CcxTestCase, APITestCase):
         )
 
         # create an oauth2 provider client app entry
-        app_client_oauth2_provider = dot_models.Application.objects.create(
+        app_client_oauth2_provider = get_application_model().objects.create(
             name='test client 2',
             user=user,
             client_type='confidential',
@@ -126,7 +126,7 @@ class CcxRestApiTest(CcxTestCase, APITestCase):
             redirect_uris='http://localhost:8079/complete/edxorg/'
         )
         # create an authorization code
-        auth_oauth2_provider = dot_models.AccessToken.objects.create(
+        auth_oauth2_provider = AccessToken.objects.create(
             user=user,
             application=app_client_oauth2_provider,
             expires=datetime.utcnow() + timedelta(weeks=1),
