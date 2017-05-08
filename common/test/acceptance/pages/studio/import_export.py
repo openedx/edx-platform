@@ -253,17 +253,6 @@ class ImportMixin(ImportExportMixin):
         """
         return self.q(css='.choose-file-button').present
 
-    def is_click_handler_registered(self):
-        """
-        Check if the click handler for the file selector button has been registered yet
-        """
-        script = """
-            var $ = require('jquery'),
-                    buttonEvents = $._data($('a.choose-file-button')[0], 'events');
-            return buttonEvents && buttonEvents.hasOwnProperty('click');"""
-        stripped_script = ''.join([line.strip() for line in script.split('\n')])
-        return self.browser.execute_script(stripped_script)
-
     @staticmethod
     def file_path(filename):
         """
@@ -324,13 +313,6 @@ class ImportMixin(ImportExportMixin):
         Tell us whether it's currently being shown.
         """
         return self.q(css='#fileupload .error-block').visible
-
-    def wait_for_choose_file_click_handler(self):
-        """
-        Wait for the choose file button click handler to be registered
-        """
-        EmptyPromise(self.is_click_handler_registered, 'Choose File Button Click Handler Registered',
-                     timeout=30).fulfill()
 
     def wait_for_filename_error(self):
         """

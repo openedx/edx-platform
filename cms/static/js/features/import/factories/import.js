@@ -116,7 +116,7 @@ define([
                                         Import.reset();
                                         onComplete();
 
-                                        alert(gettext('Your import has failed.') + '\n\n' + errMsg);
+                                        alert(gettext('Your import has failed.') + '\n\n' + errMsg);  // eslint-disable-line max-len, no-alert
                                     }
                                 }
                             });
