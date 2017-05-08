@@ -13,22 +13,33 @@ class CatalogFixture(object):
     """
     Interface to set up mock responses from the Catalog stub server.
     """
-    def install_programs(self, data):
-        """Set response data for the catalog's course run API."""
+    def install_programs(self, programs):
+        """
+        Stub the discovery service's program list and detail API endpoints.
+
+        Arguments:
+            programs (list): A list of programs. Both list and detail endpoints
+                will be stubbed using data from this list.
+        """
         key = 'catalog.programs'
 
-        if isinstance(data, dict):
-            key += '.' + data['uuid']
+        uuids = []
+        for program in programs:
+            uuid = program['uuid']
+            uuids.append(uuid)
+
+            program_key = '{base}.{uuid}'.format(base=key, uuid=uuid)
 
             requests.put(
                 '{}/set_config'.format(CATALOG_STUB_URL),
-                data={key: json.dumps(data)},
+                data={program_key: json.dumps(program)},
             )
-        else:
-            requests.put(
-                '{}/set_config'.format(CATALOG_STUB_URL),
-                data={key: json.dumps({'results': data})},
-            )
+
+        # Stub list endpoint as if the uuids_only query param had been passed.
+        requests.put(
+            '{}/set_config'.format(CATALOG_STUB_URL),
+            data={key: json.dumps(uuids)},
+        )
 
 
 class CatalogIntegrationMixin(object):

@@ -6,6 +6,7 @@ from common.test.acceptance.fixtures.programs import ProgramsConfigMixin
 from common.test.acceptance.fixtures.course import CourseFixture
 from common.test.acceptance.tests.helpers import UniqueCourseTest
 from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.lms.catalog import CacheProgramsPage
 from common.test.acceptance.pages.lms.programs import ProgramListingPage, ProgramDetailsPage
 from openedx.core.djangoapps.catalog.tests.factories import (
     ProgramFactory, CourseFactory, CourseRunFactory
@@ -39,10 +40,19 @@ class ProgramPageBase(ProgramsConfigMixin, CatalogIntegrationMixin, UniqueCourse
 
         return ProgramFactory(courses=[course])
 
-    def stub_catalog_api(self, data=None):
-        """Stub out the catalog API's program and course run endpoints."""
+    def stub_catalog_api(self, programs):
+        """
+        Stub the discovery service's program list and detail API endpoints.
+        """
         self.set_catalog_integration(is_enabled=True, service_username=self.username)
-        CatalogFixture().install_programs(data or self.programs)
+        CatalogFixture().install_programs(programs)
+
+    def cache_programs(self):
+        """
+        Populate the LMS' cache of program data.
+        """
+        cache_programs_page = CacheProgramsPage(self.browser)
+        cache_programs_page.visit()
 
 
 class ProgramListingPageTest(ProgramPageBase):
@@ -55,7 +65,8 @@ class ProgramListingPageTest(ProgramPageBase):
     def test_no_enrollments(self):
         """Verify that no cards appear when the user has no enrollments."""
         self.auth(enroll=False)
-        self.stub_catalog_api()
+        self.stub_catalog_api(self.programs)
+        self.cache_programs()
 
         self.listing_page.visit()
 
@@ -68,7 +79,8 @@ class ProgramListingPageTest(ProgramPageBase):
         but none are included in an active program.
         """
         self.auth()
-        self.stub_catalog_api()
+        self.stub_catalog_api(self.programs)
+        self.cache_programs()
 
         self.listing_page.visit()
 
@@ -83,7 +95,8 @@ class ProgramListingPageTest(ProgramPageBase):
         self.auth()
 
         program = self.create_program()
-        self.stub_catalog_api(data=[program])
+        self.stub_catalog_api(programs=[program])
+        self.cache_programs()
 
         self.listing_page.visit()
 
@@ -104,7 +117,8 @@ class ProgramListingPageA11yTest(ProgramPageBase):
     def test_empty_a11y(self):
         """Test a11y of the page's empty state."""
         self.auth(enroll=False)
-        self.stub_catalog_api(data=[self.program])
+        self.stub_catalog_api(programs=[self.program])
+        self.cache_programs()
 
         self.listing_page.visit()
 
@@ -115,7 +129,8 @@ class ProgramListingPageA11yTest(ProgramPageBase):
     def test_cards_a11y(self):
         """Test a11y when program cards are present."""
         self.auth()
-        self.stub_catalog_api(data=[self.program])
+        self.stub_catalog_api(programs=[self.program])
+        self.cache_programs()
 
         self.listing_page.visit()
 
@@ -138,7 +153,8 @@ class ProgramDetailsPageA11yTest(ProgramPageBase):
     def test_a11y(self):
         """Test the page's a11y compliance."""
         self.auth()
-        self.stub_catalog_api(data=self.program)
+        self.stub_catalog_api(programs=[self.program])
+        self.cache_programs()
 
         self.details_page.visit()
 

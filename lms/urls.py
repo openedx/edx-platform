@@ -86,6 +86,8 @@ urlpatterns = (
     url(r'^rss_proxy/', include('rss_proxy.urls', namespace='rss_proxy')),
     url(r'^api/organizations/', include('organizations.urls', namespace='organizations')),
 
+    url(r'^catalog/', include('openedx.core.djangoapps.catalog.urls', namespace='catalog')),
+
     # Update session view
     url(
         r'^lang_pref/session_language',
