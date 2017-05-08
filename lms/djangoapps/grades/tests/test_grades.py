@@ -101,7 +101,7 @@ class TestGradeIteration(SharedModuleStoreTestCase):
         with self.assertNumQueries(4):
             all_course_grades, all_errors = self._course_grades_and_errors_for(self.course, self.students)
         self.assertEqual(
-            all_errors,
+            {student: all_errors[student].message for student in all_errors},
             {
                 student3: "Error for student3.",
                 student4: "Error for student4.",
@@ -130,10 +130,10 @@ class TestGradeIteration(SharedModuleStoreTestCase):
         students_to_course_grades = {}
         students_to_errors = {}
 
-        for student, course_grade, err_msg in CourseGradeFactory().iter(students, course):
+        for student, course_grade, error in CourseGradeFactory().iter(students, course):
             students_to_course_grades[student] = course_grade
-            if err_msg:
-                students_to_errors[student] = err_msg
+            if error:
+                students_to_errors[student] = error
 
         return students_to_course_grades, students_to_errors
 
