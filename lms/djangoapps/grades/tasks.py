@@ -54,8 +54,8 @@ class _BaseTask(PersistOnFailureTask, LoggedTask):  # pylint: disable=abstract-m
     abstract = True
 
 
-@task(base=_BaseTask)
-def compute_grades_for_course_v2(**kwargs):
+@task(base=_BaseTask, bind=True, default_retry_delay=30, max_retries=1)
+def compute_grades_for_course_v2(self, **kwargs):
     """
     Compute grades for a set of students in the specified course.
 
@@ -80,7 +80,10 @@ def compute_grades_for_course_v2(**kwargs):
     estimate_first_attempted = kwargs.pop('estimate_first_attempted', False)
     if estimate_first_attempted:
         waffle().override_for_request(ESTIMATE_FIRST_ATTEMPTED, True)
-    return compute_grades_for_course(course_key, offset, batch_size)
+    try:
+        return compute_grades_for_course(course_key, offset, batch_size)
+    except Exception as exc:   # pylint: disable=broad-except
+        raise self.retry(kwargs=kwargs, exc=exc)
 
 
 @task(base=_BaseTask)
