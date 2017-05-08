@@ -322,10 +322,10 @@ class CourseGradeReport(object):
         certificate_whitelist = CertificateWhitelist.objects.filter(course_id=context.course_id, whitelist=True)
         whitelisted_user_ids = [entry.user_id for entry in certificate_whitelist]
         success_rows, error_rows = [], []
-        for user, course_grade, err_msg in CourseGradeFactory().iter(users, course_key=context.course_id):
+        for user, course_grade, error in CourseGradeFactory().iter(users, course_key=context.course_id):
             if not course_grade:
                 # An empty gradeset means we failed to grade a student.
-                error_rows.append([user.id, user.username, err_msg])
+                error_rows.append([user.id, user.username, error.message])
             else:
                 success_rows.append(
                     [user.id, user.email, user.username] +
@@ -365,11 +365,12 @@ class ProblemGradeReport(object):
         current_step = {'step': 'Calculating Grades'}
 
         course = get_course_by_id(course_id)
-        for student, course_grade, err_msg in CourseGradeFactory().iter(enrolled_students, course):
+        for student, course_grade, error in CourseGradeFactory().iter(enrolled_students, course):
             student_fields = [getattr(student, field_name) for field_name in header_row]
             task_progress.attempted += 1
 
             if not course_grade:
+                err_msg = error.message
                 # There was an error grading this student.
                 if not err_msg:
                     err_msg = u'Unknown error'
