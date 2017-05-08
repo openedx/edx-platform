@@ -202,7 +202,7 @@
                 var $general;
                 this.$('.forum-new-post-form')[0].reset();
                 DiscussionUtil.clearFormErrors(this.$('.post-errors'));
-                this.$('.wmd-preview p').html('');
+                this.$('.wmd-preview').html('');
                 if (this.isTabMode()) {
                     $general = this.$('.post-topic option:contains(General)');
                     this.topicView.setTopic($general || this.$('button.topic-title').first());
