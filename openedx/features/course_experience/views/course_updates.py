@@ -13,7 +13,7 @@ from courseware.courses import get_course_info_section, get_course_with_access
 from lms.djangoapps.courseware.views.views import CourseTabView
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
-from openedx.features.course_experience import defaut_course_url_name
+from openedx.features.course_experience import default_course_url_name
 from web_fragments.fragment import Fragment
 
 
@@ -45,7 +45,7 @@ class CourseUpdatesFragmentView(EdxFragmentView):
         """
         course_key = CourseKey.from_string(course_id)
         course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
-        course_url_name = defaut_course_url_name(request)
+        course_url_name = default_course_url_name(request)
         course_url = reverse(course_url_name, kwargs={'course_id': unicode(course.id)})
 
         # Fetch the updates as HTML

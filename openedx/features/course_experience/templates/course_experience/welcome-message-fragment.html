@@ -1,0 +1,14 @@
+## mako
+
+<%page expression_filter="h"/>
+<%namespace name='static' file='../static_content.html'/>
+
+<%!
+from openedx.core.djangolib.markup import HTML
+%>
+
+<%block name="content">
+<div class="welcome-message">
+    ${HTML(welcome_message_html)}
+</div>
+</%block>

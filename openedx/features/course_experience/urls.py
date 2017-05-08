@@ -7,6 +7,7 @@ from django.conf.urls import url
 from views.course_home import CourseHomeView, CourseHomeFragmentView
 from views.course_outline import CourseOutlineFragmentView
 from views.course_updates import CourseUpdatesFragmentView, CourseUpdatesView
+from views.welcome_message import WelcomeMessageFragmentView
 
 urlpatterns = [
     url(
@@ -33,5 +34,10 @@ urlpatterns = [
         r'^updates_fragment$',
         CourseUpdatesFragmentView.as_view(),
         name='openedx.course_experience.course_updates_fragment_view',
+    ),
+    url(
+        r'^welcome_message_fragment$',
+        WelcomeMessageFragmentView.as_view(),
+        name='openedx.course_experience.welcome_message_fragment_view',
     ),
 ]
