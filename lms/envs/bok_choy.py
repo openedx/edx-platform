@@ -237,8 +237,6 @@ from django.db.utils import ProgrammingError
 from waffle.models import Flag
 try:
     flag, created = Flag.objects.get_or_create(name='unified_course_view')
-    flag.everyone = True
-    flag.save
     WAFFLE_OVERRIDE = True
 except ProgrammingError:
     # during initial reset_db, the table for the flag doesn't yet exist.
