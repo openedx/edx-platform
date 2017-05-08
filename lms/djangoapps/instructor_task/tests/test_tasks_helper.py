@@ -132,7 +132,7 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
         progress dict and uploaded to the report store.
         """
         mock_grades_iter.return_value = [
-            (self.create_student('username', 'student@example.com'), None, 'Cannot grade student')
+            (self.create_student('username', 'student@example.com'), None, TypeError('Cannot grade student'))
         ]
         result = CourseGradeReport.generate(None, None, self.course.id, None, 'graded')
         self.assertDictContainsSubset({'attempted': 1, 'succeeded': 0, 'failed': 1}, result)
@@ -315,7 +315,7 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
             (
                 self.create_student('username', 'student@example.com'),
                 mock_course_grade,
-                '',
+                None,
             )
         ]
         result = CourseGradeReport.generate(None, None, self.course.id, None, 'graded')
@@ -667,7 +667,7 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         """
         student = self.create_student(u'username', u'student@example.com')
         mock_grades_iter.return_value = [
-            (student, None, error_message)
+            (student, None, Exception(error_message))
         ]
         result = ProblemGradeReport.generate(None, None, self.course.id, None, 'graded')
         self.assertDictContainsSubset({'attempted': 1, 'succeeded': 0, 'failed': 1}, result)

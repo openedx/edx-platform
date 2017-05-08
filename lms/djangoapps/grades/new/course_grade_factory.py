@@ -18,7 +18,7 @@ class CourseGradeFactory(object):
     """
     Factory class to create Course Grade objects.
     """
-    GradeResult = namedtuple('GradeResult', ['student', 'course_grade', 'err_msg'])
+    GradeResult = namedtuple('GradeResult', ['student', 'course_grade', 'error'])
 
     def create(self, user, course=None, collected_block_structure=None, course_structure=None, course_key=None):
         """
@@ -108,7 +108,7 @@ class CourseGradeFactory(object):
                 try:
                     method = CourseGradeFactory().update if force_update else CourseGradeFactory().create
                     course_grade = method(user, course, course_data.collected_structure, course_structure, course_key)
-                    yield self.GradeResult(user, course_grade, "")
+                    yield self.GradeResult(user, course_grade, None)
 
                 except Exception as exc:  # pylint: disable=broad-except
                     # Keep marching on even if this student couldn't be graded for
@@ -119,7 +119,7 @@ class CourseGradeFactory(object):
                         course_data.course_key,
                         exc.message
                     )
-                    yield self.GradeResult(user, None, exc.message)
+                    yield self.GradeResult(user, None, exc)
 
     @staticmethod
     def _create_zero(user, course_data):
