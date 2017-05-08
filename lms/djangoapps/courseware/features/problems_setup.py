@@ -390,7 +390,7 @@ def inputfield(course, problem_type, choice=None, input_num=1):
     ptype = problem_type.replace(" ", "_")
     # this is necessary due to naming requirement for this problem type
     if problem_type in ("radio_text", "checkbox_text"):
-        selector_template = "input#{}_2_{input}"
+        selector_template = "input#ctinput{}_2_{input}"
     else:
         selector_template = "input#input_{}_2_{input}"
 

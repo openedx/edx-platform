@@ -13,12 +13,12 @@
             var $node = $(elt);
             var name = $node.attr('id').replace('ctinput_', '');
             var val = $node.val();
-            var radio_value = $node.attr('value');
+            var radioValue = $node.attr('value');
             var type = $node.attr('type');
-            var is_checked = $node.attr('checked');
+            var isChecked = $node.attr('checked');
             if (type === 'radio' || type === 'checkbox') {
-                if (is_checked === 'checked' || is_checked === 'true') {
-                    user_inputs[name] = radio_value;
+                if (isChecked === 'checked' || isChecked === 'true') {
+                    user_inputs[name] = radioValue;
                 }
             } else {
                 user_inputs[name] = val;
