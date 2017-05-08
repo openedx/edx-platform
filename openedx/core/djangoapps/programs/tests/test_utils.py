@@ -136,6 +136,34 @@ class TestProgramProgressMeter(TestCase):
         )
         self.assertEqual(meter.completed_programs, [])
 
+    def test_course_run_no_image(self, mock_get_programs):
+        """
+        Verify that if the course run does not have an image course image is
+        used instead.
+        """
+        course_run_key = generate_course_run_key()
+        data = [
+            ProgramFactory(
+                courses=[
+                    CourseFactory(course_runs=[
+                        CourseRunFactory(key=course_run_key, image=None),
+                    ]),
+                ]
+            ),
+            ProgramFactory(),
+        ]
+        mock_get_programs.return_value = data
+
+        self._create_enrollments(course_run_key)
+        meter = ProgramProgressMeter(self.user)
+        invert_program = meter.invert_programs()
+        actual_program = invert_program[course_run_key]
+
+        self._attach_detail_url(data)
+        self.assertEqual(
+            actual_program[0]['courses'][0]['course_runs'][0]['image'], data[0]['courses'][0]['image']
+        )
+
     def test_course_progress(self, mock_get_programs):
         """
         Verify that the progress meter can represent progress in terms of
