@@ -19,6 +19,7 @@ from edxmako.shortcuts import marketing_link
 from util.cache import cache_if_anonymous
 from util.json_request import JsonResponse
 import branding.api as branding_api
+from openedx.core.djangoapps.lang_pref.api import released_languages
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 log = logging.getLogger(__name__)
@@ -121,12 +122,14 @@ def _footer_css_urls(request, package_name):
     ]
 
 
-def _render_footer_html(request, show_openedx_logo, include_dependencies):
+def _render_footer_html(request, show_openedx_logo, include_dependencies, lang_opts):
     """Render the footer as HTML.
 
     Arguments:
         show_openedx_logo (bool): If True, include the OpenEdX logo in the rendered HTML.
         include_dependencies (bool): If True, include JavaScript and CSS dependencies.
+        lang_opts (list<tuple>): A list of language options (code, display name) to use to populate
+            a language selector. If len(lang_opts) <= 1, the language selector will be omitted.
 
     Returns: unicode
 
@@ -140,6 +143,7 @@ def _render_footer_html(request, show_openedx_logo, include_dependencies):
         'footer_css_urls': _footer_css_urls(request, css_name),
         'bidi': bidi,
         'include_dependencies': include_dependencies,
+        'lang_opts': lang_opts
     }
 
     return render_to_response("footer.html", context)
@@ -234,6 +238,11 @@ def footer(request):
         GET /api/branding/v1/footer?language=en
         Accepts: text/html
 
+    Example: Retrieving the footer with a language selector
+
+        GET /api/branding/v1/footer?language-selector-opts=en,es_419
+        Accepts: text/html
+
     Example: Retrieving the footer with all JS and CSS dependencies (for testing)
 
         GET /api/branding/v1/footer?include-dependencies=1
@@ -256,6 +265,11 @@ def footer(request):
     # Override the language if necessary
     language = request.GET.get('language', translation.get_language())
 
+    lang_opts = request.GET.get('language-selector-opts', '')
+    if lang_opts:
+        released = {lang.code: lang.name for lang in released_languages()}
+        lang_opts = [(code, released[code]) for code in lang_opts.split(',') if code in released]
+
     # Render the footer information based on the extension
     if 'text/html' in accepts or '*/*' in accepts:
         cache_key = u"branding.footer.{params}.html".format(
@@ -263,12 +277,13 @@ def footer(request):
                 'language': language,
                 'show_openedx_logo': show_openedx_logo,
                 'include_dependencies': include_dependencies,
+                'language_options': ','.join(sorted([code for code, _ in lang_opts]))
             })
         )
         content = cache.get(cache_key)
         if content is None:
             with translation.override(language):
-                content = _render_footer_html(request, show_openedx_logo, include_dependencies)
+                content = _render_footer_html(request, show_openedx_logo, include_dependencies, lang_opts)
                 cache.set(cache_key, content, settings.FOOTER_CACHE_TIMEOUT)
         return HttpResponse(content, status=200, content_type="text/html; charset=utf-8")
 
