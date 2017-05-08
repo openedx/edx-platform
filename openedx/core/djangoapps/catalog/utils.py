@@ -2,7 +2,6 @@
 import copy
 import logging
 
-import waffle
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
@@ -39,62 +38,27 @@ def get_programs(uuid=None):
         list of dict, representing programs.
         dict, if a specific program is requested.
     """
-    if waffle.switch_is_active('read_cached_programs'):
-        missing_details_msg_tpl = 'Details for program {uuid} are not cached.'
+    missing_details_msg_tpl = 'Details for program {uuid} are not cached.'
 
-        if uuid:
-            program = cache.get(PROGRAM_CACHE_KEY_TPL.format(uuid=uuid))
-            if not program:
-                logger.warning(missing_details_msg_tpl.format(uuid=uuid))
-
-            return program
-
-        uuids = cache.get(PROGRAM_UUIDS_CACHE_KEY, [])
-        if not uuids:
-            logger.warning('Program UUIDs are not cached.')
-
-        programs = cache.get_many([PROGRAM_CACHE_KEY_TPL.format(uuid=uuid) for uuid in uuids])
-        programs = list(programs.values())
-
-        missing_uuids = set(uuids) - set(program['uuid'] for program in programs)
-        for uuid in missing_uuids:
+    if uuid:
+        program = cache.get(PROGRAM_CACHE_KEY_TPL.format(uuid=uuid))
+        if not program:
             logger.warning(missing_details_msg_tpl.format(uuid=uuid))
 
-        return programs
-    else:
-        # Old implementation which may request programs in-process. To be removed
-        # as part of LEARNER-382.
-        catalog_integration = CatalogIntegration.current()
-        if catalog_integration.enabled:
-            try:
-                user = User.objects.get(username=catalog_integration.service_username)
-            except User.DoesNotExist:
-                return []
+        return program
 
-            api = create_catalog_api_client(user, catalog_integration)
+    uuids = cache.get(PROGRAM_UUIDS_CACHE_KEY, [])
+    if not uuids:
+        logger.warning('Program UUIDs are not cached.')
 
-            cache_key = '{base}.programs'.format(
-                base=catalog_integration.CACHE_KEY
-            )
+    programs = cache.get_many([PROGRAM_CACHE_KEY_TPL.format(uuid=uuid) for uuid in uuids])
+    programs = list(programs.values())
 
-            querystring = {
-                'exclude_utm': 1,
-                'status': ('active', 'retired',),
-            }
+    missing_uuids = set(uuids) - set(program['uuid'] for program in programs)
+    for uuid in missing_uuids:
+        logger.warning(missing_details_msg_tpl.format(uuid=uuid))
 
-            if uuid:
-                querystring['use_full_course_serializer'] = 1
-
-            return get_edx_api_data(
-                catalog_integration,
-                'programs',
-                api=api,
-                resource_id=uuid,
-                cache_key=cache_key if catalog_integration.is_cache_enabled else None,
-                querystring=querystring,
-            )
-        else:
-            return []
+    return programs
 
 
 def get_program_types(name=None):
