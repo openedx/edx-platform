@@ -1,0 +1,30 @@
+<%page expression_filter="h" args="languages"/>
+<%!
+  from django.conf import settings
+  from django.utils.translation import ugettext as _
+
+  from openedx.core.djangolib.js_utils import js_escaped_string
+%>
+
+<div>
+    <label for="footer-language-selector">
+        <i class="fa fa-globe" aria-hidden="true"></i><span class="sr">${_("Choose Language")}</span>
+    </label>
+    <select id="footer-language-selector" class="js-language-selector" onchange="setLanguage(this)">
+        % for code, display in languages:
+            % if code == LANGUAGE_CODE:
+                <option value="${code}" selected="selected">${display}</option>
+            % else:
+                <option value="${code}">${display}</option>
+            % endif
+        % endfor
+    </select>
+</div>
+
+<script type="text/javascript">
+  function setLanguage(selectObj) {
+      document.cookie = '${settings.LANGUAGE_COOKIE | n, js_escaped_string}' + '=' + selectObj.value; 
+      window.location.reload();
+  }
+</script>
+
