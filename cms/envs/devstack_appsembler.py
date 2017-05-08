@@ -6,7 +6,6 @@ import dj_database_url
 
 INSTALLED_APPS += (
     'django_extensions',
-    'appsembler',
     'openedx.core.djangoapps.appsembler.sites',
 )
 

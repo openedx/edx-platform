@@ -14,7 +14,6 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 INSTALLED_APPS += (
     'django_extensions',
-    'appsembler',
     'openedx.core.djangoapps.appsembler.sites',
 )
 
