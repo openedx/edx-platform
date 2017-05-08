@@ -168,7 +168,6 @@ class ImportTestMixin(object):
             I can select the file and upload it
             And the page will give me confirmation that it uploaded successfully
         """
-        self.import_page.wait_for_choose_file_click_handler()
         self.import_page.upload_tarball(self.tarball_name)
         self.import_page.wait_for_upload()
 
@@ -184,7 +183,6 @@ class ImportTestMixin(object):
         # import_page timestamp is in (MM/DD/YYYY at HH:mm) so replacing (second, microsecond) to
         # keep the comparison consistent
         upload_start_time = datetime.utcnow().replace(microsecond=0, second=0)
-        self.import_page.wait_for_choose_file_click_handler()
         self.import_page.upload_tarball(self.tarball_name)
         self.import_page.wait_for_upload()
 
@@ -218,7 +216,6 @@ class ImportTestMixin(object):
             Given that I upload a library or course
             A button will appear that contains the URL to the library or course's main page
         """
-        self.import_page.wait_for_choose_file_click_handler()
         self.import_page.upload_tarball(self.tarball_name)
         self.assertEqual(self.import_page.finished_target_url(), self.landing_page.url)
 
@@ -228,7 +225,6 @@ class ImportTestMixin(object):
             Given that I select a file that is an .mp4 for upload
             An error message will appear
         """
-        self.import_page.wait_for_choose_file_click_handler()
         self.import_page.upload_tarball('funny_cat_video.mp4')
         self.import_page.wait_for_filename_error()
 
@@ -244,7 +240,6 @@ class ImportTestMixin(object):
         # The task list shouldn't be visible to start.
         self.assertFalse(self.import_page.is_task_list_showing(), "Task list shown too early.")
         self.import_page.wait_for_tasks()
-        self.import_page.wait_for_choose_file_click_handler()
         self.import_page.upload_tarball(self.tarball_name)
         self.import_page.wait_for_tasks(completed=True)
         self.assertTrue(self.import_page.is_task_list_showing(), "Task list did not display.")
@@ -258,7 +253,6 @@ class ImportTestMixin(object):
             And the 'Updating' task should be marked failed
             And the remaining tasks should not be marked as started
         """
-        self.import_page.wait_for_choose_file_click_handler()
         self.import_page.upload_tarball(self.bad_tarball_name)
         self.import_page.wait_for_tasks(fail_on='Updating')
 
@@ -296,7 +290,6 @@ class TestEntranceExamCourseImport(ImportTestMixin, StudioCourseTest):
         self.assertRaises(IndexError, self.landing_page.section, "Section")
         self.assertRaises(IndexError, self.landing_page.section, "Entrance Exam")
         self.import_page.visit()
-        self.import_page.wait_for_choose_file_click_handler()
         self.import_page.upload_tarball(self.tarball_name)
         self.import_page.wait_for_upload()
         self.landing_page.visit()
@@ -346,7 +339,6 @@ class TestCourseImport(ImportTestMixin, StudioCourseTest):
         # Should not exist yet.
         self.assertRaises(IndexError, self.landing_page.section, "Section")
         self.import_page.visit()
-        self.import_page.wait_for_choose_file_click_handler()
         self.import_page.upload_tarball(self.tarball_name)
         self.import_page.wait_for_upload()
         self.landing_page.visit()
@@ -373,7 +365,6 @@ class TestCourseImport(ImportTestMixin, StudioCourseTest):
         Then timestamp is not visible
         """
         self.import_page.visit()
-        self.import_page.wait_for_choose_file_click_handler()
         self.import_page.upload_tarball(self.tarball_name)
         self.import_page.wait_for_upload()
         self.assertTrue(self.import_page.is_timestamp_visible())
@@ -419,7 +410,6 @@ class TestLibraryImport(ImportTestMixin, StudioLibraryTest):
         # No items should be in the library to start.
         self.assertEqual(len(self.landing_page.xblocks), 0)
         self.import_page.visit()
-        self.import_page.wait_for_choose_file_click_handler()
         self.import_page.upload_tarball(self.tarball_name)
         self.import_page.wait_for_upload()
         self.landing_page.visit()

@@ -5,8 +5,14 @@
 var path = require('path');
 var webpack = require('webpack');
 var BundleTracker = require('webpack-bundle-tracker');
+var StringReplace = require('string-replace-webpack-plugin');
 
 var isProd = process.env.NODE_ENV === 'production';
+
+var namespacedRequireFiles = [
+    path.resolve(__dirname, 'common/static/common/js/components/views/feedback_notification.js'),
+    path.resolve(__dirname, 'common/static/common/js/components/views/feedback.js')
+];
 
 var wpconfig = {
     context: __dirname,
@@ -52,8 +58,29 @@ var wpconfig = {
     module: {
         rules: [
             {
+                test: namespacedRequireFiles,
+                loader: StringReplace.replace(
+                    ['babel-loader'],
+                    {
+                        replacements: [
+                            {
+                                pattern: /\(function ?\(define\) ?\{/,
+                                replacement: function() { return ''; }
+                            },
+                            {
+                                pattern: /\}\)\.call\(this, define \|\| RequireJS\.define\);/,
+                                replacement: function() { return ''; }
+                            }
+                        ]
+                    }
+                )
+            },
+            {
                 test: /\.js$/,
-                exclude: /node_modules/,
+                exclude: [
+                    /node_modules/,
+                    namespacedRequireFiles
+                ],
                 use: 'babel-loader'
             },
             {
@@ -72,7 +99,8 @@ var wpconfig = {
                 use: {
                     loader: 'imports-loader',
                     options: {
-                        AjaxPrefix: 'exports-loader?this.AjaxPrefix!../../../../common/static/coffee/src/ajax_prefix.coffee'
+                        AjaxPrefix:
+                            'exports-loader?this.AjaxPrefix!../../../../common/static/coffee/src/ajax_prefix.coffee'
                     }
                 }
             }

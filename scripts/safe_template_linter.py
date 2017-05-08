@@ -2378,6 +2378,8 @@ class MakoTemplateLinter(BaseLinter):
                 </script> |  # script tag end
                 <%static:require_module(_async)?.*?> |  # require js script tag start (optionally the _async version)
                 </%static:require_module(_async)?> | # require js script tag end (optionally the _async version)
+                <%static:webpack.*?> |  # webpack script tag start
+                </%static:webpack> | # webpack script tag end
                 <%block[ ]*name=['"]requirejs['"]\w*> |  # require js tag start
                 </%block>  # require js tag end
             """,
