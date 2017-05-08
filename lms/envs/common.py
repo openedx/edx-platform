@@ -270,7 +270,7 @@ FEATURES = {
     'ALLOW_AUTOMATED_SIGNUPS': False,
 
     # Enable display of enrollment counts in instructor dash, analytics section
-    'DISPLAY_ANALYTICS_ENROLLMENTS': True,
+    'DISPLAY_ANALYTICS_ENROLLMENTS': False,
 
     # Show the mobile app links in the footer
     'ENABLE_FOOTER_MOBILE_APP_LINKS': False,
