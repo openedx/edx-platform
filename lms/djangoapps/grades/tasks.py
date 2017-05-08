@@ -96,7 +96,9 @@ def compute_grades_for_course(course_key, offset, batch_size, **kwargs):  # pyli
     course = courses.get_course_by_id(CourseKey.from_string(course_key))
     enrollments = CourseEnrollment.objects.filter(course_id=course.id).order_by('created')
     student_iter = (enrollment.user for enrollment in enrollments[offset:offset + batch_size])
-    list(CourseGradeFactory().iter(users=student_iter, course=course, force_update=True))
+    for result in CourseGradeFactory().iter(users=student_iter, course=course, force_update=True):
+        if result.error is not None:
+            raise result.error
 
 
 @task(bind=True, base=_BaseTask, default_retry_delay=30, routing_key=settings.RECALCULATE_GRADES_ROUTING_KEY)
