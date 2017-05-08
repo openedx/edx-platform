@@ -96,9 +96,16 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     def test_course_info_feature_flag(self):
         SelfPacedConfiguration(enable_course_home_improvements=False).save()
         self.setup_course_and_user()
+        self.client.login(username='mrrobot', password='test')
         url = reverse('info', args=(self.course.id,))
         response = self.client.get(url)
         self.assertNotIn('date-summary', response.content)
+
+    def test_course_info_logged_out(self):
+        self.setup_course_and_user()
+        url = reverse('info', args=(self.course.id,))
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
 
     # Tests for which blocks are enabled
     def assert_block_types(self, expected_blocks):
