@@ -8,7 +8,7 @@
         'underscore.string',
         'backbone',
         'gettext',
-        '../../../../common/static/common/js/components/views/feedback_notification',
+        '../../common/js/components/views/feedback_notification',
         'jquery.cookie'
     ], function(domReady, $, str, Backbone, gettext, NotificationView) {
         var main, sendJSON;
