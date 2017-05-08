@@ -228,7 +228,7 @@ class TestProgramListing(ProgramsApiConfigMixin, CredentialsApiConfigMixin, Shar
 
 
 @skip_unless_lms
-@mock.patch(CATALOG_UTILS_MODULE + '.get_edx_api_data')
+@mock.patch(PROGRAMS_UTILS_MODULE + '.get_programs')
 class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, SharedModuleStoreTestCase):
     """Unit tests for the program details page."""
     program_uuid = str(uuid4())
@@ -266,7 +266,7 @@ class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, Shared
             any(soup.find_all('a', class_='tab-nav-link', href=reverse('program_listing_view')))
         )
 
-    def test_login_required(self, mock_get_edx_api_data):
+    def test_login_required(self, mock_get_programs):
         """
         Verify that login is required to access the page.
         """
@@ -275,7 +275,7 @@ class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, Shared
         catalog_integration = self.create_catalog_integration()
         UserFactory(username=catalog_integration.service_username)
 
-        mock_get_edx_api_data.return_value = self.data
+        mock_get_programs.return_value = self.data
 
         self.client.logout()
 
@@ -290,7 +290,7 @@ class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, Shared
         response = self.client.get(self.url)
         self.assert_program_data_present(response)
 
-    def test_404_if_disabled(self, _mock_get_edx_api_data):
+    def test_404_if_disabled(self, _mock_get_programs):
         """
         Verify that the page 404s if disabled.
         """
@@ -299,9 +299,11 @@ class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, Shared
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 404)
 
-    def test_404_if_no_data(self, _mock_get_edx_api_data):
+    def test_404_if_no_data(self, mock_get_programs):
         """Verify that the page 404s if no program data is found."""
         self.create_programs_config()
+
+        mock_get_programs.return_value = None
 
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 404)

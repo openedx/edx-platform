@@ -7,7 +7,6 @@ import mock
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.test import TestCase
-from waffle.models import Switch
 
 from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL, PROGRAM_UUIDS_CACHE_KEY
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
@@ -29,13 +28,8 @@ User = get_user_model()  # pylint: disable=invalid-name
 
 @skip_unless_lms
 @mock.patch(UTILS_MODULE + '.logger.warning')
-class TestGetCachedPrograms(CacheIsolationTestCase):
+class TestGetPrograms(CacheIsolationTestCase):
     ENABLED_CACHES = ['default']
-
-    def setUp(self):
-        super(TestGetCachedPrograms, self).setUp()
-
-        Switch.objects.create(name='read_cached_programs', active=True)
 
     def test_get_many(self, mock_warning):
         programs = ProgramFactory.create_batch(3)
@@ -118,130 +112,6 @@ class TestGetCachedPrograms(CacheIsolationTestCase):
         actual_program = get_programs(uuid=expected_uuid)
         self.assertEqual(actual_program, expected_program)
         self.assertFalse(mock_warning.called)
-
-
-@skip_unless_lms
-@mock.patch(UTILS_MODULE + '.get_edx_api_data')
-class TestGetPrograms(CatalogIntegrationMixin, TestCase):
-    """Tests covering retrieval of programs from the catalog service."""
-    def setUp(self):
-        super(TestGetPrograms, self).setUp()
-
-        self.uuid = str(uuid.uuid4())
-        self.types = ['Foo', 'Bar', 'FooBar']
-        self.catalog_integration = self.create_catalog_integration(cache_ttl=1)
-
-        UserFactory(username=self.catalog_integration.service_username)
-
-    def assert_contract(self, call_args, program_uuid=None, types=None):
-        """Verify that API data retrieval utility is used correctly."""
-        args, kwargs = call_args
-
-        for arg in (self.catalog_integration, 'programs'):
-            self.assertIn(arg, args)
-
-        self.assertEqual(kwargs['resource_id'], program_uuid)
-
-        types_param = ','.join(types) if types and isinstance(types, list) else None
-        cache_key = '{base}.programs{types}'.format(
-            base=self.catalog_integration.CACHE_KEY,
-            types='.' + types_param if types_param else ''
-        )
-        self.assertEqual(
-            kwargs['cache_key'],
-            cache_key if self.catalog_integration.is_cache_enabled else None
-        )
-
-        self.assertEqual(kwargs['api']._store['base_url'], self.catalog_integration.internal_api_url)  # pylint: disable=protected-access
-
-        querystring = {
-            'exclude_utm': 1,
-            'status': ('active', 'retired',),
-        }
-        if program_uuid:
-            querystring['use_full_course_serializer'] = 1
-        if types:
-            querystring['types'] = types_param
-
-        self.assertEqual(kwargs['querystring'], querystring)
-
-        return args, kwargs
-
-    def test_get_programs(self, mock_get_edx_api_data):
-        programs = ProgramFactory.create_batch(3)
-        mock_get_edx_api_data.return_value = programs
-
-        data = get_programs()
-
-        self.assert_contract(mock_get_edx_api_data.call_args)
-        self.assertEqual(data, programs)
-
-    def test_get_one_program(self, mock_get_edx_api_data):
-        program = ProgramFactory()
-        mock_get_edx_api_data.return_value = program
-
-        data = get_programs(uuid=self.uuid)
-
-        self.assert_contract(mock_get_edx_api_data.call_args, program_uuid=self.uuid)
-        self.assertEqual(data, program)
-
-    def test_programs_unavailable(self, mock_get_edx_api_data):
-        mock_get_edx_api_data.return_value = []
-
-        data = get_programs()
-
-        self.assert_contract(mock_get_edx_api_data.call_args)
-        self.assertEqual(data, [])
-
-    def test_cache_disabled(self, mock_get_edx_api_data):
-        self.catalog_integration = self.create_catalog_integration(cache_ttl=0)
-        get_programs()
-        self.assert_contract(mock_get_edx_api_data.call_args)
-
-    def test_config_missing(self, _mock_get_edx_api_data):
-        """
-        Verify that no errors occur if this method is called when catalog config
-        is missing.
-        """
-        CatalogIntegration.objects.all().delete()
-
-        data = get_programs()
-        self.assertEqual(data, [])
-
-    def test_service_user_missing(self, _mock_get_edx_api_data):
-        """
-        Verify that no errors occur if this method is called when the catalog
-        service user is missing.
-        """
-        # Note: Deleting the service user would be ideal, but causes mysterious
-        # errors on Jenkins.
-        self.create_catalog_integration(service_username='nonexistent-user')
-
-        data = get_programs()
-        self.assertEqual(data, [])
-
-    @mock.patch(UTILS_MODULE + '.get_programs')
-    @mock.patch(UTILS_MODULE + '.get_program_types')
-    def test_get_programs_with_type(self, mock_get_program_types, mock_get_programs, _mock_get_edx_api_data):
-        """Verify get_programs_with_type returns the expected list of programs."""
-        programs_with_program_type = []
-        programs = ProgramFactory.create_batch(2)
-        program_types = []
-
-        for program in programs:
-            program_type = ProgramTypeFactory(name=program['type'])
-            program_types.append(program_type)
-
-            program_with_type = copy.deepcopy(program)
-            program_with_type['type'] = program_type
-            programs_with_program_type.append(program_with_type)
-
-        mock_get_programs.return_value = programs
-        mock_get_program_types.return_value = program_types
-
-        actual = get_programs_with_type()
-
-        self.assertEqual(actual, programs_with_program_type)
 
 
 @skip_unless_lms
