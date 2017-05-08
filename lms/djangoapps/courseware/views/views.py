@@ -334,10 +334,10 @@ def course_info(request, course_id):
 
         # Construct the dates fragment
         dates_fragment = None
-        if SelfPacedConfiguration.current().enable_course_home_improvements:
-            dates_fragment = CourseDatesFragmentView().render_to_fragment(request, course_id=course_id)
 
         if request.user.is_authenticated():
+            if SelfPacedConfiguration.current().enable_course_home_improvements:
+                dates_fragment = CourseDatesFragmentView().render_to_fragment(request, course_id=course_id)
             show_upgrade_notification = False
             if request.GET.get('upgrade', 'false') == 'true':
                 store_upgrade_cookie = True
