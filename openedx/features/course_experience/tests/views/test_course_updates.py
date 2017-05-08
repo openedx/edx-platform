@@ -3,11 +3,13 @@ Tests for the course updates page.
 """
 from django.core.urlresolvers import reverse
 
+from courseware.courses import get_course_info_section_module, get_course_info_usage_key
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.html_module import CourseInfoModule
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
@@ -24,6 +26,51 @@ def course_updates_url(course):
             'course_id': unicode(course.id),
         }
     )
+
+
+def create_course_update(course, user, content, date='December 31, 1999'):
+    """
+    Creates a test welcome message for the specified course.
+    """
+    updates_usage_key = get_course_info_usage_key(course, 'updates')
+    try:
+        course_updates = modulestore().get_item(updates_usage_key)
+    except ItemNotFoundError:
+        course_updates = create_course_updates_block(course, user)
+    course_updates.items.append({
+        "id": len(course_updates.items) + 1,
+        "date": date,
+        "content": content,
+        "status": CourseInfoModule.STATUS_VISIBLE
+    })
+    modulestore().update_item(course_updates, user.id)
+
+
+def create_course_updates_block(course, user):
+    """
+    Create a course updates block.
+    """
+    updates_usage_key = get_course_info_usage_key(course, 'updates')
+    course_updates = modulestore().create_item(
+        user.id,
+        updates_usage_key.course_key,
+        updates_usage_key.block_type,
+        block_id=updates_usage_key.block_id
+    )
+    course_updates.data = ''
+    return course_updates
+
+
+def remove_course_updates(course):
+    """
+    Remove any course updates in the specified course.
+    """
+    updates_usage_key = get_course_info_usage_key(course, 'updates')
+    try:
+        course_updates = modulestore().get_item(updates_usage_key)
+        course_updates.items = []
+    except ItemNotFoundError:
+        pass
 
 
 class TestCourseUpdatesPage(SharedModuleStoreTestCase):
@@ -50,24 +97,6 @@ class TestCourseUpdatesPage(SharedModuleStoreTestCase):
         cls.user = UserFactory(password=TEST_PASSWORD)
         CourseEnrollment.enroll(cls.user, cls.course.id)
 
-        # Create course updates
-        cls.create_course_updates(cls.course, cls.user)
-
-    @classmethod
-    def create_course_updates(cls, course, user, count=5):
-        """
-        Create some test course updates.
-        """
-        updates_usage_key = course.id.make_usage_key('course_info', 'updates')
-        course_updates = modulestore().create_item(
-            user.id,
-            updates_usage_key.course_key,
-            updates_usage_key.block_type,
-            block_id=updates_usage_key.block_id
-        )
-        course_updates.data = u'<ol><li><a href="test">Test Update</a></li></ol>'
-        modulestore().update_item(course_updates, user.id)
-
     def setUp(self):
         """
         Set up for the tests.
@@ -75,14 +104,25 @@ class TestCourseUpdatesPage(SharedModuleStoreTestCase):
         super(TestCourseUpdatesPage, self).setUp()
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
 
+    def tearDown(self):
+        remove_course_updates(self.course)
+        super(TestCourseUpdatesPage, self).tearDown()
+
     def test_view(self):
+        create_course_update(self.course, self.user, 'First Message')
+        create_course_update(self.course, self.user, 'Second Message')
         url = course_updates_url(self.course)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        response_content = response.content.decode("utf-8")
-        self.assertIn('<a href="test">Test Update</a>', response_content)
+        self.assertContains(response, 'First Message')
+        self.assertContains(response, 'Second Message')
 
     def test_queries(self):
+        create_course_update(self.course, self.user, 'First Message')
+
+        # Pre-fetch the view to populate any caches
+        course_updates_url(self.course)
+
         # Fetch the view and verify that the query counts haven't changed
         with self.assertNumQueries(32):
             with check_mongo_calls(4):

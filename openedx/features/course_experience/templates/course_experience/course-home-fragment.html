@@ -58,6 +58,12 @@ from openedx.features.course_experience import UNIFIED_COURSE_EXPERIENCE_FLAG
     <div class="page-content">
         <div class="layout layout-1q3q">
             <main class="layout-col layout-col-b">
+                % if welcome_message_fragment and waffle.flag_is_active(request, UNIFIED_COURSE_EXPERIENCE_FLAG):
+                    <div class="section section-dates">
+                        ${HTML(welcome_message_fragment.body_html())}
+                    </div>
+                % endif
+
                 ${HTML(outline_fragment.body_html())}
             </main>
             <aside class="course-sidebar layout-col layout-col-a">

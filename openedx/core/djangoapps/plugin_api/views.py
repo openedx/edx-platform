@@ -2,11 +2,11 @@
 Views for building plugins.
 """
 
-from abc import abstractmethod
 import logging
 
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
+from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from web_fragments.views import FragmentView
 
@@ -78,10 +78,14 @@ class EdxFragmentView(FragmentView):
         for js_file in self.js_dependencies():
             fragment.add_javascript_url(staticfiles_storage.url(js_file))
 
-    def render_to_standalone_html(self, request, fragment, **kwargs):
+    def render_standalone_response(self, request, fragment, **kwargs):
         """
-        Renders this fragment to HTML for a standalone page.
+        Renders a standalone page for the specified fragment.
+
+        Note: if fragment is None, a 204 response will be returned (no content).
         """
+        if fragment is None:
+            return HttpResponse(status=204)
         context = {
             'uses-pattern-library': self.USES_PATTERN_LIBRARY,
             'settings': settings,

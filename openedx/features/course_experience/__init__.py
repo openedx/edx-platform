@@ -14,7 +14,7 @@ UNIFIED_COURSE_EXPERIENCE_FLAG = 'unified_course_experience'
 UNIFIED_COURSE_VIEW_FLAG = 'unified_course_view'
 
 
-def defaut_course_url_name(request=None):
+def default_course_url_name(request=None):
     """
     Returns the default course URL name for the current user.
     """

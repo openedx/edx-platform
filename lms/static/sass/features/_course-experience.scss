@@ -1,3 +1,17 @@
+// Welcome message
+.welcome-message {
+  border: solid 1px $lms-border-color;
+  @include border-left(solid 4px $black);
+  margin-bottom: $baseline;
+  padding: $baseline;
+
+  h1, h2, h3 {
+    font-size: font-size(large);
+    font-weight: bold;
+    color: $black;
+  }
+}
+
 // Course sidebar
 .course-sidebar {
   @include margin-left(0);

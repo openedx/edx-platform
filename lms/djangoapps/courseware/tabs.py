@@ -10,7 +10,7 @@ from django.utils.translation import ugettext as _, ugettext_noop
 from courseware.access import has_access
 from courseware.entrance_exams import user_can_skip_entrance_exam
 from openedx.core.lib.course_tabs import CourseTabPluginManager
-from openedx.features.course_experience import defaut_course_url_name, UNIFIED_COURSE_EXPERIENCE_FLAG
+from openedx.features.course_experience import default_course_url_name, UNIFIED_COURSE_EXPERIENCE_FLAG
 from request_cache.middleware import RequestCache
 from student.models import CourseEnrollment
 from xmodule.tabs import CourseTab, CourseTabList, key_checker, link_reverse_func
@@ -45,7 +45,7 @@ class CoursewareTab(EnrolledTab):
         Returns a function that computes the URL for this tab.
         """
         request = RequestCache.get_current_request()
-        url_name = defaut_course_url_name(request)
+        url_name = default_course_url_name(request)
         return link_reverse_func(url_name)
 
 
