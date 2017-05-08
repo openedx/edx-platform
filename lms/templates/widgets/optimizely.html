@@ -1,5 +1,5 @@
 <%page expression_filter="h"/>
 
 % if settings.OPTIMIZELY_PROJECT_ID and not disable_optimizely:
-<script src=${ '//cdn.optimizely.com/js/{}.js'.format(settings.OPTIMIZELY_PROJECT_ID) }></script>
+<script src="${ '//cdn.optimizely.com/js/{}.js'.format(settings.OPTIMIZELY_PROJECT_ID) }"></script>
 % endif
