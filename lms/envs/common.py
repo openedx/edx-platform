@@ -290,6 +290,10 @@ FEATURES = {
     # For easily adding modes to courses during acceptance testing
     'MODE_CREATION_FOR_TESTING': False,
 
+    # For caching programs in contexts where the LMS can only
+    # be reached over HTTP.
+    'EXPOSE_CACHE_PROGRAMS_ENDPOINT': False,
+
     # Courseware search feature
     'ENABLE_COURSEWARE_SEARCH': False,
 

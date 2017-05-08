@@ -50,12 +50,10 @@ from lms.djangoapps.grades.config.waffle import waffle as grades_waffle, ASSUME_
 from milestones.tests.utils import MilestonesTestCaseMixin
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
 from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory, CourseRunFactory
-from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.credit.api import set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
-from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.lib.gating import api as gating_api
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
@@ -966,8 +964,10 @@ class ViewsTestCase(ModuleStoreTestCase):
 
 
 @attr(shard=2)
-@patch('openedx.core.djangoapps.catalog.utils.get_edx_api_data')
-class TestProgramMarketingView(ProgramsApiConfigMixin, CatalogIntegrationMixin, SharedModuleStoreTestCase):
+# Patching 'lms.djangoapps.courseware.views.views.get_programs' would be ideal,
+# but for some unknown reason that patch doesn't seem to be applied.
+@patch('openedx.core.djangoapps.catalog.utils.cache')
+class TestProgramMarketingView(SharedModuleStoreTestCase):
     """Unit tests for the program marketing page."""
     program_uuid = str(uuid4())
     url = reverse('program_marketing_view', kwargs={'program_uuid': program_uuid})
@@ -982,25 +982,20 @@ class TestProgramMarketingView(ProgramsApiConfigMixin, CatalogIntegrationMixin, 
 
         cls.data = ProgramFactory(uuid=cls.program_uuid, courses=[course])
 
-    def test_404_if_no_data(self, _mock_get_edx_api_data):
+    def test_404_if_no_data(self, mock_cache):
         """
         Verify that the page 404s if no program data is found.
         """
-        self.create_programs_config()
+        mock_cache.get.return_value = None
 
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 404)
 
-    def test_200(self, mock_get_edx_api_data):
+    def test_200(self, mock_cache):
         """
         Verify the view returns a 200.
         """
-        self.create_programs_config()
-
-        catalog_integration = self.create_catalog_integration()
-        UserFactory(username=catalog_integration.service_username)
-
-        mock_get_edx_api_data.return_value = self.data
+        mock_cache.get.return_value = self.data
 
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
