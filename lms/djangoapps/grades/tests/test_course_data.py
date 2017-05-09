@@ -4,6 +4,7 @@ Tests for CourseData utility class.
 from mock import patch
 
 from lms.djangoapps.course_blocks.api import get_course_blocks
+from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
 from student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -23,10 +24,13 @@ class CourseDataTest(ModuleStoreTestCase):
             # need to re-retrieve the course since the version on the original course isn't accurate.
             self.course = self.store.get_course(self.course.id)
         self.user = UserFactory.create()
-        self.one_true_structure = get_course_blocks(self.user, self.course.location)
+        self.collected_structure = get_course_in_cache(self.course.id)
+        self.one_true_structure = get_course_blocks(
+            self.user, self.course.location, collected_block_structure=self.collected_structure,
+        )
         self.expected_results = {
             'course': self.course,
-            'collected_block_structure': self.one_true_structure,
+            'collected_block_structure': self.collected_structure,
             'structure': self.one_true_structure,
             'course_key': self.course.id,
             'location': self.course.location,
@@ -75,3 +79,18 @@ class CourseDataTest(ModuleStoreTestCase):
     def test_no_data(self):
         with self.assertRaises(ValueError):
             _ = CourseData(self.user)
+
+    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    def test_full_string(self):
+        empty_structure = get_course_blocks(self.user, self.course.location)
+        self.assertFalse(empty_structure)
+
+        # full_string retrieves value from collected_structure when structure is empty.
+        course_data = CourseData(
+            self.user, structure=empty_structure, collected_block_structure=self.collected_structure,
+        )
+        self.assertIn(u'Course: course_key: {}, version:'.format(self.course.id), course_data.full_string())
+
+        # full_string returns minimal value when structures aren't readily available.
+        course_data = CourseData(self.user, course_key=self.course.id)
+        self.assertIn(u'empty course structure', course_data.full_string())
