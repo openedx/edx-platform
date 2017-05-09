@@ -1,5 +1,4 @@
 """Learner dashboard views"""
-import waffle
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.http import Http404
@@ -67,6 +66,7 @@ def program_details(request, program_uuid):
         'commerce_api_url': reverse('commerce_api:v0:baskets:create'),
     }
 
+    # TODO: Tighten this up!
     context = {
         'urls': urls,
         'show_program_listing': programs_config.enabled,
@@ -76,20 +76,15 @@ def program_details(request, program_uuid):
         'user_preferences': get_user_preferences(request.user)
     }
 
-    if waffle.switch_is_active('new_program_progress'):
-        course_data = meter.progress(programs=[program_data], count_only=False)[0]
-        certificate_data = get_certificates(request.user, program_data)
+    course_data = meter.progress(programs=[program_data], count_only=False)[0]
+    certificate_data = get_certificates(request.user, program_data)
 
-        program_data.pop('courses')
+    program_data.pop('courses')
 
-        context.update({
-            'program_data': program_data,
-            'course_data': course_data,
-            'certificate_data': certificate_data,
-        })
+    context.update({
+        'program_data': program_data,
+        'course_data': course_data,
+        'certificate_data': certificate_data,
+    })
 
-        return render_to_response('learner_dashboard/program_details_2017.html', context)
-    else:
-        context.update({'program_data': program_data})
-
-        return render_to_response('learner_dashboard/program_details.html', context)
+    return render_to_response('learner_dashboard/program_details.html', context)

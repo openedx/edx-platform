@@ -1,7 +1,7 @@
 define([
     'backbone',
     'jquery',
-    'js/learner_dashboard/views/program_details_view_2017'
+    'js/learner_dashboard/views/program_details_view'
 ], function(Backbone, $, ProgramDetailsView) {
     'use strict';
 
