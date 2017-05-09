@@ -53,7 +53,7 @@ def get_programs(uuid=None):
         if not uuids:
             logger.warning('Program UUIDs are not cached.')
 
-        programs = cache.get_many(PROGRAM_CACHE_KEY_TPL.format(uuid=uuid) for uuid in uuids)
+        programs = cache.get_many([PROGRAM_CACHE_KEY_TPL.format(uuid=uuid) for uuid in uuids])
         programs = list(programs.values())
 
         missing_uuids = set(uuids) - set(program['uuid'] for program in programs)
