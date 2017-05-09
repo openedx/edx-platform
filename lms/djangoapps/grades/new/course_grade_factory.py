@@ -81,7 +81,6 @@ class CourseGradeFactory(object):
             users,
             course=None,
             collected_block_structure=None,
-            course_structure=None,
             course_key=None,
             force_update=False,
     ):
@@ -99,7 +98,9 @@ class CourseGradeFactory(object):
         #    compute the grade for all students.
         # 2. Optimization: the collected course_structure is not
         #    retrieved from the data store multiple times.
-        course_data = CourseData(None, course, collected_block_structure, course_structure, course_key)
+        course_data = CourseData(
+            user=None, course=course, collected_block_structure=collected_block_structure, course_key=course_key,
+        )
         for user in users:
             with dog_stats_api.timer(
                     'lms.grades.CourseGradeFactory.iter',
@@ -107,7 +108,9 @@ class CourseGradeFactory(object):
             ):
                 try:
                     method = CourseGradeFactory().update if force_update else CourseGradeFactory().create
-                    course_grade = method(user, course, course_data.collected_structure, course_structure, course_key)
+                    course_grade = method(
+                        user, course_data.course, course_data.collected_structure, course_key=course_key,
+                    )
                     yield self.GradeResult(user, course_grade, None)
 
                 except Exception as exc:  # pylint: disable=broad-except
