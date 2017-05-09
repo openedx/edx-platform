@@ -70,7 +70,7 @@ class RandomUserPartitionScheme(object):
                     exc_info=True
                 )
 
-        if group is None and assign and not course_tag_api.BulkCourseTags.is_prefetched(course_key):
+        if group is None and assign:
             if not user_partition.groups:
                 raise UserPartitionError('Cannot assign user to an empty user partition')
 
