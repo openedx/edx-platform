@@ -30,25 +30,19 @@ from track.event_transaction_utils import (
 from util.date_utils import from_timestamp
 from xmodule.modulestore.django import modulestore
 
+from .config.waffle import waffle, ESTIMATE_FIRST_ATTEMPTED
 from .constants import ScoreDatabaseTableEnum
+from .exceptions import DatabaseNotReadyError
 from .new.subsection_grade_factory import SubsectionGradeFactory
 from .new.course_grade_factory import CourseGradeFactory
 from .signals.signals import SUBSECTION_SCORE_CHANGED
 from .transformer import GradesTransformer
 
 
-class DatabaseNotReadyError(IOError):
-    """
-    Subclass of IOError to indicate the database has not yet committed
-    the data we're trying to find.
-    """
-    pass
-
-
 KNOWN_RETRY_ERRORS = (  # Errors we expect occasionally, should be resolved on retry
     DatabaseError,
     ValidationError,
-    DatabaseNotReadyError
+    DatabaseNotReadyError,
 )
 RECALCULATE_GRADE_DELAY = 2  # in seconds, to prevent excessive _has_db_updated failures. See TNL-6424.
 
@@ -61,7 +55,36 @@ class _BaseTask(PersistOnFailureTask, LoggedTask):  # pylint: disable=abstract-m
 
 
 @task(base=_BaseTask)
-def compute_grades_for_course(course_key, offset, batch_size):
+def compute_grades_for_course_v2(**kwargs):
+    """
+    Compute grades for a set of students in the specified course.
+
+    The set of students will be determined by the order of enrollment date, and
+    limited to at most <batch_size> students, starting from the specified
+    offset.
+
+    TODO: Roll this back into compute_grades_for_course once all workers have
+    the version with **kwargs.
+
+    Sets the ESTIMATE_FIRST_ATTEMPTED flag, then calls the original task as a
+    synchronous function.
+
+    estimate_first_attempted:
+        controls whether to unconditionally set the ESTIMATE_FIRST_ATTEMPTED
+        waffle switch.  If false or not provided, use the global value of
+        the ESTIMATE_FIRST_ATTEMPTED waffle switch.
+    """
+    course_key = kwargs.pop('course_key')
+    offset = kwargs.pop('offset')
+    batch_size = kwargs.pop('batch_size')
+    estimate_first_attempted = kwargs.pop('estimate_first_attempted', False)
+    if estimate_first_attempted:
+        waffle().override_for_request(ESTIMATE_FIRST_ATTEMPTED, True)
+    return compute_grades_for_course(course_key, offset, batch_size)
+
+
+@task(base=_BaseTask)
+def compute_grades_for_course(course_key, offset, batch_size, **kwargs):  # pylint: disable=unused-argument
     """
     Compute grades for a set of students in the specified course.
 
@@ -73,7 +96,9 @@ def compute_grades_for_course(course_key, offset, batch_size):
     course = courses.get_course_by_id(CourseKey.from_string(course_key))
     enrollments = CourseEnrollment.objects.filter(course_id=course.id).order_by('created')
     student_iter = (enrollment.user for enrollment in enrollments[offset:offset + batch_size])
-    list(CourseGradeFactory().iter(course, students=student_iter, force_update=True))
+    for result in CourseGradeFactory().iter(users=student_iter, course=course, force_update=True):
+        if result.error is not None:
+            raise result.error
 
 
 @task(bind=True, base=_BaseTask, default_retry_delay=30, routing_key=settings.RECALCULATE_GRADES_ROUTING_KEY)
@@ -189,12 +214,7 @@ def _has_db_updated_with_new_score(self, scored_block_usage_key, **kwargs):
     return db_is_updated
 
 
-def _update_subsection_grades(
-        course_key,
-        scored_block_usage_key,
-        only_if_higher,
-        user_id,
-):
+def _update_subsection_grades(course_key, scored_block_usage_key, only_if_higher, user_id):
     """
     A helper function to update subsection grades in the database
     for each subsection containing the given block, and to signal

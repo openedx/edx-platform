@@ -340,7 +340,7 @@ class CourseMode(models.Model):
         return {mode.slug: mode for mode in modes}
 
     @classmethod
-    def mode_for_course(cls, course_id, mode_slug, modes=None):
+    def mode_for_course(cls, course_id, mode_slug, modes=None, include_expired=False):
         """Returns the mode for the course corresponding to mode_slug.
 
         Returns only non-expired modes.
@@ -356,12 +356,15 @@ class CourseMode(models.Model):
                 of course modes.  This can be used to avoid an additional
                 database query if you have already loaded the modes list.
 
+            include_expired (bool): If True, expired course modes will be included
+                in the returned values. If False, these modes will be omitted.
+
         Returns:
             Mode
 
         """
         if modes is None:
-            modes = cls.modes_for_course(course_id)
+            modes = cls.modes_for_course(course_id, include_expired=include_expired)
 
         matched = [m for m in modes if m.slug == mode_slug]
         if matched:

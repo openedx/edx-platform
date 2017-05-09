@@ -60,7 +60,6 @@ DISCUSSION_SETTINGS = {
 }
 
 LMS_ROOT_URL = "http://localhost:8000"
-ENTERPRISE_API_URL = LMS_ROOT_URL + '/enterprise/api/v1/'
 
 # Features
 FEATURES = {
@@ -374,6 +373,13 @@ FEATURES = {
 
     # Whether or not the dynamic EnrollmentTrackUserPartition should be registered.
     'ENABLE_ENROLLMENT_TRACK_USER_PARTITION': False,
+
+    # Enable one click program purchase
+    # See LEARNER-493
+    'ENABLE_ONE_CLICK_PROGRAM_PURCHASE': False,
+
+    # Whether to display account activation notification on dashboard.
+    'DISPLAY_ACCOUNT_ACTIVATION_MESSAGE_ON_SIDEBAR': False,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -541,7 +547,7 @@ TEMPLATES = [
                 'edxmako.shortcuts.footer_context_processor',
 
                 # Online contextual help
-                'context_processors.doc_url',
+                'help_tokens.context_processor',
                 'openedx.core.djangoapps.site_configuration.context_processors.configuration_context'
             ],
             # Change 'debug' in your environment settings files - not here.
@@ -856,6 +862,8 @@ TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_
 LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
 # these languages display right to left
 LANGUAGES_BIDI = ("he", "ar", "fa", "ur", "fa-ir", "rtl")
+
+LANGUAGE_COOKIE = "openedx-language-preference"
 
 # Sourced from http://www.localeplanet.com/icu/ and wikipedia
 LANGUAGES = (
@@ -1180,7 +1188,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     # to redirected unenrolled students to the course info page
-    'courseware.middleware.RedirectUnenrolledMiddleware',
+    'courseware.middleware.RedirectMiddleware',
 
     'course_wiki.middleware.WikiAccessMiddleware',
 
@@ -1740,7 +1748,17 @@ REQUIRE_JS_PATH_OVERRIDES = {
     'js/student_profile/views/learner_profile_factory': 'js/student_profile/views/learner_profile_factory.js',
     'js/courseware/courseware_factory': 'js/courseware/courseware_factory.js',
     'js/groups/views/cohorts_dashboard_factory': 'js/groups/views/cohorts_dashboard_factory.js',
-    'draggabilly': 'js/vendor/draggabilly.js'
+    'draggabilly': 'js/vendor/draggabilly.js',
+    'hls': 'common/js/vendor/hls.js'
+}
+
+########################## DJANGO WEBPACK LOADER ##############################
+
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'BUNDLE_DIR_NAME': 'bundles/',
+        'STATS_FILE': os.path.join(STATIC_ROOT, 'webpack-stats.json')
+    }
 }
 
 ########################## DJANGO DEBUG TOOLBAR ###############################
@@ -1941,6 +1959,7 @@ INSTALLED_APPS = (
     'edxmako',
     'pipeline',
     'static_replace',
+    'webpack_loader',
 
     # For user interface plugins
     'web_fragments',
@@ -2017,6 +2036,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',  # only used in DEBUG mode
     'django_nose',
     'debug',
+    'django_extensions',
 
     # Discussion forums
     'django_comment_client',
@@ -2151,6 +2171,9 @@ INSTALLED_APPS = (
 
     # Verified Track Content Cohorting (Beta feature that will hopefully be removed)
     'openedx.core.djangoapps.verified_track_content',
+
+    # Video module configs (This will be moved to Video once it becomes an XBlock)
+    'openedx.core.djangoapps.video_config',
 
     # Learner's dashboard
     'learner_dashboard',
@@ -2407,6 +2430,7 @@ XDOMAIN_PROXY_CACHE_TIMEOUT = 60 * 15
 # - 'hidden': to not display the field
 
 REGISTRATION_EXTRA_FIELDS = {
+    'confirm_email': 'hidden',
     'level_of_education': 'optional',
     'gender': 'optional',
     'year_of_birth': 'optional',
@@ -2417,6 +2441,28 @@ REGISTRATION_EXTRA_FIELDS = {
     'city': 'hidden',
     'country': 'hidden',
 }
+
+REGISTRATION_FIELD_ORDER = [
+    "email",
+    "confirm_email",
+    "name",
+    "username",
+    "password",
+    "first_name",
+    "last_name",
+    "city",
+    "state",
+    "country",
+    "gender",
+    "year_of_birth",
+    "level_of_education",
+    "company",
+    "title",
+    "mailing_address",
+    "goals",
+    "honor_code",
+    "terms_of_service",
+]
 
 # Optional setting to restrict registration / account creation to only emails
 # that match a regex in this list. Set to None to allow any email (default).
@@ -2848,7 +2894,6 @@ ECOMMERCE_PUBLIC_URL_ROOT = None
 ECOMMERCE_API_URL = None
 ECOMMERCE_API_TIMEOUT = 5
 ECOMMERCE_SERVICE_WORKER_USERNAME = 'ecommerce_worker'
-ENTERPRISE_SERVICE_WORKER_USERNAME = 'enterprise_worker'
 
 COURSE_CATALOG_API_URL = None
 
@@ -2941,8 +2986,8 @@ LTI_AGGREGATE_SCORE_PASSBACK_DELAY = 15 * 60
 
 
 # For help generating a key pair import and run `openedx.core.lib.rsa_key_utils.generate_rsa_key_pair()`
-PUBLIC_RSA_KEY = None
-PRIVATE_RSA_KEY = None
+JWT_PRIVATE_SIGNING_KEY = None
+JWT_EXPIRED_PRIVATE_SIGNING_KEYS = []
 
 # Credit notifications settings
 NOTIFICATION_EMAIL_CSS = "templates/credit_notifications/credit_notification.css"
@@ -3065,13 +3110,30 @@ REDIRECT_CACHE_KEY_PREFIX = 'redirects'
 
 ############## Settings for LMS Context Sensitive Help ##############
 
-DOC_LINK_BASE_URL = None
+HELP_TOKENS_INI_FILE = REPO_ROOT / "docs" / "lms_config.ini"
+HELP_TOKENS_BOOKS = {
+    'learner': 'http://edx.readthedocs.io/projects/open-edx-learner-guide',
+    'course_author': 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course',
+}
 
-############## Settings for the Enterprise App ######################
+############## OPEN EDX ENTERPRISE SERVICE CONFIGURATION ######################
+# The Open edX Enterprise service is currently hosted via the LMS container/process.
+# However, for all intents and purposes this service is treated as a standalone IDA.
+# These configuration settings are specific to the Enterprise service and you should
+# not find references to them within the edx-platform project.
 
 ENTERPRISE_ENROLLMENT_API_URL = LMS_ROOT_URL + "/api/enrollment/v1/"
 ENTERPRISE_PUBLIC_ENROLLMENT_API_URL = ENTERPRISE_ENROLLMENT_API_URL
+
+############## ENTERPRISE SERVICE API CLIENT CONFIGURATION ######################
+# The LMS communicates with the Enterprise service via the EdxRestApiClient class
+# These default settings are utilized by the LMS when interacting with the service,
+# and are overridden by the configuration parameter accessors defined in aws.py
+
+ENTERPRISE_API_URL = LMS_ROOT_URL + '/enterprise/api/v1/'
+ENTERPRISE_SERVICE_WORKER_USERNAME = 'enterprise_worker'
 ENTERPRISE_API_CACHE_TIMEOUT = 3600  # Value is in seconds
+ENTERPRISE_CUSTOMER_LOGO_IMAGE_SIZE = 512   # Enterprise logo image size limit in KB's
 
 ############## Settings for Course Enrollment Modes ######################
 COURSE_ENROLLMENT_MODES = {

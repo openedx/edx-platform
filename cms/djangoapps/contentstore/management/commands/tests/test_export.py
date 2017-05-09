@@ -17,9 +17,6 @@ class TestArgParsingCourseExport(unittest.TestCase):
     """
     Tests for parsing arguments for the `export` management command
     """
-    def setUp(self):
-        super(TestArgParsingCourseExport, self).setUp()
-
     def test_no_args(self):
         """
         Test export command with no arguments

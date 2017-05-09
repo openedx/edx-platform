@@ -117,6 +117,14 @@ class ProviderConfig(ConfigurationModel):
             'The Site that this provider configuration belongs to.'
         ),
     )
+    skip_hinted_login_dialog = models.BooleanField(
+        default=False,
+        help_text=_(
+            "If this option is enabled, users that visit a \"TPA hinted\" URL for this provider "
+            "(e.g. a URL ending with `?tpa_hint=[provider_name]`) will be forwarded directly to "
+            "the login URL of the provider instead of being first prompted with a login dialog."
+        ),
+    )
     skip_registration_form = models.BooleanField(
         default=False,
         help_text=_(
@@ -139,6 +147,26 @@ class ProviderConfig(ConfigurationModel):
             "as an option to authenticate with on the login screen, but manual "
             "authentication using the correct link is still possible."
         ),
+    )
+    drop_existing_session = models.BooleanField(
+        default=False,
+        help_text=_(
+            "Whether to drop an existing session when accessing a view decorated with "
+            "third_party_auth.decorators.tpa_hint_ends_existing_session when a tpa_hint "
+            "URL query parameter mapping to this provider is included in the request."
+        )
+    )
+    max_session_length = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        default=None,
+        verbose_name='Max session length (seconds)',
+        help_text=_(
+            "If this option is set, then users logging in using this SSO provider will have "
+            "their session length limited to no longer than this value. If set to 0 (zero), "
+            "the session will expire upon the user closing their browser. If left blank, the "
+            "Django platform session default length will be used."
+        )
     )
     prefix = None  # used for provider_id. Set to a string value in subclass
     backend_name = None  # Set to a field or fixed value in subclass

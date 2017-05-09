@@ -11,6 +11,7 @@ from nose.plugins.attrib import attr
 import pytz
 
 from django.conf import settings
+from django.db.utils import IntegrityError
 from django.test.utils import override_settings
 from django.utils import timezone
 from PIL import Image
@@ -41,7 +42,7 @@ from .models import CourseOverview, CourseOverviewImageSet, CourseOverviewImageC
 @ddt.ddt
 class CourseOverviewTestCase(ModuleStoreTestCase):
     """
-    Tests for CourseOverviewDescriptor model.
+    Tests for CourseOverview model.
     """
 
     TODAY = timezone.now()
@@ -62,7 +63,7 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
         Specifically, given a course, test that data within the following three
         objects match each other:
          - the CourseDescriptor itself
-         - a CourseOverview that was newly constructed from _create_from_course
+         - a CourseOverview that was newly constructed from _create_or_update
          - a CourseOverview that was loaded from the MySQL database
 
         Arguments:
@@ -83,7 +84,7 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
             return math.floor((date_time - epoch).total_seconds())
 
         # Load the CourseOverview from the cache twice. The first load will be a cache miss (because the cache
-        # is empty) so the course will be newly created with CourseOverviewDescriptor.create_from_course. The second
+        # is empty) so the course will be newly created with CourseOverview._create_or_update. The second
         # load will be a cache hit, so the course will be loaded from the cache.
         course_overview_cache_miss = CourseOverview.get_from_id(course.id)
         course_overview_cache_hit = CourseOverview.get_from_id(course.id)
@@ -345,7 +346,7 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
         course._grading_policy['GRADE_CUTOFFS'] = {}  # pylint: disable=protected-access
         with self.assertRaises(ValueError):
             __ = course.lowest_passing_grade
-        course_overview = CourseOverview._create_from_course(course)  # pylint: disable=protected-access
+        course_overview = CourseOverview._create_or_update(course)  # pylint: disable=protected-access
         self.assertEqual(course_overview.lowest_passing_grade, None)
 
     @ddt.data((ModuleStoreEnum.Type.mongo, 4, 4), (ModuleStoreEnum.Type.split, 3, 4))
@@ -551,11 +552,27 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
     """
     Course thumbnail generation tests.
     """
+    ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
         """Create an active CourseOverviewImageConfig with non-default values."""
         self.set_config(True)
         super(CourseOverviewImageSetTestCase, self).setUp()
+
+    def _create_course_image(self, course, image_name):
+        """
+        Creates a course image in contentstore.
+        """
+        # Create a source image...
+        image = Image.new('RGB', (800, 400), 'blue')
+        image_buff = StringIO()
+        image.save(image_buff, format='PNG')
+        image_buff.seek(0)
+
+        # Save the image to the contentstore...
+        course_image_asset_key = StaticContent.compute_location(course.id, course.course_image)
+        course_image_content = StaticContent(course_image_asset_key, image_name, 'image/png', image_buff)
+        contentstore().save(course_image_content)
 
     def set_config(self, enabled):
         """
@@ -920,9 +937,9 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
         CourseOverviewImageSet.objects.create(course_overview=overview)
 
         # Now do it the normal way -- this will cause an IntegrityError to be
-        # thrown and suppressed in create_for_course()
+        # thrown and suppressed in create()
         self.set_config(True)
-        CourseOverviewImageSet.create_for_course(overview)
+        CourseOverviewImageSet.create(overview)
         self.assertTrue(hasattr(overview, 'image_set'))
 
         # The following is actually very important for this test because
@@ -935,6 +952,47 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
         # transaction. So we don't really care about setting the config -- it's
         # just a convenient way to cause a database write operation to happen.
         self.set_config(False)
+
+    def test_successful_image_update(self):
+        """
+        Test the successful image set re-creation on updating
+        the course overview.
+        """
+        # Get current course overview image config
+        config = CourseOverviewImageConfig.current()
+
+        # Image names
+        course_image = 'src_course_image.png'
+        updated_course_image = 'src_course_image1.png'
+
+        # Setup course with course image.
+        course = CourseFactory.create(course_image=course_image)
+        self._create_course_image(course, course_image)
+
+        # Create course overview with image set.
+        overview = CourseOverview.get_from_id(course.id)
+        self.assertTrue(hasattr(overview, 'image_set'))
+
+        # Make sure the thumbnail names come out as expected...
+        image_urls = overview.image_urls
+        self.assertTrue(image_urls['raw'].endswith('src_course_image.png'))
+        self.assertTrue(image_urls['small'].endswith('src_course_image-png-{}x{}.jpg'.format(*config.small)))
+        self.assertTrue(image_urls['large'].endswith('src_course_image-png-{}x{}.jpg'.format(*config.large)))
+
+        # Update course image on the course descriptor This fires a
+        # course_published signal, this will be caught in signals.py,
+        # which should in turn load CourseOverview from modulestore.
+        course.course_image = 'src_course_image1.png'
+        # create updated course image in contentstore too.
+        self._create_course_image(course, updated_course_image)
+        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
+            self.store.update_item(course, ModuleStoreEnum.UserID.test)
+
+        # Get latest course overview and make sure the thumbnail names are correctly updated..
+        image_urls = CourseOverview.objects.get(id=overview.id).image_urls
+        self.assertTrue(image_urls['raw'].endswith('src_course_image1.png'))
+        self.assertTrue(image_urls['small'].endswith('src_course_image1-png-{}x{}.jpg'.format(*config.small)))
+        self.assertTrue(image_urls['large'].endswith('src_course_image1-png-{}x{}.jpg'.format(*config.large)))
 
     def _assert_image_urls_all_default(self, modulestore_type, raw_course_image_name, expected_url=None):
         """
@@ -965,3 +1023,41 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
                 }
             )
             return course_overview
+
+
+@attr(shard=3)
+@ddt.ddt
+class CourseOverviewTabTestCase(ModuleStoreTestCase):
+    """
+    Tests for CourseOverviewTab model.
+    """
+
+    ENABLED_SIGNALS = ['course_published']
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_tabs_deletion_rollback_on_integrity_error(self, modulestore_type):
+        """
+        Tests that course_overview tabs deletion is correctly rolled back if an Exception
+        occurs while updating the course_overview.
+        """
+        course = CourseFactory.create(default_store=modulestore_type)
+        course_overview = CourseOverview.get_from_id(course.id)
+        expected_tabs = {tab.tab_id for tab in course_overview.tabs.all()}
+
+        with mock.patch(
+            'openedx.core.djangoapps.content.course_overviews.models.CourseOverviewTab.objects.bulk_create'
+        ) as course_overview_tabs_bulk_create:
+            course_overview_tabs_bulk_create.side_effect = IntegrityError
+
+            # Update display name on the course descriptor
+            # This fires a course_published signal, which should be caught in signals.py,
+            # which should in turn load CourseOverview from modulestore.
+            course.display_name = u'Updated display name'
+            with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
+                self.store.update_item(course, ModuleStoreEnum.UserID.test)
+
+            # Asserts that the tabs deletion is properly rolled back to a save point and
+            # the course overview is not updated.
+            actual_tabs = {tab.tab_id for tab in course_overview.tabs.all()}
+            self.assertEqual(actual_tabs, expected_tabs)
+            self.assertNotEqual(course_overview.display_name, course.display_name)

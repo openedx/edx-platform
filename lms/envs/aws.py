@@ -121,6 +121,7 @@ with open(CONFIG_ROOT / CONFIG_PREFIX + "env.json") as env_file:
 STATIC_ROOT_BASE = ENV_TOKENS.get('STATIC_ROOT_BASE', None)
 if STATIC_ROOT_BASE:
     STATIC_ROOT = path(STATIC_ROOT_BASE)
+    WEBPACK_LOADER['DEFAULT']['STATS_FILE'] = STATIC_ROOT / "webpack-stats.json"
 
 
 # STATIC_URL_BASE specifies the base url to use for static files
@@ -168,6 +169,7 @@ AWS_SES_REGION_ENDPOINT = ENV_TOKENS.get('AWS_SES_REGION_ENDPOINT', 'email.us-ea
 REGISTRATION_EXTRA_FIELDS = ENV_TOKENS.get('REGISTRATION_EXTRA_FIELDS', REGISTRATION_EXTRA_FIELDS)
 REGISTRATION_EXTENSION_FORM = ENV_TOKENS.get('REGISTRATION_EXTENSION_FORM', REGISTRATION_EXTENSION_FORM)
 REGISTRATION_EMAIL_PATTERNS_ALLOWED = ENV_TOKENS.get('REGISTRATION_EMAIL_PATTERNS_ALLOWED')
+REGISTRATION_FIELD_ORDER = ENV_TOKENS.get('REGISTRATION_FIELD_ORDER', REGISTRATION_FIELD_ORDER)
 
 # Set the names of cookies shared with the marketing site
 # These have the same cookie domain as the session, which in production
@@ -176,11 +178,6 @@ EDXMKTG_LOGGED_IN_COOKIE_NAME = ENV_TOKENS.get('EDXMKTG_LOGGED_IN_COOKIE_NAME', 
 EDXMKTG_USER_INFO_COOKIE_NAME = ENV_TOKENS.get('EDXMKTG_USER_INFO_COOKIE_NAME', EDXMKTG_USER_INFO_COOKIE_NAME)
 
 LMS_ROOT_URL = ENV_TOKENS.get('LMS_ROOT_URL')
-
-DEFAULT_ENTERPRISE_API_URL = None
-if LMS_ROOT_URL is not None:
-    DEFAULT_ENTERPRISE_API_URL = LMS_ROOT_URL + '/enterprise/api/v1/'
-ENTERPRISE_API_URL = ENV_TOKENS.get('ENTERPRISE_API_URL', DEFAULT_ENTERPRISE_API_URL)
 
 ENV_FEATURES = ENV_TOKENS.get('FEATURES', {})
 for feature, value in ENV_FEATURES.items():
@@ -319,6 +316,8 @@ TIME_ZONE = ENV_TOKENS.get('TIME_ZONE', TIME_ZONE)
 LANGUAGES = ENV_TOKENS.get('LANGUAGES', LANGUAGES)
 LANGUAGE_DICT = dict(LANGUAGES)
 LANGUAGE_CODE = ENV_TOKENS.get('LANGUAGE_CODE', LANGUAGE_CODE)
+LANGUAGE_COOKIE = ENV_TOKENS.get('LANGUAGE_COOKIE', LANGUAGE_COOKIE)
+
 USE_I18N = ENV_TOKENS.get('USE_I18N', USE_I18N)
 
 # Additional installed apps
@@ -850,8 +849,8 @@ CREDIT_HELP_LINK_URL = ENV_TOKENS.get('CREDIT_HELP_LINK_URL', CREDIT_HELP_LINK_U
 
 #### JWT configuration ####
 JWT_AUTH.update(ENV_TOKENS.get('JWT_AUTH', {}))
-PUBLIC_RSA_KEY = ENV_TOKENS.get('PUBLIC_RSA_KEY', PUBLIC_RSA_KEY)
-PRIVATE_RSA_KEY = ENV_TOKENS.get('PRIVATE_RSA_KEY', PRIVATE_RSA_KEY)
+JWT_PRIVATE_SIGNING_KEY = ENV_TOKENS.get('JWT_PRIVATE_SIGNING_KEY', JWT_PRIVATE_SIGNING_KEY)
+JWT_EXPIRED_PRIVATE_SIGNING_KEYS = ENV_TOKENS.get('JWT_EXPIRED_PRIVATE_SIGNING_KEYS', JWT_EXPIRED_PRIVATE_SIGNING_KEYS)
 
 ################# PROCTORING CONFIGURATION ##################
 
@@ -900,9 +899,14 @@ AFFILIATE_COOKIE_NAME = ENV_TOKENS.get('AFFILIATE_COOKIE_NAME', AFFILIATE_COOKIE
 
 ############## Settings for LMS Context Sensitive Help ##############
 
-DOC_LINK_BASE_URL = ENV_TOKENS.get('DOC_LINK_BASE_URL', DOC_LINK_BASE_URL)
+HELP_TOKENS_BOOKS = ENV_TOKENS.get('HELP_TOKENS_BOOKS', HELP_TOKENS_BOOKS)
 
-############## Settings for the Enterprise App ######################
+
+############## OPEN EDX ENTERPRISE SERVICE CONFIGURATION ######################
+# The Open edX Enterprise service is currently hosted via the LMS container/process.
+# However, for all intents and purposes this service is treated as a standalone IDA.
+# These configuration settings are specific to the Enterprise service and you should
+# not find references to them within the edx-platform project.
 
 # Publicly-accessible enrollment URL, for use on the client side.
 ENTERPRISE_PUBLIC_ENROLLMENT_API_URL = ENV_TOKENS.get(
@@ -911,12 +915,41 @@ ENTERPRISE_PUBLIC_ENROLLMENT_API_URL = ENV_TOKENS.get(
 )
 
 # Enrollment URL used on the server-side.
-# If not overridden in ENV_TOKENS, then fallback to the value set in env/common.py
 ENTERPRISE_ENROLLMENT_API_URL = ENV_TOKENS.get(
     'ENTERPRISE_ENROLLMENT_API_URL',
     ENTERPRISE_ENROLLMENT_API_URL
 )
 
+# Enterprise logo image size limit in KB's
+ENTERPRISE_CUSTOMER_LOGO_IMAGE_SIZE = ENV_TOKENS.get(
+    'ENTERPRISE_CUSTOMER_LOGO_IMAGE_SIZE',
+    ENTERPRISE_CUSTOMER_LOGO_IMAGE_SIZE
+)
 
-# Discovery App config
+
+############## ENTERPRISE SERVICE API CLIENT CONFIGURATION ######################
+# The LMS communicates with the Enterprise service via the EdxRestApiClient class
+# The below environmental settings are utilized by the LMS when interacting with
+# the service, and override the default parameters which are defined in common.py
+
+DEFAULT_ENTERPRISE_API_URL = None
+if LMS_ROOT_URL is not None:
+    DEFAULT_ENTERPRISE_API_URL = LMS_ROOT_URL + '/enterprise/api/v1/'
+ENTERPRISE_API_URL = ENV_TOKENS.get('ENTERPRISE_API_URL', DEFAULT_ENTERPRISE_API_URL)
+
+ENTERPRISE_SERVICE_WORKER_USERNAME = ENV_TOKENS.get(
+    'ENTERPRISE_SERVICE_WORKER_USERNAME',
+    ENTERPRISE_SERVICE_WORKER_USERNAME
+)
+ENTERPRISE_API_CACHE_TIMEOUT = ENV_TOKENS.get(
+    'ENTERPRISE_API_CACHE_TIMEOUT',
+    ENTERPRISE_API_CACHE_TIMEOUT
+)
+
+
+############## CATALOG/DISCOVERY SERVICE API CLIENT CONFIGURATION ######################
+# The LMS communicates with the Catalog service via the EdxRestApiClient class
+# The below environmental settings are utilized by the LMS when interacting with
+# the service, and override the default parameters which are defined in common.py
+
 COURSES_API_CACHE_TIMEOUT = ENV_TOKENS.get('COURSES_API_CACHE_TIMEOUT', COURSES_API_CACHE_TIMEOUT)

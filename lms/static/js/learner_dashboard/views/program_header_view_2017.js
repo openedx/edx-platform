@@ -5,9 +5,9 @@
         'jquery',
         'edx-ui-toolkit/js/utils/html-utils',
         'text!../../../templates/learner_dashboard/program_header_view_2017.underscore',
-        'text!/static/images/programs/micromasters-program-details.svg',
-        'text!/static/images/programs/xseries-program-details.svg',
-        'text!/static/images/programs/professional-certificate-program-details.svg'
+        'text!../../../images/programs/micromasters-program-details.svg',
+        'text!../../../images/programs/xseries-program-details.svg',
+        'text!../../../images/programs/professional-certificate-program-details.svg'
     ],
          function(Backbone, $, HtmlUtils, pageTpl, MicroMastersLogo,
                   XSeriesLogo, ProfessionalCertificateLogo) {

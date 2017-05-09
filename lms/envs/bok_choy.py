@@ -14,6 +14,8 @@ import os
 from path import Path as path
 from tempfile import mkdtemp
 
+from openedx.core.release import RELEASE_LINE
+
 CONFIG_ROOT = path(__file__).abspath().dirname()
 TEST_ROOT = CONFIG_ROOT.dirname().dirname() / "test_root"
 
@@ -30,9 +32,6 @@ from .aws import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
 
 ######################### Testing overrides ####################################
-
-# Needed for the reset database management command
-INSTALLED_APPS += ('django_extensions',)
 
 # Redirect to the test_root folder within the repo
 GITHUB_REPO_ROOT = (TEST_ROOT / "data").abspath()
@@ -67,6 +66,9 @@ STATICFILES_DIRS = [
 
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 MEDIA_ROOT = TEST_ROOT / "uploads"
+
+# Webpack loader must use webpack output setting
+WEBPACK_LOADER['DEFAULT']['STATS_FILE'] = TEST_ROOT / "staticfiles" / "lms" / "webpack-stats.json"
 
 # Don't use compression during tests
 PIPELINE_JS_COMPRESSOR = None
@@ -223,15 +225,18 @@ BADGING_BACKEND = 'lms.djangoapps.badges.backends.tests.dummy_backend.DummyBacke
 ECOMMERCE_API_URL = 'http://localhost:8043/api/v2/'
 
 LMS_ROOT_URL = "http://localhost:8000"
-DOC_LINK_BASE_URL = 'http://edx.readthedocs.io/projects/edx-guide-for-students'
+if RELEASE_LINE == "master":
+    # On master, acceptance tests use edX books, not the default Open edX books.
+    HELP_TOKENS_BOOKS = {
+        'learner': 'http://edx.readthedocs.io/projects/edx-guide-for-students',
+        'course_author': 'http://edx.readthedocs.io/projects/edx-partner-course-staff',
+    }
 
 # TODO: TNL-6546: Remove this waffle and flag code.
 from django.db.utils import ProgrammingError
 from waffle.models import Flag
 try:
     flag, created = Flag.objects.get_or_create(name='unified_course_view')
-    flag.everyone = True
-    flag.save
     WAFFLE_OVERRIDE = True
 except ProgrammingError:
     # during initial reset_db, the table for the flag doesn't yet exist.

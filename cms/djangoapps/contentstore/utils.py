@@ -163,24 +163,24 @@ def is_currently_visible_to_students(xblock):
     return True
 
 
-def has_children_visible_to_specific_content_groups(xblock):
+def has_children_visible_to_specific_partition_groups(xblock):
     """
-    Returns True if this xblock has children that are limited to specific content groups.
+    Returns True if this xblock has children that are limited to specific user partition groups.
     Note that this method is not recursive (it does not check grandchildren).
     """
     if not xblock.has_children:
         return False
 
     for child in xblock.get_children():
-        if is_visible_to_specific_content_groups(child):
+        if is_visible_to_specific_partition_groups(child):
             return True
 
     return False
 
 
-def is_visible_to_specific_content_groups(xblock):
+def is_visible_to_specific_partition_groups(xblock):
     """
-    Returns True if this xblock has visibility limited to specific content groups.
+    Returns True if this xblock has visibility limited to specific user partition groups.
     """
     if not xblock.group_access:
         return False

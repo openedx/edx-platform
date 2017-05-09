@@ -83,7 +83,7 @@ class SurveyViewsTests(ModuleStoreTestCase):
         # is the SurveyForm html present in the HTML response?
         self.assertIn(self.test_form, resp.content)
 
-    def test_unautneticated_survey_postback(self):
+    def test_unauthenticated_survey_postback(self):
         """
         Asserts that an anonymous user cannot answer a survey
         """

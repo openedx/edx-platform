@@ -144,7 +144,7 @@ class IntegrationTestMixin(object):
         """
         raise NotImplementedError
 
-    def _test_return_login(self, user_is_activated=True):
+    def _test_return_login(self, user_is_activated=True, previous_session_timed_out=False):
         """ Test logging in to an account that is already linked. """
         # Make sure we're not logged in:
         dashboard_response = self.client.get(reverse('dashboard'))
@@ -156,12 +156,14 @@ class IntegrationTestMixin(object):
         # The user should be redirected to the provider:
         self.assertEqual(try_login_response.status_code, 302)
         login_response = self.do_provider_login(try_login_response['Location'])
-        # There will be one weird redirect required to set the login cookie:
-        self.assertEqual(login_response.status_code, 302)
-        self.assertEqual(login_response['Location'], self.url_prefix + self.complete_url)
-        # And then we should be redirected to the dashboard:
-        login_response = self.client.get(login_response['Location'])
-        self.assertEqual(login_response.status_code, 302)
+        # If the previous session was manually logged out, there will be one weird redirect
+        # required to set the login cookie (it sticks around if the main session times out):
+        if not previous_session_timed_out:
+            self.assertEqual(login_response.status_code, 302)
+            self.assertEqual(login_response['Location'], self.url_prefix + self.complete_url)
+            # And then we should be redirected to the dashboard:
+            login_response = self.client.get(login_response['Location'])
+            self.assertEqual(login_response.status_code, 302)
         if user_is_activated:
             url_expected = reverse('dashboard')
         else:
@@ -363,7 +365,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         self.assertEqual(200, response.status_code)  # Yes, it's a 200 even though it's a failure.
         payload = json.loads(response.content)
         self.assertFalse(payload.get('success'))
-        self.assertIn('Before you sign in, you need to activate your account', payload.get('value'))
+        self.assertIn('In order to sign in, you need to activate your account.', payload.get('value'))
 
     def assert_json_failure_response_is_missing_social_auth(self, response):
         """Asserts failure on /login for missing social auth looks right."""

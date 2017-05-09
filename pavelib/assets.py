@@ -19,6 +19,7 @@ from watchdog.events import PatternMatchingEventHandler
 from .utils.envs import Env
 from .utils.cmd import cmd, django_cmd
 from .utils.timer import timed
+from .utils.process import run_background_process
 
 from openedx.core.djangoapps.theming.paver_helpers import get_theme_paths
 
@@ -58,6 +59,7 @@ NPM_INSTALLED_LIBRARIES = [
     'requirejs/require.js',
     'underscore.string/dist/underscore.string.js',
     'underscore/underscore.js',
+    'hls.js/dist/hls.js',
 ]
 
 # A list of NPM installed developer libraries that should be copied into the common
@@ -702,6 +704,19 @@ def execute_compile_sass(args):
         )
 
 
+def execute_webpack(prod, settings=None):
+    sh(cmd("NODE_ENV={node_env} STATIC_ROOT={static_root} $(npm bin)/webpack".format(
+        node_env="production" if prod else "development",
+        static_root=Env.get_django_setting("STATIC_ROOT", "lms", settings=settings)
+    )))
+
+
+def execute_webpack_watch(settings=None):
+    run_background_process("STATIC_ROOT={static_root} $(npm bin)/webpack --watch --watch-poll=200".format(
+        static_root=Env.get_django_setting("STATIC_ROOT", "lms", settings=settings)
+    ))
+
+
 def get_parsed_option(command_opts, opt_key, default=None):
     """
     Extract user command option and parse it.
@@ -768,6 +783,11 @@ def watch_assets(options):
 
     print("Starting asset watcher...")
     observer.start()
+
+    # We only want Webpack to re-run on changes to its own entry points, not all JS files, so we use its own watcher
+    # instead of subclassing from Watchdog like the other watchers do
+    execute_webpack_watch(settings='devstack')
+
     if not getattr(options, 'background', False):
         # when running as a separate process, the main thread needs to loop
         # in order to allow for shutdown by contrl-c
@@ -828,6 +848,7 @@ def update_assets(args):
     process_xmodule_assets()
     process_npm_assets()
     compile_coffeescript()
+    execute_webpack(prod=(args.settings != "devstack"), settings=args.settings)
 
     # Compile sass for themes and system
     execute_compile_sass(args)

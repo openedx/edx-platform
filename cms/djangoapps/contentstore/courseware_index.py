@@ -377,7 +377,7 @@ class CoursewareSearchIndexer(SearchIndexerBase):
     @classmethod
     def fetch_group_usage(cls, modulestore, structure):
         groups_usage_dict = {}
-        groups_usage_info = GroupConfiguration.get_content_groups_usage_info(modulestore, structure).items()
+        groups_usage_info = GroupConfiguration.get_partitions_usage_info(modulestore, structure).items()
         groups_usage_info.extend(
             GroupConfiguration.get_content_groups_items_usage_info(
                 modulestore,

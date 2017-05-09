@@ -2,8 +2,10 @@
 Test grade calculation.
 """
 
-import ddt
+import datetime
 import itertools
+
+import ddt
 from mock import patch
 from nose.plugins.attrib import attr
 
@@ -58,7 +60,7 @@ class TestGradeIteration(SharedModuleStoreTestCase):
         If we don't pass in any students, it should return a zero-length
         iterator, but it shouldn't error.
         """
-        grade_results = list(CourseGradeFactory().iter(self.course, []))
+        grade_results = list(CourseGradeFactory().iter([], self.course))
         self.assertEqual(grade_results, [])
 
     def test_all_empty_grades(self):
@@ -99,7 +101,7 @@ class TestGradeIteration(SharedModuleStoreTestCase):
         with self.assertNumQueries(4):
             all_course_grades, all_errors = self._course_grades_and_errors_for(self.course, self.students)
         self.assertEqual(
-            all_errors,
+            {student: all_errors[student].message for student in all_errors},
             {
                 student3: "Error for student3.",
                 student4: "Error for student4.",
@@ -128,10 +130,10 @@ class TestGradeIteration(SharedModuleStoreTestCase):
         students_to_course_grades = {}
         students_to_errors = {}
 
-        for student, course_grade, err_msg in CourseGradeFactory().iter(course, students):
+        for student, course_grade, error in CourseGradeFactory().iter(students, course):
             students_to_course_grades[student] = course_grade
-            if err_msg:
-                students_to_errors[student] = err_msg
+            if error:
+                students_to_errors[student] = error
 
         return students_to_course_grades, students_to_errors
 
@@ -201,7 +203,9 @@ class TestWeightedProblems(SharedModuleStoreTestCase):
 
         # verify all problem grades
         for problem in self.problems:
-            problem_score = subsection_grade.locations_to_scores[problem.location]
+            problem_score = subsection_grade.problem_scores[problem.location]
+            self.assertEqual(type(expected_score.first_attempted), type(problem_score.first_attempted))
+            expected_score.first_attempted = problem_score.first_attempted
             self.assertEquals(problem_score, expected_score)
 
         # verify subsection grades
@@ -235,7 +239,7 @@ class TestWeightedProblems(SharedModuleStoreTestCase):
             weighted_possible=expected_w_possible,
             weight=weight,
             graded=expected_graded,
-            attempted=True,
+            first_attempted=datetime.datetime(2010, 1, 1),
         )
         self._verify_grades(raw_earned, raw_possible, weight, expected_score)
 

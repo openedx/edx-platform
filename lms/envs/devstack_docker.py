@@ -30,6 +30,7 @@ FEATURES.update({
     'ENABLE_COURSEWARE_SEARCH': False,
     'ENABLE_COURSE_DISCOVERY': False,
     'ENABLE_DASHBOARD_SEARCH': False,
+    'SHOW_LANGUAGE_SELECTOR': True
 })
 
 ENABLE_MKTG_SITE = os.environ.get('ENABLE_MARKETING_SITE', False)
@@ -58,3 +59,5 @@ MKTG_URLS = {
     'TOS_AND_HONOR': '/edx-terms-service',
     'WHAT_IS_VERIFIED_CERT': '/verified-certificate',
 }
+
+CREDENTIALS_SERVICE_USERNAME = 'credentials_worker'

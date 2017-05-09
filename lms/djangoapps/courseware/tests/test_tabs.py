@@ -2,6 +2,8 @@
 Test cases for tabs.
 """
 
+from waffle.testutils import override_flag
+
 from django.core.urlresolvers import reverse
 from django.http import Http404
 from mock import MagicMock, Mock, patch
@@ -16,6 +18,7 @@ from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tests.factories import InstructorFactory, StaffFactory
 from courseware.views.views import get_static_tab_fragment, StaticCourseTabView
 from openedx.core.djangolib.testing.utils import get_mock_request
+from openedx.features.course_experience import UNIFIED_COURSE_EXPERIENCE_FLAG
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from util.milestones_helpers import (
@@ -764,6 +767,25 @@ class StaticTabTestCase(TabTestCase):
         )
         self.check_can_display_results(tab)
         self.check_get_and_set_method_for_key(tab, 'url_slug')
+
+
+@attr(shard=1)
+class CourseInfoTabTestCase(TabTestCase):
+    """Test cases for the course info tab."""
+    def setUp(self):
+        self.user = self.create_mock_user()
+        self.request = get_mock_request(self.user)
+
+    def test_default_tab(self):
+        # Verify that the course info tab is the first tab
+        tabs = get_course_tab_list(self.request, self.course)
+        self.assertEqual(tabs[0].type, 'course_info')
+
+    @override_flag(UNIFIED_COURSE_EXPERIENCE_FLAG, active=True)
+    def test_default_tab_for_new_course_experience(self):
+        # Verify that the unified course experience hides the course info tab
+        tabs = get_course_tab_list(self.request, self.course)
+        self.assertEqual(tabs[0].type, 'courseware')
 
 
 @attr(shard=1)

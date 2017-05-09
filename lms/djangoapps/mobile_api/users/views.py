@@ -13,10 +13,10 @@ from opaque_keys.edx.keys import UsageKey
 from opaque_keys import InvalidKeyError
 
 from courseware.access import is_mobile_available_for_user
+from courseware.courses import get_current_child
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
 from courseware.views.index import save_positions_recursively_up
-from courseware.views.views import get_current_child
 from student.models import CourseEnrollment, User
 
 from xblock.fields import Scope
@@ -229,6 +229,7 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
           including any access errors.
 
           * course_about: The URL to the course about page.
+          * course_sharing_utm_parameters: Encoded UTM parameters to be included in course sharing url
           * course_handouts: The URI to get data for course handouts.
           * course_image: The path to the course image.
           * course_updates: The URI to get data for course updates.

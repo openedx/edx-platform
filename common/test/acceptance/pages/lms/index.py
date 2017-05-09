@@ -14,14 +14,6 @@ class IndexPage(PageObject):
     """
     LMS index (home) page, the default landing page for Open edX users when they are not logged in
     """
-    def __init__(self, browser):
-        """Initialize the page.
-
-        Arguments:
-            browser (Browser): The browser instance.
-        """
-        super(IndexPage, self).__init__(browser)
-
     url = "{base}/".format(base=BASE_URL)
 
     def is_browser_on_page(self):

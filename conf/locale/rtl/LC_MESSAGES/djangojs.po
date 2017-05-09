@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-04-11 15:04+0000\n"
-"PO-Revision-Date: 2017-04-11 15:06:29.691078\n"
+"POT-Creation-Date: 2017-04-27 12:10+0000\n"
+"PO-Revision-Date: 2017-04-27 12:11:15.755069\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -59,7 +59,6 @@ msgstr "سشدهرل"
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 #: cms/templates/js/certificate-details.underscore
 #: cms/templates/js/certificate-editor.underscore
-#: cms/templates/js/content-group-details.underscore
 #: cms/templates/js/content-group-editor.underscore
 #: cms/templates/js/course-instructor-details.underscore
 #: cms/templates/js/course-outline.underscore
@@ -68,6 +67,7 @@ msgstr "سشدهرل"
 #: cms/templates/js/course_info_update.underscore
 #: cms/templates/js/group-configuration-details.underscore
 #: cms/templates/js/group-configuration-editor.underscore
+#: cms/templates/js/partition-group-details.underscore
 #: cms/templates/js/show-textbook.underscore
 #: cms/templates/js/signatory-editor.underscore
 #: cms/templates/js/xblock-outline.underscore
@@ -287,6 +287,22 @@ msgstr "ذخووثرفشقغ"
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Reply to Annotation"
 msgstr "قثحمغ فخ شررخفشفهخر"
+
+#. Translators: %(num_points)s is the number of points possible (examples: 1,
+#. 3, 10).;
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "%(num_points)s point possible (graded, results hidden)"
+msgid_plural "%(num_points)s points possible (graded, results hidden)"
+msgstr[0] "%(num_points)s حخهرف حخسسهزمث (لقشيثي, قثسعمفس اهييثر)"
+msgstr[1] "%(num_points)s حخهرفس حخسسهزمث (لقشيثي, قثسعمفس اهييثر)"
+
+#. Translators: %(num_points)s is the number of points possible (examples: 1,
+#. 3, 10).;
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "%(num_points)s point possible (ungraded, results hidden)"
+msgid_plural "%(num_points)s points possible (ungraded, results hidden)"
+msgstr[0] "%(num_points)s حخهرف حخسسهزمث (عرلقشيثي, قثسعمفس اهييثر)"
+msgstr[1] "%(num_points)s حخهرفس حخسسهزمث (عرلقشيثي, قثسعمفس اهييثر)"
 
 #. Translators: %(num_points)s is the number of points possible (examples: 1,
 #. 3, 10).;
@@ -733,10 +749,10 @@ msgstr "ثيهف افوم"
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: cms/templates/js/certificate-details.underscore
-#: cms/templates/js/content-group-details.underscore
 #: cms/templates/js/course_info_handouts.underscore
 #: cms/templates/js/course_info_update.underscore
 #: cms/templates/js/group-configuration-details.underscore
+#: cms/templates/js/partition-group-details.underscore
 #: cms/templates/js/show-textbook.underscore
 #: cms/templates/js/signatory-details.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
@@ -1755,12 +1771,6 @@ msgstr "دثقغ مخعي"
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Maximum"
 msgstr "وشطهوعو"
-
-#: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
-msgid ""
-"VideoPlayer: Element corresponding to the given selector was not found."
-msgstr ""
-"دهيثخحمشغثق: ثمثوثرف ذخققثسحخريهرل فخ فاث لهدثر سثمثذفخق صشس رخف بخعري."
 
 #: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
 msgid "This browser cannot play .mp4, .ogg, or .webm files."
@@ -3586,6 +3596,14 @@ msgstr "ثققخق شييهرل/قثوخدهرل عسثقس شس زثفش فثس
 msgid "These users were successfully added as beta testers:"
 msgstr "فاثسث عسثقس صثقث سعذذثسسبعممغ شييثي شس زثفش فثسفثقس:"
 
+#: lms/static/js/instructor_dashboard/membership.js
+msgid ""
+"These users could not be added as beta testers because their accounts are "
+"not yet activated:"
+msgstr ""
+"فاثسث عسثقس ذخعمي رخف زث شييثي شس زثفش فثسفثقس زثذشعسث فاثهق شذذخعرفس شقث "
+"رخف غثف شذفهدشفثي:"
+
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "These users were successfully removed as beta testers:"
@@ -4086,8 +4104,15 @@ msgstr ""
 "مهرنس شقث لثرثقشفثي خر يثوشري شري ثطحهقث صهفاهر 5 وهرعفثس يعث فخ فاث "
 "سثرسهفهدث رشفعقث خب سفعيثرف هربخقوشفهخر."
 
+#: lms/static/js/learner_dashboard/views/program_details_sidebar_view.js
+msgid "{type} Progress"
+msgstr "{type} حقخلقثسس"
+
+#: lms/static/js/learner_dashboard/views/program_details_sidebar_view.js
+msgid "Earned Certificates"
+msgstr "ثشقرثي ذثقفهبهذشفثس"
+
 #: lms/static/js/learner_dashboard/views/program_details_view_2017.js
-#: lms/templates/learner_dashboard/program_card.underscore
 msgid "Enrolled"
 msgstr "ثرقخممثي"
 
@@ -4693,6 +4718,7 @@ msgid "Validation Error"
 msgstr "دشمهيشفهخر ثققخق"
 
 #: lms/static/js/views/fields.js
+#: lms/templates/learner_dashboard/program_card.underscore
 msgid "In Progress"
 msgstr "هر حقخلقثسس"
 
@@ -5239,35 +5265,6 @@ msgstr "مخشي شرخفاثق بهمث"
 msgid "Adding"
 msgstr "شييهرل"
 
-#: cms/static/js/views/content_group_details.js
-#: cms/static/js/views/group_configuration_details.js
-msgid "Not in Use"
-msgstr "رخف هر عسث"
-
-#. Translators: 'count' is number of units that the group
-#. configuration is used in.
-#: cms/static/js/views/content_group_details.js
-#: cms/static/js/views/group_configuration_details.js
-msgid "Used in {count} unit"
-msgid_plural "Used in {count} units"
-msgstr[0] "عسثي هر {count} عرهف"
-msgstr[1] "عسثي هر {count} عرهفس"
-
-#. Translators: This refers to a content group that can be linked to a student
-#. cohort.
-#: cms/static/js/views/content_group_item.js
-#: cms/static/js/views/content_group_list.js
-msgid "content group"
-msgstr "ذخرفثرف لقخعح"
-
-#: cms/static/js/views/content_group_list.js
-msgid "Add your first content group"
-msgstr "شيي غخعق بهقسف ذخرفثرف لقخعح"
-
-#: cms/static/js/views/content_group_list.js
-msgid "You have not created any content groups yet."
-msgstr "غخع اشدث رخف ذقثشفثي شرغ ذخرفثرف لقخعحس غثف."
-
 #: cms/static/js/views/course_info_update.js
 msgid "Are you sure you want to delete this update?"
 msgstr "شقث غخع سعقث غخع صشرف فخ يثمثفث فاهس عحيشفث?"
@@ -5355,6 +5352,20 @@ msgid "Contains {count} group"
 msgid_plural "Contains {count} groups"
 msgstr[0] "ذخرفشهرس {count} لقخعح"
 msgstr[1] "ذخرفشهرس {count} لقخعحس"
+
+#: cms/static/js/views/group_configuration_details.js
+#: cms/static/js/views/partition_group_details.js
+msgid "Not in Use"
+msgstr "رخف هر عسث"
+
+#. Translators: 'count' is number of units that the group
+#. configuration is used in.
+#: cms/static/js/views/group_configuration_details.js
+#: cms/static/js/views/partition_group_details.js
+msgid "Used in {count} unit"
+msgid_plural "Used in {count} units"
+msgstr[0] "عسثي هر {count} عرهف"
+msgstr[1] "عسثي هر {count} عرهفس"
 
 #. Translators: this refers to a collection of groups.
 #: cms/static/js/views/group_configuration_item.js
@@ -5550,6 +5561,10 @@ msgstr "حعزمهسا"
 msgid "Basic"
 msgstr "زشسهذ"
 
+#: cms/static/js/views/modals/course_outline_modals.js
+msgid "Visibility"
+msgstr "دهسهزهمهفغ"
+
 #. Translators: "title" is the name of the current component being edited.
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Editing: %(title)s"
@@ -5609,8 +5624,8 @@ msgid "This {parentCategory} has no {childCategory}"
 msgstr "فاهس {parentCategory} اشس رخ {childCategory}"
 
 #: cms/static/js/views/move_xblock_list.js
-#: cms/templates/js/content-group-details.underscore
 #: cms/templates/js/group-configuration-details.underscore
+#: cms/templates/js/partition-group-details.underscore
 msgid "Course Outline"
 msgstr "ذخعقسث خعفمهرث"
 
@@ -5737,6 +5752,21 @@ msgstr ""
 #: cms/static/js/views/paging_header.js
 msgid "{totalItems} total"
 msgstr "{totalItems} فخفشم"
+
+#. Translators: This refers to a content group that can be linked to a student
+#. cohort.
+#: cms/static/js/views/partition_group_item.js
+#: cms/static/js/views/partition_group_list.js
+msgid "content group"
+msgstr "ذخرفثرف لقخعح"
+
+#: cms/static/js/views/partition_group_list.js
+msgid "Add your first content group"
+msgstr "شيي غخعق بهقسف ذخرفثرف لقخعح"
+
+#: cms/static/js/views/partition_group_list.js
+msgid "You have not created any content groups yet."
+msgstr "غخع اشدث رخف ذقثشفثي شرغ ذخرفثرف لقخعحس غثف."
 
 #. Translators: This is listed as the duration for a video
 #. that has not yet reached the point in its processing by
@@ -6339,8 +6369,13 @@ msgstr "شيي ش ذخووثرف"
 
 #: common/static/common/templates/discussion/thread-show.underscore
 #, python-format
-msgid "%(post_type)s posted %(time_ago)s by %(author)s"
-msgstr "%(post_type)s حخسفثي %(time_ago)s زغ %(author)s"
+msgid "discussion posted %(time_ago)s by %(author)s"
+msgstr "يهسذعسسهخر حخسفثي %(time_ago)s زغ %(author)s"
+
+#: common/static/common/templates/discussion/thread-show.underscore
+#, python-format
+msgid "question posted %(time_ago)s by %(author)s"
+msgstr "ضعثسفهخر حخسفثي %(time_ago)s زغ %(author)s"
 
 #: common/static/common/templates/discussion/thread-show.underscore
 msgid "Closed"
@@ -6922,8 +6957,28 @@ msgid "Click to edit"
 msgstr "ذمهذن فخ ثيهف"
 
 #: lms/templates/fields/field_order_history.underscore
+msgid "Order Number"
+msgstr "خقيثق رعوزثق"
+
+#: lms/templates/fields/field_order_history.underscore
+msgid "Date Placed"
+msgstr "يشفث حمشذثي"
+
+#: lms/templates/fields/field_order_history.underscore
+msgid "Cost"
+msgstr "ذخسف"
+
+#: lms/templates/fields/field_order_history.underscore
 msgid "Order Details"
 msgstr "خقيثق يثفشهمس"
+
+#: lms/templates/fields/field_order_history.underscore
+msgid "for"
+msgstr "بخق"
+
+#: lms/templates/fields/field_order_history.underscore
+msgid "Product Name"
+msgstr "حقخيعذف رشوث"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 #: lms/templates/financial-assistance/financial_assessment_submitted.underscore
@@ -7349,7 +7404,6 @@ msgid "View Archived Course"
 msgstr "دهثص شقذاهدثي ذخعقسث"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
-#: lms/templates/learner_dashboard/program_card.underscore
 msgid "Not Enrolled"
 msgstr "رخف ثرقخممثي"
 
@@ -7426,9 +7480,22 @@ msgid "Completed"
 msgstr "ذخوحمثفثي"
 
 #: lms/templates/learner_dashboard/program_card.underscore
+msgid "Remaining"
+msgstr "قثوشهرهرل"
+
+#: lms/templates/learner_dashboard/program_card.underscore
 #, python-format
 msgid "%(programName)s Home Page."
 msgstr "%(programName)s اخوث حشلث."
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid "Your {program} Certificate"
+msgstr "غخعق {program} ذثقفهبهذشفث"
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+#, python-format
+msgid "Open the certificate you earned for the %(title)s program."
+msgstr "خحثر فاث ذثقفهبهذشفث غخع ثشقرثي بخق فاث %(title)s حقخلقشو."
 
 #: lms/templates/learner_dashboard/program_details_view_2017.underscore
 msgid "Congratulations!"
@@ -8468,8 +8535,8 @@ msgid "Lock/unlock file"
 msgstr "مخذن/عرمخذن بهمث"
 
 #: cms/templates/js/certificate-details.underscore
-#: cms/templates/js/content-group-details.underscore
 #: cms/templates/js/group-configuration-details.underscore
+#: cms/templates/js/partition-group-details.underscore
 msgid "ID"
 msgstr "هي"
 
@@ -8572,23 +8639,6 @@ msgstr ""
 "ذشعفهخر: فاث مشسف حعزمهساثي دثقسهخر خب فاهس عرهف هس مهدث. زغ حعزمهساهرل "
 "ذاشرلثس غخع صهمم ذاشرلث فاث سفعيثرف ثطحثقهثرذث."
 
-#: cms/templates/js/content-group-details.underscore
-#: cms/templates/js/content-group-editor.underscore
-msgid "Cannot delete when in use by a unit"
-msgstr "ذشررخف يثمثفث صاثر هر عسث زغ ش عرهف"
-
-#: cms/templates/js/content-group-details.underscore
-msgid "This content group is used in:"
-msgstr "فاهس ذخرفثرف لقخعح هس عسثي هر:"
-
-#: cms/templates/js/content-group-details.underscore
-msgid ""
-"This content group is not in use. Add a content group to any unit from the "
-"{linkStart}Course Outline{linkEnd}."
-msgstr ""
-"فاهس ذخرفثرف لقخعح هس رخف هر عسث. شيي ش ذخرفثرف لقخعح فخ شرغ عرهف بقخو فاث "
-"{linkStart}ذخعقسث خعفمهرث{linkEnd}."
-
 #: cms/templates/js/content-group-editor.underscore
 msgid "Content Group Name"
 msgstr "ذخرفثرف لقخعح رشوث"
@@ -8604,6 +8654,11 @@ msgstr "فاهس هس فاث رشوث خب فاث لقخعح"
 #: cms/templates/js/content-group-editor.underscore
 msgid "This content group is used in one or more units."
 msgstr "فاهس ذخرفثرف لقخعح هس عسثي هر خرث خق وخقث عرهفس."
+
+#: cms/templates/js/content-group-editor.underscore
+#: cms/templates/js/partition-group-details.underscore
+msgid "Cannot delete when in use by a unit"
+msgstr "ذشررخف يثمثفث صاثر هر عسث زغ ش عرهف"
 
 #: cms/templates/js/content-visibility-editor.underscore
 msgid "Subsection Visibility"
@@ -8749,6 +8804,12 @@ msgstr "عرحعزمهساثي عرهفس صهمم رخف زث قثمثشسثي"
 #: cms/templates/js/course-outline.underscore
 msgid "Unpublished changes to content that will release in the future"
 msgstr "عرحعزمهساثي ذاشرلثس فخ ذخرفثرف فاشف صهمم قثمثشسث هر فاث بعفعقث"
+
+#: cms/templates/js/course-outline.underscore
+msgid ""
+"Some content in this unit is visible only to specific groups of learners"
+msgstr ""
+"سخوث ذخرفثرف هر فاهس عرهف هس دهسهزمث خرمغ فخ سحثذهبهذ لقخعحس خب مثشقرثقس"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Ungraded"
@@ -9178,6 +9239,18 @@ msgstr "غخع اشدثر'ف شييثي شرغ فثطفزخخنس فخ فاهس 
 msgid "Add your first textbook"
 msgstr "شيي غخعق بهقسف فثطفزخخن"
 
+#: cms/templates/js/partition-group-details.underscore
+msgid "This group controls visibility of:"
+msgstr "فاهس لقخعح ذخرفقخمس دهسهزهمهفغ خب:"
+
+#: cms/templates/js/partition-group-details.underscore
+msgid ""
+"Use this group to control a component's visibility in the {linkStart}Course "
+"Outline{linkEnd}."
+msgstr ""
+"عسث فاهس لقخعح فخ ذخرفقخم ش ذخوحخرثرف'س دهسهزهمهفغ هر فاث {linkStart}ذخعقسث "
+"خعفمهرث{linkEnd}."
+
 #: cms/templates/js/previous-video-upload-list.underscore
 msgid "Previous Uploads"
 msgstr "حقثدهخعس عحمخشيس"
@@ -9207,7 +9280,6 @@ msgid "Never published"
 msgstr "رثدثق حعزمهساثي"
 
 #: cms/templates/js/publish-history.underscore
-#: cms/templates/js/publish-xblock.underscore
 #, python-format
 msgid "Last published %(last_published_date)s by %(publish_username)s"
 msgstr "مشسف حعزمهساثي %(last_published_date)s زغ %(publish_username)s"
@@ -9246,9 +9318,20 @@ msgid "Publishing Status"
 msgstr "حعزمهساهرل سفشفعس"
 
 #: cms/templates/js/publish-xblock.underscore
-#, python-format
-msgid "Draft saved on %(last_saved_date)s by %(edit_username)s"
-msgstr "يقشبف سشدثي خر %(last_saved_date)s زغ %(edit_username)s"
+msgid ""
+"Draft saved on {lastSavedStart}{editedOn}{lastSavedEnd} by "
+"{editedByStart}{editedBy}{editedByEnd}"
+msgstr ""
+"يقشبف سشدثي خر {lastSavedStart}{editedOn}{lastSavedEnd} زغ "
+"{editedByStart}{editedBy}{editedByEnd}"
+
+#: cms/templates/js/publish-xblock.underscore
+msgid ""
+"Last published {lastPublishedStart}{publishedOn}{lastPublishedEnd} by "
+"{publishedByStart}{publishedBy}{publishedByEnd}"
+msgstr ""
+"مشسف حعزمهساثي {lastPublishedStart}{publishedOn}{lastPublishedEnd} زغ "
+"{publishedByStart}{publishedBy}{publishedByEnd}"
 
 #: cms/templates/js/publish-xblock.underscore
 #, python-format
@@ -9306,6 +9389,74 @@ msgstr "قثمثشسث فهوث هر عفذ:"
 #: cms/templates/js/release-date-editor.underscore
 msgid "Clear Release Date/Time"
 msgstr "ذمثشق قثمثشسث يشفث/فهوث"
+
+#: cms/templates/js/show-correctness-editor.underscore
+msgid "Assessment Results Visibility"
+msgstr "شسسثسسوثرف قثسعمفس دهسهزهمهفغ"
+
+#: cms/templates/js/show-correctness-editor.underscore
+msgid "Always show assessment results"
+msgstr "شمصشغس ساخص شسسثسسوثرف قثسعمفس"
+
+#: cms/templates/js/show-correctness-editor.underscore
+msgid ""
+"When learners submit an answer to an assessment, they immediately see "
+"whether the answer is correct or incorrect, and the score received."
+msgstr ""
+"صاثر مثشقرثقس سعزوهف شر شرسصثق فخ شر شسسثسسوثرف, فاثغ هووثيهشفثمغ سثث "
+"صاثفاثق فاث شرسصثق هس ذخققثذف خق هرذخققثذف, شري فاث سذخقث قثذثهدثي."
+
+#: cms/templates/js/show-correctness-editor.underscore
+msgid "Never show assessment results"
+msgstr "رثدثق ساخص شسسثسسوثرف قثسعمفس"
+
+#: cms/templates/js/show-correctness-editor.underscore
+msgid ""
+"Learners never see whether their answers to assessments are correct or "
+"incorrect, nor the score received."
+msgstr ""
+"مثشقرثقس رثدثق سثث صاثفاثق فاثهق شرسصثقس فخ شسسثسسوثرفس شقث ذخققثذف خق "
+"هرذخققثذف, رخق فاث سذخقث قثذثهدثي."
+
+#: cms/templates/js/show-correctness-editor.underscore
+msgid "Show assessment results when subsection is past due"
+msgstr "ساخص شسسثسسوثرف قثسعمفس صاثر سعزسثذفهخر هس حشسف يعث"
+
+#: cms/templates/js/show-correctness-editor.underscore
+msgid ""
+"Learners do not see whether their answers to assessments were correct or "
+"incorrect, nor the score received, until after the course end date has "
+"passed."
+msgstr ""
+"مثشقرثقس يخ رخف سثث صاثفاثق فاثهق شرسصثقس فخ شسسثسسوثرفس صثقث ذخققثذف خق "
+"هرذخققثذف, رخق فاث سذخقث قثذثهدثي, عرفهم شبفثق فاث ذخعقسث ثري يشفث اشس "
+"حشسسثي."
+
+#: cms/templates/js/show-correctness-editor.underscore
+msgid ""
+"If the course does not have an end date, learners always see their scores "
+"when they submit answers to assessments."
+msgstr ""
+"هب فاث ذخعقسث يخثس رخف اشدث شر ثري يشفث, مثشقرثقس شمصشغس سثث فاثهق سذخقثس "
+"صاثر فاثغ سعزوهف شرسصثقس فخ شسسثسسوثرفس."
+
+#: cms/templates/js/show-correctness-editor.underscore
+msgid ""
+"Learners do not see whether their answers to assessments were correct or "
+"incorrect, nor the score received, until after the due date for the "
+"subsection has passed."
+msgstr ""
+"مثشقرثقس يخ رخف سثث صاثفاثق فاثهق شرسصثقس فخ شسسثسسوثرفس صثقث ذخققثذف خق "
+"هرذخققثذف, رخق فاث سذخقث قثذثهدثي, عرفهم شبفثق فاث يعث يشفث بخق فاث "
+"سعزسثذفهخر اشس حشسسثي."
+
+#: cms/templates/js/show-correctness-editor.underscore
+msgid ""
+"If the subsection does not have a due date, learners always see their scores"
+" when they submit answers to assessments."
+msgstr ""
+"هب فاث سعزسثذفهخر يخثس رخف اشدث ش يعث يشفث, مثشقرثقس شمصشغس سثث فاثهق سذخقثس"
+" صاثر فاثغ سعزوهف شرسصثقس فخ شسسثسسوثرفس."
 
 #: cms/templates/js/show-textbook.underscore
 msgid "View Live"

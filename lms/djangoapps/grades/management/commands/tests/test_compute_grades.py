@@ -20,6 +20,13 @@ from lms.djangoapps.grades.config.models import ComputeGradesSetting
 from lms.djangoapps.grades.management.commands import compute_grades
 
 
+def _sorted_by_batch(calls):
+    """
+    Return the list of calls sorted by course_key and batch.
+    """
+    return sorted(calls, key=lambda x: (x[1]['kwargs']['course_key'], x[1]['kwargs']['offset']))
+
+
 @ddt.ddt
 class TestComputeGrades(SharedModuleStoreTestCase):
     """
@@ -72,35 +79,73 @@ class TestComputeGrades(SharedModuleStoreTestCase):
         with self.assertRaises(CommandError):
             self.command._get_course_keys({'from_settings': True})
 
-    @patch('lms.djangoapps.grades.tasks.compute_grades_for_course')
-    def test_tasks_fired(self, mock_task):
-        call_command(
+    @ddt.data(True, False)
+    @patch('lms.djangoapps.grades.tasks.compute_grades_for_course_v2')
+    def test_tasks_fired(self, estimate_first_attempted, mock_task):
+        command = [
             'compute_grades',
             '--routing_key=key',
             '--batch_size=2',
+        ]
+        courses = [
             '--courses',
             self.course_keys[0],
             self.course_keys[3],
             'd/n/e'  # No tasks created for nonexistent course, because it has no enrollments
-        )
+        ]
+        if not estimate_first_attempted:
+            command.append('--no_estimate_first_attempted')
+        call_command(*(command + courses))
+        _kwargs = lambda course_key, offset: {
+            'course_key': course_key,
+            'batch_size': 2,
+            'offset': offset,
+            'estimate_first_attempted': estimate_first_attempted
+        }
         self.assertEqual(
-            mock_task.apply_async.call_args_list,
+            _sorted_by_batch(mock_task.apply_async.call_args_list),
             [
                 ({
-                    'options': {'routing_key': 'key'},
-                    'kwargs': {'course_key': self.course_keys[0], 'batch_size': 2, 'offset': 0}
+                    'routing_key': 'key',
+                    'kwargs': _kwargs(self.course_keys[0], 0)
                 },),
                 ({
-                    'options': {'routing_key': 'key'},
-                    'kwargs': {'course_key': self.course_keys[0], 'batch_size': 2, 'offset': 2}
+                    'routing_key': 'key',
+                    'kwargs': _kwargs(self.course_keys[0], 2)
                 },),
                 ({
-                    'options': {'routing_key': 'key'},
-                    'kwargs': {'course_key': self.course_keys[3], 'batch_size': 2, 'offset': 0}
+                    'routing_key': 'key',
+                    'kwargs': _kwargs(self.course_keys[3], 0)
                 },),
                 ({
-                    'options': {'routing_key': 'key'},
-                    'kwargs': {'course_key': self.course_keys[3], 'batch_size': 2, 'offset': 2}
+                    'routing_key': 'key',
+                    'kwargs': _kwargs(self.course_keys[3], 2)
+                },),
+            ],
+        )
+
+    @patch('lms.djangoapps.grades.tasks.compute_grades_for_course_v2')
+    def test_tasks_fired_from_settings(self, mock_task):
+        ComputeGradesSetting.objects.create(course_ids=self.course_keys[1], batch_size=2)
+        call_command('compute_grades', '--from_settings')
+        self.assertEqual(
+            _sorted_by_batch(mock_task.apply_async.call_args_list),
+            [
+                ({
+                    'kwargs': {
+                        'course_key': self.course_keys[1],
+                        'batch_size': 2,
+                        'offset': 0,
+                        'estimate_first_attempted': True
+                    },
+                },),
+                ({
+                    'kwargs': {
+                        'course_key': self.course_keys[1],
+                        'batch_size': 2,
+                        'offset': 2,
+                        'estimate_first_attempted': True
+                    },
                 },),
             ],
         )

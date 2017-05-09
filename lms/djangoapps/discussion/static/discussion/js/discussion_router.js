@@ -102,7 +102,8 @@
                         model: this.thread,
                         mode: 'tab',
                         startHeader: this.startHeader,
-                        courseSettings: this.courseSettings
+                        courseSettings: this.courseSettings,
+                        is_commentable_divided: this.discussion.is_commentable_divided
                     });
                     this.main.render();
                     this.main.on('thread:responses:rendered', function() {

@@ -23,7 +23,7 @@ from django.contrib.auth.views import password_reset_confirm
 from django.contrib import messages
 from django.core.context_processors import csrf
 from django.core import mail
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.urlresolvers import reverse, NoReverseMatch, reverse_lazy
 from django.core.validators import validate_email, ValidationError
 from django.db import IntegrityError, transaction
@@ -31,7 +31,7 @@ from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbid
 from django.shortcuts import redirect
 from django.utils.encoding import force_bytes, force_text
 from django.utils.translation import ungettext
-from django.utils.http import base36_to_int, urlsafe_base64_encode, urlencode
+from django.utils.http import base36_to_int, is_safe_url, urlsafe_base64_encode, urlencode
 from django.utils.translation import ugettext as _, get_language
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.http import require_POST, require_GET
@@ -116,6 +116,7 @@ from student.models import anonymous_id_for_user, UserAttribute, EnrollStatusCha
 from shoppingcart.models import DonationConfiguration, CourseRegistrationCode
 
 from openedx.core.djangoapps.embargo import api as embargo_api
+from openedx.features.course_experience import course_home_url_name
 from openedx.features.enterprise_support.api import get_dashboard_consent_notification
 
 import analytics
@@ -423,16 +424,22 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
                 )
 
     if status in {'generating', 'ready', 'notpassing', 'restricted', 'auditing', 'unverified'}:
+        cert_grade_percent = -1
+        persisted_grade_percent = -1
         persisted_grade = CourseGradeFactory().read(user, course=course_overview)
         if persisted_grade is not None:
-            status_dict['grade'] = unicode(persisted_grade.percent)
-        elif 'grade' in cert_status:
-            status_dict['grade'] = cert_status['grade']
-        else:
+            persisted_grade_percent = persisted_grade.percent
+
+        if 'grade' in cert_status:
+            cert_grade_percent = float(cert_status['grade'])
+
+        if cert_grade_percent == -1 and persisted_grade_percent == -1:
             # Note: as of 11/20/2012, we know there are students in this state-- cs169.1x,
             # who need to be regraded (we weren't tracking 'notpassing' at first).
             # We can add a log.warning here once we think it shouldn't happen.
             return default_info
+
+        status_dict['grade'] = unicode(max(cert_grade_percent, persisted_grade_percent))
 
     return status_dict
 
@@ -624,6 +631,8 @@ def dashboard(request):
 
     """
     user = request.user
+    if not UserProfile.objects.filter(user=user).exists():
+        return redirect(reverse('account_settings'))
 
     platform_name = configuration_helpers.get_value("platform_name", settings.PLATFORM_NAME)
     enable_verified_certificates = configuration_helpers.get_value(
@@ -677,9 +686,22 @@ def dashboard(request):
 
     course_optouts = Optout.objects.filter(user=user).values_list('course_id', flat=True)
 
-    message = ""
-    if not user.is_active:
-        message = render_to_string(
+    sidebar_account_activation_message = ''
+    banner_account_activation_message = ''
+    display_account_activation_message_on_sidebar = configuration_helpers.get_value(
+        'DISPLAY_ACCOUNT_ACTIVATION_MESSAGE_ON_SIDEBAR',
+        settings.FEATURES.get('DISPLAY_ACCOUNT_ACTIVATION_MESSAGE_ON_SIDEBAR', False)
+    )
+
+    # Display activation message in sidebar if DISPLAY_ACCOUNT_ACTIVATION_MESSAGE_ON_SIDEBAR
+    # flag is active. Otherwise display existing message at the top.
+    if display_account_activation_message_on_sidebar and not user.is_active:
+        sidebar_account_activation_message = render_to_string(
+            'registration/account_activation_sidebar_notice.html',
+            {'email': user.email}
+        )
+    elif not user.is_active:
+        banner_account_activation_message = render_to_string(
             'registration/activate_account_notice.html',
             {'email': user.email, 'platform_name': platform_name}
         )
@@ -811,7 +833,8 @@ def dashboard(request):
         'redirect_message': redirect_message,
         'course_enrollments': course_enrollments,
         'course_optouts': course_optouts,
-        'message': message,
+        'banner_account_activation_message': banner_account_activation_message,
+        'sidebar_account_activation_message': sidebar_account_activation_message,
         'staff_access': staff_access,
         'errored_courses': errored_courses,
         'show_courseware_links_for': show_courseware_links_for,
@@ -1213,6 +1236,39 @@ def change_enrollment(request, check_access=True):
         return HttpResponseBadRequest(_("Enrollment action is invalid"))
 
 
+def _generate_not_activated_message(user):
+    """
+    Generates the message displayed on the sign-in screen when a learner attempts to access the
+    system with an inactive account.
+
+    Arguments:
+        user (User): User object for the learner attempting to sign in.
+    """
+
+    support_url = configuration_helpers.get_value(
+        'SUPPORT_SITE_LINK',
+        settings.SUPPORT_SITE_LINK
+    )
+
+    platform_name = configuration_helpers.get_value(
+        'PLATFORM_NAME',
+        settings.PLATFORM_NAME
+    )
+
+    not_activated_msg_template = _('In order to sign in, you need to activate your account.<br /><br />'
+                                   'We just sent an activation link to <strong>{email}</strong>.  If '
+                                   'you do not receive an email, check your spam folders or '
+                                   '<a href="{support_url}">contact {platform} Support</a>.')
+
+    not_activated_message = not_activated_msg_template.format(
+        email=user.email,
+        support_url=support_url,
+        platform=platform_name
+    )
+
+    return not_activated_message
+
+
 # Need different levels of logging
 @ensure_csrf_cookie
 def login_user(request, error=""):  # pylint: disable=too-many-statements,unused-argument
@@ -1433,11 +1489,10 @@ def login_user(request, error=""):  # pylint: disable=too-many-statements,unused
         AUDIT_LOG.warning(u"Login failed - Account not active for user {0}, resending activation".format(username))
 
     reactivation_email_for_user(user)
-    not_activated_msg = _("Before you sign in, you need to activate your account. We have sent you an "
-                          "email message with instructions for activating your account.")
+
     return JsonResponse({
         "success": False,
-        "value": not_activated_msg,
+        "value": _generate_not_activated_message(user),
     })  # TODO: this should be status code 400  # pylint: disable=fixme
 
 
@@ -2172,12 +2227,12 @@ def auto_auth(request):
         # Redirect to specific page if specified
         if redirect_to:
             redirect_url = redirect_to
-        # Redirect to course info page if course_id is known
+        # Redirect to course home page if course_id is known
         elif course_id:
             try:
-                # redirect to course info page in LMS
+                # redirect to course home page in LMS
                 redirect_url = reverse(
-                    'info',
+                    course_home_url_name(request),
                     kwargs={'course_id': course_id}
                 )
             except NoReverseMatch:
@@ -2436,10 +2491,21 @@ def reactivation_email_for_user(user):
             "error": _('No inactive user with this e-mail exists'),
         })  # TODO: this should be status code 400  # pylint: disable=fixme
 
-    context = {
-        'name': user.profile.name,
-        'key': reg.activation_key,
-    }
+    try:
+        context = {
+            'name': user.profile.name,
+            'key': reg.activation_key,
+        }
+    except ObjectDoesNotExist:
+        log.error(
+            u'Unable to send reactivation email due to unavailable profile for the user "%s"',
+            user.username,
+            exc_info=True
+        )
+        return JsonResponse({
+            "success": False,
+            "error": _('Unable to send reactivation email')
+        })
 
     subject = render_to_string('emails/activation_email_subject.txt', context)
     subject = ''.join(subject.splitlines())
@@ -2659,7 +2725,21 @@ class LogoutView(TemplateView):
     template_name = 'logout.html'
 
     # Keep track of the page to which the user should ultimately be redirected.
-    target = reverse_lazy('cas-logout') if settings.FEATURES.get('AUTH_USE_CAS') else '/'
+    default_target = reverse_lazy('cas-logout') if settings.FEATURES.get('AUTH_USE_CAS') else '/'
+
+    @property
+    def target(self):
+        """
+        If a redirect_url is specified in the querystring for this request, and the value is a url
+        with the same host, the view will redirect to this page after rendering the template.
+        If it is not specified, we will use the default target url.
+        """
+        target_url = self.request.GET.get('redirect_url')
+
+        if target_url and is_safe_url(target_url, self.request.META.get('HTTP_HOST')):
+            return target_url
+        else:
+            return self.default_target
 
     def dispatch(self, request, *args, **kwargs):  # pylint: disable=missing-docstring
         # We do not log here, because we have a handler registered to perform logging on successful logouts.

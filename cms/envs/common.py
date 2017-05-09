@@ -89,7 +89,11 @@ from lms.envs.common import (
     FILE_UPLOAD_STORAGE_BUCKET_NAME,
     FILE_UPLOAD_STORAGE_PREFIX,
 
-    COURSE_ENROLLMENT_MODES
+    COURSE_ENROLLMENT_MODES,
+
+    HELP_TOKENS_BOOKS,
+
+    SUPPORT_SITE_LINK,
 )
 from path import Path as path
 from warnings import simplefilter
@@ -300,7 +304,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',  # this is required for admin
                 'django.template.context_processors.csrf',
                 'dealer.contrib.django.staff.context_processor',  # access git revision
-                'contentstore.context_processors.doc_url',
+                'help_tokens.context_processor',
             ),
             # Change 'debug' in your environment settings files - not here.
             'debug': False
@@ -546,6 +550,8 @@ STATICFILES_DIRS = [
 TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGES_BIDI = lms.envs.common.LANGUAGES_BIDI
+
+LANGUAGE_COOKIE = lms.envs.common.LANGUAGE_COOKIE
 
 LANGUAGES = lms.envs.common.LANGUAGES
 LANGUAGE_DICT = dict(LANGUAGES)
@@ -859,6 +865,7 @@ INSTALLED_APPS = (
 
     # Maintenance tools
     'maintenance',
+    'django_extensions',
 
     # Tracking
     'track',
@@ -933,6 +940,9 @@ INSTALLED_APPS = (
 
     # Self-paced course configuration
     'openedx.core.djangoapps.self_paced',
+
+    # Video module configs (This will be moved to Video once it becomes an XBlock)
+    'openedx.core.djangoapps.video_config',
 
     # django-oauth2-provider (deprecated)
     'provider',
@@ -1084,6 +1094,9 @@ OPTIONAL_APPS = (
 
     # Organizations App (http://github.com/edx/edx-organizations)
     'organizations',
+
+    # Enterprise App (http://github.com/edx/edx-enterprise)
+    'enterprise',
 )
 
 
@@ -1239,7 +1252,7 @@ AFFILIATE_COOKIE_NAME = 'affiliate_id'
 
 ############## Settings for Studio Context Sensitive Help ##############
 
-DOC_LINK_BASE_URL = None
+HELP_TOKENS_INI_FILE = REPO_ROOT / "docs" / "cms_config.ini"
 
 # Theme directory locale paths
 COMPREHENSIVE_THEME_LOCALE_PATHS = []
@@ -1263,6 +1276,8 @@ USER_TASKS_MAX_AGE = timedelta(days=7)
 ############## Settings for the Enterprise App ######################
 
 ENTERPRISE_ENROLLMENT_API_URL = LMS_ROOT_URL + "/api/enrollment/v1/"
+ENTERPRISE_SERVICE_WORKER_USERNAME = 'enterprise_worker'
+ENTERPRISE_API_CACHE_TIMEOUT = 3600  # Value is in seconds
 
 ############## Settings for the Discovery App ######################
 

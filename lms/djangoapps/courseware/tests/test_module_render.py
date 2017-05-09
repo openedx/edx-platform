@@ -1834,24 +1834,24 @@ class TestXmoduleRuntimeEvent(TestSubmittingProblems):
         self.assertIsNone(student_module.grade)
         self.assertIsNone(student_module.max_grade)
 
-    @freeze_time(datetime.now().replace(tzinfo=pytz.UTC))
     @patch('lms.djangoapps.grades.signals.handlers.PROBLEM_RAW_SCORE_CHANGED.send')
     def test_score_change_signal(self, send_mock):
         """Test that a Django signal is generated when a score changes"""
-        self.set_module_grade_using_publish(self.grade_dict)
-        expected_signal_kwargs = {
-            'sender': None,
-            'raw_possible': self.grade_dict['max_value'],
-            'raw_earned': self.grade_dict['value'],
-            'weight': None,
-            'user_id': self.student_user.id,
-            'course_id': unicode(self.course.id),
-            'usage_id': unicode(self.problem.location),
-            'only_if_higher': None,
-            'modified': datetime.now().replace(tzinfo=pytz.UTC),
-            'score_db_table': 'csm',
-        }
-        send_mock.assert_called_with(**expected_signal_kwargs)
+        with freeze_time(datetime.now().replace(tzinfo=pytz.UTC)):
+            self.set_module_grade_using_publish(self.grade_dict)
+            expected_signal_kwargs = {
+                'sender': None,
+                'raw_possible': self.grade_dict['max_value'],
+                'raw_earned': self.grade_dict['value'],
+                'weight': None,
+                'user_id': self.student_user.id,
+                'course_id': unicode(self.course.id),
+                'usage_id': unicode(self.problem.location),
+                'only_if_higher': None,
+                'modified': datetime.now().replace(tzinfo=pytz.UTC),
+                'score_db_table': 'csm',
+            }
+            send_mock.assert_called_with(**expected_signal_kwargs)
 
 
 @attr(shard=1)

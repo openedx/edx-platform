@@ -53,9 +53,8 @@ class TestPreferenceAPI(CacheIsolationTestCase):
         super(TestPreferenceAPI, self).setUp()
         self.user = UserFactory.create(password=self.password)
         self.different_user = UserFactory.create(password=self.password)
-        self.staff_user = UserFactory(is_staff=True, password=self.password)
-        self.no_such_user = UserFactory.create(password=self.password)
-        self.no_such_user.username = "no_such_user"
+        self.staff_user = UserFactory.create(is_staff=True, password=self.password)
+        self.no_such_user = UserFactory.build(password=self.password, username="no_such_user")
         self.test_preference_key = "test_key"
         self.test_preference_value = "test_value"
         set_user_preference(self.user, self.test_preference_key, self.test_preference_value)

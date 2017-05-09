@@ -13,9 +13,6 @@ class VideoHandoutTest(CMSVideoBaseTest):
     CMS Video Handout Test Class
     """
 
-    def setUp(self):
-        super(VideoHandoutTest, self).setUp()
-
     def _create_course_unit_with_handout(self, handout_filename, save_settings=True):
         """
         Create a course with unit and also upload handout

@@ -9,6 +9,7 @@
         'js/learner_dashboard/models/course_enroll_model',
         'js/learner_dashboard/views/upgrade_message_view_2017',
         'js/learner_dashboard/views/certificate_status_view_2017',
+        'js/learner_dashboard/views/expired_notification_view',
         'js/learner_dashboard/views/course_enroll_view_2017',
         'text!../../../templates/learner_dashboard/course_card_2017.underscore'
     ],
@@ -21,6 +22,7 @@
              EnrollModel,
              UpgradeMessageView,
              CertificateStatusView,
+             ExpiredNotificationView,
              CourseEnrollView,
              pageTpl
          ) {
@@ -50,7 +52,9 @@
 
                  postRender: function() {
                      var $upgradeMessage = this.$('.upgrade-message'),
-                         $certStatus = this.$('.certificate-status');
+                         $certStatus = this.$('.certificate-status'),
+                         $expiredNotification = this.$('.expired-notification'),
+                         expired = this.model.get('expired');
 
                      this.enrollView = new CourseEnrollView({
                          $parentEl: this.$('.course-actions'),
@@ -59,14 +63,14 @@
                          enrollModel: this.enrollModel
                      });
 
-                     if (this.model.get('upgrade_url')) {
+                     if (this.model.get('upgrade_url') && !(expired === true)) {
                          this.upgradeMessage = new UpgradeMessageView({
                              $el: $upgradeMessage,
                              model: this.model
                          });
 
                          $certStatus.remove();
-                     } else if (this.model.get('certificate_url')) {
+                     } else if (this.model.get('certificate_url') && !(expired === true)) {
                          this.certificateStatus = new CertificateStatusView({
                              $el: $certStatus,
                              model: this.model
@@ -77,6 +81,13 @@
                         // Styles are applied to these elements which will be visible if they're empty.
                          $upgradeMessage.remove();
                          $certStatus.remove();
+                     }
+
+                     if (expired) {
+                         this.expiredNotification = new ExpiredNotificationView({
+                             $el: $expiredNotification,
+                             model: this.model
+                         });
                      }
                  }
              });

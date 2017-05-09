@@ -28,7 +28,7 @@ class BulkChangeEnrollmentTests(SharedModuleStoreTestCase):
     @ddt.unpack
     def test_bulk_convert(self, from_mode, to_mode, mock_tracker):
         """Verify that enrollments are changed correctly."""
-        self._enroll_users(from_mode)
+        self._enroll_users(self.course, self.users, from_mode)
         CourseModeFactory(course_id=self.course.id, mode_slug=to_mode)
 
         # Verify that no users are in the `from` mode yet.
@@ -46,27 +46,25 @@ class BulkChangeEnrollmentTests(SharedModuleStoreTestCase):
         # raise CourseEnrollment.DoesNotExist
         for user in self.users:
             CourseEnrollment.objects.get(mode=to_mode, course_id=self.course.id, user=user)
-
-            # Confirm the analytics event was emitted.
-            mock_tracker.emit.assert_has_calls(  # pylint: disable=maybe-no-member
-                [
-                    call(
-                        EVENT_NAME_ENROLLMENT_MODE_CHANGED,
-                        {'course_id': unicode(self.course.id), 'user_id': user.id, 'mode': to_mode}
-                    ),
-                ]
-            )
+            self._assert_mode_changed(mock_tracker, self.course, user, to_mode)
 
     @patch('student.models.tracker')
     @ddt.data(('audit', 'no-id-professional'), ('no-id-professional', 'audit'))
     @ddt.unpack
     def test_bulk_convert_with_org(self, from_mode, to_mode, mock_tracker):
         """Verify that enrollments are changed correctly when org was given."""
-        self._enroll_users(from_mode)
+        self._enroll_users(self.course, self.users, from_mode)
         CourseModeFactory(course_id=self.course.id, mode_slug=to_mode)
 
-        # Verify that no users are in the `from` mode yet.
+        # Create a second course under the same org
+        course_2 = CourseFactory.create(org=self.org)
+        CourseModeFactory(course_id=course_2.id, mode_slug=to_mode)
+        CourseOverview.load_from_module_store(course_2.id)
+        self._enroll_users(course_2, self.users, from_mode)
+
+        # Verify that no users are in the `to` mode yet.
         self.assertEqual(len(CourseEnrollment.objects.filter(mode=to_mode, course_id=self.course.id)), 0)
+        self.assertEqual(len(CourseEnrollment.objects.filter(mode=to_mode, course_id=course_2.id)), 0)
 
         call_command(
             'bulk_change_enrollment',
@@ -79,21 +77,13 @@ class BulkChangeEnrollmentTests(SharedModuleStoreTestCase):
         # Verify that all users have been moved -- if not, this will
         # raise CourseEnrollment.DoesNotExist
         for user in self.users:
-            CourseEnrollment.objects.get(mode=to_mode, course_id=self.course.id, user=user)
-
-            # Confirm the analytics event was emitted.
-            mock_tracker.emit.assert_has_calls(  # pylint: disable=maybe-no-member
-                [
-                    call(
-                        EVENT_NAME_ENROLLMENT_MODE_CHANGED,
-                        {'course_id': unicode(self.course.id), 'user_id': user.id, 'mode': to_mode}
-                    ),
-                ]
-            )
+            for course in [self.course, course_2]:
+                CourseEnrollment.objects.get(mode=to_mode, course_id=course.id, user=user)
+                self._assert_mode_changed(mock_tracker, course, user, to_mode)
 
     def test_with_org_and_course_key(self):
         """Verify that command raises CommandError when `org` and `course_key` both are given."""
-        self._enroll_users('audit')
+        self._enroll_users(self.course, self.users, 'audit')
         CourseModeFactory(course_id=self.course.id, mode_slug='no-id-professional')
 
         with self.assertRaises(CommandError):
@@ -106,9 +96,45 @@ class BulkChangeEnrollmentTests(SharedModuleStoreTestCase):
                 commit=True,
             )
 
+    @patch('student.models.tracker')
+    def test_with_org_and_invalid_to_mode(self, mock_tracker):
+        """Verify that enrollments are changed correctly when org was given."""
+        from_mode = 'audit'
+        to_mode = 'no-id-professional'
+        self._enroll_users(self.course, self.users, from_mode)
+
+        # Create a second course under the same org
+        course_2 = CourseFactory.create(org=self.org)
+        CourseModeFactory(course_id=course_2.id, mode_slug=to_mode)
+        CourseOverview.load_from_module_store(course_2.id)
+        self._enroll_users(course_2, self.users, from_mode)
+
+        # Verify that no users are in the `to` mode yet.
+        self.assertEqual(len(CourseEnrollment.objects.filter(mode=to_mode, course_id=self.course.id)), 0)
+        self.assertEqual(len(CourseEnrollment.objects.filter(mode=to_mode, course_id=course_2.id)), 0)
+
+        call_command(
+            'bulk_change_enrollment',
+            org=self.org,
+            from_mode=from_mode,
+            to_mode=to_mode,
+            commit=True,
+        )
+
+        # Verify that users were not moved for the invalid course/mode combination
+        for user in self.users:
+            with self.assertRaises(CourseEnrollment.DoesNotExist):
+                CourseEnrollment.objects.get(mode=to_mode, course_id=self.course.id, user=user)
+
+        # Verify that all users have been moved -- if not, this will
+        # raise CourseEnrollment.DoesNotExist
+        for user in self.users:
+            CourseEnrollment.objects.get(mode=to_mode, course_id=course_2.id, user=user)
+            self._assert_mode_changed(mock_tracker, course_2, user, to_mode)
+
     def test_with_invalid_org(self):
         """Verify that command raises CommandError when invalid `org` is given."""
-        self._enroll_users('audit')
+        self._enroll_users(self.course, self.users, 'audit')
         CourseModeFactory(course_id=self.course.id, mode_slug='no-id-professional')
 
         with self.assertRaises(CommandError):
@@ -122,7 +148,7 @@ class BulkChangeEnrollmentTests(SharedModuleStoreTestCase):
 
     def test_without_commit(self):
         """Verify that nothing happens when the `commit` flag is not given."""
-        self._enroll_users('audit')
+        self._enroll_users(self.course, self.users, 'audit')
         CourseModeFactory(course_id=self.course.id, mode_slug='honor')
 
         call_command(
@@ -137,7 +163,7 @@ class BulkChangeEnrollmentTests(SharedModuleStoreTestCase):
 
     def test_without_to_mode(self):
         """Verify that the command fails when the `to_mode` argument does not exist."""
-        self._enroll_users('audit')
+        self._enroll_users(self.course, self.users, 'audit')
         CourseModeFactory(course_id=self.course.id, mode_slug='audit')
 
         with self.assertRaises(CommandError):
@@ -145,7 +171,6 @@ class BulkChangeEnrollmentTests(SharedModuleStoreTestCase):
                 'bulk_change_enrollment',
                 course=unicode(self.course.id),
                 from_mode='audit',
-                to_mode='honor',
             )
 
     @ddt.data('from_mode', 'to_mode', 'course')
@@ -177,7 +202,18 @@ class BulkChangeEnrollmentTests(SharedModuleStoreTestCase):
                 commit=True
             )
 
-    def _enroll_users(self, mode):
+    def _assert_mode_changed(self, mock_tracker, course, user, to_mode):
+        """Confirm the analytics event was emitted."""
+        mock_tracker.emit.assert_has_calls(  # pylint: disable=maybe-no-member
+            [
+                call(
+                    EVENT_NAME_ENROLLMENT_MODE_CHANGED,
+                    {'course_id': unicode(course.id), 'user_id': user.id, 'mode': to_mode}
+                ),
+            ]
+        )
+
+    def _enroll_users(self, course, users, mode):
         """Enroll users in the given mode."""
-        for user in self.users:
-            CourseEnrollmentFactory(mode=mode, course_id=self.course.id, user=user)
+        for user in users:
+            CourseEnrollmentFactory(mode=mode, course_id=course.id, user=user)

@@ -93,12 +93,12 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                         entries: {
                             Topic_C_1: {
                                 sort_key: null,
-                                is_cohorted: true,
+                                is_divided: true,
                                 id: 'Topic_C_1'
                             },
                             Topic_C_2: {
                                 sort_key: null,
-                                is_cohorted: false,
+                                is_divided: false,
                                 id: 'Topic_C_2'
                             }
                         }
@@ -111,12 +111,12 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                                 entries: {
                                     Inline_Discussion_1: {
                                         sort_key: null,
-                                        is_cohorted: true,
+                                        is_divided: true,
                                         id: 'Inline_Discussion_1'
                                     },
                                     Inline_Discussion_2: {
                                         sort_key: null,
-                                        is_cohorted: allCohorted || false,
+                                        is_divided: allCohorted || false,
                                         id: 'Inline_Discussion_2'
                                     }
                                 }
@@ -1492,7 +1492,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                                 entries: {
                                     Topic_C_1: {
                                         sort_key: null,
-                                        is_cohorted: true,
+                                        is_divided: true,
                                         id: 'Topic_C_1'
                                     }
                                 }

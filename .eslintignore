@@ -58,3 +58,5 @@ common/lib/xmodule/xmodule/js/src/vertical/edit.js
 
 # This file is responsible for almost half of the repo's total issues.
 common/lib/xmodule/xmodule/js/src/capa/schematic.js
+
+!**/.eslintrc.js

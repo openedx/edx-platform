@@ -23,12 +23,14 @@ from pytz import UTC
 from xblock.core import XBlock
 from xblock.fields import Scope
 from xblock.fragment import Fragment
+
+from xblock_config.models import CourseEditLTIFieldsEnabledFlag
 from xblock_django.user_service import DjangoXBlockUserService
 
 from cms.lib.xblock.authoring_mixin import VISIBILITY_VIEW
 from contentstore.utils import (
     find_release_date_source, find_staff_lock_source, is_currently_visible_to_students,
-    ancestor_has_staff_lock, has_children_visible_to_specific_content_groups,
+    ancestor_has_staff_lock, has_children_visible_to_specific_partition_groups,
     get_user_partition_info, get_split_group_display_name,
 )
 from contentstore.views.helpers import is_unit, xblock_studio_url, xblock_primary_child_category, \
@@ -51,7 +53,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from xmodule.modulestore.inheritance import own_metadata
-from xmodule.services import SettingsService
+from xmodule.services import ConfigurationService, SettingsService
 from xmodule.tabs import CourseTabList
 from xmodule.x_module import PREVIEW_VIEWS, STUDIO_VIEW, STUDENT_VIEW, DEPRECATION_VSCOMPAT_EVENT
 
@@ -269,6 +271,8 @@ class StudioEditModuleRuntime(object):
                 return StudioPermissionsService(self._user)
             if service_name == "settings":
                 return SettingsService()
+            if service_name == "lti-configuration":
+                return ConfigurationService(CourseEditLTIFieldsEnabledFlag)
         return None
 
 
@@ -1005,6 +1009,7 @@ def _get_module_info(xblock, rewrite_static_links=True, include_ancestor_info=Fa
         )
         if include_publishing_info:
             add_container_page_publishing_info(xblock, xblock_info)
+
         return xblock_info
 
 
@@ -1162,6 +1167,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
             'explanatory_message': explanatory_message,
             'group_access': xblock.group_access,
             'user_partitions': user_partitions,
+            'show_correctness': xblock.show_correctness,
         })
 
         if xblock.category == 'sequential':
@@ -1217,6 +1223,10 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
                 )
             else:
                 xblock_info['staff_only_message'] = False
+
+            xblock_info["has_partition_group_components"] = has_children_visible_to_specific_partition_groups(
+                xblock
+            )
     return xblock_info
 
 
@@ -1245,7 +1255,7 @@ def add_container_page_publishing_info(xblock, xblock_info):  # pylint: disable=
     xblock_info["edited_by"] = safe_get_username(xblock.subtree_edited_by)
     xblock_info["published_by"] = safe_get_username(xblock.published_by)
     xblock_info["currently_visible_to_students"] = is_currently_visible_to_students(xblock)
-    xblock_info["has_content_group_components"] = has_children_visible_to_specific_content_groups(xblock)
+    xblock_info["has_partition_group_components"] = has_children_visible_to_specific_partition_groups(xblock)
     if xblock_info["release_date"]:
         xblock_info["release_date_from"] = _get_release_date_from(xblock)
     if xblock_info["visibility_state"] == VisibilityState.staff_only:

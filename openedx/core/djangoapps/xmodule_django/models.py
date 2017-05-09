@@ -18,13 +18,6 @@ class NoneToEmptyManager(models.Manager):
     A :class:`django.db.models.Manager` that has a :class:`NoneToEmptyQuerySet`
     as its `QuerySet`, initialized with a set of specified `field_names`.
     """
-    def __init__(self):
-        """
-        Args:
-            field_names: The list of field names to initialize the :class:`NoneToEmptyQuerySet` with.
-        """
-        super(NoneToEmptyManager, self).__init__()
-
     def get_queryset(self):
         """
         Returns the result of NoneToEmptyQuerySet instead of a regular QuerySet.

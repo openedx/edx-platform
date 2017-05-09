@@ -225,18 +225,7 @@ CORS_ORIGIN_WHITELIST = ()
 CORS_ORIGIN_ALLOW_ALL = True
 
 # JWT settings for devstack
-PUBLIC_RSA_KEY = """\
------BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApCujf5oZBGK4MafMRGY9
-+zdRRI9YDm1r+81coDCysSrwkhTkFIwP2dmS6lYvJuQ5wifuQa3WFv1Kh9Nr2XRJ
-1m9OL3/JpmMyTi/YuwD7tIf65tab1SOSRYkoxOKRuuvZuXQG9nWbXrGDncnwuWxf
-eymwWaIrAhALUS5+nDa7dauj8VngsWauMrEA/MWShEzsR53wGKlciEZA1r/AfQ55
-XS42GvBobhhy9SeZ3B6LHiaAEywpwFmKPssuoHSNhbPa49LW3gXJ6CsFGRDcBFKd
-xJ/l8O847Q7kg1lvckpLsKyu5167NK9Qj1X/O3SwVBL3cxx1HpQ6+q3SGLZ4ngow
-hwIDAQAB
------END PUBLIC KEY-----"""
-
-PRIVATE_RSA_KEY = """\
+JWT_PRIVATE_SIGNING_KEY = """\
 -----BEGIN PRIVATE KEY-----
 MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQCkK6N/mhkEYrgx
 p8xEZj37N1FEj1gObWv7zVygMLKxKvCSFOQUjA/Z2ZLqVi8m5DnCJ+5BrdYW/UqH
@@ -271,6 +260,18 @@ JWT_AUTH.update({
     'JWT_ISSUER': 'http://127.0.0.1:8000/oauth2',
     'JWT_AUDIENCE': 'lms-key',
 })
+
+# TODO: TNL-6546: Remove this waffle and flag code.
+from django.db.utils import ProgrammingError
+from waffle.models import Flag
+try:
+    flag, created = Flag.objects.get_or_create(name='unified_course_view')
+    flag.everyone = True
+    flag.save()
+    WAFFLE_OVERRIDE = True
+except ProgrammingError:
+    # during initial reset_db, the table for the flag doesn't yet exist.
+    pass
 
 #####################################################################
 # See if the developer has any local overrides.

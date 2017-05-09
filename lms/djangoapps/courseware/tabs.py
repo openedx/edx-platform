@@ -10,6 +10,7 @@ from django.utils.translation import ugettext as _, ugettext_noop
 from courseware.access import has_access
 from courseware.entrance_exams import user_can_skip_entrance_exam
 from openedx.core.lib.course_tabs import CourseTabPluginManager
+from openedx.features.course_experience import defaut_course_url_name, UNIFIED_COURSE_EXPERIENCE_FLAG
 from request_cache.middleware import RequestCache
 from student.models import CourseEnrollment
 from xmodule.tabs import CourseTab, CourseTabList, key_checker, link_reverse_func
@@ -38,23 +39,13 @@ class CoursewareTab(EnrolledTab):
     is_default = False
     supports_preview_menu = True
 
-    @staticmethod
-    def main_course_url_name(request):
-        """
-        Returns the main course URL for the current user.
-        """
-        if waffle.flag_is_active(request, 'unified_course_view'):
-            return 'edx.course_experience.course_home'
-        else:
-            return 'courseware'
-
     @property
     def link_func(self):
         """
         Returns a function that computes the URL for this tab.
         """
         request = RequestCache.get_current_request()
-        url_name = self.main_course_url_name(request)
+        url_name = defaut_course_url_name(request)
         return link_reverse_func(url_name)
 
 
@@ -72,7 +63,11 @@ class CourseInfoTab(CourseTab):
 
     @classmethod
     def is_enabled(cls, course, user=None):
-        return True
+        """
+        The "Home" tab is not shown for the new unified course experience.
+        """
+        request = RequestCache.get_current_request()
+        return not waffle.flag_is_active(request, UNIFIED_COURSE_EXPERIENCE_FLAG)
 
 
 class SyllabusTab(EnrolledTab):

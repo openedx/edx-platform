@@ -11,14 +11,6 @@ class DashboardPage(PageObject):
     Student dashboard, where the student can view
     courses she/he has registered for.
     """
-    def __init__(self, browser):
-        """Initialize the page.
-
-        Arguments:
-            browser (Browser): The browser instance.
-        """
-        super(DashboardPage, self).__init__(browser)
-
     url = "{base}/dashboard".format(base=BASE_URL)
 
     def is_browser_on_page(self):

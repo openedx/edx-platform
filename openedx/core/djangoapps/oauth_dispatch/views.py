@@ -5,15 +5,20 @@ django-oauth-toolkit as appropriate.
 
 from __future__ import unicode_literals
 
+import hashlib
 import json
 
+from Crypto.PublicKey import RSA
+from django.conf import settings
+from django.core.urlresolvers import reverse
+from django.http import JsonResponse
 from django.views.generic import View
 from edx_oauth2_provider import views as dop_views  # django-oauth2-provider views
+from jwkest.jwk import RSAKey
 from oauth2_provider import models as dot_models, views as dot_views  # django-oauth-toolkit
 
 from openedx.core.djangoapps.auth_exchange import views as auth_exchange_views
 from openedx.core.lib.token_utils import JwtBuilder
-
 from . import adapters
 
 
@@ -132,3 +137,45 @@ class RevokeTokenView(_DispatchingView):
     Dispatch to the RevokeTokenView of django-oauth-toolkit
     """
     dot_view = dot_views.RevokeTokenView
+
+
+class ProviderInfoView(View):
+    def get(self, request, *args, **kwargs):
+        data = {
+            'issuer': settings.JWT_AUTH['JWT_ISSUER'],
+            'authorization_endpoint': request.build_absolute_uri(reverse('authorize')),
+            'token_endpoint': request.build_absolute_uri(reverse('access_token')),
+            'end_session_endpoint': request.build_absolute_uri(reverse('logout')),
+            'token_endpoint_auth_methods_supported': ['client_secret_post'],
+            # NOTE (CCB): This is not part of the OpenID Connect standard. It is added here since we
+            # use JWS for our access tokens.
+            'access_token_signing_alg_values_supported': ['RS512', 'HS256'],
+            'scopes_supported': ['openid', 'profile', 'email'],
+            'claims_supported': ['sub', 'iss', 'name', 'given_name', 'family_name', 'email'],
+            'jwks_uri': request.build_absolute_uri(reverse('jwks')),
+        }
+        response = JsonResponse(data)
+        return response
+
+
+class JwksView(View):
+    @staticmethod
+    def serialize_rsa_key(key):
+        kid = hashlib.md5(key.encode('utf-8')).hexdigest()
+        key = RSAKey(kid=kid, key=RSA.importKey(key), use='sig', alg='RS512')
+        return key.serialize(private=False)
+
+    def get(self, request, *args, **kwargs):
+        secret_keys = []
+
+        if settings.JWT_PRIVATE_SIGNING_KEY:
+            secret_keys.append(settings.JWT_PRIVATE_SIGNING_KEY)
+
+        # NOTE: We provide the expired keys in case there are unexpired access tokens
+        # that need to have their signatures verified.
+        if settings.JWT_EXPIRED_PRIVATE_SIGNING_KEYS:
+            secret_keys += settings.JWT_EXPIRED_PRIVATE_SIGNING_KEYS
+
+        return JsonResponse({
+            'keys': [self.serialize_rsa_key(key) for key in secret_keys if key],
+        })

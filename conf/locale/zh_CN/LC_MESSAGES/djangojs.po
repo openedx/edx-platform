@@ -187,7 +187,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-04-11 14:17+0000\n"
+"POT-Creation-Date: 2017-04-11 15:16+0000\n"
 "PO-Revision-Date: 2017-04-11 14:32+0000\n"
 "Last-Translator: Anthony Mangano <amangano@edx.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
@@ -207,8 +207,8 @@ msgstr ""
 #: cms/static/js/views/edit_textbook.js
 #: cms/static/js/views/list_item_editor.js
 #: cms/static/js/views/modals/edit_xblock.js cms/static/js/views/tabs.js
-#: cms/static/js/views/tabs.js.c cms/static/js/views/utils/xblock_utils.js
-#: lms/static/js/ccx/schedule.js lms/static/js/views/fields.js
+#: cms/static/js/views/utils/xblock_utils.js lms/static/js/ccx/schedule.js
+#: lms/static/js/views/fields.js
 msgid "Saving"
 msgstr "正在保存"
 
@@ -2176,7 +2176,9 @@ msgid "Loading posts list"
 msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
-msgid "No results found for {original_query}. "
+msgid ""
+"No results found for {original_query}. Showing results for "
+"{suggested_query}."
 msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
@@ -2291,13 +2293,13 @@ msgstr "在目标上放下"
 
 #. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
+#, javascript-format
 msgid "%s ago"
 msgstr "%s 以前"
 
 #. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
+#, javascript-format
 msgid "%s from now"
 msgstr "距现在:%s"
 
@@ -2310,7 +2312,7 @@ msgid "about a minute"
 msgstr "大约一分钟"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
+#, javascript-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d 分钟"
@@ -2320,7 +2322,7 @@ msgid "about an hour"
 msgstr "大约一小时"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
+#, javascript-format
 msgid "about %d hour"
 msgid_plural "about %d hours"
 msgstr[0] "大约 %d 小时"
@@ -2330,7 +2332,7 @@ msgid "a day"
 msgstr "一天"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
+#, javascript-format
 msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] "%d 天"
@@ -2340,7 +2342,7 @@ msgid "about a month"
 msgstr "大约一个月"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
+#, javascript-format
 msgid "%d month"
 msgid_plural "%d months"
 msgstr[0] "%d 个月"
@@ -2350,7 +2352,7 @@ msgid "about a year"
 msgstr "大约一年"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, c-format
+#, javascript-format
 msgid "%d year"
 msgid_plural "%d years"
 msgstr[0] "%d 年"
@@ -2740,6 +2742,8 @@ msgstr "您的请求无法完成。刷新页面，然后重试。"
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid ""
 "Your request could not be completed due to a server problem. Reload the page"
+" and try again. If the issue persists, click the Help tab to report the "
+"problem."
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
@@ -3004,7 +3008,10 @@ msgid "Heading"
 msgstr "标题"
 
 #: lms/static/js/ajax-error.js
-msgid "You have been logged out of your edX account. "
+msgid ""
+"You have been logged out of your edX account. Click Okay to log in again "
+"now. Click Cancel to stay on this page (you must log in again to save your "
+"work)."
 msgstr ""
 
 #: lms/static/js/api_admin/views/catalog_preview.js
@@ -3019,8 +3026,7 @@ msgstr "所有节"
 msgid "All units"
 msgstr "所有单元"
 
-#: lms/static/js/ccx/schedule.js lms/static/js/ccx/schedule.js.c
-#: lms/templates/ccx/schedule.underscore
+#: lms/static/js/ccx/schedule.js lms/templates/ccx/schedule.underscore
 msgid "Click to change"
 msgstr "点击更改"
 
@@ -3028,7 +3034,7 @@ msgstr "点击更改"
 msgid "Select a chapter"
 msgstr "选择一章"
 
-#: lms/static/js/ccx/schedule.js lms/static/js/ccx/schedule.js.c
+#: lms/static/js/ccx/schedule.js
 msgid "Save changes"
 msgstr "保存修改"
 
@@ -3049,8 +3055,15 @@ msgid "Enter Start Date and Time"
 msgstr "输入开始日期与时间"
 
 #: lms/static/js/certificates/models/certificate_exception.js
+msgid ""
+"Student username/email field is required and can not be empty. Kindly fill "
+"in username/email and then press \"Add to Exception List\" button."
+msgstr ""
+
 #: lms/static/js/certificates/models/certificate_invalidation.js
-msgid "Student username/email field is required and can not be empty. "
+msgid ""
+"Student username/email field is required and can not be empty. Kindly fill "
+"in username/email and then press \"Invalidate Certificate\" button."
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
@@ -3066,15 +3079,15 @@ msgid " learner is successfully added to the exception list"
 msgstr "学习者已经成功地加入到例外列表"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " records are not in correct format and not added to"
+msgid " records are not in correct format and not added to the exception list"
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " record is not in correct format and not added to the exception"
+msgid " record is not in correct format and not added to the exception list"
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learners do not exist in LMS and not added to the"
+msgid " learners do not exist in LMS and not added to the exception list"
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
@@ -3082,19 +3095,20 @@ msgid " learner does not exist in LMS and not added to the exception list"
 msgstr "学习者不存在系统中，将不加到例外列表中"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learners are already white listed and not added to"
+msgid " learners are already white listed and not added to the exception list"
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learner is already white listed and not added to the exception "
+msgid " learner is already white listed and not added to the exception list"
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learners are not enrolled in course and not added to"
+msgid ""
+" learners are not enrolled in course and not added to the exception list"
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid " learner is not enrolled in course and not added to the exception"
+msgid " learner is not enrolled in course and not added to the exception list"
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
@@ -3168,13 +3182,13 @@ msgid "An error occurred. Please try again later."
 msgstr "出现了一个错误，请稍后重试。"
 
 #: lms/static/js/discovery/views/search_form.js
-#, c-format
+#, javascript-format
 msgid "Viewing %s course"
 msgid_plural "Viewing %s courses"
 msgstr[0] "查看 %s 个课程"
 
 #: lms/static/js/discovery/views/search_form.js
-#, c-format
+#, javascript-format
 msgid "We couldn't find any results for \"%s\"."
 msgstr "我们找不到有关“%s”的任何结果。"
 
@@ -4008,7 +4022,7 @@ msgid "Enrolled"
 msgstr ""
 
 #: lms/static/js/search/base/views/search_results_view.js
-#, c-format
+#, javascript-format
 msgid "%s result"
 msgid_plural "%s results"
 msgstr[0] "%s 个结果"
@@ -4101,7 +4115,7 @@ msgid "We couldn't sign you in."
 msgstr ""
 
 #: lms/static/js/student_account/views/LoginView.js
-#, c-format
+#, javascript-format
 msgid "An error occurred when signing you in to %s."
 msgstr ""
 
@@ -4114,7 +4128,10 @@ msgid ""
 "{paragraphStart}You entered {boldStart}{email}{boldEnd}. If this email "
 "address is associated with your {platform_name} account, we will send a "
 "message with password reset instructions to this email "
-"address.{paragraphEnd}"
+"address.{paragraphEnd}{paragraphStart}If you do not receive a password reset"
+" message, verify that you entered the correct email address, or check your "
+"spam folder.{paragraphEnd}{paragraphStart}If you need further assistance, "
+"{anchorStart}contact technical support{anchorEnd}.{paragraphEnd}"
 msgstr ""
 
 #: lms/static/js/student_account/views/LoginView.js
@@ -4126,7 +4143,8 @@ msgstr "发生错误。请尝试刷新页面，或检查您的网络连接情况
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
 "You have successfully signed into %(currentProvider)s, but your "
-"%(currentProvider)s"
+"%(currentProvider)s account does not have a linked %(platformName)s account."
+" To link your accounts, sign in now using your %(platformName)s password."
 msgstr ""
 
 #: lms/static/js/student_account/views/RegisterView.js
@@ -4615,10 +4633,6 @@ msgid ""
 "release date."
 msgstr "在此课程公开之前，您无法以学生或测试者身份查看该课程。"
 
-#: lms/templates/class_dashboard/all_section_metrics.js
-msgid "Unable to retrieve data, please try again later."
-msgstr ""
-
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
 msgid "%(num_students)s student opened Subsection"
 msgid_plural "%(num_students)s students opened Subsection"
@@ -4732,7 +4746,7 @@ msgid "Image must be in PNG format."
 msgstr ""
 
 #: cms/static/js/collections/group.js
-#, c-format
+#, javascript-format
 msgid "Group %s"
 msgstr "%s组"
 
@@ -4999,7 +5013,9 @@ msgid "Upload failed for video {fileName}"
 msgstr ""
 
 #: cms/static/js/views/active_video_upload_list.js
-msgid "{filename} is not in a supported file format. "
+msgid ""
+"{filename} is not in a supported file format. Supported file formats are "
+"{supportedFileFormats}."
 msgstr ""
 
 #: cms/static/js/views/active_video_upload_list.js
@@ -5056,11 +5072,11 @@ msgstr "请按照这里（{maxFileSizeRedirectUrl}）的说明上传文件到别
 msgid "Max file size exceeded"
 msgstr "文件大小超出限制"
 
-#: cms/static/js/views/assets.js cms/static/js/views/assets.js.c
+#: cms/static/js/views/assets.js
 msgid "Upload New File"
 msgstr "上传新文件"
 
-#: cms/static/js/views/assets.js cms/static/js/views/assets.js.c
+#: cms/static/js/views/assets.js
 msgid "Load Another File"
 msgstr "加载其他文件"
 
@@ -5122,7 +5138,11 @@ msgid "There has been an error while exporting."
 msgstr "导出时出错了。"
 
 #: cms/static/js/views/export.js
-msgid "There has been a failure to export to XML at least one component. "
+msgid ""
+"There has been a failure to export to XML at least one component. It is "
+"recommended that you go to the edit page and repair the error before "
+"attempting another export. Please check that all components on the page are "
+"valid and do not display any error messages."
 msgstr ""
 
 #: cms/static/js/views/export.js
@@ -5136,7 +5156,8 @@ msgstr "返回至导出页面"
 #: cms/static/js/views/export.js
 msgid ""
 "Your library could not be exported to XML. There is not enough information "
-"to "
+"to identify the failed component. Inspect your library to identify any "
+"problematic components and try again."
 msgstr ""
 
 #: cms/static/js/views/export.js
@@ -5146,7 +5167,8 @@ msgstr "跳转至知识库主页"
 #: cms/static/js/views/export.js
 msgid ""
 "Your course could not be exported to XML. There is not enough information to"
-" "
+" identify the failed component. Inspect your course to identify any "
+"problematic components and try again."
 msgstr ""
 
 #: cms/static/js/views/export.js

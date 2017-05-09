@@ -160,6 +160,7 @@ class RegistrationView(APIView):
     DEFAULT_FIELDS = ["email", "name", "username", "password"]
 
     EXTRA_FIELDS = [
+        "confirm_email",
         "first_name",
         "last_name",
         "city",
@@ -206,9 +207,20 @@ class RegistrationView(APIView):
 
         # Map field names to the instance method used to add the field to the form
         self.field_handlers = {}
-        for field_name in self.DEFAULT_FIELDS + self.EXTRA_FIELDS:
+        valid_fields = self.DEFAULT_FIELDS + self.EXTRA_FIELDS
+        for field_name in valid_fields:
             handler = getattr(self, "_add_{field_name}_field".format(field_name=field_name))
             self.field_handlers[field_name] = handler
+
+        field_order = configuration_helpers.get_value('REGISTRATION_FIELD_ORDER')
+        if not field_order:
+            field_order = settings.REGISTRATION_FIELD_ORDER or valid_fields
+
+        # Check that all of the valid_fields are in the field order and vice versa, if not set to the default order
+        if set(valid_fields) != set(field_order):
+            field_order = valid_fields
+
+        self.field_order = field_order
 
     @method_decorator(ensure_csrf_cookie)
     def get(self, request):
@@ -235,14 +247,14 @@ class RegistrationView(APIView):
         form_desc = FormDescription("post", reverse("user_api_registration"))
         self._apply_third_party_auth_overrides(request, form_desc)
 
-        # Default fields are always required
-        for field_name in self.DEFAULT_FIELDS:
-            self.field_handlers[field_name](form_desc, required=True)
-
         # Custom form fields can be added via the form set in settings.REGISTRATION_EXTENSION_FORM
         custom_form = get_registration_extension_form()
 
         if custom_form:
+            # Default fields are always required
+            for field_name in self.DEFAULT_FIELDS:
+                self.field_handlers[field_name](form_desc, required=True)
+
             for field_name, field in custom_form.fields.items():
                 restrictions = {}
                 if getattr(field, 'max_length', None):
@@ -270,14 +282,24 @@ class RegistrationView(APIView):
                     include_default_option=field_options.get('include_default_option'),
                 )
 
-        # Extra fields configured in Django settings
-        # may be required, optional, or hidden
-        for field_name in self.EXTRA_FIELDS:
-            if self._is_field_visible(field_name):
-                self.field_handlers[field_name](
-                    form_desc,
-                    required=self._is_field_required(field_name)
-                )
+            # Extra fields configured in Django settings
+            # may be required, optional, or hidden
+            for field_name in self.EXTRA_FIELDS:
+                if self._is_field_visible(field_name):
+                    self.field_handlers[field_name](
+                        form_desc,
+                        required=self._is_field_required(field_name)
+                    )
+        else:
+            # Go through the fields in the fields order and add them if they are required or visible
+            for field_name in self.field_order:
+                if field_name in self.DEFAULT_FIELDS:
+                    self.field_handlers[field_name](form_desc, required=True)
+                elif self._is_field_visible(field_name):
+                    self.field_handlers[field_name](
+                        form_desc,
+                        required=self._is_field_required(field_name)
+                    )
 
         return HttpResponse(form_desc.to_json(), content_type="application/json")
 
@@ -384,6 +406,30 @@ class RegistrationView(APIView):
                 "max_length": EMAIL_MAX_LENGTH,
             },
             required=required
+        )
+
+    def _add_confirm_email_field(self, form_desc, required=True):
+        """Add an email confirmation field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to True
+
+        """
+        # Translators: This label appears above a field on the registration form
+        # meant to confirm the user's email address.
+        email_label = _(u"Confirm Email")
+        error_msg = _(u"Please confirm your email.")
+
+        form_desc.add_field(
+            "confirm_email",
+            label=email_label,
+            required=required,
+            error_messages={
+                "required": error_msg
+            }
         )
 
     def _add_name_field(self, form_desc, required=True):
@@ -956,7 +1002,7 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     """
     authentication_classes = (authentication.SessionAuthentication,)
     permission_classes = (ApiKeyHeaderPermission,)
-    queryset = User.objects.all().prefetch_related("preferences")
+    queryset = User.objects.all().prefetch_related("preferences").select_related("profile")
     serializer_class = UserSerializer
     paginate_by = 10
     paginate_by_param = "page_size"
@@ -982,7 +1028,7 @@ class ForumRoleUsersListView(generics.ListAPIView):
             raise ParseError('course_id must be specified')
         course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id_string)
         role = Role.objects.get_or_create(course_id=course_id, name=name)[0]
-        users = role.users.all()
+        users = role.users.prefetch_related("preferences").select_related("profile").all()
         return users
 
 
@@ -1011,7 +1057,7 @@ class PreferenceUsersListView(generics.ListAPIView):
     paginate_by_param = "page_size"
 
     def get_queryset(self):
-        return User.objects.filter(preferences__key=self.kwargs["pref_key"]).prefetch_related("preferences")
+        return User.objects.filter(preferences__key=self.kwargs["pref_key"]).prefetch_related("preferences").select_related("profile")
 
 
 class UpdateEmailOptInPreference(APIView):

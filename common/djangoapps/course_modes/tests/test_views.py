@@ -29,12 +29,13 @@ from util.testing import UrlResetMixin
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from util.tests.mixins.discovery import CourseCatalogServiceMockMixin
 from util import organizations_helpers as organizations_api
+from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 
 
 @attr(shard=3)
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase, EnterpriseServiceMockMixin, CourseCatalogServiceMockMixin):
+class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTestCase, EnterpriseServiceMockMixin, CourseCatalogServiceMockMixin):
     """
     Course Mode View tests
     """
@@ -155,6 +156,9 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase, EnterpriseServiceMo
         for mode in ('audit', 'honor', 'verified'):
             CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)
 
+        catalog_integration = self.create_catalog_integration()
+        UserFactory(username=catalog_integration.service_username)
+
         self.mock_enterprise_learner_api()
 
         self.mock_course_discovery_api_for_catalog_contains(
@@ -185,6 +189,8 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase, EnterpriseServiceMo
         for mode in ('audit', 'honor', 'verified'):
             CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)
 
+        catalog_integration = self.create_catalog_integration()
+        UserFactory(username=catalog_integration.service_username)
         self.mock_enterprise_learner_api()
         self.mock_course_discovery_api_for_catalog_contains(
             catalog_id=1, course_run_ids=[str(self.course.id)]
@@ -521,19 +527,19 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase, EnterpriseServiceMo
         self.assertNotContains(response, "Schools & Partners")
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-    @freezegun.freeze_time('2015-01-02')
     def test_course_closed(self):
-        for mode in ["honor", "verified"]:
-            CourseModeFactory(mode_slug=mode, course_id=self.course.id)
+        with freezegun.freeze_time('2015-01-02'):
+            for mode in ["honor", "verified"]:
+                CourseModeFactory(mode_slug=mode, course_id=self.course.id)
 
-        self.course.enrollment_end = datetime(2015, 01, 01)
-        modulestore().update_item(self.course, self.user.id)
+            self.course.enrollment_end = datetime(2015, 01, 01)
+            modulestore().update_item(self.course, self.user.id)
 
-        url = reverse('course_modes_choose', args=[unicode(self.course.id)])
-        response = self.client.get(url)
-        # URL-encoded version of 1/1/15, 12:00 AM
-        redirect_url = reverse('dashboard') + '?course_closed=1%2F1%2F15%2C+12%3A00+AM'
-        self.assertRedirects(response, redirect_url)
+            url = reverse('course_modes_choose', args=[unicode(self.course.id)])
+            response = self.client.get(url)
+            # URL-encoded version of 1/1/15, 12:00 AM
+            redirect_url = reverse('dashboard') + '?course_closed=1%2F1%2F15%2C+12%3A00+AM'
+            self.assertRedirects(response, redirect_url)
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')

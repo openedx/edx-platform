@@ -31,7 +31,7 @@ from lms.djangoapps.grades.constants import ScoreDatabaseTableEnum
 from lms.djangoapps.grades.models import PersistentCourseGrade, PersistentSubsectionGrade
 from lms.djangoapps.grades.signals.signals import PROBLEM_WEIGHTED_SCORE_CHANGED
 from lms.djangoapps.grades.tasks import (
-    compute_grades_for_course,
+    compute_grades_for_course_v2,
     recalculate_subsection_grade_v3,
     RECALCULATE_GRADE_DELAY
 )
@@ -156,8 +156,8 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
     @ddt.data(
         (ModuleStoreEnum.Type.mongo, 1, 28, True),
         (ModuleStoreEnum.Type.mongo, 1, 24, False),
-        (ModuleStoreEnum.Type.split, 3, 27, True),
-        (ModuleStoreEnum.Type.split, 3, 23, False),
+        (ModuleStoreEnum.Type.split, 3, 28, True),
+        (ModuleStoreEnum.Type.split, 3, 24, False),
     )
     @ddt.unpack
     def test_query_counts(self, default_store, num_mongo_calls, num_sql_calls, create_multiple_subsections):
@@ -170,7 +170,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
 
     @ddt.data(
         (ModuleStoreEnum.Type.mongo, 1, 28),
-        (ModuleStoreEnum.Type.split, 3, 27),
+        (ModuleStoreEnum.Type.split, 3, 28),
     )
     @ddt.unpack
     def test_query_counts_dont_change_with_more_content(self, default_store, num_mongo_calls, num_sql_calls):
@@ -216,7 +216,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
 
     @ddt.data(
         (ModuleStoreEnum.Type.mongo, 1, 11),
-        (ModuleStoreEnum.Type.split, 3, 10),
+        (ModuleStoreEnum.Type.split, 3, 11),
     )
     @ddt.unpack
     def test_persistent_grades_not_enabled_on_course(self, default_store, num_mongo_queries, num_sql_queries):
@@ -226,12 +226,12 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
                 with self.assertNumQueries(num_sql_queries):
                     self._apply_recalculate_subsection_grade()
             with self.assertRaises(PersistentCourseGrade.DoesNotExist):
-                PersistentCourseGrade.read_course_grade(self.user.id, self.course.id)
+                PersistentCourseGrade.read(self.user.id, self.course.id)
             self.assertEqual(len(PersistentSubsectionGrade.bulk_read_grades(self.user.id, self.course.id)), 0)
 
     @ddt.data(
         (ModuleStoreEnum.Type.mongo, 1, 25),
-        (ModuleStoreEnum.Type.split, 3, 24),
+        (ModuleStoreEnum.Type.split, 3, 25),
     )
     @ddt.unpack
     def test_persistent_grades_enabled_on_course(self, default_store, num_mongo_queries, num_sql_queries):
@@ -240,7 +240,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
             with check_mongo_calls(num_mongo_queries):
                 with self.assertNumQueries(num_sql_queries):
                     self._apply_recalculate_subsection_grade()
-            self.assertIsNotNone(PersistentCourseGrade.read_course_grade(self.user.id, self.course.id))
+            self.assertIsNotNone(PersistentCourseGrade.read(self.user.id, self.course.id))
             self.assertGreater(len(PersistentSubsectionGrade.bulk_read_grades(self.user.id, self.course.id)), 0)
 
     @patch('lms.djangoapps.grades.signals.signals.SUBSECTION_SCORE_CHANGED.send')
@@ -378,7 +378,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
 @ddt.ddt
 class ComputeGradesForCourseTest(HasCourseWithProblemsMixin, ModuleStoreTestCase):
     """
-    Test compute_grades_for_course task.
+    Test compute_grades_for_course_v2 task.
     """
 
     ENABLED_SIGNALS = ['course_published', 'pre_publish']
@@ -392,7 +392,7 @@ class ComputeGradesForCourseTest(HasCourseWithProblemsMixin, ModuleStoreTestCase
 
     @ddt.data(*xrange(0, 12, 3))
     def test_behavior(self, batch_size):
-        result = compute_grades_for_course.delay(
+        result = compute_grades_for_course_v2.delay(
             course_key=six.text_type(self.course.id),
             batch_size=batch_size,
             offset=4,
@@ -412,7 +412,7 @@ class ComputeGradesForCourseTest(HasCourseWithProblemsMixin, ModuleStoreTestCase
         per_user_queries = 17 * min(batch_size, 6)  # No more than 6 due to offset
         with self.assertNumQueries(5 + per_user_queries):
             with check_mongo_calls(1):
-                compute_grades_for_course.delay(
+                compute_grades_for_course_v2.delay(
                     course_key=six.text_type(self.course.id),
                     batch_size=batch_size,
                     offset=6,

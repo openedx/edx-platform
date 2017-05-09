@@ -59,9 +59,6 @@ class TestSites(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             emit_signals=True,
         )
 
-    def setUp(self):
-        super(TestSites, self).setUp()
-
     def setup_users(self):
         # Create student accounts and activate them.
         for i in range(len(self.STUDENT_INFO)):

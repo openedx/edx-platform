@@ -461,16 +461,27 @@ such that the value can be defined later than this assignment (file load order).
                 return displayResponse.$task_response.append($taskResSection);
             };
             if (successes.length && dataFromServer.action === 'add') {
-                // Translators: A list of users appears after this sentence;
-                renderList(gettext('These users were successfully added as beta testers:'), (function() {
-                    var j, len1, results;
-                    results = [];
-                    for (j = 0, len1 = successes.length; j < len1; j++) {
-                        sr = successes[j];
-                        results.push(sr.identifier);
+                var j, len1, inActiveUsers, activeUsers; // eslint-disable-line vars-on-top
+                activeUsers = [];
+                inActiveUsers = [];
+                for (j = 0, len1 = successes.length; j < len1; j++) {
+                    sr = successes[j];
+                    if (sr.is_active) {
+                        activeUsers.push(sr.identifier);
+                    } else {
+                        inActiveUsers.push(sr.identifier);
                     }
-                    return results;
-                }()));
+                }
+                if (activeUsers.length) {
+                    // Translators: A list of users appears after this sentence;
+                    renderList(gettext('These users were successfully added as beta testers:'), activeUsers);
+                }
+                if (inActiveUsers.length) {
+                    // Translators: A list of users appears after this sentence;
+                    renderList(gettext(
+                        'These users could not be added as beta testers because their accounts are not yet activated:'),
+                        inActiveUsers);
+                }
             }
             if (successes.length && dataFromServer.action === 'remove') {
                 // Translators: A list of users appears after this sentence;
@@ -524,7 +535,6 @@ such that the value can be defined later than this assignment (file load order).
             }
             return renderList();
         };
-
         return betaTesterBulkAddition;
     }());
 

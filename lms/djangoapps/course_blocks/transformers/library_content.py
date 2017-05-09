@@ -12,6 +12,8 @@ from xmodule.modulestore.django import modulestore
 from eventtracking import tracker
 from track import contexts
 
+from ..utils import get_student_module_as_dict
+
 
 class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransformer):
     """
@@ -78,12 +80,7 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
                 max_count = block_structure.get_xblock_field(block_key, 'max_count')
 
                 # Retrieve "selected" json from LMS MySQL database.
-                module = self._get_student_module(usage_info.user, usage_info.course_key, block_key)
-                if module:
-                    state_dict = json.loads(module.state)
-                else:
-                    state_dict = {}
-
+                state_dict = get_student_module_as_dict(usage_info.user, usage_info.course_key, block_key)
                 for selected_block in state_dict.get('selected', []):
                     # Add all selected entries for this user for this
                     # library module to the selected list.
@@ -134,28 +131,6 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
             return True
 
         return [block_structure.create_removal_filter(check_child_removal)]
-
-    @classmethod
-    def _get_student_module(cls, user, course_key, block_key):
-        """
-        Get the student module for the given user for the given block.
-
-        Arguments:
-            user (User)
-            course_key (CourseLocator)
-            block_key (BlockUsageLocator)
-
-        Returns:
-            StudentModule if exists, or None.
-        """
-        try:
-            return StudentModule.objects.get(
-                student=user,
-                course_id=course_key,
-                module_state_key=block_key,
-            )
-        except StudentModule.DoesNotExist:
-            return None
 
     def _publish_events(self, block_structure, location, previous_count, max_count, block_keys, user_id):
         """

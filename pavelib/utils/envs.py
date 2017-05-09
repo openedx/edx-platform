@@ -7,6 +7,8 @@ import sys
 import json
 from lazy import lazy
 from path import Path as path
+from pavelib.utils.cmd import django_cmd
+from paver.easy import sh
 import memcache
 
 
@@ -170,6 +172,29 @@ class Env(object):
             SERVICE_VARIANT = 'cms'
         else:
             SERVICE_VARIANT = 'lms'
+
+    @classmethod
+    def get_django_setting(self, django_setting, system, settings=None):
+        """
+        Interrogate Django environment for specific settings values
+        :param django_setting: the django setting to get
+        :param system: the django app to use when asking for the setting (lms | cms)
+        :param settings: the settings file to use when asking for the value
+        :return: unicode value of the django setting
+        """
+        if not settings:
+            settings = os.environ.get("EDX_PLATFORM_SETTINGS", "aws")
+        value = sh(
+            django_cmd(
+                system,
+                settings,
+                "print_settings {django_setting} --format=value 2>/dev/null".format(
+                    django_setting=django_setting
+                )
+            ),
+            capture=True
+        )
+        return unicode(value).strip()
 
     @lazy
     def env_tokens(self):

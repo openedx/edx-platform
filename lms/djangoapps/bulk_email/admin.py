@@ -37,6 +37,7 @@ Other tags that may be used (surrounded by one curly brace on each side):
 {platform_name}        : the name of the platform
 {course_title}         : the name of the course
 {course_root}          : the URL path to the root of the course
+{course_language}      : the course language. The default is None.
 {course_url}           : the course's full URL
 {email}                : the user's email address
 {account_settings_url} : URL at which users can change account preferences

@@ -20,7 +20,7 @@ from ..errors import (
     UserAPIInternalError, UserAPIRequestError, UserNotFound, UserNotAuthorized,
     PreferenceValidationError, PreferenceUpdateError, CountryCodeError
 )
-from ..helpers import intercept_errors
+from ..helpers import intercept_errors, serializer_is_dirty
 from ..models import UserOrgTag, UserPreference
 from ..serializers import UserSerializer, RawUserPreferenceSerializer
 
@@ -142,7 +142,9 @@ def update_user_preferences(requesting_user, update, user=None):
         if preference_value is not None:
             try:
                 serializer = serializers[preference_key]
-                serializer.save()
+
+                if serializer_is_dirty(serializer):
+                    serializer.save()
             except Exception as error:
                 raise _create_preference_update_error(preference_key, preference_value, error)
         else:
@@ -177,10 +179,12 @@ def set_user_preference(requesting_user, preference_key, preference_value, usern
     existing_user = _get_authorized_user(requesting_user, username)
     serializer = create_user_preference_serializer(existing_user, preference_key, preference_value)
     validate_user_preference_serializer(serializer, preference_key, preference_value)
-    try:
-        serializer.save()
-    except Exception as error:
-        raise _create_preference_update_error(preference_key, preference_value, error)
+
+    if serializer_is_dirty(serializer):
+        try:
+            serializer.save()
+        except Exception as error:
+            raise _create_preference_update_error(preference_key, preference_value, error)
 
 
 @intercept_errors(UserAPIInternalError, ignore_errors=[UserAPIRequestError])
@@ -310,7 +314,13 @@ def _get_authorized_user(requesting_user, username=None, allow_staff=False):
     If username is not provided, requesting_user.username is assumed.
     """
     if username is None:
-        username = requesting_user.username
+        # If the user is one that has already been stored to the database, use that
+        if requesting_user.pk:
+            return requesting_user
+        else:
+            # Otherwise, treat this as a request against a separate user
+            username = requesting_user.username
+
     try:
         existing_user = User.objects.get(username=username)
     except ObjectDoesNotExist:
@@ -347,13 +357,13 @@ def create_user_preference_serializer(user, preference_key, preference_value):
     except ObjectDoesNotExist:
         existing_user_preference = None
     new_data = {
-        "user": user.id,
         "key": preference_key,
         "value": preference_value,
     }
     if existing_user_preference:
-        serializer = RawUserPreferenceSerializer(existing_user_preference, data=new_data)
+        serializer = RawUserPreferenceSerializer(existing_user_preference, data=new_data, partial=True)
     else:
+        new_data['user'] = user.id
         serializer = RawUserPreferenceSerializer(data=new_data)
     return serializer
 

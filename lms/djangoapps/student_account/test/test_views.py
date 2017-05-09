@@ -290,7 +290,7 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         super(StudentAccountLoginAndRegistrationTest, self).setUp()
 
         # Several third party auth providers are created for these tests:
-        self.configure_google_provider(enabled=True, visible=True)
+        self.google_provider = self.configure_google_provider(enabled=True, visible=True)
         self.configure_facebook_provider(enabled=True, visible=True)
         self.configure_dummy_provider(
             visible=True,
@@ -442,6 +442,18 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         params = [("next", "/courses/something/?tpa_hint={0}".format(tpa_hint))]
         response = self.client.get(reverse('signin_user'), params, HTTP_ACCEPT="text/html")
         self.assertNotIn(response.content, tpa_hint)
+
+    def test_hinted_login_dialog_disabled(self):
+        """Test that the dialog doesn't show up for hinted logins when disabled. """
+        self.google_provider.skip_hinted_login_dialog = True
+        self.google_provider.save()
+        params = [("next", "/courses/something/?tpa_hint=oa2-google-oauth2")]
+        response = self.client.get(reverse('signin_user'), params, HTTP_ACCEPT="text/html")
+        self.assertRedirects(
+            response,
+            'auth/login/google-oauth2/?auth_entry=login&next=%2Fcourses%2Fsomething%2F%3Ftpa_hint%3Doa2-google-oauth2',
+            target_status_code=302
+        )
 
     @override_settings(SITE_NAME=settings.MICROSITE_TEST_HOSTNAME)
     def test_microsite_uses_old_login_page(self):
@@ -634,20 +646,21 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase, ProgramsApiConf
         self.assertContains(response, '<li class="item nav-global-01">')
 
     def test_commerce_order_detail(self):
+        """
+        Verify that get_user_orders returns the correct order data.
+        """
         with mock_get_orders():
             order_detail = get_user_orders(self.user)
 
-        user_order = mock_get_orders.default_response['results'][0]
-        expected = [
-            {
-                'number': user_order['number'],
-                'price': user_order['total_excl_tax'],
-                'title': user_order['lines'][0]['title'],
+        for i, order in enumerate(mock_get_orders.default_response['results']):
+            expected = {
+                'number': order['number'],
+                'price': order['total_excl_tax'],
                 'order_date': 'Jan 01, 2016',
-                'receipt_url': '/commerce/checkout/receipt/?orderNum=' + user_order['number']
+                'receipt_url': '/checkout/receipt/?order_number=' + order['number'],
+                'lines': order['lines'],
             }
-        ]
-        self.assertEqual(order_detail, expected)
+            self.assertEqual(order_detail[i], expected)
 
     def test_commerce_order_detail_exception(self):
         with mock_get_orders(exception=exceptions.HttpNotFoundError):
@@ -663,26 +676,6 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase, ProgramsApiConf
                     lines=[
                         factories.OrderLineFactory(
                             product=factories.ProductFactory(attribute_values=[factories.ProductAttributeFactory()])
-                        )
-                    ]
-                )
-            ]
-        }
-        with mock_get_orders(response=response):
-            order_detail = get_user_orders(self.user)
-
-        self.assertEqual(order_detail, [])
-
-    def test_honor_course_order_detail(self):
-        response = {
-            'results': [
-                factories.OrderFactory(
-                    lines=[
-                        factories.OrderLineFactory(
-                            product=factories.ProductFactory(attribute_values=[factories.ProductAttributeFactory(
-                                name='certificate_type',
-                                value='honor'
-                            )])
                         )
                     ]
                 )

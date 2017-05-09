@@ -17,6 +17,8 @@ from opaque_keys.edx.keys import CourseKey
 from courseware.access import has_access
 from util.file import store_uploaded_file
 from courseware.courses import get_course_with_access, get_course_overview_with_access, get_course_by_id
+from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
+
 import django_comment_client.settings as cc_settings
 from django_comment_common.signals import (
     thread_created,
@@ -239,11 +241,11 @@ def create_thread(request, course_id, commentable_id):
 
     thread = cc.Thread(**params)
 
-    # Cohort the thread if required
+    # Divide the thread if required
     try:
         group_id = get_group_id_for_comments_service(request, course_key, commentable_id)
     except ValueError:
-        return HttpResponseServerError("Invalid cohort id")
+        return HttpResponseServerError("Invalid group id for commentable")
     if group_id is not None:
         thread.group_id = group_id
 
@@ -777,6 +779,9 @@ def users(request, course_id):
         get_course_overview_with_access(request.user, 'load', course_key, check_if_enrolled=True)
     except Http404:
         # course didn't exist, or requesting user does not have access to it.
+        return JsonError(status=404)
+    except CourseAccessRedirect:
+        # user does not have access to the course.
         return JsonError(status=404)
 
     try:

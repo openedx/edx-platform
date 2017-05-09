@@ -4,6 +4,7 @@ import ddt
 from paver.easy import call_task
 
 from .utils import PaverTestCase
+from ..utils.envs import Env
 
 EXPECTED_COFFEE_COMMAND = (
     u"node_modules/.bin/coffee --compile `find {platform_root}/lms "
@@ -39,6 +40,12 @@ EXPECTED_RUN_SERVER_COMMAND = (
 )
 EXPECTED_INDEX_COURSE_COMMAND = (
     u"python manage.py {system} --settings={settings} reindex_course --setup"
+)
+EXPECTED_PRINT_SETTINGS_COMMAND = (
+    u"python manage.py {system} --settings={settings} print_settings STATIC_ROOT --format=value 2>/dev/null"
+)
+EXPECTED_WEBPACK_COMMAND = (
+    u"NODE_ENV={node_env} STATIC_ROOT={static_root} $(npm bin)/webpack"
 )
 
 
@@ -233,6 +240,14 @@ class TestPaverServerTasks(PaverTestCase):
             expected_messages.append(u"xmodule_assets common/static/xmodule")
             expected_messages.append(u"install npm_assets")
             expected_messages.append(EXPECTED_COFFEE_COMMAND.format(platform_root=self.platform_root))
+            expected_messages.append(EXPECTED_PRINT_SETTINGS_COMMAND.format(
+                system="lms",
+                settings=expected_asset_settings
+            ))
+            expected_messages.append(EXPECTED_WEBPACK_COMMAND.format(
+                node_env="production" if expected_asset_settings != "devstack" else "development",
+                static_root=None
+            ))
             expected_messages.extend(self.expected_sass_commands(system=system, asset_settings=expected_asset_settings))
         if expected_collect_static:
             expected_messages.append(EXPECTED_COLLECT_STATIC_COMMAND.format(
@@ -270,6 +285,11 @@ class TestPaverServerTasks(PaverTestCase):
             expected_messages.append(u"xmodule_assets common/static/xmodule")
             expected_messages.append(u"install npm_assets")
             expected_messages.append(EXPECTED_COFFEE_COMMAND.format(platform_root=self.platform_root))
+            expected_messages.append(EXPECTED_PRINT_SETTINGS_COMMAND.format(system="lms", settings=expected_asset_settings))
+            expected_messages.append(EXPECTED_WEBPACK_COMMAND.format(
+                node_env="production" if expected_asset_settings != "devstack" else "development",
+                static_root=None
+            ))
             expected_messages.extend(self.expected_sass_commands(asset_settings=expected_asset_settings))
         if expected_collect_static:
             expected_messages.append(EXPECTED_COLLECT_STATIC_COMMAND.format(

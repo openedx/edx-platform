@@ -122,19 +122,25 @@
                 },
 
                 getCertificatePriceString: function(run) {
-                    var verifiedSeat, currency;
+                    var upgradeableSeat, upgradeableSeats, currency;
                     if ('seats' in run && run.seats.length) {
                         // eslint-disable-next-line consistent-return
-                        verifiedSeat = _.filter(run.seats, function(seat) {
-                            if (['verified', 'professional', 'credit'].indexOf(seat.type) >= 0) {
+                        upgradeableSeats = _.filter(run.seats, function(seat) {
+                            var upgradeableSeatTypes = ['verified', 'professional', 'no-id-professional', 'credit'];
+                            if (upgradeableSeatTypes.indexOf(seat.type) >= 0) {
                                 return seat;
                             }
-                        })[0];
-                        currency = verifiedSeat.currency;
-                        if (currency === 'USD') {
-                            return '$' + verifiedSeat.price;
-                        } else {
-                            return verifiedSeat.price + ' ' + currency;
+                        });
+                        if (upgradeableSeats.length > 0) {
+                            upgradeableSeat = upgradeableSeats[0];
+                            if (upgradeableSeat) {
+                                currency = upgradeableSeat.currency;
+                                if (currency === 'USD') {
+                                    return '$' + upgradeableSeat.price;
+                                } else {
+                                    return upgradeableSeat.price + ' ' + currency;
+                                }
+                            }
                         }
                     }
                     return null;
@@ -158,7 +164,7 @@
                         } else if (end && endDate < now) {
                             dateString += ' - Ended ' + end;
                         }
-                    } else if (pacingType === 'instructor_paced') {
+                    } else {
                         if (start && end) {
                             dateString = start + ' - ' + end;
                         } else if (start) {

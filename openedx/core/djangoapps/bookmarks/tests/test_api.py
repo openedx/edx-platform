@@ -43,9 +43,6 @@ class BookmarksAPITests(BookmarkApiEventTestMixin, BookmarksTestsBase):
     """
     These tests cover the parts of the API methods.
     """
-    def setUp(self):
-        super(BookmarksAPITests, self).setUp()
-
     def test_get_bookmark(self):
         """
         Verifies that get_bookmark returns data as expected.

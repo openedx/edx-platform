@@ -2,7 +2,6 @@ from collections import namedtuple
 import dogstats_wrapper as dog_stats_api
 from logging import getLogger
 
-from openedx.core.djangoapps.content.block_structure.api import get_block_structure_manager
 from openedx.core.djangoapps.signals.signals import COURSE_GRADE_CHANGED
 
 from ..config import assume_zero_if_absent, should_persist_grades
@@ -19,7 +18,7 @@ class CourseGradeFactory(object):
     """
     Factory class to create Course Grade objects.
     """
-    GradeResult = namedtuple('GradeResult', ['student', 'course_grade', 'err_msg'])
+    GradeResult = namedtuple('GradeResult', ['student', 'course_grade', 'error'])
 
     def create(self, user, course=None, collected_block_structure=None, course_structure=None, course_key=None):
         """
@@ -77,7 +76,15 @@ class CourseGradeFactory(object):
         course_data = CourseData(user, course, collected_block_structure, course_structure, course_key)
         return self._update(user, course_data, read_only=False)
 
-    def iter(self, course, students, force_update=False):
+    def iter(
+            self,
+            users,
+            course=None,
+            collected_block_structure=None,
+            course_structure=None,
+            course_key=None,
+            force_update=False,
+    ):
         """
         Given a course and an iterable of students (User), yield a GradeResult
         for every student enrolled in the course.  GradeResult is a named tuple of:
@@ -92,26 +99,27 @@ class CourseGradeFactory(object):
         #    compute the grade for all students.
         # 2. Optimization: the collected course_structure is not
         #    retrieved from the data store multiple times.
-
-        collected_block_structure = get_block_structure_manager(course.id).get_collected()
-        for student in students:
-            with dog_stats_api.timer('lms.grades.CourseGradeFactory.iter', tags=[u'action:{}'.format(course.id)]):
+        course_data = CourseData(None, course, collected_block_structure, course_structure, course_key)
+        for user in users:
+            with dog_stats_api.timer(
+                    'lms.grades.CourseGradeFactory.iter',
+                    tags=[u'action:{}'.format(course_data.course_key)]
+            ):
                 try:
-                    operation = CourseGradeFactory().update if force_update else CourseGradeFactory().create
-                    course_grade = operation(student, course, collected_block_structure)
-                    yield self.GradeResult(student, course_grade, "")
+                    method = CourseGradeFactory().update if force_update else CourseGradeFactory().create
+                    course_grade = method(user, course, course_data.collected_structure, course_structure, course_key)
+                    yield self.GradeResult(user, course_grade, None)
 
                 except Exception as exc:  # pylint: disable=broad-except
                     # Keep marching on even if this student couldn't be graded for
                     # some reason, but log it for future reference.
                     log.exception(
-                        'Cannot grade student %s (%s) in course %s because of exception: %s',
-                        student.username,
-                        student.id,
-                        course.id,
+                        'Cannot grade student %s in course %s because of exception: %s',
+                        user.id,
+                        course_data.course_key,
                         exc.message
                     )
-                    yield self.GradeResult(student, None, exc.message)
+                    yield self.GradeResult(user, None, exc)
 
     @staticmethod
     def _create_zero(user, course_data):
@@ -130,7 +138,7 @@ class CourseGradeFactory(object):
         if not should_persist_grades(course_data.course_key):
             raise PersistentCourseGrade.DoesNotExist
 
-        persistent_grade = PersistentCourseGrade.read_course_grade(user.id, course_data.course_key)
+        persistent_grade = PersistentCourseGrade.read(user.id, course_data.course_key)
         course_grade = CourseGrade(
             user,
             course_data,
@@ -153,13 +161,13 @@ class CourseGradeFactory(object):
         course_grade.update()
 
         should_persist = (
-            not read_only and  # TODO(TNL-6786) Remove the read_only boolean once all grades are back-filled.
+            (not read_only) and  # TODO(TNL-6786) Remove the read_only boolean once all grades are back-filled.
             should_persist_grades(course_data.course_key) and
-            not waffle().is_enabled(WRITE_ONLY_IF_ENGAGED) or course_grade.attempted
+            (not waffle().is_enabled(WRITE_ONLY_IF_ENGAGED) or course_grade.attempted)
         )
         if should_persist:
             course_grade._subsection_grade_factory.bulk_create_unsaved()
-            PersistentCourseGrade.update_or_create_course_grade(
+            PersistentCourseGrade.update_or_create(
                 user_id=user.id,
                 course_id=course_data.course_key,
                 course_version=course_data.version,

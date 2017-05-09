@@ -86,6 +86,7 @@
             DiscussionUtil.loadRoles(response.roles);
 
             this.courseSettings = new DiscussionCourseSettings(response.course_settings);
+            this.is_commentable_divided = response.is_commentable_divided;
 
             this.discussion = new Discussion(undefined, {pages: response.num_pages});
             this.discussion.reset(response.discussion_data, {
@@ -125,7 +126,7 @@
                 course_settings: this.courseSettings,
                 topicId: discussionId,
                 startHeader: this.startHeader,
-                is_commentable_cohorted: response.is_commentable_cohorted
+                is_commentable_divided: response.is_commentable_divided
             });
 
             this.newPostView.render();
@@ -152,7 +153,8 @@
                 model: thread,
                 mode: 'inline',
                 startHeader: this.startHeader,
-                courseSettings: this.courseSettings
+                courseSettings: this.courseSettings,
+                is_commentable_divided: this.is_commentable_divided
             });
             this.threadView.render();
             this.listenTo(this.threadView.showView, 'thread:_delete', this.navigateToAllPosts);

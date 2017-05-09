@@ -721,7 +721,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
             course_id=unicode(self.course.id)
         )
         self.cert.delete()
-        self.assertEqual(len(GeneratedCertificate.eligible_certificates.all()), 0)
+        self.assertListEqual(list(GeneratedCertificate.eligible_certificates.all()), [])
 
         response = self.client.get(test_url)
         self.assertIn('invalid', response.content)
@@ -744,7 +744,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         preview mode. Either the certificate is marked active or not.
         """
         self.cert.delete()
-        self.assertEqual(len(GeneratedCertificate.eligible_certificates.all()), 0)
+        self.assertListEqual(list(GeneratedCertificate.eligible_certificates.all()), [])
         self._add_course_certificates(count=1, signatory_count=2)
         test_url = get_certificate_url(
             user_id=self.user.id,

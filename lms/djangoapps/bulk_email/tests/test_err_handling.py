@@ -17,13 +17,13 @@ from smtplib import SMTPDataError, SMTPServerDisconnected, SMTPConnectError
 
 from bulk_email.models import CourseEmail, SEND_TO_MYSELF, BulkEmailFlag
 from bulk_email.tasks import perform_delegate_email_batches, send_course_email
+from lms.djangoapps.instructor_task.exceptions import DuplicateTaskException
 from lms.djangoapps.instructor_task.models import InstructorTask
 from lms.djangoapps.instructor_task.subtasks import (
     initialize_subtask_info,
     SubtaskStatus,
     check_subtask_is_valid,
     update_subtask_status,
-    DuplicateTaskException,
     MAX_DATABASE_LOCK_RETRIES,
 )
 from opaque_keys.edx.locations import SlashSeparatedCourseKey

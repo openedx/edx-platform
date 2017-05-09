@@ -207,7 +207,7 @@ def remove_course_milestones(course_key, user, relationship):
         milestones_api.remove_user_milestone({'id': user.id}, milestone)
 
 
-def get_required_content(course, user):
+def get_required_content(course_key, user):
     """
     Queries milestones subsystem to see if the specified course is gated on one or more milestones,
     and if those milestones can be fulfilled via completion of a particular course content module
@@ -217,7 +217,7 @@ def get_required_content(course, user):
         # Get all of the outstanding milestones for this course, for this user
         try:
             milestone_paths = get_course_milestones_fulfillment_paths(
-                unicode(course.id),
+                unicode(course_key),
                 serialize_user(user)
             )
         except InvalidMilestoneRelationshipTypeException:
