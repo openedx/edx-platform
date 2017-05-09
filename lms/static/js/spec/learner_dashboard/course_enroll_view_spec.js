@@ -33,6 +33,9 @@ define([
             };
 
         beforeEach(function() {
+            // Stub analytics tracking
+            window.analytics = jasmine.createSpyObj('analytics', ['track']);
+
             // NOTE: This data is redefined prior to each test case so that tests
             // can't break each other by modifying data copied by reference.
             singleCourseRunList = [{
@@ -132,8 +135,6 @@ define([
 
         it('should render the course enroll view when not enrolled', function() {
             setupView(singleCourseRunList);
-
-            expect(view.$('.enrollment-info').html().trim()).toEqual('Not Enrolled');
             expect(view.$('.enroll-button').text().trim()).toEqual('Enroll Now');
             expect(view.$('.run-select').length).toBe(0);
         });
@@ -142,22 +143,8 @@ define([
             singleCourseRunList[0].is_enrolled = true;
 
             setupView(singleCourseRunList);
-
-            expect(view.$('.enrollment-info').html().trim()).toEqual('enrolled');
-            expect(view.$('.view-course-link').attr('href')).toEqual(course.course_runs[0].course_url);
-            expect(view.$('.view-course-link').text().trim()).toEqual('View Course');
+            expect(view.$('.view-course-button').text().trim()).toEqual('View Course');
             expect(view.$('.run-select').length).toBe(0);
-        });
-
-        it('should allow the learner to view an archived course', function() {
-            // Regression test for ECOM-4974.
-            singleCourseRunList[0].is_enrolled = true;
-            singleCourseRunList[0].is_enrollment_open = false;
-            singleCourseRunList[0].is_course_ended = true;
-
-            setupView(singleCourseRunList);
-
-            expect(view.$('.view-course-link').text().trim()).toEqual('View Archived Course');
         });
 
         it('should not render anything if course runs are empty', function() {
@@ -172,24 +159,8 @@ define([
             setupView(multiCourseRunList);
 
             expect(view.$('.run-select').length).toBe(1);
-            expect(view.$('.run-select').val()).toEqual('');
-            expect(view.$('.run-select option').length).toBe(3);
-        });
-
-        it('should switch course run context if an option is selected from the dropdown', function() {
-            setupView(multiCourseRunList);
-
-            spyOn(courseCardModel, 'updateCourseRun').and.callThrough();
-
-            expect(view.$('.run-select').val()).toEqual('');
-
-            view.$('.run-select').val(multiCourseRunList[1].key);
-            view.$('.run-select').trigger('change');
-
-            expect(view.$('.run-select').val()).toEqual(multiCourseRunList[1].key);
-            expect(courseCardModel.updateCourseRun)
-                .toHaveBeenCalledWith(multiCourseRunList[1].key);
-            expect(courseCardModel.get('course_key')).toEqual(course.key);
+            expect(view.$('.run-select').val()).toEqual(multiCourseRunList[0].key);
+            expect(view.$('.run-select option').length).toBe(2);
         });
 
         it('should enroll learner when enroll button is clicked with one course run available', function() {
@@ -302,6 +273,15 @@ define([
 
             expect(view.redirect).toHaveBeenCalledWith(
                 response.responseJSON.user_message_url
+            );
+        });
+
+        it('sends analytics event when enrollment succeeds', function() {
+            setupView(singleCourseRunList, urls);
+            spyOn(view, 'redirect');
+            view.enrollSuccess();
+            expect(window.analytics.track).toHaveBeenCalledWith(
+                'edx.bi.user.program-details.enrollment'
             );
         });
     });

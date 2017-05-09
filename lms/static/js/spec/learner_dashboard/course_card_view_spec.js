@@ -17,7 +17,7 @@ define([
                 var programData = $.extend({}, data);
 
                 programData.course_runs[0].is_enrolled = isEnrolled;
-                setFixtures('<div class="course-card card"></div>');
+                setFixtures('<div class="program-course-card"></div>');
                 courseCardModel = new CourseCardModel(programData);
                 view = new CourseCardView({
                     model: courseCardModel
@@ -26,12 +26,10 @@ define([
 
             validateCourseInfoDisplay = function() {
                 // DRY validation for course card in enrolled state
-                expect(view.$('.header-img').attr('src')).toEqual(course.course_runs[0].image.src);
                 expect(view.$('.course-details .course-title-link').text().trim()).toEqual(course.title);
                 expect(view.$('.course-details .course-title-link').attr('href')).toEqual(
                     course.course_runs[0].marketing_url
                 );
-                expect(view.$('.course-details .course-text .course-key').html()).toEqual(course.key);
                 expect(view.$('.course-details .course-text .run-period').html()).toEqual(
                     startDate + ' - ' + endDate
                 );
@@ -99,7 +97,9 @@ define([
         it('should show the course advertised start date', function() {
             var advertisedStart = 'A long time ago...';
             course.course_runs[0].advertised_start = advertisedStart;
+
             setupView(course, false);
+
             expect(view.$('.course-details .course-text .run-period').html()).toEqual(
                 advertisedStart + ' - ' + endDate
             );
@@ -108,13 +108,12 @@ define([
         it('should only show certificate status section if a certificate has been earned', function() {
             var certUrl = 'sample-certificate';
 
-            expect(view.$('.certificate-status').length).toEqual(0);
+            expect(view.$('.course-certificate .certificate-status').length).toEqual(0);
             view.remove();
 
             course.course_runs[0].certificate_url = certUrl;
             setupView(course, false);
-            expect(view.$('.certificate-status').length).toEqual(1);
-            expect(view.$('.certificate-status .cta-secondary').attr('href')).toEqual(certUrl);
+            expect(view.$('.course-certificate .certificate-status').length).toEqual(1);
         });
 
         it('should only show upgrade message section if an upgrade is required', function() {
@@ -135,7 +134,7 @@ define([
             course.course_runs[0].certificate_url = '';
             setupView(course, false);
             expect(view.$('.upgrade-message').length).toEqual(0);
-            expect(view.$('.certificate-status').length).toEqual(0);
+            expect(view.$('.course-certificate .certificate-status').length).toEqual(0);
             view.remove();
 
             // Verify that the upgrade message takes priority.
@@ -143,7 +142,7 @@ define([
             course.course_runs[0].certificate_url = '/path/to/certificate';
             setupView(course, false);
             expect(view.$('.upgrade-message').length).toEqual(1);
-            expect(view.$('.certificate-status').length).toEqual(0);
+            expect(view.$('.course-certificate .certificate-status').length).toEqual(0);
         });
 
         it('should show a message if an there is an upcoming course run', function() {
@@ -151,9 +150,7 @@ define([
 
             setupView(course, false);
 
-            expect(view.$('.header-img').attr('src')).toEqual(course.course_runs[0].image.src);
             expect(view.$('.course-details .course-title').text().trim()).toEqual(course.title);
-            expect(view.$('.course-details .course-text .course-key').html()).toEqual(course.key);
             expect(view.$('.course-details .course-text .run-period').length).toBe(0);
             expect(view.$('.no-action-message').text().trim()).toBe('Coming Soon');
             expect(view.$('.enrollment-open-date').text().trim()).toEqual(
@@ -167,27 +164,21 @@ define([
 
             setupView(course, false);
 
-            expect(view.$('.header-img').attr('src')).toEqual(course.course_runs[0].image.src);
             expect(view.$('.course-details .course-title').text().trim()).toEqual(course.title);
-            expect(view.$('.course-details .course-text .course-key').html()).toEqual(course.key);
             expect(view.$('.course-details .course-text .run-period').length).toBe(0);
             expect(view.$('.no-action-message').text().trim()).toBe('Not Currently Available');
             expect(view.$('.enrollment-opens').length).toEqual(0);
         });
 
         it('should link to the marketing site when a URL is available', function() {
-            $.each(['.course-image-link', '.course-title-link'], function(index, selector) {
-                expect(view.$(selector).attr('href')).toEqual(course.course_runs[0].marketing_url);
-            });
+            expect(view.$('.course-title-link').attr('href')).toEqual(course.course_runs[0].marketing_url);
         });
 
         it('should link to the course home when no marketing URL is available', function() {
             course.course_runs[0].marketing_url = null;
             setupView(course, false);
 
-            $.each(['.course-image-link', '.course-title-link'], function(index, selector) {
-                expect(view.$(selector).attr('href')).toEqual(course.course_runs[0].course_url);
-            });
+            expect(view.$('.course-title-link').attr('href')).toEqual(course.course_runs[0].course_url);
         });
 
         it('should not link to the marketing site or the course home if neither URL is available', function() {
@@ -195,9 +186,7 @@ define([
             course.course_runs[0].course_url = null;
             setupView(course, false);
 
-            $.each(['.course-image-link', '.course-title-link'], function(index, selector) {
-                expect(view.$(selector).length).toEqual(0);
-            });
+            expect(view.$('.course-title-link').length).toEqual(0);
         });
     });
 }

@@ -30,7 +30,6 @@
             'js/groups/views/cohorts_dashboard_factory',
             'js/header_factory',
             'js/learner_dashboard/program_details_factory',
-            'js/learner_dashboard/program_details_factory_2017',
             'js/learner_dashboard/program_list_factory',
             'js/search/course/course_search_factory',
             'js/search/dashboard/dashboard_search_factory',

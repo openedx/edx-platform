@@ -1,12 +1,10 @@
-<div class="message col-12 md-col-8">
-    <% // safe-lint: disable=underscore-not-escaped %>
-    <span class="certificate-icon green-icon" aria-hidden="true"><%= certificateSvg %></span>
-    <span class="card-msg"><%- gettext('You need a certificate in this course to be eligible for a program certificate.') %></span>
+<div class="message certificate-status col-12 md-col-8">
+    <span class="card-msg"><%- gettext('Certificate Status:') %></span>
+    <span><%- gettext('Needs verified certificate ') %></span>
+    <span class="price">  <%- price %></span>
 </div>
 <div class="action col-12 md-col-4">
-    <a href="<%- upgrade_url %>" class="btn-brand cta-primary">
-        <% // safe-lint: disable=underscore-not-escaped %>
-        <span class="certificate-icon green-icon" aria-hidden="true"><%= certificateSvg %></span>
-        <%- gettext('Upgrade Now') %>
-    </a>
+    <a href="<%- upgrade_url %>" class="btn-brand btn cta-primary upgrade-button">
+        <%- gettext('Buy Certificate') %>
+    <a>
 </div>
