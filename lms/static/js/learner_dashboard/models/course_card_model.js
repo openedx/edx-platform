@@ -48,7 +48,7 @@
                     if (courseRuns && courseRuns.length > 0) {
                         courseRun = courseRuns[0];
 
-                        if (courseRun.hasOwnProperty('image')) {
+                        if (courseRun.image && courseRun.image.src) {
                             courseImageUrl = courseRun.image.src;
                         } else {
                             // The course_image_url property is attached by setActiveCourseRun.
@@ -191,7 +191,7 @@
                             startDateString = this.formatDate(courseRun.start, userPreferences);
                         }
 
-                        if (courseRun.hasOwnProperty('image')) {
+                        if (courseRun.image && courseRun.image.src) {
                             courseImageUrl = courseRun.image.src;
                         } else {
                             courseImageUrl = courseRun.course_image_url;
