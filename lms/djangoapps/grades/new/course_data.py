@@ -49,7 +49,7 @@ class CourseData(object):
 
     @property
     def structure(self):
-        if not self._structure:
+        if self._structure is None:
             self._structure = get_course_blocks(
                 self.user,
                 self.location,
@@ -59,7 +59,7 @@ class CourseData(object):
 
     @property
     def collected_structure(self):
-        if not self._collected_block_structure:
+        if self._collected_block_structure is None:
             self._collected_block_structure = get_block_structure_manager(self.course_key).get_collected()
         return self._collected_block_structure
 
@@ -90,7 +90,8 @@ class CourseData(object):
     @property
     def edited_on(self):
         # get course block from structure only; subtree_edited_on field on modulestore's course block isn't optimized.
-        course_block = self.structure[self.location]
+        structure = self._effective_structure
+        course_block = structure[self.location]
         return getattr(course_block, 'subtree_edited_on', None)
 
     def __unicode__(self):
