@@ -13,6 +13,7 @@ from pyquery import PyQuery as pq
 from courseware.tests.factories import StaffFactory
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.course_module import DEFAULT_START_DATE
@@ -26,11 +27,13 @@ PAST_DAY = datetime.datetime.now() - datetime.timedelta(days=30)
 
 class TestCourseOutlinePage(SharedModuleStoreTestCase):
     """
-    Test the new course outline view.
+    Test the course outline view.
     """
     @classmethod
     def setUpClass(cls):
-        """Set up the simplest course possible."""
+        """
+        Set up an array of various courses to be tested.
+        """
         # setUpClassAndTestData() already calls setUpClass on SharedModuleStoreTestCase
         # pylint: disable=super-method-not-called
         with super(TestCourseOutlinePage, cls).setUpClassAndTestData():
@@ -38,40 +41,40 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
             course = CourseFactory.create()
             with cls.store.bulk_operations(course.id):
                 chapter = ItemFactory.create(category='chapter', parent_location=course.location)
-                section = ItemFactory.create(category='sequential', parent_location=chapter.location)
-                vertical = ItemFactory.create(category='vertical', parent_location=section.location)
+                sequential = ItemFactory.create(category='sequential', parent_location=chapter.location)
+                vertical = ItemFactory.create(category='vertical', parent_location=sequential.location)
             course.children = [chapter]
-            chapter.children = [section]
-            section.children = [vertical]
+            chapter.children = [sequential]
+            sequential.children = [vertical]
             cls.courses.append(course)
 
             course = CourseFactory.create()
             with cls.store.bulk_operations(course.id):
                 chapter = ItemFactory.create(category='chapter', parent_location=course.location)
-                section = ItemFactory.create(category='sequential', parent_location=chapter.location)
-                section2 = ItemFactory.create(category='sequential', parent_location=chapter.location)
-                vertical = ItemFactory.create(category='vertical', parent_location=section.location)
-                vertical2 = ItemFactory.create(category='vertical', parent_location=section2.location)
+                sequential = ItemFactory.create(category='sequential', parent_location=chapter.location)
+                sequential2 = ItemFactory.create(category='sequential', parent_location=chapter.location)
+                vertical = ItemFactory.create(category='vertical', parent_location=sequential.location)
+                vertical2 = ItemFactory.create(category='vertical', parent_location=sequential2.location)
             course.children = [chapter]
-            chapter.children = [section, section2]
-            section.children = [vertical]
-            section2.children = [vertical2]
+            chapter.children = [sequential, sequential2]
+            sequential.children = [vertical]
+            sequential2.children = [vertical2]
             cls.courses.append(course)
 
             course = CourseFactory.create()
             with cls.store.bulk_operations(course.id):
                 chapter = ItemFactory.create(category='chapter', parent_location=course.location)
-                section = ItemFactory.create(
+                sequential = ItemFactory.create(
                     category='sequential',
                     parent_location=chapter.location,
                     due=datetime.datetime.now(),
                     graded=True,
                     format='Homework',
                 )
-                vertical = ItemFactory.create(category='vertical', parent_location=section.location)
+                vertical = ItemFactory.create(category='vertical', parent_location=sequential.location)
             course.children = [chapter]
-            chapter.children = [section]
-            section.children = [vertical]
+            chapter.children = [sequential]
+            sequential.children = [vertical]
             cls.courses.append(course)
 
     @classmethod
@@ -100,14 +103,81 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
             for chapter in course.children:
                 self.assertIn(chapter.display_name, response_content)
                 self.assertTrue(chapter.children)
-                for section in chapter.children:
-                    self.assertIn(section.display_name, response_content)
-                    if section.graded:
-                        self.assertIn(section.due.strftime('%Y-%m-%d %H:%M:%S'), response_content)
-                        self.assertIn(section.format, response_content)
-                    self.assertTrue(section.children)
-                    for vertical in section.children:
+                for sequential in chapter.children:
+                    self.assertIn(sequential.display_name, response_content)
+                    if sequential.graded:
+                        self.assertIn(sequential.due.strftime('%Y-%m-%d %H:%M:%S'), response_content)
+                        self.assertIn(sequential.format, response_content)
+                    self.assertTrue(sequential.children)
+                    for vertical in sequential.children:
                         self.assertNotIn(vertical.display_name, response_content)
+
+
+class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase):
+    """
+    Test start course and resume course for the course outline view.
+
+    Technically, this mixes course home and course outline tests, but checking
+    the counts of start/resume course should be done together to avoid false
+    positives.
+
+    """
+    @classmethod
+    def setUpClass(cls):
+        """
+        Creates a test course that can be used for non-destructive tests
+        """
+        # setUpClassAndTestData() already calls setUpClass on SharedModuleStoreTestCase
+        # pylint: disable=super-method-not-called
+        with super(TestCourseOutlineResumeCourse, cls).setUpClassAndTestData():
+            cls.course = cls.create_test_course()
+
+    @classmethod
+    def setUpTestData(cls):
+        """Set up and enroll our fake user in the course."""
+        cls.user = UserFactory(password=TEST_PASSWORD)
+        CourseEnrollment.enroll(cls.user, cls.course.id)
+
+    @classmethod
+    def create_test_course(cls):
+        """
+        Creates a test course.
+        """
+        course = CourseFactory.create()
+        with cls.store.bulk_operations(course.id):
+            chapter = ItemFactory.create(category='chapter', parent_location=course.location)
+            sequential = ItemFactory.create(category='sequential', parent_location=chapter.location)
+            sequential2 = ItemFactory.create(category='sequential', parent_location=chapter.location)
+            vertical = ItemFactory.create(category='vertical', parent_location=sequential.location)
+            vertical2 = ItemFactory.create(category='vertical', parent_location=sequential2.location)
+        course.children = [chapter]
+        chapter.children = [sequential, sequential2]
+        sequential.children = [vertical]
+        sequential2.children = [vertical2]
+        if hasattr(cls, 'user'):
+            CourseEnrollment.enroll(cls.user, course.id)
+        return course
+
+    def setUp(self):
+        """
+        Set up for the tests.
+        """
+        super(TestCourseOutlineResumeCourse, self).setUp()
+        self.client.login(username=self.user.username, password=TEST_PASSWORD)
+
+    def visit_sequential(self, course, chapter, sequential):
+        """
+        Navigates to the provided sequential.
+        """
+        last_accessed_url = reverse(
+            'courseware_section',
+            kwargs={
+                'course_id': course.id.to_deprecated_string(),
+                'chapter': chapter.url_name,
+                'section': sequential.url_name,
+            }
+        )
+        self.assertEqual(200, self.client.get(last_accessed_url).status_code)
 
     def test_start_course(self):
         """
@@ -117,7 +187,7 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
         start/resume course should be done together to not get a false positive.
 
         """
-        course = self.courses[0]
+        course = self.course
 
         response = self.client.get(course_home_url(course))
         self.assertEqual(response.status_code, 200)
@@ -131,25 +201,13 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
     def test_resume_course(self):
         """
         Tests that two resume course buttons appear when the course has been accessed.
-
-        Technically, this is a mix of a course home and course outline test, but checking the counts of start/resume
-        course should be done together to not get a false positive.
-
         """
-        course = self.courses[0]
+        course = self.course
 
-        # first navigate to a section to make it the last accessed
+        # first navigate to a sequential to make it the last accessed
         chapter = course.children[0]
-        section = chapter.children[0]
-        last_accessed_url = reverse(
-            'courseware_section',
-            kwargs={
-                'course_id': course.id.to_deprecated_string(),
-                'chapter': chapter.url_name,
-                'section': section.url_name,
-            }
-        )
-        self.assertEqual(200, self.client.get(last_accessed_url).status_code)
+        sequential = chapter.children[0]
+        self.visit_sequential(course, chapter, sequential)
 
         # check resume course buttons
         response = self.client.get(course_home_url(course))
@@ -159,7 +217,62 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
         self.assertContains(response, 'Resume Course', count=2)
 
         content = pq(response.content)
-        self.assertTrue(content('.action-resume-course').attr('href').endswith('/sequential/' + section.url_name))
+        self.assertTrue(content('.action-resume-course').attr('href').endswith('/sequential/' + sequential.url_name))
+
+    def test_resume_course_deleted_sequential(self):
+        """
+        Tests resume course when the last accessed sequential is deleted and
+        there is another sequential in the vertical.
+
+        """
+        course = self.create_test_course()
+
+        # first navigate to a sequential to make it the last accessed
+        chapter = course.children[0]
+        self.assertGreaterEqual(len(chapter.children), 2)
+        sequential = chapter.children[0]
+        sequential2 = chapter.children[1]
+        self.visit_sequential(course, chapter, sequential)
+
+        # remove one of the sequentials from the chapter
+        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course.id):
+            self.store.delete_item(sequential.location, self.user.id)  # pylint: disable=no-member
+
+        # check resume course buttons
+        response = self.client.get(course_home_url(course))
+        self.assertEqual(response.status_code, 200)
+
+        self.assertContains(response, 'Start Course', count=0)
+        self.assertContains(response, 'Resume Course', count=2)
+
+        content = pq(response.content)
+        self.assertTrue(content('.action-resume-course').attr('href').endswith('/sequential/' + sequential2.url_name))
+
+    def test_resume_course_deleted_sequentials(self):
+        """
+        Tests resume course when the last accessed sequential is deleted and
+        there are no sequentials left in the vertical.
+
+        """
+        course = self.create_test_course()
+
+        # first navigate to a sequential to make it the last accessed
+        chapter = course.children[0]
+        self.assertEqual(len(chapter.children), 2)
+        sequential = chapter.children[0]
+        self.visit_sequential(course, chapter, sequential)
+
+        # remove all sequentials from chapter
+        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course.id):
+            for sequential in chapter.children:
+                self.store.delete_item(sequential.location, self.user.id)  # pylint: disable=no-member
+
+        # check resume course buttons
+        response = self.client.get(course_home_url(course))
+        self.assertEqual(response.status_code, 200)
+
+        self.assertContains(response, 'Start Course', count=0)
+        self.assertContains(response, 'Resume Course', count=1)
 
 
 class TestCourseOutlinePreview(SharedModuleStoreTestCase):
@@ -184,8 +297,8 @@ class TestCourseOutlinePreview(SharedModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
         return response
 
-    # TODO: LEARNER-837: If you see this past 6/4/2017, please see why ticket is not yet closed.
-    @skip("testing skipping")
+    # TODO: LEARNER-837: Due 6/4/2017. Remove skip.
+    @skip("skipping test")
     def test_preview(self):
         """
         Verify the behavior of preview for the course outline.
@@ -203,16 +316,16 @@ class TestCourseOutlinePreview(SharedModuleStoreTestCase):
                 parent_location=course.location,
                 display_name='First Chapter',
             )
-            section = ItemFactory.create(category='sequential', parent_location=chapter.location)
-            ItemFactory.create(category='vertical', parent_location=section.location)
+            sequential = ItemFactory.create(category='sequential', parent_location=chapter.location)
+            ItemFactory.create(category='vertical', parent_location=sequential.location)
             chapter = ItemFactory.create(
                 category='chapter',
                 parent_location=course.location,
                 display_name='Future Chapter',
                 due=future_date,
             )
-            section = ItemFactory.create(category='sequential', parent_location=chapter.location)
-            ItemFactory.create(category='vertical', parent_location=section.location)
+            sequential = ItemFactory.create(category='sequential', parent_location=chapter.location)
+            ItemFactory.create(category='vertical', parent_location=sequential.location)
 
         # Verify that a staff user sees a chapter with a due date in the future
         self.client.login(username=staff_user.username, password='test')
