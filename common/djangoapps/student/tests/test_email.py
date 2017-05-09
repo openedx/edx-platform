@@ -85,15 +85,6 @@ class ActivationEmailTests(TestCase):
         )
     ]
 
-    # Text fragments we expect in the body of an email
-    # sent from an EdX-controlled domain.
-    EDX_DOMAIN_FRAGMENTS = [
-        u"Thank you for creating an account with {platform}!".format(platform=settings.PLATFORM_NAME),
-        "http://edx.org/activate/",
-        "https://www.edx.org/contact-us",
-        "This email message was automatically sent by edx.org"
-    ]
-
     def test_activation_email(self):
         self._create_account()
         self._assert_activation_email(self.ACTIVATION_SUBJECT, self.OPENEDX_FRAGMENTS)
@@ -101,7 +92,7 @@ class ActivationEmailTests(TestCase):
     @with_comprehensive_theme("edx.org")
     def test_activation_email_edx_domain(self):
         self._create_account()
-        self._assert_activation_email(self.ACTIVATION_SUBJECT, self.EDX_DOMAIN_FRAGMENTS)
+        self._assert_activation_email(self.ACTIVATION_SUBJECT, self.OPENEDX_FRAGMENTS)
 
     def _create_account(self):
         """Create an account, triggering the activation email. """
