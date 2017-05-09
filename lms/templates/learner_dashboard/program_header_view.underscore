@@ -1,15 +1,14 @@
-<div class="banner-background-wrapper">
-    <picture>
-        <source srcset="<%- programData.banner_image.large.url %>" media="(min-width: <%- breakpoints.min.large %>)">
-        <source srcset="<%- programData.banner_image.medium.url %>" media="(min-width: <%- breakpoints.min.medium %>)">
-        <img class="banner-background-image" srcset="<%- programData.banner_image['x-small'].url %>" alt="">
-    </picture>
-
-    <div class="banner-content grid-container">
-        <h2 class="hd-1 title row"><%- programData.title %></h2>
-        <p class="hd-4 subtitle row"><%- programData.subtitle %></p>
+<div class="program-details-header">
+    <div class="meta-info grid-container">
+        <% if (logo) { %>
+            <span aria-label="<%- gettext(programData.type) %>" class="<%- programData.type.toLowerCase() %> program-details-icon"><%= logo %></span>
+        <% } %>
+        <h2 class="hd-1 program-title"><%- programData.title %></h2>
+    </div>
+    <div class='authoring-organizations'>
+        <h2 class="heading">Institutions</h2>
         <% if (programData.authoring_organizations.length) { %>
-            <div class="org-wrapper">
+            <div class="orgs">
               <% _.each(programData.authoring_organizations, function(org) { %>
                 <img src="<%- org.certificate_logo_image_url || org.logo_image_url %>" class="org-logo" alt="<%- StringUtils.interpolate(
                     gettext('{organization}\'s logo'),
@@ -20,20 +19,3 @@
         <% } %>
     </div>
 </div>
-
-<nav class="breadcrumb-wrapper grid-container" aria-label="breadcrumb" role="navigation">
-    <h3 class="sr-only"><%- gettext('You are here') %></h2>
-    <ol class="breadcrumb-list">
-        <li class="crumb">
-            <a href="/" class="crumb-link"><%- gettext('Dashboard') %></a>
-            <span class="crumb-separator fa fa-chevron-right" aria-hidden="true"></span>
-        </li>
-        <li class="crumb">
-            <a href="<%- urls.program_listing_url %>" class="crumb-link"><%- gettext('Programs') %></a>
-            <span class="crumb-separator fa fa-chevron-right" aria-hidden="true"></span>
-        </li>
-        <li class="crumb active">
-            <%- programData.title %>
-        </li>
-    </ol>
-</nav>

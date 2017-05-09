@@ -42,22 +42,12 @@
 
                 getUnselectedCourseRun: function(courseRuns) {
                     var unselectedRun = {},
-                        courseRun,
-                        courseImageUrl;
+                        courseRun;
 
                     if (courseRuns && courseRuns.length > 0) {
                         courseRun = courseRuns[0];
 
-                        if (courseRun.image && courseRun.image.src) {
-                            courseImageUrl = courseRun.image.src;
-                        } else {
-                            // The course_image_url property is attached by setActiveCourseRun.
-                            // If that hasn't been called, it won't be present yet.
-                            courseImageUrl = courseRun.course_image_url;
-                        }
-
                         $.extend(unselectedRun, {
-                            course_image_url: courseImageUrl,
                             marketing_url: courseRun.marketing_url,
                             is_enrollment_open: courseRun.is_enrollment_open
                         });
@@ -149,8 +139,8 @@
                 formatDateString: function(run) {
                     var pacingType = run.pacing_type,
                         dateString = '',
-                        start = run.start_date || this.get('start_date'),
-                        end = run.end_date || this.get('end_date'),
+                        start = this.get('start_date') || run.start_date,
+                        end = this.get('end_date') || run.end_date,
                         now = new Date(),
                         startDate = new Date(start),
                         endDate = new Date(end);
@@ -181,8 +171,7 @@
                 },
 
                 setActiveCourseRun: function(courseRun, userPreferences) {
-                    var startDateString,
-                        courseImageUrl;
+                    var startDateString;
 
                     if (courseRun) {
                         if (this.valueIsDefined(courseRun.advertised_start)) {
@@ -191,16 +180,8 @@
                             startDateString = this.formatDate(courseRun.start, userPreferences);
                         }
 
-                        if (courseRun.image && courseRun.image.src) {
-                            courseImageUrl = courseRun.image.src;
-                        } else {
-                            courseImageUrl = courseRun.course_image_url;
-                        }
-
-
                         this.set({
                             certificate_url: courseRun.certificate_url,
-                            course_image_url: courseImageUrl || '',
                             course_run_key: courseRun.key,
                             course_url: courseRun.course_url || '',
                             title: this.context.title,

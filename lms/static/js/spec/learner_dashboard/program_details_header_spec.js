@@ -8,9 +8,6 @@ define([
     describe('Program Details Header View', function() {
         var view = null,
             context = {
-                urls: {
-                    program_listing_url: '/dashboard/programs'
-                },
                 programData: {
                     uuid: 'a87e5eac-3c93-45a1-a8e1-4c79ca8401c8',
                     title: 'Food Security and Sustainability',
@@ -68,16 +65,12 @@ define([
         });
 
         it('should render the header based on the passed in model', function() {
-            var programListUrl = view.$('.breadcrumb-list .crumb:nth-of-type(2) .crumb-link').attr('href');
-
-            expect(view.$('.title').html()).toEqual(context.programData.title);
-            expect(view.$('.subtitle').html()).toEqual(context.programData.subtitle);
+            expect(view.$('.program-title').html()).toEqual(context.programData.title);
             expect(view.$('.org-logo').length).toEqual(context.programData.authoring_organizations.length);
             expect(view.$('.org-logo').attr('src'))
                 .toEqual(context.programData.authoring_organizations[0].certificate_logo_image_url);
             expect(view.$('.org-logo').attr('alt'))
                 .toEqual(context.programData.authoring_organizations[0].name + '\'s logo');
-            expect(programListUrl).toEqual(context.urls.program_listing_url);
         });
     });
 }
