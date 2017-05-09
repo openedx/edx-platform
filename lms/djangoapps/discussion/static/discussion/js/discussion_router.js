@@ -47,10 +47,12 @@
                     this.discussionBoardView.discussionThreadListView.on(
                         'thread:created', _.bind(this.navigateToThread, this)
                     );
-
+                    var root_url = '/courses/' + this.courseId + '/discussion/';
+                    var result = window.location.pathname.match('.*/discussion');
+                    root_url = (result !== null) ? result[0] + '/' : root_url;
                     Backbone.history.start({
                         pushState: true,
-                        root: window.location.pathname
+                        root: root_url
                     });
                 },
 

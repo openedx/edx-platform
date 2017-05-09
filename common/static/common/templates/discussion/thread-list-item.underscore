@@ -64,7 +64,7 @@
         </ul>
       <% } %>
       <div class="post-context"><div class="group-visibility-label">
-        <% if (group_name) { %>
+        <% if (typeof(group_name) !== "undefined" && group_name) { %>
             <%-
             interpolate(
                 gettext('This post is visible only to %(group_name)s.'),
