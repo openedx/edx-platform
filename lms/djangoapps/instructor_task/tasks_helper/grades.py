@@ -12,19 +12,14 @@ from time import time
 
 from instructor_analytics.basic import list_problem_responses
 from instructor_analytics.csvs import format_dictlist
-from certificates.models import CertificateWhitelist, certificate_info_for_user, GeneratedCertificate
+from certificates.models import CertificateWhitelist, certificate_info_for_user
 from courseware.courses import get_course_by_id
-from lms.djangoapps.grades.context import grading_context_for_course, grading_context
+from lms.djangoapps.grades.context import grading_context_for_course
 from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
-from lms.djangoapps.grades.models import PersistentCourseGrade
 from lms.djangoapps.teams.models import CourseTeamMembership
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
-from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
-from openedx.core.djangoapps.course_groups.cohorts import get_cohort, is_course_cohorted, bulk_cache_cohorts
-from openedx.core.djangoapps.user_api.course_tag.api import BulkCourseTags
+from openedx.core.djangoapps.course_groups.cohorts import get_cohort, is_course_cohorted
 from student.models import CourseEnrollment
-from student.roles import BulkRoleCache
-from xmodule.modulestore.django import modulestore
 from xmodule.partitions.partitions_service import PartitionService
 from xmodule.split_test_module import get_split_user_partitions
 
@@ -35,7 +30,7 @@ from .utils import upload_csv_to_report_store
 TASK_LOG = logging.getLogger('edx.celery.task')
 
 
-class _CourseGradeReportContext(object):
+class CourseGradeReportContext(object):
     """
     Internal class that provides a common context to use for a single grade
     report.  When a report is parallelized across multiple processes,
@@ -63,10 +58,6 @@ class _CourseGradeReportContext(object):
         return get_course_by_id(self.course_id)
 
     @lazy
-    def course_structure(self):
-        return get_course_in_cache(self.course_id)
-
-    @lazy
     def course_experiments(self):
         return get_split_user_partitions(self.course.user_partitions)
 
@@ -84,9 +75,9 @@ class _CourseGradeReportContext(object):
         Returns an OrderedDict that maps an assignment type to a dict of
         subsection-headers and average-header.
         """
-        grading_cxt = grading_context(self.course_structure)
+        grading_context = grading_context_for_course(self.course_id)
         graded_assignments_map = OrderedDict()
-        for assignment_type_name, subsection_infos in grading_cxt['all_graded_subsections_by_type'].iteritems():
+        for assignment_type_name, subsection_infos in grading_context['all_graded_subsections_by_type'].iteritems():
             graded_subsections_map = OrderedDict()
             for subsection_index, subsection_info in enumerate(subsection_infos, start=1):
                 subsection = subsection_info['subsection_block']
@@ -121,64 +112,17 @@ class _CourseGradeReportContext(object):
         return self.task_progress.update_task_state(extra_meta={'step': message})
 
 
-class _CertificateBulkContext(object):
-    def __init__(self, context, users):
-        certificate_whitelist = CertificateWhitelist.objects.filter(course_id=context.course_id, whitelist=True)
-        self.whitelisted_user_ids = [entry.user_id for entry in certificate_whitelist]
-        self.certificates_by_user = {
-            certificate.user.id: certificate
-            for certificate in
-            GeneratedCertificate.objects.filter(course_id=context.course_id, user__in=users)
-        }
-
-
-class _TeamBulkContext(object):
-    def __init__(self, context, users):
-        if context.teams_enabled:
-            self.teams_by_user = {
-                membership.user.id: membership.team.name
-                for membership in
-                CourseTeamMembership.objects.filter(team__course_id=context.course_id, user__in=users)
-            }
-        else:
-            self.teams_by_user = {}
-
-
-class _EnrollmentBulkContext(object):
-    def __init__(self, context, users):
-        CourseEnrollment.bulk_fetch_enrollment_states(users, context.course_id)
-        self.verified_users = [
-            verified.user.id for verified in
-            SoftwareSecurePhotoVerification.verified_query().filter(user__in=users).select_related('user__id')
-        ]
-
-
-class _CourseGradeBulkContext(object):
-    def __init__(self, context, users):
-        self.certs = _CertificateBulkContext(context, users)
-        self.teams = _TeamBulkContext(context, users)
-        self.enrollments = _EnrollmentBulkContext(context, users)
-        bulk_cache_cohorts(context.course_id, users)
-        BulkRoleCache.prefetch(users)
-        PersistentCourseGrade.prefetch(context.course_id, users)
-        BulkCourseTags.prefetch(context.course_id, users)
-
-
 class CourseGradeReport(object):
     """
     Class to encapsulate functionality related to generating Grade Reports.
     """
-    # Batch size for chunking the list of enrollees in the course.
-    USER_BATCH_SIZE = 100
-
     @classmethod
     def generate(cls, _xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
         """
         Public method to generate a grade report.
         """
-        with modulestore().bulk_operations(course_id):
-            context = _CourseGradeReportContext(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name)
-            return CourseGradeReport()._generate(context)
+        context = CourseGradeReportContext(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name)
+        return CourseGradeReport()._generate(context)
 
     def _generate(self, context):
         """
@@ -222,7 +166,6 @@ class CourseGradeReport(object):
         A generator of batches of (success_rows, error_rows) for this report.
         """
         for users in self._batch_users(context):
-            users = filter(lambda u: u is not None, users)
             yield self._rows_for_users(context, users)
 
     def _compile(self, context, batched_rows):
@@ -268,11 +211,10 @@ class CourseGradeReport(object):
         """
         Returns a generator of batches of users.
         """
-        def grouper(iterable, chunk_size=self.USER_BATCH_SIZE, fillvalue=None):
+        def grouper(iterable, chunk_size=1, fillvalue=None):
             args = [iter(iterable)] * chunk_size
             return izip_longest(*args, fillvalue=fillvalue)
         users = CourseEnrollment.objects.users_enrolled_in(context.course_id)
-        users = users.select_related('profile__allow_certificate')
         return grouper(users)
 
     def _user_grade_results(self, course_grade, context):
@@ -307,7 +249,7 @@ class CourseGradeReport(object):
         """
         cohort_group_names = []
         if context.cohorts_enabled:
-            group = get_cohort(user, context.course_id, assign=False, use_cached=True)
+            group = get_cohort(user, context.course_id, assign=False)
             cohort_group_names.append(group.name if group else '')
         return cohort_group_names
 
@@ -322,13 +264,20 @@ class CourseGradeReport(object):
             experiment_group_names.append(group.name if group else '')
         return experiment_group_names
 
-    def _user_team_names(self, user, bulk_teams):
+    def _user_team_names(self, user, context):
         """
         Returns a list of names of teams in which the given user belongs.
         """
-        return [bulk_teams.teams_by_user.get(user.id, '')]
+        team_names = []
+        if context.teams_enabled:
+            try:
+                membership = CourseTeamMembership.objects.get(user=user, team__course_id=context.course_id)
+                team_names.append(membership.team.name)
+            except CourseTeamMembership.DoesNotExist:
+                team_names.append('')
+        return team_names
 
-    def _user_verification_mode(self, user, context, bulk_enrollments):
+    def _user_verification_mode(self, user, context):
         """
         Returns a list of enrollment-mode and verification-status for the
         given user.
@@ -337,21 +286,19 @@ class CourseGradeReport(object):
         verification_status = SoftwareSecurePhotoVerification.verification_status_for_user(
             user,
             context.course_id,
-            enrollment_mode,
-            user_is_verified=user.id in bulk_enrollments.verified_users,
+            enrollment_mode
         )
         return [enrollment_mode, verification_status]
 
-    def _user_certificate_info(self, user, context, course_grade, bulk_certs):
+    def _user_certificate_info(self, user, context, course_grade, whitelisted_user_ids):
         """
         Returns the course certification information for the given user.
         """
-        is_whitelisted = user.id in bulk_certs.whitelisted_user_ids
         certificate_info = certificate_info_for_user(
             user,
+            context.course_id,
             course_grade.letter_grade,
-            is_whitelisted,
-            bulk_certs.certificates_by_user.get(user.id),
+            user.id in whitelisted_user_ids
         )
         TASK_LOG.info(
             u'Student certificate eligibility: %s '
@@ -364,7 +311,7 @@ class CourseGradeReport(object):
             course_grade.letter_grade,
             context.course.grade_cutoffs,
             user.profile.allow_certificate,
-            is_whitelisted,
+            user.id in whitelisted_user_ids,
         )
         return certificate_info
 
@@ -372,30 +319,24 @@ class CourseGradeReport(object):
         """
         Returns a list of rows for the given users for this report.
         """
-        with modulestore().bulk_operations(context.course_id):
-            bulk_context = _CourseGradeBulkContext(context, users)
-
-            success_rows, error_rows = [], []
-            for user, course_grade, error in CourseGradeFactory().iter(
-                users,
-                course=context.course,
-                collected_block_structure=context.course_structure,
-                course_key=context.course_id,
-            ):
-                if not course_grade:
-                    # An empty gradeset means we failed to grade a student.
-                    error_rows.append([user.id, user.username, error.message])
-                else:
-                    success_rows.append(
-                        [user.id, user.email, user.username] +
-                        self._user_grade_results(course_grade, context) +
-                        self._user_cohort_group_names(user, context) +
-                        self._user_experiment_group_names(user, context) +
-                        self._user_team_names(user, bulk_context.teams) +
-                        self._user_verification_mode(user, context, bulk_context.enrollments) +
-                        self._user_certificate_info(user, context, course_grade, bulk_context.certs)
-                    )
-            return success_rows, error_rows
+        certificate_whitelist = CertificateWhitelist.objects.filter(course_id=context.course_id, whitelist=True)
+        whitelisted_user_ids = [entry.user_id for entry in certificate_whitelist]
+        success_rows, error_rows = [], []
+        for user, course_grade, error in CourseGradeFactory().iter(users, course_key=context.course_id):
+            if not course_grade:
+                # An empty gradeset means we failed to grade a student.
+                error_rows.append([user.id, user.username, error.message])
+            else:
+                success_rows.append(
+                    [user.id, user.email, user.username] +
+                    self._user_grade_results(course_grade, context) +
+                    self._user_cohort_group_names(user, context) +
+                    self._user_experiment_group_names(user, context) +
+                    self._user_team_names(user, context) +
+                    self._user_verification_mode(user, context) +
+                    self._user_certificate_info(user, context, course_grade, whitelisted_user_ids)
+                )
+        return success_rows, error_rows
 
 
 class ProblemGradeReport(object):
