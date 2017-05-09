@@ -107,6 +107,6 @@ class InstructorDashboardHelp(BaseInstructorDashboardTest):
         When I click "Help"
         Then I see help about the instructor dashboard in a new tab
         """
-        href = url_for_help('learner', '/SFD_instructor_dash_help.html')
+        href = url_for_help('course_author', '/CA_instructor_dash_help.html')
         self.instructor_dashboard_page.click_help()
         assert_opened_help_link_is_correct(self, href)
