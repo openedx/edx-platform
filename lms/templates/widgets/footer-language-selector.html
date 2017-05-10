@@ -1,7 +1,7 @@
 ## Language-selection widget for the footer.
 ##
-## Expects a single argument, languages, which should be a list of two-tuples containing
-## (language_code, language_display_name).
+## Expects a single argument, languages, which should be a list of Language objects containing
+## name and code properties.
 ## Requires settings.LANGUAGE_COOKIE.
 ##
 <%page expression_filter="h" args="languages"/>
@@ -22,11 +22,11 @@
         <i class="fa fa-globe" aria-hidden="true"></i><span class="sr">${_("Choose Language")}</span>
     </label>
     <select id="footer-language-selector" onchange="setLanguage(this)">
-        % for language_code, language_display_name in languages:
-            % if language_code == LANGUAGE_CODE:
-                <option value="${language_code}" selected="selected">${language_display_name}</option>
+        % for language in languages:
+            % if language.code == LANGUAGE_CODE:
+                <option value="${language.code}" selected="selected">${language.name}</option>
             % else:
-                <option value="${language_code}">${language_display_name}</option>
+                <option value="${language.code}">${language.name}</option>
             % endif
         % endfor
     </select>
