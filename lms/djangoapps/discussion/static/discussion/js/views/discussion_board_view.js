@@ -159,10 +159,11 @@
                 headerHeight = this.$('.forum-nav-header').outerHeight();
                 refineBarHeight = this.$('.forum-nav-refine-bar').outerHeight();
                 browseFilterHeight = this.$('.forum-nav-browse-filter').outerHeight();
+                var askTAHeight = $('.ask-ta').outerHeight();
                 this.$('.forum-nav-thread-list')
-                    .css('height', (sidebarHeight - headerHeight - refineBarHeight - 2) + 'px');
+                    .css('height', (sidebarHeight - headerHeight - refineBarHeight - askTAHeight - 2) + 'px');
                 this.$('.forum-nav-browse-menu')
-                    .css('height', (sidebarHeight - headerHeight - browseFilterHeight - 2) + 'px');
+                    .css('height', (sidebarHeight - headerHeight - browseFilterHeight - askTAHeight - 2) + 'px');
             },
 
             goHome: function() {
