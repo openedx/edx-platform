@@ -6,7 +6,6 @@ from waffle.testutils import override_flag
 
 from django.core.urlresolvers import reverse
 
-from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
@@ -15,7 +14,10 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, chec
 
 from openedx.features.course_experience import UNIFIED_COURSE_EXPERIENCE_FLAG
 
+from .test_course_updates import create_course_update, remove_course_updates
+
 TEST_PASSWORD = 'test'
+TEST_WELCOME_MESSAGE = '<h2>Welcome!</h2>'
 
 
 def course_home_url(course):
@@ -55,12 +57,19 @@ class TestCourseHomePage(SharedModuleStoreTestCase):
         cls.user = UserFactory(password=TEST_PASSWORD)
         CourseEnrollment.enroll(cls.user, cls.course.id)
 
+        # Create a welcome message
+        create_course_update(cls.course, cls.user, TEST_WELCOME_MESSAGE)
+
     def setUp(self):
         """
         Set up for the tests.
         """
         super(TestCourseHomePage, self).setUp()
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
+
+    def tearDown(self):
+        remove_course_updates(self.course)
+        super(TestCourseHomePage, self).tearDown()
 
     @override_flag(UNIFIED_COURSE_EXPERIENCE_FLAG, active=True)
     def test_unified_page(self):
@@ -71,15 +80,27 @@ class TestCourseHomePage(SharedModuleStoreTestCase):
         response = self.client.get(url)
         self.assertContains(response, '<h2 class="hd hd-3 page-title">Test Course</h2>')
 
+    @override_flag(UNIFIED_COURSE_EXPERIENCE_FLAG, active=True)
+    def test_welcome_message_when_unified(self):
+        url = course_home_url(self.course)
+        response = self.client.get(url)
+        self.assertContains(response, TEST_WELCOME_MESSAGE, status_code=200)
+
+    @override_flag(UNIFIED_COURSE_EXPERIENCE_FLAG, active=False)
+    def test_welcome_message_when_not_unified(self):
+        url = course_home_url(self.course)
+        response = self.client.get(url)
+        self.assertNotContains(response, TEST_WELCOME_MESSAGE, status_code=200)
+
     def test_queries(self):
         """
         Verify that the view's query count doesn't regress.
         """
-        # Pre-fill the course blocks cache
-        get_course_in_cache(self.course.id)
+        # Pre-fetch the view to populate any caches
+        course_home_url(self.course)
 
         # Fetch the view and verify the query counts
-        with self.assertNumQueries(35):
-            with check_mongo_calls(3):
+        with self.assertNumQueries(43):
+            with check_mongo_calls(5):
                 url = course_home_url(self.course)
                 self.client.get(url)

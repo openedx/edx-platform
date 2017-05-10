@@ -235,6 +235,13 @@ def get_course_about_section(request, course, section_key):
     raise KeyError("Invalid about key " + str(section_key))
 
 
+def get_course_info_usage_key(course, section_key):
+    """
+    Returns the usage key for the specified section's course info module.
+    """
+    return course.id.make_usage_key('course_info', section_key)
+
+
 def get_course_info_section_module(request, user, course, section_key):
     """
     This returns the course info module for a given section_key.
@@ -245,7 +252,7 @@ def get_course_info_section_module(request, user, course, section_key):
     - updates
     - guest_updates
     """
-    usage_key = course.id.make_usage_key('course_info', section_key)
+    usage_key = get_course_info_usage_key(course, section_key)
 
     # Use an empty cache
     field_data_cache = FieldDataCache([], course.id, user)

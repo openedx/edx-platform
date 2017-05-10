@@ -210,7 +210,7 @@ py2neo==3.1.2
 -r coverage.txt
 
 # Support for plugins
-web-fragments==0.2.1
+web-fragments==0.2.2
 xblock==0.5.0
 
 # Third Party XBlocks

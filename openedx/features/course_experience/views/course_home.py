@@ -18,6 +18,7 @@ from web_fragments.fragment import Fragment
 
 from .course_outline import CourseOutlineFragmentView
 from .course_dates import CourseDatesFragmentView
+from .welcome_message import WelcomeMessageFragmentView
 from ..utils import get_course_outline_block_tree
 
 
@@ -93,6 +94,11 @@ class CourseHomeFragmentView(EdxFragmentView):
         # Get resume course information
         has_visited_course, resume_course_url = self._get_resume_course_info(request, course_id)
 
+        # Render the welcome message as a fragment
+        welcome_message_fragment = WelcomeMessageFragmentView().render_to_fragment(
+            request, course_id=course_id, **kwargs
+        )
+
         # Render the course dates as a fragment
         dates_fragment = CourseDatesFragmentView().render_to_fragment(request, course_id=course_id, **kwargs)
 
@@ -113,6 +119,7 @@ class CourseHomeFragmentView(EdxFragmentView):
             'has_visited_course': has_visited_course,
             'resume_course_url': resume_course_url,
             'dates_fragment': dates_fragment,
+            'welcome_message_fragment': welcome_message_fragment,
             'disable_courseware_js': True,
             'uses_pattern_library': True,
         }
