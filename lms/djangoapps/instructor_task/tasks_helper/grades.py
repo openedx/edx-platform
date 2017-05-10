@@ -134,8 +134,7 @@ class _CertificateBulkContext(object):
 
 class _TeamBulkContext(object):
     def __init__(self, context, users):
-        self.enabled = context.teams_enabled
-        if self.enabled:
+        if context.teams_enabled:
             self.teams_by_user = {
                 membership.user.id: membership.team.name
                 for membership in
@@ -327,10 +326,7 @@ class CourseGradeReport(object):
         """
         Returns a list of names of teams in which the given user belongs.
         """
-        team_names = []
-        if bulk_teams.enabled:
-            team_names = [bulk_teams.teams_by_user.get(user.id, '')]
-        return team_names
+        return [bulk_teams.teams_by_user.get(user.id, '')]
 
     def _user_verification_mode(self, user, context, bulk_enrollments):
         """
