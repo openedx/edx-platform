@@ -41,6 +41,16 @@ def get_cache(name):
     return middleware.RequestCache.get_request_cache(name)
 
 
+def clear_cache(name):
+    """
+    Clears the request cache named ``name``.
+
+    Arguments:
+        name (str): The name of the request cache to clear
+    """
+    return middleware.RequestCache.clear_request_cache(name)
+
+
 def get_request():
     """
     Return the current request.

@@ -9,8 +9,11 @@ from config_models.models import ConfigurationModel
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
+from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
+from request_cache.middleware import ns_request_cached, RequestCache
+
 
 Mode = namedtuple('Mode',
                   [
@@ -141,6 +144,8 @@ class CourseMode(models.Model):
     DEFAULT_SHOPPINGCART_MODE_SLUG = HONOR
     DEFAULT_SHOPPINGCART_MODE = Mode(HONOR, _('Honor'), 0, '', 'usd', None, None, None, None)
 
+    CACHE_NAMESPACE = u"course_modes.CourseMode.cache."
+
     class Meta(object):
         unique_together = ('course_id', 'mode_slug', 'currency')
 
@@ -265,6 +270,7 @@ class CourseMode(models.Model):
         return [mode.to_tuple() for mode in found_course_modes]
 
     @classmethod
+    @ns_request_cached(CACHE_NAMESPACE)
     def modes_for_course(cls, course_id, include_expired=False, only_selectable=True):
         """
         Returns a list of the non-expired modes for a given course id
@@ -664,6 +670,13 @@ class CourseMode(models.Model):
         return u"{} : {}, min={}".format(
             self.course_id, self.mode_slug, self.min_price
         )
+
+
+@receiver(models.signals.post_save, sender=CourseMode)
+@receiver(models.signals.post_delete, sender=CourseMode)
+def invalidate_course_mode_cache(sender, **kwargs):   # pylint: disable=unused-argument
+    """Invalidate the cache of course modes. """
+    RequestCache.clear_request_cache(name=CourseMode.CACHE_NAMESPACE)
 
 
 class CourseModesArchive(models.Model):
