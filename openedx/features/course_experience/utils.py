@@ -32,15 +32,15 @@ def get_course_outline_block_tree(request, course_id):
 
         return block
 
-    def set_lasted_accessed_default(block):
+    def set_last_accessed_default(block):
         """
         Set default of False for last_accessed on all blocks.
         """
         block['last_accessed'] = False
         for child in block.get('children', []):
-            set_lasted_accessed_default(child)
+            set_last_accessed_default(child)
 
-    def mark_lasted_accessed(user, course_key, block):
+    def mark_last_accessed(user, course_key, block):
         """
         Recursively marks the branch to the last accessed block.
         """
@@ -49,10 +49,10 @@ def get_course_outline_block_tree(request, course_id):
         last_accessed_child_position = student_module_dict.get('position')
         if last_accessed_child_position and block.get('children'):
             block['last_accessed'] = True
-            if len(block['children']) <= last_accessed_child_position:
+            if last_accessed_child_position <= len(block['children']):
                 last_accessed_child_block = block['children'][last_accessed_child_position - 1]
                 last_accessed_child_block['last_accessed'] = True
-                mark_lasted_accessed(user, course_key, last_accessed_child_block)
+                mark_last_accessed(user, course_key, last_accessed_child_block)
             else:
                 # We should be using an id in place of position for last accessed. However, while using position, if
                 # the child block is no longer accessible we'll use the last child.
@@ -72,7 +72,7 @@ def get_course_outline_block_tree(request, course_id):
 
     course_outline_root_block = all_blocks['blocks'][all_blocks['root']]
     populate_children(course_outline_root_block, all_blocks['blocks'])
-    set_lasted_accessed_default(course_outline_root_block)
-    mark_lasted_accessed(request.user, course_key, course_outline_root_block)
+    set_last_accessed_default(course_outline_root_block)
+    mark_last_accessed(request.user, course_key, course_outline_root_block)
 
     return course_outline_root_block
