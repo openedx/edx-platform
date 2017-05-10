@@ -22,6 +22,7 @@ from model_utils.models import TimeStampedModel
 import pytz
 from simple_history.models import HistoricalRecords
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
+from request_cache.middleware import ns_request_cached, RequestCache
 
 
 CREDIT_PROVIDER_ID_REGEX = r"[a-z,A-Z,0-9,\-]+"
@@ -290,6 +291,8 @@ class CreditRequirement(TimeStampedModel):
     criteria = JSONField()
     active = models.BooleanField(default=True)
 
+    CACHE_NAMESPACE = u"credit.CreditRequirement.cache."
+
     class Meta(object):
         unique_together = ('namespace', 'name', 'course')
         ordering = ["order"]
@@ -331,6 +334,7 @@ class CreditRequirement(TimeStampedModel):
         return credit_requirement, created
 
     @classmethod
+    @ns_request_cached(CACHE_NAMESPACE)
     def get_course_requirements(cls, course_key, namespace=None, name=None):
         """
         Get credit requirements of a given course.
@@ -390,6 +394,13 @@ class CreditRequirement(TimeStampedModel):
             )
         except cls.DoesNotExist:
             return None
+
+
+@receiver(models.signals.post_save, sender=CreditRequirement)
+@receiver(models.signals.post_delete, sender=CreditRequirement)
+def invalidate_credit_requirement_cache(sender, **kwargs):   # pylint: disable=unused-argument
+    """Invalidate the cache of credit requirements. """
+    RequestCache.clear_request_cache(name=CreditRequirement.CACHE_NAMESPACE)
 
 
 class CreditRequirementStatus(TimeStampedModel):

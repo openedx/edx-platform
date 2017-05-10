@@ -5,17 +5,17 @@ from django.db import models
 from django.utils.translation import ugettext_lazy
 from django.dispatch import receiver
 from django.db.models.signals import post_save, pre_save
+import logging
 
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
-from student.models import CourseEnrollment
 from lms.djangoapps.courseware.courses import get_course_by_id
-
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from openedx.core.djangoapps.verified_track_content.tasks import sync_cohort_with_mode
 from openedx.core.djangoapps.course_groups.cohorts import (
     get_course_cohorts, CourseCohort, is_course_cohorted, get_random_cohort
 )
+from request_cache.middleware import ns_request_cached, RequestCache
+from student.models import CourseEnrollment
 
-import logging
 
 log = logging.getLogger(__name__)
 
@@ -97,6 +97,8 @@ class VerifiedTrackCohortedCourse(models.Model):
 
     enabled = models.BooleanField()
 
+    CACHE_NAMESPACE = u"verified_track_content.VerifiedTrackCohortedCourse.cache."
+
     def __unicode__(self):
         return u"Course: {}, enabled: {}".format(unicode(self.course_key), self.enabled)
 
@@ -119,6 +121,7 @@ class VerifiedTrackCohortedCourse(models.Model):
             return None
 
     @classmethod
+    @ns_request_cached(CACHE_NAMESPACE)
     def is_verified_track_cohort_enabled(cls, course_key):
         """
         Checks whether or not verified track cohort is enabled for the given course.
@@ -134,3 +137,10 @@ class VerifiedTrackCohortedCourse(models.Model):
             return cls.objects.get(course_key=course_key).enabled
         except cls.DoesNotExist:
             return False
+
+
+@receiver(models.signals.post_save, sender=VerifiedTrackCohortedCourse)
+@receiver(models.signals.post_delete, sender=VerifiedTrackCohortedCourse)
+def invalidate_verified_track_cache(sender, **kwargs):   # pylint: disable=unused-argument
+    """Invalidate the cache of VerifiedTrackCohortedCourse. """
+    RequestCache.clear_request_cache(name=VerifiedTrackCohortedCourse.CACHE_NAMESPACE)

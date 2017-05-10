@@ -26,6 +26,11 @@ class MemoryCourseTagAPI(object):
         """Gets the value of ``key``"""
         self._tags[course_id][key] = value
 
+    class BulkCourseTags(object):
+        @classmethod
+        def is_prefetched(self, course_id):
+            return False
+
 
 class TestRandomUserPartitionScheme(PartitionTestCase):
     """
