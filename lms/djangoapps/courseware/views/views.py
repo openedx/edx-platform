@@ -428,7 +428,7 @@ class StaticCourseTabView(EdxFragmentView):
         """
         return get_static_tab_fragment(request, course, tab)
 
-    def render_to_standalone_html(self, request, fragment, course=None, tab=None, **kwargs):
+    def render_standalone_response(self, request, fragment, course=None, tab=None, **kwargs):
         """
         Renders this static tab's fragment to HTML for a standalone page.
         """
@@ -531,14 +531,14 @@ class CourseTabView(EdxFragmentView):
         tab = page_context['tab']
         return tab.render_to_fragment(request, course, **kwargs)
 
-    def render_to_standalone_html(self, request, fragment, course=None, tab=None, page_context=None, **kwargs):
+    def render_standalone_response(self, request, fragment, course=None, tab=None, page_context=None, **kwargs):
         """
         Renders this course tab's fragment to HTML for a standalone page.
         """
         if not page_context:
             page_context = self.create_page_context(request, course=course, tab=tab, **kwargs)
         page_context['fragment'] = fragment
-        return render_to_string('courseware/tab-view.html', page_context)
+        return render_to_response('courseware/tab-view.html', page_context)
 
 
 @ensure_csrf_cookie
