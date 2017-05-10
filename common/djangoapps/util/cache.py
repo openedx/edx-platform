@@ -65,7 +65,10 @@ def cache_if_anonymous(*get_parameters):
                 # Once a SiteConfiguration is saved it will create a new SiteConfigurationHistory
                 # row. We use this to break the cache since we need to load the new resources. We rely on
                 # memcached to reap the old entries from it's datastore once they are expired
-                version = request.site.configuration_histories.count() or 1
+                if hasattr(request, 'site'):
+                    version = request.site.configuration_histories.count()
+                else:
+                    version = 1
                 cache_key = domain + "cache_if_anonymous." + get_language() + '.' + request.path
 
                 # Include the values of GET parameters in the cache key.
