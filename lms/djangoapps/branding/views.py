@@ -159,7 +159,7 @@ def _parse_language_selector_options(language_selector_options):
 
         Returns: list
     """
-    return [Language(code, Locale.parse(code, sep='-').language_name) for code in language_selector_options]
+    return [Language(_code, Locale.parse(_code, sep='-').language_name) for _code in language_selector_options]
 
 def _filter_language_selector_options(language_selector_options):
     """Filters unsupported language codes from the list of language_selector_options.
@@ -169,8 +169,8 @@ def _filter_language_selector_options(language_selector_options):
 
         Returns: list
     """
-    released_languages = {language.code for language in released_languages()}
-    return [code for code in language_selector_options if code in released_languages]
+    _released_languages = {_language.code for _language in released_languages()}
+    return [_code for _code in language_selector_options if _code in _released_languages]
 
 
 @cache_control(must_revalidate=True, max_age=settings.FOOTER_BROWSER_CACHE_MAX_AGE)
@@ -307,7 +307,7 @@ def footer(request):
                 'language': language,
                 'show_openedx_logo': show_openedx_logo,
                 'include_dependencies': include_dependencies,
-                'language_selector': ','.join([language.code for language in language_selector_options])
+                'language_selector': ','.join([_language.code for _language in language_selector_options])
             })
         )
         content = cache.get(cache_key)
