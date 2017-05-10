@@ -32,6 +32,8 @@ class LanguagePreferenceMiddleware(object):
         if cookie_lang:
             if request.user.is_authenticated():
                 set_user_preference(request.user, LANGUAGE_KEY, cookie_lang)
+            else:
+                request._anonymous_user_cookie_lang = cookie_lang
 
             accept_header = request.META.get(LANGUAGE_HEADER, None)
             if accept_header:
@@ -51,25 +53,32 @@ class LanguagePreferenceMiddleware(object):
     def process_response(self, request, response):
         # If the user is logged in, check for their language preference
         if getattr(request, 'user', None) and request.user.is_authenticated():
-            # Get the user's language preference
-            try:
-                user_pref = get_user_preference(request.user, LANGUAGE_KEY)
-            except (UserAPIRequestError, UserAPIInternalError):
-                # If we can't find the user preferences, then don't modify the cookie
-                pass
+            user_pref = None
+
+            anonymous_cookie_lang = getattr(request, '_anonymous_user_cookie_lang', None)
+            if anonymous_cookie_lang:
+                user_pref = anonymous_cookie_lang
+                set_user_preference(request.user, LANGUAGE_KEY, anonymous_cookie_lang)
             else:
-                # Set it in the LANGUAGE_COOKIE
-                if user_pref:
-                    response.set_cookie(
-                        settings.LANGUAGE_COOKIE,
-                        value=user_pref,
-                        domain=settings.SESSION_COOKIE_DOMAIN,
-                        max_age=COOKIE_DURATION,
-                    )
-                else:
-                    response.delete_cookie(
-                        settings.LANGUAGE_COOKIE,
-                        domain=settings.SESSION_COOKIE_DOMAIN
-                    )
+                # Get the user's language preference
+                try:
+                    user_pref = get_user_preference(request.user, LANGUAGE_KEY)
+                except (UserAPIRequestError, UserAPIInternalError):
+                    # If we can't find the user preferences, then don't modify the cookie
+                    pass
+
+            # If set, set the user_pref in the LANGUAGE_COOKIE
+            if user_pref:
+                response.set_cookie(
+                    settings.LANGUAGE_COOKIE,
+                    value=user_pref,
+                    domain=settings.SESSION_COOKIE_DOMAIN,
+                    max_age=COOKIE_DURATION,
+                )
+            else:
+                response.delete_cookie(
+                    settings.LANGUAGE_COOKIE,
+                    domain=settings.SESSION_COOKIE_DOMAIN
+                )
 
         return response
