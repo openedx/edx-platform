@@ -168,6 +168,54 @@ class TestUserPreferenceMiddleware(TestCase):
         else:
             self.assertNotIn(settings.LANGUAGE_COOKIE, self.client.cookies)
 
+    @ddt.data(
+        (None, None),
+        ('es', 'es-419'),
+        ('en', 'en'),
+        ('es-419', 'es-419')
+    )
+    @ddt.unpack
+    def test_login_captures_lang_pref(self, lang_cookie, expected_lang):
+        if lang_cookie:
+            self.client.cookies[settings.LANGUAGE_COOKIE] = lang_cookie
+        elif settings.LANGUAGE_COOKIE in self.client.cookies:
+            del self.client.cookies[settings.LANGUAGE_COOKIE]
+
+        # Use an actual call to the login endpoint, to validate that the middleware
+        # stack does the right thing
+        if settings.FEATURES.get('ENABLE_COMBINED_LOGIN_REGISTRATION'):
+            response = self.client.post(
+                reverse('user_api_login_session'),
+                data={
+                    'email': self.user.email,
+                    'password': UserFactory._DEFAULT_PASSWORD,
+                    'remember': True,
+                }
+            )
+        else:
+            response = self.client.post(
+                reverse('login_post'),
+                data={
+                    'email': self.user.email,
+                    'password': UserFactory._DEFAULT_PASSWORD,
+                    'honor_code': True,
+                }
+            )
+
+        self.assertEqual(response.status_code, 200)
+
+        if lang_cookie:
+            self.assertEqual(response['Content-Language'], expected_lang)
+            self.assertEqual(get_user_preference(self.user, LANGUAGE_KEY), lang_cookie)
+            self.assertEqual(
+                self.client.cookies[settings.LANGUAGE_COOKIE].value,
+                lang_cookie
+            )
+        else:
+            self.assertEqual(response['Content-Language'], 'en')
+            self.assertEqual(get_user_preference(self.user, LANGUAGE_KEY), None)
+            self.assertEqual(self.client.cookies[settings.LANGUAGE_COOKIE].value, '')
+
     def test_process_response_no_user_noop(self):
         del self.request.user
         response = mock.Mock(spec=HttpResponse)
