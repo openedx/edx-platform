@@ -178,10 +178,10 @@ class TestCourseGradeFactory(GradeTestBase):
             self.assertEqual(course_grade.letter_grade, u'Pass' if expected_pass else None)
             self.assertEqual(course_grade.percent, 0.5)
 
-        with self.assertNumQueries(12), mock_get_score(1, 2):
+        with self.assertNumQueries(11), mock_get_score(1, 2):
             _assert_create(expected_pass=True)
 
-        with self.assertNumQueries(15), mock_get_score(1, 2):
+        with self.assertNumQueries(13), mock_get_score(1, 2):
             grade_factory.update(self.request.user, self.course)
 
         with self.assertNumQueries(1):
@@ -189,7 +189,7 @@ class TestCourseGradeFactory(GradeTestBase):
 
         self._update_grading_policy(passing=0.9)
 
-        with self.assertNumQueries(8):
+        with self.assertNumQueries(6):
             _assert_create(expected_pass=False)
 
     @ddt.data(True, False)

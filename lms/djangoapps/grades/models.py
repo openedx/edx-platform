@@ -25,6 +25,7 @@ from track.event_transaction_utils import get_event_transaction_id, get_event_tr
 from coursewarehistoryextended.fields import UnsignedBigIntAutoField
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, UsageKeyField
+from request_cache import get_cache
 
 from .config import waffle
 
@@ -522,6 +523,8 @@ class PersistentCourseGrade(DeleteGradesMixin, TimeStampedModel):
     # Information related to course completion
     passed_timestamp = models.DateTimeField(u'Date learner earned a passing grade', blank=True, null=True)
 
+    CACHE_NAMESPACE = u"grades.models.PersistentCourseGrade"
+
     def __unicode__(self):
         """
         Returns a string representation of this model.
@@ -536,6 +539,21 @@ class PersistentCourseGrade(DeleteGradesMixin, TimeStampedModel):
         ])
 
     @classmethod
+    def _cache_key(cls, course_id):
+        return u"grades_cache.{}".format(course_id)
+
+    @classmethod
+    def prefetch(cls, course_id, users):
+        """
+        Prefetches grades for the given users for the given course.
+        """
+        get_cache(cls.CACHE_NAMESPACE)[cls._cache_key(course_id)] = {
+            grade.user_id: grade
+            for grade in
+            cls.objects.filter(user_id__in=[user.id for user in users], course_id=course_id)
+        }
+
+    @classmethod
     def read(cls, user_id, course_id):
         """
         Reads a grade from database
@@ -546,7 +564,17 @@ class PersistentCourseGrade(DeleteGradesMixin, TimeStampedModel):
 
         Raises PersistentCourseGrade.DoesNotExist if applicable
         """
-        return cls.objects.get(user_id=user_id, course_id=course_id)
+        try:
+            prefetched_grades = get_cache(cls.CACHE_NAMESPACE)[cls._cache_key(course_id)]
+            try:
+                return prefetched_grades[user_id]
+            except KeyError:
+                # user's grade is not in the prefetched list, so
+                # assume they have no grade
+                raise cls.DoesNotExist
+        except KeyError:
+            # grades were not prefetched for the course, so fetch it
+            return cls.objects.get(user_id=user_id, course_id=course_id)
 
     @classmethod
     def update_or_create(cls, user_id, course_id, **kwargs):

@@ -16,7 +16,7 @@ from opaque_keys.edx.locator import CourseLocator
 import pytz
 
 from course_modes.helpers import enrollment_mode_display
-from course_modes.models import CourseMode, Mode
+from course_modes.models import CourseMode, Mode, invalidate_course_mode_cache
 from course_modes.tests.factories import CourseModeFactory
 
 
@@ -30,6 +30,9 @@ class CourseModeModelTest(TestCase):
         super(CourseModeModelTest, self).setUp()
         self.course_key = SlashSeparatedCourseKey('Test', 'TestCourse', 'TestCourseRun')
         CourseMode.objects.all().delete()
+
+    def tearDown(self):
+        invalidate_course_mode_cache(sender=None)
 
     def create_mode(
             self,
