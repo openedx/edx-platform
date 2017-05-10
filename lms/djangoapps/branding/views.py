@@ -3,14 +3,15 @@ import logging
 import urllib
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
-from django.core.cache import cache
-from django.views.decorators.cache import cache_control
-from django.http import HttpResponse, Http404
-from django.utils import translation
-from django.shortcuts import redirect
-from django.views.decorators.csrf import ensure_csrf_cookie
 from django.contrib.staticfiles.storage import staticfiles_storage
+from django.core.cache import cache
+from django.core.urlresolvers import reverse
+from django.http import HttpResponse, Http404
+from django.shortcuts import redirect
+from django.utils import translation
+from django.utils.translation.trans_real import get_supported_language_variant
+from django.views.decorators.cache import cache_control
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 from edxmako.shortcuts import render_to_response
 import student.views
@@ -255,6 +256,10 @@ def footer(request):
 
     # Override the language if necessary
     language = request.GET.get('language', translation.get_language())
+    try:
+        language = get_supported_language_variant(language)
+    except LookupError:
+        language = settings.LANGUAGE_CODE
 
     # Render the footer information based on the extension
     if 'text/html' in accepts or '*/*' in accepts:
