@@ -34,9 +34,11 @@ from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMe
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup, CohortMembership
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
+from openedx.core.djangoapps.credit.tests.factories import CreditCourseFactory
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase, TestConditionalContent
+from request_cache.middleware import RequestCache
 from shoppingcart.models import (
     Order, PaidCourseRegistration, CourseRegistrationCode, Invoice,
     CourseRegistrationCodeInvoiceItem, InvoiceTransaction, Coupon
@@ -44,8 +46,9 @@ from shoppingcart.models import (
 from student.models import CourseEnrollment, CourseEnrollmentAllowed, ManualEnrollmentAudit, ALLOWEDTOENROLL_TO_ENROLLED
 from student.tests.factories import CourseEnrollmentFactory, CourseModeFactory, UserFactory
 from survey.models import SurveyForm, SurveyAnswer
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 from xmodule.partitions.partitions import Group, UserPartition
 
 from ..models import ReportStore
@@ -320,6 +323,44 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
         ]
         result = CourseGradeReport.generate(None, None, self.course.id, None, 'graded')
         self.assertDictContainsSubset({'attempted': 1, 'succeeded': 1, 'failed': 0}, result)
+
+    @ddt.data(
+        (ModuleStoreEnum.Type.mongo, 4),
+        (ModuleStoreEnum.Type.split, 3),
+    )
+    @ddt.unpack
+    def test_query_counts(self, store_type, mongo_count):
+        with self.store.default_store(store_type):
+            experiment_group_a = Group(2, u'Expériment Group A')
+            experiment_group_b = Group(3, u'Expériment Group B')
+            experiment_partition = UserPartition(
+                1,
+                u'Content Expériment Configuration',
+                u'Group Configuration for Content Expériments',
+                [experiment_group_a, experiment_group_b],
+                scheme_id='random'
+            )
+            course = CourseFactory.create(
+                cohort_config={'cohorted': True, 'auto_cohort': True, 'auto_cohort_groups': ['cohort 1', 'cohort 2']},
+                user_partitions=[experiment_partition],
+                teams_configuration={
+                    'max_size': 2, 'topics': [{'topic-id': 'topic', 'name': 'Topic', 'description': 'A Topic'}]
+                },
+            )
+        _ = CreditCourseFactory(course_key=course.id)
+
+        num_users = 5
+        for _ in range(num_users):
+            user = UserFactory.create()
+            CourseEnrollment.enroll(user, course.id, mode='verified')
+            SoftwareSecurePhotoVerificationFactory.create(user=user, status='approved')
+
+        RequestCache.clear_request_cache()
+
+        with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
+            with check_mongo_calls(mongo_count):
+                with self.assertNumQueries(41):
+                    CourseGradeReport.generate(None, None, course.id, None, 'graded')
 
 
 class TestTeamGradeReport(InstructorGradeReportTestCase):
@@ -1783,7 +1824,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             'failed': 3,
             'skipped': 2
         }
-        with self.assertNumQueries(186):
+        with self.assertNumQueries(171):
             self.assertCertificatesGenerated(task_input, expected_results)
 
         expected_results = {

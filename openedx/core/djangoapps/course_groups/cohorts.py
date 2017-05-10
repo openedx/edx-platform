@@ -14,7 +14,8 @@ from django.utils.translation import ugettext as _
 
 from courseware import courses
 from eventtracking import tracker
-from request_cache.middleware import RequestCache, request_cached
+import request_cache
+from request_cache.middleware import request_cached
 from student.models import get_user_by_username_or_email
 
 from .models import (
@@ -146,8 +147,45 @@ def get_cohorted_commentables(course_key):
     return ans
 
 
+COHORT_CACHE_NAMESPACE = u"cohorts.get_cohort"
+
+
+def _cohort_cache_key(user_id, course_key):
+    """
+    Returns the cache key for the given user_id and course_key.
+    """
+    return u"{}.{}".format(user_id, course_key)
+
+
+def bulk_cache_cohorts(course_key, users):
+    """
+    Pre-fetches and caches the cohort assignments for the
+    given users, for later fast retrieval by get_cohort.
+    """
+    # before populating the cache with another bulk set of data,
+    # remove previously cached entries to keep memory usage low.
+    request_cache.clear_cache(COHORT_CACHE_NAMESPACE)
+    cache = request_cache.get_cache(COHORT_CACHE_NAMESPACE)
+
+    if is_course_cohorted(course_key):
+        cohorts_by_user = {
+            membership.user: membership
+            for membership in
+            CohortMembership.objects.filter(user__in=users, course_id=course_key).select_related('user__id')
+        }
+        for user, membership in cohorts_by_user.iteritems():
+            cache[_cohort_cache_key(user.id, course_key)] = membership.course_user_group
+        uncohorted_users = filter(lambda u: u not in cohorts_by_user, users)
+    else:
+        uncohorted_users = users
+
+    for user in uncohorted_users:
+        cache[_cohort_cache_key(user.id, course_key)] = None
+
+
 def get_cohort(user, course_key, assign=True, use_cached=False):
-    """Returns the user's cohort for the specified course.
+    """
+    Returns the user's cohort for the specified course.
 
     The cohort for the user is cached for the duration of a request. Pass
     use_cached=True to use the cached value instead of fetching from the
@@ -166,19 +204,19 @@ def get_cohort(user, course_key, assign=True, use_cached=False):
     Raises:
        ValueError if the CourseKey doesn't exist.
     """
-    request_cache = RequestCache.get_request_cache()
-    cache_key = u"cohorts.get_cohort.{}.{}".format(user.id, course_key)
+    cache = request_cache.get_cache(COHORT_CACHE_NAMESPACE)
+    cache_key = _cohort_cache_key(user.id, course_key)
 
-    if use_cached and cache_key in request_cache.data:
-        return request_cache.data[cache_key]
+    if use_cached and cache_key in cache:
+        return cache[cache_key]
 
-    request_cache.data.pop(cache_key, None)
+    cache.pop(cache_key, None)
 
     # First check whether the course is cohorted (users shouldn't be in a cohort
     # in non-cohorted courses, but settings can change after course starts)
     course_cohort_settings = get_course_cohort_settings(course_key)
     if not course_cohort_settings.is_cohorted:
-        return request_cache.data.setdefault(cache_key, None)
+        return cache.setdefault(cache_key, None)
 
     # If course is cohorted, check if the user already has a cohort.
     try:
@@ -186,7 +224,7 @@ def get_cohort(user, course_key, assign=True, use_cached=False):
             course_id=course_key,
             user_id=user.id,
         )
-        return request_cache.data.setdefault(cache_key, membership.course_user_group)
+        return cache.setdefault(cache_key, membership.course_user_group)
     except CohortMembership.DoesNotExist:
         # Didn't find the group. If we do not want to assign, return here.
         if not assign:
@@ -201,7 +239,7 @@ def get_cohort(user, course_key, assign=True, use_cached=False):
                 user=user,
                 course_user_group=get_random_cohort(course_key)
             )
-            return request_cache.data.setdefault(cache_key, membership.course_user_group)
+            return cache.setdefault(cache_key, membership.course_user_group)
     except IntegrityError as integrity_error:
         # An IntegrityError is raised when multiple workers attempt to
         # create the same row in one of the cohort model entries:
@@ -419,21 +457,21 @@ def get_group_info_for_cohort(cohort, use_cached=False):
     use_cached=True to use the cached value instead of fetching from the
     database.
     """
-    request_cache = RequestCache.get_request_cache()
-    cache_key = u"cohorts.get_group_info_for_cohort.{}".format(cohort.id)
+    cache = request_cache.get_cache(u"cohorts.get_group_info_for_cohort")
+    cache_key = unicode(cohort.id)
 
-    if use_cached and cache_key in request_cache.data:
-        return request_cache.data[cache_key]
+    if use_cached and cache_key in cache:
+        return cache[cache_key]
 
-    request_cache.data.pop(cache_key, None)
+    cache.pop(cache_key, None)
 
     try:
         partition_group = CourseUserGroupPartitionGroup.objects.get(course_user_group=cohort)
-        return request_cache.data.setdefault(cache_key, (partition_group.group_id, partition_group.partition_id))
+        return cache.setdefault(cache_key, (partition_group.group_id, partition_group.partition_id))
     except CourseUserGroupPartitionGroup.DoesNotExist:
         pass
 
-    return request_cache.data.setdefault(cache_key, (None, None))
+    return cache.setdefault(cache_key, (None, None))
 
 
 def set_assignment_type(user_group, assignment_type):
