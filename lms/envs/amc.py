@@ -99,3 +99,5 @@ DATABASE_ROUTERS += ['openedx.core.djangoapps.appsembler.sites.routers.TiersDbRo
 CLONE_COURSE_FOR_NEW_SIGNUPS = False
 HIJACK_ALLOW_GET_REQUESTS = True
 HIJACK_LOGOUT_REDIRECT_URL = '/admin/auth/user'
+
+USE_S3_FOR_CUSTOMER_THEMES = True

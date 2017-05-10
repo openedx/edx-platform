@@ -143,27 +143,27 @@ class SiteConfiguration(models.Model):
     def compile_microsite_sass(self):
         css_output = compile_sass('main.scss', custom_branding=self._sass_var_override)
         file_name = self.get_value('css_overrides_file')
-        if settings.DEBUG:
-            theme_folder = os.path.join(settings.COMPREHENSIVE_THEME_DIRS[0], 'customer_themes')
-            theme_file = os.path.join(theme_folder, file_name)
-            with open(theme_file, 'w') as f:
-                f.write(css_output.encode('utf-8'))
-        else:
+        if settings.USE_S3_FOR_CUSTOMER_THEMES:
             storage = S3BotoStorage(
                 location="customer_themes",
             )
             with storage.open(file_name, 'w') as f:
                 f.write(css_output.encode('utf-8'))
+        else:
+            theme_folder = os.path.join(settings.COMPREHENSIVE_THEME_DIRS[0], 'customer_themes')
+            theme_file = os.path.join(theme_folder, file_name)
+            with open(theme_file, 'w') as f:
+                f.write(css_output.encode('utf-8'))
 
     def get_css_url(self):
-        if settings.DEBUG:
-            return static("customer_themes/{}".format(self.get_value('css_overrides_file')))
-        else:
+        if settings.USE_S3_FOR_CUSTOMER_THEMES:
             kwargs = {
                 'location': "customer_themes",
             }
             storage = get_storage_class()(**kwargs)
             return storage.url(self.get_value('css_overrides_file'))
+        else:
+            return static("customer_themes/{}".format(self.get_value('css_overrides_file')))
 
     def set_sass_variables(self, entries):
         """
@@ -179,14 +179,14 @@ class SiteConfiguration(models.Model):
         css_file = self.values.get('css_overrides_file')
         if css_file:
             try:
-                if settings.DEBUG:
-                    os.remove(os.path.join(settings.COMPREHENSIVE_THEME_DIRS[0], css_file))
-                else:
+                if settings.USE_S3_FOR_CUSTOMER_THEMES:
                     kwargs = {
                         'location': "customer_themes",
                     }
                     storage = get_storage_class()(**kwargs)
                     storage.delete(self.get_value('css_overrides_file'))
+                else:
+                    os.remove(os.path.join(settings.COMPREHENSIVE_THEME_DIRS[0], css_file))
             except OSError:
                 logger.warning("Can't delete CSS file {}".format(css_file))
 
