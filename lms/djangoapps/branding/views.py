@@ -150,6 +150,17 @@ def _render_footer_html(request, show_openedx_logo, include_dependencies, langua
     return render_to_response("footer.html", context)
 
 
+def _parse_language_code(language_code):
+    """Parses the language code into a Language object.
+
+        Arguments:
+            language_code (str): A valid language code
+
+        Returns: Language
+    """
+    return Language(language_code, Locale.parse(language_code.replace('_', '-'), sep='-').language_name)
+
+
 def _parse_language_selector_options(language_selector_options):
     """Parses the list of language_selector_options into Language objects containing the code and
         display_name for each language.
@@ -159,7 +170,8 @@ def _parse_language_selector_options(language_selector_options):
 
         Returns: list
     """
-    return [Language(_code, Locale.parse(_code, sep='-').language_name) for _code in language_selector_options]
+    return [_parse_language_code(_code) for _code in language_selector_options]
+
 
 def _filter_language_selector_options(language_selector_options):
     """Filters unsupported language codes from the list of language_selector_options.
