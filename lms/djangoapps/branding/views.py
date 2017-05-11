@@ -20,6 +20,7 @@ from edxmako.shortcuts import marketing_link
 from util.cache import cache_if_anonymous
 from util.json_request import JsonResponse
 import branding.api as branding_api
+from openedx.core.djangoapps.lang_pref.api import released_languages
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 log = logging.getLogger(__name__)
@@ -122,12 +123,13 @@ def _footer_css_urls(request, package_name):
     ]
 
 
-def _render_footer_html(request, show_openedx_logo, include_dependencies):
+def _render_footer_html(request, show_openedx_logo, include_dependencies, include_language_selector):
     """Render the footer as HTML.
 
     Arguments:
         show_openedx_logo (bool): If True, include the OpenEdX logo in the rendered HTML.
         include_dependencies (bool): If True, include JavaScript and CSS dependencies.
+        include_language_selector (bool): If True, include a language selector with all supported languages.
 
     Returns: unicode
 
@@ -141,6 +143,7 @@ def _render_footer_html(request, show_openedx_logo, include_dependencies):
         'footer_css_urls': _footer_css_urls(request, css_name),
         'bidi': bidi,
         'include_dependencies': include_dependencies,
+        'include_language_selector': include_language_selector
     }
 
     return render_to_response("footer.html", context)
@@ -235,6 +238,13 @@ def footer(request):
         GET /api/branding/v1/footer?language=en
         Accepts: text/html
 
+
+    Example: Retrieving the footer with a language selector
+
+        GET /api/branding/v1/footer?include-language-selector=1
+        Accepts: text/html
+
+
     Example: Retrieving the footer with all JS and CSS dependencies (for testing)
 
         GET /api/branding/v1/footer?include-dependencies=1
@@ -261,19 +271,26 @@ def footer(request):
     except LookupError:
         language = settings.LANGUAGE_CODE
 
+    # Include a language selector
+    include_language_selector = request.GET.get('include-language-selector', '') == '1'
+
     # Render the footer information based on the extension
     if 'text/html' in accepts or '*/*' in accepts:
-        cache_key = u"branding.footer.{params}.html".format(
-            params=urllib.urlencode({
-                'language': language,
-                'show_openedx_logo': show_openedx_logo,
-                'include_dependencies': include_dependencies,
-            })
-        )
+        cache_params = {
+            'language': language,
+            'show_openedx_logo': show_openedx_logo,
+            'include_dependencies': include_dependencies
+        }
+        if include_language_selector:
+            cache_params['language_selector_options'] = ','.join(sorted([lang.code for lang in released_languages()]))
+        cache_key = u"branding.footer.{params}.html".format(params=urllib.urlencode(cache_params))
+
         content = cache.get(cache_key)
         if content is None:
             with translation.override(language):
-                content = _render_footer_html(request, show_openedx_logo, include_dependencies)
+                content = _render_footer_html(
+                    request, show_openedx_logo, include_dependencies, include_language_selector
+                )
                 cache.set(cache_key, content, settings.FOOTER_CACHE_TIMEOUT)
         return HttpResponse(content, status=200, content_type="text/html; charset=utf-8")
 
