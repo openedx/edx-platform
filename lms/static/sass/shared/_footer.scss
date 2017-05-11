@@ -37,6 +37,11 @@
       }
     }
 
+    .icon {
+      font-family: 'FontAwesome';
+      font-style: normal;
+    }
+
     // colophon
     .colophon {
       @include span-columns(8);
@@ -184,6 +189,13 @@
         &:hover {
           border-bottom: none;
         }
+      }
+    }
+
+    .footer-language-selector {
+      label[for=footer-language-select] {
+        display: inline-block;
+        cursor: initial;
       }
     }
   }
