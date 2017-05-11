@@ -20,8 +20,10 @@ class CourseGradeBase(object):
         self.course_data = course_data
 
         self.percent = percent
-        self.letter_grade = letter_grade
         self.passed = passed
+
+        # Convert empty strings to None when reading from the table
+        self.letter_grade = letter_grade or None
 
     def __unicode__(self):
         return u'Course Grade: percent: {}, letter_grade: {}, passed: {}'.format(
