@@ -28,7 +28,7 @@ define(
                     icon: '',
                     text: HtmlUtils.interpolateHtml(
                         // Translators: This is a 3 part text which tells the image requirements.
-                        gettext('Image requirements {lineBreak} 1280px by 720px {lineBreak} .jpg | .png | .gif'),
+                        gettext('Image requirements: {lineBreak} 1280px by 720px {lineBreak} .jpg, .png, or .gif'),
                         {
                             lineBreak: HtmlUtils.HTML('<br>')
                         }
@@ -208,7 +208,10 @@ define(
                     this.$('.thumbnail-action .action-icon'),
                     HtmlUtils.HTML(this.actionsInfo[action].icon)
                 );
-                this.$('.thumbnail-action .action-text').html(this.actionsInfo[action].text);
+                HtmlUtils.setHtml(
+                    this.$('.thumbnail-action .action-text'),
+                    HtmlUtils.HTML(this.actionsInfo[action].text)
+                );
                 this.$('.thumbnail-action .action-text-sr').text(additionalSRText || '');
                 this.$('.thumbnail-wrapper').attr('class', 'thumbnail-wrapper {action}'.replace('{action}', action));
             },

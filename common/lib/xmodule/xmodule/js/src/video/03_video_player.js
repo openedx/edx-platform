@@ -162,6 +162,7 @@ function(HTML5Video, HTML5HLSVideo, Resizer, HLS, _) {
         commonPlayerConfig = {
             playerVars: state.videoPlayer.playerVars,
             videoSources: state.config.sources,
+            poster: state.config.poster,
             browserIsSafari: state.browserIsSafari,
             events: {
                 onReady: state.videoPlayer.onReady,
