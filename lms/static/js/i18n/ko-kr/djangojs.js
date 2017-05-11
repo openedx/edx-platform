@@ -597,7 +597,6 @@
     "Video Capture Error": "\ub3d9\uc601\uc0c1 \ucea1\uccd0 \uc624\ub958", 
     "Video ended": "\ub3d9\uc601\uc0c1 \ub05d\ub0a8", 
     "Video position": "\ub3d9\uc601\uc0c1 \uc704\uce58", 
-    "VideoPlayer: Element corresponding to the given selector was not found.": "\ube44\uc774\uc624\ud50c\ub808\uc774\uc5b4: \uc8fc\uc5b4\uc9c4 \uc120\ud0dd\uc790\uc5d0 \ub300\uc751\ud558\ub294 \uc694\uc18c\uac00 \uc5c6\uc2b5\ub2c8\ub2e4. ", 
     "View": "\ubcf4\uae30", 
     "View %(span_start)s %(team_name)s %(span_end)s": "%(span_start)s %(team_name)s %(span_end)s \ubcf4\uae30", 
     "View Teams in the %(topic_name)s Topic": "%(topic_name)s \uc8fc\uc81c\uc758 \ud300 \ubcf4\uae30", 

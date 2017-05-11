@@ -67,7 +67,6 @@
       "%(num_students)s estudiante abri\u00f3 la subsecci\u00f3n", 
       "%(num_students)s estudiantes abrieron la subsecci\u00f3n"
     ], 
-    "%(post_type)s posted %(time_ago)s by %(author)s": "%(post_type)s publicada hace %(time_ago)s por %(author)s", 
     "%(programName)s Home Page.": "P\u00e1gina de inicio de %(programName)s.", 
     "%(team_count)s Team": [
       "%(team_count)s Equipo", 
@@ -523,7 +522,6 @@
     "Download the user's certificate": "Descargar el certificado del usuario", 
     "Draft (Never published)": "Borrador (Nunca publicado)", 
     "Draft (Unpublished changes)": "Borrador (Cambios no publicados)", 
-    "Draft saved on %(last_saved_date)s by %(edit_username)s": "Borrador guardado el %(last_saved_date)s por %(edit_username)s", 
     "Drag and drop or click here to upload video files.": "Arrastre y suelte o pulse aqu\u00ed para subir archivos de video.", 
     "Drag to reorder": "Arrastre para reorganizar", 
     "Drop target image": "Soltar la imagen", 
@@ -1468,9 +1466,7 @@
     "This comment could not be deleted. Refresh the page and try again.": "No se pudo borrar este comentario. Recargue la p\u00e1gina e intente nuevamente.", 
     "This component has validation issues.": "El componente tiene errores de validaci\u00f3n", 
     "This configuration is currently used in content experiments. If you make changes to the groups, you may need to edit those experiments.": "Esta configuraci\u00f3n se est\u00e1 usando en contenidos experimentales. Si hace cambios a los grupos, puede que necesite editar tambi\u00e9n dichos experimentos.", 
-    "This content group is not in use. Add a content group to any unit from the {linkStart}Course Outline{linkEnd}.": "Este grupo de contenidos no est\u00e1 en uso. A\u00f1ada un grupo de contenidos a cualquier unidad de la {linkStart}Estructura del curso{linkEnd}.", 
     "This content group is used in one or more units.": "Este contenido de grupo es usado en uno o mas unidades.", 
-    "This content group is used in:": "Este contenido de grupo es usado en:", 
     "This course has automatic cohorting enabled for verified track learners, but cohorts are disabled. You must enable cohorts for the feature to work.": "Este curso tiene la funci\u00f3n de cohortes habilitada autom\u00e1ticamente para los estudiantes del modo verificado, pero los cohortes est\u00e1n inhabilitados. Usted deber habilitar los cohortes para que esta caracter\u00edstica funcione. ", 
     "This course has automatic cohorting enabled for verified track learners, but the required cohort does not exist. You must create a manually-assigned cohort named '{verifiedCohortName}' for the feature to work.": "Este curso tiene la funci\u00f3n de cohortes habilitada autom\u00e1ticamente para estudiantes en el modo verificado, pero el cohorte requerido no existe. Usted debe crear un cohorte asignado manualmente con el t\u00edtulo '{verifiedCohortName}' para que esta caracter\u00edstica funcione.", 
     "This course uses automatic cohorting for verified track learners. You cannot disable cohorts, and you cannot rename the manual cohort named '{verifiedCohortName}'. To change the configuration for verified track cohorts, contact your edX partner manager.": "Este curso utiliza la funci\u00f3n de cohortes autom\u00e1ticamente para estudiantes en el modo verificado. No se puede desactivar los cohortes, ni se puede cambiarle el nombre al cohorte manual nombrado '{verifiedCohortName}'. Para modificar la configuraci\u00f3n de los cohortes del modo verificado, comun\u00edquese con su punto de contacto en edX.", 
@@ -1656,7 +1652,6 @@
     "Video position": "Posici\u00f3n del video", 
     "Video speed: ": "Velocidad del video:", 
     "Video transcript": "Transcripci\u00f3n de video", 
-    "VideoPlayer: Element corresponding to the given selector was not found.": "VideoPlayer: El elemento correspondiente al selector dado no ha sido encontrado.", 
     "View": "Ver", 
     "View %(span_start)s %(team_name)s %(span_end)s": "Ver %(span_start)s %(team_name)s %(span_end)s", 
     "View Archived Course": "Ver curso archivado", 

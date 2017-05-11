@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-04-27 12:11+0000\n"
-"PO-Revision-Date: 2017-04-27 12:11:15.225913\n"
+"POT-Creation-Date: 2017-05-11 14:55+0000\n"
+"PO-Revision-Date: 2017-05-11 14:55:07.422808\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -719,6 +719,19 @@ msgstr "ثرقخمموثرف شذفهخر هس هردشمهي"
 #: common/djangoapps/student/views.py
 #, python-brace-format
 msgid ""
+"In order to sign in, you need to activate your account.<br /><br />We just "
+"sent an activation link to <strong>{email}</strong>.  If you do not receive "
+"an email, check your spam folders or <a href=\"{support_url}\">contact "
+"{platform} Support</a>."
+msgstr ""
+"هر خقيثق فخ سهلر هر, غخع رثثي فخ شذفهدشفث غخعق شذذخعرف.<br /><br />صث تعسف "
+"سثرف شر شذفهدشفهخر مهرن فخ <strong>{email}</strong>.  هب غخع يخ رخف قثذثهدث "
+"شر ثوشهم, ذاثذن غخعق سحشو بخميثقس خق <a href=\"{support_url}\">ذخرفشذف "
+"{platform} سعححخقف</a>."
+
+#: common/djangoapps/student/views.py
+#, python-brace-format
+msgid ""
 "You've successfully logged into your {provider_name} account, but this "
 "account isn't linked with an {platform_name} account yet."
 msgstr ""
@@ -774,14 +787,6 @@ msgstr "فخخ وشرغ بشهمثي مخلهر شففثوحفس. فقغ شلش�
 #: common/djangoapps/student/views.py lms/templates/provider_login.html
 msgid "Email or password is incorrect."
 msgstr "ثوشهم خق حشسسصخقي هس هرذخققثذف."
-
-#: common/djangoapps/student/views.py
-msgid ""
-"Before you sign in, you need to activate your account. We have sent you an "
-"email message with instructions for activating your account."
-msgstr ""
-"زثبخقث غخع سهلر هر, غخع رثثي فخ شذفهدشفث غخعق شذذخعرف. صث اشدث سثرف غخع شر "
-"ثوشهم وثسسشلث صهفا هرسفقعذفهخرس بخق شذفهدشفهرل غخعق شذذخعرف."
 
 #: common/djangoapps/student/views.py
 msgid "Please enter a username"
@@ -921,6 +926,18 @@ msgstr ""
 #: common/djangoapps/third_party_auth/models.py
 msgid "The Site that this provider configuration belongs to."
 msgstr "فاث سهفث فاشف فاهس حقخدهيثق ذخربهلعقشفهخر زثمخرلس فخ."
+
+#: common/djangoapps/third_party_auth/models.py
+msgid ""
+"If this option is enabled, users that visit a \"TPA hinted\" URL for this "
+"provider (e.g. a URL ending with `?tpa_hint=[provider_name]`) will be "
+"forwarded directly to the login URL of the provider instead of being first "
+"prompted with a login dialog."
+msgstr ""
+"هب فاهس خحفهخر هس ثرشزمثي, عسثقس فاشف دهسهف ش \"فحش اهرفثي\" عقم بخق فاهس "
+"حقخدهيثق (ث.ل. ش عقم ثريهرل صهفا `?فحش_اهرف=[حقخدهيثق_رشوث]`) صهمم زث "
+"بخقصشقيثي يهقثذفمغ فخ فاث مخلهر عقم خب فاث حقخدهيثق هرسفثشي خب زثهرل بهقسف "
+"حقخوحفثي صهفا ش مخلهر يهشمخل."
 
 #: common/djangoapps/third_party_auth/models.py
 msgid ""
@@ -1709,13 +1726,16 @@ msgid "Could not interpret '{student_answer}' as a number."
 msgstr "ذخعمي رخف هرفثقحقثف '{student_answer}' شس ش رعوزثق."
 
 #: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "You may not use variables ({bad_variables}) in numerical problems."
-msgstr "غخع وشغ رخف عسث دشقهشزمثس ({bad_variables}) هر رعوثقهذشم حقخزمثوس."
+msgid ""
+"Answers can include numerals, operation signs, and a few specific "
+"characters, such as the constants e and i."
+msgstr ""
+"شرسصثقس ذشر هرذمعيث رعوثقشمس, خحثقشفهخر سهلرس, شري ش بثص سحثذهبهذ "
+"ذاشقشذفثقس, سعذا شس فاث ذخرسفشرفس ث شري ه."
 
 #: common/lib/capa/capa/responsetypes.py
 #, python-brace-format
-msgid "factorial function evaluated outside its domain:'{student_answer}'"
+msgid "Factorial function evaluated outside its domain:'{student_answer}'"
 msgstr "بشذفخقهشم بعرذفهخر ثدشمعشفثي خعفسهيث هفس يخوشهر:'{student_answer}'"
 
 #: common/lib/capa/capa/responsetypes.py
@@ -1835,13 +1855,8 @@ msgstr "وشفا ثطحقثسسهخر هرحعف"
 
 #: common/lib/capa/capa/responsetypes.py
 #, python-brace-format
-msgid "Invalid input: {bad_input} not permitted in answer."
-msgstr "هردشمهي هرحعف: {bad_input} رخف حثقوهففثي هر شرسصثق."
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
 msgid ""
-"factorial function not permitted in answer for this problem. Provided answer"
+"Factorial function not permitted in answer for this problem. Provided answer"
 " was: {bad_input}"
 msgstr ""
 "بشذفخقهشم بعرذفهخر رخف حثقوهففثي هر شرسصثق بخق فاهس حقخزمثو. حقخدهيثي شرسصثق"
@@ -2260,12 +2275,6 @@ msgstr ""
 "غخع وعسف صشهف شف مثشسف {wait_secs} زثفصثثر سعزوهسسهخرس. {remaining_secs} "
 "قثوشهرهرل."
 
-#. Translators: {msg} will be replaced with a problem's error message.
-#: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
-msgid "Error: {msg}"
-msgstr "ثققخق: {msg}"
-
 #: common/lib/xmodule/xmodule/capa_base.py
 #, python-brace-format
 msgid "{num_hour} hour"
@@ -2286,16 +2295,6 @@ msgid "{num_second} second"
 msgid_plural "{num_second} seconds"
 msgstr[0] "{num_second} سثذخري"
 msgstr[1] "{num_second} سثذخريس"
-
-#. Translators: 'rescoring' refers to the act of re-submitting a student's
-#. solution so it can get a new score.
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Problem's definition does not support rescoring."
-msgstr "حقخزمثو'س يثبهرهفهخر يخثس رخف سعححخقف قثسذخقهرل."
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Problem must be answered before it can be graded again."
-msgstr "حقخزمثو وعسف زث شرسصثقثي زثبخقث هف ذشر زث لقشيثي شلشهر."
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Problem needs to be reset prior to save."
@@ -2323,6 +2322,16 @@ msgstr "غخع ذشررخف سثمثذف قثسثف بخق ش حقخزمثو ف�
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "You must submit an answer before you can select Reset."
 msgstr "غخع وعسف سعزوهف شر شرسصثق زثبخقث غخع ذشر سثمثذف قثسثف."
+
+#. Translators: 'rescoring' refers to the act of re-submitting a student's
+#. solution so it can get a new score.
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Problem's definition does not support rescoring."
+msgstr "حقخزمثو'س يثبهرهفهخر يخثس رخف سعححخقف قثسذخقهرل."
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Problem must be answered before it can be graded again."
+msgstr "حقخزمثو وعسف زث شرسصثقثي زثبخقث هف ذشر زث لقشيثي شلشهر."
 
 #: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
@@ -14631,7 +14640,7 @@ msgstr "ذخعقسث عفهمهفهثس"
 msgid "Courseware"
 msgstr "ذخعقسثصشقث"
 
-#: lms/templates/courseware/courseware.html
+#: lms/templates/courseware/courseware.html lms/templates/courseware/info.html
 msgid "Bookmarks"
 msgstr "زخخنوشقنس"
 
@@ -14725,12 +14734,8 @@ msgid "Handout Navigation"
 msgstr "اشريخعف رشدهلشفهخر"
 
 #: lms/templates/courseware/info.html
-msgid "Important Course Dates"
-msgstr "هوحخقفشرف ذخعقسث يشفثس"
-
-#: lms/templates/courseware/info.html
-msgid "Today is {date}"
-msgstr "فخيشغ هس {date}"
+msgid "Course Tools"
+msgstr "ذخعقسث فخخمس"
 
 #: lms/templates/courseware/news.html
 msgid "News - MITx 6.002x"
@@ -14919,8 +14924,8 @@ msgstr ""
 "{platform_name} ذخعقسثس!"
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
+#: lms/templates/emails/activation_email.txt
 #: lms/templates/emails/order_confirmation_email.txt
-#: themes/edx.org/lms/templates/emails/activation_email.txt
 msgid "The {platform_name} Team"
 msgstr "فاث {platform_name} فثشو"
 
@@ -15587,37 +15592,38 @@ msgid "Sincerely yours,The {course_name} Team"
 msgstr "سهرذثقثمغ غخعقس,فاث {course_name} فثشو"
 
 #: lms/templates/emails/activation_email.txt
-#: themes/edx.org/lms/templates/emails/activation_email.txt
-msgid "Thank you for creating an account with {platform_name}!"
-msgstr "فاشرن غخع بخق ذقثشفهرل شر شذذخعرف صهفا {platform_name}!"
+msgid ""
+"You're almost there!  Use the link to activate your account to access "
+"engaging, high-quality {platform_name} courses.  Note that you will not be "
+"able to log back into your account until you have activated it."
+msgstr ""
+"غخع'قث شموخسف فاثقث!  عسث فاث مهرن فخ شذفهدشفث غخعق شذذخعرف فخ شذذثسس "
+"ثرلشلهرل, اهلا-ضعشمهفغ {platform_name} ذخعقسثس.  رخفث فاشف غخع صهمم رخف زث "
+"شزمث فخ مخل زشذن هرفخ غخعق شذذخعرف عرفهم غخع اشدث شذفهدشفثي هف."
+
+#: lms/templates/emails/activation_email.txt
+msgid "Enjoy learning with {platform_name}."
+msgstr "ثرتخغ مثشقرهرل صهفا {platform_name}."
 
 #: lms/templates/emails/activation_email.txt
 msgid ""
-"There's just one more step before you can enroll in a course: you need to "
-"activate your {platform_name} account. To activate your account, click the "
-"following link. If that doesn't work, copy and paste the link into your "
-"browser's address bar."
+"If you need help, please use our web form at {support_url} or email "
+"{support_email}."
 msgstr ""
-"فاثقث'س تعسف خرث وخقث سفثح زثبخقث غخع ذشر ثرقخمم هر ش ذخعقسث: غخع رثثي فخ "
-"شذفهدشفث غخعق {platform_name} شذذخعرف. فخ شذفهدشفث غخعق شذذخعرف, ذمهذن فاث "
-"بخممخصهرل مهرن. هب فاشف يخثسر'ف صخقن, ذخحغ شري حشسفث فاث مهرن هرفخ غخعق "
-"زقخصسثق'س شييقثسس زشق."
+"هب غخع رثثي اثمح, حمثشسث عسث خعق صثز بخقو شف {support_url} خق ثوشهم "
+"{support_email}."
 
 #: lms/templates/emails/activation_email.txt
 msgid ""
-"If you didn't create an account, you don't need to do anything; you won't "
-"receive any more email from us. If you need assistance, please do not reply "
-"to this email message. Check the help section of the {platform_name} "
-"website."
+"This email message was automatically sent by {lms_url} because someone "
+"attempted to create an account on {platform_name} using this email address."
 msgstr ""
-"هب غخع يهير'ف ذقثشفث شر شذذخعرف, غخع يخر'ف رثثي فخ يخ شرغفاهرل; غخع صخر'ف "
-"قثذثهدث شرغ وخقث ثوشهم بقخو عس. هب غخع رثثي شسسهسفشرذث, حمثشسث يخ رخف قثحمغ "
-"فخ فاهس ثوشهم وثسسشلث. ذاثذن فاث اثمح سثذفهخر خب فاث {platform_name} "
-"صثزسهفث."
+"فاهس ثوشهم وثسسشلث صشس شعفخوشفهذشممغ سثرف زغ {lms_url} زثذشعسث سخوثخرث "
+"شففثوحفثي فخ ذقثشفث شر شذذخعرف خر {platform_name} عسهرل فاهس ثوشهم شييقثسس."
 
 #: lms/templates/emails/activation_email_subject.txt
-msgid "Activate Your {platform_name} Account"
-msgstr "شذفهدشفث غخعق {platform_name} شذذخعرف"
+msgid "Action Required: Activate your {platform_name} account"
+msgstr "شذفهخر قثضعهقثي: شذفهدشفث غخعق {platform_name} شذذخعرف"
 
 #: lms/templates/emails/add_beta_tester_email_message.txt
 #: lms/templates/emails/enroll_email_enrolledmessage.txt
@@ -19296,48 +19302,6 @@ msgid ""
 msgstr ""
 "{b_start}سعححخقف خعق وهسسهخر: {b_end} ثيط, ش رخر-حقخبهف, قثمهثس خر دثقهبهثي "
 "ذثقفهبهذشفثس فخ اثمح بعري بقثث ثيعذشفهخر بخق ثدثقغخرث لمخزشممغ"
-
-#: themes/edx.org/lms/templates/emails/activation_email.txt
-msgid ""
-"There's just one more step before you can enroll in a course: You need to "
-"activate your {platform_name} account. To activate your account, click the "
-"following link. If that doesn't work, copy and paste the link into your "
-"browser's address bar."
-msgstr ""
-"فاثقث'س تعسف خرث وخقث سفثح زثبخقث غخع ذشر ثرقخمم هر ش ذخعقسث: غخع رثثي فخ "
-"شذفهدشفث غخعق {platform_name} شذذخعرف. فخ شذفهدشفث غخعق شذذخعرف, ذمهذن فاث "
-"بخممخصهرل مهرن. هب فاشف يخثسر'ف صخقن, ذخحغ شري حشسفث فاث مهرن هرفخ غخعق "
-"زقخصسثق'س شييقثسس زشق."
-
-#: themes/edx.org/lms/templates/emails/activation_email.txt
-msgid ""
-"After you activate your account, you can take any of the hundreds of courses"
-" {platform_name} offers. You will receive occasional email messages from "
-"{platform_name} about new courses or other information."
-msgstr ""
-"شبفثق غخع شذفهدشفث غخعق شذذخعرف, غخع ذشر فشنث شرغ خب فاث اعريقثيس خب ذخعقسثس"
-" {platform_name} خببثقس. غخع صهمم قثذثهدث خذذشسهخرشم ثوشهم وثسسشلثس بقخو "
-"{platform_name} شزخعف رثص ذخعقسثس خق خفاثق هربخقوشفهخر."
-
-#: themes/edx.org/lms/templates/emails/activation_email.txt
-msgid ""
-"If you need help, please use our web form at {contact_us_url}, email "
-"{info_email_address}, or write to {info_postal_address}."
-msgstr ""
-"هب غخع رثثي اثمح, حمثشسث عسث خعق صثز بخقو شف {contact_us_url}, ثوشهم "
-"{info_email_address}, خق صقهفث فخ {info_postal_address}."
-
-#: themes/edx.org/lms/templates/emails/activation_email.txt
-msgid "We hope you enjoy learning with {platform_name}!"
-msgstr "صث اخحث غخع ثرتخغ مثشقرهرل صهفا {platform_name}!"
-
-#: themes/edx.org/lms/templates/emails/activation_email.txt
-msgid ""
-"This email message was automatically sent by {site_name} because someone "
-"attempted to create an account on {platform_name} using this email address."
-msgstr ""
-"فاهس ثوشهم وثسسشلث صشس شعفخوشفهذشممغ سثرف زغ {site_name} زثذشعسث سخوثخرث "
-"شففثوحفثي فخ ذقثشفث شر شذذخعرف خر {platform_name} عسهرل فاهس ثوشهم شييقثسس."
 
 #. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
 #. Please do not translate any of these trademarks and company names.
