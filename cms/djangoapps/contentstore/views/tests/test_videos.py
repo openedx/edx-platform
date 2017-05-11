@@ -13,7 +13,7 @@ import ddt
 import pytz
 from django.conf import settings
 from django.test.utils import override_settings
-from edxval.api import create_profile, create_video, get_video_info
+from edxval.api import create_profile, create_video, get_video_info, get_course_video_image_url
 from mock import Mock, patch
 
 from contentstore.models import VideoUploadConfig
