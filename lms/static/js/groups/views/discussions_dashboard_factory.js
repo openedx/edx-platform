@@ -1,8 +1,7 @@
 (function(define) {
     'use strict';
-    define(['jquery', 'js/groups/views/discussions', 'js/groups/models/cohort_discussions',
-        'js/groups/models/course_discussions_settings'],
-
+    define('js/groups/views/discussions_dashboard_factory', ['jquery', 'js/groups/views/discussions', 'js/groups/models/cohort_discussions',
+            'js/groups/models/course_discussions_settings'],
         function($, DiscussionsView, DiscussionTopicsSettingsModel, CourseDiscussionsSettingsModel) {
             return function() {
                 var courseDiscussionSettings = new CourseDiscussionsSettingsModel(),

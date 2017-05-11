@@ -1755,6 +1755,7 @@ REQUIRE_JS_PATH_OVERRIDES = {
     'js/student_profile/views/learner_profile_factory': 'js/student_profile/views/learner_profile_factory.js',
     'js/courseware/courseware_factory': 'js/courseware/courseware_factory.js',
     'js/groups/views/cohorts_dashboard_factory': 'js/groups/views/cohorts_dashboard_factory.js',
+    'js/groups/views/discussions_dashboard_factory': 'js/groups/views/discussions_dashboard_factory.js',
     'draggabilly': 'js/vendor/draggabilly.js',
     'hls': 'common/js/vendor/hls.js'
 }
