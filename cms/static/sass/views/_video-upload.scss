@@ -147,6 +147,11 @@
   }
 
   .assets-library {
+
+    .js-table-body .video-id-col {
+      word-break: break-all;
+    }
+
     .assets-title {
       display: inline-block;
       width: flex-grid(5, 9);

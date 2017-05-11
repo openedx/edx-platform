@@ -4,7 +4,8 @@
         var state,
             oldOTBD,
             playbackRates = [0.75, 1.0, 1.25, 1.5],
-            describeInfo;
+            describeInfo,
+            POSTER_URL = '/media/video-images/poster.png';
 
         beforeEach(function() {
             oldOTBD = window.onTouchBasedDevice;
@@ -320,6 +321,15 @@
                     }).done(done);
                 });
             });
+
+            describe('poster', function() {
+                it('has url in player config', function() {
+                    expect(state.videoPlayer.player.config.poster).toEqual(POSTER_URL);
+                    expect(state.videoPlayer.player.videoEl).toHaveAttrs({
+                        poster: POSTER_URL
+                    });
+                });
+            });
         });
 
         describe('non-hls encoding', function() {
@@ -336,6 +346,28 @@
                 done();
             });
             jasmine.getEnv().describe(describeInfo.description, describeInfo.specDefinitions);
+        });
+
+        it('does not show poster for html5 video if url is not present', function() {
+            state = jasmine.initializePlayer(
+                'video_html5.html',
+                {
+                    poster: null
+                }
+            );
+            expect(state.videoPlayer.player.config.poster).toEqual(null);
+            expect(state.videoPlayer.player.videoEl).not.toHaveAttr('poster');
+        });
+
+        it('does not show poster for hls video if url is not present', function() {
+            state = jasmine.initializePlayer(
+                'video_hls.html',
+                {
+                    poster: null
+                }
+            );
+            expect(state.videoPlayer.player.config.poster).toEqual(null);
+            expect(state.videoPlayer.player.videoEl).not.toHaveAttr('poster');
         });
 
         it('native controls are used on  iPhone', function() {

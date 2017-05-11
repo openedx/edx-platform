@@ -312,7 +312,10 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             'streams': self.youtube_streams,
             'sub': self.sub,
             'sources': sources,
-
+            'poster': edxval_api and edxval_api.get_course_video_image_url(
+                course_id=self.runtime.course_id.for_branch(None),
+                edx_video_id=self.edx_video_id.strip()
+            ),
             # This won't work when we move to data that
             # isn't on the filesystem
             'captionDataDir': getattr(self, 'data_dir', None),
