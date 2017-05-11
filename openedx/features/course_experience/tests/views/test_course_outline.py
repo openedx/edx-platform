@@ -297,8 +297,6 @@ class TestCourseOutlinePreview(SharedModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
         return response
 
-    # TODO: LEARNER-837: Due 6/4/2017. Remove skip.
-    @skip("skipping test")
     def test_preview(self):
         """
         Verify the behavior of preview for the course outline.
@@ -322,7 +320,7 @@ class TestCourseOutlinePreview(SharedModuleStoreTestCase):
                 category='chapter',
                 parent_location=course.location,
                 display_name='Future Chapter',
-                due=future_date,
+                start=future_date,
             )
             sequential = ItemFactory.create(category='sequential', parent_location=chapter.location)
             ItemFactory.create(category='vertical', parent_location=sequential.location)
