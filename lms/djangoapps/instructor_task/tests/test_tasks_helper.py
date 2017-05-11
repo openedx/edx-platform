@@ -398,6 +398,25 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
                 with self.assertNumQueries(41):
                     CourseGradeReport.generate(None, None, course.id, None, 'graded')
 
+    def test_inactive_enrollments(self):
+        """
+        Test that students with inactive enrollments are included in report.
+        """
+        self.create_student('active-student', 'active@example.com')
+        self.create_student('inactive-student', 'inactive@example.com', enrollment_active=False)
+
+        self.current_task = Mock()
+        self.current_task.update_state = Mock()
+
+        with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task') as mock_current_task:
+            mock_current_task.return_value = self.current_task
+            result = CourseGradeReport.generate(None, None, self.course.id, None, 'graded')
+
+        expected_students = 2
+        self.assertDictContainsSubset(
+            {'attempted': expected_students, 'succeeded': expected_students, 'failed': 0}, result
+        )
+
 
 class TestTeamGradeReport(InstructorGradeReportTestCase):
     """ Test that teams appear correctly in the grade report when it is enabled for the course. """
@@ -758,6 +777,55 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
                 u'Username': student.username,
                 u'error_msg': error_message if error_message else "Unknown error"
             }
+        ])
+
+    @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
+    def test_inactive_enrollment_included(self, _get_current_task):
+        """
+        Students with inactive enrollments in a course should be included in Problem Grade Report.
+        """
+        inactive_student = self.create_student('inactive-student', 'inactive@example.com', enrollment_active=False)
+        vertical = ItemFactory.create(
+            parent_location=self.problem_section.location,
+            category='vertical',
+            metadata={'graded': True},
+            display_name='Problem Vertical'
+        )
+        self.define_option_problem(u'Problem1', parent=vertical)
+
+        self.submit_student_answer(self.student_1.username, u'Problem1', ['Option 1'])
+        result = ProblemGradeReport.generate(None, None, self.course.id, None, 'graded')
+        self.assertDictContainsSubset({'action_name': 'graded', 'attempted': 3, 'succeeded': 3, 'failed': 0}, result)
+        problem_name = u'Homework 1: Subsection - Problem1'
+        header_row = self.csv_header_row + [problem_name + ' (Earned)', problem_name + ' (Possible)']
+        self.verify_rows_in_csv([
+            dict(zip(
+                header_row,
+                [
+                    unicode(self.student_1.id),
+                    self.student_1.email,
+                    self.student_1.username,
+                    '0.01', '1.0', '2.0',
+                ]
+            )),
+            dict(zip(
+                header_row,
+                [
+                    unicode(self.student_2.id),
+                    self.student_2.email,
+                    self.student_2.username,
+                    '0.0', u'Not Attempted', '2.0',
+                ]
+            )),
+            dict(zip(
+                header_row,
+                [
+                    unicode(inactive_student.id),
+                    inactive_student.email,
+                    inactive_student.username,
+                    '0.0', u'Not Attempted', '2.0',
+                ]
+            ))
         ])
 
 

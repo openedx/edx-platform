@@ -21,6 +21,7 @@ class CourseEnrollmentTests(SharedModuleStoreTestCase):
     def setUp(self):
         super(CourseEnrollmentTests, self).setUp()
         self.user = UserFactory.create()
+        self.user_2 = UserFactory.create()
 
     def test_enrollment_status_hash_cache_key(self):
         username = 'test-user'
@@ -82,3 +83,23 @@ class CourseEnrollmentTests(SharedModuleStoreTestCase):
         # Modifying enrollments should delete the cached value.
         CourseEnrollmentFactory.create(user=self.user)
         self.assertIsNone(cache.get(CourseEnrollment.enrollment_status_hash_cache_key(self.user)))
+
+    def test_users_enrolled_in_active_only(self):
+        """CourseEnrollment.users_enrolled_in should return only Users with active enrollments when
+        `include_inactive` has its default value (False)."""
+        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id, is_active=True)
+        CourseEnrollmentFactory.create(user=self.user_2, course_id=self.course.id, is_active=False)
+
+        active_enrolled_users = list(CourseEnrollment.objects.users_enrolled_in(self.course.id))
+        self.assertEqual([self.user], active_enrolled_users)
+
+    def test_users_enrolled_in_all(self):
+        """CourseEnrollment.users_enrolled_in should return active and inactive users when
+        `include_inactive` is True."""
+        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id, is_active=True)
+        CourseEnrollmentFactory.create(user=self.user_2, course_id=self.course.id, is_active=False)
+
+        all_enrolled_users = list(
+            CourseEnrollment.objects.users_enrolled_in(self.course.id, include_inactive=True)
+        )
+        self.assertListEqual([self.user, self.user_2], all_enrolled_users)

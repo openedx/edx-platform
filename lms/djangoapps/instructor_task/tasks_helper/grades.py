@@ -272,7 +272,8 @@ class CourseGradeReport(object):
         def grouper(iterable, chunk_size=self.USER_BATCH_SIZE, fillvalue=None):
             args = [iter(iterable)] * chunk_size
             return izip_longest(*args, fillvalue=fillvalue)
-        users = CourseEnrollment.objects.users_enrolled_in(context.course_id)
+
+        users = CourseEnrollment.objects.users_enrolled_in(context.course_id, include_inactive=True)
         users = users.select_related('profile__allow_certificate')
         return grouper(users)
 
@@ -412,7 +413,7 @@ class ProblemGradeReport(object):
         start_time = time()
         start_date = datetime.now(UTC)
         status_interval = 100
-        enrolled_students = CourseEnrollment.objects.users_enrolled_in(course_id)
+        enrolled_students = CourseEnrollment.objects.users_enrolled_in(course_id, include_inactive=True)
         task_progress = TaskProgress(action_name, enrolled_students.count(), start_time)
 
         # This struct encapsulates both the display names of each static item in the
