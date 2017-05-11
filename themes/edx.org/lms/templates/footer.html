@@ -45,7 +45,7 @@
             </ul>
           </nav>
 
-          % if language_selector_options and len(language_selector_options) > 0:
+          % if language_selector_options:
               <%include file="widgets/footer-language-selector.html" args="languages=language_selector_options"/>
           % endif
 
