@@ -11,7 +11,7 @@ from pytz import UTC
 from flaky import flaky
 
 from common.test.acceptance.tests.discussion.helpers import BaseDiscussionTestCase
-from common.test.acceptance.tests.helpers import UniqueCourseTest
+from common.test.acceptance.tests.helpers import UniqueCourseTest, get_modal_alert
 from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.discussion import (
@@ -996,6 +996,27 @@ class DiscussionEditorPreviewTest(UniqueCourseTest):
         )
 
         self.assertEqual(self.page.get_new_post_preview_text(), 'Text line 1\nText line 2')
+
+    def test_mathjax_not_rendered_after_post_cancel(self):
+        """
+        Tests that mathjax is not rendered when we cancel the post
+
+        When user types the mathjax expression into discussion editor, it will appear in te preview
+        box, and when user cancel it and again click the "Add new post" button, mathjax will not
+        appear in the preview box
+        """
+        self.page.set_new_post_editor_value(
+            '\\begin{equation}'
+            '\\tau_g(\omega) = - \\frac{d}{d\omega}\phi(\omega) \hspace{2em} (1) '
+            '\\end{equation}'
+        )
+        self.assertIsNotNone(self.page.get_new_post_preview_text())
+        self.page.click_element(".cancel")
+        alert = get_modal_alert(self.browser)
+        alert.accept()
+        self.assertIsNotNone(self.page.new_post_button)
+        self.page.click_new_post_button()
+        self.assertEqual(self.page.get_new_post_preview_value('.wmd-preview'), "")
 
 
 @attr(shard=2)
