@@ -30,6 +30,8 @@ from certificates.tests.factories import GeneratedCertificateFactory, Certificat
 from course_modes.models import CourseMode
 from courseware.tests.factories import InstructorFactory
 from instructor_analytics.basic import UNAVAILABLE
+from lms.djangoapps.grades.models import PersistentCourseGrade
+from lms.djangoapps.grades.transformer import GradesTransformer
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup, CohortMembership
@@ -86,13 +88,13 @@ from lms.djangoapps.instructor_task.tests.test_base import (
 class InstructorGradeReportTestCase(TestReportMixin, InstructorTaskCourseTestCase):
     """ Base class for grade report tests. """
 
-    def _verify_cell_data_for_user(self, username, course_id, column_header, expected_cell_content):
+    def _verify_cell_data_for_user(self, username, course_id, column_header, expected_cell_content, num_rows=2):
         """
         Verify cell data in the grades CSV for a particular user.
         """
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
             result = CourseGradeReport.generate(None, None, course_id, None, 'graded')
-            self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
+            self.assertDictContainsSubset({'attempted': num_rows, 'succeeded': num_rows, 'failed': 0}, result)
             report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
             report_csv_filename = report_store.links_for(course_id)[0][0]
             report_path = report_store.path_to(course_id, report_csv_filename)
@@ -326,6 +328,37 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
         ]
         result = CourseGradeReport.generate(None, None, self.course.id, None, 'graded')
         self.assertDictContainsSubset({'attempted': 1, 'succeeded': 1, 'failed': 0}, result)
+
+    def test_certificate_eligibility(self):
+        """
+        Verifies that whether a learner has a failing grade in the database or the grade is
+        calculated on the fly, a failing grade will result in a Certificate Eligibility of
+        "N" in the report.
+
+        Also confirms that a persisted passing grade will result in a Certificate Eligibility
+        of "Y."
+        """
+        course = CourseFactory.create()
+        user = CourseEnrollment.enroll(UserFactory.create(), course.id)
+        self._verify_cell_data_for_user(user.username, course.id, 'Certificate Eligible', 'N', num_rows=1)
+        grading_policy_hash = GradesTransformer.grading_policy_hash(course)
+        PersistentCourseGrade.update_or_create(
+            user_id=user.user_id,
+            course_id=course.id,
+            passed=False,
+            percent_grade=0.0,
+            grading_policy_hash=grading_policy_hash,
+        )
+        self._verify_cell_data_for_user(user.username, course.id, 'Certificate Eligible', 'N', num_rows=1)
+        PersistentCourseGrade.update_or_create(
+            user_id=user.user_id,
+            course_id=course.id,
+            passed=True,
+            percent_grade=0.8,
+            letter_grade="pass",
+            grading_policy_hash=grading_policy_hash,
+        )
+        self._verify_cell_data_for_user(user.username, course.id, 'Certificate Eligible', 'Y', num_rows=1)
 
     @ddt.data(
         (ModuleStoreEnum.Type.mongo, 4),
