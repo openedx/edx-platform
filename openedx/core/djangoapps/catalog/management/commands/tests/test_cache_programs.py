@@ -46,10 +46,18 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase):
         )
 
     def mock_detail(self, uuid, program):
+        def detail_callback(request, uri, headers):
+            expected = {
+                'exclude_utm': ['1'],
+            }
+            self.assertEqual(request.querystring, expected)
+
+            return (200, headers, json.dumps(program))
+
         httpretty.register_uri(
             httpretty.GET,
             self.detail_tpl.format(uuid=uuid),
-            body=json.dumps(program),
+            body=detail_callback,
             content_type='application/json'
         )
 
