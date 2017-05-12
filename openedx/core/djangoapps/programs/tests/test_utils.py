@@ -205,32 +205,32 @@ class TestProgramProgressMeter(TestCase):
 
         self.assertEqual(meter.progress(count_only=False), expected)
 
-    @ddt.data(1, -1)
-    def test_in_progress_course_upgrade_deadline_check(self, modifier, mock_get_programs):
+    @ddt.data(None, 1, -1)
+    def test_in_progress_course_upgrade_deadline_check(self, offset, mock_get_programs):
         """
         Verify that if the user's enrollment is not of the same type as the course run,
         the course will only count as in progress if there is another available seat with
-        the right type, where the upgrade deadline has not expired.
+        the right type for which the upgrade deadline has not passed.
         """
         course_run_key = generate_course_run_key()
         now = datetime.datetime.now(utc)
-        date_modifier = modifier * datetime.timedelta(days=1)
-        seat_with_upgrade_deadline = SeatFactory(type='test', upgrade_deadline=str(now + date_modifier))
-        enrolled_seat = SeatFactory(type='verified')
-        seats = [seat_with_upgrade_deadline, enrolled_seat]
+        upgrade_deadline = None if not offset else str(now + datetime.timedelta(days=offset))
+        required_seat = SeatFactory(type='verified', upgrade_deadline=upgrade_deadline)
+        enrolled_seat = SeatFactory(type='audit')
+        seats = [required_seat, enrolled_seat]
 
         data = [
             ProgramFactory(
                 courses=[
                     CourseFactory(course_runs=[
-                        CourseRunFactory(key=course_run_key, type='test', seats=seats),
+                        CourseRunFactory(key=course_run_key, type='verified', seats=seats),
                     ]),
                 ]
             )
         ]
         mock_get_programs.return_value = data
 
-        self._create_enrollments(course_run_key)
+        CourseEnrollmentFactory(user=self.user, course_id=course_run_key, mode='audit')
 
         meter = ProgramProgressMeter(self.user)
 
@@ -239,10 +239,11 @@ class TestProgramProgressMeter(TestCase):
             ProgressFactory(
                 uuid=program['uuid'],
                 completed=0,
-                in_progress=1 if modifier == 1 else 0,
-                not_started=1 if modifier == -1 else 0
+                in_progress=1 if offset in [None, 1] else 0,
+                not_started=1 if offset in [-1] else 0
             )
         ]
+
         self.assertEqual(meter.progress(count_only=True), expected)
 
     def test_mutiple_program_engagement(self, mock_get_programs):
