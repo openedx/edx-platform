@@ -150,30 +150,28 @@ class ProgramProgressMeter(object):
         Returns:
             bool, indicating whether the course is in progress.
         """
-        # Part 1: Check if any of the seats you are enrolled in qualify this course as in progress
         enrolled_runs = [run for run in course['course_runs'] if run['key'] in self.course_run_ids]
-        # Check if the user is enrolled in the required mode for the run
+
+        # Check if the user is enrolled in a required run and mode/seat.
         runs_with_required_mode = [
             run for run in enrolled_runs
             if run['type'] == self.enrolled_run_modes[run['key']]
         ]
+
         if runs_with_required_mode:
-            # Check if the runs you are enrolled in with the right mode are not failed
             not_failed_runs = [run for run in runs_with_required_mode if run not in self.failed_course_runs]
             if not_failed_runs:
                 return True
-        # Part 2: Check if any of the seats you are not enrolled in
-        # in the runs you are enrolled in qualify this course as in progress
+
+        # Check if seats required for course completion are still available.
         upgrade_deadlines = []
         for run in enrolled_runs:
             for seat in run['seats']:
                 if seat['type'] == run['type'] and run['type'] != self.enrolled_run_modes[run['key']]:
                     upgrade_deadlines.append(seat['upgrade_deadline'])
 
-        course_still_upgradeable = any(
-            (deadline is not None) and (parse(deadline) > now) for deadline in upgrade_deadlines
-        )
-        return course_still_upgradeable
+        # An upgrade deadline of None means the course is always upgradeable.
+        return any(not deadline or deadline and parse(deadline) > now for deadline in upgrade_deadlines)
 
     def progress(self, programs=None, count_only=True):
         """Gauge a user's progress towards program completion.
