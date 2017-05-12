@@ -75,6 +75,13 @@
 
                 showThread: function(forumName, threadId) {
                     this.thread = this.discussion.get(threadId);
+                    if (typeof this.thread === 'undefined') {
+                        DiscussionUtil.discussionAlert(
+                            gettext('Error'),
+                            gettext('You are not permitted to view this discussion.')
+                        );
+                        return;
+                    }
                     this.thread.set('unread_comments_count', 0);
                     this.thread.set('read', true);
                     this.setActiveThread();
