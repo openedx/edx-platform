@@ -2370,7 +2370,7 @@ class CapaDescriptorTest(unittest.TestCase):
     def test_indexing_checkboxes(self):
         name = "Checkboxes"
         descriptor = self._create_descriptor(self.sample_checkbox_problem_xml, name=name)
-        capa_content = textwrap.dedent("""
+        capa_content = textwrap.dedent(u"""
             Title
             Description
             Example
@@ -2384,7 +2384,8 @@ class CapaDescriptorTest(unittest.TestCase):
         """)
         self.assertEquals(descriptor.problem_types, {"choiceresponse"})
         self.assertEquals(
-            descriptor.index_dictionary(), {
+            descriptor.index_dictionary(),
+            {
                 'content_type': CapaDescriptor.INDEX_CONTENT_TYPE,
                 'problem_types': ["choiceresponse"],
                 'content': {
