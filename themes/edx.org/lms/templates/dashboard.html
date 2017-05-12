@@ -82,6 +82,19 @@ from openedx.core.djangoapps.theming import helpers as theming_helpers
             ${ enterprise_message | n, decode.utf8 }
         </div>
     %endif
+
+    %if account_activation_messages:
+      <div class="activation-message-container">
+        % for account_activation_message in account_activation_messages:
+          <div class="account-activation ${account_activation_message.tags}" role="alert" aria-label="Account Activation Message" tabindex="-1">
+            <div class="message-copy" >
+              ${ account_activation_message | n, decode.utf8 }
+            </div>
+          </div>
+        % endfor
+      </div>
+    %endif
+
 </div>
 
 <section class="container dashboard" id="dashboard-main">

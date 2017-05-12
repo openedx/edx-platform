@@ -514,6 +514,17 @@ $dashboard-profile-color: rgb(252,252,252) !default;
 $dot-color: rgb(221, 221, 221) !default;
 $dashboard-course-cover-border: rgb(221, 221, 221) !default;
 
+// dashboard notification messages
+$palette-info-border: #cce3f0;
+$palette-info-back: #f2f8fb;
+$palette-info-text: #0075b4;
+$palette-error-border: #ebccd1;
+$palette-error-back: #feeced;
+$palette-error-text: #b20610;
+$palette-success-border: #b9edb9;
+$palette-success-back: #ecfaec;
+$palette-success-text: #008100;
+
 // course elements
 $content-wrapper-bg: $white !default;
 $course-bg-color: $uxpl-grayscale-x-back !default;
