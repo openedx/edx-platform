@@ -205,7 +205,8 @@
                 toggleForm: function(e) {
                     var type = $(e.currentTarget).data('type'),
                         $form = $('#' + type + '-form'),
-                        $anchor = $('#' + type + '-anchor'),
+                        scrollX = window.scrollX,
+                        scrollY = window.scrollY,
                         queryParams = url('?'),
                         queryStr = queryParams.length > 0 ? '?' + queryParams : '';
 
@@ -224,7 +225,6 @@
                     this.element.hide($(this.el).find('.submission-success'));
                     this.element.hide($(this.el).find('.form-wrapper'));
                     this.element.show($form);
-                    this.element.scrollTop($anchor);
 
                 // Update url without reloading page
                     if (type != 'institution_login') {
@@ -234,6 +234,9 @@
 
                 // Focus on the form
                     $('#' + type).focus();
+
+               // Maintain original scroll position
+                    window.scrollTo(scrollX, scrollY);
                 },
 
             /**

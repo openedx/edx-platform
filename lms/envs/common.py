@@ -2450,13 +2450,13 @@ REGISTRATION_EXTRA_FIELDS = {
 }
 
 REGISTRATION_FIELD_ORDER = [
-    "email",
-    "confirm_email",
     "name",
-    "username",
-    "password",
     "first_name",
     "last_name",
+    "username",
+    "email",
+    "confirm_email",
+    "password",
     "city",
     "state",
     "country",
