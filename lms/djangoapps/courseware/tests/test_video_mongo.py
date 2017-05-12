@@ -83,7 +83,7 @@ class TestVideoYouTube(TestVideo):
                 "recordedYoutubeIsAvailable": True,
             })),
             'track': None,
-            'transcript_download_format': 'srt',
+            'transcript_download_format': u'srt',
             'transcript_download_formats_list': [
                 {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
@@ -162,7 +162,7 @@ class TestVideoNonYouTube(TestVideo):
                 "recordedYoutubeIsAvailable": True,
             })),
             'track': None,
-            'transcript_download_format': 'srt',
+            'transcript_download_format': u'srt',
             'transcript_download_formats_list': [
                 {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
@@ -283,7 +283,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'id': self.item_descriptor.location.html_id(),
             'metadata': '',
             'track': None,
-            'transcript_download_format': 'srt',
+            'transcript_download_format': u'srt',
             'transcript_download_formats_list': [
                 {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
@@ -321,7 +321,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             })
             expected_context.update({
                 'transcript_download_format': (
-                    None if self.item_descriptor.track and self.item_descriptor.download_track else 'srt'
+                    None if self.item_descriptor.track and self.item_descriptor.download_track else u'srt'
                 ),
                 'track': (
                     track_url if data['expected_track_url'] == u'a_sub_file.srt.sjson' else data['expected_track_url']
@@ -405,7 +405,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'id': self.item_descriptor.location.html_id(),
             'metadata': self.default_metadata_dict,
             'track': None,
-            'transcript_download_format': 'srt',
+            'transcript_download_format': u'srt',
             'transcript_download_formats_list': [
                 {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
@@ -528,7 +528,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'handout': None,
             'id': self.item_descriptor.location.html_id(),
             'track': None,
-            'transcript_download_format': 'srt',
+            'transcript_download_format': u'srt',
             'transcript_download_formats_list': [
                 {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
@@ -702,7 +702,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'handout': None,
             'id': self.item_descriptor.location.html_id(),
             'track': None,
-            'transcript_download_format': 'srt',
+            'transcript_download_format': u'srt',
             'transcript_download_formats_list': [
                 {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
@@ -816,7 +816,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'id': None,
             'metadata': self.default_metadata_dict,
             'track': None,
-            'transcript_download_format': 'srt',
+            'transcript_download_format': u'srt',
             'transcript_download_formats_list': [
                 {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
@@ -1531,7 +1531,7 @@ class TestVideoWithBumper(TestVideo):
                 "recordedYoutubeIsAvailable": True,
             })),
             'track': None,
-            'transcript_download_format': 'srt',
+            'transcript_download_format': u'srt',
             'transcript_download_formats_list': [
                 {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
