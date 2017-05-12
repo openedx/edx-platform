@@ -8,6 +8,8 @@ from django.contrib.auth.models import AnonymousUser
 from django.contrib.sites.models import Site
 from mock import patch, ANY
 from util.json_request import JsonResponse
+from testfixtures import LogCapture
+from freezegun import freeze_time
 
 from email_marketing.signals import email_marketing_register_user, \
     email_marketing_user_field_changed, \
@@ -26,6 +28,8 @@ from sailthru.sailthru_response import SailthruResponse
 from sailthru.sailthru_error import SailthruClientError
 
 log = logging.getLogger(__name__)
+
+LOGGER_NAME = "email_marketing.signals"
 
 TEST_EMAIL = "test@edx.org"
 
@@ -77,6 +81,7 @@ class EmailMarketingTests(TestCase):
         self.request.site = self.site
         super(EmailMarketingTests, self).setUp()
 
+    @freeze_time(datetime.datetime.now())
     @patch('email_marketing.signals.crum.get_current_request')
     @patch('email_marketing.signals.SailthruClient.api_post')
     def test_drop_cookie(self, mock_sailthru, mock_get_current_request):
@@ -90,7 +95,20 @@ class EmailMarketingTests(TestCase):
         self.request.COOKIES['anonymous_interest'] = 'cookie_content'
         mock_get_current_request.return_value = self.request
         mock_sailthru.return_value = SailthruResponse(JsonResponse({'keys': {'cookie': 'test_cookie'}}))
-        add_email_marketing_cookies(None, response=response, user=self.user)
+        cookie_log = "Sending to Sailthru the user interest cookie [{'anonymous_interest': 'cookie_content'}]" \
+                     ' for user [test@edx.org]'
+
+        with LogCapture(LOGGER_NAME, level=logging.INFO) as logger:
+            add_email_marketing_cookies(None, response=response, user=self.user)
+            logger.check(
+                (LOGGER_NAME, 'INFO', cookie_log),
+                (LOGGER_NAME, 'INFO',
+                    'Started at {start} and ended at {end}, time spent:{delta} milliseconds'.format(
+                        start=datetime.datetime.now().isoformat(' '),
+                        end=datetime.datetime.now().isoformat(' '),
+                        delta=0)
+                 )
+            )
         mock_sailthru.assert_called_with('user',
                                          {'fields': {'keys': 1},
                                           'cookies': {'anonymous_interest': 'cookie_content'},
