@@ -1,4 +1,4 @@
-# docker build . -t edxops/edxapp:devstack
+# docker build . -t edxops/edxapp:devstack-slim
 FROM clintonb/edx-base:python-2.7-slim
 ENV DJANGO_SETTINGS_MODULE devstack_docker
 ENV NO_PYTHON_UNINSTALL 1

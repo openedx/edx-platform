@@ -703,19 +703,17 @@ def execute_compile_sass(args):
             ),
         )
 
-# TODO Pull from environment variable
-STATIC_ROOT = '/edx/var/edxapp/staticfiles'
 
 def execute_webpack(prod, settings=None):
     sh(cmd("NODE_ENV={node_env} STATIC_ROOT={static_root} $(npm bin)/webpack".format(
         node_env="production" if prod else "development",
-        static_root=STATIC_ROOT
+        static_root=Env.get_django_setting("STATIC_ROOT", "lms", settings=settings)
     )))
 
 
 def execute_webpack_watch(settings=None):
     run_background_process("STATIC_ROOT={static_root} $(npm bin)/webpack --watch --watch-poll=200".format(
-        static_root=STATIC_ROOT
+        static_root=Env.get_django_setting("STATIC_ROOT", "lms", settings=settings)
     ))
 
 
