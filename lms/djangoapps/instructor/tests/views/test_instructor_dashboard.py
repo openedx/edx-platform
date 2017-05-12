@@ -327,7 +327,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         """
         ora_section = (
             '<li class="nav-item">'
-            '<button type="button" class="btn-link open_response_assessment" data-section="open_response_assessment" >'
+            '<button type="button" class="btn-link" data-section="open_response_assessment">'
             'Open Responses'
             '</button>'
             '</li>'
