@@ -18,6 +18,7 @@ import pytz
 from bs4 import BeautifulSoup
 from mock import patch, Mock
 import requests
+from waffle.testutils import override_switch
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -41,16 +42,19 @@ from shoppingcart.models import Order, CertificateItem
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from student.models import CourseEnrollment
 from util.testing import UrlResetMixin
-from lms.djangoapps.verify_student.views import (
-    checkout_with_ecommerce_service, render_to_response, PayAndVerifyView,
-)
-from lms.djangoapps.verify_student.models import (
-    VerificationDeadline, SoftwareSecurePhotoVerification,
-)
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
+
+
+from lms.djangoapps.verify_student.models import (
+    VerificationDeadline, SoftwareSecurePhotoVerification,
+)
+from lms.djangoapps.verify_student.views import (
+    checkout_with_ecommerce_service, render_to_response, PayAndVerifyView,
+    DISABLE_ACCOUNT_ACTIVATION_REQUIREMENT_SWITCH,
+)
 
 
 def mock_render_to_response(*args, **kwargs):
@@ -668,6 +672,25 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         )
         self._assert_requirements_displayed(response, [
             PayAndVerifyView.ACCOUNT_ACTIVATION_REQ,
+            PayAndVerifyView.PHOTO_ID_REQ,
+            PayAndVerifyView.WEBCAM_REQ,
+        ])
+
+    @override_switch(DISABLE_ACCOUNT_ACTIVATION_REQUIREMENT_SWITCH, active=True)
+    @ddt.data("verify_student_start_flow", "verify_student_begin_flow")
+    def test_disable_account_activation_requirement_flag_active(self, payment_flow):
+        """
+        Here we are validating that the activation requirement step is not
+        being returned in the requirements response when the waffle flag is active
+        """
+        self.user.is_active = False
+        self.user.save()
+        course = self._create_course("verified")
+        response = self._get_page(payment_flow, course.id)
+
+        # Confirm that ID and webcam requirements are displayed,
+        # and that activation requirement is hidden.
+        self._assert_requirements_displayed(response, [
             PayAndVerifyView.PHOTO_ID_REQ,
             PayAndVerifyView.WEBCAM_REQ,
         ])
