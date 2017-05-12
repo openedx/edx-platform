@@ -136,24 +136,9 @@
                     this.showCohortEditor(selectedCohort);
                 },
 
-                hideDiscussionsManagement: function() {
-                    $('section#discussions_management').hide();
-                    $('.btn-link.discussions_management').hide();
-                },
-
-                showDiscussionsManagement: function() {
-                    $('section#discussions_management').show();
-                    $('.btn-link.discussions_management').show();
-                },
-
                 onCohortsEnabledChanged: function(event) {
                     event.preventDefault();
                     this.saveCohortSettings();
-                    if (this.getCohortsEnabled()) {
-                        this.showDiscussionsManagement();
-                    } else {
-                        this.hideDiscussionsManagement();
-                    }
                 },
 
                 saveCohortSettings: function() {
