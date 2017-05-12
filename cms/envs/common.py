@@ -1267,7 +1267,7 @@ AFFILIATE_COOKIE_NAME = 'affiliate_id'
 
 ############## Settings for Studio Context Sensitive Help ##############
 
-HELP_TOKENS_INI_FILE = REPO_ROOT / "docs" / "cms_config.ini"
+HELP_TOKENS_INI_FILE = REPO_ROOT / "cms" / "envs" / "help_tokens.ini"
 
 # Theme directory locale paths
 COMPREHENSIVE_THEME_LOCALE_PATHS = []
