@@ -45,7 +45,6 @@
       "%(num_students)s aluno abriu Subse\u00e7\u00e3o", 
       "%(num_students)s alunos abriram a Subse\u00e7\u00e3o"
     ], 
-    "%(post_type)s posted %(time_ago)s by %(author)s": "%(post_type)s postado %(time_ago)s por %(author)s", 
     "%(team_count)s Team": [
       "%(team_count)s equipe", 
       "%(team_count)s equipes"
@@ -436,7 +435,6 @@
     "Download the user's certificate": "Baixar certificado do usu\u00e1rio", 
     "Draft (Never published)": "Rascunho (Nunca publicado)", 
     "Draft (Unpublished changes)": "Rascunho (altera\u00e7\u00f5es n\u00e3o publicadas)", 
-    "Draft saved on %(last_saved_date)s by %(edit_username)s": "Rascunho salvo em %(last_saved_date)s por %(edit_username)s", 
     "Drag and drop or click here to upload video files.": "Arraste e solte ou clique aqui para enviar os v\u00eddeos.", 
     "Drag to reorder": "Arraste para reordenar", 
     "Drop target image": "Soltar a imagem de destino", 
@@ -1199,7 +1197,6 @@
     "This component has validation issues.": "Este componente tem problemas de valida\u00e7\u00e3o.", 
     "This configuration is currently used in content experiments. If you make changes to the groups, you may need to edit those experiments.": "Essa configura\u00e7\u00e3o est\u00e1 sendo usada em experimentos de conte\u00fado. Se fizer altera\u00e7\u00f5es aos grupos, voc\u00ea vai precisar editar os experimentos.", 
     "This content group is used in one or more units.": "Este grupo de conte\u00fado \u00e9 utilizado em uma ou mais unidades.", 
-    "This content group is used in:": "Esse grupo de conte\u00fado \u00e9 utilizado em:", 
     "This is the Description of the Group Configuration": "Esta \u00e9 a Descri\u00e7\u00e3o da Configura\u00e7\u00e3o do Grupo", 
     "This is the Name of the Group Configuration": "Este \u00e9 o Nome da Configura\u00e7\u00e3o do Grupo", 
     "This is the name of the group": "Esse \u00e9 o nome do grupo", 
@@ -1332,7 +1329,6 @@
     "Video ID": "ID do V\u00eddeo", 
     "Video ended": "V\u00eddeo conclu\u00eddo", 
     "Video position": "Posi\u00e7\u00e3o do v\u00eddeo", 
-    "VideoPlayer: Element corresponding to the given selector was not found.": "Reprodutor de v\u00eddeo: o elemento correspondente ao seletor dado n\u00e3o foi encontrado.", 
     "View": "Visualizar", 
     "View %(span_start)s %(team_name)s %(span_end)s": "Visualizar %(span_start)s %(team_name)s %(span_end)s", 
     "View Cohort": "Visualizar grupo", 

@@ -89,7 +89,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-04-11 15:18+0000\n"
+"POT-Creation-Date: 2017-04-27 14:25+0000\n"
 "PO-Revision-Date: 2017-03-16 12:39+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/open-edx/edx-platform/language/ko_KR/)\n"
@@ -904,6 +904,21 @@ msgid ""
 msgstr ""
 
 #: common/djangoapps/third_party_auth/models.py
+msgid ""
+"Whether to drop an existing session when accessing a view decorated with "
+"third_party_auth.decorators.tpa_hint_ends_existing_session when a tpa_hint "
+"URL query parameter mapping to this provider is included in the request."
+msgstr ""
+
+#: common/djangoapps/third_party_auth/models.py
+msgid ""
+"If this option is set, then users logging in using this SSO provider will "
+"have their session length limited to no longer than this value. If set to 0 "
+"(zero), the session will expire upon the user closing their browser. If left"
+" blank, the Django platform session default length will be used."
+msgstr ""
+
+#: common/djangoapps/third_party_auth/models.py
 msgid "The Site that this SAML configuration belongs to."
 msgstr ""
 
@@ -1417,6 +1432,10 @@ msgid "unanswered"
 msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
+msgid "submitted"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py
 msgid "processing"
 msgstr ""
 
@@ -1848,6 +1867,29 @@ msgstr ""
 msgid "Amount of time after the due date that submissions will be accepted"
 msgstr ""
 
+#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Show Results"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid ""
+"Defines when to show whether a learner's answer to the problem is correct. "
+"Configured on the subsection."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Always"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Never"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Past Due"
+msgstr ""
+
 #: lms/templates/problem.html
 msgid "Show Answer"
 msgstr "정답 보기"
@@ -1856,10 +1898,6 @@ msgstr "정답 보기"
 msgid ""
 "Defines when to show the answer to the problem. A default value can be set "
 "in Advanced Settings."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Always"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
@@ -1880,14 +1918,6 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Correct or Past Due"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Past Due"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Never"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
@@ -2077,6 +2107,10 @@ msgstr[0] ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Partially Correct"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Answer submitted."
 msgstr ""
 
 #. Translators: 'closed' means the problem's due date has passed. You may no
@@ -3502,6 +3536,14 @@ msgstr ""
 #. specific words for the acceptable values.
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
+"Specify when to show answer correctness and score to learners. Valid values "
+"are \"always\", \"never\", and \"past_due\"."
+msgstr ""
+
+#. Translators: DO NOT translate the words in quotes here, they are
+#. specific words for the acceptable values.
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
 "Specify the default for how often variable values in a problem are "
 "randomized. This setting should be set to \"never\" unless you plan to "
 "provide a Python script to identify and randomize values in most of the "
@@ -3630,7 +3672,8 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/partitions/partitions_service.py
-msgid "Enrollment Tracks"
+#: cms/templates/group_configurations.html
+msgid "Enrollment Track Groups"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/partitions/partitions_service.py
@@ -4379,6 +4422,12 @@ msgstr ""
 #: lms/djangoapps/branding/api.py
 #, python-brace-format
 msgid "Download the {platform_name} mobile app from Google Play"
+msgstr ""
+
+#. Translators: Bulk email from address e.g. ("Physics 101" Course Staff)
+#: lms/djangoapps/bulk_email/tasks.py
+#, python-brace-format
+msgid "\"{course_title}\" Course Staff"
 msgstr ""
 
 #: lms/djangoapps/ccx/plugins.py
@@ -5746,7 +5795,7 @@ msgid "Date Report Run"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "User ID"
 msgstr ""
 
@@ -5755,7 +5804,7 @@ msgid "Email"
 msgstr "이메일"
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Language"
 msgstr ""
 
@@ -5773,7 +5822,7 @@ msgid "Gender"
 msgstr "성별"
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Level of Education"
 msgstr ""
 
@@ -5783,7 +5832,7 @@ msgid "Mailing Address"
 msgstr "주소"
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Goals"
 msgstr ""
 
@@ -6457,14 +6506,14 @@ msgstr ""
 
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the First Name
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_api/views.py
 msgid "First Name"
 msgstr ""
 
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the First Name
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Last Name"
 msgstr ""
@@ -6482,47 +6531,47 @@ msgstr "제목"
 msgid "Year of Birth"
 msgstr "출생연도"
 
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Enrollment Date"
 msgstr ""
 
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Currently Enrolled"
 msgstr ""
 
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Enrollment Source"
 msgstr ""
 
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Manual (Un)Enrollment Reason"
 msgstr ""
 
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Enrollment Role"
 msgstr ""
 
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "List Price"
 msgstr ""
 
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Payment Amount"
 msgstr ""
 
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Coupon Codes Used"
 msgstr ""
 
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Registration Code Used"
 msgstr ""
 
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Payment Status"
 msgstr ""
 
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Transaction Reference Number"
 msgstr ""
 
@@ -7935,10 +7984,6 @@ msgid "Invalid course key"
 msgstr ""
 
 #: lms/djangoapps/verify_student/views.py
-msgid "Invalid checkpoint location"
-msgstr ""
-
-#: lms/djangoapps/verify_student/views.py
 msgid "No profile found for user"
 msgstr ""
 
@@ -9088,6 +9133,16 @@ msgid ""
 msgstr ""
 
 #. Translators: This label appears above a field on the registration form
+#. meant to confirm the user's email address.
+#: openedx/core/djangoapps/user_api/views.py
+msgid "Confirm Email"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/views.py
+msgid "Please confirm your email."
+msgstr ""
+
+#. Translators: This label appears above a field on the registration form
 #. meant to hold the user's full name.
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Full name"
@@ -9614,6 +9669,11 @@ msgid ""
 "There is already a library defined with the same organization and library "
 "code. Please change your library code so that it is unique within your "
 "organization."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/preview.py
+#, python-brace-format
+msgid "Visible to: {list_of_groups}"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
@@ -11594,6 +11654,12 @@ msgid "No playable video sources found."
 msgstr "재생 가능한 동영상 소스가 없습니다."
 
 #: lms/templates/video.html
+msgid ""
+"Your browser does not support this video format. Try using a different "
+"browser."
+msgstr ""
+
+#: lms/templates/video.html
 msgid "Downloads and transcripts"
 msgstr ""
 
@@ -13399,12 +13465,16 @@ msgid "View Archived Course"
 msgstr "완료된 강좌 보기"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "I'm taking {course_name} online with edX.org. Check it out!"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Share on Facebook"
 msgstr "Facebook 에서 공유하기"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "I'm learning on {platform_name}:"
-msgstr "{platform_name}에서 학습하고 있습니다:"
+msgid "I'm taking {course_name} online with @edxonline. Check it out!"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course options for"
@@ -16346,6 +16416,20 @@ msgstr ""
 msgid "Manage your data: {permission}"
 msgstr ""
 
+#: lms/templates/registration/account_activation_sidebar_notice.html
+msgid "Account Activation Info"
+msgstr ""
+
+#: lms/templates/registration/account_activation_sidebar_notice.html
+msgid "Activate your account!"
+msgstr ""
+
+#: lms/templates/registration/account_activation_sidebar_notice.html
+msgid ""
+"Check your {email_start}{email}{email_end} inbox for an account activation "
+"link from edX. If you need help, contact {link_start}edX Support{link_end}."
+msgstr ""
+
 #: lms/templates/registration/activate_account_notice.html
 msgid "You're almost there!"
 msgstr ""
@@ -18513,6 +18597,27 @@ msgstr "이 모듈은 비활성화 되었습니다."
 
 #: cms/templates/group_configurations.html
 msgid ""
+"Enrollment track groups allow you to offer different course content to "
+"learners in each enrollment track. Learners enrolled in each enrollment "
+"track in your course are automatically included in the corresponding "
+"enrollment track group."
+msgstr ""
+
+#: cms/templates/group_configurations.html
+msgid ""
+"On unit pages in the course outline, you can designate components as visible"
+" only to learners in a specific enrollment track."
+msgstr ""
+
+#: cms/templates/group_configurations.html
+msgid ""
+"You cannot edit enrollment track groups, but you can expand each group to "
+"view details of the course content that is designated for learners in the "
+"group."
+msgstr ""
+
+#: cms/templates/group_configurations.html
+msgid ""
 "If you have cohorts enabled in your course, you can use content groups to "
 "create cohort-specific courseware. In other words, you can customize the "
 "content that particular cohorts see in your course."
@@ -18521,13 +18626,11 @@ msgstr "귀하의 강좌에서 학습 집단을 활성화하면, 특정 학습 �
 #: cms/templates/group_configurations.html
 msgid ""
 "Each content group that you create can be associated with one or more "
-"cohorts. In addition to course content that is intended for all students, "
+"cohorts. In addition to course content that is intended for all learners, "
 "you can designate some content as visible only to specified content groups. "
 "Only learners in the cohorts that are associated with the specified content "
 "groups see the additional content."
 msgstr ""
-"각 콘텐츠 그룹은 1개 이상의 학습 집단과 연결할 수 있습니다. 전체 학습자를 위한 강좌 콘텐츠 외에도, 지정한 콘텐츠 그룹만 특정 "
-"콘텐츠를 볼 수 있도록 할 수 있습니다. "
 
 #: cms/templates/group_configurations.html
 msgid ""
@@ -18545,12 +18648,10 @@ msgstr ""
 msgid ""
 "Use experiment group configurations if you are conducting content "
 "experiments, also known as A/B testing, in your course. Experiment group "
-"configurations define how many groups of students are in a content "
+"configurations define how many groups of learners are in a content "
 "experiment. When you create a content experiment for a course, you select "
 "the group configuration to use."
 msgstr ""
-"콘텐츠 실험을 위해, '실험 집단 설정'을 이용하세요. 실험 집단 설정은 콘텐츠 실험의 학습자 수를 정하는 것입니다. 실험을 할 때, "
-"집단 설정을 선택할 수 있습니다. "
 
 #: cms/templates/group_configurations.html
 msgid ""
@@ -19818,8 +19919,9 @@ msgstr "강좌 관련 세부 정보"
 #: cms/templates/settings.html
 msgid ""
 "Identify the course language here. This is used to assist users find courses"
-" that are taught in a specific language."
-msgstr "강좌 언어를 선택하세요. 특정 언어로 하는 강좌를 찾는 학습자에게 도움이 됩니다."
+" that are taught in a specific language. It is also used to localize the "
+"'From:' field in bulk emails."
+msgstr ""
 
 #: cms/templates/settings.html
 msgid "Introducing Your Course"
@@ -20422,7 +20524,7 @@ msgid "Change visibility to:"
 msgstr ""
 
 #: cms/templates/visibility_editor.html
-msgid "Choose one"
+msgid "Select a group type"
 msgstr ""
 
 #: cms/templates/visibility_editor.html

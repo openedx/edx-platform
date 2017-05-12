@@ -78,7 +78,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-04-11 15:18+0000\n"
+"POT-Creation-Date: 2017-04-27 14:25+0000\n"
 "PO-Revision-Date: 2017-03-29 06:21+0000\n"
 "Last-Translator: e2f_HE c1 <e2f_HE_c1@outlook.com>\n"
 "Language-Team: Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)\n"
@@ -977,6 +977,21 @@ msgstr ""
 "לאימות אלא רק אימות ידני באמצעות הקישור המתאים"
 
 #: common/djangoapps/third_party_auth/models.py
+msgid ""
+"Whether to drop an existing session when accessing a view decorated with "
+"third_party_auth.decorators.tpa_hint_ends_existing_session when a tpa_hint "
+"URL query parameter mapping to this provider is included in the request."
+msgstr ""
+
+#: common/djangoapps/third_party_auth/models.py
+msgid ""
+"If this option is set, then users logging in using this SSO provider will "
+"have their session length limited to no longer than this value. If set to 0 "
+"(zero), the session will expire upon the user closing their browser. If left"
+" blank, the Django platform session default length will be used."
+msgstr ""
+
+#: common/djangoapps/third_party_auth/models.py
 msgid "The Site that this SAML configuration belongs to."
 msgstr "האתר שתצורת SAML זו שייכת אליו."
 
@@ -1502,6 +1517,10 @@ msgid "unanswered"
 msgstr "לא נענה"
 
 #: common/lib/capa/capa/inputtypes.py
+msgid "submitted"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py
 msgid "processing"
 msgstr "מעבד"
 
@@ -1952,6 +1971,29 @@ msgstr "משך הזמן לאחר תאריך היעד בו יתקבלו עדיי�
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Show Results"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid ""
+"Defines when to show whether a learner's answer to the problem is correct. "
+"Configured on the subsection."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Always"
+msgstr "תמיד"
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Never"
+msgstr "לעולם לא"
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Past Due"
+msgstr "תאריך היעד להגשה עבר"
+
+#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 #: lms/templates/problem.html
 msgid "Show Answer"
 msgstr "הצג תשובה"
@@ -1963,10 +2005,6 @@ msgid ""
 msgstr ""
 "מגדיר מתי להראות את הפתרון עבור הבעיה. ניתן לקבוע ערך ברירת מחדל בהגדרות "
 "מתקדמות."
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Always"
-msgstr "תמיד"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Answered"
@@ -1987,14 +2025,6 @@ msgstr "הושלם"
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Correct or Past Due"
 msgstr "נכון או עבר תאריך יעד"
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Past Due"
-msgstr "תאריך היעד להגשה עבר"
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Never"
-msgstr "לעולם לא"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Whether to force the save button to appear on the page"
@@ -2201,6 +2231,10 @@ msgstr[1] " ({progress} נקודות נכונות חלקית)"
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Partially Correct"
 msgstr "נכון חלקית"
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Answer submitted."
+msgstr ""
 
 #. Translators: 'closed' means the problem's due date has passed. You may no
 #. longer attempt to solve the problem.
@@ -3798,6 +3832,14 @@ msgstr ""
 #. specific words for the acceptable values.
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
+"Specify when to show answer correctness and score to learners. Valid values "
+"are \"always\", \"never\", and \"past_due\"."
+msgstr ""
+
+#. Translators: DO NOT translate the words in quotes here, they are
+#. specific words for the acceptable values.
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
 "Specify the default for how often variable values in a problem are "
 "randomized. This setting should be set to \"never\" unless you plan to "
 "provide a Python script to identify and randomize values in most of the "
@@ -3957,7 +3999,8 @@ msgstr ""
 "דירוג מבחן הכניסה/אלגוריתם הכניסה. "
 
 #: common/lib/xmodule/xmodule/partitions/partitions_service.py
-msgid "Enrollment Tracks"
+#: cms/templates/group_configurations.html
+msgid "Enrollment Track Groups"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/partitions/partitions_service.py
@@ -4805,6 +4848,12 @@ msgstr "הורד את האפליקציה לנייד של {platform_name} מ-Appl
 msgid "Download the {platform_name} mobile app from Google Play"
 msgstr "הורד את האפליקציה לנייד של {platform_name} מ-Google Play"
 
+#. Translators: Bulk email from address e.g. ("Physics 101" Course Staff)
+#: lms/djangoapps/bulk_email/tasks.py
+#, python-brace-format
+msgid "\"{course_title}\" Course Staff"
+msgstr ""
+
 #: lms/djangoapps/ccx/plugins.py
 msgid "CCX Coach"
 msgstr "מטמון CCX"
@@ -5253,7 +5302,7 @@ msgstr "מידע נוסף אודות ההישג של {fullname}"
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/tools.py
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: lms/templates/staff_problem_info.html
 #: lms/templates/api_admin/catalogs/search.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
@@ -6263,7 +6312,7 @@ msgid "Date Report Run"
 msgstr "תאריך הרצת הדוח"
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "User ID"
 msgstr "מזהה משתמש"
 
@@ -6282,7 +6331,7 @@ msgid "Email"
 msgstr "דואר אלקטרוני"
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Language"
 msgstr "שפה"
 
@@ -6298,7 +6347,7 @@ msgstr "שנת לידה"
 #. Translators: This label appears above a dropdown menu on the registration
 #. form used to select the user's gender.
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
 #: lms/templates/signup_modal.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -6306,19 +6355,19 @@ msgid "Gender"
 msgstr "מגדר"
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Level of Education"
 msgstr "רמת השכלה"
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Mailing Address"
 msgstr "כתובת למשלוח דואר"
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Goals"
 msgstr "יעדים"
 
@@ -6342,7 +6391,7 @@ msgstr "צוות"
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the city in which they live.
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/receipt.html
@@ -6354,7 +6403,7 @@ msgstr "עיר"
 #. Translators: This label appears above a dropdown menu on the registration
 #. form used to select the country in which the user lives.
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/receipt.html
@@ -6974,9 +7023,10 @@ msgid "No due date extension is set for that student and unit."
 msgstr "לא נקבעה הארכה לתאריך היעד להגשה עבור סטודנט ויחידה זו"
 
 #: lms/djangoapps/instructor/views/tools.py
-#: lms/djangoapps/instructor_task/tasks_helper.py cms/templates/register.html
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
+#: cms/templates/register.html lms/templates/register-form.html
+#: lms/templates/register-shib.html lms/templates/signup_modal.html
+#: lms/templates/sysadmin_dashboard.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Full Name"
@@ -7060,19 +7110,19 @@ msgstr "להיאסף כקבוצת לימוד"
 
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the First Name
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_api/views.py
 msgid "First Name"
 msgstr "שם פרטי"
 
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the First Name
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Last Name"
 msgstr "שם משפחה"
 
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/api_admin/forms.py
 #: lms/templates/shoppingcart/receipt.html
 msgid "Company Name"
@@ -7081,58 +7131,58 @@ msgstr "שם החברה"
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the Title
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_api/views.py wiki/forms.py
 msgid "Title"
 msgstr "כותרת"
 
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Year of Birth"
 msgstr "שנת לידה"
 
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Enrollment Date"
 msgstr "תאריך הרשמה"
 
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Currently Enrolled"
 msgstr "נרשם כרגע"
 
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Enrollment Source"
 msgstr "מקור הרשמה"
 
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Manual (Un)Enrollment Reason"
 msgstr "סיבה ל(אי) רישום ידני"
 
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Enrollment Role"
 msgstr "תפקיד ההרשמה"
 
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "List Price"
 msgstr "מחיר מחירון"
 
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Payment Amount"
 msgstr "סכום לתשלום"
 
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Coupon Codes Used"
 msgstr "קודי שובר שנעשה בהם שימוש"
 
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Registration Code Used"
 msgstr "קוד רישום שנעשה בו שימוש"
 
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Payment Status"
 msgstr "סטטוס תשלום"
 
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Transaction Reference Number"
 msgstr "מספר סימוכין לעסקה"
 
@@ -8732,10 +8782,6 @@ msgid "Invalid course key"
 msgstr "מפתח קורס אינו חוקי"
 
 #: lms/djangoapps/verify_student/views.py
-msgid "Invalid checkpoint location"
-msgstr "מיקום נקודת ביקורת אינו חוקי"
-
-#: lms/djangoapps/verify_student/views.py
 msgid "No profile found for user"
 msgstr "לא נמצא פרופיל למשתמש "
 
@@ -9967,6 +10013,16 @@ msgid ""
 msgstr "נראה כי {username} שייך לחשבון קיים. נסה שוב עם שם משתמש אחר."
 
 #. Translators: This label appears above a field on the registration form
+#. meant to confirm the user's email address.
+#: openedx/core/djangoapps/user_api/views.py
+msgid "Confirm Email"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/views.py
+msgid "Please confirm your email."
+msgstr ""
+
+#. Translators: This label appears above a field on the registration form
 #. meant to hold the user's full name.
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Full name"
@@ -10530,6 +10586,11 @@ msgid ""
 msgstr ""
 "הוגדרה כבר ספריה בעלת אותו קוד ארגון וספריה. אנא שנה את קוד הספריה על מנת "
 "שיהיה ייחודי בארגונך."
+
+#: cms/djangoapps/contentstore/views/preview.py
+#, python-brace-format
+msgid "Visible to: {list_of_groups}"
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Incoming video data is empty."
@@ -12559,6 +12620,12 @@ msgstr "נגן סרטון וידאו"
 #: lms/templates/video.html
 msgid "No playable video sources found."
 msgstr "לא נמצא מקור וידאו שניתן לצפות בו. "
+
+#: lms/templates/video.html
+msgid ""
+"Your browser does not support this video format. Try using a different "
+"browser."
+msgstr ""
 
 #: lms/templates/video.html
 msgid "Downloads and transcripts"
@@ -14619,12 +14686,16 @@ msgid "View Archived Course"
 msgstr "צפה בארכיון הקורס"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "I'm taking {course_name} online with edX.org. Check it out!"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Share on Facebook"
 msgstr "שתף בפייסבוק"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "I'm learning on {platform_name}:"
-msgstr "אני לומד ב{platform_name}:"
+msgid "I'm taking {course_name} online with @edxonline. Check it out!"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course options for"
@@ -17740,6 +17811,20 @@ msgstr "לראות אם אתה משתמש צוות גלובלי"
 msgid "Manage your data: {permission}"
 msgstr "נהל את נתוניך: {permission}"
 
+#: lms/templates/registration/account_activation_sidebar_notice.html
+msgid "Account Activation Info"
+msgstr ""
+
+#: lms/templates/registration/account_activation_sidebar_notice.html
+msgid "Activate your account!"
+msgstr ""
+
+#: lms/templates/registration/account_activation_sidebar_notice.html
+msgid ""
+"Check your {email_start}{email}{email_end} inbox for an account activation "
+"link from edX. If you need help, contact {link_start}edX Support{link_end}."
+msgstr ""
+
 #: lms/templates/registration/activate_account_notice.html
 msgid "You're almost there!"
 msgstr "אתה כמעט שם!"
@@ -20036,6 +20121,27 @@ msgstr "מודול זה מושבת כעת"
 
 #: cms/templates/group_configurations.html
 msgid ""
+"Enrollment track groups allow you to offer different course content to "
+"learners in each enrollment track. Learners enrolled in each enrollment "
+"track in your course are automatically included in the corresponding "
+"enrollment track group."
+msgstr ""
+
+#: cms/templates/group_configurations.html
+msgid ""
+"On unit pages in the course outline, you can designate components as visible"
+" only to learners in a specific enrollment track."
+msgstr ""
+
+#: cms/templates/group_configurations.html
+msgid ""
+"You cannot edit enrollment track groups, but you can expand each group to "
+"view details of the course content that is designated for learners in the "
+"group."
+msgstr ""
+
+#: cms/templates/group_configurations.html
+msgid ""
 "If you have cohorts enabled in your course, you can use content groups to "
 "create cohort-specific courseware. In other words, you can customize the "
 "content that particular cohorts see in your course."
@@ -20047,15 +20153,11 @@ msgstr ""
 #: cms/templates/group_configurations.html
 msgid ""
 "Each content group that you create can be associated with one or more "
-"cohorts. In addition to course content that is intended for all students, "
+"cohorts. In addition to course content that is intended for all learners, "
 "you can designate some content as visible only to specified content groups. "
 "Only learners in the cohorts that are associated with the specified content "
 "groups see the additional content."
 msgstr ""
-"ניתן לקשר כל קבוצת תוכן שתיצור עם קבוצת לימוד אחת או יותר. בנוסף לתוכן הקורס"
-" המיועד לכלל הסטודנטים בקורס, ניתן להפוך תוכן מסוים לזמין רק לקבוצות תוכן "
-"מסוימות. רק הלומדים בקבוצות למידה, המקושרות לקבוצות התוכן הרלוונטיות, יוכלו "
-"לראות את התוכן הנוסף."
 
 #: cms/templates/group_configurations.html
 msgid ""
@@ -20074,14 +20176,10 @@ msgstr ""
 msgid ""
 "Use experiment group configurations if you are conducting content "
 "experiments, also known as A/B testing, in your course. Experiment group "
-"configurations define how many groups of students are in a content "
+"configurations define how many groups of learners are in a content "
 "experiment. When you create a content experiment for a course, you select "
 "the group configuration to use."
 msgstr ""
-"השתמש בהגדרות תצורה קבוצתיות ניסיוניות במידה ואתה עורך ניסויי תוכן בקורס "
-"שלך, הידועים גם כבחינת א/ב. הגדרות תצורה קבוצתיות ניסיוניות מגדירות מספר "
-"קבוצות סטודנטים נמצאים בניסוי תוכן. כאשר אתה יוצר ניסוי תוכן לקורס, אתה בוחר"
-" את הגדרות התצורה הקבוצתיות לשימוש."
 
 #: cms/templates/group_configurations.html
 msgid ""
@@ -21443,10 +21541,9 @@ msgstr "ספק מידע שימושי על הקורס שלך"
 #: cms/templates/settings.html
 msgid ""
 "Identify the course language here. This is used to assist users find courses"
-" that are taught in a specific language."
+" that are taught in a specific language. It is also used to localize the "
+"'From:' field in bulk emails."
 msgstr ""
-"זהה את שפת הקורס כאן. הדבר נועד לעזור לסטודנטים למצוא קורסים הנלמדים בשפה "
-"מסוימת."
 
 #: cms/templates/settings.html
 msgid "Introducing Your Course"
@@ -22105,7 +22202,7 @@ msgid "Change visibility to:"
 msgstr ""
 
 #: cms/templates/visibility_editor.html
-msgid "Choose one"
+msgid "Select a group type"
 msgstr ""
 
 #: cms/templates/visibility_editor.html

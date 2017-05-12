@@ -48,7 +48,6 @@
       "%(num_students)s \u00e9tudiant a ouvert cette sous-section", 
       "%(num_students)s \u00e9tudiants ont ouvert la sous-section"
     ], 
-    "%(post_type)s posted %(time_ago)s by %(author)s": "%(post_type)s post\u00e9 %(time_ago)s par %(author)s", 
     "%(team_count)s Team": [
       "%(team_count)s Equipe", 
       "%(team_count)s \u00c9quipes"
@@ -446,7 +445,6 @@
     "Download the user's certificate": "T\u00e9l\u00e9charger le certificat de l'utilisateur", 
     "Draft (Never published)": "Brouillon (Jamais publi\u00e9)", 
     "Draft (Unpublished changes)": "Brouillon (changements non publi\u00e9s)", 
-    "Draft saved on %(last_saved_date)s by %(edit_username)s": "Brouillon sauvegard\u00e9 le %(last_saved_date)s par %(edit_username)s", 
     "Drag and drop or click here to upload video files.": "Glisser d\u00e9poser ou cliquer ici pour importer des fichiers vid\u00e9o.", 
     "Drag to reorder": "Glissez pour modifier l'ordre", 
     "Drop target image": "D\u00e9poser l'image cible", 
@@ -1218,7 +1216,6 @@
     "This component has validation issues.": "Ce composant a des probl\u00e8mes de validation.", 
     "This configuration is currently used in content experiments. If you make changes to the groups, you may need to edit those experiments.": "Cette configuration est actuellement utilis\u00e9 dans des exp\u00e9riences de contenu. Si vous apportez des modifications aux groupes, vous devrez peut-\u00eatre modifier ces exp\u00e9riences.", 
     "This content group is used in one or more units.": "Ce groupe de contenu est utilis\u00e9 dans une ou plusieurs unit\u00e9s.", 
-    "This content group is used in:": "Ce groupe de contenu est utilis\u00e9 dans :", 
     "This course has automatic cohorting enabled for verified track learners, but cohorts are disabled. You must enable cohorts for the feature to work.": "Ce cours a les cohortes automatiques activ\u00e9es pour les apprenants v\u00e9rifi\u00e9s, mais les cohortes sont d\u00e9sactiv\u00e9es. Vous devez activer les cohortes pour que cette fonctionnalit\u00e9 fonctionne.", 
     "This course has automatic cohorting enabled for verified track learners, but the required cohort does not exist. You must create a manually-assigned cohort named '{verifiedCohortName}' for the feature to work.": "Ce cours a les cohortes automatiques activ\u00e9es pour les apprenants v\u00e9rifi\u00e9s, mais la cohorte requise n'existe pas. Vous devez cr\u00e9er manuellement une cohorte nomm\u00e9e '{verifiedCohortName}' pour que cette fonctionnalit\u00e9 fonctionne.", 
     "This course uses automatic cohorting for verified track learners. You cannot disable cohorts, and you cannot rename the manual cohort named '{verifiedCohortName}'. To change the configuration for verified track cohorts, contact your edX partner manager.": "Ce cours utilise des cohortes automatiques pour les apprenants v\u00e9rifi\u00e9s. Vous ne pouvez pas d\u00e9sactiver les cohortes, et vous ne pouvez pas renommer la cohorte manuelle nomm\u00e9e'{verifiedCohortName}'. Pour changer la configuration des cohortes v\u00e9rifi\u00e9es,contacter votre gestionnaire de partenariat edX.", 
@@ -1358,7 +1355,6 @@
     "Video position": "Position de la vid\u00e9o", 
     "Video speed: ": "Vitesse de lecture de la vid\u00e9o :", 
     "Video transcript": "Transcription de la vid\u00e9o", 
-    "VideoPlayer: Element corresponding to the given selector was not found.": "Lecteur vid\u00e9o : l'\u00e9l\u00e9ment correspondant au s\u00e9lecteur donn\u00e9 n'a pas \u00e9t\u00e9 trouv\u00e9. ", 
     "View": "Voir", 
     "View %(span_start)s %(team_name)s %(span_end)s": "Voir %(span_start)s %(team_name)s %(span_end)s", 
     "View Archived Course": "Voir le cours archiv\u00e9", 
@@ -1512,7 +1508,6 @@
     "dropped on target": "d\u00e9pos\u00e9 sur la cible", 
     "e.g. 'Sky with clouds'. The description is helpful for users who cannot see the image.": "exemple 'Ciel avec nuages'. La description est utile pour les utilisateurs qui ne peuvent pas voir l'image.", 
     "e.g. 'google'": "exemple 'google'", 
-    "e.g. johndoe@example.com, JaneDoe, joeydoe@example.com": "ex: johndoe@example.com, JaneDoe, joeydoe@example.com", 
     "emphasized text": "texte en italique", 
     "endorsed %(time_ago)s": "approuv\u00e9 %(time_ago)s", 
     "endorsed %(time_ago)s by %(user)s": "approuv\u00e9 %(time_ago)s par %(user)s", 

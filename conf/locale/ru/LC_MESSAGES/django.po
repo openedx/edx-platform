@@ -195,8 +195,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-04-11 15:18+0000\n"
-"PO-Revision-Date: 2017-04-14 12:21+0000\n"
+"POT-Creation-Date: 2017-04-27 14:25+0000\n"
+"PO-Revision-Date: 2017-04-28 15:10+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
 "MIME-Version: 1.0\n"
@@ -1128,6 +1128,21 @@ msgid ""
 msgstr ""
 
 #: common/djangoapps/third_party_auth/models.py
+msgid ""
+"Whether to drop an existing session when accessing a view decorated with "
+"third_party_auth.decorators.tpa_hint_ends_existing_session when a tpa_hint "
+"URL query parameter mapping to this provider is included in the request."
+msgstr ""
+
+#: common/djangoapps/third_party_auth/models.py
+msgid ""
+"If this option is set, then users logging in using this SSO provider will "
+"have their session length limited to no longer than this value. If set to 0 "
+"(zero), the session will expire upon the user closing their browser. If left"
+" blank, the Django platform session default length will be used."
+msgstr ""
+
+#: common/djangoapps/third_party_auth/models.py
 msgid "The Site that this SAML configuration belongs to."
 msgstr ""
 
@@ -1646,6 +1661,10 @@ msgid "unanswered"
 msgstr "нет ответа"
 
 #: common/lib/capa/capa/inputtypes.py
+msgid "submitted"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py
 msgid "processing"
 msgstr "обработка"
 
@@ -2122,6 +2141,29 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Show Results"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid ""
+"Defines when to show whether a learner's answer to the problem is correct. "
+"Configured on the subsection."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Always"
+msgstr "Всегда"
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Never"
+msgstr "Никогда"
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Past Due"
+msgstr "Прошёл срок сдачи"
+
+#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 #: lms/templates/problem.html
 msgid "Show Answer"
 msgstr "Показать ответ"
@@ -2133,10 +2175,6 @@ msgid ""
 msgstr ""
 "Определяет, когда отображать ответ на задание.  В расширенных настройках "
 "можно установить значение по умолчанию."
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Always"
-msgstr "Всегда"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Answered"
@@ -2157,14 +2195,6 @@ msgstr "Выполнено"
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Correct or Past Due"
 msgstr "Верные или просроченные"
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Past Due"
-msgstr "Прошёл срок сдачи"
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Never"
-msgstr "Никогда"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Whether to force the save button to appear on the page"
@@ -2383,6 +2413,10 @@ msgstr[3] ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Partially Correct"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Answer submitted."
 msgstr ""
 
 #. Translators: 'closed' means the problem's due date has passed. You may no
@@ -4079,6 +4113,14 @@ msgstr ""
 #. specific words for the acceptable values.
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
+"Specify when to show answer correctness and score to learners. Valid values "
+"are \"always\", \"never\", and \"past_due\"."
+msgstr ""
+
+#. Translators: DO NOT translate the words in quotes here, they are
+#. specific words for the acceptable values.
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
 "Specify the default for how often variable values in a problem are "
 "randomized. This setting should be set to \"never\" unless you plan to "
 "provide a Python script to identify and randomize values in most of the "
@@ -4247,7 +4289,8 @@ msgstr ""
 "вступительного испытания."
 
 #: common/lib/xmodule/xmodule/partitions/partitions_service.py
-msgid "Enrollment Tracks"
+#: cms/templates/group_configurations.html
+msgid "Enrollment Track Groups"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/partitions/partitions_service.py
@@ -5134,6 +5177,12 @@ msgstr "Скачать мобильное приложение {platform_name} �
 msgid "Download the {platform_name} mobile app from Google Play"
 msgstr "Скачать мобильное приложение {platform_name} с сайта Google Play"
 
+#. Translators: Bulk email from address e.g. ("Physics 101" Course Staff)
+#: lms/djangoapps/bulk_email/tasks.py
+#, python-brace-format
+msgid "\"{course_title}\" Course Staff"
+msgstr ""
+
 #: lms/djangoapps/ccx/plugins.py
 msgid "CCX Coach"
 msgstr "Тьютор"
@@ -5590,7 +5639,7 @@ msgstr "Дальнейшая информация о достижениях {ful
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/tools.py
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: lms/templates/staff_problem_info.html
 #: lms/templates/api_admin/catalogs/search.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
@@ -6631,7 +6680,7 @@ msgid "Date Report Run"
 msgstr "Дата отчёта"
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "User ID"
 msgstr "Идентификатор пользователя"
 
@@ -6650,7 +6699,7 @@ msgid "Email"
 msgstr "Электронная почта"
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Language"
 msgstr "Язык"
 
@@ -6666,7 +6715,7 @@ msgstr "Год Рождения"
 #. Translators: This label appears above a dropdown menu on the registration
 #. form used to select the user's gender.
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
 #: lms/templates/signup_modal.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -6674,19 +6723,19 @@ msgid "Gender"
 msgstr "Пол"
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Level of Education"
 msgstr "Уровень образования"
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Mailing Address"
 msgstr "Почтовый адрес"
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Goals"
 msgstr "Цели"
 
@@ -6710,7 +6759,7 @@ msgstr "Команда"
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the city in which they live.
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/receipt.html
@@ -6722,7 +6771,7 @@ msgstr "Город"
 #. Translators: This label appears above a dropdown menu on the registration
 #. form used to select the country in which the user lives.
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_api/views.py lms/templates/register-form.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/receipt.html
@@ -7390,9 +7439,10 @@ msgid "No due date extension is set for that student and unit."
 msgstr "Срок сдачи задания для этого обучающегося не был продлён."
 
 #: lms/djangoapps/instructor/views/tools.py
-#: lms/djangoapps/instructor_task/tasks_helper.py cms/templates/register.html
-#: lms/templates/register-form.html lms/templates/register-shib.html
-#: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
+#: cms/templates/register.html lms/templates/register-form.html
+#: lms/templates/register-shib.html lms/templates/signup_modal.html
+#: lms/templates/sysadmin_dashboard.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Full Name"
@@ -7476,19 +7526,19 @@ msgstr "распределено по группам"
 
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the First Name
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_api/views.py
 msgid "First Name"
 msgstr "Имя"
 
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the First Name
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Last Name"
 msgstr "Фамилия"
 
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/api_admin/forms.py
 #: lms/templates/shoppingcart/receipt.html
 msgid "Company Name"
@@ -7497,58 +7547,58 @@ msgstr "Наименование организации"
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the Title
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_api/views.py wiki/forms.py
 msgid "Title"
 msgstr "Заголовок"
 
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Year of Birth"
 msgstr "Год рождения"
 
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Enrollment Date"
 msgstr "Дата записи на курс"
 
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Currently Enrolled"
 msgstr "Сейчас записан"
 
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Enrollment Source"
 msgstr "Способ записи"
 
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Manual (Un)Enrollment Reason"
 msgstr "Причина для ручного отчисления (зачисления)"
 
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Enrollment Role"
 msgstr "Роль"
 
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "List Price"
 msgstr "Заявленная цена"
 
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Payment Amount"
 msgstr "Cумма платежа"
 
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Coupon Codes Used"
 msgstr "Использованный код купона"
 
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Registration Code Used"
 msgstr "Использованный регистрационный код"
 
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Payment Status"
 msgstr "Статус платежа"
 
-#: lms/djangoapps/instructor_task/tasks_helper.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Transaction Reference Number"
 msgstr "Идентификационный номер операции"
 
@@ -9214,10 +9264,6 @@ msgid "Invalid course key"
 msgstr "Неверный ключ курса"
 
 #: lms/djangoapps/verify_student/views.py
-msgid "Invalid checkpoint location"
-msgstr "Неверное местоположение контрольной точки"
-
-#: lms/djangoapps/verify_student/views.py
 msgid "No profile found for user"
 msgstr "Личные данные пользователя не найдены"
 
@@ -10461,6 +10507,16 @@ msgstr ""
 "пользователя."
 
 #. Translators: This label appears above a field on the registration form
+#. meant to confirm the user's email address.
+#: openedx/core/djangoapps/user_api/views.py
+msgid "Confirm Email"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/views.py
+msgid "Please confirm your email."
+msgstr ""
+
+#. Translators: This label appears above a field on the registration form
 #. meant to hold the user's full name.
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Full name"
@@ -11038,6 +11094,11 @@ msgstr ""
 "Библиотека этой организации с таким кодом уже существует.  Пожалуйста, "
 "измените код вашей библиотеки, чтобы он был уникальным в пределах вашей "
 "организации."
+
+#: cms/djangoapps/contentstore/views/preview.py
+#, python-brace-format
+msgid "Visible to: {list_of_groups}"
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Incoming video data is empty."
@@ -13110,6 +13171,12 @@ msgid "No playable video sources found."
 msgstr "Воспроизводимых видеоматериалов не найдено."
 
 #: lms/templates/video.html
+msgid ""
+"Your browser does not support this video format. Try using a different "
+"browser."
+msgstr ""
+
+#: lms/templates/video.html
 msgid "Downloads and transcripts"
 msgstr ""
 
@@ -15176,12 +15243,16 @@ msgid "View Archived Course"
 msgstr "Посмотреть курс из архива"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "I'm taking {course_name} online with edX.org. Check it out!"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Share on Facebook"
 msgstr "Поделиться на Facebook"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "I'm learning on {platform_name}:"
-msgstr "Я учусь на {platform_name}:"
+msgid "I'm taking {course_name} online with @edxonline. Check it out!"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course options for"
@@ -18427,6 +18498,20 @@ msgstr "Проверить, что вы включены в команды вс�
 msgid "Manage your data: {permission}"
 msgstr "Управление своими данными: {permission}"
 
+#: lms/templates/registration/account_activation_sidebar_notice.html
+msgid "Account Activation Info"
+msgstr ""
+
+#: lms/templates/registration/account_activation_sidebar_notice.html
+msgid "Activate your account!"
+msgstr ""
+
+#: lms/templates/registration/account_activation_sidebar_notice.html
+msgid ""
+"Check your {email_start}{email}{email_end} inbox for an account activation "
+"link from edX. If you need help, contact {link_start}edX Support{link_end}."
+msgstr ""
+
 #: lms/templates/registration/activate_account_notice.html
 msgid "You're almost there!"
 msgstr "Вы почти у цели!"
@@ -20805,6 +20890,27 @@ msgstr "Этот модуль в данный момент недоступен.
 
 #: cms/templates/group_configurations.html
 msgid ""
+"Enrollment track groups allow you to offer different course content to "
+"learners in each enrollment track. Learners enrolled in each enrollment "
+"track in your course are automatically included in the corresponding "
+"enrollment track group."
+msgstr ""
+
+#: cms/templates/group_configurations.html
+msgid ""
+"On unit pages in the course outline, you can designate components as visible"
+" only to learners in a specific enrollment track."
+msgstr ""
+
+#: cms/templates/group_configurations.html
+msgid ""
+"You cannot edit enrollment track groups, but you can expand each group to "
+"view details of the course content that is designated for learners in the "
+"group."
+msgstr ""
+
+#: cms/templates/group_configurations.html
+msgid ""
 "If you have cohorts enabled in your course, you can use content groups to "
 "create cohort-specific courseware. In other words, you can customize the "
 "content that particular cohorts see in your course."
@@ -20815,16 +20921,11 @@ msgstr ""
 #: cms/templates/group_configurations.html
 msgid ""
 "Each content group that you create can be associated with one or more "
-"cohorts. In addition to course content that is intended for all students, "
+"cohorts. In addition to course content that is intended for all learners, "
 "you can designate some content as visible only to specified content groups. "
 "Only learners in the cohorts that are associated with the specified content "
 "groups see the additional content."
 msgstr ""
-"Каждая созданная группа по изучаемым материалам должна быть связана не менее"
-" чем с одной группой в курсе. В дополнение к материалам курса, "
-"предназначенным для всех слушателей, вы можете указать, что некоторые "
-"материалы доступны только определённым группам. Только члены этих групп, "
-"получат доступ к дополнительным материалам."
 
 #: cms/templates/group_configurations.html
 msgid ""
@@ -20845,15 +20946,10 @@ msgstr ""
 msgid ""
 "Use experiment group configurations if you are conducting content "
 "experiments, also known as A/B testing, in your course. Experiment group "
-"configurations define how many groups of students are in a content "
+"configurations define how many groups of learners are in a content "
 "experiment. When you create a content experiment for a course, you select "
 "the group configuration to use."
 msgstr ""
-"Используйте настройку экспериментальных групп если вы хотите провести "
-"А/Б-тестирование материалов вашего курса. Данная настройка определяет, "
-"сколько групп слушателей будет участвовать в эксперименте.  Когда вы "
-"создаёте экспериментальный материал, укажите группы, которые будут его "
-"использовать."
 
 #: cms/templates/group_configurations.html
 msgid ""
@@ -22280,10 +22376,9 @@ msgstr "Предоставьте полезную информацию о кур
 #: cms/templates/settings.html
 msgid ""
 "Identify the course language here. This is used to assist users find courses"
-" that are taught in a specific language."
+" that are taught in a specific language. It is also used to localize the "
+"'From:' field in bulk emails."
 msgstr ""
-"Укажите здесь язык обучения на курсе.  Это поможет пользователям найти "
-"курсы, которые преподаются на определённом языке."
 
 #: cms/templates/settings.html
 msgid "Introducing Your Course"
@@ -22948,7 +23043,7 @@ msgid "Change visibility to:"
 msgstr ""
 
 #: cms/templates/visibility_editor.html
-msgid "Choose one"
+msgid "Select a group type"
 msgstr ""
 
 #: cms/templates/visibility_editor.html
