@@ -44,7 +44,6 @@
     "%(num_students)s student opened Subsection": [
       "%(num_students)s \u4e2a\u5b66\u751f\u5df2\u6253\u5f00\u5206\u9879"
     ], 
-    "%(post_type)s posted %(time_ago)s by %(author)s": "\u7531%(author)s\u53d1\u8868\u4e8e%(time_ago)s\u7684%(post_type)s", 
     "%(team_count)s Team": [
       "%(team_count)s \u4e2a\u56e2\u961f"
     ], 
@@ -1177,7 +1176,6 @@
     "Video position": "\u89c6\u9891\u4f4d\u7f6e", 
     "Video speed: ": "\u89c6\u9891\u64ad\u653e\u901f\u5ea6:", 
     "Video transcript": "\u89c6\u9891\u5b57\u5e55", 
-    "VideoPlayer: Element corresponding to the given selector was not found.": "\u89c6\u9891\u64ad\u653e\u5668\uff1a\u672a\u627e\u5230\u4e0e\u7ed9\u5b9a\u9009\u62e9\u5bf9\u5e94\u7684\u5143\u7d20\u3002", 
     "View": "\u89c6\u56fe", 
     "View %(span_start)s %(team_name)s %(span_end)s": "\u67e5\u770b%(span_start)s %(team_name)s %(span_end)s", 
     "View Cohort": "\u67e5\u770b\u7fa4\u7ec4", 
