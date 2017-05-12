@@ -58,7 +58,7 @@ class Command(BaseCommand):
         for uuid in uuids:
             try:
                 logger.info('Requesting details for program {uuid}.'.format(uuid=uuid))
-                program = client.programs(uuid).get()
+                program = client.programs(uuid).get(exclude_utm=1)
 
                 cache_key = PROGRAM_CACHE_KEY_TPL.format(uuid=uuid)
                 programs[cache_key] = program
