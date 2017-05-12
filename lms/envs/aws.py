@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """
 This is the default template for our main set of AWS servers. This does NOT
 cover the content machines, which use content.py
@@ -956,3 +958,6 @@ ENTERPRISE_API_CACHE_TIMEOUT = ENV_TOKENS.get(
 # the service, and override the default parameters which are defined in common.py
 
 COURSES_API_CACHE_TIMEOUT = ENV_TOKENS.get('COURSES_API_CACHE_TIMEOUT', COURSES_API_CACHE_TIMEOUT)
+
+# Add an ICP license for serving content in China if your organization is registered to do so
+ICP_LICENSE = ENV_TOKENS.get('ICP_LICENSE', None)
