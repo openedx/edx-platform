@@ -509,7 +509,7 @@ urlpatterns += (
         r'^courses/{}/discussions/settings$'.format(
             settings.COURSE_KEY_PATTERN,
         ),
-        'openedx.core.djangoapps.course_groups.views.course_discussions_settings_handler',
+        'lms.djangoapps.discussion.views.course_discussions_settings_handler',
         name='course_discussions_settings',
     ),
 
@@ -560,7 +560,7 @@ urlpatterns += (
         r'^courses/{}/discussion/topics$'.format(
             settings.COURSE_KEY_PATTERN,
         ),
-        'openedx.core.djangoapps.course_groups.views.discussion_topics',
+        'lms.djangoapps.discussion.views.discussion_topics',
         name='discussion_topics',
     ),
     url(

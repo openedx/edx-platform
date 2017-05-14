@@ -63,25 +63,10 @@ class CourseCohortSettingsFactory(DjangoModelFactory):
     always_cohort_inline_discussions = False
 
 
-def topic_name_to_id(course, name):
-    """
-    Given a discussion topic name, return an id for that name (includes
-    course and url_name).
-    """
-    return "{course}_{run}_{name}".format(
-        course=course.location.course,
-        run=course.url_name,
-        name=name
-    )
-
-
 def config_course_cohorts_legacy(
         course,
-        discussions,
         cohorted,
-        cohorted_discussions=None,
-        auto_cohort_groups=None,
-        always_cohort_inline_discussions=None
+        auto_cohort_groups=None
 ):
     """
     Given a course with no discussion set up, add the discussions and set
@@ -93,38 +78,18 @@ def config_course_cohorts_legacy(
 
     Arguments:
         course: CourseDescriptor
-        discussions: list of topic names strings.  Picks ids and sort_keys
-            automatically.
         cohorted: bool.
-        cohorted_discussions: optional list of topic names.  If specified,
-            converts them to use the same ids as topic names.
         auto_cohort_groups: optional list of strings
                   (names of groups to put students into).
 
     Returns:
         Nothing -- modifies course in place.
     """
-    def to_id(name):
-        """
-        Helper method to convert a discussion topic name to a database identifier
-        """
-        return topic_name_to_id(course, name)
-
-    topics = dict((name, {"sort_key": "A",
-                          "id": to_id(name)})
-                  for name in discussions)
-
-    course.discussion_topics = topics
+    course.discussion_topics = {}
 
     config = {"cohorted": cohorted}
-    if cohorted_discussions is not None:
-        config["cohorted_discussions"] = [to_id(name)
-                                          for name in cohorted_discussions]
     if auto_cohort_groups is not None:
         config["auto_cohort_groups"] = auto_cohort_groups
-
-    if always_cohort_inline_discussions is not None:
-        config["always_cohort_inline_discussions"] = always_cohort_inline_discussions
 
     course.cohort_config = config
 
@@ -136,52 +101,10 @@ def config_course_cohorts_legacy(
 
 
 # pylint: disable=dangerous-default-value
-def config_course_discussions(
-        course,
-        discussion_topics={},
-        divided_discussions=[],
-        always_divide_inline_discussions=False
-):
-        """
-        Set discussions and configure divided discussions for a course.
-
-        Arguments:
-            course: CourseDescriptor
-            discussion_topics (Dict): Discussion topic names. Picks ids and
-                sort_keys automatically.
-            divided_discussions: Discussion topics to divide. Converts the
-                list to use the same ids as discussion topic names.
-            always_divide_inline_discussions (bool): Whether inline discussions
-                should be divided by default.
-
-        Returns:
-            Nothing -- modifies course in place.
-        """
-
-        def to_id(name):
-            """Convert name to id."""
-            return topic_name_to_id(course, name)
-
-        set_course_discussion_settings(
-            course.id,
-            divided_discussions=[to_id(name) for name in divided_discussions],
-            always_divide_inline_discussions=always_divide_inline_discussions,
-            division_scheme=CourseDiscussionSettings.COHORT,
-        )
-
-        course.discussion_topics = dict((name, {"sort_key": "A", "id": to_id(name)})
-                                        for name in discussion_topics)
-        try:
-            # Not implemented for XMLModulestore, which is used by test_cohorts.
-            modulestore().update_item(course, ModuleStoreEnum.UserID.test)
-        except NotImplementedError:
-            pass
-
-
-# pylint: disable=dangerous-default-value
 def config_course_cohorts(
         course,
         is_cohorted,
+        discussion_division_scheme=CourseDiscussionSettings.COHORT,
         auto_cohorts=[],
         manual_cohorts=[],
 ):
@@ -191,6 +114,8 @@ def config_course_cohorts(
     Arguments:
         course: CourseDescriptor
         is_cohorted (bool): Is the course cohorted?
+        discussion_division_scheme (String): the division scheme for discussions. Default is
+            CourseDiscussionSettings.COHORT.
         auto_cohorts (list): Names of auto cohorts to create.
         manual_cohorts (list): Names of manual cohorts to create.
 
@@ -201,7 +126,7 @@ def config_course_cohorts(
     set_course_cohorted(course.id, is_cohorted)
     set_course_discussion_settings(
         course.id,
-        division_scheme=CourseDiscussionSettings.COHORT,
+        division_scheme=discussion_division_scheme,
     )
 
     for cohort_name in auto_cohorts:

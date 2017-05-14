@@ -860,6 +860,24 @@ def course_discussion_division_enabled(course_discussion_settings):
     return _get_course_division_scheme(course_discussion_settings) != CourseDiscussionSettings.NONE
 
 
+def available_division_schemes(course_key):
+    """
+    Returns a list of possible discussion division schemes for this course.
+    This takes into account if cohorts are enabled and if there are multiple
+    enrollment tracks. If no schemes are available, returns an empty list.
+    Args:
+        course_key: CourseKey
+
+    Returns: list of possible division schemes (for example, CourseDiscussionSettings.COHORT)
+    """
+    available_schemes = []
+    if is_course_cohorted(course_key):
+        available_schemes.append(CourseDiscussionSettings.COHORT)
+    if len(_get_enrollment_track_groups(course_key)) > 1:
+        available_schemes.append(CourseDiscussionSettings.ENROLLMENT_TRACK)
+    return available_schemes
+
+
 def _get_course_division_scheme(course_discussion_settings):
     division_scheme = course_discussion_settings.division_scheme
     if (
