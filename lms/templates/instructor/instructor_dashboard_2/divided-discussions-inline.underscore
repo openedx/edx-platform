@@ -6,17 +6,17 @@
             <div class="form-field">
                 <div class="inline-discussion-topics">
                     <h4 class="hd hd-4 subsection-title"><%- gettext('Content-Specific Discussion Topics') %></h4>
-                    <p><%- gettext('Specify whether content-specific discussion topics are divided by cohort.') %></p>
+                    <p><%- gettext('Specify whether content-specific discussion topics are divided.') %></p>
                     <div class="always_divide_inline_discussions">
                         <label>
                             <input type="radio" name="inline" class="check-all-inline-discussions" <%- alwaysDivideInlineDiscussions ? 'checked="checked"' : '' %>/>
-                            <span class="all-inline-discussions"><%- gettext('Always cohort content-specific discussion topics') %></span>
+                            <span class="all-inline-discussions"><%- gettext('Always divide content-specific discussion topics') %></span>
                         </label>
                     </div>
                     <div class="divide_inline_discussions">
                         <label>
                             <input type="radio" name="inline" class="check-cohort-inline-discussions" <%- alwaysDivideInlineDiscussions ? '' : 'checked="checked"' %>/>
-                            <span class="all-inline-discussions"><%- gettext('Cohort selected content-specific discussion topics') %></span>
+                            <span class="all-inline-discussions"><%- gettext('Divide the selected content-specific discussion topics') %></span>
                         </label>
                     </div>
                     <hr class="divider divider-lv1" />

@@ -99,7 +99,7 @@ class BaseDividedDiscussionTest(UniqueCourseTest, CohortTestMixin):
         Verify that the save confirmation message for the specified portion of the page is visible.
         """
         confirmation_message = self.discussion_management_page.get_divide_discussions_message(key=key)
-        self.assertEqual("Your changes have been saved.", confirmation_message)
+        self.assertIn("Your changes have been saved.", confirmation_message)
 
 
 @attr(shard=6)
