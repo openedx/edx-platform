@@ -1241,6 +1241,12 @@
 // --------------------
 .instructor-dashboard-wrapper-2 section.idash-section#discussions_management {
 
+  .division-scheme-container {
+    // See https://css-tricks.com/snippets/css/a-guide-to-flexbox/
+    display: flex;
+  }
+
+  // cohort management
   .form-submit {
     @include idashbutton($uxpl-blue-base);
     @include font-size(14);

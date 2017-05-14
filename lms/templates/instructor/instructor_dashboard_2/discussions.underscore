@@ -1,5 +1,24 @@
 <!-- Discussion Topics. -->
 <div class="discussions-nav" id="discussions-management" tabindex="-1">
-    <div class="course-wide-discussions-nav"></div>
-    <div class="inline-discussions-nav"></div>
+
+    <div class="hd hd-3 subsection-title"><%- gettext('Specify whether discussion topics are divided') %></div>
+    <div class="division-scheme-container">
+        <fieldset class="field-radio">
+            <% for (var i = 0; i < availableSchemes.length; i++) { %>
+            <label>
+                <input class="division-scheme" type="radio" name="division-scheme" id="<%- availableSchemes[i].key %>"
+                       value="<%- availableSchemes[i].key %>"
+                <% if (availableSchemes[i].selected) { %>
+                checked
+                <% } %>
+                >
+                <%- availableSchemes[i].displayName %></label>
+                <p class='field-message'><%- availableSchemes[i].descriptiveText %></p>
+            <% } %>
+        </fieldset>
+    </div>
+    <div class="topic-division-nav">
+        <div class="course-wide-discussions-nav"></div>
+        <div class="inline-discussions-nav"></div>
+    </div>
 </div>
