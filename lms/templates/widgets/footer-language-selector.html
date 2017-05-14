@@ -1,0 +1,55 @@
+## Language-selection widget for the footer.
+##
+## Expects a single argument, languages, which should be a list of Language objects containing
+## name and code properties.
+## Requires settings.LANGUAGE_COOKIE.
+##
+<%page expression_filter="h" args="languages"/>
+<%!
+  from django.conf import settings
+  from django.utils.translation import ugettext as _
+
+  from openedx.core.djangoapps.lang_pref import COOKIE_DURATION
+  from openedx.core.djangolib.js_utils import js_escaped_string
+
+  # Make sure LANGUAGE_COOKIE is present.
+  if not settings.LANGUAGE_COOKIE:
+      raise ValueError('settings.LANGUAGE_COOKIE is required to use footer-language-selector.')
+%>
+
+<div>
+    <label for="footer-language-selector">
+        <i class="fa fa-globe" aria-hidden="true"></i><span class="sr">${_("Choose Language")}</span>
+    </label>
+    <select id="footer-language-selector" onchange="setLanguage(this)">
+        % for language in languages:
+            % if language.code == LANGUAGE_CODE:
+                <option value="${language.code}" selected="selected">${language.name}</option>
+            % else:
+                <option value="${language.code}">${language.name}</option>
+            % endif
+        % endfor
+    </select>
+</div>
+
+<script type="text/javascript">
+  ##
+  ## Set the language cookie using the same settings as
+  ## https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/lang_pref/views.py#L26
+  ## and
+  ## https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/lang_pref/middleware.py#63
+  ##
+  function setLanguage($select) {
+      var cookie = '${settings.LANGUAGE_COOKIE | n, js_escaped_string}=' + $select.value + ';path=/';
+      % if settings.SESSION_COOKIE_DOMAIN:
+          cookie += ';domain=${settings.SESSION_COOKIE_DOMAIN | n, js_escaped_string}';
+      % endif
+      % if COOKIE_DURATION:
+          cookie += ';max-age=${COOKIE_DURATION | n, js_escaped_string}';
+      % endif
+
+      document.cookie = cookie;
+      window.location.reload();
+  }
+</script>
+

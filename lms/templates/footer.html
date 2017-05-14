@@ -28,6 +28,10 @@
         </ol>
       </nav>
 
+      % if language_selector_options:
+          <%include file="widgets/footer-language-selector.html" args="languages=language_selector_options"/>
+      % endif
+
       <div class="wrapper-logo">
         <p>
           <a href="/">

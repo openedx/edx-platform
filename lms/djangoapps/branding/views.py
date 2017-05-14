@@ -2,6 +2,7 @@
 import logging
 import urllib
 
+from babel import Locale
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.core.cache import cache
@@ -19,6 +20,7 @@ from edxmako.shortcuts import marketing_link
 from util.cache import cache_if_anonymous
 from util.json_request import JsonResponse
 import branding.api as branding_api
+from openedx.core.djangoapps.lang_pref.api import Language, released_languages
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 log = logging.getLogger(__name__)
@@ -121,12 +123,14 @@ def _footer_css_urls(request, package_name):
     ]
 
 
-def _render_footer_html(request, show_openedx_logo, include_dependencies):
+def _render_footer_html(request, show_openedx_logo, include_dependencies, language_selector_options):
     """Render the footer as HTML.
 
     Arguments:
         show_openedx_logo (bool): If True, include the OpenEdX logo in the rendered HTML.
         include_dependencies (bool): If True, include JavaScript and CSS dependencies.
+        language_selector_options (list): A list of Language objects to use to populate the language selector. If
+            empty, the language selector will be omitted.
 
     Returns: unicode
 
@@ -140,9 +144,45 @@ def _render_footer_html(request, show_openedx_logo, include_dependencies):
         'footer_css_urls': _footer_css_urls(request, css_name),
         'bidi': bidi,
         'include_dependencies': include_dependencies,
+        'language_selector_options': language_selector_options
     }
 
     return render_to_response("footer.html", context)
+
+
+def _parse_language_code(language_code):
+    """Parses the language code into a Language object.
+
+        Arguments:
+            language_code (str): A valid language code
+
+        Returns: Language
+    """
+    return Language(language_code, Locale.parse(language_code.replace('_', '-'), sep='-').language_name)
+
+
+def _parse_language_selector_options(language_selector_options):
+    """Parses the list of language_selector_options into Language objects containing the code and
+        display_name for each language.
+
+        Arguments:
+            language_selector_options (list): List of supported language codes to use with the language selector.
+
+        Returns: list
+    """
+    return [_parse_language_code(_code) for _code in language_selector_options]
+
+
+def _filter_language_selector_options(language_selector_options):
+    """Filters unsupported language codes from the list of language_selector_options.
+
+        Arguments:
+            language_selector_options (list): List of language codes to use with the language selector.
+
+        Returns: list
+    """
+    _released_languages = {_language.code for _language in released_languages()}
+    return [_code for _code in language_selector_options if _code in _released_languages]
 
 
 @cache_control(must_revalidate=True, max_age=settings.FOOTER_BROWSER_CACHE_MAX_AGE)
@@ -234,6 +274,13 @@ def footer(request):
         GET /api/branding/v1/footer?language=en
         Accepts: text/html
 
+
+    Example: Retrieving the footer with a language selector
+
+        GET /api/branding/v1/footer?language-selector=en,es-419
+        Accepts: text/html
+
+
     Example: Retrieving the footer with all JS and CSS dependencies (for testing)
 
         GET /api/branding/v1/footer?include-dependencies=1
@@ -256,6 +303,15 @@ def footer(request):
     # Override the language if necessary
     language = request.GET.get('language', translation.get_language())
 
+    # Include language selector if requested with at least one supported language.
+    language_selector_options = request.GET.get('language-selector', [])
+    if language_selector_options:
+        language_selector_options = sorted(
+            _parse_language_selector_options(
+                _filter_language_selector_options(language_selector_options.split(','))
+            )
+        )
+
     # Render the footer information based on the extension
     if 'text/html' in accepts or '*/*' in accepts:
         cache_key = u"branding.footer.{params}.html".format(
@@ -263,12 +319,15 @@ def footer(request):
                 'language': language,
                 'show_openedx_logo': show_openedx_logo,
                 'include_dependencies': include_dependencies,
+                'language_selector': ','.join([_language.code for _language in language_selector_options])
             })
         )
         content = cache.get(cache_key)
         if content is None:
             with translation.override(language):
-                content = _render_footer_html(request, show_openedx_logo, include_dependencies)
+                content = _render_footer_html(
+                    request, show_openedx_logo, include_dependencies, language_selector_options
+                )
                 cache.set(cache_key, content, settings.FOOTER_CACHE_TIMEOUT)
         return HttpResponse(content, status=200, content_type="text/html; charset=utf-8")
 
