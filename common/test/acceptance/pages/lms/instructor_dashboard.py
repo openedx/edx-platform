@@ -807,19 +807,19 @@ class DiscussionManagementSection(PageObject):
         Returns the ID of the selected discussion division scheme
         ("NOT_DIVIDED_SCHEME", "COHORT_SCHEME", or "ENROLLMENT_TRACK_SCHEME)".
         """
-        return self.q(css=self._bounded_selector('.division-scheme:checked')).first.attrs('id')[0]
+        return self.q(css=self._bounded_selector('.division-scheme:checked')).first.attrs('value')[0]
 
     def select_division_scheme(self, scheme):
         """
         Selects the radio button associated with the specified division scheme.
         """
-        self.q(css=self._bounded_selector("input#%s" % scheme)).first.click()
+        self.q(css=self._bounded_selector("input.%s" % scheme)).first.click()
 
     def division_scheme_visible(self, scheme):
         """
         Returns whether or not the specified scheme is visible as an option.
         """
-        return self.q(css=self._bounded_selector("input#%s" % scheme)).visible
+        return self.q(css=self._bounded_selector("input.%s" % scheme)).visible
 
 
 class MembershipPageAutoEnrollSection(PageObject):
