@@ -350,7 +350,6 @@ class TestCohorts(ModuleStoreTestCase):
         # This will have no effect on lms side as we are already done with migrations
         config_course_cohorts_legacy(
             course,
-            discussions=[],
             cohorted=True,
             auto_cohort_groups=["OtherGroup"]
         )
@@ -393,7 +392,6 @@ class TestCohorts(ModuleStoreTestCase):
         # This will have no effect on lms side as we are already done with migrations
         config_course_cohorts_legacy(
             course,
-            discussions=[],
             cohorted=True,
             auto_cohort_groups=["AutoGroup"]
         )

@@ -14,6 +14,7 @@ from edxmako import add_lookup
 
 from django_comment_client.tests.factories import RoleFactory
 from django_comment_client.tests.unicode import UnicodeTestMixin
+from django_comment_client.tests.utils import topic_name_to_id, config_course_discussions
 from django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
 import django_comment_client.utils as utils
 from lms.lib.comment_client.utils import perform_request, CommentClientMaintenanceError
@@ -26,7 +27,7 @@ from courseware.tests.factories import InstructorFactory
 from courseware.tabs import get_course_tab_list
 from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
-from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts, config_course_discussions, topic_name_to_id, CohortFactory
+from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts, CohortFactory
 from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentFactory
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
@@ -1489,7 +1490,7 @@ class GroupIdForUserTestCase(ModuleStoreTestCase):
 
 @attr(shard=1)
 class CourseDiscussionDivisionEnabledTestCase(ModuleStoreTestCase):
-    """ Test the course_discussion_division_enabled method. """
+    """ Test the course_discussion_division_enabled and available_division_schemes methods. """
 
     def setUp(self):
         super(CourseDiscussionDivisionEnabledTestCase, self).setUp()
@@ -1504,6 +1505,7 @@ class CourseDiscussionDivisionEnabledTestCase(ModuleStoreTestCase):
     def test_discussion_division_disabled(self):
         course_discussion_settings = get_course_discussion_settings(self.course.id)
         self.assertFalse(utils.course_discussion_division_enabled(course_discussion_settings))
+        self.assertEqual([], utils.available_division_schemes(self.course.id))
 
     def test_discussion_division_by_cohort(self):
         set_discussion_division_settings(
@@ -1511,11 +1513,13 @@ class CourseDiscussionDivisionEnabledTestCase(ModuleStoreTestCase):
         )
         # Because cohorts are disabled, discussion division is not enabled.
         self.assertFalse(utils.course_discussion_division_enabled(get_course_discussion_settings(self.course.id)))
+        self.assertEqual([], utils.available_division_schemes(self.course.id))
         # Now enable cohorts, which will cause discussions to be divided.
         set_discussion_division_settings(
             self.course.id, enable_cohorts=True, division_scheme=CourseDiscussionSettings.COHORT
         )
         self.assertTrue(utils.course_discussion_division_enabled(get_course_discussion_settings(self.course.id)))
+        self.assertEqual([CourseDiscussionSettings.COHORT], utils.available_division_schemes(self.course.id))
 
     def test_discussion_division_by_enrollment_track(self):
         set_discussion_division_settings(
@@ -1523,10 +1527,12 @@ class CourseDiscussionDivisionEnabledTestCase(ModuleStoreTestCase):
         )
         # Only a single enrollment track exists, so discussion division is not enabled.
         self.assertFalse(utils.course_discussion_division_enabled(get_course_discussion_settings(self.course.id)))
+        self.assertEqual([], utils.available_division_schemes(self.course.id))
 
         # Now create a second CourseMode, which will cause discussions to be divided.
         CourseModeFactory.create(course_id=self.course.id, mode_slug=CourseMode.VERIFIED)
         self.assertTrue(utils.course_discussion_division_enabled(get_course_discussion_settings(self.course.id)))
+        self.assertEqual([CourseDiscussionSettings.ENROLLMENT_TRACK], utils.available_division_schemes(self.course.id))
 
 
 @attr(shard=1)
