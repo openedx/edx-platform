@@ -87,30 +87,20 @@ def handle_item_deleted(**kwargs):
             gating_api.set_required_content(course_key, module.location, None, None)
 
 
-@receiver(SignalHandler.grading_policy_change)
-def listen_for_grading_policy_change(sender, course_key, **kwargs):  # pylint: disable=unused-argument
+@receiver(GRADING_POLICY_CHANGED)
+def listen_for_grading_policy_change(sender, course_key, user_id, **kwargs):  # pylint: disable=unused-argument
     """
     Receives signal and kicks off celery task to recalculate grades
     """
     if sender is CourseGradingModel:
-        subsection = kwargs.get('subsection', None)
-        if subsection is None:
-            pass
-            """
-            Future home of recompute grades for course subsection
+        pass
+        """
+        Future home of recompute grades for entire course
 
-            compute_grades_for_course.apply_async(
-                course_key=course_key,
-            )
-            """
-        else:
-            """
-            Future home of recompute grades for entire course
-
-            compute_grades_for_course.apply_async(
-                course_key=course_key,
-            )
-            """
+        compute_grades_for_course.apply_async(
+            course_key=course_key,
+        )
+        """
     else:
         """
         This tests the signal end-to-end without firing the regrade task
