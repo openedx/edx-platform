@@ -227,6 +227,7 @@ def inline_discussion(request, course_key, discussion_id):
         'is_commentable_divided': is_commentable_divided(course_key, discussion_id),
         'discussion_data': threads,
         'user_info': user_info,
+        'user_group_id': get_group_id_for_user(request.user, course.id),
         'annotated_content_info': annotated_content_info,
         'page': query_params['page'],
         'num_pages': query_params['num_pages'],

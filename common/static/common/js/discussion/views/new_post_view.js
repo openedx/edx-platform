@@ -42,6 +42,7 @@
                 }
                 this.course_settings = options.course_settings;
                 this.is_commentable_divided = options.is_commentable_divided;
+                this.user_group_id = options.user_group_id;
                 this.topicId = options.topicId;
                 this.discussionBoardView = options.discussionBoardView;
             };
@@ -53,6 +54,7 @@
                 _.extend(context, {
                     group_options: this.getGroupOptions(),
                     is_commentable_divided: this.is_commentable_divided,
+                    is_cohorted: this.course_settings.get('is_cohorted'),
                     mode: this.mode,
                     startHeader: this.startHeader,
                     form_id: this.mode + (this.topicId ? '-' + this.topicId : '')
@@ -68,10 +70,17 @@
                 if (this.isTabMode()) {
                     this.topicView = new DiscussionTopicMenuView({
                         topicId: this.topicId,
-                        course_settings: this.course_settings
+                        course_settings: this.course_settings,
+                        group_name: this.getGroupName()
                     });
-                    this.topicView.on('thread:topic_change', this.toggleGroupDropdown);
+                    this.topicView.on('thread:topic_change', this.toggleGroupDropDown);
+                    if (this.course_settings.get('is_cohorted')) {
+                        this.topicView.on('thread:topic_change', this.updateVisibilityMessage);
+                    }
                     this.addField(this.topicView.render());
+                } else {
+                    this.group_name = this.getGroupName();
+                    this.updateVisibilityMessage(null, this.is_commentable_divided);
                 }
                 return DiscussionUtil.makeWmdEditor(this.$el, $.proxy(this.$, this), 'js-post-body');
             };
@@ -100,6 +109,26 @@
                 }
             };
 
+            NewPostView.prototype.getGroupName = function() {
+                var userGroupId;
+                var cohort;
+                var group_name = null;
+                if (this.course_settings.get('is_cohorted')) {
+                    userGroupId = $('#discussion-container').data('user-group-id');
+                    if (!userGroupId) {
+                        userGroupId = this.user_group_id;
+                    }
+                    cohort = this.course_settings.get('cohorts').find(function(cohort) {
+                        return cohort.id == userGroupId;
+                    });
+                    if (cohort) {
+                        group_name = cohort.name;
+                    }
+                }
+
+                return group_name;
+            };
+
             NewPostView.prototype.events = {
                 'keypress .forum-new-post-form input:not(.wmd-input)': function(event) {
                     return DiscussionUtil.ignoreEnterKey(event);
@@ -119,6 +148,17 @@
                     $('.js-group-select').val('').prop('disabled', true);
                     return $('.group-selector-wrapper').addClass('disabled');
                 }
+            };
+
+            NewPostView.prototype.updateVisibilityMessage = function($target, force_cohorted) {
+                var visEl = $('.group-visibility .field-label-text');
+                var visTemplate = edx.HtmlUtils.template($('#new-post-visibility-template').html());
+                var group_name = null;
+                if (($target && $target.data('cohorted')) || force_cohorted) {
+                    group_name = this.group_name;
+                }
+
+                edx.HtmlUtils.setHtml(visEl, visTemplate({group_name: group_name}));
             };
 
             NewPostView.prototype.postOptionChange = function(event) {
