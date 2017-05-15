@@ -32,8 +32,13 @@ def get_initial_sass_variables():
 
 
 def get_branding_values_from_file():
-    from openedx.core.djangoapps.theming.helpers import get_current_theme
-    theme = get_current_theme()
+    from openedx.core.djangoapps.theming.helpers import get_theme_base_dir, Theme
+    site_theme = SiteTheme(site=Site.objects.get(id=settings.SITE_ID), theme_dir_name=settings.DEFAULT_SITE_THEME)
+    theme = Theme(
+        name=site_theme.theme_dir_name,
+        theme_dir_name=site_theme.theme_dir_name,
+        themes_base_dir=get_theme_base_dir(site_theme.theme_dir_name)
+    )
     if theme:
         sass_var_file = os.path.join(theme.customer_specific_path, 'static',
                                      'sass', 'base', '_branding-basics.scss')
