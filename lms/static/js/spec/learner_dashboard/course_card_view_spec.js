@@ -145,6 +145,26 @@ define([
             expect(view.$('.course-certificate .certificate-status').length).toEqual(0);
         });
 
+        it('should allow enrollment in future runs when the user has an expired enrollment', function() {
+            var newRun = $.extend({}, course.course_runs[0]),
+                newRunKey = 'course-v1:foo+bar+baz',
+                advertisedStart = 'Summer';
+
+            newRun.key = newRunKey;
+            newRun.is_enrolled = false;
+            newRun.advertised_start = advertisedStart;
+            course.course_runs.push(newRun);
+
+            course.expired = true;
+
+            setupView(course, true);
+
+            expect(courseCardModel.get('course_run_key')).toEqual(newRunKey);
+            expect(view.$('.course-details .course-text .run-period').html()).toEqual(
+                advertisedStart + ' - ' + endDate
+            );
+        });
+
         it('should show a message if an there is an upcoming course run', function() {
             course.course_runs[0].is_enrollment_open = false;
 
