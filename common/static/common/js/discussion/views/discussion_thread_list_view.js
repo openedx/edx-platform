@@ -213,6 +213,10 @@
                 return this;
             };
 
+            DiscussionThreadListView.prototype.convertMath = function() {
+                DiscussionUtil.convertMath(this.$('.thread-preview-body'));
+            };
+
             DiscussionThreadListView.prototype.renderThreads = function() {
                 var $content, thread, i, len;
                 this.$('.forum-nav-thread-list').empty();
@@ -220,7 +224,9 @@
                     thread = this.displayedCollection.models[i];
                     $content = this.renderThread(thread);
                     this.$('.forum-nav-thread-list').append($content);
+
                 }
+                this.convertMath();
                 this.showMetadataAccordingToSort();
                 this.renderMorePages();
                 if (this.hideRefineBar) {
