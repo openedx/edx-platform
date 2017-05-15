@@ -122,6 +122,9 @@ class CourseMode(models.Model):
     DEFAULT_MODE = Mode(AUDIT, _('Audit'), 0, '', 'usd', None, None, None, None)
     DEFAULT_MODE_SLUG = AUDIT
 
+    # Modes utilized for audit/free enrollments
+    AUDIT_MODES = [AUDIT, HONOR]
+
     # Modes that allow a student to pursue a verified certificate
     VERIFIED_MODES = [VERIFIED, PROFESSIONAL]
 
