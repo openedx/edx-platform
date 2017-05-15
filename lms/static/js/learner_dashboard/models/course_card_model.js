@@ -14,18 +14,18 @@
                 initialize: function(data) {
                     if (data) {
                         this.context = data;
-                        this.setActiveCourseRun(this.getCourseRun(data.course_runs), data.user_preferences);
+                        this.setActiveCourseRun(this.getCourseRun(data), data.user_preferences);
                     }
                 },
 
-                getCourseRun: function(courseRuns) {
-                    var enrolledCourseRun = _.findWhere(courseRuns, {is_enrolled: true}),
+                getCourseRun: function(course) {
+                    var enrolledCourseRun = _.findWhere(course.course_runs, {is_enrolled: true}),
                         openEnrollmentCourseRuns = this.getEnrollableCourseRuns(),
                         desiredCourseRun;
 
-                    // We populate our model by looking at the course runs.
-                    if (enrolledCourseRun) {
-                        // If the learner is already enrolled in a course run, return that one.
+                    // If the learner has an existing, unexpired enrollment,
+                    // use it to populate the model.
+                    if (enrolledCourseRun && !course.expired) {
                         desiredCourseRun = enrolledCourseRun;
                     } else if (openEnrollmentCourseRuns.length > 0) {
                         if (openEnrollmentCourseRuns.length === 1) {
@@ -34,7 +34,7 @@
                             desiredCourseRun = this.getUnselectedCourseRun(openEnrollmentCourseRuns);
                         }
                     } else {
-                        desiredCourseRun = this.getUnselectedCourseRun(courseRuns);
+                        desiredCourseRun = this.getUnselectedCourseRun(course.course_runs);
                     }
 
                     return desiredCourseRun;
