@@ -357,6 +357,43 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
             [s.email for s in self.students]
         )
 
+    def test_send_to_track_other_enrollments(self):
+        """
+        Failing test for EDUCATOR-217: verifies that emails are only sent to
+        users in a specific track if they're in that track in the course the
+        email is being sent from.
+        """
+        # Create a mode and designate an enrolled user to be placed in that mode
+        CourseMode.objects.create(mode_slug='test_mode', course_id=self.course.id)
+        test_mode_student = self.students[0]
+        update_enrollment(test_mode_student, unicode(self.course.id), 'test_mode')
+
+        # Take another user already enrolled in the course, then enroll them in
+        # another course but in that same test mode
+        test_mode_student_other_course = self.students[1]
+        other_course = CourseFactory.create()
+        CourseMode.objects.create(mode_slug='test_mode', course_id=other_course.id)
+        CourseEnrollmentFactory.create(
+            user=test_mode_student_other_course,
+            course_id=other_course.id
+        )
+        update_enrollment(test_mode_student_other_course, unicode(other_course.id), 'test_mode')
+
+        # Send the emails...
+        test_email = {
+            'action': 'Send email',
+            'send_to': '["track:test_mode"]',
+            'subject': 'test subject for test_mode track',
+            'message': 'test message for test_mode track',
+        }
+        response = self.client.post(self.send_mail_url, test_email)
+        self.assertEquals(json.loads(response.content), self.success_content)
+
+        # Only the the student in the test mode in the course the email was
+        # sent from should receive an email
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].to[0], test_mode_student.email)
+
     def test_send_to_all(self):
         """
         Make sure email send to all goes there.
