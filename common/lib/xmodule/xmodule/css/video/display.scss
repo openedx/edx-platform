@@ -201,9 +201,9 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
     }
 
     .closed-captions {
+      @include left(5%);
       position: absolute;
       width: 85%;
-      left: 5%;
       top: 70%;
       text-align: center;
     }
@@ -259,6 +259,7 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
       object,
       iframe,
       video {
+        @include left(0);
         display: block;
         border: none;
         width: 100%;
