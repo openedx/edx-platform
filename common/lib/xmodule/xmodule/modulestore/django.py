@@ -187,12 +187,6 @@ class SignalHandler(object):
         in [pre_publish, course_published, course_deleted, library_updated, item_deleted, grading_policy_change]
     }
 
-    _mapping = {
-        signal.name: signal
-        for signal
-        in [pre_publish, course_published, course_deleted, library_updated, item_deleted, grading_policy_change]
-    }
-
     def __init__(self, modulestore_class):
         self.modulestore_class = modulestore_class
 
