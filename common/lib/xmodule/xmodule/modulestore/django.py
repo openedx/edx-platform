@@ -187,7 +187,6 @@ class SignalHandler(object):
         in [pre_publish, course_published, course_deleted, library_updated, item_deleted, grading_policy_change]
     }
 
-
     _mapping = {
         signal.name: signal
         for signal
