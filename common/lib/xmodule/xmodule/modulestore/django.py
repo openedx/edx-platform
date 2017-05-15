@@ -176,7 +176,7 @@ class SignalHandler(object):
     course_deleted = SwitchedSignal("course_deleted", providing_args=["course_key"])
     library_updated = SwitchedSignal("library_updated", providing_args=["library_key"])
     item_deleted = SwitchedSignal("item_deleted", providing_args=["usage_key", "user_id"])
-    grading_policy_change = SwitchedSignal("grading_policy_change", providing_args = ["course_key"])
+    grading_policy_change = SwitchedSignal("grading_policy_change", providing_args=["course_key", "user_id"])
 
     _mapping = {
         signal.name: signal
