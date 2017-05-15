@@ -42,8 +42,8 @@ from xmodule.modulestore.django import modulestore
 from xmodule.x_module import STUDENT_VIEW
 from web_fragments.fragment import Fragment
 
-from ..access import has_access, _adjust_start_date_for_beta_testers
-from ..access_utils import in_preview_mode
+from ..access import has_access
+from ..access_utils import in_preview_mode, is_course_open_for_learner
 from ..courses import get_current_child, get_studio_url, get_course_with_access
 from ..entrance_exams import (
     course_has_entrance_exam,
@@ -359,12 +359,11 @@ class CoursewareIndex(View):
         self._add_entrance_exam_to_context(courseware_context)
 
         # staff masquerading data
-        now = datetime.now(UTC())
-        effective_start = _adjust_start_date_for_beta_testers(self.effective_user, self.course, self.course_key)
-        if not in_preview_mode() and self.is_staff and now < effective_start:
+        if not is_course_open_for_learner(self.effective_user, self.course):
             # Disable student view button if user is staff and
             # course is not yet visible to students.
             courseware_context['disable_student_access'] = True
+            courseware_context['supports_preview_menu'] = False
 
         if self.section:
             # chromeless data
