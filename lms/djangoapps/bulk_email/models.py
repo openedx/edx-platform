@@ -107,11 +107,12 @@ class Target(models.Model):
         staff_qset = CourseStaffRole(course_id).users_with_role()
         instructor_qset = CourseInstructorRole(course_id).users_with_role()
         staff_instructor_qset = (staff_qset | instructor_qset)
-        enrollment_qset = User.objects.filter(
+        enrollment_query = models.Q(
             is_active=True,
             courseenrollment__course_id=course_id,
             courseenrollment__is_active=True
         )
+        enrollment_qset = User.objects.filter(enrollment_query)
         if self.target_type == SEND_TO_MYSELF:
             if user_id is None:
                 raise ValueError("Must define self user to send email to self.")
@@ -120,13 +121,16 @@ class Target(models.Model):
         elif self.target_type == SEND_TO_STAFF:
             return use_read_replica_if_available(staff_instructor_qset)
         elif self.target_type == SEND_TO_LEARNERS:
-            return use_read_replica_if_available(enrollment_qset.exclude(id__in=staff_instructor_qset))
+            return use_read_replica_if_available(
+                enrollment_qset.exclude(id__in=staff_instructor_qset)
+            )
         elif self.target_type == SEND_TO_COHORT:
             return self.cohorttarget.cohort.users.filter(id__in=enrollment_qset)  # pylint: disable=no-member
         elif self.target_type == SEND_TO_TRACK:
             return use_read_replica_if_available(
-                enrollment_qset.filter(
-                    courseenrollment__mode=self.coursemodetarget.track.mode_slug
+                User.objects.filter(
+                    models.Q(courseenrollment__mode=self.coursemodetarget.track.mode_slug)
+                    & enrollment_query
                 )
             )
         else:
