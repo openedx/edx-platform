@@ -2523,6 +2523,7 @@ def send_email(request, course_id):
     course_id = CourseKey.from_string(course_id)
 
     if not BulkEmailFlag.feature_enabled(course_id):
+        log.warning(u'Email is not enabled for course %s', course_id)
         return HttpResponseForbidden("Email is not enabled for this course.")
 
     targets = json.loads(request.POST.get("send_to"))
@@ -2564,6 +2565,8 @@ def send_email(request, course_id):
             from_addr=from_addr
         )
     except ValueError as err:
+        log.exception(u'Cannot create course email for course %s requested by user %s for targets %s',
+                      course_id, request.user, targets)
         return HttpResponseBadRequest(repr(err))
 
     # Submit the task, so that the correct InstructorTask object gets created (for monitoring purposes)
