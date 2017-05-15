@@ -51,6 +51,7 @@
     "pa11y": "4.0.1",
     "pa11y-reporter-json-oldnode": "1.0.0",
     "plato": "1.2.2",
+    "rtlcss": "^2.1.2",
     "sinon": "^1.17.7",
     "squirejs": "^0.1.0"
   }
