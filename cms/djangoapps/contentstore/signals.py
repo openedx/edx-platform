@@ -24,7 +24,6 @@ GRADING_POLICY_CHANGED = Signal(
     providing_args=[
         'user_id',  # Integer User ID
         'course_id',  # Unicode string representing the course
-        'modified'  # A datetime indicating when the signal was fired
     ]
 )
 
