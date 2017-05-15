@@ -364,6 +364,9 @@ simplefilter('ignore')
 MIDDLEWARE_CLASSES = (
     'crum.CurrentRequestUserMiddleware',
     'request_cache.middleware.RequestCache',
+
+    'openedx.core.djangoapps.monitoring_utils.middleware.MonitoringMemoryMiddleware',
+
     'openedx.core.djangoapps.header_control.middleware.HeaderControlMiddleware',
     'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
