@@ -62,7 +62,8 @@ class EnterpriseServiceMockMixin(object):
             catalog_id=1,
             entitlement_id=1,
             learner_id=1,
-            enterprise_customer_uuid='cf246b88-d5f6-4908-a522-fc307e0b0c59'
+            enterprise_customer_uuid='cf246b88-d5f6-4908-a522-fc307e0b0c59',
+            enable_audit_enrollment=False,
     ):
         """
         Helper function to register enterprise learner API endpoint.
@@ -85,6 +86,7 @@ class EnterpriseServiceMockMixin(object):
                         },
                         'enable_data_sharing_consent': True,
                         'enforce_data_sharing_consent': 'at_login',
+                        'enable_audit_enrollment': enable_audit_enrollment,
                         'enterprise_customer_users': [
                             1
                         ],

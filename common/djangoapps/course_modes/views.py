@@ -156,16 +156,17 @@ class ChooseModeView(View):
         )
         enterprise_learner_data = enterprise_api.get_enterprise_learner_data(site=request.site, user=request.user)
         if enterprise_learner_data:
+            enterprise_learner = enterprise_learner_data[0]
             is_course_in_enterprise_catalog = enterprise_api.is_course_in_enterprise_catalog(
                 site=request.site,
                 course_id=course_id,
-                enterprise_catalog_id=enterprise_learner_data[0]['enterprise_customer']['catalog']
+                enterprise_catalog_id=enterprise_learner['enterprise_customer']['catalog']
             )
 
             if is_course_in_enterprise_catalog:
                 partner_names = partner_name = course.display_organization \
                     if course.display_organization else course.org
-                enterprise_name = enterprise_learner_data[0]['enterprise_customer']['name']
+                enterprise_name = enterprise_learner['enterprise_customer']['name']
                 organizations = organization_api.get_course_organizations(course_id=course.id)
                 if organizations:
                     partner_names = ' and '.join([org.get('name', partner_name) for org in organizations])
@@ -178,6 +179,12 @@ class ChooseModeView(View):
                     partner_names=partner_names,
                     enterprise_name=enterprise_name
                 )
+
+                # Hide the audit modes for this enterprise customer, if necessary
+                if not enterprise_learner['enterprise_customer'].get('enable_audit_enrollment'):
+                    for audit_mode in CourseMode.AUDIT_MODES:
+                        modes.pop(audit_mode, None)
+
         context["title_content"] = title_content
 
         if "verified" in modes:
