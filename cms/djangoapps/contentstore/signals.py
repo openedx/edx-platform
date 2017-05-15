@@ -9,6 +9,7 @@ from django.dispatch import receiver
 from xmodule.modulestore.django import modulestore, SignalHandler
 from contentstore.courseware_index import CoursewareSearchIndexer, LibrarySearchIndexer
 from contentstore.proctoring import register_special_exams
+from lms.djangoapps.grades.tasks import compute_grades_for_course
 from openedx.core.djangoapps.credit.signals import on_course_publish
 from openedx.core.lib.gating import api as gating_api
 from util.module_utils import yield_dynamic_descriptor_descendants
@@ -85,3 +86,13 @@ def handle_item_deleted(**kwargs):
             gating_api.remove_prerequisite(module.location)
             # Remove any 'requires' course content milestone relationships
             gating_api.set_required_content(course_key, module.location, None, None)
+
+
+@receiver(SignalHandler.grading_policy_change)
+def listen_for_grading_policy_change(sender, course_key, **kwargs):  # pylint: disable=unused-argument
+    """
+    Receives signal and kicks off celery task to recalculate grades
+    """
+    compute_grades_for_course.apply_async(
+        course_key=course_key,
+    )
