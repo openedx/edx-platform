@@ -117,24 +117,24 @@
   .date-summary {
     @include clearfix;
     padding: 10px;
-    @include border-left(3px solid $gray-l3);
+    @include border-left(3px solid $lms-gray);
 
     .heading {
       @extend %t-title7;
-      color: $gray-d2;
+      color: $lms-gray;
     }
 
     .description {
       margin-top: $baseline/2;
       margin-bottom: $baseline/2;
       display: inline-block;
-      color: $gray-d1;
+      color: $lms-gray;
       @extend %t-title8;
     }
 
     .date-summary-link {
       @extend %t-title8;
-      font-weight: $font-semibold;
+      font-weight: 600;
       a {
         color: $link-color;
         font-weight: normal;
@@ -142,7 +142,7 @@
     }
 
     .date {
-      color: $gray-d1;
+      color: $lms-gray;
       @extend %t-title9;
     }
 
