@@ -2,7 +2,7 @@
 Middleware for handling the storage, aggregation, and reporting of custom
 metrics for monitoring.
 
-At this time, the custom metrics can only reported to New Relic.
+At this time, the custom metrics can only be reported to New Relic.
 
 This middleware will only call on the newrelic agent if there are any metrics
 to report for this request, so it will not incur any processing overhead for
@@ -19,8 +19,11 @@ except ImportError:
 
 import psutil
 import request_cache
+from openedx.core.djangolib.waffle_utils import WaffleSwitchPlus
+
 
 REQUEST_CACHE_KEY = 'monitoring_custom_metrics'
+WAFFLE_NAMESPACE = 'monitoring_utils'
 
 
 class MonitoringCustomMetrics(object):
@@ -82,15 +85,17 @@ class MonitoringMemoryMiddleware(object):
     memory_data_key = u'memory_data'
 
     def process_request(self, request):
-        log_prefix = self._log_prefix(u"Before", request)
-        self._cache[self.memory_data_key] = self._memory_data(log_prefix)
+        if self._is_enabled():
+            log_prefix = self._log_prefix(u"Before", request)
+            self._cache[self.memory_data_key] = self._memory_data(log_prefix)
 
     def process_response(self, request, response):
-        log_prefix = self._log_prefix(u"After", request)
-        new_memory_data = self._memory_data(log_prefix)
+        if self._is_enabled():
+            log_prefix = self._log_prefix(u"After", request)
+            new_memory_data = self._memory_data(log_prefix)
 
-        log_prefix = self._log_prefix(u"Diff", request)
-        self._diff_memory_data(log_prefix, new_memory_data, self._cache.get(self.memory_data_key))
+            log_prefix = self._log_prefix(u"Diff", request)
+            self._log_diff_memory_data(log_prefix, new_memory_data, self._cache.get(self.memory_data_key))
         return response
 
     @property
@@ -153,3 +158,9 @@ class MonitoringMemoryMiddleware(object):
                 _process_rss(new_memory_data) - _process_rss(old_memory_data),
                 _process_vms(new_memory_data) - _process_vms(old_memory_data),
             )
+
+    def _is_enabled(self):
+        """
+        Returns whether this middleware is enabled.
+        """
+        return WaffleSwitchPlus(namespace=WAFFLE_NAMESPACE).is_enabled(u'enable_memory_middleware')
