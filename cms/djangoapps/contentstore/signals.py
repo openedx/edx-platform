@@ -9,10 +9,10 @@ from django.dispatch import receiver
 from xmodule.modulestore.django import modulestore, SignalHandler
 from contentstore.courseware_index import CoursewareSearchIndexer, LibrarySearchIndexer
 from contentstore.proctoring import register_special_exams
+from models.settings.course_grading import CourseGradingModel
 from openedx.core.djangoapps.credit.signals import on_course_publish
 from openedx.core.lib.gating import api as gating_api
 from util.module_utils import yield_dynamic_descriptor_descendants
-
 
 log = logging.getLogger(__name__)
 
@@ -95,15 +95,24 @@ def listen_for_grading_policy_change(sender, course_key, **kwargs):  # pylint: d
     if sender is CourseGradingModel:
         subsection = kwargs.get('subsection', None)
         if subsection is None:
+            pass
+            """
+            Future home of recompute grades for course subsection
+
             compute_grades_for_course.apply_async(
                 course_key=course_key,
             )
+            """
         else:
+            """
+            Future home of recompute grades for entire course
+
             compute_grades_for_course.apply_async(
                 course_key=course_key,
             )
+            """
     else:
         """
-        This tests the signal
+        This tests the signal end-to-end without firing the regrade task
         """
         course_key.course_run = '2020_Q1'
