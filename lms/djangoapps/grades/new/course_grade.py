@@ -147,7 +147,7 @@ class CourseGrade(object):
 
         return grade_summary
 
-    def compute_and_update(self, read_only=False, fire_signal=True):
+    def compute_and_update(self, read_only=False):
         """
         Computes the grade for the given student and course.
 
@@ -172,8 +172,8 @@ class CourseGrade(object):
                 letter_grade=self.letter_grade or "",
                 passed=self.passed,
             )
-        if fire_signal:
-            self._signal_listeners_when_grade_computed()
+
+        self._signal_listeners_when_grade_computed()
         self._log_event(
             log.warning,
             u"compute_and_update, read_only: {0}, subsections read/created: {1}/{2}, blocks accessed: {3}, total "
@@ -329,7 +329,7 @@ class CourseGradeFactory(object):
     """
     Factory class to create Course Grade objects
     """
-    def create(self, student, course, read_only=True, fire_signal=True):
+    def create(self, student, course, read_only=True):
         """
         Returns the CourseGrade object for the given student and course.
 
@@ -342,7 +342,7 @@ class CourseGradeFactory(object):
             raise PermissionDenied("User does not have access to this course")
         return (
             self._get_saved_grade(student, course, course_structure) or
-            self._compute_and_update_grade(student, course, course_structure, read_only, fire_signal)
+            self._compute_and_update_grade(student, course, course_structure, read_only)
         )
 
     GradeResult = namedtuple('GradeResult', ['student', 'course_grade', 'err_msg'])
@@ -405,14 +405,14 @@ class CourseGradeFactory(object):
             course_structure
         )
 
-    def _compute_and_update_grade(self, student, course, course_structure, read_only=False, fire_signal=True):
+    def _compute_and_update_grade(self, student, course, course_structure, read_only=False):
         """
         Freshly computes and updates the grade for the student and course.
 
         If read_only is True, doesn't save any updates to the grades.
         """
         course_grade = CourseGrade(student, course, course_structure)
-        course_grade.compute_and_update(read_only, fire_signal)
+        course_grade.compute_and_update(read_only)
         return course_grade
 
     def _user_has_access_to_course(self, course_structure):
