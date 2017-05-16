@@ -579,18 +579,22 @@
   .wrapper-modal-window-bulkpublish-subsection,
   .wrapper-modal-window-bulkpublish-unit,
   .course-outline-modal {
-    .exam-time-list-fields,
-    .exam-review-rules-list-fields {
-      margin: 0 0 ($baseline/2) 0;
+    .no-descriptive-text {
+      display: block;
+      margin-bottom: ($baseline/4);
     }
+
     .list-fields {
       .field-message {
-        @extend %t-copy-sub2;
+        @extend %t-copy-sub1;
         color: $gray-d1;
+        margin-bottom: ($baseline/4);
       }
       label {
-        @extend %t-title7;
+        @extend %t-title6;
+        font-weight: font-weight(semi-bold);
       }
+
       .field {
         display: inline-block;
         vertical-align: top;
@@ -598,9 +602,10 @@
         margin-bottom: ($baseline/4);
 
         label {
-          @extend %t-strong;
+          @include font-size(16);
+          font-weight: font-weight(semi-bold);
           @include transition(color $tmg-f3 ease-in-out 0s);
-          margin: 0 0 ($baseline/4) 0;
+          margin-bottom: ($baseline/4);
 
           &.is-focused {
             color: $blue;
@@ -737,8 +742,7 @@
     // UI: timed and proctored exam section
     .edit-settings-timed-examination {
 
-      // give a little space between the sections
-      padding-bottom: 10px;
+      margin-bottom: $baseline;
 
       .checkbox-cosmetic .input-checkbox {
         @extend %cont-text-sr;
