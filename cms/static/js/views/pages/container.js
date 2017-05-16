@@ -184,7 +184,7 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
                 this.editXBlock(event, {
                     view: 'visibility_view',
                     // Translators: "title" is the name of the current component being edited.
-                    titleFormat: gettext('Editing visibility for: %(title)s'),
+                    titleFormat: gettext('Editing access for: %(title)s'),
                     viewSpecificClasses: '',
                     modalSize: 'med'
                 });
