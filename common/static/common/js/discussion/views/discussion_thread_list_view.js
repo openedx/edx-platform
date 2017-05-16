@@ -216,8 +216,8 @@
                 return this;
             };
 
-            DiscussionThreadListView.prototype.convertMath = function() {
-                DiscussionUtil.convertMath(this.$('.thread-preview-body'));
+            DiscussionThreadListView.prototype.convertMath = function(element) {
+                DiscussionUtil.convertMath(element.find('.thread-preview-body'));
             };
 
             DiscussionThreadListView.prototype.renderThreads = function() {
@@ -226,10 +226,9 @@
                 for (i = 0, len = this.displayedCollection.models.length; i < len; i++) {
                     thread = this.displayedCollection.models[i];
                     $content = this.renderThread(thread);
+                    this.convertMath($content);
                     this.$('.forum-nav-thread-list').append($content);
-
                 }
-                this.convertMath();
                 this.showMetadataAccordingToSort();
                 this.renderMorePages();
                 if (this.hideRefineBar) {
