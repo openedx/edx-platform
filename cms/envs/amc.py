@@ -56,23 +56,28 @@ INSTALLED_APPS += (
     'hijack',
     'compat',
     'hijack_admin',
-    'tiers',
 )
 MIDDLEWARE_CLASSES += (
     'organizations.middleware.OrganizationMiddleware',
-    'tiers.middleware.TierMiddleware',
 )
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
-TIERS_ORGANIZATION_MODEL = 'organizations.Organization'
-TIERS_EXPIRED_REDIRECT_URL = AMC_APP_URL + "/expired"
-TIERS_ORGANIZATION_TIER_GETTER_NAME = 'get_tier_for_org'
+if FEATURES.get("ENABLE_TIERS_APP", True):
+    TIERS_ORGANIZATION_MODEL = 'organizations.Organization'
+    TIERS_EXPIRED_REDIRECT_URL = None
+    TIERS_ORGANIZATION_TIER_GETTER_NAME = 'get_tier_for_org'
 
-TIERS_DATABASE_URL = AUTH_TOKENS.get('TIERS_DATABASE_URL')
-DATABASES['tiers'] = dj_database_url.parse(TIERS_DATABASE_URL)
+    TIERS_DATABASE_URL = AUTH_TOKENS.get('TIERS_DATABASE_URL')
+    DATABASES['tiers'] = dj_database_url.parse(TIERS_DATABASE_URL)
+    DATABASE_ROUTERS += ['openedx.core.djangoapps.appsembler.sites.routers.TiersDbRouter']
 
-DATABASE_ROUTERS += ['openedx.core.djangoapps.appsembler.sites.routers.TiersDbRouter']
+    MIDDLEWARE_CLASSES += (
+        'tiers.middleware.TierMiddleware',
+    )
+    INSTALLED_APPS += (
+        'tiers',
+    )
 
 XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5
 

@@ -78,23 +78,28 @@ INSTALLED_APPS += (
     'hijack',
     'compat',
     'hijack_admin',
-    'tiers',
 )
 MIDDLEWARE_CLASSES += (
-    'organizations.middleware.OrganizationMiddleware',
     'tiers.middleware.TierMiddleware',
 )
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
-TIERS_ORGANIZATION_MODEL = 'organizations.Organization'
-TIERS_EXPIRED_REDIRECT_URL = None
-TIERS_ORGANIZATION_TIER_GETTER_NAME = 'get_tier_for_org'
+if FEATURES.get("ENABLE_TIERS_APP", True):
+    TIERS_ORGANIZATION_MODEL = 'organizations.Organization'
+    TIERS_EXPIRED_REDIRECT_URL = None
+    TIERS_ORGANIZATION_TIER_GETTER_NAME = 'get_tier_for_org'
 
-TIERS_DATABASE_URL = AUTH_TOKENS.get('TIERS_DATABASE_URL')
-DATABASES['tiers'] = dj_database_url.parse(TIERS_DATABASE_URL)
+    TIERS_DATABASE_URL = AUTH_TOKENS.get('TIERS_DATABASE_URL')
+    DATABASES['tiers'] = dj_database_url.parse(TIERS_DATABASE_URL)
+    DATABASE_ROUTERS += ['openedx.core.djangoapps.appsembler.sites.routers.TiersDbRouter']
 
-DATABASE_ROUTERS += ['openedx.core.djangoapps.appsembler.sites.routers.TiersDbRouter']
+    MIDDLEWARE_CLASSES += (
+        'tiers.middleware.TierMiddleware',
+    )
+    INSTALLED_APPS += (
+        'tiers',
+    )
 
 CLONE_COURSE_FOR_NEW_SIGNUPS = False
 HIJACK_ALLOW_GET_REQUESTS = True

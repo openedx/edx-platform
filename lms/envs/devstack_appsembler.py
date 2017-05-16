@@ -47,11 +47,9 @@ INSTALLED_APPS += (
     'hijack',
     'compat',
     'hijack_admin',
-    'tiers',
 )
 MIDDLEWARE_CLASSES += (
     'organizations.middleware.OrganizationMiddleware',
-#    'tiers.middleware.TierMiddleware',
 )
 
 COURSE_CATALOG_VISIBILITY_PERMISSION = 'see_in_catalog'
@@ -60,13 +58,21 @@ SEARCH_SKIP_ENROLLMENT_START_DATE_FILTERING = True
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
-TIERS_ORGANIZATION_MODEL = 'organizations.Organization'
-TIERS_EXPIRED_REDIRECT_URL = None
+if FEATURES.get("ENABLE_TIERS_APP", True):
+    TIERS_ORGANIZATION_MODEL = 'organizations.Organization'
+    TIERS_EXPIRED_REDIRECT_URL = None
 
-TIERS_DATABASE_URL = AUTH_TOKENS.get('TIERS_DATABASE_URL')
-DATABASES['tiers'] = dj_database_url.parse(TIERS_DATABASE_URL)
+    TIERS_DATABASE_URL = AUTH_TOKENS.get('TIERS_DATABASE_URL')
+    DATABASES['tiers'] = dj_database_url.parse(TIERS_DATABASE_URL)
+    DATABASE_ROUTERS += ['openedx.core.djangoapps.appsembler.sites.routers.TiersDbRouter']
 
-DATABASE_ROUTERS += ['openedx.core.djangoapps.appsembler.sites.routers.TiersDbRouter']
+    MIDDLEWARE_CLASSES += (
+        'tiers.middleware.TierMiddleware',
+    )
+
+    INSTALLED_APPS += (
+        'tiers',
+    )
 
 COURSE_TO_CLONE = "course-v1:Appsembler+CC101+2017"
 
@@ -90,3 +96,8 @@ HIJACK_ALLOW_GET_REQUESTS = True
 HIJACK_LOGOUT_REDIRECT_URL = '/admin/auth/user'
 
 USE_S3_FOR_CUSTOMER_THEMES = False
+
+try:
+    from .private import *
+except ImportError:
+    pass
