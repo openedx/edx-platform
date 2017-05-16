@@ -4,6 +4,7 @@
   from django.core.urlresolvers import reverse
   from django.utils.translation import ugettext as _
   from branding.api import get_footer
+  from openedx.core.djangoapps.lang_pref.api import footer_language_selector_is_enabled
 %>
 <% footer = get_footer(is_secure=is_secure) %>
 <%namespace name='static' file='static_content.html'/>
@@ -28,8 +29,8 @@
         </ol>
       </nav>
 
-      % if include_language_selector:
-          <%include file="widgets/footer-language-selector.html"/>
+      % if context.get('include_language_selector', footer_language_selector_is_enabled()):
+          <%include file="${static.get_template_path('widgets/footer-language-selector.html')}"/>
       % endif
 
       <div class="wrapper-logo">
