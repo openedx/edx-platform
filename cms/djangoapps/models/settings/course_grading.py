@@ -1,4 +1,6 @@
 from datetime import timedelta
+
+from contentstore.signals.signals import GRADING_POLICY_CHANGED
 from xmodule.modulestore.django import modulestore
 
 
@@ -65,6 +67,8 @@ class CourseGradingModel(object):
 
         CourseGradingModel.update_minimum_grade_credit_from_json(course_key, jsondict['minimum_grade_credit'], user)
 
+        GRADING_POLICY_CHANGED.send(sender=CourseGradingModel, user_id=user.id, course_id=course_key)
+
         return CourseGradingModel.fetch(course_key)
 
     @staticmethod
@@ -85,6 +89,8 @@ class CourseGradingModel(object):
             descriptor.raw_grader.append(grader)
 
         modulestore().update_item(descriptor, user.id)
+
+        GRADING_POLICY_CHANGED.send(sender=CourseGradingModel, user_id=user.id, course_id=course_key)
 
         return CourseGradingModel.jsonize_grader(index, descriptor.raw_grader[index])
 
@@ -155,6 +161,8 @@ class CourseGradingModel(object):
 
         modulestore().update_item(descriptor, user.id)
 
+        GRADING_POLICY_CHANGED.send(sender=CourseGradingModel, user_id=user.id, course_id=course_key)
+
     @staticmethod
     def delete_grace_period(course_key, user):
         """
@@ -184,6 +192,13 @@ class CourseGradingModel(object):
             del descriptor.graded
 
         modulestore().update_item(descriptor, user.id)
+
+        GRADING_POLICY_CHANGED.send(
+            sender=CourseGradingModel,
+            user_id=user.id,
+            course_id=descriptor.location.course_key
+        )
+
         return {'graderType': grader_type}
 
     @staticmethod
