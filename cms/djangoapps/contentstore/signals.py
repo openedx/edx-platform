@@ -4,7 +4,7 @@ import logging
 from datetime import datetime
 from pytz import UTC
 
-from django.dispatch import receiver
+from django.dispatch import receiver, Signal
 
 from xmodule.modulestore.django import modulestore, SignalHandler
 from contentstore.courseware_index import CoursewareSearchIndexer, LibrarySearchIndexer
@@ -15,6 +15,17 @@ from util.module_utils import yield_dynamic_descriptor_descendants
 
 
 log = logging.getLogger(__name__)
+
+
+# Signal that indicates that a course grading policy has been updated.
+# This signal is generated when a grading policy change occurs within
+# modulestore for either course or subsection changes.
+GRADING_POLICY_CHANGED = Signal(
+    providing_args=[
+        'user_id',  # Integer User ID
+        'course_id',  # Unicode string representing the course
+    ]
+)
 
 
 @receiver(SignalHandler.course_published)
