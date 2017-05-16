@@ -591,14 +591,14 @@ def _compile_sass(system, theme, debug, force, timing_info):
 
             # FIXME: this is a hack to generate Bootstrap RTL files
             for bootstrap_css_file in BOOTSTRAP_CSS_FILES:
-                css_file_path = css_dir / bootstrap_css_file
-                raw_css_file_path = css_dir / (bootstrap_css_file + '.raw')
-                if css_file_path.exists():
+                css_file_path = os.path.abspath(css_dir / bootstrap_css_file)
+                raw_css_file_path = os.path.abspath(css_dir / (bootstrap_css_file + '.raw'))
+                if os.path.exists(css_file_path):
                     sh("mv {source_file} {target_file}".format(
                         source_file=css_file_path,
                         target_file=raw_css_file_path,
                     ))
-                    sh("rtlcss {source_file} {target_file}".format(
+                    sh("postcss {source_file} --output {target_file}".format(
                         source_file=raw_css_file_path,
                         target_file=css_file_path,
                     ))
