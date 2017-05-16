@@ -541,7 +541,7 @@ SERVER_EMAIL = 'devops@example.com'
 ADMINS = ()
 MANAGERS = ADMINS
 
-EDX_PLATFORM_REVISION = os.environ.get('EDX_PLATFORM_REVISION')
+EDX_PLATFORM_REVISION = os.environ.get('EDX_PLATFORM_REVISION', 'cms')
 
 if not EDX_PLATFORM_REVISION:
     try:
