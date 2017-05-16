@@ -9,7 +9,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import ddt
 from django.contrib.auth import get_user_model
 from django.core.management import CommandError, call_command
-from mock import patch
+from mock import ANY, patch
 import six
 
 from student.models import CourseEnrollment
@@ -25,14 +25,6 @@ def _sorted_by_batch(calls):
     Return the list of calls sorted by course_key and batch.
     """
     return sorted(calls, key=lambda x: (x[1]['kwargs']['course_key'], x[1]['kwargs']['offset']))
-
-
-class Any(object):
-    """
-    Dummy object that compares equal to all other objects.
-    """
-    def __eq__(self, other):
-        return True
 
 
 @ddt.ddt
@@ -109,7 +101,7 @@ class TestComputeGrades(SharedModuleStoreTestCase):
             'batch_size': 2,
             'offset': offset,
             'estimate_first_attempted': estimate_first_attempted,
-            'seq_id': Any(),
+            'seq_id': ANY,
         }
         self.assertEqual(
             _sorted_by_batch(mock_task.apply_async.call_args_list),
@@ -146,7 +138,7 @@ class TestComputeGrades(SharedModuleStoreTestCase):
                         'batch_size': 2,
                         'offset': 0,
                         'estimate_first_attempted': True,
-                        'seq_id': Any(),
+                        'seq_id': ANY,
                     },
                 },),
                 ({
@@ -155,7 +147,7 @@ class TestComputeGrades(SharedModuleStoreTestCase):
                         'batch_size': 2,
                         'offset': 2,
                         'estimate_first_attempted': True,
-                        'seq_id': Any(),
+                        'seq_id': ANY,
                     },
                 },),
             ],
