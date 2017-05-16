@@ -101,6 +101,11 @@ class InstructorDashboardPage(CoursePage):
         ecommerce_section.wait_for_page()
         return ecommerce_section
 
+    def is_rescore_unsupported_message_visible(self):
+        return u'This component cannot be rescored.' in unicode(
+            self.q(css='.request-response-error').html
+        )
+
     @staticmethod
     def get_asset_path(file_name):
         """
