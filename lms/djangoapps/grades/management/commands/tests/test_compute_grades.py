@@ -27,6 +27,14 @@ def _sorted_by_batch(calls):
     return sorted(calls, key=lambda x: (x[1]['kwargs']['course_key'], x[1]['kwargs']['offset']))
 
 
+class Any(object):
+    """
+    Dummy object that compares equal to all other objects.
+    """
+    def __eq__(self, other):
+        return True
+
+
 @ddt.ddt
 class TestComputeGrades(SharedModuleStoreTestCase):
     """
@@ -100,7 +108,8 @@ class TestComputeGrades(SharedModuleStoreTestCase):
             'course_key': course_key,
             'batch_size': 2,
             'offset': offset,
-            'estimate_first_attempted': estimate_first_attempted
+            'estimate_first_attempted': estimate_first_attempted,
+            'seq_id': Any(),
         }
         self.assertEqual(
             _sorted_by_batch(mock_task.apply_async.call_args_list),
@@ -136,7 +145,8 @@ class TestComputeGrades(SharedModuleStoreTestCase):
                         'course_key': self.course_keys[1],
                         'batch_size': 2,
                         'offset': 0,
-                        'estimate_first_attempted': True
+                        'estimate_first_attempted': True,
+                        'seq_id': Any(),
                     },
                 },),
                 ({
@@ -144,7 +154,8 @@ class TestComputeGrades(SharedModuleStoreTestCase):
                         'course_key': self.course_keys[1],
                         'batch_size': 2,
                         'offset': 2,
-                        'estimate_first_attempted': True
+                        'estimate_first_attempted': True,
+                        'seq_id': Any(),
                     },
                 },),
             ],

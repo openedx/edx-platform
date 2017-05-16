@@ -4,8 +4,8 @@ Command to compute all grades for specified courses.
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import hashlib
 import logging
-from random import shuffle
 
 from django.core.management.base import BaseCommand
 import six
@@ -88,7 +88,8 @@ class Command(BaseCommand):
         Enqueue all tasks, in shuffled order.
         """
         task_options = {'routing_key': options['routing_key']} if options.get('routing_key') else {}
-        for kwargs in self._shuffled_task_kwargs(options):
+        for seq_id, kwargs in enumerate(self._shuffled_task_kwargs(options)):
+            kwargs['seq_id'] = seq_id
             result = tasks.compute_grades_for_course_v2.apply_async(kwargs=kwargs, **task_options)
             log.info("Grades: Created {task_name}[{task_id}] with arguments {kwargs}".format(
                 task_name=tasks.compute_grades_for_course.name,
@@ -116,7 +117,7 @@ class Command(BaseCommand):
                 # The dictionaries with their extra overhead will be created
                 # and consumed one at a time.
                 all_args.append((six.text_type(course_key), offset, batch_size))
-        shuffle(all_args)
+        all_args.sort(key=lambda x: hashlib.md5(b'{!r}'.format(x)))
         for args in all_args:
             yield {
                 'course_key': args[0],
