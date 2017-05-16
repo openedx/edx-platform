@@ -128,8 +128,8 @@ class TestSubsectionGating(CourseTestCase):
         self.assertEqual(resp['prereq_min_score'], 100)
         self.assertEqual(resp['visibility_state'], VisibilityState.gated)
 
-    @patch('contentstore.signals.gating_api.set_required_content')
-    @patch('contentstore.signals.gating_api.remove_prerequisite')
+    @patch('contentstore.signals.handlers.gating_api.set_required_content')
+    @patch('contentstore.signals.handlers.gating_api.remove_prerequisite')
     def test_delete_item_signal_handler_called(self, mock_remove_prereq, mock_set_required):
         seq3 = ItemFactory.create(
             parent_location=self.chapter.location,
