@@ -226,9 +226,8 @@
                     thread = this.displayedCollection.models[i];
                     $content = this.renderThread(thread);
                     this.$('.forum-nav-thread-list').append($content);
-                    this.convertMath();
                 }
-
+                this.convertMath();
                 this.showMetadataAccordingToSort();
                 this.renderMorePages();
                 this.trigger('threads:rendered');
