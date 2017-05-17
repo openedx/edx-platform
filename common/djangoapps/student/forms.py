@@ -20,6 +20,7 @@ from django.conf import settings
 from student.models import CourseEnrollmentAllowed
 from util.password_policy_validators import validate_password_strength
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.theming.helpers import get_template_path
 
 
 class PasswordResetFormNoActive(PasswordResetForm):
@@ -80,10 +81,10 @@ class PasswordResetFormNoActive(PasswordResetForm):
                 'protocol': 'https' if use_https else 'http',
                 'platform_name': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)
             }
-            subject = loader.render_to_string(subject_template_name, context)
+            subject = loader.render_to_string(get_template_path(subject_template_name), context)
             # Email subject *must not* contain newlines
             subject = subject.replace('\n', '')
-            email = loader.render_to_string(email_template_name, context)
+            email = loader.render_to_string(get_template_path(email_template_name), context)
             send_mail(subject, email, from_email, [user.email])
 
 
