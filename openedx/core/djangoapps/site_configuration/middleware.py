@@ -67,7 +67,6 @@ class LoginRequiredMiddleware:
 
     def __init__(self):
         self.LOGIN_URL = settings.LOGIN_URL or '/login/'
-        self.LOGIN_EXEMPT_URLS = list()
 
         # Needed for user to be able to login at all
         self.DEFAULT_LOGIN_EXEMPT_URLS = [
@@ -77,8 +76,6 @@ class LoginRequiredMiddleware:
             r'^create_account.*$',
             r'^admin.*$'
         ]
-        self.RESTRICT_SITE_TO_LOGGED_IN_USERS = None
-        self.EXEMPT_URLS = [compile(self.LOGIN_URL.lstrip('/'))]
 
     def process_view(self, request, view_func, view_args, view_kwargs):
 
@@ -90,23 +87,23 @@ class LoginRequiredMiddleware:
         if request.user.is_authenticated():
             return None
 
-        self.RESTRICT_SITE_TO_LOGGED_IN_USERS = self.RESTRICT_SITE_TO_LOGGED_IN_USERS or configuration_helpers.get_value(
+        RESTRICT_SITE_TO_LOGGED_IN_USERS = configuration_helpers.get_value(
             'RESTRICT_SITE_TO_LOGGED_IN_USERS',
             settings.FEATURES.get('RESTRICT_SITE_TO_LOGGED_IN_USERS', False)
         )
 
-        if self.RESTRICT_SITE_TO_LOGGED_IN_USERS:
-            self.LOGIN_EXEMPT_URLS = self.LOGIN_EXEMPT_URLS or configuration_helpers.get_value(
+        if RESTRICT_SITE_TO_LOGGED_IN_USERS:
+            LOGIN_EXEMPT_URLS = configuration_helpers.get_value(
                 'LOGIN_EXEMPT_URLS',
                 settings.FEATURES.get('LOGIN_EXEMPT_URLS', None)
             )
 
-            if self.LOGIN_EXEMPT_URLS:
-                if type(self.LOGIN_EXEMPT_URLS) is str or type(self.LOGIN_EXEMPT_URLS) is unicode:
-                    self.LOGIN_EXEMPT_URLS = [self.LOGIN_EXEMPT_URLS]
-                self.EXEMPT_URLS += [compile(expr) for expr in self.LOGIN_EXEMPT_URLS + self.DEFAULT_LOGIN_EXEMPT_URLS]
-            path = request.path_info.lstrip('/')
-            if not any(m.match(path) for m in self.EXEMPT_URLS):
-                return login_required(view_func)(request, view_args, view_kwargs)
+            EXEMPT_URLS = [compile(self.LOGIN_URL.lstrip('/'))]
 
-        return None
+            if LOGIN_EXEMPT_URLS:
+                if type(LOGIN_EXEMPT_URLS) is str or type(LOGIN_EXEMPT_URLS) is unicode:
+                    LOGIN_EXEMPT_URLS = [LOGIN_EXEMPT_URLS]
+                EXEMPT_URLS += [compile(expr) for expr in LOGIN_EXEMPT_URLS + self.DEFAULT_LOGIN_EXEMPT_URLS]
+            path = request.path_info.lstrip('/')
+            if not any(m.match(path) for m in EXEMPT_URLS):
+                return login_required(view_func)(request, view_args, view_kwargs)
