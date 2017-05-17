@@ -67,6 +67,16 @@ class TestWelcomeMessageView(SharedModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Second Update')
 
+    def test_replace_urls(self):
+        img_url = 'img.png'
+        create_course_update(self.course, self.user, "<img src='/static/{url}'>".format(url=img_url))
+        response = self.client.get(welcome_message_url(self.course))
+        self.assertContains(response, "/asset-v1:{org}+{course}+{run}+type@asset+block/img.png".format(
+            org=self.course.id.org,
+            course=self.course.id.course,
+            run=self.course.id.run
+        ))
+
     def test_empty_welcome_message(self):
         response = self.client.get(welcome_message_url(self.course))
         self.assertEqual(response.status_code, 204)

@@ -45,4 +45,8 @@ class WelcomeMessageFragmentView(EdxFragmentView):
         # Return the course update with the most recent publish date
         info_block = getattr(info_module, '_xmodule', info_module)
         ordered_updates = info_block.ordered_updates()
-        return ordered_updates[0]['content'] if ordered_updates else None
+        content = None
+        if ordered_updates:
+            content = info_block.system.replace_urls(ordered_updates[0]['content'])
+
+        return content
