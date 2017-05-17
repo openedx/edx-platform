@@ -165,6 +165,7 @@
                 $currentElement = this.$('.forum-nav-thread[data-id=' + threadId + ']');
                 active = $currentElement.has('.forum-nav-thread-link.is-active').length !== 0;
                 $currentElement.replaceWith($content);
+                this.convertMath($content);
                 this.showMetadataAccordingToSort();
                 this.$('span.timeago').timeago();
                 if (this.supportsActiveThread && active) {
