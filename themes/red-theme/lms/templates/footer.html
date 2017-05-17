@@ -43,6 +43,10 @@ from django.utils.translation import ugettext as _
       </ol>
       </nav>
 
+      % if include_language_selector:
+          <%include file='widgets/footer-language-selector.html'/>
+      % endif
+
       <div class="wrapper-logo">
         <p>
           <a href="/">
