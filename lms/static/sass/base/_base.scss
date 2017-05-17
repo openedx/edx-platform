@@ -55,8 +55,8 @@ p {
 }
 
 span {
-  font: inherit;
   color: inherit;
+  font: inherit;
 }
 
 /* Fix for CodeMirror: prevent top-level span from affecting deeply-embedded span in CodeMirror */

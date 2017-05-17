@@ -21,7 +21,7 @@
     <div class="footer-content-wrapper">
       <div class="footer-logo">
           <a href="${marketing_link('ROOT')}">
-            <img alt="edX Home Page" src="${footer['logo_image']}">
+            <img alt="${_('edX Home Page')}" src="${footer['logo_image']}">
           </a>
       </div>
 
@@ -44,6 +44,11 @@
               % endfor
             </ul>
           </nav>
+
+          % if include_language_selector:
+              <%include file="widgets/footer-language-selector.html"/>
+          % endif
+
           <p class="copyright">${_(
           u"\u00A9 2012-{year} edX Inc.  All rights reserved except where noted.  "
           u"EdX, Open edX and the edX and Open EdX logos are registered trademarks "
