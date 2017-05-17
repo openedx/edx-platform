@@ -2,7 +2,7 @@
 Middleware for handling the storage, aggregation, and reporting of custom
 metrics for monitoring.
 
-At this time, the custom metrics can only reported to New Relic.
+At this time, the custom metrics can only be reported to New Relic.
 
 This middleware will only call on the newrelic agent if there are any metrics
 to report for this request, so it will not incur any processing overhead for
@@ -17,9 +17,13 @@ except ImportError:
     log.warning("Unable to load NewRelic agent module")
     newrelic = None  # pylint: disable=invalid-name
 
+import psutil
 import request_cache
+from openedx.core.djangolib.waffle_utils import WaffleSwitchPlus
+
 
 REQUEST_CACHE_KEY = 'monitoring_custom_metrics'
+WAFFLE_NAMESPACE = 'monitoring_utils'
 
 
 class MonitoringCustomMetrics(object):
@@ -72,3 +76,91 @@ class MonitoringCustomMetrics(object):
         """
         self._batch_report()
         return None
+
+
+class MonitoringMemoryMiddleware(object):
+    """
+    Middleware for monitoring memory usage.
+    """
+    memory_data_key = u'memory_data'
+
+    def process_request(self, request):
+        if self._is_enabled():
+            log_prefix = self._log_prefix(u"Before", request)
+            self._cache[self.memory_data_key] = self._memory_data(log_prefix)
+
+    def process_response(self, request, response):
+        if self._is_enabled():
+            log_prefix = self._log_prefix(u"After", request)
+            new_memory_data = self._memory_data(log_prefix)
+
+            log_prefix = self._log_prefix(u"Diff", request)
+            self._log_diff_memory_data(log_prefix, new_memory_data, self._cache.get(self.memory_data_key))
+        return response
+
+    @property
+    def _cache(self):
+        """
+        Namespaced request cache for tracking memory usage.
+        """
+        return request_cache.get_cache(name='monitoring_memory')
+
+    def _log_prefix(self, prefix, request):
+        """
+        Returns a formatted prefix for logging for the given request.
+        """
+        return u"{} request '{} {}'".format(prefix, request.method, request.path)
+
+    def _memory_data(self, log_prefix):
+        """
+        Returns a dict with information for current memory utilization.
+        Uses log_prefix in log statements.
+        """
+        machine_data = psutil.virtual_memory()
+
+        process = psutil.Process()
+        process_data = {
+            'memory_info': process.get_memory_info(),
+            'ext_memory_info': process.get_ext_memory_info(),
+            'memory_percent': process.get_memory_percent(),
+            'cpu_percent': process.get_cpu_percent(),
+        }
+
+        log.info(u"%s Machine memory usage: %s; Process memory usage: %s", log_prefix, machine_data, process_data)
+        return {
+            'machine_data': machine_data,
+            'process_data': process_data,
+        }
+
+    def _log_diff_memory_data(self, prefix, new_memory_data, old_memory_data):
+        """
+        Computes and logs the difference in memory utilization
+        between the given old and new memory data.
+        """
+        def _vmem_used(memory_data):
+            return memory_data['machine_data'].used
+
+        def _process_mem_percent(memory_data):
+            return memory_data['process_data']['memory_percent']
+
+        def _process_rss(memory_data):
+            return memory_data['process_data']['memory_info'].rss
+
+        def _process_vms(memory_data):
+            return memory_data['process_data']['memory_info'].vms
+
+        if new_memory_data and old_memory_data:
+            log.info(
+                u"%s Diff Vmem used: %s, Diff percent memory: %s, Diff rss: %s, Diff vms: %s",
+                prefix,
+                _vmem_used(new_memory_data) - _vmem_used(old_memory_data),
+                _process_mem_percent(new_memory_data) - _process_mem_percent(old_memory_data),
+                _process_rss(new_memory_data) - _process_rss(old_memory_data),
+                _process_vms(new_memory_data) - _process_vms(old_memory_data),
+            )
+
+    def _is_enabled(self):
+        """
+        Returns whether this middleware is enabled.
+        """
+        return WaffleSwitchPlus(namespace=WAFFLE_NAMESPACE).is_enabled(u'enable_memory_middleware')
