@@ -214,8 +214,8 @@
                 return this;
             };
 
-            DiscussionThreadListView.prototype.convertMath = function(element) {
-                DiscussionUtil.convertMath(element.find('.thread-preview-body'));
+            DiscussionThreadListView.prototype.convertMath = function(content) {
+                DiscussionUtil.convertMath(content.find('.thread-preview-body'));
             };
 
             DiscussionThreadListView.prototype.renderThreads = function() {
