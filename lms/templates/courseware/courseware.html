@@ -12,7 +12,7 @@ from django.utils.translation import ugettext as _
 from edxnotes.helpers import is_feature_enabled as is_edxnotes_enabled
 from openedx.core.djangolib.js_utils import js_escaped_string
 from openedx.core.djangolib.markup import HTML
-from openedx.features.course_experience import UNIFIED_COURSE_VIEW_FLAG
+from openedx.features.course_experience import course_home_page_title, UNIFIED_COURSE_VIEW_FLAG
 %>
 <%
   include_special_exams = settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and (course.enable_proctored_exams or course.enable_timed_exams)
@@ -31,7 +31,7 @@ from openedx.features.course_experience import UNIFIED_COURSE_VIEW_FLAG
 
 <%block name="header_extras">
 
-% for template_name in ["image-modal", "sequence-breadcrumbs"]:
+% for template_name in ["image-modal"]:
 <script type="text/template" id="${template_name}-tpl">
     <%static:include path="common/templates/${template_name}.underscore" />
 </script>
@@ -155,11 +155,37 @@ ${HTML(fragment.foot_html())}
     </div>
 % endif
     <section class="course-content" id="course-content">
+        <header class="page-header has-secondary">
+            <div class="page-header-main">
+                <nav aria-label="${_('Course')}" class="sr-is-focusable" tabindex="-1">
+                    <div class="has-breadcrumbs">
+                        <div class="breadcrumbs">
+                            % if waffle.flag_is_active(request, UNIFIED_COURSE_VIEW_FLAG):
+                                <span class="nav-item nav-item-course">
+                                    <a href="${course_url}">${course_home_page_title(course)}</a>
+                                </span>
+                                <span class="icon fa fa-angle-right" aria-hidden="true"></span>
+                            % endif
+                            % if chapter:
+                                <span class="nav-item nav-item-chapter">
+                                    <a href="${course_url}#${unicode(chapter.location)}">${chapter.display_name_with_default}</a>
+                                </span>
+                                <span class="icon fa fa-angle-right" aria-hidden="true"></span>
+                            % endif
+                            % if section:
+                                <span class="nav-item nav-item-section">
+                                    <a href="${course_url}#${unicode(section.location)}">${section.display_name_with_default}</a>
+                                </span>
+                                <span class="icon fa fa-angle-right" aria-hidden="true"></span>
+                            % endif
+                            <span class="nav-item nav-item-sequence">${sequence_title}</span>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </header>
+
         <main id="main" tabindex="-1" aria-label="Content">
-            <div
-              class="path"
-              data-unified-course-view="${'true' if waffle.flag_is_active(request, UNIFIED_COURSE_VIEW_FLAG) else 'false'}"
-            ></div>
             % if getattr(course, 'entrance_exam_enabled') and \
                getattr(course, 'entrance_exam_minimum_score_pct') and \
                entrance_exam_current_score is not UNDEFINED:

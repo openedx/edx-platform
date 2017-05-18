@@ -136,15 +136,20 @@
 
         Sequence.prototype.updatePageTitle = function() {
             // update the page title to include the current section
-            var currentSectionTitle,
+            var currentUnitTitle,
+                newPageTitle,
                 positionLink = this.link_for(this.position);
 
             if (positionLink && positionLink.data('page-title')) {
-                currentSectionTitle = positionLink.data('page-title') + ' | ' + this.base_page_title;
+                currentUnitTitle = positionLink.data('page-title');
+                newPageTitle = currentUnitTitle + ' | ' + this.base_page_title;
 
-                if (currentSectionTitle !== document.title) {
-                    document.title = currentSectionTitle;
+                if (newPageTitle !== document.title) {
+                    document.title = newPageTitle;
                 }
+
+                // Update the title section of the breadcrumb
+                $('.nav-item-sequence').text(currentUnitTitle);
             }
         };
 
@@ -268,16 +273,6 @@
                 this.updatePageTitle();
                 sequenceLinks = this.content_container.find('a.seqnav');
                 sequenceLinks.click(this.goto);
-
-                edx.HtmlUtils.setHtml(
-                    this.path,
-                    edx.HtmlUtils.template($('#sequence-breadcrumbs-tpl').text())({
-                        courseId: this.el.parent().data('course-id'),
-                        blockId: this.id,
-                        pathText: this.el.find('.nav-item.active').data('path'),
-                        unifiedCourseView: this.path.data('unified-course-view')
-                    })
-                );
 
                 this.sr_container.focus();
             }
