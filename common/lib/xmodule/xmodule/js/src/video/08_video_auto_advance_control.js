@@ -1,8 +1,9 @@
 (function(requirejs, require, define) {
     'use strict';
     define(
-    'video/08_video_auto_advance_control.js', [],
-function() {
+    'video/08_video_auto_advance_control.js', [
+    'edx-ui-toolkit/js/utils/html-utils'
+], function(HtmlUtils) {
     /**
      * Auto advance control module.
      * @exports video/08_video_auto_advance_control.js
@@ -24,17 +25,30 @@ function() {
     };
 
     AutoAdvanceControl.prototype = {
-        template: [
-            '<button class="control auto-advance" aria-disabled="false" title="',
-            gettext('Auto-advance'),
-            '">',
-            '<span class="label" aria-hidden="true">', gettext('Auto-advance'), '</span>',
-            '</button>'
-        ].join(''),
+        template: HtmlUtils.interpolateHtml(
+            HtmlUtils.HTML([
+                '<button class="control auto-advance" aria-disabled="false" title="',
+                '{autoAdvanceText}',
+                '">',
+                '<span class="label" aria-hidden="true">',
+                '{autoAdvanceText}',
+                '</span>',
+                '</button>'].join('')),
+            {
+                autoAdvanceText: gettext('Auto-advance')
+            }
+        ).toString(),
 
         destroy: function() {
+            this.el.off({
+                'click': this.onClick,
+            });
             this.el.remove();
-            this.state.el.off('destroy', this.destroy);
+            this.state.el.off({
+                'ready': this.autoPlay,
+                'ended': this.autoAdvance,
+                'destroy': this.destroy,
+            });
             delete this.state.videoAutoAdvanceControl;
         },
 
@@ -76,7 +90,7 @@ function() {
 
         onClick: function(event) {
             event.preventDefault();
-            var enabled = this.state.auto_advance ? false : true;
+            var enabled = !this.state.auto_advance;
             this.setAutoAdvance(enabled);
             this.el.trigger('autoadvancechange', [enabled]);
         },
