@@ -34,4 +34,4 @@ ubcpi-xblock==0.6.2
 
 # Vector Drawing and ActiveTable XBlocks (Davidson)
 -e git+https://github.com/open-craft/xblock-vectordraw.git@v0.2.1#egg=xblock-vectordraw==0.2.1
--e git+https://github.com/open-craft/xblock-activetable.git@1786a2c8fc06ca3ecfac1972464048982bd486ff#egg=xblock-activetable
+-e git+https://github.com/open-craft/xblock-activetable.git@e933d41bb86a8d50fb878787ca680165a092a6d5#egg=xblock-activetable
