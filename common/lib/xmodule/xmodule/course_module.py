@@ -770,7 +770,7 @@ class CourseFields(object):
             "Enter true or false. If this value is true, timed exams are enabled in your course. "
             "Regardless of this setting, timed exams are enabled if Enable Proctored Exams is set to true."
         ),
-        default=False,
+        default=True,
         scope=Scope.settings
     )
 
