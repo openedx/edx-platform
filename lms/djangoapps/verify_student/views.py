@@ -29,7 +29,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 import waffle
 
-from commerce.utils import EcommerceService
+from commerce.utils import EcommerceService, is_account_activation_requirement_disabled
 from course_modes.models import CourseMode
 from edx_rest_api_client.exceptions import SlumberBaseException
 from edxmako.shortcuts import render_to_response, render_to_string
@@ -56,8 +56,6 @@ from util.db import outer_atomic
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
-
-DISABLE_ACCOUNT_ACTIVATION_REQUIREMENT_SWITCH = 'verify_student_disable_account_activation_requirement'
 
 
 class PayAndVerifyView(View):
@@ -205,10 +203,7 @@ class PayAndVerifyView(View):
         Arguments:
             user (User): Current user involved in the onboarding/verification flow
         """
-        user_is_active = user.is_active
-        if waffle.switch_is_active(DISABLE_ACCOUNT_ACTIVATION_REQUIREMENT_SWITCH):
-            user_is_active = True
-        return user_is_active
+        return user.is_active or is_account_activation_requirement_disabled()
 
     @method_decorator(login_required)
     def get(
@@ -614,7 +609,7 @@ class PayAndVerifyView(View):
         }
 
         # Remove the account activation requirement if disabled via waffle
-        if waffle.switch_is_active(DISABLE_ACCOUNT_ACTIVATION_REQUIREMENT_SWITCH):
+        if is_account_activation_requirement_disabled():
             all_requirements.pop(self.ACCOUNT_ACTIVATION_REQ)
 
         display_steps = set(step['name'] for step in display_steps)
