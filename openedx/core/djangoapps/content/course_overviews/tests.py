@@ -178,6 +178,11 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
                 lambda c, field_name: get_active_web_certificate(c) is not None,
                 getattr,
             ),
+            (
+                'instructors',
+                lambda c, field_name: getattr(c, 'instructor_info').get('instructors', []),
+                getattr,
+            )
         ]
         for attribute_name, course_accessor, course_overview_accessor in others_to_test:
             course_value = course_accessor(course, attribute_name)
@@ -206,6 +211,18 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
                 ],
                 "static_asset_path": "/my/abs/path",        # Absolute path
                 "certificates_show_before_end": True,
+                "instructor_info": {
+                    'instructors': [
+                        {
+                            'name': 'test-instructor1',
+                            'organization': 'TextX',
+                        },
+                        {
+                            'name': 'test-instructor2',
+                            'organization': 'TextX',
+                        }
+                    ]
+                },
             },
             {
                 "display_name": "",                         # Empty display name
@@ -216,6 +233,7 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
                 "static_asset_path": "my/relative/path",    # Relative asset path
                 "certificates_show_before_end": False,
                 "catalog_visibility": CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
+                "instructor_info": {},
             },
             {
                 "display_name": "",                         # Empty display name
@@ -226,6 +244,7 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
                 "static_asset_path": "",                    # Empty asset path
                 "certificates_show_before_end": False,
                 "catalog_visibility": CATALOG_VISIBILITY_ABOUT,
+                "instructor_info": {'instructors': []},
             },
             {
                 #                                           # Don't set display name
@@ -236,6 +255,7 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
                 "static_asset_path": None,                  # No asset path
                 "certificates_show_before_end": False,
                 "catalog_visibility": CATALOG_VISIBILITY_NONE,
+                "instructor_info": {'a': 1, 'b': 2, 'c': 3}
             }
         ],
         [ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split]

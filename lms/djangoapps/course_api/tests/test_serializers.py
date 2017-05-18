@@ -31,6 +31,19 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
     maxDiff = 5000  # long enough to show mismatched dicts, in case of error
     serializer_class = CourseSerializer
 
+    instructor_info = {
+        'instructors': [
+            {
+                'name': 'test-instructor1',
+                'organization': 'TextX',
+            },
+            {
+                'name': 'test-instructor2',
+                'organization': 'TextX',
+            }
+        ]
+    }
+
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
@@ -71,6 +84,7 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
             'pacing': 'instructor',
             'mobile_available': False,
             'hidden': False,
+            'instructors': [],
 
             # 'course_id' is a deprecated field, please use 'id' instead.
             'course_id': u'edX/toy/2012_Fall',
@@ -136,6 +150,11 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
         course = self.create_course(self_paced=self_paced)
         result = self._get_result(course)
         self.assertEqual(result['pacing'], expected_pacing)
+
+    def test_course_instructors(self):
+        course = self.create_course(instructor_info=self.instructor_info)
+        result = self._get_result(course)
+        self.assertEqual(result['instructors'], self.instructor_info['instructors'])
 
 
 class TestCourseDetailSerializer(TestCourseSerializer):  # pylint: disable=test-inherits-tests

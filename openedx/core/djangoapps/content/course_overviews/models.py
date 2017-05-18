@@ -101,6 +101,9 @@ class CourseOverview(TimeStampedModel):
     marketing_url = TextField(null=True)
     eligible_for_financial_aid = BooleanField(default=True)
 
+    # Course instructors
+    _instructor_info = TextField(default='{}')
+
     @classmethod
     def _create_or_update(cls, course):
         """
@@ -189,6 +192,8 @@ class CourseOverview(TimeStampedModel):
         course_overview.effort = CourseDetails.fetch_about_attribute(course.id, 'effort')
         course_overview.course_video_url = CourseDetails.fetch_video_url(course.id)
         course_overview.self_paced = course.self_paced
+
+        course_overview._instructor_info = json.dumps(course.instructor_info or {})
 
         return course_overview
 
@@ -481,6 +486,13 @@ class CourseOverview(TimeStampedModel):
         Returns a list of ID strings for this course's prerequisite courses.
         """
         return json.loads(self._pre_requisite_courses_json)
+
+    @property
+    def instructors(self):
+        """
+        Returns a dictionary containing information about course instructors.
+        """
+        return json.loads(self._instructor_info).get('instructors', [])
 
     @classmethod
     def get_select_courses(cls, course_keys):
