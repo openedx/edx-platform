@@ -19,7 +19,8 @@ from slumber.exceptions import HttpClientError, HttpServerError
 from edx_rest_api_client.client import EdxRestApiClient
 try:
     from enterprise import utils as enterprise_utils
-    from enterprise.models import EnterpriseCourseEnrollment
+    from enterprise.models import EnterpriseCourseEnrollment, EnterpriseCustomer
+    from enterprise.tpa_pipeline import get_enterprise_customer_for_request
     from enterprise.utils import consent_necessary_for_course
 except ImportError:
     pass
@@ -231,6 +232,32 @@ def enterprise_enabled():
     Determines whether the Enterprise app is installed
     """
     return 'enterprise' in settings.INSTALLED_APPS and getattr(settings, 'ENABLE_ENTERPRISE_INTEGRATION', True)
+
+
+def enterprise_customer_for_request(request, tpa_hint=None):
+    """
+    Check all the context clues of the request to determine if
+    the request being made is tied to a particular EnterpriseCustomer.
+    """
+    if not enterprise_enabled():
+        return None
+
+    ec = get_enterprise_customer_for_request(request)
+
+    if not ec and tpa_hint:
+        try:
+            ec = EnterpriseCustomer.objects.get(enterprise_customer_identity_provider__provider_id=tpa_hint)
+        except EnterpriseCustomer.DoesNotExist:
+            pass
+
+    ec_uuid = request.GET.get('enterprise_customer')
+    if not ec and ec_uuid:
+        try:
+            ec = EnterpriseCustomer.objects.get(uuid=ec_uuid)
+        except (EnterpriseCustomer.DoesNotExist, ValueError):
+            ec = None
+
+    return ec
 
 
 def consent_needed_for_course(user, course_id):
