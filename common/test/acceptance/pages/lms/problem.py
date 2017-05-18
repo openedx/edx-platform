@@ -149,7 +149,10 @@ class ProblemPage(PageObject):
         """
         Click the Show Answer button.
         """
-        self.q(css='.problem .show').click()
+        css = '.problem .show'
+        # First make sure that the button visible and can be clicked on.
+        self.scroll_to_element(css)
+        self.q(css=css).click()
         self.wait_for_ajax()
 
     def is_hint_notification_visible(self):

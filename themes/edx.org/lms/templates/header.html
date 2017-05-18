@@ -72,7 +72,7 @@ site_status_msg = get_site_status_msg(course_id)
     % if user.is_authenticated():
       % if not course or disable_courseware_header:
         % if not nav_hidden or show_program_listing:
-          <nav aria-label="Main" class="nav-main">
+          <nav aria-label="${_('Main')}" class="nav-main">
             <ul class="left list-inline nav-global authenticated">
               % if not nav_hidden:
                 <%block name="navigation_global_links_authenticated">
@@ -121,7 +121,7 @@ site_status_msg = get_site_status_msg(course_id)
       % endif
 
     % else:
-      <nav aria-label="Account" class="nav-account-management">
+      <nav aria-label="${_('Account')}" class="nav-account-management">
         <div class="right nav-courseware list-inline">
           <div class="item nav-courseware-01">
             % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
