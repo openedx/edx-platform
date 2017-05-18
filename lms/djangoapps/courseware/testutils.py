@@ -4,7 +4,7 @@ Common test utilities for courseware functionality
 # pylint: disable=attribute-defined-outside-init
 
 from abc import ABCMeta, abstractmethod
-from datetime import datetime
+from datetime import datetime, timedelta
 import ddt
 from mock import patch
 from urllib import urlencode
@@ -80,7 +80,9 @@ class RenderXBlockTestMixin(object):
         Options to configure the test course. Intended to be overridden by
         subclasses.
         """
-        return {}
+        return {
+            'start': datetime.now() - timedelta(days=1)
+        }
 
     def setup_course(self, default_store=None):
         """

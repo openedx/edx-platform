@@ -57,9 +57,9 @@ from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from commerce.utils import EcommerceService
 from enrollment.api import add_enrollment
 from course_modes.models import CourseMode
-from courseware.access import has_access, has_ccx_coach_role, _adjust_start_date_for_beta_testers
+from courseware.access import has_access, has_ccx_coach_role
 from courseware.access_response import StartDateError
-from courseware.access_utils import in_preview_mode
+from courseware.access_utils import in_preview_mode, is_course_open_for_learner
 from courseware.courses import (
     get_courses,
     get_course,
@@ -374,12 +374,11 @@ def course_info(request, course_id):
         if SelfPacedConfiguration.current().enable_course_home_improvements:
             context['last_accessed_courseware_url'] = get_last_accessed_courseware(course, request, user)
 
-        now = datetime.now(UTC())
-        effective_start = _adjust_start_date_for_beta_testers(user, course, course_key)
-        if not in_preview_mode() and staff_access and now < effective_start:
+        if not is_course_open_for_learner(user, course):
             # Disable student view button if user is staff and
             # course is not yet visible to students.
             context['disable_student_access'] = True
+            context['supports_preview_menu'] = False
 
         if CourseEnrollment.is_enrolled(request.user, course.id):
             inject_coursetalk_keys_into_context(context, course_key)
@@ -513,6 +512,11 @@ class CourseTabView(EdxFragmentView):
             request.user = masquerade_user
         else:
             masquerade = None
+
+        if course and not is_course_open_for_learner(request.user, course):
+            # Disable student view button if user is staff and
+            # course is not yet visible to students.
+            supports_preview_menu = False
         return {
             'course': course,
             'tab': tab,
