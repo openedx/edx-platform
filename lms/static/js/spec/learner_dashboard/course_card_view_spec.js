@@ -61,6 +61,7 @@ define([
                         is_course_ended: false,
                         is_enrolled: true,
                         is_enrollment_open: true,
+                        status: 'published',
                         upgrade_url: ''
                     }
                 ]
