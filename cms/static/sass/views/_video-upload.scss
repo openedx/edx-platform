@@ -169,6 +169,34 @@
     }
   }
 
+  .gray-l6 {
+    background: $gray-l6 !important;
+  }
+
+  .white {
+    background: white !important;
+  }
+
+  .blue-l5 {
+    background: $blue-l5 !important;
+  }
+
+  .thumbnail-error-wrapper {
+    padding: 0 !important;
+    border: none !important;
+
+    .thumbnail-error-text {
+      color: $red;
+      .action-text {
+        margin-left: 5px;
+      }
+    }
+  }
+
+  tr.has-thumbnail-error {
+    border: none !important;
+  }
+
   $thumbnail-width: ($baseline*7.5);
   $thumbnail-height: ($baseline*5);
 
@@ -192,6 +220,16 @@
     }
 
     &.requirements {
+      .requirements-text {
+        font-weight: 600;
+      }
+      .requirements-instructions {
+        font-size: 15px;
+        font-family: "Open Sans";
+        text-align: left;
+        color: #4c4c4c;
+        line-height: 1.5;
+      }
       .video-duration {
         opacity: 0;
       }

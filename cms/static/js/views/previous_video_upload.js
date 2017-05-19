@@ -20,7 +20,8 @@ define(
                 this.videoThumbnailView = new VideoThumbnailView({
                     model: this.model,
                     imageUploadURL: options.videoImageUploadURL,
-                    defaultVideoImageURL: options.defaultVideoImageURL
+                    defaultVideoImageURL: options.defaultVideoImageURL,
+                    videoImageSettings: options.videoImageSettings
                 });
             },
 

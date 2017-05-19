@@ -9,7 +9,10 @@
         </label>
 
         <span class="requirements-text-sr sr">
-            <%- gettext('Recommended image resolution is 1280x720 pixels and format must be one of .jpg, .png or .gif') %>
+            <%- edx.StringUtils.interpolate(
+                gettext("Recommended image resolution is {imageResolution}, maximum image file size should be {maxFileSize} and format must be one of {supportedImageFormats}."),
+                {imageResolution: videoImageResolution, maxFileSize: videoImageMaxSize.humanize, supportedImageFormats: videoImageSupportedFileFormats.humanize}
+            ) %>
         </span>
     </div>
     <% if(duration) { %>

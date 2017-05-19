@@ -14,7 +14,8 @@ define(
                     },
                     view = new PreviousVideoUploadView({
                         model: new Backbone.Model($.extend({}, defaultData, modelData)),
-                        videoHandlerUrl: '/videos/course-v1:org.0+course_0+Run_0'
+                        videoHandlerUrl: '/videos/course-v1:org.0+course_0+Run_0',
+                        videoImageSettings: {}
                     });
                 return view.render().$el;
             };
