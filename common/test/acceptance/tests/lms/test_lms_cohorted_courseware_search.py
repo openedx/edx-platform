@@ -9,11 +9,11 @@ from nose.plugins.attrib import attr
 
 from common.test.acceptance.fixtures import LMS_BASE_URL
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.common.logout import LogoutPage
 from common.test.acceptance.pages.lms.courseware_search import CoursewareSearchPage
 from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage
 from common.test.acceptance.pages.lms.staff_view import StaffCoursewarePage
-from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage as StudioAutoAuthPage
 from common.test.acceptance.pages.studio.component_editor import ComponentVisibilityEditorView
 from common.test.acceptance.pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
 from common.test.acceptance.pages.studio.settings_group_configurations import GroupConfigurationsPage
@@ -54,21 +54,21 @@ class CoursewareSearchCohortTest(ContainerBase):
         # Create a student who will be in "Cohort A"
         self.cohort_a_student_username = "cohort_a_" + str(uuid.uuid4().hex)[:12]
         self.cohort_a_student_email = self.cohort_a_student_username + "@example.com"
-        StudioAutoAuthPage(
+        AutoAuthPage(
             self.browser, username=self.cohort_a_student_username, email=self.cohort_a_student_email, no_login=True
         ).visit()
 
         # Create a student who will be in "Cohort B"
         self.cohort_b_student_username = "cohort_b_" + str(uuid.uuid4().hex)[:12]
         self.cohort_b_student_email = self.cohort_b_student_username + "@example.com"
-        StudioAutoAuthPage(
+        AutoAuthPage(
             self.browser, username=self.cohort_b_student_username, email=self.cohort_b_student_email, no_login=True
         ).visit()
 
         # Create a student who will end up in the default cohort group
         self.cohort_default_student_username = "cohort_default_student"
         self.cohort_default_student_email = "cohort_default_student@example.com"
-        StudioAutoAuthPage(
+        AutoAuthPage(
             self.browser, username=self.cohort_default_student_username,
             email=self.cohort_default_student_email, no_login=True
         ).visit()
@@ -89,8 +89,8 @@ class CoursewareSearchCohortTest(ContainerBase):
         Logout and login with given credentials.
         """
         LogoutPage(self.browser).visit()
-        StudioAutoAuthPage(self.browser, username=username, email=email,
-                           course_id=self.course_id, staff=staff).visit()
+        AutoAuthPage(self.browser, username=username, email=email,
+                     course_id=self.course_id, staff=staff).visit()
 
     def _studio_reindex(self):
         """

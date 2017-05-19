@@ -5,7 +5,7 @@ from ddt import data, ddt
 from nose.plugins.attrib import attr
 
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
-from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.studio.library import LibraryEditPage
 from common.test.acceptance.pages.studio.users import LibraryUsersPage
 from common.test.acceptance.pages.studio.utils import add_component

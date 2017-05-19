@@ -2,6 +2,7 @@
 """
 End-to-end tests for the LMS that utilize the course home page and course outline.
 """
+
 from nose.plugins.attrib import attr
 
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc

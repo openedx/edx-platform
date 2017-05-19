@@ -5,7 +5,7 @@ import uuid
 
 from nose.plugins.attrib import attr
 
-from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.studio.index import DashboardPage
 from common.test.acceptance.pages.studio.overview import CourseOutlinePage
 from common.test.acceptance.tests.helpers import AcceptanceTest
