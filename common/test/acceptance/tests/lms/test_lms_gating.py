@@ -5,11 +5,11 @@ End-to-end tests for the gating feature.
 from textwrap import dedent
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.common.logout import LogoutPage
 from common.test.acceptance.pages.lms.course_home import CourseHomePage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.problem import ProblemPage
-from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
 from common.test.acceptance.tests.helpers import UniqueCourseTest
 

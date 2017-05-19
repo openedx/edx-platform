@@ -20,7 +20,7 @@ from common.test.acceptance.fixtures.discussion import (
     Thread,
     UserProfileViewFixture
 )
-from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.discussion import (
     DiscussionSortPreferencePage,

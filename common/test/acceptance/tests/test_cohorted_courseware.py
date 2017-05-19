@@ -9,11 +9,10 @@ from nose.plugins.attrib import attr
 
 from common.test.acceptance.fixtures import LMS_BASE_URL
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.common.utils import add_enrollment_course_modes, enroll_user_track
-from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage as LmsAutoAuthPage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage
-from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage as StudioAutoAuthPage
 from common.test.acceptance.pages.studio.component_editor import ComponentVisibilityEditorView
 from common.test.acceptance.pages.studio.settings_group_configurations import GroupConfigurationsPage
 from common.test.acceptance.tests.lms.test_lms_user_preview import verify_expected_problem_visibility
@@ -43,21 +42,21 @@ class EndToEndCohortedCoursewareTest(ContainerBase):
         # Create a student who will be in "Cohort A"
         self.cohort_a_student_username = "cohort_a_student"
         self.cohort_a_student_email = "cohort_a_student@example.com"
-        StudioAutoAuthPage(
+        AutoAuthPage(
             self.browser, username=self.cohort_a_student_username, email=self.cohort_a_student_email, no_login=True
         ).visit()
 
         # Create a student who will be in "Cohort B"
         self.cohort_b_student_username = "cohort_b_student"
         self.cohort_b_student_email = "cohort_b_student@example.com"
-        StudioAutoAuthPage(
+        AutoAuthPage(
             self.browser, username=self.cohort_b_student_username, email=self.cohort_b_student_email, no_login=True
         ).visit()
 
         # Create a Verified Student
         self.cohort_verified_student_username = "cohort_verified_student"
         self.cohort_verified_student_email = "cohort_verified_student@example.com"
-        StudioAutoAuthPage(
+        AutoAuthPage(
             self.browser,
             username=self.cohort_verified_student_username,
             email=self.cohort_verified_student_email,
@@ -67,7 +66,7 @@ class EndToEndCohortedCoursewareTest(ContainerBase):
         # Create audit student
         self.cohort_audit_student_username = "cohort_audit_student"
         self.cohort_audit_student_email = "cohort_audit_student@example.com"
-        StudioAutoAuthPage(
+        AutoAuthPage(
             self.browser,
             username=self.cohort_audit_student_username,
             email=self.cohort_audit_student_email,
@@ -77,13 +76,13 @@ class EndToEndCohortedCoursewareTest(ContainerBase):
         # Create a student who will end up in the default cohort group
         self.cohort_default_student_username = "cohort_default_student"
         self.cohort_default_student_email = "cohort_default_student@example.com"
-        StudioAutoAuthPage(
+        AutoAuthPage(
             self.browser, username=self.cohort_default_student_username,
             email=self.cohort_default_student_email, no_login=True
         ).visit()
 
         # Start logged in as the staff user.
-        StudioAutoAuthPage(
+        AutoAuthPage(
             self.browser, username=self.staff_user["username"], email=self.staff_user["email"]
         ).visit()
 
@@ -194,7 +193,7 @@ class EndToEndCohortedCoursewareTest(ContainerBase):
         courseware_page = CoursewarePage(self.browser, self.course_id)
 
         def login_and_verify_visible_problems(username, email, expected_problems, track=None):
-            LmsAutoAuthPage(
+            AutoAuthPage(
                 self.browser, username=username, email=email, course_id=self.course_id
             ).visit()
             if track is not None:
