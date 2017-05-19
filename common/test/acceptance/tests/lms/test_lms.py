@@ -13,11 +13,11 @@ from flaky import flaky
 from nose.plugins.attrib import attr
 
 from common.test.acceptance.fixtures.course import CourseFixture, CourseUpdateDesc, XBlockFixtureDesc
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.common.logout import LogoutPage
 from common.test.acceptance.pages.common.utils import enroll_user_track
 from common.test.acceptance.pages.lms import BASE_URL
 from common.test.acceptance.pages.lms.account_settings import AccountSettingsPage
-from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.course_home import CourseHomePage
 from common.test.acceptance.pages.lms.course_info import CourseInfoPage
 from common.test.acceptance.pages.lms.course_wiki import (

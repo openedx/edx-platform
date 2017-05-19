@@ -11,7 +11,7 @@ from nose.plugins.attrib import attr
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.fixtures.edxnotes import EdxNotesFixture, Note, Range
-from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.course_home import CourseHomePage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.edxnotes import EdxNotesPage, EdxNotesPageNoContent, EdxNotesUnitPage

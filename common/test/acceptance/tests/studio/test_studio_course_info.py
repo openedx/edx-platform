@@ -4,7 +4,7 @@ Acceptance Tests for Course Information
 from common.test.acceptance.pages.studio.course_info import CourseUpdatesPage
 from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest
 
-from ...pages.studio.auto_auth import AutoAuthPage
+from ...pages.common.auto_auth import AutoAuthPage
 from ...pages.studio.index import DashboardPage
 
 

@@ -7,8 +7,8 @@ from unittest import skip
 from nose.plugins.attrib import attr
 
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.studio.asset_index import AssetIndexPage
-from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.studio.course_info import CourseUpdatesPage
 from common.test.acceptance.pages.studio.edit_tabs import PagesPage
 from common.test.acceptance.pages.studio.import_export import (
