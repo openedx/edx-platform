@@ -13,10 +13,12 @@ from django.conf import settings
 from django.utils.timezone import UTC
 from django.test.utils import override_settings
 
+from contentstore.signals import listen_for_grading_policy_change
 from contentstore.utils import reverse_course_url, reverse_usage_url
 from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
 from models.settings.encoder import CourseSettingsEncoder
+from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from student.roles import CourseInstructorRole, CourseStaffRole
@@ -24,7 +26,7 @@ from student.tests.factories import UserFactory
 from xblock_django.models import XBlockStudioConfigurationFlag
 from xmodule.fields import Date
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore, SignalHandler
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.tabs import InvalidTabsException
 from milestones.tests.utils import MilestonesTestCaseMixin
@@ -1007,6 +1009,7 @@ class CourseGraderUpdatesTest(CourseTestCase):
     def setUp(self):
         """Compute the url to use in tests"""
         super(CourseGraderUpdatesTest, self).setUp()
+        SignalHandler.grading_policy_change.disconnect(listen_for_grading_policy_change)
         self.url = get_url(self.course.id, 'grading_handler')
         self.starting_graders = CourseGradingModel(self.course).graders
 
@@ -1062,6 +1065,25 @@ class CourseGraderUpdatesTest(CourseTestCase):
         self.assertEqual(obj, grader)
         current_graders = CourseGradingModel.fetch(self.course.id).graders
         self.assertEqual(len(self.starting_graders) + 1, len(current_graders))
+
+    def test_grading_policy_signal(self):
+        org = 'TestX'
+        course_number = 'TS01'
+        course_run = '2015_Q1'
+
+        # Create a course using split modulestore
+        self.course = CourseFactory.create(
+            org=org,
+            number=course_number,
+            run=course_run
+        )
+        course_key = CourseKey.from_string(self.course.url)
+        grading_policy_change.send(
+            sender=CourseGraderUpdatesTest,
+            course_key=course_key,
+            test=True
+        )
+        self.assertAssetsEqual(course_key.course_run, '2020_Q1')
 
 
 class CourseEnrollmentEndFieldTest(CourseTestCase):
