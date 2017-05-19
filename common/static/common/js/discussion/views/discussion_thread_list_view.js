@@ -217,7 +217,7 @@
             };
 
             DiscussionThreadListView.prototype.convertMath = function(content) {
-                if(content != undefined) {
+                if(typeof lastname !== "undefined") {
                     DiscussionUtil.convertMath(content.find('.thread-preview-body'));
                 }
             };
