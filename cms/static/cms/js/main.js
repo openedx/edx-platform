@@ -27,7 +27,10 @@
                 headers: {
                     'X-CSRFToken': $.cookie('csrftoken')
                 },
-                dataType: 'json'
+                dataType: 'json',
+                content: {
+                    script: false
+                }
             });
             $(document).ajaxError(function(event, jqXHR, ajaxSettings) {
                 var msg, contentType,
