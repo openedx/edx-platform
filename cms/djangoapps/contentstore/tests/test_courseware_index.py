@@ -44,7 +44,7 @@ from contentstore.courseware_index import (
     SearchIndexingError,
     CourseAboutSearchIndexer,
 )
-from contentstore.signals import listen_for_course_publish, listen_for_library_update
+from contentstore.signals.handlers import listen_for_course_publish, listen_for_library_update
 from contentstore.utils import reverse_course_url, reverse_usage_url
 from contentstore.tests.utils import CourseTestCase
 

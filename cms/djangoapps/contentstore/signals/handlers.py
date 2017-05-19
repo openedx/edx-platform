@@ -4,7 +4,7 @@ import logging
 from datetime import datetime
 from pytz import UTC
 
-from django.dispatch import receiver, Signal
+from django.dispatch import receiver
 
 from xmodule.modulestore.django import modulestore, SignalHandler
 from contentstore.courseware_index import CoursewareSearchIndexer, LibrarySearchIndexer
@@ -15,17 +15,6 @@ from util.module_utils import yield_dynamic_descriptor_descendants
 
 
 log = logging.getLogger(__name__)
-
-
-# Signal that indicates that a course grading policy has been updated.
-# This signal is generated when a grading policy change occurs within
-# modulestore for either course or subsection changes.
-GRADING_POLICY_CHANGED = Signal(
-    providing_args=[
-        'user_id',  # Integer User ID
-        'course_id',  # Unicode string representing the course
-    ]
-)
 
 
 @receiver(SignalHandler.course_published)
@@ -50,10 +39,9 @@ def listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=
 
     # Finally call into the course search subsystem
     # to kick off an indexing action
-
     if CoursewareSearchIndexer.indexing_is_enabled():
         # import here, because signal is registered at startup, but items in tasks are not yet able to be loaded
-        from .tasks import update_search_index
+        from contentstore.tasks import update_search_index
 
         update_search_index.delay(unicode(course_key), datetime.now(UTC).isoformat())
 
@@ -66,7 +54,7 @@ def listen_for_library_update(sender, library_key, **kwargs):  # pylint: disable
 
     if LibrarySearchIndexer.indexing_is_enabled():
         # import here, because signal is registered at startup, but items in tasks are not yet able to be loaded
-        from .tasks import update_library_index
+        from contentstore.tasks import update_library_index
 
         update_library_index.delay(unicode(library_key), datetime.now(UTC).isoformat())
 
