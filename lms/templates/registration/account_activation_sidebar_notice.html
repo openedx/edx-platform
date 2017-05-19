@@ -1,6 +1,7 @@
 <%page expression_filter="h"/>
 <%!
 from django.utils.translation import ugettext as _
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangolib.markup import HTML, Text
 %>
 <div class="profile-sidebar" role="region" aria-labelledby="account-activation-title">
@@ -16,12 +17,13 @@ from openedx.core.djangolib.markup import HTML, Text
           ${_("Activate your account!")}
         </span>
         <p class="status-note">${Text(_(
-          "Check your {email_start}{email}{email_end} inbox for an account activation link from edX. "
-          "If you need help, contact {link_start}edX Support{link_end}."
+          "Check your {email_start}{email}{email_end} inbox for an account activation link from {platform_name}. "
+          "If you need help, contact {link_start}{platform_name} Support{link_end}."
         )).format(
           email_start=HTML("<strong>"),
           email_end=HTML("</strong>"),
           email=email,
+          platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
           link_start=HTML("<a target='_blank' href='https://support.edx.org/hc/en-us/articles/227340127-Why-haven-t-I-received-my-activation-email-'>"),
           link_end=HTML("</a>"),
         )}
