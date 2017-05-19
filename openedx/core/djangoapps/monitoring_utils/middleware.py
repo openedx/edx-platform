@@ -19,7 +19,7 @@ except ImportError:
 
 import psutil
 import request_cache
-from openedx.core.djangolib.waffle_utils import WaffleSwitchPlus
+from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 
 
 REQUEST_CACHE_KEY = 'monitoring_custom_metrics'
@@ -163,4 +163,4 @@ class MonitoringMemoryMiddleware(object):
         """
         Returns whether this middleware is enabled.
         """
-        return WaffleSwitchPlus(namespace=WAFFLE_NAMESPACE).is_enabled(u'enable_memory_middleware')
+        return WaffleSwitchNamespace(name=WAFFLE_NAMESPACE).is_enabled(u'enable_memory_middleware')
