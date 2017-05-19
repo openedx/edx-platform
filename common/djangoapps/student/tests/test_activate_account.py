@@ -6,6 +6,8 @@ from django.conf import settings
 from django.test import TestCase, override_settings
 from django.core.urlresolvers import reverse
 
+from uuid import uuid4
+
 from edxmako.shortcuts import render_to_string
 from student.models import Registration
 from student.tests.factories import UserFactory
@@ -159,3 +161,28 @@ class TestActivateAccount(TestCase):
         )
         response = self.client.get(reverse('dashboard'))
         self.assertNotContains(response, expected_message, html=True)
+
+    def test_account_activation_notification_on_logistration(self):
+        """
+        Verify that logistration page displays success/error/info messages
+        about account activation.
+        """
+        login_page_url = "{login_url}?next={redirect_url}".format(
+            login_url=reverse('signin_user'),
+            redirect_url=reverse('dashboard'),
+        )
+        # Access activation link, message should say that account has been activated.
+        response = self.client.get(reverse('activate', args=[self.registration.activation_key]), follow=True)
+        self.assertRedirects(response, login_page_url)
+        self.assertContains(response, 'You have activated your account.')
+
+        # Access activation link again, message should say that account is already active.
+        response = self.client.get(reverse('activate', args=[self.registration.activation_key]), follow=True)
+        self.assertRedirects(response, login_page_url)
+        self.assertContains(response, 'This account has already been activated.')
+
+        # Open account activation page with an invalid activation link,
+        # there should be an error message displayed.
+        response = self.client.get(reverse('activate', args=[uuid4().hex]), follow=True)
+        self.assertRedirects(response, login_page_url)
+        self.assertContains(response, 'Your account could not be activated')

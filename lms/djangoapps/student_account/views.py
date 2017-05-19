@@ -117,6 +117,13 @@ def login_and_registration_form(request, initial_mode="login"):
     if ext_auth_response is not None:
         return ext_auth_response
 
+    # Account activation message
+    account_activation_messages = [
+        {
+            'message': message.message, 'tags': message.tags
+        } for message in messages.get_messages(request) if 'account-activation' in message.tags
+    ]
+
     # Otherwise, render the combined login/registration page
     context = {
         'data': {
@@ -126,6 +133,7 @@ def login_and_registration_form(request, initial_mode="login"):
             'third_party_auth_hint': third_party_auth_hint or '',
             'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
             'support_link': configuration_helpers.get_value('SUPPORT_SITE_LINK', settings.SUPPORT_SITE_LINK),
+            'account_activation_messages': account_activation_messages,
 
             # Include form descriptions retrieved from the user API.
             # We could have the JS client make these requests directly,

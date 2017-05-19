@@ -52,6 +52,9 @@
 
                     this.thirdPartyAuthHint = options.third_party_auth_hint || null;
 
+                    // Account activation messages
+                    this.accountActivationMessages = options.account_activation_messages || [];
+
                     if (options.login_redirect_url) {
                     // Ensure that the next URL is internal for security reasons
                         if (! window.isExternal(options.login_redirect_url)) {
@@ -82,6 +85,10 @@
                 // Once the third party error message has been shown once,
                 // there is no need to show it again, if the user changes mode:
                     this.thirdPartyAuth.errorMessage = null;
+
+                    // Once the account activation messages have been shown once,
+                    // there is no need to show it again, if the user changes mode:
+                    this.accountActivationMessages = [];
                 },
 
                 render: function() {
@@ -119,6 +126,7 @@
                             model: model,
                             resetModel: this.resetModel,
                             thirdPartyAuth: this.thirdPartyAuth,
+                            accountActivationMessages: this.accountActivationMessages,
                             platformName: this.platformName,
                             supportURL: this.supportURL,
                             createAccountOption: this.createAccountOption

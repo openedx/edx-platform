@@ -560,6 +560,30 @@
                 margin: 0 0 ($baseline/4) $baseline;
             }
         }
+
+        &.account-activation {
+            .message-copy {
+                padding: 0 1em !important;
+            }
+
+            &.info {
+                background-color: $palette-info-back;
+                border: $palette-info-border 1px solid;
+                color: $palette-info-text;
+            }
+
+            &.success {
+                background-color: $palette-success-back;
+                border: $palette-success-border 1px solid;
+                color: $palette-success-text;
+           }
+
+            &.error {
+                background-color: $palette-error-back;
+                border: $palette-error-border 1px solid;
+                color: $palette-error-text 1px solid;
+            }
+        }
     }
 
     .submission-error, .system-error {
