@@ -14,6 +14,7 @@ LMS_ROOT_URL = 'http://edx.devstack.lms:18000'
 FEATURES.update({
     'ENABLE_COURSEWARE_INDEX': False,
     'ENABLE_LIBRARY_INDEX': False,
+    'ENABLE_DISCUSSION_SERVICE': False,
 })
 
 CREDENTIALS_SERVICE_USERNAME = 'credentials_worker'
