@@ -1,14 +1,9 @@
 """
 Unit tests for bulk-email-related models.
 """
-from django.test import TestCase
-from django.core.management import call_command
+import datetime
 
-from student.tests.factories import UserFactory
-
-from mock import patch, Mock
-from nose.plugins.attrib import attr
-
+import ddt
 from bulk_email.models import (
     CourseEmail,
     SEND_TO_COHORT,
@@ -19,13 +14,22 @@ from bulk_email.models import (
     BulkEmailFlag
 )
 from course_modes.models import CourseMode
-from openedx.core.djangoapps.course_groups.models import CourseCohort
+from django.core.management import call_command
+from django.test import TestCase
+from mock import patch, Mock
+from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
+from student.tests.factories import UserFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
+
+from openedx.core.djangoapps.course_groups.models import CourseCohort
 
 
+@ddt.ddt
 @attr(shard=1)
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
-class CourseEmailTest(TestCase):
+class CourseEmailTest(ModuleStoreTestCase):
     """Test the CourseEmail model."""
 
     def test_creation(self):
@@ -69,16 +73,28 @@ class CourseEmailTest(TestCase):
         with self.assertRaises(ValueError):
             CourseEmail.create(course_id, sender, to_option, subject, html_message)
 
-    def test_track_target(self):
-        course_id = CourseKey.from_string('abc/123/doremi')
+    @ddt.data(
+        datetime.datetime(1999, 1, 1),
+        datetime.datetime(datetime.MAXYEAR, 1, 1),
+    )
+    def test_track_target(self, expiration_datetime):
+        """
+        Tests that emails can be sent to a specific track. Also checks that
+         emails can be sent to an expired track (EDUCATOR-364)
+        """
+        course = CourseFactory.create()
+        course_id = course.id
         sender = UserFactory.create()
         to_option = 'track:test'
         subject = "dummy subject"
         html_message = "<html>dummy message</html>"
-        CourseMode.objects.create(mode_slug='test', mode_display_name='Test', course_id=course_id)
-        with patch('bulk_email.models.validate_course_mode'):
-            # we don't have a real course, so validation will fail. Mock it out!
-            email = CourseEmail.create(course_id, sender, [to_option], subject, html_message)
+        CourseMode.objects.create(
+            mode_slug='test',
+            mode_display_name='Test',
+            course_id=course_id,
+            expiration_datetime=expiration_datetime,
+        )
+        email = CourseEmail.create(course_id, sender, [to_option], subject, html_message)
         self.assertEqual(len(email.targets.all()), 1)
         target = email.targets.all()[0]
         self.assertEqual(target.target_type, SEND_TO_TRACK)
