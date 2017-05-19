@@ -90,6 +90,7 @@ from openedx.core.djangoapps.external_auth.login_and_register import (
     register as external_auth_register
 )
 from openedx.core.djangoapps import monitoring_utils
+from openedx.core.djangolib.markup import HTML, Text
 
 import track.views
 
@@ -721,6 +722,11 @@ def dashboard(request):
 
     enterprise_message = get_dashboard_consent_notification(request, user, course_enrollments)
 
+    # Account activation message
+    account_activation_messages = [
+        message for message in messages.get_messages(request) if 'account-activation' in message.tags
+    ]
+
     # Global staff can see what courses errored on their dashboard
     staff_access = False
     errored_courses = {}
@@ -844,6 +850,7 @@ def dashboard(request):
         'enterprise_message': enterprise_message,
         'enrollment_message': enrollment_message,
         'redirect_message': redirect_message,
+        'account_activation_messages': account_activation_messages,
         'course_enrollments': course_enrollments,
         'course_optouts': course_optouts,
         'banner_account_activation_message': banner_account_activation_message,
@@ -2285,31 +2292,83 @@ def auto_auth(request):
 @ensure_csrf_cookie
 def activate_account(request, key):
     """When link in activation e-mail is clicked"""
-    regs = Registration.objects.filter(activation_key=key)
-    if len(regs) == 1:
+
+    # If request is in Studio call the appropriate view
+    if theming_helpers.get_project_root_name().lower() == u'cms':
+        return activate_account_studio(request, key)
+
+    try:
+        registration = Registration.objects.get(activation_key=key)
+    except (Registration.DoesNotExist, Registration.MultipleObjectsReturned):
+        messages.error(
+            request,
+            Text(_(
+                '{html_start}Your account could not be activated{html_end}'
+                'Something went wrong, please <a href="{support_url}">contact support</a> to resolve this issue.'
+            )).format(
+                support_url=configuration_helpers.get_value('SUPPORT_SITE_LINK', settings.SUPPORT_SITE_LINK),
+                html_start=HTML('<p class="message-title">'),
+                html_end=HTML('</p>'),
+            ),
+            extra_tags='account-activation icon'
+        )
+    else:
+        if not registration.user.is_active:
+            registration.activate()
+            # Add account activation success message for display later
+            messages.success(
+                request,
+                Text(_('{html_start}Success{html_end} You have activated your account.')).format(
+                    html_start=HTML('<p class="message-title">'),
+                    html_end=HTML('</p>'),
+                ),
+                extra_tags='account-activation icon',
+            )
+        else:
+            messages.info(
+                request,
+                Text(_('{html_start}This account has already been activated.{html_end}')).format(
+                    html_start=HTML('<p class="message-title">'),
+                    html_end=HTML('</p>'),
+                ),
+                extra_tags='account-activation icon',
+            )
+
+        # Enroll student in any pending courses he/she may have if auto_enroll flag is set
+        _enroll_user_in_pending_courses(registration.user)
+
+    return redirect('dashboard')
+
+
+@ensure_csrf_cookie
+def activate_account_studio(request, key):
+    """
+    When link in activation e-mail is clicked and the link belongs to studio.
+    """
+    try:
+        registration = Registration.objects.get(activation_key=key)
+    except (Registration.DoesNotExist, Registration.MultipleObjectsReturned):
+        return render_to_response(
+            "registration/activation_invalid.html",
+            {'csrf': csrf(request)['csrf_token']}
+        )
+    else:
         user_logged_in = request.user.is_authenticated()
         already_active = True
-        if not regs[0].user.is_active:
-            regs[0].activate()
+        if not registration.user.is_active:
+            registration.activate()
             already_active = False
 
         # Enroll student in any pending courses he/she may have if auto_enroll flag is set
-        _enroll_user_in_pending_courses(regs[0].user)
+        _enroll_user_in_pending_courses(registration.user)
 
-        resp = render_to_response(
+        return render_to_response(
             "registration/activation_complete.html",
             {
                 'user_logged_in': user_logged_in,
                 'already_active': already_active
             }
         )
-        return resp
-    if len(regs) == 0:
-        return render_to_response(
-            "registration/activation_invalid.html",
-            {'csrf': csrf(request)['csrf_token']}
-        )
-    return HttpResponseServerError(_("Unknown error. Please e-mail us to let us know how it happened."))
 
 
 @csrf_exempt
