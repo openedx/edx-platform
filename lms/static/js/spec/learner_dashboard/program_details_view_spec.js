@@ -187,7 +187,8 @@ define([
                                     modified: '2017-03-24T14:22:15.609907Z',
                                     is_enrolled: true,
                                     pacing_type: 'self_paced',
-                                    video: null
+                                    video: null,
+                                    status: 'published'
                                 }
                             ]
                         }
@@ -268,7 +269,8 @@ define([
                                     modified: '2017-03-24T14:16:47.547643Z',
                                     is_enrolled: true,
                                     pacing_type: 'instructor_paced',
-                                    video: null
+                                    video: null,
+                                    status: 'published'
                                 }
                             ]
                         }
@@ -372,7 +374,8 @@ define([
                                     modified: '2017-03-24T14:18:08.693748Z',
                                     is_enrolled: false,
                                     pacing_type: 'instructor_paced',
-                                    video: null
+                                    video: null,
+                                    status: 'published'
                                 },
                                 {
                                     upgrade_url: null,
@@ -445,7 +448,8 @@ define([
                                     modified: '2017-03-23T16:47:37.108260Z',
                                     is_enrolled: false,
                                     pacing_type: 'self_paced',
-                                    video: null
+                                    video: null,
+                                    status: 'published'
                                 }
                             ]
                         }

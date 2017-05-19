@@ -63,7 +63,8 @@
                     rawCourseRuns = _.where(this.context.course_runs, {
                         is_enrollment_open: true,
                         is_enrolled: false,
-                        is_course_ended: false
+                        is_course_ended: false,
+                        status: 'published'
                     });
 
                     // Deep copy to avoid mutating this.context.
@@ -90,7 +91,8 @@
                     return _.where(this.context.course_runs, {
                         is_enrollment_open: false,
                         is_enrolled: false,
-                        is_course_ended: false
+                        is_course_ended: false,
+                        status: 'published'
                     });
                 },
 

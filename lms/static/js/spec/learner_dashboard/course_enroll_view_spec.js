@@ -57,6 +57,7 @@ define([
                 is_course_ended: false,
                 is_enrolled: false,
                 is_enrollment_open: true,
+                status: 'published',
                 upgrade_url: ''
             }];
 
@@ -80,7 +81,8 @@ define([
                 enrollment_open_date: 'Jan 18, 2016',
                 is_course_ended: false,
                 is_enrolled: false,
-                is_enrollment_open: true
+                is_enrollment_open: true,
+                status: 'published'
             }, {
                 key: 'course-v1:WageningenX+FFESx+1T2017',
                 uuid: '2f2edf03-79e6-4e39-aef0-65436a6ee344',
@@ -99,7 +101,8 @@ define([
                 enrollment_open_date: 'Jan 18, 2016',
                 is_course_ended: false,
                 is_enrolled: false,
-                is_enrollment_open: true
+                is_enrollment_open: true,
+                status: 'published'
             }];
         });
 
@@ -150,7 +153,6 @@ define([
         it('should not render anything if course runs are empty', function() {
             setupView([]);
 
-            expect(view.$('.enrollment-info').length).toBe(0);
             expect(view.$('.run-select').length).toBe(0);
             expect(view.$('.enroll-button').length).toBe(0);
         });
@@ -161,6 +163,22 @@ define([
             expect(view.$('.run-select').length).toBe(1);
             expect(view.$('.run-select').val()).toEqual(multiCourseRunList[0].key);
             expect(view.$('.run-select option').length).toBe(2);
+        });
+
+        it('should not allow enrollment in unpublished course runs', function() {
+            multiCourseRunList[0].status = 'unpublished';
+
+            setupView(multiCourseRunList);
+            expect(view.$('.run-select').length).toBe(0);
+            expect(view.$('.enroll-button').length).toBe(1);
+        });
+
+        it('should not allow enrollment in course runs with a null status', function() {
+            multiCourseRunList[0].status = null;
+
+            setupView(multiCourseRunList);
+            expect(view.$('.run-select').length).toBe(0);
+            expect(view.$('.enroll-button').length).toBe(1);
         });
 
         it('should enroll learner when enroll button is clicked with one course run available', function() {
