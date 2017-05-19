@@ -2548,6 +2548,8 @@ TIME_ZONE_DISPLAYED_FOR_DEADLINES = 'UTC'
 ########################## VIDEO IMAGE STORAGE ############################
 
 VIDEO_IMAGE_SETTINGS = dict(
+    VIDEO_IMAGE_MAX_BYTES=2 * 1024 * 1024,    # 2 MB
+    VIDEO_IMAGE_MIN_BYTES=2 * 1024,       # 2 KB
     # Backend storage
     # STORAGE_CLASS='storages.backends.s3boto.S3BotoStorage',
     # STORAGE_KWARGS=dict(bucket='video-image-bucket'),
