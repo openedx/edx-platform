@@ -17,11 +17,11 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from provider.oauth2.models import Client
 from provider.utils import long_token
-from social.backends.base import BaseAuth
-from social.backends.oauth import OAuthAuth
-from social.backends.saml import SAMLAuth, SAMLIdentityProvider
-from social.exceptions import SocialAuthBaseException
-from social.utils import module_member
+from social_core.backends.base import BaseAuth
+from social_core.backends.oauth import OAuthAuth
+from social_core.backends.saml import SAMLAuth, SAMLIdentityProvider
+from social_core.exceptions import SocialAuthBaseException
+from social_core.utils import module_member
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import get_current_request
@@ -581,7 +581,7 @@ class SAMLConfiguration(ConfigurationModel):
             return getattr(settings, 'SOCIAL_AUTH_SAML_SP_PRIVATE_KEY', '')
         other_config = {
             # These defaults can be overriden by self.other_config_str
-            "EXTRA_DATA": ["attributes"],  # Save all attribute values the IdP sends into the UserSocialAuth table
+            "GET_ALL_EXTRA_DATA": True,  # Save all attribute values the IdP sends into the UserSocialAuth table
             "TECHNICAL_CONTACT": DEFAULT_SAML_CONTACT,
             "SUPPORT_CONTACT": DEFAULT_SAML_CONTACT,
         }

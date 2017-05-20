@@ -16,7 +16,7 @@ from django.test.testcases import TransactionTestCase
 from django.test.utils import override_settings
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from pytz import common_timezones_set, UTC
-from social.apps.django_app.default.models import UserSocialAuth
+from social_django.models import UserSocialAuth, Partial
 
 from django_comment_common import models
 from openedx.core.djangoapps.site_configuration.helpers import get_value
@@ -1976,6 +1976,10 @@ class ThirdPartyRegistrationTestMixin(ThirdPartyOAuthTestMixin, CacheIsolationTe
         super(ThirdPartyRegistrationTestMixin, self).setUp()
         self.url = reverse('user_api_registration')
 
+    def tearDown(self):
+        super(ThirdPartyRegistrationTestMixin, self).tearDown()
+        Partial.objects.all().delete()
+
     def data(self, user=None):
         """Returns the request data for the endpoint."""
         return {
@@ -1996,7 +2000,6 @@ class ThirdPartyRegistrationTestMixin(ThirdPartyOAuthTestMixin, CacheIsolationTe
         for conflict_attribute in ["username", "email"]:
             self.assertIn(conflict_attribute, errors)
             self.assertIn("belongs to an existing account", errors[conflict_attribute][0]["user_message"])
-        self.assertNotIn("partial_pipeline", self.client.session)
 
     def _assert_access_token_error(self, response, expected_error_message):
         """Assert that the given response was an error for the access_token field with the given error message."""
@@ -2006,7 +2009,6 @@ class ThirdPartyRegistrationTestMixin(ThirdPartyOAuthTestMixin, CacheIsolationTe
             response_json,
             {"access_token": [{"user_message": expected_error_message}]}
         )
-        self.assertNotIn("partial_pipeline", self.client.session)
 
     def _assert_third_party_session_expired_error(self, response, expected_error_message):
         """Assert that given response is an error due to third party session expiry"""
@@ -2109,8 +2111,6 @@ class ThirdPartyRegistrationTestMixin(ThirdPartyOAuthTestMixin, CacheIsolationTe
         # to identify that request is made using browser
         data.update({"social_auth_provider": "Google"})
         response = self.client.post(self.url, data)
-        # NO partial_pipeline in session means pipeline is expired
-        self.assertNotIn("partial_pipeline", self.client.session)
         self._assert_third_party_session_expired_error(
             response,
             u"Registration using {provider} has timed out.".format(provider="Google")
@@ -2127,7 +2127,7 @@ class TestFacebookRegistrationView(
 
     def test_social_auth_exception(self):
         """
-        According to the do_auth method in social.backends.facebook.py,
+        According to the do_auth method in social_core.backends.facebook.py,
         the Facebook API sometimes responds back a JSON with just False as value.
         """
         self._setup_provider_response_with_body(200, json.dumps("false"))

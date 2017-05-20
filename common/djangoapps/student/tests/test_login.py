@@ -14,7 +14,7 @@ from django.test import TestCase
 from django.test.client import Client
 from django.test.utils import override_settings
 from mock import patch
-from social.apps.django_app.default.models import UserSocialAuth
+from social_django.models import UserSocialAuth
 
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
@@ -540,7 +540,6 @@ class LoginOAuthTokenMixin(ThirdPartyOAuthTestMixin):
         """Assert that the given response was a 400 with the given error code"""
         self.assertEqual(response.status_code, status_code)
         self.assertEqual(json.loads(response.content), {"error": error})
-        self.assertNotIn("partial_pipeline", self.client.session)
 
     def test_success(self):
         self._setup_provider_response(success=True)

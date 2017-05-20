@@ -6,10 +6,9 @@ import ddt
 import unittest
 import httpretty
 import json
-import time
 from mock import patch
 from freezegun import freeze_time
-from social.apps.django_app.default.models import UserSocialAuth
+from social_django.models import UserSocialAuth
 from unittest import skip
 
 from third_party_auth.saml import log as saml_log
@@ -119,7 +118,7 @@ class SamlIntegrationTestUtilities(object):
 
 
 @ddt.ddt
-@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, 'third_party_auth not enabled')
+@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
 class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin, testutil.SAMLTestCase):
     """
     TestShib provider Integration Test, to test SAML functionality
@@ -157,7 +156,7 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
         record = UserSocialAuth.objects.get(
             user=self.user, provider=self.PROVIDER_BACKEND, uid__startswith=self.PROVIDER_IDP_SLUG
         )
-        attributes = record.extra_data["attributes"]
+        attributes = record.extra_data
         self.assertEqual(
             attributes.get("urn:oid:1.3.6.1.4.1.5923.1.1.1.9"), ["Member@testshib.org", "Staff@testshib.org"]
         )
@@ -232,7 +231,7 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
             self._test_return_login(previous_session_timed_out=True)
 
 
-@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, 'third_party_auth not enabled')
+@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
 class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin, testutil.SAMLTestCase):
     """
     Test basic SAML capability using the TestShib details, and then check that we're able
