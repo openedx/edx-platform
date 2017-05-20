@@ -10,8 +10,8 @@ from provider.forms import OAuthForm, OAuthValidationError
 from provider.oauth2.forms import ScopeChoiceField, ScopeMixin
 from provider.oauth2.models import Client
 from requests import HTTPError
-from social.backends import oauth as social_oauth
-from social.exceptions import AuthException
+from social_core.backends import oauth as social_oauth
+from social_core.exceptions import AuthException
 
 from third_party_auth import pipeline
 
@@ -90,15 +90,16 @@ class AccessTokenExchangeForm(ScopeMixin, OAuthForm):
         self.cleaned_data["client"] = client
 
         user = None
+        access_token = self.cleaned_data.get("access_token")
         try:
-            user = backend.do_auth(self.cleaned_data.get("access_token"), allow_inactive_user=True)
+            user = backend.do_auth(access_token, allow_inactive_user=True)
         except (HTTPError, AuthException):
             pass
         if user and isinstance(user, User):
             self.cleaned_data["user"] = user
         else:
             # Ensure user does not re-enter the pipeline
-            self.request.social_strategy.clean_partial_pipeline()
+            self.request.social_strategy.clean_partial_pipeline(access_token)
             raise OAuthValidationError(
                 {
                     "error": "invalid_grant",

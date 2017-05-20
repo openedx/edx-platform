@@ -40,11 +40,11 @@ class TestEnterpriseApi(unittest.TestCase):
         the utilities to return the expected values.
         """
         self.assertTrue(enterprise_enabled())
-        pipeline = ['abc', 'social.pipeline.social_auth.load_extra_data', 'def']
+        pipeline = ['abc', 'social_core.pipeline.social_auth.load_extra_data', 'def']
         insert_enterprise_pipeline_elements(pipeline)
         self.assertEqual(pipeline, ['abc',
                                     'enterprise.tpa_pipeline.handle_enterprise_logistration',
-                                    'social.pipeline.social_auth.load_extra_data',
+                                    'social_core.pipeline.social_auth.load_extra_data',
                                     'def'])
 
     @override_settings(ENABLE_ENTERPRISE_INTEGRATION=True)

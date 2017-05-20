@@ -320,7 +320,7 @@ def insert_enterprise_pipeline_elements(pipeline):
         'enterprise.tpa_pipeline.handle_enterprise_logistration',
     )
     # Find the item we need to insert the data sharing consent elements before
-    insert_point = pipeline.index('social.pipeline.social_auth.load_extra_data')
+    insert_point = pipeline.index('social_core.pipeline.social_auth.load_extra_data')
 
     for index, element in enumerate(additional_elements):
         pipeline.insert(insert_point + index, element)

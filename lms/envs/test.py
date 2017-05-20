@@ -260,11 +260,11 @@ PASSWORD_COMPLEXITY = {}
 FEATURES['ENABLE_THIRD_PARTY_AUTH'] = True
 
 AUTHENTICATION_BACKENDS = (
-    'social.backends.google.GoogleOAuth2',
-    'social.backends.linkedin.LinkedinOAuth2',
-    'social.backends.facebook.FacebookOAuth2',
-    'social.backends.azuread.AzureADOAuth2',
-    'social.backends.twitter.TwitterOAuth',
+    'social_core.backends.google.GoogleOAuth2',
+    'social_core.backends.linkedin.LinkedinOAuth2',
+    'social_core.backends.facebook.FacebookOAuth2',
+    'social_core.backends.azuread.AzureADOAuth2',
+    'social_core.backends.twitter.TwitterOAuth',
     'third_party_auth.dummy.DummyBackend',
     'third_party_auth.saml.SAMLAuthBackend',
     'third_party_auth.lti.LTIAuthBackend',
@@ -554,7 +554,7 @@ SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
 
 FACEBOOK_APP_SECRET = "Test"
 FACEBOOK_APP_ID = "Test"
-FACEBOOK_API_VERSION = "v2.2"
+FACEBOOK_API_VERSION = "v2.8"
 
 ######### custom courses #########
 INSTALLED_APPS += ('lms.djangoapps.ccx', 'openedx.core.djangoapps.ccxcon')
