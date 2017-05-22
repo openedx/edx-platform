@@ -7,7 +7,6 @@ from django.views.decorators.http import require_GET
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.learner_dashboard.utils import strip_course_id, FAKE_COURSE_KEY
 from openedx.core.djangoapps.catalog.utils import get_programs
-from openedx.core.djangoapps.credentials.utils import get_programs_credentials
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.utils import (
     get_program_marketing_url,
@@ -29,7 +28,6 @@ def program_listing(request):
     meter = ProgramProgressMeter(request.user)
 
     context = {
-        'credentials': get_programs_credentials(request.user),
         'disable_courseware_js': True,
         'marketing_url': get_program_marketing_url(programs_config),
         'nav_hidden': True,

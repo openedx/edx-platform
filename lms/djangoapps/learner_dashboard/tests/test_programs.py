@@ -4,7 +4,6 @@ Unit tests covering the program listing and detail pages.
 """
 import json
 import re
-import unittest
 from urlparse import urljoin
 from uuid import uuid4
 
@@ -16,8 +15,6 @@ import mock
 
 from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory, CourseFactory, CourseRunFactory
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
-from openedx.core.djangoapps.credentials.tests.factories import UserCredential, ProgramCredential
-from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
@@ -25,15 +22,13 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory as ModuleStoreCourseFactory
 
 
-CATALOG_UTILS_MODULE = 'openedx.core.djangoapps.catalog.utils'
-CREDENTIALS_UTILS_MODULE = 'openedx.core.djangoapps.credentials.utils'
 PROGRAMS_UTILS_MODULE = 'openedx.core.djangoapps.programs.utils'
 
 
 @skip_unless_lms
 @override_settings(MKTG_URLS={'ROOT': 'https://www.example.com'})
 @mock.patch(PROGRAMS_UTILS_MODULE + '.get_programs')
-class TestProgramListing(ProgramsApiConfigMixin, CredentialsApiConfigMixin, SharedModuleStoreTestCase):
+class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
     """Unit tests for the program listing page."""
     maxDiff = None
     password = 'test'
@@ -64,15 +59,6 @@ class TestProgramListing(ProgramsApiConfigMixin, CredentialsApiConfigMixin, Shar
         Helper function used to sort dictionaries representing programs.
         """
         return program['title']
-
-    def credential_sort_key(self, credential):
-        """
-        Helper function used to sort dictionaries representing credentials.
-        """
-        try:
-            return credential['certificate_url']
-        except KeyError:
-            return credential['credential_url']
 
     def load_serialized_data(self, response, key):
         """
@@ -183,48 +169,6 @@ class TestProgramListing(ProgramsApiConfigMixin, CredentialsApiConfigMixin, Shar
 
             expected_url = reverse('program_details_view', kwargs={'program_uuid': expected_program['uuid']})
             self.assertEqual(actual_program['detail_url'], expected_url)
-
-    @mock.patch(CREDENTIALS_UTILS_MODULE + '.get_credentials')
-    @mock.patch(CREDENTIALS_UTILS_MODULE + '.get_programs')
-    def test_certificates_listed(self, mock_get_programs, mock_get_credentials, __):
-        """
-        Verify that the response contains accurate certificate data when certificates are available.
-        """
-        self.create_programs_config()
-        self.create_credentials_config(is_learner_issuance_enabled=True)
-
-        mock_get_programs.return_value = self.data
-
-        first_credential = UserCredential(
-            username=self.user.username,
-            credential=ProgramCredential(
-                program_uuid=self.first_program['uuid']
-            )
-        )
-        second_credential = UserCredential(
-            username=self.user.username,
-            credential=ProgramCredential(
-                program_uuid=self.second_program['uuid']
-            )
-        )
-
-        credentials_data = sorted([first_credential, second_credential], key=self.credential_sort_key)
-        mock_get_credentials.return_value = credentials_data
-
-        response = self.client.get(self.url)
-        actual = self.load_serialized_data(response, 'certificatesData')
-        actual = sorted(actual, key=self.credential_sort_key)
-
-        self.assertEqual(len(actual), len(credentials_data))
-        for index, actual_credential in enumerate(actual):
-            expected_credential = credentials_data[index]
-
-            self.assertEqual(
-                # TODO: certificate_url is needlessly transformed to credential_url. (╯°□°）╯︵ ┻━┻
-                # Clean this up!
-                actual_credential['credential_url'],
-                expected_credential['certificate_url']
-            )
 
 
 @skip_unless_lms
