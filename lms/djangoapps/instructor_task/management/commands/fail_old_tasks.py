@@ -6,15 +6,16 @@ from celery.states import FAILURE
 from django.core.management.base import BaseCommand, CommandError
 from pytz import utc
 
-from lms.djangoapps.instructor_task.models import InstructorTask, QUEUING
+from lms.djangoapps.instructor_task.models import InstructorTask, QUEUING, PROGRESS
 
 
 class Command(BaseCommand):
     """
-    Command to manually fail old "QUEUING" tasks in the instructor task table.
+    Command to manually fail old "QUEUING" or "PROGRESS" tasks in the
+    instructor task table.
 
     Example:
-    ./manage.py lms fail_old_queueing_tasks --dry-run --after 2001-01-03 \
+    ./manage.py lms fail_old_tasks QUEUING --dry-run --after 2001-01-03 \
         --before 2001-01-06 --task-type bulk_course_email
     """
 
@@ -22,6 +23,14 @@ class Command(BaseCommand):
         """
         Add arguments to the command parser.
         """
+
+        parser.add_argument(
+            "task_state",
+            type=str,
+            choices=[QUEUING, PROGRESS],
+            help="choose the current task_state of tasks you want to fail"
+        )
+
         parser.add_argument(
             '--before',
             type=str,
@@ -71,7 +80,7 @@ class Command(BaseCommand):
         before = self.parse_date(options['before'])
         after = self.parse_date(options['after'])
         filter_kwargs = {
-            "task_state": QUEUING,
+            "task_state": options['task_state'],
             "created__lte": before,
             "created__gte": after,
         }
