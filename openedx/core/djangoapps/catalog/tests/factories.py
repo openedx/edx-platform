@@ -35,6 +35,10 @@ def generate_zulu_datetime():
 
 
 class DictFactoryBase(factory.Factory):
+    """
+    Subclass this to make factories that can be used to produce fake API response
+    bodies for testing.
+    """
     class Meta(object):
         model = dict
 
