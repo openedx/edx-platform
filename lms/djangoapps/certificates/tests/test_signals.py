@@ -1,5 +1,5 @@
-""" Unit tests for enabling self-generated certificates by default
-for self-paced courses.
+""" Unit tests for enabling self-generated certificates for
+self-paced courses and disabling for instructor-paced courses.
 """
 from certificates import api as certs_api
 from certificates.models import CertificateGenerationConfiguration
@@ -10,8 +10,8 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
 class SelfGeneratedCertsSignalTest(ModuleStoreTestCase):
-    """ Tests for enabling self-generated certificates by default
-    for self-paced courses.
+    """ Tests for enabling/disabling self-generated certificates
+    according to pacing.
     """
 
     def setUp(self):
@@ -22,10 +22,20 @@ class SelfGeneratedCertsSignalTest(ModuleStoreTestCase):
         CertificateGenerationConfiguration.objects.create(enabled=True)
 
     def test_cert_generation_enabled_for_self_paced(self):
-        """ Verify the signal enable the self-generated certificates by default for
+        """ Verify the signal enable the self-generated certificates for
         self-paced courses.
         """
         self.assertFalse(certs_api.cert_generation_enabled(self.course.id))
 
         _listen_for_course_publish('store', self.course.id)
         self.assertTrue(certs_api.cert_generation_enabled(self.course.id))
+
+    def test_cert_generation_disabled_for_instructor_paced(self):
+        """ Verify the signal disable the self-generated certificates for
+        instructor-paced courses.
+        """
+        self.course.self_paced = False
+        self.store.update_item(self.course, self.user.id)
+
+        _listen_for_course_publish('store', self.course.id)
+        self.assertFalse(certs_api.cert_generation_enabled(self.course.id))

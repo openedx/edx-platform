@@ -54,6 +54,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models, transaction
+from django.db.utils import IntegrityError
 from django.db.models import Count
 from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
@@ -890,10 +891,13 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
             is_enabled (boolean): Whether to enable or disable self-generated certificates.
 
         """
-        CertificateGenerationCourseSetting.objects.create(
-            course_key=course_key,
-            enabled=is_enabled
-        )
+        certificate_generation_course_setting = CertificateGenerationCourseSetting(course_key=course_key,
+                                                                                   enabled=is_enabled)
+        try:
+            with transaction.atomic():
+                certificate_generation_course_setting.save()
+        except IntegrityError:
+            pass
 
 
 class CertificateGenerationConfiguration(ConfigurationModel):

@@ -12,6 +12,7 @@ from common.test.acceptance.pages.lms.course_info import CourseInfoPage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.progress import ProgressPage
 from common.test.acceptance.pages.lms.tab_nav import TabNavPage
+from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage
 
 
 @attr(shard=5)
@@ -158,6 +159,7 @@ class CertificateProgressPageTest(UniqueCourseTest):
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
         self.course_home_page = CourseHomePage(self.browser, self.course_id)
         self.tab_nav = TabNavPage(self.browser)
+        self.instructor_dashboard_page = InstructorDashboardPage(self.browser, self.course_id)
 
     def log_in_as_unique_user(self):
         """
@@ -168,7 +170,8 @@ class CertificateProgressPageTest(UniqueCourseTest):
             username="testprogress",
             email="progress@example.com",
             password="testuser",
-            course_id=self.course_id
+            course_id=self.course_id,
+            staff=True,
         ).visit()
 
     def test_progress_page_has_view_certificate_button(self):
