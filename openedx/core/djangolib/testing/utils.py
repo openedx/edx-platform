@@ -19,7 +19,6 @@ from django.test import RequestFactory, TestCase, override_settings
 from django.conf import settings
 from django.contrib import sites
 from nose.plugins import Plugin
-from waffle.models import Switch
 
 from request_cache.middleware import RequestCache
 

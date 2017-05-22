@@ -737,7 +737,6 @@
         'js/spec/instructor_dashboard/certificates_spec.js',
         'js/spec/instructor_dashboard/ecommerce_spec.js',
         'js/spec/instructor_dashboard/student_admin_spec.js',
-        'js/spec/learner_dashboard/certificate_view_spec.js',
         'js/spec/learner_dashboard/collection_list_view_spec.js',
         'js/spec/learner_dashboard/program_card_view_spec.js',
         'js/spec/learner_dashboard/sidebar_view_spec.js',
