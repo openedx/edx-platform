@@ -4,6 +4,7 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from mock import patch
+from waffle.testutils import override_switch
 
 from commerce.models import CommerceConfiguration
 from commerce.utils import EcommerceService
@@ -54,6 +55,14 @@ class EcommerceServiceTests(TestCase):
         config.save()
         is_not_enabled = EcommerceService().is_enabled(self.user)
         self.assertFalse(is_not_enabled)
+
+    @override_switch(settings.DISABLE_ACCOUNT_ACTIVATION_REQUIREMENT_SWITCH, active=True)
+    def test_is_enabled_activation_requirement_disabled(self):
+        """Verify that is_enabled() returns True when ecomm checkout is enabled. """
+        self.user.is_active = False
+        self.user.save()
+        is_enabled = EcommerceService().is_enabled(self.user)
+        self.assertTrue(is_enabled)
 
     @patch('openedx.core.djangoapps.theming.helpers.is_request_in_themed_site')
     def test_is_enabled_for_microsites(self, is_microsite):

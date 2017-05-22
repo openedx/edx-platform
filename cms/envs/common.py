@@ -96,6 +96,8 @@ from lms.envs.common import (
     SUPPORT_SITE_LINK,
 
     CONTACT_EMAIL,
+
+    DISABLE_ACCOUNT_ACTIVATION_REQUIREMENT_SWITCH,
 )
 from path import Path as path
 from warnings import simplefilter
