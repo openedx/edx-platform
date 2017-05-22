@@ -90,7 +90,7 @@ from openedx.core.djangoapps.external_auth.login_and_register import (
     register as external_auth_register
 )
 from openedx.core.djangoapps import monitoring_utils
-from openedx.core.djangolib.markup import HTML, Text
+from openedx.core.djangolib.markup import HTML
 
 import track.views
 
@@ -2302,7 +2302,7 @@ def activate_account(request, key):
     except (Registration.DoesNotExist, Registration.MultipleObjectsReturned):
         messages.error(
             request,
-            Text(_(
+            HTML(_(
                 '{html_start}Your account could not be activated{html_end}'
                 'Something went wrong, please <a href="{support_url}">contact support</a> to resolve this issue.'
             )).format(
@@ -2310,7 +2310,7 @@ def activate_account(request, key):
                 html_start=HTML('<p class="message-title">'),
                 html_end=HTML('</p>'),
             ),
-            extra_tags='account-activation icon'
+            extra_tags='account-activation aa-icon'
         )
     else:
         if not registration.user.is_active:
@@ -2318,20 +2318,20 @@ def activate_account(request, key):
             # Add account activation success message for display later
             messages.success(
                 request,
-                Text(_('{html_start}Success{html_end} You have activated your account.')).format(
+                HTML(_('{html_start}Success{html_end} You have activated your account.')).format(
                     html_start=HTML('<p class="message-title">'),
                     html_end=HTML('</p>'),
                 ),
-                extra_tags='account-activation icon',
+                extra_tags='account-activation aa-icon',
             )
         else:
             messages.info(
                 request,
-                Text(_('{html_start}This account has already been activated.{html_end}')).format(
+                HTML(_('{html_start}This account has already been activated.{html_end}')).format(
                     html_start=HTML('<p class="message-title">'),
                     html_end=HTML('</p>'),
                 ),
-                extra_tags='account-activation icon',
+                extra_tags='account-activation aa-icon',
             )
 
         # Enroll student in any pending courses he/she may have if auto_enroll flag is set
