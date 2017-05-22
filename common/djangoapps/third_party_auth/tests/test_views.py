@@ -6,6 +6,7 @@ import ddt
 from lxml import etree
 from onelogin.saml2.errors import OneLogin_Saml2_Error
 import unittest
+from urlparse import urlparse
 
 from django.conf import settings
 
@@ -33,10 +34,21 @@ class SAMLMetadataTest(SAMLTestCase):
     def test_metadata(self):
         self.enable_saml()
         doc = self._fetch_metadata()
+
         # Check the ACS URL:
-        acs_node = doc.find(".//{}".format(etree.QName(SAML_XML_NS, 'AssertionConsumerService')))
-        self.assertIsNotNone(acs_node)
-        self.assertEqual(acs_node.attrib['Location'], 'http://example.none/auth/complete/tpa-saml/')
+        self._assert_acs(doc)
+
+    def test_entityid_metadata(self):
+        """ Verify that SP metadata can also be retrieved via the entityID URI """
+        self.enable_saml()
+        doc = self._fetch_metadata()
+        entity_id = doc.attrib['entityID']
+        entity_url = urlparse(entity_id)
+        entity_path = entity_url.path
+        doc = self._fetch_metadata(entity_path)
+
+        # Confirm valid metadata by checking the ACS URL:
+        self._assert_acs(doc)
 
     def test_default_contact_info(self):
         self.enable_saml()
@@ -104,11 +116,15 @@ class SAMLMetadataTest(SAMLTestCase):
         self.assertIsNotNone(pub_key_node)
         self.assertIn(pub_key_starts_with, pub_key_node.text)
 
-    def _fetch_metadata(self):
+    def _fetch_metadata(self, metadata_url=None):
         """ Fetch and parse the metadata XML at self.METADATA_URL """
-        response = self.client.get(self.METADATA_URL)
+        if not metadata_url:
+            metadata_url = self.METADATA_URL
+
+        response = self.client.get(metadata_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'text/xml')
+
         # The result should be valid XML:
         try:
             metadata_doc = etree.fromstring(response.content)
@@ -116,6 +132,12 @@ class SAMLMetadataTest(SAMLTestCase):
             self.fail('SAML metadata must be valid XML')
         self.assertEqual(metadata_doc.tag, etree.QName(SAML_XML_NS, 'EntityDescriptor'))
         return metadata_doc
+
+    def _assert_acs(self, document):
+        """ Verify that the AssertionConsumerService URL is present and accurate """
+        acs_node = document.find(".//{}".format(etree.QName(SAML_XML_NS, 'AssertionConsumerService')))
+        self.assertIsNotNone(acs_node)
+        self.assertEqual(acs_node.attrib['Location'], 'http://example.none/auth/complete/tpa-saml/')
 
     def check_metadata_contacts(self, xml, tech_name, tech_email, support_name, support_email):
         """ Validate that the contact info in the metadata has the expected values """
