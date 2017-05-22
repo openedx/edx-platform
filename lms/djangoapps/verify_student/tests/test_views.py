@@ -53,7 +53,6 @@ from lms.djangoapps.verify_student.models import (
 )
 from lms.djangoapps.verify_student.views import (
     checkout_with_ecommerce_service, render_to_response, PayAndVerifyView,
-    DISABLE_ACCOUNT_ACTIVATION_REQUIREMENT_SWITCH,
 )
 
 
@@ -676,7 +675,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
             PayAndVerifyView.WEBCAM_REQ,
         ])
 
-    @override_switch(DISABLE_ACCOUNT_ACTIVATION_REQUIREMENT_SWITCH, active=True)
+    @override_switch(settings.DISABLE_ACCOUNT_ACTIVATION_REQUIREMENT_SWITCH, active=True)
     @ddt.data("verify_student_start_flow", "verify_student_begin_flow")
     def test_disable_account_activation_requirement_flag_active(self, payment_flow):
         """
