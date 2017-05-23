@@ -27,11 +27,12 @@ User = get_user_model()  # pylint: disable=invalid-name
 
 
 @skip_unless_lms
+@mock.patch(UTILS_MODULE + '.logger.info')
 @mock.patch(UTILS_MODULE + '.logger.warning')
 class TestGetPrograms(CacheIsolationTestCase):
     ENABLED_CACHES = ['default']
 
-    def test_get_many(self, mock_warning):
+    def test_get_many(self, mock_warning, mock_info):
         programs = ProgramFactory.create_batch(3)
 
         # Cache details for 2 of 3 programs.
@@ -40,10 +41,10 @@ class TestGetPrograms(CacheIsolationTestCase):
         }
         cache.set_many(partial_programs, None)
 
-        # When called before UUIDs are cached, the function should return an empty
-        # list and log a warning.
+        # When called before UUIDs are cached, the function should return an
+        # empty list and log a warning.
         self.assertEqual(get_programs(), [])
-        mock_warning.assert_called_once_with('Program UUIDs are not cached.')
+        mock_warning.assert_called_once_with('Failed to get program UUIDs from the cache.')
         mock_warning.reset_mock()
 
         # Cache UUIDs for all 3 programs.
@@ -55,14 +56,15 @@ class TestGetPrograms(CacheIsolationTestCase):
 
         actual_programs = get_programs()
 
-        # The 2 cached programs should be returned while a warning should be logged
-        # for the missing one.
+        # The 2 cached programs should be returned while info and warning
+        # messages should be logged for the missing one.
         self.assertEqual(
             set(program['uuid'] for program in actual_programs),
             set(program['uuid'] for program in partial_programs.values())
         )
+        mock_info.assert_called_with('Failed to get details for 1 programs. Retrying.')
         mock_warning.assert_called_with(
-            'Details for program {uuid} are not cached.'.format(uuid=programs[2]['uuid'])
+            'Failed to get details for program {uuid} from the cache.'.format(uuid=programs[2]['uuid'])
         )
         mock_warning.reset_mock()
 
@@ -93,13 +95,50 @@ class TestGetPrograms(CacheIsolationTestCase):
             key = PROGRAM_CACHE_KEY_TPL.format(uuid=program['uuid'])
             self.assertEqual(program, all_programs[key])
 
-    def test_get_one(self, mock_warning):
+    @mock.patch(UTILS_MODULE + '.cache')
+    def test_get_many_with_missing(self, mock_cache, mock_warning, mock_info):
+        programs = ProgramFactory.create_batch(3)
+
+        all_programs = {
+            PROGRAM_CACHE_KEY_TPL.format(uuid=program['uuid']): program for program in programs
+        }
+
+        partial_programs = {
+            PROGRAM_CACHE_KEY_TPL.format(uuid=program['uuid']): program for program in programs[:2]
+        }
+
+        def fake_get_many(keys):
+            if len(keys) == 1:
+                return {PROGRAM_CACHE_KEY_TPL.format(uuid=programs[-1]['uuid']): programs[-1]}
+            else:
+                return partial_programs
+
+        mock_cache.get.return_value = [program['uuid'] for program in programs]
+        mock_cache.get_many.side_effect = fake_get_many
+
+        actual_programs = get_programs()
+
+        # All 3 cached programs should be returned. An info message should be
+        # logged about the one that was initially missing, but the code should
+        # be able to stitch together all the details.
+        self.assertEqual(
+            set(program['uuid'] for program in actual_programs),
+            set(program['uuid'] for program in all_programs.values())
+        )
+        self.assertFalse(mock_warning.called)
+        mock_info.assert_called_with('Failed to get details for 1 programs. Retrying.')
+
+        for program in actual_programs:
+            key = PROGRAM_CACHE_KEY_TPL.format(uuid=program['uuid'])
+            self.assertEqual(program, all_programs[key])
+
+    def test_get_one(self, mock_warning, _mock_info):
         expected_program = ProgramFactory()
         expected_uuid = expected_program['uuid']
 
         self.assertEqual(get_programs(uuid=expected_uuid), None)
         mock_warning.assert_called_once_with(
-            'Details for program {uuid} are not cached.'.format(uuid=expected_uuid)
+            'Failed to get details for program {uuid} from the cache.'.format(uuid=expected_uuid)
         )
         mock_warning.reset_mock()
 
