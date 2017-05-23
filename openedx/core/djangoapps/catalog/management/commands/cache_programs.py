@@ -30,7 +30,7 @@ class Command(BaseCommand):
 
         try:
             user = User.objects.get(username=username)
-            client = create_catalog_api_client(user, catalog_integration)
+            client = create_catalog_api_client(user)
         except User.DoesNotExist:
             logger.error(
                 'Failed to create API client. Service user {username} does not exist.'.format(username)

@@ -3,8 +3,8 @@ import copy
 import logging
 
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.core.cache import cache
+from django.core.exceptions import ObjectDoesNotExist
 from edx_rest_api_client.client import EdxRestApiClient
 
 from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL, PROGRAM_UUIDS_CACHE_KEY
@@ -13,16 +13,16 @@ from openedx.core.lib.edx_api_utils import get_edx_api_data
 from openedx.core.lib.token_utils import JwtBuilder
 
 logger = logging.getLogger(__name__)
-User = get_user_model()  # pylint: disable=invalid-name
 
 
-def create_catalog_api_client(user, catalog_integration):
-    """Returns an API client which can be used to make catalog API requests."""
+def create_catalog_api_client(user):
+    """Returns an API client which can be used to make Catalog API requests."""
     scopes = ['email', 'profile']
     expires_in = settings.OAUTH_ID_TOKEN_EXPIRATION
     jwt = JwtBuilder(user).build_token(scopes, expires_in)
 
-    return EdxRestApiClient(catalog_integration.internal_api_url, jwt=jwt)
+    url = CatalogIntegration.current().get_internal_api_url()
+    return EdxRestApiClient(url, jwt=jwt)
 
 
 def get_programs(uuid=None):
@@ -90,11 +90,11 @@ def get_program_types(name=None):
     catalog_integration = CatalogIntegration.current()
     if catalog_integration.enabled:
         try:
-            user = User.objects.get(username=catalog_integration.service_username)
-        except User.DoesNotExist:
+            user = catalog_integration.get_service_user()
+        except ObjectDoesNotExist:
             return []
 
-        api = create_catalog_api_client(user, catalog_integration)
+        api = create_catalog_api_client(user)
         cache_key = '{base}.program_types'.format(base=catalog_integration.CACHE_KEY)
 
         data = get_edx_api_data(catalog_integration, 'program_types', api=api,
@@ -161,15 +161,15 @@ def get_course_runs():
     course_runs = []
     if catalog_integration.enabled:
         try:
-            user = User.objects.get(username=catalog_integration.service_username)
-        except User.DoesNotExist:
+            user = catalog_integration.get_service_user()
+        except ObjectDoesNotExist:
             logger.error(
                 'Catalog service user with username [%s] does not exist. Course runs will not be retrieved.',
                 catalog_integration.service_username,
             )
             return course_runs
 
-        api = create_catalog_api_client(user, catalog_integration)
+        api = create_catalog_api_client(user)
 
         querystring = {
             'page_size': catalog_integration.page_size,

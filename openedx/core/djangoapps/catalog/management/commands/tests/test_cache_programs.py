@@ -21,7 +21,7 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase):
 
         self.catalog_integration = self.create_catalog_integration()
 
-        self.list_url = self.catalog_integration.internal_api_url.rstrip('/') + '/programs/'
+        self.list_url = self.catalog_integration.get_internal_api_url().rstrip('/') + '/programs/'
         self.detail_tpl = self.list_url.rstrip('/') + '/{uuid}/'
 
         self.programs = ProgramFactory.create_batch(3)

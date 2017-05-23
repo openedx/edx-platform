@@ -40,7 +40,7 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
     def _mock_catalog_api(self, responses, url=None):
         self.assertTrue(httpretty.is_enabled(), msg='httpretty must be enabled to mock Catalog API calls.')
 
-        url = url if url else CatalogIntegration.current().internal_api_url.strip('/') + '/programs/'
+        url = url if url else CatalogIntegration.current().get_internal_api_url().strip('/') + '/programs/'
 
         httpretty.register_uri(httpretty.GET, url, responses=responses)
 
@@ -51,7 +51,7 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
     def test_get_unpaginated_data(self):
         """Verify that unpaginated data can be retrieved."""
         catalog_integration = self.create_catalog_integration()
-        api = create_catalog_api_client(self.user, catalog_integration)
+        api = create_catalog_api_client(self.user)
 
         expected_collection = ['some', 'test', 'data']
         data = {
@@ -76,10 +76,10 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
     def test_get_paginated_data(self):
         """Verify that paginated data can be retrieved."""
         catalog_integration = self.create_catalog_integration()
-        api = create_catalog_api_client(self.user, catalog_integration)
+        api = create_catalog_api_client(self.user)
 
         expected_collection = ['some', 'test', 'data']
-        url = CatalogIntegration.current().internal_api_url.strip('/') + '/programs/?page={}'
+        url = CatalogIntegration.current().get_internal_api_url().strip('/') + '/programs/?page={}'
 
         responses = []
         for page, record in enumerate(expected_collection, start=1):
@@ -105,9 +105,9 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
         Verify that pagination is not traversed if traverse_pagination=False is passed as argument.
         """
         catalog_integration = self.create_catalog_integration()
-        api = create_catalog_api_client(self.user, catalog_integration)
+        api = create_catalog_api_client(self.user)
 
-        url = CatalogIntegration.current().internal_api_url.strip('/') + '/programs/?page={}'
+        url = CatalogIntegration.current().get_internal_api_url().strip('/') + '/programs/?page={}'
         responses = [
             {
                 'next': url.format(2),
@@ -131,11 +131,11 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
     def test_get_specific_resource(self):
         """Verify that a specific resource can be retrieved."""
         catalog_integration = self.create_catalog_integration()
-        api = create_catalog_api_client(self.user, catalog_integration)
+        api = create_catalog_api_client(self.user)
 
         resource_id = 1
         url = '{api_root}/programs/{resource_id}/'.format(
-            api_root=CatalogIntegration.current().internal_api_url.strip('/'),
+            api_root=CatalogIntegration.current().get_internal_api_url().strip('/'),
             resource_id=resource_id,
         )
 
@@ -160,11 +160,11 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
         return the value of that "results" key.
         """
         catalog_integration = self.create_catalog_integration()
-        api = create_catalog_api_client(self.user, catalog_integration)
+        api = create_catalog_api_client(self.user)
 
         resource_id = 0
         url = '{api_root}/programs/{resource_id}/'.format(
-            api_root=CatalogIntegration.current().internal_api_url.strip('/'),
+            api_root=CatalogIntegration.current().get_internal_api_url().strip('/'),
             resource_id=resource_id,
         )
 
@@ -183,7 +183,7 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
     def test_cache_utilization(self):
         """Verify that when enabled, the cache is used."""
         catalog_integration = self.create_catalog_integration(cache_ttl=5)
-        api = create_catalog_api_client(self.user, catalog_integration)
+        api = create_catalog_api_client(self.user)
 
         expected_collection = ['some', 'test', 'data']
         data = {
@@ -197,7 +197,7 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
 
         resource_id = 1
         url = '{api_root}/programs/{resource_id}/'.format(
-            api_root=CatalogIntegration.current().internal_api_url.strip('/'),
+            api_root=CatalogIntegration.current().get_internal_api_url().strip('/'),
             resource_id=resource_id,
         )
 
@@ -240,7 +240,7 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
     def test_data_retrieval_failure(self, mock_exception):
         """Verify that an exception is logged when data can't be retrieved."""
         catalog_integration = self.create_catalog_integration()
-        api = create_catalog_api_client(self.user, catalog_integration)
+        api = create_catalog_api_client(self.user)
 
         self._mock_catalog_api(
             [httpretty.Response(body='clunk', content_type='application/json', status_code=500)]
@@ -271,7 +271,7 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
     def test_data_retrieval_failure_with_id(self, mock_exception):
         """Verify that an exception is logged when data can't be retrieved."""
         catalog_integration = self.create_catalog_integration()
-        api = create_catalog_api_client(self.user, catalog_integration)
+        api = create_catalog_api_client(self.user)
 
         self._mock_catalog_api(
             [httpretty.Response(body='clunk', content_type='application/json', status_code=500)]
