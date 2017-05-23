@@ -7,7 +7,7 @@ import ddt
 import mock
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL, PROGRAM_UUIDS_CACHE_KEY
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
@@ -209,6 +209,7 @@ class TestGetProgramsWithType(TestCase):
 @mock.patch(UTILS_MODULE + '.get_edx_api_data')
 class TestGetProgramTypes(CatalogIntegrationMixin, TestCase):
     """Tests covering retrieval of program types from the catalog service."""
+    @override_settings(COURSE_CATALOG_API_URL='https://api.example.com/v1/')
     def test_get_program_types(self, mock_get_edx_api_data):
         """Verify get_program_types returns the expected list of program types."""
         program_types = ProgramTypeFactory.create_batch(3)
@@ -249,7 +250,7 @@ class TestGetCourseRuns(CatalogIntegrationMixin, TestCase):
         for arg in (self.catalog_integration, 'course_runs'):
             self.assertIn(arg, args)
 
-        self.assertEqual(kwargs['api']._store['base_url'], self.catalog_integration.internal_api_url)  # pylint: disable=protected-access
+        self.assertEqual(kwargs['api']._store['base_url'], self.catalog_integration.get_internal_api_url())  # pylint: disable=protected-access
 
         querystring = {
             'page_size': 20,
