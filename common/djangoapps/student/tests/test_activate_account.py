@@ -174,7 +174,7 @@ class TestActivateAccount(TestCase):
         # Access activation link, message should say that account has been activated.
         response = self.client.get(reverse('activate', args=[self.registration.activation_key]), follow=True)
         self.assertRedirects(response, login_page_url)
-        self.assertContains(response, 'You have activated your account.')
+        self.assertContains(response, 'Success! You have activated your account.')
 
         # Access activation link again, message should say that account is already active.
         response = self.client.get(reverse('activate', args=[self.registration.activation_key]), follow=True)
