@@ -28,16 +28,16 @@ from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG
         <div class="page-header-secondary">
             % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
                 <div class="page-header-search">
-                    <form class="search-form" role="search">
+                    <form class="search-form" role="search" action="${reverse('openedx.course_search.course_search_results', args=[course_key])}">
                         <label class="field-label sr-only" for="search" id="search-hint">${_('Search the course')}</label>
                         <input
                                 class="field-input input-text search-input"
                                 type="search"
-                                name="search"
+                                name="query"
                                 id="search"
                                 placeholder="${_('Search the course')}"
                         />
-                        <button class="btn btn-small search-btn" type="button">${_('Search')}</button>
+                        <button class="btn btn-small search-button" type="submit">${_('Search')}</button>
                     </form>
                 </div>
             % endif

@@ -11,8 +11,7 @@
         courseSearchItemTemplate
     ) {
         return SearchResultsView.extend({
-
-            el: '.courseware-results',
+            el: '.search-results',
             contentElement: '#course-content',
             coursewareResultsWrapperElement: '.courseware-results-wrapper',
             resultsTemplate: courseSearchResultsTemplate,
