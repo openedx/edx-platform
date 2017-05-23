@@ -1,7 +1,7 @@
 (function(define) {
-    define(['jquery', 'backbone'], function($, Backbone) {
-        'use strict';
+    'use strict';
 
+    define(['jquery', 'backbone'], function($, Backbone) {
         return Backbone.View.extend({
 
             el: '',
@@ -22,19 +22,17 @@
             },
 
             doSearch: function(term) {
+                var trimmed;
                 if (term) {
-                    this.$searchField.val(term);
+                    trimmed = term.trim();
+                    this.$searchField.val(trimmed);
+                } else {
+                    trimmed = this.$searchField.val().trim();
                 }
-                else {
-                    term = this.$searchField.val();
-                }
-
-                var trimmed = $.trim(term);
                 if (trimmed) {
                     this.setActiveStyle();
                     this.trigger('search', trimmed);
-                }
-                else {
+                } else {
                     this.clearSearch();
                 }
             },
@@ -63,4 +61,4 @@
 
         });
     });
-})(define || RequireJS.define);
+}(define || RequireJS.define));

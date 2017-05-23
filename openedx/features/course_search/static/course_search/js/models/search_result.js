@@ -1,7 +1,7 @@
 (function(define) {
-    define(['backbone'], function(Backbone) {
-        'use strict';
+    'use strict';
 
+    define(['backbone'], function(Backbone) {
         return Backbone.Model.extend({
             defaults: {
                 location: [],
@@ -11,4 +11,4 @@
             }
         });
     });
-})(define || RequireJS.define);
+}(define || RequireJS.define));

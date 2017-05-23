@@ -1,10 +1,11 @@
 (function(define) {
-    define([
-        'backbone',
-        'js/search/base/models/search_result'
-    ], function(Backbone, SearchResult) {
-        'use strict';
+    'use strict';
 
+    define([
+        'underscore',
+        'backbone',
+        'course_search/js/models/search_result'
+    ], function(_, Backbone, SearchResult) {
         return Backbone.Collection.extend({
 
             model: SearchResult,
@@ -26,7 +27,9 @@
             },
 
             performSearch: function(searchTerm) {
-                this.fetchXhr && this.fetchXhr.abort();
+                if (this.fetchXhr) {
+                    this.fetchXhr.abort();
+                }
                 this.searchTerm = searchTerm || '';
                 this.resetState();
                 this.fetchXhr = this.fetch({
@@ -36,17 +39,19 @@
                         page_index: 0
                     },
                     type: 'POST',
-                    success: function(self, xhr) {
+                    success: function(self) {
                         self.trigger('search');
                     },
-                    error: function(self, xhr) {
+                    error: function(self) {
                         self.trigger('error');
                     }
                 });
             },
 
             loadNextPage: function() {
-                this.fetchXhr && this.fetchXhr.abort();
+                if (this.fetchXhr) {
+                    this.fetchXhr.abort();
+                }
                 this.fetchXhr = this.fetch({
                     data: {
                         search_string: this.searchTerm,
@@ -54,11 +59,11 @@
                         page_index: this.page + 1
                     },
                     type: 'POST',
-                    success: function(self, xhr) {
-                        self.page += 1;
+                    success: function(self) {
+                        self.page += 1;  // eslint-disable-line no-param-reassign
                         self.trigger('next');
                     },
-                    error: function(self, xhr) {
+                    error: function(self) {
                         self.trigger('error');
                     },
                     add: true,
@@ -68,7 +73,9 @@
             },
 
             cancelSearch: function() {
-                this.fetchXhr && this.fetchXhr.abort();
+                if (this.fetchXhr) {
+                    this.fetchXhr.abort();
+                }
                 this.resetState();
             },
 
@@ -101,4 +108,4 @@
 
         });
     });
-})(define || RequireJS.define);
+}(define || RequireJS.define));

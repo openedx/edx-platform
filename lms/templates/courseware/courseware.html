@@ -37,14 +37,6 @@ from openedx.features.course_experience import course_home_page_title, UNIFIED_C
 </script>
 % endfor
 
-% if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
-    % for template_name in ["course_search_item", "course_search_results", "search_loading", "search_error"]:
-        <script type="text/template" id="${template_name}-tpl">
-            <%static:include path="search/${template_name}.underscore" />
-        </script>
-    % endfor
-% endif
-
 % if include_special_exams is not UNDEFINED and include_special_exams:
   % for template_name in ["proctored-exam-status"]:
     <script type="text/template" id="${template_name}-tpl">
@@ -81,7 +73,7 @@ from openedx.features.course_experience import course_home_page_title, UNIFIED_C
   <%include file="/mathjax_include.html" args="disable_fast_preview=True"/>
 
   % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
-    <%static:require_module module_name="js/search/course/course_search_factory" class_name="CourseSearchFactory">
+    <%static:require_module module_name="course_search/js/course_search_factory" class_name="CourseSearchFactory">
         var courseId = $('.courseware-results').data('courseId');
         CourseSearchFactory(courseId);
     </%static:require_module>
