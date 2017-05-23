@@ -14,29 +14,27 @@ import urlparse
 from contextlib import contextmanager
 from datetime import datetime
 from path import Path as path
+from pymongo import MongoClient, ASCENDING
+from unittest import TestCase
 
 from bok_choy.javascript import js_defined
 from bok_choy.web_app_test import WebAppTest
 from bok_choy.promise import EmptyPromise, Promise
 from bok_choy.page_object import XSS_INJECTION
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
+from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.common import BASE_URL
 from opaque_keys.edx.locator import CourseLocator
-from pymongo import MongoClient, ASCENDING
 from openedx.core.lib.tests.assertions.events import assert_event_matches, is_matching_event, EventMatchTolerates
-from xmodule.partitions.partitions import UserPartition
+from openedx.core.lib.partitions.partitions import UserPartition
+from openedx.core.release import doc_version, RELEASE_LINE
 from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from unittest import TestCase
-
-from openedx.core.release import doc_version, RELEASE_LINE
-
-from common.test.acceptance.pages.common import BASE_URL
 
 
 MAX_EVENTS_IN_FAILURE_OUTPUT = 20

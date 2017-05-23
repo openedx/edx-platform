@@ -9,14 +9,14 @@ from django.utils.timezone import UTC
 import json
 import logging
 from pkg_resources import resource_string
-
 from lxml import etree
+
 from xblock.core import XBlock
 from xblock.fields import Integer, Scope, Boolean, String
 from xblock.fragment import Fragment
 
+from openedx.core.lib.xblock_fields.fields import Date
 from .exceptions import NotFoundError
-from .fields import Date
 from .mako_module import MakoModuleDescriptor
 from .progress import Progress
 from .x_module import XModule, STUDENT_VIEW

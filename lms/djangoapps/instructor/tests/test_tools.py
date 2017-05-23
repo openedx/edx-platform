@@ -14,7 +14,7 @@ from nose.plugins.attrib import attr
 from courseware.field_overrides import OverrideFieldData
 from lms.djangoapps.ccx.tests.test_overrides import inject_field_overrides
 from student.tests.factories import UserFactory
-from xmodule.fields import Date
+from openedx.core.lib.xblock_fields.fields import Date
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from opaque_keys.edx.keys import CourseKey

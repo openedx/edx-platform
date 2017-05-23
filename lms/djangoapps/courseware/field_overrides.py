@@ -22,7 +22,7 @@ from django.conf import settings
 from xblock.field_data import FieldData
 
 from request_cache.middleware import RequestCache
-from xmodule.modulestore.inheritance import InheritanceMixin
+from openedx.core.lib.xblock_fields.inherited_fields import InheritanceMixin
 
 
 NOTSET = object()

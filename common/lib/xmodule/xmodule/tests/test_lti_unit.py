@@ -10,7 +10,7 @@ from webob.request import Request
 from copy import copy
 import urllib
 
-from xmodule.fields import Timedelta
+from openedx.core.lib.xblock_fields.fields import Timedelta
 from xmodule.lti_module import LTIDescriptor
 from xmodule.lti_2_util import LTIError
 

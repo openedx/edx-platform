@@ -27,7 +27,7 @@ from xblock.runtime import DictKeyValueStore
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
-from xmodule.partitions.partitions import Group, UserPartition
+from openedx.core.lib.partitions.partitions import Group, UserPartition
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 
 

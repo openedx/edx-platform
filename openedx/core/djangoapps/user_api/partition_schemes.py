@@ -5,7 +5,7 @@ import logging
 import random
 import course_tag.api as course_tag_api
 
-from xmodule.partitions.partitions import UserPartitionError, NoSuchUserPartitionGroupError
+from openedx.core.lib.partitions.partitions import UserPartitionError, NoSuchUserPartitionGroupError
 
 log = logging.getLogger(__name__)
 

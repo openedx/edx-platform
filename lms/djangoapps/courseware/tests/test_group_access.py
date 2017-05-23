@@ -7,9 +7,9 @@ import ddt
 from nose.plugins.attrib import attr
 from stevedore.extension import Extension, ExtensionManager
 
+from openedx.core.lib.partitions.partitions import Group, UserPartition, USER_PARTITION_SCHEME_NAMESPACE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.partitions.partitions import Group, UserPartition, USER_PARTITION_SCHEME_NAMESPACE
 from xmodule.modulestore.django import modulestore
 
 import courseware.access as access

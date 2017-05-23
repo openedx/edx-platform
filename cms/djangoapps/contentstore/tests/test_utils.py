@@ -4,13 +4,12 @@ from datetime import datetime, timedelta
 
 from pytz import UTC
 from django.test import TestCase
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from xmodule.modulestore.django import modulestore
-from xmodule.partitions.partitions import UserPartition, Group
-
+from openedx.core.lib.partitions.partitions import UserPartition, Group
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 
 from contentstore import utils

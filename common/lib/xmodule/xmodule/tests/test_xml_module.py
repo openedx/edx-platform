@@ -11,13 +11,14 @@ from xblock.field_data import DictFieldData
 from xblock.fields import Scope, String, Dict, Boolean, Integer, Float, Any, List
 from xblock.runtime import KvsFieldData, DictKeyValueStore
 
-from xmodule.fields import Date, Timedelta, RelativeTime
-from xmodule.modulestore.inheritance import InheritanceKeyValueStore, InheritanceMixin, InheritingFieldData
+from openedx.core.lib.xblock_fields.fields import Date, Timedelta, RelativeTime
+from openedx.core.lib.xblock_fields.inherited_fields import InheritanceMixin
+from xmodule.modulestore.inheritance import InheritanceKeyValueStore, InheritingFieldData
 from xmodule.modulestore.split_mongo.split_mongo_kvs import SplitMongoKVS
-from xmodule.xml_module import XmlDescriptor, serialize_field, deserialize_field
 from xmodule.course_module import CourseDescriptor
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.x_module import XModuleMixin
+from xmodule.xml_module import XmlDescriptor, serialize_field, deserialize_field
 
 from xmodule.tests import get_test_descriptor_system
 from xmodule.tests.xml import XModuleXmlImportTest

@@ -10,20 +10,20 @@ from mock import Mock, patch
 
 from django.utils.timezone import UTC
 
-from xmodule.xml_module import is_pointer_tag
-from opaque_keys.edx.locations import Location
-from xmodule.modulestore import only_xmodules
-from xmodule.modulestore.xml import ImportSystem, XMLModuleStore, LibraryXMLModuleStore
-from xmodule.modulestore.inheritance import compute_inherited_metadata
-from xmodule.x_module import XModuleMixin
-from xmodule.fields import Date
-from xmodule.tests import DATA_DIR
-from xmodule.modulestore.inheritance import InheritanceMixin
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-
 from xblock.core import XBlock
 from xblock.fields import Scope, String, Integer
 from xblock.runtime import KvsFieldData, DictKeyValueStore
+
+from opaque_keys.edx.locations import Location
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from openedx.core.lib.xblock_fields.fields import Date
+from openedx.core.lib.xblock_fields.inherited_fields import InheritanceMixin
+from xmodule.modulestore import only_xmodules
+from xmodule.modulestore.xml import ImportSystem, XMLModuleStore, LibraryXMLModuleStore
+from xmodule.modulestore.inheritance import compute_inherited_metadata
+from xmodule.tests import DATA_DIR
+from xmodule.x_module import XModuleMixin
+from xmodule.xml_module import is_pointer_tag
 
 
 ORG = 'test_org'

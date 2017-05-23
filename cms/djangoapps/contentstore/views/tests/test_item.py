@@ -16,7 +16,13 @@ from django.core.urlresolvers import reverse
 from contentstore.utils import reverse_usage_url, reverse_course_url
 
 from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import UsageKey, CourseKey
+from opaque_keys.edx.locations import Location
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
+from openedx.core.lib.partitions.partitions import (
+    Group, UserPartition, ENROLLMENT_TRACK_PARTITION_ID, MINIMUM_STATIC_PARTITION_ID
+)
+from openedx.core.lib.xblock_fields.inherited_fields import DEFAULT_START_DATE
 from contentstore.views.component import (
     component_handler, get_component_templates
 )
@@ -35,7 +41,6 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
 from xmodule.modulestore.tests.factories import ItemFactory, LibraryFactory, check_mongo_calls, CourseFactory
 from xmodule.x_module import STUDIO_VIEW, STUDENT_VIEW
-from xmodule.course_module import DEFAULT_START_DATE
 from xblock.core import XBlockAside
 from xblock.fields import Scope, String, ScopeIds
 from xblock.fragment import Fragment
@@ -43,11 +48,6 @@ from xblock.runtime import DictKeyValueStore, KvsFieldData
 from xblock.test.tools import TestRuntime
 from xblock.exceptions import NoSuchHandlerError
 from xblock_django.user_service import DjangoXBlockUserService
-from opaque_keys.edx.keys import UsageKey, CourseKey
-from opaque_keys.edx.locations import Location
-from xmodule.partitions.partitions import (
-    Group, UserPartition, ENROLLMENT_TRACK_PARTITION_ID, MINIMUM_STATIC_PARTITION_ID
-)
 
 
 class AsideTest(XBlockAside):

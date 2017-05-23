@@ -4,21 +4,20 @@ End-to-end tests related to the cohort management on the LMS Instructor Dashboar
 """
 
 from datetime import datetime
-
+import os
+import unicodecsv
+import uuid
 from pytz import UTC, utc
 from bok_choy.promise import EmptyPromise
 from nose.plugins.attrib import attr
+
 from common.test.acceptance.tests.discussion.helpers import CohortTestMixin
 from common.test.acceptance.tests.helpers import UniqueCourseTest, EventsTestMixin, create_user_partition_json
-from xmodule.partitions.partitions import Group
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage, DataDownloadPage
 from common.test.acceptance.pages.studio.settings_group_configurations import GroupConfigurationsPage
-
-import os
-import unicodecsv
-import uuid
+from openedx.core.lib.partitions.partitions import Group
 
 
 @attr(shard=8)

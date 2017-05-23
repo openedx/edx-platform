@@ -40,6 +40,7 @@ from openedx.core.djangoapps.credit.tests.factories import CreditCourseFactory
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase, TestConditionalContent
+from openedx.core.lib.partitions.partitions import Group, UserPartition
 from request_cache.middleware import RequestCache
 from shoppingcart.models import (
     Order, PaidCourseRegistration, CourseRegistrationCode, Invoice,
@@ -51,7 +52,6 @@ from survey.models import SurveyForm, SurveyAnswer
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
-from xmodule.partitions.partitions import Group, UserPartition
 
 from ..models import ReportStore
 from lms.djangoapps.instructor_task.tasks_helper.certs import (

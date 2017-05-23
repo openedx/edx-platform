@@ -21,7 +21,7 @@ from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.staff_view import StaffCoursewarePage
 from common.test.acceptance.tests.helpers import create_user_partition_json
 
-from xmodule.partitions.partitions import (
+from openedx.core.lib.partitions.partitions import (
     Group, ENROLLMENT_TRACK_PARTITION_ID, MINIMUM_STATIC_PARTITION_ID
 )
 

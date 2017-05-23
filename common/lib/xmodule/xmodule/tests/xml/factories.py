@@ -9,7 +9,7 @@ from factory import Factory, lazy_attribute, post_generation, Sequence
 from lxml import etree
 
 from xblock.mixins import HierarchyMixin
-from xmodule.modulestore.inheritance import InheritanceMixin
+from openedx.core.lib.xblock_fields.inherited_fields import InheritanceMixin
 from xmodule.x_module import XModuleMixin
 from xmodule.modulestore import only_xmodules
 

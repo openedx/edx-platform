@@ -17,7 +17,7 @@ from util.json_request import expect_json, JsonResponse
 from opaque_keys.edx.keys import CourseKey
 from xblock.fragment import Fragment
 from xblock.runtime import KeyValueStore
-from xmodule.partitions.partitions import NoSuchUserPartitionGroupError
+from openedx.core.lib.partitions.partitions import NoSuchUserPartitionGroupError
 
 
 log = logging.getLogger(__name__)

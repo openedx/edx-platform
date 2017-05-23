@@ -27,9 +27,9 @@ from xblock.fields import Boolean, Dict, Float, Integer, Scope, String, XMLStrin
 from xblock.scorable import ScorableXBlockMixin, Score
 from xmodule.capa_base_constants import RANDOMIZATION, SHOWANSWER, SHOW_CORRECTNESS
 from xmodule.exceptions import NotFoundError
-from .fields import Date, Timedelta
 from .progress import Progress
 
+from openedx.core.lib.xblock_fields.fields import Date, Timedelta
 from openedx.core.djangolib.markup import HTML, Text
 
 log = logging.getLogger("edx.courseware")

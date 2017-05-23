@@ -4,6 +4,8 @@ Tests the "preview" selector in the LMS that allows changing between Staff, Lear
 """
 
 
+from bok_choy.promise import EmptyPromise
+from textwrap import dedent
 from nose.plugins.attrib import attr
 
 from common.test.acceptance.tests.helpers import UniqueCourseTest, create_user_partition_json
@@ -12,9 +14,7 @@ from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage
 from common.test.acceptance.pages.lms.staff_view import StaffCoursewarePage
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
-from bok_choy.promise import EmptyPromise
-from xmodule.partitions.partitions import (Group, ENROLLMENT_TRACK_PARTITION_ID, MINIMUM_STATIC_PARTITION_ID)
-from textwrap import dedent
+from openedx.core.lib.partitions.partitions import Group, ENROLLMENT_TRACK_PARTITION_ID, MINIMUM_STATIC_PARTITION_ID
 
 
 @attr(shard=10)

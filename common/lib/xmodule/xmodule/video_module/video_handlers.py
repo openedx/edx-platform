@@ -10,11 +10,11 @@ import logging
 from datetime import datetime
 from webob import Response
 
+from opaque_keys.edx.locator import CourseLocator
 from xblock.core import XBlock
 
+from openedx.core.lib.xblock_fields.fields import RelativeTime
 from xmodule.exceptions import NotFoundError
-from xmodule.fields import RelativeTime
-from opaque_keys.edx.locator import CourseLocator
 
 from .transcripts_utils import (
     get_or_create_sjson,

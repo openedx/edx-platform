@@ -27,14 +27,14 @@ from xblock.fields import (
 
 from xblock.fragment import Fragment
 from xblock.runtime import Runtime, IdReader, IdGenerator
-from xmodule import block_metadata_utils
-from xmodule.fields import RelativeTime
-from xmodule.errortracker import exc_info_to_str
-from xmodule.modulestore.exceptions import ItemNotFoundError
-
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.asides import AsideUsageKeyV2, AsideDefinitionKeyV2
+from openedx.core.lib.xblock_fields.fields import RelativeTime
+from xmodule import block_metadata_utils
+from xmodule.errortracker import exc_info_to_str
 from xmodule.exceptions import UndefinedContext
+from xmodule.modulestore.exceptions import ItemNotFoundError
+
 import dogstats_wrapper as dog_stats_api
 
 log = logging.getLogger(__name__)

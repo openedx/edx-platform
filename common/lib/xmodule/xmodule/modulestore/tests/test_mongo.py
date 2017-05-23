@@ -4,8 +4,10 @@ Unit tests for the Mongo modulestore
 # pylint: disable=protected-access
 # pylint: disable=no-name-in-module
 # pylint: disable=bad-continuation
-from nose.tools import assert_equals, assert_raises, \
+from nose.tools import (
+    assert_equals, assert_raises, assert_in,
     assert_not_equals, assert_false, assert_true, assert_greater, assert_is_instance, assert_is_none
+)
 # pylint: enable=E0611
 from path import Path as path
 import pymongo
@@ -17,35 +19,34 @@ from datetime import datetime
 from pytz import UTC
 import unittest
 from mock import patch
-from xblock.core import XBlock
+from git.test.lib.asserts import assert_not_none
 
+from xblock.core import XBlock
 from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
 from xblock.runtime import KeyValueStore
 from xblock.exceptions import InvalidScopeError
 
-from xmodule.tests import DATA_DIR
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import Location
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.mongo import MongoKeyValueStore
-from xmodule.modulestore.draft import DraftModuleStore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
 from opaque_keys.edx.locator import LibraryLocator, CourseLocator
 from opaque_keys.edx.keys import UsageKey
-from xmodule.modulestore.xml_exporter import export_course_to_xml
-from xmodule.modulestore.xml_importer import import_course_from_xml, perform_xlint
-from xmodule.contentstore.mongo import MongoContentStore
 
-from nose.tools import assert_in
+from openedx.core.lib.xblock_fields.inherited_fields import InheritanceMixin
 from xmodule.exceptions import NotFoundError
-from git.test.lib.asserts import assert_not_none
+from xmodule.tests import DATA_DIR
 from xmodule.x_module import XModuleMixin
+from xmodule.contentstore.mongo import MongoContentStore
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.draft import DraftModuleStore
+from xmodule.modulestore.edit_info import EditInfoMixin
+from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.mongo import MongoKeyValueStore
 from xmodule.modulestore.mongo.base import as_draft
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 from xmodule.modulestore.tests.utils import LocationMixin, mock_tab_from_json
-from xmodule.modulestore.edit_info import EditInfoMixin
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.modulestore.xml_exporter import export_course_to_xml
+from xmodule.modulestore.xml_importer import import_course_from_xml, perform_xlint
 
 
 log = logging.getLogger(__name__)

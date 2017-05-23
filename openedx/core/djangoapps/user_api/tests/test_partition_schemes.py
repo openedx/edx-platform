@@ -6,9 +6,9 @@ from mock import patch
 from unittest import TestCase
 
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme, UserPartitionError
+from openedx.core.lib.partitions.partitions import Group, UserPartition
+from openedx.core.lib.partitions.tests.test_partitions import PartitionTestCase
 from student.tests.factories import UserFactory
-from xmodule.partitions.partitions import Group, UserPartition
-from xmodule.partitions.tests.test_partitions import PartitionTestCase
 
 
 class MemoryCourseTagAPI(object):
