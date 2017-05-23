@@ -2315,10 +2315,21 @@ def activate_account(request, key):
     else:
         if not registration.user.is_active:
             registration.activate()
-            # Add account activation success message for display later
+            # Success message for logged in users.
+            message = _('{html_start}Success{html_end} You have activated your account.')
+
+            if not request.user.is_authenticated():
+                # Success message for logged out users
+                message = _(
+                    '{html_start}Success! You have activated your account.{html_end}'
+                    'You will now receive email updates and alerts from us related to'
+                    ' the courses you are enrolled in. Sign In to continue.'
+                )
+
+            # Add message for later use.
             messages.success(
                 request,
-                HTML(_('{html_start}Success{html_end} You have activated your account.')).format(
+                HTML(message).format(
                     html_start=HTML('<p class="message-title">'),
                     html_end=HTML('</p>'),
                 ),
