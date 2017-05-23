@@ -76,7 +76,7 @@ from xmodule.contentstore.django import contentstore
 from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.lti_module import LTIModule
-from xmodule.mixin import wrap_with_license
+from openedx.core.lib.license import wrap_with_license
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.x_module import XModuleDescriptor
