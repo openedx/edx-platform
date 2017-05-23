@@ -1,22 +1,25 @@
 (function(define) {
-    define([
-        'js/search/base/views/search_results_view',
-        'js/search/course/views/search_item_view'
-    ], function(SearchResultsView, CourseSearchItemView) {
-        'use strict';
+    'use strict';
 
+    define([
+        'course_search/js/views/search_results_view',
+        'text!course_search/templates/course_search_results.underscore',
+        'text!course_search/templates/course_search_item.underscore'
+    ], function(
+        SearchResultsView,
+        courseSearchResultsTemplate,
+        courseSearchItemTemplate
+    ) {
         return SearchResultsView.extend({
 
             el: '.courseware-results',
             contentElement: '#course-content',
             coursewareResultsWrapperElement: '.courseware-results-wrapper',
-            resultsTemplateId: '#course_search_results-tpl',
-            loadingTemplateId: '#search_loading-tpl',
-            errorTemplateId: '#search_error-tpl',
+            resultsTemplate: courseSearchResultsTemplate,
+            itemTemplate: courseSearchItemTemplate,
             events: {
                 'click .search-load-next': 'loadNext'
             },
-            SearchItemView: CourseSearchItemView,
 
             clear: function() {
                 SearchResultsView.prototype.clear.call(this);
@@ -31,4 +34,4 @@
 
         });
     });
-})(define || RequireJS.define);
+}(define || RequireJS.define));

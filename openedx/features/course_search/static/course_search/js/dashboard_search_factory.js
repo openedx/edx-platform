@@ -1,12 +1,16 @@
 (function(define) {
     'use strict';
 
-    define(['backbone', 'js/search/base/routers/search_router', 'js/search/dashboard/views/search_form',
-            'js/search/base/collections/search_collection', 'js/search/dashboard/views/search_results_view'],
-        function(Backbone, SearchRouter, SearchForm, SearchCollection, SearchListView) {
+    define([
+        'underscore', 'backbone', 'course_search/js/search_router', 'course_search/js/views/search_form',
+        'course_search/js/collections/search_collection', 'course_search/js/views/dashboard_search_results_view'
+    ],
+        function(_, Backbone, SearchRouter, SearchForm, SearchCollection, SearchListView) {
             return function() {
                 var router = new SearchRouter();
-                var form = new SearchForm();
+                var form = new SearchForm({
+                    el: $('#dashboard-search-bar')
+                });
                 var collection = new SearchCollection([]);
                 var results = new SearchListView({collection: collection});
                 var dispatcher = _.clone(Backbone.Events);
@@ -48,4 +52,4 @@
                 });
             };
         });
-})(define || RequireJS.define);
+}(define || RequireJS.define));
