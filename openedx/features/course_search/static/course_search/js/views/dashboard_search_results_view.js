@@ -11,7 +11,7 @@
         dashboardSearchItemTemplate
     ) {
         return SearchResultsView.extend({
-            el: '#dashboard-search-results',
+            el: '.search-results',
             contentElement: '#my-courses, #profile-sidebar',
             resultsTemplate: dashboardSearchResultsTemplate,
             itemTemplate: dashboardSearchItemTemplate,

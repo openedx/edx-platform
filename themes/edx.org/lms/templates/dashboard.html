@@ -158,7 +158,7 @@ from openedx.core.djangoapps.theming import helpers as theming_helpers
 
   % if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
     <div id="dashboard-search-bar" class="search-bar dashboard-search-bar" role="search" aria-label="Dashboard">
-      <form>
+      <form class="search-form">
         <label for="dashboard-search-input">${_('Search Your Courses')}</label>
         <div class="search-field-wrapper">
           <input id="dashboard-search-input" type="text" class="search-field"/>

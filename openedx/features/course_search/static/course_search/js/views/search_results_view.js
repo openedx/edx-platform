@@ -24,7 +24,7 @@
             spinner: '.search-load-next .icon',
 
             initialize: function() {
-                this.$contentElement = $(this.contentElement);
+                this.$contentElement = this.contentElement ? $(this.contentElement) : $([]);
             },
 
             render: function() {
@@ -59,6 +59,7 @@
                     });
                     return item.render().el;
                 }, this);
+                // safe-lint: disable=javascript-jquery-append
                 this.$el.find('ol').append(items);
             },
 
@@ -80,23 +81,20 @@
             },
 
             showLoadingMessage: function() {
-                this.doCleanup();
+                // Empty any previous loading/error message
+                $('#loading-message').html('');
+                $('#error-message').html('');
+
+                // Show the loading message
                 HtmlUtils.setHtml(this.$el, HtmlUtils.template(this.loadingTemplate)());
+
+                // Show the results
                 this.showResults();
             },
 
             showErrorMessage: function() {
                 HtmlUtils.setHtml(this.$el, HtmlUtils.template(this.errorTemplate)());
                 this.showResults();
-            },
-
-            doCleanup: function() {
-                // Empty any loading/error message and empty the el
-                // Bookmarks share the same container element, So we are doing
-                // this to ensure that elements are in clean/initial state
-                $('#loading-message').html('');
-                $('#error-message').html('');
-                this.$el.html('');
             },
 
             loadNext: function(event) {
