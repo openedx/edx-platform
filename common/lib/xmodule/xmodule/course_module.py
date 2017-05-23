@@ -16,7 +16,7 @@ from pytz import utc
 from xblock.fields import Boolean, Dict, Float, Integer, List, Scope, String
 from xmodule import course_metadata_utils
 from xmodule.graders import grader_from_conf
-from xmodule.mixin import LicenseMixin
+from openedx.core.lib.license import LicenseMixin
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.tabs import CourseTabList, InvalidTabsException
 

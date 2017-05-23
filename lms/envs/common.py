@@ -40,7 +40,7 @@ from django.utils.translation import ugettext_lazy as _
 from .discussionsettings import *
 from xmodule.modulestore.modulestore_settings import update_module_store_settings
 from xmodule.modulestore.edit_info import EditInfoMixin
-from xmodule.mixin import LicenseMixin
+from openedx.core.lib.license import LicenseMixin
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 
 ################################### FEATURES ###################################
@@ -502,6 +502,7 @@ MAKO_TEMPLATES['main'] = [
     COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates',
     OPENEDX_ROOT / 'core' / 'djangoapps' / 'cors_csrf' / 'templates',
     OPENEDX_ROOT / 'core' / 'djangoapps' / 'dark_lang' / 'templates',
+    OPENEDX_ROOT / 'core' / 'lib' / 'license' / 'templates',
 ]
 
 # Django templating
