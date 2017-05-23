@@ -16,7 +16,7 @@ from courseware.student_field_overrides import (
     get_override_for_user,
     override_field_for_user,
 )
-from xmodule.fields import Date
+from openedx.core.lib.xblock_fields.fields import Date
 from opaque_keys.edx.keys import UsageKey
 
 DATE_FIELD = Date()

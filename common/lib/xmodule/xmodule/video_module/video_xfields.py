@@ -4,7 +4,7 @@ XFields for video module.
 import datetime
 
 from xblock.fields import Scope, String, Float, Boolean, List, Dict, DateTime
-from xmodule.fields import RelativeTime
+from openedx.core.lib.xblock_fields.fields import RelativeTime
 
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
 #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file

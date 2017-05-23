@@ -13,11 +13,11 @@ from edxmako.shortcuts import render_to_string
 from openedx.core.lib.xblock_utils import (
     replace_static_urls, wrap_xblock, wrap_fragment, wrap_xblock_aside, request_token, xblock_local_resource_url,
 )
+from openedx.core.lib.partitions.partitions_service import PartitionService
 from xmodule.x_module import PREVIEW_VIEWS, STUDENT_VIEW, AUTHOR_VIEW
 from xmodule.contentstore.django import contentstore
 from xmodule.error_module import ErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
-from xmodule.partitions.partitions_service import PartitionService
 from xmodule.studio_editable import has_author_view
 from xmodule.services import SettingsService
 from xmodule.modulestore.django import modulestore, ModuleI18nService

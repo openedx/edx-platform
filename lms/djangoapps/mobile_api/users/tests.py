@@ -13,7 +13,6 @@ from django.utils import timezone
 from django.template import defaultfilters
 from django.test import RequestFactory, override_settings
 from milestones.tests.utils import MilestonesTestCaseMixin
-from xmodule.course_module import DEFAULT_START_DATE
 from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
 
 from certificates.api import generate_user_certificates
@@ -27,6 +26,7 @@ from courseware.access_response import (
 from course_modes.models import CourseMode
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from openedx.core.lib.courses import course_image_url
+from openedx.core.lib.xblock_fields.inherited_fields import DEFAULT_START_DATE
 from student.models import CourseEnrollment
 from util.milestones_helpers import set_prerequisite_courses
 from util.testing import UrlResetMixin

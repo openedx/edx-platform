@@ -30,7 +30,9 @@ from xmodule.course_module import (
 )
 from xmodule.error_module import ErrorDescriptor
 from xmodule.x_module import XModule
-from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError
+from openedx.core.lib.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 
 from courseware.access_response import (
     MilestoneError,
@@ -49,8 +51,6 @@ from courseware.masquerade import get_masquerade_role, is_masquerading_as_studen
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from mobile_api.models import IgnoreMobileAvailableFlagConfig
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from student import auth
 from student.models import CourseEnrollmentAllowed
 from student.roles import (

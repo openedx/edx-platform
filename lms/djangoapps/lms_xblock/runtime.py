@@ -13,7 +13,7 @@ from request_cache.middleware import RequestCache
 import xblock.reference.plugins
 from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore.django import modulestore, ModuleI18nService
-from xmodule.partitions.partitions_service import PartitionService
+from openedx.core.lib.partitions.partitions_service import PartitionService
 from xmodule.services import SettingsService
 from xmodule.x_module import ModuleSystem
 

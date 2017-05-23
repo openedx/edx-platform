@@ -14,7 +14,7 @@ from django_comment_common.utils import seed_permissions_roles
 
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
-from xmodule.partitions.partitions_service import get_all_partitions_for_course
+from openedx.core.lib.partitions.partitions_service import get_all_partitions_for_course
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore

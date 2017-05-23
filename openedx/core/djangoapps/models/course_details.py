@@ -6,7 +6,7 @@ import logging
 
 from django.conf import settings
 
-from xmodule.fields import Date
+from openedx.core.lib.xblock_fields.fields import Date
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.lib.courses import course_image_url

@@ -22,10 +22,10 @@ from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort, is_course_cohorted, bulk_cache_cohorts
 from openedx.core.djangoapps.user_api.course_tag.api import BulkCourseTags
+from openedx.core.lib.partitions.partitions_service import PartitionService
 from student.models import CourseEnrollment
 from student.roles import BulkRoleCache
 from xmodule.modulestore.django import modulestore
-from xmodule.partitions.partitions_service import PartitionService
 from xmodule.split_test_module import get_split_user_partitions
 
 from .runner import TaskProgress

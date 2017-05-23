@@ -1,21 +1,22 @@
 """
 Tests for XML importer.
 """
-import mock
-from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
-from xblock.fields import String, Scope, ScopeIds, List
-from xblock.runtime import Runtime, KvsFieldData, DictKeyValueStore
-from xmodule.x_module import XModuleMixin
-from opaque_keys.edx.locations import Location
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.modulestore.xml_importer import _update_and_import_module, _update_module_location
-from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from xmodule.tests import DATA_DIR
 from uuid import uuid4
 import unittest
 import importlib
+import mock
+
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
+from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
+from xblock.fields import String, Scope, ScopeIds, List
+from xblock.runtime import Runtime, KvsFieldData, DictKeyValueStore
+
+from openedx.core.lib.xblock_fields.inherited_fields import InheritanceMixin
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.xml_importer import _update_and_import_module, _update_module_location
+from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
+from xmodule.tests import DATA_DIR
+from xmodule.x_module import XModuleMixin
 
 
 class ModuleStoreNoSettings(unittest.TestCase):

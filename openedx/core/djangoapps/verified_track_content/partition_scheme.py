@@ -12,7 +12,7 @@ from course_modes.models import CourseMode
 from student.models import CourseEnrollment
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.verified_track_content.models import VerifiedTrackCohortedCourse
-from xmodule.partitions.partitions import NoSuchUserPartitionGroupError, Group, UserPartition
+from openedx.core.lib.partitions.partitions import NoSuchUserPartitionGroupError, Group, UserPartition
 
 
 # These IDs must be less than 100 so that they do not overlap with Groups in

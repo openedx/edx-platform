@@ -5,7 +5,7 @@ from openedx.core.djangoapps.content.block_structure.transformer import (
     BlockStructureTransformer,
     FilteringTransformerMixin,
 )
-from xmodule.partitions.partitions_service import get_all_partitions_for_course
+from openedx.core.lib.partitions.partitions_service import get_all_partitions_for_course
 
 from .split_test import SplitTestTransformer
 from .utils import get_field_on_block

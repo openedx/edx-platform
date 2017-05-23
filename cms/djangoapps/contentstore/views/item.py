@@ -38,16 +38,16 @@ from contentstore.views.helpers import is_unit, xblock_studio_url, xblock_primar
 from contentstore.views.preview import get_preview_fragment
 from contentstore.utils import is_self_paced
 
-from openedx.core.lib.gating import api as gating_api
 from edxmako.shortcuts import render_to_string
 from models.settings.course_grading import CourseGradingModel
+from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.xblock_utils import wrap_xblock, request_token
+from openedx.core.lib.xblock_fields.inherited_fields import DEFAULT_START_DATE
 from static_replace import replace_static_urls
 from student.auth import has_studio_write_access, has_studio_read_access
 from util.date_utils import get_default_time_display
 from util.json_request import expect_json, JsonResponse
 from util.milestones_helpers import is_entrance_exams_enabled
-from xmodule.course_module import DEFAULT_START_DATE
 from xmodule.modulestore import ModuleStoreEnum, EdxJSONEncoder
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES

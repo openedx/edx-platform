@@ -432,7 +432,7 @@ P3P_HEADER = 'CP="Open EdX does not have a P3P policy."'
 ############# XBlock Configuration ##########
 
 # Import after sys.path fixup
-from xmodule.modulestore.inheritance import InheritanceMixin
+from openedx.core.lib.xblock_fields.inherited_fields import InheritanceMixin
 from xmodule.modulestore import prefer_xmodules
 from xmodule.x_module import XModuleMixin
 

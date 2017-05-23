@@ -15,27 +15,27 @@ from contracts import contract
 from nose.plugins.attrib import attr
 from django.core.cache import caches, InvalidCacheBackendError
 
-from openedx.core.lib import tempdir
+from opaque_keys.edx.locator import CourseKey, CourseLocator, BlockUsageLocator, VersionTree, LocalId
+from ccx_keys.locator import CCXBlockUsageLocator
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict
+from openedx.core.lib import tempdir
+from openedx.core.lib.xblock_fields.fields import Date, Timedelta
+from openedx.core.lib.xblock_fields.inherited_fields import InheritanceMixin
 from xmodule.course_module import CourseDescriptor
+from xmodule.x_module import XModuleMixin
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import (
     ItemNotFoundError, VersionConflictError,
     DuplicateItemError, DuplicateCourseError,
     InsufficientSpecificationError
 )
-from opaque_keys.edx.locator import CourseKey, CourseLocator, BlockUsageLocator, VersionTree, LocalId
-from ccx_keys.locator import CCXBlockUsageLocator
-from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.x_module import XModuleMixin
-from xmodule.fields import Date, Timedelta
-from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
-from xmodule.modulestore.tests.test_modulestore import check_has_course_method
+from xmodule.modulestore.edit_info import EditInfoMixin
 from xmodule.modulestore.split_mongo import BlockKey
+from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
 from xmodule.modulestore.tests.factories import check_mongo_calls
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
+from xmodule.modulestore.tests.test_modulestore import check_has_course_method
 from xmodule.modulestore.tests.utils import mock_tab_from_json
-from xmodule.modulestore.edit_info import EditInfoMixin
 
 
 BRANCH_NAME_DRAFT = ModuleStoreEnum.BranchName.draft

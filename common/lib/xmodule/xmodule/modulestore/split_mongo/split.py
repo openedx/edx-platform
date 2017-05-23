@@ -77,13 +77,14 @@ from ccx_keys.locator import CCXLocator, CCXBlockUsageLocator
 from xmodule.modulestore.exceptions import InsufficientSpecificationError, VersionConflictError, DuplicateItemError, \
     DuplicateCourseError, MultipleCourseBlocksFound
 from xmodule.modulestore import (
-    inheritance, ModuleStoreWriteBase, ModuleStoreEnum,
+    ModuleStoreWriteBase, ModuleStoreEnum,
     BulkOpsRecord, BulkOperationsMixin, SortedAssetList, BlockData
 )
+from openedx.core.lib.xblock_fields.inherited_fields import InheritanceMixin
+from openedx.core.lib.partitions.partitions_service import PartitionService
 
 from ..exceptions import ItemNotFoundError
 from .caching_descriptor_system import CachingDescriptorSystem
-from xmodule.partitions.partitions_service import PartitionService
 from xmodule.modulestore.split_mongo.mongo_connection import MongoConnection, DuplicateKeyError
 from xmodule.modulestore.split_mongo import BlockKey, CourseEnvelope
 from xmodule.modulestore.store_utilities import DETACHED_XBLOCK_TYPES
@@ -2149,7 +2150,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         else:
             inherited_settings = parent_xblock.xblock_kvs.inherited_settings.copy()
             if fields is not None:
-                for field_name in inheritance.InheritanceMixin.fields:
+                for field_name in InheritanceMixin.fields:
                     if field_name in fields:
                         inherited_settings[field_name] = fields[field_name]
 
@@ -2698,7 +2699,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         # update the inheriting w/ what should pass to children
         inheriting_settings = inherited_settings_map[block_key].copy()
         block_fields = block_data.fields
-        for field_name in inheritance.InheritanceMixin.fields:
+        for field_name in InheritanceMixin.fields:
             if field_name in block_fields:
                 inheriting_settings[field_name] = block_fields[field_name]
 

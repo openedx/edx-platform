@@ -6,7 +6,7 @@ from openedx.core.djangoapps.content.block_structure.transformer import (
     FilteringTransformerMixin,
 )
 from lms.djangoapps.courseware.access_utils import check_start_date
-from xmodule.course_metadata_utils import DEFAULT_START_DATE
+from openedx.core.lib.xblock_fields.inherited_fields import DEFAULT_START_DATE
 
 from .utils import collect_merged_date_field
 

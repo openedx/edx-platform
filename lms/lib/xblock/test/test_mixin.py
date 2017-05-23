@@ -9,7 +9,7 @@ from xblock.validation import ValidationMessage
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import CourseFactory, ToyCourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_MIXED_MODULESTORE
-from xmodule.partitions.partitions import Group, UserPartition
+from openedx.core.lib.partitions.partitions import Group, UserPartition
 
 
 class LmsXBlockMixinTestCase(ModuleStoreTestCase):

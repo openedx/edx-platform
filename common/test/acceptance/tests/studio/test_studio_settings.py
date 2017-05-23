@@ -7,6 +7,7 @@ import os
 
 from mock import patch
 from nose.plugins.attrib import attr
+from textwrap import dedent
 
 from base_studio_test import StudioCourseTest
 from bok_choy.promise import EmptyPromise
@@ -19,9 +20,7 @@ from common.test.acceptance.pages.studio.settings_group_configurations import Gr
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.studio.utils import get_input_value
 from common.test.acceptance.pages.common.utils import add_enrollment_course_modes
-
-from textwrap import dedent
-from xmodule.partitions.partitions import Group
+from openedx.core.lib.partitions.partitions import Group
 
 
 @attr(shard=8)

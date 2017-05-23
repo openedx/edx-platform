@@ -5,8 +5,7 @@ import unittest
 
 from django.utils.timezone import UTC
 
-from xmodule.fields import Date, Timedelta, RelativeTime
-from xmodule.timeinfo import TimeInfo
+from openedx.core.lib.xblock_fields.fields import Date, Timedelta, RelativeTime, TimeInfo
 
 
 class DateTest(unittest.TestCase):

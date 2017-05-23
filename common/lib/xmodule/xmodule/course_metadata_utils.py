@@ -12,7 +12,7 @@ from math import exp
 
 from pytz import utc
 
-DEFAULT_START_DATE = datetime(2030, 1, 1, tzinfo=utc)
+from openedx.core.lib.xblock_fields.inherited_fields import DEFAULT_START_DATE
 
 
 def clean_course_key(course_key, padding_char):

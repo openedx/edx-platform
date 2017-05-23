@@ -11,7 +11,7 @@ from common.test.acceptance.pages.lms.courseware_search import CoursewareSearchP
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.tests.helpers import create_user_partition_json
 
-from xmodule.partitions.partitions import Group
+from openedx.core.lib.partitions.partitions import Group
 
 from nose.plugins.attrib import attr
 
