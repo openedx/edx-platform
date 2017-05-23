@@ -627,6 +627,14 @@ urlpatterns += (
         ),
         include('openedx.features.course_bookmarks.urls'),
     ),
+
+    # Course search
+    url(
+        r'^courses/{}/search/'.format(
+            settings.COURSE_ID_PATTERN,
+        ),
+        include('openedx.features.course_search.urls'),
+    ),
 )
 
 if settings.FEATURES["ENABLE_TEAMS"]:

@@ -6,7 +6,9 @@
         'course_search/js/collections/search_collection', 'course_search/js/views/course_search_results_view'
     ],
         function(_, Backbone, SearchRouter, CourseSearchForm, SearchCollection, CourseSearchResultsView) {
-            return function(courseId) {
+            return function(options) {
+                var courseId = options.courseId;
+                var query = options.query;
                 var router = new SearchRouter();
                 var form = new CourseSearchForm();
                 var collection = new SearchCollection([], {courseId: courseId});
@@ -44,6 +46,11 @@
                 dispatcher.listenTo(collection, 'error', function() {
                     results.showErrorMessage();
                 });
+
+                // Perform a search if an initial query has been provided.
+                if (query) {
+                    router.trigger('search', query);
+                }
             };
         });
 }(define || RequireJS.define));

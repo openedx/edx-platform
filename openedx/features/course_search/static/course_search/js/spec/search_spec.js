@@ -613,7 +613,9 @@ define([
                         '<div class="courseware-results"></div>' +
                         '<section id="course-content"></section>'
                     );
-                    CourseSearchFactory(courseId);
+                    CourseSearchFactory({
+                        courseId: courseId
+                    });
                     spyOn(Backbone.history, 'navigate');
                     this.$contentElement = $('#course-content');
                     this.contentElementDisplayValue = 'table-cell';
@@ -646,7 +648,7 @@ define([
                     spyOn(Backbone.history, 'navigate');
                     this.$contentElement = $('#my-courses');
                     this.contentElementDisplayValue = 'block';
-                    this.$searchResults = $('#dashboard-search-results');
+                    this.$searchResults = $('.search-results');
                 });
 
                 afterEach(function() {

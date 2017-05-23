@@ -113,7 +113,6 @@ class CourseHomeFragmentView(EdxFragmentView):
             'csrf': csrf(request)['csrf_token'],
             'course': course,
             'course_key': course_key,
-            'course': course,
             'outline_fragment': outline_fragment,
             'handouts_html': handouts_html,
             'has_visited_course': has_visited_course,
