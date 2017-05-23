@@ -1,33 +1,34 @@
 (function(define) {
+    'use strict';
+
     define([
         'jquery',
         'underscore',
         'backbone',
-        'gettext'
-    ], function($, _, Backbone, gettext) {
-        'use strict';
-
+        'edx-ui-toolkit/js/utils/html-utils',
+        'edx-ui-toolkit/js/utils/string-utils',
+        'course_search/js/views/search_item_view',
+        'text!course_search/templates/search_loading.underscore',
+        'text!course_search/templates/search_error.underscore'
+    ], function($, _, Backbone, HtmlUtils, StringUtils, SearchItemView, searchLoadingTemplate, searchErrorTemplate) {
         return Backbone.View.extend({
 
-        // these should be defined by subclasses
+            // these should be defined by subclasses
             el: '',
             contentElement: '',
-            resultsTemplateId: '',
-            loadingTemplateId: '',
-            errorTemplateId: '',
+            resultsTemplate: null,
+            itemTemplate: null,
+            loadingTemplate: searchLoadingTemplate,
+            errorTemplate: searchErrorTemplate,
             events: {},
             spinner: '.search-load-next .icon',
-            SearchItemView: function() {},
 
             initialize: function() {
                 this.$contentElement = $(this.contentElement);
-                this.resultsTemplate = _.template($(this.resultsTemplateId).html());
-                this.loadingTemplate = _.template($(this.loadingTemplateId).html());
-                this.errorTemplate = _.template($(this.errorTemplateId).html());
             },
 
             render: function() {
-                this.$el.html(this.resultsTemplate({
+                HtmlUtils.setHtml(this.$el, HtmlUtils.template(this.resultsTemplate)({
                     totalCount: this.collection.totalCount,
                     totalCountMsg: this.totalCountMsg(),
                     pageSize: this.collection.pageSize,
@@ -40,10 +41,10 @@
             },
 
             renderNext: function() {
-            // total count may have changed
+                // total count may have changed
                 this.$el.find('.search-count').text(this.totalCountMsg());
                 this.renderItems();
-                if (! this.collection.hasNextPage()) {
+                if (!this.collection.hasNextPage()) {
                     this.$el.find('.search-load-next').remove();
                 }
                 this.$el.find(this.spinner).hide();
@@ -52,15 +53,20 @@
             renderItems: function() {
                 var latest = this.collection.latestModels();
                 var items = latest.map(function(result) {
-                    var item = new this.SearchItemView({model: result});
+                    var item = new SearchItemView({
+                        model: result,
+                        template: this.itemTemplate
+                    });
                     return item.render().el;
                 }, this);
                 this.$el.find('ol').append(items);
             },
 
             totalCountMsg: function() {
-                var fmt = ngettext('%s result', '%s results', this.collection.totalCount);
-                return interpolate(fmt, [this.collection.totalCount]);
+                var fmt = ngettext('{total_results} result', '{total_results} results', this.collection.totalCount);
+                return StringUtils.interpolate(fmt, {
+                    total_results: this.collection.totalCount
+                });
             },
 
             clear: function() {
@@ -75,26 +81,28 @@
 
             showLoadingMessage: function() {
                 this.doCleanup();
-                this.$el.html(this.loadingTemplate());
+                HtmlUtils.setHtml(this.$el, HtmlUtils.template(this.loadingTemplate)());
                 this.showResults();
             },
 
             showErrorMessage: function() {
-                this.$el.html(this.errorTemplate());
+                HtmlUtils.setHtml(this.$el, HtmlUtils.template(this.errorTemplate)());
                 this.showResults();
             },
 
             doCleanup: function() {
-            // Empty any loading/error message and empty the el
-            // Bookmarks share the same container element, So we are doing
-            // this to ensure that elements are in clean/initial state
+                // Empty any loading/error message and empty the el
+                // Bookmarks share the same container element, So we are doing
+                // this to ensure that elements are in clean/initial state
                 $('#loading-message').html('');
                 $('#error-message').html('');
                 this.$el.html('');
             },
 
             loadNext: function(event) {
-                event && event.preventDefault();
+                if (event) {
+                    event.preventDefault();
+                }
                 this.$el.find(this.spinner).show();
                 this.trigger('next');
                 return false;
@@ -102,4 +110,4 @@
 
         });
     });
-})(define || RequireJS.define);
+}(define || RequireJS.define));

@@ -5,17 +5,16 @@ define([
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'common/js/spec_helpers/page_helpers',
     'common/js/spec_helpers/template_helpers',
-    'js/search/base/models/search_result',
-    'js/search/base/collections/search_collection',
-    'js/search/base/routers/search_router',
-    'js/search/course/views/search_item_view',
-    'js/search/dashboard/views/search_item_view',
-    'js/search/course/views/search_form',
-    'js/search/dashboard/views/search_form',
-    'js/search/course/views/search_results_view',
-    'js/search/dashboard/views/search_results_view',
-    'js/search/course/course_search_factory',
-    'js/search/dashboard/dashboard_search_factory'
+    'course_search/js/models/search_result',
+    'course_search/js/collections/search_collection',
+    'course_search/js/search_router',
+    'course_search/js/views/search_form',
+    'course_search/js/views/search_item_view',
+    'course_search/js/views/course_search_results_view',
+    'course_search/js/views/dashboard_search_results_view',
+    'course_search/js/course_search_factory',
+    'course_search/js/dashboard_search_factory',
+    'text!course_search/templates/course_search_item.underscore'
 ], function(
     $,
     Backbone,
@@ -26,14 +25,13 @@ define([
     SearchResult,
     SearchCollection,
     SearchRouter,
-    CourseSearchItemView,
-    DashSearchItemView,
-    CourseSearchForm,
-    DashSearchForm,
+    SearchForm,
+    SearchItemView,
     CourseSearchResultsView,
     DashSearchResultsView,
     CourseSearchFactory,
-    DashboardSearchFactory
+    DashboardSearchFactory,
+    courseSearchItemTemplate
 ) {
     'use strict';
 
@@ -86,7 +84,6 @@ define([
 
             it('sends a request and parses the json result', function() {
                 var requests = AjaxHelpers.requests(this);
-                this.collection.performSearch('search string');
                 var response = {
                     total: 2,
                     access_denied_count: 1,
@@ -99,6 +96,7 @@ define([
                         }
                     }]
                 };
+                this.collection.performSearch('search string');
                 AjaxHelpers.respondWithJson(requests, response);
 
                 expect(this.onSearch).toHaveBeenCalled();
@@ -221,12 +219,7 @@ define([
 
 
         describe('SearchItemView', function() {
-            function beforeEachHelper(SearchItemView) {
-                TemplateHelpers.installTemplates([
-                    'templates/search/course_search_item',
-                    'templates/search/dashboard_search_item'
-                ]);
-
+            beforeEach(function() {
                 this.model = new SearchResult({
                     location: ['section', 'subsection', 'unit'],
                     content_type: 'Video',
@@ -243,31 +236,37 @@ define([
                     url: 'path/to/content'
                 });
 
-                this.item = new SearchItemView({model: this.model});
+                this.item = new SearchItemView({
+                    model: this.model,
+                    template: courseSearchItemTemplate
+                });
                 this.item.render();
-                this.seqItem = new SearchItemView({model: this.seqModel});
+                this.seqItem = new SearchItemView({
+                    model: this.seqModel,
+                    template: courseSearchItemTemplate
+                });
                 this.seqItem.render();
-            }
+            });
 
-            function rendersItem() {
+            it('rendersItem', function() {
                 expect(this.item.$el).toHaveAttr('role', 'region');
                 expect(this.item.$el).toHaveAttr('aria-label', 'search result');
                 expect(this.item.$el).toContainElement('a[href="' + this.model.get('url') + '"]');
                 expect(this.item.$el.find('.result-type')).toContainHtml(this.model.get('content_type'));
                 expect(this.item.$el.find('.result-excerpt')).toContainHtml(this.model.get('excerpt'));
                 expect(this.item.$el.find('.result-location')).toContainHtml('section ▸ subsection ▸ unit');
-            }
+            });
 
-            function rendersSequentialItem() {
+            it('rendersSequentialItem', function() {
                 expect(this.seqItem.$el).toHaveAttr('role', 'region');
                 expect(this.seqItem.$el).toHaveAttr('aria-label', 'search result');
                 expect(this.seqItem.$el).toContainElement('a[href="' + this.seqModel.get('url') + '"]');
                 expect(this.seqItem.$el.find('.result-type')).toBeEmpty();
                 expect(this.seqItem.$el.find('.result-excerpt')).toBeEmpty();
                 expect(this.seqItem.$el.find('.result-location')).toContainHtml('section ▸ subsection');
-            }
+            });
 
-            function logsSearchItemViewEvent() {
+            it('logsSearchItemViewEvent', function() {
                 this.model.collection = new SearchCollection([this.model], {course_id: 'edx101'});
                 this.item.render();
                 // Mock the redirect call
@@ -277,27 +276,6 @@ define([
                 expect(this.item.redirect).toHaveBeenCalled();
                 this.item.$el.trigger('click');
                 expect(this.item.redirect).toHaveBeenCalled();
-            }
-
-            describe('CourseSearchItemView', function() {
-                beforeEach(function() {
-                    beforeEachHelper.call(this, CourseSearchItemView);
-                });
-                it('renders items correctly', rendersItem);
-                it('renders Sequence items correctly', rendersSequentialItem);
-                it('logs view event', logsSearchItemViewEvent);
-            });
-
-            describe('DashSearchItemView', function() {
-                beforeEach(function() {
-                    beforeEachHelper.call(this, DashSearchItemView);
-                });
-                it('renders items correctly', rendersItem);
-                it('renders Sequence items correctly', rendersSequentialItem);
-                it('displays course name in breadcrumbs', function() {
-                    expect(this.seqItem.$el.find('.result-course-name')).toContainHtml(this.model.get('course_name'));
-                });
-                it('logs view event', logsSearchItemViewEvent);
             });
         });
 
@@ -315,7 +293,7 @@ define([
                 $('.search-field').val(term);
                 this.form.doSearch(term);
                 expect(this.onSearch).toHaveBeenCalledWith($.trim(term));
-                expect($('.search-field').val()).toEqual(term);
+                expect($('.search-field').val()).toEqual(term.trim());
                 expect($('.search-field')).toHaveClass('is-active');
                 expect($('.search-button')).toBeHidden();
                 expect($('.cancel-button')).toBeVisible();
@@ -350,26 +328,12 @@ define([
                 expect($('.search-button')).toBeVisible();
             }
 
-            describe('CourseSearchForm', function() {
+            describe('SearchForm', function() {
                 beforeEach(function() {
-                    loadFixtures('js/fixtures/search/course_search_form.html');
-                    this.form = new CourseSearchForm();
-                    this.onClear = jasmine.createSpy('onClear');
-                    this.onSearch = jasmine.createSpy('onSearch');
-                    this.form.on('clear', this.onClear);
-                    this.form.on('search', this.onSearch);
-                });
-                it('trims input string', trimsInputString);
-                it('handles calls to doSearch', doesSearch);
-                it('triggers a search event and changes to active state', triggersSearchEvent);
-                it('clears search when clicking on cancel button', clearsSearchOnCancel);
-                it('clears search when search box is empty', clearsSearchOnEmpty);
-            });
-
-            describe('DashSearchForm', function() {
-                beforeEach(function() {
-                    loadFixtures('js/fixtures/search/dashboard_search_form.html');
-                    this.form = new DashSearchForm();
+                    loadFixtures('course_search/fixtures/course_search_form.html');
+                    this.form = new SearchForm({
+                        el: '#courseware-search-bar'
+                    });
                     this.onClear = jasmine.createSpy('onClear');
                     this.onSearch = jasmine.createSpy('onSearch');
                     this.form.on('clear', this.onClear);
@@ -401,7 +365,9 @@ define([
 
             function returnsToContent() {
                 this.resultsView.clear();
-                expect(this.resultsView.$contentElement).toHaveCss({'display': this.contentElementDisplayValue});
+                expect(this.resultsView.$contentElement).toHaveCss({
+                    display: this.contentElementDisplayValue
+                });
                 expect(this.resultsView.$el).toBeHidden();
                 expect(this.resultsView.$el).toBeEmpty();
             }
@@ -467,28 +433,14 @@ define([
                 expect(this.resultsView.$el.find('a.search-load-next .icon')).toBeHidden();
                 this.resultsView.loadNext();
                 // toBeVisible does not work with inline
-                expect(this.resultsView.$el.find('a.search-load-next .icon')).toHaveCss({'display': 'inline'});
+                expect(this.resultsView.$el.find('a.search-load-next .icon')).toHaveCss({
+                    display: 'inline'
+                });
                 this.resultsView.renderNext();
                 expect(this.resultsView.$el.find('a.search-load-next .icon')).toBeHidden();
             }
 
             function beforeEachHelper(SearchResultsView) {
-                appendSetFixtures(
-                    '<div class="courseware-results"></div>' +
-                    '<section id="course-content"></section>' +
-                    '<section id="dashboard-search-results"></section>' +
-                    '<section id="my-courses" tabindex="-1"></section>'
-                );
-
-                TemplateHelpers.installTemplates([
-                    'templates/search/course_search_item',
-                    'templates/search/dashboard_search_item',
-                    'templates/search/course_search_results',
-                    'templates/search/dashboard_search_results',
-                    'templates/search/search_loading',
-                    'templates/search/search_error'
-                ]);
-
                 var MockCollection = Backbone.Collection.extend({
                     hasNextPage: function() {},
                     latestModelsCount: 0,
@@ -497,6 +449,14 @@ define([
                         return SearchCollection.prototype.latestModels.apply(this, arguments);
                     }
                 });
+
+                appendSetFixtures(
+                    '<div class="courseware-results"></div>' +
+                    '<section id="course-content"></section>' +
+                    '<section id="dashboard-search-results"></section>' +
+                    '<section id="my-courses" tabindex="-1"></section>'
+                );
+
                 this.collection = new MockCollection();
                 this.resultsView = new SearchResultsView({collection: this.collection});
             }
@@ -599,13 +559,13 @@ define([
                 $('.cancel-button').trigger('click');
                 AjaxHelpers.skipResetRequest(requests);
                 // there should be no results
-                expect(this.$contentElement).toHaveCss({'display': this.contentElementDisplayValue});
+                expect(this.$contentElement).toHaveCss({display: this.contentElementDisplayValue});
                 expect(this.$searchResults).toBeHidden();
             }
 
             function clearsResults() {
                 $('.cancel-button').trigger('click');
-                expect(this.$contentElement).toHaveCss({'display': this.contentElementDisplayValue});
+                expect(this.$contentElement).toHaveCss({display: this.contentElementDisplayValue});
                 expect(this.$searchResults).toBeHidden();
             }
 
@@ -624,13 +584,14 @@ define([
                         }
                     }]
                 };
+                var body;
                 $('.search-field').val('query');
                 $('.search-button').trigger('click');
                 AjaxHelpers.respondWithJson(requests, response);
                 expect(this.$searchResults.find('li').length).toEqual(1);
                 expect($('.search-load-next')).toBeVisible();
                 $('.search-load-next').trigger('click');
-                var body = requests[1].requestBody;
+                body = requests[1].requestBody;
                 expect(body).toContain('search_string=query');
                 expect(body).toContain('page_index=1');
                 AjaxHelpers.respondWithJson(requests, response);
@@ -644,27 +605,14 @@ define([
                 expect(requests[0].requestBody).toContain('search_string=query');
             }
 
-            function loadTemplates() {
-                TemplateHelpers.installTemplates([
-                    'templates/search/course_search_item',
-                    'templates/search/dashboard_search_item',
-                    'templates/search/search_loading',
-                    'templates/search/search_error',
-                    'templates/search/course_search_results',
-                    'templates/search/dashboard_search_results'
-                ]);
-            }
-
             describe('CourseSearchApp', function() {
                 beforeEach(function() {
-                    loadFixtures('js/fixtures/search/course_search_form.html');
+                    var courseId = 'a/b/c';
+                    loadFixtures('course_search/fixtures/course_search_form.html');
                     appendSetFixtures(
                         '<div class="courseware-results"></div>' +
                         '<section id="course-content"></section>'
                     );
-                    loadTemplates.call(this);
-
-                    var courseId = 'a/b/c';
                     CourseSearchFactory(courseId);
                     spyOn(Backbone.history, 'navigate');
                     this.$contentElement = $('#course-content');
@@ -688,12 +636,11 @@ define([
 
             describe('DashSearchApp', function() {
                 beforeEach(function() {
-                    loadFixtures('js/fixtures/search/dashboard_search_form.html');
+                    loadFixtures('course_search/fixtures/dashboard_search_form.html');
                     appendSetFixtures(
                         '<section id="dashboard-search-results"></section>' +
                         '<section id="my-courses" tabindex="-1"></section>'
                     );
-                    loadTemplates.call(this);
                     DashboardSearchFactory();
 
                     spyOn(Backbone.history, 'navigate');

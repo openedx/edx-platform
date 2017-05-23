@@ -2214,6 +2214,7 @@ INSTALLED_APPS = (
     # Features
     'openedx.features.course_bookmarks',
     'openedx.features.course_experience',
+    'openedx.features.course_search',
     'openedx.features.enterprise_support',
 )
 

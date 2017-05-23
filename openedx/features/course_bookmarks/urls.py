@@ -1,5 +1,5 @@
 """
-Defines URLs for the course experience.
+Defines URLs for course bookmarks.
 """
 
 from django.conf.urls import url
