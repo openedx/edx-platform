@@ -11,8 +11,10 @@ version that was passed in.
 """
 from contextlib import contextmanager
 from functools import partial
+
 from ccx_keys.locator import CCXLocator, CCXBlockUsageLocator
 from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
+
 from xmodule.modulestore import XMODULE_FIELDS_WITH_USAGE_KEYS
 
 
@@ -112,7 +114,7 @@ class CCXModulestoreWrapper(object):
         with remove_ccx(locator) as (locator, restore):
             # pylint: disable=protected-access
             return restore(
-                self._modulestore._clean_locator_for_mapping(locator)
+                self._modulestore.clean_locator_for_mapping(locator)
             )
 
     def _get_modulestore_for_courselike(self, locator=None):

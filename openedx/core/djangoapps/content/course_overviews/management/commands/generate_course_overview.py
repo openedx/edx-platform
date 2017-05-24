@@ -5,11 +5,13 @@ Command to load course overviews.
 import logging
 
 from django.core.management.base import BaseCommand, CommandError
+
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from xmodule.modulestore.django import modulestore
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from xmodule.modulestore.django import modulestore
+from xmodule.course_module import get_course_summaries
 
 
 log = logging.getLogger(__name__)
@@ -39,7 +41,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         if options['all']:
-            course_keys = [course.id for course in modulestore().get_course_summaries()]
+            course_keys = [course.id for course in get_course_summaries(modulestore())]
         else:
             if len(args) < 1:
                 raise CommandError('At least one course or --all must be specified.')

@@ -53,45 +53,45 @@ Representation:
         *** 'original_version': definition_id of the root of the previous version relation on this
         definition. Acts as a pseudo-object identifier.
 """
+from collections import defaultdict
 import copy
 import datetime
 import hashlib
 import logging
-import six
+from types import NoneType
+
 from contracts import contract, new_contract
 from importlib import import_module
+import six
+
+from bson.objectid import ObjectId
 from mongodb_proxy import autoretry_read
 from path import Path as path
 from pytz import UTC
-from bson.objectid import ObjectId
 
-from xblock.core import XBlock
-from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
-from xmodule.course_module import CourseSummary
-from xmodule.errortracker import null_error_tracker
+from ccx_keys.locator import CCXLocator, CCXBlockUsageLocator
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import (
     BlockUsageLocator, DefinitionLocator, CourseLocator, LibraryLocator, VersionTree, LocalId,
 )
-from ccx_keys.locator import CCXLocator, CCXBlockUsageLocator
-from xmodule.modulestore.exceptions import InsufficientSpecificationError, VersionConflictError, DuplicateItemError, \
-    DuplicateCourseError, MultipleCourseBlocksFound
+from xblock.core import XBlock
+from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
+
+from xmodule.assetstore import AssetMetadata
+from xmodule.error_module import ErrorDescriptor
+from xmodule.errortracker import null_error_tracker
 from xmodule.modulestore import (
     inheritance, ModuleStoreWriteBase, ModuleStoreEnum,
     BulkOpsRecord, BulkOperationsMixin, SortedAssetList, BlockData
 )
-
-from ..exceptions import ItemNotFoundError
-from .caching_descriptor_system import CachingDescriptorSystem
-from xmodule.partitions.partitions_service import PartitionService
+from xmodule.modulestore.exceptions import InsufficientSpecificationError, VersionConflictError, DuplicateItemError, \
+    DuplicateCourseError, MultipleCourseBlocksFound
 from xmodule.modulestore.split_mongo.mongo_connection import MongoConnection, DuplicateKeyError
 from xmodule.modulestore.split_mongo import BlockKey, CourseEnvelope
 from xmodule.modulestore.store_utilities import DETACHED_XBLOCK_TYPES
-from xmodule.error_module import ErrorDescriptor
-from collections import defaultdict
-from types import NoneType
-from xmodule.assetstore import AssetMetadata
-
+from xmodule.partitions.partitions_service import PartitionService
+from ..exceptions import ItemNotFoundError
+from .caching_descriptor_system import CachingDescriptorSystem
 
 log = logging.getLogger(__name__)
 
@@ -981,7 +981,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
     @autoretry_read()
     def get_course_summaries(self, branch, **kwargs):
         """
-        Returns a list of `CourseSummary` which matching any given qualifiers.
+        Returns a list of course_summary_data which matching any given qualifiers.
 
         qualifiers should be a dict of keywords matching the db fields or any
         legal query for mongo to use against the active_versions collection.
@@ -991,16 +991,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
         :param branch: the branch for which to return courses.
         """
-        def extract_course_summary(course):
-            """
-            Extract course information from the course block for split.
-            """
-            return {
-                field: course.fields[field]
-                for field in CourseSummary.course_info_fields
-                if field in course.fields
-            }
-
         courses_summaries = []
         for entry, structure_info in self._get_course_blocks_for_branch(branch, **kwargs):
             course_locator = self._create_course_locator(structure_info, branch=None)
@@ -1016,10 +1006,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 raise MultipleCourseBlocksFound(
                     "Expected 1 course block to be found in the course, but found {0}".format(len(course_block))
                 )
-            course_summary = extract_course_summary(course_block[0])
-            courses_summaries.append(
-                CourseSummary(course_locator, **course_summary)
-            )
+            courses_summaries.append((course_locator, course_block[0]))
         return courses_summaries
 
     def get_libraries(self, branch="library", **kwargs):

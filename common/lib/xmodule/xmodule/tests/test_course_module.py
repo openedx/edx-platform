@@ -1,17 +1,21 @@
 """Tests the course modules and their functions"""
 import ddt
+import itertools
 import unittest
 from datetime import datetime, timedelta
 
-import itertools
 from fs.memoryfs import MemoryFS
 from mock import Mock, patch
 from pytz import utc
+
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xblock.runtime import KvsFieldData, DictKeyValueStore
 
 import xmodule.course_module
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.utils import PureModulestoreTestCase
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 ORG = 'test_org'
@@ -376,6 +380,7 @@ class CourseDescriptorTestCase(unittest.TestCase):
 
     def test_has_started(self):
         """
+    except Exception as exc:
         Test CourseDescriptor.has_started.
         """
         self.course.start = _LAST_WEEK
@@ -388,3 +393,49 @@ class CourseDescriptorTestCase(unittest.TestCase):
         Test CourseDescriptor.number.
         """
         self.assertEqual(self.course.number, COURSE)
+
+
+class CourseSummaryTestCase(PureModulestoreTestCase):
+    """
+    Verify the behavior of Direct Only items
+    blocks intended to store snippets of course content.
+    """
+    __test__ = False
+
+    def setUp(self):
+        super(CourseSummaryTestCase, self).setUp()
+        self.course = CourseFactory.create(
+            org='test_org',
+            number='999',
+            run='test_run',
+            display_name='My Test Course',
+            modulestore=self.store
+        )
+
+    def assertCourseSummaryFields(self, course_summaries):
+        """
+        Assert that the `course_summary` of a course has all expected fields.
+        Arguments:
+            course_summaries: list of CourseSummary class objects.
+        """
+        def verify_course_summery_fields(course_summary):
+            """ Verify that every `course_summary` object has all the required fields """
+            expected_fields = xmodule.course_module.CourseSummary.course_info_fields + ['id', 'location']
+            return all([hasattr(course_summary, field) for field in expected_fields])
+
+        self.assertTrue(all(verify_course_summery_fields(course_summary) for course_summary in course_summaries))
+
+    @ddt.data(ModuleStoreEnum.Branch.draft_preferred, ModuleStoreEnum.Branch.published_only)
+    def test_course_summaries(self, branch):
+        """ Test that `get_course_summaries` method in course_module works as expected. """
+        with self.store.branch_setting(branch_setting=branch):
+            course_summaries = xmodule.course_module.get_course_summaries(self.store)
+
+            # Verify course summaries
+            self.assertEqual(len(course_summaries), 1)
+
+            # Verify that all course summary objects have the required attributes.
+            self.assertCourseSummaryFields(course_summaries)
+
+            # Verify fetched accessible courses list is a list of CourseSummery instances
+            self.assertTrue(all(isinstance(course, xmodule.course_module.CourseSummary) for course in course_summaries))

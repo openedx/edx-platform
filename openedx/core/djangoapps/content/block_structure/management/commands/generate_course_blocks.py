@@ -4,7 +4,6 @@ Command to load course blocks.
 import logging
 
 from django.core.management.base import BaseCommand
-from xmodule.modulestore.django import modulestore
 
 import openedx.core.djangoapps.content.block_structure.api as api
 from openedx.core.djangoapps.content.block_structure.config import STORAGE_BACKING_FOR_CACHE, waffle
@@ -15,6 +14,8 @@ from openedx.core.lib.command_utils import (
     validate_dependent_option,
     parse_course_keys,
 )
+from xmodule.course_module import get_course_summaries
+from xmodule.modulestore.django import modulestore
 
 
 log = logging.getLogger(__name__)
@@ -89,7 +90,7 @@ class Command(BaseCommand):
         validate_dependent_option(options, 'end_index', 'all_courses')
 
         if courses_mode == 'all_courses':
-            course_keys = [course.id for course in modulestore().get_course_summaries()]
+            course_keys = [course.id for course in get_course_summaries(modulestore())]
             if options.get('start_index'):
                 end = options.get('end_index') or len(course_keys)
                 course_keys = course_keys[options['start_index']:end]

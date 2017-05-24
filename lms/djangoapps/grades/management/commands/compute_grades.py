@@ -8,14 +8,13 @@ import hashlib
 import logging
 
 from django.core.management.base import BaseCommand
+
 import six
 
-from openedx.core.lib.command_utils import (
-    get_mutually_exclusive_required_option,
-    parse_course_keys,
-)
 from lms.djangoapps.grades.config.models import ComputeGradesSetting
+from openedx.core.lib.command_utils import get_mutually_exclusive_required_option, parse_course_keys
 from student.models import CourseEnrollment
+from xmodule.course_module import get_course_summaries
 from xmodule.modulestore.django import modulestore
 
 from ... import tasks
@@ -133,7 +132,7 @@ class Command(BaseCommand):
 
         courses_mode = get_mutually_exclusive_required_option(options, 'courses', 'all_courses', 'from_settings')
         if courses_mode == 'all_courses':
-            course_keys = [course.id for course in modulestore().get_course_summaries()]
+            course_keys = [course.id for course in get_course_summaries(modulestore())]
         elif courses_mode == 'courses':
             course_keys = parse_course_keys(options['courses'])
         else:

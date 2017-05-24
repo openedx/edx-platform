@@ -18,16 +18,14 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods, require_GET
 from django.views.decorators.csrf import ensure_csrf_cookie
 
+from ccx_keys.locator import CCXLocator
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import Location
 
-from .component import (
-    ADVANCED_COMPONENT_TYPES,
-)
+from .component import ADVANCED_COMPONENT_TYPES
 from .item import create_xblock_info
 from .library import LIBRARIES_ENABLED, get_library_creator_status
-from ccx_keys.locator import CCXLocator
 from contentstore.course_group_config import (
     COHORT_SCHEME,
     ENROLLMENT_SCHEME,
@@ -92,6 +90,7 @@ from util.organizations_helpers import (
 from util.string_utils import _has_non_ascii_characters
 from xblock_django.api import deprecated_xblocks
 from xmodule.contentstore.content import StaticContent
+from xmodule.course_module import get_course_summaries
 from xmodule.course_module import CourseFields
 from xmodule.course_module import DEFAULT_START_DATE
 from xmodule.error_module import ErrorDescriptor
@@ -378,7 +377,7 @@ def _accessible_courses_summary_list(request):
 
         return has_studio_read_access(request.user, course_summary.id)
 
-    courses_summary = filter(course_filter, modulestore().get_course_summaries())
+    courses_summary = filter(course_filter, get_course_summaries(modulestore()))
     in_process_course_actions = get_in_process_course_actions(request)
     return courses_summary, in_process_course_actions
 

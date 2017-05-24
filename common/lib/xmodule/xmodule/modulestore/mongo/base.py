@@ -30,13 +30,13 @@ from opaque_keys.edx.locations import Location, BlockUsageLocator, SlashSeparate
 from opaque_keys.edx.locator import CourseLocator, LibraryLocator
 from path import Path as path
 from pytz import UTC
+
 from xblock.core import XBlock
 from xblock.exceptions import InvalidScopeError
 from xblock.fields import Scope, ScopeIds, Reference, ReferenceList, ReferenceValueDict
 from xblock.runtime import KvsFieldData
 
 from xmodule.assetstore import AssetMetadata, CourseAssetsFromStorage
-from xmodule.course_module import CourseSummary
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import null_error_tracker, exc_info_to_str
 from xmodule.exceptions import HeartbeatFailure
@@ -47,9 +47,9 @@ from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished
 from xmodule.modulestore.edit_info import EditInfoRuntimeMixin
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError, ReferentialIntegrityError
 from xmodule.modulestore.inheritance import InheritanceMixin, inherit_metadata, InheritanceKeyValueStore
-from xmodule.partitions.partitions_service import PartitionService
 from xmodule.modulestore.xml import CourseLocationManager
 from xmodule.modulestore.store_utilities import DETACHED_XBLOCK_TYPES
+from xmodule.partitions.partitions_service import PartitionService
 from xmodule.services import SettingsService
 
 
@@ -997,19 +997,9 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
     @autoretry_read()
     def get_course_summaries(self, **kwargs):
         """
-        Returns a list of `CourseSummary`. This accepts an optional parameter of 'org' which
+        Returns a list of course summary data. This accepts an optional parameter of 'org' which
         will apply an efficient filter to only get courses with the specified ORG
         """
-        def extract_course_summary(course):
-            """
-            Extract course information from the course block for mongo.
-            """
-            return {
-                field: course['metadata'][field]
-                for field in CourseSummary.course_info_fields
-                if field in course['metadata']
-            }
-
         course_org_filter = kwargs.get('org')
         query = {'_id.category': 'course'}
 
@@ -1022,10 +1012,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         for course in course_records:
             if not (course['_id']['org'] == 'edx' and course['_id']['course'] == 'templates'):
                 locator = SlashSeparatedCourseKey(course['_id']['org'], course['_id']['course'], course['_id']['name'])
-                course_summary = extract_course_summary(course)
-                courses_summaries.append(
-                    CourseSummary(locator, **course_summary)
-                )
+                courses_summaries.append((locator, course))
         return courses_summaries
 
     @autoretry_read()

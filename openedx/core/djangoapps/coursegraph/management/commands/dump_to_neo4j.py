@@ -6,16 +6,19 @@ from __future__ import unicode_literals, print_function
 
 import logging
 
-from django.core.management.base import BaseCommand
-from django.utils import six, timezone
-from opaque_keys.edx.keys import CourseKey
 from py2neo import Graph, Node, Relationship, authenticate, NodeSelector
 from py2neo.compat import integer, string, unicode as neo4j_unicode
 from request_cache.middleware import RequestCache
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.store_utilities import DETACHED_XBLOCK_TYPES
+
+from django.core.management.base import BaseCommand
+from django.utils import six, timezone
+
+from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
+from xmodule.course_module import get_course_summaries
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.store_utilities import DETACHED_XBLOCK_TYPES
 
 log = logging.getLogger(__name__)
 
@@ -48,7 +51,7 @@ class ModuleStoreSerializer(object):
             course_keys = [CourseKey.from_string(course.strip()) for course in courses]
         else:
             course_keys = [
-                course.id for course in modulestore().get_course_summaries()
+                course.id for course in get_course_summaries(modulestore())
             ]
         if skip is not None:
             skip_keys = [CourseKey.from_string(course.strip()) for course in skip]

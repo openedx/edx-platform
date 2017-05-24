@@ -9,14 +9,15 @@ import logging
 from contextlib import contextmanager
 import itertools
 import functools
+
 from contracts import contract, new_contract
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, AssetKey
 from opaque_keys.edx.locator import LibraryLocator
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from xmodule.assetstore import AssetMetadata
 
+from xmodule.assetstore import AssetMetadata
 from . import ModuleStoreWriteBase, ModuleStoreEnum, XMODULE_FIELDS_WITH_USAGE_KEYS
 from .exceptions import ItemNotFoundError, DuplicateCourseError
 from .draft_and_published import ModuleStoreDraftAndPublished
@@ -185,7 +186,8 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                     self.mappings[course_key] = store
             self.modulestores.append(store)
 
-    def _clean_locator_for_mapping(self, locator):
+    @staticmethod
+    def clean_locator_for_mapping(locator):
         """
         In order for mapping to work, the locator must be minimal--no version, no branch--
         as we never store one version or one branch in one ms and another in another ms.
@@ -206,7 +208,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         If locator is None, returns the first (ordered) store as the default
         """
         if locator is not None:
-            locator = self._clean_locator_for_mapping(locator)
+            locator = self.clean_locator_for_mapping(locator)
             mapping = self.mappings.get(locator, None)
             if mapping is not None:
                 return mapping
@@ -293,13 +295,13 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
     @strip_key
     def get_course_summaries(self, **kwargs):
         """
-        Returns a list containing the course information in CourseSummary objects.
+        Returns a list containing the course information.
         Information contains `location`, `display_name`, `locator` of the courses in this modulestore.
         """
         course_summaries = {}
         for store in self.modulestores:
-            for course_summary in store.get_course_summaries(**kwargs):
-                course_id = self._clean_locator_for_mapping(locator=course_summary.id)
+            for locator, course_summary in store.get_course_summaries(**kwargs):
+                course_id = self.clean_locator_for_mapping(locator=locator)
 
                 # Check if course is indeed unique. Save it in result if unique
                 if course_id in course_summaries:
@@ -307,7 +309,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                         u"Modulestore %s have duplicate courses %s; skipping from result.", store, course_id
                     )
                 else:
-                    course_summaries[course_id] = course_summary
+                    course_summaries[course_id] = (locator, course_summary)
         return course_summaries.values()
 
     @strip_key
@@ -319,7 +321,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         for store in self.modulestores:
             # filter out ones which were fetched from earlier stores but locations may not be ==
             for course in store.get_courses(**kwargs):
-                course_id = self._clean_locator_for_mapping(course.id)
+                course_id = self.clean_locator_for_mapping(course.id)
                 if course_id not in courses:
                     # course is indeed unique. save it in result
                     courses[course_id] = course
@@ -336,7 +338,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                 continue
             # filter out ones which were fetched from earlier stores but locations may not be ==
             for library in store.get_libraries(**kwargs):
-                library_id = self._clean_locator_for_mapping(library.location)
+                library_id = self.clean_locator_for_mapping(library.location)
                 if library_id not in libraries:
                     # library is indeed unique. save it in result
                     libraries[library_id] = library
