@@ -962,6 +962,8 @@ class CourseEnrollment(models.Model):
             enrollment.is_active = False
             enrollment.save()
 
+        log.info("User %s enrolled to course %s", user.email, course_key)
+
         return enrollment
 
     @classmethod
