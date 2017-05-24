@@ -1,3 +1,11 @@
+'''
+Manage user access:
+
+* Who has access to which courses?
+* Who has course creator access?
+* Who is staff vs. instructor
+'''
+
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required

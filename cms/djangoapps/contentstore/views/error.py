@@ -1,3 +1,8 @@
+"""
+Helper functions to return error pages to users. Isolating this
+here allows us to provide a consistent error UX across Studio.
+"""
+
 # pylint: disable=missing-docstring,unused-argument
 
 from django.http import (HttpResponse, HttpResponseServerError,
