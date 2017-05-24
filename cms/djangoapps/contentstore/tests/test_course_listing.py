@@ -17,11 +17,11 @@ from common.test.utils import XssTestMixin
 from xmodule.course_module import CourseSummary
 
 from contentstore.views.course import (
-    _accessible_courses_list,
+    _accessible_courses_iter,
     _accessible_courses_list_from_groups,
     AccessListFallback,
     get_courses_accessible_to_user,
-    _accessible_courses_summary_list,
+    _accessible_courses_summary_iter,
 )
 from contentstore.utils import delete_course_and_groups
 from contentstore.tests.utils import AjaxEnabledTestClient
@@ -132,11 +132,12 @@ class TestCourseListing(ModuleStoreTestCase, XssTestMixin):
         self._create_course_with_access_groups(course_location, self.user)
 
         # get courses through iterating all courses
-        courses_list, __ = _accessible_courses_list(self.request)
+        courses_iter, __ = _accessible_courses_iter(self.request)
+        courses_list = list(courses_iter)
         self.assertEqual(len(courses_list), 1)
 
-        courses_summary_list, __ = _accessible_courses_summary_list(self.request)
-        self.assertEqual(len(courses_summary_list), 1)
+        courses_summary_list, __ = _accessible_courses_summary_iter(self.request)
+        self.assertEqual(len(list(courses_summary_list)), 1)
 
         # get courses by reversing group name formats
         courses_list_by_groups, __ = _accessible_courses_list_from_groups(self.request)
@@ -179,8 +180,8 @@ class TestCourseListing(ModuleStoreTestCase, XssTestMixin):
         # Verify that CCX courses are filtered out while iterating over all courses
         mocked_ccx_course = Mock(id=ccx_course_key)
         with patch('xmodule.modulestore.mixed.MixedModuleStore.get_courses', return_value=[mocked_ccx_course]):
-            courses_list, __ = _accessible_courses_list(self.request)
-            self.assertEqual(len(courses_list), 0)
+            courses_iter, __ = _accessible_courses_iter(self.request)
+            self.assertEqual(len(list(courses_iter)), 0)
 
     @ddt.data(
         (ModuleStoreEnum.Type.split, 'xmodule.modulestore.split_mongo.split_mongo_kvs.SplitMongoKVS'),
@@ -201,8 +202,8 @@ class TestCourseListing(ModuleStoreTestCase, XssTestMixin):
                 self.assertIsInstance(self.store.get_course(course_key), ErrorDescriptor)
 
                 # get courses through iterating all courses
-                courses_list, __ = _accessible_courses_list(self.request)
-                self.assertEqual(courses_list, [])
+                courses_iter, __ = _accessible_courses_iter(self.request)
+                self.assertEqual(list(courses_iter), [])
 
                 # get courses by reversing group name formats
                 courses_list_by_groups, __ = _accessible_courses_list_from_groups(self.request)
@@ -231,14 +232,14 @@ class TestCourseListing(ModuleStoreTestCase, XssTestMixin):
 
         # Fetch accessible courses list & verify their count
         courses_list_by_staff, __ = get_courses_accessible_to_user(self.request)
-        self.assertEqual(len(courses_list_by_staff), TOTAL_COURSES_COUNT)
+        self.assertEqual(len(list(courses_list_by_staff)), TOTAL_COURSES_COUNT)
 
         # Verify fetched accessible courses list is a list of CourseSummery instances
         self.assertTrue(all(isinstance(course, CourseSummary) for course in courses_list_by_staff))
 
         # Now count the db queries for staff
         with check_mongo_calls(mongo_calls):
-            _accessible_courses_summary_list(self.request)
+            list(_accessible_courses_summary_iter(self.request))
 
     @ddt.data(
         (ModuleStoreEnum.Type.split, 'xmodule.modulestore.split_mongo.split_mongo_kvs.SplitMongoKVS'),
@@ -261,7 +262,8 @@ class TestCourseListing(ModuleStoreTestCase, XssTestMixin):
                 self.assertIsInstance(self.store.get_course(course_key), ErrorDescriptor)
 
                 # get courses through iterating all courses
-                courses_list, __ = _accessible_courses_list(self.request)
+                courses_iter, __ = _accessible_courses_iter(self.request)
+                courses_list = list(courses_iter)
                 self.assertEqual(courses_list, [])
 
                 # get courses by reversing group name formats
@@ -279,10 +281,12 @@ class TestCourseListing(ModuleStoreTestCase, XssTestMixin):
             self._create_course_with_access_groups(course_key, self.user, store)
 
         # get courses through iterating all courses
-        courses_list, __ = _accessible_courses_list(self.request)
+        courses_iter, __ = _accessible_courses_iter(self.request)
+        courses_list = list(courses_iter)
         self.assertEqual(len(courses_list), 1)
 
-        courses_summary_list, __ = _accessible_courses_summary_list(self.request)
+        courses_summary_iter, __ = _accessible_courses_summary_iter(self.request)
+        courses_summary_list = list(courses_summary_iter)
 
         # Verify fetched accessible courses list is a list of CourseSummery instances and only one course
         # is returned
@@ -302,17 +306,17 @@ class TestCourseListing(ModuleStoreTestCase, XssTestMixin):
         CourseInstructorRole(course_key).add_users(self.user)
 
         # Get courses through iterating all courses
-        courses_list, __ = _accessible_courses_list(self.request)
+        courses_iter, __ = _accessible_courses_iter(self.request)
 
         # Get course summaries by iterating all courses
-        courses_summary_list, __ = _accessible_courses_summary_list(self.request)
+        courses_summary_iter, __ = _accessible_courses_summary_iter(self.request)
 
         # Get courses by reversing group name formats
         courses_list_by_groups, __ = _accessible_courses_list_from_groups(self.request)
 
         # Test that course list returns no course
         self.assertEqual(
-            [len(courses_list), len(courses_list_by_groups), len(courses_summary_list)],
+            [len(list(courses_iter)), len(courses_list_by_groups), len(list(courses_summary_iter))],
             [0, 0, 0]
         )
 
@@ -344,13 +348,13 @@ class TestCourseListing(ModuleStoreTestCase, XssTestMixin):
 
         # time the get courses by iterating through all courses
         with Timer() as iteration_over_courses_time_1:
-            courses_list, __ = _accessible_courses_list(self.request)
-        self.assertEqual(len(courses_list), USER_COURSES_COUNT)
+            courses_iter, __ = _accessible_courses_iter(self.request)
+        self.assertEqual(len(list(courses_iter)), USER_COURSES_COUNT)
 
         # time again the get courses by iterating through all courses
         with Timer() as iteration_over_courses_time_2:
-            courses_list, __ = _accessible_courses_list(self.request)
-        self.assertEqual(len(courses_list), USER_COURSES_COUNT)
+            courses_iter, __ = _accessible_courses_iter(self.request)
+        self.assertEqual(len(list(courses_iter)), USER_COURSES_COUNT)
 
         # time the get courses by reversing django groups
         with Timer() as iteration_over_groups_time_1:
@@ -372,7 +376,7 @@ class TestCourseListing(ModuleStoreTestCase, XssTestMixin):
             _accessible_courses_list_from_groups(self.request)
 
         with check_mongo_calls(courses_list_calls):
-            _accessible_courses_list(self.request)
+            list(_accessible_courses_iter(self.request))
         # Calls:
         #    1) query old mongo
         #    2) get_more on old mongo
@@ -424,7 +428,7 @@ class TestCourseListing(ModuleStoreTestCase, XssTestMixin):
 
         # Verify fetched accessible courses list is a list of CourseSummery instances and test expacted
         # course count is returned
-        self.assertEqual(len(courses_list), 2)
+        self.assertEqual(len(list(courses_list)), 2)
         self.assertTrue(all(isinstance(course, CourseSummary) for course in courses_list))
 
     def test_course_listing_with_actions_in_progress(self):
@@ -447,7 +451,7 @@ class TestCourseListing(ModuleStoreTestCase, XssTestMixin):
             )
 
         # verify return values
-        for method in (_accessible_courses_list_from_groups, _accessible_courses_list):
+        for method in (_accessible_courses_list_from_groups, _accessible_courses_iter):
             def set_of_course_keys(course_list, key_attribute_name='id'):
                 """Returns a python set of course keys by accessing the key with the given attribute name."""
                 return set(getattr(c, key_attribute_name) for c in course_list)
