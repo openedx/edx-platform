@@ -27,6 +27,18 @@ def welcome_message_url(course):
     )
 
 
+def dismiss_message_url(course):
+    """
+    Returns the URL for the dismiss message endpoint.
+    """
+    return reverse(
+        'openedx.course_experience.dismiss_welcome_message',
+        kwargs={
+            'course_id': unicode(course.id),
+        }
+    )
+
+
 class TestWelcomeMessageView(ModuleStoreTestCase):
     """
     Tests for the course welcome message fragment view.
@@ -41,10 +53,8 @@ class TestWelcomeMessageView(ModuleStoreTestCase):
                 chapter = ItemFactory.create(category='chapter', parent_location=self.course.location)
                 section = ItemFactory.create(category='sequential', parent_location=chapter.location)
                 ItemFactory.create(category='vertical', parent_location=section.location)
-
         self.user = UserFactory(password=TEST_PASSWORD)
         CourseEnrollment.enroll(self.user, self.course.id)
-
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
 
     def tearDown(self):
@@ -58,6 +68,7 @@ class TestWelcomeMessageView(ModuleStoreTestCase):
         response = self.client.get(welcome_message_url(self.course))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Second Update')
+        self.assertContains(response, 'Dismiss')
 
     def test_replace_urls(self):
         img_url = 'img.png'
@@ -71,4 +82,16 @@ class TestWelcomeMessageView(ModuleStoreTestCase):
 
     def test_empty_welcome_message(self):
         response = self.client.get(welcome_message_url(self.course))
+        self.assertEqual(response.status_code, 204)
+
+    def test_dismiss_message(self):
+        create_course_update(self.course, self.user, 'First Update', date='January 1, 2017')
+
+        response = self.client.get(welcome_message_url(self.course))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'First Update')
+
+        self.client.post(dismiss_message_url(self.course))
+        response = self.client.get(welcome_message_url(self.course))
+        self.assertNotIn('First Update', response)
         self.assertEqual(response.status_code, 204)

@@ -20,6 +20,7 @@ var wpconfig = {
     entry: {
         CourseOutline: './openedx/features/course_experience/static/course_experience/js/CourseOutline.js',
         CourseSock: './openedx/features/course_experience/static/course_experience/js/CourseSock.js',
+        WelcomeMessage: './openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js',
         Import: './cms/static/js/features/import/factories/import.js'
     },
 
