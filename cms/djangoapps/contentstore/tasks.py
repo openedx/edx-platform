@@ -312,6 +312,7 @@ def create_export_tarball(course_module, course_key, context, status=None):
             status.fail(json.dumps({'raw_error_msg': context['raw_err_msg'],
                                     'edit_unit_url': context['edit_unit_url']}))
         raise
+    except Exception as exc:
         LOGGER.exception('There was an error exporting %s', course_key)
         context.update({
             'in_err': True,
