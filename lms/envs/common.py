@@ -2908,6 +2908,9 @@ ECOMMERCE_SERVICE_WORKER_USERNAME = 'ecommerce_worker'
 
 COURSE_CATALOG_API_URL = None
 
+CREDENTIALS_INTERNAL_SERVICE_URL = None
+CREDENTIALS_PUBLIC_SERVICE_URL = None
+
 # Reverification checkpoint name pattern
 CHECKPOINT_PATTERN = r'(?P<checkpoint_name>[^/]+)'
 
