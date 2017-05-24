@@ -709,7 +709,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         save_message = None
         if self.has_saved_answers:
             save_message = _(
-                "Your answers were previously saved. Click '{button_name}' to grade them."
+                u"Your answers were previously saved. Click '{button_name}' to grade them."
             ).format(button_name=self.submit_button_name())
 
         context = {
