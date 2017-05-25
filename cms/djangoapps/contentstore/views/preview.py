@@ -3,45 +3,41 @@ from __future__ import absolute_import
 import logging
 from functools import partial
 
+import static_replace
+from cms.lib.xblock.field_data import CmsFieldData
+from contentstore.utils import get_visibility_partition_info
+from contentstore.views.access import get_user_role
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseBadRequest
-from django.contrib.auth.decorators import login_required
 from django.utils.translation import ugettext as _
 from edxmako.shortcuts import render_to_string
-
+from lms.djangoapps.lms_xblock.field_data import LmsFieldData
+from opaque_keys.edx.keys import UsageKey
 from openedx.core.lib.xblock_utils import (
     replace_static_urls, wrap_xblock, wrap_fragment, wrap_xblock_aside, request_token, xblock_local_resource_url,
 )
-from xmodule.x_module import PREVIEW_VIEWS, STUDENT_VIEW, AUTHOR_VIEW
-from xmodule.contentstore.django import contentstore
-from xmodule.error_module import ErrorDescriptor
-from xmodule.exceptions import NotFoundError, ProcessingError
-from xmodule.partitions.partitions_service import PartitionService
-from xmodule.studio_editable import has_author_view
-from xmodule.services import SettingsService
-from xmodule.modulestore.django import modulestore, ModuleI18nService
-from xmodule.mixin import wrap_with_license
-from opaque_keys.edx.keys import UsageKey
-from xmodule.x_module import ModuleSystem
-from xblock.runtime import KvsFieldData
+from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 from xblock.django.request import webob_to_django_response, django_to_webob_request
 from xblock.exceptions import NoSuchHandlerError
 from xblock.fragment import Fragment
-from xblock_django.user_service import DjangoXBlockUserService
-
-from lms.djangoapps.lms_xblock.field_data import LmsFieldData
-from cms.lib.xblock.field_data import CmsFieldData
-
-from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
-
-import static_replace
-from .session_kv_store import SessionKeyValueStore
-from .helpers import render_from_lms
-
-from contentstore.utils import get_visibility_partition_info
-from contentstore.views.access import get_user_role
+from xblock.runtime import KvsFieldData
 from xblock_config.models import StudioConfig
+from xblock_django.user_service import DjangoXBlockUserService
+from xmodule.contentstore.django import contentstore
+from xmodule.error_module import ErrorDescriptor
+from xmodule.exceptions import NotFoundError, ProcessingError
+from xmodule.mixin import wrap_with_license
+from xmodule.modulestore.django import modulestore, ModuleI18nService
+from xmodule.partitions.partitions_service import PartitionService
+from xmodule.services import SettingsService
+from xmodule.studio_editable import has_author_view
+from xmodule.x_module import ModuleSystem
+from xmodule.x_module import PREVIEW_VIEWS, STUDENT_VIEW, AUTHOR_VIEW
+
+from .helpers import render_from_lms
+from .session_kv_store import SessionKeyValueStore
 
 __all__ = ['preview_handler']
 
@@ -280,7 +276,7 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
         is_reorderable = _is_xblock_reorderable(xblock, context)
         selected_groups_label = get_visibility_partition_info(xblock)['selected_groups_label']
         if selected_groups_label:
-            selected_groups_label = _('Visible to: {list_of_groups}').format(list_of_groups=selected_groups_label)
+            selected_groups_label = _('Access restricted to: {list_of_groups}').format(list_of_groups=selected_groups_label)
         template_context = {
             'xblock_context': context,
             'xblock': xblock,

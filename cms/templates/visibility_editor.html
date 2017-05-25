@@ -16,13 +16,13 @@ is_staff_locked = ancestor_has_staff_lock(xblock)
 <div class="modal-section visibility-summary">
     % if len(selectable_partitions) == 0:
         <div class="is-not-configured has-actions">
-            <h3 class="title">${_('No visibility settings')}</h3>
+            <h3 class="title">${_('Access is not restricted')}</h3>
             <div class="copy">
-                <p>${_('No visibility settings are defined for this component, but visibility might be affected by inherited settings.')}</p>
+                <p>${_('Access to this component is not restricted, but visibility might be affected by inherited settings.')}</p>
                 % if settings.FEATURES.get('ENABLE_ENROLLMENT_TRACK_USER_PARTITION'):
-                <p>${_('You can make this component visible only to specific groups of learners based either on their enrollment track, or by content groups that you create.')}</p>
+                <p>${_('You can restrict access to specific groups of learners based either on their enrollment track or by content groups that you create.')}</p>
                 % else:
-                <p>${_('You can make this component visible only to specific groups of learners based on content groups that you create.')}</p>
+                <p>${_('You can restrict access to specific groups of learners based on content groups that you create.')}</p>
                 % endif
             </div>
 
@@ -36,7 +36,7 @@ is_staff_locked = ancestor_has_staff_lock(xblock)
             <p class="copy">
                 ## Translators: Any text between {screen_reader_start} and {screen_reader_end} is only read by screen readers and never shown in the browser.
                 ${Text(_(
-                    "{screen_reader_start}Warning:{screen_reader_end} The unit that contains this component is hidden from learners. The unit setting overrides the component visibility settings defined here."
+                    "{screen_reader_start}Warning:{screen_reader_end} The unit that contains this component is hidden from learners. The unit setting overrides the component access settings defined here."
                     )).format(
                         screen_reader_start=HTML('<span class="sr">'),
                         screen_reader_end=HTML('</span>'),
@@ -52,18 +52,21 @@ is_staff_locked = ancestor_has_staff_lock(xblock)
         <div role="group" aria-labelledby="visibility-title">
         <div class="modal-section visibility-controls">
             <h3 class="modal-section-title visibility-header" id="visibility-title">
+                % if selected_partition_index == -1:
                 <span class="current-visibility-title">
                     <span class="icon fa fa-eye" aria-hidden="true"></span>
-                    <span>${_('Currently visible to:')}</span>
+                    <span>${_('Access is not restricted')}</span>
                 </span>
-                % if selected_partition_index == -1:
-                <span>${_('All Learners and Staff')}</span>
                 % else:
+                <span class="current-visibility-title">
+                    <span class="icon fa fa-eye" aria-hidden="true"></span>
+                    <span>${_('Access is restricted to:')}</span>
+                </span>
                 <span>${selected_groups_label}</span>
                 % endif
             </h3>
             <div class="modal-section-content partition-visibility">
-                <label class="group-select-title">${_('Change visibility to:')}
+                <label class="group-select-title">${_('Restrict access to:')}
                     <select>
                         <option value="-1" selected ="selected">
                             % if selected_partition_index == -1:
@@ -96,7 +99,7 @@ is_staff_locked = ancestor_has_staff_lock(xblock)
                             % if group["deleted"]:
                             <label for="visibility-group-${partition["id"]}-${group["id"]}" class="label">
                                 ${_("Deleted Group")}
-                                <span class="note">${_('This group no longer exists. Choose another group or make this component visible to All Learners and Staff.')}</span>
+                                <span class="note">${_('This group no longer exists. Choose another group or do not restrict access to this component.')}</span>
                             </label>
                             % else:
                             <label for="visibility-group-${partition["id"]}-${group["id"]}" class="label">${group["name"]}</label>
