@@ -34,10 +34,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
 from openedx.core.djangoapps.user_api.accounts.api import request_password_change
 from openedx.core.djangoapps.user_api.errors import UserNotFound
-from openedx.features.enterprise_support.api import (
-    enterprise_customer_for_request,
-    set_enterprise_branding_filter_param
-)
+from openedx.features.enterprise_support.api import enterprise_customer_for_request
 from openedx.core.lib.time_zone_utils import TIME_ZONE_CHOICES
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from student.models import UserProfile
@@ -98,8 +95,6 @@ def login_and_registration_form(request, initial_mode="login"):
                 initial_mode = "hinted_login"
         except (KeyError, ValueError, IndexError):
             pass
-
-    set_enterprise_branding_filter_param(request=request, provider_id=third_party_auth_hint)
 
     # If this is a themed site, revert to the old login/registration pages.
     # We need to do this for now to support existing themes.
