@@ -8,10 +8,9 @@ from courseware.masquerade import (  # pylint: disable=import-error
     get_masquerading_user_group,
     is_masquerading_as_specific_student
 )
-from xmodule.partitions.partitions import NoSuchUserPartitionGroupError
+from openedx.core.lib.partitions.partitions import NoSuchUserPartitionGroupError
 
 from .cohorts import get_cohort, get_group_info_for_cohort
-
 
 log = logging.getLogger(__name__)
 

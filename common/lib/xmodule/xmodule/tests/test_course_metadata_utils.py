@@ -6,6 +6,7 @@ from datetime import timedelta, datetime
 from unittest import TestCase
 
 from pytz import utc
+from openedx.core.lib.xblock_fields.inherited_fields import DEFAULT_START_DATE
 from xmodule.block_metadata_utils import (
     url_name_for_block,
     display_name_with_default,
@@ -16,7 +17,6 @@ from xmodule.course_metadata_utils import (
     number_for_course_location,
     has_course_started,
     has_course_ended,
-    DEFAULT_START_DATE,
     course_start_date_is_default,
     may_certify_for_course,
 )

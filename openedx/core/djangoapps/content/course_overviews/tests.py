@@ -19,11 +19,11 @@ from PIL import Image
 from lms.djangoapps.certificates.api import get_active_web_certificate
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.lib.courses import course_image_url
+from openedx.core.lib.xblock_fields.inherited_fields import DEFAULT_START_DATE
 from static_replace.models import AssetBaseUrlConfig
 from xmodule.assetstore.assetmgr import AssetManager
 from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.content import StaticContent
-from xmodule.course_metadata_utils import DEFAULT_START_DATE
 from xmodule.course_module import (
     CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
     CATALOG_VISIBILITY_ABOUT,

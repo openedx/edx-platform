@@ -1,25 +1,25 @@
-import sys
 import logging
+import sys
 
 from contracts import contract, new_contract
 from fs.osfs import OSFS
 from lazy import lazy
-from xblock.runtime import KvsFieldData, KeyValueStore
-from xblock.fields import ScopeIds
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator, DefinitionLocator, LibraryLocator, LocalId
+from openedx.core.lib.xblock_fields.inherited_fields import InheritanceMixin
 from xblock.core import XBlock
-from opaque_keys.edx.locator import BlockUsageLocator, LocalId, CourseLocator, LibraryLocator, DefinitionLocator
-
-from xmodule.library_tools import LibraryToolsService
-from xmodule.mako_module import MakoDescriptorSystem
+from xblock.fields import ScopeIds
+from xblock.runtime import KeyValueStore, KvsFieldData
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import exc_info_to_str
+from xmodule.library_tools import LibraryToolsService
+from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.modulestore import BlockData
 from xmodule.modulestore.edit_info import EditInfoRuntimeMixin
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore.inheritance import inheriting_field_data, InheritanceMixin
+from xmodule.modulestore.inheritance import inheriting_field_data
 from xmodule.modulestore.split_mongo import BlockKey, CourseEnvelope
-from xmodule.modulestore.split_mongo.id_manager import SplitMongoIdManager
 from xmodule.modulestore.split_mongo.definition_lazy_loader import DefinitionLazyLoader
+from xmodule.modulestore.split_mongo.id_manager import SplitMongoIdManager
 from xmodule.modulestore.split_mongo.split_mongo_kvs import SplitMongoKVS
 from xmodule.x_module import XModuleMixin
 

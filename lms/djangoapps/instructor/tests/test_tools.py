@@ -3,21 +3,20 @@ Tests for views/tools.py.
 """
 
 import datetime
-import mock
 import json
 import unittest
 
-from django.utils.timezone import utc
-from django.test.utils import override_settings
-from nose.plugins.attrib import attr
-
+import mock
 from courseware.field_overrides import OverrideFieldData
+from django.test.utils import override_settings
+from django.utils.timezone import utc
 from lms.djangoapps.ccx.tests.test_overrides import inject_field_overrides
+from nose.plugins.attrib import attr
+from opaque_keys.edx.keys import CourseKey
+from openedx.core.lib.xblock_fields.fields import Date
 from student.tests.factories import UserFactory
-from xmodule.fields import Date
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from opaque_keys.edx.keys import CourseKey
 
 from ..views import tools
 
