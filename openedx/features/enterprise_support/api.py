@@ -1,11 +1,11 @@
 """
 APIs providing support for enterprise functionality.
 """
-from functools import wraps
 import hashlib
 import logging
-import six
+from functools import wraps
 
+import six
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
@@ -14,9 +14,15 @@ from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django.utils.http import urlencode
 from django.utils.translation import ugettext as _
-from slumber.exceptions import HttpClientError, HttpServerError
-
 from edx_rest_api_client.client import EdxRestApiClient
+from requests.exceptions import ConnectionError, Timeout
+from slumber.exceptions import HttpClientError, HttpServerError, SlumberBaseException
+
+from openedx.core.djangoapps.api_admin.utils import course_discovery_api_client
+from openedx.core.djangoapps.catalog.models import CatalogIntegration
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.lib.token_utils import JwtBuilder
+
 try:
     from enterprise import utils as enterprise_utils
     from enterprise.models import EnterpriseCourseEnrollment, EnterpriseCustomer
@@ -24,13 +30,6 @@ try:
     from enterprise.utils import consent_necessary_for_course
 except ImportError:
     pass
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from slumber.exceptions import SlumberBaseException
-from requests.exceptions import ConnectionError, Timeout
-from openedx.core.djangoapps.api_admin.utils import course_discovery_api_client
-
-from openedx.core.lib.token_utils import JwtBuilder
-from openedx.core.djangoapps.catalog.models import CatalogIntegration
 
 
 CONSENT_FAILED_PARAMETER = 'consent_failed'
