@@ -165,6 +165,7 @@
                 $currentElement = this.$('.forum-nav-thread[data-id=' + threadId + ']');
                 active = $currentElement.has('.forum-nav-thread-link.is-active').length !== 0;
                 $currentElement.replaceWith($content);
+                this.convertMath($content);
                 this.showMetadataAccordingToSort();
                 if (this.supportsActiveThread && active) {
                     this.setActiveThread(threadId);
@@ -215,12 +216,19 @@
                 return this;
             };
 
+            DiscussionThreadListView.prototype.convertMath = function(element) {
+                if (typeof element !== 'undefined') {
+                    DiscussionUtil.convertMath(element.find('.thread-preview-body'));
+                }
+            };
+
             DiscussionThreadListView.prototype.renderThreads = function() {
                 var $content, thread, i, len;
                 this.$('.forum-nav-thread-list').empty();
                 for (i = 0, len = this.displayedCollection.models.length; i < len; i++) {
                     thread = this.displayedCollection.models[i];
                     $content = this.renderThread(thread);
+                    this.convertMath($content);
                     this.$('.forum-nav-thread-list').append($content);
                 }
                 this.showMetadataAccordingToSort();

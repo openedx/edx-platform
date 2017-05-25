@@ -54,7 +54,13 @@ var options = {
         {pattern: 'common/js/xblock/runtime.v1.js', included: true},
         {pattern: 'common/js/discussion/**/*.js', included: true},
         {pattern: 'js/capa/src/**/*.js', included: true},
-        {pattern: 'js/src/**/*.js', included: true}
+        {pattern: 'js/src/**/*.js', included: true},
+        {pattern: '../../lms/static/js/Markdown.Converter.js', included: true},
+        {pattern: '../../lms/static/js/Markdown.Editor.js', included: true},
+        {pattern: '../../lms/static/js/Markdown.Sanitizer.js', included: true},
+        {pattern: '../../lms/static/js/split.js', included: true},
+        {pattern: '../../lms/static/coffee/src/customwmd.js', included: true},
+        {pattern: '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured', included: true} // eslint-disable-line max-len
     ],
 
     specFiles: [
