@@ -13,11 +13,8 @@ from openedx.features.enterprise_support.api import (
     enterprise_customer_for_request,
     enterprise_enabled,
     get_dashboard_consent_notification,
-    get_enterprise_branding_filter_param,
     get_enterprise_consent_url,
-    get_enterprise_customer_logo_url,
-    insert_enterprise_pipeline_elements,
-    set_enterprise_branding_filter_param
+    insert_enterprise_pipeline_elements
 )
 
 
@@ -49,74 +46,6 @@ class TestEnterpriseApi(unittest.TestCase):
                                     'enterprise.tpa_pipeline.handle_enterprise_logistration',
                                     'social.pipeline.social_auth.load_extra_data',
                                     'def'])
-
-    def test_set_enterprise_branding_filter_param(self):
-        """
-        Test that the enterprise customer branding parameters are setting correctly.
-        """
-        ec_uuid = '97b4a894-cea9-4103-8f9f-2c5c95a58ba3'
-        provider_id = 'test-provider-idp'
-
-        request = mock.MagicMock(session={}, GET={'ec_src': ec_uuid})
-        set_enterprise_branding_filter_param(request, provider_id=None)
-        self.assertEqual(get_enterprise_branding_filter_param(request), {'ec_uuid': ec_uuid})
-
-        set_enterprise_branding_filter_param(request, provider_id=provider_id)
-        self.assertEqual(get_enterprise_branding_filter_param(request), {'provider_id': provider_id})
-
-    @override_settings(ENABLE_ENTERPRISE_INTEGRATION=True)
-    def test_get_enterprise_customer_logo_url(self):
-        """
-        Test test_get_enterprise_customer_logo_url return the logo url as desired.
-        """
-        ec_uuid = '97b4a894-cea9-4103-8f9f-2c5c95a58ba3'
-        provider_id = 'test-provider-idp'
-        request = mock.MagicMock(session={}, GET={'ec_src': ec_uuid})
-        branding_info = mock.Mock(
-            logo=mock.Mock(
-                url='/test/image.png'
-            )
-        )
-
-        set_enterprise_branding_filter_param(request, provider_id=None)
-        with mock.patch('enterprise.utils.get_enterprise_branding_info_by_ec_uuid', return_value=branding_info):
-            logo_url = get_enterprise_customer_logo_url(request)
-            self.assertEqual(logo_url, '/test/image.png')
-
-        set_enterprise_branding_filter_param(request, provider_id)
-        with mock.patch('enterprise.utils.get_enterprise_branding_info_by_provider_id', return_value=branding_info):
-            logo_url = get_enterprise_customer_logo_url(request)
-            self.assertEqual(logo_url, '/test/image.png')
-
-    @override_settings(ENABLE_ENTERPRISE_INTEGRATION=False)
-    def test_get_enterprise_customer_logo_url_return_none(self):
-        """
-        Test get_enterprise_customer_logo_url return 'None' when enterprise application is not installed.
-        """
-        request = mock.MagicMock(session={})
-        branding_info = mock.Mock()
-
-        set_enterprise_branding_filter_param(request, 'test-idp')
-        with mock.patch('enterprise.utils.get_enterprise_branding_info_by_provider_id', return_value=branding_info):
-            logo_url = get_enterprise_customer_logo_url(request)
-            self.assertEqual(logo_url, None)
-
-    @override_settings(ENABLE_ENTERPRISE_INTEGRATION=True)
-    @mock.patch(
-        'openedx.features.enterprise_support.api.get_enterprise_branding_filter_param',
-        mock.Mock(return_value=None)
-    )
-    def test_get_enterprise_customer_logo_url_return_none_when_param_missing(self):
-        """
-        Test get_enterprise_customer_logo_url return 'None' when filter parameters are missing.
-        """
-        request = mock.MagicMock(session={})
-        branding_info = mock.Mock()
-
-        set_enterprise_branding_filter_param(request, provider_id=None)
-        with mock.patch('enterprise.utils.get_enterprise_branding_info_by_provider_id', return_value=branding_info):
-            logo_url = get_enterprise_customer_logo_url(request)
-            self.assertEqual(logo_url, None)
 
     @override_settings(ENABLE_ENTERPRISE_INTEGRATION=True)
     @mock.patch('openedx.features.enterprise_support.api.get_enterprise_customer_for_request')
