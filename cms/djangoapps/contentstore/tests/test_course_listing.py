@@ -366,10 +366,18 @@ class TestCourseListing(ModuleStoreTestCase, XssTestMixin):
             courses_list, __ = _accessible_courses_list_from_groups(self.request)
         self.assertEqual(len(courses_list), USER_COURSES_COUNT)
 
-        # test that the time taken by getting courses through reversing django groups is lower then the time
-        # taken by traversing through all courses (if accessible courses are relatively small)
-        self.assertGreaterEqual(iteration_over_courses_time_1.elapsed, iteration_over_groups_time_1.elapsed)
-        self.assertGreaterEqual(iteration_over_courses_time_2.elapsed, iteration_over_groups_time_2.elapsed)
+        # TODO (cdyer) : iteration over courses was optimized, and is now
+        # sometimes faster than iteration over groups. One of the following
+        # should be done to resolve this:
+        # * Iteration over groups should be sped up.
+        # * Iteration over groups should be removed, as it no longer saves time.
+        # * Or this part of the test should be removed.
+
+        # Test that the time taken by getting courses through reversing django
+        # groups is lower then the time taken by traversing through all courses
+        # (if accessible courses are relatively small).
+        #self.assertGreaterEqual(iteration_over_courses_time_1.elapsed, iteration_over_groups_time_1.elapsed)
+        #self.assertGreaterEqual(iteration_over_courses_time_2.elapsed, iteration_over_groups_time_2.elapsed)
 
         # Now count the db queries
         with check_mongo_calls(courses_list_from_group_calls):
@@ -436,11 +444,17 @@ class TestCourseListing(ModuleStoreTestCase, XssTestMixin):
 
         num_courses_to_create = 3
         courses = [
-            self._create_course_with_access_groups(CourseLocator('Org', 'CreatedCourse' + str(num), 'Run'), self.user)
+            self._create_course_with_access_groups(
+                CourseLocator('Org', 'CreatedCourse' + str(num), 'Run'),
+                self.user,
+            )
             for num in range(num_courses_to_create)
         ]
         courses_in_progress = [
-            self._create_course_with_access_groups(CourseLocator('Org', 'InProgressCourse' + str(num), 'Run'), self.user)
+            self._create_course_with_access_groups(
+                CourseLocator('Org', 'InProgressCourse' + str(num), 'Run'),
+                self.user,
+            )
             for num in range(num_courses_to_create)
         ]
 
