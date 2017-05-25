@@ -11,26 +11,27 @@ import struct
 import sys
 import traceback
 
+from capa.capa_problem import LoncapaProblem, LoncapaSystem
+from capa.inputtypes import Status
+from capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
+from capa.util import convert_files_to_filenames, get_inner_html_from_xpath
 from django.conf import settings
+from openedx.core.djangolib.markup import HTML, Text
+from openedx.core.lib.xblock_fields.fields import Date, Timedelta
+from pytz import utc
+from xblock.fields import Boolean, Dict, Float, Integer, Scope, String, XMLString
+from xblock.scorable import ScorableXBlockMixin, Score
+from xmodule.capa_base_constants import RANDOMIZATION, SHOW_CORRECTNESS, SHOWANSWER
+from xmodule.exceptions import NotFoundError
+
+from .progress import Progress
+
 # We don't want to force a dependency on datadog, so make the import conditional
 try:
     import dogstats_wrapper as dog_stats_api
 except ImportError:
     dog_stats_api = None
-from pytz import utc
 
-from capa.capa_problem import LoncapaProblem, LoncapaSystem
-from capa.inputtypes import Status
-from capa.responsetypes import StudentInputError, ResponseError, LoncapaProblemError
-from capa.util import convert_files_to_filenames, get_inner_html_from_xpath
-from xblock.fields import Boolean, Dict, Float, Integer, Scope, String, XMLString
-from xblock.scorable import ScorableXBlockMixin, Score
-from xmodule.capa_base_constants import RANDOMIZATION, SHOWANSWER, SHOW_CORRECTNESS
-from xmodule.exceptions import NotFoundError
-from .fields import Date, Timedelta
-from .progress import Progress
-
-from openedx.core.djangolib.markup import HTML, Text
 
 log = logging.getLogger("edx.courseware")
 
