@@ -14,16 +14,14 @@ package and is used to wrap the `authored_data` when constructing an
 `LmsFieldData`.  This means overrides will be in effect for all scopes covered
 by `authored_data`, e.g. course content and settings stored in Mongo.
 """
+import threading
 from abc import ABCMeta, abstractmethod
 from contextlib import contextmanager
-import threading
 
 from django.conf import settings
-from xblock.field_data import FieldData
-
-from request_cache.middleware import RequestCache
 from openedx.core.lib.xblock_fields.inherited_fields import InheritanceMixin
-
+from request_cache.middleware import RequestCache
+from xblock.field_data import FieldData
 
 NOTSET = object()
 ENABLED_OVERRIDE_PROVIDERS_KEY = u'courseware.field_overrides.enabled_providers.{course_id}'

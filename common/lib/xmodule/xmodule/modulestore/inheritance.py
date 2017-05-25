@@ -4,10 +4,9 @@ Support for inheritance of fields down an XBlock hierarchy.
 from __future__ import absolute_import
 
 from django.conf import settings
-
+from openedx.core.lib.xblock_fields.inherited_fields import InheritanceMixin
 from xblock.fields import Scope
 from xblock.runtime import KeyValueStore, KvsFieldData
-from openedx.core.lib.xblock_fields.inherited_fields import InheritanceMixin
 
 
 def compute_inherited_metadata(descriptor):

@@ -2,24 +2,22 @@
 Module for running content split tests
 """
 
-import logging
 import json
-from webob import Response
-from uuid import uuid4
+import logging
 from operator import itemgetter
+from uuid import uuid4
+
 from lxml import etree
-
-from xblock.core import XBlock
-from xblock.fields import Scope, Integer, String, ReferenceValueDict
-from xblock.fragment import Fragment
-
 from openedx.core.lib.xblock_fields.inherited_fields import UserPartitionList
+from webob import Response
+from xblock.core import XBlock
+from xblock.fields import Integer, ReferenceValueDict, Scope, String
+from xblock.fragment import Fragment
 from xmodule.progress import Progress
 from xmodule.seq_module import SequenceDescriptor
-from xmodule.studio_editable import StudioEditableModule, StudioEditableDescriptor
+from xmodule.studio_editable import StudioEditableDescriptor, StudioEditableModule
 from xmodule.validation import StudioValidation, StudioValidationMessage
-from xmodule.x_module import XModule, module_attr, STUDENT_VIEW
-
+from xmodule.x_module import STUDENT_VIEW, XModule, module_attr
 
 log = logging.getLogger('edx.' + __name__)
 
