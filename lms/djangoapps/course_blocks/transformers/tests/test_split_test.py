@@ -2,9 +2,8 @@
 Tests for SplitTestTransformer.
 """
 import ddt
-from nose.plugins.attrib import attr
-
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
+from nose.plugins.attrib import attr
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from openedx.core.lib.partitions.partitions import Group, UserPartition
 from student.tests.factories import CourseEnrollmentFactory

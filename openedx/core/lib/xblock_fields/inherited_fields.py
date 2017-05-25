@@ -2,15 +2,15 @@
 Inherited fields for all XBlocks.
 """
 from __future__ import absolute_import
+
 from datetime import datetime
 
 from django.conf import settings
-from pytz import utc
-
-from xblock.fields import Scope, Boolean, String, Float, XBlockMixin, Dict, Integer, List
 from openedx.core.lib.partitions.partitions import UserPartition
-from .fields import Date, Timedelta
+from pytz import utc
+from xblock.fields import Boolean, Dict, Float, Integer, List, Scope, String, XBlockMixin
 
+from .fields import Date, Timedelta
 
 DEFAULT_START_DATE = datetime(2030, 1, 1, tzinfo=utc)
 

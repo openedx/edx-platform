@@ -3,9 +3,9 @@ Provides partition support to the user service.
 """
 import logging
 import random
-import course_tag.api as course_tag_api
 
-from openedx.core.lib.partitions.partitions import UserPartitionError, NoSuchUserPartitionGroupError
+import course_tag.api as course_tag_api
+from openedx.core.lib.partitions.partitions import NoSuchUserPartitionGroupError, UserPartitionError
 
 log = logging.getLogger(__name__)
 
