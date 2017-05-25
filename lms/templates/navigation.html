@@ -14,6 +14,7 @@ from branding import api as branding_api
 # app that handles site status messages
 from status.status import get_site_status_msg
 from openedx.features.enterprise_support.api import get_enterprise_customer_logo_url
+from openedx.core.djangoapps.lang_pref.api import header_language_selector_is_enabled, released_languages
 %>
 
 ## Provide a hook for themes to inject branding on top.
@@ -176,8 +177,8 @@ site_status_msg = get_site_status_msg(course_id)
         </%block>
       </ol>
     % endif
-    % if static.show_language_selector():
-     <% languages = static.get_released_languages() %>
+    % if header_language_selector_is_enabled():
+     <% languages = released_languages() %>
       % if len(languages) > 1:
       <ol class="user">
         <li class="primary">

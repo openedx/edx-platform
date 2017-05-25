@@ -3,6 +3,7 @@
 <%!
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
+from openedx.core.djangoapps.lang_pref.api import footer_language_selector_is_enabled
 %>
 
 <div class="wrapper wrapper-footer">
@@ -43,8 +44,8 @@ from django.utils.translation import ugettext as _
       </ol>
       </nav>
 
-      % if include_language_selector:
-          <%include file='widgets/footer-language-selector.html'/>
+      % if context.get('include_language_selector', footer_language_selector_is_enabled()):
+          <%include file="${static.get_template_path('widgets/footer-language-selector.html')}"/>
       % endif
 
       <div class="wrapper-logo">

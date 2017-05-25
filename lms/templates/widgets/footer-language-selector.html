@@ -15,6 +15,7 @@
   if not settings.LANGUAGE_COOKIE:
       raise ValueError('settings.LANGUAGE_COOKIE is required to use footer-language-selector.')
 %>
+<%namespace name='static' file='../static_content.html'/>
 
 <div class="footer-language-selector">
     <label for="footer-language-select">
@@ -53,8 +54,10 @@
 
         setLanguageCookie: function(value, callback) {
             var cookie = '${settings.LANGUAGE_COOKIE | n, js_escaped_string}=' + value + ';path=/';
-            % if settings.SESSION_COOKIE_DOMAIN:
-                cookie += ';domain=${settings.SESSION_COOKIE_DOMAIN | n, js_escaped_string}';
+
+            <% session_cookie_domain = static.get_value('SESSION_COOKIE_DOMAIN', settings.SESSION_COOKIE_DOMAIN) %>
+            % if session_cookie_domain:
+                cookie += ';domain=${session_cookie_domain | n, js_escaped_string}';
             % endif
             % if COOKIE_DURATION:
                 cookie += ';max-age=${COOKIE_DURATION | n, js_escaped_string}';

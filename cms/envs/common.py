@@ -227,8 +227,8 @@ FEATURES = {
 
     'ORGANIZATIONS_APP': False,
 
-    # Show Language selector
-    'SHOW_LANGUAGE_SELECTOR': False,
+    # Show the language selector in the header
+    'SHOW_HEADER_LANGUAGE_SELECTOR': False,
 
     # Set this to False to facilitate cleaning up invalid xml from your modulestore.
     'ENABLE_XBLOCK_XML_VALIDATION': True,
