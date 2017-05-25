@@ -63,18 +63,6 @@ class CourseCohortSettingsFactory(DjangoModelFactory):
     always_cohort_inline_discussions = False
 
 
-def topic_name_to_id(course, name):
-    """
-    Given a discussion topic name, return an id for that name (includes
-    course and url_name).
-    """
-    return "{course}_{run}_{name}".format(
-        course=course.location.course,
-        run=course.url_name,
-        name=name
-    )
-
-
 def config_course_cohorts_legacy(
         course,
         discussions,
@@ -133,49 +121,6 @@ def config_course_cohorts_legacy(
         modulestore().update_item(course, ModuleStoreEnum.UserID.test)
     except NotImplementedError:
         pass
-
-
-# pylint: disable=dangerous-default-value
-def config_course_discussions(
-        course,
-        discussion_topics={},
-        divided_discussions=[],
-        always_divide_inline_discussions=False
-):
-        """
-        Set discussions and configure divided discussions for a course.
-
-        Arguments:
-            course: CourseDescriptor
-            discussion_topics (Dict): Discussion topic names. Picks ids and
-                sort_keys automatically.
-            divided_discussions: Discussion topics to divide. Converts the
-                list to use the same ids as discussion topic names.
-            always_divide_inline_discussions (bool): Whether inline discussions
-                should be divided by default.
-
-        Returns:
-            Nothing -- modifies course in place.
-        """
-
-        def to_id(name):
-            """Convert name to id."""
-            return topic_name_to_id(course, name)
-
-        set_course_discussion_settings(
-            course.id,
-            divided_discussions=[to_id(name) for name in divided_discussions],
-            always_divide_inline_discussions=always_divide_inline_discussions,
-            division_scheme=CourseDiscussionSettings.COHORT,
-        )
-
-        course.discussion_topics = dict((name, {"sort_key": "A", "id": to_id(name)})
-                                        for name in discussion_topics)
-        try:
-            # Not implemented for XMLModulestore, which is used by test_cohorts.
-            modulestore().update_item(course, ModuleStoreEnum.UserID.test)
-        except NotImplementedError:
-            pass
 
 
 # pylint: disable=dangerous-default-value

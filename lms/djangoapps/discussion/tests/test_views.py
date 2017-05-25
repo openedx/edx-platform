@@ -1,6 +1,7 @@
 import json
 import logging
 
+from datetime import datetime
 import ddt
 from django.core.urlresolvers import reverse
 from django.http import Http404
@@ -12,17 +13,22 @@ from lms.lib.comment_client.utils import CommentClientPaginatedResult
 from django_comment_common.utils import ThreadContext
 from django_comment_common.models import ForumsConfig
 from django_comment_client.permissions import get_team
+from django_comment_client.tests.utils import config_course_discussions
 from django_comment_client.tests.group_id import (
     GroupIdAssertionMixin,
     CohortedTopicGroupIdTestMixin,
     NonCohortedTopicGroupIdTestMixin,
 )
+from django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
 from django_comment_client.tests.unicode import UnicodeTestMixin
-from django_comment_client.tests.utils import CohortedTestCase, ForumsEnableMixin
+from django_comment_client.tests.utils import CohortedTestCase, ForumsEnableMixin, topic_name_to_id
 from django_comment_client.utils import strip_none
 from lms.djangoapps.discussion import views
+from lms.djangoapps.discussion.views import course_discussions_settings_handler
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from util.testing import UrlResetMixin
+from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts
+from openedx.core.djangoapps.course_groups.tests.test_views import CohortViewsTestCase
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from xmodule.modulestore import ModuleStoreEnum
@@ -1626,3 +1632,229 @@ class EnterpriseConsentTestCase(EnterpriseTestConsentRequired, ForumsEnableMixin
                         kwargs=dict(course_id=course_id, discussion_id=self.discussion_id, thread_id=thread_id)),
         ):
             self.verify_consent_required(self.client, url)
+
+
+class DividedDiscussionsTestCase(CohortViewsTestCase):
+
+    def create_divided_discussions(self):
+        """
+        Set up a divided discussion in the system, complete with all the fixings
+        """
+        divided_inline_discussions = ['Topic A']
+        divided_course_wide_discussions = ["Topic B"]
+        divided_discussions = divided_inline_discussions + divided_course_wide_discussions
+
+        # inline discussion
+        ItemFactory.create(
+            parent_location=self.course.location,
+            category="discussion",
+            discussion_id=topic_name_to_id(self.course, "Topic A"),
+            discussion_category="Chapter",
+            discussion_target="Discussion",
+            start=datetime.now()
+        )
+        # course-wide discussion
+        discussion_topics = {
+            "Topic B": {"id": "Topic B"},
+        }
+
+        config_course_cohorts(
+            self.course,
+            is_cohorted=True,
+        )
+
+        config_course_discussions(
+            self.course,
+            discussion_topics=discussion_topics,
+            divided_discussions=divided_discussions
+        )
+        return divided_inline_discussions, divided_course_wide_discussions
+
+
+class CourseDiscussionTopicsTestCase(DividedDiscussionsTestCase):
+    """
+    Tests the `divide_discussion_topics` view.
+    """
+
+    def test_non_staff(self):
+        """
+        Verify that we cannot access divide_discussion_topics if we're a non-staff user.
+        """
+        self._verify_non_staff_cannot_access(views.discussion_topics, "GET", [unicode(self.course.id)])
+
+    def test_get_discussion_topics(self):
+        """
+        Verify that discussion_topics is working for HTTP GET.
+        """
+        # create inline & course-wide discussion to verify the different map.
+        self.create_divided_discussions()
+
+        response = self.get_handler(self.course, handler=views.discussion_topics)
+        start_date = response['inline_discussions']['subcategories']['Chapter']['start_date']
+        expected_response = {
+            "course_wide_discussions": {
+                'children': [['Topic B', TYPE_ENTRY]],
+                'entries': {
+                    'Topic B': {
+                        'sort_key': 'A',
+                        'is_divided': True,
+                        'id': topic_name_to_id(self.course, "Topic B"),
+                        'start_date': response['course_wide_discussions']['entries']['Topic B']['start_date']
+                    }
+                }
+            },
+            "inline_discussions": {
+                'subcategories': {
+                    'Chapter': {
+                        'subcategories': {},
+                        'children': [['Discussion', TYPE_ENTRY]],
+                        'entries': {
+                            'Discussion': {
+                                'sort_key': None,
+                                'is_divided': True,
+                                'id': topic_name_to_id(self.course, "Topic A"),
+                                'start_date': start_date
+                            }
+                        },
+                        'sort_key': 'Chapter',
+                        'start_date': start_date
+                    }
+                },
+                'children': [['Chapter', TYPE_SUBCATEGORY]]
+            }
+        }
+        self.assertEqual(response, expected_response)
+
+
+class CourseDiscussionsHandlerTestCase(DividedDiscussionsTestCase):
+    """
+    Tests the course_discussion_settings_handler
+    """
+    def get_expected_response(self):
+        """
+        Returns the static response dict.
+        """
+        return {
+            u'always_divide_inline_discussions': False,
+            u'divided_inline_discussions': [],
+            u'divided_course_wide_discussions': [],
+            u'id': 1,
+            u'division_scheme': 'cohort'
+        }
+
+    def test_non_staff(self):
+        """
+        Verify that we cannot access course_discussions_settings_handler if we're a non-staff user.
+        """
+        self._verify_non_staff_cannot_access(
+            course_discussions_settings_handler, "GET", [unicode(self.course.id)]
+        )
+        self._verify_non_staff_cannot_access(
+            course_discussions_settings_handler, "PATCH", [unicode(self.course.id)]
+        )
+
+    def test_update_always_divide_inline_discussion_settings(self):
+        """
+        Verify that course_discussions_settings_handler is working for always_divide_inline_discussions via HTTP PATCH.
+        """
+        config_course_cohorts(self.course, is_cohorted=True)
+
+        response = self.get_handler(self.course, handler=course_discussions_settings_handler)
+
+        expected_response = self.get_expected_response()
+
+        self.assertEqual(response, expected_response)
+
+        expected_response['always_divide_inline_discussions'] = True
+        response = self.patch_handler(
+            self.course, data=expected_response, handler=course_discussions_settings_handler
+        )
+
+        self.assertEqual(response, expected_response)
+
+    def test_update_course_wide_discussion_settings(self):
+        """
+        Verify that course_discussions_settings_handler is working for divided_course_wide_discussions via HTTP PATCH.
+        """
+        # course-wide discussion
+        discussion_topics = {
+            "Topic B": {"id": "Topic B"},
+        }
+
+        config_course_cohorts(self.course, is_cohorted=True)
+        config_course_discussions(self.course, discussion_topics=discussion_topics)
+
+        response = self.get_handler(self.course, handler=views.course_discussions_settings_handler)
+
+        expected_response = self.get_expected_response()
+        self.assertEqual(response, expected_response)
+
+        expected_response['divided_course_wide_discussions'] = [topic_name_to_id(self.course, "Topic B")]
+        response = self.patch_handler(
+            self.course, data=expected_response, handler=views.course_discussions_settings_handler
+        )
+
+        self.assertEqual(response, expected_response)
+
+    def test_update_inline_discussion_settings(self):
+        """
+        Verify that course_discussions_settings_handler is working for divided_inline_discussions via HTTP PATCH.
+        """
+        config_course_cohorts(self.course, is_cohorted=True)
+
+        response = self.get_handler(self.course, handler=views.course_discussions_settings_handler)
+
+        expected_response = self.get_expected_response()
+        self.assertEqual(response, expected_response)
+
+        now = datetime.now()
+        # inline discussion
+        ItemFactory.create(
+            parent_location=self.course.location,
+            category="discussion",
+            discussion_id="Topic_A",
+            discussion_category="Chapter",
+            discussion_target="Discussion",
+            start=now
+        )
+
+        expected_response['divided_inline_discussions'] = ["Topic_A"]
+        response = self.patch_handler(
+            self.course, data=expected_response, handler=views.course_discussions_settings_handler
+        )
+
+        self.assertEqual(response, expected_response)
+
+    def test_get_settings(self):
+        """
+        Verify that course_discussions_settings_handler is working for HTTP GET.
+        """
+        divided_inline_discussions, divided_course_wide_discussions = self.create_divided_discussions()
+
+        response = self.get_handler(self.course, handler=views.course_discussions_settings_handler)
+        expected_response = self.get_expected_response()
+
+        expected_response['divided_inline_discussions'] = [topic_name_to_id(self.course, name)
+                                                           for name in divided_inline_discussions]
+        expected_response['divided_course_wide_discussions'] = [topic_name_to_id(self.course, name)
+                                                                for name in divided_course_wide_discussions]
+
+        self.assertEqual(response, expected_response)
+
+    def test_update_settings_with_invalid_field_data_type(self):
+        """
+        Verify that course_discussions_settings_handler return HTTP 400 if field data type is incorrect.
+        """
+        config_course_cohorts(self.course, is_cohorted=True)
+
+        response = self.patch_handler(
+            self.course,
+            data={'always_divide_inline_discussions': ''},
+            expected_response_code=400,
+            handler=views.course_discussions_settings_handler
+        )
+        self.assertEqual(
+            "Incorrect field type for `{}`. Type must be `{}`".format('always_divide_inline_discussions', bool.__name__),
+            response.get("error")
+        )
+
