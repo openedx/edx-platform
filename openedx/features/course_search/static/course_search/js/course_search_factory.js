@@ -8,7 +8,7 @@
         function(_, Backbone, SearchRouter, CourseSearchForm, SearchCollection, CourseSearchResultsView) {
             return function(options) {
                 var courseId = options.courseId;
-                var query = options.query;
+                var requestedQuery = options.query;
                 var router = new SearchRouter();
                 var form = new CourseSearchForm();
                 var collection = new SearchCollection([], {courseId: courseId});
@@ -48,8 +48,8 @@
                 });
 
                 // Perform a search if an initial query has been provided.
-                if (query) {
-                    router.trigger('search', query);
+                if (requestedQuery) {
+                    router.trigger('search', requestedQuery);
                 }
             };
         });
