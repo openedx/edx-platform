@@ -361,6 +361,7 @@ MKTG_URL_LINK_MAP = {
 }
 
 SUPPORT_SITE_LINK = 'https://support.example.com'
+PASSWORD_RESET_SUPPORT_LINK = 'https://support.example.com/password-reset-help.html'
 ACTIVATION_EMAIL_SUPPORT_LINK = 'https://support.example.com/activation-email-help.html'
 
 ############################ STATIC FILES #############################
