@@ -45,7 +45,7 @@ from openedx.features.course_experience import UNIFIED_COURSE_VIEW_FLAG
     % endfor
 % endif
 
-% if include_special_exams:
+% if include_special_exams is not UNDEFINED and include_special_exams:
   % for template_name in ["proctored-exam-status"]:
     <script type="text/template" id="${template_name}-tpl">
         <%static:include path="courseware/${template_name}.underscore" />
