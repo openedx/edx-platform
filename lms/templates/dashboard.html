@@ -8,6 +8,7 @@ from django.utils.translation import ugettext as _
 from django.template import RequestContext
 import third_party_auth
 from third_party_auth import pipeline
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 from openedx.core.djangolib.markup import HTML, Text
 %>
@@ -102,7 +103,12 @@ from openedx.core.djangolib.markup import HTML, Text
 
         % if len(course_enrollments) > 0:
           <ul class="listing-courses">
-          <% share_settings = getattr(settings, 'SOCIAL_SHARING_SETTINGS', {}) %>
+          <%
+              share_settings = configuration_helpers.get_value(
+                  'SOCIAL_SHARING_SETTINGS',
+                  getattr(settings, 'SOCIAL_SHARING_SETTINGS', {})
+              )
+          %>
           % for dashboard_index, enrollment in enumerate(course_enrollments):
             <% show_courseware_link = (enrollment.course_id in show_courseware_links_for) %>
             <% cert_status = cert_statuses.get(enrollment.course_id) %>
