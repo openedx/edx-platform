@@ -67,9 +67,19 @@ def unlink_cohort_partition_group(cohort):
 
 
 # pylint: disable=invalid-name
-def _get_course_cohort_settings_representation(course, is_cohorted, course_discussion_settings):
+def _get_course_cohort_settings_representation(cohort_id, is_cohorted):
     """
     Returns a JSON representation of a course cohort settings.
+    """
+    return {
+        'id': cohort_id,
+        'is_cohorted': is_cohorted,
+    }
+
+
+def _get_course_discussion_settings_representation(course, course_discussion_settings):
+    """
+    Returns a JSON representation of a course discussion settings.
     """
     divided_course_wide_discussions, divided_inline_discussions = get_divided_discussions(
         course, course_discussion_settings
@@ -77,10 +87,9 @@ def _get_course_cohort_settings_representation(course, is_cohorted, course_discu
 
     return {
         'id': course_discussion_settings.id,
-        'is_cohorted': is_cohorted,
-        'cohorted_inline_discussions': divided_inline_discussions,
-        'cohorted_course_wide_discussions': divided_course_wide_discussions,
-        'always_cohort_inline_discussions': course_discussion_settings.always_divide_inline_discussions,
+        'divided_inline_discussions': divided_inline_discussions,
+        'divided_course_wide_discussions': divided_course_wide_discussions,
+        'always_divide_inline_discussions': course_discussion_settings.always_divide_inline_discussions,
     }
 
 
@@ -124,6 +133,61 @@ def get_divided_discussions(course, discussion_settings):
 @ensure_csrf_cookie
 @expect_json
 @login_required
+def course_discussions_settings_handler(request, course_key_string):
+    """
+    The restful handler for divided discussion setting requests. Requires JSON.
+    This will raise 404 if user is not staff.
+    GET
+        Returns the JSON representation of divided discussion settings for the course.
+    PATCH
+        Updates the divided discussion settings for the course. Returns the JSON representation of updated settings.
+    """
+    course_key = CourseKey.from_string(course_key_string)
+    course = get_course_with_access(request.user, 'staff', course_key)
+    discussion_settings = get_course_discussion_settings(course_key)
+
+    if request.method == 'PATCH':
+        divided_course_wide_discussions, divided_inline_discussions = get_divided_discussions(
+            course, discussion_settings
+        )
+
+        settings_to_change = {}
+
+        if 'divided_course_wide_discussions' in request.json or 'divided_inline_discussions' in request.json:
+            divided_course_wide_discussions = request.json.get(
+                'divided_course_wide_discussions', divided_course_wide_discussions
+            )
+            divided_inline_discussions = request.json.get(
+                'divided_inline_discussions', divided_inline_discussions
+            )
+            settings_to_change['divided_discussions'] = divided_course_wide_discussions + divided_inline_discussions
+
+        if 'always_divide_inline_discussions' in request.json:
+            settings_to_change['always_divide_inline_discussions'] = request.json.get(
+                'always_divide_inline_discussions'
+            )
+
+        if not settings_to_change:
+            return JsonResponse({"error": unicode("Bad Request")}, 400)
+
+        try:
+            if settings_to_change:
+                discussion_settings = set_course_discussion_settings(course_key, **settings_to_change)
+
+        except ValueError as err:
+            # Note: error message not translated because it is not exposed to the user (UI prevents this state).
+            return JsonResponse({"error": unicode(err)}, 400)
+
+    return JsonResponse(_get_course_discussion_settings_representation(
+        course,
+        discussion_settings
+    ))
+
+
+@require_http_methods(("GET", "PATCH"))
+@ensure_csrf_cookie
+@expect_json
+@login_required
 def course_cohort_settings_handler(request, course_key_string):
     """
     The restful handler for cohort setting requests. Requires JSON.
@@ -134,51 +198,27 @@ def course_cohort_settings_handler(request, course_key_string):
         Updates the cohort settings for the course. Returns the JSON representation of updated settings.
     """
     course_key = CourseKey.from_string(course_key_string)
+    # Although this course data is not used this method will return 404 is user is not staff
     course = get_course_with_access(request.user, 'staff', course_key)
-    is_cohorted = cohorts.is_course_cohorted(course_key)
-    discussion_settings = get_course_discussion_settings(course_key)
 
     if request.method == 'PATCH':
-        divided_course_wide_discussions, divided_inline_discussions = get_divided_discussions(
-            course, discussion_settings
-        )
-
-        settings_to_change = {}
-
-        if 'is_cohorted' in request.json:
-            settings_to_change['is_cohorted'] = request.json.get('is_cohorted')
-
-        if 'cohorted_course_wide_discussions' in request.json or 'cohorted_inline_discussions' in request.json:
-            divided_course_wide_discussions = request.json.get(
-                'cohorted_course_wide_discussions', divided_course_wide_discussions
-            )
-            divided_inline_discussions = request.json.get(
-                'cohorted_inline_discussions', divided_inline_discussions
-            )
-            settings_to_change['divided_discussions'] = divided_course_wide_discussions + divided_inline_discussions
-
-        if 'always_cohort_inline_discussions' in request.json:
-            settings_to_change['always_divide_inline_discussions'] = request.json.get(
-                'always_cohort_inline_discussions'
-            )
-
-        if not settings_to_change:
+        if 'is_cohorted' not in request.json:
             return JsonResponse({"error": unicode("Bad Request")}, 400)
 
+        is_cohorted = request.json.get('is_cohorted')
         try:
-            if 'is_cohorted' in settings_to_change:
-                is_cohorted = settings_to_change['is_cohorted']
-                cohorts.set_course_cohorted(course_key, is_cohorted)
-                del settings_to_change['is_cohorted']
-                settings_to_change['division_scheme'] = CourseDiscussionSettings.COHORT if is_cohorted \
-                    else CourseDiscussionSettings.NONE
-            if settings_to_change:
-                discussion_settings = set_course_discussion_settings(course_key, **settings_to_change)
+            cohorts.set_course_cohorted(course_key, is_cohorted)
+            scheme = CourseDiscussionSettings.COHORT if is_cohorted else CourseDiscussionSettings.NONE
+            scheme_settings = {'division_scheme': scheme}
+            set_course_discussion_settings(course_key, **scheme_settings)
         except ValueError as err:
             # Note: error message not translated because it is not exposed to the user (UI prevents this state).
             return JsonResponse({"error": unicode(err)}, 400)
 
-    return JsonResponse(_get_course_cohort_settings_representation(course, is_cohorted, discussion_settings))
+    return JsonResponse(_get_course_cohort_settings_representation(
+        cohorts.get_course_cohort_id(course_key),
+        cohorts.is_course_cohorted(course_key)
+    ))
 
 
 @require_http_methods(("GET", "PUT", "POST", "PATCH"))
@@ -431,9 +471,9 @@ def debug_cohort_mgmt(request, course_key_string):
 
 @expect_json
 @login_required
-def cohort_discussion_topics(request, course_key_string):
+def discussion_topics(request, course_key_string):
     """
-    The handler for cohort discussion categories requests.
+    The handler for divided discussion categories requests.
     This will raise 404 if user is not staff.
 
     Returns the JSON representation of discussion topics w.r.t categories for the course.

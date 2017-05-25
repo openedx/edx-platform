@@ -26,7 +26,7 @@ from courseware.tests.factories import InstructorFactory
 from courseware.tabs import get_course_tab_list
 from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
-from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts, topic_name_to_id, CohortFactory
+from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts, config_course_discussions, topic_name_to_id, CohortFactory
 from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentFactory
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
@@ -478,7 +478,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
             }
         )
 
-    def test_inline_with_always_cohort_inline_discussion_flag(self):
+    def test_inline_with_always_divide_inline_discussion_flag(self):
         self.create_discussion("Chapter", "Discussion")
         set_discussion_division_settings(self.course.id, enable_cohorts=True, always_divide_inline_discussions=True)
 
@@ -502,7 +502,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
             }
         )
 
-    def test_inline_without_always_cohort_inline_discussion_flag(self):
+    def test_inline_without_always_divide_inline_discussion_flag(self):
         self.create_discussion("Chapter", "Discussion")
         set_discussion_division_settings(self.course.id, enable_cohorts=True)
 
@@ -1301,15 +1301,16 @@ class IsCommentableDividedTestCase(ModuleStoreTestCase):
         )
 
         # not cohorted
-        config_course_cohorts(course, is_cohorted=False, discussion_topics=["General", "Feedback"])
-
+        config_course_cohorts(course, is_cohorted=False)
+        config_course_discussions(course, discussion_topics=["General", "Feedback"])
         self.assertFalse(
             utils.is_commentable_divided(course.id, to_id("General")),
             "Course isn't cohorted"
         )
 
         # cohorted, but top level topics aren't
-        config_course_cohorts(course, is_cohorted=True, discussion_topics=["General", "Feedback"])
+        config_course_cohorts(course, is_cohorted=True)
+        config_course_discussions(course, discussion_topics=["General", "Feedback"])
 
         self.assertTrue(cohorts.is_course_cohorted(course.id))
         self.assertFalse(
@@ -1320,10 +1321,9 @@ class IsCommentableDividedTestCase(ModuleStoreTestCase):
         # cohorted, including "Feedback" top-level topics aren't
         config_course_cohorts(
             course,
-            is_cohorted=True,
-            discussion_topics=["General", "Feedback"],
-            divided_discussions=["Feedback"]
+            is_cohorted=True
         )
+        config_course_discussions(course, discussion_topics=["General", "Feedback"], divided_discussions=["Feedback"])
 
         self.assertTrue(cohorts.is_course_cohorted(course.id))
         self.assertFalse(
@@ -1345,42 +1345,52 @@ class IsCommentableDividedTestCase(ModuleStoreTestCase):
         config_course_cohorts(
             course,
             is_cohorted=True,
+        )
+        config_course_discussions(
+            course,
             discussion_topics=["General", "Feedback"],
             divided_discussions=["Feedback", "random_inline"]
         )
+
         self.assertFalse(
             utils.is_commentable_divided(course.id, to_id("random")),
             "By default, Non-top-level discussions are not cohorted in a cohorted courses."
         )
 
-        # if always_cohort_inline_discussions is set to False, non-top-level discussion are always
-        # non cohorted unless they are explicitly set in cohorted_discussions
+        # if always_divide_inline_discussions is set to False, non-top-level discussion are always
+        # not divided unless they are explicitly set in divided_discussions
         config_course_cohorts(
             course,
             is_cohorted=True,
+        )
+        config_course_discussions(
+            course,
             discussion_topics=["General", "Feedback"],
             divided_discussions=["Feedback", "random_inline"],
             always_divide_inline_discussions=False
         )
+
         self.assertFalse(
             utils.is_commentable_divided(course.id, to_id("random")),
-            "Non-top-level discussion is not cohorted if always_cohort_inline_discussions is False."
+            "Non-top-level discussion is not cohorted if always_divide_inline_discussions is False."
         )
         self.assertTrue(
             utils.is_commentable_divided(course.id, to_id("random_inline")),
-            "If always_cohort_inline_discussions set to False, Non-top-level discussion is "
+            "If always_divide_inline_discussions set to False, Non-top-level discussion is "
             "cohorted if explicitly set in cohorted_discussions."
         )
         self.assertTrue(
             utils.is_commentable_divided(course.id, to_id("Feedback")),
-            "If always_cohort_inline_discussions set to False, top-level discussion are not affected."
+            "If always_divide_inline_discussions set to False, top-level discussion are not affected."
         )
 
     def test_is_commentable_divided_team(self):
         course = modulestore().get_course(self.toy_course_key)
         self.assertFalse(cohorts.is_course_cohorted(course.id))
 
-        config_course_cohorts(course, is_cohorted=True, always_divide_inline_discussions=True)
+        config_course_cohorts(course, is_cohorted=True)
+        config_course_discussions(course, always_divide_inline_discussions=True)
+
         team = CourseTeamFactory(course_id=course.id)
 
         # Verify that team discussions are not cohorted, but other discussions are
