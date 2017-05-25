@@ -15,6 +15,7 @@ from django.utils.translation import ugettext as _
 from edxmako.shortcuts import render_to_string
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from opaque_keys.edx.keys import UsageKey
+from openedx.core.lib.license import wrap_with_license
 from openedx.core.lib.partitions.partitions_service import PartitionService
 from openedx.core.lib.xblock_utils import (
     replace_static_urls,
@@ -34,7 +35,6 @@ from xblock_django.user_service import DjangoXBlockUserService
 from xmodule.contentstore.django import contentstore
 from xmodule.error_module import ErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
-from xmodule.mixin import wrap_with_license
 from xmodule.modulestore.django import ModuleI18nService, modulestore
 from xmodule.services import SettingsService
 from xmodule.studio_editable import has_author_view

@@ -1,5 +1,5 @@
 """
-Reusable mixins for XBlocks and/or XModules
+License mixin for XBlocks and XModules
 """
 from xblock.fields import Scope, String, XBlockMixin
 
@@ -51,14 +51,3 @@ class LicenseMixin(XBlockMixin):
         """
         if getattr(self, "license", default):
             node.set('license', self.license)
-
-
-def wrap_with_license(block, view, frag, context):  # pylint: disable=unused-argument
-    """
-    In the LMS, display the custom license underneath the XBlock.
-    """
-    license = getattr(block, "license", None)  # pylint: disable=redefined-builtin
-    if license:
-        context = {"license": license}
-        frag.content += block.runtime.render_template('license_wrapper.html', context)
-    return frag
