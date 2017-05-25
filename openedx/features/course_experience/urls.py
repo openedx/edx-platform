@@ -4,7 +4,7 @@ Defines URLs for the course experience.
 
 from django.conf.urls import url
 
-from views.course_home import CourseHomeView, CourseHomeFragmentView
+from views.course_home import CourseHomeFragmentView, CourseHomeView
 from views.course_outline import CourseOutlineFragmentView
 from views.course_updates import CourseUpdatesFragmentView, CourseUpdatesView
 from views.welcome_message import WelcomeMessageFragmentView

@@ -4,11 +4,11 @@ Views to show a course outline.
 
 from django.core.context_processors import csrf
 from django.template.loader import render_to_string
+from opaque_keys.edx.keys import CourseKey
+from web_fragments.fragment import Fragment
 
 from courseware.courses import get_course_overview_with_access
-from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
-from web_fragments.fragment import Fragment
 
 from ..utils import get_course_outline_block_tree
 
