@@ -8,18 +8,18 @@ from django.template.loader import render_to_string
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
+from opaque_keys.edx.keys import CourseKey
+from web_fragments.fragment import Fragment
 
 from courseware.courses import get_course_info_section, get_course_with_access
 from lms.djangoapps.courseware.views.views import CourseTabView
-from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from util.views import ensure_valid_course_key
-from web_fragments.fragment import Fragment
 
-from .course_outline import CourseOutlineFragmentView
-from .course_dates import CourseDatesFragmentView
-from .welcome_message import WelcomeMessageFragmentView
 from ..utils import get_course_outline_block_tree
+from .course_dates import CourseDatesFragmentView
+from .course_outline import CourseOutlineFragmentView
+from .welcome_message import WelcomeMessageFragmentView
 
 
 class CourseHomeView(CourseTabView):

@@ -4,8 +4,9 @@ Fragment for rendering the course dates sidebar.
 from django.template.loader import render_to_string
 from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
+
+from courseware.courses import get_course_date_blocks, get_course_with_access
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
-from courseware.courses import get_course_with_access, get_course_date_blocks
 
 
 class CourseDatesFragmentView(EdxFragmentView):

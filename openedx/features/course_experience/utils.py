@@ -1,9 +1,10 @@
 """
 Common utilities for the course experience, including course outline.
 """
+from opaque_keys.edx.keys import CourseKey
+
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.course_blocks.utils import get_student_module_as_dict
-from opaque_keys.edx.keys import CourseKey
 from openedx.core.lib.cache_utils import memoized
 from xmodule.modulestore.django import modulestore
 
