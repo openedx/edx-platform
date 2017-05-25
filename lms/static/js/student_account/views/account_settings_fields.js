@@ -189,10 +189,14 @@
                 successMessage: function() {
                     return HtmlUtils.joinHtml(
                         this.indicators.success,
-                        StringUtils.interpolate(
-                            gettext('We\'ve sent a message to {email_address}. Click the link in the message to reset your password.'),  // eslint-disable-line max-len
-                            {'email_address': this.model.get(this.options.emailAttribute)}
-                        )
+                        HtmlUtils.interpolateHtml(
+                            gettext('We\'ve sent a message to {email}. Click the link in the message to reset your password. Didn\'t receive the message? See {anchor_start}support{anchor_end}.'),  // eslint-disable-line max-len
+                            {
+                                email: this.model.get(this.options.emailAttribute),
+                                anchor_start: HtmlUtils.HTML('<a href="' + this.passwordResetSupportURL + '">'),
+                                anchor_end: HtmlUtils.HTML('</a>')
+                            }
+                        ),
                     );
                 }
             }),

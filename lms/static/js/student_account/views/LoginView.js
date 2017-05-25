@@ -126,7 +126,7 @@
                                 paragraphEnd: HtmlUtils.HTML('</p>'),
                                 email: email,
                                 platform_name: this.platformName,
-                                anchorStart: HtmlUtils.HTML('<a href="' + this.supportURL + '">'),
+                                anchorStart: HtmlUtils.HTML('<a href="' + this.passwordResetSupportURL + '">'),
                                 anchorEnd: HtmlUtils.HTML('</a>')
                             }
                         );
