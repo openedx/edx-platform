@@ -94,6 +94,7 @@ from lms.envs.common import (
     HELP_TOKENS_BOOKS,
 
     SUPPORT_SITE_LINK,
+    ACTIVATION_EMAIL_SUPPORT_LINK,
 
     CONTACT_EMAIL,
 
