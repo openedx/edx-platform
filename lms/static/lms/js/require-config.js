@@ -1,5 +1,5 @@
 /* globals _, requirejs */
-/* eslint-disable quote-props */
+/* eslint-disable quote-props, no-console, no-plusplus */
 
 (function(require, define) {
     'use strict';

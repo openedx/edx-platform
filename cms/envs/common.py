@@ -600,7 +600,13 @@ STATICFILES_FINDERS = [
 
 # Don't use compression by default
 PIPELINE_CSS_COMPRESSOR = None
-PIPELINE_JS_COMPRESSOR = None
+PIPELINE_JS_COMPRESSOR = 'pipeline.compressors.uglifyjs.UglifyJSCompressor'
+
+# Don't wrap JavaScript as there is code that depends upon updating the global namespace
+PIPELINE_DISABLE_WRAPPER = True
+
+# Specify the UglifyJS binary to use
+PIPELINE_UGLIFYJS_BINARY = 'node_modules/.bin/uglifyjs'
 
 from openedx.core.lib.rooted_paths import rooted_glob
 
@@ -675,9 +681,34 @@ PIPELINE_CSS = {
     },
 }
 
+base_vendor_js = [
+    'js/src/utility.js',
+    'js/src/logger.js',
+    'common/js/vendor/jquery.js',
+    'common/js/vendor/jquery-migrate.js',
+    'js/vendor/jquery.cookie.js',
+    'js/vendor/url.min.js',
+    'common/js/vendor/underscore.js',
+    'common/js/vendor/underscore.string.js',
+    'common/js/vendor/backbone.js',
+    'js/vendor/URI.min.js',
+
+    # Make some edX UI Toolkit utilities available in the global "edx" namespace
+    'edx-ui-toolkit/js/utils/global-loader.js',
+    'edx-ui-toolkit/js/utils/string-utils.js',
+    'edx-ui-toolkit/js/utils/html-utils.js',
+
+    # Finally load RequireJS
+    'common/js/vendor/require.js'
+]
+
 # test_order: Determines the position of this chunk of javascript on
 # the jasmine test page
 PIPELINE_JS = {
+    'base_vendor': {
+        'source_filenames': base_vendor_js,
+        'output_filename': 'js/cms-base-vendor.js',
+    },
     'module-js': {
         'source_filenames': (
             rooted_glob(COMMON_ROOT / 'static/', 'xmodule/descriptors/js/*.js') +
@@ -738,22 +769,8 @@ REQUIRE_BUILD_PROFILE = "cms/js/build.js"
 # The name of the require.js script used by your project, relative to REQUIRE_BASE_URL.
 REQUIRE_JS = "js/vendor/requiresjs/require.js"
 
-# A dictionary of standalone modules to build with almond.js.
-REQUIRE_STANDALONE_MODULES = {}
-
 # Whether to run django-require in debug mode.
 REQUIRE_DEBUG = False
-
-# A tuple of files to exclude from the compilation result of r.js.
-REQUIRE_EXCLUDE = ("build.txt",)
-
-# The execution environment in which to run r.js: auto, node or rhino.
-# auto will autodetect the environment and make use of node if available and
-# rhino if not.
-# It can also be a path to a custom class that subclasses
-# require.environments.Environment and defines some "args" function that
-# returns a list with the command arguments to execute.
-REQUIRE_ENVIRONMENT = "node"
 
 ########################## DJANGO WEBPACK LOADER ##############################
 
