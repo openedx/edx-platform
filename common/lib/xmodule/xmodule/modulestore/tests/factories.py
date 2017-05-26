@@ -4,28 +4,27 @@ Factories for use in tests of XBlocks.
 
 import datetime
 import functools
-import pymongo.message
-import pytz
 import threading
 import traceback
 from collections import defaultdict
 from contextlib import contextmanager
 from uuid import uuid4
 
-from factory import Factory, Sequence, lazy_attribute_sequence, lazy_attribute
+import dogstats_wrapper as dog_stats_api
+import pymongo.message
+import pytz
+from factory import Factory, Sequence, lazy_attribute, lazy_attribute_sequence
 from factory.errors import CyclicDefinitionError
 from mock import patch
-from nose.tools import assert_less_equal, assert_greater_equal
-import dogstats_wrapper as dog_stats_api
-
-from opaque_keys.edx.locations import Location
+from nose.tools import assert_greater_equal, assert_less_equal
 from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.locations import Location
+from openedx.core.lib.course_tabs import CourseTab
 from xblock.core import XBlock
-from xmodule.modulestore import prefer_xmodules, ModuleStoreEnum
-from xmodule.modulestore.tests.sample_courses import default_block_info_tree, TOY_BLOCK_INFO_TREE
-from xmodule.tabs import CourseTab
-from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT
 from xmodule.course_module import Textbook
+from xmodule.modulestore import ModuleStoreEnum, prefer_xmodules
+from xmodule.modulestore.tests.sample_courses import TOY_BLOCK_INFO_TREE, default_block_info_tree
+from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT
 
 
 class Dummy(object):

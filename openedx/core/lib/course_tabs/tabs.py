@@ -1,13 +1,15 @@
 """
 Implement CourseTab
 """
-from abc import ABCMeta
 import logging
-
-from xblock.fields import List
-from openedx.core.lib.api.plugins import PluginError
+from abc import ABCMeta
 
 from django.core.files.storage import get_storage_class
+from openedx.core.lib.api.plugins import PluginError
+from xblock.fields import List
+
+from .course_tabs import CourseTabPluginManager
+
 
 log = logging.getLogger("edx.courseware")
 
@@ -221,8 +223,6 @@ class CourseTab(object):
         Raises:
             InvalidTabsException if the given tab doesn't have the right keys.
         """
-        # TODO: don't import openedx capabilities from common
-        from openedx.core.lib.course_tabs import CourseTabPluginManager
         tab_type_name = tab_dict.get('type')
         if tab_type_name is None:
             log.error('No type included in tab_dict: %r', tab_dict)
@@ -495,8 +495,6 @@ class CourseTabList(List):
                 "Expected second tab to have type 'courseware'.  tabs: '{0}'".format(tabs))
 
         # the following tabs should appear only once
-        # TODO: don't import openedx capabilities from common
-        from openedx.core.lib.course_tabs import CourseTabPluginManager
         for tab_type in CourseTabPluginManager.get_tab_types():
             if not tab_type.allow_multiple:
                 cls._validate_num_tabs_of_type(tabs, tab_type.type, 1)

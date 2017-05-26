@@ -133,7 +133,7 @@ class TestMongoModuleStoreBase(unittest.TestCase):
 
         )
 
-        with patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json):
+        with patch('openedx.core.lib.course_tabs.CourseTab.from_json', side_effect=mock_tab_from_json):
             import_course_from_xml(
                 draft_store,
                 999,
@@ -208,7 +208,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         )
         assert_equals(store.get_modulestore_type(''), ModuleStoreEnum.Type.mongo)
 
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    @patch('openedx.core.lib.course_tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
     def test_get_courses(self, _from_json):
         '''Make sure the course objects loaded properly'''
         courses = self.draft_store.get_courses()
@@ -238,7 +238,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
             assert_false(self.draft_store.has_course(mix_cased))
             assert_true(self.draft_store.has_course(mix_cased, ignore_case=True))
 
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    @patch('openedx.core.lib.course_tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
     def test_get_org_courses(self, _from_json):
         """
         Make sure that we can query for a filtered list of courses for a given ORG
@@ -443,7 +443,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
             {'displayname': 'hello'}
         )
 
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    @patch('openedx.core.lib.course_tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
     def test_get_courses_for_wiki(self, _from_json):
         """
         Test the get_courses_for_wiki method
@@ -559,7 +559,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         check_xblock_fields()
         check_mongo_fields()
 
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    @patch('openedx.core.lib.course_tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
     def test_export_course_image(self, _from_json):
         """
         Test to make sure that we have a course image in the contentstore,
@@ -577,7 +577,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         self.assertTrue(path(root_dir / 'test_export/static/images/course_image.jpg').isfile())
         self.assertTrue(path(root_dir / 'test_export/static/images_course_image.jpg').isfile())
 
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    @patch('openedx.core.lib.course_tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
     def test_export_course_image_nondefault(self, _from_json):
         """
         Make sure that if a non-default image path is specified that we

@@ -9,7 +9,7 @@ from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 from openedx.core.djangolib.js_utils import js_escaped_string
 from openedx.core.djangolib.markup import HTML, Text
-from xmodule.tabs import CourseTabList
+from openedx.core.lib.course_tabs import CourseTabList
 %>
 
 % if settings.FEATURES.get('ENABLE_FEEDBACK_SUBMISSION', False):

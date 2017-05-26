@@ -1,20 +1,18 @@
 """
 Views related to course tabs
 """
-from student.auth import has_course_author_access
-from util.json_request import expect_json, JsonResponse
-
-from django.http import HttpResponseNotFound
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.http import HttpResponseNotFound
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
-
 from edxmako.shortcuts import render_to_response
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.tabs import CourseTabList, CourseTab, InvalidTabsException, StaticTab
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from openedx.core.lib.course_tabs import CourseTab, CourseTabList, InvalidTabsException, StaticTab
+from student.auth import has_course_author_access
+from util.json_request import JsonResponse, expect_json
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
 
 from ..utils import get_lms_link_for_item
 

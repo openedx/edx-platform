@@ -2601,7 +2601,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
                 self.store.clone_course(course_key, dest_course_id, self.user_id)
                 signal_handler.send.assert_called_with('course_published', course_key=dest_course_id)
 
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    @patch('openedx.core.lib.course_tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_course_publish_signal_import_firing(self, default, _from_json):
         with MongoContentstoreBuilder().build() as contentstore:

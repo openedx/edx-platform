@@ -2,12 +2,11 @@
 Views handling read (GET) requests for the Discussion tab and inline discussions.
 """
 
+import django_comment_client.utils as utils
+from courseware.tabs import EnrolledTab
 from django.conf import settings
 from django.utils.translation import ugettext_noop
-
-from courseware.tabs import EnrolledTab
-import django_comment_client.utils as utils
-from xmodule.tabs import TabFragmentViewMixin
+from openedx.core.lib.course_tabs import TabFragmentViewMixin
 
 
 class DiscussionTab(TabFragmentViewMixin, EnrolledTab):

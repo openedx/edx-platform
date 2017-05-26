@@ -1,11 +1,10 @@
 """ Tests of specific tabs. """
 
-from mock import patch, Mock
-from nose.plugins.attrib import attr
 from unittest import TestCase
 
-import xmodule.tabs as xmodule_tabs
-
+import openedx.core.lib.course_tabs as xmodule_tabs
+from mock import Mock, patch
+from nose.plugins.attrib import attr
 from openedx.core.lib.course_tabs import CourseTabPluginManager
 
 

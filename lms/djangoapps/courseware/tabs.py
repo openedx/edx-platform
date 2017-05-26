@@ -3,17 +3,21 @@ This module is essentially a broker to xmodule/tabs.py -- it was originally intr
 perform some LMS-specific tab display gymnastics for the Entrance Exams feature
 """
 import waffle
-
-from django.conf import settings
-from django.utils.translation import ugettext as _, ugettext_noop
-
 from courseware.access import has_access
 from courseware.entrance_exams import user_can_skip_entrance_exam
-from openedx.core.lib.course_tabs import CourseTabPluginManager
-from openedx.features.course_experience import default_course_url_name, UNIFIED_COURSE_EXPERIENCE_FLAG
+from django.conf import settings
+from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_noop
+from openedx.core.lib.course_tabs import (
+    CourseTab,
+    CourseTabList,
+    CourseTabPluginManager,
+    key_checker,
+    link_reverse_func
+)
+from openedx.features.course_experience import UNIFIED_COURSE_EXPERIENCE_FLAG, default_course_url_name
 from request_cache.middleware import RequestCache
 from student.models import CourseEnrollment
-from xmodule.tabs import CourseTab, CourseTabList, key_checker, link_reverse_func
 
 
 class EnrolledTab(CourseTab):
@@ -303,7 +307,7 @@ class SingleTextbookTab(CourseTab):
 
 def get_course_tab_list(request, course):
     """
-    Retrieves the course tab list from xmodule.tabs and manipulates the set as necessary
+    Retrieves the course tab list from openedx.core.lib.course_tabs and manipulates the set as necessary
     """
     user = request.user
     xmodule_tab_list = CourseTabList.iterate_displayable(course, user=user)
