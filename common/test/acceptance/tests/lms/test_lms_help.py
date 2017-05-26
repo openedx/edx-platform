@@ -4,17 +4,12 @@ Test Help links in LMS
 
 import json
 
-from common.test.acceptance.tests.lms.test_lms_instructor_dashboard import BaseInstructorDashboardTest
-from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage
-from common.test.acceptance.tests.studio.base_studio_test import ContainerBase
 from common.test.acceptance.fixtures import LMS_BASE_URL
 from common.test.acceptance.fixtures.course import CourseFixture
-
-from common.test.acceptance.tests.helpers import (
-    assert_link,
-    assert_opened_help_link_is_correct,
-    url_for_help,
-)
+from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage
+from common.test.acceptance.tests.helpers import assert_opened_help_link_is_correct, url_for_help
+from common.test.acceptance.tests.lms.test_lms_instructor_dashboard import BaseInstructorDashboardTest
+from common.test.acceptance.tests.studio.base_studio_test import ContainerBase
 
 
 class TestCohortHelp(ContainerBase):

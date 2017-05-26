@@ -1,9 +1,10 @@
 """
 Common code shared by course and library fixtures.
 """
-import re
-import requests
 import json
+import re
+
+import requests
 from lazy import lazy
 
 from common.test.acceptance.fixtures import STUDIO_BASE_URL

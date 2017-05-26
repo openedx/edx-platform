@@ -7,6 +7,8 @@ import datetime
 from unittest import skip
 
 import ddt
+from nose.plugins.attrib import attr
+
 from base_studio_test import ContainerBase
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
@@ -18,7 +20,6 @@ from common.test.acceptance.pages.studio.html_component_editor import HtmlCompon
 from common.test.acceptance.pages.studio.move_xblock import MoveModalView
 from common.test.acceptance.pages.studio.utils import add_discussion, drag
 from common.test.acceptance.tests.helpers import create_user_partition_json
-from nose.plugins.attrib import attr
 from openedx.core.lib.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID, MINIMUM_STATIC_PARTITION_ID, Group
 
 

@@ -2,9 +2,10 @@
 Courseware page.
 """
 
+import re
+
 from bok_choy.page_object import PageObject, unguarded
 from bok_choy.promise import EmptyPromise
-import re
 from selenium.webdriver.common.action_chains import ActionChains
 
 from common.test.acceptance.pages.lms.bookmarks import BookmarksPage

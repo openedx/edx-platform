@@ -5,9 +5,11 @@ End-to-end test for cohorted courseware. This uses both Studio and LMS.
 import json
 
 from bok_choy.page_object import XSS_INJECTION
+from nose.plugins.attrib import attr
+
 from common.test.acceptance.fixtures import LMS_BASE_URL
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
-from common.test.acceptance.pages.common.utils import enroll_user_track, add_enrollment_course_modes
+from common.test.acceptance.pages.common.utils import add_enrollment_course_modes, enroll_user_track
 from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage as LmsAutoAuthPage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage
@@ -15,8 +17,6 @@ from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage as Studio
 from common.test.acceptance.pages.studio.component_editor import ComponentVisibilityEditorView
 from common.test.acceptance.pages.studio.settings_group_configurations import GroupConfigurationsPage
 from common.test.acceptance.tests.lms.test_lms_user_preview import verify_expected_problem_visibility
-from nose.plugins.attrib import attr
-
 from studio.base_studio_test import ContainerBase
 
 AUDIT_TRACK = "Audit"

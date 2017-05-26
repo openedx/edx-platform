@@ -11,9 +11,10 @@ The methods in these classes are organized into several conceptual buckets:
 import os
 
 from bok_choy.promise import EmptyPromise
+from selenium.webdriver import ActionChains
+
 from common.test.acceptance.pages.studio.course_page import CoursePage
 from common.test.acceptance.tests.helpers import disable_animations
-from selenium.webdriver import ActionChains
 
 
 class CertificatesPage(CoursePage):

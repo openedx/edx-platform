@@ -3,6 +3,7 @@ Base class for pages in courseware.
 """
 
 from bok_choy.page_object import PageObject
+
 from common.test.acceptance.pages.lms import BASE_URL
 from common.test.acceptance.pages.lms.tab_nav import TabNavPage
 
