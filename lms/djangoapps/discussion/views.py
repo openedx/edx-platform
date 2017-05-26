@@ -44,6 +44,7 @@ from django_comment_common.utils import ThreadContext, get_course_discussion_set
 from django_comment_client.constants import TYPE_ENTRY
 from django_comment_client.permissions import has_permission, get_team
 from django_comment_client.utils import (
+    available_division_schemes,
     merge_dict,
     extract,
     strip_none,
@@ -832,9 +833,9 @@ def course_discussions_settings_handler(request, course_key_string):
         'divided_inline_discussions': divided_inline_discussions,
         'divided_course_wide_discussions': divided_course_wide_discussions,
         'always_divide_inline_discussions': discussion_settings.always_divide_inline_discussions,
-        'division_scheme': discussion_settings.division_scheme
+        'division_scheme': discussion_settings.division_scheme,
+        'available_division_schemes': available_division_schemes(course_key)
     })
-
 
 
 def get_divided_discussions(course, discussion_settings):

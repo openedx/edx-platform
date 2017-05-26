@@ -1490,7 +1490,7 @@ class GroupIdForUserTestCase(ModuleStoreTestCase):
 
 @attr(shard=1)
 class CourseDiscussionDivisionEnabledTestCase(ModuleStoreTestCase):
-    """ Test the course_discussion_division_enabled method. """
+    """ Test the course_discussion_division_enabled and available_division_schemes methods. """
 
     def setUp(self):
         super(CourseDiscussionDivisionEnabledTestCase, self).setUp()
@@ -1505,6 +1505,7 @@ class CourseDiscussionDivisionEnabledTestCase(ModuleStoreTestCase):
     def test_discussion_division_disabled(self):
         course_discussion_settings = get_course_discussion_settings(self.course.id)
         self.assertFalse(utils.course_discussion_division_enabled(course_discussion_settings))
+        self.assertEqual([], utils.available_division_schemes(self.course.id))
 
     def test_discussion_division_by_cohort(self):
         set_discussion_division_settings(
@@ -1512,11 +1513,13 @@ class CourseDiscussionDivisionEnabledTestCase(ModuleStoreTestCase):
         )
         # Because cohorts are disabled, discussion division is not enabled.
         self.assertFalse(utils.course_discussion_division_enabled(get_course_discussion_settings(self.course.id)))
+        self.assertEqual([], utils.available_division_schemes(self.course.id))
         # Now enable cohorts, which will cause discussions to be divided.
         set_discussion_division_settings(
             self.course.id, enable_cohorts=True, division_scheme=CourseDiscussionSettings.COHORT
         )
         self.assertTrue(utils.course_discussion_division_enabled(get_course_discussion_settings(self.course.id)))
+        self.assertEqual([CourseDiscussionSettings.COHORT], utils.available_division_schemes(self.course.id))
 
     def test_discussion_division_by_enrollment_track(self):
         set_discussion_division_settings(
@@ -1524,10 +1527,12 @@ class CourseDiscussionDivisionEnabledTestCase(ModuleStoreTestCase):
         )
         # Only a single enrollment track exists, so discussion division is not enabled.
         self.assertFalse(utils.course_discussion_division_enabled(get_course_discussion_settings(self.course.id)))
+        self.assertEqual([], utils.available_division_schemes(self.course.id))
 
         # Now create a second CourseMode, which will cause discussions to be divided.
         CourseModeFactory.create(course_id=self.course.id, mode_slug=CourseMode.VERIFIED)
         self.assertTrue(utils.course_discussion_division_enabled(get_course_discussion_settings(self.course.id)))
+        self.assertEqual([CourseDiscussionSettings.ENROLLMENT_TRACK], utils.available_division_schemes(self.course.id))
 
 
 @attr(shard=1)

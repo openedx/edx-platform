@@ -4,8 +4,6 @@ Views related to course groups functionality.
 
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
-from django_comment_common.models import CourseDiscussionSettings
-from django_comment_common.utils import set_course_discussion_settings
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator, EmptyPage
 from django.core.urlresolvers import reverse
@@ -108,7 +106,7 @@ def course_cohort_settings_handler(request, course_key_string):
     """
     course_key = CourseKey.from_string(course_key_string)
     # Although this course data is not used this method will return 404 is user is not staff
-    course = get_course_with_access(request.user, 'staff', course_key)
+    get_course_with_access(request.user, 'staff', course_key)
 
     if request.method == 'PATCH':
         if 'is_cohorted' not in request.json:
@@ -117,11 +115,6 @@ def course_cohort_settings_handler(request, course_key_string):
         is_cohorted = request.json.get('is_cohorted')
         try:
             cohorts.set_course_cohorted(course_key, is_cohorted)
-            # TODO: this is the logic that we will want to change (only change division scheme
-            # if cohorts were disabled and current scheme is CourseDiscussionSettings.COHORT)
-            scheme = CourseDiscussionSettings.COHORT if is_cohorted else CourseDiscussionSettings.NONE
-            scheme_settings = {'division_scheme': scheme}
-            set_course_discussion_settings(course_key, **scheme_settings)
         except ValueError as err:
             # Note: error message not translated because it is not exposed to the user (UI prevents this state).
             return JsonResponse({"error": unicode(err)}, 400)

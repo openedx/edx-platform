@@ -10,8 +10,10 @@ from django.test.utils import override_settings
 from django.utils import translation
 from lms.lib.comment_client.utils import CommentClientPaginatedResult
 
+from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
 from django_comment_common.utils import ThreadContext
-from django_comment_common.models import ForumsConfig
+from django_comment_common.models import ForumsConfig, CourseDiscussionSettings
 from django_comment_client.permissions import get_team
 from django_comment_client.tests.utils import config_course_discussions
 from django_comment_client.tests.group_id import (
@@ -1739,7 +1741,8 @@ class CourseDiscussionsHandlerTestCase(DividedDiscussionsTestCase):
             u'divided_inline_discussions': [],
             u'divided_course_wide_discussions': [],
             u'id': 1,
-            u'division_scheme': 'cohort'
+            u'division_scheme': u'cohort',
+            u'available_division_schemes': [u'cohort']
         }
 
     def test_non_staff(self):
@@ -1858,3 +1861,25 @@ class CourseDiscussionsHandlerTestCase(DividedDiscussionsTestCase):
             response.get("error")
         )
 
+    def test_available_schemes(self):
+        # Cohorts disabled, single enrollment mode.
+        config_course_cohorts(self.course, is_cohorted=False)
+        response = self.get_handler(self.course, handler=views.course_discussions_settings_handler)
+        expected_response = self.get_expected_response()
+        expected_response['available_division_schemes'] = []
+        self.assertEqual(response, expected_response)
+
+        # Add 2 enrollment modes
+        CourseModeFactory.create(course_id=self.course.id, mode_slug=CourseMode.AUDIT)
+        CourseModeFactory.create(course_id=self.course.id, mode_slug=CourseMode.VERIFIED)
+        response = self.get_handler(self.course, handler=views.course_discussions_settings_handler)
+        expected_response['available_division_schemes'] = [CourseDiscussionSettings.ENROLLMENT_TRACK]
+        self.assertEqual(response, expected_response)
+
+        # Enable cohorts
+        config_course_cohorts(self.course, is_cohorted=True)
+        response = self.get_handler(self.course, handler=views.course_discussions_settings_handler)
+        expected_response['available_division_schemes'] = [
+            CourseDiscussionSettings.COHORT, CourseDiscussionSettings.ENROLLMENT_TRACK
+        ]
+        self.assertEqual(response, expected_response)

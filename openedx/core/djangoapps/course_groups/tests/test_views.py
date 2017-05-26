@@ -12,6 +12,8 @@ from django.contrib.auth.models import User
 from django.http import Http404
 from django.test.client import RequestFactory
 
+from django_comment_common.models import CourseDiscussionSettings
+from django_comment_common.utils import get_course_discussion_settings
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -184,6 +186,30 @@ class CourseCohortSettingsHandlerTestCase(CohortViewsTestCase):
 
         self.assertEqual(response, expected_response)
 
+    def test_enabling_cohorts_does_not_change_division_scheme(self):
+        """
+        Verify that enabling cohorts on a course does not automatically set the discussion division_scheme
+        to cohort.
+        """
+        config_course_cohorts(self.course, is_cohorted=False, discussion_division_scheme=CourseDiscussionSettings.NONE)
+
+        response = self.get_handler(self.course, handler=course_cohort_settings_handler)
+
+        expected_response = self.get_expected_response()
+        expected_response['is_cohorted'] = False
+        self.assertEqual(response, expected_response)
+        self.assertEqual(
+            CourseDiscussionSettings.NONE, get_course_discussion_settings(self.course.id).division_scheme
+        )
+
+        expected_response['is_cohorted'] = True
+        response = self.patch_handler(self.course, data=expected_response, handler=course_cohort_settings_handler)
+
+        self.assertEqual(response, expected_response)
+        self.assertEqual(
+            CourseDiscussionSettings.NONE, get_course_discussion_settings(self.course.id).division_scheme
+        )
+
     def test_update_settings_with_missing_field(self):
         """
         Verify that course_cohort_settings_handler return HTTP 400 if required data field is missing from post data.
@@ -331,7 +357,7 @@ class CohortHandlerTestCase(CohortViewsTestCase):
 
         # set auto_cohort_groups
         # these cohort config will have not effect on lms side as we are already done with migrations
-        config_course_cohorts_legacy(self.course, [], cohorted=True, auto_cohort_groups=["AutoGroup"])
+        config_course_cohorts_legacy(self.course, cohorted=True, auto_cohort_groups=["AutoGroup"])
 
         # We should expect the DoesNotExist exception because above cohort config have
         # no effect on lms side so as a result there will be no AutoGroup cohort present
