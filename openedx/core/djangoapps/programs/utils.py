@@ -464,18 +464,13 @@ def get_certificates(user, extended_program):
                 # We only want one certificate per course to be returned.
                 break
 
-    # A user can only have earned a program certificate if they've earned certificates
-    # in associated course runs. If they haven't earned any course run certificates,
-    # they can't have earned a program certificate, and we can save a network call
-    # to the credentials service.
-    if certificates:
-        program_credentials = get_credentials(user, program_uuid=extended_program['uuid'])
-        if program_credentials:
-            certificates.append({
-                'type': 'program',
-                'title': extended_program['title'],
-                'url': program_credentials[0]['certificate_url'],
-            })
+    program_credentials = get_credentials(user, program_uuid=extended_program['uuid'])
+    if program_credentials:
+        certificates.append({
+            'type': 'program',
+            'title': extended_program['title'],
+            'url': program_credentials[0]['certificate_url'],
+        })
 
     return certificates
 
