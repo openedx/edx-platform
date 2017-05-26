@@ -2,9 +2,8 @@
 OAuth Dispatch test mixins
 """
 
-from django.conf import settings
-
 import jwt
+from django.conf import settings
 from jwt.exceptions import ExpiredSignatureError
 
 from student.models import UserProfile, anonymous_id_for_user

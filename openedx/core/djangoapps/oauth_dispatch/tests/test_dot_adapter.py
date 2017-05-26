@@ -2,6 +2,7 @@
 Tests for DOT Adapter
 """
 
+import unittest
 from datetime import timedelta
 
 import ddt
@@ -9,13 +10,12 @@ from django.conf import settings
 from django.test import TestCase
 from django.utils.timezone import now
 from oauth2_provider import models
-import unittest
 
 from student.tests.factories import UserFactory
 
 from ..adapters import DOTAdapter
-from .constants import DUMMY_REDIRECT_URL, DUMMY_REDIRECT_URL2
 from ..models import RestrictedApplication
+from .constants import DUMMY_REDIRECT_URL, DUMMY_REDIRECT_URL2
 
 
 @ddt.ddt

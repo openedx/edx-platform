@@ -7,8 +7,8 @@ from datetime import timedelta
 import ddt
 from django.test import TestCase
 from django.utils.timezone import now
-from provider.oauth2 import models
 from provider import constants
+from provider.oauth2 import models
 
 from student.tests.factories import UserFactory
 

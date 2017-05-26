@@ -3,11 +3,10 @@
 from datetime import datetime, timedelta
 
 import factory
+import pytz
 from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyText
-import pytz
-
-from oauth2_provider.models import Application, AccessToken, RefreshToken
+from oauth2_provider.models import AccessToken, Application, RefreshToken
 
 from student.tests.factories import UserFactory
 
