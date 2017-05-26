@@ -1,0 +1,93 @@
+//
+// Base Styles
+
+body {
+    font-weight: normal;
+    font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.33333333;
+    color: #212121;
+    background-color: #fff;
+    padding-top: $navbar-height;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    @media screen and (min-width: $screen-sm-min) {
+        padding-top: $navbar-height-lg;
+    }
+}
+
+a {
+    outline: none;
+    color: $teal;
+
+    &:hover,
+    &:focus,
+    &:active {
+        outline: none;
+        cursor: pointer;
+    }
+}
+
+// Typography
+h1, h2, h3, h4, h5, h6 {
+    line-height: normal;
+}
+
+h1, h2 {
+    font-family: 'TrioGrotesk-Bold';
+    line-height: 1.4;
+}
+
+h1, .h1 {
+    font-size: 18px;
+    @media screen and (min-width: $screen-xxs) {
+        font-size: 24px;
+    }
+    @media screen and (min-width: $screen-sm-min) {
+        font-size: 36px;
+    }
+}
+
+h2, .h2 {
+    font-size: 16px;
+    @media screen and (min-width: $screen-xxs) {
+        font-size: 22px;
+    }
+    @media screen and (min-width: $screen-sm-min) {
+        font-size: 32px;
+    }
+}
+
+h3, .h3 {
+    font-size: 15px;
+    @media screen and (min-width: $screen-xxs) {
+        font-size: 20px;
+    }
+    @media screen and (min-width: $screen-sm-min) {
+        font-size: 26px;
+    }
+}
+
+h4, .h4 {
+    font-size: 14px;
+    @media screen and (min-width: $screen-xxs) {
+        font-size: 18px;
+    }
+    @media screen and (min-width: $screen-sm-min) {
+        font-size: 22px;
+    }
+}
+
+h5, .h5 {
+    font-size: 13px;
+    @media screen and (min-width: $screen-xxs) {
+        font-size: 16px;
+    }
+    @media screen and (min-width: $screen-sm-min) {
+        font-size: 18px;
+    }
+}
+
+h6, .h6 {
+    font-size: 14px;
+}

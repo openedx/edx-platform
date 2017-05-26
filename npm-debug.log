@@ -1,0 +1,24 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/bin/node',
+1 verbose cli   '/usr/bin/npm',
+1 verbose cli   'config',
+1 verbose cli   'set',
+1 verbose cli   'registry',
+1 verbose cli   'https://registry.npmjs.org/' ]
+2 info using npm@1.4.28
+3 info using node@v0.10.37
+4 verbose node symlink /usr/bin/node
+5 info config set "registry" "https://registry.npmjs.org/"
+6 error Error: EPERM, chown '/edx/app/edxapp/.npmrc'
+6 error  { [Error: EPERM, chown '/edx/app/edxapp/.npmrc'] errno: 50, code: 'EPERM', path: '/edx/app/edxapp/.npmrc' }
+7 error Please try running this command again as root/Administrator.
+8 error System Linux 3.2.0-23-generic
+9 error command "/usr/bin/node" "/usr/bin/npm" "config" "set" "registry" "https://registry.npmjs.org/"
+10 error cwd /edx/app/edxapp/edx-platform
+11 error node -v v0.10.37
+12 error npm -v 1.4.28
+13 error path /edx/app/edxapp/.npmrc
+14 error code EPERM
+15 error errno 50
+16 error stack Error: EPERM, chown '/edx/app/edxapp/.npmrc'
+17 verbose exit [ 50, true ]

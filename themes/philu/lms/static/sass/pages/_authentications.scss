@@ -1,0 +1,340 @@
+
+.philanthropy-logo-text {
+    position: relative;
+    color: #fff;
+    text-align: center;
+    margin: 30px auto 10px;
+    @media screen and (min-width: $screen-sm-min) {
+        margin: 50px auto 20px;
+    }
+    @media screen and (min-width: $screen-md-min) {
+        margin: 70px auto 20px;
+    }
+
+    .brand-logo {
+        margin: auto;
+        max-width: 220px;
+        @media screen and (min-width: $screen-sm-min) {
+            max-width: 100%;
+        }
+    }
+
+    h6 {
+        margin-top: 10px;
+    }
+}
+
+.authentications {
+    border-top: 5px solid rgb(0, 175, 170);
+    border-radius: 4px 4px 0 0;
+    max-width: 400px;
+    margin: 0 auto;
+    color: #748499;
+    position: relative;
+    z-index: 1;
+
+    .authentications-header {
+        background: #fff;
+        border-bottom: 1px solid #d4dae1;
+        text-align: center;
+        padding: 10px;
+        margin: 0;
+        @media screen and (min-width: $screen-sm-min) {
+            padding: 15px;
+        }
+        @media screen and (min-width: $screen-md-min) {
+            padding: 20px;
+        }
+
+        .sub-text {
+            text-align: center;
+            font-size: 14px;
+        }
+
+        h3 {
+            font-weight: 300;
+            margin: 3px 0;
+            color: #1d2126;
+            font-size: 20px;
+            @media screen and (min-width: $screen-sm-min) {
+                margin: 4px 0;
+                font-size: 24px;
+            }
+        }
+
+        a {
+            color: #1d2126;
+            float: left;
+            margin-left: 14px;
+            font-size: 26px;
+            @media screen and (min-width: $screen-sm-min) {
+                font-size: 32px;
+            }
+
+            &:hover {
+                text-decoration: none;
+                color: #39B0e5;
+            }
+        }
+    }
+
+    .authentications-body {
+        background-color: #f7f8fa;
+        padding: 15px;
+        @media screen and (min-width: $screen-sm-min) {
+            padding: 30px;
+        }
+        @media screen and (min-width: $screen-md-min) {
+            padding: 40px;
+        }
+
+        .authentications-header-text {
+            text-align: center;
+            margin: 5px auto 10px;
+            font-size: 20px;
+            line-height: 33px;
+            font-weight: 300;
+            @media screen and (min-width: $screen-sm-min) {
+                font-size: 24px;
+            }
+            @media screen and (min-width: $screen-lg-min) {
+                margin: 0 auto 20px;
+            }
+        }
+    }
+
+    .authentications-footer {
+        font-size: 14px;
+        text-align: center;
+        padding: 8px 10px 6px;
+        background-color: #e4e7ec;
+        margin: 0 0 15px;
+        color: #576373;
+        border-bottom-left-radius: 4px;
+        border-bottom-right-radius: 4px;
+        @media screen and (min-width: $screen-sm-min) {
+            padding: 12px 10px 10px;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
+        a {
+            font-size: 26px;
+            margin-left: 10px;
+            vertical-align: sub;
+            @media screen and (min-width: $screen-sm-min) {
+                font-size: 34px;
+            }
+
+            &.icon-facebook {
+                color: #47609b;
+            }
+
+            &.icon-googlePlus {
+                color: #cc4a41;
+            }
+
+            &:hover {
+                text-decoration: none;
+            }
+        }
+    }
+
+    .authentications-switch-link {
+        text-align: center;
+        margin-bottom: 10px;
+
+        a {
+            color: #fff;
+            font-size: 14px;
+
+            &:hover,
+            &:active,
+            &:visited,
+            &:focus {
+                text-decoration: none;
+            }
+        }
+    }
+}
+
+.authentications-form {
+
+    .form-group {
+        position: relative;
+        margin-bottom: 8px;
+        @media screen and (min-width: $screen-sm-min) {
+            margin-bottom: 15px;
+        }
+
+        label {
+            opacity: 0;
+            font-size: 12px;
+            line-height: 17px;
+            font-weight: 300;
+            @include transition(0.3s);
+        }
+
+        .form-control {
+            box-shadow: none;
+            -webkit-appearance: none;
+            border-radius: 0;
+            border-color: #acb5c2;
+            padding: 6px 25px 6px 8px;
+            height: auto;
+            @include transition(0.3s);
+            @media screen and (min-width: $screen-sm-min) {
+                padding: 11px 25px 11px 11px;
+            }
+
+            &:focus {
+                border: 1px solid #39B0e5;
+
+                + .required {
+                    color: #1d2126;
+                }
+            }
+        }
+
+        .required {
+            font-weight: 300;
+            position: absolute;
+            z-index: 1;
+            right: 12px;
+            bottom: 3px;
+            color: #acb5c2;
+            @include transition(0.3s);
+            @media screen and (min-width: $screen-sm-min) {
+                bottom: 8px;
+            }
+        }
+    }
+
+    .btn-submit {
+        border-radius: 4px;
+        font-size: 16px;
+        margin: 15px auto;
+        padding: 5px 10px;
+        font-weight: normal;
+        font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        background-color: #39B0e5;
+        border-color: #39B0e5;
+        @media screen and (min-width: $screen-sm-min) {
+            margin: 30px auto 15px;
+            padding: 7px 12px;
+        }
+
+        &[disabled] {
+            cursor: default;
+            color: #748499;
+            background-color: #e4e7ec;
+            border-color: #e4e7ec;
+
+            &:hover,
+            &:active,
+            &:focus {
+                background-color: #e4e7ec;
+                border-color: #e4e7ec;
+            }
+        }
+
+        &:hover {
+            background-color: #3094BF;
+        }
+    }
+
+    .forgot-password {
+        text-align: center;
+
+        a {
+            color: #39B0e5;
+            font-size: 14px;
+
+            &:hover {
+                text-decoration: none;
+                color: darken(#39B0e5, 5%);
+            }
+        }
+    }
+
+    .text-small {
+        font-size: 12px;
+        margin: 15px 0 0;
+        @media screen and (min-width: $screen-sm-min) {
+            font-size: 14px;
+            margin: 30px 0 0;
+        }
+    }
+
+    .terms-of-service-link {
+        text-align: center;
+        color: #748499;
+        font-size: 12px;
+        @media screen and (min-width: $screen-sm-min) {
+            font-size: 14px;
+        }
+
+        a {
+            color: #39B0e5;
+
+            &:hover {
+                text-decoration: none;
+                color: darken(#39B0e5, 5%);
+            }
+        }
+    }
+}
+
+.validation-popover {
+    position: absolute;
+    z-index: 999;
+    top: calc(100% + 7px);
+    color: #1d2126;
+    text-align: center;
+    background-color: white;
+    border-radius: 6px;
+    box-shadow: 0 5px 7px rgba(29, 33, 38, 0.1);
+    max-width: 250px;
+    border: 1px solid #d6d7da;
+    top: calc(100% + 7px);
+    left: 30px;
+
+    .popover-title {
+        font-size: 14px;
+        background: none;
+        color: #ff2956;
+        border-color: white;
+        padding-bottom: 0;
+    }
+
+    .popover-content {
+        font-size: 14px;
+    }
+
+    &:before,
+    &:after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        margin: auto;
+        width: 0;
+        height: 0;
+    }
+    &:before {
+        z-index: -1;
+        top: -7px;
+        border-left: 7px solid transparent;
+        border-right: 7px solid transparent;
+        border-bottom: 7px solid #d6d7da;
+        //border-bottom-color: rgba(29, 33, 38, 0.1);
+    }
+
+    &:after {
+        z-index: 1;
+        top: -6px;
+        border-left: 6px solid transparent;
+        border-right: 6px solid transparent;
+        border-bottom: 6px solid #fff;
+    }
+}

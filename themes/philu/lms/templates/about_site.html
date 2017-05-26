@@ -1,0 +1,243 @@
+<%doc><nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" aria-expanded="false" data-target="#navbar">
+                MENU
+                    <span class="iconbar-wrap">
+                        <span class="icon-bar top-bar"></span>
+                    <span class="icon-bar middle-bar"></span>
+                    <span class="icon-bar bottom-bar"></span>
+                    </span>
+            </button>
+            <a class="navbar-brand" href="#!">
+                <img class="img-responsive" src="/static/philu/images/logo.png"/>
+            </a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                        About <i class="fa fa-angle-down" aria-hidden="true"></i>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#!">About</a></li>
+                        <li><a href="#!">Supporters</a></li>
+                        <li><a href="#!">Advisory and Curriculum Committees</a></li>
+                        <li><a href="#!">FAQs</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                        Courses <i class="fa fa-angle-down" aria-hidden="true"></i>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#!">Current Courses</a></li>
+                        <li><a href="#!">2017 Calendar</a></li>
+                        <li><a href="#!">Course Certification</a></li>
+                    </ul>
+                </li>
+                <li><a href="#!">Instructors</a></li>
+                <li><a href="#!">Global Change Makers</a></li>
+                <li><a href="#!">Blog</a></li>
+                <li><a href="/register">Register</a></li>
+                <li><a href="/login">Login</a></li>
+            </ul>
+            <ul id="menu-social-media" class="nav navbar-nav">
+                <li>
+                    <a href="#!">
+                        <i class="fa fa-facebook-square" aria-hidden="true"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="#!">
+                        <i class="fa fa-twitter-square" aria-hidden="true"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="#!">
+                        <i class="fa fa-linkedin-square" aria-hidden="true"></i>
+                    </a>
+                </li>
+            </ul>
+            <ul id="menu-search" class="nav navbar-nav">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                        <i class="fa fa-search" aria-hidden="true"></i>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Search for..."/>
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-info" type="button">Go</button>
+                                    </span>
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav></%doc>
+
+<div id="hero-content">
+    <a class="scroll-down-now hidden-xs glyphicon glyphicon-menu-down" href="#!"></a>
+    <div class="v-row">
+        <div class="v-col powered-by">
+            <img class="brand-logo" src="/static/philu/images/logo.png"/>
+            <h1>PHILANTHROPY<br/>UNIVERSITY</h1>
+            <h4>Powered by Berkeley-Haas</h4>
+        </div>
+        <div class="v-col video-link">
+            <div class="v-row background hidden-xs">&nbsp;</div>
+            <div class="v-row">
+                <div class="v-col grow-text">
+                    <h2>
+                        Grow your skills.<br/>
+                        Grow your network.<br/>
+                        Grow your impact.
+                    </h2>
+                </div>
+                <div class="v-col course-of-week">&nbsp;</div>
+            </div>
+        </div>
+    </div>
+    <div class="v-row">
+        <div class="v-col text-overlay">
+            <div class="inner-container">
+                <h3>
+                    Philanthropy University is a <strong>free</strong>, first-of-its kind educational initiative for change makers in the social sector.
+                </h3>
+                    <span>
+                        This nonprofit initiative is sponsored by Philanthropy U, Inc.
+                    </span>
+            </div>
+        </div>
+        <div class="v-col pick-course">
+            <div class="inner-container">
+                <h2>Pick your<br/>first course</h2>
+                <div class="dropdown">
+                    <button class="btn btn-info btn-lg dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                        <i class="fa fa-globe" aria-hidden="true"></i> Dropdown
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                        <li><a href="#">Action</a></li>
+                        <li><a href="#">Another action</a></li>
+                        <li><a href="#">Something else here</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#">Separated link</a></li>
+                    </ul>
+                </div>
+                <a href="#!">Register <span class="glyphicon glyphicon-lock"></span></a>
+                <br/>
+                <span>
+                    Philanthropy University is a non-degree, diploma or credit granting non-profit initiative. By signing up, you agree to our <a href="#!">terms of service.</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="home-section courses-section">
+    <main id="main" aria-label="Content" tabindex="-1">
+        <section class="home">
+                <%include file="${courses_list}" />
+        </section>
+    </main>
+</div>
+
+<div class="home-section our-vision">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-10 col-sm-offset-1">
+                <div class="contenet-outer-wrap">
+                    <div class="contenet-inner-wrap">
+                        <h2>OUR VISION</h2>
+                        <h3>
+                            Our 100X20 vision aims to impact the lives of 100 million people by 2020 by training hundreds of thousands of learners working for social good, elevating their cause and furthering their reach.
+                        </h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="home-section our-instructors">
+    <div class="container">
+        <h2>OUR INSTRUCTORS</h2>
+        <h3>
+            Through engaging lectures and thought provoking discussions, our renowned instructors will teach you how to be stronger and more effective in the work you do to change the world.
+        </h3>
+        <div class="row">
+            <div class="col-sm-6 col-md-3 instructor-block">
+                <div class="instructor-photo">
+                    <img src="/static/philu/images/instructor__0002_Erik-1.png"/>
+                </div>
+                <div class="instructor-name">ERIK SIMANIS</div>
+                <div class="short-text">
+                    Dr. Erik Simanis is a Partner in the innovation consultancy, TIL Ventures, and core faculty of The Intrapreneur Lab.
+                </div>
+            </div>
+            <div class="col-sm-6 col-md-3 instructor-block">
+                <div class="instructor-photo">
+                    <img src="/static/philu/images/instructor__0006_Tom-1.png"/>
+                </div>
+                <div class="instructor-name">THOMAS WOLF</div>
+                <div class="short-text">
+                    Tom Wolf is founder of WolfBrown, a consultancy, and a former lecturer at Harvard University.
+                </div>
+            </div>
+            <div class="col-sm-6 col-md-3 instructor-block">
+                <div class="instructor-photo">
+                    <img src="/static/philu/images/instructor__0005_shashi-sq.png"/>
+                </div>
+                <div class="instructor-name">SHASHI BULUSWAR</div>
+                <div class="short-text">
+                    Shashi Buluswar is co-founder and executive director of the Lawrence Institute for Globally Transformative Technologies.
+                </div>
+            </div>
+            <div class="col-sm-6 col-md-3 instructor-block">
+                <div class="instructor-photo">
+                    <img src="/static/philu/images/instructor__0000_Amr-1.png"/>
+                </div>
+                <div class="instructor-name">AMR AL-DABBAGH</div>
+                <div class="short-text">
+                    Founder of Philanthropy U, Amr Al-Dabbagh is the CEO and Chairman of Al-Dabbagh Group, the Founding Chairman of the Stars Foundation and author of the book Omnipreneurship: An Organized Approach to Living a Life of
+                    Meaning.
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt20">
+            <a class="btn btn-lg btn-info btn-register slide-bg-gray" href="#!">SEE All<br/>INSTRUCTORS</a>
+        </div>
+    </div>
+</div>
+
+<div class="home-section our-mission">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-10 col-sm-offset-1">
+                <div class="contenet-outer-wrap">
+                    <div class="contenet-inner-wrap">
+                        <h2>OUR MISSION</h2>
+                        <h3>
+                            Through our free, dynamic online courses, we provide leaders in the social sector with the tools they need to increase their organization’s impact.
+                        </h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="home-section sponsor-section">
+    <div class="container">
+        <div class="contenet-outer-wrap">
+            <div class="contenet-inner-wrap">
+                <h4>Philanthropy University was created in collaboration with the Haas School of Business at the University of California, Berkeley.</h4>
+            </div>
+        </div>
+    </div>
+</div>

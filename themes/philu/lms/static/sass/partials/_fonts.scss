@@ -1,0 +1,62 @@
+//
+// Fonts
+
+// Source Sans Pro (light)
+@font-face {
+    font-family: 'Source Sans Pro', sans-serif;
+    src: url('../fonts/sourceSansPro/SourceSansPro-Light.eot');
+    src: url('../fonts/sourceSansPro/SourceSansPro-Light.eot?#iefix') format('embedded-opentype'),
+    url('../fonts/sourceSansPro/SourceSansPro-Light.woff') format('woff'),
+    url('../fonts/sourceSansPro/SourceSansPro-Light.ttf') format('truetype'),
+    url('../fonts/sourceSansPro/SourceSansPro-Light.svg#SourceSansPro-Light') format('svg');
+    font-weight: 300;
+    font-style: normal;
+}
+
+// Source Sans Pro (regular)
+@font-face {
+    font-family: 'Source Sans Pro', sans-serif;
+    src: url('../fonts/sourceSansPro/SourceSansPro-Regular.eot');
+    src: url('../fonts/sourceSansPro/SourceSansPro-Regular.eot?#iefix') format('embedded-opentype'),
+    url('../fonts/sourceSansPro/SourceSansPro-Regular.woff') format('woff'),
+    url('../fonts/sourceSansPro/SourceSansPro-Regular.ttf') format('truetype'),
+    url('../fonts/sourceSansPro/SourceSansPro-Regular.svg#SourceSansPro-Regular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+// Source Sans Pro (regular)
+@font-face {
+    font-family: 'Source Sans Pro', sans-serif;
+    src: url('../fonts/sourceSansPro/SourceSansPro-Semibold.eot');
+    src: url('../fonts/sourceSansPro/SourceSansPro-Semibold.eot?#iefix') format('embedded-opentype'),
+    url('../fonts/sourceSansPro/SourceSansPro-Semibold.woff') format('woff'),
+    url('../fonts/sourceSansPro/SourceSansPro-Semibold.ttf') format('truetype'),
+    url('../fonts/sourceSansPro/SourceSansPro-Semibold.svg#SourceSansPro-Semibold') format('svg');
+    font-weight: 600;
+    font-style: normal;
+}
+
+// Source Sans Pro (regular)
+@font-face {
+    font-family: 'Source Sans Pro', sans-serif;
+    src: url('../fonts/sourceSansPro/SourceSansPro-Bold.eot');
+    src: url('../fonts/sourceSansPro/SourceSansPro-Bold.eot?#iefix') format('embedded-opentype'),
+    url('../fonts/sourceSansPro/SourceSansPro-Bold.woff') format('woff'),
+    url('../fonts/sourceSansPro/SourceSansPro-Bold.ttf') format('truetype'),
+    url('../fonts/sourceSansPro/SourceSansPro-Bold.svg#SourceSansPro-Bold') format('svg');
+    font-weight: 700;
+    font-style: normal;
+}
+
+// TrioGrotesk Bold
+@font-face {
+    font-family: 'TrioGrotesk-Bold';
+    src: url('../fonts/trioGrotesk-bold/TrioGrotesk-Bold.eot');
+    src: url('../fonts/trioGrotesk-bold/TrioGrotesk-Bold.eot?#iefix') format('embedded-opentype'),
+    url('../fonts/trioGrotesk-bold/TrioGrotesk-Bold.woff') format('woff'),
+    url('../fonts/trioGrotesk-bold/TrioGrotesk-Bold.ttf') format('truetype'),
+    url('../fonts/trioGrotesk-bold/TrioGrotesk-Bold.svg#TrioGrotesk-Bold') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}

@@ -1,0 +1,25 @@
+/**************************************
+/ All SCSS includes
+/**************************************/
+
+//
+// Venders
+@import 'venders/bootstrap';
+@import 'venders/font-awesome';
+@import 'animate.css';
+
+// Partials / Layouts
+@import 'partials/_custom-variables';
+@import "partials/_custom-mixins.scss";
+@import "partials/loading";
+@import "partials/reset";
+@import "partials/fonts";
+@import "partials/helpers";
+
+@import "layouts/navbar";
+@import "layouts/custom";
+
+// Pages
+@import "pages/authentications";
+@import "pages/course-page";
+
