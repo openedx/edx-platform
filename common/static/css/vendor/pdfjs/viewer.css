@@ -1988,3 +1988,13 @@ html[dir='rtl'] #documentPropertiesOverlay .row > * {
     display: none;
   }
 }
+
+.toolbarButton#openFile,
+.toolbarButton#print,
+.toolbarButton#download,
+.secondaryToolbarButton#secondaryOpenFile,
+.secondaryToolbarButton#secondaryPrint,
+.secondaryToolbarButton#secondaryDownload,
+.horizontalToolbarSeparator.visibleLargeView {
+    display: none;
+}
