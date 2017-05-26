@@ -3,18 +3,19 @@
 End-to-end tests for the courseware unit bookmarks.
 """
 import json
-from nose.plugins.attrib import attr
+
 import requests
-from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage as StudioAutoAuthPage
+from nose.plugins.attrib import attr
+
+from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
+from common.test.acceptance.pages.common import BASE_URL
+from common.test.acceptance.pages.common.logout import LogoutPage
 from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage as LmsAutoAuthPage
 from common.test.acceptance.pages.lms.bookmarks import BookmarksPage
 from common.test.acceptance.pages.lms.course_home import CourseHomePage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage as StudioAutoAuthPage
 from common.test.acceptance.pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
-from common.test.acceptance.pages.common.logout import LogoutPage
-from common.test.acceptance.pages.common import BASE_URL
-
-from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.tests.helpers import EventsTestMixin, UniqueCourseTest, is_404_page
 
 

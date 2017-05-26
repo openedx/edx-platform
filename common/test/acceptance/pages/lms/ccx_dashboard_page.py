@@ -3,6 +3,7 @@
 CCX coach dashboard page
 """
 from bok_choy.promise import EmptyPromise
+
 from common.test.acceptance.pages.lms.course_page import CoursePage
 
 

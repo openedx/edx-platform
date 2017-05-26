@@ -1,10 +1,12 @@
 """
 Base class for pages specific to a course in Studio.
 """
-from abc import abstractmethod
 import os
-from opaque_keys.edx.locator import CourseLocator
+from abc import abstractmethod
+
 from bok_choy.page_object import PageObject
+from opaque_keys.edx.locator import CourseLocator
+
 from common.test.acceptance.pages.studio import BASE_URL
 from common.test.acceptance.pages.studio.utils import HelpMixin
 
