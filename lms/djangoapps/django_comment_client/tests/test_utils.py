@@ -14,6 +14,7 @@ from edxmako import add_lookup
 
 from django_comment_client.tests.factories import RoleFactory
 from django_comment_client.tests.unicode import UnicodeTestMixin
+from django_comment_client.tests.utils import topic_name_to_id, config_course_discussions
 from django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
 import django_comment_client.utils as utils
 from lms.lib.comment_client.utils import perform_request, CommentClientMaintenanceError
@@ -26,7 +27,7 @@ from courseware.tests.factories import InstructorFactory
 from courseware.tabs import get_course_tab_list
 from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
-from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts, config_course_discussions, topic_name_to_id, CohortFactory
+from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts, CohortFactory
 from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentFactory
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
