@@ -266,6 +266,7 @@ class VideoStudentViewHandlers(object):
             else:
                 response = Response(
                     transcript_content,
+                    charset='UTF-8',
                     headerlist=[
                         ('Content-Disposition', 'attachment; filename="{}"'.format(transcript_filename.encode('utf8'))),
                         ('Content-Language', self.transcript_language),
