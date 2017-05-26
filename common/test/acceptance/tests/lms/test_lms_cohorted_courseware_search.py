@@ -5,24 +5,20 @@ Test courseware search
 import json
 import uuid
 
-from common.test.acceptance.tests.helpers import remove_file
-from common.test.acceptance.pages.common.logout import LogoutPage
-from common.test.acceptance.pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
-from common.test.acceptance.pages.lms.courseware_search import CoursewareSearchPage
-from common.test.acceptance.pages.lms.staff_view import StaffCoursewarePage
-from common.test.acceptance.fixtures.course import XBlockFixtureDesc
-
 from nose.plugins.attrib import attr
 
-from common.test.acceptance.tests.studio.base_studio_test import ContainerBase
-
-from common.test.acceptance.pages.studio.settings_group_configurations import GroupConfigurationsPage
-from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage as StudioAutoAuthPage
 from common.test.acceptance.fixtures import LMS_BASE_URL
-from common.test.acceptance.pages.studio.component_editor import ComponentVisibilityEditorView
+from common.test.acceptance.fixtures.course import XBlockFixtureDesc
+from common.test.acceptance.pages.common.logout import LogoutPage
+from common.test.acceptance.pages.lms.courseware_search import CoursewareSearchPage
 from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage
-
-from bok_choy.promise import EmptyPromise
+from common.test.acceptance.pages.lms.staff_view import StaffCoursewarePage
+from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage as StudioAutoAuthPage
+from common.test.acceptance.pages.studio.component_editor import ComponentVisibilityEditorView
+from common.test.acceptance.pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
+from common.test.acceptance.pages.studio.settings_group_configurations import GroupConfigurationsPage
+from common.test.acceptance.tests.helpers import remove_file
+from common.test.acceptance.tests.studio.base_studio_test import ContainerBase
 
 
 @attr(shard=1)

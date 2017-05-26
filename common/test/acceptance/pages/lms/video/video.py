@@ -2,15 +2,16 @@
 Video player in the courseware.
 """
 
-import time
 import json
+import logging
+import time
+
 import requests
-from selenium.webdriver.common.action_chains import ActionChains
+from bok_choy.javascript import js_defined, wait_for_js
 from bok_choy.page_object import PageObject
 from bok_choy.promise import EmptyPromise, Promise
-from bok_choy.javascript import wait_for_js, js_defined
+from selenium.webdriver.common.action_chains import ActionChains
 
-import logging
 log = logging.getLogger('VideoPage')
 
 VIDEO_BUTTONS = {

@@ -2,17 +2,15 @@
 
 import datetime
 import json
-from mock import patch
-from nose.plugins.attrib import attr
-import os
-import ddt
 
+import ddt
+from nose.plugins.attrib import attr
+from opaque_keys.edx.keys import CourseKey, UsageKey
+
+from common.test.acceptance.pages.lms.video.video import _parse_time_str
 from common.test.acceptance.tests.helpers import EventsTestMixin
 from common.test.acceptance.tests.video.test_video_module import VideoBaseTest
-from common.test.acceptance.pages.lms.video.video import _parse_time_str
-
 from openedx.core.lib.tests.assertions.events import assert_event_matches, assert_events_equal
-from opaque_keys.edx.keys import UsageKey, CourseKey
 
 
 class VideoEventsTestMixin(EventsTestMixin, VideoBaseTest):
