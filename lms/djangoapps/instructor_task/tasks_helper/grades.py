@@ -34,6 +34,25 @@ from .utils import upload_csv_to_report_store
 
 TASK_LOG = logging.getLogger('edx.celery.task')
 
+ENROLLED_IN_COURSE = 'enrolled'
+
+NOT_ENROLLED_IN_COURSE = 'unenrolled'
+
+
+def _user_enrollment_status(user, course_id):
+    """
+    Returns the enrollment activation status in the given course
+    for the given user.
+    """
+    enrollment_is_active = CourseEnrollment.enrollment_mode_for_user(user, course_id)[1]
+    if enrollment_is_active:
+        return ENROLLED_IN_COURSE
+    return NOT_ENROLLED_IN_COURSE
+
+
+def _flatten(iterable):
+    return list(chain.from_iterable(iterable))
+
 
 class _CourseGradeReportContext(object):
     """
@@ -209,7 +228,8 @@ class CourseGradeReport(object):
             [u'Experiment Group ({})'.format(partition.name) for partition in context.course_experiments] +
             (['Team Name'] if context.teams_enabled else []) +
             ['Enrollment Track', 'Verification Status'] +
-            ['Certificate Eligible', 'Certificate Delivered', 'Certificate Type']
+            ['Certificate Eligible', 'Certificate Delivered', 'Certificate Type'] +
+            ['Enrollment Status']
         )
 
     def _error_headers(self):
@@ -300,7 +320,7 @@ class CourseGradeReport(object):
                     'percent'
                 )
                 grade_results.append([assignment_average])
-        return [course_grade.percent] + list(chain.from_iterable(grade_results))
+        return [course_grade.percent] + _flatten(grade_results)
 
     def _user_cohort_group_names(self, user, context):
         """
@@ -398,7 +418,8 @@ class CourseGradeReport(object):
                         self._user_experiment_group_names(user, context) +
                         self._user_team_names(user, bulk_context.teams) +
                         self._user_verification_mode(user, context, bulk_context.enrollments) +
-                        self._user_certificate_info(user, context, course_grade, bulk_context.certs)
+                        self._user_certificate_info(user, context, course_grade, bulk_context.certs) +
+                        [_user_enrollment_status(user, context.course_id)]
                     )
             return success_rows, error_rows
 
@@ -424,9 +445,13 @@ class ProblemGradeReport(object):
         graded_scorable_blocks = cls._graded_scorable_blocks_to_header(course_id)
 
         # Just generate the static fields for now.
-        rows = [list(header_row.values()) + ['Grade'] + list(chain.from_iterable(graded_scorable_blocks.values()))]
+        rows = [list(header_row.values()) + ['Enrollment Status', 'Grade'] + _flatten(graded_scorable_blocks.values())]
         error_rows = [list(header_row.values()) + ['error_msg']]
         current_step = {'step': 'Calculating Grades'}
+
+        # Bulk fetch and cache enrollment states so we can efficiently determine
+        # whether each user is currently enrolled in the course.
+        CourseEnrollment.bulk_fetch_enrollment_states(enrolled_students, course_id)
 
         course = get_course_by_id(course_id)
         for student, course_grade, error in CourseGradeFactory().iter(enrolled_students, course):
@@ -442,6 +467,8 @@ class ProblemGradeReport(object):
                 task_progress.failed += 1
                 continue
 
+            enrollment_status = _user_enrollment_status(student, course_id)
+
             earned_possible_values = []
             for block_location in graded_scorable_blocks:
                 try:
@@ -454,7 +481,7 @@ class ProblemGradeReport(object):
                     else:
                         earned_possible_values.append([u'Not Attempted', problem_score.possible])
 
-            rows.append(student_fields + [course_grade.percent] + list(chain.from_iterable(earned_possible_values)))
+            rows.append(student_fields + [enrollment_status, course_grade.percent] + _flatten(earned_possible_values))
 
             task_progress.succeeded += 1
             if task_progress.attempted % status_interval == 0:
