@@ -16,7 +16,8 @@ from openedx.core.djangolib.markup import HTML, Text
           "instructions for activating your account. If "
           "you don't receive this message, check your "
           "spam folder."
-          )).format(email_start=HTML("<strong>"),
+          )).format(
+            email_start=HTML("<strong>"),
             email_end=HTML("</strong>"),
             email=email,
         )}

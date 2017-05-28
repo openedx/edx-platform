@@ -2,13 +2,15 @@
 Page classes to test either the Course Team page or the Library Team page.
 """
 import os
-from opaque_keys.edx.locator import CourseLocator
-from bok_choy.promise import EmptyPromise
+
 from bok_choy.page_object import PageObject
-from common.test.acceptance.tests.helpers import disable_animations
-from common.test.acceptance.pages.studio.course_page import CoursePage
+from bok_choy.promise import EmptyPromise
+from opaque_keys.edx.locator import CourseLocator
+
 from common.test.acceptance.pages.studio import BASE_URL
+from common.test.acceptance.pages.studio.course_page import CoursePage
 from common.test.acceptance.pages.studio.utils import HelpMixin
+from common.test.acceptance.tests.helpers import disable_animations
 
 
 def wait_for_ajax_or_reload(browser):

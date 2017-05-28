@@ -361,6 +361,7 @@ MKTG_URL_LINK_MAP = {
 }
 
 SUPPORT_SITE_LINK = 'https://support.example.com'
+ACTIVATION_EMAIL_SUPPORT_LINK = 'https://support.example.com/activation-email-help.html'
 
 ############################ STATIC FILES #############################
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'

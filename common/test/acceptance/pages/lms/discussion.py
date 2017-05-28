@@ -2,12 +2,11 @@ from contextlib import contextmanager
 
 from bok_choy.javascript import wait_for_js
 from bok_choy.page_object import PageObject
-from bok_choy.promise import EmptyPromise, Promise
+from bok_choy.promise import EmptyPromise
 
-from common.test.acceptance.tests.helpers import is_focused_on_element
 from common.test.acceptance.pages.common.utils import hover
-
 from common.test.acceptance.pages.lms.course_page import CoursePage
+from common.test.acceptance.tests.helpers import is_focused_on_element
 
 
 class DiscussionPageMixin(object):

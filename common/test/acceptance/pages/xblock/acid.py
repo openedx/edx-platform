@@ -3,7 +3,8 @@ PageObjects related to the AcidBlock
 """
 
 from bok_choy.page_object import PageObject
-from bok_choy.promise import EmptyPromise, BrokenPromise
+from bok_choy.promise import BrokenPromise, EmptyPromise
+
 from common.test.acceptance.pages.xblock.utils import wait_for_xblock_initialization
 
 

@@ -4,30 +4,32 @@ End-to-end tests for the LMS Instructor Dashboard.
 """
 
 import ddt
-
-from nose.plugins.attrib import attr
 from bok_choy.promise import EmptyPromise
-from flaky import flaky
+from nose.plugins.attrib import attr
 
-from common.test.acceptance.tests.helpers import UniqueCourseTest, get_modal_alert, EventsTestMixin
-from common.test.acceptance.pages.common.logout import LogoutPage
-from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
-from common.test.acceptance.pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
-from common.test.acceptance.pages.lms.create_mode import ModeCreationPage
-from common.test.acceptance.pages.lms.courseware import CoursewarePage
-from common.test.acceptance.pages.lms.instructor_dashboard import (
-    InstructorDashboardPage,
-    EntranceExamAdmin,
-    StudentSpecificAdmin,
-)
-from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
-from common.test.acceptance.pages.lms.dashboard import DashboardPage
-from common.test.acceptance.pages.lms.problem import ProblemPage
-from common.test.acceptance.pages.lms.pay_and_verify import PaymentAndVerificationFlow
-from common.test.acceptance.pages.lms.login_and_register import CombinedLoginAndRegisterPage
-from common.test.acceptance.pages.common.utils import enroll_user_track
-from common.test.acceptance.tests.helpers import disable_animations, create_multiple_choice_problem
 from common.test.acceptance.fixtures.certificates import CertificateConfigFixture
+from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
+from common.test.acceptance.pages.common.logout import LogoutPage
+from common.test.acceptance.pages.common.utils import enroll_user_track
+from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.pages.lms.create_mode import ModeCreationPage
+from common.test.acceptance.pages.lms.dashboard import DashboardPage
+from common.test.acceptance.pages.lms.instructor_dashboard import (
+    EntranceExamAdmin,
+    InstructorDashboardPage,
+    StudentSpecificAdmin
+)
+from common.test.acceptance.pages.lms.login_and_register import CombinedLoginAndRegisterPage
+from common.test.acceptance.pages.lms.problem import ProblemPage
+from common.test.acceptance.pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
+from common.test.acceptance.tests.helpers import (
+    EventsTestMixin,
+    UniqueCourseTest,
+    create_multiple_choice_problem,
+    disable_animations,
+    get_modal_alert
+)
 
 
 class BaseInstructorDashboardTest(EventsTestMixin, UniqueCourseTest):

@@ -4,7 +4,9 @@ Auto-auth page (used to automatically log in during testing).
 
 import re
 import urllib
-from bok_choy.page_object import PageObject, unguarded, XSS_INJECTION
+
+from bok_choy.page_object import XSS_INJECTION, PageObject, unguarded
+
 from common.test.acceptance.pages.lms import AUTH_BASE_URL
 
 

@@ -2,8 +2,8 @@
 Tools for creating discussion content fixture data.
 """
 
-from datetime import datetime
 import json
+from datetime import datetime
 
 import factory
 import requests

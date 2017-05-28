@@ -657,6 +657,9 @@ def dashboard(request):
         'DISPLAY_COURSE_MODES_ON_DASHBOARD',
         settings.FEATURES.get('DISPLAY_COURSE_MODES_ON_DASHBOARD', True)
     )
+    activation_email_support_link = configuration_helpers.get_value(
+        'ACTIVATION_EMAIL_SUPPORT_LINK', settings.SUPPORT_SITE_LINK
+    )
 
     # Let's filter out any courses in an "org" that has been declared to be
     # in a configuration
@@ -712,12 +715,16 @@ def dashboard(request):
     if display_account_activation_message_on_sidebar and not user.is_active:
         sidebar_account_activation_message = render_to_string(
             'registration/account_activation_sidebar_notice.html',
-            {'email': user.email}
+            {
+                'email': user.email,
+                'platform_name': platform_name,
+                'activation_email_support_link': activation_email_support_link
+            }
         )
     elif not user.is_active:
         banner_account_activation_message = render_to_string(
             'registration/activate_account_notice.html',
-            {'email': user.email, 'platform_name': platform_name}
+            {'email': user.email}
         )
 
     enterprise_message = get_dashboard_consent_notification(request, user, course_enrollments)
@@ -727,11 +734,11 @@ def dashboard(request):
         message for message in messages.get_messages(request) if 'account-activation' in message.tags
     ]
 
-    # Global staff can see what courses errored on their dashboard
+    # Global staff can see what courses encountered an error on their dashboard
     staff_access = False
     errored_courses = {}
     if has_access(user, 'staff', 'global'):
-        # Show any courses that errored on load
+        # Show any courses that encountered an error on load
         staff_access = True
         errored_courses = modulestore().get_errored_courses()
 

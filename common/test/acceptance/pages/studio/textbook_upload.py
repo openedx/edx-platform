@@ -4,6 +4,7 @@ Course Textbooks page.
 
 import requests
 from path import Path as path
+
 from common.test.acceptance.pages.common.utils import click_css
 from common.test.acceptance.pages.studio.course_page import CoursePage
 

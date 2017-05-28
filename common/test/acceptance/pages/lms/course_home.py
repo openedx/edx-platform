@@ -3,6 +3,7 @@ LMS Course Home page object
 """
 
 from collections import OrderedDict
+
 from bok_choy.page_object import PageObject
 
 from .bookmarks import BookmarksPage

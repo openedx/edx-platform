@@ -3,20 +3,18 @@ Course Outline page in Studio.
 """
 import datetime
 
+from bok_choy.javascript import js_defined, wait_for_js
 from bok_choy.page_object import PageObject
 from bok_choy.promise import EmptyPromise
-from bok_choy.javascript import js_defined, wait_for_js
-
 from selenium.webdriver import ActionChains
-from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import Select
 
 from common.test.acceptance.pages.common.utils import click_css, confirm_prompt
-from common.test.acceptance.tests.helpers import disable_animations, enable_animations
-
-from common.test.acceptance.pages.studio.course_page import CoursePage
 from common.test.acceptance.pages.studio.container import ContainerPage
-from common.test.acceptance.pages.studio.utils import set_input_value_and_save, set_input_value
+from common.test.acceptance.pages.studio.course_page import CoursePage
+from common.test.acceptance.pages.studio.utils import set_input_value, set_input_value_and_save
+from common.test.acceptance.tests.helpers import disable_animations, enable_animations
 
 
 @js_defined('jQuery')
