@@ -5,8 +5,11 @@ Acceptance tests for Studio related to the split_test module.
 import math
 from unittest import skip
 
+from bok_choy.promise import Promise
+from nose.plugins.attrib import attr
+from selenium.webdriver.support.ui import Select
+
 from base_studio_test import StudioCourseTest
-from bok_choy.promise import EmptyPromise, Promise
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.studio.component_editor import ComponentEditorView
@@ -16,9 +19,7 @@ from common.test.acceptance.pages.studio.settings_group_configurations import Gr
 from common.test.acceptance.pages.studio.utils import add_advanced_component
 from common.test.acceptance.pages.xblock.utils import wait_for_xblock_initialization
 from common.test.acceptance.tests.helpers import create_user_partition_json
-from nose.plugins.attrib import attr
 from openedx.core.lib.partitions.partitions import Group
-from selenium.webdriver.support.ui import Select
 from test_studio_container import ContainerBase
 
 

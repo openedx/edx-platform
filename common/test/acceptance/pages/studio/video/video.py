@@ -1,17 +1,18 @@
 """
 CMS Video
 """
-import time
 import os
-import requests
-from bok_choy.promise import EmptyPromise, Promise
-from bok_choy.javascript import wait_for_js, js_defined
-from common.test.acceptance.tests.helpers import YouTubeStubConfig
-from common.test.acceptance.pages.lms.video.video import VideoPage
-from common.test.acceptance.pages.common.utils import sync_on_notification
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.action_chains import ActionChains
+import time
 
+import requests
+from bok_choy.javascript import js_defined, wait_for_js
+from bok_choy.promise import EmptyPromise, Promise
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
+
+from common.test.acceptance.pages.common.utils import sync_on_notification
+from common.test.acceptance.pages.lms.video.video import VideoPage
+from common.test.acceptance.tests.helpers import YouTubeStubConfig
 
 CLASS_SELECTORS = {
     'video_container': '.video',

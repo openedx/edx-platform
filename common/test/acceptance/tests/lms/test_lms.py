@@ -2,46 +2,50 @@
 """
 End-to-end tests for the LMS.
 """
+import urllib
 from datetime import datetime, timedelta
-from flaky import flaky
 from textwrap import dedent
 from unittest import skip
-from nose.plugins.attrib import attr
-import pytz
-import urllib
 
+import pytz
 from bok_choy.promise import EmptyPromise
-from common.test.acceptance.tests.helpers import (
-    UniqueCourseTest,
-    EventsTestMixin,
-    load_data_str,
-    generate_course_key,
-    select_option_by_value,
-    element_has_text,
-    select_option_by_text,
-    get_selected_option_text
-)
+from flaky import flaky
+from nose.plugins.attrib import attr
+
+from common.test.acceptance.fixtures.course import CourseFixture, CourseUpdateDesc, XBlockFixtureDesc
 from common.test.acceptance.pages.common.logout import LogoutPage
+from common.test.acceptance.pages.common.utils import enroll_user_track
 from common.test.acceptance.pages.lms import BASE_URL
 from common.test.acceptance.pages.lms.account_settings import AccountSettingsPage
 from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
-from common.test.acceptance.pages.lms.create_mode import ModeCreationPage
 from common.test.acceptance.pages.lms.course_home import CourseHomePage
 from common.test.acceptance.pages.lms.course_info import CourseInfoPage
 from common.test.acceptance.pages.lms.course_wiki import (
-    CourseWikiPage, CourseWikiEditPage, CourseWikiHistoryPage, CourseWikiChildrenPage
+    CourseWikiChildrenPage,
+    CourseWikiEditPage,
+    CourseWikiHistoryPage,
+    CourseWikiPage
 )
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.pages.lms.create_mode import ModeCreationPage
 from common.test.acceptance.pages.lms.dashboard import DashboardPage
 from common.test.acceptance.pages.lms.login_and_register import CombinedLoginAndRegisterPage, ResetPasswordPage
-from common.test.acceptance.pages.lms.pay_and_verify import PaymentAndVerificationFlow, FakePaymentPage
-from common.test.acceptance.pages.lms.progress import ProgressPage
+from common.test.acceptance.pages.lms.pay_and_verify import FakePaymentPage, PaymentAndVerificationFlow
 from common.test.acceptance.pages.lms.problem import ProblemPage
+from common.test.acceptance.pages.lms.progress import ProgressPage
 from common.test.acceptance.pages.lms.tab_nav import TabNavPage
 from common.test.acceptance.pages.lms.video.video import VideoPage
-from common.test.acceptance.pages.common.utils import enroll_user_track
 from common.test.acceptance.pages.studio.settings import SettingsPage
-from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc, CourseUpdateDesc
+from common.test.acceptance.tests.helpers import (
+    EventsTestMixin,
+    UniqueCourseTest,
+    element_has_text,
+    generate_course_key,
+    get_selected_option_text,
+    load_data_str,
+    select_option_by_text,
+    select_option_by_value
+)
 
 
 @attr(shard=8)

@@ -1,16 +1,16 @@
 """
 Acceptance tests for Library Content in LMS
 """
-import ddt
-from nose.plugins.attrib import attr
 import textwrap
 
-from common.test.acceptance.tests.studio.base_studio_test import StudioLibraryTest
-from common.test.acceptance.fixtures.course import CourseFixture
-from common.test.acceptance.tests.helpers import UniqueCourseTest, TestWithSearchIndexMixin
-from common.test.acceptance.pages.studio.library import StudioLibraryContentEditor, StudioLibraryContainerXBlockWrapper
+import ddt
+from nose.plugins.attrib import attr
+
+from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
+from common.test.acceptance.pages.studio.library import StudioLibraryContainerXBlockWrapper, StudioLibraryContentEditor
 from common.test.acceptance.pages.studio.overview import CourseOutlinePage
-from common.test.acceptance.fixtures.course import XBlockFixtureDesc
+from common.test.acceptance.tests.helpers import TestWithSearchIndexMixin, UniqueCourseTest
+from common.test.acceptance.tests.studio.base_studio_test import StudioLibraryTest
 
 SECTION_NAME = 'Test Section'
 SUBSECTION_NAME = 'Test Subsection'

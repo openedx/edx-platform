@@ -2,6 +2,7 @@
 Move XBlock Modal Page Object
 """
 from bok_choy.page_object import PageObject
+
 from common.test.acceptance.pages.common.utils import click_css
 
 
