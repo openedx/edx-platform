@@ -46,7 +46,11 @@ def render(request, template):
     content_type, __ = mimetypes.guess_type(template)
 
     try:
-        return render_to_response('static_templates/' + template, {}, content_type=content_type)
+        context = {}
+        # This is necessary for the dialog presented with the TOS in /register
+        if template == 'honor.html':
+            context['allow_iframing'] = True
+        return render_to_response('static_templates/' + template, context, content_type=content_type)
     except TopLevelLookupException:
         raise Http404
 
