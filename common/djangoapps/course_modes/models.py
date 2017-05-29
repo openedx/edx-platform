@@ -296,6 +296,7 @@ class CourseMode(models.Model):
             list of `Mode` tuples
 
         """
+
         now = datetime.now(pytz.UTC)
 
         found_course_modes = cls.objects.filter(course_id=course_id)
@@ -376,6 +377,7 @@ class CourseMode(models.Model):
             modes = cls.modes_for_course(course_id, include_expired=include_expired)
 
         matched = [m for m in modes if m.slug == mode_slug]
+
         if matched:
             return matched[0]
         else:
