@@ -126,6 +126,7 @@ define([
                 $('li a.upload-button').on('click', _.bind(this.showUploadModal, this));
                 $('.upload-modal .close-button').on('click', _.bind(this.hideModal, this));
                 $('.upload-modal .choose-file-button').on('click', _.bind(this.showFileSelectionMenu, this));
+                this.enableFilterInput();
                 return this;
             },
 
@@ -228,6 +229,34 @@ define([
                     this.largeFileErrorMsg.hide();
                 }
                 $('.file-input').click();
+            },
+
+            enableFilterInput: function() {
+                $('.filter-criteria-clearable').on('keyup focus change', function() {
+                    if ($(this).val().length > 0) {
+                        $(this).addClass('x');
+                    } else {
+                        $(this).removeClass('x');
+                    }
+                })
+                .on('click', function(e) {
+                    if (this.offsetWidth - 18 < e.clientX - this.getBoundingClientRect().left) {
+                        e.preventDefault();
+                        $(this).removeClass('x')
+                            .val('')
+                            .change();
+                        $('.filter-criteria').val('');
+                        $('.filter-criteria-form').submit();
+                    }
+                })
+                .on('mousemove', function(e) {
+                    if (this.offsetWidth - 18 < e.clientX - this.getBoundingClientRect().left) {
+                        $(this).css('cursor', 'pointer');
+                    } else {
+                        $(this).css('cursor', 'text');
+                    }
+                })
+                .change();
             },
 
             startUpload: function(event) {

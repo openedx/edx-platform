@@ -213,6 +213,20 @@ class PaginationTestCase(AssetsTestCase):
         # Verify valid page requests
         self.assert_correct_filter_response(self.url, 'asset_type', 'OTHER')
 
+    def test_filter_by_name_response(self):
+        """
+        Test with name filter string
+        """
+        self.upload_asset("asset-1-text")
+        self.upload_asset("asset-2-text")
+        self.upload_asset("asset-3-image", "image")
+
+        # Verify valid page requests
+        self.assert_correct_asset_response(self.url, 0, 3, 3)
+        self.assert_correct_asset_response(self.url + "?filter_criteria=text", 0, 2, 2)
+        self.assert_correct_asset_response(
+            self.url + "?filter_criteria=text&page_size=1&page=1", 1, 1, 2)
+
     def assert_correct_asset_response(self, url, expected_start, expected_length, expected_total):
         """
         Get from the url and ensure it contains the expected number of responses
