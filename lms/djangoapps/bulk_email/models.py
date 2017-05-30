@@ -339,6 +339,9 @@ class CourseEmailTemplate(models.Model):
     plain_template = models.TextField(null=True, blank=True)
     name = models.CharField(null=True, max_length=255, unique=True, blank=True)
 
+    def __unicode__(self):
+        return self.name if self.name else u"no name provided"
+
     @staticmethod
     def get_template(name=None):
         """
