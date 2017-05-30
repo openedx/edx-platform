@@ -228,7 +228,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         Test analytics dashboard message is shown
         """
         response = self.client.get(self.url)
-        analytics_section = '<li class="nav-item"><button type="button" class="btn-link" data-section="instructor_analytics">Analytics</button></li>'  # pylint: disable=line-too-long
+        analytics_section = '<li class="nav-item"><button type="button" class="btn-link instructor_analytics" data-section="instructor_analytics">Analytics</button></li>'  # pylint: disable=line-too-long
         self.assertIn(analytics_section, response.content)
 
         # link to dashboard shown
@@ -327,7 +327,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         """
         ora_section = (
             '<li class="nav-item">'
-            '<button type="button" class="btn-link" data-section="open_response_assessment">'
+            '<button type="button" class="btn-link open_response_assessment" data-section="open_response_assessment">'
             'Open Responses'
             '</button>'
             '</li>'

@@ -56,6 +56,12 @@ class InstructorDashboardPage(CoursePage):
         discussion_management_section.wait_for_page()
         return discussion_management_section
 
+    def is_discussion_management_visible(self):
+        """
+        Is the Discussion tab visible
+        """
+        return self.q(css='[data-section="discussions_management"').visible
+
     def select_data_download(self):
         """
         Selects the data download tab and returns a DataDownloadPage.

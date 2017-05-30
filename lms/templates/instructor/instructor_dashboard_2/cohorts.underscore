@@ -35,7 +35,7 @@
 
         <!-- Uploading a CSV file of cohort assignments. -->
         <button class="toggle-cohort-management-secondary" data-href="#cohort-management-file-upload"><%- gettext('Assign students to cohorts by uploading a CSV file') %></button>
-        <div class="cohort-management-file-upload csv-upload is-hidden" id="cohort-management-file-upload" tabindex="-1"></div>
+        <div class="cohort-management-file-upload csv-upload hidden" id="cohort-management-file-upload" tabindex="-1"></div>
 
         <div class="cohort-management-supplemental">
             <p class="">
