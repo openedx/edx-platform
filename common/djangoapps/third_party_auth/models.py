@@ -10,6 +10,7 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models.fields import BLANK_CHOICE_DASH
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 import json
@@ -579,6 +580,17 @@ class SAMLProviderData(models.Model):
 
     entity_id = models.CharField(max_length=255, db_index=True)  # This is the key for lookups in this table
     sso_url = models.URLField(verbose_name="SSO URL")
+    slo_url = models.URLField(verbose_name="Single Log-Out URL", null=True, blank=True)
+    slo_binding = models.CharField(
+        max_length=100,
+        choices=BLANK_CHOICE_DASH + [
+            ('urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect', 'HTTP-Redirect'),
+            ('urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST', 'HTTP-POST')
+        ],
+        null=True,
+        blank=True,
+        verbose_name="SLO binding type",
+    )
     public_key = models.TextField()
 
     class Meta(object):

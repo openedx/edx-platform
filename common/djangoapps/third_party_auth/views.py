@@ -1,20 +1,51 @@
 """
 Extra views required for SSO
 """
+import logging
+
 from django.conf import settings
+from django.contrib.auth import logout
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseServerError, Http404, HttpResponseNotAllowed
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import View
+
 import social
 from social.apps.django_app.views import complete
 from social.apps.django_app.utils import load_strategy, load_backend
 from social.utils import setting_name
+
 from student.models import UserProfile
 from student.views import compose_and_send_activation_email
 from .models import SAMLConfiguration
 
 URL_NAMESPACE = getattr(settings, setting_name('URL_NAMESPACE'), None) or 'social'
+log = logging.getLogger(__name__)
+
+
+class SamlSingleLogoutView(View):
+    """
+    View handles requests to log out a user linked to a SAML SSO session.
+    """
+
+    def get(self, request):
+        """
+        Handles requests of the 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect' type
+        """
+        pass
+
+    def post(self, request):
+        """
+        Handles requests of the 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST' type
+        """
+        pass
+
+    def get_thing(self):
+        pass
+
+    def current_user_matches_logout_request(self, request):
+        pass
 
 
 def inactive_user_view(request):
@@ -33,6 +64,42 @@ def inactive_user_view(request):
     profile = UserProfile.objects.get(user=request.user)
     compose_and_send_activation_email(request.user, profile)
     return redirect(request.GET.get('next', 'dashboard'))
+
+def saml_logout_view(request):
+    """
+    Terminate the Open edX learner's session.  This view is mapped to the
+    SAML Single Logout (SLO) URL included in the metadata response payload.
+
+    Note: The current implementation does not take OIDC sessions into account.  For a more
+    robust implementation we should combine the workflow executed here with the LogoutView
+    mechanism found in common/student/views.py ~L2650.
+    """
+
+    # Ensure SAML support is enabled for this Open edX installation
+    if not SAMLConfiguration.is_enabled(request.site):
+        message = "SAML session termination attempted for {0}, but SAML is not enabled.".format(
+            request.site.name
+        )
+        log.error(message)
+
+    # Ensure there is an authenticated user included in the request
+    if not hasattr(request, "user") or not request.user.is_authenticated():
+        message = "SAML session termination attempted for {0}, but no user was provided.".format(
+            request.site.name
+        )
+        log.info(message)
+
+    # If none of the guards were tripped, we are clear to terminate the learner's session
+    if not message:
+
+        # There is a system handler registered to perform logging on successful logouts.
+        request.is_from_logout = True
+
+        # Now perform the actual application session termination
+        logout(request)
+
+    # Instruct the browser to send the user back to the origination point
+    redirect()
 
 
 def saml_metadata_view(request):

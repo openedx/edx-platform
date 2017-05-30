@@ -17,6 +17,10 @@ from third_party_auth.models import SAMLConfiguration, SAMLProviderConfig, SAMLP
 log = logging.getLogger(__name__)
 
 SAML_XML_NS = 'urn:oasis:names:tc:SAML:2.0:metadata'  # The SAML Metadata XML namespace
+VALID_SLO_BINDING_HIERARCHY = [
+    'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
+    'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
+]
 
 
 class MetadataParseError(Exception):
@@ -86,8 +90,8 @@ def fetch_saml_metadata():
 
             for entity_id in entity_ids:
                 log.info(u"Processing IdP with entityID %s", entity_id)
-                public_key, sso_url, expires_at = _parse_metadata_xml(xml, entity_id)
-                changed = _update_data(entity_id, public_key, sso_url, expires_at)
+                public_key, sso_url, slo_binding, slo_url, expires_at = _parse_metadata_xml(xml, entity_id)
+                changed = _update_data(entity_id, public_key, sso_url, slo_binding, slo_url, expires_at)
                 if changed:
                     log.info(u"→ Created new record for SAMLProviderData")
                     num_updated += 1
@@ -168,6 +172,11 @@ def _parse_metadata_xml(xml, entity_id):
     if not public_key:
         raise MetadataParseError("Public Key missing. Expected an <X509Certificate>")
     public_key = public_key.replace(" ", "")
+
+    slo_binding_elements = sso_desc.iterfind("./{}".format(etree.QName(SAML_XML_NS, "SingleLogoutService")))
+    slo_bindings = {element.get('Binding'): element.get('Location') for element in slo_binding_elements}
+    slo_binding, slo_url = _get_best_slo_choice(slo_bindings)
+
     binding_elements = sso_desc.iterfind("./{}".format(etree.QName(SAML_XML_NS, "SingleSignOnService")))
     sso_bindings = {element.get('Binding'): element.get('Location') for element in binding_elements}
     try:
@@ -175,10 +184,10 @@ def _parse_metadata_xml(xml, entity_id):
         sso_url = sso_bindings['urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect']
     except KeyError:
         raise MetadataParseError("Unable to find SSO URL with HTTP-Redirect binding.")
-    return public_key, sso_url, expires_at
+    return public_key, sso_url, slo_binding, slo_url, expires_at
 
 
-def _update_data(entity_id, public_key, sso_url, expires_at):
+def _update_data(entity_id, public_key, sso_url, slo_binding, slo_url, expires_at):
     """
     Update/Create the SAMLProviderData for the given entity ID.
     Return value:
@@ -187,7 +196,13 @@ def _update_data(entity_id, public_key, sso_url, expires_at):
     """
     data_obj = SAMLProviderData.current(entity_id)
     fetched_at = datetime.datetime.now()
-    if data_obj and (data_obj.public_key == public_key and data_obj.sso_url == sso_url):
+    attrs_to_match = (
+        ('public_key', public_key),
+        ('sso_url', sso_url),
+        ('slo_binding', slo_binding),
+        ('slo_url', slo_url)
+    )
+    if data_obj and all(getattr(data_obj, attr) == value for attr, value in attrs_to_match):
         data_obj.expires_at = expires_at
         data_obj.fetched_at = fetched_at
         data_obj.save()
@@ -198,6 +213,21 @@ def _update_data(entity_id, public_key, sso_url, expires_at):
             fetched_at=fetched_at,
             expires_at=expires_at,
             sso_url=sso_url,
+            slo_binding=slo_binding,
+            slo_url=slo_url,
             public_key=public_key,
         )
         return True
+
+
+def _get_best_slo_choice(slo_bindings):
+    """
+    Retrieve the best SLO URL/binding combination
+    """
+    for binding in VALID_SLO_BINDING_HIERARCHY:
+        if binding in slo_bindings:
+            url = slo_bindings[binding]
+            break
+    else:
+        binding, url = '', ''
+    return binding, url
