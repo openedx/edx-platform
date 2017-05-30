@@ -2,11 +2,12 @@
 Test finding orphans via the view and django config
 """
 import json
+
 import ddt
+from opaque_keys.edx.locator import BlockUsageLocator
 
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import reverse_course_url
-from opaque_keys.edx.locator import BlockUsageLocator
 from student.models import CourseEnrollment
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.search import path_to_location

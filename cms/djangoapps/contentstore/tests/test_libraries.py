@@ -1,31 +1,35 @@
 """
 Content library unit tests that require the CMS runtime.
 """
+import ddt
 from django.test.utils import override_settings
+from mock import Mock, patch
+from opaque_keys.edx.locator import CourseKey, LibraryLocator
+
 from contentstore.tests.utils import AjaxEnabledTestClient, parse_json
-from contentstore.utils import reverse_url, reverse_usage_url, reverse_library_url
+from contentstore.utils import reverse_library_url, reverse_url, reverse_usage_url
 from contentstore.views.item import _duplicate_item
 from contentstore.views.preview import _load_preview_module
 from contentstore.views.tests.test_library import LIBRARY_REST_URL
-import ddt
-from mock import patch
+from course_creators.views import add_user_with_status_granted
+from openedx.core.djangoapps.content.course_structures.tests import SignalDisconnectTestMixin
+from student import auth
 from student.auth import has_studio_read_access, has_studio_write_access
 from student.roles import (
-    CourseInstructorRole, CourseStaffRole, LibraryUserRole,
-    OrgStaffRole, OrgInstructorRole, OrgLibraryUserRole,
+    CourseInstructorRole,
+    CourseStaffRole,
+    LibraryUserRole,
+    OrgInstructorRole,
+    OrgLibraryUserRole,
+    OrgStaffRole
 )
+from student.tests.factories import UserFactory
+from xblock_django.user_service import DjangoXBlockUserService
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from mock import Mock
-from opaque_keys.edx.locator import CourseKey, LibraryLocator
-from openedx.core.djangoapps.content.course_structures.tests import SignalDisconnectTestMixin
-from xblock_django.user_service import DjangoXBlockUserService
 from xmodule.x_module import STUDIO_VIEW
-from student import auth
-from student.tests.factories import UserFactory
-from course_creators.views import add_user_with_status_granted
 
 
 class LibraryTestCase(ModuleStoreTestCase):

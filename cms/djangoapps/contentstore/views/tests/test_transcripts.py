@@ -6,19 +6,19 @@ import os
 import tempfile
 import textwrap
 from uuid import uuid4
-from mock import patch
 
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
-from django.conf import settings
+from mock import patch
+from opaque_keys.edx.keys import UsageKey
 
 from contentstore.tests.utils import CourseTestCase, mock_requests_get
-from opaque_keys.edx.keys import UsageKey
 from openedx.core.djangoapps.contentserver.caching import del_cached_content
-from xmodule.modulestore.django import modulestore
-from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.content import StaticContent
+from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
+from xmodule.modulestore.django import modulestore
 from xmodule.video_module import transcripts_utils
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)

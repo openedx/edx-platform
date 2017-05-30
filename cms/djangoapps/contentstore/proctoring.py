@@ -5,24 +5,20 @@ Code related to the handling of Proctored Exams in Studio
 import logging
 
 from django.conf import settings
+from edx_proctoring.api import (
+    create_exam,
+    create_exam_review_policy,
+    get_all_exams_for_course,
+    get_exam_by_content_id,
+    remove_review_policy,
+    update_exam,
+    update_review_policy
+)
+from edx_proctoring.exceptions import ProctoredExamNotFoundException, ProctoredExamReviewPolicyNotFoundException
 
+from contentstore.views.helpers import is_item_in_course_tree
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from contentstore.views.helpers import is_item_in_course_tree
-
-from edx_proctoring.api import (
-    get_exam_by_content_id,
-    update_exam,
-    create_exam,
-    get_all_exams_for_course,
-    update_review_policy,
-    create_exam_review_policy,
-    remove_review_policy,
-)
-from edx_proctoring.exceptions import (
-    ProctoredExamNotFoundException,
-    ProctoredExamReviewPolicyNotFoundException
-)
 
 log = logging.getLogger(__name__)
 
