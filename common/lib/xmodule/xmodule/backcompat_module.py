@@ -1,11 +1,13 @@
 """
 These modules exist to translate old format XML into newer, semantic forms
 """
-from .x_module import XModuleDescriptor
-from lxml import etree
-from functools import wraps
 import logging
 import traceback
+from functools import wraps
+
+from lxml import etree
+
+from .x_module import XModuleDescriptor
 
 log = logging.getLogger(__name__)
 

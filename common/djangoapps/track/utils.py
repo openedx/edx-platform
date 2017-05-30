@@ -1,7 +1,7 @@
 """Utility functions and classes for track backends"""
 
 import json
-from datetime import datetime, date
+from datetime import date, datetime
 
 from pytz import UTC
 

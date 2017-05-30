@@ -1,7 +1,7 @@
 """Helper methods for CORS and CSRF checks. """
+import contextlib
 import logging
 import urlparse
-import contextlib
 
 from django.conf import settings
 

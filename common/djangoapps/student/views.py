@@ -2,139 +2,132 @@
 Student Views
 """
 import datetime
+import json
 import logging
 import uuid
-import json
 import warnings
-from collections import defaultdict
-from urlparse import urljoin, urlsplit, parse_qs, urlunsplit
+from collections import defaultdict, namedtuple
+from urlparse import parse_qs, urljoin, urlsplit, urlunsplit
 
-from django.views.generic import TemplateView
-from pytz import UTC
-from requests import HTTPError
-from ipware.ip import get_ip
-
+import analytics
 import edx_oauth2_provider
 from django.conf import settings
-from django.contrib.auth import logout, authenticate, login
-from django.contrib.auth.models import User, AnonymousUser
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.views import password_reset_confirm
 from django.contrib import messages
-from django.core.context_processors import csrf
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import AnonymousUser, User
+from django.contrib.auth.views import password_reset_confirm
 from django.core import mail
-from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
-from django.core.urlresolvers import reverse, NoReverseMatch, reverse_lazy
-from django.core.validators import validate_email, ValidationError
+from django.core.context_processors import csrf
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
+from django.core.urlresolvers import NoReverseMatch, reverse, reverse_lazy
+from django.core.validators import ValidationError, validate_email
 from django.db import IntegrityError, transaction
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseServerError, Http404
-from django.shortcuts import redirect
-from django.utils.encoding import force_bytes, force_text
-from django.utils.translation import ungettext
-from django.utils.http import base36_to_int, is_safe_url, urlsafe_base64_encode, urlencode
-from django.utils.translation import ugettext as _, get_language
-from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
-from django.views.decorators.http import require_POST, require_GET
 from django.db.models.signals import post_save
-from django.dispatch import receiver, Signal
+from django.dispatch import Signal, receiver
+from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseServerError
+from django.shortcuts import redirect
 from django.template.response import TemplateResponse
-from provider.oauth2.models import Client
-from ratelimitbackend.exceptions import RateLimitException
-
-from social.apps.django_app import utils as social_utils
-from social.backends import oauth as social_oauth
-from social.exceptions import AuthException, AuthAlreadyAssociated
-
-from edxmako.shortcuts import render_to_response, render_to_string
-
-from course_modes.models import CourseMode
-from shoppingcart.api import order_history
-from student.models import (
-    Registration, UserProfile,
-    PendingEmailChange, CourseEnrollment, CourseEnrollmentAttribute, unique_id_for_user,
-    CourseEnrollmentAllowed, UserStanding, LoginFailures,
-    create_comments_service_user, PasswordHistory, UserSignupSource,
-    DashboardConfiguration, LinkedInAddToProfileConfiguration, ManualEnrollmentAudit, ALLOWEDTOENROLL_TO_ENROLLED,
-    LogoutViewConfiguration, RegistrationCookieConfiguration)
-from student.forms import AccountCreationForm, PasswordResetFormNoActive, get_registration_extension_form
-from student.tasks import send_activation_email
-from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification  # pylint: disable=import-error
-from bulk_email.models import Optout, BulkEmailFlag  # pylint: disable=import-error
-from certificates.models import (  # pylint: disable=import-error
-    CertificateStatuses, GeneratedCertificate, certificate_status_for_student
-)
-from certificates.api import (  # pylint: disable=import-error
-    get_certificate_url,
-    has_html_certificates_enabled,
-)
-from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
-
-from xmodule.modulestore.django import modulestore
+from django.utils.encoding import force_bytes, force_text
+from django.utils.http import base36_to_int, is_safe_url, urlencode, urlsafe_base64_encode
+from django.utils.translation import ugettext as _
+from django.utils.translation import get_language, ungettext
+from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
+from django.views.decorators.http import require_GET, require_POST
+from django.views.generic import TemplateView
+from ipware.ip import get_ip
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator
-
-from collections import namedtuple
-
-from courseware.courses import get_courses, sort_by_announcement, sort_by_start_date  # pylint: disable=import-error
-from courseware.access import has_access
-
-from django_comment_common.models import Role
-
-from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
-import openedx.core.djangoapps.external_auth.views
-from openedx.core.djangoapps.external_auth.login_and_register import (
-    login as external_auth_login,
-    register as external_auth_register
-)
-from openedx.core.djangoapps import monitoring_utils
-from openedx.core.djangolib.markup import HTML
-
-import track.views
+from provider.oauth2.models import Client
+from pytz import UTC
+from ratelimitbackend.exceptions import RateLimitException
+from requests import HTTPError
+from social.apps.django_app import utils as social_utils
+from social.backends import oauth as social_oauth
+from social.exceptions import AuthAlreadyAssociated, AuthException
 
 import dogstats_wrapper as dog_stats_api
-
-from util.db import outer_atomic
-from util.json_request import JsonResponse
-from util.bad_request_rate_limiter import BadRequestRateLimiter
-from util.milestones_helpers import (
-    get_pre_requisite_courses_not_completed,
-)
-
-from util.password_policy_validators import validate_password_strength
+import openedx.core.djangoapps.external_auth.views
 import third_party_auth
-from third_party_auth import pipeline, provider
-from student.helpers import (
-    check_verify_status_by_course,
-    auth_pipeline_urls, get_next_url_for_login_page,
-    DISABLE_UNENROLL_CERT_STATES,
-    destroy_oauth_tokens
+import track.views
+from bulk_email.models import BulkEmailFlag, Optout  # pylint: disable=import-error
+from certificates.api import get_certificate_url, has_html_certificates_enabled  # pylint: disable=import-error
+from certificates.models import (  # pylint: disable=import-error
+    CertificateStatuses,
+    GeneratedCertificate,
+    certificate_status_for_student
 )
-from student.cookies import set_logged_in_cookies, delete_logged_in_cookies, set_user_info_cookie
-from student.models import anonymous_id_for_user, UserAttribute, EnrollStatusChange
-from shoppingcart.models import DonationConfiguration, CourseRegistrationCode
-
-from openedx.core.djangoapps.embargo import api as embargo_api
-from openedx.features.course_experience import course_home_url_name
-from openedx.features.enterprise_support.api import get_dashboard_consent_notification
-
-import analytics
+from course_modes.models import CourseMode
+from courseware.access import has_access
+from courseware.courses import get_courses, sort_by_announcement, sort_by_start_date  # pylint: disable=import-error
+from django_comment_common.models import Role
+from edxmako.shortcuts import render_to_response, render_to_string
 from eventtracking import tracker
-
+from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
+from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification  # pylint: disable=import-error
 # Note that this lives in LMS, so this dependency should be refactored.
 from notification_prefs.views import enable_notifications
-
+from openedx.core.djangoapps import monitoring_utils
 from openedx.core.djangoapps.catalog.utils import get_programs_with_type
 from openedx.core.djangoapps.credit.email_utils import get_credit_provider_display_names, make_providers_strings
+from openedx.core.djangoapps.embargo import api as embargo_api
+from openedx.core.djangoapps.external_auth.login_and_register import login as external_auth_login
+from openedx.core.djangoapps.external_auth.login_and_register import register as external_auth_register
+from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
-
+from openedx.core.djangolib.markup import HTML
+from openedx.features.course_experience import course_home_url_name
+from openedx.features.enterprise_support.api import get_dashboard_consent_notification
+from shoppingcart.api import order_history
+from shoppingcart.models import CourseRegistrationCode, DonationConfiguration
+from student.cookies import delete_logged_in_cookies, set_logged_in_cookies, set_user_info_cookie
+from student.forms import AccountCreationForm, PasswordResetFormNoActive, get_registration_extension_form
+from student.helpers import (
+    DISABLE_UNENROLL_CERT_STATES,
+    auth_pipeline_urls,
+    check_verify_status_by_course,
+    destroy_oauth_tokens,
+    get_next_url_for_login_page
+)
+from student.models import (
+    ALLOWEDTOENROLL_TO_ENROLLED,
+    CourseEnrollment,
+    CourseEnrollmentAllowed,
+    CourseEnrollmentAttribute,
+    DashboardConfiguration,
+    EnrollStatusChange,
+    LinkedInAddToProfileConfiguration,
+    LoginFailures,
+    LogoutViewConfiguration,
+    ManualEnrollmentAudit,
+    PasswordHistory,
+    PendingEmailChange,
+    Registration,
+    RegistrationCookieConfiguration,
+    UserAttribute,
+    UserProfile,
+    UserSignupSource,
+    UserStanding,
+    anonymous_id_for_user,
+    create_comments_service_user,
+    unique_id_for_user
+)
+from student.tasks import send_activation_email
+from third_party_auth import pipeline, provider
+from util.bad_request_rate_limiter import BadRequestRateLimiter
+from util.db import outer_atomic
+from util.json_request import JsonResponse
+from util.milestones_helpers import get_pre_requisite_courses_not_completed
+from util.password_policy_validators import validate_password_strength
+from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")

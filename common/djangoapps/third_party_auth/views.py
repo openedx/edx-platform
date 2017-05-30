@@ -1,17 +1,19 @@
 """
 Extra views required for SSO
 """
+import social
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse, HttpResponseServerError, Http404, HttpResponseNotAllowed
+from django.http import Http404, HttpResponse, HttpResponseNotAllowed, HttpResponseServerError
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
-import social
+from social.apps.django_app.utils import load_backend, load_strategy
 from social.apps.django_app.views import complete
-from social.apps.django_app.utils import load_strategy, load_backend
 from social.utils import setting_name
+
 from student.models import UserProfile
 from student.views import compose_and_send_activation_email
+
 from .models import SAMLConfiguration
 
 URL_NAMESPACE = getattr(settings, setting_name('URL_NAMESPACE'), None) or 'social'

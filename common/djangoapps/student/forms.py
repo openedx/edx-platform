@@ -1,25 +1,24 @@
 """
 Utility functions for validating forms
 """
-from importlib import import_module
 import re
+from importlib import import_module
 
 from django import forms
-from django.forms import widgets
-from django.core.exceptions import ValidationError
-from django.contrib.auth.models import User
+from django.conf import settings
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX
+from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
-
+from django.core.exceptions import ValidationError
+from django.forms import widgets
+from django.template import loader
 from django.utils.http import int_to_base36
 from django.utils.translation import ugettext_lazy as _
-from django.template import loader
 
-from django.conf import settings
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from student.models import CourseEnrollmentAllowed
 from util.password_policy_validators import validate_password_strength
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
 class PasswordResetFormNoActive(PasswordResetForm):

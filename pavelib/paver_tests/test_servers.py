@@ -3,8 +3,8 @@
 import ddt
 from paver.easy import call_task
 
-from .utils import PaverTestCase
 from ..utils.envs import Env
+from .utils import PaverTestCase
 
 EXPECTED_COFFEE_COMMAND = (
     u"node_modules/.bin/coffee --compile `find {platform_root}/lms "

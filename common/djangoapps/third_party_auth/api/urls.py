@@ -2,7 +2,7 @@
 
 from django.conf.urls import patterns, url
 
-from .views import UserView, UserMappingView
+from .views import UserMappingView, UserView
 
 USERNAME_PATTERN = r'(?P<username>[\w.+-]+)'
 PROVIDER_PATTERN = r'(?P<provider_id>[\w.+-]+)(?:\:(?P<idp_slug>[\w.+-]+))?'

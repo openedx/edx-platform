@@ -2,14 +2,14 @@
 Utility methods related to file handling.
 """
 
-from datetime import datetime
 import os
-from pytz import UTC
+from datetime import datetime
 
 from django.core.exceptions import PermissionDenied
 from django.core.files.storage import DefaultStorage, get_valid_filename
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
+from pytz import UTC
 
 
 class FileValidationException(Exception):

@@ -1,23 +1,23 @@
 """
 Test the enterprise support APIs.
 """
-import mock
 import unittest
 
+import mock
 from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.test.utils import override_settings
 
 from openedx.features.enterprise_support.api import (
-    enterprise_enabled,
-    enterprise_customer_for_request,
-    insert_enterprise_pipeline_elements,
     data_sharing_consent_required,
-    set_enterprise_branding_filter_param,
+    enterprise_customer_for_request,
+    enterprise_enabled,
     get_dashboard_consent_notification,
     get_enterprise_branding_filter_param,
     get_enterprise_consent_url,
-    get_enterprise_customer_logo_url
+    get_enterprise_customer_logo_url,
+    insert_enterprise_pipeline_elements,
+    set_enterprise_branding_filter_param
 )
 
 

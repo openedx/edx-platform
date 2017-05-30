@@ -8,7 +8,6 @@ from django.views.decorators.csrf import csrf_exempt
 
 from . import views
 
-
 urlpatterns = patterns(
     '',
     url(r'^authorize/?$', csrf_exempt(views.AuthorizationView.as_view()), name='authorize'),

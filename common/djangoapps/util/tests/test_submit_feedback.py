@@ -1,23 +1,23 @@
 """Tests for the Zendesk"""
 
+import json
+from smtplib import SMTPException
+
+import httpretty
+import mock
+from ddt import data, ddt, unpack
 from django.contrib.auth.models import AnonymousUser
 from django.http import Http404
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from smtplib import SMTPException
-from student.tests.factories import UserFactory
+from zendesk import ZendeskError
+
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
-from util import views
-from zendesk import ZendeskError
-import httpretty
-import json
-import mock
-from ddt import ddt, data, unpack
-
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from student.tests.test_configuration_overrides import fake_get_value
-from student.tests.factories import CourseEnrollmentFactory
+from util import views
 
 TEST_SUPPORT_EMAIL = "support@example.com"
 TEST_ZENDESK_CUSTOM_FIELD_CONFIG = {

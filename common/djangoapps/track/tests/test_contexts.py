@@ -1,7 +1,8 @@
 # pylint: disable=missing-docstring
 
-import ddt
 from unittest import TestCase
+
+import ddt
 
 from track import contexts
 

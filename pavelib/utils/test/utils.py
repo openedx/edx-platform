@@ -1,12 +1,14 @@
 """
 Helper functions for test tasks
 """
-from paver.easy import sh, task, cmdopts
-from pavelib.utils.envs import Env
-from pavelib.utils.timer import timed
 import os
 import re
 import subprocess
+
+from paver.easy import cmdopts, sh, task
+
+from pavelib.utils.envs import Env
+from pavelib.utils.timer import timed
 
 MONGO_PORT_NUM = int(os.environ.get('EDXAPP_TEST_MONGO_PORT', '27017'))
 MONGO_HOST = os.environ.get('EDXAPP_TEST_MONGO_HOST', 'localhost')

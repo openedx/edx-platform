@@ -4,9 +4,10 @@
 import hashlib
 import json
 import logging
-import requests
-import dogstats_wrapper as dog_stats_api
 
+import requests
+
+import dogstats_wrapper as dog_stats_api
 
 log = logging.getLogger(__name__)
 dateformat = '%Y%m%d%H%M%S'

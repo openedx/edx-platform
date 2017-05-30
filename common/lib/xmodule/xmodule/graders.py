@@ -5,12 +5,12 @@ Code used to calculate learner grades.
 from __future__ import division
 
 import abc
-from collections import OrderedDict
-from datetime import datetime  # Used by pycontracts.  pylint: disable=unused-import
 import inspect
 import logging
 import random
 import sys
+from collections import OrderedDict
+from datetime import datetime  # Used by pycontracts.  pylint: disable=unused-import
 
 from contracts import contract
 

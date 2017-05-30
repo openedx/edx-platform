@@ -2,8 +2,13 @@
 Common comment client utility functions.
 """
 
-from django_comment_common.models import Role, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, \
-    FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_STUDENT
+from django_comment_common.models import (
+    FORUM_ROLE_ADMINISTRATOR,
+    FORUM_ROLE_COMMUNITY_TA,
+    FORUM_ROLE_MODERATOR,
+    FORUM_ROLE_STUDENT,
+    Role
+)
 
 
 class ThreadContext(object):

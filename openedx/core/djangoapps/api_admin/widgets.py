@@ -7,6 +7,7 @@ from django.forms.widgets import CheckboxInput
 from django.utils.encoding import force_text
 from django.utils.html import format_html
 from django.utils.translation import ugettext as _
+
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 

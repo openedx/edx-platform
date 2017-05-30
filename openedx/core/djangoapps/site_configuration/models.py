@@ -2,17 +2,15 @@
 Django models for site configurations.
 """
 import collections
+from logging import getLogger
 
-from django.db import models
 from django.contrib.sites.models import Site
+from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
 from django_extensions.db.models import TimeStampedModel
 from jsonfield.fields import JSONField
 
-
-from logging import getLogger
 logger = getLogger(__name__)  # pylint: disable=invalid-name
 
 

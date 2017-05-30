@@ -3,10 +3,9 @@ Models for CourseTalk configurations
 """
 from __future__ import unicode_literals
 
+from config_models.models import ConfigurationModel
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-
-from config_models.models import ConfigurationModel
 
 
 class CourseTalkWidgetConfiguration(ConfigurationModel):

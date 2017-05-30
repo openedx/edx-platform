@@ -1,11 +1,10 @@
 """Unit tests for settings.py."""
 
-from third_party_auth import provider, settings
-from third_party_auth.tests import testutil
 import unittest
 
 from openedx.features.enterprise_support.api import enterprise_enabled
-
+from third_party_auth import provider, settings
+from third_party_auth.tests import testutil
 
 _ORIGINAL_AUTHENTICATION_BACKENDS = ('first_authentication_backend',)
 _ORIGINAL_INSTALLED_APPS = ('first_installed_app',)

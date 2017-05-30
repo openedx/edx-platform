@@ -1,17 +1,16 @@
 """Tests for account activation"""
-from mock import patch
 import unittest
-
-from django.conf import settings
-from django.test import TestCase, override_settings
-from django.core.urlresolvers import reverse
-
 from uuid import uuid4
 
+from django.conf import settings
+from django.core.urlresolvers import reverse
+from django.test import TestCase, override_settings
+from mock import patch
+
 from edxmako.shortcuts import render_to_string
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from student.models import Registration
 from student.tests.factories import UserFactory
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')

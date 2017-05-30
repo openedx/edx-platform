@@ -1,27 +1,22 @@
 """Helpers for the student app. """
-from datetime import datetime
 import logging
-import urllib
 import mimetypes
+import urllib
+from datetime import datetime
 
 from django.conf import settings
-from django.core.urlresolvers import reverse, NoReverseMatch
+from django.core.urlresolvers import NoReverseMatch, reverse
 from django.utils import http
-from oauth2_provider.models import (
-    AccessToken as dot_access_token,
-    RefreshToken as dot_refresh_token
-)
-from provider.oauth2.models import (
-    AccessToken as dop_access_token,
-    RefreshToken as dop_refresh_token
-)
+from oauth2_provider.models import AccessToken as dot_access_token
+from oauth2_provider.models import RefreshToken as dot_refresh_token
+from provider.oauth2.models import AccessToken as dop_access_token
+from provider.oauth2.models import RefreshToken as dop_refresh_token
 from pytz import UTC
 
 import third_party_auth
-from lms.djangoapps.verify_student.models import VerificationDeadline, SoftwareSecurePhotoVerification
 from course_modes.models import CourseMode
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
 from openedx.core.djangoapps.theming.helpers import get_themes
-
 
 # Enumeration of per-course verification statuses
 # we display on the student dashboard.

@@ -2,17 +2,16 @@
 Install Python and Node prerequisites.
 """
 
-from distutils import sysconfig
 import hashlib
 import os
 import re
 import sys
+from distutils import sysconfig
 
-from paver.easy import sh, task, BuildFailure
+from paver.easy import BuildFailure, sh, task
 
 from .utils.envs import Env
 from .utils.timer import timed
-
 
 PREREQS_STATE_DIR = os.getenv('PREREQ_CACHE_DIR', Env.REPO_ROOT / '.prereqs_cache')
 NPM_REGISTRY = "https://registry.npmjs.org/"

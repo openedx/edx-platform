@@ -1,13 +1,11 @@
 """Tests covering time zone utilities."""
-from freezegun import freeze_time
-from student.tests.factories import UserFactory
-from openedx.core.lib.time_zone_utils import (
-    get_display_time_zone,
-    get_time_zone_abbr,
-    get_time_zone_offset,
-)
-from pytz import timezone, utc
 from unittest import TestCase
+
+from freezegun import freeze_time
+from pytz import timezone, utc
+
+from openedx.core.lib.time_zone_utils import get_display_time_zone, get_time_zone_abbr, get_time_zone_offset
+from student.tests.factories import UserFactory
 
 
 class TestTimeZoneUtils(TestCase):

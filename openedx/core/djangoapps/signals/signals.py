@@ -4,7 +4,6 @@ This module contains all signals.
 
 from django.dispatch import Signal
 
-
 # Signal that fires when a user is graded
 COURSE_GRADE_CHANGED = Signal(providing_args=["user", "course_grade", "course_key", "deadline"])
 

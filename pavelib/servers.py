@@ -2,6 +2,7 @@
 Run and manage servers for local development.
 """
 from __future__ import print_function
+
 import argparse
 import sys
 
@@ -9,9 +10,8 @@ from paver.easy import call_task, cmdopts, consume_args, needs, sh, task
 
 from .assets import collect_assets
 from .utils.cmd import django_cmd
-from .utils.process import run_process, run_multi_processes
+from .utils.process import run_multi_processes, run_process
 from .utils.timer import timed
-
 
 DEFAULT_PORT = {"lms": 8000, "studio": 8001}
 DEFAULT_SETTINGS = 'devstack'
