@@ -2,41 +2,40 @@ import logging
 import os
 import sys
 import time
-from collections import namedtuple
-from functools import partial
-
-from pkg_resources import resource_exists, resource_isdir, resource_listdir, resource_string
-
-import dogstats_wrapper as dog_stats_api
 import yaml
+
 from contracts import contract, new_contract
-from lazy import lazy
+from functools import partial
 from lxml import etree
-from opaque_keys.edx.asides import AsideDefinitionKeyV2, AsideUsageKeyV2
-from opaque_keys.edx.keys import UsageKey
-from openedx.core.lib.xblock_fields.fields import RelativeTime
+from collections import namedtuple
+from pkg_resources import (
+    resource_exists,
+    resource_listdir,
+    resource_string,
+    resource_isdir,
+)
 from webob import Response
 from webob.multidict import MultiDict
+from lazy import lazy
+
 from xblock.core import XBlock, XBlockAside
 from xblock.fields import (
-    Dict,
-    Float,
-    Integer,
-    List,
-    Reference,
-    ReferenceList,
-    ReferenceValueDict,
-    Scope,
-    ScopeIds,
-    String,
-    UserScope
+    Scope, Integer, Float, List,
+    String, Dict, ScopeIds, Reference, ReferenceList,
+    ReferenceValueDict, UserScope
 )
+
 from xblock.fragment import Fragment
-from xblock.runtime import IdGenerator, IdReader, Runtime
+from xblock.runtime import Runtime, IdReader, IdGenerator
 from xmodule import block_metadata_utils
+from xmodule.fields import RelativeTime
 from xmodule.errortracker import exc_info_to_str
-from xmodule.exceptions import UndefinedContext
 from xmodule.modulestore.exceptions import ItemNotFoundError
+
+from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.asides import AsideUsageKeyV2, AsideDefinitionKeyV2
+from xmodule.exceptions import UndefinedContext
+import dogstats_wrapper as dog_stats_api
 
 log = logging.getLogger(__name__)
 

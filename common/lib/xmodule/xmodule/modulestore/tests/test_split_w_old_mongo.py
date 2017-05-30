@@ -3,16 +3,17 @@ import random
 import unittest
 import uuid
 
-import mock
 from nose.plugins.attrib import attr
-from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
-from openedx.core.lib.xblock_fields.inherited_fields import InheritanceMixin
+import mock
+
+from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.x_module import XModuleMixin
+from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore.mongo import DraftMongoModuleStore
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
-from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
+from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 from xmodule.modulestore.tests.utils import MemoryCache
-from xmodule.x_module import XModuleMixin
 
 
 @attr('mongo')

@@ -70,7 +70,6 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.course_tabs import CourseTabPluginManager
 from openedx.core.lib.courses import course_image_url
-from openedx.core.lib.xblock_fields.inherited_fields import DEFAULT_START_DATE
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from student import auth
 from student.auth import has_course_author_access, has_studio_write_access, has_studio_read_access
@@ -95,6 +94,7 @@ from util.string_utils import _has_non_ascii_characters
 from xblock_django.api import deprecated_xblocks
 from xmodule.contentstore.content import StaticContent
 from xmodule.course_module import CourseFields
+from xmodule.course_module import DEFAULT_START_DATE
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.django import modulestore
