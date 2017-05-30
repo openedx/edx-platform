@@ -31,6 +31,17 @@ CATALOG_VISIBILITY_ABOUT = "about"
 CATALOG_VISIBILITY_NONE = "none"
 
 
+def get_course_summaries(modulestore, **kwargs):
+    kwargs['fields'] = CourseSummary.course_info_fields
+    courses = modulestore.get_course_summaries(**kwargs)
+    course_summaries = []
+
+    for locator, course in courses:
+        course_summaries.append(CourseSummary(locator, **course))
+
+    return course_summaries
+
+
 class StringOrDate(Date):
     def from_json(self, value):
         """

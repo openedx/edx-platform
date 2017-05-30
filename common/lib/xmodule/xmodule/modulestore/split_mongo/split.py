@@ -53,6 +53,7 @@ Representation:
         *** 'original_version': definition_id of the root of the previous version relation on this
         definition. Acts as a pseudo-object identifier.
 """
+from collections import defaultdict
 import copy
 import datetime
 import hashlib
@@ -62,7 +63,6 @@ from importlib import import_module
 from types import NoneType
 
 import six
-
 from bson.objectid import ObjectId
 from ccx_keys.locator import CCXBlockUsageLocator, CCXLocator
 from contracts import contract, new_contract
@@ -104,7 +104,6 @@ from xmodule.modulestore.exceptions import (
 from xmodule.modulestore.split_mongo import BlockKey, CourseEnvelope
 from xmodule.modulestore.split_mongo.mongo_connection import DuplicateKeyError, MongoConnection
 from xmodule.modulestore.store_utilities import DETACHED_XBLOCK_TYPES
-
 from ..exceptions import ItemNotFoundError
 from .caching_descriptor_system import CachingDescriptorSystem
 
@@ -996,7 +995,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
     @autoretry_read()
     def get_course_summaries(self, branch, **kwargs):
         """
-        Returns a list of `CourseSummary` which matching any given qualifiers.
+        Returns a list of course_summary_data which matching any given qualifiers.
 
         qualifiers should be a dict of keywords matching the db fields or any
         legal query for mongo to use against the active_versions collection.
@@ -1006,16 +1005,17 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
         :param branch: the branch for which to return courses.
         """
-        def extract_course_summary(course):
+        def extract_course_summary(course, fields):
             """
-            Extract course information from the course block for split.
+            Extract course information from the course block for mongo.
             """
             return {
                 field: course.fields[field]
-                for field in CourseSummary.course_info_fields
+                for field in fields
                 if field in course.fields
             }
 
+        fields = kwargs.get('fields')
         courses_summaries = []
         for entry, structure_info in self._get_course_blocks_for_branch(branch, **kwargs):
             course_locator = self._create_course_locator(structure_info, branch=None)
@@ -1031,10 +1031,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 raise MultipleCourseBlocksFound(
                     "Expected 1 course block to be found in the course, but found {0}".format(len(course_block))
                 )
-            course_summary = extract_course_summary(course_block[0])
-            courses_summaries.append(
-                CourseSummary(course_locator, **course_summary)
-            )
+            courses_summaries.append((course_locator, extract_course_summary(course_block[0], fields)))
         return courses_summaries
 
     def get_libraries(self, branch="library", **kwargs):
