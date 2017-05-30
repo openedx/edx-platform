@@ -1,56 +1,53 @@
 """Tests for items views."""
 import json
 from datetime import datetime, timedelta
-
 import ddt
-from contentstore.tests.utils import CourseTestCase
-from contentstore.utils import reverse_course_url, reverse_usage_url
-from contentstore.views.component import component_handler, get_component_templates
-from contentstore.views.item import (
-    ALWAYS,
-    VisibilityState,
-    _get_module_info,
-    _get_source_index,
-    _xblock_type_and_display_name,
-    add_container_page_publishing_info,
-    create_xblock_info
-)
+
+from mock import patch, Mock, PropertyMock
+from pytz import UTC
+from pyquery import PyQuery
+from webob import Response
+
 from django.conf import settings
-from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.test import TestCase
 from django.test.client import RequestFactory
-from mock import Mock, PropertyMock, patch
+from django.core.urlresolvers import reverse
+from contentstore.utils import reverse_usage_url, reverse_course_url
+
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey, UsageKey
-from opaque_keys.edx.locations import Location
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
-from openedx.core.lib.partitions.partitions import (
-    ENROLLMENT_TRACK_PARTITION_ID,
-    MINIMUM_STATIC_PARTITION_ID,
-    Group,
-    UserPartition
+from contentstore.views.component import (
+    component_handler, get_component_templates
 )
-from openedx.core.lib.xblock_fields.inherited_fields import DEFAULT_START_DATE
-from pyquery import PyQuery
-from pytz import UTC
+
+from contentstore.views.item import (
+    create_xblock_info, _get_source_index, _get_module_info, ALWAYS, VisibilityState, _xblock_type_and_display_name,
+    add_container_page_publishing_info
+)
+from contentstore.tests.utils import CourseTestCase
 from student.tests.factories import UserFactory
-from webob import Response
-from xblock.core import XBlockAside
-from xblock.exceptions import NoSuchHandlerError
-from xblock.fields import Scope, ScopeIds, String
-from xblock.fragment import Fragment
-from xblock.runtime import DictKeyValueStore, KvsFieldData
-from xblock.test.tools import TestRuntime
 from xblock_django.models import XBlockConfiguration, XBlockStudioConfiguration, XBlockStudioConfigurationFlag
-from xblock_django.user_service import DjangoXBlockUserService
 from xmodule.capa_module import CapaDescriptor
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory, check_mongo_calls
-from xmodule.x_module import STUDENT_VIEW, STUDIO_VIEW
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
+from xmodule.modulestore.tests.factories import ItemFactory, LibraryFactory, check_mongo_calls, CourseFactory
+from xmodule.x_module import STUDIO_VIEW, STUDENT_VIEW
+from xmodule.course_module import DEFAULT_START_DATE
+from xblock.core import XBlockAside
+from xblock.fields import Scope, String, ScopeIds
+from xblock.fragment import Fragment
+from xblock.runtime import DictKeyValueStore, KvsFieldData
+from xblock.test.tools import TestRuntime
+from xblock.exceptions import NoSuchHandlerError
+from xblock_django.user_service import DjangoXBlockUserService
+from opaque_keys.edx.keys import UsageKey, CourseKey
+from opaque_keys.edx.locations import Location
+from xmodule.partitions.partitions import (
+    Group, UserPartition, ENROLLMENT_TRACK_PARTITION_ID, MINIMUM_STATIC_PARTITION_ID
+)
 
 
 class AsideTest(XBlockAside):

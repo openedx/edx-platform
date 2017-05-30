@@ -9,11 +9,11 @@ import ddt
 from nose.plugins.attrib import attr
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.lib.xblock_fields.inherited_fields import DEFAULT_START_DATE
 from rest_framework.test import APIRequestFactory
 from rest_framework.request import Request
 
 from xblock.core import XBlock
+from xmodule.course_module import DEFAULT_START_DATE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import check_mongo_calls
 
