@@ -263,10 +263,6 @@ class CohortManagementSection(PageObject):
     no_content_group_button_css = '.cohort-management-details-association-course input.radio-no'
     select_content_group_button_css = '.cohort-management-details-association-course input.radio-yes'
     assignment_type_buttons_css = '.cohort-management-assignment-type-settings input'
-    discussion_form_selectors = {
-        'course-wide': '.cohort-course-wide-discussions-form',
-        'inline': '.cohort-inline-discussions-form'
-    }
 
     def get_cohort_help_element_and_click_help(self):
         """
@@ -689,8 +685,13 @@ class DiscussionManagementSection(PageObject):
 
     discussion_form_selectors = {
         'course-wide': '.cohort-course-wide-discussions-form',
-        'inline': '.cohort-inline-discussions-form'
+        'inline': '.cohort-inline-discussions-form',
+        'scheme': '.division-scheme-container',
     }
+
+    NOT_DIVIDED_SCHEME = "none"
+    COHORT_SCHEME = "cohort"
+    ENROLLMENT_TRACK_SCHEME = "enrollment_track"
 
     def is_browser_on_page(self):
         return self.q(css=self.discussion_form_selectors['course-wide']).present
@@ -800,6 +801,25 @@ class DiscussionManagementSection(PageObject):
         Returns the status for category checkboxes.
         """
         return self.q(css=self._bounded_selector('.check-discussion-category:checked')).is_present()
+
+    def get_selected_scheme(self):
+        """
+        Returns the ID of the selected discussion division scheme
+        ("NOT_DIVIDED_SCHEME", "COHORT_SCHEME", or "ENROLLMENT_TRACK_SCHEME)".
+        """
+        return self.q(css=self._bounded_selector('.division-scheme:checked')).first.attrs('id')[0]
+
+    def select_division_scheme(self, scheme):
+        """
+        Selects the radio button associated with the specified division scheme.
+        """
+        self.q(css=self._bounded_selector("input#%s" % scheme)).first.click()
+
+    def division_scheme_visible(self, scheme):
+        """
+        Returns whether or not the specified scheme is visible as an option.
+        """
+        return self.q(css=self._bounded_selector("input#%s" % scheme)).visible
 
 
 class MembershipPageAutoEnrollSection(PageObject):

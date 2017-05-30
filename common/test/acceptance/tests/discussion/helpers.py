@@ -76,22 +76,26 @@ class CohortTestMixin(object):
 
     def enable_cohorting(self, course_fixture):
         """
-        enables cohorts and always_divide_inline_discussions for the current course fixture.
+        Enables cohorting for the specified course fixture.
         """
-        url = LMS_BASE_URL + "/courses/" + course_fixture._course_key + '/cohorts/settings'  # pylint: disable=protected-access
-        discussions_url = LMS_BASE_URL + "/courses/" + course_fixture._course_key + '/discussions/settings'  # pylint: disable=protected-access
-
+        url = LMS_BASE_URL + "/courses/" + course_fixture._course_key + '/cohorts/settings'
         data = json.dumps({'is_cohorted': True})
-        discussions_data = json.dumps({'always_divide_inline_discussions': True})
-
         response = course_fixture.session.patch(url, data=data, headers=course_fixture.headers)
+        self.assertTrue(response.ok, "Failed to enable cohorts")
+
+    def enable_always_divide_inline_discussions(self, course_fixture):
+        """
+        Enables "always_divide_inline_discussions" (but does not enabling cohorting).
+        """
+        discussions_url = LMS_BASE_URL + "/courses/" + course_fixture._course_key + '/discussions/settings'
+        discussions_data = json.dumps({'always_divide_inline_discussions': True})
         course_fixture.session.patch(discussions_url, data=discussions_data, headers=course_fixture.headers)
 
     def disable_cohorting(self, course_fixture):
         """
-        Disables cohorting for the current course fixture.
+        Disables cohorting for the specified course fixture.
         """
-        url = LMS_BASE_URL + "/courses/" + course_fixture._course_key + '/cohorts/settings'  # pylint: disable=protected-access
+        url = LMS_BASE_URL + "/courses/" + course_fixture._course_key + '/cohorts/settings'
         data = json.dumps({'is_cohorted': False})
         response = course_fixture.session.patch(url, data=data, headers=course_fixture.headers)
         self.assertTrue(response.ok, "Failed to disable cohorts")
