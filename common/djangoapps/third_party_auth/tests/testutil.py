@@ -212,7 +212,7 @@ class SAMLTestCase(TestCase):
             kwargs['private_key'] = self._get_private_key()
         if 'public_key' not in kwargs:
             kwargs['public_key'] = self._get_public_key()
-        kwargs.setdefault('entity_id', "https://saml.example.none")
+        kwargs.setdefault('entity_id', "https://saml.example.none/saml")
         super(SAMLTestCase, self).enable_saml(**kwargs)
 
     @mock.patch('third_party_auth.saml.log')
