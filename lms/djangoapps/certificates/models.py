@@ -897,6 +897,10 @@ class CertificateGenerationCourseSetting(TimeStampedModel):
             with transaction.atomic():
                 certificate_generation_course_setting.save()
         except IntegrityError:
+            if is_enabled:
+                LOGGER.exception("Cannot enable self-generated certificates for course %s.", unicode(course_key))
+            else:
+                LOGGER.exception("Cannot disable self-generated certificates for course %s.", unicode(course_key))
             pass
 
 

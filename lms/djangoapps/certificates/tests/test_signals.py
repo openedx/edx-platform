@@ -22,7 +22,8 @@ class SelfGeneratedCertsSignalTest(ModuleStoreTestCase):
         CertificateGenerationConfiguration.objects.create(enabled=True)
 
     def test_cert_generation_enabled_for_self_paced(self):
-        """ Verify the signal enable the self-generated certificates for
+        """
+        Verify the signal enables the self-generated certificates for
         self-paced courses.
         """
         self.assertFalse(certs_api.cert_generation_enabled(self.course.id))
@@ -31,7 +32,8 @@ class SelfGeneratedCertsSignalTest(ModuleStoreTestCase):
         self.assertTrue(certs_api.cert_generation_enabled(self.course.id))
 
     def test_cert_generation_disabled_for_instructor_paced(self):
-        """ Verify the signal disable the self-generated certificates for
+        """
+        Verify the signal disables the self-generated certificates for
         instructor-paced courses.
         """
         self.course.self_paced = False

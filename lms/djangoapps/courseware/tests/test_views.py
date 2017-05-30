@@ -1349,7 +1349,8 @@ class ProgressPageTests(ModuleStoreTestCase):
         self.course.save()
         self.store.update_item(self.course, self.user.id)
 
-        # verify that certificate web view button disappears for disabled self-generation certificates
+        # verify that certificate web view button disappears if self-generated certificates
+        # are disabled
         resp = self._get_progress_page()
         self.assertNotContains(resp, u"View Certificate")
 

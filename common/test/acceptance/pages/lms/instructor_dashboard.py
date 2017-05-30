@@ -1415,9 +1415,9 @@ class CertificatesPage(PageObject):
         self.get_selector('#invalidate-certificate').click()
 
     @property
-    def self_generation_certificate_enabled_button(self):
+    def self_generated_certificate_enabled_button(self):
         """
-        Returns the "Self Generation Certificate Enable" button.
+        Returns the "Self Generated Certificate Enable" button.
         """
         return self.get_selector('#enable-certificates-submit')
 
