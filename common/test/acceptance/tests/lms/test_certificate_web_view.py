@@ -2,6 +2,7 @@
 Acceptance tests for the certificate web view feature.
 """
 from nose.plugins.attrib import attr
+
 from common.test.acceptance.fixtures.certificates import CertificateConfigFixture
 from common.test.acceptance.fixtures.course import CourseFixture, CourseUpdateDesc, XBlockFixtureDesc
 from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
@@ -21,6 +22,7 @@ from common.test.acceptance.tests.helpers import (
     get_element_padding,
     get_modal_alert,
 )
+
 
 @attr(shard=5)
 class CertificateWebViewTest(EventsTestMixin, UniqueCourseTest):
