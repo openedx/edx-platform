@@ -5,9 +5,8 @@ Test authorization functions
 from django.contrib.auth.models import AnonymousUser
 from django.test import TestCase
 
-from .mixins import CourseApiFactoryMixin
-
 from ..permissions import can_view_courses_for_username
+from .mixins import CourseApiFactoryMixin
 
 
 class ViewCoursesForUsernameTestCase(CourseApiFactoryMixin, TestCase):

@@ -1,37 +1,36 @@
 """
 Tests for Discussion API views
 """
-from datetime import datetime
 import json
+from datetime import datetime
 from urlparse import urlparse
 
 import ddt
 import httpretty
 import mock
-from nose.plugins.attrib import attr
-from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_storage
-from pytz import UTC
-
 from django.core.urlresolvers import reverse
+from nose.plugins.attrib import attr
+from pytz import UTC
 from rest_framework.parsers import JSONParser
-
 from rest_framework.test import APIClient
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
 
 from common.test.utils import disable_signal
 from discussion_api import api
 from discussion_api.tests.utils import (
     CommentsServiceMockMixin,
+    ProfileImageTestMixin,
     make_minimal_cs_comment,
     make_minimal_cs_thread,
-    make_paginated_api_response,
-    ProfileImageTestMixin)
+    make_paginated_api_response
+)
 from django_comment_client.tests.utils import ForumsEnableMixin
+from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_storage
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from util.testing import UrlResetMixin, PatchMediaTypeMixin
+from util.testing import PatchMediaTypeMixin, UrlResetMixin
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
 
 class DiscussionAPIViewTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMixin):

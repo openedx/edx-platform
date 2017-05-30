@@ -85,11 +85,7 @@ from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.programs.utils import ProgramMarketingDataExtender
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.features.course_experience import (
-    UNIFIED_COURSE_TAB_FLAG,
-    UNIFIED_COURSE_VIEW_FLAG,
-    course_home_url_name,
-)
+from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, UNIFIED_COURSE_VIEW_FLAG, course_home_url_name
 from openedx.features.course_experience.views.course_dates import CourseDatesFragmentView
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 from shoppingcart.utils import is_shopping_cart_enabled

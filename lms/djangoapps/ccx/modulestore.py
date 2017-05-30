@@ -11,8 +11,10 @@ version that was passed in.
 """
 from contextlib import contextmanager
 from functools import partial
-from ccx_keys.locator import CCXLocator, CCXBlockUsageLocator
-from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
+
+from ccx_keys.locator import CCXBlockUsageLocator, CCXLocator
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
+
 from xmodule.modulestore import XMODULE_FIELDS_WITH_USAGE_KEYS
 
 

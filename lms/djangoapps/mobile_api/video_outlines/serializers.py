@@ -1,19 +1,16 @@
 """
 Serializer for video outline
 """
+from edxval.api import ValInternalError, get_video_info_for_course_and_profiles
 from rest_framework.reverse import reverse
 
-from xmodule.modulestore.mongo.base import BLOCK_TYPES_WITH_CHILDREN
-from xmodule.modulestore.django import modulestore
 from courseware.access import has_access
 from courseware.courses import get_course_by_id
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
 from util.module_utils import get_dynamic_descriptor_children
-
-from edxval.api import (
-    get_video_info_for_course_and_profiles, ValInternalError
-)
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.mongo.base import BLOCK_TYPES_WITH_CHILDREN
 
 
 class BlockOutline(object):

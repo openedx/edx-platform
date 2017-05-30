@@ -3,7 +3,7 @@ Course Structure API URI specification.
 
 Patterns here should simply point to version-specific patterns.
 """
-from django.conf.urls import patterns, url, include
+from django.conf.urls import include, patterns, url
 
 urlpatterns = patterns(
     '',

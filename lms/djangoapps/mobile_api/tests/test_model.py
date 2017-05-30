@@ -2,9 +2,11 @@
 Tests for Mobile API Configuration Models
 """
 from datetime import datetime
+
 import ddt
 from django.test import TestCase
 from pytz import UTC
+
 from mobile_api.models import AppVersionConfig, MobileApiConfig
 
 

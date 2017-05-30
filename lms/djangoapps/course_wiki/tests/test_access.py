@@ -4,16 +4,15 @@ Tests for wiki permissions
 
 from django.contrib.auth.models import Group
 from nose.plugins.attrib import attr
-from student.tests.factories import UserFactory
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-
-from courseware.tests.factories import InstructorFactory, StaffFactory
-
 from wiki.models import URLPath
-from course_wiki.views import get_or_create_root
-from course_wiki.utils import user_is_article_course_staff, course_wiki_slug
+
 from course_wiki import settings
+from course_wiki.utils import course_wiki_slug, user_is_article_course_staff
+from course_wiki.views import get_or_create_root
+from courseware.tests.factories import InstructorFactory, StaffFactory
+from student.tests.factories import UserFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class TestWikiAccessBase(ModuleStoreTestCase):

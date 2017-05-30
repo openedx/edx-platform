@@ -1,8 +1,8 @@
 """
 Tests for the Video Branding configuration.
 """
-from django.test import TestCase
 from django.core.exceptions import ValidationError
+from django.test import TestCase
 from nose.plugins.attrib import attr
 
 from branding.models import BrandingInfoConfig

@@ -1,6 +1,6 @@
 import functools
-import logging
 import json
+import logging
 import random
 import time
 import urlparse
@@ -14,39 +14,38 @@ from django.views.decorators import csrf
 from django.views.decorators.http import require_GET, require_POST
 from opaque_keys.edx.keys import CourseKey
 
-from courseware.access import has_access
-from util.file import store_uploaded_file
-from courseware.courses import get_course_with_access, get_course_overview_with_access, get_course_by_id
-from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
-
 import django_comment_client.settings as cc_settings
-from django_comment_common.signals import (
-    thread_created,
-    thread_edited,
-    thread_voted,
-    thread_deleted,
-    comment_created,
-    comment_edited,
-    comment_voted,
-    comment_deleted,
-    comment_endorsed,
-)
-from django_comment_common.utils import ThreadContext
+import lms.lib.comment_client as cc
+from courseware.access import has_access
+from courseware.courses import get_course_by_id, get_course_overview_with_access, get_course_with_access
+from django_comment_client.permissions import check_permissions_by_view, get_team, has_permission
 from django_comment_client.utils import (
-    add_courseware_context,
-    get_annotated_content_info,
-    get_ability,
-    is_comment_too_deep,
     JsonError,
     JsonResponse,
-    prepare_content,
-    get_group_id_for_comments_service,
+    add_courseware_context,
     discussion_category_id_access,
+    get_ability,
+    get_annotated_content_info,
     get_cached_discussion_id_map,
+    get_group_id_for_comments_service,
+    is_comment_too_deep,
+    prepare_content
 )
-from django_comment_client.permissions import check_permissions_by_view, has_permission, get_team
+from django_comment_common.signals import (
+    comment_created,
+    comment_deleted,
+    comment_edited,
+    comment_endorsed,
+    comment_voted,
+    thread_created,
+    thread_deleted,
+    thread_edited,
+    thread_voted
+)
+from django_comment_common.utils import ThreadContext
 from eventtracking import tracker
-import lms.lib.comment_client as cc
+from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
+from util.file import store_uploaded_file
 
 log = logging.getLogger(__name__)
 

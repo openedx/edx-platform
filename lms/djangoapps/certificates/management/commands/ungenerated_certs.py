@@ -2,20 +2,20 @@
 Management command to find all students that need certificates for
 courses that have finished, and put their cert requests on the queue.
 """
-import logging
 import datetime
-from pytz import UTC
-from django.core.management.base import BaseCommand, CommandError
-from certificates.models import certificate_status_for_student
-from certificates.api import generate_user_certificates
-from django.contrib.auth.models import User
+import logging
 from optparse import make_option
+
+from django.contrib.auth.models import User
+from django.core.management.base import BaseCommand, CommandError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from xmodule.modulestore.django import modulestore
-from certificates.models import CertificateStatuses
+from pytz import UTC
 
+from certificates.api import generate_user_certificates
+from certificates.models import CertificateStatuses, certificate_status_for_student
+from xmodule.modulestore.django import modulestore
 
 LOGGER = logging.getLogger(__name__)
 

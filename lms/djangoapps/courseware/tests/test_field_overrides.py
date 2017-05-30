@@ -3,22 +3,22 @@ Tests for `field_overrides` module.
 """
 # pylint: disable=missing-docstring
 import unittest
-from nose.plugins.attrib import attr
 
 from django.test.utils import override_settings
+from nose.plugins.attrib import attr
 from xblock.field_data import DictFieldData
-from xmodule.modulestore.tests.factories import CourseFactory
+
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 from ..field_overrides import (
-    resolve_dotted,
-    disable_overrides,
     FieldOverrideProvider,
     OverrideFieldData,
     OverrideModulestoreFieldData,
+    disable_overrides,
+    resolve_dotted
 )
 from ..testutils import FieldOverrideTestMixin
-
 
 TESTUSER = "testuser"
 

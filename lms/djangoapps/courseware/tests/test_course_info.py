@@ -3,32 +3,30 @@
 Test the course_info xblock
 """
 import mock
-from nose.plugins.attrib import attr
-from pyquery import PyQuery as pq
-
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import QueryDict
 from django.test.utils import override_settings
-
-from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
-from util.date_utils import strftime_localized
-from xmodule.modulestore.tests.django_utils import (
-    ModuleStoreTestCase,
-    SharedModuleStoreTestCase,
-    TEST_DATA_SPLIT_MODULESTORE,
-    TEST_DATA_MIXED_MODULESTORE
-)
-from xmodule.modulestore.tests.utils import TEST_DATA_DIR
-from xmodule.modulestore.xml_importer import import_course_from_xml
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
-from student.models import CourseEnrollment
-from student.tests.factories import AdminFactory
-
-from .helpers import LoginEnrollmentTestCase
+from nose.plugins.attrib import attr
+from pyquery import PyQuery as pq
 
 from lms.djangoapps.ccx.tests.factories import CcxFactory
+from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
+from student.models import CourseEnrollment
+from student.tests.factories import AdminFactory
+from util.date_utils import strftime_localized
+from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_MIXED_MODULESTORE,
+    TEST_DATA_SPLIT_MODULESTORE,
+    ModuleStoreTestCase,
+    SharedModuleStoreTestCase
+)
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+from xmodule.modulestore.tests.utils import TEST_DATA_DIR
+from xmodule.modulestore.xml_importer import import_course_from_xml
+
+from .helpers import LoginEnrollmentTestCase
 
 
 @attr(shard=1)

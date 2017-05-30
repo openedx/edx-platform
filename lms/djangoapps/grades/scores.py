@@ -3,11 +3,12 @@ Functionality for problem scores.
 """
 from logging import getLogger
 
-from openedx.core.lib.cache_utils import memoized
 from xblock.core import XBlock
-from xmodule.graders import ProblemScore
-from .transformer import GradesTransformer
 
+from openedx.core.lib.cache_utils import memoized
+from xmodule.graders import ProblemScore
+
+from .transformer import GradesTransformer
 
 log = getLogger(__name__)
 

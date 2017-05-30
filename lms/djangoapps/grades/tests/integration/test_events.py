@@ -3,18 +3,18 @@ Test grading events across apps.
 """
 # pylint: disable=protected-access
 
+from mock import patch
+
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
+from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from lms.djangoapps.instructor.enrollment import reset_student_attempts
 from lms.djangoapps.instructor_task.api import submit_rescore_problem_for_student
-from mock import patch
 from openedx.core.djangolib.testing.utils import get_mock_request
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-
-from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 STATE_DELETED_TYPE = 'edx.grades.problem.state_deleted'
 RESCORE_TYPE = 'edx.grades.problem.rescored'

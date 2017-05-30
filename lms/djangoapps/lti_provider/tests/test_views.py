@@ -5,15 +5,14 @@ Tests for the LTI provider views
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.client import RequestFactory
-from mock import patch, MagicMock
+from mock import MagicMock, patch
 from nose.plugins.attrib import attr
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
 from courseware.testutils import RenderXBlockTestMixin
-from lti_provider import views, models
-from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
+from lti_provider import models, views
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-
 
 LTI_DEFAULT_PARAMS = {
     'roles': u'Instructor,urn:lti:instrole:ims/lis/Administrator',

@@ -4,26 +4,26 @@ Unit tests for bulk-email-related models.
 import datetime
 
 import ddt
-from bulk_email.models import (
-    CourseEmail,
-    SEND_TO_COHORT,
-    SEND_TO_TRACK,
-    SEND_TO_STAFF,
-    CourseEmailTemplate,
-    CourseAuthorization,
-    BulkEmailFlag
-)
-from course_modes.models import CourseMode
 from django.core.management import call_command
 from django.test import TestCase
-from mock import patch, Mock
+from mock import Mock, patch
 from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
+
+from bulk_email.models import (
+    SEND_TO_COHORT,
+    SEND_TO_STAFF,
+    SEND_TO_TRACK,
+    BulkEmailFlag,
+    CourseAuthorization,
+    CourseEmail,
+    CourseEmailTemplate
+)
+from course_modes.models import CourseMode
+from openedx.core.djangoapps.course_groups.models import CourseCohort
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-
-from openedx.core.djangoapps.course_groups.models import CourseCohort
 
 
 @ddt.ddt

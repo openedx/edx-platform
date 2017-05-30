@@ -1,31 +1,31 @@
 """
 Instructor Tasks related to module state.
 """
-from django.contrib.auth.models import User
-import dogstats_wrapper as dog_stats_api
 import json
 import logging
 from time import time
 
-from eventtracking import tracker
+from django.contrib.auth.models import User
 from opaque_keys.edx.keys import UsageKey
-from xmodule.modulestore.django import modulestore
-from capa.responsetypes import StudentInputError, ResponseError, LoncapaProblemError
+from xblock.runtime import KvsFieldData
+
+import dogstats_wrapper as dog_stats_api
+from capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
 from courseware.courses import get_course_by_id, get_problems_in_section
-from courseware.models import StudentModule
 from courseware.model_data import DjangoKeyValueStore, FieldDataCache
+from courseware.models import StudentModule
 from courseware.module_render import get_module_for_descriptor_internal
+from eventtracking import tracker
 from lms.djangoapps.grades.scores import weighted_score
 from track.contexts import course_context_from_course_id
-from track.event_transaction_utils import set_event_transaction_type, create_new_event_transaction_id
+from track.event_transaction_utils import create_new_event_transaction_id, set_event_transaction_type
 from track.views import task_track
 from util.db import outer_atomic
-from xblock.runtime import KvsFieldData
+from xmodule.modulestore.django import modulestore
 
 from ..exceptions import UpdateProblemModuleStateError
 from .runner import TaskProgress
-from .utils import UPDATE_STATUS_SUCCEEDED, UPDATE_STATUS_FAILED, UPDATE_STATUS_SKIPPED, UNKNOWN_TASK_ID
-
+from .utils import UNKNOWN_TASK_ID, UPDATE_STATUS_FAILED, UPDATE_STATUS_SKIPPED, UPDATE_STATUS_SUCCEEDED
 
 TASK_LOG = logging.getLogger('edx.celery.task')
 

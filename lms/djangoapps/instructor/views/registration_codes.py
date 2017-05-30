@@ -1,18 +1,20 @@
 """
 E-commerce Tab Instructor Dashboard Query Registration Code Status.
 """
+import logging
+
 from django.core.urlresolvers import reverse
-from django.views.decorators.http import require_GET, require_POST
-from lms.djangoapps.instructor.enrollment import get_email_params, send_mail_to_student
 from django.utils.translation import ugettext as _
+from django.views.decorators.cache import cache_control
+from django.views.decorators.http import require_GET, require_POST
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
+
 from courseware.courses import get_course_by_id
+from lms.djangoapps.instructor.enrollment import get_email_params, send_mail_to_student
 from lms.djangoapps.instructor.views.api import require_level
+from shoppingcart.models import CourseRegistrationCode, RegistrationCodeRedemption
 from student.models import CourseEnrollment
 from util.json_request import JsonResponse
-from shoppingcart.models import CourseRegistrationCode, RegistrationCodeRedemption
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from django.views.decorators.cache import cache_control
-import logging
 
 log = logging.getLogger(__name__)
 

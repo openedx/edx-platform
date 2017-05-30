@@ -4,8 +4,9 @@ marked as "purchased" in the db
 """
 
 from django.core.management.base import BaseCommand
+
+from shoppingcart.exceptions import InvalidStatusToRetire, UnexpectedOrderItemStatus
 from shoppingcart.models import Order
-from shoppingcart.exceptions import UnexpectedOrderItemStatus, InvalidStatusToRetire
 
 
 class Command(BaseCommand):

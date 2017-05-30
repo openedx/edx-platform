@@ -5,13 +5,13 @@
 
 import mimetypes
 
-from edxmako.shortcuts import render_to_response, render_to_string
-from mako.exceptions import TopLevelLookupException
-from django.shortcuts import redirect
 from django.conf import settings
-from django.http import HttpResponseNotFound, HttpResponseServerError, Http404
+from django.http import Http404, HttpResponseNotFound, HttpResponseServerError
+from django.shortcuts import redirect
 from django.views.decorators.csrf import ensure_csrf_cookie
+from mako.exceptions import TopLevelLookupException
 
+from edxmako.shortcuts import render_to_response, render_to_string
 from util.cache import cache_if_anonymous
 
 valid_templates = []
