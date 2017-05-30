@@ -4,22 +4,23 @@
 Tests for import_course_from_xml using the mongo modulestore.
 """
 
+import copy
+from uuid import uuid4
+
+import ddt
+from django.conf import settings
 from django.test.client import Client
 from django.test.utils import override_settings
-from django.conf import settings
-import ddt
-import copy
 from mock import patch
 
 from openedx.core.djangoapps.content.course_structures.tests import SignalDisconnectTestMixin
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.contentstore.django import contentstore
+from xmodule.exceptions import NotFoundError
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.contentstore.django import contentstore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import check_exact_number_of_calls, check_number_of_calls
 from xmodule.modulestore.xml_importer import import_course_from_xml
-from xmodule.exceptions import NotFoundError
-from uuid import uuid4
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex

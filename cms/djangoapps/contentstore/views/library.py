@@ -7,31 +7,36 @@ from __future__ import absolute_import
 
 import logging
 
-from contentstore.views.item import create_xblock_info
-from contentstore.utils import reverse_library_url, add_instructor
-from django.http import HttpResponseNotAllowed, Http404, HttpResponseForbidden
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.conf import settings
+from django.http import Http404, HttpResponseForbidden, HttpResponseNotAllowed
 from django.utils.translation import ugettext as _
-from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import ensure_csrf_cookie
-from edxmako.shortcuts import render_to_response
+from django.views.decorators.http import require_http_methods
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator, LibraryUsageLocator
-from xmodule.modulestore.exceptions import DuplicateCourseError
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from .user import user_with_role
 
+from contentstore.utils import add_instructor, reverse_library_url
+from contentstore.views.item import create_xblock_info
 from course_creators.views import get_course_creator_status
-from .component import get_component_templates, CONTAINER_TEMPLATES
+from edxmako.shortcuts import render_to_response
 from student.auth import (
-    STUDIO_VIEW_USERS, STUDIO_EDIT_ROLES, get_user_permissions, has_studio_read_access, has_studio_write_access
+    STUDIO_EDIT_ROLES,
+    STUDIO_VIEW_USERS,
+    get_user_permissions,
+    has_studio_read_access,
+    has_studio_write_access
 )
 from student.roles import CourseInstructorRole, CourseStaffRole, LibraryUserRole
-from util.json_request import expect_json, JsonResponse, JsonResponseBadRequest
+from util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import DuplicateCourseError
+
+from .component import CONTAINER_TEMPLATES, get_component_templates
+from .user import user_with_role
 
 __all__ = ['library_handler', 'manage_library_users']
 

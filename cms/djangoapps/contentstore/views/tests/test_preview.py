@@ -2,24 +2,21 @@
 Tests for contentstore.views.preview.py
 """
 import re
+
 import ddt
 import mock
-from xblock.core import XBlock
-
 from django.test.client import Client, RequestFactory
+from xblock.core import XBlock, XBlockAside
 
-from xblock.core import XBlockAside
-from student.tests.factories import UserFactory
-
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-
-from contentstore.views.preview import get_preview_fragment, _preview_module_system
 from contentstore.utils import reverse_usage_url
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.test_asides import AsideTestType
+from contentstore.views.preview import _preview_module_system, get_preview_fragment
+from student.tests.factories import UserFactory
 from xblock_config.models import StudioConfig
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.test_asides import AsideTestType
 
 
 @ddt.ddt

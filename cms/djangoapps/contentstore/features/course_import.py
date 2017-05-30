@@ -3,8 +3,9 @@
 # pylint: disable=unused-argument
 
 import os
-from lettuce import world, step
+
 from django.conf import settings
+from lettuce import step, world
 
 
 def import_file(filename):

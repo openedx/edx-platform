@@ -8,55 +8,62 @@ from datetime import datetime
 from functools import partial
 from uuid import uuid4
 
-import dogstats_wrapper as dog_stats_api
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponseBadRequest, HttpResponse, Http404
+from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryUsageLocator
 from pytz import UTC
-
 from xblock.core import XBlock
 from xblock.fields import Scope
 from xblock.fragment import Fragment
 
-from xblock_config.models import CourseEditLTIFieldsEnabledFlag
-from xblock_django.user_service import DjangoXBlockUserService
-
+import dogstats_wrapper as dog_stats_api
 from cms.lib.xblock.authoring_mixin import VISIBILITY_VIEW
 from contentstore.utils import (
-    find_release_date_source, find_staff_lock_source, is_currently_visible_to_students,
-    ancestor_has_staff_lock, has_children_visible_to_specific_partition_groups,
-    get_user_partition_info, get_split_group_display_name,
+    ancestor_has_staff_lock,
+    find_release_date_source,
+    find_staff_lock_source,
+    get_split_group_display_name,
+    get_user_partition_info,
+    has_children_visible_to_specific_partition_groups,
+    is_currently_visible_to_students,
+    is_self_paced
 )
-from contentstore.views.helpers import is_unit, xblock_studio_url, xblock_primary_child_category, \
-    xblock_type_display_name, get_parent_xblock, create_xblock, usage_key_with_run
+from contentstore.views.helpers import (
+    create_xblock,
+    get_parent_xblock,
+    is_unit,
+    usage_key_with_run,
+    xblock_primary_child_category,
+    xblock_studio_url,
+    xblock_type_display_name
+)
 from contentstore.views.preview import get_preview_fragment
-from contentstore.utils import is_self_paced
-
-from openedx.core.lib.gating import api as gating_api
 from edxmako.shortcuts import render_to_string
 from models.settings.course_grading import CourseGradingModel
-from openedx.core.lib.xblock_utils import wrap_xblock, request_token
+from openedx.core.lib.gating import api as gating_api
+from openedx.core.lib.xblock_utils import request_token, wrap_xblock
 from static_replace import replace_static_urls
-from student.auth import has_studio_write_access, has_studio_read_access
+from student.auth import has_studio_read_access, has_studio_write_access
 from util.date_utils import get_default_time_display
-from util.json_request import expect_json, JsonResponse
+from util.json_request import JsonResponse, expect_json
 from util.milestones_helpers import is_entrance_exams_enabled
+from xblock_config.models import CourseEditLTIFieldsEnabledFlag
+from xblock_django.user_service import DjangoXBlockUserService
 from xmodule.course_module import DEFAULT_START_DATE
-from xmodule.modulestore import ModuleStoreEnum, EdxJSONEncoder
+from xmodule.modulestore import EdxJSONEncoder, ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
-from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
+from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.services import ConfigurationService, SettingsService
 from xmodule.tabs import CourseTabList
-from xmodule.x_module import PREVIEW_VIEWS, STUDIO_VIEW, STUDENT_VIEW, DEPRECATION_VSCOMPAT_EVENT
-
+from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT, PREVIEW_VIEWS, STUDENT_VIEW, STUDIO_VIEW
 
 __all__ = [
     'orphan_handler', 'xblock_handler', 'xblock_view_handler', 'xblock_outline_handler', 'xblock_container_handler'

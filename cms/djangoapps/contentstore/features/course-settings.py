@@ -1,12 +1,12 @@
 # pylint: disable=missing-docstring
 # pylint: disable=redefined-outer-name
 
-from lettuce import world, step
-from selenium.webdriver.common.keys import Keys
-from cms.djangoapps.contentstore.features.common import type_in_codemirror
 from django.conf import settings
+from lettuce import step, world
+from nose.tools import assert_false, assert_true
+from selenium.webdriver.common.keys import Keys
 
-from nose.tools import assert_true, assert_false
+from cms.djangoapps.contentstore.features.common import type_in_codemirror
 
 TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
 

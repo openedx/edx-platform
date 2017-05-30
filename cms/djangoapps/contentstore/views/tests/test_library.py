@@ -3,19 +3,19 @@ Unit tests for contentstore.views.library
 
 More important high-level tests are in contentstore/tests/test_libraries.py
 """
+import ddt
+import mock
 from django.conf import settings
-from contentstore.tests.utils import AjaxEnabledTestClient, parse_json
+from mock import patch
+from opaque_keys.edx.locator import CourseKey, LibraryLocator
+
+from contentstore.tests.utils import AjaxEnabledTestClient, CourseTestCase, parse_json
 from contentstore.utils import reverse_course_url, reverse_library_url
-from contentstore.tests.utils import CourseTestCase
 from contentstore.views.component import get_component_templates
 from contentstore.views.library import get_library_creator_status
 from course_creators.views import add_user_with_status_granted as grant_course_creator_status
-from xmodule.modulestore.tests.factories import LibraryFactory
-from mock import patch
-from opaque_keys.edx.locator import CourseKey, LibraryLocator
-import ddt
-import mock
 from student.roles import LibraryUserRole
+from xmodule.modulestore.tests.factories import LibraryFactory
 
 LIBRARY_REST_URL = '/library/'  # URL for GET/POST requests involving libraries
 

@@ -3,9 +3,10 @@
 
 from collections import OrderedDict
 
-from lettuce import world, step
-from nose.tools import assert_in, assert_false, assert_true, assert_equal
-from common import type_in_codemirror, get_codemirror_value
+from lettuce import step, world
+from nose.tools import assert_equal, assert_false, assert_in, assert_true
+
+from common import get_codemirror_value, type_in_codemirror
 
 CODEMIRROR_SELECTOR_PREFIX = "$('iframe').contents().find"
 
