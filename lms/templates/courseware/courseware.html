@@ -113,47 +113,6 @@ ${HTML(fragment.foot_html())}
 
 <div class="container">
   <div class="course-wrapper" role="presentation">
-
-% if disable_accordion is UNDEFINED or not disable_accordion:
-    <div class="course-index">
-
-      <div class="wrapper-course-modes">
-
-          <div class="courseware-bookmarks-button">
-              <a class="bookmarks-list-button" href="${reverse('openedx.course_bookmarks.home', args=[course.id])}">
-                  ${_('Bookmarks')}
-              </a>
-          </div>
-
-          % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
-            <div id="courseware-search-bar" class="search-bar courseware-search-bar" role="search" aria-label="Course">
-              <form>
-                <label for="course-search-input" class="sr">${_('Course Search')}</label>
-                <div class="search-field-wrapper">
-                  <input id="course-search-input" type="text" class="search-field"/>
-                  <button type="submit" class="search-button">${_('Search')}</button>
-                  <button type="button" class="cancel-button" title="${_('Clear search')}">
-                    <span class="icon fa fa-remove" aria-hidden="true"></span>
-                  </button>
-                </div>
-              </form>
-            </div>
-          % endif
-
-      </div>
-
-      <div class="accordion">
-        <nav class="course-navigation" aria-label="${_('Course')}">
-          % if accordion.strip():
-            ${HTML(accordion)}
-          % else:
-            <div class="chapter">${_("No content has been added to this course")}</div>
-          % endif
-        </nav>
-      </div>
-
-    </div>
-% endif
     <section class="course-content" id="course-content">
         <main id="main" tabindex="-1" aria-label="Content">
             <div
