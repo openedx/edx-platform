@@ -112,6 +112,20 @@ class mock_basket_order(mock_ecommerce_api_endpoint):
         return '/baskets/{}/order/'.format(self.basket_id)
 
 
+class mock_calculate_discount(mock_ecommerce_api_endpoint):
+    """ Mocks calls to E-Commerce API client basket calculate method. """
+
+    default_response = {
+        'total_incl_tax_excl_discounts': 200.0,
+        'currency': "USD",
+        'total_incl_tax': 100.0
+    }
+    method = httpretty.GET
+
+    def get_path(self):
+        return '/baskets/calculate/'
+
+
 class mock_create_refund(mock_ecommerce_api_endpoint):
     """ Mocks calls to E-Commerce API client refund creation method. """
 

@@ -38,6 +38,7 @@ max_hours_effort_per_week = program['max_hours_effort_per_week']
 video_url = (program.get('video', {}) or {}).get('src', '')
 banner_image = program.get('banner_image', {}).get('large', {}).get('url', '')
 description_max_length = 250
+price = program.get('discounted_price', full_program_price)
 %>
 
 <%static:css group='style-main-v2'/>
@@ -66,7 +67,7 @@ description_max_length = 250
           <a href="${program['basket_page_url']}" class="btn-brand btn-large hidden-sm btn-start">
             ${Text(_('Buy the {program_name} (${price} USD)')).format(
               program_name=title,
-              price=program['price_ranges'][0]['total']
+              price=price
             )}
           </a>
         </div>
@@ -131,7 +132,7 @@ description_max_length = 250
             </span>
             <span>
               ${Text(_('${full_program_price} for entire program')).format(
-                full_program_price=full_program_price
+                full_program_price=price
               )}
             </span>
           </li>

@@ -7,13 +7,16 @@ import ddt
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
+from edx_rest_api_client.exceptions import SlumberBaseException
 import mock
 from nose.plugins.attrib import attr
 from pytz import utc
 
 from course_modes.models import CourseMode
 from lms.djangoapps.certificates.api import MODES
+from lms.djangoapps.commerce.tests.mocks import mock_calculate_discount
 from lms.djangoapps.commerce.tests.test_utils import update_commerce_config
+from lms.djangoapps.commerce.utils import EcommerceService
 from openedx.core.djangoapps.catalog.tests.factories import (
     generate_course_run_key,
     ProgramFactory,
@@ -834,6 +837,19 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
         )
         return CourseFactory(course_runs=[course_run])
 
+    def _prepare_program_for_discounted_price_calculation_endpoint(self):
+        """
+        Program's applicable seat types should match some or all seat types of the seats that are a part of the program.
+        Otherwise, ecommerce API endpoint for calculating the discounted price won't be called.
+
+        Returns:
+            seat: seat for which the discount is applicable
+        """
+        self.ecommerce_service = EcommerceService()
+        seat = self.program['courses'][0]['course_runs'][0]['seats'][0]
+        self.program['applicable_seat_types'] = [seat['type']]
+        return seat
+
     def test_instructors(self):
         data = ProgramMarketingDataExtender(self.program, self.user).extend()
 
@@ -863,8 +879,8 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
     def test_learner_eligibility_for_one_click_purchase(self):
         """
         Learner should be eligible for one click purchase if:
-        - program is eligible for one click purchase
-        - learner is not enrolled in any of the course runs associated with the program
+            - program is eligible for one click purchase
+            - learner is not enrolled in any of the course runs associated with the program
         """
         data = ProgramMarketingDataExtender(self.program, self.user).extend()
         self.assertTrue(data['is_learner_eligible_for_one_click_purchase'])
@@ -887,3 +903,42 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
         )
         data = ProgramMarketingDataExtender(program2, self.user).extend()
         self.assertFalse(data['is_learner_eligible_for_one_click_purchase'])
+
+    def test_fetching_program_discounted_price(self):
+        """
+        Authenticated users eligible for one click purchase should see the purchase button
+            - displaying program's discounted price if it exists.
+            - leading to ecommerce basket page
+        """
+        seat = self._prepare_program_for_discounted_price_calculation_endpoint()
+
+        mock_discount_data = {
+            'total_incl_tax_excl_discounts': 200.0,
+            'currency': "USD",
+            'total_incl_tax': 50.0
+        }
+        with mock_calculate_discount(response=mock_discount_data):
+            data = ProgramMarketingDataExtender(self.program, self.user).extend()
+
+        self.assertEqual(data['basket_page_url'], self.ecommerce_service.checkout_page_url(seat['sku']))
+        self.assertEqual(data['discounted_price'], mock_discount_data['total_incl_tax'])
+
+    def test_fetching_program_discounted_price_no_applicable_seats(self):
+        """
+        User shouldn't be able to do a one click purchase of a program if a program has no applicable seat types.
+        """
+        data = ProgramMarketingDataExtender(self.program, self.user).extend()
+
+        self.assertEqual(data['basket_page_url'], '#courses')
+
+    def test_fetching_program_discounted_price_api_exception_caught(self):
+        """
+        User should be able to do a one click purchase of a program even if the ecommerce API throws an exception
+        during the calculation of program discounted price.
+        """
+        seat = self._prepare_program_for_discounted_price_calculation_endpoint()
+
+        with mock_calculate_discount(exception=SlumberBaseException):
+            data = ProgramMarketingDataExtender(self.program, self.user).extend()
+
+        self.assertEqual(data['basket_page_url'], self.ecommerce_service.checkout_page_url(seat['sku']))

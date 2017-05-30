@@ -43,6 +43,10 @@ def generate_price_ranges():
     }]
 
 
+def generate_seat_sku():
+    return 'sku_{}'.format(str(generate_zulu_datetime())[:10])
+
+
 class DictFactoryBase(factory.Factory):
     """
     Subclass this to make factories that can be used to produce fake API response
@@ -90,9 +94,10 @@ class OrganizationFactory(DictFactoryBase):
 
 
 class SeatFactory(DictFactoryBase):
-    type = factory.Faker('word')
-    price = factory.Faker('random_int')
     currency = 'USD'
+    price = factory.Faker('random_int')
+    sku = factory.LazyFunction(generate_seat_sku)
+    type = factory.Faker('word')
 
 
 class CourseRunFactory(DictFactoryBase):

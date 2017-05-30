@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Helper functions for working with Programs."""
 import datetime
+import logging
 from collections import defaultdict
 from copy import deepcopy
 from itertools import chain
@@ -11,6 +12,7 @@ from django.conf import settings
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.utils.functional import cached_property
+from edx_rest_api_client.exceptions import SlumberBaseException
 from opaque_keys.edx.keys import CourseKey
 from pytz import utc
 
@@ -19,6 +21,7 @@ from lms.djangoapps.certificates import api as certificate_api
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.access import has_access
 from openedx.core.djangoapps.catalog.utils import get_programs
+from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credentials.utils import get_credentials
 from student.models import CourseEnrollment
@@ -27,6 +30,8 @@ from xmodule.modulestore.django import modulestore
 
 # The datetime module's strftime() methods require a year >= 1900.
 DEFAULT_ENROLLMENT_START_DATE = datetime.datetime(1900, 1, 1, tzinfo=utc)
+
+log = logging.getLogger(__name__)
 
 
 def get_program_marketing_url(programs_config):
@@ -581,7 +586,6 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
         applicable_seat_types = self.data['applicable_seat_types']
         is_learner_eligible_for_one_click_purchase = self.data['is_program_eligible_for_one_click_purchase']
         skus = []
-
         if is_learner_eligible_for_one_click_purchase:
             for course in self.data['courses']:
                 is_learner_eligible_for_one_click_purchase = not any(
@@ -595,6 +599,15 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
                 else:
                     skus = []
                     break
+
+        if skus and not self.user.is_anonymous():
+            try:
+                api = ecommerce_api_client(self.user)
+                # Make an API call to calculate the discounted price
+                results = api.baskets.calculate.get(sku=skus)
+                self.data['discounted_price'] = results.get('total_incl_tax')
+            except SlumberBaseException:
+                log.exception('Failed to get discount price for following product SKUs: %s ', ', '.join(skus))
 
         self.data.update({
             'basket_page_url': self.ecommerce_service.checkout_page_url(*skus) if skus else '#courses',
