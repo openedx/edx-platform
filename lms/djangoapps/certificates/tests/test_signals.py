@@ -1,5 +1,6 @@
-""" Unit tests for enabling self-generated certificates for
-self-paced courses and disabling for instructor-paced courses.
+"""
+Unit tests for enabling self-generated certificates for self-paced courses
+and disabling for instructor-paced courses.
 """
 from certificates import api as certs_api
 from certificates.models import CertificateGenerationConfiguration
@@ -10,8 +11,8 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
 class SelfGeneratedCertsSignalTest(ModuleStoreTestCase):
-    """ Tests for enabling/disabling self-generated certificates
-    according to pacing.
+    """
+    Tests for enabling/disabling self-generated certificates according to course-pacing.
     """
 
     def setUp(self):
