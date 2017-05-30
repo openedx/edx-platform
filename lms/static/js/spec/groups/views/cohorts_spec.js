@@ -276,7 +276,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                 );
 
                 // If no cohorts have been created, can't upload a CSV file.
-                expect(cohortsView.$('.wrapper-cohort-supplemental')).toHaveClass('is-hidden');
+                expect(cohortsView.$('.wrapper-cohort-supplemental')).toHaveClass('hidden');
             });
 
             it('syncs data when membership tab is clicked', function() {
@@ -294,7 +294,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                 createCohortsView(this);
 
                 // Should see the control to toggle CSV file upload.
-                expect(cohortsView.$('.wrapper-cohort-supplemental')).not.toHaveClass('is-hidden');
+                expect(cohortsView.$('.wrapper-cohort-supplemental')).not.toHaveClass('hidden');
                 // But upload form should not be visible until toggle is clicked.
                 expect(cohortsView.$(fileUploadFormCss).length).toBe(0);
                 uploadCsvToggle = cohortsView.$('.toggle-cohort-management-secondary');
@@ -302,7 +302,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                     toContain('Assign students to cohorts by uploading a CSV file');
                 uploadCsvToggle.click();
                 // After toggle is clicked, it should be hidden.
-                expect(uploadCsvToggle).toHaveClass('is-hidden');
+                expect(uploadCsvToggle).toHaveClass('hidden');
 
                 fileUploadForm = cohortsView.$(fileUploadFormCss);
                 expect(fileUploadForm.length).toBe(1);
@@ -517,7 +517,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                     cohortsView.$('.action-create').click();
                     expect(cohortsView.$('.cohort-management-settings-form').length).toBe(1);
                     expect(cohortsView.$('.cohort-management-nav')).toHaveClass('is-disabled');
-                    expect(cohortsView.$('.cohort-management-group')).toHaveClass('is-hidden');
+                    expect(cohortsView.$('.cohort-management-group')).toHaveClass('hidden');
                     cohortsView.$('.cohort-name').val(defaultCohortName);
                     cohortsView.$('.type-random').prop('checked', true).change();
                     selectContentGroup(contentGroupId, MOCK_COHORTED_USER_PARTITION_ID);
@@ -544,7 +544,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                     );
                     verifyHeader(1, defaultCohortName, 0, MOCK_RANDOM_ASSIGNMENT);
                     expect(cohortsView.$('.cohort-management-nav')).not.toHaveClass('is-disabled');
-                    expect(cohortsView.$('.cohort-management-group')).not.toHaveClass('is-hidden');
+                    expect(cohortsView.$('.cohort-management-group')).not.toHaveClass('hidden');
                     expect(getAddModal().find('.cohort-management-settings-form').length).toBe(0);
                 });
 

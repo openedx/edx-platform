@@ -868,9 +868,20 @@ def available_division_schemes(course_key):
     available_schemes = []
     if is_course_cohorted(course_key):
         available_schemes.append(CourseDiscussionSettings.COHORT)
-    if len(_get_enrollment_track_groups(course_key)) > 1:
+    if enrollment_track_group_count(course_key) > 1:
         available_schemes.append(CourseDiscussionSettings.ENROLLMENT_TRACK)
     return available_schemes
+
+
+def enrollment_track_group_count(course_key):
+    """
+    Returns the count of possible enrollment track division schemes for this course.
+    Args:
+        course_key: CourseKey
+    Returns:
+        Count of enrollment track division scheme
+    """
+    return len(_get_enrollment_track_groups(course_key))
 
 
 def _get_course_division_scheme(course_discussion_settings):
@@ -882,7 +893,7 @@ def _get_course_division_scheme(course_discussion_settings):
         division_scheme = CourseDiscussionSettings.NONE
     elif (
         division_scheme == CourseDiscussionSettings.ENROLLMENT_TRACK and
-        len(_get_enrollment_track_groups(course_discussion_settings.course_id)) <= 1
+        enrollment_track_group_count(course_discussion_settings.course_id) <= 1
     ):
         division_scheme = CourseDiscussionSettings.NONE
     return division_scheme
