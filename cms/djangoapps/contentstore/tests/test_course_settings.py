@@ -1,34 +1,35 @@
 """
 Tests for Studio Course Settings.
 """
-import copy
 import datetime
+import ddt
 import json
+import copy
+import mock
+from mock import Mock, patch
 import unittest
 
-import ddt
-import mock
-from contentstore.utils import reverse_course_url, reverse_usage_url
 from django.conf import settings
-from django.test.utils import override_settings
 from django.utils.timezone import UTC
-from milestones.tests.utils import MilestonesTestCaseMixin
-from mock import Mock, patch
+from django.test.utils import override_settings
+
+from contentstore.utils import reverse_course_url, reverse_usage_url
 from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
 from models.settings.encoder import CourseSettingsEncoder
-from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
-from openedx.core.lib.xblock_fields.fields import Date
+from openedx.core.djangoapps.models.course_details import CourseDetails
 from student.roles import CourseInstructorRole, CourseStaffRole
 from student.tests.factories import UserFactory
 from xblock_django.models import XBlockStudioConfigurationFlag
+from xmodule.fields import Date
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.tabs import InvalidTabsException
+from milestones.tests.utils import MilestonesTestCaseMixin
 
-from .utils import AjaxEnabledTestClient, CourseTestCase
+from .utils import CourseTestCase, AjaxEnabledTestClient
 
 
 def get_url(course_id, handler_name='settings_handler'):

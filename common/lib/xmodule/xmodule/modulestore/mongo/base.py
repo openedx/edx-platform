@@ -13,44 +13,45 @@ structure:
 """
 
 import copy
-import logging
-import re
-import sys
 from datetime import datetime
 from importlib import import_module
+import logging
+import pymongo
+import re
+import sys
 from uuid import uuid4
 
-import pymongo
 from bson.son import SON
 from contracts import contract, new_contract
 from fs.osfs import OSFS
 from mongodb_proxy import autoretry_read
-from opaque_keys.edx.keys import AssetKey, CourseKey, UsageKey
-from opaque_keys.edx.locations import BlockUsageLocator, Location, SlashSeparatedCourseKey
+from opaque_keys.edx.keys import UsageKey, CourseKey, AssetKey
+from opaque_keys.edx.locations import Location, BlockUsageLocator, SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator, LibraryLocator
-from openedx.core.lib.partitions.partitions_service import PartitionService
-from openedx.core.lib.xblock_fields.inherited_fields import InheritanceMixin
 from path import Path as path
 from pytz import UTC
 from xblock.core import XBlock
 from xblock.exceptions import InvalidScopeError
-from xblock.fields import Reference, ReferenceList, ReferenceValueDict, Scope, ScopeIds
+from xblock.fields import Scope, ScopeIds, Reference, ReferenceList, ReferenceValueDict
 from xblock.runtime import KvsFieldData
+
 from xmodule.assetstore import AssetMetadata, CourseAssetsFromStorage
 from xmodule.course_module import CourseSummary
 from xmodule.error_module import ErrorDescriptor
-from xmodule.errortracker import exc_info_to_str, null_error_tracker
+from xmodule.errortracker import null_error_tracker, exc_info_to_str
 from xmodule.exceptions import HeartbeatFailure
 from xmodule.mako_module import MakoDescriptorSystem
-from xmodule.modulestore import BulkOperationsMixin, BulkOpsRecord, ModuleStoreEnum, ModuleStoreWriteBase
-from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES, ModuleStoreDraftAndPublished
-from xmodule.modulestore.edit_info import EditInfoRuntimeMixin
-from xmodule.modulestore.exceptions import DuplicateCourseError, ItemNotFoundError, ReferentialIntegrityError
-from xmodule.modulestore.inheritance import InheritanceKeyValueStore, inherit_metadata
-from xmodule.modulestore.store_utilities import DETACHED_XBLOCK_TYPES
-from xmodule.modulestore.xml import CourseLocationManager
 from xmodule.mongo_utils import connect_to_mongodb, create_collection_index
+from xmodule.modulestore import ModuleStoreWriteBase, ModuleStoreEnum, BulkOperationsMixin, BulkOpsRecord
+from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished, DIRECT_ONLY_CATEGORIES
+from xmodule.modulestore.edit_info import EditInfoRuntimeMixin
+from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError, ReferentialIntegrityError
+from xmodule.modulestore.inheritance import InheritanceMixin, inherit_metadata, InheritanceKeyValueStore
+from xmodule.partitions.partitions_service import PartitionService
+from xmodule.modulestore.xml import CourseLocationManager
+from xmodule.modulestore.store_utilities import DETACHED_XBLOCK_TYPES
 from xmodule.services import SettingsService
+
 
 log = logging.getLogger(__name__)
 

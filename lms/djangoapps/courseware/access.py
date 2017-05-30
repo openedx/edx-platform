@@ -10,12 +10,33 @@ Note: The access control logic in this file does NOT check for enrollment in
   If enrollment is to be checked, use get_course_with_access in courseware.courses.
   It is a wrapper around has_access that additionally checks for enrollment.
 """
-import logging
 from datetime import datetime
-
+import logging
 import pytz
-from ccx_keys.locator import CCXLocator
-from courseware.access_response import MilestoneError, MobileAvailabilityError, VisibilityError
+
+from django.conf import settings
+from django.contrib.auth.models import AnonymousUser
+from django.utils.timezone import UTC
+
+from opaque_keys.edx.keys import CourseKey, UsageKey
+
+from util import milestones_helpers as milestones_helpers
+from xblock.core import XBlock
+
+from xmodule.course_module import (
+    CourseDescriptor,
+    CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
+    CATALOG_VISIBILITY_ABOUT,
+)
+from xmodule.error_module import ErrorDescriptor
+from xmodule.x_module import XModule
+from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError
+
+from courseware.access_response import (
+    MilestoneError,
+    MobileAvailabilityError,
+    VisibilityError,
+)
 from courseware.access_utils import (
     ACCESS_DENIED,
     ACCESS_GRANTED,
@@ -25,16 +46,11 @@ from courseware.access_utils import (
     in_preview_mode
 )
 from courseware.masquerade import get_masquerade_role, is_masquerading_as_student
-from django.conf import settings
-from django.contrib.auth.models import AnonymousUser
-from django.utils.timezone import UTC
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from mobile_api.models import IgnoreMobileAvailableFlagConfig
-from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
-from openedx.core.lib.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError
 from student import auth
 from student.models import CourseEnrollmentAllowed
 from student.roles import (
@@ -43,20 +59,16 @@ from student.roles import (
     CourseInstructorRole,
     CourseStaffRole,
     GlobalStaff,
+    SupportStaffRole,
     OrgInstructorRole,
     OrgStaffRole,
-    SupportStaffRole
 )
-from util import milestones_helpers as milestones_helpers
 from util.milestones_helpers import (
-    any_unfulfilled_milestones,
     get_pre_requisite_courses_not_completed,
-    is_prerequisite_courses_enabled
+    any_unfulfilled_milestones,
+    is_prerequisite_courses_enabled,
 )
-from xblock.core import XBlock
-from xmodule.course_module import CATALOG_VISIBILITY_ABOUT, CATALOG_VISIBILITY_CATALOG_AND_ABOUT, CourseDescriptor
-from xmodule.error_module import ErrorDescriptor
-from xmodule.x_module import XModule
+from ccx_keys.locator import CCXLocator
 
 log = logging.getLogger(__name__)
 

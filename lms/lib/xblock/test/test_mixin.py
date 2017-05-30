@@ -2,13 +2,14 @@
 Tests of the LMS XBlock Mixin
 """
 import ddt
-from lms_xblock.mixin import INVALID_USER_PARTITION_GROUP_VALIDATION, INVALID_USER_PARTITION_VALIDATION
 from nose.plugins.attrib import attr
-from openedx.core.lib.partitions.partitions import Group, UserPartition
+
+from lms_xblock.mixin import INVALID_USER_PARTITION_VALIDATION, INVALID_USER_PARTITION_GROUP_VALIDATION
 from xblock.validation import ValidationMessage
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, ToyCourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ToyCourseFactory, ItemFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_MIXED_MODULESTORE
+from xmodule.partitions.partitions import Group, UserPartition
 
 
 class LmsXBlockMixinTestCase(ModuleStoreTestCase):

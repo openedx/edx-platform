@@ -1,17 +1,16 @@
 """
 Tests for the Studio authoring XBlock mixin.
 """
-from course_modes.tests.factories import CourseModeFactory
 from django.conf import settings
 from django.test.utils import override_settings
-from openedx.core.lib.partitions.partitions import (
-    ENROLLMENT_TRACK_PARTITION_ID,
-    MINIMUM_STATIC_PARTITION_ID,
-    Group,
-    UserPartition
-)
+
+from course_modes.tests.factories import CourseModeFactory
+
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.partitions.partitions import (
+    Group, UserPartition, ENROLLMENT_TRACK_PARTITION_ID, MINIMUM_STATIC_PARTITION_ID
+)
 
 
 class AuthoringMixinTestCase(ModuleStoreTestCase):

@@ -731,7 +731,7 @@ VIRTUAL_UNIVERSITIES = []
 ############# XBlock Configuration ##########
 
 # Import after sys.path fixup
-from openedx.core.lib.xblock_fields.inherited_fields import InheritanceMixin
+from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore import prefer_xmodules
 from xmodule.x_module import XModuleMixin
 

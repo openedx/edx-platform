@@ -2,17 +2,17 @@
 """Test for LTI Xmodule functional logic."""
 
 import datetime
-import textwrap
-import urllib
-from copy import copy
-
 from django.utils.timezone import UTC
+from mock import Mock, patch, PropertyMock
+import textwrap
 from lxml import etree
-from mock import Mock, PropertyMock, patch
-from openedx.core.lib.xblock_fields.fields import Timedelta
 from webob.request import Request
-from xmodule.lti_2_util import LTIError
+from copy import copy
+import urllib
+
+from xmodule.fields import Timedelta
 from xmodule.lti_module import LTIDescriptor
+from xmodule.lti_2_util import LTIError
 
 from . import LogicTest
 
