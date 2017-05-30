@@ -21,6 +21,7 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from courseware.courses import get_course_with_access
 from edxmako.shortcuts import render_to_response
+from django_comment_common.models import CourseDiscussionSettings
 
 from . import cohorts
 from lms.djangoapps.django_comment_client.utils import get_discussion_category_map, get_discussion_categories_ids
@@ -64,7 +65,7 @@ def unlink_cohort_partition_group(cohort):
 
 
 # pylint: disable=invalid-name
-def _get_course_cohort_settings_representation(course, course_cohort_settings):
+def _get_course_cohort_settings_representation(course, course_cohort_settings, course_discussion_settings):
     """
     Returns a JSON representation of a course cohort settings.
     """
@@ -74,10 +75,12 @@ def _get_course_cohort_settings_representation(course, course_cohort_settings):
 
     return {
         'id': course_cohort_settings.id,
+        # is_cohorted will continue to be a part of CourseCohortSettings
         'is_cohorted': course_cohort_settings.is_cohorted,
         'cohorted_inline_discussions': cohorted_inline_discussions,
         'cohorted_course_wide_discussions': cohorted_course_wide_discussions,
-        'always_cohort_inline_discussions': course_cohort_settings.always_cohort_inline_discussions,
+        # 'always_cohort_inline_discussions' should be renamed to always_divide_inline_discussions
+        'always_cohort_inline_discussions': course_discussion_settings.always_divide_inline_discussions,
     }
 
 
@@ -102,19 +105,29 @@ def get_cohorted_discussions(course, course_settings):
     """
     Returns the course-wide and inline cohorted discussion ids separately.
     """
-    cohorted_course_wide_discussions = []
-    cohorted_inline_discussions = []
+    divided_course_wide_discussions = []
+    divided_inline_discussions = []
 
     course_wide_discussions = [topic['id'] for __, topic in course.discussion_topics.items()]
     all_discussions = get_discussion_categories_ids(course, None, include_all=True)
 
-    for cohorted_discussion_id in course_settings.cohorted_discussions:
-        if cohorted_discussion_id in course_wide_discussions:
-            cohorted_course_wide_discussions.append(cohorted_discussion_id)
-        elif cohorted_discussion_id in all_discussions:
-            cohorted_inline_discussions.append(cohorted_discussion_id)
+    course_discussion_settings, created = CourseDiscussionSettings.objects.get_or_create(course_id=course.id)
+    divided_discussions = course_discussion_settings.divided_discussions.all()
 
-    return cohorted_course_wide_discussions, cohorted_inline_discussions
+    # Get just the IDs from all of the divided_discussions for easy set comparisons
+    divided_discussion_ids = list(
+        map(lambda divided_discussion: divided_discussion.discussion_id, divided_discussions)
+    )
+    if not divided_discussion_ids:
+        divided_discussion_ids = course_settings.cohorted_discussions
+
+    for divided_discussion_id in divided_discussion_ids:
+        if divided_discussion_id in course_wide_discussions:
+            divided_course_wide_discussions.append(divided_discussion_id)
+        elif divided_discussion_id in all_discussions:
+            divided_inline_discussions.append(divided_discussion_id)
+
+    return divided_course_wide_discussions, divided_inline_discussions
 
 
 @require_http_methods(("GET", "PATCH"))
@@ -133,6 +146,7 @@ def course_cohort_settings_handler(request, course_key_string):
     course_key = CourseKey.from_string(course_key_string)
     course = get_course_with_access(request.user, 'staff', course_key)
     cohort_settings = cohorts.get_course_cohort_settings(course_key)
+    discussion_settings = cohorts.get_course_discussion_settings(course_key)
 
     if request.method == 'PATCH':
         cohorted_course_wide_discussions, cohorted_inline_discussions = get_cohorted_discussions(
@@ -154,7 +168,7 @@ def course_cohort_settings_handler(request, course_key_string):
             settings_to_change['cohorted_discussions'] = cohorted_course_wide_discussions + cohorted_inline_discussions
 
         if 'always_cohort_inline_discussions' in request.json:
-            settings_to_change['always_cohort_inline_discussions'] = request.json.get(
+            settings_to_change['always_divide_inline_discussions'] = request.json.get(
                 'always_cohort_inline_discussions'
             )
 
@@ -162,14 +176,14 @@ def course_cohort_settings_handler(request, course_key_string):
             return JsonResponse({"error": unicode("Bad Request")}, 400)
 
         try:
-            cohort_settings = cohorts.set_course_cohort_settings(
+            cohort_settings, discussion_settings = cohorts.set_course_cohort_settings(
                 course_key, **settings_to_change
             )
         except ValueError as err:
             # Note: error message not translated because it is not exposed to the user (UI prevents this state).
             return JsonResponse({"error": unicode(err)}, 400)
 
-    return JsonResponse(_get_course_cohort_settings_representation(course, cohort_settings))
+    return JsonResponse(_get_course_cohort_settings_representation(course, cohort_settings, discussion_settings))
 
 
 @require_http_methods(("GET", "PUT", "POST", "PATCH"))

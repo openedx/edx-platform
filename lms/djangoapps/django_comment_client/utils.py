@@ -25,7 +25,7 @@ from courseware import courses
 from courseware.access import has_access
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from openedx.core.djangoapps.course_groups.cohorts import (
-    get_course_cohort_settings, get_cohort_by_id, get_cohort_id, is_course_cohorted
+    get_course_cohort_settings, get_cohort_by_id, get_cohort_id, is_course_cohorted, get_divided_discussion_ids
 )
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from request_cache.middleware import request_cached
@@ -311,6 +311,9 @@ def get_discussion_category_map(course, user, divided_only_if_explicit=False, ex
     xblocks = get_accessible_discussion_xblocks(course, user)
 
     course_cohort_settings = get_course_cohort_settings(course.id)
+    divided_discussion_ids = get_divided_discussion_ids(course.id)
+    if not divided_discussion_ids:
+        divided_discussion_ids = course_cohort_settings.cohorted_discussions
 
     for xblock in xblocks:
         discussion_id = xblock.discussion_id
@@ -363,7 +366,7 @@ def get_discussion_category_map(course, user, divided_only_if_explicit=False, ex
         for entry in entries:
             is_entry_divided = (
                 course_cohort_settings.is_cohorted and (
-                    divide_all_inline_discussions or entry["id"] in course_cohort_settings.cohorted_discussions
+                    divide_all_inline_discussions or entry["id"] in divided_discussion_ids
                 )
             )
 
@@ -386,9 +389,7 @@ def get_discussion_category_map(course, user, divided_only_if_explicit=False, ex
             "id": entry["id"],
             "sort_key": entry.get("sort_key", topic),
             "start_date": datetime.now(UTC()),
-            "is_divided": (
-                course_cohort_settings.is_cohorted and entry["id"] in course_cohort_settings.cohorted_discussions
-            )
+            "is_divided": (course_cohort_settings.is_cohorted and entry["id"] in divided_discussion_ids)
         }
 
     _sort_map_entries(category_map, course.discussion_sort_alpha)
