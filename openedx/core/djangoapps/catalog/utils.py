@@ -38,7 +38,7 @@ def get_programs(uuid=None):
         list of dict, representing programs.
         dict, if a specific program is requested.
     """
-    missing_details_msg_tpl = 'Details for program {uuid} are not cached.'
+    missing_details_msg_tpl = 'Failed to get details for program {uuid} from the cache.'
 
     if uuid:
         program = cache.get(PROGRAM_CACHE_KEY_TPL.format(uuid=uuid))
@@ -49,14 +49,31 @@ def get_programs(uuid=None):
 
     uuids = cache.get(PROGRAM_UUIDS_CACHE_KEY, [])
     if not uuids:
-        logger.warning('Program UUIDs are not cached.')
+        logger.warning('Failed to get program UUIDs from the cache.')
 
     programs = cache.get_many([PROGRAM_CACHE_KEY_TPL.format(uuid=uuid) for uuid in uuids])
     programs = list(programs.values())
 
+    # The get_many above sometimes fails to bring back details cached on one or
+    # more Memcached nodes. It doesn't look like these keys are being evicted.
+    # 99% of the time all keys come back, but 1% of the time all the keys stored
+    # on one or more nodes are missing from the result of the get_many. One
+    # get_many may fail to bring these keys back, but a get_many occurring
+    # immediately afterwards will succeed in bringing back all the keys. This
+    # behavior can be mitigated by trying again for the missing keys, which is
+    # what we do here. Splitting the get_many into smaller chunks may also help.
     missing_uuids = set(uuids) - set(program['uuid'] for program in programs)
-    for uuid in missing_uuids:
-        logger.warning(missing_details_msg_tpl.format(uuid=uuid))
+    if missing_uuids:
+        logger.info(
+            'Failed to get details for {count} programs. Retrying.'.format(count=len(missing_uuids))
+        )
+
+        retried_programs = cache.get_many([PROGRAM_CACHE_KEY_TPL.format(uuid=uuid) for uuid in missing_uuids])
+        programs += list(retried_programs.values())
+
+        still_missing_uuids = set(uuids) - set(program['uuid'] for program in programs)
+        for uuid in still_missing_uuids:
+            logger.warning(missing_details_msg_tpl.format(uuid=uuid))
 
     return programs
 

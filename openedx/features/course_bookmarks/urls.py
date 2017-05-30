@@ -4,7 +4,7 @@ Defines URLs for the course experience.
 
 from django.conf.urls import url
 
-from views.course_bookmarks import CourseBookmarksView, CourseBookmarksFragmentView
+from views.course_bookmarks import CourseBookmarksFragmentView, CourseBookmarksView
 
 urlpatterns = [
     url(

@@ -58,38 +58,52 @@ import copy
 import datetime
 import hashlib
 import logging
+from collections import defaultdict
+from importlib import import_module
 from types import NoneType
 
-from contracts import contract, new_contract
-from importlib import import_module
 import six
-
 from bson.objectid import ObjectId
+from ccx_keys.locator import CCXBlockUsageLocator, CCXLocator
+from contracts import contract, new_contract
 from mongodb_proxy import autoretry_read
-from path import Path as path
-from pytz import UTC
-
-from ccx_keys.locator import CCXLocator, CCXBlockUsageLocator
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import (
-    BlockUsageLocator, DefinitionLocator, CourseLocator, LibraryLocator, VersionTree, LocalId,
+    BlockUsageLocator,
+    CourseLocator,
+    DefinitionLocator,
+    LibraryLocator,
+    LocalId,
+    VersionTree
 )
+from openedx.core.lib.partitions.partitions_service import PartitionService
+from openedx.core.lib.xblock_fields.inherited_fields import InheritanceMixin
+from path import Path as path
+from pytz import UTC
 from xblock.core import XBlock
-from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
-
+from xblock.fields import Reference, ReferenceList, ReferenceValueDict, Scope
 from xmodule.assetstore import AssetMetadata
+from xmodule.course_module import CourseSummary
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import null_error_tracker
 from xmodule.modulestore import (
-    inheritance, ModuleStoreWriteBase, ModuleStoreEnum,
-    BulkOpsRecord, BulkOperationsMixin, SortedAssetList, BlockData
+    BlockData,
+    BulkOperationsMixin,
+    BulkOpsRecord,
+    ModuleStoreEnum,
+    ModuleStoreWriteBase,
+    SortedAssetList
 )
-from xmodule.modulestore.exceptions import InsufficientSpecificationError, VersionConflictError, DuplicateItemError, \
-    DuplicateCourseError, MultipleCourseBlocksFound
-from xmodule.modulestore.split_mongo.mongo_connection import MongoConnection, DuplicateKeyError
+from xmodule.modulestore.exceptions import (
+    DuplicateCourseError,
+    DuplicateItemError,
+    InsufficientSpecificationError,
+    MultipleCourseBlocksFound,
+    VersionConflictError
+)
 from xmodule.modulestore.split_mongo import BlockKey, CourseEnvelope
+from xmodule.modulestore.split_mongo.mongo_connection import DuplicateKeyError, MongoConnection
 from xmodule.modulestore.store_utilities import DETACHED_XBLOCK_TYPES
-from xmodule.partitions.partitions_service import PartitionService
 from ..exceptions import ItemNotFoundError
 from .caching_descriptor_system import CachingDescriptorSystem
 
@@ -2147,7 +2161,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         else:
             inherited_settings = parent_xblock.xblock_kvs.inherited_settings.copy()
             if fields is not None:
-                for field_name in inheritance.InheritanceMixin.fields:
+                for field_name in InheritanceMixin.fields:
                     if field_name in fields:
                         inherited_settings[field_name] = fields[field_name]
 
@@ -2696,7 +2710,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         # update the inheriting w/ what should pass to children
         inheriting_settings = inherited_settings_map[block_key].copy()
         block_fields = block_data.fields
-        for field_name in inheritance.InheritanceMixin.fields:
+        for field_name in InheritanceMixin.fields:
             if field_name in block_fields:
                 inheriting_settings[field_name] = block_fields[field_name]
 

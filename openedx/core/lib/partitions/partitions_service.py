@@ -7,7 +7,7 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 import logging
 
-from xmodule.partitions.partitions import UserPartition, UserPartitionError, ENROLLMENT_TRACK_PARTITION_ID
+from .partitions import UserPartition, UserPartitionError, ENROLLMENT_TRACK_PARTITION_ID
 from xmodule.modulestore.django import modulestore
 
 

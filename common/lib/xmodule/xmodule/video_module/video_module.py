@@ -18,35 +18,33 @@ import logging
 import random
 from collections import OrderedDict
 from operator import itemgetter
-from lxml import etree
+
 from pkg_resources import resource_string
 
 from django.conf import settings
-
-from openedx.core.lib.cache_utils import memoize_in_request_cache
+from lxml import etree
+from opaque_keys.edx.locator import AssetLocator
 from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag
+from openedx.core.lib.cache_utils import memoize_in_request_cache
+from openedx.core.lib.license import LicenseMixin
 from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.runtime import KvsFieldData
-from opaque_keys.edx.locator import AssetLocator
-
-from xmodule.modulestore.inheritance import InheritanceKeyValueStore, own_metadata
-from xmodule.x_module import XModule, module_attr
-from xmodule.editing_module import TabsEditingDescriptor
-from xmodule.raw_module import EmptyDataRawDescriptor
-from xmodule.xml_module import is_pointer_tag, name_to_pathname, deserialize_field
-from xmodule.exceptions import NotFoundError
 from xmodule.contentstore.content import StaticContent
-from xmodule.validation import StudioValidationMessage, StudioValidation
-
-from .transcripts_utils import VideoTranscriptsMixin, Transcript, get_html5_ids
-from .video_utils import create_youtube_string, get_poster, rewrite_video_url, format_xml_exception_message
-from .bumper_utils import bumperize
-from .video_xfields import VideoFields
-from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
-
+from xmodule.editing_module import TabsEditingDescriptor
+from xmodule.exceptions import NotFoundError
+from xmodule.modulestore.inheritance import InheritanceKeyValueStore, own_metadata
+from xmodule.raw_module import EmptyDataRawDescriptor
+from xmodule.validation import StudioValidation, StudioValidationMessage
 from xmodule.video_module import manage_video_subtitles_save
-from xmodule.mixin import LicenseMixin
+from xmodule.x_module import XModule, module_attr
+from xmodule.xml_module import deserialize_field, is_pointer_tag, name_to_pathname
+
+from .bumper_utils import bumperize
+from .transcripts_utils import Transcript, VideoTranscriptsMixin, get_html5_ids
+from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
+from .video_utils import create_youtube_string, format_xml_exception_message, get_poster, rewrite_video_url
+from .video_xfields import VideoFields
 
 # The following import/except block for edxval is temporary measure until
 # edxval is a proper XBlock Runtime Service.
@@ -703,10 +701,32 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             'default_value': [get_youtube_link(youtube_id_1_0['default_value'])]
         })
 
-        youtube_id_1_0_value = get_youtube_link(youtube_id_1_0['value'])
+        source_url = self.create_youtube_url(youtube_id_1_0['value'])
 
-        if youtube_id_1_0_value:
-            video_url['value'].insert(0, youtube_id_1_0_value)
+        # First try a lookup in VAL. If any video encoding is found given the video id then
+        # override the source_url with it.
+        if self.edx_video_id and edxval_api:
+
+            val_profiles = ['youtube', 'desktop_webm', 'desktop_mp4']
+            if HLSPlaybackEnabledFlag.feature_enabled(self.runtime.course_id.for_branch(None)):
+                val_profiles.append('hls')
+
+            # Get video encodings for val profiles.
+            val_video_encodings = edxval_api.get_urls_for_profiles(self.edx_video_id, val_profiles)
+
+            # If multiple encodings are there in val, the priority will be: youtube > hls > mp4 and webm.
+            if val_video_encodings.get('youtube'):
+                source_url = self.create_youtube_url(val_video_encodings['youtube'])
+            elif val_video_encodings.get('hls'):
+                source_url = val_video_encodings['hls']
+            elif val_video_encodings.get('desktop_mp4'):
+                source_url = val_video_encodings['desktop_mp4']
+            elif val_video_encodings.get('desktop_webm'):
+                source_url = val_video_encodings['desktop_webm']
+
+        # Only add if html5 sources do not already contain source_url.
+        if source_url and source_url not in video_url['value']:
+            video_url['value'].insert(0, source_url)
 
         metadata = {
             'display_name': display_name,

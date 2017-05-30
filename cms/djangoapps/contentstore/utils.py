@@ -4,26 +4,23 @@ Common utility functions useful throughout the contentstore
 
 import logging
 from datetime import datetime
-from pytz import UTC
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from django_comment_common.models import assign_default_role
 from django_comment_common.utils import seed_permissions_roles
-
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
-from xmodule.partitions.partitions_service import get_all_partitions_for_course
-
+from openedx.core.lib.partitions.partitions_service import get_all_partitions_for_course
+from pytz import UTC
+from student import auth
+from student.models import CourseEnrollment
+from student.roles import CourseInstructorRole, CourseStaffRole
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from opaque_keys.edx.keys import UsageKey, CourseKey
-from student.roles import CourseInstructorRole, CourseStaffRole
-from student.models import CourseEnrollment
-from student import auth
-
 
 log = logging.getLogger(__name__)
 

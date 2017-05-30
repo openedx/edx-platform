@@ -2,8 +2,9 @@
 Problem Page.
 """
 from bok_choy.page_object import PageObject
-from common.test.acceptance.pages.common.utils import click_css
 from selenium.webdriver.common.keys import Keys
+
+from common.test.acceptance.pages.common.utils import click_css
 
 
 class ProblemPage(PageObject):

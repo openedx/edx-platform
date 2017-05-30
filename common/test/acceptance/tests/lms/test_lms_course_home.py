@@ -2,14 +2,13 @@
 """
 End-to-end tests for the LMS that utilize the course home page and course outline.
 """
-from contextlib import contextmanager
 from nose.plugins.attrib import attr
 
-from ..helpers import auto_auth, load_data_str, UniqueCourseTest
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from ...pages.lms.bookmarks import BookmarksPage
 from ...pages.lms.course_home import CourseHomePage
 from ...pages.lms.courseware import CoursewarePage
+from ..helpers import UniqueCourseTest, auto_auth, load_data_str
 
 
 class CourseHomeBaseTest(UniqueCourseTest):

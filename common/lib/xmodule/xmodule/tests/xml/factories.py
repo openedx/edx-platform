@@ -4,14 +4,13 @@ Factories for generating edXML for testing XModule import
 
 import inspect
 
+from factory import Factory, Sequence, lazy_attribute, post_generation
 from fs.memoryfs import MemoryFS
-from factory import Factory, lazy_attribute, post_generation, Sequence
 from lxml import etree
-
+from openedx.core.lib.xblock_fields.inherited_fields import InheritanceMixin
 from xblock.mixins import HierarchyMixin
-from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.x_module import XModuleMixin
 from xmodule.modulestore import only_xmodules
+from xmodule.x_module import XModuleMixin
 
 
 class XmlImportData(object):

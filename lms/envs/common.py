@@ -40,7 +40,7 @@ from django.utils.translation import ugettext_lazy as _
 from .discussionsettings import *
 from xmodule.modulestore.modulestore_settings import update_module_store_settings
 from xmodule.modulestore.edit_info import EditInfoMixin
-from xmodule.mixin import LicenseMixin
+from openedx.core.lib.license import LicenseMixin
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 
 ################################### FEATURES ###################################
@@ -345,8 +345,11 @@ FEATURES = {
     # Enable LTI Provider feature.
     'ENABLE_LTI_PROVIDER': False,
 
-    # Show Language selector.
-    'SHOW_LANGUAGE_SELECTOR': False,
+    # Show the language selector in the header
+    'SHOW_HEADER_LANGUAGE_SELECTOR': False,
+
+    # Show the language selector in the footer
+    'SHOW_FOOTER_LANGUAGE_SELECTOR': False,
 
     # Write new CSM history to the extended table.
     # This will eventually default to True and may be
@@ -499,6 +502,7 @@ MAKO_TEMPLATES['main'] = [
     COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates',
     OPENEDX_ROOT / 'core' / 'djangoapps' / 'cors_csrf' / 'templates',
     OPENEDX_ROOT / 'core' / 'djangoapps' / 'dark_lang' / 'templates',
+    OPENEDX_ROOT / 'core' / 'lib' / 'license' / 'templates',
 ]
 
 # Django templating
@@ -727,7 +731,7 @@ VIRTUAL_UNIVERSITIES = []
 ############# XBlock Configuration ##########
 
 # Import after sys.path fixup
-from xmodule.modulestore.inheritance import InheritanceMixin
+from openedx.core.lib.xblock_fields.inherited_fields import InheritanceMixin
 from xmodule.modulestore import prefer_xmodules
 from xmodule.x_module import XModuleMixin
 
@@ -2264,6 +2268,7 @@ MKTG_URL_LINK_MAP = {
 STATIC_TEMPLATE_VIEW_DEFAULT_FILE_EXTENSION = 'html'
 
 SUPPORT_SITE_LINK = ''
+ACTIVATION_EMAIL_SUPPORT_LINK = ''
 
 ############################# SOCIAL MEDIA SHARING #############################
 # Social Media Sharing on Student Dashboard
@@ -2904,6 +2909,9 @@ ECOMMERCE_API_TIMEOUT = 5
 ECOMMERCE_SERVICE_WORKER_USERNAME = 'ecommerce_worker'
 
 COURSE_CATALOG_API_URL = None
+
+CREDENTIALS_INTERNAL_SERVICE_URL = None
+CREDENTIALS_PUBLIC_SERVICE_URL = None
 
 # Reverification checkpoint name pattern
 CHECKPOINT_PATTERN = r'(?P<checkpoint_name>[^/]+)'

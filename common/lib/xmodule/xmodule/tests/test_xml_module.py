@@ -4,24 +4,29 @@
 import unittest
 
 from mock import Mock
-from nose.tools import assert_equals, assert_not_equals, assert_true, assert_false, assert_in, assert_not_in  # pylint: disable=no-name-in-module
+from nose.tools import (  # pylint: disable=no-name-in-module
+    assert_equals,
+    assert_false,
+    assert_in,
+    assert_not_equals,
+    assert_not_in,
+    assert_true
+)
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
-
+from openedx.core.lib.xblock_fields.fields import Date, RelativeTime, Timedelta
+from openedx.core.lib.xblock_fields.inherited_fields import InheritanceMixin
 from xblock.field_data import DictFieldData
-from xblock.fields import Scope, String, Dict, Boolean, Integer, Float, Any, List
-from xblock.runtime import KvsFieldData, DictKeyValueStore
-
-from xmodule.fields import Date, Timedelta, RelativeTime
-from xmodule.modulestore.inheritance import InheritanceKeyValueStore, InheritanceMixin, InheritingFieldData
-from xmodule.modulestore.split_mongo.split_mongo_kvs import SplitMongoKVS
-from xmodule.xml_module import XmlDescriptor, serialize_field, deserialize_field
+from xblock.fields import Any, Boolean, Dict, Float, Integer, List, Scope, String
+from xblock.runtime import DictKeyValueStore, KvsFieldData
 from xmodule.course_module import CourseDescriptor
+from xmodule.modulestore.inheritance import InheritanceKeyValueStore, InheritingFieldData
+from xmodule.modulestore.split_mongo.split_mongo_kvs import SplitMongoKVS
 from xmodule.seq_module import SequenceDescriptor
-from xmodule.x_module import XModuleMixin
-
 from xmodule.tests import get_test_descriptor_system
 from xmodule.tests.xml import XModuleXmlImportTest
-from xmodule.tests.xml.factories import CourseFactory, SequenceFactory, ProblemFactory
+from xmodule.tests.xml.factories import CourseFactory, ProblemFactory, SequenceFactory
+from xmodule.x_module import XModuleMixin
+from xmodule.xml_module import XmlDescriptor, deserialize_field, serialize_field
 
 
 class CrazyJsonString(String):

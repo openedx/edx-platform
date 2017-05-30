@@ -94,6 +94,7 @@ from lms.envs.common import (
     HELP_TOKENS_BOOKS,
 
     SUPPORT_SITE_LINK,
+    ACTIVATION_EMAIL_SUPPORT_LINK,
 
     CONTACT_EMAIL,
 
@@ -106,7 +107,7 @@ from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 from cms.lib.xblock.authoring_mixin import AuthoringMixin
 import dealer.git
 from xmodule.modulestore.edit_info import EditInfoMixin
-from xmodule.mixin import LicenseMixin
+from openedx.core.lib.license import LicenseMixin
 
 ############################ FEATURE CONFIGURATION #############################
 
@@ -227,8 +228,8 @@ FEATURES = {
 
     'ORGANIZATIONS_APP': False,
 
-    # Show Language selector
-    'SHOW_LANGUAGE_SELECTOR': False,
+    # Show the language selector in the header
+    'SHOW_HEADER_LANGUAGE_SELECTOR': False,
 
     # Set this to False to facilitate cleaning up invalid xml from your modulestore.
     'ENABLE_XBLOCK_XML_VALIDATION': True,
@@ -280,6 +281,7 @@ MAKO_TEMPLATES['main'] = [
     COMMON_ROOT / 'static',  # required to statically include common Underscore templates
     OPENEDX_ROOT / 'core' / 'djangoapps' / 'cors_csrf' / 'templates',
     OPENEDX_ROOT / 'core' / 'djangoapps' / 'dark_lang' / 'templates',
+    OPENEDX_ROOT / 'core' / 'lib' / 'license' / 'templates',
     CMS_ROOT / 'djangoapps' / 'pipeline_js' / 'templates',
 ]
 
@@ -432,7 +434,7 @@ P3P_HEADER = 'CP="Open EdX does not have a P3P policy."'
 ############# XBlock Configuration ##########
 
 # Import after sys.path fixup
-from xmodule.modulestore.inheritance import InheritanceMixin
+from openedx.core.lib.xblock_fields.inherited_fields import InheritanceMixin
 from xmodule.modulestore import prefer_xmodules
 from xmodule.x_module import XModuleMixin
 

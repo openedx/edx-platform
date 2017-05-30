@@ -1,16 +1,15 @@
 """
 Bok-Choy PageObject class for learner profile page.
 """
-from bok_choy.query import BrowserQuery
-
-from common.test.acceptance.pages.lms import BASE_URL
 from bok_choy.page_object import PageObject
-from common.test.acceptance.pages.lms.fields import FieldsMixin
 from bok_choy.promise import EmptyPromise
-from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage
-from common.test.acceptance.tests.helpers import select_option_by_value
+from bok_choy.query import BrowserQuery
 from selenium.webdriver import ActionChains
 
+from common.test.acceptance.pages.lms import BASE_URL
+from common.test.acceptance.pages.lms.fields import FieldsMixin
+from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage
+from common.test.acceptance.tests.helpers import select_option_by_value
 
 PROFILE_VISIBILITY_SELECTOR = '#u-field-select-account_privacy option[value="{}"]'
 PROFILE_VISIBILITY_INPUT = '#u-field-select-account_privacy'

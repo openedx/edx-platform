@@ -8,25 +8,23 @@ StudioViewHandlers are handlers for video descriptor instance.
 import json
 import logging
 from datetime import datetime
-from webob import Response
 
-from xblock.core import XBlock
-
-from xmodule.exceptions import NotFoundError
-from xmodule.fields import RelativeTime
 from opaque_keys.edx.locator import CourseLocator
+from openedx.core.lib.xblock_fields.fields import RelativeTime
+from webob import Response
+from xblock.core import XBlock
+from xmodule.exceptions import NotFoundError
 
 from .transcripts_utils import (
-    get_or_create_sjson,
+    Transcript,
     TranscriptException,
     TranscriptsGenerationException,
     generate_sjson_for_all_speeds,
-    youtube_speed_dict,
-    Transcript,
+    get_or_create_sjson,
     save_to_store,
-    subs_filename
+    subs_filename,
+    youtube_speed_dict
 )
-
 
 log = logging.getLogger(__name__)
 

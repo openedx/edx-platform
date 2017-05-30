@@ -982,6 +982,7 @@ class TestVideoCDNRewriting(BaseTestXmodule):
 
 
 @attr(shard=1)
+@ddt.ddt
 class TestVideoDescriptorInitialization(BaseTestXmodule):
     """
     Make sure that module initialization works correctly.
@@ -1050,6 +1051,68 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
 
         self.assertNotIn('source', fields)
         self.assertFalse(self.item_descriptor.download_video)
+
+    @ddt.data(
+        (
+            {
+                'desktop_webm': 'https://webm.com/dw.webm',
+                'hls': 'https://hls.com/hls.m3u8',
+                'youtube': 'v0TFmdO4ZP0',
+                'desktop_mp4': 'https://mp4.com/dm.mp4'
+            },
+            ['https://www.youtube.com/watch?v=v0TFmdO4ZP0']
+        ),
+        (
+            {
+                'desktop_webm': 'https://webm.com/dw.webm',
+                'hls': 'https://hls.com/hls.m3u8',
+                'youtube': None,
+                'desktop_mp4': 'https://mp4.com/dm.mp4'
+            },
+            ['https://hls.com/hls.m3u8']
+        ),
+        (
+            {
+                'desktop_webm': 'https://webm.com/dw.webm',
+                'hls': None,
+                'youtube': None,
+                'desktop_mp4': 'https://mp4.com/dm.mp4'
+            },
+            ['https://mp4.com/dm.mp4']
+        ),
+        (
+            {
+                'desktop_webm': 'https://webm.com/dw.webm',
+                'hls': None,
+                'youtube': None,
+                'desktop_mp4': None
+            },
+            ['https://webm.com/dw.webm']
+        ),
+        (
+            {
+                'desktop_webm': None,
+                'hls': None,
+                'youtube': None,
+                'desktop_mp4': None
+            },
+            ['https://www.youtube.com/watch?v=3_yD_cEKoCk']
+        ),
+    )
+    @ddt.unpack
+    @patch('xmodule.video_module.video_module.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
+    def test_val_encoding_in_context(self, val_video_encodings, video_url):
+        """
+        Tests that the val encodings correctly override the video url when the edx video id is set and
+        one or more encodings are present.
+        """
+        with patch('xmodule.video_module.video_module.edxval_api.get_urls_for_profiles') as get_urls_for_profiles:
+            get_urls_for_profiles.return_value = val_video_encodings
+            self.initialize_module(
+                data='<video display_name="Video" download_video="true" edx_video_id="12345-67890">[]</video>'
+            )
+            context = self.item_descriptor.get_context()
+            self.assertEqual(context['transcripts_basic_tab_metadata']['video_url']['value'], video_url)
 
 
 @attr(shard=1)
