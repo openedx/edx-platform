@@ -47,6 +47,7 @@ class CohortedDiscussionTestMixin(BaseDiscussionMixin, CohortTestMixin):
 
         # Enable cohorts and verify that the post shows to cohort only.
         self.enable_cohorting(self.course_fixture)
+        self.enable_always_divide_inline_discussions(self.course_fixture)
         self.refresh_thread_page(self.thread_id)
         self.assertEquals(
             self.thread_page.get_group_visibility_label(),
