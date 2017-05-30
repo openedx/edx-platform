@@ -1,13 +1,12 @@
 """
 Theming aware template loaders.
 """
-from django.utils._os import safe_join
 from django.core.exceptions import SuspiciousFileOperation
 from django.template.loaders.filesystem import Loader as FilesystemLoader
+from django.utils._os import safe_join
 
 from edxmako.makoloader import MakoLoader
-from openedx.core.djangoapps.theming.helpers import get_current_request, \
-    get_current_theme, get_all_theme_template_dirs
+from openedx.core.djangoapps.theming.helpers import get_all_theme_template_dirs, get_current_request, get_current_theme
 
 
 class ThemeTemplateLoader(MakoLoader):

@@ -3,16 +3,15 @@ Classes used to model the roles used in the courseware. Each role is responsible
 adding users, removing users, and listing members
 """
 
+import logging
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict
 
 from django.contrib.auth.models import User
-import logging
 
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from request_cache import get_cache
 from student.models import CourseAccessRole
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
-
 
 log = logging.getLogger(__name__)
 

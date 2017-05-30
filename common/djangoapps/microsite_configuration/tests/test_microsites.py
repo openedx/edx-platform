@@ -4,14 +4,15 @@ Tests configuration templatetags and helper functions.
 """
 import logging
 
-from mock import patch
-from django.test import TestCase
 from django.conf import settings
+from django.test import TestCase
+from mock import patch
+
 from microsite_configuration import microsite
 from microsite_configuration.backends.base import BaseMicrositeBackend
 from microsite_configuration.backends.database import DatabaseMicrositeBackend
-from openedx.core.djangoapps.site_configuration.templatetags import configuration as configuration_tags
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.site_configuration.templatetags import configuration as configuration_tags
 
 log = logging.getLogger(__name__)
 

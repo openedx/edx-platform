@@ -11,24 +11,24 @@ Provides sympy representation.
 # Author: I. Chuang <ichuang@mit.edu>
 #
 
-import os
-import string
-import re
 import logging
 import operator
+import os
+import re
+import string
+import unicodedata
+#import subprocess
+from copy import deepcopy
+from xml.sax.saxutils import unescape
+
 import requests
 import sympy
-from sympy.printing.latex import LatexPrinter
-from sympy.printing.str import StrPrinter
+from lxml import etree
 from sympy import latex, sympify
 from sympy.physics.quantum.qubit import Qubit
 from sympy.physics.quantum.state import Ket
-
-from xml.sax.saxutils import unescape
-import unicodedata
-from lxml import etree
-#import subprocess
-from copy import deepcopy
+from sympy.printing.latex import LatexPrinter
+from sympy.printing.str import StrPrinter
 
 log = logging.getLogger(__name__)
 

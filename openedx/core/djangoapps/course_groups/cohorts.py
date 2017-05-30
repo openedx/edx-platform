@@ -7,25 +7,24 @@ import logging
 import random
 
 from django.db import IntegrityError, transaction
-from django.db.models.signals import post_save, m2m_changed
+from django.db.models.signals import m2m_changed, post_save
 from django.dispatch import receiver
 from django.http import Http404
 from django.utils.translation import ugettext as _
 
+import request_cache
 from courseware import courses
 from eventtracking import tracker
-import request_cache
 from request_cache.middleware import request_cached
 from student.models import get_user_by_username_or_email
 
 from .models import (
-    CourseUserGroup,
+    CohortMembership,
     CourseCohort,
     CourseCohortsSettings,
-    CourseUserGroupPartitionGroup,
-    CohortMembership
+    CourseUserGroup,
+    CourseUserGroupPartitionGroup
 )
-
 
 log = logging.getLogger(__name__)
 

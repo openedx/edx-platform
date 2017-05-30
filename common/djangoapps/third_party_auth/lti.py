@@ -1,18 +1,18 @@
 """
 Third-party-auth module for Learning Tools Interoperability
 """
-import logging
 import calendar
+import logging
 import time
 
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from oauthlib.common import Request
 from oauthlib.oauth1.rfc5849.signature import (
-    normalize_base_string_uri,
-    normalize_parameters,
     collect_parameters,
     construct_base_string,
-    sign_hmac_sha1,
+    normalize_base_string_uri,
+    normalize_parameters,
+    sign_hmac_sha1
 )
 from social.backends.base import BaseAuth
 from social.exceptions import AuthFailed

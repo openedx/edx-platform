@@ -4,7 +4,6 @@ from django.conf.urls import patterns, url
 
 from .views import CourseAccessMessageView
 
-
 urlpatterns = patterns(
     'openedx.core.djangoapps.embargo.views',
     url(

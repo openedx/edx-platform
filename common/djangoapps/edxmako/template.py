@@ -12,12 +12,13 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-import edxmako
-
 from django.conf import settings
+from mako.template import Template as MakoTemplate
+
+import edxmako
 from edxmako.request_context import get_template_request_context
 from edxmako.shortcuts import marketing_link
-from mako.template import Template as MakoTemplate
+
 
 # TODO: We should make this a Django Template subclass that simply has the MakoTemplate inside of it? (Intead of inheriting from MakoTemplate)
 

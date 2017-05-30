@@ -2,62 +2,53 @@
 """
 Miscellaneous tests for the student app.
 """
-from datetime import datetime, timedelta
 import json
 import logging
 import unittest
+from datetime import datetime, timedelta
 from urllib import quote
 
 import ddt
+import httpretty
+import pytz
+from config_models.models import cache
 from django.conf import settings
-from django.contrib.auth.models import User, AnonymousUser
+from django.contrib.auth.models import AnonymousUser, User
 from django.core.urlresolvers import reverse
 from django.test import TestCase, override_settings
 from django.test.client import Client
-import httpretty
 from markupsafe import escape
 from mock import Mock, patch
 from nose.plugins.attrib import attr
-from opaque_keys.edx.locations import SlashSeparatedCourseKey, CourseLocator
+from opaque_keys.edx.locations import CourseLocator, SlashSeparatedCourseKey
 from provider.constants import CONFIDENTIAL
 from pyquery import PyQuery as pq
-import pytz
 
+import shoppingcart  # pylint: disable=import-error
 from bulk_email.models import Optout  # pylint: disable=import-error
 from certificates.models import CertificateStatuses  # pylint: disable=import-error
 from certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
-from config_models.models import cache
 from course_modes.models import CourseMode
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
-from openedx.core.djangoapps.catalog.tests.factories import (
-    generate_course_run_key,
-    ProgramFactory,
-    CourseFactory as CatalogCourseFactory,
-    CourseRunFactory,
-)
+from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
+from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory, ProgramFactory, generate_course_run_key
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
-import shoppingcart  # pylint: disable=import-error
 from student.models import (
-    anonymous_id_for_user, user_by_anonymous_id, CourseEnrollment,
-    unique_id_for_user, LinkedInAddToProfileConfiguration, UserAttribute
+    CourseEnrollment,
+    LinkedInAddToProfileConfiguration,
+    UserAttribute,
+    anonymous_id_for_user,
+    unique_id_for_user,
+    user_by_anonymous_id
 )
-from student.tests.factories import UserFactory, CourseModeFactory, CourseEnrollmentFactory
-from student.views import (
-    process_survey_link,
-    _cert_info,
-    complete_course_mode_info,
-)
+from student.tests.factories import CourseEnrollmentFactory, CourseModeFactory, UserFactory
+from student.views import _cert_info, complete_course_mode_info, process_survey_link
 from util.model_utils import USER_SETTINGS_CHANGED_EVENT_NAME
 from util.testing import EventTestMixin
-from xmodule.modulestore.tests.django_utils import (
-    ModuleStoreTestCase,
-    ModuleStoreEnum,
-    SharedModuleStoreTestCase,
-)
+from xmodule.modulestore.tests.django_utils import ModuleStoreEnum, ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
-
 
 log = logging.getLogger(__name__)
 

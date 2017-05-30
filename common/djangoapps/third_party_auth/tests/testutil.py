@@ -4,29 +4,28 @@ Utilities for writing third_party_auth tests.
 Used by Django and non-Django tests; must not have Django deps.
 """
 
+import os.path
 from contextlib import contextmanager
+
+import django.test
+import mock
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
-from provider.oauth2.models import Client as OAuth2Client
-from provider import constants
-import django.test
 from mako.template import Template
-import mock
-import os.path
+from provider import constants
+from provider.oauth2.models import Client as OAuth2Client
 from storages.backends.overwrite import OverwriteStorage
 
+from third_party_auth.models import cache as config_cache
 from third_party_auth.models import (
-    OAuth2ProviderConfig,
-    SAMLProviderConfig,
-    SAMLConfiguration,
     LTIProviderConfig,
-    cache as config_cache,
+    OAuth2ProviderConfig,
     ProviderApiPermissions,
+    SAMLConfiguration,
+    SAMLProviderConfig
 )
-
-from third_party_auth.saml import get_saml_idp_class, SAMLIdentityProvider
-
+from third_party_auth.saml import SAMLIdentityProvider, get_saml_idp_class
 
 AUTH_FEATURES_KEY = 'ENABLE_THIRD_PARTY_AUTH'
 AUTH_FEATURE_ENABLED = AUTH_FEATURES_KEY in settings.FEATURES

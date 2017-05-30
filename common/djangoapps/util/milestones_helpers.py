@@ -4,17 +4,16 @@ Utility library for working with the edx-milestones app
 """
 from django.conf import settings
 from django.utils.translation import ugettext as _
-
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
-
 from milestones import api as milestones_api
 from milestones.exceptions import InvalidMilestoneRelationshipTypeException
 from milestones.models import MilestoneRelationshipType
 from milestones.services import MilestonesService
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+
+import request_cache
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.modulestore.django import modulestore
-import request_cache
 
 NAMESPACE_CHOICES = {
     'ENTRANCE_EXAM': 'entrance_exams'

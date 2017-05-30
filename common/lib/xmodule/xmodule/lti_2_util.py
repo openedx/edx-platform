@@ -3,17 +3,17 @@
 A mixin class for LTI 2.0 functionality.  This is really just done to refactor the code to
 keep the LTIModule class from getting too big
 """
-import json
-import re
-import mock
-import urllib
-import hashlib
 import base64
+import hashlib
+import json
 import logging
+import re
+import urllib
 
+import mock
+from oauthlib.oauth1 import Client
 from webob import Response
 from xblock.core import XBlock
-from oauthlib.oauth1 import Client
 
 log = logging.getLogger(__name__)
 

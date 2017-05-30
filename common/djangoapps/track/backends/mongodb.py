@@ -5,12 +5,11 @@ from __future__ import absolute_import
 import logging
 
 import pymongo
+from bson.errors import BSONError
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError
-from bson.errors import BSONError
 
 from track.backends import BaseBackend
-
 
 log = logging.getLogger(__name__)
 

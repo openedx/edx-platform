@@ -1,11 +1,13 @@
 """Unit tests for provider.py."""
 
+import unittest
+
 from django.contrib.sites.models import Site
 from mock import Mock, patch
+
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from third_party_auth import provider
 from third_party_auth.tests import testutil
-import unittest
 
 SITE_DOMAIN_A = 'professionalx.example.com'
 SITE_DOMAIN_B = 'somethingelse.example.com'

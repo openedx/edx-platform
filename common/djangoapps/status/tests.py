@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 """ Tests for setting and displaying the site status message. """
-import ddt
 import unittest
 
-from django.test import TestCase
-from django.core.cache import cache
+import ddt
 from django.conf import settings
+from django.core.cache import cache
+from django.test import TestCase
 from opaque_keys.edx.locations import CourseLocator
 
+from .models import CourseMessage, GlobalStatusMessage
 from .status import get_site_status_msg
-from .models import GlobalStatusMessage, CourseMessage
 
 
 @ddt.ddt

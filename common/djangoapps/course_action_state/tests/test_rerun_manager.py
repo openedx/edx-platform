@@ -4,8 +4,9 @@ Tests specific to the CourseRerunState Model and Manager.
 
 from django.test import TestCase
 from opaque_keys.edx.locations import CourseLocator
-from course_action_state.models import CourseRerunState
+
 from course_action_state.managers import CourseRerunUIStateManager
+from course_action_state.models import CourseRerunState
 from student.tests.factories import UserFactory
 
 

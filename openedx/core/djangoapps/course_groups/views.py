@@ -2,30 +2,29 @@
 Views related to course groups functionality.
 """
 
-from django.views.decorators.csrf import ensure_csrf_cookie
-from django.views.decorators.http import require_POST
-from django.contrib.auth.models import User
-from django.core.paginator import Paginator, EmptyPage
-from django.core.urlresolvers import reverse
-from django.http import Http404, HttpResponseBadRequest
-from django.views.decorators.http import require_http_methods
-from util.json_request import expect_json, JsonResponse
-from django.db import transaction
-from django.contrib.auth.decorators import login_required
-from django.utils.translation import ugettext
-
 import logging
 import re
 
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.core.paginator import EmptyPage, Paginator
+from django.core.urlresolvers import reverse
+from django.db import transaction
+from django.http import Http404, HttpResponseBadRequest
+from django.utils.translation import ugettext
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.http import require_http_methods, require_POST
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+
 from courseware.courses import get_course_with_access
 from edxmako.shortcuts import render_to_response
+from lms.djangoapps.django_comment_client.constants import TYPE_ENTRY
+from lms.djangoapps.django_comment_client.utils import get_discussion_categories_ids, get_discussion_category_map
+from util.json_request import JsonResponse, expect_json
 
 from . import cohorts
-from lms.djangoapps.django_comment_client.utils import get_discussion_category_map, get_discussion_categories_ids
-from lms.djangoapps.django_comment_client.constants import TYPE_ENTRY
-from .models import CourseUserGroup, CourseUserGroupPartitionGroup, CohortMembership
+from .models import CohortMembership, CourseUserGroup, CourseUserGroupPartitionGroup
 
 log = logging.getLogger(__name__)
 

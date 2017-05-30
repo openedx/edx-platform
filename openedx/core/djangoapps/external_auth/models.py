@@ -9,8 +9,8 @@ file and check it in at the same time as your model changes. To do that,
 3. Add the migration file created in edx-platform/openedx/core/djangoapps/external_auth/migrations/
 """
 
-from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
 
 
 class ExternalAuthMap(models.Model):

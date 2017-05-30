@@ -2,10 +2,10 @@
 An implementation of a RequestCache. This cache is reset at the beginning
 and end of every request.
 """
-from django.utils.encoding import force_text
+import threading
 
 import crum
-import threading
+from django.utils.encoding import force_text
 
 
 class _RequestCache(threading.local):

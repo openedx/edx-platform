@@ -5,8 +5,7 @@ URL routes for the bookmarks app.
 from django.conf import settings
 from django.conf.urls import patterns, url
 
-from .views import BookmarksListView, BookmarksDetailView
-
+from .views import BookmarksDetailView, BookmarksListView
 
 urlpatterns = patterns(
     'bookmarks',

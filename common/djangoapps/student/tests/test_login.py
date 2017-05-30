@@ -4,29 +4,29 @@ Tests for student activation and login
 import json
 import unittest
 
-from django.test import TestCase
-from django.test.client import Client
-from django.test.utils import override_settings
+import httpretty
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
-from django.core.urlresolvers import reverse, NoReverseMatch
-from django.http import HttpResponseBadRequest, HttpResponse
-import httpretty
+from django.core.urlresolvers import NoReverseMatch, reverse
+from django.http import HttpResponse, HttpResponseBadRequest
+from django.test import TestCase
+from django.test.client import Client
+from django.test.utils import override_settings
 from mock import patch
 from social.apps.django_app.default.models import UserSocialAuth
 
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from student.tests.factories import UserFactory, RegistrationFactory, UserProfileFactory
+from student.tests.factories import RegistrationFactory, UserFactory, UserProfileFactory
 from student.views import login_oauth_token
 from third_party_auth.tests.utils import (
     ThirdPartyOAuthTestMixin,
     ThirdPartyOAuthTestMixinFacebook,
     ThirdPartyOAuthTestMixinGoogle
 )
-from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class LoginTest(CacheIsolationTestCase):

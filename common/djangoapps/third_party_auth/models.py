@@ -5,6 +5,9 @@ Models used to implement SAML SSO support in third_party_auth
 """
 from __future__ import absolute_import
 
+import json
+import logging
+
 from config_models.models import ConfigurationModel, cache
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -12,19 +15,19 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-import json
-import logging
-from provider.utils import long_token
 from provider.oauth2.models import Client
+from provider.utils import long_token
 from social.backends.base import BaseAuth
 from social.backends.oauth import OAuthAuth
 from social.backends.saml import SAMLAuth, SAMLIdentityProvider
-from .lti import LTIAuthBackend, LTI_PARAMS_KEY
-from .saml import STANDARD_SAML_PROVIDER_KEY, get_saml_idp_choices, get_saml_idp_class
 from social.exceptions import SocialAuthBaseException
 from social.utils import module_member
+
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import get_current_request
+
+from .lti import LTI_PARAMS_KEY, LTIAuthBackend
+from .saml import STANDARD_SAML_PROVIDER_KEY, get_saml_idp_choices, get_saml_idp_class
 
 log = logging.getLogger(__name__)
 

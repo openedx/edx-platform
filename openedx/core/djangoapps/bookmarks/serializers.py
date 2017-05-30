@@ -2,6 +2,7 @@
 Serializers for Bookmarks.
 """
 from rest_framework import serializers
+
 from openedx.core.lib.api.serializers import CourseKeyField, UsageKeyField
 
 from . import DEFAULT_FIELDS

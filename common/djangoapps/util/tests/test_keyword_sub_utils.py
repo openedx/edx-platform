@@ -2,15 +2,14 @@
 Tests for keyword_substitution.py
 """
 
-from student.tests.factories import UserFactory
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from ddt import ddt, file_data
 from mock import patch
 
-
-from util.date_utils import get_default_time_display
+from student.tests.factories import UserFactory
 from util import keyword_substitution as Ks
+from util.date_utils import get_default_time_display
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @ddt

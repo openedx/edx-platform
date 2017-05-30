@@ -1,16 +1,13 @@
 """
 Celery task for Automatic Verifed Track Cohorting MVP feature.
 """
-from django.contrib.auth.models import User
-
 from celery.task import task
 from celery.utils.log import get_task_logger
-
+from django.contrib.auth.models import User
 from opaque_keys.edx.keys import CourseKey
+
+from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, get_cohort, get_cohort_by_name
 from student.models import CourseEnrollment, CourseMode
-from openedx.core.djangoapps.course_groups.cohorts import (
-    get_cohort_by_name, get_cohort, add_user_to_cohort
-)
 
 LOGGER = get_task_logger(__name__)
 

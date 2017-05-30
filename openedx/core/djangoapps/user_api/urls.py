@@ -7,7 +7,7 @@ from django.conf.urls import patterns, url
 
 from ..profile_images.views import ProfileImageView
 from .accounts.views import AccountDeactivationView, AccountViewSet
-from .preferences.views import PreferencesView, PreferencesDetailView
+from .preferences.views import PreferencesDetailView, PreferencesView
 from .verification_api.views import PhotoVerificationStatusView
 
 ME = AccountViewSet.as_view({

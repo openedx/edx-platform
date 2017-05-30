@@ -1,27 +1,28 @@
 import copy
-from datetime import datetime
-from fs.errors import ResourceNotFoundError
 import logging
-from lxml import etree
 import os
-from path import Path as path
-from pkg_resources import resource_string
 import re
 import sys
 import textwrap
+from datetime import datetime
+
+from fs.errors import ResourceNotFoundError
+from lxml import etree
+from path import Path as path
+from pkg_resources import resource_string
+from xblock.core import XBlock
+from xblock.fields import Boolean, List, Scope, String
+from xblock.fragment import Fragment
 
 import dogstats_wrapper as dog_stats_api
-from xmodule.util.misc import escape_html_characters
 from xmodule.contentstore.content import StaticContent
 from xmodule.editing_module import EditingDescriptor
 from xmodule.edxnotes_utils import edxnotes
 from xmodule.html_checker import check_html
 from xmodule.stringify import stringify_children
-from xmodule.x_module import XModule, DEPRECATION_VSCOMPAT_EVENT
+from xmodule.util.misc import escape_html_characters
+from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT, XModule
 from xmodule.xml_module import XmlDescriptor, name_to_pathname
-from xblock.core import XBlock
-from xblock.fields import Scope, String, Boolean, List
-from xblock.fragment import Fragment
 
 log = logging.getLogger("edx.courseware")
 

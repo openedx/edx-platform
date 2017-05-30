@@ -7,11 +7,11 @@ import textwrap
 import unittest
 
 from mock import mock_open, patch
-from paver.easy import task, call_task
+from paver.easy import call_task, task
 
 import pavelib.i18n
-
 from pavelib.paver_tests.utils import PaverTestCase
+
 
 TX_CONFIG_SIMPLE = """\
 [main]

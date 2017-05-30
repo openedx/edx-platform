@@ -3,15 +3,17 @@
 Code to manage fetching and storing the metadata of IdPs.
 """
 
-from celery.task import task
 import datetime
+import logging
+
 import dateutil.parser
 import pytz
-import logging
-from lxml import etree
 import requests
-from requests import exceptions
+from celery.task import task
+from lxml import etree
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
+from requests import exceptions
+
 from third_party_auth.models import SAMLConfiguration, SAMLProviderConfig, SAMLProviderData
 
 log = logging.getLogger(__name__)
