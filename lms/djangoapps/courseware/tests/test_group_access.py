@@ -3,15 +3,17 @@ This module defines tests for courseware.access that are specific to group
 access control rules.
 """
 
-import courseware.access as access
 import ddt
-from courseware.tests.factories import StaffFactory, UserFactory
 from nose.plugins.attrib import attr
-from openedx.core.lib.partitions.partitions import USER_PARTITION_SCHEME_NAMESPACE, Group, UserPartition
 from stevedore.extension import Extension, ExtensionManager
-from xmodule.modulestore.django import modulestore
+
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.partitions.partitions import Group, UserPartition, USER_PARTITION_SCHEME_NAMESPACE
+from xmodule.modulestore.django import modulestore
+
+import courseware.access as access
+from courseware.tests.factories import StaffFactory, UserFactory
 
 
 class MemoryUserPartitionScheme(object):

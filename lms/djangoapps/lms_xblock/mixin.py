@@ -4,11 +4,12 @@ Namespace that defines fields common to all blocks used in the LMS
 
 #from django.utils.translation import ugettext_noop as _
 from lazy import lazy
-from openedx.core.lib.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError
-from openedx.core.lib.xblock_fields.inherited_fields import UserPartitionList
+
 from xblock.core import XBlock
-from xblock.fields import Boolean, Dict, Scope, String, XBlockMixin
+from xblock.fields import Boolean, Scope, String, XBlockMixin, Dict
 from xblock.validation import ValidationMessage
+from xmodule.modulestore.inheritance import UserPartitionList
+from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError
 
 # Please do not remove, this is a workaround for Django 1.8.
 # more information can be found here: https://openedx.atlassian.net/browse/PLAT-902

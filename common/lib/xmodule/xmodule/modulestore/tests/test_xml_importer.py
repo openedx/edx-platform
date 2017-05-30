@@ -1,21 +1,21 @@
 """
 Tests for XML importer.
 """
-import importlib
-import unittest
-from uuid import uuid4
-
 import mock
-from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
-from openedx.core.lib.xblock_fields.inherited_fields import InheritanceMixin
-from xblock.fields import List, Scope, ScopeIds, String
-from xblock.runtime import DictKeyValueStore, KvsFieldData, Runtime
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
-from xmodule.modulestore.xml_importer import _update_and_import_module, _update_module_location
-from xmodule.tests import DATA_DIR
+from xblock.fields import String, Scope, ScopeIds, List
+from xblock.runtime import Runtime, KvsFieldData, DictKeyValueStore
 from xmodule.x_module import XModuleMixin
+from opaque_keys.edx.locations import Location
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.modulestore.xml_importer import _update_and_import_module, _update_module_location
+from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from xmodule.tests import DATA_DIR
+from uuid import uuid4
+import unittest
+import importlib
 
 
 class ModuleStoreNoSettings(unittest.TestCase):
