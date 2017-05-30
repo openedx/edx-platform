@@ -5,14 +5,13 @@ Python tests for the Survey views
 import json
 from collections import OrderedDict
 
-from django.test.client import Client
 from django.core.urlresolvers import reverse
-
-from survey.models import SurveyForm, SurveyAnswer
+from django.test.client import Client
 
 from student.tests.factories import UserFactory
-from xmodule.modulestore.tests.factories import CourseFactory
+from survey.models import SurveyAnswer, SurveyForm
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class SurveyViewsTests(ModuleStoreTestCase):

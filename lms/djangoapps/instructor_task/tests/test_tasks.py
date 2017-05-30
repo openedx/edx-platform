@@ -5,36 +5,33 @@ Runs tasks on answers to course problems to validate that code
 paths actually work.
 """
 
-from functools import partial
 import json
+from functools import partial
 from uuid import uuid4
 
-from celery.states import SUCCESS, FAILURE
 import ddt
+from celery.states import FAILURE, SUCCESS
 from django.utils.translation import ugettext_noop
-from mock import Mock, MagicMock, patch
+from mock import MagicMock, Mock, patch
 from nose.plugins.attrib import attr
-
 from opaque_keys.edx.locations import i4xEncoder
 
 from courseware.models import StudentModule
 from courseware.tests.factories import StudentModuleFactory
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
-from xmodule.modulestore.exceptions import ItemNotFoundError
-
 from lms.djangoapps.instructor_task.exceptions import UpdateProblemModuleStateError
 from lms.djangoapps.instructor_task.models import InstructorTask
-from lms.djangoapps.instructor_task.tests.test_base import InstructorTaskModuleTestCase
-from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
 from lms.djangoapps.instructor_task.tasks import (
-    rescore_problem,
-    reset_problem_attempts,
     delete_problem_state,
-    generate_certificates,
     export_ora2_data,
+    generate_certificates,
+    rescore_problem,
+    reset_problem_attempts
 )
 from lms.djangoapps.instructor_task.tasks_helper.misc import upload_ora2_data
-
+from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
+from lms.djangoapps.instructor_task.tests.test_base import InstructorTaskModuleTestCase
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 PROBLEM_URL_NAME = "test_urlname"
 

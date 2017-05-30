@@ -1,10 +1,19 @@
 import logging
 
-from eventtracking import tracker
-from .utils import merge_dict, strip_blank, strip_none, extract, perform_request, CommentClientPaginatedResult
-from .utils import CommentClientRequestError
-import models
 import settings
+
+import models
+from eventtracking import tracker
+
+from .utils import (
+    CommentClientPaginatedResult,
+    CommentClientRequestError,
+    extract,
+    merge_dict,
+    perform_request,
+    strip_blank,
+    strip_none
+)
 
 log = logging.getLogger(__name__)
 

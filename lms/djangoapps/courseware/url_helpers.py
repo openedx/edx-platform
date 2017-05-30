@@ -5,8 +5,8 @@ from urllib import urlencode
 
 from django.core.urlresolvers import reverse
 
-from xmodule.modulestore.search import path_to_location, navigation_index
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.search import navigation_index, path_to_location
 
 
 def get_redirect_url(course_key, usage_key):

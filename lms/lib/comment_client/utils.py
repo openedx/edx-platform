@@ -1,12 +1,14 @@
 """" Common utilities for comment client wrapper """
-from contextlib import contextmanager
-import dogstats_wrapper as dog_stats_api
 import logging
-import requests
-from django.conf import settings
+from contextlib import contextmanager
 from time import time
 from uuid import uuid4
+
+import requests
+from django.conf import settings
 from django.utils.translation import get_language
+
+import dogstats_wrapper as dog_stats_api
 
 log = logging.getLogger(__name__)
 

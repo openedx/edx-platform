@@ -5,40 +5,37 @@ Tests for course access
 import itertools
 
 import ddt
+import mock
 from django.conf import settings
-from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
-import mock
+from django.test.utils import override_settings
 from nose.plugins.attrib import attr
 
 from courseware.courses import (
     get_cms_block_link,
     get_cms_course_link,
-    get_courses,
     get_course_about_section,
     get_course_by_id,
     get_course_info_section,
     get_course_overview_with_access,
     get_course_with_access,
-    get_current_child,
+    get_courses,
+    get_current_child
 )
-from courseware.module_render import get_module_for_descriptor
 from courseware.model_data import FieldDataCache
+from courseware.module_render import get_module_for_descriptor
 from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.courses import course_image_url
 from student.tests.factories import UserFactory
-from xmodule.modulestore.django import _get_modulestore_branch_setting, modulestore
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.xml_importer import import_course_from_xml
+from xmodule.modulestore.django import _get_modulestore_branch_setting, modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import (
-    CourseFactory, ItemFactory, check_mongo_calls
-)
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+from xmodule.modulestore.xml_importer import import_course_from_xml
 from xmodule.tests.xml import factories as xml
 from xmodule.tests.xml import XModuleXmlImportTest
-
 
 CMS_BASE_TEST = 'testcms'
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT

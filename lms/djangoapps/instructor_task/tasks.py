@@ -22,40 +22,33 @@ of the query for traversing StudentModule objects.
 import logging
 from functools import partial
 
+from celery import task
 from django.conf import settings
 from django.utils.translation import ugettext_noop
 
-from celery import task
 from bulk_email.tasks import perform_delegate_email_batches
 from lms.djangoapps.instructor_task.tasks_base import BaseInstructorTask
-from lms.djangoapps.instructor_task.tasks_helper.runner import run_main_task
-from lms.djangoapps.instructor_task.tasks_helper.certs import (
-    generate_students_certificates,
-)
+from lms.djangoapps.instructor_task.tasks_helper.certs import generate_students_certificates
 from lms.djangoapps.instructor_task.tasks_helper.enrollments import (
     upload_enrollment_report,
-    upload_may_enroll_csv,
     upload_exec_summary_report,
-    upload_students_csv,
+    upload_may_enroll_csv,
+    upload_students_csv
 )
-from lms.djangoapps.instructor_task.tasks_helper.grades import (
-    CourseGradeReport,
-    ProblemGradeReport,
-    ProblemResponses,
-)
+from lms.djangoapps.instructor_task.tasks_helper.grades import CourseGradeReport, ProblemGradeReport, ProblemResponses
 from lms.djangoapps.instructor_task.tasks_helper.misc import (
     cohort_students_and_upload,
     upload_course_survey_report,
-    upload_proctored_exam_results_report,
     upload_ora2_data,
+    upload_proctored_exam_results_report
 )
 from lms.djangoapps.instructor_task.tasks_helper.module_state import (
+    delete_problem_module_state,
     perform_module_state_update,
     rescore_problem_module_state,
-    reset_attempts_module_state,
-    delete_problem_module_state,
+    reset_attempts_module_state
 )
-
+from lms.djangoapps.instructor_task.tasks_helper.runner import run_main_task
 
 TASK_LOG = logging.getLogger('edx.celery.task')
 

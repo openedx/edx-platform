@@ -4,19 +4,24 @@
 Tests for the Shopping Cart Models
 """
 import datetime
-import pytz
 import StringIO
 from textwrap import dedent
+
+import pytz
+from django.conf import settings
 from mock import patch
 
-from django.conf import settings
-
 from course_modes.models import CourseMode
-from shoppingcart.models import (Order, CertificateItem, PaidCourseRegistration, PaidCourseRegistrationAnnotation,
-                                 CourseRegCodeItemAnnotation)
+from shoppingcart.models import (
+    CertificateItem,
+    CourseRegCodeItemAnnotation,
+    Order,
+    PaidCourseRegistration,
+    PaidCourseRegistrationAnnotation
+)
 from shoppingcart.views import initialize_report
-from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
+from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

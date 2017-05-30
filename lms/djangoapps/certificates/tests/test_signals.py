@@ -5,8 +5,8 @@ from certificates import api as certs_api
 from certificates.models import CertificateGenerationConfiguration
 from certificates.signals import _listen_for_course_publish
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
-from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class SelfGeneratedCertsSignalTest(ModuleStoreTestCase):

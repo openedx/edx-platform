@@ -2,20 +2,20 @@
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.views.decorators.http import require_http_methods
 from django_countries import countries
-from django.contrib.staticfiles.storage import staticfiles_storage
 
 from badges.utils import badges_enabled
-from edxmako.shortcuts import render_to_response, marketing_link
+from edxmako.shortcuts import marketing_link, render_to_response
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
-from openedx.core.djangoapps.user_api.errors import UserNotFound, UserNotAuthorized
+from openedx.core.djangoapps.user_api.errors import UserNotAuthorized, UserNotFound
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
 from student.models import User
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
 @login_required

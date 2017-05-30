@@ -1,8 +1,7 @@
-from .utils import CommentClientRequestError, perform_request
+from lms.lib.comment_client import models, settings
 
 from .thread import Thread, _url_for_flag_abuse_thread, _url_for_unflag_abuse_thread
-from lms.lib.comment_client import models
-from lms.lib.comment_client import settings
+from .utils import CommentClientRequestError, perform_request
 
 
 class Comment(models.Model):

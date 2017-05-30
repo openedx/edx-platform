@@ -2,49 +2,47 @@
 """Tests for certificates views. """
 
 import json
-import ddt
-from uuid import uuid4
-from nose.plugins.attrib import attr
-from mock import patch
-from urllib import urlencode
 from collections import OrderedDict
+from urllib import urlencode
+from uuid import uuid4
 
+import ddt
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
+from mock import patch
+from nose.plugins.attrib import attr
 
+from certificates.api import get_certificate_url
+from certificates.models import (
+    CertificateHtmlViewConfiguration,
+    CertificateSocialNetworks,
+    CertificateStatuses,
+    CertificateTemplate,
+    CertificateTemplateAsset,
+    GeneratedCertificate
+)
+from certificates.tests.factories import (
+    CertificateHtmlViewConfigurationFactory,
+    GeneratedCertificateFactory,
+    LinkedInAddToProfileConfigurationFactory
+)
 from course_modes.models import CourseMode
 from lms.djangoapps.badges.events.course_complete import get_completion_badge
 from lms.djangoapps.badges.tests.factories import (
     BadgeAssertionFactory,
-    CourseCompleteImageConfigurationFactory,
     BadgeClassFactory,
+    CourseCompleteImageConfigurationFactory
 )
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from openedx.core.lib.tests.assertions.events import assert_event_matches
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from student.roles import CourseStaffRole
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from track.tests import EventTrackingTestCase
 from util import organizations_helpers as organizations_api
-from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-
-from certificates.api import get_certificate_url
-from certificates.models import (
-    GeneratedCertificate,
-    CertificateStatuses,
-    CertificateSocialNetworks,
-    CertificateTemplate,
-    CertificateHtmlViewConfiguration,
-    CertificateTemplateAsset,
-)
-
-from certificates.tests.factories import (
-    CertificateHtmlViewConfigurationFactory,
-    LinkedInAddToProfileConfigurationFactory,
-    GeneratedCertificateFactory,
-)
+from xmodule.modulestore.tests.factories import CourseFactory
 
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True

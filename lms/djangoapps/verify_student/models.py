@@ -12,36 +12,38 @@ import functools
 import json
 import logging
 import os.path
+import uuid
 from datetime import datetime, timedelta
 from email.utils import formatdate
 
 import pytz
 import requests
-import uuid
-
+from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
 from django.core.cache import cache
 from django.core.files.base import ContentFile
-from django.dispatch import receiver
+from django.core.urlresolvers import reverse
 from django.db import models
+from django.dispatch import receiver
 from django.utils.functional import cached_property
-from django.utils.translation import ugettext as _, ugettext_lazy
-
-from openedx.core.storage import get_storage
-from simple_history.models import HistoricalRecords
-from config_models.models import ConfigurationModel
-from course_modes.models import CourseMode
-from model_utils.models import StatusModel, TimeStampedModel
+from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy
 from model_utils import Choices
+from model_utils.models import StatusModel, TimeStampedModel
+from simple_history.models import HistoricalRecords
+
+from course_modes.models import CourseMode
 from lms.djangoapps.verify_student.ssencrypt import (
-    random_aes_key, encrypt_and_encode,
-    generate_signed_message, rsa_encrypt
+    encrypt_and_encode,
+    generate_signed_message,
+    random_aes_key,
+    rsa_encrypt
 )
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from openedx.core.djangolib.model_mixins import DeprecatedModelMixin
+from openedx.core.storage import get_storage
 
 log = logging.getLogger(__name__)
 

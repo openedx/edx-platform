@@ -3,16 +3,16 @@ import logging
 from datetime import datetime
 
 import ddt
-from mock import ANY, Mock, call, patch
-from nose.tools import assert_true
-
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
 from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
 from django.utils import translation
+from mock import ANY, Mock, call, patch
+from nose.tools import assert_true
+
+from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
 from django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
 from django_comment_client.permissions import get_team
 from django_comment_client.tests.group_id import (

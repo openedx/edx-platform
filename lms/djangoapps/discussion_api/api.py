@@ -3,9 +3,16 @@ Discussion API internal interface
 """
 import itertools
 from collections import defaultdict
-from enum import Enum
 from urllib import urlencode
 from urlparse import urlunparse
+
+from django.core.exceptions import ValidationError
+from django.core.urlresolvers import reverse
+from django.http import Http404
+from enum import Enum
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.locator import CourseKey
+from rest_framework.exceptions import PermissionDenied
 
 from courseware.courses import get_course_with_access
 from discussion_api.exceptions import CommentNotFoundError, DiscussionDisabledError, ThreadNotFoundError
@@ -17,9 +24,6 @@ from discussion_api.permissions import (
     get_initializable_thread_fields
 )
 from discussion_api.serializers import CommentSerializer, DiscussionTopicSerializer, ThreadSerializer, get_context
-from django.core.exceptions import ValidationError
-from django.core.urlresolvers import reverse
-from django.http import Http404
 from django_comment_client.base.views import track_comment_created_event, track_thread_created_event, track_voted_event
 from django_comment_client.utils import get_accessible_discussion_xblocks, get_group_id_for_user, is_commentable_divided
 from django_comment_common.signals import (
@@ -38,11 +42,8 @@ from lms.djangoapps.discussion_api.pagination import DiscussionAPIPagination
 from lms.lib.comment_client.comment import Comment
 from lms.lib.comment_client.thread import Thread
 from lms.lib.comment_client.utils import CommentClientRequestError
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.locator import CourseKey
 from openedx.core.djangoapps.user_api.accounts.views import AccountViewSet
 from openedx.core.lib.exceptions import CourseNotFoundError, DiscussionNotFoundError, PageNotFoundError
-from rest_framework.exceptions import PermissionDenied
 
 
 class DiscussionTopic(object):

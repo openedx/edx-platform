@@ -2,25 +2,25 @@
 """
 Tests for the newer CyberSource API implementation.
 """
-from mock import patch
-from django.test import TestCase
-from django.conf import settings
 import ddt
+from django.conf import settings
+from django.test import TestCase
+from mock import patch
 
-from student.tests.factories import UserFactory
 from shoppingcart.models import Order, OrderItem
 from shoppingcart.processors.CyberSource2 import (
-    processor_hash,
-    process_postpay_callback,
-    render_purchase_form_html,
+    _get_processor_exception_html,
     get_signed_purchase_params,
-    _get_processor_exception_html
+    process_postpay_callback,
+    processor_hash,
+    render_purchase_form_html
 )
 from shoppingcart.processors.exceptions import (
-    CCProcessorSignatureException,
     CCProcessorDataException,
+    CCProcessorSignatureException,
     CCProcessorWrongAmountException
 )
+from student.tests.factories import UserFactory
 
 
 @ddt.ddt

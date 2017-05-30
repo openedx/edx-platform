@@ -10,10 +10,7 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 
 from courseware.access import has_access
-from courseware.masquerade import (
-    handle_ajax,
-    setup_masquerade
-)
+from courseware.masquerade import handle_ajax, setup_masquerade
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import Registration
 

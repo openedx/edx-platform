@@ -47,9 +47,10 @@ Eligibility:
 """
 import json
 import logging
+import os
 import uuid
 
-import os
+from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
@@ -60,15 +61,13 @@ from django.utils.translation import ugettext_lazy as _
 from django_extensions.db.fields import CreationDateTimeField
 from model_utils import Choices
 from model_utils.models import TimeStampedModel
-from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED
-
 
 from badges.events.course_complete import course_badge_check
 from badges.events.course_meta import completion_check, course_group_check
-from config_models.models import ConfigurationModel
 from lms.djangoapps.instructor_task.models import InstructorTask
-from util.milestones_helpers import fulfill_course_milestone, is_prerequisite_courses_enabled
+from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, NoneToEmptyManager
+from util.milestones_helpers import fulfill_course_milestone, is_prerequisite_courses_enabled
 
 LOGGER = logging.getLogger(__name__)
 

@@ -1,50 +1,59 @@
 """
 Tests for the Shopping Cart Models
 """
-from decimal import Decimal
-import datetime
-import sys
-import json
 import copy
-
+import datetime
+import json
 import smtplib
-from boto.exception import BotoServerError  # this is a super-class of SESError and catches connection errors
+import sys
+from decimal import Decimal
 
-from mock import patch, MagicMock
-from nose.plugins.attrib import attr
-import pytz
 import ddt
+import pytz
+from boto.exception import BotoServerError  # this is a super-class of SESError and catches connection errors
+from django.conf import settings
+from django.contrib.auth.models import AnonymousUser
 from django.core import mail
 from django.core.mail.message import EmailMessage
-from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.db import DatabaseError
 from django.test import TestCase
 from django.test.utils import override_settings
-from django.core.urlresolvers import reverse
-from django.contrib.auth.models import AnonymousUser
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from mock import MagicMock, patch
+from nose.plugins.attrib import attr
+from opaque_keys.edx.locator import CourseLocator
 
-from shoppingcart.models import (
-    Order, OrderItem, CertificateItem,
-    InvalidCartItem, CourseRegistrationCode, PaidCourseRegistration, CourseRegCodeItem,
-    Donation, OrderItemSubclassPK,
-    Invoice, CourseRegistrationCodeInvoiceItem, InvoiceTransaction, InvoiceHistory,
-    RegistrationCodeRedemption,
-    Coupon, CouponRedemption)
-from student.tests.factories import UserFactory
-from student.models import CourseEnrollment
 from course_modes.models import CourseMode
 from shoppingcart.exceptions import (
-    PurchasedCallbackException,
-    CourseDoesNotExistException,
-    ItemAlreadyInCartException,
     AlreadyEnrolledInCourseException,
+    CourseDoesNotExistException,
     InvalidStatusToRetire,
-    UnexpectedOrderItemStatus,
+    ItemAlreadyInCartException,
+    PurchasedCallbackException,
+    UnexpectedOrderItemStatus
 )
-
-from opaque_keys.edx.locator import CourseLocator
+from shoppingcart.models import (
+    CertificateItem,
+    Coupon,
+    CouponRedemption,
+    CourseRegCodeItem,
+    CourseRegistrationCode,
+    CourseRegistrationCodeInvoiceItem,
+    Donation,
+    InvalidCartItem,
+    Invoice,
+    InvoiceHistory,
+    InvoiceTransaction,
+    Order,
+    OrderItem,
+    OrderItemSubclassPK,
+    PaidCourseRegistration,
+    RegistrationCodeRedemption
+)
+from student.models import CourseEnrollment
+from student.tests.factories import UserFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @attr(shard=3)

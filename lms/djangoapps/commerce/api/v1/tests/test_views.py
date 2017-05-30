@@ -1,9 +1,10 @@
 """ Commerce API v1 view tests. """
-from datetime import datetime, timedelta
 import itertools
 import json
+from datetime import datetime, timedelta
 
 import ddt
+import pytz
 from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.core.urlresolvers import reverse
@@ -12,16 +13,15 @@ from django.test.utils import override_settings
 from edx_rest_api_client import exceptions
 from flaky import flaky
 from nose.plugins.attrib import attr
-import pytz
 from rest_framework.utils.encoders import JSONEncoder
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
 from commerce.tests.mocks import mock_order_endpoint
 from commerce.tests.test_views import UserMixin
 from course_modes.models import CourseMode
-from student.tests.factories import UserFactory
 from lms.djangoapps.verify_student.models import VerificationDeadline
+from student.tests.factories import UserFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 PASSWORD = 'test'
 JSON_CONTENT_TYPE = 'application/json'

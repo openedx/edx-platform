@@ -8,19 +8,16 @@ import hashlib
 import json
 import logging
 
-from django.utils.translation import ugettext as _
-from util.db import outer_atomic
-
 from celery.result import AsyncResult
-from celery.states import READY_STATES, SUCCESS, FAILURE, REVOKED
-
-from courseware.module_render import get_xqueue_callback_url_prefix
-from courseware.courses import get_problems_in_section
-
-from xmodule.modulestore.django import modulestore
+from celery.states import FAILURE, READY_STATES, REVOKED, SUCCESS
+from django.utils.translation import ugettext as _
 from opaque_keys.edx.keys import UsageKey
-from lms.djangoapps.instructor_task.models import InstructorTask, PROGRESS
 
+from courseware.courses import get_problems_in_section
+from courseware.module_render import get_xqueue_callback_url_prefix
+from lms.djangoapps.instructor_task.models import PROGRESS, InstructorTask
+from util.db import outer_atomic
+from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 

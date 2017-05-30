@@ -1,16 +1,16 @@
 """Tests for self-paced course due date overrides."""
 # pylint: disable=missing-docstring
 import datetime
-import pytz
 
+import pytz
 from django.test.utils import override_settings
 from mock import patch
 
-from courseware.tests.factories import BetaTesterFactory
 from courseware.access import has_access
+from courseware.tests.factories import BetaTesterFactory
 from lms.djangoapps.ccx.tests.test_overrides import inject_field_overrides
-from lms.djangoapps.django_comment_client.utils import get_accessible_discussion_xblocks
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData, OverrideModulestoreFieldData
+from lms.djangoapps.django_comment_client.utils import get_accessible_discussion_xblocks
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory

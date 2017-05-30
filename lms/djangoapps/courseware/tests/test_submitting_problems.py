@@ -20,20 +20,20 @@ from mock import patch
 from nose.plugins.attrib import attr
 
 from capa.tests.response_xml_factory import (
-    OptionResponseXMLFactory, CustomResponseXMLFactory, SchematicResponseXMLFactory,
     CodeResponseXMLFactory,
+    CustomResponseXMLFactory,
+    OptionResponseXMLFactory,
+    SchematicResponseXMLFactory
 )
 from course_modes.models import CourseMode
-from courseware.models import StudentModule, BaseStudentModuleHistory
+from courseware.models import BaseStudentModuleHistory, StudentModule
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
-from openedx.core.djangoapps.credit.api import (
-    set_credit_requirements, get_credit_requirement_status
-)
+from openedx.core.djangoapps.credit.api import get_credit_requirement_status, set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 from openedx.core.lib.url_utils import quote_slashes
-from student.models import anonymous_id_for_user, CourseEnrollment
+from student.models import CourseEnrollment, anonymous_id_for_user
 from submissions import api as submissions_api
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
