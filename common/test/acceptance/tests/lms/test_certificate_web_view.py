@@ -1,13 +1,6 @@
 """
 Acceptance tests for the certificate web view feature.
 """
-from common.test.acceptance.tests.helpers import (
-    UniqueCourseTest,
-    EventsTestMixin,
-    load_data_str,
-    get_element_padding,
-    get_modal_alert,
-)
 from nose.plugins.attrib import attr
 from common.test.acceptance.fixtures.certificates import CertificateConfigFixture
 from common.test.acceptance.fixtures.course import CourseFixture, CourseUpdateDesc, XBlockFixtureDesc
@@ -21,7 +14,13 @@ from common.test.acceptance.pages.lms.tab_nav import TabNavPage
 from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage
 from common.test.acceptance.tests.helpers import disable_animations
 from common.test.acceptance.pages.common.logout import LogoutPage
-
+from common.test.acceptance.tests.helpers import (
+    UniqueCourseTest,
+    EventsTestMixin,
+    load_data_str,
+    get_element_padding,
+    get_modal_alert,
+)
 
 @attr(shard=5)
 class CertificateWebViewTest(EventsTestMixin, UniqueCourseTest):
@@ -183,7 +182,7 @@ class CertificateProgressPageTest(UniqueCourseTest):
 
     def log_in_as_staff(self):
         """
-        Log in as a staff.
+        Log in as a staff user.
         """
         AutoAuthPage(
             self.browser,
@@ -209,7 +208,7 @@ class CertificateProgressPageTest(UniqueCourseTest):
         """
         self.cert_fixture.install()
 
-        self.enable_self_generation_certificates()
+        self.enable_self_generated_certificates()
 
         self.log_in_as_unique_user()
         self.complete_course_problems()
@@ -272,17 +271,18 @@ class CertificateProgressPageTest(UniqueCourseTest):
         self.courseware_page.q(css='button.submit').click()
         self.courseware_page.wait_for_ajax()
 
-    def enable_self_generation_certificates(self):
+    def enable_self_generated_certificates(self):
         """
-        Enable self-generation certificates for instructor-paced courses.
-        By default, it is disabled. (EDUCATOR-394)
+        Self-generated certificates should be enabled for the presence of View
+        Certificate button on Course Progress menu. By default, it is disabled
+        for instructor-paced courses. (EDUCATOR-394)
         """
         self.log_in_as_staff()
 
         self.instructor_dashboard_page.visit()
         self.certificates_section = self.instructor_dashboard_page.select_certificates()
         disable_animations(self.certificates_section)
-        self.certificates_section.self_generation_certificate_enabled_button.click()
+        self.certificates_section.self_generated_certificate_enabled_button.click()
         alert = get_modal_alert(self.certificates_section.browser)
         alert.accept()
         self.certificates_section.wait_for_ajax()
