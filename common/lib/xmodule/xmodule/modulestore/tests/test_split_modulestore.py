@@ -571,7 +571,7 @@ class SplitModuleTest(unittest.TestCase):
 class TestHasChildrenAtDepth(SplitModuleTest):
     """Test the has_children_at_depth method of XModuleMixin. """
 
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    @patch('openedx.core.lib.course_tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
     def test_has_children_at_depth(self, _from_json):
         course_locator = CourseLocator(
             org='testx', course='GreekHero', run="run", branch=BRANCH_NAME_DRAFT
@@ -611,7 +611,7 @@ class SplitModuleCourseTests(SplitModuleTest):
     Course CRUD operation tests
     '''
 
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    @patch('openedx.core.lib.course_tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
     def test_get_courses(self, _from_json):
         courses = modulestore().get_courses(branch=BRANCH_NAME_DRAFT)
         # should have gotten 3 draft courses
@@ -634,7 +634,7 @@ class SplitModuleCourseTests(SplitModuleTest):
         self.assertEqual(course.edited_by, "testassist@edx.org")
         self.assertDictEqual(course.grade_cutoffs, {"Pass": 0.45})
 
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    @patch('openedx.core.lib.course_tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
     def test_get_courses_with_same_course_index(self, _from_json):
         """
         Test that if two courses point to same course index,
@@ -654,7 +654,7 @@ class SplitModuleCourseTests(SplitModuleTest):
         self.assertEqual(len(courses), 4)
         self.assertIn(new_draft_course.id.version_agnostic(), [c.id for c in courses])
 
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    @patch('openedx.core.lib.course_tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
     def test_get_org_courses(self, _from_json):
         courses = modulestore().get_courses(branch=BRANCH_NAME_DRAFT, org='guestx')
 
@@ -672,7 +672,7 @@ class SplitModuleCourseTests(SplitModuleTest):
         courses = modulestore().get_courses(branch=BRANCH_NAME_DRAFT)
         self.assertEqual(len(courses), 3)
 
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    @patch('openedx.core.lib.course_tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
     def test_branch_requests(self, _from_json):
         # query w/ branch qualifier (both draft and published)
         def _verify_published_course(courses_published):
@@ -703,7 +703,7 @@ class SplitModuleCourseTests(SplitModuleTest):
             locator_key_fields=['org', 'course', 'run']
         )
 
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    @patch('openedx.core.lib.course_tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
     def test_get_course(self, _from_json):
         '''
         Test the various calling forms for get_course
@@ -757,7 +757,7 @@ class SplitModuleCourseTests(SplitModuleTest):
         with self.assertRaises(ItemNotFoundError):
             modulestore().get_course(CourseLocator(org='testx', course='GreekHero', run="run", branch=BRANCH_NAME_PUBLISHED))
 
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    @patch('openedx.core.lib.course_tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
     def test_cache(self, _from_json):
         """
         Test that the mechanics of caching work.
@@ -770,7 +770,7 @@ class SplitModuleCourseTests(SplitModuleTest):
         self.assertIn(BlockKey('chapter', 'chapter1'), block_map)
         self.assertIn(BlockKey('problem', 'problem3_2'), block_map)
 
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    @patch('openedx.core.lib.course_tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
     def test_course_successors(self, _from_json):
         """
         get_course_successors(course_locator, version_history_depth=1)
@@ -802,7 +802,7 @@ class SplitModuleCourseTests(SplitModuleTest):
         self.assertEqual(len(result.children[0].children), 1)
         self.assertEqual(result.children[0].children[0].locator.version_guid, versions[0])
 
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    @patch('openedx.core.lib.course_tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
     def test_persist_dag(self, _from_json):
         """
         try saving temporary xblocks
@@ -847,7 +847,7 @@ class SplitModuleCourseTests(SplitModuleTest):
         persisted_problem = modulestore().update_item(persisted_problem, 'testbot')
         self.assertEqual(persisted_problem.display_name, 'altered problem')
 
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    @patch('openedx.core.lib.course_tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
     def test_block_generations(self, _from_json):
         """
         Test get_block_generations
@@ -1013,7 +1013,7 @@ class SplitModuleItemTests(SplitModuleTest):
     Item read tests including inheritance
     '''
 
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    @patch('openedx.core.lib.course_tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
     def test_has_item(self, _from_json):
         '''
         has_item(BlockUsageLocator)
@@ -1078,7 +1078,7 @@ class SplitModuleItemTests(SplitModuleTest):
         )
         self.assertFalse(modulestore().has_item(locator))
 
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    @patch('openedx.core.lib.course_tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
     def test_get_item(self, _from_json):
         '''
         get_item(blocklocator)
@@ -1242,7 +1242,7 @@ class SplitModuleItemTests(SplitModuleTest):
         parent = modulestore().get_parent_location(locator)
         self.assertIsNone(parent)
 
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    @patch('openedx.core.lib.course_tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
     def test_get_children(self, _from_json):
         """
         Test the existing get_children method on xdescriptors
@@ -1596,7 +1596,7 @@ class TestItemCrud(SplitModuleTest):
         other_updated = modulestore().update_item(other_block, self.user_id)
         self.assertIn(moved_child.version_agnostic(), version_agnostic(other_updated.children))
 
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    @patch('openedx.core.lib.course_tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
     def test_update_definition(self, _from_json):
         """
         test updating an item's definition: ensure it gets versioned as well as the course getting versioned
@@ -1868,7 +1868,7 @@ class TestCourseCreation(SplitModuleTest):
             fields['grading_policy']['GRADE_CUTOFFS']
         )
 
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    @patch('openedx.core.lib.course_tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
     def test_update_course_index(self, _from_json):
         """
         Test the versions pointers. NOTE: you can change the org, course, or other things, but
@@ -1924,7 +1924,7 @@ class TestCourseCreation(SplitModuleTest):
                 dupe_course_key.org, dupe_course_key.course, dupe_course_key.run, user, BRANCH_NAME_DRAFT
             )
 
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    @patch('openedx.core.lib.course_tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
     def test_bulk_ops_get_courses(self, _from_json):
         """
         Test get_courses when some are created, updated, and deleted w/in a bulk operation
@@ -1964,7 +1964,7 @@ class TestInheritance(SplitModuleTest):
     """
     Test the metadata inheritance mechanism.
     """
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    @patch('openedx.core.lib.course_tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
     def test_inheritance(self, _from_json):
         """
         The actual test
@@ -2039,7 +2039,7 @@ class TestPublish(SplitModuleTest):
     """
     Test the publishing api
     """
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    @patch('openedx.core.lib.course_tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
     def test_publish_safe(self, _from_json):
         """
         Test the standard patterns: publish to new branch, revise and publish
@@ -2109,7 +2109,7 @@ class TestPublish(SplitModuleTest):
         with self.assertRaises(ItemNotFoundError):
             modulestore().copy(self.user_id, source_course, destination_course, [problem1], [])
 
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    @patch('openedx.core.lib.course_tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
     def test_move_delete(self, _from_json):
         """
         Test publishing moves and deletes.

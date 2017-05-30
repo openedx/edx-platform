@@ -57,7 +57,7 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest, PartitionTestCase):
         self.export_dir = mkdtemp()
         self.addCleanup(rmtree, self.export_dir, ignore_errors=True)
 
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
+    @patch('openedx.core.lib.course_tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
     @ddt.data(*itertools.product(
         MODULESTORE_SETUPS,
         MODULESTORE_SETUPS,

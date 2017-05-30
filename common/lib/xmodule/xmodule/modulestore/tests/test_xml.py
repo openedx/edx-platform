@@ -5,15 +5,14 @@ well-formed and not-well-formed XML.
 import os.path
 import unittest
 from glob import glob
-from mock import patch, Mock
 
-from xmodule.modulestore.xml import XMLModuleStore
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.x_module import XModuleMixin
-
-from xmodule.tests import DATA_DIR
+from mock import Mock, patch
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.test_modulestore import check_has_course_method
+from xmodule.modulestore.xml import XMLModuleStore
+from xmodule.tests import DATA_DIR
+from xmodule.x_module import XModuleMixin
 
 
 def glob_tildes_at_end(path):
@@ -31,7 +30,7 @@ class TestXMLModuleStore(unittest.TestCase):
     """
     Test around the XML modulestore
     """
-    @patch('xmodule.tabs.CourseTabList.initialize_default', Mock())
+    @patch('openedx.core.lib.course_tabs.CourseTabList.initialize_default', Mock())
     def test_unicode_chars_in_xml_content(self):
         # edX/full/6.002_Spring_2012 has non-ASCII chars, and during
         # uniquification of names, would raise a UnicodeError. It no longer does.

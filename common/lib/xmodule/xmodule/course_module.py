@@ -9,6 +9,7 @@ from datetime import datetime
 import requests
 from lazy import lazy
 from lxml import etree
+from openedx.core.lib.course_tabs import CourseTabList, InvalidTabsException
 from openedx.core.lib.license import LicenseMixin
 from openedx.core.lib.xblock_fields.fields import Date
 from openedx.core.lib.xblock_fields.inherited_fields import DEFAULT_START_DATE
@@ -18,7 +19,6 @@ from xblock.fields import Boolean, Dict, Float, Integer, List, Scope, String
 from xmodule import course_metadata_utils
 from xmodule.graders import grader_from_conf
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
-from xmodule.tabs import CourseTabList, InvalidTabsException
 
 log = logging.getLogger(__name__)
 

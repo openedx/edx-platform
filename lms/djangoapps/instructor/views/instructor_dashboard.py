@@ -2,61 +2,60 @@
 Instructor Dashboard Views
 """
 
-import logging
 import datetime
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
+import logging
 import uuid
+
 import pytz
-
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_POST
-from django.utils.translation import ugettext as _, ugettext_noop
-from django.views.decorators.csrf import ensure_csrf_cookie
-from django.views.decorators.cache import cache_control
-from edxmako.shortcuts import render_to_response
-from django.core.urlresolvers import reverse
-from django.utils.html import escape
-from django.http import Http404, HttpResponseServerError
-from django.conf import settings
-from util.json_request import JsonResponse
-from mock import patch
-
-from openedx.core.lib.xblock_utils import wrap_xblock
-from openedx.core.lib.url_utils import quote_slashes
-from xmodule.html_module import HtmlDescriptor
-from xmodule.modulestore.django import modulestore
-from xmodule.tabs import CourseTab
-from xblock.field_data import DictFieldData
-from xblock.fields import ScopeIds
-from courseware.access import has_access
-from courseware.courses import get_course_by_id, get_studio_url
-from django_comment_client.utils import has_forum_access
-from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
-from openedx.core.djangoapps.course_groups.cohorts import get_course_cohorts, is_course_cohorted, DEFAULT_COHORT_NAME
-from student.models import CourseEnrollment
-from shoppingcart.models import Coupon, PaidCourseRegistration, CourseRegCodeItem
-from course_modes.models import CourseMode, CourseModesArchive
-from student.roles import CourseFinanceAdminRole, CourseSalesAdminRole
-from lms.djangoapps.courseware.module_render import get_module_by_usage_id
+from bulk_email.models import BulkEmailFlag
+from certificates import api as certs_api
 from certificates.models import (
     CertificateGenerationConfiguration,
-    CertificateWhitelist,
-    GeneratedCertificate,
-    CertificateStatuses,
     CertificateGenerationHistory,
     CertificateInvalidation,
+    CertificateStatuses,
+    CertificateWhitelist,
+    GeneratedCertificate
 )
-from certificates import api as certs_api
-from bulk_email.models import BulkEmailFlag
-
-from class_dashboard.dashboard_data import get_section_display_name, get_array_section_has_problem
-from .tools import get_units_with_due_date, title_or_url
+from class_dashboard.dashboard_data import get_array_section_has_problem, get_section_display_name
+from course_modes.models import CourseMode, CourseModesArchive
+from courseware.access import has_access
+from courseware.courses import get_course_by_id, get_studio_url
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse
+from django.http import Http404, HttpResponseServerError
+from django.utils.html import escape
+from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_noop
+from django.views.decorators.cache import cache_control
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.http import require_POST
+from django_comment_client.utils import has_forum_access
+from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
+from edxmako.shortcuts import render_to_response
+from lms.djangoapps.courseware.module_render import get_module_by_usage_id
+from mock import patch
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from openedx.core.djangoapps.course_groups.cohorts import DEFAULT_COHORT_NAME, get_course_cohorts, is_course_cohorted
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.verified_track_content.models import VerifiedTrackCohortedCourse
-
 from openedx.core.djangolib.markup import HTML, Text
+from openedx.core.lib.course_tabs import CourseTab
+from openedx.core.lib.url_utils import quote_slashes
+from openedx.core.lib.xblock_utils import wrap_xblock
+from shoppingcart.models import Coupon, CourseRegCodeItem, PaidCourseRegistration
+from student.models import CourseEnrollment
+from student.roles import CourseFinanceAdminRole, CourseSalesAdminRole
+from util.json_request import JsonResponse
+from xblock.field_data import DictFieldData
+from xblock.fields import ScopeIds
+from xmodule.html_module import HtmlDescriptor
+from xmodule.modulestore.django import modulestore
+
+from .tools import get_units_with_due_date, title_or_url
 
 log = logging.getLogger(__name__)
 

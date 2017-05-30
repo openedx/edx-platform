@@ -2,12 +2,11 @@
 Registers the CCX feature for the edX platform.
 """
 
+from courseware.access import has_access
 from django.conf import settings
 from django.utils.translation import ugettext_noop
-
-from xmodule.tabs import CourseTab
+from openedx.core.lib.course_tabs import CourseTab
 from student.roles import CourseCcxCoachRole
-from courseware.access import has_access
 
 
 class CcxCourseTab(CourseTab):

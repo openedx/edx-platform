@@ -1,3 +1,4 @@
+import glob
 import hashlib
 import itertools
 import json
@@ -5,39 +6,37 @@ import logging
 import os
 import re
 import sys
-import glob
-
 from collections import defaultdict
-from cStringIO import StringIO
-from fs.osfs import OSFS
-from importlib import import_module
-from lxml import etree
-from path import Path as path
 from contextlib import contextmanager
-from lazy import lazy
-
-from xmodule.error_module import ErrorDescriptor
-from xmodule.errortracker import make_error_tracker, exc_info_to_str
-from xmodule.mako_module import MakoDescriptorSystem
-from xmodule.x_module import (
-    XMLParsingSystem, policy_key,
-    OpaqueKeyReader, AsideKeyGenerator, DEPRECATION_VSCOMPAT_EVENT
-)
-from xmodule.modulestore.xml_exporter import DEFAULT_CONTENT_FIELDS
-from xmodule.modulestore import ModuleStoreEnum, ModuleStoreReadBase, LIBRARY_ROOT, COURSE_ROOT
-from xmodule.tabs import CourseTabList
-from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
-from opaque_keys.edx.locator import CourseLocator, LibraryLocator, BlockUsageLocator
-
-from xblock.field_data import DictFieldData
-from xblock.runtime import DictKeyValueStore
-from xblock.fields import ScopeIds
+from cStringIO import StringIO
+from importlib import import_module
 
 import dogstats_wrapper as dog_stats_api
+from fs.osfs import OSFS
+from lazy import lazy
+from lxml import etree
+from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator, LibraryLocator
+from openedx.core.lib.course_tabs import CourseTabList
+from path import Path as path
+from xblock.field_data import DictFieldData
+from xblock.fields import ScopeIds
+from xblock.runtime import DictKeyValueStore
+from xmodule.error_module import ErrorDescriptor
+from xmodule.errortracker import exc_info_to_str, make_error_tracker
+from xmodule.mako_module import MakoDescriptorSystem
+from xmodule.modulestore import COURSE_ROOT, LIBRARY_ROOT, ModuleStoreEnum, ModuleStoreReadBase
+from xmodule.modulestore.xml_exporter import DEFAULT_CONTENT_FIELDS
+from xmodule.x_module import (
+    DEPRECATION_VSCOMPAT_EVENT,
+    AsideKeyGenerator,
+    OpaqueKeyReader,
+    XMLParsingSystem,
+    policy_key
+)
 
 from .exceptions import ItemNotFoundError
-from .inheritance import compute_inherited_metadata, inheriting_field_data, InheritanceKeyValueStore
-
+from .inheritance import InheritanceKeyValueStore, compute_inherited_metadata, inheriting_field_data
 
 edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
                                  remove_comments=True, remove_blank_text=True)
