@@ -113,7 +113,6 @@ class ModuleStoreSerializer(object):
         items = modulestore().get_items(course_id)
 
         # create nodes
-        nodes = []
         for item in items:
             fields, block_type = self.serialize_item(item)
 
@@ -121,19 +120,20 @@ class ModuleStoreSerializer(object):
                 fields[field_name] = self.coerce_types(value)
 
             node = Node(block_type, 'item', **fields)
-            nodes.append(node)
             location_to_node[item.location] = node
 
         # create relationships
         relationships = []
         for item in items:
-            for child_loc in item.get_children():
+            for index, child_loc in enumerate(item.get_children()):
                 parent_node = location_to_node.get(item.location)
                 child_node = location_to_node.get(child_loc.location)
+                child_node["index"] = index
                 if parent_node is not None and child_node is not None:
                     relationship = Relationship(parent_node, "PARENT_OF", child_node)
                     relationships.append(relationship)
 
+        nodes = location_to_node.values()
         return nodes, relationships
 
     @staticmethod
