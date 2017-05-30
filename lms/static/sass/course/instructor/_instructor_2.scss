@@ -1244,6 +1244,28 @@
   .division-scheme-container {
     // See https://css-tricks.com/snippets/css/a-guide-to-flexbox/
     display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    .division-scheme-items {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+
+    .division-scheme {
+      font-size: 18px;
+    }
+
+    .division-scheme-item {
+      padding-left: 1%;
+      padding-right: 1%;
+      min-width: 30%;
+    }
+
+    .field-message {
+        font-size: 13px;
+    }
   }
 
   // cohort management

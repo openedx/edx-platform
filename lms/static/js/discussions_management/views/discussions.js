@@ -9,6 +9,8 @@
     ],
 
         function($, _, Backbone, gettext, InlineDiscussionsView, CourseWideDiscussionsView, HtmlUtils) {
+            /* global NotificationModel, NotificationView */
+
             var hiddenClass = 'is-hidden';
             var cohort = 'cohort';
             var none = 'none';
@@ -26,38 +28,48 @@
                 },
 
                 render: function() {
+                    var selectedScheme, topicNav;
                     HtmlUtils.setHtml(this.$el, this.template({
                         availableSchemes: this.getDivisionSchemeData(this.discussionSettings.attributes.division_scheme)
                     }));
-                    var selectedScheme = this.getSelectedScheme(),
-                        topicNav = this.getTopicNav();
+                    selectedScheme = this.getSelectedScheme();
+                    topicNav = this.getTopicNav();
                     this.hideTopicNav(selectedScheme, topicNav);
                     this.showDiscussionTopics();
                     return this;
                 },
 
                 getDivisionSchemeData: function(selectedScheme) {
+                    var self = this;
                     return [
                         {
                             key: none,
                             displayName: gettext('Not divided'),
-                            descriptiveText: gettext('Discussions are unified; all learners interact with posts from other learners, regardless of the group they are in.'),
-                            selected: selectedScheme === none
+                            descriptiveText: gettext('Discussions are unified; all learners interact with posts from other learners, regardless of the group they are in.'), //  eslint-disable-line max-len
+                            selected: selectedScheme === none,
+                            enabled: true // always leave none enabled
                         },
                         {
                             key: enrollmentTrack,
                             displayName: gettext('Enrollment Tracks'),
-                            descriptiveText: gettext('Use enrollment tracks as the basis for dividing discussions. All learners, regardless of their enrollment track, see the same discussion topics, but within divided topics, only learners who are in the same enrollment track see and respond to each others’ posts.'),
-                            selected: selectedScheme === enrollmentTrack
+                            descriptiveText: gettext('Use enrollment tracks as the basis for dividing discussions. All learners, regardless of their enrollment track, see the same discussion topics, but within divided topics, only learners who are in the same enrollment track see and respond to each others’ posts.'), //  eslint-disable-line max-len
+                            selected: selectedScheme === enrollmentTrack,
+                            enabled: self.isSchemeAvailable(enrollmentTrack) || selectedScheme === enrollmentTrack
                         },
                         {
                             key: cohort,
                             displayName: gettext('Cohorts'),
-                            descriptiveText: gettext('Use cohorts as the basis for dividing discussions. All learners, regardless of cohort, see the same discussion topics, but within divided topics, only members of the same cohort see and respond to each others’ posts. '),
-                            selected: selectedScheme === cohort
+                            descriptiveText: gettext('Use cohorts as the basis for dividing discussions. All learners, regardless of cohort, see the same discussion topics, but within divided topics, only members of the same cohort see and respond to each others’ posts. '), //  eslint-disable-line max-len
+                            selected: selectedScheme === cohort,
+                            enabled: self.isSchemeAvailable(cohort) || selectedScheme === cohort
                         }
 
                     ];
+                },
+
+                isSchemeAvailable: function(scheme) {
+                    var self = this;
+                    return self.discussionSettings.attributes.available_division_schemes.indexOf(scheme) !== -1;
                 },
 
                 showMessage: function(message, type) {
@@ -67,7 +79,7 @@
                     this.notification = new NotificationView({
                         model: model
                     });
-                    self.$('.field-radio').before(this.notification.$el);
+                    self.$('.division-scheme-container').prepend(this.notification.$el);
                     this.notification.render();
                 },
 
@@ -106,8 +118,8 @@
 
                     this.removeNotification();
                     showErrorMessage = function(message) {
-                            self.showMessage(message, 'error');
-                        };
+                        self.showMessage(message, 'error');
+                    };
 
                     discussionSettingsModel.save(
                         fieldData, {patch: true, wait: true}
@@ -144,15 +156,17 @@
 
                 showSelectMessage: function(selectedScheme, messageSpan) {
                     switch (selectedScheme) {
-                        case none:
-                            messageSpan.text(gettext('Discussion topics in the course are not divided.'));
-                            break;
-                        case enrollmentTrack:
-                            messageSpan.text(gettext('Any divided discussion topics are divided based on enrollment track.'));
-                            break;
-                        case cohort:
-                            messageSpan.text(gettext('Any divided discussion topics are divided based on cohort.'));
-                            break;
+                    case none:
+                        messageSpan.text(gettext('Discussion topics in the course are not divided.'));
+                        break;
+                    case enrollmentTrack:
+                        messageSpan.text(gettext('Any divided discussion topics are divided based on enrollment track.')); //  eslint-disable-line max-len
+                        break;
+                    case cohort:
+                        messageSpan.text(gettext('Any divided discussion topics are divided based on cohort.'));
+                        break;
+                    default:
+                        break;
                     }
                 },
 
