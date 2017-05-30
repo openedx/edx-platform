@@ -991,6 +991,17 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
         :param branch: the branch for which to return courses.
         """
+        def extract_course_summary(course, fields):
+            """
+            Extract course information from the course block for mongo.
+            """
+            return {
+                field: course.fields[field]
+                for field in fields
+                if field in course.fields
+            }
+
+        fields = kwargs.get('fields')
         courses_summaries = []
         for entry, structure_info in self._get_course_blocks_for_branch(branch, **kwargs):
             course_locator = self._create_course_locator(structure_info, branch=None)
@@ -1006,7 +1017,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 raise MultipleCourseBlocksFound(
                     "Expected 1 course block to be found in the course, but found {0}".format(len(course_block))
                 )
-            courses_summaries.append((course_locator, course_block[0]))
+            courses_summaries.append((course_locator, extract_course_summary(course_block[0], fields)))
         return courses_summaries
 
     def get_libraries(self, branch="library", **kwargs):

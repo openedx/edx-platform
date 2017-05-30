@@ -32,39 +32,14 @@ CATALOG_VISIBILITY_ABOUT = "about"
 CATALOG_VISIBILITY_NONE = "none"
 
 
-def _extract_course_summary(course):
-    """
-    Extract course information from the course block for split.
-    """
-    return {
-        field: course.fields[field]
-        for field in CourseSummary.course_info_fields
-        if field in course.fields
-    }
-
-
-def _extract_course_summary_old_mongo(course):
-    """
-    Extract course information from the course block for mongo.
-    """
-    return {
-        field: course['metadata'][field]
-        for field in CourseSummary.course_info_fields
-        if field in course['metadata']
-    }
-
-
 def get_course_summaries(modulestore, **kwargs):
+    kwargs['fields'] = CourseSummary.course_info_fields
     courses = modulestore.get_course_summaries(**kwargs)
     course_summaries = []
 
     for locator, course in courses:
-        if hasattr(course, "fields"):
-            course_summary = _extract_course_summary(course)
-        else:
-            course_summary = _extract_course_summary_old_mongo(course)
+        course_summaries.append(CourseSummary(locator, **course))
 
-        course_summaries.append(CourseSummary(locator, **course_summary))
     return course_summaries
 
 

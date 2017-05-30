@@ -1000,6 +1000,18 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         Returns a list of course summary data. This accepts an optional parameter of 'org' which
         will apply an efficient filter to only get courses with the specified ORG
         """
+
+        def extract_course_summary(course, fields):
+            """
+            Extract course information from the course block for mongo.
+            """
+            return {
+                field: course['metadata'][field]
+                for field in fields
+                if field in course['metadata']
+            }
+
+        fields = kwargs.get('fields')
         course_org_filter = kwargs.get('org')
         query = {'_id.category': 'course'}
 
@@ -1012,7 +1024,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         for course in course_records:
             if not (course['_id']['org'] == 'edx' and course['_id']['course'] == 'templates'):
                 locator = SlashSeparatedCourseKey(course['_id']['org'], course['_id']['course'], course['_id']['name'])
-                courses_summaries.append((locator, course))
+                courses_summaries.append((locator, extract_course_summary(course, fields)))
         return courses_summaries
 
     @autoretry_read()
