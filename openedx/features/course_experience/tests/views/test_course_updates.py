@@ -3,10 +3,10 @@ Tests for the course updates page.
 """
 from django.core.urlresolvers import reverse
 
-from courseware.courses import get_course_info_section_module, get_course_info_usage_key
+from courseware.courses import get_course_info_usage_key
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
-from xmodule.html_module import CourseInfoModule
+from openedx.features.course_experience.views.course_updates import CourseUpdatesFragmentView
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -41,7 +41,7 @@ def create_course_update(course, user, content, date='December 31, 1999'):
         "id": len(course_updates.items) + 1,
         "date": date,
         "content": content,
-        "status": CourseInfoModule.STATUS_VISIBLE
+        "status": CourseUpdatesFragmentView.STATUS_VISIBLE
     })
     modulestore().update_item(course_updates, user.id)
 
@@ -124,7 +124,7 @@ class TestCourseUpdatesPage(SharedModuleStoreTestCase):
         course_updates_url(self.course)
 
         # Fetch the view and verify that the query counts haven't changed
-        with self.assertNumQueries(33):
+        with self.assertNumQueries(32):
             with check_mongo_calls(4):
                 url = course_updates_url(self.course)
                 self.client.get(url)
