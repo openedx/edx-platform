@@ -3,6 +3,7 @@
 from collections import defaultdict
 from copy import deepcopy
 import datetime
+import logging
 from urlparse import urljoin
 
 from dateutil.parser import parse
@@ -26,6 +27,7 @@ from util.date_utils import strftime_localized
 from xmodule.modulestore.django import modulestore
 
 
+log = logging.getLogger(__name__)
 # The datetime module's strftime() methods require a year >= 1900.
 DEFAULT_ENROLLMENT_START_DATE = datetime.datetime(1900, 1, 1, tzinfo=utc)
 
@@ -104,6 +106,9 @@ class ProgramProgressMeter(object):
                 for course_run in course['course_runs']:
                     course_run_id = course_run['key']
                     if course_run_id in self.course_run_ids:
+                        if not course_run['image']:
+                            log.warning('Image for course run [%s] does not exist', course_run['key'])
+                            course_run['image'] = self.get_course_image(course)
                         program_list = inverted_programs[course_run_id]
                         if program not in program_list:
                             program_list.append(program)
@@ -239,6 +244,14 @@ class ProgramProgressMeter(object):
             bool, indicating whether the program is complete.
         """
         return all(self._is_course_complete(course) for course in program['courses'])
+
+    def get_course_image(self, course):
+        course_image = course.get('image')
+        if not course_image or not course_image.get('src'):
+            log.warning('Image source for course [%s] does not exist', course['key'])
+            return
+
+        return course['image']
 
     def _is_course_complete(self, course):
         """Check if a user has completed a course.
