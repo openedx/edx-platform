@@ -230,6 +230,23 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         self.assertEqual(len(nodes), 9)
         self.assertEqual(len(relationships), 7)
 
+    def test_nodes_have_indices(self):
+        """
+        Test that we add index values on nodes
+        """
+        nodes, relationships = self.mss.serialize_course(self.course.id)
+
+        # the html node should have 0 index, and the problem should have 1
+        html_nodes = [node for node in nodes if node['block_type'] == 'html']
+        self.assertEqual(len(html_nodes), 1)
+        problem_nodes = [node for node in nodes if node['block_type'] == 'problem']
+        self.assertEqual(len(problem_nodes), 1)
+        html_node = html_nodes[0]
+        problem_node = problem_nodes[0]
+
+        self.assertEqual(html_node['index'], 0)
+        self.assertEqual(problem_node['index'], 1)
+
     @ddt.data(
         (1, 1),
         (object, "<type 'object'>"),
