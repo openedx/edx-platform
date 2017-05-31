@@ -4,6 +4,7 @@ import datetime
 import uuid
 
 import ddt
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -14,7 +15,7 @@ from pytz import utc
 
 from course_modes.models import CourseMode
 from lms.djangoapps.certificates.api import MODES
-from lms.djangoapps.commerce.tests.mocks import mock_calculate_discount
+from lms.djangoapps.commerce.tests import mocks
 from lms.djangoapps.commerce.tests.test_utils import update_commerce_config
 from lms.djangoapps.commerce.utils import EcommerceService
 from openedx.core.djangoapps.catalog.tests.factories import (
@@ -33,7 +34,7 @@ from openedx.core.djangoapps.programs.utils import (
     get_certificates,
 )
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from student.tests.factories import AnonymousUserFactory, UserFactory, CourseEnrollmentFactory
 from util.date_utils import strftime_localized
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory as ModuleStoreCourseFactory
@@ -792,7 +793,6 @@ class TestGetCertificates(TestCase):
 
 @ddt.ddt
 @override_settings(ECOMMERCE_PUBLIC_URL_ROOT=ECOMMERCE_URL_ROOT)
-@override_settings(ECOMMERCE_API_URL=ECOMMERCE_URL_ROOT)
 @skip_unless_lms
 class TestProgramMarketingDataExtender(ModuleStoreTestCase):
     """Tests of the program data extender utility class."""
@@ -811,6 +811,9 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
 
     def setUp(self):
         super(TestProgramMarketingDataExtender, self).setUp()
+
+        # Ensure the E-Commerce service user exists
+        UserFactory(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME, is_staff=True)
 
         self.course_price = 100
         self.number_of_courses = 2
@@ -907,19 +910,25 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
 
     def test_fetching_program_discounted_price(self):
         """
-        Authenticated users eligible for one click purchase should see the purchase button
+        Users eligible for one click purchase and anonymous users should see the purchase button
             - displaying program's discounted price if it exists.
             - leading to ecommerce basket page
         """
         seat = self._prepare_program_for_discounted_price_calculation_endpoint()
-
         mock_discount_data = {
             'total_incl_tax_excl_discounts': 200.0,
             'currency': "USD",
             'total_incl_tax': 50.0
         }
-        with mock_calculate_discount(response=mock_discount_data):
+
+        with mocks.mock_calculate_discount(response=mock_discount_data):
             data = ProgramMarketingDataExtender(self.program, self.user).extend()
+
+        self.assertEqual(data['basket_page_url'], self.ecommerce_service.checkout_page_url(seat['sku']))
+        self.assertEqual(data['discounted_price'], mock_discount_data['total_incl_tax'])
+
+        with mocks.mock_calculate_discount(response=mock_discount_data):
+            data = ProgramMarketingDataExtender(self.program, AnonymousUserFactory()).extend()
 
         self.assertEqual(data['basket_page_url'], self.ecommerce_service.checkout_page_url(seat['sku']))
         self.assertEqual(data['discounted_price'], mock_discount_data['total_incl_tax'])
@@ -939,7 +948,7 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
         """
         seat = self._prepare_program_for_discounted_price_calculation_endpoint()
 
-        with mock_calculate_discount(exception=SlumberBaseException):
+        with mocks.mock_calculate_discount(exception=SlumberBaseException):
             data = ProgramMarketingDataExtender(self.program, self.user).extend()
 
         self.assertEqual(data['basket_page_url'], self.ecommerce_service.checkout_page_url(seat['sku']))

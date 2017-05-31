@@ -9,6 +9,7 @@ from urlparse import urljoin
 
 from dateutil.parser import parse
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.utils.functional import cached_property
@@ -600,9 +601,11 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
                     skus = []
                     break
 
-        if skus and not self.user.is_anonymous():
+        if skus:
             try:
-                api = ecommerce_api_client(self.user)
+                User = get_user_model()
+                service_user = User.objects.get(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME)
+                api = ecommerce_api_client(service_user)
                 # Make an API call to calculate the discounted price
                 results = api.baskets.calculate.get(sku=skus)
                 self.data['discounted_price'] = results.get('total_incl_tax')
