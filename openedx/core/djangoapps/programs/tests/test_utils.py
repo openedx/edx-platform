@@ -1,9 +1,11 @@
 """Tests covering Programs utilities."""
 # pylint: disable=no-member
 import datetime
+import json
 import uuid
 
 import ddt
+import httpretty
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase
@@ -15,7 +17,6 @@ from pytz import utc
 
 from course_modes.models import CourseMode
 from lms.djangoapps.certificates.api import MODES
-from lms.djangoapps.commerce.tests import mocks
 from lms.djangoapps.commerce.tests.test_utils import update_commerce_config
 from lms.djangoapps.commerce.utils import EcommerceService
 from openedx.core.djangoapps.catalog.tests.factories import (
@@ -796,6 +797,9 @@ class TestGetCertificates(TestCase):
 @skip_unless_lms
 class TestProgramMarketingDataExtender(ModuleStoreTestCase):
     """Tests of the program data extender utility class."""
+    ECOMMERCE_CALCULATE_DISCOUNT_ENDPOINT = '{root}/baskets/calculate/'.format(
+        root=settings.ECOMMERCE_API_URL.rstrip('/')
+    )
     instructors = {
         'instructors': [
             {
@@ -908,6 +912,7 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
         data = ProgramMarketingDataExtender(program2, self.user).extend()
         self.assertFalse(data['is_learner_eligible_for_one_click_purchase'])
 
+    @httpretty.activate
     def test_fetching_program_discounted_price(self):
         """
         Users eligible for one click purchase and anonymous users should see the purchase button
@@ -920,15 +925,19 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
             'currency': "USD",
             'total_incl_tax': 50.0
         }
+        httpretty.register_uri(
+            httpretty.GET,
+            self.ECOMMERCE_CALCULATE_DISCOUNT_ENDPOINT,
+            body=json.dumps(mock_discount_data),
+            content_type='application/json'
+        )
 
-        with mocks.mock_calculate_discount(response=mock_discount_data):
-            data = ProgramMarketingDataExtender(self.program, self.user).extend()
+        data = ProgramMarketingDataExtender(self.program, self.user).extend()
 
         self.assertEqual(data['basket_page_url'], self.ecommerce_service.checkout_page_url(seat['sku']))
         self.assertEqual(data['discounted_price'], mock_discount_data['total_incl_tax'])
 
-        with mocks.mock_calculate_discount(response=mock_discount_data):
-            data = ProgramMarketingDataExtender(self.program, AnonymousUserFactory()).extend()
+        data = ProgramMarketingDataExtender(self.program, AnonymousUserFactory()).extend()
 
         self.assertEqual(data['basket_page_url'], self.ecommerce_service.checkout_page_url(seat['sku']))
         self.assertEqual(data['discounted_price'], mock_discount_data['total_incl_tax'])
@@ -941,14 +950,20 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
 
         self.assertEqual(data['basket_page_url'], '#courses')
 
+    @httpretty.activate
     def test_fetching_program_discounted_price_api_exception_caught(self):
         """
         User should be able to do a one click purchase of a program even if the ecommerce API throws an exception
         during the calculation of program discounted price.
         """
         seat = self._prepare_program_for_discounted_price_calculation_endpoint()
+        httpretty.register_uri(
+            httpretty.GET,
+            self.ECOMMERCE_CALCULATE_DISCOUNT_ENDPOINT,
+            status=400,
+            content_type='application/json'
+        )
 
-        with mocks.mock_calculate_discount(exception=SlumberBaseException):
-            data = ProgramMarketingDataExtender(self.program, self.user).extend()
+        data = ProgramMarketingDataExtender(self.program, self.user).extend()
 
         self.assertEqual(data['basket_page_url'], self.ecommerce_service.checkout_page_url(seat['sku']))
