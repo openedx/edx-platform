@@ -792,6 +792,7 @@ class TestGetCertificates(TestCase):
 
 @ddt.ddt
 @override_settings(ECOMMERCE_PUBLIC_URL_ROOT=ECOMMERCE_URL_ROOT)
+@override_settings(ECOMMERCE_API_URL=ECOMMERCE_URL_ROOT)
 @skip_unless_lms
 class TestProgramMarketingDataExtender(ModuleStoreTestCase):
     """Tests of the program data extender utility class."""
