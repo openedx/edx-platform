@@ -10,7 +10,6 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
-from edx_rest_api_client.exceptions import SlumberBaseException
 import mock
 from nose.plugins.attrib import attr
 from pytz import utc
@@ -43,7 +42,7 @@ from xmodule.modulestore.tests.factories import CourseFactory as ModuleStoreCour
 
 UTILS_MODULE = 'openedx.core.djangoapps.programs.utils'
 CERTIFICATES_API_MODULE = 'lms.djangoapps.certificates.api'
-ECOMMERCE_URL_ROOT = 'https://example-ecommerce.com'
+ECOMMERCE_URL_ROOT = 'https://ecommerce.example.com'
 
 
 @ddt.ddt
@@ -797,9 +796,7 @@ class TestGetCertificates(TestCase):
 @skip_unless_lms
 class TestProgramMarketingDataExtender(ModuleStoreTestCase):
     """Tests of the program data extender utility class."""
-    ECOMMERCE_CALCULATE_DISCOUNT_ENDPOINT = '{root}/baskets/calculate/'.format(
-        root=settings.ECOMMERCE_API_URL.rstrip('/')
-    )
+    ECOMMERCE_CALCULATE_DISCOUNT_ENDPOINT = '{root}/api/v2/baskets/calculate/'.format(root=ECOMMERCE_URL_ROOT)
     instructors = {
         'instructors': [
             {

@@ -19,13 +19,6 @@
                 position: 'fixed'
             };
 
-            if ($('#lean_overlay').length === 0) {
-                edx.HtmlUtils.append(
-                    $('body'),
-                    $("<div id='lean_overlay'></div>")
-                );
-            }
-
             options = $.extend(defaults, options);  // eslint-disable-line no-param-reassign
 
             function closeModal(modalId, e) {

@@ -124,6 +124,9 @@ class ProgramMarketingPageTest(ProgramPageBase):
         self.marketing_page.visit()
 
         self.assertTrue(self.marketing_page.are_course_cards_present)
+        self.assertTrue(self.marketing_page.are_instructor_profiles_present)
+        self.assertTrue(self.marketing_page.is_program_description_table_present)
+        self.assertTrue(self.marketing_page.is_program_accordion_present)
 
 
 @attr('a11y')

@@ -45,3 +45,18 @@ class ProgramMarketingPage(PageObject):
     def are_course_cards_present(self):
         """Check whether course cards are present."""
         return self.q(css='.course-card').present
+
+    @property
+    def are_instructor_profiles_present(self):
+        """Check whether instructor profiles are present."""
+        return
+
+    @property
+    def is_program_description_table_present(self):
+        """Check whether program's description table is present."""
+        return self.q(css='.program-desc-tbl').present
+
+    @property
+    def is_program_accordion_present(self):
+        """Check whether accordion element for displaying additional program's data is present."""
+        return self.q(css='.accordion-group').present
