@@ -13,11 +13,6 @@ from tempfile import NamedTemporaryFile, mkdtemp
 
 from celery.task import task
 from celery.utils.log import get_task_logger
-from organizations.models import OrganizationCourse
-from path import Path as path
-from pytz import UTC
-from six import iteritems, text_type
-
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import SuspiciousOperation
@@ -25,8 +20,13 @@ from django.core.files import File
 from django.test import RequestFactory
 from django.utils.text import get_valid_filename
 from django.utils.translation import ugettext as _
-
 from djcelery.common import respect_language
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locator import LibraryLocator
+from organizations.models import OrganizationCourse
+from path import Path as path
+from pytz import UTC
+from six import iteritems, text_type
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 from user_tasks.tasks import UserTask
 
@@ -36,9 +36,7 @@ from contentstore.storage import course_import_export_storage
 from contentstore.utils import initialize_permissions, reverse_usage_url
 from course_action_state.models import CourseRerunState
 from models.settings.course_metadata import CourseMetadata
-from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locator import LibraryLocator
-from openedx.core.djangoapps.embargo.models import RestrictedCourse, CountryAccessRule
+from openedx.core.djangoapps.embargo.models import CountryAccessRule, RestrictedCourse
 from openedx.core.lib.extract_tar import safetar_extractall
 from student.auth import has_course_author_access
 from xmodule.contentstore.django import contentstore
@@ -49,7 +47,6 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import DuplicateCourseError, ItemNotFoundError
 from xmodule.modulestore.xml_exporter import export_course_to_xml, export_library_to_xml
 from xmodule.modulestore.xml_importer import import_course_from_xml, import_library_from_xml
-
 
 LOGGER = get_task_logger(__name__)
 FILE_READ_CHUNK = 1024  # bytes

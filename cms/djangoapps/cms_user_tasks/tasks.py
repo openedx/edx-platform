@@ -2,11 +2,10 @@
 Celery tasks used by cms_user_tasks
 """
 
-from celery.task import task
-from celery.exceptions import MaxRetriesExceededError
-from celery.utils.log import get_task_logger
 from boto.exception import NoAuthHandlerFound
-
+from celery.exceptions import MaxRetriesExceededError
+from celery.task import task
+from celery.utils.log import get_task_logger
 from django.conf import settings
 from django.core import mail
 

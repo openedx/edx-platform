@@ -8,12 +8,14 @@
         none
 """
 from django.core.management.base import BaseCommand, CommandError
-from .prompt import query_yes_no
-from contentstore.utils import delete_course_and_groups
-from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+
+from contentstore.utils import delete_course_and_groups
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
+
+from .prompt import query_yes_no
 
 
 class Command(BaseCommand):

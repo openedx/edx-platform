@@ -1,7 +1,7 @@
 """ Helper methods for determining user access permissions in Studio """
 
-from student.roles import CourseInstructorRole
 from student import auth
+from student.roles import CourseInstructorRole
 
 
 def get_user_role(user, course_id):
