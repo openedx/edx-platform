@@ -23,8 +23,9 @@ from openedx.core.djangolib.markup import HTML, Text
           email_start=HTML("<strong>"),
           email_end=HTML("</strong>"),
           email=email,
-          activation_email_support_link=activation_email_support_link,
-          link_start=HTML("<a target='_blank' href='${activation_email_support_link}'>"),
+          link_start=HTML("<a target='_blank' href='{activation_email_support_link}'>").format(
+            activation_email_support_link=activation_email_support_link,
+          ),
           link_end=HTML("</a>"),
         )}
         </p>
