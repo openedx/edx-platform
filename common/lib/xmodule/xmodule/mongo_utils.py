@@ -1,10 +1,10 @@
 """
 Common MongoDB connection functions.
 """
-import pymongo
-from mongodb_proxy import MongoProxy
 import logging
 
+import pymongo
+from mongodb_proxy import MongoProxy
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 

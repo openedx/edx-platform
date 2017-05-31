@@ -1,11 +1,12 @@
 """
 Check code quality using pep8, pylint, and diff_quality.
 """
-from paver.easy import sh, task, cmdopts, needs, BuildFailure
 import json
 import os
 import re
 from string import join
+
+from paver.easy import BuildFailure, cmdopts, needs, sh, task
 
 from openedx.core.djangolib.markup import HTML
 

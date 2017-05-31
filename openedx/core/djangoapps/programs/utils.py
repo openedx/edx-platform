@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """Helper functions for working with Programs."""
+import datetime
 from collections import defaultdict
 from copy import deepcopy
-import datetime
+from itertools import chain
 from urlparse import urljoin
 
 from dateutil.parser import parse
@@ -12,7 +13,6 @@ from django.core.urlresolvers import reverse
 from django.utils.functional import cached_property
 from opaque_keys.edx.keys import CourseKey
 from pytz import utc
-from itertools import chain
 
 from course_modes.models import CourseMode
 from lms.djangoapps.certificates import api as certificate_api
@@ -24,7 +24,6 @@ from openedx.core.djangoapps.credentials.utils import get_credentials
 from student.models import CourseEnrollment
 from util.date_utils import strftime_localized
 from xmodule.modulestore.django import modulestore
-
 
 # The datetime module's strftime() methods require a year >= 1900.
 DEFAULT_ENROLLMENT_START_DATE = datetime.datetime(1900, 1, 1, tzinfo=utc)

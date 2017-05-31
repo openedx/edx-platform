@@ -2,34 +2,33 @@
 Tests for course_modes views.
 """
 
-from datetime import datetime
-import unittest
 import decimal
+import unittest
+from datetime import datetime
+
 import ddt
-import httpretty
 import freezegun
+import httpretty
+from django.conf import settings
+from django.core.urlresolvers import reverse
 from mock import patch
 from nose.plugins.attrib import attr
 
-from django.conf import settings
-from django.core.urlresolvers import reverse
-
-from lms.djangoapps.commerce.tests import test_utils as ecomm_test_utils
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.factories import CourseFactory
-
 from course_modes.models import CourseMode, Mode
 from course_modes.tests.factories import CourseModeFactory
+from lms.djangoapps.commerce.tests import test_utils as ecomm_test_utils
+from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
+from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
 from student.models import CourseEnrollment
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from util.testing import UrlResetMixin
-from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
-from util.tests.mixins.discovery import CourseCatalogServiceMockMixin
 from util import organizations_helpers as organizations_api
-from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
+from util.testing import UrlResetMixin
+from util.tests.mixins.discovery import CourseCatalogServiceMockMixin
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @attr(shard=3)

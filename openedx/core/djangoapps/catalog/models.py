@@ -1,8 +1,7 @@
 """Models governing integration with the catalog service."""
-from django.utils.translation import ugettext_lazy as _
-from django.db import models
-
 from config_models.models import ConfigurationModel
+from django.db import models
+from django.utils.translation import ugettext_lazy as _
 
 
 class CatalogIntegration(ConfigurationModel):

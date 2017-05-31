@@ -1,15 +1,14 @@
 """
 Utilities for waffle usage.
 """
+import logging
 from abc import ABCMeta
 from contextlib import contextmanager
-import logging
 
-from waffle.testutils import override_switch as waffle_override_switch
 from waffle import switch_is_active
+from waffle.testutils import override_switch as waffle_override_switch
 
 from request_cache import get_cache as get_request_cache
-
 
 log = logging.getLogger(__name__)
 

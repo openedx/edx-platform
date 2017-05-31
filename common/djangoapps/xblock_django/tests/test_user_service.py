@@ -2,19 +2,20 @@
 Tests for the DjangoXBlockUserService.
 """
 from django.test import TestCase
+from opaque_keys.edx.keys import CourseKey
+
+from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
+from student.models import anonymous_id_for_user
+from student.tests.factories import AnonymousUserFactory, UserFactory
 from xblock_django.user_service import (
-    DjangoXBlockUserService,
     ATTR_KEY_IS_AUTHENTICATED,
     ATTR_KEY_USER_ID,
-    ATTR_KEY_USERNAME,
     ATTR_KEY_USER_IS_STAFF,
     ATTR_KEY_USER_PREFERENCES,
+    ATTR_KEY_USERNAME,
     USER_PREFERENCES_WHITE_LIST,
+    DjangoXBlockUserService
 )
-from student.models import anonymous_id_for_user
-from student.tests.factories import UserFactory, AnonymousUserFactory
-from opaque_keys.edx.keys import CourseKey
-from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 
 
 class UserServiceTestCase(TestCase):

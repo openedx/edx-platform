@@ -6,8 +6,9 @@
 # Used in translating LON-CAPA problems to i4x problem specification language.
 
 from __future__ import division
-import random
+
 import math
+import random
 
 
 def lc_random(lower, upper, stepsize):

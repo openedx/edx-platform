@@ -1,19 +1,19 @@
 """
 Add and create new modes for running courses on this particular LMS
 """
+from collections import defaultdict, namedtuple
 from datetime import datetime, timedelta
-import pytz
 
-from collections import namedtuple, defaultdict
+import pytz
 from config_models.models import ConfigurationModel
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
 from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
-from request_cache.middleware import ns_request_cached, RequestCache
 
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
+from request_cache.middleware import RequestCache, ns_request_cached
 
 Mode = namedtuple('Mode',
                   [

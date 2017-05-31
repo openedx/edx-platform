@@ -2,11 +2,13 @@
 A custom Strategy for python-social-auth that allows us to fetch configuration from
 ConfigurationModels rather than django.settings
 """
-from .models import OAuth2ProviderConfig
-from .pipeline import AUTH_ENTRY_CUSTOM, get as get_pipeline_from_request
-from .provider import Registry
 from social.backends.oauth import OAuthAuth
 from social.strategies.django_strategy import DjangoStrategy
+
+from .models import OAuth2ProviderConfig
+from .pipeline import get as get_pipeline_from_request
+from .pipeline import AUTH_ENTRY_CUSTOM
+from .provider import Registry
 
 
 class ConfigurationModelStrategy(DjangoStrategy):

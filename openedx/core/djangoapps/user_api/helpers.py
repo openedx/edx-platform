@@ -2,11 +2,11 @@
 Helper functions for the account/profile Python APIs.
 This is NOT part of the public API.
 """
+import json
+import logging
+import traceback
 from collections import defaultdict
 from functools import wraps
-import logging
-import json
-import traceback
 
 from django import forms
 from django.core.serializers.json import DjangoJSONEncoder

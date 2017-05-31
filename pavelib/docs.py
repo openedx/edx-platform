@@ -3,12 +3,12 @@ Open edX Documentation Builder
 Ties into Sphinx to generate files at the specified location(s)
 """
 from __future__ import print_function
+
 import sys
 
 from paver.easy import cmdopts, needs, sh, task
 
 from .utils.timer import timed
-
 
 DOC_PATHS = {
     "dev": "docs/en_us/developers",

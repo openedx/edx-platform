@@ -63,11 +63,11 @@ import hmac
 import json
 import random
 import string
-from collections import OrderedDict
 import urllib
-import analytics
-from eventtracking import tracker
+from collections import OrderedDict
+from logging import getLogger
 
+import analytics
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -80,11 +80,9 @@ from social.pipeline import partial
 from social.pipeline.social_auth import associate_by_email
 
 import student
-
-from logging import getLogger
+from eventtracking import tracker
 
 from . import provider
-
 
 # These are the query string params you can pass
 # to the URL that starts the authentication process.

@@ -3,11 +3,11 @@
 """
 import logging
 
-from xmodule.studio_editable import StudioEditableModule
-
-from xblock.fields import Scope, String, List, Boolean
-from xblock.fragment import Fragment
 from xblock.core import XBlock
+from xblock.fields import Boolean, List, Scope, String
+from xblock.fragment import Fragment
+
+from xmodule.studio_editable import StudioEditableModule
 
 log = logging.getLogger(__name__)
 

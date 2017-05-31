@@ -6,10 +6,10 @@ import json
 
 from django.conf import settings
 from django.http import HttpResponse
-from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils.translation import LANGUAGE_SESSION_KEY
+from django.views.decorators.csrf import ensure_csrf_cookie
 
-from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY, COOKIE_DURATION
+from openedx.core.djangoapps.lang_pref import COOKIE_DURATION, LANGUAGE_KEY
 
 
 @ensure_csrf_cookie

@@ -1,20 +1,21 @@
 """Implements basics of Capa, including class CapaModule."""
 import json
 import logging
-import sys
 import re
-from lxml import etree
+import sys
 
+from lxml import etree
 from pkg_resources import resource_string
 
 import dogstats_wrapper as dog_stats_api
-from .capa_base import CapaMixin, CapaFields, ComplexEncoder
 from capa import responsetypes
-from .progress import Progress
-from xmodule.util.misc import escape_html_characters
-from xmodule.x_module import XModule, module_attr, DEPRECATION_VSCOMPAT_EVENT
-from xmodule.raw_module import RawDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
+from xmodule.raw_module import RawDescriptor
+from xmodule.util.misc import escape_html_characters
+from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT, XModule, module_attr
+
+from .capa_base import CapaFields, CapaMixin, ComplexEncoder
+from .progress import Progress
 
 log = logging.getLogger("edx.courseware")
 

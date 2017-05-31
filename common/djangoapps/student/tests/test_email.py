@@ -1,29 +1,34 @@
 
 import json
 import unittest
-import mock
 
-from student.tests.factories import UserFactory, RegistrationFactory, PendingEmailChangeFactory
-from student.views import (
-    reactivation_email_for_user, do_email_change_request, confirm_email_change,
-    validate_new_email, SETTING_CHANGE_INITIATED, generate_activation_email_context
-)
-from student.models import UserProfile, PendingEmailChange, Registration
-from third_party_auth.views import inactive_user_view
-from django.core.urlresolvers import reverse
-from django.core import mail
+import mock
+from django.conf import settings
 from django.contrib.auth.models import User
+from django.core import mail
+from django.core.urlresolvers import reverse
 from django.db import transaction
+from django.http import HttpResponse
 from django.test import TestCase, TransactionTestCase
 from django.test.client import RequestFactory
 from mock import Mock, patch
-from django.http import HttpResponse
-from django.conf import settings
+
 from edxmako.shortcuts import render_to_string
-from util.request import safe_get_host
-from util.testing import EventTestMixin
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
+from student.models import PendingEmailChange, Registration, UserProfile
+from student.tests.factories import PendingEmailChangeFactory, RegistrationFactory, UserFactory
+from student.views import (
+    SETTING_CHANGE_INITIATED,
+    confirm_email_change,
+    do_email_change_request,
+    generate_activation_email_context,
+    reactivation_email_for_user,
+    validate_new_email
+)
+from third_party_auth.views import inactive_user_view
+from util.request import safe_get_host
+from util.testing import EventTestMixin
 
 
 class TestException(Exception):
