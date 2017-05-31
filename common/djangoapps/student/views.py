@@ -711,9 +711,9 @@ def dashboard(request):
         'course_programs': course_programs,
     }
 
-    http_referer = request.META.get('HTTP_REFERER')
-    if http_referer:
-        if http_referer.find("register") >= 0 or http_referer.find("oauth") > 0:
+    referer = request.META.get('HTTP_REFERER')
+    if referer:
+        if referer.find("register") >= 0 or referer.find("oauth") > 0:
             return redirect("/welcome-unactivated/")
 
     return render_to_response('dashboard.html', context)
