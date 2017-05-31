@@ -54,7 +54,11 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
   % else:
     <% mode_class = '' %>
   % endif
-<div class="course-container">
+      <div class="course-container"
+        % if getattr(course_overview, 'language'):
+          lang="${course_overview.language}"
+        % endif
+      >
 <article class="course${mode_class}">
   <% course_target = reverse(course_home_url_name(course_overview.id), args=[unicode(course_overview.id)]) %>
   <section class="details" aria-labelledby="details-heading-${course_overview.number}">

@@ -111,7 +111,11 @@ ${HTML(fragment.foot_html())}
   <%include file="/courseware/course_navigation.html" args="active_page='courseware'" />
 % endif
 
-<div class="container">
+<div class="container"
+  % if getattr(course, 'language'):
+    lang="${course.language}"
+  % endif
+  >
   <div class="course-wrapper" role="presentation">
 
 % if disable_accordion is UNDEFINED or not disable_accordion:
