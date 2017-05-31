@@ -7,13 +7,13 @@ from __future__ import unicode_literals
 import argparse
 import logging
 import sys
-from path import Path as path
-
 from cStringIO import StringIO
+
+from mako.lookup import TemplateLookup
+from path import Path as path
 
 from calc import UndefinedVariable
 from capa.capa_problem import LoncapaProblem
-from mako.lookup import TemplateLookup
 
 logging.basicConfig(format="%(levelname)s %(message)s")
 log = logging.getLogger('capa.checker')

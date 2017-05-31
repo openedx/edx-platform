@@ -1,17 +1,18 @@
+import json
+
+import ddt
+from django.conf import settings
+from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test.client import Client
-from django.contrib.auth.models import User
-from django.conf import settings
-from django_comment_common.models import (
-    Role, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_STUDENT)
-from django_comment_common.utils import seed_permissions_roles
-from student.models import anonymous_id_for_user, CourseEnrollment, UserProfile
-from util.testing import UrlResetMixin
+from mock import Mock, patch
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator
-from mock import patch, Mock
-import ddt
-import json
+
+from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_STUDENT, Role
+from django_comment_common.utils import seed_permissions_roles
+from student.models import CourseEnrollment, UserProfile, anonymous_id_for_user
+from util.testing import UrlResetMixin
 
 
 class AutoAuthTestCase(UrlResetMixin, TestCase):

@@ -6,6 +6,7 @@ Note:
     So it must be added to INSTALLED_APPS in django settings files.
 """
 from django.conf import settings
+
 from openedx.core.djangoapps.theming.models import SiteTheme
 
 

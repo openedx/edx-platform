@@ -9,18 +9,18 @@ If student have answered - Question with statistics for each answers.
 import cgi
 import json
 import logging
-from copy import deepcopy
 from collections import OrderedDict
+from copy import deepcopy
 
 from lxml import etree
-from openedx.core.djangolib.markup import Text
 from pkg_resources import resource_string
+from xblock.fields import Boolean, Dict, List, Scope, String
 
-from xmodule.x_module import XModule
-from xmodule.stringify import stringify_children
+from openedx.core.djangolib.markup import Text
 from xmodule.mako_module import MakoModuleDescriptor
+from xmodule.stringify import stringify_children
+from xmodule.x_module import XModule
 from xmodule.xml_module import XmlDescriptor
-from xblock.fields import Scope, String, Dict, Boolean, List
 
 log = logging.getLogger(__name__)
 _ = lambda text: text

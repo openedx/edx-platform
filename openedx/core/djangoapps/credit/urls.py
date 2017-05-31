@@ -1,9 +1,9 @@
 """
 URLs for the credit app.
 """
-from django.conf.urls import patterns, url, include
+from django.conf.urls import include, patterns, url
 
-from openedx.core.djangoapps.credit import views, routers, models
+from openedx.core.djangoapps.credit import models, routers, views
 
 PROVIDER_ID_PATTERN = r'(?P<provider_id>{})'.format(models.CREDIT_PROVIDER_ID_REGEX)
 

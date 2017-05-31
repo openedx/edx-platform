@@ -3,24 +3,26 @@
 LibraryContent: The XBlock used to include blocks from a library in a course.
 """
 import json
-from lxml import etree
-from copy import copy
-from capa.responsetypes import registry
-from gettext import ngettext
-from lazy import lazy
-
-from .mako_module import MakoModuleDescriptor
-from opaque_keys.edx.locator import LibraryLocator
 import random
+from copy import copy
+from gettext import ngettext
+
+from lazy import lazy
+from lxml import etree
+from opaque_keys.edx.locator import LibraryLocator
+from pkg_resources import resource_string
 from webob import Response
 from xblock.core import XBlock
-from xblock.fields import Scope, String, List, Integer, Boolean
+from xblock.fields import Boolean, Integer, List, Scope, String
 from xblock.fragment import Fragment
-from xmodule.validation import StudioValidationMessage, StudioValidation
-from xmodule.x_module import XModule, STUDENT_VIEW
-from xmodule.studio_editable import StudioEditableModule, StudioEditableDescriptor
+
+from capa.responsetypes import registry
+from xmodule.studio_editable import StudioEditableDescriptor, StudioEditableModule
+from xmodule.validation import StudioValidation, StudioValidationMessage
+from xmodule.x_module import STUDENT_VIEW, XModule
+
+from .mako_module import MakoModuleDescriptor
 from .xml_module import XmlDescriptor
-from pkg_resources import resource_string
 
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
 #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file

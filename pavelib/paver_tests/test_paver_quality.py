@@ -1,20 +1,20 @@
 """
 Tests for paver quality tasks
 """
+import os
 import tempfile
 import textwrap
 import unittest
 
-import os
 import paver.easy
 import paver.tasks
 from ddt import ddt, file_data
-from mock import patch, MagicMock, mock_open
+from mock import MagicMock, mock_open, patch
 from path import Path as path
 from paver.easy import BuildFailure
 
 import pavelib.quality
-from pavelib.paver_tests.utils import fail_on_pylint, fail_on_eslint
+from pavelib.paver_tests.utils import fail_on_eslint, fail_on_pylint
 
 
 @ddt

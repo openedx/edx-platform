@@ -3,7 +3,6 @@
 
 from django.dispatch import Signal
 
-
 thread_created = Signal(providing_args=['user', 'post'])
 thread_edited = Signal(providing_args=['user', 'post'])
 thread_voted = Signal(providing_args=['user', 'post'])

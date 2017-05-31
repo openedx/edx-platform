@@ -1,18 +1,18 @@
 """
 Helper functions for bok_choy test tasks
 """
-import sys
-import os
-import time
 import httplib
+import os
 import subprocess
+import sys
+import time
+
 from paver import tasks
-from paver.easy import sh, task, cmdopts, needs
+from paver.easy import cmdopts, needs, sh, task
+
 from pavelib.utils.envs import Env
 from pavelib.utils.process import run_background_process
-from pavelib.utils.test.bokchoy_options import (
-    BOKCHOY_COVERAGERC, BOKCHOY_DEFAULT_STORE, BOKCHOY_DEFAULT_STORE_DEPR
-)
+from pavelib.utils.test.bokchoy_options import BOKCHOY_COVERAGERC, BOKCHOY_DEFAULT_STORE, BOKCHOY_DEFAULT_STORE_DEPR
 from pavelib.utils.timer import timed
 
 try:

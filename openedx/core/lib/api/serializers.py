@@ -2,9 +2,9 @@
 Serializers to be used in APIs.
 """
 
-from rest_framework import serializers
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from rest_framework import serializers
 
 
 class CollapsedReferenceSerializer(serializers.HyperlinkedModelSerializer):

@@ -6,7 +6,6 @@ from either enrolling in or accessing a course.
 """
 from collections import namedtuple
 
-
 BlockedMessage = namedtuple('BlockedMessage', [
     # A user-facing description of the message
     'description',

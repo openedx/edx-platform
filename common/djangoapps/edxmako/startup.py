@@ -2,6 +2,7 @@
 Initialize the mako template lookup
 """
 from django.conf import settings
+
 from . import add_lookup, clear_lookups
 
 

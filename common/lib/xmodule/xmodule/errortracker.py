@@ -1,7 +1,6 @@
 import logging
 import sys
 import traceback
-
 from collections import namedtuple
 
 log = logging.getLogger(__name__)

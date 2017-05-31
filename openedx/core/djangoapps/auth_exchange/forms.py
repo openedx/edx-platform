@@ -1,14 +1,14 @@
 """
 Forms to support third-party to first-party OAuth 2.0 access token exchange
 """
+import provider.constants
 from django.contrib.auth.models import User
 from django.forms import CharField
 from edx_oauth2_provider.constants import SCOPE_NAMES
-import provider.constants
+from oauth2_provider.models import Application
 from provider.forms import OAuthForm, OAuthValidationError
 from provider.oauth2.forms import ScopeChoiceField, ScopeMixin
 from provider.oauth2.models import Client
-from oauth2_provider.models import Application
 from requests import HTTPError
 from social.backends import oauth as social_oauth
 from social.exceptions import AuthException

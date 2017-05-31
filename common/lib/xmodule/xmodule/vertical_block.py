@@ -3,9 +3,11 @@ VerticalBlock - an XBlock which renders its children in a column.
 """
 import logging
 from copy import copy
+
 from lxml import etree
 from xblock.core import XBlock
 from xblock.fragment import Fragment
+
 from xmodule.mako_module import MakoTemplateBlockBase
 from xmodule.progress import Progress
 from xmodule.seq_module import SequenceFields

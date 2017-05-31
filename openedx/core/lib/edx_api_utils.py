@@ -1,5 +1,6 @@
 """Helper functions to get data from APIs"""
 from __future__ import unicode_literals
+
 import logging
 
 from django.conf import settings
@@ -10,7 +11,6 @@ from provider.oauth2.models import Client
 
 from openedx.core.lib.cache_utils import zpickle, zunpickle
 from openedx.core.lib.token_utils import JwtBuilder
-
 
 log = logging.getLogger(__name__)
 

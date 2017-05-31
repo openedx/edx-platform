@@ -15,7 +15,6 @@ from django.db import models
 
 from track.backends import BaseBackend
 
-
 log = logging.getLogger('track.backends.django')
 
 

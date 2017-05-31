@@ -15,10 +15,12 @@ from django.http import JsonResponse
 from django.views.generic import View
 from edx_oauth2_provider import views as dop_views  # django-oauth2-provider views
 from jwkest.jwk import RSAKey
-from oauth2_provider import models as dot_models, views as dot_views  # django-oauth-toolkit
+from oauth2_provider import models as dot_models  # django-oauth-toolkit
+from oauth2_provider import views as dot_views
 
 from openedx.core.djangoapps.auth_exchange import views as auth_exchange_views
 from openedx.core.lib.token_utils import JwtBuilder
+
 from . import adapters
 
 

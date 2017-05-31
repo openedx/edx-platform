@@ -1,32 +1,30 @@
 """
     Tests for enrollment refund capabilities.
 """
+import logging
+import unittest
 from datetime import datetime, timedelta
+
 import ddt
 import httpretty
-import logging
 import pytz
-import unittest
-
+# Explicitly import the cache from ConfigurationModel so we can reset it after each test
+from config_models.models import cache
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.client import Client
 from django.test.utils import override_settings
 from mock import patch
 
-from student.models import CourseEnrollment, CourseEnrollmentAttribute
-from student.tests.factories import UserFactory, CourseModeFactory
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-
 # These imports refer to lms djangoapps.
 # Their testcases are only run under lms.
 from certificates.models import CertificateStatuses, GeneratedCertificate  # pylint: disable=import-error
 from certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
 from openedx.core.djangoapps.commerce.utils import ECOMMERCE_DATE_FORMAT
-
-# Explicitly import the cache from ConfigurationModel so we can reset it after each test
-from config_models.models import cache
+from student.models import CourseEnrollment, CourseEnrollmentAttribute
+from student.tests.factories import CourseModeFactory, UserFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 log = logging.getLogger(__name__)
 TEST_API_URL = 'http://www-internal.example.com/api'

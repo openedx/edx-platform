@@ -1,24 +1,22 @@
 """
 Tests for credit courses on the student dashboard.
 """
-import unittest
 import datetime
+import unittest
 
 import ddt
-from mock import patch
 import pytz
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
+from mock import patch
 
+from openedx.core.djangoapps.credit import api as credit_api
+from openedx.core.djangoapps.credit.models import CreditCourse, CreditEligibility, CreditProvider
+from student.models import CourseEnrollmentAttribute
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from student.models import CourseEnrollmentAttribute
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
-
-from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider, CreditEligibility
-from openedx.core.djangoapps.credit import api as credit_api
-
 
 TEST_CREDIT_PROVIDER_SECRET_KEY = "931433d583c84ca7ba41784bad3232e6"
 

@@ -3,15 +3,14 @@ Decorators that can be used to interact with third_party_auth.
 """
 from functools import wraps
 
-from six.moves.urllib.parse import urlencode, urlparse
-
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
 from django.utils.decorators import available_attrs
-from django.core.urlresolvers import reverse
 
-from third_party_auth.provider import Registry
+from six.moves.urllib.parse import urlencode, urlparse
 from third_party_auth.models import LTIProviderConfig
+from third_party_auth.provider import Registry
 
 
 def xframe_allow_whitelisted(view_func):

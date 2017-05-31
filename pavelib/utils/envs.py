@@ -2,14 +2,17 @@
 Helper functions for loading environment settings.
 """
 from __future__ import print_function
+
+import json
 import os
 import sys
-import json
+
+import memcache
 from lazy import lazy
 from path import Path as path
-from pavelib.utils.cmd import django_cmd
 from paver.easy import sh
-import memcache
+
+from pavelib.utils.cmd import django_cmd
 
 
 class Env(object):

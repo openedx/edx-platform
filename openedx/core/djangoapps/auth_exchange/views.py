@@ -9,9 +9,10 @@ The following are currently implemented:
 
 # pylint: disable=abstract-method
 
+import django.contrib.auth as auth
+import social.apps.django_app.utils as social_utils
 from django.conf import settings
 from django.contrib.auth import login
-import django.contrib.auth as auth
 from django.http import HttpResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -24,7 +25,6 @@ from provider.oauth2.views import AccessTokenView as DOPAccessTokenView
 from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
-import social.apps.django_app.utils as social_utils
 
 from openedx.core.djangoapps.auth_exchange.forms import AccessTokenExchangeForm
 from openedx.core.djangoapps.oauth_dispatch import adapters

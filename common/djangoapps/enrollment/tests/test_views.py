@@ -1,42 +1,42 @@
 """
 Tests for user enrollment.
 """
-import json
-import itertools
-import unittest
 import datetime
+import itertools
+import json
+import unittest
 
 import ddt
+import httpretty
+import pytz
+from django.conf import settings
 from django.core.cache import cache
-from mock import patch
-from nose.plugins.attrib import attr
-from django.test import Client
 from django.core.handlers.wsgi import WSGIRequest
 from django.core.urlresolvers import reverse
-from rest_framework.test import APITestCase
-from rest_framework import status
-from django.conf import settings
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls_range
+from django.test import Client
 from django.test.utils import override_settings
-import pytz
-import httpretty
+from mock import patch
+from nose.plugins.attrib import attr
+from rest_framework import status
+from rest_framework.test import APITestCase
 
 from course_modes.models import CourseMode
-from enrollment.views import EnrollmentUserThrottle
-from util.models import RateLimitConfiguration
-from util.testing import UrlResetMixin
-from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
 from enrollment import api
 from enrollment.errors import CourseEnrollmentError
+from enrollment.views import EnrollmentUserThrottle
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.embargo.models import Country, CountryAccessRule, RestrictedCourse
+from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from openedx.core.djangoapps.user_api.models import UserOrgTag
 from openedx.core.lib.django_test_client_utils import get_absolute_url
+from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
 from student.models import CourseEnrollment
 from student.roles import CourseStaffRole
 from student.tests.factories import AdminFactory, CourseModeFactory, UserFactory
-from openedx.core.djangoapps.embargo.models import CountryAccessRule, Country, RestrictedCourse
-from openedx.core.djangoapps.embargo.test_utils import restrict_course
+from util.models import RateLimitConfiguration
+from util.testing import UrlResetMixin
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls_range
 
 
 class EnrollmentTestMixin(object):

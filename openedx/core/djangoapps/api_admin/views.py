@@ -3,13 +3,13 @@ import logging
 
 from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
-from django.core.urlresolvers import reverse_lazy, reverse
+from django.core.urlresolvers import reverse, reverse_lazy
 from django.http.response import JsonResponse
 from django.shortcuts import redirect
 from django.views.generic import View
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView
-from oauth2_provider.generators import generate_client_secret, generate_client_id
+from oauth2_provider.generators import generate_client_id, generate_client_secret
 from oauth2_provider.models import get_application_model
 from oauth2_provider.views import ApplicationRegistration
 from slumber.exceptions import HttpNotFoundError

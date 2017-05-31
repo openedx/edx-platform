@@ -2,11 +2,17 @@
 Third-party auth provider configuration API.
 """
 from django.contrib.sites.models import Site
+
 from openedx.core.djangoapps.theming.helpers import get_current_request
 
 from .models import (
-    OAuth2ProviderConfig, SAMLConfiguration, SAMLProviderConfig, LTIProviderConfig,
-    _PSA_OAUTH2_BACKENDS, _PSA_SAML_BACKENDS, _LTI_BACKENDS,
+    _LTI_BACKENDS,
+    _PSA_OAUTH2_BACKENDS,
+    _PSA_SAML_BACKENDS,
+    LTIProviderConfig,
+    OAuth2ProviderConfig,
+    SAMLConfiguration,
+    SAMLProviderConfig
 )
 
 

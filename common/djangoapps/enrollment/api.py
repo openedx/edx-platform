@@ -5,6 +5,7 @@ course level, such as available course modes.
 """
 import importlib
 import logging
+
 from django.conf import settings
 from django.core.cache import cache
 from opaque_keys.edx.keys import CourseKey

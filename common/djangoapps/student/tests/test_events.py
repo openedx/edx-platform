@@ -2,15 +2,14 @@
 """
 Test that various events are fired for models in the student app.
 """
+import mock
+from django.db.utils import IntegrityError
 from django.test import TestCase
-
 from django_countries.fields import Country
 
 from student.models import PasswordHistory
 from student.tests.factories import UserFactory
 from student.tests.tests import UserSettingsEventTestMixin
-import mock
-from django.db.utils import IntegrityError
 
 
 class TestUserProfileEvents(UserSettingsEventTestMixin, TestCase):

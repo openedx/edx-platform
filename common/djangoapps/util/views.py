@@ -1,32 +1,29 @@
 import json
 import logging
-from smtplib import SMTPException
 import sys
 from functools import wraps
+from smtplib import SMTPException
 
+import zendesk
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.cache import caches
 from django.core.mail import send_mail
 from django.core.validators import ValidationError, validate_email
+from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseNotAllowed, HttpResponseServerError
 from django.views.decorators.csrf import requires_csrf_token
 from django.views.defaults import server_error
-from django.http import (Http404, HttpResponse, HttpResponseNotAllowed,
-                         HttpResponseServerError, HttpResponseForbidden)
-import dogstats_wrapper as dog_stats_api
-import zendesk
-import calc
-
 from opaque_keys import InvalidKeyError
-
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
+import calc
+import dogstats_wrapper as dog_stats_api
+import track.views
 from edxmako.shortcuts import render_to_response, render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.features.enterprise_support import api as enterprise_api
-import track.views
-from student.roles import GlobalStaff
 from student.models import CourseEnrollment
+from student.roles import GlobalStaff
 
 log = logging.getLogger(__name__)
 

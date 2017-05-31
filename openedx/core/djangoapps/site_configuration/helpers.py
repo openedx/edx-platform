@@ -2,8 +2,9 @@
 Helpers methods for site configuration.
 """
 from django.conf import settings
-from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
+
 from microsite_configuration import microsite
+from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 
 
 def get_current_site_configuration():

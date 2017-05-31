@@ -3,9 +3,10 @@ Utility functions related to urls.
 """
 
 import sys
+from importlib import import_module
+
 from django.conf import settings
 from django.core.urlresolvers import set_urlconf
-from importlib import import_module
 
 
 def reload_django_url_config():
