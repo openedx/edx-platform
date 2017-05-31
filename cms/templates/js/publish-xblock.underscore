@@ -100,7 +100,7 @@ var visibleToStaffOnly = visibilityState === 'staff_only';
             <% if (hasPartitionGroupComponents) { %>
                 <p class="note-visibility">
                     <span class="icon fa fa-eye" aria-hidden="true"></span>
-                    <span class="note-copy"><%- gettext("Some content in this unit is visible only to specific groups of learners.") %></span>
+                    <span class="note-copy"><%- gettext("Access to some content in this unit is restricted to specific groups of learners.") %></span>
                 </p>
             <% } %>
         <ul class="actions-inline">

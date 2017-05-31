@@ -127,7 +127,7 @@ class ComponentVisibilityEditorView(BaseComponentEditorView):
         """
         This returns the message shown at the top of the visibility dialog about the
         current visibility state (at the time that the dialog was opened).
-        For example, "Current visible to: All Learners and Staff".
+        For example, "Access is restricted to: All Learners and Staff".
         """
         return self.q(css=self._bounded_selector('.visibility-header'))[0].text
 
