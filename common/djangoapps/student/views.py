@@ -128,6 +128,9 @@ from notification_prefs.views import enable_notifications
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.programs.utils import get_programs_for_dashboard
 
+# Used in redirecting registered users to welcome page
+from django.http import HttpResponseRedirect
+import re
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
@@ -707,6 +710,10 @@ def dashboard(request):
         'nav_hidden': True,
         'course_programs': course_programs,
     }
+
+    if request.META.get('HTTP_REFERER'):
+        if request.META.get('HTTP_REFERER').find("register") >= 1:
+            return redirect("/welcome-unactivated/")
 
     return render_to_response('dashboard.html', context)
 
