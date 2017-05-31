@@ -9,7 +9,7 @@
 
     <% if (hasMoreResults) { %>
         <a class="search-load-next" href="#">
-            <%=
+            <%-
             StringUtils.interpolate(
                 ngettext("Load next {num_items} result", "Load next {num_items} results", pageSize),
                 {

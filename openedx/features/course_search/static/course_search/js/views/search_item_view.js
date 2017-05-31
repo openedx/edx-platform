@@ -35,6 +35,8 @@
                     data.excerpt = '';
                     data.content_type = '';
                 }
+                data.excerptHtml = HtmlUtils.HTML(data.excerpt);
+                delete data.excerpt;
                 HtmlUtils.setHtml(this.$el, HtmlUtils.template(this.template)(data));
                 return this;
             },

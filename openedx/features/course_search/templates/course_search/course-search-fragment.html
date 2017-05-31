@@ -63,7 +63,7 @@ from openedx.features.course_experience import UNIFIED_COURSE_EXPERIENCE_FLAG
     var courseId = $('.courseware-results').data('courseId');
     CourseSearchFactory({
         courseId: courseId,
-        query: '${query}'
+        query: '${query | n, js_escaped_string}'
     });
 </%static:require_module>
 </%block>

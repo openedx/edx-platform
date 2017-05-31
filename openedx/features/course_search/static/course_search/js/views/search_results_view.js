@@ -59,6 +59,7 @@
                     });
                     return item.render().el;
                 }, this);
+                // safe-lint: disable=javascript-jquery-append
                 this.$el.find('ol').append(items);
             },
 
