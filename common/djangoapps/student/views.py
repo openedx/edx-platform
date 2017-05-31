@@ -1970,6 +1970,9 @@ def activate_account(request, key):
                             manual_enrollment_audit.reason, enrollment
                         )
 
+        if not already_active:
+            return redirect('/welcome')
+
         resp = render_to_response(
             "registration/activation_complete.html",
             {
