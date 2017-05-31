@@ -1,35 +1,37 @@
 """
 Unit tests for getting the list of courses and the course outline.
 """
-import ddt
-import json
-import lxml
 import datetime
+import json
+
+import ddt
+import lxml
 import mock
 import pytz
-
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.utils.translation import ugettext as _
+from opaque_keys.edx.locator import CourseLocator
+from search.api import perform_search
 
 from contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
 from contentstore.tests.utils import CourseTestCase
-from contentstore.utils import reverse_course_url, reverse_library_url, add_instructor, reverse_usage_url
+from contentstore.utils import add_instructor, reverse_course_url, reverse_library_url, reverse_usage_url
 from contentstore.views.course import (
-    course_outline_initial_state, reindex_course_and_check_access, _deprecated_blocks_info
+    _deprecated_blocks_info,
+    course_outline_initial_state,
+    reindex_course_and_check_access
 )
-from contentstore.views.item import create_xblock_info, VisibilityState
+from contentstore.views.item import VisibilityState, create_xblock_info
 from course_action_state.managers import CourseRerunUIStateManager
 from course_action_state.models import CourseRerunState
-from opaque_keys.edx.locator import CourseLocator
-from search.api import perform_search
 from student.auth import has_course_author_access
 from student.roles import LibraryUserRole
 from student.tests.factories import UserFactory
 from util.date_utils import get_default_time_display
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory
 
 

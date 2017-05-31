@@ -2,7 +2,8 @@
 Admin registration for tags models
 """
 from django.contrib import admin
-from .models import TagCategories, TagAvailableValues
+
+from .models import TagAvailableValues, TagCategories
 
 
 class TagCategoriesAdmin(admin.ModelAdmin):

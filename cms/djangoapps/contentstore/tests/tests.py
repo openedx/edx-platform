@@ -1,27 +1,26 @@
 """
 This test file will test registration, login, activation, and session activity timeouts
 """
+import datetime
 import time
-import mock
 import unittest
-from ddt import ddt, data, unpack
 
-from django.test import TestCase
-from django.test.utils import override_settings
-from django.core.cache import cache
+import mock
+from ddt import data, ddt, unpack
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.cache import cache
 from django.core.urlresolvers import reverse
+from django.test import TestCase
+from django.test.utils import override_settings
+from freezegun import freeze_time
+from pytz import UTC
 
 from contentstore.models import PushNotificationConfig
 from contentstore.tests.test_course_settings import CourseTestCase
-from contentstore.tests.utils import parse_json, user, registration, AjaxEnabledTestClient
+from contentstore.tests.utils import AjaxEnabledTestClient, parse_json, registration, user
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-import datetime
-from pytz import UTC
-
-from freezegun import freeze_time
 
 
 class ContentStoreTestCase(ModuleStoreTestCase):

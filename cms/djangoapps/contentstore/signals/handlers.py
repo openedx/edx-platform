@@ -2,17 +2,16 @@
 
 import logging
 from datetime import datetime
-from pytz import UTC
 
 from django.dispatch import receiver
+from pytz import UTC
 
-from xmodule.modulestore.django import modulestore, SignalHandler
 from contentstore.courseware_index import CoursewareSearchIndexer, LibrarySearchIndexer
 from contentstore.proctoring import register_special_exams
 from openedx.core.djangoapps.credit.signals import on_course_publish
 from openedx.core.lib.gating import api as gating_api
 from util.module_utils import yield_dynamic_descriptor_descendants
-
+from xmodule.modulestore.django import SignalHandler, modulestore
 
 log = logging.getLogger(__name__)
 

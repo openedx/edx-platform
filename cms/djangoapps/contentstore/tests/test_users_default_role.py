@@ -5,9 +5,8 @@ after deleting it creates same course again
 from contentstore.tests.utils import AjaxEnabledTestClient
 from contentstore.utils import delete_course_and_groups, reverse_url
 from courseware.tests.factories import UserFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-
 from student.models import CourseEnrollment
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
 class TestUsersDefaultRole(ModuleStoreTestCase):

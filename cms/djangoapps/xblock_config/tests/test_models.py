@@ -1,12 +1,12 @@
 """
 Tests for the models that configures Edit LTI fields feature.
 """
-import ddt
-
 from contextlib import contextmanager
-from django.test import TestCase
 
+import ddt
+from django.test import TestCase
 from opaque_keys.edx.locator import CourseLocator
+
 from request_cache.middleware import RequestCache
 from xblock_config.models import CourseEditLTIFieldsEnabledFlag
 

@@ -2,25 +2,29 @@
 Test module for Entrance Exams AJAX callback handler workflows
 """
 import json
-from mock import patch
 
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.test.client import RequestFactory
+from milestones.tests.utils import MilestonesTestCaseMixin
+from mock import patch
+from opaque_keys.edx.keys import UsageKey
 
 from contentstore.tests.utils import AjaxEnabledTestClient, CourseTestCase
 from contentstore.utils import reverse_url
-from contentstore.views.entrance_exam import create_entrance_exam, update_entrance_exam, delete_entrance_exam,\
-    add_entrance_exam_milestone, remove_entrance_exam_milestone_reference
-from contentstore.views.helpers import GRADER_TYPES
+from contentstore.views.entrance_exam import (
+    add_entrance_exam_milestone,
+    create_entrance_exam,
+    delete_entrance_exam,
+    remove_entrance_exam_milestone_reference,
+    update_entrance_exam
+)
+from contentstore.views.helpers import GRADER_TYPES, create_xblock
 from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
-from opaque_keys.edx.keys import UsageKey
 from student.tests.factories import UserFactory
 from util import milestones_helpers
 from xmodule.modulestore.django import modulestore
-from contentstore.views.helpers import create_xblock
-from milestones.tests.utils import MilestonesTestCaseMixin
 
 
 @patch.dict(settings.FEATURES, {'ENTRANCE_EXAMS': True})

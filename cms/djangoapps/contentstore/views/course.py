@@ -7,75 +7,63 @@ import logging
 import random
 import string  # pylint: disable=deprecated-module
 
+import django.utils
+import six
+from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound, Http404
+from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseNotFound
 from django.shortcuts import redirect
-import django.utils
 from django.utils.translation import ugettext as _
-from django.views.decorators.http import require_http_methods, require_GET
 from django.views.decorators.csrf import ensure_csrf_cookie
-import six
-
+from django.views.decorators.http import require_GET, require_http_methods
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import Location
 
-from .component import (
-    ADVANCED_COMPONENT_TYPES,
-)
-from .item import create_xblock_info
-from .library import LIBRARIES_ENABLED, get_library_creator_status
-from ccx_keys.locator import CCXLocator
 from contentstore.course_group_config import (
     COHORT_SCHEME,
     ENROLLMENT_SCHEME,
-    GroupConfiguration,
-    GroupConfigurationsValidationError,
     RANDOM_SCHEME,
+    GroupConfiguration,
+    GroupConfigurationsValidationError
 )
-from contentstore.course_info_model import get_course_updates, update_course_updates, delete_course_update
+from contentstore.course_info_model import delete_course_update, get_course_updates, update_course_updates
 from contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
 from contentstore.push_notification import push_notification_enabled
 from contentstore.tasks import rerun_course
 from contentstore.utils import (
     add_instructor,
-    initialize_permissions,
     get_lms_link_for_item,
+    initialize_permissions,
     remove_all_instructors,
     reverse_course_url,
     reverse_library_url,
-    reverse_usage_url,
     reverse_url,
+    reverse_usage_url
 )
-from contentstore.views.entrance_exam import (
-    create_entrance_exam,
-    delete_entrance_exam,
-    update_entrance_exam,
-)
+from contentstore.views.entrance_exam import create_entrance_exam, delete_entrance_exam, update_entrance_exam
 from course_action_state.managers import CourseActionStateItemNotFoundError
 from course_action_state.models import CourseRerunState, CourseRerunUIStateManager
-from course_creators.views import get_course_creator_status, add_user_with_status_unrequested
+from course_creators.views import add_user_with_status_unrequested, get_course_creator_status
 from edxmako.shortcuts import render_to_response
 from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
 from models.settings.encoder import CourseSettingsEncoder
 from openedx.core.djangoapps.content.course_structures.api.v0 import api, errors
-from openedx.core.djangoapps.credit.api import is_credit_course, get_credit_requirements
+from openedx.core.djangoapps.credit.api import get_credit_requirements, is_credit_course
 from openedx.core.djangoapps.credit.tasks import update_credit_course_requirements
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from openedx.core.lib.course_tabs import CourseTabPluginManager
 from openedx.core.lib.courses import course_image_url
-from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from student import auth
-from student.auth import has_course_author_access, has_studio_write_access, has_studio_read_access
-from student.roles import (
-    CourseInstructorRole, CourseStaffRole, CourseCreatorRole, GlobalStaff, UserBasedRole
-)
+from student.auth import has_course_author_access, has_studio_read_access, has_studio_write_access
+from student.roles import CourseCreatorRole, CourseInstructorRole, CourseStaffRole, GlobalStaff, UserBasedRole
 from util.course import get_link_for_about_page
 from util.date_utils import get_default_time_display
 from util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
@@ -83,23 +71,22 @@ from util.milestones_helpers import (
     is_entrance_exams_enabled,
     is_prerequisite_courses_enabled,
     is_valid_course_key,
-    set_prerequisite_courses,
+    set_prerequisite_courses
 )
-from util.organizations_helpers import (
-    add_organization_course,
-    get_organization_by_short_name,
-    organizations_enabled,
-)
+from util.organizations_helpers import add_organization_course, get_organization_by_short_name, organizations_enabled
 from util.string_utils import _has_non_ascii_characters
 from xblock_django.api import deprecated_xblocks
 from xmodule.contentstore.content import StaticContent
-from xmodule.course_module import CourseFields
-from xmodule.course_module import DEFAULT_START_DATE
+from xmodule.course_module import DEFAULT_START_DATE, CourseFields
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError
+from xmodule.modulestore.exceptions import DuplicateCourseError, ItemNotFoundError
 from xmodule.tabs import CourseTab, CourseTabList, InvalidTabsException
+
+from .component import ADVANCED_COMPONENT_TYPES
+from .item import create_xblock_info
+from .library import LIBRARIES_ENABLED, get_library_creator_status
 
 log = logging.getLogger(__name__)
 

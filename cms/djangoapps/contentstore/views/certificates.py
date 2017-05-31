@@ -26,27 +26,26 @@ import logging
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.csrf import ensure_csrf_cookie
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
-
-from contentstore.utils import reverse_course_url
-from edxmako.shortcuts import render_to_response
-from opaque_keys.edx.keys import CourseKey, AssetKey
 from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import AssetKey, CourseKey
+
+from contentstore.utils import get_lms_link_for_certificate_web_view, reverse_course_url
+from contentstore.views.assets import delete_asset
+from contentstore.views.exception import AssetNotFoundException
+from course_modes.models import CourseMode
+from edxmako.shortcuts import render_to_response
 from eventtracking import tracker
 from student.auth import has_studio_write_access
 from student.roles import GlobalStaff
-from util.db import generate_int_id, MYSQL_MAX_INT
+from util.db import MYSQL_MAX_INT, generate_int_id
 from util.json_request import JsonResponse
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.django import modulestore
-from contentstore.views.assets import delete_asset
-from contentstore.views.exception import AssetNotFoundException
-from django.core.exceptions import PermissionDenied
-from course_modes.models import CourseMode
-from contentstore.utils import get_lms_link_for_certificate_web_view
 
 CERTIFICATE_SCHEMA_VERSION = 1
 CERTIFICATE_MINIMUM_ID = 100

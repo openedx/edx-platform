@@ -4,43 +4,40 @@ by reversing group name formats.
 """
 import random
 
-from chrono import Timer
-from mock import patch, Mock
 import ddt
-
-from django.conf import settings
 from ccx_keys.locator import CCXLocator
+from chrono import Timer
+from django.conf import settings
 from django.test import RequestFactory
 from django.test.client import Client
+from mock import Mock, patch
+from opaque_keys.edx.locations import CourseLocator
 
 from common.test.utils import XssTestMixin
-from xmodule.course_module import CourseSummary
-
+from contentstore.tests.utils import AjaxEnabledTestClient
+from contentstore.utils import delete_course_and_groups
 from contentstore.views.course import (
+    AccessListFallback,
     _accessible_courses_iter,
     _accessible_courses_list_from_groups,
-    AccessListFallback,
-    get_courses_accessible_to_user,
     _accessible_courses_summary_iter,
+    get_courses_accessible_to_user
 )
-from contentstore.utils import delete_course_and_groups
-from contentstore.tests.utils import AjaxEnabledTestClient
-from student.tests.factories import UserFactory
+from course_action_state.models import CourseRerunState
 from student.roles import (
     CourseInstructorRole,
     CourseStaffRole,
     GlobalStaff,
-    OrgStaffRole,
     OrgInstructorRole,
-    UserBasedRole,
+    OrgStaffRole,
+    UserBasedRole
 )
+from student.tests.factories import UserFactory
+from xmodule.course_module import CourseSummary
+from xmodule.error_module import ErrorDescriptor
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
-from xmodule.modulestore import ModuleStoreEnum
-from opaque_keys.edx.locations import CourseLocator
-from xmodule.error_module import ErrorDescriptor
-from course_action_state.models import CourseRerunState
-
 
 TOTAL_COURSES_COUNT = 10
 USER_COURSES_COUNT = 1
