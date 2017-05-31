@@ -8,10 +8,13 @@ from pytz import UTC
 
 from contentstore.courseware_index import CoursewareSearchIndexer, LibrarySearchIndexer
 from contentstore.proctoring import register_special_exams
+from lms.djangoapps.grades.tasks import compute_all_grades_for_course
 from openedx.core.djangoapps.credit.signals import on_course_publish
 from openedx.core.lib.gating import api as gating_api
 from util.module_utils import yield_dynamic_descriptor_descendants
+from .signals import GRADING_POLICY_CHANGED
 from xmodule.modulestore.django import SignalHandler, modulestore
+
 
 log = logging.getLogger(__name__)
 
@@ -83,3 +86,18 @@ def handle_item_deleted(**kwargs):
             gating_api.remove_prerequisite(module.location)
             # Remove any 'requires' course content milestone relationships
             gating_api.set_required_content(course_key, module.location, None, None)
+
+
+@receiver(GRADING_POLICY_CHANGED)
+def handle_grading_policy_changed(sender, **kwargs):
+    # pylint: disable=unused-argument
+    """
+    Receives signal and kicks off celery task to recalculate grades
+    """
+    course_key = kwargs.get('course_key')
+    result = compute_all_grades_for_course.apply_async(course_key=course_key)
+    log.info("Grades: Created {task_name}[{task_id}] with arguments {kwargs}".format(
+        task_name=compute_all_grades_for_course.name,
+        task_id=result.task_id,
+        kwargs=kwargs,
+    ))
