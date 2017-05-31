@@ -10,7 +10,9 @@
                 var courseId = options.courseId;
                 var requestedQuery = options.query;
                 var router = new SearchRouter();
-                var form = new CourseSearchForm();
+                var form = new CourseSearchForm({
+                    el: options.searchForm
+                });
                 var collection = new SearchCollection([], {courseId: courseId});
                 var results = new CourseSearchResultsView({collection: collection});
                 var dispatcher = _.clone(Backbone.Events);
@@ -49,6 +51,7 @@
 
                 // Perform a search if an initial query has been provided.
                 if (requestedQuery) {
+                    debugger;
                     router.trigger('search', requestedQuery);
                 }
             };

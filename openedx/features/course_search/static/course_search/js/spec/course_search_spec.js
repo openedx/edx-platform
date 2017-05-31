@@ -614,7 +614,8 @@ define([
                         '<section id="course-content"></section>'
                     );
                     CourseSearchFactory({
-                        courseId: courseId
+                        courseId: courseId,
+                        searchForm: $('.search-form')
                     });
                     spyOn(Backbone.history, 'navigate');
                     this.$contentElement = $('#course-content');

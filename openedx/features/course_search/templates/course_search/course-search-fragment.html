@@ -36,7 +36,7 @@ from openedx.features.course_experience import UNIFIED_COURSE_EXPERIENCE_FLAG
         </div>
         <div class="page-header-secondary">
             <div class="page-header-search">
-                <form class="search-form" role="search" action="${reverse('openedx.course_search.course_search_results', args=[course_key])}">
+                <form class="search-form" role="search">
                     <label class="field-label sr-only" for="search" id="search-hint">${_('Search the course')}</label>
                     <input
                             class="field-input input-text search-input"
@@ -63,6 +63,7 @@ from openedx.features.course_experience import UNIFIED_COURSE_EXPERIENCE_FLAG
     var courseId = $('.courseware-results').data('courseId');
     CourseSearchFactory({
         courseId: courseId,
+        searchForm: $('.search-form'),
         query: '${query | n, js_escaped_string}'
     });
 </%static:require_module>
