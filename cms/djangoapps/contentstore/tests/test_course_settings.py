@@ -15,7 +15,7 @@ from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
 
 from contentstore.utils import reverse_course_url, reverse_usage_url
-from models.settings.course_grading import CourseGradingModel
+from models.settings.course_grading import CourseGradingModel, GRADING_POLICY_CHANGED_EVENT_TYPE, hash_grading_policy
 from models.settings.course_metadata import CourseMetadata
 from models.settings.encoder import CourseSettingsEncoder
 from openedx.core.djangoapps.models.course_details import CourseDetails
@@ -418,19 +418,21 @@ class CourseGradingTest(CourseTestCase):
             subgrader = CourseGradingModel.fetch_grader(self.course.id, i)
             self.assertDictEqual(grader, subgrader, str(i) + "th graders not equal")
 
+    @mock.patch('track.event_transaction_utils.uuid4')
+    @mock.patch('models.settings.course_grading.tracker')
     @mock.patch('contentstore.signals.signals.GRADING_POLICY_CHANGED.send')
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_update_from_json(self, store, send_signal):
+    def test_update_from_json(self, store, send_signal, tracker, uuid):
+        uuid.return_value = "mockUUID"
         self.course = CourseFactory.create(default_store=store)
-
         test_grader = CourseGradingModel.fetch(self.course.id)
         altered_grader = CourseGradingModel.update_from_json(self.course.id, test_grader.__dict__, self.user)
         self.assertDictEqual(test_grader.__dict__, altered_grader.__dict__, "Noop update")
-
+        grading_policy_1 = self._grading_policy_hash_for_course()
         test_grader.graders[0]['weight'] = test_grader.graders[0].get('weight') * 2
         altered_grader = CourseGradingModel.update_from_json(self.course.id, test_grader.__dict__, self.user)
         self.assertDictEqual(test_grader.__dict__, altered_grader.__dict__, "Weight[0] * 2")
-
+        grading_policy_2 = self._grading_policy_hash_for_course()
         # test for bug LMS-11485
         with modulestore().bulk_operations(self.course.id):
             new_grader = test_grader.graders[0].copy()
@@ -442,11 +444,11 @@ class CourseGradingTest(CourseTestCase):
             CourseGradingModel.update_from_json(self.course.id, test_grader.__dict__, self.user)
             altered_grader = CourseGradingModel.fetch(self.course.id)
             self.assertDictEqual(test_grader.__dict__, altered_grader.__dict__)
-
+        grading_policy_3 = self._grading_policy_hash_for_course()
         test_grader.grade_cutoffs['D'] = 0.3
         altered_grader = CourseGradingModel.update_from_json(self.course.id, test_grader.__dict__, self.user)
         self.assertDictEqual(test_grader.__dict__, altered_grader.__dict__, "cutoff add D")
-
+        grading_policy_4 = self._grading_policy_hash_for_course()
         test_grader.grace_period = {'hours': 4, 'minutes': 5, 'seconds': 0}
         altered_grader = CourseGradingModel.update_from_json(self.course.id, test_grader.__dict__, self.user)
         self.assertDictEqual(test_grader.__dict__, altered_grader.__dict__, "4 hour grace period")
@@ -460,23 +462,46 @@ class CourseGradingTest(CourseTestCase):
             mock.call(sender=CourseGradingModel, user_id=self.user.id, course_id=self.course.id),
         ])
 
+        # one for each of the calls to update_from_json(); the last update doesn't actually change the parts of the
+        # policy that get hashed
+        tracker.emit.assert_has_calls([
+            mock.call(
+                GRADING_POLICY_CHANGED_EVENT_TYPE,
+                {
+                    'course_id': unicode(self.course.id),
+                    'event_transaction_type': 'edx.grades.grading_policy_changed',
+                    'grading_policy_hash': policy_hash,
+                    'user_id': unicode(self.user.id),
+                    'event_transaction_id': 'mockUUID',
+                }
+            ) for policy_hash in (
+                grading_policy_1, grading_policy_2, grading_policy_3, grading_policy_4, grading_policy_4
+            )
+        ])
+
+    @mock.patch('track.event_transaction_utils.uuid4')
+    @mock.patch('models.settings.course_grading.tracker')
     @mock.patch('contentstore.signals.signals.GRADING_POLICY_CHANGED.send')
-    def test_update_grader_from_json(self, send_signal):
+    def test_update_grader_from_json(self, send_signal, tracker, uuid):
+        uuid.return_value = 'mockUUID'
         test_grader = CourseGradingModel.fetch(self.course.id)
         altered_grader = CourseGradingModel.update_grader_from_json(
             self.course.id, test_grader.graders[1], self.user
         )
         self.assertDictEqual(test_grader.graders[1], altered_grader, "Noop update")
+        grading_policy_1 = self._grading_policy_hash_for_course()
 
         test_grader.graders[1]['min_count'] = test_grader.graders[1].get('min_count') + 2
         altered_grader = CourseGradingModel.update_grader_from_json(
             self.course.id, test_grader.graders[1], self.user)
         self.assertDictEqual(test_grader.graders[1], altered_grader, "min_count[1] + 2")
+        grading_policy_2 = self._grading_policy_hash_for_course()
 
         test_grader.graders[1]['drop_count'] = test_grader.graders[1].get('drop_count') + 1
         altered_grader = CourseGradingModel.update_grader_from_json(
             self.course.id, test_grader.graders[1], self.user)
         self.assertDictEqual(test_grader.graders[1], altered_grader, "drop_count[1] + 2")
+        grading_policy_3 = self._grading_policy_hash_for_course()
 
         # one for each of the calls to update_grader_from_json()
         send_signal.assert_has_calls([
@@ -485,23 +510,57 @@ class CourseGradingTest(CourseTestCase):
             mock.call(sender=CourseGradingModel, user_id=self.user.id, course_id=self.course.id),
         ])
 
-    def test_update_cutoffs_from_json(self):
+        # one for each of the calls to update_grader_from_json()
+        tracker.emit.assert_has_calls([
+            mock.call(
+                GRADING_POLICY_CHANGED_EVENT_TYPE,
+                {
+                    'course_id': unicode(self.course.id),
+                    'event_transaction_type': 'edx.grades.grading_policy_changed',
+                    'grading_policy_hash': policy_hash,
+                    'user_id': unicode(self.user.id),
+                    'event_transaction_id': 'mockUUID',
+                }
+            ) for policy_hash in {grading_policy_1, grading_policy_2, grading_policy_3}
+        ])
+
+    @mock.patch('track.event_transaction_utils.uuid4')
+    @mock.patch('models.settings.course_grading.tracker')
+    def test_update_cutoffs_from_json(self, tracker, uuid):
+        uuid.return_value = 'mockUUID'
         test_grader = CourseGradingModel.fetch(self.course.id)
         CourseGradingModel.update_cutoffs_from_json(self.course.id, test_grader.grade_cutoffs, self.user)
         # Unlike other tests, need to actually perform a db fetch for this test since update_cutoffs_from_json
         #  simply returns the cutoffs you send into it, rather than returning the db contents.
         altered_grader = CourseGradingModel.fetch(self.course.id)
         self.assertDictEqual(test_grader.grade_cutoffs, altered_grader.grade_cutoffs, "Noop update")
+        grading_policy_1 = self._grading_policy_hash_for_course()
 
         test_grader.grade_cutoffs['D'] = 0.3
         CourseGradingModel.update_cutoffs_from_json(self.course.id, test_grader.grade_cutoffs, self.user)
         altered_grader = CourseGradingModel.fetch(self.course.id)
         self.assertDictEqual(test_grader.grade_cutoffs, altered_grader.grade_cutoffs, "cutoff add D")
+        grading_policy_2 = self._grading_policy_hash_for_course()
 
         test_grader.grade_cutoffs['Pass'] = 0.75
         CourseGradingModel.update_cutoffs_from_json(self.course.id, test_grader.grade_cutoffs, self.user)
         altered_grader = CourseGradingModel.fetch(self.course.id)
         self.assertDictEqual(test_grader.grade_cutoffs, altered_grader.grade_cutoffs, "cutoff change 'Pass'")
+        grading_policy_3 = self._grading_policy_hash_for_course()
+
+        # one for each of the calls to update_cutoffs_from_json()
+        tracker.emit.assert_has_calls([
+            mock.call(
+                GRADING_POLICY_CHANGED_EVENT_TYPE,
+                {
+                    'course_id': unicode(self.course.id),
+                    'event_transaction_type': 'edx.grades.grading_policy_changed',
+                    'grading_policy_hash': policy_hash,
+                    'user_id': unicode(self.user.id),
+                    'event_transaction_id': 'mockUUID',
+                }
+            ) for policy_hash in (grading_policy_1, grading_policy_2, grading_policy_3)
+        ])
 
     def test_delete_grace_period(self):
         test_grader = CourseGradingModel.fetch(self.course.id)
@@ -526,8 +585,11 @@ class CourseGradingTest(CourseTestCase):
         # Once deleted, the grace period should simply be None
         self.assertEqual(None, altered_grader.grace_period, "Delete grace period")
 
+    @mock.patch('track.event_transaction_utils.uuid4')
+    @mock.patch('models.settings.course_grading.tracker')
     @mock.patch('contentstore.signals.signals.GRADING_POLICY_CHANGED.send')
-    def test_update_section_grader_type(self, send_signal):
+    def test_update_section_grader_type(self, send_signal, tracker, uuid):
+        uuid.return_value = 'mockUUID'
         # Get the descriptor and the section_grader_type and assert they are the default values
         descriptor = modulestore().get_item(self.course.location)
         section_grader_type = CourseGradingModel.get_section_grader_type(self.course.location)
@@ -540,6 +602,7 @@ class CourseGradingTest(CourseTestCase):
         CourseGradingModel.update_section_grader_type(self.course, 'Homework', self.user)
         descriptor = modulestore().get_item(self.course.location)
         section_grader_type = CourseGradingModel.get_section_grader_type(self.course.location)
+        grading_policy_1 = self._grading_policy_hash_for_course()
 
         self.assertEqual('Homework', section_grader_type['graderType'])
         self.assertEqual('Homework', descriptor.format)
@@ -549,6 +612,7 @@ class CourseGradingTest(CourseTestCase):
         CourseGradingModel.update_section_grader_type(self.course, 'notgraded', self.user)
         descriptor = modulestore().get_item(self.course.location)
         section_grader_type = CourseGradingModel.get_section_grader_type(self.course.location)
+        grading_policy_2 = self._grading_policy_hash_for_course()
 
         self.assertEqual('notgraded', section_grader_type['graderType'])
         self.assertEqual(None, descriptor.format)
@@ -558,6 +622,19 @@ class CourseGradingTest(CourseTestCase):
         send_signal.assert_has_calls([
             mock.call(sender=CourseGradingModel, user_id=self.user.id, course_id=self.course.id),
             mock.call(sender=CourseGradingModel, user_id=self.user.id, course_id=self.course.id),
+        ])
+
+        tracker.emit.assert_has_calls([
+            mock.call(
+                GRADING_POLICY_CHANGED_EVENT_TYPE,
+                {
+                    'course_id': unicode(self.course.id),
+                    'event_transaction_type': 'edx.grades.grading_policy_changed',
+                    'grading_policy_hash': policy_hash,
+                    'user_id': unicode(self.user.id),
+                    'event_transaction_id': 'mockUUID',
+                }
+            ) for policy_hash in (grading_policy_1, grading_policy_2)
         ])
 
     def _model_from_url(self, url_base):
@@ -651,6 +728,9 @@ class CourseGradingTest(CourseTestCase):
         self.assertEqual(200, response.status_code)
         response = self.client.get_json(grade_type_url + '?fields=graderType')
         self.assertEqual(json.loads(response.content).get('graderType'), u'notgraded')
+
+    def _grading_policy_hash_for_course(self):
+        return hash_grading_policy(modulestore().get_course(self.course.id).grading_policy)
 
 
 @ddt.ddt

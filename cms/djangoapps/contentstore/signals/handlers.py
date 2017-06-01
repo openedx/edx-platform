@@ -11,6 +11,7 @@ from contentstore.proctoring import register_special_exams
 from lms.djangoapps.grades.tasks import compute_all_grades_for_course
 from openedx.core.djangoapps.credit.signals import on_course_publish
 from openedx.core.lib.gating import api as gating_api
+from track.event_transaction_utils import get_event_transaction_id, get_event_transaction_type
 from util.module_utils import yield_dynamic_descriptor_descendants
 from .signals import GRADING_POLICY_CHANGED
 from xmodule.modulestore.django import SignalHandler, modulestore
@@ -95,7 +96,11 @@ def handle_grading_policy_changed(sender, **kwargs):
     Receives signal and kicks off celery task to recalculate grades
     """
     course_key = kwargs.get('course_key')
-    result = compute_all_grades_for_course.apply_async(course_key=course_key)
+    result = compute_all_grades_for_course.apply_async(
+        course_key=course_key,
+        event_transaction_id=get_event_transaction_id(),
+        event_transaction_type=get_event_transaction_type(),
+    )
     log.info("Grades: Created {task_name}[{task_id}] with arguments {kwargs}".format(
         task_name=compute_all_grades_for_course.name,
         task_id=result.task_id,
