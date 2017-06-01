@@ -224,7 +224,7 @@ def get_next_url_for_login_page(request):
         if referer.find("register") >= 0 or referer.find("oauth") > 0:
             return redirect("/welcome-unactivated/")
 
-    if not request.context['already_active']
+    if not request.context['already_active']:
         return redirect('/welcome')
 
     redirect_to = request.GET.get('next', None)
