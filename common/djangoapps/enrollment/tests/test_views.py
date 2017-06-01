@@ -19,6 +19,8 @@ from mock import patch
 from nose.plugins.attrib import attr
 from rest_framework import status
 from rest_framework.test import APITestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls_range
 
 from course_modes.models import CourseMode
 from enrollment import api
@@ -35,8 +37,6 @@ from student.roles import CourseStaffRole
 from student.tests.factories import AdminFactory, CourseModeFactory, UserFactory
 from util.models import RateLimitConfiguration
 from util.testing import UrlResetMixin
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls_range
 
 
 class EnrollmentTestMixin(object):
@@ -996,6 +996,55 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
             '/enterprise/api/v1/enterprise-course-enrollment/',
             'No request was made to the mocked enterprise-course-enrollment API'
         )
+
+    def test_enrollment_attributes_always_written(self):
+        """ Enrollment attributes should always be written, regardless of whether
+        the enrollment is being created or updated.
+        """
+        course_key = self.course.id
+        for mode in [CourseMode.DEFAULT_MODE_SLUG, CourseMode.VERIFIED]:
+            CourseModeFactory.create(
+                course_id=course_key,
+                mode_slug=mode,
+                mode_display_name=mode,
+            )
+
+        # Creating a new enrollment should write attributes
+        order_number = 'EDX-1000'
+        enrollment_attributes = [{
+            'namespace': 'order',
+            'name': 'order_number',
+            'value': order_number,
+        }]
+        mode = CourseMode.VERIFIED
+        self.assert_enrollment_status(
+            as_server=True,
+            is_active=True,
+            mode=mode,
+            enrollment_attributes=enrollment_attributes
+        )
+        enrollment = CourseEnrollment.objects.get(user=self.user, course_id=course_key)
+        self.assertTrue(enrollment.is_active)
+        self.assertEqual(enrollment.mode, CourseMode.VERIFIED)
+        self.assertEqual(enrollment.attributes.get(namespace='order', name='order_number').value, order_number)
+
+        # Updating an enrollment should update attributes
+        order_number = 'EDX-2000'
+        enrollment_attributes = [{
+            'namespace': 'order',
+            'name': 'order_number',
+            'value': order_number,
+        }]
+        mode = CourseMode.DEFAULT_MODE_SLUG
+        self.assert_enrollment_status(
+            as_server=True,
+            mode=mode,
+            enrollment_attributes=enrollment_attributes
+        )
+        enrollment.refresh_from_db()
+        self.assertTrue(enrollment.is_active)
+        self.assertEqual(enrollment.mode, mode)
+        self.assertEqual(enrollment.attributes.get(namespace='order', name='order_number').value, order_number)
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')

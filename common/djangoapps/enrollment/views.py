@@ -641,7 +641,13 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 )
             else:
                 # Will reactivate inactive enrollments.
-                response = api.add_enrollment(username, unicode(course_id), mode=mode, is_active=is_active)
+                response = api.add_enrollment(
+                    username,
+                    unicode(course_id),
+                    mode=mode,
+                    is_active=is_active,
+                    enrollment_attributes=enrollment_attributes
+                )
 
             email_opt_in = request.data.get('email_opt_in', None)
             if email_opt_in is not None:
