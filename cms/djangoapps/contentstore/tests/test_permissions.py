@@ -5,11 +5,11 @@ import copy
 
 from django.contrib.auth.models import User
 
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from contentstore.tests.utils import AjaxEnabledTestClient
-from contentstore.utils import reverse_url, reverse_course_url
-from student.roles import CourseInstructorRole, CourseStaffRole, OrgStaffRole, OrgInstructorRole
+from contentstore.utils import reverse_course_url, reverse_url
 from student import auth
+from student.roles import CourseInstructorRole, CourseStaffRole, OrgInstructorRole, OrgStaffRole
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
 class TestCourseAccess(ModuleStoreTestCase):

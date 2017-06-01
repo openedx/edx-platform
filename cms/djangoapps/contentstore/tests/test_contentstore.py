@@ -1,63 +1,54 @@
 # -*- coding: utf-8 -*-
 
 import copy
-import mock
 import shutil
-import lxml.html
-from lxml import etree
-import ddt
-
 from datetime import timedelta
-from fs.osfs import OSFS
-from json import loads
-from path import Path as path
-from textwrap import dedent
-from uuid import uuid4
 from functools import wraps
+from json import loads
+from textwrap import dedent
 from unittest import SkipTest
+from uuid import uuid4
 
+import ddt
+import lxml.html
+import mock
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test.utils import override_settings
-
-from openedx.core.lib.tempdir import mkdtemp_clean
-from common.test.utils import XssTestMixin
-from contentstore.tests.utils import parse_json, AjaxEnabledTestClient, CourseTestCase
-from contentstore.views.component import ADVANCED_COMPONENT_TYPES
-
 from edxval.api import create_video, get_videos_for_course
-
-from xmodule.contentstore.django import contentstore
-from xmodule.contentstore.utils import restore_asset_from_trashcan, empty_asset_trashcan
-from xmodule.exceptions import InvalidVersionError
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore.inheritance import own_metadata
-from opaque_keys.edx.keys import UsageKey, CourseKey
+from fs.osfs import OSFS
+from lxml import etree
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locations import AssetLocation, CourseLocator
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory, check_mongo_calls
-from xmodule.modulestore.xml_exporter import export_course_to_xml
-from xmodule.modulestore.xml_importer import import_course_from_xml, perform_xlint
+from path import Path as path
 
-from xmodule.capa_module import CapaDescriptor
-from xmodule.course_module import CourseDescriptor, Textbook
-from xmodule.seq_module import SequenceDescriptor
-
-from contentstore.utils import delete_course_and_groups, reverse_url, reverse_course_url
+from common.test.utils import XssTestMixin
+from contentstore.tests.utils import AjaxEnabledTestClient, CourseTestCase, get_url, parse_json
+from contentstore.utils import delete_course_and_groups, reverse_course_url, reverse_url
+from contentstore.views.component import ADVANCED_COMPONENT_TYPES
+from course_action_state.managers import CourseActionStateItemNotFoundError
+from course_action_state.models import CourseRerunState, CourseRerunUIStateManager
 from django_comment_common.utils import are_permissions_roles_seeded
-
+from openedx.core.lib.tempdir import mkdtemp_clean
 from student import auth
 from student.models import CourseEnrollment
 from student.roles import CourseCreatorRole, CourseInstructorRole
-from opaque_keys import InvalidKeyError
-from contentstore.tests.utils import get_url
-from course_action_state.models import CourseRerunState, CourseRerunUIStateManager
-
-from course_action_state.managers import CourseActionStateItemNotFoundError
+from xmodule.capa_module import CapaDescriptor
 from xmodule.contentstore.content import StaticContent
+from xmodule.contentstore.django import contentstore
+from xmodule.contentstore.utils import empty_asset_trashcan, restore_asset_from_trashcan
+from xmodule.course_module import CourseDescriptor, Textbook
+from xmodule.exceptions import InvalidVersionError
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-
+from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.inheritance import own_metadata
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory, check_mongo_calls
+from xmodule.modulestore.xml_exporter import export_course_to_xml
+from xmodule.modulestore.xml_importer import import_course_from_xml, perform_xlint
+from xmodule.seq_module import SequenceDescriptor
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex

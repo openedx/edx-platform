@@ -14,7 +14,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
-from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.course_info import CourseInfoPage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.tab_nav import TabNavPage

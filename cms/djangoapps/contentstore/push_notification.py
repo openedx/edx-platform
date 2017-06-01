@@ -2,16 +2,17 @@
 Helper methods for push notifications from Studio.
 """
 
-from uuid import uuid4
-from django.conf import settings
 from logging import exception as log_exception
+from uuid import uuid4
 
-from contentstore.tasks import push_course_update_task
+from django.conf import settings
+
 from contentstore.models import PushNotificationConfig
-from xmodule.modulestore.django import modulestore
-from parse_rest.installation import Push
+from contentstore.tasks import push_course_update_task
 from parse_rest.connection import register
 from parse_rest.core import ParseError
+from parse_rest.installation import Push
+from xmodule.modulestore.django import modulestore
 
 
 def push_notification_enabled():

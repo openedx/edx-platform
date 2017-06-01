@@ -1,16 +1,16 @@
 """Tests for the login and registration form rendering. """
-import urllib
 import unittest
+import urllib
 
 import ddt
-from mock import patch
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from mock import patch
 
-from util.testing import UrlResetMixin
-from xmodule.modulestore.tests.factories import CourseFactory
 from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin
+from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 # This relies on third party auth being enabled in the test
 # settings with the feature flag `ENABLE_THIRD_PARTY_AUTH`

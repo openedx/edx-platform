@@ -8,21 +8,22 @@ import unittest
 
 import ddt
 import mock
-from contentstore.utils import reverse_course_url, reverse_usage_url
 from django.conf import settings
 from django.test.utils import override_settings
 from django.utils.timezone import UTC
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
+
+from contentstore.utils import reverse_course_url, reverse_usage_url
 from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
 from models.settings.encoder import CourseSettingsEncoder
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
-from openedx.core.lib.xblock_fields.fields import Date
 from student.roles import CourseInstructorRole, CourseStaffRole
 from student.tests.factories import UserFactory
 from xblock_django.models import XBlockStudioConfigurationFlag
+from xmodule.fields import Date
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory

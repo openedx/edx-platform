@@ -4,11 +4,12 @@ API for the gating djangoapp
 import logging
 
 from django.utils.translation import ugettext as _
-from lms.djangoapps.courseware.access import _has_access_to_course
 from milestones import api as milestones_api
 from opaque_keys.edx.keys import UsageKey
-from xmodule.modulestore.django import modulestore
+
+from lms.djangoapps.courseware.access import _has_access_to_course
 from openedx.core.lib.gating.exceptions import GatingValidationError
+from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 

@@ -4,17 +4,17 @@ loading or rendering other modules
 """
 
 import hashlib
-import logging
 import json
+import logging
 import sys
 
 from lxml import etree
-from xmodule.x_module import XModule, XModuleDescriptor
-from xmodule.errortracker import exc_info_to_str
-from xblock.fields import String, Scope, ScopeIds
 from xblock.field_data import DictFieldData
-from xmodule.modulestore import EdxJSONEncoder
+from xblock.fields import Scope, ScopeIds, String
 
+from xmodule.errortracker import exc_info_to_str
+from xmodule.modulestore import EdxJSONEncoder
+from xmodule.x_module import XModule, XModuleDescriptor
 
 log = logging.getLogger(__name__)
 

@@ -7,7 +7,6 @@ from django.dispatch import receiver
 
 from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED
 
-
 LOGGER = logging.getLogger(__name__)
 
 

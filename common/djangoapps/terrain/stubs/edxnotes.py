@@ -4,11 +4,11 @@ Stub implementation of EdxNotes for acceptance tests
 
 import json
 import re
-from uuid import uuid4
-from datetime import datetime
 from copy import deepcopy
+from datetime import datetime
 from math import ceil
 from urllib import urlencode
+from uuid import uuid4
 
 from .http import StubHttpRequestHandler, StubHttpService
 

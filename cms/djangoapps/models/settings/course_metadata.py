@@ -1,12 +1,12 @@
 """
 Django module for Course Metadata class -- manages advanced settings and related parameters
 """
+from django.conf import settings
+from django.utils.translation import ugettext as _
 from xblock.fields import Scope
+
 from xblock_django.models import XBlockStudioConfigurationFlag
 from xmodule.modulestore.django import modulestore
-
-from django.utils.translation import ugettext as _
-from django.conf import settings
 
 
 class CourseMetadata(object):

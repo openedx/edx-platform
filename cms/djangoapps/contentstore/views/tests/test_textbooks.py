@@ -1,10 +1,9 @@
 import json
 from unittest import TestCase
+
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import reverse_course_url
-
-from contentstore.views.course import (
-    validate_textbooks_json, validate_textbook_json, TextbookValidationError)
+from contentstore.views.course import TextbookValidationError, validate_textbook_json, validate_textbooks_json
 
 
 class TextbookIndexTestCase(CourseTestCase):

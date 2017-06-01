@@ -5,7 +5,7 @@ from nose.plugins.attrib import attr
 
 from common.test.acceptance.fixtures.certificates import CertificateConfigFixture
 from common.test.acceptance.fixtures.course import CourseFixture, CourseUpdateDesc, XBlockFixtureDesc
-from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.certificate_page import CertificatePage
 from common.test.acceptance.pages.lms.course_home import CourseHomePage
 from common.test.acceptance.pages.lms.course_info import CourseInfoPage

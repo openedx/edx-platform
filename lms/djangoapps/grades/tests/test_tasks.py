@@ -31,9 +31,11 @@ from lms.djangoapps.grades.constants import ScoreDatabaseTableEnum
 from lms.djangoapps.grades.models import PersistentCourseGrade, PersistentSubsectionGrade
 from lms.djangoapps.grades.signals.signals import PROBLEM_WEIGHTED_SCORE_CHANGED
 from lms.djangoapps.grades.tasks import (
+    compute_all_grades_for_course,
     compute_grades_for_course_v2,
     recalculate_subsection_grade_v3,
-    RECALCULATE_GRADE_DELAY
+    RECALCULATE_GRADE_DELAY,
+    _course_task_args
 )
 
 
@@ -417,3 +419,23 @@ class ComputeGradesForCourseTest(HasCourseWithProblemsMixin, ModuleStoreTestCase
                     batch_size=batch_size,
                     offset=6,
                 )
+
+    @ddt.data(*xrange(1, 12, 3))
+    def test_compute_all_grades_for_course(self, batch_size):
+        self.set_up_course()
+        result = compute_all_grades_for_course.delay(
+            course_key=six.text_type(self.course.id),
+            batch_size=batch_size,
+        )
+        self.assertTrue(result.successful)
+
+    @ddt.data(*xrange(1, 12, 3))
+    def test_course_task_args(self, test_batch_size):
+        offset_expected = 0
+        for course_key, offset, batch_size in _course_task_args(
+            batch_size=test_batch_size, course_key=self.course.id, from_settings=False
+        ):
+            self.assertEqual(course_key, six.text_type(self.course.id))
+            self.assertEqual(batch_size, test_batch_size)
+            self.assertEqual(offset, offset_expected)
+            offset_expected += test_batch_size

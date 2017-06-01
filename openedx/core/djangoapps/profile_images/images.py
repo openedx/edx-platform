@@ -1,19 +1,19 @@
 """
 Image file manipulation functions related to profile images.
 """
-from cStringIO import StringIO
 from collections import namedtuple
 from contextlib import closing
+from cStringIO import StringIO
 
+import piexif
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.utils.translation import ugettext as _
-import piexif
 from PIL import Image
 
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_storage
-from .exceptions import ImageValidationError
 
+from .exceptions import ImageValidationError
 
 ImageType = namedtuple('ImageType', ('extensions', 'mimetypes', 'magic'))
 

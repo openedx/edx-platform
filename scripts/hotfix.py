@@ -9,10 +9,11 @@ The script should be run with the hotfix's git hash as a command-line argument.
 i.e. `python scripts/hotfix.py <hotfix hash>`
 """
 from __future__ import print_function
-from datetime import date
-import sys
+
 import argparse
+import sys
 import textwrap
+from datetime import date
 
 
 def generate_alton_commands(hotfix_hash):

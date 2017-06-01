@@ -14,8 +14,8 @@ from selenium.common.exceptions import TimeoutException
 from common.test.acceptance.fixtures import LMS_BASE_URL
 from common.test.acceptance.fixtures.course import CourseFixture
 from common.test.acceptance.fixtures.discussion import ForumsConfigMixin, MultipleThreadFixture, Thread
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.common.utils import confirm_prompt
-from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.course_info import CourseInfoPage
 from common.test.acceptance.pages.lms.learner_profile import LearnerProfilePage
 from common.test.acceptance.pages.lms.tab_nav import TabNavPage

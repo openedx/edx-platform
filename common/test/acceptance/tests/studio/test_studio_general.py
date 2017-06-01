@@ -5,8 +5,8 @@ import uuid
 
 from base_studio_test import StudioCourseTest
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.studio.asset_index import AssetIndexPage
-from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.studio.course_info import CourseUpdatesPage
 from common.test.acceptance.pages.studio.edit_tabs import PagesPage
 from common.test.acceptance.pages.studio.import_export import ExportCoursePage, ImportCoursePage

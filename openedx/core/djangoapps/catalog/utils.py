@@ -12,7 +12,6 @@ from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from openedx.core.lib.token_utils import JwtBuilder
 
-
 logger = logging.getLogger(__name__)
 User = get_user_model()  # pylint: disable=invalid-name
 

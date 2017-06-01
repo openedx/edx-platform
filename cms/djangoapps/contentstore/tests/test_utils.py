@@ -2,17 +2,18 @@
 import collections
 from datetime import datetime, timedelta
 
-from contentstore import utils
-from contentstore.tests.utils import CourseTestCase
 from django.test import TestCase
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
-from openedx.core.lib.partitions.partitions import Group, UserPartition
 from pytz import UTC
+
+from contentstore import utils
+from contentstore.tests.utils import CourseTestCase
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.partitions.partitions import Group, UserPartition
 
 
 class LMSLinksTestCase(TestCase):

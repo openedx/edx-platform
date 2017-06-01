@@ -752,12 +752,18 @@ class TestGetCertificates(TestCase):
 
     def test_course_run_certificates_missing(self, mock_get_credentials):
         """
-        Verify an empty list is returned when course run certificates are missing,
-        and that no attempt is made to retrieve program certificates.
+        Verify program certificates are retrieved even if the learner has not earned any course certificates.
         """
+        expected = [{
+            'type': 'program',
+            'title': self.program['title'],
+            'url': self.program_certificate_url,
+        }]
+        mock_get_credentials.return_value = [{'certificate_url': self.program_certificate_url}]
+
         certificates = get_certificates(self.user, self.program)
-        self.assertEqual(certificates, [])
-        self.assertFalse(mock_get_credentials.called)
+        self.assertTrue(mock_get_credentials.called)
+        self.assertEqual(certificates, expected)
 
     def test_program_certificate_missing(self, mock_get_credentials):
         """

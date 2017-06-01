@@ -1,17 +1,20 @@
+import json
+
+import ddt
+from django.conf import settings
+from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test.client import Client
-from django.contrib.auth.models import User
-from django.conf import settings
-from django_comment_common.models import (
-    Role, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_STUDENT)
-from django_comment_common.utils import seed_permissions_roles
-from student.models import anonymous_id_for_user, CourseEnrollment, UserProfile
-from util.testing import UrlResetMixin
+from mock import patch, Mock
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator
-from mock import patch, Mock
-import ddt
-import json
+
+from django_comment_common.models import (
+    Role, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_STUDENT
+)
+from django_comment_common.utils import seed_permissions_roles
+from student.models import anonymous_id_for_user, CourseAccessRole, CourseEnrollment, UserProfile
+from util.testing import UrlResetMixin
 
 
 class AutoAuthTestCase(UrlResetMixin, TestCase):
@@ -168,18 +171,16 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase):
                 course_roles[FORUM_ROLE_MODERATOR],
                 course_roles[FORUM_ROLE_ADMINISTRATOR]]))
 
-    @ddt.data(*COURSE_IDS_DDT)
-    @ddt.unpack
-    def test_json_response(self, course_id, course_key):  # pylint: disable=unused-argument
-        """Verify that we can get JSON back from the auto_auth page."""
-        response = self._auto_auth(HTTP_ACCEPT='application/json')
+    def test_json_response(self):
+        """ The view should return JSON. """
+        response = self._auto_auth()
         response_data = json.loads(response.content)
         for key in ['created_status', 'username', 'email', 'password', 'user_id', 'anonymous_id']:
             self.assertIn(key, response_data)
         user = User.objects.get(username=response_data['username'])
         self.assertDictContainsSubset(
             {
-                'created_status': "Logged in",
+                'created_status': 'Logged in',
                 'anonymous_id': anonymous_id_for_user(user, None),
             },
             response_data
@@ -236,23 +237,23 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase):
 
         self.assertTrue(response.url.endswith(url_pattern))  # pylint: disable=no-member
 
-    def _auto_auth(self, params=None, status_code=None, **kwargs):
+    def _auto_auth(self, params=None, status_code=200, **kwargs):
         """
         Make a request to the auto-auth end-point and check
         that the response is successful.
 
         Arguments:
             params (dict): Dict of params to pass to the auto_auth view
+            status_code (int): Expected response status code
             kwargs: Passed directly to the test client's get method.
 
-        Returns
-            response: The response object for the auto_auth page.
+        Returns:
+            Response: The response object for the auto_auth page.
         """
         params = params or {}
         response = self.client.get(self.url, params, **kwargs)
 
-        expected_status_code = status_code if status_code else 200
-        self.assertEqual(response.status_code, expected_status_code)
+        self.assertEqual(response.status_code, status_code)
 
         # Check that session and CSRF are set in the response
         for cookie in ['csrftoken', 'sessionid']:
@@ -268,6 +269,26 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase):
         """
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 403)
+
+    def test_course_access_roles(self):
+        """ Passing role names via the course_access_roles query string parameter should create CourseAccessRole
+        objects associated with the user.
+        """
+        expected_roles = ['finance_admin', 'sales_admin']
+        course_key = CourseLocator.from_string(self.COURSE_ID_SPLIT)
+        params = {
+            'course_id': str(course_key),
+            'course_access_roles': ','.join(expected_roles)
+        }
+        response = self._auto_auth(params)
+        user_info = json.loads(response.content)
+
+        for role in expected_roles:
+            self.assertTrue(
+                CourseAccessRole.objects.filter(
+                    user__id=user_info['user_id'], course_id=course_key, org=course_key.org, role=role
+                ).exists()
+            )
 
 
 class AutoAuthDisabledTestCase(AutoAuthTestCase):

@@ -9,9 +9,9 @@ from nose.plugins.attrib import attr
 
 from common.test.acceptance.fixtures.certificates import CertificateConfigFixture
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.common.logout import LogoutPage
 from common.test.acceptance.pages.common.utils import enroll_user_track
-from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.create_mode import ModeCreationPage
 from common.test.acceptance.pages.lms.dashboard import DashboardPage
@@ -36,13 +36,24 @@ class BaseInstructorDashboardTest(EventsTestMixin, UniqueCourseTest):
     """
     Mixin class for testing the instructor dashboard.
     """
-    def log_in_as_instructor(self):
+    def log_in_as_instructor(self, course_access_roles=None):
         """
-        Logs in as an instructor and returns the id.
+        Login with an instructor account.
+
+        Args:
+            course_access_roles (str[]): List of course access roles that should be assigned to the user.
+
+        Returns
+            username (str)
+            user_id (int)
         """
-        username = "test_instructor_{uuid}".format(uuid=self.unique_id[0:6])
-        auto_auth_page = AutoAuthPage(self.browser, username=username, course_id=self.course_id, staff=True)
-        return username, auto_auth_page.visit().get_user_id()
+        course_access_roles = course_access_roles or []
+        auto_auth_page = AutoAuthPage(
+            self.browser, course_id=self.course_id, staff=True, course_access_roles=course_access_roles
+        )
+        auto_auth_page.visit()
+        user_info = auto_auth_page.user_info
+        return user_info['username'], user_info['user_id']
 
     def visit_instructor_dashboard(self):
         """
@@ -1257,23 +1268,11 @@ class EcommerceTest(BaseInstructorDashboardTest):
         )
         course_fixture.install()
 
-    def log_in_as_unique_user(self):
-        """
-        Log in as a valid lms user.
-        """
-        AutoAuthPage(
-            self.browser,
-            username="test_instructor",
-            email="test_instructor@example.com",
-            password="password",
-            course_id=self.course_id
-        ).visit()
-
     def visit_ecommerce_section(self):
         """
         Log in to visit Instructor dashboard and click E-commerce tab
         """
-        self.log_in_as_unique_user()
+        self.log_in_as_instructor(course_access_roles=['finance_admin'])
         instructor_dashboard_page = self.visit_instructor_dashboard()
         return instructor_dashboard_page.select_ecommerce_tab()
 

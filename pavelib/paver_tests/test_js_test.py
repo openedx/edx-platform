@@ -5,8 +5,9 @@ from mock import patch
 from paver.easy import call_task
 
 import pavelib.js_test
-from .utils import PaverTestCase
 from pavelib.utils.envs import Env
+
+from .utils import PaverTestCase
 
 
 @ddt.ddt

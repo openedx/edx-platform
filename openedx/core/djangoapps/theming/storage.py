@@ -2,24 +2,22 @@
 Comprehensive Theming support for Django's collectstatic functionality.
 See https://docs.djangoproject.com/en/1.8/ref/contrib/staticfiles/
 """
-import posixpath
 import os.path
-from django.conf import settings
-from django.utils._os import safe_join
-from django.contrib.staticfiles.storage import StaticFilesStorage, CachedFilesMixin
-from django.contrib.staticfiles.finders import find
-from django.utils.six.moves.urllib.parse import (  # pylint: disable=no-name-in-module, import-error
-    unquote, urlsplit,
-)
+import posixpath
 
+from django.conf import settings
+from django.contrib.staticfiles.finders import find
+from django.contrib.staticfiles.storage import CachedFilesMixin, StaticFilesStorage
+from django.utils._os import safe_join
+from django.utils.six.moves.urllib.parse import unquote, urlsplit  # pylint: disable=no-name-in-module, import-error
 from pipeline.storage import PipelineMixin
 
 from openedx.core.djangoapps.theming.helpers import (
-    get_theme_base_dir,
-    get_project_root_name,
     get_current_theme,
+    get_project_root_name,
+    get_theme_base_dir,
     get_themes,
-    is_comprehensive_theming_enabled,
+    is_comprehensive_theming_enabled
 )
 
 

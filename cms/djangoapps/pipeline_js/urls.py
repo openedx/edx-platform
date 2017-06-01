@@ -1,7 +1,7 @@
 """
 URL patterns for Javascript files used to load all of the XModule JS in one wad.
 """
-from django.conf.urls import url, patterns
+from django.conf.urls import patterns, url
 
 urlpatterns = patterns(
     'pipeline_js.views',

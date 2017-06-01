@@ -434,7 +434,7 @@ P3P_HEADER = 'CP="Open EdX does not have a P3P policy."'
 ############# XBlock Configuration ##########
 
 # Import after sys.path fixup
-from openedx.core.lib.xblock_fields.inherited_fields import InheritanceMixin
+from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore import prefer_xmodules
 from xmodule.x_module import XModuleMixin
 
@@ -1006,6 +1006,10 @@ INSTALLED_APPS = (
 
     # Unusual migrations
     'database_fixups',
+
+    # Customized celery tasks, including persisting failed tasks so they can
+    # be retried
+    'celery_utils',
 )
 
 
@@ -1302,3 +1306,8 @@ ENTERPRISE_API_CACHE_TIMEOUT = 3600  # Value is in seconds
 ############## Settings for the Discovery App ######################
 
 COURSE_CATALOG_API_URL = None
+
+############################# Persistent Grades ####################################
+
+# Queue to use for updating persistent grades
+RECALCULATE_GRADES_ROUTING_KEY = LOW_PRIORITY_QUEUE

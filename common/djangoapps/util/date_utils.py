@@ -2,11 +2,11 @@
 Convenience methods for working with datetime objects
 """
 
-from datetime import datetime, timedelta
 import re
+from datetime import datetime, timedelta
 
 from django.utils.translation import pgettext, ugettext
-from pytz import timezone, utc, UnknownTimeZoneError
+from pytz import UnknownTimeZoneError, timezone, utc
 
 
 def get_default_time_display(dtime):

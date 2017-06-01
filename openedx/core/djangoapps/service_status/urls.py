@@ -4,7 +4,6 @@ Django URLs for service status app
 
 from django.conf.urls import patterns, url
 
-
 urlpatterns = patterns(
     '',
     url(r'^$', 'openedx.core.djangoapps.service_status.views.index', name='status.service.index'),

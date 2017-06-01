@@ -5,10 +5,10 @@ Includes:
     StudioConfig: A ConfigurationModel for managing Studio.
 """
 
-from django.db.models import BooleanField, TextField
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
-
 from config_models.models import ConfigurationModel
+from django.db.models import BooleanField, TextField
+
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from request_cache.middleware import request_cached
 
 

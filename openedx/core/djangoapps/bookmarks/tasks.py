@@ -2,10 +2,11 @@
 Tasks for bookmarks.
 """
 import logging
-from django.db import transaction
 
 from celery.task import task  # pylint: disable=import-error,no-name-in-module
+from django.db import transaction
 from opaque_keys.edx.keys import CourseKey
+
 from xmodule.modulestore.django import modulestore
 
 from . import PathItem

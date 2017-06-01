@@ -1,45 +1,47 @@
 """HTTP end-points for the User API. """
 import copy
 
-from opaque_keys import InvalidKeyError
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.http import HttpResponse, HttpResponseForbidden
+from django.core.exceptions import NON_FIELD_ERRORS, ImproperlyConfigured, PermissionDenied, ValidationError
 from django.core.urlresolvers import reverse
-from django.core.exceptions import ImproperlyConfigured, NON_FIELD_ERRORS, ValidationError, PermissionDenied
-from django.utils.translation import ugettext as _
+from django.http import HttpResponse, HttpResponseForbidden
 from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect, csrf_exempt
-from opaque_keys.edx import locator
-from rest_framework import authentication
-from rest_framework import filters
-from rest_framework import generics
-from rest_framework import status
-from rest_framework import viewsets
-from rest_framework.views import APIView
-from rest_framework.exceptions import ParseError
+from django.utils.translation import ugettext as _
+from django.views.decorators.csrf import csrf_exempt, csrf_protect, ensure_csrf_cookie
 from django_countries import countries
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx import locator
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from rest_framework import authentication, filters, generics, status, viewsets
+from rest_framework.exceptions import ParseError
+from rest_framework.views import APIView
 
-from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
 import third_party_auth
 from django_comment_common.models import Role
 from edxmako.shortcuts import marketing_link
-from student.forms import get_registration_extension_form
-from student.views import create_account_with_params
-from student.cookies import set_logged_in_cookies
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.api.authentication import SessionAuthenticationAllowInactiveUser
+from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
+from student.cookies import set_logged_in_cookies
+from student.forms import get_registration_extension_form
+from student.views import create_account_with_params
 from util.json_request import JsonResponse
-from .preferences.api import get_country_time_zones, update_email_opt_in
-from .helpers import FormDescription, shim_student_view, require_post_params
-from .models import UserPreference, UserProfile
+
 from .accounts import (
-    NAME_MAX_LENGTH, EMAIL_MIN_LENGTH, EMAIL_MAX_LENGTH, PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH,
-    USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH
+    EMAIL_MAX_LENGTH,
+    EMAIL_MIN_LENGTH,
+    NAME_MAX_LENGTH,
+    PASSWORD_MAX_LENGTH,
+    PASSWORD_MIN_LENGTH,
+    USERNAME_MAX_LENGTH,
+    USERNAME_MIN_LENGTH
 )
 from .accounts.api import check_account_exists
-from .serializers import CountryTimeZoneSerializer, UserSerializer, UserPreferenceSerializer
+from .helpers import FormDescription, require_post_params, shim_student_view
+from .models import UserPreference, UserProfile
+from .preferences.api import get_country_time_zones, update_email_opt_in
+from .serializers import CountryTimeZoneSerializer, UserPreferenceSerializer, UserSerializer
 
 
 class LoginSessionView(APIView):

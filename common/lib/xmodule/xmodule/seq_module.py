@@ -4,23 +4,22 @@ xModule implementation of a learning sequence
 
 # pylint: disable=abstract-method
 import collections
+from datetime import datetime
+from django.utils.timezone import UTC
 import json
 import logging
-from datetime import datetime
-
 from pkg_resources import resource_string
 
-from django.utils.timezone import UTC
 from lxml import etree
-from openedx.core.lib.xblock_fields.fields import Date
 from xblock.core import XBlock
-from xblock.fields import Boolean, Integer, Scope, String
+from xblock.fields import Integer, Scope, Boolean, String
 from xblock.fragment import Fragment
 
 from .exceptions import NotFoundError
+from .fields import Date
 from .mako_module import MakoModuleDescriptor
 from .progress import Progress
-from .x_module import STUDENT_VIEW, XModule
+from .x_module import XModule, STUDENT_VIEW
 from .xml_module import XmlDescriptor
 
 log = logging.getLogger(__name__)

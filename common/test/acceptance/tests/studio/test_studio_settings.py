@@ -21,7 +21,7 @@ from common.test.acceptance.pages.studio.settings_advanced import AdvancedSettin
 from common.test.acceptance.pages.studio.settings_group_configurations import GroupConfigurationsPage
 from common.test.acceptance.pages.studio.utils import get_input_value
 from common.test.acceptance.tests.helpers import create_user_partition_json, element_has_text
-from openedx.core.lib.partitions.partitions import Group
+from xmodule.partitions.partitions import Group
 
 
 @attr(shard=8)

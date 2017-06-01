@@ -2,11 +2,10 @@
 Definitions of all options used by the various bok_choy tasks.
 """
 
-from optparse import make_option
 import os
+from optparse import make_option
 
 from pavelib.utils.envs import Env
-
 
 BOKCHOY_IMPORTS_DIR = ('imports-dir=', 'i', 'Directory containing (un-archived) courses to be imported')
 BOKCHOY_IMPORTS_DIR_DEPR = ('imports_dir=', None, 'deprecated in favor of imports-dir')
