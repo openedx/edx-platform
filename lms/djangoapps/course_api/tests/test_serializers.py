@@ -72,6 +72,7 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
             'pacing': 'instructor',
             'mobile_available': False,
             'hidden': False,
+            'invitation_only': False,
 
             # 'course_id' is a deprecated field, please use 'id' instead.
             'course_id': u'edX/toy/2012_Fall',
