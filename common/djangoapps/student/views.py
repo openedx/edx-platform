@@ -128,9 +128,9 @@ from notification_prefs.views import enable_notifications
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.programs.utils import get_programs_for_dashboard
 
-# Used in redirecting registered users to welcome page
-from django.http import HttpResponseRedirect
-import re
+# # Used in redirecting registered users to welcome page
+# from django.http import HttpResponseRedirect
+# import re
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
@@ -711,10 +711,10 @@ def dashboard(request):
         'course_programs': course_programs,
     }
 
-    referer = request.META.get('HTTP_REFERER')
-    if referer:
-        if referer.find("register") >= 0 or referer.find("oauth") > 0:
-            return redirect("/welcome-unactivated/")
+    # referer = request.META.get('HTTP_REFERER')
+    # if referer:
+    #     if referer.find("register") >= 0 or referer.find("oauth") > 0:
+    #         return redirect("/welcome-unactivated/")
 
     return render_to_response('dashboard.html', context)
 
@@ -1970,8 +1970,8 @@ def activate_account(request, key):
                             manual_enrollment_audit.reason, enrollment
                         )
 
-        if not already_active:
-            return redirect('/welcome')
+        # if not already_active:
+        #     return redirect('/welcome')
 
         resp = render_to_response(
             "registration/activation_complete.html",

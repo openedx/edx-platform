@@ -10,6 +10,7 @@ from lms.djangoapps.verify_student.models import VerificationDeadline, SoftwareS
 from course_modes.models import CourseMode
 
 # Used in redirecting registered users to welcome page
+from django.shortcuts
 from django.http import HttpResponseRedirect
 import re
 
