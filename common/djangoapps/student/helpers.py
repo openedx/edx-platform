@@ -225,8 +225,9 @@ def get_next_url_for_login_page(request):
         if referer.find("register") >= 0 or referer.find("oauth") > 0:
             return shortcuts.redirect("/welcome-unactivated/")
 
-    if not request.context['already_active']:
-        return shortcuts.redirect('/welcome')
+    if 'already_active' in request.META:
+        if not request.META.get['already_active']:
+            return shortcuts.redirect('/welcome')
 
     redirect_to = request.GET.get('next', None)
     if not redirect_to:
