@@ -227,7 +227,7 @@ def get_next_url_for_login_page(request):
 
     if 'already_active' in request.META:
         if not request.META.get['already_active']:
-            return shortcuts.redirect('/welcome')
+            return redirect('/welcome')
 
     redirect_to = request.GET.get('next', None)
     if not redirect_to:
