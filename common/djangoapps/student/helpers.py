@@ -218,9 +218,15 @@ def get_next_url_for_login_page(request):
     redirect_to = request.GET.get('next', None)
     if not redirect_to:
         try:
-            redirect_to = reverse('dashboard')
+            if request.path == "/register":
+                redirect_to = reverse('welcome')
+            else:
+                redirect_to = reverse('dashboard')
         except NoReverseMatch:
-            redirect_to = reverse('home')
+            try:
+                redirect_to = reverse('dashboard')
+            except NoReverseMatch:
+                redirect_to = reverse('home')
     if any(param in request.GET for param in POST_AUTH_PARAMS):
         # Before we redirect to next/dashboard, we need to handle auto-enrollment:
         params = [(param, request.GET[param]) for param in POST_AUTH_PARAMS if param in request.GET]

@@ -1004,3 +1004,13 @@ if settings.FEATURES.get('ENABLE_FINANCIAL_ASSISTANCE_FORM'):
             name='submit_financial_assistance_request'
         )
     )
+
+if settings.FEATURES.get('ENABLE_MKTG_SITE'):
+    if 'WELCOME' in settings.MKTG_URLS:
+        urlpatterns += (
+            url(
+                r'^welcome$',
+                RedirectView.as_view(url=settings.MKTG_URLS['ROOT'] + settings.MKTG_URLS['WELCOME'], permanent=True),
+                name='welcome'
+            ),
+        )
