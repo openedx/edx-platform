@@ -428,7 +428,7 @@ class RegistrationView(APIView):
         # Translators: This label appears above a field on the registration form
         # meant to confirm the user's email address.
         email_label = _(u"Confirm Email")
-        error_msg = _(u"Please confirm your email address.")
+        error_msg = _(u"The email addresses do not match.")
 
         form_desc.add_field(
             "confirm_email",
