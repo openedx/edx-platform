@@ -9,10 +9,6 @@ import third_party_auth
 from lms.djangoapps.verify_student.models import VerificationDeadline, SoftwareSecurePhotoVerification
 from course_modes.models import CourseMode
 
-# Used in redirecting registered users to welcome page
-from django.shortcuts import redirect
-from django.http import HttpResponseRedirect
-import re
 
 # Enumeration of per-course verification statuses
 # we display on the student dashboard.
@@ -219,16 +215,6 @@ def get_next_url_for_login_page(request):
     Otherwise, we go to the ?next= query param or to the dashboard if nothing else is
     specified.
     """
-
-    referer = request.META.get('HTTP_REFERER')
-    if referer:
-        if referer.find("register") >= 0 or referer.find("oauth") > 0:
-            return "/welcome-unactivated"
-
-    if 'already_active' in request.META:
-        if not request.META.get['already_active']:
-            return '/welcome'
-
     redirect_to = request.GET.get('next', None)
     if not redirect_to:
         try:
