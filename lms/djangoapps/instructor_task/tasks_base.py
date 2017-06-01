@@ -48,7 +48,7 @@ class BaseInstructorTask(Task):
         This is JSON-serialized and stored in the task_output column of the InstructorTask entry.
 
         """
-        TASK_LOG.debug('Task %s: success returned with progress: %s', task_id, task_progress)
+        TASK_LOG.info('Task %s: success returned with progress: %s', task_id, task_progress)
         # We should be able to find the InstructorTask object to update
         # based on the task_id here, without having to dig into the
         # original args to the task.  On the other hand, the entry_id
@@ -81,7 +81,7 @@ class BaseInstructorTask(Task):
         Note that there is no way to record progress made within the task (e.g. attempted,
         succeeded, etc.) when such failures occur.
         """
-        TASK_LOG.debug(u'Task %s: failure returned', task_id)
+        TASK_LOG.info(u'Task %s: failure returned', task_id)
         entry_id = args[0]
         try:
             entry = InstructorTask.objects.get(pk=entry_id)
