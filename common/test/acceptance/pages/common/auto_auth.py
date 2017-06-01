@@ -1,26 +1,28 @@
 """
 Auto-auth page (used to automatically log in during testing).
 """
-
-import re
+import json
+import os
 import urllib
 
 from bok_choy.page_object import XSS_INJECTION, PageObject, unguarded
 
-from common.test.acceptance.pages.lms import AUTH_BASE_URL
+# The URL used for user auth in testing
+AUTH_BASE_URL = os.environ.get('test_url', 'http://localhost:8031')
 
 
 class AutoAuthPage(PageObject):
     """
     The automatic authorization page.
-    When allowed via the django settings file, visiting
-    this url will create a user and log them in.
+
+    When enabled via the Django settings file, visiting this url will create a user and log them in.
     """
 
-    CONTENT_REGEX = r'.+? user (?P<username>\S+) \((?P<email>.+?)\) with password \S+ and user_id (?P<user_id>\d+)$'
+    # Internal cache for parsed user info.
+    _user_info = None
 
-    def __init__(self, browser, username=None, email=None, password=None, full_name=None, staff=None, course_id=None,
-                 enrollment_mode=None, roles=None, is_active=None):
+    def __init__(self, browser, username=None, email=None, password=None, full_name=XSS_INJECTION, staff=False, course_id=None,
+                 enrollment_mode=None, roles=None, no_login=False, is_active=True, course_access_roles=None):
         """
         Auto-auth is an end-point for HTTP GET requests.
         By default, it will create accounts with random user credentials,
@@ -39,33 +41,36 @@ class AutoAuthPage(PageObject):
         # This will eventually hold the details about the user account
         self._user_info = None
 
-        # Create query string parameters if provided
-        self._params = {}
+        course_access_roles = course_access_roles or []
+        course_access_roles = ','.join(course_access_roles)
 
-        if username is not None:
+        self._params = {
+            'full_name': full_name,
+            'staff': staff,
+            'is_active': is_active,
+            'course_access_roles': course_access_roles,
+        }
+
+        if username:
             self._params['username'] = username
 
-        self._params['full_name'] = full_name if full_name is not None else XSS_INJECTION
-
-        if email is not None:
+        if email:
             self._params['email'] = email
 
-        if password is not None:
+        if password:
             self._params['password'] = password
 
-        if staff is not None:
-            self._params['staff'] = "true" if staff else "false"
-
-        if course_id is not None:
+        if course_id:
             self._params['course_id'] = course_id
+
             if enrollment_mode:
                 self._params['enrollment_mode'] = enrollment_mode
 
-        if roles is not None:
+        if roles:
             self._params['roles'] = roles
 
-        if is_active is not None:
-            self._params['is_active'] = "true" if is_active else "false"
+        if no_login:
+            self._params['no_login'] = True
 
     @property
     def url(self):
@@ -81,27 +86,16 @@ class AutoAuthPage(PageObject):
         return url
 
     def is_browser_on_page(self):
-        return True if self.get_user_info() is not None else False
-
-    @unguarded
-    def get_user_info(self):
-        """Parse the auto auth page body to extract relevant details about the user that was logged in."""
-        message = self.q(css='BODY').text[0]
-        match = re.match(self.CONTENT_REGEX, message)
-        if not match:
-            return None
-        else:
-            user_info = match.groupdict()
-            user_info['user_id'] = int(user_info['user_id'])
-            return user_info
+        return bool(self.user_info)
 
     @property
+    @unguarded
     def user_info(self):
         """A dictionary containing details about the user account."""
-        if self._user_info is None:
-            user_info = self.get_user_info()
-            if user_info is not None:
-                self._user_info = self.get_user_info()
+        if not self._user_info:
+            body = self.q(css='BODY').text[0]
+            self._user_info = json.loads(body)
+
         return self._user_info
 
     def get_user_id(self):

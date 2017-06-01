@@ -7,51 +7,56 @@ of a variety of types.
 
 Used by capa_problem.py
 """
-# TODO: Refactor this code and fix this issue.
+
 # pylint: disable=attribute-defined-outside-init
 # standard library imports
 import abc
+# TODO: Refactor this code and fix this issue.
 import cgi
 import inspect
 import json
 import logging
-import html5lib
 import numbers
-import numpy
 import os
-from pyparsing import ParseException
-import sys
 import random
 import re
-import requests
 import subprocess
+import sys
 import textwrap
 import traceback
 import xml.sax.saxutils as saxutils
-from cmath import isnan
+from collections import namedtuple
+from datetime import datetime
 from sys import float_info
 
-from collections import namedtuple
-from shapely.geometry import Point, MultiPoint
-
-import dogstats_wrapper as dog_stats_api
-
-# specific library imports
-from calc import evaluator, UndefinedVariable
-from . import correctmap
-from .registry import TagRegistry
-from datetime import datetime
-from pytz import UTC
-from .util import (
-    compare_with_tolerance, contextualize_text, convert_files_to_filenames,
-    is_list_of_files, find_with_default, default_tolerance, get_inner_html_from_xpath
-)
+import html5lib
+import numpy
+import requests
 from lxml import etree
-from lxml.html.soupparser import fromstring as fromstring_bs     # uses Beautiful Soup!!! FIXME?
-import capa.xqueue_interface as xqueue_interface
+from lxml.html.soupparser import fromstring as fromstring_bs  # uses Beautiful Soup!!! FIXME?
+from pyparsing import ParseException
+from pytz import UTC
+from shapely.geometry import MultiPoint, Point
 
 import capa.safe_exec as safe_exec
+import capa.xqueue_interface as xqueue_interface
+import dogstats_wrapper as dog_stats_api
+# specific library imports
+from calc import UndefinedVariable, evaluator
+from cmath import isnan
 from openedx.core.djangolib.markup import HTML, Text
+
+from . import correctmap
+from .registry import TagRegistry
+from .util import (
+    compare_with_tolerance,
+    contextualize_text,
+    convert_files_to_filenames,
+    default_tolerance,
+    find_with_default,
+    get_inner_html_from_xpath,
+    is_list_of_files
+)
 
 log = logging.getLogger(__name__)
 

@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """Helper functions for working with Programs."""
+import datetime
 from collections import defaultdict
 from copy import deepcopy
-import datetime
+from itertools import chain
 from urlparse import urljoin
 
 from dateutil.parser import parse
@@ -12,7 +13,6 @@ from django.core.urlresolvers import reverse
 from django.utils.functional import cached_property
 from opaque_keys.edx.keys import CourseKey
 from pytz import utc
-from itertools import chain
 
 from course_modes.models import CourseMode
 from lms.djangoapps.certificates import api as certificate_api
@@ -24,7 +24,6 @@ from openedx.core.djangoapps.credentials.utils import get_credentials
 from student.models import CourseEnrollment
 from util.date_utils import strftime_localized
 from xmodule.modulestore.django import modulestore
-
 
 # The datetime module's strftime() methods require a year >= 1900.
 DEFAULT_ENROLLMENT_START_DATE = datetime.datetime(1900, 1, 1, tzinfo=utc)
@@ -464,18 +463,13 @@ def get_certificates(user, extended_program):
                 # We only want one certificate per course to be returned.
                 break
 
-    # A user can only have earned a program certificate if they've earned certificates
-    # in associated course runs. If they haven't earned any course run certificates,
-    # they can't have earned a program certificate, and we can save a network call
-    # to the credentials service.
-    if certificates:
-        program_credentials = get_credentials(user, program_uuid=extended_program['uuid'])
-        if program_credentials:
-            certificates.append({
-                'type': 'program',
-                'title': extended_program['title'],
-                'url': program_credentials[0]['certificate_url'],
-            })
+    program_credentials = get_credentials(user, program_uuid=extended_program['uuid'])
+    if program_credentials:
+        certificates.append({
+            'type': 'program',
+            'title': extended_program['title'],
+            'url': program_credentials[0]['certificate_url'],
+        })
 
     return certificates
 

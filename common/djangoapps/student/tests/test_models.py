@@ -5,11 +5,11 @@ import hashlib
 from django.contrib.auth.models import AnonymousUser
 from django.core.cache import cache
 from django.db.models.functions import Lower
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
 from student.models import CourseEnrollment
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class CourseEnrollmentTests(SharedModuleStoreTestCase):

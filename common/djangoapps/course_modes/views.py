@@ -12,23 +12,24 @@ from django.db import transaction
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
-from django.utils.translation import get_language, to_locale, ugettext as _
+from django.utils.translation import ugettext as _
+from django.utils.translation import get_language, to_locale
 from django.views.generic.base import View
 from ipware.ip import get_ip
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from xmodule.modulestore.django import modulestore
 
-from lms.djangoapps.commerce.utils import EcommerceService
 from course_modes.models import CourseMode
 from courseware.access import has_access
 from edxmako.shortcuts import render_to_response
+from lms.djangoapps.commerce.utils import EcommerceService
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.features.enterprise_support import api as enterprise_api
 from student.models import CourseEnrollment
-from util.db import outer_atomic
-from util import organizations_helpers as organization_api
 from third_party_auth.decorators import tpa_hint_ends_existing_session
+from util import organizations_helpers as organization_api
+from util.db import outer_atomic
+from xmodule.modulestore.django import modulestore
 
 
 class ChooseModeView(View):

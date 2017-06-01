@@ -2,9 +2,9 @@
 Tests for paver safecommit quality tasks
 """
 from mock import patch
+from paver.easy import call_task
 
 import pavelib.quality
-from paver.easy import call_task
 
 from .utils import PaverTestCase
 

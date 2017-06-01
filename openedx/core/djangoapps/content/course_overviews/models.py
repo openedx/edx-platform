@@ -21,11 +21,10 @@ from lms.djangoapps import django_comment_client
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from static_replace.models import AssetBaseUrlConfig
 from xmodule import course_metadata_utils, block_metadata_utils
-from xmodule.course_module import CourseDescriptor
+from xmodule.course_module import CourseDescriptor, DEFAULT_START_DATE
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, UsageKeyField
-from openedx.core.lib.xblock_fields.inherited_fields import DEFAULT_START_DATE
 
 COURSE_OVERVIEW_UPDATED = Signal(providing_args=["course_key"])
 log = logging.getLogger(__name__)

@@ -9,7 +9,7 @@ from django.apps import AppConfig
 
 class ContentstoreConfig(AppConfig):
     """
-    Application Configuration for Grades.
+    Application Configuration for Contentstore.
     """
     name = u'contentstore'
 

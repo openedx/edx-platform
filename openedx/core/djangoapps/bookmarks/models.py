@@ -5,15 +5,14 @@ import logging
 
 from django.contrib.auth.models import User
 from django.db import models
-
 from jsonfield.fields import JSONField
 from model_utils.models import TimeStampedModel
-
 from opaque_keys.edx.keys import UsageKey
+
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, LocationKeyField
 from xmodule.modulestore import search
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, LocationKeyField
 
 from . import PathItem
 

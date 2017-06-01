@@ -20,7 +20,7 @@ from common.test.acceptance.pages.studio.html_component_editor import HtmlCompon
 from common.test.acceptance.pages.studio.move_xblock import MoveModalView
 from common.test.acceptance.pages.studio.utils import add_discussion, drag
 from common.test.acceptance.tests.helpers import create_user_partition_json
-from openedx.core.lib.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID, MINIMUM_STATIC_PARTITION_ID, Group
+from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID, MINIMUM_STATIC_PARTITION_ID, Group
 
 
 class NestedVerticalTest(ContainerBase):
@@ -319,10 +319,10 @@ class BaseGroupConfigurationsTest(ContainerBase):
     CHOOSE_ONE = "Select a group type"
     CONTENT_GROUP_PARTITION = ComponentVisibilityEditorView.CONTENT_GROUP_PARTITION
     ENROLLMENT_TRACK_PARTITION = ComponentVisibilityEditorView.ENROLLMENT_TRACK_PARTITION
-    MISSING_GROUP_LABEL = 'Deleted Group\nThis group no longer exists. Choose another group or make this component visible to All Learners and Staff.'
+    MISSING_GROUP_LABEL = 'Deleted Group\nThis group no longer exists. Choose another group or do not restrict access to this component.'
     VALIDATION_ERROR_LABEL = 'This component has validation issues.'
-    VALIDATION_ERROR_MESSAGE = "Error:\nThis component's visibility settings refer to deleted or invalid groups."
-    GROUP_VISIBILITY_MESSAGE = 'Some content in this unit is visible only to specific groups of learners.'
+    VALIDATION_ERROR_MESSAGE = "Error:\nThis component's access settings refer to deleted or invalid groups."
+    GROUP_VISIBILITY_MESSAGE = 'Access to some content in this unit is restricted to specific groups of learners.'
 
     def setUp(self):
         super(BaseGroupConfigurationsTest, self).setUp()
@@ -374,10 +374,13 @@ class BaseGroupConfigurationsTest(ContainerBase):
         """
         Check that the current visibility is displayed at the top of the dialog.
         """
-        self.assertEqual(
-            "Currently visible to: {groups}".format(groups=expected_current_groups),
-            visibility_editor.current_groups_message
-        )
+        if expected_current_groups == self.ALL_LEARNERS_AND_STAFF:
+            self.assertEqual("Access is not restricted", visibility_editor.current_groups_message)
+        else:
+            self.assertEqual(
+                "Access is restricted to: {groups}".format(groups=expected_current_groups),
+                visibility_editor.current_groups_message
+            )
 
     def verify_selected_partition_scheme(self, visibility_editor, expected_scheme):
         """
@@ -648,7 +651,7 @@ class EnrollmentTrackVisibilityModalTest(BaseGroupConfigurationsTest):
         if not expected_groups:
             self.assertIsNone(component.get_partition_group_message)
         else:
-            self.assertEqual("Visible to: " + expected_groups, component.get_partition_group_message)
+            self.assertEqual("Access restricted to: " + expected_groups, component.get_partition_group_message)
 
     def test_setting_enrollment_tracks(self):
         """

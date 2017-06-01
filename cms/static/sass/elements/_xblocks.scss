@@ -248,15 +248,6 @@
         }
       }
     }
-
-    // CASE: xblock has specific visibility based on content groups set
-    &.has-group-visibility-set {
-
-      .action-visibility .visibility-button.visibility-button { // needed to cascade in front of overscoped header-actions CSS rule
-        color: $color-visibility-set;
-      }
-    }
-
   }
 
   // +Messaging - Xblocks

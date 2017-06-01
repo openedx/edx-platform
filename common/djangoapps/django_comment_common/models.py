@@ -1,19 +1,17 @@
 import logging
 
+from config_models.models import ConfigurationModel
 from django.conf import settings
-from django.db import models
 from django.contrib.auth.models import User
-
-from django.dispatch import receiver
+from django.db import models
 from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.utils.translation import ugettext_noop
 
-from config_models.models import ConfigurationModel
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, NoneToEmptyManager
 from student.models import CourseEnrollment
-
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, NoneToEmptyManager
 
 FORUM_ROLE_ADMINISTRATOR = ugettext_noop('Administrator')
 FORUM_ROLE_MODERATOR = ugettext_noop('Moderator')

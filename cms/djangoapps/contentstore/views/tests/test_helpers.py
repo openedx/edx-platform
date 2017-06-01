@@ -2,10 +2,11 @@
 Unit tests for helpers.py.
 """
 
+from django.utils import http
+
 from contentstore.tests.utils import CourseTestCase
 from contentstore.views.helpers import xblock_studio_url, xblock_type_display_name
 from xmodule.modulestore.tests.factories import ItemFactory, LibraryFactory
-from django.utils import http
 
 
 class HelpersTestCase(CourseTestCase):

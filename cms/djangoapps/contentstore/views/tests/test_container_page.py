@@ -1,18 +1,18 @@
 """
 Unit tests for the container page.
 """
-import re
 import datetime
-from pytz import UTC
-from mock import patch, Mock
+import re
 
 from django.http import Http404
 from django.test.client import RequestFactory
 from django.utils import http
+from mock import Mock, patch
+from pytz import UTC
 
 import contentstore.views.component as views
-from contentstore.views.tests.utils import StudioPageTestCase
 from contentstore.tests.test_libraries import LibraryTestCase
+from contentstore.views.tests.utils import StudioPageTestCase
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory

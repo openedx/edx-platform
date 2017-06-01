@@ -3,10 +3,9 @@ import cStringIO
 import gzip
 import logging
 
+from config_models.models import ConfigurationModel
 from django.db import models
 from django.utils.text import compress_string
-
-from config_models.models import ConfigurationModel
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 

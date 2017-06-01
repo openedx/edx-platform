@@ -1,9 +1,10 @@
 """
 Tests for cache_utils.py
 """
+from unittest import TestCase
+
 import ddt
 from mock import MagicMock
-from unittest import TestCase
 
 from openedx.core.lib.cache_utils import memoize_in_request_cache
 

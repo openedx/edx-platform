@@ -4,7 +4,7 @@ from nose.plugins.attrib import attr
 from common.test.acceptance.fixtures.catalog import CatalogFixture, CatalogIntegrationMixin
 from common.test.acceptance.fixtures.course import CourseFixture
 from common.test.acceptance.fixtures.programs import ProgramsConfigMixin
-from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.catalog import CacheProgramsPage
 from common.test.acceptance.pages.lms.programs import ProgramDetailsPage, ProgramListingPage
 from common.test.acceptance.tests.helpers import UniqueCourseTest

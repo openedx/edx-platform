@@ -2,10 +2,11 @@
 Tests for paver quality tasks
 """
 import unittest
+
 from mock import patch
+from paver.easy import BuildFailure
 
 import pavelib.quality
-from paver.easy import BuildFailure
 
 
 class TestPaverESLint(unittest.TestCase):

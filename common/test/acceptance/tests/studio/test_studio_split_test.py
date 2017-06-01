@@ -19,8 +19,8 @@ from common.test.acceptance.pages.studio.settings_group_configurations import Gr
 from common.test.acceptance.pages.studio.utils import add_advanced_component
 from common.test.acceptance.pages.xblock.utils import wait_for_xblock_initialization
 from common.test.acceptance.tests.helpers import create_user_partition_json
-from openedx.core.lib.partitions.partitions import Group
 from test_studio_container import ContainerBase
+from xmodule.partitions.partitions import Group
 
 
 class SplitTestMixin(object):

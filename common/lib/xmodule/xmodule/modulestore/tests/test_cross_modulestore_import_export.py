@@ -14,25 +14,23 @@ and then for each combination of modulestores, performing the sequence:
 
 import itertools
 import os
+from path import Path as path
 from shutil import rmtree
 from tempfile import mkdtemp
 
 import ddt
-from mock import patch
 from nose.plugins.attrib import attr
-from openedx.core.lib.partitions.tests.test_partitions import PartitionTestCase
-from path import Path as path
-from xmodule.modulestore.tests.utils import (
-    CONTENTSTORE_SETUPS,
-    MODULESTORE_SETUPS,
-    SPLIT_MODULESTORE_SETUP,
-    TEST_DATA_DIR,
-    MongoContentstoreBuilder,
-    mock_tab_from_json
-)
-from xmodule.modulestore.xml_exporter import export_course_to_xml
-from xmodule.modulestore.xml_importer import import_course_from_xml
+from mock import patch
+
 from xmodule.tests import CourseComparisonTest
+from xmodule.modulestore.xml_importer import import_course_from_xml
+from xmodule.modulestore.xml_exporter import export_course_to_xml
+from xmodule.modulestore.tests.utils import mock_tab_from_json
+from xmodule.partitions.tests.test_partitions import PartitionTestCase
+from xmodule.modulestore.tests.utils import (
+    MongoContentstoreBuilder, MODULESTORE_SETUPS, SPLIT_MODULESTORE_SETUP,
+    CONTENTSTORE_SETUPS, TEST_DATA_DIR
+)
 
 COURSE_DATA_NAMES = (
     'toy',

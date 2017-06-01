@@ -2,15 +2,14 @@
 
 import unittest
 
-from django.conf import settings
-from django import test
-from django.contrib.auth import models
 import mock
+from django import test
+from django.conf import settings
+from django.contrib.auth import models
+from social.apps.django_app.default import models as social_models
 
 from third_party_auth import pipeline, provider
 from third_party_auth.tests import testutil
-from social.apps.django_app.default import models as social_models
-
 
 # Get Django User model by reference from python-social-auth. Not a type
 # constant, pylint.

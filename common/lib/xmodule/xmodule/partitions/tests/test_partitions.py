@@ -8,11 +8,11 @@ from mock import Mock
 
 from opaque_keys.edx.locator import CourseLocator
 from stevedore.extension import Extension, ExtensionManager
-from openedx.core.lib.partitions.partitions import (
+from xmodule.partitions.partitions import (
     Group, UserPartition, UserPartitionError, NoSuchUserPartitionGroupError,
     USER_PARTITION_SCHEME_NAMESPACE, ENROLLMENT_TRACK_PARTITION_ID
 )
-from openedx.core.lib.partitions.partitions_service import (
+from xmodule.partitions.partitions_service import (
     PartitionService, get_all_partitions_for_course, FEATURES
 )
 

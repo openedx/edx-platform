@@ -3,20 +3,17 @@ Tests for the Split Testing Module
 """
 import ddt
 import lxml
-from fs.memoryfs import MemoryFS
 from mock import Mock, patch
-from openedx.core.lib.partitions.partitions import MINIMUM_STATIC_PARTITION_ID, Group, UserPartition
-from openedx.core.lib.partitions.tests.test_partitions import (
-    MockPartitionService,
-    MockUserPartitionScheme,
-    PartitionTestCase
-)
-from xmodule.split_test_module import SplitTestDescriptor, SplitTestFields, get_split_user_partitions
-from xmodule.tests import get_test_system
+from fs.memoryfs import MemoryFS
+
+from xmodule.partitions.tests.test_partitions import MockPartitionService, PartitionTestCase, MockUserPartitionScheme
 from xmodule.tests.xml import factories as xml
 from xmodule.tests.xml import XModuleXmlImportTest
-from xmodule.validation import StudioValidationMessage
+from xmodule.tests import get_test_system
 from xmodule.x_module import AUTHOR_VIEW, STUDENT_VIEW
+from xmodule.validation import StudioValidationMessage
+from xmodule.split_test_module import SplitTestDescriptor, SplitTestFields, get_split_user_partitions
+from xmodule.partitions.partitions import Group, UserPartition, MINIMUM_STATIC_PARTITION_ID
 
 
 class SplitTestModuleFactory(xml.XmlImportFactory):

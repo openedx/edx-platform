@@ -2,29 +2,30 @@
 Helper classes and methods for running modulestore tests without Django.
 """
 import random
+
 from contextlib import contextmanager, nested
 from importlib import import_module
+from opaque_keys.edx.keys import UsageKey
+from path import Path as path
 from shutil import rmtree
 from tempfile import mkdtemp
 from unittest import TestCase
 
-from opaque_keys.edx.keys import UsageKey
-from openedx.core.lib.xblock_fields.inherited_fields import InheritanceMixin
-from path import Path as path
 from xblock.fields import XBlockMixin
+from xmodule.x_module import XModuleMixin
 from xmodule.contentstore.mongo import MongoContentStore
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished
 from xmodule.modulestore.edit_info import EditInfoMixin
+from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.modulestore.mongo.base import ModuleStoreEnum
 from xmodule.modulestore.mongo.draft import DraftModuleStore
 from xmodule.modulestore.split_mongo.split_draft import DraftVersioningModuleStore
 from xmodule.modulestore.tests.factories import ItemFactory
-from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
+from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.tests import DATA_DIR
-from xmodule.x_module import XModuleMixin
 
 
 def load_function(path):

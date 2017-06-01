@@ -1,11 +1,12 @@
 """Utilities for writing unit tests that involve course embargos. """
 import contextlib
+
 import mock
+from django.core.cache import cache
+from django.core.urlresolvers import reverse
 
 import pygeoip
 
-from django.core.urlresolvers import reverse
-from django.core.cache import cache
 from .models import Country, CountryAccessRule, RestrictedCourse
 
 

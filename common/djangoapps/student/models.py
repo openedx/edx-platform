@@ -14,41 +14,41 @@ import hashlib
 import json
 import logging
 import uuid
-from collections import defaultdict, OrderedDict, namedtuple
+from collections import OrderedDict, defaultdict, namedtuple
 from datetime import datetime, timedelta
 from functools import total_ordering
 from importlib import import_module
 from urllib import urlencode
 
 import analytics
-import dogstats_wrapper as dog_stats_api
 from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.core.cache import cache
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-from django.db import models, IntegrityError
+from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
+from django.db import IntegrityError, models
 from django.db.models import Count
-from django.db.models.signals import pre_save, post_save
-from django.dispatch import receiver, Signal
+from django.db.models.signals import post_save, pre_save
+from django.dispatch import Signal, receiver
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext_noop
 from django_countries.fields import CountryField
-from eventtracking import tracker
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from pytz import UTC
 from simple_history.models import HistoricalRecords
 
+import dogstats_wrapper as dog_stats_api
 import lms.lib.comment_client as cc
 import request_cache
 from certificates.models import GeneratedCertificate
 from course_modes.models import CourseMode
 from enrollment.api import _default_course_mode
+from eventtracking import tracker
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, NoneToEmptyManager

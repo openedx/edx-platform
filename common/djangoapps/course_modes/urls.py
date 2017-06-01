@@ -1,5 +1,5 @@
-from django.conf.urls import patterns, url
 from django.conf import settings
+from django.conf.urls import patterns, url
 
 from course_modes import views
 

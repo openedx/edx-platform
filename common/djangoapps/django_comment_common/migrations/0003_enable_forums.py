@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+
 from django.db import migrations, models
+
 
 def add_default_enable(apps, schema_editor):
     ForumsConfig = apps.get_model("django_comment_common", "ForumsConfig")

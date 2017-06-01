@@ -84,7 +84,7 @@ from openedx.core.djangolib.markup import HTML, Text
           <div class="enrollment-track-doc">
             <h3 class="title-3">${_("Enrollment Track Groups")}</h3>
             <p>${_("Enrollment track groups allow you to offer different course content to learners in each enrollment track. Learners enrolled in each enrollment track in your course are automatically included in the corresponding enrollment track group.")}</p>
-            <p>${_("On unit pages in the course outline, you can designate components as visible only to learners in a specific enrollment track.")}</p>
+            <p>${_("On unit pages in the course outline, you can restrict access to components to learners based on their enrollment track.")}</p>
             <p>${_("You cannot edit enrollment track groups, but you can expand each group to view details of the course content that is designated for learners in the group.")}</p>
             <p><a href="${get_online_help_info(enrollment_track_help_token())['doc_url']}" target="_blank" class="button external-help-button">${_("Learn More")}</a></p>
           </div>
@@ -94,7 +94,7 @@ from openedx.core.djangolib.markup import HTML, Text
           <div class="content-groups-doc">
               <h3 class="title-3">${_("Content Groups")}</h3>
               <p>${_("If you have cohorts enabled in your course, you can use content groups to create cohort-specific courseware. In other words, you can customize the content that particular cohorts see in your course.")}</p>
-              <p>${_("Each content group that you create can be associated with one or more cohorts. In addition to course content that is intended for all learners, you can designate some content as visible only to specified content groups. Only learners in the cohorts that are associated with the specified content groups see the additional content.")}</p>
+              <p>${_("Each content group that you create can be associated with one or more cohorts. In addition to making course content available to all learners, you can restrict access to some content to learners in specific content groups. Only learners in the cohorts that are associated with the specified content groups see the additional content.")}</p>
               <p>${Text(_("Click {em_start}New content group{em_end} to add a new content group. To edit the name of a content group, hover over its box and click {em_start}Edit{em_end}. You can delete a content group only if it is not in use by a unit. To delete a content group, hover over its box and click the delete icon.")).format(em_start=HTML("<strong>"), em_end=HTML("</strong>"))}</p>
               <p><a href="${get_online_help_info(content_groups_help_token())['doc_url']}" target="_blank" class="button external-help-button">${_("Learn More")}</a></p>
           </div>

@@ -3,15 +3,13 @@
 import logging
 
 import django.utils.timezone
-from rest_framework.authentication import SessionAuthentication
+from oauth2_provider import models as dot_models
+from provider.oauth2 import models as dop_models
 from rest_framework import exceptions as drf_exceptions
+from rest_framework.authentication import SessionAuthentication
 from rest_framework_oauth.authentication import OAuth2Authentication
 
-from provider.oauth2 import models as dop_models
-from oauth2_provider import models as dot_models
-
 from openedx.core.lib.api.exceptions import AuthenticationFailed
-
 
 OAUTH2_TOKEN_ERROR = u'token_error'
 OAUTH2_TOKEN_ERROR_EXPIRED = u'token_expired'

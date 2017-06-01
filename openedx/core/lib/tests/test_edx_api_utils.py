@@ -2,12 +2,12 @@
 # pylint: disable=missing-docstring
 import json
 
-from django.core.cache import cache
-from django.test.utils import override_settings
 import httpretty
 import mock
-from nose.plugins.attrib import attr
+from django.core.cache import cache
+from django.test.utils import override_settings
 from edx_oauth2_provider.tests.factories import ClientFactory
+from nose.plugins.attrib import attr
 from provider.constants import CONFIDENTIAL
 
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
@@ -18,7 +18,6 @@ from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfi
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from student.tests.factories import UserFactory
-
 
 UTILITY_MODULE = 'openedx.core.lib.edx_api_utils'
 TEST_API_URL = 'http://www-internal.example.com/api'

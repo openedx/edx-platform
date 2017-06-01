@@ -4,6 +4,7 @@ Stub implementation of cs_comments_service for acceptance tests
 
 import re
 import urlparse
+
 from .http import StubHttpRequestHandler, StubHttpService
 
 

@@ -1,53 +1,47 @@
 """
 External Auth Views
 """
+import fnmatch
 import functools
 import json
 import logging
 import random
 import re
 import string
-import fnmatch
 import unicodedata
 import urllib
-
 from textwrap import dedent
-from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
-from openedx.core.djangoapps.external_auth.djangostore import DjangoOpenIDStore
 
+import django_openid_auth.views as openid_views
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME, authenticate, login
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.core.validators import validate_email
-from django.core.exceptions import ValidationError
-
-if settings.FEATURES.get('AUTH_USE_CAS'):
-    from django_cas.views import login as django_cas_login
-
-from student.helpers import get_next_url_for_login_page
-from student.models import UserProfile
-
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
-from django.utils.http import urlquote, is_safe_url
+from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import redirect
+from django.utils.http import is_safe_url, urlquote
 from django.utils.translation import ugettext as _
-
-from edxmako.shortcuts import render_to_response, render_to_string
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
-
-import django_openid_auth.views as openid_views
 from django_openid_auth import auth as openid_auth
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from openid.consumer.consumer import SUCCESS
-
-from openid.server.server import Server, ProtocolError, UntrustedReturnURL
-from openid.server.trustroot import TrustRoot
 from openid.extensions import ax, sreg
+from openid.server.server import ProtocolError, Server, UntrustedReturnURL
+from openid.server.trustroot import TrustRoot
 from ratelimitbackend.exceptions import RateLimitException
 
 import student.views
+from edxmako.shortcuts import render_to_response, render_to_string
+from openedx.core.djangoapps.external_auth.djangostore import DjangoOpenIDStore
+from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
+from student.helpers import get_next_url_for_login_page
+from student.models import UserProfile
 from xmodule.modulestore.django import modulestore
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+
+if settings.FEATURES.get('AUTH_USE_CAS'):
+    from django_cas.views import login as django_cas_login
 
 log = logging.getLogger("edx.external_auth")
 AUDIT_LOG = logging.getLogger("audit")

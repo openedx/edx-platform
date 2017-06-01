@@ -1,17 +1,16 @@
 """
 Tests for the Studio authoring XBlock mixin.
 """
-from course_modes.tests.factories import CourseModeFactory
 from django.conf import settings
 from django.test.utils import override_settings
-from openedx.core.lib.partitions.partitions import (
-    ENROLLMENT_TRACK_PARTITION_ID,
-    MINIMUM_STATIC_PARTITION_ID,
-    Group,
-    UserPartition
-)
+
+from course_modes.tests.factories import CourseModeFactory
+
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.partitions.partitions import (
+    Group, UserPartition, ENROLLMENT_TRACK_PARTITION_ID, MINIMUM_STATIC_PARTITION_ID
+)
 
 
 class AuthoringMixinTestCase(ModuleStoreTestCase):
@@ -19,9 +18,9 @@ class AuthoringMixinTestCase(ModuleStoreTestCase):
     Tests the studio authoring XBlock mixin.
     """
     GROUP_NO_LONGER_EXISTS = "This group no longer exists"
-    NO_CONTENT_OR_ENROLLMENT_GROUPS = "No visibility settings are defined for this component"
-    NO_CONTENT_ENROLLMENT_TRACK_ENABLED = "specific groups of learners based either on their enrollment track, or by content groups that you create"
-    NO_CONTENT_ENROLLMENT_TRACK_DISABLED = "specific groups of learners based on content groups that you create"
+    NO_CONTENT_OR_ENROLLMENT_GROUPS = "Access to this component is not restricted"
+    NO_CONTENT_ENROLLMENT_TRACK_ENABLED = "You can restrict access to this component to learners in specific enrollment tracks or content groups"
+    NO_CONTENT_ENROLLMENT_TRACK_DISABLED = "You can restrict access to this component to learners in specific content groups"
     CONTENT_GROUPS_TITLE = "Content Groups"
     ENROLLMENT_GROUPS_TITLE = "Enrollment Track Groups"
     STAFF_LOCKED = 'The unit that contains this component is hidden from learners'
