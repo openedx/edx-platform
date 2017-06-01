@@ -10,9 +10,10 @@ import logging
 import random
 import sys
 from collections import OrderedDict
-from datetime import datetime  # Used by pycontracts.  pylint: disable=unused-import
+from datetime import datetime
 
 from contracts import contract
+from pytz import UTC
 
 log = logging.getLogger("edx.courseware")
 
@@ -462,3 +463,38 @@ def _min_or_none(itr):
         return min(itr)
     except ValueError:
         return None
+
+
+class ShowCorrectness(object):
+    """
+    Helper class for determining whether correctness is currently hidden for a block.
+
+    When correctness is hidden, this limits the user's access to the correct/incorrect flags, messages, problem scores,
+    and aggregate subsection and course grades.
+    """
+
+    """
+    Constants used to indicate when to show correctness
+    """
+    ALWAYS = "always"
+    PAST_DUE = "past_due"
+    NEVER = "never"
+
+    @classmethod
+    def correctness_available(cls, show_correctness='', due_date=None, has_staff_access=False):
+        """
+        Returns whether correctness is available now, for the given attributes.
+        """
+        if show_correctness == cls.NEVER:
+            return False
+        elif has_staff_access:
+            # This is after the 'never' check because course staff can see correctness
+            # unless the sequence/problem explicitly prevents it
+            return True
+        elif show_correctness == cls.PAST_DUE:
+            # Is it now past the due date?
+            return (due_date is None or
+                    due_date < datetime.now(UTC))
+
+        # else: show_correctness == cls.ALWAYS
+        return True
