@@ -91,6 +91,12 @@ def compute_grades_for_course_v2(self, **kwargs):
         waffle switch.  If false or not provided, use the global value of
         the ESTIMATE_FIRST_ATTEMPTED waffle switch.
     """
+    if 'event_transaction_id' in kwargs:
+        set_event_transaction_id(kwargs['event_transaction_id'])
+
+    if 'event_transaction_type' in kwargs:
+        set_event_transaction_type(kwargs['event_transaction_type'])
+
     course_key = kwargs.pop('course_key')
     offset = kwargs.pop('offset')
     batch_size = kwargs.pop('batch_size')
