@@ -1010,6 +1010,9 @@ INSTALLED_APPS = (
     # Customized celery tasks, including persisting failed tasks so they can
     # be retried
     'celery_utils',
+
+    # Waffle related utilities
+    'openedx.core.djangoapps.waffle_utils',
 )
 
 

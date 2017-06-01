@@ -5,7 +5,6 @@
 
 <%!
 import json
-import waffle
 
 from django.conf import settings
 from django.utils.translation import ugettext as _
@@ -15,7 +14,7 @@ from django.core.urlresolvers import reverse
 from django_comment_client.permissions import has_permission
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 from openedx.core.djangolib.markup import HTML
-from openedx.features.course_experience import UNIFIED_COURSE_EXPERIENCE_FLAG
+from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG
 %>
 
 <%block name="content">
@@ -58,7 +57,7 @@ from openedx.features.course_experience import UNIFIED_COURSE_EXPERIENCE_FLAG
     <div class="page-content">
         <div class="layout layout-1q3q">
             <main class="layout-col layout-col-b">
-                % if welcome_message_fragment and waffle.flag_is_active(request, UNIFIED_COURSE_EXPERIENCE_FLAG):
+                % if welcome_message_fragment and UNIFIED_COURSE_TAB_FLAG.is_enabled(course.id):
                     <div class="section section-dates">
                         ${HTML(welcome_message_fragment.body_html())}
                     </div>
@@ -76,7 +75,7 @@ from openedx.features.course_experience import UNIFIED_COURSE_EXPERIENCE_FLAG
                                 ${_("Bookmarks")}
                             </a>
                         </li>
-                        % if waffle.flag_is_active(request, UNIFIED_COURSE_EXPERIENCE_FLAG):
+                        % if UNIFIED_COURSE_TAB_FLAG.is_enabled(course.id):
                             <li>
                                 <a href="${reverse('openedx.course_experience.course_updates', args=[course.id])}">
                                     <span class="icon fa fa-newspaper-o" aria-hidden="true"></span>

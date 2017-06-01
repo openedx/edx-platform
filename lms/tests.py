@@ -55,6 +55,6 @@ class HelpModalTests(ModuleStoreTestCase):
         Simple test to make sure that you don't get a 500 error when the modal
         is enabled.
         """
-        url = reverse(course_home_url_name(), args=[self.course.id.to_deprecated_string()])
+        url = reverse(course_home_url_name(self.course.id), args=[self.course.id.to_deprecated_string()])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)

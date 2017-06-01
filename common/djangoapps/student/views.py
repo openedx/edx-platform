@@ -2267,7 +2267,7 @@ def auto_auth(request):
         elif course_id:
             # Redirect to the course homepage (in LMS) or outline page (in Studio)
             try:
-                redirect_url = reverse(course_home_url_name(request), kwargs={'course_id': course_id})
+                redirect_url = reverse(course_home_url_name(course_key), kwargs={'course_id': course_id})
             except NoReverseMatch:
                 redirect_url = reverse('course_handler', kwargs={'course_key_string': course_id})
         else:

@@ -2211,6 +2211,9 @@ INSTALLED_APPS = (
     # Unusual migrations
     'database_fixups',
 
+    # Waffle related utilities
+    'openedx.core.djangoapps.waffle_utils',
+
     # Features
     'openedx.features.course_bookmarks',
     'openedx.features.course_experience',
