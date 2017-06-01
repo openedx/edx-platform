@@ -154,7 +154,7 @@ from django.utils.http import urlquote_plus
                                 %for section in chapter['sections']:
                                     <div>
                                         <%
-                                        earned = section.all_total.earned
+                                        earned = round(section.all_total.earned,1)
                                         total = section.all_total.possible
                                         percentageString = "{0:.0%}".format( float(earned)/total) if earned > 0 and total > 0 else ""
                                         %>
@@ -183,7 +183,7 @@ from django.utils.http import urlquote_plus
                                         <dl class="scores">
                                             <dt class="hd hd-6">${ _("Problem Scores: ") if section.graded else _("Practice Scores: ")}</dt>
                                             %for score in section.problem_scores.values():
-                                            <dd>${"{0:.3n}/{1:.3n}".format(float(score.earned),float(score.possible))}</dd>
+                                            <dd>${"{0:.3n}/{1:.3n}".format(round(float(score.earned),1),float(score.possible))}</dd>
                                             %endfor
                                         </dl>
                                         %else:

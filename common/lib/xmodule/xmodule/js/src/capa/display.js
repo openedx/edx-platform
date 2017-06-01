@@ -276,9 +276,9 @@
             }
             progress = interpolate(
                 progressTemplate, {
-                    earned: curScore,
+                    earned: Math.round(curScore,1),
                     num_points: totalScore,
-                    possible: totalScore
+                    possible: Math.round(totalScore,1)
                 }, true
             );
             return this.$('.problem-progress').text(progress);

@@ -802,6 +802,8 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
                 else:
                     answer_notification_message = _('Correct')
             elif answer_notification_type == 'partially-correct':
+                # representing values as a whole numbers
+                progress = Progress(round(progress.frac()[0], 1), progress.frac()[1])
                 if progress is not None:
                     answer_notification_message = ungettext(
                         "Partially correct ({progress} point)",
