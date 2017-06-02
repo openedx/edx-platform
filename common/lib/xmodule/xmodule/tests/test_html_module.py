@@ -1,13 +1,13 @@
 import unittest
 
 from mock import Mock
-
-from xblock.field_data import DictFieldData
-from xmodule.html_module import HtmlModule, HtmlDescriptor, CourseInfoModule
-
-from . import get_test_system, get_test_descriptor_system
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
+
+from xmodule.html_module import CourseInfoModule, HtmlDescriptor, HtmlModule
+
+from . import get_test_descriptor_system, get_test_system
 
 
 def instantiate_descriptor(**field_data):
@@ -148,7 +148,7 @@ class HtmlDescriptorIndexingTestCase(unittest.TestCase):
 
 class CourseInfoModuleTestCase(unittest.TestCase):
     """
-    Make sure that CourseInfoModule renders updates properly
+    Make sure that CourseInfoModule renders updates properly.
     """
     def test_updates_render(self):
         """

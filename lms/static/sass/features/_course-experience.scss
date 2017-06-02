@@ -171,3 +171,24 @@
     }
   }
 }
+
+// Course Updates Page
+.course-updates {
+  .all-updates {
+    .updates-article {
+      margin: ($baseline*6/5) 0;
+      padding-bottom: ($baseline*6/5);
+      border-bottom: 1px solid $lms-border-color;
+      .date {
+        font-size: font-size(small);
+        font-weight: 300;
+        float: none;
+        padding-bottom: ($baseline/4);
+      }
+      &:last-child {
+        border-bottom: 0;
+      }
+    }
+  }
+}
+
