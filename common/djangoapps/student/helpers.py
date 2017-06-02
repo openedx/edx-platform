@@ -219,7 +219,7 @@ def get_next_url_for_login_page(request):
     if not redirect_to:
         try:
             if request.path == "/register":
-                redirect_to = reverse('welcome')
+                redirect_to = reverse('welcome-unactivated')
             else:
                 redirect_to = reverse('dashboard')
         except NoReverseMatch:
