@@ -14,6 +14,7 @@ from django.utils.translation import ugettext as _
 
 import request_cache
 from courseware import courses
+from django_comment_common.models import CourseDiscussionSettings
 from eventtracking import tracker
 from request_cache.middleware import request_cached
 from student.models import get_user_by_username_or_email
@@ -118,7 +119,8 @@ def is_course_cohorted(course_key):
     Raises:
        Http404 if the course doesn't exist.
     """
-    return get_course_cohort_settings(course_key).is_cohorted
+    course_cohort_settings, course_discussion_settings = get_course_settings(course_key)
+    return course_cohort_settings.is_cohorted
 
 
 def get_cohort_id(user, course_key, use_cached=False):
@@ -130,18 +132,19 @@ def get_cohort_id(user, course_key, use_cached=False):
     return None if cohort is None else cohort.id
 
 
-def get_cohorted_commentables(course_key):
+def get_divided_commentables(course_key):
     """
     Given a course_key return a set of strings representing cohorted commentables.
     """
 
-    course_cohort_settings = get_course_cohort_settings(course_key)
+    course_cohort_settings, course_discussion_settings = get_course_settings(course_key)
 
+    # We may need to check the division_scheme for the discussion_settings in the future
     if not course_cohort_settings.is_cohorted:
         # this is the easy case :)
         ans = set()
     else:
-        ans = set(course_cohort_settings.cohorted_discussions)
+        ans = set(course_discussion_settings.cohorted_discussions)
 
     return ans
 
@@ -213,7 +216,7 @@ def get_cohort(user, course_key, assign=True, use_cached=False):
 
     # First check whether the course is cohorted (users shouldn't be in a cohort
     # in non-cohorted courses, but settings can change after course starts)
-    course_cohort_settings = get_course_cohort_settings(course_key)
+    course_cohort_settings, course_discussion_settings = course_cohort_settings(course_key)
     if not course_cohort_settings.is_cohorted:
         return cache.setdefault(cache_key, None)
 
@@ -298,6 +301,22 @@ def migrate_cohort_settings(course):
             CourseCohort.create(cohort_name=group_name, course_id=course.id, assignment_type=CourseCohort.RANDOM)
 
     return cohort_settings
+
+
+def migrate_discussion_settings(course_cohorts_settings):
+    """
+    Migrate all of the divided discussion settings from CourseCohortSettings to CourseDiscussionSettings
+    """
+    discussion_settings, created = CourseDiscussionSettings.objects.get_or_create(
+        course_id=course_cohorts_settings.course_id,
+        defaults={
+            'always_divide_inline_discussions': course_cohorts_settings.always_cohort_inline_discussions,
+            'divided_discussions': course_cohorts_settings.cohorted_discussions,
+            'division_scheme': CourseDiscussionSettings.COHORT
+        }
+    )
+
+    return discussion_settings
 
 
 def get_course_cohorts(course, assignment_type=None):
@@ -507,7 +526,7 @@ def is_last_random_cohort(user_group):
     return len(random_cohorts) == 1 and random_cohorts[0].name == user_group.name
 
 
-def set_course_cohort_settings(course_key, **kwargs):
+def set_course_settings(course_key, **kwargs):
     """
     Set cohort settings for a course.
 
@@ -518,24 +537,30 @@ def set_course_cohort_settings(course_key, **kwargs):
         cohorted_discussions (list): List of discussion ids.
 
     Returns:
-        A CourseCohortSettings object.
+        A CourseCohortSettings and CourseDiscussionSettings object.
 
     Raises:
         Http404 if course_key is invalid.
     """
     fields = {'is_cohorted': bool, 'always_cohort_inline_discussions': bool, 'cohorted_discussions': list}
-    course_cohort_settings = get_course_cohort_settings(course_key)
+    course_cohort_settings, course_discussion_settings = get_course_settings(course_key)
     for field, field_type in fields.items():
         if field in kwargs:
             if not isinstance(kwargs[field], field_type):
                 raise ValueError("Incorrect field type for `{}`. Type must be `{}`".format(field, field_type.__name__))
-            setattr(course_cohort_settings, field, kwargs[field])
-    course_cohort_settings.save()
-    return course_cohort_settings
+            if field == 'is_cohorted':
+                setattr(course_cohort_settings, field, kwargs[field])
+                course_cohort_settings.save()
+            elif field == 'always_cohort_inline_discussions':
+                setattr(course_discussion_settings, 'always_divide_inline_discussions', kwargs[field])
+            elif field == 'cohorted_discussions':
+                setattr(course_discussion_settings, 'divided_discussions', kwargs[field])
+    course_discussion_settings.save()
+    return course_cohort_settings, course_discussion_settings
 
 
 @request_cached
-def get_course_cohort_settings(course_key):
+def get_course_settings(course_key):
     """
     Return cohort settings for a course.
 
@@ -553,4 +578,9 @@ def get_course_cohort_settings(course_key):
     except CourseCohortsSettings.DoesNotExist:
         course = courses.get_course_by_id(course_key)
         course_cohort_settings = migrate_cohort_settings(course)
-    return course_cohort_settings
+    try:
+        course_discussion_settings = CourseDiscussionSettings.objects.get(course_id=course_key)
+    except CourseDiscussionSettings.DoesNotExist:
+        course_discussion_settings = migrate_discussion_settings(course_cohort_settings)
+
+    return course_cohort_settings, course_discussion_settings

@@ -63,12 +63,12 @@ def unlink_cohort_partition_group(cohort):
 
 
 # pylint: disable=invalid-name
-def _get_course_cohort_settings_representation(course, course_cohort_settings):
+def _get_course_settings_representation(course, course_cohort_settings, course_discussion_settings):
     """
     Returns a JSON representation of a course cohort settings.
     """
-    cohorted_course_wide_discussions, cohorted_inline_discussions = get_cohorted_discussions(
-        course, course_cohort_settings
+    cohorted_course_wide_discussions, cohorted_inline_discussions = get_divided_discussions(
+        course, course_cohort_settings, course_discussion_settings
     )
 
     return {
@@ -76,7 +76,7 @@ def _get_course_cohort_settings_representation(course, course_cohort_settings):
         'is_cohorted': course_cohort_settings.is_cohorted,
         'cohorted_inline_discussions': cohorted_inline_discussions,
         'cohorted_course_wide_discussions': cohorted_course_wide_discussions,
-        'always_cohort_inline_discussions': course_cohort_settings.always_cohort_inline_discussions,
+        'always_cohort_inline_discussions': course_discussion_settings.always_divide_inline_discussions,
     }
 
 
@@ -97,23 +97,23 @@ def _get_cohort_representation(cohort, course):
     }
 
 
-def get_cohorted_discussions(course, course_settings):
+def get_divided_discussions(course, course_settings, discussion_settings):
     """
-    Returns the course-wide and inline cohorted discussion ids separately.
+    Returns the course-wide and inline divided discussion ids separately.
     """
-    cohorted_course_wide_discussions = []
-    cohorted_inline_discussions = []
+    divided_course_wide_discussions = []
+    divided_inline_discussions = []
 
     course_wide_discussions = [topic['id'] for __, topic in course.discussion_topics.items()]
     all_discussions = get_discussion_categories_ids(course, None, include_all=True)
 
-    for cohorted_discussion_id in course_settings.cohorted_discussions:
-        if cohorted_discussion_id in course_wide_discussions:
-            cohorted_course_wide_discussions.append(cohorted_discussion_id)
-        elif cohorted_discussion_id in all_discussions:
-            cohorted_inline_discussions.append(cohorted_discussion_id)
+    for divided_discussion_id in discussion_settings.divided_discussions:
+        if divided_discussion_id in course_wide_discussions:
+            divided_course_wide_discussions.append(divided_discussion_id)
+        elif divided_discussion_id in all_discussions:
+            divided_inline_discussions.append(divided_discussion_id)
 
-    return cohorted_course_wide_discussions, cohorted_inline_discussions
+    return divided_course_wide_discussions, divided_inline_discussions
 
 
 @require_http_methods(("GET", "PATCH"))
@@ -131,11 +131,11 @@ def course_cohort_settings_handler(request, course_key_string):
     """
     course_key = CourseKey.from_string(course_key_string)
     course = get_course_with_access(request.user, 'staff', course_key)
-    cohort_settings = cohorts.get_course_cohort_settings(course_key)
+    cohort_settings, discussion_settings = cohorts.get_course_settings(course_key)
 
     if request.method == 'PATCH':
-        cohorted_course_wide_discussions, cohorted_inline_discussions = get_cohorted_discussions(
-            course, cohort_settings
+        cohorted_course_wide_discussions, cohorted_inline_discussions = get_divided_discussions(
+            course, cohort_settings, discussion_settings
         )
 
         settings_to_change = {}
@@ -161,14 +161,14 @@ def course_cohort_settings_handler(request, course_key_string):
             return JsonResponse({"error": unicode("Bad Request")}, 400)
 
         try:
-            cohort_settings = cohorts.set_course_cohort_settings(
+            cohort_settings, discussion_settings = cohorts.set_course_settings(
                 course_key, **settings_to_change
             )
         except ValueError as err:
             # Note: error message not translated because it is not exposed to the user (UI prevents this state).
             return JsonResponse({"error": unicode(err)}, 400)
 
-    return JsonResponse(_get_course_cohort_settings_representation(course, cohort_settings))
+    return JsonResponse(_get_course_settings_representation(course, cohort_settings, discussion_settings))
 
 
 @require_http_methods(("GET", "PUT", "POST", "PATCH"))

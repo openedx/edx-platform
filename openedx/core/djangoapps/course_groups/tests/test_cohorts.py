@@ -475,17 +475,17 @@ class TestCohorts(ModuleStoreTestCase):
             {cohort1.id: cohort1.name, cohort2.id: cohort2.name}
         )
 
-    def test_get_cohorted_commentables(self):
+    def test_get_divided_commentables(self):
         """
-        Make sure cohorts.get_cohorted_commentables() correctly returns a list of strings representing cohorted
-        commentables.  Also verify that we can't get the cohorted commentables from a course which does not exist.
+        Make sure cohorts.get_divided_commentables() correctly returns a list of strings representing divided
+        commentables.  Also verify that we can't get the divided commentables from a course which does not exist.
         """
         course = modulestore().get_course(self.toy_course_key)
 
-        self.assertEqual(cohorts.get_cohorted_commentables(course.id), set())
+        self.assertEqual(cohorts.get_divided_commentables(course.id), set())
 
         config_course_cohorts(course, is_cohorted=True)
-        self.assertEqual(cohorts.get_cohorted_commentables(course.id), set())
+        self.assertEqual(cohorts.get_divided_commentables(course.id), set())
 
         config_course_cohorts(
             course,
@@ -494,7 +494,7 @@ class TestCohorts(ModuleStoreTestCase):
             cohorted_discussions=["Feedback"]
         )
         self.assertItemsEqual(
-            cohorts.get_cohorted_commentables(course.id),
+            cohorts.get_divided_commentables(course.id),
             set([topic_name_to_id(course, "Feedback")])
         )
 
@@ -505,12 +505,12 @@ class TestCohorts(ModuleStoreTestCase):
             cohorted_discussions=["General", "Feedback"]
         )
         self.assertItemsEqual(
-            cohorts.get_cohorted_commentables(course.id),
+            cohorts.get_divided_commentables(course.id),
             set([topic_name_to_id(course, "General"), topic_name_to_id(course, "Feedback")])
         )
         self.assertRaises(
             Http404,
-            lambda: cohorts.get_cohorted_commentables(SlashSeparatedCourseKey("course", "does_not", "exist"))
+            lambda: cohorts.get_divided_commentables(SlashSeparatedCourseKey("course", "does_not", "exist"))
         )
 
     def test_get_cohort_by_name(self):
@@ -672,12 +672,12 @@ class TestCohorts(ModuleStoreTestCase):
         # Note that the following get() will fail with MultipleObjectsReturned if race condition is not handled.
         self.assertEqual(first_cohort.users.get(), course_user)
 
-    def test_get_course_cohort_settings(self):
+    def test_get_course_settings(self):
         """
-        Test that cohorts.get_course_cohort_settings is working as expected.
+        Test that cohorts.course_cohort_settings is working as expected.
         """
         course = modulestore().get_course(self.toy_course_key)
-        course_cohort_settings = cohorts.get_course_cohort_settings(course.id)
+        course_cohort_settings = cohorts.course_cohort_settings(course.id)
 
         self.assertFalse(course_cohort_settings.is_cohorted)
         self.assertEqual(course_cohort_settings.cohorted_discussions, [])
@@ -685,19 +685,19 @@ class TestCohorts(ModuleStoreTestCase):
 
     def test_update_course_cohort_settings(self):
         """
-        Test that cohorts.set_course_cohort_settings is working as expected.
+        Test that cohorts.set_course_settings is working as expected.
         """
         course = modulestore().get_course(self.toy_course_key)
         CourseCohortSettingsFactory(course_id=course.id)
 
-        cohorts.set_course_cohort_settings(
+        cohorts.set_course_settings(
             course.id,
             is_cohorted=False,
             cohorted_discussions=['topic a id', 'topic b id'],
             always_cohort_inline_discussions=True
         )
 
-        course_cohort_settings = cohorts.get_course_cohort_settings(course.id)
+        course_cohort_settings, course_discussion_settings = cohorts.course_cohort_settings(course.id)
 
         self.assertFalse(course_cohort_settings.is_cohorted)
         self.assertEqual(course_cohort_settings.cohorted_discussions, ['topic a id', 'topic b id'])
@@ -705,7 +705,7 @@ class TestCohorts(ModuleStoreTestCase):
 
     def test_update_course_cohort_settings_with_invalid_data_type(self):
         """
-        Test that cohorts.set_course_cohort_settings raises exception if fields have incorrect data type.
+        Test that cohorts.set_course_settings raises exception if fields have incorrect data type.
         """
         course = modulestore().get_course(self.toy_course_key)
         CourseCohortSettingsFactory(course_id=course.id)
@@ -719,7 +719,7 @@ class TestCohorts(ModuleStoreTestCase):
 
         for field in fields:
             with self.assertRaises(ValueError) as value_error:
-                cohorts.set_course_cohort_settings(course.id, **{field['name']: ''})
+                cohorts.set_course_settings(course.id, **{field['name']: ''})
 
             self.assertEqual(
                 value_error.exception.message,
