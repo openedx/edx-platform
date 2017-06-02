@@ -45,7 +45,7 @@ from django_comment_common.signals import (
     thread_voted
 )
 from django_comment_common.utils import ThreadContext
-from eventtracking import tracker
+import eventtracking
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from util.file import store_uploaded_file
 
@@ -82,7 +82,7 @@ def track_forum_event(request, event_name, course, obj, data, id_map=None):
         role.role for role in user.courseaccessrole_set.filter(course_id=course.id)
     ]
 
-    tracker.emit(event_name, data)
+    eventtracking.tracker.emit(event_name, data)
 
 
 def track_created_event(request, event_name, course, obj, data):
@@ -97,7 +97,7 @@ def track_created_event(request, event_name, course, obj, data):
     track_forum_event(request, event_name, course, obj, data)
 
 
-def add_truncated_title_to_event_data(event_data, full_title):
+def add_truncated_title_to_event_data(event_data, full_title):  # pylint: disable=invalid-name
     event_data['title_truncated'] = (len(full_title) > TRACKING_MAX_FORUM_TITLE)
     event_data['title'] = full_title[:TRACKING_MAX_FORUM_TITLE]
 
@@ -156,6 +156,19 @@ def track_voted_event(request, course, obj, vote_value, undo_vote=False):
         'vote_value': vote_value,
     }
     track_forum_event(request, event_name, course, obj, event_data)
+
+
+def track_thread_viewed_event(request, course, thread):
+    """
+    Send analytics event for a viewed thread.
+    """
+    event_name = _EVENT_NAME_TEMPLATE.format(obj_type='thread', action_name='viewed')
+    event_data = {}
+    event_data['commentable_id'] = thread.commentable_id
+    if hasattr(thread, 'username'):
+        event_data['target_username'] = thread.username
+    add_truncated_title_to_event_data(event_data, thread.title)
+    track_forum_event(request, event_name, course, thread, event_data)
 
 
 def permitted(func):
