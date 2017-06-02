@@ -300,10 +300,14 @@ div.problem {
 
     legend {
       margin-bottom: $baseline;
+      max-width: 100%;
+      white-space: normal;
     }
 
     legend + .question-description {
       margin-top: -$baseline;
+      max-width: 100%;
+      white-space: normal;
     }
   }
 }
