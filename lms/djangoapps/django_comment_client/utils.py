@@ -130,11 +130,19 @@ def get_accessible_discussion_xblocks(course, user, include_all=False):  # pylin
     Return a list of all valid discussion xblocks in this course that
     are accessible to the given user.
     """
-    all_xblocks = modulestore().get_items(course.id, qualifiers={'category': 'discussion'}, include_orphans=False)
+    return get_accessible_discussion_xblocks_by_course_id(course.id, user, include_all=include_all)
+
+
+def get_accessible_discussion_xblocks_by_course_id(course_id, user, include_all=False):  # pylint: disable=invalid-name
+    """
+    Return a list of all valid discussion xblocks in this course that
+    are accessible to the given user.
+    """
+    all_xblocks = modulestore().get_items(course_id, qualifiers={'category': 'discussion'}, include_orphans=False)
 
     return [
         xblock for xblock in all_xblocks
-        if has_required_keys(xblock) and (include_all or has_access(user, 'load', xblock, course.id))
+        if has_required_keys(xblock) and (include_all or has_access(user, 'load', xblock, course_id))
     ]
 
 
@@ -178,19 +186,27 @@ def get_cached_discussion_id_map(course, discussion_ids, user):
     Returns a dict mapping discussion_ids to respective discussion xblock metadata if it is cached and visible to the
     user. If not, returns the result of get_discussion_id_map
     """
+    return get_cached_discussion_id_map_by_course_id(course.id, discussion_ids, user)
+
+
+def get_cached_discussion_id_map_by_course_id(course_id, discussion_ids, user):  # pylint: disable=invalid-name
+    """
+    Returns a dict mapping discussion_ids to respective discussion xblock metadata if it is cached and visible to the
+    user. If not, returns the result of get_discussion_id_map
+    """
     try:
         entries = []
         for discussion_id in discussion_ids:
-            key = get_cached_discussion_key(course.id, discussion_id)
+            key = get_cached_discussion_key(course_id, discussion_id)
             if not key:
                 continue
             xblock = modulestore().get_item(key)
-            if not (has_required_keys(xblock) and has_access(user, 'load', xblock, course.id)):
+            if not (has_required_keys(xblock) and has_access(user, 'load', xblock, course_id)):
                 continue
             entries.append(get_discussion_id_map_entry(xblock))
         return dict(entries)
     except DiscussionIdMapIsNotCached:
-        return get_discussion_id_map(course, user)
+        return get_discussion_id_map_by_course_id(course_id, user)
 
 
 def get_discussion_id_map(course, user):
@@ -198,7 +214,16 @@ def get_discussion_id_map(course, user):
     Transform the list of this course's discussion xblocks (visible to a given user) into a dictionary of metadata keyed
     by discussion_id.
     """
-    return dict(map(get_discussion_id_map_entry, get_accessible_discussion_xblocks(course, user)))
+    return get_discussion_id_map_by_course_id(course.id, user)
+
+
+def get_discussion_id_map_by_course_id(course_id, user):  # pylint: disable=invalid-name
+    """
+    Transform the list of this course's discussion xblocks (visible to a given user) into a dictionary of metadata keyed
+    by discussion_id.
+    """
+    xblocks = get_accessible_discussion_xblocks_by_course_id(course_id, user)
+    return dict(map(get_discussion_id_map_entry, xblocks))
 
 
 def _filter_unstarted_categories(category_map, course):

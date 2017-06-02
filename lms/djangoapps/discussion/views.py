@@ -28,6 +28,7 @@ import lms.lib.comment_client as cc
 from courseware.access import has_access
 from courseware.courses import get_course_with_access
 from courseware.views.views import CourseTabView
+from django_comment_client.base.views import track_thread_viewed_event
 from django_comment_client.constants import TYPE_ENTRY
 from django_comment_client.permissions import get_team, has_permission
 from django_comment_client.utils import (
@@ -291,10 +292,13 @@ def single_thread(request, course_key, discussion_id, thread_id):
         cc_user = cc.User.from_django_user(request.user)
         user_info = cc_user.to_dict()
         is_staff = has_permission(request.user, 'openclose_thread', course.id)
-
-        thread = _find_thread(request, course, discussion_id=discussion_id, thread_id=thread_id)
-        if not thread:
-            raise Http404
+        thread = _load_thread_for_viewing(
+            request,
+            course,
+            discussion_id=discussion_id,
+            thread_id=thread_id,
+            raise_event=True,
+        )
 
         with newrelic_function_trace("get_annotated_content_infos"):
             annotated_content_info = utils.get_annotated_content_infos(
@@ -358,6 +362,34 @@ def _find_thread(request, course, discussion_id, thread_id):
     return thread
 
 
+def _load_thread_for_viewing(request, course, discussion_id, thread_id, raise_event):
+    """
+    Loads the discussion thread with the specified ID and fires an
+    edx.forum.thread.viewed event.
+
+    Args:
+        request: The Django request.
+        course_id: The ID of the owning course.
+        discussion_id: The ID of the owning discussion.
+        thread_id: The ID of the thread.
+        raise_event: Whether an edx.forum.thread.viewed tracking event should
+                     be raised
+
+    Returns:
+        The thread in question if the user can see it.
+
+    Raises:
+        Http404 if the thread does not exist or the user cannot
+        see it.
+    """
+    thread = _find_thread(request, course, discussion_id=discussion_id, thread_id=thread_id)
+    if not thread:
+        raise Http404
+    if raise_event:
+        track_thread_viewed_event(request, course, thread)
+    return thread
+
+
 def _create_base_discussion_view_context(request, course_key):
     """
     Returns the default template context for rendering any discussion view.
@@ -393,20 +425,20 @@ def _get_discussion_default_topic_id(course):
             return entry['id']
 
 
-def _create_discussion_board_context(request, course_key, discussion_id=None, thread_id=None):
+def _create_discussion_board_context(request, base_context, thread=None):
     """
     Returns the template context for rendering the discussion board.
     """
-    context = _create_base_discussion_view_context(request, course_key)
+    context = base_context.copy()
     course = context['course']
+    course_key = course.id
+    thread_id = thread.id if thread else None
+    discussion_id = thread.commentable_id if thread else None
     course_settings = context['course_settings']
     user = context['user']
     cc_user = cc.User.from_django_user(user)
     user_info = context['user_info']
-    if thread_id:
-        thread = _find_thread(request, course, discussion_id=discussion_id, thread_id=thread_id)
-        if not thread:
-            raise Http404
+    if thread:
 
         # Since we're in page render mode, and the discussions UI will request the thread list itself,
         # we need only return the thread information for this one.
@@ -637,12 +669,25 @@ class DiscussionBoardFragmentView(EdxFragmentView):
         """
         course_key = CourseKey.from_string(course_id)
         try:
-            context = _create_discussion_board_context(
-                request,
-                course_key,
-                discussion_id=discussion_id,
-                thread_id=thread_id,
+            base_context = _create_base_discussion_view_context(request, course_key)
+            # Note:
+            #   After the thread is rendered in this fragment, an AJAX
+            #   request is made and the thread is completely loaded again
+            #   (yes, this is something to fix). Because of this, we pass in
+            #   raise_event=False to _load_thread_for_viewing avoid duplicate
+            #   tracking events.
+            thread = (
+                _load_thread_for_viewing(
+                    request,
+                    base_context['course'],
+                    discussion_id=discussion_id,
+                    thread_id=thread_id,
+                    raise_event=False,
+                )
+                if thread_id
+                else None
             )
+            context = _create_discussion_board_context(request, base_context, thread=thread)
             html = render_to_string('discussion/discussion_board_fragment.html', context)
             inline_js = render_to_string('discussion/discussion_board_js.template', context)
 

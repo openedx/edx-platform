@@ -2,6 +2,7 @@
 """Tests for django comment client views."""
 import json
 import logging
+import mock
 from contextlib import contextmanager
 
 import ddt
@@ -9,6 +10,7 @@ from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
+from eventtracking.processors.exceptions import EventEmissionExit
 from mock import ANY, Mock, patch
 from nose.plugins.attrib import attr
 from nose.tools import assert_equal, assert_true
@@ -25,18 +27,34 @@ from django_comment_client.tests.group_id import (
 )
 from django_comment_client.tests.unicode import UnicodeTestMixin
 from django_comment_client.tests.utils import CohortedTestCase, ForumsEnableMixin
-from django_comment_common.models import CourseDiscussionSettings, Role, assign_role
+from django_comment_common.models import (
+    assign_role,
+    CourseDiscussionSettings,
+    FORUM_ROLE_ADMINISTRATOR,
+    FORUM_ROLE_STUDENT,
+    Role
+)
 from django_comment_common.utils import ThreadContext, seed_permissions_roles, set_course_discussion_settings
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
 from lms.lib.comment_client import Thread
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
+from student.roles import CourseStaffRole, UserBasedRole
 from student.tests.factories import CourseAccessRoleFactory, CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+from track.middleware import TrackMiddleware
+from track.views import segmentio
+from track.views.tests.base import (
+    SegmentIOTrackingTestCaseBase,
+    SEGMENTIO_TEST_USER_ID
+)
+
+from event_transformers import ForumThreadViewedEventTransformer
+
 
 log = logging.getLogger(__name__)
 
@@ -1734,7 +1752,7 @@ class ForumEventTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockReque
 
     @patch('eventtracking.tracker.emit')
     @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
-    def test_thread_event(self, __, mock_emit):
+    def test_thread_created_event(self, __, mock_emit):
         request = RequestFactory().post(
             "dummy_url", {
                 "thread_type": "discussion",
@@ -1983,3 +2001,329 @@ class UsersEndpointTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockRe
         response = self.make_request(username="other")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(json.loads(response.content)["users"], [])
+
+
+@ddt.ddt
+class SegmentIOForumThreadViewedEventTestCase(SegmentIOTrackingTestCaseBase):
+
+    def _raise_navigation_event(self, label, include_name):
+        middleware = TrackMiddleware()
+        kwargs = {'label': label}
+        if include_name:
+            kwargs['name'] = 'edx.bi.app.navigation.screen'
+        else:
+            kwargs['exclude_name'] = True
+        request = self.create_request(
+            data=self.create_segmentio_event_json(**kwargs),
+            content_type='application/json',
+        )
+        User.objects.create(pk=SEGMENTIO_TEST_USER_ID, username=str(mock.sentinel.username))
+        middleware.process_request(request)
+        try:
+            response = segmentio.segmentio_event(request)
+            self.assertEquals(response.status_code, 200)
+        finally:
+            middleware.process_response(request, None)
+
+    @ddt.data(True, False)
+    def test_thread_viewed(self, include_name):
+        """
+        Tests that a SegmentIO thread viewed event is accepted and transformed.
+
+        Only tests that the transformation happens at all; does not
+        comprehensively test that it happens correctly.
+        ForumThreadViewedEventTransformerTestCase tests for correctness.
+        """
+        self._raise_navigation_event('Forum: View Thread', include_name)
+        event = self.get_event()
+        self.assertEqual(event['name'], 'edx.forum.thread.viewed')
+        self.assertEqual(event['event_type'], event['name'])
+
+    @ddt.data(True, False)
+    def test_non_thread_viewed(self, include_name):
+        """
+        Tests that other BI events are thrown out.
+        """
+        self._raise_navigation_event('Forum: Create Thread', include_name)
+        self.assert_no_events_emitted()
+
+
+def _get_transformed_event(input_event):
+    transformer = ForumThreadViewedEventTransformer(**input_event)
+    transformer.transform()
+    return transformer
+
+
+def _create_event(
+    label='Forum: View Thread',
+    include_context=True,
+    inner_context=None,
+    username=None,
+    course_id=None,
+    **event_data
+):
+    result = {'name': 'edx.bi.app.navigation.screen'}
+    if include_context:
+        result['context'] = {'label': label}
+        if course_id:
+            result['context']['course_id'] = str(course_id)
+    if username:
+        result['username'] = username
+    if event_data:
+        result['event'] = event_data
+    if inner_context:
+        if not event_data:
+            result['event'] = {}
+        result['event']['context'] = inner_context
+    return result
+
+
+def _create_and_transform_event(**kwargs):
+    event = _create_event(**kwargs)
+    return event, _get_transformed_event(event)
+
+
+@ddt.ddt
+class ForumThreadViewedEventTransformerTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase):
+    """
+    Test that the ForumThreadViewedEventTransformer transforms events correctly
+    and without raising exceptions.
+
+    Because the events passed through the transformer can come from external
+    sources (e.g., a mobile app), we carefully test a myriad of cases, including
+    those with incomplete and malformed events.
+    """
+
+    CATEGORY_ID = 'i4x-edx-discussion-id'
+    CATEGORY_NAME = 'Discussion 1'
+    PARENT_CATEGORY_NAME = 'Chapter 1'
+
+    TEAM_CATEGORY_ID = 'i4x-edx-team-discussion-id'
+    TEAM_CATEGORY_NAME = 'Team Chat'
+    TEAM_PARENT_CATEGORY_NAME = PARENT_CATEGORY_NAME
+
+    DUMMY_CATEGORY_ID = 'i4x-edx-dummy-commentable-id'
+    DUMMY_THREAD_ID = 'dummy_thread_id'
+
+    @mock.patch.dict("student.models.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def setUp(self):
+        super(ForumThreadViewedEventTransformerTestCase, self).setUp()
+        self.courses_by_store = {
+            ModuleStoreEnum.Type.mongo: CourseFactory.create(
+                org='TestX',
+                course='TR-101',
+                run='Event_Transform_Test',
+                default_store=ModuleStoreEnum.Type.mongo,
+            ),
+            ModuleStoreEnum.Type.split: CourseFactory.create(
+                org='TestX',
+                course='TR-101S',
+                run='Event_Transform_Test_Split',
+                default_store=ModuleStoreEnum.Type.split,
+            ),
+        }
+        self.course = self.courses_by_store['mongo']
+        self.student = UserFactory.create()
+        self.staff = UserFactory.create(is_staff=True)
+        UserBasedRole(user=self.staff, role=CourseStaffRole.ROLE).add_course(self.course.id)
+        CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)
+        self.category = ItemFactory.create(
+            parent_location=self.course.location,
+            category='discussion',
+            discussion_id=self.CATEGORY_ID,
+            discussion_category=self.PARENT_CATEGORY_NAME,
+            discussion_target=self.CATEGORY_NAME,
+        )
+        self.team_category = ItemFactory.create(
+            parent_location=self.course.location,
+            category='discussion',
+            discussion_id=self.TEAM_CATEGORY_ID,
+            discussion_category=self.TEAM_PARENT_CATEGORY_NAME,
+            discussion_target=self.TEAM_CATEGORY_NAME,
+        )
+        self.team = CourseTeamFactory.create(
+            name='Team 1',
+            course_id=self.course.id,
+            topic_id='arbitrary-topic-id',
+            discussion_topic_id=self.team_category.discussion_id,
+        )
+
+    def test_missing_context(self):
+        event = _create_event(include_context=False)
+        with self.assertRaises(EventEmissionExit):
+            _get_transformed_event(event)
+
+    def test_no_data(self):
+        event, event_trans = _create_and_transform_event()
+        event['name'] = 'edx.forum.thread.viewed'
+        event['event_type'] = event['name']
+        event['event'] = {}
+        self.assertDictEqual(event_trans, event)
+
+    def test_inner_context(self):
+        _, event_trans = _create_and_transform_event(inner_context={})
+        self.assertNotIn('context', event_trans['event'])
+
+    def test_non_thread_view(self):
+        event = _create_event(
+            label='Forum: Create Thread',
+            course_id=self.course.id,
+            topic_id=self.DUMMY_CATEGORY_ID,
+            thread_id=self.DUMMY_THREAD_ID,
+        )
+        with self.assertRaises(EventEmissionExit):
+            _get_transformed_event(event)
+
+    def test_bad_field_types(self):
+        event, event_trans = _create_and_transform_event(
+            course_id={},
+            topic_id=3,
+            thread_id=object(),
+            action=3.14,
+        )
+        event['name'] = 'edx.forum.thread.viewed'
+        event['event_type'] = event['name']
+        self.assertDictEqual(event_trans, event)
+
+    def test_bad_course_id(self):
+        event, event_trans = _create_and_transform_event(course_id='non-existent-course-id')
+        event_data = event_trans['event']
+        self.assertNotIn('category_id', event_data)
+        self.assertNotIn('category_name', event_data)
+        self.assertNotIn('url', event_data)
+        self.assertNotIn('user_forums_roles', event_data)
+        self.assertNotIn('user_course_roles', event_data)
+
+    def test_bad_username(self):
+        event, event_trans = _create_and_transform_event(username='non-existent-username')
+        event_data = event_trans['event']
+        self.assertNotIn('category_id', event_data)
+        self.assertNotIn('category_name', event_data)
+        self.assertNotIn('user_forums_roles', event_data)
+        self.assertNotIn('user_course_roles', event_data)
+
+    def test_bad_url(self):
+        event, event_trans = _create_and_transform_event(
+            course_id=self.course.id,
+            topic_id='malformed/commentable/id',
+            thread_id='malformed/thread/id',
+        )
+        self.assertNotIn('url', event_trans['event'])
+
+    def test_renamed_fields(self):
+        AUTHOR = 'joe-the-plumber'
+        event, event_trans = _create_and_transform_event(
+            course_id=self.course.id,
+            topic_id=self.DUMMY_CATEGORY_ID,
+            thread_id=self.DUMMY_THREAD_ID,
+            author=AUTHOR,
+        )
+        self.assertEqual(event_trans['event']['commentable_id'], self.DUMMY_CATEGORY_ID)
+        self.assertEqual(event_trans['event']['id'], self.DUMMY_THREAD_ID)
+        self.assertEqual(event_trans['event']['target_username'], AUTHOR)
+
+    def test_titles(self):
+
+        # No title
+        _, event_1_trans = _create_and_transform_event()
+        self.assertNotIn('title', event_1_trans['event'])
+        self.assertNotIn('title_truncated', event_1_trans['event'])
+
+        # Short title
+        _, event_2_trans = _create_and_transform_event(
+            action='!',
+        )
+        self.assertIn('title', event_2_trans['event'])
+        self.assertIn('title_truncated', event_2_trans['event'])
+        self.assertFalse(event_2_trans['event']['title_truncated'])
+
+        # Long title
+        _, event_3_trans = _create_and_transform_event(
+            action=('covfefe' * 200),
+        )
+        self.assertIn('title', event_3_trans['event'])
+        self.assertIn('title_truncated', event_3_trans['event'])
+        self.assertTrue(event_3_trans['event']['title_truncated'])
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_urls(self, store):
+        course = self.courses_by_store[store]
+        commentable_id = self.DUMMY_CATEGORY_ID
+        thread_id = self.DUMMY_THREAD_ID
+        _, event_trans = _create_and_transform_event(
+            course_id=course.id,
+            topic_id=commentable_id,
+            thread_id=thread_id,
+        )
+        expected_path = '/courses/{0}/discussion/forum/{1}/threads/{2}'.format(
+            course.id, commentable_id, thread_id
+        )
+        self.assertTrue(event_trans['event'].get('url').endswith(expected_path))
+
+    def test_categories(self):
+
+        # Bad category
+        _, event_trans_1 = _create_and_transform_event(
+            username=self.student.username,
+            course_id=self.course.id,
+            topic_id='non-existent-category-id',
+        )
+        self.assertNotIn('category_id', event_trans_1['event'])
+        self.assertNotIn('category_name', event_trans_1['event'])
+
+        # Good category
+        _, event_trans_2 = _create_and_transform_event(
+            username=self.student.username,
+            course_id=self.course.id,
+            topic_id=self.category.discussion_id,
+        )
+        self.assertEqual(event_trans_2['event'].get('category_id'), self.category.discussion_id)
+        full_category_name = '{0} / {1}'.format(self.category.discussion_category, self.category.discussion_target)
+        self.assertEqual(event_trans_2['event'].get('category_name'), full_category_name)
+
+    def test_roles(self):
+
+        # No user
+        _, event_trans_1 = _create_and_transform_event(
+            course_id=self.course.id,
+        )
+        self.assertNotIn('user_forums_roles', event_trans_1['event'])
+        self.assertNotIn('user_course_roles', event_trans_1['event'])
+
+        # Student user
+        _, event_trans_2 = _create_and_transform_event(
+            course_id=self.course.id,
+            username=self.student.username,
+        )
+        self.assertEqual(event_trans_2['event'].get('user_forums_roles'), [FORUM_ROLE_STUDENT])
+        self.assertEqual(event_trans_2['event'].get('user_course_roles'), [])
+
+        # Course staff user
+        _, event_trans_3 = _create_and_transform_event(
+            course_id=self.course.id,
+            username=self.staff.username,
+        )
+        self.assertEqual(event_trans_3['event'].get('user_forums_roles'), [])
+        self.assertEqual(event_trans_3['event'].get('user_course_roles'), [CourseStaffRole.ROLE])
+
+    def test_teams(self):
+
+        # No category
+        _, event_trans_1 = _create_and_transform_event(
+            course_id=self.course.id,
+        )
+        self.assertNotIn('team_id', event_trans_1)
+
+        # Non-team category
+        _, event_trans_2 = _create_and_transform_event(
+            course_id=self.course.id,
+            topic_id=self.CATEGORY_ID,
+        )
+        self.assertNotIn('team_id', event_trans_2)
+
+        # Team category
+        _, event_trans_3 = _create_and_transform_event(
+            course_id=self.course.id,
+            topic_id=self.TEAM_CATEGORY_ID,
+        )
+        self.assertEqual(event_trans_3['event'].get('team_id'), self.team.team_id)
