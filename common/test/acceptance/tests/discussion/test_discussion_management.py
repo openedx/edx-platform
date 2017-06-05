@@ -3,16 +3,17 @@
 End-to-end tests related to the divided discussion management on the LMS Instructor Dashboard
 """
 
+import uuid
+
 from nose.plugins.attrib import attr
-from common.test.acceptance.tests.discussion.helpers import BaseDiscussionMixin, CohortTestMixin
-from common.test.acceptance.tests.helpers import UniqueCourseTest
+
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
-from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.common.utils import add_enrollment_course_modes
 from common.test.acceptance.pages.lms.discussion import DiscussionTabSingleThreadPage
 from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage
-from common.test.acceptance.pages.common.utils import add_enrollment_course_modes
-
-import uuid
+from common.test.acceptance.tests.discussion.helpers import BaseDiscussionMixin, CohortTestMixin
+from common.test.acceptance.tests.helpers import UniqueCourseTest
 
 
 class BaseDividedDiscussionTest(UniqueCourseTest, CohortTestMixin):
