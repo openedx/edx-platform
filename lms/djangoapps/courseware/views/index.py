@@ -33,6 +33,7 @@ from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 from openedx.features.course_experience import UNIFIED_COURSE_VIEW_FLAG, default_course_url_name
 from openedx.features.enterprise_support.api import data_sharing_consent_required
+from openedx.features.course_experience.views.course_sock import CourseSockFragmentView
 from request_cache.middleware import RequestCache
 from shoppingcart.models import CourseRegistrationCode
 from student.views import is_course_blocked
@@ -366,6 +367,9 @@ class CoursewareIndex(View):
             self.course,
             table_of_contents['chapters'],
         )
+
+        courseware_context['course_sock_fragment'] = CourseSockFragmentView().render_to_fragment(
+            request, course=self.course)
 
         # entrance exam data
         self._add_entrance_exam_to_context(courseware_context)
