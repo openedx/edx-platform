@@ -652,8 +652,8 @@ def dashboard(request):
         settings.FEATURES.get('DISPLAY_COURSE_MODES_ON_DASHBOARD', True)
     )
     activation_email_support_link = configuration_helpers.get_value(
-        'ACTIVATION_EMAIL_SUPPORT_LINK', settings.SUPPORT_SITE_LINK
-    )
+        'ACTIVATION_EMAIL_SUPPORT_LINK', settings.ACTIVATION_EMAIL_SUPPORT_LINK
+    ) or settings.SUPPORT_SITE_LINK
 
     # Let's filter out any courses in an "org" that has been declared to be
     # in a configuration
