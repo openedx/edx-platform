@@ -5,13 +5,12 @@ Tests for cohorts
 import ddt
 from mock import call, patch
 from nose.plugins.attrib import attr
-import before_after
 
+import before_after
 from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.http import Http404
 from django.test import TestCase
-
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
@@ -19,12 +18,9 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ToyCourseFactory
 
-from ..models import CourseUserGroup, CourseCohort, CourseUserGroupPartitionGroup
 from .. import cohorts
-from ..tests.helpers import (
-    config_course_cohorts, config_course_cohorts_legacy,
-    CohortFactory, CourseCohortFactory
-)
+from ..models import CourseCohort, CourseUserGroup, CourseUserGroupPartitionGroup
+from ..tests.helpers import CohortFactory, CourseCohortFactory, config_course_cohorts, config_course_cohorts_legacy
 
 
 @attr(shard=2)

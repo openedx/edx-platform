@@ -2,67 +2,56 @@
 Views handling read (GET) requests for the Discussion tab and inline discussions.
 """
 
-from functools import wraps
 import logging
+from contextlib import contextmanager
+from functools import wraps
 from sets import Set
 
+import django_comment_client.utils as utils
+import lms.lib.comment_client as cc
+from courseware.access import has_access
+from courseware.courses import get_course_with_access
+from courseware.views.views import CourseTabView
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.core.context_processors import csrf
-from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.contrib.staticfiles.storage import staticfiles_storage
+from django.core.context_processors import csrf
+from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseServerError
 from django.shortcuts import render_to_response
 from django.template.loader import render_to_string
 from django.utils.translation import get_language_bidi
-from django.views.decorators.http import require_GET
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.http import require_GET, require_http_methods
+from django_comment_client.constants import TYPE_ENTRY
+from django_comment_client.permissions import get_team, has_permission
+from django_comment_client.utils import (
+    add_courseware_context,
+    available_division_schemes,
+    course_discussion_division_enabled,
+    extract,
+    get_group_id_for_comments_service,
+    get_group_id_for_user,
+    get_group_names_by_id,
+    is_commentable_divided,
+    merge_dict,
+    strip_none
+)
+from django_comment_common.utils import ThreadContext, get_course_discussion_settings, set_course_discussion_settings
+from opaque_keys.edx.keys import CourseKey
+from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
+from rest_framework import status
+from student.models import CourseEnrollment
+from util.json_request import JsonResponse, expect_json
+from web_fragments.fragment import Fragment
+from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger("edx.discussions")
 try:
     import newrelic.agent
 except ImportError:
     newrelic = None  # pylint: disable=invalid-name
-
-from django.views.decorators.csrf import ensure_csrf_cookie
-from django.views.decorators.http import require_http_methods
-
-from rest_framework import status
-
-from web_fragments.fragment import Fragment
-
-from courseware.courses import get_course_with_access
-from courseware.views.views import CourseTabView
-from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
-
-from courseware.access import has_access
-from student.models import CourseEnrollment
-from xmodule.modulestore.django import modulestore
-
-from django_comment_common.utils import ThreadContext, get_course_discussion_settings, set_course_discussion_settings
-
-from django_comment_client.constants import TYPE_ENTRY
-from django_comment_client.permissions import has_permission, get_team
-from django_comment_client.utils import (
-    available_division_schemes,
-    merge_dict,
-    extract,
-    strip_none,
-    add_courseware_context,
-    get_group_id_for_comments_service,
-    course_discussion_division_enabled,
-    get_group_names_by_id,
-    is_commentable_divided,
-    get_group_id_for_user,
-)
-
-import django_comment_client.utils as utils
-import lms.lib.comment_client as cc
-
-from opaque_keys.edx.keys import CourseKey
-
-from contextlib import contextmanager
-from util.json_request import expect_json, JsonResponse
 
 
 THREADS_PER_PAGE = 20
