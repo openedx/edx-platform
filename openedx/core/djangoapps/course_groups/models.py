@@ -10,7 +10,6 @@ from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
-
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from util.db import outer_atomic
 
@@ -228,3 +227,12 @@ class CourseCohort(models.Model):
         )
 
         return course_cohort
+
+
+class UnregisteredLearnerCohortAssignments(models.Model):
+
+    course_user_group = models.ForeignKey(CourseUserGroup)
+    email = models.CharField(blank=True, max_length=255, db_index=True)
+
+    # TODO: store course_id also so we can make a unique_together relationship between email and course_id?
+    # or how else to deal with multiple course_user_group instances within the same course linked to a single email?

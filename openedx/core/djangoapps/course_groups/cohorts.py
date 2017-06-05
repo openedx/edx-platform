@@ -6,14 +6,16 @@ forums, and to the cohort admin views.
 import logging
 import random
 
+import request_cache
+from courseware import courses
+from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 from django.db import IntegrityError, transaction
 from django.db.models.signals import m2m_changed, post_save
 from django.dispatch import receiver
 from django.http import Http404
 from django.utils.translation import ugettext as _
-
-import request_cache
-from courseware import courses
 from eventtracking import tracker
 from request_cache.middleware import request_cached
 from student.models import get_user_by_username_or_email
@@ -23,7 +25,8 @@ from .models import (
     CourseCohort,
     CourseCohortsSettings,
     CourseUserGroup,
-    CourseUserGroupPartitionGroup
+    CourseUserGroupPartitionGroup,
+    UnregisteredLearnerCohortAssignments
 )
 
 log = logging.getLogger(__name__)
@@ -234,9 +237,23 @@ def get_cohort(user, course_key, assign=True, use_cached=False):
     # Otherwise assign the user a cohort.
     try:
         with transaction.atomic():
+            # If learner has been pre-registered in a cohort, get that cohort. Otherwise assign to a random cohort.
+            course_user_group = None
+            for assignment in UnregisteredLearnerCohortAssignments.objects.filter(email=user.email):
+                if assignment.course_user_group.course_id == course_key:
+                    course_user_group = assignment.course_user_group
+
+            if course_user_group:
+                UnregisteredLearnerCohortAssignments.objects.get(
+                    email=user.email,
+                    course_user_group=course_user_group
+                ).delete()
+            else:
+                course_user_group = get_random_cohort(course_key)
+
             membership = CohortMembership.objects.create(
                 user=user,
-                course_user_group=get_random_cohort(course_key)
+                course_user_group=course_user_group
             )
             return cache.setdefault(cache_key, membership.course_user_group)
     except IntegrityError as integrity_error:
@@ -423,10 +440,23 @@ def add_user_to_cohort(cohort, username_or_email):
         Tuple of User object and string (or None) indicating previous cohort
 
     Raises:
-        User.DoesNotExist if can't find user.
+        User.DoesNotExist if can't find user. However, if an email is provided for the user, it is stored
+        in a database so that the user can be added to the cohort if they eventually enroll in the course.
         ValueError if user already present in this cohort.
     """
-    user = get_user_by_username_or_email(username_or_email)
+    try:
+        user = get_user_by_username_or_email(username_or_email)
+    except User.DoesNotExist as ex:
+        # If username_or_email is an email address, store in database.
+        try:
+            validate_email(username_or_email)
+            UnregisteredLearnerCohortAssignments.objects.get_or_create(
+                course_user_group=cohort, email=username_or_email
+            )
+        except ValidationError:
+            pass
+        # Reraise exception.
+        raise ex
 
     membership = CohortMembership(course_user_group=cohort, user=user)
     membership.save()  # This will handle both cases, creation and updating, of a CohortMembership for this user.
