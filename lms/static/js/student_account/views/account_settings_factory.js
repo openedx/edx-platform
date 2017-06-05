@@ -13,6 +13,7 @@
             fieldsData,
             ordersHistoryData,
             authData,
+            passwordResetSupportUrl,
             userAccountsApiUrl,
             userPreferencesApiUrl,
             accountUserId,
@@ -76,6 +77,7 @@
                                 screenReaderTitle: gettext('Reset Your Password'),
                                 valueAttribute: 'password',
                                 emailAttribute: 'email',
+                                passwordResetSupportUrl: passwordResetSupportUrl,
                                 linkTitle: gettext('Reset Your Password'),
                                 linkHref: fieldsData.password.url,
                                 helpMessage: StringUtils.interpolate(
@@ -191,7 +193,7 @@
                     ),
                     fields: _.map(authData.providers, function(provider) {
                         return {
-                            'view': new AccountSettingsFieldViews.AuthFieldView({
+                            view: new AccountSettingsFieldViews.AuthFieldView({
                                 title: provider.name,
                                 valueAttribute: 'auth-' + provider.id,
                                 helpMessage: '',
@@ -208,10 +210,10 @@
 
             ordersHistoryData.unshift(
                 {
-                    'title': gettext('ORDER NAME'),
-                    'order_date': gettext('ORDER PLACED'),
-                    'price': gettext('TOTAL'),
-                    'number': gettext('ORDER NUMBER')
+                    title: gettext('ORDER NAME'),
+                    order_date: gettext('ORDER PLACED'),
+                    price: gettext('TOTAL'),
+                    number: gettext('ORDER NUMBER')
                 }
             );
 
@@ -228,7 +230,7 @@
                             orderNumber = 'orderId';
                         }
                         return {
-                            'view': new AccountSettingsFieldViews.OrderHistoryFieldView({
+                            view: new AccountSettingsFieldViews.OrderHistoryFieldView({
                                 totalPrice: order.price,
                                 orderId: order.number,
                                 orderDate: order.order_date,
