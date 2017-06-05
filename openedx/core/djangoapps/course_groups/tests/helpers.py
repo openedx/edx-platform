@@ -2,18 +2,18 @@
 Helper methods for testing cohorts.
 """
 
-from factory import post_generation, Sequence
-from factory.django import DjangoModelFactory
 import json
 
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore import ModuleStoreEnum
-
-from ..cohorts import set_course_cohorted
 from django_comment_common.models import CourseDiscussionSettings
 from django_comment_common.utils import set_course_discussion_settings
-from ..models import CourseUserGroup, CourseCohort, CourseCohortsSettings, CohortMembership
+from factory import Sequence, post_generation
+from factory.django import DjangoModelFactory
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
+
+from ..cohorts import set_course_cohorted
+from ..models import CohortMembership, CourseCohort, CourseCohortsSettings, CourseUserGroup
 
 
 class CohortFactory(DjangoModelFactory):

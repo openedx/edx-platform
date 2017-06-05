@@ -1,24 +1,16 @@
 """
 Tests for Discussion API internal interface
 """
-from datetime import datetime, timedelta
 import itertools
-from urlparse import parse_qs, urlparse, urlunparse
+from datetime import datetime, timedelta
 from urllib import urlencode
+from urlparse import parse_qs, urlparse, urlunparse
 
 import ddt
-import httpretty
 import mock
 from nose.plugins.attrib import attr
-from pytz import UTC
 
-from django.core.exceptions import ValidationError
-from django.test.client import RequestFactory
-
-from rest_framework.exceptions import PermissionDenied
-
-from opaque_keys.edx.locator import CourseLocator
-
+import httpretty
 from common.test.utils import MockSignalHandlerMixin, disable_signal
 from courseware.tests.factories import BetaTesterFactory, StaffFactory
 from discussion_api import api
@@ -30,29 +22,34 @@ from discussion_api.api import (
     get_comment_list,
     get_course,
     get_course_topics,
+    get_thread,
     get_thread_list,
     update_comment,
-    update_thread,
-    get_thread,
+    update_thread
 )
-from discussion_api.exceptions import DiscussionDisabledError, ThreadNotFoundError, CommentNotFoundError
+from discussion_api.exceptions import CommentNotFoundError, DiscussionDisabledError, ThreadNotFoundError
 from discussion_api.tests.utils import (
     CommentsServiceMockMixin,
     make_minimal_cs_comment,
     make_minimal_cs_thread,
-    make_paginated_api_response,
+    make_paginated_api_response
 )
+from django.core.exceptions import ValidationError
+from django.test.client import RequestFactory
+from django_comment_client.tests.utils import ForumsEnableMixin
 from django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_COMMUNITY_TA,
     FORUM_ROLE_MODERATOR,
     FORUM_ROLE_STUDENT,
-    Role,
+    Role
 )
-from django_comment_client.tests.utils import ForumsEnableMixin
+from opaque_keys.edx.locator import CourseLocator
 from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.lib.exceptions import CourseNotFoundError, PageNotFoundError
+from pytz import UTC
+from rest_framework.exceptions import PermissionDenied
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
 from xmodule.modulestore import ModuleStoreEnum

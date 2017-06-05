@@ -2,8 +2,6 @@
 End-to-end test for cohorted courseware. This uses both Studio and LMS.
 """
 
-import json
-
 from bok_choy.page_object import XSS_INJECTION
 from nose.plugins.attrib import attr
 
@@ -14,8 +12,8 @@ from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage
 from common.test.acceptance.pages.studio.component_editor import ComponentVisibilityEditorView
 from common.test.acceptance.pages.studio.settings_group_configurations import GroupConfigurationsPage
-from common.test.acceptance.tests.lms.test_lms_user_preview import verify_expected_problem_visibility
 from common.test.acceptance.tests.discussion.helpers import CohortTestMixin
+from common.test.acceptance.tests.lms.test_lms_user_preview import verify_expected_problem_visibility
 from studio.base_studio_test import ContainerBase
 
 AUDIT_TRACK = "Audit"

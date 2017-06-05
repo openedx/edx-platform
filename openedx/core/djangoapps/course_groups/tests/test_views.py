@@ -4,37 +4,32 @@ Tests for course group views
 # pylint: disable=attribute-defined-outside-init
 # pylint: disable=no-member
 import json
-
 from collections import namedtuple
+
 from nose.plugins.attrib import attr
 
 from django.contrib.auth.models import User
 from django.http import Http404
 from django.test.client import RequestFactory
-
 from django_comment_common.models import CourseDiscussionSettings
 from django_comment_common.utils import get_course_discussion_settings
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-
-from ..models import CourseUserGroup, CourseCohort
+from ..cohorts import DEFAULT_COHORT_NAME, get_cohort, get_cohort_by_id, get_cohort_by_name, get_group_info_for_cohort
+from ..models import CourseCohort, CourseUserGroup
 from ..views import (
+    add_users_to_cohort,
+    cohort_handler,
     course_cohort_settings_handler,
-    cohort_handler, users_in_cohort,
-    add_users_to_cohort, remove_user_from_cohort,
     link_cohort_to_partition_group,
+    remove_user_from_cohort,
+    users_in_cohort
 )
-from ..cohorts import (
-    get_cohort, get_cohort_by_name, get_cohort_by_id,
-    DEFAULT_COHORT_NAME, get_group_info_for_cohort
-)
-from .helpers import (
-    config_course_cohorts, config_course_cohorts_legacy, CohortFactory, CourseCohortFactory
-)
+from .helpers import CohortFactory, CourseCohortFactory, config_course_cohorts, config_course_cohorts_legacy
 
 
 @attr(shard=2)
