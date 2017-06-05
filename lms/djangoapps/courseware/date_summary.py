@@ -118,6 +118,14 @@ class DateSummary(object):
             return datetime.now(utc) <= self.date
         return False
 
+    def deadline_has_passed(self):
+        """
+        Return True if a deadline (the date) exists, and has already passed.
+        Returns False otherwise.
+        """
+        deadline = self.date
+        return deadline is not None and deadline <= datetime.now(utc)
+
     def __repr__(self):
         return u'DateSummary: "{title}" {date} is_enabled={is_enabled}'.format(
             title=self.title,
@@ -312,13 +320,6 @@ class VerificationDeadlineDate(DateSummary):
     def verification_status(self):
         """Return the verification status for this user."""
         return SoftwareSecurePhotoVerification.user_status(self.user)[0]
-
-    def deadline_has_passed(self):
-        """
-        Return True if a verification deadline exists, and has already passed.
-        """
-        deadline = self.date
-        return deadline is not None and deadline <= datetime.now(utc)
 
     def must_retry(self):
         """Return True if the user must re-submit verification, False otherwise."""

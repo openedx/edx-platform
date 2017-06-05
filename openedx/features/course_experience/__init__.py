@@ -19,6 +19,9 @@ WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='course_experience')
 # Waffle flag to enable a single unified "Course" tab.
 UNIFIED_COURSE_TAB_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'unified_course_tab')
 
+# Waffle flag to enable the sock on the footer of the home and courseware pages
+DISPLAY_COURSE_SOCK = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'display_course_sock')
+
 
 def course_home_page_title(course):  # pylint: disable=unused-argument
     """

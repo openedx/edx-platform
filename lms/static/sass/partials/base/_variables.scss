@@ -36,7 +36,7 @@ $fg-gutter: $gw-gutter !default;
 $fg-max-columns: 12 !default;
 $fg-max-width: 1400px !default;
 $fg-min-width: 810px !default;
-
+$lms-max-width: 1180px !default;
 
 // ----------------------------
 // #COLORS
@@ -218,7 +218,7 @@ $active-color: $blue !default;
 $highlight-color: rgb(255,255,0) !default;
 $alert-color: rgb(212, 64, 64) !default;
 $success-color: rgb(0, 155, 0) !default;
-
+$success-color-hover: rgb(0, 129, 0) !default;
 
 // ----------------------------
 // #COLORS- EDX-SPECIFIC
