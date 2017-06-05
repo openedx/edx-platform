@@ -5,9 +5,9 @@ Views related to course groups functionality.
 import logging
 import re
 
-from courseware.courses import get_course_with_access
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.core.paginator import EmptyPage, Paginator
 from django.core.urlresolvers import reverse
 from django.db import transaction
@@ -15,9 +15,13 @@ from django.http import Http404, HttpResponseBadRequest
 from django.utils.translation import ugettext
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods, require_POST
-from edxmako.shortcuts import render_to_response
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+
+from courseware.courses import get_course_with_access
+from edxmako.shortcuts import render_to_response
+from lms.djangoapps.django_comment_client.constants import TYPE_ENTRY
+from lms.djangoapps.django_comment_client.utils import get_discussion_categories_ids, get_discussion_category_map
 from util.json_request import JsonResponse, expect_json
 
 from . import cohorts
@@ -267,7 +271,9 @@ def add_users_to_cohort(request, course_key_string, cohort_id):
                   'email': ...,
                   'previous_cohort': ...}, ...],
      'present': [str1, str2, ...],    # already there
-     'unknown': [str1, str2, ...]}
+     'unknown': [str1, str2, ...],
+     'preassigned': [str1, str2, ...],
+     'invalid': [str1, str2, ...]}
 
      Raises Http404 if the cohort cannot be found for the given course.
     """
@@ -288,31 +294,41 @@ def add_users_to_cohort(request, course_key_string, cohort_id):
     changed = []
     present = []
     unknown = []
+    preassigned = []
+    invalid = []
     for username_or_email in split_by_comma_and_whitespace(users):
         if not username_or_email:
             continue
 
         try:
-            (user, previous_cohort) = cohorts.add_user_to_cohort(cohort, username_or_email)
-            info = {
-                'username': user.username,
-                'email': user.email,
-            }
-            if previous_cohort:
-                info['previous_cohort'] = previous_cohort
+            # A user object is only returned by add_user_to_cohort if the user already exists.
+            (user, previous_cohort, preassignedCohort) = cohorts.add_user_to_cohort(cohort, username_or_email)
+
+            if preassignedCohort:
+                preassigned.append(username_or_email)
+            elif previous_cohort:
+                info = {'email': user.email,
+                        'previous_cohort': previous_cohort,
+                        'username': user.username}
                 changed.append(info)
             else:
+                info = {'username': user.username,
+                        'email': user.email}
                 added.append(info)
-        except ValueError:
-            present.append(username_or_email)
         except User.DoesNotExist:
             unknown.append(username_or_email)
+        except ValidationError:
+            invalid.append(username_or_email)
+        except ValueError:
+            present.append(username_or_email)
 
     return json_http_response({'success': True,
                                'added': added,
                                'changed': changed,
                                'present': present,
-                               'unknown': unknown})
+                               'unknown': unknown,
+                               'preassigned': preassigned,
+                               'invalid': invalid})
 
 
 @ensure_csrf_cookie
