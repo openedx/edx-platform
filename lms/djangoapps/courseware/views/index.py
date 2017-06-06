@@ -33,7 +33,7 @@ from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.monitoring_utils import set_custom_metrics_for_course_key
 from openedx.features.enterprise_support.api import data_sharing_consent_required
-from openedx.features.course_experience import UNIFIED_COURSE_VIEW_FLAG
+from openedx.features.course_experience import UNIFIED_COURSE_VIEW_FLAG, default_course_url_name
 from request_cache.middleware import RequestCache
 from shoppingcart.models import CourseRegistrationCode
 from student.views import is_course_blocked
@@ -324,9 +324,14 @@ class CoursewareIndex(View):
         Also returns the table of contents for the courseware.
         """
         request = RequestCache.get_current_request()
+        course_url_name = default_course_url_name(request)
+        course_url = reverse(course_url_name, kwargs={'course_id': unicode(self.course.id)})
         courseware_context = {
             'csrf': csrf(self.request)['csrf_token'],
             'course': self.course,
+            'course_url': course_url,
+            'chapter': self.chapter,
+            'section': self.section,
             'init': '',
             'fragment': Fragment(),
             'staff_access': self.is_staff,

@@ -107,10 +107,21 @@ html.video-fullscreen {
     display: none;
   }
 
+  main {
+    padding: $baseline;
+  }
+
+  .course-content {
+    padding: 0;
+  }
+
+  .courseware-results-wrapper {
+    padding: ($baseline*2) 3%; // percent allows for smaller padding on mobile
+  }
+
   .course-content,
   .courseware-results-wrapper {
     @extend .content;
-    padding: ($baseline*2) 3%; // percent allows for smaller padding on mobile
     line-height: 1.6;
 
     .xblock {
