@@ -210,11 +210,7 @@ class CourseGradeReport(object):
         batched_rows = self._batched_rows(context)
 
         context.update_status(u'Compiling grades')
-        try:
-            success_rows, error_rows = self._compile(context, batched_rows)
-        except Exception:  # pylint:disable=broad-except
-            TASK_LOG.exception('Something failed in compilation')
-            return context.update_status('Failed grades')
+        success_rows, error_rows = self._compile(context, batched_rows)
 
         context.update_status(u'Uploading grades')
         self._upload(context, success_headers, success_rows, error_headers, error_rows)
