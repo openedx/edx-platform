@@ -4,7 +4,7 @@
     <div class="division-scheme-container">
         <div class="division-scheme-items" role="group" aria-labelledby="division-scheme-title">
             <% for (var i = 0; i < availableSchemes.length; i++) { %>
-                <div class="division-scheme-item <%- layoutClass %> <% if (!availableSchemes[i].enabled) { %>is-hidden<% } %>">
+                <div class="division-scheme-item <%- availableSchemes[i].key %> <%- layoutClass %> <% if (!availableSchemes[i].enabled) { %>hidden<% } %>">
                     <label class="division-scheme-label">
                         <input class="division-scheme <%- availableSchemes[i].key %>" type="radio" name="division-scheme"
                                value="<%- availableSchemes[i].key %>" aria-describedby="<%- availableSchemes[i].key %>-description"

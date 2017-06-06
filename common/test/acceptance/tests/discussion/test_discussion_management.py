@@ -310,6 +310,7 @@ class DivisionSchemeTest(BaseDividedDiscussionTest, BaseDiscussionMixin):
         Go to the discussion tab on the instructor dashboard.
         """
         self.instructor_dashboard_page.visit()
+        self.assertTrue(self.instructor_dashboard_page.is_discussion_management_visible())
         self.instructor_dashboard_page.select_discussion_management()
         self.discussion_management_page.wait_for_page()
 
@@ -357,11 +358,55 @@ class DivisionSchemeTest(BaseDividedDiscussionTest, BaseDiscussionMixin):
 
     def test_disabling_cohorts(self):
         """
-        Test that disabling cohorts hides the cohort division scheme iff it is not the selected scheme
+        Test that the discussions management tab hides when there is <= 1 enrollment track, the Cohort division scheme
+         is not selected, and cohorts are disabled.
         (even without reloading the page).
         """
-        # TODO: will be added as part of AJ's work.
-        pass
+        self.disable_cohorting(self.course_fixture)
+        self.instructor_dashboard_page.visit()
+        self.assertFalse(self.instructor_dashboard_page.is_discussion_management_visible())
+
+    def test_disabling_cohorts_while_selected(self):
+        """
+        Test that disabling cohorts does not hide the discussion tab when there is more than one enrollment track.
+        Also that the division scheme for cohorts is visible iff it was selected.
+        (even without reloading the page).
+        """
+        add_enrollment_course_modes(self.browser, self.course_id, ['audit', 'verified'])
+
+        # Verify that the tab is visible, the cohort scheme is selected by default for divided discussions
+        self.disable_cohorting(self.course_fixture)
+
+        # Go to Discussions tab and ensure that the correct scheme options are visible
+        self.view_discussion_management_page()
+        self.assertTrue(
+            self.discussion_management_page.division_scheme_visible(
+                self.discussion_management_page.COHORT_SCHEME
+            )
+        )
+
+    def test_disabling_cohorts_while_not_selected(self):
+        """
+        Test that disabling cohorts does not hide the discussion tab when there is more than one enrollment track.
+        Also that the division scheme for cohorts is not visible when cohorts are disabled and another scheme is
+        selected for division.
+        (even without reloading the page).
+        """
+        add_enrollment_course_modes(self.browser, self.course_id, ['audit', 'verified'])
+
+        # Verify that the tab is visible
+        self.view_discussion_management_page()
+        self.discussion_management_page.select_division_scheme(self.discussion_management_page.ENROLLMENT_TRACK_SCHEME)
+        self.verify_save_confirmation_message(self.scheme_key)
+        self.disable_cohorting(self.course_fixture)
+
+        # Go to Discussions tab and ensure that the correct scheme options are visible
+        self.view_discussion_management_page()
+        self.assertFalse(
+            self.discussion_management_page.division_scheme_visible(
+                self.discussion_management_page.COHORT_SCHEME
+            )
+        )
 
     def test_single_enrollment_mode(self):
         """
