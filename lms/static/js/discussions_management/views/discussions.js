@@ -39,7 +39,7 @@
                     var numberAvailableSchemes = this.discussionSettings.attributes.available_division_schemes.length;
                     HtmlUtils.setHtml(this.$el, this.template({
                         availableSchemes: this.getDivisionSchemeData(this.discussionSettings.attributes.division_scheme), //  eslint-disable-line max-len
-                        layoutClass: numberAvailableSchemes === 1 ? 'two-column-layout' : 'three-column-layout'
+                        layoutClass: numberAvailableSchemes === 2 ? THREE_COLUMN_CLASS : TWO_COLUMN_CLASS
                     }));
                     this.updateTopicVisibility(this.getSelectedScheme(), this.getTopicNav());
                     this.renderTopics();
@@ -88,9 +88,10 @@
                 },
 
                 cohortStateUpdate: function(state) {
-                    if ($('.discussions-management').data('enrollment-track-count') <= 1) {
+                    if (!this.isSchemeAvailable(ENROLLMENT_TRACK)) {
                         this.showDiscussionManagement(state.is_cohorted);
-                    } if (this.getSelectedScheme() !== COHORT) {
+                    }
+                    if (this.getSelectedScheme() !== COHORT) {
                         this.showCohortSchemeControl(state.is_cohorted);
                     }
                 },
@@ -108,18 +109,15 @@
                 showCohortSchemeControl: function(show) {
                     if (!show) {
                         $('.division-scheme-item.cohort').addClass(HIDDEN_CLASS);
-                        this.updateSchemeSelectionLayout(2);
-                    } else {
-                        $('.division-scheme-item.cohort').removeClass(HIDDEN_CLASS);
-                        this.updateSchemeSelectionLayout(3);
-                    }
-                },
-
-                updateSchemeSelectionLayout: function(columns) {
-                    if (columns === 2) {
+                        // Since we are removing the cohort scheme, we can have at most 2 columns.
                         $('.division-scheme-item').removeClass(THREE_COLUMN_CLASS).addClass(TWO_COLUMN_CLASS);
                     } else {
-                        $('.division-scheme-item').removeClass(TWO_COLUMN_CLASS).addClass(THREE_COLUMN_CLASS);
+                        $('.division-scheme-item.cohort').removeClass(HIDDEN_CLASS);
+                        if (this.isSchemeAvailable(ENROLLMENT_TRACK)) {
+                            $('.division-scheme-item').removeClass(TWO_COLUMN_CLASS).addClass(THREE_COLUMN_CLASS);
+                        } else {
+                            $('.division-scheme-item').removeClass(THREE_COLUMN_CLASS).addClass(TWO_COLUMN_CLASS);
+                        }
                     }
                 },
 
