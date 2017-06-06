@@ -117,6 +117,7 @@ LOG_OVERRIDES = [
     ('edxmako.shortcuts', logging.ERROR),
     ('dd.dogapi', logging.ERROR),
     ('edx.discussion', logging.CRITICAL),
+    ('factory.generate', logging.WARNING),
 ]
 for log_name, log_level in LOG_OVERRIDES:
     logging.getLogger(log_name).setLevel(log_level)

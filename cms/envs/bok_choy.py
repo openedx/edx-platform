@@ -71,6 +71,7 @@ import logging
 LOG_OVERRIDES = [
     ('track.middleware', logging.CRITICAL),
     ('edx.discussion', logging.CRITICAL),
+    ('factory.generate', logging.WARNING),
 ]
 for log_name, log_level in LOG_OVERRIDES:
     logging.getLogger(log_name).setLevel(log_level)
