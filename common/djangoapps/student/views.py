@@ -216,7 +216,7 @@ def index(request, extra_context=None, user=AnonymousUser()):
 
     # Do not add programs to the context if there are no program types enabled for the site.
     if program_types:
-        programs_list = get_programs_with_type(program_types)
+        programs_list = get_programs_with_type(program_types, include_hidden=False)
 
     context["programs_list"] = programs_list
 
