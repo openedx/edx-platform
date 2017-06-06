@@ -10,7 +10,6 @@ from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
-
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from util.db import outer_atomic
 
@@ -228,3 +227,13 @@ class CourseCohort(models.Model):
         )
 
         return course_cohort
+
+
+class UnregisteredLearnerCohortAssignments(models.Model):
+
+    course_user_group = models.ForeignKey(CourseUserGroup)
+    email = models.CharField(blank=True, max_length=255, db_index=True)
+
+    # TODO: Also store course_id with unique_together relationship between email and course_id.
+    # Then if course staff assign the same learner/course_id combination to multiple cohorts, we
+    # simply update the existing entry to reflect the most recent cohort (course_user_group) assignment.
