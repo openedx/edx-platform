@@ -338,6 +338,8 @@ INSTALLED_APPS += ('openedx.core.djangoapps.api_admin',)
 
 ########################## VIDEO IMAGE STORAGE ############################
 VIDEO_IMAGE_SETTINGS = dict(
+    VIDEO_IMAGE_MAX_BYTES=2 * 1024 * 1024,    # 2 MB
+    VIDEO_IMAGE_MIN_BYTES=2 * 1024,       # 2 KB
     STORAGE_KWARGS=dict(
         location=MEDIA_ROOT,
         base_url=MEDIA_URL,

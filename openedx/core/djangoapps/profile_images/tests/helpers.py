@@ -11,7 +11,7 @@ from PIL import Image
 
 
 @contextmanager
-def make_image_file(dimensions=(320, 240), extension=".jpeg", force_size=None, orientation=None):
+def make_image_file(dimensions=(320, 240), prefix='tmp', extension='.jpeg', force_size=None, orientation=None):
     """
     Yields a named temporary file created with the specified image type and
     options.
@@ -21,9 +21,13 @@ def make_image_file(dimensions=(320, 240), extension=".jpeg", force_size=None, o
 
     The temporary file will be closed and deleted automatically upon exiting
     the `with` block.
+
+    prefix - To add prefix to random image file name, after adding will be like <custom-prefix><random-name>.png
+            otherwise by default `tmp` is added making file name tmp<random-name>.png.
+
     """
     image = Image.new('RGB', dimensions, "green")
-    image_file = NamedTemporaryFile(suffix=extension)
+    image_file = NamedTemporaryFile(prefix=prefix, suffix=extension)
     try:
         if orientation and orientation in xrange(1, 9):
             exif_bytes = piexif.dump({'0th': {piexif.ImageIFD.Orientation: orientation}})

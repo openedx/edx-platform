@@ -12,6 +12,7 @@ import dateutil.parser
 import ddt
 import pytz
 from django.conf import settings
+from django.core.files.uploadedfile import UploadedFile
 from django.test.utils import override_settings
 from edxval.api import create_profile, create_video, get_video_info, get_course_video_image_url
 from mock import Mock, patch
@@ -23,7 +24,8 @@ from contentstore.views.videos import (
     KEY_EXPIRATION_IN_SECONDS,
     StatusDisplayStrings,
     convert_video_status,
-    _get_default_video_image_url
+    _get_default_video_image_url,
+    validate_video_image
 )
 from contentstore.views.videos import KEY_EXPIRATION_IN_SECONDS, StatusDisplayStrings, convert_video_status
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -532,6 +534,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
         self.assert_video_status(url, edx_video_id, 'Failed')
 
 
+@ddt.ddt
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_VIDEO_UPLOAD_PIPELINE': True})
 @override_settings(VIDEO_UPLOAD_PIPELINE={'BUCKET': 'test_bucket', 'ROOT_PATH': 'test_root'})
 class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
@@ -560,18 +563,35 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
 
         return val_image_url
 
+    def verify_error_message(self, response, error_message):
+        """
+        Verify that image upload failure gets proper error message.
+
+        Arguments:
+            response: Response object.
+            error_message: Expected error message.
+        """
+        self.assertEqual(response.status_code, 400)
+        response = json.loads(response.content)
+        self.assertIn('error', response)
+        self.assertEqual(response['error'], error_message)
+
     def test_video_image(self):
         """
         Test video image is saved.
         """
         edx_video_id = 'test1'
         video_image_upload_url = self.get_url_for_course_key(self.course.id, {'edx_video_id': edx_video_id})
-        with make_image_file() as image_file:
+        with make_image_file(
+            dimensions=(settings.VIDEO_IMAGE_MIN_WIDTH, settings.VIDEO_IMAGE_MIN_HEIGHT),
+        ) as image_file:
             response = self.client.post(video_image_upload_url, {'file': image_file}, format='multipart')
             image_url1 = self.verify_image_upload_reponse(self.course.id, edx_video_id, response)
 
         # upload again to verify that new image is uploaded successfully
-        with make_image_file() as image_file:
+        with make_image_file(
+            dimensions=(settings.VIDEO_IMAGE_MIN_WIDTH, settings.VIDEO_IMAGE_MIN_HEIGHT),
+        ) as image_file:
             response = self.client.post(video_image_upload_url, {'file': image_file}, format='multipart')
             image_url2 = self.verify_image_upload_reponse(self.course.id, edx_video_id, response)
 
@@ -583,9 +603,27 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
         """
         video_image_upload_url = self.get_url_for_course_key(self.course.id, {'edx_video_id': 'test1'})
         response = self.client.post(video_image_upload_url, {})
-        self.assertEqual(response.status_code, 400)
-        response = json.loads(response.content)
-        self.assertEqual(response['error'], 'No file provided for video image')
+        self.verify_error_message(response, 'No file provided for video image')
+
+    def test_invalid_image_file_info(self):
+        """
+        Test that when no file information is provided to validate_video_image, it gives proper error message.
+        """
+        error = validate_video_image({})
+        self.assertEquals(error, 'The image must have name, content type, and size information.')
+
+    def test_currupt_image_file(self):
+        """
+        Test that when corrupt file is provided to validate_video_image, it gives proper error message.
+        """
+        with open(settings.MEDIA_ROOT + '/test-corrupt-image.png', 'w+') as file:
+            image_file = UploadedFile(
+                file,
+                content_type='image/png',
+                size=settings.VIDEO_IMAGE_SETTINGS['VIDEO_IMAGE_MIN_BYTES']
+            )
+            error = validate_video_image(image_file)
+            self.assertEquals(error, 'This image file is corrupted.')
 
     def test_no_video_image(self):
         """
@@ -594,7 +632,9 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
         edx_video_id = 'test1'
         get_videos_url = reverse_course_url('videos_handler', self.course.id)
         video_image_upload_url = self.get_url_for_course_key(self.course.id, {'edx_video_id': edx_video_id})
-        with make_image_file() as image_file:
+        with make_image_file(
+            dimensions=(settings.VIDEO_IMAGE_MIN_WIDTH, settings.VIDEO_IMAGE_MIN_HEIGHT),
+        ) as image_file:
             self.client.post(video_image_upload_url, {'file': image_file}, format='multipart')
 
         val_image_url = get_course_video_image_url(course_id=self.course.id, edx_video_id=edx_video_id)
@@ -607,6 +647,171 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
                 self.assertEqual(response_video['course_video_image_url'], val_image_url)
             else:
                 self.assertEqual(response_video['course_video_image_url'], None)
+
+    @ddt.data(
+        # Image file type validation
+        (
+            {
+                'extension': '.png'
+            },
+            None
+        ),
+        (
+            {
+                'extension': '.gif'
+            },
+            None
+        ),
+        (
+            {
+                'extension': '.bmp'
+            },
+            None
+        ),
+        (
+            {
+                'extension': '.jpg'
+            },
+            None
+        ),
+        (
+            {
+                'extension': '.jpeg'
+            },
+            None
+        ),
+        (
+            {
+                'extension': '.PNG'
+            },
+            None
+        ),
+        (
+            {
+                'extension': '.tiff'
+            },
+            'This image file type is not supported. Supported file types are {supported_file_formats}.'.format(
+                supported_file_formats=settings.VIDEO_IMAGE_SUPPORTED_FILE_FORMATS.keys()
+            )
+        ),
+        # Image file size validation
+        (
+            {
+                'size': settings.VIDEO_IMAGE_SETTINGS['VIDEO_IMAGE_MAX_BYTES'] + 10
+            },
+            'This image file must be smaller than {image_max_size}.'.format(
+                image_max_size=settings.VIDEO_IMAGE_MAX_FILE_SIZE_MB
+            )
+        ),
+        (
+            {
+                'size': settings.VIDEO_IMAGE_SETTINGS['VIDEO_IMAGE_MIN_BYTES'] - 10
+            },
+            'This image file must be larger than {image_min_size}.'.format(
+                image_min_size=settings.VIDEO_IMAGE_MIN_FILE_SIZE_KB
+            )
+        ),
+        # Image file resolution validation
+        (
+            {
+                'width': settings.VIDEO_IMAGE_MAX_WIDTH,  # 1280x720
+                'height': settings.VIDEO_IMAGE_MAX_HEIGHT
+            },
+            None
+        ),
+        (
+            {
+                'width': 850,  # 16:9
+                'height': 478
+            },
+            None
+        ),
+        (
+            {
+                'width': 940,  # 1.67 ratio, applicable aspect ratio margin of .01
+                'height': 560
+            },
+            None
+        ),
+        (
+            {
+                'width': 1200,  # not 16:9
+                'height': 100
+            },
+            'This image file must have an aspect ratio of {video_image_aspect_ratio_text}.'.format(
+                video_image_aspect_ratio_text=settings.VIDEO_IMAGE_ASPECT_RATIO_TEXT
+            )
+        ),
+        (
+            {
+                'width': settings.VIDEO_IMAGE_MIN_WIDTH + 100,
+                'height': settings.VIDEO_IMAGE_MIN_HEIGHT + 200
+            },
+            'This image file must have an aspect ratio of {video_image_aspect_ratio_text}.'.format(
+                video_image_aspect_ratio_text=settings.VIDEO_IMAGE_ASPECT_RATIO_TEXT
+            )
+        ),
+        # Image file minimum width / height
+        (
+            {
+                'width': 16,  # 16x9
+                'height': 9
+            },
+            'The minimum allowed image resolution is {image_file_min_width}x{image_file_min_height}.'.format(
+                image_file_min_width=settings.VIDEO_IMAGE_MIN_WIDTH,
+                image_file_min_height=settings.VIDEO_IMAGE_MIN_HEIGHT
+            )
+        ),
+        (
+            {
+                'width': settings.VIDEO_IMAGE_MIN_WIDTH - 10,
+                'height': settings.VIDEO_IMAGE_MIN_HEIGHT
+            },
+            'The minimum allowed image resolution is {image_file_min_width}x{image_file_min_height}.'.format(
+                image_file_min_width=settings.VIDEO_IMAGE_MIN_WIDTH,
+                image_file_min_height=settings.VIDEO_IMAGE_MIN_HEIGHT
+            )
+        ),
+        (
+            {
+                'width': settings.VIDEO_IMAGE_MIN_WIDTH,
+                'height': settings.VIDEO_IMAGE_MIN_HEIGHT - 10
+            },
+            'The minimum allowed image resolution is {image_file_min_width}x{image_file_min_height}.'.format(
+                image_file_min_width=settings.VIDEO_IMAGE_MIN_WIDTH,
+                image_file_min_height=settings.VIDEO_IMAGE_MIN_HEIGHT
+            )
+        ),
+        # Image file name validation
+        (
+            {
+                'prefix': u'nøn-åßç¡¡'
+            },
+            'The image file name can only contain letters, numbers, hyphens (-), and underscores (_).'
+        )
+    )
+    @ddt.unpack
+    def test_video_image_validation_message(self, image_data, error_message):
+        """
+        Test video image validation gives proper error message.
+
+        Arguments:
+            image_data (Dict): Specific data to create image file.
+            error_message (String): Error message
+        """
+        edx_video_id = 'test1'
+        video_image_upload_url = self.get_url_for_course_key(self.course.id, {'edx_video_id': edx_video_id})
+        with make_image_file(
+            dimensions=(image_data.get('width', settings.VIDEO_IMAGE_MIN_WIDTH), image_data.get('height', settings.VIDEO_IMAGE_MIN_HEIGHT)),
+            prefix=image_data.get('prefix', 'videoimage'),
+            extension=image_data.get('extension', '.png'),
+            force_size=image_data.get('size', settings.VIDEO_IMAGE_SETTINGS['VIDEO_IMAGE_MIN_BYTES'])
+        ) as image_file:
+            response = self.client.post(video_image_upload_url, {'file': image_file}, format='multipart')
+            if error_message:
+                self.verify_error_message(response, error_message)
+            else:
+                self.verify_image_upload_reponse(self.course.id, edx_video_id, response)
 
 
 @patch.dict("django.conf.settings.FEATURES", {"ENABLE_VIDEO_UPLOAD_PIPELINE": True})
