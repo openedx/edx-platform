@@ -32,6 +32,7 @@ from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.monitoring_utils import set_custom_metrics_for_course_key
+from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 from openedx.features.course_experience import UNIFIED_COURSE_VIEW_FLAG, default_course_url_name
 from request_cache.middleware import RequestCache
@@ -341,7 +342,7 @@ class CoursewareIndex(View):
             'xqa_server': settings.FEATURES.get('XQA_SERVER', "http://your_xqa_server.com"),
             'bookmarks_api_url': reverse('bookmarks'),
             'language_preference': self._get_language_preference(),
-            'disable_optimizely': True,
+            'disable_optimizely': not WaffleSwitchNamespace('RET').is_enabled('enable_optimizely_in_courseware'),
             'section_title': None,
             'sequence_title': None,
             'disable_accordion': waffle.flag_is_active(request, UNIFIED_COURSE_VIEW_FLAG),
