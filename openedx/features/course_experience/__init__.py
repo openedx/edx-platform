@@ -3,6 +3,8 @@ Unified course experience settings and helper methods.
 """
 import waffle
 
+from django.utils.translation import ugettext as _
+
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlagNamespace
 from request_cache.middleware import RequestCache
 
@@ -16,6 +18,13 @@ WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='course_experience')
 
 # Waffle flag to enable a single unified "Course" tab.
 UNIFIED_COURSE_TAB_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'unified_course_tab')
+
+
+def course_home_page_title(course):  # pylint: disable=unused-argument
+    """
+    Returns the title for the course home page.
+    """
+    return _('Course')
 
 
 def default_course_url_name(request=None):

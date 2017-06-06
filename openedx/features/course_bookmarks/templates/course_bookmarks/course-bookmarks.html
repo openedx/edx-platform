@@ -18,6 +18,7 @@ from django.template.defaultfilters import escapejs
 from django_comment_client.permissions import has_permission
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 from openedx.core.djangolib.markup import HTML
+from openedx.features.course_experience import course_home_page_title
 %>
 
 <%block name="bodyclass">course</%block>
@@ -43,7 +44,7 @@ ${HTML(bookmarks_fragment.foot_html())}
                 <div class="has-breadcrumbs">
                     <div class="breadcrumbs">
                         <span class="nav-item">
-                            <a href="${course_url}">Course</a>
+                            <a href="${course_url}">${course_home_page_title(course)}</a>
                         </span>
                         <span class="icon fa fa-angle-right" aria-hidden="true"></span>
                         <span class="nav-item">${_('My Bookmarks')}</span>
