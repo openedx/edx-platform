@@ -110,14 +110,15 @@
                 event.preventDefault();
                 event.stopPropagation();
                 if (this.isBrowseMenuVisible()) {
+                    this.breadcrumbs.model.set('contents', [this.breadcrumItem]);
                     this.hideBrowseMenu();
                 } else {
                     if (inputText !== '') {
                         this.filterTopics(inputText);
                     }
                     this.showBrowseMenu();
+                    this.breadcrumbs.model.set('contents', []);
                 }
-                this.breadcrumbs.model.set('contents', []);
                 this.clearSearch();
             },
 
@@ -304,7 +305,8 @@
                 var $item = $(event.target).closest('.forum-nav-browse-menu-item');
                 event.preventDefault();
                 this.hideBrowseMenu();
-                this.trigger('topic:selected', this.getBreadcrumbText($item));
+                this.breadcrumItem = this.getBreadcrumbText($item);
+                this.trigger('topic:selected', this.breadcrumItem);
                 return this.discussionThreadListView.selectTopic($(event.target));
             },
 
