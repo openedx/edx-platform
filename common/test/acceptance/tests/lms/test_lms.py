@@ -9,7 +9,6 @@ from unittest import skip
 
 import pytz
 from bok_choy.promise import EmptyPromise
-from flaky import flaky
 from nose.plugins.attrib import attr
 
 from common.test.acceptance.fixtures.course import CourseFixture, CourseUpdateDesc, XBlockFixtureDesc
@@ -564,7 +563,7 @@ class CourseWikiTest(UniqueCourseTest):
         self.course_wiki_edit_page.wait_for_page()
 
     @attr(shard=1)
-    @flaky  # EDUCATOR-511
+    @skip  # EDUCATOR-511
     def test_edit_course_wiki(self):
         """
         Wiki page by default is editable for students.
