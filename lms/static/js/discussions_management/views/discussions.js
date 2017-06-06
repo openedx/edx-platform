@@ -88,9 +88,10 @@
                 },
 
                 cohortStateUpdate: function(state) {
-                    if ($('.discussions-management').data('enrollment-track-count') <= 1) {
+                    if (!this.isSchemeAvailable(ENROLLMENT_TRACK)) {
                         this.showDiscussionManagement(state.is_cohorted);
-                    } if (this.getSelectedScheme() !== COHORT) {
+                    }
+                    if (this.getSelectedScheme() !== COHORT) {
                         this.showCohortSchemeControl(state.is_cohorted);
                     }
                 },
@@ -114,6 +115,8 @@
                         $('.division-scheme-item.cohort').removeClass(HIDDEN_CLASS);
                         if (this.isSchemeAvailable(ENROLLMENT_TRACK)) {
                             $('.division-scheme-item').removeClass(TWO_COLUMN_CLASS).addClass(THREE_COLUMN_CLASS);
+                        } else {
+                            $('.division-scheme-item').removeClass(THREE_COLUMN_CLASS).addClass(TWO_COLUMN_CLASS);
                         }
                     }
                 },
