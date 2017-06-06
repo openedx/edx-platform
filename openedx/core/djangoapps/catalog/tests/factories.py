@@ -125,6 +125,7 @@ class ProgramFactory(DictFactoryBase):
     title = factory.Faker('catch_phrase')
     type = factory.Faker('word')
     uuid = factory.Faker('uuid4')
+    hidden = False
 
 
 class ProgramTypeFactory(DictFactoryBase):
