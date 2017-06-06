@@ -3,8 +3,9 @@ Views related to course groups functionality.
 """
 
 import logging
-import re
 
+import re
+from courseware.courses import get_course_with_access
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.paginator import EmptyPage, Paginator
@@ -14,13 +15,11 @@ from django.http import Http404, HttpResponseBadRequest
 from django.utils.translation import ugettext
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods, require_POST
-from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-
-from courseware.courses import get_course_with_access
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.django_comment_client.constants import TYPE_ENTRY
 from lms.djangoapps.django_comment_client.utils import get_discussion_categories_ids, get_discussion_category_map
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from util.json_request import JsonResponse, expect_json
 
 from . import cohorts
@@ -322,6 +321,8 @@ def add_users_to_cohort(request, course_key_string, cohort_id):
      Raises Http404 if the cohort cannot be found for the given course.
     """
     # this is a string when we get it here
+    # TODO: this is the code called when you add a learner via the textbox (not CSV).
+    # Need to add a new item in the JSON response for preregistered learners.
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_key_string)
     get_course_with_access(request.user, 'staff', course_key)
 

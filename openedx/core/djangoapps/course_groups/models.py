@@ -234,5 +234,6 @@ class UnregisteredLearnerCohortAssignments(models.Model):
     course_user_group = models.ForeignKey(CourseUserGroup)
     email = models.CharField(blank=True, max_length=255, db_index=True)
 
-    # TODO: store course_id also so we can make a unique_together relationship between email and course_id?
-    # or how else to deal with multiple course_user_group instances within the same course linked to a single email?
+    # TODO: Also store course_id with unique_together relationship between email and course_id.
+    # Then if course staff assign the same learner/course_id combination to multiple cohorts, we
+    # simply update the existing entry to reflect the most recent cohort (course_user_group) assignment.

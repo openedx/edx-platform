@@ -3,27 +3,25 @@ This file contains tasks that are designed to perform background operations on t
 running state of a course.
 
 """
-from collections import OrderedDict
-from datetime import datetime
 import logging
-from pytz import UTC
+from collections import OrderedDict
 from time import time
-import unicodecsv
 
+import unicodecsv
+from datetime import datetime
 from django.contrib.auth.models import User
 from django.core.files.storage import DefaultStorage
-
 from instructor_analytics.basic import get_proctored_exam_results
 from instructor_analytics.csvs import format_dictlist
 from openassessment.data import OraAggregateData
-from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort
+from openedx.core.djangoapps.course_groups.models import CourseUserGroup
+from pytz import UTC
 from survey.models import SurveyAnswer
-from util.file import course_filename_prefix_generator, UniversalNewlineIterator
+from util.file import UniversalNewlineIterator
 
 from .runner import TaskProgress
 from .utils import upload_csv_to_report_store, UPDATE_STATUS_SUCCEEDED, UPDATE_STATUS_FAILED
-
 
 # define different loggers for use within tasks and on client side
 TASK_LOG = logging.getLogger('edx.celery.task')
@@ -123,6 +121,8 @@ def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, tas
     Within a given course, cohort students in bulk, then upload the results
     using a `ReportStore`.
     """
+    # TODO: this is the code executed when a CSV file is uploaded.
+    # Need to add a new column for preregistered learners.
     start_time = time()
     start_date = datetime.now(UTC)
 
