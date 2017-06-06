@@ -1,0 +1,24 @@
+// LMS - CSS application architecture
+// Version 3 styling (Bootstrap)
+// ====================
+
+@import 'vendor/bi-app/bi-app-ltr'; // set the layout for left-to-right languages
+
+// Bootstrap
+@import 'edx-bootstrap-theme';
+@import 'bootstrap/scss/bootstrap';
+
+// Base
+@import 'shared-v3/variables';
+@import 'shared-v3/base';
+@import 'shared-v3/layouts';
+
+// Components
+@import 'shared-v3/components';
+@import 'shared-v3/header';
+@import 'shared-v3/pagination';
+
+// Features
+@import 'features/bookmarks';
+@import 'features/course-content';
+@import 'features/course-experience';

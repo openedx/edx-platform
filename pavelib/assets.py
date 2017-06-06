@@ -46,6 +46,12 @@ COMMON_LOOKUP_PATHS = [
     path('node_modules/edx-pattern-library/node_modules'),
 ]
 
+# Hack to know which files need to be run through rtlcss
+BOOTSTRAP_CSS_FILES = [
+    'lms-main-v3.css',
+    'lms-course-v3.css',
+]
+
 # A list of NPM installed libraries that should be copied into the common
 # static directory.
 NPM_INSTALLED_LIBRARIES = [
@@ -60,7 +66,6 @@ NPM_INSTALLED_LIBRARIES = [
     'requirejs/require.js',
     'underscore.string/dist/underscore.string.js',
     'underscore/underscore.js',
-    'hls.js/dist/hls.js',
 ]
 
 # A list of NPM installed developer libraries that should be copied into the common
@@ -584,6 +589,22 @@ def _compile_sass(system, theme, debug, force, timing_info):
                 source_comments=source_comments,
                 output_style=output_style,
             )
+
+            # FIXME: this is a hack to generate Bootstrap RTL files
+            for bootstrap_css_file in BOOTSTRAP_CSS_FILES:
+                css_file_path = os.path.abspath(css_dir / bootstrap_css_file)
+                raw_css_file_path = os.path.abspath(css_dir / (bootstrap_css_file + '.raw'))
+                if os.path.exists(css_file_path):
+                    sh("mv {source_file} {target_file}".format(
+                        source_file=css_file_path,
+                        target_file=raw_css_file_path,
+                    ))
+                    sh("postcss {source_file} --output {target_file}".format(
+                        source_file=raw_css_file_path,
+                        target_file=css_file_path,
+                    ))
+
+            # Generate timing information
             duration = datetime.now() - start
             timing_info.append((sass_source_dir, css_dir, duration))
     return True

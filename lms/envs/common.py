@@ -1478,6 +1478,18 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/lms-course-rtl.css',
     },
+    'style-course-v3': {
+        'source_filenames': [
+            'css/lms-course-v3.css',
+        ],
+        'output_filename': 'css/lms-course-v3.css',
+    },
+    'style-course-v3-rtl': {
+        'source_filenames': [
+            'css/lms-course-v3-rtl.css',
+        ],
+        'output_filename': 'css/lms-course-v3-rtl.css',
+    },
     'style-student-notes': {
         'source_filenames': [
             'css/vendor/edxnotes/annotator.min.css',

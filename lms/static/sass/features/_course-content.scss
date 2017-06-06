@@ -1,0 +1,14 @@
+// Styling for courseware
+
+.wrapper-select-course-material {
+    margin: 0.5rem;
+}
+
+
+.sequence-list-wrapper {
+    display: none;
+
+    @include media-breakpoint-up(md) {
+        display: block;
+    }
+}

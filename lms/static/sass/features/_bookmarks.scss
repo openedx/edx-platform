@@ -62,9 +62,10 @@ $bookmarked-icon: "\f02e"; // .fa-bookmark
 
         .fa-arrow-right {
 
-            @include rtl {
-                @include transform(rotate(180deg));
-            }
+            // TODO: fix RTL!
+            //@include rtl {
+            //    @include transform(rotate(180deg));
+            //}
         }
     }
 }

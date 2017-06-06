@@ -1,0 +1,34 @@
+// LMS variables
+
+$baseline: 20px !default;
+
+$lms-header-height: 64px;
+
+$header-bg: $white;
+$lms-gray: $gray;
+$lms-background-color: $gray-lightest;
+$lms-container-background-color: $white;
+$lms-border-color: $gray-lighter;
+$lms-label-color: $body-color;
+$lms-active-color: $brand-primary;
+$lms-preview-menu-color: #c8c8c8;
+
+$white-transparent: rgba(255, 255, 255, 0);
+$white-opacity-40: rgba(255, 255, 255, 0.4);
+$white-opacity-60: rgba(255, 255, 255, 0.6);
+$white-opacity-70: rgba(255, 255, 255, 0.7);
+$white-opacity-80: rgba(255, 255, 255, 0.8);
+
+$light-grey-transparent: rgba(200,200,200, 0);
+$light-grey-solid: rgba(200,200,200, 1);
+
+// Icons
+$lms-dark-icon-color: $white;
+$lms-dark-icon-background-color: $gray-dark;
+
+$site-status-color: rgb(182,37,103);
+
+$shadow-l1: rgba(0,0,0,0.1) !default;
+
+// Fonts
+$body-font-size: 1rem !default;

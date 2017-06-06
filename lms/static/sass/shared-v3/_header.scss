@@ -1,0 +1,181 @@
+// LMS header styles
+
+.header-global {
+    position: fixed;
+    top: 0;
+    z-index: 999;
+    width: 100%;
+    height: $lms-header-height;
+    border-bottom: 1px solid $gray-light;
+    box-shadow: 0 1px 5px 0 $shadow-l1;
+    background: $header-bg;
+    font-size: 18px;
+
+    @include media-breakpoint-up(md) {
+        position: relative;
+    }
+
+    .wrapper-header {
+        margin: 0 auto;
+        padding: 10px 10px 0;
+        font-size: 18px;
+
+        .logo-header {
+            display: none;
+
+            @include media-breakpoint-up(md) {
+                display: inline;
+            }
+        }
+
+        .logo {
+            display: inline;
+            margin-bottom: 0;
+
+            @include media-breakpoint-up(md) {
+                margin: 4px 10px 0 0;
+            }
+        }
+
+        .main-menu-nav {
+            .mobile-menu-button {
+                position: absolute;
+                top: 18px;
+            }
+
+            .modal {
+                top: 53px;
+
+                .show {
+                    display: block;
+                }
+            }
+        }
+
+        .course-header {
+            @include margin(12px, 10px, 0px, 10px);
+            display: none;  // TODO: should this be read to screen readers?
+            font-size: 1rem;
+            font-weight: 400;
+            color: $lms-label-color;
+
+            @include media-breakpoint-up(md) {
+                display: inline;
+            }
+
+            .provider {
+                font-weight: bold;
+            }
+        }
+
+        .wrapper-user-menu {
+            margin-top: 4px;
+            width: auto;
+            float: right;
+        }
+
+        .dropdown-menu {
+            @include text-align(left);
+            top: inherit;
+        }
+
+        .user-menu {
+            display: inline;
+        }
+
+        .list-inline {
+            &.nav-global {
+                display: none;
+                margin-top: 12px;
+                margin-bottom: 0;
+
+                @include media-breakpoint-up(md) {
+                    display: inline;
+                }
+            }
+
+            &.nav-courseware {
+                margin-top: 5px;
+            }
+
+            .item {
+                font-weight: font-weight(semi-bold);
+                text-transform: uppercase;
+
+                &.active {
+                    a {
+                        text-decoration: none;
+                        color: $link-color;
+                    }
+                }
+            }
+        }
+
+        .tab-nav-item{
+            display: flex;
+            margin: 0;
+            justify-content: center;
+
+            .tab-nav-link{
+                font-size: font-size(base);
+                font-weight: font-weight(semi-bold);
+                color: palette(grayscale, dark);
+                padding: 5px 25px 23px;
+                display: inline-block;
+
+                &:active,
+                &:focus,
+                &:hover {
+                    border-bottom: 4px solid $lms-border-color;
+                }
+            }
+
+            .active{
+            }
+        }
+    }
+
+    // Style the courseware's slim version of the header
+    &.slim {
+        .wrapper-header {
+            .logo img {
+                margin-top: 4px;
+                height: 30px;
+            }
+
+            .course-header {
+                margin-top: 10px;
+            }
+
+            .list-inline.nav-global {
+                margin-top: 10px;
+            }
+
+            .wrapper-user-menu {
+                display: none;
+                margin-top: 0;
+
+                @include media-breakpoint-up(md) {
+                    display: inline;
+                }
+            }
+        }
+    }
+}
+
+.doc-link {
+    @include margin(($baseline*0.75), ($baseline*0.75), ($baseline*0.75), ($baseline*0.75));
+    float: right;
+    display: none;
+    font-size: 14px;
+    font-weight: bold;
+    color: $body-color;
+
+    @include media-breakpoint-up(md) {
+        display: inline;
+    }
+
+    &:visited {
+        color: $body-color;
+    }
+}

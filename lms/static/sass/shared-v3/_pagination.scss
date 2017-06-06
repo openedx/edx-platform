@@ -1,0 +1,114 @@
+// LMS pagination
+
+.paging-footer {
+    width: 300px;
+    margin: 0 auto;
+}
+
+.pagination {
+    @include clearfix();
+    display: inline-block;
+    width: flex-grid(3, 12);
+
+    &.pagination-compact {
+        @include text-align(right);
+    }
+
+    &.pagination-full {
+        display: block;
+        width: flex-grid(4, 12);
+        margin: $baseline auto;
+    }
+
+    .nav-item {
+        position: relative;
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    .nav-link {
+        display: block;
+        border: 0;
+        background-image: none;
+        background-color: transparent;
+        padding: ($baseline/2) ($baseline*0.75);
+
+        &.previous {
+            margin-right: ($baseline/2);
+        }
+
+        &.next {
+            margin-left: ($baseline/2);
+        }
+
+        &:hover {
+            background-color: $lms-active-color;
+            background-image: none;
+            border-radius: 3px;
+            color: $white;
+        }
+
+        &.is-disabled {
+            background-color: transparent;
+            color: $lms-gray;
+            pointer-events: none;
+        }
+    }
+
+    .nav-label {
+        @extend .sr-only;
+    }
+
+    .pagination-form,
+    .current-page,
+    .page-divider,
+    .total-pages {
+        display: inline-block;
+    }
+
+    .current-page,
+    .page-number-input,
+    .total-pages {
+        width: ($baseline*2.5);
+        vertical-align: middle;
+        margin: 0 ($baseline*0.75);
+        padding: ($baseline/4);
+        text-align: center;
+        color: $lms-gray;
+    }
+
+    .current-page {
+        position: absolute;
+        @include left(-($baseline/4));
+    }
+
+    .page-divider {
+        vertical-align: middle;
+        color: $lms-gray;
+    }
+
+    .pagination-form {
+        position: relative;
+        z-index: 100;
+
+        .page-number-label,
+        .submit-pagination-form {
+            @extend .sr-only;
+        }
+    }
+}
+
+// styles for search/pagination metadata and sorting
+.listing-tools {
+    color: $lms-gray;
+
+    label { // override
+        color: inherit;
+        font-size: inherit;
+        cursor: auto;
+    }
+
+    .listing-sort-select {
+        border: 0;
+    }
+}

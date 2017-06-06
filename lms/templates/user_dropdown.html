@@ -14,7 +14,7 @@ from django.utils.translation import ugettext as _
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
 %>
 
-% if uses_pattern_library:
+% if uses_pattern_library or uses_bootstrap:
     <div class="wrapper-user-menu dropdown-menu-container logged-in js-header-user-menu">
         <a href="${reverse('dashboard')}" class="menu-title">
             <span class="sr-only">${_("Dashboard for:")}</span>

@@ -340,6 +340,7 @@ class CoursewareIndex(View):
             'section_title': None,
             'sequence_title': None,
             'disable_accordion': waffle.flag_is_active(request, UNIFIED_COURSE_VIEW_FLAG),
+            'uses_bootstrap': True,
         }
         table_of_contents = toc_for_course(
             self.effective_user,

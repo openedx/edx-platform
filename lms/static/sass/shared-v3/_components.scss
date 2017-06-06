@@ -1,0 +1,28 @@
+// Bootstrap component style overrides
+
+// Select
+select.mobile-only {
+    width: 100%;
+    height: 3rem;
+    font-size: $font-size-lg;
+    line-height: $line-height-lg;
+    background-color: transparent;
+    border: none;
+}
+
+// Tabs
+.nav {
+    .nav-link {
+        border-style: solid;
+        border-color: transparent;
+        border-width: 0 0 4px;
+
+        @include hover-focus {
+            border-color: $brand-primary;
+        }
+
+        &.active {
+            border-color: $brand-primary;
+        }
+    }
+}

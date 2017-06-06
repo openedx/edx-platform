@@ -1,0 +1,75 @@
+// LMS layouts
+
+.content-wrapper {
+    margin: 0 auto;
+    margin-top: $lms-header-height;
+
+    &.container {
+        padding: 0;
+    }
+
+    @include media-breakpoint-up(md) {
+        margin-top: 0;
+        padding: $baseline*2 0;
+    }
+
+    .main-container {
+        border: 1px solid $lms-border-color;
+        background-color: $lms-container-background-color;
+    }
+
+    .page-header {
+        @include clearfix();
+        border-bottom: 1px solid $lms-border-color;
+        padding: $baseline;
+
+        .page-title {
+            @extend %t-title4;
+            margin-bottom: ($baseline/4);
+            text-transform: none;
+            color: $black;
+        }
+
+        .page-header-search {
+            .search-form {
+                display: inline-flex;
+
+                .search-input {
+                    height: 2.2rem;
+                    padding: 0.625rem;
+                }
+            }
+        }
+
+        .page-description {
+            @extend %t-copy-sub1;
+            margin-bottom: ($baseline/4);
+            color: $gray;
+        }
+
+        &.has-secondary {
+            .page-header-main {
+                display: inline-block;
+            }
+
+            .page-header-secondary {
+                @include float(right);
+                @include text-align(right);
+                display: inline-block;
+                vertical-align: text-bottom;
+
+                .form-actions {
+                    display: inline-block;
+                }
+
+                .form-actions > *:first-child {
+                    @include margin-left(0);
+                }
+            }
+        }
+    }
+
+    .page-content {
+        padding: $baseline;
+    }
+}
