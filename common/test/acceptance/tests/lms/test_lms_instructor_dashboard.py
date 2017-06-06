@@ -1374,6 +1374,7 @@ class StudentAdminTest(BaseInstructorDashboardTest):
         self.username, _ = self.log_in_as_instructor()
         self.instructor_dashboard_page = self.visit_instructor_dashboard()
 
+    @flaky  # See EDUCATOR-552
     def test_rescore_nonrescorable(self):
         student_admin_section = self.instructor_dashboard_page.select_student_admin(StudentSpecificAdmin)
         student_admin_section.set_student_email_or_username(self.username)
