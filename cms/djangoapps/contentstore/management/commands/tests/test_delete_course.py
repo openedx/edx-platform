@@ -6,9 +6,11 @@ import mock
 
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from django.core.management import call_command, CommandError
+from django.contrib.auth.models import User
 from contentstore.tests.utils import CourseTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.django import modulestore
+from student.roles import CourseInstructorRole
 
 
 class DeleteCourseTest(CourseTestCase):
@@ -60,3 +62,27 @@ class DeleteCourseTest(CourseTestCase):
             patched_yes_no.return_value = True
             call_command('delete_course', 'TestX/TS01/2015_Q1')
             self.assertIsNone(modulestore().get_course(SlashSeparatedCourseKey("TestX", "TS01", "2015_Q1")))
+
+    def test_course_deletion_with_keep_instructors(self):
+        """
+        Tests that deleting course with keep-instructors option do not remove instructors from course.
+        """
+        instructor_user = User.objects.create(
+            username='test_instructor',
+            email='test_email@example.com'
+        )
+        self.assertIsNotNone(instructor_user)
+
+        # Add and verify instructor role for the course
+        instructor_role = CourseInstructorRole(self.course.id)
+        instructor_role.add_users(instructor_user)
+        self.assertTrue(instructor_role.has_user(instructor_user))
+
+        # Verify the course we are about to delete exists in the modulestore
+        self.assertIsNotNone(modulestore().get_course(self.course.id))
+
+        with mock.patch(self.YESNO_PATCH_LOCATION, return_value=True):
+            call_command('delete_course', 'TestX/TS01/2015_Q1', '--keep-instructors')
+
+        self.assertIsNone(modulestore().get_course(self.course.id))
+        self.assertTrue(instructor_role.has_user(instructor_user))
