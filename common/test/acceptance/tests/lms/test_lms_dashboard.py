@@ -5,6 +5,7 @@ End-to-end tests for the main LMS Dashboard (aka, Student Dashboard).
 import datetime
 
 from nose.plugins.attrib import attr
+from flaky import flaky
 
 from common.test.acceptance.fixtures.course import CourseFixture
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
@@ -275,6 +276,7 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         # and course does not start within 5 days
         self.assertEqual(course_date, expected_course_date)
 
+    @flaky  # NOTE: This is a flaky test to test for dateutils.
     def test_near_future_course_date(self):
         """
         Scenario:
