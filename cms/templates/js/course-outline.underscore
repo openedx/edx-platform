@@ -4,6 +4,32 @@ var visibilityState = xblockInfo.get('visibility_state');
 var published = xblockInfo.get('published');
 var prereq = xblockInfo.get('prereq');
 var hasPartitionGroups = xblockInfo.get('has_partition_group_components');
+var userPartitions = xblockInfo.get('user_partitions');
+var groupAccess = xblockInfo.get('group_access');
+var allowedGroups = [];
+var groupIdToName = {};
+
+for (var schemeId in groupAccess) {
+    var schemeAllowedGroups = groupAccess[schemeId];
+
+    schemeAllowedGroups.forEach(function (groupId) {
+        var fullId = schemeId + groupId;
+        allowedGroups.push(fullId);
+    });
+}
+
+userPartitions.forEach(function (partition) {
+    var schemeId = null;
+    var groupId = null;
+    schemeId = partition['id'];
+    var groups = partition['groups'];
+    groups.forEach(function (group) {
+        var groupId = group['id'];
+        var groupName = group['name'];
+        var fullId = schemeId.toString() + groupId.toString();
+        groupIdToName[fullId] = groupName;
+    })
+})
 
 var statusMessages = [];
 var messageType;
@@ -57,11 +83,25 @@ if (staffOnlyMessage) {
         addStatusMessage(messageType, messageText);
     }
 
-    if (hasPartitionGroups) {
+    if (hasPartitionGroups && allowedGroups.length === 0) {
         addStatusMessage(
             'partition-groups',
             gettext('Access to some content in this unit is restricted to specific groups of learners')
         );
+    } else if (allowedGroups.length >= 1 && xblockInfo.isVertical()) {
+        var groupNames = [];
+        for (var i = 0; i < allowedGroups.length; i++) {
+            var groupName = groupIdToName[allowedGroups[i]];
+            groupNames.push(groupName);
+        }
+        messageType = 'partition-groups';
+        messageText = edx.StringUtils.interpolate(
+                gettext('Access to this unit is restricted to {groupNames}'),
+                {
+                    groupNames: groupNames.join(', ')
+                }
+        )
+        addStatusMessage(messageType, messageText);
     }
 }
 
