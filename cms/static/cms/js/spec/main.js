@@ -10,13 +10,15 @@
                 'underscore',
                 'underscore.string',
                 'edx-ui-toolkit/js/utils/html-utils',
-                'edx-ui-toolkit/js/utils/string-utils'
-            ], function(_, str, HtmlUtils, StringUtils) {
+                'edx-ui-toolkit/js/utils/string-utils',
+                'edx-ui-toolkit/js/utils/date-utils'
+            ], function(_, str, HtmlUtils, StringUtils, DateUtils) {
                 window._ = _;
                 window._.str = str;
                 window.edx = window.edx || {};
                 window.edx.HtmlUtils = HtmlUtils;
                 window.edx.StringUtils = StringUtils;
+                window.edx.DateUtils = DateUtils;
             });
     }
 
