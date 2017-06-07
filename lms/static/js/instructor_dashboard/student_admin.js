@@ -42,6 +42,10 @@
             this.$btn_rescore_problem_if_higher_single = this.$section.find(
                 "input[name='rescore-problem-if-higher-single']"
             );
+            this.$btn_override_problem_score_single = this.$section.find(
+                "input[name='override-problem-score-single']"
+            );
+            this.$field_select_score_single = findAndAssert(this.$section, "input[name='score-select-single']");
             this.$btn_task_history_single = this.$section.find("input[name='task-history-single']");
             this.$table_task_history_single = this.$section.find('.task-history-single-table');
             this.$field_exam_grade = this.$section.find("input[name='entrance-exam-student-select-grade']");
@@ -408,6 +412,9 @@
             this.$btn_rescore_problem_if_higher_all.click(function() {
                 return studentadmin.rescore_problem_all(true);
             });
+            this.$btn_override_problem_score_single.click(function() {
+                return studentadmin.override_problem_score_single();
+            });
             this.$btn_task_history_all.click(function() {
                 var sendData;
                 sendData = {
@@ -470,6 +477,60 @@
                 type: 'POST',
                 dataType: 'json',
                 url: this.$btn_rescore_problem_single.data('endpoint'),
+                data: sendData,
+                success: this.clear_errors_then(function() {
+                    return alert(fullSuccessMessage);  // eslint-disable-line no-alert
+                }),
+                error: statusAjaxError(function(response) {
+                    if (response.responseText) {
+                        return that.$request_err_grade.text(response.responseText);
+                    }
+                    return that.$request_err_grade.text(fullDefaultErrorMessage);
+                })
+            });
+        };
+
+        StudentAdmin.prototype.override_problem_score_single = function() {
+            var defaultErrorMessage, fullDefaultErrorMessage, fullSuccessMessage,
+                problemToReset, score, sendData, successMessage, uniqStudentIdentifier,
+                that = this;
+            uniqStudentIdentifier = this.$field_student_select_grade.val();
+            problemToReset = this.$field_problem_select_single.val();
+            score = this.$field_select_score_single.val();
+            if (!uniqStudentIdentifier) {
+                return this.$request_err_grade.text(
+                    gettext('Please enter a student email address or username.')
+                );
+            }
+            if (!problemToReset) {
+                return this.$request_err_grade.text(
+                    gettext('Please enter a problem location.')
+                );
+            }
+            if (!score) {
+                return this.$request_err_grade.text(
+                    gettext('Please enter a score.')
+                );
+            }
+            sendData = {
+                unique_student_identifier: uniqStudentIdentifier,
+                problem_to_reset: problemToReset,
+                score: score
+            };
+            successMessage = gettext("Started task to override the score for problem '<%- problem_id %>' and student '<%- student_id %>'. Click the 'Show Task Status' button to see the status of the task.");  // eslint-disable-line max-len
+            fullSuccessMessage = _.template(successMessage)({
+                student_id: uniqStudentIdentifier,
+                problem_id: problemToReset
+            });
+            defaultErrorMessage = gettext("Error starting a task to override score for problem '<%- problem_id %>' for student '<%- student_id %>'. Make sure that the the score and the problem and student identifiers are complete and correct.");  // eslint-disable-line max-len
+            fullDefaultErrorMessage = _.template(defaultErrorMessage)({
+                student_id: uniqStudentIdentifier,
+                problem_id: problemToReset
+            });
+            return $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                url: this.$btn_override_problem_score_single.data('endpoint'),
                 data: sendData,
                 success: this.clear_errors_then(function() {
                     return alert(fullSuccessMessage);  // eslint-disable-line no-alert

@@ -17,6 +17,7 @@ from courseware.courses import get_problems_in_section
 from courseware.module_render import get_xqueue_callback_url_prefix
 from lms.djangoapps.instructor_task.models import PROGRESS, InstructorTask
 from util.db import outer_atomic
+from xblock.scorable import ScorableXBlockMixin
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
@@ -261,6 +262,25 @@ def check_arguments_for_rescoring(usage_key):
     if not _supports_rescore(descriptor):
         msg = _("This component cannot be rescored.")
         raise NotImplementedError(msg)
+
+
+def check_arguments_for_overriding(usage_key, score):
+    """
+    Do simple checks on the descriptor to confirm that it supports overriding
+    the problem score and the score passed in is not greater than the value of
+    the problem or less than 0.
+    """
+    descriptor = modulestore().get_item(usage_key)
+    score = float(score)
+
+    # some weirdness around initializing the descriptor requires this
+    if not hasattr(descriptor.__class__, 'set_score'):
+        msg = _("This component does not support score override.")
+        raise NotImplementedError(msg)
+
+    if score < 0 or score > descriptor.max_score():
+        msg = _("Scores must be between 0 and the value of the problem.")
+        raise ValueError(msg)
 
 
 def check_entrance_exam_problems_for_rescoring(exam_key):  # pylint: disable=invalid-name

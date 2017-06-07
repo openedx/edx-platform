@@ -23,6 +23,9 @@ from track.views import task_track
 from util.db import outer_atomic
 from xmodule.modulestore.django import modulestore
 
+from xblock.runtime import KvsFieldData
+from xblock.scorable import Score, ScorableXBlockMixin
+from xmodule.modulestore.django import modulestore
 from ..exceptions import UpdateProblemModuleStateError
 from .runner import TaskProgress
 from .utils import UNKNOWN_TASK_ID, UPDATE_STATUS_FAILED, UPDATE_STATUS_SKIPPED, UPDATE_STATUS_SUCCEEDED
@@ -31,6 +34,7 @@ TASK_LOG = logging.getLogger('edx.celery.task')
 
 # define value to be used in grading events
 GRADES_RESCORE_EVENT_TYPE = 'edx.grades.problem.rescored'
+GRADES_OVERRIDE_EVENT_TYPE = 'edx.grades.problem.score_overridden'
 
 
 def perform_module_state_update(update_fcn, filter_fcn, _entry_id, course_id, task_input, action_name):
@@ -168,8 +172,8 @@ def rescore_problem_module_state(xmodule_instance_args, module_descriptor, stude
         if instance is None:
             # Either permissions just changed, or someone is trying to be clever
             # and load something they shouldn't have access to.
-            msg = "No module {loc} for student {student}--access denied?".format(
-                loc=usage_key,
+            msg = "No module {location} for student {student}--access denied?".format(
+                location=usage_key,
                 student=student
             )
             TASK_LOG.warning(msg)
@@ -209,6 +213,86 @@ def rescore_problem_module_state(xmodule_instance_args, module_descriptor, stude
         instance.save()
         TASK_LOG.debug(
             u"successfully processed rescore call for course %(course)s, problem %(loc)s "
+            u"and student %(student)s",
+            dict(
+                course=course_id,
+                loc=usage_key,
+                student=student
+            )
+        )
+
+        return UPDATE_STATUS_SUCCEEDED
+
+
+@outer_atomic
+def override_score_module_state(xmodule_instance_args, module_descriptor, student_module, task_input):
+    '''
+    Takes an XModule descriptor and a corresponding StudentModule object, and
+    performs an override on the student's problem score.
+
+    Throws exceptions if the override is fatal and should be aborted if in a loop.
+    In particular, raises UpdateProblemModuleStateError if module fails to instantiate,
+    or if the module doesn't support overriding, or if the score used for override
+    is outside the acceptable range of scores (between 0 and the max score for the
+    problem).
+
+    Returns True if problem was successfully overriden for the given student, and False
+    if problem encountered some kind of error in overriding.
+    '''
+    # unpack the StudentModule:
+    course_id = student_module.course_id
+    student = student_module.student
+    usage_key = student_module.module_state_key
+
+    with modulestore().bulk_operations(course_id):
+        course = get_course_by_id(course_id)
+        instance = _get_module_instance_for_task(
+            course_id,
+            student,
+            module_descriptor,
+            xmodule_instance_args,
+            course=course
+        )
+
+        if instance is None:
+            # Either permissions just changed, or someone is trying to be clever
+            # and load something they shouldn't have access to.
+            msg = "No module {location} for student {student}--access denied?".format(
+                location=usage_key,
+                student=student
+            )
+            TASK_LOG.warning(msg)
+            return UPDATE_STATUS_FAILED
+
+        if not hasattr(instance, 'set_score'):
+            msg = "Scores cannot be overridden for this problem type."
+            raise UpdateProblemModuleStateError(msg)
+
+        weighted_override_score = float(task_input['score'])
+        if not (0 <= weighted_override_score <= instance.max_score()):
+            msg = "Score must be between 0 and the maximum points available for the problem."
+            raise UpdateProblemModuleStateError(msg)
+
+        # Set the tracking info before this call, because it makes downstream
+        # calls that create events.  We retrieve and store the id here because
+        # the request cache will be erased during downstream calls.
+        create_new_event_transaction_id()
+        set_event_transaction_type(GRADES_OVERRIDE_EVENT_TYPE)
+
+        problem_weight = instance.weight if instance.weight is not None else 1
+        if problem_weight == 0:
+            msg = "Scores cannot be overridden for a problem that has a weight of zero."
+            raise UpdateProblemModuleStateError(msg)
+        else:
+            instance.set_score(Score(
+                raw_earned=weighted_override_score / problem_weight,
+                raw_possible=instance.max_score() / problem_weight
+            ))
+
+        instance.publish_grade()
+        instance.save()
+        TASK_LOG.debug(
+            u"successfully processed score override for course %(course)s, problem %(loc)s "
             u"and student %(student)s",
             dict(
                 course=course_id,
