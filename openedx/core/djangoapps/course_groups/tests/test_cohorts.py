@@ -5,13 +5,12 @@ Tests for cohorts
 import ddt
 from mock import call, patch
 from nose.plugins.attrib import attr
-import before_after
 
+import before_after
 from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.http import Http404
 from django.test import TestCase
-
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
@@ -19,12 +18,9 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ToyCourseFactory
 
-from ..models import CourseUserGroup, CourseCohort, CourseUserGroupPartitionGroup
 from .. import cohorts
-from ..tests.helpers import (
-    topic_name_to_id, config_course_cohorts, config_course_cohorts_legacy,
-    CohortFactory, CourseCohortFactory, CourseCohortSettingsFactory
-)
+from ..models import CourseCohort, CourseUserGroup, CourseUserGroupPartitionGroup
+from ..tests.helpers import CohortFactory, CourseCohortFactory, config_course_cohorts, config_course_cohorts_legacy
 
 
 @attr(shard=2)
@@ -350,7 +346,6 @@ class TestCohorts(ModuleStoreTestCase):
         # This will have no effect on lms side as we are already done with migrations
         config_course_cohorts_legacy(
             course,
-            discussions=[],
             cohorted=True,
             auto_cohort_groups=["OtherGroup"]
         )
@@ -393,7 +388,6 @@ class TestCohorts(ModuleStoreTestCase):
         # This will have no effect on lms side as we are already done with migrations
         config_course_cohorts_legacy(
             course,
-            discussions=[],
             cohorted=True,
             auto_cohort_groups=["AutoGroup"]
         )
@@ -473,44 +467,6 @@ class TestCohorts(ModuleStoreTestCase):
         self.assertEqual(
             cohorts.get_cohort_names(course),
             {cohort1.id: cohort1.name, cohort2.id: cohort2.name}
-        )
-
-    def test_get_cohorted_commentables(self):
-        """
-        Make sure cohorts.get_cohorted_commentables() correctly returns a list of strings representing cohorted
-        commentables.  Also verify that we can't get the cohorted commentables from a course which does not exist.
-        """
-        course = modulestore().get_course(self.toy_course_key)
-
-        self.assertEqual(cohorts.get_cohorted_commentables(course.id), set())
-
-        config_course_cohorts(course, is_cohorted=True)
-        self.assertEqual(cohorts.get_cohorted_commentables(course.id), set())
-
-        config_course_cohorts(
-            course,
-            is_cohorted=True,
-            discussion_topics=["General", "Feedback"],
-            cohorted_discussions=["Feedback"]
-        )
-        self.assertItemsEqual(
-            cohorts.get_cohorted_commentables(course.id),
-            set([topic_name_to_id(course, "Feedback")])
-        )
-
-        config_course_cohorts(
-            course,
-            is_cohorted=True,
-            discussion_topics=["General", "Feedback"],
-            cohorted_discussions=["General", "Feedback"]
-        )
-        self.assertItemsEqual(
-            cohorts.get_cohorted_commentables(course.id),
-            set([topic_name_to_id(course, "General"), topic_name_to_id(course, "Feedback")])
-        )
-        self.assertRaises(
-            Http404,
-            lambda: cohorts.get_cohorted_commentables(SlashSeparatedCourseKey("course", "does_not", "exist"))
         )
 
     def test_get_cohort_by_name(self):
@@ -672,59 +628,16 @@ class TestCohorts(ModuleStoreTestCase):
         # Note that the following get() will fail with MultipleObjectsReturned if race condition is not handled.
         self.assertEqual(first_cohort.users.get(), course_user)
 
-    def test_get_course_cohort_settings(self):
+    def test_set_cohorted_with_invalid_data_type(self):
         """
-        Test that cohorts.get_course_cohort_settings is working as expected.
-        """
-        course = modulestore().get_course(self.toy_course_key)
-        course_cohort_settings = cohorts.get_course_cohort_settings(course.id)
-
-        self.assertFalse(course_cohort_settings.is_cohorted)
-        self.assertEqual(course_cohort_settings.cohorted_discussions, [])
-        self.assertFalse(course_cohort_settings.always_cohort_inline_discussions)
-
-    def test_update_course_cohort_settings(self):
-        """
-        Test that cohorts.set_course_cohort_settings is working as expected.
+        Test that cohorts.set_course_cohorted raises exception if argument is not a boolean.
         """
         course = modulestore().get_course(self.toy_course_key)
-        CourseCohortSettingsFactory(course_id=course.id)
 
-        cohorts.set_course_cohort_settings(
-            course.id,
-            is_cohorted=False,
-            cohorted_discussions=['topic a id', 'topic b id'],
-            always_cohort_inline_discussions=True
-        )
+        with self.assertRaises(ValueError) as value_error:
+            cohorts.set_course_cohorted(course.id, 'not a boolean')
 
-        course_cohort_settings = cohorts.get_course_cohort_settings(course.id)
-
-        self.assertFalse(course_cohort_settings.is_cohorted)
-        self.assertEqual(course_cohort_settings.cohorted_discussions, ['topic a id', 'topic b id'])
-        self.assertTrue(course_cohort_settings.always_cohort_inline_discussions)
-
-    def test_update_course_cohort_settings_with_invalid_data_type(self):
-        """
-        Test that cohorts.set_course_cohort_settings raises exception if fields have incorrect data type.
-        """
-        course = modulestore().get_course(self.toy_course_key)
-        CourseCohortSettingsFactory(course_id=course.id)
-
-        exception_msg_tpl = "Incorrect field type for `{}`. Type must be `{}`"
-        fields = [
-            {'name': 'is_cohorted', 'type': bool},
-            {'name': 'always_cohort_inline_discussions', 'type': bool},
-            {'name': 'cohorted_discussions', 'type': list}
-        ]
-
-        for field in fields:
-            with self.assertRaises(ValueError) as value_error:
-                cohorts.set_course_cohort_settings(course.id, **{field['name']: ''})
-
-            self.assertEqual(
-                value_error.exception.message,
-                exception_msg_tpl.format(field['name'], field['type'].__name__)
-            )
+        self.assertEqual("Cohorted must be a boolean", value_error.exception.message)
 
 
 @attr(shard=2)

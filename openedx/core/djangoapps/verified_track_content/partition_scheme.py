@@ -1,19 +1,17 @@
 """
 UserPartitionScheme for enrollment tracks.
 """
-from django.conf import settings
-
+from course_modes.models import CourseMode
 from courseware.masquerade import (
     get_course_masquerade,
     get_masquerading_user_group,
     is_masquerading_as_specific_student
 )
-from course_modes.models import CourseMode
-from student.models import CourseEnrollment
+from django.conf import settings
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.verified_track_content.models import VerifiedTrackCohortedCourse
-from xmodule.partitions.partitions import NoSuchUserPartitionGroupError, Group, UserPartition
-
+from student.models import CourseEnrollment
+from xmodule.partitions.partitions import Group, UserPartition
 
 # These IDs must be less than 100 so that they do not overlap with Groups in
 # CohortUserPartition or RandomUserPartitionScheme

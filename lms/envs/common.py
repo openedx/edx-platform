@@ -379,7 +379,7 @@ FEATURES = {
     'ENABLE_COOKIE_CONSENT': False,
 
     # Whether or not the dynamic EnrollmentTrackUserPartition should be registered.
-    'ENABLE_ENROLLMENT_TRACK_USER_PARTITION': False,
+    'ENABLE_ENROLLMENT_TRACK_USER_PARTITION': True,
 
     # Enable one click program purchase
     # See LEARNER-493
@@ -1759,6 +1759,7 @@ REQUIRE_JS_PATH_OVERRIDES = {
     'js/student_profile/views/learner_profile_factory': 'js/student_profile/views/learner_profile_factory.js',
     'js/courseware/courseware_factory': 'js/courseware/courseware_factory.js',
     'js/groups/views/cohorts_dashboard_factory': 'js/groups/views/cohorts_dashboard_factory.js',
+    'js/groups/discussions_management/discussions_dashboard_factory': 'js/discussions_management/views/discussions_dashboard_factory.js',
     'draggabilly': 'js/vendor/draggabilly.js',
     'hls': 'common/js/vendor/hls.js'
 }

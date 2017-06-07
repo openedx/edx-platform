@@ -25,6 +25,7 @@ def _get_context(requester_id, is_requester_privileged, is_cohorted=False, threa
         "cc_requester": User(id=requester_id),
         "is_requester_privileged": is_requester_privileged,
         "course": CourseFactory(cohort_config={"cohorted": is_cohorted}),
+        "discussion_division_enabled": is_cohorted,
         "thread": thread,
     }
 
