@@ -232,15 +232,7 @@ if RELEASE_LINE == "master":
         'course_author': 'http://edx.readthedocs.io/projects/edx-partner-course-staff',
     }
 
-# TODO: TNL-6546: Remove this waffle and flag code.
-from django.db.utils import ProgrammingError
-from waffle.models import Flag
-try:
-    flag, created = Flag.objects.get_or_create(name='unified_course_view')
-    WAFFLE_OVERRIDE = True
-except ProgrammingError:
-    # during initial reset_db, the table for the flag doesn't yet exist.
-    pass
+WAFFLE_OVERRIDE = True
 
 #####################################################################
 # Lastly, see if the developer has any local overrides.
