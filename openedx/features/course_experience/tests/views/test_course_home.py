@@ -89,7 +89,7 @@ class TestCourseHomePage(SharedModuleStoreTestCase):
         course_home_url(self.course)
 
         # Fetch the view and verify the query counts
-        with self.assertNumQueries(42):
+        with self.assertNumQueries(45):
             with check_mongo_calls(5):
                 url = course_home_url(self.course)
                 self.client.get(url)
