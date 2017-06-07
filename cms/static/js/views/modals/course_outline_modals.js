@@ -15,7 +15,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
     'use strict';
     var CourseOutlineXBlockModal, SettingsXBlockModal, PublishXBlockModal, AbstractEditor, BaseDateEditor,
         ReleaseDateEditor, DueDateEditor, GradingEditor, PublishEditor, AbstractVisibilityEditor, StaffLockEditor,
-        ContentVisibilityEditor, TimedExaminationPreferenceEditor, AccessEditor, ShowCorrectnessEditor;
+        UnitAcessEditor, ContentVisibilityEditor, TimedExaminationPreferenceEditor, AccessEditor, ShowCorrectnessEditor;
 
     CourseOutlineXBlockModal = BaseModal.extend({
         events: _.extend({}, BaseModal.prototype.events, {
@@ -110,18 +110,6 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 gettext('{display_name} Settings'),
                 {display_name: this.model.get('display_name')}
             );
-        },
-
-        getIntroductionMessage: function() {
-            var message = '';
-            var tabs = this.options.tabs;
-            if (!tabs || tabs.length < 2) {
-                message = StringUtils.interpolate(
-                    gettext('Change the settings for {display_name}'),
-                    {display_name: this.model.get('display_name')}
-                );
-            }
-            return message;
         },
 
         initializeEditors: function() {
@@ -591,10 +579,45 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             return this.model.get('ancestor_has_staff_lock');
         },
 
+        isModelContentRestricted: function() {
+            if (this.model.get('group_restricted') == 'cohort') {
+                return true
+            } else {
+                return false
+            }
+        },
+
+        isModelEnrollmentRestricted: function() {
+            if (this.model.get('group_restricted') == 'enrollment') {
+                return true
+            } else {
+                return false
+            }
+        },
+
+        getModelRestrictedGroups: function() {
+            return this.model.get('restricted_groups');
+        },
+
+        getContentGroups: function () {
+            var firstPartition = this.model.attributes.user_partitions[0];
+            if (firstPartition.name == "Content Groups") {
+                return firstPartition.groups;
+            } else {
+                return [];
+            }
+        },
+
+        getModelCourse: function() {
+            return course;
+        },
+
         getContext: function() {
             return {
                 hasExplicitStaffLock: this.isModelLocked(),
-                ancestorLocked: this.isAncestorLocked()
+                ancestorLocked: this.isAncestorLocked(),
+                contentGroups: this.getContentGroups(),
+                course: this.getModelCourse()
             };
         }
     });
@@ -602,9 +625,40 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
     StaffLockEditor = AbstractVisibilityEditor.extend({
         templateName: 'staff-lock-editor',
         className: 'edit-staff-lock',
+        events: {
+            'change #content_access_restriction': 'updateAccessSelection',
+            'change #content-group-select input:checkbox': function(){this.uncheckAll('enrollment-track-select');},
+            'change #enrollment-track-select input:checkbox': function(){this.uncheckAll('content-group-select');},
+        },
+
         afterRender: function() {
             AbstractVisibilityEditor.prototype.afterRender.call(this);
             this.setLock(this.isModelLocked());
+            if (this.isModelContentRestricted()) {
+                this.$('#content_access_restriction option[value="content-group"]').prop('selected', true);
+                this.$('#enrollment-track-select').hide();
+                this.checkSelections('content-group-', this.getModelRestrictedGroups());
+            } else if (this.isModelEnrollmentRestricted()) {
+                this.$('#content_access_restriction option[value="enrollment-track"]').prop('selected', true);
+                this.$('#content-group-select').hide();
+                this.checkSelections('enrollment-track-', this.getModelRestrictedGroups());
+            } else {
+                if (!this.contentAccessSelected()) {
+                    this.$('#content-group-select').hide();
+                    this.$('#enrollment-track-select').hide();
+                }
+            }
+        },
+
+        uncheckAll: function(divId) {
+            $('#' + divId).find('input[type=checkbox]:checked').removeAttr('checked');
+        },
+
+        checkSelections: function(selection, groupIds) {
+            var i;
+            for (i = 0; i < groupIds.length; i++) {
+                this.$('#' + selection +  groupIds[i]).prop('checked', true);
+            }
         },
 
         setLock: function(value) {
@@ -615,20 +669,92 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             return this.$('#staff_lock').is(':checked');
         },
 
+        isContentRestricted: function () {
+            return (this.$('#content-group-select input:checkbox:checked').length > 0);
+        },
+
+        isEnrollmentRestricted: function () {
+            return (this.$('#enrollment-track-select input:checkbox:checked').length > 0);
+        },
+
         hasChanges: function() {
-            return this.isModelLocked() !== this.isLocked();
+            return (this.isModelLocked() !== this.isLocked())
+                || (this.getModelRestrictedGroups() !== this.getRestrictedGroups());
+        },
+
+        getRestrictedGroups: function(type) {
+            var restrictedGroups = [];
+            this.$('#' + type + 'select ' + 'input:checkbox:checked').each(function(){
+                var $this = $(this);
+                var elemId = $this.attr('id');
+                var groupId = elemId.substring(type.length);
+                restrictedGroups.push(groupId);
+            });
+            return restrictedGroups;
+        },
+
+        getCoursePartitions: function() {
+            return null;
         },
 
         getRequestData: function() {
             if (this.hasChanges()) {
+                var metadata = {};
+
+                if (this.isLocked()) {
+                    metadata.visible_to_staff_only = true;
+                } else {
+                    metadata.visible_to_staff_only = null;
+                }
+
+                /*
+                if (this.isContentRestricted()) {
+                    metadata.group_restricted = 'cohort';
+                } else if (this.isEnrollmentRestricted()) {
+                    metadata.group_restricted = 'enrollment';
+                } else {
+                    metadata.group_restricted = null;
+                }
+
+                if (this.isContentRestricted()) {
+                    metadata.restricted_groups = this.getRestrictedGroups('content-group-');
+                } else if (this.isEnrollmentRestricted()) {
+                    metadata.restricted_groups = this.getRestrictedGroups('enrollment-track-');
+                } else {
+                    metadata.restricted_groups = [];
+                }
+                */
+
                 return {
                     publish: 'republish',
-                    metadata: {
-                        visible_to_staff_only: this.isLocked() ? true : null
-                    }
+                    metadata: metadata
                 };
             } else {
                 return {};
+            }
+        },
+
+        contentAccessSelected: function() {
+            return this.$('#content_access_restriction').selectedIndex != null;
+        },
+
+        getSelectedGroup: function () {
+            return this.$('#content_access_restriction').val();
+        },
+
+        updateAccessSelection: function () {
+            var selectedGroup = this.getSelectedGroup();
+            if (selectedGroup == 'enrollment-track') {
+                this.$('#content-group-select').hide();
+                this.$('#enrollment-track-select').show();
+            } else if (selectedGroup == 'content-group') {
+                this.$('#content-group-select').show();
+                this.$('#enrollment-track-select').hide();
+            } else {
+                this.$('#content-group-select').hide();
+                this.$('#enrollment-track-select').hide();
+                this.uncheckAll('content-group-select');
+                this.uncheckAll('enrollment-track-select');
             }
         }
     });
