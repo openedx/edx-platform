@@ -239,7 +239,7 @@ FEATURES = {
     'ALLOW_PUBLIC_ACCOUNT_CREATION': True,
 
     # Whether or not the dynamic EnrollmentTrackUserPartition should be registered.
-    'ENABLE_ENROLLMENT_TRACK_USER_PARTITION': False,
+    'ENABLE_ENROLLMENT_TRACK_USER_PARTITION': True,
 }
 
 ENABLE_JASMINE = False

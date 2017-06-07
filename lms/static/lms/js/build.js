@@ -28,6 +28,7 @@
             'js/edxnotes/views/page_factory',
             'js/financial-assistance/financial_assistance_form_factory',
             'js/groups/views/cohorts_dashboard_factory',
+            'js/discussions_management/views/discussions_dashboard_factory',
             'js/header_factory',
             'js/learner_dashboard/program_details_factory',
             'js/learner_dashboard/program_list_factory',
