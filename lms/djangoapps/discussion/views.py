@@ -39,6 +39,8 @@ from django_comment_client.utils import (
     strip_none
 )
 from django_comment_common.utils import ThreadContext, get_course_discussion_settings, set_course_discussion_settings
+from lms.djangoapps.courseware.views.views import check_and_get_upgrade_link, get_cosmetic_verified_display_price
+
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from rest_framework import status
@@ -440,7 +442,9 @@ def _create_discussion_board_context(request, course_key, discussion_id=None, th
         'sort_preference': cc_user.default_sort_key,
         'category_map': course_settings["category_map"],
         'course_settings': course_settings,
-        'is_commentable_divided': is_commentable_divided(course_key, discussion_id, course_discussion_settings)
+        'is_commentable_divided': is_commentable_divided(course_key, discussion_id, course_discussion_settings),
+        'upgrade_link': check_and_get_upgrade_link(request, user, course.id),
+        'upgrade_price': get_cosmetic_verified_display_price(course),
     })
     return context
 
