@@ -5,6 +5,8 @@ import logging
 import random
 import course_tag.api as course_tag_api
 
+from eventtracking import tracker
+
 from xmodule.partitions.partitions import UserPartitionError, NoSuchUserPartitionGroupError
 
 log = logging.getLogger(__name__)
@@ -88,6 +90,7 @@ class RandomUserPartitionScheme(object):
                 # FYI - context is always user ID that is logged in, NOT the user id that is
                 # being operated on. If instructor can move user explicitly, then we should
                 # put in event_info the user id that is being operated on.
+                event_name = 'xmodule.partitions.assigned_user_to_partition'
                 event_info = {
                     'group_id': group.id,
                     'group_name': group.name,
@@ -96,7 +99,11 @@ class RandomUserPartitionScheme(object):
                 }
                 # pylint: disable=fixme
                 # TODO: Use the XBlock publish api instead
-                track_function('xmodule.partitions.assigned_user_to_partition', event_info)
+                with tracker.get_tracker().context(event_name, {}):
+                    tracker.emit(
+                        event_name,
+                        event_info,
+                    )
 
         return group
 
