@@ -235,12 +235,12 @@ define(['jquery', 'underscore', 'underscore.string', 'edx-ui-toolkit/js/utils/sp
                     });
 
                     it('can show a visibility modal for a child xblock if supported for the page', function() {
-                        var visibilityButtons, request;
+                        var accessButtons, request;
                         renderContainerPage(this, mockContainerXBlockHtml);
-                        visibilityButtons = containerPage.$('.wrapper-xblock .visibility-button');
+                        accessButtons = containerPage.$('.wrapper-xblock .access-button');
                         if (hasVisibilityEditor) {
-                            expect(visibilityButtons.length).toBe(6);
-                            visibilityButtons[0].click();
+                            expect(accessButtons.length).toBe(6);
+                            accessButtons[0].click();
                             request = AjaxHelpers.currentRequest(requests);
                             expect(str.startsWith(request.url, '/xblock/locator-component-A1/visibility_view'))
                                 .toBeTruthy();
@@ -251,7 +251,7 @@ define(['jquery', 'underscore', 'underscore.string', 'edx-ui-toolkit/js/utils/sp
                             expect(EditHelpers.isShowingModal()).toBeTruthy();
                         }
                         else {
-                            expect(visibilityButtons.length).toBe(0);
+                            expect(accessButtons.length).toBe(0);
                         }
                     });
 

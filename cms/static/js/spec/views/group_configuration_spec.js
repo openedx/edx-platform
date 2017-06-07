@@ -76,7 +76,7 @@ define([
         expect(view.$('.delete')).toHaveClass('is-disabled');
         expect(view.$(SELECTORS.usageText)).not.toExist();
         expect(view.$(SELECTORS.usageUnit)).not.toExist();
-        expect(view.$(SELECTORS.usageCount)).toContainText('Used in 2 units');
+        expect(view.$(SELECTORS.usageCount)).toContainText('Used in 2 locations');
     };
     var setUsageInfo = function(model) {
         model.set('usage', [
