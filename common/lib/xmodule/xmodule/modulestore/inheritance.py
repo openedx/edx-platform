@@ -50,12 +50,8 @@ class InheritanceMixin(XBlockMixin):
         default=False,
         scope=Scope.settings,
     )
-    unit_division_access_scheme = List(
-        help=_(""),
-        scope=Scope.settings
-    )
     unit_division_access_groups = List(
-        help=_(""),
+        help=_("Group IDs in this list will only be seen by users in those groups"),
         scope=Scope.settings
     )
     course_edit_method = String(
