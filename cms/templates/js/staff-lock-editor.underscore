@@ -29,4 +29,70 @@
         </li>
     </ul>
 </div>
+<br>
+
+<% if (xblockInfo.isVertical()) { %>
+    <h3 class="modal-section-title">
+        <%- gettext('Unit Access') %>
+    </h3>
+    <div class="modal-section-content access-change">
+        <ul class="list-fields list-input">
+          <li>
+            Restrict access to:
+            <select id="content_access_restriction">
+              <option value="no-restriction">Choose one</option>
+              <option value="enrollment-track">Enrollment track</option>
+              <option value="content-group">Content group</option>
+            </select>
+          </li>
+          <br>
+          <div id="enrollment-track-select">
+              <p>
+                  Select an enrollment track:
+              </p>
+              <li class="field field-checkbox checkbox-cosmetic">
+                  <input type="checkbox" id="restrict_to_audit" name="restrict_to_audit" class="input input-checkbox" />
+                  <label for="restrict_to_audit" class="label">
+                    <span class="icon fa fa-check-square-o input-checkbox-checked" aria-hidden="true"></span>
+                    <span class="icon fa fa-square-o input-checkbox-unchecked" aria-hidden="true"></span>
+                    <%- gettext('Audit learners') %>
+                  </label>
+              </li>
+              <br>
+              <li class="field field-checkbox checkbox-cosmetic">
+                  <input type="checkbox" id="restrict_to_verified" name="restrict_to_verified" class="input input-checkbox" />
+                  <label for="restrict_to_verified" class="label">
+                    <span class="icon fa fa-check-square-o input-checkbox-checked" aria-hidden="true"></span>
+                    <span class="icon fa fa-square-o input-checkbox-unchecked" aria-hidden="true"></span>
+                    <%- gettext('Verified learners') %>
+                  </label>
+              </li>
+          </div>
+
+          <div id="content-group-select">
+              <% if (contentGroups.length > 0) { %>
+                  <p>
+                      Select one or more groups:
+                  </p>
+                  <% _.each(contentGroups, function(group) { %>
+                      <li class="field field-checkbox checkbox-cosmetic">
+                          <input type="checkbox" id="content-group-<%= group.id %>" name="content-group-<%= group.id %>" class="input input-checkbox" />
+                          <label for="content-group-<%= group.id %>" class="label">
+                            <span class="icon fa fa-check-square-o input-checkbox-checked" aria-hidden="true"></span>
+                            <span class="icon fa fa-square-o input-checkbox-unchecked" aria-hidden="true"></span>
+                            <%- group.name %>
+                          </label>
+                      </li>
+                      <br>
+                  <% }) %>
+                  <br>
+              <% } else { %>
+                  <p>
+                      You have not set up any content groups yet.
+                  </p>
+              <% } %>
+          </div>
+        </ul>
+    </div>
+ <% } %>
 </form>
