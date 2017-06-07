@@ -151,6 +151,9 @@
     }
 
     .modal-section-content {
+      .user-partition-group-checkboxes {
+        min-height: 95px;
+      }
 
       .list-fields, .list-actions {
         display: inline-block;
@@ -191,10 +194,10 @@
       }
 
       a {
-        color: $blue;
+        color: $blue-d2;
 
         &:hover {
-          color: $blue-s2;
+          color: $blue-d4;
         }
       }
     }
@@ -700,7 +703,7 @@
       }
     }
 
-    .edit-staff-lock, .edit-content-visibility {
+    .edit-staff-lock, .edit-content-visibility, .edit-unit-access {
       margin-bottom: $baseline;
 
       .tip {
@@ -710,7 +713,7 @@
     }
 
     // UI: staff lock section
-    .edit-staff-lock, .edit-settings-timed-examination {
+    .edit-staff-lock, .edit-settings-timed-examination, .edit-unit-access {
 
       .checkbox-cosmetic .input-checkbox {
         @extend %cont-text-sr;
@@ -774,6 +777,46 @@
     .edit-settings-access {
       .gating-prereq {
         margin-bottom: 10px;
+      }
+    }
+  }
+
+  .edit-unit-access, .edit-staff-lock {
+    .modal-section-content {
+      @include font-size(16);
+
+      .group-select-title {
+        font-weight: font-weight(semi-bold);
+        font-size: inherit;
+        margin-bottom: ($baseline/4);
+
+        .user-partition-select {
+          font-size: inherit;
+        }
+      }
+
+      .partition-group-directions {
+        padding-top: ($baseline/2);
+      }
+
+      .label {
+
+        &.deleted {
+          color: $red;
+        }
+
+        font-size: inherit;
+        @include margin-left($baseline/4);
+      }
+
+      .deleted-group-message {
+        display: block;
+        color: $red;
+        @include font-size(14);
+      }
+
+      .field {
+        margin-top: ($baseline/4);
       }
     }
   }

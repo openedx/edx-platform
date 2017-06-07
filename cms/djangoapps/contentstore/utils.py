@@ -431,7 +431,7 @@ def get_user_partition_info(xblock, schemes=None, course=None):
     return partitions
 
 
-def get_visibility_partition_info(xblock):
+def get_visibility_partition_info(xblock, course=None):
     """
     Retrieve user partition information for the component visibility editor.
 
@@ -440,12 +440,16 @@ def get_visibility_partition_info(xblock):
     Arguments:
         xblock (XBlock): The component being edited.
 
+        course (XBlock): The course descriptor.  If provided, uses this to look up the user partitions
+            instead of loading the course.  This is useful if we're calling this function multiple
+            times for the same course want to minimize queries to the modulestore.
+
     Returns: dict
 
     """
     selectable_partitions = []
     # We wish to display enrollment partitions before cohort partitions.
-    enrollment_user_partitions = get_user_partition_info(xblock, schemes=["enrollment_track"])
+    enrollment_user_partitions = get_user_partition_info(xblock, schemes=["enrollment_track"], course=course)
 
     # For enrollment partitions, we only show them if there is a selected group or
     # or if the number of groups > 1.
@@ -454,7 +458,7 @@ def get_visibility_partition_info(xblock):
             selectable_partitions.append(partition)
 
     # Now add the cohort user partitions.
-    selectable_partitions = selectable_partitions + get_user_partition_info(xblock, schemes=["cohort"])
+    selectable_partitions = selectable_partitions + get_user_partition_info(xblock, schemes=["cohort"], course=course)
 
     # Find the first partition with a selected group. That will be the one initially enabled in the dialog
     # (if the course has only been added in Studio, only one partition should have a selected group).
