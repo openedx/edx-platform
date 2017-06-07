@@ -2,58 +2,48 @@
 """
 Tests courseware views.py
 """
-
-from urllib import urlencode, quote
-import ddt
-import json
 import itertools
+import json
 import unittest
-from uuid import uuid4
 from datetime import datetime, timedelta
 from HTMLParser import HTMLParser
-from nose.plugins.attrib import attr
-from freezegun import freeze_time
+from urllib import quote, urlencode
+from uuid import uuid4
 
+import courseware.views.views as views
+import ddt
+import shoppingcart
+from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
+from certificates import api as certs_api
+from certificates.models import CertificateGenerationConfiguration, CertificateStatuses
+from certificates.tests.factories import CertificateInvalidationFactory, GeneratedCertificateFactory
+from commerce.models import CommerceConfiguration
+from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
+from courseware.access_utils import is_course_open_for_learner
+from courseware.model_data import FieldDataCache, set_score
+from courseware.module_render import get_module
+from courseware.tests.factories import GlobalStaffFactory, StudentModuleFactory
+from courseware.testutils import RenderXBlockTestMixin
+from courseware.url_helpers import get_redirect_url
+from courseware.user_state_client import DjangoXBlockUserStateClient
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseBadRequest
 from django.test import TestCase
-from django.test.client import RequestFactory
-from django.test.client import Client
+from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
-from mock import MagicMock, patch, create_autospec, PropertyMock
-from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
-from pytz import UTC
-from xblock.core import XBlock
-from xblock.fields import String, Scope
-from xblock.fragment import Fragment
-
-from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from courseware.model_data import FieldDataCache
-from courseware.module_render import get_module
-import courseware.views.views as views
-import shoppingcart
-from certificates import api as certs_api
-from certificates.models import CertificateStatuses, CertificateGenerationConfiguration
-from certificates.tests.factories import (
-    CertificateInvalidationFactory,
-    GeneratedCertificateFactory
-)
-from commerce.models import CommerceConfiguration
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
-from courseware.access_utils import is_course_open_for_learner
-from courseware.model_data import set_score
-from courseware.testutils import RenderXBlockTestMixin
-from courseware.tests.factories import StudentModuleFactory, GlobalStaffFactory
-from courseware.url_helpers import get_redirect_url
-from courseware.user_state_client import DjangoXBlockUserStateClient
+from freezegun import freeze_time
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
-from lms.djangoapps.grades.config.waffle import waffle as grades_waffle, ASSUME_ZERO_GRADE_IF_ABSENT
+from lms.djangoapps.grades.config.waffle import waffle as grades_waffle
+from lms.djangoapps.grades.config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT
 from milestones.tests.utils import MilestonesTestCaseMixin
+from mock import MagicMock, PropertyMock, create_autospec, patch
+from nose.plugins.attrib import attr
+from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
-from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory, CourseRunFactory
+from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory, ProgramFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.credit.api import set_credit_requirements
@@ -62,16 +52,24 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.gating import api as gating_api
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
+from pytz import UTC
 from student.models import CourseEnrollment
-from student.tests.factories import AdminFactory, UserFactory, CourseEnrollmentFactory
-from util.tests.test_date_utils import fake_ugettext, fake_pgettext
+from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
+from util.tests.test_date_utils import fake_pgettext, fake_ugettext
 from util.url import reload_django_url_config
 from util.views import ensure_valid_course_key
+from waffle.testutils import override_flag
+from xblock.core import XBlock
+from xblock.fields import Scope, String
+from xblock.fragment import Fragment
 from xmodule.graders import ShowCorrectness
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_MIXED_MODULESTORE,
+    ModuleStoreTestCase,
+    SharedModuleStoreTestCase
+)
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
 
@@ -521,9 +519,23 @@ class ViewsTestCase(ModuleStoreTestCase):
         mock_user.is_authenticated.return_value = False
         self.assertEqual(views.user_groups(mock_user), [])
 
+    # TODO: TNL-6546: Remove decorator for unified_course_view
+    @override_flag('unified_course_view', active=True)
     def test_get_redirect_url(self):
-        self.assertIn(
-            'activate_block_id',
+        # test the course location
+        self.assertEqual(
+            u'/courses/{course_key}/courseware?{activate_block_id}'.format(
+                course_key=self.course_key.to_deprecated_string(),
+                activate_block_id=urlencode({'activate_block_id': self.course.location.to_deprecated_string()})
+            ),
+            get_redirect_url(self.course_key, self.course.location),
+        )
+        # test a section location
+        self.assertEqual(
+            u'/courses/{course_key}/courseware/Chapter_1/Sequential_1/?{activate_block_id}'.format(
+                course_key=self.course_key.to_deprecated_string(),
+                activate_block_id=urlencode({'activate_block_id': self.section.location.to_deprecated_string()})
+            ),
             get_redirect_url(self.course_key, self.section.location),
         )
 
