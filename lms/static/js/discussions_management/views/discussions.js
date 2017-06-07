@@ -37,12 +37,18 @@
 
                 render: function() {
                     var numberAvailableSchemes = this.discussionSettings.attributes.available_division_schemes.length;
+
                     HtmlUtils.setHtml(this.$el, this.template({
                         availableSchemes: this.getDivisionSchemeData(this.discussionSettings.attributes.division_scheme), //  eslint-disable-line max-len
                         layoutClass: numberAvailableSchemes === 2 ? THREE_COLUMN_CLASS : TWO_COLUMN_CLASS
                     }));
                     this.updateTopicVisibility(this.getSelectedScheme(), this.getTopicNav());
                     this.renderTopics();
+
+                    if (this.isSchemeAvailable(COHORT) ||
+                        (!this.isSchemeAvailable(COHORT) && this.getSelectedScheme() === COHORT)) {
+                        this.showCohortSchemeControl(true);
+                    }
                     return this;
                 },
 
@@ -88,6 +94,16 @@
                 },
 
                 cohortStateUpdate: function(state) {
+                    var cohortIndex;
+                    if (state.is_cohorted && !this.isSchemeAvailable(COHORT)) {
+                        this.discussionSettings.attributes.available_division_schemes.push(COHORT);
+                    } else if (!state.is_cohorted && this.getSelectedScheme() !== COHORT) {
+                        cohortIndex = this.discussionSettings.attributes.available_division_schemes.indexOf(COHORT);
+                        if (cohortIndex > -1) {
+                            this.discussionSettings.attributes.available_division_schemes.splice(cohortIndex, 1);
+                        }
+                    }
+
                     if (!this.isSchemeAvailable(ENROLLMENT_TRACK)) {
                         this.showDiscussionManagement(state.is_cohorted);
                     }
