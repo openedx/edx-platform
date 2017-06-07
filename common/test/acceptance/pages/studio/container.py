@@ -332,6 +332,16 @@ class ContainerPage(PageObject, HelpMixin):
         """
         return self.q(css=".xblock-message.information").first.text[0]
 
+    def get_xblock_access_message(self):
+        """
+        Returns a message detailing the access to the specified unit
+        """
+        access_message = self.q(css=".access-message").first
+        if access_message:
+            return access_message.text[0]
+        else:
+            return ""
+
     def is_inline_editing_display_name(self):
         """
         Return whether this container's display name is in its editable form.

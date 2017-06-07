@@ -458,6 +458,59 @@ class BaseGroupConfigurationsTest(ContainerBase):
         self.assertFalse(component.has_validation_error)
 
 
+class UnitAccessContainerTest(BaseGroupConfigurationsTest):
+    GROUP_RESTRICTED_MESSAGE = 'Access to this unit is restricted to: Dogs'
+
+    def _toggle_container_unit_access(self, group_ids, unit):
+        """
+        Toggle the unit level access on the course outline page
+        """
+        unit.toggle_unit_access('Content Groups', group_ids)
+
+    def _verify_container_unit_access_message(self, group_ids, expected_message):
+        """
+        Check that the container page displays the correct unit
+        access message.
+        """
+        self.outline.visit()
+        self.outline.expand_all_subsections()
+        unit = self.outline.section_at(0).subsection_at(0).unit_at(0)
+        self._toggle_container_unit_access(group_ids, unit)
+
+        container_page = self.go_to_unit_page()
+        self.assertEqual(str(container_page.get_xblock_access_message()), expected_message)
+
+    def test_default_selection(self):
+        """
+        Tests that no message is displayed when there are no
+        restrictions on the unit or components.
+        """
+        self._verify_container_unit_access_message([], '')
+
+    def test_restricted_components_message(self):
+        """
+        Test that the proper message is displayed when access to
+        some components is restricted.
+        """
+        container_page = self.go_to_unit_page()
+        html_component = container_page.xblocks[1]
+
+        # Initially set visibility to Dog group.
+        self.update_component(
+            html_component,
+            {'group_access': {self.id_base: [self.id_base + 1]}}
+        )
+
+        self._verify_container_unit_access_message([], self.GROUP_VISIBILITY_MESSAGE)
+
+    def test_restricted_access_message(self):
+        """
+        Test that the proper message is displayed when access to the
+        unit is restricted to a particular group.
+        """
+        self._verify_container_unit_access_message([self.id_base + 1], self.GROUP_RESTRICTED_MESSAGE)
+
+
 @attr(shard=3)
 class ContentGroupVisibilityModalTest(BaseGroupConfigurationsTest):
     """
@@ -484,18 +537,14 @@ class ContentGroupVisibilityModalTest(BaseGroupConfigurationsTest):
         Scenario: The component visibility modal can be set to be visible to all students and staff.
             Given I have a unit with one component
             When I go to the container page for that unit
-            And I open the visibility editor modal for that unit's component
-            And I select 'Dogs'
-            And I save the modal
-            Then the container page should display the content visibility warning
-            And I re-open the visibility editor modal for that unit's component
+            Then the container page should not display the content visibility warning by default.
+            If I then restrict access and save, and then I open the visibility editor modal for that unit's component
             And I select 'All Students and Staff'
             And I save the modal
             Then the visibility selection should be 'All Students and Staff'
-            And the container page should not display the content visibility warning
+            And the container page should still not display the content visibility warning
         """
         self.select_and_verify_saved(self.html_component, self.CONTENT_GROUP_PARTITION, ['Dogs'])
-        self.verify_visibility_set(self.html_component, True)
         self.select_and_verify_saved(self.html_component, self.ALL_LEARNERS_AND_STAFF)
         self.verify_visibility_set(self.html_component, False)
 
@@ -508,10 +557,8 @@ class ContentGroupVisibilityModalTest(BaseGroupConfigurationsTest):
             And I select 'Dogs'
             And I save the modal
             Then the visibility selection should be 'Dogs' and 'Specific Content Groups'
-            And the container page should display the content visibility warning
         """
         self.select_and_verify_saved(self.html_component, self.CONTENT_GROUP_PARTITION, ['Dogs'])
-        self.verify_visibility_set(self.html_component, True)
 
     def test_select_multiple_content_groups(self):
         """
@@ -522,10 +569,8 @@ class ContentGroupVisibilityModalTest(BaseGroupConfigurationsTest):
             And I select 'Dogs' and 'Cats'
             And I save the modal
             Then the visibility selection should be 'Dogs', 'Cats', and 'Specific Content Groups'
-            And the container page should display the content visibility warning
         """
         self.select_and_verify_saved(self.html_component, self.CONTENT_GROUP_PARTITION, ['Dogs', 'Cats'])
-        self.verify_visibility_set(self.html_component, True)
 
     def test_select_zero_content_groups(self):
         """
@@ -581,12 +626,10 @@ class ContentGroupVisibilityModalTest(BaseGroupConfigurationsTest):
             Then I should see a validation error message on that unit's component
             And I open the visibility editor modal for that unit's component
             Then I should see that I have selected multiple deleted groups
-            And the container page should display the content visibility warning
-            And I de-select the missing groups
+            And then if I de-select the missing groups
             And I save the modal
             Then the visibility selection should be the names of the valid groups.
             And I should not see any validation errors on the component
-            And the container page should display the content visibility warning
         """
         self.update_component(
             self.html_component,
@@ -603,7 +646,6 @@ class ContentGroupVisibilityModalTest(BaseGroupConfigurationsTest):
         expected_groups = ['Dogs', 'Cats']
         self.verify_current_groups_message(visibility_editor, ", ".join(expected_groups))
         self.verify_selected_groups(visibility_editor, expected_groups)
-        self.verify_visibility_set(self.html_component, True)
 
     def _verify_and_remove_missing_content_groups(self, current_groups_message, all_group_labels):
         self.verify_component_validation_error(self.html_component)

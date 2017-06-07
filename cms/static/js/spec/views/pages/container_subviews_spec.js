@@ -108,18 +108,6 @@ define(['jquery', 'underscore', 'underscore.string', 'edx-ui-toolkit/js/utils/sp
                     fetch({published: false});
                     expect(containerPage.$(viewPublishedCss)).toHaveClass(disabledCss);
                 });
-
-                it('updates when has_partition_group_components attribute changes', function() {
-                    renderContainerPage(this, mockContainerXBlockHtml);
-                    fetch({has_partition_group_components: false});
-                    expect(containerPage.$(visibilityNoteCss).length).toBe(0);
-
-                    fetch({has_partition_group_components: true});
-                    expect(containerPage.$(visibilityNoteCss).length).toBe(1);
-
-                    fetch({has_partition_group_components: false});
-                    expect(containerPage.$(visibilityNoteCss).length).toBe(0);
-                });
             });
 
             describe('Publisher', function() {

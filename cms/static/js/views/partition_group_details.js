@@ -68,10 +68,10 @@ define([
                 /* globals ngettext */
                 return StringUtils.interpolate(ngettext(
                     /*
-                        Translators: 'count' is number of units that the group
+                        Translators: 'count' is number of locations that the group
                         configuration is used in.
                     */
-                    'Used in {count} unit', 'Used in {count} units',
+                    'Used in {count} location', 'Used in {count} locations',
                     count
                 ),
                     {count: count}

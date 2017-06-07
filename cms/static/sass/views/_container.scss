@@ -55,6 +55,14 @@
             }
           }
         }
+
+        .container-unit-access {
+          @include font-size(14);
+          line-height: 1.5;
+          white-space: normal;
+          color: #707070;
+          font-weight: font-weight(semi-bold);
+        }
       }
 
       &.has-actions {
