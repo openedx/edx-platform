@@ -25,6 +25,7 @@ from lms.djangoapps.instructor_task.api import (
     submit_detailed_enrollment_features_csv,
     submit_executive_summary_report,
     submit_export_ora2_data,
+    submit_override_problem_score_for_student,
     submit_rescore_entrance_exam_for_student,
     submit_rescore_problem_for_all_students,
     submit_rescore_problem_for_student,
@@ -159,6 +160,7 @@ class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
         ),
         (submit_reset_problem_attempts_in_entrance_exam, 'reset_problem_attempts', {'student': True}),
         (submit_delete_entrance_exam_state_for_student, 'delete_problem_state', {'student': True}),
+        (submit_override_problem_score_for_student, 'override_problem_score', {'student': True, 'score': 0})
     )
     @ddt.unpack
     def test_submit_task(self, task_function, expected_task_type, params=None):

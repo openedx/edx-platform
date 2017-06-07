@@ -56,7 +56,7 @@ ${block_content}
 <div aria-hidden="true" role="dialog" tabindex="-1" class="modal staff-modal" id="${element_id}_debug" >
   <div class="inner-wrapper">
     <header>
-      <h2>${_('Staff Debug')}</h2>
+      <h2>${_('Staff Debug:')} ${dict(fields)['display_name']}</h2>
     </header>
 
     <hr />
@@ -66,6 +66,13 @@ ${block_content}
         <label for="sd_fu_${location.name | h}">${_('Username')}:</label>
         <input type="text" tabindex="0" id="sd_fu_${location.name | h}" placeholder="${user.username}"/>
       </div>
+      % if can_override_problem_score:
+      <div>
+        <label for="sd_fs_${location.name | h}">${_('Score (for override only)')}:</label>
+        <input type="text" tabindex="0" id="sd_fs_${location.name | h}" placeholder="0"/>
+        <label for="sd_fs_${location.name | h}"> / ${max_problem_score}</label>
+      </div>
+      % endif
       <div data-location="${location | h}" data-location-name="${location.name | h}">
         [
         % if can_reset_attempts:
@@ -79,6 +86,10 @@ ${block_content}
         <button type="button" class="btn-link staff-debug-rescore">${_('Rescore Learner\'s Submission')}</button>
         |
         <button type="button" class="btn-link staff-debug-rescore-if-higher">${_('Rescore Only If Score Improves')}</button>
+        |
+        % endif
+        % if can_override_problem_score:
+        <button type="button" class="btn-link staff-debug-override-score">${_('Override Score')}</button>
         % endif
         % endif
         ]

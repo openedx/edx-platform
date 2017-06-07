@@ -331,6 +331,7 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     rescore = module_attr('rescore')
     reset_problem = module_attr('reset_problem')
     save_problem = module_attr('save_problem')
+    set_score = module_attr('set_score')
     set_state_from_lcp = module_attr('set_state_from_lcp')
     should_show_submit_button = module_attr('should_show_submit_button')
     should_show_reset_button = module_attr('should_show_reset_button')

@@ -2152,6 +2152,48 @@ def rescore_problem(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
+@require_post_params(problem_to_reset="problem urlname to reset", score='overriding score')
+@common_exceptions_400
+def override_problem_score(request, course_id):
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    score = strip_if_string(request.POST.get('score'))
+    problem_to_reset = strip_if_string(request.POST.get('problem_to_reset'))
+    student_identifier = request.POST.get('unique_student_identifier', None)
+
+    if not (problem_to_reset and student_identifier):
+        return HttpResponseBadRequest("Missing query parameters.")
+
+    if student_identifier is not None:
+        student = get_student_from_identifier(student_identifier)
+    else:
+        return HttpResponseBadRequest("Invalid student ID.")
+
+    try:
+        module_state_key = course_id.make_usage_key_from_deprecated_string(problem_to_reset)
+    except InvalidKeyError:
+        return HttpResponseBadRequest("Unable to parse problem id")
+
+    response_payload = {'problem_to_reset': problem_to_reset}
+    response_payload['student'] = student_identifier
+    try:
+        lms.djangoapps.instructor_task.api.submit_override_problem_score_for_student(
+            request,
+            module_state_key,
+            student,
+            score,
+        )
+    except NotImplementedError as exc:
+        return HttpResponseBadRequest(exc.message)
+
+    response_payload['task'] = 'created'
+    return JsonResponse(response_payload)
+
+
+@transaction.non_atomic_requests
+@require_POST
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('instructor')
 @common_exceptions_400
 def rescore_entrance_exam(request, course_id):
     """

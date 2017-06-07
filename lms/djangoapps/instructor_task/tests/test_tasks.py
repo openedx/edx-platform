@@ -25,7 +25,8 @@ from lms.djangoapps.instructor_task.tasks import (
     export_ora2_data,
     generate_certificates,
     rescore_problem,
-    reset_problem_attempts
+    reset_problem_attempts,
+    override_problem_score
 )
 from lms.djangoapps.instructor_task.tasks_helper.misc import upload_ora2_data
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
@@ -54,7 +55,9 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         self.instructor = self.create_instructor('instructor')
         self.location = self.problem_location(PROBLEM_URL_NAME)
 
-    def _create_input_entry(self, student_ident=None, use_problem_url=True, course_id=None, only_if_higher=False):
+    def _create_input_entry(
+            self, student_ident=None, use_problem_url=True, course_id=None, only_if_higher=False, score=None
+    ):
         """Creates a InstructorTask entry for testing."""
         task_id = str(uuid4())
         task_input = {'only_if_higher': only_if_higher}
@@ -62,6 +65,8 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
             task_input['problem_url'] = self.location
         if student_ident is not None:
             task_input['student'] = student_ident
+        if score is not None:
+            task_input['score'] = score
 
         course_id = course_id or self.course.id
         instructor_task = InstructorTaskFactory.create(course_id=course_id,
@@ -218,6 +223,115 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         self.assertEquals(output['exception'], 'TestTaskFailure')
         self.assertEquals(output['message'], expected_message)
         self.assertEquals(output['traceback'][-3:], "...")
+
+
+class TestOverrideScoreInstructorTask(TestInstructorTasks):
+    """Tests instructor task to override learner's problem score"""
+    def assert_task_output(self, output, **expected_output):
+        """
+        Check & compare output of the task
+        """
+        self.assertEqual(output.get('total'), expected_output.get('total'))
+        self.assertEqual(output.get('attempted'), expected_output.get('attempted'))
+        self.assertEqual(output.get('succeeded'), expected_output.get('succeeded'))
+        self.assertEqual(output.get('skipped'), expected_output.get('skipped'))
+        self.assertEqual(output.get('failed'), expected_output.get('failed'))
+        self.assertEqual(output.get('action_name'), expected_output.get('action_name'))
+        self.assertGreater(output.get('duration_ms'), expected_output.get('duration_ms', 0))
+
+    def get_task_output(self, task_id):
+        """Get and load instructor task output"""
+        entry = InstructorTask.objects.get(id=task_id)
+        return json.loads(entry.task_output)
+
+    def test_override_missing_current_task(self):
+        self._test_missing_current_task(override_problem_score)
+
+    def test_override_undefined_course(self):
+        self._test_undefined_course(override_problem_score)
+
+    def test_override_undefined_problem(self):
+        self._test_undefined_problem(override_problem_score)
+
+    def test_override_with_no_state(self):
+        self._test_run_with_no_state(override_problem_score, 'overridden')
+
+    def test_override_with_failure(self):
+        self._test_run_with_failure(override_problem_score, 'We expected this to fail')
+
+    def test_override_with_long_error_msg(self):
+        self._test_run_with_long_error_msg(override_problem_score)
+
+    def test_override_with_short_error_msg(self):
+        self._test_run_with_short_error_msg(override_problem_score)
+
+    def test_overriding_non_scorable(self):
+        input_state = json.dumps({'done': True})
+        num_students = 1
+        self._create_students_with_state(num_students, input_state)
+        task_entry = self._create_input_entry(score=0)
+        mock_instance = MagicMock()
+        del mock_instance.set_score
+        with patch(
+                'lms.djangoapps.instructor_task.tasks_helper.module_state.get_module_for_descriptor_internal') as mock_get_module:
+            mock_get_module.return_value = mock_instance
+            with self.assertRaises(UpdateProblemModuleStateError):
+                self._run_task_with_mock_celery(override_problem_score, task_entry.id, task_entry.task_id)
+        # check values stored in table:
+        entry = InstructorTask.objects.get(id=task_entry.id)
+        output = json.loads(entry.task_output)
+        self.assertEquals(output['exception'], "UpdateProblemModuleStateError")
+        self.assertEquals(output['message'], "Score override is only valid for scorable components.")
+        self.assertGreater(len(output['traceback']), 0)
+
+    def test_overriding_unaccessable(self):
+        """
+        Tests rescores a problem in a course, for all students fails if user has answered a
+        problem to which user does not have access to.
+        """
+        input_state = json.dumps({'done': True})
+        num_students = 1
+        self._create_students_with_state(num_students, input_state)
+        task_entry = self._create_input_entry(score=0)
+        with patch('lms.djangoapps.instructor_task.tasks_helper.module_state.get_module_for_descriptor_internal',
+                   return_value=None):
+            self._run_task_with_mock_celery(override_problem_score, task_entry.id, task_entry.task_id)
+
+        self.assert_task_output(
+            output=self.get_task_output(task_entry.id),
+            total=num_students,
+            attempted=num_students,
+            succeeded=0,
+            skipped=0,
+            failed=num_students,
+            action_name='overridden'
+        )
+
+    def test_overriding_success(self):
+        """
+        Tests rescores a problem in a course, for all students succeeds.
+        """
+        mock_instance = MagicMock()
+        getattr(mock_instance, 'override_problem_score').return_value = None
+
+        num_students = 10
+        self._create_students_with_state(num_students)
+        task_entry = self._create_input_entry(score=0)
+        with patch(
+                'lms.djangoapps.instructor_task.tasks_helper.module_state.get_module_for_descriptor_internal'
+        ) as mock_get_module:
+            mock_get_module.return_value = mock_instance
+            self._run_task_with_mock_celery(override_problem_score, task_entry.id, task_entry.task_id)
+
+        self.assert_task_output(
+            output=self.get_task_output(task_entry.id),
+            total=num_students,
+            attempted=num_students,
+            succeeded=num_students,
+            skipped=0,
+            failed=0,
+            action_name='overridden'
+        )
 
 
 @attr(shard=3)

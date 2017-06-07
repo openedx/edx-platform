@@ -6,6 +6,7 @@ import time
 import dateutil.parser
 from pytz import UTC
 from xblock.fields import JSONField
+from xblock.scorable import Score
 
 log = logging.getLogger(__name__)
 
@@ -252,3 +253,19 @@ class RelativeTime(JSONField):
             return value
 
         return self.from_json(value)
+
+
+class ScoreField(JSONField):
+    def from_json(self, value):
+        if value is None:
+            return value
+        if isinstance(value, Score):
+            return value
+
+        keys = value.keys()
+        if 'raw_earned' not in keys or 'raw_possible' not in keys:
+            raise TypeError('Scores must contain only a raw earned and raw possible value')
+
+        return Score(raw_earned=value['raw_earned'], raw_possible=value['raw_possible'])
+
+    enforce_type = from_json

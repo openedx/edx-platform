@@ -45,6 +45,7 @@ from lms.djangoapps.instructor_task.tasks_helper.misc import (
 from lms.djangoapps.instructor_task.tasks_helper.module_state import (
     delete_problem_module_state,
     perform_module_state_update,
+    override_problem_score_module_state,
     rescore_problem_module_state,
     reset_attempts_module_state
 )
@@ -75,6 +76,19 @@ def rescore_problem(entry_id, xmodule_instance_args):
     # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
     action_name = ugettext_noop('rescored')
     update_fcn = partial(rescore_problem_module_state, xmodule_instance_args)
+
+    visit_fcn = partial(perform_module_state_update, update_fcn, None)
+    return run_main_task(entry_id, visit_fcn, action_name)
+
+
+@task(base=BaseInstructorTask)  # pylint: disable=not-callable
+def override_problem_score(entry_id, xmodule_instance_args):
+    """
+    Overrides a specific learner's score on a problem.
+    """
+    # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
+    action_name = ugettext_noop('overridden')
+    update_fcn = partial(override_problem_score_module_state, xmodule_instance_args)
 
     visit_fcn = partial(perform_module_state_update, update_fcn, None)
     return run_main_task(entry_id, visit_fcn, action_name)
