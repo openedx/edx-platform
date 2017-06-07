@@ -36,6 +36,8 @@ class CourseMetadata(object):
         'user_partitions',
         'name',  # from xblock
         'tags',  # from xblock
+        'unit_division_access_scheme',
+        'unit_division_access_groups',
         'visible_to_staff_only',
         'group_access',
         'pre_requisite_courses',
