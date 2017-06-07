@@ -1,0 +1,31 @@
+<%
+var selectedGroupsLabel = userPartitionInfo['selected_groups_label'];
+var selectedPartitionIndex = userPartitionInfo['selected_partition_index'];
+var category = this.model.attributes.category;
+var blockType = "";
+if (category == "vertical") {
+    blockType = gettext("unit")
+} else {
+    blockType = gettext("component")
+}
+%>
+<% if (selectedGroupsLabel) { %>
+    <span class="access-message"><%-
+        edx.StringUtils.interpolate(
+                // Translators: blockType refers to the type of the xblock that access is restricted to.
+                gettext('Access to this {blockType} is restricted to: {selectedGroupsLabel}'),
+                {
+                    selectedGroupsLabel: selectedGroupsLabel,
+                    blockType: blockType
+                }
+        ) %></span>
+<% } else if (hasPartitionGroupComponents) { %>
+     <span class="access-message"><%-
+         edx.StringUtils.interpolate(
+                    // Translators: blockType refers to the type of the xblock that access is restricted to.
+                    gettext('Access to some content in this {blockType} is restricted to specific groups of learners.'),
+                    {
+                        blockType: blockType
+                    }
+            ) %></span>
+<% } %>

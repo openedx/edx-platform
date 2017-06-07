@@ -30,7 +30,9 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
                         category: 'chapter',
                         display_name: 'Section',
                         children: []
-                    }
+                    },
+                    user_partitions: [],
+                    user_partition_info: {}
                 }, options, {child_info: {children: children}});
             };
 
@@ -50,7 +52,10 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
                         category: 'sequential',
                         display_name: 'Subsection',
                         children: []
-                    }
+                    },
+                    user_partitions: [],
+                    group_access: {},
+                    user_partition_info: {}
                 }, options, {child_info: {children: children}});
             };
 
@@ -76,7 +81,10 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
                         category: 'vertical',
                         display_name: 'Unit',
                         children: []
-                    }
+                    },
+                    user_partitions: [],
+                    group_access: {},
+                    user_partition_info: {}
                 }, options, {child_info: {children: children}});
             };
 
@@ -91,7 +99,10 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
                     published: true,
                     visibility_state: 'unscheduled',
                     edited_on: 'Jul 02, 2014 at 20:56 UTC',
-                    edited_by: 'MockUser'
+                    edited_by: 'MockUser',
+                    user_partitions: [],
+                    group_access: {},
+                    user_partition_info: {}
                 }, options);
             };
 
@@ -242,8 +253,9 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
                     'course-outline', 'xblock-string-field-editor', 'modal-button',
                     'basic-modal', 'course-outline-modal', 'release-date-editor',
                     'due-date-editor', 'grading-editor', 'publish-editor',
-                    'staff-lock-editor', 'content-visibility-editor', 'settings-modal-tabs',
-                    'timed-examination-preference-editor', 'access-editor', 'show-correctness-editor'
+                    'staff-lock-editor', 'unit-access-editor', 'content-visibility-editor',
+                    'settings-modal-tabs', 'timed-examination-preference-editor', 'access-editor',
+                    'show-correctness-editor'
                 ]);
                 appendSetFixtures(mockOutlinePage);
                 mockCourseJSON = createMockCourseJSON({}, [
@@ -1604,6 +1616,44 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
                     expect(messages.length).toBe(1);
                     expect(messages).toContainText(
                         'Access to some content in this unit is restricted to specific groups of learners'
+                    );
+                });
+
+                it('shows partition group information with group_access set', function() {
+                    var partitions = [
+                        {
+                            scheme: 'cohort',
+                            id: 1,
+                            groups: [
+                                {
+                                    deleted: false,
+                                    selected: true,
+                                    id: 2,
+                                    name: 'Group 2'
+                                },
+                                {
+                                    deleted: false,
+                                    selected: true,
+                                    id: 3,
+                                    name: 'Group 3'
+                                }
+                            ],
+                            name: 'Content Group Configuration'
+                        }
+                    ];
+                    var messages = getUnitStatus({
+                        has_partition_group_components: true,
+                        user_partitions: partitions,
+                        group_access: {1: [2, 3]},
+                        user_partition_info: {
+                            selected_partition_index: 1,
+                            selected_groups_label: '1, 2',
+                            selectable_partitions: partitions
+                        }
+                    });
+                    expect(messages.length).toBe(1);
+                    expect(messages).toContainText(
+                        'Access to this unit is restricted to'
                     );
                 });
 
