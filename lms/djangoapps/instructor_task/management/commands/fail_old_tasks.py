@@ -91,7 +91,8 @@ class Command(BaseCommand):
 
         for task in tasks:
             print(
-                "Queueing task '{task_id}', of type '{task_type}', created on '{created}', will be marked as 'FAILURE'".format(
+                "{task_state} task '{task_id}', of type '{task_type}', created on '{created}', will be marked as 'FAILURE'".format(
+                    task_state=task.task_state,
                     task_id=task.task_id,
                     task_type=task.task_type,
                     created=task.created,
@@ -103,7 +104,12 @@ class Command(BaseCommand):
                 task_state=FAILURE,
             )
             print("{tasks_updated} records updated.".format(
-                tasks_updated=tasks_updated)
-            )
+                tasks_updated=tasks_updated
+            ))
         else:
-            print("This was a dry run, so no records were updated.")
+            print(
+                "This was a dry run, so no records were updated. "
+                "If this command were run for real, {number} records would have been updated.".format(
+                    number=tasks.count()
+                )
+            )
