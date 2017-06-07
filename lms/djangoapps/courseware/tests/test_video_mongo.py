@@ -1128,8 +1128,8 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
         video module initialization.
         """
         self.initialize_module(
-                data='<video display_name="Video">[]</video>'
-            )
+            data='<video display_name="Video">[]</video>'
+        )
         self.assertTrue(self.item_descriptor.download_video)
         self.assertTrue(self.item_descriptor.download_track)
 
