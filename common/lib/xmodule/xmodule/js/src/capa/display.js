@@ -241,8 +241,9 @@
                         totalScore
                     );
                 }
-            } else if (attemptsUsed === 0 || totalScore === 0) {
+            } else if ((attemptsUsed === 0 || totalScore === 0) && curScore === 0) {
                 // Render 'x point(s) possible' if student has not yet attempted question
+                // But if staff has overridden score to a non-zero number, show it
                 if (graded) {
                     progressTemplate = ngettext(
                         // Translators: %(num_points)s is the number of points possible (examples: 1, 3, 10).;

@@ -46,6 +46,10 @@ urlpatterns = patterns(
         'lms.djangoapps.instructor.views.api.rescore_problem',
         name="rescore_problem"
     ), url(
+        r'^override_problem_score$',
+        'lms.djangoapps.instructor.views.api.override_problem_score',
+        name="override_problem_score"
+    ), url(
         r'^reset_student_attempts_for_entrance_exam$',
         'lms.djangoapps.instructor.views.api.reset_student_attempts_for_entrance_exam',
         name="reset_student_attempts_for_entrance_exam"

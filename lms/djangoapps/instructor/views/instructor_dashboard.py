@@ -567,6 +567,7 @@ def _section_student_admin(course, access):
             kwargs={'course_id': unicode(course_key)},
         ),
         'rescore_problem_url': reverse('rescore_problem', kwargs={'course_id': unicode(course_key)}),
+        'override_problem_score_url': reverse('override_problem_score', kwargs={'course_id': unicode(course_key)}),
         'rescore_entrance_exam_url': reverse('rescore_entrance_exam', kwargs={'course_id': unicode(course_key)}),
         'student_can_skip_entrance_exam_url': reverse(
             'mark_student_can_skip_entrance_exam',
