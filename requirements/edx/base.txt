@@ -17,13 +17,13 @@ defusedxml==0.4.1
 django-babel-underscore==0.5.1
 markey==0.8  # From django-babel-underscore
 django-celery==3.1.16
-django-config-models==0.1.3
+-e git+git://github.com/snowcrshd/django-config-models.git@lucas/OC-2387/django-1.10-support#egg=django-config-models==0.1.6
 django-countries==4.0
 django-extensions==1.5.9
 django-filter==0.11.0
 django-ipware==1.1.0
 django-mako==0.1.5pre
-django-model-utils==2.3.1
+django-model-utils==3.0.0
 django-mptt==0.7.4
 django-oauth-plus==2.2.8
 django-oauth-toolkit==0.10.0
@@ -52,7 +52,7 @@ edx-lint==0.4.3
 astroid==1.3.8
 edx-django-oauth2-provider==1.1.4
 edx-django-sites-extensions==2.1.1
-edx-enterprise==0.33.19
+-e git+git://github.com/snowcrshd/edx-enterprise.git@lucas/OC-2387/django-1.10-support#egg=edx-enterprise==0.34.4
 edx-oauth2-provider==1.2.0
 edx-opaque-keys==0.4.0
 edx-organizations==0.4.4
