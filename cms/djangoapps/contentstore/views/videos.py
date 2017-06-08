@@ -386,7 +386,7 @@ def videos_post(course, request):
     resp_files = []
 
     for req_file in req_files:
-        file_name = req_file["file_name"]
+        file_name = unicode(req_file["file_name"])
 
         try:
             file_name.encode('ascii')
