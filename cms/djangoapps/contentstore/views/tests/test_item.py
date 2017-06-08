@@ -1229,7 +1229,7 @@ class TestMoveItem(ItemTest):
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_move_item_not_found(self, store_type=ModuleStoreEnum.Type.mongo):
         """
-        Test that an item not found exception raised when an item is not found when getting the item.
+        Test that response status is 400 and proper message is shown when an item is not found when getting the item.
 
         Arguments:
             store_type (ModuleStoreEnum.Type): Type of modulestore to create test course in.
@@ -1240,12 +1240,15 @@ class TestMoveItem(ItemTest):
             'move_source_locator': unicode(self.usage_key.course_key.make_usage_key('html', 'html_test')),
             'parent_locator': unicode(self.vert2_usage_key)
         }
-        with self.assertRaises(ItemNotFoundError):
-            self.client.patch(
-                reverse('contentstore.views.xblock_handler'),
-                json.dumps(data),
-                content_type='application/json'
-            )
+        response = self.client.patch(
+            reverse('contentstore.views.xblock_handler'),
+            json.dumps(data),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 400)
+        response = json.loads(response.content)
+        error = "{source_usage_key} not found.".format(source_usage_key=data['move_source_locator'])
+        self.assertEqual(response['error'], error)
 
 
 class TestDuplicateItemWithAsides(ItemTest, DuplicateHelper):
