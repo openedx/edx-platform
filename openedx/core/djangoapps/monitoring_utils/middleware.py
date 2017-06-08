@@ -114,7 +114,11 @@ class MonitoringMemoryMiddleware(object):
         """
         Returns a formatted prefix for logging for the given request.
         """
-        return u"{} request '{} {} {}'".format(prefix, request.method, request.path, self._cache[self.guid_key])
+        # After a celery task runs, the request cache is cleared. So if celery
+        # tasks are running synchronously (CELERY_ALWAYS _EAGER), "guid_key"
+        # will no longer be in the request cache when process_response executes.
+        cached_guid = self._cache.get(self.guid_key) or u"without_guid"
+        return u"{} request '{} {} {}'".format(prefix, request.method, request.path, cached_guid)
 
     def _memory_data(self, log_prefix):
         """
