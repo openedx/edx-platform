@@ -329,7 +329,7 @@ class TestMultipleProblemTypesSubsectionScores(SharedModuleStoreTestCase):
     """
 
     SCORED_BLOCK_COUNT = 7
-    ACTUAL_TOTAL_POSSIBLE = 17.0
+    ACTUAL_TOTAL_POSSIBLE = 16.0   # solutions fork is using old version of DnD which does not count
 
     @classmethod
     def setUpClass(cls):
