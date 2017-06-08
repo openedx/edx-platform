@@ -26,6 +26,10 @@
     "%(cohort_name)s (%(user_count)s)": "%(cohort_name)s (%(user_count)s)", 
     "%(comments_count)s %(span_sr_open)scomments %(span_close)s": "%(comments_count)s %(span_sr_open)scommentaires %(span_close)s", 
     "%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s unread comments)%(span_close)s": "%(comments_count)s %(span_sr_open)scommentaires (%(unread_comments_count)s commentaires non lus)%(span_close)s", 
+    "%(earned)s/%(possible)s point (ungraded)": [
+      "%(earned)s/%(possible)s point (non not\u00e9)", 
+      "%(earned)s/%(possible)s points (non not\u00e9s)"
+    ], 
     "%(errorCount)s error found in form.": [
       "%(errorCount)s erreur trouv\u00e9e dans le formulaire.", 
       "%(errorCount)s erreurs trouv\u00e9es dans le formulaire."
@@ -35,6 +39,14 @@
     "%(memberCount)s / %(maxMemberCount)s Member": [
       "%(memberCount)s / %(maxMemberCount)s membre", 
       "%(memberCount)s / %(maxMemberCount)s membres"
+    ], 
+    "%(num_points)s point possible (ungraded)": [
+      "%(num_points)s point possible (non not\u00e9)", 
+      "%(num_points)s points possibles (non not\u00e9s)"
+    ], 
+    "%(num_points)s point possible (ungraded, results hidden)": [
+      "%(num_points)s point possible (non not\u00e9, r\u00e9sultats masqu\u00e9s)", 
+      "%(num_points)s points possible (non not\u00e9, r\u00e9sultats masqu\u00e9s)"
     ], 
     "%(num_questions)s question": [
       "%(num_questions)s question", 
@@ -262,7 +274,7 @@
     "Certificate name is required.": "Le nom du certificat est requis.", 
     "Certificate of <%= user %> has already been invalidated. Please check your spelling and retry.": "Le certificat de <%= user %> a d\u00e9j\u00e0 \u00e9t\u00e9 invalid\u00e9. Veuillez v\u00e9rifier votre saisie et r\u00e9essayer.", 
     "Change Manually": "Changer manuellement", 
-    "Change My Email Address": "Changer mon adresse email", 
+    "Change My Email Address": "Modifier mon adresse email", 
     "Change image": "Modifier l'image", 
     "Change the settings for {display_name}": "Modifier les param\u00e8tres pour {display_name}", 
     "Chapter Asset": "Ressource associ\u00e9e au chapitre", 
@@ -283,7 +295,6 @@
     "Check the highlighted fields below and try again.": "V\u00e9rifiez les champs en surbrillance ci-dessous et r\u00e9essayez.", 
     "Check this box to receive an email digest once a day notifying you about new, unread activity from posts you are following.": "Cocher cette case pour recevoir une fois par jour un e-mail r\u00e9capitulatif des nouveaut\u00e9s dans les fils de discussion que vous suivez.", 
     "Check your email": "V\u00e9rifiez votre email", 
-    "Check your email for an activation message.": "V\u00e9rifiez dans vos emails que vous avez re\u00e7u le message d'activation", 
     "Checkout": "Payer", 
     "Checkout with PayPal": "Payer avec PayPal", 
     "Checkout with {processor}": "Payer avec {processor}", 
@@ -492,8 +503,7 @@
     "Enter Due Date and Time": "Entrez la date et heure d'\u00e9ch\u00e9ance", 
     "Enter Start Date and Time": "Entrez la date et heure de d\u00e9but", 
     "Enter a student's username or email address.": "Entrez un nom d'utilisateur et un email.", 
-    "Enter a username or email.": "Entrez un nom d'utilisateur ou un email", 
-    "Enter email addresses and/or usernames, separated by new lines or commas, for the students you want to add. *": "Entrez les adresses \u00e9lectroniques et / ou les noms d'utilisateurs , s\u00e9par\u00e9s par des retours \u00e0 la ligne ou des virgules, pour les \u00e9tudiants que vous voulez ajouter. *", 
+    "Enter a username or email.": "Entrez un nom d'utilisateur ou un email.", 
     "Enter information to describe your team. You cannot change these details after you create the team.": "Saisissez une description de votre \u00e9quipe. Vous ne pourrez pas changer ces \u00e9l\u00e9ments une fois que l'\u00e9quipe est cr\u00e9\u00e9e.", 
     "Enter team description.": "Saisir la description de l'\u00e9quipe. ", 
     "Enter team name.": "Saisir le nom de l'\u00e9quipe.", 
@@ -501,7 +511,6 @@
     "Enter the name of the cohort": "Entrer le nom de la cohorte", 
     "Enter the page number you'd like to quickly navigate to.": "Saisissez le num\u00e9ro de la page que vous souhaitez atteindre rapidement.", 
     "Enter the username or email address of each learner that you want to add as an exception.": "Saisissez le nom d'utilisateur ou l'adresse email de chaque \u00e9tudiant que vous souhaitez ajouter comme exception.", 
-    "Enter username or email": "Veuillez saisir un nom d'utilisateur ou un email.", 
     "Entrance exam attempts is being reset for student '{student_id}'.": "Le nombre d'examens d'entr\u00e9e est r\u00e9initialis\u00e9 pour l'\u00e9tudiant '{student_id}'.", 
     "Entrance exam state is being deleted for student '{student_id}'.": "Effacement du status de l'examen d'entr\u00e9e pour l'\u00e9tudiant '{student_id}'.", 
     "Error": "Erreur", 
@@ -972,7 +981,6 @@
     "Restore last draft": "Restaurer le dernier brouillon", 
     "Retake Photo": "Reprendre une photo", 
     "Retake Your Photos": "Reprenez vos photos", 
-    "Return and add email address": "Retourner et ajouter une adresse e-mail", 
     "Return to Export": "Retourner \u00e0 l'exportation", 
     "Return to Your Dashboard": "Retour au Tableau de bord", 
     "Return to team listing": "Retour \u00e0 la liste des membres de l'\u00e9quipe", 
@@ -1078,7 +1086,7 @@
     "Strikethrough": "Barr\u00e9", 
     "Student": "\u00c9tudiant", 
     "Student Removed from certificate white list successfully.": "\u00c9tudiant retir\u00e9 avec succ\u00e8s de la liste blanche des certificats.", 
-    "Student email or username": "nom d'utilisateur ou adresse courriel", 
+    "Student email or username": "Nom d'utilisateur ou email", 
     "Studio's having trouble saving your work": "Studio a des probl\u00e8mes pour sauvegarder votre travail", 
     "Studio:": "Studio :", 
     "Style": "Style", 
@@ -1148,7 +1156,6 @@
     "The course start date must be later than the enrollment start date.": "La date de d\u00e9but de cours ne peut pas \u00eatre ant\u00e9rieure \u00e0 la date de d\u00e9but des inscriptions.", 
     "The data could not be saved.": "Les donn\u00e9es n'ont pas pu \u00eatre enregistr\u00e9es", 
     "The email address you use to sign in. Communications from {platform_name} and your courses are sent to this address.": "L'adresse email utilis\u00e9e \u00e0 l'inscription. Les communications de {platform_name} et des cours sont envoy\u00e9es \u00e0 cette adresse.", 
-    "The email address you've provided isn't formatted correctly.": "L'adresse e-mail que vous avez fournie est incorrecte.", 
     "The enrollment end date cannot be after the course end date.": "La date de fin des inscriptions ne peut pas \u00eatre post\u00e9rieure \u00e0 la date de fin du Cours.", 
     "The enrollment start date cannot be after the enrollment end date.": " La date de d\u00e9but des inscriptions ne peut pas \u00eatre post\u00e9rieure \u00e0 la date de fin des inscriptions.", 
     "The file must be at least {size} in size.": "Le fichier doit avoir une taille sup\u00e9rieure \u00e0 {size}.", 
@@ -1158,7 +1165,7 @@
     "The following users are no longer enrolled in the course:": "Les utilisateurs suivants ont \u00e9t\u00e9 d\u00e9sinscrits du cours\u00a0:", 
     "The following warnings were generated:": "Les avertissements suivants ont \u00e9t\u00e9 g\u00e9n\u00e9r\u00e9s:", 
     "The grading process is still running. Refresh the page to see updates.": "Le processus d'\u00e9valuation est toujours en cours. Rafra\u00eechir la page pour mettre \u00e0 jour.", 
-    "The language that team members primarily use to communicate with each other.": "La langue utilis\u00e9e par les membres de l'\u00e9quipe pour communiquer entre eux.", 
+    "The language that team members primarily use to communicate with each other.": "La langue principalement utilis\u00e9e par les membres de l'\u00e9quipe pour communiquer entre eux.", 
     "The language used throughout this site. This site is currently available in a limited number of languages.": "La langue utilis\u00e9e au travers du site. Le site est actuellement disponible dans un nombre limit\u00e9 de langues.", 
     "The minimum grade for course credit is not set.": "La note minimale d'obtention d'un cr\u00e9dit pour ce cours n'est pas fix\u00e9e.", 
     "The minimum score percentage must be a whole number between 0 and 100.": "Le score minimum en pourcentage doit-\u00eatre un nombre entier compris entre 0 et 100.", 
@@ -1330,7 +1337,8 @@
     "User": "Utilisateur", 
     "User Email": "Email de l'utilisateur", 
     "Username": "Nom d'utilisateur", 
-    "Username or email address": "Nom d'utilisateur ou adresse courriel", 
+    "Username or Email": "Nom d'utilisateur ou Email", 
+    "Username or email address": "Nom d'utilisateur ou adresse email", 
     "Users": "Utilisateurs", 
     "Users must create and activate their account before they can be promoted to beta tester.": "Les utilisateurs doivent cr\u00e9er et activer leur compte avant de pouvoir devenir des b\u00eata-testeurs.", 
     "V Align": "Alignement Vertical", 
