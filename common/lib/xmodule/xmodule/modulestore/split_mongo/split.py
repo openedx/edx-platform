@@ -2512,7 +2512,10 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             # Note that new_block_info now points to the same definition ID entry as source_block_info did
             existing_block_info = dest_structure['blocks'].get(new_block_key, BlockData())
             # Inherit the Scope.settings values from 'fields' to 'defaults'
-            new_block_info.defaults = new_block_info.fields
+            if new_block_info.defaults:
+                new_block_info.defaults.update(new_block_info.fields)
+            else:
+                new_block_info.defaults = new_block_info.fields
 
             # <workaround>
             # CAPA modules store their 'markdown' value (an alternate representation of their content)
