@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Helper functions for working with Programs."""
 import datetime
+import logging
 from collections import defaultdict
 from copy import deepcopy
 from itertools import chain
@@ -8,17 +9,21 @@ from urlparse import urljoin
 
 from dateutil.parser import parse
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.utils.functional import cached_property
+from edx_rest_api_client.exceptions import SlumberBaseException
 from opaque_keys.edx.keys import CourseKey
 from pytz import utc
+from requests.exceptions import ConnectionError, Timeout
 
 from course_modes.models import CourseMode
 from lms.djangoapps.certificates import api as certificate_api
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.access import has_access
 from openedx.core.djangoapps.catalog.utils import get_programs
+from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credentials.utils import get_credentials
 from student.models import CourseEnrollment
@@ -27,6 +32,8 @@ from xmodule.modulestore.django import modulestore
 
 # The datetime module's strftime() methods require a year >= 1900.
 DEFAULT_ENROLLMENT_START_DATE = datetime.datetime(1900, 1, 1, tzinfo=utc)
+
+log = logging.getLogger(__name__)
 
 
 def get_program_marketing_url(programs_config):
@@ -507,27 +514,25 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
             uuid=self.data['uuid']
         )
         program_instructors = cache.get(cache_key)
-        is_learner_eligible_for_one_click_purchase = self.data['is_program_eligible_for_one_click_purchase']
 
         for course in self.data['courses']:
             self._execute('_collect_course', course)
             if not program_instructors:
                 for course_run in course['course_runs']:
                     self._execute('_collect_instructors', course_run)
-            if is_learner_eligible_for_one_click_purchase:
-                is_learner_eligible_for_one_click_purchase = not any(
-                    course_run['is_enrolled'] for course_run in course['course_runs']
-                )
 
         if not program_instructors:
             # We cache the program instructors list to avoid repeated modulestore queries
             program_instructors = self.instructors.values()
             cache.set(cache_key, program_instructors, 3600)
 
-        self.data.update({
-            'instructors': program_instructors,
-            'is_learner_eligible_for_one_click_purchase': is_learner_eligible_for_one_click_purchase,
-        })
+        self.data['instructors'] = program_instructors
+
+    def extend(self):
+        """Execute extension handlers, returning the extended data."""
+        self.data.update(super(ProgramMarketingDataExtender, self).extend())
+        self._collect_one_click_purchase_eligibility_data()
+        return self.data
 
     @classmethod
     def _handlers(cls, prefix):
@@ -582,3 +587,53 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
             self.instructors.update(
                 {instructor.get('name'): instructor for instructor in course_instructors.get('instructors', [])}
             )
+
+    def _collect_one_click_purchase_eligibility_data(self):
+        """
+        Extend the program data with data about learner's eligibility for one click purchase,
+        discount data of the program and SKUs of seats that should be added to basket.
+        """
+        applicable_seat_types = self.data['applicable_seat_types']
+        is_learner_eligible_for_one_click_purchase = self.data['is_program_eligible_for_one_click_purchase']
+        skus = []
+        if is_learner_eligible_for_one_click_purchase:
+            for course in self.data['courses']:
+                is_learner_eligible_for_one_click_purchase = not any(
+                    course_run['is_enrolled'] for course_run in course['course_runs']
+                )
+                if is_learner_eligible_for_one_click_purchase:
+                    published_course_runs = filter(lambda run: run['status'] == 'published', course['course_runs'])
+                    if len(published_course_runs) == 1:
+                        for seat in published_course_runs[0]['seats']:
+                            if seat['type'] in applicable_seat_types:
+                                skus.append(seat['sku'])
+                    else:
+                        # If a course in the program has more than 1 published course run
+                        # learner won't be eligible for a one click purchase.
+                        is_learner_eligible_for_one_click_purchase = False
+                        skus = []
+                        break
+                else:
+                    skus = []
+                    break
+
+        if skus:
+            try:
+                User = get_user_model()
+                service_user = User.objects.get(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME)
+                api = ecommerce_api_client(service_user)
+
+                # Make an API call to calculate the discounted price
+                discount_data = api.baskets.calculate.get(sku=skus)
+
+                self.data.update({
+                    'discount_data': discount_data,
+                    'full_program_price': discount_data['total_incl_tax']
+                })
+            except (ConnectionError, SlumberBaseException, Timeout):
+                log.exception('Failed to get discount price for following product SKUs: %s ', ', '.join(skus))
+
+        self.data.update({
+            'is_learner_eligible_for_one_click_purchase': is_learner_eligible_for_one_click_purchase,
+            'skus': skus,
+        })

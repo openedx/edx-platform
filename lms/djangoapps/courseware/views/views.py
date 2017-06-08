@@ -801,8 +801,13 @@ def program_marketing(request, program_uuid):
     if not program_data:
         raise Http404
 
+    program = ProgramMarketingDataExtender(program_data, request.user).extend()
+    skus = program.get('skus')
+    ecommerce_service = EcommerceService()
+
     return render_to_response('courseware/program_marketing.html', {
-        'program': ProgramMarketingDataExtender(program_data, request.user).extend()
+        'buy_button_href': ecommerce_service.get_checkout_page_url(*skus) if skus else '#courses',
+        'program': program,
     })
 
 
