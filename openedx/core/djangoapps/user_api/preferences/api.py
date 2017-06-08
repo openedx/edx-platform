@@ -72,18 +72,7 @@ def get_user_preferences(requesting_user, username=None):
          UserAPIInternalError: the operation failed due to an unexpected error.
     """
     existing_user = _get_authorized_user(requesting_user, username, allow_staff=True)
-
-    # Django Rest Framework V3 uses the current request to version
-    # hyperlinked URLS, so we need to retrieve the request and pass
-    # it in the serializer's context (otherwise we get an AssertionError).
-    # We're retrieving the request from the cache rather than passing it in
-    # as an argument because this is an implementation detail of how we're
-    # serializing data, which we want to encapsulate in the API call.
-    context = {
-        "request": get_request_or_stub()
-    }
-    user_serializer = UserSerializer(existing_user, context=context)
-    return user_serializer.data["preferences"]
+    return UserPreference.get_all_preferences(existing_user)
 
 
 @intercept_errors(UserAPIInternalError, ignore_errors=[UserAPIRequestError])
