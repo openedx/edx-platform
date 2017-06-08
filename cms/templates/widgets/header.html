@@ -77,6 +77,28 @@
             </div>
           </li>
 
+          <li>
+            <div id="test-container"></div>
+            <%static:webpack entry="DropdownRenderer">
+              new DropdownRenderer({
+                selector: '#test-container',
+                context: {
+                  title: 'Course',
+                  menuItems: [
+                    {
+                      label: 'Outline',
+                      href: '/'
+                    },
+                    {
+                      label: 'Outline',
+                      href: '/'
+                    }
+                  ]
+                }
+              });
+            </%static:webpack>
+          </li>
+
           <li class="nav-item nav-course-settings">
             <h3 class="title"><span class="label"><span class="label-prefix sr">${_("Course")} </span>${_("Settings")}</span> <span class="icon fa fa-caret-down ui-toggle-dd" aria-hidden="true"></span></h3>
 
