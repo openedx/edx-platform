@@ -40,7 +40,7 @@ def get_visible_courses(org=None, filter_=None):
     else:
         courses = CourseOverview.get_all_courses(filter_=filter_)
 
-    courses = sorted(courses, key=lambda course: course.number)
+    courses = sorted(courses, key=lambda course: (course.sort_key, course.number))
 
     # Filtering can stop here.
     if current_site_orgs:
