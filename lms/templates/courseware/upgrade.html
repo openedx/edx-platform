@@ -1,0 +1,9 @@
+<%page expression_filter="h"/>
+
+% if upgrade_link:
+<script type="text/plain"
+    id="upgrade_user"
+    data-link="${upgrade_link}"
+    data-price="${upgrade_price}">
+</script>
+% endif
