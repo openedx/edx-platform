@@ -19,6 +19,7 @@ except ImportError:
 
 import psutil
 import request_cache
+from uuid import uuid4
 from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 
 
@@ -83,9 +84,11 @@ class MonitoringMemoryMiddleware(object):
     Middleware for monitoring memory usage.
     """
     memory_data_key = u'memory_data'
+    guid_key = u'guid_key'
 
     def process_request(self, request):
         if self._is_enabled():
+            self._cache[self.guid_key] = unicode(uuid4())
             log_prefix = self._log_prefix(u"Before", request)
             self._cache[self.memory_data_key] = self._memory_data(log_prefix)
 
@@ -109,7 +112,7 @@ class MonitoringMemoryMiddleware(object):
         """
         Returns a formatted prefix for logging for the given request.
         """
-        return u"{} request '{} {}'".format(prefix, request.method, request.path)
+        return u"{} request '{} {} {}'".format(prefix, request.method, request.path, self._cache[self.guid_key])
 
     def _memory_data(self, log_prefix):
         """
