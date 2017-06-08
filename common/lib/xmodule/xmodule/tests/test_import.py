@@ -236,7 +236,7 @@ class ImportTestCase(BaseCourseTestCase):
         with descriptor.runtime.export_fs.open('chapter/ch.xml') as f:
             chapter_xml = etree.fromstring(f.read())
         self.assertEqual(chapter_xml.tag, 'chapter')
-        self.assertNotIn('due', chapter_xml.attrib)
+        self.assertIn('due', chapter_xml.attrib)
 
     def test_metadata_import_export(self):
         """Two checks:

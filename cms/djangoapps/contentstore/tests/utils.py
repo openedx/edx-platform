@@ -275,7 +275,7 @@ class CourseTestCase(ProceduralCourseTestMixin, ModuleStoreTestCase):
 
         return course
 
-    def assertCoursesEqual(self, course1_id, course2_id):
+    def assertCoursesEqual(self, course1_id, course2_id, include_default=False):
         """
         Verifies the content of the two given courses are equal
         """
@@ -313,7 +313,7 @@ class CourseTestCase(ProceduralCourseTestMixin, ModuleStoreTestCase):
                 self.assertEqual(course1_item.data, course2_item.data)
 
             # compare meta-data
-            self.assertEqual(own_metadata(course1_item), own_metadata(course2_item))
+            self.assertEqual(own_metadata(course1_item, include_default), own_metadata(course2_item, include_default))
 
             # compare children
             self.assertEqual(course1_item.has_children, course2_item.has_children)

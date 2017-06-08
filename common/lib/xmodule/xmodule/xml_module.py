@@ -455,10 +455,13 @@ class XmlParserMixin(object):
         node.tag = self.category
 
         # Add the non-inherited metadata
-        for attr in sorted(own_metadata(self)):
+        for attr in sorted(own_metadata(self, include_default=True)):
             # don't want e.g. data_dir
             if attr not in self.metadata_to_strip and attr not in self.metadata_to_export_to_policy:
-                val = serialize_field(self._field_data.get(self, attr))
+                try:
+                    val = serialize_field(self._field_data.get(self, attr))
+                except KeyError:
+                    val = serialize_field(self._field_data.default(self, attr))
                 try:
                     xml_object.set(attr, val)
                 except Exception:
