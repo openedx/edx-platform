@@ -124,15 +124,16 @@ site_status_msg = get_site_status_msg(course_id)
       <nav aria-label="${_('Account')}" class="nav-account-management">
         <div class="right nav-courseware list-inline">
           <div class="item nav-courseware-01">
-            % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
+            % if not settings.FEATURES['DISABLE_LOGIN_BUTTON'] and not combined_login_and_register:
               % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
                 <a class="btn btn-login" href="${reverse('course-specific-login', args=[course.id.to_deprecated_string()])}${login_query()}">${_("Sign in")}</a>
               % else:
                 <a class="btn btn-login" href="/login${login_query()}">${_("Sign in")}</a>
               % endif
+
             % endif
           </div>
-          % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
+          % if not settings.FEATURES['DISABLE_LOGIN_BUTTON'] and not combined_login_and_register:
             % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
               <div class="item nav-courseware-02">
                 <a class="btn-neutral btn-register" href="${reverse('course-specific-register', args=[course.id.to_deprecated_string()])}">${_("Register")}</a>
