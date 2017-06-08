@@ -1186,6 +1186,8 @@ MIDDLEWARE_CLASSES = (
 
     # 'debug_toolbar.middleware.DebugToolbarMiddleware',
 
+    'lms.djangoapps.verify_student.middleware.CourseUpsellMiddleware',
+
     'django_comment_client.utils.ViewNameMiddleware',
     'codejail.django_integration.ConfigureCodeJailMiddleware',
 
