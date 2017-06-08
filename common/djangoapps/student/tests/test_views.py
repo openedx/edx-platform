@@ -160,7 +160,7 @@ class LogoutTests(TestCase):
     def assert_logout_redirects(self):
         """ Verify logging out redirects the user to the homepage. """
         response = self.client.get(reverse('logout'))
-        self.assertRedirects(response, '/', fetch_redirect_response=False)
+        self.assertRedirects(response, '/login', fetch_redirect_response=False)
 
     def test_switch(self):
         """ Verify the IDA logout functionality is disabled if the associated switch is disabled. """
@@ -183,7 +183,7 @@ class LogoutTests(TestCase):
         response = self.assert_session_logged_out(client)
         expected = {
             'logout_uris': [client.logout_uri + '?no_redirect=1'],  # pylint: disable=no-member
-            'target': '/',
+            'target': '/login',
         }
         self.assertDictContainsSubset(expected, response.context_data)  # pylint: disable=no-member
 
@@ -195,7 +195,7 @@ class LogoutTests(TestCase):
         response = self.assert_session_logged_out(client, HTTP_REFERER=client.logout_uri)  # pylint: disable=no-member
         expected = {
             'logout_uris': [],
-            'target': '/',
+            'target': '/login',
         }
         self.assertDictContainsSubset(expected, response.context_data)  # pylint: disable=no-member
 
