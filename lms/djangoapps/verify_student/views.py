@@ -505,7 +505,7 @@ class PayAndVerifyView(View):
             # is enabled redirect him to the ecommerce checkout page.
             ecommerce_service = EcommerceService()
             if ecommerce_service.is_enabled(user):
-                url = ecommerce_service.checkout_page_url(sku)
+                url = ecommerce_service.get_checkout_page_url(sku)
 
         # Redirect if necessary, otherwise implicitly return None
         if url is not None:
