@@ -943,6 +943,13 @@ ENTERPRISE_CUSTOMER_LOGO_IMAGE_SIZE = ENV_TOKENS.get(
     ENTERPRISE_CUSTOMER_LOGO_IMAGE_SIZE
 )
 
+# Course enrollment modes to be hidden in the Enterprise enrollment page
+# if the "Hide audit track" flag is enabled for an EnterpriseCustomer
+ENTERPRISE_COURSE_ENROLLMENT_AUDIT_MODES = ENV_TOKENS.get(
+    'ENTERPRISE_COURSE_ENROLLMENT_AUDIT_MODES',
+    ENTERPRISE_COURSE_ENROLLMENT_AUDIT_MODES
+)
+
 
 ############## ENTERPRISE SERVICE API CLIENT CONFIGURATION ######################
 # The LMS communicates with the Enterprise service via the EdxRestApiClient class
