@@ -14,6 +14,7 @@ define(
                         videoImageUploadURL: options.videoImageUploadURL,
                         defaultVideoImageURL: options.defaultVideoImageURL,
                         videoHandlerUrl: options.videoHandlerUrl,
+                        videoImageSettings: options.videoImageSettings,
                         model: model
                     });
                 });

@@ -25,7 +25,8 @@ define(
                     );
                     var view = new PreviousVideoUploadListView({
                         collection: collection,
-                        videoHandlerUrl: videoHandlerUrl
+                        videoHandlerUrl: videoHandlerUrl,
+                        videoImageSettings: {}
                     });
                     return view.render().$el;
                 },

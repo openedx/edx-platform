@@ -423,7 +423,14 @@ def videos_index_html(course):
             'previous_uploads': _get_index_videos(course),
             'concurrent_upload_limit': settings.VIDEO_UPLOAD_PIPELINE.get('CONCURRENT_UPLOAD_LIMIT', 0),
             'video_supported_file_formats': VIDEO_SUPPORTED_FILE_FORMATS.keys(),
-            'video_upload_max_file_size': VIDEO_UPLOAD_MAX_FILE_SIZE_GB
+            'video_upload_max_file_size': VIDEO_UPLOAD_MAX_FILE_SIZE_GB,
+            'video_image_settings': {
+                'max_size': settings.VIDEO_IMAGE_SETTINGS['VIDEO_IMAGE_MAX_BYTES'],
+                'min_size': settings.VIDEO_IMAGE_SETTINGS['VIDEO_IMAGE_MIN_BYTES'],
+                'max_width': settings.VIDEO_IMAGE_MAX_WIDTH,
+                'max_height': settings.VIDEO_IMAGE_MAX_HEIGHT,
+                'supported_file_formats': settings.VIDEO_IMAGE_SUPPORTED_FILE_FORMATS
+            }
         }
     )
 
