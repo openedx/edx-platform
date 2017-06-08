@@ -75,6 +75,7 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
         self.instructor = UserFactory.create(is_staff=True, username=u'test_instructor', password=u'test')
         self.refresh_course()
 
+    @flaky  # TODO this test sometimes fails on CircleCI(weighted_earned is 0 instead of 2.0)
     @patch('lms.djangoapps.instructor.enrollment.tracker')
     @patch('lms.djangoapps.grades.signals.handlers.tracker')
     @patch('lms.djangoapps.grades.models.tracker')
