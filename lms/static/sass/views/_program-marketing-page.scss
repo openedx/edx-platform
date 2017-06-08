@@ -909,6 +909,23 @@
     .instructor-profiles {
         margin-bottom: 30px;
 
+        .instructor-image,
+        .instructor-label {
+          border: none;
+          box-shadow: none;
+          background: none;
+          padding: 0;
+          color: palette(primary, base);
+          text-shadow: none;
+          text-decoration: underline;
+          font-size: 16px;
+          font-weight: 600;
+
+          &:visited {
+            color: palette(primary, dark);
+          }
+        }
+
         .profile-item {
             @extend .tbl-view;
             margin-bottom: 25px;
@@ -1464,49 +1481,66 @@
         }
       }
       .modal-custom{
-         display:none;
-         width: 540px;
-         padding: 30px 30px;
-         left: calc(50% - 270px) !important;
-         .focusKeeper {
-            width: 0;
-            height: 0;
-            overflow: hidden;
-         }
-         .modal-body{
-           .modal-header{
-             display: table;
-             width: 100%;
-             .instructor-data{
-               display: table-row;
-               .thumbnail{
-                 display: table-cell;
-                 width: 25%;
-                 padding-bottom: 0;
-                 img{
-                   margin-bottom: 0;
-                 }
-               }
-               h3{
-                 display: table-cell;
-                 width: 65%;
-                 padding: 1rem;
-               }
-             }
-           }
+        display: none;
+        width: 540px;
+        padding: 30px 30px;
+        left: calc(50% - 270px) !important;
 
-           .links{
-             a{
-               margin-right: 1.5rem;
-               display: inline-block;
-               margin-bottom: 0;
-             }
-           }
-         }
+        button.close {
+          border: none;
+          background: none;
+          box-shadow: none;
+          padding: 0;
+          color: black;
+          text-shadow: none;
+        }
+
+        .focusKeeper {
+          width: 0;
+          height: 0;
+          overflow: hidden;
+        }
+
+        .modal-body{
+          .modal-header{
+            display: table;
+            width: 100%;
+
+            .instructor-data{
+              display: table-row;
+
+              .thumbnail{
+                display: table-cell;
+                width: 25%;
+                padding-bottom: 0;
+
+                img{
+                  margin-bottom: 0;
+                }
+              }
+
+              h3{
+                display: table-cell;
+                width: 65%;
+                padding: 1rem;
+              }
+            }
+          }
+
+          .links{
+            a{
+              margin-right: 1.5rem;
+              display: inline-block;
+              margin-bottom: 0;
+            }
+          }
+        }
       }
+
       .rtl .hero.hero-video .tint-dark .grid-container .row .description{
         padding-right: 1.04167%;
       }
+
       .course-card{
         .title{
           small{

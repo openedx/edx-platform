@@ -900,10 +900,9 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
         self.assertFalse(data['is_learner_eligible_for_one_click_purchase'])
 
         course = self._create_course(self.course_price)
-        courses.append(course)
         CourseEnrollmentFactory(user=self.user, course_id=course['course_runs'][0]['key'])
         program2 = ProgramFactory(
-            courses=courses,
+            courses=[course],
             is_program_eligible_for_one_click_purchase=True
         )
         data = ProgramMarketingDataExtender(program2, self.user).extend()
@@ -912,7 +911,7 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
     @httpretty.activate
     def test_fetching_program_discounted_price(self):
         """
-        Users eligible for one click purchase and anonymous users should see the purchase button
+        Authenticated users eligible for one click purchase should see the purchase button
             - displaying program's discounted price if it exists.
             - leading to ecommerce basket page
         """
@@ -931,13 +930,32 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
 
         data = ProgramMarketingDataExtender(self.program, self.user).extend()
 
-        self.assertEqual(data['basket_page_url'], self.ecommerce_service.checkout_page_url(seat['sku']))
-        self.assertEqual(data['discounted_price'], mock_discount_data['total_incl_tax'])
+        self.assertEqual(data['skus'], [seat['sku']])
+        self.assertEqual(data['discount_data'], mock_discount_data)
+
+    @httpretty.activate
+    def test_fetching_program_discounted_price_as_anonymous_user(self):
+        """
+        Anonymous users should see the purchase button same way the authenticated users do
+        when the program is eligible for one click purchase.
+        """
+        seat = self._prepare_program_for_discounted_price_calculation_endpoint()
+        mock_discount_data = {
+            'total_incl_tax_excl_discounts': 200.0,
+            'currency': "USD",
+            'total_incl_tax': 50.0
+        }
+        httpretty.register_uri(
+            httpretty.GET,
+            self.ECOMMERCE_CALCULATE_DISCOUNT_ENDPOINT,
+            body=json.dumps(mock_discount_data),
+            content_type='application/json'
+        )
 
         data = ProgramMarketingDataExtender(self.program, AnonymousUserFactory()).extend()
 
-        self.assertEqual(data['basket_page_url'], self.ecommerce_service.checkout_page_url(seat['sku']))
-        self.assertEqual(data['discounted_price'], mock_discount_data['total_incl_tax'])
+        self.assertEqual(data['skus'], [seat['sku']])
+        self.assertEqual(data['discount_data'], mock_discount_data)
 
     def test_fetching_program_discounted_price_no_applicable_seats(self):
         """
@@ -945,7 +963,7 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
         """
         data = ProgramMarketingDataExtender(self.program, self.user).extend()
 
-        self.assertEqual(data['basket_page_url'], '#courses')
+        self.assertEqual(len(data['skus']), 0)
 
     @httpretty.activate
     def test_fetching_program_discounted_price_api_exception_caught(self):
@@ -963,4 +981,4 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
 
         data = ProgramMarketingDataExtender(self.program, self.user).extend()
 
-        self.assertEqual(data['basket_page_url'], self.ecommerce_service.checkout_page_url(seat['sku']))
+        self.assertEqual(data['skus'], [seat['sku']])

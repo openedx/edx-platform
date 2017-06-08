@@ -1,5 +1,4 @@
 """Tests of commerce utilities."""
-import ddt
 from django.conf import settings
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -10,6 +9,7 @@ from waffle.testutils import override_switch
 from commerce.models import CommerceConfiguration
 from commerce.utils import EcommerceService
 from openedx.core.lib.log_utils import audit_log
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from student.tests.factories import UserFactory
 
 
@@ -34,9 +34,9 @@ class AuditLogTests(TestCase):
         self.assertTrue(mock_log.info.called_with(message))
 
 
-@ddt.ddt
 class EcommerceServiceTests(TestCase):
     """Tests for the EcommerceService helper class."""
+    SKU = 'TESTSKU'
 
     def setUp(self):
         self.request_factory = RequestFactory()
@@ -91,12 +91,8 @@ class EcommerceServiceTests(TestCase):
         self.assertEqual(url, expected_url)
 
     @override_settings(ECOMMERCE_PUBLIC_URL_ROOT='http://ecommerce_url')
-    @ddt.data(
-        (['TESTSKU'], 'http://ecommerce_url/test_basket/?sku=TESTSKU'),
-        (['TESTSKU1', 'TESTSKU2', 'TESTSKU3'], 'http://ecommerce_url/test_basket/?sku=TESTSKU1&sku=TESTSKU2&sku=TESTSKU3')
-    )
-    @ddt.unpack
-    def test_checkout_page_url(self, skus, expected_url):
+    def test_checkout_page_url(self):
         """ Verify the checkout page URL is properly constructed and returned. """
-        url = EcommerceService().checkout_page_url(*skus)
+        url = EcommerceService().checkout_page_url(self.SKU)
+        expected_url = 'http://ecommerce_url/test_basket/?sku={}'.format(self.SKU)
         self.assertEqual(url, expected_url)

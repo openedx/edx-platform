@@ -502,8 +502,6 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
         self.data['number_of_courses'] = 0
         self.data['full_program_price'] = 0
 
-        self.ecommerce_service = EcommerceService()
-
     def _extend_program(self):
         """Aggregates data from the program data structure."""
         cache_key = 'program.instructors.{uuid}'.format(
@@ -536,6 +534,10 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
         # function names given the fact that the subclass overrides
         # some functions on the parent class.
         return {name for name in chain(cls.__dict__, ProgramDataExtender.__dict__) if name.startswith(prefix)}
+
+    def _attach_course_run_start_date(self, run_mode):
+        """Convert course run start datetime from string to datetime."""
+        run_mode['start'] = parse(run_mode['start'])
 
     def _attach_course_run_can_enroll(self, run_mode):
         run_mode['can_enroll'] = bool(has_access(self.user, 'enroll', self.course_overview))
@@ -584,6 +586,10 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
             )
 
     def _collect_one_click_purchase_eligibility_data(self):
+        """
+        Extend the program data with data about learner's eligibility for one click purchase,
+        discount data of the program and SKUs of seats that should be added to basket.
+        """
         applicable_seat_types = self.data['applicable_seat_types']
         is_learner_eligible_for_one_click_purchase = self.data['is_program_eligible_for_one_click_purchase']
         skus = []
@@ -593,10 +599,9 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
                     course_run['is_enrolled'] for course_run in course['course_runs']
                 )
                 if is_learner_eligible_for_one_click_purchase:
-                    for course_run in course['course_runs']:
-                        for seat in course_run['seats']:
-                            if seat['type'] in applicable_seat_types:
-                                skus.append(seat['sku'])
+                    for seat in course['course_runs'][0]['seats']:
+                        if seat['type'] in applicable_seat_types:
+                            skus.append(seat['sku'])
                 else:
                     skus = []
                     break
@@ -606,13 +611,18 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
                 User = get_user_model()
                 service_user = User.objects.get(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME)
                 api = ecommerce_api_client(service_user)
+
                 # Make an API call to calculate the discounted price
-                results = api.baskets.calculate.get(sku=skus)
-                self.data['discounted_price'] = results.get('total_incl_tax')
+                discount_data = api.baskets.calculate.get(sku=skus)
+
+                self.data.update({
+                    'discount_data': discount_data,
+                    'full_program_price': discount_data['total_incl_tax']
+                })
             except SlumberBaseException:
                 log.exception('Failed to get discount price for following product SKUs: %s ', ', '.join(skus))
 
         self.data.update({
-            'basket_page_url': self.ecommerce_service.checkout_page_url(*skus) if skus else '#courses',
             'is_learner_eligible_for_one_click_purchase': is_learner_eligible_for_one_click_purchase,
+            'skus': skus,
         })
