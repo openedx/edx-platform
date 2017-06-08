@@ -207,7 +207,7 @@ class VerifiedUpgradeDeadlineDate(DateSummary):
             course_mode = CourseMode.objects.get(
                 course_id=self.course_id, mode_slug=CourseMode.VERIFIED
             )
-            return ecommerce_service.checkout_page_url(course_mode.sku)
+            return ecommerce_service.get_checkout_page_url(course_mode.sku)
         return reverse('verify_student_upgrade_and_verify', args=(self.course_id,))
 
     @property
