@@ -51,9 +51,17 @@
       "%(num_points)s punto posible (calificado)", 
       "%(num_points)s puntos posibles (calificado)"
     ], 
+    "%(num_points)s point possible (graded, results hidden)": [
+      "%(num_points)s punto posible (calificado, resultados escondidos)", 
+      "%(num_points)s puntos posibles (calificado, resultados escondidos)"
+    ], 
     "%(num_points)s point possible (ungraded)": [
       "%(num_points)s punto posible (no calificado)", 
       "%(num_points)s puntos posibles (no calificados)"
+    ], 
+    "%(num_points)s point possible (ungraded, results hidden)": [
+      "%(num_points)s punto posible (calificado, resultados escondidos)", 
+      "%(num_points)s puntos posibles (no calificado, resultados escondidos)"
     ], 
     "%(num_questions)s question": [
       "%(num_questions)s pregunta", 
@@ -939,6 +947,7 @@
     "No receipt available": "No hay recibo disponible", 
     "No results": "Sin resultados", 
     "No results found for \"%(query_string)s\". Please try searching again.": "No se encontraron resultados para \"%(query_string)s\". Por favor intente nuevamente.", 
+    "No results found for {original_query}. Showing results for {suggested_query}.": "No se encontraron resultados para {original_query}. Mostrando resultados para {suggested_query}.", 
     "No sources": "No hay fuentes", 
     "No tasks currently running.": "No hay tareas corriendo en el momento.", 
     "No validation is performed on policy keys or value pairs. If you are having difficulties, check your formatting.": "No se realiza validaci\u00f3n de pares clave/valor de pol\u00edtica. Si tiene dificultades, por favor revisa tu formato.", 
@@ -1504,7 +1513,6 @@
     "Time Sent:": "Hora de env\u00edo:", 
     "Time Zone": "Zona horaria", 
     "Timed": "Cronometrado", 
-    "Timed Exam": "Examen cronometrado", 
     "Timed Transcript Conflict": "Conflicto en la transcripci\u00f3n", 
     "Timed Transcript Found": "Se encontr\u00f3 una transcripci\u00f3n", 
     "Timed Transcript Uploaded Successfully": "Transcripci\u00f3n cargada exitosamente", 
@@ -1650,6 +1658,7 @@
     "Video ID": "ID del video", 
     "Video ended": "Fin del video", 
     "Video position": "Posici\u00f3n del video", 
+    "Video position. Press space to toggle playback": "Posici\u00f3n del video. Presione el espacio para alternar la reproducci\u00f3n", 
     "Video speed: ": "Velocidad del video:", 
     "Video transcript": "Transcripci\u00f3n de video", 
     "View": "Ver", 
@@ -1737,6 +1746,7 @@
     "You don't seem to have a webcam connected.": "Parece que no hay una webcam conectada.", 
     "You have already reported this annotation.": "Ya hab\u00eda reportado esta publicaci\u00f3n.", 
     "You have already verified your ID!": "Usted ha verificado su ID!", 
+    "You have been logged out of your edX account. Click Okay to log in again now. Click Cancel to stay on this page (you must log in again to save your work).": "Su sesi\u00f3n ha sido cerrada. Haga clic en Aceptar para volver a iniciar sesi\u00f3n. Haga clic en Cancelar para permanecer en est\u00e1 p\u00e1gina (Deber\u00e1 iniciar sesi\u00f3n nuevamente para guardar su trabajo).", 
     "You have done a dry run of force publishing the course. Nothing has changed. Had you run it, the following course versions would have been change.": "Ha corrido un simulacro de publicaci\u00f3n del curso. No han habido cambios. Si lo hubiera hecho realmente, las siguientes versiones habr\u00edan tenido cambios.", 
     "You have no handouts defined": "No tiene Materiales denifidos", 
     "You have not created any certificates yet.": "Todav\u00eda no ha creado ning\u00fan certificado.", 
@@ -1789,6 +1799,7 @@
     "Your message must have at least one target.": "Su mensaje debe tener al menos un objetivo.", 
     "Your policy changes have been saved.": "Sus cambios de pol\u00edtica han sido guardados.", 
     "Your post will be discarded.": "Su publicaci\u00f3n ser\u00e1 descartada.", 
+    "Your request could not be completed due to a server problem. Reload the page and try again. If the issue persists, click the Help tab to report the problem.": "Su solicitud no pudo ser completada debido a un problema en el servidor. Recargue la p\u00e1gina e intente nuevamente. Si el problema persiste, haga clic en la pesta\u00f1a de ayuda para reportar el problema.", 
     "Your request could not be completed. Reload the page and try again.": "Su solicitud no pudo ser completada. Recargue la p\u00e1gina e intente nuevamente.", 
     "Your request could not be completed. Reload the page and try again. If the issue persists, click the Help tab to report the problem.": "Su solicitud no pudo ser completada. Recargue la p\u00e1gina e intente nuevamente. Si el problema persiste, haga clic en la pesta\u00f1a de Ayuda para reportar el problema.", 
     "Your request could not be processed. Refresh the page and try again.": "Su solicitud no pudo ser completada. Recargue la p\u00e1gina e intente nuevamente.", 
