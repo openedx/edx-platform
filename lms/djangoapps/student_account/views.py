@@ -141,6 +141,7 @@ def login_and_registration_form(request, initial_mode="login"):
         'responsive': True,
         'allow_iframing': True,
         'disable_courseware_js': True,
+        'combined_login_and_register': True,
         'disable_footer': not configuration_helpers.get_value(
             'ENABLE_COMBINED_LOGIN_REGISTRATION_FOOTER',
             settings.FEATURES['ENABLE_COMBINED_LOGIN_REGISTRATION_FOOTER']

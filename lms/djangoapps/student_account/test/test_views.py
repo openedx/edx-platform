@@ -328,19 +328,19 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         ("edx.org", "register_user"),
     )
     @ddt.unpack
-    def test_login_and_registration_form_signin_preserves_params(self, theme, url_name):
+    def test_login_and_registration_form_signin_not_preserves_params(self, theme, url_name):
         params = [
             ('course_id', 'edX/DemoX/Demo_Course'),
             ('enrollment_action', 'enroll'),
         ]
 
-        # The response should have a "Sign In" button with the URL
+        # The response should not have a "Sign In" button with the URL
         # that preserves the querystring params
         with with_comprehensive_theme_context(theme):
             response = self.client.get(reverse(url_name), params, HTTP_ACCEPT="text/html")
 
         expected_url = '/login?{}'.format(self._finish_auth_url_param(params + [('next', '/dashboard')]))
-        self.assertContains(response, expected_url)
+        self.assertNotContains(response, expected_url)
 
         # Add additional parameters:
         params = [
@@ -356,7 +356,7 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
             response = self.client.get(reverse(url_name), params, HTTP_ACCEPT="text/html")
 
         expected_url = '/login?{}'.format(self._finish_auth_url_param(params))
-        self.assertContains(response, expected_url)
+        self.assertNotContains(response, expected_url)
 
     @mock.patch.dict(settings.FEATURES, {"ENABLE_THIRD_PARTY_AUTH": False})
     @ddt.data("signin_user", "register_user")
