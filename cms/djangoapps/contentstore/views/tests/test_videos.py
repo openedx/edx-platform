@@ -711,46 +711,6 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
                 image_min_size=settings.VIDEO_IMAGE_MIN_FILE_SIZE_KB
             )
         ),
-        # Image file resolution validation
-        (
-            {
-                'width': settings.VIDEO_IMAGE_MAX_WIDTH,  # 1280x720
-                'height': settings.VIDEO_IMAGE_MAX_HEIGHT
-            },
-            None
-        ),
-        (
-            {
-                'width': 850,  # 16:9
-                'height': 478
-            },
-            None
-        ),
-        (
-            {
-                'width': 940,  # 1.67 ratio, applicable aspect ratio margin of .01
-                'height': 560
-            },
-            None
-        ),
-        (
-            {
-                'width': 1200,  # not 16:9
-                'height': 100
-            },
-            'This image file must have an aspect ratio of {video_image_aspect_ratio_text}.'.format(
-                video_image_aspect_ratio_text=settings.VIDEO_IMAGE_ASPECT_RATIO_TEXT
-            )
-        ),
-        (
-            {
-                'width': settings.VIDEO_IMAGE_MIN_WIDTH + 100,
-                'height': settings.VIDEO_IMAGE_MIN_HEIGHT + 200
-            },
-            'This image file must have an aspect ratio of {video_image_aspect_ratio_text}.'.format(
-                video_image_aspect_ratio_text=settings.VIDEO_IMAGE_ASPECT_RATIO_TEXT
-            )
-        ),
         # Image file minimum width / height
         (
             {
@@ -780,6 +740,47 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
             'The minimum allowed image resolution is {image_file_min_width}x{image_file_min_height}.'.format(
                 image_file_min_width=settings.VIDEO_IMAGE_MIN_WIDTH,
                 image_file_min_height=settings.VIDEO_IMAGE_MIN_HEIGHT
+            )
+        ),
+        (
+            {
+                'width': 1200,  # not 16:9, but width/height check first.
+                'height': 100
+            },
+            'The minimum allowed image resolution is {image_file_min_width}x{image_file_min_height}.'.format(
+                image_file_min_width=settings.VIDEO_IMAGE_MIN_WIDTH,
+                image_file_min_height=settings.VIDEO_IMAGE_MIN_HEIGHT
+            )
+        ),
+        # Image file aspect ratio validation
+        (
+            {
+                'width': settings.VIDEO_IMAGE_MAX_WIDTH,  # 1280x720
+                'height': settings.VIDEO_IMAGE_MAX_HEIGHT
+            },
+            None
+        ),
+        (
+            {
+                'width': 850,  # 16:9
+                'height': 478
+            },
+            None
+        ),
+        (
+            {
+                'width': 940,  # 1.67 ratio, applicable aspect ratio margin of .01
+                'height': 560
+            },
+            None
+        ),
+        (
+            {
+                'width': settings.VIDEO_IMAGE_MIN_WIDTH + 100,
+                'height': settings.VIDEO_IMAGE_MIN_HEIGHT + 200
+            },
+            'This image file must have an aspect ratio of {video_image_aspect_ratio_text}.'.format(
+                video_image_aspect_ratio_text=settings.VIDEO_IMAGE_ASPECT_RATIO_TEXT
             )
         ),
         # Image file name validation
