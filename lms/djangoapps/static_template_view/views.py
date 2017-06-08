@@ -4,6 +4,7 @@
 # security reasons.
 
 import mimetypes
+import crum
 
 from edxmako.shortcuts import render_to_response, render_to_string
 from mako.exceptions import TopLevelLookupException
@@ -71,8 +72,10 @@ def render_press_release(request, slug):
 
 
 def render_404(request):
+    crum.set_current_request(request)
     return HttpResponseNotFound(render_to_string('static_templates/404.html', {}, request=request))
 
 
 def render_500(request):
+    crum.set_current_request(request)
     return HttpResponseServerError(render_to_string('static_templates/server-error.html', {}, request=request))
