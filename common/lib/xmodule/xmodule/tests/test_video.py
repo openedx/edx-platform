@@ -408,7 +408,7 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
             'end_time': datetime.timedelta(seconds=0.0),
             'track': '',
             'handout': None,
-            'download_track': False,
+            'download_track': True,
             'download_video': True,
             'html5_sources': ['http://www.example.com/source.mp4'],
             'data': ''
@@ -462,8 +462,8 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
             'end_time': datetime.timedelta(seconds=0.0),
             'track': '',
             'handout': None,
-            'download_track': False,
-            'download_video': False,
+            'download_track': True,
+            'download_video': True,
             'html5_sources': [],
             'data': '',
             'transcripts': {},
@@ -525,8 +525,8 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
             'end_time': datetime.timedelta(seconds=0.0),
             'track': '',
             'handout': None,
-            'download_track': False,
-            'download_video': False,
+            'download_track': True,
+            'download_video': True,
             'html5_sources': [],
             'data': ''
         })
@@ -720,7 +720,7 @@ class VideoExportTestCase(VideoDescriptorTestBase):
 
         xml = self.descriptor.definition_to_xml(None)
         parser = etree.XMLParser(remove_blank_text=True)
-        xml_string = '<video url_name="SampleProblem" download_video="false"/>'
+        xml_string = '<video url_name="SampleProblem" download_video="true"/>'
         expected = etree.XML(xml_string, parser=parser)
         self.assertXmlEqual(expected, xml)
 
@@ -758,7 +758,7 @@ class VideoExportTestCase(VideoDescriptorTestBase):
         """
         xml = self.descriptor.definition_to_xml(None)
         # Check that download_video field is also set to default (False) in xml for backward compatibility
-        expected = '<video url_name="SampleProblem" download_video="false"/>\n'
+        expected = '<video url_name="SampleProblem" download_video="true"/>\n'
         self.assertEquals(expected, etree.tostring(xml, pretty_print=True))
 
     def test_export_to_xml_with_transcripts_as_none(self):
@@ -767,7 +767,7 @@ class VideoExportTestCase(VideoDescriptorTestBase):
         """
         self.descriptor.transcripts = None
         xml = self.descriptor.definition_to_xml(None)
-        expected = '<video url_name="SampleProblem" download_video="false"/>\n'
+        expected = '<video url_name="SampleProblem" download_video="true"/>\n'
         self.assertEquals(expected, etree.tostring(xml, pretty_print=True))
 
     def test_export_to_xml_invalid_characters_in_attributes(self):

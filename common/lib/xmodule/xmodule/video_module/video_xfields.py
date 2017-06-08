@@ -85,7 +85,7 @@ class VideoFields(object):
         help=_("Allow students to download versions of this video in different formats if they cannot use the edX video player or do not have access to YouTube. You must add at least one non-YouTube URL in the Video File URLs field."),  # pylint: disable=line-too-long
         display_name=_("Video Download Allowed"),
         scope=Scope.settings,
-        default=False
+        default=True
     )
     html5_sources = List(
         help=_("The URL or URLs where you've posted non-YouTube versions of the video. Each URL must end in .mpeg, .mp4, .ogg, or .webm and cannot be a YouTube URL. (For browser compatibility, we strongly recommend .mp4 and .webm format.) Students will be able to view the first listed video that's compatible with the student's computer. To allow students to download these videos, set Video Download Allowed to True."),  # pylint: disable=line-too-long
@@ -102,7 +102,7 @@ class VideoFields(object):
         help=_("Allow students to download the timed transcript. A link to download the file appears below the video. By default, the transcript is an .srt or .txt file. If you want to provide the transcript for download in a different format, upload a file by using the Upload Handout field."),  # pylint: disable=line-too-long
         display_name=_("Download Transcript Allowed"),
         scope=Scope.settings,
-        default=False
+        default=True
     )
     sub = String(
         help=_("The default transcript for the video, from the Default Timed Transcript field on the Basic tab. This transcript should be in English. You don't have to change this setting."),  # pylint: disable=line-too-long

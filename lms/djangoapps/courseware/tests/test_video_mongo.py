@@ -82,7 +82,9 @@ class TestVideoYouTube(TestVideo):
                 "autohideHtml5": False,
                 "recordedYoutubeIsAvailable": True,
             })),
-            'track': None,
+            'track': '{usage_id}/transcriptdownload'.format(
+                usage_id=unicode(self.item_descriptor.scope_ids.usage_id)
+            ),
             'transcript_download_format': u'srt',
             'transcript_download_formats_list': [
                 {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
@@ -161,7 +163,9 @@ class TestVideoNonYouTube(TestVideo):
                 "autohideHtml5": False,
                 "recordedYoutubeIsAvailable": True,
             })),
-            'track': None,
+            'track': '{usage_id}/transcriptdownload'.format(
+                usage_id=unicode(self.item_descriptor.scope_ids.usage_id)
+            ),
             'transcript_download_format': u'srt',
             'transcript_download_formats_list': [
                 {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
@@ -341,6 +345,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             display_name="A Name"
             sub="a_sub_file.srt.sjson" source="{source}"
             download_video="{download_video}"
+            download_track="false"
             start_time="01:00:03" end_time="01:00:10"
             >
                 {sources}
@@ -490,6 +495,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             display_name="A Name"
             sub="a_sub_file.srt.sjson" source="{source}"
             download_video="{download_video}"
+            download_track="false"
             start_time="01:00:03" end_time="01:00:10"
             edx_video_id="{edx_video_id}"
             >
@@ -681,6 +687,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             display_name="A Name"
             sub="a_sub_file.srt.sjson" source="{source}"
             download_video="{download_video}"
+            download_track="false"
             start_time="01:00:03" end_time="01:00:10"
             edx_video_id="{edx_video_id}"
             >
@@ -771,6 +778,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             display_name="A Name"
             sub="a_sub_file.srt.sjson" source="{source}"
             download_video="{download_video}"
+            download_track="false"
             edx_video_id="{edx_video_id}"
             start_time="01:00:03" end_time="01:00:10"
             >
@@ -1050,7 +1058,7 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
         fields = self.item_descriptor.editable_metadata_fields
 
         self.assertNotIn('source', fields)
-        self.assertFalse(self.item_descriptor.download_video)
+        self.assertTrue(self.item_descriptor.download_video)
 
     @ddt.data(
         (
@@ -1113,6 +1121,17 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
             )
             context = self.item_descriptor.get_context()
             self.assertEqual(context['transcripts_basic_tab_metadata']['video_url']['value'], video_url)
+
+    def test_video_and_transcript_download_defaults(self):
+        """
+        Verifies the default values of `Allow Video Download` and `Allow Transcripts Download` on
+        video module initialization.
+        """
+        self.initialize_module(
+            data='<video display_name="Video">[]</video>'
+        )
+        self.assertTrue(self.item_descriptor.download_video)
+        self.assertTrue(self.item_descriptor.download_track)
 
 
 @attr(shard=1)
@@ -1424,7 +1443,7 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
 
         actual = self.descriptor.definition_to_xml(resource_fs=None)
         expected_str = """
-            <video download_video="false" url_name="SampleProblem">
+            <video download_video="true" url_name="SampleProblem">
                 <video_asset client_video_id="test_client_video_id" duration="111.0">
                     <encoded_video profile="mobile" url="http://example.com/video" file_size="222" bitrate="333"/>
                 </video_asset>
@@ -1437,7 +1456,7 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
     def test_export_val_data_not_found(self):
         self.descriptor.edx_video_id = 'nonexistent'
         actual = self.descriptor.definition_to_xml(resource_fs=None)
-        expected_str = """<video download_video="false" url_name="SampleProblem"/>"""
+        expected_str = """<video download_video="true" url_name="SampleProblem"/>"""
         parser = etree.XMLParser(remove_blank_text=True)
         expected = etree.XML(expected_str, parser=parser)
         self.assertXmlEqual(expected, actual)
@@ -1593,7 +1612,9 @@ class TestVideoWithBumper(TestVideo):
                 "autohideHtml5": False,
                 "recordedYoutubeIsAvailable": True,
             })),
-            'track': None,
+            'track': '{usage_id}/transcriptdownload'.format(
+                usage_id=unicode(self.item_descriptor.scope_ids.usage_id)
+            ),
             'transcript_download_format': u'srt',
             'transcript_download_formats_list': [
                 {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
