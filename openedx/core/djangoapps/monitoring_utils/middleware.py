@@ -10,17 +10,19 @@ request handlers which do not record custom metrics.
 
 """
 import logging
+from uuid import uuid4
+
+import psutil
+
+import request_cache
+from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
+
 log = logging.getLogger(__name__)
 try:
     import newrelic.agent
 except ImportError:
     log.warning("Unable to load NewRelic agent module")
     newrelic = None  # pylint: disable=invalid-name
-
-import psutil
-import request_cache
-from uuid import uuid4
-from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 
 
 REQUEST_CACHE_KEY = 'monitoring_custom_metrics'
