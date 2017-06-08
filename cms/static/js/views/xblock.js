@@ -18,11 +18,13 @@ define(['jquery', 'underscore', 'common/js/components/utils/view_utils', 'js/vie
                 var self = this,
                     view = this.view,
                     xblockInfo = this.model,
-                    xblockUrl = xblockInfo.url();
+                    xblockUrl = xblockInfo.url(),
+                    data = options === 'undefined' ? {} : options.data;
                 return $.ajax({
                     url: decodeURIComponent(xblockUrl) + '/' + view,
                     type: 'GET',
                     cache: false,
+                    data: data,
                     headers: {Accept: 'application/json'},
                     success: function(fragment) {
                         self.handleXBlockFragment(fragment, options);

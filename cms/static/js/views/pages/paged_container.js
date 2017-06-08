@@ -28,11 +28,13 @@ define(['jquery', 'underscore', 'gettext', 'js/views/pages/container', 'js/views
 
             refreshXBlock: function(element, block_added, is_duplicate) {
                 var xblockElement = this.findXBlockElement(element),
-                    rootLocator = this.xblockView.model.id;
+                    rootLocator = this.xblockView.model.id,
+                    renderParameters;
                 if (xblockElement.length === 0 || xblockElement.data('locator') === rootLocator) {
                     this.render({refresh: true, block_added: block_added});
                 } else {
-                    this.refreshChildXBlock(xblockElement, block_added, is_duplicate);
+                    renderParameters = {can_edit_visibility: false};
+                    this.refreshChildXBlock(xblockElement, block_added, is_duplicate, renderParameters);
                 }
             },
 

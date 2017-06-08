@@ -2,6 +2,7 @@
 from __future__ import absolute_import
 
 import hashlib
+import json
 import logging
 from collections import OrderedDict
 from datetime import datetime
@@ -304,7 +305,9 @@ def xblock_view_handler(request, usage_key_string, view_name):
     if 'application/json' in accept_header:
         store = modulestore()
         xblock = store.get_item(usage_key)
-        container_views = ['container_preview', 'reorderable_container_child_preview', 'container_child_preview']
+        container_views = [
+            'container_preview', 'reorderable_container_child_preview', 'library_container_child_preview'
+        ]
 
         # wrap the generated fragment in the xmodule_editor div so that the javascript
         # can bind to it correctly
@@ -360,6 +363,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
                 )
 
             force_render = request.GET.get('force_render', None)
+            can_edit_visibility = request.GET.get('can_edit_visibility', None)
 
             # Set up the context to be passed to each XBlock's render method.
             context = {
@@ -371,6 +375,9 @@ def xblock_view_handler(request, usage_key_string, view_name):
                 'paging': paging,
                 'force_render': force_render,
             }
+
+            if can_edit_visibility is not None:
+                context['can_edit_visibility'] = json.loads(can_edit_visibility)
 
             fragment = get_preview_fragment(request, xblock, context)
 

@@ -323,11 +323,11 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
              * Refresh an xblock element inline on the page, using the specified xblockInfo.
              * Note that the element is removed and replaced with the newly rendered xblock.
              * @param xblockElement The xblock element to be refreshed.
-             * @param block_added Specifies if a block has been added, rather than just needs
+             * @param blockAdded Specifies if a block has been added, rather than just needs
              * refreshing.
              * @returns {jQuery promise} A promise representing the complete operation.
              */
-            refreshChildXBlock: function(xblockElement, block_added, is_duplicate) {
+            refreshChildXBlock: function(xblockElement, blockAdded, isDuplicate, renderParameters) {
                 var self = this,
                     xblockInfo,
                     TemporaryXBlockView,
@@ -352,8 +352,9 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
                     el: xblockElement
                 });
                 return temporaryView.render({
+                    data: renderParameters || {},
                     success: function() {
-                        self.onXBlockRefresh(temporaryView, block_added, is_duplicate);
+                        self.onXBlockRefresh(temporaryView, blockAdded, isDuplicate);
                         temporaryView.unbind();  // Remove the temporary view
                     },
                     initRuntimeData: this
