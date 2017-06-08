@@ -37,7 +37,7 @@
 # Joe99_Du <joe99.du@gmail.com>, 2014
 # Joe99_Du <joe99.du@gmail.com>, 2014
 # jsgang <jsgang9@gmail.com>, 2014
-# jsgang <jsgang9@gmail.com>, 2014-2016
+# jsgang <jsgang9@gmail.com>, 2014-2017
 # jsgang <jsgang9@gmail.com>, 2014
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2017
 # 刘洋 <liuyang2011@tsinghua.edu.cn>, 2013
@@ -106,7 +106,7 @@
 # jiangnan.hugo <jiangnan.hugo@gmail.com>, 2014
 # Jie Li <jie.li@anu.edu.au>, 2013
 # Jie Li <jie.li@anu.edu.au>, 2013
-# jsgang <jsgang9@gmail.com>, 2015-2016
+# jsgang <jsgang9@gmail.com>, 2015-2017
 # jsgang <jsgang9@gmail.com>, 2015
 # 刘洋 <liuyang2011@tsinghua.edu.cn>, 2013
 # pku9104038 <pku9104038@hotmail.com>, 2014
@@ -351,7 +351,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-04-27 14:25+0000\n"
+"POT-Creation-Date: 2017-05-11 15:06+0000\n"
 "PO-Revision-Date: 2017-03-16 12:39+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
@@ -995,6 +995,15 @@ msgstr "选课操作无效"
 #: common/djangoapps/student/views.py
 #, python-brace-format
 msgid ""
+"In order to sign in, you need to activate your account.<br /><br />We just "
+"sent an activation link to <strong>{email}</strong>.  If you do not receive "
+"an email, check your spam folders or <a href=\"{support_url}\">contact "
+"{platform} Support</a>."
+msgstr ""
+
+#: common/djangoapps/student/views.py
+#, python-brace-format
+msgid ""
 "You've successfully logged into your {provider_name} account, but this "
 "account isn't linked with an {platform_name} account yet."
 msgstr "你已成功登录{provider_name}帐户，但该帐号尚未与{platform_name}帐户关联。"
@@ -1039,12 +1048,6 @@ msgstr "失败次数超过限制，请稍后再试！"
 #: common/djangoapps/student/views.py lms/templates/provider_login.html
 msgid "Email or password is incorrect."
 msgstr "邮箱或密码错误。"
-
-#: common/djangoapps/student/views.py
-msgid ""
-"Before you sign in, you need to activate your account. We have sent you an "
-"email message with instructions for activating your account."
-msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Please enter a username"
@@ -1171,6 +1174,14 @@ msgstr "二级供应商不会突出显示，将出现在一个单独的登录供
 
 #: common/djangoapps/third_party_auth/models.py
 msgid "The Site that this provider configuration belongs to."
+msgstr ""
+
+#: common/djangoapps/third_party_auth/models.py
+msgid ""
+"If this option is enabled, users that visit a \"TPA hinted\" URL for this "
+"provider (e.g. a URL ending with `?tpa_hint=[provider_name]`) will be "
+"forwarded directly to the login URL of the provider instead of being first "
+"prompted with a login dialog."
 msgstr ""
 
 #: common/djangoapps/third_party_auth/models.py
@@ -1925,14 +1936,15 @@ msgid "Could not interpret '{student_answer}' as a number."
 msgstr "无法将“{student_answer}”解释为一个数字。"
 
 #: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "You may not use variables ({bad_variables}) in numerical problems."
-msgstr "你可能在数学问题中无法使用变量({bad_variables})。"
+msgid ""
+"Answers can include numerals, operation signs, and a few specific "
+"characters, such as the constants e and i."
+msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 #, python-brace-format
-msgid "factorial function evaluated outside its domain:'{student_answer}'"
-msgstr "在阶乘函数的定义域之外对其求值：'{student_answer}'"
+msgid "Factorial function evaluated outside its domain:'{student_answer}'"
+msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 #, python-brace-format
@@ -2047,15 +2059,10 @@ msgstr "数学表达式输入"
 
 #: common/lib/capa/capa/responsetypes.py
 #, python-brace-format
-msgid "Invalid input: {bad_input} not permitted in answer."
-msgstr "无效输入：{bad_input}不允许出现在回答中。"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
 msgid ""
-"factorial function not permitted in answer for this problem. Provided answer"
+"Factorial function not permitted in answer for this problem. Provided answer"
 " was: {bad_input}"
-msgstr "该问题的答案中不允许使用阶乘函数。提交的回答是：{bad_input}"
+msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 #, python-brace-format
@@ -2442,12 +2449,6 @@ msgid ""
 "remaining."
 msgstr "在两次提交之间需要等待 {wait_secs} 秒。还需等待{remaining_secs}秒。"
 
-#. Translators: {msg} will be replaced with a problem's error message.
-#: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
-msgid "Error: {msg}"
-msgstr "错误: {msg}"
-
 #: common/lib/xmodule/xmodule/capa_base.py
 #, python-brace-format
 msgid "{num_hour} hour"
@@ -2465,16 +2466,6 @@ msgstr[0] "{num_minute} 分钟"
 msgid "{num_second} second"
 msgid_plural "{num_second} seconds"
 msgstr[0] "{num_second} 秒钟"
-
-#. Translators: 'rescoring' refers to the act of re-submitting a student's
-#. solution so it can get a new score.
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Problem's definition does not support rescoring."
-msgstr "问题定义不支持重新打分。"
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Problem must be answered before it can be graded again."
-msgstr "回答问题后才能够重新评定。"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Problem needs to be reset prior to save."
@@ -2500,6 +2491,16 @@ msgstr ""
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "You must submit an answer before you can select Reset."
 msgstr ""
+
+#. Translators: 'rescoring' refers to the act of re-submitting a student's
+#. solution so it can get a new score.
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Problem's definition does not support rescoring."
+msgstr "问题定义不支持重新打分。"
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Problem must be answered before it can be graded again."
+msgstr "回答问题后才能够重新评定。"
 
 #: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
@@ -13762,7 +13763,7 @@ msgstr "课程工具"
 msgid "Courseware"
 msgstr "课程页面"
 
-#: lms/templates/courseware/courseware.html
+#: lms/templates/courseware/courseware.html lms/templates/courseware/info.html
 msgid "Bookmarks"
 msgstr "书签"
 
@@ -13852,11 +13853,7 @@ msgid "Handout Navigation"
 msgstr "讲义导航"
 
 #: lms/templates/courseware/info.html
-msgid "Important Course Dates"
-msgstr "重要课程日期"
-
-#: lms/templates/courseware/info.html
-msgid "Today is {date}"
+msgid "Course Tools"
 msgstr ""
 
 #: lms/templates/courseware/news.html
@@ -14031,8 +14028,8 @@ msgid ""
 msgstr "我们希望您享受这门课程，我们希望在{platform_name}的新课程中见到您。"
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
+#: lms/templates/emails/activation_email.txt
 #: lms/templates/emails/order_confirmation_email.txt
-#: themes/edx.org/lms/templates/emails/activation_email.txt
 msgid "The {platform_name} Team"
 msgstr " {platform_name} 团队"
 
@@ -14631,29 +14628,31 @@ msgid "Sincerely yours,The {course_name} Team"
 msgstr "您的真挚的{course_name}团队"
 
 #: lms/templates/emails/activation_email.txt
-#: themes/edx.org/lms/templates/emails/activation_email.txt
-msgid "Thank you for creating an account with {platform_name}!"
+msgid ""
+"You're almost there!  Use the link to activate your account to access "
+"engaging, high-quality {platform_name} courses.  Note that you will not be "
+"able to log back into your account until you have activated it."
+msgstr ""
+
+#: lms/templates/emails/activation_email.txt
+msgid "Enjoy learning with {platform_name}."
 msgstr ""
 
 #: lms/templates/emails/activation_email.txt
 msgid ""
-"There's just one more step before you can enroll in a course: you need to "
-"activate your {platform_name} account. To activate your account, click the "
-"following link. If that doesn't work, copy and paste the link into your "
-"browser's address bar."
+"If you need help, please use our web form at {support_url} or email "
+"{support_email}."
 msgstr ""
 
 #: lms/templates/emails/activation_email.txt
 msgid ""
-"If you didn't create an account, you don't need to do anything; you won't "
-"receive any more email from us. If you need assistance, please do not reply "
-"to this email message. Check the help section of the {platform_name} "
-"website."
+"This email message was automatically sent by {lms_url} because someone "
+"attempted to create an account on {platform_name} using this email address."
 msgstr ""
 
 #: lms/templates/emails/activation_email_subject.txt
-msgid "Activate Your {platform_name} Account"
-msgstr "激活您的 {platform_name}账户"
+msgid "Action Required: Activate your {platform_name} account"
+msgstr ""
 
 #: lms/templates/emails/add_beta_tester_email_message.txt
 #: lms/templates/emails/enroll_email_enrolledmessage.txt
@@ -17990,37 +17989,6 @@ msgid ""
 "{b_start}Support our Mission: {b_end} EdX, a non-profit, relies on verified "
 "certificates to help fund free education for everyone globally"
 msgstr "{b_start}支持我们的使命：{b_end} EdX 是一个非营利组织，依靠认证证书来来资助人人可享的全球免费教育"
-
-#: themes/edx.org/lms/templates/emails/activation_email.txt
-msgid ""
-"There's just one more step before you can enroll in a course: You need to "
-"activate your {platform_name} account. To activate your account, click the "
-"following link. If that doesn't work, copy and paste the link into your "
-"browser's address bar."
-msgstr ""
-
-#: themes/edx.org/lms/templates/emails/activation_email.txt
-msgid ""
-"After you activate your account, you can take any of the hundreds of courses"
-" {platform_name} offers. You will receive occasional email messages from "
-"{platform_name} about new courses or other information."
-msgstr ""
-
-#: themes/edx.org/lms/templates/emails/activation_email.txt
-msgid ""
-"If you need help, please use our web form at {contact_us_url}, email "
-"{info_email_address}, or write to {info_postal_address}."
-msgstr ""
-
-#: themes/edx.org/lms/templates/emails/activation_email.txt
-msgid "We hope you enjoy learning with {platform_name}!"
-msgstr ""
-
-#: themes/edx.org/lms/templates/emails/activation_email.txt
-msgid ""
-"This email message was automatically sent by {site_name} because someone "
-"attempted to create an account on {platform_name} using this email address."
-msgstr ""
 
 #. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
 #. Please do not translate any of these trademarks and company names.
