@@ -41,7 +41,9 @@ define(
             },
 
             removeVideo: function(event) {
-                var videoView = this;
+                var $thumbnailEl,
+                    videoView = this,
+                    videoId = videoView.model.get('edx_video_id');
 
                 event.preventDefault();
 
@@ -58,6 +60,11 @@ define(
                                     type: 'DELETE'
                                 }).done(function() {
                                     videoView.remove();
+                                    // TODO: Remove this when cleaning up - EDUCATOR-562
+                                    $thumbnailEl = $('.thumbnail-error-wrapper[data-video-id="' + videoId + '"]');
+                                    if ($thumbnailEl.length) {
+                                        $thumbnailEl.remove();
+                                    }
                                 });
                             }
                         );
