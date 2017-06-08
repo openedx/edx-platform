@@ -612,13 +612,14 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         afterRender: function() {
             AbstractVisibilityEditor.prototype.afterRender.call(this);
             this.setLock(this.isModelLocked());
+            this.hideCheckboxDivs();
             for (var key in this.model.attributes.group_access) {
                 this.$('.user-partition-select').val(key).change(); // should be only one partition key
             }
         },
 
         getSelectedEnrollmentTrackId: function() {
-            return this.$('.user-partition-select').val();
+            return parseInt(this.$('.user-partition-select').val());
         },
 
         getCheckboxDivs: function() {
@@ -629,8 +630,10 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             var checkboxes = $('#' + contentGroupId + '-checkboxes input:checked'),
                 selectedCheckboxValues = [];
             for(var i = 0; i < checkboxes.length; i++ ){
-                selectedCheckboxValues.push($(checkboxes[i]).val());
+                selectedCheckboxValues.push(parseInt($(checkboxes[i]).val()));
             }
+            console.dir('selected');
+            console.dir(selectedCheckboxValues);
             return selectedCheckboxValues;
         },
 
