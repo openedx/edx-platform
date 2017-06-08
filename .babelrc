@@ -13,5 +13,6 @@
       }
     ],
     "babel-preset-react"
-  ]
+  ],
+  "plugins": ["transform-object-rest-spread"]
 }
