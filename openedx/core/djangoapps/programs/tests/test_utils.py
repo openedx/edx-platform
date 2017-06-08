@@ -1,9 +1,12 @@
 """Tests covering Programs utilities."""
 # pylint: disable=no-member
 import datetime
+import json
 import uuid
 
 import ddt
+import httpretty
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -14,6 +17,7 @@ from pytz import utc
 from course_modes.models import CourseMode
 from lms.djangoapps.certificates.api import MODES
 from lms.djangoapps.commerce.tests.test_utils import update_commerce_config
+from lms.djangoapps.commerce.utils import EcommerceService
 from openedx.core.djangoapps.catalog.tests.factories import (
     generate_course_run_key,
     ProgramFactory,
@@ -30,15 +34,15 @@ from openedx.core.djangoapps.programs.utils import (
     get_certificates,
 )
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from student.tests.factories import AnonymousUserFactory, UserFactory, CourseEnrollmentFactory
 from util.date_utils import strftime_localized
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory as ModuleStoreCourseFactory
 
 
-UTILS_MODULE = 'openedx.core.djangoapps.programs.utils'
 CERTIFICATES_API_MODULE = 'lms.djangoapps.certificates.api'
-ECOMMERCE_URL_ROOT = 'https://example-ecommerce.com'
+ECOMMERCE_URL_ROOT = 'https://ecommerce.example.com'
+UTILS_MODULE = 'openedx.core.djangoapps.programs.utils'
 
 
 @ddt.ddt
@@ -809,6 +813,7 @@ class TestGetCertificates(TestCase):
 @skip_unless_lms
 class TestProgramMarketingDataExtender(ModuleStoreTestCase):
     """Tests of the program data extender utility class."""
+    ECOMMERCE_CALCULATE_DISCOUNT_ENDPOINT = '{root}/api/v2/baskets/calculate/'.format(root=ECOMMERCE_URL_ROOT)
     instructors = {
         'instructors': [
             {
@@ -825,13 +830,16 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
     def setUp(self):
         super(TestProgramMarketingDataExtender, self).setUp()
 
+        # Ensure the E-Commerce service user exists
+        UserFactory(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME, is_staff=True)
+
         self.course_price = 100
         self.number_of_courses = 2
         self.program = ProgramFactory(
             courses=[self._create_course(self.course_price) for __ in range(self.number_of_courses)]
         )
 
-    def _create_course(self, course_price, is_enrolled=False):
+    def _create_course(self, course_price):
         """
         Creates the course in mongo and update it with the instructor data.
         Also creates catalog course with respect to course run.
@@ -846,11 +854,23 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
         course = self.update_course(course, self.user.id)
 
         course_run = CourseRunFactory(
-            is_enrolled=is_enrolled,
             key=unicode(course.id),
             seats=[SeatFactory(price=course_price)]
         )
         return CourseFactory(course_runs=[course_run])
+
+    def _prepare_program_for_discounted_price_calculation_endpoint(self):
+        """
+        Program's applicable seat types should match some or all seat types of the seats that are a part of the program.
+        Otherwise, ecommerce API endpoint for calculating the discounted price won't be called.
+
+        Returns:
+            seat: seat for which the discount is applicable
+        """
+        self.ecommerce_service = EcommerceService()
+        seat = self.program['courses'][0]['course_runs'][0]['seats'][0]
+        self.program['applicable_seat_types'] = [seat['type']]
+        return seat
 
     def test_instructors(self):
         data = ProgramMarketingDataExtender(self.program, self.user).extend()
@@ -881,8 +901,8 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
     def test_learner_eligibility_for_one_click_purchase(self):
         """
         Learner should be eligible for one click purchase if:
-        - program is eligible for one click purchase
-        - learner is not enrolled in any of the course runs associated with the program
+            - program is eligible for one click purchase
+            - learner is not enrolled in any of the course runs associated with the program
         """
         data = ProgramMarketingDataExtender(self.program, self.user).extend()
         self.assertTrue(data['is_learner_eligible_for_one_click_purchase'])
@@ -896,10 +916,136 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
         data = ProgramMarketingDataExtender(program, self.user).extend()
         self.assertFalse(data['is_learner_eligible_for_one_click_purchase'])
 
-        courses.append(self._create_course(self.course_price, is_enrolled=True))
+        course = self._create_course(self.course_price)
+        CourseEnrollmentFactory(user=self.user, course_id=course['course_runs'][0]['key'])
         program2 = ProgramFactory(
-            courses=courses,
+            courses=[course],
             is_program_eligible_for_one_click_purchase=True
         )
         data = ProgramMarketingDataExtender(program2, self.user).extend()
         self.assertFalse(data['is_learner_eligible_for_one_click_purchase'])
+
+    def test_multiple_published_course_runs(self):
+        """
+        Learner should not be eligible for one click purchase if:
+            - program has a course with more than one published course run
+        """
+        course_run_1 = CourseRunFactory(
+            key=str(ModuleStoreCourseFactory().id),
+            status='published'
+        )
+        course_run_2 = CourseRunFactory(
+            key=str(ModuleStoreCourseFactory().id),
+            status='published'
+        )
+        course = CourseFactory(course_runs=[course_run_1, course_run_2])
+        program = ProgramFactory(
+            courses=[
+                CourseFactory(course_runs=[
+                    CourseRunFactory(
+                        key=str(ModuleStoreCourseFactory().id),
+                        status='published'
+                    )
+                ]),
+                course,
+                CourseFactory(course_runs=[
+                    CourseRunFactory(
+                        key=str(ModuleStoreCourseFactory().id),
+                        status='published'
+                    )
+                ])
+            ],
+            is_program_eligible_for_one_click_purchase=True
+        )
+        data = ProgramMarketingDataExtender(program, self.user).extend()
+
+        self.assertFalse(data['is_learner_eligible_for_one_click_purchase'])
+
+        course_run_2['status'] = 'unpublished'
+        data = ProgramMarketingDataExtender(program, self.user).extend()
+
+        self.assertTrue(data['is_learner_eligible_for_one_click_purchase'])
+
+    @httpretty.activate
+    def test_fetching_program_discounted_price(self):
+        """
+        Authenticated users eligible for one click purchase should see the purchase button
+            - displaying program's discounted price if it exists.
+            - leading to ecommerce basket page
+        """
+        self._prepare_program_for_discounted_price_calculation_endpoint()
+        mock_discount_data = {
+            'total_incl_tax_excl_discounts': 200.0,
+            'currency': "USD",
+            'total_incl_tax': 50.0
+        }
+        httpretty.register_uri(
+            httpretty.GET,
+            self.ECOMMERCE_CALCULATE_DISCOUNT_ENDPOINT,
+            body=json.dumps(mock_discount_data),
+            content_type='application/json'
+        )
+
+        data = ProgramMarketingDataExtender(self.program, self.user).extend()
+
+        self.assertEqual(
+            data['skus'],
+            [course['course_runs'][0]['seats'][0]['sku'] for course in self.program['courses']]
+        )
+        self.assertEqual(data['discount_data'], mock_discount_data)
+
+    @httpretty.activate
+    def test_fetching_program_discounted_price_as_anonymous_user(self):
+        """
+        Anonymous users should see the purchase button same way the authenticated users do
+        when the program is eligible for one click purchase.
+        """
+        self._prepare_program_for_discounted_price_calculation_endpoint()
+        mock_discount_data = {
+            'total_incl_tax_excl_discounts': 200.0,
+            'currency': "USD",
+            'total_incl_tax': 50.0
+        }
+        httpretty.register_uri(
+            httpretty.GET,
+            self.ECOMMERCE_CALCULATE_DISCOUNT_ENDPOINT,
+            body=json.dumps(mock_discount_data),
+            content_type='application/json'
+        )
+
+        data = ProgramMarketingDataExtender(self.program, AnonymousUserFactory()).extend()
+
+        self.assertEqual(
+            data['skus'],
+            [course['course_runs'][0]['seats'][0]['sku'] for course in self.program['courses']]
+        )
+        self.assertEqual(data['discount_data'], mock_discount_data)
+
+    def test_fetching_program_discounted_price_no_applicable_seats(self):
+        """
+        User shouldn't be able to do a one click purchase of a program if a program has no applicable seat types.
+        """
+        data = ProgramMarketingDataExtender(self.program, self.user).extend()
+
+        self.assertEqual(len(data['skus']), 0)
+
+    @httpretty.activate
+    def test_fetching_program_discounted_price_api_exception_caught(self):
+        """
+        User should be able to do a one click purchase of a program even if the ecommerce API throws an exception
+        during the calculation of program discounted price.
+        """
+        self._prepare_program_for_discounted_price_calculation_endpoint()
+        httpretty.register_uri(
+            httpretty.GET,
+            self.ECOMMERCE_CALCULATE_DISCOUNT_ENDPOINT,
+            status=400,
+            content_type='application/json'
+        )
+
+        data = ProgramMarketingDataExtender(self.program, self.user).extend()
+
+        self.assertEqual(
+            data['skus'],
+            [course['course_runs'][0]['seats'][0]['sku'] for course in self.program['courses']]
+        )
