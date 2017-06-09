@@ -42,6 +42,7 @@ class Command(BaseCommand):
                 'exclude_utm': 1,
                 'status': ('active', 'retired'),
                 'uuids_only': 1,
+                'hidden': 0
             }
 
             logger.info('Requesting program UUIDs.')
