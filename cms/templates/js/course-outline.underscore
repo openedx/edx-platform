@@ -92,7 +92,12 @@ if (staffOnlyMessage) {
         var allowedId = allowedGroups[0];
         var groupName = groupIdToName[allowedId];
         messageType = 'partition-groups';
-        messageText = gettext('Access to this unit is restricted to ' + groupName + ' learners');
+        messageText = edx.StringUtils.interpolate(
+                gettext('Access to this unit is restricted to {groupName} learners'),
+                {
+                    groupName: groupName
+                }
+        )
         addStatusMessage(messageType, messageText);
     }
 }
