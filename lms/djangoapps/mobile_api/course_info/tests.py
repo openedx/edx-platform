@@ -17,7 +17,7 @@ from ..testutils import (
 )
 
 
-@attr('shard_3')
+@attr(shard=3)
 @ddt.ddt
 class TestUpdates(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin, MilestonesTestCaseMixin):
     """
@@ -85,7 +85,7 @@ class TestUpdates(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTest
             self.assertIn("Update" + str(num), update_data['content'])
 
 
-@attr('shard_3')
+@attr(shard=3)
 @ddt.ddt
 class TestHandouts(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin, MilestonesTestCaseMixin):
     """

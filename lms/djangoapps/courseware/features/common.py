@@ -5,7 +5,7 @@ from __future__ import absolute_import
 
 import time
 
-from lettuce import world, step
+from lettuce import world, step, before
 from lettuce.django import django_url
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse

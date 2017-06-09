@@ -3,54 +3,12 @@ metadata:
     display_name: Math Expression Input
     markdown: !!null
 data: |
-  <problem>
-  <p>
-  In math expression input problems, learners enter text that represents a
-  mathematical expression into a field, and text is converted to a symbolic
-  expression that appears below that field. You can refer learners to
-  <a href="http://edx.readthedocs.io/projects/edx-guide-for-students/en/latest/completing_assignments/SFD_mathformatting.html" target="_blank">
-  Entering Mathematical and Scientific Expressions</a> in the <i>EdX Learner's
-  Guide</i> for information about how to enter text into the field.
-  </p>
-  <p>
-  Math expression problems can include unknown variables and relatively
-  complicated symbolic expressions. The grader uses a numerical sampling to
-  determine whether the student’s response matches your math expression, to a
-  specified numerical tolerance. You must specify the allowed variables in the
-  expression as well as the range of values for each variable.
-  </p>
-  <p>
-  To create these problems, you use MathJax to change your plain text into
-  "beautiful math." For more information about how to use MathJax in Studio,
-  see <a href="http://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/mathjax.html" target="_blank">
-  A Brief Introduction to MathJax in Studio</a> in <i>Building and Running an edx
-  Course</i>.
-  </p>
-  <p>When you add the problem, be sure to select <strong>Settings</strong>
-  to specify a <strong>Display Name</strong> and other values that apply.</p>
-  <p>You can use the following example problems as models.</p>
-
-  <p>Write an expression for the product of \( R_1\), \( R_2\), and
-  the inverse of \( R_3\) .</p>
-  <formularesponse type="ci" samples="R_1,R_2,R_3@1,2,3:3,4,5#10" answer="$VoVi">
-    <responseparam type="tolerance" default="0.00001"/>
-    <formulaequationinput size="40" label="Enter the equation"/>
-  </formularesponse>
-
-  <script type="loncapa/python">
-  VoVi = "(R_1*R_2)/R_3"
-  </script>
-
-  <p>Let \( x\) be a variable, and let \( n\) be an arbitrary constant.
-  What is the derivative of \( x^n\)?</p>
-
-  <script type="loncapa/python">
-  derivative = "n*x^(n-1)"
-  </script>
-
-  <formularesponse type="ci" samples="x,n@1,2:3,4#10" answer="$derivative">
-    <responseparam type="tolerance" default="0.00001"/>
-    <formulaequationinput size="40"  label="Enter the equation"/>
-  </formularesponse>
-
-  </problem>
+      <problem>
+          <formularesponse type="ci" samples="R_1,R_2,R_3@1,2,3:3,4,5#10" answer="R_1*R_2/R_3">
+              <p>You can use this template as a guide to the OLX markup to use for math expression problems. Edit this component to replace the example with your own assessment.</p>
+              <label>Add the question text, or prompt, here. This text is required. Example: Write an expression for the product of R_1, R_2, and the inverse of R_3.</label>
+              <description>You can add an optional tip or note related to the prompt like this. Example: To test this example, the correct answer is R_1*R_2/R_3</description>
+              <responseparam type="tolerance" default="0.00001"/>
+              <formulaequationinput size="40"/>
+          </formularesponse>
+      </problem>

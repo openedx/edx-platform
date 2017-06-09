@@ -1,12 +1,12 @@
 """
 Base class for account settings page.
 """
-from . import BASE_URL
+from common.test.acceptance.pages.lms import BASE_URL
 
 from bok_choy.page_object import PageObject
 from bok_choy.promise import EmptyPromise
 
-from .fields import FieldsMixin
+from common.test.acceptance.pages.lms.fields import FieldsMixin
 
 
 class AccountSettingsPage(FieldsMixin, PageObject):
@@ -33,7 +33,7 @@ class AccountSettingsPage(FieldsMixin, PageObject):
         """
         structure = []
 
-        sections = self.q(css='.section')
+        sections = self.q(css='#aboutTabSections-tabpanel .section')
         for section in sections:
             section_title_element = section.find_element_by_class_name('section-header')
             field_title_elements = section.find_elements_by_class_name('u-field-title')

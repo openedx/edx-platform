@@ -37,7 +37,8 @@ def with_site_configuration(domain="test.localhost", configuration=None):
             with patch('openedx.core.djangoapps.site_configuration.helpers.get_current_site_configuration',
                        return_value=site_configuration):
                 with patch('openedx.core.djangoapps.theming.helpers.get_current_site', return_value=site):
-                    return func(*args, **kwargs)
+                    with patch('django.contrib.sites.models.SiteManager.get_current', return_value=site):
+                        return func(*args, **kwargs)
         return _decorated
     return _decorator
 
@@ -63,4 +64,5 @@ def with_site_configuration_context(domain="test.localhost", configuration=None)
     with patch('openedx.core.djangoapps.site_configuration.helpers.get_current_site_configuration',
                return_value=site_configuration):
         with patch('openedx.core.djangoapps.theming.helpers.get_current_site', return_value=site):
-            yield
+            with patch('django.contrib.sites.models.SiteManager.get_current', return_value=site):
+                yield

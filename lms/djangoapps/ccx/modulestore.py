@@ -296,8 +296,8 @@ class CCXModulestoreWrapper(object):
             yield
 
     @contextmanager
-    def bulk_operations(self, course_id, emit_signals=True):
+    def bulk_operations(self, course_id, emit_signals=True, ignore_case=False):
         """See the docs for xmodule.modulestore.mixed.MixedModuleStore"""
         course_id, _ = strip_ccx(course_id)
-        with self._modulestore.bulk_operations(course_id, emit_signals=emit_signals):
+        with self._modulestore.bulk_operations(course_id, emit_signals=emit_signals, ignore_case=ignore_case):
             yield

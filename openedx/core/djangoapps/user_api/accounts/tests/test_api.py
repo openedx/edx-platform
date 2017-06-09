@@ -34,7 +34,7 @@ def mock_render_to_string(template_name, context):
     return str((template_name, sorted(context.iteritems())))
 
 
-@attr('shard_2')
+@attr(shard=2)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
 class TestAccountApi(UserSettingsEventTestMixin, TestCase):
     """
@@ -232,7 +232,7 @@ class TestAccountApi(UserSettingsEventTestMixin, TestCase):
         verify_event_emitted([], [{"code": "en"}, {"code": "fr"}])
 
 
-@attr('shard_2')
+@attr(shard=2)
 @patch('openedx.core.djangoapps.user_api.accounts.image_helpers._PROFILE_IMAGE_SIZES', [50, 10])
 @patch.dict(
     'openedx.core.djangoapps.user_api.accounts.image_helpers.PROFILE_IMAGE_SIZES_MAP',
@@ -286,7 +286,7 @@ class AccountSettingsOnCreationTest(TestCase):
         })
 
 
-@attr('shard_2')
+@attr(shard=2)
 @ddt.ddt
 class AccountCreationActivationAndPasswordChangeTest(TestCase):
     """

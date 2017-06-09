@@ -33,7 +33,7 @@ def intercepted_function(raise_error=None):
 
     """
     if raise_error is not None:
-        raise raise_error
+        raise raise_error                   # pylint: disable=raising-bad-type
 
 
 class InterceptErrorsTest(TestCase):
@@ -88,7 +88,9 @@ class FormDescriptionTest(TestCase):
             },
             error_messages={
                 "required": "You must provide a value!"
-            }
+            },
+            supplementalLink="",
+            supplementalText="",
         )
 
         self.assertEqual(desc.to_json(), json.dumps({
@@ -109,7 +111,9 @@ class FormDescriptionTest(TestCase):
                     },
                     "errorMessages": {
                         "required": "You must provide a value!"
-                    }
+                    },
+                    "supplementalLink": "",
+                    "supplementalText": ""
                 }
             ]
         }))

@@ -6,7 +6,7 @@ import django.utils.timezone
 from django.conf import settings
 import django_extensions.db.fields
 import model_utils.fields
-import xmodule_django.models
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 import certificates.models
 import datetime
 from django.utils.timezone import utc
@@ -43,7 +43,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, verbose_name='created', editable=False)),
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
-                ('course_id', xmodule_django.models.CourseKeyField(max_length=255)),
+                ('course_id', CourseKeyField(max_length=255)),
                 ('is_regeneration', models.BooleanField(default=False)),
                 ('generated_by', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
                 ('instructor_task', models.ForeignKey(to='instructor_task.InstructorTask')),
@@ -59,7 +59,7 @@ class Migration(migrations.Migration):
                 ('description', models.CharField(help_text='Description and/or admin notes.', max_length=255, null=True, blank=True)),
                 ('template', models.TextField(help_text='Django template HTML.')),
                 ('organization_id', models.IntegerField(help_text='Organization of template.', null=True, db_index=True, blank=True)),
-                ('course_key', xmodule_django.models.CourseKeyField(db_index=True, max_length=255, null=True, blank=True)),
+                ('course_key', CourseKeyField(db_index=True, max_length=255, null=True, blank=True)),
                 ('mode', models.CharField(default=b'honor', choices=[(b'verified', b'verified'), (b'honor', b'honor'), (b'audit', b'audit'), (b'professional', b'professional'), (b'no-id-professional', b'no-id-professional')], max_length=125, blank=True, help_text='The course mode for this template.', null=True)),
                 ('is_active', models.BooleanField(default=False, help_text='On/Off switch.')),
             ],

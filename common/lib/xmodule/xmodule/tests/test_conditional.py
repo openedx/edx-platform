@@ -2,6 +2,7 @@ import json
 import unittest
 
 from fs.memoryfs import MemoryFS
+from lxml import etree
 from mock import Mock, patch
 
 from xblock.field_data import DictFieldData
@@ -11,8 +12,9 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore, CourseLocationManager
 from xmodule.conditional_module import ConditionalDescriptor
 from xmodule.tests import DATA_DIR, get_test_system, get_test_descriptor_system
-from xmodule.x_module import STUDENT_VIEW
-
+from xmodule.tests.xml import factories as xml, XModuleXmlImportTest
+from xmodule.validation import StudioValidationMessage
+from xmodule.x_module import STUDENT_VIEW, AUTHOR_VIEW
 
 ORG = 'test_org'
 COURSE = 'conditional'      # name of directory with course data
@@ -37,13 +39,20 @@ class DummySystem(ImportSystem):
         raise Exception("Shouldn't be called")
 
 
+class ConditionalModuleFactory(xml.XmlImportFactory):
+    """
+    Factory for generating ConditionalModule for testing purposes
+    """
+    tag = 'conditional'
+
+
 class ConditionalFactory(object):
     """
     A helper class to create a conditional module and associated source and child modules
     to allow for testing.
     """
     @staticmethod
-    def create(system, source_is_error_module=False):
+    def create(system, source_is_error_module=False, source_visible_to_staff_only=False):
         """
         return a dict of modules: the conditional with a single source and a single child.
         Keys are 'cond_module', 'source_module', and 'child_module'.
@@ -66,11 +75,13 @@ class ConditionalFactory(object):
             source_descriptor = Mock(name='source_descriptor')
             source_descriptor.location = source_location
 
+        source_descriptor.visible_to_staff_only = source_visible_to_staff_only
         source_descriptor.runtime = descriptor_system
         source_descriptor.render = lambda view, context=None: descriptor_system.render(source_descriptor, view, context)
 
         # construct other descriptors:
         child_descriptor = Mock(name='child_descriptor')
+        child_descriptor.visible_to_staff_only = False
         child_descriptor._xmodule.student_view.return_value.content = u'<p>This is a secret</p>'
         child_descriptor.student_view = child_descriptor._xmodule.student_view
         child_descriptor.displayable_items.return_value = [child_descriptor]
@@ -78,6 +89,12 @@ class ConditionalFactory(object):
         child_descriptor.xmodule_runtime = get_test_system()
         child_descriptor.render = lambda view, context=None: descriptor_system.render(child_descriptor, view, context)
         child_descriptor.location = source_location.replace(category='html', name='child')
+
+        def visible_to_nonstaff_users(desc):
+            """
+            Returns if the object is visible to nonstaff users.
+            """
+            return not desc.visible_to_staff_only
 
         def load_item(usage_id, for_parent=None):  # pylint: disable=unused-argument
             """Test-only implementation of load_item that simply returns static xblocks."""
@@ -94,6 +111,8 @@ class ConditionalFactory(object):
         cond_location = Location("edX", "conditional_test", "test_run", "conditional", "SampleConditional", None)
         field_data = DictFieldData({
             'data': '<conditional/>',
+            'conditional_attr': 'attempted',
+            'conditional_value': 'true',
             'xml_attributes': {'attempted': 'true'},
             'children': [child_descriptor.location],
         })
@@ -104,8 +123,12 @@ class ConditionalFactory(object):
             ScopeIds(None, None, cond_location, cond_location)
         )
         cond_descriptor.xmodule_runtime = system
-        system.get_module = lambda desc: desc
+        system.get_module = lambda desc: desc if visible_to_nonstaff_users(desc) else None
         cond_descriptor.get_required_module_descriptors = Mock(return_value=[source_descriptor])
+        cond_descriptor.required_modules = [
+            system.get_module(descriptor)
+            for descriptor in cond_descriptor.get_required_module_descriptors()
+        ]
 
         # return dict:
         return {'cond_module': cond_descriptor,
@@ -146,9 +169,9 @@ class ConditionalModuleBasicTest(unittest.TestCase):
 
     def test_handle_ajax(self):
         modules = ConditionalFactory.create(self.test_system)
+        modules['cond_module'].save()
         modules['source_module'].is_attempted = "false"
         ajax = json.loads(modules['cond_module'].handle_ajax('', ''))
-        modules['cond_module'].save()
         print "ajax: ", ajax
         html = ajax['html']
         self.assertFalse(any(['This is a secret' in item for item in html]))
@@ -167,10 +190,23 @@ class ConditionalModuleBasicTest(unittest.TestCase):
         and that the condition is not satisfied.
         '''
         modules = ConditionalFactory.create(self.test_system, source_is_error_module=True)
-        ajax = json.loads(modules['cond_module'].handle_ajax('', ''))
         modules['cond_module'].save()
+        ajax = json.loads(modules['cond_module'].handle_ajax('', ''))
         html = ajax['html']
         self.assertFalse(any(['This is a secret' in item for item in html]))
+
+    @patch('xmodule.conditional_module.log')
+    def test_conditional_with_staff_only_source_module(self, mock_log):
+        modules = ConditionalFactory.create(
+            self.test_system,
+            source_visible_to_staff_only=True,
+        )
+        cond_module = modules['cond_module']
+        cond_module.save()
+        cond_module.is_attempted = "false"
+        cond_module.handle_ajax('', '')
+        self.assertFalse(mock_log.warn.called)
+        self.assertIn(None, cond_module.required_modules)
 
 
 class ConditionalModuleXmlTest(unittest.TestCase):
@@ -304,3 +340,106 @@ class ConditionalModuleXmlTest(unittest.TestCase):
             conditional.parse_sources(conditional.xml_attributes),
             ['i4x://HarvardX/ER22x/poll_question/T15_poll', 'i4x://HarvardX/ER22x/poll_question/T16_poll']
         )
+
+    def test_conditional_module_parse_attr_values(self):
+        root = '<conditional attempted="false"></conditional>'
+        xml_object = etree.XML(root)
+        definition = ConditionalDescriptor.definition_from_xml(xml_object, Mock())[0]
+        expected_definition = {
+            'show_tag_list': [],
+            'conditional_attr': 'attempted',
+            'conditional_value': 'false',
+            'conditional_message': ''
+        }
+
+        self.assertEqual(definition, expected_definition)
+
+    def test_presence_attributes_in_xml_attributes(self):
+        modules = ConditionalFactory.create(self.test_system)
+        modules['cond_module'].save()
+        modules['cond_module'].definition_to_xml(Mock())
+        expected_xml_attributes = {
+            'attempted': 'true',
+            'message': 'You must complete {link} before you can access this unit.',
+            'sources': ''
+        }
+        self.assertDictEqual(modules['cond_module'].xml_attributes, expected_xml_attributes)
+
+
+class ConditionalModuleStudioTest(XModuleXmlImportTest):
+    """
+    Unit tests for how conditional test interacts with Studio.
+    """
+
+    def setUp(self):
+        super(ConditionalModuleStudioTest, self).setUp()
+        course = xml.CourseFactory.build()
+        sequence = xml.SequenceFactory.build(parent=course)
+        conditional = ConditionalModuleFactory(
+            parent=sequence,
+            attribs={
+                'group_id_to_child': '{"0": "i4x://edX/xml_test_course/html/conditional_0"}'
+            }
+        )
+        xml.HtmlFactory(parent=conditional, url_name='conditional_0', text='This is a secret HTML')
+
+        self.course = self.process_xml(course)
+        self.sequence = self.course.get_children()[0]
+        self.conditional = self.sequence.get_children()[0]
+
+        self.module_system = get_test_system()
+        self.module_system.descriptor_runtime = self.course._runtime  # pylint: disable=protected-access
+
+        user = Mock(username='ma', email='ma@edx.org', is_staff=False, is_active=True)
+        self.conditional.bind_for_student(
+            self.module_system,
+            user.id
+        )
+
+    def test_render_author_view(self,):
+        """
+        Test the rendering of the Studio author view.
+        """
+
+        def create_studio_context(root_xblock, is_unit_page):
+            """
+            Context for rendering the studio "author_view".
+            """
+            return {
+                'reorderable_items': set(),
+                'root_xblock': root_xblock,
+                'is_unit_page': is_unit_page
+            }
+
+        context = create_studio_context(self.conditional, False)
+        html = self.module_system.render(self.conditional, AUTHOR_VIEW, context).content
+        self.assertIn('This is a secret HTML', html)
+
+        context = create_studio_context(self.sequence, True)
+        html = self.module_system.render(self.conditional, AUTHOR_VIEW, context).content
+        self.assertNotIn('This is a secret HTML', html)
+
+    def test_non_editable_settings(self):
+        """
+        Test the settings that are marked as "non-editable".
+        """
+        non_editable_metadata_fields = self.conditional.non_editable_metadata_fields
+        self.assertIn(ConditionalDescriptor.due, non_editable_metadata_fields)
+        self.assertIn(ConditionalDescriptor.is_practice_exam, non_editable_metadata_fields)
+        self.assertIn(ConditionalDescriptor.is_time_limited, non_editable_metadata_fields)
+        self.assertIn(ConditionalDescriptor.default_time_limit_minutes, non_editable_metadata_fields)
+        self.assertIn(ConditionalDescriptor.show_tag_list, non_editable_metadata_fields)
+
+    def test_validation_messages(self):
+        """
+        Test the validation message for a correctly configured conditional.
+        """
+        self.conditional.sources_list = None
+        validation = self.conditional.validate()
+        self.assertEqual(
+            validation.summary.text,
+            u"This component has no source components configured yet."
+        )
+        self.assertEqual(validation.summary.type, StudioValidationMessage.NOT_CONFIGURED)
+        self.assertEqual(validation.summary.action_class, 'edit-button')
+        self.assertEqual(validation.summary.action_label, u"Configure list of sources")

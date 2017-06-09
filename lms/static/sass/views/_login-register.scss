@@ -244,8 +244,10 @@
             &.error {
                 color: $red;
             }
-
-            &[for="register-honor_code"], &[for="register-terms_of_service"] {
+            
+            &[for="register-data_sharing_consent"],
+            &[for="register-honor_code"],
+            &[for="register-terms_of_service"] {
                 display: inline-block;
                 margin: 5px 5px 0 0;
                 width: 90%;
@@ -255,10 +257,6 @@
             &[for="login-remember"] {
                 display: inline-block;
             }
-
-            a {
-                font-family: $sans-serif;
-            }
         }
 
         .field-link {
@@ -266,10 +264,22 @@
             display: block;
             margin-bottom: ($baseline/2);
             margin-top: ($baseline/4);
-            color: $m-blue-d5;
+            border: none;
+            padding: 0;
+            background: transparent;
+            box-shadow: none;
+            text-transform: initial;
+            letter-spacing: normal;
+            color: $uxpl-blue-base;
             font-weight: $font-regular;
-            text-decoration: none !important; // needed but nasty
+            text-decoration: none;
+            text-shadow: none;
             font-family: $sans-serif;
+            
+            &:hover,
+            &:focus {
+                text-decoration: underline;
+            }
         }
 
         input,
@@ -323,7 +333,7 @@
             @extend %t-copy-sub2;
             display: block;
             margin: 0 0 ($baseline/2) 0;
-            color: $m-gray-l1;
+            color: $base-font-color;
         }
         /** FROM _accounts.scss - end **/
     }
@@ -591,4 +601,8 @@
     #finish-auth-status li:last-child {
         font-weight: bold;
     }
+}
+
+.supplemental-link {
+    margin: 1rem 0;
 }

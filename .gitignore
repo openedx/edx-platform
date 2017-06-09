@@ -3,9 +3,13 @@
 
 ### Files private to developers
 
+# Files that should be git-ignored, but are hand-edited or otherwise valued,
+# and so should not be destroyed by "make clean".
+# start-noclean
 requirements/private.txt
 lms/envs/private.py
 cms/envs/private.py
+# end-noclean
 
 ### Python artifacts
 *.pyc
@@ -19,6 +23,18 @@ cms/envs/private.py
 .redcar/
 codekit-config.json
 .pycharm_helpers/
+/_mac/*
+/IntelliLang.xml
+/conda_packages.xml
+/databaseSettings.xml
+/diff.xml
+/debugger.xml
+/editor.xml
+/ide.general.xml
+/inspection/Default.xml
+/other.xml
+/packages.xml
+/web-browsers.xml
 
 ### NFS artifacts
 .nfs*
@@ -86,6 +102,7 @@ cms/static/sass/*.css
 cms/static/sass/*.css.map
 cms/static/themed_sass/
 themes/**/css/*.css
+themes/**/css/discussion/*.css
 
 ### Logging artifacts
 log/

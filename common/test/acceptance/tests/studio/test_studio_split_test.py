@@ -10,15 +10,15 @@ from selenium.webdriver.support.ui import Select
 from xmodule.partitions.partitions import Group
 from bok_choy.promise import Promise, EmptyPromise
 
-from ...fixtures.course import XBlockFixtureDesc
-from ...pages.studio.component_editor import ComponentEditorView
-from ...pages.studio.overview import CourseOutlinePage, CourseOutlineUnit
-from ...pages.studio.container import ContainerPage
-from ...pages.studio.settings_group_configurations import GroupConfigurationsPage
-from ...pages.studio.utils import add_advanced_component
-from ...pages.xblock.utils import wait_for_xblock_initialization
-from ...pages.lms.courseware import CoursewarePage
-from ..helpers import create_user_partition_json
+from common.test.acceptance.fixtures.course import XBlockFixtureDesc
+from common.test.acceptance.pages.studio.component_editor import ComponentEditorView
+from common.test.acceptance.pages.studio.overview import CourseOutlinePage, CourseOutlineUnit
+from common.test.acceptance.pages.studio.container import ContainerPage
+from common.test.acceptance.pages.studio.settings_group_configurations import GroupConfigurationsPage
+from common.test.acceptance.pages.studio.utils import add_advanced_component
+from common.test.acceptance.pages.xblock.utils import wait_for_xblock_initialization
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.tests.helpers import create_user_partition_json
 
 from base_studio_test import StudioCourseTest
 
@@ -66,7 +66,7 @@ class SplitTestMixin(object):
         Promise(missing_groups_button_not_present, "Add missing groups button should not be showing.").fulfill()
 
 
-@attr('shard_2')
+@attr(shard=2)
 class SplitTest(ContainerBase, SplitTestMixin):
     """
     Tests for creating and editing split test instances in Studio.
@@ -199,7 +199,7 @@ class SplitTest(ContainerBase, SplitTestMixin):
         self.verify_groups(container, ['alpha'], [], verify_missing_groups_not_present=False)
 
 
-@attr('shard_2')
+@attr(shard=2)
 class GroupConfigurationsNoSplitTest(StudioCourseTest):
     """
     Tests how the Group Configuration page should look when the split_test module is not enabled.
@@ -224,7 +224,7 @@ class GroupConfigurationsNoSplitTest(StudioCourseTest):
         self.assertFalse(self.group_configurations_page.experiment_group_sections_present)
 
 
-@attr('shard_2')
+@attr(shard=2)
 class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
     """
     Tests that Group Configurations page works correctly with previously
@@ -759,10 +759,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         config.click_outline_anchor()
 
         # Waiting for the page load and verify that we've landed on course outline page
-        EmptyPromise(
-            lambda: self.outline_page.is_browser_on_page(), "loaded page {!r}".format(self.outline_page),
-            timeout=30
-        ).fulfill()
+        self.outline_page.wait_for_page()
 
     def test_group_configuration_non_empty_usage(self):
         """
@@ -806,10 +803,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
 
         unit = ContainerPage(self.browser, vertical.locator)
         # Waiting for the page load and verify that we've landed on the unit page
-        EmptyPromise(
-            lambda: unit.is_browser_on_page(), "loaded page {!r}".format(unit),
-            timeout=30
-        ).fulfill()
+        unit.wait_for_page()
 
         self.assertIn(unit.name, usage)
 

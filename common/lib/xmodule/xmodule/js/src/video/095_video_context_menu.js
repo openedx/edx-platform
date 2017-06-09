@@ -1,14 +1,14 @@
-(function (define) {
-'use strict';
+(function(define) {
+    'use strict';
 // VideoContextMenu module.
-define(
+    define(
 'video/095_video_context_menu.js',
 ['video/00_component.js'],
-function (Component) {
+function(Component) {
     var AbstractItem, AbstractMenu, Menu, Overlay, Submenu, MenuItem;
 
     AbstractItem = Component.extend({
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = $.extend(true, {
                 label: '',
                 prefix: 'edx-',
@@ -26,24 +26,24 @@ function (Component) {
             this.delegateEvents();
             this.options.initialize.call(this, this);
         },
-        destroy: function () {
+        destroy: function() {
             _.invoke(this.getChildren(), 'destroy');
             this.undelegateEvents();
             this.getElement().remove();
         },
-        open: function () {
+        open: function() {
             this.getElement().addClass('is-opened');
             return this;
         },
-        close: function () { },
-        closeSiblings: function () {
+        close: function() { },
+        closeSiblings: function() {
             _.invoke(this.getSiblings(), 'close');
             return this;
         },
-        getElement: function () {
+        getElement: function() {
             return this.element;
         },
-        addChild: function (child) {
+        addChild: function(child) {
             var firstChild = null, lastChild = null;
             if (this.hasChildren()) {
                 lastChild = this.getLastChild();
@@ -57,51 +57,51 @@ function (Component) {
             this.children.push(child);
             return this;
         },
-        getChildren: function () {
+        getChildren: function() {
             // Returns the copy.
             return this.children.concat();
         },
-        hasChildren: function () {
+        hasChildren: function() {
             return this.getChildren().length > 0;
         },
-        getFirstChild: function () {
+        getFirstChild: function() {
             return _.first(this.children);
         },
-        getLastChild: function () {
+        getLastChild: function() {
             return _.last(this.children);
         },
-        bindEvent: function (element, events, handler) {
+        bindEvent: function(element, events, handler) {
             $(element).on(this.addNamespace(events), handler);
             return this;
         },
-        getNext: function () {
+        getNext: function() {
             var item = this.next;
             while (item.isHidden() && this.id !== item.id) { item = item.next; }
             return item;
         },
-        getPrev: function () {
+        getPrev: function() {
             var item = this.prev;
             while (item.isHidden() && this.id !== item.id) { item = item.prev; }
             return item;
         },
-        createElement: function () {
+        createElement: function() {
             return null;
         },
-        getRoot: function () {
+        getRoot: function() {
             var item = this;
             while (item.parent) { item = item.parent; }
             return item;
         },
-        populateElement: function () { },
-        focus: function () {
+        populateElement: function() { },
+        focus: function() {
             this.getElement().focus();
             this.closeSiblings();
             return this;
         },
-        isHidden: function () {
+        isHidden: function() {
             return this.getElement().is(':hidden');
         },
-        getSiblings: function () {
+        getSiblings: function() {
             var items = [],
                 item = this;
             while (item.next && item.next.id !== this.id) {
@@ -110,33 +110,33 @@ function (Component) {
             }
             return items;
         },
-        select: function () { },
-        unselect: function () { },
-        setLabel: function () { },
-        itemHandler: function () { },
-        keyDownHandler: function () { },
-        delegateEvents: function () { },
-        undelegateEvents: function () {
+        select: function() { },
+        unselect: function() { },
+        setLabel: function() { },
+        itemHandler: function() { },
+        keyDownHandler: function() { },
+        delegateEvents: function() { },
+        undelegateEvents: function() {
             this.getElement().off('.' + this.id);
         },
-        addNamespace: function (events) {
-            return _.map(events.split(/\s+/), function (event) {
+        addNamespace: function(events) {
+            return _.map(events.split(/\s+/), function(event) {
                 return event + '.' + this.id;
             }, this).join(' ');
         }
     });
 
     AbstractMenu = AbstractItem.extend({
-        delegateEvents: function () {
+        delegateEvents: function() {
             this.bindEvent(this.getElement(), 'keydown mouseleave mouseover', this.itemHandler.bind(this))
-                .bindEvent(this.getElement(), 'contextmenu', function (event) { event.preventDefault(); });
+                .bindEvent(this.getElement(), 'contextmenu', function(event) { event.preventDefault(); });
             return this;
         },
 
-        populateElement: function () {
+        populateElement: function() {
             var fragment = document.createDocumentFragment();
 
-            _.each(this.getChildren(), function (child) {
+            _.each(this.getChildren(), function(child) {
                 fragment.appendChild(child.populateElement()[0]);
             }, this);
 
@@ -145,40 +145,40 @@ function (Component) {
             return this.getElement();
         },
 
-        close: function () {
+        close: function() {
             this.closeChildren();
             this.getElement().removeClass('is-opened');
             return this;
         },
 
-        closeChildren: function () {
+        closeChildren: function() {
             _.invoke(this.getChildren(), 'close');
             return this;
         },
 
-        itemHandler: function (event) {
+        itemHandler: function(event) {
             event.preventDefault();
             var item = $(event.target).data('menu');
-            switch(event.type) {
-                case 'keydown':
-                    this.keyDownHandler.call(this, event, item);
-                    break;
-                case 'mouseover':
-                    this.mouseOverHandler.call(this, event, item);
-                    break;
-                case 'mouseleave':
-                    this.mouseLeaveHandler.call(this, event, item);
-                    break;
+            switch (event.type) {
+            case 'keydown':
+                this.keyDownHandler.call(this, event, item);
+                break;
+            case 'mouseover':
+                this.mouseOverHandler.call(this, event, item);
+                break;
+            case 'mouseleave':
+                this.mouseLeaveHandler.call(this, event, item);
+                break;
             }
         },
 
-        keyDownHandler: function () { },
-        mouseOverHandler: function () { },
-        mouseLeaveHandler: function () { }
+        keyDownHandler: function() { },
+        mouseOverHandler: function() { },
+        mouseLeaveHandler: function() { }
     });
 
     Menu = AbstractMenu.extend({
-        initialize: function (options, contextmenuElement, container) {
+        initialize: function(options, contextmenuElement, container) {
             this.contextmenuElement = $(contextmenuElement);
             this.container = $(container);
             this.overlay = this.getOverlay();
@@ -186,7 +186,7 @@ function (Component) {
             this.build(this, this.options.items);
         },
 
-        createElement: function () {
+        createElement: function() {
             return $('<ol />', {
                 'class': ['contextmenu', this.options.prefix + 'contextmenu'].join(' '),
                 'role': 'menu',
@@ -194,40 +194,40 @@ function (Component) {
             });
         },
 
-        delegateEvents: function () {
+        delegateEvents: function() {
             AbstractMenu.prototype.delegateEvents.call(this);
             this.bindEvent(this.contextmenuElement, 'contextmenu', this.contextmenuHandler.bind(this))
                 .bindEvent(window, 'resize', _.debounce(this.close.bind(this), 100));
             return this;
         },
 
-        destroy: function () {
+        destroy: function() {
             AbstractMenu.prototype.destroy.call(this);
             this.overlay.destroy();
             this.contextmenuElement.removeData('contextmenu');
             return this;
         },
 
-        undelegateEvents: function () {
+        undelegateEvents: function() {
             AbstractMenu.prototype.undelegateEvents.call(this);
             this.contextmenuElement.off(this.addNamespace('contextmenu'));
             this.overlay.undelegateEvents();
             return this;
         },
 
-        appendContent: function (content) {
+        appendContent: function(content) {
             this.getElement().append(content);
             return this;
         },
 
-        addChild: function () {
+        addChild: function() {
             AbstractMenu.prototype.addChild.apply(this, arguments);
             this.next = this.getFirstChild();
             this.prev = this.getLastChild();
             return this;
         },
 
-        build: function (container, items) {
+        build: function(container, items) {
             _.each(items, function(item) {
                 var child;
                 if (_.has(item, 'items')) {
@@ -240,12 +240,12 @@ function (Component) {
             return container;
         },
 
-        focus: function () {
+        focus: function() {
             this.getElement().focus();
             return this;
         },
 
-        open: function () {
+        open: function() {
             var menu = (this.isRendered) ? this.getElement() : this.populateElement();
             this.container.append(menu);
             AbstractItem.prototype.open.call(this);
@@ -253,7 +253,7 @@ function (Component) {
             return this;
         },
 
-        close: function () {
+        close: function() {
             AbstractMenu.prototype.close.call(this);
             this.getElement().detach();
             this.overlay.hide();
@@ -271,7 +271,7 @@ function (Component) {
             return this;
         },
 
-        pointInContainerBox: function (x, y) {
+        pointInContainerBox: function(x, y) {
             var containerOffset = this.contextmenuElement.offset(),
                 containerBox = {
                     x0: containerOffset.left,
@@ -282,10 +282,10 @@ function (Component) {
             return containerBox.x0 <= x && x <= containerBox.x1 && containerBox.y0 <= y && y <= containerBox.y1;
         },
 
-        getOverlay: function () {
+        getOverlay: function() {
             return new Overlay(
                 this.close.bind(this),
-                function (event) {
+                function(event) {
                     event.preventDefault();
                     if (this.pointInContainerBox(event.pageX, event.pageY)) {
                         this.position(event).focus();
@@ -293,45 +293,44 @@ function (Component) {
                     } else {
                         this.close();
                     }
-
                 }.bind(this)
             );
         },
 
-        contextmenuHandler: function (event) {
+        contextmenuHandler: function(event) {
             event.preventDefault();
             event.stopPropagation();
             this.open().position(event).focus();
         },
 
-        keyDownHandler: function (event, item) {
+        keyDownHandler: function(event, item) {
             var KEY = $.ui.keyCode,
                 keyCode = event.keyCode;
 
             switch (keyCode) {
-                case KEY.UP:
-                    item.getPrev().focus();
-                    event.stopPropagation();
-                    break;
-                case KEY.DOWN:
-                    item.getNext().focus();
-                    event.stopPropagation();
-                    break;
-                case KEY.TAB:
-                    event.stopPropagation();
-                    break;
-                case KEY.ESCAPE:
-                    this.close();
-                    break;
+            case KEY.UP:
+                item.getPrev().focus();
+                event.stopPropagation();
+                break;
+            case KEY.DOWN:
+                item.getNext().focus();
+                event.stopPropagation();
+                break;
+            case KEY.TAB:
+                event.stopPropagation();
+                break;
+            case KEY.ESCAPE:
+                this.close();
+                break;
             }
 
             return false;
-        }
+                                                }
     });
 
     Overlay = Component.extend({
         ns: '.overlay',
-        initialize: function (clickHandler, contextmenuHandler) {
+        initialize: function(clickHandler, contextmenuHandler) {
             this.element = $('<div />', {
                 'class': 'overlay'
             });
@@ -339,37 +338,37 @@ function (Component) {
             this.contextmenuHandler = contextmenuHandler;
         },
 
-        destroy: function () {
+        destroy: function() {
             this.getElement().remove();
             this.undelegateEvents();
         },
 
-        getElement: function () {
+        getElement: function() {
             return this.element;
         },
 
-        hide: function () {
+        hide: function() {
             this.getElement().detach();
             this.undelegateEvents();
             return this;
         },
 
-        show: function (container) {
+        show: function(container) {
             $(container).append(this.getElement());
             this.delegateEvents();
             return this;
         },
 
-        delegateEvents: function () {
+        delegateEvents: function() {
             var self = this;
             $(document)
-                .on('click' + this.ns, function () {
+                .on('click' + this.ns, function() {
                     if (_.isFunction(self.clickHandler)) {
                         self.clickHandler.apply(this, arguments);
                     }
                     self.hide();
                 })
-                .on('contextmenu' + this.ns, function () {
+                .on('contextmenu' + this.ns, function() {
                     if (_.isFunction(self.contextmenuHandler)) {
                         self.contextmenuHandler.apply(this, arguments);
                     }
@@ -377,21 +376,21 @@ function (Component) {
             return this;
         },
 
-        undelegateEvents: function () {
+        undelegateEvents: function() {
             $(document).off(this.ns);
             return this;
         }
     });
 
     Submenu = AbstractMenu.extend({
-        initialize: function (options, contextmenuElement) {
+        initialize: function(options, contextmenuElement) {
             this.contextmenuElement = contextmenuElement;
             AbstractMenu.prototype.initialize.apply(this, arguments);
         },
 
-        createElement: function () {
+        createElement: function() {
             var element = $('<li />', {
-                'class': ['submenu-item','menu-item', this.options.prefix + 'submenu-item'].join(' '),
+                'class': ['submenu-item', 'menu-item', this.options.prefix + 'submenu-item'].join(' '),
                 'aria-expanded': 'false',
                 'aria-haspopup': 'true',
                 'aria-labelledby': 'submenu-item-label-' + this.id,
@@ -412,17 +411,17 @@ function (Component) {
             return element;
         },
 
-        appendContent: function (content) {
+        appendContent: function(content) {
             this.list.append(content);
             return this;
         },
 
-        setLabel: function (label) {
+        setLabel: function(label) {
             this.label.text(label);
             return this;
         },
 
-        openKeyboard: function () {
+        openKeyboard: function() {
             if (this.hasChildren()) {
                 this.open();
                 this.getFirstChild().focus();
@@ -430,40 +429,40 @@ function (Component) {
             return this;
         },
 
-        keyDownHandler: function (event) {
+        keyDownHandler: function(event) {
             var KEY = $.ui.keyCode,
                 keyCode = event.keyCode;
 
             switch (keyCode) {
-                case KEY.LEFT:
-                    this.close().focus();
-                    event.stopPropagation();
-                    break;
-                case KEY.RIGHT:
-                case KEY.ENTER:
-                case KEY.SPACE:
-                    this.openKeyboard();
-                    event.stopPropagation();
-                    break;
+            case KEY.LEFT:
+                this.close().focus();
+                event.stopPropagation();
+                break;
+            case KEY.RIGHT:
+            case KEY.ENTER:
+            case KEY.SPACE:
+                this.openKeyboard();
+                event.stopPropagation();
+                break;
             }
 
             return false;
-        },
+                                                },
 
-        open: function () {
+        open: function() {
             AbstractMenu.prototype.open.call(this);
             this.getElement().attr({'aria-expanded': 'true'});
             this.position();
             return this;
         },
 
-        close: function () {
+        close: function() {
             AbstractMenu.prototype.close.call(this);
             this.getElement().attr({'aria-expanded': 'false'});
             return this;
         },
 
-        position: function () {
+        position: function() {
             this.list.position({
                 my: 'left top',
                 at: 'right top',
@@ -474,13 +473,13 @@ function (Component) {
             return this;
         },
 
-        mouseOverHandler: function () {
+        mouseOverHandler: function() {
             clearTimeout(this.timer);
             this.timer = setTimeout(this.open.bind(this), 200);
             this.focus();
         },
 
-        mouseLeaveHandler: function () {
+        mouseLeaveHandler: function() {
             clearTimeout(this.timer);
             this.timer = setTimeout(this.close.bind(this), 200);
             this.focus();
@@ -488,7 +487,7 @@ function (Component) {
     });
 
     MenuItem = AbstractItem.extend({
-        createElement: function () {
+        createElement: function() {
             var classNames = [
                 'menu-item', this.options.prefix + 'menu-item',
                 this.options.isSelected ? 'is-selected' : ''
@@ -503,21 +502,21 @@ function (Component) {
             });
         },
 
-        populateElement: function () {
+        populateElement: function() {
             return this.getElement();
         },
 
-        delegateEvents: function () {
+        delegateEvents: function() {
             this.bindEvent(this.getElement(), 'click keydown contextmenu mouseover', this.itemHandler.bind(this));
             return this;
         },
 
-        setLabel: function (label) {
+        setLabel: function(label) {
             this.getElement().text(label);
             return this;
         },
 
-        select: function (event) {
+        select: function(event) {
             this.options.callback.call(this, event, this, this.options);
             this.getElement()
                 .addClass('is-selected')
@@ -528,96 +527,95 @@ function (Component) {
             return this;
         },
 
-        unselect: function () {
+        unselect: function() {
             this.getElement()
                 .removeClass('is-selected')
                 .attr({'aria-selected': 'false'});
             return this;
         },
 
-        itemHandler: function (event) {
+        itemHandler: function(event) {
             event.preventDefault();
-            switch(event.type) {
-                case 'contextmenu':
-                case 'click':
-                    this.select();
-                    break;
-                case 'mouseover':
-                    this.focus();
-                    event.stopPropagation();
-                    break;
-                case 'keydown':
-                    this.keyDownHandler.call(this, event, this);
-                    break;
+            switch (event.type) {
+            case 'contextmenu':
+            case 'click':
+                this.select();
+                break;
+            case 'mouseover':
+                this.focus();
+                event.stopPropagation();
+                break;
+            case 'keydown':
+                this.keyDownHandler.call(this, event, this);
+                break;
             }
         },
 
-        keyDownHandler: function (event) {
+        keyDownHandler: function(event) {
             var KEY = $.ui.keyCode,
                 keyCode = event.keyCode;
 
             switch (keyCode) {
-                case KEY.RIGHT:
-                    event.stopPropagation();
-                    break;
-                case KEY.ENTER:
-                case KEY.SPACE:
-                    this.select();
-                    event.stopPropagation();
-                    break;
+            case KEY.RIGHT:
+                event.stopPropagation();
+                break;
+            case KEY.ENTER:
+            case KEY.SPACE:
+                this.select();
+                event.stopPropagation();
+                break;
             }
 
             return false;
-        }
+                                                }
     });
 
     // VideoContextMenu() function - what this module 'exports'.
-    return function (state, i18n) {
-
-        var speedCallback = function (event, menuitem, options) {
+    return function(state, i18n) {
+        var speedCallback = function(event, menuitem, options) {
                 var speed = parseFloat(options.label);
                 state.videoCommands.execute('speed', speed);
             },
             options = {
                 items: [{
-                    label: i18n['Play'], // jshint ignore:line
-                    callback: function () {
+                    label: i18n.Play,
+                    callback: function() {
                         state.videoCommands.execute('togglePlayback');
                     },
-                    initialize: function (menuitem) {
+                    initialize: function(menuitem) {
                         state.el.on({
-                            'play': function () {
-                                menuitem.setLabel(i18n['Pause']); // jshint ignore:line
+                            'play': function() {
+                                menuitem.setLabel(i18n.Pause);
                             },
-                            'pause': function () {
-                                menuitem.setLabel(i18n['Play']); // jshint ignore:line
+                            'pause': function() {
+                                menuitem.setLabel(i18n.Play);
                             }
                         });
                     }
                 }, {
-                    label: state.videoVolumeControl.getMuteStatus() ? i18n['Unmute'] : i18n['Mute'], // jshint ignore:line
-                    callback: function () {
+                    label: state.videoVolumeControl.getMuteStatus() ? i18n.Unmute : i18n.Mute,
+                    callback: function() {
                         state.videoCommands.execute('toggleMute');
                     },
-                    initialize: function (menuitem) {
+                    initialize: function(menuitem) {
                         state.el.on({
-                            'volumechange': function () {
+                            'volumechange': function() {
                                 if (state.videoVolumeControl.getMuteStatus()) {
-                                    menuitem.setLabel(i18n['Unmute']); // jshint ignore:line
+                                    menuitem.setLabel(i18n.Unmute);
                                 } else {
-                                    menuitem.setLabel(i18n['Mute']); // jshint ignore:line
+                                    menuitem.setLabel(i18n.Mute);
                                 }
                             }
                         });
                     }
                 }, {
                     label: i18n['Fill browser'],
-                    callback: function () {
+                    callback: function() {
                         state.videoCommands.execute('toggleFullScreen');
                     },
-                    initialize: function (menuitem) {
+                    initialize: function(menuitem) {
                         state.el.on({
-                            'fullscreen': function (event, isFullscreen) {
+                            'fullscreen': function(event, isFullscreen) {
                                 if (isFullscreen) {
                                     menuitem.setLabel(i18n['Exit full browser']);
                                 } else {
@@ -627,15 +625,15 @@ function (Component) {
                         });
                     }
                 }, {
-                    label: i18n['Speed'], // jshint ignore:line
-                    items: _.map(state.speeds, function (speed) {
+                    label: i18n.Speed,
+                    items: _.map(state.speeds, function(speed) {
                         var isSelected = speed === state.speed;
                         return {label: speed + 'x', callback: speedCallback, speed: speed, isSelected: isSelected};
                     }),
-                    initialize: function (menuitem) {
+                    initialize: function(menuitem) {
                         state.el.on({
-                            'speedchange': function (event, speed) {
-                                var item = menuitem.getChildren().filter(function (item) {
+                            'speedchange': function(event, speed) {
+                                var item = menuitem.getChildren().filter(function(item) {
                                     return item.options.speed === speed;
                                 })[0];
                                 if (item) {
@@ -646,9 +644,9 @@ function (Component) {
                     }
                 }
             ]
-        };
+            };
 
-        $.fn.contextmenu = function (container, options) {
+        $.fn.contextmenu = function(container, options) {
             return this.each(function() {
                 $(this).data('contextmenu', new Menu(options, this, container));
             });
@@ -656,7 +654,7 @@ function (Component) {
 
         if (!state.isYoutubeType()) {
             state.el.find('video').contextmenu(state.el, options);
-            state.el.on('destroy', function () {
+            state.el.on('destroy', function() {
                 var contextmenu = $(this).find('video').data('contextmenu');
                 if (contextmenu) {
                     contextmenu.destroy();
@@ -667,5 +665,4 @@ function (Component) {
         return $.Deferred().resolve().promise();
     };
 });
-
 }(RequireJS.define));

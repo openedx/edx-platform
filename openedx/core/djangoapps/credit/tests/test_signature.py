@@ -12,7 +12,7 @@ from django.test.utils import override_settings
 from openedx.core.djangoapps.credit import signature
 
 
-@attr('shard_2')
+@attr(shard=2)
 @override_settings(CREDIT_PROVIDER_SECRET_KEYS={
     "asu": u'abcd1234'
 })

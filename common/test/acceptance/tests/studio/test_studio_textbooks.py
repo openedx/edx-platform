@@ -2,13 +2,12 @@
 Acceptance tests for Studio related to the textbooks.
 """
 from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest
-from ...pages.studio.textbook_upload import TextbookUploadPage
-from ...pages.lms.textbook_view import TextbookViewPage
-from ...tests.helpers import disable_animations
+from common.test.acceptance.pages.studio.textbook_upload import TextbookUploadPage
+from common.test.acceptance.pages.lms.textbook_view import TextbookViewPage
+from common.test.acceptance.tests.helpers import disable_animations
 from nose.plugins.attrib import attr
 
 
-@attr('shard_2')
 class TextbooksTest(StudioCourseTest):
     """
     Test that textbook functionality is working properly on studio side
@@ -29,6 +28,7 @@ class TextbooksTest(StudioCourseTest):
 
         self.textbook_view_page = TextbookViewPage(self.browser, self.course_id)
 
+    @attr(shard=2)
     def test_create_first_book_message(self):
         """
         Scenario: A message is displayed on the textbooks page when there are no uploaded textbooks
@@ -39,6 +39,7 @@ class TextbooksTest(StudioCourseTest):
         message = self.textbook_upload_page.get_element_text('.wrapper-content .no-textbook-content')
         self.assertIn("You haven't added any textbooks", message)
 
+    @attr(shard=2)
     def test_new_textbook_upload(self):
         """
         Scenario: View Live link for textbook is correctly populated
@@ -60,9 +61,6 @@ class TextbooksTest(StudioCourseTest):
 
         self.textbook_view_page.a11y_audit.config.set_rules({
             'ignore': [
-                'color-contrast',  # AC-500
-                'skip-link',  # AC-501
-                'link-href',  # AC-502
                 'section'  # AC-503
             ],
         })
@@ -78,13 +76,14 @@ class TextbooksTest(StudioCourseTest):
         self.textbook_view_page.visit()
 
         self.textbook_view_page.switch_to_pdf_frame(self)
+        self.textbook_view_page.a11y_audit.config.set_scope({
+            'exclude': [
+                '#viewer',  # PDF viewer (vendor file)
+            ]
+        })
         self.textbook_view_page.a11y_audit.config.set_rules({
             'ignore': [
                 'color-contrast',  # will always fail because pdf.js converts pdf to divs with transparent text
-                'html-lang',  # AC-504
-                'meta-viewport',  # AC-505
-                'skip-link',  # AC-506
-                'link-href',  # AC-507
             ],
         })
         self.textbook_view_page.a11y_audit.check_for_accessibility_errors()

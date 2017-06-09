@@ -5,6 +5,7 @@
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 from django.utils import html
+from openedx.core.djangolib.markup import Text, HTML
 %>
 
 <%block name="pagetitle">${_("User Survey")}</%block>
@@ -42,7 +43,7 @@ from django.utils import html
         <ul class="message-copy"> </ul>
       </div>
 
-      ${survey_form | n, unicode}
+      ${HTML(survey_form)}
 
       <div class="form-actions">
         <button name="submit" type="submit" id="submit" class="action action-primary action-update">${_('Submit')}</button>
@@ -63,7 +64,11 @@ from django.utils import html
       <div class="bit">
         <h3 class="title">${_('Who can I contact if I have questions?')}</h3>
         <p>
-          ${_('If you have any questions about this course or this form, you can contact <a href="{mail_to_link}"">{mail_to_link}</a>.').format(mail_to_link=mail_to_link)}
+          ${Text(_("If you have any questions about this course or this form, you can contact {link_start}{mail_to_link}{link_end}.")).format(
+                      link_start=HTML('<a href="mailto:{mail_to_link}">').format(mail_to_link=mail_to_link),
+                      link_end=HTML('</a>'),
+                      mail_to_link=mail_to_link
+          )}
         </p>
       </div>
     </aside>

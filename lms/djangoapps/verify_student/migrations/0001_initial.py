@@ -4,10 +4,11 @@ from __future__ import unicode_literals
 from django.db import migrations, models
 import lms.djangoapps.verify_student.models
 import model_utils.fields
-import xmodule_django.models
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 import django.db.models.deletion
 import django.utils.timezone
 from django.conf import settings
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
 
 class Migration(migrations.Migration):
@@ -34,7 +35,7 @@ class Migration(migrations.Migration):
             name='SkippedReverification',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('course_id', xmodule_django.models.CourseKeyField(max_length=255, db_index=True)),
+                ('course_id', CourseKeyField(max_length=255, db_index=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
             ],
         ),
@@ -68,7 +69,7 @@ class Migration(migrations.Migration):
             name='VerificationCheckpoint',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('course_id', xmodule_django.models.CourseKeyField(max_length=255, db_index=True)),
+                ('course_id', CourseKeyField(max_length=255, db_index=True)),
                 ('checkpoint_location', models.CharField(max_length=255)),
                 ('photo_verification', models.ManyToManyField(to='verify_student.SoftwareSecurePhotoVerification')),
             ],

@@ -1,14 +1,13 @@
 // Backbone.js Application Model: CertificateInvalidation
-/*global define, RequireJS */
+/* global define, RequireJS */
 
-;(function(define) {
+(function(define) {
     'use strict';
 
     define(
         ['underscore', 'underscore.string', 'gettext', 'backbone'],
 
         function(_, str, gettext, Backbone) {
-
             return Backbone.Model.extend({
                 idAttribute: 'id',
 
@@ -19,7 +18,7 @@
                     notes: ''
                 },
 
-                initialize: function (attributes, options) {
+                initialize: function(attributes, options) {
                     this.url = options.url;
                 },
 

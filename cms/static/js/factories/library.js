@@ -1,11 +1,11 @@
 define([
     'jquery', 'underscore', 'js/models/xblock_info', 'js/views/pages/paged_container',
-    'js/views/library_container', 'js/collections/component_template', 'xmodule', 'coffee/src/main',
+    'js/views/library_container', 'js/collections/component_template', 'xmodule', 'cms/js/main',
     'xblock/cms.runtime.v1'
 ],
 function($, _, XBlockInfo, PagedContainerPage, LibraryContainerView, ComponentTemplates, xmoduleLoader) {
     'use strict';
-    return function (componentTemplates, XBlockInfoJson, options) {
+    return function(componentTemplates, XBlockInfoJson, options) {
         var main_options = {
             el: $('#content'),
             model: new XBlockInfo(XBlockInfoJson, {parse: true}),
@@ -15,7 +15,7 @@ function($, _, XBlockInfo, PagedContainerPage, LibraryContainerView, ComponentTe
             canEdit: true
         };
 
-        xmoduleLoader.done(function () {
+        xmoduleLoader.done(function() {
             var view = new PagedContainerPage(_.extend(main_options, options));
             view.render();
         });

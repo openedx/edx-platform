@@ -4,7 +4,6 @@ Tools for the instructor dashboard
 import dateutil
 import json
 
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import HttpResponseBadRequest
 from django.utils.timezone import utc
@@ -18,8 +17,6 @@ from courseware.student_field_overrides import (
     override_field_for_user,
 )
 from xmodule.fields import Date
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.keys import UsageKey
 
 DATE_FIELD = Date()

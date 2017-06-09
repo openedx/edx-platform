@@ -24,7 +24,7 @@ from student.models import UserProfile
 
   <div class="form-actions form-third-party-auth">
 
-  % for enabled in provider.Registry.accepting_logins():
+  % for enabled in provider.Registry.displayed_for_login():
     ## Translators: provider_name is the name of an external, third-party user authentication service (like Google or LinkedIn).
     <button type="submit" class="button button-primary button-${enabled.provider_id} register-${enabled.provider_id}" onclick="thirdPartySignin(event, '${pipeline_urls[enabled.provider_id]}');">
       % if enabled.icon_class:

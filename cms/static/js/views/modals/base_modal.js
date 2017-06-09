@@ -19,10 +19,10 @@
  *   addSaveButton: A boolean indicating whether to include a save
  *     button on the modal.
  */
-define(["jquery", "underscore", "gettext", "js/views/baseview"],
+define(['jquery', 'underscore', 'gettext', 'js/views/baseview'],
     function($, _, gettext, BaseView) {
         var BaseModal = BaseView.extend({
-            events : {
+            events: {
                 'click .action-cancel': 'cancel'
             },
 

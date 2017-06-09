@@ -9,7 +9,6 @@ Module containing the problem elements which render into input objects
 - textbox (aka codeinput)
 - schematic
 - choicegroup (aka radiogroup, checkboxgroup)
-- javascriptinput
 - imageinput  (for clickable image)
 - optioninput (for option list)
 - filesubmission (upload a file)
@@ -39,25 +38,27 @@ graded status as'status'
 # makes sense, but a bunch of problems have markup that assumes block.  Bigger TODO: figure out a
 # general css and layout strategy for capa, document it, then implement it.
 
-import time
 import json
 import logging
-from lxml import etree
-import re
 import shlex  # for splitting quoted strings
 import sys
-import pyparsing
-import html5lib
-import bleach
-
-from .util import sanitize_html
-from .registry import TagRegistry
-from chem import chemcalc
-from calc.preview import latex_preview
-import xqueue_interface
-from xqueue_interface import XQUEUE_TIMEOUT
+import time
 from datetime import datetime
+
+import bleach
+import html5lib
+import pyparsing
+import re
+from calc.preview import latex_preview
+from chem import chemcalc
+from lxml import etree
+from openedx.core.djangolib.markup import HTML, Text
+
+import xqueue_interface
 from xmodule.stringify import stringify_children
+from capa.xqueue_interface import XQUEUE_TIMEOUT
+from .registry import TagRegistry
+from .util import sanitize_html
 
 log = logging.getLogger(__name__)
 
@@ -96,10 +97,13 @@ class Status(object):
             'correct': _('This answer is correct.'),
             'incorrect': _('This answer is incorrect.'),
             'partially-correct': _('This answer is partially correct.'),
-            'unanswered': _('This answer is unanswered.'),
-            'unsubmitted': _('This answer is unanswered.'),
             'queued': _('This answer is being processed.'),
         }
+        tooltips.update(
+            dict.fromkeys(
+                ['incomplete', 'unanswered', 'unsubmitted'], _('Not yet answered.')
+            )
+        )
         self.display_name = names.get(status, unicode(status))
         self.display_tooltip = tooltips.get(status, u'')
         self._status = status or ''
@@ -224,11 +228,13 @@ class InputTypeBase(object):
         self.hint = feedback.get('hint', '')
         self.hintmode = feedback.get('hintmode', None)
         self.input_state = state.get('input_state', {})
-        self.answervariable = state.get("answervariable", None)
+        self.answervariable = state.get('answervariable', None)
+        self.response_data = state.get('response_data')
 
         # put hint above msg if it should be displayed
         if self.hintmode == 'always':
-            self.msg = self.hint + ('<br/>' if self.msg else '') + self.msg
+            self.msg = HTML('{hint}<br/>{msg}' if self.msg else '{hint}').format(hint=HTML(self.hint),
+                                                                                 msg=HTML(self.msg))
 
         self.status = state.get('status', 'unanswered')
 
@@ -316,8 +322,21 @@ class InputTypeBase(object):
             'value': self.value,
             'status': Status(self.status, self.capa_system.i18n.ugettext),
             'msg': self.msg,
+            'response_data': self.response_data,
             'STATIC_URL': self.capa_system.STATIC_URL,
+            'describedby_html': HTML(''),
         }
+
+        # Generate the list of ids to be used with the aria-describedby field.
+        # Every list should contain the status id
+        status_id = 'status_' + self.input_id
+        descriptions = list([status_id])
+        descriptions.extend(self.response_data.get('descriptions', {}).keys())
+        description_ids = ' '.join(descriptions)
+        context.update(
+            {'describedby_html': HTML('aria-describedby="{}"').format(description_ids)}
+        )
+
         context.update(
             (a, v) for (a, v) in self.loaded_attributes.iteritems() if a in self.to_render
         )
@@ -344,7 +363,7 @@ class InputTypeBase(object):
 
         context = self._get_render_context()
 
-        html = self.capa_system.render_template(self.template, context)
+        html = self.capa_system.render_template(self.template, context).strip()
 
         try:
             output = etree.XML(html)
@@ -377,7 +396,7 @@ class OptionInput(InputTypeBase):
 
     Example:
 
-    <optioninput options="('Up','Down')" label="Where is the sky?" correct="Up"/><text>The location of the sky</text>
+    <optioninput options="('Up','Down')" correct="Up"/><text>The location of the sky</text>
 
     # TODO: allow ordering to be randomized
     """
@@ -413,8 +432,14 @@ class OptionInput(InputTypeBase):
         Convert options to a convenient format.
         """
         return [Attribute('options', transform=cls.parse_options),
-                Attribute('label', ''),
                 Attribute('inline', False)]
+
+    def _extra_context(self):
+        """
+        Return extra context.
+        """
+        _ = self.capa_system.i18n.ugettext
+        return {'default_option_text': _('Select an option')}
 
 #-----------------------------------------------------------------------------
 
@@ -432,7 +457,7 @@ class ChoiceGroup(InputTypeBase):
 
     Example:
 
-    <choicegroup label="Which foil?">
+    <choicegroup>
       <choice correct="false" name="foil1">
         <text>This is foil One.</text>
       </choice>
@@ -475,7 +500,6 @@ class ChoiceGroup(InputTypeBase):
         #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
         _ = lambda text: text
         return [Attribute("show_correctness", "always"),
-                Attribute('label', ''),
                 Attribute("submitted_message", _("Answer received."))]
 
     def _extra_context(self):
@@ -503,9 +527,10 @@ class ChoiceGroup(InputTypeBase):
                 choices.append((choice.get("name"), stringify_children(choice)))
             else:
                 if choice.tag != 'compoundhint':
-                    msg = u'[capa.inputtypes.extract_choices] {error_message}'.format(
-                        # Translators: '<choice>' and '<compoundhint>' are tag names and should not be translated.
-                        error_message=_('Expected a <choice> or <compoundhint> tag; got {given_tag} instead').format(
+                    msg = Text('[capa.inputtypes.extract_choices] {error_message}').format(
+                        error_message=Text(
+                            # Translators: '<choice>' and '<compoundhint>' are tag names and should not be translated.
+                            _('Expected a <choice> or <compoundhint> tag; got {given_tag} instead')).format(
                             given_tag=choice.tag
                         )
                     )
@@ -517,42 +542,6 @@ class ChoiceGroup(InputTypeBase):
             return self._choices_map[internal_answer]
 
         return [self._choices_map[i] for i in internal_answer]
-
-
-#-----------------------------------------------------------------------------
-
-
-@registry.register
-class JavascriptInput(InputTypeBase):
-    """
-    Hidden field for javascript to communicate via; also loads the required
-    scripts for rendering the problem and passes data to the problem.
-
-    TODO (arjun?): document this in detail.  Initial notes:
-    - display_class is a subclass of XProblemClassDisplay (see
-        xmodule/xmodule/js/src/capa/display.coffee),
-    - display_file is the js script to be in /static/js/ where display_class is defined.
-    """
-
-    template = "javascriptinput.html"
-    tags = ['javascriptinput']
-
-    @classmethod
-    def get_attributes(cls):
-        """
-        Register the attributes.
-        """
-        return [Attribute('params', None),
-                Attribute('problem_state', None),
-                Attribute('display_class', None),
-                Attribute('display_file', None), ]
-
-    def setup(self):
-        # Need to provide a value that JSON can parse if there is no
-        # student-supplied value yet.
-        if self.value == "":
-            self.value = 'null'
-
 
 #-----------------------------------------------------------------------------
 
@@ -603,8 +592,12 @@ class JSInput(InputTypeBase):
                                              #   set state
             Attribute('width', "400"),       # iframe width
             Attribute('height', "300"),      # iframe height
-            Attribute('sop', None)           # SOP will be relaxed only if this
-                                             # attribute is set to false.
+            # Title for the iframe, which should be supplied by the author of the problem. Not translated
+            # because we are in a class method and therefore do not have access to capa_system.i18n.
+            # Note that the default "display name" for the problem is also not translated.
+            Attribute('title', "Problem Remote Content"),
+            # SOP will be relaxed only if this attribute is set to false.
+            Attribute('sop', None)
         ]
 
     def _extra_context(self):
@@ -637,7 +630,7 @@ class TextLine(InputTypeBase):
     is used e.g. for embedding simulations turned into questions.
 
     Example:
-        <textline math="1" trailing_text="m/s" label="How fast is a cheetah?" />
+        <textline math="1" trailing_text="m/s"/>
 
     This example will render out a text line with a math preview and the text 'm/s'
     after the end of the text line.
@@ -653,7 +646,6 @@ class TextLine(InputTypeBase):
         """
         return [
             Attribute('size', None),
-            Attribute('label', ''),
 
             Attribute('hidden', False),
             Attribute('inline', False),
@@ -713,7 +705,6 @@ class FileSubmission(InputTypeBase):
         Convert the list of allowed files to a convenient format.
         """
         return [Attribute('allowed_files', '[]', transform=cls.parse_files),
-                Attribute('label', ''),
                 Attribute('required_files', '[]', transform=cls.parse_files), ]
 
     def setup(self):
@@ -801,8 +792,17 @@ class CodeInput(InputTypeBase):
         self.setup_code_response_rendering()
 
     def _extra_context(self):
-        """Defined queue_len, add it """
-        return {'queue_len': self.queue_len, }
+        """
+        Define queue_len, arial_label and code mirror exit message context variables
+        """
+        _ = self.capa_system.i18n.ugettext
+        return {
+            'queue_len': self.queue_len,
+            'aria_label': _('{programming_language} editor').format(
+                programming_language=self.loaded_attributes.get('mode')
+            ),
+            'code_mirror_exit_message': _('Press ESC then TAB or click outside of the code editor to exit')
+        }
 
 
 #-----------------------------------------------------------------------------
@@ -913,13 +913,13 @@ class MatlabInput(CodeInput):
         queue_msg = self.queue_msg
         if len(self.queue_msg) > 0:  # An empty string cannot be parsed as XML but is okay to include in the template.
             try:
-                etree.XML(u'<div>{0}</div>'.format(self.queue_msg))
+                etree.XML(HTML(u'<div>{0}</div>').format(HTML(self.queue_msg)))
             except etree.XMLSyntaxError:
                 try:
                     html5lib.parseFragment(self.queue_msg, treebuilder='lxml', namespaceHTMLElements=False)[0]
                 except (IndexError, ValueError):
                     # If neither can parse queue_msg, it contains invalid xml.
-                    queue_msg = u"<span>{0}</span>".format(_("Error running code."))
+                    queue_msg = HTML("<span>{0}</span>").format(_("Error running code."))
 
         extra_context = {
             'queue_len': str(self.queue_len),
@@ -1027,7 +1027,6 @@ class Schematic(InputTypeBase):
             Attribute('analyses', None),
             Attribute('initial_value', None),
             Attribute('submit_analyses', None),
-            Attribute('label', ''),
         ]
 
     def _extra_context(self):
@@ -1063,7 +1062,6 @@ class ImageInput(InputTypeBase):
         """
         return [Attribute('src'),
                 Attribute('height'),
-                Attribute('label', ''),
                 Attribute('width'), ]
 
     def setup(self):
@@ -1154,8 +1152,7 @@ class ChemicalEquationInput(InputTypeBase):
         """
         Can set size of text field.
         """
-        return [Attribute('size', '20'),
-                Attribute('label', ''), ]
+        return [Attribute('size', '20'), ]
 
     def _extra_context(self):
         """
@@ -1218,7 +1215,7 @@ class FormulaEquationInput(InputTypeBase):
 
     Example:
 
-    <formulaequationinput size="50" label="Enter the equation for motion" />
+    <formulaequationinput size="50"/>
 
     options: size -- width of the textbox.
              trailing_text -- text to show after the input textbox when
@@ -1236,7 +1233,6 @@ class FormulaEquationInput(InputTypeBase):
         return [
             Attribute('size', '20'),
             Attribute('inline', False),
-            Attribute('label', ''),
             Attribute('trailing_text', ''),
         ]
 
@@ -1289,7 +1285,7 @@ class FormulaEquationInput(InputTypeBase):
             # At some point, we might want to mark invalid variables as red
             # or something, and this is where we would need to pass those in.
             result['preview'] = latex_preview(formula)
-        except pyparsing.ParseException as err:
+        except pyparsing.ParseException:
             result['error'] = _("Sorry, couldn't parse formula")
             result['formula'] = formula
         except Exception:
@@ -1614,7 +1610,7 @@ class AnnotationInput(InputTypeBase):
 
 @registry.register
 class ChoiceTextGroup(InputTypeBase):
-    """
+    r"""
     Groups of radiobutton/checkboxes with text inputs.
 
     Examples:
@@ -1626,7 +1622,7 @@ class ChoiceTextGroup(InputTypeBase):
         select the correct choice and fill in numbers to make it accurate.
       <endouttext/>
       <choicetextresponse>
-        <radiotextgroup label="What is the correct choice?">
+        <radiotextgroup>
           <choice correct="false">The lowest number rolled was:
             <decoy_input/> and the highest number rolled was:
             <decoy_input/> .</choice>
@@ -1649,7 +1645,7 @@ class ChoiceTextGroup(InputTypeBase):
         select the correct choices and fill in numbers to make them accurate.
       <endouttext/>
       <choicetextresponse>
-        <checkboxtextgroup label="What is the answer?">
+        <checkboxtextgroup>
              <choice correct="true">
                 The lowest number selected was <numtolerance_input answer="1.4142" tolerance="0.01"/>
              </choice>
@@ -1715,7 +1711,6 @@ class ChoiceTextGroup(InputTypeBase):
         return [
             Attribute("show_correctness", "always"),
             Attribute("submitted_message", _("Answer received.")),
-            Attribute("label", ""),
         ]
 
     def _extra_context(self):
@@ -1776,10 +1771,10 @@ class ChoiceTextGroup(InputTypeBase):
 
         for choice in element:
             if choice.tag != 'choice':
-                msg = u"[capa.inputtypes.extract_choices] {0}".format(
+                msg = Text("[capa.inputtypes.extract_choices] {0}").format(
                     # Translators: a "tag" is an XML element, such as "<b>" in HTML
-                    _("Expected a {expected_tag} tag; got {given_tag} instead").format(
-                        expected_tag=u"<choice>",
+                    Text(_("Expected a {expected_tag} tag; got {given_tag} instead")).format(
+                        expected_tag="<choice>",
                         given_tag=choice.tag,
                     )
                 )

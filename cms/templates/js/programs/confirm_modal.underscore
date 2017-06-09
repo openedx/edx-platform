@@ -1,0 +1,24 @@
+<div class="wrapper wrapper-modal-window wrapper-modal-window-<%- name %>"
+     aria-describedby="modal-window-description"
+     aria-labelledby="modal-window-title"
+     aria-hidden=""
+     role="dialog">
+    <div class="modal-window-overlay"></div>
+    <div class="js-focus-first modal-window modal-medium modal-type-confirm" tabindex="-1" aria-labelledby="modal-window-title">
+        <div class="<%- name %>-modal">
+            <div class="modal-content">
+                <span class="copy copy-lead emphasized"><%- title %></span>
+                <p class="copy copy-base"><%- body %></p>
+            </div>
+            <div class="modal-actions">
+                <h3 class="sr-only"><%- gettext('Actions') %></h3>
+                <button class="js-confirm btn btn-brand btn-base">
+                    <span><%- cta.confirm %></span>
+                </button>
+                <button class="js-cancel btn btn-neutral btn-base">
+                    <span><%- cta.cancel %></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -6,7 +6,8 @@ from logging import getLogger
 
 from openedx.core.lib.cache_utils import zpickle, zunpickle
 
-from .block_structure import BlockStructureModulestoreData, BlockStructureBlockData
+from .block_structure import BlockStructureBlockData
+from .factory import BlockStructureFactory
 
 
 logger = getLogger(__name__)  # pylint: disable=C0103
@@ -97,12 +98,12 @@ class BlockStructureCache(object):
 
         # Deserialize and construct the block structure.
         block_relations, transformer_data, block_data_map = zunpickle(zp_data_from_cache)
-        block_structure = BlockStructureModulestoreData(root_block_usage_key)
-        block_structure._block_relations = block_relations
-        block_structure.transformer_data = transformer_data
-        block_structure._block_data_map = block_data_map
-
-        return block_structure
+        return BlockStructureFactory.create_new(
+            root_block_usage_key,
+            block_relations,
+            transformer_data,
+            block_data_map,
+        )
 
     def delete(self, root_block_usage_key):
         """

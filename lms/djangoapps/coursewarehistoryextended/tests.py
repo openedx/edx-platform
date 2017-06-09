@@ -17,7 +17,7 @@ from courseware.models import BaseStudentModuleHistory, StudentModuleHistory, St
 from courseware.tests.factories import StudentModuleFactory, location, course_id
 
 
-@attr('shard_1')
+@attr(shard=1)
 @skipUnless(settings.FEATURES["ENABLE_CSMH_EXTENDED"], "CSMH Extended needs to be enabled")
 class TestStudentModuleHistoryBackends(TestCase):
     """ Tests of data in CSMH and CSMHE """

@@ -76,15 +76,16 @@ class IntegrationTestMixin(object):
         self.assertEqual(form_fields['email']['defaultValue'], self.USER_EMAIL)
         self.assertEqual(form_fields['name']['defaultValue'], self.USER_NAME)
         self.assertEqual(form_fields['username']['defaultValue'], self.USER_USERNAME)
+        registration_values = {
+            'email': 'email-edited@tpa-test.none',
+            'name': 'My Customized Name',
+            'username': 'new_username',
+            'honor_code': True,
+        }
         # Now complete the form:
         ajax_register_response = self.client.post(
             reverse('user_api_registration'),
-            {
-                'email': 'email-edited@tpa-test.none',
-                'name': 'My Customized Name',
-                'username': 'new_username',
-                'honor_code': True,
-            }
+            registration_values
         )
         self.assertEqual(ajax_register_response.status_code, 200)
         # Then the AJAX will finish the third party auth:
@@ -102,7 +103,7 @@ class IntegrationTestMixin(object):
         self._test_return_login(user_is_activated=True)
 
     def test_login(self):
-        user = UserFactory.create()
+        self.user = UserFactory.create()  # pylint: disable=attribute-defined-outside-init
         # The user goes to the login page, and sees a button to login with this provider:
         provider_login_url = self._check_login_page()
         # The user clicks on the provider's button:
@@ -122,7 +123,7 @@ class IntegrationTestMixin(object):
         # The AJAX on the page will log them in:
         ajax_login_response = self.client.post(
             reverse('user_api_login_session'),
-            {'email': user.email, 'password': 'test'}
+            {'email': self.user.email, 'password': 'test'}
         )
         self.assertEqual(ajax_login_response.status_code, 200)
         # Then the AJAX will finish the third party auth:

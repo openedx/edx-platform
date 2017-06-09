@@ -13,7 +13,7 @@ from mako.template import Template
 from openedx.core.djangolib.markup import HTML, Text
 
 
-@attr('shard_2')
+@attr(shard=2)
 @ddt.ddt
 class FormatHtmlTest(unittest.TestCase):
     """Test that we can format plain strings and HTML into them properly."""

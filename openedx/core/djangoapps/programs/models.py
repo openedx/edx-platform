@@ -1,5 +1,4 @@
 """Models providing Programs support for the LMS and Studio."""
-from collections import namedtuple
 from urlparse import urljoin
 
 from django.utils.translation import ugettext_lazy as _
@@ -8,13 +7,11 @@ from django.db import models
 from config_models.models import ConfigurationModel
 
 
-AuthoringAppConfig = namedtuple('AuthoringAppConfig', ['js_url', 'css_url'])
-
-
 class ProgramsApiConfig(ConfigurationModel):
     """
-    Manages configuration for connecting to the Programs service and using its
-    API.
+    DEPRECATED. To be removed as part of ECOM-5136.
+
+    Manages configuration for connecting to the Programs service and using its API.
     """
     OAUTH2_CLIENT_NAME = 'programs'
     CACHE_KEY = 'programs.api.data'
@@ -25,6 +22,14 @@ class ProgramsApiConfig(ConfigurationModel):
     internal_service_url = models.URLField(verbose_name=_("Internal Service URL"))
     public_service_url = models.URLField(verbose_name=_("Public Service URL"))
 
+    marketing_path = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text=_(
+            'Path used to construct URLs to programs marketing pages (e.g., "/foo").'
+        )
+    )
+
     authoring_app_js_path = models.CharField(
         verbose_name=_("Path to authoring app's JS"),
         max_length=255,
@@ -33,6 +38,7 @@ class ProgramsApiConfig(ConfigurationModel):
             "This value is required in order to enable the Studio authoring interface."
         )
     )
+
     authoring_app_css_path = models.CharField(
         verbose_name=_("Path to authoring app's CSS"),
         max_length=255,
@@ -104,28 +110,9 @@ class ProgramsApiConfig(ConfigurationModel):
         return urljoin(self.public_service_url, '/api/v{}/'.format(self.api_version_number))
 
     @property
-    def authoring_app_config(self):
-        """
-        Returns a named tuple containing information required for working with the Programs
-        authoring app, a Backbone app hosted by the Programs service.
-        """
-        js_url = urljoin(self.public_service_url, self.authoring_app_js_path)
-        css_url = urljoin(self.public_service_url, self.authoring_app_css_path)
-
-        return AuthoringAppConfig(js_url=js_url, css_url=css_url)
-
-    @property
     def is_cache_enabled(self):
         """Whether responses from the Programs API will be cached."""
         return self.cache_ttl > 0
-
-    @property
-    def is_student_dashboard_enabled(self):
-        """
-        Indicates whether LMS dashboard functionality related to Programs should
-        be enabled or not.
-        """
-        return self.enabled and self.enable_student_dashboard
 
     @property
     def is_studio_tab_enabled(self):
@@ -133,12 +120,7 @@ class ProgramsApiConfig(ConfigurationModel):
         Indicates whether Studio functionality related to Programs should
         be enabled or not.
         """
-        return (
-            self.enabled and
-            self.enable_studio_tab and
-            bool(self.authoring_app_js_path) and
-            bool(self.authoring_app_css_path)
-        )
+        return self.enabled and self.enable_studio_tab
 
     @property
     def is_certification_enabled(self):
@@ -147,13 +129,6 @@ class ProgramsApiConfig(ConfigurationModel):
         certificates for Program completion.
         """
         return self.enabled and self.enable_certification
-
-    @property
-    def show_xseries_ad(self):
-        """
-        Indicates whether we should show xseries add
-        """
-        return self.enabled and self.xseries_ad_enabled
 
     @property
     def show_program_listing(self):

@@ -10,6 +10,8 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from student.roles import CourseStaffRole, CourseInstructorRole
 
+from openedx.core.lib.log_utils import audit_log
+
 
 class ApiKeyHeaderPermission(permissions.BasePermission):
     """
@@ -26,10 +28,17 @@ class ApiKeyHeaderPermission(permissions.BasePermission):
         present in the request and matches the setting.
         """
         api_key = getattr(settings, "EDX_API_KEY", None)
-        return (
-            (settings.DEBUG and api_key is None) or
-            (api_key is not None and request.META.get("HTTP_X_EDX_API_KEY") == api_key)
-        )
+
+        if settings.DEBUG and api_key is None:
+            return True
+
+        elif api_key is not None and request.META.get("HTTP_X_EDX_API_KEY") == api_key:
+            audit_log("ApiKeyHeaderPermission used",
+                      path=request.path,
+                      ip=request.META.get("REMOTE_ADDR"))
+            return True
+
+        return False
 
 
 class ApiKeyHeaderPermissionIsAuthenticated(ApiKeyHeaderPermission, permissions.IsAuthenticated):

@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from django.db import migrations, models
 from django.conf import settings
-import xmodule_django.models
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
 
 class Migration(migrations.Migration):
@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('name', models.CharField(max_length=30)),
-                ('course_id', xmodule_django.models.CourseKeyField(db_index=True, max_length=255, blank=True)),
+                ('course_id', CourseKeyField(db_index=True, max_length=255, blank=True)),
                 ('users', models.ManyToManyField(related_name='roles', to=settings.AUTH_USER_MODEL)),
             ],
             options={

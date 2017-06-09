@@ -27,7 +27,10 @@ from opaque_keys.edx.keys import UsageKey
 
 from student.auth import has_course_author_access
 from django.utils.translation import ugettext as _
-from xblock_django.models import XBlockDisableConfig
+
+from xblock_django.api import disabled_xblocks, authorable_xblocks
+from xblock_django.models import XBlockStudioConfigurationFlag
+
 
 __all__ = [
     'container_handler',
@@ -47,17 +50,41 @@ CONTAINER_TEMPLATES = [
     "basic-modal", "modal-button", "edit-xblock-modal",
     "editor-mode-button", "upload-dialog",
     "add-xblock-component", "add-xblock-component-button", "add-xblock-component-menu",
-    "add-xblock-component-menu-problem", "xblock-string-field-editor", "publish-xblock", "publish-history",
+    "add-xblock-component-support-legend", "add-xblock-component-support-level", "add-xblock-component-menu-problem",
+    "xblock-string-field-editor", "publish-xblock", "publish-history",
     "unit-outline", "container-message", "license-selector",
 ]
 
 
-def _advanced_component_types():
+def _advanced_component_types(show_unsupported):
     """
     Return advanced component types which can be created.
+
+    Args:
+        show_unsupported: if True, unsupported XBlocks may be included in the return value
+
+    Returns:
+        A dict of authorable XBlock types and their support levels (see XBlockStudioConfiguration). For example:
+        {
+            "done": "us",  # unsupported
+            "discussion: "fs"  # fully supported
+        }
+        Note that the support level will be "True" for all XBlocks if XBlockStudioConfigurationFlag
+        is not enabled.
     """
-    disabled_create_block_types = XBlockDisableConfig.disabled_create_block_types()
-    return [c_type for c_type in ADVANCED_COMPONENT_TYPES if c_type not in disabled_create_block_types]
+    enabled_block_types = _filter_disabled_blocks(ADVANCED_COMPONENT_TYPES)
+    if XBlockStudioConfigurationFlag.is_enabled():
+        authorable_blocks = authorable_xblocks(allow_unsupported=show_unsupported)
+        filtered_blocks = {}
+        for block in authorable_blocks:
+            if block.name in enabled_block_types:
+                filtered_blocks[block.name] = block.support_level
+        return filtered_blocks
+    else:
+        all_blocks = {}
+        for block_name in enabled_block_types:
+            all_blocks[block_name] = True
+        return all_blocks
 
 
 def _load_mixed_class(category):
@@ -152,13 +179,14 @@ def get_component_templates(courselike, library=False):
     """
     Returns the applicable component templates that can be used by the specified course or library.
     """
-    def create_template_dict(name, cat, boilerplate_name=None, tab="common", hinted=False):
+    def create_template_dict(name, category, support_level, boilerplate_name=None, tab="common", hinted=False):
         """
         Creates a component template dict.
 
         Parameters
             display_name: the user-visible name of the component
             category: the type of component (problem, html, etc.)
+            support_level: the support level of this component
             boilerplate_name: name of boilerplate for filling in default values. May be None.
             hinted: True if hinted problem else False
             tab: common(default)/advanced, which tab it goes in
@@ -166,10 +194,50 @@ def get_component_templates(courselike, library=False):
         """
         return {
             "display_name": name,
-            "category": cat,
+            "category": category,
             "boilerplate_name": boilerplate_name,
             "hinted": hinted,
-            "tab": tab
+            "tab": tab,
+            "support_level": support_level
+        }
+
+    def component_support_level(editable_types, name, template=None):
+        """
+        Returns the support level for the given xblock name/template combination.
+
+        Args:
+            editable_types: a QuerySet of xblocks with their support levels
+            name: the name of the xblock
+            template: optional template for the xblock
+
+        Returns:
+            If XBlockStudioConfigurationFlag is enabled, returns the support level
+            (see XBlockStudioConfiguration) or False if this xblock name/template combination
+            has no Studio support at all. If XBlockStudioConfigurationFlag is disabled,
+            simply returns True.
+        """
+        # If the Studio support feature is disabled, return True for all.
+        if not XBlockStudioConfigurationFlag.is_enabled():
+            return True
+        if template is None:
+            template = ""
+        extension_index = template.rfind(".yaml")
+        if extension_index >= 0:
+            template = template[0:extension_index]
+        for block in editable_types:
+            if block.name == name and block.template == template:
+                return block.support_level
+
+        return False
+
+    def create_support_legend_dict():
+        """
+        Returns a dict of settings information for the display of the support level legend.
+        """
+        return {
+            "show_legend": XBlockStudioConfigurationFlag.is_enabled(),
+            "allow_unsupported_xblocks": allow_unsupported,
+            "documentation_label": _("{platform_name} Support Levels:").format(platform_name=settings.PLATFORM_NAME)
         }
 
     component_display_names = {
@@ -189,57 +257,92 @@ def get_component_templates(courselike, library=False):
     if library:
         component_types = [component for component in component_types if component != 'discussion']
 
+    component_types = _filter_disabled_blocks(component_types)
+
+    # Content Libraries currently don't allow opting in to unsupported xblocks/problem types.
+    allow_unsupported = getattr(courselike, "allow_unsupported_xblocks", False)
+
     for category in component_types:
+        authorable_variations = authorable_xblocks(allow_unsupported=allow_unsupported, name=category)
+        support_level_without_template = component_support_level(authorable_variations, category)
         templates_for_category = []
         component_class = _load_mixed_class(category)
-        # add the default template with localized display name
-        # TODO: Once mixins are defined per-application, rather than per-runtime,
-        # this should use a cms mixed-in class. (cpennington)
-        display_name = xblock_type_display_name(category, _('Blank'))  # this is the Blank Advanced problem
-        templates_for_category.append(create_template_dict(display_name, category, None, 'advanced'))
-        categories.add(category)
+
+        if support_level_without_template:
+            # add the default template with localized display name
+            # TODO: Once mixins are defined per-application, rather than per-runtime,
+            # this should use a cms mixed-in class. (cpennington)
+            display_name = xblock_type_display_name(category, _('Blank'))  # this is the Blank Advanced problem
+            templates_for_category.append(
+                create_template_dict(display_name, category, support_level_without_template, None, 'advanced')
+            )
+            categories.add(category)
 
         # add boilerplates
         if hasattr(component_class, 'templates'):
             for template in component_class.templates():
                 filter_templates = getattr(component_class, 'filter_templates', None)
                 if not filter_templates or filter_templates(template, courselike):
-                    # Tab can be 'common' 'advanced'
-                    # Default setting is common/advanced depending on the presence of markdown
-                    tab = 'common'
-                    if template['metadata'].get('markdown') is None:
-                        tab = 'advanced'
-                    hinted = template.get('hinted', False)
-
-                    templates_for_category.append(
-                        create_template_dict(
-                            _(template['metadata'].get('display_name')),    # pylint: disable=translation-of-non-string
-                            category,
-                            template.get('template_id'),
-                            tab,
-                            hinted,
-                        )
+                    template_id = template.get('template_id')
+                    support_level_with_template = component_support_level(
+                        authorable_variations, category, template_id
                     )
+                    if support_level_with_template:
+                        # Tab can be 'common' 'advanced'
+                        # Default setting is common/advanced depending on the presence of markdown
+                        tab = 'common'
+                        if template['metadata'].get('markdown') is None:
+                            tab = 'advanced'
+                        hinted = template.get('hinted', False)
 
-        # Add any advanced problem types
+                        templates_for_category.append(
+                            create_template_dict(
+                                _(template['metadata'].get('display_name')),    # pylint: disable=translation-of-non-string
+                                category,
+                                support_level_with_template,
+                                template_id,
+                                tab,
+                                hinted,
+                            )
+                        )
+
+        # Add any advanced problem types. Note that these are different xblocks being stored as Advanced Problems.
         if category == 'problem':
-            for advanced_problem_type in ADVANCED_PROBLEM_TYPES:
+            disabled_block_names = [block.name for block in disabled_xblocks()]
+            advanced_problem_types = [advanced_problem_type for advanced_problem_type in ADVANCED_PROBLEM_TYPES
+                                      if advanced_problem_type['component'] not in disabled_block_names]
+            for advanced_problem_type in advanced_problem_types:
                 component = advanced_problem_type['component']
                 boilerplate_name = advanced_problem_type['boilerplate_name']
-                try:
-                    component_display_name = xblock_type_display_name(component)
-                except PluginMissingError:
-                    log.warning('Unable to load xblock type %s to read display_name', component, exc_info=True)
-                else:
-                    templates_for_category.append(
-                        create_template_dict(component_display_name, component, boilerplate_name, 'advanced')
-                    )
-                    categories.add(component)
+
+                authorable_advanced_component_variations = authorable_xblocks(
+                    allow_unsupported=allow_unsupported, name=component
+                )
+                advanced_component_support_level = component_support_level(
+                    authorable_advanced_component_variations, component, boilerplate_name
+                )
+                if advanced_component_support_level:
+                    try:
+                        component_display_name = xblock_type_display_name(component)
+                    except PluginMissingError:
+                        log.warning('Unable to load xblock type %s to read display_name', component, exc_info=True)
+                    else:
+                        templates_for_category.append(
+                            create_template_dict(
+                                component_display_name,
+                                component,
+                                advanced_component_support_level,
+                                boilerplate_name,
+                                'advanced'
+                            )
+                        )
+                        categories.add(component)
 
         component_templates.append({
             "type": category,
             "templates": templates_for_category,
-            "display_name": component_display_names[category]
+            "display_name": component_display_names[category],
+            "support_legend": create_support_legend_dict()
         })
 
     # Libraries do not support advanced components at this time.
@@ -251,19 +354,25 @@ def get_component_templates(courselike, library=False):
     # are the names of the modules in ADVANCED_COMPONENT_TYPES that should be
     # enabled for the course.
     course_advanced_keys = courselike.advanced_modules
-    advanced_component_templates = {"type": "advanced", "templates": [], "display_name": _("Advanced")}
-    advanced_component_types = _advanced_component_types()
+    advanced_component_templates = {
+        "type": "advanced",
+        "templates": [],
+        "display_name": _("Advanced"),
+        "support_legend": create_support_legend_dict()
+    }
+    advanced_component_types = _advanced_component_types(allow_unsupported)
     # Set component types according to course policy file
     if isinstance(course_advanced_keys, list):
         for category in course_advanced_keys:
-            if category in advanced_component_types and category not in categories:
+            if category in advanced_component_types.keys() and category not in categories:
                 # boilerplates not supported for advanced components
                 try:
                     component_display_name = xblock_type_display_name(category, default_display_name=category)
                     advanced_component_templates['templates'].append(
                         create_template_dict(
                             component_display_name,
-                            category
+                            category,
+                            advanced_component_types[category]
                         )
                     )
                     categories.add(category)
@@ -286,6 +395,14 @@ def get_component_templates(courselike, library=False):
         component_templates.insert(0, advanced_component_templates)
 
     return component_templates
+
+
+def _filter_disabled_blocks(all_blocks):
+    """
+    Filter out disabled xblocks from the provided list of xblock names.
+    """
+    disabled_block_names = [block.name for block in disabled_xblocks()]
+    return [block_name for block_name in all_blocks if block_name not in disabled_block_names]
 
 
 @login_required

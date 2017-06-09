@@ -58,7 +58,7 @@ class TestStudentDashboardEmailView(SharedModuleStoreTestCase):
         BulkEmailFlag.objects.create(enabled=True, require_course_email_auth=False)
         # Assert that the URL for the email view is in the response
         response = self.client.get(self.url)
-        self.assertTrue(self.email_modal_link in response.content)
+        self.assertIn(self.email_modal_link, response.content)
 
     def test_email_flag_false(self):
         BulkEmailFlag.objects.create(enabled=False)
@@ -85,7 +85,7 @@ class TestStudentDashboardEmailView(SharedModuleStoreTestCase):
         # Assert that the URL for the email view is not in the response
         # if this course isn't authorized
         response = self.client.get(self.url)
-        self.assertTrue(self.email_modal_link in response.content)
+        self.assertIn(self.email_modal_link, response.content)
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -125,10 +125,10 @@ class TestStudentDashboardEmailViewXMLBacked(SharedModuleStoreTestCase):
         # The flag is enabled, and since REQUIRE_COURSE_EMAIL_AUTH is False, all courses should
         # be authorized to use email. But the course is not Mongo-backed (should not work)
         response = self.client.get(self.url)
-        self.assertFalse(self.email_modal_link in response.content)
+        self.assertNotIn(self.email_modal_link, response.content)
 
     def test_email_flag_false_xml_store(self):
         BulkEmailFlag.objects.create(enabled=False, require_course_email_auth=False)
         # Email disabled, shouldn't see link.
         response = self.client.get(self.url)
-        self.assertFalse(self.email_modal_link in response.content)
+        self.assertNotIn(self.email_modal_link, response.content)

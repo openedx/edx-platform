@@ -48,7 +48,7 @@
 
     <% if ( nextStepTitle ) { %>
     <nav class="nav-wizard" id="face_next_button_nav">
-      <button id="next_step_button" class="next action-primary is-disabled right" aria-hidden="true" title="Next">
+      <button id="next_step_button" class="next action-primary right" disabled title="Next">
         <%- _.sprintf(
           gettext( "Next: %(nextStepTitle)s" ),
           { nextStepTitle: nextStepTitle }

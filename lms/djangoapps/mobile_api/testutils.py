@@ -11,6 +11,7 @@ Test utilities for mobile API tests:
 """
 # pylint: disable=no-member
 from datetime import timedelta
+from django.conf import settings
 
 from django.utils import timezone
 import ddt
@@ -71,13 +72,13 @@ class MobileAPITestCase(ModuleStoreTestCase, APITestCase):
         self.login()
         self.enroll(course_id)
 
-    def api_response(self, reverse_args=None, expected_response_code=200, **kwargs):
+    def api_response(self, reverse_args=None, expected_response_code=200, data=None, **kwargs):
         """
         Helper method for calling endpoint, verifying and returning response.
         If expected_response_code is None, doesn't verify the response' status_code.
         """
         url = self.reverse_url(reverse_args, **kwargs)
-        response = self.url_method(url, **kwargs)
+        response = self.url_method(url, data=data, **kwargs)
         if expected_response_code is not None:
             self.assertEqual(response.status_code, expected_response_code)
         return response
@@ -91,9 +92,9 @@ class MobileAPITestCase(ModuleStoreTestCase, APITestCase):
             reverse_args.update({'username': kwargs.get('username', self.user.username)})
         return reverse(self.REVERSE_INFO['name'], kwargs=reverse_args)
 
-    def url_method(self, url, **kwargs):  # pylint: disable=unused-argument
+    def url_method(self, url, data=None, **kwargs):  # pylint: disable=unused-argument
         """Base implementation that returns response from the GET method of the URL."""
-        return self.client.get(url)
+        return self.client.get(url, data=data)
 
 
 class MobileAuthTestMixin(object):
@@ -153,6 +154,7 @@ class MobileCourseAccessTestMixin(MobileAPIMilestonesMixin):
         """Base implementation of initializing the user for each test."""
         self.login_and_enroll(course_id)
 
+    @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
     def test_success(self):
         self.init_course_access()
 
@@ -166,7 +168,7 @@ class MobileCourseAccessTestMixin(MobileAPIMilestonesMixin):
         response = self.api_response(expected_response_code=None, course_id=non_existent_course_id)
         self.verify_failure(response)  # allow subclasses to override verification
 
-    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False, 'ENABLE_MKTG_SITE': True})
     def test_unreleased_course(self):
         # ensure the course always starts in the future
         # pylint: disable=attribute-defined-outside-init
@@ -184,6 +186,7 @@ class MobileCourseAccessTestMixin(MobileAPIMilestonesMixin):
         (None, False)
     )
     @ddt.unpack
+    @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
     def test_non_mobile_available(self, role, should_succeed):
         self.init_course_access()
         # set mobile_available to False for the test course
@@ -202,6 +205,7 @@ class MobileCourseAccessTestMixin(MobileAPIMilestonesMixin):
         (None, False)
     )
     @ddt.unpack
+    @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
     def test_visible_to_staff_only_course(self, role, should_succeed):
         self.init_course_access()
         self.course.visible_to_staff_only = True

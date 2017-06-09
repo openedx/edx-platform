@@ -18,6 +18,8 @@
          * done.
          */
         modules: getModulesList([
+            'discussion/js/discussion_board_factory',
+            'discussion/js/discussion_profile_page_factory',
             'js/api_admin/catalog_preview_factory',
             'js/courseware/courseware_factory',
             'js/discovery/discovery_factory',
@@ -38,7 +40,8 @@
             'lms/js/preview/preview_factory',
             'support/js/certificates_factory',
             'support/js/enrollment_factory',
-            'teams/js/teams_tab_factory'
+            'teams/js/teams_tab_factory',
+            'js/dateutil_factory'
         ]),
 
         /**
@@ -76,7 +79,7 @@
             'logger': 'empty:',
             'utility': 'empty:',
             'URI': 'empty:',
-            'DiscussionModuleView': 'empty:',
+            'common/js/discussion/views/discussion_inline_view': 'empty:',
             'modernizr': 'empty',
 
             // Don't bundle UI Toolkit helpers as they are loaded into the "edx" namespace
@@ -162,4 +165,4 @@
          */
         logLevel: 1
     };
-}())
+}());

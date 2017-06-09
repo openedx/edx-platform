@@ -43,7 +43,7 @@ function(BaseView, _, str, gettext, groupEditTemplate) {
             if (event && event.preventDefault) { event.preventDefault(); }
             this.model.set({
                 name: this.$('.group-name').val()
-            }, { silent: true });
+            }, {silent: true});
 
             return this;
         },
@@ -58,11 +58,11 @@ function(BaseView, _, str, gettext, groupEditTemplate) {
             return Math.floor(100 / this.model.collection.length);
         },
 
-        onFocus: function () {
+        onFocus: function() {
             this.$el.closest('.groups-fields').addClass('is-focused');
         },
 
-        onBlur: function () {
+        onBlur: function() {
             this.$el.closest('.groups-fields').removeClass('is-focused');
         }
     });

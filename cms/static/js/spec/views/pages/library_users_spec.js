@@ -1,16 +1,16 @@
 define([
-    "jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/js/spec_helpers/view_helpers",
-    "js/factories/manage_users_lib", "common/js/components/utils/view_utils"
+    'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/js/spec_helpers/view_helpers',
+    'js/factories/manage_users_lib', 'common/js/components/utils/view_utils'
 ],
-function ($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
-    "use strict";
-    describe("Library Instructor Access Page", function () {
-        var changeRoleUrl = "dummy_change_role_url/@@EMAIL@@";
-        var team_member_fixture = readFixtures("team-member.underscore");
+function($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
+    'use strict';
+    describe('Library Instructor Access Page', function() {
+        var changeRoleUrl = 'dummy_change_role_url/@@EMAIL@@';
+        var team_member_fixture = readFixtures('team-member.underscore');
 
-        function setRole(email, role){
-            var user_li = $('li.user-item[data-email="'+ email + '"]');
-            var role_action = $("li.action-role a.make-"+role, user_li);
+        function setRole(email, role) {
+            var user_li = $('li.user-item[data-email="' + email + '"]');
+            var role_action = $('li.action-role a.make-' + role, user_li);
             expect(role_action).toBeVisible();
             role_action.click();
         }
@@ -19,19 +19,19 @@ function ($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
             return changeRoleUrl.replace('@@EMAIL@@', email);
         }
 
-        describe("read-write access", function() {
+        describe('read-write access', function() {
             var mockHTML = readFixtures('mock/mock-manage-users-lib.underscore');
 
-            beforeEach(function (done) {
+            beforeEach(function(done) {
                 ViewHelpers.installMockAnalytics();
                 setFixtures(mockHTML);
-                appendSetFixtures($("<script>", { id: "team-member-tpl", type: "text/template"}).text(team_member_fixture));
+                appendSetFixtures($('<script>', {id: 'team-member-tpl', type: 'text/template'}).text(team_member_fixture));
                 ManageUsersFactory(
-                    "Mock Library",
+                    'Mock Library',
                     [
-                        {id: 1, email: "honor@example.com", username:"honor", role: 'staff'},
-                        {id: 2, email: "audit@example.com", username:"audit", role: 'instructor'},
-                        {id: 3, email: "staff@example.com", username:"staff", role: 'library_user'}
+                        {id: 1, email: 'honor@example.com', username: 'honor', role: 'staff'},
+                        {id: 2, email: 'audit@example.com', username: 'audit', role: 'instructor'},
+                        {id: 3, email: 'staff@example.com', username: 'staff', role: 'library_user'}
                     ],
                     changeRoleUrl,
                     10000,
@@ -39,15 +39,15 @@ function ($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
                 );
 
                 jasmine.waitUntil(function() {
-                    return ($(".ui-loading").length === 0);
+                    return ($('.ui-loading').length === 0);
                 }).then(done);
             });
 
-            afterEach(function () {
+            afterEach(function() {
                 ViewHelpers.removeMockAnalytics();
             });
 
-            it("can give a user permission to use the library", function () {
+            it('can give a user permission to use the library', function() {
                 var email = 'other@example.com';
                 var requests = AjaxHelpers.requests(this);
                 var reloadSpy = spyOn(ViewUtils, 'reload');
@@ -60,23 +60,23 @@ function ($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
                 expect(reloadSpy).toHaveBeenCalled();
             });
 
-            it("can promote user", function() {
-                var email = "staff@example.com";
+            it('can promote user', function() {
+                var email = 'staff@example.com';
                 var requests = AjaxHelpers.requests(this);
                 var reloadSpy = spyOn(ViewUtils, 'reload');
-                setRole("staff@example.com", 'staff');
+                setRole('staff@example.com', 'staff');
                 AjaxHelpers.expectJsonRequest(requests, 'POST', getUrl(email), {role: 'staff'});
                 AjaxHelpers.respondWithJson(requests, {'result': 'ok'});
                 expect(reloadSpy).toHaveBeenCalled();
             });
 
-            it("can cancel adding a user to the library", function () {
+            it('can cancel adding a user to the library', function() {
                 $('.create-user-button').click();
                 $('.form-create.create-user .action-secondary').click();
                 expect($('.wrapper-create-user')).not.toHaveClass('is-shown');
             });
 
-            it("displays an error when the required field is blank", function () {
+            it('displays an error when the required field is blank', function() {
                 var requests = AjaxHelpers.requests(this);
                 $('.create-user-button').click();
                 $('.user-email-input').val('');
@@ -88,7 +88,7 @@ function ($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
                 AjaxHelpers.expectNoRequests(requests);
             });
 
-            it("displays an error when the user has already been added", function () {
+            it('displays an error when the user has already been added', function() {
                 var requests = AjaxHelpers.requests(this);
                 var promptSpy = ViewHelpers.createPromptSpy();
                 $('.create-user-button').click();
@@ -99,12 +99,12 @@ function ($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
             });
 
 
-            it("can remove a user's permission to access the library", function () {
+            it("can remove a user's permission to access the library", function() {
                 var requests = AjaxHelpers.requests(this);
                 var promptSpy = ViewHelpers.createPromptSpy();
                 var reloadSpy = spyOn(ViewUtils, 'reload');
-                var email = "honor@example.com";
-                $('.user-item[data-email="'+email+'"] .action-delete .delete').click();
+                var email = 'honor@example.com';
+                $('.user-item[data-email="' + email + '"] .action-delete .delete').click();
                 ViewHelpers.verifyPromptShowing(promptSpy, 'Are you sure?');
                 ViewHelpers.confirmPrompt(promptSpy);
                 ViewHelpers.verifyPromptHidden(promptSpy);
@@ -114,36 +114,36 @@ function ($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
             });
         });
 
-        describe("read-only access", function() {
+        describe('read-only access', function() {
             var mockHTML = readFixtures('mock/mock-manage-users-lib-ro.underscore');
 
-            beforeEach(function () {
+            beforeEach(function() {
                 ViewHelpers.installMockAnalytics();
                 setFixtures(mockHTML);
-                appendSetFixtures($("<script>", { id: "team-member-tpl", type: "text/template"}).text(team_member_fixture));
+                appendSetFixtures($('<script>', {id: 'team-member-tpl', type: 'text/template'}).text(team_member_fixture));
                 ManageUsersFactory(
-                    "Mock Library",
+                    'Mock Library',
                     [
-                        {id: 1, email: "honor@example.com", username:"honor", role: 'staff'},
-                        {id: 2, email: "audit@example.com", username:"audit", role: 'instructor'},
-                        {id: 3, email: "staff@example.com", username:"staff", role: 'library_user'}
+                        {id: 1, email: 'honor@example.com', username: 'honor', role: 'staff'},
+                        {id: 2, email: 'audit@example.com', username: 'audit', role: 'instructor'},
+                        {id: 3, email: 'staff@example.com', username: 'staff', role: 'library_user'}
                     ],
-                    "dummy_change_role_url",
+                    'dummy_change_role_url',
                     10000,
                     false
                 );
             });
 
-            afterEach(function () {
+            afterEach(function() {
                 ViewHelpers.removeMockAnalytics();
             });
 
-            it("can't give a user permission to use the library", function () {
+            it("can't give a user permission to use the library", function() {
                 expect($('.create-user-button')).not.toBeVisible();
                 expect($('.wrapper-create-user')).not.toBeVisible();
             });
 
-            it("can't promote or demote user", function () {
+            it("can't promote or demote user", function() {
                 expect($('.action-role')).not.toBeVisible();
             });
         });

@@ -152,7 +152,7 @@ class ProfileImageEndpointMixin(UserSettingsEventTestMixin):
         self.assert_no_events_were_emitted()
 
 
-@attr('shard_2')
+@attr(shard=2)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Profile Image API is only supported in LMS')
 @mock.patch('openedx.core.djangoapps.profile_images.views.log')
 class ProfileImageViewGeneralTestCase(ProfileImageEndpointMixin, APITestCase):
@@ -172,7 +172,7 @@ class ProfileImageViewGeneralTestCase(ProfileImageEndpointMixin, APITestCase):
         self.assert_no_events_were_emitted()
 
 
-@attr('shard_2')
+@attr(shard=2)
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Profile Image API is only supported in LMS')
 @mock.patch('openedx.core.djangoapps.profile_images.views.log')
@@ -383,7 +383,7 @@ class ProfileImageViewPostTestCase(ProfileImageEndpointMixin, APITestCase):
         self.assert_no_events_were_emitted()
 
 
-@attr('shard_2')
+@attr(shard=2)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Profile Image API is only supported in LMS')
 @mock.patch('openedx.core.djangoapps.profile_images.views.log')
 class ProfileImageViewDeleteTestCase(ProfileImageEndpointMixin, APITestCase):
@@ -514,7 +514,7 @@ class DeprecatedProfileImageTestMixin(ProfileImageEndpointMixin):
         self.assert_no_events_were_emitted()
 
 
-@attr('shard_2')
+@attr(shard=2)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Profile Image API is only supported in LMS')
 @mock.patch('openedx.core.djangoapps.profile_images.views.log')
 class DeprecatedProfileImageUploadTestCase(DeprecatedProfileImageTestMixin, APITestCase):
@@ -527,7 +527,7 @@ class DeprecatedProfileImageUploadTestCase(DeprecatedProfileImageTestMixin, APIT
     _replacement_method = 'openedx.core.djangoapps.profile_images.views.ProfileImageView.post'
 
 
-@attr('shard_2')
+@attr(shard=2)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Profile Image API is only supported in LMS')
 @mock.patch('openedx.core.djangoapps.profile_images.views.log')
 class DeprecatedProfileImageRemoveTestCase(DeprecatedProfileImageTestMixin, APITestCase):

@@ -1,22 +1,22 @@
 define(['jquery.cookie', 'utility', 'common/js/components/utils/view_utils'], function(cookie, utility, ViewUtils) {
     'use strict';
-    return function (homepageURL) {
+    return function(homepageURL) {
         function postJSON(url, data, callback) {
             $.ajax({
-                type:'POST',
+                type: 'POST',
                 url: url,
                 dataType: 'json',
                 data: data,
-                success: callback,
+                success: callback
             });
         }
 
         // Clear the login error message when credentials are edited
-        $('input#email').on('input',function() {
+        $('input#email').on('input', function() {
             $('#login_error').removeClass('is-shown');
         });
 
-        $('input#password').on('input',function() {
+        $('input#password').on('input', function() {
             $('#login_error').removeClass('is-shown');
         });
 
@@ -29,14 +29,14 @@ define(['jquery.cookie', 'utility', 'common/js/components/utils/view_utils'], fu
             var submit_data = $('#login_form').serialize();
 
             postJSON('/login_post', submit_data, function(json) {
-                if(json.success) {
+                if (json.success) {
                     var next = /next=([^&]*)/g.exec(decodeURIComponent(window.location.search));
                     if (next && next.length > 1 && !isExternal(next[1])) {
                         ViewUtils.redirect(next[1]);
                     } else {
                         ViewUtils.redirect(homepageURL);
                     }
-                } else if($('#login_error').length === 0) {
+                } else if ($('#login_error').length === 0) {
                     $('#login_form').prepend(
                         '<div id="login_error" class="message message-status error">' +
                         json.value +

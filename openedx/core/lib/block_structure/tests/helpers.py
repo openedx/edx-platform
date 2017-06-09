@@ -55,7 +55,7 @@ class MockModulestore(object):
         """
         self.blocks = blocks
 
-    def get_item(self, block_key, depth=None):  # pylint: disable=unused-argument
+    def get_item(self, block_key, depth=None, lazy=False):  # pylint: disable=unused-argument
         """
         Returns the mock XBlock (MockXBlock) associated with the
         given block_key.

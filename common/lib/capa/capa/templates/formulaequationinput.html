@@ -1,33 +1,36 @@
+<%page expression_filter="h"/>
+<%! from openedx.core.djangolib.markup import HTML %>
 <% doinline = 'style="display:inline-block;vertical-align:top"' if inline else "" %>
-<section id="formulaequationinput_${id}" class="inputtype formulaequationinput" ${doinline}>
-  <div class="${status.classname}" id="status_${id}">
-    <input type="text" name="input_${id}" id="input_${id}"
-        data-input-id="${id}" value="${value|h}"
-        aria-label="${label}"
-        aria-describedby="${id}_status"
-        % if size:
-        size="${size}"
-        % endif
-        />
-    ${trailing_text | h}
+<div id="formulaequationinput_${id}" class="inputtype formulaequationinput" ${doinline | n, decode.utf8}>
+    <div class="${status.classname}">
+      % if response_data['label']:
+          <label class="problem-group-label" for="input_${id}" id="label_${id}">${response_data['label']}</label>
+      % endif
+        % for description_id, description_text in response_data['descriptions'].items():
+            <p class="question-description" id="${description_id}">${description_text}</p>
+        % endfor
+        <input type="text" name="input_${id}" id="input_${id}"
+            data-input-id="${id}" value="${value}"
+            ${describedby_html}
+            % if size:
+            size="${size}"
+            % endif
+            />
+        <span class="trailing_text">${trailing_text}</span>
 
-      <span class="status" id="${id}_status" data-tooltip="${status.display_tooltip}">
-        <span class="sr">
-          ${status.display_name}
-        </span>
-      </span>
+        <%include file="status_span.html" args="status=status, status_id=id"/>
 
-      <p id="answer_${id}" class="answer"></p>
+        <p id="answer_${id}" class="answer"></p>
 
-      <div id="input_${id}_preview" class="equation">
-        \(\)
-        <img src="${STATIC_URL}images/spinner.gif" class="loading" alt="Loading"/>
-      </div>
-  </div>
+        <div id="input_${id}_preview" class="equation">
+            \(\)
+            <img src="${STATIC_URL}images/spinner.gif" class="loading" alt="Loading"/>
+        </div>
+    </div>
 
-  <div class="script_placeholder" data-src="${previewer}"/>
+    <div class="script_placeholder" data-src="${previewer}"/>
 
   % if msg:
-      <span class="message">${msg|n}</span>
+      <span class="message" aria-describedby="label_${id}" tabindex="-1">${HTML(msg)}</span>
   % endif
-</section>
+</div>

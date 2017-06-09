@@ -296,9 +296,11 @@ def copy_or_rename_transcript(new_name, old_name, item, delete_old=False, user=N
 def get_html5_ids(html5_sources):
     """
     Helper method to parse out an HTML5 source into the ideas
-    NOTE: This assumes that '/' are not in the filename
+    NOTE: This assumes that '/' are not in the filename.
+    Slices each id by 150, restricting too long strings as video names.
     """
-    html5_ids = [x.split('/')[-1].rsplit('.', 1)[0] for x in html5_sources]
+    html5_ids = [x.split('/')[-1].rsplit('.', 1)[0][:150] for x in html5_sources]
+
     return html5_ids
 
 
@@ -383,9 +385,7 @@ def manage_video_subtitles_save(item, user, old_metadata=None, generate_translat
                     lang,
                 )
             except TranscriptException as ex:
-                # remove key from transcripts because proper srt file does not exist in assets.
-                item.transcripts.pop(lang)
-                reraised_message += ' ' + ex.message
+                pass
         if reraised_message:
             item.save_with_metadata(user)
             raise TranscriptException(reraised_message)
@@ -531,6 +531,9 @@ class Transcript(object):
         """
         Return asset location. `location` is module location.
         """
+        # If user transcript filename is empty, raise `TranscriptException` to avoid `InvalidKeyError`.
+        if not filename:
+            raise TranscriptException("Transcript not uploaded yet")
         return StaticContent.compute_location(location.course_key, filename)
 
     @staticmethod
@@ -670,12 +673,17 @@ class VideoTranscriptsMixin(object):
         """
         if is_bumper:
             transcripts = copy.deepcopy(get_bumper_settings(self).get('transcripts', {}))
-            return {
-                "sub": transcripts.pop("en", ""),
-                "transcripts": transcripts,
-            }
+            sub = transcripts.pop("en", "")
         else:
-            return {
-                "sub": self.sub,
-                "transcripts": self.transcripts,
-            }
+            transcripts = self.transcripts if self.transcripts else {}
+            sub = self.sub
+
+        # Only attach transcripts that are not empty.
+        transcripts = {
+            language_code: transcript_file
+            for language_code, transcript_file in transcripts.items() if transcript_file != ''
+        }
+        return {
+            "sub": sub,
+            "transcripts": transcripts,
+        }

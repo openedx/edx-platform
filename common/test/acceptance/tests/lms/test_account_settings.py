@@ -2,20 +2,20 @@
 """
 End-to-end tests for the Account Settings page.
 """
+from datetime import datetime
 from unittest import skip
-from nose.plugins.attrib import attr
 
-from bok_choy.web_app_test import WebAppTest
 from bok_choy.page_object import XSS_INJECTION
+from nose.plugins.attrib import attr
+from pytz import timezone, utc
 
-from ...pages.lms.account_settings import AccountSettingsPage
-from ...pages.lms.auto_auth import AutoAuthPage
-from ...pages.lms.dashboard import DashboardPage
+from common.test.acceptance.pages.lms.account_settings import AccountSettingsPage
+from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.lms.dashboard import DashboardPage
+from common.test.acceptance.tests.helpers import AcceptanceTest, EventsTestMixin
 
-from ..helpers import EventsTestMixin
 
-
-class AccountSettingsTestMixin(EventsTestMixin, WebAppTest):
+class AccountSettingsTestMixin(EventsTestMixin, AcceptanceTest):
     """
     Mixin with helper methods to test the account settings page.
     """
@@ -88,8 +88,8 @@ class AccountSettingsTestMixin(EventsTestMixin, WebAppTest):
         self.assert_no_matching_events_were_emitted({'event_type': self.USER_SETTINGS_CHANGED_EVENT_NAME})
 
 
-@attr('shard_8')
-class DashboardMenuTest(AccountSettingsTestMixin, WebAppTest):
+@attr(shard=8)
+class DashboardMenuTest(AccountSettingsTestMixin, AcceptanceTest):
     """
     Tests that the dashboard menu works correctly with the account settings page.
     """
@@ -111,8 +111,8 @@ class DashboardMenuTest(AccountSettingsTestMixin, WebAppTest):
         dashboard_page.click_account_settings_link()
 
 
-@attr('shard_8')
-class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
+@attr(shard=8)
+class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
     """
     Tests that verify behaviour of the Account Settings page.
     """
@@ -214,7 +214,13 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
                 self.assertEqual(self.account_settings_page.value_for_text_field(field_id), new_value)
 
     def _test_dropdown_field(
-            self, field_id, title, initial_value, new_values, success_message=SUCCESS_MESSAGE, reloads_on_save=False
+            self,
+            field_id,
+            title,
+            initial_value,
+            new_values,
+            success_message=SUCCESS_MESSAGE,  # pylint: disable=unused-argument
+            reloads_on_save=False
     ):
         """
         Test behaviour of a dropdown field.
@@ -406,6 +412,32 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
             [u'Pakistan', u'Palau'],
         )
 
+    def test_time_zone_field(self):
+        """
+        Test behaviour of "Time Zone" field
+        """
+        kiev_abbr, kiev_offset = self._get_time_zone_info('Europe/Kiev')
+        pacific_abbr, pacific_offset = self._get_time_zone_info('US/Pacific')
+        self._test_dropdown_field(
+            u'time_zone',
+            u'Time Zone',
+            u'Default (Local Time Zone)',
+            [
+                u'Europe/Kiev ({abbr}, UTC{offset})'.format(abbr=kiev_abbr, offset=kiev_offset),
+                u'US/Pacific ({abbr}, UTC{offset})'.format(abbr=pacific_abbr, offset=pacific_offset),
+            ],
+        )
+
+    def _get_time_zone_info(self, time_zone_str):
+        """
+        Helper that returns current time zone abbreviation and UTC offset
+        and accounts for daylight savings time
+        """
+        time_zone = datetime.now(utc).astimezone(timezone(time_zone_str))
+        abbr = time_zone.strftime('%Z')
+        offset = time_zone.strftime('%z')
+        return abbr, offset
+
     def test_preferred_language_field(self):
         """
         Test behaviour of "Preferred Language" field.
@@ -469,7 +501,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
 
 
 @attr('a11y')
-class AccountSettingsA11yTest(AccountSettingsTestMixin, WebAppTest):
+class AccountSettingsA11yTest(AccountSettingsTestMixin, AcceptanceTest):
     """
     Class to test account settings accessibility.
     """
@@ -480,9 +512,4 @@ class AccountSettingsA11yTest(AccountSettingsTestMixin, WebAppTest):
         """
         self.log_in_as_unique_user()
         self.visit_account_settings_page()
-        self.account_settings_page.a11y_audit.config.set_rules({
-            'ignore': [
-                'link-href',  # TODO: AC-233
-            ],
-        })
         self.account_settings_page.a11y_audit.check_for_accessibility_errors()

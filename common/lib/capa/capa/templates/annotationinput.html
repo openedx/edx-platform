@@ -1,4 +1,5 @@
-<form class="annotation-input">
+<%! from openedx.core.djangolib.markup import HTML %>
+<div class="annotation-input">
 <div class="script_placeholder" data-src="${STATIC_URL}js/capa/annotationinput.js"/>
 
 <div class="annotation-header">
@@ -16,17 +17,15 @@
     <div class="block">${comment_prompt}</div>
     <textarea class="comment" id="input_${id}_comment" name="input_${id}_comment" aria-describedby="answer_${id}">${comment_value|h}</textarea>
 
-    <div class="block">${tag_prompt}</div>
+    <div class="block" id="label_${id}">${tag_prompt}</div>
     <ul class="tags">
     % for option in options:
         <li>
             % if has_options_value:
-                % if all([c == 'correct' for c in option['choice'], status]):
-                <span class="tag-status correct" id="status_${id}" aria-describedby="input_${id}_comment"><span class="sr">Status: Correct</span></span>
-                % elif all([c == 'partially-correct' for c in option['choice'], status]):
-                <span class="tag-status partially-correct" id="status_${id}" aria-describedby="input_${id}_comment"><span class="sr">Status: Partially Correct</span></span>
-                % elif all([c == 'incorrect' for c in option['choice'], status]):
-                <span class="tag-status incorrect" id="status_${id}" aria-describedby="input_${id}_comment"><span class="sr">Status: Incorrect</span></span>
+                % if all([c == status.classname for c in option['choice'], status]):
+                <span class="tag-status ${status.classname}" aria-describedby="input_${id}_comment">
+                    <%include file="status_span.html" args="status=status"/>
+                </span>
                 % endif
             % endif
 
@@ -52,13 +51,12 @@
         <input type="hidden" class="value" name="input_${id}" id="input_${id}" value="${value|h}" />
     % endif
 
-    <span class="status ${status.classname}" id="status_${id}" aria-describedby="input_${id}"><span class="sr">${status.display_name}</span></span>
+    <%include file="status_span.html" args="status=status, status_id=id"/>
 
     <p id="answer_${id}" class="answer answer-annotation"></p>
 </div>
-</form>
+</div>
 
 % if msg:
-<span class="message">${msg|n}</span>
+<span class="message" aria-describedby="label_${id}" tabindex="-1">${HTML(msg)}</span>
 % endif
-

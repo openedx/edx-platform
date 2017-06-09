@@ -1,53 +1,54 @@
 """
-Test for student tasks.
+Tests for the Sending activation email celery tasks
 """
 
-from student.tasks import publish_course_notifications_task
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
-from edx_notifications.data import NotificationMessage
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
-from edx_notifications.lib.publisher import get_notification_type
-from xmodule.modulestore.django import modulestore
-from edx_notifications.lib.consumer import get_notifications_count_for_user
-from mock import patch
-from lms import startup
+import mock
+
+from django.test import TestCase
+from django.conf import settings
+from student.tasks import send_activation_email
+from boto.exception import NoAuthHandlerFound
+
+from lms.djangoapps.courseware.tests.factories import UserFactory
 
 
-class StudentTasksTestCase(ModuleStoreTestCase):
+class SendActivationEmailTestCase(TestCase):
     """
-    Tests of student.roles
+    Test for send activation email to user
     """
-
     def setUp(self):
-        super(StudentTasksTestCase, self).setUp()
-        self.course = CourseFactory.create()
+        """ Setup components used by each test."""
+        super(SendActivationEmailTestCase, self).setUp()
+        self.student = UserFactory()
 
-    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_NOTIFICATIONS": True})
-    def test_course_bulk_notification_tests(self):
-        # create new users and enroll them in the course.
-        startup.startup_notification_subsystem()
+    @mock.patch('time.sleep', mock.Mock(return_value=None))
+    @mock.patch('student.tasks.log')
+    @mock.patch('django.core.mail.send_mail', mock.Mock(side_effect=NoAuthHandlerFound))
+    def test_send_email(self, mock_log):
+        """
+        Tests retries when the activation email doesn't send
+        """
+        from_address = 'task_testing@example.com'
+        email_max_attempts = settings.RETRY_ACTIVATION_EMAIL_MAX_ATTEMPTS
 
-        test_user_1 = UserFactory.create(password='test_pass')
-        CourseEnrollmentFactory(user=test_user_1, course_id=self.course.id)
-        test_user_2 = UserFactory.create(password='test_pass')
-        CourseEnrollmentFactory(user=test_user_2, course_id=self.course.id)
+        # pylint: disable=no-member
+        send_activation_email.delay('Task_test', 'Task_test_message', from_address, self.student.email)
 
-        notification_type = get_notification_type(u'open-edx.studio.announcements.new-announcement')
-        course = modulestore().get_course(self.course.id, depth=0)
-        notification_msg = NotificationMessage(
-            msg_type=notification_type,
-            namespace=unicode(self.course.id),
-            payload={
-                '_schema_version': '1',
-                'course_name': course.display_name,
+        # Asserts sending email retry logging.
+        for attempt in range(email_max_attempts):
+            mock_log.info.assert_any_call(
+                'Retrying sending email to user {dest_addr}, attempt # {attempt} of {max_attempts}'.format(
+                    dest_addr=self.student.email,
+                    attempt=attempt,
+                    max_attempts=email_max_attempts
+                ))
+        self.assertEquals(mock_log.info.call_count, 6)
 
-            }
+        # Asserts that the error was logged on crossing max retry attempts.
+        mock_log.error.assert_called_with(
+            'Unable to send activation email to user from "%s" to "%s"',
+            from_address,
+            self.student.email,
+            exc_info=True
         )
-        # Send the notification_msg to the Celery task
-        publish_course_notifications_task.delay(self.course.id, notification_msg)
-
-        # now the enrolled users should get notification about the
-        # course update where they are enrolled as student.
-        self.assertTrue(get_notifications_count_for_user(test_user_1.id), 1)
-        self.assertTrue(get_notifications_count_for_user(test_user_2.id), 1)
+        self.assertEquals(mock_log.error.call_count, 1)

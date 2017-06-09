@@ -8,15 +8,14 @@ define(['backbone',
         'js/bookmarks/views/bookmarks_list_button',
         'js/bookmarks/views/bookmarks_list',
         'js/bookmarks/collections/bookmarks'],
-    function (Backbone, $, _, Logger, URI, AjaxHelpers, TemplateHelpers, BookmarksListButtonView, BookmarksListView,
+    function(Backbone, $, _, Logger, URI, AjaxHelpers, TemplateHelpers, BookmarksListButtonView, BookmarksListView,
               BookmarksCollection) {
         'use strict';
 
-        describe("lms.courseware.bookmarks", function () {
-
+        describe('lms.courseware.bookmarks', function() {
             var bookmarksButtonView;
 
-            beforeEach(function () {
+            beforeEach(function() {
                 loadFixtures('js/fixtures/bookmarks/bookmarks.html');
                 TemplateHelpers.installTemplates(
                     [
@@ -26,28 +25,28 @@ define(['backbone',
                 );
                 spyOn(Logger, 'log').and.returnValue($.Deferred().resolve());
                 jasmine.addMatchers({
-                   toHaveBeenCalledWithUrl: function () {
-                       return {
-                         compare: function (actual, expectedUrl) {
-                             return {
-                                 pass: expectedUrl === actual.calls.mostRecent().args[0].currentTarget.pathname
-                             };
-                         }
-                       };
-                   }
+                    toHaveBeenCalledWithUrl: function() {
+                        return {
+                            compare: function(actual, expectedUrl) {
+                                return {
+                                    pass: expectedUrl === actual.calls.mostRecent().args[0].currentTarget.pathname
+                                };
+                            }
+                        };
+                    }
                 });
 
                 bookmarksButtonView = new BookmarksListButtonView();
             });
 
-            var verifyRequestParams = function (requests, params) {
+            var verifyRequestParams = function(requests, params) {
                 var urlParams = (new URI(requests[requests.length - 1].url)).query(true);
-                _.each(params, function (value, key) {
+                _.each(params, function(value, key) {
                     expect(urlParams[key]).toBe(value);
                 });
             };
 
-            var createBookmarksData = function (options) {
+            var createBookmarksData = function(options) {
                 var data = {
                     count: options.count || 0,
                     num_pages: options.num_pages || 1,
@@ -56,7 +55,7 @@ define(['backbone',
                     results: []
                 };
 
-                for(var i = 0; i < options.numBookmarksToCreate; i++) {
+                for (var i = 0; i < options.numBookmarksToCreate; i++) {
                     var bookmarkInfo = {
                         id: i,
                         display_name: 'UNIT_DISPLAY_NAME_' + i,
@@ -76,24 +75,24 @@ define(['backbone',
                 return data;
             };
 
-            var createBookmarkUrl = function (courseId, usageId) {
+            var createBookmarkUrl = function(courseId, usageId) {
                 return '/courses/' + courseId + '/jump_to/' + usageId;
             };
 
-            var breadcrumbTrail = function (path, unitDisplayName) {
+            var breadcrumbTrail = function(path, unitDisplayName) {
                 return _.pluck(path, 'display_name').
                     concat([unitDisplayName]).
                     join(' <span class="icon fa fa-caret-right" aria-hidden="true"></span><span class="sr">-</span> ');
             };
 
-            var verifyBookmarkedData = function (view, expectedData) {
+            var verifyBookmarkedData = function(view, expectedData) {
                 var courseId, usageId;
                 var bookmarks = view.$('.bookmarks-results-list-item');
                 var results = expectedData.results;
 
                 expect(bookmarks.length, results.length);
 
-                for(var bookmark_index = 0; bookmark_index < results.length; bookmark_index++) {
+                for (var bookmark_index = 0; bookmark_index < results.length; bookmark_index++) {
                     courseId = results[bookmark_index].course_id;
                     usageId = results[bookmark_index].usage_id;
 
@@ -111,7 +110,7 @@ define(['backbone',
                 }
             };
 
-            var verifyPaginationInfo = function (requests, expectedData, currentPage, headerMessage) {
+            var verifyPaginationInfo = function(requests, expectedData, currentPage, headerMessage) {
                 AjaxHelpers.respondWithJson(requests, expectedData);
                 verifyBookmarkedData(bookmarksButtonView.bookmarksListView, expectedData);
                 expect(bookmarksButtonView.bookmarksListView.$('.paging-footer span.current-page').text().trim()).
@@ -120,7 +119,7 @@ define(['backbone',
                     toBe(headerMessage);
             };
 
-            it("has correct behavior for bookmarks button", function () {
+            it('has correct behavior for bookmarks button', function() {
                 var requests = AjaxHelpers.requests(this);
 
                 spyOn(bookmarksButtonView, 'toggleBookmarksListView').and.callThrough();
@@ -141,7 +140,7 @@ define(['backbone',
                 expect(bookmarksButtonView.$('.bookmarks-list-button')).toHaveClass('is-inactive');
             });
 
-            it("can correctly render an empty bookmarks list", function () {
+            it('can correctly render an empty bookmarks list', function() {
                 var requests = AjaxHelpers.requests(this);
                 var expectedData = createBookmarksData({numBookmarksToCreate: 0});
 
@@ -151,10 +150,10 @@ define(['backbone',
                 expect(bookmarksButtonView.bookmarksListView.$('.bookmarks-empty-header').text().trim()).
                     toBe('You have not bookmarked any courseware pages yet.');
 
-                var emptyListText = "Use bookmarks to help you easily return to courseware pages. " +
-                    "To bookmark a page, select Bookmark in the upper right corner of that page. " +
-                    "To see a list of all your bookmarks, select Bookmarks in the upper left " +
-                    "corner of any courseware page.";
+                var emptyListText = 'Use bookmarks to help you easily return to courseware pages. ' +
+                    'To bookmark a page, select Bookmark in the upper right corner of that page. ' +
+                    'To see a list of all your bookmarks, select Bookmarks in the upper left ' +
+                    'corner of any courseware page.';
 
                 expect(bookmarksButtonView.bookmarksListView.$('.bookmarks-empty-detail-title').text().trim()).
                     toBe(emptyListText);
@@ -163,7 +162,7 @@ define(['backbone',
                 expect(bookmarksButtonView.bookmarksListView.$('.paging-footer').length).toBe(0);
             });
 
-            it("has rendered bookmarked list correctly", function () {
+            it('has rendered bookmarked list correctly', function() {
                 var requests = AjaxHelpers.requests(this);
                 var expectedData = createBookmarksData({numBookmarksToCreate: 3});
 
@@ -184,7 +183,7 @@ define(['backbone',
                 expect(bookmarksButtonView.bookmarksListView.$('.paging-footer').length).toBe(1);
             });
 
-            it("calls bookmarks list render on page_changed event", function () {
+            it('calls bookmarks list render on page_changed event', function() {
                 var renderSpy = spyOn(BookmarksListView.prototype, 'render');
                 var listView = new BookmarksListView({
                     collection: new BookmarksCollection([], {
@@ -196,7 +195,7 @@ define(['backbone',
                 expect(renderSpy).toHaveBeenCalled();
             });
 
-            it("can go to a page number", function () {
+            it('can go to a page number', function() {
                 var requests = AjaxHelpers.requests(this);
                 var expectedData = createBookmarksData(
                     {
@@ -233,7 +232,7 @@ define(['backbone',
                     toBe('Showing 11-12 out of 12 total');
             });
 
-            it("can navigate forward and backward", function () {
+            it('can navigate forward and backward', function() {
                 var requests = AjaxHelpers.requests(this);
                 var expectedData = createBookmarksData(
                     {
@@ -285,7 +284,7 @@ define(['backbone',
                 );
             });
 
-            it("can navigate to correct url", function () {
+            it('can navigate to correct url', function() {
                 var requests = AjaxHelpers.requests(this);
                 spyOn(bookmarksButtonView.bookmarksListView, 'visitBookmark');
 
@@ -297,7 +296,7 @@ define(['backbone',
                 expect(bookmarksButtonView.bookmarksListView.visitBookmark).toHaveBeenCalledWithUrl(url);
             });
 
-            it("shows an error message for HTTP 500", function () {
+            it('shows an error message for HTTP 500', function() {
                 var requests = AjaxHelpers.requests(this);
 
                 bookmarksButtonView.$('.bookmarks-list-button').click();

@@ -216,4 +216,4 @@ class ContentTest(unittest.TestCase):
         js_file_paths = _write_js(output_root, _list_descriptors())
         js_file_paths = [file_path for file_path in js_file_paths if os.path.basename(file_path).startswith('000-')]
         self.assertEqual(len(js_file_paths), 1)
-        self.assertIn("XModule.Descriptor = (function () {", open(js_file_paths[0]).read())
+        self.assertIn("XModule.Descriptor = (function() {", open(js_file_paths[0]).read())

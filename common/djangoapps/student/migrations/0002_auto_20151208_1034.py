@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.db import migrations, models
 import django.db.models.deletion
 from django.conf import settings
-import xmodule_django.models
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
 
 class Migration(migrations.Migration):
@@ -32,7 +32,7 @@ class Migration(migrations.Migration):
             name='HistoricalCourseEnrollment',
             fields=[
                 ('id', models.IntegerField(verbose_name='ID', db_index=True, auto_created=True, blank=True)),
-                ('course_id', xmodule_django.models.CourseKeyField(max_length=255, db_index=True)),
+                ('course_id', CourseKeyField(max_length=255, db_index=True)),
                 ('created', models.DateTimeField(db_index=True, null=True, editable=False, blank=True)),
                 ('is_active', models.BooleanField(default=True)),
                 ('mode', models.CharField(default=b'honor', max_length=100)),

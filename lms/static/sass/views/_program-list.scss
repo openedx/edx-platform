@@ -3,9 +3,10 @@
 }
 
 .program-cards-container {
+  @include grid-container();
   @include span(12);
 
-  @include susy-media($bp-screen-md) {
+  @media(min-width: $bp-screen-md) {
     @include span(9);
   }
 }
@@ -15,14 +16,13 @@
   @include float(right);
   margin-bottom: $baseline;
 
-  @include susy-media($bp-screen-md) {
+  @media(min-width: $bp-screen-md) {
     @include span(3);
   }
 
   .aside {
     padding: $baseline;
     margin-bottom: $baseline;
-    background-color: $body-bg;
     box-sizing: border-box;
     border: 1px solid $border-color-l3;
   }
@@ -30,7 +30,7 @@
   .program-advertise {
     clear: both;
 
-    .btn-neutral {
+    .new-programs-btn {
       width: 100%;
       text-align: center;
       padding: 10px;
@@ -67,6 +67,7 @@
 }
 
 .empty-programs-message {
+  @include span(12);
   border: 3px solid $gray-l4;
   background: $gray-l6;
   padding: ($baseline*2) 0;
@@ -76,33 +77,5 @@
   .hd-3 {
     color: $black;
     margin-bottom: $baseline;
-  }
-
-  .find-xseries-programs {
-    background: $black;
-    border-color: $black;
-    color: $white;
-
-    .action-xseries-icon {
-      @include float(left);
-      @include margin-right($baseline*0.4);
-
-      display: inline;
-      background: url('#{$static-path}/images/icon-sm-xseries-white.png') no-repeat;
-      background-color: transparent;
-      width: ($baseline*1.1);
-      height: ($baseline*1.1);
-    }
-
-    &:active,
-    &:hover,
-    &:focus {
-      background: $white;
-      color: $black;
-
-      .action-xseries-icon {
-        background: url('#{$static-path}/images/icon-sm-xseries-black.png') no-repeat;
-      }
-    }
   }
 }

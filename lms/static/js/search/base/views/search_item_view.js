@@ -1,73 +1,70 @@
-;(function (define) {
+(function(define) {
+    define([
+        'jquery',
+        'underscore',
+        'backbone',
+        'gettext',
+        'logger'
+    ], function($, _, Backbone, gettext, Logger) {
+        'use strict';
 
-define([
-    'jquery',
-    'underscore',
-    'backbone',
-    'gettext',
-    'logger'
-], function ($, _, Backbone, gettext, Logger) {
-    'use strict';
+        return Backbone.View.extend({
 
-    return Backbone.View.extend({
+            tagName: 'li',
+            templateId: '',
+            className: 'search-results-item',
+            attributes: {
+                'role': 'region',
+                'aria-label': 'search result'
+            },
 
-        tagName: 'li',
-        templateId: '',
-        className: 'search-results-item',
-        attributes: {
-            'role': 'region',
-            'aria-label': 'search result'
-        },
+            events: {
+                'click': 'logSearchItem'
+            },
 
-        events: {
-            'click': 'logSearchItem',
-        },
+            initialize: function() {
+                this.tpl = _.template($(this.templateId).html());
+            },
 
-        initialize: function () {
-            this.tpl = _.template($(this.templateId).html());
-        },
-
-        render: function () {
-            var data = _.clone(this.model.attributes);
+            render: function() {
+                var data = _.clone(this.model.attributes);
             // Drop the preview text and result type if the search term is found
             //  in the title/location in the course hierarchy
-            if (this.model.get('content_type') === 'Sequence') {
-                data.excerpt = '';
-                data.content_type = '';
-            }
-            this.$el.html(this.tpl(data));
-            return this;
-        },
+                if (this.model.get('content_type') === 'Sequence') {
+                    data.excerpt = '';
+                    data.content_type = '';
+                }
+                this.$el.html(this.tpl(data));
+                return this;
+            },
 
         /**
          * Redirect to a URL.  Mainly useful for mocking out in tests.
          * @param  {string} url The URL to redirect to.
          */
-        redirect: function(url) {
-            window.location.href = url;
-        },
+            redirect: function(url) {
+                window.location.href = url;
+            },
 
-        logSearchItem: function(event) {
-            event.preventDefault();
-            var self = this;
-            var target = this.model.id;
-            var link = this.model.get('url');
-            var collection = this.model.collection;
-            var page = collection.page;
-            var pageSize = collection.pageSize;
-            var searchTerm = collection.searchTerm;
-            var index = collection.indexOf(this.model);
-            Logger.log('edx.course.search.result_selected', {
-                'search_term': searchTerm,
-                'result_position': (page * pageSize + index),
-                'result_link': target
-            }).always(function() {
-                self.redirect(link);
-            });
-        }
+            logSearchItem: function(event) {
+                event.preventDefault();
+                var self = this;
+                var target = this.model.id;
+                var link = this.model.get('url');
+                var collection = this.model.collection;
+                var page = collection.page;
+                var pageSize = collection.pageSize;
+                var searchTerm = collection.searchTerm;
+                var index = collection.indexOf(this.model);
+                Logger.log('edx.course.search.result_selected', {
+                    'search_term': searchTerm,
+                    'result_position': (page * pageSize + index),
+                    'result_link': target
+                }).always(function() {
+                    self.redirect(link);
+                });
+            }
 
+        });
     });
-
-});
-
 })(define || RequireJS.define);

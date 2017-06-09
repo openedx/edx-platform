@@ -29,7 +29,7 @@ from config_models.decorators import require_config
 from shoppingcart.reports import RefundReport, ItemizedPurchaseReport, UniversityRevenueShareReport, CertificateStatusReport
 from student.models import CourseEnrollment, EnrollmentClosedError, CourseFullError, \
     AlreadyEnrolledError
-from embargo import api as embargo_api
+from openedx.core.djangoapps.embargo import api as embargo_api
 from .exceptions import (
     ItemAlreadyInCartException, AlreadyEnrolledInCourseException,
     CourseDoesNotExistException, ReportTypeDoesNotExistException,

@@ -15,7 +15,7 @@ from student.tests.factories import UserFactory
 import mock
 
 
-@attr('shard_1')
+@attr(shard=1)
 class InstructorServiceTests(SharedModuleStoreTestCase):
     """
     Tests for the InstructorService
@@ -49,7 +49,8 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
             state=json.dumps({'attempts': 2}),
         )
 
-    def test_reset_student_attempts_delete(self):
+    @mock.patch('lms.djangoapps.grades.signals.handlers.PROBLEM_WEIGHTED_SCORE_CHANGED.send')
+    def test_reset_student_attempts_delete(self, _mock_signal):
         """
         Test delete student state.
         """

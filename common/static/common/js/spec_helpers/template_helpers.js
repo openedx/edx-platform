@@ -1,14 +1,14 @@
 /**
  * Provides helper methods for invoking Studio modal windows in Jasmine tests.
  */
-define(["jquery", "underscore"],
+define(['jquery', 'underscore'],
     function($, _) {
         var installTemplate, installTemplates;
 
         installTemplate = function(templateFile, isFirst, templateId) {
             var template = readFixtures(templateFile + '.underscore'),
                 templateName = templateFile,
-                slashIndex = _.lastIndexOf(templateName, "/");
+                slashIndex = _.lastIndexOf(templateName, '/');
             if (slashIndex >= 0) {
                 templateName = templateFile.substring(slashIndex + 1);
             }
@@ -17,9 +17,9 @@ define(["jquery", "underscore"],
             }
 
             if (isFirst) {
-                setFixtures($('<script>', { id: templateId, type: 'text/template' }).text(template));
+                setFixtures($('<script>', {id: templateId, type: 'text/template'}).text(template));
             } else {
-                appendSetFixtures($('<script>', { id: templateId, type: 'text/template' }).text(template));
+                appendSetFixtures($('<script>', {id: templateId, type: 'text/template'}).text(template));
             }
         };
 

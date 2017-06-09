@@ -21,6 +21,7 @@ from lms.djangoapps.badges.tests.factories import (
     CourseCompleteImageConfigurationFactory,
     BadgeClassFactory,
 )
+from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from openedx.core.lib.tests.assertions.events import assert_event_matches
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from student.roles import CourseStaffRole
@@ -170,7 +171,7 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
         template.save()
 
 
-@attr('shard_1')
+@attr(shard=1)
 @ddt.ddt
 class CertificatesViewsTests(CommonCertificatesTestCase):
     """
@@ -189,7 +190,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         params = OrderedDict([
             ('_ed', '0_0dPSPyS070e0HsE9HNz_13_d11_',),
             ('pfCertificationName', '{platform_name} Honor Code Certificate for {course_name}'.format(
-                platform_name=settings.PLATFORM_NAME,
+                platform_name=settings.PLATFORM_NAME.encode('utf-8'),
                 course_name=self.course.display_name,
             ),),
             ('pfCertificationUrl', self.request.build_absolute_uri(test_url),),
@@ -836,8 +837,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         request_certificate_url = reverse('certificates.views.request_certificate')
         with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_queue:
             mock_queue.return_value = (0, "Successfully queued")
-            with patch('courseware.grades.grade') as mock_grade:
-                mock_grade.return_value = {'grade': 'Pass', 'percent': 0.75}
+            with mock_passing_grade():
                 response = self.client.post(request_certificate_url, {'course_id': unicode(self.course.id)})
                 self.assertEqual(response.status_code, 200)
                 response_json = json.loads(response.content)
@@ -1145,7 +1145,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         )
 
 
-@attr('shard_1')
+@attr(shard=1)
 class CertificateEventTests(CommonCertificatesTestCase, EventTrackingTestCase):
     """
     Test events emitted by certificate handling.

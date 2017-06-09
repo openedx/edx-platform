@@ -11,7 +11,7 @@ import logging
 import re
 import time
 from django.conf import settings
-from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST, require_http_methods
 from django.views.decorators.cache import cache_control
 from django.core.exceptions import ValidationError, PermissionDenied
@@ -29,12 +29,13 @@ import random
 import unicodecsv
 import decimal
 from student import auth
-from student.roles import GlobalStaff, CourseSalesAdminRole, CourseFinanceAdminRole
+from student.roles import CourseSalesAdminRole, CourseFinanceAdminRole
 from util.file import (
     store_uploaded_file, course_and_time_based_filename_generator,
     FileValidationException, UniversalNewlineIterator
 )
 from util.json_request import JsonResponse, JsonResponseBadRequest
+from util.views import require_global_staff
 from lms.djangoapps.instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
 
 from courseware.access import has_access
@@ -203,20 +204,6 @@ def require_level(level):
                 return HttpResponseForbidden()
         return wrapped
     return decorator
-
-
-def require_global_staff(func):
-    """View decorator that requires that the user have global staff permissions. """
-    def wrapped(request, *args, **kwargs):  # pylint: disable=missing-docstring
-        if GlobalStaff().has_user(request.user):
-            return func(request, *args, **kwargs)
-        else:
-            return HttpResponseForbidden(
-                u"Must be {platform_name} staff to perform this action.".format(
-                    platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
-                )
-            )
-    return wrapped
 
 
 def require_sales_admin(func):
@@ -615,8 +602,8 @@ def students_update_enrollment(request, course_id):
     action = request.POST.get('action')
     identifiers_raw = request.POST.get('identifiers')
     identifiers = _split_input_list(identifiers_raw)
-    auto_enroll = request.POST.get('auto_enroll') in ['true', 'True', True]
-    email_students = request.POST.get('email_students') in ['true', 'True', True]
+    auto_enroll = _get_boolean_param(request, 'auto_enroll')
+    email_students = _get_boolean_param(request, 'email_students')
     is_white_label = CourseMode.is_white_label(course_id)
     reason = request.POST.get('reason')
     if is_white_label:
@@ -756,8 +743,8 @@ def bulk_beta_modify_access(request, course_id):
     action = request.POST.get('action')
     identifiers_raw = request.POST.get('identifiers')
     identifiers = _split_input_list(identifiers_raw)
-    email_students = request.POST.get('email_students') in ['true', 'True', True]
-    auto_enroll = request.POST.get('auto_enroll') in ['true', 'True', True]
+    email_students = _get_boolean_param(request, 'email_students')
+    auto_enroll = _get_boolean_param(request, 'auto_enroll')
     results = []
     rolename = 'beta'
     course = get_course_by_id(course_id)
@@ -1226,7 +1213,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
         query_features = [
             'id', 'username', 'name', 'email', 'language', 'location',
             'year_of_birth', 'gender', 'level_of_education', 'mailing_address',
-            'goals',
+            'goals', 'enrollment_mode', 'verification_status',
         ]
 
     # Provide human-friendly and translatable names for these features. These names
@@ -1244,6 +1231,8 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
         'level_of_education': _('Level of Education'),
         'mailing_address': _('Mailing Address'),
         'goals': _('Goals'),
+        'enrollment_mode': _('Enrollment Mode'),
+        'verification_status': _('Verification Status'),
     }
 
     if is_course_cohorted(course.id):
@@ -1952,8 +1941,8 @@ def reset_student_attempts(request, course_id):
     student = None
     if student_identifier is not None:
         student = get_student_from_identifier(student_identifier)
-    all_students = request.POST.get('all_students', False) in ['true', 'True', True]
-    delete_module = request.POST.get('delete_module', False) in ['true', 'True', True]
+    all_students = _get_boolean_param(request, 'all_students')
+    delete_module = _get_boolean_param(request, 'delete_module')
 
     # parameter combinations
     if all_students and student:
@@ -2040,8 +2029,8 @@ def reset_student_attempts_for_entrance_exam(request, course_id):  # pylint: dis
     student = None
     if student_identifier is not None:
         student = get_student_from_identifier(student_identifier)
-    all_students = request.POST.get('all_students', False) in ['true', 'True', True]
-    delete_module = request.POST.get('delete_module', False) in ['true', 'True', True]
+    all_students = _get_boolean_param(request, 'all_students')
+    delete_module = _get_boolean_param(request, 'delete_module')
 
     # parameter combinations
     if all_students and student:
@@ -2105,7 +2094,8 @@ def rescore_problem(request, course_id):
     if student_identifier is not None:
         student = get_student_from_identifier(student_identifier)
 
-    all_students = request.POST.get('all_students') in ['true', 'True', True]
+    all_students = _get_boolean_param(request, 'all_students')
+    only_if_higher = _get_boolean_param(request, 'only_if_higher')
 
     if not (problem_to_reset and (all_students or student)):
         return HttpResponseBadRequest("Missing query parameters.")
@@ -2120,19 +2110,26 @@ def rescore_problem(request, course_id):
     except InvalidKeyError:
         return HttpResponseBadRequest("Unable to parse problem id")
 
-    response_payload = {}
-    response_payload['problem_to_reset'] = problem_to_reset
+    response_payload = {'problem_to_reset': problem_to_reset}
 
     if student:
         response_payload['student'] = student_identifier
-        lms.djangoapps.instructor_task.api.submit_rescore_problem_for_student(request, module_state_key, student)
-        response_payload['task'] = 'created'
+        lms.djangoapps.instructor_task.api.submit_rescore_problem_for_student(
+            request,
+            module_state_key,
+            student,
+            only_if_higher,
+        )
     elif all_students:
-        lms.djangoapps.instructor_task.api.submit_rescore_problem_for_all_students(request, module_state_key)
-        response_payload['task'] = 'created'
+        lms.djangoapps.instructor_task.api.submit_rescore_problem_for_all_students(
+            request,
+            module_state_key,
+            only_if_higher,
+        )
     else:
         return HttpResponseBadRequest()
 
+    response_payload['task'] = 'created'
     return JsonResponse(response_payload)
 
 
@@ -2159,11 +2156,12 @@ def rescore_entrance_exam(request, course_id):
     )
 
     student_identifier = request.POST.get('unique_student_identifier', None)
+    only_if_higher = request.POST.get('only_if_higher', None)
     student = None
     if student_identifier is not None:
         student = get_student_from_identifier(student_identifier)
 
-    all_students = request.POST.get('all_students') in ['true', 'True', True]
+    all_students = _get_boolean_param(request, 'all_students')
 
     if not course.entrance_exam_id:
         return HttpResponseBadRequest(
@@ -2185,7 +2183,10 @@ def rescore_entrance_exam(request, course_id):
         response_payload['student'] = student_identifier
     else:
         response_payload['student'] = _("All Students")
-    lms.djangoapps.instructor_task.api.submit_rescore_entrance_exam_for_student(request, entrance_exam_key, student)
+
+    lms.djangoapps.instructor_task.api.submit_rescore_entrance_exam_for_student(
+        request, entrance_exam_key, student, only_if_higher,
+    )
     response_payload['task'] = 'created'
     return JsonResponse(response_payload)
 
@@ -2863,7 +2864,13 @@ def start_certificate_regeneration(request, course_id):
         )
 
     # Check if the selected statuses are allowed
-    allowed_statuses = [CertificateStatuses.downloadable, CertificateStatuses.error, CertificateStatuses.notpassing]
+    allowed_statuses = [
+        CertificateStatuses.downloadable,
+        CertificateStatuses.error,
+        CertificateStatuses.notpassing,
+        CertificateStatuses.audit_passing,
+        CertificateStatuses.audit_notpassing,
+    ]
     if not set(certificates_statuses).issubset(allowed_statuses):
         return JsonResponse(
             {'message': _('Please select certificate statuses from the list only.')},
@@ -3331,3 +3338,12 @@ def validate_request_data_and_get_certificate(certificate_invalidation, course_k
             "username/email and the selected course are correct and try again."
         ).format(student=student.username, course=course_key.course))
     return certificate
+
+
+def _get_boolean_param(request, param_name):
+    """
+    Returns the value of the boolean parameter with the given
+    name in the POST request. Handles translation from string
+    values to boolean values.
+    """
+    return request.POST.get(param_name, False) in ['true', 'True', True]

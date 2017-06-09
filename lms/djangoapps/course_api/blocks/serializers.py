@@ -37,6 +37,7 @@ class BlockSerializer(serializers.Serializer):  # pylint: disable=abstract-metho
         # create response data dict for basic fields
         data = {
             'id': unicode(block_key),
+            'block_id': unicode(block_key.block_id),
             'lms_web_url': reverse(
                 'jump_to',
                 kwargs={'course_id': unicode(block_key.course_key), 'location': unicode(block_key)},

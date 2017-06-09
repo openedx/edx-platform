@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.db import migrations, models
 import provider.utils
 from django.conf import settings
-import xmodule_django.models
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, UsageKeyField
 
 
 class Migration(migrations.Migration):
@@ -18,8 +18,8 @@ class Migration(migrations.Migration):
             name='GradedAssignment',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('course_key', xmodule_django.models.CourseKeyField(max_length=255, db_index=True)),
-                ('usage_key', xmodule_django.models.UsageKeyField(max_length=255, db_index=True)),
+                ('course_key', CourseKeyField(max_length=255, db_index=True)),
+                ('usage_key', UsageKeyField(max_length=255, db_index=True)),
                 ('lis_result_sourcedid', models.CharField(max_length=255, db_index=True)),
                 ('version_number', models.IntegerField(default=0)),
             ],

@@ -13,7 +13,6 @@ from courseware.module_render import toc_for_course, get_module, handle_xblock_c
 from courseware.tests.factories import UserFactory, InstructorFactory, StaffFactory
 from courseware.tests.helpers import (
     LoginEnrollmentTestCase,
-    get_request_for_user
 )
 from courseware.entrance_exams import (
     course_has_entrance_exam,
@@ -22,6 +21,7 @@ from courseware.entrance_exams import (
     user_can_skip_entrance_exam,
     user_has_passed_entrance_exam,
 )
+from openedx.core.djangolib.testing.utils import get_mock_request
 from student.models import CourseEnrollment
 from student.tests.factories import CourseEnrollmentFactory, AnonymousUserFactory
 from util.milestones_helpers import (
@@ -38,8 +38,8 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
-@attr('shard_2')
-@patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': True, 'MILESTONES_APP': True})
+@attr(shard=2)
+@patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': True})
 class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTestCaseMixin):
     """
     Check that content is properly gated.
@@ -47,7 +47,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
     Creates a test course from scratch. The tests below are designed to execute
     workflows regardless of the feature flag settings.
     """
-    @patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': True, 'MILESTONES_APP': True})
+    @patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': True})
     def setUp(self):
         """
         Test case scaffolding
@@ -141,7 +141,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         self.course.entrance_exam_id = unicode(self.entrance_exam.scope_ids.usage_id)
 
         self.anonymous_user = AnonymousUserFactory()
-        self.request = get_request_for_user(UserFactory())
+        self.request = get_mock_request(UserFactory())
         modulestore().update_item(self.course, self.request.user.id)  # pylint: disable=no-member
 
         self.client.login(username=self.request.user.username, password="test")
@@ -293,7 +293,9 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         """
         test entrance exam score. we will hit the method get_entrance_exam_score to verify exam score.
         """
-        with self.assertNumQueries(1):
+        # One query is for getting the list of disabled XBlocks (which is
+        # then stored in the request).
+        with self.assertNumQueries(2):
             exam_score = get_entrance_exam_score(self.request, self.course)
         self.assertEqual(exam_score, 0)
 

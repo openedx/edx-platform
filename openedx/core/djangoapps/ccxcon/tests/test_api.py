@@ -38,7 +38,7 @@ def fetch_token_mock(*args, **kwargs):  # pylint: disable=unused-argument
     return
 
 
-@attr('shard_1')
+@attr(shard=1)
 class APIsTestCase(SharedModuleStoreTestCase):
     """
     Unit tests for the API module functions

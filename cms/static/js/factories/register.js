@@ -1,6 +1,6 @@
 define(['jquery', 'jquery.cookie'], function($) {
     'use strict';
-    return function () {
+    return function() {
         $('form :input')
             .focus(function() {
                 $('label[for="' + this.id + '"]').addClass('is-focused');
@@ -21,11 +21,11 @@ define(['jquery', 'jquery.cookie'], function($) {
                 notifyOnError: false,
                 data: submit_data,
                 success: function(json) {
-                   location.href = '/course/';
+                    location.href = '/course/';
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
-                   var json = $.parseJSON(jqXHR.responseText);
-                   $('#register_error').html(json.value).stop().addClass('is-shown');
+                    var json = $.parseJSON(jqXHR.responseText);
+                    $('#register_error').html(json.value).stop().addClass('is-shown');
                 }
             });
         });

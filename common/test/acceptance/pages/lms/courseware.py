@@ -2,7 +2,7 @@
 Courseware page.
 """
 
-from .course_page import CoursePage
+from common.test.acceptance.pages.lms.course_page import CoursePage
 from bok_choy.promise import EmptyPromise
 from selenium.webdriver.common.action_chains import ActionChains
 
@@ -209,6 +209,20 @@ class CoursewarePage(CoursePage):
         """
         return self.q(css="div.proctored-exam.completed").visible
 
+    def content_hidden_past_due_date(self, content_type="subsection"):
+        """
+        Returns whether the "the due date for this ___ has passed" message is present.
+        ___ is the type of the hidden content, and defaults to subsection.
+        This being true implies "the ___ contents are hidden because their due date has passed".
+        """
+        message = "The due date for this {0} has passed.".format(content_type)
+        if self.q(css="div.seq_content").is_present():
+            return False
+        for html in self.q(css="div.hidden-content").html:
+            if message in html:
+                return True
+        return False
+
     @property
     def entrance_exam_message_selector(self):
         """
@@ -229,6 +243,12 @@ class CoursewarePage(CoursePage):
         return self.entrance_exam_message_selector.is_present() \
             and "You have passed the entrance exam" in self.entrance_exam_message_selector.text[0]
 
+    def has_banner(self):
+        """
+        Returns boolean indicating presence of banner
+        """
+        return self.q(css='.pattern-library-shim').is_present()
+
     @property
     def is_timer_bar_present(self):
         """
@@ -246,6 +266,10 @@ class CoursewarePage(CoursePage):
     def breadcrumb(self):
         """ Return the course tree breadcrumb shown above the sequential bar """
         return [part.strip() for part in self.q(css='.path').text[0].split('>')]
+
+    def unit_title_visible(self):
+        """ Check if unit title is visible """
+        return self.q(css='.unit-title').visible
 
     def bookmark_button_visible(self):
         """ Check if bookmark button is visible """

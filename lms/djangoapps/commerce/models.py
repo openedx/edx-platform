@@ -15,6 +15,7 @@ class CommerceConfiguration(ConfigurationModel):
 
     API_NAME = 'commerce'
     CACHE_KEY = 'commerce.api.data'
+    DEFAULT_RECEIPT_PAGE_URL = '/commerce/checkout/receipt/?orderNum='
 
     checkout_on_ecommerce_service = models.BooleanField(
         default=False,
@@ -35,7 +36,7 @@ class CommerceConfiguration(ConfigurationModel):
     )
     receipt_page = models.CharField(
         max_length=255,
-        default='/commerce/checkout/receipt/?orderNum=',
+        default=DEFAULT_RECEIPT_PAGE_URL,
         help_text=_('Path to order receipt page.')
     )
 

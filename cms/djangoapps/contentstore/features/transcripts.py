@@ -134,7 +134,7 @@ def i_see_button(_step, not_see, button_type):
         assert world.css_has_text(TRANSCRIPTS_BUTTONS[button][0], TRANSCRIPTS_BUTTONS[button][1])
 
 
-@step('I (.*)see (.*)button "([^"]*)" number (\d+)$')
+@step(r'I (.*)see (.*)button "([^"]*)" number (\d+)$')
 def i_see_button_with_custom_text(_step, not_see, button_type, custom_text, index):
     button = button_type.strip()
     custom_text = custom_text.strip()
@@ -153,7 +153,7 @@ def click_button_transcripts_variant(_step, button_type):
     world.wait_for_ajax_complete()
 
 
-@step('I click transcript button "([^"]*)" number (\d+)$')
+@step(r'I click transcript button "([^"]*)" number (\d+)$')
 def click_button_index(_step, button_type, index):
     button = button_type.strip()
     index = int(index.strip()) - 1
@@ -178,7 +178,7 @@ def remove_transcripts_from_store(_step, subs_id):
         print 'Transcript file was NOT found and not removed.'
 
 
-@step('I enter a "([^"]+)" source to field number (\d+)$')
+@step(r'I enter a "([^"]+)" source to field number (\d+)$')
 def i_enter_a_source(_step, link, index):
     index = int(index) - 1
 

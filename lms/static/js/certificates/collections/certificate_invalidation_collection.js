@@ -1,7 +1,7 @@
 // Backbone.js Application Collection: CertificateInvalidationCollection
-/*global define, RequireJS */
+/* global define, RequireJS */
 
-;(function(define) {
+(function(define) {
     'use strict';
 
     define(

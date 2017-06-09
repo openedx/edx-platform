@@ -1,15 +1,14 @@
-define(["jquery", "underscore", "js/views/baseview", "js/utils/handle_iframe_binding", "sinon"],
-    function ($, _, BaseView, IframeBinding, sinon) {
-
-        describe("BaseView", function() {
+define(['jquery', 'underscore', 'js/views/baseview', 'js/utils/handle_iframe_binding', 'sinon'],
+    function($, _, BaseView, IframeBinding, sinon) {
+        describe('BaseView', function() {
             var baseViewPrototype;
 
-            describe("BaseView rendering", function () {
+            describe('BaseView rendering', function() {
                 var iframeBinding_spy;
 
-                beforeEach(function () {
+                beforeEach(function() {
                     baseViewPrototype = BaseView.prototype;
-                    iframeBinding_spy = sinon.spy(IframeBinding, "iframeBinding");
+                    iframeBinding_spy = sinon.spy(IframeBinding, 'iframeBinding');
 
                     spyOn(baseViewPrototype, 'initialize');
                     spyOn(baseViewPrototype, 'beforeRender');
@@ -17,11 +16,11 @@ define(["jquery", "underscore", "js/views/baseview", "js/utils/handle_iframe_bin
                     spyOn(baseViewPrototype, 'afterRender').and.callThrough();
                 });
 
-                afterEach(function () {
+                afterEach(function() {
                     iframeBinding_spy.restore();
                 });
 
-                it('calls before and after render functions when render of baseview is called', function () {
+                it('calls before and after render functions when render of baseview is called', function() {
                     var baseView = new BaseView();
                     baseView.render();
 
@@ -31,20 +30,20 @@ define(["jquery", "underscore", "js/views/baseview", "js/utils/handle_iframe_bin
                     expect(baseViewPrototype.afterRender).toHaveBeenCalled();
                 });
 
-                it('calls iframeBinding function when afterRender of baseview is called', function () {
+                it('calls iframeBinding function when afterRender of baseview is called', function() {
                     var baseView = new BaseView();
                     baseView.render();
                     expect(baseViewPrototype.afterRender).toHaveBeenCalled();
                     expect(iframeBinding_spy.called).toEqual(true);
 
-                    //check calls count of iframeBinding function
+                    // check calls count of iframeBinding function
                     expect(iframeBinding_spy.callCount).toBe(1);
                     IframeBinding.iframeBinding();
                     expect(iframeBinding_spy.callCount).toBe(2);
                 });
             });
 
-            describe("Expand/Collapse", function () {
+            describe('Expand/Collapse', function() {
                 var view, MockCollapsibleViewClass;
 
                 MockCollapsibleViewClass = BaseView.extend({
@@ -57,7 +56,7 @@ define(["jquery", "underscore", "js/views/baseview", "js/utils/handle_iframe_bin
                     }
                 });
 
-                it('hides a collapsible node when clicking on the toggle link', function () {
+                it('hides a collapsible node when clicking on the toggle link', function() {
                     view = new MockCollapsibleViewClass();
                     view.render();
                     view.$('.ui-toggle-expansion').click();
@@ -66,7 +65,7 @@ define(["jquery", "underscore", "js/views/baseview", "js/utils/handle_iframe_bin
                     expect(view.$('.is-collapsible')).toHaveClass('collapsed');
                 });
 
-                it('expands a collapsible node when clicking twice on the toggle link', function () {
+                it('expands a collapsible node when clicking twice on the toggle link', function() {
                     view = new MockCollapsibleViewClass();
                     view.render();
                     view.$('.ui-toggle-expansion').click();

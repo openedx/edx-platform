@@ -12,7 +12,7 @@ from rest_framework.test import APITestCase, APIRequestFactory
 from openedx.core.lib.api import parsers
 
 
-@attr('shard_2')
+@attr(shard=2)
 class TestTypedFileUploadParser(APITestCase):
     """
     Tests that verify the behavior of TypedFileUploadParser

@@ -87,6 +87,17 @@ $blue-t1: rgba($blue, 0.25);
 $blue-t2: rgba($blue, 0.50);
 $blue-t3: rgba($blue, 0.75);
 
+$uxpl-blue-base: rgb(0, 117, 180); // wcag2a compliant
+$uxpl-blue-hover-active: rgb(6, 86, 131); // wcag2a compliant
+
+$uxpl-green-base: rgb(0, 129, 0); // wcag2a compliant
+$uxpl-green-hover-active: rgb(0, 155, 0); // wcag2a compliant
+
+$uxpl-pink-base: rgb(194, 56, 125); // wcag2a compliant
+$uxpl-pink-hover-active: lighten($uxpl-pink-base, 7%); // wcag2a compliant
+
+$uxpl-grayscale-x-back: rgb(245, 245, 245); // UXPL grayscale, x-back
+
 $pink: rgb(183, 37, 103); // #b72567;
 $pink-l1: tint($pink,20%);
 $pink-l2: tint($pink,40%);

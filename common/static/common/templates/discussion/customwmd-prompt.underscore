@@ -44,8 +44,8 @@
             %></div>
         </fieldset>
         <div class="form-actions">
-            <input type="button" id="new-link-image-ok" class="btn btn-primary btn-base form-btn" value="<%- okText %>" />
-            <input type="button" id="new-link-image-cancel" class="btn btn-primary btn-base form-btn" value="<%- cancelText %>" >
+            <input type="button" id="new-link-image-ok" class="btn-brand form-btn" value="<%- okText %>" />
+            <input type="button" id="new-link-image-cancel" class="btn form-btn" value="<%- cancelText %>" >
         </div>
     </form>
 </div>

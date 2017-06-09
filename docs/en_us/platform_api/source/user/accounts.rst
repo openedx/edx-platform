@@ -21,7 +21,7 @@ Get and Update a User's Account Information
 
 **Example response showing a user's account information**
 
-.. code-block:: json
+.. code-block:: none
 
     HTTP 200 OK
     Content-Type: application/json

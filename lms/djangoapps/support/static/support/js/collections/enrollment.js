@@ -1,4 +1,4 @@
-;(function (define) {
+(function(define) {
     'use strict';
     define(['backbone', 'support/js/models/enrollment'],
         function(Backbone, EnrollmentModel) {
@@ -14,5 +14,5 @@
                     return this.baseUrl + this.user;
                 }
             });
-    });
+        });
 }).call(this, define || RequireJS.define);

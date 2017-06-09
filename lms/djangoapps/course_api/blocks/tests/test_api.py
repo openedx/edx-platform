@@ -2,12 +2,14 @@
 Tests for Blocks api.py
 """
 
+import ddt
 from django.test.client import RequestFactory
 
+from openedx.core.djangoapps.content.block_structure.api import clear_course_from_cache
 from student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import SampleCourseFactory
+from xmodule.modulestore.tests.factories import SampleCourseFactory, check_mongo_calls
 
 from ..api import get_blocks
 
@@ -19,7 +21,8 @@ class TestGetBlocks(SharedModuleStoreTestCase):
     @classmethod
     def setUpClass(cls):
         super(TestGetBlocks, cls).setUpClass()
-        cls.course = SampleCourseFactory.create()
+        with cls.store.default_store(ModuleStoreEnum.Type.split):
+            cls.course = SampleCourseFactory.create()
 
         # hide the html block
         cls.html_block = cls.store.get_item(cls.course.id.make_usage_key('html', 'html_x1a_1'))
@@ -95,3 +98,47 @@ class TestGetBlocks(SharedModuleStoreTestCase):
         self.assertEquals(len(blocks['blocks']), 3)
         for block in blocks['blocks'].itervalues():
             self.assertEqual(block['type'], 'problem')
+
+
+@ddt.ddt
+class TestGetBlocksQueryCounts(SharedModuleStoreTestCase):
+    """
+    Tests query counts for the get_blocks function.
+    """
+    def setUp(self):
+        super(TestGetBlocksQueryCounts, self).setUp()
+
+        self.user = UserFactory.create()
+        self.request = RequestFactory().get("/dummy")
+        self.request.user = self.user
+
+    def _create_course(self, store_type):
+        """
+        Creates the sample course in the given store type.
+        """
+        with self.store.default_store(store_type):
+            return SampleCourseFactory.create()
+
+    def _get_blocks(self, course, expected_mongo_queries):
+        """
+        Verifies the number of expected queries when calling
+        get_blocks on the given course.
+        """
+        with check_mongo_calls(expected_mongo_queries):
+            with self.assertNumQueries(2):
+                get_blocks(self.request, course.location, self.user)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_query_counts_cached(self, store_type):
+        course = self._create_course(store_type)
+        self._get_blocks(course, expected_mongo_queries=0)
+
+    @ddt.data(
+        (ModuleStoreEnum.Type.mongo, 5),
+        (ModuleStoreEnum.Type.split, 3),
+    )
+    @ddt.unpack
+    def test_query_counts_uncached(self, store_type, expected_mongo_queries):
+        course = self._create_course(store_type)
+        clear_course_from_cache(course.id)
+        self._get_blocks(course, expected_mongo_queries)

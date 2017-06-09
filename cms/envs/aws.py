@@ -88,19 +88,6 @@ CELERY_QUEUES = {
     DEFAULT_PRIORITY_QUEUE: {}
 }
 
-# Setup alternate queues, to allow access to cross-process workers
-ALTERNATE_QUEUE_ENVS = os.environ.get('ALTERNATE_WORKER_QUEUES', '').split()
-ALTERNATE_QUEUES = [
-    DEFAULT_PRIORITY_QUEUE.replace(QUEUE_VARIANT, alternate + '.')
-    for alternate in ALTERNATE_QUEUE_ENVS
-]
-CELERY_QUEUES.update(
-    {
-        alternate: {}
-        for alternate in ALTERNATE_QUEUES
-        if alternate not in CELERY_QUEUES.keys()
-    }
-)
 CELERY_ROUTES = "{}celery.Router".format(QUEUE_VARIANT)
 
 ############# NON-SECURE ENV CONFIG ##############################
@@ -139,6 +126,7 @@ EMAIL_PORT = ENV_TOKENS.get('EMAIL_PORT', EMAIL_PORT)
 EMAIL_USE_TLS = ENV_TOKENS.get('EMAIL_USE_TLS', EMAIL_USE_TLS)
 
 LMS_BASE = ENV_TOKENS.get('LMS_BASE')
+LMS_ROOT_URL = ENV_TOKENS.get('LMS_ROOT_URL')
 # Note that FEATURES['PREVIEW_LMS_BASE'] gets read in from the environment file.
 
 SITE_NAME = ENV_TOKENS['SITE_NAME']
@@ -210,14 +198,18 @@ COURSES_WITH_UNSAFE_CODE = ENV_TOKENS.get("COURSES_WITH_UNSAFE_CODE", [])
 
 ASSET_IGNORE_REGEX = ENV_TOKENS.get('ASSET_IGNORE_REGEX', ASSET_IGNORE_REGEX)
 
-# Theme overrides
-THEME_NAME = ENV_TOKENS.get('THEME_NAME', None)
-
 # following setting is for backward compatibility
 if ENV_TOKENS.get('COMPREHENSIVE_THEME_DIR', None):
     COMPREHENSIVE_THEME_DIR = ENV_TOKENS.get('COMPREHENSIVE_THEME_DIR')
 
 COMPREHENSIVE_THEME_DIRS = ENV_TOKENS.get('COMPREHENSIVE_THEME_DIRS', COMPREHENSIVE_THEME_DIRS) or []
+
+# COMPREHENSIVE_THEME_LOCALE_PATHS contain the paths to themes locale directories e.g.
+# "COMPREHENSIVE_THEME_LOCALE_PATHS" : [
+#        "/edx/src/edx-themes/conf/locale"
+#    ],
+COMPREHENSIVE_THEME_LOCALE_PATHS = ENV_TOKENS.get('COMPREHENSIVE_THEME_LOCALE_PATHS', [])
+
 DEFAULT_SITE_THEME = ENV_TOKENS.get('DEFAULT_SITE_THEME', DEFAULT_SITE_THEME)
 ENABLE_COMPREHENSIVE_THEMING = ENV_TOKENS.get('ENABLE_COMPREHENSIVE_THEMING', ENABLE_COMPREHENSIVE_THEMING)
 
@@ -284,6 +276,9 @@ if FEATURES.get('AUTH_USE_CAS'):
             CAS_ATTRIBUTE_CALLBACK['function']
         )
 
+# Specific setting for the File Upload Service to store media in a bucket.
+FILE_UPLOAD_STORAGE_BUCKET_NAME = ENV_TOKENS.get('FILE_UPLOAD_STORAGE_BUCKET_NAME', FILE_UPLOAD_STORAGE_BUCKET_NAME)
+FILE_UPLOAD_STORAGE_PREFIX = ENV_TOKENS.get('FILE_UPLOAD_STORAGE_PREFIX', FILE_UPLOAD_STORAGE_PREFIX)
 
 ################ SECURE AUTH ITEMS ###############################
 # Secret things: passwords, access keys, etc.
@@ -377,6 +372,26 @@ BROKER_URL = "{0}://{1}:{2}@{3}/{4}".format(CELERY_BROKER_TRANSPORT,
                                             CELERY_BROKER_PASSWORD,
                                             CELERY_BROKER_HOSTNAME,
                                             CELERY_BROKER_VHOST)
+BROKER_USE_SSL = ENV_TOKENS.get('CELERY_BROKER_USE_SSL', False)
+
+# Allow CELERY_QUEUES to be overwritten by ENV_TOKENS,
+ENV_CELERY_QUEUES = ENV_TOKENS.get('CELERY_QUEUES', None)
+if ENV_CELERY_QUEUES:
+    CELERY_QUEUES = {queue: {} for queue in ENV_CELERY_QUEUES}
+
+# Then add alternate environment queues
+ALTERNATE_QUEUE_ENVS = ENV_TOKENS.get('ALTERNATE_WORKER_QUEUES', '').split()
+ALTERNATE_QUEUES = [
+    DEFAULT_PRIORITY_QUEUE.replace(QUEUE_VARIANT, alternate + '.')
+    for alternate in ALTERNATE_QUEUE_ENVS
+]
+CELERY_QUEUES.update(
+    {
+        alternate: {}
+        for alternate in ALTERNATE_QUEUES
+        if alternate not in CELERY_QUEUES.keys()
+    }
+)
 
 # Event tracking
 TRACKING_BACKENDS.update(AUTH_TOKENS.get("TRACKING_BACKENDS", {}))
@@ -409,9 +424,6 @@ ADVANCED_SECURITY_CONFIG = ENV_TOKENS.get('ADVANCED_SECURITY_CONFIG', {})
 ################ ADVANCED COMPONENT/PROBLEM TYPES ###############
 
 ADVANCED_PROBLEM_TYPES = ENV_TOKENS.get('ADVANCED_PROBLEM_TYPES', ADVANCED_PROBLEM_TYPES)
-DEPRECATED_ADVANCED_COMPONENT_TYPES = ENV_TOKENS.get(
-    'DEPRECATED_ADVANCED_COMPONENT_TYPES', DEPRECATED_ADVANCED_COMPONENT_TYPES
-)
 
 ################ VIDEO UPLOAD PIPELINE ###############
 
@@ -481,6 +493,9 @@ if FEATURES.get('EDX_SOLUTIONS_API'):
         'edx_solutions_organizations',
     )
 
+#### JWT configuration ####
+JWT_AUTH.update(ENV_TOKENS.get('JWT_AUTH', {}))
+
 ######################## CUSTOM COURSES for EDX CONNECTOR ######################
 if FEATURES.get('CUSTOM_COURSES_EDX'):
     INSTALLED_APPS += ('openedx.core.djangoapps.ccxcon',)
@@ -490,3 +505,7 @@ PARTNER_SUPPORT_EMAIL = ENV_TOKENS.get('PARTNER_SUPPORT_EMAIL', PARTNER_SUPPORT_
 
 # Affiliate cookie tracking
 AFFILIATE_COOKIE_NAME = ENV_TOKENS.get('AFFILIATE_COOKIE_NAME', AFFILIATE_COOKIE_NAME)
+
+############## Settings for Studio Context Sensitive Help ##############
+
+DOC_LINK_BASE_URL = ENV_TOKENS.get('DOC_LINK_BASE_URL', DOC_LINK_BASE_URL)

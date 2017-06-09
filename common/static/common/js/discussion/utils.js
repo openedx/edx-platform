@@ -23,10 +23,6 @@
             this.roleIds = roles;
         };
 
-        DiscussionUtil.loadRolesFromContainer = function() {
-            return this.loadRoles($('#discussion-container').data('roles'));
-        };
-
         DiscussionUtil.isStaff = function(userId) {
             var staff;
             if (_.isUndefined(userId)) {
@@ -99,9 +95,6 @@
                 retrieve_discussion: '/courses/' + $$course_id + '/discussion/forum/' + param + '/inline',
                 retrieve_single_thread: '/courses/' + $$course_id + '/discussion/forum/' + param + '/threads/' + param1,
                 openclose_thread: '/courses/' + $$course_id + '/discussion/threads/' + param + '/close',
-                permanent_link_thread: '/courses/' + $$course_id + '/discussion/forum/' + param + '/threads/' + param1,
-                permanent_link_comment: '/courses/' + $$course_id +
-                                        '/discussion/forum/' + param + '/threads/' + param1 + '#' + param2,
                 user_profile: '/courses/' + $$course_id + '/discussion/forum/users/' + param,
                 followed_threads: '/courses/' + $$course_id + '/discussion/forum/users/' + param + '/followed',
                 threads: '/courses/' + $$course_id + '/discussion/forum',
@@ -191,10 +184,8 @@
             if (!params.error) {
                 params.error = function() {
                     self.discussionAlert(
-                        gettext('Sorry'),
-                        gettext(
-                            'We had some trouble processing your request. Please ensure you have copied any ' +
-                            'unsaved work and then reload the page.')
+                        gettext('Error'),
+                        gettext('Your request could not be processed. Refresh the page and try again.')
                     );
                 };
             }
@@ -230,7 +221,7 @@
                 self = this;
             if (errorMsg) {
                 safeAjaxParams.error = function() {
-                    return self.discussionAlert(gettext('Sorry'), errorMsg);
+                    return self.discussionAlert(gettext('Error'), errorMsg);
                 };
             }
             undo = _.pick(model.attributes, _.keys(updates));
@@ -283,7 +274,7 @@
                         }
                     }
                 } else {
-                    $errorItem = makeErrorElem('We had some trouble processing your request. Please try again.', 0);
+                    $errorItem = makeErrorElem('Your request could not be processed. Refresh the page and try again.', 0); // eslint-disable-line max-len
                     edx.HtmlUtils.append(errorsField, $errorItem);
                 }
 
@@ -391,10 +382,9 @@
                 } else if (RE_DISPLAYMATH.test(htmlString)) {
                     htmlString = htmlString.replace(RE_DISPLAYMATH, function($0, $1, $2, $3) {
                         /*
-                         bug fix, ordering is off
+                         corrected mathjax rendering in preview
                          */
-                        processedHtmlString = processor('$$' + $2 + '$$', 'display') + processedHtmlString;
-                        processedHtmlString = $1 + processedHtmlString;
+                        processedHtmlString += $1 + processor('$$' + $2 + '$$', 'display');
                         return $3;
                     });
                 } else {

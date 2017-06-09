@@ -14,7 +14,7 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr('shard_1')
+@attr(shard=1)
 class CoursewareMiddlewareTestCase(SharedModuleStoreTestCase):
     """Tests that courseware middleware is correctly redirected"""
 

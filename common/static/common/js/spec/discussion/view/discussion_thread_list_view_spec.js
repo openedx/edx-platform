@@ -11,8 +11,113 @@
             var deferred;
             DiscussionSpecHelper.setUpGlobals();
             DiscussionSpecHelper.setUnderscoreFixtures();
-            // suppressing Line is too long (4272 characters!)
-            appendSetFixtures("<script type=\"text/template\" id=\"thread-list-template\">\n    <div class=\"forum-nav-header\">\n        <button type=\"button\" class=\"forum-nav-browse\" id=\"forum-nav-browse\" aria-haspopup=\"true\">\n            <span class=\"icon fa fa-bars\" aria-hidden=\"true\"></span>\n            <span class=\"sr\">Discussion topics; currently listing: </span>\n            <span class=\"forum-nav-browse-current\">All Discussions</span>\n            ▾\n        </button>\n        <form class=\"forum-nav-search\">\n            <label>\n                <span class=\"sr\">Search all posts</span>\n                <input class=\"forum-nav-search-input\" id=\"forum-nav-search\" type=\"text\" placeholder=\"Search all posts\">\n                <span class=\"icon fa fa-search\" aria-hidden=\"true\"></span>\n            </label>\n        </form>\n    </div>\n    <div class=\"forum-nav-browse-menu-wrapper\" style=\"display: none\">\n        <form class=\"forum-nav-browse-filter\">\n            <label>\n                <span class=\"sr\">Filter Topics</span>\n                <input type=\"text\" class=\"forum-nav-browse-filter-input\" placeholder=\"filter topics\">\n            </label>\n        </form>\n        <ul class=\"forum-nav-browse-menu\">\n            <li class=\"forum-nav-browse-menu-item forum-nav-browse-menu-all\">\n                <a href=\"#\" class=\"forum-nav-browse-title\">All Discussions</a>\n            </li>\n            <li class=\"forum-nav-browse-menu-item forum-nav-browse-menu-following\">\n                <a href=\"#\" class=\"forum-nav-browse-title\"><span class=\"icon fa fa-star\" aria-hidden=\"true\"></span>Posts I'm Following</a>\n            </li>\n            <li class=\"forum-nav-browse-menu-item\">\n                <a href=\"#\" class=\"forum-nav-browse-title\">Parent</a>\n                <ul class=\"forum-nav-browse-submenu\">\n                    <li class=\"forum-nav-browse-menu-item\">\n                        <a href=\"#\" class=\"forum-nav-browse-title\">Target</a>\n                        <ul class=\"forum-nav-browse-submenu\">\n                            <li\n                                class=\"forum-nav-browse-menu-item\"\n                                data-discussion-id=\"child\"\n                                data-cohorted=\"false\"\n                            >\n                                <a href=\"#\" class=\"forum-nav-browse-title\">Child</a>\n                            </li>\n                        </ul>\n                    <li\n                        class=\"forum-nav-browse-menu-item\"\n                        data-discussion-id=\"sibling\"\n                        data-cohorted=\"false\"\n                    >\n                        <a href=\"#\" class=\"forum-nav-browse-title\">Sibling</a>\n                    </li>\n                </ul>\n            </li>\n            <li\n                class=\"forum-nav-browse-menu-item\"\n                data-discussion-id=\"other\"\n                data-cohorted=\"true\"\n            >\n                <a href=\"#\" class=\"forum-nav-browse-title\">Other Category</a>\n            </li>\n        </ul>\n    </div>\n    <div class=\"forum-nav-thread-list-wrapper\" id=\"sort-filter-wrapper\" tabindex=\"-1\">\n        <div class=\"forum-nav-refine-bar\">\n            <label class=\"forum-nav-filter-main\">\n                <select class=\"forum-nav-filter-main-control\">\n                    <option value=\"all\">Show all</option>\n                    <option value=\"unread\">Unread</option>\n                    <option value=\"unanswered\">Unanswered</option>\n                    <option value=\"flagged\">Flagged</option>\n                </select>\n            </label>\n            <% if (isCohorted && isPrivilegedUser) { %>\n            <label class=\"forum-nav-filter-cohort\">\n                <span class=\"sr\">Cohort:</span>\n                <select class=\"forum-nav-filter-cohort-control\">\n                    <option value=\"\">in all cohorts</option>\n                    <option value=\"1\">Cohort1</option>\n                    <option value=\"2\">Cohort2</option>\n                </select>\n            </label>\n            <% } %>\n            <label class=\"forum-nav-sort\">\n                <select class=\"forum-nav-sort-control\">\n                    <option value=\"activity\">by recent activity</option>\n                    <option value=\"comments\">by most activity</option>\n                    <option value=\"votes\">by most votes</option>\n                </select>\n            </label>\n        </div>\n    </div>\n    <div class=\"search-alerts\"></div>\n    <ul class=\"forum-nav-thread-list\"></ul>\n</script>");  // eslint-disable-line max-len
+            appendSetFixtures(
+                '<script type="text/template" id="thread-list-template">' +
+                '    <div class="forum-nav-header">' +
+                '        <button type="button" class="forum-nav-browse" id="forum-nav-browse" aria-haspopup="true">' +
+                '            <span class="icon fa fa-bars" aria-hidden="true"></span>' +
+                '            <span class="sr">Discussion topics; currently listing: </span>' +
+                '            <span class="forum-nav-browse-current">All Discussions</span>' +
+                '        </button>' +
+                '        <form class="forum-nav-search">' +
+                '            <label>' +
+                '                <span class="sr">Search all posts</span>' +
+                '                <input' +
+                '                    class="forum-nav-search-input"' +
+                '                    id="forum-nav-search"' +
+                '                    type="text"' +
+                '                    placeholder="Search all posts"' +
+                '                >' +
+                '                <span class="icon fa fa-search" aria-hidden="true"></span>' +
+                '            </label>' +
+                '        </form>' +
+                '    </div>' +
+                '    <div class="forum-nav-browse-menu-wrapper" style="display: none">' +
+                '        <form class="forum-nav-browse-filter">' +
+                '            <label>' +
+                '                <span class="sr">Filter Topics</span>' +
+                '                <input' +
+                '                    type="text"' +
+                '                    class="forum-nav-browse-filter-input"' +
+                '                    placeholder="filter topics"' +
+                '                >' +
+                '            </label>' +
+                '        </form>' +
+                '        <ul class="forum-nav-browse-menu">' +
+                '            <li class="forum-nav-browse-menu-item forum-nav-browse-menu-all">' +
+                '                <a href="#" class="forum-nav-browse-title">All Discussions</a>' +
+                '            </li>' +
+                '            <li class="forum-nav-browse-menu-item forum-nav-browse-menu-following">' +
+                '                <a href="#" class="forum-nav-browse-title">' +
+                '                    <span class="icon fa fa-star" aria-hidden="true"></span>' +
+                '                    Posts I\'m Following' +
+                '                </a>' +
+                '            </li>' +
+                '            <li class="forum-nav-browse-menu-item">' +
+                '                <a href="#" class="forum-nav-browse-title">Parent</a>' +
+                '                <ul class="forum-nav-browse-submenu">' +
+                '                    <li class="forum-nav-browse-menu-item">' +
+                '                        <a href="#" class="forum-nav-browse-title">Target</a>' +
+                '                        <ul class="forum-nav-browse-submenu">' +
+                '                            <li' +
+                '                                class="forum-nav-browse-menu-item"' +
+                '                                data-discussion-id="child"' +
+                '                                data-cohorted="false"' +
+                '                            >' +
+                '                                <a href="#" class="forum-nav-browse-title">Child</a>' +
+                '                            </li>' +
+                '                        </ul>' +
+                '                    <li' +
+                '                        class="forum-nav-browse-menu-item"' +
+                '                        data-discussion-id="sibling"' +
+                '                        data-cohorted="false"' +
+                '                    >' +
+                '                        <a href="#" class="forum-nav-browse-title">Sibling</a>' +
+                '                    </li>' +
+                '                </ul>' +
+                '            </li>' +
+                '            <li' +
+                '                class="forum-nav-browse-menu-item"' +
+                '                data-discussion-id="other"' +
+                '                data-cohorted="true"' +
+                '            >' +
+                '                <a href="#" class="forum-nav-browse-title">Other Category</a>' +
+                '            </li>' +
+                '        </ul>' +
+                '    </div>' +
+                '    <div class="forum-nav-thread-list-wrapper" id="sort-filter-wrapper" tabindex="-1">' +
+                '        <div class="forum-nav-refine-bar">' +
+                '            <label class="forum-nav-filter-main">' +
+                '                <select class="forum-nav-filter-main-control">' +
+                '                    <option value="all">Show all</option>' +
+                '                    <option value="unread">Unread</option>' +
+                '                    <option value="unanswered">Unanswered</option>' +
+                '                    <option value="flagged">Flagged</option>' +
+                '                </select>' +
+                '            </label>' +
+                '            <% if (isCohorted && isPrivilegedUser) { %>' +
+                '            <label class="forum-nav-filter-cohort">' +
+                '                <span class="sr">Cohort:</span>' +
+                '                <select class="forum-nav-filter-cohort-control">' +
+                '                    <option value="">in all cohorts</option>' +
+                '                    <option value="1">Cohort1</option>' +
+                '                    <option value="2">Cohort2</option>' +
+                '                </select>' +
+                '            </label>' +
+                '            <% } %>' +
+                '            <label class="forum-nav-sort">' +
+                '                <select class="forum-nav-sort-control">' +
+                '                    <option value="activity">by recent activity</option>' +
+                '                    <option value="comments">by most activity</option>' +
+                '                    <option value="votes">by most votes</option>' +
+                '                </select>' +
+                '            </label>' +
+                '        </div>' +
+                '    </div>' +
+                '    <div class="search-alerts"></div>' +
+                '    <ul class="forum-nav-thread-list"></ul>' +
+                '</script>'
+            );
             this.threads = [
                 DiscussionViewSpecHelper.makeThreadWithProps({
                     id: '1',
@@ -87,6 +192,7 @@
             return new DiscussionThreadListView({
                 el: $('#fixture-element'),
                 collection: discussion,
+                showThreadPreview: true,
                 courseSettings: new DiscussionCourseSettings({
                     is_cohorted: true
                 })
@@ -266,6 +372,88 @@
                 changeSorting(this.threads, 'votes', 'comments', ['Thread1', 'Thread4', 'Thread3', 'Thread2']);
             });
         });
+
+        describe('post type renders correctly', function() {
+            it('for discussion', function() {
+                renderSingleThreadWithProps({
+                    thread_type: 'discussion'
+                });
+                expect($('.forum-nav-thread-wrapper-0 .icon')).toHaveClass('fa-comments');
+                return expect($('.forum-nav-thread-wrapper-0 .sr')).toHaveText('discussion');
+            });
+
+            it('for answered question', function() {
+                renderSingleThreadWithProps({
+                    thread_type: 'question',
+                    endorsed: true
+                });
+                expect($('.forum-nav-thread-wrapper-0 .icon')).toHaveClass('fa-check-square-o');
+                return expect($('.forum-nav-thread-wrapper-0 .sr')).toHaveText('answered question');
+            });
+
+            it('for unanswered question', function() {
+                renderSingleThreadWithProps({
+                    thread_type: 'question',
+                    endorsed: false
+                });
+                expect($('.forum-nav-thread-wrapper-0 .icon')).toHaveClass('fa-question');
+                return expect($('.forum-nav-thread-wrapper-0 .sr')).toHaveText('unanswered question');
+            });
+        });
+
+        describe('post labels render correctly', function() {
+            beforeEach(function() {
+                this.moderatorId = '42';
+                this.administratorId = '43';
+                this.communityTaId = '44';
+                return DiscussionUtil.loadRoles({
+                    Moderator: [parseInt(this.moderatorId, 10)],
+                    Administrator: [parseInt(this.administratorId, 10)],
+                    'Community TA': [parseInt(this.communityTaId, 10)]
+                });
+            });
+
+            it('for pinned', function() {
+                renderSingleThreadWithProps({
+                    pinned: true
+                });
+                return expect($('.post-label-pinned').length).toEqual(1);
+            });
+
+            it('for following', function() {
+                renderSingleThreadWithProps({
+                    subscribed: true
+                });
+                return expect($('.post-label-following').length).toEqual(1);
+            });
+
+            it('for moderator', function() {
+                renderSingleThreadWithProps({
+                    user_id: this.moderatorId
+                });
+                return expect($('.post-label-by-staff').length).toEqual(1);
+            });
+
+            it('for administrator', function() {
+                renderSingleThreadWithProps({
+                    user_id: this.administratorId
+                });
+                return expect($('.post-label-by-staff').length).toEqual(1);
+            });
+
+            it('for community TA', function() {
+                renderSingleThreadWithProps({
+                    user_id: this.communityTaId
+                });
+                return expect($('.post-label-by-community-ta').length).toEqual(1);
+            });
+
+            it('when none should be present', function() {
+                renderSingleThreadWithProps({});
+                return expect($('.forum-nav-thread-labels').length).toEqual(0);
+            });
+        });
+
         describe('search alerts', function() {
             var testAlertMessages, getAlertMessagesAndClasses;
 
@@ -362,7 +550,7 @@
             it('does not add a search alert when no alternate term was searched', function() {
                 testCorrection(this.view, null);
                 expect(this.view.addSearchAlert.calls.count()).toEqual(1);
-                return expect(this.view.addSearchAlert.calls.mostRecent().args[0]).toMatch(/no threads matched/i);
+                return expect(this.view.addSearchAlert.calls.mostRecent().args[0]).toMatch(/no posts matched/i);
             });
 
             it('clears search alerts when a new search is performed', function() {
@@ -460,227 +648,37 @@
             });
         });
 
-        describe('post type renders correctly', function() {
-            it('for discussion', function() {
+        describe('thread preview body', function() {
+            it('should be shown when showThreadPreview is true', function() {
                 renderSingleThreadWithProps({
                     thread_type: 'discussion'
                 });
-                expect($('.forum-nav-thread-wrapper-0 .icon')).toHaveClass('fa-comments');
-                return expect($('.forum-nav-thread-wrapper-0 .sr')).toHaveText('discussion');
+                expect($('.thread-preview-body').length).toEqual(1);
             });
 
-            it('for answered question', function() {
+            it('should not show image when showThreadPreview is true', function() {
                 renderSingleThreadWithProps({
-                    thread_type: 'question',
-                    endorsed: true
+                    thread_type: 'discussion',
+                    body: '![customizedImageAltTitle].png'
                 });
-                expect($('.forum-nav-thread-wrapper-0 .icon')).toHaveClass('fa-check-square-o');
-                return expect($('.forum-nav-thread-wrapper-0 .sr')).toHaveText('answered question');
+                expect($('.thread-preview-body').text()).toEqual('');
             });
 
-            it('for unanswered question', function() {
+            it('should not show MathJax when showThreadPreview is true', function() {
                 renderSingleThreadWithProps({
-                    thread_type: 'question',
-                    endorsed: false
+                    thread_type: 'discussion',
+                    body: '$$x^2 + sqrt(y)$$'
                 });
-                expect($('.forum-nav-thread-wrapper-0 .icon')).toHaveClass('fa-question');
-                return expect($('.forum-nav-thread-wrapper-0 .sr')).toHaveText('unanswered question');
-            });
-        });
-
-        describe('post labels render correctly', function() {
-            beforeEach(function() {
-                this.moderatorId = '42';
-                this.administratorId = '43';
-                this.communityTaId = '44';
-                return DiscussionUtil.loadRoles({
-                    'Moderator': [parseInt(this.moderatorId)],
-                    'Administrator': [parseInt(this.administratorId)],
-                    'Community TA': [parseInt(this.communityTaId)]
-                });
+                expect($('.thread-preview-body').text()).toEqual('');
             });
 
-            it('for pinned', function() {
-                renderSingleThreadWithProps({
-                    pinned: true
-                });
-                return expect($('.post-label-pinned').length).toEqual(1);
-            });
-
-            it('for following', function() {
-                renderSingleThreadWithProps({
-                    subscribed: true
-                });
-                return expect($('.post-label-following').length).toEqual(1);
-            });
-
-            it('for moderator', function() {
-                renderSingleThreadWithProps({
-                    user_id: this.moderatorId
-                });
-                return expect($('.post-label-by-staff').length).toEqual(1);
-            });
-
-            it('for administrator', function() {
-                renderSingleThreadWithProps({
-                    user_id: this.administratorId
-                });
-                return expect($('.post-label-by-staff').length).toEqual(1);
-            });
-
-            it('for community TA', function() {
-                renderSingleThreadWithProps({
-                    user_id: this.communityTaId
-                });
-                return expect($('.post-label-by-community-ta').length).toEqual(1);
-            });
-
-            it('when none should be present', function() {
-                renderSingleThreadWithProps({});
-                return expect($('.forum-nav-thread-labels').length).toEqual(0);
-            });
-        });
-
-        describe('browse menu', function() {
-            var expectBrowseMenuVisible;
-            afterEach(function() {
-                return $('body').unbind('click');
-            });
-
-            expectBrowseMenuVisible = function(isVisible) {
-                expect($('.forum-nav-browse-menu:visible').length).toEqual(isVisible ? 1 : 0);
-                return expect($('.forum-nav-thread-list-wrapper:visible').length).toEqual(isVisible ? 0 : 1);
-            };
-
-            it('should be visible by default', function() {
-                expectBrowseMenuVisible(true);
-            });
-
-            it('should disappear when header button is clicked', function() {
-                $('.forum-nav-browse').click();
-                return expectBrowseMenuVisible(false);
-            });
-
-            describe('when shown', function() {
-                it('should show again when header button is clicked', function() {
-                    $('.forum-nav-browse').click();
-                    return expectBrowseMenuVisible(false);
-                });
-
-                it('should hide when a click outside the menu occurs', function() {
-                    $('.forum-nav-search-input').click();
-                    return expectBrowseMenuVisible(false);
-                });
-
-                it('should hide when a category is clicked', function() {
-                    $('.forum-nav-browse-title')[0].click();
-                    return expectBrowseMenuVisible(false);
-                });
-
-                it('should still be shown when filter input is clicked', function() {
-                    $('.forum-nav-browse-filter-input').click();
-                    return expectBrowseMenuVisible(true);
-                });
-
-                describe('filtering', function() {
-                    var checkFilter;
-                    checkFilter = function(filterText, expectedItems) {
-                        var visibleItems;
-                        $('.forum-nav-browse-filter-input').val(filterText).keyup();
-                        visibleItems = $('.forum-nav-browse-title:visible').map(function(i, elem) {
-                            return $(elem).text();
-                        }).get();
-                        return expect(visibleItems).toEqual(expectedItems);
-                    };
-
-                    it('should be case-insensitive', function() {
-                        return checkFilter('other', ['Other Category']);
-                    });
-
-                    it('should match partial words', function() {
-                        return checkFilter('ateg', ['Other Category']);
-                    });
-
-                    it('should show ancestors and descendants of matches', function() {
-                        return checkFilter('Target', ['Parent', 'Target', 'Child']);
-                    });
-
-                    it('should handle multiple words regardless of order', function() {
-                        return checkFilter('Following Posts', ["Posts I'm Following"]);
-                    });
-
-                    it('should handle multiple words in different depths', function() {
-                        return checkFilter('Parent Child', ['Parent', 'Target', 'Child']);
-                    });
-                });
-            });
-
-            describe('selecting an item', function() {
-                var testSelectionRequest;
-
-                it('should show/hide the cohort selector', function() {
-                    var self = this;
-                    DiscussionSpecHelper.makeModerator();
-                    this.view.render();
-                    setupAjax();
-                    return _.each([
-                        {
-                            selector: '.forum-nav-browse-menu-all',
-                            cohortVisibility: true
-                        }, {
-                            selector: '.forum-nav-browse-menu-following',
-                            cohortVisibility: false
-                        }, {
-                            selector: '.forum-nav-browse-menu-item:' +
-                                        'has(.forum-nav-browse-menu-item .forum-nav-browse-menu-item)',
-                            cohortVisibility: false
-                        }, {
-                            selector: '[data-discussion-id=child]',
-                            cohortVisibility: false
-                        }, {
-                            selector: '[data-discussion-id=other]',
-                            cohortVisibility: true
-                        }
-                    ], function(itemInfo) {
-                        self.view.$('' + itemInfo.selector + ' > .forum-nav-browse-title').click();
-                        return expect(self.view.$('.forum-nav-filter-cohort').is(':visible'))
-                            .toEqual(itemInfo.cohortVisibility);
-                    });
-                });
-
-                testSelectionRequest = function(callback, itemText) {
-                    setupAjax(callback);
-                    $('.forum-nav-browse-title:contains(' + itemText + ')').click();
-                    return expect($.ajax).toHaveBeenCalled();
-                };
-
-                it('should get all discussions', function() {
-                    return testSelectionRequest(function(params) {
-                        return expect(params.url.path()).toEqual(DiscussionUtil.urlFor('threads'));
-                    }, 'All');
-                });
-
-                it('should get followed threads', function() {
-                    testSelectionRequest(function(params) {
-                        return expect(params.url.path())
-                            .toEqual(DiscussionUtil.urlFor('followed_threads', window.user.id));
-                    }, 'Following');
-                    return expect($.ajax.calls.mostRecent().args[0].data.group_id).toBeUndefined();
-                });
-
-                it('should get threads for the selected leaf', function() {
-                    return testSelectionRequest(function(params) {
-                        expect(params.url.path()).toEqual(DiscussionUtil.urlFor('search'));
-                        return expect(params.data.commentable_ids).toEqual('child');
-                    }, 'Child');
-                });
-
-                it('should get threads for children of the selected intermediate node', function() {
-                    return testSelectionRequest(function(params) {
-                        expect(params.url.path()).toEqual(DiscussionUtil.urlFor('search'));
-                        return expect(params.data.commentable_ids).toEqual('child,sibling');
-                    }, 'Parent');
-                });
+            it('should not be shown when showThreadPreview is false', function() {
+                var view,
+                    discussion = new Discussion([]),
+                    showThreadPreview = false;
+                view = makeView(discussion, showThreadPreview);
+                view.render();
+                expect(view.$el.find('.thread-preview-body').length).toEqual(0);
             });
         });
     });

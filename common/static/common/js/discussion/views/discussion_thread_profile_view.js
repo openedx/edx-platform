@@ -51,7 +51,7 @@
             };
 
             DiscussionThreadProfileView.prototype.convertMath = function() {
-                var htmlSnippet = DiscussionUtil.postMathJaxProcessor(DiscussionUtil.markdownWithHighlight(this.model.get('body')));
+                var htmlSnippet = DiscussionUtil.markdownWithHighlight(this.model.get('body'));
                 this.model.set('markdownBody', htmlSnippet);
             };
 

@@ -14,7 +14,7 @@ from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_t
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-@attr('shard_1')
+@attr(shard=1)
 class TestFooter(TestCase):
     """
     Tests for edx and OpenEdX footer

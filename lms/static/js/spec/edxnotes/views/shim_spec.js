@@ -45,7 +45,7 @@ define([
             spyOn($.fn, 'off').and.callThrough();
         });
 
-        afterEach(function () {
+        afterEach(function() {
             while (Annotator._instances.length > 0) {
                 Annotator._instances[0].destroy();
             }
@@ -143,7 +143,7 @@ define([
             var close,
                 annotation = {
                     id: '01',
-                    text: "Test text",
+                    text: 'Test text',
                     highlights: [highlights[0].get(0)]
                 };
 
@@ -153,11 +153,11 @@ define([
             expect($('#edx-notes-wrapper-123 .annotator-viewer')).toHaveClass('annotator-hide');
         });
 
-        describe('_setupViewer', function () {
+        describe('_setupViewer', function() {
             var mockViewer = null;
 
-            beforeEach(function () {
-                var  element = $('<div />');
+            beforeEach(function() {
+                var element = $('<div />');
                 mockViewer = {
                     fields: [],
                     element: element
@@ -166,7 +166,7 @@ define([
                 mockViewer.on = jasmine.createSpy().and.returnValue(mockViewer);
                 mockViewer.hide = jasmine.createSpy().and.returnValue(mockViewer);
                 mockViewer.destroy = jasmine.createSpy().and.returnValue(mockViewer);
-                mockViewer.addField = jasmine.createSpy().and.callFake(function (options) {
+                mockViewer.addField = jasmine.createSpy().and.callFake(function(options) {
                     mockViewer.fields.push(options);
                     return mockViewer;
                 });
@@ -178,22 +178,22 @@ define([
                 annotators[0]._setupViewer();
             });
 
-            it('should create a new instance of Annotator.Viewer and set Annotator#viewer', function () {
+            it('should create a new instance of Annotator.Viewer and set Annotator#viewer', function() {
                 expect(annotators[0].viewer).toEqual(mockViewer);
             });
 
-            it('should hide the annotator on creation', function () {
+            it('should hide the annotator on creation', function() {
                 expect(mockViewer.hide.calls.count()).toBe(1);
             });
 
-            it('should setup the default text field', function () {
+            it('should setup the default text field', function() {
                 var args = mockViewer.addField.calls.mostRecent().args[0];
 
                 expect(mockViewer.addField.calls.count()).toBe(1);
                 expect(_.isFunction(args.load)).toBeTruthy();
             });
 
-            it('should set the contents of the field on load', function () {
+            it('should set the contents of the field on load', function() {
                 var field = document.createElement('div'),
                     annotation = {text: 'text \nwith\r\nline\n\rbreaks \r'};
 
@@ -201,7 +201,7 @@ define([
                 expect($(field).html()).toBe('text <br>with<br>line<br>breaks <br>');
             });
 
-            it('should set the contents of the field to placeholder text when empty', function () {
+            it('should set the contents of the field to placeholder text when empty', function() {
                 var field = document.createElement('div'),
                     annotation = {text: ''};
 
@@ -209,7 +209,7 @@ define([
                 expect($(field).html()).toBe('<i>No Comment</i>');
             });
 
-            it('should setup the default text field to publish an event on load', function () {
+            it('should setup the default text field to publish an event on load', function() {
                 var field = document.createElement('div'),
                     annotation = {text: ''},
                     callback = jasmine.createSpy();
@@ -219,30 +219,30 @@ define([
                 expect(callback).toHaveBeenCalledWith(field, annotation);
             });
 
-            it('should subscribe to custom events', function () {
+            it('should subscribe to custom events', function() {
                 expect(mockViewer.on).toHaveBeenCalledWith('edit', annotators[0].onEditAnnotation);
                 expect(mockViewer.on).toHaveBeenCalledWith('delete', annotators[0].onDeleteAnnotation);
             });
 
-            it('should bind to browser mouseover and mouseout events', function () {
+            it('should bind to browser mouseover and mouseout events', function() {
                 expect(mockViewer.element.bind).toHaveBeenCalledWith({
                     'mouseover': annotators[0].clearViewerHideTimer,
-                    'mouseout':  annotators[0].startViewerHideTimer
+                    'mouseout': annotators[0].startViewerHideTimer
                 });
             });
 
-            it('should append the Viewer#element to the Annotator#wrapper', function () {
+            it('should append the Viewer#element to the Annotator#wrapper', function() {
                 expect(mockViewer.element.appendTo).toHaveBeenCalledWith(annotators[0].wrapper);
             });
         });
 
-        describe('TagsPlugin', function () {
+        describe('TagsPlugin', function() {
             it('should add ARIA label information to the viewer', function() {
                 var tagDiv,
                     annotation = {
                         id: '01',
-                        text: "Test text",
-                        tags: ["tag1", "tag2", "tag3"],
+                        text: 'Test text',
+                        tags: ['tag1', 'tag2', 'tag3'],
                         highlights: [highlights[0].get(0)]
                     };
 
@@ -262,7 +262,7 @@ define([
                 // but the sr label "for" attribute should match the ID of the element immediately following it.
                 annotators[0].showEditor({}, {});
                 editor = annotators[0].editor;
-                srLabel = editor.element.find("label.sr");
+                srLabel = editor.element.find('label.sr');
                 inputId = srLabel.next().attr('id');
                 expect(srLabel.attr('for')).toEqual(inputId);
             });

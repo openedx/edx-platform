@@ -48,11 +48,11 @@ class AnnotatableFields(object):
 class AnnotatableModule(AnnotatableFields, XModule):
     js = {
         'coffee': [
-            resource_string(__name__, 'js/src/javascript_loader.coffee'),
             resource_string(__name__, 'js/src/html/display.coffee'),
             resource_string(__name__, 'js/src/annotatable/display.coffee'),
         ],
         'js': [
+            resource_string(__name__, 'js/src/javascript_loader.js'),
             resource_string(__name__, 'js/src/collapsible.js'),
         ]
     }

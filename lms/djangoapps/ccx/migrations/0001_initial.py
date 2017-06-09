@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from django.db import migrations, models
 from django.conf import settings
-import xmodule_django.models
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, LocationKeyField
 
 
 class Migration(migrations.Migration):
@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
             name='CcxFieldOverride',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('location', xmodule_django.models.LocationKeyField(max_length=255, db_index=True)),
+                ('location', LocationKeyField(max_length=255, db_index=True)),
                 ('field', models.CharField(max_length=255)),
                 ('value', models.TextField(default=b'null')),
             ],
@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
             name='CustomCourseForEdX',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('course_id', xmodule_django.models.CourseKeyField(max_length=255, db_index=True)),
+                ('course_id', CourseKeyField(max_length=255, db_index=True)),
                 ('display_name', models.CharField(max_length=255)),
                 ('coach', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
             ],

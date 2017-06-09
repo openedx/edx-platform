@@ -49,9 +49,9 @@ except ImportError:
     HAS_USER_SERVICE = False
 
 try:
-    from xblock_django.models import XBlockDisableConfig
+    from xblock_django.api import disabled_xblocks
 except ImportError:
-    XBlockDisableConfig = None
+    disabled_xblocks = None
 
 log = logging.getLogger(__name__)
 ASSET_IGNORE_REGEX = getattr(settings, "ASSET_IGNORE_REGEX", r"(^\._.*$)|(^\.DS_Store$)|(^.*~$)")
@@ -188,12 +188,25 @@ def create_modulestore_instance(
     if 'read_preference' in doc_store_config:
         doc_store_config['read_preference'] = getattr(ReadPreference, doc_store_config['read_preference'])
 
-    if XBlockDisableConfig and settings.FEATURES.get('ENABLE_DISABLING_XBLOCK_TYPES', False):
-        disabled_xblock_types = XBlockDisableConfig.disabled_block_types()
-    else:
-        disabled_xblock_types = ()
-
     xblock_field_data_wrappers = [load_function(path) for path in settings.XBLOCK_FIELD_DATA_WRAPPERS]
+
+    def fetch_disabled_xblock_types():
+        """
+        Get the disabled xblock names, using the request_cache if possible to avoid hitting
+        a database every time the list is needed.
+        """
+        # If the import could not be loaded, return an empty list.
+        if disabled_xblocks is None:
+            return []
+
+        if request_cache:
+            if 'disabled_xblock_types' not in request_cache.data:
+                request_cache.data['disabled_xblock_types'] = [block.name for block in disabled_xblocks()]
+            return request_cache.data['disabled_xblock_types']
+        else:
+            disabled_xblock_types = [block.name for block in disabled_xblocks()]
+
+        return disabled_xblock_types
 
     return class_(
         contentstore=content_store,
@@ -202,7 +215,7 @@ def create_modulestore_instance(
         xblock_mixins=getattr(settings, 'XBLOCK_MIXINS', ()),
         xblock_select=getattr(settings, 'XBLOCK_SELECT_FUNCTION', None),
         xblock_field_data_wrappers=xblock_field_data_wrappers,
-        disabled_xblock_types=disabled_xblock_types,
+        disabled_xblock_types=fetch_disabled_xblock_types,
         doc_store_config=doc_store_config,
         i18n_service=i18n_service or ModuleI18nService,
         fs_service=fs_service or xblock.reference.plugins.FSService(),

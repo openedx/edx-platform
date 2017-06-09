@@ -141,7 +141,7 @@ from pipeline_mako import render_require_js_path_overrides
     </div>
 
     % if not disable_footer:
-        <%include file="themable-footer.html" />
+        <%include file="${static.get_template_path('footer.html')}" />
     % endif
 
 % if not disable_window_wrap:

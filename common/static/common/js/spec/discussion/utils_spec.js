@@ -29,7 +29,7 @@
                 });
                 spyOn(DiscussionUtil, 'discussionAlert');
                 DiscussionUtil.safeAjax.calls.mostRecent().args[0].error();
-                expect(DiscussionUtil.discussionAlert).toHaveBeenCalledWith('Sorry', 'error message');
+                expect(DiscussionUtil.discussionAlert).toHaveBeenCalledWith('Error', 'error message');
                 deferred.reject();
                 return expect(model.attributes).toEqual({
                     hello: false,

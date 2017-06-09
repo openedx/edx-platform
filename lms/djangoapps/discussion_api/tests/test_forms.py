@@ -147,7 +147,6 @@ class ThreadListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
         ("order_by", "last_activity_at"),
         ("order_by", "comment_count"),
         ("order_by", "vote_count"),
-        ("order_direction", "asc"),
         ("order_direction", "desc"),
     )
     @ddt.unpack

@@ -1,6 +1,6 @@
 /* Creates a new selector for managing toggling which child to show. */
-window.ABTestSelector = function (runtime, elem) {
-    "use strict";
+window.ABTestSelector = function(runtime, elem) {
+    'use strict';
     var _this = {};
     _this.elem = $(elem);
     _this.children = _this.elem.find('.split-test-child');
@@ -12,7 +12,7 @@ window.ABTestSelector = function (runtime, elem) {
         _this.children.each(function() {
             // force this id to remain a string, even if it looks like something else
             var child_group_id = $(this).data('group-id').toString();
-            if(child_group_id === group_id) {
+            if (child_group_id === group_id) {
                 _this.content_container.html($(this).text());
                 XBlock.initializeBlocks(_this.content_container, $(elem).data('request-token'));
             }

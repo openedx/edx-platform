@@ -6,7 +6,7 @@ from django.db import models
 from django.contrib import admin
 from django.core.cache import cache
 
-from xmodule_django.models import CourseKeyField
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
 from config_models.models import ConfigurationModel
 from config_models.admin import ConfigurationModelAdmin

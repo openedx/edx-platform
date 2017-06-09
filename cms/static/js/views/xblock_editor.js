@@ -2,10 +2,9 @@
  * XBlockEditorView displays the authoring view of an xblock, and allows the user to switch between
  * the available modes.
  */
-define(["jquery", "underscore", "gettext", "js/views/xblock", "js/views/metadata", "js/collections/metadata",
-        "jquery.inputnumber"],
-    function ($, _, gettext, XBlockView, MetadataView, MetadataCollection) {
-
+define(['jquery', 'underscore', 'gettext', 'js/views/xblock', 'js/views/metadata', 'js/collections/metadata',
+        'jquery.inputnumber'],
+    function($, _, gettext, XBlockView, MetadataView, MetadataCollection) {
         var XBlockEditorView = XBlockView.extend({
             // takes XBlockInfo as a model
 
@@ -40,8 +39,8 @@ define(["jquery", "underscore", "gettext", "js/views/xblock", "js/views/metadata
 
             getDefaultModes: function() {
                 return [
-                    { id: 'editor', name: gettext("Editor")},
-                    { id: 'settings', name: gettext("Settings")}
+                    {id: 'editor', name: gettext('Editor')},
+                    {id: 'settings', name: gettext('Settings')}
                 ];
             },
 
@@ -134,7 +133,7 @@ define(["jquery", "underscore", "gettext", "js/views/xblock", "js/views/metadata
                 metadataNameElements = this.$('[data-metadata-name]');
                 for (i = 0; i < metadataNameElements.length; i++) {
                     element = metadataNameElements[i];
-                    metadataName = $(element).data("metadata-name");
+                    metadataName = $(element).data('metadata-name');
                     metadata[metadataName] = element.value;
                 }
                 return metadata;

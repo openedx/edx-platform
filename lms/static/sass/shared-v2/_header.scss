@@ -12,7 +12,6 @@
     .wrapper-header {
         @include clearfix();
         box-sizing: border-box;
-        height: 74px;
         margin: 0 auto;
         padding: 10px 10px 0;
         width: 100%;
@@ -50,6 +49,10 @@
         .dropdown-menu {
             @include text-align(left);
             top: inherit;
+        }
+
+        .user-menu {
+            display: inline;
         }
 
         .list-inline {
@@ -123,5 +126,17 @@
                 margin-top: 0;
             }
         }
+    }
+}
+
+.doc-link {
+    @include float(right);
+    @include margin(($baseline*0.75), ($baseline*0.75), ($baseline*0.75), ($baseline*0.75));
+    font-size: 14px;
+    font-weight: bold;
+    color: $base-font-color;
+
+    &:visited {
+      color: $base-font-color;
     }
 }

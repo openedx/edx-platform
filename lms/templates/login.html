@@ -218,7 +218,7 @@ from third_party_auth import provider, pipeline
 
     <div class="form-actions form-third-party-auth">
 
-    % for enabled in provider.Registry.accepting_logins():
+    % for enabled in provider.Registry.displayed_for_login():
       ## Translators: provider_name is the name of an external, third-party user authentication provider (like Google or LinkedIn).
       <button type="submit" class="button button-primary button-${enabled.provider_id} login-${enabled.provider_id}" onclick="thirdPartySignin(event, '${pipeline_url[enabled.provider_id]}');">
         % if enabled.icon_class:

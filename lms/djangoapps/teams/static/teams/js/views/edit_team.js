@@ -1,4 +1,4 @@
-;(function (define) {
+(function(define) {
     'use strict';
 
     define(['backbone',
@@ -8,7 +8,7 @@
             'teams/js/models/team',
             'common/js/components/utils/view_utils',
             'text!teams/templates/edit-team.underscore'],
-        function (Backbone, _, gettext, FieldViews, TeamModel, ViewUtils, editTeamTemplate) {
+        function(Backbone, _, gettext, FieldViews, TeamModel, ViewUtils, editTeamTemplate) {
             return Backbone.View.extend({
 
                 maxTeamNameLength: 255,
@@ -30,12 +30,12 @@
                     if (this.action === 'create') {
                         this.teamModel = new TeamModel({});
                         this.teamModel.url = this.context.teamsUrl;
-                        this.primaryButtonTitle = gettext("Create");
-                    } else if(this.action === 'edit' ) {
+                        this.primaryButtonTitle = gettext('Create');
+                    } else if (this.action === 'edit') {
                         this.teamModel = options.model;
                         this.teamModel.url = this.context.teamsDetailUrl.replace('team_id', options.model.get('id')) +
                             '?expand=user';
-                        this.primaryButtonTitle = gettext("Update");
+                        this.primaryButtonTitle = gettext('Update');
                     }
 
                     this.teamNameField = new FieldViews.TextFieldView({
@@ -78,7 +78,7 @@
                 },
 
                 render: function() {
-                    this.$el.html(_.template(editTeamTemplate) ({
+                    this.$el.html(_.template(editTeamTemplate)({
                         primaryButtonTitle: this.primaryButtonTitle,
                         action: this.action,
                         totalMembers: _.isUndefined(this.teamModel) ? 0 : this.teamModel.get('membership').length
@@ -99,7 +99,7 @@
                     }
                 },
 
-                createOrUpdateTeam: function (event) {
+                createOrUpdateTeam: function(event) {
                     event.preventDefault();
                     var view = this,
                         teamLanguage = this.teamLanguageField.fieldValue(),
@@ -117,7 +117,7 @@
                     if (this.action === 'create') {
                         data.course_id = this.context.courseID;
                         data.topic_id = this.topic.id;
-                    } else if (this.action === 'edit' ) {
+                    } else if (this.action === 'edit') {
                         saveOptions.patch = true;
                         saveOptions.contentType = 'application/merge-patch+json';
                     }
@@ -140,15 +140,15 @@
                         })
                         .fail(function(data) {
                             var response = JSON.parse(data.responseText);
-                            var message = gettext("An error occurred. Please try again.");
-                            if ('user_message' in response){
+                            var message = gettext('An error occurred. Please try again.');
+                            if ('user_message' in response) {
                                 message = response.user_message;
                             }
                             view.showMessage(message, message);
                         });
                 },
 
-                validateTeamData: function (data) {
+                validateTeamData: function(data) {
                     var status = true,
                         message = gettext('Check the highlighted fields below and try again.');
                     var srMessages = [];
@@ -156,7 +156,7 @@
                     this.teamNameField.unhighlightField();
                     this.teamDescriptionField.unhighlightField();
 
-                    if (_.isEmpty(data.name.trim()) ) {
+                    if (_.isEmpty(data.name.trim())) {
                         status = false;
                         this.teamNameField.highlightFieldOnError();
                         srMessages.push(
@@ -170,7 +170,7 @@
                         );
                     }
 
-                    if (_.isEmpty(data.description.trim()) ) {
+                    if (_.isEmpty(data.description.trim())) {
                         status = false;
                         this.teamDescriptionField.highlightFieldOnError();
                         srMessages.push(
@@ -191,7 +191,7 @@
                     };
                 },
 
-                showMessage: function (message, screenReaderMessage) {
+                showMessage: function(message, screenReaderMessage) {
                     this.$('.wrapper-msg').removeClass('is-hidden');
                     this.$('.msg-content .copy p').text(message);
                     this.$('.wrapper-msg').focus();
@@ -201,12 +201,12 @@
                     }
                 },
 
-                cancelAndGoBack: function (event) {
+                cancelAndGoBack: function(event) {
                     event.preventDefault();
                     var url;
                     if (this.action === 'create') {
                         url = 'topics/' + this.topic.id;
-                    } else if (this.action === 'edit' ) {
+                    } else if (this.action === 'edit') {
                         url = 'teams/' + this.topic.id + '/' + this.teamModel.get('id');
                     }
                     Backbone.history.navigate(url, {trigger: true});

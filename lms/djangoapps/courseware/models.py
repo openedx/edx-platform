@@ -19,14 +19,14 @@ from django.contrib.auth.models import User
 from django.conf import settings
 from django.db import models
 from django.db.models.signals import post_save
-from django.dispatch import receiver, Signal
+from django.dispatch import receiver
 
 from model_utils.models import TimeStampedModel
-from student.models import user_by_anonymous_id
-from submissions.models import score_set, score_reset
 import coursewarehistoryextended
 
-from xmodule_django.models import CourseKeyField, LocationKeyField, BlockTypeKeyField
+from openedx.core.djangoapps.xmodule_django.models import (
+    CourseKeyField, LocationKeyField, BlockTypeKeyField
+)
 
 log = logging.getLogger("edx.courseware")
 
@@ -69,8 +69,6 @@ class ChunkingManager(models.Manager):
             for chunk in chunks(items, chunk_size)
         )
         return res
-
-from courseware.signals import score_changed
 
 
 class StudentModule(models.Model):
@@ -149,27 +147,6 @@ class StudentModule(models.Model):
 
     def __unicode__(self):
         return unicode(repr(self))
-
-
-@receiver(post_save, sender=StudentModule)
-def send_score_changed_signal(sender, instance, **kwargs):
-    """
-    Broadcast the recorded score to connected receivers
-    """
-    if settings.FEATURES.get('SIGNAL_ON_SCORE_CHANGED', False) and instance.grade is not None:
-        previous_entries = StudentModuleHistory.objects.filter(student_module=instance)\
-            .exclude(grade=None)\
-            .exclude(created=instance.modified, state=instance.state)\
-            .order_by('-id')
-        if not len(previous_entries) or (instance.grade != previous_entries[0].grade) or \
-                (instance.max_grade != previous_entries[0].max_grade):
-            score_changed.send(
-                sender=sender,
-                user=instance.student,
-                course_key=instance.course_id,
-                score=instance.grade,
-                problem=instance.module_state_key
-            )
 
 
 class BaseStudentModuleHistory(models.Model):
@@ -382,101 +359,3 @@ class StudentFieldOverride(TimeStampedModel):
 
     field = models.CharField(max_length=255)
     value = models.TextField(default='null')
-
-
-# Signal that indicates that a user's score for a problem has been updated.
-# This signal is generated when a scoring event occurs either within the core
-# platform or in the Submissions module. Note that this signal will be triggered
-# regardless of the new and previous values of the score (i.e. it may be the
-# case that this signal is generated when a user re-attempts a problem but
-# receives the same score).
-SCORE_CHANGED = Signal(
-    providing_args=[
-        'points_possible',  # Maximum score available for the exercise
-        'points_earned',   # Score obtained by the user
-        'user_id',  # Integer User ID
-        'course_id',  # Unicode string representing the course
-        'usage_id'  # Unicode string indicating the courseware instance
-    ]
-)
-
-
-@receiver(score_set)
-def submissions_score_set_handler(sender, **kwargs):  # pylint: disable=unused-argument
-    """
-    Consume the score_set signal defined in the Submissions API, and convert it
-    to a SCORE_CHANGED signal defined in this module. Converts the unicode keys
-    for user, course and item into the standard representation for the
-    SCORE_CHANGED signal.
-
-    This method expects that the kwargs dictionary will contain the following
-    entries (See the definition of score_set):
-      - 'points_possible': integer,
-      - 'points_earned': integer,
-      - 'anonymous_user_id': unicode,
-      - 'course_id': unicode,
-      - 'item_id': unicode
-    """
-    points_possible = kwargs.get('points_possible', None)
-    points_earned = kwargs.get('points_earned', None)
-    course_id = kwargs.get('course_id', None)
-    usage_id = kwargs.get('item_id', None)
-    user = None
-    if 'anonymous_user_id' in kwargs:
-        user = user_by_anonymous_id(kwargs.get('anonymous_user_id'))
-
-    # If any of the kwargs were missing, at least one of the following values
-    # will be None.
-    if all((user, points_possible, points_earned, course_id, usage_id)):
-        SCORE_CHANGED.send(
-            sender=None,
-            points_possible=points_possible,
-            points_earned=points_earned,
-            user_id=user.id,
-            course_id=course_id,
-            usage_id=usage_id
-        )
-    else:
-        log.exception(
-            u"Failed to process score_set signal from Submissions API. "
-            "points_possible: %s, points_earned: %s, user: %s, course_id: %s, "
-            "usage_id: %s", points_possible, points_earned, user, course_id, usage_id
-        )
-
-
-@receiver(score_reset)
-def submissions_score_reset_handler(sender, **kwargs):  # pylint: disable=unused-argument
-    """
-    Consume the score_reset signal defined in the Submissions API, and convert
-    it to a SCORE_CHANGED signal indicating that the score has been set to 0/0.
-    Converts the unicode keys for user, course and item into the standard
-    representation for the SCORE_CHANGED signal.
-
-    This method expects that the kwargs dictionary will contain the following
-    entries (See the definition of score_reset):
-      - 'anonymous_user_id': unicode,
-      - 'course_id': unicode,
-      - 'item_id': unicode
-    """
-    course_id = kwargs.get('course_id', None)
-    usage_id = kwargs.get('item_id', None)
-    user = None
-    if 'anonymous_user_id' in kwargs:
-        user = user_by_anonymous_id(kwargs.get('anonymous_user_id'))
-
-    # If any of the kwargs were missing, at least one of the following values
-    # will be None.
-    if all((user, course_id, usage_id)):
-        SCORE_CHANGED.send(
-            sender=None,
-            points_possible=0,
-            points_earned=0,
-            user_id=user.id,
-            course_id=course_id,
-            usage_id=usage_id
-        )
-    else:
-        log.exception(
-            u"Failed to process score_reset signal from Submissions API. "
-            "user: %s, course_id: %s, usage_id: %s", user, course_id, usage_id
-        )

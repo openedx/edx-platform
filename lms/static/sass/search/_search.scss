@@ -13,30 +13,39 @@
     top: 5px;
     width: 100%;
     border-radius: 4px;
-    background: $white-t1;
-    &.is-active {
-      background: $white;
-    }
+    background: $white;
   }
 
-  .search-button, .cancel-button,
-  .search-button:hover, .cancel-button:hover {
-    @extend %t-icon6;
+  .search-button,
+  .cancel-button,
+  .search-button:hover,
+  .cancel-button:hover {
     @extend %t-regular;
     @include box-sizing(border-box);
-    @include right(12px);
+    @include right(0);
     display: block;
     position: absolute;
     top: 0;
     border: none;
-    background: transparent;
-    padding: 0;
+    border-radius: 0;
+    @include border-top-right-radius(3px);
+    @include border-bottom-right-radius(3px);
+    background: $uxpl-blue-base;
+    padding: 0 10px;
     height: 35px;
-    color: $gray-l1;
+    color: $white;
     box-shadow: none;
-    line-height: 35px;
+    line-height: 33px;
     text-shadow: none;
     text-transform: none;
+    
+    &:hover,
+    &:focus,
+    &:active {
+        background: $uxpl-blue-hover-active;
+        box-shadow: none;
+        border: none;
+    }
   }
 
   .cancel-button {
@@ -171,4 +180,3 @@
     }
   }
 }
-

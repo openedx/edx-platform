@@ -4,7 +4,7 @@ Tests course_creators.views.py.
 
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
-from django.test import TestCase, RequestFactory
+from django.test import TestCase
 from django.core.urlresolvers import reverse
 
 from course_creators.views import add_user_with_status_unrequested, add_user_with_status_granted

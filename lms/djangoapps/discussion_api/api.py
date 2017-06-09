@@ -96,6 +96,8 @@ def _get_thread_and_context(request, thread_id, retrieve_kwargs=None):
     """
     retrieve_kwargs = retrieve_kwargs or {}
     try:
+        if "with_responses" not in retrieve_kwargs:
+            retrieve_kwargs["with_responses"] = False
         if "mark_as_read" not in retrieve_kwargs:
             retrieve_kwargs["mark_as_read"] = False
         cc_thread = Thread(id=thread_id).retrieve(**retrieve_kwargs)
@@ -375,9 +377,15 @@ def _get_users(discussion_entity_type, discussion_entity, username_profile_dict)
 
         A dict of users with username as key and user profile details as value.
     """
-    users = {discussion_entity['author']: _user_profile(username_profile_dict[discussion_entity['author']])}
+    users = {}
+    if discussion_entity['author']:
+        users[discussion_entity['author']] = _user_profile(username_profile_dict[discussion_entity['author']])
 
-    if discussion_entity_type == DiscussionEntity.comment and discussion_entity['endorsed']:
+    if (
+            discussion_entity_type == DiscussionEntity.comment
+            and discussion_entity['endorsed']
+            and discussion_entity['endorsed_by']
+    ):
         users[discussion_entity['endorsed_by']] = _user_profile(username_profile_dict[discussion_entity['endorsed_by']])
     return users
 
@@ -446,11 +454,12 @@ def _serialize_discussion_entities(request, context, discussion_entities, reques
         results.append(serialized_entity)
 
         if include_profile_image:
-            if serialized_entity['author'] not in usernames:
+            if serialized_entity['author'] and serialized_entity['author'] not in usernames:
                 usernames.append(serialized_entity['author'])
             if (
                     'endorsed' in serialized_entity and serialized_entity['endorsed'] and
-                    'endorsed_by' in serialized_entity and serialized_entity['endorsed_by'] not in usernames
+                    'endorsed_by' in serialized_entity and
+                    serialized_entity['endorsed_by'] and serialized_entity['endorsed_by'] not in usernames
             ):
                 usernames.append(serialized_entity['endorsed_by'])
 
@@ -489,8 +498,9 @@ def get_thread_list(
     order_by: The key in which to sort the threads by. The only values are
         "last_activity_at", "comment_count", and "vote_count". The default is
         "last_activity_at".
-    order_direction: The direction in which to sort the threads by. The only
-        values are "asc" or "desc". The default is "desc".
+    order_direction: The direction in which to sort the threads by. The default
+        and only value is "desc". This will be removed in a future major
+        version.
     requested_fields: Indicates which additional fields to return
         for each thread. (i.e. ['profile_image'])
 
@@ -519,9 +529,9 @@ def get_thread_list(
             "order_by":
                 ["Invalid value. '{}' must be 'last_activity_at', 'comment_count', or 'vote_count'".format(order_by)]
         })
-    if order_direction not in ["asc", "desc"]:
+    if order_direction != "desc":
         raise ValidationError({
-            "order_direction": ["Invalid value. '{}' must be 'asc' or 'desc'".format(order_direction)]
+            "order_direction": ["Invalid value. '{}' must be 'desc'".format(order_direction)]
         })
 
     course = _get_course(course_key, request.user)
@@ -537,10 +547,7 @@ def get_thread_list(
         "per_page": page_size,
         "text": text_search,
         "sort_key": cc_map.get(order_by),
-        "sort_order": order_direction,
     }
-
-    text_search_rewrite = None
 
     if view:
         if view in ["unread", "unanswered"]:
@@ -611,6 +618,7 @@ def get_comment_list(request, thread_id, endorsed, page, page_size, requested_fi
         request,
         thread_id,
         retrieve_kwargs={
+            "with_responses": True,
             "recursive": False,
             "user_id": request.user.id,
             "response_skip": response_skip,
@@ -895,7 +903,7 @@ def update_thread(request, thread_id, update_data):
         The updated thread; see discussion_api.views.ThreadViewSet for more
         detail.
     """
-    cc_thread, context = _get_thread_and_context(request, thread_id)
+    cc_thread, context = _get_thread_and_context(request, thread_id, retrieve_kwargs={"with_responses": True})
     _check_editable_fields(cc_thread, update_data, context)
     serializer = ThreadSerializer(cc_thread, data=update_data, partial=True, context=context)
     actions_form = ThreadActionsForm(update_data)
@@ -908,6 +916,11 @@ def update_thread(request, thread_id, update_data):
         thread_edited.send(sender=None, user=request.user, post=cc_thread)
     api_thread = serializer.data
     _do_extra_actions(api_thread, cc_thread, update_data.keys(), actions_form, context, request)
+
+    # always return read as True (and therefore unread_comment_count=0) as reasonably
+    # accurate shortcut, rather than adding additional processing.
+    api_thread['read'] = True
+    api_thread['unread_comment_count'] = 0
     return api_thread
 
 
@@ -969,10 +982,15 @@ def get_thread(request, thread_id, requested_fields=None):
         requested_fields: Indicates which additional fields to return for
         thread. (i.e. ['profile_image'])
     """
+    # Possible candidate for optimization with caching:
+    #   Param with_responses=True required only to add "response_count" to response.
     cc_thread, context = _get_thread_and_context(
         request,
         thread_id,
-        retrieve_kwargs={"user_id": unicode(request.user.id)}
+        retrieve_kwargs={
+            "with_responses": True,
+            "user_id": unicode(request.user.id),
+        }
     )
     return _serialize_discussion_entities(request, context, [cc_thread], requested_fields, DiscussionEntity.thread)[0]
 
@@ -1006,6 +1024,7 @@ def get_response_comments(request, comment_id, page, page_size, requested_fields
             request,
             cc_comment["thread_id"],
             retrieve_kwargs={
+                "with_responses": True,
                 "recursive": True,
             }
         )

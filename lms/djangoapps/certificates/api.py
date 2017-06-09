@@ -15,7 +15,7 @@ from opaque_keys.edx.keys import CourseKey
 from branding import api as branding_api
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.modulestore.django import modulestore
-from xmodule_django.models import CourseKeyField
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from util.organizations_helpers import get_course_organizations
 
 from certificates.models import (
@@ -571,7 +571,7 @@ def get_certificate_header_context(is_secure=True):
     data returned should be customized according to the site configuration.
     """
     data = dict(
-        logo_src=branding_api.get_logo_url(),
+        logo_src=branding_api.get_logo_url(is_secure),
         logo_url=branding_api.get_base_url(is_secure),
     )
 

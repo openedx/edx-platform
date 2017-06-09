@@ -1,9 +1,9 @@
-(function () {
+(function() {
     'use strict';
 
     var XModule = {};
 
-    XModule.Descriptor = (function () {
+    XModule.Descriptor = (function() {
         /*
          * Bind the module to an element. This may be called multiple times,
          * if the element content has changed and so the module needs to be rebound
@@ -11,7 +11,7 @@
          * @method: constructor
          * @param {html element} the .xmodule_edit section containing all of the descriptor content
          */
-        var Descriptor = function (element) {
+        var Descriptor = function(element) {
             this.element = element;
             this.update = _.bind(this.update, this);
         };
@@ -21,7 +21,7 @@
          * descriptor is updated. The callback will be passed the results
          * of calling the save method on this descriptor.
          */
-        Descriptor.prototype.onUpdate = function (callback) {
+        Descriptor.prototype.onUpdate = function(callback) {
             if (!this.callbacks) {
                 this.callbacks = [];
             }
@@ -32,14 +32,14 @@
         /*
          * Notify registered callbacks that the state of this descriptor has changed
          */
-        Descriptor.prototype.update = function () {
+        Descriptor.prototype.update = function() {
             var data, callbacks, i, length;
 
             data = this.save();
             callbacks = this.callbacks;
             length = callbacks.length;
 
-            $.each(callbacks, function (index, callback) {
+            $.each(callbacks, function(index, callback) {
                 callback(data);
             });
         };
@@ -51,14 +51,14 @@
          * @returns {object} An object containing children and data attributes (both optional).
          *                   The contents of the attributes will be saved to the server
          */
-        Descriptor.prototype.save = function () {
+        Descriptor.prototype.save = function() {
             return {};
         };
 
         return Descriptor;
     }());
 
-    this.XBlockToXModuleShim = function (runtime, element, initArgs) {
+    this.XBlockToXModuleShim = function(runtime, element, initArgs) {
         /*
          * Load a single module (either an edit module or a display module)
          * from the supplied element, which should have a data-type attribute

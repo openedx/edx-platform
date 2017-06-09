@@ -3,11 +3,11 @@ define([
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'support/js/spec_helpers/enrollment_helpers',
     'support/js/views/enrollment'
-], function (_, AjaxHelpers, EnrollmentHelpers, EnrollmentView) {
+], function(_, AjaxHelpers, EnrollmentHelpers, EnrollmentView) {
     'use strict';
 
     var enrollmentView,
-        createEnrollmentView = function (options) {
+        createEnrollmentView = function(options) {
             if (_.isUndefined(options)) {
                 options = {};
             }
@@ -15,22 +15,22 @@ define([
                 el: '.enrollment-content',
                 user: 'test-user',
                 enrollmentsUrl: '/support/enrollment/',
-                enrollmentSupportUrl: '/support/enrollment/',
+                enrollmentSupportUrl: '/support/enrollment/'
             }, options));
         };
 
-    beforeEach(function () {
+    beforeEach(function() {
         setFixtures('<div class="enrollment-content"></div>');
     });
 
-    describe('EnrollmentView', function () {
-        it('can render itself without an initial user', function () {
+    describe('EnrollmentView', function() {
+        it('can render itself without an initial user', function() {
             enrollmentView = createEnrollmentView({user: ''}).render();
             expect($('.enrollment-search input').val()).toBe('');
             expect($('.enrollment-results').length).toBe(0);
         });
 
-        it('renders itself when an initial user is provided', function () {
+        it('renders itself when an initial user is provided', function() {
             var requests = AjaxHelpers.requests(this);
             enrollmentView = createEnrollmentView().render();
             AjaxHelpers.expectRequest(requests, 'GET', '/support/enrollment/test-user', null);
@@ -43,7 +43,7 @@ define([
             });
         });
 
-        it('re-renders itself when its collection changes', function () {
+        it('re-renders itself when its collection changes', function() {
             var requests = AjaxHelpers.requests(this);
             enrollmentView = createEnrollmentView().render();
             spyOn(enrollmentView, 'render').and.callThrough();
@@ -51,7 +51,7 @@ define([
             expect(enrollmentView.render).toHaveBeenCalled();
         });
 
-        it('shows a modal dialog to change enrollments', function () {
+        it('shows a modal dialog to change enrollments', function() {
             var requests = AjaxHelpers.requests(this);
             enrollmentView = createEnrollmentView().render();
             AjaxHelpers.respondWithJson(requests, [EnrollmentHelpers.mockEnrollmentData]);

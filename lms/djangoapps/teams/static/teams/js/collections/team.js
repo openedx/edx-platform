@@ -1,27 +1,27 @@
-;(function (define) {
+(function(define) {
     'use strict';
     define(['teams/js/collections/base', 'teams/js/models/team', 'gettext'],
         function(BaseCollection, TeamModel, gettext) {
             var TeamCollection = BaseCollection.extend({
                 model: TeamModel,
-                
+
                 state: {
                     sortKey: 'last_activity_at',
                     order: null
                 },
 
                 queryParams: {
-                    topic_id: function () {
+                    topic_id: function() {
                         return this.options.topic_id;
                     },
                     expand: 'user',
-                    course_id: function () {
+                    course_id: function() {
                         return this.options.course_id;
                     },
-                    order_by: function () {
+                    order_by: function() {
                         return this.getSearchString() ? '' : this.state.sortKey;
                     },
-                    text_search: function () {
+                    text_search: function() {
                         return this.getSearchString() || '';
                     }
                 },
@@ -36,10 +36,10 @@
                     this.registerSortableField('open_slots', gettext('open slots'));
                 },
 
-                setFilterField: function (fieldName, value) {
+                setFilterField: function(fieldName, value) {
                     BaseCollection.prototype.setFilterField.call(this, fieldName, value);
 
-                    this.queryParams[fieldName] = function () {
+                    this.queryParams[fieldName] = function() {
                         return value;
                     };
                 }

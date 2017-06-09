@@ -21,6 +21,7 @@ except ImportError:
     DJANGO_AVAILABLE = False
 
 import dogstats_wrapper as dog_stats_api
+import logging
 
 from contracts import check, new_contract
 from mongodb_proxy import autoretry_read
@@ -31,6 +32,7 @@ from xmodule.mongo_utils import connect_to_mongodb, create_collection_index
 
 
 new_contract('BlockData', BlockData)
+log = logging.getLogger(__name__)
 
 
 def get_cache(alias):
@@ -315,7 +317,7 @@ class MongoConnection(object):
         """
         Get the structure from the persistence mechanism whose id is the given key.
 
-        This method will use a cached version of the structure if it is availble.
+        This method will use a cached version of the structure if it is available.
         """
         with TIMER.timer("get_structure", course_context) as tagger_get_structure:
             cache = CourseStructureCache()
@@ -328,6 +330,12 @@ class MongoConnection(object):
 
                 with TIMER.timer("get_structure.find_one", course_context) as tagger_find_one:
                     doc = self.structures.find_one({'_id': key})
+                    if doc is None:
+                        log.warning(
+                            "doc was None when attempting to retrieve structure for item with key %s",
+                            unicode(key)
+                        )
+                        return None
                     tagger_find_one.measure("blocks", len(doc['blocks']))
                     structure = structure_from_mongo(doc, course_context)
                     tagger_find_one.sample_rate = 1

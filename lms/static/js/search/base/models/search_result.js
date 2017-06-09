@@ -1,17 +1,14 @@
-;(function (define) {
+(function(define) {
+    define(['backbone'], function(Backbone) {
+        'use strict';
 
-define(['backbone'], function (Backbone) {
-    'use strict';
-
-    return Backbone.Model.extend({
-        defaults: {
-            location: [],
-            content_type: '',
-            excerpt: '',
-            url: ''
-        }
+        return Backbone.Model.extend({
+            defaults: {
+                location: [],
+                content_type: '',
+                excerpt: '',
+                url: ''
+            }
+        });
     });
-
-});
-
 })(define || RequireJS.define);

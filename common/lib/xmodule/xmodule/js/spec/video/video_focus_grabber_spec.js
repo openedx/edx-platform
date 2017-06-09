@@ -1,8 +1,8 @@
-(function (undefined) {
-    describe('Video FocusGrabber', function () {
+(function(undefined) {
+    describe('Video FocusGrabber', function() {
         var state;
 
-        beforeEach(function () {
+        beforeEach(function() {
             // https://github.com/pivotal/jasmine/issues/184
             //
             // This is a known issue. jQuery animations depend on setTimeout
@@ -24,7 +24,7 @@
             spyOn(state.focusGrabber, 'enableFocusGrabber').and.callThrough();
         });
 
-        afterEach(function () {
+        afterEach(function() {
             // Turn jQuery animations back on.
             jQuery.fx.off = true;
             state.storage.clear();
@@ -33,22 +33,21 @@
 
         it(
             'check existence of focus grabber elements and their position',
-            function () {
-
-            var firstFGEl = state.el.find('.focus_grabber.first'),
-                lastFGEl = state.el.find('.focus_grabber.last'),
-                tcWrapperEl = state.el.find('.tc-wrapper');
+            function() {
+                var firstFGEl = state.el.find('.focus_grabber.first'),
+                    lastFGEl = state.el.find('.focus_grabber.last'),
+                    tcWrapperEl = state.el.find('.tc-wrapper');
 
             // Existence check.
-            expect(firstFGEl.length).toBe(1);
-            expect(lastFGEl.length).toBe(1);
+                expect(firstFGEl.length).toBe(1);
+                expect(lastFGEl.length).toBe(1);
 
             // Position check.
-            expect(firstFGEl.index() + 1).toBe(tcWrapperEl.index());
-            expect(lastFGEl.index() - 1).toBe(tcWrapperEl.index());
-        });
+                expect(firstFGEl.index() + 1).toBe(tcWrapperEl.index());
+                expect(lastFGEl.index() - 1).toBe(tcWrapperEl.index());
+            });
 
-        it('from the start, focus grabbers are disabled', function () {
+        it('from the start, focus grabbers are disabled', function() {
             expect(state.focusGrabber.elFirst.attr('tabindex')).toBe('-1');
             expect(state.focusGrabber.elLast.attr('tabindex')).toBe('-1');
         });
@@ -56,24 +55,22 @@
         it(
             'when first focus grabber is focused "mousemove" event is ' +
             'triggered, grabbers are disabled',
-            function () {
+            function() {
+                state.focusGrabber.elFirst.triggerHandler('focus');
 
-            state.focusGrabber.elFirst.triggerHandler('focus');
-
-            expect('mousemove').toHaveBeenTriggeredOn(state.el);
-            expect(state.focusGrabber.disableFocusGrabber).toHaveBeenCalled();
-        });
+                expect('mousemove').toHaveBeenTriggeredOn(state.el);
+                expect(state.focusGrabber.disableFocusGrabber).toHaveBeenCalled();
+            });
 
         it(
             'when last focus grabber is focused "mousemove" event is ' +
             'triggered, grabbers are disabled',
-            function () {
+            function() {
+                state.focusGrabber.elLast.triggerHandler('focus');
 
-            state.focusGrabber.elLast.triggerHandler('focus');
-
-            expect('mousemove').toHaveBeenTriggeredOn(state.el);
-            expect(state.focusGrabber.disableFocusGrabber).toHaveBeenCalled();
-        });
+                expect('mousemove').toHaveBeenTriggeredOn(state.el);
+                expect(state.focusGrabber.disableFocusGrabber).toHaveBeenCalled();
+            });
 
         // Disabled on 18.11.2013 due to flakiness on local dev machine.
         //
@@ -85,8 +82,8 @@
         //
         // TODO: Most likely, focusGrabber will be disabled in the future. This
         // test could become unneeded in the future.
-        xit('after controls hide focus grabbers are enabled', function () {
-            runs(function () {
+        xit('after controls hide focus grabbers are enabled', function() {
+            runs(function() {
                 // Captions should not be "sticky" for the autohide mechanism
                 // to work.
                 state.videoCaption.hideCaptions(true);
@@ -100,7 +97,7 @@
             // that there is clearly no race conditions for our expect below.
             waits(state.videoControl.fadeOutTimeout + 100);
 
-            runs(function () {
+            runs(function() {
                 expect(
                     state.focusGrabber.enableFocusGrabber
                 ).toHaveBeenCalled();

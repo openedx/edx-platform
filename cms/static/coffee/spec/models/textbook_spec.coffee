@@ -1,4 +1,5 @@
-define ["backbone", "js/models/textbook", "js/collections/textbook", "js/models/chapter", "js/collections/chapter", "coffee/src/main"],
+
+define ["backbone", "js/models/textbook", "js/collections/textbook", "js/models/chapter", "js/collections/chapter", "cms/js/main"],
 (Backbone, Textbook, TextbookSet, Chapter, ChapterSet, main) ->
 
     describe "Textbook model", ->

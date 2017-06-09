@@ -76,7 +76,7 @@ class CourseUpdateTest(CourseTestCase):
         course_update_url = self.create_update_url()
         resp = self.client.get_json(course_update_url)
         payload = json.loads(resp.content)
-        self.assertTrue(len(payload) == 2)
+        self.assertEqual(len(payload), 2)
 
         # try json w/o required fields
         self.assertContains(
@@ -128,7 +128,30 @@ class CourseUpdateTest(CourseTestCase):
         url = self.create_update_url(provided_id=this_id)
         resp = self.client.delete(url)
         payload = json.loads(resp.content)
-        self.assertTrue(len(payload) == before_delete - 1)
+        self.assertEqual(len(payload), before_delete - 1)
+
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_NOTIFICATIONS": True})
+    def test_notifications_enabled_when_new_updates_in_course(self):
+        # create new users and enroll them in the course.
+        test_user_1 = UserFactory.create(password='test_pass')
+        CourseEnrollmentFactory(user=test_user_1, course_id=self.course.id)
+        test_user_2 = UserFactory.create(password='test_pass')
+        CourseEnrollmentFactory(user=test_user_2, course_id=self.course.id)
+
+        content = 'Test update'
+        payload = {'content': content, 'date': 'Feb 19, 2015'}
+        url = self.create_update_url()
+
+        resp = self.client.ajax_post(
+            url, payload, REQUEST_METHOD="POST"
+        )
+        self.assertEqual(resp.status_code, 200)
+        self.assertHTMLEqual(content, json.loads(resp.content)['content'])
+
+        # now the enrolled users should get notification about the
+        # course update where they are enrolled as student.
+        self.assertTrue(get_notifications_count_for_user(test_user_1.id), 1)
+        self.assertTrue(get_notifications_count_for_user(test_user_2.id), 1)
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_NOTIFICATIONS": True})
     def test_notifications_enabled_when_new_updates_in_course(self):
@@ -177,7 +200,7 @@ class CourseUpdateTest(CourseTestCase):
         resp = self.client.get_json(course_update_url)
         payload = json.loads(resp.content)
         self.assertEqual(payload, [{u'date': update_date, u'content': update_content, u'id': 1}])
-        self.assertTrue(len(payload) == 1)
+        self.assertEqual(len(payload), 1)
 
         # test getting single update item
 
@@ -262,7 +285,7 @@ class CourseUpdateTest(CourseTestCase):
         # now confirm that the bad news and the iframe make up single update
         resp = self.client.get_json(course_update_url)
         payload = json.loads(resp.content)
-        self.assertTrue(len(payload) == 1)
+        self.assertEqual(len(payload), 1)
 
     def post_course_update(self, send_push_notification=False):
         """

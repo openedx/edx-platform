@@ -1,7 +1,7 @@
 """
 Acceptance tests for Video Times(Start, End and Finish) functionality.
 """
-from .test_video_module import VideoBaseTest
+from common.test.acceptance.tests.video.test_video_module import VideoBaseTest
 
 
 class VideoTimesTest(VideoBaseTest):

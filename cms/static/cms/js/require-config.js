@@ -1,4 +1,7 @@
-;(function(require, define) {
+/* globals _, requirejs */
+/* eslint-disable quote-props */
+
+(function(require, define) {
     'use strict';
 
     if (window) {
@@ -49,13 +52,14 @@
             'jquery.immediateDescendents': 'coffee/src/jquery.immediateDescendents',
             'datepair': 'js/vendor/timepicker/datepair',
             'date': 'js/vendor/date',
-            'moment': 'js/vendor/moment.min',
-            'moment-with-locales': 'js/vendor/moment-with-locales.min',
+            moment: 'common/js/vendor/moment-with-locales',
+            'moment-timezone': 'common/js/vendor/moment-timezone-with-data',
             'text': 'js/vendor/requirejs/text',
             'underscore': 'common/js/vendor/underscore',
             'underscore.string': 'common/js/vendor/underscore.string',
             'backbone': 'common/js/vendor/backbone',
             'backbone-relational': 'js/vendor/backbone-relational.min',
+            'backbone.validation': 'common/js/vendor/backbone-validation-min',
             'backbone.associations': 'js/vendor/backbone-associations-min',
             'backbone.paginator': 'common/js/vendor/backbone.paginator',
             'tinymce': 'js/vendor/tinymce/js/tinymce/tinymce.full.min',
@@ -68,9 +72,6 @@
             'URI': 'js/vendor/URI.min',
             'ieshim': 'js/src/ie_shim',
             'tooltip_manager': 'js/src/tooltip_manager',
-            'modernizr': 'edx-pattern-library/js/modernizr-custom',
-            'afontgarde': 'edx-pattern-library/js/afontgarde',
-            'edxicons': 'edx-pattern-library/js/edx-icons',
             'draggabilly': 'js/vendor/draggabilly',
 
             // Files needed for Annotations feature
@@ -212,12 +213,12 @@
                     window.MathJax.Hub.Config({
                         tex2jax: {
                             inlineMath: [
-                                ['\\(','\\)'],
-                                ['[mathjaxinline]','[/mathjaxinline]']
+                                ['\\(', '\\)'],
+                                ['[mathjaxinline]', '[/mathjaxinline]']
                             ],
                             displayMath: [
-                                ['\\[','\\]'],
-                                ['[mathjax]','[/mathjax]']
+                                ['\\[', '\\]'],
+                                ['[mathjax]', '[/mathjax]']
                             ]
                         }
                     });
@@ -247,18 +248,12 @@
                 exports: 'XBlock',
                 deps: ['xblock/core']
             },
-            'coffee/src/main': {
+            'cms/js/main': {
                 deps: ['coffee/src/ajax_prefix']
             },
             'js/src/logger': {
                 exports: 'Logger',
                 deps: ['coffee/src/ajax_prefix']
-            },
-            'modernizr': {
-                exports: 'Modernizr'
-            },
-            'afontgarde': {
-                exports: 'AFontGarde'
             },
 
             // the following are all needed for annotation tools

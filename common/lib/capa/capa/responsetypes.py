@@ -51,6 +51,7 @@ from lxml.html.soupparser import fromstring as fromstring_bs     # uses Beautifu
 import capa.xqueue_interface as xqueue_interface
 
 import capa.safe_exec as safe_exec
+from openedx.core.djangolib.markup import HTML, Text
 
 log = logging.getLogger(__name__)
 
@@ -153,7 +154,7 @@ class LoncapaResponse(object):
     # By default, we set this to False, allowing subclasses to override as appropriate.
     multi_device_support = False
 
-    def __init__(self, xml, inputfields, context, system, capa_module):
+    def __init__(self, xml, inputfields, context, system, capa_module, minimal_init):
         """
         Init is passed the following arguments:
 
@@ -189,10 +190,7 @@ class LoncapaResponse(object):
             raise LoncapaProblemError(msg)
 
         for prop in self.required_attributes:
-            prop_value = xml.get(prop)
-            if prop_value:  # Stripping off the empty strings
-                prop_value = prop_value.strip()
-            if not prop_value:
+            if not xml.get(prop):
                 msg = "Error in problem specification: %s missing required attribute %s" % (
                     unicode(self), prop)
                 msg += "\nSee XML source line %s" % getattr(
@@ -212,28 +210,29 @@ class LoncapaResponse(object):
             maxpoints = inputfield.get('points', '1')
             self.maxpoints.update({inputfield.get('id'): int(maxpoints)})
 
-        # dict for default answer map (provided in input elements)
-        self.default_answer_map = {}
-        for entry in self.inputfields:
-            answer = entry.get('correct_answer')
-            if answer:
-                self.default_answer_map[entry.get(
-                    'id')] = contextualize_text(answer, self.context)
+        if not minimal_init:
+            # dict for default answer map (provided in input elements)
+            self.default_answer_map = {}
+            for entry in self.inputfields:
+                answer = entry.get('correct_answer')
+                if answer:
+                    self.default_answer_map[entry.get(
+                        'id')] = contextualize_text(answer, self.context)
 
-        # Does this problem have partial credit?
-        # If so, what kind? Get it as a list of strings.
-        partial_credit = xml.xpath('.')[0].get('partial_credit', default=False)
+            # Does this problem have partial credit?
+            # If so, what kind? Get it as a list of strings.
+            partial_credit = xml.xpath('.')[0].get('partial_credit', default=False)
 
-        if str(partial_credit).lower().strip() == 'false':
-            self.has_partial_credit = False
-            self.credit_type = []
-        else:
-            self.has_partial_credit = True
-            self.credit_type = partial_credit.split(',')
-            self.credit_type = [word.strip().lower() for word in self.credit_type]
+            if str(partial_credit).lower().strip() == 'false':
+                self.has_partial_credit = False
+                self.credit_type = []
+            else:
+                self.has_partial_credit = True
+                self.credit_type = partial_credit.split(',')
+                self.credit_type = [word.strip().lower() for word in self.credit_type]
 
-        if hasattr(self, 'setup_response'):
-            self.setup_response()
+            if hasattr(self, 'setup_response'):
+                self.setup_response()
 
     def get_max_score(self):
         """
@@ -250,8 +249,35 @@ class LoncapaResponse(object):
           - renderer : procedure which produces HTML given an ElementTree
           - response_msg: a message displayed at the end of the Response
         """
-        # render ourself as a <span> + our content
-        tree = etree.Element('span')
+        _ = self.capa_system.i18n.ugettext
+
+        # response_id = problem_id + response index
+        response_id = self.xml.attrib['id']
+
+        response_index = response_id.split('_')[-1]
+        # Translators: index here could be 1,2,3 and so on
+        response_label = _(u'Question {index}').format(index=response_index)
+
+        # wrap the content inside a section
+        tree = etree.Element('div')
+        tree.set('class', 'wrapper-problem-response')
+        tree.set('tabindex', '-1')
+        tree.set('aria-label', response_label)
+        tree.set('role', 'group')
+
+        if self.xml.get('multiple_inputtypes'):
+            # add <div> to wrap all inputtypes
+            content = etree.SubElement(tree, 'div')
+            content.set('class', 'multi-inputs-group')
+            content.set('role', 'group')
+
+            if self.xml.get('multiinput-group-label-id'):
+                content.set('aria-labelledby', self.xml.get('multiinput-group-label-id'))
+
+            if self.xml.get('multiinput-group_description_ids'):
+                content.set('aria-describedby', self.xml.get('multiinput-group_description_ids'))
+        else:
+            content = tree
 
         # problem author can make this span display:inline
         if self.xml.get('inline', ''):
@@ -261,12 +287,12 @@ class LoncapaResponse(object):
             # call provided procedure to do the rendering
             item_xhtml = renderer(item)
             if item_xhtml is not None:
-                tree.append(item_xhtml)
+                content.append(item_xhtml)
         tree.tail = self.xml.tail
 
         # Add a <div> for the message at the end of the response
         if response_msg:
-            tree.append(self._render_response_msg_html(response_msg))
+            content.append(self._render_response_msg_html(response_msg))
 
         return tree
 
@@ -333,9 +359,9 @@ class LoncapaResponse(object):
         # Tricky: label None means output defaults, while '' means output empty label
         if label is None:
             if correct:
-                label = _(u'Correct')
+                label = _(u'Correct:')
             else:
-                label = _(u'Incorrect')
+                label = _(u'Incorrect:')
 
         # self.runtime.track_function('get_demand_hint', event_info)
         # This this "feedback hint" event
@@ -353,15 +379,23 @@ class LoncapaResponse(object):
         self.capa_module.runtime.track_function('edx.problem.hint.feedback_displayed', event_info)
 
         # Form the div-wrapped hint texts
-        hints_wrap = u''.join(
-            [u'<div class="{0}">{1}</div>'.format(QUESTION_HINT_TEXT_STYLE, dct.get('text'))
-             for dct in hint_log]
+        hints_wrap = HTML('').join(
+            [HTML('<div class="{question_hint_text_style}">{hint_content}</div>').format(
+                question_hint_text_style=QUESTION_HINT_TEXT_STYLE,
+                hint_content=HTML(dct.get('text'))
+            ) for dct in hint_log]
         )
         if multiline_mode:
-            hints_wrap = u'<div class="{0}">{1}</div>'.format(QUESTION_HINT_MULTILINE, hints_wrap)
+            hints_wrap = HTML('<div class="{question_hint_multiline}">{hints_wrap}</div>').format(
+                question_hint_multiline=QUESTION_HINT_MULTILINE,
+                hints_wrap=hints_wrap
+            )
         label_wrap = ''
         if label:
-            label_wrap = u'<div class="{0}">{1}: </div>'.format(QUESTION_HINT_LABEL_STYLE, label)
+            label_wrap = HTML('<span class="{question_hint_label_style}">{label} </span>').format(
+                question_hint_label_style=QUESTION_HINT_LABEL_STYLE,
+                label=Text(label)
+            )
 
         # Establish the outer style
         if correct:
@@ -370,7 +404,12 @@ class LoncapaResponse(object):
             style = QUESTION_HINT_INCORRECT_STYLE
 
         # Ready to go
-        return u'<div class="{0}">{1}{2}</div>'.format(style, label_wrap, hints_wrap)
+        return HTML('<div class="{st}"><div class="explanation-title">{text}</div>{lwrp}{hintswrap}</div>').format(
+            st=style,
+            text=Text(_("Answer")),
+            lwrp=label_wrap,
+            hintswrap=hints_wrap
+        )
 
     def get_extended_hints(self, student_answers, new_cmap):
         """
@@ -568,210 +607,6 @@ class LoncapaResponse(object):
         """True if the response has an answer-pool transformation."""
         return hasattr(self, '_has_answerpool')
 
-#-----------------------------------------------------------------------------
-
-
-@registry.register
-class JavascriptResponse(LoncapaResponse):
-    """
-    This response type is used when the student's answer is graded via
-    Javascript using Node.js.
-    """
-
-    human_name = _('JavaScript Input')
-    tags = ['javascriptresponse']
-    max_inputfields = 1
-    allowed_inputfields = ['javascriptinput']
-
-    def setup_response(self):
-        # Sets up generator, grader, display, and their dependencies.
-        self.parse_xml()
-
-        self.compile_display_javascript()
-
-        self.params = self.extract_params()
-
-        if self.generator:
-            self.problem_state = self.generate_problem_state()
-        else:
-            self.problem_state = None
-
-        self.solution = None
-
-        self.prepare_inputfield()
-
-    def compile_display_javascript(self):
-
-        # TODO FIXME
-        # arjun: removing this behavior for now (and likely forever). Keeping
-        # until we decide on exactly how to solve this issue. For now, files are
-        # manually being compiled to DATA_DIR/js/compiled.
-
-        # latestTimestamp = 0
-        # basepath = self.capa_system.filestore.root_path + '/js/'
-        # for filename in (self.display_dependencies + [self.display]):
-        #    filepath = basepath + filename
-        #    timestamp = os.stat(filepath).st_mtime
-        #    if timestamp > latestTimestamp:
-        #        latestTimestamp = timestamp
-        #
-        # h = hashlib.md5()
-        # h.update(self.answer_id + str(self.display_dependencies))
-        # compiled_filename = 'compiled/' + h.hexdigest() + '.js'
-        # compiled_filepath = basepath + compiled_filename
-
-        # if not os.path.exists(compiled_filepath) or os.stat(compiled_filepath).st_mtime < latestTimestamp:
-        #    outfile = open(compiled_filepath, 'w')
-        #    for filename in (self.display_dependencies + [self.display]):
-        #        filepath = basepath + filename
-        #        infile = open(filepath, 'r')
-        #        outfile.write(infile.read())
-        #        outfile.write(';\n')
-        #        infile.close()
-        #    outfile.close()
-
-        # TODO this should also be fixed when the above is fixed.
-        filename = self.capa_system.ajax_url.split('/')[-1] + '.js'
-        self.display_filename = 'compiled/' + filename
-
-    def parse_xml(self):
-        self.generator_xml = self.xml.xpath('//*[@id=$id]//generator',
-                                            id=self.xml.get('id'))[0]
-
-        self.grader_xml = self.xml.xpath('//*[@id=$id]//grader',
-                                         id=self.xml.get('id'))[0]
-
-        self.display_xml = self.xml.xpath('//*[@id=$id]//display',
-                                          id=self.xml.get('id'))[0]
-
-        self.xml.remove(self.generator_xml)
-        self.xml.remove(self.grader_xml)
-        self.xml.remove(self.display_xml)
-
-        self.generator = self.generator_xml.get("src")
-        self.grader = self.grader_xml.get("src")
-        self.display = self.display_xml.get("src")
-
-        if self.generator_xml.get("dependencies"):
-            self.generator_dependencies = self.generator_xml.get(
-                "dependencies").split()
-        else:
-            self.generator_dependencies = []
-
-        if self.grader_xml.get("dependencies"):
-            self.grader_dependencies = self.grader_xml.get(
-                "dependencies").split()
-        else:
-            self.grader_dependencies = []
-
-        if self.display_xml.get("dependencies"):
-            self.display_dependencies = self.display_xml.get(
-                "dependencies").split()
-        else:
-            self.display_dependencies = []
-
-        self.display_class = self.display_xml.get("class")
-
-    def get_node_env(self):
-
-        js_dir = os.path.join(self.capa_system.filestore.root_path, 'js')
-        tmp_env = os.environ.copy()
-        node_path = self.capa_system.node_path + ":" + os.path.normpath(js_dir)
-        tmp_env["NODE_PATH"] = node_path
-        return tmp_env
-
-    def call_node(self, args):
-        # Node.js code is un-sandboxed. If the LoncapaSystem says we aren't
-        # allowed to run unsafe code, then stop now.
-        if not self.capa_system.can_execute_unsafe_code():
-            _ = self.capa_system.i18n.ugettext
-            msg = _("Execution of unsafe Javascript code is not allowed.")
-            raise LoncapaProblemError(msg)
-
-        subprocess_args = ["node"]
-        subprocess_args.extend(args)
-
-        return subprocess.check_output(subprocess_args, env=self.get_node_env())
-
-    def generate_problem_state(self):
-
-        generator_file = os.path.dirname(os.path.normpath(
-            __file__)) + '/javascript_problem_generator.js'
-        output = self.call_node([generator_file,
-                                 self.generator,
-                                 json.dumps(self.generator_dependencies),
-                                 json.dumps(str(self.context['seed'])),
-                                 json.dumps(self.params)]).strip()
-
-        return json.loads(output)
-
-    def extract_params(self):
-
-        params = {}
-
-        for param in self.xml.xpath('//*[@id=$id]//responseparam',
-                                    id=self.xml.get('id')):
-
-            raw_param = param.get("value")
-            params[param.get("name")] = json.loads(
-                contextualize_text(raw_param, self.context))
-
-        return params
-
-    def prepare_inputfield(self):
-
-        for inputfield in self.xml.xpath('//*[@id=$id]//javascriptinput',
-                                         id=self.xml.get('id')):
-
-            escapedict = {'"': '&quot;'}
-
-            encoded_params = json.dumps(self.params)
-            encoded_params = saxutils.escape(encoded_params, escapedict)
-            inputfield.set("params", encoded_params)
-
-            encoded_problem_state = json.dumps(self.problem_state)
-            encoded_problem_state = saxutils.escape(encoded_problem_state,
-                                                    escapedict)
-            inputfield.set("problem_state", encoded_problem_state)
-
-            inputfield.set("display_file", self.display_filename)
-            inputfield.set("display_class", self.display_class)
-
-    def get_score(self, student_answers):
-        json_submission = student_answers[self.answer_id]
-        (all_correct, evaluation, solution) = self.run_grader(json_submission)
-        self.solution = solution
-        correctness = 'correct' if all_correct else 'incorrect'
-        if all_correct:
-            points = self.get_max_score()
-        else:
-            points = 0
-        return CorrectMap(self.answer_id, correctness, npoints=points, msg=evaluation)
-
-    def run_grader(self, submission):
-        if submission is None or submission == '':
-            submission = json.dumps(None)
-
-        grader_file = os.path.dirname(os.path.normpath(
-            __file__)) + '/javascript_problem_grader.js'
-        outputs = self.call_node([grader_file,
-                                  self.grader,
-                                  json.dumps(self.grader_dependencies),
-                                  submission,
-                                  json.dumps(self.problem_state),
-                                  json.dumps(self.params)]).split('\n')
-
-        all_correct = json.loads(outputs[0].strip())
-        evaluation = outputs[1].strip()
-        solution = outputs[2].strip()
-        return (all_correct, evaluation, solution)
-
-    def get_answers(self):
-        if self.solution is None:
-            (_, _, self.solution) = self.run_grader(None)
-
-        return {self.answer_id: self.solution}
-
 
 #-----------------------------------------------------------------------------
 @registry.register
@@ -832,31 +667,30 @@ class ChoiceResponse(LoncapaResponse):
     def setup_response(self):
         self.assign_choice_names()
 
-        correct_xml = self.xml.xpath(
-            '//*[@id=$id]//choice[@correct="true"]',
-            id=self.xml.get('id')
-        )
+        self.correct_choices = set()
+        self.incorrect_choices = set()
+        for choice in self.get_choices():
 
-        self.correct_choices = set([
-            choice.get('name') for choice in correct_xml
-        ])
+            # contextualize the name and correct attributes
+            name = contextualize_text(choice.get('name'), self.context)
+            correct = contextualize_text(choice.get('correct'), self.context).upper()
 
-        incorrect_xml = self.xml.xpath(
-            '//*[@id=$id]//choice[@correct="false"]',
-            id=self.xml.get('id')
-        )
+            # divide choices into correct and incorrect
+            if correct == 'TRUE':
+                self.correct_choices.add(name)
+            elif correct == 'FALSE':
+                self.incorrect_choices.add(name)
 
-        self.incorrect_choices = set([
-            choice.get('name') for choice in incorrect_xml
-        ])
+    def get_choices(self):
+        """Returns this response's XML choice elements."""
+        return self.xml.xpath('//*[@id=$id]//choice', id=self.xml.get('id'))
 
     def assign_choice_names(self):
         """
         Initialize name attributes in <choice> tags for this response.
         """
 
-        for index, choice in enumerate(self.xml.xpath('//*[@id=$id]//choice',
-                                                      id=self.xml.get('id'))):
+        for index, choice in enumerate(self.get_choices()):
             choice.set("name", "choice_" + str(index))
             # If a choice does not have an id, assign 'A' 'B', .. used by CompoundHint
             if not choice.get('id'):
@@ -1670,6 +1504,8 @@ class NumericalResponse(LoncapaResponse):
 
     def __init__(self, *args, **kwargs):
         self.correct_answer = ''
+        self.additional_answers = []
+        self.additional_answer_index = -1
         self.tolerance = default_tolerance
         self.range_tolerance = False
         self.answer_range = self.inclusion = None
@@ -1679,6 +1515,10 @@ class NumericalResponse(LoncapaResponse):
         xml = self.xml
         context = self.context
         answer = xml.get('answer')
+
+        self.additional_answers = (
+            [element.get('answer') for element in xml.findall('additional_answer')]
+        )
 
         if answer.startswith(('[', '(')) and answer.endswith((']', ')')):  # range tolerance case
             self.range_tolerance = True
@@ -1890,6 +1730,20 @@ class NumericalResponse(LoncapaResponse):
                 if compare_with_tolerance(student_float, correct_float, expanded_tolerance):
                     is_correct = 'partially-correct'
 
+        # Reset self.additional_answer_index to -1 so that we always have a fresh index to look up.
+        self.additional_answer_index = -1
+
+        # Compare with additional answers.
+        if is_correct == 'incorrect':
+            temp_additional_answer_idx = 0
+            for additional_answer in self.additional_answers:
+                staff_answer = self.get_staff_ans(additional_answer)
+                if complex(student_float) == staff_answer:
+                    is_correct = 'correct'
+                    self.additional_answer_index = temp_additional_answer_idx
+                    break
+                temp_additional_answer_idx += 1
+
         if is_correct == 'partially-correct':
             return CorrectMap(self.answer_id, is_correct, npoints=partial_score)
         else:
@@ -1917,7 +1771,38 @@ class NumericalResponse(LoncapaResponse):
             return False
 
     def get_answers(self):
-        return {self.answer_id: self.correct_answer}
+        _ = self.capa_system.i18n.ugettext
+        # Example: "Answer: Answer_1 or Answer_2 or Answer_3".
+        separator = Text(' {b_start}{or_separator}{b_end} ').format(
+            # Translators: Separator used in NumericalResponse to display multiple answers.
+            or_separator=_('or'),
+            b_start=HTML('<b>'),
+            b_end=HTML('</b>'),
+        )
+        return {self.answer_id: separator.join([self.correct_answer] + self.additional_answers)}
+
+    def set_cmap_msg(self, student_answers, new_cmap, hint_type, hint_index):
+        """
+        Sets feedback to correct hint node in correct map.
+
+        Arguments:
+            student_answers (dict): Dict containing student input.
+            new_cmap (dict): Dict containing correct map properties.
+            hint_type (str): Hint type, either `correcthint` or `additional_answer`
+            hint_index (int): Index of the hint node
+        """
+        # Note: using self.id here, not the more typical self.answer_id
+        hint_nodes = self.xml.xpath('//numericalresponse[@id=$id]/' + hint_type, id=self.id)
+        if hint_nodes:
+            hint_node = hint_nodes[hint_index]
+            if hint_type == 'additional_answer':
+                hint_node = hint_nodes[hint_index].find('./correcthint')
+            new_cmap[self.answer_id]['msg'] += self.make_hint_div(
+                hint_node,
+                True,
+                [student_answers[self.answer_id]],
+                self.tags[0]
+            )
 
     def get_extended_hints(self, student_answers, new_cmap):
         """
@@ -1926,23 +1811,18 @@ class NumericalResponse(LoncapaResponse):
         """
         if self.answer_id in student_answers:
             if new_cmap.cmap[self.answer_id]['correctness'] == 'correct':  # if the grader liked the student's answer
-                # Note: using self.id here, not the more typical self.answer_id
-                hints = self.xml.xpath('//numericalresponse[@id=$id]/correcthint', id=self.id)
-                if hints:
-                    hint_node = hints[0]
-                    new_cmap[self.answer_id]['msg'] += self.make_hint_div(
-                        hint_node,
-                        True,
-                        [student_answers[self.answer_id]],
-                        self.tags[0]
-                    )
+                # Answer is not an additional answer.
+                if self.additional_answer_index == -1:
+                    self.set_cmap_msg(student_answers, new_cmap, 'correcthint', 0)
+                else:
+                    self.set_cmap_msg(student_answers, new_cmap, 'additional_answer', self.additional_answer_index)
 
 #-----------------------------------------------------------------------------
 
 
 @registry.register
 class StringResponse(LoncapaResponse):
-    """
+    r"""
     This response type allows one or more answers.
 
     Additional answers are added by `additional_answer` tag.
@@ -4032,7 +3912,6 @@ __all__ = [
     ChoiceResponse,
     MultipleChoiceResponse,
     TrueFalseResponse,
-    JavascriptResponse,
     AnnotationResponse,
     ChoiceTextResponse,
 ]

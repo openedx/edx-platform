@@ -2,6 +2,7 @@
 Tests for the Studio Tagging XBlockAside
 """
 
+import ddt
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -17,13 +18,14 @@ from contentstore.utils import reverse_usage_url
 from contentstore.tests.utils import AjaxEnabledTestClient
 from django.test.client import RequestFactory
 from student.tests.factories import UserFactory
-from opaque_keys.edx.asides import AsideUsageKeyV1
+from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2
 from datetime import datetime
 from pytz import UTC
 from lxml import etree
 from StringIO import StringIO
 
 
+@ddt.ddt
 class StructuredTagsAsideTestCase(ModuleStoreTestCase):
     """
     Base class for tests of StructuredTagsAside (tagging.py)
@@ -179,13 +181,14 @@ class StructuredTagsAsideTestCase(ModuleStoreTestCase):
         video_html = get_preview_fragment(request, self.video, context).content
         self.assertNotRegexpMatches(video_html, "<select")
 
-    def test_handle_requests(self):
+    @ddt.data(AsideUsageKeyV1, AsideUsageKeyV2)
+    def test_handle_requests(self, aside_key_class):
         """
         Checks that handler to save tags in StructuredTagsAside works properly
         """
         handler_url = reverse_usage_url(
             'preview_handler',
-            '%s:%s::%s' % (AsideUsageKeyV1.CANONICAL_NAMESPACE, self.problem.location, self.aside_name),
+            unicode(aside_key_class(self.problem.location, self.aside_name)),
             kwargs={'handler': 'save_tags'}
         )
 

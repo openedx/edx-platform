@@ -1,28 +1,28 @@
-;(function (define, undefined) {
+(function(define, undefined) {
     'use strict';
     define([
-            'gettext',
-            'jquery',
-            'underscore',
-            'edx-ui-toolkit/js/utils/html-utils',
-            'common/js/components/views/list',
-            'js/student_profile/views/badge_view',
-            'text!templates/student_profile/badge_placeholder.underscore'
-        ],
-        function (gettext, $, _, HtmlUtils, ListView, BadgeView, badgePlaceholder) {
+        'gettext',
+        'jquery',
+        'underscore',
+        'edx-ui-toolkit/js/utils/html-utils',
+        'common/js/components/views/list',
+        'js/student_profile/views/badge_view',
+        'text!templates/student_profile/badge_placeholder.underscore'
+    ],
+        function(gettext, $, _, HtmlUtils, ListView, BadgeView, badgePlaceholder) {
             var BadgeListView = ListView.extend({
                 tagName: 'div',
-                
+
                 template: HtmlUtils.template(badgePlaceholder),
-                
-                renderCollection: function () {
+
+                renderCollection: function() {
                     var self = this,
                         $row;
 
                     this.$el.empty();
 
                     // Split into two columns.
-                    this.collection.each(function (badge, index) {
+                    this.collection.each(function(badge, index) {
                         if (index % 2 === 0) {
                             $row = $('<div class="row">');
                             this.$el.append($row);

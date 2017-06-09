@@ -11,7 +11,7 @@ from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditRequirement
 
 
-@attr('shard_2')
+@attr(shard=2)
 @ddt.ddt
 class CreditEligibilityModelTests(TestCase):
     """

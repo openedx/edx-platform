@@ -104,3 +104,10 @@ class TabNavPage(PageObject):
             lambda: self._is_on_tab(tab_name),
             "{0} is the current tab".format(tab_name)
         )
+
+    def has_new_post_button_visible_on_tab(self):
+        """
+        Check if new post button present and visible on course tab page
+        """
+        new_post_btn = self.q(css='ol.course-tabs .new-post-btn')
+        return new_post_btn.present and new_post_btn.visible

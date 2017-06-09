@@ -129,9 +129,7 @@ ${HTML(fragment.foot_html())}
                 <label for="course-search-input" class="sr">${_('Course Search')}</label>
                 <div class="search-field-wrapper">
                   <input id="course-search-input" type="text" class="search-field"/>
-                  <button type="submit" class="search-button">
-                    ${_('search')} <span class="icon fa fa-search" aria-hidden="true"></span>
-                  </button>
+                  <button type="submit" class="search-button">${_('Search')}</button>
                   <button type="button" class="cancel-button" title="${_('Clear search')}">
                     <span class="icon fa fa-remove" aria-hidden="true"></span>
                   </button>
@@ -155,6 +153,7 @@ ${HTML(fragment.foot_html())}
     </div>
 % endif
     <section class="course-content" id="course-content">
+        <div class="path"></div>
         <main id="main" aria-label="Content" tabindex="-1">
         % if getattr(course, 'entrance_exam_enabled') and \
            getattr(course, 'entrance_exam_minimum_score_pct') and \

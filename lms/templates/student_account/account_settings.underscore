@@ -2,16 +2,18 @@
 <div class="account-settings-container">
     <div class="wrapper-header">
         <h2 class="header-title"><%- gettext("Account Settings") %></h2>
-        <ul class="left list-inline account-nav">
+        <div class="left list-inline account-nav" role="tablist">
             <% _.each(accountSettingsTabs, function(tab) { %>
-            <li class="account-nav-item">
-                <button id="<%- tab.id %>" data-name="<%- tab.name %>" <% if (tab.class) { %> aria-describedby="header-subtitle-<%- tab.name %>" <% } %> class="account-nav-link <%- tab.class %>" ><%- tab.label %></button>
-            </li>
+                <button id="<%- tab.id %>" aria-controls="<%- tab.name %>-tabpanel" tabindex="<%- tab.tabindex %>" aria-selected="<%- tab.selected %>" aria-expanded="<%- tab.expanded %>" data-name="<%- tab.name %>" aria-describedby="header-subtitle-<%- tab.name %>" class="tab account-nav-link <%- tab.class %>" role="tab">
+                    <%- tab.label %>
+                </button>
             <% }); %>
-        </ul>
+        </div>
     </div>
-
     <div class="account-settings-sections">
+        <% _.each(accountSettingsTabs, function(tab) { %>
+            <div id="<%- tab.name %>-tabpanel" class="account-settings-tabpanels <% if (!tab.class) { %> hidden <% } %>" aria-label="<%- tab.label %>" role="tabpanel"></div>
+        <% }); %>
     </div>
 </div>
 </main>

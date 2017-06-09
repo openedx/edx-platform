@@ -52,7 +52,7 @@ class StudentModuleFactory(cmfStudentModuleFactory):
     course_id = course_id
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestInvalidScopes(TestCase):
     def setUp(self):
         super(TestInvalidScopes, self).setUp()
@@ -73,7 +73,7 @@ class TestInvalidScopes(TestCase):
             self.assertRaises(InvalidScopeError, self.kvs.set_many, {key: 'value'})
 
 
-@attr('shard_1')
+@attr(shard=1)
 class OtherUserFailureTestMixin(object):
     """
     Mixin class to add test cases for failures when a user trying to use the kvs is not
@@ -98,7 +98,7 @@ class OtherUserFailureTestMixin(object):
             self.kvs.set(self.other_key_factory(self.existing_field_name), "new_value")
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
     """Tests for user_state storage via StudentModule"""
     other_key_factory = partial(DjangoKeyValueStore.Key, Scope.user_state, 2, location('usage_id'))  # user_id=2, not 1
@@ -139,7 +139,7 @@ class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
         # to discover if something other than the DjangoXBlockUserStateClient
         # has written to the StudentModule (such as UserStateCache setting the score
         # on the StudentModule).
-        with self.assertNumQueries(2, using='default'):
+        with self.assertNumQueries(4, using='default'):
             with self.assertNumQueries(1, using='student_module_history'):
                 self.kvs.set(user_state_key('a_field'), 'new_value')
         self.assertEquals(1, StudentModule.objects.all().count())
@@ -152,7 +152,7 @@ class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
         # to discover if something other than the DjangoXBlockUserStateClient
         # has written to the StudentModule (such as UserStateCache setting the score
         # on the StudentModule).
-        with self.assertNumQueries(2, using='default'):
+        with self.assertNumQueries(4, using='default'):
             with self.assertNumQueries(1, using='student_module_history'):
                 self.kvs.set(user_state_key('not_a_field'), 'new_value')
         self.assertEquals(1, StudentModule.objects.all().count())
@@ -206,7 +206,7 @@ class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
         # We also need to read the database to discover if something other than the
         # DjangoXBlockUserStateClient has written to the StudentModule (such as
         # UserStateCache setting the score on the StudentModule).
-        with self.assertNumQueries(2, using="default"):
+        with self.assertNumQueries(4, using="default"):
             with self.assertNumQueries(1, using="student_module_history"):
                 self.kvs.set_many(kv_dict)
 
@@ -227,7 +227,7 @@ class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
         self.assertEquals(exception_context.exception.saved_field_names, [])
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestMissingStudentModule(TestCase):
     # Tell Django to clean out all databases, not just default
     multi_db = True
@@ -283,7 +283,7 @@ class TestMissingStudentModule(TestCase):
             self.assertFalse(self.kvs.has(user_state_key('a_field')))
 
 
-@attr('shard_1')
+@attr(shard=1)
 class StorageTestBase(object):
     """
     A base class for that gets subclassed when testing each of the scopes.

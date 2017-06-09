@@ -16,7 +16,7 @@
                 'title': 'test thread title'
             });
             this.thread = new Thread(this.threadData);
-            this.course_settings = DiscussionSpecHelper.makeCourseSettings();
+            this.course_settings = DiscussionSpecHelper.createTestCourseSettings();
 
             this.createEditView = function(options) {
                 options = _.extend({
@@ -47,10 +47,10 @@
                     }
                 };
             });
-
             view.$el.find('.topic-title').filter(function(idx, el) {
                 return $(el).data('discussionId') === newTopicId;
-            }).click(); // set new topic
+            }).prop('selected', true); // set new topic
+            view.$('.post-topic').trigger('change');
             view.$('.edit-post-title').val('changed thread title'); // set new title
             if (discussionMode !== 'inline') {
                 view.$("label[for$='post-type-discussion']").click(); // set new thread type
@@ -97,7 +97,11 @@
             beforeEach(function() {
                 this.course_settings = new DiscussionCourseSettings({
                     'category_map': {
-                        'children': ['Topic', 'General', 'Basic Question'],
+                        'children': [ // eslint-disable-line quote-props
+                            ['Topic', 'entry'],
+                            ['General', 'entry'],
+                            ['Basic Question', 'entry']
+                        ],
                         'entries': {
                             'Topic': {
                                 'is_cohorted': true,

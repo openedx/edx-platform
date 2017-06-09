@@ -2,10 +2,12 @@
 from contextlib import contextmanager
 import ddt
 from functools import wraps
+import uuid
 
 from django.test import TestCase, RequestFactory
 from django.test.utils import override_settings
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from mock import patch
 from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import CourseLocator
@@ -14,6 +16,7 @@ from config_models.models import cache
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.tests.factories import GlobalStaffFactory
+from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from microsite_configuration import microsite
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
@@ -47,16 +50,6 @@ class WebCertificateTestMixin(object):
     """
     Mixin with helpers for testing Web Certificates.
     """
-    @contextmanager
-    def _mock_passing_grade(self):
-        """
-        Mock the grading function to always return a passing grade.
-        """
-        symbol = 'courseware.grades.grade'
-        with patch(symbol) as mock_grade:
-            mock_grade.return_value = {'grade': 'Pass', 'percent': 0.75}
-            yield
-
     @contextmanager
     def _mock_queue(self, is_successful=True):
         """
@@ -92,7 +85,7 @@ class WebCertificateTestMixin(object):
         self.store.update_item(self.course, self.user.id)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTestCase):
     """Tests for the `certificate_downloadable_status` helper function. """
 
@@ -193,7 +186,7 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
     def test_with_downloadable_web_cert(self):
         CourseEnrollment.enroll(self.student, self.course.id, mode='honor')
         self._setup_course_certificate()
-        with self._mock_passing_grade():
+        with mock_passing_grade():
             certs_api.generate_user_certificates(self.student, self.course.id)
 
         cert_status = certificate_status_for_student(self.student, self.course.id)
@@ -212,7 +205,7 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
         )
 
 
-@attr('shard_1')
+@attr(shard=1)
 @ddt.ddt
 class CertificateisInvalid(WebCertificateTestMixin, ModuleStoreTestCase):
     """Tests for the `is_certificate_invalid` helper function. """
@@ -324,7 +317,7 @@ class CertificateisInvalid(WebCertificateTestMixin, ModuleStoreTestCase):
         )
 
 
-@attr('shard_1')
+@attr(shard=1)
 class CertificateGetTests(SharedModuleStoreTestCase):
     """Tests for the `test_get_certificate_for_user` helper function. """
     @classmethod
@@ -332,43 +325,48 @@ class CertificateGetTests(SharedModuleStoreTestCase):
         super(CertificateGetTests, cls).setUpClass()
         cls.student = UserFactory()
         cls.student_no_cert = UserFactory()
-        cls.course_1 = CourseFactory.create(
+        cls.uuid = uuid.uuid4().hex
+        cls.web_cert_course = CourseFactory.create(
             org='edx',
             number='verified_1',
-            display_name='Verified Course 1'
+            display_name='Verified Course 1',
+            cert_html_view_enabled=True
         )
-        cls.course_2 = CourseFactory.create(
+        cls.pdf_cert_course = CourseFactory.create(
             org='edx',
             number='verified_2',
-            display_name='Verified Course 2'
+            display_name='Verified Course 2',
+            cert_html_view_enabled=False
         )
         # certificate for the first course
         GeneratedCertificateFactory.create(
             user=cls.student,
-            course_id=cls.course_1.id,
+            course_id=cls.web_cert_course.id,
             status=CertificateStatuses.downloadable,
             mode='verified',
             download_url='www.google.com',
             grade="0.88",
+            verify_uuid=cls.uuid,
         )
         # certificate for the second course
         GeneratedCertificateFactory.create(
             user=cls.student,
-            course_id=cls.course_2.id,
+            course_id=cls.pdf_cert_course.id,
             status=CertificateStatuses.downloadable,
             mode='honor',
             download_url='www.gmail.com',
             grade="0.99",
+            verify_uuid=cls.uuid,
         )
 
     def test_get_certificate_for_user(self):
         """
         Test to get a certificate for a user for a specific course.
         """
-        cert = certs_api.get_certificate_for_user(self.student.username, self.course_1.id)
+        cert = certs_api.get_certificate_for_user(self.student.username, self.web_cert_course.id)
 
         self.assertEqual(cert['username'], self.student.username)
-        self.assertEqual(cert['course_key'], self.course_1.id)
+        self.assertEqual(cert['course_key'], self.web_cert_course.id)
         self.assertEqual(cert['type'], CourseMode.VERIFIED)
         self.assertEqual(cert['status'], CertificateStatuses.downloadable)
         self.assertEqual(cert['grade'], "0.88")
@@ -382,8 +380,8 @@ class CertificateGetTests(SharedModuleStoreTestCase):
         self.assertEqual(len(certs), 2)
         self.assertEqual(certs[0]['username'], self.student.username)
         self.assertEqual(certs[1]['username'], self.student.username)
-        self.assertEqual(certs[0]['course_key'], self.course_1.id)
-        self.assertEqual(certs[1]['course_key'], self.course_2.id)
+        self.assertEqual(certs[0]['course_key'], self.web_cert_course.id)
+        self.assertEqual(certs[1]['course_key'], self.pdf_cert_course.id)
         self.assertEqual(certs[0]['type'], CourseMode.VERIFIED)
         self.assertEqual(certs[1]['type'], CourseMode.HONOR)
         self.assertEqual(certs[0]['status'], CertificateStatuses.downloadable)
@@ -398,7 +396,7 @@ class CertificateGetTests(SharedModuleStoreTestCase):
         Test the case when there is no certificate for a user for a specific course.
         """
         self.assertIsNone(
-            certs_api.get_certificate_for_user(self.student_no_cert.username, self.course_1.id)
+            certs_api.get_certificate_for_user(self.student_no_cert.username, self.web_cert_course.id)
         )
 
     def test_no_certificates_for_user(self):
@@ -410,8 +408,50 @@ class CertificateGetTests(SharedModuleStoreTestCase):
             []
         )
 
+    @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
+    def test_get_web_certificate_url(self):
+        """
+        Test the get_certificate_url with a web cert course
+        """
+        expected_url = reverse(
+            'certificates:render_cert_by_uuid',
+            kwargs=dict(certificate_uuid=self.uuid)
+        )
+        cert_url = certs_api.get_certificate_url(
+            user_id=self.student.id,  # pylint: disable=no-member
+            course_id=self.web_cert_course.id,
+            uuid=self.uuid
+        )
+        self.assertEqual(expected_url, cert_url)
 
-@attr('shard_1')
+        expected_url = reverse(
+            'certificates:html_view',
+            kwargs={
+                "user_id": str(self.student.id),  # pylint: disable=no-member
+                "course_id": unicode(self.web_cert_course.id),
+            }
+        )
+
+        cert_url = certs_api.get_certificate_url(
+            user_id=self.student.id,  # pylint: disable=no-member
+            course_id=self.web_cert_course.id
+        )
+        self.assertEqual(expected_url, cert_url)
+
+    @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
+    def test_get_pdf_certificate_url(self):
+        """
+        Test the get_certificate_url with a pdf cert course
+        """
+        cert_url = certs_api.get_certificate_url(
+            user_id=self.student.id,  # pylint: disable=no-member
+            course_id=self.pdf_cert_course.id,
+            uuid=self.uuid
+        )
+        self.assertEqual('www.gmail.com', cert_url)
+
+
+@attr(shard=1)
 @override_settings(CERT_QUEUE='certificates')
 class GenerateUserCertificatesTest(EventTestMixin, WebCertificateTestMixin, ModuleStoreTestCase):
     """Tests for generating certificates for students. """
@@ -437,7 +477,7 @@ class GenerateUserCertificatesTest(EventTestMixin, WebCertificateTestMixin, Modu
         self.request_factory = RequestFactory()
 
     def test_new_cert_requests_into_xqueue_returns_generating(self):
-        with self._mock_passing_grade():
+        with mock_passing_grade():
             with self._mock_queue():
                 certs_api.generate_user_certificates(self.student, self.course.id)
 
@@ -455,7 +495,7 @@ class GenerateUserCertificatesTest(EventTestMixin, WebCertificateTestMixin, Modu
         )
 
     def test_xqueue_submit_task_error(self):
-        with self._mock_passing_grade():
+        with mock_passing_grade():
             with self._mock_queue(is_successful=False):
                 certs_api.generate_user_certificates(self.student, self.course.id)
 
@@ -476,7 +516,7 @@ class GenerateUserCertificatesTest(EventTestMixin, WebCertificateTestMixin, Modu
             mode='verified'
         )
 
-        with self._mock_passing_grade():
+        with mock_passing_grade():
             with self._mock_queue(is_successful=False):
                 status = certs_api.generate_user_certificates(self.student, self.course.id)
                 self.assertEqual(status, None)
@@ -487,7 +527,7 @@ class GenerateUserCertificatesTest(EventTestMixin, WebCertificateTestMixin, Modu
         Test no message sent to Xqueue if HTML certificate view is enabled
         """
         self._setup_course_certificate()
-        with self._mock_passing_grade():
+        with mock_passing_grade():
             certs_api.generate_user_certificates(self.student, self.course.id)
 
         # Verify that the certificate has status 'downloadable'
@@ -503,7 +543,7 @@ class GenerateUserCertificatesTest(EventTestMixin, WebCertificateTestMixin, Modu
         self.assertEqual(url, "")
 
 
-@attr('shard_1')
+@attr(shard=1)
 @ddt.ddt
 class CertificateGenerationEnabledTest(EventTestMixin, TestCase):
     """Test enabling/disabling self-generated certificates for a course. """
@@ -571,7 +611,7 @@ class CertificateGenerationEnabledTest(EventTestMixin, TestCase):
         self.assertEqual(expect_enabled, actual_enabled)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class GenerateExampleCertificatesTest(TestCase):
     """Test generation of example certificates. """
 
@@ -659,7 +699,7 @@ def set_microsite(domain):
 
 
 @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-@attr('shard_1')
+@attr(shard=1)
 class CertificatesBrandingTest(TestCase):
     """Test certificates branding. """
 

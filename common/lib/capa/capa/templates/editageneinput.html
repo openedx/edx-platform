@@ -3,7 +3,7 @@
     <div class="script_placeholder" data-src="${applet_loader}"/>
 
     % if status in ['unsubmitted', 'correct', 'incorrect', 'partially-correct', 'incomplete']:
-    <div class="${status.classname}" id="status_${id}">
+    <div class="${status.classname}">
     % endif
 
     <div id="genex_container"></div>
@@ -11,8 +11,8 @@
     <input type="hidden" name="genex_problem_number" id="genex_problem_number" value ="${genex_problem_number}"></input>
     <input type="hidden" name="input_${id}" aria-describedby="answer_${id}" id="input_${id}" value="${value|h}"/>
 
-    <p class="status" aria-describedby="input_${id}">
-    ${status.display_name}
+    <p class="indicator-container" aria-describedby="input_${id}">
+        <%include file="status_span.html" args="status=status, status_id=id"/>
     </p>
 
     <p id="answer_${id}" class="answer"></p>

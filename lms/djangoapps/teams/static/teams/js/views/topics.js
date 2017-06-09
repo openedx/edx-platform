@@ -1,4 +1,4 @@
-;(function (define) {
+(function(define) {
     'use strict';
     define([
         'gettext',
@@ -6,7 +6,7 @@
         'teams/js/views/team_utils',
         'common/js/components/views/paging_header',
         'common/js/components/views/paginated_view'
-    ], function (gettext, TopicCardView, TeamUtils, PagingHeader, PaginatedView) {
+    ], function(gettext, TopicCardView, TeamUtils, PagingHeader, PaginatedView) {
         var TopicsView = PaginatedView.extend({
             type: 'topics',
 
@@ -15,7 +15,7 @@
                 text: gettext('All topics')
             },
 
-            initialize: function (options) {
+            initialize: function(options) {
                 this.options = _.extend({}, options);
                 this.itemViewClass = TopicCardView.extend({
                     router: options.router,
@@ -24,7 +24,7 @@
                 PaginatedView.prototype.initialize.call(this);
             },
 
-            createHeaderView: function () {
+            createHeaderView: function() {
                 return new PagingHeader({
                     collection: this.options.collection,
                     srInfo: this.srInfo,

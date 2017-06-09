@@ -7,16 +7,18 @@
             </div>
         </div>
         <div class="post-extended-content thread-responses-wrapper">
-            <% if (!readOnly) { %>
+            <div class="response-btn-count-wrapper">
+                <% if (!readOnly) { %>
                 <div class="add-response">
-                    <button class="btn-brand btn-small add-response-btn">
+                    <button class="btn btn-small add-response-btn">
                         <%- gettext("Add a Response") %>
                     </button>
                 </div>
-            <% } %>
-            <div class="response-count"/>
-            <ol class="responses js-response-list"/>
-            <div class="response-pagination"/>
+                <% } %>
+                <div class="response-count"></div>
+            </div>
+            <ol class="responses js-response-list"></ol>
+            <div class="response-pagination"></div>
             <div class="post-status-closed bottom-post-status" style="display: none">
               <%- gettext("This thread is closed.") %>
             </div>
@@ -26,14 +28,10 @@
                 <ul class="discussion-errors"></ul>
                 <div class="reply-body" data-id="<%- id %>"></div>
                 <div class="reply-post-control">
-                    <button class="btn-brand discussion-submit-post control-button"><%- gettext("Submit") %></button>
+                    <button class="btn discussion-submit-post control-button"><%- gettext("Submit") %></button>
                 </div>
             </form>
             <% } %>
         </div>
-    </div>
-    <div class="post-tools">
-        <button class="btn-link forum-thread-expand"><span class="icon fa fa-plus" aria-hidden="true"/><%- gettext("Expand discussion") %></button>
-        <button class="btn-link forum-thread-collapse"><span class="icon fa fa-minus" aria-hidden="true"/><%- gettext("Collapse discussion") %></button>
     </div>
 </article>

@@ -8,7 +8,7 @@ from ..visibility import VisibilityTransformer
 from .helpers import BlockParentsMapTestCase, update_block
 
 
-@attr('shard_3')
+@attr(shard=3)
 @ddt.ddt
 class VisibilityTransformerTestCase(BlockParentsMapTestCase):
     """

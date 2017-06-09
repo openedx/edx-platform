@@ -13,7 +13,7 @@
     <div id="request-email-status" />
 
     <div id="password-reset">
-        <a href="#"><%- gettext("Reset Password") %></a>
+        <button type="button"><%- gettext("Reset Password") %></button>
     </div>
     <div id="password-reset-status" />
 </form>

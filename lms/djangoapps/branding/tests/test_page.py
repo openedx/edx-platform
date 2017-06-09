@@ -2,6 +2,7 @@
 Tests for branding page
 """
 
+import mock
 import datetime
 
 from django.conf import settings
@@ -16,7 +17,6 @@ from nose.plugins.attrib import attr
 from edxmako.shortcuts import render_to_response
 
 from branding.views import index
-import student.views
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -41,7 +41,7 @@ def mock_render_to_response(*args, **kwargs):
 RENDER_MOCK = Mock(side_effect=mock_render_to_response)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class AnonymousIndexPageTest(ModuleStoreTestCase):
     """
     Tests that anonymous users can access the '/' page,  Need courses with start date
@@ -113,13 +113,13 @@ class AnonymousIndexPageTest(ModuleStoreTestCase):
         self.assertEqual(response._headers.get("location")[1], "/login")  # pylint: disable=protected-access
 
 
-@attr('shard_1')
+@attr(shard=1)
 class PreRequisiteCourseCatalog(ModuleStoreTestCase, LoginEnrollmentTestCase, MilestonesTestCaseMixin):
     """
     Test to simulate and verify fix for disappearing courses in
     course catalog when using pre-requisite courses
     """
-    @patch.dict(settings.FEATURES, {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
+    @patch.dict(settings.FEATURES, {'ENABLE_PREREQUISITE_COURSES': True})
     def test_course_with_prereq(self):
         """
         Simulate having a course which has closed enrollments that has
@@ -157,7 +157,7 @@ class PreRequisiteCourseCatalog(ModuleStoreTestCase, LoginEnrollmentTestCase, Mi
         self.assertIn('course that has pre requisite', resp.content)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
     """
     Test for Index page course cards sorting
@@ -288,3 +288,37 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         self.assertEqual(context['courses'][0].id, self.starting_later.id)
         self.assertEqual(context['courses'][1].id, self.starting_earlier.id)
         self.assertEqual(context['courses'][2].id, self.course_with_default_start_date.id)
+
+
+@attr(shard=1)
+class IndexPageProgramsTests(ModuleStoreTestCase):
+    """
+    Tests for Programs List in Marketing Pages.
+    """
+    @patch.dict('django.conf.settings.FEATURES', {'DISPLAY_PROGRAMS_ON_MARKETING_PAGES': False})
+    def test_get_programs_not_called(self):
+        with mock.patch("student.views.get_programs_data") as patched_get_programs_data:
+            # check the /dashboard
+            response = self.client.get('/')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(patched_get_programs_data.call_count, 0)
+
+        with mock.patch("courseware.views.views.get_programs_data") as patched_get_programs_data:
+            # check the /courses view
+            response = self.client.get(reverse('branding.views.courses'))
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(patched_get_programs_data.call_count, 0)
+
+    @patch.dict('django.conf.settings.FEATURES', {'DISPLAY_PROGRAMS_ON_MARKETING_PAGES': True})
+    def test_get_programs_called(self):
+        with mock.patch("student.views.get_programs_data") as patched_get_programs_data:
+            # check the /dashboard
+            response = self.client.get('/')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(patched_get_programs_data.call_count, 1)
+
+        with mock.patch("courseware.views.views.get_programs_data") as patched_get_programs_data:
+            # check the /courses view
+            response = self.client.get(reverse('branding.views.courses'))
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(patched_get_programs_data.call_count, 1)

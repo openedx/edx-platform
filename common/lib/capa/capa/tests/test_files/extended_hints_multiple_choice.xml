@@ -1,8 +1,8 @@
 <problem>
 <p>(note the blank line before mushroom -- be sure to include this test case)</p>
-<p>Select the fruit from the list</p>
 <multiplechoiceresponse>
-  <choicegroup label="Select the fruit from the list" type="MultipleChoice">
+  <label>Select the fruit from the list</label>
+  <choicegroup type="MultipleChoice">
     <choice correct="false">Mushroom
         <choicehint label="">Mushroom is a fungus, not a fruit.
         </choicehint>
@@ -14,9 +14,10 @@
     </choice>
   </choicegroup>
 </multiplechoiceresponse>
-<p>Select the vegetables from the list</p>
+
 <multiplechoiceresponse>
-  <choicegroup label="Select the vegetables from the list" type="MultipleChoice">
+  <label>Select the vegetables from the list</label>
+  <choicegroup type="MultipleChoice">
     <choice correct="false">Mushroom
         <choicehint>Mushroom is a fungus, not a vegetable.
         </choicehint>

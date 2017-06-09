@@ -24,20 +24,20 @@ var edx = edx || {};
             'review-photos-step'
         ],
 
-        initialize: function( obj ) {
+        initialize: function(obj) {
             this.errorModel = obj.errorModel || null;
             this.displaySteps = obj.displaySteps || [];
             this.courseKey = obj.courseKey || null;
             this.checkpointLocation = obj.checkpointLocation || null;
 
-            this.initializeStepViews( obj.stepInfo || {} );
+            this.initializeStepViews(obj.stepInfo || {});
             this.currentStepIndex = _.indexOf(
-                _.pluck( this.displaySteps, 'name' ),
+                _.pluck(this.displaySteps, 'name'),
                 obj.currentStep
             );
         },
 
-        initializeStepViews: function( stepInfo ) {
+        initializeStepViews: function(stepInfo) {
             var i,
                 stepName,
                 stepData,
@@ -73,22 +73,22 @@ var edx = edx || {};
                 checkpoint: this.checkpointLocation
             });
 
-            for ( i = 0; i < this.displaySteps.length; i++ ) {
+            for (i = 0; i < this.displaySteps.length; i++) {
                 stepName = this.displaySteps[i].name;
                 subview = null;
 
-                if ( i < this.displaySteps.length - 1) {
+                if (i < this.displaySteps.length - 1) {
                     nextStepTitle = this.displaySteps[i + 1].title;
                 } else {
-                    nextStepTitle = "";
+                    nextStepTitle = '';
                 }
 
-                if ( subviewConstructors.hasOwnProperty( stepName ) ) {
+                if (subviewConstructors.hasOwnProperty(stepName)) {
                     stepData = {};
 
                     // Add any info specific to this step
-                    if ( stepInfo.hasOwnProperty( stepName ) ) {
-                        _.extend( stepData, stepInfo[ stepName ] );
+                    if (stepInfo.hasOwnProperty(stepName)) {
+                        _.extend(stepData, stepInfo[stepName]);
                     }
 
                     subviewConfig = {
@@ -98,19 +98,19 @@ var edx = edx || {};
                     };
 
                     // For photo verification steps, set the shared photo model
-                    if ( this.VERIFICATION_VIEW_NAMES.indexOf(stepName) >= 0 ) {
-                        _.extend( subviewConfig, { model: verificationModel } );
+                    if (this.VERIFICATION_VIEW_NAMES.indexOf(stepName) >= 0) {
+                        _.extend(subviewConfig, {model: verificationModel});
                     }
 
                     // Create the subview instance
                     // Note that we are NOT yet rendering the view,
                     // so this doesn't trigger GET requests or modify
                     // the DOM.
-                    this.subviews[stepName] = new subviewConstructors[stepName]( subviewConfig );
+                    this.subviews[stepName] = new subviewConstructors[stepName](subviewConfig);
 
                     // Listen for events to change the current step
-                    this.listenTo( this.subviews[stepName], 'next-step', this.nextStep );
-                    this.listenTo( this.subviews[stepName], 'go-to-step', this.goToStep );
+                    this.listenTo(this.subviews[stepName], 'next-step', this.nextStep);
+                    this.listenTo(this.subviews[stepName], 'go-to-step', this.goToStep);
                 }
             }
         },
@@ -124,7 +124,7 @@ var edx = edx || {};
             var stepName, stepView, stepEl;
 
             // Get or create the step container
-            stepEl = $("#current-step-container");
+            stepEl = $('#current-step-container');
             if (!stepEl.length) {
                 stepEl = $('<div id="current-step-container"></div>').appendTo(this.el);
             }
@@ -132,8 +132,8 @@ var edx = edx || {};
             // Render the subview
             // When the view is rendered, it will overwrite the existing
             // step in the DOM.
-            stepName = this.displaySteps[ this.currentStepIndex ].name;
-            stepView = this.subviews[ stepName ];
+            stepName = this.displaySteps[this.currentStepIndex].name;
+            stepView = this.subviews[stepName];
             stepView.el = stepEl;
             stepView.render();
         },
@@ -146,18 +146,17 @@ var edx = edx || {};
             this.render();
         },
 
-        goToStep: function( stepName ) {
+        goToStep: function(stepName) {
             var stepIndex = _.indexOf(
-                _.pluck( this.displaySteps, 'name' ),
+                _.pluck(this.displaySteps, 'name'),
                 stepName
             );
 
-            if ( stepIndex >= 0 ) {
+            if (stepIndex >= 0) {
                 this.currentStepIndex = stepIndex;
             }
 
             this.render();
         }
     });
-
 })(jQuery, _, Backbone, gettext);

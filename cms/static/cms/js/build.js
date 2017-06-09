@@ -16,7 +16,7 @@
 
     var getModulesList = function(modules) {
         var result = [getModule(commonLibrariesPath)];
-        return result.concat(modules.map(function (moduleName) {
+        return result.concat(modules.map(function(moduleName) {
             return getModule(moduleName, true);
         }));
     };
@@ -53,7 +53,8 @@
             'js/factories/settings_graders',
             'js/factories/textbooks',
             'js/factories/videos_index',
-            'js/factories/xblock_validation'
+            'js/factories/xblock_validation',
+            'js/programs/program_admin_app'
         ]),
         /**
          * By default all the configuration for optimization happens from the command
@@ -170,4 +171,4 @@
          */
         logLevel: 1
     };
-}())
+}());

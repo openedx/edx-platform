@@ -2,20 +2,20 @@ define([
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'support/js/spec_helpers/enrollment_helpers',
     'support/js/models/enrollment'
-], function (AjaxHelpers, EnrollmentHelpers, EnrollmentModel) {
+], function(AjaxHelpers, EnrollmentHelpers, EnrollmentModel) {
     'use strict';
 
-    describe('EnrollmentModel', function () {
+    describe('EnrollmentModel', function() {
         var enrollment;
 
-        beforeEach(function () {
+        beforeEach(function() {
             enrollment = new EnrollmentModel(EnrollmentHelpers.mockEnrollmentData);
-            enrollment.url = function () {
+            enrollment.url = function() {
                 return '/support/enrollment/test-user';
             };
         });
 
-        it('can save an enrollment to the server and updates itself on success', function () {
+        it('can save an enrollment to the server and updates itself on success', function() {
             var requests = AjaxHelpers.requests(this),
                 manual_enrollment = {
                     'enrolled_by': 'staff@edx.org',
@@ -33,7 +33,7 @@ define([
             expect(enrollment.get('manual_enrollment')).toEqual(manual_enrollment);
         });
 
-        it('does not update itself on a server error', function () {
+        it('does not update itself on a server error', function() {
             var requests = AjaxHelpers.requests(this);
             enrollment.updateEnrollment('verified', 'Financial Assistance');
             AjaxHelpers.respondWithError(requests, 500);

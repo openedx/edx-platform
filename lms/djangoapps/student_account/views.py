@@ -8,6 +8,7 @@ from datetime import datetime
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse, resolve
 from django.http import (
     HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpRequest
@@ -21,15 +22,16 @@ from edxmako.shortcuts import render_to_response
 import pytz
 
 from commerce.models import CommerceConfiguration
-from external_auth.login_and_register import (
+from lms.djangoapps.commerce.utils import EcommerceService
+from openedx.core.djangoapps.external_auth.login_and_register import (
     login as external_auth_login,
     register as external_auth_register
 )
-from lang_pref.api import released_languages, all_languages
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
+from openedx.core.djangoapps.lang_pref.api import released_languages, all_languages
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
-from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
 from openedx.core.djangoapps.user_api.accounts.api import request_password_change
 from openedx.core.djangoapps.user_api.errors import UserNotFound
 from openedx.core.lib.time_zone_utils import TIME_ZONE_CHOICES
@@ -39,15 +41,17 @@ from student.views import (
     signin_user as old_login_view,
     register_user as old_register_view
 )
-from student.helpers import get_next_url_for_login_page
+from student.helpers import get_next_url_for_login_page, destroy_oauth_tokens
 import third_party_auth
 from third_party_auth import pipeline
 from third_party_auth.decorators import xframe_allow_whitelisted
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 from util.date_utils import strftime_localized
+from util.enterprise_helpers import set_enterprise_branding_filter_param
 
 AUDIT_LOG = logging.getLogger("audit")
 log = logging.getLogger(__name__)
+User = get_user_model()  # pylint:disable=invalid-name
 
 
 @require_http_methods(['GET'])
@@ -65,13 +69,27 @@ def login_and_registration_form(request, initial_mode="login"):
     """
     # Determine the URL to redirect to following login/registration/third_party_auth
     redirect_to = get_next_url_for_login_page(request)
-
     # If we're already logged in, redirect to the dashboard
     if request.user.is_authenticated():
         return redirect(redirect_to)
 
     # Retrieve the form descriptions from the user API
     form_descriptions = _get_form_descriptions(request)
+
+    # Our ?next= URL may itself contain a parameter 'tpa_hint=x' that we need to check.
+    # If present, we display a login page focused on third-party auth with that provider.
+    third_party_auth_hint = None
+    if '?' in redirect_to:
+        try:
+            next_args = urlparse.parse_qs(urlparse.urlparse(redirect_to).query)
+            provider_id = next_args['tpa_hint'][0]
+            if third_party_auth.provider.Registry.get(provider_id=provider_id):
+                third_party_auth_hint = provider_id
+                initial_mode = "hinted_login"
+        except (KeyError, ValueError, IndexError):
+            pass
+
+    set_enterprise_branding_filter_param(request=request, provider_id=third_party_auth_hint)
 
     # If this is a themed site, revert to the old login/registration pages.
     # We need to do this for now to support existing themes.
@@ -89,19 +107,6 @@ def login_and_registration_form(request, initial_mode="login"):
     if ext_auth_response is not None:
         return ext_auth_response
 
-    # Our ?next= URL may itself contain a parameter 'tpa_hint=x' that we need to check.
-    # If present, we display a login page focused on third-party auth with that provider.
-    third_party_auth_hint = None
-    if '?' in redirect_to:
-        try:
-            next_args = urlparse.parse_qs(urlparse.urlparse(redirect_to).query)
-            provider_id = next_args['tpa_hint'][0]
-            if third_party_auth.provider.Registry.get(provider_id=provider_id):
-                third_party_auth_hint = provider_id
-                initial_mode = "hinted_login"
-        except (KeyError, ValueError, IndexError):
-            pass
-
     # Otherwise, render the combined login/registration page
     context = {
         'data': {
@@ -110,6 +115,7 @@ def login_and_registration_form(request, initial_mode="login"):
             'third_party_auth': _third_party_auth_context(request, redirect_to),
             'third_party_auth_hint': third_party_auth_hint or '',
             'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
+            'support_link': configuration_helpers.get_value('SUPPORT_SITE_LINK', settings.SUPPORT_SITE_LINK),
 
             # Include form descriptions retrieved from the user API.
             # We could have the JS client make these requests directly,
@@ -125,7 +131,10 @@ def login_and_registration_form(request, initial_mode="login"):
         'responsive': True,
         'allow_iframing': True,
         'disable_courseware_js': True,
-        'disable_footer': True,
+        'disable_footer': not configuration_helpers.get_value(
+            'ENABLE_COMBINED_LOGIN_REGISTRATION_FOOTER',
+            settings.FEATURES['ENABLE_COMBINED_LOGIN_REGISTRATION_FOOTER']
+        ),
     }
 
     return render_to_response('student_account/login_and_register.html', context)
@@ -147,8 +156,7 @@ def password_change_request_handler(request):
 
     Returns:
         HttpResponse: 200 if the email was sent successfully
-        HttpResponse: 400 if there is no 'email' POST parameter, or if no user with
-            the provided email exists
+        HttpResponse: 400 if there is no 'email' POST parameter
         HttpResponse: 403 if the client has been rate limited
         HttpResponse: 405 if using an unsupported HTTP method
 
@@ -157,6 +165,7 @@ def password_change_request_handler(request):
         POST /account/password
 
     """
+
     limiter = BadRequestRateLimiter()
     if limiter.is_rate_limit_exceeded(request):
         AUDIT_LOG.warning("Password reset rate limit exceeded")
@@ -169,12 +178,12 @@ def password_change_request_handler(request):
     if email:
         try:
             request_password_change(email, request.get_host(), request.is_secure())
+            user = user if user.is_authenticated() else User.objects.get(email=email)
+            destroy_oauth_tokens(user)
         except UserNotFound:
             AUDIT_LOG.info("Invalid password reset attempt")
             # Increment the rate limit counter
             limiter.tick_bad_request_counter(request)
-
-            return HttpResponseBadRequest(_("No user with the provided email address exists."))
 
         return HttpResponse(status=200)
     else:
@@ -203,7 +212,7 @@ def _third_party_auth_context(request, redirect_to):
     }
 
     if third_party_auth.is_enabled():
-        for enabled in third_party_auth.provider.Registry.accepting_logins():
+        for enabled in third_party_auth.provider.Registry.displayed_for_login():
             info = {
                 "id": enabled.provider_id,
                 "name": enabled.name,
@@ -312,7 +321,7 @@ def _external_auth_intercept(request, mode):
 def get_user_orders(user):
     """Given a user, get the detail of all the orders from the Ecommerce service.
 
-    Arguments:
+    Args:
         user (User): The user to authenticate as when requesting ecommerce.
 
     Returns:
@@ -347,7 +356,7 @@ def get_user_orders(user):
                                     'order_date': strftime_localized(
                                         date_placed.replace(tzinfo=pytz.UTC), 'SHORT_DATE'
                                     ),
-                                    'receipt_url': commerce_configuration.receipt_page + order['number']
+                                    'receipt_url': EcommerceService().get_receipt_page_url(order['number'])
                                 }
                                 user_orders.append(order_data)
                             except KeyError:
@@ -436,6 +445,7 @@ def account_settings_context(request):
     context = {
         'auth': {},
         'duplicate_provider': None,
+        'nav_hidden': True,
         'fields': {
             'country': {
                 'options': list(countries),
@@ -453,7 +463,6 @@ def account_settings_context(request):
                 'options': all_languages(),
             }, 'time_zone': {
                 'options': TIME_ZONE_CHOICES,
-                'enabled': settings.FEATURES.get('ENABLE_TIME_ZONE_PREFERENCE'),
             }
         },
         'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
@@ -487,6 +496,8 @@ def account_settings_context(request):
             # If the user is connected, sending a POST request to this url removes the connection
             # information for this provider from their edX account.
             'disconnect_url': pipeline.get_disconnect_url(state.provider.provider_id, state.association_id),
-        } for state in auth_states]
+            # We only want to include providers if they are either currently available to be logged
+            # in with, or if the user is already authenticated with them.
+        } for state in auth_states if state.provider.display_for_login or state.has_account]
 
     return context

@@ -163,14 +163,20 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
         self.assertEqual(consumer.instance_guid, u'consumer instance guid')
 
 
-@attr('shard_3')
+@attr(shard=3)
 class LtiLaunchTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCase):
     """
     Tests for the rendering returned by lti_launch view.
     This class overrides the get_response method, which is used by
     the tests defined in RenderXBlockTestMixin.
     """
-    def get_response(self, url_encoded_params=None):
+    def setUp(self):
+        """
+        Set up tests
+        """
+        super(LtiLaunchTestRender, self).setUp()
+
+    def get_response(self, usage_key, url_encoded_params=None):
         """
         Overridable method to get the response from the endpoint that is being tested.
         """
@@ -178,7 +184,7 @@ class LtiLaunchTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCa
             'lti_provider_launch',
             kwargs={
                 'course_id': unicode(self.course.id),
-                'usage_id': unicode(self.html_block.location)
+                'usage_id': unicode(usage_key)
             }
         )
         if url_encoded_params:

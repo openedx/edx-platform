@@ -6,13 +6,13 @@ import boto
 import ddt
 from django.conf import settings
 from django.db import IntegrityError
-from django.test import TestCase
 from freezegun import freeze_time
 import mock
 from mock import patch
 from nose.tools import assert_is_none, assert_equals, assert_raises, assert_true, assert_false  # pylint: disable=no-name-in-module
 import pytz
 import requests.exceptions
+from testfixtures import LogCapture
 
 from common.test.utils import MockS3Mixin
 from student.tests.factories import UserFactory
@@ -28,6 +28,7 @@ from lms.djangoapps.verify_student.models import (
     VerificationStatus, SkippedReverification,
     VerificationDeadline
 )
+
 
 FAKE_SETTINGS = {
     "SOFTWARE_SECURE": {
@@ -72,8 +73,8 @@ def mock_software_secure_post(url, headers=None, data=None, **kwargs):
         )
 
     # The keys should be stored as Base64 strings, i.e. this should not explode
-    photo_id_key = data_dict["PhotoIDKey"].decode("base64")
-    user_photo_key = data_dict["UserPhotoKey"].decode("base64")
+    data_dict["PhotoIDKey"].decode("base64")
+    data_dict["UserPhotoKey"].decode("base64")
 
     response = requests.Response()
     response.status_code = 200
@@ -205,10 +206,15 @@ class TestPhotoVerification(MockS3Mixin, ModuleStoreTestCase):
             attempt = self.create_and_submit()
             assert_equals(attempt.status, "must_retry")
 
-        # We try to post, but run into an error (in this case a newtork connection error)
+        # We try to post, but run into an error (in this case a network connection error)
         with patch('lms.djangoapps.verify_student.models.requests.post', new=mock_software_secure_post_unavailable):
-            attempt = self.create_and_submit()
-            assert_equals(attempt.status, "must_retry")
+            with LogCapture('lms.djangoapps.verify_student.models') as logger:
+                attempt = self.create_and_submit()
+                assert_equals(attempt.status, "must_retry")
+                logger.check(
+                    ('lms.djangoapps.verify_student.models', 'ERROR',
+                     'Software Secure submission failed for user %s, setting status to must_retry'
+                     % attempt.user.username))
 
     @mock.patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
     def test_submission_while_testing_flag_is_true(self):
@@ -383,8 +389,9 @@ class TestPhotoVerification(MockS3Mixin, ModuleStoreTestCase):
         self.assertTrue(attempt.active_at_datetime(before_expiration))
 
         # Not active after the expiration date
-        after = expiration + timedelta(seconds=1)
-        self.assertFalse(attempt.active_at_datetime(after))
+        attempt.created_at = attempt.created_at - timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
+        attempt.save()
+        self.assertFalse(attempt.active_at_datetime(datetime.now(pytz.UTC) + timedelta(days=1)))
 
     def test_verification_for_datetime(self):
         user = UserFactory.create()
@@ -428,7 +435,9 @@ class TestPhotoVerification(MockS3Mixin, ModuleStoreTestCase):
         self.assertEqual(result, attempt)
 
         # Immediately after the expiration date, should not get the attempt
-        after = expiration + timedelta(seconds=1)
+        attempt.created_at = attempt.created_at - timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
+        attempt.save()
+        after = datetime.now(pytz.UTC) + timedelta(days=1)
         query = SoftwareSecurePhotoVerification.objects.filter(user=user)
         result = SoftwareSecurePhotoVerification.verification_for_datetime(after, query)
         self.assertIs(result, None)

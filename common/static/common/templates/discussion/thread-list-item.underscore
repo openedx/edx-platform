@@ -21,6 +21,15 @@
       <span class="icon fa <%= icon_class %>" aria-hidden="true"></span>
     </div><div class="forum-nav-thread-wrapper-1">
       <span class="forum-nav-thread-title"><%- title %></span>
+      <% if(typeof(username) !== "undefined" && typeof(created_at) !== "undefined") { %>
+        <div class="posted-details">
+          <%- gettext("discussion posted") %> <span class="timeago" title="<%- created_at %>"><%- created_at %></span> by
+          <span class="username"><%- username %></span>
+        </div>
+      <% } %>
+      <% if (showThreadPreview){ %>
+        <div class="thread-preview-body"><%- threadPreview %></div>
+      <% } %>
       <% if(typeof(subscribed) === "undefined") { var subscribed = null; } %>
       <% if(pinned || subscribed || staff_authored || community_ta_authored) { %>
         <ul class="forum-nav-thread-labels">
@@ -54,6 +63,19 @@
         <% } %>
         </ul>
       <% } %>
+      <div class="post-context"><div class="group-visibility-label">
+        <% if (typeof(group_name) !== "undefined" && group_name) { %>
+            <%-
+            interpolate(
+                gettext('This post is visible only to %(group_name)s.'),
+                {group_name: group_name},
+                true
+            )
+            %>
+        <% } else { %>
+            <%- gettext('This post is visible to everyone.') %>
+        <% } %>
+      </div></div>
     </div><div class="forum-nav-thread-wrapper-2">
       <%
       // Translators: 'votes_count' is a numerical placeholder for a specific discussion thread; 'span_start' and 'span_end' placeholders refer to HTML markup.  Please translate the word 'votes'.

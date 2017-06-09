@@ -13,7 +13,7 @@ from xblock.fields import Scope, String
 from xblock.fragment import Fragment
 
 from openedx.core.lib.xblock_builtin.xblock_discussion_course.utils import (
-    _, get_js_dependencies, render_mustache_templates
+    _, get_js_dependencies,
 )
 
 
@@ -65,10 +65,6 @@ class DiscussionCourseXBlock(XBlock):
         for js_file in self.js_dependencies():
             fragment.add_javascript_url(static(js_file))
 
-        fragment.add_javascript(loader.load_unicode("static/js/discussion_classes.js"))
-
-        fragment.add_javascript_url(static('js/discussion_forum.js'))
-
         fragment.add_javascript(loader.render_template('static/js/discussion_course.js', {
             'course_id': self.course_id
         }))
@@ -93,9 +89,7 @@ class DiscussionCourseXBlock(XBlock):
         context = discussion_service.get_course_template_context()
         context['enable_new_post_btn'] = True
 
-        fragment.add_content(self.runtime.render_template('discussion/_discussion_course.html', context))
-
-        fragment.add_content(render_mustache_templates())
+        fragment.add_content(self.runtime.render_template('discussion/_course_discussion_section.html', context))
 
         fragment.initialize_js('DiscussionCourseBlock')
 

@@ -1,7 +1,6 @@
-;(function (define) {
+(function(define) {
     'use strict';
     define(['backbone'], function(Backbone) {
-
         var CohortModel = Backbone.Model.extend({
             idAttribute: 'id',
             defaults: {

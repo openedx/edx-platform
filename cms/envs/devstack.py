@@ -31,6 +31,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 ################################# LMS INTEGRATION #############################
 
 LMS_BASE = "localhost:8000"
+LMS_ROOT_URL = "http://{}".format(LMS_BASE)
 FEATURES['PREVIEW_LMS_BASE'] = "preview." + LMS_BASE
 
 ########################### PIPELINE #################################
@@ -78,7 +79,12 @@ DEBUG_TOOLBAR_PANELS = (
 )
 
 DEBUG_TOOLBAR_CONFIG = {
-    'SHOW_TOOLBAR_CALLBACK': 'cms.envs.devstack.should_show_debug_toolbar'
+    # Profile panel is incompatible with wrapped views
+    # See https://github.com/jazzband/django-debug-toolbar/issues/792
+    'DISABLE_PANELS': (
+        'debug_toolbar.panels.profiling.ProfilingPanel',
+    ),
+    'SHOW_TOOLBAR_CALLBACK': 'cms.envs.devstack.should_show_debug_toolbar',
 }
 
 
@@ -122,6 +128,12 @@ REQUIRE_DEBUG = DEBUG
 
 ########################### OAUTH2 #################################
 OAUTH_OIDC_ISSUER = 'http://127.0.0.1:8000/oauth2'
+
+JWT_AUTH.update({
+    'JWT_SECRET_KEY': 'lms-secret',
+    'JWT_ISSUER': 'http://127.0.0.1:8000/oauth2',
+    'JWT_AUDIENCE': 'lms-key',
+})
 
 ###############################################################################
 # See if the developer has any local overrides.

@@ -131,13 +131,6 @@ def _create_entrance_exam(request, course_key, entrance_exam_minimum_score_pct=N
         return HttpResponse(status=400)
 
     # Create the entrance exam item (currently it's just a chapter)
-    payload = {
-        'category': "chapter",
-        'display_name': _("Entrance Exam"),
-        'parent_locator': unicode(course.location),
-        'is_entrance_exam': True,
-        'in_entrance_exam': True,
-    }
     parent_locator = unicode(course.location)
     created_block = create_xblock(
         parent_locator=parent_locator,

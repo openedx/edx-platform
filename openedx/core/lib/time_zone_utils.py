@@ -2,19 +2,7 @@
 Utilities related to timezones
 """
 from datetime import datetime
-
 from pytz import common_timezones, timezone, utc
-
-
-def get_user_time_zone(user):
-    """
-    Returns pytz time zone object of the user's time zone if available or UTC time zone if unavailable
-    """
-    #TODO: exception for unknown timezones?
-    time_zone = user.preferences.model.get_value(user, "time_zone")
-    if time_zone is not None:
-        return timezone(time_zone)
-    return utc
 
 
 def _format_time_zone_string(time_zone, date_time, format_string):
@@ -45,12 +33,13 @@ def get_time_zone_offset(time_zone, date_time=None):
     return _format_time_zone_string(time_zone, date_time, '%z')
 
 
-def get_formatted_time_zone(time_zone):
+def get_display_time_zone(time_zone_name):
     """
-    Returns a formatted time zone (e.g. 'Asia/Tokyo (JST, UTC+0900)')
+    Returns a formatted display time zone (e.g. 'Asia/Tokyo (JST, UTC+0900)')
 
-    :param time_zone: Pytz time zone object
+    :param time_zone_name (str): Name of Pytz time zone
     """
+    time_zone = timezone(time_zone_name)
     tz_abbr = get_time_zone_abbr(time_zone)
     tz_offset = get_time_zone_offset(time_zone)
 
@@ -58,6 +47,6 @@ def get_formatted_time_zone(time_zone):
 
 
 TIME_ZONE_CHOICES = sorted(
-    [(tz, get_formatted_time_zone(timezone(tz))) for tz in common_timezones],
+    [(tz, get_display_time_zone(tz)) for tz in common_timezones],
     key=lambda tz_tuple: tz_tuple[1]
 )

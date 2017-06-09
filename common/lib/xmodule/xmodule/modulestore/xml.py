@@ -730,6 +730,7 @@ class XMLModuleStore(ModuleStoreReadBase):
                             tab = CourseTabList.get_tab_by_slug(tab_list=course_descriptor.tabs, url_slug=slug)
                             if tab:
                                 module.display_name = tab.name
+                                module.course_staff_only = tab.course_staff_only
                         module.data_dir = course_dir
                         module.save()
 

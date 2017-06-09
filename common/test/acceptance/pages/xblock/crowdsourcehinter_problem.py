@@ -26,7 +26,7 @@ class CrowdsourcehinterProblemPage(PageObject):
         Submit an answer to the problem block
         """
         self.q(css='input[type="text"]').fill(text)
-        self.q(css='.action [data-value="Check"]').click()
+        self.q(css='.action [data-value="Submit"]').click()
         self.wait_for_ajax()
 
     def get_hint_text(self):

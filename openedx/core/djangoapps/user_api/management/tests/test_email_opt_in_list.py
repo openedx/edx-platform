@@ -23,7 +23,7 @@ from openedx.core.djangoapps.user_api.models import UserOrgTag
 from openedx.core.djangoapps.user_api.management.commands import email_opt_in_list
 
 
-@attr('shard_2')
+@attr(shard=2)
 @ddt.ddt
 @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class EmailOptInListTest(ModuleStoreTestCase):

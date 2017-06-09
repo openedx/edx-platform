@@ -2,7 +2,10 @@
 Django REST Framework serializers for the User API application
 """
 from django.contrib.auth.models import User
+from django.utils.timezone import now
 from rest_framework import serializers
+
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from student.models import UserProfile
 
 from .models import UserPreference
@@ -81,3 +84,28 @@ class ReadOnlyFieldsSerializerMixin(object):
         """
         all_fields = getattr(cls.Meta, 'fields', tuple())
         return tuple(set(all_fields) - set(cls.get_read_only_fields()))
+
+
+class CountryTimeZoneSerializer(serializers.Serializer):  # pylint: disable=abstract-method
+    """
+    Serializer that generates a list of common time zones for a country
+    """
+    time_zone = serializers.CharField()
+    description = serializers.CharField()
+
+
+class SoftwareSecurePhotoVerificationSerializer(serializers.ModelSerializer):
+    """
+    Serializer that generates a representation of a user's photo verification status.
+    """
+    is_verified = serializers.SerializerMethodField()
+
+    def get_is_verified(self, obj):
+        """
+        Return a boolean indicating if a the user is verified.
+        """
+        return obj.status == 'approved' and obj.expiration_datetime > now()
+
+    class Meta(object):
+        fields = ('status', 'expiration_datetime', 'is_verified')
+        model = SoftwareSecurePhotoVerification

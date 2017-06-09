@@ -27,9 +27,15 @@ class Comment(models.Model):
     base_url = "{prefix}/comments".format(prefix=settings.PREFIX)
     type = 'comment'
 
+    def __init__(self, *args, **kwargs):
+        super(Comment, self).__init__(*args, **kwargs)
+        self._cached_thread = None
+
     @property
     def thread(self):
-        return Thread(id=self.thread_id, type='thread')
+        if not self._cached_thread:
+            self._cached_thread = Thread(id=self.thread_id, type='thread')
+        return self._cached_thread
 
     @property
     def context(self):

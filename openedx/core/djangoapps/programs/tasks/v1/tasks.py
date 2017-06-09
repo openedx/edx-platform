@@ -5,13 +5,15 @@ from celery import task
 from celery.utils.log import get_task_logger  # pylint: disable=no-name-in-module, import-error
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.exceptions import ImproperlyConfigured
 from edx_rest_api_client.client import EdxRestApiClient
+from provider.oauth2.models import Client
 
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 from openedx.core.djangoapps.credentials.utils import get_user_credentials
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
-from openedx.core.lib.token_utils import get_id_token
+from openedx.core.lib.token_utils import JwtBuilder
 
 
 LOGGER = get_task_logger(__name__)
@@ -31,8 +33,21 @@ def get_api_client(api_config, student):
         EdxRestApiClient
 
     """
-    id_token = get_id_token(student, api_config.OAUTH2_CLIENT_NAME)
-    return EdxRestApiClient(api_config.internal_api_url, jwt=id_token)
+    # TODO: Use the system's JWT_AUDIENCE and JWT_SECRET_KEY instead of client ID and name.
+    client_name = api_config.OAUTH2_CLIENT_NAME
+
+    try:
+        client = Client.objects.get(name=client_name)
+    except Client.DoesNotExist:
+        raise ImproperlyConfigured(
+            'OAuth2 Client with name [{}] does not exist.'.format(client_name)
+        )
+
+    scopes = ['email', 'profile']
+    expires_in = settings.OAUTH_ID_TOKEN_EXPIRATION
+    jwt = JwtBuilder(student, secret=client.client_secret).build_token(scopes, expires_in, aud=client.client_id)
+
+    return EdxRestApiClient(api_config.internal_api_url, jwt=jwt)
 
 
 def get_completed_programs(student):

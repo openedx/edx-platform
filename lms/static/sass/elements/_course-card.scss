@@ -1,5 +1,7 @@
 .course-card {
-  width: 85%;
+  @include span(10);
+  @include pre(1);
+  @include post(1);
   margin: {
     left: auto;
     right: auto;
@@ -8,18 +10,16 @@
   padding: $baseline/2 0;
 
   .section {
-    @extend .grid-container;
     @extend .grid-manual;
-
     padding: $baseline/2 $baseline;
   }
 
-  .course-image-container{
+  .course-image-container {
     @include float(left);
 
     .header-img {
       max-width: 100%;
-      @include susy-media($bp-screen-sm) {
+      @media(min-width: $bp-screen-sm) {
         max-width: 191px;
       }
     }
@@ -28,7 +28,7 @@
   .course-details {
     @include float(right);
     width: 100%;
-    @include susy-media($bp-screen-sm) { width: calc(100% - 191px); }
+    @media(min-width: $bp-screen-sm) { width: calc(100% - 191px); }
     padding-left: $baseline*1.5;
 
     .course-title {
@@ -47,34 +47,39 @@
   }
 
   .course-actions {
+
     .enrollment-info {
       width: $baseline*10;
       text-align: center;
       margin-bottom: $baseline/2;
       text-transform: uppercase;
     }
-    .select-error{
-      color: palette(error, base);
+
+    .select-error {
+      color: palette(error, text);
       margin-bottom: $baseline/4;
       font-size: font-size(small);
       visibility: hidden;
     }
-    .no-action-message{
+
+    .no-action-message {
+      margin-top: $baseline*2;
       margin-bottom: $baseline/2;
       color: palette(grayscale, dark);
       font-size: font-size(large);
       text-align: center;
       text-transform: uppercase;
-      margin-top: $baseline*2;
     }
-    .enrollment-opens{
+
+    .enrollment-opens {
       text-align: center;
       margin-bottom: $baseline/2;
-      .enrollment-open-date{
-         white-space: nowrap;
+      .enrollment-open-date {
+        white-space: nowrap;
       }
     }
-    .run-select-container{
+
+    .run-select-container {
       margin-bottom: $baseline;
 
       .run-select {
@@ -87,7 +92,7 @@
       text-align: center;
     }
 
-    .view-course-link{
+    .view-course-link {
       min-width: $baseline*10;
       text-align: center;
     }
@@ -95,14 +100,14 @@
 
   .cta-primary {
     display: inline-block;
-    background-color: palette(success, dark);
-    border-color: palette(success, dark);
+    background-color: palette(success, text);
+    border-color: palette(success, text);
 
     &:active,
     &:focus,
     &:hover {
-      background-color: palette(success, base);
-      border-color: palette(success, base);
+      background-color: palette(success, accent);
+      border-color: palette(success, accent);
     }
   }
 
@@ -126,17 +131,17 @@
   .message {
     margin-bottom: $baseline;
 
-    @include susy-media($bp-screen-md) {
+    @media(min-width: $bp-screen-md) {
       margin-bottom: 0;
     }
   }
-  
+
   .upgrade-message,
   .certificate-status {
-    border-top: 1px solid palette(grayscale, x-trans);
+    border-top: 1px solid palette(grayscale, back);
     padding-top: $baseline;
 
-    @include susy-media($bp-screen-md) {
+    @media(min-width: $bp-screen-md) {
       display: flex;
       align-items: center;
     }

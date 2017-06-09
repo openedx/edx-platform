@@ -4,15 +4,15 @@ Acceptance tests for licensing of the Video module
 """
 from __future__ import unicode_literals
 from nose.plugins.attrib import attr
-from ..studio.base_studio_test import StudioCourseTest
+from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest
 
-#from ..helpers import UniqueCourseTest
-from ...pages.studio.overview import CourseOutlinePage
-from ...pages.lms.courseware import CoursewarePage
-from ...fixtures.course import XBlockFixtureDesc
+#from common.test.acceptance.tests.helpers import UniqueCourseTest
+from common.test.acceptance.pages.studio.overview import CourseOutlinePage
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 
 
-@attr('shard_2')
+@attr(shard=2)
 class VideoLicenseTest(StudioCourseTest):
     """
     Tests for video module-level licensing (that is, setting the license,

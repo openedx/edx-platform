@@ -1,18 +1,20 @@
 """
 This module contains signals needed for email integration
 """
-import logging
-import datetime
 import crum
+import datetime
+import logging
 
+from django.conf import settings
 from django.dispatch import receiver
 
-from student.models import ENROLL_STATUS_CHANGE
 from student.cookies import CREATE_LOGON_COOKIE
 from student.views import REGISTER_USER
 from email_marketing.models import EmailMarketingConfiguration
 from util.model_utils import USER_FIELD_CHANGED
-from lms.djangoapps.email_marketing.tasks import update_user, update_user_email, update_course_enrollment
+from lms.djangoapps.email_marketing.tasks import (
+    update_user, update_user_email
+)
 
 from sailthru.sailthru_client import SailthruClient
 from sailthru.sailthru_error import SailthruClientError
@@ -23,47 +25,6 @@ log = logging.getLogger(__name__)
 CHANGED_FIELDNAMES = ['username', 'is_active', 'name', 'gender', 'education',
                       'age', 'level_of_education', 'year_of_birth',
                       'country']
-
-
-@receiver(ENROLL_STATUS_CHANGE)
-def handle_enroll_status_change(sender, event=None, user=None, mode=None, course_id=None, cost=None, currency=None,
-                                **kwargs):  # pylint: disable=unused-argument
-    """
-    Signal receiver for enroll/unenroll/purchase events
-    """
-    email_config = EmailMarketingConfiguration.current()
-    if not email_config.enabled or not event or not user or not mode or not course_id:
-        return
-
-    request = crum.get_current_request()
-    if not request:
-        return
-
-    # figure out course url
-    course_url = _build_course_url(request, course_id.to_deprecated_string())
-
-    # pass event to email_marketing.tasks
-    update_course_enrollment.delay(user.email, course_url, event, mode,
-                                   unit_cost=cost, course_id=course_id, currency=currency,
-                                   message_id=request.COOKIES.get('sailthru_bid'))
-
-
-def _build_course_url(request, course_id):
-    """
-    Build a course url from a course id and the host from the current request
-    :param request:
-    :param course_id:
-    :return:
-    """
-    host = request.get_host()
-    # hack for integration testing since Sailthru rejects urls with localhost
-    if host.startswith('localhost'):
-        host = 'courses.edx.org'
-    return '{scheme}://{host}/courses/{course}/info'.format(
-        scheme=request.scheme,
-        host=host,
-        course=course_id
-    )
 
 
 @receiver(CREATE_LOGON_COOKIE)
@@ -111,13 +72,16 @@ def add_email_marketing_cookies(sender, response=None, user=None,
             response.set_cookie(
                 'sailthru_hid',
                 cookie,
-                max_age=365 * 24 * 60 * 60  # set for 1 year
+                max_age=365 * 24 * 60 * 60,  # set for 1 year
+                domain=settings.SESSION_COOKIE_DOMAIN,
+                path='/',
             )
         else:
             log.error("No cookie returned attempting to obtain cookie from Sailthru for %s", user.email)
     else:
         error = sailthru_response.get_error()
-        log.error("Error attempting to obtain cookie from Sailthru: %s", error.get_message())
+        # generally invalid email address
+        log.info("Error attempting to obtain cookie from Sailthru: %s", error.get_message())
     return response
 
 
@@ -142,7 +106,9 @@ def email_marketing_register_user(sender, user=None, profile=None,
         return
 
     # perform update asynchronously
-    update_user.delay(user.username, new_user=True)
+    update_user.delay(
+        _create_sailthru_user_vars(user, user.profile), user.email, site=_get_current_site(), new_user=True
+    )
 
 
 @receiver(USER_FIELD_CHANGED)
@@ -178,13 +144,45 @@ def email_marketing_user_field_changed(sender, user=None, table=None, setting=No
         email_config = EmailMarketingConfiguration.current()
         if not email_config.enabled:
             return
+
         # perform update asynchronously, flag if activation
-        update_user.delay(user.username, new_user=False,
-                          activation=(setting == 'is_active') and new_value is True)
+        update_user.delay(_create_sailthru_user_vars(user, user.profile), user.email, site=_get_current_site(),
+                          new_user=False, activation=(setting == 'is_active') and new_value is True)
 
     elif setting == 'email':
         # email update is special case
         email_config = EmailMarketingConfiguration.current()
         if not email_config.enabled:
             return
-        update_user_email.delay(user.username, old_value)
+        update_user_email.delay(user.email, old_value)
+
+
+def _create_sailthru_user_vars(user, profile):
+    """
+    Create sailthru user create/update vars from user + profile.
+    """
+    sailthru_vars = {'username': user.username,
+                     'activated': int(user.is_active),
+                     'joined_date': user.date_joined.strftime("%Y-%m-%d")}
+
+    if profile:
+        sailthru_vars['fullname'] = profile.name
+        sailthru_vars['gender'] = profile.gender
+        sailthru_vars['education'] = profile.level_of_education
+
+        if profile.year_of_birth:
+            sailthru_vars['year_of_birth'] = profile.year_of_birth
+        sailthru_vars['country'] = unicode(profile.country.code)
+
+    return sailthru_vars
+
+
+def _get_current_site():
+    """
+    Returns the site for the current request if any.
+    """
+    request = crum.get_current_request()
+    if not request:
+        return
+
+    return {'id': request.site.id, 'domain': request.site.domain, 'name': request.site.name}

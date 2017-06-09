@@ -1,3 +1,1 @@
-<li role="menuitem" class="topic-menu-item">
-    <button class="btn-link topic-title topic-menu-entry" data-discussion-id="<%- id %>" data-cohorted="<%- is_cohorted %>"><%- text %></button>
-</li>
+<option class="topic-title" data-discussion-id="<%- id %>" data-cohorted="<%- is_cohorted %>"><%- text %></option>

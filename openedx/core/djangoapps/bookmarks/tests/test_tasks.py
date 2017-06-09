@@ -4,6 +4,8 @@ Tests for tasks.
 import ddt
 from nose.plugins.attrib import attr
 
+from django.conf import settings
+
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import check_mongo_calls, ItemFactory
 
@@ -12,7 +14,7 @@ from ..tasks import _calculate_course_xblocks_data, _update_xblocks_cache
 from .test_models import BookmarksTestsBase
 
 
-@attr('shard_2')
+@attr(shard=2)
 @ddt.ddt
 class XBlockCacheTaskTests(BookmarksTestsBase):
     """
@@ -101,11 +103,11 @@ class XBlockCacheTaskTests(BookmarksTestsBase):
         }
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 2, 2, 3),
-        (ModuleStoreEnum.Type.mongo, 4, 2, 3),
-        (ModuleStoreEnum.Type.mongo, 2, 3, 4),
-        (ModuleStoreEnum.Type.mongo, 4, 3, 4),
-        (ModuleStoreEnum.Type.mongo, 2, 4, 5),
+        (ModuleStoreEnum.Type.mongo, 2, 2, 4),
+        (ModuleStoreEnum.Type.mongo, 4, 2, 4),
+        (ModuleStoreEnum.Type.mongo, 2, 3, 5),
+        (ModuleStoreEnum.Type.mongo, 4, 3, 5),
+        (ModuleStoreEnum.Type.mongo, 2, 4, 6),
         # (ModuleStoreEnum.Type.mongo, 4, 4, 6), Too slow.
         (ModuleStoreEnum.Type.split, 2, 2, 3),
         (ModuleStoreEnum.Type.split, 4, 2, 3),
@@ -116,6 +118,9 @@ class XBlockCacheTaskTests(BookmarksTestsBase):
     def test_calculate_course_xblocks_data_queries(self, store_type, children_per_block, depth, expected_mongo_calls):
 
         course = self.create_course_with_blocks(children_per_block, depth, store_type)
+
+        # clear cache to get consistent query counts
+        self.clear_caches()
 
         with check_mongo_calls(expected_mongo_calls):
             blocks_data = _calculate_course_xblocks_data(course.id)
@@ -151,6 +156,12 @@ class XBlockCacheTaskTests(BookmarksTestsBase):
         Test that the xblocks data is persisted correctly.
         """
         course = getattr(self, course_attr)
+
+        if settings.ROOT_URLCONF == 'lms.urls':
+            # When the tests run under LMS, there is a certificates course_published
+            # signal handler that runs and causes the number of queries to be one more
+            # (due to the check for disabled_xblocks in django.py).
+            expected_sql_queries += 1
 
         with self.assertNumQueries(expected_sql_queries):
             _update_xblocks_cache(course.id)

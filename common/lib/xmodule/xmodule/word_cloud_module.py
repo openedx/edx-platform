@@ -15,6 +15,7 @@ from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xmodule.x_module import XModule
 
 from xblock.fields import Scope, Dict, Boolean, List, Integer, String
+from xblock.fragment import Fragment
 
 log = logging.getLogger(__name__)
 
@@ -37,20 +38,25 @@ class WordCloudFields(object):
     """XFields for word cloud."""
     display_name = String(
         display_name=_("Display Name"),
-        help=_("Display name for this module"),
+        help=_("The label for this word cloud on the course page."),
         scope=Scope.settings,
         default="Word cloud"
     )
+    instructions = String(
+        display_name=_("Instructions"),
+        help=_("Add instructions to help learners understand how to use the word cloud. Clear instructions are important, especially for learners who have accessibility requirements."),  # nopep8 pylint: disable=C0301
+        scope=Scope.settings,
+    )
     num_inputs = Integer(
         display_name=_("Inputs"),
-        help=_("Number of text boxes available for students to input words/sentences."),
+        help=_("The number of text boxes available for learners to add words and sentences."),
         scope=Scope.settings,
         default=5,
         values={"min": 1}
     )
     num_top_words = Integer(
         display_name=_("Maximum Words"),
-        help=_("Maximum number of words to be displayed in generated word cloud."),
+        help=_("The maximum number of words displayed in the generated word cloud."),
         scope=Scope.settings,
         default=250,
         values={"min": 1}
@@ -64,7 +70,7 @@ class WordCloudFields(object):
 
     # Fields for descriptor.
     submitted = Boolean(
-        help=_("Whether this student has posted words to the cloud."),
+        help=_("Whether this learner has posted words to the cloud."),
         scope=Scope.user_state,
         default=False
     )
@@ -74,7 +80,7 @@ class WordCloudFields(object):
         default=[]
     )
     all_words = Dict(
-        help=_("All possible words from all students."),
+        help=_("All possible words from all learners."),
         scope=Scope.user_state_summary
     )
     top_words = Dict(
@@ -86,12 +92,8 @@ class WordCloudFields(object):
 class WordCloudModule(WordCloudFields, XModule):
     """WordCloud Xmodule"""
     js = {
-        'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee')],
         'js': [
-            resource_string(__name__, 'js/src/word_cloud/d3.min.js'),
-            resource_string(__name__, 'js/src/word_cloud/d3.layout.cloud.js'),
-            resource_string(__name__, 'js/src/word_cloud/word_cloud.js'),
-            resource_string(__name__, 'js/src/word_cloud/word_cloud_main.js'),
+            resource_string(__name__, 'js/src/javascript_loader.js'),
         ],
     }
     css = {'scss': [resource_string(__name__, 'css/word_cloud/display.scss')]}
@@ -232,21 +234,38 @@ class WordCloudModule(WordCloudFields, XModule):
                 'error': 'Unknown Command!'
             })
 
-    def get_html(self):
-        """Template rendering."""
-        context = {
-            'element_id': self.location.html_id(),
-            'element_class': self.location.category,
+    def student_view(self, context):
+        """
+        Renders the output that a student will see.
+        """
+        fragment = Fragment()
+
+        fragment.add_content(self.system.render_template('word_cloud.html', {
             'ajax_url': self.system.ajax_url,
+            'display_name': self.display_name,
+            'instructions': self.instructions,
+            'element_class': self.location.category,
+            'element_id': self.location.html_id(),
             'num_inputs': self.num_inputs,
-            'submitted': self.submitted
-        }
-        self.content = self.system.render_template('word_cloud.html', context)
-        return self.content
+            'submitted': self.submitted,
+        }))
+
+        fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/d3.min.js'))
+        fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/d3.layout.cloud.js'))
+        fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/word_cloud.js'))
+        fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/word_cloud_main.js'))
+
+        return fragment
+
+    def author_view(self, context):
+        """
+        Renders the output that an author will see.
+        """
+        return self.student_view(context)
 
 
 class WordCloudDescriptor(WordCloudFields, MetadataOnlyEditingDescriptor, EmptyDataRawDescriptor):
     """Descriptor for WordCloud Xmodule."""
     module_class = WordCloudModule
-    resources_dir = None
+    resources_dir = 'assets/word_cloud'
     template_dir_name = 'word_cloud'

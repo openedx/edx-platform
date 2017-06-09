@@ -155,7 +155,7 @@ class CreditService(object):
             return None
 
         api_set_credit_requirement_status(
-            user.username,
+            user,
             course_key,
             req_namespace,
             req_name,

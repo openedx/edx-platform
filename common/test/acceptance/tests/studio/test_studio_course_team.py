@@ -3,14 +3,14 @@ Acceptance tests for course in studio
 """
 from nose.plugins.attrib import attr
 
-from .base_studio_test import StudioCourseTest
-from ...pages.studio.auto_auth import AutoAuthPage
+from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest
+from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
 
-from ...pages.studio.users import CourseTeamPage
-from ...pages.studio.index import DashboardPage
+from common.test.acceptance.pages.studio.users import CourseTeamPage
+from common.test.acceptance.pages.studio.index import DashboardPage
 
 
-@attr('shard_2')
+@attr(shard=2)
 class CourseTeamPageTest(StudioCourseTest):
     """ As a course author, I want to be able to add others to my team """
     def _make_user(self, username):
@@ -25,6 +25,17 @@ class CourseTeamPageTest(StudioCourseTest):
             username=user.get('username'), email=user.get('email'), password=user.get('password')
         ).visit()
         return user
+
+    def _update_user(self, user_info):
+        """
+        Update user with provided `user_info`
+
+        Arguments:
+            `user_info`: dictionary containing values of attributes to be updated
+        """
+        AutoAuthPage(
+            self.browser, no_login=True, **user_info
+        ).visit()
 
     def setUp(self, is_staff=False):
         """
@@ -173,6 +184,34 @@ class CourseTeamPageTest(StudioCourseTest):
 
         self.log_in(self.other_user)
         self._assert_current_course(visible=False)
+
+    def test_admins_can_delete_other_inactive_users(self):
+        """
+        Scenario: Admins can delete other inactive users
+        Given I have opened a new course in Studio
+        And I am viewing the course team settings.
+        When I add other user to the course team,
+        And then delete that other user from the course team.
+        And other user logs in
+        Then he/she does not see the course on page
+        """
+        self.page.add_user_to_course(self.other_user.get('email'))
+        self._assert_user_present(self.other_user, present=True)
+
+        # inactivate user
+        user_info = {
+            'username': self.other_user.get('username'),
+            'email': self.other_user.get('email'),
+            'password': self.other_user.get('password'),
+            'is_active': False
+        }
+        self._update_user(user_info)
+
+        # go to course team page to perform delete operation
+        self._go_to_course_team_page()
+        self.page.delete_user_from_course(self.other_user.get('email'))
+
+        self._assert_user_present(self.other_user, present=False)
 
     def test_admins_cannot_add_users_that_do_not_exist(self):
         """

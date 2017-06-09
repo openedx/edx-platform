@@ -73,12 +73,6 @@
                 return this.trigger('thread:_delete', event);
             };
 
-            DiscussionThreadShowView.prototype.highlight = function(el) {
-                if (el.html()) {
-                    return el.html(el.html().replace(/&lt;mark&gt;/g, "<mark>").replace(/&lt;\/mark&gt;/g, "</mark>"));
-                }
-            };
-
             return DiscussionThreadShowView;
         })(DiscussionContentShowView);
     }

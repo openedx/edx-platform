@@ -1,6 +1,6 @@
 from bok_choy.page_object import PageObject
 from selenium.webdriver.common.keys import Keys
-from ..common.utils import click_css
+from common.test.acceptance.pages.common.utils import click_css
 from selenium.webdriver.support.ui import Select
 
 

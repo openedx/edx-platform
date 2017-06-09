@@ -160,6 +160,14 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
           @extend %shame-link-text;
           display: inline;
           @include margin-left($baseline/4);
+          border: 0;
+          background: transparent;
+          padding: 0;
+          
+          &:active {
+              background: transparent;
+              box-shadow: none;
+          }
         }
 
         // note - comment made on highlighted content

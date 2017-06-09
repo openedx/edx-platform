@@ -5,15 +5,15 @@ from ddt import ddt, data
 from nose.plugins.attrib import attr
 from flaky import flaky
 
-from .base_studio_test import StudioLibraryTest
-from ...fixtures.course import XBlockFixtureDesc
-from ...pages.studio.auto_auth import AutoAuthPage
-from ...pages.studio.utils import add_component
-from ...pages.studio.library import LibraryEditPage
-from ...pages.studio.users import LibraryUsersPage
+from common.test.acceptance.tests.studio.base_studio_test import StudioLibraryTest
+from common.test.acceptance.fixtures.course import XBlockFixtureDesc
+from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.studio.utils import add_component
+from common.test.acceptance.pages.studio.library import LibraryEditPage
+from common.test.acceptance.pages.studio.users import LibraryUsersPage
 
 
-@attr('shard_2')
+@attr(shard=2)
 @ddt
 class LibraryEditPageTest(StudioLibraryTest):
     """
@@ -129,7 +129,6 @@ class LibraryEditPageTest(StudioLibraryTest):
         """
         self.assertFalse(self.browser.find_elements_by_css_selector('span.large-discussion-icon'))
 
-    @flaky  # TODO fix this, see TNL-2322
     def test_library_pagination(self):
         """
         Scenario: Ensure that adding several XBlocks to a library results in pagination.
@@ -186,7 +185,7 @@ class LibraryEditPageTest(StudioLibraryTest):
         self.assertIn("Checkboxes", problem_block.name)
 
 
-@attr('shard_2')
+@attr(shard=2)
 @ddt
 class LibraryNavigationTest(StudioLibraryTest):
     """
@@ -652,14 +651,9 @@ class StudioLibraryA11yTest(StudioLibraryTest):
         lib_page.visit()
         lib_page.wait_until_ready()
 
-        # There are several existing color contrast errors on this page,
-        # we will ignore this error in the test until we fix them.
         lib_page.a11y_audit.config.set_rules({
             "ignore": [
-                'color-contrast',  # TODO: AC-225
-                'link-href',  # TODO: AC-226
-                'nav-aria-label',  # TODO: AC-227
-                'icon-aria-hidden',  # TODO: AC-229
+                'link-href',  # TODO: AC-590
             ],
         })
 

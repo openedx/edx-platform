@@ -1,4 +1,4 @@
-define(["backbone", "gettext", "underscore"], function (Backbone, gettext, _) {
+define(['backbone', 'gettext', 'underscore'], function(Backbone, gettext, _) {
     /**
      * Model for xblock validation messages as displayed in Studio.
      */
@@ -10,21 +10,21 @@ define(["backbone", "gettext", "underscore"], function (Backbone, gettext, _) {
             xblock_id: null
         },
 
-        WARNING : "warning",
-        ERROR: "error",
-        NOT_CONFIGURED: "not-configured",
+        WARNING: 'warning',
+        ERROR: 'error',
+        NOT_CONFIGURED: 'not-configured',
 
         parse: function(response) {
             if (!response.empty) {
-                var summary = "summary" in response ? response.summary : {};
-                var messages = "messages" in response ? response.messages : [];
+                var summary = 'summary' in response ? response.summary : {};
+                var messages = 'messages' in response ? response.messages : [];
                 if (!summary.text) {
-                    summary.text = gettext("This component has validation issues.");
+                    summary.text = gettext('This component has validation issues.');
                 }
                 if (!summary.type) {
                     summary.type = this.WARNING;
                     // Possible types are ERROR, WARNING, and NOT_CONFIGURED. NOT_CONFIGURED is treated as a warning.
-                    _.find(messages, function (message) {
+                    _.find(messages, function(message) {
                         if (message.type === this.ERROR) {
                             summary.type = this.ERROR;
                             return true;

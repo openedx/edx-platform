@@ -2,7 +2,7 @@
  * This is the base view that all Studio pages extend from.
  */
 define(['jquery', 'js/views/baseview'],
-    function ($, BaseView) {
+    function($, BaseView) {
         var BasePage = BaseView.extend({
 
             initialize: function() {

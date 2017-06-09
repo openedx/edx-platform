@@ -1,6 +1,6 @@
-'''
+"""
 Tests for student activation and login
-'''
+"""
 import json
 import unittest
 
@@ -16,7 +16,7 @@ import httpretty
 from mock import patch
 from social.apps.django_app.default.models import UserSocialAuth
 
-from external_auth.models import ExternalAuthMap
+from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import UserFactory, RegistrationFactory, UserProfileFactory
 from student.views import login_oauth_token
@@ -30,9 +30,9 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
 class LoginTest(CacheIsolationTestCase):
-    '''
+    """
     Test student.views.login_user() view
-    '''
+    """
 
     ENABLED_CACHES = ['default']
 
@@ -171,12 +171,8 @@ class LoginTest(CacheIsolationTestCase):
         cookie = self.client.cookies[settings.EDXMKTG_USER_INFO_COOKIE_NAME]
         user_info = json.loads(cookie.value)
 
-        # Check that the version is set
         self.assertEqual(user_info["version"], settings.EDXMKTG_USER_INFO_COOKIE_VERSION)
-
-        # Check that the username and email are set
         self.assertEqual(user_info["username"], self.user.username)
-        self.assertEqual(user_info["email"], self.user.email)
 
         # Check that the URLs are absolute
         for url in user_info["header_urls"].values():
@@ -413,7 +409,7 @@ class LoginTest(CacheIsolationTestCase):
         if value is not None:
             msg = ("'%s' did not contain '%s'" %
                    (str(response_dict['value']), str(value)))
-            self.assertTrue(value in response_dict['value'], msg)
+            self.assertIn(value, response_dict['value'], msg)
 
     def _assert_audit_log(self, mock_audit_log, level, log_strings):
         """
@@ -505,7 +501,7 @@ class ExternalAuthShibTest(ModuleStoreTestCase):
         noshib_response = self.client.get(TARGET_URL, follow=True)
         self.assertEqual(noshib_response.redirect_chain[-1],
                          ('http://testserver/login?next={url}'.format(url=TARGET_URL), 302))
-        self.assertContains(noshib_response, ("Sign in or Register | {platform_name}"
+        self.assertContains(noshib_response, (u"Sign in or Register | {platform_name}"
                                               .format(platform_name=settings.PLATFORM_NAME)))
         self.assertEqual(noshib_response.status_code, 200)
 

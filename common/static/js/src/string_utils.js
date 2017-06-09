@@ -19,7 +19,7 @@
      * @param values the templatized dictionary values
      * @returns the text with placeholder values filled in
      */
-    var interpolate_ntext = function (singular, plural, count, values) {
+    var interpolate_ntext = function(singular, plural, count, values) {
         var text = count === 1 ? singular : plural;
         return _.template(text, {interpolate: /\{(.+?)\}/g})(values);
     };
@@ -41,7 +41,7 @@
      * @param values the templatized dictionary values
      * @returns the text with placeholder values filled in
      */
-    var interpolate_text = function (text, values) {
+    var interpolate_text = function(text, values) {
         return _.template(text, {interpolate: /\{(.+?)\}/g})(values);
     };
     this.interpolate_text = interpolate_text;

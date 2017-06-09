@@ -13,7 +13,7 @@ from model_utils.models import TimeStampedModel
 
 from survey.exceptions import SurveyFormNameAlreadyExists, SurveyFormNotFound
 
-from xmodule_django.models import CourseKeyField
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
 log = logging.getLogger("edx.survey")
 

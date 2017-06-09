@@ -1,4 +1,7 @@
 ## mako
+
+<%page expression_filter="h"/>
+
 <%! import json %>
 <%!
 from django.utils.translation import ugettext as _
@@ -23,18 +26,16 @@ from openedx.core.djangolib.js_utils import (
 
 <div class="container">
     <div class="teams-wrapper">
-        <section class="teams-content">
-        </section>
+        <main id="main" aria-label="Content" tabindex="-1">
+            <section class="teams-content">
+            </section>
+        </main>
     </div>
 </div>
 
 <%block name="js_extra">
 
 <%include file="../discussion/_js_body_dependencies.html" />
-<%static:js group='discussion'/>
-<script type="text/javascript">
-    RequireJS.define('DiscussionModuleView', [], function() {return window['DiscussionModuleView'];});
-</script>
 
 <%static:require_module module_name="teams/js/teams_tab_factory" class_name="TeamsTabFactory">
     TeamsTabFactory({
@@ -57,3 +58,4 @@ from openedx.core.djangolib.js_utils import (
 </%block>
 
 <%include file="../discussion/_underscore_templates.html" />
+<%include file="../discussion/_thread_list_template.html" />

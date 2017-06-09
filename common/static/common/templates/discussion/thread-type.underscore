@@ -2,23 +2,27 @@
     <div class="field-label">
         <span class="field-label-text">
             <% // Translators: This is the label for a control to select a forum post type %>
-            <%- gettext("Post type:") %>
-        </span><fieldset class="field-input">
-            <legend class="sr"><%- gettext("Post type:") %></legend>
-            <input aria-describedby="field_help_post_type" type="radio" name="<%= form_id %>-post-type" class="post-type-input" id="<%= form_id %>-post-type-question" value="question">
-            <label for="<%= form_id %>-post-type-question" class="post-type-label">
-                <span class="icon fa fa-question" aria-hidden="true"></span>
-                <% // Translators: This is a forum post type %>
-                <%- gettext("Question") %>
-            </label>
-            <input aria-describedby="field_help_post_type" type="radio" name="<%= form_id %>-post-type" class="post-type-input" id="<%= form_id %>-post-type-discussion" value="discussion" checked>
-            <label for="<%= form_id %>-post-type-discussion" class="post-type-label">
-                <span class="icon fa fa-comments" aria-hidden="true"></span>
-                <% // Translators: This is a forum post type %>
-                <%- gettext("Discussion") %>
-            </label>
-        </fieldset>
-    </div><span class="field-help" id="field_help_post_type">
-        <%- gettext("Questions raise issues that need answers. Discussions share ideas and start conversations.") %>
-    </span>
+            <%- gettext("Post type") %>
+        </span>
+        <div class="field-help" id="field_help_post_type">
+            <%- gettext("Questions raise issues that need answers. Discussions share ideas and start conversations.") %>
+        </div>
+        <div class="field-label">
+            <fieldset class="field-input">
+                <legend class="sr"><%- gettext("Post type") %></legend>
+                <input aria-describedby="field_help_post_type" type="radio" name="<%= form_id %>-post-type" class="post-type-input" id="<%= form_id %>-post-type-question" value="question">
+                <label for="<%= form_id %>-post-type-question" class="post-type-label">
+                    <span class="icon fa fa-question" aria-hidden="true"></span>
+                    <% // Translators: This is a forum post type %>
+                    <%- gettext("Question") %>
+                </label>
+                <input aria-describedby="field_help_post_type" type="radio" name="<%= form_id %>-post-type" class="post-type-input" id="<%= form_id %>-post-type-discussion" value="discussion" checked>
+                <label for="<%= form_id %>-post-type-discussion" class="post-type-label">
+                    <span class="icon fa fa-comments" aria-hidden="true"></span>
+                    <% // Translators: This is a forum post type %>
+                    <%- gettext("Discussion") %>
+                </label>
+            </fieldset>
+        </div>
+    </div>
 </div>

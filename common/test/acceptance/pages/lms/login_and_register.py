@@ -3,8 +3,8 @@
 from urllib import urlencode
 from bok_choy.page_object import PageObject, unguarded
 from bok_choy.promise import Promise, EmptyPromise
-from . import BASE_URL
-from .dashboard import DashboardPage
+from common.test.acceptance.pages.lms import BASE_URL
+from common.test.acceptance.pages.lms.dashboard import DashboardPage
 
 
 class RegisterPage(PageObject):
@@ -271,7 +271,7 @@ class CombinedLoginAndRegisterPage(PageObject):
         login_form = self.current_form
 
         # Click the password reset link on the login page
-        self.q(css="a.forgot-password").click()
+        self.q(css=".forgot-password").click()
 
         # Wait for the password reset form to load
         EmptyPromise(
@@ -356,10 +356,10 @@ class CombinedLoginAndRegisterPage(PageObject):
         """Wait for a status message to be visible following third_party registration, then return it."""
         def _check_func():
             """Return third party auth status notice message."""
-            for selector in ['.already-authenticated-msg p', '.status p']:
-                msg_element = self.q(css=selector)
-                if msg_element.visible:
-                    return (True, msg_element.text[0])
+            selector = '.js-auth-warning p'
+            msg_element = self.q(css=selector)
+            if msg_element.visible:
+                return (True, msg_element.text[0])
             return (False, None)
         return Promise(_check_func, "Result of third party auth is visible").fulfill()
 

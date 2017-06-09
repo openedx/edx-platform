@@ -34,29 +34,33 @@
         describe('cohort selector', function() {
             beforeEach(function() {
                 this.course_settings = new DiscussionCourseSettings({
-                    'category_map': {
-                        'children': ['Topic', 'General'],
-                        'entries': {
-                            'Topic': {
-                                'is_cohorted': true,
-                                'id': 'topic'
+                    category_map: {
+                        children: [['Topic', 'entry'], ['General', 'entry'], ['Not Cohorted', 'entry']],
+                        entries: {
+                            Topic: {
+                                is_cohorted: true,
+                                id: 'topic'
                             },
-                            'General': {
-                                'is_cohorted': false,
-                                'id': 'general'
+                            General: {
+                                is_cohorted: true,
+                                id: 'general'
+                            },
+                            'Not Cohorted': {
+                                is_cohorted: false,
+                                id: 'not-cohorted'
                             }
                         }
                     },
-                    'allow_anonymous': false,
-                    'allow_anonymous_to_peers': false,
-                    'is_cohorted': true,
-                    'cohorts': [
+                    allow_anonymous: false,
+                    allow_anonymous_to_peers: false,
+                    is_cohorted: true,
+                    cohorts: [
                         {
-                            'id': 1,
-                            'name': 'Cohort1'
+                            id: 1,
+                            name: 'Cohort1'
                         }, {
-                            'id': 2,
-                            'name': 'Cohort2'
+                            id: 2,
+                            name: 'Cohort2'
                         }
                     ]
                 });
@@ -71,20 +75,24 @@
             it('is not visible to students', function() {
                 return checkVisibility(this.view, false, false, true);
             });
-            it('allows TAs to see the cohort selector', function() {
+            it('allows TAs to see the cohort selector when the topic is cohorted', function() {
                 DiscussionSpecHelper.makeTA();
                 return checkVisibility(this.view, true, false, true);
             });
-            it('allows moderators to see the cohort selector', function() {
+            it('allows moderators to see the cohort selector when the topic is cohorted', function() {
                 DiscussionSpecHelper.makeModerator();
                 return checkVisibility(this.view, true, false, true);
             });
             it('only enables the cohort selector when applicable', function() {
                 DiscussionSpecHelper.makeModerator();
                 checkVisibility(this.view, true, false, true);
-                $('.topic-menu-entry:contains(General)').click();
+
+                $('option:contains(Not Cohorted)').prop('selected', true);
+                $('.post-topic').trigger('change');
                 checkVisibility(this.view, true, true, false);
-                $('.topic-menu-entry:contains(Topic)').click();
+
+                $('option:contains(Topic)').prop('selected', true);
+                $('.post-topic').trigger('change');
                 return checkVisibility(this.view, true, false, false);
             });
             it('allows the user to make a cohort selection', function() {
@@ -164,7 +172,9 @@
                         'subcategories': {
                             'Week 1': {
                                 'subcategories': {},
-                                'children': ['Topic-Level Student-Visible Label'],
+                                'children': [ // eslint-disable-line quote-props
+                                    ['Topic-Level Student-Visible Label', 'entry']
+                                ],
                                 'entries': {
                                     'Topic-Level Student-Visible Label': {
                                         'sort_key': null,
@@ -174,7 +184,10 @@
                                 }
                             }
                         },
-                        'children': ['General', 'Week 1'],
+                        'children': [ // eslint-disable-line quote-props
+                            ['General', 'entry'],
+                            ['Week 1', 'subcategory']
+                        ],
                         'entries': {
                             'General': {
                                 'sort_key': 'General',
@@ -218,7 +231,7 @@
                 expect(view.$('.js-anon')).not.toBeChecked();
                 expect(view.$('.js-anon-peers')).not.toBeChecked();
                 if (mode === 'tab') {
-                    return expect(view.$('.js-selected-topic').text()).toEqual('General');
+                    return expect(view.$('.post-topic option:selected').text()).toEqual('General');
                 }
             };
             return _.each(['tab', 'inline'], function(mode) {

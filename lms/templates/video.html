@@ -39,52 +39,49 @@ from openedx.core.djangolib.js_utils import js_escaped_string
     </div>
 
     <div class="focus_grabber last"></div>
-  <ul class="wrapper-downloads">
-    % if download_video_link:
-        <li class="video-sources video-download-button">
-            <a href="${download_video_link}">${_('Download video')}</a>
-        </li>
-    % endif
-    % if track:
-        <li class="video-tracks video-download-button">
-          % if transcript_download_format:
-            <a href="${track}">${_('Download transcript')}</a>
-            <div class="a11y-menu-container">
-                <a class="a11y-menu-button" href="#" title="${'.' + transcript_download_format}" role="button" aria-disabled="false">${'.' + transcript_download_format}</a>
-                <ol class="a11y-menu-list" role="menu">
+    
+    % if download_video_link or track or handout or branding_info:
+    <h3 class="hd hd-4 downloads-heading sr" id="video-download-transcripts_${id}">${_('Downloads and transcripts')}</h3>
+    <div class="wrapper-downloads" role="region" aria-labelledby="video-download-transcripts_${id}">
+        % if download_video_link:
+        <div class="wrapper-download-video">
+            <h4 class="hd hd-5">${_('Video')}</h4>
+            <a class="btn-link video-sources video-download-button" href="${download_video_link}">
+                ${_('Download video file')}
+            </a>
+        </div>
+        % endif
+        % if track:
+        <div class="wrapper-download-transcripts">
+            <h4 class="hd hd-5">${_('Transcripts')}</h4>
+            % if transcript_download_format:
+            <ul class="list-download-transcripts">
                 % for item in transcript_download_formats_list:
-                  % if item['value'] == transcript_download_format:
-                  <li class="a11y-menu-item active">
-                  % else:
-                  <li class="a11y-menu-item">
-                  % endif
-                  ## This is necessary so we don't scrape 'display_name' as a string.
-                  <% dname = item['display_name'] %>
-                      <a class="a11y-menu-item-link" href="#${item['value']}" title="${_(dname)}" data-value="${item['value']}" role="menuitem" aria-disabled="false">
-                        ${_(dname)}
-                      </a>
-                  </li>
+                    <li class="transcript-option">
+                        <% dname = _("Download {file}").format(file=item['display_name']) %>
+                        <a class="btn btn-link" href="${track}" data-value="${item['value']}">${dname}</a>
+                    </li>
                 % endfor
-                </ol>
-            </div>
-          % else:
-            <a href="${track}" class="external-track">${_('Download transcript')}</a>
-          % endif
-        </li>
+            </ul>
+            % else:
+            <a class="btn-link external-track" href="${track}">${_('Download transcript')}</a>
+            % endif
+        </div>
+        % endif
+        % if handout:
+        <div class="wrapper-handouts">
+            <h4 class="hd hd-5">${_('Handouts')}</h4>
+            <a class="btn-link" href="${handout}">${_('Download Handout')}</a>
+        </div>
+        % endif
+        % if branding_info:
+        <div class="branding">
+            <span class="host-tag">${branding_info['logo_tag']}</span>
+            <a href="${branding_info['url']}"><img class="brand-logo" src="${branding_info['logo_src']}" alt="${branding_info['logo_tag']}" /></a>
+        </div>
+        % endif
+    </div>
     % endif
-    % if handout:
-        <li class="video-handout video-download-button">
-            <a href="${handout}" target="_blank">${_('Download Handout')}</a>
-        </li>
-    % endif
-
-    % if branding_info:
-      <li id="branding" class="branding">
-        <span class="host-tag">${branding_info['logo_tag']}</span>
-        <a href="${branding_info['url']}" target="_blank" title="${branding_info['logo_tag']}"><img class="brand-logo" src="${branding_info['logo_src']}" alt="${branding_info['logo_tag']}" /></a>
-      </li>
-    % endif
-  </ul>
 </div>
 % if cdn_eval:
 <script>

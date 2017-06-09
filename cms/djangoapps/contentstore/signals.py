@@ -1,5 +1,6 @@
 """ receivers of course_published and library_updated events in order to trigger indexing task """
 
+import logging
 from datetime import datetime
 from pytz import UTC
 
@@ -13,6 +14,9 @@ from openedx.core.lib.gating import api as gating_api
 from util.module_utils import yield_dynamic_descriptor_descendants
 
 
+log = logging.getLogger(__name__)
+
+
 @receiver(SignalHandler.course_published)
 def listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=unused-argument
     """
@@ -23,7 +27,11 @@ def listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=
 
     # first is to registered exams, the credit subsystem will assume that
     # all proctored exams have already been registered, so we have to do that first
-    register_special_exams(course_key)
+    try:
+        register_special_exams(course_key)
+    # pylint: disable=broad-except
+    except Exception as exception:
+        log.exception(exception)
 
     # then call into the credit subsystem (in /openedx/djangoapps/credit)
     # to perform any 'on_publish' workflow

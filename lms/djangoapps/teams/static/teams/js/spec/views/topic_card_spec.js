@@ -2,9 +2,8 @@ define(['jquery',
         'underscore',
         'teams/js/views/topic_card',
         'teams/js/models/topic'],
-    function ($, _, TopicCardView, Topic) {
-
-        describe('Topic card view', function () {
+    function($, _, TopicCardView, Topic) {
+        describe('Topic card view', function() {
             var createTopicCardView = function() {
                 return new TopicCardView({
                     model: new Topic({
@@ -16,11 +15,11 @@ define(['jquery',
                 });
             };
 
-            beforeEach(function () {
+            beforeEach(function() {
                 spyOn(TopicCardView.prototype, 'action');
             });
 
-            it('can render itself', function () {
+            it('can render itself', function() {
                 var view = createTopicCardView();
                 expect(view.$el).toHaveClass('square-card');
                 expect(view.$el.find('.card-title').text()).toContain('Renewable Energy');
@@ -29,7 +28,7 @@ define(['jquery',
                 expect(view.$el.find('.action .sr').text()).toContain('View Teams in the Renewable Energy Topic');
             });
 
-            it('navigates when action button is clicked', function () {
+            it('navigates when action button is clicked', function() {
                 var view = createTopicCardView();
                 view.$el.find('.action').trigger('click');
                 // TODO test actual navigation once implemented

@@ -32,7 +32,7 @@ from edx_proctoring.api import create_exam
 from edx_proctoring.models import ProctoredExamStudentAttempt
 
 
-@attr('shard_3')
+@attr(shard=3)
 class TestAnalyticsBasic(ModuleStoreTestCase):
     """ Test basic analytics functions. """
 
@@ -92,8 +92,8 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
                 # Check if list_problem_responses returned expected results:
                 self.assertEqual(len(problem_responses), len(mock_results))
                 for mock_result in mock_results:
-                    self.assertTrue(
-                        {'username': mock_result.student.username, 'state': mock_result.state} in
+                    self.assertIn(
+                        {'username': mock_result.student.username, 'state': mock_result.state},
                         problem_responses
                     )
 
@@ -148,6 +148,34 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
             self.assertEqual(set(userreport.keys()), set(query_features))
             self.assertIn(userreport['meta.position'], ["edX expert {}".format(user.id) for user in self.users])
             self.assertIn(userreport['meta.company'], ["Open edX Inc {}".format(user.id) for user in self.users])
+
+    def test_enrolled_students_enrollment_verification(self):
+        """
+        Assert that we can get enrollment mode and verification status
+        """
+        query_features = ('enrollment_mode', 'verification_status')
+        userreports = enrolled_students_features(self.course_key, query_features)
+        self.assertEqual(len(userreports), len(self.users))
+        # by default all users should have "audit" as their enrollment mode
+        # and "N/A" as their verification status
+        for userreport in userreports:
+            self.assertEqual(set(userreport.keys()), set(query_features))
+            self.assertIn(userreport['enrollment_mode'], ["audit"])
+            self.assertIn(userreport['verification_status'], ["N/A"])
+        # make sure that the user report respects whatever value
+        # is returned by verification and enrollment code
+        with patch("student.models.CourseEnrollment.enrollment_mode_for_user") as enrollment_patch:
+            with patch(
+                "lms.djangoapps.verify_student.models.SoftwareSecurePhotoVerification.verification_status_for_user"
+            ) as verify_patch:
+                enrollment_patch.return_value = ["verified"]
+                verify_patch.return_value = "dummy verification status"
+                userreports = enrolled_students_features(self.course_key, query_features)
+                self.assertEqual(len(userreports), len(self.users))
+                for userreport in userreports:
+                    self.assertEqual(set(userreport.keys()), set(query_features))
+                    self.assertIn(userreport['enrollment_mode'], ["verified"])
+                    self.assertIn(userreport['verification_status'], ["dummy verification status"])
 
     def test_enrolled_students_features_keys_cohorted(self):
         course = CourseFactory.create(org="test", course="course1", display_name="run1")

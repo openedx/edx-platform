@@ -10,7 +10,7 @@ boto==2.6.0
 celery==3.0.19
 distribute>=0.6.28, <0.7
 django-celery==3.0.17
-django-countries==1.5
+django-countries==4.0
 django-filter==0.11.0
 django-mako==0.1.5pre
 django-mptt==0.5.5
@@ -45,7 +45,7 @@ pygments==1.5
 pymongo==2.4.1
 python-memcached==1.48
 python-openid==2.2.5
-pytz==2015.2
+pytz==2016.7
 PyYAML==3.10
 requests==2.3.0
 Shapely==1.2.16

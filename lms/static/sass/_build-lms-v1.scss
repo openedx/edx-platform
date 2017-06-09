@@ -12,12 +12,17 @@
 // base - starter
 @import 'base/base';
 
+// Pattern Library shims
+@import 'edx-pattern-library-shims/base/variables';
+@import 'edx-pattern-library-shims/buttons';
+
 // base - elements
-@import 'elements/typography';
 @import 'elements/controls';
+@import 'elements/creative-commons';
+@import 'elements/icons';
 @import 'elements/navigation';
 @import 'elements/pagination';
-@import 'elements/creative-commons';
+@import 'elements/typography';
 
 // shared - course
 @import 'shared/fields';
@@ -58,7 +63,6 @@
 @import "views/financial-assistance";
 @import 'views/bookmarks';
 @import 'course/auto-cert';
-@import 'elements/xseries-certificates';
 @import 'views/api-access';
 
 // search

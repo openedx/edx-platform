@@ -10,9 +10,12 @@ If true, it:
     b) calls apply_settings(), passing in the Django settings
 """
 
+from util.enterprise_helpers import insert_enterprise_pipeline_elements
+
 _FIELDS_STORED_IN_SESSION = ['auth_entry', 'next']
 _MIDDLEWARE_CLASSES = (
     'third_party_auth.middleware.ExceptionMiddleware',
+    'third_party_auth.middleware.PipelineQuarantineMiddleware',
 )
 _SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/dashboard'
 
@@ -37,7 +40,7 @@ def apply_settings(django_settings):
 
     # Inject our customized auth pipeline. All auth backends must work with
     # this pipeline.
-    django_settings.SOCIAL_AUTH_PIPELINE = (
+    django_settings.SOCIAL_AUTH_PIPELINE = [
         'third_party_auth.pipeline.parse_query_params',
         'social.pipeline.social_auth.social_details',
         'social.pipeline.social_auth.social_uid',
@@ -53,7 +56,10 @@ def apply_settings(django_settings):
         'social.pipeline.user.user_details',
         'third_party_auth.pipeline.set_logged_in_cookies',
         'third_party_auth.pipeline.login_analytics',
-    )
+    ]
+
+    # Add enterprise pipeline elements if the enterprise app is installed
+    insert_enterprise_pipeline_elements(django_settings.SOCIAL_AUTH_PIPELINE)
 
     # Required so that we can use unmodified PSA OAuth2 backends:
     django_settings.SOCIAL_AUTH_STRATEGY = 'third_party_auth.strategy.ConfigurationModelStrategy'

@@ -1,4 +1,4 @@
-<%page args="course_overview, enrollment, show_courseware_link, cert_status, can_unenroll, credit_status, show_email_settings, course_mode_info, show_refund_option, is_paid_course, is_course_blocked, verification_status, course_requirements, dashboard_index, share_settings, course_program_info" expression_filter="h"/>
+<%page args="course_overview, enrollment, show_courseware_link, cert_status, can_unenroll, credit_status, show_email_settings, course_mode_info, show_refund_option, is_paid_course, is_course_blocked, verification_status, course_requirements, dashboard_index, share_settings, related_programs, display_course_modes_on_dashboard" expression_filter="h"/>
 
 <%!
 import urllib
@@ -10,10 +10,10 @@ from course_modes.models import CourseMode
 from course_modes.helpers import enrollment_mode_display
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from openedx.core.djangolib.markup import HTML, Text
-from openedx.core.lib.time_zone_utils import get_user_time_zone
 from student.helpers import (
   VERIFY_STATUS_NEED_TO_VERIFY,
   VERIFY_STATUS_SUBMITTED,
+  VERIFY_STATUS_RESUBMITTED,
   VERIFY_STATUS_APPROVED,
   VERIFY_STATUS_MISSED_DEADLINE,
   VERIFY_STATUS_NEED_TO_REVERIFY,
@@ -36,7 +36,7 @@ from student.helpers import (
 <%namespace name='static' file='../static_content.html'/>
 
 <li class="course-item">
-  % if settings.FEATURES.get('ENABLE_VERIFIED_CERTIFICATES'):
+  % if display_course_modes_on_dashboard:
     <%
         course_verified_certs = enrollment_mode_display(
             enrollment.mode,
@@ -53,12 +53,6 @@ from student.helpers import (
     <% mode_class = '' %>
   % endif
 <div class="course-container">
- % if course_program_info and course_program_info.get('category')=='xseries':
-  <div class="label-xseries-association">
-    <span class="xseries-icon" aria-hidden="true"></span>
-    <p class="message-copy">${_("{category} Program Course").format(category=course_program_info['display_category'])}</p>
-  </div>
- % endif
 <article class="course${mode_class}">
   <% course_target = reverse('info', args=[unicode(course_overview.id)]) %>
   <section class="details" aria-labelledby="details-heading-${course_overview.number}">
@@ -79,7 +73,7 @@ from student.helpers import (
           <img src="${course_overview.image_urls['small']}" class="course-image" alt="${_('{course_number} {course_name} Cover Image').format(course_number=course_overview.number, course_name=course_overview.display_name_with_default)}" />
         </a>
       % endif
-      % if settings.FEATURES.get('ENABLE_VERIFIED_CERTIFICATES') and course_verified_certs.get('display_mode') != 'audit':
+      % if display_course_modes_on_dashboard and course_verified_certs.get('display_mode') != 'audit':
         <span class="sts-enrollment" title="${course_verified_certs.get('enrollment_title')}">
           <span class="label">${_("Enrolled as: ")}</span>
           % if course_verified_certs.get('show_image'):
@@ -104,20 +98,37 @@ from student.helpers import (
         <div class="course-info">
           <span class="info-university">${course_overview.display_org_with_default} - </span>
           <span class="info-course-id">${course_overview.display_number_with_default}</span>
-          <span class="info-date-block" data-tooltip="Hi">
-          <% time_zone = get_user_time_zone(user) %>
-          % if course_overview.has_ended():
-            ${_("Ended - {end_date}").format(end_date=course_overview.end_datetime_text("SHORT_DATE", time_zone))}
-          % elif course_overview.has_started():
-            ${_("Started - {start_date}").format(start_date=course_overview.start_datetime_text("SHORT_DATE", time_zone))}
-          % elif course_overview.start_date_is_still_default: # Course start date TBD
-            ${_("Coming Soon")}
-          % elif course_overview.starts_within(days=5):   # hasn't started yet
-            ${_("Starts - {start_date}").format(start_date=course_overview.start_datetime_text("DAY_AND_TIME", time_zone))}
-          % else:   # hasn't started yet
-            ${_("Starts - {start_date}").format(start_date=course_overview.start_datetime_text("SHORT_DATE", time_zone))}
-          % endif
-          </span>
+          <%
+            if course_overview.start_date_is_still_default:
+                container_string = _("Coming Soon")
+                course_date = None
+            else:
+                format = 'shortDate'
+                if course_overview.has_ended():
+                    container_string = _("Ended - {date}")
+                    course_date = course_overview.end
+                elif course_overview.has_started():
+                    container_string = _("Started - {date}")
+                    course_date = course_overview.start
+                elif course_overview.starts_within(days=5):
+                    container_string = _("Starts - {date}")
+                    course_date = course_overview.start
+                    format = 'defaultFormat'
+                else: ## hasn't started yet
+                    container_string = _("Starts - {date}")
+                    course_date = course_overview.start
+                endif
+            endif
+          %>
+
+                % if isinstance(course_date, str):
+                    <span class="info-date-block" data-tooltip="Hi">${_(container_string).format(date=course_date)}</span>
+                % elif course_date is not None:
+                    <%
+                        course_date_string = course_date.strftime('%Y-%m-%dT%H:%M:%S%z')
+                    %>
+                    <span class="info-date-block localized-datetime" data-language="${user_language}" data-tooltip="Hi" data-timezone="${user_timezone}" data-datetime="${course_date_string}" data-format=${format} data-string="${container_string}"></span>
+                % endif
         </div>
         <div class="wrapper-course-actions">
           <div class="course-actions">
@@ -283,6 +294,20 @@ from student.helpers import (
   </section>
   <footer class="wrapper-messages-primary">
     <ul class="messages-list">
+      % if related_programs:
+      <div class="message message-related-programs is-shown">
+        <span class="related-programs-preface" tabindex="0">${_('Related Programs')}:</span>
+        <ul>
+          % for program in related_programs:
+          <li>
+            <span class="category-icon ${program['category'].lower()}-icon" aria-hidden="true"></span>
+            <span><a href="${program['detail_url']}">${u'{name} {category}'.format(name=program['name'], category=program['category'])}</a></span>
+          </li>
+          % endfor
+        </ul>
+      </div>
+      % endif
+
       % if course_overview.may_certify() and cert_status:
         <%include file='_dashboard_certificate_information.html' args='cert_status=cert_status,course_overview=course_overview, enrollment=enrollment, reverify_link=reverify_link'/>
       % endif
@@ -291,7 +316,7 @@ from student.helpers import (
         <%include file="_dashboard_credit_info.html" args="credit_status=credit_status"/>
       % endif
 
-        % if verification_status.get('status') in [VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED, VERIFY_STATUS_APPROVED, VERIFY_STATUS_NEED_TO_REVERIFY] and not is_course_blocked:
+        % if verification_status.get('status') in [VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED, VERIFY_STATUS_RESUBMITTED, VERIFY_STATUS_APPROVED, VERIFY_STATUS_NEED_TO_REVERIFY] and not is_course_blocked:
         <div class="message message-status wrapper-message-primary is-shown">
           % if verification_status['status'] == VERIFY_STATUS_NEED_TO_VERIFY:
             <div class="verification-reminder">
@@ -308,25 +333,27 @@ from student.helpers import (
               % endif
             </div>
             <div class="verification-cta">
-              <a href="${reverse('verify_student_verify_now', kwargs={'course_id': unicode(course_overview.id)})}" class="cta" data-course-id="${course_overview.id}">${_('Verify Now')}</a>
+              <a href="${reverse('verify_student_verify_now', kwargs={'course_id': unicode(course_overview.id)})}" class="btn" data-course-id="${course_overview.id}">${_('Verify Now')}</a>
             </div>
           % elif verification_status['status'] == VERIFY_STATUS_SUBMITTED:
-            <h4 class="message-title">${_('You have already verified your ID!')}</h4>
-            <p class="message-copy">${_('Thanks for your patience as we process your request.')}</p>
+            <h4 class="message-title">${_('You have submitted your verification information.')}</h4>
+            <p class="message-copy">${_('You will see a message on your dashboard when the verification process is complete (usually within 1-2 days).')}</p>
+          % elif verification_status['status'] == VERIFY_STATUS_RESUBMITTED:
+            <h4 class="message-title">${_('Your current verification will expire soon!')}</h4>
+            <p class="message-copy">${_('You have submitted your reverification information. You will see a message on your dashboard when the verification process is complete (usually within 1-2 days).')}</p>
           % elif verification_status['status'] == VERIFY_STATUS_APPROVED:
-            <h4 class="message-title">${_('You have already verified your ID!')}</h4>
+            <h4 class="message-title">${_('You have successfully verified your ID with edX')}</h4>
             % if verification_status.get('verification_good_until') is not None:
-              <p class="message-copy">${_('Your verification status is good until {date}.').format(date=verification_status['verification_good_until'])}
+              <p class="message-copy">${_('Your current verification is effective until {date}.').format(date=verification_status['verification_good_until'])}
             % endif
           % elif verification_status['status'] == VERIFY_STATUS_NEED_TO_REVERIFY:
-            <h4 class="message-title">${_('Your verification will expire soon!')}</h4>
+            <h4 class="message-title">${_('Your current verification will expire soon.')}</h4>
             ## Translators: start_link and end_link will be replaced with HTML tags;
             ## please do not translate these.
-            <p class="message-copy">${Text(_('Your current verification will expire before the verification deadline '
-              'for this course. {start_link}Re-verify your identity now{end_link} using a webcam and a '
-              'government-issued ID.')).format(
+            <p class="message-copy">${Text(_('Your current verification will expire in {days} days. {start_link}Re-verify your identity now{end_link} using a webcam and a government-issued photo ID.')).format(
                 start_link=HTML('<a href="{href}">').format(href=reverse('verify_student_reverify')),
-                end_link=HTML('</a>')
+                end_link=HTML('</a>'),
+                days=settings.VERIFY_STUDENT.get("EXPIRING_SOON_WINDOW")
               )}
             </p>
           % endif
@@ -370,9 +397,9 @@ from student.helpers import (
           </div>
         %endif
 
-        % if course_program_info and course_program_info.get('category')=='xseries':
+        % if course_program_info and course_program_info.get('category'):
           %for program_data in course_program_info.get('course_program_list', []):
-            <%include file = "_dashboard_xseries_info.html" args="program_data=program_data, enrollment_mode=enrollment.mode, display_category=course_program_info['display_category']" />
+            <%include file = "_dashboard_program_info.html" args="program_data=program_data, enrollment_mode=enrollment.mode, category=course_program_info['category']" />
           %endfor
         % endif
 
@@ -383,8 +410,8 @@ from student.helpers import (
                 "to request payment, or you can "
                 "{unenroll_link_start}unenroll{unenroll_link_end} "
                 "from this course")).format(
-              contact_link_start=HTML('<a href="#">'),
-              contact_link_end=HTML('</a>'),
+              contact_link_start=HTML('<button type="button">'),
+              contact_link_end=HTML('</button>'),
               unenroll_link_start=HTML(
                 '<a id="unregister_block_course" rel="leanModal" '
                 'data-course-id="{course_id}" data-course-number="{course_number}" data-course-name="{course_name}" '
@@ -428,3 +455,7 @@ from student.helpers import (
                }
            });
 </script>
+
+<%static:require_module_async module_name="js/dateutil_factory" class_name="DateUtilFactory">
+    DateUtilFactory.transform(iterationKey=".localized-datetime");
+</%static:require_module_async>

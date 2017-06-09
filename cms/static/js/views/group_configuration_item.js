@@ -25,7 +25,7 @@ define([
         // Translators: this refers to a collection of groups.
         itemDisplayName: gettext('group configuration'),
 
-        attributes: function () {
+        attributes: function() {
             return {
                 'id': this.model.get('id'),
                 'tabindex': -1

@@ -8,13 +8,12 @@
  *  - changes cause a refresh of the entire section rather than just the view for the changed xblock
  *  - adding units will automatically redirect to the unit page rather than showing them inline
  */
-define(["jquery", "underscore", "js/views/xblock_outline", "common/js/components/utils/view_utils", "js/views/utils/xblock_utils",
-        "js/models/xblock_outline_info", "js/views/modals/course_outline_modals", "js/utils/drag_and_drop"],
+define(['jquery', 'underscore', 'js/views/xblock_outline', 'common/js/components/utils/view_utils', 'js/views/utils/xblock_utils',
+        'js/models/xblock_outline_info', 'js/views/modals/course_outline_modals', 'js/utils/drag_and_drop'],
     function(
         $, _, XBlockOutlineView, ViewUtils, XBlockViewUtils,
         XBlockOutlineInfo, CourseOutlineModalsFactory, ContentDragger
     ) {
-
         var CourseOutlineView = XBlockOutlineView.extend({
             // takes XBlockOutlineInfo as a model
 
@@ -67,7 +66,7 @@ define(["jquery", "underscore", "js/views/xblock_outline", "common/js/components
              * @param isCollapsed true if the element should be collapsed, else false
              */
             refreshWithCollapsedState: function(isCollapsed) {
-                var locator =  this.model.get('id');
+                var locator = this.model.get('id');
                 if (isCollapsed) {
                     this.expandedLocators.remove(locator);
                 }
@@ -92,9 +91,28 @@ define(["jquery", "underscore", "js/views/xblock_outline", "common/js/components
                 }
             },
 
-            onSectionAdded: function(locator) {
+            /**
+             * Perform specific actions for duplicated xblock.
+             * @param {String}  locator  The locator of the new duplicated xblock.
+             * @param {String}  xblockType The front-end terminology of the xblock category.
+             * @param {jquery Element}  xblockElement  The xblock element to be duplicated.
+             */
+            onChildDuplicated: function(locator, xblockType, xblockElement) {
+                var scrollOffset = ViewUtils.getScrollOffset(xblockElement);
+                if (xblockType === 'section') {
+                    this.onSectionAdded(locator, xblockElement, scrollOffset);
+                } else {
+                    // For all other block types, refresh the view and do the following:
+                    //  - show the new block expanded
+                    //  - ensure it is scrolled into view
+                    //  - make its name editable
+                    this.refresh(this.createNewItemViewState(locator, scrollOffset));
+                }
+            },
+
+            onSectionAdded: function(locator, xblockElement, scrollOffset) {
                 var self = this,
-                    initialState = self.createNewItemViewState(locator),
+                    initialState = self.createNewItemViewState(locator, scrollOffset),
                     sectionInfo, sectionView;
                 // For new chapters in a non-empty view, add a new child view and render it
                 // to avoid the expense of refreshing the entire page.
@@ -109,7 +127,7 @@ define(["jquery", "underscore", "js/views/xblock_outline", "common/js/components
                         sectionView.initialState = initialState;
                         sectionView.expandedLocators = self.expandedLocators;
                         sectionView.render();
-                        self.addChildView(sectionView);
+                        self.addChildView(sectionView, xblockElement);
                         sectionView.setViewState(initialState);
                     });
                 } else {
@@ -192,7 +210,7 @@ define(["jquery", "underscore", "js/views/xblock_outline", "common/js/components
             },
 
             makeContentDraggable: function(element) {
-                if ($(element).hasClass("outline-section")) {
+                if ($(element).hasClass('outline-section')) {
                     ContentDragger.makeDraggable(element, {
                         type: '.outline-section',
                         handleClass: '.section-drag-handle',
@@ -202,7 +220,7 @@ define(["jquery", "underscore", "js/views/xblock_outline", "common/js/components
                         ensureChildrenRendered: this.ensureChildrenRendered.bind(this)
                     });
                 }
-                else if ($(element).hasClass("outline-subsection")) {
+                else if ($(element).hasClass('outline-subsection')) {
                     ContentDragger.makeDraggable(element, {
                         type: '.outline-subsection',
                         handleClass: '.subsection-drag-handle',
@@ -212,7 +230,7 @@ define(["jquery", "underscore", "js/views/xblock_outline", "common/js/components
                         ensureChildrenRendered: this.ensureChildrenRendered.bind(this)
                     });
                 }
-                else if ($(element).hasClass("outline-unit")) {
+                else if ($(element).hasClass('outline-unit')) {
                     ContentDragger.makeDraggable(element, {
                         type: '.outline-unit',
                         handleClass: '.unit-drag-handle',

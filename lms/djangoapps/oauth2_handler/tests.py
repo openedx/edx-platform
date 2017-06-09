@@ -1,7 +1,6 @@
 # pylint: disable=missing-docstring
 from django.core.cache import cache
 from django.test.utils import override_settings
-from lang_pref import LANGUAGE_KEY
 
 from xmodule.modulestore.tests.factories import (check_mongo_calls, CourseFactory)
 from student.models import anonymous_id_for_user
@@ -9,6 +8,7 @@ from student.models import UserProfile
 from student.roles import (CourseInstructorRole, CourseStaffRole, GlobalStaff,
                            OrgInstructorRole, OrgStaffRole)
 from student.tests.factories import UserFactory, UserProfileFactory
+from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 

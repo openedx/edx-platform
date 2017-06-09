@@ -5,11 +5,11 @@
  * ~ Donald Knuth
  */
 
-(function ($, ImageInput, undefined) {
-    describe('ImageInput', function () {
+(function($, ImageInput, undefined) {
+    describe('ImageInput', function() {
         var state;
 
-        beforeEach(function () {
+        beforeEach(function() {
             var el;
 
             loadFixtures('imageinput.html');
@@ -20,7 +20,7 @@
             state = new ImageInput('12345');
         });
 
-        it('initialization', function () {
+        it('initialization', function() {
             // Check that object's properties are present, and that the DOM
             // elements they reference exist.
             expect(state.el).toBeDefined();
@@ -35,7 +35,7 @@
             expect(state.el).toHandle('click');
         });
 
-        it('cross becomes visible after first click', function () {
+        it('cross becomes visible after first click', function() {
             expect(state.crossEl.css('visibility')).toBe('hidden');
 
             state.el.click();
@@ -43,7 +43,7 @@
             expect(state.crossEl.css('visibility')).toBe('visible');
         });
 
-        it('coordinates are updated [offsetX is set]', function () {
+        it('coordinates are updated [offsetX is set]', function() {
             var event, posX, posY, cssLeft, cssTop;
 
             // Set up of 'click' event.
@@ -71,7 +71,7 @@
             );
         });
 
-        it('coordinates are updated [offsetX is NOT set]', function () {
+        it('coordinates are updated [offsetX is NOT set]', function() {
             var offset = state.el.offset(),
                 event, posX, posY, cssLeft, cssTop;
 

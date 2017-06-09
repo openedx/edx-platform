@@ -1,63 +1,48 @@
-<div class="status submission-error hidden" aria-live="polite">
-    <h4 class="message-title"><%- gettext("We couldn't create your account.") %></h4>
-    <ul class="message-copy"></ul>
+<div class="js-form-feedback" aria-live="assertive" tabindex="-1">
 </div>
 
-<form id="register" class="register-form" autocomplete="off" tabindex="-1">
+<form id="register" class="register-form" autocomplete="off" tabindex="-1" method="POST">
+    <% if (!context.currentProvider) { %>
+        <% if (context.providers.length > 0 || context.hasSecondaryProviders) { %>
+            <div class="login-providers">
+                <div class="section-title lines">
+                    <h2>
+                        <span class="text"><%- gettext("Create an account using") %></span>
+                    </h2>
+                </div>
+                <%
+                _.each( context.providers, function( provider) {
+                    if ( provider.registerUrl ) { %>
+                        <button type="button" class="button button-primary button-<%- provider.id %> login-provider register-<%- provider.id %>" data-provider-url="<%- provider.registerUrl %>">
+                            <div class="icon <% if ( provider.iconClass ) { %>fa <%- provider.iconClass %><% } %>" aria-hidden="true">
+                                <% if ( provider.iconImage ) { %>
+                                    <img class="icon-image" src="<%- provider.iconImage %>" alt="<%- provider.name %> icon" />
+                                <% } %>
+                            </div>
+                            <span aria-hidden="true"><%- provider.name %></span>
+                            <span class="sr"><%- _.sprintf( gettext("Create account using %(providerName)s."), {providerName: provider.name} ) %></span>
+                        </button>
+                <%  }
+                }); %>
 
-    <% if (context.errorMessage) { %>
-        <div class="status submission-error">
-            <h4 class="message-title"><%- gettext("An error occurred.") %></h4>
-            <ul class="message-copy"><%- context.errorMessage %></ul>
-        </div>
-    <% } %>
-
-    <% if (context.currentProvider) { %>
-        <div class="status" aria-hidden="false">
-            <p class="message-copy">
-                <%- _.sprintf( gettext("You've successfully signed into %(currentProvider)s."), context ) %>
-                <%- _.sprintf( gettext("We just need a little more information before you start learning with %(platformName)s."), context ) %>
-            </p>
-        </div>
-    <% } else if ( context.providers.length > 0 || context.hasSecondaryProviders ) {  %>
-        <div class="login-providers">
+                <% if ( context.hasSecondaryProviders ) { %>
+                    <button type="button" class="button-secondary-login form-toggle" data-type="institution_login">
+                        <%- gettext("Use my institution/campus credentials") %>
+                    </button>
+                <% } %>
+            </div>
             <div class="section-title lines">
                 <h2>
-                    <span class="text"><%- gettext("Create an account using") %></span>
+                    <span class="text"><%- gettext("or create a new one here") %></span>
                 </h2>
             </div>
-            <%
-            _.each( context.providers, function( provider) {
-                if ( provider.registerUrl ) { %>
-                    <button type="button" class="button button-primary button-<%- provider.id %> login-provider register-<%- provider.id %>" data-provider-url="<%- provider.registerUrl %>">
-                        <div class="icon <% if ( provider.iconClass ) { %>fa <%- provider.iconClass %><% } %>" aria-hidden="true">
-                            <% if ( provider.iconImage ) { %>
-                                <img class="icon-image" src="<%- provider.iconImage %>" alt="<%- provider.name %> icon" />
-                            <% } %>
-                        </div>
-                        <span aria-hidden="true"><%- provider.name %></span>
-                        <span class="sr"><%- _.sprintf( gettext("Create account using %(providerName)s."), {providerName: provider.name} ) %></span>
-                    </button>
-            <%  }
-            }); %>
-
-            <% if ( context.hasSecondaryProviders ) { %>
-                <button type="button" class="button-secondary-login form-toggle" data-type="institution_login">
-                    <%- gettext("Use my institution/campus credentials") %>
-                </button>
-            <% } %>
-        </div>
-        <div class="section-title lines">
-            <h2>
-                <span class="text"><%- gettext("or create a new one here") %></span>
-            </h2>
-        </div>
-    <% } else { %>
-        <div class="section-title lines">
-            <h2>
-                <span class="text"><%- gettext("Create a new account") %></span>
-            </h2>
-        </div>
+        <% } else { %>
+            <div class="section-title lines">
+                <h2>
+                    <span class="text"><%- gettext("Create a new account") %></span>
+                </h2>
+            </div>
+        <% } %>
     <% } %>
 
     <%= context.fields %>

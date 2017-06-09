@@ -1,17 +1,16 @@
-(function (requirejs, require, define) {
-
-define(
+(function(requirejs, require, define) {
+    define(
 'video/00_video_storage.js',
 [],
 function() {
-    "use strict";
+    'use strict';
 /**
  * Provides convenient way to store key value pairs.
  *
  * @param {string} namespace Namespace that is used to store data.
  * @return {object} VideoStorage API.
  */
-    var VideoStorage = function (namespace, id) {
+    var VideoStorage = function(namespace, id) {
         /**
         * Adds new value to the storage or rewrites existent.
         *
@@ -20,7 +19,7 @@ function() {
         * @param {boolean} instanceSpecific Data with this flag will be added
         *     to instance specific storage.
         */
-        var setItem = function (name, value, instanceSpecific) {
+        var setItem = function(name, value, instanceSpecific) {
             if (name) {
                 if (instanceSpecific) {
                     window[namespace][id][name] = value;
@@ -40,7 +39,7 @@ function() {
         *     If the given key does not exist in the list
         *     associated with the object then this method must return null.
         */
-        var getItem = function (name, instanceSpecific) {
+        var getItem = function(name, instanceSpecific) {
             if (instanceSpecific) {
                 return window[namespace][id][name];
             } else {
@@ -55,7 +54,7 @@ function() {
         * @param {boolean} instanceSpecific Data with this flag will be added
         *     to instance specific storage.
         */
-        var removeItem = function (name, instanceSpecific) {
+        var removeItem = function(name, instanceSpecific) {
             if (instanceSpecific) {
                 delete window[namespace][id][name];
             } else {
@@ -67,7 +66,7 @@ function() {
         * Empties the storage.
         *
         */
-        var clear = function () {
+        var clear = function() {
             window[namespace] = {};
             window[namespace][id] = {};
         };

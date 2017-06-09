@@ -11,7 +11,7 @@ from openedx.core.djangoapps.credit.tests.factories import CreditProviderFactory
 from student.tests.factories import UserFactory
 
 
-@attr('shard_2')
+@attr(shard=2)
 class CreditProviderSerializerTests(TestCase):
     """ CreditProviderSerializer tests. """
 
@@ -32,7 +32,7 @@ class CreditProviderSerializerTests(TestCase):
         self.assertDictEqual(serializer.data, expected)
 
 
-@attr('shard_2')
+@attr(shard=2)
 class CreditEligibilitySerializerTests(TestCase):
     """ CreditEligibilitySerializer tests. """
 

@@ -2,8 +2,8 @@
     <header class="cohort-management-group-header"></header>
 
     <ul class="wrapper-tabs">
-        <li class="tab tab-manage_students is-selected" data-tab="manage_students"><a href="#"><span class="sr"><%- gettext('Selected tab') %> </span><%- gettext("Manage Students") %></a></li>
-        <li class="tab tab-settings" data-tab="settings"><a href="#"><%- gettext("Settings") %></a></li>
+        <li class="tab tab-manage_students is-selected" data-tab="manage_students"><button type="button" class="toggle-button"><span class="sr"><%- gettext('Selected tab') %> </span><%- gettext("Manage Students") %></button></li>
+        <li class="tab tab-settings" data-tab="settings"><button type="button" class="toggle-button"><%- gettext("Settings") %></button></li>
     </ul>
 
     <div class="cohort-management-group-add tab-content tab-content-manage_students" tabindex="-1">

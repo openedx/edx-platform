@@ -5,6 +5,6 @@ setup(
     version="0.1",
     packages=["symmath"],
     install_requires=[
-        "sympy",
+        "sympy==0.7.1",
     ],
 )

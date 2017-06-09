@@ -71,7 +71,7 @@ define([
             }
         },
 
-        addNewItemView: function (model) {
+        addNewItemView: function(model) {
             var view = this.createItemView({model: model});
 
             // If items already exist, just append one new.
@@ -101,7 +101,7 @@ define([
             this.collection.add({editing: true}, this.newModelOptions);
         },
 
-        onRemoveItem: function () {
+        onRemoveItem: function() {
             if (this.collection.length === 0) {
                 this.render();
             }

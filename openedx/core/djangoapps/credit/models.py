@@ -21,7 +21,7 @@ from jsonfield.fields import JSONField
 from model_utils.models import TimeStampedModel
 import pytz
 from simple_history.models import HistoricalRecords
-from xmodule_django.models import CourseKeyField
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
 
 CREDIT_PROVIDER_ID_REGEX = r"[a-z,A-Z,0-9,\-]+"

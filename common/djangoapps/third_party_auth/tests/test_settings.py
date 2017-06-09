@@ -2,6 +2,7 @@
 
 from third_party_auth import provider, settings
 from third_party_auth.tests import testutil
+from util.enterprise_helpers import enterprise_enabled
 import unittest
 
 
@@ -55,3 +56,9 @@ class SettingsUnitTest(testutil.TestCase):
         # bad in prod.
         settings.apply_settings(self.settings)
         self.assertFalse(self.settings.SOCIAL_AUTH_RAISE_EXCEPTIONS)
+
+    @unittest.skipUnless(enterprise_enabled(), 'enterprise not enabled')
+    def test_enterprise_elements_inserted(self):
+        settings.apply_settings(self.settings)
+        self.assertIn('enterprise.tpa_pipeline.set_data_sharing_consent_record', self.settings.SOCIAL_AUTH_PIPELINE)
+        self.assertIn('enterprise.tpa_pipeline.verify_data_sharing_consent', self.settings.SOCIAL_AUTH_PIPELINE)

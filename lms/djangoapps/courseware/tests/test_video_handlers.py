@@ -8,26 +8,25 @@ import textwrap
 import json
 import ddt
 
-from nose.plugins.attrib import attr
 from datetime import timedelta, datetime
-from webob import Request
 from mock import MagicMock, Mock, patch
+from nose.plugins.attrib import attr
+from webob import Request
 
+from openedx.core.djangoapps.contentserver.caching import del_cached_content
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.x_module import STUDENT_VIEW
-from . import BaseTestXmodule
-from .test_video_xml import SOURCE_XML
-from contentserver.caching import del_cached_content
 from xmodule.exceptions import NotFoundError
-
 from xmodule.video_module.transcripts_utils import (
     TranscriptException,
     TranscriptsGenerationException,
 )
 
+from . import BaseTestXmodule
+from .test_video_xml import SOURCE_XML
 
 TRANSCRIPT = {"start": [10], "end": [100], "text": ["Hi, welcome to Edx."]}
 BUMPER_TRANSCRIPT = {"start": [1], "end": [10], "text": ["A bumper"]}
@@ -123,7 +122,7 @@ def attach_bumper_transcript(item, filename, lang="en"):
     item.video_bumper["transcripts"][lang] = filename
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestVideo(BaseTestXmodule):
     """Integration tests: web client + mongo."""
     CATEGORY = "video"
@@ -189,7 +188,7 @@ class TestVideo(BaseTestXmodule):
         super(TestVideo, self).tearDown()
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestTranscriptAvailableTranslationsDispatch(TestVideo):
     """
     Test video handler that provide available translations info.
@@ -249,7 +248,7 @@ class TestTranscriptAvailableTranslationsDispatch(TestVideo):
         self.assertEqual(json.loads(response.body), ['en', 'uk'])
 
 
-@attr('shard_1')
+@attr(shard=1)
 @ddt.ddt
 class TestTranscriptAvailableTranslationsBumperDispatch(TestVideo):
     """
@@ -372,7 +371,7 @@ class TestTranscriptDownloadDispatch(TestVideo):
         self.assertEqual(response.headers['Content-Disposition'], 'attachment; filename="塞.srt"')
 
 
-@attr('shard_1')
+@attr(shard=1)
 @ddt.ddt
 class TestTranscriptTranslationGetDispatch(TestVideo):
     """
@@ -604,7 +603,7 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
             store.update_item(self.course, self.user.id)
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestStudioTranscriptTranslationGetDispatch(TestVideo):
     """
     Test Studio video handler that provide translation transcripts.
@@ -662,7 +661,7 @@ class TestStudioTranscriptTranslationGetDispatch(TestVideo):
         self.assertEqual(response.headers['Content-Language'], 'zh')
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestStudioTranscriptTranslationPostDispatch(TestVideo):
     """
     Test Studio video handler that provide translation transcripts.
@@ -723,7 +722,7 @@ class TestStudioTranscriptTranslationPostDispatch(TestVideo):
         self.assertTrue(_check_asset(self.item_descriptor.location, u'filename.srt'))
 
 
-@attr('shard_1')
+@attr(shard=1)
 class TestGetTranscript(TestVideo):
     """
     Make sure that `get_transcript` method works correctly

@@ -9,7 +9,7 @@ import uuid
 
 from django.test.client import RequestFactory
 
-from lms.djangoapps.lms_xblock.runtime import quote_slashes
+from openedx.core.lib.url_utils import quote_slashes
 from xblock.fragment import Fragment
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -30,7 +30,7 @@ from openedx.core.lib.xblock_builtin import (
 )
 
 
-@attr('shard_2')
+@attr(shard=2)
 @ddt.ddt
 class TestXblockUtils(SharedModuleStoreTestCase):
     """
