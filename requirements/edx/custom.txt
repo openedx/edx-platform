@@ -10,11 +10,12 @@
 -e git+https://github.com/edx-solutions/xblock-adventure.git@7bdeb62b1055377dc04a7b503f7eea8264f5847b#egg=xblock-adventure
 -e git+https://github.com/open-craft/xblock-poll.git@copy-change-patch#egg=xblock-poll
 -e git+https://github.com/edx/edx-notifications.git@0.6.0#egg=edx-notifications==0.6.0
--e git+https://github.com/open-craft/problem-builder.git@a4cc464c3b9f8cf9ff0055dbd5802968b15adb24#egg=problem-builder
+-e git+https://github.com/open-craft/problem-builder.git@6cc9169342d40d809a8c9de45608e0f40e896687#egg=problem-builder
 -e git+https://github.com/open-craft/xblock-group-project-v2.git@39771899e30700d3083daedc6464611c1ce9427a#egg=xblock-group-project-v2
 -e git+https://github.com/OfficeDev/xblock-officemix.git@86238f5968a08db005717dbddc346808f1ed3716#egg=xblock-officemix
 -e git+https://github.com/open-craft/xblock-chat.git@ff9c8da99f702d3ddfc36d6eb3381fee29d17e3c#egg=xblock-chat
 git+https://github.com/mckinseyacademy/xblock-diagnosticfeedback.git@v0.2.1#egg=xblock-diagnostic-feedback==0.2.1
+
 git+https://github.com/edx-solutions/api-integration.git@v1.1.7#egg=api-integration==1.1.7
 git+https://github.com/edx-solutions/organizations-edx-platform-extensions.git@v1.1.4#egg=organizations-edx-platform-extensions==1.1.4
 git+https://github.com/edx-solutions/gradebook-edx-platform-extensions.git@1.0.7#egg=gradebook-edx-platform-extensions==1.0.7
@@ -22,4 +23,3 @@ git+https://github.com/edx-solutions/projects-edx-platform-extensions.git@v1.0.9
 git+https://github.com/edx-solutions/discussion-edx-platform-extensions.git@v1.0.6#egg=discussion-edx-platform-extensions==1.0.6
 git+https://github.com/edx-solutions/course-edx-platform-extensions.git@v1.0.3#egg=course-edx-platform-extensions==1.0.3
 git+https://github.com/edx-solutions/progress-edx-platform-extensions.git@1.0.3#egg=progress-edx-platform-extensions==1.0.3
-
