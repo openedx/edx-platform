@@ -417,7 +417,7 @@ class OrderViewTests(UserMixin, TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_login_required(self):
-        """ The view should return 403 if the user is not logged in. """
+        """ The view should return 401 if the user is not logged in. """
         self.client.logout()
         response = self.client.get(self.path)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)
