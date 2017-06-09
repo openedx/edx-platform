@@ -18,7 +18,7 @@ from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.db.models import Q
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, QueryDict
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
 from django.utils.timezone import UTC
 from django.utils.translation import ugettext as _
@@ -805,9 +805,18 @@ def program_marketing(request, program_uuid):
     if not program_data:
         raise Http404
 
-    return render_to_response('courseware/program_marketing.html', {
-        'program': ProgramMarketingDataExtender(program_data, request.user).extend()
-    })
+    program = ProgramMarketingDataExtender(program_data, request.user).extend()
+    skus = program.get('skus')
+    ecommerce_service = EcommerceService()
+
+    return render(
+        request,
+        'courseware/program_marketing.html',
+        {
+            'checkout_url': ecommerce_service.checkout_page_url(*skus) if skus else '#courses',
+            'program': program,
+        }
+    )
 
 
 @transaction.non_atomic_requests

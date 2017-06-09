@@ -1,3 +1,373 @@
-<%page expression_filter="h"/>
+{% extends "main_django.html" %}
+{% load i18n %}
+{% load pipeline %}
+{% load static %}
+{% load url from future %}
 
-## This page is intentionally left blank. You can add your own program marketing page using comprehensive theming (http://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/changing_appearance/theming/enable_themes.html?highlight=theming).
+{% block title %}{{program.title}}{% endblock %}
+
+{% block headextra %}
+  {% stylesheet 'style-main-v2' %}
+  {% stylesheet 'style-learner-dashboard' %}
+{% endblock %}
+
+{% block body %}
+  <div id="program-details-page">
+    <div class="main-banner" style="background: #000 url({{program.banner_image.large.url}}) no-repeat center center / cover; %}">
+      <div class="grid-manual">
+        <div class="row">
+          <div class="col col-12 md-col-8 lg-col-9">
+            <div class="org-logo">
+              {% for organization in program.authoring_organizations %}
+                {% if organization.logo_image_url %}
+                  <img src="{{organization.logo_image_url}}" alt="{{organization.name}}">
+                {% endif %}
+              {% endfor %}
+            </div>
+            <h1 class="banner-title">{{program.title}}</h1>
+            <p class="banner-description">{{program.subtitle}}</p>
+            <a href="{{checkout_url}}" class="btn-brand btn-large hidden-sm btn-start">
+              {% blocktrans with program_name=program.title price=program.full_program_price|floatformat %}
+                Buy the {{program_name}} (${{price}} USD)
+              {% endblocktrans %}
+            </a>
+          </div>
+          <div class="col col-12 md-col-4 lg-col-3" id="course-trailer">
+            <button class="media trailer-link visible-sm" data-toggle="modal" data-target="#video-modal">
+              <i class="fa fa-play-circle-o" aria-hidden="true"></i>
+              <span>{% trans "View Course Trailer" %}</span>
+            </button>
+            <div class="hidden-sm">
+              <button class="media btn-play" data-toggle="modal" data-target="#video-modal">
+                <span class="sr">
+                  {% blocktrans with program_name=program.title %}
+                    Play the {{program_name}} program video
+                  {% endblocktrans %}
+                </span>
+                <i class="icon fa fa-2x fa-play" alt="{% trans "Play" %}" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-manual data-table">
+      <div class="row">
+        <div class="col col-12 md-col-7 lg-col-8 left-col">
+          <ul class="list-divided program-desc-tbl">
+            <li class="item">
+              <span>
+                <span class="fa fa-book fa-lg" aria-hidden="true"></span>
+                {% trans "Number of Courses" %}
+              </span>
+              <a href="#courses">
+                {% blocktrans with number_of_courses=program.courses|length %}
+                  {{number_of_courses}} courses in program
+                {% endblocktrans %}
+              </a>
+            </li>
+            <li class="item">
+              <span>
+                <span class="fa fa-clock-o fa-lg" aria-hidden="true"></span>
+                {% trans "Average Length" %}
+              </span>
+              <span>
+                {% blocktrans with weeks_to_complete=program.weeks_to_complete %}
+                  {{weeks_to_complete}} weeks per course
+                {% endblocktrans %}
+              </span>
+            </li>
+            <li class="item">
+              <span>
+                <span class="fa fa-tachometer fa-lg" aria-hidden="true"></span>
+                {% trans "Effort" %}
+              </span>
+              <span>
+                {% blocktrans with max_hours_effort_per_week=program.max_hours_effort_per_week min_hours_effort_per_week=program.min_hours_effort_per_week %}
+                  {{min_hours_effort_per_week}}-{{max_hours_effort_per_week}} hours per week, per course
+                {% endblocktrans %}
+              </span>
+            </li>
+            <li class="item">
+              <span>
+                <span class="fa fa-tag fa-lg" aria-hidden="true"></span>
+                {% trans "Price (USD)" %}
+              </span>
+              <span>
+                {% blocktrans with full_program_price=program.full_program_price|floatformat %}
+                  ${{full_program_price}} for entire program
+                {% endblocktrans %}
+              </span>
+            </li>
+          </ul>
+          <div id="accordion-group">
+            <div class="accordion-item">
+              <div class="accordion-head">{% trans "Overview" %}</div>
+              <div class="accordion-content">
+                <p>{{program.overview}}</p>
+              </div>
+            </div>
+            <div class="accordion-item">
+              <div class="accordion-head">{% trans "Job Outlook" %}</div>
+              <div class="accordion-content">
+                <ul class="list-bulleted list-disc no-indent">
+                  {% for item in program.job_outlook_items %}
+                    <li>{{item}}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </div>
+            <div class="accordion-item">
+              <div class="accordion-head">{% trans "What You'll Learn" %}</div>
+              <div class="accordion-content">
+                <ul class="list-bulleted list-disc no-indent">
+                  {% for item in program.expected_learning_items %}
+                    <li>{{item}}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </div>
+            <div class="accordion-item instructors-mobile-list">
+              <div class="accordion-head">{% trans "Instructors" %}</div>
+              <div class="accordion-content">
+                <div class="instructor-profiles">
+                  {% for instructor in program.instructors %}
+                    <div class="profile-item">
+                      <div class="avatar">
+                        <div class="img-holder">
+                          <a href="#instructor-details-mobile-{{forloop.counter}}" class="instructor-image">
+                            <img src="{% static instructor.image %}" alt="{{instructor.name}}"/>
+                          </a>
+                        </div>
+                      </div>
+                      <div class="details">
+                        <div class="name">
+                          <a href="#instructor-details-mobile-{{forloop.counter}}" class="instructor-label">{{instructor.name}}</a>
+                        </div>
+                        <div class="dept">{{instructor.organization}}</div>
+                      </div>
+                      <div class="modal modal-custom" id="instructor-details-mobile-{{forloop.counter}}">
+                        <a href="#" class="focusKeeper"></a>
+                        <div class="btn-close modal_close">
+                          <a href="#">
+                            <span class="sr">{% trans "Close" %}</span>
+                            <i class="fa fa-close" aria-hidden="true"></i>
+                          </a>
+                        </div>
+                        <div class="modal-body">
+                          <div class="modal-header">
+                            <div class="instructor-data">
+                              <div class="thumbnail">
+                                <img src="{{instructor.image}}" alt="{{instructor.name}}">
+                              </div>
+                              <h3>
+                                <span class="instructor-name">{{instructor.name}}</span>
+                                <span>
+                                  {% blocktrans with position=instructor.title organization=instructor.organization %}
+                                    {{position}} at {{organization}}
+                                  {% endblocktrans %}
+                                </span>
+                              </h3>
+                            </div>
+                          </div>
+                          <div class="instructor-bio">{{instructor.bio}}</div>
+                        </div>
+                        <a href="#" class="focusKeeper"></a>
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+            {% include "courseware/_program_type_faq.html" with program_type=program.type %}
+            <div class="accordion-item">
+              <div class="accordion-head">{% trans "FAQ" %}</div>
+              <div class="accordion-content">
+                <ul class="list-unstyled faq-links-list">
+                  {% for item in program.faq %}
+                    <li class="item">
+                      <a href="#!">{{item.question}}</a>
+                      <div class="answer hidden">{{item.answer}}</div>
+                    </li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </div>
+          </div>
+          <blockquote class="program-quote visible-sm">
+            <div class="quote">
+              {% if program.individual_endorsements %}
+                {% for endorsement in program.individual_endorsements %}
+                  <span>"{{endorsement.quote}}"</span>
+                  {% if endorsement.endorser %}
+                    <img class="visible-sm pull-left"
+                         src="{{endorsement.endorser.profile_image.medium.url}}"
+                         width="40" height="40"
+                         alt="{% trans 'Endorser Image' %}"/>
+                    <span class="writer">
+                      {{endorsement.endorser.given_name}},
+                      {{endorsement.endorser.position.title}},
+                      {{endorsement.endorser.position.organization_name}}
+                    </span>
+                  {% endif %}
+                {% endfor %}
+              {% endif %}
+            </div>
+          </blockquote>
+        </div>
+
+        <div class="col col-12 md-col-5 lg-col-4 right-col hidden-sm">
+          <h2 class="instructors-title">
+            {% trans "Meet the Instructors" %}
+            <span>({{program.instructors|length}})</span>
+          </h2>
+          <div class="instructor-profiles">
+            {% for instructor in program.instructors %}
+              <div class="profile-item profile-item-desktop">
+                <div class="avatar">
+                  <div class="img-holder">
+                    <a href="#instructor-details-{{forloop.counter}}" class="instructor-image">
+                      <img src="{% static instructor.image %}" alt="{{instructor.name}}"/>
+                    </a>
+                  </div>
+                </div>
+                <div class="details">
+                  <div class="name">
+                    <a href="#instructor-details-{{forloop.counter}}" class="instructor-label">{{instructor.name}}</a>
+                  </div>
+                  <div class="dept">{{instructor.organization}}</div>
+                </div>
+
+                <div class="modal modal-custom" id="instructor-details-{{forloop.counter}}">
+                  <a href="#" class="focusKeeper"></a>
+                  <div class="btn-close modal_close">
+                    <a href="#">
+                      <span class="sr">{% trans "Close" %}</span>
+                      <i class="fa fa-close" aria-hidden="true"></i>
+                    </a>
+                  </div>
+                  <div class="modal-body">
+                    <div class="modal-header">
+                      <div class="instructor-data">
+                        <div class="thumbnail">
+                          <img src="{% static instructor.image %}" alt="{{instructor.name}}"/>
+                        </div>
+                        <h3>
+                          <span class="instructor-name">{{instructor.name}}</span>
+                          <span>
+                            {% blocktrans with position=instructor.title organization=instructor.organization %}
+                              {{position}} at {{organization}}
+                            {% endblocktrans %}
+                          </span>
+                        </h3>
+                      </div>
+                    </div>
+                    <div class="instructor-bio">{{instructor.bio}}</div>
+                  </div>
+                  <a href="#" class="focusKeeper"></a>
+                </div>
+              </div>
+            {% endfor %}
+
+            <div class="pagination hidden-xs">
+              <div class="pages">
+                {% with number_of_instructors=program.instructors|length|stringformat:"s" %}
+                  {# Translators: page_start and page_end are ordinal numbers of the first and the last instructor shown on the current page, respectively. #}
+                  {% blocktrans with page_start='<span class="pagination-start"></span>' page_end='<span class="pagination-end"></span>' number_of_instructors='<span class="instructor-size">'|add:number_of_instructors|add:'</span>'|safe %}
+                    {{page_start}}-{{page_end}} of {{number_of_instructors}}
+                  {% endblocktrans %}
+                {% endwith %}
+              </div>
+              <div class="controls">
+                <a href="#" id="pagination-previous"><span class="fa fa-chevron-up"></span></a>
+                <a href="#" id="pagination-next"><span class="fa fa-chevron-down"></span></a>
+              </div>
+            </div>
+          </div>
+          <blockquote class="program-quote">
+            <div class="quote">
+              {% if program.individual_endorsements %}
+                {% for endorsement in program.individual_endorsements %}
+                  <span class="pull-right hidden-sm">
+                    {% if endorsement.endorser %}
+                      <img src="{{endorsement.endorser.profile_image.medium.url}}"
+                           width="90" height="90"
+                           alt="{% trans 'Endorser Image' %}"/>
+                    {% endif %}
+                  </span>
+                  <span>"{{endorsement.quote}}"</span>
+                  <span class="writer">
+                    {% if endorsement.endorser %}
+                      {{endorsement.endorser.given_name}},
+                      {{endorsement.endorser.position.title}},
+                      {{endorsement.endorser.position.organization_name}}
+                    {% endif %}
+                  </span>
+                {% endfor %}
+              {% endif %}
+            </div>
+          </blockquote>
+        </div>
+      </div>
+    </div>
+
+    <div class="container courses-in-program" id="courses">
+      <h3 class="hd">
+        {% blocktrans with program_type=program.type %}
+          Courses in the {{program_type}}
+        {% endblocktrans %}
+      </h3>
+      <div class="course-cards">
+        {% for course in program.courses %}
+          {% if course.course_runs %}
+            <div class="course-card">
+              <div class="course-content">
+                <div class="col-full-sm">
+                  <h4 class="hd title">
+                    <a href="/courses/{{course.course_runs.0.key}}/about"> {{course.title}}</a>
+                    <small>
+                      <span>
+                        <i class="fa fa-clock-o" aria-hidden="true"></i>
+                        {% blocktrans with course_start_datetime=course.course_runs.0.start|date:"E d, Y" %}
+                          Starts {{course_start_datetime}}
+                        {% endblocktrans %}
+                      </span>
+
+                      {% if course.course_runs.0.pacing_type == "instructor_paced" %}
+                        <span>{% trans "Instructor - Paced" %}</span>
+                      {% else %}
+                        <span>{% trans "Self - Paced" %}</span>
+                      {% endif %}
+                    </small>
+                  </h4>
+                  <p class="copy-meta">
+                    {% if course.course_runs.0.short_description %}
+                      {{course.course_runs.0.short_description}}
+                    {% endif %}
+                  </p>
+                  <p class="copy-meta-mobile">
+                    {{course.course_runs.0.short_description|truncatechars:253}}
+                  </p>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+      <span class="pagingInfo"></span>
+    </div>
+
+    <div id="video-modal" class="modal modal-custom custom-video-modal">
+      <div class="inner-wrapper">
+        <iframe title="{% trans 'YouTube Video' %}" width="640" height="360"
+                src="{{program.video.src}}"
+                frameborder="0" allowfullscreen></iframe>
+      </div>
+    </div>
+  </div>
+
+  <script type="text/javascript" src="{% static 'js/bootstrap-modal.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/slick.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/program_marketing.js' %}"></script>
+{% endblock %}
