@@ -87,9 +87,8 @@ class PartitionService(object):
     with a given course.
     """
 
-    def __init__(self, course_id, track_function=None, cache=None):
+    def __init__(self, course_id, cache=None):
         self._course_id = course_id
-        self._track_function = track_function
         self._cache = cache
 
     def get_course(self):
@@ -165,7 +164,7 @@ class PartitionService(object):
         the partition's scheme.
         """
         return user_partition.scheme.get_group_for_user(
-            self._course_id, user, user_partition, assign=assign, track_function=self._track_function
+            self._course_id, user, user_partition, assign=assign,
         )
 
 
