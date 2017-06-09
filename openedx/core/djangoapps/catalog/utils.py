@@ -109,15 +109,17 @@ def get_program_types(name=None):
         return []
 
 
-def get_programs_with_type(types=None):
+def get_programs_with_type(types=None, include_hidden=True):
     """
     Return the list of programs. You can filter the types of programs returned using the optional
-    types parameter. If no filter is provided, all programs of all types will be returned.
+    types parameter. If no filter is provided, all programs of all types will be returned. In addition,
+    you can specify whether to include hidden programs using the optional include_hidden parameter.
 
     The program dict is updated with the fully serialized program type.
 
     Keyword Arguments:
         types (list): List of program type slugs to filter by.
+        include_hidden (bool): whether to include hidden programs
 
     Return:
         list of dict, representing the active programs.
@@ -134,6 +136,9 @@ def get_programs_with_type(types=None):
             # arise, consider using the cache_programs management command to
             # cache the filtered lists of UUIDs.
             if types and program['type'] not in types:
+                continue
+
+            if program['hidden'] and not include_hidden:
                 continue
 
             # deepcopy the program dict here so we are not adding
