@@ -12,16 +12,7 @@ from common.test.acceptance.pages.lms.course_info import CourseInfoPage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.progress import ProgressPage
 from common.test.acceptance.pages.lms.tab_nav import TabNavPage
-from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage
-from common.test.acceptance.tests.helpers import disable_animations
-from common.test.acceptance.pages.common.logout import LogoutPage
-from common.test.acceptance.tests.helpers import (
-    UniqueCourseTest,
-    EventsTestMixin,
-    load_data_str,
-    get_element_padding,
-    get_modal_alert,
-)
+from common.test.acceptance.tests.helpers import EventsTestMixin, UniqueCourseTest, get_element_padding, load_data_str
 
 
 @attr(shard=5)
@@ -168,7 +159,6 @@ class CertificateProgressPageTest(UniqueCourseTest):
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
         self.course_home_page = CourseHomePage(self.browser, self.course_id)
         self.tab_nav = TabNavPage(self.browser)
-        self.instructor_dashboard_page = InstructorDashboardPage(self.browser, self.course_id)
 
     def log_in_as_unique_user(self):
         """
@@ -180,19 +170,6 @@ class CertificateProgressPageTest(UniqueCourseTest):
             email="progress@example.com",
             password="testuser",
             course_id=self.course_id
-        ).visit()
-
-    def log_in_as_staff(self):
-        """
-        Log in as a staff user.
-        """
-        AutoAuthPage(
-            self.browser,
-            username="teststaff",
-            email="test_staff@example.com",
-            password="teststaff",
-            course_id=self.course_id,
-            staff=True
         ).visit()
 
     def test_progress_page_has_view_certificate_button(self):
@@ -209,10 +186,8 @@ class CertificateProgressPageTest(UniqueCourseTest):
         And their should be no padding around Certificate info box.
         """
         self.cert_fixture.install()
-
-        self.enable_self_generated_certificates()
-
         self.log_in_as_unique_user()
+
         self.complete_course_problems()
 
         self.course_info_page.visit()
@@ -272,20 +247,3 @@ class CertificateProgressPageTest(UniqueCourseTest):
         # Submit the answer
         self.courseware_page.q(css='button.submit').click()
         self.courseware_page.wait_for_ajax()
-
-    def enable_self_generated_certificates(self):
-        """
-        Self-generated certificates should be enabled for the presence of View
-        Certificate button on Course Progress menu. By default, it is disabled
-        for instructor-paced courses. (EDUCATOR-394)
-        """
-        self.log_in_as_staff()
-
-        self.instructor_dashboard_page.visit()
-        self.certificates_section = self.instructor_dashboard_page.select_certificates()
-        disable_animations(self.certificates_section)
-        self.certificates_section.self_generated_certificate_enabled_button.click()
-        alert = get_modal_alert(self.certificates_section.browser)
-        alert.accept()
-        self.certificates_section.wait_for_ajax()
-        LogoutPage(self.browser).visit()

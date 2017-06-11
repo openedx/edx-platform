@@ -1361,6 +1361,9 @@ class ProgressPageTests(ProgressPageBaseTests):
         # Enable the feature, but do not enable it for this course
         CertificateGenerationConfiguration(enabled=True).save()
 
+        # Enable certificate generation for this course
+        certs_api.set_cert_generation_enabled(self.course.id, True)
+
         # Course certificate configurations
         certificates = [
             {
@@ -1379,14 +1382,6 @@ class ProgressPageTests(ProgressPageBaseTests):
         self.course.save()
         self.store.update_item(self.course, self.user.id)
 
-        # verify that certificate web view button disappears if self-generated certificates
-        # are disabled
-        resp = self._get_progress_page()
-        self.assertNotContains(resp, u"View Certificate")
-
-        # Enable certificate self-generation for this course
-        certs_api.set_cert_generation_enabled(self.course.id, True)
-
         resp = self._get_progress_page()
         self.assertContains(resp, u"View Certificate")
 
@@ -1397,11 +1392,6 @@ class ProgressPageTests(ProgressPageBaseTests):
         # when course certificate is not active
         certificates[0]['is_active'] = False
         self.store.update_item(self.course, self.user.id)
-
-        # Re-enable certificate self-generation for this course because whenever
-        # course content changes then self-generation changes according to pacing
-        # (EDUCATOR-394)
-        certs_api.set_cert_generation_enabled(self.course.id, True)
 
         resp = self._get_progress_page()
         self.assertNotContains(resp, u"View Your Certificate")
@@ -1532,9 +1522,6 @@ class ProgressPageTests(ProgressPageBaseTests):
         self.course.cert_html_view_enabled = True
         self.course.save()
         self.store.update_item(self.course, self.user.id)
-
-        # Enable certificate generation for this course (EDUCATOR-394)
-        certs_api.set_cert_generation_enabled(self.course.id, True)
 
         resp = self._get_progress_page()
         self.assertContains(resp, u"View Certificate")
