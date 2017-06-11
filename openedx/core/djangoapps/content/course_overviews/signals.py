@@ -11,11 +11,9 @@ from xmodule.modulestore.django import SignalHandler
 def _listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=unused-argument
     """
     Catches the signal that a course has been published in Studio and
-    updates the corresponding CourseOverview cache entry. Also sends out
-    the signal that course_overview table has been updated.
+    updates the corresponding CourseOverview cache entry.
     """
-    course_overview = CourseOverview.load_from_module_store(course_key)
-    course_overview.send_signal()
+    CourseOverview.load_from_module_store(course_key)
 
 
 @receiver(SignalHandler.course_deleted)
