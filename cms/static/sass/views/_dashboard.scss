@@ -625,6 +625,18 @@
 
   }
 
+  .optimization-form {
+    margin-bottom: $baseline;
+
+    label {
+      font-size: 1.4rem;
+    }
+
+    .form-actions {
+      margin-top: ($baseline/2);
+    }
+  }
+
   // ====================
 
   // ELEM: new user form
