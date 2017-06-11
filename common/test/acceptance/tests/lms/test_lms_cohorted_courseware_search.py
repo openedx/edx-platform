@@ -7,7 +7,6 @@ import uuid
 
 from nose.plugins.attrib import attr
 
-from common.test.acceptance.fixtures import LMS_BASE_URL
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.common.logout import LogoutPage
@@ -17,12 +16,13 @@ from common.test.acceptance.pages.lms.staff_view import StaffCoursewarePage
 from common.test.acceptance.pages.studio.component_editor import ComponentVisibilityEditorView
 from common.test.acceptance.pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
 from common.test.acceptance.pages.studio.settings_group_configurations import GroupConfigurationsPage
+from common.test.acceptance.tests.discussion.helpers import CohortTestMixin
 from common.test.acceptance.tests.helpers import remove_file
 from common.test.acceptance.tests.studio.base_studio_test import ContainerBase
 
 
 @attr(shard=1)
-class CoursewareSearchCohortTest(ContainerBase):
+class CoursewareSearchCohortTest(ContainerBase, CohortTestMixin):
     """
     Test courseware search.
     """
@@ -131,15 +131,6 @@ class CoursewareSearchCohortTest(ContainerBase):
                 )
             )
         )
-
-    def enable_cohorting(self, course_fixture):
-        """
-        Enables cohorting for the current course.
-        """
-        url = LMS_BASE_URL + "/courses/" + course_fixture._course_key + '/cohorts/settings'  # pylint: disable=protected-access
-        data = json.dumps({'is_cohorted': True})
-        response = course_fixture.session.patch(url, data=data, headers=course_fixture.headers)
-        self.assertTrue(response.ok, "Failed to enable cohorts")
 
     def create_content_groups(self):
         """

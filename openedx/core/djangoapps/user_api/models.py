@@ -29,6 +29,15 @@ class UserPreference(models.Model):
     class Meta(object):
         unique_together = ("user", "key")
 
+    @staticmethod
+    def get_all_preferences(user):
+        """
+        Gets all preferences for a given user
+
+        Returns: Set of (preference type, value) pairs for each of the user's preferences
+        """
+        return dict([(pref.key, pref.value) for pref in user.preferences.all()])
+
     @classmethod
     def get_value(cls, user, preference_key, default=None):
         """Gets the user preference value for a given key.

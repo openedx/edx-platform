@@ -9,7 +9,6 @@ from unittest import skip
 
 import pytz
 from bok_choy.promise import EmptyPromise
-from flaky import flaky
 from nose.plugins.attrib import attr
 
 from common.test.acceptance.fixtures.course import CourseFixture, CourseUpdateDesc, XBlockFixtureDesc
@@ -140,7 +139,6 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
         self.login_page.visit().toggle_form()
         self.assertEqual(self.login_page.current_form, "register")
 
-    @flaky  # ECOM-1165
     def test_password_reset_success(self):
         # Create a user account
         email, password = self._create_unique_user()  # pylint: disable=unused-variable
@@ -565,6 +563,7 @@ class CourseWikiTest(UniqueCourseTest):
         self.course_wiki_edit_page.wait_for_page()
 
     @attr(shard=1)
+    @skip  # EDUCATOR-511
     def test_edit_course_wiki(self):
         """
         Wiki page by default is editable for students.

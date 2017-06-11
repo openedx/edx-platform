@@ -34,10 +34,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
 from openedx.core.djangoapps.user_api.accounts.api import request_password_change
 from openedx.core.djangoapps.user_api.errors import UserNotFound
-from openedx.features.enterprise_support.api import (
-    enterprise_customer_for_request,
-    set_enterprise_branding_filter_param
-)
+from openedx.features.enterprise_support.api import enterprise_customer_for_request
 from openedx.core.lib.time_zone_utils import TIME_ZONE_CHOICES
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from student.models import UserProfile
@@ -99,8 +96,6 @@ def login_and_registration_form(request, initial_mode="login"):
         except (KeyError, ValueError, IndexError):
             pass
 
-    set_enterprise_branding_filter_param(request=request, provider_id=third_party_auth_hint)
-
     # If this is a themed site, revert to the old login/registration pages.
     # We need to do this for now to support existing themes.
     # Themed sites can use the new logistration page by setting
@@ -133,6 +128,9 @@ def login_and_registration_form(request, initial_mode="login"):
             'third_party_auth_hint': third_party_auth_hint or '',
             'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
             'support_link': configuration_helpers.get_value('SUPPORT_SITE_LINK', settings.SUPPORT_SITE_LINK),
+            'password_reset_support_link': configuration_helpers.get_value(
+                'PASSWORD_RESET_SUPPORT_LINK', settings.PASSWORD_RESET_SUPPORT_LINK
+            ) or settings.SUPPORT_SITE_LINK,
             'account_activation_messages': account_activation_messages,
 
             # Include form descriptions retrieved from the user API.
@@ -560,6 +558,9 @@ def account_settings_context(request):
             }
         },
         'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
+        'password_reset_support_link': configuration_helpers.get_value(
+            'PASSWORD_RESET_SUPPORT_LINK', settings.PASSWORD_RESET_SUPPORT_LINK
+        ) or settings.SUPPORT_SITE_LINK,
         'user_accounts_api_url': reverse("accounts_api", kwargs={'username': user.username}),
         'user_preferences_api_url': reverse('preferences_api', kwargs={'username': user.username}),
         'disable_courseware_js': True,

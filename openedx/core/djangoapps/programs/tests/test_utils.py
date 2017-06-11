@@ -518,6 +518,23 @@ class TestProgramProgressMeter(TestCase):
         meter = ProgramProgressMeter(self.user)
         self.assertEqual(meter.completed_programs, [program['uuid']])
 
+    @mock.patch(UTILS_MODULE + '.ProgramProgressMeter.completed_course_runs', new_callable=mock.PropertyMock)
+    def test_credit_course_counted_complete_for_verified(self, mock_completed_course_runs, mock_get_programs):
+        """
+        Verify that 'credit' course certificate type are treated as if they were
+        "verified" when checking for course completion status.
+        """
+        course_run_key = generate_course_run_key()
+        course = CourseFactory(course_runs=[
+            CourseRunFactory(key=course_run_key, type='credit'),
+        ])
+        program = ProgramFactory(courses=[course])
+        mock_get_programs.return_value = [program]
+        self._create_enrollments(course_run_key)
+        meter = ProgramProgressMeter(self.user)
+        mock_completed_course_runs.return_value = [{'course_run_id': course_run_key, 'type': 'verified'}]
+        self.assertEqual(meter._is_course_complete(course), True)
+
 
 @ddt.ddt
 @override_settings(ECOMMERCE_PUBLIC_URL_ROOT=ECOMMERCE_URL_ROOT)

@@ -32,8 +32,9 @@ from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.monitoring_utils import set_custom_metrics_for_course_key
+from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 from openedx.features.enterprise_support.api import data_sharing_consent_required
-from openedx.features.course_experience import UNIFIED_COURSE_VIEW_FLAG
+from openedx.features.course_experience import UNIFIED_COURSE_VIEW_FLAG, default_course_url_name
 from request_cache.middleware import RequestCache
 from shoppingcart.models import CourseRegistrationCode
 from student.views import is_course_blocked
@@ -54,7 +55,10 @@ from ..entrance_exams import (
 from ..masquerade import setup_masquerade
 from ..model_data import FieldDataCache
 from ..module_render import toc_for_course, get_module_for_descriptor
-from .views import CourseTabView, check_access_to_course
+from .views import (
+    CourseTabView, check_access_to_course, check_and_get_upgrade_link,
+    get_cosmetic_verified_display_price
+)
 
 
 TEMPLATE_IMPORTS = {'urllib': urllib}
@@ -148,7 +152,7 @@ class CoursewareIndex(View):
                 self._save_positions()
                 self._prefetch_and_bind_section()
 
-        return render_to_response('courseware/courseware.html', self._create_courseware_context())
+        return render_to_response('courseware/courseware.html', self._create_courseware_context(request))
 
     def _redirect_if_not_requested_section(self):
         """
@@ -318,15 +322,19 @@ class CoursewareIndex(View):
         save_child_position(self.course, self.chapter_url_name)
         save_child_position(self.chapter, self.section_url_name)
 
-    def _create_courseware_context(self):
+    def _create_courseware_context(self, request):
         """
         Returns and creates the rendering context for the courseware.
         Also returns the table of contents for the courseware.
         """
-        request = RequestCache.get_current_request()
+        course_url_name = default_course_url_name(request)
+        course_url = reverse(course_url_name, kwargs={'course_id': unicode(self.course.id)})
         courseware_context = {
             'csrf': csrf(self.request)['csrf_token'],
             'course': self.course,
+            'course_url': course_url,
+            'chapter': self.chapter,
+            'section': self.section,
             'init': '',
             'fragment': Fragment(),
             'staff_access': self.is_staff,
@@ -336,10 +344,12 @@ class CoursewareIndex(View):
             'xqa_server': settings.FEATURES.get('XQA_SERVER', "http://your_xqa_server.com"),
             'bookmarks_api_url': reverse('bookmarks'),
             'language_preference': self._get_language_preference(),
-            'disable_optimizely': True,
+            'disable_optimizely': not WaffleSwitchNamespace('RET').is_enabled('enable_optimizely_in_courseware'),
             'section_title': None,
             'sequence_title': None,
             'disable_accordion': waffle.flag_is_active(request, UNIFIED_COURSE_VIEW_FLAG),
+            'upgrade_link': check_and_get_upgrade_link(request, self.effective_user, self.course.id),
+            'upgrade_price': get_cosmetic_verified_display_price(self.course),
         }
         table_of_contents = toc_for_course(
             self.effective_user,

@@ -67,7 +67,7 @@ from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError
 from certificates.tests.factories import GeneratedCertificateFactory
 from certificates.models import CertificateStatuses
 
-from openedx.core.djangoapps.course_groups.cohorts import set_course_cohort_settings
+from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
 from openedx.core.lib.xblock_utils import grade_histogram
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
@@ -2701,7 +2701,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         cohorted, and does not when the course is not cohorted.
         """
         url = reverse('get_students_features', kwargs={'course_id': unicode(self.course.id)})
-        set_course_cohort_settings(self.course.id, is_cohorted=is_cohorted)
+        set_course_cohorted(self.course.id, is_cohorted)
 
         response = self.client.post(url, {})
         res_json = json.loads(response.content)

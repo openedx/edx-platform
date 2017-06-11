@@ -216,7 +216,7 @@ def index(request, extra_context=None, user=AnonymousUser()):
 
     # Do not add programs to the context if there are no program types enabled for the site.
     if program_types:
-        programs_list = get_programs_with_type(program_types)
+        programs_list = get_programs_with_type(program_types, include_hidden=False)
 
     context["programs_list"] = programs_list
 
@@ -652,8 +652,8 @@ def dashboard(request):
         settings.FEATURES.get('DISPLAY_COURSE_MODES_ON_DASHBOARD', True)
     )
     activation_email_support_link = configuration_helpers.get_value(
-        'ACTIVATION_EMAIL_SUPPORT_LINK', settings.SUPPORT_SITE_LINK
-    )
+        'ACTIVATION_EMAIL_SUPPORT_LINK', settings.ACTIVATION_EMAIL_SUPPORT_LINK
+    ) or settings.SUPPORT_SITE_LINK
 
     # Let's filter out any courses in an "org" that has been declared to be
     # in a configuration
@@ -2267,7 +2267,7 @@ def auto_auth(request):
         elif course_id:
             # Redirect to the course homepage (in LMS) or outline page (in Studio)
             try:
-                redirect_url = reverse(course_home_url_name(request), kwargs={'course_id': course_id})
+                redirect_url = reverse(course_home_url_name(course_key), kwargs={'course_id': course_id})
             except NoReverseMatch:
                 redirect_url = reverse('course_handler', kwargs={'course_key_string': course_id})
         else:

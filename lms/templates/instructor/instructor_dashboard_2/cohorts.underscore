@@ -35,7 +35,7 @@
 
         <!-- Uploading a CSV file of cohort assignments. -->
         <button class="toggle-cohort-management-secondary" data-href="#cohort-management-file-upload"><%- gettext('Assign students to cohorts by uploading a CSV file') %></button>
-        <div class="cohort-management-file-upload csv-upload is-hidden" id="cohort-management-file-upload" tabindex="-1"></div>
+        <div class="cohort-management-file-upload csv-upload hidden" id="cohort-management-file-upload" tabindex="-1"></div>
 
         <div class="cohort-management-supplemental">
             <p class="">
@@ -49,15 +49,5 @@
                 %>
             </p>
         </div>
-
-        <hr class="divider divider-lv1" />
-
-        <!-- Discussion Topics. -->
-        <button class="toggle-cohort-management-discussions" data-href="#cohort-discussions-management"><%- gettext('Specify whether discussion topics are divided by cohort') %></button>
-        <div class="cohort-discussions-nav is-hidden" id="cohort-discussions-management" tabindex="-1">
-            <div class="cohort-course-wide-discussions-nav"></div>
-            <div class="cohort-inline-discussions-nav"></div>
-        </div>
-
     </div>
 <% } %>

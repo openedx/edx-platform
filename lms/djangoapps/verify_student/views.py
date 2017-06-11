@@ -505,7 +505,7 @@ class PayAndVerifyView(View):
             # is enabled redirect him to the ecommerce checkout page.
             ecommerce_service = EcommerceService()
             if ecommerce_service.is_enabled(user):
-                url = ecommerce_service.checkout_page_url(sku)
+                url = ecommerce_service.get_checkout_page_url(sku)
 
         # Redirect if necessary, otherwise implicitly return None
         if url is not None:
@@ -1109,13 +1109,15 @@ def results_callback(request):
 
     headers = {
         "Authorization": request.META.get("HTTP_AUTHORIZATION", ""),
+        "Content-Type": "application/json",
         "Date": request.META.get("HTTP_DATE", "")
     }
 
+    body_for_signature = {"EdX-ID": body_dict.get("EdX-ID")}
     has_valid_signature(
         "POST",
         headers,
-        body_dict,
+        body_for_signature,
         settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["API_ACCESS_KEY"],
         settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["API_SECRET_KEY"]
     )

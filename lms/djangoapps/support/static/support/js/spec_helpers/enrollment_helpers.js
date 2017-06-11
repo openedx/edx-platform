@@ -39,7 +39,7 @@ define([], function() {
             enrollment_end: null,
             verified_price: 5,
             verified_upgrade_deadline: null,
-            verification_deadline: null,
+            verification_deadline: '2017-09-01T16:00:00Z',
             manual_enrollment: {}
         }
     };

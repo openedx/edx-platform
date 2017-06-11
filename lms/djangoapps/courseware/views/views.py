@@ -86,9 +86,9 @@ from openedx.core.djangoapps.programs.utils import ProgramMarketingDataExtender
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.features.course_experience import (
-    UNIFIED_COURSE_EXPERIENCE_FLAG,
+    UNIFIED_COURSE_TAB_FLAG,
     UNIFIED_COURSE_VIEW_FLAG,
-    course_home_url_name
+    course_home_url_name,
 )
 from openedx.features.course_experience.views.course_dates import CourseDatesFragmentView
 from openedx.features.enterprise_support.api import data_sharing_consent_required
@@ -167,7 +167,7 @@ def courses(request):
 
     # Do not add programs to the context if there are no program types enabled for the site.
     if program_types:
-        programs_list = get_programs_with_type(program_types)
+        programs_list = get_programs_with_type(program_types, include_hidden=False)
 
     return render_to_response(
         "courseware/courses.html",
@@ -207,7 +207,7 @@ def jump_to_id(request, course_id, module_id):
 
 
 @ensure_csrf_cookie
-def jump_to(request, course_id, location):
+def jump_to(_request, course_id, location):
     """
     Show the page that contains a specific location.
 
@@ -222,8 +222,7 @@ def jump_to(request, course_id, location):
     except InvalidKeyError:
         raise Http404(u"Invalid course_key or usage_key")
     try:
-        unified_course_view = waffle.flag_is_active(request, UNIFIED_COURSE_VIEW_FLAG)
-        redirect_url = get_redirect_url(course_key, usage_key, unified_course_view=unified_course_view)
+        redirect_url = get_redirect_url(course_key, usage_key)
     except ItemNotFoundError:
         raise Http404(u"No data at this location: {0}".format(usage_key))
     except NoPathToItem:
@@ -263,11 +262,12 @@ def course_info(request, course_id):
                 return url
         return None
 
-    # If the unified course experience is enabled, redirect to the "Course" tab
-    if waffle.flag_is_active(request, UNIFIED_COURSE_EXPERIENCE_FLAG):
-        return redirect(reverse(course_home_url_name(request), args=[course_id]))
-
     course_key = CourseKey.from_string(course_id)
+
+    # If the unified course experience is enabled, redirect to the "Course" tab
+    if UNIFIED_COURSE_TAB_FLAG.is_enabled(course_key):
+        return redirect(reverse(course_home_url_name(course_key), args=[course_id]))
+
     with modulestore().bulk_operations(course_key):
         course = get_course_by_id(course_key, depth=2)
         access_response = has_access(request.user, 'load', course, course_key)
@@ -320,30 +320,12 @@ def course_info(request, course_id):
         if settings.FEATURES.get('ENABLE_MKTG_SITE'):
             url_to_enroll = marketing_link('COURSES')
 
-        store_upgrade_cookie = False
-        upgrade_cookie_name = 'show_upgrade_notification'
-        upgrade_link = None
-
         # Construct the dates fragment
         dates_fragment = None
 
         if request.user.is_authenticated():
             if SelfPacedConfiguration.current().enable_course_home_improvements:
                 dates_fragment = CourseDatesFragmentView().render_to_fragment(request, course_id=course_id)
-            show_upgrade_notification = False
-            if request.GET.get('upgrade', 'false') == 'true':
-                store_upgrade_cookie = True
-                show_upgrade_notification = True
-            elif upgrade_cookie_name in request.COOKIES and course_id in request.COOKIES[upgrade_cookie_name]:
-                show_upgrade_notification = True
-
-            if show_upgrade_notification:
-                upgrade_data = VerifiedUpgradeDeadlineDate(course, user)
-                if upgrade_data.is_enabled:
-                    upgrade_link = upgrade_data.link
-                else:
-                    # The upgrade is not enabled so the cookie does not need to be stored
-                    store_upgrade_cookie = False
 
         context = {
             'request': request,
@@ -358,7 +340,8 @@ def course_info(request, course_id):
             'show_enroll_banner': show_enroll_banner,
             'dates_fragment': dates_fragment,
             'url_to_enroll': url_to_enroll,
-            'upgrade_link': upgrade_link,
+            'upgrade_link': check_and_get_upgrade_link(request, user, course.id),
+            'upgrade_price': get_cosmetic_verified_display_price(course),
         }
 
         # Get the URL of the user's last position in order to display the 'where you were last' message
@@ -375,25 +358,22 @@ def course_info(request, course_id):
         if CourseEnrollment.is_enrolled(request.user, course.id):
             inject_coursetalk_keys_into_context(context, course_key)
 
-        response = render_to_response('courseware/info.html', context)
-        if store_upgrade_cookie:
-            if upgrade_cookie_name in request.COOKIES and str(course_id) not in request.COOKIES[upgrade_cookie_name]:
-                cookie_value = '%s,%s' % (course_id, request.COOKIES[upgrade_cookie_name])
-            elif upgrade_cookie_name in request.COOKIES and str(course_id) in request.COOKIES[upgrade_cookie_name]:
-                cookie_value = request.COOKIES[upgrade_cookie_name]
-            else:
-                cookie_value = course_id
+        return render_to_response('courseware/info.html', context)
 
-            if cookie_value is not None:
-                response.set_cookie(
-                    upgrade_cookie_name,
-                    cookie_value,
-                    max_age=10 * 24 * 60 * 60,  # set for 10 days
-                    domain=settings.SESSION_COOKIE_DOMAIN,
-                    httponly=True  # no use case for accessing from JavaScript
-                )
 
-        return response
+UPGRADE_COOKIE_NAME = 'show_upgrade_notification'
+
+
+def check_and_get_upgrade_link(request, user, course_id):
+    upgrade_link = None
+
+    if request.user.is_authenticated():
+        upgrade_data = VerifiedUpgradeDeadlineDate(None, user, course_id=course_id)
+        if upgrade_data.is_enabled:
+            upgrade_link = upgrade_data.link
+            request.need_to_set_upgrade_cookie = True
+
+    return upgrade_link
 
 
 class StaticCourseTabView(EdxFragmentView):
@@ -518,6 +498,8 @@ class CourseTabView(EdxFragmentView):
             'supports_preview_menu': supports_preview_menu,
             'uses_pattern_library': True,
             'disable_courseware_js': True,
+            'upgrade_link': check_and_get_upgrade_link(request, request.user, course.id),
+            'upgrade_price': get_cosmetic_verified_display_price(course),
         }
 
     def render_to_fragment(self, request, course=None, page_context=None, **kwargs):
@@ -569,23 +551,57 @@ def registered_for_course(course, user):
         return False
 
 
-def get_cosmetic_display_price(course, registration_price):
+def get_cosmetic_verified_display_price(course):
     """
-    Return Course Price as a string preceded by correct currency, or 'Free'
+    Returns the minimum verified cert course price as a string preceded by correct currency, or 'Free'.
     """
+    return get_course_prices(course, verified_only=True)[1]
+
+
+def get_cosmetic_display_price(course):
+    """
+    Returns the course price as a string preceded by correct currency, or 'Free'.
+    """
+    return get_course_prices(course)[1]
+
+
+def get_course_prices(course, verified_only=False):
+    """
+    Return registration_price and cosmetic_display_prices.
+    registration_price is the minimum price for the course across all course modes.
+    cosmetic_display_prices is the course price as a string preceded by correct currency, or 'Free'.
+    """
+    # Find the
+    if verified_only:
+        registration_price = CourseMode.min_course_price_for_verified_for_currency(
+            course.id,
+            settings.PAID_COURSE_REGISTRATION_CURRENCY[0]
+        )
+    else:
+        registration_price = CourseMode.min_course_price_for_currency(
+            course.id,
+            settings.PAID_COURSE_REGISTRATION_CURRENCY[0]
+        )
+
     currency_symbol = settings.PAID_COURSE_REGISTRATION_CURRENCY[1]
 
-    price = course.cosmetic_display_price
     if registration_price > 0:
         price = registration_price
+    # Handle course overview objects which have no cosmetic_display_price
+    elif hasattr(course, 'cosmetic_display_price'):
+        price = course.cosmetic_display_price
+    else:
+        price = None
 
     if price:
         # Translators: This will look like '$50', where {currency_symbol} is a symbol such as '$' and {price} is a
         # numerical amount in that currency. Adjust this display as needed for your language.
-        return _("{currency_symbol}{price}").format(currency_symbol=currency_symbol, price=price)
+        cosmetic_display_price = _("{currency_symbol}{price}").format(currency_symbol=currency_symbol, price=price)
     else:
         # Translators: This refers to the cost of the course. In this case, the course costs nothing so it is free.
-        return _('Free')
+        cosmetic_display_price = _('Free')
+
+    return registration_price, cosmetic_display_price
 
 
 class EnrollStaffView(View):
@@ -669,7 +685,7 @@ def course_about(request, course_id):
         modes = CourseMode.modes_for_course_dict(course_key)
 
         if configuration_helpers.get_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
-            return redirect(reverse(course_home_url_name(request), args=[unicode(course.id)]))
+            return redirect(reverse(course_home_url_name(course.id), args=[unicode(course.id)]))
 
         registered = registered_for_course(course, request.user)
 
@@ -677,7 +693,7 @@ def course_about(request, course_id):
         studio_url = get_studio_url(course, 'settings/details')
 
         if has_access(request.user, 'load', course):
-            course_target = reverse(course_home_url_name(request), args=[course.id.to_deprecated_string()])
+            course_target = reverse(course_home_url_name(course.id), args=[course.id.to_deprecated_string()])
         else:
             course_target = reverse('about_course', args=[course.id.to_deprecated_string()])
 
@@ -716,16 +732,11 @@ def course_about(request, course_id):
             professional_mode = modes.get(CourseMode.PROFESSIONAL, '') or \
                 modes.get(CourseMode.NO_ID_PROFESSIONAL_MODE, '')
             if professional_mode.sku:
-                ecommerce_checkout_link = ecomm_service.checkout_page_url(professional_mode.sku)
+                ecommerce_checkout_link = ecomm_service.get_checkout_page_url(professional_mode.sku)
             if professional_mode.bulk_sku:
-                ecommerce_bulk_checkout_link = ecomm_service.checkout_page_url(professional_mode.bulk_sku)
+                ecommerce_bulk_checkout_link = ecomm_service.get_checkout_page_url(professional_mode.bulk_sku)
 
-        # Find the minimum price for the course across all course modes
-        registration_price = CourseMode.min_course_price_for_currency(
-            course_key,
-            settings.PAID_COURSE_REGISTRATION_CURRENCY[0]
-        )
-        course_price = get_cosmetic_display_price(course, registration_price)
+        registration_price, course_price = get_course_prices(course)
 
         # Determine which checkout workflow to use -- LMS shoppingcart or Otto basket
         can_add_course_to_cart = _is_shopping_cart_enabled and registration_price and not ecommerce_checkout_link
@@ -889,6 +900,8 @@ def _progress(request, course_key, student_id):
         'passed': is_course_passed(course, grade_summary),
         'credit_course_requirements': _credit_course_requirements(course_key, student),
         'certificate_data': _get_cert_data(student, course, course_key, is_active, enrollment_mode),
+        'upgrade_link': check_and_get_upgrade_link(request, student, course.id),
+        'upgrade_price': get_cosmetic_verified_display_price(course),
     }
 
     with outer_atomic():
@@ -1241,7 +1254,7 @@ def course_survey(request, course_id):
     course_key = CourseKey.from_string(course_id)
     course = get_course_with_access(request.user, 'load', course_key)
 
-    redirect_url = reverse(course_home_url_name(request), args=[course_id])
+    redirect_url = reverse(course_home_url_name(course.id), args=[course_id])
 
     # if there is no Survey associated with this course,
     # then redirect to the course instead

@@ -56,7 +56,7 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
   % endif
 <div class="course-container">
 <article class="course${mode_class}">
-  <% course_target = reverse(course_home_url_name(), args=[unicode(course_overview.id)]) %>
+  <% course_target = reverse(course_home_url_name(course_overview.id), args=[unicode(course_overview.id)]) %>
   <section class="details" aria-labelledby="details-heading-${course_overview.number}">
       <h2 class="hd hd-2 sr" id="details-heading-${course_overview.number}">${_('Course details')}</h2>
     <div class="wrapper-course-image" aria-hidden="true">
