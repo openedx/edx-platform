@@ -12,9 +12,11 @@ from social.exceptions import AuthForbidden, AuthMissingParameter
 
 from openedx.core.djangoapps.theming.helpers import get_current_request
 
+log = logging.getLogger(__name__)
+
+
 STANDARD_SAML_PROVIDER_KEY = 'standard_saml_provider'
 SAP_SUCCESSFACTORS_SAML_KEY = 'sap_success_factors'
-log = logging.getLogger(__name__)
 
 
 class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
