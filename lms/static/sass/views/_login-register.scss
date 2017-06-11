@@ -62,7 +62,7 @@
         margin: 0;
         letter-spacing: normal;
         font-family: $sans-serif;
-        color: $gray-d4;
+        color: $uxpl-gray-dark;
     }
 
     a, label {
@@ -354,7 +354,7 @@
             }
 
             &.error {
-                border-color: tint($red,50%);
+                border-color: $error-color;
             }
         }
 
@@ -373,11 +373,15 @@
             &:active, &:focus {
                 outline: auto;
             }
+
+            &.error {
+                outline-color: $error-color;
+            }
         }
 
         .tip, .label-optional {
             @extend %t-copy-sub1;
-            color: $gray-d2;
+            color: $uxpl-gray-base;
         }
         .tip {
             display: block;

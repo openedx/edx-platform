@@ -68,16 +68,11 @@ def get_request_or_stub():
     request that can be used to build an absolute URI.
 
     This is useful in cases where we need to pass in a request object
-    but don't have an active request (for example, in test cases).
+    but don't have an active request (for example, in tests, celery tasks, and XBlocks).
     """
     request = crum.get_current_request()
 
     if request is None:
-        log.warning(
-            "Could not retrieve the current request. "
-            "A stub request will be created instead using settings.SITE_NAME. "
-            "This should be used *only* in test cases, never in production!"
-        )
 
         # The settings SITE_NAME may contain a port number, so we need to
         # parse the full URL.

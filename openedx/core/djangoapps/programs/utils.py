@@ -266,7 +266,12 @@ class ProgramProgressMeter(object):
                 # count towards completion of a course in a program). This may change
                 # in the future to make use of the more rigid set of "applicable seat
                 # types" associated with each program type in the catalog.
-                'type': course_run['type'],
+
+                # Runs of type 'credit' are counted as 'verified' since verified
+                # certificates are earned when credit runs are completed. LEARNER-1274
+                # tracks a cleaner way to do this using the discovery service's
+                # applicable_seat_types field.
+                'type': 'verified' if course_run['type'] == 'credit' else course_run['type'],
             }
 
         return any(reshape(course_run) in self.completed_course_runs for course_run in course['course_runs'])
@@ -427,7 +432,7 @@ class ProgramDataExtender(object):
             ecommerce = EcommerceService()
             sku = getattr(required_mode, 'sku', None)
             if ecommerce.is_enabled(self.user) and sku:
-                run_mode['upgrade_url'] = ecommerce.checkout_page_url(required_mode.sku)
+                run_mode['upgrade_url'] = ecommerce.get_checkout_page_url(required_mode.sku)
             else:
                 run_mode['upgrade_url'] = None
         else:

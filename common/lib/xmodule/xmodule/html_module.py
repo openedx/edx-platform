@@ -447,23 +447,26 @@ class CourseInfoModule(CourseInfoFields, HtmlModuleMixin):
                 return self.data.replace("%%USER_ID%%", self.system.anonymous_student_id)
             return self.data
         else:
-            course_updates = self.ordered_updates()
+            # This should no longer be called on production now that we are using a separate updates page
+            # and using a fragment HTML file - it will be called in tests until those are removed.
+            course_updates = self.order_updates(self.items)
             context = {
                 'visible_updates': course_updates[:3],
                 'hidden_updates': course_updates[3:],
             }
             return self.system.render_template("{0}/course_updates.html".format(self.TEMPLATE_DIR), context)
 
-    def ordered_updates(self):
+    @classmethod
+    def order_updates(self, updates):
         """
         Returns any course updates in reverse chronological order.
         """
-        course_updates = [item for item in self.items if item.get('status') == self.STATUS_VISIBLE]
-        course_updates.sort(
-            key=lambda item: (CourseInfoModule.safe_parse_date(item['date']), item['id']),
+        sorted_updates = [update for update in updates if update.get('status') == self.STATUS_VISIBLE]
+        sorted_updates.sort(
+            key=lambda item: (self.safe_parse_date(item['date']), item['id']),
             reverse=True
         )
-        return course_updates
+        return sorted_updates
 
     @staticmethod
     def safe_parse_date(date):

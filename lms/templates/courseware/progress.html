@@ -180,12 +180,30 @@ from django.utils.http import urlquote_plus
                                             %endif
                                         </p>
                                         %if len(section.problem_scores.values()) > 0:
-                                        <dl class="scores">
-                                            <dt class="hd hd-6">${ _("Problem Scores: ") if section.graded else _("Practice Scores: ")}</dt>
-                                            %for score in section.problem_scores.values():
-                                            <dd>${"{0:.3n}/{1:.3n}".format(float(score.earned),float(score.possible))}</dd>
-                                            %endfor
-                                        </dl>
+                                          %if section.show_grades(staff_access):
+                                          <dl class="scores">
+                                              <dt class="hd hd-6">${ _("Problem Scores: ") if section.graded else _("Practice Scores: ")}</dt>
+                                              %for score in section.problem_scores.values():
+                                              <dd>${"{0:.3n}/{1:.3n}".format(float(score.earned),float(score.possible))}</dd>
+                                              %endfor
+                                          </dl>
+                                          %else:
+                                            <p class="hide-scores">
+                                            %if section.show_correctness == 'past_due':
+                                                %if section.graded:
+                                                  ${_("Problem scores are hidden until the due date.")}
+                                                %else:
+                                                  ${_("Practice scores are hidden until the due date.")}
+                                                %endif
+                                            %else:
+                                                %if section.graded:
+                                                  ${_("Problem scores are hidden.")}
+                                                %else:
+                                                  ${_("Practice scores are hidden.")}
+                                                %endif
+                                            %endif
+                                            </p>
+                                          %endif
                                         %else:
                                         <p class="no-scores">${_("No problem scores in this section")}</p>
                                         %endif

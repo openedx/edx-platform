@@ -56,7 +56,7 @@
             'squire': 'common/js/vendor/Squire',
             'jasmine-imagediff': 'xmodule_js/common_static/js/vendor/jasmine-imagediff',
             'domReady': 'xmodule_js/common_static/js/vendor/domReady',
-            mathjax: '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured',  // eslint-disable-line max-len
+            mathjax: '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured',  // eslint-disable-line max-len
             'youtube': '//www.youtube.com/player_api?noext',
             'coffee/src/ajax_prefix': 'xmodule_js/common_static/coffee/src/ajax_prefix',
             'js/instructor_dashboard/student_admin': 'js/instructor_dashboard/student_admin',
@@ -731,6 +731,7 @@
         'js/spec/edxnotes/views/visibility_decorator_spec.js',
         'js/spec/financial-assistance/financial_assistance_form_view_spec.js',
         'js/spec/groups/views/cohorts_spec.js',
+        'js/spec/groups/views/discussions_spec.js',
         'js/spec/instructor_dashboard/certificates_bulk_exception_spec.js',
         'js/spec/instructor_dashboard/certificates_exception_spec.js',
         'js/spec/instructor_dashboard/certificates_invalidation_spec.js',

@@ -1,6 +1,10 @@
 #
 # Dependencies that are used in development only - and are *NOT* needed to be installed in staging/production.
 #
+# These must be installed manually in your development environment using:
+#
+#    pip install -r requirements/edx/development.txt
+#
 
 # Python libraries to install directly from github / PyPi
 

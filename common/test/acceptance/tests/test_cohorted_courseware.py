@@ -2,12 +2,9 @@
 End-to-end test for cohorted courseware. This uses both Studio and LMS.
 """
 
-import json
-
 from bok_choy.page_object import XSS_INJECTION
 from nose.plugins.attrib import attr
 
-from common.test.acceptance.fixtures import LMS_BASE_URL
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.common.utils import add_enrollment_course_modes, enroll_user_track
@@ -15,6 +12,7 @@ from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage
 from common.test.acceptance.pages.studio.component_editor import ComponentVisibilityEditorView
 from common.test.acceptance.pages.studio.settings_group_configurations import GroupConfigurationsPage
+from common.test.acceptance.tests.discussion.helpers import CohortTestMixin
 from common.test.acceptance.tests.lms.test_lms_user_preview import verify_expected_problem_visibility
 from studio.base_studio_test import ContainerBase
 
@@ -23,7 +21,7 @@ VERIFIED_TRACK = "Verified"
 
 
 @attr(shard=5)
-class EndToEndCohortedCoursewareTest(ContainerBase):
+class EndToEndCohortedCoursewareTest(ContainerBase, CohortTestMixin):
     """
     End-to-end of cohorted courseware.
     """
@@ -112,15 +110,6 @@ class EndToEndCohortedCoursewareTest(ContainerBase):
                 )
             )
         )
-
-    def enable_cohorting(self, course_fixture):
-        """
-        Enables cohorting for the current course.
-        """
-        url = LMS_BASE_URL + "/courses/" + course_fixture._course_key + '/cohorts/settings'  # pylint: disable=protected-access
-        data = json.dumps({'is_cohorted': True})
-        response = course_fixture.session.patch(url, data=data, headers=course_fixture.headers)
-        self.assertTrue(response.ok, "Failed to enable cohorts")
 
     def create_content_groups(self):
         """

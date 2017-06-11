@@ -379,7 +379,7 @@ FEATURES = {
     'ENABLE_COOKIE_CONSENT': False,
 
     # Whether or not the dynamic EnrollmentTrackUserPartition should be registered.
-    'ENABLE_ENROLLMENT_TRACK_USER_PARTITION': False,
+    'ENABLE_ENROLLMENT_TRACK_USER_PARTITION': True,
 
     # Enable one click program purchase
     # See LEARNER-493
@@ -1759,6 +1759,7 @@ REQUIRE_JS_PATH_OVERRIDES = {
     'js/student_profile/views/learner_profile_factory': 'js/student_profile/views/learner_profile_factory.js',
     'js/courseware/courseware_factory': 'js/courseware/courseware_factory.js',
     'js/groups/views/cohorts_dashboard_factory': 'js/groups/views/cohorts_dashboard_factory.js',
+    'js/groups/discussions_management/discussions_dashboard_factory': 'js/discussions_management/views/discussions_dashboard_factory.js',
     'draggabilly': 'js/vendor/draggabilly.js',
     'hls': 'common/js/vendor/hls.js'
 }
@@ -2211,6 +2212,9 @@ INSTALLED_APPS = (
     # Unusual migrations
     'database_fixups',
 
+    # Waffle related utilities
+    'openedx.core.djangoapps.waffle_utils',
+
     # Features
     'openedx.features.course_bookmarks',
     'openedx.features.course_experience',
@@ -2268,6 +2272,7 @@ MKTG_URL_LINK_MAP = {
 STATIC_TEMPLATE_VIEW_DEFAULT_FILE_EXTENSION = 'html'
 
 SUPPORT_SITE_LINK = ''
+PASSWORD_RESET_SUPPORT_LINK = ''
 ACTIVATION_EMAIL_SUPPORT_LINK = ''
 
 ############################# SOCIAL MEDIA SHARING #############################
@@ -3140,6 +3145,7 @@ HELP_TOKENS_BOOKS = {
 
 ENTERPRISE_ENROLLMENT_API_URL = LMS_ROOT_URL + "/api/enrollment/v1/"
 ENTERPRISE_PUBLIC_ENROLLMENT_API_URL = ENTERPRISE_ENROLLMENT_API_URL
+ENTERPRISE_COURSE_ENROLLMENT_AUDIT_MODES = ['audit', 'honor']
 
 ############## ENTERPRISE SERVICE API CLIENT CONFIGURATION ######################
 # The LMS communicates with the Enterprise service via the EdxRestApiClient class

@@ -1,9 +1,9 @@
 (function(define) {
     'use strict';
-    define(['jquery', 'underscore', 'backbone', 'gettext', 'js/groups/views/cohort_discussions',
+    define(['jquery', 'underscore', 'backbone', 'gettext', 'js/discussions_management/views/divided_discussions',
         'edx-ui-toolkit/js/utils/html-utils', 'js/vendor/jquery.qubit'],
-            function($, _, Backbone, gettext, CohortDiscussionConfigurationView, HtmlUtils) {
-                var InlineDiscussionsView = CohortDiscussionConfigurationView.extend({
+            function($, _, Backbone, gettext, DividedDiscussionConfigurationView, HtmlUtils) {
+                var InlineDiscussionsView = DividedDiscussionConfigurationView.extend({
                     events: {
                         'change .check-discussion-category': 'setSaveButton',
                         'change .check-discussion-subcategory-inline': 'setSaveButton',
@@ -13,17 +13,19 @@
                     },
 
                     initialize: function(options) {
-                        this.template = HtmlUtils.template($('#cohort-discussions-inline-tpl').text());
-                        this.cohortSettings = options.cohortSettings;
+                        this.template = HtmlUtils.template($('#divided-discussions-inline-tpl').text());
+                        this.discussionSettings = options.discussionSettings;
                     },
 
                     render: function() {
-                        var alwaysCohortInlineDiscussions = this.cohortSettings.get('always_cohort_inline_discussions'),
-                            inline_discussions = this.model.get('inline_discussions');
+                        var inlineDiscussions = this.model.get('inline_discussions'),
+                            alwaysDivideInlineDiscussions = this.discussionSettings.get(
+                                'always_divide_inline_discussions'
+                            );
 
-                        HtmlUtils.setHtml(this.$('.cohort-inline-discussions-nav'), this.template({
-                            inlineDiscussionTopicsHtml: this.getInlineDiscussionsHtml(inline_discussions),
-                            alwaysCohortInlineDiscussions: alwaysCohortInlineDiscussions
+                        HtmlUtils.setHtml(this.$('.inline-discussions-nav'), this.template({
+                            inlineDiscussionTopicsHtml: this.getInlineDiscussionsHtml(inlineDiscussions),
+                            alwaysDivideInlineDiscussions: alwaysDivideInlineDiscussions
                         }));
 
                         // Provides the semantics for a nested list of tri-state checkboxes.
@@ -32,7 +34,7 @@
                         // based on the checked values of any checkboxes in child elements of the DOM.
                         this.$('ul.inline-topics').qubit();
 
-                        this.setElementsEnabled(alwaysCohortInlineDiscussions, true);
+                        this.setElementsEnabled(alwaysDivideInlineDiscussions, true);
                     },
 
                     /**
@@ -99,45 +101,48 @@
                     *
                     * Enable/Disable the category and sub-category checkboxes.
                     * Enable/Disable the save button.
-                    * @param {bool} enable_checkboxes - The flag to enable/disable the checkboxes.
-                    * @param {bool} enable_save_button - The flag to enable/disable the save button.
+                    * @param {bool} enableCheckboxes - The flag to enable/disable the checkboxes.
+                    * @param {bool} enableSaveButton - The flag to enable/disable the save button.
                     */
-                    setElementsEnabled: function(enable_checkboxes, enable_save_button) {
-                        this.setDisabled(this.$('.check-discussion-category'), enable_checkboxes);
-                        this.setDisabled(this.$('.check-discussion-subcategory-inline'), enable_checkboxes);
-                        this.setDisabled(this.$('.cohort-inline-discussions-form .action-save'), enable_save_button);
+                    setElementsEnabled: function(enableCheckboxes, enableSaveButton) {
+                        this.setDisabled(this.$('.check-discussion-category'), enableCheckboxes);
+                        this.setDisabled(this.$('.check-discussion-subcategory-inline'), enableCheckboxes);
+                        this.setDisabled(this.$('.cohort-inline-discussions-form .action-save'), enableSaveButton);
                     },
 
                     /**
                     * Enables the save button for inline discussions.
                     */
-                    setSaveButton: function(event) {
+                    setSaveButton: function() {
                         this.setDisabled(this.$('.cohort-inline-discussions-form .action-save'), false);
                     },
 
                     /**
-                    * Sends the cohorted_inline_discussions to the server and renders the view.
+                    * Sends the dividedInlineDiscussions to the server and renders the view.
                     */
                     saveInlineDiscussionsForm: function(event) {
-                        event.preventDefault();
-
                         var self = this,
-                            cohortedInlineDiscussions = self.getCohortedDiscussions(
+                            dividedInlineDiscussions = self.getDividedDiscussions(
                                 '.check-discussion-subcategory-inline:checked'
                             ),
                             fieldData = {
-                                cohorted_inline_discussions: cohortedInlineDiscussions,
-                                always_cohort_inline_discussions: self.$('.check-all-inline-discussions').prop('checked')
+                                divided_inline_discussions: dividedInlineDiscussions,
+                                always_divide_inline_discussions: self.$(
+                                    '.check-all-inline-discussions'
+                                ).prop('checked')
                             };
+
+                        event.preventDefault();
 
                         self.saveForm(self.$('.inline-discussion-topics'), fieldData)
                             .done(function() {
                                 self.model.fetch()
                                     .done(function() {
                                         self.render();
-                                        self.showMessage(gettext('Your changes have been saved.'), self.$('.inline-discussion-topics'));
+                                        self.showMessage(gettext('Your changes have been saved.'),
+                                            self.$('.inline-discussion-topics'));
                                     }).fail(function() {
-                                        var errorMessage = gettext("We've encountered an error. Refresh your browser and then try again.");
+                                        var errorMessage = gettext("We've encountered an error. Refresh your browser and then try again."); // eslint-disable-line max-len
                                         self.showMessage(errorMessage, self.$('.inline-discussion-topics'), 'error');
                                     });
                             });

@@ -1202,7 +1202,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 "required": True,
                 "label": "Confirm Email",
                 "errorMessages": {
-                    "required": "Please confirm your email address.",
+                    "required": "The email addresses do not match.",
                 }
             }
         )

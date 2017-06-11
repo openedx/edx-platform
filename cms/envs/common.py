@@ -94,6 +94,7 @@ from lms.envs.common import (
     HELP_TOKENS_BOOKS,
 
     SUPPORT_SITE_LINK,
+    PASSWORD_RESET_SUPPORT_LINK,
     ACTIVATION_EMAIL_SUPPORT_LINK,
 
     CONTACT_EMAIL,
@@ -238,7 +239,7 @@ FEATURES = {
     'ALLOW_PUBLIC_ACCOUNT_CREATION': True,
 
     # Whether or not the dynamic EnrollmentTrackUserPartition should be registered.
-    'ENABLE_ENROLLMENT_TRACK_USER_PARTITION': False,
+    'ENABLE_ENROLLMENT_TRACK_USER_PARTITION': True,
 }
 
 ENABLE_JASMINE = False
@@ -1010,6 +1011,9 @@ INSTALLED_APPS = (
     # Customized celery tasks, including persisting failed tasks so they can
     # be retried
     'celery_utils',
+
+    # Waffle related utilities
+    'openedx.core.djangoapps.waffle_utils',
 )
 
 

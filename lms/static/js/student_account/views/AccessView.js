@@ -72,6 +72,7 @@
 
                     this.platformName = options.platform_name;
                     this.supportURL = options.support_link;
+                    this.passwordResetSupportUrl = options.password_reset_support_link;
                     this.createAccountOption = options.account_creation_allowed;
 
                 // The login view listens for 'sync' events from the reset model
@@ -129,6 +130,7 @@
                             accountActivationMessages: this.accountActivationMessages,
                             platformName: this.platformName,
                             supportURL: this.supportURL,
+                            passwordResetSupportUrl: this.passwordResetSupportUrl,
                             createAccountOption: this.createAccountOption
                         });
 

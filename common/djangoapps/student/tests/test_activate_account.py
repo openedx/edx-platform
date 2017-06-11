@@ -33,8 +33,8 @@ class TestActivateAccount(TestCase):
 
         self.platform_name = configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
         self.activation_email_support_link = configuration_helpers.get_value(
-            'ACTIVATION_EMAIL_SUPPORT_LINK', settings.SUPPORT_SITE_LINK  # Intentional default.
-        )
+            'ACTIVATION_EMAIL_SUPPORT_LINK', settings.ACTIVATION_EMAIL_SUPPORT_LINK
+        ) or settings.SUPPORT_SITE_LINK
 
     def login(self):
         """
