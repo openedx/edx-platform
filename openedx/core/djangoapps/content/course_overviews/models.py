@@ -10,7 +10,6 @@ from django.db import models, transaction
 from django.db.models.fields import BooleanField, DateTimeField, DecimalField, TextField, FloatField, IntegerField
 from django.db.utils import IntegrityError
 from django.template import defaultfilters
-from django.dispatch import Signal
 
 from ccx_keys.locator import CCXLocator
 from model_utils.models import TimeStampedModel
@@ -26,7 +25,6 @@ from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, UsageKeyField
 
-COURSE_OVERVIEW_UPDATED = Signal(providing_args=["course_key"])
 log = logging.getLogger(__name__)
 
 
@@ -646,12 +644,6 @@ class CourseOverview(TimeStampedModel):
     def __unicode__(self):
         """Represent ourselves with the course key."""
         return unicode(self.id)
-
-    def send_signal(self):
-        """
-        Sends out the signal that course_overview table has been updated.
-        """
-        COURSE_OVERVIEW_UPDATED.send(sender=None, course_key=self.id)
 
 
 class CourseOverviewTab(models.Model):

@@ -29,7 +29,7 @@ class SelfGeneratedCertsSignalTest(ModuleStoreTestCase):
         """
         self.assertFalse(certs_api.cert_generation_enabled(self.course.id))
 
-        _listen_for_course_publish('store', self.course.id)
+        _listen_for_course_publish('store', self.course.id, self.course.self_paced)
         self.assertTrue(certs_api.cert_generation_enabled(self.course.id))
 
     def test_cert_generation_disabled_for_instructor_paced(self):
@@ -40,5 +40,5 @@ class SelfGeneratedCertsSignalTest(ModuleStoreTestCase):
         self.course.self_paced = False
         self.store.update_item(self.course, self.user.id)
 
-        _listen_for_course_publish('store', self.course.id)
+        _listen_for_course_publish('store', self.course.id, self.course.self_paced)
         self.assertFalse(certs_api.cert_generation_enabled(self.course.id))
