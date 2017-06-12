@@ -3,7 +3,7 @@ Unit tests for checking default forum role "Student" of a user when he creates a
 after deleting it creates same course again
 """
 from contentstore.tests.utils import AjaxEnabledTestClient
-from contentstore.utils import delete_course_and_groups, reverse_url
+from contentstore.utils import delete_course, reverse_url
 from courseware.tests.factories import UserFactory
 from student.models import CourseEnrollment
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -60,7 +60,7 @@ class TestUsersDefaultRole(ModuleStoreTestCase):
         # check that user has his default "Student" forum role for this course
         self.assertTrue(self.user.roles.filter(name="Student", course_id=self.course_key))
 
-        delete_course_and_groups(self.course_key, self.user.id)
+        delete_course(self.course_key, self.user.id)
 
         # check that user's enrollment for this course is not deleted
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course_key))
@@ -78,7 +78,7 @@ class TestUsersDefaultRole(ModuleStoreTestCase):
         self.assertTrue(self.user.roles.filter(name="Student", course_id=self.course_key))
 
         # delete this course and recreate this course with same user
-        delete_course_and_groups(self.course_key, self.user.id)
+        delete_course(self.course_key, self.user.id)
         resp = self._create_course_with_given_location(self.course_key)
         self.assertEqual(resp.status_code, 200)
 
@@ -96,7 +96,7 @@ class TestUsersDefaultRole(ModuleStoreTestCase):
         # check that user has enrollment and his default "Student" forum role for this course
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course_key))
         # delete this course and recreate this course with same user
-        delete_course_and_groups(self.course_key, self.user.id)
+        delete_course(self.course_key, self.user.id)
 
         # now create same course with different name case ('uppercase')
         new_course_key = self.course_key.replace(course=self.course_key.course.upper())
