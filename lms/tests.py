@@ -1,16 +1,16 @@
 """Tests for the lms module itself."""
 
 import mimetypes
+
+from django.core.urlresolvers import reverse
+from django.test import TestCase
 from mock import patch
 
-from django.test import TestCase
-from django.core.urlresolvers import reverse
-
-from edxmako import add_lookup, LOOKUP
+from edxmako import LOOKUP, add_lookup
 from lms import startup
 from openedx.features.course_experience import course_home_url_name
-from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class LmsModuleTests(TestCase):

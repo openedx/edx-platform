@@ -12,18 +12,18 @@ transition is complete, we can remove this view.
 """
 import logging
 
-from django.contrib.auth.models import User
-from django.views.generic.edit import FormView
-from django.utils.translation import ugettext as _
-from django.http import HttpResponseRedirect
-from django.contrib import messages
 from django import forms
+from django.contrib import messages
+from django.contrib.auth.models import User
+from django.http import HttpResponseRedirect
 from django.utils.decorators import method_decorator
+from django.utils.translation import ugettext as _
+from django.views.generic.edit import FormView
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from student.models import CourseEnrollment
-from opaque_keys.edx.keys import CourseKey
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from support.decorators import require_support_permission
 
 log = logging.getLogger(__name__)

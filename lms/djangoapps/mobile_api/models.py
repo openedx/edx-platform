@@ -1,11 +1,11 @@
 """
 ConfigurationModel for the mobile_api djangoapp.
 """
+from config_models.models import ConfigurationModel
 from django.db import models
 
-from config_models.models import ConfigurationModel
-from .mobile_platform import PLATFORM_CLASSES
 from . import utils
+from .mobile_platform import PLATFORM_CLASSES
 
 
 class MobileApiConfig(ConfigurationModel):

@@ -5,55 +5,47 @@ Tests of verify_student views.
 
 import json
 import urllib
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
 from uuid import uuid4
 
+import boto
 import ddt
 import httpretty
 import mock
-from nose.plugins.attrib import attr
-import boto
 import moto
 import pytz
-from bs4 import BeautifulSoup
-from mock import patch, Mock
 import requests
-from waffle.testutils import override_switch
-
+from bs4 import BeautifulSoup
 from django.conf import settings
-from django.core.urlresolvers import reverse
 from django.core import mail
+from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
-
+from mock import Mock, patch
+from nose.plugins.attrib import attr
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator
+from waffle.testutils import override_switch
 
+from commerce.models import CommerceConfiguration
+from commerce.tests import TEST_API_URL, TEST_PAYMENT_DATA, TEST_PUBLIC_URL_ROOT
+from common.test.utils import XssTestMixin
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from common.test.utils import XssTestMixin
-from commerce.models import CommerceConfiguration
-from commerce.tests import TEST_PAYMENT_DATA, TEST_API_URL, TEST_PUBLIC_URL_ROOT
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
+from lms.djangoapps.verify_student.views import PayAndVerifyView, checkout_with_ecommerce_service, render_to_response
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
-from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
-from shoppingcart.models import Order, CertificateItem
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
+from shoppingcart.models import CertificateItem, Order
 from student.models import CourseEnrollment
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore import ModuleStoreEnum
-
-
-from lms.djangoapps.verify_student.models import (
-    VerificationDeadline, SoftwareSecurePhotoVerification,
-)
-from lms.djangoapps.verify_student.views import (
-    checkout_with_ecommerce_service, render_to_response, PayAndVerifyView,
-)
 
 
 def mock_render_to_response(*args, **kwargs):

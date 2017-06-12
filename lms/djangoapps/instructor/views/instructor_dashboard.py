@@ -6,9 +6,24 @@ import datetime
 import logging
 import uuid
 
-from mock import patch
-
 import pytz
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse
+from django.http import Http404, HttpResponseServerError
+from django.utils.html import escape
+from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_noop
+from django.views.decorators.cache import cache_control
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.http import require_POST
+from mock import patch
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from xblock.field_data import DictFieldData
+from xblock.fields import ScopeIds
+
 from bulk_email.models import BulkEmailFlag
 from certificates import api as certs_api
 from certificates.models import (
@@ -23,23 +38,10 @@ from class_dashboard.dashboard_data import get_array_section_has_problem, get_se
 from course_modes.models import CourseMode, CourseModesArchive
 from courseware.access import has_access
 from courseware.courses import get_course_by_id, get_studio_url
-from django.conf import settings
-from django.contrib.auth.decorators import login_required
-from django.core.urlresolvers import reverse
-from django.http import Http404, HttpResponseServerError
-from django.utils.html import escape
-from django.utils.translation import ugettext as _
-from django.utils.translation import ugettext_noop
-from django.views.decorators.cache import cache_control
-from django.views.decorators.csrf import ensure_csrf_cookie
-from django.views.decorators.http import require_POST
 from django_comment_client.utils import available_division_schemes, has_forum_access
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, CourseDiscussionSettings
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.courseware.module_render import get_module_by_usage_id
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from openedx.core.djangoapps.course_groups.cohorts import DEFAULT_COHORT_NAME, get_course_cohorts, is_course_cohorted
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.verified_track_content.models import VerifiedTrackCohortedCourse
@@ -50,8 +52,6 @@ from shoppingcart.models import Coupon, CourseRegCodeItem, PaidCourseRegistratio
 from student.models import CourseEnrollment
 from student.roles import CourseFinanceAdminRole, CourseSalesAdminRole
 from util.json_request import JsonResponse
-from xblock.field_data import DictFieldData
-from xblock.fields import ScopeIds
 from xmodule.html_module import HtmlDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import CourseTab

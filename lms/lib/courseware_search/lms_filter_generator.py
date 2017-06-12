@@ -3,11 +3,12 @@ This file contains implementation override of SearchFilterGenerator which will a
     * Filter by all courses in which the user is enrolled in
 """
 
-from student.models import CourseEnrollment
 from search.filter_generator import SearchFilterGenerator
-from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
+
 from openedx.core.djangoapps.course_groups.partition_scheme import CohortPartitionScheme
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
+from student.models import CourseEnrollment
 
 INCLUDE_SCHEMES = [CohortPartitionScheme, RandomUserPartitionScheme, ]
 SCHEME_SUPPORTS_ASSIGNMENT = [RandomUserPartitionScheme, ]

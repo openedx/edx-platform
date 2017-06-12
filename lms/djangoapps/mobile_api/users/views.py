@@ -4,13 +4,13 @@ Views for user API
 
 from django.shortcuts import redirect
 from django.utils import dateparse
-
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import UsageKey
 from rest_framework import generics, views
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-
-from opaque_keys.edx.keys import UsageKey
-from opaque_keys import InvalidKeyError
+from xblock.fields import Scope
+from xblock.runtime import KeyValueStore
 
 from courseware.access import is_mobile_available_for_user
 from courseware.courses import get_current_child
@@ -18,15 +18,12 @@ from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
 from courseware.views.index import save_positions_recursively_up
 from student.models import CourseEnrollment, User
-
-from xblock.fields import Scope
-from xblock.runtime import KeyValueStore
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from .serializers import CourseEnrollmentSerializer, UserSerializer
 from .. import errors
 from ..decorators import mobile_course_access, mobile_view
+from .serializers import CourseEnrollmentSerializer, UserSerializer
 
 
 @mobile_view(is_user=True)

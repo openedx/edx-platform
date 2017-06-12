@@ -2,22 +2,21 @@
 Unit tests for the notes app.
 """
 
-from mock import patch, Mock
-
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from django.test import TestCase, RequestFactory
-from django.test.client import Client
-from django.core.urlresolvers import reverse
-from django.contrib.auth.models import User
-from django.core.exceptions import ValidationError
-
 import json
 
+from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+from django.core.urlresolvers import reverse
+from django.test import RequestFactory, TestCase
+from django.test.client import Client
+from mock import Mock, patch
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
+
+from courseware.tabs import CourseTab, get_course_tab_list
+from notes import api, models, utils
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from courseware.tabs import get_course_tab_list, CourseTab
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
-from notes import utils, api, models
 
 
 class UtilsTest(ModuleStoreTestCase):

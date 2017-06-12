@@ -5,9 +5,9 @@ This is meant to simplify the process of sending user preferences (espec. time_z
 to the templates without having to append every view file.
 
 """
-from openedx.core.djangoapps.user_api.errors import UserNotFound, UserAPIInternalError
-from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
 import request_cache
+from openedx.core.djangoapps.user_api.errors import UserAPIInternalError, UserNotFound
+from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
 
 RETRIEVABLE_PREFERENCES = {
     'user_timezone': 'time_zone',

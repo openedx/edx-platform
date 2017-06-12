@@ -1,35 +1,35 @@
 """ Commerce API v0 view tests. """
-from datetime import datetime, timedelta
-import json
 import itertools
+import json
+from datetime import datetime, timedelta
 from uuid import uuid4
-import httpretty
 
 import ddt
+import httpretty
+import mock
+import pytz
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
-import mock
+from edx_rest_api_client import exceptions
 from nose.plugins.attrib import attr
-import pytz
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
+from commerce.api.v0.views import SAILTHRU_CAMPAIGN_COOKIE
 from commerce.constants import Messages
 from commerce.tests import TEST_BASKET_ID, TEST_ORDER_NUMBER, TEST_PAYMENT_DATA
 from commerce.tests.mocks import mock_basket_order, mock_create_basket
 from commerce.tests.test_views import UserMixin
 from course_modes.models import CourseMode
-from edx_rest_api_client import exceptions
-from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from enrollment.api import get_enrollment
+from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from openedx.core.lib.django_test_client_utils import get_absolute_url
 from student.models import CourseEnrollment
 from student.tests.factories import CourseModeFactory
 from student.tests.tests import EnrollmentEventTestMixin
 from xmodule.modulestore.django import modulestore
-from commerce.api.v0.views import SAILTHRU_CAMPAIGN_COOKIE
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 UTM_COOKIE_NAME = 'edx.test.utm'
 UTM_COOKIE_CONTENTS = {

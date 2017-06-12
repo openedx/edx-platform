@@ -10,9 +10,9 @@ from django.test.utils import override_settings
 from mock import Mock, patch
 
 from notification_prefs import NOTIFICATION_PREF_KEY
-from notification_prefs.views import ajax_enable, ajax_disable, ajax_status, set_subscription, UsernameCipher
-from student.tests.factories import UserFactory
+from notification_prefs.views import UsernameCipher, ajax_disable, ajax_enable, ajax_status, set_subscription
 from openedx.core.djangoapps.user_api.models import UserPreference
+from student.tests.factories import UserFactory
 from util.testing import UrlResetMixin
 
 

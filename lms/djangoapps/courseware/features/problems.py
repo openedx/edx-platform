@@ -5,9 +5,10 @@ Steps for problem.feature lettuce tests
 # pylint: disable=missing-docstring
 # pylint: disable=redefined-outer-name
 
-from lettuce import world, step
+from lettuce import step, world
+
 from common import i_am_registered_for_the_course, visit_scenario_item
-from problems_setup import PROBLEM_DICT, answer_problem, problem_has_answer, add_problem_to_course
+from problems_setup import PROBLEM_DICT, add_problem_to_course, answer_problem, problem_has_answer
 
 
 def _view_problem(step, problem_type, problem_settings=None):

@@ -5,11 +5,11 @@ Unit tests for the VerificationDeadline signals
 from datetime import datetime, timedelta
 
 from pytz import UTC
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.signals import _listen_for_course_publish
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class VerificationDeadlineSignalTest(ModuleStoreTestCase):

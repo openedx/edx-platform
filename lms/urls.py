@@ -2,15 +2,15 @@
 URLs for LMS
 """
 
+from config_models.views import ConfigurationModelCurrentAPIView
 from django.conf import settings
-from django.conf.urls import patterns, include, url
+from django.conf.urls import include, patterns, url
+from django.conf.urls.static import static
 from django.views.generic.base import RedirectView
 from ratelimitbackend import admin
-from django.conf.urls.static import static
 
-from courseware.views.views import CourseTabView, EnrollStaffView, StaticCourseTabView
-from config_models.views import ConfigurationModelCurrentAPIView
 from courseware.views.index import CoursewareIndex
+from courseware.views.views import CourseTabView, EnrollStaffView, StaticCourseTabView
 from django_comment_common.models import ForumsConfig
 from openedx.core.djangoapps.auth_exchange.views import LoginWithAccessTokenView
 from openedx.core.djangoapps.catalog.models import CatalogIntegration

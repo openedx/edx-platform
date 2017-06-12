@@ -1,17 +1,16 @@
 """Defines serializers used by the Team API."""
 from copy import deepcopy
+
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.models import Count
-from django.conf import settings
-
 from django_countries import countries
 from rest_framework import serializers
 
-from openedx.core.lib.api.serializers import CollapsedReferenceSerializer
-from openedx.core.lib.api.fields import ExpandableField
-from openedx.core.djangoapps.user_api.accounts.serializers import UserReadOnlySerializer
-
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
+from openedx.core.djangoapps.user_api.accounts.serializers import UserReadOnlySerializer
+from openedx.core.lib.api.fields import ExpandableField
+from openedx.core.lib.api.serializers import CollapsedReferenceSerializer
 
 
 class CountryField(serializers.Field):

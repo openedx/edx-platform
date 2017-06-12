@@ -22,29 +22,24 @@ DjangoOrmFieldCache: A base-class for single-row-per-field caches.
 """
 
 import json
-from abc import abstractmethod, ABCMeta
-from collections import defaultdict, namedtuple
-from .models import (
-    StudentModule,
-    XModuleUserStateSummaryField,
-    XModuleStudentPrefsField,
-    XModuleStudentInfoField
-)
 import logging
-from opaque_keys.edx.keys import CourseKey, UsageKey
-from opaque_keys.edx.block_types import BlockTypeKeyV1
-from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2
+from abc import ABCMeta, abstractmethod
+from collections import defaultdict, namedtuple
+
 from contracts import contract, new_contract
-
 from django.db import DatabaseError
-
-from xblock.runtime import KeyValueStore
-from xblock.exceptions import KeyValueMultiSaveError, InvalidScopeError
-from xblock.fields import Scope, UserScope
-from xmodule.modulestore.django import modulestore
+from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2
+from opaque_keys.edx.block_types import BlockTypeKeyV1
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from xblock.core import XBlockAside
-from courseware.user_state_client import DjangoXBlockUserStateClient
+from xblock.exceptions import InvalidScopeError, KeyValueMultiSaveError
+from xblock.fields import Scope, UserScope
+from xblock.runtime import KeyValueStore
 
+from courseware.user_state_client import DjangoXBlockUserStateClient
+from xmodule.modulestore.django import modulestore
+
+from .models import StudentModule, XModuleStudentInfoField, XModuleStudentPrefsField, XModuleUserStateSummaryField
 
 log = logging.getLogger(__name__)
 

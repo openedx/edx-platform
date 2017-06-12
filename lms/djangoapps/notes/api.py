@@ -1,15 +1,15 @@
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, Http404
-from django.core.exceptions import ValidationError
-
-from notes.models import Note
-from notes.utils import notes_enabled_for_course
-from courseware.courses import get_course_with_access
-
+import collections
 import json
 import logging
-import collections
+
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ValidationError
+from django.http import Http404, HttpResponse
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
+
+from courseware.courses import get_course_with_access
+from notes.models import Note
+from notes.utils import notes_enabled_for_course
 
 log = logging.getLogger(__name__)
 

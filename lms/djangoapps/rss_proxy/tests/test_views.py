@@ -1,9 +1,10 @@
 """
 Tests for the rss_proxy views
 """
-from django.test import TestCase
 from django.core.urlresolvers import reverse
-from mock import patch, Mock
+from django.test import TestCase
+from mock import Mock, patch
+
 from rss_proxy.models import WhitelistedRssUrl
 
 
