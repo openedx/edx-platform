@@ -4,22 +4,25 @@ data in a Django ORM model.
 """
 
 import itertools
+import logging
 from operator import attrgetter
 from time import time
-import logging
+
+from django.contrib.auth.models import User
+from django.db import transaction
+from django.db.utils import IntegrityError
+from edx_user_state_client.interface import XBlockUserState, XBlockUserStateClient
+from xblock.fields import Scope
+
+import dogstats_wrapper as dog_stats_api
+from courseware.models import BaseStudentModuleHistory, StudentModule
+from openedx.core.djangoapps import monitoring_utils
+
 try:
     import simplejson as json
 except ImportError:
     import json
 
-import dogstats_wrapper as dog_stats_api
-from django.contrib.auth.models import User
-from django.db import transaction
-from django.db.utils import IntegrityError
-from xblock.fields import Scope
-from courseware.models import StudentModule, BaseStudentModuleHistory
-from edx_user_state_client.interface import XBlockUserStateClient, XBlockUserState
-from openedx.core.djangoapps import monitoring_utils
 
 log = logging.getLogger(__name__)
 

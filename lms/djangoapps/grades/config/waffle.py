@@ -4,7 +4,6 @@ waffle switches for the Grades app.
 """
 from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 
-
 # Namespace
 WAFFLE_NAMESPACE = u'grades'
 

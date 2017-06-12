@@ -13,12 +13,11 @@ request to the view with param "success"
 set to "success" or "failure".  The view defaults to payment success.
 """
 
-from django.views.generic.base import View
-from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse, HttpResponseBadRequest
+from django.views.decorators.csrf import csrf_exempt
+from django.views.generic.base import View
+
 from edxmako.shortcuts import render_to_response
-
-
 # We use the same hashing function as the software under test,
 # because it mainly uses standard libraries, and I want
 # to avoid duplicating that code.

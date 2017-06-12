@@ -7,10 +7,15 @@ from urllib import urlencode
 from urlparse import parse_qs, urlparse, urlunparse
 
 import ddt
-import mock
-from nose.plugins.attrib import attr
-
 import httpretty
+import mock
+from django.core.exceptions import ValidationError
+from django.test.client import RequestFactory
+from nose.plugins.attrib import attr
+from opaque_keys.edx.locator import CourseLocator
+from pytz import UTC
+from rest_framework.exceptions import PermissionDenied
+
 from common.test.utils import MockSignalHandlerMixin, disable_signal
 from courseware.tests.factories import BetaTesterFactory, StaffFactory
 from discussion_api import api
@@ -34,8 +39,6 @@ from discussion_api.tests.utils import (
     make_minimal_cs_thread,
     make_paginated_api_response
 )
-from django.core.exceptions import ValidationError
-from django.test.client import RequestFactory
 from django_comment_client.tests.utils import ForumsEnableMixin
 from django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
@@ -44,12 +47,9 @@ from django_comment_common.models import (
     FORUM_ROLE_STUDENT,
     Role
 )
-from opaque_keys.edx.locator import CourseLocator
 from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.lib.exceptions import CourseNotFoundError, PageNotFoundError
-from pytz import UTC
-from rest_framework.exceptions import PermissionDenied
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
 from xmodule.modulestore import ModuleStoreEnum

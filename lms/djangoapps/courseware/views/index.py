@@ -1,65 +1,65 @@
 """
 View for Courseware Index
 """
+import logging
+import urllib
 # pylint: disable=attribute-defined-outside-init
 from datetime import datetime
+
+import waffle
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.context_processors import csrf
 from django.core.urlresolvers import reverse
 from django.http import Http404
+from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
 from django.utils.timezone import UTC
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import View
-from django.shortcuts import redirect
+from opaque_keys.edx.keys import CourseKey
+from web_fragments.fragment import Fragment
 
 from edxmako.shortcuts import render_to_response, render_to_string
-import logging
-
-log = logging.getLogger("edx.courseware.views.index")
-
-import urllib
-import waffle
-
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.gating.api import get_entrance_exam_score_ratio, get_entrance_exam_usage_key
 from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
-from opaque_keys.edx.keys import CourseKey
-from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
-from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
+from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.monitoring_utils import set_custom_metrics_for_course_key
+from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
-from openedx.features.enterprise_support.api import data_sharing_consent_required
 from openedx.features.course_experience import UNIFIED_COURSE_VIEW_FLAG, default_course_url_name
+from openedx.features.enterprise_support.api import data_sharing_consent_required
 from request_cache.middleware import RequestCache
 from shoppingcart.models import CourseRegistrationCode
 from student.views import is_course_blocked
 from util.views import ensure_valid_course_key
 from xmodule.modulestore.django import modulestore
 from xmodule.x_module import STUDENT_VIEW
-from web_fragments.fragment import Fragment
 
 from ..access import has_access
 from ..access_utils import in_preview_mode, is_course_open_for_learner
-from ..courses import get_current_child, get_studio_url, get_course_with_access
+from ..courses import get_course_with_access, get_current_child, get_studio_url
 from ..entrance_exams import (
     course_has_entrance_exam,
     get_entrance_exam_content,
-    user_has_passed_entrance_exam,
     user_can_skip_entrance_exam,
+    user_has_passed_entrance_exam
 )
 from ..masquerade import setup_masquerade
 from ..model_data import FieldDataCache
-from ..module_render import toc_for_course, get_module_for_descriptor
+from ..module_render import get_module_for_descriptor, toc_for_course
 from .views import (
-    CourseTabView, check_access_to_course, check_and_get_upgrade_link,
+    CourseTabView,
+    check_access_to_course,
+    check_and_get_upgrade_link,
     get_cosmetic_verified_display_price
 )
 
+log = logging.getLogger("edx.courseware.views.index")
 
 TEMPLATE_IMPORTS = {'urllib': urllib}
 CONTENT_DEPTH = 2

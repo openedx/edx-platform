@@ -1,31 +1,35 @@
 # -*- coding: utf-8 -*-
-from datetime import timedelta, datetime
 import json
+from datetime import datetime, timedelta
 
 import boto
 import ddt
-from django.conf import settings
-from freezegun import freeze_time
 import mock
-from mock import patch
-from nose.tools import assert_is_none, assert_equals, assert_raises, assert_true, assert_false  # pylint: disable=no-name-in-module
 import pytz
 import requests.exceptions
+from django.conf import settings
+from freezegun import freeze_time
+from mock import patch
+from nose.tools import (  # pylint: disable=no-name-in-module
+    assert_equals,
+    assert_false,
+    assert_is_none,
+    assert_raises,
+    assert_true
+)
+from opaque_keys.edx.keys import CourseKey
 from testfixtures import LogCapture
 
 from common.test.utils import MockS3Mixin
+from lms.djangoapps.verify_student.models import (
+    SoftwareSecurePhotoVerification,
+    VerificationDeadline,
+    VerificationException
+)
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-
-from opaque_keys.edx.keys import CourseKey
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-
-from lms.djangoapps.verify_student.models import (
-    SoftwareSecurePhotoVerification,
-    VerificationException, VerificationDeadline
-)
-
 
 FAKE_SETTINGS = {
     "SOFTWARE_SECURE": {

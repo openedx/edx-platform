@@ -2,13 +2,15 @@
 CourseGrade Class
 """
 from abc import abstractmethod
-from collections import defaultdict, OrderedDict
+from collections import OrderedDict, defaultdict
+
 from django.conf import settings
 from lazy import lazy
 
 from xmodule import block_metadata_utils
-from .subsection_grade_factory import SubsectionGradeFactory
+
 from .subsection_grade import ZeroSubsectionGrade
+from .subsection_grade_factory import SubsectionGradeFactory
 
 
 class CourseGradeBase(object):

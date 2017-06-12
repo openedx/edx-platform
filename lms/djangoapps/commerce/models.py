@@ -1,10 +1,9 @@
 """
 Commerce-related models.
 """
+from config_models.models import ConfigurationModel
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-
-from config_models.models import ConfigurationModel
 
 
 class CommerceConfiguration(ConfigurationModel):

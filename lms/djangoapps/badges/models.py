@@ -3,6 +3,7 @@ Database models for the badges app
 """
 from importlib import import_module
 
+from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
@@ -15,9 +16,8 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
 from badges.utils import deserialize_count_specs
-from config_models.models import ConfigurationModel
-from xmodule.modulestore.django import modulestore
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
+from xmodule.modulestore.django import modulestore
 
 
 def validate_badge_image(image):

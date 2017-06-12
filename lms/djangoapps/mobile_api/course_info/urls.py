@@ -1,10 +1,10 @@
 """
 URLs for course_info API
 """
-from django.conf.urls import patterns, url
 from django.conf import settings
+from django.conf.urls import patterns, url
 
-from .views import CourseUpdatesList, CourseHandoutsList
+from .views import CourseHandoutsList, CourseUpdatesList
 
 urlpatterns = patterns(
     'mobile_api.course_info.views',

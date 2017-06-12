@@ -4,10 +4,10 @@ Unit tests for bulk-email-related forms.
 """
 
 from nose.plugins.attrib import attr
-
-from bulk_email.models import CourseEmailTemplate, BulkEmailFlag
-from bulk_email.forms import CourseAuthorizationAdminForm, CourseEmailTemplateForm
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+
+from bulk_email.forms import CourseAuthorizationAdminForm, CourseEmailTemplateForm
+from bulk_email.models import BulkEmailFlag, CourseEmailTemplate
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

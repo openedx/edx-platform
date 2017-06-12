@@ -6,22 +6,21 @@ from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse, Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
 from django.utils import translation
 from django.utils.translation.trans_real import get_supported_language_variant
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 
-from edxmako.shortcuts import render_to_response
-import student.views
-import courseware.views.views
-from edxmako.shortcuts import marketing_link
-from util.cache import cache_if_anonymous
-from util.json_request import JsonResponse
 import branding.api as branding_api
+import courseware.views.views
+import student.views
+from edxmako.shortcuts import marketing_link, render_to_response
 from openedx.core.djangoapps.lang_pref.api import released_languages
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from util.cache import cache_if_anonymous
+from util.json_request import JsonResponse
 
 log = logging.getLogger(__name__)
 

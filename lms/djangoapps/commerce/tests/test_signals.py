@@ -19,12 +19,12 @@ from opaque_keys.edx.keys import CourseKey
 from requests import Timeout
 
 from commerce.models import CommerceConfiguration
-from commerce.signals import send_refund_notification, generate_refund_notification_body, create_zendesk_ticket
+from commerce.signals import create_zendesk_ticket, generate_refund_notification_body, send_refund_notification
 from commerce.tests import JSON
 from commerce.tests.mocks import mock_create_refund, mock_process_refund
 from course_modes.models import CourseMode
 from student.models import UNENROLL_DONE
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 ZENDESK_URL = 'http://zendesk.example.com/'
 ZENDESK_USER = 'test@example.com'

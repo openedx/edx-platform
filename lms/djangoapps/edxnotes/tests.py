@@ -1,38 +1,38 @@
 """
 Tests for the EdxNotes app.
 """
-from contextlib import contextmanager
-import ddt
 import json
-import jwt
-from mock import patch, MagicMock
-from nose.plugins.attrib import attr
-from unittest import skipUnless
-from datetime import datetime
 import urlparse
+from contextlib import contextmanager
+from datetime import datetime
+from unittest import skipUnless
 
+import ddt
+import jwt
+from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
+from django.core.urlresolvers import reverse
+from django.test.client import RequestFactory
+from django.test.utils import override_settings
+from edx_oauth2_provider.tests.factories import ClientFactory
+from mock import MagicMock, patch
+from nose.plugins.attrib import attr
+from provider.oauth2.models import Client
+
+from courseware.model_data import FieldDataCache
+from courseware.module_render import get_module_for_descriptor
+from courseware.tabs import get_course_tab_list
 from edxmako.shortcuts import render_to_string
 from edxnotes import helpers
 from edxnotes.decorators import edxnotes
 from edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
 from edxnotes.plugins import EdxNotesTab
-from django.conf import settings
-from django.core.urlresolvers import reverse
-from django.core.exceptions import ImproperlyConfigured
-from django.test.client import RequestFactory
-from django.test.utils import override_settings
-from edx_oauth2_provider.tests.factories import ClientFactory
-from provider.oauth2.models import Client
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.tabs import CourseTab
-from courseware.model_data import FieldDataCache
-from courseware.module_render import get_module_for_descriptor
-from courseware.tabs import get_course_tab_list
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
-
 
 FEATURES = settings.FEATURES.copy()
 

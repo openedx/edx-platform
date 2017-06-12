@@ -10,7 +10,7 @@ from discussion_api.permissions import (
     can_delete,
     get_editable_fields,
     get_initializable_comment_fields,
-    get_initializable_thread_fields,
+    get_initializable_thread_fields
 )
 from lms.lib.comment_client.comment import Comment
 from lms.lib.comment_client.thread import Thread

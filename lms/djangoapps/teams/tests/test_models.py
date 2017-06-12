@@ -1,33 +1,32 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=no-member
 """Tests for the teams API at the HTTP request level."""
+import itertools
 from contextlib import contextmanager
 from datetime import datetime
+
 import ddt
-import itertools
-from mock import Mock
 import pytz
+from mock import Mock
+from opaque_keys.edx.keys import CourseKey
 
 from django_comment_common.signals import (
-    thread_created,
-    thread_edited,
-    thread_deleted,
-    thread_voted,
     comment_created,
-    comment_edited,
     comment_deleted,
+    comment_edited,
+    comment_endorsed,
     comment_voted,
-    comment_endorsed
+    thread_created,
+    thread_deleted,
+    thread_edited,
+    thread_voted
 )
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from opaque_keys.edx.keys import CourseKey
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
-
-from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
-from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from lms.djangoapps.teams import TEAM_DISCUSSION_CONTEXT
+from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
+from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import EventTestMixin
-
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 COURSE_KEY1 = CourseKey.from_string('edx/history/1')
 COURSE_KEY2 = CourseKey.from_string('edx/history/2')

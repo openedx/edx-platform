@@ -2,15 +2,16 @@
 Tests for reset_grades management command.
 """
 from datetime import datetime, timedelta
+
 import ddt
 from django.core.management.base import CommandError
 from django.test import TestCase
 from freezegun import freeze_time
-from mock import patch, MagicMock
+from mock import MagicMock, patch
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
 from lms.djangoapps.grades.management.commands import reset_grades
-from lms.djangoapps.grades.models import PersistentSubsectionGrade, PersistentCourseGrade
-from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
+from lms.djangoapps.grades.models import PersistentCourseGrade, PersistentSubsectionGrade
 
 
 @ddt.ddt

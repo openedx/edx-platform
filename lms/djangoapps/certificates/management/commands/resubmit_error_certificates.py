@@ -18,14 +18,14 @@ Example usage:
 """
 import logging
 from optparse import make_option
-from django.core.management.base import BaseCommand, CommandError
 
-from xmodule.modulestore.django import modulestore
+from django.core.management.base import BaseCommand, CommandError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from certificates import api as certs_api
-from certificates.models import GeneratedCertificate, CertificateStatuses
 
+from certificates import api as certs_api
+from certificates.models import CertificateStatuses, GeneratedCertificate
+from xmodule.modulestore.django import modulestore
 
 LOGGER = logging.getLogger(__name__)
 

@@ -3,6 +3,7 @@ Factories related to student verification.
 """
 
 from factory.django import DjangoModelFactory
+
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 
 

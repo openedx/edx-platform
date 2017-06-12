@@ -5,13 +5,13 @@ import itertools
 from urlparse import urlparse
 
 import ddt
+import httpretty
 import mock
+from django.test.client import RequestFactory
 from nose.plugins.attrib import attr
 
-import httpretty
 from discussion_api.serializers import CommentSerializer, ThreadSerializer, get_context
 from discussion_api.tests.utils import CommentsServiceMockMixin, make_minimal_cs_comment, make_minimal_cs_thread
-from django.test.client import RequestFactory
 from django_comment_client.tests.utils import ForumsEnableMixin
 from django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,

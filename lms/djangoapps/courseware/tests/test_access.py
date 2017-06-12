@@ -3,31 +3,33 @@
 Test the access control framework
 """
 import datetime
-import ddt
 import itertools
-import pytz
 
-from django.contrib.auth.models import User
+import ddt
+import pytz
 from ccx_keys.locator import CCXLocator
-from django.test.client import RequestFactory
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test import TestCase
+from django.test.client import RequestFactory
+from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
 from nose.plugins.attrib import attr
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-from ccx.tests.factories import CcxFactory
 import courseware.access as access
 import courseware.access_response as access_response
+from ccx.tests.factories import CcxFactory
 from courseware.masquerade import CourseMasquerade
 from courseware.tests.factories import (
     BetaTesterFactory,
     GlobalStaffFactory,
     InstructorFactory,
     StaffFactory,
-    UserFactory,
+    UserFactory
 )
 from courseware.tests.helpers import LoginEnrollmentTestCase, masquerade_as_group_member
+from lms.djangoapps.ccx.models import CustomCourseForEdX
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import CourseEnrollment
 from student.roles import CourseCcxCoachRole, CourseStaffRole
@@ -35,34 +37,27 @@ from student.tests.factories import (
     AdminFactory,
     AnonymousUserFactory,
     CourseEnrollmentAllowedFactory,
-    CourseEnrollmentFactory,
+    CourseEnrollmentFactory
 )
-
+from util.milestones_helpers import fulfill_course_milestone, set_prerequisite_courses
 from xmodule.course_module import (
-    CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
     CATALOG_VISIBILITY_ABOUT,
-    CATALOG_VISIBILITY_NONE,
+    CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
+    CATALOG_VISIBILITY_NONE
 )
 from xmodule.error_module import ErrorDescriptor
-from xmodule.partitions.partitions import Group, UserPartition, MINIMUM_STATIC_PARTITION_ID
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_SPLIT_MODULESTORE,
     ModuleStoreTestCase,
-    SharedModuleStoreTestCase,
-    TEST_DATA_SPLIT_MODULESTORE
+    SharedModuleStoreTestCase
 )
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.xml import CourseLocationManager
+from xmodule.partitions.partitions import MINIMUM_STATIC_PARTITION_ID, Group, UserPartition
 from xmodule.tests import get_test_system
 
-from util.milestones_helpers import (
-    set_prerequisite_courses,
-    fulfill_course_milestone,
-)
-from milestones.tests.utils import MilestonesTestCaseMixin
-
-from lms.djangoapps.ccx.models import CustomCourseForEdX
 
 # pylint: disable=protected-access
 
