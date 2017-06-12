@@ -1,18 +1,19 @@
 """
 django admin pages for certificates models
 """
-from django.contrib import admin
-from django import forms
 from config_models.admin import ConfigurationModelAdmin
-from util.organizations_helpers import get_organizations
+from django import forms
+from django.contrib import admin
+
 from certificates.models import (
     CertificateGenerationConfiguration,
     CertificateGenerationCourseSetting,
     CertificateHtmlViewConfiguration,
     CertificateTemplate,
     CertificateTemplateAsset,
-    GeneratedCertificate,
+    GeneratedCertificate
 )
+from util.organizations_helpers import get_organizations
 
 
 class CertificateTemplateForm(forms.ModelForm):

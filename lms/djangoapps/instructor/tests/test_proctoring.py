@@ -2,10 +2,9 @@
 Unit tests for Edx Proctoring feature flag in new instructor dashboard.
 """
 
-from mock import patch
-
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from mock import patch
 from nose.plugins.attrib import attr
 
 from student.roles import CourseFinanceAdminRole

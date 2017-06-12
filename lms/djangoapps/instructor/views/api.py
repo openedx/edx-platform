@@ -5,112 +5,116 @@ JSON views which the instructor dashboard requests.
 
 Many of these GETs may become PUTs in the future.
 """
-import StringIO
+import csv
+import decimal
 import json
 import logging
+import random
 import re
+import string
+import StringIO
 import time
+
+import unicodecsv
 from django.conf import settings
-from django.views.decorators.csrf import ensure_csrf_cookie
-from django.views.decorators.http import require_POST, require_http_methods
-from django.views.decorators.cache import cache_control
-from django.core.exceptions import ValidationError, PermissionDenied
+from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied, ValidationError
 from django.core.mail.message import EmailMessage
-from django.core.exceptions import ObjectDoesNotExist
-from django.db import IntegrityError, transaction
 from django.core.urlresolvers import reverse
 from django.core.validators import validate_email
-from django.utils.translation import ugettext as _
+from django.db import IntegrityError, transaction
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound
-from django.utils.html import strip_tags
 from django.shortcuts import redirect
-import string
-import random
-import unicodecsv
-import decimal
+from django.utils.html import strip_tags
+from django.utils.translation import ugettext as _
+from django.views.decorators.cache import cache_control
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.http import require_http_methods, require_POST
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
+
+import instructor_analytics.basic
+import instructor_analytics.csvs
+import instructor_analytics.distributions
+import lms.djangoapps.instructor.enrollment as enrollment
+import lms.djangoapps.instructor_task.api
+from bulk_email.models import BulkEmailFlag, CourseEmail
+from certificates import api as certs_api
+from certificates.models import CertificateInvalidation, CertificateStatuses, CertificateWhitelist, GeneratedCertificate
+from courseware.access import has_access
+from courseware.courses import get_course_by_id, get_course_with_access
+from courseware.models import StudentModule
+from django_comment_client.utils import has_forum_access
+from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_MODERATOR, Role
+from edxmako.shortcuts import render_to_string
+from lms.djangoapps.instructor.access import ROLES, allow_access, list_with_level, revoke_access, update_forum_role
+from lms.djangoapps.instructor.enrollment import (
+    enroll_email,
+    get_email_params,
+    get_user_email_language,
+    send_beta_role_email,
+    send_mail_to_student,
+    unenroll_email
+)
+from lms.djangoapps.instructor.views import INVOICE_KEY
+from lms.djangoapps.instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
+from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError
+from lms.djangoapps.instructor_task.models import ReportStore
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.course_groups.cohorts import is_course_cohorted
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.user_api.preferences.api import get_user_preference, set_user_preference
+from openedx.core.djangolib.markup import HTML, Text
+from shoppingcart.models import (
+    Coupon,
+    CourseMode,
+    CourseRegistrationCode,
+    CourseRegistrationCodeInvoiceItem,
+    Invoice,
+    RegistrationCodeRedemption
+)
 from student import auth
-from student.roles import CourseSalesAdminRole, CourseFinanceAdminRole
+from student.models import (
+    ALLOWEDTOENROLL_TO_ENROLLED,
+    ALLOWEDTOENROLL_TO_UNENROLLED,
+    DEFAULT_TRANSITION_STATE,
+    ENROLLED_TO_ENROLLED,
+    ENROLLED_TO_UNENROLLED,
+    UNENROLLED_TO_ALLOWEDTOENROLL,
+    UNENROLLED_TO_ENROLLED,
+    UNENROLLED_TO_UNENROLLED,
+    CourseEnrollment,
+    EntranceExamConfiguration,
+    ManualEnrollmentAudit,
+    Registration,
+    UserProfile,
+    anonymous_id_for_user,
+    get_user_by_username_or_email,
+    unique_id_for_user
+)
+from student.roles import CourseFinanceAdminRole, CourseSalesAdminRole
+from submissions import api as sub_api  # installed from the edx-submissions repository
 from util.file import (
-    store_uploaded_file, course_and_time_based_filename_generator,
-    FileValidationException, UniversalNewlineIterator
+    FileValidationException,
+    UniversalNewlineIterator,
+    course_and_time_based_filename_generator,
+    store_uploaded_file
 )
 from util.json_request import JsonResponse, JsonResponseBadRequest
 from util.views import require_global_staff
-from lms.djangoapps.instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
-
-from courseware.access import has_access
-from courseware.courses import get_course_with_access, get_course_by_id
-from django.contrib.auth.models import User
-from django_comment_client.utils import has_forum_access
-from django_comment_common.models import (
-    Role,
-    FORUM_ROLE_ADMINISTRATOR,
-    FORUM_ROLE_MODERATOR,
-    FORUM_ROLE_COMMUNITY_TA,
-)
-from edxmako.shortcuts import render_to_string
-from courseware.models import StudentModule
-from shoppingcart.models import (
-    Coupon,
-    CourseRegistrationCode,
-    RegistrationCodeRedemption,
-    Invoice,
-    CourseMode,
-    CourseRegistrationCodeInvoiceItem,
-)
-from student.models import (
-    CourseEnrollment, unique_id_for_user, anonymous_id_for_user,
-    UserProfile, Registration, EntranceExamConfiguration,
-    ManualEnrollmentAudit, UNENROLLED_TO_ALLOWEDTOENROLL, ALLOWEDTOENROLL_TO_ENROLLED,
-    ENROLLED_TO_ENROLLED, ENROLLED_TO_UNENROLLED, UNENROLLED_TO_ENROLLED,
-    UNENROLLED_TO_UNENROLLED, ALLOWEDTOENROLL_TO_UNENROLLED, DEFAULT_TRANSITION_STATE
-)
-import lms.djangoapps.instructor_task.api
-from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError
-from lms.djangoapps.instructor_task.models import ReportStore
-import lms.djangoapps.instructor.enrollment as enrollment
-from lms.djangoapps.instructor.enrollment import (
-    get_user_email_language,
-    enroll_email,
-    send_mail_to_student,
-    get_email_params,
-    send_beta_role_email,
-    unenroll_email,
-)
-from lms.djangoapps.instructor.access import list_with_level, allow_access, revoke_access, ROLES, update_forum_role
-import instructor_analytics.basic
-import instructor_analytics.distributions
-import instructor_analytics.csvs
-import csv
-from openedx.core.djangoapps.user_api.preferences.api import get_user_preference, set_user_preference
-from openedx.core.djangolib.markup import HTML, Text
-from lms.djangoapps.instructor.views import INVOICE_KEY
-
-from submissions import api as sub_api  # installed from the edx-submissions repository
-
-from certificates import api as certs_api
-from certificates.models import CertificateWhitelist, GeneratedCertificate, CertificateStatuses, CertificateInvalidation
-
-from bulk_email.models import CourseEmail, BulkEmailFlag
-from student.models import get_user_by_username_or_email
 
 from .tools import (
-    dump_student_extensions,
     dump_module_extensions,
+    dump_student_extensions,
     find_unit,
     get_student_from_identifier,
-    require_student_from_identifier,
     handle_dashboard_error,
     parse_datetime,
+    require_student_from_identifier,
     set_due_date_extension,
-    strip_if_string,
+    strip_if_string
 )
-from opaque_keys.edx.keys import CourseKey, UsageKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from opaque_keys import InvalidKeyError
-from openedx.core.djangoapps.course_groups.cohorts import is_course_cohorted
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 log = logging.getLogger(__name__)
 

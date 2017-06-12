@@ -2,7 +2,7 @@
 # pylint: disable=redefined-outer-name
 # pylint: disable=unused-argument
 
-from lettuce import world, step
+from lettuce import step, world
 
 
 @step('I click on View Courseware')

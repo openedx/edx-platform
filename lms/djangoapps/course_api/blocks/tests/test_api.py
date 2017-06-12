@@ -2,13 +2,13 @@
 Tests for Blocks api.py
 """
 
+from itertools import product
+
 import ddt
 from django.test.client import RequestFactory
-from itertools import product
 
 from openedx.core.djangoapps.content.block_structure.api import clear_course_from_cache
 from openedx.core.djangoapps.content.block_structure.config import STORAGE_BACKING_FOR_CACHE, waffle
-
 from student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase

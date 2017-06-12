@@ -6,13 +6,11 @@ import textwrap
 
 import mock
 import requests
+from django.core.urlresolvers import NoReverseMatch, reverse
 
-from django.core.urlresolvers import reverse, NoReverseMatch
-
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
-from xmodule.modulestore.tests.factories import CourseFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-
+from xmodule.modulestore.tests.factories import CourseFactory
 
 IMAGE_BOOK = ("An Image Textbook", "http://example.com/the_book/")
 

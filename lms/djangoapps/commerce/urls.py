@@ -2,8 +2,8 @@
 Defines the URL routes for this app.
 """
 from django.conf.urls import patterns, url
-from commerce import views
 
+from commerce import views
 
 urlpatterns = patterns(
     '',

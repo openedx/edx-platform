@@ -1,11 +1,12 @@
 """
 Base class for Instructor celery tasks.
 """
-from celery import Task
-from celery.states import SUCCESS, FAILURE
 import logging
-from lms.djangoapps.instructor_task.models import InstructorTask
 
+from celery import Task
+from celery.states import FAILURE, SUCCESS
+
+from lms.djangoapps.instructor_task.models import InstructorTask
 
 # define different loggers for use within tasks and on client side
 TASK_LOG = logging.getLogger('edx.celery.task')

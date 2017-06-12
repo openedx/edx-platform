@@ -9,11 +9,9 @@ from django.core.urlresolvers import reverse
 from nose.plugins.attrib import attr
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-from bulk_email.models import CourseAuthorization, BulkEmailFlag
-from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_MIXED_MODULESTORE, SharedModuleStoreTestCase
-)
+from bulk_email.models import BulkEmailFlag, CourseAuthorization
 from student.tests.factories import AdminFactory
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 

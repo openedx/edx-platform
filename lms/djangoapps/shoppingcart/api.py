@@ -2,8 +2,9 @@
 API for for getting information about the user's shopping cart.
 """
 from django.core.urlresolvers import reverse
-from xmodule.modulestore.django import ModuleI18nService
+
 from shoppingcart.models import OrderItem
+from xmodule.modulestore.django import ModuleI18nService
 
 
 def order_history(user, **kwargs):

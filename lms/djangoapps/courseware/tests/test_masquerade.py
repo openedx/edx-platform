@@ -3,32 +3,32 @@ Unit tests for masquerade.
 """
 import json
 import pickle
-from mock import patch
-from nose.plugins.attrib import attr
 from datetime import datetime
 
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.utils.timezone import UTC
+from mock import patch
+from nose.plugins.attrib import attr
+from xblock.runtime import DictKeyValueStore
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
 from courseware.masquerade import (
     CourseMasquerade,
     MasqueradingKeyValueStore,
+    get_masquerading_user_group,
     handle_ajax,
-    setup_masquerade,
-    get_masquerading_user_group
+    setup_masquerade
 )
 from courseware.tests.factories import StaffFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase, masquerade_as_group_member
 from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
+from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from student.tests.factories import UserFactory
-from xblock.runtime import DictKeyValueStore
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import Group, UserPartition
-from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 
 
 class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):

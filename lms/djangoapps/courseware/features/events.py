@@ -1,11 +1,8 @@
 # pylint: disable=missing-docstring
 
-from lettuce import step
-from lettuce import world
-from lettuce import before
+from lettuce import before, step, world
+from nose.tools import assert_equals, assert_in
 from pymongo import MongoClient
-from nose.tools import assert_equals
-from nose.tools import assert_in
 
 REQUIRED_EVENT_FIELDS = [
     'agent',

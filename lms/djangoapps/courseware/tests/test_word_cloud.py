@@ -3,10 +3,12 @@
 
 import json
 from operator import itemgetter
+
 from nose.plugins.attrib import attr
 
-from . import BaseTestXmodule
 from xmodule.x_module import STUDENT_VIEW
+
+from . import BaseTestXmodule
 
 
 @attr(shard=1)

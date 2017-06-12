@@ -9,8 +9,8 @@ from nose.plugins.attrib import attr
 from pytz import utc
 
 from commerce.models import CommerceConfiguration
-from course_modes.tests.factories import CourseModeFactory
 from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
 from courseware.courses import get_course_date_blocks
 from courseware.date_summary import (
     CourseEndDate,
@@ -18,15 +18,15 @@ from courseware.date_summary import (
     DateSummary,
     TodaysDate,
     VerificationDeadlineDate,
-    VerifiedUpgradeDeadlineDate,
+    VerifiedUpgradeDeadlineDate
 )
+from lms.djangoapps.verify_student.models import VerificationDeadline
+from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from lms.djangoapps.verify_student.models import VerificationDeadline
-from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

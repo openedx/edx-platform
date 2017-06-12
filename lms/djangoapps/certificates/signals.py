@@ -3,9 +3,9 @@ for self-paced courses.
 """
 from celery.task import task
 from django.dispatch.dispatcher import receiver
+from opaque_keys.edx.keys import CourseKey
 
 from certificates.models import CertificateGenerationCourseSetting
-from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.modulestore.django import SignalHandler
 

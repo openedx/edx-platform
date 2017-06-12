@@ -1,16 +1,15 @@
 """
 Django admin page for grades models
 """
+from config_models.admin import ConfigurationModelAdmin, KeyedConfigurationModelAdmin
 from django.contrib import admin
 
-from config_models.admin import ConfigurationModelAdmin, KeyedConfigurationModelAdmin
-
-from lms.djangoapps.grades.config.models import (
-    CoursePersistentGradesFlag,
-    PersistentGradesEnabledFlag,
-    ComputeGradesSetting,
-)
 from lms.djangoapps.grades.config.forms import CoursePersistentGradesAdminForm
+from lms.djangoapps.grades.config.models import (
+    ComputeGradesSetting,
+    CoursePersistentGradesFlag,
+    PersistentGradesEnabledFlag
+)
 
 
 class CoursePersistentGradesAdmin(KeyedConfigurationModelAdmin):

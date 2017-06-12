@@ -3,27 +3,26 @@ This file contains tasks that are designed to perform background operations on t
 running state of a course.
 
 """
+import logging
 from collections import OrderedDict
 from datetime import datetime
-import logging
-from pytz import UTC
 from time import time
-import unicodecsv
 
+import unicodecsv
 from django.contrib.auth.models import User
 from django.core.files.storage import DefaultStorage
+from openassessment.data import OraAggregateData
+from pytz import UTC
 
 from instructor_analytics.basic import get_proctored_exam_results
 from instructor_analytics.csvs import format_dictlist
-from openassessment.data import OraAggregateData
-from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort
+from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from survey.models import SurveyAnswer
-from util.file import course_filename_prefix_generator, UniversalNewlineIterator
+from util.file import UniversalNewlineIterator, course_filename_prefix_generator
 
 from .runner import TaskProgress
-from .utils import upload_csv_to_report_store, UPDATE_STATUS_SUCCEEDED, UPDATE_STATUS_FAILED
-
+from .utils import UPDATE_STATUS_FAILED, UPDATE_STATUS_SUCCEEDED, upload_csv_to_report_store
 
 # define different loggers for use within tasks and on client side
 TASK_LOG = logging.getLogger('edx.celery.task')

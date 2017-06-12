@@ -8,21 +8,20 @@ from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
-from django.test.utils import override_settings
 from django.test.client import RequestFactory
-from mock import patch, Mock
+from django.test.utils import override_settings
+from milestones.tests.utils import MilestonesTestCaseMixin
+from mock import Mock, patch
 from nose.plugins.attrib import attr
 from pytz import UTC
-from edxmako.shortcuts import render_to_response
 
 from branding.views import index
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from milestones.tests.utils import MilestonesTestCaseMixin
+from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from util.milestones_helpers import set_prerequisite_courses
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-
 
 FEATURES_WITH_STARTDATE = settings.FEATURES.copy()
 FEATURES_WITH_STARTDATE['DISABLE_START_DATES'] = False

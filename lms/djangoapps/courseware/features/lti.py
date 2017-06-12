@@ -1,20 +1,20 @@
 # pylint: disable=missing-docstring
 import datetime
 import os
+
 import pytz
 from django.conf import settings
+from lettuce import step, world
 from mock import patch
+from nose.tools import assert_equal, assert_in, assert_is_none, assert_true
 from pytz import UTC
-from splinter.exceptions import ElementDoesNotExist
 from selenium.common.exceptions import NoAlertPresentException
-from nose.tools import assert_true, assert_equal, assert_in, assert_is_none
-from lettuce import world, step
-
-from courseware.tests.factories import InstructorFactory, BetaTesterFactory
-from courseware.access import has_access
-from student.tests.factories import UserFactory
+from splinter.exceptions import ElementDoesNotExist
 
 from common import visit_scenario_item
+from courseware.access import has_access
+from courseware.tests.factories import BetaTesterFactory, InstructorFactory
+from student.tests.factories import UserFactory
 
 TEST_COURSE_NAME = "test_course_a"
 

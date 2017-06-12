@@ -2,11 +2,11 @@
 """Tests of Branding API """
 from __future__ import unicode_literals
 
-from django.test import TestCase
-
 import mock
-from branding.api import get_logo_url, get_footer
+from django.test import TestCase
 from django.test.utils import override_settings
+
+from branding.api import get_footer, get_logo_url
 
 
 class TestHeader(TestCase):

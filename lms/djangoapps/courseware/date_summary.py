@@ -4,18 +4,17 @@ page. Each block gives information about a particular
 course-run-specific date which will be displayed to the user.
 """
 from datetime import datetime
-from pytz import timezone, utc
 
 from babel.dates import format_timedelta
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
-from django.utils.translation import ugettext_lazy
-from django.utils.translation import to_locale, get_language
+from django.utils.translation import get_language, to_locale, ugettext_lazy
 from lazy import lazy
+from pytz import timezone, utc
 
 from course_modes.models import CourseMode
 from lms.djangoapps.commerce.utils import EcommerceService
-from lms.djangoapps.verify_student.models import VerificationDeadline, SoftwareSecurePhotoVerification
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
 from student.models import CourseEnrollment
 
 

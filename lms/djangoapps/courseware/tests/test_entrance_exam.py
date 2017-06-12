@@ -1,37 +1,34 @@
 """
 Tests use cases related to LMS Entrance Exam behavior, such as gated content access (TOC)
 """
-from mock import patch, Mock
-
 from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
+from milestones.tests.utils import MilestonesTestCaseMixin
+from mock import Mock, patch
 from nose.plugins.attrib import attr
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from courseware.model_data import FieldDataCache
-from courseware.module_render import toc_for_course, get_module, handle_xblock_callback
-from courseware.tests.factories import UserFactory, InstructorFactory, StaffFactory
-from courseware.tests.helpers import (
-    LoginEnrollmentTestCase,
-)
 from courseware.entrance_exams import (
     course_has_entrance_exam,
     get_entrance_exam_content,
     user_can_skip_entrance_exam,
-    user_has_passed_entrance_exam,
+    user_has_passed_entrance_exam
 )
+from courseware.model_data import FieldDataCache
+from courseware.module_render import get_module, handle_xblock_callback, toc_for_course
+from courseware.tests.factories import InstructorFactory, StaffFactory, UserFactory
+from courseware.tests.helpers import LoginEnrollmentTestCase
 from openedx.core.djangolib.testing.utils import get_mock_request
 from student.models import CourseEnrollment
-from student.tests.factories import CourseEnrollmentFactory, AnonymousUserFactory
+from student.tests.factories import AnonymousUserFactory, CourseEnrollmentFactory
 from util.milestones_helpers import (
-    add_milestone,
-    add_course_milestone,
-    get_namespace_choices,
-    generate_milestone_namespace,
     add_course_content_milestone,
+    add_course_milestone,
+    add_milestone,
+    generate_milestone_namespace,
     get_milestone_relationship_types,
+    get_namespace_choices
 )
-from milestones.tests.utils import MilestonesTestCaseMixin
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory

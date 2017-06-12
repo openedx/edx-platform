@@ -2,19 +2,19 @@
 This test file will run through some LMS test scenarios regarding access and navigation of the LMS
 """
 import time
-from mock import patch
-from nose.plugins.attrib import attr
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
+from mock import patch
+from nose.plugins.attrib import attr
 
-from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tests.factories import GlobalStaffFactory
+from courseware.tests.helpers import LoginEnrollmentTestCase
 from student.tests.factories import UserFactory
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.django import modulestore
 
 
 @attr(shard=1)
