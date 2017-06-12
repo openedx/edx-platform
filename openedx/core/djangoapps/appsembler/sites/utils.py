@@ -21,6 +21,7 @@ def get_lms_link_from_course_key(base_lms_url, course_key):
     """
     return "{}.{}".format(course_key.org, base_lms_url)
 
+
 def get_initial_sass_variables():
     """
     This method loads the SASS variables file from the currently active theme. It is used as a default value

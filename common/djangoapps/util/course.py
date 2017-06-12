@@ -5,6 +5,7 @@ import logging
 from django.conf import settings
 
 from opaque_keys.edx.keys import CourseKey
+from openedx.core.djangoapps.appsembler.sites.utils import get_lms_link_from_course_key
 
 log = logging.getLogger(__name__)
 
@@ -20,7 +21,8 @@ def get_lms_link_for_about_page(course_key):
         # but redirects exist from www.edx.org to get to the Drupal course about page URL.
         about_base = settings.MKTG_URLS['ROOT']
     else:
-        about_base = settings.LMS_ROOT_URL
+        about_base = settings.LMS_BASE
+        about_base = "https://{}".format(get_lms_link_from_course_key(about_base, course_key))
 
     return u"{about_base_url}/courses/{course_key}/about".format(
         about_base_url=about_base,
