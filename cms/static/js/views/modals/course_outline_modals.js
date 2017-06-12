@@ -14,8 +14,9 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
 ) {
     'use strict';
     var CourseOutlineXBlockModal, SettingsXBlockModal, PublishXBlockModal, AbstractEditor, BaseDateEditor,
-        ReleaseDateEditor, DueDateEditor, GradingEditor, PublishEditor, AbstractVisibilityEditor, StaffLockEditor,
-        ContentVisibilityEditor, TimedExaminationPreferenceEditor, AccessEditor, ShowCorrectnessEditor;
+        ReleaseDateEditor, DueDateEditor, GradingEditor, PublishEditor, AbstractVisibilityEditor,
+        AbstractVisibilityAndAccessEditor, StaffLockEditor, VisibilityAndAccessEditor, ContentVisibilityEditor,
+        TimedExaminationPreferenceEditor, AccessEditor, ShowCorrectnessEditor;
 
     CourseOutlineXBlockModal = BaseModal.extend({
         events: _.extend({}, BaseModal.prototype.events, {
@@ -580,6 +581,20 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             return this.model.get('ancestor_has_staff_lock');
         },
 
+        getContext: function() {
+            return {
+                hasExplicitStaffLock: this.isModelLocked(),
+                ancestorLocked: this.isAncestorLocked()
+            };
+        }
+    });
+
+    AbstractVisibilityAndAccessEditor = AbstractEditor.extend({
+
+        afterRender: function() {
+            AbstractEditor.prototype.afterRender.call(this);
+        },
+
         getContentGroups: function() {
             return this.model.get('user_partitions');
         },
@@ -590,8 +605,6 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
 
         getContext: function() {
             return {
-                hasExplicitStaffLock: this.isModelLocked(),
-                ancestorLocked: this.isAncestorLocked(),
                 contentGroups: this.getContentGroups(),
                 groupAccess: this.getGroupAccess()
             };
@@ -600,6 +613,40 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
 
     StaffLockEditor = AbstractVisibilityEditor.extend({
         templateName: 'staff-lock-editor',
+        className: 'edit-staff-lock',
+        afterRender: function() {
+            AbstractVisibilityEditor.prototype.afterRender.call(this);
+            this.setLock(this.isModelLocked());
+        },
+
+        setLock: function(value) {
+            this.$('#staff_lock').prop('checked', value);
+        },
+
+        isLocked: function() {
+            return this.$('#staff_lock').is(':checked');
+        },
+
+        hasChanges: function() {
+            return this.isModelLocked() !== this.isLocked();
+        },
+
+        getRequestData: function() {
+            if (this.hasChanges()) {
+                return {
+                    publish: 'republish',
+                    metadata: {
+                        visible_to_staff_only: this.isLocked() ? true : null
+                    }
+                };
+            } else {
+                return {};
+            }
+        }
+    });
+
+    VisibilityAndAccessEditor = AbstractVisibilityAndAccessEditor.extend({
+        templateName: 'visibility-and-access-editor',
         className: 'edit-staff-lock',
         events: {
             'change .user-partition-select': function() {
@@ -610,19 +657,21 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         },
 
         afterRender: function() {
-            var keys = [];
-            AbstractVisibilityEditor.prototype.afterRender.call(this);
-            this.setLock(this.isModelLocked());
+            var groupAccess,
+                keys;
+            AbstractVisibilityAndAccessEditor.prototype.afterRender.call(this);
             this.hideCheckboxDivs();
             if (this.model.attributes.group_access) {
-                keys = Object.keys(this.model.attributes.group_access);
+                groupAccess = this.model.attributes.group_access;
+                keys = Object.keys(groupAccess);
                 if (keys.length === 1) { // should be only one partition key
-                    if (this.model.attributes.group_access.hasOwnProperty(keys[0])) {
-                        this.$('.user-partition-select').val(this.model.attributes.group_access[keys[0]]).change();
+                    if (groupAccess.hasOwnProperty(keys[0]) && groupAccess[keys[0]].length > 0) {
+                        // Select the option that has group access, provided there is a specific group within the scheme
+                        this.$('.user-partition-select option[value=' + keys[0] + ']').prop('selected', true);
+                        this.showSelectedDiv(keys[0]);
                     }
                 }
             }
-
         },
 
         getSelectedEnrollmentTrackId: function() {
@@ -651,18 +700,9 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             this.getCheckboxDivs().hide();
         },
 
-        setLock: function(value) {
-            this.$('#staff_lock').prop('checked', value);
-        },
-
-        isLocked: function() {
-            return this.$('#staff_lock').is(':checked');
-        },
-
         hasChanges: function() {
-            return (this.isModelLocked() !== this.isLocked()) ||
-                // compare the group access object retrieved vs the current selection
-                (JSON.stringify(this.model.get('group_access')) !== JSON.stringify(this.getGroupAccessData()));
+            // compare the group access object retrieved vs the current selection
+            return (JSON.stringify(this.model.get('group_access')) !== JSON.stringify(this.getGroupAccessData()));
         },
 
         getSelectedGroupAccess: function() {
@@ -677,7 +717,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 groupAccess[userPartitionId] = this.getSelectedCheckboxesByDivId(userPartitionId);
                 return groupAccess;
             } else {
-                return null;
+                return {};
             }
         },
 
@@ -685,16 +725,9 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             var metadata = {},
                 groupAccessData = this.getGroupAccessData();
             if (this.hasChanges()) {
-                if (this.isLocked()) {
-                    metadata.visible_to_staff_only = true;
-                } else {
-                    metadata.visible_to_staff_only = null;
-                }
-
                 if (groupAccessData) {
                     metadata.group_access = groupAccessData;
                 }
-
                 return {
                     publish: 'republish',
                     metadata: metadata
@@ -854,7 +887,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 editors: []
             };
             if (xblockInfo.isVertical()) {
-                editors = [StaffLockEditor];
+                editors = [StaffLockEditor, VisibilityAndAccessEditor];
             } else {
                 tabs = [
                     {
@@ -870,7 +903,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 ];
                 if (xblockInfo.isChapter()) {
                     tabs[0].editors = [ReleaseDateEditor];
-                    tabs[1].editors = [StaffLockEditor];
+                    tabs[1].editors = [StaffLockEditor, VisibilityAndAccessEditor];
                 } else if (xblockInfo.isSequential()) {
                     tabs[0].editors = [ReleaseDateEditor, GradingEditor, DueDateEditor];
                     tabs[1].editors = [ContentVisibilityEditor, ShowCorrectnessEditor];

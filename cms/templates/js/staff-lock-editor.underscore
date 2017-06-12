@@ -29,46 +29,4 @@
         </li>
     </ul>
 </div>
-<br>
-
-<% if (xblockInfo.isVertical()) { %>
-    <h3 class="modal-section-title">
-        <%- gettext('Unit Access') %>
-    </h3>
-    <div class="modal-section-content access-change">
-        <ul class="list-fields list-input">
-            <li>
-            <%- gettext('Restrict access to:') %>
-            <select class="user-partition-select">
-                <option value="none">Choose one</option>
-                <% for (var i=0; i < contentGroups.length; i++) { %>
-                    <option id="<%= contentGroups[i].id %>-option" value="<%= contentGroups[i].id %>"><%= contentGroups[i].name %></option>
-                <% } %>
-            </select>
-            </li>
-            <br>
-            <% if (contentGroups.length > 0) { %>
-                <div class="user-partition-group-checkboxes">
-                    <% for (var i=0; i < contentGroups.length; i++) { %>
-                        <div id="<%= contentGroups[i].id %>-checkboxes">
-                            <% for (var j = 0; j < contentGroups[i].groups.length; j++) { %>
-                                <li class="field field-checkbox checkbox-cosmetic">
-                                    <input type="checkbox" id="content-group-<%= contentGroups[i].groups[j].id %>" value="<%= contentGroups[i].groups[j].id %>" class="input input-checkbox"
-                                        <% if (groupAccess[contentGroups[i].id] && groupAccess[contentGroups[i].id].indexOf(contentGroups[i].groups[j].id) !== -1) { %> checked="checked" <% } %> />
-                                    <label for="content-group-<%= contentGroups[i].groups[j].id %>" class="label">
-                                        <span class="icon fa fa-check-square-o input-checkbox-checked" aria-hidden="true"></span>
-                                        <span class="icon fa fa-square-o input-checkbox-unchecked" aria-hidden="true"></span>
-                                        <%- contentGroups[i].groups[j].name %>
-                                    </label>
-                                </li>
-                            <% } %>
-                        </div>
-                    <% } %>
-                </div>
-            <% } else { %>
-                <%- gettext('You have not set up any content groups yet.') %>
-            <% } %>
-        </ul>
-    </div>
- <% } %>
 </form>

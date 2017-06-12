@@ -83,19 +83,22 @@ if (staffOnlyMessage) {
         addStatusMessage(messageType, messageText);
     }
 
-    if (hasPartitionGroups && allowedGroups.length > 1) {
+    if (hasPartitionGroups && allowedGroups.length === 0) {
         addStatusMessage(
             'partition-groups',
             gettext('Access to some content in this unit is restricted to specific groups of learners')
         );
-    } else if (allowedGroups.length === 1 && xblockInfo.isVertical()) {
-        var allowedId = allowedGroups[0];
-        var groupName = groupIdToName[allowedId];
+    } else if (allowedGroups.length >= 1 && xblockInfo.isVertical()) {
+        var groupNames = [];
+        for (var i = 0; i < allowedGroups.length; i++) {
+            var groupName = groupIdToName[allowedGroups[i]];
+            groupNames.push(groupName);
+        }
         messageType = 'partition-groups';
         messageText = edx.StringUtils.interpolate(
-                gettext('Access to this unit is restricted to {groupName} learners'),
+                gettext('Access to this unit is restricted to {groupNames}'),
                 {
-                    groupName: groupName
+                    groupNames: groupNames.join(', ')
                 }
         )
         addStatusMessage(messageType, messageText);
