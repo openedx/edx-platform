@@ -98,7 +98,7 @@ python-dateutil==2.1
 git+https://github.com/edx/python-social-auth@758985102cee98f440fae44ed99617b7cfef3473#egg=python-social-auth==0.2.21.edx.a
 pytz==2016.7
 pysrt==0.4.7
-PyYAML==3.10
+PyYAML==3.12
 requests==2.9.1
 requests-oauthlib==0.4.1
 rules==1.1.1
