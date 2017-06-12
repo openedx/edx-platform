@@ -595,7 +595,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 contentGroups: this.getContentGroups(),
                 groupAccess: this.getGroupAccess()
             };
-        },
+        }
     });
 
     StaffLockEditor = AbstractVisibilityEditor.extend({
@@ -610,16 +610,19 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         },
 
         afterRender: function() {
+            var keys = Object.keys(this.model.attributes.group_access);
             AbstractVisibilityEditor.prototype.afterRender.call(this);
             this.setLock(this.isModelLocked());
             this.hideCheckboxDivs();
-            for (var key in this.model.attributes.group_access) {
-                this.$('.user-partition-select').val(key).change(); // should be only one partition key
+            if (keys.length === 1) { // should be only one partition key
+                if (this.model.attributes.group_access.hasOwnProperty(keys[0])) {
+                    this.$('.user-partition-select').val(this.model.attributes.group_access[keys[0]]).change();
+                }
             }
         },
 
         getSelectedEnrollmentTrackId: function() {
-            return parseInt(this.$('.user-partition-select').val());
+            return parseInt(this.$('.user-partition-select').val(), 10);
         },
 
         getCheckboxDivs: function() {
@@ -627,13 +630,12 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         },
 
         getSelectedCheckboxesByDivId: function(contentGroupId) {
-            var checkboxes = $('#' + contentGroupId + '-checkboxes input:checked'),
-                selectedCheckboxValues = [];
-            for(var i = 0; i < checkboxes.length; i++ ){
-                selectedCheckboxValues.push(parseInt($(checkboxes[i]).val()));
+            var $checkboxes = $('#' + contentGroupId + '-checkboxes input:checked'),
+                selectedCheckboxValues = [],
+                i;
+            for (i = 0; i < $checkboxes.length; i++) {
+                selectedCheckboxValues.push(parseInt($($checkboxes[i]).val(), 10));
             }
-            console.dir('selected');
-            console.dir(selectedCheckboxValues);
             return selectedCheckboxValues;
         },
 
@@ -656,7 +658,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         hasChanges: function() {
             return (this.isModelLocked() !== this.isLocked()) ||
                 // compare the group access object retrieved vs the current selection
-                (JSON.stringify(this.model.get('group_access')) != JSON.stringify(this.getGroupAccessData()));
+                (JSON.stringify(this.model.get('group_access')) !== JSON.stringify(this.getGroupAccessData()));
         },
 
         getSelectedGroupAccess: function() {
@@ -666,10 +668,10 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
 
         getGroupAccessData: function() {
             var userPartitionId = this.getSelectedEnrollmentTrackId(),
-                group_access = {};
+                groupAccess = {};
             if (userPartitionId !== 'none') { // If the selected partition ID is not none
-                group_access[userPartitionId] = this.getSelectedCheckboxesByDivId(userPartitionId);
-                return group_access;
+                groupAccess[userPartitionId] = this.getSelectedCheckboxesByDivId(userPartitionId);
+                return groupAccess;
             } else {
                 return null;
             }
@@ -696,7 +698,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             } else {
                 return {};
             }
-        },
+        }
     });
 
     ContentVisibilityEditor = AbstractVisibilityEditor.extend({
