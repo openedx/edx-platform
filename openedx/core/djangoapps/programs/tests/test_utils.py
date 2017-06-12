@@ -886,6 +886,18 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
         self.assertEqual(data['full_program_price'], program_full_price)
         self.assertEqual(data['avg_price_per_course'], program_full_price / self.number_of_courses)
 
+    def test_course_pricing_when_all_course_runs_have_no_seats(self):
+        course = ModuleStoreCourseFactory()
+        course = self.update_course(course, self.user.id)
+        course_run = CourseRunFactory(key=unicode(course.id), seats=[])
+        program = ProgramFactory(courses=[CourseFactory(course_runs=[course_run])])
+
+        data = ProgramMarketingDataExtender(program, self.user).extend()
+
+        self.assertEqual(data['number_of_courses'], len(program['courses']))
+        self.assertEqual(data['full_program_price'], 0.0)
+        self.assertEqual(data['avg_price_per_course'], 0.0)
+
     @ddt.data(True, False)
     @mock.patch(UTILS_MODULE + '.has_access')
     def test_can_enroll(self, can_enroll, mock_has_access):

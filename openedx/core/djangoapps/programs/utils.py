@@ -504,9 +504,9 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
         self.instructors = {}
 
         # Values for programs' price calculation.
-        self.data['avg_price_per_course'] = 0
+        self.data['avg_price_per_course'] = 0.0
         self.data['number_of_courses'] = 0
-        self.data['full_program_price'] = 0
+        self.data['full_program_price'] = 0.0
 
     def _extend_program(self):
         """Aggregates data from the program data structure."""
