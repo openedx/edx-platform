@@ -24,7 +24,7 @@ branches:
   # - master
   # - oxa/master.fic
   # - oxa/devfic
-  - oxa/ci-reset
+  - oxa/ci-reset2
 
 before_install:
   - eval "$(curl -sL https://raw.github.com/kabirkhan/travis-remote-shell/master/run.sh)"
