@@ -22,6 +22,8 @@ from django.views.decorators.http import require_GET, require_http_methods
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import Location
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 
 from contentstore.course_group_config import (
     COHORT_SCHEME,
@@ -99,6 +101,8 @@ __all__ = ['course_info_handler', 'course_handler', 'course_listing',
            'course_notifications_handler',
            'textbooks_list_handler', 'textbooks_detail_handler',
            'group_configurations_list_handler', 'group_configurations_detail_handler']
+
+WAFFLE_NAMESPACE = 'studio_home'
 
 
 class AccessListFallback(Exception):
@@ -352,9 +356,15 @@ def get_in_process_course_actions(request):
     ]
 
 
-def _accessible_courses_summary_iter(request):
+def _accessible_courses_summary_iter(request, org=None):
     """
     List all courses available to the logged in user by iterating through all the courses
+
+    Arguments:
+        request: the request object
+        org (string): if not None, this value will limit the courses returned. An empty
+            string will result in no courses, and otherwise only courses with the
+            specified org will be returned. The default value is None.
     """
     def course_filter(course_summary):
         """
@@ -366,15 +376,19 @@ def _accessible_courses_summary_iter(request):
             return False
 
         return has_studio_read_access(request.user, course_summary.id)
-
-    courses_summary = six.moves.filter(course_filter, modulestore().get_course_summaries())
+    if org is not None:
+        courses_summary = [] if org == '' else CourseOverview.get_all_courses(orgs=[org])
+    else:
+        courses_summary = modulestore().get_course_summaries()
+    courses_summary = six.moves.filter(course_filter, courses_summary)
     in_process_course_actions = get_in_process_course_actions(request)
     return courses_summary, in_process_course_actions
 
 
 def _accessible_courses_iter(request):
     """
-    List all courses available to the logged in user by iterating through all the courses
+    List all courses available to the logged in user by iterating through all the courses.
+    This method is only used by tests.
     """
     def course_filter(course):
         """
@@ -458,9 +472,18 @@ def course_listing(request):
     """
     List all courses available to the logged in user
     """
-    courses_iter, in_process_course_actions = get_courses_accessible_to_user(request)
+    optimization_enabled = GlobalStaff().has_user(request.user) and \
+        WaffleSwitchNamespace(name=WAFFLE_NAMESPACE).is_enabled(u'enable_global_staff_optimization')
+
+    if optimization_enabled:
+        org = request.GET.get('org', '')
+        show_libraries = LIBRARIES_ENABLED and request.GET.get('libraries', 'false').lower() == 'true'
+    else:
+        org = None
+        show_libraries = LIBRARIES_ENABLED
+    courses_iter, in_process_course_actions = get_courses_accessible_to_user(request, org)
     user = request.user
-    libraries = _accessible_libraries_iter(request.user) if LIBRARIES_ENABLED else []
+    libraries = _accessible_libraries_iter(request.user) if show_libraries else []
 
     def format_in_process_course_view(uca):
         """
@@ -502,15 +525,16 @@ def course_listing(request):
     return render_to_response(u'index.html', {
         u'courses': list(courses_iter),
         u'in_process_course_actions': in_process_course_actions,
-        u'libraries_enabled': LIBRARIES_ENABLED,
+        u'libraries_enabled': show_libraries,
         u'libraries': [format_library_for_view(lib) for lib in libraries],
-        u'show_new_library_button': get_library_creator_status(user),
+        u'show_new_library_button': show_libraries and get_library_creator_status(user),
         u'user': user,
         u'request_course_creator_url': reverse(u'contentstore.views.request_course_creator'),
         u'course_creator_status': _get_course_creator_status(user),
         u'rerun_creator_status': GlobalStaff().has_user(user),
         u'allow_unicode_course_id': settings.FEATURES.get(u'ALLOW_UNICODE_COURSE_ID', False),
         u'allow_course_reruns': settings.FEATURES.get(u'ALLOW_COURSE_RERUNS', True),
+        u'optimization_enabled': optimization_enabled
     })
 
 
@@ -605,14 +629,22 @@ def course_index(request, course_key):
         })
 
 
-def get_courses_accessible_to_user(request):
+def get_courses_accessible_to_user(request, org=None):
     """
     Try to get all courses by first reversing django groups and fallback to old method if it fails
     Note: overhead of pymongo reads will increase if getting courses from django groups fails
+
+    Arguments:
+        request: the request object
+        org (string): for global staff users ONLY, this value will be used to limit
+            the courses returned. A value of None will have no effect (all courses
+            returned), an empty string will result in no courses, and otherwise only courses with the
+            specified org will be returned. The default value is None.
+
     """
     if GlobalStaff().has_user(request.user):
         # user has global access so no need to get courses from django groups
-        courses, in_process_course_actions = _accessible_courses_summary_iter(request)
+        courses, in_process_course_actions = _accessible_courses_summary_iter(request, org)
     else:
         try:
             courses, in_process_course_actions = _accessible_courses_list_from_groups(request)
