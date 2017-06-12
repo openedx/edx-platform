@@ -3189,6 +3189,7 @@ ENTERPRISE_EXCLUDED_REGISTRATION_FIELDS = {
     'year_of_birth',
     'mailing_address',
 }
+ENTERPRISE_CUSTOMER_COOKIE_NAME = 'enterprise_customer_uuid'
 
 ############## Settings for Course Enrollment Modes ######################
 COURSE_ENROLLMENT_MODES = {
