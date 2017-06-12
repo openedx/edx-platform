@@ -491,7 +491,7 @@
     .course-metadata {
       @extend %t-copy-sub1;
       @include transition(opacity $tmg-f1 ease-in-out 0);
-      color: $gray;
+      color: $gray-d2;
 
       .metadata-item {
         display: inline-block;

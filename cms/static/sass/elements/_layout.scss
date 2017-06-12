@@ -107,7 +107,7 @@
         display: inline-block;
         vertical-align: bottom; // correct for extra padding in FF
         max-width: 250px;
-        color: $gray;
+        color: $gray-d2;
 
         &.navigation-current {
           @extend %ui-disabled;
