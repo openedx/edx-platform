@@ -2,23 +2,24 @@
 Tests for the views
 """
 from datetime import datetime
+from urllib import urlencode
+
 import ddt
 from django.core.urlresolvers import reverse
+from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
 from mock import patch
 from opaque_keys import InvalidKeyError
 from pytz import UTC
 from rest_framework import status
 from rest_framework.test import APITestCase
-from urllib import urlencode
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory, StaffFactory
 from lms.djangoapps.grades.tests.utils import mock_get_score
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
 
 
 @ddt.ddt

@@ -1,4 +1,4 @@
-from __future__ import unicode_literals, print_function
+from __future__ import print_function, unicode_literals
 
 from datetime import datetime
 
@@ -6,7 +6,7 @@ from celery.states import FAILURE
 from django.core.management.base import BaseCommand, CommandError
 from pytz import utc
 
-from lms.djangoapps.instructor_task.models import InstructorTask, QUEUING, PROGRESS
+from lms.djangoapps.instructor_task.models import PROGRESS, QUEUING, InstructorTask
 
 
 class Command(BaseCommand):

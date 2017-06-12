@@ -1,6 +1,5 @@
 from django.test import TestCase
 from django.test.utils import override_settings
-
 from nose.plugins.attrib import attr
 
 from util.testing import UrlResetMixin

@@ -9,12 +9,11 @@ general XBlock representation in this rather specialized formatting.
 from functools import partial
 
 from django.http import Http404, HttpResponse
-from mobile_api.models import MobileApiConfig
-
+from opaque_keys.edx.locator import BlockUsageLocator
 from rest_framework import generics
 from rest_framework.response import Response
-from opaque_keys.edx.locator import BlockUsageLocator
 
+from mobile_api.models import MobileApiConfig
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
 

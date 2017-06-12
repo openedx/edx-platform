@@ -5,8 +5,11 @@ Manually set Software Secure verification status.
 import sys
 
 from django.core.management.base import BaseCommand
+
 from lms.djangoapps.verify_student.models import (
-    SoftwareSecurePhotoVerification, VerificationCheckpoint, VerificationStatus
+    SoftwareSecurePhotoVerification,
+    VerificationCheckpoint,
+    VerificationStatus
 )
 
 

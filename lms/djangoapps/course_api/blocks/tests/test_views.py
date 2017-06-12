@@ -2,13 +2,13 @@
 Tests for Blocks Views
 """
 from datetime import datetime
-
-from django.core.urlresolvers import reverse
 from string import join
 from urllib import urlencode
 from urlparse import urlunparse
 
+from django.core.urlresolvers import reverse
 from opaque_keys.edx.locator import CourseLocator
+
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase

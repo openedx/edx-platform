@@ -1,14 +1,16 @@
 """
 Instructor tasks related to certificates.
 """
+from time import time
+
 from django.contrib.auth.models import User
 from django.db.models import Q
-from time import time
 
 from certificates.api import generate_user_certificates
 from certificates.models import CertificateStatuses, GeneratedCertificate
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
+
 from .runner import TaskProgress
 
 

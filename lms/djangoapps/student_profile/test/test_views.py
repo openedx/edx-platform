@@ -6,10 +6,9 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.client import RequestFactory
 
-from util.testing import UrlResetMixin
 from student.tests.factories import UserFactory
-
 from student_profile.views import learner_profile_context
+from util.testing import UrlResetMixin
 
 
 class LearnerProfileViewTest(UrlResetMixin, TestCase):

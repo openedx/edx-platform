@@ -1,23 +1,19 @@
 """
 Tools for the instructor dashboard
 """
-import dateutil
 import json
 
+import dateutil
 from django.contrib.auth.models import User
 from django.http import HttpResponseBadRequest
 from django.utils.timezone import utc
 from django.utils.translation import ugettext as _
-
-from courseware.models import StudentFieldOverride
-from courseware.field_overrides import disable_overrides
-from courseware.student_field_overrides import (
-    clear_override_for_user,
-    get_override_for_user,
-    override_field_for_user,
-)
-from xmodule.fields import Date
 from opaque_keys.edx.keys import UsageKey
+
+from courseware.field_overrides import disable_overrides
+from courseware.models import StudentFieldOverride
+from courseware.student_field_overrides import clear_override_for_user, get_override_for_user, override_field_for_user
+from xmodule.fields import Date
 
 DATE_FIELD = Date()
 

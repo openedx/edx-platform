@@ -1,8 +1,9 @@
 """ User model wrapper for comment service"""
-from .utils import merge_dict, perform_request, CommentClientRequestError, CommentClientPaginatedResult
+import settings
 
 import models
-import settings
+
+from .utils import CommentClientPaginatedResult, CommentClientRequestError, merge_dict, perform_request
 
 
 class User(models.Model):

@@ -1,16 +1,18 @@
 """
 E-commerce Tab Instructor Dashboard Coupons Operations views
 """
+import datetime
+import logging
+
+import pytz
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
-from django.views.decorators.http import require_POST
 from django.utils.translation import ugettext as _
-from util.json_request import JsonResponse
-from shoppingcart.models import Coupon, CourseRegistrationCode
+from django.views.decorators.http import require_POST
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-import datetime
-import pytz
-import logging
+
+from shoppingcart.models import Coupon, CourseRegistrationCode
+from util.json_request import JsonResponse
 
 log = logging.getLogger(__name__)
 

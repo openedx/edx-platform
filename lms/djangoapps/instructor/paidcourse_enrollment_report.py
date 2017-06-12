@@ -2,16 +2,23 @@
 Defines concrete class for cybersource  Enrollment Report.
 
 """
-from courseware.access import has_access
 import collections
+
 from django.conf import settings
 from django.utils.translation import ugettext as _
+
+from courseware.access import has_access
 from courseware.courses import get_course_by_id
 from lms.djangoapps.instructor.enrollment_report import BaseAbstractEnrollmentReportProvider
-from shoppingcart.models import RegistrationCodeRedemption, PaidCourseRegistration, CouponRedemption, OrderItem, \
-    InvoiceTransaction
-from student.models import CourseEnrollment, ManualEnrollmentAudit
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from shoppingcart.models import (
+    CouponRedemption,
+    InvoiceTransaction,
+    OrderItem,
+    PaidCourseRegistration,
+    RegistrationCodeRedemption
+)
+from student.models import CourseEnrollment, ManualEnrollmentAudit
 
 
 class PaidCourseEnrollmentReportProvider(BaseAbstractEnrollmentReportProvider):

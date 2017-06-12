@@ -2,16 +2,16 @@
 Python tests for the Survey models
 """
 
-import ddt
 from collections import OrderedDict
 
+import ddt
+from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.test.client import Client
-from django.contrib.auth.models import User
 
-from survey.exceptions import SurveyFormNotFound, SurveyFormNameAlreadyExists
-from django.core.exceptions import ValidationError
-from survey.models import SurveyForm, SurveyAnswer
+from survey.exceptions import SurveyFormNameAlreadyExists, SurveyFormNotFound
+from survey.models import SurveyAnswer, SurveyForm
 
 
 @ddt.ddt

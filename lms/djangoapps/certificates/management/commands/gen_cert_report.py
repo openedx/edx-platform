@@ -2,14 +2,16 @@
 Generate a report of certificate statuses
 """
 
-from django.core.management.base import BaseCommand, CommandError
-from certificates.models import GeneratedCertificate
-from django.contrib.auth.models import User
 from optparse import make_option
+
+from django.contrib.auth.models import User
+from django.core.management.base import BaseCommand, CommandError
+from django.db.models import Count
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from django.db.models import Count
+
+from certificates.models import GeneratedCertificate
 
 
 class Command(BaseCommand):

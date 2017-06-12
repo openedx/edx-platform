@@ -3,10 +3,10 @@
 Tests for support views.
 """
 
-from datetime import datetime, timedelta
 import itertools
 import json
 import re
+from datetime import datetime, timedelta
 
 import ddt
 from django.core.urlresolvers import reverse
@@ -16,9 +16,9 @@ from pytz import UTC
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.verify_student.models import VerificationDeadline
-from student.models import CourseEnrollment, ManualEnrollmentAudit, ENROLLED_TO_ENROLLED
+from student.models import ENROLLED_TO_ENROLLED, CourseEnrollment, ManualEnrollmentAudit
 from student.roles import GlobalStaff, SupportStaffRole
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

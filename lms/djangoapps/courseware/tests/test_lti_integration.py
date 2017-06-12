@@ -1,14 +1,14 @@
 """LTI integration tests"""
 
-from collections import OrderedDict
 import json
-import mock
-from nose.plugins.attrib import attr
-import oauthlib
 import urllib
+from collections import OrderedDict
 
+import mock
+import oauthlib
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from nose.plugins.attrib import attr
 
 from courseware.tests import BaseTestXmodule
 from courseware.views.views import get_course_lti_endpoints

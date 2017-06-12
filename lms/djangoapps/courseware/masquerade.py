@@ -11,14 +11,13 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
-from student.models import CourseEnrollment
-from util.json_request import expect_json, JsonResponse
-
 from opaque_keys.edx.keys import CourseKey
 from xblock.fragment import Fragment
 from xblock.runtime import KeyValueStore
-from xmodule.partitions.partitions import NoSuchUserPartitionGroupError
 
+from student.models import CourseEnrollment
+from util.json_request import JsonResponse, expect_json
+from xmodule.partitions.partitions import NoSuchUserPartitionGroupError
 
 log = logging.getLogger(__name__)
 

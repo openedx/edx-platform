@@ -1,9 +1,5 @@
 """ Certificates API URLs. """
-from django.conf.urls import (
-    include,
-    patterns,
-    url,
-)
+from django.conf.urls import include, patterns, url
 
 urlpatterns = patterns(
     '',

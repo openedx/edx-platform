@@ -10,8 +10,26 @@ from HTMLParser import HTMLParser
 from urllib import quote, urlencode
 from uuid import uuid4
 
-import courseware.views.views as views
 import ddt
+from django.conf import settings
+from django.contrib.auth.models import AnonymousUser
+from django.core.urlresolvers import reverse
+from django.http import Http404, HttpResponseBadRequest
+from django.test import TestCase
+from django.test.client import Client, RequestFactory
+from django.test.utils import override_settings
+from freezegun import freeze_time
+from milestones.tests.utils import MilestonesTestCaseMixin
+from mock import MagicMock, PropertyMock, create_autospec, patch
+from nose.plugins.attrib import attr
+from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
+from pytz import UTC
+from waffle.testutils import override_flag
+from xblock.core import XBlock
+from xblock.fields import Scope, String
+from xblock.fragment import Fragment
+
+import courseware.views.views as views
 import shoppingcart
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from certificates import api as certs_api
@@ -27,21 +45,9 @@ from courseware.tests.factories import GlobalStaffFactory, StudentModuleFactory
 from courseware.testutils import RenderXBlockTestMixin
 from courseware.url_helpers import get_redirect_url
 from courseware.user_state_client import DjangoXBlockUserStateClient
-from django.conf import settings
-from django.contrib.auth.models import AnonymousUser
-from django.core.urlresolvers import reverse
-from django.http import Http404, HttpResponseBadRequest
-from django.test import TestCase
-from django.test.client import Client, RequestFactory
-from django.test.utils import override_settings
-from freezegun import freeze_time
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
 from lms.djangoapps.grades.config.waffle import waffle as grades_waffle
 from lms.djangoapps.grades.config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT
-from milestones.tests.utils import MilestonesTestCaseMixin
-from mock import MagicMock, PropertyMock, create_autospec, patch
-from nose.plugins.attrib import attr
-from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
 from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory, ProgramFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -52,16 +58,11 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.gating import api as gating_api
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
-from pytz import UTC
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from util.tests.test_date_utils import fake_pgettext, fake_ugettext
 from util.url import reload_django_url_config
 from util.views import ensure_valid_course_key
-from waffle.testutils import override_flag
-from xblock.core import XBlock
-from xblock.fields import Scope, String
-from xblock.fragment import Fragment
 from xmodule.graders import ShowCorrectness
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore

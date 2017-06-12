@@ -4,12 +4,12 @@ from django.conf import settings
 from django.conf.urls import patterns, url
 
 from .views import (
-    TeamsListView,
-    TeamsDetailView,
-    TopicDetailView,
-    TopicListView,
+    MembershipDetailView,
     MembershipListView,
-    MembershipDetailView
+    TeamsDetailView,
+    TeamsListView,
+    TopicDetailView,
+    TopicListView
 )
 
 TEAM_ID_PATTERN = r'(?P<team_id>[a-z\d_-]+)'

@@ -11,10 +11,11 @@ from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase, ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import check_mongo_calls
-from .mixins import CourseApiFactoryMixin
+
 from ..api import course_detail, list_courses
+from .mixins import CourseApiFactoryMixin
 
 
 class CourseApiTestMixin(CourseApiFactoryMixin):

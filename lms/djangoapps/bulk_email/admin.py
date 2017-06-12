@@ -1,12 +1,11 @@
 """
 Django admin page for bulk email models
 """
+from config_models.admin import ConfigurationModelAdmin
 from django.contrib import admin
 
-from config_models.admin import ConfigurationModelAdmin
-
-from bulk_email.models import CourseEmail, Optout, CourseEmailTemplate, CourseAuthorization, BulkEmailFlag
-from bulk_email.forms import CourseEmailTemplateForm, CourseAuthorizationAdminForm
+from bulk_email.forms import CourseAuthorizationAdminForm, CourseEmailTemplateForm
+from bulk_email.models import BulkEmailFlag, CourseAuthorization, CourseEmail, CourseEmailTemplate, Optout
 
 
 class CourseEmailAdmin(admin.ModelAdmin):

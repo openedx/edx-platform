@@ -8,18 +8,18 @@ to the E-Commerce service is complete.
 
 """
 import datetime
-import pytz
-from mock import patch
 
+import pytz
 from django.test.client import Client
+from mock import patch
 
 from course_modes.models import CourseMode
 from shoppingcart.models import CertificateItem, Order
 from student.models import CourseEnrollment
 from student.roles import SupportStaffRole
 from student.tests.factories import UserFactory
-from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class RefundTests(ModuleStoreTestCase):

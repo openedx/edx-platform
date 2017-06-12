@@ -1,26 +1,27 @@
 """
 Functionality for generating grade reports.
 """
+import logging
+import re
 from collections import OrderedDict
 from datetime import datetime
-from itertools import chain, izip_longest, izip
-from lazy import lazy
-import logging
-from pytz import UTC
-import re
+from itertools import chain, izip, izip_longest
 from time import time
 
+from lazy import lazy
+from pytz import UTC
+
+from certificates.models import CertificateWhitelist, GeneratedCertificate, certificate_info_for_user
+from courseware.courses import get_course_by_id
 from instructor_analytics.basic import list_problem_responses
 from instructor_analytics.csvs import format_dictlist
-from certificates.models import CertificateWhitelist, certificate_info_for_user, GeneratedCertificate
-from courseware.courses import get_course_by_id
-from lms.djangoapps.grades.context import grading_context_for_course, grading_context
-from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.grades.context import grading_context, grading_context_for_course
 from lms.djangoapps.grades.models import PersistentCourseGrade
+from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.teams.models import CourseTeamMembership
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
-from openedx.core.djangoapps.course_groups.cohorts import get_cohort, is_course_cohorted, bulk_cache_cohorts
+from openedx.core.djangoapps.course_groups.cohorts import bulk_cache_cohorts, get_cohort, is_course_cohorted
 from openedx.core.djangoapps.user_api.course_tag.api import BulkCourseTags
 from student.models import CourseEnrollment
 from student.roles import BulkRoleCache
@@ -30,7 +31,6 @@ from xmodule.split_test_module import get_split_user_partitions
 
 from .runner import TaskProgress
 from .utils import upload_csv_to_report_store
-
 
 TASK_LOG = logging.getLogger('edx.celery.task')
 

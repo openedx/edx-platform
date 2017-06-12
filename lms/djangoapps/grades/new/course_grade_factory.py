@@ -1,15 +1,14 @@
 from collections import namedtuple
-import dogstats_wrapper as dog_stats_api
 from logging import getLogger
 
+import dogstats_wrapper as dog_stats_api
 from openedx.core.djangoapps.signals.signals import COURSE_GRADE_CHANGED
 
 from ..config import assume_zero_if_absent, should_persist_grades
-from ..config.waffle import waffle, WRITE_ONLY_IF_ENGAGED
+from ..config.waffle import WRITE_ONLY_IF_ENGAGED, waffle
 from ..models import PersistentCourseGrade
 from .course_data import CourseData
 from .course_grade import CourseGrade, ZeroCourseGrade
-
 
 log = getLogger(__name__)
 
