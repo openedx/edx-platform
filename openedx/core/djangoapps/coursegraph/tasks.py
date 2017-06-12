@@ -225,7 +225,7 @@ def should_dump_course(course_key, graph):
     return last_this_command_was_run < course_last_published_date
 
 
-@task
+@task(routing_key=settings.COURSEGRAPH_JOB_QUEUE)
 def dump_course_to_neo4j(course_key_string, credentials):
     """
     Serializes a course and writes it to neo4j.
@@ -341,7 +341,6 @@ class ModuleStoreSerializer(object):
 
             dump_course_to_neo4j.apply_async(
                 args=[six.text_type(course_key), credentials],
-                routing_key=settings.COURSEGRAPH_JOB_QUEUE,
             )
             submitted_courses.append(six.text_type(course_key))
 
