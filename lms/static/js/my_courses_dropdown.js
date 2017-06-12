@@ -90,4 +90,13 @@ $(document).ready(function() {
     $dropdownMenu.on('keydown', function(event) {
         catchKeyPress($(this), event);
     });
+    $(this).on('click', function() {
+        if($dropdownMenu.hasClass('expanded')) {
+            $dropdownMenu.removeClass('expanded');
+            $dropdownMenuToggle.removeClass('active').attr('aria-expanded', 'false').focus();
+        }
+    });
+    $dropdownMenu.on('click',function(event) {
+        event.stopPropagation();
+    });
 });
