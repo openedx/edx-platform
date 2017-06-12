@@ -114,7 +114,7 @@
             @extend %t-regular;
             background-image: none;
             background-color: $white;
-            color: $mediumGrey;
+            color: $gray-d1;
             border-radius: 0;
             box-shadow: none;
             border: 0;
@@ -122,11 +122,11 @@
             text-transform: uppercase;
             &:hover {
               background-color: $white;
-              color: $blue;
+              color: $uxpl-blue-base;
             }
             &.active {
-              border-bottom: 4px solid $blue-d2;
-              color: $offBlack;
+              border-bottom: 4px solid $uxpl-blue-base;
+              color: $uxpl-blue-base;
             }
           }
         }
@@ -191,7 +191,7 @@
       }
 
       a {
-        color: $blue;
+        color: $blue-d2;
 
         &:hover {
           color: $blue-s2;
