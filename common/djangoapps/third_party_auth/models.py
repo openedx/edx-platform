@@ -31,6 +31,11 @@ from .saml import STANDARD_SAML_PROVIDER_KEY, get_saml_idp_choices, get_saml_idp
 
 log = logging.getLogger(__name__)
 
+REGISTRATION_FORM_FIELD_BLACKLIST = [
+    'name',
+    'username'
+]
+
 
 # A dictionary of {name: class} entries for each python-social-auth backend available.
 # Because this setting can specify arbitrary code to load and execute, it is set via
@@ -241,8 +246,13 @@ class ProviderConfig(ConfigurationModel):
             values for that field. Where there is no value, the empty string
             must be used.
         """
+        registration_form_data = {}
+
         # Details about the user sent back from the provider.
-        details = pipeline_kwargs.get('details')
+        details = pipeline_kwargs.get('details').copy()
+
+        # Set the registration form to use the `fullname` detail for the `name` field.
+        registration_form_data['name'] = details.get('fullname', '')
 
         # Get the username separately to take advantage of the de-duping logic
         # built into the pipeline. The provider cannot de-dupe because it can't
@@ -250,13 +260,19 @@ class ProviderConfig(ConfigurationModel):
         # technically a data race between the creation of this value and the
         # creation of the user object, so it is still possible for users to get
         # an error on submit.
-        suggested_username = pipeline_kwargs.get('username')
+        registration_form_data['username'] = pipeline_kwargs.get('username')
 
-        return {
-            'email': details.get('email', ''),
-            'name': details.get('fullname', ''),
-            'username': suggested_username,
-        }
+        # Any other values that are present in the details dict should be copied
+        # into the registration form details. This may include details that do
+        # not map to a value that exists in the registration form. However,
+        # because the fields that are actually rendered are not based on this
+        # list, only those values that map to a valid registration form field
+        # will actually be sent to the form as default values.
+        for blacklisted_field in REGISTRATION_FORM_FIELD_BLACKLIST:
+            details.pop(blacklisted_field, None)
+        registration_form_data.update(details)
+
+        return registration_form_data
 
     def get_authentication_backend(self):
         """Gets associated Django settings.AUTHENTICATION_BACKEND string."""
@@ -401,10 +417,13 @@ class SAMLProviderConfig(ProviderConfig):
         verbose_name="Advanced settings", blank=True,
         help_text=(
             'For advanced use cases, enter a JSON object with addtional configuration. '
-            'The tpa-saml backend supports only {"requiredEntitlements": ["urn:..."]} '
-            'which can be used to require the presence of a specific eduPersonEntitlement. '
-            'Custom provider types, as selected in the "Identity Provider Type" field, may make '
-            'use of the information stored in this field for configuration.'
+            'The tpa-saml backend supports {"requiredEntitlements": ["urn:..."]}, '
+            'which can be used to require the presence of a specific eduPersonEntitlement, '
+            'and {"extra_field_definitions": [{"name": "...", "urn": "..."},...]}, which can be '
+            'used to define registration form fields and the URNs that can be used to retrieve '
+            'the relevant values from the SAML response. Custom provider types, as selected '
+            'in the "Identity Provider Type" field, may make use of the information stored '
+            'in this field for additional configuration.'
         ))
 
     def clean(self):

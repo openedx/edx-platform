@@ -251,7 +251,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         self.assertEqual(302, response.status_code)
         self.assertTrue(response.has_header('Location'))
 
-    def assert_register_response_in_pipeline_looks_correct(self, response, pipeline_kwargs):
+    def assert_register_response_in_pipeline_looks_correct(self, response, pipeline_kwargs, required_fields):
         """Performs spot checks of the rendered register.html page.
 
         When we display the new account registration form after the user signs
@@ -267,9 +267,10 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         self.assertIn('successfully signed in with <strong>%s</strong>' % self.provider.name, response.content)
         # Expect that each truthy value we've prepopulated the register form
         # with is actually present.
-        for prepopulated_form_value in self.provider.get_register_form_data(pipeline_kwargs).values():
-            if prepopulated_form_value:
-                self.assertIn(prepopulated_form_value, response.content)
+        form_field_data = self.provider.get_register_form_data(pipeline_kwargs)
+        for prepopulated_form_data in form_field_data:
+            if prepopulated_form_data in required_fields:
+                self.assertIn(form_field_data[prepopulated_form_data], response.content)
 
     # Implementation details and actual tests past this point -- no more
     # configuration needed.
@@ -823,7 +824,10 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         # fire off the view that displays the registration form.
         with self._patch_edxmako_current_request(request):
             self.assert_register_response_in_pipeline_looks_correct(
-                student_views.register_user(strategy.request), pipeline.get(request)['kwargs'])
+                student_views.register_user(strategy.request),
+                pipeline.get(request)['kwargs'],
+                ['name', 'username', 'email']
+            )
 
         # Next, we invoke the view that handles the POST. Not all providers
         # supply email. Manually add it as the user would have to; this
@@ -892,7 +896,10 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
 
         with self._patch_edxmako_current_request(request):
             self.assert_register_response_in_pipeline_looks_correct(
-                student_views.register_user(strategy.request), pipeline.get(request)['kwargs'])
+                student_views.register_user(strategy.request),
+                pipeline.get(request)['kwargs'],
+                ['name', 'username', 'email']
+            )
 
         with self._patch_edxmako_current_request(strategy.request):
             strategy.request.POST = self.get_registration_post_vars()
