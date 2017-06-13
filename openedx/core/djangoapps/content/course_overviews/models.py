@@ -101,6 +101,8 @@ class CourseOverview(TimeStampedModel):
     marketing_url = TextField(null=True)
     eligible_for_financial_aid = BooleanField(default=True)
 
+    language = TextField(null=True)
+
     @classmethod
     def _create_or_update(cls, course):
         """
@@ -189,6 +191,8 @@ class CourseOverview(TimeStampedModel):
         course_overview.effort = CourseDetails.fetch_about_attribute(course.id, 'effort')
         course_overview.course_video_url = CourseDetails.fetch_video_url(course.id)
         course_overview.self_paced = course.self_paced
+
+        course_overview.language = course.language
 
         return course_overview
 

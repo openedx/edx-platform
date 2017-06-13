@@ -282,6 +282,7 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
         selected_groups_label = get_visibility_partition_info(xblock)['selected_groups_label']
         if selected_groups_label:
             selected_groups_label = _('Access restricted to: {list_of_groups}').format(list_of_groups=selected_groups_label)
+        course = modulestore().get_course(xblock.location.course_key)
         template_context = {
             'xblock_context': context,
             'xblock': xblock,
@@ -293,8 +294,10 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
             'can_edit_visibility': context.get('can_edit_visibility', True),
             'selected_groups_label': selected_groups_label,
             'can_add': context.get('can_add', True),
-            'can_move': context.get('can_move', True)
+            'can_move': context.get('can_move', True),
+            'language': getattr(course, 'language', None)
         }
+
         html = render_to_string('studio_xblock_wrapper.html', template_context)
         frag = wrap_fragment(frag, html)
     return frag
