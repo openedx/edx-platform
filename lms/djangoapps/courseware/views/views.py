@@ -5,10 +5,10 @@ import json
 import logging
 import urllib
 from collections import OrderedDict, namedtuple
-from datetime import datetime
+from datetime import datetime, timedelta
+from pytz import utc
 
 import analytics
-import waffle
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import AnonymousUser, User
@@ -502,6 +502,9 @@ class CourseTabView(EdxFragmentView):
             'upgrade_link': check_and_get_upgrade_link(request, request.user, course.id),
             'upgrade_price': get_cosmetic_verified_display_price(course),
             # ENDTODO
+            # TODO: (Experimental Code). See https://openedx.atlassian.net/wiki/display/RET/3.+Planning+Prompts
+            'display_planning_prompt': _should_display_planning_prompt(request, course),
+            # ENDTODO
         }
 
     def render_to_fragment(self, request, course=None, page_context=None, **kwargs):
@@ -519,6 +522,24 @@ class CourseTabView(EdxFragmentView):
             page_context = self.create_page_context(request, course=course, tab=tab, **kwargs)
         page_context['fragment'] = fragment
         return render_to_response('courseware/tab-view.html', page_context)
+
+
+# TODO: (Experimental Code). See https://openedx.atlassian.net/wiki/display/RET/3.+Planning+Prompts
+def _should_display_planning_prompt(request, course_overview):
+    """
+    A planning prompt is enabled in the experiment for all enrollments whose
+    content availability date is less than 14 days from today.
+
+    The content availability date is defined as either the course start date
+    or the enrollment date, whichever was most recent.
+    """
+    enrollment = CourseEnrollment.get_enrollment(request.user, course_overview.id)
+    if enrollment:
+        content_availability_date = max(course_overview.start, enrollment.created)
+        return content_availability_date > (datetime.now(utc) - timedelta(days=14))
+    else:
+        return False
+# ENDTODO
 
 
 @ensure_csrf_cookie
