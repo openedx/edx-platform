@@ -1253,12 +1253,16 @@ def advanced_settings_handler(request, course_key_string):
                         # Throw away old versions of CourseOverview and CourseOverviewTab - added by labster
                         # as they might contain stale data then create new one.
                         try:
+                            # Delete old data of CourseOverview and CourseOverviewTab if exist.
                             course_overview = CourseOverview.objects.get(id=course_key)
                             CourseOverviewTab.objects.filter(course_overview=course_overview).delete()
                             course_overview.delete()
                         except CourseOverview.DoesNotExist:
                             pass
-                        CourseOverview.load_from_module_store(course_key)
+                        # Create new one CourseOverview and CourseOverviewTab from data course module that
+                        # has been updated so the data always up to date. It fixes the issue when `invitation_value` has
+                        # changed and user can't enroll a course through voucher feature.
+                        CourseOverview.load_from_module_store(course_key)  # added by labster
 
                         return JsonResponse(updated_data)
                     else:
