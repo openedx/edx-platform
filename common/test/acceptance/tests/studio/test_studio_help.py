@@ -799,7 +799,6 @@ class SettingsHelpTest(StudioCourseTest):
 
         self.settings_page.visit()
 
-    @skip("Fix studio help links in DOC-3686")
     def test_settings_page_nav_help(self):
         """
         Scenario: Help link in navigation bar is working on Settings page.
@@ -809,7 +808,7 @@ class SettingsHelpTest(StudioCourseTest):
         Then Help link should open.
         And help url should be correct
         """
-        expected_url = _get_expected_documentation_url('/set_up_course/setting_up_student_view.html')
+        expected_url = _get_expected_documentation_url('/set_up_course/studio_add_course_information/index.html')
 
         # Assert that help link is correct.
         assert_nav_help_link(
@@ -872,7 +871,6 @@ class CourseTeamSettingsHelpTest(StudioCourseTest):
 
         self.course_team_settings_page.visit()
 
-    @skip("Fix studio help links in DOC-3686")
     def test_course_course_team_nav_help(self):
         """
         Scenario: Help link in navigation bar is working on Course Team settings page
@@ -882,7 +880,7 @@ class CourseTeamSettingsHelpTest(StudioCourseTest):
         Then Help link should open.
         And help url should be correct
         """
-        expected_url = _get_expected_documentation_url('/set_up_course/course_staffing.html#add-course-team-members')
+        expected_url = _get_expected_documentation_url('/set_up_course/studio_add_course_information/studio_course_staffing.html')
 
         # Assert that help link is correct.
         assert_nav_help_link(
@@ -1002,7 +1000,6 @@ class CertificatePageHelpTest(StudioCourseTest):
 
         self.certificates_page.visit()
 
-    @skip("Fix studio help links in DOC-3686")
     def test_certificate_page_nav_help(self):
         """
         Scenario: Help link in navigation bar is working on Certificate settings page
@@ -1012,7 +1009,7 @@ class CertificatePageHelpTest(StudioCourseTest):
         Then Help link should open.
         And help url should be correct
         """
-        expected_url = _get_expected_documentation_url('/set_up_course/creating_course_certificates.html')
+        expected_url = _get_expected_documentation_url('/set_up_course/studio_add_course_information/studio_creating_certificates.html')
 
         # Assert that help link is correct.
         assert_nav_help_link(
@@ -1021,7 +1018,6 @@ class CertificatePageHelpTest(StudioCourseTest):
             href=expected_url,
         )
 
-    @skip("Fix studio help links in DOC-3686")
     def test_certificate_page_side_bar_help(self):
         """
         Scenario: Help link in side bar is working Certificate settings page
@@ -1031,7 +1027,7 @@ class CertificatePageHelpTest(StudioCourseTest):
         Then Help link should open.
         And help url should be correct
         """
-        expected_url = _get_expected_documentation_url('/set_up_course/creating_course_certificates.html')
+        expected_url = _get_expected_documentation_url('/set_up_course/studio_add_course_information/studio_creating_certificates.html')
 
         # Assert that help link is correct.
         assert_side_bar_help_link(
