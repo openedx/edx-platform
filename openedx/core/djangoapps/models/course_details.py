@@ -191,6 +191,7 @@ class CourseDetails(object):
         descriptor = module_store.get_course(course_key)
 
         dirty = False
+        is_pacing_changed = False
 
         # In the descriptor's setter, the date is converted to JSON
         # using Date's to_json method. Calling to_json on something that
@@ -274,8 +275,7 @@ class CourseDetails(object):
                 and jsondict['self_paced'] != descriptor.self_paced):
             descriptor.self_paced = jsondict['self_paced']
             dirty = True
-            # sends out the signal that course pacing has changed
-            COURSE_PACING_CHANGE.send(sender=None, course_key=course_key, course_self_paced=descriptor.self_paced)
+            is_pacing_changed = True
 
         if dirty:
             module_store.update_item(descriptor, user.id)
@@ -289,6 +289,10 @@ class CourseDetails(object):
                 cls.update_about_item(descriptor, attribute, jsondict[attribute], user.id)
 
         cls.update_about_video(descriptor, jsondict['intro_video'], user.id)
+
+        # fires the signal that course pacing has changed after changes are reflected in db
+        if is_pacing_changed:
+            COURSE_PACING_CHANGE.send(sender=None, course_key=course_key, course_self_paced=descriptor.self_paced)
 
         # Could just return jsondict w/o doing any db reads, but I put
         # the reads in as a means to confirm it persisted correctly
