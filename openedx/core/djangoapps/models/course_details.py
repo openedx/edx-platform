@@ -280,6 +280,10 @@ class CourseDetails(object):
         if dirty:
             module_store.update_item(descriptor, user.id)
 
+        # fires a signal indicating that the course pacing has changed
+        if is_pacing_changed:
+            COURSE_PACING_CHANGE.send(sender=None, course_key=course_key, course_self_paced=descriptor.self_paced)
+
         # NOTE: below auto writes to the db w/o verifying that any of
         # the fields actually changed to make faster, could compare
         # against db or could have client send over a list of which
@@ -289,10 +293,6 @@ class CourseDetails(object):
                 cls.update_about_item(descriptor, attribute, jsondict[attribute], user.id)
 
         cls.update_about_video(descriptor, jsondict['intro_video'], user.id)
-
-        # fires the signal that course pacing has changed after changes are reflected in db
-        if is_pacing_changed:
-            COURSE_PACING_CHANGE.send(sender=None, course_key=course_key, course_self_paced=descriptor.self_paced)
 
         # Could just return jsondict w/o doing any db reads, but I put
         # the reads in as a means to confirm it persisted correctly
