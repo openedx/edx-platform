@@ -1085,6 +1085,26 @@
                     }
                 }
             }
+
+            .description {
+              display: block;
+              float: left;
+            }
+
+            .price {
+              .green-highlight {
+                font-weight: 700;
+                color: palette(success, text);
+              }
+
+              .original-price {
+                text-decoration: line-through;
+              }
+
+              .savings {
+                display: block;
+              }
+            }
         }
     }
 

@@ -69,7 +69,7 @@ description_max_length = 250
             <a href="${buy_button_href}" class="btn-brand btn-large hidden-sm btn-start">
               ${Text(_('Buy the {program_name} (${price} USD)')).format(
                 program_name=title,
-                price=program['price_ranges'][0]['total']
+                price=full_program_price
               )}
             </a>
           % else:
@@ -99,7 +99,7 @@ description_max_length = 250
       <div class="col col-12 md-col-7 lg-col-8 left-col">
         <ul class="list-divided program-desc-tbl">
           <li class="item">
-            <span>
+            <span class="description">
               <span class="fa fa-book fa-lg" aria-hidden="true"></span>
               ${_('Number of Courses')}
             </span>
@@ -110,7 +110,7 @@ description_max_length = 250
             </a>
           </li>
           <li class="item">
-            <span>
+            <span class="description">
               <span class="fa fa-clock-o fa-lg" aria-hidden="true"></span>
               ${_('Average Length')}
             </span>
@@ -121,7 +121,7 @@ description_max_length = 250
             </span>
           </li>
           <li class="item">
-            <span>
+            <span class="description">
               <span class="fa fa-tachometer fa-lg" aria-hidden="true"></span>
               ${_('Effort')}
             </span>
@@ -133,15 +133,36 @@ description_max_length = 250
             </span>
           </li>
           <li class="item">
-            <span>
+            <span class="description">
               <span class="fa fa-tag fa-lg" aria-hidden="true"></span>
               ${_('Price (USD)')}
             </span>
-            <span>
-              ${Text(_('${full_program_price} for entire program')).format(
-                full_program_price=full_program_price
-              )}
-            </span>
+            % if program.get('discount_data') and program['discount_data']['is_discounted']:
+              <span class="price">
+                <span role="group" aria-label="${_('Original Price')}" class="original-price">
+                  ${Text(_('${oldPrice}')).format(
+                    oldPrice=full_program_price_format.format(program['discount_data']['total_incl_tax_excl_discounts'])
+                  )}
+                </span>
+                <span role="group" aria-label="${_('Discounted Price')}" class="discount green-highlight">
+                  ${Text(_('${newPrice}{htmlEnd} for entire program')).format(
+                    newPrice=full_program_price,
+                    htmlEnd=HTML('</span>')
+                  )}
+                <span class="savings green-highlight">
+                  ${Text(_('You save ${discount_value} {currency}')).format(
+                    discount_value=full_program_price_format.format(program['discount_data']['discount_value']),
+                    currency=program['discount_data']['currency']
+                  )}
+                </span>
+              </span>
+            % else:
+              <span>
+                ${Text(_('${full_program_price} for entire program')).format(
+                  full_program_price=full_program_price
+                )}
+              </span>
+            % endif
           </li>
         </ul>
         <div id="accordion-group">
