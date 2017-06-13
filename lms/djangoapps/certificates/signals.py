@@ -10,7 +10,7 @@ from openedx.core.djangoapps.models.course_details import COURSE_PACING_CHANGE
 
 
 @receiver(COURSE_PACING_CHANGE, dispatch_uid="course_pacing_changed")
-def _listen_for_course_publish(sender, course_key, course_self_paced, **kwargs):  # pylint: disable=unused-argument
+def _listen_for_course_pacing_changed(sender, course_key, course_self_paced, **kwargs):  # pylint: disable=unused-argument
     """
     Catches the signal that course pacing has changed and enable/disable
     the self-generated certificates according to course-pacing.
