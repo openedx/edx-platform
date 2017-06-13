@@ -924,7 +924,7 @@ class RegistrationView(APIView):
                         running_pipeline.get('kwargs')
                     )
 
-                    for field_name in self.DEFAULT_FIELDS:
+                    for field_name in self.DEFAULT_FIELDS + self.EXTRA_FIELDS:
                         if field_name in field_overrides:
                             form_desc.override_field_properties(
                                 field_name, default=field_overrides[field_name]

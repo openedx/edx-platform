@@ -234,21 +234,29 @@ class FormDescription(object):
             "supplementalText": supplementalText
         }
 
+        field_override = self._field_overrides.get(name, {})
+
         if field_type == "select":
             if options is not None:
                 field_dict["options"] = []
 
-                # Include an empty "default" option at the beginning of the list
+                # Get an existing default value from the field override
+                existing_default_value = field_override.get('defaultValue')
+
+                # Include an empty "default" option at the beginning of the list;
+                # preselect it if there isn't an overriding default.
                 if include_default_option:
                     field_dict["options"].append({
                         "value": "",
                         "name": "--",
-                        "default": True
+                        "default": existing_default_value is None
                     })
-
                 field_dict["options"].extend([
-                    {"value": option_value, "name": option_name}
-                    for option_value, option_name in options
+                    {
+                        'value': option_value,
+                        'name': option_name,
+                        'default': option_value == existing_default_value
+                    } for option_value, option_name in options
                 ])
             else:
                 raise InvalidFieldError("You must provide options for a select field.")
@@ -270,7 +278,7 @@ class FormDescription(object):
 
         # If there are overrides for this field, apply them now.
         # Any field property can be overwritten (for example, the default value or placeholder)
-        field_dict.update(self._field_overrides.get(name, {}))
+        field_dict.update(field_override)
 
         self.fields.append(field_dict)
 
@@ -291,8 +299,8 @@ class FormDescription(object):
                     "placeholder": "",
                     "instructions": "",
                     "options": [
-                        {"value": "cheese", "name": "Cheese"},
-                        {"value": "wine", "name": "Wine"}
+                        {"value": "cheese", "name": "Cheese", "default": False},
+                        {"value": "wine", "name": "Wine", "default": False}
                     ]
                     "restrictions": {},
                     "errorMessages": {},

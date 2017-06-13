@@ -25,7 +25,7 @@ from third_party_auth.models import (
     SAMLConfiguration,
     SAMLProviderConfig
 )
-from third_party_auth.saml import SAMLIdentityProvider, get_saml_idp_class
+from third_party_auth.saml import EdXSAMLIdentityProvider, get_saml_idp_class
 
 AUTH_FEATURES_KEY = 'ENABLE_THIRD_PARTY_AUTH'
 AUTH_FEATURE_ENABLED = AUTH_FEATURES_KEY in settings.FEATURES
@@ -219,14 +219,14 @@ class SAMLTestCase(TestCase):
         error_mock = log_mock.error
         idp_class = get_saml_idp_class('fake_idp_class_option')
         error_mock.assert_called_once_with(
-            '%s is not a valid SAMLIdentityProvider subclass; using SAMLIdentityProvider base class.',
+            '%s is not a valid EdXSAMLIdentityProvider subclass; using EdXSAMLIdentityProvider base class.',
             'fake_idp_class_option'
         )
-        self.assertIs(idp_class, SAMLIdentityProvider)
+        self.assertIs(idp_class, EdXSAMLIdentityProvider)
 
 
 @contextmanager
-def simulate_running_pipeline(pipeline_target, backend, email=None, fullname=None, username=None):
+def simulate_running_pipeline(pipeline_target, backend, email=None, fullname=None, username=None, **kwargs):
     """Simulate that a pipeline is currently running.
 
     You can use this context manager to test packages that rely on third party auth.
@@ -269,6 +269,9 @@ def simulate_running_pipeline(pipeline_target, backend, email=None, fullname=Non
             app generates itself and should be available by the time the user
             is authenticating with a third-party provider.
 
+        kwargs (dict): If provided, simulate that the current provider has
+            included additional user details (useful for filling in the registration form).
+
     Returns:
         None
 
@@ -276,9 +279,10 @@ def simulate_running_pipeline(pipeline_target, backend, email=None, fullname=Non
     pipeline_data = {
         "backend": backend,
         "kwargs": {
-            "details": {}
+            "details": kwargs
         }
     }
+
     if email is not None:
         pipeline_data["kwargs"]["details"]["email"] = email
     if fullname is not None:
