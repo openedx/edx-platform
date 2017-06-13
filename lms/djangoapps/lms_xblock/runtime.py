@@ -139,7 +139,6 @@ class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         services['library_tools'] = LibraryToolsService(modulestore())
         services['partitions'] = PartitionService(
             course_id=kwargs.get('course_id'),
-            track_function=kwargs.get('track_function', None),
             cache=request_cache_dict
         )
         store = modulestore()
