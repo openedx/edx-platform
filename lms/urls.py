@@ -108,10 +108,9 @@ urlpatterns = (
 
     # URLs for API access management
     url(r'^api-admin/', include('openedx.core.djangoapps.api_admin.urls', namespace='api_admin')),
-)
 
-urlpatterns += (
     url(r'^dashboard/', include('learner_dashboard.urls')),
+    url(r'^api/experiments/', include('experiments.urls', namespace='api_experiments')),
 )
 
 # TODO: This needs to move to a separate urls.py once the student_account and
