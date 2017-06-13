@@ -158,7 +158,11 @@ messages = xblock.validate().to_json()
 
 % if show_preview:
     % if is_root or not xblock_url:
-        <article class="xblock-render">
+        % if not is_root and language:
+            <article class="xblock-render" lang="${language}">
+        % else:
+            <article class="xblock-render">
+        % endif
         ${content | n, decode.utf8}
         </article>
     % else:
