@@ -15,17 +15,17 @@ from third_party_auth.models import SAMLProviderConfig
 APP_NAME = 'third_party_auth'
 MIGRATIONS = [
     None,
-    '0001_initial',
-    '0002_schema__provider_icon_image',
-    '0003_samlproviderconfig_debug_mode',
-    '0004_add_visible_field',
-    '0005_add_site_field',
-    '0006_samlproviderconfig_automatic_refresh_enabled',
-    '0007_auto_20170406_0912',
-    '0008_auto_20170413_1455',
-    '0009_auto_20170415_1144',
-    '0010_add_skip_hinted_login_dialog_field',
-    '0011_samlproviderconfig_json_attributes'
+    "0001_initial",
+    "0002_schema__provider_icon_image",
+    "0003_samlproviderconfig_debug_mode",
+    "0004_add_visible_field",
+    "0005_add_site_field",
+    "0006_samlproviderconfig_automatic_refresh_enabled",
+    "0007_auto_20170406_0912",
+    "0008_auto_20170413_1455",
+    "0009_auto_20170415_1144",
+    "0010_add_skip_hinted_login_dialog_field",
+    "0011_samlproviderconfig_json_attributes"
 ]
 
 
@@ -78,7 +78,7 @@ class SAMLProviderConfigDataMigrationTestCase(MigrationTestCase):
         "attr_permanent_user_id": backend.OID_USERID,
         "attr_fullname": backend.OID_COMMON_NAME,
         "attr_first_name": backend.OID_GIVEN_NAME,
-        "attr_last_name": backend.OID_SURNAM,
+        "attr_last_name": backend.OID_SURNAME,
         "attr_username": backend.OID_USERID,
         "attr_email": backend.OID_MAIL
     }
@@ -89,7 +89,7 @@ class SAMLProviderConfigDataMigrationTestCase(MigrationTestCase):
     model = SAMLProviderConfig
 
     def setUp(self):
-        super(MigrationTestCase, self).setUp()
+        super(SAMLProviderConfigDataMigrationTestCase, self).setUp()
         self.old_instance = self.setup_old_samlproviderconfig()
         self.new_instance = self.setup_new_samlproviderconfig()
         self.new_instance_attrs = json.loads(self.new_instance.attributes)
