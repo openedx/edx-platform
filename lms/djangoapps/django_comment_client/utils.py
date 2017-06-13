@@ -17,7 +17,7 @@ import pystache_custom as pystache
 from courseware import courses
 from courseware.access import has_access
 from django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
-from django_comment_client.permissions import check_permissions_by_view, get_team, has_permission
+from django_comment_client.permissions import check_permissions_by_view, get_team, has_permission, check_permissions_by_view_group
 from django_comment_client.settings import MAX_COMMENT_DEPTH
 from django_comment_common.models import FORUM_ROLE_STUDENT, CourseDiscussionSettings, Role
 from django_comment_common.utils import get_course_discussion_settings
@@ -29,6 +29,8 @@ from student.roles import GlobalStaff
 from xmodule.modulestore.django import modulestore
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
 from xmodule.partitions.partitions_service import PartitionService
+from student.models import get_user_by_username_or_email
+
 
 log = logging.getLogger(__name__)
 
@@ -516,8 +518,16 @@ def get_ability(course_id, content, user):
     """
     Return a dictionary of forums-oriented actions and the user's permission to perform them
     """
+    content_user = get_user_by_username_or_email(content.get('username'))
     return {
-        'editable': check_permissions_by_view(user, course_id, content, "update_thread" if content['type'] == 'thread' else "update_comment"),
+        'editable': check_permissions_by_view_group(
+                        user,
+                        course_id,
+                        content,
+                        "update_thread" if content['type'] == 'thread' else "update_comment",
+                        get_group_id_for_user(user, get_course_discussion_settings(course_id)),
+                        get_group_id_for_user(content_user, get_course_discussion_settings(course_id))
+                    ),
         'can_reply': check_permissions_by_view(user, course_id, content, "create_comment" if content['type'] == 'thread' else "create_sub_comment"),
         'can_delete': check_permissions_by_view(user, course_id, content, "delete_thread" if content['type'] == 'thread' else "delete_comment"),
         'can_openclose': check_permissions_by_view(user, course_id, content, "openclose_thread") if content['type'] == 'thread' else False,

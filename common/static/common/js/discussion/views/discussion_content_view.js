@@ -51,6 +51,7 @@
                     var action, selector, _ref, _results;
                     _ref = this.abilityRenderer;
                     _results = [];
+                    debugger;
                     for (action in _ref) {
                         if (_ref.hasOwnProperty(action)) {
                             selector = _ref[action];
@@ -68,6 +69,7 @@
             DiscussionContentView.prototype.abilityRenderer = {
                 editable: {
                     enable: function() {
+                        debugger;
                         return this.$('.action-edit').closest('.actions-item').removeClass('is-hidden');
                     },
                     disable: function() {
@@ -118,6 +120,7 @@
                 var attr, value, _ref, _results;
                 _ref = this.model.changedAttributes();
                 _results = [];
+                debugger;
                 for (attr in _ref) {
                     if (_ref.hasOwnProperty(attr)) {
                         value = _ref[attr];

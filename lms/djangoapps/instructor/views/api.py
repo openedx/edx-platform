@@ -46,7 +46,13 @@ from courseware.access import has_access
 from courseware.courses import get_course_by_id, get_course_with_access
 from courseware.models import StudentModule
 from django_comment_client.utils import has_forum_access
-from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_MODERATOR, Role
+from django_comment_common.models import (
+    Role,
+    FORUM_ROLE_ADMINISTRATOR,
+    FORUM_ROLE_MODERATOR,
+    FORUM_ROLE_GROUP_MODERATOR,
+    FORUM_ROLE_COMMUNITY_TA,
+)
 from edxmako.shortcuts import render_to_string
 from lms.djangoapps.instructor.access import ROLES, allow_access, list_with_level, revoke_access, update_forum_role
 from lms.djangoapps.instructor.enrollment import (
@@ -2487,7 +2493,8 @@ def list_forum_members(request, course_id):
         return HttpResponseBadRequest("Operation requires instructor access.")
 
     # filter out unsupported for roles
-    if rolename not in [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]:
+    if rolename not in [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_GROUP_MODERATOR,
+                        FORUM_ROLE_COMMUNITY_TA]:
         return HttpResponseBadRequest(strip_tags(
             "Unrecognized rolename '{}'.".format(rolename)
         ))
@@ -2634,7 +2641,8 @@ def update_forum_role_membership(request, course_id):
     if rolename == FORUM_ROLE_ADMINISTRATOR and not has_instructor_access:
         return HttpResponseBadRequest("Operation requires instructor access.")
 
-    if rolename not in [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]:
+    if rolename not in [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_GROUP_MODERATOR,
+                        FORUM_ROLE_COMMUNITY_TA]:
         return HttpResponseBadRequest(strip_tags(
             "Unrecognized rolename '{}'.".format(rolename)
         ))
