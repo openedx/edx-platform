@@ -15,11 +15,11 @@ def _listen_for_course_publish(sender, course_key, course_self_paced, **kwargs):
     Catches the signal that course pacing has changed and enable/disable
     the self-generated certificates according to course-pacing.
     """
-    enable_self_generated_certs.delay(unicode(course_key), course_self_paced)
+    toggle_self_generated_certs.delay(unicode(course_key), course_self_paced)
 
 
 @task()
-def enable_self_generated_certs(course_key, course_self_paced):
+def toggle_self_generated_certs(course_key, course_self_paced):
     """
     Enable or disable self-generated certificates for a course according to pacing.
     """
