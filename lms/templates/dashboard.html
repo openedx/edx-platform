@@ -28,12 +28,6 @@ from openedx.core.djangolib.markup import HTML, Text
   <%static:include path="dashboard/${template_name}.underscore" />
 </script>
 % endfor
-
-% for template_name in ["dashboard_search_item", "dashboard_search_results", "search_loading", "search_error"]:
-<script type="text/template" id="${template_name}-tpl">
-    <%static:include path="search/${template_name}.underscore" />
-</script>
-% endfor
 </%block>
 
 <%block name="js_extra">
@@ -49,7 +43,7 @@ from openedx.core.djangolib.markup import HTML, Text
     });
   </script>
   % if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
-    <%static:require_module module_name="js/search/dashboard/dashboard_search_factory" class_name="DashboardSearchFactory">
+    <%static:require_module module_name="course_search/js/dashboard_search_factory" class_name="DashboardSearchFactory">
         DashboardSearchFactory();
     </%static:require_module>
   % endif
@@ -165,7 +159,7 @@ from openedx.core.djangolib.markup import HTML, Text
 
       % if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
         <div id="dashboard-search-bar" class="search-bar dashboard-search-bar" role="search" aria-label="Dashboard">
-          <form>
+          <form class="search-form">
             <label for="dashboard-search-input">${_('Search Your Courses')}</label>
             <div class="search-field-wrapper">
               <input id="dashboard-search-input" type="text" class="search-field"/>
