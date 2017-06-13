@@ -139,7 +139,7 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase):
     def test_set_roles(self, course_id, course_key):
         seed_permissions_roles(course_key)
         course_roles = dict((r.name, r) for r in Role.objects.filter(course_id=course_key))
-        self.assertEqual(len(course_roles), 4)  # sanity check
+        self.assertEqual(len(course_roles), 5)  # sanity check
 
         # Student role is assigned by default on course enrollment.
         self._auto_auth({'username': 'a_student', 'course_id': course_id})
