@@ -336,8 +336,10 @@ def course_info(request, course_id):
             'show_enroll_banner': show_enroll_banner,
             'dates_fragment': dates_fragment,
             'url_to_enroll': url_to_enroll,
+            # TODO: (Experimental Code). See https://openedx.atlassian.net/wiki/display/RET/2.+In-course+Verification+Prompts
             'upgrade_link': check_and_get_upgrade_link(request, user, course.id),
             'upgrade_price': get_cosmetic_verified_display_price(course),
+            # ENDTODO
         }
 
         # Get the URL of the user's last position in order to display the 'where you were last' message
@@ -360,6 +362,7 @@ def course_info(request, course_id):
 UPGRADE_COOKIE_NAME = 'show_upgrade_notification'
 
 
+# TODO: (Experimental Code). See https://openedx.atlassian.net/wiki/display/RET/2.+In-course+Verification+Prompts
 def check_and_get_upgrade_link(request, user, course_id):
     upgrade_link = None
 
@@ -370,6 +373,7 @@ def check_and_get_upgrade_link(request, user, course_id):
             request.need_to_set_upgrade_cookie = True
 
     return upgrade_link
+# ENDTODO
 
 
 class StaticCourseTabView(EdxFragmentView):
@@ -494,8 +498,10 @@ class CourseTabView(EdxFragmentView):
             'supports_preview_menu': supports_preview_menu,
             'uses_pattern_library': True,
             'disable_courseware_js': True,
+            # TODO: (Experimental Code). See https://openedx.atlassian.net/wiki/display/RET/2.+In-course+Verification+Prompts
             'upgrade_link': check_and_get_upgrade_link(request, request.user, course.id),
             'upgrade_price': get_cosmetic_verified_display_price(course),
+            # ENDTODO
         }
 
     def render_to_fragment(self, request, course=None, page_context=None, **kwargs):
@@ -901,8 +907,10 @@ def _progress(request, course_key, student_id):
         'passed': is_course_passed(course, grade_summary),
         'credit_course_requirements': _credit_course_requirements(course_key, student),
         'certificate_data': _get_cert_data(student, course, course_key, is_active, enrollment_mode),
+        # TODO: (Experimental Code). See https://openedx.atlassian.net/wiki/display/RET/2.+In-course+Verification+Prompts
         'upgrade_link': check_and_get_upgrade_link(request, student, course.id),
         'upgrade_price': get_cosmetic_verified_display_price(course),
+        # ENDTODO
     }
 
     with outer_atomic():

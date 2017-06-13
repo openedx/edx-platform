@@ -348,8 +348,10 @@ class CoursewareIndex(View):
             'section_title': None,
             'sequence_title': None,
             'disable_accordion': waffle.flag_is_active(request, UNIFIED_COURSE_VIEW_FLAG),
+            # TODO: (Experimental Code). See https://openedx.atlassian.net/wiki/display/RET/2.+In-course+Verification+Prompts
             'upgrade_link': check_and_get_upgrade_link(request, self.effective_user, self.course.id),
             'upgrade_price': get_cosmetic_verified_display_price(self.course),
+            # ENDTODO
         }
         table_of_contents = toc_for_course(
             self.effective_user,

@@ -443,8 +443,10 @@ def _create_discussion_board_context(request, course_key, discussion_id=None, th
         'category_map': course_settings["category_map"],
         'course_settings': course_settings,
         'is_commentable_divided': is_commentable_divided(course_key, discussion_id, course_discussion_settings),
+        # TODO: (Experimental Code). See https://openedx.atlassian.net/wiki/display/RET/2.+In-course+Verification+Prompts
         'upgrade_link': check_and_get_upgrade_link(request, user, course.id),
         'upgrade_price': get_cosmetic_verified_display_price(course),
+        # ENDTODO
     })
     return context
 
