@@ -600,7 +600,7 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
             group_config_hdr_tpl = 'Experiment Group ({})'
             return {
                 group_config_hdr_tpl.format(self.partition.name): self.partition.scheme.get_group_for_user(
-                    self.course.id, user, self.partition, track_function=None
+                    self.course.id, user, self.partition
                 ).name
             }
 
