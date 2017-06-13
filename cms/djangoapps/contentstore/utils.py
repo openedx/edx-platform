@@ -61,22 +61,38 @@ def remove_all_instructors(course_key):
     instructor_role.remove_users(*instructor_role.users_with_role())
 
 
-def delete_course_and_groups(course_key, user_id):
+def delete_course(course_key, user_id, keep_instructors=False):
     """
-    This deletes the courseware associated with a course_key as well as cleaning update_item
-    the various user table stuff (groups, permissions, etc.)
+    Delete course from module store and if specified remove user and
+    groups permissions from course.
+    """
+    _delete_course_from_modulestore(course_key, user_id)
+
+    if not keep_instructors:
+        _remove_instructors(course_key)
+
+
+def _delete_course_from_modulestore(course_key, user_id):
+    """
+    Delete course from MongoDB. Deleting course will fire a signal which will result into
+    deletion of the courseware associated with a course_key.
     """
     module_store = modulestore()
 
     with module_store.bulk_operations(course_key):
         module_store.delete_course(course_key, user_id)
 
-        print 'removing User permissions from course....'
-        # in the django layer, we need to remove all the user permissions groups associated with this course
-        try:
-            remove_all_instructors(course_key)
-        except Exception as err:
-            log.error("Error in deleting course groups for {0}: {1}".format(course_key, err))
+
+def _remove_instructors(course_key):
+    """
+    In the django layer, remove all the user/groups permissions associated with this course
+    """
+    print 'removing User permissions from course....'
+
+    try:
+        remove_all_instructors(course_key)
+    except Exception as err:
+        log.error("Error in deleting course groups for {0}: {1}".format(course_key, err))
 
 
 def get_lms_link_for_item(location, preview=False):

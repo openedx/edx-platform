@@ -15,7 +15,7 @@ from opaque_keys.edx.locations import CourseLocator
 
 from common.test.utils import XssTestMixin
 from contentstore.tests.utils import AjaxEnabledTestClient
-from contentstore.utils import delete_course_and_groups
+from contentstore.utils import delete_course
 from contentstore.views.course import (
     AccessListFallback,
     _accessible_courses_iter,
@@ -298,7 +298,7 @@ class TestCourseListing(ModuleStoreTestCase, XssTestMixin):
         self.assertEqual(courses_list, courses_list_by_groups)
 
         # now delete this course and re-add user to instructor group of this course
-        delete_course_and_groups(course_key, self.user.id)
+        delete_course(course_key, self.user.id)
 
         CourseInstructorRole(course_key).add_users(self.user)
 
