@@ -63,12 +63,18 @@ description_max_length = 250
           </div>
           <h1 class="banner-title">${title}</h1>
           <p class="banner-description">${subtitle}</p>
-          <a href="${buy_button_href}" class="btn-brand btn-large hidden-sm btn-start">
-            ${Text(_('Buy the {program_name} (${price} USD)')).format(
-              program_name=title,
-              price=program['price_ranges'][0]['total']
-            )}
-          </a>
+          % if program.get('is_learner_eligible_for_one_click_purchase'):
+            <a href="${buy_button_href}" class="btn-brand btn-large hidden-sm btn-start">
+              ${Text(_('Buy the {program_name} (${price} USD)')).format(
+                program_name=title,
+                price=program['price_ranges'][0]['total']
+              )}
+            </a>
+          % else:
+            <a href="#courses" class="btn-brand btn-large hidden-sm btn-start">
+              ${_('Start Learning')}
+            </a>
+          % endif
         </div>
         <div class="col col-12 md-col-4 lg-col-3" id="course-trailer">
           <a href="#video-modal" class="media trailer-link visible-sm" rel="leanModal">
@@ -365,11 +371,11 @@ description_max_length = 250
                       )}
                     </span>
 
-                    %if course['course_runs'][0]['pacing_type'] == "instructor_paced":
+                    % if course['course_runs'][0]['pacing_type'] == "instructor_paced":
                       <span>${_('Instructor - Paced')}</span>
-                    %else:
+                    % else:
                       <span>${_('Self - Paced')}</span>
-                    %endif
+                    % endif
                   </small>
                 </h4>
                 <p class="copy-meta">
