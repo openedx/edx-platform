@@ -835,10 +835,11 @@ def program_marketing(request, program_uuid):
     skus = program.get('skus')
     ecommerce_service = EcommerceService()
 
-    return render_to_response('courseware/program_marketing.html', {
-        'buy_button_href': ecommerce_service.get_checkout_page_url(*skus) if skus else '#courses',
-        'program': program,
-    })
+    context = {'program': program}
+    if program.get('is_learner_eligible_for_one_click_purchase') and skus:
+        context['buy_button_href'] = ecommerce_service.get_checkout_page_url(*skus)
+
+    return render_to_response('courseware/program_marketing.html', context)
 
 
 @transaction.non_atomic_requests
