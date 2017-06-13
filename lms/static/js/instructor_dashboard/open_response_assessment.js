@@ -7,11 +7,15 @@
         function OpenResponseAssessmentBlock($section) {
             this.$section = $section;
             this.$section.data('wrapper', this);
+            this.initialized = false;
         }
 
         OpenResponseAssessmentBlock.prototype.onClickTitle = function() {
             var block = this.$section.find('.open-response-assessment');
-            XBlock.initializeBlock($(block).find('.xblock')[0]);
+            if (!this.initialized) {
+                this.initialized = true;
+                XBlock.initializeBlock($(block).find('.xblock')[0]);
+            }
         };
 
         return OpenResponseAssessmentBlock;
