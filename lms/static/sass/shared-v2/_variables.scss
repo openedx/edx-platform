@@ -1,7 +1,19 @@
-// LMS variables
+// lms - utilities - variables
+// ====================
 
+// #GRID:           Grid and layout variables
+// #COLORS:         Base, palette and theme color definitions + application
+// #TYPOGRAPHY:     Font definitions and scales
+// #ICONS:          Icon specific colors + other styling
+
+// ----------------------------
+// #GRID
+// ----------------------------
 $lms-max-width: 1180px;
 
+// ----------------------------
+// #COLORS
+// ----------------------------
 $lms-gray: palette(grayscale, base);
 $lms-background-color: palette(grayscale, x-back);
 $lms-container-background-color: $white;
@@ -19,7 +31,17 @@ $white-opacity-80: rgba(255, 255, 255, 0.8);
 $light-grey-transparent: rgba(200,200,200, 0);
 $light-grey-solid: rgba(200,200,200, 1);
 
-// Icons
+// ----------------------------
+// #TYPOGRAPHY
+// ----------------------------
+$font-light: 300 !default;
+$font-regular: 400 !default;
+$font-semibold: 600 !default;
+$font-bold: 700 !default;
+
+// ----------------------------
+// #ICONS
+// ----------------------------
 $lms-dark-icon-color: $white;
 $lms-dark-icon-background-color: palette(grayscale, black);
 
