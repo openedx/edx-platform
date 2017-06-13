@@ -605,7 +605,7 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
                     published_course_runs = filter(lambda run: run['status'] == 'published', course['course_runs'])
                     if len(published_course_runs) == 1:
                         for seat in published_course_runs[0]['seats']:
-                            if seat['type'] in applicable_seat_types:
+                            if seat['type'] in applicable_seat_types and seat['sku']:
                                 skus.append(seat['sku'])
                     else:
                         # If a course in the program has more than 1 published course run
@@ -625,6 +625,11 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
 
                 # Make an API call to calculate the discounted price
                 discount_data = api.baskets.calculate.get(sku=skus)
+
+                program_discounted_price = discount_data['total_incl_tax']
+                program_full_price = discount_data['total_incl_tax_excl_discounts']
+                discount_data['is_discounted'] = program_discounted_price < program_full_price
+                discount_data['discount_value'] = program_full_price - program_discounted_price
 
                 self.data.update({
                     'discount_data': discount_data,
