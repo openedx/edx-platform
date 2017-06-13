@@ -610,15 +610,19 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         },
 
         afterRender: function() {
-            var keys = Object.keys(this.model.attributes.group_access);
+            var keys = [];
             AbstractVisibilityEditor.prototype.afterRender.call(this);
             this.setLock(this.isModelLocked());
             this.hideCheckboxDivs();
-            if (keys.length === 1) { // should be only one partition key
-                if (this.model.attributes.group_access.hasOwnProperty(keys[0])) {
-                    this.$('.user-partition-select').val(this.model.attributes.group_access[keys[0]]).change();
+            if (this.model.attributes.group_access) {
+                keys = Object.keys(this.model.attributes.group_access);
+                if (keys.length === 1) { // should be only one partition key
+                    if (this.model.attributes.group_access.hasOwnProperty(keys[0])) {
+                        this.$('.user-partition-select').val(this.model.attributes.group_access[keys[0]]).change();
+                    }
                 }
             }
+
         },
 
         getSelectedEnrollmentTrackId: function() {

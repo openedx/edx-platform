@@ -30,7 +30,8 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
                         category: 'chapter',
                         display_name: 'Section',
                         children: []
-                    }
+                    },
+                    user_partitions: []
                 }, options, {child_info: {children: children}});
             };
 
@@ -50,7 +51,8 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
                         category: 'sequential',
                         display_name: 'Subsection',
                         children: []
-                    }
+                    },
+                    user_partitions: []
                 }, options, {child_info: {children: children}});
             };
 
@@ -76,7 +78,9 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
                         category: 'vertical',
                         display_name: 'Unit',
                         children: []
-                    }
+                    },
+                    user_partitions: [],
+                    group_access: {}
                 }, options, {child_info: {children: children}});
             };
 
@@ -91,7 +95,9 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
                     published: true,
                     visibility_state: 'unscheduled',
                     edited_on: 'Jul 02, 2014 at 20:56 UTC',
-                    edited_by: 'MockUser'
+                    edited_by: 'MockUser',
+                    user_partitions: [],
+                    group_access: {}
                 }, options);
             };
 
