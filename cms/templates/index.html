@@ -183,6 +183,30 @@ from openedx.core.djangolib.markup import HTML, Text
       </div>
       % endif
 
+      %if optimization_enabled:
+      <div class="optimization-form">
+        <h2 class="title title-3">${_("Organization and Library Settings")}</h2>
+        <form class="form" action="/home/" method="GET">
+          <fieldset class="form-group">
+            <div class="field">
+              <label class="field-label">${_("Show all courses in organization:")}
+                <input class="field-input input-text" type="text" name="org"
+                       placeholder="${_('For example, MITx')}"/>
+              </label>
+            </div>
+            <div class="field">
+              <label class="field-label">${_("Show content libraries")}
+                <input class="field-input input-text" type="checkbox" value="true" name="libraries"/>
+              </label>
+            </div>
+          </fieldset>
+          <div class="form-actions">
+              <button class="btn-brand btn-base" type="submit">${_("Submit")}</button>
+          </div>
+        </form>
+      </div>
+      %endif
+
       <!-- STATE: processing courses -->
       %if allow_course_reruns and rerun_creator_status and len(in_process_course_actions) > 0:
       <div class="courses courses-processing">
@@ -296,7 +320,7 @@ from openedx.core.djangolib.markup import HTML, Text
       </ul>
       % endif
 
-      %if len(courses) > 0:
+      %if len(courses) > 0 or optimization_enabled:
       <div class="courses courses-tab active">
         <ul class="list-courses">
           %for course_info in sorted(courses, key=lambda s: s['display_name'].lower() if s['display_name'] is not None else ''):
