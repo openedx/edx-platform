@@ -285,7 +285,7 @@ class DiscussionNavigationTest(BaseDiscussionTestCase):
 
     def test_breadcrumbs_clear_search(self):
         self.thread_page.q(css=".search-input").fill("search text")
-        self.thread_page.q(css=".search-btn").click()
+        self.thread_page.q(css=".search-button").click()
 
         # Verify that clicking the first breadcrumb clears your search
         self.thread_page.q(css=".breadcrumbs .nav-item")[0].click()
